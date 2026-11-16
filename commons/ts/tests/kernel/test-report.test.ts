@@ -165,12 +165,12 @@ proves(
 );
 
 proves([FR("003")], "the installation record: runtime, system, revision, digests and role; a person's address is refused as a role", () => {
-  const self = { runtime: "deno", runtimeVersion: "2.9.8", os: "linux", arch: "x86_64" };
+  const self = { runtime: "bun", runtimeVersion: "1.4.4", os: "linux", arch: "x86_64" };
   const sha = "a".repeat(64);
   const ci = installationFromEnv(self, { CI: "true", GITHUB_SHA: "abc123", IFC_TEST_LOCKFILE_SHA256: sha, IFC_TEST_PINS_SHA256: "nope" });
   assertEquals(ci.installation, {
-    runtime: "deno",
-    runtimeVersion: "2.9.8",
+    runtime: "bun",
+    runtimeVersion: "1.4.4",
     os: "linux",
     arch: "amd64",
     revision: "abc123",
@@ -244,7 +244,7 @@ proves(
     assertEquals(judge({ tests: [t("fail")], runners: ok0, required: [], reviews: [] }).failures, ["1 test failed"]);
     assertEquals(judge({ tests: [t("cancelled")], runners: ok0, required: [], reviews: [] }).failures, ["1 test was cancelled"]);
     assertEquals(
-      judge({ tests: [t("pass")], runners: [{ kind: "exited", runtime: "deno", code: 1 }], required: [], reviews: [] }).status,
+      judge({ tests: [t("pass")], runners: [{ kind: "exited", runtime: "bun", code: 1 }], required: [], reviews: [] }).status,
       "failure",
     );
     assertEquals(judge({ tests: [], runners: [{ kind: "missing", runtime: "bun" }], required: [], reviews: [] }).failures, [
@@ -284,7 +284,7 @@ proves(
   () => {
     const { run, text } = runOf([
       { runtime: "node", test: testCase(1, "pass") },
-      { runtime: "deno", test: testCase(2, "fail", { message: "boom" }) },
+      { runtime: "bun", test: testCase(2, "fail", { message: "boom" }) },
     ]);
     const doc: unknown = JSON.parse(text);
     assert(typeof doc === "object" && doc !== null && "resourceSpans" in doc && "resourceLogs" in doc);
@@ -294,13 +294,13 @@ proves(
     assertEquals(
       run.tests.map((t) => [t.runtime, t.outcome]),
       [
-        ["deno", "fail"],
+        ["bun", "fail"],
         ["node", "pass"],
       ],
     );
     assertEquals(
       run.installations.map((i) => i.runtime),
-      ["deno", "node"],
+      ["bun", "node"],
     );
     assertEquals(run.runner.role, "ci");
     assertEquals(run.status, "failure");
@@ -473,7 +473,7 @@ proves(
 const outcomeArb = fc.constantFrom<Outcome>("pass", "fail", "skip", "todo", "cancelled");
 const caseArb = fc.record(
   {
-    runtime: fc.constantFrom("node", "deno", "bun"),
+    runtime: fc.constantFrom("node", "bun"),
     file: fc.constantFrom("tests/a.test.ts", "tests/b#c.test.ts", "tests/d.test.ts"),
     name: fc.string({ minLength: 1, maxLength: 12 }),
     outcome: outcomeArb,

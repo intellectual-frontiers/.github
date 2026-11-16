@@ -504,7 +504,7 @@ proves([CONTEXT], "the clock is nanoseconds since the epoch and never goes back"
 const CHILD = `process.stdout.write(process.env.TRACEPARENT ?? "none"); process.exit(Number(process.argv[2] ?? 0));`;
 
 function runtimeArgv(script: string, ...args: string[]): string[] {
-  return proc.runtimeName() === "deno" ? [proc.execPath(), "run", "-A", script, ...args] : [proc.execPath(), script, ...args];
+  return [proc.execPath(), script, ...args];
 }
 
 function spansNamed(spans: readonly SpanData[], name: string): readonly SpanData[] {

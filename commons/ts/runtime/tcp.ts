@@ -1,12 +1,12 @@
 /**
- * TCP connections, plain and over TLS (commons 0005-typescript-runtime FR-055), on `node:net` and `node:tls`, by the names of
- * `Deno.listen`, `Deno.listenTls`, `Deno.connect` and `Deno.connectTls` so that a conversion is a rename. A {@link Listener} gives its
+ * TCP connections, plain and over TLS (commons 0005-typescript-runtime FR-055), on `node:net` and `node:tls`: `listen`,
+ * `listenTls`, `connect` and `connectTls`. A {@link Listener} gives its
  * address and its connections as an async iterable and closes by `close()`, an abort signal or `using`; a {@link Conn} gives its local and
- * remote addresses, a web `ReadableStream` and `WritableStream` (made here by hand over the socket, the same on Deno, Node and Bun),
+ * remote addresses, a web `ReadableStream` and `WritableStream` (made here by hand over the socket, the same on Bun and Node),
  * `closeWrite` and `close`. Failures are thrown as the runtime's errors (FR-019): `AddrInUse`, `ConnectionRefused`, `TimedOut`
  * (an `AbortSignal.timeout` that fired), and `InvalidData` for a server certificate that does not check out.
  *
- * Where it differs from Deno, on purpose: `listen` and `listenTls` return a promise (Node binds asynchronously and reports a taken port
+ * Some choices are deliberate: `listen` and `listenTls` return a promise (Node binds asynchronously and reports a taken port
  * then); a listener binds `127.0.0.1` unless asked, as `serve.ts` does, never every interface; `connectTls`'s `caCerts` replace the system's
  * roots instead of adding to them, so a test or a pinned service trusts exactly the roots it names; and a TLS connection is given once its
  * handshake is done.
@@ -101,7 +101,7 @@ export type Listener = {
 };
 
 /**
- * Every TCP socket, and each a TLS listener accepts, is half-open, as a `Deno.Conn` is: the end of what the peer sends ends the readable
+ * Every TCP socket, and each a TLS listener accepts, is half-open: the end of what the peer sends ends the readable
  * stream alone, and this side writes on until it closes its own (`closeWrite`, `close`). Node's default ends this side too as soon as the
  * peer's end is read, so an echo server whose peer half-closed could lose what it had still to send, by the order in which the peer's end
  * and its own writes happened. A TLS client keeps the TLS socket's own setting, which Node's types do not let one choose.
@@ -266,12 +266,12 @@ function makeListener(server: net.Server, event: "connection" | "secureConnectio
   });
 }
 
-/** Listen for TCP connections (`Deno.listen`); `AddrInUse` where the port is taken. */
+/** Listen for TCP connections; `AddrInUse` where the port is taken. */
 export function listen(options: ListenOptions = {}): Promise<Listener> {
   return makeListener(net.createServer({ pauseOnConnect: false, allowHalfOpen: HALF_OPEN }), "connection", options);
 }
 
-/** Listen for TLS connections with a certificate and key in PEM (`Deno.listenTls`); `AddrInUse` where the port is taken. */
+/** Listen for TLS connections with a certificate and key in PEM; `AddrInUse` where the port is taken. */
 export function listenTls(options: ListenTlsOptions): Promise<Listener> {
   return makeListener(tls.createServer({ cert: options.cert, key: options.key, allowHalfOpen: HALF_OPEN }), "secureConnection", options);
 }
@@ -314,7 +314,7 @@ function open(socket: net.Socket, ready: "connect" | "secureConnect", where: str
   });
 }
 
-/** Connect over TCP (`Deno.connect`); `ConnectionRefused` where nothing listens. */
+/** Connect over TCP; `ConnectionRefused` where nothing listens. */
 export function connect(options: ConnectOptions): Promise<Conn> {
   const host = options.hostname ?? "127.0.0.1";
   const where = `${host}:${options.port}`;
@@ -323,7 +323,7 @@ export function connect(options: ConnectOptions): Promise<Conn> {
 }
 
 /**
- * Connect over TLS (`Deno.connectTls`), checking the server's certificate against the system's roots or the `caCerts` given, and its
+ * Connect over TLS, checking the server's certificate against the system's roots or the `caCerts` given, and its
  * name against `serverName` or `hostname`; `InvalidData` where the certificate does not check out.
  */
 export function connectTls(options: ConnectTlsOptions): Promise<Conn> {

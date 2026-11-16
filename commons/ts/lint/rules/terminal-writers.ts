@@ -19,8 +19,6 @@ export const TERMINAL_WRITERS: readonly Writer[] = [
   { object: "process", property: "stdout" },
   { object: "process", property: "stderr" },
   { object: "console", property: "*" },
-  { object: "Deno", property: "stdout" },
-  { object: "Deno", property: "stderr" },
   { object: "Bun", property: "stdout" },
   { object: "Bun", property: "stderr" },
 ];

@@ -109,7 +109,7 @@ proves([FR], "dotted versions compare part by part, a missing part as 0", () => 
   assert(atLeast("v26.13.1", "26"));
   assertEquals(compareDotted("1.4.4", "1.4.4"), 0);
   assertEquals(dottedParts("1.2-rc3"), [1, 2, 0]);
-  assertEquals(versionIn("deno 2.9.8 (stable, release, x86_64-unknown-linux-gnu)"), "2.9.8");
+  assertEquals(versionIn("bun 1.4.4 (linux x64)"), "1.4.4");
   assertEquals(versionIn("no version"), undefined);
   fc.assert(
     fc.property(fc.array(fc.nat(), { minLength: 1, maxLength: 4 }), fc.array(fc.nat(), { minLength: 1, maxLength: 4 }), (a, b) => {

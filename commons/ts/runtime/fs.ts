@@ -1,12 +1,12 @@
 /**
- * Files and folders (commons 0005-typescript-runtime FR-020), on `node:fs` alone, so the same code runs on Deno, Node and Bun. The functions
- * the three codebases call on `Deno` keep their names and shapes (`readTextFile`, `writeTextFile`, `remove`, `mkdir`, `stat`, `readDir`,
- * `makeTempDir`, ...), so a conversion is a rename; every failure is thrown as an error of `./errors.ts` (`NotFound`, `AlreadyExists`, ...).
+ * Files and folders (commons 0005-typescript-runtime FR-020), on `node:fs` alone, so the same code runs on Bun and Node. The functions
+ * have short, plain names and shapes (`readTextFile`, `writeTextFile`, `remove`, `mkdir`, `stat`, `readDir`,
+ * `makeTempDir`, ...); every failure is thrown as an error of `./errors.ts` (`NotFound`, `AlreadyExists`, ...).
  * The helpers Stolos wrote over them (`exists`, `readTextOr`, `ensureDir`, `writeIfChanged`, `listDirs`, `listFiles`, `walkFiles`) and the
  * setup's `sha256File` are here too.
  *
- * `readDir` is an async iterable as `Deno.readDir` is, with `chown` and `symlinkSync` (FR-048); `open` and `openSync` give an `FsFile` as
- * `Deno.open` does, with no lock, which is `./lock.ts`'s (FR-049); `copy` and `walk` are `@std/fs`'s (FR-050), and `expandGlob` gives the
+ * `readDir` is an async iterable, with `chown` and `symlinkSync` (FR-048); `open` and `openSync` give an `FsFile`
+ * with no lock, which is `./lock.ts`'s (FR-049); `copy` and `walk` are `@std/fs`'s (FR-050), and `expandGlob` gives the
  * entries a glob of `../kernel/glob.ts` matches, in byte order (FR-058).
  *
  * @example
@@ -38,7 +38,7 @@ export type PathLike = string | URL;
 
 const p = (path: PathLike): string => (typeof path === "string" ? path : fileURLToPath(path));
 
-/** What `stat` knows of a file, by `Deno.FileInfo`'s names. A time the file system does not keep is `null`. */
+/** What `stat` knows of a file, by these names. A time the file system does not keep is `null`. */
 export type FileInfo = {
   readonly isFile: boolean;
   readonly isDirectory: boolean;
@@ -77,7 +77,7 @@ function info(s: nfs.Stats): FileInfo {
   };
 }
 
-/** One entry of a folder, by `Deno.DirEntry`'s names. */
+/** One entry of a folder, by these names. */
 export type DirEntry = { readonly name: string; readonly isFile: boolean; readonly isDirectory: boolean; readonly isSymlink: boolean };
 
 const entry = (d: nfs.Dirent): DirEntry => ({
@@ -165,7 +165,7 @@ export function writeFileSync(path: PathLike, data: Uint8Array, options: WriteFi
 /** How to remove: a folder and everything in it only with `recursive`. */
 export type RemoveOptions = { readonly recursive?: boolean };
 
-/** A file, a link or an empty folder removed; with `recursive`, a folder and everything in it. `NotFound` where nothing is there, as Deno throws it. */
+/** A file, a link or an empty folder removed; with `recursive`, a folder and everything in it. `NotFound` where nothing is there; the error is of `./errors.ts`. */
 export async function remove(path: PathLike, options: RemoveOptions = {}): Promise<void> {
   const file = p(path);
   await hostCall(file, async () => {
@@ -226,7 +226,7 @@ export function lstatSync(path: PathLike): FileInfo {
   return info(hostCallSync(p(path), () => nfs.lstatSync(p(path))));
 }
 
-/** The entries of a folder, in the order the file system gives them, as `Deno.readDir` does (FR-048); `NotFound` at the first step where it is not there. */
+/** The entries of a folder, in the order the file system gives them (FR-048); `NotFound` at the first step where it is not there. */
 export async function* readDir(path: PathLike): AsyncIterable<DirEntry> {
   const dir = p(path);
   const entries = await hostCall(dir, () => fsp.readdir(dir, { withFileTypes: true }));
@@ -467,7 +467,7 @@ export function symlinkSync(target: PathLike, path: PathLike, options: { readonl
 
 // FR-049: a file handle.
 
-/** How to open a file, by `Deno.OpenOptions`'s names: `read` alone where none is given. `append` writes at the end and implies `write`. */
+/** How to open a file, by these names: `read` alone where none is given. `append` writes at the end and implies `write`. */
 export type OpenOptions = {
   readonly read?: boolean;
   readonly write?: boolean;
@@ -478,7 +478,7 @@ export type OpenOptions = {
   readonly mode?: number;
 };
 
-/** Where `seek` counts from: the start of the file, the handle's position, or the end (`Deno.SeekMode`'s `Start`, `Current`, `End`). */
+/** Where `seek` counts from: the start of the file, the handle's position, or the end (`start`, `current`, `end`). */
 export type SeekWhence = "start" | "current" | "end";
 
 function openFlags(path: string, o: OpenOptions): number {
@@ -522,7 +522,7 @@ function cutIfAskedSync(fd: number, path: string, o: OpenOptions): void {
 const CHUNK = 64 * 1024;
 
 /**
- * An open file, as `Deno.FsFile` is: it reads and writes at its position (a handle opened with `append` always writes at the end), `seek`s,
+ * An open file: it reads and writes at its position (a handle opened with `append` always writes at the end), `seek`s,
  * `truncate`s, `stat`s and `sync`s, gives its bytes as a web `ReadableStream` and takes them as a `WritableStream` (each closes the file
  * when it ends), and is closed by `close`, `using` or `await using`. It has no lock: one run at a time is `./lock.ts` (FR-039, FR-049).
  * Made by {@link open} and {@link openSync}.
@@ -718,7 +718,7 @@ export class FsFile implements Disposable, AsyncDisposable {
 
 const modeArg = (o: OpenOptions): number => (o.mode === undefined ? 0o666 : o.mode);
 
-/** A file opened as `Deno.open` opens it: for reading where no options are given. `AlreadyExists` with `createNew`, `NotFound` without `create`. */
+/** A file opened for reading where no options are given. `AlreadyExists` with `createNew`, `NotFound` without `create`. */
 export async function open(path: PathLike, options: OpenOptions = { read: true }): Promise<FsFile> {
   const file = p(path);
   const flags = openFlags(file, options);

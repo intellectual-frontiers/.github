@@ -3,7 +3,7 @@
  * empty project depends on the repository's root package at one commit by a `git+file:` URL, Bun installs it, and then, on Bun and on
  * Node 26 (through the hook, `--import @intellectual-frontiers/commons/ts/node`), a small program imports the kernel, the runtime and the
  * test registration by the package's name and uses each, and the package's own `ifc test run` runs a small suite and writes its record;
- * on Deno, the same program runs through an import map of the entry points; and TypeScript 7 checks a consumer against the sources. Any
+ * and TypeScript 7 checks a consumer against the sources. Any
  * failure, or a runtime that is not on `PATH`, ends with status 1.
  *
  * `bun tools/smoke.ts [--repo DIR] [--commit SHA]`: by default the checkout this file is in, at its `HEAD`; the commit must be committed.
@@ -91,11 +91,6 @@ try {
   await writeTextFile(join(dir, "tests", "consumer.test.ts"), SUITE);
   await writeTextFile(join(dir, "consumer.ts"), CONSUMER);
   const pkg = join(dir, "node_modules", ...NAME.split("/"));
-  // Deno reads a file under node_modules as an npm package's, which it does not strip; the import map makes each a file of the project.
-  const imports = Object.fromEntries(
-    Object.entries(root.value.exports).map(([k, v]) => [`${NAME}${k.slice(1)}`, `./node_modules/${NAME}/${v.slice(2)}`]),
-  );
-  await writeTextFile(join(dir, "deno.json"), JSON.stringify({ imports, nodeModulesDir: "none" }));
   await writeTextFile(
     join(dir, "tsconfig.json"),
     JSON.stringify({
@@ -121,13 +116,12 @@ try {
   const ifc = join(pkg, ...(root.value.bin?.["ifc"] ?? "./commons/ts/node/ifc.mjs").slice(2).split("/"));
   const hook = `${NAME}/ts/node`;
   const runtimes: readonly {
-    readonly name: "bun" | "node" | "deno";
+    readonly name: "bun" | "node";
     readonly program: readonly string[];
     readonly ifc?: readonly string[];
   }[] = [
     { name: "bun", program: ["check.ts"], ifc: [ifc] },
     { name: "node", program: ["--import", hook, "check.ts"], ifc: [ifc] },
-    { name: "deno", program: ["run", "-A", "check.ts"] },
   ];
   for (const r of runtimes) {
     const exe = r.name === "bun" ? bun : which(r.name);

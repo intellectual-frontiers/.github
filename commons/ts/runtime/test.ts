@@ -1,6 +1,6 @@
 /**
- * Tests that run unchanged under `deno test`, `node --test` and `bun test` (commons 0005-typescript-runtime FR-013): registration on
- * `node:test`, assertions on `node:assert/strict`, with the names of `@std/assert` so a conversion is a rename. `proves` names the
+ * Tests that run unchanged under `bun test` and `node --test` (commons 0005-typescript-runtime FR-013): registration on
+ * `node:test`, assertions on `node:assert/strict`, with short plain names (`assert`, `assertEquals`, `assertStringIncludes`, ...). `proves` names the
  * requirements a test proves, as erga's kernel `test.ts` does, and keeps them for a report. Kept out of `./mod.ts`, so that importing the
  * runtime never loads a test runner.
  *
@@ -22,10 +22,10 @@
  * `only` runs a test alone among the tests of its file (FR-060). Each runner is given `node:test`'s `only`, and this module also skips
  * the other tests of the file itself, so that "the one marked only runs alone" holds on each runner, and each of the others is recorded
  * as `skip` with the reason `ONLY_REASON`:
- * - `node --test --test-only` and `deno test` run only the tests marked `only`, of themselves;
+ * - `node --test --test-only` runs only the tests marked `only`, of itself;
  * - `node --test` without `--test-only` (Node 26 then says "'only' and 'runOnly' require the --test-only command-line option") and
  *   `bun test` (Bun's `node:test` ignores `only`) run every test: the others then skip themselves, and a runner shows them as passed
- *   (Bun, Deno) or skipped (Node);
+ *   (Bun) or skipped (Node);
  * - `bun test --only` runs no test of `node:test` at all, `only` or not, as its `node:test` never marks one: give `bun test` no `--only`.
  * The others of the file are those registered before the first test marked `only` that have not started, and every one registered after
  * it; `bun test` loads every file in one process, so the mark is kept for each file, never for the process.
@@ -254,15 +254,6 @@ function hookExit(): void {
   if (exitHooked) return;
   exitHooked = true;
   process.on("exit", onExit);
-  // Deno does not emit the process's `exit` event under `deno test`; it dispatches the web's `unload` event on the global scope.
-  const g: unknown = globalThis;
-  if (typeof g === "object" && g !== null && "addEventListener" in g && typeof g.addEventListener === "function") {
-    try {
-      Reflect.apply(g.addEventListener, g, ["unload", onExit]);
-    } catch {
-      // No `unload` here; the run closes the test from its start mark.
-    }
-  }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------------- the test's file

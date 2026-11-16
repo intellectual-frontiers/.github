@@ -7,12 +7,12 @@
  */
 import type { About } from "./kernel/mod.ts";
 
-/** IFC TypeScript: a pure kernel and one host runtime, the same code on Deno, Node and Bun. */
+/** IFC TypeScript: a pure kernel and one host runtime, the same code on Bun and Node. */
 export const about: About = {
   title: "IFC TypeScript",
   summary:
     "The TypeScript part of Intellectual Frontiers Commons. It rests only on what belongs to no vendor (TypeScript 7, ECMAScript, the web " +
-    "standards and the `node:` modules that Deno, Node and Bun all implement), so the same code runs on each of the three, on Linux, macOS and " +
+    "standards and the `node:` modules that Bun and Node both implement), so the same code runs on Bun, the default runtime, and on Node 26, the backup, on Linux, macOS and " +
     "Windows. It is OpenTelemetry-native (commons 0006-signals), carries the primitives of GRC engineering (commons 0007-grc) and records each " +
     "test run as compliance evidence (commons 0008-test-evidence). A harness depends on this repository's root package, " +
     "`@intellectual-frontiers/commons`, by Git at a commit its lockfile holds, and imports the `.ts` sources (`@intellectual-frontiers/commons/ts/kernel`): " +
@@ -68,14 +68,13 @@ export const about: About = {
     },
     { run: "bun run test", does: "Runs the suite under Bun." },
     { run: "bun run test:node", does: "Runs the suite under Node 26." },
-    { run: "bun run test:deno", does: "Runs the suite under Deno, whose own checker is TypeScript 6, so tsc checks instead." },
     {
       run: "bun run test:evidence",
-      does: "Runs the suite on all three runtimes into one OTLP record, its TAP, JUnit, CTRF, SARIF, OSCAL and completion reports, and the ledger.",
+      does: "Runs the suite on Bun and Node into one OTLP record, its TAP, JUnit, CTRF, SARIF, OSCAL and completion reports, and the ledger.",
     },
     {
       run: "bun run smoke",
-      does: "Installs the checkout's HEAD as a Git dependency into an empty project, uses it and runs ifc test on Bun and Node 26, runs it on Deno, and checks a consumer with tsc 7.",
+      does: "Installs the checkout's HEAD as a Git dependency into an empty project, uses it and runs ifc test on Bun and Node 26, and checks a consumer with tsc 7.",
     },
     {
       run: "bun tools/ocsf-gen.ts --check",
@@ -91,7 +90,7 @@ export const about: About = {
       ],
     },
     {
-      rule: "No `Deno.*`, `Bun.*`, `jsr:`, `npm:`, `@std/` or URL import anywhere.",
+      rule: "No vendor global (`Bun.*` and the like), `jsr:`, `npm:`, `@std/` or URL import anywhere.",
       enforcedBy: [
         { kind: "test", file: "tests/boundaries.test.ts" },
         { kind: "lint", rule: "no-vendor-api" },

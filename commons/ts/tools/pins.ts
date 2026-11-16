@@ -5,7 +5,7 @@
  * @module
  */
 
-/** The target name of Bun's release asset and the suffix of commons' pin key for a platform (by `Deno.build`'s names); undefined where Bun has no build. */
+/** The target name of Bun's release asset and the suffix of commons' pin key for a platform (by the names `proc.build` gives); undefined where Bun has no build. */
 export function bunTarget(os: string, arch: string): { readonly target: string; readonly key: string } | undefined {
   const table: Readonly<Record<string, { readonly target: string; readonly key: string }>> = {
     "linux/x86_64": { target: "linux-x64", key: "X86_64" },

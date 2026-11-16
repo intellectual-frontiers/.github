@@ -57,7 +57,7 @@ function pem(label: string, der: ArrayBuffer): string {
 
 function cli(...words: string[]): readonly string[] {
   const tool = join(ROOT, "tools", "test.ts");
-  return RUNTIME === "deno" ? [execPath(), "run", "-A", tool, ...words] : [execPath(), tool, ...words];
+  return [execPath(), tool, ...words];
 }
 
 proves(

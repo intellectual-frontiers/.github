@@ -134,7 +134,7 @@ await telemetry.shutdown(1000);
 `;
 
 function runtimeArgv(script: string, ...args: string[]): string[] {
-  return proc.runtimeName() === "deno" ? [proc.execPath(), "run", "-A", script, ...args] : [proc.execPath(), script, ...args];
+  return [proc.execPath(), script, ...args];
 }
 
 proves([FR], "a program reads its input whole or by read, and writes by write, writeSync and writable to both streams", async () => {

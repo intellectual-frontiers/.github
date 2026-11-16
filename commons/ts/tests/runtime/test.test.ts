@@ -203,12 +203,7 @@ proves([EV("004")], "without IFC_TEST_RECORD, each test goes to the installed pi
     const vars = env.toObject();
     for (const k of ["IFC_TEST_RECORD", "NODE_TEST_CONTEXT", "TRACEPARENT"]) Reflect.deleteProperty(vars, k);
     const runtime = runtimeName();
-    const argv =
-      runtime === "node"
-        ? [execPath(), "--test", fixture]
-        : runtime === "deno"
-          ? [execPath(), "test", "-A", "--no-check", fixture]
-          : [execPath(), "test", fixture];
+    const argv = runtime === "node" ? [execPath(), "--test", fixture] : [execPath(), "test", fixture];
     const r = await run(argv, { cwd: dir, env: { ...vars, PIPE_OUT: out }, clearEnv: true });
     assertEquals(r.code, 0, r.stderr);
     assertEquals(
@@ -287,11 +282,7 @@ proves(
 /** This runtime's runner over one file, with extra flags (`--test-only` for Node). */
 function runner(file: string, extra: readonly string[] = []): string[] {
   const runtime = runtimeName();
-  return runtime === "node"
-    ? [execPath(), "--test", ...extra, file]
-    : runtime === "deno"
-      ? [execPath(), "test", "-A", "--no-check", ...extra, file]
-      : [execPath(), "test", ...extra, file];
+  return runtime === "node" ? [execPath(), "--test", ...extra, file] : [execPath(), "test", ...extra, file];
 }
 
 /** The environment of a child runner: this one's, without the variables of this run's own record and runner. */

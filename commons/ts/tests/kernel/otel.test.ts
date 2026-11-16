@@ -206,7 +206,7 @@ proves([CONFIG], "the configuration comes from the OTEL_ variables, with their d
     OTEL_SPAN_EVENT_COUNT_LIMIT: "4",
     OTEL_SPAN_LINK_COUNT_LIMIT: "2",
     OTEL_LOG_LEVEL: "DEBUG",
-    OTEL_DENO: "true",
+    OTEL_BUN: "true",
   });
   assertEquals(full.warnings, []);
   const c = full.config;

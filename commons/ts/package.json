@@ -20,9 +20,8 @@
     "check": "tsc -p tsconfig.json && tsc -p tsconfig.kernel.json && tsc -p tsconfig.root-tests.json",
     "test": "bun test tests/",
     "test:node": "node --test \"tests/**/*.test.ts\"",
-    "test:deno": "deno test -A --no-check tests/",
     "smoke": "bun tools/smoke.ts",
-    "test:evidence": "bun tools/test.ts run --runtime node,deno,bun --out test-results --report tap,junit,ctrf,sarif,md,html,oscal --requirements ../spec-kit/enforcement.tsv --spec 0005-typescript-runtime --ledger test-results/ledger.jsonl tests",
+    "test:evidence": "bun tools/test.ts run --runtime bun,node --out test-results --report tap,junit,ctrf,sarif,md,html,oscal --requirements ../spec-kit/enforcement.tsv --spec 0005-typescript-runtime --ledger test-results/ledger.jsonl tests",
     "test:verify": "bun tools/test.ts verify --record"
   },
   "devDependencies": {

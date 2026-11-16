@@ -1,7 +1,7 @@
 /**
- * An HTTP server whose handler takes a web `Request` and gives a web `Response`, as `Deno.serve` does, on `node:http`, so the same handler
- * runs on Deno, Node and Bun (commons 0005-typescript-runtime FR-025). Request bodies and response bodies stream; a client that goes away
- * aborts `request.signal`. Unlike `Deno.serve`, `serve` returns a promise, settled once the port is bound, so `addr` is known.
+ * An HTTP server whose handler takes a web `Request` and gives a web `Response` on `node:http`, so the same handler
+ * runs on Bun and Node (commons 0005-typescript-runtime FR-025). Request bodies and response bodies stream; a client that goes away
+ * aborts `request.signal`. `serve` returns a promise, settled once the port is bound, so `addr` is known.
  *
  * @example
  * ```ts

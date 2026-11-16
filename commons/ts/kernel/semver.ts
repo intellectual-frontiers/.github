@@ -145,7 +145,7 @@ export function atLeast(have: string, want: string): boolean {
   return compareDotted(have, want) >= 0;
 }
 
-/** The first dotted version in a program's output (`deno 2.9.8 (stable, ...)` gives `2.9.8`), or undefined. */
+/** The first dotted version in a program's output (`bun 1.4.4 (...)` gives `1.4.4`), or undefined. */
 export function versionIn(text: string): string | undefined {
   return /\d+(?:\.\d+)+/.exec(text)?.[0];
 }

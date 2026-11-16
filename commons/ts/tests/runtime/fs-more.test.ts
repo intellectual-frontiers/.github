@@ -122,30 +122,26 @@ proves(
   },
 );
 
-proves(
-  [R49],
-  "open refuses as Deno's open does: createNew where it exists, a missing file without create, no access asked for",
-  async () => {
-    await fs.withTempDir(async (dir) => {
-      const path = join(dir, "f.txt");
-      await fs.writeTextFile(path, "abc");
-      await assertRejects(() => fs.open(path, { write: true, createNew: true }), errors.AlreadyExists);
-      await assertRejects(() => fs.open(join(dir, "none")), errors.NotFound);
-      assertThrows(() => fs.openSync(join(dir, "none")), errors.NotFound);
-      await assertRejects(() => fs.open(path, {}), errors.InvalidData);
-      await assertRejects(() => fs.open(path, { read: true, create: true }), errors.InvalidData);
-      await assertRejects(() => fs.open(path, { append: true, truncate: true }), errors.InvalidData);
-      const t = await fs.open(path, { write: true, truncate: true });
-      t.close();
-      assertEquals(await fs.readTextFile(path), "");
-      const n = fs.openSync(join(dir, "new.txt"), { write: true, createNew: true, mode: 0o600 });
-      n.writeSync(enc.encode("n"));
-      n.close();
-      assertEquals(await fs.readTextFile(join(dir, "new.txt")), "n");
-      if (posix) assertEquals(((await fs.stat(join(dir, "new.txt"))).mode ?? 0) & 0o777, 0o600);
-    });
-  },
-);
+proves([R49], "open refuses: createNew where it exists, a missing file without create, no access asked for", async () => {
+  await fs.withTempDir(async (dir) => {
+    const path = join(dir, "f.txt");
+    await fs.writeTextFile(path, "abc");
+    await assertRejects(() => fs.open(path, { write: true, createNew: true }), errors.AlreadyExists);
+    await assertRejects(() => fs.open(join(dir, "none")), errors.NotFound);
+    assertThrows(() => fs.openSync(join(dir, "none")), errors.NotFound);
+    await assertRejects(() => fs.open(path, {}), errors.InvalidData);
+    await assertRejects(() => fs.open(path, { read: true, create: true }), errors.InvalidData);
+    await assertRejects(() => fs.open(path, { append: true, truncate: true }), errors.InvalidData);
+    const t = await fs.open(path, { write: true, truncate: true });
+    t.close();
+    assertEquals(await fs.readTextFile(path), "");
+    const n = fs.openSync(join(dir, "new.txt"), { write: true, createNew: true, mode: 0o600 });
+    n.writeSync(enc.encode("n"));
+    n.close();
+    assertEquals(await fs.readTextFile(join(dir, "new.txt")), "n");
+    if (posix) assertEquals(((await fs.stat(join(dir, "new.txt"))).mode ?? 0) & 0o777, 0o600);
+  });
+});
 
 proves([R49], "a file opened with append and written from two handles keeps both writes, each at the end", async () => {
   await fs.withTempDir(async (dir) => {

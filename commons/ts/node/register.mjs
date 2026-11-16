@@ -3,7 +3,7 @@
  * the types of a `.ts` file by itself, except under `node_modules`, where it refuses with `ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING`.
  * Commons is installed as a Git dependency whose entry points are its `.ts` sources, so this module registers a synchronous load hook
  * (`module.registerHooks`) that strips the types of such a file with Node's own `stripTypeScriptTypes` and hands the rest on unchanged.
- * It is JavaScript because it must load before any TypeScript can, and it does nothing on Bun or Deno, which run TypeScript anywhere.
+ * It is JavaScript because it must load before any TypeScript can, and it does nothing on Bun, which runs TypeScript anywhere.
  *
  * ```sh
  * node --import @intellectual-frontiers/commons/ts/node app.ts
@@ -29,8 +29,8 @@ export function strippable(url) {
   return /\.[cm]?ts$/.test(pathname) && pathname.split("/").includes("node_modules");
 }
 
-/** The runtime is Node: Bun and Deno also give `node:module`, and need no hook. */
-const onNode = typeof process === "object" && process.versions.bun === undefined && process.versions.deno === undefined;
+/** The runtime is Node: Bun also gives `node:module`, and needs no hook. */
+const onNode = typeof process === "object" && process.versions.bun === undefined;
 
 /**
  * A call made with Node's one warning about it held back: `stripTypeScriptTypes` says once that it is experimental, which is Node's own

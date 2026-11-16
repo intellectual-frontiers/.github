@@ -65,7 +65,7 @@ else await telemetry.shutdown(1000);
 async function child(dir: string, mode: string, extra: Readonly<Record<string, string>> = {}): Promise<proc.TextOutput> {
   const script = join(dir, "child.ts");
   await writeTextFile(script, SCRIPT);
-  const argv = proc.runtimeName() === "deno" ? [proc.execPath(), "run", "-A", script, mode] : [proc.execPath(), script, mode];
+  const argv = [proc.execPath(), script, mode];
   return await proc.run(argv, { env: { LANG: "C.UTF-8", LC_ALL: "C.UTF-8", IFC_CONSOLE: "", NO_COLOR: "", FORCE_COLOR: "", ...extra } });
 }
 

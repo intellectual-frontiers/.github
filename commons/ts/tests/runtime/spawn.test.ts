@@ -1,7 +1,7 @@
 /**
  * Tests of `proc.spawn` (commons 0005-typescript-runtime FR-052) and of `ppid`, `build.target`, `unrefTimer` and `selfCommand` (FR-053):
  * a program fed a web stream and read as one, its status and signal, `kill`, the abort signal and `await using` with SIGTERM then
- * SIGKILL, `NotFound` at once, `unref` that lets this process end, the `process` span and `TRACEPARENT`; the target triples Deno names, a
+ * SIGKILL, `NotFound` at once, `unref` that lets this process end, the `process` span and `TRACEPARENT`; the target triples, a
  * timer that never keeps a process alive, and the argument vector that runs a program again, on each runtime and from a compiled binary.
  * The running runtime itself runs small scripts, so the tests need no other program (`gzip` is used where there is one).
  *
@@ -45,7 +45,7 @@ import process from "node:process";
 import * as proc from "${url("../../runtime/proc.ts")}";
 const [mode, child] = process.argv.slice(2);
 if (mode === "unref") {
-  const argv = proc.runtimeName() === "deno" ? [proc.execPath(), "run", "-A", child, "sleep"] : [proc.execPath(), child, "sleep"];
+  const argv = [proc.execPath(), child, "sleep"];
   const c = proc.spawn(argv, { stdin: "null", stdout: "piped", stderr: "null" });
   c.unref();
   process.stdout.write(String(c.pid));
@@ -66,7 +66,7 @@ if (mode === "again") process.stdout.write(JSON.stringify({ args: process.argv.s
 
 /** The argument vector that runs a script with the runtime running this test. */
 function runtimeArgv(script: string, ...args: string[]): string[] {
-  return proc.runtimeName() === "deno" ? [proc.execPath(), "run", "-A", script, ...args] : [proc.execPath(), script, ...args];
+  return [proc.execPath(), script, ...args];
 }
 
 /** A stream of the bytes given, in chunks of `size`. */
@@ -124,20 +124,13 @@ proves(
   GZIP === undefined ? { skip: "no gzip on PATH; the next test shows the same with the runtime copying its input" } : {},
 );
 
-/**
- * Deno on Windows: a Deno child copying a megabyte back while it is still being fed never finished in CI (the job hung there), where the
- * same test passes on Node and Bun on Windows and on every runtime elsewhere. There the child takes the whole of its input before it
- * answers, so each pipe still carries a megabyte with backpressure, one after the other rather than both at once.
- */
-const ONE_WAY_AT_A_TIME = proc.runtimeName() === "deno" && proc.build.os === "windows";
-
 proves(
   [SPAWN],
   "a program fed a megabyte through its stdin stream gives it back through its stdout stream, with backpressure",
   async () => {
     await withScripts(async (script) => {
       const bytes = new Uint8Array(1 << 20).map((_, i) => (i * 31) % 251);
-      const mode = ONE_WAY_AT_A_TIME ? "sponge" : "cat";
+      const mode = "cat";
       await using child = proc.spawn(runtimeArgv(script, mode), { stdin: "piped", stdout: "piped", stderr: "null" });
       assert(child.pid > 0);
       assertEquals(child.stderr, null, "a stream not piped is null");
@@ -222,7 +215,7 @@ proves([SPAWN], "await using stops a program that still runs when the block ends
   });
 });
 
-proves([SPAWN], "a program that does not exist is NotFound at once, as Deno throws; an empty argument vector is refused", () => {
+proves([SPAWN], "a program that does not exist is NotFound at once; an empty argument vector is refused", () => {
   const e = assertThrows(() => proc.spawn(["no-such-program-ifc-ts"]), errors.NotFound);
   assertEquals(e.code, "ENOENT");
   assertThrows(() => proc.spawn(["./no/such/program"]), errors.NotFound);
@@ -267,7 +260,7 @@ proves([SPAWN], "where a pipeline is installed, a spawned program is a process s
   }
 });
 
-proves([SPAWN], "the handle's types are Deno's shapes", () => {
+proves([SPAWN], "the handle's types", () => {
   expectType<Equal<proc.Child["stdin"], WritableStream<Uint8Array> | null>>();
   expectType<Equal<proc.Child["stdout"], ReadableStream<Uint8Array> | null>>();
   expectType<Equal<Awaited<proc.Child["status"]>, proc.Status>>();
@@ -282,7 +275,7 @@ proves([SPAWN], "the handle's types are Deno's shapes", () => {
 // FR-053
 // ---------------------------------------------------------------------------------------------------------------------------------
 
-proves([PROC], "build.target is the triple Deno names, and ppid is the parent's id", () => {
+proves([PROC], "build.target is the target triple, and ppid is the parent's id", () => {
   assertEquals(proc.tripleOf("linux", "x86_64"), "x86_64-unknown-linux-gnu");
   assertEquals(proc.tripleOf("linux", "aarch64"), "aarch64-unknown-linux-gnu");
   assertEquals(proc.tripleOf("darwin", "aarch64"), "aarch64-apple-darwin");
@@ -331,14 +324,12 @@ const facts = (over: Partial<proc.SelfFacts>): proc.SelfFacts => ({
   ...over,
 });
 
-proves([PROC], "selfCommand on Bun, Node and Deno, and from a binary that Bun, Deno or Node compiled: the binary alone", () => {
+proves([PROC], "selfCommand on Bun and Node, and from a binary that Bun or Node compiled: the binary alone", () => {
   assertEquals(proc.selfCommandOf(facts({}), ["a"]), ["/home/u/.bun/bin/bun", "/w/main.ts", "a"]);
   assertEquals(proc.selfCommandOf(facts({ execArgv: ["--smol"] }), []), ["/home/u/.bun/bin/bun", "--smol", "/w/main.ts"]);
   const node = facts({ runtime: "node", execPath: "/usr/bin/node", argv: ["/usr/bin/node", "/w/m.ts"], execArgv: ["--no-warnings"] });
   assertEquals(proc.selfCommandOf(node, ["x"]), ["/usr/bin/node", "--no-warnings", "/w/m.ts", "x"]);
   assertEquals(proc.selfCommandOf({ ...node, execPath: "/opt/node26/bin/node26" }, []).length, 3, "a versioned node is a runtime");
-  const deno = facts({ runtime: "deno", execPath: "C:\\deno\\deno.exe", argv: ["C:\\deno\\deno.exe", "C:\\w\\m.ts"] });
-  assertEquals(proc.selfCommandOf(deno, ["x"]), ["C:\\deno\\deno.exe", "run", "-A", "C:\\w\\m.ts", "x"]);
   // A binary Bun compiled: Bun's argv[0] is "bun", the script is in its embedded file system.
   const bunBinary = facts({ execPath: "/usr/local/bin/tool", argv: ["bun", "/$bunfs/root/tool", "x"] });
   assert(proc.isCompiled(bunBinary));
@@ -346,11 +337,9 @@ proves([PROC], "selfCommand on Bun, Node and Deno, and from a binary that Bun, D
   const bunWindows = facts({ execPath: "C:\\tools\\bun.exe", argv: ["bun", "B:\\~BUN\\root\\bun.exe"] });
   assert(proc.isCompiled(bunWindows), "Bun's mark is enough, even for a binary named bun");
   assertEquals(proc.selfCommandOf(bunWindows, []), ["C:\\tools\\bun.exe"]);
-  const denoBinary = facts({ runtime: "deno", execPath: "/opt/tool", argv: ["/opt/tool", "/opt/tool"] });
-  assertEquals(proc.selfCommandOf(denoBinary, ["z"]), ["/opt/tool", "z"]);
   const sea = facts({ runtime: "node", execPath: "C:\\tool.exe", argv: ["C:\\tool.exe", "C:\\tool.exe"] });
   assertEquals(proc.selfCommandOf(sea, []), ["C:\\tool.exe"]);
-  assert(!proc.isCompiled(facts({})) && !proc.isCompiled(deno) && !proc.isCompiled(node));
+  assert(!proc.isCompiled(facts({})) && !proc.isCompiled(node));
   assertEquals(
     proc.selfCommandOf(facts({ argv: ["/home/u/.bun/bin/bun"] }), ["e"]),
     ["/home/u/.bun/bin/bun", "e"],

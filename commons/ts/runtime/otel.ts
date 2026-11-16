@@ -125,7 +125,7 @@ export function environmentParent(env: Readonly<Record<string, string | undefine
 
 function runtimeName(): string {
   const v: Readonly<Record<string, string | undefined>> = process.versions;
-  return v["deno"] !== undefined ? "deno" : v["bun"] !== undefined ? "bun" : "node";
+  return v["bun"] !== undefined ? "bun" : "node";
 }
 
 const OS_TYPES: Readonly<Record<string, string>> = { win32: "windows", sunos: "solaris" };

@@ -1,6 +1,6 @@
 /**
- * Files and folders watched (commons 0005-typescript-runtime FR-051), on `node:fs`'s `watch` alone, so the same code runs on Deno, Node and
- * Bun, on Linux, macOS and Windows. `watchFs` takes the place of `Deno.watchFs`: an async iterable of events (`create`, `modify`, `remove`,
+ * Files and folders watched (commons 0005-typescript-runtime FR-051), on `node:fs`'s `watch` alone, so the same code runs on Bun and
+ * Node, on Linux, macOS and Windows. `watchFs` gives an async iterable of events (`create`, `modify`, `remove`,
  * `rename` with both paths), stopped by `close`, an `AbortSignal`, `using` or leaving the loop.
  *
  * What the platforms report differs (which of `rename` and `change`, how many, a name or none), so the raw reports only say where to look:
@@ -325,7 +325,7 @@ export class FsWatcher implements AsyncIterableIterator<FsEvent>, Disposable, As
 }
 
 /**
- * Files and folders watched, as `Deno.watchFs` watches them (see the module's documentation): each path a file, or a folder whose entries
+ * Files and folders watched, (see the module's documentation): each path a file, or a folder whose entries
  * (with `recursive`, everything under it) are watched. `NotFound` where a path is not there.
  */
 export function watchFs(paths: string | URL | readonly (string | URL)[], options: WatchOptions = {}): FsWatcher {

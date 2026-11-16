@@ -1,5 +1,5 @@
 /**
- * Tests of `runtime/fs.ts` and `runtime/errors.ts`: the Deno-named calls on a real temporary folder, each failure thrown as its typed error,
+ * Tests of `runtime/fs.ts` and `runtime/errors.ts`: the calls on a real temporary folder, each failure thrown as its typed error,
  * and Stolos's helpers over them.
  *
  * @module
@@ -32,7 +32,7 @@ proves([ERR], "a Node error code becomes its class, keeping the code, the path a
   assertEquals(mapError(mapped), mapped);
 });
 
-proves([FR, ERR], "text and bytes written, appended and read; createNew and create:false refuse as Deno does", async () => {
+proves([FR, ERR], "text and bytes written, appended and read; createNew and create:false refuse", async () => {
   await fs.withTempDir(async (dir) => {
     const f = join(dir, "a.txt");
     await fs.writeTextFile(f, "héllo");

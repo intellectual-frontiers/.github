@@ -1,8 +1,8 @@
 /**
  * The process and the programs it runs (commons 0005-typescript-runtime FR-022, FR-052, FR-053), on `node:process`, `node:child_process`
- * and `node:os`. The names follow the `Deno` calls in use (`env.get`, `args`, `exit`, `cwd`, `build.os`, `build.target`, `ppid`,
- * `Command(...).output()`, `Command(...).spawn()`, `unrefTimer`) so a conversion is a rename; `selfCommand` replaces `Deno.execPath()` with
- * `Deno.mainModule` for a program that runs itself again, from a script or from a compiled binary. A program is always run by its argument
+ * and `node:os`, the same on Bun and on Node 26. The names are short and plain (`env.get`, `args`, `exit`, `cwd`, `build.os`, `build.target`,
+ * `ppid`, `output`, `spawn`, `unrefTimer`); `selfCommand` gives the argument vector for a program that runs itself again, from a script or
+ * from a compiled binary. A program is always run by its argument
  * vector, never through a shell; one that cannot be found throws `NotFound`, and a non-zero exit is an outcome, not an error. Taken
  * from erga's `lib/ts/process`, Stolos's `src/archon/core/exec.ts` and the setup's `proc.ts`.
  *
@@ -27,7 +27,7 @@ import { absurd } from "../kernel/absurd.ts";
 import { InvalidData, mapError, NotFound, toError } from "./errors.ts";
 import { traceProcess } from "./otel.ts";
 
-/** The process's environment, by `Deno.env`'s names. */
+/** The process's environment. */
 export const env = {
   /** A variable's value, or undefined where it is not set. */
   get(key: string): string | undefined {
@@ -78,12 +78,12 @@ export function chdir(path: string): void {
 /** The process's id. */
 export const pid: number = process.pid;
 
-/** The id of the process's parent (`Deno.ppid`, FR-053); a function, as the parent changes where the first one ends. */
+/** The id of the process's parent (FR-053); a function, as the parent changes where the first one ends. */
 export function ppid(): number {
   return process.ppid;
 }
 
-/** The path of the runtime's executable (deno, node or bun). */
+/** The path of the runtime's executable (bun or node). */
 export function execPath(): string {
   return process.execPath;
 }
@@ -108,9 +108,9 @@ export function isRoot(): boolean {
   return uid() === 0;
 }
 
-/** An operating system, by `Deno.build.os`'s names. */
+/** An operating system, by the names `build.os` gives. */
 export type Os = "linux" | "darwin" | "windows" | "freebsd" | "netbsd" | "openbsd" | "solaris" | "aix" | "android" | "other";
-/** A processor, by `Deno.build.arch`'s names. */
+/** A processor, by the names `build.arch` gives. */
 export type Arch = "x86_64" | "aarch64" | "arm" | "riscv64" | "s390x" | "ppc64" | "other";
 
 /** The operating system's name for `node:process`'s `platform`. */
@@ -151,7 +151,7 @@ export function archOf(arch: string): Arch {
 }
 
 /**
- * The target triple Deno names for an operating system and a processor (FR-053): `x86_64-unknown-linux-gnu`, `aarch64-apple-darwin`,
+ * The target triple (as Rust and Bun name it) for an operating system and a processor (FR-053): `x86_64-unknown-linux-gnu`, `aarch64-apple-darwin`,
  * `x86_64-pc-windows-msvc`, `aarch64-linux-android`, and `<arch>-unknown-<os>` for the rest.
  */
 export function tripleOf(os: Os, arch: Arch): string {
@@ -176,7 +176,7 @@ export function tripleOf(os: Os, arch: Arch): string {
   }
 }
 
-/** The platform this process runs on, by `Deno.build`'s names, with the target triple (FR-053). */
+/** The platform this process runs on, with the target triple (FR-053). */
 export const build: { readonly os: Os; readonly arch: Arch; readonly target: string } = Object.freeze({
   os: osOf(process.platform),
   arch: archOf(process.arch),
@@ -184,12 +184,11 @@ export const build: { readonly os: Os; readonly arch: Arch; readonly target: str
 });
 
 /** Which runtime runs this code. */
-export type RuntimeName = "deno" | "bun" | "node";
+export type RuntimeName = "bun" | "node";
 
-/** Which runtime runs this code, from `process.versions`, which each of them fills. */
+/** Which runtime runs this code, from `process.versions`, which each of them fills: Bun, the default, or Node 26, the backup. */
 export function runtimeName(): RuntimeName {
   const v: Readonly<Record<string, string | undefined>> = process.versions;
-  if (v["deno"] !== undefined) return "deno";
   if (v["bun"] !== undefined) return "bun";
   return "node";
 }
@@ -251,7 +250,7 @@ export type RunOptions = {
   readonly killAfterMs?: number;
 };
 
-/** How a program ended (`Deno.CommandStatus`). */
+/** How a program ended. */
 export type Status = {
   /** Its exit status; 128 plus the signal's number where a signal ended it, as a shell reports it. */
   readonly code: number;
@@ -261,7 +260,7 @@ export type Status = {
   readonly signal: string | null;
 };
 
-/** What a program did, with its output as bytes (`Deno.CommandOutput`). */
+/** What a program did, with its output as bytes. */
 export type Output = {
   /** Its exit status; 128 plus the signal's number where a signal ended it, as a shell reports it. */
   readonly code: number;
@@ -423,7 +422,7 @@ export async function firstLine(argv: readonly string[], options: RunOptions = {
 /** A signal a program can be sent. */
 export type KillSignal = Signal | "SIGKILL" | "SIGABRT" | "SIGALRM" | "SIGSTOP" | "SIGCONT" | "SIGPIPE";
 
-/** How to start a program that runs beside this one; as `Deno.Command`, each stream is this process's own (`inherit`) unless asked. */
+/** How to start a program that runs beside this one; each stream is this process's own (`inherit`) unless asked. */
 export type SpawnOptions = {
   /** Its working folder. */
   readonly cwd?: string;
@@ -443,7 +442,7 @@ export type SpawnOptions = {
   readonly killAfterMs?: number;
 };
 
-/** A program while it runs (`Deno.ChildProcess`). `await using` stops it (SIGTERM, then SIGKILL) where it still runs, and waits for it. */
+/** A program while it runs `await using` stops it (SIGTERM, then SIGKILL) where it still runs, and waits for it. */
 export type Child = AsyncDisposable & {
   /** Its process id. */
   readonly pid: number;
@@ -500,8 +499,7 @@ async function readAll(stream: ReadableStream<Uint8Array> | null): Promise<Uint8
 }
 
 /**
- * Starts a program by its argument vector, never through a shell, and gives its handle while it runs (`new Deno.Command(...).spawn()`,
- * FR-052). A program that cannot be found throws `NotFound` at once, as Deno does: a path that is not an executable file, or a name not
+ * Starts a program by its argument vector, never through a shell, and gives its handle while it runs (FR-052). A program that cannot be found throws `NotFound` at once: a path that is not an executable file, or a name not
  * on the `PATH` of the environment it is given. Where a telemetry pipeline is installed, the run is a `process` span that ends when the
  * program does, and the program is given its `TRACEPARENT` (0006-signals FR-018), as for `output`.
  *
@@ -660,9 +658,9 @@ export type Timer = Disposable & {
 };
 
 /**
- * Calls `callback` after `ms` milliseconds, with a timer that never keeps the process alive (`Deno.unrefTimer`, FR-053): where nothing
+ * Calls `callback` after `ms` milliseconds, with a timer that never keeps the process alive (FR-053): where nothing
  * else is left to do, the process ends without waiting for it. It is made on `node:timers`, whose timers can be unreferenced on each
- * runtime (a global `setTimeout` gives a number on Deno, which only `Deno.unrefTimer` could unreference).
+ * runtime.
  */
 export function unrefTimer(callback: () => void, ms: number): Timer {
   const t = nodeSetTimeout(callback, ms);
@@ -684,15 +682,15 @@ export function selfFacts(): SelfFacts {
   return { runtime: runtimeName(), execPath: process.execPath, argv: [...process.argv], execArgv: [...process.execArgv] };
 }
 
-/** The names a runtime's own executable starts with (`bun`, `bun-debug`, `node`, `nodejs`, `node26`, `deno`, `deno.exe`, ...). */
-const RUNTIME_EXECUTABLE = /^(?:bun|node|deno)(?:[-._\d]|js|$)/i;
+/** The names a runtime's own executable starts with (`bun`, `bun-debug`, `node`, `nodejs`, `node26`, `node.exe`, ...). */
+const RUNTIME_EXECUTABLE = /^(?:bun|node)(?:[-._\d]|js|$)/i;
 
 /**
  * Whether the running program is a binary that holds its own code (FR-053), so that running it again needs no script. Either is enough:
  * - Bun's own mark of a binary it compiled: the script's path, `process.argv[1]`, is in Bun's embedded file system (`/$bunfs/...`, or
  *   `B:\~BUN\...` on Windows), where it keeps the code it compiled in;
- * - the executable, `process.execPath`, is not named as a runtime is (`bun`, `node`, `deno`, with any version or `.exe`): the binaries
- *   that `bun build --compile`, `deno compile` and Node's single executable applications make are named after the program.
+ * - the executable, `process.execPath`, is not named as a runtime is (`bun`, `node`, with any version or `.exe`): the binaries
+ *   that `bun build --compile` and Node's single executable applications make are named after the program.
  */
 export function isCompiled(facts: SelfFacts): boolean {
   const script = facts.argv[1] ?? "";
@@ -701,17 +699,14 @@ export function isCompiled(facts: SelfFacts): boolean {
 }
 
 /**
- * The argument vector that runs the program again with `args` (FR-053; `Deno.execPath()` with `Deno.mainModule`): from a compiled binary,
- * the binary alone; on Bun and Node, the runtime with its own options (`process.execArgv`) and the script; on Deno, `deno run -A` and the
- * script, as the permissions the program was given cannot be read. With no script (code given on the command line), the runtime alone.
+ * The argument vector that runs the program again with `args` (FR-053): from a compiled binary,
+ * the binary alone; on Bun and Node, the runtime with its own options (`process.execArgv`) and the script. With no script (code given on the command line), the runtime alone.
  */
 export function selfCommandOf(facts: SelfFacts, args: readonly string[] = []): readonly string[] {
   if (isCompiled(facts)) return [facts.execPath, ...args];
   const script = facts.argv[1];
   const scriptArgs = script === undefined ? [] : [script];
   switch (facts.runtime) {
-    case "deno":
-      return [facts.execPath, "run", "-A", ...scriptArgs, ...args];
     case "bun":
     case "node":
       return [facts.execPath, ...facts.execArgv, ...scriptArgs, ...args];
@@ -720,7 +715,7 @@ export function selfCommandOf(facts: SelfFacts, args: readonly string[] = []): r
   }
 }
 
-/** The argument vector that runs this program again with `args`, on Bun, Node and Deno and from a binary Bun compiled (FR-053). */
+/** The argument vector that runs this program again with `args`, on Bun and Node and from a binary Bun compiled (FR-053). */
 export function selfCommand(args: readonly string[] = []): readonly string[] {
   return selfCommandOf(selfFacts(), args);
 }

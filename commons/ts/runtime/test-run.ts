@@ -1,6 +1,6 @@
 /**
  * A test run as evidence (commons 0008-test-evidence FR-005 to FR-007, FR-011, FR-012): `runTests` starts one trace with a `test run`
- * span, runs `node --test`, `deno test -A --no-check` or `bun test` (one or several in turn) with `TRACEPARENT` and `IFC_TEST_RECORD` set,
+ * span, runs `bun test` or `node --test` (one or both in turn) with `TRACEPARENT` and `IFC_TEST_RECORD` set,
  * passes each runner's own output on, gathers every process's records into one OTLP JSON file (`<out>/<trace id>.otlp.json`) with the
  * run's span, applies the exit rule, renders the reports asked for from the record as written, appends the record's digest to an
  * evidence ledger and, where a key is given, signs an in-toto Test Result statement of it in a DSSE envelope whose signature is entered
@@ -54,10 +54,10 @@ import { basename, dirname, join, resolve } from "./path.ts";
 import { build, env, execPath, output, runtimeName, runtimeVersion, which } from "./proc.ts";
 
 /** A runtime whose runner a run uses. */
-export type Runtime = "node" | "deno" | "bun";
+export type Runtime = "bun" | "node";
 
 /** Every runtime. */
-export const RUNTIMES: readonly Runtime[] = ["node", "deno", "bun"];
+export const RUNTIMES: readonly Runtime[] = ["bun", "node"];
 
 /** A report a run renders from its record (FR-008, FR-009). */
 export type ReportFormat = "tap" | "junit" | "ctrf" | "sarif" | "md" | "html" | "oscal";
@@ -191,8 +191,6 @@ function runnerArgv(runtime: Runtime, exe: string, files: readonly string[]): re
   switch (runtime) {
     case "node":
       return [exe, "--import", NODE_HOOK, "--test", ...files];
-    case "deno":
-      return [exe, "test", "-A", "--no-check", ...files];
     case "bun":
       return [exe, "test", ...files];
     default: {

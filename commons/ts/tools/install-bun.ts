@@ -1,7 +1,7 @@
 /**
  * Bun at the version commons pins (`BUN_VERSION` and its SHA-256 per platform in `commons/generated/pins.auto.env`, commons
  * 0005-typescript-runtime FR-026), fetched from Bun's release with retries, kept only where its SHA-256 is the pinned one, unpacked by the
- * kernel's own zip reader and put in a folder; nothing but IFC TypeScript itself, so it runs on Node 26 (or Deno, or Bun) on Linux, macOS
+ * kernel's own zip reader and put in a folder; nothing but IFC TypeScript itself, so it runs on Node 26 (or Bun) on Linux, macOS
  * and Windows with no shell, no Python and no unzip. CI's `.github/actions/bun` runs it.
  *
  * `node commons/ts/tools/install-bun.ts <folder>` (the folder is required) prints the folder that holds `bun` (or `bun.exe`); with `GITHUB_PATH` set, it is also

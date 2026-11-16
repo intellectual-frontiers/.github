@@ -26,7 +26,7 @@ export type StdStream = "stdin" | "stdout" | "stderr";
 
 const FD: Readonly<Record<StdStream, number>> = { stdin: 0, stdout: 1, stderr: 2 };
 
-/** Whether a standard stream is a terminal (`Deno.stdin.isTerminal()`). */
+/** Whether a standard stream is a terminal. */
 export function isTerminal(stream: StdStream): boolean {
   try {
     return isatty(FD[stream]);

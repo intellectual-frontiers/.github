@@ -1,7 +1,7 @@
 /**
  * Standard input, output and error for what a program reads (commons 0005-typescript-runtime FR-054): JSON, a protocol on standard input
- * and output, bytes passed along a pipe. The names follow `Deno.stdin`, `Deno.stdout` and `Deno.stderr` (`read`, `readable`, `write`,
- * `writeSync`, `writable`), so a conversion is a rename. This file and `runtime/console.ts` are the only files of the runtime that write to
+ * and output, bytes passed along a pipe. The names are plain (`read`, `readable`, `write`,
+ * `writeSync`, `writable`). This file and `runtime/console.ts` are the only files of the runtime that write to
  * standard output or standard error: what a person reads goes through the console (0006-signals FR-026), what a program reads through here.
  *
  * Writes: `write` waits until the bytes are handed to the system and gives their length; `writeSync` writes them all to the file
@@ -27,11 +27,11 @@ import { mapError } from "./errors.ts";
 // Standard input
 // ---------------------------------------------------------------------------------------------------------------------------------
 
-/** Standard input (`Deno.stdin`). */
+/** Standard input. */
 export type Stdin = {
   /** The whole of standard input as a web stream; made once, on first use. Bytes `read` took but did not give come first. */
   readonly readable: ReadableStream<Uint8Array>;
-  /** Reads into `buffer` and gives how many bytes it read, or null at the end of the input (`Deno.stdin.read`). */
+  /** Reads into `buffer` and gives how many bytes it read, or null at the end of the input. */
   read(buffer: Uint8Array): Promise<number | null>;
   /** The rest of standard input, to its end, as bytes. */
   bytes(): Promise<Uint8Array>;
@@ -128,7 +128,7 @@ export const stdin: Stdin = stdinOf(
 // Standard output and standard error
 // ---------------------------------------------------------------------------------------------------------------------------------
 
-/** Standard output or standard error, for output a program reads (`Deno.stdout`, `Deno.stderr`). */
+/** Standard output or standard error, for output a program reads. */
 export type Stdout = {
   /** Writes bytes, or text as UTF-8, and gives how many bytes were written, once they are handed to the system. */
   write(data: Uint8Array | string): Promise<number>;

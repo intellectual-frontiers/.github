@@ -13,7 +13,7 @@
  * import { array, object, string } from "../kernel/decode.ts";
  * import { getJson, liveTransport, withBackoff } from "./http-client.ts";
  * const http = withBackoff(liveTransport());
- * const repo = await getJson(http, "https://api.github.com/repos/denoland/deno", object({ full_name: string }));
+ * const repo = await getJson(http, "https://api.github.com/repos/oven-sh/bun", object({ full_name: string }));
  * ```
  *
  * @module

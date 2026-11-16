@@ -1,18 +1,18 @@
 /**
  * Names on the network (commons 0005-typescript-runtime FR-056). `resolveDns` asks for `A`, `AAAA`, `CNAME`, `MX`, `NS`, `TXT` and `SRV`
- * records as `Deno.resolveDns` does, with the records in Deno's shapes (`MX` as `{ preference, exchange }`, `TXT` as each record's
+ * records, with the records in these shapes (`MX` as `{ preference, exchange }`, `TXT` as each record's
  * strings, `SRV` as `{ priority, weight, port, target }`), and answers with a `Result` whose error says whether the name does not exist,
  * has no such record, or could not be asked: a name that does not resolve is an expected outcome, not an exception. `networkInterfaces`
  * gives each interface's name, family, address, netmask and whether it is internal; the process module gives it as
  * `proc.networkInterfaces()`.
  *
- * The question is asked here, over `node:dgram` (and `node:net` where the answer is too long for UDP), not through `node:dns`: the three
- * runtimes' `node:dns` disagree on exactly what this must tell apart (Bun reports a name without the record as one that does not exist,
- * Deno a server failure as a name without the record, and Deno ends names with a dot), so one small stub resolver (RFC 1035, with EDNS0
+ * The question is asked here, over `node:dgram` (and `node:net` where the answer is too long for UDP), not through `node:dns`: the two
+ * runtimes' `node:dns` can disagree on exactly what this must tell apart (Bun reports a name without the record as one that does not exist),
+ * so one small stub resolver (RFC 1035, with EDNS0
  * for answers up to 1232 bytes over UDP) gives the same answer everywhere. The servers asked are the system's (`node:dns`'s `getServers`,
  * which reads `/etc/resolv.conf` or Windows's settings) or the one given; each is tried twice, for two seconds each time.
  *
- * Where it differs from Deno: names in records come without the trailing dot (`mail.example.com`, as Node gives them). As with Deno, the
+ * Names in records come without the trailing dot (`mail.example.com`, as Node gives them). The
  * DNS is asked directly, so the hosts file (`localhost`) is not read.
  *
  * @example
@@ -381,7 +381,7 @@ function failure(name: string, e: unknown): Failed {
   return { kind: "failed", name, code: typeof code === "string" ? code : "", message: e instanceof Error ? e.message : String(e) };
 }
 
-/** The records of a type for a name (`Deno.resolveDns`), or why there are none. */
+/** The records of a type for a name, or why there are none. */
 export async function resolveDns<T extends RecordType>(
   name: string,
   type: T,
@@ -445,7 +445,7 @@ export type NetworkInterfaceInfo = {
   readonly internal: boolean;
 };
 
-/** Every address of every network interface of this computer (`Deno.networkInterfaces`, `proc.networkInterfaces()`). */
+/** Every address of every network interface of this computer (`proc.networkInterfaces()`). */
 export function networkInterfaces(): readonly NetworkInterfaceInfo[] {
   const out: NetworkInterfaceInfo[] = [];
   for (const [name, infos] of Object.entries(os.networkInterfaces())) {

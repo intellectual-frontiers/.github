@@ -1,7 +1,7 @@
 /**
  * Tests of `runtime/dns.ts` (commons 0005-typescript-runtime FR-056), with no Internet: a small DNS server on a free UDP port of 127.0.0.1,
  * made here on `node:dgram`, answers from a fixed zone, and `resolveDns` is pointed at it by `nameServer`. Each record type comes back in
- * `Deno.resolveDns`'s shape; a name that does not exist, a name without the record asked for, a server failure and a server that does not
+ * the shapes of records (`MX` as `{ preference, exchange }`, ...); a name that does not exist, a name without the record asked for, a server failure and a server that does not
  * answer each give their own error; TXT strings round-trip whatever they hold; and the interface list has a loopback.
  *
  * @module
@@ -142,7 +142,7 @@ const ZONE: Zone = (name, type) => {
 
 const sorted = <A>(xs: readonly A[]): A[] => [...xs].sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
 
-proves([DNS], "A, AAAA, CNAME, MX, NS, TXT and SRV records come back in the shapes Deno's resolver gave", async () => {
+proves([DNS], "A, AAAA, CNAME, MX, NS, TXT and SRV records come back in their shapes", async () => {
   await using server = await dnsServer(ZONE);
   const nameServer = { ipAddr: "127.0.0.1", port: server.port };
   const a = await resolveDns("mail.example.test", "A", { nameServer });

@@ -1,6 +1,5 @@
 /**
- * The errors the runtime throws (commons 0005-typescript-runtime FR-019): one class for each kind a caller acts on, by the names of
- * `Deno.errors` so that a conversion is a rename (`Deno.errors.NotFound` becomes `errors.NotFound`), each made from the `code` Node gives
+ * The errors the runtime throws (commons 0005-typescript-runtime FR-019): one class for each kind a caller acts on, by plain names (`errors.NotFound`), each made from the `code` Node gives
  * (`ENOENT`, `EEXIST`, `EACCES`, ...), keeping that code, the path or address where there is one, and the original error as its `cause`.
  * The runtime throws; `Result` belongs to the layers above, which turn these into their own errors.
  *
@@ -78,7 +77,7 @@ export class NotSupported extends RuntimeError {}
 /** The end of the data came before what was needed. */
 export class UnexpectedEof extends RuntimeError {}
 
-/** The error classes by their `Deno.errors` names. */
+/** The error classes by name. */
 export const errors = {
   RuntimeError,
   NotFound,

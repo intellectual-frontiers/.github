@@ -177,7 +177,7 @@ proves(
       "src/a.ts": `${DOC}console.log("x");\n`,
       "src/b.ts": `${DOC}import process from "node:process";\nprocess.stdout.write("x");\n`,
       "src/c.ts": `${DOC}import { stderr } from "node:process";\nexport { stderr };\n`,
-      "src/d.ts": `${DOC}export const s = ${D}.stderr;\n`,
+      "src/d.ts": `${DOC}export const s = ${B}.stderr;\n`,
       "src/console.ts": `${DOC}console.error("x");\n`,
       "src/e.ts": `${DOC}const c = { log: (x: string): string => x };\nexport const y = c.log("x");\n`,
     };

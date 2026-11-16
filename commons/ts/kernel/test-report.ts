@@ -16,7 +16,7 @@
  * @example
  * ```ts
  * import { readRecord, tap14 } from "./test-report.ts";
- * // const run = readRecord(await Deno.readTextFile("out/4bf92f3577b34da6a3ce929d0e0e4736.otlp.json"));
+ * // const run = readRecord(await readTextFile("out/4bf92f3577b34da6a3ce929d0e0e4736.otlp.json"));
  * // if (run.kind === "ok") console.log(tap14(run.value));
  * ```
  *

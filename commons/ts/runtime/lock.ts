@@ -3,7 +3,7 @@
  * and operating system gives atomically, where `flock` has no `node:` form), holding who holds it (process id, command, since when). A
  * waiting run polls until it is free, says once who it waits for, and takes over a lock whose holder's process no longer runs. A child of
  * a holder can inherit the lock through an environment variable instead of waiting for its own parent. Taken from Stolos's
- * `src/archon/core/lock.ts`, which used `Deno.FsFile.lock`.
+ * `src/archon/core/lock.ts`, which locked through the runtime's own file lock.
  *
  * @example
  * ```ts

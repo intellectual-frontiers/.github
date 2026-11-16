@@ -5,7 +5,7 @@
  * status is the run's: 0 where it passed, 1 where it failed, 2 for a command line that does not fit.
  *
  * ```sh
- * bun tools/test.ts run --runtime node,deno,bun --out test-results --report tap,junit,ctrf,sarif,md,html,oscal \
+ * bun tools/test.ts run --runtime bun,node --out test-results --report tap,junit,ctrf,sarif,md,html,oscal \
  *   --requirements ../spec-kit/enforcement.tsv --spec 0005-typescript-runtime --ledger test-results/ledger.jsonl tests
  * bun tools/test.ts sign --record test-results/<trace>.otlp.json --ledger test-results/ledger.jsonl --key reviewer.pem --meaning reviewed --role qa-lead
  * bun tools/test.ts verify --record test-results/<trace>.otlp.json --ledger test-results/ledger.jsonl --envelope e.dsse.json --public-key pub.pem --require-review

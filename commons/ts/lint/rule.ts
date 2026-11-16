@@ -30,7 +30,7 @@ import { err, ok } from "../kernel/result.ts";
 /** Any node: its type, its offsets in the source (`range`), and its parent where the linter links them. */
 export type Node = { readonly type: string; readonly range?: readonly [number, number]; readonly parent?: Node };
 
-/** A name: `Deno`, `kind`. */
+/** A name: `Bun`, `kind`. */
 export type Identifier = Node & { readonly type: "Identifier"; readonly name: string };
 
 /** A literal: a string, a number, a boolean, `null` or a regular expression. */
@@ -243,8 +243,8 @@ export function isNode(value: unknown): value is Node {
 }
 
 /**
- * The name a member expression's object and property give, `globalThis.` taken off the object: `Deno.readTextFile` is `["Deno",
- * "readTextFile"]`, `globalThis.console.log` is `["console", "log"]`, `a["b"]` is `["a", "b"]`; undefined where either is not a name.
+ * The name a member expression's object and property give, `globalThis.` taken off the object: `Bun.file` is `["Bun",
+ * "file"]`, `globalThis.console.log` is `["console", "log"]`, `a["b"]` is `["a", "b"]`; undefined where either is not a name.
  */
 export function nameOf(node: MemberExpression): readonly [string, string] | undefined {
   const object = isIdentifier(node.object)

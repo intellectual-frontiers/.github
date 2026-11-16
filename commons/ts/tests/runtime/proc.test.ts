@@ -26,10 +26,10 @@ process.stdin.on("end", () => {
 
 /** The argument vector that runs a script with the runtime running this test. */
 function runtimeArgv(script: string, ...args: string[]): string[] {
-  return proc.runtimeName() === "deno" ? [proc.execPath(), "run", "-A", script, ...args] : [proc.execPath(), script, ...args];
+  return [proc.execPath(), script, ...args];
 }
 
-proves([FR], "the environment, by the names Deno gave it", () => {
+proves([FR], "the environment", () => {
   proc.env.set("IFC_TS_TEST", "1");
   assert(proc.env.has("IFC_TS_TEST"));
   assertEquals(proc.env.get("IFC_TS_TEST"), "1");
@@ -39,14 +39,14 @@ proves([FR], "the environment, by the names Deno gave it", () => {
   assert(!proc.env.has("IFC_TS_TEST"));
 });
 
-proves([FR], "the platform, by the names Deno gave it, the runtime's name and version, the process", () => {
+proves([FR], "the platform, the runtime's name and version, the process", () => {
   assertEquals(
     [proc.osOf("win32"), proc.osOf("darwin"), proc.osOf("linux"), proc.osOf("sunos"), proc.osOf("plan9")],
     ["windows", "darwin", "linux", "solaris", "other"],
   );
   assertEquals([proc.archOf("x64"), proc.archOf("arm64"), proc.archOf("mips")], ["x86_64", "aarch64", "other"]);
   assert(["linux", "darwin", "windows"].includes(proc.build.os));
-  assert(["deno", "node", "bun"].includes(proc.runtimeName()));
+  assert(["node", "bun"].includes(proc.runtimeName()));
   assert(/^\d+\.\d+/.test(proc.runtimeVersion()), proc.runtimeVersion());
   assert(Array.isArray(proc.args));
   assert(proc.pid > 0 && proc.cwd() !== "" && proc.homeDir() !== "" && proc.hostname() !== "");

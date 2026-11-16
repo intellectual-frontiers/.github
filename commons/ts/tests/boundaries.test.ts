@@ -7,6 +7,7 @@
  * @module
  */
 import { lf } from "../kernel/text.ts";
+import { VENDOR_GLOBALS } from "../lint/rules/no-vendor-api.ts";
 import { decodeManifest, type Manifest, PACKAGE_NAME, rootEntries } from "../tools/manifest.ts";
 import { existsSync, readDirSync, readTextFile, readTextFileSync, statSync } from "../runtime/fs.ts";
 import { dirname, fromFileUrl, join, relative, resolve, toPosix } from "../runtime/path.ts";
@@ -113,33 +114,37 @@ proves(
   },
 );
 
-const VENDOR = [
-  /\bDeno\s*\./,
-  /\bBun\s*\./,
-  /["']jsr:/,
-  /["']npm:/,
-  /["']@std\//,
-  /["']@erga\//,
-  /["']https?:\/\/[^"']*\.(?:ts|js|mjs)["']/,
-];
+/** The vendor globals the lint rule `no-vendor-api` refuses, as expressions that find a member of one. */
+const VENDOR_MEMBER = VENDOR_GLOBALS.map((g) => new RegExp(`\\b${g}\\s*\\.`));
+const VENDOR = [...VENDOR_MEMBER, /["']jsr:/, /["']npm:/, /["']@std\//, /["']@erga\//, /["']https?:\/\/[^"']*\.(?:ts|js|mjs)["']/];
 /** A line with the contents of its single- and double-quoted strings blanked, so that a name such as `"process.runtime.name"` is not taken for the host global. */
 export function withoutStrings(text: string): string {
   return text.replace(/"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'/g, (m) => `${m[0]}${" ".repeat(m.length - 2)}${m[0]}`);
 }
 
-const HOST_IN_KERNEL = [/\bprocess\b/, /\bBuffer\b/, /\brequire\s*\(/, /\b__dirname\b/, /\bglobalThis\s*\.\s*(?:process|Deno|Bun)\b/];
+const HOST_IN_KERNEL = [
+  /\bprocess\b/,
+  /\bBuffer\b/,
+  /\brequire\s*\(/,
+  /\b__dirname\b/,
+  new RegExp(`\\bglobalThis\\s*\\.\\s*(?:process|${VENDOR_GLOBALS.join("|")})\\b`),
+];
 
-proves(["0005-typescript-runtime FR-004"], "no code names Deno, Bun, a registry or a URL import; the kernel names no host global", () => {
-  const bad: string[] = [];
-  for (const f of [...KERNEL, ...RUNTIME, ...LINT, ...TESTS, ...TOOLS]) {
-    for (const { line, text } of codeLines(readTextFileSync(join(ROOT, f)))) {
-      for (const re of VENDOR) if (re.test(text) && !f.startsWith("tests/boundaries")) bad.push(`${f}:${line}: ${text.trim()}`);
-      if (f.startsWith("kernel/"))
-        for (const re of HOST_IN_KERNEL) if (re.test(withoutStrings(text))) bad.push(`${f}:${line}: ${text.trim()}`);
+proves(
+  ["0005-typescript-runtime FR-004"],
+  "no code uses a vendor global, a registry or a URL import; the kernel names no host global",
+  () => {
+    const bad: string[] = [];
+    for (const f of [...KERNEL, ...RUNTIME, ...LINT, ...TESTS, ...TOOLS]) {
+      for (const { line, text } of codeLines(readTextFileSync(join(ROOT, f)))) {
+        for (const re of VENDOR) if (re.test(text) && !f.startsWith("tests/boundaries")) bad.push(`${f}:${line}: ${text.trim()}`);
+        if (f.startsWith("kernel/"))
+          for (const re of HOST_IN_KERNEL) if (re.test(withoutStrings(text))) bad.push(`${f}:${line}: ${text.trim()}`);
+      }
     }
-  }
-  assertEquals(bad, []);
-});
+    assertEquals(bad, []);
+  },
+);
 
 proves(["0005-typescript-runtime FR-004"], "the checks see what they look for (negative controls)", () => {
   assertEquals(
@@ -148,8 +153,8 @@ proves(["0005-typescript-runtime FR-004"], "the checks see what they look for (n
     ),
     ["x", "./y.ts", "v", "z", "w"],
   );
-  const code = codeLines("/**\n * Deno.readTextFile\n */\n// Deno.x\nDeno.exit();");
-  assertEquals(code, [{ line: 5, text: "Deno.exit();" }]);
+  const code = codeLines("/**\n * Bun.file\n */\n// Bun.x\nBun.exit();");
+  assertEquals(code, [{ line: 5, text: "Bun.exit();" }]);
   assert(VENDOR.some((re) => re.test(`import x from "jsr:@std/path";`)));
   assert(HOST_IN_KERNEL.some((re) => re.test(withoutStrings("const e = process.env;"))));
   assert(!HOST_IN_KERNEL.some((re) => re.test(withoutStrings(`const k = "process.runtime.name", q = 'a \\' process';`))));

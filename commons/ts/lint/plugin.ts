@@ -14,7 +14,7 @@
  *
  * The rules every harness wants, each taking its lists from its options so that a harness keeps its own lists and adds its own rules
  * (as its own plugin, with `defineRule` of `./rule.ts`):
- * - `no-vendor-api`: no `Deno.*` or `Bun.*` outside the files listed with their reasons;
+ * - `no-vendor-api`: no member of a vendor's global (`Bun.*` and the like) outside the files listed with their reasons;
  * - `no-registry-import`: no `npm:`, `jsr:` or URL specifier;
  * - `import-boundary`: a relative import that leaves its package (the option `roots`) is refused;
  * - `module-doc`: every file begins with a JSDoc block that says `@module`;
