@@ -1,4 +1,6 @@
 #Requires -Version 5.1
+[CmdletBinding()]
+param([switch] $DestroyExisting)
 # agora-install.ps1: the one command that installs agora on Windows 11. You install Git and GitHub CLI; this does everything else: it signs GitHub
 # in where erga cannot be read yet (GitHub CLI, a code and a browser), turns on long paths (Windows', once, with a prompt, and Git's), copies the `.github` and `erga`
 # repositories to ~\workspaces\github.com\intellectual-frontiers\<repo> (or says they are there and brings them up to date) and runs the installer in erga, which gets
@@ -9,7 +11,12 @@
 # `iex` runs this text inside your own session, so it never ends that session or changes it: no `exit` (which would close the window), everything in one function with its own
 # settings, the variables it sets for Git put back, and the result left in $LASTEXITCODE. A window that was opened only to run this command (a shortcut, Win+R, "Run with
 # PowerShell") waits for Enter before it closes, so that what it said can be read.
-# $env:ERGA_DESTROY_EXISTING = '1' (set before the command, and removed after) removes the copies that are there, with anything not committed in them, and copies both again.
+# -DestroyExisting starts from scratch: it removes the copies that are there, with anything not committed in them, and agora's own store and state (the programs it downloaded,
+# its Bun, what it remembers), then copies both again from GitHub and installs everything again. `iex` takes no arguments, so run the text as a script block:
+#
+#   & ([scriptblock]::Create((irm https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/agora-install.ps1))) -DestroyExisting
+#
+# ($env:ERGA_DESTROY_EXISTING = '1' does the same, for the `| iex` form.)
 # $env:ERGA_WORKSPACES is the folder the two repositories go in, instead of the one above.
 # Spec: erga 274-agora FR-096, FR-122
 
@@ -20,7 +27,7 @@ function Stop-Install([string] $What, [string] $Next) {
     throw [System.OperationCanceledException]::new($What)
 }
 
-function Install-Agora {
+function Install-Agora([bool] $Destroy) {
     $ErrorActionPreference = 'Stop'
     $how = 'winget install --id Git.Git -e; winget install --id GitHub.cli -e (then open a new terminal)'
     if (-not (Get-Command git -ErrorAction SilentlyContinue)) { Stop-Install 'Git is not installed' "install Git and GitHub CLI, then run this again: $how" }
@@ -76,10 +83,17 @@ function Install-Agora {
     # Both repositories live side by side in the workspace: ~\workspaces\github.com\intellectual-frontiers\<repo>. One that is there is said so and brought
     # up to date by a fast-forward (a copy that cannot be is left as it is, and said); one that is not is copied.
     $base = if ($env:ERGA_WORKSPACES) { $env:ERGA_WORKSPACES } else { Join-Path $HOME 'workspaces\github.com\intellectual-frontiers' }
+    if ($Destroy) {
+        $own = Join-Path ($(if ($env:LOCALAPPDATA) { $env:LOCALAPPDATA } else { Join-Path $HOME 'AppData\Local' })) 'erga'
+        if (Test-Path $own) {
+            Write-Host "🗑️ removing $own (-DestroyExisting)"
+            Remove-Item -LiteralPath $own -Recurse -Force
+        }
+    }
     function Sync-Repo([string] $Repo) {
         $dest = Join-Path $base $Repo
-        if ($env:ERGA_DESTROY_EXISTING -and (Test-Path $dest)) {
-            Write-Host "🗑️ removing $dest (ERGA_DESTROY_EXISTING), to copy $Repo again"
+        if ($Destroy -and (Test-Path $dest)) {
+            Write-Host "🗑️ removing $dest (-DestroyExisting), to copy $Repo again"
             Remove-Item -LiteralPath $dest -Recurse -Force
         }
         if (Test-Path (Join-Path $dest '.git')) {
@@ -134,7 +148,7 @@ function Wait-BeforeClose {
 
 $agoraInstallCode = 0
 try {
-    $agoraInstallCode = [int](Install-Agora | Select-Object -Last 1)
+    $agoraInstallCode = [int](Install-Agora ([bool]($DestroyExisting -or $env:ERGA_DESTROY_EXISTING)) | Select-Object -Last 1)
 } catch [System.OperationCanceledException] {
     $agoraInstallCode = 3
 } catch {

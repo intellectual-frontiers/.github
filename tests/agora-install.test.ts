@@ -303,10 +303,10 @@ proves(
     assert(!/(^|[\s;{(])exit(\s|;|$)/m.test(code), "no exit statement");
     assert(!/^\s*class\s/m.test(code), "no class");
     // Everything runs in one function, whose settings are its own; what it needs of the session's environment it puts back; the result is $LASTEXITCODE.
-    assert(code.includes("function Install-Agora {"), "one function");
+    assert(code.includes("function Install-Agora("), "one function");
     assert(
       code.indexOf("$ErrorActionPreference = 'Stop'") >
-        code.indexOf("function Install-Agora {"),
+        code.indexOf("function Install-Agora("),
       "its error handling is the function's own",
     );
     assert(
@@ -396,10 +396,13 @@ proves(
       assertEquals((await install(p.env)).code, 0);
       const mine = path.join(p.workspace, "erga");
       await fs.writeTextFile(path.join(mine, "scratch.txt"), "mine\n");
+      const own = path.join(p.env["HOME"] ?? "", ".local", "share", "erga", "toolchain");
+      await fs.mkdir(own, { recursive: true });
       const r = await proc.run(["sh", SH, "--destroy-existing"], { env: p.env, clearEnv: true });
       assertEquals(r.code, 0);
       assert(r.stdout.includes("removing"), r.stdout);
       assertEquals(await fs.exists(path.join(mine, "scratch.txt")), false);
+      assertEquals(await fs.exists(own), false);
       assertEquals(await fs.readTextFile(path.join(mine, "docs", "a.txt")), "a\n");
       const bad = await proc.run(["sh", SH, "--nope"], { env: p.env, clearEnv: true });
       assertEquals(bad.code, 2);

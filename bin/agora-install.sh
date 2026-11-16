@@ -6,7 +6,8 @@
 #   d=$(mktemp -d) && git clone --depth 1 https://github.com/intellectual-frontiers/.github "$d" && sh "$d/bin/agora-install.sh"
 #
 # ERGA_WORKSPACES is the folder the two repositories go in, instead of the one above.
-# --destroy-existing (or ERGA_DESTROY_EXISTING=1) removes the copies that are there, with anything not committed in them, and copies both again from GitHub:
+# --destroy-existing (or ERGA_DESTROY_EXISTING=1) starts from scratch: it removes the copies that are there, with anything not committed in them, and agora's own store and
+# state (the programs it downloaded, its Bun, what it remembers), then copies both repositories again from GitHub and installs everything again:
 #   sh "$d/bin/agora-install.sh" --destroy-existing
 # Spec: erga 274-agora FR-096
 set -eu
@@ -50,6 +51,11 @@ fi
 # Both repositories live side by side in the workspace: ~/workspaces/github.com/intellectual-frontiers/<repo>. One that is there is said so and brought
 # up to date by a fast-forward (a copy that cannot be is left as it is, and said); one that is not is copied.
 base="${ERGA_WORKSPACES:-$HOME/workspaces/github.com/intellectual-frontiers}"
+if [ -n "$destroy" ]; then
+  for gone in "${XDG_DATA_HOME:-$HOME/.local/share}/erga" "${XDG_STATE_HOME:-$HOME/.local/state}/erga"; do
+    if [ -e "$gone" ]; then say "🗑️ removing $gone (--destroy-existing)"; rm -rf "$gone"; fi
+  done
+fi
 sync_repo() {
   repo=$1
   dest="$base/$repo"
