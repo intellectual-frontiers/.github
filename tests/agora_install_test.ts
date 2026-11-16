@@ -29,7 +29,7 @@ function standIns(root: string, tools: readonly string[]): string {
       `echo "gh $*" >> "$RECORD"
 case "$1 $2" in
   "auth status") [ -z "\${SIGNED_OUT:-}" ] && exit 0 || exit 1 ;;
-  "repo clone") mkdir -p "$4/bin"; printf '#!/bin/sh\\necho installer ran >> "$RECORD"\\n' > "$4/bin/install.sh" ;;
+  "repo clone") mkdir -p "$4/bin" "$4/.git"; printf '#!/bin/sh\\necho installer ran >> "$RECORD"\\n' > "$4/bin/install.sh" ;;
 esac
 exit 0`,
     );
@@ -40,7 +40,8 @@ exit 0`,
 function fixture(tools: readonly string[]) {
   const root = Deno.makeTempDirSync({ prefix: "agora-install-" });
   const bin = standIns(root, tools);
-  const dest = `${root}/copy/erga`;
+  const base = `${root}/copy`;
+  const dest = `${base}/erga`;
   const record = `${root}/record`;
   // The system's own programs the script uses, and none of the system's git or gh: only the stand-ins stand for those.
   const sys = `${root}/sys`;
@@ -55,8 +56,8 @@ function fixture(tools: readonly string[]) {
       }
     }
   }
-  const env = { PATH: `${bin}:${sys}`, HOME: `${root}/home`, ERGA_DIR: dest, RECORD: record, LANG: "C" };
-  return { root, dest, record, env, lines: () => (Deno.statSync(record).isFile ? Deno.readTextFileSync(record).split("\n").filter((l) => l !== "") : []) };
+  const env = { PATH: `${bin}:${sys}`, HOME: `${root}/home`, ERGA_WORKSPACES: base, RECORD: record, LANG: "C" };
+  return { root, base, dest, record, env, lines: () => (Deno.statSync(record).isFile ? Deno.readTextFileSync(record).split("\n").filter((l) => l !== "") : []) };
 }
 
 Deno.test("agora-install.sh without Git, or without GitHub CLI, says what is missing and the one line that installs both (exit 3)", async () => {
@@ -79,7 +80,14 @@ Deno.test("agora-install.sh signed in copies erga with GitHub CLI and runs the i
   try {
     const r = await run(fx.env);
     assertEquals(r.code, 0);
-    assertEquals(fx.lines(), ["gh auth status", "gh auth setup-git", `gh repo clone intellectual-frontiers/erga ${fx.dest}`, "installer ran"]);
+    assertEquals(fx.lines(), [
+      "gh auth status",
+      "gh auth setup-git",
+      `gh repo clone intellectual-frontiers/.github ${fx.base}/.github`,
+      `gh repo clone intellectual-frontiers/erga ${fx.dest}`,
+      "installer ran",
+    ]);
+    assertStringIncludes(r.out, `copying .github to ${fx.base}/.github`);
     const out = await run({ ...fx.env, SIGNED_OUT: "1" });
     assertEquals(out.code, 0);
     assert(fx.lines().some((l) => l.startsWith("gh auth login --hostname github.com --git-protocol https --web")));
@@ -88,15 +96,39 @@ Deno.test("agora-install.sh signed in copies erga with GitHub CLI and runs the i
   }
 });
 
-Deno.test("agora-install.sh run again brings the copy up to date with a fast-forward alone, and runs the installer again", async () => {
+Deno.test("agora-install.sh finding both repositories there says so, brings each up to date with a fast-forward, and continues to the installer", async () => {
   const fx = fixture(["git", "gh"]);
   try {
-    Deno.mkdirSync(`${fx.dest}/.git`, { recursive: true });
+    for (const repo of [".github", "erga"]) Deno.mkdirSync(`${fx.base}/${repo}/.git`, { recursive: true });
     Deno.mkdirSync(`${fx.dest}/bin`, { recursive: true });
     Deno.writeTextFileSync(`${fx.dest}/bin/install.sh`, '#!/bin/sh\necho installer ran >> "$RECORD"\n');
     const r = await run(fx.env);
     assertEquals(r.code, 0);
-    assertEquals(fx.lines(), ["gh auth status", "gh auth setup-git", `git -C ${fx.dest} pull --ff-only`, "installer ran"]);
+    assertEquals(fx.lines(), ["gh auth status", "gh auth setup-git", `git -C ${fx.base}/.github pull --ff-only`, `git -C ${fx.dest} pull --ff-only`, "installer ran"]);
+    assertStringIncludes(r.out, `✅ .github is already in ${fx.base}/.github; bringing it up to date`);
+    assertStringIncludes(r.out, `✅ erga is already in ${fx.dest}; bringing it up to date`);
+    assert(!r.out.includes("copying"));
+  } finally {
+    Deno.removeSync(fx.root, { recursive: true });
+  }
+});
+
+Deno.test("agora-install.sh with one repository there and one not copies only the one that is not, and a copy that cannot be fast-forwarded is said and left as it is", async () => {
+  const fx = fixture(["git", "gh"]);
+  try {
+    Deno.mkdirSync(`${fx.base}/.github/.git`, { recursive: true });
+    // A git that refuses to fast-forward.
+    Deno.writeTextFileSync(`${fx.root}/bin/git`, '#!/bin/sh\necho "git $*" >> "$RECORD"\nexit 1\n', { mode: 0o755 });
+    const r = await run(fx.env);
+    assertEquals(r.code, 0);
+    assertEquals(fx.lines(), [
+      "gh auth status",
+      "gh auth setup-git",
+      `git -C ${fx.base}/.github pull --ff-only`,
+      `gh repo clone intellectual-frontiers/erga ${fx.dest}`,
+      "installer ran",
+    ]);
+    assertStringIncludes(r.out, ".github could not be fast-forwarded, so it is left as it is");
   } finally {
     Deno.removeSync(fx.root, { recursive: true });
   }
@@ -110,7 +142,9 @@ Deno.test("agora-install.ps1 asks for the same, in the same order, and hands ove
     "gh auth status",
     "gh auth login --hostname github.com --git-protocol https --web",
     "gh auth setup-git",
-    "gh repo clone intellectual-frontiers/erga",
+    "gh repo clone",
+    "Sync-Repo '.github'",
+    "Sync-Repo 'erga'",
     "bin\\install.ps1",
   ];
   let at = -1;
@@ -120,4 +154,6 @@ Deno.test("agora-install.ps1 asks for the same, in the same order, and hands ove
     at = i;
   }
   assertStringIncludes(ps, "winget install --id Git.Git -e; winget install --id GitHub.cli -e");
+  assertStringIncludes(ps, "is already in $dest; bringing it up to date");
+  assertStringIncludes(ps, "pull --ff-only");
 });

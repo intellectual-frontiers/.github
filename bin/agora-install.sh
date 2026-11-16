@@ -1,11 +1,11 @@
 #!/bin/sh
 # agora-install.sh: the one command that installs agora on Linux and macOS. You install Git and GitHub CLI; this does everything else: it signs
-# GitHub CLI in if it is not (a code and a browser), copies the `erga` repository to ~/workspaces/github.com/intellectual-frontiers/erga (or brings that copy
-# up to date) and runs the installer in it, which gets Bun at its pin, installs agora's packages and runs the doctor. Safe to run again.
+# GitHub CLI in if it is not (a code and a browser), copies the `.github` and `erga` repositories to ~/workspaces/github.com/intellectual-frontiers/<repo> (or
+# says they are there and brings them up to date) and runs the installer in erga, which gets Bun at its pin, installs agora's packages and runs the doctor. Safe to run again.
 #
 #   d=$(mktemp -d) && git clone --depth 1 https://github.com/intellectual-frontiers/.github "$d" && sh "$d/bin/agora-install.sh"
 #
-# ERGA_DIR is where the copy of erga goes, instead of the folder above.
+# ERGA_WORKSPACES is the folder the two repositories go in, instead of the one above.
 # Spec: erga 274-agora FR-096
 set -eu
 say() { printf '%s\n' "$*"; }
@@ -32,13 +32,22 @@ if ! gh auth status >/dev/null 2>&1; then
 fi
 gh auth setup-git >/dev/null 2>&1 || true
 
-dest="${ERGA_DIR:-$HOME/workspaces/github.com/intellectual-frontiers/erga}"
-if [ -d "$dest/.git" ]; then
-  say "⏳ bringing $dest up to date"
-  git -C "$dest" pull --ff-only
-else
-  say "⏳ copying erga to $dest"
-  mkdir -p "$(dirname -- "$dest")"
-  gh repo clone intellectual-frontiers/erga "$dest"
-fi
+# Both repositories live side by side in the workspace: ~/workspaces/github.com/intellectual-frontiers/<repo>. One that is there is said so and brought
+# up to date by a fast-forward (a copy that cannot be is left as it is, and said); one that is not is copied.
+base="${ERGA_WORKSPACES:-$HOME/workspaces/github.com/intellectual-frontiers}"
+sync_repo() {
+  repo=$1
+  dest="$base/$repo"
+  if [ -d "$dest/.git" ]; then
+    say "✅ $repo is already in $dest; bringing it up to date"
+    git -C "$dest" pull --ff-only || say "⚠️ $repo could not be fast-forwarded, so it is left as it is (commit or set aside what you changed there)"
+  else
+    say "⏳ copying $repo to $dest"
+    mkdir -p "$base"
+    gh repo clone "intellectual-frontiers/$repo" "$dest"
+  fi
+}
+sync_repo .github
+sync_repo erga
+dest="$base/erga"
 exec sh "$dest/bin/install.sh"
