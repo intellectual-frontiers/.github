@@ -2,7 +2,8 @@
  * The kernel of IFC TypeScript (commons 0005-typescript-runtime): pure code that imports nothing outside this folder, has no effect on the
  * host and runs wherever ECMAScript and the web standards do (Deno, Node, Bun, a browser, a Cloudflare Worker). Errors as values,
  * exhaustive matching, branded identifiers, decoders at the boundary; versions, SHA-256, SHA-512 crypt, base64, ASN.1 DER (as `der`), CMS
- * encryption (as `cms`), signed in-toto statements (as `dsse`) and AWS Signature Version 4 (as `sigv4`); PNG and ICO pictures (as `png`);
+ * encryption (as `cms`), signed in-toto statements (as `dsse`) and AWS Signature Version 4 (as `sigv4`); CBOR (as `cbor`), COSE keys (as `cose`)
+ * and WebAuthn verification for a relying party (as `webauthn`); PNG and ICO pictures (as `png`);
  * archives, JSON5, TOML, YAML, CSV, XML and TypeScript literals; HTTP headers and media types; graphs; command-line arguments (as `args`) and command trees (as `commands`);
  * OS scheduled jobs planned (as `jobs`); and type-level tests.
  *
@@ -54,7 +55,9 @@ export * as args from "./args.ts";
 export * as assess from "./assess.ts";
 export * as attest from "./attest.ts";
 export * as cms from "./cms.ts";
+export * as cbor from "./cbor.ts";
 export * as commands from "./commands.ts";
+export * as cose from "./cose.ts";
 export { csvField, formatCsvError, parseCsv, parseCsvRecords, toCsv } from "./csv.ts";
 export type { CsvError, CsvOptions } from "./csv.ts";
 export { CRYPT_ROUNDS, cryptSalt, sha512Crypt, verifySha512Crypt } from "./crypt.ts";
@@ -145,6 +148,7 @@ export type { Literal, LiteralError, LiteralShape } from "./ts-literal.ts";
 export { expectType } from "./types.ts";
 export * as uuid from "./uuid.ts";
 export * as vt from "./vt.ts";
+export * as webauthn from "./webauthn.ts";
 export * as width from "./width.ts";
 export {
   attribute,
