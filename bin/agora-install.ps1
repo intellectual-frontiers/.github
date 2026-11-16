@@ -79,6 +79,14 @@ function Install-Agora {
         $dest = Join-Path $base $Repo
         if (Test-Path (Join-Path $dest '.git')) {
             Write-Host "✅ $Repo is already in $dest; bringing it up to date"
+            # A copy that stopped part way (a path too long for Windows, a full disk) lacks files, and Git then sees them as changes that stop a pull: restore those files, and only those.
+            $missing = @(& git -C $dest ls-files --deleted)
+            if ($missing.Count -gt 0) {
+                Write-Host "⏳ restoring the $($missing.Count) files an earlier copy of $Repo did not finish"
+                $OutputEncoding = New-Object System.Text.UTF8Encoding($false)
+                $missing | & git -C $dest restore --pathspec-from-file=- | Out-Host
+                if ($LASTEXITCODE -ne 0) { Write-Host "⚠️ $Repo's missing files could not be restored" }
+            }
             & git -C $dest pull --ff-only | Out-Host
             if ($LASTEXITCODE -ne 0) { Write-Host "⚠️ $Repo could not be fast-forwarded, so it is left as it is (commit or set aside what you changed there)" }
         } else {

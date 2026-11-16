@@ -46,6 +46,12 @@ sync_repo() {
   dest="$base/$repo"
   if [ -d "$dest/.git" ]; then
     say "✅ $repo is already in $dest; bringing it up to date"
+    # A copy that stopped part way (a path too long for Windows, a full disk) lacks files, and Git then sees them as changes that stop a pull: restore those files, and only those.
+    missing=$(git -C "$dest" ls-files --deleted | wc -l | tr -d ' ')
+    if [ "$missing" -gt 0 ]; then
+      say "⏳ restoring the $missing files an earlier copy of $repo did not finish"
+      git -C "$dest" ls-files --deleted | git -C "$dest" restore --pathspec-from-file=- || say "⚠️ $repo's missing files could not be restored"
+    fi
     git -C "$dest" pull --ff-only || say "⚠️ $repo could not be fast-forwarded, so it is left as it is (commit or set aside what you changed there)"
   else
     say "⏳ copying $repo to $dest"

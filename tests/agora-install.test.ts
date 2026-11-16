@@ -51,6 +51,9 @@ async function place(): Promise<{
       path.join(seed, "bin", "install.sh"),
       `#!/bin/sh\necho "installer ran in $(git -C "$(dirname "$0")/.." rev-parse --short HEAD)" >> "${record}"\n`,
     );
+    await fs.mkdir(path.join(seed, "docs"), { recursive: true });
+    await fs.writeTextFile(path.join(seed, "docs", "a.txt"), "a\n");
+    await fs.writeTextFile(path.join(seed, "docs", "b.txt"), "b\n");
     await fs.writeTextFile(path.join(seed, "notes.txt"), "one\n");
     await git(seed, "add", ".");
     await git(seed, "commit", "-m", "first");
@@ -151,6 +154,55 @@ proves(
       assertEquals(
         (await fs.readTextFile(p.record)).trim(),
         `installer ran in ${await git(other, "rev-parse", "--short", "HEAD")}`,
+      );
+    } finally {
+      await fs.remove(p.top, { recursive: true });
+    }
+  },
+);
+
+proves(
+  R,
+  "a copy that an earlier install did not finish gets back the files it lacks, and only those, and is then brought up to date",
+  async () => {
+    if (proc.build.os === "windows") return;
+    const p = await place();
+    try {
+      assertEquals((await install(p.env)).code, 0);
+      const mine = path.join(p.workspace, "erga");
+      // The earlier copy stopped part way: two files are missing; and a file the person changed is theirs.
+      await fs.remove(path.join(mine, "docs", "a.txt"));
+      await fs.remove(path.join(mine, "docs", "b.txt"));
+      await fs.writeTextFile(path.join(mine, "scratch.txt"), "mine\n");
+      const other = path.join(p.top, "other");
+      await git(p.top, "clone", "-q", path.join(p.origins, "erga.git"), other);
+      await fs.writeTextFile(path.join(other, "notes.txt"), "two\n");
+      await git(other, "commit", "-qam", "second");
+      await git(other, "push", "-q", "origin", "main");
+      const r = await install(p.env);
+      assertEquals(r.code, 0);
+      assert(
+        r.stdout.includes(
+          "restoring the 2 files an earlier copy of erga did not finish",
+        ),
+        r.stdout,
+      );
+      assert(!r.stdout.includes("could not be fast-forwarded"), r.stdout);
+      assertEquals(
+        await fs.readTextFile(path.join(mine, "docs", "a.txt")),
+        "a\n",
+      );
+      assertEquals(
+        await fs.readTextFile(path.join(mine, "docs", "b.txt")),
+        "b\n",
+      );
+      assertEquals(
+        await fs.readTextFile(path.join(mine, "scratch.txt")),
+        "mine\n",
+      );
+      assertEquals(
+        await git(mine, "rev-parse", "HEAD"),
+        await git(other, "rev-parse", "HEAD"),
       );
     } finally {
       await fs.remove(p.top, { recursive: true });
