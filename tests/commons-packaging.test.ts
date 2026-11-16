@@ -12,7 +12,16 @@ import { cpSync } from "node:fs";
 import { basename } from "node:path";
 import { parseToml } from "../commons/ts/kernel/toml.ts";
 import { fs, path, proc } from "../commons/ts/runtime/mod.ts";
-import { assert, assertEquals, assertMatch, assertNotEquals, assertStringIncludes, proves, test } from "../commons/ts/runtime/test.ts";
+import {
+  assert,
+  assertEquals,
+  assertMatch,
+  assertNotEquals,
+  assertNotMatch,
+  assertStringIncludes,
+  proves,
+  test,
+} from "../commons/ts/runtime/test.ts";
 import * as mod from "../commons/generated/packaging.auto.ts";
 import { rules as portabilityRules, scan } from "../commons/tools/shell-portability-check.ts";
 import { words } from "../commons/tools/shlex.ts";
@@ -842,4 +851,59 @@ test("pyJson: JSON as Python's json.dumps(indent=2, ensure_ascii=False) writes i
     }),
     '{\n  "2": "é\\u0001\\"\\\\\\n",\n  "1": [\n    null,\n    true,\n    3\n  ]\n}',
   );
+});
+
+// ---- the tools' typing ------------------------------------------------------------------------------------------------------------------------------
+
+test("commons' tools are strongly typed: no any, no non-null escape, one audited cast, an exhaustive switch over each union, and no third-party module", () => {
+  const dir = `${COMMONS}/tools`;
+  const sources = fs
+    .readDirSync(dir)
+    .filter((f) => f.name.endsWith(".ts"))
+    .map((f) => ({ name: f.name, text: fs.readTextFileSync(`${dir}/${f.name}`) }));
+  assert(sources.length >= 3, "the three tools are there");
+  const code = (text: string): string =>
+    text
+      .split("\n")
+      .filter((l) => !/^\s*(\/\/|\*|\/\*)/.test(l))
+      .join("\n");
+  // the code without its comments and the insides of its strings, so that prose cannot pass or fail the test
+  const bare = (text: string): string =>
+    code(text)
+      .replace(/"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'|`(?:[^`\\]|\\.)*`/g, '""')
+      .replace(/\/\/.*$/gm, "");
+  for (const { name, text } of sources) {
+    const c = bare(text);
+    assertNotMatch(c, /:\s*any\b|as any\b|<any>/, `${name} uses any`);
+    assertNotMatch(c, /[\w)\]]!\.|[\w)\]]!\)|[\w)\]]!;|[\w)\]]!,/, `${name} has a non-null assertion`);
+    const casts = [...c.matchAll(/\bas\s+(?!const\b)[\w<{[(]/g)];
+    if (name === "core.ts")
+      assertEquals(
+        casts.map((m) => m[0]),
+        ["as B"],
+        "core.ts has one cast, in brand()",
+      );
+    else
+      assertEquals(
+        casts.map((m) => m[0]),
+        [],
+        `${name} casts: a value is decoded with a guard, or branded with brand()`,
+      );
+    if (/\bswitch \(/.test(c)) assertStringIncludes(c, "absurd(", `${name} has a switch with no exhaustiveness check`);
+    for (const m of text.matchAll(/^(?:import|export)[^;]*? from "([^"]+)";/gm)) {
+      const spec = m[1] ?? "";
+      const ontology = spec === "../ontology/supply-chain/packaging/mod.ts" && (name === "ontology.ts" || name === "generate-packaging.ts");
+      const toml = name === "shell-portability-check.ts" && spec === "../ts/kernel/toml.ts";
+      assert(
+        spec.startsWith("./") || spec === "node:fs" || spec === "node:process" || ontology || toml,
+        `${name} imports ${spec}: the tools have no dependency`,
+      );
+    }
+  }
+  assertStringIncludes(fs.readTextFileSync(`${dir}/core.ts`), "export function absurd(x: never): never");
+  const brands = sources
+    .filter((f) => /\bbrand(<[^>]*>)?\(/.test(bare(f.text).replace(/export function brand/, "")))
+    .map((f) => f.name)
+    .sort();
+  assertEquals(brands, ["ontology.ts"], "only the decode boundary brands a value");
 });

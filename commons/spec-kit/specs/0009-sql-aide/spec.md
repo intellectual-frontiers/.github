@@ -10,7 +10,7 @@
 
 ## The library
 
-- **FR-001**: The library MUST be kept in `commons/ts/data/sql-aide/`, in the package `commons/ts/data/package.json` describes, and MUST be built on IFC TypeScript (0005-typescript-runtime): its errors as values, exhaustive matching, brands, graphs and hashes are the kernel's, and its tests register through `runtime/test.ts`. It MUST be TypeScript that the TypeScript 7 compiler checks with IFC TypeScript's options (`commons/ts/data/tsconfig.json` extends `commons/ts/tsconfig.json`) and that the pinned Bun and Node 26 or later run as written, with no build step. Deno is not a runtime of it.
+- **FR-001**: The library MUST be kept in `commons/ts/data/sql-aide/`, in the package `commons/ts/data/package.json` describes, and MUST be built on IFC TypeScript (0005-typescript-runtime): its errors as values, exhaustive matching, brands, graphs and hashes are the kernel's, and its tests register through `runtime/test.ts`. It MUST be TypeScript that the TypeScript 7 compiler checks with IFC TypeScript's options (`commons/ts/data/tsconfig.json` extends `commons/ts/tsconfig.json`) and that the pinned Bun and Node 26 or later run as written, with no build step.
 - **FR-002**: The package MUST have no `dependencies`: what it installs is for checking and testing only. A file of the library MUST import only files of `commons/ts/data/sql-aide/` and the kernel of IFC TypeScript, and only the files under its `runtime/` folder MAY import IFC TypeScript's runtime; none imports a module of a host or of a vendor.
 - **FR-003**: The library MUST use only syntax a runtime can erase (no `enum`, no `namespace`, no parameter property, no decorator), MUST NOT use `any` or a non-null `!`, MUST return a failure it expects as a value (the kernel's `Result`) and MUST handle a tagged union with a `switch` that fails to compile where a case is left out (the kernel's `absurd`).
 - **FR-004**: What a person would configure MUST be a typed TypeScript value: the library MUST NOT read a YAML, XML, TOML or JSON file as its configuration, and MUST NOT find a model by scanning directories. A project is a module that imports its models and passes them in.
@@ -140,7 +140,7 @@
 
 ## Assumptions
 
-- A harness that uses the library runs Bun or Node; `commons/tools/` and the machine setup stay Deno (their specifications say so) and do not import it.
+- A harness that uses the library runs Bun or Node; `commons/tools/` stays apart and does not import it.
 - IFC TypeScript (0005-typescript-runtime) is in the same checkout: the library imports its kernel by a relative path until a release of it is what a harness installs.
 - TAP version 14 and the Data Privacy Vocabulary are read as their publishers wrote them; DPV is a W3C Community Group report, not a W3C standard.
 - pgTAP is installed in a PostgreSQL server by whoever runs it; where it is not, the SQL that returns TAP lines is what runs.

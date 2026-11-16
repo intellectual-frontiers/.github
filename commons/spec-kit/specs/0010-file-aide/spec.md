@@ -10,7 +10,7 @@
 
 ## The library
 
-- **FR-001**: The library MUST be kept in `commons/ts/data/file-aide/`, in the package `commons/ts/data/package.json` describes, and MUST be built on IFC TypeScript (0005-typescript-runtime) as SQL Aide is (0009-sql-aide FR-001): its errors as values, exhaustive matching, brands and hashes are the kernel's, its tests register through `runtime/test.ts`, the TypeScript 7 compiler checks it with IFC TypeScript's options, and the pinned Bun and Node 26 or later run it as written, with no build step. Deno is not a runtime of it.
+- **FR-001**: The library MUST be kept in `commons/ts/data/file-aide/`, in the package `commons/ts/data/package.json` describes, and MUST be built on IFC TypeScript (0005-typescript-runtime) as SQL Aide is (0009-sql-aide FR-001): its errors as values, exhaustive matching, brands and hashes are the kernel's, its tests register through `runtime/test.ts`, the TypeScript 7 compiler checks it with IFC TypeScript's options, and the pinned Bun and Node 26 or later run it as written, with no build step.
 - **FR-002**: The package MUST have no `dependencies`. A file of the library MUST import only files of `commons/ts/data/file-aide/`, the kernel of IFC TypeScript and SQL Aide's public entry point (`commons/ts/data/sql-aide/mod.ts`); only the files under its `runtime/` folder MAY import IFC TypeScript's runtime; none imports a module of a host or of a vendor.
 - **FR-003**: The library MUST use only syntax a runtime can erase, MUST NOT use `any` or a non-null `!`, MUST return a failure it expects as a value (the kernel's `Result`) and MUST handle a tagged union with a `switch` that fails to compile where a case is left out (the kernel's `absurd`). It MUST NOT make code from text at run time: no `new Function`, no `eval`, and no import of source it wrote.
 - **FR-004**: What a person would configure MUST be a typed TypeScript value: the library MUST NOT read a YAML, XML, TOML or JSON file as its configuration and MUST NOT find a layout by scanning directories. The ignore files of FR-027 and FR-028 are data of the tree being walked, not configuration of the library.
@@ -89,7 +89,7 @@
 - Reading the contents of a file in a query (FR-026).
 - Moving a store from one layout to another, lifecycle rules, bucket policies, a command line and diagrams.
 - Handles, streams, watching, locks and caches.
-- Multipart uploads (OQ-1), and Deno.
+- Multipart uploads (OQ-1).
 
 ## Edge cases
 

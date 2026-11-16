@@ -23,12 +23,12 @@ export const about: About = {
     },
     {
       path: "tools/",
-      what: "The tools, in TypeScript that Deno runs: the generator of `generated/`, the spec-kit checker and the shell portability checker.",
-      mayImport: ["tools/", "ontology/ (the generator, which reads its typed values)", "@std/toml (the shell portability checker)"],
+      what: "The tools, in TypeScript that Bun runs (Node 26 too): the generator of `generated/`, the spec-kit checker and the shell portability checker.",
+      mayImport: ["tools/", "ontology/ (the generator, which reads its typed values)", "ts/kernel/toml.ts (the shell portability checker)"],
     },
     {
       path: "generated/",
-      what: "The tables made from the ontology, for programs, scripts and the machine setup, with the pinned downloads, and the ontology's Turtle; never edited by hand.",
+      what: "The tables made from the ontology, for programs, scripts and a harness's setup, with the pinned downloads, and the ontology's Turtle; never edited by hand.",
       mayImport: ["nothing: generated"],
     },
     { path: "ts/", what: "IFC TypeScript, and the data libraries built on it (`ts/data/`).", mayImport: ["see its own about.ts"] },
@@ -36,8 +36,8 @@ export const about: About = {
     { path: "spec-kit/", what: "The specifications of the capabilities, the register of their numbers and of what enforces each requirement.", mayImport: ["nothing: Markdown and TSV"] },
   ],
   commands: [
-    { run: "deno run --allow-read --allow-write tools/generate-packaging.ts", does: "Writes `generated/` again from the ontology; with `--check` it fails where a file is stale." },
-    { run: "deno run --no-config --allow-read tools/spec-kit-check.ts", does: "Checks `spec-kit/` against the format of 0003-spec-kit." },
-    { run: "deno run --allow-read tools/shell-portability-check.ts FILE...", does: "Finds what only GNU tools have in shell scripts." },
+    { run: "bun tools/generate-packaging.ts", does: "Writes `generated/` again from the ontology; with `--check` it fails where a file is stale." },
+    { run: "bun tools/spec-kit-check.ts", does: "Checks `spec-kit/` against the format of 0003-spec-kit." },
+    { run: "bun tools/shell-portability-check.ts FILE...", does: "Finds what only GNU tools have in shell scripts." },
   ],
 };

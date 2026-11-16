@@ -21,7 +21,7 @@
 
 - **FR-008**: Commons' ontology MUST be TypeScript modules under `commons/ontology/` that import nothing but the kernel's RDF and one another, one module for each file of facts, each exporting its individuals and the file they make (its name, its prefixes and its individuals), and a `mod.ts` for each ontology that lists its files. No `.ttl` file MAY be under `commons/ontology/`: Turtle is not a source.
 - **FR-009**: Every IRI of the ontology MUST be made from a namespace or a typed vocabulary (FR-001, FR-002), never written as free text; every class and property MUST be stated by the schemas of FR-004, every individual by a class schema of its ontology's vocabulary module, and every code list (the packaging operations, support statuses, assurances, manager kinds and tiers) by a code list of FR-004, whose keys the tools map to their words in a table the compiler holds complete.
-- **FR-010**: The type checker MUST refuse an ontology module with a required field left out, a value of the wrong range or a reference to an individual of another class: `deno check` of the generator, which imports the ontology, fails, and the tests check it on copies of the ontology. What a type cannot state (the kernel's checks of FR-005, an empty text, an identifier used twice, a reference to an individual no module states, and the rules of 0002-packaging FR-004 to FR-008, 0002-packaging FR-014 and 0004-rules FR-002) MUST be found by the generator before it writes anything, as 0002-packaging FR-010 says.
+- **FR-010**: The type checker MUST refuse an ontology module with a required field left out, a value of the wrong range or a reference to an individual of another class: `tsc` (TypeScript 7) over the generator, which imports the ontology, fails, and the tests check it on copies of the ontology. What a type cannot state (the kernel's checks of FR-005, an empty text, an identifier used twice, a reference to an individual no module states, and the rules of 0002-packaging FR-004 to FR-008, 0002-packaging FR-014 and 0004-rules FR-002) MUST be found by the generator before it writes anything, as 0002-packaging FR-010 says.
 - **FR-011**: The generator MUST write the packaging ontology as `commons/generated/packaging.auto.ttl`, in the canonical Turtle of FR-006, beginning with lines that say it is generated, by `commons/tools/generate-packaging.ts`, from which modules, and not to be edited; and its `--check` MUST fail where the file is not what the modules make (0001-software-supply-chain FR-002). Turtle is committed because it is the form an RDF tool and a person reviewing a change of meaning read; N-Triples and JSON-LD are not committed, since the kernel writes them from the same values for whoever needs them.
 - **FR-012**: The `source_sha256` the generated tables carry (0002-packaging FR-011) MUST be the SHA-256 of the canonical N-Triples (FR-006) of the whole ontology, so that a change of a fact changes it and a change of layout or comments does not.
 - **FR-013**: A file of the ontology converted from Turtle MUST keep every triple: the graph its module makes MUST be the graph of the Turtle it was taken from (a literal with no datatype being an `xsd:string`), compared triple by triple when it is converted.
@@ -35,11 +35,11 @@
 
 ## Edge cases
 
-- A family whose `usesManager` names a value that is not a manager (a platform): `deno check` fails, per FR-003 and FR-010.
-- A pin whose `version` field is left out: `deno check` fails; one whose version is an empty text: the generator names it, per FR-010.
+- A family whose `usesManager` names a value that is not a manager (a platform): the type checker fails, per FR-003 and FR-010.
+- A pin whose `version` field is left out: the type checker fails; one whose version is an empty text: the generator names it, per FR-010.
 - A family that names, by its IRI, a manager no module states: it compiles, and the generator names it, per FR-010.
 - An `order` of `1.5`: the kernel names it as not an integer, per FR-005.
-- A rule whose set is `installers`: `deno check` fails, as the set is one of a list of words; run without the checker, the kernel and the generator name it, per FR-003, FR-005 and FR-010.
+- A rule whose set is `installers`: the type checker fails, as the set is one of a list of words; run without the checker, the kernel and the generator name it, per FR-003, FR-005 and FR-010.
 - Two modules that state the same subject: the kernel names it, per FR-005.
 - `parseIri("relative/path")` or an IRI holding a space: an error, never an IRI, per FR-001.
 - The same individuals stated in another order: the same Turtle, N-Triples and JSON-LD bytes, per FR-006.
@@ -50,7 +50,7 @@
 
 ## Assumptions
 
-- Deno's checker, which checks the generator and so the ontology, and TypeScript 7, which checks the kernel, agree on the kernel's types.
+- TypeScript 7 checks the generator, the ontology and the kernel with one set of options, so they agree on the kernel's types.
 - The ontology is small enough (a few thousand triples) that it is held in memory and written at once.
 
 ## Open questions
@@ -70,7 +70,7 @@
 
 ## Success criteria
 
-- **SC-001**: A reference to an individual of the wrong class, a missing field or a misspelt term fails `deno check`.
+- **SC-001**: A reference to an individual of the wrong class, a missing field or a misspelt term fails `tsc`.
 - **SC-002**: The generator reads no Turtle, and every generated table is what it was before the conversion except for the source hash and the name of the source in its first line.
 - **SC-003**: Commons has no RDF writer outside the kernel.
 

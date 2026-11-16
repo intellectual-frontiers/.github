@@ -88,7 +88,7 @@
 ## Success criteria
 
 - **SC-001**: `erga` and `stolos` keep no type of their own for a control, a verdict, a finding, a waiver or a ledger entry.
-- **SC-002**: The same findings give the same OCSF, OSCAL and CycloneDX on Deno, Node and Bun.
+- **SC-002**: The same findings give the same OCSF, OSCAL and CycloneDX on Bun and Node.
 
 ## Review & acceptance checklist
 

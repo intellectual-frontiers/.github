@@ -1,45 +1,45 @@
 # What enforces each requirement in this repository's specs (0024-spec-format FR-011 - FR-014).
 # mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
 requirement	mechanism	by	note
-0001-software-supply-chain FR-001	check	.github: deno test -A	Layout: the files the specification names are there
-0001-software-supply-chain FR-002	check	.github: deno test -A	Generated and Generator: the files say they are generated, carry .auto. and are what the tool makes
-0001-software-supply-chain FR-003	check	.github: deno test -A	Module: the TypeScript module says what the TOML says; the setup's own tests (deno test, table_test) hold that no file of bin/setup keeps a package name, a command or a detecting ID the table holds; archon's own check follows its wiring
+0001-software-supply-chain FR-001	check	.github: bun test ./tests/	Layout: the files the specification names are there
+0001-software-supply-chain FR-002	check	.github: bun test ./tests/	Generated and Generator: the files say they are generated, carry .auto. and are what the tool makes
+0001-software-supply-chain FR-003	check	.github: bun test ./tests/	Module: the TypeScript module says what the TOML says; archon's own check follows its wiring
 0001-software-supply-chain FR-004	check	archon: archon test	archon's SBOM tests: components carry package URLs of the type the table names, percent-encoded, and the document validates against SPDX 3.0.1
 0001-software-supply-chain FR-005	check	archon: archon test	archon's SBOM tests: pinned programs carry the lock's download address and SHA-256, system packages the manager that supplied them
-0001-software-supply-chain FR-006	check	.github: deno test -A	Generated: a family is verified only with where and when, and a catalogued family has no assurance
+0001-software-supply-chain FR-006	check	.github: bun test ./tests/	Generated: a family is verified only with where and when, and a catalogued family has no assurance
 0001-software-supply-chain FR-007	none	-	a property of the text, read by a person
-0002-packaging FR-001	check	.github: deno test -A	Generator: a term with no definition is refused; Layout: the files are there
-0002-packaging FR-002	check	.github: deno test -A	Generated: every manager and operating-system row of upt is in the table
-0002-packaging FR-003	check	.github: deno test -A	Generated: upt is credited with its licence and the identifier left out is said
-0002-packaging FR-004	check	.github: deno test -A	Generated: a supported family is complete and says how far it has been tried; Generator: a verified family with no where or when is refused; the setup's tests (deno test): a known family no script acts on is named with its manager
-0002-packaging FR-005	check	.github: deno test -A	Generated: pacman -Sy and AUR helpers are prohibitions with reasons, and nothing usable is forbidden; Generator: a forbidden command is refused
-0002-packaging FR-006	check	.github: deno test -A	Generated: a command is a list of words with no shell syntax; Generator: shell syntax is refused
-0002-packaging FR-007	check	.github: deno test -A	Generated: every detecting ID detects one family; Generator: two families claiming one ID are refused
-0002-packaging FR-008	check	.github: deno test -A	Generated: required programs are named for every supported family
-0002-packaging FR-009	check	.github: deno test -A	Generator: the committed files, the TypeScript module and the pins in the bootstraps are what the ontology makes, the same bytes twice, and a hand edit fails --check
-0002-packaging FR-010	check	.github: deno test -A	Generator: every rule broken is named and nothing is written
-0002-packaging FR-011	check	.github: deno test -A	Generated: the schema, the source hash and the content
-0002-packaging FR-012	check	.github: deno test -A	ShellFragment: marks, POSIX sh, shellcheck, and what each function answers
+0002-packaging FR-001	check	.github: bun test ./tests/	Generator: a term with no definition is refused; Layout: the files are there
+0002-packaging FR-002	check	.github: bun test ./tests/	Generated: every manager and operating-system row of upt is in the table
+0002-packaging FR-003	check	.github: bun test ./tests/	Generated: upt is credited with its licence and the identifier left out is said
+0002-packaging FR-004	check	.github: bun test ./tests/	Generated: a supported family is complete and says how far it has been tried; Generator: a verified family with no where or when is refused
+0002-packaging FR-005	check	.github: bun test ./tests/	Generated: pacman -Sy and AUR helpers are prohibitions with reasons, and nothing usable is forbidden; Generator: a forbidden command is refused
+0002-packaging FR-006	check	.github: bun test ./tests/	Generated: a command is a list of words with no shell syntax; Generator: shell syntax is refused
+0002-packaging FR-007	check	.github: bun test ./tests/	Generated: every detecting ID detects one family; Generator: two families claiming one ID are refused
+0002-packaging FR-008	check	.github: bun test ./tests/	Generated: required programs are named for every supported family
+0002-packaging FR-009	check	.github: bun test ./tests/	Generator: the committed files and the TypeScript module are what the ontology makes, the same bytes twice, and a hand edit fails --check
+0002-packaging FR-010	check	.github: bun test ./tests/	Generator: every rule broken is named and nothing is written
+0002-packaging FR-011	check	.github: bun test ./tests/	Generated: the schema, the source hash and the content
+0002-packaging FR-012	check	.github: bun test ./tests/	ShellFragment: marks, POSIX sh, shellcheck, and what each function answers
 0002-packaging FR-013	check	archon: archon test	archon's packaging tests: only an allowed executable is run, shell syntax and forbidden commands are refused
-0002-packaging FR-014	check	.github: deno test -A	Pins: the env file, the TOML, the TypeScript module and the bootstraps' Deno pins agree; Generator: a bad checksum, a pin with no version and a repeated key are refused
+0002-packaging FR-014	check	.github: bun test ./tests/	Pins: the env file, the TOML and the TypeScript module agree, and Bun is pinned on every platform; Generator: a bad checksum, a pin with no version and a repeated key are refused
 0002-packaging FR-015	check	archon: archon test	archon's pin tests: its built-in pins are the file commons generates, and the store reads them
-0003-spec-kit FR-001	check	.github: deno test -A	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
-0003-spec-kit FR-002	check	.github: deno test -A	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
-0003-spec-kit FR-003	check	.github: deno test -A	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
-0003-spec-kit FR-004	check	.github: deno test -A	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
-0003-spec-kit FR-005	check	.github: deno test -A	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
-0003-spec-kit FR-006	check	.github: deno test -A	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
-0003-spec-kit FR-007	check	.github: deno test -A	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
-0003-spec-kit FR-008	check	.github: deno test -A	SpecKit: a Part of line naming no specification of the folder, or the specification itself, is named
-0002-packaging FR-016	check	.github: deno test -A	Record: the fields, their order and their values, as the TypeScript module carries them, and the setup's test (deno test, table_test) holds the record it writes to them; Generator: a bad field is refused
-0004-rules FR-001	check	.github: deno test -A	Rules: the set, the generator's refusals, the portability tool and its use on the scripts
-0004-rules FR-002	check	.github: deno test -A	Rules: the set, the generator's refusals, the portability tool and its use on the scripts
-0004-rules FR-003	check	.github: deno test -A	Rules: the set, the generator's refusals, the portability tool and its use on the scripts
-0004-rules FR-004	check	.github: deno test -A	Rules: the set, the generator's refusals, the portability tool and its use on the scripts
+0003-spec-kit FR-001	check	.github: bun test ./tests/	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
+0003-spec-kit FR-002	check	.github: bun test ./tests/	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
+0003-spec-kit FR-003	check	.github: bun test ./tests/	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
+0003-spec-kit FR-004	check	.github: bun test ./tests/	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
+0003-spec-kit FR-005	check	.github: bun test ./tests/	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
+0003-spec-kit FR-006	check	.github: bun test ./tests/	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
+0003-spec-kit FR-007	check	.github: bun test ./tests/	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
+0003-spec-kit FR-008	check	.github: bun test ./tests/	SpecKit: a Part of line naming no specification of the folder, or the specification itself, is named
+0002-packaging FR-016	check	.github: bun test ./tests/	Record: the fields, their order and their values, as the TypeScript module carries them; Generator: a bad field is refused
+0004-rules FR-001	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
+0004-rules FR-002	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
+0004-rules FR-003	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
+0004-rules FR-004	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
 0005-typescript-runtime FR-001	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries: package.json, its lockfile and the folders are there; runtime/mod.ts does not re-export test.ts (FR-001 is also held by the layout the other tests import from)
 0005-typescript-runtime FR-002	check	.github: cd commons/ts && npx tsc -p tsconfig.kernel.json	the kernel type-checks with no host types; boundaries.test.ts: the kernel imports nothing outside kernel/ and names no host global
 0005-typescript-runtime FR-003	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: the runtime imports only node: builtins, kernel/ and runtime/
-0005-typescript-runtime FR-004	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: no Deno, Bun, jsr:, npm:, @std, @erga or URL import in code, with negative controls; tsc fails on a Deno reference (types: node)
+0005-typescript-runtime FR-004	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: no vendor global, jsr:, npm:, @std, @erga or URL import in code, with negative controls; tsc fails on a vendor global (types: node)
 0005-typescript-runtime FR-005	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/result.test.ts and text.test.ts: Result's helpers, absurd with a switch that leaves an alternative out, brands kept apart
 0005-typescript-runtime FR-006	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/decode.test.ts: each decoder, its error path and the JSON round trip
 0005-typescript-runtime FR-007	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/semver.test.ts: semver.org's example order, round trip, order laws, bumps, dotted versions
@@ -48,12 +48,12 @@ requirement	mechanism	by	note
 0005-typescript-runtime FR-010	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/archive.test.ts: round trips of tar, zip and gzip, fixed bytes, unsafe and damaged archives, deflated zip read and written, pax and GNU names
 0005-typescript-runtime FR-011	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/text.test.ts: literals written and read back, keys, comments, refusals
 0005-typescript-runtime FR-012	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/http.test.ts: Link headers, Retry-After in both forms, safe methods
-0005-typescript-runtime FR-013	check	.github: .github/workflows/ifc-typescript.yml	runtime/test.test.ts: the assertions and proves; the same tests pass under deno test, node --test and bun test in CI
+0005-typescript-runtime FR-013	check	.github: .github/workflows/ifc-typescript.yml	runtime/test.test.ts: the assertions and proves; the same tests pass under bun test and node --test in CI
 0005-typescript-runtime FR-014	check	.github: cd commons/ts && npx tsc -p tsconfig.json	the type-level tests (expectType, @ts-expect-error) with their negative controls compile; the laws are property-tested with fast-check in the kernel tests
 0005-typescript-runtime FR-015	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: every file has an @module block and every export has JSDoc
 0005-typescript-runtime FR-016	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: the development dependencies are exact, the lockfile agrees, no run-time dependency
 0005-typescript-runtime FR-017	check	.github: cd commons/ts && npx tsc -p tsconfig.json	tsc 7 with the strict configuration on every file; boundaries.test.ts checks that TypeScript is 7
-0005-typescript-runtime FR-018	gate	.github: .github/workflows/ifc-typescript.yml	the CI matrix: tsc 7 on both configurations, the suite on Deno, Node 26 and Bun, on Linux, macOS and Windows
+0005-typescript-runtime FR-018	gate	.github: .github/workflows/ifc-typescript.yml	the CI matrix: tsc 7 on both configurations, the suite on Bun (the default) and Node 26 (the backup), on Linux, macOS and Windows
 0005-typescript-runtime FR-019	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/fs.test.ts: each Node error code becomes its class with code, path and cause; NotFound, AlreadyExists, IsADirectory, AddrInUse are thrown where the host refuses
 0005-typescript-runtime FR-020	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/fs.test.ts: every call on a real temporary folder, the refusals, Stolos's helpers
 0005-typescript-runtime FR-021	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/proc.test.ts: both platforms' rules and file URLs
@@ -65,7 +65,7 @@ requirement	mechanism	by	note
 0005-typescript-runtime FR-027	gate	.github: .github/workflows/ifc-typescript.yml	the lint job runs bun fmt --check
 0005-typescript-runtime FR-028	gate	.github: .github/workflows/ifc-typescript.yml	the lint job runs bun lint --type-aware --max-warnings 0 with bunfig.toml's rules; boundaries.test.ts: the rules FR-028 names are errors in bunfig.toml
 0005-typescript-runtime FR-029	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: the root package.json (its name, private, the ./ts entry points into commons/ts, ./ts/node, the bin ifc, the dependencies exact and those of commons/docs) and commons/ts/package.json's same name and entry points; no release workflow, no tarball tool
-0005-typescript-runtime FR-030	gate	.github: .github/workflows/ifc-typescript.yml	the git-dependency job installs the commit it checks by a git+file: URL into an empty project and runs tools/smoke.ts (the kernel, the runtime and the test registration by the package's name and ifc test run on a small suite, on Bun and Node 26; the program on Deno through an import map; tsc 7 on a consumer), on Linux, macOS and Windows
+0005-typescript-runtime FR-030	gate	.github: .github/workflows/ifc-typescript.yml	the git-dependency job installs the commit it checks by a git+file: URL into an empty project and runs tools/smoke.ts (the kernel, the runtime and the test registration by the package's name and ifc test run on a small suite, on Bun and Node 26; tsc 7 on a consumer), on Linux, macOS and Windows
 0005-typescript-runtime FR-031	check	.github: cd commons/ts && bun test tests/	kernel/formats.test.ts: round trips with JSON and with the writer, the specification's examples, __proto__, refusals with line and column
 0005-typescript-runtime FR-032	check	.github: cd commons/ts && bun test tests/	kernel/formats.test.ts: random trees written and read back, entities, CDATA, prefixes, the finders, refusals with line and column, no entity expansion
 0005-typescript-runtime FR-033	check	.github: cd commons/ts && bun test tests/	kernel/graph.test.ts: random acyclic graphs ordered and scheduled with random outcomes and job limits, cycles, a node that rejects
@@ -301,9 +301,9 @@ requirement	mechanism	by	note
 0012-ontology FR-005	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: a non-integer, a word not of its list, a subject stated twice and a bad namespace are named
 0012-ontology FR-006	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: the writers' output for known statements, escapes, and the same bytes for random orders of the same statements (fast-check)
 0012-ontology FR-007	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: the kernel's RDF exports no reader
-0012-ontology FR-008	check	.github: deno test -A	Ontology: the modules import only the kernel's RDF and one another, list their files, and no .ttl is under commons/ontology
-0012-ontology FR-009	check	.github: deno test -A	Ontology: no IRI is written as free text in a module; the code lists are the tools' unions
-0012-ontology FR-010	check	.github: deno test -A	Ontology: deno check refuses copies with a missing field, a wrong range and a wrong class; Generator: the rules a type cannot state are named and nothing is written
-0012-ontology FR-011	check	.github: deno test -A	Generator: packaging.auto.ttl is what the modules make, says its generator and is the same bytes twice
-0012-ontology FR-012	check	.github: deno test -A	Ontology: source_sha256 is the SHA-256 of the canonical N-Triples, and a comment changes no generated file
+0012-ontology FR-008	check	.github: bun test ./tests/	Ontology: the modules import only the kernel's RDF and one another, list their files, and no .ttl is under commons/ontology
+0012-ontology FR-009	check	.github: bun test ./tests/	Ontology: no IRI is written as free text in a module; the code lists are the tools' unions
+0012-ontology FR-010	check	.github: bun test ./tests/	Ontology: tsc 7 refuses copies with a missing field, a wrong range and a wrong class; Generator: the rules a type cannot state are named and nothing is written
+0012-ontology FR-011	check	.github: bun test ./tests/	Generator: packaging.auto.ttl is what the modules make, says its generator and is the same bytes twice
+0012-ontology FR-012	check	.github: bun test ./tests/	Ontology: source_sha256 is the SHA-256 of the canonical N-Triples, and a comment changes no generated file
 0012-ontology FR-013	none	-	a one-time comparison when the Turtle was converted (7 files, 2874 triples, reported in the commit that converted it); the Turtle it was compared with is deleted in that commit

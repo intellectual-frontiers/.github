@@ -11,7 +11,7 @@
 
 - **FR-001**: A rule MUST be a `pm:Rule` in the ontology (`commons/ontology/supply-chain/packaging/rules.ts`, amended 2026-11-16: it was Turtle) with a set, a pattern (an ECMAScript regular expression), a short name and the reason it is not allowed. The sets are `shell-portability` (a construct only GNU tools have), `ci-forbidden-program` (a program a CI step must not run), `ci-forbidden-action` (a CI construct that installs or containerizes), `host-program` (a program a command must take from its toolchain, never from the host) and `installer` (a package manager code must not call directly).
 - **FR-002**: The generator MUST write every rule to `commons/generated/rules.auto.toml` (`schema = 1`, the hash of the ontology, one `[[rules]]` table each), and MUST refuse, naming it, a rule with no set from the list, no pattern, name or reason, a pattern that is not a regular expression and a name used twice.
-- **FR-003**: `commons/tools/shell-portability-check.ts` MUST report every line of the shell scripts it is given that matches a `shell-portability` rule, as `file:line: uses X (reason)`, skipping comment lines and trailing comments and a line that holds text the caller excuses, and MUST exit 1 where it reports one. It needs only Deno and its standard library (`@std/toml`, pinned in `deno.json`) (amended 2026-11-15: it was Python, with its standard library alone).
+- **FR-003**: `commons/tools/shell-portability-check.ts` MUST report every line of the shell scripts it is given that matches a `shell-portability` rule, as `file:line: uses X (reason)`, skipping comment lines and trailing comments and a line that holds text the caller excuses, and MUST exit 1 where it reports one. It runs on Bun or Node 26 and needs only the kernel's TOML reader (`commons/ts/kernel/toml.ts`) (amended 2026-11-15: it was Python, with its standard library alone).
 - **FR-004**: A harness MUST take these sets from the generated file and MUST NOT keep its own copy of a pattern; what a harness adds (where the rules apply, which of its own paths are excused) is its own.
 
 ## Out of scope
@@ -39,7 +39,7 @@
 
 ## Success criteria
 
-- **SC-001**: `erga-bootstrap.sh` and `erga-setup.sh` have no line the tool reports.
+- **SC-001**: `bin/agora-install.sh` has no line the tool reports.
 - **SC-002**: A harness's toolchain checks read these sets and keep no pattern of their own.
 
 ## Review & acceptance checklist

@@ -9,7 +9,7 @@
 
 **Documentation: <https://intellectual-frontiers.github.io/.github/>**
 
-This public repository holds the organization's landing page ([`profile/README.md`](profile/README.md)), the machine setup ([`bin/`](bin/), two
-bootstraps that only get Deno and the TypeScript setup they hand over to, specified in the private `erga` repository's `009-machine-bootstrap`), and
+This public repository holds the organization's landing page ([`profile/README.md`](profile/README.md)), the one-command installers of agora ([`bin/`](bin/),
+`agora-install.sh` and `agora-install.ps1`, which sign GitHub CLI in and run the installer of the private `erga` repository), and
 [`commons/`](commons/about.ts), what any company or harness of Intellectual Frontiers may use. The documentation site is made from commons' TypeScript
 and its specifications; this file only points to it. Everything else lives in the private `erga` repository.

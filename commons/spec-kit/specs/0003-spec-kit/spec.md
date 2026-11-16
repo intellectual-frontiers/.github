@@ -17,7 +17,7 @@
 
 ## The tool
 
-- **FR-006**: `commons/tools/spec-kit-check.ts` MUST check a folder against FR-001 to FR-005 and FR-008, importing nothing outside `commons/tools/` and needing read access alone (`deno run --no-config --allow-read commons/tools/spec-kit-check.ts`), take the folder with `--root` (default `commons/spec-kit`), print every finding as `where: message` on standard error, write nothing, exit 1 where there is one, and offer `check(root)` for a harness that wants the findings as data. Its command line, its findings and its exit status MUST be those of the Python tool it replaced, which a harness reads (amended 2026-11-15: the tool was Python, with its standard library alone).
+- **FR-006**: `commons/tools/spec-kit-check.ts` MUST check a folder against FR-001 to FR-005 and FR-008, importing nothing outside `commons/tools/` but the `node:fs` and `node:process` built-ins and running on Bun or Node 26 (`bun commons/tools/spec-kit-check.ts`), take the folder with `--root` (default `commons/spec-kit`), print every finding as `where: message` on standard error, write nothing, exit 1 where there is one, and offer `check(root)` for a harness that wants the findings as data. Its command line, its findings and its exit status MUST be those of the Python tool it replaced, which a harness reads (amended 2026-11-15: the tool was Python, with its standard library alone).
 - **FR-007**: The tool MUST NOT read a harness's ontology or run its commands: who owns a specification and whether a named command exists are the harness's to check, on top of it.
 
 ## A specification's place
@@ -54,7 +54,7 @@
 
 ## Success criteria
 
-- **SC-001**: `deno run --no-config --allow-read commons/tools/spec-kit-check.ts` exits 0 on commons' own folder.
+- **SC-001**: `bun commons/tools/spec-kit-check.ts` exits 0 on commons' own folder.
 - **SC-002**: Each rule has a test that breaks it and sees it named.
 
 ## Review & acceptance checklist
