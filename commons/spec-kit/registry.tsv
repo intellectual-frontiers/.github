@@ -11,3 +11,6 @@ number	slug	state
 0010	file-aide	in force
 0011	documentation	in force
 0012	ontology	in force
+0013	acme	in force
+0014	webauthn	in force
+0015	trace	in force
