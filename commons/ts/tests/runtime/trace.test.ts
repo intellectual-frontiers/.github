@@ -7,8 +7,8 @@
 import { traceFindings } from "../../kernel/trace.ts";
 import { mkdir, readTextFile, withTempDir, writeTextFile } from "../../runtime/fs.ts";
 import { join } from "../../runtime/path.ts";
-import { holdBaseline, readSources, readSpecs } from "../../runtime/trace.ts";
-import { assertEquals, assertStringIncludes, proves } from "../../runtime/test.ts";
+import { holdBaseline, posixPath, readSources, readSpecs } from "../../runtime/trace.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "../../runtime/test.ts";
 
 async function put(root: string, rel: string, text: string): Promise<void> {
   await mkdir(join(root, ...rel.split("/").slice(0, -1)), { recursive: true });
@@ -47,5 +47,20 @@ proves(["0015-trace FR-011"], "a tree read, its findings held against a baseline
     const fixed = await holdBaseline({ root, file, findings: [], name });
     assertEquals(fixed.code, 1, "a fixed finding leaves a stale entry");
     assertStringIncludes(fixed.lines.join("\n"), "stale");
+  });
+});
+
+proves(["0015-trace FR-011"], "every path is relative and /-separated on every system, Windows included", async () => {
+  assertEquals(posixPath("archon\\core\\x.ts"), "archon/core/x.ts");
+  assertEquals(posixPath("archon/core/x.ts"), "archon/core/x.ts");
+  await withTempDir(async (root) => {
+    await mkdir(join(root, "src", "a", "b"), { recursive: true });
+    await writeTextFile(join(root, "src", "a", "b", "c.ts"), "export {};\n");
+    const sources = await readSources(root, ["src"]);
+    assertEquals(
+      sources.map((s) => s.path),
+      ["src/a/b/c.ts"],
+    );
+    assert(sources.every((s) => !s.path.includes("\\")));
   });
 });

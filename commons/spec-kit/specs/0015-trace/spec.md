@@ -28,7 +28,7 @@
 
 ## The runtime
 
-- **FR-011**: `runtime/trace.ts` (exported by `runtime/mod.ts` as `trace`) MUST read what the kernel judges: the specifications of a folder (`specs/NNN-slug/spec.md` and `reviewed.tsv`), the `.ts` files under roots (leaving out `node_modules`), as paths relative to the repository with `/`; and MUST hold findings against a baseline file (`holdBaseline`): read it (a missing file is an empty baseline), judge, and give the lines of FR-003 and an exit status (0 when nothing is new or stale, 1 otherwise), or, with `write`, write the baseline from the findings and give 0. It MUST print nothing itself: the harness's tool prints the lines.
+- **FR-011**: `runtime/trace.ts` (exported by `runtime/mod.ts` as `trace`) MUST read what the kernel judges: the specifications of a folder (`specs/NNN-slug/spec.md` and `reviewed.tsv`), the `.ts` files under roots (leaving out `node_modules`), as paths relative to the repository with `/`; and MUST hold findings against a baseline file (`holdBaseline`): read it (a missing file is an empty baseline), judge, and give the lines of FR-003 and an exit status (0 when nothing is new or stale, 1 otherwise), or, with `write`, write the baseline from the findings and give 0. It MUST print nothing itself: the harness's tool prints the lines. Every path it gives is relative to the repository and `/`-separated on every system, Windows included, so a ladder's homes and a baseline's keys match the same files everywhere.
 
 ## Out of scope
 
@@ -52,6 +52,7 @@
 - `src/archon/model/mod.ts` matched by the folder `src/archon/model/` and by `src/**/mod.ts`: on the rung of `src/**/mod.ts`, a home that names files, per FR-009.
 - A file of rung 4 that imports a file of rung 2, when rung 4 may rely on 0, 1 and 3: `layers/around`, per FR-010.
 - `import type { X } from "../model/types.ts"`: an import like any other, per FR-010.
+- On Windows, a file under `src\\archon\\core`: read as `src/archon/core/...`, per FR-011.
 - An import of `@intellectual-frontiers/commons/ts/kernel`: not a finding, per FR-010.
 
 ## Assumptions

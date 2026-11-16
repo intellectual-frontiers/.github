@@ -36,6 +36,11 @@ export async function readSpecs(root: string, folder = "specs"): Promise<readonl
 }
 
 /** The files under roots (folders or files, from `root`) whose names end in a suffix (`.ts` by default), leaving out `node_modules`, by path from `root` with `/`. */
+/** A relative path with `/` between its parts, whatever the system's separator (FR-011). */
+export function posixPath(p: string): string {
+  return p.replaceAll("\\", "/");
+}
+
 export async function readSources(
   root: string,
   roots: readonly string[],
@@ -45,7 +50,8 @@ export async function readSources(
   const keep = (rel: string): boolean => suffixes.some((s) => rel.endsWith(s)) && !rel.split("/").includes("node_modules");
   for (const r of roots) {
     const base = r.replace(/\/+$/, "");
-    const rels = keep(base) ? [base] : (await walkFiles(join(root, base))).map((f) => `${base}/${f}`);
+    // Paths are relative and `/`-separated on every system (FR-011): Windows walks with `\\`.
+    const rels = keep(base) ? [base] : (await walkFiles(join(root, base))).map((f) => `${base}/${posixPath(f)}`);
     for (const rel of rels) {
       if (!keep(rel)) continue;
       const text = await readTextOr(join(root, rel));
