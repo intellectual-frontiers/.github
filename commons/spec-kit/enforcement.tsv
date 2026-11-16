@@ -294,7 +294,7 @@ requirement	mechanism	by	note
 0012-ontology FR-002	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: the eight vocabularies give the IRIs of their specifications, and a vocabulary is made from local names
 0012-ontology FR-003	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: an individual's values typed from its schema, its triples in the schema's order, and type-level tests of a missing field, a wrong range and a wrong class
 0012-ontology FR-004	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: the OWL schemas, a code list and its union, a SKOS scheme and its notations
-0012-ontology FR-005	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: a non-integer, a subject stated twice and a bad namespace are named
+0012-ontology FR-005	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: a non-integer, a word not of its list, a subject stated twice and a bad namespace are named
 0012-ontology FR-006	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: the writers' output for known statements, escapes, and the same bytes for random orders of the same statements (fast-check)
 0012-ontology FR-007	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: the kernel's RDF exports no reader
 0012-ontology FR-008	check	.github: deno test -A	Ontology: the modules import only the kernel's RDF and one another, list their files, and no .ttl is under commons/ontology
