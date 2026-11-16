@@ -304,8 +304,12 @@ export function link(from: PathLike, to: PathLike): Promise<void> {
   return hostCall(p(to), () => fsp.link(p(from), p(to)));
 }
 
-/** A link at `path` that points at `target`; `type` matters on Windows only. */
-export function symlink(target: PathLike, path: PathLike, options: { readonly type?: "file" | "dir" } = {}): Promise<void> {
+/**
+ * A link at `path` that points at `target`; `type` matters on Windows only. `junction` (a folder, FR-073) is the Windows link any account
+ * may make (a symbolic link needs administrator rights or Developer Mode there): its target is made absolute, as Windows requires; on
+ * Linux and macOS it is an ordinary symbolic link.
+ */
+export function symlink(target: PathLike, path: PathLike, options: { readonly type?: "file" | "dir" | "junction" } = {}): Promise<void> {
   return hostCall(p(path), () => fsp.symlink(p(target), p(path), options.type));
 }
 
@@ -456,8 +460,8 @@ export async function chown(path: PathLike, uid: number | null, gid: number | nu
   await hostCall(p(path), () => fsp.chown(p(path), uid ?? -1, gid ?? -1));
 }
 
-/** A link at `path` that points at `target`, without waiting; `type` matters on Windows only. */
-export function symlinkSync(target: PathLike, path: PathLike, options: { readonly type?: "file" | "dir" } = {}): void {
+/** A link at `path` that points at `target`, without waiting; `type` matters on Windows only (`junction`: see `symlink`). */
+export function symlinkSync(target: PathLike, path: PathLike, options: { readonly type?: "file" | "dir" | "junction" } = {}): void {
   hostCallSync(p(path), () => nfs.symlinkSync(p(target), p(path), options.type));
 }
 
