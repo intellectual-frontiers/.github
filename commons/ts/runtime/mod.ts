@@ -2,7 +2,7 @@
  * The runtime of IFC TypeScript (commons 0005-typescript-runtime): the one part that touches the host, on `node:` builtins and web standards
  * alone, so the same code runs on Deno, Node and Bun, on Linux, macOS and Windows. Its modules keep the names of the `Deno` calls they
  * replace (`fs.readTextFile`, `proc.env.get`, `errors.NotFound`, `serve`), so a conversion is a rename; `http` is the typed HTTP client
- * and `lock` one run at a time. Tests import `./test.ts` on its own.
+ * `lock` one run at a time, and `discover` finds programs by the prefix of their name, as Git finds its commands. Tests import `./test.ts` on its own.
  *
  * @example
  * ```ts
@@ -18,6 +18,7 @@
  * @module
  */
 export * as compile from "./compile.ts";
+export * as discover from "./discover.ts";
 export * as dns from "./dns.ts";
 export * as fs from "./fs.ts";
 export * as git from "./git.ts";

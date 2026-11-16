@@ -519,6 +519,11 @@ export function helpText<S extends Spec>(
   spec: S & SpecCheck<S>,
   operands: readonly Operand[] = [],
 ): string {
+  return helpOf(program, summary, spec, operands);
+}
+
+/** The help of a command whose spec was checked where it was declared (a verb of `./commands.ts`), as `helpText` gives it. */
+export function helpOf(program: string, summary: string, spec: Spec, operands: readonly Operand[] = []): string {
   const entries: readonly Entry[] = Object.keys(spec).flatMap((key) => {
     const option = spec[key];
     return option === undefined ? [] : [{ key, long: longName(key), option }];
