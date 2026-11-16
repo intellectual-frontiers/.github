@@ -63,12 +63,15 @@ export function hrefOf(h: Href, from: string): string {
   }
 }
 
+/** The length past which inline code may wrap (in a table, shorter code stays on one line). */
+const LONG_CODE = 48;
+
 function inline(i: Inline, from: string): string {
   switch (i.kind) {
     case "text":
       return escape(i.text);
     case "code":
-      return `<code>${escape(i.text)}</code>`;
+      return `<code${i.text.length > LONG_CODE ? ' class="long"' : ""}>${escape(i.text)}</code>`;
     case "emphasis":
       return `<em>${inlines(i.children, from)}</em>`;
     case "strong":
