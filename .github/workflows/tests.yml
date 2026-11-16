@@ -1,7 +1,9 @@
 name: tests
 
-# The machine setup runs on a computer with nothing on it, so its tests run on every change, with no root, no apt and no network but the Deno and the
-# test library they fetch. Deno comes through the repository's own bootstraps (they are what is tested first); commons' tools are TypeScript too, so Deno is all.
+# The tests of the repository's own files (`tests/`: the one-command installers of agora, commons' packaging tools and specification checker, the layout of the repository),
+# on IFC TypeScript: Bun, the default runtime, and Node 26, the backup. Bun comes at the version commons pins (the `.github/actions/bun` action), Node 26 from
+# `actions/setup-node`. The tests run the real programs (real `sh`, real `git`, the real tools), never stand-ins; GitHub CLI's sign-in needs an account and a browser,
+# and is not run.
 on:
   push:
     branches: [main]
@@ -10,68 +12,73 @@ on:
 permissions:
   contents: read
 
+env:
+  NODE_VERSION: "26.13.1"
+  # Bun's linter is not in a release yet (1.4.4); this exact canary runs it until one is, then the pin in commons' pins does (commons 0005-typescript-runtime FR-028).
+  BUN_LINT_VERSION: "1.4.4-canary.20261115.1"
+
 jobs:
-  bootstrap:
+  check:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - name: Tools the tests use
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck git dash unzip
-      - name: Deno, through bin/erga-bootstrap.sh itself
+      - uses: ./.github/actions/bun
+      - name: The development tools, from bun.lock
+        working-directory: commons/ts
+        run: bun install --frozen-lockfile
+      - name: TypeScript 7 on commons' tools and on these tests
+        working-directory: commons/ts
+        run: bun run check
+      - name: The formatter
+        working-directory: commons/ts
+        run: bun fmt --check . ../tools ../../tests
+      - name: The linter, type-aware, no warning allowed
+        working-directory: commons/ts
+        run: bun x "bun@$BUN_LINT_VERSION" lint --type-aware --max-warnings 0 ../tools ../../tests
+      - name: Commons' generated files and specifications, as a person checks them, on Bun and on Node 26
         run: |
-          sh bin/erga-bootstrap.sh --help
-          v=$(sed -n 's/^DENO_VERSION=//p' commons/generated/pins.auto.env)
-          echo "$HOME/.local/share/erga/toolchain/deno/$v/linux-x64" >>"$GITHUB_PATH"
-      - name: Type check, lint and format
-        run: deno check bin/setup/main.ts commons/tools/*.ts tests/*.ts && deno lint && deno fmt --check
-      - name: The tests of the setup and of commons
-        run: deno test -A
-      - name: Commons' generated files and specifications, as a person checks them
-        run: |
-          deno run --allow-read --allow-write commons/tools/generate-packaging.ts --check
-          deno run --no-config --allow-read commons/tools/spec-kit-check.ts
-      - name: shellcheck
-        run: shellcheck -s sh -S warning bin/erga-bootstrap.sh bin/erga-setup.sh
+          bun commons/tools/generate-packaging.ts --check
+          bun commons/tools/spec-kit-check.ts
+          node commons/tools/generate-packaging.ts --check
+          node commons/tools/spec-kit-check.ts
 
-  # The same inside an Arch Linux container (erga's 009-machine-bootstrap FR-014 to FR-016): the setup on a computer whose package manager is pacman.
-  arch:
-    runs-on: ubuntu-latest
+  tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        runtime: [bun, node]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 15
-    container: archlinux:latest
     steps:
-      - name: Tools the tests use
-        run: pacman -Syu --noconfirm git shellcheck curl diffutils unzip
       - uses: actions/checkout@v4
-      - name: Let git read the checkout (the container's user is not its owner)
-        run: git config --global --add safe.directory '*'
-      - name: Deno, through bin/erga-bootstrap.sh itself
-        run: |
-          sh bin/erga-bootstrap.sh --help
-          v=$(sed -n 's/^DENO_VERSION=//p' commons/generated/pins.auto.env)
-          echo "$HOME/.local/share/erga/toolchain/deno/$v/linux-x64" >>"$GITHUB_PATH"
-      - name: The tests of the setup and of commons
-        run: deno test -A
+      - uses: ./.github/actions/bun
+      - name: The development tools, from bun.lock
+        working-directory: commons/ts
+        run: bun install --frozen-lockfile
+      - name: ShellCheck, which the packaging test uses where it is installed
+        if: runner.os == 'Linux'
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+      - name: The tests on Bun
+        if: matrix.runtime == 'bun'
+        run: bun test ./tests/
+      - name: The tests on Node 26
+        if: matrix.runtime == 'node'
+        run: node --test "tests/*.test.ts"
 
-  # Windows: bin/erga-bootstrap.ps1 gets the Windows Deno into erga's store and hands over; the Windows side (WSL, the user, PostgreSQL read only) is tested with
-  # stand-ins for wsl.exe and the registry, and its dry run runs for real.
+  # Windows: what has no shell in it. The generator and the specification checker run on both runtimes; the installers' tests need a POSIX `sh` and a Unix PATH, and
+  # `agora-install.ps1` is read by its test on the other systems and is not run by any test (it needs a sign-in to GitHub).
   windows:
     runs-on: windows-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - name: Deno, through bin/erga-bootstrap.ps1 itself
-        shell: pwsh
-        run: ./bin/erga-bootstrap.ps1 --help
-      - name: The dry run of the Windows side
-        shell: pwsh
-        run: ./bin/erga-bootstrap.ps1 --dry-run
-      - name: The old Windows line still runs it
-        shell: pwsh
-        run: ./bin/erga-windows.ps1 --help
-      - name: The Windows side's tests
-        shell: pwsh
+      - uses: ./.github/actions/bun
+      - name: Commons' generated files and specifications, on Bun and on Node 26
+        shell: bash
         run: |
-          $v = ((Select-String -Path commons/generated/pins.auto.env -Pattern '^DENO_VERSION=').Line -split '=')[1]
-          & "$env:LOCALAPPDATA\erga\toolchain\deno\$v\windows-x64\deno.exe" test -A tests/windows_test.ts
-          exit $LASTEXITCODE
+          bun commons/tools/generate-packaging.ts --check
+          bun commons/tools/spec-kit-check.ts
+          node commons/tools/generate-packaging.ts --check
+          node commons/tools/spec-kit-check.ts
