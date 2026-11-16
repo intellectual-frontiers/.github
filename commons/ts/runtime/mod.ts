@@ -3,7 +3,8 @@
  * alone, so the same code runs on Deno, Node and Bun, on Linux, macOS and Windows. Its modules keep the names of the `Deno` calls they
  * replace (`fs.readTextFile`, `proc.env.get`, `errors.NotFound`, `serve`), so a conversion is a rename; `http` is the typed HTTP client
  * `lock` one run at a time, and `discover` finds programs by the prefix of their name, as Git finds its commands; `acme` gets certificates by
- * ACME's DNS-01 challenge (commons 0013-acme). Tests import `./test.ts` on its own.
+ * ACME's DNS-01 challenge (commons 0013-acme), and `trace` reads the files the kernel's trace and layers checks judge and holds
+ * their findings against a baseline (commons 0015-trace). Tests import `./test.ts` on its own.
  *
  * @example
  * ```ts
@@ -36,6 +37,7 @@ export * as jobs from "./schedule.ts";
 export * as stdio from "./stdio.ts";
 export * as tcp from "./tcp.ts";
 export * as terminal from "./console.ts";
+export * as trace from "./trace.ts";
 export * as watch from "./watch.ts";
 export * as tty from "./tty.ts";
 export { errors, mapError, RuntimeError, toError } from "./errors.ts";

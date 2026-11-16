@@ -323,3 +323,14 @@ requirement	mechanism	by	note
 0014-webauthn FR-006	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/webauthn.test.ts: authentications by ES256 and Ed25519 credentials, and a counter that stays 0
 0014-webauthn FR-007	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/webauthn.test.ts: a flipped or short signature, a counter not going up, wrong challenge, origin, RP ID, type, no UV, another credential or key, a non-DER ES256 signature; authenticator data with extensions
 0014-webauthn FR-008	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/webauthn.test.ts: browser JSON read into the response types and verified, refusals naming the path
+0015-trace FR-001	check	.github: cd commons/ts && bun test tests/	kernel/trace.test.ts: a finding's key without its line, named by its rule, file and what it is about
+0015-trace FR-002	check	.github: cd commons/ts && bun test tests/	kernel/trace.test.ts: a baseline written sorted with its comments, read as a set; a new finding and a stale entry each fail
+0015-trace FR-003	check	.github: cd commons/ts && bun test tests/	kernel/trace.test.ts: a judgement told as plain lines, new findings, stale entries and the summary, no colour
+0015-trace FR-004	check	.github: cd commons/ts && bun test tests/	kernel/trace.test.ts: a spec's status in both forms, its requirements with their lines, and reviewed.tsv's rows of its own
+0015-trace FR-005	check	.github: cd commons/ts && bun test tests/	kernel/trace.test.ts: Spec: lines with groups, lists, ranges, whole specs and several lines; not inside a string
+0015-trace FR-006	check	.github: cd commons/ts && bun test tests/	kernel/trace.test.ts: proofs from literals, constants and arrays of constants in proves([...]), and Proves: lines; FR(3) not read
+0015-trace FR-007	check	.github: cd commons/ts && bun test tests/	kernel/trace.test.ts: a clean tree, then each rule found on a fixture tree, a Draft spec and a reviewed requirement not unproved, .auto. exempt
+0015-trace FR-008	check	.github: cd commons/ts && bun test tests/	kernel/trace.test.ts: citations of individuals made by a schema with a spec field, none of another schema's, an uncited term found
+0015-trace FR-009	check	.github: cd commons/ts && bun test tests/	kernel/trace.test.ts: placements by one path, a home naming files and literal characters; unclassified and a tie found
+0015-trace FR-010	check	.github: cd commons/ts && bun test tests/	kernel/trace.test.ts: imports of every form resolved; above and around found with both files and rungs; same rung and packages not
+0015-trace FR-011	check	.github: cd commons/ts && bun test tests/	runtime/trace.test.ts: a fixture tree on disk read; its findings held against a baseline written, passing, then failing when stale
