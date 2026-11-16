@@ -237,6 +237,54 @@ proves(
 
 proves(
   R,
+  "agora-install.ps1, which `irm | iex` runs inside the person's own session, never ends or changes that session, so the window stays open",
+  async () => {
+    const ps = await fs.readTextFile(
+      path.join(ROOT, "bin", "agora-install.ps1"),
+    );
+    const code = ps
+      .split("\n")
+      .filter((line) => !line.trimStart().startsWith("#"))
+      .join("\n");
+    // No `exit` statement (which closes the window of an `iex`), and no class (which a second `iex` in the same session cannot redefine).
+    assert(!/(^|[\s;{(])exit(\s|;|$)/m.test(code), "no exit statement");
+    assert(!/^\s*class\s/m.test(code), "no class");
+    // Everything runs in one function, whose settings are its own; what it needs of the session's environment it puts back; the result is $LASTEXITCODE.
+    assert(code.includes("function Install-Agora {"), "one function");
+    assert(
+      code.indexOf("$ErrorActionPreference = 'Stop'") >
+        code.indexOf("function Install-Agora {"),
+      "its error handling is the function's own",
+    );
+    assert(
+      code.includes("throw [System.OperationCanceledException]::new($What)") &&
+        code.includes("catch [System.OperationCanceledException]"),
+      "a stop is caught, not an exit",
+    );
+    assert(
+      code.includes("$global:LASTEXITCODE = $agoraInstallCode"),
+      "the result is left in LASTEXITCODE",
+    );
+    assert(
+      code.includes("Remove-Item Env:GIT_TERMINAL_PROMPT") &&
+        code.includes("$env:GIT_TERMINAL_PROMPT = $before"),
+      "the Git variable is put back",
+    );
+    // A window opened only to run the command waits for Enter; one the person opened does not.
+    assert(
+      code.includes("Read-Host 'Press Enter to close this window'") &&
+        code.includes("-noexit"),
+      "a one-shot window waits",
+    );
+    assert(
+      code.trimEnd().endsWith("Wait-BeforeClose"),
+      "the wait is the last thing it does",
+    );
+  },
+);
+
+proves(
+  R,
   "agora-install.ps1 does the same in the same order: Git, readable or sign in, both repositories, erga's installer",
   async () => {
     const ps = await fs.readTextFile(
