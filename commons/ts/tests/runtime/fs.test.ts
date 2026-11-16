@@ -167,3 +167,23 @@ proves(
     assert(!(await fs.exists(kept)));
   },
 );
+
+proves(
+  ["0005-typescript-runtime FR-073"],
+  "a folder linked as a junction is read through it, with no administrator rights on Windows",
+  async () => {
+    const dir = await fs.makeTempDir({ prefix: "ifc-junction-" });
+    try {
+      await fs.mkdir(join(dir, "modules"));
+      await fs.writeTextFile(join(dir, "modules", "a.txt"), "inside");
+      await fs.mkdir(join(dir, "tree"));
+      await fs.symlink(join(dir, "modules"), join(dir, "tree", "node_modules"), { type: "junction" });
+      assertEquals(await fs.readTextFile(join(dir, "tree", "node_modules", "a.txt")), "inside");
+      assert((await fs.lstat(join(dir, "tree", "node_modules"))).isSymlink);
+      fs.symlinkSync(join(dir, "modules"), join(dir, "tree", "again"), { type: "junction" });
+      assertEquals(await fs.readTextFile(join(dir, "tree", "again", "a.txt")), "inside");
+    } finally {
+      await fs.remove(dir, { recursive: true });
+    }
+  },
+);
