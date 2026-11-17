@@ -50,7 +50,10 @@ const targetOf = (file: string, spec: string): string => toPosix(relative(ROOT, 
 const WORKSPACES = sources("workspaces");
 const GITHOST = sources("githost");
 const PURE_GITHOST = ["githost/types.ts", "githost/capabilities.ts", "githost/remote.ts"];
-const PURE_WORKSPACES = WORKSPACES.filter((f) => !f.startsWith("workspaces/host/"));
+/** The host layer of the library: what runs `git`, reads and writes files and the environment, and the command that does so. */
+const isHostLayer = (f: string): boolean =>
+  f.startsWith("workspaces/host/") || f.startsWith("workspaces/commands/") || f === "workspaces/ifws.ts";
+const PURE_WORKSPACES = WORKSPACES.filter((f) => !isHostLayer(f));
 
 proves(
   ["0023-if-workspaces FR-005"],
@@ -83,9 +86,7 @@ proves(
         }
         const target = targetOf(f, s);
         const ok =
-          target.startsWith("kernel/") ||
-          (target.startsWith("workspaces/") && !target.startsWith("workspaces/host/")) ||
-          PURE_GITHOST.includes(target);
+          target.startsWith("kernel/") || (target.startsWith("workspaces/") && !isHostLayer(target)) || PURE_GITHOST.includes(target);
         if (!ok) bad.push(`${f}: ${s}`);
       }
       for (const re of [

@@ -137,6 +137,8 @@ export type BaseContext = {
   readonly interact: Interact;
   /** The root of the workspace for a run that says `--home` (or not): that, else `$IFC_WORKSPACES_HOME`, else `$HOME/workspaces`; undefined where none can be found. */
   readonly homeFor: (override: string | undefined) => string | undefined;
+  /** What is on standard input, read once (a Git hook is given its refs there). */
+  readonly stdin: () => Promise<string>;
   /** Where a run writes what is not its report: a diff or a line of progress, to standard error. */
   readonly note: (text: string) => void;
 };

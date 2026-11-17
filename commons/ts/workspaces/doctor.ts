@@ -103,7 +103,7 @@ export function fsCheck(probe: FsProbe, home: string): Check {
   const at = (level: Level, message: string): Check => ({ id: "ifws/filesystem", level, subject: home, message });
   switch (kind) {
     case "ok":
-      return at("ok", `the root is on a ${probe.type} file system`);
+      return at("ok", `the root is on a file system of type ${probe.type}`);
     case "fat":
       return at(
         "warn",

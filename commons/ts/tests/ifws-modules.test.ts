@@ -203,6 +203,7 @@ const BASE: BaseContext = {
   builtins: [],
   interact: { terminal: false, ask: () => Promise.resolve(undefined) },
   homeFor: (o) => o ?? "/home",
+  stdin: () => Promise.resolve(""),
   note: () => undefined,
 };
 

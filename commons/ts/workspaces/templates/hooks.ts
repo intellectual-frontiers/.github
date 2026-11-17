@@ -52,7 +52,7 @@ export function hookScript(name: HookName, strict: boolean): string {
     "if ! command -v ifws >/dev/null 2>&1; then",
     '  unable "ifws is not on the PATH (add $IFWS_HOME/.if-workspaces/tools/bin, or run: ifws shell --install)"',
     "fi",
-    `ifws hook ${name} --home "$IFWS_HOME" -- "$@"`,
+    `ifws hook ${name} --home "$IFWS_HOME" -- "$@" >&2`,
     "status=$?",
     'case "$status" in',
     "  0) exit 0 ;;",

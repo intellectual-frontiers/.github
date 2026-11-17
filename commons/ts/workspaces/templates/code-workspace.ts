@@ -20,6 +20,15 @@ export const codeWorkspaceTemplate: Template = {
     const files: GeneratedFile[] = [];
     const errors: GenerateError[] = [];
     for (const group of groups) {
+      // a group names one file at the root: a separator in it would make a path of the data's choosing
+      if (group.includes("/") || group.includes("\\")) {
+        errors.push({
+          kind: "bad-path",
+          path: `${group}.auto.code-workspace`,
+          reason: "a group's name is one name, with no path separator in it",
+        });
+        continue;
+      }
       const folders: Json[] = data.manifest.repositories
         .filter((r) => r.group === group)
         .sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0))
