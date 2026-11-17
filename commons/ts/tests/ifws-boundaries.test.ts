@@ -50,7 +50,9 @@ const targetOf = (file: string, spec: string): string => toPosix(relative(ROOT, 
 const WORKSPACES = sources("workspaces");
 const GITHOST = sources("githost");
 const PURE_GITHOST = ["githost/types.ts", "githost/capabilities.ts", "githost/remote.ts"];
-const PURE_WORKSPACES = WORKSPACES.filter((f) => !f.startsWith("workspaces/host/"));
+// a folder named `host` anywhere below workspaces/ (`host/`, `tools/host/`, `setup/host/`, `scan/host/`) is the host layer; every other file is pure
+const isHostFile = (f: string): boolean => f.split("/").includes("host");
+const PURE_WORKSPACES = WORKSPACES.filter((f) => !isHostFile(f));
 
 proves(
   ["0023-if-workspaces FR-005"],
@@ -83,9 +85,7 @@ proves(
         }
         const target = targetOf(f, s);
         const ok =
-          target.startsWith("kernel/") ||
-          (target.startsWith("workspaces/") && !target.startsWith("workspaces/host/")) ||
-          PURE_GITHOST.includes(target);
+          target.startsWith("kernel/") || (target.startsWith("workspaces/") && !isHostFile(target)) || PURE_GITHOST.includes(target);
         if (!ok) bad.push(`${f}: ${s}`);
       }
       for (const re of [

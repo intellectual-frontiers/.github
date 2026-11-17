@@ -33,6 +33,8 @@ export type OutRequest = {
   readonly url: string;
   readonly headers: Readonly<Record<string, string>>;
   readonly body?: string;
+  /** Read the answer as bytes (`Exchange.bytes`), for an artifact that is not text (a tarball, a zip); the text `body` of the answer is then empty. */
+  readonly binary?: boolean;
 };
 
 /** One exchange: a request and what answered it. */
@@ -43,6 +45,8 @@ export type Exchange = {
   /** The headers kept: the content type, paging, rate limits and `Retry-After`. */
   readonly headers: Readonly<Record<string, string>>;
   readonly body: string;
+  /** The answer's bytes: present where the request asked for `binary` (a recorded exchange of an artifact holds them). */
+  readonly bytes?: Uint8Array;
 };
 
 /** Why a request got no answer at all (a refusal before it was sent, or the network). */
@@ -117,6 +121,16 @@ export function liveTransport(options: LiveOptions = {}): Transport {
             for (const k of KEPT) {
               const v = res.headers.get(k);
               if (v !== null) headers[k] = v;
+            }
+            if (r.binary === true) {
+              return ok({
+                method: r.method,
+                url: r.url,
+                status: res.status,
+                headers,
+                body: "",
+                bytes: new Uint8Array(await res.arrayBuffer()),
+              });
             }
             return ok({ method: r.method, url: r.url, status: res.status, headers, body: await res.text() });
           } catch (e) {
