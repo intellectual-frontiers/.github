@@ -51,7 +51,8 @@ const WORKSPACES = sources("workspaces");
 const GITHOST = sources("githost");
 const PURE_GITHOST = ["githost/types.ts", "githost/capabilities.ts", "githost/remote.ts"];
 /** The host layer of the library: a folder named `host` anywhere below workspaces/ (`host/`, `tools/host/`, `setup/host/`, `scan/host/`), and what runs `git`, reads and writes files and the environment, and the command that does so. */
-const isHostLayer = (f: string): boolean => f.split("/").includes("host") || f.startsWith("workspaces/commands/") || f === "workspaces/ifws.ts";
+const isHostLayer = (f: string): boolean =>
+  f.split("/").includes("host") || f.startsWith("workspaces/commands/") || f === "workspaces/ifws.ts";
 const PURE_WORKSPACES = WORKSPACES.filter((f) => !isHostLayer(f));
 
 proves(
@@ -162,24 +163,30 @@ proves(
   "no code of workspaces/ names ~/.ssh, a credential store, or the user's or the system's Git configuration, and none writes a Git configuration but a repository's own",
   () => {
     const bad: string[] = [];
+    // two files may name what the rest must not, by the spec's own exceptions: the path guard names what it refuses to read (0023 FR-003), and `ifws setup --git-include` is
+    // the one place that may write the global Git configuration, only on request, with the diff shown and a yes (0024 FR-016)
+    const REFUSES = "workspaces/scan/boundary.ts";
+    const GIT_INCLUDE = "workspaces/setup/host/apply.ts";
     for (const f of WORKSPACES) {
       const text = readTextFileSync(join(ROOT, f));
       // code with its comments taken out but its strings kept: a path named in a string is a path read or written
       const stripped = text.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");
-      for (const re of [
-        /\.ssh\b/,
-        /\.gitconfig\b/,
-        /\/etc\/gitconfig/,
-        /--global\b/,
-        /--system\b/,
-        /GIT_CONFIG_GLOBAL|GIT_CONFIG_SYSTEM/,
-        /credential\.helper|\.git-credentials|keychain|keyring/i,
-        /\.npmrc|\.zshenv|\.profile\b/,
-      ]) {
+      for (const re of f === REFUSES
+        ? []
+        : [
+            /\.ssh\b/,
+            /\.gitconfig\b/,
+            /\/etc\/gitconfig/,
+            /--global\b/,
+            /--system\b/,
+            /GIT_CONFIG_GLOBAL|GIT_CONFIG_SYSTEM/,
+            /credential\.helper|\.git-credentials|keychain|keyring/i,
+            /\.npmrc|\.zshenv|\.profile\b/,
+          ]) {
         if (re.test(stripped)) bad.push(`${f}: ${re.source}`);
       }
       // every `git config` the library runs either reads (`--get`) or sets in the repository's own configuration (`--local`)
-      for (const m of stripped.matchAll(/"config"[^\n]*/g))
+      for (const m of f === GIT_INCLUDE ? [] : stripped.matchAll(/"config"[^\n]*/g))
         if (!/--(?:local|get)/.test(stripped.slice(Math.max(0, (m.index ?? 0) - 120), (m.index ?? 0) + 200)))
           bad.push(`${f}: a git config that neither reads nor is --local`);
     }
