@@ -87,16 +87,26 @@ export async function discoverModules(ctx: Context): Promise<Discovered> {
 }
 
 /** What a module answered to `--ifws-manifest`: its manifest, or that it is opaque with the reason. */
-export type Probed = { readonly kind: "typed"; readonly manifest: ExternalManifest } | { readonly kind: "opaque"; readonly why: string };
+export type Probed =
+  | { readonly kind: "typed"; readonly manifest: ExternalManifest }
+  | { readonly kind: "opaque"; readonly why: string }
+  /** It did not answer within the wait (0025-ifws FR-029): it is opaque, and the run says so as a finding. */
+  | { readonly kind: "timed-out"; readonly ms: number };
 
-/** Asks a program for its manifest, within five seconds. This runs the program: only `--probe` calls it. */
-export async function probeModule(program: string): Promise<Probed> {
+/**
+ * Asks a program for its manifest, within `timeoutMs` (five seconds where not given: 0025-ifws FR-008, FR-029). This runs the program: only `--probe` calls it, and for a module on the `PATH` only
+ * after the person said yes (FR-028); it is not sandboxed.
+ */
+export async function probeModule(program: string, timeoutMs: number = MANIFEST_TIMEOUT_MS): Promise<Probed> {
+  const signal = AbortSignal.timeout(timeoutMs);
   try {
-    const r = await run([program, MANIFEST_FLAG], { signal: AbortSignal.timeout(MANIFEST_TIMEOUT_MS), killAfterMs: 500 });
+    const r = await run([program, MANIFEST_FLAG], { signal, killAfterMs: 500 });
+    if (signal.aborted) return { kind: "timed-out", ms: timeoutMs };
     if (!r.success) return { kind: "opaque", why: `it ended with status ${r.code}` };
     const m = decodeExternalManifest(r.stdout);
     return m.kind === "ok" ? { kind: "typed", manifest: m.value } : { kind: "opaque", why: m.error };
   } catch (e) {
+    if (signal.aborted) return { kind: "timed-out", ms: timeoutMs };
     return { kind: "opaque", why: e instanceof Error ? e.message : String(e) };
   }
 }

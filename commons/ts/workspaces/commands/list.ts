@@ -5,9 +5,12 @@
  *
  * @module
  */
-import { flag } from "../../kernel/args.ts";
-import { ok } from "../../kernel/result.ts";
+import { flag, type Parser, value } from "../../kernel/args.ts";
+import { err, ok } from "../../kernel/result.ts";
+import type { Finding } from "../findings.ts";
+import { MANIFEST_TIMEOUT_MS } from "../modules/external.ts";
 import { discoverModules, probeModule } from "../host/discovery.ts";
+import { absurd } from "../../kernel/absurd.ts";
 import { hiddenFindings, resolveAll } from "../modules/registry.ts";
 import { defineCommand, dispatch, GLOBAL_OPTIONS, type IfwsModule } from "../modules/types.ts";
 import { nearestNames } from "../modules/name.ts";
@@ -38,9 +41,20 @@ export function topHelp(builtins: readonly IfwsModule[]): string {
   ].join("\n");
 }
 
+/** A number of seconds to wait: a whole number, at least one. */
+const seconds: Parser<number> = (t) => (/^\d+$/.test(t) && Number(t) >= 1 ? ok(Number(t)) : err("a whole number of seconds, at least 1"));
+
 const LIST_OPTIONS = {
   ...GLOBAL_OPTIONS,
-  probe: flag({ help: "Run each module found on the PATH or registered, to ask it for --ifws-manifest (it runs nothing else)." }),
+  probe: flag({
+    help: "Run each module registered or found on the PATH, to ask it for --ifws-manifest (it runs nothing else). A module on the PATH is run only after you say yes to it, or with --yes; it is not sandboxed.",
+  }),
+  yes: flag({ help: "With --probe, do not ask before running a module found on the PATH." }),
+  probeTimeout: value({
+    help: `With --probe, how long to wait for each module to answer (the default is ${MANIFEST_TIMEOUT_MS / 1000}); a module that does not answer in time is listed as opaque and is a warning, and the run goes on.`,
+    valueName: "SECONDS",
+    parse: seconds,
+  }),
 };
 
 const list = defineCommand({
@@ -50,25 +64,62 @@ const list = defineCommand({
   run: async (ctx, args) => {
     const found = await discoverModules(ctx);
     const resolved = resolveAll(found.candidates);
-    const findings = [...found.findings, ...hiddenFindings(resolved, ctx.today)];
+    const findings: Finding[] = [...found.findings, ...hiddenFindings(resolved, ctx.today)];
+    // a module on the PATH is run only with the person's yes for it, or with --yes (0025-ifws FR-028); a registered one is the workspace's own
+    const onPath = args.options.probe ? resolved.modules.filter((m) => m.source === "Path") : [];
+    if (onPath.length > 0 && !args.options.yes && !ctx.interact.terminal)
+      return err({
+        kind: "usage",
+        message: `there is no terminal to ask on, and --probe would run ${onPath.map((m) => m.name).join(", ")} from the PATH: run it in a terminal, or give --yes to run them`,
+      });
+    const waitMs = (args.options.probeTimeout ?? MANIFEST_TIMEOUT_MS / 1000) * 1000;
     const rows: {
       name: string;
       source: string;
       summary: string;
       where: string;
       opaque?: string;
+      probed?: false;
       commands?: { name: string; summary: string }[];
     }[] = [];
     for (const m of resolved.modules) {
       const row: (typeof rows)[number] = { name: m.name, source: `ifws:${m.source}`, summary: m.summary, where: m.where };
       if (args.options.probe && m.source !== "BuiltIn") {
-        const probed = await probeModule(m.where);
-        if (probed.kind === "typed") {
-          row.summary = probed.manifest.summary;
-          row.commands = probed.manifest.commands.map((c) => ({ name: c.name, summary: c.summary }));
-        } else {
-          row.summary = `(opaque: ${probed.why})`;
-          row.opaque = probed.why;
+        const approved =
+          m.source !== "Path" ||
+          args.options.yes ||
+          /^\s*y(es)?\s*$/i.test((await ctx.interact.ask(`Run ${m.where} to ask it for its manifest? It is not sandboxed. [y/N] `)) ?? "");
+        if (!approved) {
+          row.summary = "(not probed: it was not run)";
+          row.probed = false;
+          rows.push(row);
+          continue;
+        }
+        const probed = await probeModule(m.where, waitMs);
+        switch (probed.kind) {
+          case "typed":
+            row.summary = probed.manifest.summary;
+            row.commands = probed.manifest.commands.map((c) => ({ name: c.name, summary: c.summary }));
+            break;
+          case "opaque":
+            row.summary = `(opaque: ${probed.why})`;
+            row.opaque = probed.why;
+            break;
+          case "timed-out": {
+            const wait = probed.ms / 1000;
+            row.summary = `(opaque: no answer in ${wait} second${wait === 1 ? "" : "s"})`;
+            row.opaque = `no answer in ${wait} second${wait === 1 ? "" : "s"}`;
+            findings.push({
+              ruleId: "ifws/module-probe-timeout",
+              severity: "Warning",
+              message: `${m.name} did not answer --ifws-manifest in ${wait} second${wait === 1 ? "" : "s"}; it is listed as an opaque command; raise the wait with --probe-timeout SECONDS`,
+              subject: m.name,
+              firstSeen: ctx.today,
+            });
+            break;
+          }
+          default:
+            return absurd(probed);
         }
       }
       rows.push(row);

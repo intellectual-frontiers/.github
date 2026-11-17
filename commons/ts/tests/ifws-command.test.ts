@@ -214,7 +214,7 @@ proves(
       assertStringIncludes(doctor.stdout, "ok");
 
       // probe: typed where it answers, opaque where it does not
-      const probed = await on("list", "--probe", "--json");
+      const probed = await on("list", "--probe", "--yes", "--json");
       const rows = (
         JSON.parse(probed.stdout) as {
           data: { modules: { name: string; summary: string; opaque?: string; commands?: { name: string }[] }[] };
