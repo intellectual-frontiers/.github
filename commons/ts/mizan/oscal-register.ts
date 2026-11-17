@@ -344,7 +344,8 @@ export async function readRegisterInput(root: string, repo: string, testFolders:
     for (const e of readDirSync(folder).sort((a, b) => byText(a.name, b.name))) {
       if (!e.isDirectory || !existsSync(`${folder}/${e.name}/spec.md`)) continue;
       specs.push({ slug: e.name, spec: readTextFileSync(`${folder}/${e.name}/spec.md`).replaceAll("\r\n", "\n") });
-      if (existsSync(`${folder}/${e.name}/reviewed.tsv`)) reviewed.set(e.name, readTextFileSync(`${folder}/${e.name}/reviewed.tsv`));
+      if (existsSync(`${folder}/${e.name}/reviewed.tsv`))
+        reviewed.set(e.name, readTextFileSync(`${folder}/${e.name}/reviewed.tsv`).replaceAll("\r\n", "\n"));
     }
   const enforcement = `${root.replace(/[\\/]$/, "")}/enforcement.tsv`;
   const tests = await readSources(
@@ -357,7 +358,7 @@ export async function readRegisterInput(root: string, repo: string, testFolders:
     specs,
     reviewed,
     enforcement: existsSync(enforcement) ? readTextFileSync(enforcement).replaceAll("\r\n", "\n") : "",
-    tests: [...tests].sort((a, b) => byText(a.path, b.path)),
+    tests: [...tests].map((t) => ({ ...t, text: t.text.replaceAll("\r\n", "\n") })).sort((a, b) => byText(a.path, b.path)),
   };
 }
 

@@ -97,3 +97,24 @@ jobs:
           node commons/tools/mizan-check.ts
           node commons/ts/mizan/generate-ontology.ts --check
           node commons/ts/mizan/check.ts
+
+  # ROBOT (the OBO Foundry's ontology tool) reads the generated OWL as a second, independent OWL reader and reports its quality; it must read it, convert it and find it
+  # consistent, and its report must have no error. The jar is pinned by version and SHA-256.
+  robot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      ROBOT_VERSION: "1.9.11"
+      ROBOT_SHA256: "53cd275c8e4c0dad1fc2c1c34174876795cd7d6b6926e1444adcbb0cb3c7ab26"
+    steps:
+      - uses: actions/checkout@v4
+      - name: ROBOT, pinned
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/robot.jar" "https://github.com/ontodev/robot/releases/download/v${ROBOT_VERSION}/robot.jar"
+          echo "${ROBOT_SHA256}  $RUNNER_TEMP/robot.jar" | sha256sum -c -
+      - name: Convert, reason and report
+        run: |
+          java -jar "$RUNNER_TEMP/robot.jar" convert --input commons/generated/mizan.auto.ofn --format owl --output "$RUNNER_TEMP/mizan.owl"
+          java -jar "$RUNNER_TEMP/robot.jar" convert --input commons/generated/mizan.auto.ttl --format ofn --output "$RUNNER_TEMP/from-ttl.ofn"
+          java -jar "$RUNNER_TEMP/robot.jar" reason --reasoner ELK --input commons/generated/mizan.auto.ofn
+          java -jar "$RUNNER_TEMP/robot.jar" report --input commons/generated/mizan.auto.ofn --fail-on ERROR --output "$RUNNER_TEMP/report.tsv"

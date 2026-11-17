@@ -166,12 +166,16 @@ function owlOf(comments: readonly string[]): Parameters<typeof exportOwl>[0] {
     ...(o.label === undefined ? {} : { label: owlText(o.label) }),
     ...(o.description === undefined ? {} : { description: owlText(o.description) }),
     ...(o.versionInfo === undefined ? {} : { versionInfo: o.versionInfo }),
+    title: o.label?.value ?? "Mizan",
+    license: "https://creativecommons.org/publicdomain/zero/1.0/",
     prefixes: files.flatMap((f) => f.prefixes).map((p) => ({ prefix: p.prefix, iri: p.iri })),
     classes: classes.map((c) => ({ iri: c.iri, ...entity(c.values), subClassOf: (c.values.subClassOf ?? []).map((s) => s.iri) })),
     properties: properties.map((p) => ({
       iri: p.iri,
       kind: p.class.iri === owl.ObjectProperty.iri ? ("object" as const) : ("datatype" as const),
       ...entity(p.values),
+      // a property with no label of its own is labelled by its local name, as the HTML view does (ROBOT's missing_label rule)
+      ...(p.values.label === undefined ? { label: { value: p.iri.slice(p.iri.search(/[#/][^#/]*$/) + 1), language: "en" } } : {}),
       ...(p.values.domain === undefined ? {} : { domain: p.values.domain.iri }),
       ...(p.values.range === undefined ? {} : { range: p.values.range.iri }),
     })),

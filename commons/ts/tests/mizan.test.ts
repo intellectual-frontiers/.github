@@ -284,7 +284,7 @@ proves(
 );
 
 proves(["0012-ontology FR-015"], "a code list of 5,000 entries type-checks with a key type of its entries, within 30 seconds", async () => {
-  const root = resolve(dirname(fromFileUrl(import.meta.url)), "..");
+  const root = resolve(dirname(fromFileUrl(import.meta.url)), "..").replaceAll("\\", "/"); // forward slashes: the path is written into a TypeScript string
   const tsc = `${root}/node_modules/typescript/bin/tsc`;
   const dir = makeTempDirSync({ prefix: "mizan-codes-" });
   try {
@@ -308,25 +308,28 @@ proves(["0012-ontology FR-015"], "a code list of 5,000 entries type-checks with 
       ].join("\n"),
     );
     const started = Date.now();
-    const o = await run([
-      execPath(),
-      tsc,
-      "--ignoreConfig",
-      "--noEmit",
-      "--strict",
-      "--target",
-      "es2024",
-      "--module",
-      "nodenext",
-      "--moduleResolution",
-      "nodenext",
-      "--allowImportingTsExtensions",
-      "--erasableSyntaxOnly",
-      "--skipLibCheck",
-      "--types",
-      "node",
-      `${dir}/list.ts`,
-    ]);
+    const o = await run(
+      [
+        execPath(),
+        tsc,
+        "--ignoreConfig",
+        "--noEmit",
+        "--strict",
+        "--target",
+        "es2024",
+        "--module",
+        "nodenext",
+        "--moduleResolution",
+        "nodenext",
+        "--allowImportingTsExtensions",
+        "--erasableSyntaxOnly",
+        "--skipLibCheck",
+        "--types",
+        "node",
+        `${dir}/list.ts`,
+      ],
+      { cwd: root },
+    ); // `--types node` is found from the package's own folder, wherever the tests are run from
     assertEquals([o.code, o.stdout.trim()], [0, ""], o.stderr);
     assert(Date.now() - started < 30_000, `5,000 entries took ${Date.now() - started} ms`);
   } finally {

@@ -54,6 +54,10 @@ export type OwlOntologyInput = {
   readonly label?: OwlText;
   readonly description?: OwlText;
   readonly versionInfo?: string;
+  /** The ontology's title (`dcterms:title`), which a quality report such as ROBOT's asks for. */
+  readonly title?: string;
+  /** The IRI of the ontology's license (`dcterms:license`). */
+  readonly license?: string;
   /** Prefixes to declare, besides `owl`, `rdf`, `rdfs`, `xsd`, `skos` and `dcterms`, which are always declared as their standard IRIs. */
   readonly prefixes: readonly { readonly prefix: string; readonly iri: string }[];
   readonly classes: readonly OwlClassInput[];
@@ -151,6 +155,8 @@ export function exportOwl(o: OwlOntologyInput): Result<string, readonly string[]
     ...properties.map((p) => `Declaration(${p.kind === "object" ? "ObjectProperty" : "DataProperty"}(${name(p.iri)}))`),
     // the annotation properties that OWL 2 does not build in (`rdfs:label`, `rdfs:comment` and `owl:versionInfo` it does) are declared where they are used
     ...(o.description === undefined ? [] : [`Declaration(AnnotationProperty(${name("http://purl.org/dc/terms/description")}))`]),
+    ...(o.title === undefined ? [] : [`Declaration(AnnotationProperty(${name("http://purl.org/dc/terms/title")}))`]),
+    ...(o.license === undefined ? [] : [`Declaration(AnnotationProperty(${name("http://purl.org/dc/terms/license")}))`]),
     ...(o.classes.some((c) => c.definition !== undefined) || o.properties.some((p) => p.definition !== undefined)
       ? [`Declaration(AnnotationProperty(${name("http://www.w3.org/2004/02/skos/core#definition")}))`]
       : []),
@@ -187,6 +193,8 @@ export function exportOwl(o: OwlOntologyInput): Result<string, readonly string[]
     ...(o.label === undefined ? [] : [`Annotation(rdfs:label ${text(o.label)})`]),
     ...(o.description === undefined ? [] : [`Annotation(${name("http://purl.org/dc/terms/description")} ${text(o.description)})`]),
     ...(o.versionInfo === undefined ? [] : [`Annotation(owl:versionInfo ${quote(o.versionInfo)})`]),
+    ...(o.title === undefined ? [] : [`Annotation(${name("http://purl.org/dc/terms/title")} ${quote(o.title)})`]),
+    ...(o.license === undefined ? [] : [`Annotation(${name("http://purl.org/dc/terms/license")} <${o.license}>)`]),
   ];
   const comments = (o.comments ?? []).map((c) => `# ${c}\n`).join("");
   const declared = prefixes.map((p) => `Prefix(${p.prefix}:=<${p.iri}>)\n`).join("");
