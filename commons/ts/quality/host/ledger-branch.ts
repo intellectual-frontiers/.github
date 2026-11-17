@@ -10,6 +10,7 @@
  * @module
  */
 import { GENESIS } from "../../kernel/evidence.ts";
+import { formatAssuranceError, foldAssurance } from "../attestation/rules.ts";
 import { err, ok, type Result } from "../../kernel/result.ts";
 import { type Sha256, sha256 } from "../../kernel/sha256.ts";
 import {
@@ -80,6 +81,8 @@ export async function readLedger(repo: string): Promise<Result<LedgerRead, Ledge
   }
   const folded = foldLedger(events);
   if (folded.kind === "err") return err({ kind: "ledger", reason: formatLedgerError(folded.error) });
+  const tier2 = foldAssurance(events);
+  if (tier2.kind === "err") return err({ kind: "ledger", reason: formatAssuranceError(tier2.error) });
   return ok({ ledger: folded.value, events, files: files.value.length, head: chain.value, tip: tip.value });
 }
 
@@ -104,6 +107,8 @@ export async function appendEvents(
   const read = before.value;
   const folded = foldLedger([...read.events, ...events]);
   if (folded.kind === "err") return err({ kind: "ledger", reason: formatLedgerError(folded.error) });
+  const tier2 = foldAssurance([...read.events, ...events]);
+  if (tier2.kind === "err") return err({ kind: "ledger", reason: formatAssuranceError(tier2.error) });
   const sign = options.sign ?? (await signingFollowsConfig(repo));
   let tip = read.tip;
   let head = read.head;

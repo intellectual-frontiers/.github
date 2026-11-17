@@ -24,6 +24,7 @@
  */
 import { absurd } from "../../kernel/absurd.ts";
 import { GENESIS } from "../../kernel/evidence.ts";
+import type { Attributes } from "../../kernel/otel.ts";
 import { err, ok, type Result } from "../../kernel/result.ts";
 import type { Sha256 } from "../../kernel/sha256.ts";
 import { AlreadyExists } from "../../runtime/errors.ts";
@@ -116,6 +117,8 @@ export type KeepOptions = {
   readonly commit?: string;
   /** Whether to sign the commit that keeps it: true, false, or (not given) as the host's `commit.gpgsign` says. */
   readonly sign?: boolean;
+  /** Facts every resource of the record carries besides the installation: the SHA-256 of the plan that governs the run (`ifc.quality.plan.sha256`, 0021-ifqs FR-039). */
+  readonly resourceAttributes?: Attributes;
 };
 
 /** A run that was kept. */
@@ -245,6 +248,7 @@ export async function keepRun(options: KeepOptions): Promise<Result<Kept, KeepEr
     record: options.record,
     previous: previous ?? GENESIS,
     ...(options.notRun === undefined ? {} : { notRun: options.notRun }),
+    ...(options.resourceAttributes === undefined ? {} : { resourceAttributes: options.resourceAttributes }),
   });
   if (canonical.kind === "err") return err({ kind: "record", reason: formatQualityError(canonical.error) });
   const q = canonical.value.record;

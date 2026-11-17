@@ -44,6 +44,7 @@ import { canonicalize as jcs, GENESIS } from "../../kernel/evidence.ts";
 import { redactText } from "../../kernel/otel.ts";
 import { err, ok, type Result } from "../../kernel/result.ts";
 import { type Sha256, sha256 } from "../../kernel/sha256.ts";
+import { TIER2_EVENTS } from "./tier2-events.ts";
 import { type Day, dayDecoder } from "./time.ts";
 
 // ---------------------------------------------------------------------------------------------------------------------------- the events
@@ -99,6 +100,7 @@ const events = tagged({
   statement: object({ kind: literal("statement"), requirement, by, who: string, day: dayDecoder }, { note: text }),
   review: object({ kind: literal("review"), requirement, by, who: string, day: dayDecoder }, { sample: boolean }),
   probe: object({ kind: literal("probe"), requirement, outcome: literal("pass", "fail"), source: string, day: dayDecoder }),
+  ...TIER2_EVENTS,
 });
 
 /** One event of the ledger. */
@@ -157,6 +159,10 @@ function redactEvent(e: LedgerEvent): LedgerEvent {
     case "nonconformance-closed":
     case "review":
     case "probe":
+    case "plan-registered":
+    case "sample-drawn":
+    case "sample-attested":
+    case "mutation-run":
       return e;
     default:
       return absurd(e);
@@ -365,6 +371,12 @@ export function applyEvent(l: Ledger, e: LedgerEvent): Result<Ledger, LedgerErro
       return next({
         attestations: [...l.attestations, { kind: "probe", requirement: e.requirement, outcome: e.outcome, source: e.source, day: e.day }],
       });
+    // the records of Tier 2 (0021-ifqs FR-038 to FR-041) are folded by attestation/rules.ts; here they take their place in the sequence
+    case "plan-registered":
+    case "sample-drawn":
+    case "sample-attested":
+    case "mutation-run":
+      return next({});
     default:
       return absurd(e);
   }
