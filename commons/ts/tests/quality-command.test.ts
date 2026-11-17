@@ -116,7 +116,16 @@ proves(
       const path = /kept (\S+)/.exec(kept.stdout)?.[1] ?? "";
       assert(path.startsWith("quality/evidence/"), path);
       const rewrite = await run(
-        ["git", "-C", repo, "filter-branch", "-f", "--tree-filter", `sed -i 's/"ifc-test"/"ifc-tesT"/' ${path}`, "quality"],
+        [
+          "git",
+          "-C",
+          repo,
+          "filter-branch",
+          "-f",
+          "--tree-filter",
+          `sed -i.bak 's/"ifc-test"/"ifc-tesT"/' ${path} && rm -f ${path}.bak`,
+          "quality",
+        ],
         {
           env: { FILTER_BRANCH_SQUELCH_WARNING: "1" },
         },

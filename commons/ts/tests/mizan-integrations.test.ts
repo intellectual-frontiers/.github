@@ -39,7 +39,8 @@ import {
 
 const HERE = dirname(fromFileUrl(import.meta.url));
 const IMPORT = resolve(HERE, "..", "mizan", "integrations", "host", "import.ts");
-const KERNEL_RDF = resolve(HERE, "..", "kernel", "rdf.ts");
+// a file URL, not a path: it is written into a generated module as an import specifier, and a Windows path is not one
+const KERNEL_RDF = pathToFileURL(resolve(HERE, "..", "kernel", "rdf.ts")).href;
 const TURTLE = resolve(HERE, "..", "..", "generated", "mizan.auto.ttl");
 
 const keys = (ts: readonly RdfTriple[]): string[] => [...new Set(ts.map(tripleKey))].sort();

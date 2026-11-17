@@ -11,7 +11,7 @@
  */
 import { flag } from "../../kernel/args.ts";
 import { err, ok } from "../../kernel/result.ts";
-import { existsSync } from "../../runtime/fs.ts";
+import { existsSync, realPath } from "../../runtime/fs.ts";
 import { join } from "../../runtime/path.ts";
 import type { Finding } from "../findings.ts";
 import { worktreePathOf, worktreeWanted } from "../layout.ts";
@@ -157,7 +157,9 @@ const prune = defineCommand({
   options: PRUNE_OPTIONS,
   run: (ctx, args) =>
     withWorkspace(ctx, async (loaded) => {
-      const base = `${loaded.home.replaceAll("\\", "/")}/.worktrees/`;
+      // Git prints a worktree's real path (on macOS /private/var for /var), so the base is the root's real path too
+      const realHome = await realPath(loaded.home).catch(() => loaded.home);
+      const base = `${realHome.replaceAll("\\", "/")}/.worktrees/`;
       const lines: string[] = [];
       const done: string[] = [];
       for (const repo of loaded.manifest.repositories) {

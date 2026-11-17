@@ -148,9 +148,21 @@ proves(
       assert((await verifyBranch(repo)).kind === "ok");
       // rewrite the branch so that its first file differs by one byte, in every commit that holds it
       const first = paths[0] ?? "";
-      const r = await run(["git", "-C", repo, "filter-branch", "-f", "--tree-filter", `sed -i 's/"bun"/"bux"/' ${first}`, QUALITY_BRANCH], {
-        env: { FILTER_BRANCH_SQUELCH_WARNING: "1", GIT_TERMINAL_PROMPT: "0" },
-      });
+      const r = await run(
+        [
+          "git",
+          "-C",
+          repo,
+          "filter-branch",
+          "-f",
+          "--tree-filter",
+          `sed -i.bak 's/"bun"/"bux"/' ${first} && rm -f ${first}.bak`,
+          QUALITY_BRANCH,
+        ],
+        {
+          env: { FILTER_BRANCH_SQUELCH_WARNING: "1", GIT_TERMINAL_PROMPT: "0" },
+        },
+      );
       assert(r.success, r.stderr);
       const v = await verifyBranch(repo);
       assert(v.kind === "err", "the rewrite is found");

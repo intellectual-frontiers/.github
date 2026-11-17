@@ -25,7 +25,8 @@ import {
 
 const HERE = dirname(fromFileUrl(import.meta.url));
 const IMPORT = resolve(HERE, "..", "mizan", "integrations", "host", "import.ts");
-const KERNEL_RDF = resolve(HERE, "..", "kernel", "rdf.ts");
+// a file URL, not a path: it is written into a generated module as an import specifier, and a Windows path is not one
+const KERNEL_RDF = pathToFileURL(resolve(HERE, "..", "kernel", "rdf.ts")).href;
 
 const keys = (ts: readonly RdfTriple[]): string[] => ts.map(tripleKey).sort();
 const RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
