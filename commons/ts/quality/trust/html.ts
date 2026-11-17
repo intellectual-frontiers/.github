@@ -76,7 +76,7 @@ function capaRows(list: readonly TrustCapa[]): readonly (readonly string[])[] {
     code(c.nonconformance),
     esc(c.state === "CapaOpen" ? "open" : c.state === "CapaVerified" ? `verified ${c.verifiedOn ?? ""}` : `closed ${c.closedOn ?? ""}`),
     esc(c.openedOn),
-    esc(c.action),
+    esc(c.action ?? "withheld"),
     esc(c.test),
   ]);
 }

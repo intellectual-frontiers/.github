@@ -1,7 +1,7 @@
 /**
  * `ifws list --probe` (commons 0025-ifws FR-028, FR-029, owner decision of 2026-11-17): a module found on the `PATH` is run, to ask it for its `--ifws-manifest`, only with the person's yes for it or with
  * `--yes` (and where there is no terminal and no `--yes` the run is a usage failure that runs nothing); it is not sandboxed. The five seconds stay the default wait, `--probe-timeout SECONDS` sets
- * another, and a module that does not answer in time is an `ifws:Warning` finding that names it and the wait, while the run goes on and lists every other module. The modules are real `sh` programs
+ * another, and a module that does not answer in time is an `ifws:Informational` finding that names it and the wait, while the run goes on and lists every other module. The modules are real `sh` programs
  * on a real `PATH`; the answers of a person are given to the real `main` through its `interact`, and the rest is `ifws` run as a real program.
  *
  * @module
@@ -97,7 +97,7 @@ proves(
         interact: { terminal: true, ask: (q) => (asking.push(q), Promise.resolve("n")) },
       });
       assertEquals(asking, [], "--yes asked");
-      assertEquals(all, 1, "the module that did not answer is a warning");
+      assertEquals(all, 0, "the module that did not answer is an informational finding: the exit status stays 0");
       assertStringIncludes(await readTextFile(ran), "ifws-stuck --ifws-manifest");
     });
   },
@@ -106,7 +106,7 @@ proves(
 
 proves(
   ["0025-ifws FR-029"],
-  "the wait for --ifws-manifest is five seconds by default and --probe-timeout sets another; a module that does not answer in time is an ifws:Warning that names it and the wait, listed as opaque, and the run goes on",
+  "the wait for --ifws-manifest is five seconds by default and --probe-timeout sets another; a module that does not answer in time is an ifws:Informationaling that names it and the wait, listed as opaque, and the run goes on",
   async () => {
     await withModules(async (w, path) => {
       assertEquals(MANIFEST_TIMEOUT_MS, 5000);
@@ -116,12 +116,12 @@ proves(
       const took = Date.now() - started;
       assert(took < 20_000, `the stuck module was waited for ${took} ms`);
       const listed = JSON.parse(r.stdout) as Listed;
-      // not a failure of the run: a finding (status 1), every other module listed, the one that answered typed
-      assertEquals(r.code, 1, r.stderr);
+      // not a failure of the run: an informational finding (status 0), every other module listed, the one that answered typed
+      assertEquals(r.code, 0, r.stderr);
       const found = listed.findings.filter((f) => f.ruleId === "ifws/module-probe-timeout");
       assertEquals(found.map((f) => [f.subject, f.severity]).sort(), [
-        ["slow", "Warning"],
-        ["stuck", "Warning"],
+        ["slow", "Informational"],
+        ["stuck", "Informational"],
       ]);
       for (const f of found) assertStringIncludes(f.message, "did not answer --ifws-manifest in 1 second");
       const row = (name: string) => listed.data.modules.find((m) => m.name === name);

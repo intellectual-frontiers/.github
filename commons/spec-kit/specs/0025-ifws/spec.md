@@ -50,7 +50,7 @@
 - **FR-026**: Every run MUST write its evidence record (FR-023) but the printing form of `ifws shell <shell>` (it writes no file, 0024-ifws-host FR-017, and a start-up file may run it at every start), `ifws help` and the help of a command (they run nothing), a Git hook that `ifws hook` runs (a hook only reads, 0024-ifws-host FR-015), and a run for which `<home>/.if-workspaces/` does not exist, which has no place to keep it (`ifws init`, which makes the area, writes its record).
 - **FR-027**: The controller MUST hold the module `ifws hook <pre-commit|commit-msg|pre-push>`, which the generated hooks run (0024-ifws-host FR-014, FR-025): it is internal, it only reads, and its status is 0 or 1 where it ran its checker and 2 or 3 where it could not.
 - **FR-028**: `ifws list --probe` MUST run a module found on the `PATH` only with the user's confirmation for it, or with `--yes`, and it MUST NOT sandbox the module: a probe is the run of a program the user approved.
-- **FR-029**: The five seconds of FR-008 MUST stay the default wait for `--ifws-manifest`; `--probe-timeout` MAY raise them, and a module that does not answer in time MUST be a finding of the run (the module named, the wait given) and MUST NOT make the run fail.
+- **FR-029**: The five seconds of FR-008 MUST stay the default wait for `--ifws-manifest`; `--probe-timeout` MAY raise them, and a module that does not answer in time MUST be an informational finding of the run (the module named, the wait given) and MUST NOT make the run fail or change its exit status.
 
 ## Out of scope
 

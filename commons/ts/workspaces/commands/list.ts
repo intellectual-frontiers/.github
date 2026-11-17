@@ -111,7 +111,7 @@ const list = defineCommand({
             row.opaque = `no answer in ${wait} second${wait === 1 ? "" : "s"}`;
             findings.push({
               ruleId: "ifws/module-probe-timeout",
-              severity: "Warning",
+              severity: "Informational",
               message: `${m.name} did not answer --ifws-manifest in ${wait} second${wait === 1 ? "" : "s"}; it is listed as an opaque command; raise the wait with --probe-timeout SECONDS`,
               subject: m.name,
               firstSeen: ctx.today,

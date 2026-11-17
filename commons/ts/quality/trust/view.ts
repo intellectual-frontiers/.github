@@ -79,7 +79,8 @@ export type TrustCapa = {
   readonly nonconformance: string;
   readonly state: "CapaOpen" | "CapaVerified" | "CapaClosed";
   readonly openedOn: string;
-  readonly action: string;
+  /** The corrective action in words: for the Assessor and Internal audiences only; the Public page withholds it (0022 FR-018). */
+  readonly action?: string;
   readonly test: string;
   readonly verifiedOn?: string;
   readonly closedOn?: string;
@@ -237,7 +238,12 @@ export function trustViewOf(
     if (requirementText(n.requirement) !== undefined) withheld();
     return { ...named, requirement: r(n.requirement) };
   });
-  const capas = sortBy(input.capas, (c) => c.id).map((c): TrustCapa => ({ ...c, action: r(c.action), test: r(c.test) }));
+  const capas = sortBy(input.capas, (c) => c.id).map((c): TrustCapa => {
+    const { action, ...named } = c;
+    if (messages) return { ...named, ...(action === undefined ? {} : { action: r(action) }), test: r(c.test) };
+    if (action !== undefined) withheld();
+    return { ...named, test: r(c.test) };
+  });
   const requirements = sortBy(input.requirements, (q) => q.id).map((q): TrustRequirement => ({ ...q, id: r(q.id) }));
   const objectives = sortBy(input.objectives, (o) => o.id);
   return ok({
