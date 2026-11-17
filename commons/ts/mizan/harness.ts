@@ -17,6 +17,7 @@ import { stdio } from "../runtime/mod.ts";
 import { BASELINE_COMMENTS, readSpecTexts } from "./spec-files.ts";
 import { type Declaration } from "./changes/declaration.ts";
 import { declarationPlugin } from "./changes/plugin.ts";
+import { versionsPlugin, type WorkFile } from "./versions/plugin.ts";
 import { type MizanFinding, mizanFindings, type RulePlugin, rulePlugins } from "./rules.ts";
 import { type KnownTerms, specTermFindings } from "./spec-terms.ts";
 import { basisMissing, termFindings, type TermRecord } from "./standards.ts";
@@ -47,6 +48,11 @@ export type HarnessInput = {
    * domain needs a production day. The rules that need a range of commits are the command's (`changes.ts`).
    */
   readonly declaration?: { readonly declaration: Declaration | undefined; readonly file: string };
+  /**
+   * The records of the works under the root (`release.ts`, commons 0026-works-versioning FR-032), read as text with their paths from the root: that each decodes, that its version matches the pattern
+   * of its kind's scheme and that a controlled document's revision has its approval. The comparison with a base is the command's (`versions.ts`).
+   */
+  readonly works?: readonly WorkFile[];
 };
 
 /** Run the check: print every new finding and every stale baseline line on standard error; returns 0, or 1 where a finding is new or a baseline line is stale. */
@@ -59,7 +65,10 @@ export function holdHarness(i: HarnessInput): number {
   const gated = (f: MizanFinding): boolean => f.severity === "gate";
   const specs = readSpecTexts(i.root);
   const named = i.specTerms === undefined ? [] : specTermFindings(specs, i.specTerms.known, i.specTerms.deprecated);
-  const changes = i.declaration === undefined ? [] : [declarationPlugin(i.declaration.declaration, i.declaration.file, specs[0]?.slug)];
+  const changes = [
+    ...(i.declaration === undefined ? [] : [declarationPlugin(i.declaration.declaration, i.declaration.file, specs[0]?.slug)]),
+    ...(i.works === undefined ? [] : [versionsPlugin(i.works, specs[0]?.slug)]),
+  ];
   // a folder with no specification has none for the plugin to be anchored to: it is then asked once, of nothing
   const alone = specs.length === 0 ? changes.flatMap((p) => p.check({ slug: "", spec: "" })) : [];
   const all: readonly MizanFinding[] = [

@@ -25,6 +25,7 @@ import { type Keyed, parseSpec } from "../kernel/trace.ts";
 import { authorities, MZID } from "../../ontology/mizan/mod.ts";
 import type { ChangesRule } from "./changes/rules.ts";
 import type { Phase } from "./changes/declaration.ts";
+import type { VersionsRule } from "./versions/rules.ts";
 
 /** The ids of the rules Mizan adds (0003-mizan FR-013 to FR-015, 0018-standards-first FR-009). */
 export type MizanRule =
@@ -42,7 +43,8 @@ export type MizanRule =
   | "mizan/deprecated-no-replacement"
   | "mizan/authority-citation"
   | "mizan/standard-newer"
-  | ChangesRule;
+  | ChangesRule
+  | VersionsRule;
 
 /**
  * A finding of one of Mizan's rules: the same shape as the trace's, with a rule that is Mizan's. A finding of the `changes` check (commons 0020-ifccm) also carries its phase: a `gate`

@@ -23,6 +23,7 @@ import * as ifwsOntology from "../../ontology/ifws/mod.ts";
 import { pm } from "../../ontology/supply-chain/packaging/mod.ts";
 import { type RulePlugin, rulePlugins } from "./rules.ts";
 import { holdHarness } from "./harness.ts";
+import { readWorks } from "./versions/scan.ts";
 import { BASELINE_COMMENTS, readSpecTexts } from "./spec-files.ts";
 import type { BasisKind, TermRecord } from "./standards.ts";
 
@@ -104,6 +105,7 @@ export function main(
     // commons' own folder (no --root) also holds its ontologies to the standards rules (0018-standards-first FR-001, FR-003, FR-005)
     ...(own
       ? {
+          works: readWorks(fileURLToPath(new URL("../../..", import.meta.url))),
           terms: mizanTermRecords(),
           termsFile: "commons/ontology",
           completeness: [

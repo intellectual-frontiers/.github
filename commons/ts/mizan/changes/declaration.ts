@@ -58,6 +58,12 @@ export function dayOf(text: string): Day | undefined {
 /** A number of days a harness keeps its evidence for: a whole number of at least one, made only by the decoder. */
 export type RetentionDays = Brand<number, "RetentionDays">;
 
+/** The evidence tiers a harness may name as the tier it releases on: the keys of `ifqs:QualityTier` (0021-ifqs FR-036; a test holds the two lists equal). */
+export const RELEASE_TIERS = ["Tier0", "Tier1", "Tier2"] as const;
+
+/** An evidence tier (0021-ifqs). */
+export type ReleaseTier = (typeof RELEASE_TIERS)[number];
+
 /** A harness's declaration (`ifccm:HarnessDeclaration`). */
 export type Declaration = {
   readonly regulatedDomains: readonly RegulatedDomainName[];
@@ -65,6 +71,8 @@ export type Declaration = {
   readonly productionDeclaredOn?: Day;
   /** How long the harness keeps its evidence on the `quality` branch, in days (0021-ifqs FR-047); absent where it states none. */
   readonly retentionDays?: RetentionDays;
+  /** The evidence tier the harness releases on, the least tier a regulated harness may release at (0026-works-versioning FR-026); absent where it names none. */
+  readonly releaseTier?: ReleaseTier;
 };
 
 /** What an enforcement phase is (`ifccm:EnforcementPhase`): `warn` is held by a baseline that only shrinks, `gate` fails whatever the baseline holds. */
@@ -91,18 +99,23 @@ export type HarnessRecord = {
 const day: Decoder<Day> = refine(string, "Day", (s) => dayOf(s) !== undefined);
 const domain = literal(...REGULATED_DOMAINS);
 const retention: Decoder<RetentionDays> = refine(integer, "RetentionDays", (n) => n >= 1);
-const declarationDecoder = object({ regulatedDomains: array(domain) }, { productionDeclaredOn: day, retentionDays: retention });
+const tier = literal(...RELEASE_TIERS);
+const declarationDecoder = object(
+  { regulatedDomains: array(domain) },
+  { productionDeclaredOn: day, retentionDays: retention, releaseTier: tier },
+);
 const decisionDecoder = object({ id: string, approvedBy: string, covers: array(string) }, { record: integer });
 
 /** A declaration decoded from data read from a file. */
 export function decodeDeclaration(input: unknown): Result<Declaration, DecodeError> {
   const r = declarationDecoder(input, "declaration");
   if (r.kind === "err") return r;
-  const { regulatedDomains, productionDeclaredOn, retentionDays } = r.value;
+  const { regulatedDomains, productionDeclaredOn, retentionDays, releaseTier } = r.value;
   return ok({
     regulatedDomains: [...new Set(regulatedDomains)],
     ...(productionDeclaredOn === undefined ? {} : { productionDeclaredOn }),
     ...(retentionDays === undefined ? {} : { retentionDays }),
+    ...(releaseTier === undefined ? {} : { releaseTier }),
   });
 }
 
