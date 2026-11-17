@@ -18,6 +18,19 @@ const needs =
 
 const SWITCH = { IFWS_ALLOW_LOOPBACK_HTTP: "1" };
 
+/** The findings of the loopback rule in a `--json` report: the rule and the severity of each. */
+function loopbackFindings(json: string): readonly { readonly ruleId: string; readonly severity: unknown }[] {
+  const report: unknown = JSON.parse(json);
+  assert(typeof report === "object" && report !== null && "findings" in report && Array.isArray(report.findings), "a report with findings");
+  const found: { ruleId: string; severity: unknown }[] = [];
+  const list: readonly unknown[] = report.findings;
+  for (const f of list) {
+    if (typeof f === "object" && f !== null && "ruleId" in f && f.ruleId === "ifws/loopback-http")
+      found.push({ ruleId: f.ruleId, severity: "severity" in f ? f.severity : undefined });
+  }
+  return found;
+}
+
 proves(
   ["0023-if-workspaces FR-037"],
   "the switch is on only where the environment says 1, and its line and finding are the ones the specification states",
@@ -47,22 +60,13 @@ proves(
         assertEquals(quiet.stderr.includes("IFWS_ALLOW_LOOPBACK_HTTP"), false, `${name}: the line without the switch`);
         assertEquals(loud.stderr.split("\n").filter((l) => l === LOOPBACK_NOTICE).length, 1, `${name}: the line, once, on standard error`);
         assertEquals(loud.code, quiet.code, `${name}: the exit status is the same`);
-        const report: unknown = JSON.parse(loud.stdout);
-        assert(
-          typeof report === "object" && report !== null && "findings" in report && Array.isArray(report.findings),
-          `${name}: a report with findings`,
-        );
-        const mine = report.findings.filter(
-          (f: unknown) => typeof f === "object" && f !== null && "ruleId" in f && f.ruleId === "ifws/loopback-http",
-        );
-        assertEquals(mine.length, 1, `${name}: one informational finding`);
-        assertEquals(mine[0] !== undefined && "severity" in mine[0] ? mine[0].severity : undefined, "Informational");
-        const none: unknown = JSON.parse(quiet.stdout);
-        assert(typeof none === "object" && none !== null && "findings" in none && Array.isArray(none.findings));
+        const mine = loopbackFindings(loud.stdout);
         assertEquals(
-          none.findings.some((f: unknown) => typeof f === "object" && f !== null && "ruleId" in f && f.ruleId === "ifws/loopback-http"),
-          false,
+          mine,
+          [{ ruleId: "ifws/loopback-http", severity: "Informational" }],
+          `${name}: one informational finding in the report`,
         );
+        assertEquals(loopbackFindings(quiet.stdout), [], `${name}: none without the switch`);
       }
     });
   },
