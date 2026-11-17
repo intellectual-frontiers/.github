@@ -34,5 +34,6 @@ plugins = ["./lint/plugin.ts"]
     { files = "runtime/tty.ts", reason = "the terminal's own streams, for its size and raw mode" },
     { files = "runtime/stdio.ts", reason = "the process's standard streams, for what programs read (FR-054)" },
     { files = "tools/**", reason = "command-line tools print their results" },
+    { files = "quality/assessor/verify.ts", reason = "the verifier a pack carries imports nothing of commons (0022-trust FR-016) and prints its report itself" },
   ] },
 ]

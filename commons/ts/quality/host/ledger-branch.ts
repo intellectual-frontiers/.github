@@ -48,7 +48,10 @@ export type LedgerRead = {
 };
 
 /** The files of the ledger on a commit, in sequence. */
-async function filesAt(repo: string, tip: string): Promise<Result<readonly { readonly path: string; readonly text: string }[], HostError>> {
+export async function filesAt(
+  repo: string,
+  tip: string,
+): Promise<Result<readonly { readonly path: string; readonly text: string }[], HostError>> {
   const listed = await gitText(repo, ["ls-tree", "-r", "--name-only", tip, "--", RECORDS_ROOT]);
   if (listed.kind === "err") return listed;
   const paths = listed.value
