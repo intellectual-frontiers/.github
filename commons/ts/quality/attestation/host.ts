@@ -112,12 +112,12 @@ export async function readTier2(repo: string, options: ReadOptions = {}): Promis
 }
 
 /** What every record is kept with. */
-export type KeepOptions = { readonly sign?: boolean };
+export type Tier2KeepOptions = { readonly sign?: boolean };
 
 async function keep(
   repo: string,
   event: Parameters<typeof appendEvents>[1][number],
-  options: KeepOptions,
+  options: Tier2KeepOptions,
 ): Promise<Result<LedgerRead, Tier2Error>> {
   return appendEvents(repo, [event], options.sign === undefined ? {} : { sign: options.sign });
 }
@@ -128,7 +128,7 @@ export async function registerPlan(
   planText: string,
   by: PersonRef,
   day: string,
-  options: KeepOptions = {},
+  options: Tier2KeepOptions = {},
 ): Promise<Result<{ readonly id: string; readonly read: LedgerRead }, Tier2Error>> {
   const plan = readPlan(planText);
   if (plan.kind === "err") return err(refused(`the plan does not read: ${plan.error}`));
@@ -172,7 +172,7 @@ export async function populationOf(repo: string, subject: SampleSubject): Promis
 export async function drawAndKeep(
   repo: string,
   request: DrawRequest,
-  options: KeepOptions = {},
+  options: Tier2KeepOptions = {},
 ): Promise<Result<{ readonly id: string; readonly items: readonly string[]; readonly seed: string }, Tier2Error>> {
   const population = await populationOf(repo, request.subject);
   if (population.kind === "err") return population;
@@ -205,7 +205,7 @@ export async function attestAndKeep(
     readonly person: PersonRef;
     readonly day: string;
   },
-  options: KeepOptions = {},
+  options: Tier2KeepOptions = {},
 ): Promise<Result<LedgerRead, Tier2Error>> {
   const read = await readLedger(repo);
   if (read.kind === "err") return read;
@@ -247,7 +247,7 @@ export async function ingestMutation(
   repo: string,
   reportText: string,
   day: string,
-  options: KeepOptions = {},
+  options: Tier2KeepOptions = {},
 ): Promise<Result<{ readonly id: string }, Tier2Error>> {
   const report = readMutationReport(reportText);
   if (report.kind === "err") return err(refused(`the mutation report does not read: ${report.error}`));

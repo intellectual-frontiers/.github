@@ -47,7 +47,7 @@ async function withDemo(f: (repo: string) => Promise<void>): Promise<void> {
 }
 
 proves(
-  ["0022-trust FR-001", "0022-trust FR-002", "0021-ifqs FR-004"],
+  ["0022-trust FR-001", "0022-trust FR-002"],
   "the page is generated from the evidence: each requirement with its grade, freshness, day and run, the review debt, the objectives and the counts of passed, failed and not_run, and --check fails where a file differs",
   () =>
     withDemo(async (repo) => {

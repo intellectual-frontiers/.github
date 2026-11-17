@@ -107,7 +107,7 @@ function attribute(attributes: unknown, key: string): string | undefined {
 }
 
 /** What an evidence file says of itself: its predecessor, the trace id of its spans and the outcome of each case. */
-export type EvidenceFacts = {
+export type PackEvidenceFacts = {
   readonly previous: string | undefined;
   readonly traceId: string | undefined;
   readonly outcomes: readonly string[];
@@ -115,7 +115,7 @@ export type EvidenceFacts = {
 };
 
 /** Reads an evidence file (an OTLP/JSON document of 0021-ifqs FR-013) for what the verifier needs of it. */
-export function evidenceFacts(bytes: Uint8Array | undefined): EvidenceFacts {
+export function evidenceFacts(bytes: Uint8Array | undefined): PackEvidenceFacts {
   const doc = parse(bytes);
   if (doc === undefined) return { previous: undefined, traceId: undefined, outcomes: [], readable: false };
   let previous: string | undefined;

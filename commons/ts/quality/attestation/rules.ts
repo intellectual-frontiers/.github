@@ -31,7 +31,7 @@ export type RegisteredPlan = {
 };
 
 /** A person's attestation of a sample. */
-export type Attestation = {
+export type SampleAttestation = {
   readonly person: PersonRef;
   readonly day: string;
   readonly seq: number;
@@ -50,7 +50,7 @@ export type DrawnSample = {
   readonly by: PersonRef;
   readonly day: string;
   readonly seq: number;
-  readonly attested?: Attestation;
+  readonly attested?: SampleAttestation;
 };
 
 /** A mutation run as recorded. */

@@ -33,7 +33,7 @@ import { daysBetween } from "../pure/ledger.ts";
 import { oscalAssessmentResults } from "../../kernel/test-report.ts";
 import type { TrustCapa, TrustFailure, TrustInput, TrustNonconformance, TrustObjective, TrustRequirement } from "../trust/view.ts";
 import { buildPack, dcatOf, type BuiltPack, matrixTsv, type PackSource, type SourceFile, packTar } from "./pack.ts";
-import { figuresOf, type PackFiles } from "./verify-pack.ts";
+import { allowedSignersLine, figuresOf, type PackFiles } from "./verify-pack.ts";
 
 /** Why the evidence could not be collected. */
 export type CollectError =
@@ -363,6 +363,29 @@ export async function readPackFolder(root: string): Promise<PackFiles> {
 export async function readPackTar(path: string): Promise<Result<PackFiles, string>> {
   const entries = untar(await readFile(path));
   return entries.kind === "ok" ? ok(filesOf(entries.value)) : err(`${path} is not a tar archive: ${JSON.stringify(entries.error)}`);
+}
+
+/**
+ * The key that signs a pack, from a JWK file (`{"kty":"OKP","crv":"Ed25519","x":...,"d":...}`), and the allowed-signers file that verifies it for
+ * `principal`: the key is imported for signing alone, and what is published of it is the public part.
+ */
+export async function loadSigningKey(jwkText: string, principal: string): Promise<Result<NonNullable<PackSource["signing"]>, string>> {
+  let jwk: JsonWebKey;
+  try {
+    jwk = JSON.parse(jwkText) as JsonWebKey;
+  } catch {
+    return err("the signing key is not JSON");
+  }
+  if (jwk.kty !== "OKP" || jwk.crv !== "Ed25519" || typeof jwk.x !== "string" || typeof jwk.d !== "string")
+    return err("the signing key is an Ed25519 private key as a JWK (kty OKP, crv Ed25519, x and d)");
+  if (!/^[A-Za-z0-9._@-]+$/.test(principal)) return err(`${JSON.stringify(principal)} is not a principal an allowed-signers file can hold`);
+  try {
+    const key = await crypto.subtle.importKey("jwk", jwk, { name: "Ed25519" }, false, ["sign"]);
+    const pub = Uint8Array.from(atob(jwk.x.replaceAll("-", "+").replaceAll("_", "/")), (ch) => ch.charCodeAt(0));
+    return ok({ keys: [{ key, keyid: principal }], allowedSigners: allowedSignersLine(principal, pub) });
+  } catch (e) {
+    return err(`the signing key cannot be used: ${e instanceof Error ? e.message : String(e)}`);
+  }
 }
 
 /** A pack from the evidence collected: the page and the pack are made from the same `Collected` (FR-012). */

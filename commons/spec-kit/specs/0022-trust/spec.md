@@ -36,6 +36,10 @@
 - **FR-015**: A verification that cannot check part of the pack (a key that is not in the pack, a file the manifest lists and the pack lacks) MUST report that part as `not_run` with the reason, and MUST NOT report the pack as verified.
 - **FR-016**: The verifier MUST be small, typed TypeScript that runs on Bun and Node 26 with no dependency, and MUST be included in the pack so that the pack can check itself.
 
+## What a pack cannot redact
+
+- **FR-017**: A file kept on the `quality` branch MUST NOT be changed to redact it for a pack, because its digest is in a chain: a pack MUST refuse a kept file that still holds a secret, naming it, so that its source is fixed and kept again, and MUST name in its manifest the personal data (an e-mail address) that a kept file retains; the files a pack makes itself MUST be redacted and the redactions counted (FR-011).
+
 ## Acceptance scenarios
 
 1. **Given** the evidence of a revision with one open nonconformance, **When** the page is generated, **Then** the nonconformance is listed before any success, per FR-002 and FR-003.

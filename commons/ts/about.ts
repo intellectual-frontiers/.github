@@ -51,7 +51,7 @@ export const about: About = {
     },
     {
       path: "quality/",
-      what: "IFC Quality (commons 0021-ifqs): the canonical record of a run (`not_run`, the grade E0 to E5, CTRF case bodies), its JUnit, CTRF, SARIF and TAP renderings, the evidence chain, and the append-only `quality` branch with its notes, written and verified with real `git`. `pure/` imports the kernel alone.",
+      what: "IFC Quality (commons 0021-ifqs): the canonical record of a run (`not_run`, the grade E0 to E5, CTRF case bodies), its JUnit, CTRF, SARIF and TAP renderings, the evidence chain, and the append-only `quality` branch with its notes, written and verified with real `git`; Tier 1 (the ladder, freshness, the ledger of nonconformances and CAPA, objectives, the index) and Tier 2 (`attestation/`: pre-registered plans, attested samples, mutation runs, the agents' reviews; `trust/`: the Trust page and its audiences; `assessor/`: the assessor pack and its offline verifier, commons 0022-trust). `pure/` imports the kernel alone.",
       mayImport: ["node: builtins", "kernel/", "runtime/", "quality/"],
     },
     {
@@ -107,6 +107,10 @@ export const about: About = {
     {
       run: "bun quality/quality.ts record|verify|render",
       does: "Keeps the record of a run on the append-only quality branch (a file, a signed commit, a note on the tested commit), verifies the branch and its chain, and renders a record as JUnit, CTRF, SARIF, TAP or the 29119-3 documents.",
+    },
+    {
+      run: "bun quality/quality.ts trust|pack|verify-pack|plan|sample|mutation|agents",
+      does: "Tier 2 of the quality system: writes the Trust page for an audience (public, assessor, internal) and checks it, writes the signed assessor pack and verifies one offline (the verifier is inside the pack), registers a test plan before its run, draws a sample by a seed and records a person's attestation of it, records a mutation report and shows the strength of each proof beside its grade, and judges the sampling of the agents' reviews.",
     },
     {
       run: "bun workspaces/ifws.ts <module> (or ifws, the package's bin)",

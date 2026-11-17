@@ -97,7 +97,7 @@ proves(
 );
 
 proves(
-  ["0021-ifqs FR-038"],
+  ["0021-ifqs FR-038", "0021-ifqs FR-045"],
   "a person's attestation of a sample is a chained record: the sample, the rule and seed, the result of each item, the role and the day; a sample drawn from the branch is reproducible after the branch has grown",
   async () => {
     const repo = await makeTempDir({ prefix: "ifc-sample-" });
@@ -174,7 +174,7 @@ proves(
 );
 
 proves(
-  ["0021-ifqs FR-039"],
+  ["0021-ifqs FR-039", "0021-ifqs FR-045"],
   "a plan is registered before its run and the run records its hash: a run that followed it has no finding, and one that did not (a plan registered after, a case outside it, a planned case not run, an unknown plan) is named",
   async () => {
     const repo = await makeTempDir({ prefix: "ifc-plan-" });
@@ -183,6 +183,17 @@ proves(
       const registered = await registerPlan(repo, PLAN, ANA, DAY, { sign: false });
       assert(registered.kind === "ok", registered.kind === "err" ? JSON.stringify(registered.error) : "");
       assertEquals(registered.value.id, "PLAN-0001");
+      // a plan with no case, and a case with no acceptance criterion, are refused and nothing is kept
+      const empty = await registerPlan(repo, JSON.stringify({ title: "empty", cases: [] }), ANA, DAY, { sign: false });
+      assert(empty.kind === "err" && JSON.stringify(empty.error).includes("at least one case"));
+      const loose = await registerPlan(
+        repo,
+        JSON.stringify({ title: "loose", cases: [{ name: "a", requirements: [], acceptance: " " }] }),
+        ANA,
+        DAY,
+        { sign: false },
+      );
+      assert(loose.kind === "err" && JSON.stringify(loose.error).includes("acceptance"));
       const plan = readPlan(PLAN);
       assert(plan.kind === "ok");
       const hash = await planHash(plan.value);
@@ -260,7 +271,7 @@ const REPORT = JSON.stringify({
 });
 
 proves(
-  ["0021-ifqs FR-040"],
+  ["0021-ifqs FR-040", "0021-ifqs FR-046"],
   "a mutation report becomes a record naming its tool, each requirement's strength is shown beside its grade, and a strength below the floor lowers the grade of a run",
   async () => {
     const repo = await makeTempDir({ prefix: "ifc-mutation-" });

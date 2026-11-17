@@ -108,6 +108,11 @@
 - **FR-043**: The records of Tier 1 (a nonconformance opened, linked and closed, a CAPA opened, verified and closed, and a statement, a review or a probe's typed result kept as evidence) MUST each be one new file `quality/records/NNNNNN-<kind>.json` on the `quality` branch, in a commit that only appends, redacted as FR-020 asks and chained to the file before it by its digest (64 zeros for the first) as FR-017 chains the evidence files, so that a file changed, removed or inserted is found by the branch's verifier; a state MUST be the fold of its events and MUST NOT be a field that is edited, so that no event closes a nonconformance but the one that follows a closed CAPA.
 - **FR-044**: A proof MUST be held to a cadence by its kind of evidence (FR-025), by default 30 days for a run, 7 days for a probe, 90 days for a statement and a year for a review, and a harness MAY state its own.
 
+## Where Tier 2 keeps what it records
+
+- **FR-045**: The records of Tier 2 (a test plan registered, a sample drawn, a person's attestation of it and a mutation run) MUST each be a file of the ledger of FR-043, in its chain, and an event that does not follow what came before MUST be refused and written nowhere: an attestation of a sample that gives no result on an item sampled, a result on an item not sampled, no named person, or a second attestation; a plan with no case or a case with no acceptance criterion; a mutation row that does not account for its mutants. A sample MUST record its rule, its seed and the count and digest of its population, so that it can be drawn again, and a run that is governed by a plan MUST name it by the SHA-256 of the plan (`ifc.quality.plan.sha256`).
+- **FR-046**: The strength of a proof (FR-040) MUST be the share of its mutants that its tests detected, and a strength below the floor the harness states (60 % where it states none) MUST lower the grade of a proof that is a run by one rung, `E4` to `E3` and `E3` to `E2`, with both shown; a grade that is not a run's, and a proof that no mutation run measured, MUST keep its grade and say which.
+
 ## Acceptance scenarios
 
 1. **Given** a requirement whose only test did not run for lack of network, **When** the run is recorded, **Then** its case is `not_run` with that reason and the requirement is unproven, per FR-005 and FR-014.
