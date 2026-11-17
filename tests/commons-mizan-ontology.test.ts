@@ -219,7 +219,7 @@ doc = json.load(open(root + "/generated/mizan-schemas.auto.json"))
 meta = jsonschema.Draft202012Validator
 meta.check_schema(doc)
 defs = doc["$defs"]
-good = {"label": {"value": "Ontology", "language": "en"}, "rungNumber": 0, "purpose": {"value": "x", "language": "en"}, "kind": {"iri": "https://www.intellectualfrontiers.com/ontology/mizan#Required"}, "mayRelyOn": [], "home": [], "provedBy": []}
+good = {"label": {"value": "Ontology", "language": "en"}, "rungNumber": 0, "purpose": {"value": "x", "language": "en"}, "kind": "https://www.intellectualfrontiers.com/ontology/mizan#Required", "mayRelyOn": [], "home": [], "provedBy": []}
 jsonschema.validate(good, {**defs["Rung"], "$schema": doc["$schema"]})
 try:
     jsonschema.validate({**good, "rungNumber": "zero"}, {**defs["Rung"], "$schema": doc["$schema"]})
@@ -285,22 +285,29 @@ DCT = rdflib.DCTERMS
 catalogs = list(cat.subjects(rdflib.RDF.type, DCAT.Catalog))
 assert len(catalogs) == 1
 datasets = list(cat.objects(catalogs[0], DCAT.dataset))
-assert len(datasets) == 1 and (datasets[0], rdflib.RDF.type, DCAT.Dataset) in cat
-dists = list(cat.objects(datasets[0], DCAT.distribution))
-assert len(dists) == 9, len(dists)
+assert len(datasets) == 4, len(datasets)
 IANA = "https://www.iana.org/assignments/media-types/"
 import os
-for d in dists:
-    assert (d, rdflib.RDF.type, DCAT.Distribution) in cat
-    url = str(next(cat.objects(d, DCAT.downloadURL)))
-    rel = url.split("/commons/")[1]
-    assert os.path.exists(root + "/" + rel), rel
-    media = str(next(cat.objects(d, DCAT.mediaType)))
-    assert media.startswith(IANA) and "/" in media[len(IANA):], media
-    assert (d, DCT.license, None) in cat and (d, DCT.title, None) in cat
-by_file = {str(next(cat.objects(d, DCAT.downloadURL))).split("/")[-1]: str(next(cat.objects(d, DCAT.mediaType)))[len(IANA):] for d in dists}
-assert by_file["mizan.auto.rdf"] == "application/rdf+xml" and by_file["mizan.auto.ttl"] == "text/turtle" and by_file["mizan-schemas.auto.json"] == "application/schema+json", by_file
-assert next(cat.objects(datasets[0], DCT.identifier)) == rdflib.Literal("https://www.intellectualfrontiers.com/ontology/mizan")
+names = set()
+for dataset in datasets:
+    assert (dataset, rdflib.RDF.type, DCAT.Dataset) in cat
+    ident = str(next(cat.objects(dataset, DCT.identifier)))
+    name = ident.rsplit("/", 1)[1]
+    names.add(name)
+    dists = list(cat.objects(dataset, DCAT.distribution))
+    assert len(dists) == 9, (name, len(dists))
+    by_file = {}
+    for d in dists:
+        assert (d, rdflib.RDF.type, DCAT.Distribution) in cat
+        url = str(next(cat.objects(d, DCAT.downloadURL)))
+        rel = url.split("/commons/")[1]
+        assert os.path.exists(root + "/" + rel), rel
+        media = str(next(cat.objects(d, DCAT.mediaType)))
+        assert media.startswith(IANA) and "/" in media[len(IANA):], media
+        assert (d, DCT.license, None) in cat and (d, DCT.title, None) in cat
+        by_file[url.split("/")[-1]] = media[len(IANA):]
+    assert by_file[name + ".auto.rdf"] == "application/rdf+xml" and by_file[name + ".auto.ttl"] == "text/turtle" and by_file[name + "-schemas.auto.json"] == "application/schema+json", by_file
+assert names == {"mizan", "ifccm", "ifqs", "ifws"}, names
 print("independent tools agree")
 `;
 

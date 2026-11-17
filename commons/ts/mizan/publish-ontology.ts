@@ -244,8 +244,6 @@ function owlOf(p: OntologyPublication, comments: readonly string[]): Parameters<
       iri: x.iri,
       kind: x.class.iri === owl.ObjectProperty.iri ? ("object" as const) : ("datatype" as const),
       ...entity(x.values),
-      // a property with no label of its own is labelled by its local name, as the HTML view does (ROBOT's missing_label rule)
-      ...(x.values.label === undefined ? { label: { value: x.iri.slice(x.iri.search(/[#/][^#/]*$/) + 1), language: "en" } } : {}),
       ...(x.values.domain === undefined ? {} : { domain: x.values.domain.iri }),
       ...(x.values.range === undefined ? {} : { range: x.values.range.iri }),
     })),

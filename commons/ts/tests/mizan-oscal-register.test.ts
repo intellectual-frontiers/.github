@@ -235,7 +235,7 @@ proves(
       assertStringIncludes(stale.stderr, `${COMPONENT_FILE} is not what the folder makes; run: bun commons/ts/mizan/oscal-register.ts`);
       assert(!stale.stderr.includes(RESULTS_FILE));
       assertEquals((await run([execPath(), TOOL, "--out", `${tmp}/generated`])).code, 0);
-      assertEquals(readTextFileSync(file), readTextFileSync(`${GENERATED}/${COMPONENT_FILE}`));
+      assertEquals(readTextFileSync(file).replaceAll("\r\n", "\n"), readTextFileSync(`${GENERATED}/${COMPONENT_FILE}`).replaceAll("\r\n", "\n"));
       removeSync(`${tmp}/generated/${RESULTS_FILE}`);
       const missing = await run([execPath(), TOOL, "--check", "--out", `${tmp}/generated`]);
       assertEquals(missing.code, 1);

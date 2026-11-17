@@ -336,5 +336,6 @@ proves(["0023-if-workspaces FR-044"], "IFWS has its own namespace, and the code 
     "Severity",
   ]);
   for (const [name, list] of Object.entries(codeLists))
-    for (const individual of Object.values(list)) assert(individual.class.iri === ifws[name as keyof typeof codeLists].iri, name);
+    for (const individual of Object.values(list) as readonly { readonly class: { readonly iri: string } }[])
+      assert(individual.class.iri === ifws[name as keyof typeof codeLists].iri, name);
 });
