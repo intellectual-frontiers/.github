@@ -130,10 +130,10 @@ proves(["0003-mizan FR-004"], "a bare citation of another repository's spec", ()
 proves(["0003-mizan FR-008"], "a Part of line names another specification of the folder", () => {
   using k = Kit.make();
   assertEquals(k.findings(), "", "commons' own Part of lines name specifications it has");
-  k.edit("specs/0009-sql-aide/spec.md", "**Part of:** 0005-typescript-runtime", "**Part of:** 0020-nothing");
+  k.edit("specs/0009-sql-aide/spec.md", "**Part of:** 0005-typescript-runtime", "**Part of:** 0099-nothing");
   k.edit("specs/0010-file-aide/spec.md", "**Part of:** 0005-typescript-runtime", "**Part of:** 0010-file-aide");
   const out = k.findings();
-  assertStringIncludes(out, "specs/0009-sql-aide: **Part of:** names 0020-nothing, which is not another specification of this folder");
+  assertStringIncludes(out, "specs/0009-sql-aide: **Part of:** names 0099-nothing, which is not another specification of this folder");
   assertStringIncludes(out, "specs/0010-file-aide: **Part of:** names 0010-file-aide");
 });
 
@@ -219,10 +219,12 @@ proves(["0003-mizan FR-009"], "the former name of the tool runs the checker and 
 
 proves(["0003-mizan FR-012"], "a specification in GitHub Spec Kit's form is accepted, and its missing section and status are named", () => {
   using k = Kit.make();
+  // the next free number of the register, so that adding a specification never breaks this test
+  const n = String(fs.readTextFileSync(`${k.root}/registry.tsv`).trim().split("\n").length).padStart(4, "0");
   const kit = [
     "# Feature Specification: Example",
     "",
-    "**Feature Branch**: `0020-example`",
+    `**Feature Branch**: \`${n}-example\``,
     "**Status**: Draft",
     "",
     "## User Scenarios & Testing *(mandatory)*",
@@ -240,16 +242,16 @@ proves(["0003-mizan FR-012"], "a specification in GitHub Spec Kit's form is acce
     "- **SC-001**: It exists.",
     "",
   ].join("\n");
-  fs.writeTextFileSync(`${k.root}/registry.tsv`, `${fs.readTextFileSync(`${k.root}/registry.tsv`).trimEnd()}\n0020\texample\tin force\n`);
-  fs.mkdirSync(`${k.root}/specs/0020-example`, { recursive: true });
-  fs.writeTextFileSync(`${k.root}/specs/0020-example/spec.md`, kit);
+  fs.writeTextFileSync(`${k.root}/registry.tsv`, `${fs.readTextFileSync(`${k.root}/registry.tsv`).trimEnd()}\n${n}\texample\tin force\n`);
+  fs.mkdirSync(`${k.root}/specs/${n}-example`, { recursive: true });
+  fs.writeTextFileSync(`${k.root}/specs/${n}-example/spec.md`, kit);
   fs.writeTextFileSync(
     `${k.root}/enforcement.tsv`,
-    `${fs.readTextFileSync(`${k.root}/enforcement.tsv`).trimEnd()}\n0020-example FR-001\tnone\t-\tAn example in a test\n`,
+    `${fs.readTextFileSync(`${k.root}/enforcement.tsv`).trimEnd()}\n${n}-example FR-001\tnone\t-\tAn example in a test\n`,
   );
   assertEquals(k.findings(), "");
-  k.edit("specs/0020-example/spec.md", "## Success Criteria *(mandatory)*", "## Zzz");
-  k.edit("specs/0020-example/spec.md", "**Status**: Draft", "**Status**: Implemented");
+  k.edit(`specs/${n}-example/spec.md`, "## Success Criteria *(mandatory)*", "## Zzz");
+  k.edit(`specs/${n}-example/spec.md`, "**Status**: Draft", "**Status**: Implemented");
   const out = k.findings();
   assertStringIncludes(out, "has no ## Success Criteria section");
   assertStringIncludes(out, "**Status:** must be one of");

@@ -511,3 +511,92 @@ requirement	mechanism	by	note
 0025-ifws FR-022	none	-	Planned, M5 of issue #10: the options parsed at the boundary and the output forms are not built
 0025-ifws FR-023	none	-	Planned, M5 of issue #10: the idempotence of every command and the evidence of every run are not built
 0025-ifws FR-024	none	-	Planned, M5 of issue #10: the runtime on Bun and Node 26, the loader hook and the typing rules of the library are not built or tested
+0020-ifccm FR-001	none	-	Planned, M2 of issue #10: the changes check reads the words and sections of a capability's issue through the host adapter; the class ifccm:Capability exists and is audited (ifccm-ontology.test.ts)
+0020-ifccm FR-002	none	-	Planned, M2 of issue #10: the changes check reads the parent and child change requests of an area through the host adapter
+0020-ifccm FR-003	none	-	Planned, M2 of issue #10: the changes check reads the Why, Today, Scope and Done when sections of a capability's issue through the host adapter
+0020-ifccm FR-004	none	-	Planned, M2 of issue #10: the changes check reads the checkbox items of a capability's issue through the host adapter
+0020-ifccm FR-005	none	-	Planned, M2 of issue #10: the changes check reads Refs and Closes lines of each commit's message
+0020-ifccm FR-006	none	-	Planned, M2 of issue #10: the changes check judges Closes against the checkbox items and Done when of the issue (strict mode)
+0020-ifccm FR-007	none	-	Planned, M2 of issue #10: the changes check finds a commit that names no issue
+0020-ifccm FR-008	none	-	Planned, M2 of issue #10: the changes check finds a closing keyword other than Closes
+0020-ifccm FR-009	none	-	Planned, M2 of issue #10: the strict mode of the changes check asks the Git host for each issue named
+0020-ifccm FR-010	none	-	Planned, M2 of issue #10: the rule that a claimed regulated domain needs a production day is the changes check's; the typed declaration exists and ifccm-ontology.test.ts holds its shape
+0020-ifccm FR-011	none	-	Planned, M2 of issue #10: the changes check judges the phase (warn, gate) from the declaration and the day, and is wired into holdHarness
+0020-ifccm FR-012	none	-	Planned, M2 of issue #10: the changes check compares the declaration with its earlier version in Git (changes/gate-relaxed)
+0020-ifccm FR-013	none	-	Planned, M2 of issue #10: 0016-ladder FR-011 reads the declaration to decide which rungs a regulated harness needs
+0020-ifccm FR-014	check	.github: cd commons/ts && bun test tests/	ifccm-ontology.test.ts: the chain is six TraceStage individuals in order, each with the annotation that already links it
+0020-ifccm FR-015	none	-	Planned, M2 of issue #10: the changes check reports the first stage with no link for each requirement a Done when names
+0020-ifccm FR-016	none	-	Planned, M2 of issue #10: the generator of the view of capabilities by rung and its --check; ifccm:touchesRung exists and its domain and range are held by ifccm-ontology.test.ts
+0020-ifccm FR-017	none	-	Planned, M2 of issue #10: the view judges each rung's proving commands at the capability's last revision
+0020-ifccm FR-018	check	.github: cd commons/ts && bun test tests/	ifccm-ontology.test.ts: the four AuthorityFunction individuals and the instrument that carries each
+0020-ifccm FR-019	none	-	Planned, M2 of issue #10: the changes check finds a departure with no Decision; an issue's comment or label is never read as authority
+0020-ifccm FR-020	none	-	Planned, M2 of issue #10: the changes check compares the roles of a Decision's approver and the change's author where a regulated domain is declared
+0020-ifccm FR-021	check	.github: cd commons/ts && bun test tests/	ifccm-ontology.test.ts: the kinds (capability request, problem) and states (open, closed) are the words the specification names, and a change request has exactly one kind, state and host
+0020-ifccm FR-022	check	.github: cd commons/ts && bun test tests/	ifccm-ontology.test.ts: a change names its change requests and revisions, a baseline its items and the Decision that establishes it
+0020-ifccm FR-023	check	.github: cd commons/ts && bun test tests/	ifccm-ontology.test.ts: ChangeRequest specializes oslc_cm:ChangeRequest, Change prov:Activity, ConfigurationItem prov:Entity and Baseline prov:Collection, each with its audit record
+0020-ifccm FR-024	check	.github: cd commons/ts && bun test tests/	ifccm-ontology.test.ts: the requirement names cm-2, cm-3, cm-4, cm-5 and cm-9 and the crosswalk row repeats them; the typed code list of the OSCAL controls is imported by the lead (0019-mizan-integrations FR-015)
+0020-ifccm FR-025	check	.github: cd commons/ts && bun test tests/	ifccm-ontology.test.ts: each crosswalk row has a relation SSSOM has and requirements that exist, the standards are there, and no clause is a term
+0020-ifccm FR-026	none	-	Planned, M2 of issue #10: a harness that claims ifccm:DeviceQuality keeps its change records so that they can be handed over; the Authority citation is held by mizan/authority-citation
+0020-ifccm FR-027	check	.github: cd commons/ts && bun test tests/	ifccm-ontology.test.ts: the host kinds are GitHub, GitLab and plain Git, and no typed term carries a host's own word
+0020-ifccm FR-028	none	-	Planned, M2 of issue #10: the typed host interface (GitHub adapter in M2, GitLab in M8) that is the only code naming a host
+0020-ifccm FR-029	none	-	Planned, M2 of issue #10: the adapters read a pull request and a merge request as part of a change and #N as the issue
+0020-ifccm FR-030	none	-	Planned, M2 of issue #10: the strict mode of the changes check records not_run with the reason where the host is plain Git
+0020-ifccm FR-031	none	-	Planned, M3 of issue #10: the changes check leaves its result in the canonical record of 0021-ifqs
+0020-ifccm FR-032	none	-	Planned, M2 of issue #10: the changes rules as Mizan findings, held by a baseline, run by holdHarness
+0021-ifqs FR-001	none	-	Planned, M3 of issue #10: a principle held by the requirements under it: what runs is graded above what is stated (FR-021); the grade list exists (ifqs-ontology.test.ts)
+0021-ifqs FR-002	none	-	Planned, M3 of issue #10: 0008-test-evidence already writes the record as OTLP; the rule that no second channel carries a result is checked when the record is stored
+0021-ifqs FR-003	none	-	Planned, M7 of issue #10: the closure of a CAPA is judged against the author of its change and the approver of its Decision
+0021-ifqs FR-004	none	-	Planned, M9 of issue #10: the public page is generated for commons (0022-trust)
+0021-ifqs FR-005	none	-	Planned, M3 of issue #10: the record carries not_run with its reason and every rendering counts it; the outcome word exists (ifqs-ontology.test.ts)
+0021-ifqs FR-006	none	-	Planned, M7 of issue #10: every rendering of a count of proof shows the grade with it
+0021-ifqs FR-007	none	-	Planned, M7 of issue #10: the system opens a nonconformance itself from a failed or stale proof
+0021-ifqs FR-008	check	.github: cd commons/ts && bun test tests/	ifqs-ontology.test.ts: each crosswalk row has a relation SSSOM has and requirements that exist, and the standards the specification is held to are there
+0021-ifqs FR-009	none	-	Planned, M3 of issue #10: the test record is kept as the objective evidence of verification for a harness that claims ifccm:DeviceQuality; the Authority citation is held by mizan/authority-citation
+0021-ifqs FR-010	check	.github: cd commons/ts && bun test tests/	ifqs-ontology.test.ts: the requirement names ca-2, ca-5, ca-7, sa-11 and si-2 by their OSCAL identifiers
+0021-ifqs FR-011	none	-	Planned, M7 of issue #10: the grade a requirement needs to be counted proved follows the risk of its tests
+0021-ifqs FR-012	none	-	Planned, M3 of issue #10: the record carries ifc.test.characteristic and the reports bear the 29119-3 document names
+0021-ifqs FR-013	none	-	Planned, M3 of issue #10: the body of a case's log record is a CTRF test object (0008-test-evidence writes its name and outcome as text today)
+0021-ifqs FR-014	none	-	Planned, M3 of issue #10: ifc.test.outcome takes not_run with ifc.test.reason, and the CTRF rendering maps it to other; the five outcomes of 0008 and not_run are held by ifqs-ontology.test.ts
+0021-ifqs FR-015	none	-	Planned, M3 of issue #10: the checks of Mizan leave their findings as cases of the record
+0021-ifqs FR-016	none	-	Planned, M3 of issue #10: the orphan quality branch, its signed append-only commits and the evidence path
+0021-ifqs FR-017	none	-	Planned, M3 of issue #10: the in-file chain of ifc.quality.previous.sha256 and its verification
+0021-ifqs FR-018	none	-	Planned, M3 of issue #10: the Git note under refs/notes/quality on the tested commit
+0021-ifqs FR-019	none	-	Planned, M7 of issue #10: the index derived from the branch and rebuilt from it alone
+0021-ifqs FR-020	none	-	Planned, M3 of issue #10: redaction before commit, reusing 0006-signals FR-006 and 0008-test-evidence FR-003
+0021-ifqs FR-021	check	.github: cd commons/ts && bun test tests/	ifqs-ontology.test.ts: the six grades E0 to E5 exist in order with their ranks; deriving a requirement's grade from evidence is Planned, M7 of issue #10
+0021-ifqs FR-022	none	-	Planned, M7 of issue #10: the enforcement register is shown with the grade and day of each row's evidence, generated
+0021-ifqs FR-023	none	-	Planned, M7 of issue #10: review debt counted from the grades and held so that it does not grow without a Decision
+0021-ifqs FR-024	none	-	Planned, M7 of issue #10: a review made by an agent is said so in the record and graded no higher than E2
+0021-ifqs FR-025	none	-	Planned, M7 of issue #10: freshness by time and by change, and the nonconformance a stale proof opens; the freshness words are held by ifqs-ontology.test.ts
+0021-ifqs FR-026	none	-	Planned, M7 of issue #10: the nonconformance record, linked to a Problem change request
+0021-ifqs FR-027	none	-	Planned, M7 of issue #10: a nonconformance is closed only through a closed CAPA
+0021-ifqs FR-028	none	-	Planned, M7 of issue #10: the CAPA record and its named test
+0021-ifqs FR-029	none	-	Planned, M7 of issue #10: a CAPA becomes verified when its named test passes after the corrective change
+0021-ifqs FR-030	none	-	Planned, M7 of issue #10: a CAPA is closed only from verified and only by a named person's Decision
+0021-ifqs FR-031	none	-	Planned, M7 of issue #10: the index and the page list an opened nonconformance and its CAPA, closed ones kept
+0021-ifqs FR-032	none	-	Planned, M7 of issue #10: quality objectives computed from the evidence
+0021-ifqs FR-033	none	-	Planned, M7 of issue #10: a spent error budget opens a nonconformance
+0021-ifqs FR-034	none	-	Planned, M7 of issue #10: commons declares the suggested objectives
+0021-ifqs FR-035	none	-	Planned, M3 of issue #10: the layers check holds rung 9 as an observer once 0016-ladder amends the ladder
+0021-ifqs FR-036	none	-	Planned, M7 of issue #10: the tier a harness claims is judged against the requirements of it and the tiers below
+0021-ifqs FR-037	none	-	Planned, M9 of issue #10: the quality console
+0021-ifqs FR-038	none	-	Planned, M9 of issue #10: attestation by recorded sample
+0021-ifqs FR-039	none	-	Planned, M9 of issue #10: pre-registered test plans
+0021-ifqs FR-040	none	-	Planned, M9 of issue #10: mutation runs and the strength of a proof
+0021-ifqs FR-041	none	-	Planned, M9 of issue #10: agents' reviews and the person's sampling of them
+0022-trust FR-001	none	-	Planned, M9 of issue #10: the generator of the Trust page and its --check
+0022-trust FR-002	none	-	Planned, M9 of issue #10: the figures of the page: grade, freshness, review debt, objectives, not_run
+0022-trust FR-003	none	-	Planned, M9 of issue #10: failures listed before successes
+0022-trust FR-004	none	-	Planned, M9 of issue #10: the scope statement, and the generator's refusal of a statement of conformity
+0022-trust FR-005	none	-	Planned, M9 of issue #10: the stale-evidence notice of the page
+0022-trust FR-006	none	-	Planned, M9 of issue #10: publication with the documentation site
+0022-trust FR-007	none	-	Planned, M9 of issue #10: a rendering for one audience; the three audiences exist as an ifqs:Audience code list (ifqs-ontology.test.ts)
+0022-trust FR-008	none	-	Planned, M9 of issue #10: redaction for the public audience, with the count of redactions
+0022-trust FR-009	none	-	Planned, M9 of issue #10: deterministic redaction that does not change a figure
+0022-trust FR-010	none	-	Planned, M9 of issue #10: the assessor pack and its manifest
+0022-trust FR-011	none	-	Planned, M9 of issue #10: the pack's fuller content, redacted of secrets and personal data only
+0022-trust FR-012	none	-	Planned, M9 of issue #10: the page and the pack made from the same evidence, and the test that compares their figures
+0022-trust FR-013	none	-	Planned, M9 of issue #10: the pack as a download with its SHA-256 and a DCAT distribution
+0022-trust FR-014	none	-	Planned, M9 of issue #10: offline verification of the pack
+0022-trust FR-015	none	-	Planned, M9 of issue #10: not_run for the part of a pack that cannot be checked
+0022-trust FR-016	none	-	Planned, M9 of issue #10: the verifier shipped inside the pack, on Bun and Node 26
