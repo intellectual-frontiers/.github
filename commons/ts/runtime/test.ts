@@ -88,8 +88,11 @@ export type StepFn = (t: StepContext) => void | Promise<void>;
 /** A test's body; it may take the context `t` for its steps. */
 export type TestFn = (t: StepContext) => void | Promise<void>;
 
-/** How long a test may run when it names no `timeout`: a minute (Bun's own default of 5 seconds ends a test that starts real programs on a slow runner for the wrong reason). */
-export const DEFAULT_TIMEOUT_MS = 60_000;
+/**
+ * How long a test may run when it names no `timeout`: five minutes. Bun's own default of 5 seconds ends a test that starts real programs on a slow runner (Windows above all) for the
+ * wrong reason; five minutes is above any limit a consumer's runner sets (its own tools pass up to a few minutes), so it never shortens one, and a test that hangs still ends.
+ */
+export const DEFAULT_TIMEOUT_MS = 300_000;
 
 /**
  * How to run a test: `skip` it or mark it `todo` (with the reason as a string; neither runs its body), run it alone among the tests of
