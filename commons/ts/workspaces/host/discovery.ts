@@ -18,7 +18,7 @@ import { decodeExternalManifest, type ExternalManifest, MANIFEST_FLAG, MANIFEST_
 import { moduleName } from "../modules/name.ts";
 import { type Candidates, decodeRegistered, type Found, programMatches, type RegisteredModule } from "../modules/registry.ts";
 import type { Context } from "../modules/types.ts";
-import { join } from "../../runtime/path.ts";
+import { isAbsolute, join } from "../../runtime/path.ts";
 import { AREA } from "./workspace.ts";
 
 /** Where the registered modules are written. */
@@ -75,7 +75,8 @@ export async function discoverModules(ctx: Context): Promise<Discovered> {
         name: m.name,
         source: "Registered",
         summary: m.summary ?? "(registered)",
-        where: m.program,
+        // a program the manifest names without a folder is below the root, so that the same manifest is the same on every computer
+        where: isAbsolute(m.program) || ctx.home === undefined ? m.program : join(ctx.home, m.program),
         ...(m.sha256 === undefined ? {} : { sha256: m.sha256 }),
       })),
       path: onPath,

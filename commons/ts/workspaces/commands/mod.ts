@@ -1,7 +1,7 @@
 /**
  * The typed built-in modules of `ifws` (commons 0025-ifws FR-001, FR-004, FR-007): `BUILTIN_MODULES` is the one registry, a documented array of `IfwsModule` values whose every entry the compiler
- * checks, in the order `ifws list` shows them. `ifws setup` and `ifws tools` are another milestone's modules and are registered nowhere here: they are added to this array, in `ifws.ts`, where they
- * are wired in, so that this registry stays open to them.
+ * checks, in the order `ifws list` shows them. `ifws setup` and `ifws tools` are another milestone's modules and are registered nowhere here: they are added to this array (`BUILTIN_MODULES`), where
+ * they are wired in, so that this registry stays open to them.
  *
  * @module
  */
@@ -16,7 +16,7 @@ import { statusModule } from "./status.ts";
 import { renderModule, verifyModule } from "./verify.ts";
 import { worktreeModule } from "./worktree.ts";
 
-/** The modules `ifws` holds, built in. `setup` and `tools` are added by the lead (`ifws.ts` takes this array and the extras). */
+/** The modules `ifws` holds, built in, in the order `ifws list` names them. `setupModule` and `toolsModule` (workspaces/setup/ and workspaces/tools/) are added to this array where they are wired in. */
 export const BUILTIN_MODULES: readonly IfwsModule[] = [
   initModule,
   planModule,

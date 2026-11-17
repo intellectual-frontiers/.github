@@ -65,8 +65,13 @@ export const about: About = {
     },
     {
       path: "workspaces/",
-      what: "IF Workspaces, rung 10 of the ladder (commons 0023-if-workspaces, 0024-ifws-host): the branded types, the layout from a remote to a path, the portability of paths, the manifest, the state of a repository, the plan as a pure function, the findings and the policy; `host/` reads a repository with the real `git`.",
-      mayImport: ["kernel/", "githost/ (types, capabilities and the remote reader)", "workspaces/", "runtime/ (host/ alone)"],
+      what: "IF Workspaces, rung 10 of the ladder (commons 0023-if-workspaces, 0024-ifws-host, 0025-ifws): the branded types, the layout from a remote to a path, the portability of paths, the manifest, the state of a repository, the plan as a pure function, the findings and the policy, the typed templates and the generated files, the state record, the module contract and its discovery, the shell snippet and its one block, and the doctor's checks, all pure; `host/` (git, files, the lock, the evidence record, discovery), `commands/` (the typed built-in modules of `ifws`) and `ifws.ts` (the controller) are the host layer, which runs the real `git`.",
+      mayImport: [
+        "kernel/",
+        "githost/ (types, capabilities and the remote reader)",
+        "workspaces/ (the pure part imports no host layer)",
+        "runtime/, quality/ and mizan/changes/ (the host layer alone: host/, commands/, ifws.ts)",
+      ],
     },
     {
       path: "lint/",
@@ -75,8 +80,8 @@ export const about: About = {
     },
     {
       path: "node/",
-      what: "The Node hook that strips the types of this package's sources under `node_modules`, and the command `ifc`, in JavaScript.",
-      mayImport: ["node: builtins", "tools/test.ts, once the hook is registered"],
+      what: "The Node hook that strips the types of this package's sources under `node_modules`, and the commands `ifc` and `ifws`, in JavaScript.",
+      mayImport: ["node: builtins", "tools/test.ts and workspaces/ifws.ts, once the hook is registered"],
     },
     {
       path: "tools/",
@@ -102,6 +107,10 @@ export const about: About = {
     {
       run: "bun quality/quality.ts record|verify|render",
       does: "Keeps the record of a run on the append-only quality branch (a file, a signed commit, a note on the tested commit), verifies the branch and its chain, and renders a record as JUnit, CTRF, SARIF, TAP or the 29119-3 documents.",
+    },
+    {
+      run: "bun workspaces/ifws.ts <module> (or ifws, the package's bin)",
+      does: "The command of IF Workspaces: init, plan, apply, status, doctor, verify, render, worktree, list, help and shell, each a typed module, and modules registered by the workspace or named ifws-* on the PATH; it manages only Intellectual Frontiers Workspaces and does not front ifc. Exit status 0 ok, 1 findings, 2 usage, 3 environment.",
     },
     {
       run: "bun run test:evidence",

@@ -11,10 +11,12 @@
 import { err, ok } from "../../kernel/result.ts";
 import { build, runtimeName, runtimeVersion } from "../../runtime/proc.ts";
 import { type Check, findingsOf, fsCheck, hookChecks, type HookFacts, pathChecks, runtimeChecks } from "../doctor.ts";
+import { discoverModules } from "../host/discovery.ts";
 import { fileFacts } from "../host/files.ts";
 import { probeFileSystem, probeLongPaths, probeTool } from "../host/probe.ts";
 import { type Loaded, situate } from "../host/workspace.ts";
 import { defineCommand, GLOBAL_OPTIONS, type Context, type IfwsModule } from "../modules/types.ts";
+import { hiddenFindings, resolveAll } from "../modules/registry.ts";
 import { verifyFindings } from "../state-record.ts";
 import type { RepoPath } from "../types.ts";
 import { jsonOf, withWorkspace } from "./common.ts";
@@ -87,6 +89,11 @@ const doctor = defineCommand({
           subject: "generated files",
           message: "every generated file is as written and as the templates give it",
         });
+
+      // a module that a module of an earlier source hides is told (0025-ifws FR-004)
+      const found = await discoverModules(ctx);
+      for (const f of [...found.findings, ...hiddenFindings(resolveAll(found.candidates), ctx.today)])
+        checks.push({ id: f.ruleId, level: "suggest", subject: f.subject, message: f.message });
 
       for (const extra of DOCTOR_CHECKS) checks.push(...(await extra(ctx, loaded)));
 

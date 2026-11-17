@@ -263,6 +263,19 @@ proves(
       const listed = (JSON.parse((await on("list", "--json")).stdout) as { data: { modules: { name: string; source: string }[] } }).data
         .modules;
       assertEquals(listed.find((m) => m.name === "regd")?.source, "ifws:Registered");
+      // a program named without a folder is below the root, so that the manifest is the same on every computer
+      await program(join(w.home, "bin"), "rel", `echo "relative module ran"\nexit 0`);
+      await w.manifest({
+        ...ONE_REPOSITORY,
+        modules: [
+          { name: "regd", program: file, sha256: hash },
+          { name: "rel", program: "bin/ifws-rel" },
+        ],
+      });
+      assertEquals((await w.ifws("render")).code, 0);
+      const relative = await on("rel");
+      assertEquals(relative.code, 0, relative.stderr);
+      assertStringIncludes(relative.stdout, "relative module ran");
       // the program changes: refused, not run
       await writeTextFile(file, `#!/bin/sh\necho "a changed program ran"\n`);
       await chmod(file, 0o755);
