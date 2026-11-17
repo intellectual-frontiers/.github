@@ -381,7 +381,7 @@ requirement	mechanism	by	note
 0019-mizan-integrations FR-007	check	.github: cd commons/ts && bun test tests/	mizan-integrations.test.ts: a blank node and a collection are named as losses, in the slice only, and the rest is read
 0019-mizan-integrations FR-008	none	-	Planned, Phase 4 of issue #10: the module is not built yet
 0019-mizan-integrations FR-009	none	-	Planned, Phase 4 of issue #10: the module is not built yet
-0019-mizan-integrations FR-010	none	-	Planned, Phase 4 of issue #10: the module is not built yet
-0019-mizan-integrations FR-011	none	-	Planned, Phase 4 of issue #10: the module is not built yet
+0019-mizan-integrations FR-010	check	.github: cd commons/ts && bun test tests/	mizan-integrations.test.ts: SQL, SKOS, SHACL and JSON Schema written from a class schema and a code list; tests/commons-mizan-ontology.test.ts: Mizan's own exports are current. OWL, RDF/XML, SSSOM and DCAT are planned, Phase 4 of issue #10
+0019-mizan-integrations FR-011	none	-	Partly: the exports were read by rdflib and validated by pySHACL (Mizan's ontology conforms to the shapes made from its schemas, and a broken individual does not) while this was written, by hand; no independent validator is a dependency of the suite yet (Phase 4 of issue #10)
 0019-mizan-integrations FR-012	none	-	Planned, Phase 4 of issue #10: the module is not built yet
 0019-mizan-integrations FR-013	none	-	Planned, Phase 4 of issue #10: the module is not built yet

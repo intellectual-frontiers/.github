@@ -15,6 +15,11 @@ import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/t
 import {
   describeFinding,
   emptyRegistry,
+  exportJsonSchema,
+  exportShacl,
+  exportSkos,
+  exportSqlCodeList,
+  type AnySchema,
   importVocabulary,
   lookup,
   readNTriples,
@@ -271,3 +276,121 @@ proves(["0019-mizan-integrations FR-002"], "a manifest with a field missing or o
     removeSync(dir, { recursive: true });
   }
 });
+
+proves(
+  ["0019-mizan-integrations FR-010"],
+  "a code list is written as a SQL table with its quotes escaped, and a table name that is not one is refused",
+  () => {
+    const ok = exportSqlCodeList("basis", [
+      { code: "Adopts", label: "adopts", definition: "The standard's own." },
+      { code: "Maps", label: "maps" },
+    ]);
+    assert(ok.kind === "ok");
+    assertEquals(
+      ok.value,
+      [
+        "CREATE TABLE basis (",
+        "  code text PRIMARY KEY,",
+        "  label text NOT NULL,",
+        "  definition text",
+        ");",
+        "INSERT INTO basis (code, label, definition) VALUES ('Adopts', 'adopts', 'The standard''s own.');",
+        "INSERT INTO basis (code, label, definition) VALUES ('Maps', 'maps', NULL);",
+        "",
+      ].join("\n"),
+    );
+    const bad = exportSqlCodeList("Basis; DROP TABLE x", []);
+    assert(bad.kind === "err" && bad.error[0]?.kind === "bad-name");
+    assertStringIncludes(describeFinding(bad.error[0] ?? { kind: "slice-empty" }), "not a name an SQL table may have");
+  },
+);
+
+proves(
+  ["0019-mizan-integrations FR-010"],
+  "a code list is written as a SKOS concept scheme that the reader reads back, one concept each with its notation and label",
+  () => {
+    const text = exportSkos({
+      schemeIri: "https://example.org/Scheme",
+      label: "Basis",
+      conceptBase: "https://example.org/",
+      members: [
+        { code: "Adopts", label: "adopts", definition: 'A "quoted" one.' },
+        { code: "Maps", label: "maps" },
+      ],
+    });
+    const r = readTurtle(text);
+    assert(r.kind === "ok");
+    assertEquals(r.value.findings, []);
+    const k = keys(r.value.triples).join("\n");
+    assertStringIncludes(k, '<https://example.org/Adopts> <http://www.w3.org/2004/02/skos/core#notation> "Adopts" .');
+    assertStringIncludes(k, '"A \\"quoted\\" one."@en');
+    assertEquals(r.value.triples.filter((t) => t.predicate.endsWith("#inScheme")).length, 2);
+  },
+);
+
+proves(
+  ["0019-mizan-integrations FR-010"],
+  "a class schema is written as a JSON Schema (the one fields required, many an array, words an enumeration) and as SHACL shapes the reader reads back",
+  () => {
+    const schema = {
+      class: { kind: "named", iri: "https://example.org/Thing", curie: "ex:Thing" },
+      curie: "ex:Thing",
+      fields: {
+        label: {
+          property: { kind: "named", iri: "http://www.w3.org/2000/01/rdf-schema#label", curie: "rdfs:label" },
+          range: { kind: "lang" },
+          cardinality: "one",
+        },
+        size: {
+          property: { kind: "named", iri: "https://example.org/size", curie: "ex:size" },
+          range: { kind: "integer" },
+          cardinality: "optional",
+        },
+        tags: {
+          property: { kind: "named", iri: "https://example.org/tag", curie: "ex:tag" },
+          range: { kind: "string" },
+          cardinality: "many",
+        },
+        status: {
+          property: { kind: "named", iri: "https://example.org/status", curie: "ex:status" },
+          range: { kind: "string", words: ["Draft", "Active"] },
+          cardinality: "one",
+        },
+        made: {
+          property: { kind: "named", iri: "https://example.org/made", curie: "ex:made" },
+          range: { kind: "ref" },
+          cardinality: "one",
+        },
+      },
+    } as unknown as AnySchema;
+    const parsed: unknown = JSON.parse(exportJsonSchema(schema, "https://example.org/thing.json"));
+    assertEquals(parsed, {
+      $schema: "https://json-schema.org/draft/2020-12/schema",
+      $id: "https://example.org/thing.json",
+      title: "ex:Thing",
+      type: "object",
+      properties: {
+        label: {
+          type: "object",
+          required: ["value", "language"],
+          properties: { value: { type: "string" }, language: { type: "string" } },
+          additionalProperties: false,
+        },
+        size: { type: "integer" },
+        tags: { type: "array", items: { type: "string" } },
+        status: { enum: ["Draft", "Active"] },
+        made: { type: "string", format: "iri" },
+      },
+      required: ["label", "status", "made"],
+      additionalProperties: false,
+    });
+    const shapes = exportShacl([schema], { prefix: "sh1", iri: "https://example.org/shapes#" });
+    const r = readTurtle(shapes);
+    assert(r.kind === "ok");
+    const k = keys(r.value.triples).join("\n");
+    assertStringIncludes(k, "<http://www.w3.org/ns/shacl#targetClass> <https://example.org/Thing>");
+    assertEquals(r.value.triples.filter((t) => t.predicate === "http://www.w3.org/ns/shacl#minCount").length, 3);
+    assertEquals(r.value.triples.filter((t) => t.predicate === "http://www.w3.org/ns/shacl#maxCount").length, 4);
+    assertStringIncludes(shapes, 'sh:in ( "Draft" "Active" )');
+  },
+);

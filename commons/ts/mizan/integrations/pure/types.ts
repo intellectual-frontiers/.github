@@ -42,7 +42,8 @@ export type IntegrationFinding =
     }
   | { readonly kind: "slice-empty" }
   | { readonly kind: "term-missing"; readonly iri: string }
-  | { readonly kind: "term-untyped"; readonly iri: string };
+  | { readonly kind: "term-untyped"; readonly iri: string }
+  | { readonly kind: "bad-name"; readonly name: string };
 
 /** A finding as one plain sentence. */
 export function describeFinding(f: IntegrationFinding): string {
@@ -63,6 +64,8 @@ export function describeFinding(f: IntegrationFinding): string {
       return `${f.iri} is in the slice and not in the source`;
     case "term-untyped":
       return `${f.iri} has no class or property type that a typed vocabulary can state`;
+    case "bad-name":
+      return `${f.name} is not a name an SQL table may have (lower-case letters, digits and underscores, starting with a letter)`;
     default:
       return absurd(f);
   }

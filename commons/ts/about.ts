@@ -39,7 +39,7 @@ export const about: About = {
     },
     {
       path: "mizan/",
-      what: "Mizan, the IF Spec Profile, as code (commons 0003-mizan): the rules it adds to the format of a specification (as plugins), the command that holds them against a baseline, the generator of its ontology's Turtle, and `integrations/` (0019-mizan-integrations): the registry, the reader of Turtle and N-Triples and the importer of a slice of a vocabulary are built, the other importers and the exporters are specified.",
+      what: "Mizan, the IF Spec Profile, as code (commons 0003-mizan): the rules it adds to the format of a specification (as plugins), the command that holds them against a baseline, the generator of its ontology's Turtle, and `integrations/` (0019-mizan-integrations): the registry, the reader of Turtle and N-Triples, the importer of a slice of a vocabulary and the exporters of SHACL, JSON Schema, SKOS and SQL are built, the other importers and exporters are specified.",
       mayImport: ["node: builtins", "kernel/", "runtime/", "mizan/", "../ontology/ (the ontology it generates from)"],
     },
     {
