@@ -39,7 +39,7 @@ export const about: About = {
     },
     {
       path: "mizan/",
-      what: "Mizan, the IF Spec Profile, as code (commons 0003-mizan): today the generator of its ontology's Turtle; its checks and `integrations/` (0019-mizan-integrations) are specified and not yet built.",
+      what: "Mizan, the IF Spec Profile, as code (commons 0003-mizan): the rules it adds to the format of a specification (as plugins), the command that holds them against a baseline, and the generator of its ontology's Turtle; `integrations/` (0019-mizan-integrations) is specified and not yet built.",
       mayImport: ["node: builtins", "kernel/", "runtime/", "mizan/", "../ontology/ (the ontology it generates from)"],
     },
     {

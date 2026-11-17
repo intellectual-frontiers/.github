@@ -35,13 +35,14 @@
 
 - **FR-013**: A requirement MUST be worded with RFC 2119 keywords (MUST, MUST NOT, SHOULD, MAY) in one of the six EARS patterns: ubiquitous (`The <system> MUST ...`), event-driven (`WHEN <event>, the <system> MUST ...`), state-driven (`WHILE <state>, ...`), unwanted behaviour (`IF <condition>, THEN ...`), optional feature (`WHERE <feature present>, ...`) or a combination of them.
 - **FR-014**: An acceptance scenario MUST be written as Gherkin's Given, When, Then, and MUST cite the requirements it exercises, so that a reader can walk from a scenario to its rules and the tool can see that each cited requirement exists.
-- **FR-015**: The rules of FR-013 and FR-014, and every rule that Mizan adds after the format of FR-001 to FR-005, MUST begin as warnings held by a baseline that only shrinks: a finding the baseline does not hold fails, and a line of the baseline that no longer occurs fails, so that a harness's existing specifications are never failed on the first day.
+- **FR-015**: The rules of FR-013 and FR-014, and every rule that Mizan adds after the format of FR-001 to FR-005, MUST begin as warnings held by a baseline that only shrinks: a finding the baseline does not hold fails, and a line of the baseline that no longer occurs fails, so that a harness's existing specifications are never failed on the first day. The baseline of a folder is `mizan.baseline.txt` beside its `registry.tsv`.
 - **FR-016**: `enforcement.tsv` MUST be the one register of what proves a requirement: a requirement that a person reviews is a row whose mechanism is `review`, with its reason, where a harness kept it in `reviewed.tsv`; a harness's `reviewed.tsv` MUST be accepted until it has moved its rows to `enforcement.tsv`.
 
 ## The code
 
 - **FR-017**: Mizan's TypeScript MUST be in `commons/ts/mizan/`, exported as `@intellectual-frontiers/commons/ts/mizan`, and MUST import only `node:` built-ins, the kernel, the runtime, the ontology it generates from (`commons/ontology/`) and itself.
 - **FR-018**: `commons/ts/mizan/generate-ontology.ts` MUST write the Turtle of Mizan's ontology (`commons/ontology/mizan/`) as `commons/generated/mizan.auto.ttl`, in the canonical form of 0012-ontology FR-006, beginning with lines that say it is generated and carrying the SHA-256 of the ontology's canonical N-Triples; with `--check` it MUST write nothing and exit 1 where the file is not what the ontology makes, and it MUST stop with exit 2, naming every finding, where the ontology breaks a rule of the kernel.
+- **FR-019**: `commons/ts/mizan/check.ts` MUST read a folder's specifications (`specs/NNNN-slug/spec.md`, and `plan.md` where there is one), run the rules of FR-013 and FR-014 and of 0018-standards-first FR-009 as plugins (a harness MAY pass more), hold their findings against the folder's `mizan.baseline.txt`, print each new finding and each stale baseline line on standard error and exit 1 where there is one, and write the baseline only with `--write-baseline`.
 
 ## Out of scope
 
@@ -63,6 +64,8 @@
 - A scenario that cites no requirement, or one the specification does not have: a warning, per FR-014 and FR-015.
 - A baseline line for a finding that has been fixed: the check fails until the line is deleted, per FR-015.
 - A harness with a `reviewed.tsv`: its rows are read as `review` rows until moved, per FR-016.
+- A requirement with no MUST, MUST NOT, SHOULD, SHOULD NOT or MAY, or a trigger such as `IF` with no `THEN`: named by `check.ts`, per FR-013 and FR-019.
+- A plugin a harness adds: its findings are held by the same baseline, per FR-019.
 - A file of `commons/ts/mizan/` that imports a package that is not the kernel, the runtime, the ontology or `node:`: refused, per FR-017.
 - `commons/generated/mizan.auto.ttl` edited by hand: `--check` names it as not what the ontology makes, per FR-018.
 - A class of the Mizan ontology with no `mz:OntologyTerm` saying its basis: the test names it, per 0018-standards-first FR-003.

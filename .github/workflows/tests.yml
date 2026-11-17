@@ -41,9 +41,11 @@ jobs:
           bun commons/tools/generate-packaging.ts --check
           bun commons/tools/mizan-check.ts
           bun commons/ts/mizan/generate-ontology.ts --check
+          bun commons/ts/mizan/check.ts
           node commons/tools/generate-packaging.ts --check
           node commons/tools/mizan-check.ts
           node commons/ts/mizan/generate-ontology.ts --check
+          node commons/ts/mizan/check.ts
 
   tests:
     strategy:
@@ -83,6 +85,8 @@ jobs:
           bun commons/tools/generate-packaging.ts --check
           bun commons/tools/mizan-check.ts
           bun commons/ts/mizan/generate-ontology.ts --check
+          bun commons/ts/mizan/check.ts
           node commons/tools/generate-packaging.ts --check
           node commons/tools/mizan-check.ts
           node commons/ts/mizan/generate-ontology.ts --check
+          node commons/ts/mizan/check.ts

@@ -95,7 +95,7 @@
 - **FR-047**: Arca, the typical data models (`commons/ts/data/arca/`), MUST be built with the library's public entry point alone, MUST begin with the party model (party, person, organization, their relations, roles, identifiers and contact points, with their reference data) and MUST be the library's own work: no text, diagram or file of a published book is copied.
 - **FR-048**: Data Vault (`commons/ts/data/data-vault/`) MUST be built with the public entry point alone and MUST give hubs, satellites and links as generic functions, with loads that only insert and that change nothing when run twice.
 - **FR-049**: Both MUST be tested on SQLite, DuckDB and PostgreSQL (PGlite in process, and a database made for the run and dropped after it on a PostgreSQL server where one is given), under Bun and under Node: that the model compiles for each dialect, that what is emitted is what is committed, that it loads, that constraints hold, that the same scenario gives the same rows in every engine, and that the generated tests pass inside the engine.
-- **FR-050**: A phase of the library is done only where Arca and Data Vault pass what that phase adds.
+- **FR-050**: A phase of the library MUST be done only where Arca and Data Vault pass what that phase adds.
 
 ## Targets and durability
 

@@ -55,6 +55,15 @@ export type Finding = {
   readonly key: string;
 };
 
+/** What a baseline and its judgement need of a finding, whatever its rule: a harness's own rules (commons 0003-mizan FR-015) use the same baseline as the trace and layers checks. */
+export type Keyed = {
+  readonly file: string;
+  readonly line: number;
+  readonly rule: string;
+  readonly message: string;
+  readonly key: string;
+};
+
 /** A finding, its key made from its rule, its file and what it is about. */
 export function finding(rule: Rule, file: string, line: number, message: string, about?: string): Finding {
   return { file, line, rule, message, key: about === undefined || about === "" ? `${rule} ${file}` : `${rule} ${file} ${about}` };
@@ -86,23 +95,23 @@ function byCodePoint(a: string, b: string): number {
 }
 
 /** A baseline file from findings: the comment lines given (each prefixed `# `), then the keys sorted by code point, each once. */
-export function formatBaseline(findings: readonly Finding[], comments: readonly string[] = []): string {
+export function formatBaseline(findings: readonly Keyed[], comments: readonly string[] = []): string {
   const keys = [...new Set(findings.map((f) => f.key))].sort(byCodePoint);
   return [...comments.map((c) => (c === "" ? "#" : `# ${c}`)), ...keys].map((l) => `${l}\n`).join("");
 }
 
 /** A judgement of findings against a baseline: the new findings, the stale keys, and the findings the baseline keeps. */
-export type Judgement = {
+export type Judgement<F extends Keyed = Finding> = {
   /** Findings whose key the baseline does not hold: they fail the check. */
-  readonly fresh: readonly Finding[];
+  readonly fresh: readonly F[];
   /** Baseline keys no finding has: they fail the check until they are deleted. */
   readonly stale: readonly string[];
   /** Findings the baseline holds. */
-  readonly kept: readonly Finding[];
+  readonly kept: readonly F[];
 };
 
 /** Findings judged against a baseline's keys (FR-002). */
-export function judge(findings: readonly Finding[], baseline: readonly string[]): Judgement {
+export function judge<F extends Keyed>(findings: readonly F[], baseline: readonly string[]): Judgement<F> {
   const held = new Set(baseline);
   const seen = new Set(findings.map((f) => f.key));
   return {
@@ -113,12 +122,12 @@ export function judge(findings: readonly Finding[], baseline: readonly string[])
 }
 
 /** Whether a judgement passes: nothing new and nothing stale. */
-export function passes(j: Judgement): boolean {
+export function passes(j: Judgement<Keyed>): boolean {
   return j.fresh.length === 0 && j.stale.length === 0;
 }
 
 /** The lines a judgement is told with (FR-003): each new finding, each stale key, then a summary. `name` names the check and its baseline. */
-export function report(j: Judgement, name: string, baselineFile: string): readonly string[] {
+export function report(j: Judgement<Keyed>, name: string, baselineFile: string): readonly string[] {
   const out: string[] = [];
   for (const f of j.fresh) out.push(`${f.file}:${f.line}: ${f.rule}: ${f.message}`);
   for (const k of j.stale) out.push(`${baselineFile}: stale: "${k}" no longer occurs; delete the line, the baseline only shrinks`);

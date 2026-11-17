@@ -35,12 +35,13 @@ requirement	mechanism	by	note
 0003-mizan FR-010	check	.github: bun test ./tests/	Mizan: Active and Deferred are accepted, a word outside the list is named
 0003-mizan FR-011	none	-	Planned, Phase 4 of issue #10: the OSCAL mapping is delivered by 0019-mizan-integrations
 0003-mizan FR-012	check	.github: bun test ./tests/	Mizan: a Spec Kit form specification is accepted and its missing section and status are named
-0003-mizan FR-013	none	-	Planned, Phase 3 of issue #10: the EARS and RFC 2119 rule is a plugin of commons/ts/mizan, not built yet
-0003-mizan FR-014	none	-	Planned, Phase 3 of issue #10: the Gherkin rule is a plugin of commons/ts/mizan, not built yet
-0003-mizan FR-015	none	-	Planned, Phase 3 of issue #10: the baseline of the Mizan rules is not built yet
+0003-mizan FR-013	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: the six EARS patterns told apart; a requirement with no keyword and a trigger not in its pattern named
+0003-mizan FR-014	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: a scenario out of order or citing no requirement named
+0003-mizan FR-015	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: a new finding fails, the baseline holds, a fixed finding makes its line stale, commons' own folder passes
 0003-mizan FR-016	none	-	Planned, Phase 3 of issue #10: the single proof register is not read by the trace check yet
 0003-mizan FR-017	check	.github: cd commons/ts && bun test tests/	boundaries.test.ts: Mizan's files import only node: built-ins, the kernel, the runtime, the ontology and themselves
 0003-mizan FR-018	check	.github: bun test ./tests/	Mizan ontology: the Turtle is current, a stale file is named with exit 1, a broken ontology stops with exit 2
+0003-mizan FR-019	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: the command run as a program: new, held and stale findings, a plugin added beside the rules
 0002-packaging FR-016	check	.github: bun test ./tests/	Record: the fields, their order and their values, as the TypeScript module carries them; Generator: a bad field is refused
 0004-rules FR-001	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
 0004-rules FR-002	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
@@ -367,7 +368,7 @@ requirement	mechanism	by	note
 0018-standards-first FR-006	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
 0018-standards-first FR-007	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
 0018-standards-first FR-008	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
-0018-standards-first FR-009	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
+0018-standards-first FR-009	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: a plan with no Standards considered section named
 0018-standards-first FR-010	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
 0018-standards-first FR-011	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
 0018-standards-first FR-012	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
