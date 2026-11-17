@@ -20,6 +20,7 @@ import {
   type Ledger,
   type LedgerEvent,
   ledgerFile,
+  redactEvent,
   readLedgerFile,
   RECORDS_ROOT,
   recordPath,
@@ -102,9 +103,11 @@ export type AppendOptions = {
  */
 export async function appendEvents(
   repo: string,
-  events: readonly LedgerEvent[],
+  asked: readonly LedgerEvent[],
   options: AppendOptions = {},
 ): Promise<Result<LedgerRead, LedgerHostError>> {
+  // redaction is at the source (0022-trust FR-017): the ledger judges and keeps the events as they are redacted
+  const events = asked.map(redactEvent);
   const before = await readLedger(repo);
   if (before.kind === "err") return before;
   const read = before.value;

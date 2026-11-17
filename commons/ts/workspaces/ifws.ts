@@ -32,7 +32,7 @@ import { topHelp } from "./commands/list.ts";
 import { writeEvidence } from "./host/evidence.ts";
 import { discoverModules, runExternal } from "./host/discovery.ts";
 import { terminalInteract } from "./host/interact.ts";
-import { readManifest, AREA, loopbackAllowed } from "./host/workspace.ts";
+import { readManifest, AREA, LOOPBACK_NOTICE, loopbackAllowed, loopbackFinding } from "./host/workspace.ts";
 import { writeRunEvidence } from "./setup/host/evidence.ts";
 import type { RunFacts } from "./setup/evidence.ts";
 import { exitStatusOf, toSarif } from "./findings.ts";
@@ -212,6 +212,10 @@ export async function main(argv: readonly string[], deps: MainDeps = {}): Promis
     }
   }
 
+  // the loopback switch is never silent: one line on standard error and an informational finding in the report (0023-if-workspaces FR-037)
+  const loopback = executed !== undefined && loopbackAllowed(environment);
+  if (loopback) note(line(LOOPBACK_NOTICE));
+
   // the output of the run
   const globals: Globals = executed?.globals ?? { json: false, sarif: false, noColor: false };
   let status: ExitStatus;
@@ -225,12 +229,12 @@ export async function main(argv: readonly string[], deps: MainDeps = {}): Promis
     const r = outcome.value;
     status = statusOfReport(r);
     code = external?.code ?? exitCodeOf(status);
-    findings = r.findings;
+    findings = loopback ? [...r.findings, loopbackFinding(today)] : r.findings;
     facts = r.facts;
     runFacts = r.runFacts;
     noEvidence = r.noEvidence === true;
-    if (globals.sarif) out(line(JSON.stringify(toSarif(r.findings), null, 2)));
-    else if (globals.json) out(line(JSON.stringify({ command, status, exitCode: code, data: r.data, findings: r.findings }, null, 2)));
+    if (globals.sarif) out(line(JSON.stringify(toSarif(findings), null, 2)));
+    else if (globals.json) out(line(JSON.stringify({ command, status, exitCode: code, data: r.data, findings }, null, 2)));
     else if (r.text !== "") out(line(r.text));
   } else {
     status = outcome.error.kind === "usage" ? "Usage" : "Environment";

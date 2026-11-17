@@ -26,6 +26,7 @@ import type { Instant } from "../../kernel/grc.ts";
 import { instantFromEpochMs } from "../../kernel/grc.ts";
 import { err, ok, type Result } from "../../kernel/result.ts";
 import type { Risk } from "../../kernel/test-record.ts";
+import { type Declaration, isRegulated, phaseOf } from "../../mizan/changes/declaration.ts";
 import { type FreshnessState, type FreshnessVerdict, counts as stateCounts } from "./freshness.ts";
 import { applyEvent, type Attestation, type Ledger, type LedgerEvent, openNonconformance } from "./ledger.ts";
 import { type Grade, GRADES, gradeRank, higherGrade, NO_GRADE, showGrade } from "./names.ts";
@@ -152,10 +153,29 @@ export function gradeOfEvidence(e: Evidence): Grade {
   }
 }
 
-/** The grade a requirement needs to be counted proved (FR-011): `E4` where one of its tests is of `high` risk, else `E3`. */
+/** The grade a requirement needs to be counted proved (FR-011) by its risk alone: `E4` where one of its tests is of `high` risk, else `E3`. */
 export function gradeRequired(risk: Risk): Grade {
   return risk === "high" ? "E4" : "E3";
 }
+
+/**
+ * Whether a harness is regulated and in production on `today`: it declares a regulated domain (0020-ifccm FR-010) and its production day has come.
+ * The declaration and the day are arguments, never read here.
+ */
+export function regulatedInProduction(declaration: Declaration | undefined, today: string): boolean {
+  return isRegulated(declaration) && phaseOf(declaration, today) === "gate";
+}
+
+/**
+ * The grade a requirement needs to be counted proved (FR-011): `E3`, `E4` where one of its tests is of `high` risk, and `E4` for every
+ * requirement of a harness that declares a regulated domain and has declared production by `today`.
+ */
+export function gradeNeeded(risk: Risk, declaration: Declaration | undefined, today: string): Grade {
+  return regulatedInProduction(declaration, today) ? "E4" : gradeRequired(risk);
+}
+
+/** What a harness has declared and the day it is judged on: the two facts the grade a requirement needs depends on besides its risk (FR-011). */
+export type AssuranceContext = { readonly declaration: Declaration | undefined; readonly today: string };
 
 // ---------------------------------------------------------------------------------------------------------------------------- judging a requirement
 
@@ -199,7 +219,7 @@ export function superseding(evidence: readonly Evidence[]): readonly Evidence[] 
 }
 
 /** One requirement judged from all the evidence of it, each piece with the freshness the caller found (FR-021, FR-025, FR-011). */
-export function judgeRequirement(requirement: string, judged: readonly Judged[]): Judgement {
+export function judgeRequirement(requirement: string, judged: readonly Judged[], context?: AssuranceContext): Judgement {
   const fresh = judged.filter((j) => stateCounts(j.freshness.state) && gradeRank(j.grade) > 0);
   let best: Judged | undefined;
   for (const j of fresh) {
@@ -217,7 +237,7 @@ export function judgeRequirement(requirement: string, judged: readonly Judged[])
   const stale = judged
     .filter((j) => j.freshness.state === "Stale" && gradeRank(j.grade) > gradeRank(grade) && j.evidence.result === "pass")
     .sort((a, b) => gradeRank(b.grade) - gradeRank(a.grade))[0];
-  const required = gradeRequired(risk);
+  const required = context === undefined ? gradeRequired(risk) : gradeNeeded(risk, context.declaration, context.today);
   const newestRun = runs.sort((a, b) => (a.at < b.at ? 1 : -1))[0];
   return {
     requirement,

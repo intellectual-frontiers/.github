@@ -45,7 +45,7 @@
 
 ## Change records
 
-- **FR-021**: A change request (`ifccm:ChangeRequest`) MUST have a kind (`ifccm:ChangeRequestKind`), `ifccm:CapabilityRequest` (a request to add or change a capability) or `ifccm:Problem` (a report that something departs from what is specified or required, opened by a person or by the system from a nonconformance of `0021-ifqs`), a state (`ifccm:ChangeRequestState`: `ifccm:Open` or `ifccm:Closed`) and the kind of Git host that holds it (`ifccm:GitHostKind`).
+- **FR-021**: A change request (`ifccm:ChangeRequest`) MUST have a kind (`ifccm:ChangeRequestKind`), `ifccm:CapabilityRequest` (a request to add or change a capability) or `ifccm:Problem` (a report that something departs from what is specified or required, opened by a person or by the system from a nonconformance of `0021-ifqs`), a state (`ifccm:ChangeRequestState`: `ifccm:Open` or `ifccm:Closed`) and the kind of Git host that holds it (`ifccm:hostedOn`, one of `ifws:GitManagerKind`: FR-027).
 - **FR-022**: A change (`ifccm:Change`) MUST be the work done under one or more change requests, with the revisions it made and the change request it implements (`ifccm:implementsRequest`); a configuration item (`ifccm:ConfigurationItem`) MUST be anything a change may alter that is under control (a specification, an ontology file, a source file, a test, a generated file, a pin); and a baseline (`ifccm:Baseline`) MUST be the configuration items at one revision, established by a Decision.
 - **FR-023**: The terms of FR-021 and FR-022 MUST rest on standards (0018-standards-first FR-003): a change request specializes OSLC Change Management's `ChangeRequest`, whose `Problem` kind corresponds to OSLC's `Defect` (a mapping stated here, not a term), a change is a `prov:Activity` that used its change request, a configuration item a `prov:Entity` and a baseline a `prov:Collection`, each with its `mz:OntologyTerm` record.
 
@@ -68,10 +68,10 @@
 
 ## Git hosts
 
-- **FR-027**: Where a harness is hosted on a Git host, the host MUST be one of `ifccm:GitHub`, `ifccm:GitLab` or `ifccm:PlainGit` (`ifccm:GitHostKind`); a typed term of this specification MUST NOT carry a host's own word, and a GitHub issue and a GitLab issue are the same change request.
+- **FR-027**: Where a harness is hosted on a Git host, the host MUST be one of `ifws:Github`, `ifws:Gitlab` or `ifws:Git` (`ifws:GitManagerKind`, the one list of Git host kinds, which `ifccm:hostedOn` ranges over; IFCCM defines no list of its own, and may import from IFWS, never the other way); a typed term of this specification MUST NOT carry a host's own word, and a GitHub issue and a GitLab issue are the same change request.
 - **FR-028**: The check MUST reach a Git host through one typed interface that answers, for a reference, whether the change request exists, its state, its kind, and its body (for its sections and checkbox items); no other code of the check MUST name a host's API, URL or term.
 - **FR-029**: A pull request (GitHub) and a merge request (GitLab) MUST each be read as the part of a change that carries its commits, never as a change request; the reference `#N` MUST mean the issue on both hosts.
-- **FR-030**: WHERE a harness's host is `ifccm:PlainGit`, there is no tracker to ask: references MUST be checked by their form alone, and `--strict` MUST report the check as `not_run` with the reason that there is no host API, and MUST NOT report it as passed.
+- **FR-030**: WHERE a harness's host is `ifws:Git` (plain Git), there is no tracker to ask: references MUST be checked by their form alone, and `--strict` MUST report the check as `not_run` with the reason that there is no host API, and MUST NOT report it as passed.
 
 ## Evidence of the check
 

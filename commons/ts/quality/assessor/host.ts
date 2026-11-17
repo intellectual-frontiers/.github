@@ -18,7 +18,8 @@ import { sha256 } from "../../kernel/sha256.ts";
 import { mkdir, readFile, readTextFile, walkFiles, writeFile, exists } from "../../runtime/fs.ts";
 import { dirname, fromFileUrl, join } from "../../runtime/path.ts";
 import { type AgentStanding, agentStanding } from "../attestation/agents.ts";
-import { gradeAfterMutation, strengths, type Strength } from "../attestation/mutation.ts";
+import { gradeAfterMutation, mutationFloor, strengths, type Strength } from "../attestation/mutation.ts";
+import type { Declaration } from "../../mizan/changes/declaration.ts";
 import { readTier2, type Tier2State } from "../attestation/host.ts";
 import { blobAt, verifyBranch } from "../host/branch.ts";
 import { formatGatherError, gather, type Gathered } from "../host/gather.ts";
@@ -55,6 +56,8 @@ export type CollectOptions = {
   readonly register?: string;
   /** The day the page is as of: the day of the newest thing on the branch where not given (no clock). */
   readonly today?: string;
+  /** The harness's declaration, where it has one: a regulated harness in production needs `E4` for every requirement (0021-ifqs FR-011). */
+  readonly declaration?: Declaration;
   /** The revision the page and the pack are made at: `HEAD` where not given. */
   readonly revision?: string;
 };
@@ -65,6 +68,8 @@ export type Collected = {
   readonly revision: string;
   readonly today: string;
   readonly gathered: Gathered;
+  /** The harness's declaration the judgements were made under, where it has one. */
+  readonly declaration?: Declaration;
   readonly tier2: Tier2State;
   readonly evaluations: readonly Evaluation[];
   readonly strengths: ReadonlyMap<string, Strength>;
@@ -79,6 +84,7 @@ export async function collect(options: CollectOptions): Promise<Result<Collected
     repo: options.repo,
     ...(options.register === undefined ? {} : { register: options.register }),
     ...(options.today === undefined ? {} : { today: options.today }),
+    ...(options.declaration === undefined ? {} : { declaration: options.declaration }),
   });
   if (g.kind === "err") return err({ kind: "gather", reason: formatGatherError(g.error) });
   const tier2 = await readTier2(options.repo);
@@ -122,6 +128,7 @@ export async function collect(options: CollectOptions): Promise<Result<Collected
     revision,
     today,
     gathered: g.value,
+    ...(options.declaration === undefined ? {} : { declaration: options.declaration }),
     tier2: tier2.value,
     evaluations: evaluateObjectives(g.value, SUGGESTED_OBJECTIVES, g.value.asOf),
     strengths: strengths(tier2.value.assurance.mutations),
@@ -152,7 +159,7 @@ export function trustInputOf(
   for (const e of g.evidence) if (e.kind === "run") runOf.set(`${e.requirement} ${e.day}`, e.traceId);
   const requirements: TrustRequirement[] = g.judgements.map((j) => {
     const s = c.strengths.get(j.requirement);
-    const after = gradeAfterMutation(j.grade, isRunGrade(j.grade), s);
+    const after = gradeAfterMutation(j.grade, isRunGrade(j.grade), s, mutationFloor(c.declaration, c.today));
     const run = j.day === undefined ? undefined : runOf.get(`${j.requirement} ${j.day}`);
     return {
       id: j.requirement,

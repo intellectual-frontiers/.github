@@ -12,6 +12,7 @@
  * @module
  */
 import { instantOf } from "../../kernel/grc.ts";
+import type { Declaration } from "../../mizan/changes/declaration.ts";
 import { err, ok, type Result } from "../../kernel/result.ts";
 import { existsSync, readTextFile } from "../../runtime/fs.ts";
 import { join } from "../../runtime/path.ts";
@@ -48,6 +49,8 @@ export type GatherOptions = {
   readonly changes?: boolean;
   readonly cadences?: Cadences;
   readonly verify?: VerifyOptions;
+  /** The harness's declaration (`ifccm:HarnessDeclaration`): a regulated harness in production needs `E4` for every requirement (FR-011). Read by the caller, never here. */
+  readonly declaration?: Declaration;
 };
 
 /** A run as the gatherer read it. */
@@ -59,6 +62,8 @@ export type GatheredRun = IndexRun & {
 /** What was read and judged. */
 export type Gathered = {
   readonly register: readonly RegisterRow[];
+  /** The declaration the judgements were made under, where one was given. */
+  readonly declaration?: Declaration;
   readonly judgements: readonly Judgement[];
   readonly byRequirement: ReadonlyMap<string, Judgement>;
   readonly runs: readonly GatheredRun[];
@@ -277,10 +282,11 @@ export async function gather(options: GatherOptions): Promise<Result<Gathered, G
       if (what.length > 0) changed.set(requirement, [...new Set([...(changed.get(requirement) ?? []), ...what])]);
       judged.push({ evidence: e, grade: gradeOfEvidence(e), freshness: verdict });
     }
-    judgements.push(judgeRequirement(requirement, judged));
+    judgements.push(judgeRequirement(requirement, judged, { declaration: options.declaration, today }));
   }
   return ok({
     register,
+    ...(options.declaration === undefined ? {} : { declaration: options.declaration }),
     judgements,
     byRequirement: new Map(judgements.map((j) => [j.requirement, j])),
     runs,

@@ -39,7 +39,7 @@ export function factsAt(g: Gathered, day: string, cadences: Cadences = DEFAULT_C
       grade: gradeOfEvidence(e),
       freshness: at === undefined ? { state: "Fresh", by: "time", why: "no clock" } : freshnessOf(e, [], at, cadences),
     }));
-    return judgeRequirement(r, judged);
+    return judgeRequirement(r, judged, { declaration: g.declaration, today: day });
   });
   const newest = g.runs.filter((r) => r.day <= day).sort((a, b) => (a.day + a.traceId < b.day + b.traceId ? 1 : -1))[0];
   const open = g.ledger.ledger.nonconformances.filter((n) => n.openedOn <= day && (n.closedOn === undefined || n.closedOn > day));

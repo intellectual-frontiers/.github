@@ -5,7 +5,8 @@
  *
  * - The **strength** of a requirement is the share of its mutants that its tests detected: `(killed + timeout) / (mutants - equivalent)`, in
  *   a thousandth (`permille`), rounded down. A requirement whose mutants are all equivalent has none.
- * - The **grade** is shown beside it. A strength below the floor the harness states (60 % where it states none) lowers the grade of a
+ * - The **grade** is shown beside it. A strength below the floor the harness states (60 % where it states none, 80 % where it declares a
+ *   regulated domain and production: `mutationFloor`) lowers the grade of a
  *   proof that is a run, `E4` to `E3` and `E3` to `E2`: tests that do not notice a change to the code they prove do not attest it. A grade
  *   that is not a run's (`E1`, `E2`, `E5`) and a requirement that no mutation run measured keep their grade, and say which.
  *
@@ -18,6 +19,8 @@
  */
 import { array, type Decoded, formatDecodeError, json, literal, object, string } from "../../kernel/decode.ts";
 import { err, ok, type Result } from "../../kernel/result.ts";
+import type { Declaration } from "../../mizan/changes/declaration.ts";
+import { regulatedInProduction } from "../pure/ladder.ts";
 import type { LedgerEvent } from "../pure/ledger.ts";
 import { type Grade, gradeRank, GRADES } from "../pure/names.ts";
 import { dayOfText } from "../pure/time.ts";
@@ -26,6 +29,19 @@ import { type Assurance, formatAssuranceError, foldAssurance, nextId, type Recor
 
 /** The floor of strength, in a thousandth, below which a proof's grade is lowered where the harness states no other. */
 export const DEFAULT_FLOOR_PERMILLE = 600;
+
+/** The floor of a harness that declares a regulated domain and has declared production (FR-046), in a thousandth. */
+export const REGULATED_FLOOR_PERMILLE = 800;
+
+/**
+ * The floor of strength a harness is held to on `today` (0021-ifqs FR-046): 600 where it states none, 800 where it declares a regulated domain and
+ * has declared production (`today` is on or after its production day), and where it states a floor of its own, that floor, never below the
+ * regulated one for a regulated harness in production. The declaration and the day are arguments: nothing is read here.
+ */
+export function mutationFloor(declaration: Declaration | undefined, today: string, stated?: number): number {
+  const base = stated ?? DEFAULT_FLOOR_PERMILLE;
+  return regulatedInProduction(declaration, today) ? Math.max(base, REGULATED_FLOOR_PERMILLE) : base;
+}
 
 /** The strength of a row (FR-040): the share of the mutants that were not equivalent that the tests detected, in a thousandth, rounded down; none where all were equivalent. */
 export function strengthPermille(r: MutationRow): number | undefined {

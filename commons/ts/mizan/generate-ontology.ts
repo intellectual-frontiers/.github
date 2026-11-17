@@ -184,7 +184,6 @@ export const IFCCM: OntologyPublication = {
     ["ChangeRequestState", ifccmOntology.changeRequestStates],
     ["IssueReferenceKind", ifccmOntology.issueReferenceKinds],
     ["EnforcementPhase", ifccmOntology.enforcementPhases],
-    ["GitHostKind", ifccmOntology.gitHostKinds],
     ["RegulatedDomain", ifccmOntology.regulatedDomains],
     ["TraceStage", ifccmOntology.traceStages],
     ["AuthorityFunction", ifccmOntology.authorityFunctions],
