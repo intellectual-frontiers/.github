@@ -20,6 +20,7 @@ import {
   classes,
   CODE_LIST_CLASSES,
   codeLists,
+  decisions,
   exitStatuses,
   file,
   files,
@@ -56,15 +57,20 @@ proves(
     for (const name of CODE_LIST_CLASSES) assert(CLASS_NAMES.includes(name), `${name} is a code-list class with no class record`);
     assertEquals(new Set(CODE_LIST_CLASSES).size, 7);
     // a term that rests on a standard names its term, one that does not says why and is due within 90 days of the audit
-    assertEquals(
-      termFindings(termRecordsOf(terms), AUDITED_ON).filter((f) => f.rule !== "mizan/decision-missing"),
-      [],
-    );
-    assertEquals(
-      termFindings(termRecordsOf(terms), "2027-02-14").filter((f) => f.rule === "mizan/decision-overdue"),
-      [],
-    );
-    assert(termFindings(termRecordsOf(terms), "2027-02-16").some((f) => f.rule === "mizan/decision-overdue"));
+    assertEquals(termFindings(termRecordsOf(terms), AUDITED_ON), []);
+    // the owner's decision of 2026-11-17 keeps every unaligned term so: each has a Decision that names it, and no day makes one due or overdue
+    assertEquals(termFindings(termRecordsOf(terms), "2027-12-31"), []);
+    const unaligned = terms.filter((t) => t.values.basis.iri === bases.Unaligned.iri);
+    assertEquals(decisions.length, unaligned.length);
+    for (const t of unaligned) {
+      const d = decisions.find((x) => x.values.decisionOf.iri === t.iri);
+      assert(d !== undefined && t.values.decision?.iri === d.iri, `${t.values.termIri} has a decision that names it`);
+      assertEquals(d.values.decidedOn, "2026-11-17");
+      assert((d.values.record ?? "").includes("issue #10") && (d.values.record ?? "").includes("2027-02-15"), t.values.termIri);
+    }
+    // ExitStatus says that its 0/1/2/3 follow the shell convention and not sysexits.h
+    const exit = terms.find((t) => t.values.termIri === ifws.ExitStatus.iri);
+    assert((exit?.values.justification ?? "").includes("sysexits.h") && (exit?.values.justification ?? "").includes("shell convention"));
     for (const t of terms) {
       assertEquals(t.values.addedOn === undefined, t.values.basis.iri !== bases.Unaligned.iri);
       assert(
