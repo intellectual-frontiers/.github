@@ -180,11 +180,11 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
       <p class="eyebrow">Intellectual Frontiers Commons · Strategy and implementation</p>
       <h1 class="title">Mizan</h1>
       <p class="arabic" lang="ar">ميزان</p>
-      <p class="lede">The IF Spec Profile. A profile of GitHub Spec Kit, one strongly typed TypeScript ontology and a shared ladder, held together by one rule: take the standard before you invent a term, and keep specifications, ontology and code in balance.</p>
+      <p class="lede">The IF Spec Profile. A profile of GitHub Spec Kit, four strongly typed TypeScript ontologies and a shared ladder of eleven rungs, held together by one rule: take the standard before you invent a term, and keep specifications, ontology and code in balance. It carries three products written in its form: IFCCM for change, IFQS for quality and IFWS for the workspace.</p>
       <div class="chips">
-        <span class="chip draft">Specified: five specs, Draft</span>
-        <span class="chip built">Built: checks, importers, exporters</span>
-        <span class="chip plan">Planned: migrating harnesses</span>
+        <span class="chip draft">Specified: eleven specs, Draft</span>
+        <span class="chip built">Built: M0 to M7</span>
+        <span class="chip plan">In progress: IFQS Tier 2 (M9)</span>
         <span class="chip">Tracked in <a href="https://github.com/intellectual-frontiers/.github/issues/10">issue #10</a></span>
       </div>
     </div>
@@ -218,9 +218,12 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
     <li><a href="#standards">Standards first</a></li>
     <li><a href="#ontology">The typed ontology</a></li>
     <li><a href="#integrations">IFC Mizan Integrations</a></li>
+    <li><a href="#ifccm">IFCCM: change control</a></li>
+    <li><a href="#ifqs">IFQS: the quality system</a></li>
+    <li><a href="#ifws">IFWS: workspaces</a></li>
     <li><a href="#ai">AI-first, AI-native</a></li>
     <li><a href="#drift">Reducing drift: the controls</a></li>
-    <li><a href="#roadmap">Roadmap and status</a></li>
+    <li><a href="#roadmap">Built, in progress, not verified</a></li>
     <li><a href="#decisions">Decisions taken</a></li>
     <li><a href="#glossary">Glossary and sources</a></li>
   </ol>
@@ -236,10 +239,10 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
   <div class="cards">
     <div class="card"><div class="no">1</div><h3>Spec Kit is the method</h3><p>We keep GitHub Spec Kit's commands, constitution and <code>spec.md</code>, <code>plan.md</code>, <code>tasks.md</code>. Mizan is a profile on top, not a replacement.</p></div>
     <div class="card"><div class="no">2</div><h3>Two languages</h3><p>Natural language for specifications. TypeScript 7+ for ontology, code, tools and tests. Bun by default, Node 26 as backup.</p></div>
-    <div class="card"><div class="no">3</div><h3>One typed ontology</h3><p>Strongly, algebraically typed TypeScript on commons' RDF kernel. Turtle and the rest are generated, never edited.</p></div>
+    <div class="card"><div class="no">3</div><h3>One typed ontology</h3><p>Strongly, algebraically typed TypeScript on commons' RDF kernel. Turtle and the rest are generated, never edited. Four are published: <code>mz</code>, <code>ifccm</code>, <code>ifqs</code>, <code>ifws</code>.</p></div>
     <div class="card"><div class="no">4</div><h3>Standards first</h3><p>No invented terms where a consensus standard exists. Law, then US and NIST standards, then ISO, then broadly used vocabularies.</p></div>
     <div class="card"><div class="no">5</div><h3>An invention is drift</h3><p>A term no standard backs is <code>unaligned</code>: justified, recorded, counted, and the count only falls.</p></div>
-    <div class="card"><div class="no">6</div><h3>One ladder</h3><p>Rungs 0 to 7, plus an optional lifecycle rung 8. A rung relies only on the rungs below it. Work goes lowest first.</p></div>
+    <div class="card"><div class="no">6</div><h3>One ladder</h3><p>Eleven rungs: 0 to 7 required, 8 lifecycle (optional), 9 Evidence (observer), 10 Workspace (environment). A rung relies only on the rungs below it that it names.</p></div>
     <div class="card"><div class="no">7</div><h3>Everything traces</h3><p>Code names its requirements, tests name what they prove, terms name their specifications.</p></div>
     <div class="card"><div class="no">8</div><h3>Integrations module</h3><p><code>commons/ts/mizan/integrations/</code> brings standards in as typed TypeScript and turns our ontologies into well-known forms.</p></div>
     <div class="card"><div class="no">9</div><h3>AI-first, AI-native</h3><p>Artifacts an agent can read, write and be checked on. Deterministic checks, not the agent, judge whether work is true to the spec.</p></div>
@@ -247,7 +250,7 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
 
   <div class="callout">
     <span class="t">How to read this document</span>
-    <p>Sections 2 to 4 give the rationale. Sections 5 to 9 are the substance: format, ladder, standards, ontology, integrations. Section 10 is how agents work in it, section 11 is the list of controls against drift, and sections 12 and 13 say honestly what is built, what is only specified and what was decided. Every item is marked <span class="chip built">Built</span>, <span class="chip draft">Specified</span> or <span class="chip plan">Planned</span>.</p>
+    <p>Sections 2 to 4 give the rationale. Sections 5 to 9 are the substance: format, ladder, standards, ontology, integrations. Sections 10 to 12 are the three products written in Mizan's form: IFCCM, IFQS and IFWS. Section 13 is how agents work in it, section 14 is the list of controls against drift, and sections 15 and 16 say honestly what is built, what is not yet verified and what was decided. Every item is marked <span class="chip built">Built</span>, <span class="chip draft">Specified</span> or <span class="chip plan">Planned</span>.</p>
   </div>
 </section>
 
@@ -282,7 +285,7 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
   <h3>Why it matters more for us</h3>
   <p>Most of what Intellectual Frontiers builds is regulated by United States law: federal security (NIST, FedRAMP), medical-device quality (FDA's QMSR, 21 CFR Part 820) and electronic records (21 CFR Part 11). For regulated work, "we meant the same thing" is not a defence. The words must be the law's words, the evidence must trace to a requirement, and the requirement must trace to its authority. A private vocabulary makes every audit a translation exercise.</p>
   <p>And it matters more when agents write code. An agent works from whatever it can read. If the specification, the ontology and the code disagree, the agent will pick one, confidently.</p>
-  <div class="callout warn"><span class="t">Honest limit</span><p>Drift can be reduced, not eliminated. A type checker cannot check prose against code. Mizan narrows the gap with typed data, traceable identifiers and deterministic checks, and it states plainly what only a person can judge (<a href="#drift">section 11</a>).</p></div>
+  <div class="callout warn"><span class="t">Honest limit</span><p>Drift can be reduced, not eliminated. A type checker cannot check prose against code. Mizan narrows the gap with typed data, traceable identifiers and deterministic checks, and it states plainly what only a person can judge (<a href="#drift">section 14</a>).</p></div>
 </section>
 
 <!-- 3 -->
@@ -365,6 +368,8 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
     <tr><td>Gherkin / Cucumber</td><td>Executable scenarios</td><td>We use its Given, When, Then shape for scenarios; our tests are TypeScript with <code>proves(...)</code>.</td></tr>
     <tr><td>TLA+, Alloy</td><td>Formal models</td><td>Valuable for some systems, not for everything. Not ruled out for a specification that needs it.</td></tr>
   </table></div>
+  <h3>What Mizan adds, and what Spec Kit keeps</h3>
+  <p>The profile adds what Spec Kit does not state: the gapless <code>registry.tsv</code> and the proof register <code>enforcement.tsv</code>, the tracing of source files, tests and ontology terms to requirements, the ladder, the requirement syntax (RFC 2119 and EARS) and the standards rules. IFCCM departs from Spec Kit's words in one place: the unit of change is a <strong>capability</strong>, not a feature, and what Spec Kit calls a feature is a capability here. The specifications of IFCCM, IFQS and IFWS (<code>0020</code> to <code>0025</code>) are themselves written in Mizan's form. Mizan stays the name of the specifications and ontology strategy; the workspace product is IFWS and has its own ontology.</p>
   <p>Spec Kit moves quickly (it already has a deprecated command and a new one for converging), so each Mizan specification says which version of Spec Kit's templates it follows where it departs from them.</p>
 </section>
 
@@ -414,17 +419,17 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
   <h3>The Standards considered section <span class="chip built">Built, warn-only</span></h3>
   <p>A feature's <code>plan.md</code> has a required section naming the standards looked at and the one chosen. It makes "did you check whether a standard exists?" a question with a written answer.</p>
 
-  <h3>The proof register and OSCAL <span class="chip draft">Specified</span></h3>
-  <p>Where OSCAL can say it, the register maps to OSCAL; where it cannot, it stays as <code>enforcement.tsv</code>, so no proof is written twice. The proposal: a requirement is an <code>implemented-requirement</code> of a <code>component-definition</code> of the harness; a passing proof is an <code>assessment-results</code> observation; a reviewed requirement carries its reason there; an open finding is a <code>plan-of-action-and-milestones</code> item. The command that proves it, and the harness path, stay in the TSV.</p>
+  <h3>The proof register and OSCAL <span class="chip built">Built</span></h3>
+  <p>Where OSCAL can say it, the register maps to OSCAL; where it cannot, it stays as <code>enforcement.tsv</code>, so no proof is written twice. The proposal: a requirement is an <code>implemented-requirement</code> of a <code>component-definition</code> of the harness; a passing proof is an <code>assessment-results</code> observation; a reviewed requirement carries its reason there; an open finding is a <code>plan-of-action-and-milestones</code> item. The command that proves it, and the harness path, stay in the TSV. <code>bun commons/ts/mizan/oscal-register.ts</code> writes the component definition and the assessment results to <code>commons/generated/</code>, and <code>--check</code> fails where they differ from what the folder makes.</p>
 </section>
 
 <!-- 6 -->
 <section id="ladder">
   <h2><span class="num">06</span>The ladder</h2>
-  <p class="kicker">Our harnesses each described a ladder of rungs: a stack of layers, each relying only on those below. Mizan states it <strong>once</strong>, as typed data in commons, and each harness states its own homes as an instance of it.</p>
+  <p class="kicker">Our harnesses each described a ladder of rungs: a stack of layers, each relying only on those below. Mizan states it <strong>once</strong>, as typed data in commons (<code>mz:Rung</code>, with <code>mz:RungKind</code>), and each harness states its own homes as an instance of it. The ladder now has <strong>eleven rungs</strong>.</p>
 
   <figure>
-    <svg viewBox="0 0 860 400" role="img" aria-label="The ladder of rungs 0 to 7 with optional rung 8 apart">
+    <svg viewBox="0 0 860 400" role="img" aria-label="The ladder of rungs 0 to 7, with the optional lifecycle rung 8, the evidence observer rung 9 and the workspace environment rung 10 apart">
       <g font-size="14">
         <rect class="gold" x="60" y="338" width="520" height="38" rx="8"/><text x="80" y="362" font-weight="700">0  Ontology</text><text x="560" y="362" text-anchor="end" class="soft">facts, terms, code lists</text>
         <rect class="gold" x="60" y="294" width="520" height="38" rx="8"/><text x="80" y="318" font-weight="700">1  Specifications</text><text x="560" y="318" text-anchor="end" class="soft">what each part must do</text>
@@ -435,12 +440,24 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
         <rect class="box" x="60" y="74" width="520" height="38" rx="8"/><text x="80" y="98" font-weight="700">6  Application</text><text x="560" y="98" text-anchor="end" class="soft">headless hosts, then windowed hosts</text>
         <rect class="box" x="60" y="30" width="520" height="38" rx="8"/><text x="80" y="54" font-weight="700">7  Documentation</text><text x="560" y="54" text-anchor="end" class="soft">how to operate everything below</text>
         <rect class="redb" x="640" y="30" width="190" height="80" rx="8" stroke-dasharray="6 4"/><text x="735" y="62" text-anchor="middle" font-weight="700">8  Lifecycle (optional)</text><text x="735" y="84" text-anchor="middle" class="soft" font-size="12">retired, then archived</text><text x="735" y="100" text-anchor="middle" class="soft" font-size="12">relies on nothing</text>
+        <rect class="acc" x="640" y="130" width="190" height="80" rx="8" stroke-dasharray="6 4"/><text x="735" y="162" text-anchor="middle" font-weight="700">9  Evidence (observer)</text><text x="735" y="184" text-anchor="middle" class="soft" font-size="12">what the system records</text><text x="735" y="200" text-anchor="middle" class="soft" font-size="12">relies on rungs 0 to 7</text>
+        <rect class="grn" x="640" y="230" width="190" height="80" rx="8" stroke-dasharray="6 4"/><text x="735" y="262" text-anchor="middle" font-weight="700">10  Workspace</text><text x="735" y="284" text-anchor="middle" class="soft" font-size="12">environment: where work is done</text><text x="735" y="300" text-anchor="middle" class="soft" font-size="12">relies on nothing</text>
       </g>
       <path class="ln" d="M610 350 V70" marker-end="url(#a)"/><defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="currentColor"/></marker></defs>
       <text x="630" y="210" font-size="12" class="soft" text-anchor="middle" transform="rotate(-90 630 210)">relies only on rungs below</text>
     </svg>
-    <figcaption>Rungs 0 to 7 are required of every harness. Rung 8 is optional: what is retired (alive, not to be used), then what is archived (dead, safe to delete). Nothing relies on rung 8 and it relies on nothing.</figcaption>
+    <figcaption>Rungs 0 to 7 are required of every harness. Rung 8 is optional: what is retired (alive, not to be used), then what is archived (dead, safe to delete). Rung 9, Evidence, is an observer: it records and proves what the other rungs do, and no rung relies on it. Rung 10, Workspace, is an environment: where everything else is built. Both are required of a harness that claims a regulated domain.</figcaption>
   </figure>
+
+  <h3>The four kinds of rung</h3>
+  <p><code>mz:RungKind</code> is a code list, so code branches on a type the ontology owns.</p>
+  <div class="table-scroll"><table>
+    <tr><th>Kind</th><th>Rungs</th><th>Meaning</th></tr>
+    <tr><td>required</td><td>0 to 7</td><td>Every harness has the rung and builds on the rungs it names.</td></tr>
+    <tr><td>optional</td><td>8</td><td>A harness may have it; it relies on no rung and no rung relies on it.</td></tr>
+    <tr><td>observer</td><td>9</td><td>Records and proves what the other rungs do; required where a regulated domain is claimed; no rung relies on it.</td></tr>
+    <tr><td>environment</td><td>10</td><td>The working environment everything is built in; required where a regulated domain is claimed; it relies on no rung and no rung relies on it.</td></tr>
+  </table></div>
 
   <h3>The rules</h3>
   <ol>
@@ -451,7 +468,7 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
 
   <h3>An instance, not a copy</h3>
   <p>A harness states its ladder as individuals of the commons <code>Rung</code> class in its own ontology. It may add homes, checks and rely-on edges; it may not renumber, rename or drop rungs 0 to 7, and a rung it leaves empty says why. Its constitution table and the layout in its <code>AGENTS.md</code> are generated from those individuals between marker comments, and the generator's <code>--check</code> fails if either differs. Every file belongs to exactly one rung, by the most specific of the rungs' homes.</p>
-  <p><span class="chip built">Built</span> the tracing and layer checks (<code>0015-trace</code>, in the kernel). <span class="chip draft">Specified</span> the shared <code>Rung</code> class (<code>0016-ladder</code>). <span class="chip plan">Planned</span> moving each harness's ladder to an instance.</p>
+  <p><span class="chip built">Built</span> the tracing and layer checks (<code>0015-trace</code>, in the kernel), and the shared <code>mz:Rung</code> and <code>mz:RungKind</code> with the eleven rungs as typed individuals (<code>commons/ontology/mizan/</code>, <code>0016-ladder</code>). <span class="chip plan">Planned</span> moving each harness's ladder to an instance.</p>
 
   <div class="callout warn"><span class="t">The ladder is itself an invention</span><p>No standard names these rungs (ISO/IEC/IEEE 42010 and layered architecture are related, but define none of them). Under our own rule the ladder is therefore <code>unaligned</code>, and its justification and Decision are the first entry in the register.</p></div>
 </section>
@@ -523,7 +540,7 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
 
   <h3>Mizan follows its own rule</h3>
   <p>Requirements: RFC 2119 and EARS. Scenarios: Gherkin. Mappings: SSSOM. Provenance: PROV-O. Catalogs: DCAT. Licenses: SPDX identifiers. Controls: OSCAL. The format of a standard is chosen before ours is.</p>
-  <p><span class="chip draft">Specified</span> in <code>0018-standards-first</code>. <span class="chip plan">Planned</span> the checks, all as warnings with a baseline that only shrinks. The first audit is <a href="commons/spec-kit/audits/2026-11-standards-audit.md"><code>commons/spec-kit/audits/2026-11-standards-audit.md</code></a>.</p>
+  <p><span class="chip draft">Spec: Draft</span> <code>0018-standards-first</code>. <span class="chip built">Built</span> the checks, as warnings held by a baseline that only shrinks (76 terms await a Decision; none is past its 90 days). The first audit is <a href="commons/spec-kit/audits/2026-11-standards-audit.md"><code>commons/spec-kit/audits/2026-11-standards-audit.md</code></a>.</p>
 </section>
 
 <!-- 8 -->
@@ -549,6 +566,20 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
     <li><strong>Run the checks.</strong> <code>commons/ts/mizan/check.ts</code> fails for a term with no record, holds the pending Decisions in a baseline that only shrinks, and fails a Decision past its 90 days.</li>
     <li><strong>Publish the generated forms, not the TypeScript,</strong> to anyone outside your stack: Turtle with <code>owl:versionIRI</code>, SHACL shapes, JSON Schema, SKOS, SQL code-list tables, SSSOM mappings and the HTML view (<code>commons/generated/mizan-ontology.auto.html</code> is the example).</li>
   </ol>
+
+  <h3>The four published ontologies <span class="chip built">Built</span></h3>
+  <p>Each ontology has its own namespace and a typed record of the basis of every class and code list (<code>mz:OntologyTerm</code>). Each is published through the same function (<code>publish-ontology.ts</code>) as canonical Turtle, RDF/XML, OWL 2 functional syntax, SHACL shapes, JSON Schema, SKOS code lists, SQL tables, SSSOM mappings and an HTML view, all under <code>commons/generated/</code> and checked for staleness by <code>--check</code>.</p>
+  <div class="table-scroll"><table>
+    <tr><th>Prefix</th><th>What it describes</th><th>What it stands on</th></tr>
+    <tr><td><code>mz</code></td><td>The IF Spec Profile: <code>Rung</code> and <code>RungKind</code>, <code>Standard</code>, <code>Authority</code>, <code>Jurisdiction</code>, <code>Decision</code>, <code>OntologyTerm</code>, the bases and the status words.</td><td><code>dcterms:Standard</code> for a standard; the rest is <code>unaligned</code> with Decisions due.</td></tr>
+    <tr><td><code>ifccm</code></td><td>Change control: capability, change request and its kinds and states, change, configuration item, baseline, harness declaration, regulated domains, the stages of the trace chain, the functions of authority, the Git host kinds.</td><td>PROV-O (change as activity, configuration item as entity, baseline as collection) and OSLC Change Management (<code>oslc_cm:ChangeRequest</code>); refers to <code>mz:Rung</code>, <code>mz:Decision</code> and <code>mz:Authority</code> without copying them.</td></tr>
+    <tr><td><code>ifqs</code></td><td>The quality system: test run, case and outcome (with <code>not_run</code>), evidence and its grade E0 to E5, evidence file, freshness, nonconformance, CAPA, objective, review debt, tiers, audiences, assessor pack.</td><td>PROV-O (a CAPA is a <code>prov:Plan</code>), DCAT (the assessor pack is a <code>dcat:Dataset</code>) and SKOS for the code lists; extends the test record of <code>0008-test-evidence</code>. OpenTelemetry, CTRF, SARIF and OSCAL are forms a record is written or rendered in, not RDF terms.</td></tr>
+    <tr><td><code>ifws</code></td><td>The workspace: workspace, repository, Git manager and its capabilities, tool, policy, repository states, actions and the plan, findings and severities, generated files, modules and exit statuses.</td><td>PROV-O (<code>prov:Plan</code>) and DCAT (the tool catalog as a <code>dcat:Catalog</code>); a severity carries its SARIF level. The properties are not audited yet.</td></tr>
+  </table></div>
+  <p>A standard that publishes no IRI for a term is named in the term's justification, never given an invented IRI.</p>
+
+  <h3>Validated by tools other than ours <span class="chip built">Built</span></h3>
+  <p>The generated files are read by independent tools: rdflib parses the Turtle, pySHACL checks that the ontology conforms to the shapes made from its own schemas and rejects a broken individual, sssom-py parses the SSSOM, and a CI job reads the generated OWL with ROBOT (the OBO Foundry's ontology tool, pinned by version and SHA-256), converts it and reports its quality. Tests that need those Python tools skip where they are absent.</p>
 
   <h3>Strengths and weaknesses, by who uses it</h3>
   <div class="two">
@@ -576,7 +607,7 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
 <!-- 9 -->
 <section id="integrations">
   <h2><span class="num">09</span>IFC Mizan Integrations</h2>
-  <p class="kicker">The module of Mizan extensions and plugins at <code>commons/ts/mizan/integrations/</code>. It does two jobs: bring outside ontologies into our typed TypeScript form, and turn ours into well-known, reusable ontologies. <span class="chip draft">Specified</span> in <code>0019-mizan-integrations</code>; <span class="chip plan">Planned</span> to build.</p>
+  <p class="kicker">The module of Mizan extensions and plugins at <code>commons/ts/mizan/integrations/</code>. It does two jobs: bring outside ontologies into our typed TypeScript form, and turn ours into well-known, reusable ontologies. <span class="chip draft">Spec: Draft</span> <code>0019-mizan-integrations</code>; <span class="chip built">Built</span>.</p>
 
   <figure>
     <svg viewBox="0 0 880 330" role="img" aria-label="Import pipeline from a pinned standard to a typed module, and export pipeline from our ontology to well-known forms">
@@ -656,8 +687,97 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
 </section>
 
 <!-- 10 -->
+<section id="ifccm">
+  <h2><span class="num">10</span>IFCCM: change control</h2>
+  <p class="kicker"><strong>Intellectual Frontiers Capabilities Configuration Management</strong> (<code>0020-ifccm</code>, <code>ifccm:</code>) is how a harness controls change. The unit of change is a <em>capability</em>, every commit names its issue, and each requirement can be followed from its issue to the test run that proved it. The abbreviation is never used as "CCM" alone: that is also the Cloud Security Alliance's Cloud Controls Matrix. <span class="chip built">Built</span> (M2) <span class="chip draft">Spec: Draft</span></p>
+
+  <div class="cards">
+    <div class="card"><h4>A capability is the unit of change</h4><p>One ability of a harness that can be named, specified, built, proved and released. Each area (a rung, or a subject) has one parent change request, and each capability is a child (sub-issue) of it.</p></div>
+    <div class="card"><h4>Every commit names an issue</h4><p>On a line of its own: <code>Refs #N</code> for work toward it, <code>Closes #N</code> for the commit that finishes it. Other words (Fixes, Resolves, Closed) are findings. With <code>--strict</code>, <code>Closes</code> on an issue whose checkboxes or Done when are not done is a finding too.</p></div>
+    <div class="card"><h4>Warn, then gate</h4><p>Until a harness declares its production day, a finding is a warning held by a baseline that only shrinks. From that day it is a gate. A declaration that relaxes in Git history is itself a finding (<code>changes/gate-relaxed</code>).</p></div>
+    <div class="card"><h4>Authority is kept apart</h4><p>What a specification binds, a Decision authorizes, a check verifies and an issue only plans. A departure with no Decision is a finding; so is a Decision approved by the change's own author where the harness declares a regulated domain.</p></div>
+  </div>
+
+  <h3>The trace chain</h3>
+  <p>The check follows each requirement through six stages and reports the first stage with no link: <strong>issue</strong> (<code>Refs</code>/<code>Closes</code>), <strong>requirement</strong>, <strong>ontology term</strong>, <strong>code</strong> (<code>// Spec:</code>), <strong>test</strong> (<code>proves([...])</code>) and <strong>quality run</strong>. A generated view lists the capabilities touching each rung, with <code>--check</code>.</p>
+
+  <h3>The command</h3>
+<pre><code>bun commons/ts/mizan/changes.ts [--range A..B] [--strict] [--declaration FILE] [--check]
+bun commons/ts/tools/changes.ts   <span class="c"># the same; the result is kept as a quality record</span></code></pre>
+  <p>Exit 0 is clean, 1 findings, 2 usage, 3 environment. The host (GitHub, GitLab or plain Git) is reached through one interface, <code>GitHostClient</code>. On plain Git, or where the host cannot be reached, the strict rules are <code>not_run</code> with their reason, never a pass. Only what a specification folder can judge offline (the shape of the declaration) is wired into <code>holdHarness</code> as a rule plugin; the commit rules need a range and belong to the command.</p>
+
+  <h3>Regulated domains, and what this is not</h3>
+  <p>A harness declares from a code list of five domains: federal security (NIST SP 800-53, FedRAMP), device quality (21 CFR Part 820, which incorporates ISO 13485), electronic records (21 CFR Part 11), device software (IEC 62304) and trust services (SOC 2, ISO/IEC 27001). The specification maps its parts to those standards as mapping statements. <strong>It does not claim that any harness complies</strong> with any of them: it keeps the evidence an assessor would ask for.</p>
+</section>
+
+<!-- 11 -->
+<section id="ifqs">
+  <h2><span class="num">11</span>IFQS: the quality system</h2>
+  <p class="kicker"><strong>Intellectual Frontiers Quality System</strong> (<code>0021-ifqs</code>, <code>0022-trust</code>, <code>ifqs:</code>) is based on <em>Operational Truth</em>: what is true of a system is what the system reports when it runs, kept as evidence anyone can check, with the grade of that evidence shown, and with a failure opened as a nonconformance by the system itself. A person's statement is recorded, and graded below a run. <span class="chip built">Tiers 0 and 1 built</span> <span class="chip plan">Tier 2 in progress</span></p>
+
+  <h3>Tier 0: evidence exists <span class="chip built">Built</span> (M3)</h3>
+  <ul>
+    <li><strong>One canonical record per run.</strong> An OpenTelemetry log record per case (OTLP/JSON, the OpenTelemetry test attributes, a CTRF-shaped body), extending the test record of <code>0008-test-evidence</code>. Outcomes are pass, fail, skip, todo, cancelled and <code>not_run</code>, which carries its reason and is never counted as passed.</li>
+    <li><strong>Immutable files, chained.</strong> <code>quality/evidence/YYYY/MM/DD/&lt;run&gt;.json</code>, one file per run, never edited (a writer refuses to overwrite). Each file names the hash of the one before it (<code>ifc.quality.previous.sha256</code>), so a verifier finds the first record that does not match.</li>
+    <li><strong>An append-only <code>quality</code> branch</strong> (an orphan branch written with real Git), signed through Git's own signing where configured, with a note on the tested commit under <code>refs/notes/quality</code>.</li>
+    <li><strong>Renderings, on demand:</strong> JUnit XML, CTRF, SARIF, TAP and the documents of ISO/IEC/IEEE 29119-3. The command <code>commons/ts/quality/quality.ts</code> has <code>record</code>, <code>verify</code> and <code>render</code>; <code>ifc test</code> is unchanged.</li>
+  </ul>
+
+  <h3>The evidence grade</h3>
+  <div class="table-scroll"><table>
+    <tr><th>Grade</th><th>Meaning</th></tr>
+    <tr><td><strong>E0</strong> none</td><td>No record of any kind.</td></tr>
+    <tr><td><strong>E1</strong> stated</td><td>A person or an agent says it is met; nothing ran.</td></tr>
+    <tr><td><strong>E2</strong> reviewed</td><td>A review is recorded, by a person or by an agent (said to be an agent's).</td></tr>
+    <tr><td><strong>E3</strong> tested</td><td>An automated run proved it and its record exists.</td></tr>
+    <tr><td><strong>E4</strong> attested</td><td>The run is kept on the quality branch, chained, signed and linked to its commit, so a third party can verify it.</td></tr>
+    <tr><td><strong>E5</strong> observed</td><td>A probe of the system in operation reports it met.</td></tr>
+  </table></div>
+
+  <h3>Tier 1: the system reports itself <span class="chip built">Built</span> (M7)</h3>
+  <ul>
+    <li><strong>Grades and review debt</strong> attached to each requirement of the proof register, the debt as a number.</li>
+    <li><strong>Freshness.</strong> A proof is fresh, due or stale. A proof older than its requirement's last change, or whose tested commit is not an ancestor of the specification's last revision, is stale, and a stale proof opens a nonconformance by itself.</li>
+    <li><strong>Nonconformance and CAPA</strong> as typed, append-only records. A CAPA is open, then verified when a <em>named</em> test passes in a later run, then closed only when a <em>named person</em> approves, recorded as a Decision. The person is data in the record, never inferred.</li>
+    <li><strong>Objectives.</strong> The <code>SC-NNN</code> success criteria of the specifications are read as quality objectives with targets and error budgets, emitted as OpenTelemetry metrics.</li>
+    <li><strong>An index</strong> of all of it, deterministic, generated from the branch and <code>--check</code>able; commands <code>index</code>, <code>freshness</code>, <code>nonconformances</code>, <code>capa open|verify|close</code>, <code>register</code>, <code>tier</code> and <code>attest</code>.</li>
+  </ul>
+
+  <h3>Tier 2: people see and prove <span class="chip plan">In progress</span> (M9)</h3>
+  <p>Being built now, in <code>commons/ts/quality/</code>: the <strong>assessor pack</strong> (a deterministic archive of the records, their chain, the index and the crosswalks, with an offline <code>verify-pack</code> that checks every hash, the chain and the signatures with no network); the <strong>Trust page</strong> (<code>0022-trust</code>, a generated page and JSON, redacted by audience: public, assessor, internal; failures and open nonconformances included); <strong>attestation by recorded sample</strong> (a person samples records at random with a recorded seed); <strong>pre-registered test plans</strong> (a plan committed before the run, its hash recorded in the run); <strong>mutation-run records</strong> for proof strength; and <strong>agents performing reviews</strong>, graded below a test run and sampled by a person. The console (a user interface) belongs to a harness and is not built here.</p>
+  <div class="callout warn"><span class="t">Evidence, not a verdict</span><p>The Trust page states what was proved, how and when. It does not say that a harness conforms to a standard, and it does not claim compliance with any regulation.</p></div>
+</section>
+
+<!-- 12 -->
+<section id="ifws">
+  <h2><span class="num">12</span>IFWS: workspaces</h2>
+  <p class="kicker"><strong>Intellectual Frontiers Workspaces</strong> (<code>0023-if-workspaces</code>, <code>0024-ifws-host</code>, <code>0025-ifws</code>, <code>ifws:</code>) is the managed place on a computer where repositories, worktrees, approved tools, policy and generated workspace files live. It is rung 10 of the ladder. Its command is <code>ifws</code>. <span class="chip built">Built</span> (M4 to M6) <span class="chip draft">Specs: Draft</span></p>
+
+  <div class="cards">
+    <div class="card"><h4>One root, a layout that mirrors remotes</h4><p><code>$IFC_WORKSPACES_HOME</code> (default <code>$HOME/workspaces</code>, <code>%USERPROFILE%\workspaces</code> on Windows). Repositories are at <code>&lt;home&gt;/&lt;git-host&gt;/&lt;path&gt;/&lt;repo&gt;</code>. IFWS's own area is <code>&lt;home&gt;/.if-workspaces/</code>: the typed manifest, generated <code>*.auto.*</code> files, the state record, evidence, tools and hooks.</p></div>
+    <div class="card"><h4>Portable by construction</h4><p>Branded path types reject Windows reserved names, trailing dots and spaces, forbidden characters, over-long names, non-NFC Unicode, case-fold collisions and paths over 259 characters. No symlinks are needed.</p></div>
+    <div class="card"><h4>Plan, then apply</h4><p><code>plan(desired, observed)</code> is a pure function. Updates are fast-forward only; a tree with unpushed commits or changes is never deleted; one writer holds a lock; refusals say why.</p></div>
+    <div class="card"><h4>GitHub, GitLab, plain Git</h4><p>One interface, three adapters. GitLab groups nest to any depth. A token is read only from the environment (<code>GITHUB_TOKEN</code>, <code>GH_TOKEN</code>, <code>GITLAB_TOKEN</code>, <code>CI_JOB_TOKEN</code>) and never stored or logged. Plain Git answers only the capabilities every host shares.</p></div>
+  </div>
+
+  <h3>The command</h3>
+  <p><code>ifws</code> is a controller in the style of <code>git</code>: <code>ifws name</code> runs the module <code>ifws-name</code>, found among typed built-in modules, then modules a workspace registers in <code>.if-workspaces/modules.auto.json</code>, then executables named <code>ifws-*</code> on the <code>PATH</code>. Built in: <code>init</code>, <code>plan</code>, <code>apply</code>, <code>status</code>, <code>doctor</code>, <code>verify</code>, <code>render</code>, <code>worktree</code>, <code>list</code>, <code>help</code>, <code>shell</code>, <code>setup</code>, <code>tools</code> and <code>hook</code>. Exit codes: 0 ok, 1 findings, 2 usage, 3 environment. It manages only the workspace; it is not a general Mizan or IFC controller and does not front <code>ifc</code>.</p>
+  <ul>
+    <li><strong>Typed templates, not a template language.</strong> The manifest is the source state; typed TypeScript functions generate <code>*.auto.code-workspace</code>, <code>lefthook.auto.yml</code>, <code>AGENTS.auto.md</code> and the hooks. A state record lets <code>ifws verify</code> see a hand edit. Git settings go to each repository's local configuration and <code>core.hooksPath</code>, never to the global configuration.</li>
+    <li><strong><code>ifws setup</code> is a dry run by default;</strong> <code>--apply</code> is required to change anything. It is the only command that installs. It sets <code>core.longpaths</code> per repository, and returns the exact steps to run where elevation is needed.</li>
+    <li><strong>Tools are pinned.</strong> The catalog gives each tool a version and a per-platform URL and SHA-256; <code>latest</code> is refused; the hash is checked before anything is written. <code>git</code>, <code>bun</code> and <code>node</code> are verified by a version probe and never installed. A tool or an <code>ifws-*</code> module outside the catalog is informational for 90 days from first seen, then a warning. The catalog and the inventory export as OSCAL, SPDX and CycloneDX.</li>
+    <li><strong>Secrets fail from day one.</strong> A plaintext token, private key block or credential in a URL in managed configuration is an error, and the scan never prints the secret. Signed commits are required where IFCCM declares a regulated domain and warned elsewhere.</li>
+    <li><strong><code>ifws shell &lt;bash|zsh|fish|pwsh|nu&gt;</code></strong> prints a reversible snippet to standard output and writes nothing: the root, the tools on the <code>PATH</code>, completions and one function, <code>wcd</code>, that changes to a repository by name. <code>--install</code> shows a diff of one marked block and asks; <code>--uninstall</code> removes exactly that block.</li>
+    <li><strong>Evidence.</strong> Every run writes records in the IFQS shape under <code>.if-workspaces/evidence/</code>, with <code>not_run</code> and its reason where something did not run.</li>
+  </ul>
+
+  <h3>Credits</h3>
+  <p>The layout and the <code>ensure</code>, <code>status</code> and <code>doctor</code> ideas come from the earlier workspace tools of Intellectual Frontiers' founder. <a href="https://www.chezmoi.io/">chezmoi</a> (Tom Payne and contributors, MIT) is credited as <em>inspiration</em>: source state and target state, templates over data, <code>apply</code>, <code>diff</code>, <code>verify</code> and a state record. IFWS uses no chezmoi code or program and is not a dotfiles manager. The convention that <code>git foo</code> runs <code>git-foo</code> is Git's. See <a href="commons/ts/workspaces/CREDITS.md"><code>commons/ts/workspaces/CREDITS.md</code></a>.</p>
+</section>
+
+<!-- 13 -->
 <section id="ai">
-  <h2><span class="num">10</span>AI-first, AI-native</h2>
+  <h2><span class="num">13</span>AI-first, AI-native</h2>
   <p class="kicker"><strong>AI-first</strong> means we assume an agent will read, write and change this system every day. <strong>AI-native</strong> means the artifacts are designed for that: structured, identifiable, checkable. The central principle is the same in both: <em>the agent proposes; deterministic checks and a person decide.</em></p>
 
   <h3>Why this design suits agents</h3>
@@ -696,9 +816,9 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
   </ul>
 </section>
 
-<!-- 11 -->
+<!-- 14 -->
 <section id="drift">
-  <h2><span class="num">11</span>Reducing drift: the controls</h2>
+  <h2><span class="num">14</span>Reducing drift: the controls</h2>
   <p class="kicker">Each kind of drift from <a href="#why">section 2</a> has a control that a program can run. Where no control can read the thing (meaning), a person reviews it and the reason is recorded.</p>
 
   <div class="table-scroll"><table>
@@ -710,8 +830,11 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
     <tr><td>B: code ↔ ontology</td><td>Code lists are imported as unions; generated files are checked for staleness</td><td>Generators with <code>--check</code></td><td><span class="chip built">Built</span> (per harness)</td></tr>
     <tr><td>B: layers</td><td>An import that climbs the ladder is refused</td><td><code>0015-trace</code> FR-009, FR-010</td><td><span class="chip built">Built</span></td></tr>
     <tr><td>Requirement quality</td><td>EARS patterns; Gherkin scenarios that cite requirements</td><td><code>mizan-check</code> plugins</td><td><span class="chip built">Built, warn-only</span></td></tr>
-    <tr><td>C: us ↔ the world</td><td>Standards pinned with a hash; a newer upstream version is a finding</td><td><code>Standard</code> record; integrations</td><td><span class="chip built">Pins built</span> <span class="chip plan">Newer-version finding planned</span></td></tr>
+    <tr><td>C: us ↔ the world</td><td>Standards pinned with a hash; a newer upstream version is a finding</td><td><code>Standard</code> record; integrations</td><td><span class="chip built">Built</span> (<code>newer.ts</code> is opt-in: it alone needs the network)</td></tr>
     <tr><td>D: invention</td><td>A basis on every term; <code>unaligned</code> needs justification and a Decision; the count only shrinks</td><td><code>0018-standards-first</code></td><td><span class="chip built">Built</span> (a basis on every term of commons' ontologies; 90 days; baseline)</td></tr>
+    <tr><td>Change</td><td>Every commit names an issue on a line of its own; closing words and unfinished issues are findings; warn, then gate</td><td><code>0020-ifccm</code>, <code>commons/ts/mizan/changes.ts</code></td><td><span class="chip built">Built</span></td></tr>
+    <tr><td>Proof, over time</td><td>Evidence graded E0 to E5; a stale proof opens a nonconformance; a CAPA closes on a named test and a named person</td><td><code>0021-ifqs</code>, <code>commons/ts/quality/</code></td><td><span class="chip built">Tiers 0 and 1</span> <span class="chip plan">Tier 2 in progress</span></td></tr>
+    <tr><td>The environment</td><td>Plan before apply; fast-forward only; pinned tools; secrets fail; generated files verified against a state record</td><td><code>0023</code> to <code>0025</code>, <code>commons/ts/workspaces/</code></td><td><span class="chip built">Built</span></td></tr>
     <tr><td>Languages</td><td>No fact kept as source outside natural language and TypeScript, except a named <code>Exception</code></td><td><code>0017-two-languages</code></td><td><span class="chip draft">Specified</span></td></tr>
     <tr><td>Meaning</td><td>A person reviews; the reason is in the register</td><td>Proof register mechanism <code>review</code></td><td><span class="chip built">Built</span></td></tr>
   </table></div>
@@ -720,47 +843,56 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
   <p>A new rule never fails what a harness already holds. It starts as a warning, with a baseline file listing today's findings. A new finding fails; a baseline line that no longer occurs also fails, so the baseline can only shrink, and you cannot "fix" a check by adding a line. This is the same mechanism <code>stolos</code> already uses for its trace and layer checks.</p>
 </section>
 
-<!-- 12 -->
+<!-- 15 -->
 <section id="roadmap">
-  <h2><span class="num">12</span>Roadmap and status</h2>
-  <p class="kicker">The work is tracked in <a href="https://github.com/intellectual-frontiers/.github/issues/10">issue #10</a>, and every step is specification first: specifications, then ontology, then code, then tests, then documentation. Everything below marked Built runs on Bun and on Node 26 and is tested; the checks are in CI.</p>
+  <h2><span class="num">15</span>Built, in progress and not verified</h2>
+  <p class="kicker">The work is tracked in <a href="https://github.com/intellectual-frontiers/.github/issues/10">issue #10</a>, and every step is specification first: specifications, then ontology, then code, then tests, then documentation. What is marked Built is tested, runs on Bun and on Node 26, and is checked in CI. All eleven specifications are still <strong>Draft</strong>.</p>
 
+  <h3>Milestones</h3>
   <div class="table-scroll"><table>
-    <tr><th>Phase</th><th>What</th><th>Status</th></tr>
-    <tr><td>0</td><td>Standards audit: commons and <code>stolos</code> terms inventoried, FDA QMSR verified, OSCAL 1.2.3 verified, candidate importers named, the OSCAL mapping of the proof register proposed</td><td><span class="chip built">Done</span> <a href="commons/spec-kit/audits/2026-11-standards-audit.md">report</a></td></tr>
-    <tr><td>1</td><td>Specifications <code>0003-mizan</code> and <code>0016</code> to <code>0019</code>, the <code>0012</code> amendments; the checker accepts Spec Kit's form and one status vocabulary; EARS, Gherkin and the baseline</td><td><span class="chip built">Done</span>, except the OSCAL mapping of the one proof register <span class="chip plan">Planned</span></td></tr>
-    <tr><td>2</td><td>Shared ontology (<code>Rung</code>, <code>Standard</code>, <code>Authority</code>, <code>Decision</code>, <code>OntologyTerm</code> and the rest); every term of the packaging ontology and of Mizan's vocabulary has a record of its basis; a specification names only terms the ontology defines</td><td><span class="chip built">Done</span>, except reconciling <code>stolos:Decision</code> with the commons one <span class="chip plan">Phase 6</span></td></tr>
-    <tr><td>3</td><td>Mizan checks as plugins in <code>commons/ts/mizan/</code>: keyword, EARS, Gherkin, Standards considered, the 90 days of a Decision, a basis on every term, deprecation, undefined and deprecated terms in specifications</td><td><span class="chip built">Done</span>, except the stale-pin and authority-citation rules <span class="chip plan">Planned</span></td></tr>
-    <tr><td>4</td><td><code>commons/ts/mizan/integrations/</code>: the registry; a Turtle and N-Triples reader; importers of a vocabulary slice and of an OSCAL control catalog, from a file or a pinned URL, with PROV-O provenance; exporters of SHACL, JSON Schema, SKOS, SQL, SSSOM and an HTML view; independent validators in the suite</td><td><span class="chip built">Built</span>; JSON-LD, RDF/XML, XSD, OWL, DCAT and the upstream bundle <span class="chip plan">Planned</span></td></tr>
-    <tr><td>5</td><td>Ontology weaknesses: the compile cost of a 5,000-entry code list measured and held by a test, deprecation, <code>owl:versionIRI</code>, an HTML ontology view, the generated artifacts as the contract for consumers outside TypeScript</td><td><span class="chip built">Done</span></td></tr>
-    <tr><td>6</td><td>Migrate <code>stolos</code> first, then the other harnesses; their existing <code>unaligned</code> terms go into the baseline</td><td><span class="chip plan">Waiting for a go-ahead</span></td></tr>
+    <tr><th>Milestone</th><th>What</th><th>Status</th></tr>
+    <tr><td>M0</td><td>Mizan itself: the standards audit; <code>0003</code> and <code>0016</code> to <code>0019</code>; the checks (keyword, EARS, Gherkin, Standards considered, basis on every term, the 90 days of a Decision, deprecation); the shared ontology; <code>commons/ts/mizan/integrations/</code> (importers of a vocabulary slice and of an OSCAL catalog; exporters of SHACL, JSON Schema, SKOS, SQL, SSSOM, OWL, RDF/XML, DCAT and an HTML view); the OSCAL form of the proof register</td><td><span class="chip built">Done</span> <a href="commons/spec-kit/audits/2026-11-standards-audit.md">audit</a></td></tr>
+    <tr><td>M1</td><td>Specifications <code>0020</code> to <code>0025</code>; the ladder of eleven rungs; the ontologies <code>ifccm</code>, <code>ifqs</code> and <code>ifws</code> with their bases</td><td><span class="chip built">Done</span></td></tr>
+    <tr><td>M2</td><td>IFCCM: <code>commons/ts/mizan/changes/</code> and the command <code>changes.ts</code></td><td><span class="chip built">Done</span></td></tr>
+    <tr><td>M3</td><td>IFQS Tier 0: the canonical record, the files and chain, the signed <code>quality</code> branch, the renderings</td><td><span class="chip built">Done</span></td></tr>
+    <tr><td>M4</td><td>IFWS core (types, portable paths, layout, manifest, state, plan, findings, policy) and the GitHub, GitLab and plain Git adapters behind one interface</td><td><span class="chip built">Done</span></td></tr>
+    <tr><td>M5</td><td>The <code>ifws</code> command, modules, host layer, templates and <code>shell</code></td><td><span class="chip built">Done</span></td></tr>
+    <tr><td>M6</td><td>Tools, <code>ifws setup</code> (dry run by default), and the policy scans</td><td><span class="chip built">Done</span></td></tr>
+    <tr><td>M7</td><td>IFQS Tier 1: grades, review debt, freshness, nonconformance and CAPA, objectives, the index; the change check leaves its result as a quality record</td><td><span class="chip built">Done</span></td></tr>
+    <tr><td>M9</td><td>IFQS Tier 2 (<code>0021</code> and <code>0022</code>): assessor pack, Trust page, attestation, pre-registered plans, mutation records, agent review</td><td><span class="chip plan">In progress</span></td></tr>
+    <tr><td>M10</td><td>Credits (<code>commons/ts/workspaces/CREDITS.md</code>), this document and the README, and the Decisions</td><td><span class="chip plan">In progress</span></td></tr>
+    <tr><td>Later</td><td>Migrate <code>stolos</code> first, then the other harnesses, and move each harness's ladder to an instance; their existing <code>unaligned</code> terms go into the baseline</td><td><span class="chip plan">Waiting for a go-ahead</span></td></tr>
   </table></div>
+
+  <p>In the proof register (<code>enforcement.tsv</code>) 534 requirements are enforced by a check and 5 by a gate, 6 are reviewed by a person, and 64 have no enforcement yet: they are the Tier 2 requirements (<code>0021</code>, <code>0022</code>), and others of <code>0016</code> to <code>0019</code> and <code>0023</code>, each marked <code>none</code> with its reason. A <code>none</code> is never hidden.</p>
 
   <h3>What the audits found</h3>
   <ul>
-    <li>The packaging ontology has 61 terms: 5 specialize schema.org, 5 map to a schema.org property, and 51 are <code>unaligned</code>, each with the candidates still to examine. Mizan's own vocabulary has 14 classes: 1 specializes <code>dcterms:Standard</code> and 13 are <code>unaligned</code>. All 64 pending Decisions are due within 90 days of 2026-11-17 and are held by a baseline that only shrinks; a Decision past its day fails whatever the baseline holds.</li>
+    <li>The packaging ontology has 61 terms: 5 specialize schema.org, 5 map to a schema.org property, and 51 are <code>unaligned</code>, each with the candidates still to examine. Across the ontologies, 76 terms await a Decision; all are within their 90 days and are held by a baseline that only shrinks; a Decision past its day fails whatever the baseline holds.</li>
     <li><code>stolos</code> has the best precedent for importing: vendored, pinned, hashed, generated. The integrations module generalizes it.</li>
   </ul>
 
-  <h3>Verified for real, with the standards hosts allowed</h3>
+  <h3>Verified for real</h3>
   <ul>
-    <li>OSCAL 1.2.3 is the newest release (tags 1.2.4, 1.2.5 and 1.3.0 do not exist) and is public domain and CC0.</li>
-    <li>A slice of the real schema.org 30.1 Turtle, fetched by pinned SHA-256, makes exactly the vocabulary commons used to write by hand, and commons' packaging ontology now takes it from the generated module (its generated tables are unchanged).</li>
-    <li>The reader's triple counts on schema.org (17,515), PROV-O (961) and SHACL (1,112) agree exactly with rdflib; sssom-py parses the SSSOM file; pySHACL finds Mizan's ontology conforms to the shapes made from its own schemas and rejects a broken individual.</li>
-    <li>NIST SP 800-53 Rev. 5.2.0 (1,196 controls with enhancements) imports from a pinned <code>oscal-content</code> commit in 0.7 s.</li>
-    <li>TypeScript 7 checks a 5,000-entry code list, with its key type, in 0.18 s and 85 MB, linear in its entries.</li>
+    <li>OSCAL 1.2.3 is the newest release (tags 1.2.4, 1.2.5 and 1.3.0 do not exist) and is public domain and CC0. NIST SP 800-53 Rev. 5.2.0 (1,196 controls with enhancements) imports from a pinned <code>oscal-content</code> commit in 0.7 s.</li>
+    <li>A slice of the real schema.org 30.1 Turtle, fetched by pinned SHA-256, makes exactly the vocabulary commons used to write by hand. The reader's triple counts on schema.org (17,515), PROV-O (961) and SHACL (1,112) agree exactly with rdflib; sssom-py parses the SSSOM file; pySHACL finds the ontology conforms to its own shapes and rejects a broken individual; ROBOT reads the generated OWL.</li>
+    <li>TypeScript 7 checks a 5,000-entry code list in 0.18 s and 85 MB, linear in its entries.</li>
+    <li>The GitHub, GitLab and plain Git adapters are tested with recorded exchanges written from the hosts' documented answers, a real HTTP server on loopback for the live transport, and real Git repositories. The change check, the quality branch (including signing with an SSH key made in the test where <code>ssh-keygen</code> exists) and <code>ifws</code> run as programs on Bun and on Node 26 against real temporary repositories.</li>
   </ul>
 
-  <h3>Still to verify</h3>
-  <ul>
-    <li>The licenses and redistribution terms of the remaining candidate importers (DPV, SPDX, CycloneDX, FHIR, NIEM), before each first import; SPDX 3 could not be fetched from this environment, so its <code>Hash</code> terms remain a candidate, not a claim.</li>
-    <li>That the GitHub Actions run, which installs the independent validators and fetches schema.org directly, is green on the branch.</li>
-  </ul>
+  <h3>Not verified</h3>
+  <div class="callout warn"><span class="t">What we have not seen work</span><ul>
+    <li><strong>Windows.</strong> The Windows path rules are pure and tested everywhere, and CI includes a Windows job, but some of the tests that run Git, shells and the file system have not been seen to pass on Windows.</li>
+    <li><strong>Private repositories on GitHub and GitLab.</strong> The adapters map an unauthenticated answer for a private repository to <code>unauthorized</code> or <code>not-found</code> as the host says, and take a token only from the environment; this is tested against recorded answers, not against a real private repository on either host.</li>
+    <li><strong>The shell snippets for zsh, fish, PowerShell and Nushell</strong> are generated and were read, not run in those shells. Only bash is run.</li>
+    <li>The licenses and redistribution terms of the remaining candidate importers (DPV, SPDX, CycloneDX, FHIR, NIEM), before each first import; SPDX 3 could not be fetched from the build environment.</li>
+    <li>Compliance. Nothing here claims that any harness complies with any regulation or standard. IFCCM, IFQS and IFWS keep evidence an assessor can check.</li>
+  </ul></div>
 </section>
 
-<!-- 13 -->
+<!-- 16 -->
 <section id="decisions">
-  <h2><span class="num">13</span>Decisions taken</h2>
+  <h2><span class="num">16</span>Decisions taken</h2>
   <p class="kicker">What was decided, so that it is not decided again by accident.</p>
   <div class="table-scroll"><table>
     <tr><th>#</th><th>Decision</th></tr>
@@ -780,23 +912,42 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
     <tr><td>14</td><td>Non-TypeScript tools state the platforms they support; their tests run only there.</td></tr>
     <tr><td>15</td><td>Trace and layers stay in the kernel as pure functions; <code>commons/ts/mizan/</code> imports them; <code>spec-kit-check.ts</code> remains a wrapper for one repin cycle.</td></tr>
     <tr><td>16</td><td>The 13 <code>unaligned</code> terms of Mizan stay <code>unaligned</code>, due within 90 days; schema.org is fetched by pinned hash and not vendored; the work continues through Phase 5 and waits for confirmation before Phase 6; a push to <code>main</code> happens only when a person says so.</td></tr>
+    <tr><td>17</td><td>The ladder has eleven rungs: 0 to 7 required, 8 lifecycle (optional), 9 Evidence (observer) and 10 Workspace (environment), with <code>mz:RungKind</code> (required, optional, observer, environment).</td></tr>
+    <tr><td>18</td><td>IFCCM: the unit of change is a capability; every commit names its issue on a line of its own; enforcement is a warning until a harness declares its production day, then a gate. "CCM" is never used alone.</td></tr>
+    <tr><td>19</td><td>IFQS is based on Operational Truth: one canonical OpenTelemetry record per run, an append-only signed <code>quality</code> branch, evidence grades E0 to E5, a stale proof opens a nonconformance, and a CAPA closes only on a named test and a named person.</td></tr>
+    <tr><td>20</td><td>IFWS is the workspace product and has its own ontology and name; Mizan stays the name of the specification and ontology strategy. Its command is <code>ifws</code>; its area is <code>.if-workspaces/</code>; <code>ifws</code> does not front <code>ifc</code>.</td></tr>
+    <tr><td>21</td><td>The workspace is not a dotfiles manager: it never edits a person's global Git configuration, shell rc files or <code>~/.ssh</code>; Git settings are per repository; <code>ifws shell</code> prints and writes nothing unless asked with <code>--install</code>.</td></tr>
+    <tr><td>22</td><td>Templates are typed TypeScript functions, not a template language. chezmoi is credited as inspiration for ideas; no code or program of it is used or required.</td></tr>
+    <tr><td>23</td><td>Tools are pinned by version and SHA-256, never <code>latest</code>; <code>git</code>, <code>bun</code> and <code>node</code> are verified, never installed; a tool or module outside the catalog is informational for 90 days, then a warning. Plaintext tokens fail from day one.</td></tr>
+    <tr><td>24</td><td>GitHub and plain Git first, GitLab shaped with them behind one interface; a token is read only from the environment, never stored or logged.</td></tr>
+    <tr><td>25</td><td>Signed commits are required where a harness declares a regulated domain, and warned elsewhere.</td></tr>
+    <tr><td>26</td><td>The ontologies are published as generated files (Turtle, RDF/XML, OWL, SHACL, JSON Schema, SKOS, SQL, SSSOM, HTML) and are read by independent tools (rdflib, pySHACL, ROBOT); none of the generated files is edited by hand.</td></tr>
+    <tr><td>27</td><td>No document, page or specification of ours claims compliance with a regulation or standard; they state evidence and what was proved.</td></tr>
   </table></div>
 </section>
 
-<!-- 14 -->
+<!-- 17 -->
 <section id="glossary">
-  <h2><span class="num">14</span>Glossary and sources</h2>
+  <h2><span class="num">17</span>Glossary and sources</h2>
   <dl class="gloss">
     <dt>Basis</dt><dd>How a term relates to a standard: <code>adopts</code>, <code>specializes</code>, <code>maps</code> or <code>unaligned</code>.</dd>
     <dt>Baseline</dt><dd>A file of today's findings for a new rule. A new finding fails; a line that no longer occurs also fails, so it only shrinks.</dd>
+    <dt>Capability</dt><dd>The unit of change in IFCCM: one ability of a harness that can be named, specified, built, proved and released.</dd>
+    <dt>CAPA</dt><dd>Corrective and preventive action. In IFQS it closes only when a named test passes in a later run and a named person approves.</dd>
     <dt>Decision</dt><dd>A typed individual recording why a term is <code>unaligned</code>, due within 90 days of the term.</dd>
     <dt>Drift</dt><dd>The separation of specification, ontology, code and the world they describe.</dd>
     <dt>EARS</dt><dd>Easy Approach to Requirements Syntax: six patterns for testable requirements.</dd>
     <dt>Exception</dt><dd>A recorded choice of a tool that is not TypeScript, with reason, version, isolation, platforms and tests.</dd>
+    <dt>Evidence grade</dt><dd>E0 none, E1 stated, E2 reviewed, E3 tested, E4 attested, E5 observed: what a piece of evidence is worth.</dd>
     <dt>Harness</dt><dd>A company or product repository of Intellectual Frontiers that uses commons.</dd>
-    <dt>Ladder</dt><dd>The shared architecture of rungs 0 to 7, plus optional rung 8.</dd>
+    <dt>IFCCM</dt><dd>Intellectual Frontiers Capabilities Configuration Management: change control by capability and issue.</dd>
+    <dt>IFQS</dt><dd>Intellectual Frontiers Quality System, based on Operational Truth.</dd>
+    <dt>IFWS</dt><dd>Intellectual Frontiers Workspaces, and its command <code>ifws</code>.</dd>
+    <dt>Ladder</dt><dd>The shared architecture of eleven rungs: 0 to 7 required, 8 lifecycle, 9 Evidence (observer), 10 Workspace (environment).</dd>
+    <dt>Operational Truth</dt><dd>What is true of a system is what the system reports when it runs, kept as evidence anyone can check.</dd>
     <dt>Profile</dt><dd>A specification that narrows or extends another without replacing it; Mizan is a profile of GitHub Spec Kit.</dd>
     <dt>Pull up</dt><dd>To move a capability into commons when more than one harness should read the same facts.</dd>
+    <dt>Quality branch</dt><dd>The append-only, signed <code>quality</code> branch holding one immutable evidence file per run, chained by hash.</dd>
     <dt>Slice</dt><dd>The named part of a standard that an import takes.</dd>
     <dt>Unaligned</dt><dd>A term no standard names. Allowed, justified, recorded, counted, never hidden.</dd>
   </dl>
@@ -809,14 +960,14 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
     <li><a href="https://cucumber.io/docs/gherkin/">Gherkin</a></li>
     <li><a href="https://www.fda.gov/medical-devices/postmarket-requirements-devices/quality-system-qs-regulationmedical-device-good-manufacturing-practices">FDA: Quality Management System Regulation</a> and <a href="https://www.federalregister.gov/documents/2024/02/02/2024-01709/medical-devices-quality-system-regulation-amendments">the Federal Register notice</a></li>
     <li><a href="https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11">21 CFR Part 11 (eCFR)</a></li>
-    <li><a href="https://pages.nist.gov/OSCAL/">NIST OSCAL</a>, <a href="https://www.fedramp.gov/">FedRAMP</a></li>
+    <li><a href="https://pages.nist.gov/OSCAL/">NIST OSCAL</a>, <a href="https://www.fedramp.gov/">FedRAMP</a>, <a href="https://opentelemetry.io/">OpenTelemetry</a>, <a href="https://ctrf.io/">CTRF</a>, <a href="https://sarifweb.azurewebsites.net/">SARIF</a>, <a href="https://www.chezmoi.io/">chezmoi</a> (inspiration only), <a href="https://github.com/ontodev/robot">ROBOT</a>, <a href="https://rdflib.readthedocs.io/">rdflib</a>, <a href="https://github.com/RDFLib/pySHACL">pySHACL</a></li>
     <li><a href="https://schema.org/">schema.org</a>, <a href="https://www.w3.org/TR/prov-o/">PROV-O</a>, <a href="https://www.w3.org/TR/skos-reference/">SKOS</a>, <a href="https://www.w3.org/TR/shacl/">SHACL</a>, <a href="https://www.w3.org/TR/vocab-dcat-3/">DCAT</a>, <a href="https://mapping-commons.github.io/sssom/">SSSOM</a>, <a href="https://spdx.dev/">SPDX</a></li>
-    <li>In this repository: <a href="README.md"><code>README.md</code></a>, <a href="AGENTS.md"><code>AGENTS.md</code></a>, <a href="commons/spec-kit/"><code>commons/spec-kit/</code></a> (specifications <code>0003</code>, <code>0012</code>, <code>0015</code> to <code>0019</code>), <a href="commons/spec-kit/audits/2026-11-standards-audit.md">the Phase 0 audit</a></li>
+    <li>In this repository: <a href="README.md"><code>README.md</code></a>, <a href="AGENTS.md"><code>AGENTS.md</code></a>, <a href="commons/spec-kit/"><code>commons/spec-kit/</code></a> (specifications <code>0003</code>, <code>0012</code>, <code>0015</code> to <code>0025</code>), <a href="commons/ts/workspaces/CREDITS.md">the credits of IFWS</a>, <a href="commons/spec-kit/audits/2026-11-standards-audit.md">the Phase 0 audit</a></li>
   </ul>
 </section>
 
 <footer>
-  <p><strong>Mizan, the IF Spec Profile.</strong> A living document: it states what is decided, what is built and what is only planned, and is kept by hand in step with <code>commons/spec-kit/</code>. If this page and a specification disagree, the specification binds, and the disagreement is drift to be fixed.</p>
+  <p><strong>Mizan, the IF Spec Profile.</strong> A living document: it states what is decided, what is built, what is in progress and what is not verified, and is kept by hand in step with <code>commons/spec-kit/</code>. If this page and a specification disagree, the specification binds, and the disagreement is drift to be fixed.</p>
   <p>Intellectual Frontiers · public repository · no secret, token or person's data belongs here.</p>
 </footer>
 
