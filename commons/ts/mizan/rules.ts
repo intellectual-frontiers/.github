@@ -23,6 +23,8 @@
  */
 import { type Keyed, parseSpec } from "../kernel/trace.ts";
 import { authorities, MZID } from "../../ontology/mizan/mod.ts";
+import type { ChangesRule } from "./changes/rules.ts";
+import type { Phase } from "./changes/declaration.ts";
 
 /** The ids of the rules Mizan adds (0003-mizan FR-013 to FR-015, 0018-standards-first FR-009). */
 export type MizanRule =
@@ -39,10 +41,14 @@ export type MizanRule =
   | "mizan/spec-term-deprecated"
   | "mizan/deprecated-no-replacement"
   | "mizan/authority-citation"
-  | "mizan/standard-newer";
+  | "mizan/standard-newer"
+  | ChangesRule;
 
-/** A finding of one of Mizan's rules: the same shape as the trace's, with a rule that is Mizan's. */
-export type MizanFinding = Keyed & { readonly rule: MizanRule };
+/**
+ * A finding of one of Mizan's rules: the same shape as the trace's, with a rule that is Mizan's. A finding of the `changes` check (commons 0020-ifccm) also carries its phase: a `gate`
+ * finding fails whatever the baseline holds, a `warn` finding is held by it.
+ */
+export type MizanFinding = Keyed & { readonly rule: MizanRule; readonly severity?: Phase };
 
 /** One specification of a folder as the rules read it: its slug, the text of `spec.md` and, where it has one, of `plan.md`. */
 export type SpecText = { readonly slug: string; readonly spec: string; readonly plan?: string };

@@ -15,6 +15,8 @@ import { formatBaseline, judge, parseBaseline, passes, report } from "../kernel/
 import { existsSync, readTextFileSync, writeTextFileSync } from "../runtime/fs.ts";
 import { stdio } from "../runtime/mod.ts";
 import { BASELINE_COMMENTS, readSpecTexts } from "./spec-files.ts";
+import { type Declaration } from "./changes/declaration.ts";
+import { declarationPlugin } from "./changes/plugin.ts";
 import { type MizanFinding, mizanFindings, type RulePlugin, rulePlugins } from "./rules.ts";
 import { type KnownTerms, specTermFindings } from "./spec-terms.ts";
 import { basisMissing, termFindings, type TermRecord } from "./standards.ts";
@@ -40,6 +42,11 @@ export type HarnessInput = {
   readonly specTerms?: { readonly known: KnownTerms; readonly deprecated?: ReadonlyMap<string, string> };
   /** The name the report is headed with. */
   readonly name?: string;
+  /**
+   * The harness's declaration for the `changes` check (commons 0020-ifccm FR-010, FR-032) and the file it is read from, `undefined` for a harness that declares nothing: the rule that a regulated
+   * domain needs a production day. The rules that need a range of commits are the command's (`changes.ts`).
+   */
+  readonly declaration?: { readonly declaration: Declaration | undefined; readonly file: string };
 };
 
 /** Run the check: print every new finding and every stale baseline line on standard error; returns 0, or 1 where a finding is new or a baseline line is stale. */
@@ -49,9 +56,20 @@ export function holdHarness(i: HarnessInput): number {
     ...(i.completeness ?? []).flatMap((c) => basisMissing(c.ontology, c.recorded, c.file)),
   ];
   const always = (f: MizanFinding): boolean => f.rule === "mizan/decision-overdue" || f.rule === "mizan/term-basis-missing";
+  const gated = (f: MizanFinding): boolean => f.severity === "gate";
   const specs = readSpecTexts(i.root);
   const named = i.specTerms === undefined ? [] : specTermFindings(specs, i.specTerms.known, i.specTerms.deprecated);
-  const found: readonly MizanFinding[] = [...mizanFindings(specs, i.plugins ?? rulePlugins), ...named, ...own.filter((f) => !always(f))];
+  const changes = i.declaration === undefined ? [] : [declarationPlugin(i.declaration.declaration, i.declaration.file, specs[0]?.slug)];
+  // a folder with no specification has none for the plugin to be anchored to: it is then asked once, of nothing
+  const alone = specs.length === 0 ? changes.flatMap((p) => p.check({ slug: "", spec: "" })) : [];
+  const all: readonly MizanFinding[] = [
+    ...mizanFindings(specs, [...(i.plugins ?? rulePlugins), ...changes]),
+    ...alone,
+    ...named,
+    ...own.filter((f) => !always(f)),
+  ];
+  // a finding in the gate phase fails whatever the baseline holds, and is never written to it (0020-ifccm FR-011)
+  const found = all.filter((f) => !gated(f));
   if (i.writeBaseline === true) {
     writeTextFileSync(i.baselineFile, formatBaseline(found, BASELINE_COMMENTS));
     stdio.stdout.writeSync(`wrote ${i.baselineFile}: ${new Set(found.map((f) => f.key)).size} findings\n`);
@@ -59,7 +77,7 @@ export function holdHarness(i: HarnessInput): number {
   }
   const held = existsSync(i.baselineFile) ? parseBaseline(readTextFileSync(i.baselineFile)) : [];
   const judged = judge(found, held);
-  const verdict = { ...judged, fresh: [...judged.fresh, ...own.filter(always)] };
+  const verdict = { ...judged, fresh: [...judged.fresh, ...all.filter(gated), ...own.filter(always)] };
   stdio.stderr.writeSync(`${report(verdict, i.name ?? "mizan-rules", i.baselineFile).join("\n")}\n`);
   return passes(verdict) ? 0 : 1;
 }

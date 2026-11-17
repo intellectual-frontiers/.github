@@ -69,20 +69,28 @@ const TOOLS = sources("tools");
 const LINT = sources("lint");
 const MIZAN = sources("mizan");
 
-proves(["0003-mizan FR-017"], "Mizan's files import only node: built-ins, the kernel, the runtime, the ontology and themselves", () => {
-  assert(MIZAN.length > 1);
-  const bad: string[] = [];
-  for (const f of MIZAN) {
-    for (const s of specifiers(readTextFileSync(join(ROOT, f)))) {
-      if (s.startsWith("node:")) continue;
-      const target = toPosix(relative(ROOT, resolve(ROOT, dirname(f), s)));
-      const ok =
-        target.startsWith("mizan/") || target.startsWith("kernel/") || target.startsWith("runtime/") || target.startsWith("../ontology/");
-      if (!ok) bad.push(`${f}: ${s}`);
+proves(
+  ["0003-mizan FR-017"],
+  "Mizan's files import only node: built-ins, the kernel, the runtime, the ontology, the Git host contract's types and themselves",
+  () => {
+    assert(MIZAN.length > 1);
+    const bad: string[] = [];
+    for (const f of MIZAN) {
+      for (const s of specifiers(readTextFileSync(join(ROOT, f)))) {
+        if (s.startsWith("node:")) continue;
+        const target = toPosix(relative(ROOT, resolve(ROOT, dirname(f), s)));
+        const ok =
+          target.startsWith("mizan/") ||
+          target.startsWith("kernel/") ||
+          target.startsWith("runtime/") ||
+          target.startsWith("../ontology/") ||
+          target === "githost/types.ts";
+        if (!ok) bad.push(`${f}: ${s}`);
+      }
     }
-  }
-  assertEquals(bad, []);
-});
+    assertEquals(bad, []);
+  },
+);
 
 proves(
   ["0019-mizan-integrations FR-001"],
