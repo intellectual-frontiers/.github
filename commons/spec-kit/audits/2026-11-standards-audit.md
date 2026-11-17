@@ -67,7 +67,7 @@ Included at the owner's decision. Its text is U.S. law (`0018` FR-001); its auth
 
 ### Federal security: NIST and FedRAMP
 
-- **OSCAL.** A web search found 1.2.2 as the newest release (April 2026) and could not confirm it on the GitHub releases page; commons' kernel writes `1.2.3`. **To verify:** the current OSCAL release tag, and whether `1.2.3` exists. Until then, commons' value is the one in use.
+- **OSCAL.** Verified 2026-11-17 against the repository's tags (`raw.githubusercontent.com/usnistgov/OSCAL`): `v1.2.3` and `v1.2.2` exist, and `v1.2.4`, `v1.2.5` and `v1.3.0` do not, so `1.2.3` is the newest release found and is the value commons' kernel writes (`OSCAL_VERSION`). A web search had found only 1.2.2, which was a stale result. The repository's license file says the work is in the public domain in the United States as a work of the U.S. government, and is also dedicated worldwide under CC0 1.0, so it may be redistributed. The machine-readable JSON Schemas are not at a fixed path in the Git tree (a request for `json/schema/oscal_catalog_schema.json` at that tag returned 404); they ship with the release artifacts, so the first OSCAL importer must find them there and pin their SHA-256.
 - **FedRAMP.** The 2026 consolidated rules and Key Security Indicators (KSIs) are published by FedRAMP as machine-readable data; `stolos` already vendors release `2026.11.02.01`. Secondary sources describe an OSCAL requirement for new Rev5 packages from 30 September 2026, but their details conflict; read fedramp.gov before a requirement cites a date or count.
 - **NIST SP 800-53** and its OSCAL catalog are the control source; only the controls a specification cites are imported (`0019` FR-005).
 
@@ -75,9 +75,9 @@ Included at the owner's decision. Its text is U.S. law (`0018` FR-001); its auth
 
 | Source | Format | Why | License and terms: to verify |
 |---|---|---|---|
-| OSCAL (NIST) | JSON Schema, catalogs | the proof register and controls | U.S. Government work; confirm the repository's license file |
+| OSCAL (NIST) | JSON Schema, catalogs | the proof register and controls | Public domain (U.S. Government work) and CC0 1.0, confirmed from the repository's license file at `v1.2.3` |
 | FedRAMP rules | JSON | KSIs, baselines | already vendored by `stolos`; confirm terms |
-| schema.org | Turtle, JSON-LD | already specialized by commons | CC BY-SA family; confirm attribution duty |
+| schema.org | Turtle, JSON-LD | already specialized by commons | CC BY-SA 3.0; a slice was imported and read on 2026-11-17 (17,515 triples agree with rdflib); the attribution and share-alike duty applies to a vendored copy |
 | PROV-O, SKOS, SHACL | Turtle | already typed in the kernel | W3C document license |
 | DPV | Turtle | privacy terms | confirm |
 | SPDX 3.0.1, CycloneDX | JSON-LD, JSON Schema | packaging and SBOM | confirm |
@@ -101,6 +101,6 @@ Proposal, for the Phase 1 specification: each requirement maps to an OSCAL `impl
 
 ## Open items for later phases
 
-- Confirm the OSCAL release and the version the register writes.
+- ~~Confirm the OSCAL release and the version the register writes.~~ Done: 1.2.3 (see above); find the JSON Schemas in the release artifacts.
 - Confirm each candidate's license and redistribution terms before its first import.
 - Re-run this audit as a script, so that the baseline is a file that only shrinks (`0018` FR-012), once the `basis` field exists.
