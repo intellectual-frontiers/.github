@@ -88,14 +88,14 @@ export type StepFn = (t: StepContext) => void | Promise<void>;
 /** A test's body; it may take the context `t` for its steps. */
 export type TestFn = (t: StepContext) => void | Promise<void>;
 
+/** How long a test may run when it names no `timeout`: a minute (Bun's own default of 5 seconds ends a test that starts real programs on a slow runner for the wrong reason). */
+export const DEFAULT_TIMEOUT_MS = 60_000;
+
 /**
  * How to run a test: `skip` it or mark it `todo` (with the reason as a string; neither runs its body), run it alone among the tests of
  * its file (`only`), give it a `timeout` in milliseconds (a test that does not end by then is `cancelled`), its `risk` (`not-high` by
  * default), or the `file` it is recorded under.
  */
-/** How long a test may run when it names no `timeout`: a minute (Bun's own default of 5 seconds ends a test that starts real programs on a slow runner for the wrong reason). */
-export const DEFAULT_TIMEOUT_MS = 60_000;
-
 export type TestOptions = {
   readonly skip?: boolean | string;
   readonly todo?: boolean | string;
