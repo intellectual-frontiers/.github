@@ -410,13 +410,52 @@ proves(
       assertEquals(gone.code, 0, gone.stderr);
       assertEquals(await readTextFile(rc), `${original}export AFTER=1\n`);
       assertStringIncludes((await w.ifws("shell", "bash", "--uninstall", "--rc", rc, "--yes")).stdout, "has no ifws block");
-      // a file of the shell's own name is made where there is none, in its own folder
+      // a start-up file that is not there is not made (0024-ifws-host FR-026): nothing is written and the way to make it is said
       const fish = join(w.dir, "config", "fish", "conf.d", "ifws.fish");
+      const absent = await w.ifws("shell", "fish", "--install", "--rc", fish, "--yes");
+      assertEquals(absent.code, 3, absent.stderr);
+      assertStringIncludes(absent.stderr, "never creates a start-up file");
+      assertStringIncludes(absent.stderr, `touch '${fish}'`);
+      assert(!existsSync(fish) && !existsSync(join(w.dir, "config")), "a start-up file or its folder was made");
+      // made by the person, it is written like any other
+      await mkdir(join(w.dir, "config", "fish", "conf.d"), { recursive: true });
+      await writeTextFile(fish, "");
       assertEquals((await w.ifws("shell", "fish", "--install", "--rc", fish, "--yes")).code, 0);
-      assert(existsSync(fish));
+      assertStringIncludes(await readTextFile(fish), BEGIN);
       assertEquals((await w.ifws("shell", "bash", "--install", "--uninstall", "--rc", rc, "--yes")).code, 2);
       // nothing else of the user's home was written
       assertEquals(await w.userDigest().then((d) => d.length), 64);
+    });
+  },
+  needsWorld,
+);
+
+proves(
+  ["0024-ifws-host FR-026"],
+  "ifws shell --install, run as a program, never creates the shell's own start-up file or its folder: it writes nothing, says the command and the path, and --uninstall does not create one either",
+  async () => {
+    await withWorld(async (w) => {
+      await w.ifws("init");
+      const before = await w.userDigest();
+      // the default start-up file of zsh is not in the user's home of the world
+      const zshrc = join(w.user, ".zshrc");
+      assert(!existsSync(zshrc));
+      const refused = await w.ifws("shell", "zsh", "--install", "--yes");
+      assertEquals(refused.code, 3, refused.stderr);
+      assertStringIncludes(refused.stderr, "never creates a start-up file");
+      assertStringIncludes(refused.stderr, `touch '${zshrc}'`);
+      assert(!existsSync(zshrc), "the start-up file was made");
+      assertEquals(await w.userDigest(), before, "the user's home changed");
+      // no terminal and no --yes: the refusal is the same and nothing is asked
+      assertEquals((await w.ifws("shell", "zsh", "--install")).code, 3);
+      // uninstall of a file that is not there: nothing to remove, nothing made
+      const gone = await w.ifws("shell", "zsh", "--uninstall", "--yes");
+      assertEquals(gone.code, 0, gone.stderr);
+      assert(!existsSync(zshrc), "uninstall made the start-up file");
+      // what the command says works: made by the person, it takes the block
+      await writeTextFile(zshrc, "");
+      assertEquals((await w.ifws("shell", "zsh", "--install", "--yes")).code, 0);
+      assertStringIncludes(await readTextFile(zshrc), BEGIN);
     });
   },
   needsWorld,

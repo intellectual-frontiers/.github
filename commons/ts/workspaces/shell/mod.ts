@@ -7,6 +7,7 @@
 export { BEGIN, type BlockError, blockText, describeBlockError, type Edit, END, installBlock, removeBlock } from "./block.ts";
 export {
   type Completions,
+  createCommand,
   type HomeSpec,
   isShell,
   type RcFacts,

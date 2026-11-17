@@ -222,3 +222,25 @@ export function rcFileFor(shell: Shell, f: RcFacts): string {
       return absurd(shell);
   }
 }
+
+/**
+ * What a person runs to create a start-up file that does not exist (0024-ifws-host FR-026): `ifws shell --install` never creates one, so it says the command and the path. A path with a quote in it is quoted
+ * for the shell it names.
+ */
+export function createCommand(shell: Shell, rc: string): string {
+  const slash = Math.max(rc.lastIndexOf("/"), rc.lastIndexOf("\\"));
+  const dir = slash > 0 ? rc.slice(0, slash) : ".";
+  const single = (t: string): string => `'${t.replaceAll("'", shell === "pwsh" || shell === "nu" ? "''" : "'\\''")}'`;
+  switch (shell) {
+    case "bash":
+    case "zsh":
+    case "fish":
+      return `mkdir -p ${single(dir)} && touch ${single(rc)}`;
+    case "pwsh":
+      return `New-Item -ItemType File -Force -Path ${single(rc)}`;
+    case "nu":
+      return `mkdir ${single(dir)}; touch ${single(rc)}`;
+    default:
+      return absurd(shell);
+  }
+}

@@ -5,10 +5,12 @@
  * @remarks
  * Pure: these are functions from the file's text to its new text; the host layer reads the file, shows the diff, asks and writes. The block is appended at the end of the file with no blank line of
  * its own, so that removing it removes nothing the person wrote; where the file did not end in a newline, one is added before the block and stays after it is removed. A file that uses CRLF gets
- * a block that uses CRLF. A block with a begin and no end is refused rather than guessed at.
+ * a block that uses CRLF. A block with a begin and no end is refused rather than guessed at. A file that does not exist is not made (0024-ifws-host FR-026): `installBlock` refuses it as `absent`,
+ * and the command says how the person creates it.
  *
  * @module
  */
+import { absurd } from "../../kernel/absurd.ts";
 import { err, ok, type Result } from "../../kernel/result.ts";
 
 /** The line that begins the block. */
@@ -18,13 +20,24 @@ export const BEGIN = "# >>> ifws >>>";
 export const END = "# <<< ifws <<<";
 
 /** What is wrong with a file's blocks. */
-export type BlockError = { readonly kind: "unterminated"; readonly line: number } | { readonly kind: "unopened"; readonly line: number };
+export type BlockError =
+  | { readonly kind: "unterminated"; readonly line: number }
+  | { readonly kind: "unopened"; readonly line: number }
+  /** The start-up file does not exist: ifws never creates one (0024-ifws-host FR-026). */
+  | { readonly kind: "absent" };
 
 /** A refusal as one sentence. */
 export function describeBlockError(e: BlockError): string {
-  return e.kind === "unterminated"
-    ? `the block that begins at line ${e.line} has no end line (${END}); fix or remove it by hand`
-    : `the end line of a block at line ${e.line} has no begin line (${BEGIN}); fix or remove it by hand`;
+  switch (e.kind) {
+    case "unterminated":
+      return `the block that begins at line ${e.line} has no end line (${END}); fix or remove it by hand`;
+    case "unopened":
+      return `the end line of a block at line ${e.line} has no begin line (${BEGIN}); fix or remove it by hand`;
+    case "absent":
+      return "the start-up file does not exist, and ifws never creates one";
+    default:
+      return absurd(e);
+  }
 }
 
 /** The lines of a text with their line endings kept. */
@@ -64,10 +77,11 @@ export type Edit = { readonly text: string; readonly changed: boolean };
 
 /**
  * The file after the block is installed: appended where there is none, replaced where one is there (so that the snippet is the current one), and one only where several are. `existing` is the file's
- * text, or undefined where there is no file.
+ * text, or undefined where there is no file, which is refused as `absent`: a start-up file is never created (0024-ifws-host FR-026).
  */
 export function installBlock(existing: string | undefined, snippet: string): Result<Edit, BlockError> {
-  const text = existing ?? "";
+  if (existing === undefined) return err({ kind: "absent" });
+  const text = existing;
   const eol = text.includes("\r\n") ? "\r\n" : "\n";
   const block = blockText(snippet, eol);
   const lines = linesKept(text);

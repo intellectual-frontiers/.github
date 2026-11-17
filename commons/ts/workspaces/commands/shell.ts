@@ -1,17 +1,16 @@
 /**
  * `ifws shell` (commons 0024-ifws-host FR-017 to FR-019, 0025-ifws FR-020, FR-021): `ifws shell <bash|zsh|fish|pwsh|nu>` prints the snippet for that shell on standard output and writes nothing; `--install`
  * shows a unified diff of the one marked block it would write in the shell's start-up file and asks, and writes only after a yes (and ends with a usage failure where there is no terminal and no
- * `--yes`); `--uninstall` removes exactly that block. Run twice, `--install` leaves one block. Only the printing form writes no evidence record: it is what a start-up file may run at every start.
+ * `--yes`); `--uninstall` removes exactly that block. Neither creates a start-up file that is not there: where it is absent `--install` writes nothing and says the command that creates it (0024-ifws-host FR-026). Run twice, `--install` leaves one block. Only the printing form writes no evidence record: it is what a start-up file may run at every start.
  *
  * @module
  */
 import { flag, value } from "../../kernel/args.ts";
 import { err, ok } from "../../kernel/result.ts";
-import { existsSync, mkdir, readTextFile, writeTextFile } from "../../runtime/fs.ts";
-import { dirname } from "../../runtime/path.ts";
+import { existsSync, readTextFile, writeTextFile } from "../../runtime/fs.ts";
 import { unifiedDiff } from "../diff.ts";
 import { describeBlockError, installBlock, removeBlock } from "../shell/block.ts";
-import { type Completions, isShell, rcFileFor, SHELLS, snippetFor } from "../shell/snippet.ts";
+import { type Completions, createCommand, isShell, rcFileFor, SHELLS, snippetFor } from "../shell/snippet.ts";
 import { defineCommand, GLOBAL_OPTIONS, type IfwsModule } from "../modules/types.ts";
 
 const OPTIONS = {
@@ -56,6 +55,12 @@ const shell = defineCommand({
     if (rc === undefined)
       return err({ kind: "environment", message: "the start-up file cannot be found: HOME is not set; give --rc FILE" });
     const before = existsSync(rc) ? await readTextFile(rc) : undefined;
+    // ifws never creates a start-up file (0024-ifws-host FR-026): where there is none it writes nothing and says how to make one
+    if (args.options.install && before === undefined)
+      return err({
+        kind: "environment",
+        message: `${rc} does not exist, and ifws never creates a start-up file: nothing was written; create it with \`${createCommand(word, rc)}\` and run this again`,
+      });
     const edited = args.options.install ? installBlock(before, snippet) : removeBlock(before ?? "");
     if (edited.kind === "err") return err({ kind: "environment", message: `${rc}: ${describeBlockError(edited.error)}` });
     if (!edited.value.changed) {
@@ -81,7 +86,6 @@ const shell = defineCommand({
         return ok({ text: `not written: ${rc} is as it was`, data: { rc, written: false }, findings: [], facts: { applied: false } });
     }
     try {
-      await mkdir(dirname(rc), { recursive: true });
       await writeTextFile(rc, edited.value.text);
     } catch (e) {
       return err({ kind: "environment", message: `${rc} cannot be written: ${e instanceof Error ? e.message : String(e)}` });

@@ -10,8 +10,8 @@ import { mkdir, withTempDir, writeTextFile } from "../runtime/fs.ts";
 import { join } from "../runtime/path.ts";
 import { build, run, which } from "../runtime/proc.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
-import { BEGIN, END, installBlock, removeBlock } from "../workspaces/shell/block.ts";
-import { rcFileFor, SHELLS, snippetFor, type Completions, type Shell } from "../workspaces/shell/snippet.ts";
+import { BEGIN, describeBlockError, END, installBlock, removeBlock } from "../workspaces/shell/block.ts";
+import { createCommand, rcFileFor, SHELLS, snippetFor, type Completions, type Shell } from "../workspaces/shell/snippet.ts";
 
 const COMPLETIONS: Completions = [
   { module: "plan", commands: ["plan"] },
@@ -187,7 +187,10 @@ proves(
   "install and uninstall keep a file that is empty, has no final newline or uses CRLF as it was, and refuse a block with no end",
   () => {
     const snippet = "echo hi\n";
-    const empty = installBlock(undefined, snippet);
+    // an empty file is a file: the block is written into it; a file that is not there is not made (FR-026)
+    const absent = installBlock(undefined, snippet);
+    assert(absent.kind === "err" && absent.error.kind === "absent");
+    const empty = installBlock("", snippet);
     assert(empty.kind === "ok");
     if (empty.kind === "ok") {
       assertEquals(empty.value.text, `${BEGIN}\necho hi\n${END}\n`);
@@ -218,6 +221,32 @@ proves(
     assertEquals(removeBlock(`x\n${END}\n`).kind, "err");
     const none = removeBlock("nothing here\n");
     assert(none.kind === "ok" && !none.value.changed);
+  },
+);
+
+proves(
+  ["0024-ifws-host FR-026"],
+  "a start-up file that is not there is never made by install, and the command that makes it is said for each shell, with a path quoted for it",
+  () => {
+    const absent = installBlock(undefined, "echo hi\n");
+    assert(absent.kind === "err" && absent.error.kind === "absent");
+    assertStringIncludes(describeBlockError({ kind: "absent" }), "never creates one");
+    // an empty file is a file
+    assertEquals(installBlock("", "echo hi\n").kind, "ok");
+    assertEquals(createCommand("bash", "/home/u/.bashrc"), `mkdir -p '/home/u' && touch '/home/u/.bashrc'`);
+    assertEquals(
+      createCommand("fish", "/home/u/.config/fish/conf.d/ifws.fish"),
+      `mkdir -p '/home/u/.config/fish/conf.d' && touch '/home/u/.config/fish/conf.d/ifws.fish'`,
+    );
+    assertEquals(createCommand("zsh", "/home/o'neil/.zshrc"), `mkdir -p '/home/o'\\''neil' && touch '/home/o'\\''neil/.zshrc'`);
+    assertEquals(
+      createCommand("pwsh", "C:\\Users\\a\\Documents\\PowerShell\\profile.ps1"),
+      `New-Item -ItemType File -Force -Path 'C:\\Users\\a\\Documents\\PowerShell\\profile.ps1'`,
+    );
+    assertEquals(
+      createCommand("nu", "/home/u/.config/nushell/config.nu"),
+      `mkdir '/home/u/.config/nushell'; touch '/home/u/.config/nushell/config.nu'`,
+    );
   },
 );
 
