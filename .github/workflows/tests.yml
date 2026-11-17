@@ -66,6 +66,11 @@ jobs:
       - name: ShellCheck, which the packaging test uses where it is installed
         if: runner.os == 'Linux'
         run: sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+      - name: Independent validators of the exports (rdflib, pySHACL, jsonschema), which the Mizan test uses where they are installed
+        run: |
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install -q rdflib==7.6.0 pyshacl==0.40.2 jsonschema==4.26.0
+          echo "$RUNNER_TEMP/venv/bin" >> "$GITHUB_PATH"
       - name: The tests on Bun
         if: matrix.runtime == 'bun'
         run: bun test ./tests/

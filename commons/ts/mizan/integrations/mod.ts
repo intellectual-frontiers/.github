@@ -23,6 +23,8 @@ export {
   exportShacl,
   exportSkos,
   exportSqlCodeList,
+  exportSssom,
+  type Mapping,
 } from "./pure/export.ts";
 export {
   type Catalog,

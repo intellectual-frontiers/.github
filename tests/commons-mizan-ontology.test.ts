@@ -56,13 +56,14 @@ proves(
 
 proves(
   ["0019-mizan-integrations FR-010"],
-  "the exports of the ontology (SHACL shapes, JSON Schema, SKOS, SQL) are written, current, and each says it is generated",
+  "the exports of the ontology (SHACL shapes, JSON Schema, SKOS, SQL, SSSOM mappings) are written, current, and each says it is generated",
   async () => {
     const made = await wanted();
     const exports = [...made.keys()].filter((k) => k !== TURTLE_PATH).sort();
     assertEquals(exports, [
       "generated/mizan-code-lists.auto.skos.ttl",
       "generated/mizan-code-lists.auto.sql",
+      "generated/mizan-mappings.auto.sssom.tsv",
       "generated/mizan-schemas.auto.json",
       "generated/mizan-shapes.auto.ttl",
     ]);
@@ -144,5 +145,58 @@ proves(
     );
     assertEquals(cfr820.values.effective, "2026-02-02");
     assertEquals(cfr820.values.incorporates, ["ISO 13485:2016"]);
+  },
+);
+
+const INDEPENDENT = `
+import json, sys
+import rdflib
+import jsonschema
+from pyshacl import validate
+
+root = sys.argv[1]
+def ttl(name):
+    g = rdflib.Graph()
+    g.parse(root + "/generated/" + name, format="turtle")
+    return g
+
+data = ttl("mizan.auto.ttl")
+shapes = ttl("mizan-shapes.auto.ttl")
+skos = ttl("mizan-code-lists.auto.skos.ttl")
+conforms, _, report = validate(data, shacl_graph=shapes, inference="none")
+assert conforms, report
+MZ = rdflib.Namespace("https://www.intellectualfrontiers.com/ontology/mizan#")
+rung = next(data.subjects(rdflib.RDF.type, MZ.Rung))
+data.remove((rung, MZ.rungNumber, None))
+broken, _, _ = validate(data, shacl_graph=shapes, inference="none")
+assert not broken, "the shapes accepted a rung with no number"
+doc = json.load(open(root + "/generated/mizan-schemas.auto.json"))
+meta = jsonschema.Draft202012Validator
+meta.check_schema(doc)
+defs = doc["$defs"]
+good = {"label": {"value": "Ontology", "language": "en"}, "rungNumber": 0, "purpose": {"value": "x", "language": "en"}, "required": True, "mayRelyOn": [], "home": [], "provedBy": []}
+jsonschema.validate(good, {**defs["Rung"], "$schema": doc["$schema"]})
+try:
+    jsonschema.validate({**good, "rungNumber": "zero"}, {**defs["Rung"], "$schema": doc["$schema"]})
+    raise SystemExit("the JSON Schema accepted a string for rungNumber")
+except jsonschema.ValidationError:
+    pass
+assert len(list(skos.subjects(rdflib.RDF.type, rdflib.SKOS.ConceptScheme))) == 3
+print("independent tools agree")
+`;
+
+proves(
+  ["0019-mizan-integrations FR-011"],
+  "independent tools read the exports: rdflib parses the Turtle, pySHACL finds the ontology conforms to the shapes made from its schemas and rejects a broken one, jsonschema checks the JSON Schema",
+  async (t) => {
+    // Python with rdflib, pySHACL and jsonschema is not on every computer (the CI installs them): where it is not, this check is skipped
+    const python = proc.which("python3");
+    const have = python === undefined ? undefined : await proc.run([python, "-c", "import rdflib, pyshacl, jsonschema"]);
+    if (python === undefined || have === undefined || have.code !== 0) {
+      t.skip("python3 with rdflib, pyshacl and jsonschema is not installed");
+      return;
+    }
+    const o = await proc.run([python, "-c", INDEPENDENT, `${ROOT}/commons`]);
+    assertEquals([o.code, o.stdout.trim()], [0, "independent tools agree"], o.stderr);
   },
 );

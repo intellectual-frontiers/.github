@@ -43,7 +43,8 @@ export type IntegrationFinding =
   | { readonly kind: "slice-empty" }
   | { readonly kind: "term-missing"; readonly iri: string }
   | { readonly kind: "term-untyped"; readonly iri: string }
-  | { readonly kind: "bad-name"; readonly name: string };
+  | { readonly kind: "bad-name"; readonly name: string }
+  | { readonly kind: "no-curie"; readonly iri: string };
 
 /** A finding as one plain sentence. */
 export function describeFinding(f: IntegrationFinding): string {
@@ -66,6 +67,8 @@ export function describeFinding(f: IntegrationFinding): string {
       return `${f.iri} has no class or property type that a typed vocabulary can state`;
     case "bad-name":
       return `${f.name} is not a name an SQL table may have (lower-case letters, digits and underscores, starting with a letter)`;
+    case "no-curie":
+      return `${f.iri} has no prefix in the curie map, so a mapping cannot be written with it`;
     default:
       return absurd(f);
   }

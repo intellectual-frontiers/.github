@@ -20,6 +20,7 @@ import {
   exportShacl,
   exportSkos,
   exportSqlCodeList,
+  exportSssom,
   type AnySchema,
   decodeCatalog,
   importOscalCatalog,
@@ -569,5 +570,47 @@ proves(
     } finally {
       removeSync(dir, { recursive: true });
     }
+  },
+);
+
+proves(
+  ["0019-mizan-integrations FR-010"],
+  "mappings are written as an SSSOM TSV with its curie map, set id, license and justification, and an IRI no prefix shortens is named",
+  () => {
+    const curies = { ex: "https://example.org/vocab#", dc: "http://purl.org/dc/terms/" };
+    const r = exportSssom({
+      setId: "https://example.org/maps",
+      license: "https://creativecommons.org/publicdomain/zero/1.0/",
+      comment: "made: by a test",
+      curies,
+      mappings: [
+        { subject: "https://example.org/vocab#Thing", relation: "subClassOf", object: "http://purl.org/dc/terms/Standard" },
+        { subject: "https://example.org/vocab#size", relation: "exactMatch", object: "http://www.w3.org/2004/02/skos/core#notation" },
+      ],
+    });
+    assert(r.kind === "ok");
+    assertEquals(r.value.split("\n"), [
+      "#curie_map:",
+      "#  dc: http://purl.org/dc/terms/",
+      "#  ex: https://example.org/vocab#",
+      "#  rdfs: http://www.w3.org/2000/01/rdf-schema#",
+      "#  semapv: https://w3id.org/semapv/vocab/",
+      "#  skos: http://www.w3.org/2004/02/skos/core#",
+      "#mapping_set_id: https://example.org/maps",
+      "#license: https://creativecommons.org/publicdomain/zero/1.0/",
+      '#comment: "made: by a test"',
+      "subject_id\tpredicate_id\tobject_id\tmapping_justification",
+      "ex:Thing\trdfs:subClassOf\tdc:Standard\tsemapv:ManualMappingCuration",
+      "ex:size\tskos:exactMatch\tskos:notation\tsemapv:ManualMappingCuration",
+      "",
+    ]);
+    const lost = exportSssom({
+      setId: "s",
+      license: "l",
+      curies,
+      mappings: [{ subject: "https://elsewhere.org/X", relation: "exactMatch", object: "http://purl.org/dc/terms/Standard" }],
+    });
+    assert(lost.kind === "err" && lost.error[0]?.kind === "no-curie");
+    assertStringIncludes(describeFinding(lost.error[0] ?? { kind: "slice-empty" }), "has no prefix in the curie map");
   },
 );

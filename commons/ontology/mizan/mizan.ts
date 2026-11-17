@@ -77,6 +77,7 @@ export const mz = vocabulary(MZ, {
   termIri: "owl:DatatypeProperty",
   basis: "owl:ObjectProperty",
   standardTerm: "owl:DatatypeProperty",
+  mappingRelation: "owl:DatatypeProperty",
   justification: "owl:DatatypeProperty",
   decision: "owl:ObjectProperty",
   addedOn: "owl:DatatypeProperty",
@@ -113,6 +114,8 @@ export const mz = vocabulary(MZ, {
 
 /** The statuses of a specification (commons 0003-mizan FR-010). */
 export const SPEC_STATUSES = ["Draft", "Active", "Deferred", "Superseded"] as const;
+/** How a term relates to its standard's term, in the words SSSOM publishes mappings with (commons 0019-mizan-integrations FR-010). */
+export const MAPPING_RELATIONS = ["exactMatch", "closeMatch", "narrowMatch", "broadMatch", "subClassOf", "subPropertyOf"] as const;
 /** The platforms an exception's tool may support (commons 0017-two-languages FR-004). */
 export const PLATFORMS = ["linux", "macos", "windows"] as const;
 
@@ -196,6 +199,7 @@ export const OntologyTerm = classSchema(mz.OntologyTerm, {
   termIri: one(mz.termIri, range.string),
   basis: one(mz.basis, range.ref<"mz:Basis">()),
   standardTerm: optional(mz.standardTerm, range.string),
+  mappingRelation: optional(mz.mappingRelation, range.oneOf(MAPPING_RELATIONS)),
   justification: optional(mz.justification, range.string),
   decision: optional(mz.decision, range.ref<"mz:Decision">()),
   addedOn: optional(mz.addedOn, range.string),
@@ -247,6 +251,7 @@ export const properties = [
   DatatypeProperty.make(mz.termIri, { domain: mz.OntologyTerm, range: xsd.string, definition: en("The IRI of the term the individual describes.") }),
   ObjectProperty.make(mz.basis, { domain: mz.OntologyTerm, range: mz.Basis, definition: en("How the term relates to a standard.") }),
   DatatypeProperty.make(mz.standardTerm, { domain: mz.OntologyTerm, range: xsd.string, definition: en("The IRI of the standard's term, where there is one.") }),
+  DatatypeProperty.make(mz.mappingRelation, { domain: mz.OntologyTerm, range: xsd.string, definition: en("How the term relates to the standard's term, in the words a mapping is published with: exactMatch, closeMatch, narrowMatch, broadMatch, subClassOf or subPropertyOf.") }),
   DatatypeProperty.make(mz.justification, { domain: mz.OntologyTerm, range: xsd.string, definition: en("For an unaligned term: the standards looked at and why none fits.") }),
   ObjectProperty.make(mz.decision, { domain: mz.OntologyTerm, range: mz.Decision, definition: en("The decision that records why the term is unaligned.") }),
   DatatypeProperty.make(mz.addedOn, { domain: mz.OntologyTerm, range: xsd.string, definition: en("The day (YYYY-MM-DD) the term was added; the decision is due 90 days after it.") }),
@@ -402,6 +407,7 @@ export const termStandard = OntologyTerm.make(term(MZID, "term-Standard"), {
   termIri: "https://www.intellectualfrontiers.com/ontology/mizan#Standard",
   basis: bases.Specializes,
   standardTerm: "http://purl.org/dc/terms/Standard",
+  mappingRelation: "subClassOf",
   definedBy: ["0018-standards-first FR-006"],
 });
 

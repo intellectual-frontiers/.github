@@ -21,9 +21,11 @@ import {
   Jurisdiction,
   jurisdictionLevels,
   MZ,
+  MZID,
   OntologyTerm,
   Rung,
   Standard,
+  terms,
 } from "../../ontology/mizan/mod.ts";
 import { formatRdfFinding, nTriples, type OntologyFile, triplesOf, turtle, validate } from "../kernel/rdf.ts";
 import { stdio } from "../runtime/mod.ts";
@@ -34,6 +36,8 @@ import {
   exportShacl,
   exportSkos,
   exportSqlCodeList,
+  exportSssom,
+  type Mapping,
 } from "./integrations/pure/export.ts";
 
 /** The command that writes the file again. */
@@ -77,7 +81,20 @@ export function exportsOf(digest: string): ReadonlyMap<string, string> {
     const r = exportSqlCodeList(l.table, l.members);
     return r.kind === "ok" ? r.value : "";
   }).join("\n");
+  const mappings: Mapping[] = terms.flatMap((t) =>
+    t.values.standardTerm === undefined || t.values.mappingRelation === undefined
+      ? []
+      : [{ subject: t.values.termIri, relation: t.values.mappingRelation, object: t.values.standardTerm }],
+  );
+  const sssom = exportSssom({
+    setId: "https://www.intellectualfrontiers.com/ontology/mizan-mappings",
+    license: "https://creativecommons.org/publicdomain/zero/1.0/",
+    comment: note,
+    curies: { mz: MZ.iri, mzid: MZID.iri, dcterms: "http://purl.org/dc/terms/" },
+    mappings,
+  });
   return new Map([
+    ["generated/mizan-mappings.auto.sssom.tsv", sssom.kind === "ok" ? sssom.value : ""],
     [
       "generated/mizan-shapes.auto.ttl",
       `# ${note}\n\n${exportShacl(SCHEMAS, { prefix: "mzsh", iri: "https://www.intellectualfrontiers.com/ontology/mizan-shapes#" })}`,

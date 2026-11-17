@@ -217,3 +217,60 @@ export function exportJsonSchemaDefs(schemas: readonly AnySchema[], id: string, 
   }
   return `${JSON.stringify({ $schema: "https://json-schema.org/draft/2020-12/schema", $id: id, $comment: comment, $defs: defs }, null, 2)}\n`;
 }
+
+/** One mapping of a term of ours to a term of a standard, as SSSOM publishes it. */
+export type Mapping = {
+  readonly subject: string;
+  readonly relation: "exactMatch" | "closeMatch" | "narrowMatch" | "broadMatch" | "subClassOf" | "subPropertyOf";
+  readonly object: string;
+};
+
+const PREDICATE = {
+  exactMatch: "skos:exactMatch",
+  closeMatch: "skos:closeMatch",
+  narrowMatch: "skos:narrowMatch",
+  broadMatch: "skos:broadMatch",
+  subClassOf: "rdfs:subClassOf",
+  subPropertyOf: "rdfs:subPropertyOf",
+} as const;
+
+/** The mappings of an ontology as an SSSOM TSV (Simple Standard for Sequential Mappings): the metadata as commented YAML, then one row per mapping, each justified as manual curation, or the finding of an IRI that no prefix of the map shortens. */
+export function exportSssom(set: {
+  readonly setId: string;
+  readonly license: string;
+  /** A note carried as the set's `comment`, such as where the file was generated from. */
+  readonly comment?: string;
+  readonly curies: Readonly<Record<string, string>>;
+  readonly mappings: readonly Mapping[];
+}): Result<string, readonly IntegrationFinding[]> {
+  const curies = {
+    ...set.curies,
+    rdfs: "http://www.w3.org/2000/01/rdf-schema#",
+    semapv: "https://w3id.org/semapv/vocab/",
+    skos: "http://www.w3.org/2004/02/skos/core#",
+  };
+  const short = (iri: string): string | undefined => {
+    for (const [prefix, ns] of Object.entries(curies).sort((a, b) => b[1].length - a[1].length))
+      if (iri.startsWith(ns)) return `${prefix}:${iri.slice(ns.length)}`;
+    return undefined;
+  };
+  const rows: string[] = [];
+  const lost: IntegrationFinding[] = [];
+  for (const m of set.mappings) {
+    const [s, o] = [short(m.subject), short(m.object)];
+    if (s === undefined) lost.push({ kind: "no-curie", iri: m.subject });
+    else if (o === undefined) lost.push({ kind: "no-curie", iri: m.object });
+    else rows.push(`${s}\t${PREDICATE[m.relation]}\t${o}\tsemapv:ManualMappingCuration`);
+  }
+  if (lost.length > 0) return err(lost);
+  const head = [
+    "#curie_map:",
+    ...Object.entries(curies)
+      .sort(([a], [b]) => (a < b ? -1 : 1))
+      .map(([p, ns]) => `#  ${p}: ${ns}`),
+    `#mapping_set_id: ${set.setId}`,
+    `#license: ${set.license}`,
+    ...(set.comment === undefined ? [] : [`#comment: ${JSON.stringify(set.comment)}`]),
+  ];
+  return ok(`${[...head, "subject_id\tpredicate_id\tobject_id\tmapping_justification", ...rows].join("\n")}\n`);
+}
