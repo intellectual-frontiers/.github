@@ -1,0 +1,3 @@
+# The standards whose latest source served other bytes than the pin when each was first held (commons 0018-standards-first FR-017).
+# A new finding fails the check, and so does a line below that no longer occurs: when you repin an import, delete its line.
+# Never add a line to make a check pass.

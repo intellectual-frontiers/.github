@@ -39,6 +39,8 @@ export const about: About = {
     { run: "bun tools/generate-packaging.ts", does: "Writes `generated/` again from the ontology; with `--check` it fails where a file is stale." },
     { run: "bun tools/mizan-check.ts", does: "Checks `spec-kit/` against the format of 0003-mizan." },
     { run: "bun ts/mizan/generate-ontology.ts", does: "Writes `generated/mizan.auto.ttl` from Mizan's ontology; with `--check` it fails where the file is stale." },
+    { run: "bun ts/mizan/oscal-register.ts", does: "Writes the proof register of `spec-kit/` as OSCAL 1.2.3 (`generated/mizan-register.auto.oscal.json`, `generated/mizan-register-results.auto.oscal.json`); with `--check` it fails where a file is stale." },
+    { run: "bun ts/mizan/newer.ts", does: "Fetches the `latest` source of each import manifest and finds a standard whose newest bytes differ from its pin; needs the network, so it is opt-in and `check.ts` never runs it." },
     { run: "bun tools/shell-portability-check.ts FILE...", does: "Finds what only GNU tools have in shell scripts." },
   ],
 };

@@ -18,6 +18,8 @@ export const manifest = {
     sha256: "7f15ca89398c4f235f478a4b3b8d1f975d63c5a860b77c8a8fce01f791b7ae2f",
   },
   source: "https://schema.org/version/30.1/schemaorg-current-https.ttl",
+  // the URL that always serves the newest version: only `newer.ts` reads it (0018-standards-first FR-014); an import never does (0019-mizan-integrations FR-014)
+  latest: "https://schema.org/version/latest/schemaorg-current-https.ttl",
   format: "turtle",
   namespace: { prefix: "schema", iri: "https://schema.org/" },
   slice: ["Action", "SoftwareApplication", "Thing", "name", "operatingSystem", "processorRequirements", "softwareVersion"],
