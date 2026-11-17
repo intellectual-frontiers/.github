@@ -12,6 +12,7 @@
     "./ts/lint/rule": "./commons/ts/lint/rule.ts",
     "./ts/lint/test-rule": "./commons/ts/lint/test-rule.ts",
     "./ts/mizan": "./commons/ts/mizan/mod.ts",
+    "./ts/mizan/integrations": "./commons/ts/mizan/integrations/mod.ts",
     "./ts/node": "./commons/ts/node/register.mjs",
     "./docs": "./commons/docs/mod.ts"
   },

@@ -372,13 +372,13 @@ requirement	mechanism	by	note
 0018-standards-first FR-010	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
 0018-standards-first FR-011	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
 0018-standards-first FR-012	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
-0019-mizan-integrations FR-001	none	-	Planned, Phase 4 of issue #10: the module is not built yet
-0019-mizan-integrations FR-002	none	-	Planned, Phase 4 of issue #10: the module is not built yet
+0019-mizan-integrations FR-001	check	.github: cd commons/ts && bun test tests/	boundaries.test.ts: pure/ imports only the kernel and itself, host/ exists, the module is exported
+0019-mizan-integrations FR-002	check	.github: cd commons/ts && bun test tests/	mizan-integrations.test.ts: the registry looks integrations up by formats and refuses an identifier or a pair twice; the record is typed
 0019-mizan-integrations FR-003	none	-	Planned, Phase 4 of issue #10: the module is not built yet
-0019-mizan-integrations FR-004	none	-	Planned, Phase 4 of issue #10: the module is not built yet
-0019-mizan-integrations FR-005	none	-	Planned, Phase 4 of issue #10: the module is not built yet
-0019-mizan-integrations FR-006	none	-	Planned, Phase 4 of issue #10: the module is not built yet
-0019-mizan-integrations FR-007	none	-	Planned, Phase 4 of issue #10: the module is not built yet
+0019-mizan-integrations FR-004	check	.github: cd commons/ts && bun test tests/	mizan-integrations.test.ts: the reader reads the Turtle the kernel writes back to the same graph; kernel/rdf.test.ts: the kernel exports no reader
+0019-mizan-integrations FR-005	check	.github: cd commons/ts && bun test tests/	mizan-integrations.test.ts: only the slice is taken, an empty slice and a term the source lacks are refused
+0019-mizan-integrations FR-006	check	.github: cd commons/ts && bun test tests/	mizan-integrations.test.ts: a pin mismatch, no license and no right to copy are refused; the module's header names its source; the command writes and checks it
+0019-mizan-integrations FR-007	check	.github: cd commons/ts && bun test tests/	mizan-integrations.test.ts: a blank node and a collection are named as losses, in the slice only, and the rest is read
 0019-mizan-integrations FR-008	none	-	Planned, Phase 4 of issue #10: the module is not built yet
 0019-mizan-integrations FR-009	none	-	Planned, Phase 4 of issue #10: the module is not built yet
 0019-mizan-integrations FR-010	none	-	Planned, Phase 4 of issue #10: the module is not built yet
