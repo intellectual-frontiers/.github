@@ -1,0 +1,149 @@
+# Feature Specification: How works are versioned
+
+**Spec ID:** 0026-works-versioning
+**Status:** Draft
+**Owner:** if
+**Domain:** commons
+**Part of:** 0003-mizan
+
+**Input:** An opinionated view of how Intellectual Frontiers versions and releases a work: software, a library, a command-line interface, an ontology, a schema, published prose, data, a controlled document or a specification. Identity, version, edition, rendition and release are different things, each with its own place in a typed ontology (Intellectual Frontiers Releases, IFR, `ifr:`, `commons/ontology/ifr/`); each kind of work uses exactly one scheme of version (Semantic Versioning for software, libraries, command-line interfaces, ontologies and schemas; the commit-date edition for published prose; a snapshot date and a digest, with a Semantic Version for the schema, for data; an integer revision and an approval record for a controlled document; no version for a specification); every published version names its commit and its Git tree hash and is immutable; a release is a signed annotated Git tag `<work>-v<version>` and the ledger of releases is derived from the tags; a version is raised by the capability that changes the work (0020-ifccm) with its declared impact, a check fails where a work changed and its version did not grow, and the release notes are generated from the capabilities closed since the last tag, so that the change log and the trace chain are one thing; every release carries its provenance, its software bill of materials, its checksums, its citation file and the evidence tier it was released on (0021-ifqs); and nothing published is silently removed. The vocabulary, the migration of commons' own ontologies to Semantic Versioning and the mapping from the schemes in use today are built here; the tool (`commons/ts/mizan/versions/`) follows, and its requirements are written precisely enough to be built from this specification alone.
+
+## The vocabulary
+
+- **FR-001**: Intellectual Frontiers Releases MUST be a typed ontology in `commons/ontology/ifr/` (namespace `https://www.intellectualfrontiers.com/ontology/ifr#`, prefix `ifr:`), written as typed values like `ifccm`, `ifqs` and `ifws` (0012-ontology), published through `commons/ts/mizan/generate-ontology.ts` in every form the others are (Turtle, OWL functional syntax, RDF/XML, SHACL shapes, JSON Schema, SKOS code lists, SQL code-list tables, SSSOM mappings, an HTML view and an entry in the DCAT catalog), and Mizan's check MUST know its terms so that a specification may name `ifr:` terms and no others.
+- **FR-002**: Every class and every class of a code list of the ontology MUST have one `mz:OntologyTerm` record of the standard it rests on or of why none is adopted (0018-standards-first FR-003), and a class of no standard MUST be `unaligned`, with what was examined and the day it was added, from which its Decision is due within 90 days.
+- **FR-003**: The ontology MUST keep apart the five things a version number is too often asked to carry: the identity of a work (`ifr:Work`: a slug and an IRI), a state of its content (`ifr:Expression`), a rendition of that state (`ifr:Manifestation`: a PDF, an EPUB, a print run), a version or an edition (`ifr:version`, `ifr:Edition`) and a release (`ifr:Release`: a version that was published, named by a tag and immutable); a work has expressions (`ifr:hasExpression`) and releases (`ifr:hasRelease`), an expression has renditions (`ifr:hasRendition`), a release realizes an expression (`ifr:realizes`), and a rendition has no version of its own.
+- **FR-004**: The ontology MUST hold three code lists with these keys: `ifr:VersionScheme` (`SemVer`, `CommitDateEdition`, `SnapshotDate`, `IntegerRevision`, `NoVersion`), `ifr:WorkKind` (`Software`, `Library`, `CommandLineInterface`, `Ontology`, `Schema`, `Prose`, `Data`, `ControlledDocument`, `Specification`) and `ifr:Impact` (`Major`, `Minor`, `Patch`), each class with the properties the tools branch on.
+- **FR-005**: Each `ifr:WorkKind` MUST use exactly one `ifr:VersionScheme` (`ifr:usesScheme`): `SemVer` for `Software`, `Library`, `CommandLineInterface`, `Ontology` and `Schema`; `CommitDateEdition` for `Prose`; `SnapshotDate` for `Data`, which also carries a `SemVer` for its schema (`ifr:companionScheme`); `IntegerRevision` for `ControlledDocument`; `NoVersion` for `Specification`; and no other kind MUST have a companion scheme.
+- **FR-006**: Each `ifr:VersionScheme` that has versions MUST carry the pattern its versions match (`ifr:versionPattern`) and how two of them are ordered (`ifr:precedenceRule`): Semantic Versioning 2.0.0 for `SemVer` (build metadata after `+` is not part of precedence), `YYYY.MM.DD-<commit8>` for `CommitDateEdition`, `YYYY-MM-DD` for `SnapshotDate` and a whole number from 1 for `IntegerRevision`; and `NoVersion` MUST have no pattern; the kind of a work decides its scheme and a pattern never does, since a commit-date edition is also syntactically a Semantic Version (`2026.11.17` with the pre-release `1a2b3c4d`).
+
+## Identity and the release record
+
+- **FR-007**: The identity of a work, its slug and its IRI, and the position of a volume in the work it is part of, MUST never change; the check MUST find a change of any of the three between the base and the head as `versions/identity-changed`, and a work that is renamed or renumbered MUST be a new work whose record names the one it replaces.
+- **FR-008**: A work MUST have a typed record, the file `<work>/release.ts`, whose only export is `release`, an object literal of data that a program reads as data and never runs (as 0020-ifccm reads a harness's declaration, so that a version from Git reads like the present one): `slug` (lower-case letters, digits and hyphens; the prefix of its tags), `kind` (the name of an `ifr:WorkKind`), `title`, `authors` (a list of objects with a `name`), and `version` (written by the scheme of its kind; absent for a `Specification`); and it MAY carry `iri`, `partOf` (the slug of the work it is part of), `position`, `identifier` (a DOI or an ISBN), `repository`, `exclude` (paths of the folder that are not the work's files), `snapshot` (`digest` and `schemaVersion`, for data), `approval` (for a controlled document, FR-013), `retention` (FR-027), `retired` (FR-028) and `migratedFrom` (FR-037); a decoder MUST check it, an unknown field or a wrong type MUST be a finding that names the file and the field, and a tool MUST write it through a template and never by a hand edit.
+- **FR-009**: A work MUST be a folder that holds a `release.ts`; the files of the work MUST be every file tracked by Git under that folder except the files of a work nested in it, the folder's `release.ts` and `CITATION.cff`, and the paths its record names in `exclude`; and every judgement of a version MUST be scoped to those files and to no others (path-scoped).
+
+## The scheme of each kind
+
+- **FR-010**: WHERE a work is of the kind `Software`, `Library`, `CommandLineInterface`, `Ontology` or `Schema`, its version MUST be a Semantic Version 2.0.0 compared by its precedence (a pre-release before its release, build metadata ignored), the build metadata `+<commit12>` MUST NOT appear in its record, its tag or a comparison and MAY appear in the version an artifact displays, and a version that does not grow by precedence MUST be a finding.
+- **FR-011**: WHERE a work is of the kind `Prose`, its version MUST be the commit-date edition `YYYY.MM.DD-<commit8>`: the committer date in UTC of the commit the edition is made at, and the first eight characters of that commit's object name, never the clock; the edition MUST be a commit that is in the history of the head and not before the base's edition, and an edition grows where its date is later or its date is the same and its commit is a descendant of the base's edition commit.
+- **FR-012**: WHERE a work is of the kind `Data`, its version MUST be the snapshot date `YYYY-MM-DD` and the record's `snapshot` MUST carry the SHA-256 of the snapshot and a Semantic Version for its schema; the snapshot date MUST be strictly later than the base's, its digest MUST differ, and the schema's version MUST grow by precedence wherever the schema's files changed.
+- **FR-013**: WHERE a work is of the kind `ControlledDocument`, its version MUST be an integer revision that is strictly greater than the base's, and the record MUST carry an approval of that revision (`approval`: `approvedBy`, a person, `role`, `on`, a day, and `decision`, the identifier of the `mz:Decision`); the person MUST be data in the record and never inferred, and a revision with no approval MUST be a finding that is never a warning.
+- **FR-014**: A work of the kind `Specification` MUST have no version: its record MUST NOT carry `version`, a requirement identifier of it MUST never be renumbered, its revision is the commit, and a tool MUST NOT judge, bump, tag or cite a version of it.
+- **FR-015**: An ontology and a schema of commons MUST use Semantic Versioning: `owl:versionInfo` MUST be a Semantic Version and `owl:versionIRI` MUST be the ontology's IRI, a `/` and that version, and commons' own ontologies (Mizan's, `ifccm`, `ifqs`, `ifws`, `ifr` and the packaging ontology) MUST be at `1.0.0` where the integer `1` was, with the DCAT catalog's `dcat:version`, the generated files and every test reading them in step.
+- **FR-016**: The version of an ontology or a schema MUST be raised by the impact of the capability that changes it: major where a term is removed or renamed or its range narrows, minor where a term is added, patch where only wording changes; the tool that compares the terms of two versions to check that impact is later.
+
+## Releases
+
+- **FR-017**: A published version MUST name its commit (the full object name) and its Git tree hash, MUST be immutable, and MUST NOT be replaced by another commit under the same version: a correction is a new version, and the one it corrects stays.
+- **FR-018**: A release MUST be a signed annotated Git tag named `<slug>-v<version>` (in a repository of many works, one tag per work, with commons' tags `ifc-ts-v0.1.0` to `ifc-ts-v0.4.0` and `ifc-docs-v0.1.0` keeping the scheme); `versions tag <work>` MUST create the annotated tag at the head, MUST sign it where Git signing is configured and MUST say so where it is not, MUST refuse a tag that exists, a work whose record has an uncommitted change and a version that is not greater than the work's last tag, and MUST write the tag's message with the commit, the tree hash, the scheme and the evidence tier.
+- **FR-019**: The ledger of releases MUST be derived from the tags and MUST never be written by hand: `versions ledger [<work>]` MUST read the annotated tags of the form `<slug>-v<version>` and print, for each, the work, the version, the commit, the tree hash, whether the tag is signed and the day of the commit, in order by the work's scheme, as text or, with `--json`, as a deterministic JSON document.
+- **FR-020**: The ledger MUST find as `versions/ledger-order` a tag whose version is not greater than that of a tag of the same work whose commit is an ancestor of its own; MUST find as `versions/tag-moved` and `versions/tag-removed` a tag whose commit or tree differs from, or is absent from, an earlier ledger given with `--against FILE` (a `--json` output kept earlier) unless the record's `retired` names the version (FR-028); and MUST compare versions only within one scheme (FR-037).
+- **FR-021**: A version MUST be raised by the capability that changes the work (0020-ifccm) with the impact it declares: a commit's message MAY carry a line `Impact: major`, `Impact: minor` or `Impact: patch` (a Git trailer on a line of its own), and `versions bump <work> --impact major|minor|patch` MUST write the next version into the record by the scheme of its kind (for `SemVer`: major raises the first number and zeroes the others, minor raises the second and zeroes the third, patch raises the third), while `--impact auto` MUST take the greatest of the impacts of the commits since the work's last tag that touch its files and MUST exit with 2 where there is none.
+- **FR-022**: A check MUST fail where files of a work changed since the base and its version did not grow: `versions check [--base REV]` MUST compare each work's files and its record at the head with the base (the merge base with `REV`, which is `origin/main` unless given, or the head's first parent where the head is `REV`), and MUST report as `versions/not-grown` a work whose files changed and whose version is not greater by its scheme (FR-010 to FR-014), as `versions/record-invalid` a record that does not decode, and as `versions/scheme-mismatch` a version that does not match the pattern of its kind's scheme.
+- **FR-023**: Release notes MUST be generated from the capabilities closed since the last tag, so that the change log and the trace chain (0020-ifccm) are one thing: `versions notes <work> [--from TAG]` MUST print deterministic Markdown that lists, for each `Closes #N` line (read with the commit-message reader of 0020-ifccm) of the commits that touch the work's files since its last tag, the issue number, the subject of the commit and its first seven characters, grouped by the commit's impact (major, minor, patch, then not stated) and ordered by issue number, and MUST say how many commits closed no capability.
+- **FR-024**: Every work that is released MUST have a citation file: `versions cite <work>` MUST write `CITATION.cff` in the work's folder, deterministically from the record (the Citation File Format 1.2.0: `cff-version`, `message`, `title`, `version`, `date-released` as the day of the release's commit, `authors`, `repository-code` and, only where the record carries `identifier`, `identifiers`), and `--check` MUST exit 1 without writing where the file is not what the record makes.
+- **FR-025**: Every release MUST carry its provenance (a SLSA provenance attestation in the in-toto format), its software bill of materials (SPDX 3) and the SHA-256 checksums of its artifacts, each recorded by its digest on the release (`ifr:provenance`, `ifr:sbom`, `ifr:checksum`); the release workflow that makes them is a later piece and MUST NOT be claimed before it is built.
+- **FR-026**: Every release MUST record the evidence tier it was released on (`ifr:releasedOnTier`, an `ifqs:QualityTier` judged by `quality tier`), and WHERE a harness declares a regulated domain, `versions tag` MUST refuse to release unless the tier judged is at least the tier the harness's declaration names (a field `releaseTier` of the declaration of 0020-ifccm, taken as an argument with the judgement of the tier), and MUST refuse a regulated harness whose declaration names none.
+- **FR-027**: The digests and the metadata of every published version MUST be kept forever; the bytes of a version MAY be deleted only after a retention period the record states (`retention`, an ISO 8601 duration such as `P10Y`, from the release's day); the identifier of a version MUST always resolve, and WHERE its bytes are gone it MUST resolve to a tombstone (`ifr:Tombstone`: the metadata, the digest kept and the day the bytes were removed, in the record's `retired` entry for that version).
+- **FR-028**: A retired or archived version MUST be recorded, never silently removed: the record's `retired` MUST name the version, the day it was retired, the version that replaces it (`ifr:replaces`, `ifr:isReplacedBy`) where there is one and the day it was archived where it was, and a tag of the ledger that is gone and that `retired` does not name MUST be a finding.
+- **FR-029**: A DOI MUST be opt-in per work: a work MAY carry `identifier` in its record, and `versions cite` MUST write it into `CITATION.cff` where it is there and MUST NOT write one where it is not; no tool of this specification mints, requires or registers a DOI.
+- **FR-030**: WHERE a work is of the kind `Library`, the check SHOULD compare the exported surface of its API at the base and at the head with the impact the capability declared, and MUST report a removal under a minor or patch impact; this comparison is later and nothing claims it before it is built.
+
+## The tool
+
+- **FR-031**: The tool MUST be the command `commons/ts/mizan/versions.ts` over the pure library `commons/ts/mizan/versions/` and a thin host layer (the library reads no clock and no environment, and takes Git facts and the day as arguments), with the commands `check`, `bump`, `tag`, `notes`, `cite` and `ledger` (FR-018 to FR-024); it MUST exit with 0 where it did what was asked and found nothing, 1 where it found something or `cite --check` finds the file different, 2 for a usage error (an unknown command, option or work, a work of no version) and 3 where the environment cannot do it, and MUST say `not_run` with its reason where Git is absent, the directory is no repository or the base cannot be found, and MUST NOT write a record as a result of a run that was not run.
+- **FR-032**: Mizan's harness check MUST run a rule plugin of the tool for what a folder can judge offline: that every `release.ts` under the root decodes, that each version matches the pattern of its kind's scheme, that a `Specification` has none and that a controlled document's revision has its approval; the comparison with a base is the command's.
+- **FR-033**: The tool MUST be TypeScript 7 on the runtime of 0005-typescript-runtime (Bun by default, Node 26 as the backup, the same code and the same tests), strict, with no `any`, no non-null `!`, errors as values (`Result`), tagged unions and exhaustive `switch` statements, and no third-party runtime module, and its tests MUST use real temporary Git repositories and real annotated tags, signing with an SSH key made by `ssh-keygen` where it is present.
+- **FR-034**: Commons' own works MUST have records: `commons/ts/release.ts` and `commons/docs/release.ts`, the packages `@intellectual-frontiers/commons` for the TypeScript and for the documentation, whose versions MUST be those of their tags `ifc-ts-v0.4.0` and `ifc-docs-v0.1.0` and whose `package.json` `version` fields MUST equal their records.
+- **FR-035**: The `check` job of `.github/workflows/tests.yml` MUST run `versions check`, offline and path-scoped, and it MUST pass on this repository as it is.
+
+## Migration from the schemes in use
+
+- **FR-036**: A harness that adopts this specification MUST map the schemes it uses today to the one scheme of each kind as the table of the Assumptions says, and a reviewer MUST check that no kind of its works keeps two schemes.
+- **FR-037**: WHERE a work changes its scheme, its record MUST name the scheme it came from and the first version of the new scheme (`migratedFrom`), the versions already tagged MUST stay in the ledger as they were tagged, and a tool MUST compare versions only within one scheme and MUST begin the new scheme at the tag the record names.
+
+## Out of scope
+
+- The tags, signing and the trace chain of changes: `0020-ifccm`. The evidence tiers and the quality branch: `0021-ifqs`. The workspace that holds the repositories: `0023-if-workspaces`.
+- Minting or registering a DOI, the release workflow that generates provenance and the software bill of materials, and the comparison of an API surface or of an ontology's terms with a declared impact: later (FR-016, FR-025, FR-029, FR-030).
+- Versioning a harness's own products that are not works of this repository's own: the harness applies this specification to them through its own record files.
+
+## Edge cases
+
+- A work whose files changed and whose record did not: found as `versions/not-grown`, per FR-022.
+- A work whose only changed paths are named in its record's `exclude`: no finding, and the exclusion is visible in the record, per FR-009.
+- A Semantic Version `1.2.3+abc123def456` in a record: refused, as build metadata is not part of a record or a tag, per FR-010.
+- Two editions of a book on the same day: ordered by the history, the later commit is the greater, per FR-011.
+- A snapshot taken twice on one day with another digest: not a new version, the date must be later, per FR-012.
+- A policy revision 7 with no approval: a finding that gates, per FR-013.
+- A specification whose record carries a version: refused, per FR-014.
+- A tag `ifc-ts-v0.4.0` moved to another commit: found against an earlier ledger, per FR-020.
+- A tag deleted and not named in `retired`: found as removed, per FR-028.
+- A `bump --impact auto` with no commit that states an impact: exit status 2, per FR-021.
+- A regulated harness that declares no release tier: `tag` refuses, per FR-026.
+- A repository on plain Git with no host: `check`, `bump`, `tag`, `notes`, `cite` and `ledger` read only Git and run, per FR-031.
+- A shallow clone with no base: `not_run`, with its reason, per FR-031.
+- A commit-date edition read by a Semantic Version pattern: it matches, and is still an edition, as the work's kind says, per FR-006.
+- A work renamed from `book-one` to `book-1`: a new work that replaces the old, not a change of slug, per FR-007.
+
+## Scenarios
+
+- **Given** the ontology of releases, **When** a specification names `ifr:WorkKind` and `ifr:Impact`, **Then** Mizan's check knows both and finds nothing, and a name the ontology lacks is found (FR-001, FR-004).
+- **Given** the code list of work kinds, **When** the scheme of `Prose` and the scheme of `Data` are read, **Then** they are the commit-date edition and the snapshot date, and `Data` carries a Semantic Version for its schema (FR-005).
+- **Given** a record of a library at `0.4.0` and a commit that changes its files with `Impact: minor`, **When** `versions bump <work> --impact auto` runs, **Then** the record says `0.5.0` and the check finds nothing (FR-010, FR-021, FR-022).
+- **Given** a change to a work's files with no change to its record, **When** `versions check` runs against the base, **Then** the status is 1 and `versions/not-grown` names the work (FR-022).
+- **Given** a book at the commit-date edition `2026.11.10-1a2b3c4d` and a later commit, **When** `versions bump <work>` runs, **Then** the record carries the commit's UTC date and its first eight characters, never the clock's (FR-011).
+- **Given** a specification, **When** `versions bump` runs on it, **Then** the status is 2 and nothing is written (FR-014, FR-031).
+- **Given** a version that is raised, **When** `versions tag <work>` runs where Git signing is configured, **Then** a signed annotated tag `<slug>-v<version>` names the commit and the message holds the tree hash and the tier, and where it is not configured the command says the tag is not signed (FR-017, FR-018).
+- **Given** the tags of a repository, **When** `versions ledger --json` runs twice, **Then** the two documents are the same and each tag appears once with its commit and tree (FR-019).
+- **Given** tags `lib-v1.2.0` and `lib-v1.1.0` where the commit of the first is an ancestor of the second's, **When** the ledger is read, **Then** `versions/ledger-order` names the pair (FR-020).
+- **Given** three closed capabilities since the last tag, **When** `versions notes <work>` runs, **Then** each appears once under its impact, in order of its number, and the same text is printed again (FR-023).
+- **Given** a record with an identifier, **When** `versions cite` runs and then `versions cite --check`, **Then** `CITATION.cff` holds the identifier and the check exits with 0, and with no identifier the file holds none (FR-024, FR-029).
+- **Given** a harness that declares a regulated domain and a release tier above the tier judged, **When** `versions tag` runs, **Then** it refuses and creates no tag (FR-026).
+- **Given** a version retired with a replacement, **When** the ledger is read against an earlier one, **Then** nothing is found for it, and a tag gone without a `retired` entry is found (FR-020, FR-028).
+- **Given** commons' two packages, **When** `versions check` runs on this repository, **Then** it finds nothing, and the records equal the tags and the `package.json` versions (FR-034, FR-035).
+
+## Assumptions
+
+- **Standards considered** (0018-standards-first): IFLA LRM and FRBR (work, expression, manifestation, item) for the levels of FR-003, whose IRIs are to verify, so the classes rest on schema.org's `CreativeWork`; schema.org's `version`, `isPartOf`, `position`, `identifier` and `bookEdition`; Dublin Core Terms' `isVersionOf`, `replaces` and `isReplacedBy`; PROV-O's `wasDerivedFrom` and `wasRevisionOf`; OWL's `versionInfo` and `versionIRI`; SPDX 3's `software_packageVersion`; Semantic Versioning 2.0.0, whose build metadata `+<commit12>` is not part of precedence; the Citation File Format 1.2.0; SLSA and in-toto for provenance; DOI, DataCite and Zenodo for the opt-in identifier; Git's annotated and signed tags; and, for a controlled document, the document control of ISO 9001:2015 clause 7.5.3 and ISO 13485:2016 clause 4.2.4. Calendar Versioning was considered and not adopted: its date is the clock's, and here it is the commit's. Keep a Changelog and Conventional Commits were considered and not adopted: the notes are generated from the `Closes` lines and the `Impact` lines of 0020-ifccm's commits, so that the trace chain is the change log.
+- **The mapping from the four schemes the first publishing harness uses today to the one scheme of each kind** (FR-036):
+
+  | Scheme in use | Kind of work | Scheme here | What becomes of it |
+  | --- | --- | --- | --- |
+  | Semantic Version with `+commit12` for software | `Software`, `Library`, `CommandLineInterface` | `SemVer` | The record and the tag carry the plain Semantic Version; the commit is its own field of the release (`ifr:releaseCommit`); `+commit12` MAY stay in a displayed version and is never compared |
+  | A UTC minute stamp for books and papers | `Prose` | `CommitDateEdition` | The commit's UTC date and the first eight characters of its commit replace the stamp; the stamps already tagged stay in the ledger as they were (FR-037) |
+  | `YYYY.MM.DD-<commit8>` for a manual set | `Prose` | `CommitDateEdition` | It is already the scheme: adopted as written, with the date taken from the commit and never the clock |
+  | An integer book edition and printing | `Prose` | `CommitDateEdition` | The integer edition is the label `ifr:bookEditionNumber` of an edition, as schema.org's `bookEdition`; the printing is `ifr:printing`, a property of the print rendition; neither is the version |
+
+- A work's folder can be told from its `release.ts` alone, and a repository of one work keeps its record at its root; Git's tag namespace is shared by every work of a repository, which is why the slug is the tag's prefix.
+- The record is read as data, as the declaration of 0020-ifccm is, so that a version at the base reads like the present one and nothing is run.
+- A commit's `Impact:` line is a Git trailer that 0020-ifccm's commit reader does not read yet; the tool reads it itself and 0020-ifccm is not changed by this specification.
+- A harness that declares a regulated domain declares the release tier in the declaration it already keeps (FR-026); the field is added to the declaration's decoder by the tool, compatibly.
+- Retention is the harness's to state: the digests and metadata are kept forever, and a period for the bytes is only ever stated by a record, never assumed.
+- This specification is Draft: the ontology, the migration of commons' ontologies and the mapping are built; the tool, the records of commons' two packages and the check in the workflow are the next piece, and the register says so for each requirement.
+
+## Open questions
+
+None.
+
+## Key entities
+
+- **Work** - a work in its identity, a slug and an IRI that never change (`ifr:Work`).
+- **Expression** and **Manifestation** - a state of a work's content, and a rendition of it (`ifr:Expression`, `ifr:Manifestation`).
+- **Release** and **Edition** - a version that was published, named by a signed tag; an edition is a release of prose (`ifr:Release`, `ifr:Edition`).
+- **VersionScheme**, **WorkKind** and **Impact** - the schemes, the kinds that each use one and the impacts a version is raised by.
+- **ReleaseRecord** - the typed file `<work>/release.ts`.
+- **ReleaseTag**, **Retention**, **Tombstone**, **ApprovalRecord** and **Citation** - the tag, how long bytes are kept, what resolves where they are gone, the approval of a controlled document and the citation file.
+
+## Success criteria
+
+- **SC-001**: For every work of this repository one command says its version, whether it grew where its files changed and which release it was, and no work has two schemes.
+- **SC-002**: The change log of a release is the list of the capabilities it closed, so that no one writes a change log by hand and none disagrees with the trace chain.
+- **SC-003**: A published version is never changed or silently lost: its commit, its tree and its digest can be found as long as the repository is.
+
+## Review & acceptance checklist
+
+- [x] Every requirement is testable (MUST / MUST NOT), not aspirational
+- [x] No company fact is asserted here
+- [x] Every open item is marked, not silently decided
