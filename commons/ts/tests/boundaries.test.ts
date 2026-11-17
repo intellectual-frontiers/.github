@@ -299,6 +299,7 @@ proves(
       "./ts/lint/test-rule": "./lint/test-rule.ts",
       "./ts/mizan": "./mizan/mod.ts",
       "./ts/mizan/integrations": "./mizan/integrations/mod.ts",
+      "./ts/quality": "./quality/mod.ts",
       "./ts/node": "./node/register.mjs",
     });
     for (const target of Object.values(m.exports)) assert(existsSync(join(ROOT, target)), target);

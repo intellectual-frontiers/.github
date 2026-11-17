@@ -99,6 +99,10 @@
 - **FR-040**: WHERE a harness claims `ifqs:Tier2`, a run MAY mutate the code that a test proves and record whether the test failed, and the strength of a proof that results MUST be shown beside its grade.
 - **FR-041**: WHERE a harness claims `ifqs:Tier2`, an agent MAY perform a review mechanism, graded as FR-024 says, and a person MUST sample the agents' reviews (FR-038) at a rate the harness states.
 
+## The grade of kept evidence
+
+- **FR-042**: A file MUST claim no more than `ifqs:E3` for itself (`ifc.quality.grade`), because what makes it `ifqs:E4` is what happens to it after it is written; the grade of kept evidence MUST be the one its note gives, which MUST be `ifqs:E4` only where the commit that keeps the file is signed, the chain verifies and the note matches the file's SHA-256, `ifqs:E3` where the file is kept and any of these is not so but nothing is broken, and `ifqs:E0` where the chain does not verify or the note does not match its file; a note MUST be the lines `path`, `sha256` and `grade`, one such paragraph for each run kept for the commit, the last being the newest.
+
 ## Acceptance scenarios
 
 1. **Given** a requirement whose only test did not run for lack of network, **When** the run is recorded, **Then** its case is `not_run` with that reason and the requirement is unproven, per FR-005 and FR-014.
