@@ -67,7 +67,7 @@ body {
 a { color: var(--accent); text-underline-offset: 3px; }
 a:hover { color: var(--accent-ink); }
 code, pre, kbd { font-family: var(--mono); }
-code { font-size: .88em; background: var(--bg-soft); border: 1px solid var(--line); border-radius: 6px; padding: .08em .38em; }
+code { overflow-wrap: anywhere; font-size: .88em; background: var(--bg-soft); border: 1px solid var(--line); border-radius: 6px; padding: .08em .38em; }
 pre {
   background: var(--code-bg); color: var(--code-ink); border-radius: 12px; padding: 18px 20px;
   overflow-x: auto; font-size: 13.5px; line-height: 1.6; box-shadow: var(--shadow); margin: 1.2em 0;
@@ -182,9 +182,9 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
       <p class="arabic" lang="ar">ميزان</p>
       <p class="lede">The IF Spec Profile. A profile of GitHub Spec Kit, one strongly typed TypeScript ontology and a shared ladder, held together by one rule: take the standard before you invent a term, and keep specifications, ontology and code in balance.</p>
       <div class="chips">
-        <span class="chip draft">Draft: specifications written</span>
-        <span class="chip built">Built: checker, trace, layers</span>
-        <span class="chip plan">Planned: integrations, basis, EARS rules</span>
+        <span class="chip draft">Specified: five specs, Draft</span>
+        <span class="chip built">Built: checks, importers, exporters</span>
+        <span class="chip plan">Planned: migrating harnesses</span>
         <span class="chip">Tracked in <a href="https://github.com/intellectual-frontiers/.github/issues/10">issue #10</a></span>
       </div>
     </div>
@@ -391,7 +391,7 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
     <tr><td>Adopted</td><td>The word commons used before Mizan. Accepted until every specification has moved to Active.</td></tr>
   </table></div>
 
-  <h3>Requirement syntax: RFC 2119 and EARS <span class="chip plan">Planned, warn-only</span></h3>
+  <h3>Requirement syntax: RFC 2119 and EARS <span class="chip built">Built, warn-only</span></h3>
   <p>A vague requirement cannot be tested, and a requirement that is not testable cannot be proven. We write requirements with RFC 2119 keywords (<code>MUST</code>, <code>SHOULD</code>, <code>MAY</code>) in one of the six EARS patterns (Easy Approach to Requirements Syntax). EARS is small enough for an agent to follow and regular enough for a checker to parse.</p>
   <div class="table-scroll"><table>
     <tr><th>Pattern</th><th>Form</th><th>Example</th></tr>
@@ -403,7 +403,7 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
     <tr><td>Complex</td><td>A combination of the above</td><td>WHEN a term is added, WHILE it is <code>unaligned</code>, the check MUST count it.</td></tr>
   </table></div>
 
-  <h3>Scenarios: Gherkin's shape <span class="chip plan">Planned, warn-only</span></h3>
+  <h3>Scenarios: Gherkin's shape <span class="chip built">Built, warn-only</span></h3>
   <p>Spec Kit's acceptance scenarios already use Given, When, Then. Mizan requires each scenario to cite the requirements it exercises, so a reader can walk from a story to its rules, and a checker can verify that the rules exist.</p>
 <pre><code><span class="k">Scenario:</span> an unaligned term with no Decision after the grace period
   <span class="k">Given</span> a term added on day 0 whose basis is <span class="s">unaligned</span>
@@ -411,7 +411,7 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
   <span class="k">When</span> the check runs on day 91
   <span class="k">Then</span> it fails and names the term, per <span class="t">0018-standards-first FR-005</span></code></pre>
 
-  <h3>The Standards considered section <span class="chip plan">Planned, warn-only</span></h3>
+  <h3>The Standards considered section <span class="chip built">Built, warn-only</span></h3>
   <p>A feature's <code>plan.md</code> has a required section naming the standards looked at and the one chosen. It makes "did you check whether a standard exists?" a question with a written answer.</p>
 
   <h3>The proof register and OSCAL <span class="chip draft">Specified</span></h3>
@@ -471,7 +471,7 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
   </ol>
   <p>Only after all of these is a term our own.</p>
 
-  <h3>The basis of every term <span class="chip draft">Specified</span></h3>
+  <h3>The basis of every term <span class="chip built">Built</span></h3>
   <p>Every class, property, individual and code list carries a basis. A term with none does not compile.</p>
   <div class="table-scroll"><table>
     <tr><th>Basis</th><th>Meaning</th><th>Example</th></tr>
@@ -540,6 +540,15 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
     <li><strong>Findings as values.</strong> What a type cannot state (an unsafe integer, a malformed string) is a finding with one plain sentence.</li>
     <li><strong>Deterministic output.</strong> Canonical Turtle and N-Triples, and a SHA-256 over the whole ontology, so any change of fact changes the hash.</li>
   </ul>
+
+  <h3>Using the ontology from your harness</h3>
+  <ol>
+    <li><strong>Keep your own namespace.</strong> State your terms with <code>vocabulary(NS, {...})</code> and class schemas on commons' RDF kernel; import the shared classes (<code>Rung</code>, <code>OntologyTerm</code>, <code>Decision</code> and the rest) from <code>commons/ontology/mizan/</code> and do not copy them.</li>
+    <li><strong>Take standards by import, not by hand.</strong> Write a manifest (a TypeScript module) naming the pinned standard, its versioned URL, the slice you need and where the generated module goes; run <code>bun commons/ts/mizan/integrations/host/import.ts MANIFEST.ts</code>. The generated module is the standard's own terms, typed; commons' packaging ontology takes <code>schema:SoftwareApplication</code> this way.</li>
+    <li><strong>Record the basis of each of your terms</strong> in an audit file of <code>mz:OntologyTerm</code> individuals (see <code>commons/ontology/audit/packaging.ts</code>): <code>specializes</code> or <code>maps</code> with the standard's term and relation, or <code>unaligned</code> with the candidates you examined. A mapping to a term your import does not hold does not compile.</li>
+    <li><strong>Run the checks.</strong> <code>commons/ts/mizan/check.ts</code> fails for a term with no record, holds the pending Decisions in a baseline that only shrinks, and fails a Decision past its 90 days.</li>
+    <li><strong>Publish the generated forms, not the TypeScript,</strong> to anyone outside your stack: Turtle with <code>owl:versionIRI</code>, SHACL shapes, JSON Schema, SKOS, SQL code-list tables, SSSOM mappings and the HTML view (<code>commons/generated/mizan-ontology.auto.html</code> is the example).</li>
+  </ol>
 
   <h3>Strengths and weaknesses, by who uses it</h3>
   <div class="two">
@@ -618,7 +627,7 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
   <p>Turtle, N-Triples, N-Quads and JSON-LD already come from the kernel. The module adds SHACL shapes and JSON Schema (from class schemas), SKOS concept schemes and SQL code-list tables (from code lists), SSSOM mapping files (from terms whose basis is <code>maps</code>), and later OWL, RDF/XML and a DCAT catalog entry for each published ontology. We use SSSOM and DCAT rather than invent a mapping or catalog format, which is the standards-first rule applied to our own tooling.</p>
   <p><strong>Never published without a person.</strong> Where one of our terms could improve a standard (schema.org, SPDX), the module prepares a proposal bundle. It sends nothing.</p>
 
-  <h3>The plugin model <span class="chip draft">Specified</span></h3>
+  <h3>The plugin model <span class="chip built">Built (rules); importers and exporters are typed records</span></h3>
 <pre><code><span class="c">// Illustrative sketch of the typed integration record.</span>
 <span class="k">interface</span> <span class="t">Integration</span>&lt;In, Out&gt; {
   <span class="k">readonly</span> id: <span class="t">string</span>;
@@ -694,15 +703,15 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
 
   <div class="table-scroll"><table>
     <tr><th>Drift</th><th>Control</th><th>Where it lives</th><th>Status</th></tr>
-    <tr><td>A: spec ↔ ontology</td><td>A specification names only terms the ontology defines; every term cites its specification</td><td><code>0015-trace</code> FR-008; stolos's <code>check:ontology</code> moves to commons</td><td><span class="chip built">Trace built</span> <span class="chip plan">Term rule planned</span></td></tr>
+    <tr><td>A: spec ↔ ontology</td><td>A specification names only terms the ontology defines; every term cites its specification</td><td><code>0015-trace</code> FR-008, <code>0003-mizan</code> FR-020</td><td><span class="chip built">Built</span> (<code>0003</code> FR-020: a specification names only terms the ontology defines)</td></tr>
     <tr><td>A: spec ↔ spec</td><td>A gapless register; edge cases cite real requirements; citations of other repositories name them</td><td><code>0003-mizan</code>, <code>mizan-check</code></td><td><span class="chip built">Built</span></td></tr>
     <tr><td>A, B: requirement ↔ proof</td><td>One row per requirement in the proof register; <code>proves([...])</code> in tests; an Active spec's unproved requirement fails</td><td><code>enforcement.tsv</code>, <code>0015-trace</code></td><td><span class="chip built">Built</span></td></tr>
     <tr><td>B: code ↔ requirement</td><td>Every source file has a <code>// Spec:</code> line</td><td><code>0015-trace</code> FR-005, FR-007</td><td><span class="chip built">Built</span></td></tr>
     <tr><td>B: code ↔ ontology</td><td>Code lists are imported as unions; generated files are checked for staleness</td><td>Generators with <code>--check</code></td><td><span class="chip built">Built</span> (per harness)</td></tr>
     <tr><td>B: layers</td><td>An import that climbs the ladder is refused</td><td><code>0015-trace</code> FR-009, FR-010</td><td><span class="chip built">Built</span></td></tr>
-    <tr><td>Requirement quality</td><td>EARS patterns; Gherkin scenarios that cite requirements</td><td><code>mizan-check</code> plugins</td><td><span class="chip plan">Planned, warn-only</span></td></tr>
-    <tr><td>C: us ↔ the world</td><td>Standards pinned with a hash; a newer upstream version is a finding</td><td><code>Standard</code> record; integrations</td><td><span class="chip draft">Specified</span></td></tr>
-    <tr><td>D: invention</td><td>A basis on every term; <code>unaligned</code> needs justification and a Decision; the count only shrinks</td><td><code>0018-standards-first</code></td><td><span class="chip draft">Specified</span></td></tr>
+    <tr><td>Requirement quality</td><td>EARS patterns; Gherkin scenarios that cite requirements</td><td><code>mizan-check</code> plugins</td><td><span class="chip built">Built, warn-only</span></td></tr>
+    <tr><td>C: us ↔ the world</td><td>Standards pinned with a hash; a newer upstream version is a finding</td><td><code>Standard</code> record; integrations</td><td><span class="chip built">Pins built</span> <span class="chip plan">Newer-version finding planned</span></td></tr>
+    <tr><td>D: invention</td><td>A basis on every term; <code>unaligned</code> needs justification and a Decision; the count only shrinks</td><td><code>0018-standards-first</code></td><td><span class="chip built">Built</span> (a basis on every term of commons' ontologies; 90 days; baseline)</td></tr>
     <tr><td>Languages</td><td>No fact kept as source outside natural language and TypeScript, except a named <code>Exception</code></td><td><code>0017-two-languages</code></td><td><span class="chip draft">Specified</span></td></tr>
     <tr><td>Meaning</td><td>A person reviews; the reason is in the register</td><td>Proof register mechanism <code>review</code></td><td><span class="chip built">Built</span></td></tr>
   </table></div>
@@ -714,39 +723,38 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
 <!-- 12 -->
 <section id="roadmap">
   <h2><span class="num">12</span>Roadmap and status</h2>
-  <p class="kicker">The work is tracked in <a href="https://github.com/intellectual-frontiers/.github/issues/10">issue #10</a>, and every step is specification first: specifications, then ontology, then code, then tests, then documentation.</p>
+  <p class="kicker">The work is tracked in <a href="https://github.com/intellectual-frontiers/.github/issues/10">issue #10</a>, and every step is specification first: specifications, then ontology, then code, then tests, then documentation. Everything below marked Built runs on Bun and on Node 26 and is tested; the checks are in CI.</p>
 
   <div class="table-scroll"><table>
     <tr><th>Phase</th><th>What</th><th>Status</th></tr>
-    <tr><td>0</td><td>Standards audit: inventory commons and stolos terms, verify the FDA QMSR date, name the candidate importers, propose the OSCAL mapping of the proof register</td><td><span class="chip built">Done</span> <a href="commons/spec-kit/audits/2026-11-standards-audit.md">report</a></td></tr>
-    <tr><td>1</td><td>Specifications: <code>0003-mizan</code>, <code>0016</code> to <code>0019</code>, the <code>0012</code> amendment; then format convergence, one proof register and the EARS and Gherkin rules</td><td><span class="chip draft">Specs written</span> <span class="chip plan">Rules planned</span></td></tr>
-    <tr><td>2</td><td>Shared ontology: <code>Rung</code>, <code>Spec</code>, <code>Requirement</code>, <code>Standard</code>, <code>Authority</code>, <code>Jurisdiction</code>, <code>Decision</code>, <code>Exception</code>, <code>Integration</code>, <code>ImportRecord</code>; a basis on every term</td><td><span class="chip plan">Planned</span></td></tr>
-    <tr><td>3</td><td>Mizan checks in <code>commons/ts/mizan/</code> as plugins: register, status, EARS, Gherkin, standards rules</td><td><span class="chip plan">Planned</span></td></tr>
-    <tr><td>4</td><td><code>commons/ts/mizan/integrations/</code>: core, importers, exporters, dogfooding</td><td><span class="chip plan">Planned</span></td></tr>
-    <tr><td>5</td><td>Ontology weaknesses, inside and outside TypeScript</td><td><span class="chip plan">Planned</span></td></tr>
-    <tr><td>6</td><td>Migrate <code>stolos</code> first, then the other harnesses; their existing <code>unaligned</code> terms go into the baseline</td><td><span class="chip plan">Planned</span></td></tr>
+    <tr><td>0</td><td>Standards audit: commons and <code>stolos</code> terms inventoried, FDA QMSR verified, OSCAL 1.2.3 verified, candidate importers named, the OSCAL mapping of the proof register proposed</td><td><span class="chip built">Done</span> <a href="commons/spec-kit/audits/2026-11-standards-audit.md">report</a></td></tr>
+    <tr><td>1</td><td>Specifications <code>0003-mizan</code> and <code>0016</code> to <code>0019</code>, the <code>0012</code> amendments; the checker accepts Spec Kit's form and one status vocabulary; EARS, Gherkin and the baseline</td><td><span class="chip built">Done</span>, except the OSCAL mapping of the one proof register <span class="chip plan">Planned</span></td></tr>
+    <tr><td>2</td><td>Shared ontology (<code>Rung</code>, <code>Standard</code>, <code>Authority</code>, <code>Decision</code>, <code>OntologyTerm</code> and the rest); every term of the packaging ontology and of Mizan's vocabulary has a record of its basis; a specification names only terms the ontology defines</td><td><span class="chip built">Done</span>, except reconciling <code>stolos:Decision</code> with the commons one <span class="chip plan">Phase 6</span></td></tr>
+    <tr><td>3</td><td>Mizan checks as plugins in <code>commons/ts/mizan/</code>: keyword, EARS, Gherkin, Standards considered, the 90 days of a Decision, a basis on every term, deprecation, undefined and deprecated terms in specifications</td><td><span class="chip built">Done</span>, except the stale-pin and authority-citation rules <span class="chip plan">Planned</span></td></tr>
+    <tr><td>4</td><td><code>commons/ts/mizan/integrations/</code>: the registry; a Turtle and N-Triples reader; importers of a vocabulary slice and of an OSCAL control catalog, from a file or a pinned URL, with PROV-O provenance; exporters of SHACL, JSON Schema, SKOS, SQL, SSSOM and an HTML view; independent validators in the suite</td><td><span class="chip built">Built</span>; JSON-LD, RDF/XML, XSD, OWL, DCAT and the upstream bundle <span class="chip plan">Planned</span></td></tr>
+    <tr><td>5</td><td>Ontology weaknesses: the compile cost of a 5,000-entry code list measured and held by a test, deprecation, <code>owl:versionIRI</code>, an HTML ontology view, the generated artifacts as the contract for consumers outside TypeScript</td><td><span class="chip built">Done</span></td></tr>
+    <tr><td>6</td><td>Migrate <code>stolos</code> first, then the other harnesses; their existing <code>unaligned</code> terms go into the baseline</td><td><span class="chip plan">Waiting for a go-ahead</span></td></tr>
   </table></div>
 
-  <h3>Findings from the first audit</h3>
+  <h3>What the audits found</h3>
   <ul>
-    <li>Commons' packaging ontology: of 16 classes, 5 already <em>specialize</em> schema.org and 11 are <code>unaligned</code>; all 45 properties are its own. Several have plausible standard counterparts (checksums, versions, names, platforms, package names) to examine.</li>
-    <li><code>stolos</code> has 24 classes, 7 properties and 9 code lists of its own, and the best precedent for importing: vendored, pinned, hashed, generated.</li>
-    <li>Two <code>Decision</code> classes exist (<code>stolos:Decision</code> and the planned commons one) and must be reconciled, not duplicated.</li>
-    <li>The machinery that is missing is the basis field, the <code>Standard</code> and <code>Authority</code> classes, and the baseline.</li>
+    <li>The packaging ontology has 61 terms: 5 specialize schema.org, 5 map to a schema.org property, and 51 are <code>unaligned</code>, each with the candidates still to examine. Mizan's own vocabulary has 14 classes: 1 specializes <code>dcterms:Standard</code> and 13 are <code>unaligned</code>. All 64 pending Decisions are due within 90 days of 2026-11-17 and are held by a baseline that only shrinks; a Decision past its day fails whatever the baseline holds.</li>
+    <li><code>stolos</code> has the best precedent for importing: vendored, pinned, hashed, generated. The integrations module generalizes it.</li>
   </ul>
 
-  <h3>Verified since the first audit</h3>
+  <h3>Verified for real, with the standards hosts allowed</h3>
   <ul>
-    <li>OSCAL 1.2.3 is the newest release (the tags 1.2.4, 1.2.5 and 1.3.0 do not exist), it is public domain and CC0, and commons' kernel already writes it.</li>
-    <li>A slice of the real schema.org Turtle imports as exactly the vocabulary commons writes by hand today, and the reader's triple counts on schema.org, PROV-O and SHACL agree with an independent parser.</li>
-    <li>Mizan's ontology conforms to the SHACL shapes exported from its own schemas (checked with pySHACL), and a broken individual does not.</li>
-    <li>The suites pass on Node 26.</li>
+    <li>OSCAL 1.2.3 is the newest release (tags 1.2.4, 1.2.5 and 1.3.0 do not exist) and is public domain and CC0.</li>
+    <li>A slice of the real schema.org 30.1 Turtle, fetched by pinned SHA-256, makes exactly the vocabulary commons used to write by hand, and commons' packaging ontology now takes it from the generated module (its generated tables are unchanged).</li>
+    <li>The reader's triple counts on schema.org (17,515), PROV-O (961) and SHACL (1,112) agree exactly with rdflib; sssom-py parses the SSSOM file; pySHACL finds Mizan's ontology conforms to the shapes made from its own schemas and rejects a broken individual.</li>
+    <li>NIST SP 800-53 Rev. 5.2.0 (1,196 controls with enhancements) imports from a pinned <code>oscal-content</code> commit in 0.7 s.</li>
+    <li>TypeScript 7 checks a 5,000-entry code list, with its key type, in 0.18 s and 85 MB, linear in its entries.</li>
   </ul>
 
   <h3>Still to verify</h3>
   <ul>
-    <li>Each remaining candidate importer's license and redistribution terms (DPV, SPDX, CycloneDX, FHIR, NIEM), before its first import.</li>
-    <li>Where the OSCAL JSON Schemas are published in the release artifacts, so the first OSCAL importer can pin them.</li>
+    <li>The licenses and redistribution terms of the remaining candidate importers (DPV, SPDX, CycloneDX, FHIR, NIEM), before each first import; SPDX 3 could not be fetched from this environment, so its <code>Hash</code> terms remain a candidate, not a claim.</li>
+    <li>That the GitHub Actions run, which installs the independent validators and fetches schema.org directly, is green on the branch.</li>
   </ul>
 </section>
 
@@ -771,6 +779,7 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
     <tr><td>13</td><td>Imports only when necessary; exports to well-known forms; upstream contributions are prepared as bundles and never published without a person.</td></tr>
     <tr><td>14</td><td>Non-TypeScript tools state the platforms they support; their tests run only there.</td></tr>
     <tr><td>15</td><td>Trace and layers stay in the kernel as pure functions; <code>commons/ts/mizan/</code> imports them; <code>spec-kit-check.ts</code> remains a wrapper for one repin cycle.</td></tr>
+    <tr><td>16</td><td>The 13 <code>unaligned</code> terms of Mizan stay <code>unaligned</code>, due within 90 days; schema.org is fetched by pinned hash and not vendored; the work continues through Phase 5 and waits for confirmation before Phase 6; a push to <code>main</code> happens only when a person says so.</td></tr>
   </table></div>
 </section>
 
