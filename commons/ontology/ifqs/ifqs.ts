@@ -45,7 +45,7 @@ import {
   XSD,
   xsd,
 } from "../../ts/kernel/rdf.ts";
-import { bases, MZ, MZID, OntologyTerm } from "../mizan/mizan.ts";
+import { bases, KEPT_UNALIGNED_SENTENCE, keptUnalignedDecision, keptUnalignedDecisionId, MZ, MZID, OntologyTerm } from "../mizan/mizan.ts";
 
 /** The namespace of IFQS's terms. */
 export const IFQS = namespace("ifqs", "https://www.intellectualfrontiers.com/ontology/ifqs#");
@@ -441,7 +441,8 @@ function unaligned(local: keyof typeof ifqs, justification: string, definedBy: s
     label: en(`ifqs:${local}`),
     termIri: ifqs[local].iri,
     basis: bases.Unaligned,
-    justification: `${justification} Decision pending (0018-standards-first FR-005).`,
+    justification: `${justification} ${KEPT_UNALIGNED_SENTENCE}`,
+    decision: keptUnalignedDecisionId("ifqs", local),
     addedOn: DAY,
     definedBy: [definedBy],
   });
@@ -477,6 +478,9 @@ export const terms = [
   specializes("AssessorPack", dcat.Dataset.iri, "0022-trust FR-010"),
 ] as const;
 
+/** The decisions of the terms kept unaligned (the owner's decision of 2026-11-17, issue #10). */
+export const decisions = [keptUnalignedDecision("ifqs", "QualityObjective"), keptUnalignedDecision("ifqs", "ReviewDebt")] as const;
+
 /** The file this module states: its name, its prefixes and its individuals. */
 export const file: OntologyFile = {
   name: "ifqs",
@@ -493,5 +497,6 @@ export const file: OntologyFile = {
     ...Object.values(qualityTiers),
     ...Object.values(audiences),
     ...terms,
+    ...decisions,
   ],
 };

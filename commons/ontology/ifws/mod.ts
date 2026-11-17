@@ -7,11 +7,11 @@
 import { DCTERMS, OWL, PROV, RDFS, SKOS, XSD, type OntologyFile } from "../../ts/kernel/rdf.ts";
 import { MZ, MZID } from "../mizan/mizan.ts";
 import { SCHEMA } from "../supply-chain/packaging/schema.auto.ts";
-import { terms } from "./audit.ts";
+import { decisions, terms } from "./audit.ts";
 import * as ifws from "./ifws.ts";
 
 export * from "./ifws.ts";
-export { AUDITED_ON, terms } from "./audit.ts";
+export { AUDITED_ON, decisions, terms } from "./audit.ts";
 
 /** The file this ontology states: its name, its prefixes, its classes, properties and code lists, and the audit record of each class. */
 export const file: OntologyFile = {
@@ -29,6 +29,7 @@ export const file: OntologyFile = {
     ...Object.values(ifws.moduleSources),
     ...Object.values(ifws.exitStatuses),
     ...terms,
+    ...decisions,
   ],
 };
 

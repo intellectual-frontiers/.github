@@ -17,7 +17,7 @@
 import { absurd } from "../../ts/kernel/absurd.ts";
 import { en, type Named, prov, term } from "../../ts/kernel/rdf.ts";
 import { CLASS_NAMES, dcat, ifws, provPlan } from "./ifws.ts";
-import { bases, type MAPPING_RELATIONS, MZID, OntologyTerm } from "../mizan/mizan.ts";
+import { bases, KEPT_UNALIGNED_SENTENCE, keptUnalignedDecision, keptUnalignedDecisionId, type MAPPING_RELATIONS, MZID, OntologyTerm } from "../mizan/mizan.ts";
 import { schema } from "../supply-chain/packaging/schema.auto.ts";
 
 /** The day the audit was made, from which the decision of each `unaligned` term is due (0018-standards-first FR-005). */
@@ -131,7 +131,8 @@ const BASIS: Readonly<Record<ClassName, Basis>> = {
   ExitStatus: {
     kind: "unaligned",
     spec: "0025-ifws FR-010",
-    examined: "POSIX gives 0 for success and non-zero for failure, and BSD's sysexits.h gives EX_USAGE as 64; none gives ok, findings, usage and environment as 0 to 3",
+    examined:
+      "POSIX gives 0 for success and non-zero for failure, and the BSD header sysexits.h gives named codes (EX_OK 0, EX_USAGE 64, EX_UNAVAILABLE 69, EX_SOFTWARE 70, EX_CONFIG 78 and others); none gives ok, findings, usage and environment as 0 to 3. IFWS's 0, 1, 2 and 3 follow the shell convention (1 is a general failure, here findings; 2 is a misuse of the command, as in the Bash builtins and GNU tools), not sysexits.h, whose usage code is 64; the four values are few, kept apart on purpose, and a caller reads them without a table",
   },
   Setup: { kind: "specializes", standard: prov.Activity, spec: "0025-ifws FR-017" },
 };
@@ -166,7 +167,8 @@ function record(local: ClassName) {
       return OntologyTerm.make(id, {
         ...base,
         basis: bases.Unaligned,
-        justification: `No standard adopted yet. Examined: ${b.examined}. Decision pending (0018-standards-first FR-005).`,
+        justification: `No standard adopted yet. Examined: ${b.examined}. ${KEPT_UNALIGNED_SENTENCE}`,
+        decision: keptUnalignedDecisionId("ifws", local),
         addedOn: AUDITED_ON,
       });
     default:
@@ -176,3 +178,9 @@ function record(local: ClassName) {
 
 /** One record for every class and code-list class of the IFWS vocabulary, in the order of `CLASS_NAMES`. */
 export const terms = CLASS_NAMES.map(record);
+
+/** The classes the owner decided on 2026-11-17 (issue #10) to keep unaligned: every class of the audit whose basis is `unaligned`. */
+const KEPT_UNALIGNED = ["Workspace", "GitManager", "GitManagerKind", "GitCapability", "RepoState", "ActionKind", "ModuleSource", "ExitStatus"] as const satisfies readonly ClassName[];
+
+/** The `mz:Decision` of each class kept unaligned, to state beside the audit records. */
+export const decisions = KEPT_UNALIGNED.map((local) => keptUnalignedDecision("ifws", local));

@@ -1,17 +1,6 @@
 # The findings of the rules Mizan adds (commons 0003-mizan FR-015) that existed when each rule was first held.
 # A new finding fails the check, and so does a line below that no longer occurs: when you fix one, delete its line.
 # Never add a line to make a check pass.
-mizan/decision-missing https://www.intellectualfrontiers.com/ontology/ifccm#Capability
-mizan/decision-missing https://www.intellectualfrontiers.com/ontology/ifqs#QualityObjective
-mizan/decision-missing https://www.intellectualfrontiers.com/ontology/ifqs#ReviewDebt
-mizan/decision-missing https://www.intellectualfrontiers.com/ontology/ifws#ActionKind
-mizan/decision-missing https://www.intellectualfrontiers.com/ontology/ifws#ExitStatus
-mizan/decision-missing https://www.intellectualfrontiers.com/ontology/ifws#GitCapability
-mizan/decision-missing https://www.intellectualfrontiers.com/ontology/ifws#GitManager
-mizan/decision-missing https://www.intellectualfrontiers.com/ontology/ifws#GitManagerKind
-mizan/decision-missing https://www.intellectualfrontiers.com/ontology/ifws#ModuleSource
-mizan/decision-missing https://www.intellectualfrontiers.com/ontology/ifws#RepoState
-mizan/decision-missing https://www.intellectualfrontiers.com/ontology/ifws#Workspace
 mizan/decision-missing https://www.intellectualfrontiers.com/ontology/mizan#Authority
 mizan/decision-missing https://www.intellectualfrontiers.com/ontology/mizan#Basis
 mizan/decision-missing https://www.intellectualfrontiers.com/ontology/mizan#Decision
@@ -24,7 +13,6 @@ mizan/decision-missing https://www.intellectualfrontiers.com/ontology/mizan#Juri
 mizan/decision-missing https://www.intellectualfrontiers.com/ontology/mizan#OntologyTerm
 mizan/decision-missing https://www.intellectualfrontiers.com/ontology/mizan#Requirement
 mizan/decision-missing https://www.intellectualfrontiers.com/ontology/mizan#Rung
-mizan/decision-missing https://www.intellectualfrontiers.com/ontology/mizan#RungKind
 mizan/decision-missing https://www.intellectualfrontiers.com/ontology/mizan#Spec
 mizan/decision-missing https://www.intellectualfrontiers.com/ontology/packaging#Assurance
 mizan/decision-missing https://www.intellectualfrontiers.com/ontology/packaging#Checksum

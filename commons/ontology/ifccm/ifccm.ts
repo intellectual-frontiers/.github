@@ -44,7 +44,7 @@ import {
   XSD,
   xsd,
 } from "../../ts/kernel/rdf.ts";
-import { bases, cfr11, cfr820, MZ, MZID, mz, OntologyTerm } from "../mizan/mizan.ts";
+import { bases, cfr11, cfr820, KEPT_UNALIGNED_SENTENCE, keptUnalignedDecision, keptUnalignedDecisionId, MZ, MZID, mz, OntologyTerm } from "../mizan/mizan.ts";
 
 /** The namespace of IFCCM's terms. */
 export const IFCCM = namespace("ifccm", "https://www.intellectualfrontiers.com/ontology/ifccm#");
@@ -451,7 +451,8 @@ export const terms = [
     termIri: ifccm.Capability.iri,
     basis: bases.Unaligned,
     justification:
-      "Examined: the ArchiMate and UAF 'capability' elements (an ability of an organization or system, as here) and ISO/IEC/IEEE 15288 and 12207 (system capability); none publishes an IRI, and Spec Kit's 'feature' is the term this one replaces. Candidates to examine further: a published ArchiMate or UAF vocabulary (to verify). Decision pending (0018-standards-first FR-005).",
+      `Examined: the ArchiMate and UAF 'capability' elements (an ability of an organization or system, as here) and ISO/IEC/IEEE 15288 and 12207 (system capability); none publishes an IRI, and Spec Kit's 'feature' is the term this one replaces. Candidates to examine further: a published ArchiMate or UAF vocabulary (to verify). ${KEPT_UNALIGNED_SENTENCE}`,
+    decision: keptUnalignedDecisionId("ifccm", "Capability"),
     addedOn: DAY,
     definedBy: ["0020-ifccm FR-001"],
   }),
@@ -470,6 +471,9 @@ export const terms = [
   specializes("AuthorityFunction", SKOS_CONCEPT, "0020-ifccm FR-018"),
 ] as const;
 
+/** The decisions of the terms kept unaligned (the owner's decision of 2026-11-17, issue #10). */
+export const decisions = [keptUnalignedDecision("ifccm", "Capability")] as const;
+
 /** The file this module states: its name, its prefixes and its individuals. */
 export const file: OntologyFile = {
   name: "ifccm",
@@ -487,5 +491,6 @@ export const file: OntologyFile = {
     ...Object.values(traceStages),
     ...Object.values(authorityFunctions),
     ...terms,
+    ...decisions,
   ],
 };

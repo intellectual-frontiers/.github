@@ -478,13 +478,40 @@ export const termRung = OntologyTerm.make(term(MZID, "term-Rung"), {
   definedBy: ["0016-ladder FR-001"],
 });
 
-/** The classes whose standards, if any, have not been examined yet: unaligned, with the candidates to examine named, until the audit closes. */
-function pending(name: string, candidate: string, spec: string) {
+/** The day of the owner's decision to keep twelve terms unaligned (issue #10), and the day it is reviewed again by. */
+export const KEPT_UNALIGNED_ON = "2026-11-17";
+/** The day by which a term kept unaligned is looked at again. */
+export const KEPT_UNALIGNED_REVIEW_BY = "2027-02-15";
+
+/** The sentence a term kept unaligned carries in place of "Decision pending" (0018-standards-first FR-005). */
+export const KEPT_UNALIGNED_SENTENCE = `Kept unaligned by the owner's decision of ${KEPT_UNALIGNED_ON} (issue #10); reviewed again by ${KEPT_UNALIGNED_REVIEW_BY}.`;
+
+/**
+ * The `mz:Decision` of a term kept unaligned (0018-standards-first FR-005): the individual `decision-<ontology>-<local>`, which says of the term with the record
+ * `term-<ontology>-<local>` (`term-<local>` for Mizan's own) that it stays unaligned; the audit record of the term points to it with `mz:decision`.
+ */
+export function keptUnalignedDecision(ontology: "mz" | "ifccm" | "ifqs" | "ifws", local: string) {
+  return Decision.make(term<"mz:Decision">(MZID, `decision-${ontology}-${local}`), {
+    label: en(`Keep ${ontology}:${local} unaligned`),
+    decisionOf: term<"mz:OntologyTerm">(MZID, ontology === "mz" ? `term-${local}` : `term-${ontology}-${local}`),
+    decidedOn: KEPT_UNALIGNED_ON,
+    record: `owner decision of ${KEPT_UNALIGNED_ON} in issue #10: keep the term unaligned; reviewed again by ${KEPT_UNALIGNED_REVIEW_BY}`,
+  });
+}
+
+/** The identifier of the decision of a term kept unaligned, for the audit record to point to (`mz:decision`). */
+export function keptUnalignedDecisionId(ontology: "mz" | "ifccm" | "ifqs" | "ifws", local: string) {
+  return term<"mz:Decision">(MZID, `decision-${ontology}-${local}`);
+}
+
+/** The classes whose standards, if any, have not been examined yet: unaligned, with the candidates to examine named, until the audit closes; `kept` where the owner decided to keep it so. */
+function pending(name: string, candidate: string, spec: string, kept = false) {
   return OntologyTerm.make(term(MZID, `term-${name}`), {
     label: en(`mz:${name}`),
     termIri: `https://www.intellectualfrontiers.com/ontology/mizan#${name}`,
     basis: bases.Unaligned,
-    justification: `No standard adopted yet. Candidates to examine: ${candidate}. Decision pending (0018-standards-first FR-005).`,
+    justification: `No standard adopted yet. Candidates to examine: ${candidate}. ${kept ? KEPT_UNALIGNED_SENTENCE : "Decision pending (0018-standards-first FR-005)."}`,
+    ...(kept ? { decision: keptUnalignedDecisionId("mz", name) } : {}),
     addedOn: "2026-11-17",
     definedBy: [spec],
   });
@@ -502,13 +529,16 @@ export const pendingTerms = [
   pending("Decision", "none found; architecture decision records are documents, not a vocabulary", "0018-standards-first FR-005"),
   pending("Exception", "none found", "0017-two-languages FR-004"),
   pending("Integration", "schema:SoftwareApplication (to verify)", "0019-mizan-integrations FR-002"),
-  pending("RungKind", "none found", "0016-ladder FR-008"),
+  pending("RungKind", "none found", "0016-ladder FR-008", true),
   pending("IntegrationDirection", "none found", "0019-mizan-integrations FR-002"),
   pending("ImportRecord", "prov:Activity (to verify)", "0019-mizan-integrations FR-009"),
 ] as const;
 
 /** The first baseline of Mizan's own vocabulary: every class and the basis it rests on. */
 export const terms = [termStandard, termRung, ...pendingTerms] as const;
+
+/** The decisions of the terms kept unaligned (the owner's decision of 2026-11-17, issue #10): one `mz:Decision` for each. */
+export const decisions = [keptUnalignedDecision("mz", "RungKind")] as const;
 
 /** The file this module states: its name, its prefixes and its individuals. */
 export const file: OntologyFile = {
@@ -526,5 +556,6 @@ export const file: OntologyFile = {
     unitedStates,
     ...authorities,
     ...terms,
+    ...decisions,
   ],
 };
