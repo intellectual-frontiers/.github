@@ -60,9 +60,30 @@ export function native(home: string, path: string): string {
   return nativePath(home, path as RepoPath, sep === "\\" ? "\\" : "/"); // a path of the workspace is made only of portable segments
 }
 
-/** Whether a run may pin an artifact on `http` to the loopback interface: only where the environment says so (`IFWS_ALLOW_LOOPBACK_HTTP=1`), for a person's own local mirror or a test's own server. */
+/**
+ * Whether a run may pin an artifact on `http` to the loopback interface: only where the environment says so (`IFWS_ALLOW_LOOPBACK_HTTP=1`), for a person's own local mirror or a test's own server.
+ *
+ * @remarks
+ * A stopgap until a test certificate authority replaces it (0023-if-workspaces Assumptions): while it is on, every command that honors it says so (`LOOPBACK_NOTICE`) and the run's report holds `loopbackFinding`.
+ */
 export function loopbackAllowed(env: Readonly<Record<string, string | undefined>>): boolean {
   return env["IFWS_ALLOW_LOOPBACK_HTTP"] === "1";
+}
+
+/** The one line a command that honors `IFWS_ALLOW_LOOPBACK_HTTP` writes on standard error while it is set (0023-if-workspaces FR-037). */
+export const LOOPBACK_NOTICE =
+  "ifws: IFWS_ALLOW_LOOPBACK_HTTP is set: http to the loopback interface is accepted (the SHA-256 is still checked)";
+
+/** The informational finding that records, in the report of the run, that the loopback switch was on. */
+export function loopbackFinding(today: string): Finding {
+  return {
+    ruleId: "ifws/loopback-http",
+    severity: "Informational",
+    message:
+      "IFWS_ALLOW_LOOPBACK_HTTP is set: http to the loopback interface was accepted for pinned artifacts (the SHA-256 is still checked)",
+    subject: "IFWS_ALLOW_LOOPBACK_HTTP",
+    firstSeen: today,
+  };
 }
 
 /** Where the manifest is. */

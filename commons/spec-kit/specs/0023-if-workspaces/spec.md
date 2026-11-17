@@ -64,7 +64,7 @@
 
 ## Tools
 
-- **FR-037**: The tool catalog (`ifws:ToolCatalog`) MUST be in the manifest and MUST hold, for each `ifws:Tool`, its name, one pinned version (never `latest` and never a range), what it provides and, for each operating system and architecture, an `https` URL and a SHA-256.
+- **FR-037**: The tool catalog (`ifws:ToolCatalog`) MUST be in the manifest and MUST hold, for each `ifws:Tool`, its name, one pinned version (never `latest` and never a range), what it provides and, for each operating system and architecture, an `https` URL and a SHA-256; WHERE the environment sets `IFWS_ALLOW_LOOPBACK_HTTP=1`, an `http` URL to the loopback interface MAY be pinned too (the SHA-256 is still checked), every command that honors the switch MUST write on standard error the one line `ifws: IFWS_ALLOW_LOOPBACK_HTTP is set: http to the loopback interface is accepted (the SHA-256 is still checked)`, and the report of the run MUST hold a finding of severity informational (`ifws/loopback-http`).
 - **FR-038**: IFWS MUST verify `git`, `bun` and `node` by a probe of their versions and MUST NOT install them; Bun is the default runtime, Node 26 the backup, and Deno is not a runtime of IFWS.
 - **FR-039**: IFWS MUST install a tool only from a pinned artifact of the catalog, into `<home>/.if-workspaces/tools/<name>/<version>/`, after the SHA-256 of the downloaded bytes equals the pin, and MUST refuse, writing nothing, an artifact whose hash differs.
 - **FR-040**: The catalog MUST be expressible as OSCAL `inventory-item`s and the inventory of what is installed as SPDX and as CycloneDX, so that the workspace's configuration and its tools can be given to an assessor in those forms.
@@ -134,6 +134,7 @@
 - chezmoi (Tom Payne and contributors, MIT license) is credited as inspiration for ideas only; IFWS never calls it or depends on it (FR-046).
 - `git`, `bun` and `node` are the user's own: IFWS verifies them and tells how to install them (FR-038).
 - Pinned artifacts for each operating system and architecture are published by their projects with a checksum IFWS can pin (FR-039).
+- `IFWS_ALLOW_LOOPBACK_HTTP` (FR-037) is a stopgap, kept for a person's own local mirror and for the tests' own servers, until a test certificate authority lets those servers speak `https`; it is then removed. It is never on by default, and it is never silent.
 
 ## Open questions
 
