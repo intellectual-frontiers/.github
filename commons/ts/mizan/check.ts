@@ -14,49 +14,25 @@
  */
 import { fileURLToPath } from "node:url";
 import process from "node:process";
-import { formatBaseline, judge, parseBaseline, passes, report } from "../kernel/trace.ts";
-import { existsSync, readDirSync, readTextFileSync, writeTextFileSync } from "../runtime/fs.ts";
-import { stdio } from "../runtime/mod.ts";
 import { packagingTerms } from "../../ontology/audit/mod.ts";
 import { bases, classes, jurisdictionLevels, integrationDirections, mz, terms } from "../../ontology/mizan/mod.ts";
 import { pm } from "../../ontology/supply-chain/packaging/mod.ts";
-import { type MizanFinding, mizanFindings, type RulePlugin, rulePlugins, type SpecText } from "./rules.ts";
-import { specTermFindings } from "./spec-terms.ts";
-import { basisMissing, type BasisKind, termFindings, type TermRecord } from "./standards.ts";
+import { type RulePlugin, rulePlugins } from "./rules.ts";
+import { holdHarness } from "./harness.ts";
+import { BASELINE_COMMENTS, readSpecTexts } from "./spec-files.ts";
+import type { BasisKind, TermRecord } from "./standards.ts";
 
-/** The specifications of a folder (`root/specs/NNNN-slug/spec.md`, and `plan.md` where there is one), in the order of their names. */
-export function readSpecTexts(root: string): readonly SpecText[] {
-  const specs = `${root.replace(/[\\/]$/, "")}/specs`;
-  if (!existsSync(specs)) return [];
-  const out: SpecText[] = [];
-  for (const e of readDirSync(specs).sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))) {
-    if (!e.isDirectory || !existsSync(`${specs}/${e.name}/spec.md`)) continue;
-    const plan = existsSync(`${specs}/${e.name}/plan.md`) ? readTextFileSync(`${specs}/${e.name}/plan.md`) : undefined;
-    out.push({
-      slug: e.name,
-      spec: readTextFileSync(`${specs}/${e.name}/spec.md`).replaceAll("\r\n", "\n"),
-      ...(plan === undefined ? {} : { plan: plan.replaceAll("\r\n", "\n") }),
-    });
-  }
-  return out;
-}
+export { BASELINE_COMMENTS, readSpecTexts };
 
-/** The comment lines a baseline file begins with. */
-export const BASELINE_COMMENTS = [
-  "The findings of the rules Mizan adds (commons 0003-mizan FR-015) that existed when each rule was first held.",
-  "A new finding fails the check, and so does a line below that no longer occurs: when you fix one, delete its line.",
-  "Never add a line to make a check pass.",
-] as const;
-
-/** Mizan's own terms as the rules read them: each class of its vocabulary and the basis it rests on (0018-standards-first FR-003 to FR-005). */
-export function mizanTermRecords(): readonly TermRecord[] {
+/** The records of an audit of terms as the rules read them: each term of a vocabulary and the basis it rests on (0018-standards-first FR-003 to FR-005). */
+export function termRecordsOf(audit: readonly (typeof terms)[number][]): readonly TermRecord[] {
   const kinds = new Map<string, BasisKind>([
     [bases.Adopts.iri, "adopts"],
     [bases.Specializes.iri, "specializes"],
     [bases.Maps.iri, "maps"],
     [bases.Unaligned.iri, "unaligned"],
   ]);
-  return [...terms, ...packagingTerms].map((t) => ({
+  return audit.map((t) => ({
     iri: t.values.termIri,
     basis: kinds.get(t.values.basis.iri) ?? "unaligned",
     ...(t.values.standardTerm === undefined ? {} : { standardTerm: t.values.standardTerm }),
@@ -66,6 +42,11 @@ export function mizanTermRecords(): readonly TermRecord[] {
     ...(t.values.deprecatedOn === undefined ? {} : { deprecatedOn: t.values.deprecatedOn }),
     ...(t.values.replacedBy === undefined ? {} : { replacedBy: t.values.replacedBy }),
   }));
+}
+
+/** Mizan's own terms and the packaging ontology's as the rules read them. */
+export function mizanTermRecords(): readonly TermRecord[] {
+  return termRecordsOf([...terms, ...packagingTerms]);
 }
 
 /** The CURIE of a term of commons' own ontologies: `mz:` or `pm:` and its local name, or the IRI where it is of neither. */
@@ -98,56 +79,41 @@ export function main(
     return i >= 0 ? argv[i + 1] : undefined;
   };
   const root = arg("--root") ?? fileURLToPath(new URL("../../spec-kit", import.meta.url));
-  const baselineFile = arg("--baseline") ?? `${root.replace(/[\\/]$/, "")}/mizan.baseline.txt`;
-  // commons' own folder (no --root) also holds its ontologies to the standards rules; a decision overdue, and a term with no record of its basis, fail whatever the baseline holds
-  // (0018-standards-first FR-003, FR-005)
-  const own =
-    arg("--root") === undefined
-      ? [
-          ...termFindings(mizanTermRecords(), arg("--today") ?? today, "commons/ontology"),
-          ...basisMissing(
-            Object.values(pm).map((t) => t.iri),
-            packagingTerms.map((t) => t.values.termIri),
-            "commons/ontology/audit/packaging.ts",
-          ),
-          ...basisMissing(
-            classes.map((c) => c.iri),
-            terms.map((t) => t.values.termIri),
-            "commons/ontology/mizan/mizan.ts",
-          ),
-        ]
-      : [];
-  const always = (f: MizanFinding): boolean => f.rule === "mizan/decision-overdue" || f.rule === "mizan/term-basis-missing";
-  const overdue = own.filter(always);
-  const specs = readSpecTexts(root);
-  // commons' own specifications name terms of its own ontologies: they must be defined (0018-standards-first FR-001)
-  const named =
-    arg("--root") === undefined
-      ? specTermFindings(
-          specs,
-          {
-            mz: new Set([
-              ...Object.keys(mz),
-              ...Object.keys(bases),
-              ...Object.keys(jurisdictionLevels),
-              ...Object.keys(integrationDirections),
-            ]),
-            pm: new Set(Object.keys(pm)),
+  const own = arg("--root") === undefined;
+  return holdHarness({
+    root,
+    baselineFile: arg("--baseline") ?? `${root.replace(/[\\/]$/, "")}/mizan.baseline.txt`,
+    today: arg("--today") ?? today,
+    plugins,
+    writeBaseline: argv.includes("--write-baseline"),
+    // commons' own folder (no --root) also holds its ontologies to the standards rules (0018-standards-first FR-001, FR-003, FR-005)
+    ...(own
+      ? {
+          terms: mizanTermRecords(),
+          termsFile: "commons/ontology",
+          completeness: [
+            {
+              file: "commons/ontology/audit/packaging.ts",
+              ontology: Object.values(pm).map((t) => t.iri),
+              recorded: packagingTerms.map((t) => t.values.termIri),
+            },
+            { file: "commons/ontology/mizan/mizan.ts", ontology: classes.map((c) => c.iri), recorded: terms.map((t) => t.values.termIri) },
+          ],
+          specTerms: {
+            known: {
+              mz: new Set([
+                ...Object.keys(mz),
+                ...Object.keys(bases),
+                ...Object.keys(jurisdictionLevels),
+                ...Object.keys(integrationDirections),
+              ]),
+              pm: new Set(Object.keys(pm)),
+            },
+            deprecated: deprecatedTerms(),
           },
-          deprecatedTerms(),
-        )
-      : [];
-  const found: readonly MizanFinding[] = [...mizanFindings(specs, plugins), ...named, ...own.filter((f) => !always(f))];
-  if (argv.includes("--write-baseline")) {
-    writeTextFileSync(baselineFile, formatBaseline(found, BASELINE_COMMENTS));
-    stdio.stdout.writeSync(`wrote ${baselineFile}: ${new Set(found.map((f) => f.key)).size} findings\n`);
-    return 0;
-  }
-  const held = existsSync(baselineFile) ? parseBaseline(readTextFileSync(baselineFile)) : [];
-  const judged = judge(found, held);
-  const verdict = { ...judged, fresh: [...judged.fresh, ...overdue] };
-  stdio.stderr.writeSync(`${report(verdict, "mizan-rules", baselineFile).join("\n")}\n`);
-  return passes(verdict) ? 0 : 1;
+        }
+      : {}),
+  });
 }
 
 if (import.meta.main) process.exitCode = main(process.argv.slice(2));

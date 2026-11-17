@@ -43,6 +43,7 @@ requirement	mechanism	by	note
 0003-mizan FR-018	check	.github: bun test ./tests/	Mizan ontology: the Turtle is current, a stale file is named with exit 1, a broken ontology stops with exit 2
 0003-mizan FR-019	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: the command run as a program: new, held and stale findings, a plugin added beside the rules
 0003-mizan FR-020	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: an undefined prefixed name is found once with its line, a prefix that is not given is not read, and commons' own specifications are read for real
+0003-mizan FR-040	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: a harness folder with its own audit is held: a term with no record fails, a missing decision is held by the baseline, an overdue one fails, a specification naming an undefined term is found; stolos runs it on itself
 0002-packaging FR-016	check	.github: bun test ./tests/	Record: the fields, their order and their values, as the TypeScript module carries them; Generator: a bad field is refused
 0004-rules FR-001	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
 0004-rules FR-002	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script

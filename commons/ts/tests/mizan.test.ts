@@ -16,6 +16,7 @@ import { en, named, iriIn, OWL, OwlOntology, ontologyOf, RDFS, triplesOf, turtle
 import { exportHtmlView } from "../mizan/integrations/pure/export-html.ts";
 import { pm } from "../../ontology/supply-chain/packaging/mod.ts";
 import { basisMissing, daysBetween, termFindings } from "../mizan/standards.ts";
+import { holdHarness } from "../mizan/harness.ts";
 import { specTermFindings } from "../mizan/spec-terms.ts";
 import { readSpecTexts } from "../mizan/check.ts";
 
@@ -401,5 +402,47 @@ proves(
     assertStringIncludes(html, '<span class="chip unaligned">unaligned</span>');
     assertStringIncludes(html, "https://x/o/1");
     assert(!html.includes("<b>title"), "no raw markup from the data");
+  },
+);
+
+proves(
+  ["0003-mizan FR-040"],
+  "a harness holds its own specifications and its own audit through holdHarness: a missing record fails whatever the baseline holds, a missing decision is held, one overdue fails",
+  () => {
+    const dir = makeTempDirSync({ prefix: "mizan-harness-" });
+    try {
+      mkdirSync(`${dir}/specs/0001-x`, { recursive: true });
+      writeTextFileSync(
+        `${dir}/specs/0001-x/spec.md`,
+        "# Feature Specification: X\n\n- **FR-001**: It MUST work with `h:Gone` and `h:Here`.\n",
+      );
+      const base = {
+        root: dir,
+        baselineFile: `${dir}/mizan.baseline.txt`,
+        name: "harness",
+        termsFile: "ontology/audit.ts",
+        specTerms: { known: { h: new Set(["Here"]) } },
+        terms: [
+          { iri: "https://h/Here", basis: "unaligned" as const, justification: "none found", addedOn: "2026-11-17", decision: false },
+        ],
+        completeness: [{ file: "ontology/h.ts", ontology: ["https://h/Here"], recorded: ["https://h/Here"] }],
+      };
+      assertEquals(holdHarness({ ...base, today: "2026-11-18" }), 1);
+      assertEquals(holdHarness({ ...base, today: "2026-11-18", writeBaseline: true }), 0);
+      assertStringIncludes(readTextFileSync(`${dir}/mizan.baseline.txt`), "mizan/spec-term-unknown specs/0001-x/spec.md h:Gone");
+      assertStringIncludes(readTextFileSync(`${dir}/mizan.baseline.txt`), "mizan/decision-missing https://h/Here");
+      assertEquals(holdHarness({ ...base, today: "2026-11-19" }), 0);
+      assertEquals(holdHarness({ ...base, today: "2027-03-01" }), 1);
+      assertEquals(
+        holdHarness({
+          ...base,
+          today: "2026-11-19",
+          completeness: [{ file: "ontology/h.ts", ontology: ["https://h/Here", "https://h/New"], recorded: ["https://h/Here"] }],
+        }),
+        1,
+      );
+    } finally {
+      removeSync(dir, { recursive: true });
+    }
   },
 );

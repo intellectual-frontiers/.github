@@ -5,10 +5,13 @@
  *
  * @module
  */
-export { BASELINE_COMMENTS, readSpecTexts } from "./check.ts";
+export { BASELINE_COMMENTS, readSpecTexts } from "./spec-files.ts";
+export { holdHarness, type HarnessInput } from "./harness.ts";
+export { termRecordsOf } from "./check.ts";
+export { type KnownTerms, specTermFindings } from "./spec-terms.ts";
 export * as integrations from "./integrations/mod.ts";
 export { digestOf, findingsOf, RUN, TURTLE_PATH, turtleOf } from "./generate-ontology.ts";
-export { daysBetween, GRACE_DAYS, termFindings, type BasisKind, type TermRecord } from "./standards.ts";
+export { basisMissing, daysBetween, GRACE_DAYS, termFindings, type BasisKind, type TermRecord } from "./standards.ts";
 export {
   earsPatternOf,
   type EarsPattern,
