@@ -8,7 +8,7 @@
  */
 import { mkdir, readDirSync, readTextFileSync, withTempDir, writeTextFile } from "../runtime/fs.ts";
 import { dirname, fromFileUrl, join, resolve } from "../runtime/path.ts";
-import { run, which } from "../runtime/proc.ts";
+import { build, run, which } from "../runtime/proc.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
 import { settingsOf } from "../workspaces/desired.ts";
 import { decodeManifest, type Manifest } from "../workspaces/manifest.ts";
@@ -16,7 +16,10 @@ import { checkFiles, generated, headerText } from "../workspaces/render.ts";
 import { renderAll, type TemplateData } from "../workspaces/templates/mod.ts";
 
 const ROOT = resolve(dirname(fromFileUrl(import.meta.url)), "..");
-const skipSh = which("sh") === undefined ? { skip: "sh is not installed" } : {};
+const skipSh =
+  which("sh") === undefined || build.os === "windows"
+    ? { skip: "sh is not installed, or this is Windows, where Git for Windows runs the hooks and the tests here do not" }
+    : {};
 
 function manifestOf(input: unknown): Manifest {
   const r = decodeManifest(input);

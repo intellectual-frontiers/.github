@@ -8,7 +8,7 @@
  */
 import { mkdir, withTempDir, writeTextFile } from "../runtime/fs.ts";
 import { join } from "../runtime/path.ts";
-import { run, which } from "../runtime/proc.ts";
+import { build, run, which } from "../runtime/proc.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
 import { BEGIN, END, installBlock, removeBlock } from "../workspaces/shell/block.ts";
 import { rcFileFor, SHELLS, snippetFor, type Completions, type Shell } from "../workspaces/shell/snippet.ts";
@@ -19,7 +19,10 @@ const COMPLETIONS: Completions = [
   { module: "shell", commands: ["shell"] },
 ];
 const facts = { home: { kind: "default" } as const, completions: COMPLETIONS };
-const skipBash = which("bash") === undefined ? { skip: "bash is not installed" } : {};
+const skipBash =
+  which("bash") === undefined || build.os === "windows"
+    ? { skip: "bash is not installed, or this is Windows, where find and the paths are not Unix's" }
+    : {};
 
 proves(
   ["0024-ifws-host FR-018"],
