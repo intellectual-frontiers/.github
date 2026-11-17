@@ -112,6 +112,8 @@
 
 - **FR-045**: The records of Tier 2 (a test plan registered, a sample drawn, a person's attestation of it and a mutation run) MUST each be a file of the ledger of FR-043, in its chain, and an event that does not follow what came before MUST be refused and written nowhere: an attestation of a sample that gives no result on an item sampled, a result on an item not sampled, no named person, or a second attestation; a plan with no case or a case with no acceptance criterion; a mutation row that does not account for its mutants. A sample MUST record its rule, its seed and the count and digest of its population, so that it can be drawn again, and a run that is governed by a plan MUST name it by the SHA-256 of the plan (`ifc.quality.plan.sha256`).
 - **FR-046**: The strength of a proof (FR-040) MUST be the share of its mutants that its tests detected, and a strength below the floor the harness states (60 % where it states none, and 80 % where it declares a regulated domain and has declared production, a floor it states for itself never lowering that one; a pure function of the declaration and the day, `mutationFloor`) MUST lower the grade of a proof that is a run by one rung, `E4` to `E3` and `E3` to `E2`, with both shown; a grade that is not a run's, and a proof that no mutation run measured, MUST keep its grade and say which.
+- **FR-047**: A harness's record (`ifccm.declaration.ts`, 0020-ifccm FR-010) MUST be able to state the retention period of its evidence in days (`retentionDays`, a whole number of at least one), and the period a harness states MUST NOT be shorter than the longest retention that applies to its evidence. Evidence MUST be kept on the `quality` branch for that period and, once the period of the oldest evidence has passed, MUST be archived by a Git tag on the tip of the branch (`quality archive --tag NAME`), never deleted: no command of the quality system deletes a file, a commit, a tag or the branch, and a tag that exists MUST NOT be moved or replaced. Where the record states no period the command MUST refuse and say so. The period and the day are arguments of the pure judgement; the command reads the day from the clock.
+- **FR-048**: The review debt of FR-023 MUST be counted apart for what rests on an agent's statement or review (`reviewDebtByAgent`) and for what rests on a person's (`reviewDebtByPerson`), because an agent's review is graded below a test run (FR-024); the total MUST remain, as the sum of the two, and a count of proved requirements, the proof register, the index and the Trust page MUST show the total with both.
 
 ## Acceptance scenarios
 
@@ -161,6 +163,7 @@
 - Where evidence is graded `E5`, the probe is the harness's own and its record is made as FR-013 says.
 - Mutation testing (FR-040) is not yet an ISO or IEEE standard's requirement of a test record; its results are a record attribute until one names them.
 - Standards are cited by identifier and clause only; their text is not copied (0018-standards-first FR-007).
+- Evidence is archived by a tag and never deleted (owner decision of 2026-11-17, issue #10): the retention period is the harness's to state in its record, never shorter than the longest retention that applies to its evidence; `quality archive` only adds a tag.
 - A repository has one `quality` branch, never one for a harness across its repositories (owner decision of 2026-11-17, issue #10); a harness that wants the whole reads each repository's branch.
 - This specification is Active from 2026-11-17: the requirements it does not yet prove say so in the enforcement register.
 
@@ -175,7 +178,7 @@ None.
 - **Evidence grade** - `E0` to `E5`, how much a piece of evidence is worth.
 - **Nonconformance** and **CAPA** - a failure the system opened and the corrective action that closes it.
 - **Quality objective** - a metric with a target and an error budget.
-- **Review debt** - the number of requirements held at `E1` or `E2`.
+- **Review debt** - the number of requirements held at `E1` or `E2`, counted apart for what rests on a person and what rests on an agent.
 - **Tier** - how much of the system a harness claims.
 
 ## Success criteria
