@@ -10,6 +10,7 @@ import { files } from "../../ontology/mizan/mod.ts";
 import { nTriples, triplesOf } from "../kernel/rdf.ts";
 import { sha256 } from "../kernel/sha256.ts";
 import { makeTempDirSync, readTextFileSync, removeSync, writeTextFileSync } from "../runtime/fs.ts";
+import { pathToFileURL } from "node:url";
 import { dirname, fromFileUrl, resolve } from "../runtime/path.ts";
 import { execPath, run } from "../runtime/proc.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
@@ -250,7 +251,7 @@ proves(
       const wrote = await exec(`${dir}/manifest.ts`);
       assertEquals([wrote.code, wrote.stdout], [0, "wrote vocab.auto.ts: 3 terms\n"]);
       assertEquals((await exec(`${dir}/manifest.ts`, "--check")).code, 0);
-      const loaded: unknown = await import(`${dir}/vocab.auto.ts`);
+      const loaded: unknown = await import(pathToFileURL(`${dir}/vocab.auto.ts`).href);
       assert(typeof loaded === "object" && loaded !== null && "ex" in loaded);
       const ex = loaded.ex as Record<string, { iri: string }>;
       assertEquals(Object.keys(ex).sort(), ["Thing", "Widget", "madeBy"]);
@@ -556,7 +557,7 @@ proves(
       const wrote = await exec(`${dir}/manifest.ts`);
       assertEquals([wrote.code, wrote.stdout], [0, "wrote controls.auto.ts: 3 terms\n"]);
       assertEquals((await exec(`${dir}/manifest.ts`, "--check")).code, 0);
-      const loaded: unknown = await import(`${dir}/controls.auto.ts`);
+      const loaded: unknown = await import(pathToFileURL(`${dir}/controls.auto.ts`).href);
       assert(typeof loaded === "object" && loaded !== null && "controls" in loaded);
       assertEquals(Object.keys(loaded.controls as object), ["ac-2", "ac-2.1", "au-2"]);
       assertStringIncludes(readTextFileSync(`${dir}/controls.auto.prov.ttl`), "import-oscal-catalog.ts");

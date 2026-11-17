@@ -93,6 +93,9 @@ export type TestFn = (t: StepContext) => void | Promise<void>;
  * its file (`only`), give it a `timeout` in milliseconds (a test that does not end by then is `cancelled`), its `risk` (`not-high` by
  * default), or the `file` it is recorded under.
  */
+/** How long a test may run when it names no `timeout`: a minute (Bun's own default of 5 seconds ends a test that starts real programs on a slow runner for the wrong reason). */
+export const DEFAULT_TIMEOUT_MS = 60_000;
+
 export type TestOptions = {
   readonly skip?: boolean | string;
   readonly todo?: boolean | string;
@@ -509,6 +512,8 @@ function register(name: string, requirements: readonly Requirement[], fn: TestFn
     void nodeTest(name, { skip: ONLY_REASON }, () => undefined);
     return;
   }
+  // a test that starts real programs (git, openssl) is slow on a CI runner, Windows above all, and Bun's runner ends a test at 5 seconds unless it is told otherwise
+  const timeout = options.timeout ?? DEFAULT_TIMEOUT_MS;
   const waiting: Waiting | undefined = only ? undefined : { started: false, skipped: false, skip: () => notRun("skip", ONLY_REASON) };
   if (waiting !== undefined) state.waiting.add(waiting);
   const body = (t: NodeTestContext): Promise<void> => {
@@ -521,9 +526,9 @@ function register(name: string, requirements: readonly Requirement[], fn: TestFn
       }
       waiting.started = true;
     }
-    return runCase(base, fn, options.timeout, t);
+    return runCase(base, fn, timeout, t);
   };
-  void nodeTest(name, { ...(options.timeout === undefined ? {} : { timeout: options.timeout }), ...(only ? { only: true } : {}) }, body);
+  void nodeTest(name, { timeout, ...(only ? { only: true } : {}) }, body);
 }
 
 /** A test registered with the runtime's runner, and recorded (0008-test-evidence FR-001). */

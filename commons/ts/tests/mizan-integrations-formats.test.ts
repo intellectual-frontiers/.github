@@ -7,6 +7,7 @@
  */
 import { sha256 } from "../kernel/sha256.ts";
 import { makeTempDirSync, readTextFileSync, removeSync, writeTextFileSync } from "../runtime/fs.ts";
+import { pathToFileURL } from "node:url";
 import { dirname, fromFileUrl, resolve } from "../runtime/path.ts";
 import { execPath, run } from "../runtime/proc.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
@@ -476,10 +477,10 @@ proves(
         assertEquals((await exec(`${dir}/${name}.ts`, "--check")).code, 0, name);
         assertStringIncludes(readTextFileSync(`${dir}/${name}.auto.prov.ttl`), `urn:ifc:mizan:module:example-${name}`);
       }
-      const jsonld: unknown = await import(`${dir}/jsonld.auto.ts`);
+      const jsonld: unknown = await import(pathToFileURL(`${dir}/jsonld.auto.ts`).href);
       assert(typeof jsonld === "object" && jsonld !== null && "ex" in jsonld);
       assertEquals(Object.keys(jsonld.ex as object).sort(), ["Thing", "Widget", "madeBy"]);
-      const schema: unknown = await import(`${dir}/schema.auto.ts`);
+      const schema: unknown = await import(pathToFileURL(`${dir}/schema.auto.ts`).href);
       assert(typeof schema === "object" && schema !== null && "Severity" in schema && "EventFields" in schema);
       assertEquals(schema.Severity, ["low", "high", 3, null]);
       assertEquals(Object.keys(schema.EventFields as object), [
