@@ -149,3 +149,23 @@ export function checkPathLength(windowsPath: string, longPathsEnabled: boolean):
   if (longPathsEnabled || windowsPath.length <= WINDOWS_PATH_LIMIT) return ok(windowsPath);
   return err({ kind: "path-too-long", path: windowsPath, length: windowsPath.length, limit: WINDOWS_PATH_LIMIT });
 }
+
+/** The most characters of a repository's own path (the root and the repository's path under it) that leaves room for the files inside it (0023-if-workspaces FR-048). */
+export const REPO_PATH_ROOM = 150;
+
+/** How a repository's own path stands against the two limits of FR-048. */
+export type RepoPathLength =
+  | { readonly kind: "fits"; readonly length: number }
+  | { readonly kind: "no-room"; readonly length: number }
+  | { readonly kind: "too-long"; readonly length: number };
+
+/**
+ * A repository's own path, as the system writes it below the root (`separator` is `\\` on Windows and `/` elsewhere), against the limits of FR-048: up to 150 characters it fits; over 150 it leaves
+ * no room for the files inside it; over 259 it is too long, whether or not long paths are enabled, because tools that work with a path do not all take a long one.
+ */
+export function repoPathLength(root: string, path: RepoPath, separator: "/" | "\\"): RepoPathLength {
+  const length = nativePath(root, path, separator).length;
+  if (length > WINDOWS_PATH_LIMIT) return { kind: "too-long", length };
+  if (length > REPO_PATH_ROOM) return { kind: "no-room", length };
+  return { kind: "fits", length };
+}

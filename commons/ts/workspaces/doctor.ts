@@ -12,7 +12,7 @@
 import { absurd } from "../kernel/absurd.ts";
 import { parseSemVer } from "../kernel/semver.ts";
 import type { Finding, Severity } from "./findings.ts";
-import { checkPathLength, nativePath, WINDOWS_PATH_LIMIT } from "./portable.ts";
+import { checkPathLength, nativePath, REPO_PATH_ROOM, repoPathLength, WINDOWS_PATH_LIMIT } from "./portable.ts";
 import type { RepoPath } from "./types.ts";
 
 /** What a check came to: the four words of `ifws doctor`. */
@@ -211,6 +211,45 @@ export function pathChecks(f: PathFacts): readonly Check[] {
           : "Windows long paths not enabled; no path of the workspace exceeds 259 characters yet; run `ifws setup` to turn them on",
     });
   if (long) out.push({ id: "ifws/windows-long-paths", level: "ok", subject: f.home, message: "Windows long paths are enabled" });
+  return out;
+}
+
+/**
+ * The checks of the length of each repository's own path (0023-if-workspaces FR-048), on every system: over 150 characters is informational (it leaves little room for the files inside the repository),
+ * over 259 an error whether or not long paths are enabled. A repository whose path fits has no check of its own.
+ */
+export function repoPathChecks(f: {
+  readonly home: string;
+  readonly windows: boolean;
+  readonly repositories: readonly RepoPath[];
+}): readonly Check[] {
+  const out: Check[] = [];
+  for (const repo of f.repositories) {
+    const native = nativePath(f.home, repo, f.windows ? "\\" : "/");
+    const r = repoPathLength(f.home, repo, f.windows ? "\\" : "/");
+    switch (r.kind) {
+      case "fits":
+        break;
+      case "no-room":
+        out.push({
+          id: "ifws/repo-path-room",
+          level: "suggest",
+          subject: native,
+          message: `${native} is ${r.length} characters, over ${REPO_PATH_ROOM}: that leaves little room for the files inside the repository; move the root to a shorter path`,
+        });
+        break;
+      case "too-long":
+        out.push({
+          id: "ifws/repo-path-too-long",
+          level: "error",
+          subject: native,
+          message: `${native} is ${r.length} characters, over ${WINDOWS_PATH_LIMIT}, which is too long for a repository whether or not long paths are enabled; move the root to a shorter path or shorten the repository's path in the manifest`,
+        });
+        break;
+      default:
+        return absurd(r);
+    }
+  }
   return out;
 }
 

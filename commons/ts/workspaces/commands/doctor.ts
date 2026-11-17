@@ -10,7 +10,7 @@
  */
 import { err, ok } from "../../kernel/result.ts";
 import { build, runtimeName, runtimeVersion } from "../../runtime/proc.ts";
-import { type Check, findingsOf, fsCheck, hookChecks, type HookFacts, pathChecks, runtimeChecks } from "../doctor.ts";
+import { type Check, findingsOf, fsCheck, hookChecks, type HookFacts, pathChecks, repoPathChecks, runtimeChecks } from "../doctor.ts";
 import { discoverModules } from "../host/discovery.ts";
 import { fileFacts } from "../host/files.ts";
 import { probeFileSystem, probeLongPaths, probeTool } from "../host/probe.ts";
@@ -159,6 +159,14 @@ const doctor = defineCommand({
       ];
       // on Windows the long-path finding is the setup module's (`longPathsCheck` below); elsewhere the limit does not apply and the check says so
       if (!ctx.platform.windows) checks.push(...pathChecks({ home: loaded.home, windows: false, longPaths: "unknown", paths }));
+      // a repository's own path is judged on every system, whether or not long paths are enabled (0023-if-workspaces FR-048)
+      checks.push(
+        ...repoPathChecks({
+          home: loaded.home,
+          windows: ctx.platform.windows,
+          repositories: loaded.manifest.repositories.map((r) => r.path),
+        }),
+      );
       checks.push(fsCheck(await probeFileSystem(loaded.home), loaded.home));
 
       const s = await situate(ctx, loaded, { fetch: false });
