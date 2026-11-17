@@ -33,6 +33,7 @@ import {
   terms,
 } from "../../ontology/mizan/mod.ts";
 import * as ifccmOntology from "../../ontology/ifccm/mod.ts";
+import * as ifrOntology from "../../ontology/ifr/mod.ts";
 import * as ifqsOntology from "../../ontology/ifqs/mod.ts";
 import * as ifwsOntology from "../../ontology/ifws/mod.ts";
 import { formatRdfFinding, type OntologyFile, validate } from "../kernel/rdf.ts";
@@ -248,8 +249,46 @@ export const IFQS: OntologyPublication = {
   license: CC0,
 };
 
+/** The ontology of Intellectual Frontiers Releases (commons 0026-works-versioning), as it is published. */
+export const IFR: OntologyPublication = {
+  name: "ifr",
+  ns: { prefix: "ifr", iri: ifrOntology.IFR.iri },
+  idNs: { prefix: "mzid", iri: MZID.iri },
+  curies: [
+    ["ifr", ifrOntology.IFR.iri],
+    ["ifqs", ifqsOntology.IFQS.iri],
+    ["mz", MZ.iri],
+    ["xsd", "http://www.w3.org/2001/XMLSchema#"],
+    ["rdfs", "http://www.w3.org/2000/01/rdf-schema#"],
+    ["skos", "http://www.w3.org/2004/02/skos/core#"],
+    ["dcterms", "http://purl.org/dc/terms/"],
+    ["prov", "http://www.w3.org/ns/prov#"],
+    ["schema", "https://schema.org/"],
+  ],
+  files: ifrOntology.files,
+  ontology: ifrOntology.ifrOntology,
+  classes: ifrOntology.classes,
+  properties: ifrOntology.properties,
+  terms: ifrOntology.terms,
+  schemas: [ifrOntology.ReleaseTag, ifrOntology.ApprovalRecord, ifrOntology.Retention],
+  lists: listsOf("ifr", Object.entries(ifrOntology.codeLists)),
+  source: "commons/ontology/ifr/*.ts",
+  run: RUN,
+  shapes: { prefix: "ifrsh", iri: "https://www.intellectualfrontiers.com/ontology/ifr-shapes#" },
+  schemasIri: "https://www.intellectualfrontiers.com/ontology/ifr-schemas",
+  sssomSetId: "https://www.intellectualfrontiers.com/ontology/ifr-mappings",
+  sssomCuries: {
+    dcterms: "http://purl.org/dc/terms/",
+    prov: "http://www.w3.org/ns/prov#",
+    schema: "https://schema.org/",
+    gitdocs: "https://git-scm.com/docs/",
+  },
+  viewTitle: "Intellectual Frontiers Releases: the ontology",
+  license: CC0,
+};
+
 /** The ontologies of commons that are published, each from its own typed modules: Mizan's, then the ones its specifications define. */
-export const publications: readonly OntologyPublication[] = [MIZAN, IFCCM, IFQS, IFWS];
+export const publications: readonly OntologyPublication[] = [MIZAN, IFCCM, IFQS, IFWS, IFR];
 
 /** Where the generated files are downloaded from: this repository's `commons/` folder on its default branch. */
 const DOWNLOAD_BASE = "https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/";
