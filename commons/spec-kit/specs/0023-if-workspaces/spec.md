@@ -80,6 +80,7 @@
 - **FR-044**: The terms of this specification MUST be the typed ontology `commons/ontology/ifws/` (prefix `ifws:`), whose every class and code-list class has an audit record of the standard it rests on, or of why none does (0018-standards-first FR-003 to FR-005), and whose code lists hold the keys named in this specification.
 - **FR-045**: The workspace MUST support the controls CM-2, CM-3, CM-5, CM-6, CM-7, CM-8, CM-10, SA-10, SI-7 and IA-5 of NIST SP 800-53 (and the FedRAMP baselines that select them), and the section Standards and controls MUST name, for each, the requirement of this or of a sibling specification that supports it.
 - **FR-046**: The workspace's documentation MUST credit the author of the earlier workspace tools, whose layout, `ensure`, `status` and `doctor` ideas and code it carries on, and chezmoi (inspiration for the source and target state, templates over data, `apply`, `diff`, `status`, `verify` and a state record, with no chezmoi code or program used), and MUST name Git's `git-foo` convention as the model of its modules.
+- **FR-047**: A remote's identity MUST be its host name (lower case, with no port) and its path, so that the HTTPS, `git://`, `ssh://` and scp-like spellings of one remote name one repository and one path of the workspace; and a credential written into a remote URL (`https://user:token@host/...`) MUST be dropped on reading it and MUST NOT appear in any result, state, finding or message.
 
 ## Out of scope
 
