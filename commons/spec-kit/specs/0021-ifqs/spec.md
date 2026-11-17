@@ -76,7 +76,7 @@
 - **FR-026**: A nonconformance MUST carry its requirement, the evidence it arises from, its reason, who opened it (the system or a role) and its state (`ifqs:NonconformanceOpen` or `ifqs:NonconformanceClosed`), and MUST be linked to a Problem change request (0020-ifccm FR-021).
 - **FR-027**: A nonconformance MUST be closed only through a CAPA that is closed (FR-030), never by editing its state.
 - **FR-028**: A corrective and preventive action (`ifqs:Capa`) MUST state the corrective action, MUST name the test that verifies it (a test that exists and proves the requirement) and MUST be in one state of `ifqs:CapaOpen`, `ifqs:CapaVerified` and `ifqs:CapaClosed`, in that order.
-- **FR-029**: WHEN the test a CAPA names passes in a run at a revision after the last commit of the corrective change, the CAPA MUST become `ifqs:CapaVerified`, and its verification MUST NOT be recorded in any other way.
+- **FR-029**: WHEN the test a CAPA names passes in a run at a revision that holds the last commit of the corrective change (the revision after it, or that commit itself, whose code is the corrected code), the CAPA MUST become `ifqs:CapaVerified`, and its verification MUST NOT be recorded in any other way.
 - **FR-030**: A CAPA MUST become `ifqs:CapaClosed` only from `ifqs:CapaVerified` and only by the approval of a named person, recorded as a Decision with the person and the day; an automated run closes the verification step and a person closes the CAPA, and where 0020-ifccm FR-020 applies the person MUST NOT be the author of the corrective change.
 - **FR-031**: A nonconformance and its CAPA MUST appear in the index and on the public page (0022-trust) from the moment they are opened, and a nonconformance that closed MUST stay in the record with its CAPA.
 
@@ -102,6 +102,11 @@
 ## The grade of kept evidence
 
 - **FR-042**: A file MUST claim no more than `ifqs:E3` for itself (`ifc.quality.grade`), because what makes it `ifqs:E4` is what happens to it after it is written; the grade of kept evidence MUST be the one its note gives, which MUST be `ifqs:E4` only where the commit that keeps the file is signed, the chain verifies and the note matches the file's SHA-256, `ifqs:E3` where the file is kept and any of these is not so but nothing is broken, and `ifqs:E0` where the chain does not verify or the note does not match its file; a note MUST be the lines `path`, `sha256` and `grade`, one such paragraph for each run kept for the commit, the last being the newest.
+
+## Where Tier 1 keeps what it records
+
+- **FR-043**: The records of Tier 1 (a nonconformance opened, linked and closed, a CAPA opened, verified and closed, and a statement, a review or a probe's typed result kept as evidence) MUST each be one new file `quality/records/NNNNNN-<kind>.json` on the `quality` branch, in a commit that only appends, redacted as FR-020 asks and chained to the file before it by its digest (64 zeros for the first) as FR-017 chains the evidence files, so that a file changed, removed or inserted is found by the branch's verifier; a state MUST be the fold of its events and MUST NOT be a field that is edited, so that no event closes a nonconformance but the one that follows a closed CAPA.
+- **FR-044**: A proof MUST be held to a cadence by its kind of evidence (FR-025), by default 30 days for a run, 7 days for a probe, 90 days for a statement and a year for a review, and a harness MAY state its own.
 
 ## Acceptance scenarios
 

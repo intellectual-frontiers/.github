@@ -45,6 +45,7 @@ import {
   verifyNote,
 } from "../pure/chain.ts";
 import { EVIDENCE_ROOT, type Grade, NO_GRADE, NOTES_REF, QUALITY_BRANCH } from "../pure/names.ts";
+import { RECORDS_ROOT, verifyLedgerChain } from "../pure/ledger.ts";
 import { canonicalize, formatQualityError, type NotRun, type QualityRecord } from "../pure/record.ts";
 import { formatHostError, git, gitRaw, type GitInput, gitText, type HostError, text } from "./git.ts";
 
@@ -97,7 +98,7 @@ export async function listCommits(
   return ok(out);
 }
 
-async function blobAt(repo: string, commit: string, path: string): Promise<Result<string, HostError>> {
+export async function blobAt(repo: string, commit: string, path: string): Promise<Result<string, HostError>> {
   const r = await git(repo, ["cat-file", "blob", `${commit}:${path}`]);
   return r.kind === "ok" ? ok(text(r.value)) : r;
 }
@@ -142,19 +143,22 @@ async function gitDir(repo: string): Promise<Result<string, HostError>> {
   return gitText(repo, ["rev-parse", "--absolute-git-dir"]);
 }
 
-/** The file the head commit of the branch added: its path and text, where there is one. */
-async function lastFile(repo: string, tip: string): Promise<Result<KeptFile, HostError>> {
-  const diff = await git(repo, ["diff-tree", "--root", "--no-commit-id", "--name-only", "-r", "-z", tip]);
+/** The evidence file the newest commit that added one holds: its path and text, where there is one (a commit of the ledger adds none). */
+async function lastFile(repo: string, tip: string): Promise<Result<KeptFile | undefined, HostError>> {
+  const last = await gitText(repo, ["log", "-1", "--format=%H", "--diff-filter=A", tip, "--", EVIDENCE_ROOT]);
+  if (last.kind === "err") return last;
+  if (last.value === "") return ok(undefined);
+  const diff = await git(repo, ["diff-tree", "--root", "--no-commit-id", "--name-only", "-r", "-z", last.value]);
   if (diff.kind === "err") return diff;
   const path = text(diff.value)
     .split("\0")
     .find((p) => p.startsWith(`${EVIDENCE_ROOT}/`));
   if (path === undefined) return err({ kind: "unreadable", reason: `the head of the ${QUALITY_BRANCH} branch adds no evidence file` });
-  const body = await blobAt(repo, tip, path);
+  const body = await blobAt(repo, last.value, path);
   return body.kind === "ok" ? ok({ path, text: body.value }) : body;
 }
 
-async function signedCommit(repo: string, commit: string): Promise<Result<boolean, HostError>> {
+export async function signedCommit(repo: string, commit: string): Promise<Result<boolean, HostError>> {
   const raw = await gitText(repo, ["cat-file", "commit", commit]);
   if (raw.kind === "err") return raw;
   const headers = raw.value.split("\n\n")[0] ?? "";
@@ -179,7 +183,7 @@ async function testedCommit(
   return ok(text(r.value.stdout).trim());
 }
 
-async function writeCommit(
+export async function writeCommit(
   repo: string,
   tip: string | undefined,
   path: string,
@@ -216,7 +220,7 @@ async function writeCommit(
   }
 }
 
-async function signingFollowsConfig(repo: string): Promise<boolean> {
+export async function signingFollowsConfig(repo: string): Promise<boolean> {
   const r = await gitRaw(repo, ["config", "--type=bool", "--get", "commit.gpgsign"]);
   return r.kind === "ok" && r.value.code === 0 && text(r.value.stdout).trim() === "true";
 }
@@ -235,7 +239,7 @@ export async function keepRun(options: KeepOptions): Promise<Result<Kept, KeepEr
   if (tip.value !== undefined) {
     const last = await lastFile(repo, tip.value);
     if (last.kind === "err") return last;
-    previous = await fileDigest(last.value.text);
+    if (last.value !== undefined) previous = await fileDigest(last.value.text);
   }
   const canonical = await canonicalize({
     record: options.record,
@@ -290,6 +294,7 @@ export type BranchProblem =
   | { readonly kind: "not-append"; readonly commit: string; readonly reason: string }
   | { readonly kind: "chain"; readonly break: ChainBreak }
   | { readonly kind: "unsigned-commit"; readonly commit: string; readonly path: string; readonly status: string }
+  | { readonly kind: "ledger"; readonly path: string; readonly reason: string }
   | { readonly kind: "note"; readonly commit: string; readonly reason: string };
 
 /** What can go wrong verifying: the host, or the branch. */
@@ -306,6 +311,8 @@ export function formatVerifyError(e: VerifyError): string {
       return formatChainBreak(e.break);
     case "unsigned-commit":
       return `commit ${e.commit} that keeps ${e.path} is not signed by a key this harness trusts (status ${e.status})`;
+    case "ledger":
+      return `the ledger of nonconformances breaks at ${e.path}: ${e.reason}`;
     case "note":
       return `the note on ${e.commit} does not match the evidence: ${e.reason}; its grade is E0`;
     case "git-missing":
@@ -334,6 +341,8 @@ export type Verified = {
   readonly head: Sha256;
   readonly files: readonly VerifiedFile[];
   readonly grades: readonly CommitGrade[];
+  /** The files of the ledger of nonconformances and CAPA (FR-043), which verify as a chain of their own. */
+  readonly records: number;
 };
 
 /** How to verify. */
@@ -367,6 +376,8 @@ export async function verifyBranch(repo: string, options: VerifyOptions = {}): P
   if (commits.kind === "err") return commits;
   const files: KeptFile[] = [];
   const meta: VerifiedFile[] = [];
+  const records: KeptFile[] = [];
+  const everyCommit: { readonly commit: string; readonly path: string; readonly signed: boolean; readonly status: string }[] = [];
   for (const c of commits.value) {
     if (c.parents.length > 1) return err({ kind: "not-append", commit: c.commit, reason: "it is a merge" });
     const [only, ...rest] = c.changes;
@@ -374,25 +385,33 @@ export async function verifyBranch(repo: string, options: VerifyOptions = {}): P
       return err({ kind: "not-append", commit: c.commit, reason: `it changes ${c.changes.length} paths, and must add exactly one` });
     if (only.status !== "A")
       return err({ kind: "not-append", commit: c.commit, reason: `it ${only.status === "D" ? "removes" : "changes"} ${only.path}` });
+    const signed = isSigned(c.signature, options.allowedSigners !== undefined);
+    if (only.path.startsWith(`${RECORDS_ROOT}/`)) {
+      const record = await blobAt(repo, c.commit, only.path);
+      if (record.kind === "err") return record;
+      records.push({ path: only.path, text: record.value });
+      everyCommit.push({ commit: c.commit, path: only.path, signed, status: c.signature });
+      continue;
+    }
     const p = parseEvidencePath(only.path);
     if (p.kind === "err") return err({ kind: "not-append", commit: c.commit, reason: p.error });
     const body = await blobAt(repo, c.commit, only.path);
     if (body.kind === "err") return body;
     files.push({ path: only.path, text: body.value });
+    everyCommit.push({ commit: c.commit, path: only.path, signed, status: c.signature });
     meta.push({
       path: only.path,
       commit: c.commit,
       traceId: p.value.traceId,
-      signed: isSigned(c.signature, options.allowedSigners !== undefined),
+      signed,
     });
   }
   const chain = await verifyChain(files);
   if (chain.kind === "err") return err({ kind: "chain", break: chain.error });
+  const ledger = await verifyLedgerChain(records);
+  if (ledger.kind === "err") return err({ kind: "ledger", path: ledger.error.path, reason: ledger.error.reason });
   if (options.requireSigned === true) {
-    for (const [i, c] of commits.value.entries()) {
-      const m = meta[i];
-      if (m !== undefined && !m.signed) return err({ kind: "unsigned-commit", commit: c.commit, path: m.path, status: c.signature });
-    }
+    for (const c of everyCommit) if (!c.signed) return err({ kind: "unsigned-commit", commit: c.commit, path: c.path, status: c.status });
   }
   const grades: CommitGrade[] = [];
   const noted = await gitRaw(repo, ["notes", "--ref", NOTES_REF, "list"]);
@@ -419,7 +438,7 @@ export async function verifyBranch(repo: string, options: VerifyOptions = {}): P
       grades.push({ commit, path: n.path, grade: gradeOf({ record: true, chained: true, signed: m.signed, linked: true, broken: false }) });
     }
   }
-  return ok({ count: files.length, head: chain.value.head, files: meta, grades });
+  return ok({ count: files.length, head: chain.value.head, files: meta, grades, records: records.length });
 }
 
 /**

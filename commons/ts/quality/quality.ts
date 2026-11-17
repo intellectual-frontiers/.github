@@ -2,8 +2,12 @@
  * `quality`, the command of the quality system (commons 0021-ifqs): `record` keeps a run's record as evidence (a new file on the append-only
  * `quality` branch, signed where Git is set to sign, and a note on the tested commit), `verify` walks the branch and its chain and names the
  * first file or commit that does not match, and `render` renders a record as JUnit XML, CTRF, SARIF, TAP or the documents of ISO/IEC/IEEE
- * 29119-3, on demand. `ifc test` is unchanged: `record` takes the record that `ifc test run` writes. Exit status: 0 where it did what was
- * asked, 1 where a record was refused or the branch does not verify, 2 for a command line that does not fit.
+ * 29119-3, on demand. `ifc test` is unchanged: `record` takes the record that `ifc test run` writes, and verifies the CAPA whose named test it
+ * passes (FR-029). The system reports itself with `index` (the index of the branch, `--check`able), `freshness` (every proof judged by time and by
+ * change, the nonconformances it calls for opened with `--open`), `nonconformances`, `capa open|verify|close`, `register` (the proof register with
+ * the grade and day of its evidence), `tier` (a claim judged) and `attest` (a statement, a review or a probe's result kept as evidence); see
+ * `commands.ts`. Exit status: 0 where it did what was asked, 1 where a record was refused, the branch does not verify or it found something, 2 for
+ * a command line that does not fit.
  *
  * ```sh
  * bun quality/quality.ts record --record test-results/<trace>.otlp.json --repo . --not-run "0021-ifqs FR-005=no network"
@@ -20,6 +24,19 @@ import { join } from "../runtime/path.ts";
 import { args, exit } from "../runtime/proc.ts";
 import { stderr, stdout } from "../runtime/stdio.ts";
 import { formatKeepError, gradeOfCommit, keepRun, readKeptRun, verifyBranch, formatVerifyError } from "./host/branch.ts";
+import {
+  attestCommand,
+  capaCommand,
+  clockDay,
+  freshnessCommand,
+  indexCommand,
+  nonconformancesCommand,
+  registerCommand,
+  runFactsOf,
+  tierCommand,
+  verifications,
+} from "./commands.ts";
+import { appendEvents, formatLedgerHostError, readLedger } from "./host/ledger-branch.ts";
 import { formatHostError } from "./host/git.ts";
 import { type Grade, isGrade } from "./pure/names.ts";
 import { formatQualityError, type NotRun, readQuality } from "./pure/record.ts";
@@ -82,7 +99,7 @@ const RENDER = {
   grade: value({ help: "The grade to show (E0 to E5); the record's own where not given.", valueName: "GRADE", parse: grade }),
 };
 
-const USAGE = "usage: quality record|verify|render [OPTIONS] (--help for each)";
+const USAGE = "usage: quality record|verify|render|index|freshness|nonconformances|capa|register|tier|attest [OPTIONS] (--help for each)";
 
 /** `quality` with its arguments: the exit status. */
 export async function main(argv: readonly string[]): Promise<number> {
@@ -114,6 +131,19 @@ export async function main(argv: readonly string[]): Promise<number> {
         `quality: ${k.record.counts.tests} ran, ${k.record.counts.passed} passed, ${k.record.counts.failed} failed, ${k.record.counts.notRun} not_run`,
       );
       say(k.tested === undefined ? "quality: no tested commit, so no note" : `quality: noted ${k.tested}`);
+      // the CAPA whose named test this run passed after its corrective change become verified, and in no other way (FR-029)
+      const ledger = await readLedger(o.repo);
+      if (ledger.kind === "err") return fail(formatLedgerHostError(ledger.error), 1);
+      const verified = await verifications(
+        o.repo,
+        ledger.value.ledger,
+        runFactsOf(k.record, k.tested ?? k.record.run.runner.revision, clockDay()),
+      );
+      if (verified.length > 0) {
+        const w = await appendEvents(o.repo, verified, o.sign === undefined ? {} : { sign: o.sign });
+        if (w.kind === "err") return fail(formatLedgerHostError(w.error), 1);
+        for (const e of verified) if (e.kind === "capa-verified") say(`quality: ${e.id} is verified by this run; a person closes it`);
+      }
       return 0;
     }
     case "verify": {
@@ -169,6 +199,20 @@ export async function main(argv: readonly string[]): Promise<number> {
       }
       return 0;
     }
+    case "index":
+      return indexCommand(rest);
+    case "freshness":
+      return freshnessCommand(rest);
+    case "nonconformances":
+      return nonconformancesCommand(rest);
+    case "capa":
+      return capaCommand(rest);
+    case "register":
+      return registerCommand(rest);
+    case "tier":
+      return tierCommand(rest);
+    case "attest":
+      return attestCommand(rest);
     case undefined:
     case "--help":
     case "-h":
