@@ -32,6 +32,8 @@ import {
   Standard,
   terms,
 } from "../../ontology/mizan/mod.ts";
+import * as ifccmOntology from "../../ontology/ifccm/mod.ts";
+import * as ifqsOntology from "../../ontology/ifqs/mod.ts";
 import * as ifwsOntology from "../../ontology/ifws/mod.ts";
 import { formatRdfFinding, type OntologyFile, validate } from "../kernel/rdf.ts";
 import { stdio } from "../runtime/mod.ts";
@@ -41,6 +43,7 @@ import {
   digestOf as digestOfFiles,
   distributionsOf,
   ExportRefused,
+  listsOf,
   membersOf,
   type OntologyPublication,
   publishedFiles,
@@ -82,7 +85,7 @@ export const MIZAN: OntologyPublication = {
     { name: "RungKind", table: "mizan_rung_kind", members: membersOf(rungKinds) },
     { name: "IntegrationDirection", table: "mizan_integration_direction", members: membersOf(integrationDirections) },
   ],
-  source: "commons/ontology/mizan/*.ts and commons/ontology/audit/*.ts",
+  source: "commons/ontology/mizan/*.ts (commons 0016-ladder, 0018-standards-first, 0012-ontology FR-011)",
   run: RUN,
   shapes: { prefix: "mzsh", iri: "https://www.intellectualfrontiers.com/ontology/mizan-shapes#" },
   schemasIri: "https://www.intellectualfrontiers.com/ontology/mizan-schemas",
@@ -95,8 +98,6 @@ export const MIZAN: OntologyPublication = {
   viewTitle: "Mizan: the shared ontology",
   license: CC0,
 };
-
-const snake = (name: string): string => name.replace(/([a-z])([A-Z])/g, "$1_$2").toLowerCase();
 
 /** The ontology of Intellectual Frontiers Workspaces (commons 0023-if-workspaces, 0024-ifws-host, 0025-ifws), as it is published. */
 export const IFWS: OntologyPublication = {
@@ -127,7 +128,7 @@ export const IFWS: OntologyPublication = {
     ifwsOntology.GeneratedFile,
     ifwsOntology.Module,
   ],
-  lists: Object.entries(ifwsOntology.codeLists).map(([name, list]) => ({ name, table: `ifws_${snake(name)}`, members: membersOf(list) })),
+  lists: listsOf("ifws", Object.entries(ifwsOntology.codeLists)),
   source: "commons/ontology/ifws/*.ts",
   run: RUN,
   shapes: { prefix: "ifwssh", iri: "https://www.intellectualfrontiers.com/ontology/ifws-shapes#" },
@@ -138,13 +139,118 @@ export const IFWS: OntologyPublication = {
     prov: "http://www.w3.org/ns/prov#",
     dcat: "http://www.w3.org/ns/dcat#",
     schema: "https://schema.org/",
+    doap: "http://usefulinc.com/ns/doap#",
+    odrl: "http://www.w3.org/ns/odrl/2/",
+    gitdocs: "https://git-scm.com/docs/",
+    sarif: "https://docs.oasis-open.org/sarif/sarif/v2.1.0/errata01/os/schemas/sarif-schema-2.1.0.json#/definitions/",
   },
   viewTitle: "Intellectual Frontiers Workspaces: the ontology",
   license: CC0,
 };
 
+/** The ontology of Intellectual Frontiers Capabilities Configuration Management (commons 0020-ifccm), as it is published. */
+export const IFCCM: OntologyPublication = {
+  name: "ifccm",
+  ns: { prefix: "ifccm", iri: ifccmOntology.IFCCM.iri },
+  idNs: { prefix: "mzid", iri: MZID.iri },
+  curies: [
+    ["ifccm", ifccmOntology.IFCCM.iri],
+    ["mz", MZ.iri],
+    ["xsd", "http://www.w3.org/2001/XMLSchema#"],
+    ["rdfs", "http://www.w3.org/2000/01/rdf-schema#"],
+    ["skos", "http://www.w3.org/2004/02/skos/core#"],
+    ["dcterms", "http://purl.org/dc/terms/"],
+    ["prov", "http://www.w3.org/ns/prov#"],
+    ["oslc_cm", "http://open-services.net/ns/cm#"],
+  ],
+  files: ifccmOntology.files,
+  ontology: ifccmOntology.ifccmOntology,
+  classes: ifccmOntology.classes,
+  properties: ifccmOntology.properties,
+  terms: ifccmOntology.terms,
+  schemas: [
+    ifccmOntology.Capability,
+    ifccmOntology.ChangeRequest,
+    ifccmOntology.Change,
+    ifccmOntology.ConfigurationItem,
+    ifccmOntology.Baseline,
+    ifccmOntology.HarnessDeclaration,
+    ifccmOntology.RegulatedDomain,
+    ifccmOntology.TraceStage,
+    ifccmOntology.AuthorityFunction,
+  ],
+  lists: listsOf("ifccm", [
+    ["ChangeRequestKind", ifccmOntology.changeRequestKinds],
+    ["ChangeRequestState", ifccmOntology.changeRequestStates],
+    ["IssueReferenceKind", ifccmOntology.issueReferenceKinds],
+    ["EnforcementPhase", ifccmOntology.enforcementPhases],
+    ["GitHostKind", ifccmOntology.gitHostKinds],
+    ["RegulatedDomain", ifccmOntology.regulatedDomains],
+    ["TraceStage", ifccmOntology.traceStages],
+    ["AuthorityFunction", ifccmOntology.authorityFunctions],
+  ]),
+  source: "commons/ontology/ifccm/*.ts",
+  run: RUN,
+  shapes: { prefix: "ifccmsh", iri: "https://www.intellectualfrontiers.com/ontology/ifccm-shapes#" },
+  schemasIri: "https://www.intellectualfrontiers.com/ontology/ifccm-schemas",
+  sssomSetId: "https://www.intellectualfrontiers.com/ontology/ifccm-mappings",
+  sssomCuries: { dcterms: "http://purl.org/dc/terms/", prov: "http://www.w3.org/ns/prov#", oslc_cm: "http://open-services.net/ns/cm#" },
+  viewTitle: "Intellectual Frontiers Capabilities Configuration Management: the ontology",
+  license: CC0,
+};
+
+/** The ontology of the Intellectual Frontiers Quality System (commons 0021-ifqs, 0022-trust), as it is published. */
+export const IFQS: OntologyPublication = {
+  name: "ifqs",
+  ns: { prefix: "ifqs", iri: ifqsOntology.IFQS.iri },
+  idNs: { prefix: "mzid", iri: MZID.iri },
+  curies: [
+    ["ifqs", ifqsOntology.IFQS.iri],
+    ["mz", MZ.iri],
+    ["xsd", "http://www.w3.org/2001/XMLSchema#"],
+    ["rdfs", "http://www.w3.org/2000/01/rdf-schema#"],
+    ["skos", "http://www.w3.org/2004/02/skos/core#"],
+    ["dcterms", "http://purl.org/dc/terms/"],
+    ["prov", "http://www.w3.org/ns/prov#"],
+    ["dcat", "http://www.w3.org/ns/dcat#"],
+  ],
+  files: ifqsOntology.files,
+  ontology: ifqsOntology.ifqsOntology,
+  classes: ifqsOntology.classes,
+  properties: ifqsOntology.properties,
+  terms: ifqsOntology.terms,
+  schemas: [
+    ifqsOntology.TestRun,
+    ifqsOntology.TestCase,
+    ifqsOntology.Evidence,
+    ifqsOntology.EvidenceFile,
+    ifqsOntology.Nonconformance,
+    ifqsOntology.Capa,
+    ifqsOntology.QualityObjective,
+    ifqsOntology.ReviewDebt,
+    ifqsOntology.AssessorPack,
+  ],
+  lists: listsOf("ifqs", [
+    ["EvidenceGrade", ifqsOntology.evidenceGrades],
+    ["TestOutcome", ifqsOntology.testOutcomes],
+    ["FreshnessState", ifqsOntology.freshnessStates],
+    ["NonconformanceState", ifqsOntology.nonconformanceStates],
+    ["CapaState", ifqsOntology.capaStates],
+    ["QualityTier", ifqsOntology.qualityTiers],
+    ["Audience", ifqsOntology.audiences],
+  ]),
+  source: "commons/ontology/ifqs/*.ts",
+  run: RUN,
+  shapes: { prefix: "ifqssh", iri: "https://www.intellectualfrontiers.com/ontology/ifqs-shapes#" },
+  schemasIri: "https://www.intellectualfrontiers.com/ontology/ifqs-schemas",
+  sssomSetId: "https://www.intellectualfrontiers.com/ontology/ifqs-mappings",
+  sssomCuries: { dcterms: "http://purl.org/dc/terms/", prov: "http://www.w3.org/ns/prov#", dcat: "http://www.w3.org/ns/dcat#" },
+  viewTitle: "Intellectual Frontiers Quality System: the ontology",
+  license: CC0,
+};
+
 /** The ontologies of commons that are published, each from its own typed modules: Mizan's, then the ones its specifications define. */
-export const publications: readonly OntologyPublication[] = [MIZAN, IFWS];
+export const publications: readonly OntologyPublication[] = [MIZAN, IFCCM, IFQS, IFWS];
 
 /** Where the generated files are downloaded from: this repository's `commons/` folder on its default branch. */
 const DOWNLOAD_BASE = "https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/";

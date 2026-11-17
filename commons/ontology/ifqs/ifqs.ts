@@ -390,7 +390,7 @@ export const properties = [
   ObjectProperty.make(ifqs.correctsNonconformance, { domain: ifqs.Capa, range: ifqs.Nonconformance, label: en("corrects nonconformance"), definition: en("The nonconformance the CAPA corrects.") }),
   DatatypeProperty.make(ifqs.correctiveAction, { domain: ifqs.Capa, range: xsd.string, label: en("corrective action"), definition: en("What is done to correct the nonconformance and stop it recurring.") }),
   DatatypeProperty.make(ifqs.verifiedByTest, { domain: ifqs.Capa, range: xsd.string, label: en("verified by test"), definition: en("The test whose passing, after the corrective change, verifies the CAPA: its file and name.") }),
-  ObjectProperty.make(ifqs.capaState, { domain: ifqs.Capa, range: ifqs.CapaState, label: en("CAPA state"), definition: en("open, verified or closed.") }),
+  ObjectProperty.make(ifqs.capaState, { domain: ifqs.Capa, range: ifqs.CapaState, label: en("has CAPA state"), definition: en("open, verified or closed.") }),
   DatatypeProperty.make(ifqs.approvedBy, { domain: ifqs.Capa, range: xsd.string, label: en("approved by"), definition: en("The named person who approved the closure.") }),
   DatatypeProperty.make(ifqs.approvedOn, { domain: ifqs.Capa, range: xsd.string, label: en("approved on"), definition: en("The day (YYYY-MM-DD) of the approval.") }),
   DatatypeProperty.make(ifqs.metricName, { domain: ifqs.QualityObjective, range: xsd.string, label: en("metric name"), definition: en("The OpenTelemetry metric the objective is measured by.") }),

@@ -60,18 +60,22 @@ proves(
   async () => {
     const made = await wanted();
     const exports = [...made.keys()].filter((k) => k !== TURTLE_PATH).sort();
-    assertEquals(exports, [
+    const expected = [
       "generated/mizan-audit-packaging.auto.ttl",
       "generated/mizan-catalog.auto.ttl",
-      "generated/mizan-code-lists.auto.skos.ttl",
-      "generated/mizan-code-lists.auto.sql",
-      "generated/mizan-mappings.auto.sssom.tsv",
-      "generated/mizan-ontology.auto.html",
-      "generated/mizan-schemas.auto.json",
-      "generated/mizan-shapes.auto.ttl",
-      "generated/mizan.auto.ofn",
-      "generated/mizan.auto.rdf",
-    ]);
+      ...["mizan", "ifccm", "ifqs", "ifws"].flatMap((name) => [
+        `generated/${name}-code-lists.auto.skos.ttl`,
+        `generated/${name}-code-lists.auto.sql`,
+        `generated/${name}-mappings.auto.sssom.tsv`,
+        `generated/${name}-ontology.auto.html`,
+        `generated/${name}-schemas.auto.json`,
+        `generated/${name}-shapes.auto.ttl`,
+        `generated/${name}.auto.ofn`,
+        `generated/${name}.auto.rdf`,
+        ...(name === "mizan" ? [] : [`generated/${name}.auto.ttl`]),
+      ]),
+    ].sort();
+    assertEquals(exports, expected);
     for (const rel of exports) {
       const text = fs.readTextFileSync(`${ROOT}/commons/${rel}`);
       assertEquals(text, made.get(rel));

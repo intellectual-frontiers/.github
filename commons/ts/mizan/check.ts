@@ -16,6 +16,8 @@ import { fileURLToPath } from "node:url";
 import process from "node:process";
 import { packagingTerms } from "../../ontology/audit/mod.ts";
 import { bases, classes, jurisdictionLevels, integrationDirections, rungKinds, mz, terms } from "../../ontology/mizan/mod.ts";
+import * as ifccmOntology from "../../ontology/ifccm/mod.ts";
+import * as ifqsOntology from "../../ontology/ifqs/mod.ts";
 import * as ifwsOntology from "../../ontology/ifws/mod.ts";
 import { pm } from "../../ontology/supply-chain/packaging/mod.ts";
 import { type RulePlugin, rulePlugins } from "./rules.ts";
@@ -47,7 +49,7 @@ export function termRecordsOf(audit: readonly (typeof terms)[number][]): readonl
 
 /** Mizan's own terms and the packaging ontology's as the rules read them. */
 export function mizanTermRecords(): readonly TermRecord[] {
-  return termRecordsOf([...terms, ...packagingTerms, ...ifwsOntology.terms]);
+  return termRecordsOf([...terms, ...packagingTerms, ...ifccmOntology.terms, ...ifqsOntology.terms, ...ifwsOntology.terms]);
 }
 
 /** The CURIE of a term of commons' own ontologies: `mz:` or `pm:` and its local name, or the IRI where it is of neither. */
@@ -56,6 +58,8 @@ function curieOf(iri: string): string {
     ["mz", "https://www.intellectualfrontiers.com/ontology/mizan#"],
     ["pm", "https://www.intellectualfrontiers.com/ontology/packaging#"],
     ["ifws", ifwsOntology.IFWS.iri],
+    ["ifccm", ifccmOntology.IFCCM.iri],
+    ["ifqs", ifqsOntology.IFQS.iri],
   ] as const)
     if (iri.startsWith(ns)) return `${prefix}:${iri.slice(ns.length)}`;
   return iri;
@@ -64,7 +68,7 @@ function curieOf(iri: string): string {
 /** The deprecated terms of commons' own ontologies, by CURIE, with what replaces each (0018-standards-first): a specification that names one is found. */
 export function deprecatedTerms(): ReadonlyMap<string, string> {
   return new Map(
-    [...terms, ...packagingTerms, ...ifwsOntology.terms].flatMap((t) =>
+    [...terms, ...packagingTerms, ...ifccmOntology.terms, ...ifqsOntology.terms, ...ifwsOntology.terms].flatMap((t) =>
       t.values.deprecatedOn === undefined ? [] : [[curieOf(t.values.termIri), curieOf(t.values.replacedBy ?? "")] as const],
     ),
   );
@@ -101,6 +105,16 @@ export function main(
             },
             { file: "commons/ontology/mizan/mizan.ts", ontology: classes.map((c) => c.iri), recorded: terms.map((t) => t.values.termIri) },
             {
+              file: "commons/ontology/ifccm/ifccm.ts",
+              ontology: ifccmOntology.classes.map((c) => c.iri),
+              recorded: ifccmOntology.terms.map((t) => t.values.termIri),
+            },
+            {
+              file: "commons/ontology/ifqs/ifqs.ts",
+              ontology: ifqsOntology.classes.map((c) => c.iri),
+              recorded: ifqsOntology.terms.map((t) => t.values.termIri),
+            },
+            {
               file: "commons/ontology/ifws/ifws.ts",
               ontology: ifwsOntology.classes.map((c) => c.iri),
               recorded: ifwsOntology.terms.map((t) => t.values.termIri),
@@ -117,6 +131,31 @@ export function main(
               ]),
               pm: new Set(Object.keys(pm)),
               ifws: ifwsOntology.termNames,
+              ifccm: new Set([
+                ...Object.keys(ifccmOntology.ifccm),
+                ...[
+                  ifccmOntology.changeRequestKinds,
+                  ifccmOntology.changeRequestStates,
+                  ifccmOntology.issueReferenceKinds,
+                  ifccmOntology.enforcementPhases,
+                  ifccmOntology.gitHostKinds,
+                  ifccmOntology.regulatedDomains,
+                  ifccmOntology.traceStages,
+                  ifccmOntology.authorityFunctions,
+                ].flatMap((l) => Object.keys(l)),
+              ]),
+              ifqs: new Set([
+                ...Object.keys(ifqsOntology.ifqs),
+                ...[
+                  ifqsOntology.evidenceGrades,
+                  ifqsOntology.testOutcomes,
+                  ifqsOntology.freshnessStates,
+                  ifqsOntology.nonconformanceStates,
+                  ifqsOntology.capaStates,
+                  ifqsOntology.qualityTiers,
+                  ifqsOntology.audiences,
+                ].flatMap((l) => Object.keys(l)),
+              ]),
             },
             deprecated: deprecatedTerms(),
           },
