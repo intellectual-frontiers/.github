@@ -99,6 +99,8 @@ export type TestOptions = {
   readonly only?: boolean;
   readonly timeout?: number;
   readonly risk?: Risk;
+  /** The quality characteristic the test proves, in the words of ISO/IEC 25010, recorded as `ifc.test.characteristic` (0021-ifqs FR-012). */
+  readonly characteristic?: string;
   readonly file?: string;
 };
 
@@ -469,7 +471,14 @@ function onlyState(file: string): { marked: boolean; readonly waiting: Set<Waiti
 }
 
 function register(name: string, requirements: readonly Requirement[], fn: TestFn, options: TestOptions, file: string): void {
-  const base = { id: testIdOf(file, name), file, name, requirements: [...requirements], risk: options.risk ?? "not-high" };
+  const base = {
+    id: testIdOf(file, name),
+    file,
+    name,
+    requirements: [...requirements],
+    risk: options.risk ?? "not-high",
+    ...(options.characteristic === undefined ? {} : { characteristic: options.characteristic }),
+  };
   const notRun = (outcome: "skip" | "todo", v: boolean | string): void => {
     const at = nowNanos();
     const reason = reasonOf(v);

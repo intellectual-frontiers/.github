@@ -50,6 +50,11 @@ export const about: About = {
       ],
     },
     {
+      path: "quality/",
+      what: "IFC Quality (commons 0021-ifqs): the canonical record of a run (`not_run`, the grade E0 to E5, CTRF case bodies), its JUnit, CTRF, SARIF and TAP renderings, the evidence chain, and the append-only `quality` branch with its notes, written and verified with real `git`. `pure/` imports the kernel alone.",
+      mayImport: ["node: builtins", "kernel/", "runtime/", "quality/"],
+    },
+    {
       path: "lint/",
       what: "The lint plugin `bun lint --plugin` loads, and its rules.",
       mayImport: ["node: builtins", "kernel/", "lint/", "runtime/"],
@@ -80,6 +85,10 @@ export const about: About = {
     },
     { run: "bun run test", does: "Runs the suite under Bun." },
     { run: "bun run test:node", does: "Runs the suite under Node 26." },
+    {
+      run: "bun quality/quality.ts record|verify|render",
+      does: "Keeps the record of a run on the append-only quality branch (a file, a signed commit, a note on the tested commit), verifies the branch and its chain, and renders a record as JUnit, CTRF, SARIF, TAP or the 29119-3 documents.",
+    },
     {
       run: "bun run test:evidence",
       does: "Runs the suite on Bun and Node into one OTLP record, its TAP, JUnit, CTRF, SARIF, OSCAL and completion reports, and the ledger.",

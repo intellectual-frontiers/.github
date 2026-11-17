@@ -545,25 +545,25 @@ requirement	mechanism	by	note
 0020-ifccm FR-032	check	.github: cd commons/ts && bun test tests/	mizan-changes-pure.test.ts: the findings are Mizan findings (MizanRule, held by a baseline) and holdHarness runs the declaration rule as a plugin; mizan-changes-git.test.ts: the command runs as a program with its exit statuses; the commit rules need a range and are the command's
 0020-ifccm FR-033	check	.github: cd commons/ts && bun test tests/	mizan-changes-pure.test.ts: Departs and Decision lines are read from a commit and judged (changes/no-decision, changes/self-approved), and the record file's declaration, decisions and roles are read as data
 0021-ifqs FR-001	none	-	Planned, M3 of issue #10: a principle held by the requirements under it: what runs is graded above what is stated (FR-021); the grade list exists (ifqs-ontology.test.ts)
-0021-ifqs FR-002	none	-	Planned, M3 of issue #10: 0008-test-evidence already writes the record as OTLP; the rule that no second channel carries a result is checked when the record is stored
+0021-ifqs FR-002	check	.github: cd commons/ts && bun test tests/	quality-branch.test.ts: the quality branch holds OTLP records and nothing else (a result as JUnit XML is refused by the chain); that no other channel carries a result in a run's pipeline stays with 0006-signals
 0021-ifqs FR-003	none	-	Planned, M7 of issue #10: the closure of a CAPA is judged against the author of its change and the approver of its Decision
 0021-ifqs FR-004	none	-	Planned, M9 of issue #10: the public page is generated for commons (0022-trust)
-0021-ifqs FR-005	none	-	Planned, M3 of issue #10: the record carries not_run with its reason and every rendering counts it; the outcome word exists (ifqs-ontology.test.ts)
+0021-ifqs FR-005	check	.github: cd commons/ts && bun test tests/	quality-record.test.ts, quality-command.test.ts: a planned case that did not run is not_run with its reason, never passed, refused without a reason, counted in the TAP, JUnit, CTRF, SARIF and completion renderings and by `quality record`
 0021-ifqs FR-006	none	-	Planned, M7 of issue #10: every rendering of a count of proof shows the grade with it
 0021-ifqs FR-007	none	-	Planned, M7 of issue #10: the system opens a nonconformance itself from a failed or stale proof
 0021-ifqs FR-008	check	.github: cd commons/ts && bun test tests/	ifqs-ontology.test.ts: each crosswalk row has a relation SSSOM has and requirements that exist, and the standards the specification is held to are there
 0021-ifqs FR-009	none	-	Planned, M3 of issue #10: the test record is kept as the objective evidence of verification for a harness that claims ifccm:DeviceQuality; the Authority citation is held by mizan/authority-citation
 0021-ifqs FR-010	check	.github: cd commons/ts && bun test tests/	ifqs-ontology.test.ts: the requirement names ca-2, ca-5, ca-7, sa-11 and si-2 by their OSCAL identifiers
 0021-ifqs FR-011	none	-	Planned, M7 of issue #10: the grade a requirement needs to be counted proved follows the risk of its tests
-0021-ifqs FR-012	none	-	Planned, M3 of issue #10: the record carries ifc.test.characteristic and the reports bear the 29119-3 document names
-0021-ifqs FR-013	none	-	Planned, M3 of issue #10: the body of a case's log record is a CTRF test object (0008-test-evidence writes its name and outcome as text today)
-0021-ifqs FR-014	none	-	Planned, M3 of issue #10: ifc.test.outcome takes not_run with ifc.test.reason, and the CTRF rendering maps it to other; the five outcomes of 0008 and not_run are held by ifqs-ontology.test.ts
-0021-ifqs FR-015	none	-	Planned, M3 of issue #10: the checks of Mizan leave their findings as cases of the record
-0021-ifqs FR-016	none	-	Planned, M3 of issue #10: the orphan quality branch, its signed append-only commits and the evidence path
-0021-ifqs FR-017	none	-	Planned, M3 of issue #10: the in-file chain of ifc.quality.previous.sha256 and its verification
-0021-ifqs FR-018	none	-	Planned, M3 of issue #10: the Git note under refs/notes/quality on the tested commit
+0021-ifqs FR-012	check	.github: cd commons/ts && bun test tests/	quality-record.test.ts: the runtime records ifc.test.characteristic (an ISO/IEC 25010 word) and the reports bear the 29119-3 document names (completion, status, incident)
+0021-ifqs FR-013	check	.github: cd commons/ts && bun test tests/	quality-record.test.ts, quality-command.test.ts: the body of each case's log record is a CTRF test object; JUnit, CTRF, SARIF and TAP are rendered on demand, byte for byte the same, and not kept
+0021-ifqs FR-014	check	.github: cd commons/ts && bun test tests/	quality-record.test.ts: ifc.test.outcome takes not_run with ifc.test.reason, CTRF renders it as other, and a requirement whose only proof is not_run is unproven; the outcome words equal the ifqs ontology's
+0021-ifqs FR-015	check	.github: cd commons/ts && bun test tests/	quality-record.test.ts: checkRun leaves each rule as a case and each finding as a failed case with rule id, file and line, rendered as SARIF results (a rule that could not run is not_run); the Mizan and changes commands calling it are Planned, M2 and M7 of issue #10
+0021-ifqs FR-016	check	.github: cd commons/ts && bun test tests/	quality-branch.test.ts, quality-command.test.ts: one new file per run at quality/evidence/YYYY/MM/DD/<trace id>.otlp.json on an orphan branch in a commit that only appends, never replaced, signed through the host's SSH signing, a force-push and a deletion refused by a repository set to refuse them
+0021-ifqs FR-017	check	.github: cd commons/ts && bun test tests/	quality-branch.test.ts, quality-record.test.ts: ifc.quality.previous.sha256 on every resource (64 zeros first) and the verifier names the first file that does not match
+0021-ifqs FR-018	check	.github: cd commons/ts && bun test tests/	quality-branch.test.ts: a note under refs/notes/quality on the tested commit gives the file's path, SHA-256 and grade; no note is E0 and a note that does not match its file breaks the evidence
 0021-ifqs FR-019	none	-	Planned, M7 of issue #10: the index derived from the branch and rebuilt from it alone
-0021-ifqs FR-020	none	-	Planned, M3 of issue #10: redaction before commit, reusing 0006-signals FR-006 and 0008-test-evidence FR-003
+0021-ifqs FR-020	check	.github: cd commons/ts && bun test tests/	quality-record.test.ts: secrets and e-mail addresses are redacted before a record is kept and a record that names a person is refused
 0021-ifqs FR-021	check	.github: cd commons/ts && bun test tests/	ifqs-ontology.test.ts: the six grades E0 to E5 exist in order with their ranks; deriving a requirement's grade from evidence is Planned, M7 of issue #10
 0021-ifqs FR-022	none	-	Planned, M7 of issue #10: the enforcement register is shown with the grade and day of each row's evidence, generated
 0021-ifqs FR-023	none	-	Planned, M7 of issue #10: review debt counted from the grades and held so that it does not grow without a Decision
@@ -585,6 +585,7 @@ requirement	mechanism	by	note
 0021-ifqs FR-039	none	-	Planned, M9 of issue #10: pre-registered test plans
 0021-ifqs FR-040	none	-	Planned, M9 of issue #10: mutation runs and the strength of a proof
 0021-ifqs FR-041	none	-	Planned, M9 of issue #10: agents' reviews and the person's sampling of them
+0021-ifqs FR-042	check	.github: cd commons/ts && bun test tests/	quality-branch.test.ts: a run kept unsigned is E3 and one kept in a signed commit E4 (SSH key made by ssh-keygen), a note is path, sha256 and grade with one paragraph per run, and a note that does not match its file or a chain that does not verify is E0
 0022-trust FR-001	none	-	Planned, M9 of issue #10: the generator of the Trust page and its --check
 0022-trust FR-002	none	-	Planned, M9 of issue #10: the figures of the page: grade, freshness, review debt, objectives, not_run
 0022-trust FR-003	none	-	Planned, M9 of issue #10: failures listed before successes
