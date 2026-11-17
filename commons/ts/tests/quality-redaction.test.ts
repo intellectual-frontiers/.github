@@ -12,26 +12,20 @@ import { makeTempDir, remove } from "../runtime/fs.ts";
 import { assert, assertEquals, proves } from "../runtime/test.ts";
 import { keepRun } from "../quality/host/branch.ts";
 import { appendEvents, readLedger } from "../quality/host/ledger-branch.ts";
-import { type LedgerEvent, redactEvent } from "../quality/pure/ledger.ts";
-import { type Day, dayOfText } from "../quality/pure/time.ts";
+import { type LedgerEvent, readLedgerFile, redactEvent } from "../quality/pure/ledger.ts";
 import { assembledRun, git, needsGit, repositoryWithCommit } from "./quality-fixtures.ts";
 
 const TOKEN = `ghp_${"a1B2".repeat(9)}`;
 const MAIL = "jane.doe@example.org";
 const DIRTY = `see ${MAIL} and the token ${TOKEN}`;
 
-function day(text: string): Day {
-  const d = dayOfText(text);
-  assert(d.kind === "ok", "a day");
-  return d.value;
-}
-const DAY = day("2026-11-17");
+const DAY = "2026-11-17";
 const REQ = "0021-ifqs FR-005";
 const DIGEST = "a".repeat(64);
 const person = { name: "Jane Doe", role: `reviewer ${MAIL}` };
 
 /** One event of every kind, each with a secret and an e-mail address in every text a person typed. */
-const EVENTS: readonly LedgerEvent[] = [
+const RAW: readonly object[] = [
   {
     kind: "nonconformance-opened",
     id: "NC-0001",
@@ -90,6 +84,15 @@ const EVENTS: readonly LedgerEvent[] = [
   },
 ];
 
+/** An event as the ledger decodes it (a file of the ledger around it), which is what the writer is given. */
+function decoded(raw: object): LedgerEvent {
+  const file = readLedgerFile(JSON.stringify({ schema: "ifqs-record/1", seq: 1, previous: "0".repeat(64), event: raw }));
+  assert(file.kind === "ok", file.kind === "err" ? file.error : "");
+  return file.value.event;
+}
+
+const EVENTS: readonly LedgerEvent[] = RAW.map(decoded);
+
 /** Every string in a value, at any depth, with the key it stands under. */
 function strings(value: unknown, key = ""): readonly { readonly key: string; readonly text: string }[] {
   if (typeof value === "string") return [{ key, text: value }];
@@ -113,21 +116,21 @@ proves(
       // what is data is as it was: the name of the person, the digests, the days
       assertEquals(redactEvent(kept), kept, `${e.kind}: redaction is idempotent`);
     }
-    const plan = redactEvent(EVENTS[9] as LedgerEvent);
-    assert(plan.kind === "plan-registered");
+    const plan = EVENTS.map(redactEvent).find((e) => e.kind === "plan-registered");
+    assert(plan?.kind === "plan-registered");
     assertEquals(plan.by.name, "Jane Doe");
     assertEquals(plan.by.role, "reviewer REDACTED");
-    const attested = redactEvent(EVENTS[11] as LedgerEvent);
-    assert(attested.kind === "sample-attested");
+    const attested = EVENTS.map(redactEvent).find((e) => e.kind === "sample-attested");
+    assert(attested?.kind === "sample-attested");
     assertEquals(attested.person.name, "Jane Doe");
     assertEquals(attested.results[0]?.verdict, "pass");
   },
 );
 
 proves(["0022-trust FR-017"], "a person's own e-mail address as the name of the person is redacted; a name is kept", () => {
-  const e: LedgerEvent = { kind: "statement", requirement: REQ, by: "person", who: "Jane Doe", day: DAY };
+  const e = decoded({ kind: "statement", requirement: REQ, by: "person", who: "Jane Doe", day: DAY });
   assertEquals(redactEvent(e), e);
-  const mailed = redactEvent({ ...e, who: MAIL });
+  const mailed = redactEvent(decoded({ kind: "statement", requirement: REQ, by: "person", who: MAIL, day: DAY }));
   assert(mailed.kind === "statement");
   assertEquals(mailed.who, "REDACTED");
 });
@@ -136,7 +139,7 @@ proves(
   ["0022-trust FR-017", "0021-ifqs FR-020"],
   "events of every kind written to a real quality branch hold no secret and no e-mail address in any file, and the ledger reads back",
   async () => {
-    const dir = await makeTempDir("ifqs-redaction-");
+    const dir = await makeTempDir({ prefix: "ifqs-redaction-" });
     try {
       await repositoryWithCommit(dir);
       const wrote = await appendEvents(dir, EVENTS, { sign: false });
@@ -163,7 +166,7 @@ proves(
   ["0022-trust FR-017", "0021-ifqs FR-020"],
   "a run kept with a secret and an e-mail address in a failure message is written redacted, and neither the note on the tested commit nor the commit messages of the branch carry one",
   async () => {
-    const dir = await makeTempDir("ifqs-redaction-run-");
+    const dir = await makeTempDir({ prefix: "ifqs-redaction-run-" });
     try {
       const tested = await repositoryWithCommit(dir);
       const record = await assembledRun(1, [{ name: "a case", outcome: "fail", message: DIRTY, requirements: [REQ] }], {

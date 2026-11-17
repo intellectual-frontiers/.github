@@ -11,7 +11,9 @@
  *
  * @module
  */
-import type { RegisterRow } from "./ladder.ts";
+import type { Declaration } from "../../mizan/changes/declaration.ts";
+import { gradeNeeded, type Judgement, type RegisterRow, regulatedInProduction } from "./ladder.ts";
+import { type Grade, gradeRank, NO_GRADE } from "./names.ts";
 
 /** The tiers a harness may claim (`ifqs:QualityTier`). */
 export type Tier = "Tier0" | "Tier1" | "Tier2";
@@ -38,18 +40,44 @@ export function tierRequirements(tier: Tier): readonly string[] {
 /** What a claim of a tier comes to. */
 export type TierJudgement = {
   readonly tier: Tier;
-  /** Whether every requirement of the tier and of those below it is held by a mechanism. */
+  /** Whether every requirement of the tier and of those below it is held by a mechanism and, for a regulated harness in production, proved at the grade it needs. */
   readonly claimed: boolean;
   /** The requirements of the tier and below that are held by none. */
   readonly unmet: readonly string[];
+  /** Where a regulated harness is in production: the requirements held by a mechanism whose proof is below the grade needed (FR-011), with the grade they have. */
+  readonly underGrade: readonly { readonly requirement: string; readonly grade: Grade; readonly needed: Grade }[];
 };
 
-/** A claim judged against the register (FR-036): a requirement the register does not list, or lists with `none`, is not met. */
-export function judgeTier(tier: Tier, register: readonly RegisterRow[]): TierJudgement {
+/** What a regulated harness in production is also judged on: the judgements of its requirements, its declaration and the day (FR-011). */
+export type TierProof = {
+  readonly judgements: readonly Judgement[];
+  readonly declaration: Declaration | undefined;
+  readonly today: string;
+};
+
+/**
+ * A claim judged against the register (FR-036): a requirement the register does not list, or lists with `none`, is not met. Where `proof` is
+ * given and the harness declares a regulated domain and production (`today` is on or after its production day), a requirement held by a
+ * mechanism must also be proved at the grade `gradeNeeded` asks (`E4`: FR-011), or the claim is refused and the requirement named with the
+ * grade it has. Every other harness is judged by the register alone.
+ */
+export function judgeTier(tier: Tier, register: readonly RegisterRow[], proof?: TierProof): TierJudgement {
   const upTo = TIERS.slice(0, TIERS.indexOf(tier) + 1);
-  const unmet = upTo.flatMap(tierRequirements).filter((r) => {
+  const wanted = upTo.flatMap(tierRequirements);
+  const held = (r: string): boolean => {
     const row = register.find((x) => x.requirement === r);
-    return row === undefined || row.mechanism === "none";
-  });
-  return { tier, claimed: unmet.length === 0, unmet };
+    return row !== undefined && row.mechanism !== "none";
+  };
+  const unmet = wanted.filter((r) => !held(r));
+  const underGrade =
+    proof === undefined || !regulatedInProduction(proof.declaration, proof.today)
+      ? []
+      : wanted
+          .filter(held)
+          .map((requirement) => {
+            const j = proof.judgements.find((x) => x.requirement === requirement);
+            return { requirement, grade: j?.grade ?? NO_GRADE, needed: gradeNeeded(j?.risk ?? "not-high", proof.declaration, proof.today) };
+          })
+          .filter((x) => gradeRank(x.grade) < gradeRank(x.needed));
+  return { tier, claimed: unmet.length === 0 && underGrade.length === 0, unmet, underGrade };
 }

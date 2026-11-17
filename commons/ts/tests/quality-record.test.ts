@@ -290,6 +290,9 @@ proves(
   },
 );
 
+/** The one module outside the quality folder that it may import: the harness declaration (0020-ifccm FR-010), pure and itself importing only the kernel (0021-ifqs FR-011, FR-046). */
+const DECLARATION_MODULE = "mizan/changes/declaration.ts";
+
 test("the quality folder's pure layer imports only the kernel and itself, and its host layer only the kernel, the runtime and the quality folder", () => {
   const list = (folder: string): string[] => {
     const out: string[] = [];
@@ -309,14 +312,15 @@ test("the quality folder's pure layer imports only the kernel and itself, and it
   for (const f of list("quality/pure")) {
     for (const s of imports(f)) {
       const target = toPosix(relative(ROOT, resolve(dirname(f), s)));
-      if (s.startsWith("node:") || !(target.startsWith("kernel/") || target.startsWith("quality/pure/"))) bad.push(`${f}: ${s}`);
+      if (s.startsWith("node:") || !(target.startsWith("kernel/") || target.startsWith("quality/pure/") || target === DECLARATION_MODULE))
+        bad.push(`${f}: ${s}`);
     }
   }
   for (const f of list("quality/host")) {
     for (const s of imports(f)) {
       const target = toPosix(relative(ROOT, resolve(dirname(f), s)));
       if (s.startsWith("node:")) continue;
-      if (!["kernel/", "runtime/", "quality/"].some((p) => target.startsWith(p))) bad.push(`${f}: ${s}`);
+      if (!["kernel/", "runtime/", "quality/"].some((p) => target.startsWith(p)) && target !== DECLARATION_MODULE) bad.push(`${f}: ${s}`);
     }
   }
   assertEquals(bad, []);

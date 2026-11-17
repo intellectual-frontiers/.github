@@ -33,7 +33,8 @@ import {
   registerPlan,
   verifySamples,
 } from "./attestation/host.ts";
-import { DEFAULT_FLOOR_PERMILLE, gradeAfterMutation, showStrength, strengths } from "./attestation/mutation.ts";
+import { gradeAfterMutation, mutationFloor, showStrength, strengths } from "./attestation/mutation.ts";
+import { readDeclaration } from "./host/declaration.ts";
 import { formatPlanFinding } from "./attestation/plan.ts";
 import { SAMPLE_SUBJECTS, type SampleSubject } from "./pure/tier2-events.ts";
 import { isDay } from "./pure/time.ts";
@@ -78,6 +79,10 @@ const result: Parser<{ readonly item: string; readonly verdict: "pass" | "fail" 
 
 const REPO = value({ help: "The repository the `quality` branch is in.", valueName: "DIR", default: "." });
 const REGISTER = value({ help: "The proof register (enforcement.tsv); the repository's own where not given.", valueName: "FILE" });
+const DECLARATION = value({
+  help: "The harness's record (ifccm.declaration.ts of the repository where not given): a regulated harness in production needs E4 for every requirement and a mutation floor of 800.",
+  valueName: "FILE",
+});
 const TODAY = value({
   help: "The day (YYYY-MM-DD); where not given, the day of the newest evidence for a page or a pack, the clock for a record.",
   valueName: "DAY",
@@ -91,6 +96,7 @@ const ROLE = value({ help: "The person's role.", valueName: "ROLE" });
 
 const TRUST = {
   repo: REPO,
+  declaration: DECLARATION,
   register: REGISTER,
   today: TODAY,
   harness: value({ help: "The harness's name, as the page shows it.", valueName: "NAME", required: true }),
@@ -118,10 +124,13 @@ export async function trustCommand(rest: readonly string[]): Promise<number> {
   if (p.value.kind === "help") return help(helpText("quality trust", "Generate the Trust page from the evidence.", TRUST));
   const o = p.value.options;
   if (o.check && o.html === undefined && o.json === undefined) return fail("--check compares the files given by --html and --json", 2);
+  const declared = await readDeclaration(o.repo, o.declaration);
+  if (declared.kind === "err") return fail(declared.error, 3);
   const c = await collect({
     repo: o.repo,
     ...(o.register === undefined ? {} : { register: o.register }),
     ...(o.today === undefined ? {} : { today: o.today }),
+    ...(declared.value === undefined ? {} : { declaration: declared.value }),
   });
   if (c.kind === "err") return fail(formatCollectError(c.error), 1);
   const page = generateTrust(c.value, {
@@ -162,6 +171,7 @@ export async function trustCommand(rest: readonly string[]): Promise<number> {
 
 const PACK = {
   repo: REPO,
+  declaration: DECLARATION,
   register: REGISTER,
   today: TODAY,
   harness: value({ help: "The harness's name.", valueName: "NAME", required: true }),
@@ -190,10 +200,13 @@ export async function packCommand(rest: readonly string[]): Promise<number> {
     signing = await loadSigningKey(await readTextFile(o.signKey), o.signer);
     if (signing.kind === "err") return fail(signing.error, 1);
   }
+  const declared = await readDeclaration(o.repo, o.declaration);
+  if (declared.kind === "err") return fail(declared.error, 3);
   const c = await collect({
     repo: o.repo,
     ...(o.register === undefined ? {} : { register: o.register }),
     ...(o.today === undefined ? {} : { today: o.today }),
+    ...(declared.value === undefined ? {} : { declaration: declared.value }),
   });
   if (c.kind === "err") return fail(formatCollectError(c.error), 1);
   const pack = await packOf(c.value, {
@@ -390,8 +403,10 @@ const MUTATION_INGEST = {
 };
 const MUTATION_STRENGTH = {
   repo: REPO,
+  declaration: DECLARATION,
+  today: TODAY,
   floor: value({
-    help: "The strength, in a thousand, below which a proof's grade is lowered (600 where not given).",
+    help: "The strength, in a thousand, below which a proof's grade is lowered (600 where not given; never below 800 for a regulated harness in production).",
     valueName: "N",
     parse: permille,
   }),
@@ -423,13 +438,24 @@ export async function mutationCommand(rest: readonly string[]): Promise<number> 
       if (p.value.kind === "help")
         return help(helpText("quality mutation strength", "Show the strength of each proof beside its grade.", MUTATION_STRENGTH));
       const o = p.value.options;
-      const c = await collect({ repo: o.repo });
+      const declared = await readDeclaration(o.repo, o.declaration);
+      if (declared.kind === "err") return fail(declared.error, 3);
+      const c = await collect({
+        repo: o.repo,
+        ...(o.today === undefined ? {} : { today: o.today }),
+        ...(declared.value === undefined ? {} : { declaration: declared.value }),
+      });
       if (c.kind === "err") return fail(formatCollectError(c.error), 1);
       const s = strengths(c.value.tier2.assurance.mutations);
       for (const j of c.value.gathered.judgements) {
         const st = s.get(j.requirement);
         if (st === undefined) continue;
-        const effect = gradeAfterMutation(j.grade, j.grade === "E3" || j.grade === "E4", st, o.floor ?? DEFAULT_FLOOR_PERMILLE);
+        const effect = gradeAfterMutation(
+          j.grade,
+          j.grade === "E3" || j.grade === "E4",
+          st,
+          mutationFloor(c.value.declaration, c.value.today, o.floor),
+        );
         say(
           `${j.requirement}\t${j.grade}\t${showStrength(st.permille)}\t${effect.effect === "lowered" ? `lowered to ${effect.grade}` : effect.effect}\t${effect.why}`,
         );

@@ -36,7 +36,9 @@ import {
 } from "./pure/ledger.ts";
 import { objectiveMetricsJson, showEvaluation, SUGGESTED_OBJECTIVES } from "./pure/objectives.ts";
 import { isDay } from "./pure/time.ts";
-import { isTier, judgeTier } from "./pure/tier.ts";
+import { regulatedInProduction } from "./pure/ladder.ts";
+import { isTier, judgeTier, type TierProof } from "./pure/tier.ts";
+import { readDeclaration } from "./host/declaration.ts";
 import { showGrade } from "./pure/names.ts";
 import type { QualityRecord } from "./pure/record.ts";
 
@@ -52,6 +54,10 @@ const dayParser: Parser<string> = (t) => (isDay(t) ? ok(t) : err("a day is YYYY-
 
 const REPO = value({ help: "The repository the `quality` branch is in.", valueName: "DIR", default: "." });
 const REGISTER = value({ help: "The proof register (enforcement.tsv); the repository's own where not given.", valueName: "FILE" });
+const DECLARATION = value({
+  help: "The harness's record (ifccm.declaration.ts of the repository where not given): a regulated harness in production needs E4 for every requirement and a mutation floor of 800.",
+  valueName: "FILE",
+});
 const TODAY = value({ help: "The day to judge at, YYYY-MM-DD (the clock where not given).", valueName: "DAY", parse: dayParser });
 const SIGN = flag({ help: "Sign the commits that keep it (--no-sign: do not; neither: as commit.gpgsign says).", negatable: true });
 
@@ -120,6 +126,7 @@ export async function indexCommand(rest: readonly string[]): Promise<number> {
 
 const FRESHNESS = {
   repo: REPO,
+  declaration: DECLARATION,
   register: REGISTER,
   today: TODAY,
   open: flag({ help: "Open the nonconformances the stale and failed proofs and the spent budgets call for." }),
@@ -133,7 +140,14 @@ export async function freshnessCommand(rest: readonly string[]): Promise<number>
   if (p.value.kind === "help") return help(helpText("quality freshness", "Judge the freshness of every proof.", FRESHNESS));
   const o = p.value.options;
   const today = o.today ?? clockDay();
-  const g = await gather({ repo: o.repo, today, ...(o.register === undefined ? {} : { register: o.register }) });
+  const declared = await readDeclaration(o.repo, o.declaration);
+  if (declared.kind === "err") return fail(declared.error, 3);
+  const g = await gather({
+    repo: o.repo,
+    today,
+    ...(o.register === undefined ? {} : { register: o.register }),
+    ...(declared.value === undefined ? {} : { declaration: declared.value }),
+  });
   if (g.kind === "err") return fail(formatGatherError(g.error), 1);
   const G = g.value;
   if (G.branchProblem !== undefined) say(`quality: ${G.branchProblem}`);
@@ -452,6 +466,8 @@ export async function registerCommand(rest: readonly string[]): Promise<number> 
 // ---------------------------------------------------------------------------------------------------------------------------- tier
 
 const TIER = {
+  declaration: DECLARATION,
+  today: TODAY,
   claim: value({ help: "The tier the harness claims: Tier0, Tier1 or Tier2.", valueName: "TIER", required: true }),
   register: REGISTER,
   repo: REPO,
@@ -470,13 +486,34 @@ export async function tierCommand(rest: readonly string[]): Promise<number> {
     () => err(`${file} cannot be read`),
   );
   if (text.kind === "err") return fail(text.error, 1);
-  const j = judgeTier(o.claim, parseRegister(text.value));
+  const declared = await readDeclaration(o.repo, o.declaration);
+  if (declared.kind === "err") return fail(declared.error, 3);
+  const today = o.today ?? clockDay();
+  // a regulated harness in production is judged on the grade of its proofs too (0021-ifqs FR-011)
+  let proof: TierProof | undefined;
+  if (declared.value !== undefined && regulatedInProduction(declared.value, today)) {
+    const g = await gather({
+      repo: o.repo,
+      today,
+      ...(o.register === undefined ? {} : { register: o.register }),
+      declaration: declared.value,
+    });
+    if (g.kind === "err") return fail(formatGatherError(g.error), 1);
+    proof = { judgements: g.value.judgements, declaration: declared.value, today };
+  }
+  const j = judgeTier(o.claim, parseRegister(text.value), proof);
   if (j.claimed) {
     say(`quality: ${o.claim} is met: every requirement of it and of the tiers below is held by a mechanism`);
     return 0;
   }
   for (const r of j.unmet) say(`${r}: held by none`);
-  return fail(`${o.claim} is refused: ${j.unmet.length} requirement${j.unmet.length === 1 ? " is" : "s are"} held by none`, 1);
+  for (const u of j.underGrade)
+    say(`${u.requirement}: proved at ${showGrade(u.grade)}, a regulated harness in production needs ${showGrade(u.needed)}`);
+  const parts = [
+    ...(j.unmet.length === 0 ? [] : [`${j.unmet.length} held by none`]),
+    ...(j.underGrade.length === 0 ? [] : [`${j.underGrade.length} proved below the grade needed`]),
+  ];
+  return fail(`${o.claim} is refused: ${parts.join(", ")}`, 1);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------------- attest

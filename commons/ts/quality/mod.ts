@@ -16,7 +16,7 @@
  * `assessor/` (the assessor pack, its signature, its tar and DCAT distribution, and the verifier that is inside it: FR-010 to FR-016).
  *
  * @remarks
- * `pure/` imports only the kernel and itself; `host/` is the layer that runs `git` and reads files. The records of Tier 2 are events of the ledger
+ * `pure/` imports only the kernel, itself and the harness declaration (`mizan/changes/declaration.ts`, pure); `host/` is the layer that runs `git` and reads files. The records of Tier 2 are events of the ledger
  * (`pure/tier2-events.ts`), folded by `attestation/rules.ts`. The verifier `assessor/verify-pack.ts` imports nothing, because it is copied into every pack.
  *
  * @module
