@@ -44,7 +44,8 @@ export type IntegrationFinding =
   | { readonly kind: "term-missing"; readonly iri: string }
   | { readonly kind: "term-untyped"; readonly iri: string }
   | { readonly kind: "bad-name"; readonly name: string }
-  | { readonly kind: "no-curie"; readonly iri: string };
+  | { readonly kind: "no-curie"; readonly iri: string }
+  | { readonly kind: "unsupported"; readonly what: string; readonly about: string };
 
 /** A finding as one plain sentence. */
 export function describeFinding(f: IntegrationFinding): string {
@@ -69,6 +70,8 @@ export function describeFinding(f: IntegrationFinding): string {
       return `${f.name} is not a name an SQL table may have (lower-case letters, digits and underscores, starting with a letter)`;
     case "no-curie":
       return `${f.iri} has no prefix in the curie map, so a mapping cannot be written with it`;
+    case "unsupported":
+      return `${f.about === "" ? "the source" : f.about} has ${f.what}, which the typed form cannot hold, so it is not imported`;
     default:
       return absurd(f);
   }

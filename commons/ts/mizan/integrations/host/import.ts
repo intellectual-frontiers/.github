@@ -6,7 +6,7 @@
  *                                                                            the manifest to the module's header offline, and with --fetch fetches the source and compares fully
  *
  * The manifest is a module that exports `manifest`: the pinned `standard` (issuer, version, license, whether it may be copied, the SHA-256 of the source), the `source` (a file
- * relative to the manifest, or an `https://` URL fetched once and held to the SHA-256 pin, 0019-mizan-integrations FR-014), its `format` (`turtle` or `n-triples`), the `namespace` and the `slice` of local names to take, the `out` file and the `rdfImport` specifier of the
+ * relative to the manifest, or an `https://` URL fetched once and held to the SHA-256 pin, 0019-mizan-integrations FR-014), its `format` (`turtle`, `n-triples`, `json-ld`, `rdf-xml`, `oscal-catalog` or `json-schema`), the `namespace` and the `slice` of local names to take, the `out` file and the `rdfImport` specifier of the
  * module that gives `namespace` and `vocabulary`. The manifest is read once, here, into a typed record; a finding stops the run with exit 2 and one sentence each.
  *
  * @module
@@ -17,6 +17,7 @@ import { dirname, resolve } from "../../../runtime/path.ts";
 import { existsSync, readTextFileSync, writeTextFileSync } from "../../../runtime/fs.ts";
 import { stdio } from "../../../runtime/mod.ts";
 import { err, ok, type Result } from "../../../kernel/result.ts";
+import { importJsonSchema } from "../pure/import-json-schema.ts";
 import { importOscalCatalog } from "../pure/import-oscal-catalog.ts";
 import { importVocabulary } from "../pure/import-vocabulary.ts";
 import { provenanceTurtle } from "../pure/provenance.ts";
@@ -26,8 +27,8 @@ import { describeFinding, type StandardRecord } from "../pure/types.ts";
 export type ImportManifest = {
   readonly standard: StandardRecord;
   readonly source: string;
-  readonly format: "turtle" | "n-triples" | "oscal-catalog";
-  /** The namespace of a vocabulary's terms: required for `turtle` and `n-triples`, none for an OSCAL catalog, whose slice names control identifiers. */
+  readonly format: "turtle" | "n-triples" | "json-ld" | "rdf-xml" | "oscal-catalog" | "json-schema";
+  /** The namespace of a vocabulary's terms: required for `turtle`, `n-triples`, `json-ld` and `rdf-xml`, none for an OSCAL catalog (whose slice names control identifiers) or a JSON Schema (whose slice names `$defs`). */
   readonly namespace?: { readonly prefix: string; readonly iri: string };
   readonly slice: readonly string[];
   readonly out: string;
@@ -39,6 +40,10 @@ export type ImportManifest = {
 
 const isRecord = (x: unknown): x is Readonly<Record<string, unknown>> => typeof x === "object" && x !== null && !Array.isArray(x);
 const text = (x: unknown): string | undefined => (typeof x === "string" && x !== "" ? x : undefined);
+
+/** The formats a manifest may name: the four RDF syntaxes of a vocabulary, an OSCAL catalog and a JSON Schema. */
+const MANIFEST_FORMATS = ["turtle", "n-triples", "json-ld", "rdf-xml", "oscal-catalog", "json-schema"] as const;
+const isManifestFormat = (x: unknown): x is ImportManifest["format"] => MANIFEST_FORMATS.some((f) => f === x);
 
 /** A manifest module's `manifest` export, checked once: every field there and of its type, or the sentence that says which is not. */
 export function decodeManifest(x: unknown): Result<ImportManifest, string> {
@@ -55,15 +60,15 @@ export function decodeManifest(x: unknown): Result<ImportManifest, string> {
   if (typeof st["redistributable"] !== "boolean") return err("standard.redistributable must be true or false");
   const ns = x["namespace"];
   const format = x["format"];
-  if (format !== "turtle" && format !== "n-triples" && format !== "oscal-catalog")
-    return err("format must be turtle, n-triples or oscal-catalog");
+  if (!isManifestFormat(format)) return err(`format must be ${MANIFEST_FORMATS.join(", ")}`);
   const nsOk = isRecord(ns) && text(ns["prefix"]) !== undefined && text(ns["iri"]) !== undefined;
-  if (format !== "oscal-catalog" && !nsOk) return err("namespace must have a prefix and an iri");
+  const rdf = format !== "oscal-catalog" && format !== "json-schema";
+  if (rdf && !nsOk) return err("namespace must have a prefix and an iri");
   const slice = x["slice"];
   if (!Array.isArray(slice) || slice.some((s) => typeof s !== "string")) return err("slice must be a list of local names");
   const [source, out, rdfImport, provOut] = [text(x["source"]), text(x["out"]), text(x["rdfImport"]), text(x["provOut"])];
-  if (source === undefined || out === undefined || rdfImport === undefined)
-    return err("source, out and rdfImport must be non-empty strings");
+  if (source === undefined || out === undefined || (rdf && rdfImport === undefined))
+    return err(rdf ? "source, out and rdfImport must be non-empty strings" : "source and out must be non-empty strings");
   const exportName = text(x["exportName"]);
   return ok({
     standard: {
@@ -82,7 +87,7 @@ export function decodeManifest(x: unknown): Result<ImportManifest, string> {
     slice: slice.map(String),
     out,
     ...(provOut === undefined ? {} : { provOut }),
-    rdfImport,
+    rdfImport: rdfImport ?? "",
     ...(exportName === undefined ? {} : { exportName }),
   });
 }
@@ -109,6 +114,8 @@ export async function readSource(source: string, dir: string): Promise<Result<st
 /** What a generated module's header and vocabulary say, read back without the source: its pinned hash and the local names of its terms. */
 export function readModuleHeader(moduleText: string): { readonly sha256: string; readonly terms: readonly string[] } | undefined {
   const sha = /^\/\/ source_sha256=([0-9a-f]{64})$/m.exec(moduleText)?.[1];
+  const sliced = /^\/\/ slice: (.+)$/m.exec(moduleText)?.[1];
+  if (sha !== undefined && sliced !== undefined) return { sha256: sha, terms: sliced.split(", ").sort() };
   const block = /export const [a-z][A-Za-z0-9_]* = vocabulary\([A-Z0-9_]+, \{\n([\s\S]*?)\n\}\);/.exec(moduleText)?.[1];
   if (sha !== undefined && block !== undefined)
     return { sha256: sha, terms: [...block.matchAll(/^ {2}"?([A-Za-z0-9_]+)"?: "/gm)].map((m) => m[1] ?? "") };
@@ -157,17 +164,19 @@ export async function main(argv: readonly string[]): Promise<number> {
   const made =
     format === "oscal-catalog"
       ? await importOscalCatalog({ standard: m.value.standard, sourceText: text.value, slice: m.value.slice, ...exportName })
-      : namespace === undefined
-        ? err([{ kind: "syntax" as const, line: 1, message: "a vocabulary import has no namespace" }])
-        : await importVocabulary({
-            standard: m.value.standard,
-            sourceText: text.value,
-            format,
-            namespace,
-            slice: m.value.slice,
-            rdfImport: m.value.rdfImport,
-            ...exportName,
-          });
+      : format === "json-schema"
+        ? await importJsonSchema({ standard: m.value.standard, sourceText: text.value, slice: m.value.slice })
+        : namespace === undefined
+          ? err([{ kind: "syntax" as const, line: 1, message: "a vocabulary import has no namespace" }])
+          : await importVocabulary({
+              standard: m.value.standard,
+              sourceText: text.value,
+              format,
+              namespace,
+              slice: m.value.slice,
+              rdfImport: m.value.rdfImport,
+              ...exportName,
+            });
   if (made.kind === "err") {
     stdio.stderr.writeSync(made.error.map((f) => `${file}: ${describeFinding(f)}\n`).join(""));
     return 2;

@@ -1,5 +1,5 @@
 /**
- * The first importer (commons 0019-mizan-integrations FR-005 to FR-009): a slice of an outside vocabulary, read from Turtle or N-Triples, written as a generated TypeScript
+ * The first importer (commons 0019-mizan-integrations FR-005 to FR-009): a slice of an outside vocabulary, read from Turtle, N-Triples, JSON-LD or RDF/XML, written as a generated TypeScript
  * module of a typed vocabulary, whose terms have the basis `adopts` (0018-standards-first FR-003).
  *
  * @remarks
@@ -19,9 +19,12 @@
  *
  * @module
  */
+import { absurd } from "../../../kernel/absurd.ts";
 import { sha256 } from "../../../kernel/sha256.ts";
 import { err, ok, type Result } from "../../../kernel/result.ts";
+import { readJsonLd } from "./read-json-ld.ts";
 import { readNTriples, readTurtle, type Read, TYPE } from "./read-rdf.ts";
+import { readRdfXml } from "./read-rdf-xml.ts";
 import type { IntegrationFinding, StandardRecord } from "./types.ts";
 
 /** The kinds of term a typed vocabulary states, in the order a term's types are looked at. */
@@ -41,7 +44,7 @@ export type ImportInput = {
   readonly standard: StandardRecord;
   /** The source, as the pinned bytes read as UTF-8 text. */
   readonly sourceText: string;
-  readonly format: "turtle" | "n-triples";
+  readonly format: "turtle" | "n-triples" | "json-ld" | "rdf-xml";
   /** The namespace the slice's terms are in: its prefix and IRI. */
   readonly namespace: { readonly prefix: string; readonly iri: string };
   /** The local names of the terms to take, never the whole standard. */
@@ -69,7 +72,7 @@ export type ImportRecordData = {
 export type ImportOutput = {
   readonly module: string;
   readonly record: ImportRecordData;
-  readonly terms: readonly { readonly iri: string; readonly kind: TermKind | "control" }[];
+  readonly terms: readonly { readonly iri: string; readonly kind: TermKind | "control" | "code-list" | "field-names" }[];
   readonly findings: readonly IntegrationFinding[];
 };
 
@@ -124,6 +127,22 @@ function moduleText(i: ImportInput, terms: readonly { readonly local: string; re
   ].join("\n");
 }
 
+/** The source's triples by its format; a relative IRI of JSON-LD or RDF/XML resolves against the location the standard is published at. */
+function readSourceText(i: ImportInput): Result<Read, readonly IntegrationFinding[]> {
+  switch (i.format) {
+    case "turtle":
+      return readTurtle(i.sourceText);
+    case "n-triples":
+      return readNTriples(i.sourceText);
+    case "json-ld":
+      return readJsonLd(i.sourceText, i.standard.location);
+    case "rdf-xml":
+      return readRdfXml(i.sourceText, i.standard.location);
+    default:
+      return absurd(i.format);
+  }
+}
+
 /** A slice of an outside vocabulary as a generated typed-vocabulary module, or what stops it. */
 export async function importVocabulary(i: ImportInput): Promise<Result<ImportOutput, readonly IntegrationFinding[]>> {
   const s = i.standard;
@@ -132,7 +151,7 @@ export async function importVocabulary(i: ImportInput): Promise<Result<ImportOut
   const actual = await sha256(i.sourceText);
   if (actual !== s.sha256) return err([{ kind: "pin-mismatch", standard: s.id, expected: s.sha256, actual }]);
   if (i.slice.length === 0) return err([{ kind: "slice-empty" }]);
-  const read: Result<Read, readonly IntegrationFinding[]> = i.format === "turtle" ? readTurtle(i.sourceText) : readNTriples(i.sourceText);
+  const read: Result<Read, readonly IntegrationFinding[]> = readSourceText(i);
   if (read.kind === "err") return err(read.error);
   const findings: IntegrationFinding[] = [];
   const taken: { local: string; kind: TermKind }[] = [];
