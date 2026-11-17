@@ -285,7 +285,7 @@ proves(
 
 proves(["0012-ontology FR-015"], "a code list of 5,000 entries type-checks with a key type of its entries, within 30 seconds", async () => {
   const root = resolve(dirname(fromFileUrl(import.meta.url)), "..");
-  const tsc = `${root}/node_modules/.bin/tsc`;
+  const tsc = `${root}/node_modules/typescript/bin/tsc`;
   const dir = makeTempDirSync({ prefix: "mizan-codes-" });
   try {
     const rows = Array.from(
@@ -309,6 +309,7 @@ proves(["0012-ontology FR-015"], "a code list of 5,000 entries type-checks with 
     );
     const started = Date.now();
     const o = await run([
+      execPath(),
       tsc,
       "--ignoreConfig",
       "--noEmit",

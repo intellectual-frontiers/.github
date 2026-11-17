@@ -356,7 +356,7 @@ export async function main(argv: readonly string[], commons: string = fileURLToP
   const root = commons.replace(/[\\/]$/, "");
   if (argv.includes("--check")) {
     const stale = [...want]
-      .filter(([rel, text]) => !existsSync(`${root}/${rel}`) || readFileSync(`${root}/${rel}`, "utf8") !== text)
+      .filter(([rel, text]) => !existsSync(`${root}/${rel}`) || readFileSync(`${root}/${rel}`, "utf8").replaceAll("\r\n", "\n") !== text)
       .map(([rel]) => rel);
     for (const rel of stale) stdio.stderr.writeSync(`commons/${rel} is not what the ontology makes; run: ${RUN}\n`);
     return stale.length > 0 ? 1 : 0;

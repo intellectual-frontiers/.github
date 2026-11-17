@@ -356,7 +356,7 @@ export async function readRegisterInput(root: string, repo: string, testFolders:
     label,
     specs,
     reviewed,
-    enforcement: existsSync(enforcement) ? readTextFileSync(enforcement) : "",
+    enforcement: existsSync(enforcement) ? readTextFileSync(enforcement).replaceAll("\r\n", "\n") : "",
     tests: [...tests].sort((a, b) => byText(a.path, b.path)),
   };
 }
@@ -378,7 +378,9 @@ export async function main(argv: readonly string[]): Promise<number> {
     [RESULTS_FILE, made.assessmentResults],
   ];
   if (argv.includes("--check")) {
-    const stale = files.filter(([name, text]) => !existsSync(`${out}/${name}`) || readTextFileSync(`${out}/${name}`) !== text);
+    const stale = files.filter(
+      ([name, text]) => !existsSync(`${out}/${name}`) || readTextFileSync(`${out}/${name}`).replaceAll("\r\n", "\n") !== text,
+    );
     for (const [name] of stale) stdio.stderr.writeSync(`${out}/${name} is not what the folder makes; run: ${RUN}\n`);
     return stale.length > 0 ? 1 : 0;
   }

@@ -144,7 +144,7 @@ export async function main(argv: readonly string[]): Promise<number> {
   const check = argv.includes("--check");
   const remote = isUrl(m.value.source);
   if (check && remote && !argv.includes("--fetch")) {
-    const head = existsSync(out) ? readModuleHeader(readTextFileSync(out)) : undefined;
+    const head = existsSync(out) ? readModuleHeader(readTextFileSync(out).replaceAll("\r\n", "\n")) : undefined;
     const want = [...new Set(m.value.slice)].sort();
     const stale =
       head === undefined || head.sha256 !== m.value.standard.sha256 || head.terms.join(",") !== want.join(",") || !existsSync(provOut);
@@ -185,7 +185,10 @@ export async function main(argv: readonly string[]): Promise<number> {
   const prov = provenanceTurtle(made.value.record, m.value.out);
   if (check) {
     const current =
-      existsSync(out) && readTextFileSync(out) === made.value.module && existsSync(provOut) && readTextFileSync(provOut) === prov;
+      existsSync(out) &&
+      readTextFileSync(out).replaceAll("\r\n", "\n") === made.value.module &&
+      existsSync(provOut) &&
+      readTextFileSync(provOut).replaceAll("\r\n", "\n") === prov;
     if (!current)
       stdio.stderr.writeSync(
         `${m.value.out} is not what the import makes; run: bun commons/ts/mizan/integrations/host/import.ts ${file}\n`,
