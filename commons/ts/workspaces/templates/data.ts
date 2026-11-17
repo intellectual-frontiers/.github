@@ -1,0 +1,27 @@
+/**
+ * What a template is given and what it is (commons 0024-ifws-host FR-003): a template is a TypeScript function from the decoded data to a list of generated files, and not text in a template language,
+ * so that the compiler checks it and no value of the data can become code. `TemplateData` is the manifest and the two facts a probe gave; `Template` names its generator, which the header of each
+ * of its files says.
+ *
+ * @module
+ */
+import type { Result } from "../../kernel/result.ts";
+import type { Manifest } from "../manifest.ts";
+import type { GeneratedFile, GenerateError } from "../render.ts";
+
+/** A tool as the resolved catalog lists it. */
+export type ToolEntry = { readonly name: string; readonly version: string };
+
+/** What the templates read: the decoded manifest, whether `direnv` is wanted and found (0024-ifws-host FR-023), and the resolved tool catalog (empty until the catalog is in the manifest). */
+export type TemplateData = {
+  readonly manifest: Manifest;
+  /** The manifest says `direnv` is wanted and a probe found it. */
+  readonly direnv: boolean;
+  readonly tools: readonly ToolEntry[];
+};
+
+/** A template: its generator's name and what it makes. */
+export type Template = {
+  readonly name: string;
+  readonly render: (data: TemplateData) => Result<readonly GeneratedFile[], readonly GenerateError[]>;
+};

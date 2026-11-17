@@ -14,10 +14,12 @@
  */
 import { array, boolean, formatDecodeError, integer, object, string } from "../kernel/decode.ts";
 import { err, ok, type Result } from "../kernel/result.ts";
+import { sha256Of } from "../kernel/sha256.ts";
 import { describeRemoteError, hostKindOf, type HostKinds, parseRemote, cloneUrlOf } from "../githost/remote.ts";
 import type { RepoRef } from "../githost/types.ts";
 import type { Finding } from "./findings.ts";
 import { describeLayoutError, repoPathOf, worktreePathOf } from "./layout.ts";
+import { describeNameError, moduleName } from "./modules/name.ts";
 import { collisions } from "./portable.ts";
 import { type Policy, hostAllowed, policyOf } from "./policy.ts";
 import { branchName, describeBrandError, gitHost, type BranchName, type RepoPath } from "./types.ts";
@@ -32,6 +34,9 @@ const manifestShape = object(
       { requiresSignedCommits: boolean, regulatedDomain: array(string), unapprovedGraceDays: integer, allowedGitHost: array(string) },
     ),
     identity: object({ name: string, email: string }),
+    signing: object({ format: string }, { key: string }),
+    direnv: boolean,
+    modules: array(object({ name: string, program: string }, { sha256: string, summary: string })),
   },
 );
 
@@ -50,6 +55,17 @@ export type ManifestRepo = {
   readonly worktrees: readonly ManifestWorktree[];
 };
 
+/** A module the workspace registers (0025-ifws FR-011): its name, the program that runs it and, where given, the SHA-256 that program must have. */
+export type ManifestModule = {
+  readonly name: string;
+  readonly program: string;
+  readonly sha256?: string | undefined;
+  readonly summary?: string | undefined;
+};
+
+/** How commits are signed in a managed repository (0024-ifws-host FR-013): `openpgp` or `ssh`, and the key the manifest names, if it names one. */
+export type ManifestSigning = { readonly format: "openpgp" | "ssh"; readonly key?: string | undefined };
+
 /** The decoded manifest. */
 export type Manifest = {
   readonly repositories: readonly ManifestRepo[];
@@ -57,11 +73,17 @@ export type Manifest = {
   readonly hostKinds: HostKinds;
   readonly policy: Policy;
   readonly identity?: { readonly name: string; readonly email: string } | undefined;
+  /** The signing the policy requires, where the manifest names a format. */
+  readonly signing?: ManifestSigning | undefined;
+  /** Whether `direnv` is wanted (0024-ifws-host FR-023): `.envrc.auto` is generated only where it is wanted and a probe finds it. */
+  readonly direnv: boolean;
+  /** The modules the workspace registers, written to `modules.auto.json`. */
+  readonly modules: readonly ManifestModule[];
 };
 
 /** One thing wrong in the manifest, with where. */
 export type ManifestIssue = {
-  /** The rule that found it: `ifws/manifest-shape`, `ifws/manifest-remote`, `ifws/manifest-path`, `ifws/manifest-branch`, `ifws/manifest-host`, `ifws/path-collision`, `ifws/host-not-allowed`. */
+  /** The rule that found it: `ifws/manifest-shape`, `ifws/manifest-remote`, `ifws/manifest-path`, `ifws/manifest-branch`, `ifws/manifest-host`, `ifws/manifest-signing`, `ifws/manifest-module`, `ifws/path-collision`, `ifws/host-not-allowed`. */
   readonly rule: string;
   /** The field, as `$.repositories[2].remote`. */
   readonly path: string;
@@ -96,6 +118,34 @@ export function decodeManifest(input: unknown): Result<Manifest, readonly Manife
     else if (host.value === "github.com")
       issues.push({ rule: "ifws/manifest-host", path: `$.gitlabHosts[${i}]`, message: "github.com is GitHub, not GitLab" });
     else hostKinds[host.value] = "Gitlab";
+  }
+
+  let signing: ManifestSigning | undefined;
+  if (raw.signing !== undefined) {
+    if (raw.signing.format === "openpgp" || raw.signing.format === "ssh") signing = { format: raw.signing.format, key: raw.signing.key };
+    else
+      issues.push({
+        rule: "ifws/manifest-signing",
+        path: "$.signing.format",
+        message: `the signing format is ${JSON.stringify(raw.signing.format)}; Git signs with openpgp or ssh`,
+      });
+  }
+  const modules: ManifestModule[] = [];
+  const seenModules = new Set<string>();
+  for (const [i, m] of (raw.modules ?? []).entries()) {
+    const at = `$.modules[${i}]`;
+    const name = moduleName(m.name);
+    if (name.kind === "err") issues.push({ rule: "ifws/manifest-module", path: `${at}.name`, message: describeNameError(name.error) });
+    else if (seenModules.has(name.value))
+      issues.push({ rule: "ifws/manifest-module", path: `${at}.name`, message: `the module ${name.value} is registered twice` });
+    else seenModules.add(name.value);
+    if (m.sha256 !== undefined && sha256Of(m.sha256) === undefined)
+      issues.push({
+        rule: "ifws/manifest-module",
+        path: `${at}.sha256`,
+        message: "the SHA-256 of a module's program is 64 hexadecimal digits",
+      });
+    modules.push({ name: m.name, program: m.program, sha256: m.sha256, summary: m.summary });
   }
 
   const policy = policyOf(raw.policy);
@@ -164,7 +214,15 @@ export function decodeManifest(input: unknown): Result<Manifest, readonly Manife
   }
 
   if (issues.length > 0) return err(issues);
-  return ok({ repositories, hostKinds, policy, ...(raw.identity === undefined ? {} : { identity: raw.identity }) });
+  return ok({
+    repositories,
+    hostKinds,
+    policy,
+    ...(raw.identity === undefined ? {} : { identity: raw.identity }),
+    ...(signing === undefined ? {} : { signing }),
+    direnv: raw.direnv === true,
+    modules,
+  });
 }
 
 /** The kind of host of a name under a manifest: GitHub for `github.com`, GitLab for `gitlab.com` and the hosts it names, plain Git for the rest (0023-if-workspaces FR-019). */
