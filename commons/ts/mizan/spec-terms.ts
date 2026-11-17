@@ -21,7 +21,11 @@ import type { MizanFinding, SpecText } from "./rules.ts";
 export type KnownTerms = Readonly<Record<string, ReadonlySet<string>>>;
 
 /** The findings: a prefixed name of a given ontology that the ontology does not define, once for each name in each specification. */
-export function specTermFindings(specs: readonly SpecText[], known: KnownTerms): readonly MizanFinding[] {
+export function specTermFindings(
+  specs: readonly SpecText[],
+  known: KnownTerms,
+  deprecated: ReadonlyMap<string, string> = new Map(),
+): readonly MizanFinding[] {
   const out: MizanFinding[] = [];
   for (const s of specs) {
     const file = `specs/${s.slug}/spec.md`;
@@ -30,6 +34,18 @@ export function specTermFindings(specs: readonly SpecText[], known: KnownTerms):
       for (const m of line.matchAll(/`([a-z][a-z0-9]*):([A-Za-z][A-Za-z0-9_]*)`/g)) {
         const [name, prefix, local] = [m[0].slice(1, -1), m[1] ?? "", m[2] ?? ""];
         const defined = known[prefix];
+        const replacement = deprecated.get(name);
+        if (replacement !== undefined && !seen.has(name)) {
+          seen.add(name);
+          out.push({
+            file,
+            line: i + 1,
+            rule: "mizan/spec-term-deprecated",
+            message: `${name} is deprecated: it is named here, and ${replacement} replaces it`,
+            key: `mizan/spec-term-deprecated ${file} ${name}`,
+          });
+          continue;
+        }
         if (defined === undefined || defined.has(local) || seen.has(name)) continue;
         seen.add(name);
         out.push({

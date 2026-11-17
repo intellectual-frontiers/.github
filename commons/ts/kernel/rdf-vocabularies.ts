@@ -58,6 +58,7 @@ export const owl = vocabulary(OWL, {
   NamedIndividual: "rdfs:Class",
   Thing: "rdfs:Class",
   versionInfo: "rdf:Property",
+  versionIRI: "rdf:Property",
   imports: "rdf:Property",
   sameAs: "rdf:Property",
   equivalentClass: "rdf:Property",

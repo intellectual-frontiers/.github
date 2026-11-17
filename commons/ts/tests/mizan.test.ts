@@ -11,7 +11,9 @@ import { run, execPath } from "../runtime/proc.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
 import { earsPatternOf, mizanFindings, rulePlugins, type RulePlugin, type SpecText } from "../mizan/rules.ts";
 import { AUDITED_ON, packagingTerms } from "../../ontology/audit/mod.ts";
-import { bases, mz } from "../../ontology/mizan/mod.ts";
+import { bases, MZ, MZV, mz } from "../../ontology/mizan/mod.ts";
+import { en, named, iriIn, OWL, OwlOntology, ontologyOf, RDFS, triplesOf, turtle } from "../kernel/rdf.ts";
+import { exportHtmlView } from "../mizan/integrations/pure/export-html.ts";
 import { pm } from "../../ontology/supply-chain/packaging/mod.ts";
 import { basisMissing, daysBetween, termFindings } from "../mizan/standards.ts";
 import { specTermFindings } from "../mizan/spec-terms.ts";
@@ -275,5 +277,129 @@ proves(
     assertEquals(specTermFindings(specs, known), []);
     const none = specTermFindings(specs, { pm: new Set() });
     assert(none.length >= 5, `${none.length} packaging terms are named in the specifications`);
+  },
+);
+
+proves(["0012-ontology FR-015"], "a code list of 5,000 entries type-checks with a key type of its entries, within 30 seconds", async () => {
+  const root = resolve(dirname(fromFileUrl(import.meta.url)), "..");
+  const tsc = `${root}/node_modules/.bin/tsc`;
+  const dir = makeTempDirSync({ prefix: "mizan-codes-" });
+  try {
+    const rows = Array.from(
+      { length: 5000 },
+      (_, i) => `  Term${i}: { label: en("term ${i}"), definition: en("The term number ${i}.") },`,
+    ).join("\n");
+    writeTextFileSync(
+      `${dir}/list.ts`,
+      [
+        `import { classSchema, codes, en, namespace, one, optional, range, rdfs, skos, vocabulary } from "${root}/kernel/rdf.ts";`,
+        `const NS = namespace("t", "https://example.org/t#");`,
+        `const t = vocabulary(NS, { Code: "owl:Class" });`,
+        `const CODE = { label: one(rdfs.label, range.langString), definition: optional(skos.definition, range.langString) } as const;`,
+        `export const list = codes(classSchema(t.Code, CODE), NS, {\n${rows}\n});`,
+        `export type Key = keyof typeof list;`,
+        `export const last: Key = "Term4999";`,
+        `// @ts-expect-error a key that is not an entry does not type-check`,
+        `export const none: Key = "Term5000";`,
+        ``,
+      ].join("\n"),
+    );
+    const started = Date.now();
+    const o = await run([
+      tsc,
+      "--ignoreConfig",
+      "--noEmit",
+      "--strict",
+      "--target",
+      "es2024",
+      "--module",
+      "nodenext",
+      "--moduleResolution",
+      "nodenext",
+      "--allowImportingTsExtensions",
+      "--erasableSyntaxOnly",
+      "--skipLibCheck",
+      "--types",
+      "node",
+      `${dir}/list.ts`,
+    ]);
+    assertEquals([o.code, o.stdout.trim()], [0, ""], o.stderr);
+    assert(Date.now() - started < 30_000, `5,000 entries took ${Date.now() - started} ms`);
+  } finally {
+    removeSync(dir, { recursive: true });
+  }
+});
+
+proves(
+  ["0018-standards-first FR-013"],
+  "a deprecated term with no replacement is found, and a specification that names a deprecated term is found with its replacement",
+  () => {
+    const found = termFindings(
+      [
+        { iri: "https://x/Old", basis: "adopts", standardTerm: "https://s/Old", decision: false, deprecatedOn: "2026-01-01" },
+        {
+          iri: "https://x/Older",
+          basis: "adopts",
+          standardTerm: "https://s/Older",
+          decision: false,
+          deprecatedOn: "2025-01-01",
+          replacedBy: "https://x/New",
+        },
+      ],
+      "2026-11-17",
+    );
+    assertEquals(
+      found.map((f) => f.key),
+      ["mizan/deprecated-no-replacement https://x/Old"],
+    );
+    const named = specTermFindings(
+      [{ slug: "0001-x", spec: "Uses `mz:Older` and `mz:Older` and `mz:Fine`.\n" }],
+      { mz: new Set(["Older", "Fine"]) },
+      new Map([["mz:Older", "mz:New"]]),
+    );
+    assertEquals(
+      named.map((f) => f.rule),
+      ["mizan/spec-term-deprecated"],
+    );
+    assertStringIncludes(named[0]?.message ?? "", "mz:New replaces it");
+  },
+);
+
+proves(["0012-ontology FR-016"], "the kernel's OwlOntology takes a version IRI, which the Turtle writes as owl:versionIRI", () => {
+  const ontology = OwlOntology.make(ontologyOf(MZ), {
+    label: en("Mizan"),
+    versionInfo: "1",
+    versionIri: named<"owl:Ontology">(iriIn(MZV, "1")),
+  });
+  const ttl = turtle({ prefixes: [MZ, MZV, OWL, RDFS], triples: triplesOf([ontology]) });
+  assertStringIncludes(ttl, "owl:versionIRI mzv:1");
+  assertStringIncludes(ttl, 'owl:versionInfo "1"');
+});
+
+proves(
+  ["0019-mizan-integrations FR-010"],
+  "the HTML view escapes every text, says it is generated, and shows classes, properties, code lists and the basis of each term",
+  () => {
+    const html = exportHtmlView(
+      {
+        title: "A <b>title</b>",
+        iri: "https://x/o",
+        versionIri: "https://x/o/1",
+        classes: [{ curie: "x:A", label: "A & B", definition: '"quoted" <i>' }],
+        properties: [{ curie: "x:p", label: "p", domain: "x:A", range: "xsd:string" }],
+        codeLists: [{ name: "Basis", members: [{ code: "Adopts", label: "adopts" }] }],
+        terms: [{ curie: "x:A", basis: "unaligned", justification: "none <found>" }],
+      },
+      "made by a test",
+    );
+    assert(html.startsWith("<!doctype html>"));
+    assertStringIncludes(html, "A &lt;b&gt;title&lt;/b&gt;");
+    assertStringIncludes(html, "A &amp; B");
+    assertStringIncludes(html, "&quot;quoted&quot; &lt;i&gt;");
+    assertStringIncludes(html, "none &lt;found&gt;");
+    assertStringIncludes(html, "made by a test");
+    assertStringIncludes(html, '<span class="chip unaligned">unaligned</span>');
+    assertStringIncludes(html, "https://x/o/1");
+    assert(!html.includes("<b>title"), "no raw markup from the data");
   },
 );

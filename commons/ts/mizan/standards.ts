@@ -38,6 +38,9 @@ export type TermRecord = {
   readonly addedOn?: string;
   /** Whether a `Decision` is linked to the term. */
   readonly decision: boolean;
+  /** The day (`YYYY-MM-DD`) the term was deprecated, and the IRI of the term that replaces it (0012-ontology, 0018-standards-first). */
+  readonly deprecatedOn?: string;
+  readonly replacedBy?: string;
 };
 
 const DAY = /^\d{4}-\d{2}-\d{2}$/;
@@ -73,6 +76,8 @@ export function basisMissing(ontology: readonly string[], recorded: readonly str
 export function termFindings(terms: readonly TermRecord[], today: string, file = "ontology"): readonly MizanFinding[] {
   const out: MizanFinding[] = [];
   for (const t of terms) {
+    if (t.deprecatedOn !== undefined && (t.replacedBy ?? "") === "")
+      out.push(found("mizan/deprecated-no-replacement", file, t.iri, `${t.iri} is deprecated and names no term that replaces it`));
     if (t.basis !== "unaligned") {
       if ((t.standardTerm ?? "") === "")
         out.push(found("mizan/term-standard", file, t.iri, `${t.iri} is ${t.basis} and names no standard term`));

@@ -167,6 +167,7 @@ export const OwlOntology = classSchema(owl.Ontology, {
   comment: optional(rdfs.comment, range.langString),
   description: optional(dcterms.description, range.langString),
   versionInfo: optional(owl.versionInfo, range.string),
+  versionIri: optional(owl.versionIRI, range.ref<"owl:Ontology">()),
 });
 
 /** The schema of a class: its label, comment, SKOS definition and superclasses. */

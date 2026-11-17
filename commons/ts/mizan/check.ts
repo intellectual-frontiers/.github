@@ -63,7 +63,28 @@ export function mizanTermRecords(): readonly TermRecord[] {
     ...(t.values.justification === undefined ? {} : { justification: t.values.justification }),
     ...(t.values.addedOn === undefined ? {} : { addedOn: t.values.addedOn }),
     decision: t.values.decision !== undefined,
+    ...(t.values.deprecatedOn === undefined ? {} : { deprecatedOn: t.values.deprecatedOn }),
+    ...(t.values.replacedBy === undefined ? {} : { replacedBy: t.values.replacedBy }),
   }));
+}
+
+/** The CURIE of a term of commons' own ontologies: `mz:` or `pm:` and its local name, or the IRI where it is of neither. */
+function curieOf(iri: string): string {
+  for (const [prefix, ns] of [
+    ["mz", "https://www.intellectualfrontiers.com/ontology/mizan#"],
+    ["pm", "https://www.intellectualfrontiers.com/ontology/packaging#"],
+  ] as const)
+    if (iri.startsWith(ns)) return `${prefix}:${iri.slice(ns.length)}`;
+  return iri;
+}
+
+/** The deprecated terms of commons' own ontologies, by CURIE, with what replaces each (0018-standards-first): a specification that names one is found. */
+export function deprecatedTerms(): ReadonlyMap<string, string> {
+  return new Map(
+    [...terms, ...packagingTerms].flatMap((t) =>
+      t.values.deprecatedOn === undefined ? [] : [[curieOf(t.values.termIri), curieOf(t.values.replacedBy ?? "")] as const],
+    ),
+  );
 }
 
 /** The command line. Returns the exit status: 0, or 1 where a finding is new or a baseline line is stale. */
@@ -102,15 +123,19 @@ export function main(
   // commons' own specifications name terms of its own ontologies: they must be defined (0018-standards-first FR-001)
   const named =
     arg("--root") === undefined
-      ? specTermFindings(specs, {
-          mz: new Set([
-            ...Object.keys(mz),
-            ...Object.keys(bases),
-            ...Object.keys(jurisdictionLevels),
-            ...Object.keys(integrationDirections),
-          ]),
-          pm: new Set(Object.keys(pm)),
-        })
+      ? specTermFindings(
+          specs,
+          {
+            mz: new Set([
+              ...Object.keys(mz),
+              ...Object.keys(bases),
+              ...Object.keys(jurisdictionLevels),
+              ...Object.keys(integrationDirections),
+            ]),
+            pm: new Set(Object.keys(pm)),
+          },
+          deprecatedTerms(),
+        )
       : [];
   const found: readonly MizanFinding[] = [...mizanFindings(specs, plugins), ...named, ...own.filter((f) => !always(f))];
   if (argv.includes("--write-baseline")) {

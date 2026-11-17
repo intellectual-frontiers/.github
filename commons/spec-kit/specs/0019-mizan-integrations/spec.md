@@ -25,7 +25,7 @@
 
 ## Export
 
-- **FR-010**: The module MUST write our ontology as Turtle, N-Triples, N-Quads and JSON-LD (the kernel's writers), and as SHACL shapes and JSON Schema (from class schemas), SKOS concept schemes (from code lists), SQL code-list tables, SSSOM mappings (from terms that name a standard's term and the relation to it, each justified as manual curation), and later OWL, RDF/XML and a DCAT entry for each published ontology.
+- **FR-010**: The module MUST write our ontology as Turtle, N-Triples, N-Quads and JSON-LD (the kernel's writers), and as SHACL shapes and JSON Schema (from class schemas), SKOS concept schemes (from code lists), SQL code-list tables, SSSOM mappings (from terms that name a standard's term and the relation to it, each justified as manual curation), an HTML view of an ontology (its classes, properties, code lists and the basis of each term, one self-contained page, so that it can be read without TypeScript), and later OWL, RDF/XML and a DCAT entry for each published ontology.
 - **FR-011**: Each export MUST be read or checked by an independent tool in a test (an RDF parser for the RDF forms, a SHACL validator for shapes, a JSON Schema validator for schemas).
 - **FR-012**: The module MUST NOT publish anything to an outside project; where one of our terms could improve a standard, it MUST only prepare a proposal bundle for a person to decide on.
 

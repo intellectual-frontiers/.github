@@ -20,10 +20,12 @@ import {
   codes,
   DatatypeProperty,
   DCTERMS,
+  iriIn,
   dcterms,
   en,
   many,
   namespace,
+  named,
   ObjectProperty,
   one,
   type OntologyFile,
@@ -45,6 +47,8 @@ import {
 
 /** The namespace of Mizan's terms. */
 export const MZ = namespace("mz", "https://www.intellectualfrontiers.com/ontology/mizan#");
+/** The namespace of the versions of Mizan's ontology: `owl:versionIRI` names one of them, so that a consumer outside TypeScript can pin the version it read. */
+export const MZV = namespace("mzv", "https://www.intellectualfrontiers.com/ontology/mizan/");
 /** The namespace of Mizan's individuals: the rungs, the jurisdictions, the authorities and the terms' bases. */
 export const MZID = namespace("mzid", "https://www.intellectualfrontiers.com/id/mizan/");
 
@@ -78,6 +82,8 @@ export const mz = vocabulary(MZ, {
   basis: "owl:ObjectProperty",
   standardTerm: "owl:DatatypeProperty",
   mappingRelation: "owl:DatatypeProperty",
+  deprecatedOn: "owl:DatatypeProperty",
+  replacedBy: "owl:DatatypeProperty",
   justification: "owl:DatatypeProperty",
   decision: "owl:ObjectProperty",
   addedOn: "owl:DatatypeProperty",
@@ -200,6 +206,8 @@ export const OntologyTerm = classSchema(mz.OntologyTerm, {
   basis: one(mz.basis, range.ref<"mz:Basis">()),
   standardTerm: optional(mz.standardTerm, range.string),
   mappingRelation: optional(mz.mappingRelation, range.oneOf(MAPPING_RELATIONS)),
+  deprecatedOn: optional(mz.deprecatedOn, range.string),
+  replacedBy: optional(mz.replacedBy, range.string),
   justification: optional(mz.justification, range.string),
   decision: optional(mz.decision, range.ref<"mz:Decision">()),
   addedOn: optional(mz.addedOn, range.string),
@@ -252,6 +260,8 @@ export const properties = [
   ObjectProperty.make(mz.basis, { domain: mz.OntologyTerm, range: mz.Basis, definition: en("How the term relates to a standard.") }),
   DatatypeProperty.make(mz.standardTerm, { domain: mz.OntologyTerm, range: xsd.string, definition: en("The IRI of the standard's term, where there is one.") }),
   DatatypeProperty.make(mz.mappingRelation, { domain: mz.OntologyTerm, range: xsd.string, definition: en("How the term relates to the standard's term, in the words a mapping is published with: exactMatch, closeMatch, narrowMatch, broadMatch, subClassOf or subPropertyOf.") }),
+  DatatypeProperty.make(mz.deprecatedOn, { domain: mz.OntologyTerm, range: xsd.string, definition: en("The day (YYYY-MM-DD) the term was deprecated: a specification must not name it, and it names its replacement.") }),
+  DatatypeProperty.make(mz.replacedBy, { domain: mz.OntologyTerm, range: xsd.string, definition: en("The IRI of the term that replaces a deprecated term.") }),
   DatatypeProperty.make(mz.justification, { domain: mz.OntologyTerm, range: xsd.string, definition: en("For an unaligned term: the standards looked at and why none fits.") }),
   ObjectProperty.make(mz.decision, { domain: mz.OntologyTerm, range: mz.Decision, definition: en("The decision that records why the term is unaligned.") }),
   DatatypeProperty.make(mz.addedOn, { domain: mz.OntologyTerm, range: xsd.string, definition: en("The day (YYYY-MM-DD) the term was added; the decision is due 90 days after it.") }),
@@ -289,6 +299,7 @@ export const mizanOntology = OwlOntology.make(ontologyOf(MZ), {
   label: en("Mizan"),
   description: en("The shared vocabulary of Mizan, the IF Spec Profile: the ladder, specifications and requirements, standards, laws and the basis of every term."),
   versionInfo: "1",
+  versionIri: named<"owl:Ontology">(iriIn(MZV, "1")),
 });
 
 // ---- the individuals: the rungs
@@ -456,7 +467,7 @@ export const terms = [termStandard, termRung, ...pendingTerms] as const;
 /** The file this module states: its name, its prefixes and its individuals. */
 export const file: OntologyFile = {
   name: "mizan",
-  prefixes: [DCTERMS, MZ, MZID, OWL, RDFS, SKOS, XSD],
+  prefixes: [DCTERMS, MZ, MZID, MZV, OWL, RDFS, SKOS, XSD],
   individuals: [
     mizanOntology,
     ...classes,

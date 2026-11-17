@@ -65,6 +65,7 @@ proves(
       "generated/mizan-code-lists.auto.skos.ttl",
       "generated/mizan-code-lists.auto.sql",
       "generated/mizan-mappings.auto.sssom.tsv",
+      "generated/mizan-ontology.auto.html",
       "generated/mizan-schemas.auto.json",
       "generated/mizan-shapes.auto.ttl",
     ]);
@@ -183,6 +184,9 @@ try:
 except jsonschema.ValidationError:
     pass
 assert len(list(skos.subjects(rdflib.RDF.type, rdflib.SKOS.ConceptScheme))) == 3
+OWL = rdflib.Namespace("http://www.w3.org/2002/07/owl#")
+version = list(data.objects(rdflib.URIRef("https://www.intellectualfrontiers.com/ontology/mizan"), OWL.versionIRI))
+assert version == [rdflib.URIRef("https://www.intellectualfrontiers.com/ontology/mizan/1")], version
 print("independent tools agree")
 `;
 

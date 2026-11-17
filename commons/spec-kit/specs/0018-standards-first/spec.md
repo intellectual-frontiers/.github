@@ -31,6 +31,7 @@
 - **FR-010**: The first domains are federal security (NIST publications, OSCAL and FedRAMP baselines), FDA's QMSR (21 CFR Part 820, incorporating ISO 13485:2016) and 21 CFR Part 11 (electronic records and signatures). A domain MUST be pulled up into commons when more than one harness should read the same facts.
 - **FR-011**: Mizan's own formats MUST follow this order: requirements are worded in RFC 2119 keywords and EARS patterns, scenarios in Gherkin's Given, When, Then, mappings in SSSOM, provenance in PROV-O, catalogs in DCAT and licenses as SPDX identifiers.
 - **FR-012**: The rules of this specification MUST be delivered as warnings with a baseline that only shrinks (a new finding fails, and a line of the baseline that no longer occurs fails), never as a first-day failure of what a harness already holds.
+- **FR-013**: A term MAY be deprecated, with the day (`mz:deprecatedOn`) and the term that replaces it (`mz:replacedBy`); a deprecated term with no replacement, and a specification that names a deprecated term, MUST be found as findings the baseline may hold.
 
 ## Out of scope
 
@@ -42,6 +43,8 @@
 - A term for a medical device's complaint file: its wording and definition come from 21 CFR Part 820 as amended by the QMSR and ISO 13485:2016 is cited and not copied, per FR-001, FR-002 and FR-007.
 - A state privacy law whose definition differs from a federal one: two individuals, each qualified by its jurisdiction, per FR-002.
 - A class that specializes `schema:SoftwareApplication`: basis `specializes`, per FR-003.
+- A term deprecated in favour of another, named by a specification: found, saying what replaces it, per FR-013.
+- A term deprecated with no replacement: found, per FR-013.
 - A term added to the packaging ontology with no record in its audit: the check fails, whatever the baseline holds, per FR-003.
 - A new `unaligned` term with no Decision on day 30: a finding in the baseline, not a failure, per FR-005.
 - The same term on day 91: the check fails, per FR-005.
