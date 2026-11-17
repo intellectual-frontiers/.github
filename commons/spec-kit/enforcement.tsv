@@ -420,7 +420,7 @@ requirement	mechanism	by	note
 0019-mizan-integrations FR-030	check	.github: cd commons/ts && bun test tests/	mizan-nist-import.test.ts: the committed module names the controls the specifications cite, with the titles of the pinned catalog, and the import's offline check passes
 0023-if-workspaces FR-001	none	-	Planned, M5 of issue #10: the root and its resolution are not built (workspaces/layout.ts, the command's --home)
 0023-if-workspaces FR-002	none	-	Planned, M5 of issue #10: the workspace's own area and its folders are not built
-0023-if-workspaces FR-003	none	-	Planned, M6 of issue #10: the boundary that reads and writes only inside the root, and its test with a hostile manifest, are not built
+0023-if-workspaces FR-003	check	.github: cd commons/ts && bun test tests/	ifws-scan.test.ts: resolveInside, readInside and forbiddenRead refuse an absolute path, .., a drive, a backslash, the home folder, NUL, a link that leads out of the root and any file of ~/.ssh or a credential store, and a hostile manifest is refused as a manifest; that every writer calls them is the controller's (M5)
 0023-if-workspaces FR-004	none	-	Planned, M5 of issue #10: the command's scope statement and the refusal to edit a user profile are not built (0025-ifws FR-002)
 0023-if-workspaces FR-005	none	-	Planned, M4 of issue #10: workspaces/ and githost/ exist and no rung below imports workspaces/ (ifws-boundaries.test.ts proves it); the command and the templates are M5's, and rung 10 as an instance of the ladder is the lead's amendment of 0016-ladder
 0023-if-workspaces FR-006	check	.github: cd commons/ts && bun test tests/	ifws-layout.test.ts: a repository is at the lower-case host then the remote's path as the host writes it (GitHub owner and repository, GitLab groups to any depth), whichever spelling the remote has, and the path maps back to its remote
@@ -447,20 +447,20 @@ requirement	mechanism	by	note
 0023-if-workspaces FR-027	none	-	Planned, M5 of issue #10: mayRemove and the plan's refusal to remove an edited generated file are proved (ifws-plan.test.ts); the guard in apply that deletes nothing holding local work is not built
 0023-if-workspaces FR-028	none	-	Planned, M5 of issue #10: the Locked state from a lock file, which is never removed, is proved against a real repository (ifws-state.test.ts); the one-writer lock of the workspace is not built
 0023-if-workspaces FR-029	none	-	Planned, M5 of issue #10: the --allow-destructive gate is not built; the table it reads is held by ifws-ontology.test.ts (only RemoveGenerated is destructive)
-0023-if-workspaces FR-030	none	-	Planned, M6 of issue #10: the guard that only ifws setup carries out a host change is not built; the table it reads is held by ifws-ontology.test.ts (InstallTool and ConfigureHost carry hostChange)
-0023-if-workspaces FR-031	none	-	Planned, M6 of issue #10: the plaintext-token scan of managed files and local Git configuration is not built
-0023-if-workspaces FR-032	none	-	Planned, M6 of issue #10: the severity (error in a regulated domain, warning elsewhere) and the hook rule are pure functions proved in ifws-findings.test.ts; the check of a managed repository's commits and the hooks are not built
-0023-if-workspaces FR-033	none	-	Planned, M6 of issue #10: the 90-day clock (informational to day 90, warning from day 91, the day first seen never restarted) is proved in ifws-findings.test.ts; the doctor's scan and the state record that holds the day are not built
+0023-if-workspaces FR-030	check	.github: cd commons/ts && bun test tests/	ifws-setup.test.ts: stepChangesHost is true for exactly InstallTool, SetSystemLongPaths and AddGitInclude, setup carries them out only where --apply is given (a dry run, with --git-include too, changes nothing), and ifws tools has no install argument (ifws-tools.test.ts); the plan of every other command holds none by plan.ts (ifws-plan.test.ts)
+0023-if-workspaces FR-031	check	.github: cd commons/ts && bun test tests/	ifws-scan.test.ts: tokens of GitHub and GitLab, private key blocks, a credential in a URL and authorization headers are errors naming the file and the line and never the secret, placeholders are not secrets, and the generated files, the manifest and each repository's local Git configuration are scanned inside the root; running the scan in every command is the controller's (M5)
+0023-if-workspaces FR-032	check	.github: cd commons/ts && bun test tests/	ifws-scan.test.ts: signedCommitFindings is an error where a regulated domain is named and a warning elsewhere, over the signature letters of real commits from real git (N unsigned, G signed with an SSH key made by ssh-keygen); the Git hooks that fail where they cannot check are M5's templates
+0023-if-workspaces FR-033	check	.github: cd commons/ts && bun test tests/	ifws-tools.test.ts, ifws-scan.test.ts: a tool or an ifws-* module outside the catalog is informational through day 90 and a warning from day 91, the day first seen kept by firstSeen; writing the day into the state record is the controller's (M5)
 0023-if-workspaces FR-034	none	-	Planned, M5 of issue #10: the hooks and ifws worktree that apply the rules of 0020-ifccm are not built
 0023-if-workspaces FR-035	check	.github: cd commons/ts && bun test tests/	ifws-findings.test.ts: the finding type, its severities and their SARIF levels (the ontology's), the SARIF 2.1.0 log of findings and the exit status they give
-0023-if-workspaces FR-036	none	-	Planned, M5 of issue #10: the doctor messages, including Windows long paths, are not built
-0023-if-workspaces FR-037	none	-	Planned, M6 of issue #10: a pinned Version (no latest, no range, no v) is proved in ifws-layout.test.ts; the tool catalog in the manifest and its decoder are not built
-0023-if-workspaces FR-038	none	-	Planned, M6 of issue #10: the version probes of git, bun and node are not built
-0023-if-workspaces FR-039	none	-	Planned, M6 of issue #10: the pinned install into .if-workspaces/tools/ with the hash check is not built
-0023-if-workspaces FR-040	none	-	Planned, M6 of issue #10: the OSCAL inventory-item, SPDX and CycloneDX exports of the catalog and the inventory are not built
-0023-if-workspaces FR-041	none	-	Planned, M6 of issue #10: the evidence record of every run, in the IFQS test-record shape (0021-ifqs), is not built
-0023-if-workspaces FR-042	none	-	Planned, M6 of issue #10: the content of an evidence record and its test that none holds a credential are not built
-0023-if-workspaces FR-043	none	-	Planned, M6 of issue #10: the tool versions in the evidence of a regulated run are not built
+0023-if-workspaces FR-036	none	-	Planned, M5 of issue #10: the doctor messages are not built; the message that Windows long paths are not enabled (informational, an error once a path is over the limit, naming ifws setup) is proved in ifws-setup.test.ts as longPathFindings, which the doctor calls
+0023-if-workspaces FR-037	check	.github: cd commons/ts && bun test tests/	ifws-tools.test.ts: decodeCatalog holds name, one pinned version, provides and per system and architecture an https URL and a SHA-256, and refuses latest, a range, http, a credential in a URL, a bad hash and a path that leaves the folder; adding the field to the manifest decoder is the lead's
+0023-if-workspaces FR-038	check	.github: cd commons/ts && bun test tests/	ifws-tools.test.ts: the probes of git, bun and node judge the version the real program says (missing, too old, unreadable, ok), the catalog refuses them as tools, and setup only probes
+0023-if-workspaces FR-039	check	.github: cd commons/ts && bun test tests/	ifws-tools.test.ts, ifws-setup.test.ts: the pinned artifact is fetched through the transport from a real loopback server (tar.gz, zip, bare file) and from a recorded exchange, the SHA-256 is checked before anything is written, a hash that differs writes nothing, latest and http pins are refused, and an installed tool is verified against its install record
+0023-if-workspaces FR-040	check	.github: cd commons/ts && bun test tests/	ifws-tools.test.ts: the catalog as OSCAL inventory-items and what is installed as SPDX 2.3 and CycloneDX 1.6, deterministic, each with the pinned SHA-256
+0023-if-workspaces FR-041	check	.github: cd commons/ts && bun test tests/	ifws-setup.test.ts: writeRunEvidence writes one record in the IFQS test-record shape named by the UTC time and run id under .if-workspaces/evidence/, never overwriting, with not_run and its reason for a check that did not run; calling it at the end of every command is the controller's (M5)
+0023-if-workspaces FR-042	check	.github: cd commons/ts && bun test tests/	ifws-setup.test.ts: the record names the command and only the names of its options, the plan hash, the state hash, the tool versions, the findings and the exit, and a record that would hold a credential is redacted or refused
+0023-if-workspaces FR-043	check	.github: cd commons/ts && bun test tests/	ifws-setup.test.ts: the tool versions of the run are cases of the record and missingToolVersions names what a regulated run still lacks; passing every tool used is the controller's (M5)
 0023-if-workspaces FR-044	check	.github: cd commons/ts && bun test tests/	ifws-ontology.test.ts: every class and code-list class has one audit record and the audit's rules find nothing; the three specifications name only terms the ontology defines
 0023-if-workspaces FR-045	review	0023-if-workspaces FR-045	A reviewer checks that each control of the section Standards and controls names a requirement that supports it; the OSCAL slice of NIST SP 800-53 will make the mapping data
 0023-if-workspaces FR-046	review	0023-if-workspaces FR-046	A reviewer checks that the workspace's documentation carries the credits (the author of the earlier tools, chezmoi, Git); CREDITS.md arrives with commons/ts/workspaces/
@@ -480,10 +480,10 @@ requirement	mechanism	by	note
 0024-ifws-host FR-013	none	-	Planned, M5 of issue #10: the per-repository Git configuration is not built
 0024-ifws-host FR-014	none	-	Planned, M5 of issue #10: the generated hooks are not built
 0024-ifws-host FR-015	none	-	Planned, M5 of issue #10: the behavior of a hook that cannot run its checker is not built
-0024-ifws-host FR-016	none	-	Planned, M6 of issue #10: the optional global Git include of ifws setup --git-include is not built
+0024-ifws-host FR-016	check	.github: cd commons/ts && bun test tests/	ifws-setup.test.ts: setup --git-include shows the exact change and asks, writes only after a yes (no terminal and no --yes is a usage error before any change), leaves one marked block where run twice and the block comes out exactly; the file is a real configuration that real git config reads back
 0024-ifws-host FR-017	none	-	Planned, M5 of issue #10: ifws shell is not built
 0024-ifws-host FR-018	none	-	Planned, M5 of issue #10: the content of the shell snippet is not built
-0024-ifws-host FR-019	none	-	Planned, M6 of issue #10: ifws shell --install and --uninstall are not built
+0024-ifws-host FR-019	none	-	Planned, M5 of issue #10: ifws shell --install and --uninstall are the shell module's, not built here
 0024-ifws-host FR-020	none	-	Planned, M5 of issue #10: the guard that nothing outside the root is read or written is not built
 0024-ifws-host FR-021	none	-	Planned, M5 of issue #10: the boundary test that IFWS imports and runs no dotfiles manager is not built
 0024-ifws-host FR-022	none	-	Planned, M5 of issue #10: AGENTS.auto.md is not built
@@ -498,16 +498,16 @@ requirement	mechanism	by	note
 0025-ifws FR-008	none	-	Planned, M5 of issue #10: the --ifws-manifest answer, its decoder and its JSON Schema are not built
 0025-ifws FR-009	none	-	Planned, M5 of issue #10: the rule that list and help run nothing from the path without --probe is not built
 0025-ifws FR-010	none	-	Planned, M5 of issue #10: the exit statuses of a run are not built; their numbers (0, 1, 2, 3) are held by ifws-ontology.test.ts
-0025-ifws FR-011	none	-	Planned, M6 of issue #10: registered modules and their hash check are not built
+0025-ifws FR-011	none	-	Planned, M5 of issue #10: registered modules and their hash check are not built; the finding of a module outside the catalog (informational 90 days, then a warning) is proved in ifws-scan.test.ts
 0025-ifws FR-012	none	-	Planned, M5 of issue #10: ifws plan and ifws apply are not built
 0025-ifws FR-013	none	-	Planned, M5 of issue #10: ifws status is not built
 0025-ifws FR-014	none	-	Planned, M5 of issue #10: ifws doctor is not built
 0025-ifws FR-015	none	-	Planned, M5 of issue #10: ifws verify, render and tools are not built
 0025-ifws FR-016	none	-	Planned, M5 of issue #10: ifws worktree is not built
-0025-ifws FR-017	none	-	Planned, M6 of issue #10: ifws setup with its dry run by default is not built
-0025-ifws FR-018	none	-	Planned, M6 of issue #10: the install of pinned artifacts and the probes of git, bun and node by setup are not built
-0025-ifws FR-019	none	-	Planned, M6 of issue #10: the Windows long-path steps of setup are not built
-0025-ifws FR-020	none	-	Planned, M6 of issue #10: setup --git-include and shell --install as a setup are not built
+0025-ifws FR-017	check	.github: cd commons/ts && bun test tests/	ifws-setup.test.ts: --dry-run is the default and changes nothing, --apply carries the plan out, both is a usage error, and the run is recorded with ifws:applied and a not_run for a dry run; only setup carries out an InstallTool or a ConfigureHost
+0025-ifws FR-018	check	.github: cd commons/ts && bun test tests/	ifws-setup.test.ts: --apply creates the root and a starter manifest (never over one), installs only the pinned artifacts of the catalog for this system into .if-workspaces/tools/, and only probes git, bun and node, naming how to install one that is missing or old
+0025-ifws FR-019	check	.github: cd commons/ts && bun test tests/	ifws-setup.test.ts: on Windows setup sets core.longpaths in each cloned repository with real git, turns the system setting on only where elevated (the function that stands for reg add is given by the test), and where not elevated prints the exact steps and ends with findings; a path over 259 is an error
+0025-ifws FR-020	none	-	Planned, M5 of issue #10 for ifws shell --install and --uninstall as a setup; ifws setup --git-include is proved under 0024-ifws-host FR-016
 0025-ifws FR-021	none	-	Planned, M5 of issue #10: ifws shell is not built
 0025-ifws FR-022	none	-	Planned, M5 of issue #10: the options parsed at the boundary and the output forms are not built
 0025-ifws FR-023	none	-	Planned, M5 of issue #10: the idempotence of every command and the evidence of every run are not built
