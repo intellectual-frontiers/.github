@@ -1,7 +1,7 @@
 # Feature Specification: Intellectual Frontiers Workspaces
 
 **Spec ID:** 0023-if-workspaces
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** commons
 **Part of:** 0003-mizan
@@ -81,6 +81,8 @@
 - **FR-045**: The workspace MUST support the controls CM-2, CM-3, CM-5, CM-6, CM-7, CM-8, CM-10, SA-10, SI-7 and IA-5 of NIST SP 800-53 (and the FedRAMP baselines that select them), and the section Standards and controls MUST name, for each, the requirement of this or of a sibling specification that supports it.
 - **FR-046**: The workspace's documentation MUST credit the author of the earlier workspace tools, whose layout, `ensure`, `status` and `doctor` ideas and code it carries on, and chezmoi (inspiration for the source and target state, templates over data, `apply`, `diff`, `status`, `verify` and a state record, with no chezmoi code or program used), and MUST name Git's `git-foo` convention as the model of its modules.
 - **FR-047**: A remote's identity MUST be its host name (lower case, with no port) and its path, so that the HTTPS, `git://`, `ssh://` and scp-like spellings of one remote name one repository and one path of the workspace; and a credential written into a remote URL (`https://user:token@host/...`) MUST be dropped on reading it and MUST NOT appear in any result, state, finding or message.
+- **FR-048**: A repository's own path under the workspace root MUST be an `ifws:Informational` finding where it is longer than 150 characters, which leaves room for the files inside it, and an `ifws:Error` where it is longer than 259 characters, whether or not long paths are enabled.
+- **FR-049**: WHERE the manifest names a regulated domain, the policy MAY waive the signed-commit rule of FR-032 for a bot account that signs through the host (GitHub's web-flow key, for one), and only under a Decision that names the account and the key; the Decision is an entry of the same harness record file that `0020-ifccm` FR-033 reads, and no account or key without one is waived.
 
 ## Out of scope
 
@@ -134,12 +136,13 @@
 - chezmoi (Tom Payne and contributors, MIT license) is credited as inspiration for ideas only; IFWS never calls it or depends on it (FR-046).
 - `git`, `bun` and `node` are the user's own: IFWS verifies them and tells how to install them (FR-038).
 - Pinned artifacts for each operating system and architecture are published by their projects with a checksum IFWS can pin (FR-039).
+- The Decision records that justify each `unaligned` term of the ontology (0018-standards-first FR-005) were written on 2026-11-17 (owner decision, issue #10): every one keeps the term unaligned and is reviewed again by 2027-02-15.
+- The owner decided on 2026-11-17 to pull the layout and the `ensure`, `status` and `doctor` behavior of the earlier workspace tools up into IFWS; the record is the first file of the decisions folder (`commons/spec-kit/decisions/`, the workspace tools pull-up).
+- This specification is Active from 2026-11-17: the requirements it does not yet prove say so in the enforcement register.
 
 ## Open questions
 
-- **OQ-1**: How much room under a repository's path IFWS leaves for the files inside it before FR-012 calls a path too long; the limit is 259 characters for a file, and a repository's own files are not known when the path is chosen.
-- **OQ-2**: Whether a regulated harness may waive the signed-commit rule for a bot account that signs through the host (GitHub's web-flow key), and under which record.
-- **OQ-3**: The Decision records that justify each `unaligned` term of the ontology (0018-standards-first FR-005), written within their 90 days.
+None.
 
 ## Key entities
 

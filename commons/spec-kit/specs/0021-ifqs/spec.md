@@ -1,7 +1,7 @@
 # Feature Specification: Intellectual Frontiers Quality System
 
 **Spec ID:** 0021-ifqs
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** commons
 **Part of:** 0003-mizan
@@ -112,6 +112,8 @@
 
 - **FR-045**: The records of Tier 2 (a test plan registered, a sample drawn, a person's attestation of it and a mutation run) MUST each be a file of the ledger of FR-043, in its chain, and an event that does not follow what came before MUST be refused and written nowhere: an attestation of a sample that gives no result on an item sampled, a result on an item not sampled, no named person, or a second attestation; a plan with no case or a case with no acceptance criterion; a mutation row that does not account for its mutants. A sample MUST record its rule, its seed and the count and digest of its population, so that it can be drawn again, and a run that is governed by a plan MUST name it by the SHA-256 of the plan (`ifc.quality.plan.sha256`).
 - **FR-046**: The strength of a proof (FR-040) MUST be the share of its mutants that its tests detected, and a strength below the floor the harness states (60 % where it states none) MUST lower the grade of a proof that is a run by one rung, `E4` to `E3` and `E3` to `E2`, with both shown; a grade that is not a run's, and a proof that no mutation run measured, MUST keep its grade and say which.
+- **FR-047**: A harness MUST state how long it keeps the evidence on its `quality` branch; the evidence MUST stay on the branch for that period, never for a shorter one than the longest retention that applies to it (a law, a standard or a contract the harness names), and when the period ends it MUST be archived by a tag and never deleted.
+- **FR-048**: The review debt of the reviews that agents made (FR-024) MUST be counted apart from the review debt of the reviews that people made, and shown beside it; neither figure is added into the other, and the review debt of FR-023 stays the total.
 
 ## Acceptance scenarios
 
@@ -161,13 +163,12 @@
 - Where evidence is graded `E5`, the probe is the harness's own and its record is made as FR-013 says.
 - Mutation testing (FR-040) is not yet an ISO or IEEE standard's requirement of a test record; its results are a record attribute until one names them.
 - Standards are cited by identifier and clause only; their text is not copied (0018-standards-first FR-007).
+- A repository has one `quality` branch, never one for a harness across its repositories (owner decision of 2026-11-17, issue #10); a harness that wants the whole reads each repository's branch.
+- This specification is Active from 2026-11-17: the requirements it does not yet prove say so in the enforcement register.
 
 ## Open questions
 
 - **OQ-1**: Whether the grade needed for "proved" (`E3`, or `E4` for high risk, FR-011) is higher for a regulated harness once it declares production.
-- **OQ-2**: Whether the `quality` branch is one per repository, or one per harness across its repositories.
-- **OQ-3**: How long a harness keeps evidence on the branch before it is archived, given that a branch is append-only (0016-ladder lifecycle).
-- **OQ-4**: Whether review debt of agents' reviews (FR-024) is counted apart from a person's.
 
 ## Key entities
 

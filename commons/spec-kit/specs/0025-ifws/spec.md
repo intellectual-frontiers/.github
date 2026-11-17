@@ -1,7 +1,7 @@
 # Feature Specification: The ifws command
 
 **Spec ID:** 0025-ifws
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** commons
 **Part of:** 0003-mizan
@@ -49,6 +49,8 @@
 - **FR-025**: `ifws init` MUST make the root and the workspace's own area and write the starter manifest (0024-ifws-host FR-002) where there is none, MUST install nothing and change nothing outside the root, and run again MUST change nothing; `ifws setup` MAY call it, and `init` and `setup` are the only commands that make the root.
 - **FR-026**: Every run MUST write its evidence record (FR-023) but the printing form of `ifws shell <shell>` (it writes no file, 0024-ifws-host FR-017, and a start-up file may run it at every start), `ifws help` and the help of a command (they run nothing), a Git hook that `ifws hook` runs (a hook only reads, 0024-ifws-host FR-015), and a run for which `<home>/.if-workspaces/` does not exist, which has no place to keep it (`ifws init`, which makes the area, writes its record).
 - **FR-027**: The controller MUST hold the module `ifws hook <pre-commit|commit-msg|pre-push>`, which the generated hooks run (0024-ifws-host FR-014, FR-025): it is internal, it only reads, and its status is 0 or 1 where it ran its checker and 2 or 3 where it could not.
+- **FR-028**: `ifws list --probe` MUST run a module found on the `PATH` only with the user's confirmation for it, or with `--yes`, and it MUST NOT sandbox the module: a probe is the run of a program the user approved.
+- **FR-029**: The five seconds of FR-008 MUST stay the default wait for `--ifws-manifest`; `--probe-timeout` MAY raise them, and a module that does not answer in time MUST be a finding of the run (the module named, the wait given) and MUST NOT make the run fail.
 
 ## Out of scope
 
@@ -84,11 +86,11 @@
 - The model of the controller is Git's: `git foo` runs `git-foo`, found on the `PATH` (FR-004); IFWS credits it (0023-if-workspaces FR-046).
 - The loader hook `ifc` uses on Node 26 is reusable by `ifws` without a change (FR-024).
 - A person who wants a module on the `PATH` approves it by adding it to the catalog within 90 days, or by registering it with its hash (FR-011).
+- This specification is Active from 2026-11-17: the requirements it does not yet prove say so in the enforcement register.
 
 ## Open questions
 
-- **OQ-1**: Whether `ifws list --probe` may run a module found on the `PATH` in a sandbox, or only with the user's confirmation, since it runs a program.
-- **OQ-2**: Whether the five seconds of FR-008 are enough for `--ifws-manifest` where the module is on a slow network file system.
+None.
 
 ## Key entities
 

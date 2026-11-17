@@ -1,7 +1,7 @@
 # Feature Specification: IFWS host: typed templates, generated files and what is managed
 
 **Spec ID:** 0024-ifws-host
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** commons
 **Part of:** 0003-mizan
@@ -56,6 +56,7 @@
 - **FR-023**: `.envrc.auto` MUST be generated only where the manifest says `direnv` is wanted and a probe finds `direnv`, and it MUST only add `<home>/.if-workspaces/tools/bin` to the `PATH`.
 - **FR-024**: The templates MUST also generate `lefthook.auto.yml` at the root, which calls the three generated hooks by their relative path and holds no checker of its own, for a person who runs lefthook in the workspace's own repository.
 - **FR-025**: A generated hook MUST run `ifws hook <name>` with `--home` the root it finds from its own place (it holds no absolute path), MUST send what it prints to standard error, and MUST read its status as 0 (go on), 1 (stop) or anything else (it cannot run its checker, FR-015).
+- **FR-026**: `ifws shell --install` MUST NOT create a start-up file that does not exist: where the shell's start-up file is absent it MUST write nothing and say how to create it (the command to run and the path), and `--uninstall` MUST NOT create one either.
 
 ## Out of scope
 
@@ -88,11 +89,12 @@
 - chezmoi's ideas are credited and not used as code: the typed templates are TypeScript functions because a function is checked by the compiler and a template language is not (FR-003, FR-021).
 - Git for Windows ships `sh`, which runs the hooks on Windows (FR-014); a Windows machine without Git for Windows has no Git to configure.
 - A group of repositories in the manifest replaces the symlinked workspace files of the earlier tools (0023-if-workspaces FR-013).
+- The generated hooks run the TypeScript the library holds with Bun or Node 26 until a compiled checker exists (owner decision of 2026-11-17, issue #10).
+- This specification is Active from 2026-11-17: the requirements it does not yet prove say so in the enforcement register.
 
 ## Open questions
 
-- **OQ-1**: Whether the generated hooks call a compiled checker instead of the runtime once one exists; today they run the TypeScript the library holds with Bun or Node 26.
-- **OQ-2**: Whether `ifws shell --install` may write the file of a shell that has no start-up file yet, or must say how to create it.
+None.
 
 ## Key entities
 

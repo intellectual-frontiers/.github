@@ -1,7 +1,7 @@
 # Feature Specification: Intellectual Frontiers Capabilities Configuration Management
 
 **Spec ID:** 0020-ifccm
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** commons
 **Part of:** 0003-mizan
@@ -79,6 +79,7 @@
 - **FR-032**: The findings of the `changes` check MUST be Mizan findings (`changes/no-issue`, `changes/closing-keyword`, `changes/unknown-issue`, `changes/closed-issue`, `changes/gate-relaxed`), held by a baseline as `0003-mizan` FR-015 holds the rest, and the check MUST be run by `holdHarness` for every harness.
 
 - **FR-033**: A commit that departs from a specification MUST say so on a line of its own as `Departs: NNNN-slug FR-nnn` and name the Decision that authorizes it on a line of its own as `Decision: <id>`; a harness MUST state its Decisions (each with its identifier, the role that approved it, and the requirements it authorizes or `gate-relaxed <revision>`) and the role of each author by email in the typed file that holds its declaration, read as data and never run; and the `changes` check MUST report, besides the findings of FR-032, `changes/early-close` (FR-006), `changes/issue-shape` (FR-003), `changes/no-parent` (FR-002), `changes/no-decision` (FR-019), `changes/self-approved` (FR-020) and `changes/declaration` (FR-010), the last of them as a gate whatever the day, since a declaration wrong by itself is refused.
+- **FR-034**: WHERE a repository has no Git host account, it MAY keep its change requests as a typed file in Git, read as data and never run, so that `--strict` has change requests to ask; such a file is the plain-Git counterpart of the host adapter of FR-028 and answers the same four questions.
 
 ## Acceptance scenarios
 
@@ -124,14 +125,14 @@
 - Spec Kit's "feature" is the capability here; a harness that reads Spec Kit keeps its folder names and says capability in its trackers.
 - The NIST SP 800-53 controls are named by their OSCAL identifiers; commons imports the Configuration Management slice (cm-2, cm-3, cm-4, cm-5, cm-9) from the NIST OSCAL catalog (0019-mizan-integrations FR-015), so that the identifiers are a typed code list and a misspelt one does not compile.
 - The relations between a change request and a change are PROV-O's (`prov:used`, `prov:wasGeneratedBy`); OSLC Change Management is adopted where its resource fits and is not the model of an issue tracker's workflow.
-- A Decision (`mz:Decision`) records why a term is unaligned today; its use for departures, waivers, exceptions, baselines and releases extends it, and its definition changes when this specification is in force (OQ-1).
+- `mz:Decision` is not widened: it stays the authorization of an ontology term (why a term is unaligned). A departure, waiver or exception is authorized by an entry of the harness record file (FR-033), as built; this is revisited when a second kind of Decision appears (owner decision of 2026-11-17, issue #10).
+- The kind of a change request is read from a host's label (`capability` or `problem`), as built; an issue type or a section is not read (owner decision of 2026-11-17, issue #10).
+- This specification is Active from 2026-11-17: the requirements it does not yet prove say so in the enforcement register.
 - Git hosts' own words (issue, pull request, merge request) differ and are mapped once, in the adapter.
 
 ## Open questions
 
-- **OQ-1**: Whether `mz:Decision` is widened to every authorization of FR-018 or a subclass is added, decided with the first Decision that authorizes something other than an unaligned term.
-- **OQ-2**: Whether a repository with no Git host account keeps its change requests as a typed file in Git, so that `--strict` has something to ask under `ifccm:PlainGit`.
-- **OQ-3**: How the kind of a change request is read from a host (a label, an issue type, or a section), decided with the first adapter.
+None.
 
 ## Key entities
 
