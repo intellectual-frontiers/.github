@@ -41,9 +41,9 @@ import {
   tagged,
 } from "../../kernel/decode.ts";
 import { canonicalize as jcs, GENESIS } from "../../kernel/evidence.ts";
-import { redactText } from "../../kernel/otel.ts";
 import { err, ok, type Result } from "../../kernel/result.ts";
 import { type Sha256, sha256 } from "../../kernel/sha256.ts";
+import { redactEvidence } from "./record.ts";
 import { TIER2_EVENTS } from "./tier2-events.ts";
 import { type Day, dayDecoder } from "./time.ts";
 
@@ -143,27 +143,92 @@ export function parseRecordPath(path: string): { readonly seq: number; readonly 
   return m?.[1] === undefined || m[2] === undefined ? undefined : { seq: Number(m[1]), kind: m[2] };
 }
 
-/** Redacts every text of an event of secrets (FR-020); the event is otherwise as it was. */
-function redactEvent(e: LedgerEvent): LedgerEvent {
-  const r = (s: string): string => redactText(s);
+/** An opener with its texts redacted (the agent's name and the role are texts a person typed). */
+function redactOpener(o: Opener, r: (s: string) => string): Opener {
+  switch (o.kind) {
+    case "system":
+      return o;
+    case "agent":
+      return { ...o, name: r(o.name) };
+    case "role":
+      return { ...o, role: r(o.role) };
+    default:
+      return absurd(o);
+  }
+}
+
+/** A person as a record names them: the name is data and stays, an e-mail address in it or in the role does not. */
+function redactPerson(
+  p: { readonly name: string; readonly role?: string },
+  r: (s: string) => string,
+): { readonly name: string; readonly role?: string } {
+  return { name: r(p.name), ...(p.role === undefined ? {} : { role: r(p.role) }) };
+}
+
+/**
+ * The event as it is kept: every text of it, whatever its kind, redacted of secrets and e-mail addresses (0021-ifqs FR-020, 0022-trust FR-017:
+ * redaction is at the source, because a kept file cannot be changed without breaking its chain). A person's name is data and stays; an e-mail
+ * address does not. Digests, days, sequence numbers and kinds hold no text a person typed and are as they were. The writer folds the event as
+ * it is redacted, so that what the ledger judges is what it keeps.
+ */
+export function redactEvent(e: LedgerEvent): LedgerEvent {
+  const r = redactEvidence;
   switch (e.kind) {
     case "nonconformance-opened":
-      return { ...e, reason: r(e.reason) };
-    case "capa-opened":
-      return { ...e, action: r(e.action) };
-    case "statement":
-      return e.note === undefined ? e : { ...e, note: r(e.note) };
+      return {
+        ...e,
+        reason: r(e.reason),
+        openedBy: redactOpener(e.openedBy, r),
+        evidence: { ...e.evidence, ...(e.evidence.path === undefined ? {} : { path: r(e.evidence.path) }) },
+      };
     case "nonconformance-linked":
+      return { ...e, problem: { ...e.problem, ...(e.problem.repo === undefined ? {} : { repo: r(e.problem.repo) }) } };
+    case "capa-opened":
+      return {
+        ...e,
+        action: r(e.action),
+        test: { ...e.test, name: r(e.test.name) },
+        openedBy: redactOpener(e.openedBy, r),
+        ...(e.author === undefined ? {} : { author: r(e.author) }),
+      };
     case "capa-verified":
-    case "capa-closed":
     case "nonconformance-closed":
-    case "review":
-    case "probe":
-    case "plan-registered":
-    case "sample-drawn":
-    case "sample-attested":
-    case "mutation-run":
       return e;
+    case "capa-closed":
+      return {
+        ...e,
+        decision: { ...e.decision, person: r(e.decision.person), ...(e.decision.role === undefined ? {} : { role: r(e.decision.role) }) },
+      };
+    case "statement":
+      return { ...e, who: r(e.who), ...(e.note === undefined ? {} : { note: r(e.note) }) };
+    case "review":
+      return { ...e, who: r(e.who) };
+    case "probe":
+      return { ...e, source: r(e.source) };
+    case "plan-registered":
+      return {
+        ...e,
+        plan: {
+          title: r(e.plan.title),
+          cases: e.plan.cases.map((c) => ({
+            ...c,
+            name: r(c.name),
+            acceptance: r(c.acceptance),
+            ...(c.file === undefined ? {} : { file: r(c.file) }),
+          })),
+        },
+        by: redactPerson(e.by, r),
+      };
+    case "sample-drawn":
+      return { ...e, by: redactPerson(e.by, r) };
+    case "sample-attested":
+      return {
+        ...e,
+        results: e.results.map((x) => ({ ...x, ...(x.note === undefined ? {} : { note: r(x.note) }) })),
+        person: redactPerson(e.person, r),
+      };
+    case "mutation-run":
+      return { ...e, tool: { name: r(e.tool.name), ...(e.tool.version === undefined ? {} : { version: r(e.tool.version) }) } };
     default:
       return absurd(e);
   }

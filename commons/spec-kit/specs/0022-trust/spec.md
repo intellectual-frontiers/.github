@@ -38,7 +38,7 @@
 
 ## What a pack cannot redact
 
-- **FR-017**: A file kept on the `quality` branch MUST NOT be changed to redact it for a pack, because its digest is in a chain: a pack MUST refuse a kept file that still holds a secret, naming it, so that its source is fixed and kept again, and MUST name in its manifest the personal data (an e-mail address) that a kept file retains; the files a pack makes itself MUST be redacted and the redactions counted (FR-011).
+- **FR-017**: Redaction MUST be at the source: every writer of a file kept on the `quality` branch (the records of runs, the events of the ledger of every kind, plans, samples, attestations, mutation runs and the notes) MUST redact the file of secrets and e-mail addresses before it is kept (0021-ifqs FR-020), a person's name being data that stays. A file kept MUST NOT be changed to redact it for a pack, because its digest is in a chain; the pack's refusal is the backstop for a file kept before this rule or by another writer: a pack MUST refuse a kept file that still holds a secret, naming it, so that its source is fixed and kept again, and MUST name in its manifest the personal data (an e-mail address) that a kept file retains; the files a pack makes itself MUST be redacted and the redactions counted (FR-011).
 
 ## Acceptance scenarios
 
