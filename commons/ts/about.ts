@@ -39,8 +39,15 @@ export const about: About = {
     },
     {
       path: "mizan/",
-      what: "Mizan, the IF Spec Profile, as code (commons 0003-mizan): the rules it adds to the format of a specification (as plugins), the command that holds them against a baseline, the generator of its ontology's Turtle, and `integrations/` (0019-mizan-integrations): the registry, the readers of Turtle, N-Triples, JSON-LD and RDF/XML, the importers of a slice of a vocabulary, of an OSCAL control catalog and of a JSON Schema, and the exporters of SHACL, JSON Schema, SKOS and SQL are built, the other importers and exporters are specified.",
-      mayImport: ["node: builtins", "kernel/", "runtime/", "mizan/", "../ontology/ (the ontology it generates from)"],
+      what: "Mizan, the IF Spec Profile, as code (commons 0003-mizan): the rules it adds to the format of a specification (as plugins), the command that holds them against a baseline, the generator of its ontology's Turtle, and `integrations/` (0019-mizan-integrations): the registry, the readers of Turtle, N-Triples, JSON-LD and RDF/XML, the importers of a slice of a vocabulary, of an OSCAL control catalog and of a JSON Schema, and the exporters of SHACL, JSON Schema, SKOS and SQL are built, the other importers and exporters are specified. `changes/` and `changes.ts` (0020-ifccm) are the change-control check: the commit rules, the declaration and its phase, the chain from an issue to a run and the view of capabilities by rung, with a host layer that takes a `githost/` client as an argument.",
+      mayImport: [
+        "node: builtins",
+        "kernel/",
+        "runtime/",
+        "githost/ (its types)",
+        "mizan/",
+        "../ontology/ (the ontology it generates from)",
+      ],
     },
     {
       path: "lint/",
