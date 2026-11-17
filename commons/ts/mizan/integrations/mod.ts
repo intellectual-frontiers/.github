@@ -5,7 +5,14 @@
  *
  * @module
  */
-export { importVocabulary, type ImportInput, type ImportOutput, type TermKind } from "./pure/import-vocabulary.ts";
+export {
+  GENERATOR,
+  importVocabulary,
+  type ImportInput,
+  type ImportOutput,
+  type ImportRecordData,
+  type TermKind,
+} from "./pure/import-vocabulary.ts";
 export { readNTriples, readTurtle, type Read, type RdfTerm, type RdfTriple, tripleKey, TYPE } from "./pure/read-rdf.ts";
 export {
   type AnySchema,
@@ -16,6 +23,7 @@ export {
   exportSkos,
   exportSqlCodeList,
 } from "./pure/export.ts";
+export { provenanceTurtle } from "./pure/provenance.ts";
 export { emptyRegistry, lookup, register, type Registry, type RegistryError } from "./pure/registry.ts";
 export {
   type AnyIntegration,
@@ -26,4 +34,4 @@ export {
   type IntegrationFinding,
   type StandardRecord,
 } from "./pure/types.ts";
-export { decodeManifest, type ImportManifest } from "./host/import.ts";
+export { decodeManifest, type ImportManifest, isUrl, readModuleHeader, readSource } from "./host/import.ts";

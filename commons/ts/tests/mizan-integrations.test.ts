@@ -5,6 +5,7 @@
  *
  * @module
  */
+import { createServer } from "node:http";
 import { files } from "../../ontology/mizan/mod.ts";
 import { nTriples, triplesOf } from "../kernel/rdf.ts";
 import { sha256 } from "../kernel/sha256.ts";
@@ -22,6 +23,7 @@ import {
   type AnySchema,
   importVocabulary,
   lookup,
+  provenanceTurtle,
   readNTriples,
   readTurtle,
   register,
@@ -392,5 +394,79 @@ proves(
     assertEquals(r.value.triples.filter((t) => t.predicate === "http://www.w3.org/ns/shacl#minCount").length, 3);
     assertEquals(r.value.triples.filter((t) => t.predicate === "http://www.w3.org/ns/shacl#maxCount").length, 4);
     assertStringIncludes(shapes, 'sh:in ( "Draft" "Active" )');
+  },
+);
+
+proves(
+  ["0019-mizan-integrations FR-009"],
+  "an import leaves its provenance: a record, and PROV-O Turtle that the reader reads back",
+  async () => {
+    const input = {
+      standard: await standard(),
+      sourceText: SOURCE,
+      format: "turtle",
+      namespace: NS,
+      slice: ["Thing", "Widget"],
+      rdfImport: "../kernel/rdf.ts",
+    } as const;
+    const made = await importVocabulary(input);
+    assert(made.kind === "ok");
+    assertEquals(made.value.record.slice, ["Thing", "Widget"]);
+    assertEquals(made.value.record.sha256, input.standard.sha256);
+    assert(
+      !made.value.module.includes("importRecord"),
+      "the module holds terms alone: its provenance is the PROV-O file beside the manifest",
+    );
+    assertEquals(made.value.record.standard, "example-vocab");
+    const prov = provenanceTurtle(made.value.record, "vocab.auto.ts");
+    const read = readTurtle(prov);
+    assert(read.kind === "ok");
+    assertEquals(read.value.findings, []);
+    const k = keys(read.value.triples).join("\n");
+    assertStringIncludes(k, "<http://www.w3.org/ns/prov#wasDerivedFrom> <urn:sha256:");
+    assertStringIncludes(k, "<http://www.w3.org/ns/prov#used> <urn:sha256:");
+    assertStringIncludes(k, "<http://purl.org/dc/terms/license> <https://spdx.org/licenses/CC0-1.0.html>");
+    assertEquals(provenanceTurtle(made.value.record, "vocab.auto.ts"), prov);
+  },
+);
+
+proves(
+  ["0019-mizan-integrations FR-014"],
+  "a source fetched from a URL is held to its pin: written, checked offline, checked with a fetch, and refused when its bytes change",
+  async () => {
+    let body = SOURCE;
+    const server = createServer((_req, res) => {
+      res.setHeader("content-type", "text/turtle");
+      res.end(body);
+    });
+    await new Promise<void>((done) => server.listen(0, "127.0.0.1", done));
+    const addr = server.address();
+    assert(addr !== null && typeof addr === "object");
+    const url = `http://127.0.0.1:${addr.port}/vocab.ttl`;
+    const dir = makeTempDirSync({ prefix: "mizan-import-url-" });
+    try {
+      const std = await standard();
+      const manifest = (pin: string): string =>
+        `export const manifest = ${JSON.stringify({ standard: { ...std, sha256: pin }, source: url, format: "turtle", namespace: NS, slice: ["Thing", "Widget"], out: "vocab.auto.ts", rdfImport: KERNEL_RDF })};\n`;
+      writeTextFileSync(`${dir}/manifest.ts`, manifest(std.sha256));
+      assertEquals((await exec(`${dir}/manifest.ts`, "--check")).code, 1);
+      const wrote = await exec(`${dir}/manifest.ts`);
+      assertEquals([wrote.code, wrote.stdout], [0, "wrote vocab.auto.ts: 2 terms\n"]);
+      assertStringIncludes(readTextFileSync(`${dir}/vocab.auto.prov.ttl`), "prov:wasDerivedFrom");
+      await new Promise<void>((done) => server.close(() => done()));
+      assertEquals((await exec(`${dir}/manifest.ts`, "--check")).code, 0);
+      writeTextFileSync(`${dir}/manifest.ts`, manifest("1".repeat(64)));
+      const moved = await exec(`${dir}/manifest.ts`, "--check");
+      assertEquals(moved.code, 1);
+      assertStringIncludes(moved.stderr, "is not what the manifest pins");
+      writeTextFileSync(`${dir}/manifest.ts`, manifest(std.sha256));
+      const down = await exec(`${dir}/manifest.ts`, "--check", "--fetch");
+      assertEquals(down.code, 2);
+      assertStringIncludes(down.stderr, "127.0.0.1");
+    } finally {
+      server.close();
+      removeSync(dir, { recursive: true });
+    }
+    body = `${SOURCE}ex:Added a owl:Class .\n`;
   },
 );

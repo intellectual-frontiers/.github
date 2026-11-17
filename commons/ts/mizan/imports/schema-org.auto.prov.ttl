@@ -1,0 +1,22 @@
+# AUTO-GENERATED with ../../../ontology/supply-chain/packaging/schema.auto.ts by commons/ts/mizan/integrations/pure/import-vocabulary.ts (commons 0019-mizan-integrations FR-009). Do not edit.
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+<urn:ifc:mizan:module:schema-org> a prov:Entity ;
+    dcterms:source "../../../ontology/supply-chain/packaging/schema.auto.ts" ;
+    prov:wasGeneratedBy <urn:ifc:mizan:import:schema-org:7f15ca89398c4f235f478a4b3b8d1f975d63c5a860b77c8a8fce01f791b7ae2f> ;
+    prov:wasDerivedFrom <urn:sha256:7f15ca89398c4f235f478a4b3b8d1f975d63c5a860b77c8a8fce01f791b7ae2f> .
+
+<urn:ifc:mizan:import:schema-org:7f15ca89398c4f235f478a4b3b8d1f975d63c5a860b77c8a8fce01f791b7ae2f> a prov:Activity ;
+    prov:used <urn:sha256:7f15ca89398c4f235f478a4b3b8d1f975d63c5a860b77c8a8fce01f791b7ae2f> ;
+    prov:wasAssociatedWith <urn:ifc:mizan:generator:commons:ts:mizan:integrations:pure:import-vocabulary.ts> .
+
+<urn:ifc:mizan:generator:commons:ts:mizan:integrations:pure:import-vocabulary.ts> a prov:SoftwareAgent .
+
+<urn:sha256:7f15ca89398c4f235f478a4b3b8d1f975d63c5a860b77c8a8fce01f791b7ae2f> a prov:Entity ;
+    dcterms:title "schema.org" ;
+    dcterms:publisher "Schema.org Community Group" ;
+    dcterms:hasVersion "30.1" ;
+    dcterms:source <https://schema.org/version/30.1/schemaorg-current-https.ttl> ;
+    dcterms:license <https://spdx.org/licenses/CC-BY-SA-3.0.html> .

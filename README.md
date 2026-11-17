@@ -7,7 +7,7 @@
 
 # Intellectual Frontiers — `.github`
 
-**Documentation: <https://intellectual-frontiers.github.io/.github/>** · **Strategy: [`MIZAN.html`](MIZAN.html)** (open it in a browser)
+**Documentation: <https://intellectual-frontiers.github.io/.github/>** · **Strategy: [`MIZAN.html`](https://htmlpreview.github.io/?https://github.com/intellectual-frontiers/.github/blob/main/MIZAN.html)** (a rendered preview)
 
 This public repository holds the organization's landing page ([`profile/README.md`](profile/README.md)), the one-command installers of agora ([`bin/`](bin/),
 `agora-install.sh` and `agora-install.ps1`, which sign GitHub CLI in and run the installer of the private `erga` repository), and
@@ -29,4 +29,4 @@ and its specifications. Everything else lives in the private `erga` repository.
 9. **IFC Mizan Integrations** (`commons/ts/mizan/integrations/`) brings standards into our typed form and turns ours into well-known forms (SHACL, JSON Schema, SKOS, SSSOM and more). Imports are made only when a term is needed, and nothing is ever published upstream without a person's decision.
 10. **AI-first, AI-native.** An agent reads `AGENTS.md`, the specification and the typed ontology, and the deterministic checks, not the agent, are the judge of whether the work is true to them.
 
-**Status:** Mizan is being built in the open. The plan, its tasks and its progress are in [issue #10](https://github.com/intellectual-frontiers/.github/issues/10); the specifications are `0003-mizan` and `0016` to `0019` in [`commons/spec-kit/`](commons/spec-kit/), and the first audit is in [`commons/spec-kit/audits/`](commons/spec-kit/audits/2026-11-standards-audit.md). [`MIZAN.html`](MIZAN.html) is the full strategy and implementation document.
+**Status:** Mizan is being built in the open. The plan, its tasks and its progress are in [issue #10](https://github.com/intellectual-frontiers/.github/issues/10); the specifications are `0003-mizan` and `0016` to `0019` in [`commons/spec-kit/`](commons/spec-kit/), and the first audit is in [`commons/spec-kit/audits/`](commons/spec-kit/audits/2026-11-standards-audit.md). [`MIZAN.html`](https://htmlpreview.github.io/?https://github.com/intellectual-frontiers/.github/blob/main/MIZAN.html) is the full strategy and implementation document (a rendered preview of `main`; a static README cannot name the branch it is read on).

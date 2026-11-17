@@ -36,16 +36,13 @@ import {
   XSD,
   xsd,
 } from "../../../ts/kernel/rdf.ts";
+import { SCHEMA, schema } from "./schema.auto.ts";
 
 /** The namespace of the packaging vocabulary's terms. */
 export const PM = namespace("pm", "https://www.intellectualfrontiers.com/ontology/packaging#");
 /** The namespace of the packaging individuals: the managers, families, programs, pins and the rest. */
 export const PMID = namespace("pmid", "https://www.intellectualfrontiers.com/id/packaging/");
-/** The namespace of schema.org, whose classes the packaging classes specialize. */
-export const SCHEMA = namespace("schema", "https://schema.org/");
-/** The classes of schema.org the packaging classes specialize. */
-export const schema = vocabulary(SCHEMA, { Action: "rdfs:Class", SoftwareApplication: "rdfs:Class", Thing: "rdfs:Class" });
-
+export { SCHEMA, schema } from "./schema.auto.ts";
 /** The terms of the packaging vocabulary: its classes and properties. */
 export const pm = vocabulary(PM, {
   PackageManager: "owl:Class",

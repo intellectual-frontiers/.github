@@ -42,10 +42,12 @@ jobs:
           bun commons/tools/mizan-check.ts
           bun commons/ts/mizan/generate-ontology.ts --check
           bun commons/ts/mizan/check.ts
+          bun commons/ts/mizan/integrations/host/import.ts commons/ts/mizan/imports/schema-org.import.ts --check --fetch
           node commons/tools/generate-packaging.ts --check
           node commons/tools/mizan-check.ts
           node commons/ts/mizan/generate-ontology.ts --check
           node commons/ts/mizan/check.ts
+          node commons/ts/mizan/integrations/host/import.ts commons/ts/mizan/imports/schema-org.import.ts --check --fetch
 
   tests:
     strategy:
