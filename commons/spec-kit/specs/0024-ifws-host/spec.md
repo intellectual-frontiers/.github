@@ -54,6 +54,8 @@
 
 - **FR-022**: `AGENTS.auto.md` MUST tell an agent the layout of the workspace, its rules (plan before apply, fast-forward only, one issue for every commit, no credential in a file) and its commands, from the manifest, with no secret and no absolute path of the user's computer.
 - **FR-023**: `.envrc.auto` MUST be generated only where the manifest says `direnv` is wanted and a probe finds `direnv`, and it MUST only add `<home>/.if-workspaces/tools/bin` to the `PATH`.
+- **FR-024**: The templates MUST also generate `lefthook.auto.yml` at the root, which calls the three generated hooks by their relative path and holds no checker of its own, for a person who runs lefthook in the workspace's own repository.
+- **FR-025**: A generated hook MUST run `ifws hook <name>` with `--home` the root it finds from its own place (it holds no absolute path), MUST send what it prints to standard error, and MUST read its status as 0 (go on), 1 (stop) or anything else (it cannot run its checker, FR-015).
 
 ## Out of scope
 

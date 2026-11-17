@@ -22,6 +22,7 @@
   },
   "bin": {
     "ifc": "./commons/ts/node/ifc.mjs",
+    "ifws": "./commons/ts/node/ifws.mjs",
     "ifc-docs": "./commons/docs/ifc-docs.mjs"
   },
   "engines": {

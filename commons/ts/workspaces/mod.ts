@@ -2,14 +2,93 @@
  * IF Workspaces, the pure core (commons 0023-if-workspaces, 0024-ifws-host): the managed place on a computer where the repositories of Intellectual Frontiers live. This module is rung 10 of the
  * ladder, the environment the other rungs are worked in (0016-ladder), and no rung below it imports it. Built here: the branded types (`GitHost`, `RepoPath`, `PortableSegment`, `BranchName`, `Sha`,
  * `Version`), the layout from a remote to a path and back, the portability of a path on Linux, macOS and Windows, the typed manifest, the state of a repository and its classification, the plan
- * as a pure function, the findings with their severities and SARIF, and the policy. The three Git host adapters are in `../githost/`. The command (`ifws`), its apply, the generated files, the
- * tools and the policy scans are other milestones' work.
+ * as a pure function, the findings with their severities and SARIF, and the policy; the typed templates and the generated files, the state record, the module contract and its discovery, the shell
+ * snippet and its one block, a unified diff and the checks of the doctor. The three Git host adapters are in `../githost/`. The command `ifws` is `ifws.ts`, its modules are in `commands/`, and what it does
+ * with `git` and the files is in `host/`; the tools and the policy scans are another milestone's work.
  *
  * @remarks
- * Everything here but `host/` is pure: no file, no process, no clock, no environment; each takes what it needs as an argument. `host/observe.ts` is the one file that runs `git`, and it only reads.
+ * Everything here but `host/`, `commands/` and `ifws.ts` is pure: no file, no process, no clock, no environment; each takes what it needs as an argument. `host/` runs `git` and reads and writes files, `commands/` are the typed modules of the command, and `ifws.ts` is the controller; `host/observe.ts` only reads.
  *
  * @module
  */
+export { unifiedDiff } from "./diff.ts";
+export { digestsOf, type DesiredFacts, desiredOf, settingsOf } from "./desired.ts";
+export {
+  type Check,
+  classifyFs,
+  findingsOf,
+  fsCheck,
+  type FsKind,
+  type FsProbe,
+  hookChecks,
+  type HookFacts,
+  type Level,
+  type LongPaths,
+  MIN_NODE_MAJOR,
+  type PathFacts,
+  pathChecks,
+  runtimeChecks,
+  severityOf,
+  type ToolProbe,
+} from "./doctor.ts";
+export {
+  checkFiles,
+  describeGenerateError,
+  type FileBody,
+  type FileMode,
+  fileDigest,
+  type GeneratedFile,
+  generated,
+  generatedPath,
+  type GenerateError,
+  HOOKS_FOLDER,
+  headerText,
+  isAutoName,
+  normalizeText,
+} from "./render.ts";
+export {
+  decodeStateRecord,
+  EMPTY_RECORD,
+  encodeStateRecord,
+  type FileFacts,
+  IFWS_VERSION,
+  type RecordedFile,
+  STATE_RECORD_PATH,
+  type StateRecord,
+  verifyFindings,
+  withFile,
+  withoutFile,
+} from "./state-record.ts";
+export {
+  type Candidates,
+  decodeExternalManifest,
+  decodeRegistered,
+  defineCommand,
+  describeNameError,
+  dispatch,
+  EXIT_STATUSES,
+  type ExitStatus,
+  exitCodeOf,
+  externalManifestSchema,
+  findModule,
+  type Found,
+  GLOBAL_OPTIONS,
+  hiddenFindings,
+  type IfwsModule,
+  MODULE_SOURCES,
+  type ModuleName,
+  type ModuleSource,
+  moduleName,
+  nearestNames,
+  precedenceOf,
+  type Report,
+  resolveAll,
+  type Failure,
+  type Command,
+  type Context,
+} from "./modules/mod.ts";
+export { renderAll, type Template, type TemplateData, TEMPLATES } from "./templates/mod.ts";
+export { BEGIN, END, installBlock, removeBlock, rcFileFor, SHELLS, type Shell, snippetFor } from "./shell/mod.ts";
 export {
   type Action,
   type ActionKind,

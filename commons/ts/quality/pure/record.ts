@@ -477,6 +477,8 @@ export type CanonicalInput = {
   readonly previous?: Sha256;
   /** What was planned and did not run (FR-005). */
   readonly notRun?: readonly NotRun[];
+  /** Facts about the run that every resource of the record carries besides the installation (a command and its options, a plan's hash): the check of another system names its own. */
+  readonly resourceAttributes?: Attributes;
 };
 
 /** A record made canonical: the text to keep, and the record it reads back as. */
@@ -534,7 +536,11 @@ export async function canonicalize(input: CanonicalInput): Promise<Result<Canoni
   const runResource = spans.find((b) => b.spans.some((s) => s.name === RUN_SPAN))?.resource ?? { attributes: {} };
   const withExtra: LogBatch[] = extra.length === 0 ? logs : [...logs, { resource: runResource, scope: TEST_SCOPE, records: extra }];
   const chained = (r: Resource): Resource => ({
-    attributes: { ...r.attributes, ...(input.previous === undefined ? {} : { [ATTR.previous]: input.previous }) },
+    attributes: {
+      ...r.attributes,
+      ...(input.resourceAttributes ?? {}),
+      ...(input.previous === undefined ? {} : { [ATTR.previous]: input.previous }),
+    },
   });
   const merged: Signals = mergeBatches({
     traces: spans.map((b) => ({ ...b, resource: chained(b.resource), spans: b.spans.map(redactSpan) })),
@@ -572,6 +578,8 @@ export type CheckInput = {
   readonly runner: Installation;
   /** The requirements the check proves, which each case names. */
   readonly requirements?: readonly string[];
+  /** Facts about the run that the resource of the record carries besides the installation (a command and its options, a plan's hash, the version of each tool): a check of another system names its own. */
+  readonly resourceAttributes?: Attributes;
 };
 
 /**
@@ -672,7 +680,11 @@ export async function checkRun(input: CheckInput): Promise<Result<Canonical, Qua
     required: [],
   });
   if (assembled.kind === "err") return err({ kind: "record", error: assembled.error });
-  return canonicalize({ record: assembled.value.record, notRun });
+  return canonicalize({
+    record: assembled.value.record,
+    notRun,
+    ...(input.resourceAttributes === undefined ? {} : { resourceAttributes: input.resourceAttributes }),
+  });
 }
 
 /** A day as `YYYY/MM/DD` in UTC, from nanoseconds since the Unix epoch. */
