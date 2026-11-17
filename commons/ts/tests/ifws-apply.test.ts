@@ -82,7 +82,7 @@ proves(
       const area = readDirSync(join(w.home, ".if-workspaces"))
         .map((e) => e.name)
         .sort();
-      assertEquals(area, ["evidence", "hooks", "modules.auto.json", "state.auto.json", "tools.auto.json", "workspace.ts"]);
+      assertEquals(area, ["evidence", "git.auto.conf", "hooks", "modules.auto.json", "state.auto.json", "tools.auto.json", "workspace.ts"]);
     });
   },
   needsWorld,
@@ -289,7 +289,7 @@ proves(
 
 proves(
   ["0023-if-workspaces FR-029", "0023-if-workspaces FR-027", "0023-if-workspaces FR-030", "0025-ifws FR-012", "0025-ifws FR-017"],
-  "a generated file that is no longer generated is removed only with --allow-destructive and only while it is as written; apply never installs a tool or changes the host, and setup and tools are not registered",
+  "a generated file that is no longer generated is removed only with --allow-destructive and only while it is as written; apply never installs a tool or changes the host, and a dry run of setup changes nothing",
   async () => {
     await withWorld(async (w) => {
       await w.ifws("init");
@@ -316,12 +316,21 @@ proves(
       const removed = await w.ifws("apply", "--allow-destructive");
       assertEquals(removed.code, 0, removed.stdout + removed.stderr);
       assert(!existsSync(join(w.home, "core.auto.code-workspace")));
-      // the registry has no setup and no tools
+      // setup and tools are modules; neither plan nor apply holds a step that installs or changes the host, and a dry run of setup changes nothing
       const list = await w.ifws("list", "--json");
       const names = (JSON.parse(list.stdout) as { data: { modules: { name: string }[] } }).data.modules.map((m) => m.name);
-      assert(!names.includes("setup") && !names.includes("tools"), names.join(","));
-      const setup = await w.ifws("setup");
-      assertEquals(setup.code, 2);
+      assert(names.includes("setup") && names.includes("tools"), names.join(","));
+      const before = readDirSync(w.home)
+        .map((e) => e.name)
+        .sort();
+      const dry = await w.ifws("setup");
+      assertStringIncludes(dry.stdout, "dry run: nothing is changed");
+      assertEquals(
+        readDirSync(w.home)
+          .map((e) => e.name)
+          .sort(),
+        before,
+      );
       for (const text of [plan.stdout, kept.stdout]) assert(!/install |change the host/.test(text), text);
     });
   },

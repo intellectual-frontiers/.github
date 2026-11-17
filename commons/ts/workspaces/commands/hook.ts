@@ -6,7 +6,7 @@
  * @remarks
  * A hook only reads: it changes no commit, no tree and no configuration, uses no network and writes no evidence record (a Git hook is run at every commit). Its exit status is that of `ifws`: 0 to let
  * Git go on, 1 to stop it, and anything else (2, 3, or a program that cannot run) is "cannot run its checker", which the generated script turns into a stop where a regulated domain is named and
- * a message elsewhere. The staged-change scan is the policy scans' (`workspaces/scan/`): `CHECKERS.stagedScan` is where it is wired in, and until it is, `pre-commit` says it has no scanner.
+ * a message elsewhere. The staged-change scan is the policy scans' (`workspaces/scan/secrets.ts`, run on the index by `host/staged.ts`); `CHECKERS.stagedScan` is where it is wired in, and where it is not, `pre-commit` says it has no scanner.
  *
  * @module
  */
@@ -19,20 +19,20 @@ import type { Finding } from "../findings.ts";
 import { unsignedCommitSeverity } from "../policy.ts";
 import { HOOK_NAMES, isHookName } from "../templates/hooks.ts";
 import { defineCommand, GLOBAL_OPTIONS, type Context, type IfwsModule, type Outcome } from "../modules/types.ts";
+import { type StagedHit, stagedSecretsScan } from "../host/staged.ts";
 import { loadFailureOutcome, loadWorkspace } from "../host/workspace.ts";
 import { textOf } from "./common.ts";
 
-/** A hit of the staged-change scan: where it is and the rule that found it, never the secret. */
-export type StagedHit = { readonly file: string; readonly line: number; readonly rule: string };
-
-/** What a hook calls on, which other modules of the workspace wire in. */
+/** What a hook calls on, which other modules of the workspace may replace. */
 export type Checkers = {
-  /** Reads the staged changes of the repository in the working folder and returns what it found; undefined until the policy scans are wired in. */
+  /** Reads the staged changes of the repository in the working folder and returns what it found. */
   stagedScan: ((cwd: string) => Promise<readonly StagedHit[]>) | undefined;
 };
 
-/** The checkers a hook calls. `stagedScan` is none until the plaintext-token scan of `workspaces/scan/` is wired in by the lead. */
-export const CHECKERS: Checkers = { stagedScan: undefined };
+/** The checkers a hook calls: the plaintext-token scan of the staged changes (`host/staged.ts`, which uses `scan/secrets.ts`). */
+export const CHECKERS: Checkers = { stagedScan: stagedSecretsScan };
+
+export type { StagedHit };
 
 const ZEROS = /^0+$/;
 
@@ -104,7 +104,16 @@ async function preCommit(ctx: Context): Promise<Outcome> {
       noEvidence: true,
       message: "no plaintext-token scanner is wired into this build of ifws (the policy scans are workspaces/scan/)",
     });
-  const hits = await scan(ctx.cwd);
+  let hits: readonly StagedHit[];
+  try {
+    hits = await scan(ctx.cwd);
+  } catch (e) {
+    return err({
+      kind: "environment",
+      noEvidence: true,
+      message: `the staged changes could not be read: ${e instanceof Error ? e.message : String(e)}`,
+    });
+  }
   const findings: Finding[] = hits.map((h) => ({
     ruleId: h.rule,
     severity: "Error",

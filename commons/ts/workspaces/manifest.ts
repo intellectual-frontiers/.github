@@ -8,11 +8,11 @@
  * are one after Unicode normalization and case folding (both are named, on every file system), a branch that is not a branch name, and a repository on a host the policy does not allow.
  * An issue is a finding of severity `Error` (`issueFinding`); a manifest with one is not used.
  *
- * @limits It does not read the file: `workspace.ts` is a TypeScript module the host layer loads and hands over as a value. The tool catalog is not decoded here (0023-if-workspaces FR-037).
+ * @limits It does not read the file: `workspace.ts` is a TypeScript module the host layer loads and hands over as a value. The tool catalog is decoded by `tools/catalog.ts` (0023-if-workspaces FR-037).
  *
  * @module
  */
-import { array, boolean, formatDecodeError, integer, object, string } from "../kernel/decode.ts";
+import { array, boolean, formatDecodeError, integer, object, string, unknownValue } from "../kernel/decode.ts";
 import { err, ok, type Result } from "../kernel/result.ts";
 import { sha256Of } from "../kernel/sha256.ts";
 import { describeRemoteError, hostKindOf, type HostKinds, parseRemote, cloneUrlOf } from "../githost/remote.ts";
@@ -21,6 +21,7 @@ import type { Finding } from "./findings.ts";
 import { describeLayoutError, repoPathOf, worktreePathOf } from "./layout.ts";
 import { describeNameError, moduleName } from "./modules/name.ts";
 import { collisions } from "./portable.ts";
+import { decodeCatalog, type ToolCatalog } from "./tools/catalog.ts";
 import { type Policy, hostAllowed, policyOf } from "./policy.ts";
 import { branchName, describeBrandError, gitHost, type BranchName, type RepoPath } from "./types.ts";
 
@@ -36,6 +37,7 @@ const manifestShape = object(
     identity: object({ name: string, email: string }),
     signing: object({ format: string }, { key: string }),
     direnv: boolean,
+    tools: unknownValue,
     modules: array(object({ name: string, program: string }, { sha256: string, summary: string })),
   },
 );
@@ -79,11 +81,13 @@ export type Manifest = {
   readonly direnv: boolean;
   /** The modules the workspace registers, written to `modules.auto.json`. */
   readonly modules: readonly ManifestModule[];
+  /** The tool catalog (0023-if-workspaces FR-037): empty where the manifest names none. */
+  readonly catalog: ToolCatalog;
 };
 
 /** One thing wrong in the manifest, with where. */
 export type ManifestIssue = {
-  /** The rule that found it: `ifws/manifest-shape`, `ifws/manifest-remote`, `ifws/manifest-path`, `ifws/manifest-branch`, `ifws/manifest-host`, `ifws/manifest-signing`, `ifws/manifest-module`, `ifws/path-collision`, `ifws/host-not-allowed`. */
+  /** The rule that found it: `ifws/manifest-shape`, `ifws/manifest-remote`, `ifws/manifest-path`, `ifws/manifest-branch`, `ifws/manifest-host`, `ifws/manifest-signing`, `ifws/manifest-module`, `ifws/catalog-shape`, `ifws/catalog-tool`, `ifws/path-collision`, `ifws/host-not-allowed`. */
   readonly rule: string;
   /** The field, as `$.repositories[2].remote`. */
   readonly path: string;
@@ -96,7 +100,10 @@ export function issueFinding(issue: ManifestIssue, today: string): Finding {
 }
 
 /** The manifest from a value of unknown shape, or every issue found in it. Pure: nothing is read, and nothing in the value is kept that is not decoded. */
-export function decodeManifest(input: unknown): Result<Manifest, readonly ManifestIssue[]> {
+export function decodeManifest(
+  input: unknown,
+  options: { readonly loopbackHttp?: boolean } = {},
+): Result<Manifest, readonly ManifestIssue[]> {
   const shaped = manifestShape(input);
   if (shaped.kind === "err") {
     return err([
@@ -146,6 +153,13 @@ export function decodeManifest(input: unknown): Result<Manifest, readonly Manife
         message: "the SHA-256 of a module's program is 64 hexadecimal digits",
       });
     modules.push({ name: m.name, program: m.program, sha256: m.sha256, summary: m.summary });
+  }
+
+  let catalog: ToolCatalog = { tools: [] };
+  if (raw.tools !== undefined) {
+    const c = decodeCatalog(raw.tools, options.loopbackHttp === true);
+    if (c.kind === "ok") catalog = c.value;
+    else for (const i of c.error) issues.push({ rule: i.rule, path: i.path, message: i.message });
   }
 
   const policy = policyOf(raw.policy);
@@ -222,6 +236,7 @@ export function decodeManifest(input: unknown): Result<Manifest, readonly Manife
     ...(signing === undefined ? {} : { signing }),
     direnv: raw.direnv === true,
     modules,
+    catalog,
   });
 }
 

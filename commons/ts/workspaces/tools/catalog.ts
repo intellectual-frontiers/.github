@@ -75,7 +75,7 @@ export function safeInnerPath(path: string): boolean {
   return path.split("/").every((p) => p !== "" && p !== "." && p !== "..");
 }
 
-/** Why a URL may not be a pin, or undefined where it may: `https` only (`loopbackHttp` also allows `http` to the loopback interface, for a test's own server; the catalog's decoder never does), no credential, no query that carries one, and no `latest` in its path. */
+/** Why a URL may not be a pin, or undefined where it may: `https` only (`loopbackHttp` also allows `http` to the loopback interface, for a test's own server; the catalog's decoder does so only where it is told to, by `ifws` for a person's own local mirror), no credential, no query that carries one, and no `latest` in its path. */
 export function urlProblem(text: string, loopbackHttp = false): string | undefined {
   let url: URL;
   try {
@@ -93,7 +93,7 @@ export function urlProblem(text: string, loopbackHttp = false): string | undefin
 }
 
 /** The catalog from the manifest's `tools` value, or every issue found: the shape first (the first field that is wrong, by its path), then the meaning, all of it. */
-export function decodeCatalog(input: unknown): Result<ToolCatalog, readonly CatalogIssue[]> {
+export function decodeCatalog(input: unknown, loopbackHttp = false): Result<ToolCatalog, readonly CatalogIssue[]> {
   const shaped = catalogShape(input, "$.tools");
   if (shaped.kind === "err") {
     return err([
@@ -125,7 +125,7 @@ export function decodeCatalog(input: unknown): Result<ToolCatalog, readonly Cata
     const seen = new Set<string>();
     for (const [j, a] of raw.artifacts.entries()) {
       const where = `${at}.artifacts[${j}]`;
-      const problem = urlProblem(a.url);
+      const problem = urlProblem(a.url, loopbackHttp);
       if (problem !== undefined) bad(`${where}.url`, `the URL is not a pin: ${problem}`);
       const sum = sha256Of(a.sha256);
       if (sum === undefined) bad(`${where}.sha256`, "the hash is not a SHA-256 (64 lower-case hexadecimal digits)");

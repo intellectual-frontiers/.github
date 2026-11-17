@@ -9,23 +9,8 @@ import { exists, mkdir, writeTextFile } from "../../runtime/fs.ts";
 import { err } from "../../kernel/result.ts";
 import { GLOBAL_OPTIONS, defineCommand, type IfwsModule } from "../modules/types.ts";
 import { AREA, manifestPath } from "../host/workspace.ts";
+import { starterManifest } from "../setup/starter.ts";
 import { join } from "../../runtime/path.ts";
-
-/** The manifest `init` writes where there is none: a module whose default export is the manifest, with the one place to name a repository. */
-export const STARTER_MANIFEST = `/**
- * The manifest of this workspace: the source of everything \`ifws\` generates and plans (commons 0024-ifws-host). \`ifws\` reads the default export once and
- * checks it; change it, then run \`ifws plan\`, \`ifws apply\` and \`ifws render\`.
- */
-export default {
-  repositories: [
-    // { remote: "https://github.com/OWNER/REPO", group: "core", branch: "main" },
-  ],
-  // policy: { regulatedDomain: [], requiresSignedCommits: false },
-  // identity: { name: "Your Name", email: "you@example.org" },
-  // signing: { format: "ssh", key: "~/.ssh/id_ed25519.pub" },
-  // direnv: false,
-};
-`;
 
 const init = defineCommand({
   name: "init",
@@ -48,7 +33,7 @@ const init = defineCommand({
       }
       const manifest = manifestPath(home);
       if (!(await exists(manifest))) {
-        await writeTextFile(manifest, STARTER_MANIFEST, { createNew: true });
+        await writeTextFile(manifest, starterManifest(), { createNew: true });
         made.push(manifest);
       }
     } catch (e) {

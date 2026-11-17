@@ -558,7 +558,7 @@ proves(
       });
       assert(w.kind === "ok", JSON.stringify(w));
       assertEquals(w.value.path.startsWith(join(root, ".if-workspaces", "evidence")), true);
-      assert(/\d{8}T\d{6}Z-[0-9a-f]{32}\.otlp\.json$/.test(w.value.path), w.value.path);
+      assert(/\d{8}T\d{6}(?:\.\d{3})?Z-[0-9a-f]{32}\.otlp\.json$/.test(w.value.path), w.value.path);
       assert(!w.value.text.includes(token), "the record holds the token");
       assert(!w.value.text.includes("/secret/place"), "the record holds an option's value");
       assertEquals(holdsCredential(w.value.text), false);

@@ -167,6 +167,8 @@ proves(
     // the one place that may write the global Git configuration, only on request, with the diff shown and a yes (0024 FR-016)
     const REFUSES = "workspaces/scan/boundary.ts";
     const GIT_INCLUDE = "workspaces/setup/host/apply.ts";
+    // and the module that wraps it names where the user's global Git configuration is (`GIT_CONFIG_GLOBAL`, else `~/.gitconfig`) for that one include
+    const GIT_INCLUDE_MODULE = "workspaces/commands/setup.ts";
     for (const f of WORKSPACES) {
       const text = readTextFileSync(join(ROOT, f));
       // code with its comments taken out but its strings kept: a path named in a string is a path read or written
@@ -175,11 +177,11 @@ proves(
         ? []
         : [
             /\.ssh\b/,
-            /\.gitconfig\b/,
+            ...(f === GIT_INCLUDE_MODULE ? [] : [/\.gitconfig\b/]),
             /\/etc\/gitconfig/,
             /--global\b/,
             /--system\b/,
-            /GIT_CONFIG_GLOBAL|GIT_CONFIG_SYSTEM/,
+            ...(f === GIT_INCLUDE_MODULE ? [/GIT_CONFIG_SYSTEM/] : [/GIT_CONFIG_GLOBAL|GIT_CONFIG_SYSTEM/]),
             /credential\.helper|\.git-credentials|keychain|keyring/i,
             /\.npmrc|\.zshenv|\.profile\b/,
           ]) {

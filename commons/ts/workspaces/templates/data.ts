@@ -8,11 +8,12 @@
 import type { Result } from "../../kernel/result.ts";
 import type { Manifest } from "../manifest.ts";
 import type { GeneratedFile, GenerateError } from "../render.ts";
+import type { Tool } from "../tools/catalog.ts";
 
-/** A tool as the resolved catalog lists it. */
-export type ToolEntry = { readonly name: string; readonly version: string };
+/** A tool as the resolved catalog lists it: the catalog's own `Tool`. */
+export type ToolEntry = Tool;
 
-/** What the templates read: the decoded manifest, whether `direnv` is wanted and found (0024-ifws-host FR-023), and the resolved tool catalog (empty until the catalog is in the manifest). */
+/** What the templates read: the decoded manifest, whether `direnv` is wanted and found (0024-ifws-host FR-023), and the resolved tool catalog (the manifest's, empty where it names none). */
 export type TemplateData = {
   readonly manifest: Manifest;
   /** The manifest says `direnv` is wanted and a probe found it. */

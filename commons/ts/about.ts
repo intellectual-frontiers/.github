@@ -110,7 +110,7 @@ export const about: About = {
     },
     {
       run: "bun workspaces/ifws.ts <module> (or ifws, the package's bin)",
-      does: "The command of IF Workspaces: init, plan, apply, status, doctor, verify, render, worktree, list, help and shell, each a typed module, and modules registered by the workspace or named ifws-* on the PATH; it manages only Intellectual Frontiers Workspaces and does not front ifc. Exit status 0 ok, 1 findings, 2 usage, 3 environment.",
+      does: "The command of IF Workspaces: init, plan, apply, status, doctor, verify, render, worktree, list, help, shell, setup (the one command that installs a pinned tool or changes the host) and tools, each a typed module, and modules registered by the workspace or named ifws-* on the PATH; it manages only Intellectual Frontiers Workspaces and does not front ifc. Exit status 0 ok, 1 findings, 2 usage, 3 environment.",
     },
     {
       run: "bun run test:evidence",

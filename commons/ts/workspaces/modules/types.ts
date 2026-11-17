@@ -16,6 +16,7 @@ import type { Json } from "../../kernel/json5.ts";
 import { err, ok, type Result } from "../../kernel/result.ts";
 import type { Sha256 } from "../../kernel/sha256.ts";
 import type { Finding } from "../findings.ts";
+import type { RunFacts } from "../setup/evidence.ts";
 
 /** How a run ends: the keys of the code list `ifws:ExitStatus`. */
 export type ExitStatus = "Ok" | "Findings" | "Usage" | "Environment";
@@ -71,6 +72,8 @@ export type Report = {
   readonly status?: ExitStatus;
   /** What the evidence record of the run names besides the findings. */
   readonly facts?: EvidenceFacts;
+  /** The facts of a run whose evidence is the setup module's (`setup/host/evidence.ts`): `setup` and `tools`. Where it is given the controller writes the record from it. */
+  readonly runFacts?: RunFacts;
   /** The run writes no evidence record: `ifws shell <shell>` writes no file (0024-ifws-host FR-017), and a hook only reads (FR-015). */
   readonly noEvidence?: boolean;
 };

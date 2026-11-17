@@ -11,6 +11,7 @@ import { agentsTemplate } from "./agents.ts";
 import { codeWorkspaceTemplate } from "./code-workspace.ts";
 import type { Template, TemplateData } from "./data.ts";
 import { envrcTemplate } from "./envrc.ts";
+import { gitIncludeTemplate } from "./git-include.ts";
 import { hooksTemplate } from "./hooks.ts";
 import { modulesJsonTemplate, toolsJsonTemplate } from "./json-files.ts";
 import { lefthookTemplate } from "./lefthook.ts";
@@ -23,6 +24,7 @@ export const TEMPLATES: readonly Template[] = [
   agentsTemplate,
   codeWorkspaceTemplate,
   envrcTemplate,
+  gitIncludeTemplate,
   hooksTemplate,
   lefthookTemplate,
   modulesJsonTemplate,

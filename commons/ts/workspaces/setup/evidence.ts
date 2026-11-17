@@ -86,9 +86,7 @@ export function holdsCredential(recordText: string): boolean {
 
 /** The name of a run's evidence file below `<home>/.if-workspaces/evidence/`: the UTC time and the run's identifier (the trace id), so it sorts by time and is never reused. */
 export function evidenceFileName(endIso: string, traceId: string): string {
-  const stamp = endIso
-    .replace(/[-:]/g, "")
-    .replace(/\.\d+Z?$/, "")
-    .replace(/Z$/, "");
+  // to the millisecond, so that the names of one workspace's records sort in the order of their runs
+  const stamp = endIso.replace(/[-:]/g, "").replace(/Z$/, "");
   return `${stamp}Z-${traceId}.otlp.json`;
 }

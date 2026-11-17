@@ -19,7 +19,14 @@ export const toolsJsonTemplate: Template = {
         value: {
           tools: [...data.tools]
             .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
-            .map((t) => ({ name: t.name, version: t.version })),
+            .map((t) => ({
+              name: t.name,
+              version: t.version,
+              provides: [...t.provides],
+              artifacts: [...t.artifacts]
+                .sort((x, y) => (`${x.os}/${x.arch}` < `${y.os}/${y.arch}` ? -1 : 1))
+                .map((a) => ({ os: a.os, arch: a.arch, url: a.url, sha256: a.sha256, kind: a.kind, bin: a.bin })),
+            })),
         },
       },
       { generator: "ifws templates/tools-json" },

@@ -85,6 +85,7 @@ proves(
   () => {
     const files = filesOf(dataOf(BASE));
     assertEquals([...files.keys()].sort(), [
+      ".if-workspaces/git.auto.conf",
       ".if-workspaces/hooks/commit-msg",
       ".if-workspaces/hooks/pre-commit",
       ".if-workspaces/hooks/pre-push",

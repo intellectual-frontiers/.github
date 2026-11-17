@@ -25,6 +25,7 @@ export type FileBody =
   | { readonly format: "json"; readonly value: JsonObject }
   | { readonly format: "markdown"; readonly text: string }
   | { readonly format: "yaml"; readonly text: string }
+  | { readonly format: "gitconfig"; readonly text: string }
   | { readonly format: "envrc"; readonly text: string }
   | { readonly format: "sh"; readonly text: string };
 
@@ -101,6 +102,7 @@ function contentOf(body: FileBody, generator: string): string {
     case "markdown":
       return normalizeText(`<!-- ${header} -->\n\n${noBom(body.text)}`);
     case "yaml":
+    case "gitconfig":
     case "envrc":
       return normalizeText(`# ${header}\n\n${noBom(body.text)}`);
     case "sh": {

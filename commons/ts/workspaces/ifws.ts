@@ -32,7 +32,9 @@ import { topHelp } from "./commands/list.ts";
 import { writeEvidence } from "./host/evidence.ts";
 import { discoverModules, runExternal } from "./host/discovery.ts";
 import { terminalInteract } from "./host/interact.ts";
-import { readManifest, AREA } from "./host/workspace.ts";
+import { readManifest, AREA, loopbackAllowed } from "./host/workspace.ts";
+import { writeRunEvidence } from "./setup/host/evidence.ts";
+import type { RunFacts } from "./setup/evidence.ts";
 import { exitStatusOf, toSarif } from "./findings.ts";
 import { homeOf } from "./layout.ts";
 import { findModule } from "./modules/registry.ts";
@@ -215,6 +217,7 @@ export async function main(argv: readonly string[], deps: MainDeps = {}): Promis
   let status: ExitStatus;
   let code: number;
   let facts: EvidenceFacts | undefined;
+  let runFacts: RunFacts | undefined;
   let findings: Report["findings"] = [];
   let noEvidence: boolean;
   let notRun: string | undefined;
@@ -224,6 +227,7 @@ export async function main(argv: readonly string[], deps: MainDeps = {}): Promis
     code = external?.code ?? exitCodeOf(status);
     findings = r.findings;
     facts = r.facts;
+    runFacts = r.runFacts;
     noEvidence = r.noEvidence === true;
     if (globals.sarif) out(line(JSON.stringify(toSarif(r.findings), null, 2)));
     else if (globals.json) out(line(JSON.stringify({ command, status, exitCode: code, data: r.data, findings: r.findings }, null, 2)));
@@ -239,7 +243,7 @@ export async function main(argv: readonly string[], deps: MainDeps = {}): Promis
   // the evidence record, where the workspace has a place for it
   const home = homeFor(globals.home);
   if (!noEvidence && home !== undefined && existsSync(join(home, AREA))) {
-    const policy = await readManifest(home, today);
+    const policy = await readManifest(home, today, loopbackAllowed(environment));
     const regulated = policy.kind === "ok" && policy.value.policy.regulatedDomain.length > 0;
     const tools = [...(facts?.tools ?? []), { name: runtimeName(), version: runtimeVersion() }];
     if (regulated && !tools.some((t) => t.name === "git")) {
@@ -247,26 +251,20 @@ export async function main(argv: readonly string[], deps: MainDeps = {}): Promis
       const v = g?.success === true ? /(\d+\.\d+(?:\.\d+)?)/.exec(g.stdout)?.[1] : undefined;
       if (v !== undefined) tools.push({ name: "git", version: v });
     }
-    const written = await writeEvidence(
-      home,
-      {
-        command,
-        words,
-        status,
-        findings,
-        ...(notRun === undefined ? {} : { notRun }),
-        facts: { ...facts, tools },
-        start,
-        end: BigInt(now()) * 1_000_000n,
-      },
-      regulated,
-    );
-    if (written.kind === "err") {
-      note(
-        line(
-          `ifws: the evidence record could not be written (${written.error.kind === "write" ? written.error.reason : written.error.reason}); the run is reported as a failure of the host`,
-        ),
-      );
+    const end = BigInt(now()) * 1_000_000n;
+    // the evidence of `setup` and `tools` is made by the setup module's writer from the facts of the run; every other run's by this one's
+    const failure: string | undefined =
+      runFacts !== undefined
+        ? await writeRunEvidence({ home, start, end, env: environment }, { ...runFacts, exit: status }).then((w) =>
+            w.kind === "err" ? w.error : undefined,
+          )
+        : await writeEvidence(
+            home,
+            { command, words, status, findings, ...(notRun === undefined ? {} : { notRun }), facts: { ...facts, tools }, start, end },
+            regulated,
+          ).then((w) => (w.kind === "err" ? w.error.reason : undefined));
+    if (failure !== undefined) {
+      note(line(`ifws: the evidence record could not be written (${failure}); the run is reported as a failure of the host`));
       return exitCodeOf("Environment");
     }
   }

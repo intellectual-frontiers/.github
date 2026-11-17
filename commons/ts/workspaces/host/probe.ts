@@ -96,6 +96,16 @@ export async function probeLongPaths(): Promise<LongPaths> {
   }
 }
 
+/** Whether this process is elevated on Windows (`net session` succeeds only for an administrator); false elsewhere and where it cannot be told. */
+export async function isElevated(): Promise<boolean> {
+  if (build.os !== "windows") return false;
+  try {
+    return (await run(["net", "session"])).success;
+  } catch {
+    return false;
+  }
+}
+
 /** Whether `direnv` is on the `PATH` (0024-ifws-host FR-023). */
 export function direnvFound(path?: string): boolean {
   return which("direnv", path) !== undefined;

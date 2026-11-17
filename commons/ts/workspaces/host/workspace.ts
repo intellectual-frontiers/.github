@@ -60,6 +60,11 @@ export function native(home: string, path: string): string {
   return nativePath(home, path as RepoPath, sep === "\\" ? "\\" : "/"); // a path of the workspace is made only of portable segments
 }
 
+/** Whether a run may pin an artifact on `http` to the loopback interface: only where the environment says so (`IFWS_ALLOW_LOOPBACK_HTTP=1`), for a person's own local mirror or a test's own server. */
+export function loopbackAllowed(env: Readonly<Record<string, string | undefined>>): boolean {
+  return env["IFWS_ALLOW_LOOPBACK_HTTP"] === "1";
+}
+
 /** Where the manifest is. */
 export function manifestPath(home: string): string {
   return join(home, AREA, "workspace.ts");
@@ -81,7 +86,7 @@ async function importManifest(path: string): Promise<Result<unknown, string>> {
 }
 
 /** Reads and decodes the manifest of a root, or says why it cannot be had: absent, or findings that name each field. */
-export async function readManifest(home: string, today: string): Promise<Result<Manifest, LoadFailure>> {
+export async function readManifest(home: string, today: string, loopbackHttp = false): Promise<Result<Manifest, LoadFailure>> {
   const path = manifestPath(home);
   if (!existsSync(path)) return err({ kind: "no-manifest", path });
   const imported = await importManifest(path);
@@ -90,7 +95,7 @@ export async function readManifest(home: string, today: string): Promise<Result<
       kind: "manifest",
       findings: [{ ruleId: "ifws/manifest-shape", severity: "Error", message: imported.error, subject: "$", firstSeen: today }],
     });
-  const decoded = decodeManifest(imported.value);
+  const decoded = decodeManifest(imported.value, { loopbackHttp });
   if (decoded.kind === "err") return err({ kind: "manifest", findings: decoded.error.map((i) => issueFinding(i, today)) });
   return ok(decoded.value);
 }
@@ -100,10 +105,10 @@ export async function loadWorkspace(ctx: Context): Promise<Result<Loaded, LoadFa
   const home = ctx.home;
   if (home === undefined) return err({ kind: "no-home" });
   if (!existsSync(home)) return err({ kind: "no-root", home });
-  const read = await readManifest(home, ctx.today);
+  const read = await readManifest(home, ctx.today, loopbackAllowed(ctx.env));
   if (read.kind === "err") return read;
   const manifest = read.value;
-  const data: TemplateData = { manifest, direnv: manifest.direnv && direnvFound(ctx.env["PATH"]), tools: [] };
+  const data: TemplateData = { manifest, direnv: manifest.direnv && direnvFound(ctx.env["PATH"]), tools: manifest.catalog.tools };
   const rendered = renderAll(data);
   if (rendered.kind === "err") return err({ kind: "generate", errors: rendered.error });
   let record: StateRecord = EMPTY_RECORD;
