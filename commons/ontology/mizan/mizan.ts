@@ -55,6 +55,7 @@ export const MZID = namespace("mzid", "https://www.intellectualfrontiers.com/id/
 /** The terms of Mizan's vocabulary: its classes and properties. */
 export const mz = vocabulary(MZ, {
   Rung: "owl:Class",
+  RungKind: "owl:Class",
   Spec: "owl:Class",
   Requirement: "owl:Class",
   OntologyTerm: "owl:Class",
@@ -69,7 +70,7 @@ export const mz = vocabulary(MZ, {
   IntegrationDirection: "owl:Class",
   ImportRecord: "owl:Class",
   rungNumber: "owl:DatatypeProperty",
-  required: "owl:DatatypeProperty",
+  kind: "owl:ObjectProperty",
   mayRelyOn: "owl:ObjectProperty",
   home: "owl:DatatypeProperty",
   provedBy: "owl:DatatypeProperty",
@@ -152,6 +153,20 @@ export const integrationDirections = codes(classSchema(mz.IntegrationDirection, 
   Export: { label: en("export") },
 });
 
+/** What kind of rung a rung is (commons 0016-ladder FR-008): a code list, whose keys are the union the checks branch on. */
+export const rungKinds = codes(classSchema(mz.RungKind, CODE), MZ, {
+  Required: { label: en("required"), definition: en("Every harness has the rung and builds on the rungs it names.") },
+  Optional: { label: en("optional"), definition: en("A harness may have the rung: it relies on no rung and no rung relies on it.") },
+  Observer: {
+    label: en("observer"),
+    definition: en("The rung records and proves what the other rungs do, and is required of a harness that claims a regulated domain; no rung relies on it."),
+  },
+  Environment: {
+    label: en("environment"),
+    definition: en("The rung is the working environment everything is built in, required of a harness that claims a regulated domain; it relies on no rung and no rung relies on it."),
+  },
+});
+
 // ---- the class schemas the data is made with
 
 /** The schema of a rung of the ladder (`mz:Rung`). */
@@ -159,7 +174,7 @@ export const Rung = classSchema(mz.Rung, {
   label: one(rdfs.label, range.langString),
   rungNumber: one(mz.rungNumber, range.integer),
   purpose: one(skos.definition, range.langString),
-  required: one(mz.required, range.boolean),
+  kind: one(mz.kind, range.ref<"mz:RungKind">()),
   mayRelyOn: many(mz.mayRelyOn, range.ref<"mz:Rung">()),
   home: many(mz.home, range.string),
   provedBy: many(mz.provedBy, range.string),
@@ -220,6 +235,7 @@ export const OntologyTerm = classSchema(mz.OntologyTerm, {
 
 /** The classes, each with its label and definition. */
 export const classes = [
+  OwlClass.make(mz.RungKind, { label: en("Rung kind"), definition: en("required, optional, observer or environment.") }),
   OwlClass.make(mz.Rung, { label: en("Rung"), definition: en("One level of the ladder, with its number, purpose, homes, what it may rely on and what proves it.") }),
   OwlClass.make(mz.Spec, { label: en("Specification"), definition: en("A specification of a spec-kit folder, with its identifier and status.") }),
   OwlClass.make(mz.Requirement, { label: en("Requirement"), definition: en("One numbered requirement of a specification, with the authority it comes from where it comes from law.") }),
@@ -248,8 +264,8 @@ export const classes = [
 
 /** The properties, each with its domain, range and definition. */
 export const properties = [
-  DatatypeProperty.make(mz.rungNumber, { domain: mz.Rung, range: xsd.integer, definition: en("The rung's number, 0 to 8.") }),
-  DatatypeProperty.make(mz.required, { domain: mz.Rung, range: xsd.boolean, definition: en("True for rungs 0 to 7, false for the optional lifecycle rung.") }),
+  DatatypeProperty.make(mz.rungNumber, { domain: mz.Rung, range: xsd.integer, definition: en("The rung's number, 0 to 10.") }),
+  ObjectProperty.make(mz.kind, { domain: mz.Rung, range: mz.RungKind, definition: en("required, optional, observer or environment.") }),
   ObjectProperty.make(mz.mayRelyOn, { domain: mz.Rung, range: mz.Rung, definition: en("A rung this rung may rely on, and never reach around.") }),
   DatatypeProperty.make(mz.home, { domain: mz.Rung, range: xsd.string, definition: en("A path or a glob of a harness's files that is on the rung.") }),
   DatatypeProperty.make(mz.spec, { domain: mz.Rung, range: xsd.string, definition: en("A specification (and its requirement) the rung comes from, as a harness cites it: `NNN-slug FR-nnn`.") }),
@@ -307,7 +323,7 @@ export const mizanOntology = OwlOntology.make(ontologyOf(MZ), {
 
 // ---- the individuals: the rungs
 
-const CORE = { required: true, home: [], provedBy: [] } as const;
+const CORE = { kind: rungKinds.Required, home: [], provedBy: [] } as const;
 
 /** Rung 0: the ontology. */
 export const rung0 = Rung.make(term(MZID, "rung-0"), {
@@ -375,7 +391,7 @@ export const rung7 = Rung.make(term(MZID, "rung-7"), {
 });
 /** Rung 8: the lifecycle, optional. */
 export const rung8 = Rung.make(term(MZID, "rung-8"), {
-  required: false,
+  kind: rungKinds.Optional,
   home: [],
   provedBy: [],
   label: en("Lifecycle: retired, then archived"),
@@ -384,8 +400,34 @@ export const rung8 = Rung.make(term(MZID, "rung-8"), {
   mayRelyOn: [],
 });
 
-/** The nine rungs of the ladder, lowest first. */
-export const rungs = [rung0, rung1, rung2, rung3, rung4, rung5, rung6, rung7, rung8] as const;
+/** Rung 9: the evidence, an observer. */
+export const rung9 = Rung.make(term(MZID, "rung-9"), {
+  kind: rungKinds.Observer,
+  home: [],
+  provedBy: [],
+  label: en("Evidence: what the system records about itself"),
+  rungNumber: 9,
+  purpose: en(
+    "The records produced by operating the system, never written by hand: test and check runs, findings, nonconformances, corrective actions, change records and attestations. They are append-only and prove every other rung; no rung relies on them, so that evidence cannot authorize itself.",
+  ),
+  mayRelyOn: [rung0, rung1, rung2, rung3, rung4, rung5, rung6, rung7],
+});
+
+/** Rung 10: the workspace, an environment. */
+export const rung10 = Rung.make(term(MZID, "rung-10"), {
+  kind: rungKinds.Environment,
+  home: [],
+  provedBy: [],
+  label: en("Workspace: where the work is done"),
+  rungNumber: 10,
+  purpose: en(
+    "The controlled working environment everything else is built in: the layout of the repositories on a machine, the approved tools, the policy and the hooks that hold the work to its rules. It relies on no rung and no rung relies on it; the evidence rung records what it does.",
+  ),
+  mayRelyOn: [],
+});
+
+/** The eleven rungs of the ladder, lowest first. */
+export const rungs = [rung0, rung1, rung2, rung3, rung4, rung5, rung6, rung7, rung8, rung9, rung10] as const;
 
 // ---- the individuals: the first jurisdiction and the laws of the first domains
 
@@ -460,6 +502,7 @@ export const pendingTerms = [
   pending("Decision", "none found; architecture decision records are documents, not a vocabulary", "0018-standards-first FR-005"),
   pending("Exception", "none found", "0017-two-languages FR-004"),
   pending("Integration", "schema:SoftwareApplication (to verify)", "0019-mizan-integrations FR-002"),
+  pending("RungKind", "none found", "0016-ladder FR-008"),
   pending("IntegrationDirection", "none found", "0019-mizan-integrations FR-002"),
   pending("ImportRecord", "prov:Activity (to verify)", "0019-mizan-integrations FR-009"),
 ] as const;
@@ -478,6 +521,7 @@ export const file: OntologyFile = {
     ...Object.values(bases),
     ...Object.values(jurisdictionLevels),
     ...Object.values(integrationDirections),
+    ...Object.values(rungKinds),
     ...rungs,
     unitedStates,
     ...authorities,

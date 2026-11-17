@@ -20,6 +20,7 @@ import {
   Decision,
   files,
   integrationDirections,
+  rungKinds,
   Jurisdiction,
   jurisdictionLevels,
   MZ,
@@ -124,6 +125,7 @@ function membersOf(
 const LISTS = [
   { name: "Basis", table: "mizan_basis", members: membersOf(bases) },
   { name: "JurisdictionLevel", table: "mizan_jurisdiction_level", members: membersOf(jurisdictionLevels) },
+  { name: "RungKind", table: "mizan_rung_kind", members: membersOf(rungKinds) },
   { name: "IntegrationDirection", table: "mizan_integration_direction", members: membersOf(integrationDirections) },
 ] as const;
 

@@ -15,7 +15,7 @@
 import { fileURLToPath } from "node:url";
 import process from "node:process";
 import { packagingTerms } from "../../ontology/audit/mod.ts";
-import { bases, classes, jurisdictionLevels, integrationDirections, mz, terms } from "../../ontology/mizan/mod.ts";
+import { bases, classes, jurisdictionLevels, integrationDirections, rungKinds, mz, terms } from "../../ontology/mizan/mod.ts";
 import { pm } from "../../ontology/supply-chain/packaging/mod.ts";
 import { type RulePlugin, rulePlugins } from "./rules.ts";
 import { holdHarness } from "./harness.ts";
@@ -106,6 +106,7 @@ export function main(
                 ...Object.keys(bases),
                 ...Object.keys(jurisdictionLevels),
                 ...Object.keys(integrationDirections),
+                ...Object.keys(rungKinds),
               ]),
               pm: new Set(Object.keys(pm)),
             },

@@ -413,3 +413,7 @@ requirement	mechanism	by	note
 0019-mizan-integrations FR-027	check	.github: cd commons/ts && bun test tests/	mizan-integrations-formats.test.ts: the command runs a json-schema manifest with no namespace, and --check names a slice that drifted from the module's header
 0019-mizan-integrations FR-028	check	.github: bun test ./tests/	tests/commons-mizan-importers.test.ts: rdflib reads the JSON-LD and RDF/XML to the reader's graph and jsonschema accepts the lists the import writes; skipped where Python and these tools are not installed (CI installs them, pinned)
 0019-mizan-integrations FR-029	review	0017-two-languages FR-007	Whether an XML reader needs a pinned tool is judged on evidence recorded in the requirement: twelve W3C RDF/XML files read to rdflib's graph by the hand-written reader; the test of FR-024 keeps its features checked
+0016-ladder FR-008	check	.github: bun test ./tests/	Mizan ontology: every rung has one kind of mz:RungKind, rungs 0 to 7 required, 8 optional, 9 observer and 10 environment
+0016-ladder FR-009	check	.github: bun test ./tests/	Mizan ontology: rung 9 is an observer that may rely on rungs 0 to 7 and no rung relies on it
+0016-ladder FR-010	check	.github: bun test ./tests/	Mizan ontology: rung 10 is an environment that relies on no rung and no rung relies on it
+0016-ladder FR-011	review	0017-two-languages FR-007	Whether a harness that claims a regulated domain has rungs 9 and 10 from the day it declares production is judged by a person until the harness declares its domains as typed data (0020-ifccm)

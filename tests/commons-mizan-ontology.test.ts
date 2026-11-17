@@ -103,39 +103,56 @@ proves(["0003-mizan FR-018"], "the ontology breaks no rule of the kernel", () =>
 });
 
 proves(
-  ["0016-ladder FR-001", "0016-ladder FR-002"],
-  "the ladder is nine individuals of mz:Rung: rungs 0 to 7 required, rung 8 optional",
+  ["0016-ladder FR-001", "0016-ladder FR-002", "0016-ladder FR-008", "0016-ladder FR-010"],
+  "the ladder is eleven individuals of mz:Rung: rungs 0 to 7 required, 8 optional, 9 observer, 10 environment",
   () => {
     assertEquals(
       rungs.map((r) => r.values.rungNumber),
-      [0, 1, 2, 3, 4, 5, 6, 7, 8],
+      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     );
     assertEquals(
-      rungs.map((r) => r.values.required),
-      [true, true, true, true, true, true, true, true, false],
+      rungs.map((r) => r.values.kind.iri.split("#").pop()),
+      [
+        "Required",
+        "Required",
+        "Required",
+        "Required",
+        "Required",
+        "Required",
+        "Required",
+        "Required",
+        "Optional",
+        "Observer",
+        "Environment",
+      ],
     );
     assertEquals(rungs[8].values.mayRelyOn ?? [], []);
+    assertEquals(rungs[10].values.mayRelyOn ?? [], []);
   },
 );
 
-proves(["0016-ladder FR-003"], "a rung relies only on rungs below it, and nothing relies on the lifecycle rung", () => {
-  const number = new Map(rungs.map((r) => [r.iri, r.values.rungNumber]));
-  for (const r of rungs) {
-    for (const lower of r.values.mayRelyOn ?? []) {
-      const n = number.get(lower.iri);
-      assert(n !== undefined && n < r.values.rungNumber, `${r.iri} relies on ${lower.iri}`);
-      assert(n !== 8, "no rung relies on rung 8");
+proves(
+  ["0016-ladder FR-003", "0016-ladder FR-009"],
+  "a rung relies only on rungs below it, and nothing relies on the lifecycle rung",
+  () => {
+    const number = new Map(rungs.map((r) => [r.iri, r.values.rungNumber]));
+    for (const r of rungs) {
+      for (const lower of r.values.mayRelyOn ?? []) {
+        const n = number.get(lower.iri);
+        assert(n !== undefined && n < r.values.rungNumber, `${r.iri} relies on ${lower.iri}`);
+        assert(n !== 8 && n !== 9 && n !== 10, "no rung relies on rung 8, 9 or 10");
+      }
     }
-  }
-  assertEquals(
-    (rungs[3].values.mayRelyOn ?? []).map((r) => number.get(r.iri)),
-    [0, 1, 2],
-  );
-  assertEquals(
-    (rungs[4].values.mayRelyOn ?? []).map((r) => number.get(r.iri)),
-    [0, 1, 3],
-  );
-});
+    assertEquals(
+      (rungs[3].values.mayRelyOn ?? []).map((r) => number.get(r.iri)),
+      [0, 1, 2],
+    );
+    assertEquals(
+      (rungs[4].values.mayRelyOn ?? []).map((r) => number.get(r.iri)),
+      [0, 1, 3],
+    );
+  },
+);
 
 proves(["0018-standards-first FR-003"], "every class of Mizan's vocabulary has an individual saying its basis", () => {
   const classIris = classes.map((c) => c.iri).sort();
@@ -198,14 +215,14 @@ doc = json.load(open(root + "/generated/mizan-schemas.auto.json"))
 meta = jsonschema.Draft202012Validator
 meta.check_schema(doc)
 defs = doc["$defs"]
-good = {"label": {"value": "Ontology", "language": "en"}, "rungNumber": 0, "purpose": {"value": "x", "language": "en"}, "required": True, "mayRelyOn": [], "home": [], "provedBy": []}
+good = {"label": {"value": "Ontology", "language": "en"}, "rungNumber": 0, "purpose": {"value": "x", "language": "en"}, "kind": {"iri": "https://www.intellectualfrontiers.com/ontology/mizan#Required"}, "mayRelyOn": [], "home": [], "provedBy": []}
 jsonschema.validate(good, {**defs["Rung"], "$schema": doc["$schema"]})
 try:
     jsonschema.validate({**good, "rungNumber": "zero"}, {**defs["Rung"], "$schema": doc["$schema"]})
     raise SystemExit("the JSON Schema accepted a string for rungNumber")
 except jsonschema.ValidationError:
     pass
-assert len(list(skos.subjects(rdflib.RDF.type, rdflib.SKOS.ConceptScheme))) == 3
+assert len(list(skos.subjects(rdflib.RDF.type, rdflib.SKOS.ConceptScheme))) == 4
 version = list(data.objects(rdflib.URIRef("https://www.intellectualfrontiers.com/ontology/mizan"), OWL.versionIRI))
 assert version == [rdflib.URIRef("https://www.intellectualfrontiers.com/ontology/mizan/1")], version
 from rdflib.compare import isomorphic, to_isomorphic
