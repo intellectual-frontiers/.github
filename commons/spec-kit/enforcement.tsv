@@ -417,3 +417,4 @@ requirement	mechanism	by	note
 0016-ladder FR-009	check	.github: bun test ./tests/	Mizan ontology: rung 9 is an observer that may rely on rungs 0 to 7 and no rung relies on it
 0016-ladder FR-010	check	.github: bun test ./tests/	Mizan ontology: rung 10 is an environment that relies on no rung and no rung relies on it
 0016-ladder FR-011	review	0017-two-languages FR-007	Whether a harness that claims a regulated domain has rungs 9 and 10 from the day it declares production is judged by a person until the harness declares its domains as typed data (0020-ifccm)
+0019-mizan-integrations FR-030	check	.github: cd commons/ts && bun test tests/	mizan-nist-import.test.ts: the committed module names the controls the specifications cite, with the titles of the pinned catalog, and the import's offline check passes
