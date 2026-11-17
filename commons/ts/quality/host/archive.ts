@@ -31,6 +31,12 @@ export function formatArchiveError(e: ArchiveError): string {
   switch (e.kind) {
     case "git-missing":
     case "git":
+    case "exists":
+    case "moved":
+    case "unknown-commit":
+    case "unsigned":
+    case "refused":
+    case "unreadable":
       return formatHostError(e);
     case "no-branch":
       return "the repository has no quality branch: there is nothing to archive";

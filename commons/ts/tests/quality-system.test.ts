@@ -174,7 +174,7 @@ proves(
       assertEquals(wrote.code, 0, wrote.stderr);
       const text = await readTextFile(file);
       assertStringIncludes(text, '"schema": "ifqs-index/1"');
-      assertStringIncludes(text, '"count": "2 proved (E3 2), review debt 0"');
+      assertStringIncludes(text, '"count": "2 proved (E3 2), review debt 0 (person 0, agent 0)"');
       assertStringIncludes(text, '"asOf": "2026-11-17"');
       assertEquals(list(at(parsed(text), "runs")).length, 1);
       // the same branch gives the same bytes
@@ -232,7 +232,7 @@ proves(
       const text = (await readTextFile(view)).replaceAll("\r\n", "\n");
       assertStringIncludes(text, "0099-demo FR-001\tcheck\tE3\t2026-11-17\tFresh\tyes");
       assertStringIncludes(text, "0099-demo FR-002\tnone\tE0\t-\tNone\tno");
-      assertStringIncludes(text, "# 2 requirements; 1 proved (E3 1), review debt 0");
+      assertStringIncludes(text, "# 2 requirements; 1 proved (E3 1), review debt 0 (person 0, agent 0)");
       assertEquals((await quality("register", "--repo", repo, "--register", register, "--out", view, "--check")).code, 0);
       await writeTextFile(view, text.replace("E3\t2026", "E4\t2026"));
       assertEquals((await quality("register", "--repo", repo, "--register", register, "--out", view, "--check")).code, 1);
@@ -290,7 +290,7 @@ proves(
       assertEquals(g.value.judgements.filter((j) => j.grade === "E1" || j.grade === "E2").length, 3);
       assertEquals(by.get("0099-demo FR-004")?.proved, true);
       const index = await quality("index", "--repo", repo);
-      assertStringIncludes(index.stdout, '"count": "1 proved (E5 1), review debt 3"');
+      assertStringIncludes(index.stdout, '"count": "1 proved (E5 1), review debt 3 (person 2, agent 1)"');
       assertStringIncludes(index.stdout, '"byAgent": true');
     } finally {
       await remove(repo, { recursive: true });

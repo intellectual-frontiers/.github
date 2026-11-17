@@ -466,7 +466,13 @@ export function registerView(rows: readonly RegisterRow[], judgements: ReadonlyM
     ].join("\t");
   });
   const s = summarize(rows.map((r) => judgements.get(r.requirement)).filter((j) => j !== undefined));
-  const total = showProofCount({ proved: s.proved, provedByGrade: s.provedByGrade, reviewDebt: s.reviewDebt });
+  const total = showProofCount({
+    proved: s.proved,
+    provedByGrade: s.provedByGrade,
+    reviewDebt: s.reviewDebt,
+    reviewDebtByAgent: s.reviewDebtByAgent,
+    reviewDebtByPerson: s.reviewDebtByPerson,
+  });
   return `${REGISTER_VIEW_HEADER}\n${lines.join("\n")}${lines.length === 0 ? "" : "\n"}# ${rows.length} requirements; ${total.kind === "ok" ? total.value : total.error}\n`;
 }
 

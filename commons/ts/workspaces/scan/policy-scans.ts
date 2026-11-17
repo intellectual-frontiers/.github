@@ -10,7 +10,6 @@
  * @module
  */
 import { absurd } from "../../kernel/absurd.ts";
-import type { SigningWaiver } from "../../mizan/changes/declaration.ts";
 import { type Finding, type Severity, unapprovedSeverity } from "../findings.ts";
 import { isRegulated, type Policy, unsignedCommitSeverity } from "../policy.ts";
 import { type ToolCatalog, providedBy } from "../tools/catalog.ts";
@@ -124,6 +123,21 @@ export const SIGNED_COMMITS_RULE = "ifws/commit-not-signed";
 
 /** The rule of a commit whose signed-commit finding a Decision waived. */
 export const SIGNING_WAIVED_RULE = "ifws/commit-signing-waived";
+
+/**
+ * A waiver of the signed-commit rule for one account and one key, with the Decision that authorizes it (0023-if-workspaces FR-049). The pure core of `workspaces/` imports nothing of `mizan/`: this has the shape of
+ * `SigningWaiver` of `mizan/changes/declaration.ts`, which reads it from the Decisions of a harness record, and the host layer (`scan/host/waivers.ts`) hands one to the other.
+ */
+export type SigningWaiver = {
+  /** The Decision that names the account and the key. */
+  readonly decision: string;
+  /** The role that approved it. */
+  readonly approvedBy: string;
+  /** The account that signs, as its commits' committer address is written. */
+  readonly account: string;
+  /** The key, by its fingerprint or its key id, as Git reports it. */
+  readonly key: string;
+};
 
 /** The waivers of each repository, by its path under the root: each repository's harness record holds the Decisions that waive its own commits (0023-if-workspaces FR-049). */
 export type SigningWaivers = ReadonlyMap<string, readonly SigningWaiver[]>;

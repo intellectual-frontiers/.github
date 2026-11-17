@@ -8,8 +8,8 @@
  *
  * @module
  */
-import { decodeHarnessRecord, formatRecordError, type SigningWaiver, signingWaivers } from "../../../mizan/changes/declaration.ts";
-import type { SigningWaivers } from "../policy-scans.ts";
+import { decodeHarnessRecord, formatRecordError, signingWaivers } from "../../../mizan/changes/declaration.ts";
+import type { SigningWaiver, SigningWaivers } from "../policy-scans.ts";
 import { readInside } from "./scan.ts";
 
 /** The name of the record in a repository's root. */
