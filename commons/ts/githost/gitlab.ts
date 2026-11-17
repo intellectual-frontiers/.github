@@ -45,8 +45,8 @@ export type GitlabOptions = {
 };
 
 const projectShape = object(
-  { http_url_to_repo: string, archived: boolean },
-  { visibility: literal("public", "internal", "private"), default_branch: nullable(string) },
+  { http_url_to_repo: string },
+  { archived: boolean, visibility: literal("public", "internal", "private"), default_branch: nullable(string) },
 );
 const issueShape = object(
   { iid: integer, title: string, state: literal("opened", "closed"), web_url: string },
@@ -98,7 +98,7 @@ export function gitlabClient(options: GitlabOptions): GitHostClient {
       visibility,
       defaultBranch: r.value.default_branch ?? "",
       cloneUrl: r.value.http_url_to_repo,
-      archived: r.value.archived,
+      archived: r.value.archived ?? false, // an unauthenticated answer for a public project does not carry it
     });
   }
 
