@@ -84,6 +84,8 @@ export type TestCase = {
   readonly name: string;
   readonly requirements: readonly string[];
   readonly risk: Risk;
+  /** The quality characteristic it proves, in the words of ISO/IEC 25010 (`ifc.test.characteristic`, 0021-ifqs FR-012); absent where it names none. */
+  readonly characteristic?: string;
   readonly start: bigint;
   readonly end: bigint;
   readonly outcome: Outcome;
@@ -294,6 +296,7 @@ function caseAttributes(c: TestCase): Attributes {
     "ifc.test.risk": c.risk,
     "ifc.test.outcome": c.outcome,
     "ifc.test.attempt": BigInt(c.attempt),
+    ...(c.characteristic === undefined ? {} : { "ifc.test.characteristic": c.characteristic }),
     ...(c.reason === undefined ? {} : { "ifc.test.reason": c.reason }),
     ...(c.message === undefined ? {} : { "ifc.test.message": c.message }),
     ...(c.expected === undefined ? {} : { "ifc.test.expected": c.expected }),
@@ -398,6 +401,7 @@ export function testStartLog(c: Omit<TestCase, "end" | "outcome">, ctx: TestCont
       "ifc.test.requirements": [...c.requirements],
       "ifc.test.risk": c.risk,
       "ifc.test.attempt": BigInt(c.attempt),
+      ...(c.characteristic === undefined ? {} : { "ifc.test.characteristic": c.characteristic }),
       ...(ctx.parentSpanId === undefined ? {} : { "ifc.test.parent": ctx.parentSpanId }),
     },
     droppedAttributesCount: 0,
@@ -577,6 +581,7 @@ export function closeOrphans(signals: Signals, at: bigint): Signals {
       const a = r.attributes;
       const risk = attributeText(a, "ifc.test.risk") ?? "not-high";
       const parent = attributeText(a, "ifc.test.parent");
+      const characteristic = attributeText(a, "ifc.test.characteristic");
       const parentSpanId = parent === undefined ? undefined : parseSpanId(parent);
       const c: TestCase = {
         id: attributeText(a, "ifc.test.id") ?? "",
@@ -584,6 +589,7 @@ export function closeOrphans(signals: Signals, at: bigint): Signals {
         name: attributeText(a, "test.case.name") ?? "",
         requirements: attributeTexts(a, "ifc.test.requirements"),
         risk: isRisk(risk) ? risk : "not-high",
+        ...(characteristic === undefined ? {} : { characteristic }),
         start: r.time,
         end: at > r.time ? at : r.time,
         outcome: "cancelled",

@@ -149,12 +149,14 @@ function testOf(s: SpanData, runtime: string): Result<RunTest, RecordError> {
   const message = attributeText(a, "ifc.test.message");
   const expected = attributeText(a, "ifc.test.expected");
   const actual = attributeText(a, "ifc.test.actual");
+  const characteristic = attributeText(a, "ifc.test.characteristic");
   return ok({
     id,
     file,
     name,
     requirements: attributeTexts(a, "ifc.test.requirements"),
     risk,
+    ...(characteristic === undefined ? {} : { characteristic }),
     start: s.startTime,
     end: s.endTime,
     outcome,
@@ -793,6 +795,7 @@ export function ctrfJson(run: TestRun): string {
       risk: t.risk,
       outcome: t.outcome,
       runtime: t.runtime,
+      ...(t.characteristic === undefined ? {} : { characteristic: t.characteristic }),
       ...(t.reason === undefined ? {} : { reason: t.reason }),
       ...(t.expected === undefined ? {} : { expected: t.expected }),
       ...(t.actual === undefined ? {} : { actual: t.actual }),

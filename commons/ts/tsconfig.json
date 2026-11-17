@@ -26,6 +26,7 @@
     "kernel/**/*.ts",
     "runtime/**/*.ts",
     "mizan/**/*.ts",
+    "quality/**/*.ts",
     "lint/**/*.ts",
     "tests/**/*.ts",
     "tools/**/*.ts",
