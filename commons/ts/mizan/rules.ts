@@ -32,7 +32,8 @@ export type MizanRule =
   | "mizan/unaligned-justification"
   | "mizan/decision-missing"
   | "mizan/decision-overdue"
-  | "mizan/term-basis-missing";
+  | "mizan/term-basis-missing"
+  | "mizan/spec-term-unknown";
 
 /** A finding of one of Mizan's rules: the same shape as the trace's, with a rule that is Mizan's. */
 export type MizanFinding = Keyed & { readonly rule: MizanRule };

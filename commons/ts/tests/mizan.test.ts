@@ -11,9 +11,11 @@ import { run, execPath } from "../runtime/proc.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
 import { earsPatternOf, mizanFindings, rulePlugins, type RulePlugin, type SpecText } from "../mizan/rules.ts";
 import { AUDITED_ON, packagingTerms } from "../../ontology/audit/mod.ts";
-import { bases } from "../../ontology/mizan/mod.ts";
+import { bases, mz } from "../../ontology/mizan/mod.ts";
 import { pm } from "../../ontology/supply-chain/packaging/mod.ts";
 import { basisMissing, daysBetween, termFindings } from "../mizan/standards.ts";
+import { specTermFindings } from "../mizan/spec-terms.ts";
+import { readSpecTexts } from "../mizan/check.ts";
 
 const CHECK = resolve(dirname(fromFileUrl(import.meta.url)), "..", "mizan", "check.ts");
 
@@ -241,5 +243,37 @@ proves(
         assert(t.values.mappingRelation !== undefined, `${t.iri} says its relation`);
       }
     }
+  },
+);
+
+proves(
+  ["0003-mizan FR-020"],
+  "a prefixed name of an ontology the ontology does not define is found once with its line; a prefix not given, and a sentence's colon, are not read",
+  () => {
+    const found = specTermFindings(
+      [
+        {
+          slug: "0001-x",
+          spec: "Uses `mz:Rung`, `mz:Nothing` and `mz:Nothing` again.\nA `schema:Thing`, a **Status:** line, a URL `https://x/y` and `pm:Gone`.\n",
+        },
+      ],
+      { mz: new Set(["Rung"]), pm: new Set(["Here"]) },
+    );
+    assertEquals(
+      found.map((f) => `${f.key}@${f.line}`),
+      ["mizan/spec-term-unknown specs/0001-x/spec.md mz:Nothing@1", "mizan/spec-term-unknown specs/0001-x/spec.md pm:Gone@2"],
+    );
+  },
+);
+
+proves(
+  ["0003-mizan FR-020"],
+  "commons' own specifications are read for real: they name terms of the packaging ontology, all defined, and an ontology with none defined would find them",
+  () => {
+    const specs = readSpecTexts(`${dirname(fromFileUrl(import.meta.url))}/../../spec-kit`);
+    const known = { mz: new Set(Object.keys(mz)), pm: new Set(Object.keys(pm)) };
+    assertEquals(specTermFindings(specs, known), []);
+    const none = specTermFindings(specs, { pm: new Set() });
+    assert(none.length >= 5, `${none.length} packaging terms are named in the specifications`);
   },
 );

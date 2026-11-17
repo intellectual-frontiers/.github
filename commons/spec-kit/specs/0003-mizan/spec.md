@@ -43,6 +43,7 @@
 - **FR-017**: Mizan's TypeScript MUST be in `commons/ts/mizan/`, exported as `@intellectual-frontiers/commons/ts/mizan`, and MUST import only `node:` built-ins, the kernel, the runtime, the ontology it generates from (`commons/ontology/`) and itself.
 - **FR-018**: `commons/ts/mizan/generate-ontology.ts` MUST write the Turtle of Mizan's ontology (`commons/ontology/mizan/`) as `commons/generated/mizan.auto.ttl`, in the canonical form of 0012-ontology FR-006, beginning with lines that say it is generated and carrying the SHA-256 of the ontology's canonical N-Triples; with `--check` it MUST write nothing and exit 1 where the file is not what the ontology makes, and it MUST stop with exit 2, naming every finding, where the ontology breaks a rule of the kernel. It MUST also write the exports of 0019-mizan-integrations FR-010 that exist for it (`mizan-shapes.auto.ttl`, `mizan-schemas.auto.json`, `mizan-code-lists.auto.skos.ttl` and `mizan-code-lists.auto.sql`) and check them in the same way.
 - **FR-019**: `commons/ts/mizan/check.ts` MUST read a folder's specifications (`specs/NNNN-slug/spec.md`, and `plan.md` where there is one), run the rules of FR-013 and FR-014 and of 0018-standards-first FR-009 as plugins (a harness MAY pass more), hold their findings against the folder's `mizan.baseline.txt`, print each new finding and each stale baseline line on standard error and exit 1 where there is one, and write the baseline only with `--write-baseline`.
+- **FR-020**: `commons/ts/mizan/check.ts` MUST find, in commons' own specifications, a prefixed name in code font of one of commons' own ontologies (`mz:`, `pm:`) that the ontology does not define (a class, a property or an individual of a code list), once for each name in each specification, as a finding the baseline may hold; a prefix that is not one of commons' own (`schema:`, `skos:`) is not read, because the standard defines it and a pinned import makes its use compile.
 
 ## Out of scope
 
@@ -65,6 +66,8 @@
 - A baseline line for a finding that has been fixed: the check fails until the line is deleted, per FR-015.
 - A harness with a `reviewed.tsv`: its rows are read as `review` rows until moved, per FR-016.
 - A requirement with no MUST, MUST NOT, SHOULD, SHOULD NOT or MAY, or a trigger such as `IF` with no `THEN`: named by `check.ts`, per FR-013 and FR-019.
+- A specification that names a term of commons' own ontologies that the ontology lacks, even twice: found with its line, once, per FR-020.
+- A specification that names `schema:Thing`: not read, per FR-020.
 - A plugin a harness adds: its findings are held by the same baseline, per FR-019.
 - A file of `commons/ts/mizan/` that imports a package that is not the kernel, the runtime, the ontology or `node:`: refused, per FR-017.
 - `commons/generated/mizan.auto.ttl` edited by hand: `--check` names it as not what the ontology makes, per FR-018.

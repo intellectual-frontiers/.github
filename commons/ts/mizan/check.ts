@@ -18,9 +18,10 @@ import { formatBaseline, judge, parseBaseline, passes, report } from "../kernel/
 import { existsSync, readDirSync, readTextFileSync, writeTextFileSync } from "../runtime/fs.ts";
 import { stdio } from "../runtime/mod.ts";
 import { packagingTerms } from "../../ontology/audit/mod.ts";
-import { bases, classes, terms } from "../../ontology/mizan/mod.ts";
+import { bases, classes, jurisdictionLevels, integrationDirections, mz, terms } from "../../ontology/mizan/mod.ts";
 import { pm } from "../../ontology/supply-chain/packaging/mod.ts";
 import { type MizanFinding, mizanFindings, type RulePlugin, rulePlugins, type SpecText } from "./rules.ts";
+import { specTermFindings } from "./spec-terms.ts";
 import { basisMissing, type BasisKind, termFindings, type TermRecord } from "./standards.ts";
 
 /** The specifications of a folder (`root/specs/NNNN-slug/spec.md`, and `plan.md` where there is one), in the order of their names. */
@@ -97,7 +98,21 @@ export function main(
       : [];
   const always = (f: MizanFinding): boolean => f.rule === "mizan/decision-overdue" || f.rule === "mizan/term-basis-missing";
   const overdue = own.filter(always);
-  const found: readonly MizanFinding[] = [...mizanFindings(readSpecTexts(root), plugins), ...own.filter((f) => !always(f))];
+  const specs = readSpecTexts(root);
+  // commons' own specifications name terms of its own ontologies: they must be defined (0018-standards-first FR-001)
+  const named =
+    arg("--root") === undefined
+      ? specTermFindings(specs, {
+          mz: new Set([
+            ...Object.keys(mz),
+            ...Object.keys(bases),
+            ...Object.keys(jurisdictionLevels),
+            ...Object.keys(integrationDirections),
+          ]),
+          pm: new Set(Object.keys(pm)),
+        })
+      : [];
+  const found: readonly MizanFinding[] = [...mizanFindings(specs, plugins), ...named, ...own.filter((f) => !always(f))];
   if (argv.includes("--write-baseline")) {
     writeTextFileSync(baselineFile, formatBaseline(found, BASELINE_COMMENTS));
     stdio.stdout.writeSync(`wrote ${baselineFile}: ${new Set(found.map((f) => f.key)).size} findings\n`);
