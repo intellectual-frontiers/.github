@@ -154,7 +154,13 @@ export function trustInputOf(
   const files: PackFiles = new Map([...c.evidence, ...c.records].map((f) => [f.path, new TextEncoder().encode(f.text)]));
   const figures = figuresOf(files);
   const summary = summarize(g.judgements);
-  const count = showProofCount({ proved: summary.proved, provedByGrade: summary.provedByGrade, reviewDebt: summary.reviewDebt });
+  const count = showProofCount({
+    proved: summary.proved,
+    provedByGrade: summary.provedByGrade,
+    reviewDebt: summary.reviewDebt,
+    reviewDebtByAgent: summary.reviewDebtByAgent,
+    reviewDebtByPerson: summary.reviewDebtByPerson,
+  });
   const runOf = new Map<string, string>();
   for (const e of g.evidence) if (e.kind === "run") runOf.set(`${e.requirement} ${e.day}`, e.traceId);
   const requirements: TrustRequirement[] = g.judgements.map((j) => {
@@ -244,6 +250,8 @@ export function trustInputOf(
       proved: summary.proved,
       requirements: summary.requirements,
       reviewDebt: summary.reviewDebt,
+      reviewDebtByAgent: summary.reviewDebtByAgent,
+      reviewDebtByPerson: summary.reviewDebtByPerson,
       byGrade: summary.byGrade,
     },
     requirements,

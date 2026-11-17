@@ -38,7 +38,9 @@ import { objectiveMetricsJson, showEvaluation, SUGGESTED_OBJECTIVES } from "./pu
 import { isDay } from "./pure/time.ts";
 import { regulatedInProduction } from "./pure/ladder.ts";
 import { isTier, judgeTier, type TierProof } from "./pure/tier.ts";
+import { archiveBranch, formatArchiveError } from "./host/archive.ts";
 import { readDeclaration } from "./host/declaration.ts";
+import { showRetention, tagNameProblem } from "./pure/retention.ts";
 import { showGrade } from "./pure/names.ts";
 import type { QualityRecord } from "./pure/record.ts";
 
@@ -166,7 +168,13 @@ export async function freshnessCommand(rest: readonly string[]): Promise<number>
   for (const rev of G.unknownRevisions)
     say(`quality: the commit ${rev.slice(0, 12)} is not in this repository: its runs are judged by time only`);
   const s = summarize(G.judgements);
-  const count = showProofCount({ proved: s.proved, provedByGrade: s.provedByGrade, reviewDebt: s.reviewDebt });
+  const count = showProofCount({
+    proved: s.proved,
+    provedByGrade: s.provedByGrade,
+    reviewDebt: s.reviewDebt,
+    reviewDebtByAgent: s.reviewDebtByAgent,
+    reviewDebtByPerson: s.reviewDebtByPerson,
+  });
   say(`quality: ${count.kind === "ok" ? count.value : count.error} of ${s.requirements} requirements; ${s.stale} stale proofs`);
   const evals = evaluateObjectives(G, SUGGESTED_OBJECTIVES, today);
   for (const e of evals) say(`quality: ${showEvaluation(e)}`);
@@ -461,6 +469,48 @@ export async function registerCommand(rest: readonly string[]): Promise<number> 
   await writeTextFile(o.out, text);
   say(`quality: register ${o.out}`);
   return 0;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------------- archive
+
+const ARCHIVE = {
+  repo: REPO,
+  declaration: DECLARATION,
+  today: TODAY,
+  tag: value({ help: "The name of the Git tag that archives the branch.", valueName: "NAME", required: true }),
+};
+
+/**
+ * `quality archive --tag NAME`: where the retention period the harness's record states (`retentionDays`) has passed for the oldest evidence,
+ * a Git tag on the tip of the `quality` branch archives it; nothing is ever deleted, and there is no option that deletes (FR-047).
+ */
+export async function archiveCommand(rest: readonly string[]): Promise<number> {
+  const p = parseArgs(rest, ARCHIVE);
+  if (p.kind === "err") return fail(formatUsageError(p.error, "quality archive"), 2);
+  if (p.value.kind === "help")
+    return help(
+      helpText(
+        "quality archive",
+        "Archive the quality branch by a tag once the retention period of its oldest evidence has passed; nothing is deleted.",
+        ARCHIVE,
+      ),
+    );
+  const o = p.value.options;
+  const named = tagNameProblem(o.tag);
+  if (named !== undefined) return fail(named, 2);
+  const declared = await readDeclaration(o.repo, o.declaration);
+  if (declared.kind === "err") return fail(declared.error, 3);
+  const today = o.today ?? clockDay();
+  const retentionDays = declared.value?.retentionDays;
+  const r = await archiveBranch({ repo: o.repo, tag: o.tag, retentionDays, today });
+  if (r.kind === "err") return fail(formatArchiveError(r.error), 1);
+  if (r.value.kind === "tagged") {
+    say(`quality: ${showRetention(r.value.judgement)}`);
+    say(`quality: tagged ${r.value.tag} at ${r.value.tip}; nothing was deleted`);
+    return 0;
+  }
+  say(`quality: not archived: ${showRetention(r.value.judgement)}`);
+  return r.value.judgement.kind === "no-period" ? 1 : 0;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------------- tier

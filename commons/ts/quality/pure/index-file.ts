@@ -67,7 +67,13 @@ export function buildIndex(input: IndexInput): Result<string, string> {
     if (problem !== undefined) return err(problem);
   }
   const s = summarize(input.judgements);
-  const count = showProofCount({ proved: s.proved, provedByGrade: s.provedByGrade, reviewDebt: s.reviewDebt });
+  const count = showProofCount({
+    proved: s.proved,
+    provedByGrade: s.provedByGrade,
+    reviewDebt: s.reviewDebt,
+    reviewDebtByAgent: s.reviewDebtByAgent,
+    reviewDebtByPerson: s.reviewDebtByPerson,
+  });
   if (count.kind === "err") return err(count.error);
   const body = {
     schema: "ifqs-index/1",
@@ -80,6 +86,8 @@ export function buildIndex(input: IndexInput): Result<string, string> {
       proved: s.proved,
       provedByGrade: s.provedByGrade,
       reviewDebt: s.reviewDebt,
+      reviewDebtByAgent: s.reviewDebtByAgent,
+      reviewDebtByPerson: s.reviewDebtByPerson,
       requirements: s.requirements,
       byGrade: s.byGrade,
       stale: s.stale,

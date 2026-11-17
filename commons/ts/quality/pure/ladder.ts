@@ -261,6 +261,16 @@ export function reviewDebt(js: readonly Judgement[]): number {
   return js.filter((j) => j.grade === "E1" || j.grade === "E2").length;
 }
 
+/** The review debt that rests on an agent's statement or review (0021-ifqs FR-048): counted apart from a person's, because an agent's review is graded below a run. */
+export function reviewDebtByAgent(js: readonly Judgement[]): number {
+  return js.filter((j) => (j.grade === "E1" || j.grade === "E2") && j.byAgent).length;
+}
+
+/** The review debt that rests on a person's statement or review (0021-ifqs FR-048). */
+export function reviewDebtByPerson(js: readonly Judgement[]): number {
+  return js.filter((j) => (j.grade === "E1" || j.grade === "E2") && !j.byAgent).length;
+}
+
 /** The counts of a set of judgements: how many requirements are at each grade, how many are proved and at what grade, and the review debt. */
 export type Summary = {
   readonly requirements: number;
@@ -268,7 +278,12 @@ export type Summary = {
   readonly proved: number;
   /** How many proved requirements stand at each grade. */
   readonly provedByGrade: Readonly<Record<Grade, number>>;
+  /** The review debt in all: the sum of the two that follow (FR-048). */
   readonly reviewDebt: number;
+  /** The part of the review debt that rests on an agent's evidence (FR-048). */
+  readonly reviewDebtByAgent: number;
+  /** The part of the review debt that rests on a person's evidence (FR-048). */
+  readonly reviewDebtByPerson: number;
   readonly stale: number;
   /** Requirements whose newest run proved nothing. */
   readonly unproven: number;
@@ -294,6 +309,8 @@ export function summarize(js: readonly Judgement[]): Summary {
     proved,
     provedByGrade,
     reviewDebt: reviewDebt(js),
+    reviewDebtByAgent: reviewDebtByAgent(js),
+    reviewDebtByPerson: reviewDebtByPerson(js),
     stale: js.filter((j) => j.stale !== undefined).length,
     unproven: js.filter((j) => j.unproven).length,
   };
@@ -320,6 +337,8 @@ export function showProofCount(count: {
   readonly proved: number;
   readonly provedByGrade?: Readonly<Record<Grade, number>>;
   readonly reviewDebt?: number;
+  readonly reviewDebtByAgent?: number;
+  readonly reviewDebtByPerson?: number;
 }): Result<string, string> {
   if (count.provedByGrade === undefined) return err("a count of proved requirements is shown with its grade: this one has none");
   if (count.reviewDebt === undefined)
@@ -330,8 +349,16 @@ export function showProofCount(count: {
     .map((g) => `${g} ${count.provedByGrade?.[g]}`);
   const total = GRADES.reduce((n, g) => n + (count.provedByGrade?.[g] ?? 0), 0);
   if (total !== count.proved) return err(`${count.proved} proved but ${total} counted by grade: the grades must add up to the count`);
+  const apart =
+    count.reviewDebtByAgent === undefined || count.reviewDebtByPerson === undefined
+      ? ""
+      : ` (person ${count.reviewDebtByPerson}, agent ${count.reviewDebtByAgent})`;
+  if (apart !== "" && (count.reviewDebtByAgent ?? 0) + (count.reviewDebtByPerson ?? 0) !== count.reviewDebt)
+    return err(
+      `review debt ${count.reviewDebt} but a person's and an agent's make ${(count.reviewDebtByAgent ?? 0) + (count.reviewDebtByPerson ?? 0)}`,
+    );
   return ok(
-    `${count.proved} proved (${grades.length === 0 ? "no grade, none proved" : grades.join(", ")}), review debt ${count.reviewDebt}`,
+    `${count.proved} proved (${grades.length === 0 ? "no grade, none proved" : grades.join(", ")}), review debt ${count.reviewDebt}${apart}`,
   );
 }
 

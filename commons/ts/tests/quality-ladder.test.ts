@@ -25,6 +25,8 @@ import {
   parseRegister,
   registerView,
   reviewDebt,
+  reviewDebtByAgent,
+  reviewDebtByPerson,
   showProofCount,
   summarize,
   superseding,
@@ -166,6 +168,50 @@ proves(
     assertEquals(judgeDebt(2, 3, true).ok, true);
     assertEquals(judgeDebt(3, 3, false).ok, true);
     assertEquals(judgeDebt(undefined, 9, false).ok, true);
+  },
+);
+
+proves(
+  ["0021-ifqs FR-048"],
+  "the review debt of agents is counted apart from a person's: the two add up to the total, and the count shows both",
+  () => {
+    const led = ledgerOf(
+      { kind: "statement", requirement: "0021-ifqs FR-001", by: "person", who: "A. Person" },
+      { kind: "review", requirement: "0021-ifqs FR-002", by: "person", who: "A. Person" },
+      { kind: "review", requirement: "0021-ifqs FR-003", by: "agent", who: "a reviewing agent" },
+      { kind: "statement", requirement: "0021-ifqs FR-004", by: "agent", who: "a reviewing agent" },
+    );
+    assert(led.kind === "ok");
+    const evidence = evidenceOfLedger(led.value);
+    const js = [...new Set(evidence.map((e) => e.requirement))].sort().map((r) =>
+      judgeRequirement(
+        r,
+        evidence.filter((e) => e.requirement === r).map((e) => judge(e)),
+      ),
+    );
+    assertEquals([reviewDebt(js), reviewDebtByPerson(js), reviewDebtByAgent(js)], [4, 2, 2]);
+    const s = summarize(js);
+    assertEquals([s.reviewDebt, s.reviewDebtByPerson, s.reviewDebtByAgent], [4, 2, 2]);
+    const shown = showProofCount({
+      proved: s.proved,
+      provedByGrade: s.provedByGrade,
+      reviewDebt: s.reviewDebt,
+      reviewDebtByAgent: s.reviewDebtByAgent,
+      reviewDebtByPerson: s.reviewDebtByPerson,
+    });
+    assert(shown.kind === "ok");
+    assertStringIncludes(shown.value, "review debt 4 (person 2, agent 2)");
+    // parts that do not add up to the total are refused
+    const bad = showProofCount({
+      proved: 0,
+      provedByGrade: s.provedByGrade,
+      reviewDebt: 4,
+      reviewDebtByAgent: 1,
+      reviewDebtByPerson: 1,
+    });
+    assert(bad.kind === "err");
+    // nothing with no evidence: no debt on either side
+    assertEquals([reviewDebtByPerson([]), reviewDebtByAgent([])], [0, 0]);
   },
 );
 
