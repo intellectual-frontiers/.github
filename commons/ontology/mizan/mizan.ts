@@ -73,6 +73,7 @@ export const mz = vocabulary(MZ, {
   mayRelyOn: "owl:ObjectProperty",
   home: "owl:DatatypeProperty",
   provedBy: "owl:DatatypeProperty",
+  spec: "owl:DatatypeProperty",
   specId: "owl:DatatypeProperty",
   specStatus: "owl:DatatypeProperty",
   ofSpec: "owl:ObjectProperty",
@@ -162,6 +163,7 @@ export const Rung = classSchema(mz.Rung, {
   mayRelyOn: many(mz.mayRelyOn, range.ref<"mz:Rung">()),
   home: many(mz.home, range.string),
   provedBy: many(mz.provedBy, range.string),
+  spec: many(mz.spec, range.string),
 });
 
 /** The schema of a jurisdiction (`mz:Jurisdiction`). */
@@ -250,6 +252,7 @@ export const properties = [
   DatatypeProperty.make(mz.required, { domain: mz.Rung, range: xsd.boolean, definition: en("True for rungs 0 to 7, false for the optional lifecycle rung.") }),
   ObjectProperty.make(mz.mayRelyOn, { domain: mz.Rung, range: mz.Rung, definition: en("A rung this rung may rely on, and never reach around.") }),
   DatatypeProperty.make(mz.home, { domain: mz.Rung, range: xsd.string, definition: en("A path or a glob of a harness's files that is on the rung.") }),
+  DatatypeProperty.make(mz.spec, { domain: mz.Rung, range: xsd.string, definition: en("A specification (and its requirement) the rung comes from, as a harness cites it: `NNN-slug FR-nnn`.") }),
   DatatypeProperty.make(mz.provedBy, { domain: mz.Rung, range: xsd.string, definition: en("A command of a harness that proves the rung.") }),
   DatatypeProperty.make(mz.specId, { domain: mz.Spec, range: xsd.string, definition: en("The specification's identifier, its folder's name.") }),
   DatatypeProperty.make(mz.specStatus, { domain: mz.Spec, range: xsd.string, definition: en("Draft, Active, Deferred or Superseded.") }),

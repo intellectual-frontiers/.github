@@ -309,6 +309,8 @@ proves(
     assert(!("version" in json), "the commit is the version: the root package has none");
     const ts = Object.fromEntries(Object.entries(root.exports).filter(([k]) => k.startsWith("./ts/")));
     assertEquals(ts, rootEntries(m));
+    assertEquals(root.exports["./ontology/mizan"], "./commons/ontology/mizan/mod.ts");
+    assert(existsSync(join(ROOT, "..", "ontology", "mizan", "mod.ts")), "the shared ontology the root exports is there");
     assertEquals(root.bin?.["ifc"], "./commons/ts/node/ifc.mjs");
     const deps = Object.entries(root.dependencies ?? {});
     for (const [name, v] of deps) assert(/^\d+\.\d+\.\d+(-[\w.]+)?$/.test(v), `${name} is not pinned exactly: ${v}`);

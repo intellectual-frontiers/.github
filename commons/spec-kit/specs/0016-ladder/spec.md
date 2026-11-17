@@ -10,7 +10,7 @@
 
 ## The ladder
 
-- **FR-001**: The ladder MUST be typed data in commons' ontology: a `Rung` class whose individuals each carry a number, a name, a purpose, the homes of its files (paths and globs), the numbers of the rungs it may rely on and the commands that prove it, in TypeScript on the kernel's RDF (0012-ontology).
+- **FR-001**: The ladder MUST be typed data in commons' ontology: a `Rung` class whose individuals each carry a number, a name, a purpose, the homes of its files (paths and globs), the numbers of the rungs it may rely on, the commands that prove it and, where a harness traces its terms to its specifications, the specifications it comes from (`spec`), in TypeScript on the kernel's RDF (0012-ontology).
 - **FR-002**: Rungs 0 to 7 MUST be required: 0 ontology, 1 specifications, 2 governed data, 3 data operations, 4 infrastructure rules, 5 business rules, 6 application (the headless hosts, then the windowed hosts) and 7 documentation. A rung 8, the lifecycle (what is retired, alive but not to be used, then what is archived, dead and safe to delete), MUST be optional: where a harness has it, it relies on no rung and no rung relies on it.
 - **FR-003**: A rung MUST rely only on the rungs below it that it names, and never reach around the rung under it (dependency direction); a change MUST be complete only when every rung it touches is updated and proved by that rung's checks, lowest first (order of work).
 - **FR-004**: Headless first: rungs 0 to 5 MUST be headless; rung 6 MUST hold the headless hosts before the windowed ones, and every operation a window offers MUST also be a command or a tool.
