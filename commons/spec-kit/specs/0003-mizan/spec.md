@@ -29,6 +29,19 @@
 - **FR-009**: Mizan MUST be a profile of GitHub Spec Kit, never a replacement: a harness keeps Spec Kit's method (its commands, its constitution and the `spec.md`, `plan.md` and `tasks.md` of a feature) and Mizan adds only the registers, the tracing of requirements to proofs, the ladder (0016-ladder), the requirement syntax, the standards-first rules (0018-standards-first) and their checks. A specification MUST say which version of Spec Kit's templates it follows where it departs from them. The old name `spec-kit-check.ts` MUST remain, for one repin cycle, as a file that runs `mizan-check.ts` and adds nothing.
 - **FR-010**: A specification's status MUST be Draft (written, not yet built), Active (in force: every requirement is proven by a test or declared as reviewed), Deferred (out of scope until its owner decides) or Superseded. Adopted, the word this format used before Mizan, MUST be accepted until every specification of a harness has moved to Active.
 - **FR-011**: The register of what proves each requirement MUST map a requirement to OSCAL (a control, a component definition and its assessment results) where OSCAL can state it, and MUST stay as `enforcement.tsv` for what OSCAL cannot, so that no proof is written twice. The mapping is delivered by `0019-mizan-integrations`; until then the register is `enforcement.tsv` alone.
+- **FR-012**: A specification MAY be written in GitHub Spec Kit's form, told by its `## User Scenarios & Testing` section: its head then has `**Status**:` (or `**Status:**`) and no `**Spec ID:**`, `**Owner:**` or `**Domain:**` line is required, and it MUST hold `## User Scenarios & Testing`, `## Requirements` and `## Success Criteria` in that order (a heading may carry a suffix such as `*(mandatory)*`). The commons sections and the citing of edge cases do not apply to it; the register, the status words, the numbering of requirements, the citations of specifications and the rows of `enforcement.tsv` apply to both forms.
+
+## Requirement syntax and the proof register
+
+- **FR-013**: A requirement MUST be worded with RFC 2119 keywords (MUST, MUST NOT, SHOULD, MAY) in one of the six EARS patterns: ubiquitous (`The <system> MUST ...`), event-driven (`WHEN <event>, the <system> MUST ...`), state-driven (`WHILE <state>, ...`), unwanted behaviour (`IF <condition>, THEN ...`), optional feature (`WHERE <feature present>, ...`) or a combination of them.
+- **FR-014**: An acceptance scenario MUST be written as Gherkin's Given, When, Then, and MUST cite the requirements it exercises, so that a reader can walk from a scenario to its rules and the tool can see that each cited requirement exists.
+- **FR-015**: The rules of FR-013 and FR-014, and every rule that Mizan adds after the format of FR-001 to FR-005, MUST begin as warnings held by a baseline that only shrinks: a finding the baseline does not hold fails, and a line of the baseline that no longer occurs fails, so that a harness's existing specifications are never failed on the first day.
+- **FR-016**: `enforcement.tsv` MUST be the one register of what proves a requirement: a requirement that a person reviews is a row whose mechanism is `review`, with its reason, where a harness kept it in `reviewed.tsv`; a harness's `reviewed.tsv` MUST be accepted until it has moved its rows to `enforcement.tsv`.
+
+## The code
+
+- **FR-017**: Mizan's TypeScript MUST be in `commons/ts/mizan/`, exported as `@intellectual-frontiers/commons/ts/mizan`, and MUST import only `node:` built-ins, the kernel, the runtime, the ontology it generates from (`commons/ontology/`) and itself.
+- **FR-018**: `commons/ts/mizan/generate-ontology.ts` MUST write the Turtle of Mizan's ontology (`commons/ontology/mizan/`) as `commons/generated/mizan.auto.ttl`, in the canonical form of 0012-ontology FR-006, beginning with lines that say it is generated and carrying the SHA-256 of the ontology's canonical N-Triples; with `--check` it MUST write nothing and exit 1 where the file is not what the ontology makes, and it MUST stop with exit 2, naming every finding, where the ontology breaks a rule of the kernel.
 
 ## Out of scope
 
@@ -44,6 +57,15 @@
 - A `none` row with no reason: the tool names it, per FR-005.
 - A folder with no `registry.tsv`: the tool reports it missing and goes on to check the specifications, per FR-006.
 - A specification whose status is Adopted: the tool accepts it, per FR-010.
+- A specification in Spec Kit's form with no `## Success Criteria` section: the tool names it, per FR-012.
+- A specification in Spec Kit's form with a `**Status**:` line and no `**Spec ID:**` line: accepted, per FR-012.
+- A requirement written as `The checker does what is needed`: no EARS pattern and no keyword, so a warning held by the baseline, per FR-013 and FR-015.
+- A scenario that cites no requirement, or one the specification does not have: a warning, per FR-014 and FR-015.
+- A baseline line for a finding that has been fixed: the check fails until the line is deleted, per FR-015.
+- A harness with a `reviewed.tsv`: its rows are read as `review` rows until moved, per FR-016.
+- A file of `commons/ts/mizan/` that imports a package that is not the kernel, the runtime, the ontology or `node:`: refused, per FR-017.
+- `commons/generated/mizan.auto.ttl` edited by hand: `--check` names it as not what the ontology makes, per FR-018.
+- A class of the Mizan ontology with no `mz:OntologyTerm` saying its basis: the test names it, per 0018-standards-first FR-003.
 - A harness that still runs `spec-kit-check.ts`: it keeps working and gets the same findings, per FR-009.
 - A `**Part of:**` line that names a specification the folder does not have, or the specification itself: the tool names it, per FR-008.
 

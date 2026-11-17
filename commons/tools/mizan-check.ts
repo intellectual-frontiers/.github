@@ -37,8 +37,10 @@ const SECTIONS = [
   "## Success criteria",
   "## Review & acceptance checklist",
 ] as const;
-type Section = (typeof SECTIONS)[number];
-const OPTIONAL: ReadonlySet<Section> = new Set(["## Out of scope"]);
+const OPTIONAL: ReadonlySet<string> = new Set(["## Out of scope"]);
+/** The sections of a specification written in GitHub Spec Kit's form (0003-mizan FR-012), in their order; a heading may carry a suffix such as `*(mandatory)*`. */
+const KIT_SECTIONS = ["## User Scenarios & Testing", "## Requirements", "## Success Criteria"] as const;
+type Section = (typeof SECTIONS)[number] | (typeof KIT_SECTIONS)[number];
 const STATUSES = ["Draft", "Active", "Deferred", "Adopted", "Superseded"] as const;
 const MECHANISMS = ["check", "gate", "review", "none"] as const;
 const REGISTRY_HEADER = "number\tslug\tstate";
@@ -275,20 +277,26 @@ function specFindings(name: string, text: string, present: ReadonlyMap<string, s
   const found: Finding[] = [];
   const add = (problem: Problem): void => void found.push({ where, problem });
   if (!text.startsWith("# Feature Specification: ")) add({ kind: "title" });
+  // GitHub Spec Kit's form (0003-mizan FR-012) is told by its first section; the commons form is the other.
+  const kit = search(`${BOL}${escape("## User Scenarios & Testing")}`, text) !== null;
   const lines = [
     ["Spec ID", `${BOL}\\*\\*Spec ID:\\*\\*${S}*${escape(name)}${S}*${EOL}`],
     ["Owner", `${BOL}\\*\\*Owner:\\*\\*${S}*${NS}`],
     ["Domain", `${BOL}\\*\\*Domain:\\*\\*${S}*${NS}`],
   ] as const;
-  for (const [label, source] of lines) if (search(source, text) === null) add({ kind: "no-line", label, spec: name });
-  const status = search(`${BOL}\\*\\*Status:\\*\\*${S}*([^\\n]+?)${S}*${EOL}`, text);
+  if (!kit) for (const [label, source] of lines) if (search(source, text) === null) add({ kind: "no-line", label, spec: name });
+  const status = search(
+    kit ? `${BOL}\\*\\*Status(?:\\*\\*:|:\\*\\*)${S}*([^\\n]+?)${S}*${EOL}` : `${BOL}\\*\\*Status:\\*\\*${S}*([^\\n]+?)${S}*${EOL}`,
+    text,
+  );
   if (status === null || !isOneOf(STATUSES, status[1] ?? "")) add({ kind: "status" });
   const part = search(`${BOL}\\*\\*Part of:\\*\\*${S}*([^\\n]*?)${S}*${EOL}`, text);
   if (part !== null) {
     const named = part[1] ?? "";
     if (named === name || !present.has(named)) add({ kind: "part-of", named });
   }
-  const at = SECTIONS.map((h) => [search(`${BOL}${escape(h)}`, text)?.index ?? -1, h] as const);
+  const wanted: readonly Section[] = kit ? KIT_SECTIONS : SECTIONS;
+  const at = wanted.map((h) => [search(`${BOL}${escape(h)}`, text)?.index ?? -1, h] as const);
   for (const [pos, h] of at) if (pos < 0 && !OPTIONAL.has(h)) add({ kind: "no-section", section: h });
   const order = at.map(([p]) => p).filter((p) => p >= 0);
   if (order.some((p, i) => i > 0 && p < (order[i - 1] ?? p))) add({ kind: "section-order" });
@@ -297,7 +305,7 @@ function specFindings(name: string, text: string, present: ReadonlyMap<string, s
   const frs = requirementsOf(ids);
   requirements.set(name, frs);
   if (frs.some((r, i) => i > 0 && compareText(r, frs[i - 1] ?? r) < 0)) add({ kind: "requirement-order" });
-  const edge = search(`${BOL}## Edge cases`, text);
+  const edge = kit ? null : search(`${BOL}## Edge cases`, text);
   const assume = search(`${BOL}## Assumptions`, text);
   if (edge !== null && assume !== null && edge.index + edge[0].length < assume.index) {
     const block = strip(text.slice(edge.index + edge[0].length, assume.index));

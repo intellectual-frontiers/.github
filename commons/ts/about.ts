@@ -38,6 +38,11 @@ export const about: About = {
       mayImport: ["node: builtins"],
     },
     {
+      path: "mizan/",
+      what: "Mizan, the IF Spec Profile, as code (commons 0003-mizan): today the generator of its ontology's Turtle; its checks and `integrations/` (0019-mizan-integrations) are specified and not yet built.",
+      mayImport: ["node: builtins", "kernel/", "runtime/", "mizan/", "../ontology/ (the ontology it generates from)"],
+    },
+    {
       path: "lint/",
       what: "The lint plugin `bun lint --plugin` loads, and its rules.",
       mayImport: ["node: builtins", "kernel/", "lint/", "runtime/"],

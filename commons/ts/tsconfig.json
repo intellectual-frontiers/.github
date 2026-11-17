@@ -25,6 +25,7 @@
     "about.ts",
     "kernel/**/*.ts",
     "runtime/**/*.ts",
+    "mizan/**/*.ts",
     "lint/**/*.ts",
     "tests/**/*.ts",
     "tools/**/*.ts",

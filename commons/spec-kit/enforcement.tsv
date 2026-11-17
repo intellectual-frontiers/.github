@@ -34,6 +34,13 @@ requirement	mechanism	by	note
 0003-mizan FR-009	check	.github: bun test ./tests/	Mizan: the old tool name runs the new one and gives the same findings
 0003-mizan FR-010	check	.github: bun test ./tests/	Mizan: Active and Deferred are accepted, a word outside the list is named
 0003-mizan FR-011	none	-	Planned, Phase 4 of issue #10: the OSCAL mapping is delivered by 0019-mizan-integrations
+0003-mizan FR-012	check	.github: bun test ./tests/	Mizan: a Spec Kit form specification is accepted and its missing section and status are named
+0003-mizan FR-013	none	-	Planned, Phase 3 of issue #10: the EARS and RFC 2119 rule is a plugin of commons/ts/mizan, not built yet
+0003-mizan FR-014	none	-	Planned, Phase 3 of issue #10: the Gherkin rule is a plugin of commons/ts/mizan, not built yet
+0003-mizan FR-015	none	-	Planned, Phase 3 of issue #10: the baseline of the Mizan rules is not built yet
+0003-mizan FR-016	none	-	Planned, Phase 3 of issue #10: the single proof register is not read by the trace check yet
+0003-mizan FR-017	check	.github: cd commons/ts && bun test tests/	boundaries.test.ts: Mizan's files import only node: built-ins, the kernel, the runtime, the ontology and themselves
+0003-mizan FR-018	check	.github: bun test ./tests/	Mizan ontology: the Turtle is current, a stale file is named with exit 1, a broken ontology stops with exit 2
 0002-packaging FR-016	check	.github: bun test ./tests/	Record: the fields, their order and their values, as the TypeScript module carries them; Generator: a bad field is refused
 0004-rules FR-001	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
 0004-rules FR-002	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
@@ -338,9 +345,9 @@ requirement	mechanism	by	note
 0015-trace FR-009	check	.github: cd commons/ts && bun test tests/	kernel/trace.test.ts: placements by one path, a home naming files and literal characters; unclassified and a tie found
 0015-trace FR-010	check	.github: cd commons/ts && bun test tests/	kernel/trace.test.ts: imports of every form resolved; above and around found with both files and rungs; same rung and packages not
 0015-trace FR-011	check	.github: cd commons/ts && bun test tests/	runtime/trace.test.ts: a fixture tree on disk read; its findings held against a baseline written, passing, then failing when stale
-0016-ladder FR-001	none	-	Planned, Phase 2 and 3 of issue #10: the Rung class and the generator check are not built yet
-0016-ladder FR-002	none	-	Planned, Phase 2 and 3 of issue #10: the Rung class and the generator check are not built yet
-0016-ladder FR-003	none	-	Planned, Phase 2 and 3 of issue #10: the Rung class and the generator check are not built yet
+0016-ladder FR-001	check	.github: bun test ./tests/	Mizan ontology: the nine rungs are individuals of mz:Rung with number, purpose, required and rely-on edges
+0016-ladder FR-002	check	.github: bun test ./tests/	Mizan ontology: rungs 0 to 7 are required, rung 8 is optional and relies on nothing
+0016-ladder FR-003	check	.github: bun test ./tests/	Mizan ontology: a rung relies only on rungs below it, and no rung relies on rung 8
 0016-ladder FR-004	none	-	Planned, Phase 2 and 3 of issue #10: the Rung class and the generator check are not built yet
 0016-ladder FR-005	none	-	Planned, Phase 2 and 3 of issue #10: the Rung class and the generator check are not built yet
 0016-ladder FR-006	none	-	Planned, Phase 2 and 3 of issue #10: the Rung class and the generator check are not built yet

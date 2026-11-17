@@ -121,6 +121,7 @@ export const dcterms = vocabulary(DCTERMS, {
   hasPart: "rdf:Property",
   references: "rdf:Property",
   conformsTo: "rdf:Property",
+  Standard: "rdfs:Class",
 });
 
 /** The namespace of PROV-O. */

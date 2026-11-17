@@ -67,6 +67,23 @@ const RUNTIME = sources("runtime");
 const TESTS = sources("tests");
 const TOOLS = sources("tools");
 const LINT = sources("lint");
+const MIZAN = sources("mizan");
+
+proves(["0003-mizan FR-017"], "Mizan's files import only node: built-ins, the kernel, the runtime, the ontology and themselves", () => {
+  assert(MIZAN.length > 1);
+  const bad: string[] = [];
+  for (const f of MIZAN) {
+    for (const s of specifiers(readTextFileSync(join(ROOT, f)))) {
+      if (s.startsWith("node:")) continue;
+      const target = toPosix(relative(ROOT, resolve(ROOT, dirname(f), s)));
+      const ok = s.startsWith("./")
+        ? target.startsWith("mizan/")
+        : target.startsWith("kernel/") || target.startsWith("runtime/") || target.startsWith("../ontology/");
+      if (!ok) bad.push(`${f}: ${s}`);
+    }
+  }
+  assertEquals(bad, []);
+});
 
 proves(["0005-typescript-runtime FR-002"], "the kernel imports nothing outside kernel/", () => {
   assert(KERNEL.length > 5);
@@ -259,6 +276,7 @@ proves(
       "./ts/lint": "./lint/plugin.ts",
       "./ts/lint/rule": "./lint/rule.ts",
       "./ts/lint/test-rule": "./lint/test-rule.ts",
+      "./ts/mizan": "./mizan/mod.ts",
       "./ts/node": "./node/register.mjs",
     });
     for (const target of Object.values(m.exports)) assert(existsSync(join(ROOT, target)), target);

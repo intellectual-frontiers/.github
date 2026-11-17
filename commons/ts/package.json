@@ -11,6 +11,7 @@
     "./ts/lint": "./lint/plugin.ts",
     "./ts/lint/rule": "./lint/rule.ts",
     "./ts/lint/test-rule": "./lint/test-rule.ts",
+    "./ts/mizan": "./mizan/mod.ts",
     "./ts/node": "./node/register.mjs"
   },
   "engines": {
