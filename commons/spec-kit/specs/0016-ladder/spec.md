@@ -18,7 +18,7 @@
 ## A harness's instance
 
 - **FR-005**: A harness MUST state its ladder as individuals of `Rung` in its own ontology, and MAY add homes, checks and rely-on edges to a rung; it MUST NOT renumber, rename or drop rungs 0 to 7, and a rung it leaves empty MUST say why.
-- **FR-006**: Every folder, package and file of a harness MUST be on exactly one rung, by the most specific of the rungs' homes, and a TypeScript import MUST NOT climb to a higher rung or reach around the one under it; the checks are `0015-trace` FR-009 and FR-010, run by `0003-mizan`'s tools.
+- **FR-006**: Every folder, package and file of a harness MUST be on exactly one rung, by the most specific of the rungs' homes, and a TypeScript import MUST NOT climb to a higher rung or reach around the one under it; the checks are 0015-trace FR-009 and 0015-trace FR-010, run by the tools of 0003-mizan.
 - **FR-007**: A harness's constitution table of the ladder and the layout in its `AGENTS.md` MUST be generated from its instances between marker comments (`<!-- ladder:begin -->` and `<!-- ladder:end -->`, `<!-- layout:begin -->` and `<!-- layout:end -->`), and its generator's `--check` MUST fail where either differs.
 
 ## Out of scope

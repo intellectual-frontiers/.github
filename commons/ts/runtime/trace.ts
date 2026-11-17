@@ -35,12 +35,12 @@ export async function readSpecs(root: string, folder = "specs"): Promise<readonl
   return out;
 }
 
-/** The files under roots (folders or files, from `root`) whose names end in a suffix (`.ts` by default), leaving out `node_modules`, by path from `root` with `/`. */
 /** A relative path with `/` between its parts, whatever the system's separator (FR-011). */
 export function posixPath(p: string): string {
   return p.replaceAll("\\", "/");
 }
 
+/** The files under roots (folders or files, from `root`) whose names end in a suffix (`.ts` by default), leaving out `node_modules`, by path from `root` with `/`. */
 export async function readSources(
   root: string,
   roots: readonly string[],

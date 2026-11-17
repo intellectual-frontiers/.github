@@ -31,6 +31,7 @@ proves(R, "the repository has only the top-level entries it is meant to have", a
     ".gitignore",
     "AGENTS.md",
     "CLAUDE.md",
+    "MIZAN.html",
     "README.md",
     "bin",
     "bun.lock",
