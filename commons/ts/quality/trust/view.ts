@@ -21,7 +21,9 @@
 import { err, ok, type Result } from "../../kernel/result.ts";
 import type { Figures } from "../assessor/verify-pack.ts";
 import type { Grade } from "../pure/names.ts";
+import type { Nonconformance } from "../pure/ledger.ts";
 import { type Audience, redactFor, type RedactionRules, showsMessages } from "./audience.ts";
+import { NO_REQUIREMENT_TEXT, type RequirementText } from "./requirement-text.ts";
 
 /** A requirement as the page shows it (FR-002). */
 export type TrustRequirement = {
@@ -55,14 +57,19 @@ export type TrustFailure = {
 /** A nonconformance and where it stands, with its age in days (FR-003). */
 export type TrustNonconformance = {
   readonly id: string;
+  /** The requirement's identifier (`NNNN-slug FR-nnn`): a name, never its text on the public page (FR-018). */
   readonly requirement: string;
-  readonly cause: string;
+  /** What the requirement says at the tested revision: for the Assessor and Internal audiences only (FR-018). */
+  readonly requirementText?: string;
+  /** A code from a closed list (`failed`, `stale`, `probe-failed`, `budget-spent`), never text (FR-018). */
+  readonly cause: Nonconformance["cause"];
   readonly state: "NonconformanceOpen" | "NonconformanceClosed";
   readonly openedOn: string;
   readonly closedOn?: string;
   /** Days open: from the day it was opened to the day it closed, or to `generated`. */
   readonly ageDays: number;
-  readonly reason: string;
+  /** Why it was opened, in words: for the Assessor and Internal audiences only; the Public page names the nonconformance by its identifier (FR-018). */
+  readonly reason?: string;
   readonly capas: readonly string[];
 };
 
@@ -122,6 +129,9 @@ export type TrustInput = {
     readonly proved: number;
     readonly requirements: number;
     readonly reviewDebt: number;
+    /** The review debt apart: what rests on an agent and what on a person (0021-ifqs FR-048). */
+    readonly reviewDebtByAgent: number;
+    readonly reviewDebtByPerson: number;
     readonly byGrade: Readonly<Record<string, number>>;
   };
   readonly requirements: readonly TrustRequirement[];
@@ -167,7 +177,12 @@ const sortBy = <T>(xs: readonly T[], key: (x: T) => string): readonly T[] => [..
  * The content of the page for an audience (FR-001 to FR-005, FR-007 to FR-009), or why the page is refused: a statement of conformity in what the
  * harness wrote (FR-004). The same input, audience and rules give the same view.
  */
-export function trustViewOf(input: TrustInput, audience: Audience, rules: RedactionRules): Result<TrustView, string> {
+export function trustViewOf(
+  input: TrustInput,
+  audience: Audience,
+  rules: RedactionRules,
+  requirementText: RequirementText = NO_REQUIREMENT_TEXT,
+): Result<TrustView, string> {
   for (const [what, text] of [
     ["the harness name", input.harness],
     ["the scope", input.scopeNote ?? ""],
@@ -206,11 +221,22 @@ export function trustViewOf(input: TrustInput, audience: Audience, rules: Redact
     }
     return out;
   });
-  const nonconformances = sortBy(input.nonconformances, (n) => n.id).map((n): TrustNonconformance => ({
-    ...n,
-    requirement: r(n.requirement),
-    reason: r(n.reason),
-  }));
+  // the Public page names a nonconformance by its identifier, its requirement's identifier and a code (FR-018): no reason, no requirement text
+  const nonconformances = sortBy(input.nonconformances, (n) => n.id).map((n): TrustNonconformance => {
+    const { reason, ...named } = n;
+    if (messages) {
+      const text = requirementText(n.requirement);
+      return {
+        ...named,
+        requirement: r(n.requirement),
+        ...(text === undefined ? {} : { requirementText: r(text) }),
+        ...(reason === undefined ? {} : { reason: r(reason) }),
+      };
+    }
+    if (reason !== undefined) withheld();
+    if (requirementText(n.requirement) !== undefined) withheld();
+    return { ...named, requirement: r(n.requirement) };
+  });
   const capas = sortBy(input.capas, (c) => c.id).map((c): TrustCapa => ({ ...c, action: r(c.action), test: r(c.test) }));
   const requirements = sortBy(input.requirements, (q) => q.id).map((q): TrustRequirement => ({ ...q, id: r(q.id) }));
   const objectives = sortBy(input.objectives, (o) => o.id);

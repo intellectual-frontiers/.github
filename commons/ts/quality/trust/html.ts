@@ -50,16 +50,24 @@ function table(
 
 const code = (s: string): string => `<code>${esc(s)}</code>`;
 
-function nonconformanceRows(list: readonly TrustNonconformance[]): readonly (readonly string[])[] {
-  return list.map((n) => [
-    code(n.id),
-    esc(n.requirement),
-    esc(n.cause),
-    `${n.ageDays} day${n.ageDays === 1 ? "" : "s"}`,
-    esc(n.state === "NonconformanceOpen" ? "open" : `closed ${n.closedOn ?? ""}`),
-    esc(n.reason),
-    n.capas.map(code).join(" "),
-  ]);
+/** The head of the table of nonconformances: the Public page names each by its identifier and shows no text of the record (0022-trust FR-018). */
+function nonconformanceHead(audience: TrustView["audience"]): readonly { readonly h: string; readonly n?: boolean }[] {
+  const named = [{ h: "Id" }, { h: "Requirement" }, { h: "Cause" }, { h: "Age", n: true }, { h: "State" }];
+  return audience === "Public" ? [...named, { h: "CAPA" }] : [...named, { h: "Requirement text" }, { h: "Reason" }, { h: "CAPA" }];
+}
+
+function nonconformanceRows(list: readonly TrustNonconformance[], audience: TrustView["audience"]): readonly (readonly string[])[] {
+  return list.map((n) => {
+    const named = [
+      code(n.id),
+      esc(n.requirement),
+      esc(n.cause),
+      `${n.ageDays} day${n.ageDays === 1 ? "" : "s"}`,
+      esc(n.state === "NonconformanceOpen" ? "open" : `closed ${n.closedOn ?? ""}`),
+    ];
+    const capas = n.capas.map(code).join(" ");
+    return audience === "Public" ? [...named, capas] : [...named, esc(n.requirementText ?? ""), esc(n.reason ?? ""), capas];
+  });
 }
 
 function capaRows(list: readonly TrustCapa[]): readonly (readonly string[])[] {
@@ -115,13 +123,7 @@ export function trustHtml(v: TrustView): string {
   );
   if (open.length > 0) {
     out.push(`<h3>Open nonconformances</h3>`);
-    out.push(
-      table(
-        [{ h: "Id" }, { h: "Requirement" }, { h: "Cause" }, { h: "Age", n: true }, { h: "State" }, { h: "Reason" }, { h: "CAPA" }],
-        nonconformanceRows(open),
-        () => "fail",
-      ),
-    );
+    out.push(table(nonconformanceHead(v.audience), nonconformanceRows(open, v.audience), () => "fail"));
   }
   if (openCapas.length > 0) {
     out.push(`<h3>Open CAPA</h3>`);
@@ -144,12 +146,7 @@ export function trustHtml(v: TrustView): string {
   }
   if (closed.length > 0) {
     out.push(`<h3>Closed nonconformances</h3>`);
-    out.push(
-      table(
-        [{ h: "Id" }, { h: "Requirement" }, { h: "Cause" }, { h: "Age", n: true }, { h: "State" }, { h: "Reason" }, { h: "CAPA" }],
-        nonconformanceRows(closed),
-      ),
-    );
+    out.push(table(nonconformanceHead(v.audience), nonconformanceRows(closed, v.audience)));
     const done = v.capas.filter((c) => c.state === "CapaClosed");
     if (done.length > 0)
       out.push(
@@ -169,7 +166,7 @@ export function trustHtml(v: TrustView): string {
   );
   out.push(`<p>${esc(v.proof.count)}</p>`);
   out.push(
-    `<p>Review debt: <b>${v.proof.reviewDebt}</b> requirement${v.proof.reviewDebt === 1 ? "" : "s"} rest on a review or a statement of a person or an agent and on no run. Requirements by grade: ${Object.entries(
+    `<p>Review debt: <b>${v.proof.reviewDebt}</b> requirement${v.proof.reviewDebt === 1 ? "" : "s"} rest on a review or a statement and on no run: ${v.proof.reviewDebtByPerson} on a person's, ${v.proof.reviewDebtByAgent} on an agent's. Requirements by grade: ${Object.entries(
       v.proof.byGrade,
     )
       .map(([g, n]) => `${esc(g)} ${n}`)

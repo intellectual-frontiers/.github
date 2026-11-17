@@ -11,6 +11,7 @@ import { collect } from "../quality/assessor/host.ts";
 import { AUDIENCES, redactFor } from "../quality/trust/audience.ts";
 import { conformityClaim, DEFAULT_SCOPE } from "../quality/trust/view.ts";
 import { checkTrust, generateTrust, type TrustPage } from "../quality/trust/host.ts";
+import { NO_REQUIREMENT_TEXT, readRequirementTexts, requirementsOf, requirementTextOf } from "../quality/trust/requirement-text.ts";
 import { makeTempDir, readTextFile, remove, writeTextFile } from "../runtime/fs.ts";
 import { join } from "../runtime/path.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
@@ -26,7 +27,9 @@ async function page(
 ): Promise<TrustPage> {
   const c = await collect({ repo, ...(extra.today === undefined ? {} : { today: extra.today }) });
   assert(c.kind === "ok", c.kind === "err" ? JSON.stringify(c.error) : "");
+  const texts = await readRequirementTexts(repo, c.value.revision);
   const p = generateTrust(c.value, {
+    requirementText: texts.kind === "ok" ? texts.value : NO_REQUIREMENT_TEXT,
     harness: "demo harness",
     audience,
     rules: RULES,
@@ -47,7 +50,7 @@ async function withDemo(f: (repo: string) => Promise<void>): Promise<void> {
 }
 
 proves(
-  ["0022-trust FR-001", "0022-trust FR-002"],
+  ["0022-trust FR-001", "0022-trust FR-002", "0021-ifqs FR-048"],
   "the page is generated from the evidence: each requirement with its grade, freshness, day and run, the review debt, the objectives and the counts of passed, failed and not_run, and --check fails where a file differs",
   () =>
     withDemo(async (repo) => {
@@ -68,6 +71,10 @@ proves(
       assertEquals(typeof at(first, "run"), "string");
       assert(list(at(json, "objectives")).length > 0, "the objectives with their budgets are shown");
       assertEquals(typeof at(json, "proof", "reviewDebt"), "number");
+      // the debt of agents is counted apart from a person's and the two add up (0021-ifqs FR-048)
+      const debt = Number(at(json, "proof", "reviewDebt"));
+      assertEquals(Number(at(json, "proof", "reviewDebtByAgent")) + Number(at(json, "proof", "reviewDebtByPerson")), debt);
+      assertStringIncludes(p.html, "on a person's");
       // the page on disk is checked
       const html = join(repo, "trust.html");
       const jsonFile = join(repo, "trust.json");
@@ -144,6 +151,72 @@ proves(
       assertEquals(conformityClaim(p.html.replace(DEFAULT_SCOPE, "").replace(/It does not state[^<]*/g, "")), undefined);
     }),
   needsGit,
+);
+
+proves(
+  ["0022-trust FR-018"],
+  "the public page names an open nonconformance by its identifier, its requirement's identifier and a cause code: no reason, no cause text, no requirement text; the Assessor and Internal pages show the requirement's text read from the specifications at the tested revision",
+  () =>
+    withDemo(async (repo) => {
+      const pub = await page(repo, "Public");
+      const named = list(at(parsed(pub.json), "nonconformances"));
+      assertEquals(named.length, 1);
+      assertEquals(at(named[0], "id"), "NC-0001");
+      assertEquals(at(named[0], "requirement"), "0099-demo FR-002");
+      assertEquals(at(named[0], "cause"), "failed");
+      assertEquals(at(named[0], "reason"), undefined, "no reason on the public page");
+      assertEquals(at(named[0], "requirementText"), undefined, "no requirement text on the public page");
+      // the cause of the demo nonconformance holds a private marker and the requirement holds its sentence: neither reaches the public page
+      for (const never of [MARKER, "newest run failed", "The second requirement", "<th>Requirement text</th>"]) {
+        assert(!pub.html.includes(never) && !pub.json.includes(never), `the public page leaves out ${never}`);
+      }
+      assertStringIncludes(pub.html, "NC-0001");
+      // the Assessor and Internal pages show the text as the specification states it, and the reason
+      for (const audience of ["Assessor", "Internal"] as const) {
+        const wide = await page(repo, audience);
+        const n = list(at(parsed(wide.json), "nonconformances"))[0];
+        assertEquals(at(n, "requirementText"), "The second requirement.");
+        assertStringIncludes(wide.html, "The second requirement.");
+        assertStringIncludes(wide.html, "Requirement text");
+      }
+      // the text is the one at the tested revision, not the one on disk now
+      await writeTextFile(join(repo, "specs", "0099-demo", "spec.md"), "# Demo\n\n- **FR-002**: Changed after the test.\n");
+      const still = await page(repo, "Assessor");
+      assertEquals(at(list(at(parsed(still.json), "nonconformances"))[0], "requirementText"), "The second requirement.");
+      // the withheld values are counted, and a harness with no specification shows no text and says nothing false
+      assert(Number(at(parsed(pub.json), "redactions")) > Number(at(parsed((await page(repo, "Assessor")).json), "redactions")));
+    }),
+  needsGit,
+);
+
+proves(
+  ["0022-trust FR-018"],
+  "requirementTextOf reads a requirement's text from a specification, with the lines that continue it, and knows none it does not state",
+  () => {
+    const spec = [
+      "# X",
+      "- **FR-001**: First line of one requirement",
+      "  and its continuation.",
+      "- **FR-002**: Second.",
+      "",
+      "Not a requirement.",
+      "- **FR-003**: Third.",
+    ].join("\n");
+    assertEquals(
+      [...requirementsOf(spec)],
+      [
+        ["FR-001", "First line of one requirement and its continuation."],
+        ["FR-002", "Second."],
+        ["FR-003", "Third."],
+      ],
+    );
+    const text = requirementTextOf(new Map([["0099-x", spec]]));
+    assertEquals(text("0099-x FR-002"), "Second.");
+    assertEquals(text("0099-x FR-009"), undefined);
+    assertEquals(text("0098-y FR-001"), undefined);
+    assertEquals(text("not a requirement name"), undefined);
+    assertEquals(NO_REQUIREMENT_TEXT("0099-x FR-002"), undefined);
+  },
 );
 
 proves(

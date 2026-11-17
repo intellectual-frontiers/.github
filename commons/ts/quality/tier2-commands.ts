@@ -40,6 +40,7 @@ import { SAMPLE_SUBJECTS, type SampleSubject } from "./pure/tier2-events.ts";
 import { isDay } from "./pure/time.ts";
 import { type Audience, isAudience } from "./trust/audience.ts";
 import { checkTrust, generateTrust } from "./trust/host.ts";
+import { NO_REQUIREMENT_TEXT, readRequirementTexts } from "./trust/requirement-text.ts";
 
 const say = (text: string): void => void stdout.writeSync(`${text}\n`);
 const complain = (text: string): void => void stderr.writeSync(`quality: ${text}\n`);
@@ -133,7 +134,10 @@ export async function trustCommand(rest: readonly string[]): Promise<number> {
     ...(declared.value === undefined ? {} : { declaration: declared.value }),
   });
   if (c.kind === "err") return fail(formatCollectError(c.error), 1);
+  // the text of a requirement is read from the specifications at the tested revision, and a repository without them shows none (0022-trust FR-018)
+  const texts = await readRequirementTexts(o.repo, c.value.revision);
   const page = generateTrust(c.value, {
+    requirementText: texts.kind === "ok" ? texts.value : NO_REQUIREMENT_TEXT,
     harness: o.harness,
     audience: o.audience ?? "Public",
     rules: { terms: o.term },

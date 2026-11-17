@@ -10,6 +10,7 @@ import { exists, readTextFile } from "../../runtime/fs.ts";
 import { type Collected, trustInputOf } from "../assessor/host.ts";
 import type { Audience, RedactionRules } from "./audience.ts";
 import { trustHtml } from "./html.ts";
+import type { RequirementText } from "./requirement-text.ts";
 import { trustJson, trustViewOf, type TrustView } from "./view.ts";
 
 /** What a page is made with besides the evidence. */
@@ -21,6 +22,11 @@ export type TrustRequest = {
   readonly notCovered?: readonly string[];
   /** The rate at which a person samples the agents' reviews, in a thousandth, that the harness states (0021-ifqs FR-041). */
   readonly agentRatePermille?: number;
+  /**
+   * What a requirement says at the tested revision (0022-trust FR-018), read from the specifications by `readRequirementTexts`: the Assessor and
+   * Internal pages show it beside a nonconformance, the Public page never does. None where the harness gives none.
+   */
+  readonly requirementText?: RequirementText;
 };
 
 /** A page: its view, its HTML and its JSON. */
@@ -34,7 +40,7 @@ export function generateTrust(c: Collected, request: TrustRequest): Result<Trust
     ...(request.notCovered === undefined ? {} : { notCovered: request.notCovered }),
     ...(request.agentRatePermille === undefined ? {} : { agentRatePermille: request.agentRatePermille }),
   });
-  const view = trustViewOf(input, request.audience, request.rules);
+  const view = trustViewOf(input, request.audience, request.rules, request.requirementText);
   if (view.kind === "err") return view;
   return ok({ view: view.value, html: trustHtml(view.value), json: trustJson(view.value) });
 }
