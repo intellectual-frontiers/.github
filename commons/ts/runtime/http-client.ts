@@ -61,6 +61,7 @@ export const CREDENTIAL_HEADERS: readonly string[] = [
   "x-goog-api-key",
   "api-key",
   "private-token",
+  "job-token",
 ];
 
 /** Why a request may not be sent where credentials are refused: it carries one in a header or in its query. Undefined where it carries none. */
