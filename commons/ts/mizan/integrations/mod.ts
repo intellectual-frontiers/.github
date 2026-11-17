@@ -2,7 +2,7 @@
  * IFC Mizan Integrations (commons 0019-mizan-integrations): the module that brings outside ontologies and schemas into Intellectual Frontiers' typed TypeScript form, and
  * turns ours into well-known forms. Built today: the typed integration record and its registry, the reader of Turtle and N-Triples, the importers of a slice of a
  * vocabulary and of an OSCAL control catalog, the command that runs them from a manifest (a file or a pinned URL, with PROV-O provenance), and the exporters of SHACL, JSON
- * Schema, SKOS and SQL. The other importers and exporters are specified and not yet built.
+ * Schema, SKOS, SQL, RDF/XML, OWL and a DCAT catalog. The other importers and exporters are specified and not yet built.
  *
  * @module
  */
@@ -46,3 +46,6 @@ export {
   type StandardRecord,
 } from "./pure/types.ts";
 export { decodeManifest, type ImportManifest, isUrl, readModuleHeader, readSource } from "./host/import.ts";
+export { type RdfXmlDocument, exportRdfXml } from "./pure/export-rdfxml.ts";
+export { exportOwl, type OwlClassInput, type OwlOntologyInput, type OwlPropertyInput, type OwlText } from "./pure/export-owl.ts";
+export { type DcatCatalogInput, type DcatDatasetInput, type DcatDistributionInput, exportDcat } from "./pure/export-dcat.ts";

@@ -31,7 +31,7 @@ import {
   Standard,
   terms,
 } from "../../ontology/mizan/mod.ts";
-import { formatRdfFinding, nTriples, type OntologyFile, triplesOf, turtle, validate } from "../kernel/rdf.ts";
+import { formatRdfFinding, nTriples, owl, type OntologyFile, triplesOf, turtle, validate } from "../kernel/rdf.ts";
 import { stdio } from "../runtime/mod.ts";
 import {
   type AnySchema,
@@ -44,6 +44,9 @@ import {
   type Mapping,
 } from "./integrations/pure/export.ts";
 import { exportHtmlView, type ViewBasis, type ViewTerm } from "./integrations/pure/export-html.ts";
+import { exportDcat } from "./integrations/pure/export-dcat.ts";
+import { exportOwl, type OwlText } from "./integrations/pure/export-owl.ts";
+import { exportRdfXml } from "./integrations/pure/export-rdfxml.ts";
 
 /** The command that writes the file again. */
 export const RUN = "bun commons/ts/mizan/generate-ontology.ts";
@@ -124,6 +127,94 @@ const LISTS = [
   { name: "IntegrationDirection", table: "mizan_integration_direction", members: membersOf(integrationDirections) },
 ] as const;
 
+/** The text of an exporter's result, or a thrown sentence naming what the ontology states that the form cannot hold (`main` turns it into exit 2). */
+export function textOf(
+  r: { readonly kind: "ok"; readonly value: string } | { readonly kind: "err"; readonly error: readonly string[] },
+  what: string,
+): string {
+  if (r.kind === "ok") return r.value;
+  throw new ExportRefused(`the Mizan ontology cannot be written as ${what}: ${r.error.join("; ")}`);
+}
+
+/** The ontology cannot be written in a form: what it states is something the form cannot hold. */
+export class ExportRefused extends Error {
+  /** The refusal, told as a sentence. */
+  constructor(message: string) {
+    super(message);
+    this.name = "ExportRefused";
+  }
+}
+
+type Lang = { readonly value: string; readonly language: string };
+const owlText = (x: Lang): OwlText => ({ value: x.value, language: x.language });
+
+/** The ontology's classes and properties as the OWL writer reads them (0019-mizan-integrations FR-017). */
+function owlOf(comments: readonly string[]): Parameters<typeof exportOwl>[0] {
+  const o = mizanOntology.values;
+  const entity = (e: {
+    readonly label?: Lang | undefined;
+    readonly comment?: Lang | undefined;
+    readonly definition?: Lang | undefined;
+  }) => ({
+    ...(e.label === undefined ? {} : { label: owlText(e.label) }),
+    ...(e.comment === undefined ? {} : { comment: owlText(e.comment) }),
+    ...(e.definition === undefined ? {} : { definition: owlText(e.definition) }),
+  });
+  return {
+    iri: MZ.iri.replace(/#$/, ""),
+    ...(o.versionIri === undefined ? {} : { versionIri: o.versionIri.iri }),
+    ...(o.label === undefined ? {} : { label: owlText(o.label) }),
+    ...(o.description === undefined ? {} : { description: owlText(o.description) }),
+    ...(o.versionInfo === undefined ? {} : { versionInfo: o.versionInfo }),
+    prefixes: files.flatMap((f) => f.prefixes).map((p) => ({ prefix: p.prefix, iri: p.iri })),
+    classes: classes.map((c) => ({ iri: c.iri, ...entity(c.values), subClassOf: (c.values.subClassOf ?? []).map((s) => s.iri) })),
+    properties: properties.map((p) => ({
+      iri: p.iri,
+      kind: p.class.iri === owl.ObjectProperty.iri ? ("object" as const) : ("datatype" as const),
+      ...entity(p.values),
+      ...(p.values.domain === undefined ? {} : { domain: p.values.domain.iri }),
+      ...(p.values.range === undefined ? {} : { range: p.values.range.iri }),
+    })),
+    comments,
+  };
+}
+
+/** The distributions of the ontology (0019-mizan-integrations FR-018): the files generated from it, with the media type of each. */
+const DISTRIBUTIONS = [
+  { file: "generated/mizan.auto.ttl", title: "Mizan ontology, Turtle", mediaType: "text/turtle" },
+  { file: "generated/mizan.auto.rdf", title: "Mizan ontology, RDF/XML", mediaType: "application/rdf+xml" },
+  { file: "generated/mizan.auto.ofn", title: "Mizan ontology, OWL 2 functional syntax", mediaType: "text/owl-functional" },
+  {
+    file: "generated/mizan-shapes.auto.ttl",
+    title: "Mizan SHACL shapes",
+    mediaType: "text/turtle",
+    conformsTo: "https://www.w3.org/TR/shacl/",
+  },
+  {
+    file: "generated/mizan-schemas.auto.json",
+    title: "Mizan JSON Schema",
+    mediaType: "application/schema+json",
+    conformsTo: "https://json-schema.org/draft/2020-12/schema",
+  },
+  {
+    file: "generated/mizan-code-lists.auto.skos.ttl",
+    title: "Mizan code lists, SKOS",
+    mediaType: "text/turtle",
+    conformsTo: "https://www.w3.org/TR/skos-reference/",
+  },
+  { file: "generated/mizan-code-lists.auto.sql", title: "Mizan code lists, SQL", mediaType: "application/sql" },
+  {
+    file: "generated/mizan-mappings.auto.sssom.tsv",
+    title: "Mizan mappings to standards, SSSOM",
+    mediaType: "text/tab-separated-values",
+    conformsTo: "https://mapping-commons.github.io/sssom/spec/",
+  },
+  { file: "generated/mizan-ontology.auto.html", title: "Mizan ontology, HTML view", mediaType: "text/html" },
+] as const;
+
+/** Where the generated files are downloaded from: this repository's `commons/` folder on its default branch. */
+const DOWNLOAD_BASE = "https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/";
+
 /** The exports of the ontology (0019-mizan-integrations FR-010), by their path from commons' folder: SHACL shapes, a JSON Schema, SKOS concept schemes and SQL code-list tables. */
 export function exportsOf(digest: string, auditDigest: string): ReadonlyMap<string, string> {
   const note = `AUTO-GENERATED by ${RUN} from commons/ontology/mizan/*.ts (commons 0019-mizan-integrations FR-010). Do not edit: change the ontology. source_sha256=${digest}`;
@@ -176,6 +267,43 @@ export function exportsOf(digest: string, auditDigest: string): ReadonlyMap<stri
     ],
     ["generated/mizan-code-lists.auto.skos.ttl", `# ${note}\n\n${skos}`],
     ["generated/mizan-code-lists.auto.sql", `-- ${note}\n\n${sql}`],
+    [
+      "generated/mizan.auto.rdf",
+      textOf(
+        exportRdfXml({
+          comments: [note],
+          prefixes: [...new Map(files.flatMap((f) => f.prefixes).map((p) => [p.prefix, p])).values()],
+          triples: triplesOf(files.flatMap((f) => f.individuals)),
+        }),
+        "RDF/XML",
+      ),
+    ],
+    ["generated/mizan.auto.ofn", textOf(exportOwl(owlOf([note])), "OWL")],
+    [
+      "generated/mizan-catalog.auto.ttl",
+      textOf(
+        exportDcat({
+          iri: "https://www.intellectualfrontiers.com/ontology/mizan-catalog",
+          title: "Mizan, the IF Spec Profile: published ontologies",
+          description: "The ontologies Intellectual Frontiers publishes with Mizan, each with the files generated from it.",
+          license: "https://creativecommons.org/publicdomain/zero/1.0/",
+          publisher: { iri: "https://www.intellectualfrontiers.com/", name: "Intellectual Frontiers" },
+          downloadBase: DOWNLOAD_BASE,
+          comments: [note],
+          datasets: [
+            {
+              id: "mizan",
+              ontologyIri: MZ.iri.replace(/#$/, ""),
+              ...(mizanOntology.values.versionInfo === undefined ? {} : { versionInfo: mizanOntology.values.versionInfo }),
+              title: mizanOntology.values.label?.value ?? "Mizan",
+              ...(mizanOntology.values.description === undefined ? {} : { description: mizanOntology.values.description.value }),
+              distributions: DISTRIBUTIONS,
+            },
+          ],
+        }),
+        "a DCAT catalog",
+      ),
+    ],
   ]);
 }
 
@@ -217,7 +345,14 @@ export async function main(argv: readonly string[], commons: string = fileURLToP
     stdio.stderr.writeSync(`the Mizan ontology breaks its own rules:\n${found.map((f) => `  - ${f}\n`).join("")}`);
     return 2;
   }
-  const want = await wanted();
+  let want: ReadonlyMap<string, string>;
+  try {
+    want = await wanted();
+  } catch (e) {
+    if (!(e instanceof ExportRefused)) throw e;
+    stdio.stderr.writeSync(`${e.message}\n`);
+    return 2;
+  }
   const root = commons.replace(/[\\/]$/, "");
   if (argv.includes("--check")) {
     const stale = [...want]
