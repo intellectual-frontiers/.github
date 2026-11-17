@@ -23,7 +23,15 @@
 import { type Keyed, parseSpec } from "../kernel/trace.ts";
 
 /** The ids of the rules Mizan adds (0003-mizan FR-013 to FR-015, 0018-standards-first FR-009). */
-export type MizanRule = "mizan/requirement-keyword" | "mizan/requirement-ears" | "mizan/scenario-form" | "mizan/standards-considered";
+export type MizanRule =
+  | "mizan/requirement-keyword"
+  | "mizan/requirement-ears"
+  | "mizan/scenario-form"
+  | "mizan/standards-considered"
+  | "mizan/term-standard"
+  | "mizan/unaligned-justification"
+  | "mizan/decision-missing"
+  | "mizan/decision-overdue";
 
 /** A finding of one of Mizan's rules: the same shape as the trace's, with a rule that is Mizan's. */
 export type MizanFinding = Keyed & { readonly rule: MizanRule };

@@ -10,6 +10,7 @@ import { fromFileUrl, dirname, resolve } from "../runtime/path.ts";
 import { run, execPath } from "../runtime/proc.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
 import { earsPatternOf, mizanFindings, rulePlugins, type RulePlugin, type SpecText } from "../mizan/rules.ts";
+import { daysBetween, termFindings } from "../mizan/standards.ts";
 
 const CHECK = resolve(dirname(fromFileUrl(import.meta.url)), "..", "mizan", "check.ts");
 
@@ -134,3 +135,70 @@ proves(["0003-mizan FR-015"], "commons' own folder passes with the baseline it h
   assertEquals([o.code, o.stdout], [0, ""]);
   assert(o.stderr.includes("passed"));
 });
+
+proves(
+  ["0018-standards-first FR-003", "0018-standards-first FR-004"],
+  "a term on a standard must name its term, and an unaligned term must say why",
+  () => {
+    const found = termFindings(
+      [
+        { iri: "https://x/A", basis: "specializes", decision: false },
+        { iri: "https://x/B", basis: "adopts", standardTerm: "https://s/B", decision: false },
+        { iri: "https://x/C", basis: "unaligned", decision: true },
+      ],
+      "2026-11-17",
+    );
+    assertEquals(
+      found.map((f) => f.key),
+      ["mizan/term-standard https://x/A", "mizan/unaligned-justification https://x/C"],
+    );
+  },
+);
+
+proves(
+  ["0018-standards-first FR-005"],
+  "a decision is due 90 days after the term: missing within them, overdue after, and none where one is linked",
+  () => {
+    const term = (addedOn: string, decision = false) => ({
+      iri: "https://x/T",
+      basis: "unaligned" as const,
+      justification: "none found",
+      addedOn,
+      decision,
+    });
+    assertEquals(daysBetween("2026-11-17", "2027-02-15"), 90);
+    assertEquals(daysBetween("2026-11-17", "not a day"), undefined);
+    assertEquals(
+      termFindings([term("2026-11-17")], "2026-11-17").map((f) => f.rule),
+      ["mizan/decision-missing"],
+    );
+    assertEquals(
+      termFindings([term("2026-11-17")], "2027-02-15").map((f) => f.rule),
+      ["mizan/decision-missing"],
+    );
+    assertEquals(
+      termFindings([term("2026-11-17")], "2027-02-16").map((f) => f.rule),
+      ["mizan/decision-overdue"],
+    );
+    assertEquals(termFindings([term("2026-11-17", true)], "2030-01-01"), []);
+    assertEquals(
+      termFindings([{ iri: "https://x/U", basis: "unaligned", justification: "none found", decision: false }], "2026-11-17").map(
+        (f) => f.rule,
+      ),
+      ["mizan/decision-missing"],
+    );
+  },
+);
+
+proves(
+  ["0018-standards-first FR-005"],
+  "commons' own folder holds Mizan's terms: the baseline holds the missing decisions within 90 days, and one overdue fails whatever it holds",
+  async () => {
+    const within = await run([execPath(), CHECK, "--today", "2027-02-15"]);
+    assertEquals(within.code, 0);
+    const late = await run([execPath(), CHECK, "--today", "2027-02-16"]);
+    assertEquals(late.code, 1);
+    assertStringIncludes(late.stderr, "mizan/decision-overdue");
+    assertStringIncludes(late.stderr, "its decision was due 1 days ago");
+  },
+);

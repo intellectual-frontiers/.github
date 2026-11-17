@@ -362,9 +362,9 @@ requirement	mechanism	by	note
 0017-two-languages FR-007	none	-	Planned, Phase 1 and 3 of issue #10: a statement and controls whose checks are the harness's own, not built yet
 0018-standards-first FR-001	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
 0018-standards-first FR-002	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
-0018-standards-first FR-003	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
-0018-standards-first FR-004	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
-0018-standards-first FR-005	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
+0018-standards-first FR-003	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: a term on a standard that names none is found; every class of Mizan's vocabulary has a basis (tests/commons-mizan-ontology.test.ts). Required by the compiler for Mizan's OntologyTerm only: the kernel's schemas do not yet require it (0012 FR-014)
+0018-standards-first FR-004	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: an unaligned term with no justification is found, and the findings are held by the baseline that only shrinks
+0018-standards-first FR-005	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: a decision is missing within 90 days (held by the baseline) and overdue after, which fails whatever the baseline holds; run on commons' own folder
 0018-standards-first FR-006	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
 0018-standards-first FR-007	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
 0018-standards-first FR-008	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet

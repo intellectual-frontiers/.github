@@ -1,3 +1,16 @@
 # The findings of the rules Mizan adds (commons 0003-mizan FR-015) that existed when each rule was first held.
 # A new finding fails the check, and so does a line below that no longer occurs: when you fix one, delete its line.
 # Never add a line to make a check pass.
+mizan/decision-missing https://www.intellectualfrontiers.com/ontology/mizan#Authority
+mizan/decision-missing https://www.intellectualfrontiers.com/ontology/mizan#Basis
+mizan/decision-missing https://www.intellectualfrontiers.com/ontology/mizan#Decision
+mizan/decision-missing https://www.intellectualfrontiers.com/ontology/mizan#Exception
+mizan/decision-missing https://www.intellectualfrontiers.com/ontology/mizan#ImportRecord
+mizan/decision-missing https://www.intellectualfrontiers.com/ontology/mizan#Integration
+mizan/decision-missing https://www.intellectualfrontiers.com/ontology/mizan#IntegrationDirection
+mizan/decision-missing https://www.intellectualfrontiers.com/ontology/mizan#Jurisdiction
+mizan/decision-missing https://www.intellectualfrontiers.com/ontology/mizan#JurisdictionLevel
+mizan/decision-missing https://www.intellectualfrontiers.com/ontology/mizan#OntologyTerm
+mizan/decision-missing https://www.intellectualfrontiers.com/ontology/mizan#Requirement
+mizan/decision-missing https://www.intellectualfrontiers.com/ontology/mizan#Rung
+mizan/decision-missing https://www.intellectualfrontiers.com/ontology/mizan#Spec

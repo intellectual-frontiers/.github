@@ -20,6 +20,7 @@
  *
  * @module
  */
+import { absurd } from "../../../kernel/absurd.ts";
 import { err, ok, type Result } from "../../../kernel/result.ts";
 import type { Fields } from "../../../kernel/rdf-schema.ts";
 import type { Named } from "../../../kernel/rdf-term.ts";
@@ -72,7 +73,7 @@ function jsonFor(f: AnySchema["fields"][string]): Json {
       one = { type: "string", format: "iri" };
       break;
     default:
-      return r.kind satisfies never;
+      return absurd(r.kind);
   }
   return f.cardinality === "many" ? { type: "array", items: one } : one;
 }
@@ -145,7 +146,7 @@ export function exportShacl(schemas: readonly AnySchema[], shapes: { readonly pr
           parts.push(`sh:nodeKind sh:IRI`);
           break;
         default:
-          return r.kind satisfies never;
+          return absurd(r.kind);
       }
       out.push(
         `${shapes.prefix}:${localOf(s.class.iri)}Shape-${n} a sh:PropertyShape ;\n${parts.map((x) => `    ${x}`).join(" ;\n")} .`,

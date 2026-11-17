@@ -35,7 +35,7 @@ jobs:
         run: bun fmt --check . ../tools ../../tests
       - name: The linter, type-aware, no warning allowed
         working-directory: commons/ts
-        run: bun x "bun@$BUN_LINT_VERSION" lint --type-aware --max-warnings 0 ../tools ../../tests
+        run: bun x "bun@$BUN_LINT_VERSION" lint --type-aware --max-warnings 0 ../tools ../../tests mizan ../ontology/mizan
       - name: Commons' generated files and specifications, as a person checks them, on Bun and on Node 26
         run: |
           bun commons/tools/generate-packaging.ts --check
