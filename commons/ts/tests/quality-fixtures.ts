@@ -19,7 +19,7 @@ import {
   testCaseSpan,
   testId,
 } from "../kernel/test-record.ts";
-import { writeTextFile } from "../runtime/fs.ts";
+import { readTextFile, writeTextFile } from "../runtime/fs.ts";
 import { join } from "../runtime/path.ts";
 import { run, which } from "../runtime/proc.ts";
 import { assert } from "../runtime/test.ts";
@@ -163,9 +163,30 @@ export async function sshSigning(repo: string, keyDir: string): Promise<string> 
   const made = await run(["ssh-keygen", "-q", "-t", "ed25519", "-N", "", "-C", "ci", "-f", key]);
   assert(made.success, `ssh-keygen: ${made.stderr}`);
   await git(repo, "config", "gpg.format", "ssh");
+  await git(repo, "config", "gpg.ssh.program", "ssh-keygen");
   await git(repo, "config", "user.signingkey", `${key}.pub`);
-  const pub = (await run(["cat", `${key}.pub`])).stdout.trim();
+  const pub = (await readTextFile(`${key}.pub`)).trim();
   const allowed = join(keyDir, "allowed_signers");
   await writeTextFile(allowed, `ci@example.com namespaces="git" ${pub}\n`);
   return allowed;
+}
+
+/** JSON text as a value nothing is known of: what a test reads is looked at with `at` and `list`, never taken for a type. */
+export function parsed(text: string): unknown {
+  return JSON.parse(text);
+}
+
+/** What lies at a path of keys and indexes in a parsed value, or nothing. */
+export function at(value: unknown, ...path: readonly (string | number)[]): unknown {
+  let v: unknown = value;
+  for (const step of path) {
+    if (typeof step === "number") v = Array.isArray(v) ? (v as readonly unknown[])[step] : undefined;
+    else v = typeof v === "object" && v !== null && !Array.isArray(v) ? Object.entries(v).find(([k]) => k === step)?.[1] : undefined;
+  }
+  return v;
+}
+
+/** A parsed value as a list, empty where it is not one. */
+export function list(value: unknown): readonly unknown[] {
+  return Array.isArray(value) ? (value as readonly unknown[]) : [];
 }

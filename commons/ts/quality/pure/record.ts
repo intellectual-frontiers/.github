@@ -540,7 +540,7 @@ export async function canonicalize(input: CanonicalInput): Promise<Result<Canoni
     traces: spans.map((b) => ({ ...b, resource: chained(b.resource), spans: b.spans.map(redactSpan) })),
     logs: withExtra.map((b) => ({ ...b, resource: chained(b.resource), records: b.records.map(redactLog) })),
   });
-  const doc = { ...encodeTraces(merged.traces), ...encodeLogs(merged.logs) } as JsonObject;
+  const doc: JsonObject = { ...encodeTraces(merged.traces), ...encodeLogs(merged.logs) };
   const text = recordText(doc);
   const back = readQuality(text);
   if (back.kind === "err") return back;

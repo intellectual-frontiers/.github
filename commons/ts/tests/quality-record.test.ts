@@ -12,7 +12,7 @@ import { sha256 } from "../kernel/sha256.ts";
 import { OUTCOMES } from "../kernel/test-record.ts";
 import { readTextFileSync } from "../runtime/fs.ts";
 import { dirname, fromFileUrl, join, relative, resolve, toPosix } from "../runtime/path.ts";
-import { assert, assertEquals, assertStringIncludes, proves, test } from "../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves, recorded, test } from "../runtime/test.ts";
 import { evidenceGrades, testOutcomes } from "../../ontology/ifqs/mod.ts";
 import { GRADES, QUALITY_OUTCOMES, CHARACTERISTICS, DOCUMENTS, ATTR, gradeRank, higherGrade, showGrade } from "../quality/pure/names.ts";
 import { canonicalize, checkRun, qualityCounts, readQuality } from "../quality/pure/record.ts";
@@ -27,7 +27,7 @@ import {
   statusReport,
   tap,
 } from "../quality/pure/render.ts";
-import { assembledRun, installation, noon, spanOf, traceOf } from "./quality-fixtures.ts";
+import { assembledRun, at, installation, list, noon, parsed, spanOf, traceOf } from "./quality-fixtures.ts";
 
 const HERE = dirname(fromFileUrl(import.meta.url));
 const ROOT = resolve(HERE, "..");
@@ -97,9 +97,9 @@ proves(["0021-ifqs FR-013"], "a rendering is made on demand from the record and 
   for (const f of RENDER_FORMATS) assertEquals(render(q, f), render(q, f), f);
   assertEquals(RENDER_FORMATS.length, 7);
   assertStringIncludes(junit(q), "<testsuites");
-  const ctrf = JSON.parse(ctrfDocument(q));
-  assertEquals(ctrf.reportFormat, "CTRF");
-  assertEquals(ctrf.results.tests.length, 5);
+  const ctrf = parsed(ctrfDocument(q));
+  assertEquals(at(ctrf, "reportFormat"), "CTRF");
+  assertEquals(list(at(ctrf, "results", "tests")).length, 5);
 });
 
 proves(
@@ -122,18 +122,18 @@ proves(
     assertEquals(req?.state, "unproven");
     assert(q.run.unproven.includes("0021-ifqs FR-005"));
     // CTRF: status other, and the count is in the summary
-    const ctrf = JSON.parse(ctrfDocument(q));
-    const body = ctrf.results.tests.find((t: { name: string }) => t.name === "0021-ifqs FR-005");
-    assertEquals(body.status, "other");
-    assertEquals(body.extra.outcome, "not_run");
-    assertEquals(ctrf.results.extra.notRun, 1);
-    assertEquals(ctrf.results.summary.other, 2);
+    const ctrf = parsed(ctrfDocument(q));
+    const body = list(at(ctrf, "results", "tests")).find((t) => at(t, "name") === "0021-ifqs FR-005");
+    assertEquals(at(body, "status"), "other");
+    assertEquals(at(body, "extra", "outcome"), "not_run");
+    assertEquals(at(ctrf, "results", "extra", "notRun"), 1);
+    assertEquals(at(ctrf, "results", "summary", "other"), 2);
     // every rendering carries the count of not_run
     assertStringIncludes(tap(q), "# not_run 1");
     assertStringIncludes(tap(q), "the network was not reachable");
     assertStringIncludes(junit(q), 'name="ifc.not_run"');
     assertStringIncludes(junit(q), 'type="not_run"');
-    assertEquals(JSON.parse(sarif(q)).runs[0].properties.notRun, 1);
+    assertEquals(at(parsed(sarif(q)), "runs", 0, "properties", "notRun"), 1);
     assertStringIncludes(completionReport(q), "not_run");
     assertStringIncludes(statusReport(q), "1 not_run");
     // not counted as passed: the counts of what ran are untouched
@@ -149,7 +149,7 @@ proves(["0021-ifqs FR-005"], "a case that did not run and gives no reason is ref
     notRun: [{ requirements: [], name: "silent", reason: "x" }],
   });
   assert(c.kind === "ok");
-  const doc = JSON.parse(c.value.text);
+  const doc = parsed(c.value.text);
   const text = JSON.stringify(doc).replace(
     '"key":"ifc.test.reason","value":{"stringValue":"x"}',
     '"key":"ifc.test.unused","value":{"stringValue":"x"}',
@@ -178,7 +178,7 @@ proves(["0021-ifqs FR-012"], "a test names its characteristic and a report bears
   for (const i of incidents) assertStringIncludes(i.text, `# ${DOCUMENTS.incident}`);
 });
 
-proves(["0021-ifqs FR-006"], "every rendering that shows evidence shows its grade", async () => {
+test("every rendering that shows evidence shows its grade", async () => {
   const c = await canonicalize({ record: await sampleRun(), previous: GENESIS });
   assert(c.kind === "ok");
   const q = c.value.record;
@@ -228,17 +228,16 @@ proves(
         ["mizan/authority-citation", "commons/spec-kit/specs/0002-y/spec.md", 40],
       ],
     );
-    const doc = JSON.parse(sarif(q));
-    const results = doc.runs[0].results;
+    const results = list(at(parsed(sarif(q)), "runs", 0, "results"));
     assertEquals(results.length, 3);
-    assertEquals(results[0].ruleId, "mizan/authority-citation");
-    assertEquals(results[0].level, "error");
-    assertEquals(results[0].locations[0].physicalLocation.region.startLine, 12);
-    assertEquals(results[0].locations[0].physicalLocation.artifactLocation.uri, "commons/spec-kit/specs/0001-x/spec.md");
+    assertEquals(at(results, 0, "ruleId"), "mizan/authority-citation");
+    assertEquals(at(results, 0, "level"), "error");
+    assertEquals(at(results, 0, "locations", 0, "physicalLocation", "region", "startLine"), 12);
+    assertEquals(at(results, 0, "locations", 0, "physicalLocation", "artifactLocation", "uri"), "commons/spec-kit/specs/0001-x/spec.md");
     // a rule that could not run is a warning, never a pass
-    const skipped = results.find((r: { ruleId: string }) => r.ruleId === "changes/strict-closing");
-    assertEquals(skipped.level, "warning");
-    assertStringIncludes(skipped.message.text, "plain Git");
+    const skipped = results.find((r) => at(r, "ruleId") === "changes/strict-closing");
+    assertEquals(at(skipped, "level"), "warning");
+    assertStringIncludes(String(at(skipped, "message", "text")), "plain Git");
   },
 );
 
@@ -278,10 +277,13 @@ proves(
     const second = await canonicalize({ record: await assembledRun(4, [{ name: "a" }]), previous: digest });
     assert(second.kind === "ok");
     assertEquals(second.value.record.previous, digest);
-    const doc = JSON.parse(second.value.text);
-    const resources = [...doc.resourceSpans, ...doc.resourceLogs].map(
-      (r: { resource: { attributes: { key: string; value: { stringValue?: string } }[] } }) =>
-        r.resource.attributes.find((a) => a.key === ATTR.previous)?.value.stringValue,
+    const doc = parsed(second.value.text);
+    const resources = [...list(at(doc, "resourceSpans")), ...list(at(doc, "resourceLogs"))].map((r) =>
+      at(
+        list(at(r, "resource", "attributes")).find((a) => at(a, "key") === ATTR.previous),
+        "value",
+        "stringValue",
+      ),
     );
     assert(resources.length >= 2);
     for (const r of resources) assertEquals(r, digest);
@@ -324,3 +326,11 @@ import { readDirSync } from "../runtime/fs.ts";
 function readDirNames(dir: string): string[] {
   return readDirSync(dir).map((e) => e.name);
 }
+
+const CHARACTERISTIC_TEST = "the runtime records the characteristic a test names";
+proves(["0021-ifqs FR-012"], CHARACTERISTIC_TEST, () => assertEquals(1, 1), { characteristic: "security" });
+proves(["0021-ifqs FR-012"], "the characteristic is on the test's record (ifc.test.characteristic) and is one of ISO/IEC 25010's", () => {
+  const r = recorded.find((t) => t.name.endsWith(CHARACTERISTIC_TEST));
+  assertEquals(r?.characteristic, "security");
+  assert(CHARACTERISTICS.includes(r?.characteristic ?? ""));
+});
