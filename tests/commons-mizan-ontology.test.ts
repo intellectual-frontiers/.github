@@ -63,7 +63,7 @@ proves(
     const expected = [
       "generated/mizan-audit-packaging.auto.ttl",
       "generated/mizan-catalog.auto.ttl",
-      ...["mizan", "ifccm", "ifqs", "ifws"].flatMap((name) => [
+      ...["mizan", "ifccm", "ifqs", "ifws", "ifr"].flatMap((name) => [
         `generated/${name}-code-lists.auto.skos.ttl`,
         `generated/${name}-code-lists.auto.sql`,
         `generated/${name}-mappings.auto.sssom.tsv`,
@@ -228,7 +228,7 @@ except jsonschema.ValidationError:
     pass
 assert len(list(skos.subjects(rdflib.RDF.type, rdflib.SKOS.ConceptScheme))) == 4
 version = list(data.objects(rdflib.URIRef("https://www.intellectualfrontiers.com/ontology/mizan"), OWL.versionIRI))
-assert version == [rdflib.URIRef("https://www.intellectualfrontiers.com/ontology/mizan/1")], version
+assert version == [rdflib.URIRef("https://www.intellectualfrontiers.com/ontology/mizan/1.0.0")], version
 from rdflib.compare import isomorphic, to_isomorphic
 original = ttl("mizan.auto.ttl")
 xml = rdflib.Graph()
@@ -285,7 +285,7 @@ DCT = rdflib.DCTERMS
 catalogs = list(cat.subjects(rdflib.RDF.type, DCAT.Catalog))
 assert len(catalogs) == 1
 datasets = list(cat.objects(catalogs[0], DCAT.dataset))
-assert len(datasets) == 4, len(datasets)
+assert len(datasets) == 5, len(datasets)
 IANA = "https://www.iana.org/assignments/media-types/"
 import os
 names = set()
@@ -307,7 +307,7 @@ for dataset in datasets:
         assert (d, DCT.license, None) in cat and (d, DCT.title, None) in cat
         by_file[url.split("/")[-1]] = media[len(IANA):]
     assert by_file[name + ".auto.rdf"] == "application/rdf+xml" and by_file[name + ".auto.ttl"] == "text/turtle" and by_file[name + "-schemas.auto.json"] == "application/schema+json", by_file
-assert names == {"mizan", "ifccm", "ifqs", "ifws"}, names
+assert names == {"mizan", "ifccm", "ifqs", "ifws", "ifr"}, names
 print("independent tools agree")
 `;
 

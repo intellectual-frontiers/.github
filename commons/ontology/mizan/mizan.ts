@@ -318,8 +318,8 @@ export const properties = [
 export const mizanOntology = OwlOntology.make(ontologyOf(MZ), {
   label: en("Mizan"),
   description: en("The shared vocabulary of Mizan, the IF Spec Profile: the ladder, specifications and requirements, standards, laws and the basis of every term."),
-  versionInfo: "1",
-  versionIri: named<"owl:Ontology">(iriIn(MZV, "1")),
+  versionInfo: "1.0.0",
+  versionIri: named<"owl:Ontology">(iriIn(MZV, "1.0.0")),
 });
 
 // ---- the individuals: the rungs

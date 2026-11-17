@@ -599,8 +599,8 @@ export const properties = [
 export const ifwsOntology = OwlOntology.make(ontologyOf(IFWS), {
   label: en("Intellectual Frontiers Workspaces"),
   description: en("The vocabulary of Intellectual Frontiers Workspaces: the workspace and its repositories, Git managers, tools, policy, plans, findings, generated files and modules."),
-  versionInfo: "1",
-  versionIri: named<"owl:Ontology">(iriIn(IFWSV, "1")),
+  versionInfo: "1.0.0",
+  versionIri: named<"owl:Ontology">(iriIn(IFWSV, "1.0.0")),
 });
 
 /** The code lists, by the class each is of. */

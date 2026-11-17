@@ -410,8 +410,8 @@ export const ifccmOntology = OwlOntology.make(ontologyOf(IFCCM), {
   description: en(
     "The vocabulary of Intellectual Frontiers Capabilities Configuration Management: the capability as the unit of change, change requests, changes, configuration items, baselines, a harness's declaration and the trace chain.",
   ),
-  versionInfo: "1",
-  versionIri: named<"owl:Ontology">(iriIn(IFCCMV, "1")),
+  versionInfo: "1.0.0",
+  versionIri: named<"owl:Ontology">(iriIn(IFCCMV, "1.0.0")),
 });
 
 // ---- the audit: the basis of every class (0018-standards-first FR-003)

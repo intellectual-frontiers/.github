@@ -415,8 +415,8 @@ export const ifqsOntology = OwlOntology.make(ontologyOf(IFQS), {
   description: en(
     "The vocabulary of the Intellectual Frontiers Quality System: test runs and cases, evidence and its grades, nonconformance and CAPA, quality objectives, review debt, tiers, audiences and the assessor pack.",
   ),
-  versionInfo: "1",
-  versionIri: named<"owl:Ontology">(iriIn(IFQSV, "1")),
+  versionInfo: "1.0.0",
+  versionIri: named<"owl:Ontology">(iriIn(IFQSV, "1.0.0")),
 });
 
 // ---- the audit: the basis of every class (0018-standards-first FR-003)

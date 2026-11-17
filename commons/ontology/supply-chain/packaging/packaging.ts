@@ -17,8 +17,10 @@ import {
   DCTERMS,
   dcterms,
   en,
+  iriIn,
   many,
   namespace,
+  named,
   ObjectProperty,
   one,
   type OntologyFile,
@@ -42,6 +44,8 @@ import { SCHEMA, schema } from "./schema.auto.ts";
 export const PM = namespace("pm", "https://www.intellectualfrontiers.com/ontology/packaging#");
 /** The namespace of the packaging individuals: the managers, families, programs, pins and the rest. */
 export const PMID = namespace("pmid", "https://www.intellectualfrontiers.com/id/packaging/");
+/** The namespace of the versions of the packaging ontology: `owl:versionIRI` names one of them. */
+export const PMV = namespace("pmv", "https://www.intellectualfrontiers.com/ontology/packaging/");
 export { SCHEMA, schema } from "./schema.auto.ts";
 /** The terms of the packaging vocabulary: its classes and properties. */
 export const pm = vocabulary(PM, {
@@ -285,7 +289,8 @@ export const RecordField = classSchema(pm.RecordField, {
 export const packagingOntology = OwlOntology.make(ontologyOf(PM), {
   label: en("Packaging"),
   description: en("The package managers and system families a harness installs software with, the commands that drive them, and the package each program is called."),
-  versionInfo: "1",
+  versionInfo: "1.0.0",
+  versionIri: named<"owl:Ontology">(iriIn(PMV, "1.0.0")),
 });
 
 /** The classes, each with its label and definition. */
@@ -480,7 +485,7 @@ export const properties = [
 /** The file this module states: its name, its prefixes and its individuals. */
 export const file: OntologyFile = {
   name: "packaging",
-  prefixes: [DCTERMS, OWL, PM, RDFS, SCHEMA, SKOS, XSD],
+  prefixes: [DCTERMS, OWL, PM, PMV, RDFS, SCHEMA, SKOS, XSD],
   individuals: [
     packagingOntology,
     ...classes,
