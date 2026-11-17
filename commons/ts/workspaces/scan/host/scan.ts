@@ -81,16 +81,25 @@ export function gitConfigFilesOf(repoPath: string): readonly string[] {
 /** The signature letters of the last commits of a repository (`git log --format=%H %G?`), newest first, or why git could not say. `range` is a revision range (`HEAD` by default). */
 export async function commitSignatures(repo: string, range = "HEAD", limit = 50): Promise<Result<readonly CommitSignature[], string>> {
   try {
-    const out = await output(["git", "-C", repo, "log", `--max-count=${limit}`, "--format=%H %G?", range, "--"], {
+    // the commit, Git's signature letter, the committer's address and the key's fingerprint and id, separated by the unit separator (an address has no space, a fingerprint may be empty)
+    const out = await output(["git", "-C", repo, "log", `--max-count=${limit}`, "--format=%H%x1f%G?%x1f%ce%x1f%GF%x1f%GK", range, "--"], {
       stdout: "piped",
       stderr: "piped",
     });
     if (!out.success) return err(new TextDecoder().decode(out.stderr).trim().split("\n")[0] ?? "git log failed");
     const commits: CommitSignature[] = [];
     for (const line of new TextDecoder().decode(out.stdout).split("\n")) {
-      const [commit, said] = line.trim().split(" ");
+      const [commit, said, account, fingerprint, keyId] = line.trim().split("\x1f");
       const letter = said === undefined ? undefined : signatureLetter(said);
-      if (commit !== undefined && commit !== "" && letter !== undefined) commits.push({ repo, commit, letter });
+      const keys = [fingerprint, keyId].filter((k): k is string => k !== undefined && k !== "");
+      if (commit !== undefined && commit !== "" && letter !== undefined)
+        commits.push({
+          repo,
+          commit,
+          letter,
+          ...(account === undefined || account === "" ? {} : { account }),
+          ...(keys.length === 0 ? {} : { keys }),
+        });
     }
     return ok(commits);
   } catch (e) {

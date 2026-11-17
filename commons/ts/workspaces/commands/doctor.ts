@@ -21,6 +21,7 @@ import { hiddenFindings, resolveAll } from "../modules/registry.ts";
 import { nativePath } from "../portable.ts";
 import { type FoundModule, moduleSourceFindings, type CommitSignature, signedCommitFindings } from "../scan/policy-scans.ts";
 import { commitSignatures, gitConfigFilesOf, modulesOnPath, scanRoot } from "../scan/host/scan.ts";
+import { readSigningWaivers } from "../scan/host/waivers.ts";
 import { longPathFindings } from "../setup/windows.ts";
 import { STATE_RECORD_PATH, verifyFindings } from "../state-record.ts";
 import type { Finding } from "../findings.ts";
@@ -78,10 +79,22 @@ const signaturesCheck: DoctorCheck = async (ctx, loaded) => {
       commits.push(...said.value.map((c) => ({ ...c, repo: r.path })));
     }
   }
-  const findings = signedCommitFindings(loaded.manifest.policy, commits, ctx.today);
+  // the Decisions of each repository's own harness record may waive the rule for a bot account that signs through the host (0023-if-workspaces FR-049)
+  const record = await readSigningWaivers(
+    loaded.home,
+    loaded.manifest.repositories.map((r) => r.path),
+  );
+  const findings = signedCommitFindings(loaded.manifest.policy, commits, ctx.today, record.waivers);
+  const notes: Check[] = record.notes.map((n) => ({
+    id: "ifws/signing-waiver-unread",
+    level: "suggest",
+    subject: n.repo,
+    message: `${n.reason}: no waiver of ${n.repo} holds`,
+  }));
   return findings.length > 0
-    ? findings.map(asCheck)
+    ? [...findings.map(asCheck), ...notes]
     : [
+        ...notes,
         {
           id: "ifws/commit-not-signed",
           level: "ok",

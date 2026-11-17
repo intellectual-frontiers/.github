@@ -229,3 +229,31 @@ export function covers(decision: DecisionRecord, thing: string): boolean {
     return m?.[1] !== undefined && thing.startsWith("gate-relaxed ") && thing.slice("gate-relaxed ".length).startsWith(m[1]);
   });
 }
+
+/** The word a Decision's `covers` entry starts with when it waives the signed-commit rule for a bot account that signs through the host: `signing-waiver <account> <key>` (0023-if-workspaces FR-049). */
+export const SIGNING_WAIVER = "signing-waiver";
+
+/** A waiver of the signed-commit rule for one account and one key, with the Decision that authorizes it. */
+export type SigningWaiver = {
+  /** The Decision that names the account and the key. */
+  readonly decision: string;
+  /** The role that approved it (0020-ifccm FR-019). */
+  readonly approvedBy: string;
+  /** The account that signs, as its commits' committer address is written: `noreply@github.com` for GitHub's own. */
+  readonly account: string;
+  /** The key, by its fingerprint or its key id, as Git reports it for a signed commit. */
+  readonly key: string;
+};
+
+/**
+ * The waivers of the signed-commit rule that the Decisions of a harness record make (0023-if-workspaces FR-049): each entry of a Decision's `covers` written `signing-waiver <account> <key>`.
+ * An entry that names no account or no key waives nothing, and a Decision that says only `signing-waiver` or names the account alone waives no one.
+ */
+export function signingWaivers(decisions: readonly DecisionRecord[]): readonly SigningWaiver[] {
+  return decisions.flatMap((d) =>
+    d.covers.flatMap((c): SigningWaiver[] => {
+      const m = new RegExp(`^${SIGNING_WAIVER} (\\S+) (\\S+)$`).exec(c);
+      return m?.[1] === undefined || m[2] === undefined ? [] : [{ decision: d.id, approvedBy: d.approvedBy, account: m[1], key: m[2] }];
+    }),
+  );
+}
