@@ -10,9 +10,14 @@
  * (`pure/ledger.ts`, `host/ledger-branch.ts`), quality objectives emitted as OpenTelemetry metrics (`pure/objectives.ts`), the index of the
  * branch (`pure/index-file.ts`) and the tier a harness claims (`pure/tier.ts`).
  *
+ * Tier 2, people see and prove: `attestation/` (pre-registered test plans and the judgement of a run against its plan, attested samples drawn by a
+ * rule and a seed, mutation runs and the strength of a proof, the agents' reviews and the person who samples them: 0021-ifqs FR-038 to FR-041),
+ * `trust/` (the Trust page and JSON for one audience, redacted with the count of what was redacted, `--check`able: 0022-trust FR-001 to FR-009) and
+ * `assessor/` (the assessor pack, its signature, its tar and DCAT distribution, and the verifier that is inside it: FR-010 to FR-016).
+ *
  * @remarks
- * `pure/` imports only the kernel and itself; `host/` is the layer that runs `git` and reads files. The public page and the assessor pack are
- * the later work of 0022-trust.
+ * `pure/` imports only the kernel and itself; `host/` is the layer that runs `git` and reads files. The records of Tier 2 are events of the ledger
+ * (`pure/tier2-events.ts`), folded by `attestation/rules.ts`. The verifier `assessor/verify-pack.ts` imports nothing, because it is copied into every pack.
  *
  * @module
  */
@@ -33,3 +38,17 @@ export * from "./host/ledger-branch.ts";
 export * from "./host/gather.ts";
 export * from "./host/report.ts";
 export { formatHostError, type HostError } from "./host/git.ts";
+export * from "./pure/tier2-events.ts";
+export * from "./attestation/rules.ts";
+export * from "./attestation/sample.ts";
+export * from "./attestation/plan.ts";
+export * from "./attestation/mutation.ts";
+export * from "./attestation/agents.ts";
+export * from "./attestation/host.ts";
+export * from "./trust/audience.ts";
+export * from "./trust/view.ts";
+export * from "./trust/html.ts";
+export * from "./trust/host.ts";
+export * from "./assessor/verify-pack.ts";
+export * from "./assessor/pack.ts";
+export * from "./assessor/host.ts";

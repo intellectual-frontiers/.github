@@ -37,6 +37,15 @@ import {
   verifications,
 } from "./commands.ts";
 import { appendEvents, formatLedgerHostError, readLedger } from "./host/ledger-branch.ts";
+import {
+  agentsCommand,
+  mutationCommand,
+  packCommand,
+  planCommand,
+  sampleCommand,
+  trustCommand,
+  verifyPackCommand,
+} from "./tier2-commands.ts";
 import { formatHostError } from "./host/git.ts";
 import { type Grade, isGrade } from "./pure/names.ts";
 import { formatQualityError, type NotRun, readQuality } from "./pure/record.ts";
@@ -99,7 +108,8 @@ const RENDER = {
   grade: value({ help: "The grade to show (E0 to E5); the record's own where not given.", valueName: "GRADE", parse: grade }),
 };
 
-const USAGE = "usage: quality record|verify|render|index|freshness|nonconformances|capa|register|tier|attest [OPTIONS] (--help for each)";
+const USAGE =
+  "usage: quality record|verify|render|index|freshness|nonconformances|capa|register|tier|attest|trust|pack|verify-pack|plan|sample|mutation|agents [OPTIONS] (--help for each)";
 
 /** `quality` with its arguments: the exit status. */
 export async function main(argv: readonly string[]): Promise<number> {
@@ -213,6 +223,20 @@ export async function main(argv: readonly string[]): Promise<number> {
       return tierCommand(rest);
     case "attest":
       return attestCommand(rest);
+    case "trust":
+      return trustCommand(rest);
+    case "pack":
+      return packCommand(rest);
+    case "verify-pack":
+      return verifyPackCommand(rest);
+    case "plan":
+      return planCommand(rest);
+    case "sample":
+      return sampleCommand(rest);
+    case "mutation":
+      return mutationCommand(rest);
+    case "agents":
+      return agentsCommand(rest);
     case undefined:
     case "--help":
     case "-h":

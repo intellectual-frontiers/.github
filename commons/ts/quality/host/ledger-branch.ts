@@ -10,6 +10,7 @@
  * @module
  */
 import { GENESIS } from "../../kernel/evidence.ts";
+import { formatAssuranceError, foldAssurance } from "../attestation/rules.ts";
 import { err, ok, type Result } from "../../kernel/result.ts";
 import { type Sha256, sha256 } from "../../kernel/sha256.ts";
 import {
@@ -47,7 +48,10 @@ export type LedgerRead = {
 };
 
 /** The files of the ledger on a commit, in sequence. */
-async function filesAt(repo: string, tip: string): Promise<Result<readonly { readonly path: string; readonly text: string }[], HostError>> {
+export async function filesAt(
+  repo: string,
+  tip: string,
+): Promise<Result<readonly { readonly path: string; readonly text: string }[], HostError>> {
   const listed = await gitText(repo, ["ls-tree", "-r", "--name-only", tip, "--", RECORDS_ROOT]);
   if (listed.kind === "err") return listed;
   const paths = listed.value
@@ -80,6 +84,8 @@ export async function readLedger(repo: string): Promise<Result<LedgerRead, Ledge
   }
   const folded = foldLedger(events);
   if (folded.kind === "err") return err({ kind: "ledger", reason: formatLedgerError(folded.error) });
+  const tier2 = foldAssurance(events);
+  if (tier2.kind === "err") return err({ kind: "ledger", reason: formatAssuranceError(tier2.error) });
   return ok({ ledger: folded.value, events, files: files.value.length, head: chain.value, tip: tip.value });
 }
 
@@ -104,6 +110,8 @@ export async function appendEvents(
   const read = before.value;
   const folded = foldLedger([...read.events, ...events]);
   if (folded.kind === "err") return err({ kind: "ledger", reason: formatLedgerError(folded.error) });
+  const tier2 = foldAssurance([...read.events, ...events]);
+  if (tier2.kind === "err") return err({ kind: "ledger", reason: formatAssuranceError(tier2.error) });
   const sign = options.sign ?? (await signingFollowsConfig(repo));
   let tip = read.tip;
   let head = read.head;
