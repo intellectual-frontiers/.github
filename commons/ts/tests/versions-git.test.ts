@@ -592,6 +592,10 @@ proves(
     }
     const tags = await spawn(["git", "-C", ROOT, "tag", "-l", "ifc-ts-v0.4.0", "ifc-docs-v0.1.0"]);
     if (tags.stdout.trim() === "") return; // a clone with no tags (a shallow checkout) cannot say; the check job fetches them
+    const workflow = readTextFileSync(join(ROOT, ".github", "workflows", "tests.yml"));
+    assertStringIncludes(workflow, "fetch-depth: 0");
+    assertStringIncludes(workflow, "bun commons/ts/mizan/versions.ts check\n");
+    assertStringIncludes(workflow, "node commons/ts/mizan/versions.ts check\n");
     const ledger = await v(ROOT, "ledger", "--json");
     assertEquals(ledger.code, 0, ledger.err);
     assertStringIncludes(ledger.out, '"tag": "ifc-ts-v0.4.0"');

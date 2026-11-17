@@ -18,6 +18,7 @@
  * @module
  */
 import process from "node:process";
+import { absurd } from "../kernel/absurd.ts";
 import { flag, formatUsageError, helpText, type Operand, parseArgs, type Parser, suggest, value } from "../kernel/args.ts";
 import { err, ok } from "../kernel/result.ts";
 import { existsSync, readTextFileSync, sha256File, writeTextFileSync } from "../runtime/fs.ts";
@@ -317,7 +318,7 @@ async function runBump(rest: readonly string[], s: Say, now: () => Date): Promis
       break;
     }
     default:
-      return usage(s, `${scheme} cannot be bumped`);
+      return absurd(scheme);
   }
   writeTextFileSync(join(l.repo, w.file), releaseSource(next));
   s.out(`${r.slug}: ${r.version} -> ${next.version} (${w.file})\n`);

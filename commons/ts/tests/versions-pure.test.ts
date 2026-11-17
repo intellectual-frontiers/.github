@@ -37,7 +37,11 @@ import {
 import { filesOf, scopeOf, workFolders } from "../mizan/versions/works.ts";
 import { impacts, versionSchemes, workKinds } from "../../ontology/ifr/mod.ts";
 import { qualityTiers } from "../../ontology/ifqs/mod.ts";
+import { mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "../runtime/fs.ts";
+import { join } from "../runtime/path.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { holdHarness } from "../mizan/harness.ts";
+import { readWorks } from "../mizan/versions/scan.ts";
 
 // ------------------------------------------------------------------------------------------------------------------------------- fixtures
 
@@ -824,5 +828,50 @@ proves(
     );
     assertEquals(plugin.check({ slug: "0002-y", spec: "" }), [], "reported for the anchored specification only");
     assertEquals(versionsPlugin([], "0001-x").check({ slug: "0001-x", spec: "" }), []);
+  },
+);
+
+proves(
+  ["0026-works-versioning FR-032"],
+  "holdHarness runs the plugin: a folder whose records are sound passes, a record that does not decode or a controlled document with no approval fails (the latter whatever the baseline holds), and the records under a root are found by walking it",
+  async () => {
+    await withTempDir((root) => {
+      mkdirSync(join(root, "specs", "0001-x"), { recursive: true });
+      writeTextFileSync(
+        join(root, "specs", "0001-x", "spec.md"),
+        "# Feature Specification: X\n\n**Spec ID:** 0001-x\n**Status:** Draft\n\n- **FR-001**: The thing MUST work.\n",
+      );
+      const baselineFile = join(root, "mizan.baseline.txt");
+      const base = { root, baselineFile, today: "2026-11-17" } as const;
+      mkdirSync(join(root, "lib"), { recursive: true });
+      mkdirSync(join(root, "node_modules", "x"), { recursive: true });
+      writeTextFileSync(join(root, "lib", "release.ts"), raw());
+      writeTextFileSync(join(root, "node_modules", "x", "release.ts"), "not a record");
+      assertEquals(
+        readWorks(root).map((w) => w.path),
+        ["lib/release.ts"],
+        "node_modules holds no work",
+      );
+      assertEquals(holdHarness({ ...base, works: readWorks(root) }), 0);
+      writeTextFileSync(join(root, "lib", "release.ts"), raw({ colour: "blue" }));
+      assertEquals(holdHarness({ ...base, works: readWorks(root) }), 1);
+      writeTextFileSync(baselineFile, "");
+      assertEquals(
+        holdHarness({ ...base, works: readWorks(root), writeBaseline: true }),
+        0,
+        "a finding of the plugin can be held by the baseline",
+      );
+      assertEquals(holdHarness({ ...base, works: readWorks(root) }), 0);
+      writeTextFileSync(join(root, "lib", "release.ts"), raw({ kind: "ControlledDocument", version: "7" }));
+      assertEquals(holdHarness({ ...base, works: readWorks(root) }), 1);
+      assertEquals(holdHarness({ ...base, works: readWorks(root), writeBaseline: true }), 0);
+      assertEquals(
+        readTextFileSync(baselineFile).includes("approval-missing"),
+        false,
+        "an approval that is missing is never held by the baseline",
+      );
+      assertEquals(holdHarness({ ...base, works: readWorks(root) }), 1);
+      return Promise.resolve();
+    });
   },
 );

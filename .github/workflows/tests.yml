@@ -22,7 +22,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      # the whole history and its tags: `versions check` compares each work with the merge base, and its ledger reads the tags (commons 0026-works-versioning FR-022, FR-035)
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: ./.github/actions/bun
       - name: The development tools, from bun.lock
         working-directory: commons/ts
@@ -42,12 +45,16 @@ jobs:
           bun commons/tools/mizan-check.ts
           bun commons/ts/mizan/generate-ontology.ts --check
           bun commons/ts/mizan/check.ts
+          bun commons/ts/mizan/versions.ts check
+          bun commons/ts/mizan/versions.ts ledger
           bun commons/ts/mizan/integrations/host/import.ts commons/ts/mizan/imports/schema-org.import.ts --check --fetch
           bun commons/ts/mizan/integrations/host/import.ts commons/ts/mizan/imports/nist-sp-800-53.import.ts --check --fetch
           node commons/tools/generate-packaging.ts --check
           node commons/tools/mizan-check.ts
           node commons/ts/mizan/generate-ontology.ts --check
           node commons/ts/mizan/check.ts
+          node commons/ts/mizan/versions.ts check
+          node commons/ts/mizan/versions.ts ledger
           node commons/ts/mizan/integrations/host/import.ts commons/ts/mizan/imports/schema-org.import.ts --check --fetch
           node commons/ts/mizan/integrations/host/import.ts commons/ts/mizan/imports/nist-sp-800-53.import.ts --check --fetch
 
