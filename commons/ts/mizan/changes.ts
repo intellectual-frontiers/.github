@@ -32,11 +32,13 @@ import { dayOf, decodeHarnessRecord, formatRecordError, type HarnessRecord, phas
 import { declarationHistory, readRange } from "./changes/git-log.ts";
 import { doneWhenRequirements, parseIssueBody } from "./changes/issue-body.ts";
 import {
+  CHANGES_RULES,
   type ChangesFinding,
   commitFindings,
   declarationFindings,
   relaxationFindings,
   ruleCases,
+  STRICT_RULES,
   strictFindings,
 } from "./changes/rules.ts";
 import { askHost, NO_CLIENT } from "./changes/strict.ts";
@@ -48,8 +50,20 @@ import * as ifqsOntology from "../../ontology/ifqs/mod.ts";
 import * as ifwsOntology from "../../ontology/ifws/mod.ts";
 import { terms } from "../../ontology/mizan/mod.ts";
 
+/** One rule's result in a run of the check (0020-ifccm FR-031): its findings, or the reason it did not run. Its shape is the quality system's `CheckRule`, so a caller keeps it as a record without this file knowing the quality system. */
+export type RuleResult = {
+  readonly id: string;
+  readonly findings: readonly { readonly file: string; readonly line?: number; readonly message: string }[];
+  readonly notRun?: string;
+};
+
+/** The rules that need no range of commits: the declaration's own, and its history. */
+const WITHOUT_RANGE: readonly string[] = ["changes/declaration", "changes/gate-relaxed"];
+
 /** What the command is given besides its arguments: the host's client and the repository it serves, which the command never makes, and where it writes. */
 export type Deps = {
+  /** Called once with each rule's result where the check judged commits or a declaration (0020-ifccm FR-031), so that the caller can keep it as a record. */
+  readonly onRules?: (rules: readonly RuleResult[]) => void;
   readonly client?: GitHostClient;
   /** The repository on the host that the commits belong to; a reference `#N` is asked of it. */
   readonly home?: RepoRef;
@@ -220,6 +234,28 @@ export async function run(
       notRun = asked.notRun;
       findings.push(...strictFindings(commits, asked.answers, phase));
     }
+  }
+
+  // each rule's result, for the record of the run (FR-031): a rule that was not run is never a pass
+  if (deps.onRules !== undefined) {
+    const strict = has("--strict");
+    deps.onRules(
+      CHANGES_RULES.map((rule): RuleResult => {
+        const why =
+          range === undefined && !WITHOUT_RANGE.includes(rule)
+            ? "no --range was given, so no commit was judged"
+            : STRICT_RULES.includes(rule)
+              ? !strict
+                ? "--strict was not given, so the host was not asked"
+                : notRun
+              : undefined;
+        if (why !== undefined) return { id: rule, findings: [], notRun: why };
+        return {
+          id: rule,
+          findings: findings.filter((f) => f.rule === rule).map((f) => ({ file: f.file, line: f.line, message: f.message })),
+        };
+      }),
+    );
   }
 
   // judgement against the baseline: a warning is held by it, a finding in the gate phase never is
