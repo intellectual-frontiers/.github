@@ -547,20 +547,20 @@ requirement	mechanism	by	note
 0020-ifccm FR-028	check	.github: cd commons/ts && bun test tests/	mizan-changes-pure.test.ts: the files of the changes check reach a host only through GitHostClient and name no host API or URL; the adapters are M4's (the githost folder)
 0020-ifccm FR-029	none	-	Planned, M4 of issue #10 (the adapters): the adapters read a pull request and a merge request as part of a change and #N as the issue
 0020-ifccm FR-030	check	.github: cd commons/ts && bun test tests/	mizan-changes-git.test.ts: --strict on plain Git is not_run with the reason that there is no host API, and so are no client given and an unreachable host; never passed
-0020-ifccm FR-031	none	-	Planned, M3 of issue #10: the changes check leaves its result in the canonical record of 0021-ifqs
+0020-ifccm FR-031	check	.github: cd commons/ts && bun test tests/	quality-changes-record.test.ts: each run of tools/changes.ts leaves a quality record with each rule as a case, each finding a failed case with rule, file and line, and each rule that could not run (strict on plain Git, no client, no --strict, no --range) not_run with its reason
 0020-ifccm FR-032	check	.github: cd commons/ts && bun test tests/	mizan-changes-pure.test.ts: the findings are Mizan findings (MizanRule, held by a baseline) and holdHarness runs the declaration rule as a plugin; mizan-changes-git.test.ts: the command runs as a program with its exit statuses; the commit rules need a range and are the command's
 0020-ifccm FR-033	check	.github: cd commons/ts && bun test tests/	mizan-changes-pure.test.ts: Departs and Decision lines are read from a commit and judged (changes/no-decision, changes/self-approved), and the record file's declaration, decisions and roles are read as data
 0021-ifqs FR-001	none	-	Planned, M3 of issue #10: a principle held by the requirements under it: what runs is graded above what is stated (FR-021); the grade list exists (ifqs-ontology.test.ts)
 0021-ifqs FR-002	check	.github: cd commons/ts && bun test tests/	quality-branch.test.ts: the quality branch holds OTLP records and nothing else (a result as JUnit XML is refused by the chain); that no other channel carries a result in a run's pipeline stays with 0006-signals
-0021-ifqs FR-003	none	-	Planned, M7 of issue #10: the closure of a CAPA is judged against the author of its change and the approver of its Decision
+0021-ifqs FR-003	check	.github: cd commons/ts && bun test tests/	quality-ledger.test.ts, quality-system.test.ts: a CAPA is closed only by a named person: an automated run, an agent, the one that opened it and, where a regulated domain is declared, the author of the corrective change (read from Git) are each refused
 0021-ifqs FR-004	none	-	Planned, M9 of issue #10: the public page is generated for commons (0022-trust)
 0021-ifqs FR-005	check	.github: cd commons/ts && bun test tests/	quality-record.test.ts, quality-command.test.ts: a planned case that did not run is not_run with its reason, never passed, refused without a reason, counted in the TAP, JUnit, CTRF, SARIF and completion renderings and by `quality record`
-0021-ifqs FR-006	none	-	Planned, M7 of issue #10: every rendering of a count of proof shows the grade with it
-0021-ifqs FR-007	none	-	Planned, M7 of issue #10: the system opens a nonconformance itself from a failed or stale proof
+0021-ifqs FR-006	check	.github: cd commons/ts && bun test tests/	quality-ladder.test.ts, quality-system.test.ts: a count of proved requirements is shown with the grade it is counted at and the review debt beside it, and refused without either; the completion report, the register view and the index carry both
+0021-ifqs FR-007	check	.github: cd commons/ts && bun test tests/	quality-ladder.test.ts, quality-ledger.test.ts, quality-system.test.ts: a failed run and a stale proof open a nonconformance by themselves (once each), with the requirement, the evidence and the reason; freshness --open writes them to the quality branch
 0021-ifqs FR-008	check	.github: cd commons/ts && bun test tests/	ifqs-ontology.test.ts: each crosswalk row has a relation SSSOM has and requirements that exist, and the standards the specification is held to are there
 0021-ifqs FR-009	none	-	Planned, M3 of issue #10: the test record is kept as the objective evidence of verification for a harness that claims ifccm:DeviceQuality; the Authority citation is held by mizan/authority-citation
 0021-ifqs FR-010	check	.github: cd commons/ts && bun test tests/	ifqs-ontology.test.ts: the requirement names ca-2, ca-5, ca-7, sa-11 and si-2 by their OSCAL identifiers
-0021-ifqs FR-011	none	-	Planned, M7 of issue #10: the grade a requirement needs to be counted proved follows the risk of its tests
+0021-ifqs FR-011	check	.github: cd commons/ts && bun test tests/	quality-ladder.test.ts: a requirement is counted proved at E3, and at E4 where one of its tests is of high risk (an E3 run of a high-risk test is not counted)
 0021-ifqs FR-012	check	.github: cd commons/ts && bun test tests/	quality-record.test.ts: the runtime records ifc.test.characteristic (an ISO/IEC 25010 word) and the reports bear the 29119-3 document names (completion, status, incident)
 0021-ifqs FR-013	check	.github: cd commons/ts && bun test tests/	quality-record.test.ts, quality-command.test.ts: the body of each case's log record is a CTRF test object; JUnit, CTRF, SARIF and TAP are rendered on demand, byte for byte the same, and not kept
 0021-ifqs FR-014	check	.github: cd commons/ts && bun test tests/	quality-record.test.ts: ifc.test.outcome takes not_run with ifc.test.reason, CTRF renders it as other, and a requirement whose only proof is not_run is unproven; the outcome words equal the ifqs ontology's
@@ -568,30 +568,32 @@ requirement	mechanism	by	note
 0021-ifqs FR-016	check	.github: cd commons/ts && bun test tests/	quality-branch.test.ts, quality-command.test.ts: one new file per run at quality/evidence/YYYY/MM/DD/<trace id>.otlp.json on an orphan branch in a commit that only appends, never replaced, signed through the host's SSH signing, a force-push and a deletion refused by a repository set to refuse them
 0021-ifqs FR-017	check	.github: cd commons/ts && bun test tests/	quality-branch.test.ts, quality-record.test.ts: ifc.quality.previous.sha256 on every resource (64 zeros first) and the verifier names the first file that does not match
 0021-ifqs FR-018	check	.github: cd commons/ts && bun test tests/	quality-branch.test.ts: a note under refs/notes/quality on the tested commit gives the file's path, SHA-256 and grade; no note is E0 and a note that does not match its file breaks the evidence
-0021-ifqs FR-019	none	-	Planned, M7 of issue #10: the index derived from the branch and rebuilt from it alone
+0021-ifqs FR-019	check	.github: cd commons/ts && bun test tests/	quality-ledger.test.ts, quality-system.test.ts: the index is derived from the quality branch, deterministic, checkable with --check, and rebuilt in a repository that holds only the branch to the same bytes
 0021-ifqs FR-020	check	.github: cd commons/ts && bun test tests/	quality-record.test.ts: secrets and e-mail addresses are redacted before a record is kept and a record that names a person is refused
-0021-ifqs FR-021	check	.github: cd commons/ts && bun test tests/	ifqs-ontology.test.ts: the six grades E0 to E5 exist in order with their ranks; deriving a requirement's grade from evidence is Planned, M7 of issue #10
-0021-ifqs FR-022	none	-	Planned, M7 of issue #10: the enforcement register is shown with the grade and day of each row's evidence, generated
-0021-ifqs FR-023	none	-	Planned, M7 of issue #10: review debt counted from the grades and held so that it does not grow without a Decision
-0021-ifqs FR-024	none	-	Planned, M7 of issue #10: a review made by an agent is said so in the record and graded no higher than E2
-0021-ifqs FR-025	none	-	Planned, M7 of issue #10: freshness by time and by change, and the nonconformance a stale proof opens; the freshness words are held by ifqs-ontology.test.ts
-0021-ifqs FR-026	none	-	Planned, M7 of issue #10: the nonconformance record, linked to a Problem change request
-0021-ifqs FR-027	none	-	Planned, M7 of issue #10: a nonconformance is closed only through a closed CAPA
-0021-ifqs FR-028	none	-	Planned, M7 of issue #10: the CAPA record and its named test
-0021-ifqs FR-029	none	-	Planned, M7 of issue #10: a CAPA becomes verified when its named test passes after the corrective change
-0021-ifqs FR-030	none	-	Planned, M7 of issue #10: a CAPA is closed only from verified and only by a named person's Decision
-0021-ifqs FR-031	none	-	Planned, M7 of issue #10: the index and the page list an opened nonconformance and its CAPA, closed ones kept
-0021-ifqs FR-032	none	-	Planned, M7 of issue #10: quality objectives computed from the evidence
-0021-ifqs FR-033	none	-	Planned, M7 of issue #10: a spent error budget opens a nonconformance
-0021-ifqs FR-034	none	-	Planned, M7 of issue #10: commons declares the suggested objectives
+0021-ifqs FR-021	check	.github: cd commons/ts && bun test tests/	quality-ladder.test.ts, quality-system.test.ts, ifqs-ontology.test.ts: the six grades E0 to E5 exist in order with their ranks; a requirement is graded the highest grade of its fresh evidence (a statement E1, a review E2, a run E3 or E4, a probe E5), and stale evidence does not count
+0021-ifqs FR-022	check	.github: cd commons/ts && bun test tests/	quality-ladder.test.ts, quality-system.test.ts: quality register shows the proof register with the grade, the day and the freshness of each row, generated and checked against the file
+0021-ifqs FR-023	check	.github: cd commons/ts && bun test tests/	quality-ladder.test.ts, quality-system.test.ts: the review debt is the count of requirements held at E1 or E2, shown beside every count of proved requirements, and growth with no Decision fails
+0021-ifqs FR-024	check	.github: cd commons/ts && bun test tests/	quality-ladder.test.ts, quality-system.test.ts: a review by an agent is recorded as an agent's and graded E2 at most; a person's sample is recorded as a sample
+0021-ifqs FR-025	check	.github: cd commons/ts && bun test tests/	quality-ladder.test.ts, quality-system.test.ts: a proof is Fresh, Due or Stale by its cadence and Stale by change where a file of its chain, the requirement's own line or its commit's place in the history changed (real Git); the freshness words are also held by ifqs-ontology.test.ts
+0021-ifqs FR-026	check	.github: cd commons/ts && bun test tests/	quality-ledger.test.ts: a nonconformance carries its requirement, evidence, reason, opener and state, and is linked to a Problem change request (an unlinked one is listed as such)
+0021-ifqs FR-027	check	.github: cd commons/ts && bun test tests/	quality-ledger.test.ts: no event edits a state; the event that closes a nonconformance follows only a closed CAPA
+0021-ifqs FR-028	check	.github: cd commons/ts && bun test tests/	quality-ledger.test.ts, quality-system.test.ts: a CAPA states its corrective action and names a test that exists and proves the requirement (a name that does not exist is refused)
+0021-ifqs FR-029	check	.github: cd commons/ts && bun test tests/	quality-ledger.test.ts, quality-system.test.ts: a CAPA becomes verified only by the run that passes its named test at a revision that holds the corrective change (quality record does it); a failing, earlier or unrelated run verifies nothing
+0021-ifqs FR-030	check	.github: cd commons/ts && bun test tests/	quality-ledger.test.ts, quality-system.test.ts: a CAPA is closed only from verified and only by a named person's Decision with the person and the day; its nonconformance closes with it
+0021-ifqs FR-031	check	.github: cd commons/ts && bun test tests/	quality-ledger.test.ts, quality-system.test.ts: the index lists a nonconformance and its CAPA from the moment they are opened, and a closed one stays; the public page is 0022-trust's, Planned, M9
+0021-ifqs FR-032	check	.github: cd commons/ts && bun test tests/	quality-ladder.test.ts: the success criteria of 0021-ifqs are read as objectives (a metric named as OpenTelemetry names it, a target, a unit, an error budget, a window) whose measure is computed from the evidence and emitted as OpenTelemetry metrics
+0021-ifqs FR-033	check	.github: cd commons/ts && bun test tests/	quality-ladder.test.ts, quality-system.test.ts: a spent error budget opens a nonconformance of its own, and the remaining budget is shown with the objective
+0021-ifqs FR-034	check	.github: cd commons/ts && bun test tests/	quality-ladder.test.ts: commons declares the suggested objectives (the share at E3, the review debt, not_run, the oldest open nonconformance, the stale proofs, the figures with no grade)
 0021-ifqs FR-035	none	-	Planned, M3 of issue #10: the layers check holds rung 9 as an observer once 0016-ladder amends the ladder
-0021-ifqs FR-036	none	-	Planned, M7 of issue #10: the tier a harness claims is judged against the requirements of it and the tiers below
+0021-ifqs FR-036	check	.github: cd commons/ts && bun test tests/	quality-ladder.test.ts, quality-system.test.ts: quality tier judges a claim against the requirements of the tier and of those below it in the register
 0021-ifqs FR-037	none	-	Planned, M9 of issue #10: the quality console
 0021-ifqs FR-038	none	-	Planned, M9 of issue #10: attestation by recorded sample
 0021-ifqs FR-039	none	-	Planned, M9 of issue #10: pre-registered test plans
 0021-ifqs FR-040	none	-	Planned, M9 of issue #10: mutation runs and the strength of a proof
 0021-ifqs FR-041	none	-	Planned, M9 of issue #10: agents' reviews and the person's sampling of them
 0021-ifqs FR-042	check	.github: cd commons/ts && bun test tests/	quality-branch.test.ts: a run kept unsigned is E3 and one kept in a signed commit E4 (SSH key made by ssh-keygen), a note is path, sha256 and grade with one paragraph per run, and a note that does not match its file or a chain that does not verify is E0
+0021-ifqs FR-043	check	.github: cd commons/ts && bun test tests/	quality-ledger.test.ts: each event is one redacted file quality/records/NNNNNN-<kind>.json on the quality branch, chained to the file before it, found when changed, removed or inserted, and signed where Git is set to sign
+0021-ifqs FR-044	check	.github: cd commons/ts && bun test tests/	quality-ladder.test.ts: the default cadences are 30 days for a run, 7 for a probe, 90 for a statement and a year for a review
 0022-trust FR-001	none	-	Planned, M9 of issue #10: the generator of the Trust page and its --check
 0022-trust FR-002	none	-	Planned, M9 of issue #10: the figures of the page: grade, freshness, review debt, objectives, not_run
 0022-trust FR-003	none	-	Planned, M9 of issue #10: failures listed before successes
