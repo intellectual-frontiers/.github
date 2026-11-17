@@ -10,7 +10,7 @@ import { chmod, existsSync, mkdir, readDirSync, readTextFile, remove, statSync, 
 import { join } from "../runtime/path.ts";
 import { execPath, run, which } from "../runtime/proc.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
-import { IFWS, mtime, needsWorld, ONE_REPOSITORY, REMOTE, withWorld, type World } from "./ifws-fixtures.ts";
+import { evidenceFiles, IFWS, mtime, needsWorld, ONE_REPOSITORY, REMOTE, withWorld, type World } from "./ifws-fixtures.ts";
 
 const TWO_GROUPS = {
   repositories: [
@@ -277,7 +277,7 @@ proves(
 );
 
 proves(
-  ["0024-ifws-host FR-014", "0024-ifws-host FR-013", "0023-if-workspaces FR-034"],
+  ["0024-ifws-host FR-014", "0024-ifws-host FR-013", "0023-if-workspaces FR-034", "0025-ifws FR-026"],
   "the commit-msg hook, run by Git through core.hooksPath, stops a commit that names no issue or uses a closing word a host reads, and lets one that names its issue through",
   async () => {
     await withWorld(async (w) => {
@@ -286,6 +286,7 @@ proves(
       assertEquals((await w.ifws("apply")).code, 0);
       const bin = await toolsWith(w, ["git", "sh", "dirname"]);
       const path = `${bin}:${w.env["PATH"] ?? process.env["PATH"] ?? ""}`;
+      const records = evidenceFiles(w.home).length;
       const none = await commit(w, "a change that names no issue", path);
       assertEquals(none.code !== 0, true, none.stderr);
       assertStringIncludes(none.stderr, "names no issue");
@@ -295,6 +296,8 @@ proves(
       const good = await commit(w, "a change\n\nRefs #10", path);
       assertEquals(good.code, 0, good.stderr);
       assertEquals(await w.git(w.repo, "log", "-1", "--format=%s"), "a change");
+      // a hook only reads: it wrote no evidence record
+      assertEquals(evidenceFiles(w.home).length, records);
     });
   },
   needsWorld,

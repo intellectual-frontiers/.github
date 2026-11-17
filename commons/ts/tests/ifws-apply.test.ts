@@ -7,7 +7,7 @@
  *
  * @module
  */
-import { existsSync, mkdir, readTextFile, remove, writeTextFile } from "../runtime/fs.ts";
+import { existsSync, mkdir, readDirSync, readTextFile, remove, writeTextFile } from "../runtime/fs.ts";
 import { join } from "../runtime/path.ts";
 import { acquireLock } from "../runtime/lock.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
@@ -57,7 +57,7 @@ proves(
 );
 
 proves(
-  ["0023-if-workspaces FR-025"],
+  ["0023-if-workspaces FR-025", "0025-ifws FR-023", "0023-if-workspaces FR-002"],
   "apply is idempotent: a second run changes no file, no configuration and no state record",
   async () => {
     await withWorld(async (w) => {
@@ -71,6 +71,18 @@ proves(
       assertEquals((await w.ifws("apply")).code, 0);
       assertEquals(await Promise.all(files.map((f) => readTextFile(join(w.home, f)))), first);
       assertEquals(await readTextFile(join(w.repo, ".git", "config")), config);
+      // the root holds the repositories' hosts and the workspace's own area, and the area holds what the specification names
+      const allowedRoot = [".if-workspaces", "git.example.org", "AGENTS.auto.md", "core.auto.code-workspace", "lefthook.auto.yml"];
+      assertEquals(
+        readDirSync(w.home)
+          .map((e) => e.name)
+          .filter((n) => !allowedRoot.includes(n)),
+        [],
+      );
+      const area = readDirSync(join(w.home, ".if-workspaces"))
+        .map((e) => e.name)
+        .sort();
+      assertEquals(area, ["evidence", "hooks", "modules.auto.json", "state.auto.json", "tools.auto.json", "workspace.ts"]);
     });
   },
   needsWorld,

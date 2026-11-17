@@ -10,6 +10,7 @@ import { mkdir, readDirSync, readTextFileSync, withTempDir, writeTextFile } from
 import { dirname, fromFileUrl, join, resolve } from "../runtime/path.ts";
 import { run, which } from "../runtime/proc.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { settingsOf } from "../workspaces/desired.ts";
 import { decodeManifest, type Manifest } from "../workspaces/manifest.ts";
 import { checkFiles, generated, headerText } from "../workspaces/render.ts";
 import { renderAll, type TemplateData } from "../workspaces/templates/mod.ts";
@@ -301,4 +302,33 @@ proves(
     }
   },
   skipSh,
+);
+
+proves(
+  ["0024-ifws-host FR-013"],
+  "the settings of a repository's local configuration are the hooks path, the signing the policy requires, the identity and, on Windows, core.longpaths, and nothing else",
+  () => {
+    const plain = settingsOf(manifestOf(BASE), { homePosix: "/w", windows: false });
+    assertEquals(plain, { "core.hooksPath": "/w/.if-workspaces/hooks" });
+    const signed = settingsOf(
+      manifestOf({
+        ...BASE,
+        policy: { regulatedDomain: ["FDA"] },
+        signing: { format: "ssh", key: "/k.pub" },
+        identity: { name: "A", email: "a@example.org" },
+      }),
+      { homePosix: "C:/Users/a/workspaces/", windows: true },
+    );
+    assertEquals(signed, {
+      "core.hooksPath": "C:/Users/a/workspaces/.if-workspaces/hooks",
+      "commit.gpgsign": "true",
+      "gpg.format": "ssh",
+      "user.signingkey": "/k.pub",
+      "user.name": "A",
+      "user.email": "a@example.org",
+      "core.longpaths": "true",
+    });
+    // a signing format that is neither is refused by the manifest
+    assertEquals(decodeManifest({ ...BASE, signing: { format: "pgp" } }).kind, "err");
+  },
 );

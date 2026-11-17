@@ -43,7 +43,7 @@ function outcome(text: string[], findings: readonly Finding[]): Outcome {
 }
 
 async function commitMsg(ctx: Context, file: string | undefined): Promise<Outcome> {
-  if (file === undefined) return err({ kind: "usage", message: "commit-msg is given the file of the message" });
+  if (file === undefined) return err({ kind: "usage", message: "commit-msg is given the file of the message", noEvidence: true });
   const parsed = parseMessage(await readTextFile(file));
   const findings: Finding[] = [];
   const at = (ruleId: string, message: string): number =>
@@ -74,7 +74,11 @@ async function prePush(ctx: Context): Promise<Outcome> {
     const range = remote === undefined || ZEROS.test(remote) ? [local, "--not", "--remotes"] : [`${remote}..${local}`];
     const log = await run(["git", "log", "--format=%H %G?", ...range], { cwd: ctx.cwd, env: { GIT_TERMINAL_PROMPT: "0", LC_ALL: "C" } });
     if (!log.success)
-      return err({ kind: "environment", message: `git log could not read ${localRef}: ${log.stderr.trim().split("\n")[0] ?? ""}` });
+      return err({
+        kind: "environment",
+        noEvidence: true,
+        message: `git log could not read ${localRef}: ${log.stderr.trim().split("\n")[0] ?? ""}`,
+      });
     for (const entry of log.stdout.split("\n")) {
       const [sha, status] = entry.trim().split(" ");
       if (sha === undefined || sha === "") continue;
@@ -97,6 +101,7 @@ async function preCommit(ctx: Context): Promise<Outcome> {
   if (scan === undefined)
     return err({
       kind: "environment",
+      noEvidence: true,
       message: "no plaintext-token scanner is wired into this build of ifws (the policy scans are workspaces/scan/)",
     });
   const hits = await scan(ctx.cwd);
@@ -110,25 +115,31 @@ async function preCommit(ctx: Context): Promise<Outcome> {
   return outcome([], findings);
 }
 
+/** The checker a hook names, on the words after `--`. */
+function check(ctx: Context, name: string, rest: readonly string[]): Promise<Outcome> {
+  if (!isHookName(name))
+    return Promise.resolve(err({ kind: "usage", message: `${JSON.stringify(name)} is not a hook: ${HOOK_NAMES.join(", ")}` }));
+  switch (name) {
+    case "commit-msg":
+      return commitMsg(ctx, rest[0]);
+    case "pre-push":
+      return prePush(ctx);
+    case "pre-commit":
+      return preCommit(ctx);
+    default:
+      return absurd(name);
+  }
+}
+
 const hook = defineCommand({
   name: "hook",
   summary: `The checker the generated Git hooks run (${HOOK_NAMES.join(", ")}); it only reads.`,
   options: { ...GLOBAL_OPTIONS },
   operands: [{ name: "HOOK", help: `One of ${HOOK_NAMES.join(", ")}.`, arity: "one" }],
-  run: (ctx, args) => {
-    const [name = ""] = args.positionals;
-    if (!isHookName(name))
-      return Promise.resolve(err({ kind: "usage", message: `${JSON.stringify(name)} is not a hook: ${HOOK_NAMES.join(", ")}` }));
-    switch (name) {
-      case "commit-msg":
-        return commitMsg(ctx, args.rest[0]);
-      case "pre-push":
-        return prePush(ctx);
-      case "pre-commit":
-        return preCommit(ctx);
-      default:
-        return absurd(name);
-    }
+  run: async (ctx, args) => {
+    // a hook only reads: whatever it finds, it writes no evidence record (0025-ifws FR-026)
+    const done = await check(ctx, args.positionals[0] ?? "", args.rest);
+    return done.kind === "ok" ? ok({ ...done.value, noEvidence: true }) : err({ ...done.error, noEvidence: true });
   },
 });
 

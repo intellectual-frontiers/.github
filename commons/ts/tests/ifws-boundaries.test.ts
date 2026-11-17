@@ -157,3 +157,33 @@ proves(
     assertEquals(bad, []);
   },
 );
+
+proves(
+  ["0023-if-workspaces FR-003", "0023-if-workspaces FR-004", "0024-ifws-host FR-020"],
+  "no code of workspaces/ names ~/.ssh, a credential store, or the user's or the system's Git configuration, and none writes a Git configuration but a repository's own",
+  () => {
+    const bad: string[] = [];
+    for (const f of WORKSPACES) {
+      const text = readTextFileSync(join(ROOT, f));
+      // code with its comments taken out but its strings kept: a path named in a string is a path read or written
+      const stripped = text.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");
+      for (const re of [
+        /\.ssh\b/,
+        /\.gitconfig\b/,
+        /\/etc\/gitconfig/,
+        /--global\b/,
+        /--system\b/,
+        /GIT_CONFIG_GLOBAL|GIT_CONFIG_SYSTEM/,
+        /credential\.helper|\.git-credentials|keychain|keyring/i,
+        /\.npmrc|\.zshenv|\.profile\b/,
+      ]) {
+        if (re.test(stripped)) bad.push(`${f}: ${re.source}`);
+      }
+      // every `git config` the library runs either reads (`--get`) or sets in the repository's own configuration (`--local`)
+      for (const m of stripped.matchAll(/"config"[^\n]*/g))
+        if (!/--(?:local|get)/.test(stripped.slice(Math.max(0, (m.index ?? 0) - 120), (m.index ?? 0) + 200)))
+          bad.push(`${f}: a git config that neither reads nor is --local`);
+    }
+    assertEquals(bad, []);
+  },
+);

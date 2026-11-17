@@ -13,6 +13,10 @@
  * cannot be written). Every run writes one evidence record under `<home>/.if-workspaces/evidence/`, in the shape of an IFQS test record, including a run that ends in 2 (a case that is `not_run`, with the
  * reason); the exceptions are the ones the specifications make (the printing form of `ifws shell`, a Git hook, help) and a run where the workspace's own area is not there to hold it.
  *
+ * Credits (commons 0023-if-workspaces FR-046): the layout, and the ideas of `ensure`, `status` and `doctor`, are carried on from the earlier workspace tools, and their author is credited here; the ideas of a source
+ * state and a target state, templates over data, `apply`, `diff`, `status`, `verify` and a state record are chezmoi's (Tom Payne and contributors, MIT license), taken as inspiration only: no chezmoi code
+ * or program is used; and Git's `git-foo` convention, by which `git foo` runs the program `git-foo` found on the `PATH`, is the model of the modules of this command.
+ *
  * @module
  */
 import process from "node:process";
@@ -212,7 +216,7 @@ export async function main(argv: readonly string[], deps: MainDeps = {}): Promis
   let code: number;
   let facts: EvidenceFacts | undefined;
   let findings: Report["findings"] = [];
-  let noEvidence = false;
+  let noEvidence: boolean;
   let notRun: string | undefined;
   if (outcome.kind === "ok") {
     const r = outcome.value;
@@ -226,6 +230,7 @@ export async function main(argv: readonly string[], deps: MainDeps = {}): Promis
     else if (r.text !== "") out(line(r.text));
   } else {
     status = outcome.error.kind === "usage" ? "Usage" : "Environment";
+    noEvidence = outcome.error.noEvidence === true;
     code = exitCodeOf(status);
     notRun = outcome.error.message.split("\n")[0] ?? "";
     note(line(`ifws: ${executed === undefined ? "" : `${command}: `}${outcome.error.message}`));

@@ -88,7 +88,7 @@ export type EvidenceFacts = {
 };
 
 /** Why a run could not be done: a command line that does not fit, or a host that cannot do it. */
-export type Failure = { readonly kind: "usage" | "environment"; readonly message: string };
+export type Failure = { readonly kind: "usage" | "environment"; readonly message: string; readonly noEvidence?: boolean };
 
 /** What a command gives back. */
 export type Outcome = Result<Report, Failure>;

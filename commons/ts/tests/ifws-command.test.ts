@@ -41,7 +41,7 @@ const MANIFEST_OK = JSON.stringify({
 });
 
 proves(
-  ["0025-ifws FR-002", "0025-ifws FR-003", "0025-ifws FR-001"],
+  ["0025-ifws FR-002", "0025-ifws FR-003", "0025-ifws FR-001", "0023-if-workspaces FR-004"],
   "ifws --help says it manages only Intellectual Frontiers Workspaces and is not an IFC or Mizan controller, and list names every module with its source",
   async () => {
     await withWorld(async (w) => {
@@ -109,7 +109,7 @@ proves(
 );
 
 proves(
-  ["0025-ifws FR-010", "0023-if-workspaces FR-001", "0025-ifws FR-022"],
+  ["0025-ifws FR-010", "0023-if-workspaces FR-001", "0025-ifws FR-022", "0024-ifws-host FR-001", "0024-ifws-host FR-002"],
   "a root that does not exist is exit status 3, --home and $IFC_WORKSPACES_HOME choose the root, and --json and --sarif give the report and the findings as data",
   async () => {
     await withWorld(async (w) => {
@@ -148,6 +148,13 @@ proves(
         [["ifws/manifest-remote", "error"]],
       );
       assert(!existsSync(w.repo), "a manifest that does not decode did not stop the run");
+      // the starter manifest is written once and never rewritten (0024-ifws-host FR-002)
+      await w.manifest(ONE_REPOSITORY);
+      const written = await readTextFile(join(w.home, ".if-workspaces", "workspace.ts"));
+      const again = await w.ifws("init");
+      assertEquals(again.code, 0);
+      assertStringIncludes(again.stdout, "already a workspace");
+      assertEquals(await readTextFile(join(w.home, ".if-workspaces", "workspace.ts")), written);
     });
   },
   needsWorld,
@@ -269,7 +276,7 @@ proves(
 );
 
 proves(
-  ["0023-if-workspaces FR-041", "0023-if-workspaces FR-042", "0025-ifws FR-023"],
+  ["0023-if-workspaces FR-041", "0023-if-workspaces FR-042", "0023-if-workspaces FR-043", "0025-ifws FR-023"],
   "every run writes one evidence record in the shape of an IFQS record, a run that ends in usage is not_run with its reason, and none holds a credential",
   async () => {
     await withWorld(async (w) => {
@@ -316,7 +323,7 @@ proves(
 );
 
 proves(
-  ["0024-ifws-host FR-017", "0024-ifws-host FR-018", "0025-ifws FR-021"],
+  ["0024-ifws-host FR-017", "0024-ifws-host FR-018", "0025-ifws FR-021", "0025-ifws FR-026"],
   "ifws shell <shell> prints the snippet on standard output and writes nothing, no file and no evidence record, and a shell it does not know is exit status 2",
   async () => {
     await withWorld(async (w) => {
