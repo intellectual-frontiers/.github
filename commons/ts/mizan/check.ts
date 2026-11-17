@@ -138,7 +138,6 @@ export function main(
                   ifccmOntology.changeRequestStates,
                   ifccmOntology.issueReferenceKinds,
                   ifccmOntology.enforcementPhases,
-                  ifccmOntology.gitHostKinds,
                   ifccmOntology.regulatedDomains,
                   ifccmOntology.traceStages,
                   ifccmOntology.authorityFunctions,

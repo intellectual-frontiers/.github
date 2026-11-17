@@ -10,7 +10,7 @@
 import { absurd } from "../kernel/absurd.ts";
 import type { Result } from "../kernel/result.ts";
 
-/** The kinds of host: the keys of the code list `ifws:GitManagerKind` and `ifccm:GitHostKind`. */
+/** The kinds of host: the keys of the code list `ifws:GitManagerKind`, the one list of Git host kinds (`ifccm:hostedOn` ranges over it). */
 export type HostKind = "Github" | "Gitlab" | "Git";
 
 /** The capabilities a host may offer: the keys of the code list `ifws:GitCapability`. */

@@ -44,6 +44,7 @@ import {
   XSD,
   xsd,
 } from "../../ts/kernel/rdf.ts";
+import { IFWS, ifws } from "../ifws/ifws.ts";
 import { bases, cfr11, cfr820, MZ, MZID, mz, OntologyTerm } from "../mizan/mizan.ts";
 
 /** The namespace of IFCCM's terms. */
@@ -70,7 +71,6 @@ export const ifccm = vocabulary(IFCCM, {
   RegulatedDomain: "owl:Class",
   HarnessDeclaration: "owl:Class",
   EnforcementPhase: "owl:Class",
-  GitHostKind: "owl:Class",
   TraceStage: "owl:Class",
   AuthorityFunction: "owl:Class",
   area: "owl:DatatypeProperty",
@@ -137,13 +137,6 @@ export const issueReferenceKinds = codes(classSchema(ifccm.IssueReferenceKind, C
 export const enforcementPhases = codes(classSchema(ifccm.EnforcementPhase, CODE), IFCCM, {
   Warn: { label: en("warn"), definition: en("A finding is a warning held by a baseline that only shrinks.") },
   Gate: { label: en("gate"), definition: en("A finding fails whatever the baseline holds.") },
-});
-
-/** The kinds of Git host the check reads through one interface (0020-ifccm FR-027). */
-export const gitHostKinds = codes(classSchema(ifccm.GitHostKind, CODE), IFCCM, {
-  GitHub: { label: en("GitHub"), definition: en("A repository hosted on GitHub: its issues and its pull requests.") },
-  GitLab: { label: en("GitLab"), definition: en("A repository hosted on GitLab: its issues and its merge requests.") },
-  PlainGit: { label: en("plain Git"), definition: en("A repository with no host that keeps issues: references are checked by their form alone.") },
 });
 
 /** The schema of a regulated domain a harness may claim (`ifccm:RegulatedDomain`), with the law it rests on where it is law. */
@@ -261,7 +254,7 @@ export const ChangeRequest = classSchema(ifccm.ChangeRequest, {
   reference: one(ifccm.reference, range.string),
   requestKind: one(ifccm.requestKind, range.ref<"ifccm:ChangeRequestKind">()),
   requestState: one(ifccm.requestState, range.ref<"ifccm:ChangeRequestState">()),
-  hostedOn: one(ifccm.hostedOn, range.ref<"ifccm:GitHostKind">()),
+  hostedOn: one(ifccm.hostedOn, range.ref<"ifws:GitManagerKind">()),
   subRequestOf: optional(ifccm.subRequestOf, range.ref<"ifccm:ChangeRequest">()),
   requestsCapability: optional(ifccm.requestsCapability, range.ref<"ifccm:Capability">()),
   why: optional(ifccm.why, range.string),
@@ -362,11 +355,6 @@ export const classes = [
     subClassOf: [skos.Concept],
     definition: en("warn before a harness declares production, gate from the day it does."),
   }),
-  OwlClass.make(ifccm.GitHostKind, {
-    label: en("Git host kind"),
-    subClassOf: [skos.Concept],
-    definition: en("GitHub, GitLab or plain Git: the kinds of host the check reads through one interface."),
-  }),
   OwlClass.make(ifccm.TraceStage, {
     label: en("Trace stage"),
     subClassOf: [skos.Concept],
@@ -389,7 +377,7 @@ export const properties = [
   DatatypeProperty.make(ifccm.reference, { domain: ifccm.ChangeRequest, range: xsd.string, label: en("reference"), definition: en("How a commit names the change request: `#N`, or `owner/repo#N` for another repository.") }),
   ObjectProperty.make(ifccm.requestKind, { domain: ifccm.ChangeRequest, range: ifccm.ChangeRequestKind, label: en("request kind"), definition: en("capability request or problem.") }),
   ObjectProperty.make(ifccm.requestState, { domain: ifccm.ChangeRequest, range: ifccm.ChangeRequestState, label: en("request state"), definition: en("open or closed.") }),
-  ObjectProperty.make(ifccm.hostedOn, { domain: ifccm.ChangeRequest, range: ifccm.GitHostKind, label: en("hosted on"), definition: en("The kind of Git host that keeps the change request.") }),
+  ObjectProperty.make(ifccm.hostedOn, { domain: ifccm.ChangeRequest, range: ifws.GitManagerKind, label: en("hosted on"), definition: en("The kind of Git host that keeps the change request.") }),
   ObjectProperty.make(ifccm.subRequestOf, { domain: ifccm.ChangeRequest, range: ifccm.ChangeRequest, label: en("sub-request of"), definition: en("The parent change request of a child change request (a sub-issue).") }),
   ObjectProperty.make(ifccm.requestsCapability, { domain: ifccm.ChangeRequest, range: ifccm.Capability, label: en("requests capability"), definition: en("The capability the change request asks for.") }),
   DatatypeProperty.make(ifccm.why, { domain: ifccm.ChangeRequest, range: xsd.string, label: en("why"), definition: en("Why the capability is wanted: the first section of its issue.") }),
@@ -465,7 +453,6 @@ export const terms = [
   specializes("RegulatedDomain", SKOS_CONCEPT, "0020-ifccm FR-010"),
   specializes("HarnessDeclaration", prov.Entity.iri, "0020-ifccm FR-010"),
   specializes("EnforcementPhase", SKOS_CONCEPT, "0020-ifccm FR-011"),
-  specializes("GitHostKind", SKOS_CONCEPT, "0020-ifccm FR-027"),
   specializes("TraceStage", SKOS_CONCEPT, "0020-ifccm FR-014"),
   specializes("AuthorityFunction", SKOS_CONCEPT, "0020-ifccm FR-018"),
 ] as const;
@@ -473,7 +460,7 @@ export const terms = [
 /** The file this module states: its name, its prefixes and its individuals. */
 export const file: OntologyFile = {
   name: "ifccm",
-  prefixes: [IFCCM, IFCCMV, MZ, MZID, OSLC_CM, OWL, PROV, RDFS, SKOS, XSD],
+  prefixes: [IFCCM, IFCCMV, IFWS, MZ, MZID, OSLC_CM, OWL, PROV, RDFS, SKOS, XSD],
   individuals: [
     ifccmOntology,
     ...classes,
@@ -482,7 +469,6 @@ export const file: OntologyFile = {
     ...Object.values(changeRequestStates),
     ...Object.values(issueReferenceKinds),
     ...Object.values(enforcementPhases),
-    ...Object.values(gitHostKinds),
     ...Object.values(regulatedDomains),
     ...Object.values(traceStages),
     ...Object.values(authorityFunctions),
