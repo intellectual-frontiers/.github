@@ -37,7 +37,7 @@ export const about: About = {
   ],
   commands: [
     { run: "bun tools/generate-packaging.ts", does: "Writes `generated/` again from the ontology; with `--check` it fails where a file is stale." },
-    { run: "bun tools/spec-kit-check.ts", does: "Checks `spec-kit/` against the format of 0003-spec-kit." },
+    { run: "bun tools/mizan-check.ts", does: "Checks `spec-kit/` against the format of 0003-mizan." },
     { run: "bun tools/shell-portability-check.ts FILE...", does: "Finds what only GNU tools have in shell scripts." },
   ],
 };

@@ -2,7 +2,7 @@
  * The spec kits read for the site (commons 0011-documentation FR-015, FR-024), in either of their two layouts. Commons' layout: the
  * register of numbers, the register of what enforces each requirement, and each specification in force with its header (title, status,
  * owner, domain, part), its `**Input:**` line, its requirements, success criteria and open questions, and its text; it reads what
- * `commons/tools/spec-kit-check.ts` checks, and assumes the folder passes that check. The plain layout of Spec Kit: every folder of the
+ * `commons/tools/mizan-check.ts` checks, and assumes the folder passes that check. The plain layout of Spec Kit: every folder of the
  * specifications that holds a `spec.md`, its title, status and input where it has them, its requirements in either form
  * (`- **FR-001** text` or `- **FR-001**: text`), the `reviewed.tsv` beside it, and the constitution.
  *

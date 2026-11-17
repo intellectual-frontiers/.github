@@ -39,9 +39,9 @@ jobs:
       - name: Commons' generated files and specifications, as a person checks them, on Bun and on Node 26
         run: |
           bun commons/tools/generate-packaging.ts --check
-          bun commons/tools/spec-kit-check.ts
+          bun commons/tools/mizan-check.ts
           node commons/tools/generate-packaging.ts --check
-          node commons/tools/spec-kit-check.ts
+          node commons/tools/mizan-check.ts
 
   tests:
     strategy:
@@ -79,6 +79,6 @@ jobs:
         shell: bash
         run: |
           bun commons/tools/generate-packaging.ts --check
-          bun commons/tools/spec-kit-check.ts
+          bun commons/tools/mizan-check.ts
           node commons/tools/generate-packaging.ts --check
-          node commons/tools/spec-kit-check.ts
+          node commons/tools/mizan-check.ts

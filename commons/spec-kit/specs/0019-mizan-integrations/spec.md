@@ -1,0 +1,78 @@
+# Feature Specification: IFC Mizan Integrations
+
+**Spec ID:** 0019-mizan-integrations
+**Status:** Draft
+**Owner:** if
+**Domain:** commons
+**Part of:** 0003-mizan
+
+**Input:** IFC Mizan Integrations (`commons/ts/mizan/integrations/`) is the module of Mizan's extensions and plugins that brings outside ontologies and schemas into Intellectual Frontiers' typed TypeScript form, and turns ours into reusable, well-known ontologies, so that a harness takes standards instead of coining terms (`0018-standards-first`), and a consumer that is not TypeScript reads standard forms of what we state.
+
+## The module
+
+- **FR-001**: The module MUST live in `commons/ts/mizan/integrations/` and be exported as `@intellectual-frontiers/commons/ts/mizan/integrations`, in two layers: `pure/`, functions over text with no effect on the host, and `host/`, which fetches, reads and writes files and checks pins.
+- **FR-002**: An integration MUST be a typed record: its id, its direction (`import` or `export`), the formats it reads and writes, the `Standard` it handles, and a `run` that returns a `Result` of its output or its findings; a registry MUST look integrations up by their formats. There MUST be no `any` and no non-null `!`, and a `switch` over a union MUST be exhaustive.
+- **FR-003**: Mizan's own checks (the requirement syntax, the standards-first rules) MUST be plugins through the same extension point, so that a harness can add its rules without a fork.
+- **FR-004**: The kernel MUST stay free of readers (0012-ontology FR-007); every reader of an RDF syntax or of a schema language MUST be in this module.
+
+## Import
+
+- **FR-005**: An import MUST be made only where a term or schema a specification uses is not already available, and MUST name the slice it needs (a manifest of terms, with an optional closure), never a whole standard.
+- **FR-006**: An import MUST refuse a source whose SHA-256 or license differs from its `Standard` record, and MUST write a generated `.auto.` TypeScript module (a typed vocabulary, class schemas and code lists) whose header names the source, version, hash, license and generator, and whose terms have the basis `adopts`.
+- **FR-007**: An import MUST report what the typed form cannot hold (a blank node, an RDF list, a restriction) as a finding, and MUST NOT drop it silently.
+- **FR-008**: The graph a generated module writes, in canonical N-Triples, MUST equal the source's graph for the imported slice (0012-ontology FR-013).
+- **FR-009**: Each import MUST leave an `ImportRecord` of the ontology: what was imported, from where, when, by which generator and with which hash, in PROV-O.
+
+## Export
+
+- **FR-010**: The module MUST write our ontology as Turtle, N-Triples, N-Quads and JSON-LD (the kernel's writers), and as SHACL shapes and JSON Schema (from class schemas), SKOS concept schemes (from code lists), SQL code-list tables, SSSOM mappings (from terms whose basis is `maps`), and later OWL, RDF/XML and a DCAT entry for each published ontology.
+- **FR-011**: Each export MUST be read or checked by an independent tool in a test (an RDF parser for the RDF forms, a SHACL validator for shapes, a JSON Schema validator for schemas).
+- **FR-012**: The module MUST NOT publish anything to an outside project; where one of our terms could improve a standard, it MUST only prepare a proposal bundle for a person to decide on.
+
+## Languages
+
+- **FR-013**: The module's code MUST be TypeScript 7 where it can be, and the best stack for the job through a typed `Exception` where it cannot (0017-two-languages FR-003, FR-004); a TypeScript part MUST run on Bun and on Node 26, and an exception's tests run on the platforms it names.
+
+## Out of scope
+
+- What is standard: `0018-standards-first`.
+- The RDF kernel's writers: `0012-ontology`.
+
+## Edge cases
+
+- An import that needs three terms of schema.org: only those, per FR-005.
+- A source whose hash differs from its record: refused, per FR-006.
+- A source with an OWL restriction: the term is written, and a finding names the restriction, per FR-007.
+- A source with an RDF list in a field: a finding, per FR-007.
+- A round trip that adds or loses a triple: the import fails, per FR-008.
+- A term of ours whose basis is `maps` to a NIST term: an SSSOM row, per FR-010.
+- An exporter whose output no independent tool reads: not shipped, per FR-011.
+- A term that could be proposed to schema.org: a bundle is prepared and nothing is sent, per FR-012.
+
+## Assumptions
+
+- Hand-written parsers cover Turtle, N-Triples and JSON; XML-based formats (RDF/XML, XSD) may need an `Exception` for a reader, decided when the first one is needed.
+- The first sources are candidates until Phase 0 of issue #10 confirms their format, version and license: schema.org, DPV, PROV, OSCAL (NIST and FedRAMP), FHIR and US Core, NIEM, SPDX and CycloneDX.
+
+## Open questions
+
+- **OQ-1**: Which XML reader, if one is needed, becomes the first `Exception`.
+- **OQ-2**: Whether imports are kept in this repository or in the importing harness, per standard.
+
+## Key entities
+
+- **Integration** - an import or an export, typed.
+- **Registry** - the lookup of integrations by format.
+- **Slice** - the named part of a standard that an import takes.
+- **ImportRecord** - the provenance of one import.
+
+## Success criteria
+
+- **SC-001**: A standard we use is imported, never hand-copied, and its generated module says where it came from.
+- **SC-002**: Each export is read by an independent tool in a test.
+
+## Review & acceptance checklist
+
+- [x] Every requirement is testable (MUST / MUST NOT), not aspirational
+- [x] No company fact is asserted here
+- [x] Every open item is marked, not silently decided

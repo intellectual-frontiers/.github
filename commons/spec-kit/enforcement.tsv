@@ -23,14 +23,17 @@ requirement	mechanism	by	note
 0002-packaging FR-013	check	archon: archon test	archon's packaging tests: only an allowed executable is run, shell syntax and forbidden commands are refused
 0002-packaging FR-014	check	.github: bun test ./tests/	Pins: the env file, the TOML and the TypeScript module agree, and Bun is pinned on every platform; Generator: a bad checksum, a pin with no version and a repeated key are refused
 0002-packaging FR-015	check	archon: archon test	archon's pin tests: its built-in pins are the file commons generates, and the store reads them
-0003-spec-kit FR-001	check	.github: bun test ./tests/	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
-0003-spec-kit FR-002	check	.github: bun test ./tests/	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
-0003-spec-kit FR-003	check	.github: bun test ./tests/	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
-0003-spec-kit FR-004	check	.github: bun test ./tests/	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
-0003-spec-kit FR-005	check	.github: bun test ./tests/	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
-0003-spec-kit FR-006	check	.github: bun test ./tests/	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
-0003-spec-kit FR-007	check	.github: bun test ./tests/	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
-0003-spec-kit FR-008	check	.github: bun test ./tests/	SpecKit: a Part of line naming no specification of the folder, or the specification itself, is named
+0003-mizan FR-001	check	.github: bun test ./tests/	Mizan: the tool runs on commons' own folder and each rule is broken in a copy and named
+0003-mizan FR-002	check	.github: bun test ./tests/	Mizan: the tool runs on commons' own folder and each rule is broken in a copy and named
+0003-mizan FR-003	check	.github: bun test ./tests/	Mizan: the tool runs on commons' own folder and each rule is broken in a copy and named
+0003-mizan FR-004	check	.github: bun test ./tests/	Mizan: the tool runs on commons' own folder and each rule is broken in a copy and named
+0003-mizan FR-005	check	.github: bun test ./tests/	Mizan: the tool runs on commons' own folder and each rule is broken in a copy and named
+0003-mizan FR-006	check	.github: bun test ./tests/	Mizan: the tool runs on commons' own folder and each rule is broken in a copy and named
+0003-mizan FR-007	check	.github: bun test ./tests/	Mizan: the tool runs on commons' own folder and each rule is broken in a copy and named
+0003-mizan FR-008	check	.github: bun test ./tests/	Mizan: a Part of line naming no specification of the folder, or the specification itself, is named
+0003-mizan FR-009	check	.github: bun test ./tests/	Mizan: the old tool name runs the new one and gives the same findings
+0003-mizan FR-010	check	.github: bun test ./tests/	Mizan: Active and Deferred are accepted, a word outside the list is named
+0003-mizan FR-011	none	-	Planned, Phase 4 of issue #10: the OSCAL mapping is delivered by 0019-mizan-integrations
 0002-packaging FR-016	check	.github: bun test ./tests/	Record: the fields, their order and their values, as the TypeScript module carries them; Generator: a bad field is refused
 0004-rules FR-001	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
 0004-rules FR-002	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
@@ -307,6 +310,7 @@ requirement	mechanism	by	note
 0012-ontology FR-011	check	.github: bun test ./tests/	Generator: packaging.auto.ttl is what the modules make, says its generator and is the same bytes twice
 0012-ontology FR-012	check	.github: bun test ./tests/	Ontology: source_sha256 is the SHA-256 of the canonical N-Triples, and a comment changes no generated file
 0012-ontology FR-013	none	-	a one-time comparison when the Turtle was converted (7 files, 2874 triples, reported in the commit that converted it); the Turtle it was compared with is deleted in that commit
+0012-ontology FR-014	none	-	Planned, Phase 2 of issue #10: the basis fields are not in the schemas yet
 0013-acme FR-001	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/acme.test.ts: a name and its wildcard issued by a fake CA, the TXT values computed from its tokens and the account's thumbprint, the wait after every set, the chain, the key whose SPKI the CSR carried, notAfter; the directories named
 0013-acme FR-002	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/acme.test.ts: the fake CA verifies every JWS (ES256, nonce spent once, url, jwk only for newAccount, kid after); badNonce retried once, and given up after five
 0013-acme FR-003	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/acme.test.ts: an account made with no key, found again with the key it gave back, asked for then made for an unknown key, a non-ES256 key refused
@@ -334,3 +338,42 @@ requirement	mechanism	by	note
 0015-trace FR-009	check	.github: cd commons/ts && bun test tests/	kernel/trace.test.ts: placements by one path, a home naming files and literal characters; unclassified and a tie found
 0015-trace FR-010	check	.github: cd commons/ts && bun test tests/	kernel/trace.test.ts: imports of every form resolved; above and around found with both files and rungs; same rung and packages not
 0015-trace FR-011	check	.github: cd commons/ts && bun test tests/	runtime/trace.test.ts: a fixture tree on disk read; its findings held against a baseline written, passing, then failing when stale
+0016-ladder FR-001	none	-	Planned, Phase 2 and 3 of issue #10: the Rung class and the generator check are not built yet
+0016-ladder FR-002	none	-	Planned, Phase 2 and 3 of issue #10: the Rung class and the generator check are not built yet
+0016-ladder FR-003	none	-	Planned, Phase 2 and 3 of issue #10: the Rung class and the generator check are not built yet
+0016-ladder FR-004	none	-	Planned, Phase 2 and 3 of issue #10: the Rung class and the generator check are not built yet
+0016-ladder FR-005	none	-	Planned, Phase 2 and 3 of issue #10: the Rung class and the generator check are not built yet
+0016-ladder FR-006	none	-	Planned, Phase 2 and 3 of issue #10: the Rung class and the generator check are not built yet
+0016-ladder FR-007	none	-	Planned, Phase 2 and 3 of issue #10: the Rung class and the generator check are not built yet
+0017-two-languages FR-001	none	-	Planned, Phase 1 and 3 of issue #10: a statement and controls whose checks are the harness's own, not built yet
+0017-two-languages FR-002	none	-	Planned, Phase 1 and 3 of issue #10: a statement and controls whose checks are the harness's own, not built yet
+0017-two-languages FR-003	none	-	Planned, Phase 1 and 3 of issue #10: a statement and controls whose checks are the harness's own, not built yet
+0017-two-languages FR-004	none	-	Planned, Phase 1 and 3 of issue #10: a statement and controls whose checks are the harness's own, not built yet
+0017-two-languages FR-005	none	-	Planned, Phase 1 and 3 of issue #10: a statement and controls whose checks are the harness's own, not built yet
+0017-two-languages FR-006	none	-	Planned, Phase 1 and 3 of issue #10: a statement and controls whose checks are the harness's own, not built yet
+0017-two-languages FR-007	none	-	Planned, Phase 1 and 3 of issue #10: a statement and controls whose checks are the harness's own, not built yet
+0018-standards-first FR-001	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
+0018-standards-first FR-002	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
+0018-standards-first FR-003	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
+0018-standards-first FR-004	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
+0018-standards-first FR-005	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
+0018-standards-first FR-006	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
+0018-standards-first FR-007	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
+0018-standards-first FR-008	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
+0018-standards-first FR-009	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
+0018-standards-first FR-010	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
+0018-standards-first FR-011	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
+0018-standards-first FR-012	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
+0019-mizan-integrations FR-001	none	-	Planned, Phase 4 of issue #10: the module is not built yet
+0019-mizan-integrations FR-002	none	-	Planned, Phase 4 of issue #10: the module is not built yet
+0019-mizan-integrations FR-003	none	-	Planned, Phase 4 of issue #10: the module is not built yet
+0019-mizan-integrations FR-004	none	-	Planned, Phase 4 of issue #10: the module is not built yet
+0019-mizan-integrations FR-005	none	-	Planned, Phase 4 of issue #10: the module is not built yet
+0019-mizan-integrations FR-006	none	-	Planned, Phase 4 of issue #10: the module is not built yet
+0019-mizan-integrations FR-007	none	-	Planned, Phase 4 of issue #10: the module is not built yet
+0019-mizan-integrations FR-008	none	-	Planned, Phase 4 of issue #10: the module is not built yet
+0019-mizan-integrations FR-009	none	-	Planned, Phase 4 of issue #10: the module is not built yet
+0019-mizan-integrations FR-010	none	-	Planned, Phase 4 of issue #10: the module is not built yet
+0019-mizan-integrations FR-011	none	-	Planned, Phase 4 of issue #10: the module is not built yet
+0019-mizan-integrations FR-012	none	-	Planned, Phase 4 of issue #10: the module is not built yet
+0019-mizan-integrations FR-013	none	-	Planned, Phase 4 of issue #10: the module is not built yet

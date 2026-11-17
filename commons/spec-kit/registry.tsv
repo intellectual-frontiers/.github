@@ -1,7 +1,7 @@
 number	slug	state
 0001	software-supply-chain	in force
 0002	packaging	in force
-0003	spec-kit	in force
+0003	mizan	in force
 0004	rules	in force
 0005	typescript-runtime	in force
 0006	signals	in force
@@ -14,3 +14,7 @@ number	slug	state
 0013	acme	in force
 0014	webauthn	in force
 0015	trace	in force
+0016	ladder	in force
+0017	two-languages	in force
+0018	standards-first	in force
+0019	mizan-integrations	in force
