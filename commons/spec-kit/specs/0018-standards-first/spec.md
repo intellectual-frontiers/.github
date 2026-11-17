@@ -21,17 +21,24 @@
 
 ## Authority and standards as data
 
-- **FR-006**: A standard MUST be a typed `Standard` of the ontology: its issuer, name, version, location, license (an SPDX identifier) and the SHA-256 of what was imported; a newer version of a standard than the pin MUST be a finding.
+- **FR-006**: A standard MUST be a typed `Standard` of the ontology: its issuer, name, version, location, license (an SPDX identifier) and the SHA-256 of what was imported; a newer version of a standard than the pin MUST be a finding (FR-014).
 - **FR-007**: A specification MUST copy only what a standard's license permits: a standard that cannot be redistributed (an ISO standard) is cited by its identifier and clause, never copied.
-- **FR-008**: A requirement that comes from law MUST cite its authority as typed data (an `Authority`: the title, part and section, for example 21 CFR Part 11 or 45 CFR 164.312).
+- **FR-008**: A requirement that comes from law MUST cite its authority as typed data (an `Authority`: the law's title, part and section as its jurisdiction writes them), in the form FR-015 gives.
 - **FR-009**: A feature's `plan.md` MUST have a section, Standards considered, naming the standards looked at and the one chosen.
 
 ## Reach
 
-- **FR-010**: The first domains are federal security (NIST publications, OSCAL and FedRAMP baselines), FDA's QMSR (21 CFR Part 820, incorporating ISO 13485:2016) and 21 CFR Part 11 (electronic records and signatures). A domain MUST be pulled up into commons when more than one harness should read the same facts.
+- **FR-010**: The first domains are federal security (NIST publications, OSCAL and FedRAMP baselines), FDA's QMSR (21 CFR Part 820, incorporating ISO 13485:2016) and 21 CFR Part 11 (electronic records and signatures). A domain MUST be pulled up into commons when more than one harness should read the same facts. Authority: mzid:authority-21-cfr-820, mzid:authority-21-cfr-11.
 - **FR-011**: Mizan's own formats MUST follow this order: requirements are worded in RFC 2119 keywords and EARS patterns, scenarios in Gherkin's Given, When, Then, mappings in SSSOM, provenance in PROV-O, catalogs in DCAT and licenses as SPDX identifiers.
 - **FR-012**: The rules of this specification MUST be delivered as warnings with a baseline that only shrinks (a new finding fails, and a line of the baseline that no longer occurs fails), never as a first-day failure of what a harness already holds.
 - **FR-013**: A term MAY be deprecated, with the day (`mz:deprecatedOn`) and the term that replaces it (`mz:replacedBy`); a deprecated term with no replacement, and a specification that names a deprecated term, MUST be found as findings the baseline may hold.
+
+## Checking the pins and the authorities
+
+- **FR-014**: WHEN `commons/ts/mizan/newer.ts` runs, it MUST read each manifest (`*.import.ts`) of the folder it is given (default `commons/ts/mizan/imports/`) that names a `latest` source, an `https://` URL that always serves the newest version of the standard (`http://` on the loopback address for a test), fetch it once, and give one finding, `mizan/standard-newer`, for each whose SHA-256 differs from the manifest's pin, as one sentence that names the standard, its pinned version, the URL and the two hashes. The SHA-256 is that of the text with its line ends normalised, as an import computes it (0019-mizan-integrations FR-014); a manifest with no `latest` is not read.
+- **FR-015**: A requirement that comes from law MUST cite its authority in this form: its text carries `Authority:` followed by one or more identifiers of typed `mz:Authority` individuals of the ontology (such as `mzid:authority-21-cfr-820`), separated by commas. A requirement whose text names a citation of the Code of Federal Regulations (a title, `CFR` and a part or section) or of the United States Code (a title, `U.S.C.` and a section) is taken to come from law; each such citation MUST be covered by one of the authorities the requirement names, that is, its text after the title's number and the words `Part` or `§` MUST begin with the authority's own citation, up to a part, a section or a hyphen. A requirement that names a law and does not come from it MUST be worded so that it names none. An authority a harness names MUST be one of the individuals the harness gives the rule.
+- **FR-016**: `commons/ts/mizan/rules.ts` MUST deliver FR-015 as a plugin, `mizan/authority-citation` (0003-mizan FR-019), that finds a requirement that names a citation of law and carries no `Authority:`, a requirement whose `Authority:` names an identifier that is no `mz:Authority` individual, and a citation no named authority covers, one finding for each, as a warning held by the baseline (FR-012).
+- **FR-017**: `newer.ts` MUST hold its findings against `mizan.newer.baseline.txt` beside the folder's `mizan.baseline.txt`, judged as `check.ts` judges its own (a finding the baseline does not hold fails, and a line that no longer occurs fails, and `--write-baseline` writes it), MUST exit 2 and name the URL where a `latest` source cannot be fetched, and MUST be opt-in: `check.ts` and `import.ts --check` MUST NOT use the network, so that the network never fails the offline check.
 
 ## Out of scope
 
@@ -49,6 +56,13 @@
 - A new `unaligned` term with no Decision on day 30: a finding in the baseline, not a failure, per FR-005.
 - The same term on day 91: the check fails, per FR-005.
 - A newer NIST publication than the pinned version: a stale-pin finding, per FR-006.
+- A manifest whose `latest` URL now serves other bytes than the pin: one finding, with both hashes, per FR-014.
+- A manifest whose `latest` URL serves the bytes of the pin: no finding, per FR-014.
+- A `latest` URL that cannot be fetched: exit 2 naming it, never a pass, and the offline check is not affected, per FR-017.
+- A requirement that names section 820.30 of 21 CFR and carries `Authority: mzid:authority-21-cfr-820` (whose citation is `21 CFR Part 820`): not found, because the part covers its sections, per FR-015.
+- A requirement that names part 8200 of 21 CFR under that authority: found, because 8200 does not begin with 820 at a boundary, per FR-015 and FR-016.
+- A requirement that names Part 11 of 21 CFR and carries no `Authority:`: found, per FR-015 and FR-016.
+- A requirement whose `Authority:` names `mzid:authority-nothing`, or an authority that does not cover the citation it names: found, per FR-016.
 - A specification of a feature whose `plan.md` names no standards: a warning and a baseline entry, per FR-009 and FR-012.
 
 ## Assumptions

@@ -33,16 +33,19 @@ requirement	mechanism	by	note
 0003-mizan FR-008	check	.github: bun test ./tests/	Mizan: a Part of line naming no specification of the folder, or the specification itself, is named
 0003-mizan FR-009	check	.github: bun test ./tests/	Mizan: the old tool name runs the new one and gives the same findings
 0003-mizan FR-010	check	.github: bun test ./tests/	Mizan: Active and Deferred are accepted, a word outside the list is named
-0003-mizan FR-011	none	-	Planned, Phase 4 of issue #10: the OSCAL mapping is delivered by 0019-mizan-integrations
+0003-mizan FR-011	check	.github: cd commons/ts && bun test tests/	mizan-oscal-register.test.ts: the requirements of a folder are implemented-requirements of a component definition and the proofs observations of assessment results, both valid against the official OSCAL 1.2.3 schemas
 0003-mizan FR-012	check	.github: bun test ./tests/	Mizan: a Spec Kit form specification is accepted and its missing section and status are named
 0003-mizan FR-013	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: the six EARS patterns told apart; a requirement with no keyword and a trigger not in its pattern named
 0003-mizan FR-014	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: a scenario out of order or citing no requirement named
 0003-mizan FR-015	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: a new finding fails, the baseline holds, a fixed finding makes its line stale, commons' own folder passes
-0003-mizan FR-016	none	-	Planned, Phase 3 of issue #10: the single proof register is not read by the trace check yet
+0003-mizan FR-016	check	.github: cd commons/ts && bun test tests/	mizan-oscal-register.test.ts: a row of reviewed.tsv is read as a review row of the register, and enforcement.tsv decides where both name a requirement
 0003-mizan FR-017	check	.github: cd commons/ts && bun test tests/	boundaries.test.ts: Mizan's files import only node: built-ins, the kernel, the runtime, the ontology and themselves
 0003-mizan FR-018	check	.github: bun test ./tests/	Mizan ontology: the Turtle is current, a stale file is named with exit 1, a broken ontology stops with exit 2
 0003-mizan FR-019	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: the command run as a program: new, held and stale findings, a plugin added beside the rules
 0003-mizan FR-020	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: an undefined prefixed name is found once with its line, a prefix that is not given is not read, and commons' own specifications are read for real
+0003-mizan FR-021	check	.github: cd commons/ts && bun test tests/	mizan-oscal-register.test.ts: the control ids, the properties, the passing, accepted and gap observations, and the evidence of a proof
+0003-mizan FR-022	check	.github: cd commons/ts && bun test tests/	mizan-oscal-register.test.ts: the same bytes on two runs and whatever order the tests come in, a changed requirement or proof changes the version and nothing else does
+0003-mizan FR-023	check	.github: cd commons/ts && bun test tests/	mizan-oscal-register.test.ts: the files are current, --check names a stale one with exit 1, and each validates against the pinned official schema (jsonschema)
 0002-packaging FR-016	check	.github: bun test ./tests/	Record: the fields, their order and their values, as the TypeScript module carries them; Generator: a bad field is refused
 0004-rules FR-001	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
 0004-rules FR-002	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
@@ -368,14 +371,18 @@ requirement	mechanism	by	note
 0018-standards-first FR-003	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: a term on a standard that names none is found; every class of Mizan's vocabulary has a basis (tests/commons-mizan-ontology.test.ts). Required by the compiler for Mizan's OntologyTerm only: the kernel's schemas do not yet require it (0012 FR-014)
 0018-standards-first FR-004	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: an unaligned term with no justification is found, and the findings are held by the baseline that only shrinks
 0018-standards-first FR-005	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: a decision is missing within 90 days (held by the baseline) and overdue after, which fails whatever the baseline holds; run on commons' own folder
-0018-standards-first FR-006	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
+0018-standards-first FR-006	check	.github: cd commons/ts && bun test tests/	mizan-newer.test.ts: a newer version than the pin is a finding (FR-014); a Standard's fields are decoded by the importer (mizan-integrations.test.ts)
 0018-standards-first FR-007	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
-0018-standards-first FR-008	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
+0018-standards-first FR-008	check	.github: cd commons/ts && bun test tests/	mizan-authority.test.ts: a requirement that names a law and no Authority is found, and commons' own specifications pass (FR-015, FR-016)
 0018-standards-first FR-009	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: a plan with no Standards considered section named
 0018-standards-first FR-010	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
 0018-standards-first FR-011	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
 0018-standards-first FR-012	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
 0018-standards-first FR-013	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: a deprecated term with no replacement is found, and a specification naming a deprecated term is found saying what replaces it
+0018-standards-first FR-014	check	.github: cd commons/ts && bun test tests/	mizan-newer.test.ts: a real local HTTP server serves the pinned bytes (no finding) and then other bytes (one finding with both hashes); a manifest with no latest is not read
+0018-standards-first FR-015	check	.github: cd commons/ts && bun test tests/	mizan-authority.test.ts: the convention, what a citation of law is, and the covering of a citation by an authority, each in both directions
+0018-standards-first FR-016	check	.github: cd commons/ts && bun test tests/	mizan-authority.test.ts: the three findings of mizan/authority-citation, and commons' own specifications read for real
+0018-standards-first FR-017	check	.github: cd commons/ts && bun test tests/	mizan-newer.test.ts: the baseline holds a finding and goes stale when it is fixed, a URL that cannot be fetched exits 2 naming it, and check.ts and import.ts --check run with the network unreachable
 0019-mizan-integrations FR-001	check	.github: cd commons/ts && bun test tests/	boundaries.test.ts: pure/ imports only the kernel and itself, host/ exists, the module is exported
 0019-mizan-integrations FR-002	check	.github: cd commons/ts && bun test tests/	mizan-integrations.test.ts: the registry looks integrations up by formats and refuses an identifier or a pair twice; the record is typed
 0019-mizan-integrations FR-003	none	-	Planned, Phase 4 of issue #10: the module is not built yet
