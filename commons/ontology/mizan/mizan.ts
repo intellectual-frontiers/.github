@@ -26,6 +26,7 @@ import {
   many,
   namespace,
   named,
+  type Named,
   ObjectProperty,
   one,
   type OntologyFile,
@@ -490,7 +491,7 @@ export const KEPT_UNALIGNED_SENTENCE = `Kept unaligned by the owner's decision o
  * The `mz:Decision` of a term kept unaligned (0018-standards-first FR-005): the individual `decision-<ontology>-<local>`, which says of the term with the record
  * `term-<ontology>-<local>` (`term-<local>` for Mizan's own) that it stays unaligned; the audit record of the term points to it with `mz:decision`.
  */
-export function keptUnalignedDecision(ontology: "mz" | "ifccm" | "ifqs" | "ifws", local: string) {
+export function keptUnalignedDecision(ontology: "mz" | "ifccm" | "ifqs" | "ifws", local: string): ReturnType<typeof Decision.make> {
   return Decision.make(term<"mz:Decision">(MZID, `decision-${ontology}-${local}`), {
     label: en(`Keep ${ontology}:${local} unaligned`),
     decisionOf: term<"mz:OntologyTerm">(MZID, ontology === "mz" ? `term-${local}` : `term-${ontology}-${local}`),
@@ -500,7 +501,7 @@ export function keptUnalignedDecision(ontology: "mz" | "ifccm" | "ifqs" | "ifws"
 }
 
 /** The identifier of the decision of a term kept unaligned, for the audit record to point to (`mz:decision`). */
-export function keptUnalignedDecisionId(ontology: "mz" | "ifccm" | "ifqs" | "ifws", local: string) {
+export function keptUnalignedDecisionId(ontology: "mz" | "ifccm" | "ifqs" | "ifws", local: string): Named<"mz:Decision"> {
   return term<"mz:Decision">(MZID, `decision-${ontology}-${local}`);
 }
 
