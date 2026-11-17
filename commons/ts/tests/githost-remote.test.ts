@@ -1,0 +1,124 @@
+/**
+ * Tests of `githost/remote.ts` and `githost/capabilities.ts` (commons 0023-if-workspaces FR-017, FR-019, FR-020): every spelling of a remote gives the same repository, a credential in a URL is
+ * dropped and never appears in a result or an error, the kind of host is GitHub, GitLab or plain Git by the rule of FR-019, and the table of what each kind offers is the ontology's.
+ * Pure: no program, no network.
+ *
+ * @module
+ */
+import { CAPABILITIES, maxDepth, supports, unsupported } from "../githost/capabilities.ts";
+import { cloneUrlOf, describeRemoteError, hostKindOf, parseRemote, sameRepository } from "../githost/remote.ts";
+import type { Capability, HostKind, RepoRef } from "../githost/types.ts";
+import { gitCapabilities, gitManagerKinds } from "../../ontology/ifws/mod.ts";
+import { assert, assertEquals, proves } from "../runtime/test.ts";
+
+const ref = (text: string, kinds: Readonly<Record<string, HostKind>> = {}): RepoRef => {
+  const r = parseRemote(text, kinds);
+  if (r.kind === "err") throw new Error(`${text}: ${describeRemoteError(r.error)}`);
+  return r.value;
+};
+
+proves(["0023-if-workspaces FR-019"], "https, ssh, scp-like and git forms of one remote are one repository", () => {
+  const forms = [
+    "https://github.com/octo/hello.git",
+    "https://github.com/octo/hello",
+    "https://github.com/octo/hello/",
+    "http://GitHub.com/octo/hello.git",
+    "git@github.com:octo/hello.git",
+    "github.com:octo/hello",
+    "ssh://git@github.com/octo/hello.git",
+    "ssh://git@github.com:22/octo/hello.git",
+    "git://github.com/octo/hello.git",
+    "https://github.com:443/octo/hello.git?x=1#y",
+  ];
+  for (const f of forms) assertEquals(ref(f), { kind: "Github", host: "github.com", path: ["octo", "hello"] }, f);
+  assert(sameRepository(ref("git@github.com:Octo/Hello.git"), ref("https://github.com/octo/hello")));
+  assert(!sameRepository(ref("git@github.com:octo/hello.git"), ref("https://github.com/octo/other")));
+  assertEquals(cloneUrlOf(ref("git@github.com:octo/hello.git")), "https://github.com/octo/hello.git");
+});
+
+proves(
+  ["0023-if-workspaces FR-019"],
+  "the kind of host is GitHub, GitLab or plain Git by the rule, and a self-managed GitLab is named, never guessed",
+  () => {
+    assertEquals(hostKindOf("github.com"), "Github");
+    assertEquals(hostKindOf("GitLab.com"), "Gitlab");
+    assertEquals(hostKindOf("gitlab.example.org"), "Git", "a name that says gitlab is not enough");
+    assertEquals(hostKindOf("git.example.org"), "Git");
+    assertEquals(hostKindOf("gitlab.example.org", { "gitlab.example.org": "Gitlab" }), "Gitlab");
+    assertEquals(ref("https://gitlab.example.org/a/b").kind, "Git");
+    assertEquals(ref("https://gitlab.example.org/a/b", { "gitlab.example.org": "Gitlab" }).kind, "Gitlab");
+    assertEquals(ref("git@git.example.org:team/tool.git").kind, "Git");
+    assertEquals(ref("https://gitlab.com/g/s1/s2/proj.git"), { kind: "Gitlab", host: "gitlab.com", path: ["g", "s1", "s2", "proj"] });
+    // the map is read by its own keys: a host named like an object member is plain Git
+    assertEquals(hostKindOf("constructor", {}), "Git");
+  },
+);
+
+proves(["0023-if-workspaces FR-018"], "a credential in a remote is dropped, and no result and no error holds it", () => {
+  const secret = "ghp_SECRETSECRETSECRET0123456789";
+  for (const url of [
+    `https://user:${secret}@github.com/octo/hello.git`,
+    `https://${secret}@github.com/octo/hello.git`,
+    `ssh://git:${secret}@github.com/octo/hello.git`,
+    `https://oauth2:${secret}@github.com:443/octo/hello`,
+  ]) {
+    const r = parseRemote(url);
+    assertEquals(r.kind, "ok");
+    assert(!JSON.stringify(r).includes(secret), url);
+    assertEquals(r.kind === "ok" ? r.value.host : "", "github.com");
+  }
+  for (const url of [
+    `ftp://user:${secret}@host/a/b`,
+    `https://user:${secret}@/a/b`,
+    `https://user:${secret}@github.com/`,
+    `https://${secret}@github.com/onlyowner`,
+  ]) {
+    const r = parseRemote(url);
+    assertEquals(r.kind, "err", url);
+    const said = r.kind === "err" ? JSON.stringify(r.error) + describeRemoteError(r.error) : "";
+    assert(!said.includes(secret) && !said.includes("user:"), `${url}: ${said}`);
+  }
+});
+
+proves(["0023-if-workspaces FR-019"], "a text that is not a remote of a host is told by what is wrong with it", () => {
+  const kind = (t: string): string => {
+    const r = parseRemote(t);
+    return r.kind === "ok" ? "ok" : r.error.kind;
+  };
+  assertEquals(kind(""), "empty");
+  assertEquals(kind("   "), "empty");
+  assertEquals(kind("/srv/git/repo.git"), "local-path");
+  assertEquals(kind("./repo"), "local-path");
+  assertEquals(kind("C:\\work\\repo"), "local-path");
+  assertEquals(kind("C:/work/repo"), "local-path");
+  assertEquals(kind("file:///srv/git/repo.git"), "local-path");
+  assertEquals(kind("repo"), "local-path");
+  assertEquals(kind("ftp://host/a/b"), "unsupported-scheme");
+  assertEquals(kind("https:///a/b"), "no-host");
+  assertEquals(kind("https://github.com"), "no-path");
+  assertEquals(kind("https://github.com/owner"), "no-path");
+  assertEquals(kind("https://github.com/owner/.git"), "no-path");
+  assertEquals(kind("https://github.com/a/%E0%A4%A"), "bad-segment");
+  assertEquals(kind("https://github.com/a/b%2Fc"), "bad-segment");
+});
+
+proves(
+  ["0023-if-workspaces FR-017", "0023-if-workspaces FR-020"],
+  "the table of what each kind offers is the ontology's, and a capability a kind lacks is a typed answer naming both",
+  () => {
+    const all = Object.keys(gitCapabilities) as Capability[];
+    for (const kind of ["Github", "Gitlab", "Git"] as const) {
+      const listed = (gitManagerKinds[kind].values.supports ?? []).map((c) => c.iri.replace(/^.*[#/]/, ""));
+      assertEquals([...CAPABILITIES[kind]].sort(), [...listed].sort(), kind);
+      for (const c of all) assertEquals(supports(kind, c), listed.includes(c), `${kind} ${c}`);
+    }
+    assertEquals(unsupported("Github", "NestedGroups"), {
+      kind: "err",
+      error: { kind: "unsupported", capability: "NestedGroups", host: "Github" },
+    });
+    assertEquals(maxDepth("Github"), 2);
+    assertEquals(maxDepth("Git"), 2);
+    assertEquals(maxDepth("Gitlab"), Number.POSITIVE_INFINITY);
+    assert(!supports("Github", "NestedGroups") && supports("Gitlab", "NestedGroups") && !supports("Git", "Issues"));
+  },
+);

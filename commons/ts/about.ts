@@ -55,6 +55,20 @@ export const about: About = {
       mayImport: ["node: builtins", "kernel/", "runtime/", "quality/"],
     },
     {
+      path: "githost/",
+      what: "The one interface to a Git host (commons 0023-if-workspaces): the types and the reading of a remote URL (pure), and the adapters for GitHub (REST v3), GitLab (REST v4, groups to any depth) and plain Git, with `clientFor`, the one place that reads a token, and only from the environment it is given.",
+      mayImport: [
+        "kernel/",
+        "runtime/ (the adapters; the types, the table of capabilities and the remote reader import the kernel alone)",
+        "githost/",
+      ],
+    },
+    {
+      path: "workspaces/",
+      what: "IF Workspaces, rung 10 of the ladder (commons 0023-if-workspaces, 0024-ifws-host): the branded types, the layout from a remote to a path, the portability of paths, the manifest, the state of a repository, the plan as a pure function, the findings and the policy; `host/` reads a repository with the real `git`.",
+      mayImport: ["kernel/", "githost/ (types, capabilities and the remote reader)", "workspaces/", "runtime/ (host/ alone)"],
+    },
+    {
       path: "lint/",
       what: "The lint plugin `bun lint --plugin` loads, and its rules.",
       mayImport: ["node: builtins", "kernel/", "lint/", "runtime/"],

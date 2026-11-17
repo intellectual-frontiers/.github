@@ -7,6 +7,7 @@
  *
  * @module
  */
+import { absurd } from "../kernel/absurd.ts";
 import type { Result } from "../kernel/result.ts";
 
 /** The kinds of host: the keys of the code list `ifws:GitManagerKind` and `ifccm:GitHostKind`. */
@@ -51,6 +52,11 @@ export type IssueInfo = {
   /** The issues that are children of this one, where the host has them. */
   readonly children: readonly number[];
   readonly labels: readonly string[];
+  /**
+   * Whether `parent` and `children` are the host's answer (`known`) or the host's API offers no parent and child issues, so that they are empty for want of an answer
+   * (`unavailable`: GitLab's REST API v4). Absent means `known`.
+   */
+  readonly hierarchy?: "known" | "unavailable" | undefined;
 };
 
 /** What a host says of a pull request or a merge request. */
@@ -69,6 +75,11 @@ export type BranchProtection = {
   readonly protected: boolean;
   readonly requiresReview: boolean;
   readonly allowsForcePush: boolean;
+  /**
+   * `protected-only` where the host says the branch is protected and the credential may not read the rules (GitHub shows them to administrators only), so that `requiresReview` and
+   * `allowsForcePush` are `false` for want of an answer, not by the host's word. Absent means `full`.
+   */
+  readonly detail?: "full" | "protected-only" | undefined;
 };
 
 /** Why a host did not answer. */
@@ -110,5 +121,7 @@ export function describeFailure(f: HostFailure): string {
       return `unreachable: ${f.reason}`;
     case "unexpected":
       return `unexpected answer ${f.status}: ${f.reason}`;
+    default:
+      return absurd(f);
   }
 }

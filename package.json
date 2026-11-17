@@ -14,6 +14,8 @@
     "./ts/mizan": "./commons/ts/mizan/mod.ts",
     "./ts/mizan/integrations": "./commons/ts/mizan/integrations/mod.ts",
     "./ts/quality": "./commons/ts/quality/mod.ts",
+    "./ts/workspaces": "./commons/ts/workspaces/mod.ts",
+    "./ts/githost": "./commons/ts/githost/mod.ts",
     "./ts/node": "./commons/ts/node/register.mjs",
     "./docs": "./commons/docs/mod.ts",
     "./ontology/mizan": "./commons/ontology/mizan/mod.ts"

@@ -422,39 +422,39 @@ requirement	mechanism	by	note
 0023-if-workspaces FR-002	none	-	Planned, M5 of issue #10: the workspace's own area and its folders are not built
 0023-if-workspaces FR-003	none	-	Planned, M6 of issue #10: the boundary that reads and writes only inside the root, and its test with a hostile manifest, are not built
 0023-if-workspaces FR-004	none	-	Planned, M5 of issue #10: the command's scope statement and the refusal to edit a user profile are not built (0025-ifws FR-002)
-0023-if-workspaces FR-005	none	-	Planned, M4 of issue #10: commons/ts/workspaces/ and its place on rung 10 are not built, and rung 10 is the lead's amendment of 0016-ladder
-0023-if-workspaces FR-006	none	-	Planned, M4 of issue #10: the layout function from a remote URL to a path is not built (workspaces/layout.ts)
-0023-if-workspaces FR-007	none	-	Planned, M4 of issue #10: the worktree path and the rule of when to make one are not built (workspaces/layout.ts, worktree.ts)
-0023-if-workspaces FR-008	none	-	Planned, M4 of issue #10: the refusal of a host or segment named like a folder of the workspace is not built (workspaces/portable.ts)
-0023-if-workspaces FR-009	none	-	Planned, M4 of issue #10: PortableSegment is not built (workspaces/portable.ts), with the fixture of hostile names
-0023-if-workspaces FR-010	none	-	Planned, M4 of issue #10: RepoPath and the typed path layer are not built (workspaces/portable.ts)
-0023-if-workspaces FR-011	none	-	Planned, M4 of issue #10: the case-fold and normalization collision check is not built (workspaces/portable.ts)
-0023-if-workspaces FR-012	none	-	Planned, M4 of issue #10: the Windows path-length check is not built (workspaces/portable.ts)
+0023-if-workspaces FR-005	none	-	Planned, M4 of issue #10: workspaces/ and githost/ exist and no rung below imports workspaces/ (ifws-boundaries.test.ts proves it); the command and the templates are M5's, and rung 10 as an instance of the ladder is the lead's amendment of 0016-ladder
+0023-if-workspaces FR-006	check	.github: cd commons/ts && bun test tests/	ifws-layout.test.ts: a repository is at the lower-case host then the remote's path as the host writes it (GitHub owner and repository, GitLab groups to any depth), whichever spelling the remote has, and the path maps back to its remote
+0023-if-workspaces FR-007	check	.github: cd commons/ts && bun test tests/	ifws-layout.test.ts, ifws-plan.test.ts: a worktree is at .worktrees/<host>/<path...>/<repo>/<branch-slug>, with the slug free of what Windows refuses, and the plan holds a CreateWorktree only where another worker or uncommitted work is on the repository
+0023-if-workspaces FR-008	check	.github: cd commons/ts && bun test tests/	ifws-layout.test.ts, ifws-manifest.test.ts: a host or a segment named .worktrees, .if-workspaces or .git, in any case, is refused and named
+0023-if-workspaces FR-009	check	.github: cd commons/ts && bun test tests/	ifws-portable.test.ts: the fixture of hostile names (empty, dot, forbidden and control characters, trailing dot or space, every device name in any case with any extension and the superscript digits, over 255 bytes, non-NFC), pure so that it runs on every system
+0023-if-workspaces FR-010	check	.github: cd commons/ts && bun test tests/	ifws-portable.test.ts: a path of the workspace is made only from portable segments with / between them, never absolute, never holding .. or a drive, and given the native separator only by nativePath
+0023-if-workspaces FR-011	check	.github: cd commons/ts && bun test tests/	ifws-portable.test.ts, ifws-manifest.test.ts: paths equal after NFC and case folding collide, and the manifest refuses both and names each other, on every file system
+0023-if-workspaces FR-012	check	.github: cd commons/ts && bun test tests/	ifws-portable.test.ts: 259 characters is accepted and 260 is a path-too-long error naming the path, unless long paths are enabled (the doctor message and the ifws:Error severity are the command's, M5)
 0023-if-workspaces FR-013	none	-	Planned, M5 of issue #10: the generated *.auto.code-workspace files that replace symbolic links are not built (0024-ifws-host FR-005)
 0023-if-workspaces FR-014	none	-	Planned, M5 of issue #10: the file-system probes of ifws doctor (FAT, exFAT, network share, WSL /mnt/c) are not built
-0023-if-workspaces FR-015	none	-	Planned, M4 of issue #10: the GitManager interface and its three adapters are not built, nor the conformance tests they share
+0023-if-workspaces FR-015	check	.github: cd commons/ts && bun test tests/	githost-adapters.test.ts, githost-live.test.ts: GitHub, GitLab and plain Git pass the same conformance function (tests/githost-conformance.ts) over recorded exchanges, a loopback server and a real repository
 0023-if-workspaces FR-016	check	.github: cd commons/ts && bun test tests/	ifws-ontology.test.ts: the kinds Github, Gitlab and Git each support the four common capabilities, and GitHub and GitLab protected branches, issues and change requests
-0023-if-workspaces FR-017	none	-	Planned, M4 of issue #10: the typed unsupported result is not built; the table it reads is held by ifws-ontology.test.ts (GitHub lacks only nested groups, plain Git lacks four)
-0023-if-workspaces FR-018	none	-	Planned, M4 of issue #10: the credential helpers, the host tools and the environment token are not wired, nor the scan that no credential is written
-0023-if-workspaces FR-019	none	-	Planned, M4 of issue #10: the choice of manager for a remote URL is not built
-0023-if-workspaces FR-020	none	-	Planned, M4 of issue #10: the refusal of a path deeper than the manager supports is not built
-0023-if-workspaces FR-021	none	-	Planned, M4 of issue #10: plan(desired, observed) is not built (workspaces/plan.ts)
-0023-if-workspaces FR-022	none	-	Planned, M4 of issue #10: the observation of a repository and the plan's use of the default action are not built; the table it reads is held by ifws-ontology.test.ts (ten states and their default actions)
+0023-if-workspaces FR-017	check	.github: cd commons/ts && bun test tests/	githost-adapters.test.ts, githost-remote.test.ts: a capability a kind lacks is a typed unsupported result naming the host and the capability (GitHub nested groups, plain Git protected branches, issues and change requests), and the table is the ontology's
+0023-if-workspaces FR-018	none	-	Planned, M4 of issue #10: the adapters read a token only from the environment they are handed, send it to the one host they serve, and hold it in no result, URL or file (githost-live.test.ts, githost-remote.test.ts, ifws-boundaries.test.ts); the host's own command-line tools (gh, glab) and the evidence's lack of a credential are not wired
+0023-if-workspaces FR-019	check	.github: cd commons/ts && bun test tests/	githost-remote.test.ts, ifws-manifest.test.ts: GitHub for github.com, GitLab for gitlab.com and the hosts the manifest names, plain Git for every other, and a self-hosted GitLab is never guessed from a URL
+0023-if-workspaces FR-020	check	.github: cd commons/ts && bun test tests/	ifws-layout.test.ts, ifws-manifest.test.ts: a path of more than two segments on a host without nested groups is refused naming the manager and the path, and GitLab takes any depth
+0023-if-workspaces FR-021	check	.github: cd commons/ts && bun test tests/	ifws-plan.test.ts, ifws-boundaries.test.ts: plan(desired, observed) is a pure function (arguments frozen, same plan and digest, the pure core imports no clock, environment or file)
+0023-if-workspaces FR-022	check	.github: cd commons/ts && bun test tests/	ifws-plan.test.ts, ifws-state.test.ts: each of the ten states is observed in a real repository and the plan's action for it is the state's defaultAction in the ontology
 0023-if-workspaces FR-023	check	.github: cd commons/ts && bun test tests/	ifws-ontology.test.ts: the ten action kinds are the code list the specification names; the exhaustive switch over them is the compiler's
 0023-if-workspaces FR-024	none	-	Planned, M5 of issue #10: apply with a re-observation before each action is not built
 0023-if-workspaces FR-025	none	-	Planned, M5 of issue #10: the idempotence of apply is not tested yet, nor built
-0023-if-workspaces FR-026	none	-	Planned, M4 of issue #10: the plan's refusal to hold a fast-forward outside Behind is not built; the table it reads is held by ifws-ontology.test.ts (only Behind is fastForwardable)
-0023-if-workspaces FR-027	none	-	Planned, M5 of issue #10: the guard that deletes nothing holding local work is not built; the table it reads is held by ifws-ontology.test.ts (only Missing, Clean and Behind hold none)
-0023-if-workspaces FR-028	none	-	Planned, M5 of issue #10: the lock-file detection and the one-writer lock are not built
+0023-if-workspaces FR-026	check	.github: cd commons/ts && bun test tests/	ifws-plan.test.ts, ifws-state.test.ts: a FastForward is planned for Behind and for no other state (a property over every state), and a dirty repository behind its remote is skipped
+0023-if-workspaces FR-027	none	-	Planned, M5 of issue #10: mayRemove and the plan's refusal to remove an edited generated file are proved (ifws-plan.test.ts); the guard in apply that deletes nothing holding local work is not built
+0023-if-workspaces FR-028	none	-	Planned, M5 of issue #10: the Locked state from a lock file, which is never removed, is proved against a real repository (ifws-state.test.ts); the one-writer lock of the workspace is not built
 0023-if-workspaces FR-029	none	-	Planned, M5 of issue #10: the --allow-destructive gate is not built; the table it reads is held by ifws-ontology.test.ts (only RemoveGenerated is destructive)
 0023-if-workspaces FR-030	none	-	Planned, M6 of issue #10: the guard that only ifws setup carries out a host change is not built; the table it reads is held by ifws-ontology.test.ts (InstallTool and ConfigureHost carry hostChange)
 0023-if-workspaces FR-031	none	-	Planned, M6 of issue #10: the plaintext-token scan of managed files and local Git configuration is not built
-0023-if-workspaces FR-032	none	-	Planned, M6 of issue #10: the signed-commit policy, its check and the regulated-domain hooks are not built
-0023-if-workspaces FR-033	none	-	Planned, M6 of issue #10: the 90-day clock for a tool or module outside the catalog is not built
+0023-if-workspaces FR-032	none	-	Planned, M6 of issue #10: the severity (error in a regulated domain, warning elsewhere) and the hook rule are pure functions proved in ifws-findings.test.ts; the check of a managed repository's commits and the hooks are not built
+0023-if-workspaces FR-033	none	-	Planned, M6 of issue #10: the 90-day clock (informational to day 90, warning from day 91, the day first seen never restarted) is proved in ifws-findings.test.ts; the doctor's scan and the state record that holds the day are not built
 0023-if-workspaces FR-034	none	-	Planned, M5 of issue #10: the hooks and ifws worktree that apply the rules of 0020-ifccm are not built
-0023-if-workspaces FR-035	none	-	Planned, M5 of issue #10: the finding type and its SARIF writer are not built; the table it reads is held by ifws-ontology.test.ts (the severities and their SARIF levels)
+0023-if-workspaces FR-035	check	.github: cd commons/ts && bun test tests/	ifws-findings.test.ts: the finding type, its severities and their SARIF levels (the ontology's), the SARIF 2.1.0 log of findings and the exit status they give
 0023-if-workspaces FR-036	none	-	Planned, M5 of issue #10: the doctor messages, including Windows long paths, are not built
-0023-if-workspaces FR-037	none	-	Planned, M6 of issue #10: the tool catalog in the manifest and its decoder (no latest, no range) are not built
+0023-if-workspaces FR-037	none	-	Planned, M6 of issue #10: a pinned Version (no latest, no range, no v) is proved in ifws-layout.test.ts; the tool catalog in the manifest and its decoder are not built
 0023-if-workspaces FR-038	none	-	Planned, M6 of issue #10: the version probes of git, bun and node are not built
 0023-if-workspaces FR-039	none	-	Planned, M6 of issue #10: the pinned install into .if-workspaces/tools/ with the hash check is not built
 0023-if-workspaces FR-040	none	-	Planned, M6 of issue #10: the OSCAL inventory-item, SPDX and CycloneDX exports of the catalog and the inventory are not built
@@ -464,7 +464,8 @@ requirement	mechanism	by	note
 0023-if-workspaces FR-044	check	.github: cd commons/ts && bun test tests/	ifws-ontology.test.ts: every class and code-list class has one audit record and the audit's rules find nothing; the three specifications name only terms the ontology defines
 0023-if-workspaces FR-045	review	0023-if-workspaces FR-045	A reviewer checks that each control of the section Standards and controls names a requirement that supports it; the OSCAL slice of NIST SP 800-53 will make the mapping data
 0023-if-workspaces FR-046	review	0023-if-workspaces FR-046	A reviewer checks that the workspace's documentation carries the credits (the author of the earlier tools, chezmoi, Git); CREDITS.md arrives with commons/ts/workspaces/
-0024-ifws-host FR-001	none	-	Planned, M5 of issue #10: the typed manifest and its decoder are not built (workspaces/manifest.ts)
+0023-if-workspaces FR-047	check	.github: cd commons/ts && bun test tests/	githost-remote.test.ts, ifws-state.test.ts: https, ssh, scp-like and git forms of one remote are one repository, and a credential in a remote URL is dropped and in no result, error, state or finding
+0024-ifws-host FR-001	none	-	Planned, M5 of issue #10: the manifest decoder and its issues as ifws:Error findings naming each field are built and proved (workspaces/manifest.ts, ifws-manifest.test.ts); reading workspace.ts and stopping the run before anything is changed are not built
 0024-ifws-host FR-002	none	-	Planned, M5 of issue #10: the starter manifest written once by ifws setup is not built
 0024-ifws-host FR-003	none	-	Planned, M5 of issue #10: the typed template contract and the lint that forbids eval and new Function are not built
 0024-ifws-host FR-004	none	-	Planned, M5 of issue #10: GeneratedFile and its header are not built (workspaces/render.ts)
