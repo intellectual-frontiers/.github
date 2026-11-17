@@ -10,7 +10,10 @@ import { fromFileUrl, dirname, resolve } from "../runtime/path.ts";
 import { run, execPath } from "../runtime/proc.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
 import { earsPatternOf, mizanFindings, rulePlugins, type RulePlugin, type SpecText } from "../mizan/rules.ts";
-import { daysBetween, termFindings } from "../mizan/standards.ts";
+import { AUDITED_ON, packagingTerms } from "../../ontology/audit/mod.ts";
+import { bases } from "../../ontology/mizan/mod.ts";
+import { pm } from "../../ontology/supply-chain/packaging/mod.ts";
+import { basisMissing, daysBetween, termFindings } from "../mizan/standards.ts";
 
 const CHECK = resolve(dirname(fromFileUrl(import.meta.url)), "..", "mizan", "check.ts");
 
@@ -200,5 +203,43 @@ proves(
     assertEquals(late.code, 1);
     assertStringIncludes(late.stderr, "mizan/decision-overdue");
     assertStringIncludes(late.stderr, "its decision was due 1 days ago");
+  },
+);
+
+proves(
+  ["0012-ontology FR-014", "0018-standards-first FR-003"],
+  "a term of an ontology with no record of its basis is found, and every term of the packaging ontology has one",
+  () => {
+    assertEquals(
+      basisMissing(["https://x/A", "https://x/B"], ["https://x/A"], "audit.ts").map((f) => f.key),
+      ["mizan/term-basis-missing https://x/B"],
+    );
+    assertEquals(basisMissing(["https://x/A"], ["https://x/A", "https://x/Z"]), []);
+    assertEquals(
+      basisMissing(
+        Object.values(pm).map((t) => t.iri),
+        packagingTerms.map((t) => t.values.termIri),
+      ),
+      [],
+    );
+    assertEquals(Object.keys(pm).length, packagingTerms.length);
+    const by = (basis: string) => packagingTerms.filter((t) => t.values.basis.iri === basis).length;
+    assertEquals([by(bases.Specializes.iri), by(bases.Maps.iri), by(bases.Unaligned.iri)], [5, 5, 51]);
+  },
+);
+
+proves(
+  ["0012-ontology FR-014"],
+  "a term's mapping names a standard term, and an unaligned term of the audit says why and when it was audited",
+  () => {
+    for (const t of packagingTerms) {
+      if (t.values.basis.iri === bases.Unaligned.iri) {
+        assert((t.values.justification ?? "").includes("Candidates to examine"), `${t.iri} names its candidates`);
+        assertEquals(t.values.addedOn, AUDITED_ON);
+      } else {
+        assert((t.values.standardTerm ?? "").startsWith("https://schema.org/"), `${t.iri} names a schema.org term`);
+        assert(t.values.mappingRelation !== undefined, `${t.iri} says its relation`);
+      }
+    }
   },
 );

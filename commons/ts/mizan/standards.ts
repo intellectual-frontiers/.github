@@ -54,6 +54,21 @@ function found(rule: MizanRule, file: string, iri: string, message: string): Miz
   return { file, line: 1, rule, message, key: `${rule} ${iri}` };
 }
 
+/** A term of an ontology that has no record of its basis (0018-standards-first FR-003, 0012-ontology FR-014): such a finding fails whatever the baseline holds. */
+export function basisMissing(ontology: readonly string[], recorded: readonly string[], file = "ontology"): readonly MizanFinding[] {
+  const have = new Set(recorded);
+  return ontology
+    .filter((iri) => !have.has(iri))
+    .map((iri) =>
+      found(
+        "mizan/term-basis-missing",
+        file,
+        iri,
+        `${iri} is a term of the ontology and has no record of the standard it rests on, or that none is adopted`,
+      ),
+    );
+}
+
 /** The findings of the rules about terms, as of `today`; `file` is where the terms are stated. */
 export function termFindings(terms: readonly TermRecord[], today: string, file = "ontology"): readonly MizanFinding[] {
   const out: MizanFinding[] = [];

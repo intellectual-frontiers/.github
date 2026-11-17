@@ -56,11 +56,12 @@ proves(
 
 proves(
   ["0019-mizan-integrations FR-010"],
-  "the exports of the ontology (SHACL shapes, JSON Schema, SKOS, SQL, SSSOM mappings) are written, current, and each says it is generated",
+  "the exports of the ontology (SHACL shapes, JSON Schema, SKOS, SQL, SSSOM mappings, the audit of the packaging ontology) are written, current, and each says it is generated",
   async () => {
     const made = await wanted();
     const exports = [...made.keys()].filter((k) => k !== TURTLE_PATH).sort();
     assertEquals(exports, [
+      "generated/mizan-audit-packaging.auto.ttl",
       "generated/mizan-code-lists.auto.skos.ttl",
       "generated/mizan-code-lists.auto.sql",
       "generated/mizan-mappings.auto.sssom.tsv",

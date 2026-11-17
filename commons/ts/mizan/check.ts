@@ -5,7 +5,7 @@
  *     bun commons/ts/mizan/check.ts --root DIR            check DIR (a folder holding specs/)
  *     bun commons/ts/mizan/check.ts --baseline FILE       hold the findings against FILE
  *     bun commons/ts/mizan/check.ts --write-baseline      write the baseline from today's findings (to start it, or to shrink it: never to add a line to pass)
- *     bun commons/ts/mizan/check.ts --today YYYY-MM-DD    count the 90 days of a decision from that day (for a test); commons' own folder also holds Mizan's terms to 0018-standards-first FR-003 to FR-005
+ *     bun commons/ts/mizan/check.ts --today YYYY-MM-DD    count the 90 days of a decision from that day (for a test); commons' own folder also holds its ontologies' terms to 0018-standards-first FR-003 to FR-005
  *
  * It prints every new finding and every stale baseline line on standard error, writes nothing without `--write-baseline`, and exits 1 where a finding is new or a baseline
  * line no longer occurs, so that the baseline only shrinks (0003-mizan FR-015). The rules are plugins (`rules.ts`); this file only reads the folder and judges.
@@ -17,9 +17,11 @@ import process from "node:process";
 import { formatBaseline, judge, parseBaseline, passes, report } from "../kernel/trace.ts";
 import { existsSync, readDirSync, readTextFileSync, writeTextFileSync } from "../runtime/fs.ts";
 import { stdio } from "../runtime/mod.ts";
-import { bases, terms } from "../../ontology/mizan/mod.ts";
+import { packagingTerms } from "../../ontology/audit/mod.ts";
+import { bases, classes, terms } from "../../ontology/mizan/mod.ts";
+import { pm } from "../../ontology/supply-chain/packaging/mod.ts";
 import { type MizanFinding, mizanFindings, type RulePlugin, rulePlugins, type SpecText } from "./rules.ts";
-import { type BasisKind, termFindings, type TermRecord } from "./standards.ts";
+import { basisMissing, type BasisKind, termFindings, type TermRecord } from "./standards.ts";
 
 /** The specifications of a folder (`root/specs/NNNN-slug/spec.md`, and `plan.md` where there is one), in the order of their names. */
 export function readSpecTexts(root: string): readonly SpecText[] {
@@ -53,7 +55,7 @@ export function mizanTermRecords(): readonly TermRecord[] {
     [bases.Maps.iri, "maps"],
     [bases.Unaligned.iri, "unaligned"],
   ]);
-  return terms.map((t) => ({
+  return [...terms, ...packagingTerms].map((t) => ({
     iri: t.values.termIri,
     basis: kinds.get(t.values.basis.iri) ?? "unaligned",
     ...(t.values.standardTerm === undefined ? {} : { standardTerm: t.values.standardTerm }),
@@ -75,14 +77,27 @@ export function main(
   };
   const root = arg("--root") ?? fileURLToPath(new URL("../../spec-kit", import.meta.url));
   const baselineFile = arg("--baseline") ?? `${root.replace(/[\\/]$/, "")}/mizan.baseline.txt`;
-  // commons' own folder (no --root) also holds Mizan's own terms to the standards rules; a decision overdue fails whatever the baseline holds (0018-standards-first FR-005)
+  // commons' own folder (no --root) also holds its ontologies to the standards rules; a decision overdue, and a term with no record of its basis, fail whatever the baseline holds
+  // (0018-standards-first FR-003, FR-005)
   const own =
-    arg("--root") === undefined ? termFindings(mizanTermRecords(), arg("--today") ?? today, "commons/ontology/mizan/mizan.ts") : [];
-  const overdue = own.filter((f) => f.rule === "mizan/decision-overdue");
-  const found: readonly MizanFinding[] = [
-    ...mizanFindings(readSpecTexts(root), plugins),
-    ...own.filter((f) => f.rule !== "mizan/decision-overdue"),
-  ];
+    arg("--root") === undefined
+      ? [
+          ...termFindings(mizanTermRecords(), arg("--today") ?? today, "commons/ontology"),
+          ...basisMissing(
+            Object.values(pm).map((t) => t.iri),
+            packagingTerms.map((t) => t.values.termIri),
+            "commons/ontology/audit/packaging.ts",
+          ),
+          ...basisMissing(
+            classes.map((c) => c.iri),
+            terms.map((t) => t.values.termIri),
+            "commons/ontology/mizan/mizan.ts",
+          ),
+        ]
+      : [];
+  const always = (f: MizanFinding): boolean => f.rule === "mizan/decision-overdue" || f.rule === "mizan/term-basis-missing";
+  const overdue = own.filter(always);
+  const found: readonly MizanFinding[] = [...mizanFindings(readSpecTexts(root), plugins), ...own.filter((f) => !always(f))];
   if (argv.includes("--write-baseline")) {
     writeTextFileSync(baselineFile, formatBaseline(found, BASELINE_COMMENTS));
     stdio.stdout.writeSync(`wrote ${baselineFile}: ${new Set(found.map((f) => f.key)).size} findings\n`);

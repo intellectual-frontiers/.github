@@ -20,7 +20,7 @@ export const manifest = {
   source: "https://schema.org/version/30.1/schemaorg-current-https.ttl",
   format: "turtle",
   namespace: { prefix: "schema", iri: "https://schema.org/" },
-  slice: ["Action", "SoftwareApplication", "Thing"],
+  slice: ["Action", "SoftwareApplication", "Thing", "name", "operatingSystem", "processorRequirements", "softwareVersion"],
   out: "../../../ontology/supply-chain/packaging/schema.auto.ts",
   provOut: "schema-org.auto.prov.ttl",
   rdfImport: "../../../ts/kernel/rdf.ts",

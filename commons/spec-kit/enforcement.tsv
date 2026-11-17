@@ -318,7 +318,7 @@ requirement	mechanism	by	note
 0012-ontology FR-011	check	.github: bun test ./tests/	Generator: packaging.auto.ttl is what the modules make, says its generator and is the same bytes twice
 0012-ontology FR-012	check	.github: bun test ./tests/	Ontology: source_sha256 is the SHA-256 of the canonical N-Triples, and a comment changes no generated file
 0012-ontology FR-013	none	-	a one-time comparison when the Turtle was converted (7 files, 2874 triples, reported in the commit that converted it); the Turtle it was compared with is deleted in that commit
-0012-ontology FR-014	none	-	Planned, Phase 2 of issue #10: the basis fields are not in the schemas yet
+0012-ontology FR-014	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: a term with no record is found and fails whatever the baseline holds; every term of the packaging ontology and of Mizan's vocabulary has a record; the mappings name terms of the pinned schema.org import (the compiler)
 0013-acme FR-001	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/acme.test.ts: a name and its wildcard issued by a fake CA, the TXT values computed from its tokens and the account's thumbprint, the wait after every set, the chain, the key whose SPKI the CSR carried, notAfter; the directories named
 0013-acme FR-002	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/acme.test.ts: the fake CA verifies every JWS (ES256, nonce spent once, url, jwk only for newAccount, kid after); badNonce retried once, and given up after five
 0013-acme FR-003	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/acme.test.ts: an account made with no key, found again with the key it gave back, asked for then made for an unknown key, a non-ES256 key refused

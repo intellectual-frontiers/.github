@@ -42,6 +42,7 @@
 - A term for a medical device's complaint file: its wording and definition come from 21 CFR Part 820 as amended by the QMSR and ISO 13485:2016 is cited and not copied, per FR-001, FR-002 and FR-007.
 - A state privacy law whose definition differs from a federal one: two individuals, each qualified by its jurisdiction, per FR-002.
 - A class that specializes `schema:SoftwareApplication`: basis `specializes`, per FR-003.
+- A term added to the packaging ontology with no record in its audit: the check fails, whatever the baseline holds, per FR-003.
 - A new `unaligned` term with no Decision on day 30: a finding in the baseline, not a failure, per FR-005.
 - The same term on day 91: the check fails, per FR-005.
 - A newer NIST publication than the pinned version: a stale-pin finding, per FR-006.

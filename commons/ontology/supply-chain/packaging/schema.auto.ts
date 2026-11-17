@@ -14,5 +14,9 @@ export const schema = vocabulary(SCHEMA, {
   Action: "rdfs:Class",
   SoftwareApplication: "rdfs:Class",
   Thing: "rdfs:Class",
+  name: "rdf:Property",
+  operatingSystem: "rdf:Property",
+  processorRequirements: "rdf:Property",
+  softwareVersion: "rdf:Property",
 });
 
