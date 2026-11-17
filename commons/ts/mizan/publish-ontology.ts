@@ -249,7 +249,7 @@ function viewOf(p: OntologyPublication): Parameters<typeof exportHtmlView>[0] {
   }));
   const basisView: ViewBasis[] = p.terms.map((t) => ({
     curie: compactWith(p, t.values.termIri),
-    basis: t.values.basis.iri.slice(p.ns.iri.length).toLowerCase(),
+    basis: t.values.basis.iri.slice(t.values.basis.iri.lastIndexOf("#") + 1).toLowerCase(),
     ...(t.values.standardTerm === undefined ? {} : { standardTerm: compactWith(p, t.values.standardTerm) }),
     ...(t.values.mappingRelation === undefined ? {} : { relation: t.values.mappingRelation }),
     ...(t.values.justification === undefined ? {} : { justification: t.values.justification }),

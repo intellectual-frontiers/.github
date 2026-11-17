@@ -16,6 +16,7 @@ import { fileURLToPath } from "node:url";
 import process from "node:process";
 import { packagingTerms } from "../../ontology/audit/mod.ts";
 import { bases, classes, jurisdictionLevels, integrationDirections, rungKinds, mz, terms } from "../../ontology/mizan/mod.ts";
+import * as ifwsOntology from "../../ontology/ifws/mod.ts";
 import { pm } from "../../ontology/supply-chain/packaging/mod.ts";
 import { type RulePlugin, rulePlugins } from "./rules.ts";
 import { holdHarness } from "./harness.ts";
@@ -46,7 +47,7 @@ export function termRecordsOf(audit: readonly (typeof terms)[number][]): readonl
 
 /** Mizan's own terms and the packaging ontology's as the rules read them. */
 export function mizanTermRecords(): readonly TermRecord[] {
-  return termRecordsOf([...terms, ...packagingTerms]);
+  return termRecordsOf([...terms, ...packagingTerms, ...ifwsOntology.terms]);
 }
 
 /** The CURIE of a term of commons' own ontologies: `mz:` or `pm:` and its local name, or the IRI where it is of neither. */
@@ -54,6 +55,7 @@ function curieOf(iri: string): string {
   for (const [prefix, ns] of [
     ["mz", "https://www.intellectualfrontiers.com/ontology/mizan#"],
     ["pm", "https://www.intellectualfrontiers.com/ontology/packaging#"],
+    ["ifws", ifwsOntology.IFWS.iri],
   ] as const)
     if (iri.startsWith(ns)) return `${prefix}:${iri.slice(ns.length)}`;
   return iri;
@@ -62,7 +64,7 @@ function curieOf(iri: string): string {
 /** The deprecated terms of commons' own ontologies, by CURIE, with what replaces each (0018-standards-first): a specification that names one is found. */
 export function deprecatedTerms(): ReadonlyMap<string, string> {
   return new Map(
-    [...terms, ...packagingTerms].flatMap((t) =>
+    [...terms, ...packagingTerms, ...ifwsOntology.terms].flatMap((t) =>
       t.values.deprecatedOn === undefined ? [] : [[curieOf(t.values.termIri), curieOf(t.values.replacedBy ?? "")] as const],
     ),
   );
@@ -98,6 +100,11 @@ export function main(
               recorded: packagingTerms.map((t) => t.values.termIri),
             },
             { file: "commons/ontology/mizan/mizan.ts", ontology: classes.map((c) => c.iri), recorded: terms.map((t) => t.values.termIri) },
+            {
+              file: "commons/ontology/ifws/ifws.ts",
+              ontology: ifwsOntology.classes.map((c) => c.iri),
+              recorded: ifwsOntology.terms.map((t) => t.values.termIri),
+            },
           ],
           specTerms: {
             known: {
@@ -109,6 +116,7 @@ export function main(
                 ...Object.keys(rungKinds),
               ]),
               pm: new Set(Object.keys(pm)),
+              ifws: ifwsOntology.termNames,
             },
             deprecated: deprecatedTerms(),
           },
