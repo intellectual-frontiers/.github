@@ -55,11 +55,16 @@ export function dayOf(text: string): Day | undefined {
   return real ? (text as Day) : undefined; // checked just now: the brand's one constructor
 }
 
+/** A number of days a harness keeps its evidence for: a whole number of at least one, made only by the decoder. */
+export type RetentionDays = Brand<number, "RetentionDays">;
+
 /** A harness's declaration (`ifccm:HarnessDeclaration`). */
 export type Declaration = {
   readonly regulatedDomains: readonly RegulatedDomainName[];
   /** The day it declares production; absent where it declares none. */
   readonly productionDeclaredOn?: Day;
+  /** How long the harness keeps its evidence on the `quality` branch, in days (0021-ifqs FR-047); absent where it states none. */
+  readonly retentionDays?: RetentionDays;
 };
 
 /** What an enforcement phase is (`ifccm:EnforcementPhase`): `warn` is held by a baseline that only shrinks, `gate` fails whatever the baseline holds. */
@@ -85,15 +90,20 @@ export type HarnessRecord = {
 
 const day: Decoder<Day> = refine(string, "Day", (s) => dayOf(s) !== undefined);
 const domain = literal(...REGULATED_DOMAINS);
-const declarationDecoder = object({ regulatedDomains: array(domain) }, { productionDeclaredOn: day });
+const retention: Decoder<RetentionDays> = refine(integer, "RetentionDays", (n) => n >= 1);
+const declarationDecoder = object({ regulatedDomains: array(domain) }, { productionDeclaredOn: day, retentionDays: retention });
 const decisionDecoder = object({ id: string, approvedBy: string, covers: array(string) }, { record: integer });
 
 /** A declaration decoded from data read from a file. */
 export function decodeDeclaration(input: unknown): Result<Declaration, DecodeError> {
   const r = declarationDecoder(input, "declaration");
   if (r.kind === "err") return r;
-  const { regulatedDomains, productionDeclaredOn } = r.value;
-  return ok({ regulatedDomains: [...new Set(regulatedDomains)], ...(productionDeclaredOn === undefined ? {} : { productionDeclaredOn }) });
+  const { regulatedDomains, productionDeclaredOn, retentionDays } = r.value;
+  return ok({
+    regulatedDomains: [...new Set(regulatedDomains)],
+    ...(productionDeclaredOn === undefined ? {} : { productionDeclaredOn }),
+    ...(retentionDays === undefined ? {} : { retentionDays }),
+  });
 }
 
 /** The Decisions decoded from data. */

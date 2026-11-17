@@ -5,7 +5,7 @@
  * 29119-3, on demand. `ifc test` is unchanged: `record` takes the record that `ifc test run` writes, and verifies the CAPA whose named test it
  * passes (FR-029). The system reports itself with `index` (the index of the branch, `--check`able), `freshness` (every proof judged by time and by
  * change, the nonconformances it calls for opened with `--open`), `nonconformances`, `capa open|verify|close`, `register` (the proof register with
- * the grade and day of its evidence), `tier` (a claim judged) and `attest` (a statement, a review or a probe's result kept as evidence); see
+ * the grade and day of its evidence), `archive` (a tag on the branch once the retention period has passed, nothing deleted), `tier` (a claim judged) and `attest` (a statement, a review or a probe's result kept as evidence); see
  * `commands.ts`. Exit status: 0 where it did what was asked, 1 where a record was refused, the branch does not verify or it found something, 2 for
  * a command line that does not fit.
  *
@@ -25,6 +25,7 @@ import { args, exit } from "../runtime/proc.ts";
 import { stderr, stdout } from "../runtime/stdio.ts";
 import { formatKeepError, gradeOfCommit, keepRun, readKeptRun, verifyBranch, formatVerifyError } from "./host/branch.ts";
 import {
+  archiveCommand,
   attestCommand,
   capaCommand,
   clockDay,
@@ -109,7 +110,7 @@ const RENDER = {
 };
 
 const USAGE =
-  "usage: quality record|verify|render|index|freshness|nonconformances|capa|register|tier|attest|trust|pack|verify-pack|plan|sample|mutation|agents [OPTIONS] (--help for each)";
+  "usage: quality record|verify|render|index|freshness|nonconformances|capa|register|archive|tier|attest|trust|pack|verify-pack|plan|sample|mutation|agents [OPTIONS] (--help for each)";
 
 /** `quality` with its arguments: the exit status. */
 export async function main(argv: readonly string[]): Promise<number> {
@@ -219,6 +220,8 @@ export async function main(argv: readonly string[]): Promise<number> {
       return capaCommand(rest);
     case "register":
       return registerCommand(rest);
+    case "archive":
+      return archiveCommand(rest);
     case "tier":
       return tierCommand(rest);
     case "attest":
