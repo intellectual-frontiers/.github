@@ -78,6 +78,8 @@
 - **FR-031**: Each run of the `changes` check MUST leave a result in the record shape of `0021-ifqs`, with each rule's result as a case and each `--strict` case that could not ask the host as `not_run` with its reason.
 - **FR-032**: The findings of the `changes` check MUST be Mizan findings (`changes/no-issue`, `changes/closing-keyword`, `changes/unknown-issue`, `changes/closed-issue`, `changes/gate-relaxed`), held by a baseline as `0003-mizan` FR-015 holds the rest, and the check MUST be run by `holdHarness` for every harness.
 
+- **FR-033**: A commit that departs from a specification MUST say so on a line of its own as `Departs: NNNN-slug FR-nnn` and name the Decision that authorizes it on a line of its own as `Decision: <id>`; a harness MUST state its Decisions (each with its identifier, the role that approved it, and the requirements it authorizes or `gate-relaxed <revision>`) and the role of each author by email in the typed file that holds its declaration, read as data and never run; and the `changes` check MUST report, besides the findings of FR-032, `changes/early-close` (FR-006), `changes/issue-shape` (FR-003), `changes/no-parent` (FR-002), `changes/no-decision` (FR-019), `changes/self-approved` (FR-020) and `changes/declaration` (FR-010), the last of them as a gate whatever the day, since a declaration wrong by itself is refused.
+
 ## Acceptance scenarios
 
 1. **Given** a commit whose message ends with `Refs #10`, **When** the check runs, **Then** it reports nothing for the commit, per FR-005 and FR-007.
