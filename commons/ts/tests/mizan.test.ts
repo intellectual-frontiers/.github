@@ -69,6 +69,8 @@ proves(["0003-mizan FR-014"], "a scenario with Given, When, Then in order that c
     "2. **Given** a file, **Then** the check fails, **When** it has no line, per FR-001.",
     "3. **Given** a file, **When** it has no line, **Then** the check fails.",
     "4. **Given** a file only.",
+    "5. **Given** a long scenario that wraps",
+    "   over lines, **When** it is read as one item, **Then** it is in order, per FR-002.",
     "",
   ].join("\n");
   const found = mizanFindings([{ slug: "0001-x", spec: text }]).filter((f) => f.rule === "mizan/scenario-form");

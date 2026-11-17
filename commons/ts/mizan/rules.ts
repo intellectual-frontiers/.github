@@ -133,10 +133,17 @@ export const scenarioForm: RulePlugin = {
   check(s) {
     const file = `specs/${s.slug}/spec.md`;
     const out: MizanFinding[] = [];
-    for (const [i, line] of s.spec.split("\n").entries()) {
-      const given = line.search(/\bGiven\b/);
-      if (given < 0 || !/\*\*Given\*\*/.test(line)) continue;
-      const rest = line.slice(given);
+    const lines = s.spec.split("\n");
+    for (const [i, line] of lines.entries()) {
+      if (!/\*\*Given\*\*/.test(line)) continue;
+      // a scenario is a list item and the lines under it, up to a blank line, the next item or a heading
+      let item = line;
+      for (let k = i + 1; k < lines.length; k++) {
+        const next = lines[k] ?? "";
+        if (next.trim() === "" || /^\s*(?:\d+\.|-|\*|#)\s/.test(next)) break;
+        item += ` ${next.trim()}`;
+      }
+      const rest = item.slice(item.search(/\*\*Given\*\*/));
       const when = rest.search(/\*\*When\*\*/);
       const then = rest.search(/\*\*Then\*\*/);
       if (when < 0 || then < 0 || then < when)
