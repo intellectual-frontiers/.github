@@ -836,8 +836,8 @@ proves(["0012-ontology FR-011"], "Ontology: the Turtle export says it is generat
   assertStringIncludes(ttl, "pmid:family-debian a pm:SystemFamily ;\n");
   assertEquals(
     ttl.match(/ \.\n/g)?.length,
-    new Set(files.flatMap((f) => f.individuals.map((i) => i.iri))).size + 8,
-    "one statement for each subject, and the eight prefixes",
+    new Set(files.flatMap((f) => f.individuals.map((i) => i.iri))).size + 9,
+    "one statement for each subject, and the nine prefixes",
   );
 });
 
