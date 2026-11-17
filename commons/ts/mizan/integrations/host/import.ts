@@ -17,6 +17,7 @@ import { dirname, resolve } from "../../../runtime/path.ts";
 import { existsSync, readTextFileSync, writeTextFileSync } from "../../../runtime/fs.ts";
 import { stdio } from "../../../runtime/mod.ts";
 import { err, ok, type Result } from "../../../kernel/result.ts";
+import { importOscalCatalog } from "../pure/import-oscal-catalog.ts";
 import { importVocabulary } from "../pure/import-vocabulary.ts";
 import { provenanceTurtle } from "../pure/provenance.ts";
 import { describeFinding, type StandardRecord } from "../pure/types.ts";
@@ -25,8 +26,9 @@ import { describeFinding, type StandardRecord } from "../pure/types.ts";
 export type ImportManifest = {
   readonly standard: StandardRecord;
   readonly source: string;
-  readonly format: "turtle" | "n-triples";
-  readonly namespace: { readonly prefix: string; readonly iri: string };
+  readonly format: "turtle" | "n-triples" | "oscal-catalog";
+  /** The namespace of a vocabulary's terms: required for `turtle` and `n-triples`, none for an OSCAL catalog, whose slice names control identifiers. */
+  readonly namespace?: { readonly prefix: string; readonly iri: string };
   readonly slice: readonly string[];
   readonly out: string;
   /** Where the PROV-O record is written, relative to the manifest: beside it, named after `out`, by default. */
@@ -52,12 +54,13 @@ export function decodeManifest(x: unknown): Result<ImportManifest, string> {
   }
   if (typeof st["redistributable"] !== "boolean") return err("standard.redistributable must be true or false");
   const ns = x["namespace"];
-  if (!isRecord(ns) || text(ns["prefix"]) === undefined || text(ns["iri"]) === undefined)
-    return err("namespace must have a prefix and an iri");
+  const format = x["format"];
+  if (format !== "turtle" && format !== "n-triples" && format !== "oscal-catalog")
+    return err("format must be turtle, n-triples or oscal-catalog");
+  const nsOk = isRecord(ns) && text(ns["prefix"]) !== undefined && text(ns["iri"]) !== undefined;
+  if (format !== "oscal-catalog" && !nsOk) return err("namespace must have a prefix and an iri");
   const slice = x["slice"];
   if (!Array.isArray(slice) || slice.some((s) => typeof s !== "string")) return err("slice must be a list of local names");
-  const format = x["format"];
-  if (format !== "turtle" && format !== "n-triples") return err("format must be turtle or n-triples");
   const [source, out, rdfImport, provOut] = [text(x["source"]), text(x["out"]), text(x["rdfImport"]), text(x["provOut"])];
   if (source === undefined || out === undefined || rdfImport === undefined)
     return err("source, out and rdfImport must be non-empty strings");
@@ -75,7 +78,7 @@ export function decodeManifest(x: unknown): Result<ImportManifest, string> {
     },
     source,
     format,
-    namespace: { prefix: text(ns["prefix"]) ?? "", iri: text(ns["iri"]) ?? "" },
+    ...(nsOk ? { namespace: { prefix: text(ns["prefix"]) ?? "", iri: text(ns["iri"]) ?? "" } } : {}),
     slice: slice.map(String),
     out,
     ...(provOut === undefined ? {} : { provOut }),
@@ -107,8 +110,11 @@ export async function readSource(source: string, dir: string): Promise<Result<st
 export function readModuleHeader(moduleText: string): { readonly sha256: string; readonly terms: readonly string[] } | undefined {
   const sha = /^\/\/ source_sha256=([0-9a-f]{64})$/m.exec(moduleText)?.[1];
   const block = /export const [a-z][A-Za-z0-9_]* = vocabulary\([A-Z0-9_]+, \{\n([\s\S]*?)\n\}\);/.exec(moduleText)?.[1];
-  if (sha === undefined || block === undefined) return undefined;
-  return { sha256: sha, terms: [...block.matchAll(/^ {2}"?([A-Za-z0-9_]+)"?: "/gm)].map((m) => m[1] ?? "") };
+  if (sha !== undefined && block !== undefined)
+    return { sha256: sha, terms: [...block.matchAll(/^ {2}"?([A-Za-z0-9_]+)"?: "/gm)].map((m) => m[1] ?? "") };
+  const controls = /export const [a-z][A-Za-z0-9_]* = \{\n([\s\S]*?)\n\} as const;/.exec(moduleText)?.[1];
+  if (sha === undefined || controls === undefined) return undefined;
+  return { sha256: sha, terms: [...controls.matchAll(/^ {2}"([^"]+)": \{/gm)].map((m) => m[1] ?? "").sort() };
 }
 
 /** The command line. Returns the exit status: 0, 1 where the module is stale (`--check`), 2 where the manifest or the import has findings. */
@@ -146,15 +152,22 @@ export async function main(argv: readonly string[]): Promise<number> {
     stdio.stderr.writeSync(`${file}: ${text.error}\n`);
     return 2;
   }
-  const made = await importVocabulary({
-    standard: m.value.standard,
-    sourceText: text.value,
-    format: m.value.format,
-    namespace: m.value.namespace,
-    slice: m.value.slice,
-    rdfImport: m.value.rdfImport,
-    ...(m.value.exportName === undefined ? {} : { exportName: m.value.exportName }),
-  });
+  const exportName = m.value.exportName === undefined ? {} : { exportName: m.value.exportName };
+  const { format, namespace } = m.value;
+  const made =
+    format === "oscal-catalog"
+      ? await importOscalCatalog({ standard: m.value.standard, sourceText: text.value, slice: m.value.slice, ...exportName })
+      : namespace === undefined
+        ? err([{ kind: "syntax" as const, line: 1, message: "a vocabulary import has no namespace" }])
+        : await importVocabulary({
+            standard: m.value.standard,
+            sourceText: text.value,
+            format,
+            namespace,
+            slice: m.value.slice,
+            rdfImport: m.value.rdfImport,
+            ...exportName,
+          });
   if (made.kind === "err") {
     stdio.stderr.writeSync(made.error.map((f) => `${file}: ${describeFinding(f)}\n`).join(""));
     return 2;

@@ -33,6 +33,7 @@
 
 - **FR-013**: The module's code MUST be TypeScript 7 where it can be, and the best stack for the job through a typed `Exception` where it cannot (0017-two-languages FR-003, FR-004); a TypeScript part MUST run on Bun and on Node 26, and an exception's tests run on the platforms it names.
 - **FR-014**: An import's source MAY be a URL (`https://`, or `http://` on the loopback address for a test), fetched once and held to the SHA-256 pin of its manifest; the manifest names the version in the URL, never `latest`. `--check` MUST compare, offline, the manifest's pin and slice to the module's header and terms and the presence of the provenance file; with `--fetch` it MUST fetch the source and compare the module and the provenance fully, and it MUST exit 2, naming why, where the source cannot be fetched.
+- **FR-015**: The module MUST import a slice of an OSCAL control catalog (NIST SP 800-53, FedRAMP baselines) from its JSON as a generated TypeScript module of a typed code list whose keys are the control identifiers (`ac-2`, `ac-2.1`), each with its title, its group and, for an enhancement, the control it enhances, and the type of those identifiers; the catalog's JSON MUST be read once into typed records, its title, version and OSCAL version MUST be in the module's header, and the refusals and the determinism of FR-006 apply. It MUST take identifiers and titles only, never the prose of a control, and a control the catalog lacks MUST be named.
 
 ## Out of scope
 
@@ -46,6 +47,7 @@
 - A source with an OWL restriction: the term is written, and a finding names the restriction, per FR-007.
 - A source with an RDF list in a field: a finding, per FR-007.
 - A round trip that adds or loses a triple: the import fails, per FR-008.
+- A slice that names `ac-2.1` and a control the catalog lacks: the missing control is named and nothing is written, per FR-015.
 - A source whose bytes changed under the same URL: refused as a pin mismatch, with the pinned and the actual hash, per FR-006 and FR-014.
 - `--check` with no network: compared to the header offline, per FR-014.
 - A term of ours whose basis is `maps` to a NIST term: an SSSOM row, per FR-010.

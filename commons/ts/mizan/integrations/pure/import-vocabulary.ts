@@ -69,7 +69,7 @@ export type ImportRecordData = {
 export type ImportOutput = {
   readonly module: string;
   readonly record: ImportRecordData;
-  readonly terms: readonly { readonly iri: string; readonly kind: TermKind }[];
+  readonly terms: readonly { readonly iri: string; readonly kind: TermKind | "control" }[];
   readonly findings: readonly IntegrationFinding[];
 };
 

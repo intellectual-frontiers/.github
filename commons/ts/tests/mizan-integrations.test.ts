@@ -21,6 +21,8 @@ import {
   exportSkos,
   exportSqlCodeList,
   type AnySchema,
+  decodeCatalog,
+  importOscalCatalog,
   importVocabulary,
   lookup,
   provenanceTurtle,
@@ -468,5 +470,104 @@ proves(
       removeSync(dir, { recursive: true });
     }
     body = `${SOURCE}ex:Added a owl:Class .\n`;
+  },
+);
+
+const CATALOG = JSON.stringify({
+  catalog: {
+    uuid: "00000000-0000-4000-8000-000000000000",
+    metadata: { title: "Example catalog", version: "1.0", "oscal-version": "1.2.3" },
+    groups: [
+      {
+        id: "ac",
+        title: "Access Control",
+        controls: [
+          { id: "ac-1", title: "Policy", controls: [] },
+          { id: "ac-2", title: "Account Management", controls: [{ id: "ac-2.1", title: "Automated Account Management" }] },
+        ],
+      },
+      { id: "au", title: "Audit", controls: [{ id: "au-2", title: 'Event "Logging"' }] },
+    ],
+  },
+});
+
+async function catalogStandard(over: Partial<StandardRecord> = {}): Promise<StandardRecord> {
+  return { ...(await standard()), id: "example-catalog", name: "Example catalog", sha256: await sha256(CATALOG), ...over };
+}
+
+proves(
+  ["0019-mizan-integrations FR-015"],
+  "an OSCAL catalog is read into typed controls, enhancements included, and what is not a catalog is named",
+  () => {
+    const c = decodeCatalog(CATALOG);
+    assert(c.kind === "ok");
+    assertEquals(c.value.version, "1.0");
+    assertEquals(c.value.oscalVersion, "1.2.3");
+    assertEquals(
+      c.value.controls.map((x) => `${x.group}:${x.id}${x.enhancementOf === undefined ? "" : `<${x.enhancementOf}`}`),
+      ["ac:ac-1", "ac:ac-2", "ac:ac-2.1<ac-2", "au:au-2"],
+    );
+    assert(decodeCatalog("{").kind === "err");
+    assert(decodeCatalog("{}").kind === "err");
+    assert(decodeCatalog('{"catalog":{"metadata":{"title":"t"}}}').kind === "err");
+  },
+);
+
+proves(
+  ["0019-mizan-integrations FR-015"],
+  "a slice of controls is imported as a typed code list, deterministically, and a missing control, a pin mismatch and no right to copy are refused",
+  async () => {
+    const input = { standard: await catalogStandard(), sourceText: CATALOG, slice: ["au-2", "ac-2.1", "ac-2"] } as const;
+    const a = await importOscalCatalog(input);
+    assert(a.kind === "ok");
+    assertEquals(a.value.record.slice, ["ac-2", "ac-2.1", "au-2"]);
+    assertStringIncludes(a.value.module, '"ac-2.1": { title: "Automated Account Management", group: "ac", enhancementOf: "ac-2" },');
+    assertStringIncludes(a.value.module, '"au-2": { title: "Event \\"Logging\\"", group: "au" },');
+    assertStringIncludes(a.value.module, "export type ControlId = keyof typeof controls;");
+    assertStringIncludes(a.value.module, "// catalog: Example catalog, version 1.0, OSCAL 1.2.3");
+    assert(!a.value.module.includes("ac-1"), "only the slice is taken");
+    const b = await importOscalCatalog(input);
+    assert(b.kind === "ok");
+    assertEquals(b.value.module, a.value.module);
+    const missing = await importOscalCatalog({ ...input, slice: ["ac-2", "zz-9"] });
+    assert(missing.kind === "err" && missing.error[0]?.kind === "term-missing");
+    const pin = await importOscalCatalog({ ...input, standard: await catalogStandard({ sha256: "0".repeat(64) }) });
+    assert(pin.kind === "err" && pin.error[0]?.kind === "pin-mismatch");
+    const closed = await importOscalCatalog({ ...input, standard: await catalogStandard({ redistributable: false }) });
+    assert(closed.kind === "err" && closed.error[0]?.kind === "not-redistributable");
+    const broken = await importOscalCatalog({ ...input, standard: await catalogStandard({ sha256: await sha256("{") }), sourceText: "{" });
+    assert(broken.kind === "err" && broken.error[0]?.kind === "syntax");
+  },
+);
+
+proves(
+  ["0019-mizan-integrations FR-015"],
+  "the command imports an OSCAL catalog from a manifest with no namespace, and the module it writes loads with the controls of the slice",
+  async () => {
+    const dir = makeTempDirSync({ prefix: "mizan-oscal-" });
+    try {
+      const std = await catalogStandard();
+      writeTextFileSync(`${dir}/catalog.json`, CATALOG);
+      writeTextFileSync(
+        `${dir}/manifest.ts`,
+        `export const manifest = ${JSON.stringify({ standard: std, source: "catalog.json", format: "oscal-catalog", slice: ["ac-2", "ac-2.1", "au-2"], out: "controls.auto.ts", rdfImport: "unused" })};\n`,
+      );
+      const wrote = await exec(`${dir}/manifest.ts`);
+      assertEquals([wrote.code, wrote.stdout], [0, "wrote controls.auto.ts: 3 terms\n"]);
+      assertEquals((await exec(`${dir}/manifest.ts`, "--check")).code, 0);
+      const loaded: unknown = await import(`${dir}/controls.auto.ts`);
+      assert(typeof loaded === "object" && loaded !== null && "controls" in loaded);
+      assertEquals(Object.keys(loaded.controls as object), ["ac-2", "ac-2.1", "au-2"]);
+      assertStringIncludes(readTextFileSync(`${dir}/controls.auto.prov.ttl`), "import-oscal-catalog.ts");
+      writeTextFileSync(
+        `${dir}/manifest.ts`,
+        `export const manifest = ${JSON.stringify({ standard: std, source: "catalog.json", format: "turtle", slice: ["ac-2"], out: "x.ts", rdfImport: "r" })};\n`,
+      );
+      const noNs = await exec(`${dir}/manifest.ts`);
+      assertEquals(noNs.code, 2);
+      assertStringIncludes(noNs.stderr, "namespace must have a prefix and an iri");
+    } finally {
+      removeSync(dir, { recursive: true });
+    }
   },
 );

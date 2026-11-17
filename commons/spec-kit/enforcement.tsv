@@ -386,3 +386,4 @@ requirement	mechanism	by	note
 0019-mizan-integrations FR-012	none	-	Planned, Phase 4 of issue #10: the module is not built yet
 0019-mizan-integrations FR-013	none	-	Planned, Phase 4 of issue #10: the module is not built yet
 0019-mizan-integrations FR-014	check	.github: cd commons/ts && bun test tests/	mizan-integrations.test.ts: a source served over HTTP is written, checked offline, checked with a fetch, refused when its bytes change and named when it cannot be fetched
+0019-mizan-integrations FR-015	check	.github: cd commons/ts && bun test tests/	mizan-integrations.test.ts: a catalog read into typed controls, a slice imported deterministically, a missing control, a pin mismatch and no right to copy refused, the command run from a manifest with no namespace
