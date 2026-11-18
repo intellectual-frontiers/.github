@@ -40,6 +40,7 @@ export type MizanRule =
   | "mizan/term-basis-missing"
   | "mizan/spec-term-unknown"
   | "mizan/spec-term-deprecated"
+  | "mizan/term-not-defined-by"
   | "mizan/deprecated-no-replacement"
   | "mizan/authority-citation"
   | "mizan/standard-newer"

@@ -3,6 +3,7 @@
  *
  *     bun commons/tools/mizan-check.ts               check commons/spec-kit
  *     bun commons/tools/mizan-check.ts --root DIR    check DIR (a folder holding registry.tsv, enforcement.tsv and specs/)
+ *     bun commons/tools/mizan-check.ts --root DIR --register DIR2   the registers (registry.tsv and enforcement.tsv) are in DIR2, the specifications in DIR/specs/
  *
  * It imports nothing outside commons/tools but two built-ins of `node:`, so any harness can run it, on Bun or Node 26, from a checkout, and a harness that wants the findings as data imports `check(root)`.
  * It checks the register of numbers, the form of each specification, that edge cases cite requirements that exist, and that the enforcement register has one well-formed row for every
@@ -59,15 +60,23 @@ const EOL = "(?=\\n|$)";
 const SLUG = "[a-z][a-z0-9]*(?:-[a-z0-9]+)*";
 const rx = (source: string, flags = ""): RegExp => new RegExp(source, `u${flags}`);
 
-const FOLDER = rx(`^(${D}{4,})-(${SLUG})\\n?$`);
+const FOLDER = rx(`^(${D}{3,4})-(${SLUG})\\n?$`);
 const ITEM = rx(`${BOL}- \\*\\*(FR-${D}{3}|SC-${D}{3}|OQ-${D}+)\\*\\*`, "g");
 const ROW_COMMAND = rx(`^[A-Za-z0-9_.-]+: ${NS}[^\\n]*\\n?$`);
-const NUMBER = rx(`^${D}{4,}$`);
+const NUMBER = rx(`^${D}{3,4}$`);
 const SLUG_ONLY = rx(`^${SLUG}$`);
 const FR = rx(`FR-${D}{3}`, "g");
 /** A specification of another repository, `<repo> NNNN-slug`, which the search for bare numbers leaves out (Python's `\b`, Unicode's). */
-const QUALIFIED = rx(`(?:(?<=${W})(?!${W})|(?<!${W})(?=${W}))[A-Za-z0-9_.-]+ ${D}{4}-[a-z][a-z0-9-]*`, "g");
-const BARE = rx(`(?<![\\p{L}\\p{N}_-])(?<!${W} )(${D}{4}-[a-z][a-z0-9]*(?:-[a-z0-9]+)*)`, "g");
+const QUALIFIED = rx(`(?:(?<=${W})(?!${W})|(?<!${W})(?=${W}))[A-Za-z0-9_.-]+ ${D}{3,4}-[a-z][a-z0-9-]*`, "g");
+/** A bare citation `NNNN-slug`, of the widths (three, four) the folder's own numbers have: a folder that numbers its specifications with three digits names them with three. */
+const bareOf = (widths: ReadonlySet<number>): RegExp =>
+  rx(
+    `(?<![\\p{L}\\p{N}_-])(?<!${W} )((?:${[...widths]
+      .sort()
+      .map((w) => `${D}{${w}}`)
+      .join("|")})-[a-z][a-z0-9]*(?:-[a-z0-9]+)*)`,
+    "g",
+  );
 
 /** What is wrong, and where: the place is a file of the folder, a line of it, or a specification's folder. */
 export type Problem =
@@ -77,7 +86,7 @@ export type Problem =
   | { readonly kind: "number-twice"; readonly number: string; readonly line: number }
   | { readonly kind: "in-force-missing"; readonly spec: string }
   | { readonly kind: "retired-present"; readonly spec: string }
-  | { readonly kind: "gap"; readonly number: number }
+  | { readonly kind: "gap"; readonly number: number; readonly width: number }
   | { readonly kind: "folder-name" }
   | { readonly kind: "not-registered" }
   | { readonly kind: "spec-missing" }
@@ -112,7 +121,7 @@ export function message(p: Problem): string {
     case "registry-header":
       return "the header must be 'number\\tslug\\tstate'";
     case "registry-row":
-      return "a row is a number of four or more digits, a slug and one of ['in force', 'retired']";
+      return "a row is a number of three or four digits, a slug and one of ['in force', 'retired']";
     case "number-twice":
       return `number ${p.number} is assigned twice, also on line ${p.line}`;
     case "in-force-missing":
@@ -120,9 +129,9 @@ export function message(p: Problem): string {
     case "retired-present":
       return `${p.spec} is retired but still exists`;
     case "gap":
-      return `the sequence has a gap at ${String(p.number).padStart(4, "0")}; a number is never skipped`;
+      return `the sequence has a gap at ${String(p.number).padStart(p.width, "0")}; a number is never skipped`;
     case "folder-name":
-      return "a spec folder is named NNNN-slug";
+      return "a spec folder is named NNN-slug or NNNN-slug";
     case "not-registered":
       return "has no row in registry.tsv";
     case "spec-missing":
@@ -219,10 +228,17 @@ function registry(root: string): { rows: Row[]; found: Finding[] } {
 const requirementsOf = (ids: readonly string[]): string[] => ids.filter((m) => m.startsWith("FR-"));
 const items = (text: string): string[] => [...text.matchAll(ITEM)].map((m) => m[1] ?? "");
 
-/** Every finding of the folder at `root`, in the order the tool prints them. */
-export function check(root: string): Finding[] {
+/** What `check` may be told besides the folder: where the registers are. */
+export type CheckOptions = {
+  /** The folder that holds `registry.tsv` and `enforcement.tsv` where it is not the one that holds `specs/` (the folder of `root` where not given). */
+  readonly register?: string;
+};
+
+/** Every finding of the folder at `root`, in the order the tool prints them; the registers are in `options.register` where it is given (0003-mizan FR-042). */
+export function check(root: string, options: CheckOptions = {}): Finding[] {
   const found: Finding[] = [];
-  const { rows, found: bad } = registry(root);
+  const registers = options.register ?? root;
+  const { rows, found: bad } = registry(registers);
   found.push(...bad);
   const folder = `${root}/specs`;
   const present = new Map<string, string>();
@@ -251,8 +267,11 @@ export function check(root: string): Finding[] {
     }
   }
   const highest = Math.max(0, ...seen.keys());
-  for (let k = 1; k <= highest; k++) if (!seen.has(k)) found.push({ where: "registry.tsv", problem: { kind: "gap", number: k } });
+  const widths = new Set(rows.map((r) => [...r.number].length));
+  const width = widths.size === 0 ? 4 : Math.max(...widths);
+  for (let k = 1; k <= highest; k++) if (!seen.has(k)) found.push({ where: "registry.tsv", problem: { kind: "gap", number: k, width } });
   const registered = new Set(rows.map((r) => `${r.number}-${r.slug}`));
+  const bare = bareOf(new Set(widths.size === 0 ? [4] : widths));
   const requirements = new Map<string, string[]>();
   for (const [name, dir] of present) {
     const where = `specs/${name}`;
@@ -266,13 +285,19 @@ export function check(root: string): Finding[] {
       found.push({ where, problem: { kind: "spec-missing" } });
       continue;
     }
-    found.push(...specFindings(name, readText(spec), present, requirements));
+    found.push(...specFindings(name, readText(spec), present, requirements, bare));
   }
-  found.push(...enforcement(root, requirements));
+  found.push(...enforcement(registers, requirements));
   return found;
 }
 
-function specFindings(name: string, text: string, present: ReadonlyMap<string, string>, requirements: Map<string, string[]>): Finding[] {
+function specFindings(
+  name: string,
+  text: string,
+  present: ReadonlyMap<string, string>,
+  requirements: Map<string, string[]>,
+  bareCitation: RegExp,
+): Finding[] {
   const where = `specs/${name}`;
   const found: Finding[] = [];
   const add = (problem: Problem): void => void found.push({ where, problem });
@@ -318,7 +343,7 @@ function specFindings(name: string, text: string, present: ReadonlyMap<string, s
     }
   }
   // a specification of another repository is cited as `<repo> NNNN-slug`; a bare one is in this folder
-  const bare = new Set([...text.replace(QUALIFIED, "").matchAll(BARE)].map((m) => m[1] ?? ""));
+  const bare = new Set([...text.replace(QUALIFIED, "").matchAll(bareCitation)].map((m) => m[1] ?? ""));
   for (const cite of sortedText(bare)) if (!present.has(cite)) add({ kind: "bare-citation", cite });
   return found;
 }
@@ -367,7 +392,7 @@ function enforcement(root: string, requirements: ReadonlyMap<string, readonly st
   return found;
 }
 
-/** The command line: `--root DIR`, or commons' own folder; every finding on standard error as `where: message`; exit 1 where there is one. */
+/** The command line: `--root DIR`, or commons' own folder, and `--register DIR` for the folder of the registers; every finding on standard error as `where: message`; exit 1 where there is one. */
 export function main(argv: readonly string[]): number {
   const i = argv.indexOf("--root");
   let root = pathOfUrl(new URL("../spec-kit", import.meta.url));
@@ -379,7 +404,13 @@ export function main(argv: readonly string[]): number {
     }
     root = given;
   }
-  const found = check(root);
+  const r = argv.indexOf("--register");
+  const register = r >= 0 ? argv[r + 1] : undefined;
+  if (r >= 0 && register === undefined) {
+    writeAll("stderr", "mizan-check: --register needs a folder\n");
+    return 1;
+  }
+  const found = check(root, register === undefined ? {} : { register });
   writeAll("stderr", found.map((f) => `${f.where}: ${message(f.problem)}\n`).join(""));
   return found.length > 0 ? 1 : 0;
 }

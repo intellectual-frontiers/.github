@@ -19,7 +19,7 @@ import { type Declaration } from "./changes/declaration.ts";
 import { declarationPlugin } from "./changes/plugin.ts";
 import { versionsPlugin, type WorkFile } from "./versions/plugin.ts";
 import { type MizanFinding, mizanFindings, type RulePlugin, rulePlugins } from "./rules.ts";
-import { type KnownTerms, specTermFindings } from "./spec-terms.ts";
+import { type KnownTerms, specTermFindings, termDefinedByFindings, type TermDefinitions } from "./spec-terms.ts";
 import { basisMissing, termFindings, type TermRecord } from "./standards.ts";
 
 /** What a harness gives the check. */
@@ -40,7 +40,15 @@ export type HarnessInput = {
   /** For each ontology: its terms' IRIs and the IRIs the audit has a record of; a term with no record fails the check. */
   readonly completeness?: readonly { readonly file: string; readonly ontology: readonly string[]; readonly recorded: readonly string[] }[];
   /** The terms a specification may name by prefix, and the deprecated ones with what replaces each. */
-  readonly specTerms?: { readonly known: KnownTerms; readonly deprecated?: ReadonlyMap<string, string> };
+  readonly specTerms?: {
+    readonly known: KnownTerms;
+    readonly deprecated?: ReadonlyMap<string, string>;
+    /**
+     * What each term's `mz:definedBy` says, by CURIE (`definitionsOf`): where it is given, a requirement that names a term the term does not cite back is a finding (0003-mizan FR-044), a
+     * warning the baseline holds. Where it is not, the stage is not run.
+     */
+    readonly definitions?: TermDefinitions;
+  };
   /** The name the report is headed with. */
   readonly name?: string;
   /**
@@ -64,7 +72,13 @@ export function holdHarness(i: HarnessInput): number {
   const always = (f: MizanFinding): boolean => f.rule === "mizan/decision-overdue" || f.rule === "mizan/term-basis-missing";
   const gated = (f: MizanFinding): boolean => f.severity === "gate";
   const specs = readSpecTexts(i.root);
-  const named = i.specTerms === undefined ? [] : specTermFindings(specs, i.specTerms.known, i.specTerms.deprecated);
+  const named =
+    i.specTerms === undefined
+      ? []
+      : [
+          ...specTermFindings(specs, i.specTerms.known, i.specTerms.deprecated),
+          ...(i.specTerms.definitions === undefined ? [] : termDefinedByFindings(specs, i.specTerms.known, i.specTerms.definitions)),
+        ];
   const changes = [
     ...(i.declaration === undefined ? [] : [declarationPlugin(i.declaration.declaration, i.declaration.file, specs[0]?.slug)]),
     ...(i.works === undefined ? [] : [versionsPlugin(i.works, specs[0]?.slug)]),

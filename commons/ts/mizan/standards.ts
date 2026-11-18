@@ -41,6 +41,8 @@ export type TermRecord = {
   /** The day (`YYYY-MM-DD`) the term was deprecated, and the IRI of the term that replaces it (0012-ontology, 0018-standards-first). */
   readonly deprecatedOn?: string;
   readonly replacedBy?: string;
+  /** The specifications, or requirements (`NNNN-slug FR-nnn`), that define the term (`mz:definedBy`), for the requirement-to-term stage of the trace (0003-mizan FR-044). */
+  readonly definedBy?: readonly string[];
 };
 
 const DAY = /^\d{4}-\d{2}-\d{2}$/;

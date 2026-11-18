@@ -6,6 +6,7 @@
  *     bun commons/ts/mizan/oscal-register.ts             write commons/generated/mizan-register.auto.oscal.json and mizan-register-results.auto.oscal.json
  *     bun commons/ts/mizan/oscal-register.ts --check     write nothing; exit 1 naming each file that is not what the folder makes
  *     --root DIR      the folder (default commons/spec-kit)     --repo DIR   the repository the tests are searched in (default commons' repository)
+ *     --register DIR  the folder of `enforcement.tsv` (default: the folder of --root)     --enforcement FILE   the register's file itself (default: enforcement.tsv of the register folder)
  *     --tests A,B     the folders of tests, from the repository (default tests,commons)     --out DIR   where the files go (default commons/generated)
  *     --label TEXT    the name the documents give the folder (default `Intellectual Frontiers commons`)
  *
@@ -264,9 +265,12 @@ async function findingsOf(row: RegisterRow, control: ControlSummary, tests: Read
 /** The two documents, as the text of their files. */
 export type RegisterDocuments = { readonly componentDefinition: string; readonly assessmentResults: string };
 
-/** The register as OSCAL 1.2.3: the component definition and the assessment results, rendered (0003-mizan FR-021, FR-022). */
-export async function registerDocuments(input: RegisterInput): Promise<RegisterDocuments> {
-  const rows = registerRows(input);
+/**
+ * The register as OSCAL 1.2.3: the component definition and the assessment results, rendered (0003-mizan FR-021, FR-022). Where `register.enforcement` names a file, its text is the register
+ * and `input.enforcement` is not read (FR-043); the same bytes come for the same register wherever its file is.
+ */
+export async function registerDocuments(input: RegisterInput, register: RegisterOptions = {}): Promise<RegisterDocuments> {
+  const rows = registerRows(register.enforcement === undefined ? input : { ...input, enforcement: enforcementAt(register.enforcement) });
   const catalog = "the specifications of its Mizan folder";
   const pairs = rows.map((row) => ({ row, control: summaryOf(row, catalog) }));
   const controls = pairs.map((p) => p.control);
@@ -335,8 +339,29 @@ export async function registerDocuments(input: RegisterInput): Promise<RegisterD
   return { componentDefinition: renderOscal(withMechanism), assessmentResults: renderOscal(results) };
 }
 
-/** The specifications of a folder, the text of each `reviewed.tsv`, and `enforcement.tsv`, read from disk, with the tests of the given folders of a repository (by path from it). */
-export async function readRegisterInput(root: string, repo: string, testFolders: readonly string[], label: string): Promise<RegisterInput> {
+/** What the register may be told besides its folder (0003-mizan FR-043): where its `enforcement.tsv` is, where it is not `enforcement.tsv` of the folder. */
+export type RegisterOptions = {
+  /** The path of the proof register's file, where it is not `<root>/enforcement.tsv`. A file that is not there is an error, not an empty register. */
+  readonly enforcement?: string;
+};
+
+/** The text of the register at an explicit path, with LF line ends; an error that names the file where it is not there. */
+function enforcementAt(path: string): string {
+  if (!existsSync(path)) throw new Error(`the proof register ${path} does not exist`);
+  return readTextFileSync(path).replaceAll("\r\n", "\n");
+}
+
+/**
+ * The specifications of a folder, the text of each `reviewed.tsv`, and the proof register, read from disk, with the tests of the given folders of a repository (by path from it). The register is
+ * `<root>/enforcement.tsv` unless `options.enforcement` names another file (0003-mizan FR-043).
+ */
+export async function readRegisterInput(
+  root: string,
+  repo: string,
+  testFolders: readonly string[],
+  label: string,
+  options: RegisterOptions = {},
+): Promise<RegisterInput> {
   const specs: SpecText[] = [];
   const reviewed = new Map<string, string>();
   const folder = `${root.replace(/[\\/]$/, "")}/specs`;
@@ -347,7 +372,7 @@ export async function readRegisterInput(root: string, repo: string, testFolders:
       if (existsSync(`${folder}/${e.name}/reviewed.tsv`))
         reviewed.set(e.name, readTextFileSync(`${folder}/${e.name}/reviewed.tsv`).replaceAll("\r\n", "\n"));
     }
-  const enforcement = `${root.replace(/[\\/]$/, "")}/enforcement.tsv`;
+  const enforcement = options.enforcement ?? `${root.replace(/[\\/]$/, "")}/enforcement.tsv`;
   const tests = await readSources(
     repo,
     testFolders.filter((t) => existsSync(`${repo.replace(/[\\/]$/, "")}/${t}`)),
@@ -357,7 +382,12 @@ export async function readRegisterInput(root: string, repo: string, testFolders:
     label,
     specs,
     reviewed,
-    enforcement: existsSync(enforcement) ? readTextFileSync(enforcement).replaceAll("\r\n", "\n") : "",
+    enforcement:
+      options.enforcement !== undefined
+        ? enforcementAt(enforcement)
+        : existsSync(enforcement)
+          ? readTextFileSync(enforcement).replaceAll("\r\n", "\n")
+          : "",
     tests: [...tests].map((t) => ({ ...t, text: t.text.replaceAll("\r\n", "\n") })).sort((a, b) => byText(a.path, b.path)),
   };
 }
@@ -370,10 +400,25 @@ export async function main(argv: readonly string[]): Promise<number> {
   };
   const commons = fileURLToPath(new URL("../..", import.meta.url)).replace(/[\\/]$/, "");
   const root = arg("--root") ?? `${commons}/spec-kit`;
+  const register = arg("--register") ?? root;
+  const enforcement =
+    arg("--enforcement") ?? (arg("--register") === undefined ? undefined : `${register.replace(/[\\/]$/, "")}/enforcement.tsv`);
   const repo = arg("--repo") ?? fileURLToPath(new URL("../../..", import.meta.url)).replace(/[\\/]$/, "");
   const out = (arg("--out") ?? `${commons}/generated`).replace(/[\\/]$/, "");
   const tests = (arg("--tests") ?? "tests,commons").split(",");
-  const made = await registerDocuments(await readRegisterInput(root, repo, tests, arg("--label") ?? "Intellectual Frontiers commons"));
+  if (enforcement !== undefined && !existsSync(enforcement)) {
+    stdio.stderr.writeSync(`oscal-register: the proof register ${enforcement} does not exist\n`);
+    return 2;
+  }
+  const made = await registerDocuments(
+    await readRegisterInput(
+      root,
+      repo,
+      tests,
+      arg("--label") ?? "Intellectual Frontiers commons",
+      enforcement === undefined ? {} : { enforcement },
+    ),
+  );
   const files: readonly (readonly [string, string])[] = [
     [COMPONENT_FILE, made.componentDefinition],
     [RESULTS_FILE, made.assessmentResults],

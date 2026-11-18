@@ -3,6 +3,8 @@
  *
  *     bun commons/ts/mizan/check.ts                       check commons/spec-kit against commons/spec-kit/mizan.baseline.txt
  *     bun commons/ts/mizan/check.ts --root DIR            check DIR (a folder holding specs/)
+ *     bun commons/ts/mizan/check.ts --register DIR        the folder of the registers (and of the baseline, `mizan.baseline.txt` beside `registry.tsv`) where it is not the root
+ *     bun commons/ts/mizan/check.ts --defined-by          also hold commons' own terms to the requirement-to-term stage (0003-mizan FR-044), which a harness turns on with `specTerms.definitions`
  *     bun commons/ts/mizan/check.ts --baseline FILE       hold the findings against FILE
  *     bun commons/ts/mizan/check.ts --write-baseline      write the baseline from today's findings (to start it, or to shrink it: never to add a line to pass)
  *     bun commons/ts/mizan/check.ts --today YYYY-MM-DD    count the 90 days of a decision from that day (for a test); commons' own folder also holds its ontologies' terms to 0018-standards-first FR-003 to FR-005
@@ -25,6 +27,7 @@ import { type RulePlugin, rulePlugins } from "./rules.ts";
 import { holdHarness } from "./harness.ts";
 import { readWorks } from "./versions/scan.ts";
 import { BASELINE_COMMENTS, readSpecTexts } from "./spec-files.ts";
+import { definitionsOf } from "./spec-terms.ts";
 import type { BasisKind, TermRecord } from "./standards.ts";
 
 export { BASELINE_COMMENTS, readSpecTexts };
@@ -46,6 +49,7 @@ export function termRecordsOf(audit: readonly (typeof terms)[number][]): readonl
     decision: t.values.decision !== undefined,
     ...(t.values.deprecatedOn === undefined ? {} : { deprecatedOn: t.values.deprecatedOn }),
     ...(t.values.replacedBy === undefined ? {} : { replacedBy: t.values.replacedBy }),
+    ...(t.values.definedBy === undefined ? {} : { definedBy: t.values.definedBy }),
   }));
 }
 
@@ -61,17 +65,19 @@ export function mizanTermRecords(): readonly TermRecord[] {
   ]);
 }
 
+/** The prefixes of commons' own ontologies and their namespaces. */
+const PREFIXES = {
+  mz: "https://www.intellectualfrontiers.com/ontology/mizan#",
+  pm: "https://www.intellectualfrontiers.com/ontology/packaging#",
+  ifws: ifwsOntology.IFWS.iri,
+  ifccm: ifccmOntology.IFCCM.iri,
+  ifqs: ifqsOntology.IFQS.iri,
+  ifr: ifrOntology.IFR.iri,
+} as const;
+
 /** The CURIE of a term of commons' own ontologies: `mz:` or `pm:` and its local name, or the IRI where it is of neither. */
 function curieOf(iri: string): string {
-  for (const [prefix, ns] of [
-    ["mz", "https://www.intellectualfrontiers.com/ontology/mizan#"],
-    ["pm", "https://www.intellectualfrontiers.com/ontology/packaging#"],
-    ["ifws", ifwsOntology.IFWS.iri],
-    ["ifccm", ifccmOntology.IFCCM.iri],
-    ["ifqs", ifqsOntology.IFQS.iri],
-    ["ifr", ifrOntology.IFR.iri],
-  ] as const)
-    if (iri.startsWith(ns)) return `${prefix}:${iri.slice(ns.length)}`;
+  for (const [prefix, ns] of Object.entries(PREFIXES)) if (iri.startsWith(ns)) return `${prefix}:${iri.slice(ns.length)}`;
   return iri;
 }
 
@@ -98,7 +104,7 @@ export function main(
   const own = arg("--root") === undefined;
   return holdHarness({
     root,
-    baselineFile: arg("--baseline") ?? `${root.replace(/[\\/]$/, "")}/mizan.baseline.txt`,
+    baselineFile: arg("--baseline") ?? `${(arg("--register") ?? root).replace(/[\\/]$/, "")}/mizan.baseline.txt`,
     today: arg("--today") ?? today,
     plugins,
     writeBaseline: argv.includes("--write-baseline"),
@@ -174,6 +180,8 @@ export function main(
               ]),
             },
             deprecated: deprecatedTerms(),
+            // the requirement-to-term stage (0003-mizan FR-044) is opt-in for commons' own folder: its 229 findings are not put in the baseline, which only shrinks
+            ...(argv.includes("--defined-by") ? { definitions: definitionsOf(mizanTermRecords(), PREFIXES) } : {}),
           },
         }
       : {}),
