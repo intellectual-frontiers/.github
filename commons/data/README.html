@@ -110,7 +110,7 @@ footer { margin-top: 4rem; padding-top: 1rem; border-top: 1px solid var(--line);
 <code class="pkg">@intellectual-frontiers/data</code>
 <h1>Governance in, SQL out, and a safe way to change the database</h1>
 <p class="lede">A library of Intellectual Frontiers commons. A governance layer says what a business domain is and what must be true of its data; a logical schema is made from it; a physical schema for PostgreSQL, SQLite or DuckDB is made from that; a lifecycle layer changes a database from one physical schema to the next; and extensions add the rest.</p>
-<p class="small">Version 0.0.0, conformance level L1, private package, Node &ge; 26 (Bun is the default runtime). Specifications 0001 to 0023 are in force, in <code>spec-kit/</code>.</p>
+<p class="small">Version 0.0.0, conformance level L1, private package, Node &ge; 26 (Bun is the default runtime). Specifications 0001 to 0024 are in force, in <code>spec-kit/</code>.</p>
 </header>
 
 <section id="purpose">
@@ -203,7 +203,7 @@ if (sql.kind === "ok") console.log(render(sql.value));</code></pre>
 <tr><td><code>./engine</code>, <code>./governance</code>, <code>./sql/logical</code>, <code>./sql/physical</code>, <code>./sql/lifecycle</code></td><td>the layers</td></tr>
 <tr><td><code>./models/arca</code></td><td>the party model</td></tr>
 <tr><td><code>./sql/dialects/postgres</code>, <code>/sqlite</code>, <code>/duckdb</code></td><td>the dialects</td></tr>
-<tr><td><code>./sql/extensions/</code> <code>documentation views access routines partitions generators idempotency protected-access safety plan-report rewrite history convergence rollout integrations transforms</code></td><td>the extensions (16)</td></tr>
+<tr><td><code>./sql/extensions/</code> <code>documentation views access routines partitions generators idempotency protected-access safety plan-report rewrite history convergence rollout integrations transforms queries</code></td><td>the extensions (17)</td></tr>
 <tr><td><code>./sql/presets</code></td><td>the four presets</td></tr>
 </tbody>
 </table>
@@ -460,6 +460,16 @@ if (l.kind === "ok") await load(driver, l.value); // { outcome: "loaded", landed
   select: (r) =&gt; `SELECT ${r.column("author", "id")} AS id, ${r.column("author", "name")} AS name FROM ${r.table("author")}`,
   tests: [{ kind: "unique", columns: ["id"] }] }], { dialect });
 if (p.kind === "ok") await build(driver, p.value); // { ok: true, models: [{ outcome: "built", rows: 3, ... }] }</code></pre>
+<h3>Queries <span class="tag">0024</span></h3>
+<p>An application's reads are a catalog of named queries. Each is SQL a person writes, but its names are the schema's (given by <code>Refs</code>, so an unknown table or column is an error value when the catalog is made) and its values come in only as typed parameters (<code>text</code>, <code>integer</code>, <code>number</code>, <code>boolean</code>, each possibly nullable) written as literals by the dialect: a value can never become SQL. <code>queries(schema, specs, { dialect })</code> makes the catalog.</p>
+<ul>
+<li><strong>Read-only by construction.</strong> A query must be one <code>SELECT</code> or <code>WITH</code>; with strings, quoted names and comments left out, a <code>;</code> or a word such as <code>INSERT</code>, <code>DELETE</code>, <code>DROP</code> or <code>COPY</code> is refused. <code>run(driver, query, values)</code> runs it in a transaction that is rolled back.</li>
+<li><strong>Verified against a database.</strong> <code>verify(driver, catalog)</code> prepares every query with sample values (<code>SELECT * FROM (query) LIMIT 0</code>) and reports the ones the engine refuses with its message.</li>
+<li><strong>Compared between versions.</strong> <code>impact(specs, from, to, options)</code> says, for each query, <code>fine</code>, <code>breaks</code> (fine before, broken after, with the errors), <code>broken</code> or <code>fixed</code>: the queries a schema change breaks are known before it is applied, which is what parallel versions (rollout) needs.</li>
+</ul>
+<pre><code>const c = queries(schema, [{ name: "by name", params: { name: "text" },
+  sql: (r, p) =&gt; `SELECT ${r.column("author", "id")} FROM ${r.table("author")} WHERE ${r.column("author", "name")} = ${p("name")}` }], { dialect });
+if (c.kind === "ok") await run(driver, c.value.get("by name")!, { name: "Ann" });</code></pre>
 </section>
 
 <section id="strategies">
@@ -539,7 +549,7 @@ connect(driver, dialect, schema, { dialect }, p.convergence!, { ...p.planOptions
 <pre><code>cd commons/data &amp;&amp; bun run verify</code></pre>
 <p>which runs, in order (<code>package.json</code>): the TypeScript compiler (<code>tsc -p tsconfig.json</code>); the specification checker on <code>spec-kit/</code> (<code>mizan-check.ts --root spec-kit</code>); the Mizan rules at level L1 on it; <code>tools/check.ts</code>, the trace of sources and tests to the specifications and the layers check, held against <code>trace.baseline.txt</code>, which only shrinks; and <code>bun test suite/</code>. <code>bun run test:node</code> runs the same tests under <code>node --test</code>.</p>
 <ul>
-<li><strong>Spec kit.</strong> Twenty-three specifications, <code>0001-layers</code> to <code>0023-sql-transforms</code>, each <code>spec-kit/specs/&lt;number-slug&gt;/spec.md</code> with an input paragraph, numbered requirements (<code>FR-nnn</code>), edge cases, success criteria and an out-of-scope list; <code>registry.tsv</code> lists them, all in force.</li>
+<li><strong>Spec kit.</strong> Twenty-four specifications, <code>0001-layers</code> to <code>0024-sql-queries</code>, each <code>spec-kit/specs/&lt;number-slug&gt;/spec.md</code> with an input paragraph, numbered requirements (<code>FR-nnn</code>), edge cases, success criteria and an out-of-scope list; <code>registry.tsv</code> lists them, all in force.</li>
 <li><strong><code>enforcement.tsv</code>.</strong> Says what enforces each requirement (0024-spec-format): a <code>mechanism</code> of <code>check</code>, <code>gate</code>, <code>review</code> or <code>none</code>, and by what. At the time of writing 230 of its rows are a <code>check</code> by <code>cd commons/data &amp;&amp; bun run verify</code>, and one (0001 FR-012, the logical and physical naming conventions) is marked <code>none</code> with the note <em>Planned</em>.</li>
 <li><strong><code>proves()</code>.</strong> A test is <code>suite/&lt;kebab-case&gt;.test.ts</code> on IFC TypeScript, and <code>proves(["0001-layers FR-004"], "what it shows", fn)</code> names the requirements it proves, which the trace joins to the specifications. The sources carry <code>// Spec:</code> headers for the same join.</li>
 <li><strong>Real engines.</strong> <code>suite/engines-fixture.ts</code> opens SQLite (the runtime's <code>node:sqlite</code>), DuckDB (<code>@duckdb/node-api</code>) and PostgreSQL (PGlite, in process), in memory, and the tests load what <code>bind</code> and <code>execute</code> make and read the structure back. There is no stand-in for an engine.</li>
@@ -574,7 +584,7 @@ connect(driver, dialect, schema, { dialect }, p.convergence!, { ...p.planOptions
 <li>Changing a column's type without loss: a second column, a check that every value survives the cast, a swap (0015, 0017).</li>
 <li>Masks (<code>security.mask</code>) and vector indexes (<code>hnsw</code>, <code>ivfflat</code>) as features (0009).</li>
 <li>Interchange formats of Flyway, Liquibase and Atlas, as exports of the history files (0018, 0021).</li>
-<li><strong>Phase 10.</strong> Integrations (0022) and transforms (0023) are built. Still to come: queries, the ephemeral target build, rows made from a CSV as a typed kinds file, and the osquery ATC catalog.</li>
+<li><strong>Phase 10.</strong> Integrations (0022), transforms (0023) and queries (0024) are built. Still to come: the ephemeral target build, rows made from a CSV as a typed kinds file, and the osquery ATC catalog.</li>
 </ul>
 </section>
 
@@ -606,6 +616,7 @@ connect(driver, dialect, schema, { dialect }, p.convergence!, { ...p.planOptions
 <tr><td>0021</td><td>sql-presets</td><td>the four presets</td></tr>
 <tr><td>0022</td><td>sql-integrations</td><td>rows from outside, landed, checked, loaded and recorded</td></tr>
 <tr><td>0023</td><td>sql-transforms</td><td>models built in order with their tests, published only if the tests pass</td></tr>
+<tr><td>0024</td><td>sql-queries</td><td>a catalog of read-only queries, checked against schema versions</td></tr>
 </tbody>
 </table>
 <footer>This page is written by hand from <code>about.ts</code>, <code>library.ts</code>, <code>package.json</code>, the specifications in <code>spec-kit/specs/</code> and the sources under <code>engine/</code>, <code>governance/</code>, <code>models/</code> and <code>sql/</code>. The short introduction is <code>README.md</code>.</footer>
