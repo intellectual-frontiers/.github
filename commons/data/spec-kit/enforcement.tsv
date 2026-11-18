@@ -14,10 +14,10 @@ requirement	mechanism	by	note
 0001-layers FR-011	check	.github: cd commons/data && bun run verify	suite/layers.test.ts: the check finds nothing in the real tree, each rule is found in a copy, and verify runs tools/check.ts
 0002-engine FR-001	check	.github: cd commons/data && bun run verify	suite/layers.test.ts: the engine imports nothing of the library, and only the kernel by package name
 0002-engine FR-002	check	.github: cd commons/data && bun run verify	suite/engine.test.ts: a point carries its name and is frozen, and a name with no namespace does not compile
-0002-engine FR-003	none	-	Planned: the manifest, compose, activation and handles are built in phase 2 of the library
-0002-engine FR-004	none	-	Planned: the manifest, compose, activation and handles are built in phase 2 of the library
-0002-engine FR-005	none	-	Planned: the manifest, compose, activation and handles are built in phase 2 of the library
-0002-engine FR-006	none	-	Planned: the manifest, compose, activation and handles are built in phase 2 of the library
-0002-engine FR-007	none	-	Planned: the manifest, compose, activation and handles are built in phase 2 of the library
-0002-engine FR-008	none	-	Planned: the manifest, compose, activation and handles are built in phase 2 of the library
-0002-engine FR-009	none	-	Planned: the manifest, compose, activation and handles are built in phase 2 of the library
+0002-engine FR-003	check	.github: cd commons/data && bun run verify	suite/engine-manifest.test.ts: an identifier is checked, a manifest is frozen data with the engine's contract and empty lists by default, and a lazy entry holds what is known before it loads
+0002-engine FR-004	check	.github: cd commons/data && bun run verify	suite/engine-manifest.test.ts: a contribution is typed by its point, and a value of another type does not compile (@ts-expect-error, checked by the compiler in verify)
+0002-engine FR-005	check	.github: cd commons/data && bun run verify	suite/engine-compose.test.ts: an extension defined in an imported module is in no composition until the project lists it, and a second composition shares nothing with the first
+0002-engine FR-006	check	.github: cd commons/data && bun run verify	suite/engine-compose.test.ts: the order satisfies requires and keeps the project's order, and a duplicate, a missing extension, a cycle, a contract the engine lacks and a handle not provided come back together as values
+0002-engine FR-007	check	.github: cd commons/data && bun run verify	suite/engine-compose.test.ts: the contributions of a point come back typed and in the order of the composition
+0002-engine FR-008	check	.github: cd commons/data && bun run verify	suite/engine-activation.test.ts: start activates in order once, a lazy extension loads and activates once on its event (two at once too) after what it requires, and a bad load, a failed load and a throwing activate are values that stay
+0002-engine FR-009	check	.github: cd commons/data && bun run verify	suite/engine-activation.test.ts: use gives only a declared and provided handle, typed by it; undeclared and unprovided are error values, for a lazy extension too

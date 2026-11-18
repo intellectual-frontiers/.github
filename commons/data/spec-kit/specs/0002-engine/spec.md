@@ -14,19 +14,19 @@
 
 ## The manifest
 
-- **FR-003**: An extension MUST be one typed value, a manifest: its identifier, its version, the version of the engine's contract it was written for, the extensions it requires, what it contributes to which points, and an `activate` function; it MUST be TypeScript, never YAML, XML or JSON.
+- **FR-003**: An extension MUST be one typed value, a manifest made by `defineExtension`: its identifier (a branded `ExtensionId`: lower-case words joined by `-` or `.`), its version, the version of the engine's contract it was written for, the extensions it requires, what it contributes (each made by `contribute(point, value)`), the handles it uses, and an optional `activate` function; it MUST be TypeScript, never YAML, XML or JSON.
 - **FR-004**: A manifest's contributions MUST be typed by the point they fill, so that a contribution of another type to a point does not compile.
 
 ## Composition
 
 - **FR-005**: A project MUST compose its extensions by passing them to `compose`, an explicit list; the engine MUST NOT scan folders for extensions and MUST NOT register an extension by its being imported.
-- **FR-006**: `compose` MUST put the extensions in an order that satisfies `requires`, and MUST return as values (never by throwing) a missing extension, a cycle, a version the contract does not satisfy, and two extensions that claim one identifier.
+- **FR-006**: `compose` MUST put the extensions in an order that satisfies `requires`, the order the project listed them where `requires` does not decide, and MUST return as values (never by throwing), all together, each missing extension, each cycle, each contract version the engine does not have, each handle used and not provided, and each identifier that two extensions claim.
 - **FR-007**: What a layer needs of its extensions MUST reach it as a value the project passes in (the contributions of a point, in order), not as a registry the layer looks into.
 
 ## Activation
 
-- **FR-008**: An extension MAY be given as a thunk (`() => import(...)`) with the events that start it, and the engine MUST activate it only when one of them happens; an extension activated twice MUST be activated once.
-- **FR-009**: `activate` MUST receive only the handles the manifest asked for, each an interface the engine defines (reading the trace graph, contributing statements, emitting files), so that an extension has no reach beyond what it declared; this is a discipline, not a sandbox, and the check of FR-004 in 0001-layers is what keeps an extension to the public surfaces.
+- **FR-008**: An extension MAY be given as a lazy entry (`lazyExtension`: identifier, version, contract, requires, the events that start it, and `load`, a thunk such as `() => import(...)`), and the engine MUST load and activate it only when `fire` is given one of its events, after the extensions it requires; an extension activated twice, even at once, MUST be activated once; a lazy extension's contributions MUST appear only after it is activated; a `load` whose manifest has another identifier, and an `activate` or a `load` that fails, MUST be returned as values.
+- **FR-009**: `activate` MUST receive a context whose `use(handle)` gives only a handle the manifest declared in `uses`, and only what the project provided for it (`provide(handle, value)`); any other is an error value (`undeclared`, `unprovided`). A handle is a typed, named value of the engine's mechanism (`handle<T>(name)`) and the engine defines none of the layers' handles (the trace graph, the statements to emit, the files to write: each layer defines its own), so that an extension has no reach beyond what it declared; this is a discipline, not a sandbox, and the check of FR-004 in 0001-layers is what keeps an extension to the public surfaces.
 
 ## Out of scope
 
@@ -41,12 +41,17 @@
 - Two extensions that both claim the identifier `privacy`: `compose` returns the conflict, per FR-006.
 - An extension that requires one that is not in the list: `compose` returns the missing one, per FR-006.
 - Extensions that require each other: `compose` returns the cycle, per FR-006.
-- An extension whose thunk is called by two events at once: it is activated once, per FR-008.
+- A lazy extension fired by two events at once: it is loaded and activated once, per FR-008.
+- A lazy extension whose `load` returns a manifest with another identifier: returned as a value, and nothing is activated, per FR-008.
+- An `activate` that throws: returned as a value that names the extension, which is not active, per FR-008.
+- An extension that calls `use` on a handle it did not declare: `undeclared`, per FR-009.
+- An extension that declares a handle the project did not provide: `compose` returns it, per FR-006.
 - A module that registers an extension at import time: no registry exists for it to reach, per FR-005.
 
 ## Assumptions
 
-- Only FR-001 and FR-002 are built in this phase (the declaration of a point); FR-003 to FR-009 are Planned and the register says so for each.
+- Every requirement here is built by phase 2 of the library, and none is left Planned.
+- An activation that failed stays failed in its composition: it is not tried again; a project that wants another try composes again.
 - The contract's version is a small integer the engine raises when it breaks a manifest, not a semantic version.
 
 ## Open questions
