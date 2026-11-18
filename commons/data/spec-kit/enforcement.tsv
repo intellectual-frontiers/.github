@@ -1,23 +1,71 @@
 # What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
 # mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
 requirement	mechanism	by	note
-0001-layers FR-001	none	-	Planned: governance is built next (phase 3 of the library); its imports are held by FR-004 already
-0001-layers FR-002	none	-	Planned: the logical schema is built after governance; its imports are held by FR-004 already
+0001-layers FR-001	check	.github: cd commons/data && bun run verify	suite/governance-neutral.test.ts: the code of governance names no engine and no part of a relational schema; its imports are held by FR-004 (engine and kernel only)
+0001-layers FR-002	check	.github: cd commons/data && bun run verify	suite/logical-project.test.ts: a logical schema is made from governance by a projection; suite/logical-neutral.test.ts: it names no engine; its imports (governance, the engine and the kernel) are held by FR-004
 0001-layers FR-003	none	-	Planned: the physical schema is built after the logical one; its imports are held by FR-004 already
 0001-layers FR-004	check	.github: cd commons/data && bun run verify	suite/layers.test.ts: each unit may import only the units of the table, and an import that climbs or reaches around is layers/above or layers/around, by package name and by path
 0001-layers FR-005	check	.github: cd commons/data && bun run verify	suite/layers.test.ts: layers 1 to 3 and the engine import only the kernel and the library, and a driver or node:fs is layers/external
-0001-layers FR-006	none	-	Planned: identities are built with governance and the logical schema
-0001-layers FR-007	none	-	Planned: the flow report is built with the logical schema
+0001-layers FR-006	none	-	Planned: governance's identities and the logical schema's `from` are built (0006-logical FR-010); the physical layer's links come with it
+0001-layers FR-007	none	-	Planned: the logical flow report is built (0006-logical FR-011); the physical layer completes it, where a carried annotation becomes a table or a policy
 0001-layers FR-008	check	.github: cd commons/data && bun run verify	suite/layers.test.ts: every file of the real tree is in a unit, and one in no unit is layers/unclassified
 0001-layers FR-009	check	.github: cd commons/data && bun run verify	suite/layers.test.ts: the four layer entries of exports are the api.ts of their folders, and an import of a subpath exports does not name is layers/private
 0001-layers FR-010	check	.github: cd commons/data && bun run verify	suite/layers.test.ts: a relative import into another unit is layers/relative, and one inside the unit is not
 0001-layers FR-011	check	.github: cd commons/data && bun run verify	suite/layers.test.ts: the check finds nothing in the real tree, each rule is found in a copy, and verify runs tools/check.ts
 0002-engine FR-001	check	.github: cd commons/data && bun run verify	suite/layers.test.ts: the engine imports nothing of the library, and only the kernel by package name
 0002-engine FR-002	check	.github: cd commons/data && bun run verify	suite/engine.test.ts: a point carries its name and is frozen, and a name with no namespace does not compile
-0002-engine FR-003	none	-	Planned: the manifest, compose, activation and handles are built in phase 2 of the library
-0002-engine FR-004	none	-	Planned: the manifest, compose, activation and handles are built in phase 2 of the library
-0002-engine FR-005	none	-	Planned: the manifest, compose, activation and handles are built in phase 2 of the library
-0002-engine FR-006	none	-	Planned: the manifest, compose, activation and handles are built in phase 2 of the library
-0002-engine FR-007	none	-	Planned: the manifest, compose, activation and handles are built in phase 2 of the library
-0002-engine FR-008	none	-	Planned: the manifest, compose, activation and handles are built in phase 2 of the library
-0002-engine FR-009	none	-	Planned: the manifest, compose, activation and handles are built in phase 2 of the library
+0002-engine FR-003	check	.github: cd commons/data && bun run verify	suite/engine-manifest.test.ts: an identifier is checked, a manifest is frozen data with the engine's contract and empty lists by default, and a lazy entry holds what is known before it loads
+0002-engine FR-004	check	.github: cd commons/data && bun run verify	suite/engine-manifest.test.ts: a contribution is typed by its point, and a value of another type does not compile (@ts-expect-error, checked by the compiler in verify)
+0002-engine FR-005	check	.github: cd commons/data && bun run verify	suite/engine-compose.test.ts: an extension defined in an imported module is in no composition until the project lists it, and a second composition shares nothing with the first
+0002-engine FR-006	check	.github: cd commons/data && bun run verify	suite/engine-compose.test.ts: the order satisfies requires and keeps the project's order, and a duplicate, a missing extension, a cycle, a contract the engine lacks and a handle not provided come back together as values
+0002-engine FR-007	check	.github: cd commons/data && bun run verify	suite/engine-compose.test.ts: the contributions of a point come back typed and in the order of the composition
+0002-engine FR-008	check	.github: cd commons/data && bun run verify	suite/engine-activation.test.ts: start activates in order once, a lazy extension loads and activates once on its event (two at once too) after what it requires, and a bad load, a failed load and a throwing activate are values that stay
+0002-engine FR-009	check	.github: cd commons/data && bun run verify	suite/engine-activation.test.ts: use gives only a declared and provided handle, typed by it; undeclared and unprovided are error values, for a lazy extension too
+0003-governance FR-001	check	.github: cd commons/data && bun run verify	suite/governance-model.test.ts: the constructors are total and the pieces are frozen data with their defaults; a domain is the domain when nothing is wrong
+0003-governance FR-002	check	.github: cd commons/data && bun run verify	suite/governance-model.test.ts: every case of the datatype union is described, and none names a database
+0003-governance FR-003	check	.github: cd commons/data && bun run verify	suite/governance-model.test.ts: the names of a concept are literal types, and an identifying attribute or relationship it lacks does not compile (@ts-expect-error, checked in verify)
+0003-governance FR-004	check	.github: cd commons/data && bun run verify	suite/governance-model.test.ts: a bad name (not lower camel case), a duplicate, an annotation out of place, an unresolved relationship or code list, and a bad identifier (none, optional, a relationship that is not one, unknown) come back together as values; a relationship given as a function allows a cycle
+0003-governance FR-005	check	.github: cd commons/data && bun run verify	suite/governance-elements.test.ts: an identity is made of names, and every element is listed in a fixed order with its kind, name, definition and parent
+0003-governance FR-006	check	.github: cd commons/data && bun run verify	suite/governance-elements.test.ts: the trace graph has the elements as nodes and contains, identifies (an attribute or a relationship) and references as edges, each joining two nodes
+0003-governance FR-007	check	.github: cd commons/data && bun run verify	suite/governance-annotations.test.ts: an annotation is typed by its kind, says where it may be, and is read back typed (@ts-expect-error, checked in verify)
+0003-governance FR-008	check	.github: cd commons/data && bun run verify	suite/governance-annotations.test.ts: an extension contributes a vocabulary through the engine and the composition gives them in order
+0003-governance FR-009	check	.github: cd commons/data && bun run verify	suite/governance-annotations.test.ts: lint returns data, the core rules first (a missing definition, an unknown kind) and then each vocabulary's in order
+0003-governance FR-010	check	.github: cd commons/data && bun run verify	suite/governance-vocabularies.test.ts: the documentation kinds go where they say and the vocabulary has no rule
+0003-governance FR-011	check	.github: cd commons/data && bun run verify	suite/governance-vocabularies.test.ts: a citation is NNNN-slug FR-nnn, requirementsOf says who cites what, and the uncited and malformed rules fire and stay quiet
+0003-governance FR-012	check	.github: cd commons/data && bun run verify	suite/governance-vocabularies.test.ts: personal data names a DPV-PD term (a term that is not one does not compile), dpvClassOf and dpvIri, and the category and purpose rules
+0003-governance FR-013	check	.github: cd commons/data && bun run verify	suite/governance-dpv.test.ts: a CSV that is not the pinned one is refused and the generated file carries the pinned source and digest; the live --check against the CSV runs in .github/workflows/data.yml
+0003-governance FR-014	check	.github: cd commons/data && bun run verify	suite/governance-vocabularies.test.ts: the security kinds go where they say, and the scope, restricted-access and personal-unprotected rules fire and stay quiet
+0003-governance FR-015	check	.github: cd commons/data && bun run verify	suite/governance-vocabularies.test.ts: owner and steward go on a domain, a concept or a code list, and the owner-missing rule fires and stays quiet
+0003-governance FR-016	check	.github: cd commons/data && bun run verify	suite/governance-vocabularies.test.ts: the quality kinds (pattern, range, retention, deprecated, default, unique, differs, audited, openness) go where they say, and each rule fires and stays quiet, a default being held to its datatype
+0003-governance FR-017	check	.github: cd commons/data && bun run verify	suite/governance-vocabularies.test.ts: a lookup goes on a concept and says its members, and one that names a member the concept lacks is found
+0004-arca FR-001	check	.github: cd commons/data && bun run verify	suite/arca.test.ts: the party model is a valid domain named arca_party given as a result; its imports (governance only) are held by 0001-layers FR-004
+0004-arca FR-002	check	.github: cd commons/data && bun run verify	suite/arca.test.ts: the concepts, code lists, attributes and relationships are those of the model it replaces, and every old table and column is accounted for by the domain and the conventions a layer below must follow
+0004-arca FR-003	check	.github: cd commons/data && bun run verify	suite/arca.test.ts: a person and an organization are identified by their relationship of cardinality one to a party, every other concept by an attribute named for it
+0004-arca FR-004	check	.github: cd commons/data && bun run verify	suite/arca.test.ts: every element has a definition and lint with every vocabulary of the library finds nothing
+0004-arca FR-005	check	.github: cd commons/data && bun run verify	suite/arca.test.ts: each personal attribute names an existing DPV-PD category and a purpose, and every concept that holds personal data is confidential
+0004-arca FR-006	check	.github: cd commons/data && bun run verify	suite/arca.test.ts: the four reference code lists carry the codes, labels and definitions of the old reference data and are open; the two closed lists carry theirs
+0004-arca FR-007	check	.github: cd commons/data && bun run verify	suite/arca.test.ts: the domain is audited with removal by marking, and has an owner
+0004-arca FR-008	check	.github: cd commons/data && bun run verify	suite/arca.test.ts: one identifier of a kind, parties_differ, the default of is_primary and each lookup are said as governance
+0004-arca FR-009	check	.github: cd commons/data && bun run verify	suite/arca.test.ts: every concept cites requirements and every citation names a requirement that exists in this library's specifications
+0005-naming FR-001	check	.github: cd commons/data && bun run verify	suite/naming.test.ts: a name is lower camel case, and domain returns a name with an underscore or a capital first as an error, for every kind of element
+0005-naming FR-002	check	.github: cd commons/data && bun run verify	suite/naming.test.ts: words splits at lower to upper, around digits and at the end of a run of capitals; for 500 generated names the words are at least one, stable, and join back to the name
+0005-naming FR-003	check	.github: cd commons/data && bun run verify	suite/logical-project.test.ts: the words of tables, columns, foreign keys, uniques, checks and indexes follow the conventions, and reproduce the old model's names in snake case
+0005-naming FR-004	none	-	Planned: built with the physical schema, whose case styles, quoting and limits are specified with it
+0005-naming FR-005	none	-	Planned: built with the physical schema, where a case style is an extension that snake case is the default of
+0005-naming FR-006	none	-	Planned: built with the physical schema, which writes the stored value of a code by the case style
+0005-naming FR-007	check	.github: cd commons/data && bun run verify	suite/logical-project.test.ts: two elements named alike once made are returned with the elements that clash
+0001-layers FR-012	none	-	Planned: governance's names and words are built (0005-naming FR-001, FR-002); the logical and physical conventions come with those layers
+0004-arca FR-010	check	.github: cd commons/data && bun run verify	suite/arca.test.ts: every name is lower camel case, and the words of the domain's names make the old model's tables and columns in snake case
+0006-logical FR-001	check	.github: cd commons/data && bun run verify	suite/logical-project.test.ts: the schema is plain data whose tables, columns, constraints and value sets have identities of their own and a `from`
+0006-logical FR-002	check	.github: cd commons/data && bun run verify	suite/logical-project.test.ts: the logical type of every datatype, none an engine's
+0006-logical FR-003	check	.github: cd commons/data && bun run verify	suite/logical-project.test.ts: project returns the schema as a value or every error, a projection given to it, and one contributed through the engine's logical.projection
+0006-logical FR-004	check	.github: cd commons/data && bun run verify	suite/logical-project.test.ts: a concept is a table, an open code list a code table with its rows, a closed one a value set and no table
+0006-logical FR-005	check	.github: cd commons/data && bun run verify	suite/logical-project.test.ts: every old table's columns come from the words of the attributes and relationships, the key first; many relationships and attributes, optional relationships and a key of several columns on small domains; a cycle of identities is an error value
+0006-logical FR-006	check	.github: cd commons/data && bun run verify	suite/logical-project.test.ts: the constraints and indexes have the names the old model's SQLite golden gave them (14 and 6); defaults, ranges and patterns are made; a member that is not there is an error value
+0006-logical FR-007	check	.github: cd commons/data && bun run verify	suite/logical-project.test.ts: audit columns on every concept table and none on a code table, removal by deleting leaves out the removal columns, and the moment of the insert is the default
+0006-logical FR-008	check	.github: cd commons/data && bun run verify	suite/logical-project.test.ts: the comment of a table and of a column is the definition of what it was made from
+0006-logical FR-009	check	.github: cd commons/data && bun run verify	suite/logical-project.test.ts: two tables, two columns and two constraints named alike are returned with the elements that clash
+0006-logical FR-010	check	.github: cd commons/data && bun run verify	suite/logical-project.test.ts: every element's from is an element of the domain, and a table, a column, a foreign key column and a code table are traced to their concept, attribute, relationship and list
+0006-logical FR-011	check	.github: cd commons/data && bun run verify	suite/logical-flow.test.ts: every annotation is in the report once; expressed ones name the constraints and columns they became, carried ones the elements that keep them; an unknown kind is unexpressed, and carried where told
+0006-logical FR-012	check	.github: cd commons/data && bun run verify	suite/logical-rows.test.ts: RowOf, InsertOf and KeyOf are computed from a concept and the compiler holds them (@ts-expect-error, checked in verify)
+0006-logical FR-013	check	.github: cd commons/data && bun run verify	suite/logical-neutral.test.ts: the code of the logical schema names no engine and no type of one

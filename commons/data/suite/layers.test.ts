@@ -33,7 +33,8 @@ proves(
   ["0001-layers FR-004", "0001-layers FR-011"],
   "the real tree has no finding of the layers check, and verify runs the check against its baseline",
   async () => {
-    assertEquals(layerFindings(await realFiles(), EXPORTS), []);
+    const real = JSON.parse(await fs.readTextFile(path.join(ROOT, "package.json"))) as { exports: Record<string, string> };
+    assertEquals(layerFindings(await realFiles(), real.exports), []);
     const r = await main([]);
     assertEquals(r.code, 0, r.lines.join("\n"));
     const pkg = JSON.parse(await fs.readTextFile(path.join(ROOT, "package.json"))) as { scripts: Record<string, string> };

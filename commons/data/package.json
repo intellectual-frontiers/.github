@@ -11,7 +11,8 @@
     "./engine": "./engine/api.ts",
     "./governance": "./governance/api.ts",
     "./sql/logical": "./sql/logical/api.ts",
-    "./sql/physical": "./sql/physical/api.ts"
+    "./sql/physical": "./sql/physical/api.ts",
+    "./models/arca": "./models/arca/mod.ts"
   },
   "scripts": {
     "check": "tsc -p tsconfig.json",

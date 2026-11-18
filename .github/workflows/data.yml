@@ -42,6 +42,9 @@ jobs:
       - name: verify
         working-directory: commons/data
         run: bun run verify
+      - name: The terms of DPV, as the vocabulary's CSV makes them (a fetch, so not in verify)
+        working-directory: commons/data
+        run: bun tools/generate-dpv.ts --check
 
   node:
     runs-on: ubuntu-latest

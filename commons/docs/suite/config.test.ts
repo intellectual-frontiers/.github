@@ -11,7 +11,7 @@ import { findConfig, loadConfig, main, parseArgs } from "../cli.ts";
 import { normalDir, resolveConfig, under } from "../config.ts";
 import { CONFIG, ROOT } from "./helpers.ts";
 
-proves(["0011-documentation FR-023"], "commons' configuration resolves: its root, its packages, its spec kit, its citations, its lenses and its output", () => {
+proves(["0011-documentation FR-023"], "commons' configuration resolves: its root, its packages, its spec kits, its citations, its lenses and its output", () => {
   assertEquals(CONFIG.root, ROOT);
   assertEquals(CONFIG.fileFromRoot, "commons/docs.config.ts");
   assertEquals([CONFIG.name, CONFIG.subject, CONFIG.branch], ["IF Commons", "commons", "main"]);
