@@ -27,20 +27,23 @@ import { NAME } from "./names.ts";
 export type Multiplicity = "required" | "optional" | "many";
 
 /** An attribute of a concept. */
-export interface Attribute<T extends Datatype = Datatype> {
+export interface Attribute<T extends Datatype = Datatype, M extends Multiplicity = Multiplicity> {
   readonly kind: "attribute";
   readonly type: T;
-  readonly multiplicity: Multiplicity;
+  readonly multiplicity: M;
   readonly definition: string;
   readonly annotations: readonly Annotation[];
 }
 
 /** What `attribute` is given besides the datatype. */
-export interface AttributeOptions {
+export interface AttributeOptions<M extends Multiplicity = Multiplicity> {
   readonly definition?: string;
-  readonly multiplicity?: Multiplicity;
+  readonly multiplicity?: M;
   readonly annotations?: readonly Annotation[];
 }
+
+/** What `attribute` is given where the attribute is required: everything but its multiplicity. */
+export type RequiredOptions = Omit<AttributeOptions, "multiplicity"> & { readonly multiplicity?: never };
 
 /**
  * Makes an attribute; total. It is required unless it says otherwise.
@@ -49,6 +52,11 @@ export interface AttributeOptions {
  * @param options - its definition, multiplicity and annotations
  * @returns the attribute, frozen
  */
+export function attribute<T extends Datatype>(type: T, options?: RequiredOptions): Attribute<T, "required">;
+export function attribute<T extends Datatype, const M extends Multiplicity>(
+  type: T,
+  options: AttributeOptions<M> & { readonly multiplicity: M },
+): Attribute<T, M>;
 export function attribute<T extends Datatype>(type: T, options: AttributeOptions = {}): Attribute<T> {
   return Object.freeze({
     kind: "attribute",
@@ -66,17 +74,17 @@ export type Cardinality = "one" | "optional" | "many";
 export type Target = AnyConcept | (() => AnyConcept);
 
 /** A relationship from a concept to another. */
-export interface Relationship {
+export interface Relationship<C extends Cardinality = Cardinality, T extends Target = Target> {
   readonly kind: "relationship";
-  readonly to: Target;
-  readonly cardinality: Cardinality;
+  readonly to: T;
+  readonly cardinality: C;
   readonly definition: string;
   readonly annotations: readonly Annotation[];
 }
 
 /** What `relationship` is given besides the target. */
-export interface RelationshipOptions {
-  readonly cardinality: Cardinality;
+export interface RelationshipOptions<C extends Cardinality = Cardinality> {
+  readonly cardinality: C;
   readonly definition?: string;
   readonly annotations?: readonly Annotation[];
 }
@@ -88,7 +96,10 @@ export interface RelationshipOptions {
  * @param options - its cardinality, definition and annotations
  * @returns the relationship, frozen
  */
-export function relationship(to: Target, options: RelationshipOptions): Relationship {
+export function relationship<const T extends Target, const C extends Cardinality>(
+  to: T,
+  options: RelationshipOptions<C>,
+): Relationship<C, T> {
   return Object.freeze({
     kind: "relationship",
     to,
@@ -104,29 +115,29 @@ export type Attrs = Readonly<Record<string, Attribute>>;
 export type Rels = Readonly<Record<string, Relationship>>;
 
 /** A concept: a thing the business talks about. */
-export interface Concept<N extends string = string, A extends Attrs = Attrs, R extends Rels = Rels> {
+export interface Concept<N extends string = string, A extends Attrs = Attrs, R extends Rels = Rels, I extends string = string> {
   readonly kind: "concept";
   readonly name: N;
   readonly definition: string;
   readonly attributes: A;
   readonly relationships: R;
-  /** The names of the attributes that identify it; `concept` checked them against its attributes, as literal types, when it was made. */
-  readonly identifiedBy: readonly string[];
+  /** The names of the attributes and relationships that identify it; `concept` checked them against its own, as literal types, when it was made. */
+  readonly identifiedBy: readonly I[];
   readonly annotations: readonly Annotation[];
 }
 
 /** A concept of any name, attributes and relationships. */
-export type AnyConcept = Concept<string, Attrs, Rels>;
+export type AnyConcept = Concept<string, Attrs, Rels, string>;
 
 /** What `concept` is given. */
-export interface ConceptSpec<A extends Attrs, R extends Rels> {
+export interface ConceptSpec<A extends Attrs, R extends Rels, I extends string> {
   readonly definition?: string;
   readonly attributes: A;
   /**
    * What identifies it: names of its own attributes, or of its own relationships of cardinality one, which make it a specialization of what they point to, or it does not
    * compile.
    */
-  readonly identifiedBy: readonly ((keyof NoInfer<A> | keyof NoInfer<R>) & string)[];
+  readonly identifiedBy: readonly I[];
   readonly relationships?: R;
   readonly annotations?: readonly Annotation[];
 }
@@ -138,10 +149,12 @@ export interface ConceptSpec<A extends Attrs, R extends Rels> {
  * @param spec - its definition, attributes, identifying attributes, relationships and annotations
  * @returns the concept, frozen
  */
-export function concept<const N extends string, const A extends Attrs, const R extends Rels = Record<never, Relationship>>(
-  name: N,
-  spec: ConceptSpec<A, R>,
-): Concept<N, A, R> {
+export function concept<
+  const N extends string,
+  const A extends Attrs,
+  const I extends (keyof NoInfer<A> | keyof NoInfer<R>) & string,
+  const R extends Rels = Record<never, Relationship>,
+>(name: N, spec: ConceptSpec<A, R, I>): Concept<N, A, R, I> {
   return Object.freeze({
     kind: "concept",
     name,

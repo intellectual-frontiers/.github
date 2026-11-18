@@ -13,6 +13,9 @@
  * @module
  */
 
+/** The words of a name, lower case, in order. */
+export type Words = readonly string[];
+
 /** A name of governance: lower camel case, a letter first and then letters and digits. */
 export const NAME = /^[a-z][a-zA-Z0-9]*$/;
 
@@ -25,6 +28,6 @@ const WORD = /[A-Z]+(?![a-z])|[A-Z]?[a-z]+|[0-9]+/g;
  * @param name - a name of governance
  * @returns its words, lower case, in order; one word at least for a valid name
  */
-export function words(name: string): readonly string[] {
+export function words(name: string): Words {
   return (name.match(WORD) ?? []).map((w) => w.toLowerCase());
 }

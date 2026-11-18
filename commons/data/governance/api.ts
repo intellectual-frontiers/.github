@@ -18,18 +18,29 @@ export {
 export { type AnyCodeList, type CodeList, type CodeListSpec, type CodeSpec, codeList } from "./codelist.ts";
 export {
   binary,
+  type BinaryType,
   boolean,
+  type BooleanType,
   codeOf,
+  type CodeType,
   type Datatype,
   date,
+  type DateType,
   decimal,
+  type DecimalType,
   describeDatatype,
   identifier,
+  type IdentifierType,
   instant,
+  type InstantType,
   integer,
+  type IntegerType,
   structured,
+  type StructuredType,
   text,
+  type TextType,
 } from "./datatype.ts";
+export { type Words } from "./names.ts";
 export { type Edge, type EdgeKind, type Element, elementsOf, type TraceGraph, traceGraph } from "./elements.ts";
 export { attributeId, codeId, codeListId, conceptId, domainId, type ElementId, type ElementKind, relationshipId } from "./id.ts";
 export { coreRules, lint } from "./lint.ts";

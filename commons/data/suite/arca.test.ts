@@ -20,6 +20,7 @@ import {
   words,
 } from "@intellectual-frontiers/data/governance";
 import { partyDomain } from "@intellectual-frontiers/data/models/arca";
+import { OLD_TABLES } from "./arca-old.ts";
 import { same } from "./governance-fixture.ts";
 
 const { ownership, privacy, quality, requirements, security, usage } = vocabularies;
@@ -228,18 +229,6 @@ proves(
     }
   },
 );
-
-/** The columns the model it replaces had, as its goldens show them, without the six housekeeping columns every table of a concept also had. */
-const OLD_TABLES: Readonly<Record<string, readonly string[]>> = {
-  party: ["party_id", "party_kind_code", "display_name"],
-  person: ["party_id", "given_name", "family_name", "birth_date"],
-  organization: ["party_id", "legal_name", "founded_on"],
-  party_role: ["party_role_id", "party_id", "party_role_kind_code", "valid_from", "valid_to"],
-  party_relation: ["party_relation_id", "from_party_id", "to_party_id", "party_relation_kind_code", "valid_from", "valid_to"],
-  party_identifier: ["party_identifier_id", "party_id", "party_identifier_kind_code", "identifier", "issued_by"],
-  electronic_contact: ["electronic_contact_id", "party_id", "medium", "address", "is_primary"],
-  postal_address: ["postal_address_id", "party_id", "purpose", "line_1", "line_2", "locality", "region", "postal_code", "country_code"],
-};
 
 /** A name written in snake case, as the model it replaces wrote its names: the words of a governance name joined by an underscore. */
 const snake = (name: string): string => words(name).join("_");
