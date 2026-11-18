@@ -40,6 +40,14 @@ export type PhysicalError =
 
 /** The names that were written, by the logical element they are the name of. */
 export interface Written {
+  /** The schema tables are qualified by, where the dialect has schemas and one was given. */
+  readonly qualifier: string | undefined;
+  /** The reference to a table of the schema, quoted and qualified (0013-sql-qualified-names FR-004). */
+  ref(id: LogicalId): string;
+  /** The reference to a table of an extension, by the bare name it is written by: qualified, or with the schema's words added where the dialect has no schemas. */
+  qualify(name: string): string;
+  /** The name a table of an extension is written by once the schema's words are added where the dialect has no schemas. */
+  tableName(name: string): string;
   table(id: LogicalId): string | undefined;
   column(id: LogicalId): string | undefined;
   constraint(id: LogicalId): string | undefined;
@@ -51,6 +59,8 @@ export interface BindContext {
   readonly dialect: Dialect;
   readonly naming: Naming;
   readonly written: Written;
+  /** The schema the tables are in, as the project gave it. */
+  readonly schemaName?: string;
 }
 
 /** What an extension gives `bind`: statements for a bound schema, or its errors. */

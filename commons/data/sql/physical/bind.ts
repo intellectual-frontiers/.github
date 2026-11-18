@@ -35,6 +35,8 @@ export interface BindOptions {
   readonly naming?: Naming;
   /** What extensions add, in order. */
   readonly sources?: readonly StatementSource[];
+  /** The schema the tables are in (0013-sql-qualified-names): qualified where the dialect has schemas, else its words come first in each table's name. */
+  readonly schema?: string;
   /** What extensions add to the end of a table, in order. */
   readonly tableClauses?: readonly TableClause[];
 }
@@ -53,7 +55,7 @@ export function bind(schema: LogicalSchema, options: BindOptions): Result<Physic
   const naming = options.naming ?? defaultNaming();
   const errors: PhysicalError[] = [];
   const q = (name: string): string => dialect.quote(name);
-  const names = writeNames(schema, dialect, naming, errors);
+  const names = writeNames(schema, dialect, naming, errors, options.schema);
   const { tables, columns, constraints } = names;
   const written: Written = names;
   const x = expressor(dialect, naming, names, errors);
@@ -101,8 +103,16 @@ export function bind(schema: LogicalSchema, options: BindOptions): Result<Physic
     f.references.table.join(".") !== t.name.join(".");
 
   const statements: { group: Group; origin: Origin; sql: string; of: readonly LogicalId[] }[] = [];
+  if (names.qualifier !== undefined)
+    statements.push({ group: "setup", origin: "core", sql: `CREATE SCHEMA IF NOT EXISTS ${q(names.qualifier)};`, of: [] });
   for (const sql of dialect.setup?.(used) ?? []) statements.push({ group: "setup", origin: "core", sql, of: [] });
-  const context: BindContext = { schema, dialect, naming, written };
+  const context: BindContext = {
+    schema,
+    dialect,
+    naming,
+    written,
+    ...(options.schema === undefined ? {} : { schemaName: options.schema }),
+  };
   for (const t of order) {
     const lines: string[] = t.columns.map((c) => columnOf(t, c));
     if (t.primaryKey.length > 1) lines.push(`PRIMARY KEY (${list(t.primaryKey)})`);
@@ -121,7 +131,7 @@ export function bind(schema: LogicalSchema, options: BindOptions): Result<Physic
     statements.push({
       group: "table",
       origin: "core",
-      sql: `CREATE TABLE IF NOT EXISTS ${q(tables.get(t.id) ?? "")} (\n${lines.map((l) => `${indent}${l}`).join(",\n")}\n)${clauses.map((c) => ` ${c}`).join("")};`,
+      sql: `CREATE TABLE IF NOT EXISTS ${names.ref(t.id)} (\n${lines.map((l) => `${indent}${l}`).join(",\n")}\n)${clauses.map((c) => ` ${c}`).join("")};`,
       of: [
         t.id,
         ...t.columns.map((c) => c.id),
@@ -135,7 +145,7 @@ export function bind(schema: LogicalSchema, options: BindOptions): Result<Physic
         statements.push({
           group: "constraint",
           origin: "core",
-          sql: `ALTER TABLE ${q(tables.get(t.id) ?? "")} ADD ${fkClause(f)};`,
+          sql: `ALTER TABLE ${names.ref(t.id)} ADD ${fkClause(f)};`,
           of: [f.id],
         });
     }
@@ -145,17 +155,22 @@ export function bind(schema: LogicalSchema, options: BindOptions): Result<Physic
       statements.push({
         group: "index",
         origin: "core",
-        sql: `CREATE INDEX IF NOT EXISTS ${q(constraints.get(i.id) ?? "")} ON ${q(tables.get(t.id) ?? "")} (${list(i.columns)});`,
+        sql: `CREATE INDEX IF NOT EXISTS ${q(constraints.get(i.id) ?? "")} ON ${names.ref(t.id)} (${list(i.columns)});`,
         of: [i.id],
       });
     }
   }
   for (const t of order) {
     if (t.rows === undefined || t.rows.length === 0) continue;
-    const names = t.columns.map((c) => columns.get(c.id) ?? "");
+    const columnNames = t.columns.map((c) => columns.get(c.id) ?? "");
     const key = t.primaryKey.map((k) => naming.names.write(k));
     const rows = t.rows.map((r) => [writeCode(naming, r.code), r.label, r.description]);
-    statements.push({ group: "data", origin: "core", sql: upsert(dialect, tables.get(t.id) ?? "", names, key, rows), of: [t.id] });
+    statements.push({
+      group: "data",
+      origin: "core",
+      sql: upsert(dialect, tables.get(t.id) ?? "", columnNames, key, rows, names.qualifier),
+      of: [t.id],
+    });
   }
 
   for (const source of options.sources ?? []) {

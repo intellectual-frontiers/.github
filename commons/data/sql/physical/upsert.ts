@@ -5,6 +5,7 @@
  *
  * @module
  */
+import { qualified } from "./qualify.ts";
 import type { Dialect, Literal } from "./dialect.ts";
 
 /**
@@ -23,9 +24,10 @@ export function upsert(
   columns: readonly string[],
   key: readonly string[],
   rows: readonly (readonly Literal[])[],
+  schema?: string,
 ): string {
   const q = (n: string): string => dialect.quote(n);
   const set = columns.filter((c) => !key.includes(c)).map((c) => `${q(c)} = excluded.${q(c)}`);
   const values = rows.map((r) => `(${r.map((v) => dialect.literal(v)).join(", ")})`);
-  return `INSERT INTO ${q(table)} (${columns.map(q).join(", ")}) VALUES\n${values.join(",\n")}\nON CONFLICT (${key.map(q).join(", ")}) DO ${set.length === 0 ? "NOTHING" : `UPDATE SET ${set.join(", ")}`};`;
+  return `INSERT INTO ${qualified(dialect, schema, table)} (${columns.map(q).join(", ")}) VALUES\n${values.join(",\n")}\nON CONFLICT (${key.map(q).join(", ")}) DO ${set.length === 0 ? "NOTHING" : `UPDATE SET ${set.join(", ")}`};`;
 }

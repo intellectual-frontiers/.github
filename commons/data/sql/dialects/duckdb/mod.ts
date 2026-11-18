@@ -39,7 +39,7 @@ const type = (t: LogicalType): string => {
 /** DuckDB. */
 export const dialect: Dialect = {
   name: "duckdb",
-  features: ["comment-on", "regex-check", "or-replace-view", "alter-column"],
+  features: ["comment-on", "regex-check", "or-replace-view", "alter-column", "schemas"],
   maxName: 255,
   now: "CURRENT_TIMESTAMP",
   quote: quoteName,
@@ -47,11 +47,13 @@ export const dialect: Dialect = {
   type,
   ifExists: ["addColumn", "dropColumn", "dropTable", "dropIndex"],
   probes: {
-    table: (t) => `SELECT 1 FROM duckdb_tables() WHERE schema_name = current_schema() AND table_name = ${standardLiteral(t)}`,
-    column: (t, c) =>
-      `SELECT 1 FROM duckdb_columns() WHERE schema_name = current_schema() AND table_name = ${standardLiteral(t)} AND column_name = ${standardLiteral(c)}`,
+    table: (t, s) =>
+      `SELECT 1 FROM duckdb_tables() WHERE schema_name = ${s === undefined ? "current_schema()" : standardLiteral(s)} AND table_name = ${standardLiteral(t)}`,
+    column: (t, c, s) =>
+      `SELECT 1 FROM duckdb_columns() WHERE schema_name = ${s === undefined ? "current_schema()" : standardLiteral(s)} AND table_name = ${standardLiteral(t)} AND column_name = ${standardLiteral(c)}`,
     constraint: () => undefined,
-    index: (n) => `SELECT 1 FROM duckdb_indexes() WHERE schema_name = current_schema() AND index_name = ${standardLiteral(n)}`,
+    index: (n, s) =>
+      `SELECT 1 FROM duckdb_indexes() WHERE schema_name = ${s === undefined ? "current_schema()" : standardLiteral(s)} AND index_name = ${standardLiteral(n)}`,
   },
   pattern: (column, pattern) => `regexp_matches(${column}, ${standardLiteral(pattern)})`,
 };

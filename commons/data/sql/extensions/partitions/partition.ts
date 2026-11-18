@@ -60,7 +60,6 @@ export function partitions(divisions: readonly Division[]): { readonly clause: T
   const source: StatementSource = (context: BindContext) => {
     const { dialect, schema, written, naming } = context;
     if (!dialect.features.includes("partitions")) return ok([]);
-    const q = (n: string): string => dialect.quote(n);
     const errors: PhysicalError[] = [];
     const out: Statement[] = [];
     for (const d of divisions) {
@@ -77,7 +76,8 @@ export function partitions(divisions: readonly Division[]): { readonly clause: T
       for (const p of d.partitions) {
         const name = naming.names.write([...t.name, ...words(p.name)]);
         const id = featureId("partition", [...t.name, ...words(p.name)]);
-        if (name.length > dialect.maxName) errors.push({ kind: "length", element: id, name, max: dialect.maxName });
+        if (written.tableName(name).length > dialect.maxName)
+          errors.push({ kind: "length", element: id, name: written.tableName(name), max: dialect.maxName });
         const lit = (vs: readonly Literal[]): string => vs.map((v) => dialect.literal(v)).join(", ");
         const bounds =
           d.strategy === "range"
@@ -90,7 +90,7 @@ export function partitions(divisions: readonly Division[]): { readonly clause: T
               : `WITH (MODULUS ${(p as { modulus: number }).modulus}, REMAINDER ${(p as { remainder: number }).remainder})`;
         out.push({
           group: "table",
-          sql: `CREATE TABLE IF NOT EXISTS ${q(name)} PARTITION OF ${q(tn)} FOR VALUES ${bounds};`,
+          sql: `CREATE TABLE IF NOT EXISTS ${written.qualify(name)} PARTITION OF ${written.ref(t.id)} FOR VALUES ${bounds};`,
           of: [t.id, id],
         });
       }

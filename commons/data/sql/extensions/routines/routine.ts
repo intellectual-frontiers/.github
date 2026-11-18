@@ -95,7 +95,7 @@ export function routinesSource(definitions: readonly RoutineDefinition[]): State
               const n = t === undefined ? undefined : written.table(t.id);
               if (t === undefined || n === undefined) return bad(`the schema has no table ${part.table}`);
               used.push(t.id);
-              return q(n);
+              return written.ref(t.id);
             }
             case "column":
             case "columnName": {
@@ -106,7 +106,7 @@ export function routinesSource(definitions: readonly RoutineDefinition[]): State
               if (t === undefined || c === undefined || tn === undefined || cn === undefined)
                 return bad(`the schema has no column ${part.table}.${part.column}`);
               used.push(t.id, c.id);
-              return part.ref === "column" ? `${q(tn)}.${q(cn)}` : q(cn);
+              return part.ref === "column" ? `${written.ref(t.id)}.${q(cn)}` : q(cn);
             }
             case "param": {
               if (!params.some((p) => p.name === part.param)) return bad(`it has no parameter ${part.param}`);
@@ -128,7 +128,7 @@ export function routinesSource(definitions: readonly RoutineDefinition[]): State
           if (t === undefined || n === undefined) bad(`the schema has no table ${x.setOf}`);
           else {
             used.push(t.id);
-            returns = ` RETURNS SETOF ${q(n)}`;
+            returns = ` RETURNS SETOF ${written.ref(t.id)}`;
           }
         } else returns = ` RETURNS TABLE (${x.columns.map((c) => `${q(w(c.name))} ${typeOf(c.type)}`).join(", ")})`;
       }

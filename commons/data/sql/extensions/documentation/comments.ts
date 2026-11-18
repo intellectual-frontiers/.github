@@ -19,13 +19,17 @@ export function commentsSource(settings: DocumentationSettings): StatementSource
       const table = context.written.table(t.id);
       if (table === undefined) return err([{ kind: "unsupported", element: t.id, why: "a table that was not written" }]);
       if (t.comment.trim() !== "")
-        out.push({ group: "documentation", sql: `COMMENT ON TABLE ${q(table)} IS ${context.dialect.literal(t.comment)};`, of: [t.id] });
+        out.push({
+          group: "documentation",
+          sql: `COMMENT ON TABLE ${context.written.ref(t.id)} IS ${context.dialect.literal(t.comment)};`,
+          of: [t.id],
+        });
       for (const c of t.columns) {
         const column = context.written.column(c.id);
         if (column !== undefined && c.comment.trim() !== "") {
           out.push({
             group: "documentation",
-            sql: `COMMENT ON COLUMN ${q(table)}.${q(column)} IS ${context.dialect.literal(c.comment)};`,
+            sql: `COMMENT ON COLUMN ${context.written.ref(t.id)}.${q(column)} IS ${context.dialect.literal(c.comment)};`,
             of: [c.id],
           });
         }

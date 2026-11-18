@@ -164,19 +164,28 @@ export async function execute(
       return { kind: "step", key: entry.key, name: entry.name, message: cause instanceof Error ? cause.message : String(cause) };
     }
   };
+  // the setup comes before the steps (a schema, an extension the types need); what extensions add comes after
+  const last = new Map<string, string>();
+  for (const e of ledger) if (e.kind === "repeatable") last.set(e.key, e.hash);
+  const due: readonly Repeatable[] = dueRepeatables(plan.repeatable, last);
+  const repeated: string[] = [];
+  const runRepeatable = async (r: Repeatable): Promise<RunError | undefined> => {
+    const failed = await run(r.statements, { kind: "repeatable", key: r.key, name: r.key, from: "", to: "", hash: r.hash });
+    if (failed === undefined) repeated.push(r.key);
+    return failed;
+  };
+  for (const r of due.filter((x) => x.statements.every((s) => s.group === "setup"))) {
+    const failed = await runRepeatable(r);
+    if (failed !== undefined) return err([failed]);
+  }
   for (const s of todo) {
     const failed = await run(s.up, { kind: "step", key: s.id, name: s.name, from: s.from, to: s.to, hash: s.id });
     if (failed !== undefined) return err([failed]);
     applied.push(s.name);
   }
-  const last = new Map<string, string>();
-  for (const e of ledger) if (e.kind === "repeatable") last.set(e.key, e.hash);
-  const due: readonly Repeatable[] = dueRepeatables(plan.repeatable, last);
-  const repeated: string[] = [];
-  for (const r of due) {
-    const failed = await run(r.statements, { kind: "repeatable", key: r.key, name: r.key, from: "", to: "", hash: r.hash });
+  for (const r of due.filter((x) => !x.statements.every((s) => s.group === "setup"))) {
+    const failed = await runRepeatable(r);
     if (failed !== undefined) return err([failed]);
-    repeated.push(r.key);
   }
   return ok({ steps: applied, repeatable: repeated, ledger });
 }

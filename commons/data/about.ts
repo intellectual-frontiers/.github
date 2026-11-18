@@ -28,7 +28,7 @@ export const about: About = {
     },
     {
       path: "sql/",
-      what: "The logical schema (tables, columns, keys and indexes made from governance by a projection, with the report of the flow and the types of rows), the physical schema (a logical schema bound to a dialect and a case style, as statements) and the dialects of PostgreSQL, SQLite and DuckDB, which are extensions; the extensions are in sql/extensions/: documentation (comments, documentation tables, governance tables), views, access (row-level security and grants from governance), routines and partitions; the generators (diagrams in Mermaid and D2, the data dictionary in Markdown and HTML, row types in Rust and Zod, the register of personal data and security) are in sql/extensions/generators/",
+      what: "The logical schema (tables, columns, keys and indexes made from governance by a projection, with the report of the flow and the types of rows), the physical schema (a logical schema bound to a dialect and a case style, as statements) and the dialects of PostgreSQL, SQLite and DuckDB, which are extensions; the extensions are in sql/extensions/: documentation (comments, documentation tables, governance tables), views, access (row-level security and grants from governance), routines and partitions; names that carry a schema are in sql/physical/; the generators (diagrams in Mermaid and D2, the data dictionary in Markdown and HTML, row types in Rust and Zod, the register of personal data and security) are in sql/extensions/generators/",
       mayImport: ["governance/, engine/, by package name"],
     },
     {

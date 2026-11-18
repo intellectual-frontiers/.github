@@ -18,7 +18,15 @@ export interface IdempotencySettings {
 }
 
 const ID = '"(?:[^"]|"")*"';
+const REF = `${ID}(?:\\.${ID})?`;
 const unquote = (id: string): string => id.slice(1, -1).replaceAll('""', '"');
+/** A name as a statement refers to it, which may carry a schema: its schema, where it has one, and its name. */
+const refOf = (text: string | undefined): { readonly schema: string | undefined; readonly name: string } => {
+  const parts = (text ?? "").match(new RegExp(ID, "g")) ?? [];
+  return parts.length > 1
+    ? { schema: unquote(parts[0] ?? ""), name: unquote(parts[1] ?? "") }
+    : { schema: undefined, name: unquote(parts[0] ?? "") };
+};
 
 /** How one statement was made safe. */
 interface Made {
@@ -49,33 +57,35 @@ function make(s: StepStatement, dialect: Dialect): Made {
   if (/ ADD COLUMN IF NOT EXISTS /.test(sql) || /^DROP \w+ IF EXISTS /.test(sql)) return natural();
   if (probes === undefined) return ledgerOnly();
 
-  if ((m = sql.match(new RegExp(`^ALTER TABLE (${ID}) ADD COLUMN (${ID})`)))) {
+  if ((m = sql.match(new RegExp(`^ALTER TABLE (${REF}) ADD COLUMN (${ID})`)))) {
     if (has("addColumn")) return natural(sql.replace(" ADD COLUMN ", " ADD COLUMN IF NOT EXISTS "));
-    return guarded(probes.column(unquote(m[1] ?? ""), unquote(m[2] ?? "")), "rows");
+    return guarded(probes.column(refOf(m[1]).name, unquote(m[2] ?? ""), refOf(m[1]).schema), "rows");
   }
-  if ((m = sql.match(new RegExp(`^ALTER TABLE (${ID}) DROP COLUMN (${ID});$`)))) {
+  if ((m = sql.match(new RegExp(`^ALTER TABLE (${REF}) DROP COLUMN (${ID});$`)))) {
     if (has("dropColumn")) return natural(sql.replace(" DROP COLUMN ", " DROP COLUMN IF EXISTS "));
-    return guarded(probes.column(unquote(m[1] ?? ""), unquote(m[2] ?? "")), "none");
+    return guarded(probes.column(refOf(m[1]).name, unquote(m[2] ?? ""), refOf(m[1]).schema), "none");
   }
-  if ((m = sql.match(new RegExp(`^ALTER TABLE (${ID}) RENAME TO (${ID});$`)))) return guarded(probes.table(unquote(m[1] ?? "")), "none");
-  if ((m = sql.match(new RegExp(`^ALTER TABLE (${ID}) RENAME COLUMN (${ID}) TO (${ID});$`))))
-    return guarded(probes.column(unquote(m[1] ?? ""), unquote(m[2] ?? "")), "none");
-  if ((m = sql.match(new RegExp(`^ALTER TABLE (${ID}) ADD CONSTRAINT (${ID})`))))
-    return guarded(probes.constraint(unquote(m[1] ?? ""), unquote(m[2] ?? "")), "rows");
-  if ((m = sql.match(new RegExp(`^ALTER TABLE (${ID}) DROP CONSTRAINT (${ID});$`)))) {
+  if ((m = sql.match(new RegExp(`^ALTER TABLE (${REF}) RENAME TO (${ID});$`))))
+    return guarded(probes.table(refOf(m[1]).name, refOf(m[1]).schema), "none");
+  if ((m = sql.match(new RegExp(`^ALTER TABLE (${REF}) RENAME COLUMN (${ID}) TO (${ID});$`))))
+    return guarded(probes.column(refOf(m[1]).name, unquote(m[2] ?? ""), refOf(m[1]).schema), "none");
+  if ((m = sql.match(new RegExp(`^ALTER TABLE (${REF}) ADD CONSTRAINT (${ID})`))))
+    return guarded(probes.constraint(refOf(m[1]).name, unquote(m[2] ?? ""), refOf(m[1]).schema), "rows");
+  if ((m = sql.match(new RegExp(`^ALTER TABLE (${REF}) DROP CONSTRAINT (${ID});$`)))) {
     if (has("dropConstraint")) return natural(sql.replace(" DROP CONSTRAINT ", " DROP CONSTRAINT IF EXISTS "));
-    return guarded(probes.constraint(unquote(m[1] ?? ""), unquote(m[2] ?? "")), "none");
+    return guarded(probes.constraint(refOf(m[1]).name, unquote(m[2] ?? ""), refOf(m[1]).schema), "none");
   }
-  if ((m = sql.match(new RegExp(`^ALTER TABLE (${ID}) RENAME CONSTRAINT (${ID}) TO (${ID});$`))))
-    return guarded(probes.constraint(unquote(m[1] ?? ""), unquote(m[2] ?? "")), "none");
-  if ((m = sql.match(new RegExp(`^ALTER INDEX (${ID}) RENAME TO (${ID});$`)))) return guarded(probes.index(unquote(m[1] ?? "")), "none");
-  if ((m = sql.match(new RegExp(`^DROP TABLE (${ID});$`)))) {
+  if ((m = sql.match(new RegExp(`^ALTER TABLE (${REF}) RENAME CONSTRAINT (${ID}) TO (${ID});$`))))
+    return guarded(probes.constraint(refOf(m[1]).name, unquote(m[2] ?? ""), refOf(m[1]).schema), "none");
+  if ((m = sql.match(new RegExp(`^ALTER INDEX (${REF}) RENAME TO (${ID});$`))))
+    return guarded(probes.index(refOf(m[1]).name, refOf(m[1]).schema), "none");
+  if ((m = sql.match(new RegExp(`^DROP TABLE (${REF});$`)))) {
     if (has("dropTable")) return natural(sql.replace("DROP TABLE ", "DROP TABLE IF EXISTS "));
-    return guarded(probes.table(unquote(m[1] ?? "")), "none");
+    return guarded(probes.table(refOf(m[1]).name, refOf(m[1]).schema), "none");
   }
-  if ((m = sql.match(new RegExp(`^DROP INDEX (${ID});$`)))) {
+  if ((m = sql.match(new RegExp(`^DROP INDEX (${REF});$`)))) {
     if (has("dropIndex")) return natural(sql.replace("DROP INDEX ", "DROP INDEX IF EXISTS "));
-    return guarded(probes.index(unquote(m[1] ?? "")), "none");
+    return guarded(probes.index(refOf(m[1]).name, refOf(m[1]).schema), "none");
   }
   return ledgerOnly();
 }

@@ -67,7 +67,7 @@ export function viewsSource(definitions: readonly ViewDefinition[]): StatementSo
         const cn = written.column(c.id);
         if (tn === undefined || cn === undefined) return void bad(`${r.table}.${r.column} was not written`);
         used.push(t.id, c.id);
-        return `${q(tn)}.${q(cn)}`;
+        return `${written.ref(t.id)}.${q(cn)}`;
       };
       const from = tableNamed(schema, v.from);
       const fromName = from === undefined ? undefined : written.table(from.id);
@@ -85,7 +85,7 @@ export function viewsSource(definitions: readonly ViewDefinition[]): StatementSo
         if (jt === undefined || jn === undefined) return void bad(`the schema has no table ${j.table}`);
         const a = ref(j.on[0]);
         const b = ref(j.on[1]);
-        return a === undefined || b === undefined ? undefined : `  JOIN ${q(jn)} ON ${a} = ${b}`;
+        return a === undefined || b === undefined ? undefined : `  JOIN ${written.ref(jt.id)} ON ${a} = ${b}`;
       });
       const conditions = (v.where ?? []).map((c) => {
         const r = ref(c);
@@ -95,7 +95,7 @@ export function viewsSource(definitions: readonly ViewDefinition[]): StatementSo
       if (errors.length > 0) continue;
       const select = shown.map((s) => s.ref ?? "").join(", ");
       const body =
-        `SELECT ${select}\n  FROM ${q(fromName)}` +
+        `SELECT ${select}\n  FROM ${written.ref(from.id)}` +
         joins.map((j) => `\n${j ?? ""}`).join("") +
         (conditions.length === 0 ? "" : `\n WHERE ${conditions.map((c) => c ?? "").join(" AND ")}`);
       const head = `${q(name)} (${shown.map((s) => q(s.as)).join(", ")}) AS\n${body};`;

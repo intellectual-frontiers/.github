@@ -93,7 +93,7 @@ export function createTables(
   const taken = new Map(context.schema.tables.map((t) => [context.written.table(t.id) ?? "", t.id]));
   const errors: PhysicalError[] = [];
   for (const t of tables) {
-    const written = context.naming.names.write(t.name);
+    const written = context.written.tableName(context.naming.names.write(t.name));
     const first = taken.get(written);
     if (first !== undefined) errors.push({ kind: "collision", name: written, first, second: t.id });
   }
@@ -107,7 +107,11 @@ export function createTables(
     valueSets: [],
     governance: [],
   };
-  const bound = bind(fragment, { dialect: context.dialect, naming: context.naming });
+  const bound = bind(fragment, {
+    dialect: context.dialect,
+    naming: context.naming,
+    ...(context.schemaName === undefined ? {} : { schema: context.schemaName }),
+  });
   return bound.kind === "err" ? err(bound.error) : ok({ statements: bound.value.statements, tables });
 }
 
@@ -125,9 +129,22 @@ export function reload(context: BindContext, table: Table, rows: readonly (reado
   const name = context.naming.names.write(table.name);
   const names = table.columns.map((c) => context.naming.names.write(c.name));
   return [
-    { group: "data", sql: `DELETE FROM ${context.dialect.quote(name)};`, of: [table.id] },
+    { group: "data", sql: `DELETE FROM ${context.written.qualify(name)};`, of: [table.id] },
     ...(rows.length === 0
       ? []
-      : [{ group: "data" as const, sql: upsert(context.dialect, name, names, names.slice(0, keyLength), rows), of: [table.id] }]),
+      : [
+          {
+            group: "data" as const,
+            sql: upsert(
+              context.dialect,
+              context.written.tableName(name),
+              names,
+              names.slice(0, keyLength),
+              rows,
+              context.written.qualifier,
+            ),
+            of: [table.id],
+          },
+        ]),
   ];
 }

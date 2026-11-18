@@ -61,9 +61,9 @@ export function accessSource(settings: AccessSettings = {}): StatementSource {
           if (onUnsupported === "error") refuse("its access (security.access)");
         } else {
           const of: LogicalId[] = [t.id];
-          if (roles.read.length > 0) out.push({ group: "policy", sql: `GRANT SELECT ON ${q(table)} TO ${list(roles.read)};`, of });
+          if (roles.read.length > 0) out.push({ group: "policy", sql: `GRANT SELECT ON ${written.ref(t.id)} TO ${list(roles.read)};`, of });
           if (roles.write.length > 0)
-            out.push({ group: "policy", sql: `GRANT INSERT, UPDATE, DELETE ON ${q(table)} TO ${list(roles.write)};`, of });
+            out.push({ group: "policy", sql: `GRANT INSERT, UPDATE, DELETE ON ${written.ref(t.id)} TO ${list(roles.write)};`, of });
         }
       }
       for (const { column, scope } of scoped) {
@@ -75,13 +75,13 @@ export function accessSource(settings: AccessSettings = {}): StatementSource {
         if (col === undefined) continue;
         const test = `${q(col)}::text = current_setting(${dialect.literal(`${prefix}.${scope}`)}, true)`;
         const of = [t.id, column.id, featureId("policy", [...t.name, ...words(scope)])];
-        out.push({ group: "policy", sql: `ALTER TABLE ${q(table)} ENABLE ROW LEVEL SECURITY;`, of });
+        out.push({ group: "policy", sql: `ALTER TABLE ${written.ref(t.id)} ENABLE ROW LEVEL SECURITY;`, of });
         const policy = (op: string, kind: string, to: readonly string[], using: boolean, check: boolean): void => {
           const name = policyName(scope, op);
-          out.push({ group: "policy", sql: `DROP POLICY IF EXISTS ${q(name)} ON ${q(table)};`, of });
+          out.push({ group: "policy", sql: `DROP POLICY IF EXISTS ${q(name)} ON ${written.ref(t.id)};`, of });
           out.push({
             group: "policy",
-            sql: `CREATE POLICY ${q(name)} ON ${q(table)} FOR ${kind}${to.length === 0 ? "" : ` TO ${list(to)}`}${using ? ` USING (${test})` : ""}${check ? ` WITH CHECK (${test})` : ""};`,
+            sql: `CREATE POLICY ${q(name)} ON ${written.ref(t.id)} FOR ${kind}${to.length === 0 ? "" : ` TO ${list(to)}`}${using ? ` USING (${test})` : ""}${check ? ` WITH CHECK (${test})` : ""};`,
             of,
           });
         };

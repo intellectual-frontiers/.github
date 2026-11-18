@@ -48,6 +48,7 @@ export const dialect: Dialect = {
     "routines",
     "partitions",
     "alter-column",
+    "schemas",
   ],
   maxName: 63,
   now: "CURRENT_TIMESTAMP",
@@ -56,12 +57,14 @@ export const dialect: Dialect = {
   type,
   ifExists: ["addColumn", "dropColumn", "dropConstraint", "dropTable", "dropIndex"],
   probes: {
-    table: (t) => `SELECT 1 FROM information_schema.tables WHERE table_schema = current_schema() AND table_name = ${standardLiteral(t)}`,
-    column: (t, c) =>
-      `SELECT 1 FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = ${standardLiteral(t)} AND column_name = ${standardLiteral(c)}`,
-    constraint: (t, n) =>
-      `SELECT 1 FROM pg_constraint c JOIN pg_class r ON r.oid = c.conrelid JOIN pg_namespace s ON s.oid = r.relnamespace WHERE s.nspname = current_schema() AND r.relname = ${standardLiteral(t)} AND c.conname = ${standardLiteral(n)}`,
-    index: (n) => `SELECT 1 FROM pg_indexes WHERE schemaname = current_schema() AND indexname = ${standardLiteral(n)}`,
+    table: (t, s) =>
+      `SELECT 1 FROM information_schema.tables WHERE table_schema = ${s === undefined ? "current_schema()" : standardLiteral(s)} AND table_name = ${standardLiteral(t)}`,
+    column: (t, c, s) =>
+      `SELECT 1 FROM information_schema.columns WHERE table_schema = ${s === undefined ? "current_schema()" : standardLiteral(s)} AND table_name = ${standardLiteral(t)} AND column_name = ${standardLiteral(c)}`,
+    constraint: (t, n, s) =>
+      `SELECT 1 FROM pg_constraint c JOIN pg_class r ON r.oid = c.conrelid JOIN pg_namespace s ON s.oid = r.relnamespace WHERE s.nspname = ${s === undefined ? "current_schema()" : standardLiteral(s)} AND r.relname = ${standardLiteral(t)} AND c.conname = ${standardLiteral(n)}`,
+    index: (n, s) =>
+      `SELECT 1 FROM pg_indexes WHERE schemaname = ${s === undefined ? "current_schema()" : standardLiteral(s)} AND indexname = ${standardLiteral(n)}`,
   },
   setup: (types) => (types.some((t) => t.kind === "vector") ? ["CREATE EXTENSION IF NOT EXISTS vector;"] : []),
   pattern: (column, pattern) => `${column} ~ ${standardLiteral(pattern)}`,

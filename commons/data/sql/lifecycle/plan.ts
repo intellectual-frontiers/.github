@@ -19,6 +19,7 @@ import {
   type Statement,
   type StatementSource,
   type TableClause,
+  qualified,
   upsert,
   writeNames,
 } from "@intellectual-frontiers/data/sql/physical";
@@ -96,6 +97,7 @@ export interface Plan {
 export type PlanError =
   | { readonly kind: "write"; readonly errors: readonly PhysicalError[] }
   | { readonly kind: "dialect"; readonly from: string; readonly to: string }
+  | { readonly kind: "schema"; readonly from: string | undefined; readonly to: string | undefined }
   | { readonly kind: "refused"; readonly key: string; readonly name: string; readonly class: StepClass; readonly why: string }
   | { readonly kind: "manual"; readonly key: string; readonly name: string; readonly why: string }
   | { readonly kind: "unresolved"; readonly resolves: string }
@@ -130,6 +132,8 @@ export type StepTransform = (draft: StepDraft, context: PlanContext) => StepDraf
 export interface Desired {
   readonly dialect: Dialect;
   readonly naming?: Naming;
+  /** The schema the tables are in (0013-sql-qualified-names). */
+  readonly schema?: string;
   readonly sources?: readonly StatementSource[];
   readonly tableClauses?: readonly TableClause[];
 }
@@ -175,6 +179,7 @@ export function plan(
   const snap = snapshotOf(schema, {
     dialect,
     naming,
+    ...(desired.schema === undefined ? {} : { schema: desired.schema }),
     ...(desired.tableClauses === undefined ? {} : { tableClauses: desired.tableClauses }),
   });
   if (snap.kind === "err") return err([{ kind: "write", errors: snap.error }]);
@@ -182,12 +187,14 @@ export function plan(
   const bound = bind(schema, {
     dialect,
     naming,
+    ...(desired.schema === undefined ? {} : { schema: desired.schema }),
     ...(desired.sources === undefined ? {} : { sources: desired.sources }),
     ...(desired.tableClauses === undefined ? {} : { tableClauses: desired.tableClauses }),
   });
   if (bound.kind === "err") return err([{ kind: "write", errors: bound.error }]);
   if (from !== undefined && from.dialect !== to.dialect) return err([{ kind: "dialect", from: from.dialect, to: to.dialect }]);
-  const start: State = from ?? emptyState(to.dialect, to.naming);
+  if (from !== undefined && from.qualifier !== to.qualifier) return err([{ kind: "schema", from: from.qualifier, to: to.qualifier }]);
+  const start: State = from ?? emptyState(to.dialect, to.naming, to.qualifier);
 
   // the changes in the order they are made: creates in the order `bind` makes the tables
   const order = new Map<string, number>();
@@ -198,7 +205,7 @@ export function plan(
   const rank = (c: Change): number => (c.kind === "createTable" ? (order.get(c.table.id) ?? 0) : 0);
   changes.sort((a, b) => (a.kind === "createTable" && b.kind === "createTable" ? rank(a) - rank(b) : 0));
 
-  const names = writeNames(schema, dialect, naming, []);
+  const names = writeNames(schema, dialect, naming, [], desired.schema);
   const x = expressor(dialect, naming, names, []);
   const context: PlanContext = { dialect, naming, schema };
   const q = (n: string): string => dialect.quote(n);
@@ -212,7 +219,8 @@ export function plan(
 
   type Made = Omit<StepDraft, "name" | "kind" | "key" | "manual" | "change"> | { readonly manualNeeded: string };
   const make = (c: Change): Made => {
-    const T = (t: TableRef): string => q(t.name);
+    const T = (t: TableRef): string => qualified(dialect, to.qualifier, t.name);
+    const QI = (n: string): string => qualified(dialect, to.qualifier, n);
     const sql = (...parts: string[]): string => `${parts.join(" ")};`;
     const cols = (c2: StateConstraint): string => c2.text;
     switch (c.kind) {
@@ -220,8 +228,8 @@ export function plan(
         return {
           class: "safe",
           reversibility: "lossless",
-          up: [stmt("table", sql("ALTER TABLE", q(c.fromName), "RENAME TO", q(c.toName)), idOfTable(c.toWords))],
-          down: [stmt("table", sql("ALTER TABLE", q(c.toName), "RENAME TO", q(c.fromName)), idOfTable(c.toWords))],
+          up: [stmt("table", sql("ALTER TABLE", QI(c.fromName), "RENAME TO", q(c.toName)), idOfTable(c.toWords))],
+          down: [stmt("table", sql("ALTER TABLE", QI(c.toName), "RENAME TO", q(c.fromName)), idOfTable(c.toWords))],
           of: idOfTable(c.toWords),
         };
       case "renameColumn":
@@ -241,7 +249,7 @@ export function plan(
           return {
             class: "safe",
             reversibility: "lossless",
-            up: [stmt("index", sql("DROP INDEX", q(k.name)), of)],
+            up: [stmt("index", sql("DROP INDEX", QI(k.name)), of)],
             down: [stmt("index", sql("CREATE INDEX IF NOT EXISTS", q(k.name), "ON", T(c.table), `(${cols(k)})`), of)],
             of,
           };
@@ -262,19 +270,19 @@ export function plan(
             ? {
                 class: "safe",
                 reversibility: "lossless",
-                up: [stmt("index", sql("ALTER INDEX", q(c.from.name), "RENAME TO", q(c.to.name)), of)],
-                down: [stmt("index", sql("ALTER INDEX", q(c.to.name), "RENAME TO", q(c.from.name)), of)],
+                up: [stmt("index", sql("ALTER INDEX", QI(c.from.name), "RENAME TO", q(c.to.name)), of)],
+                down: [stmt("index", sql("ALTER INDEX", QI(c.to.name), "RENAME TO", q(c.from.name)), of)],
                 of,
               }
             : {
                 class: "safe",
                 reversibility: "lossless",
                 up: [
-                  stmt("index", sql("DROP INDEX", q(c.from.name)), of),
+                  stmt("index", sql("DROP INDEX", QI(c.from.name)), of),
                   stmt("index", sql("CREATE INDEX IF NOT EXISTS", q(c.to.name), "ON", T(c.table), `(${cols(c.to)})`), of),
                 ],
                 down: [
-                  stmt("index", sql("DROP INDEX", q(c.to.name)), of),
+                  stmt("index", sql("DROP INDEX", QI(c.to.name)), of),
                   stmt("index", sql("CREATE INDEX IF NOT EXISTS", q(c.from.name), "ON", T(c.table), `(${cols(c.from)})`), of),
                 ],
                 of,
@@ -372,7 +380,7 @@ export function plan(
           class: "safe",
           reversibility: "lossless",
           up: mine.map((s) => ({ group: s.group, origin: "core" as const, sql: s.sql, of: s.of })),
-          down: [stmt("table", sql("DROP TABLE", q(c.table.name)), [c.table.id as LogicalId])],
+          down: [stmt("table", sql("DROP TABLE", QI(c.table.name)), [c.table.id as LogicalId])],
           of: [c.table.id as LogicalId],
         };
       }
@@ -384,7 +392,7 @@ export function plan(
             class: "safe",
             reversibility: "lossless",
             up: [stmt("index", sql("CREATE INDEX IF NOT EXISTS", q(k.name), "ON", T(c.table), `(${cols(k)})`), of)],
-            down: [stmt("index", sql("DROP INDEX", q(k.name)), of)],
+            down: [stmt("index", sql("DROP INDEX", QI(k.name)), of)],
             of,
           };
         if (!can("add-constraint"))
@@ -409,7 +417,7 @@ export function plan(
         return {
           class: "safe",
           reversibility: "lossless",
-          up: [stmt("data", upsert(dialect, c.table.name, colNames, key, c.rows.map(tuple)), of)],
+          up: [stmt("data", upsert(dialect, c.table.name, colNames, key, c.rows.map(tuple), to.qualifier), of)],
           down: [
             ...(added.length === 0
               ? []
@@ -427,7 +435,9 @@ export function plan(
                     of,
                   ),
                 ]),
-            ...(c.before.length === 0 ? [] : [stmt("data", upsert(dialect, c.table.name, colNames, key, c.before.map(tuple)), of)]),
+            ...(c.before.length === 0
+              ? []
+              : [stmt("data", upsert(dialect, c.table.name, colNames, key, c.before.map(tuple), to.qualifier), of)]),
           ],
           of,
         };
@@ -468,7 +478,7 @@ export function plan(
           class: "destructive",
           why: `the table ${c.table.name} and its rows are lost`,
           reversibility: "irreversible",
-          up: [stmt("table", sql("DROP TABLE", q(c.table.name)), [c.table.id as LogicalId])],
+          up: [stmt("table", sql("DROP TABLE", QI(c.table.name)), [c.table.id as LogicalId])],
           of: [c.table.id as LogicalId],
         };
     }

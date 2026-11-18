@@ -71,6 +71,8 @@ export interface State {
   readonly format: 1;
   readonly dialect: string;
   readonly naming: { readonly names: string; readonly codes: string };
+  /** The schema the tables are qualified by, where the dialect has schemas and one was given (0013-sql-qualified-names FR-006). */
+  readonly qualifier?: string;
   readonly tables: readonly StateTable[];
 }
 
@@ -78,6 +80,8 @@ export interface State {
 export interface StateOptions {
   readonly dialect: Dialect;
   readonly naming?: Naming;
+  /** The schema the tables are in. */
+  readonly schema?: string;
   /** What extensions add to the end of a table; the lifecycle diffs them as part of the table. */
   readonly tableClauses?: readonly TableClause[];
 }
@@ -98,10 +102,10 @@ export function snapshotOf(
   const { dialect } = options;
   const naming = options.naming ?? defaultNaming();
   const errors: PhysicalError[] = [];
-  const names = writeNames(schema, dialect, naming, errors);
+  const names = writeNames(schema, dialect, naming, errors, options.schema);
   const x = expressor(dialect, naming, names, errors);
   const written = (w: readonly string[]): string => naming.names.write(w);
-  const context = { schema, dialect, naming, written: names };
+  const context = { schema, dialect, naming, written: names, ...(options.schema === undefined ? {} : { schemaName: options.schema }) };
   const tables = schema.tables.map((t: Table): StateTable => {
     const tn = names.tables.get(t.id) ?? "";
     const columns = t.columns.map((c): StateColumn => {
@@ -178,6 +182,7 @@ export function snapshotOf(
       format: 1,
       dialect: dialect.name,
       naming: { names: naming.names.name, codes: naming.codes === "name" ? "name" : naming.codes.name },
+      ...(names.qualifier === undefined ? {} : { qualifier: names.qualifier }),
       tables,
     },
   };
@@ -188,9 +193,16 @@ export function snapshotOf(
  *
  * @param dialect - the dialect's name
  * @param naming - the names of the case styles
+ * @param qualifier - the schema, where the dialect has schemas and one was given
  * @returns the empty state
  */
-export const emptyState = (dialect: string, naming: State["naming"]): State => ({ format: 1, dialect, naming, tables: [] });
+export const emptyState = (dialect: string, naming: State["naming"], qualifier?: string): State => ({
+  format: 1,
+  dialect,
+  naming,
+  ...(qualifier === undefined ? {} : { qualifier }),
+  tables: [],
+});
 
 const order = <T>(xs: readonly T[], key: (x: T) => string): T[] => [...xs].sort((a, b) => (key(a) < key(b) ? -1 : key(a) > key(b) ? 1 : 0));
 
@@ -203,6 +215,7 @@ export function canonicalState(state: State): unknown {
     format: state.format,
     dialect: state.dialect,
     naming: state.naming,
+    qualifier: state.qualifier,
     tables: order(state.tables, (t) => t.words.join(".")).map((t) => ({
       words: t.words,
       name: t.name,

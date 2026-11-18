@@ -28,17 +28,18 @@ export type Feature =
   | "grants"
   | "routines"
   | "partitions"
-  | "alter-column";
+  | "alter-column"
+  | "schemas";
 
 /** The forms of `DROP` and `ADD COLUMN` that a dialect writes with `IF [NOT] EXISTS` (0012-sql-idempotency FR-001). */
 export type IfExistsForm = "addColumn" | "dropColumn" | "dropConstraint" | "dropTable" | "dropIndex";
 
 /** Queries on a dialect's catalog that return a row if and only if the thing exists, or none where the engine cannot say (0012-sql-idempotency FR-001). */
 export interface Probes {
-  table(table: string): string;
-  column(table: string, column: string): string;
-  constraint(table: string, name: string): string | undefined;
-  index(name: string): string;
+  table(table: string, schema?: string): string;
+  column(table: string, column: string, schema?: string): string;
+  constraint(table: string, name: string, schema?: string): string | undefined;
+  index(name: string, schema?: string): string;
 }
 
 /** A literal a statement may hold. */

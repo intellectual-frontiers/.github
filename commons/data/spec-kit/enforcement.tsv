@@ -146,3 +146,11 @@ requirement	mechanism	by	note
 0012-sql-idempotency FR-007	check	.github: cd commons/data && bun run verify	suite/idempotency.test.ts: a project can refuse a step that only the ledger keeps from running twice
 0012-sql-idempotency FR-008	check	.github: cd commons/data && bun run verify	suite/idempotency.test.ts: a guarded statement is one DO block on PostgreSQL that does no harm run twice, and is refused where the dialect has no block
 0012-sql-idempotency FR-009	check	.github: cd commons/data && bun run verify	suite/idempotency.test.ts: on three real engines every step and every plan can be run twice without the ledger with the result of running it once
+0013-sql-qualified-names FR-001	check	.github: cd commons/data && bun run verify	suite/qualified.test.ts: with no schema given the statements make no schema and qualify nothing
+0013-sql-qualified-names FR-002	check	.github: cd commons/data && bun run verify	suite/qualified.test.ts: where the dialect has schemas the schema is made first and every reference to a table is qualified
+0013-sql-qualified-names FR-003	check	.github: cd commons/data && bun run verify	suite/qualified.test.ts: where the dialect has none the schema's words come before each table's name with the case style, and the length is checked after they are added
+0013-sql-qualified-names FR-004	check	.github: cd commons/data && bun run verify	suite/qualified.test.ts: a statement source is given ref, qualify and tableName
+0013-sql-qualified-names FR-005	check	.github: cd commons/data && bun run verify	suite/qualified.test.ts: the comments, documentation tables, governance tables, views, policies, routines and partitions refer to the tables in the schema, on real engines
+0013-sql-qualified-names FR-006	check	.github: cd commons/data && bun run verify	suite/qualified.test.ts: a state records the schema, and a plan writes statements and guard probes qualified by it
+0013-sql-qualified-names FR-007	check	.github: cd commons/data && bun run verify	suite/qualified.test.ts: the steps from empty and from each version to the next leave the database bind makes in the same schema on three engines
+0013-sql-qualified-names FR-008	check	.github: cd commons/data && bun run verify	suite/qualified.test.ts: the tables are in the schema and in no other on DuckDB and PostgreSQL, and carry its words on SQLite
