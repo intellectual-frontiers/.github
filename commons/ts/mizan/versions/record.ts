@@ -300,7 +300,7 @@ function literalOf(r: Release): Literal {
 
 /** The header every record carries. */
 const HEADER =
-  "/** The release record of this work (commons 0026-works-versioning): data, read and never run. `versions bump` writes it; never edit it by hand. */\n";
+  "/**\n * The release record of this work (commons 0026-works-versioning): data, read and never run. `versions bump` writes it; never edit it by hand.\n *\n * @module\n */\n";
 
 /** The text of a record's file, by the one template (FR-008): the header, `export const release = { ... };`, fields in the order of {@link RECORD_FIELDS}, a newline at the end. */
 export function releaseSource(r: Release): string {
