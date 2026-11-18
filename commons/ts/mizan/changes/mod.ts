@@ -1,6 +1,6 @@
 /**
  * The `changes` check of IFCCM (commons 0020-ifccm): the pure core (the lines of a commit message, the sections of a capability's issue, the declaration and its phase, the findings, the chain from
- * an issue to a run, the view of capabilities by rung) and the host layer that reads Git and, with a client it is given, asks a Git host. The command is `../changes.ts`.
+ * an issue to a run, the view of capabilities by rung, and the capability trace that needs no Git host) and the host layer that reads Git and, with a client it is given, asks a Git host. The command is `../changes.ts`.
  *
  * @module
  */
@@ -87,5 +87,24 @@ export {
   type ViewError,
   type ViewRecord,
 } from "./capability-view.ts";
-export { declarationHistory, readRange } from "./git-log.ts";
+export {
+  capabilityTrace,
+  NO_RUNG,
+  parseIssues,
+  traceJson,
+  traceOutput,
+  traceTable,
+  type Basis,
+  type CapabilityCommit,
+  type CapabilityTrace,
+  type CapabilityTraceInput,
+  type CapabilityTraceResult,
+  type IssueFact,
+  type RequirementTrace,
+  type RungLinks,
+  type TraceFormat,
+  type TraceRung,
+} from "./capability-trace.ts";
+export { readTermsFile } from "./terms-file.ts";
+export { declarationHistory, readRange, readRangeFacts } from "./git-log.ts";
 export { askHost, NO_CLIENT, NO_HOST_API, type StrictOutcome } from "./strict.ts";

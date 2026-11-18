@@ -39,7 +39,7 @@ export const about: About = {
     },
     {
       path: "mizan/",
-      what: "Mizan, the IF Spec Profile, as code (commons 0003-mizan): the rules it adds to the format of a specification (as plugins), the command that holds them against a baseline, the generator of its ontology's Turtle, and `integrations/` (0019-mizan-integrations): the registry, the readers of Turtle, N-Triples, JSON-LD and RDF/XML, the importers of a slice of a vocabulary, of an OSCAL control catalog and of a JSON Schema, and the exporters of SHACL, JSON Schema, SKOS and SQL are built, the other importers and exporters are specified. `changes/` and `changes.ts` (0020-ifccm) are the change-control check: the commit rules, the declaration and its phase, the chain from an issue to a run and the view of capabilities by rung, with a host layer that takes a `githost/` client as an argument.",
+      what: "Mizan, the IF Spec Profile, as code (commons 0003-mizan): the rules it adds to the format of a specification (as plugins), the command that holds them against a baseline, the generator of its ontology's Turtle, and `integrations/` (0019-mizan-integrations): the registry, the readers of Turtle, N-Triples, JSON-LD and RDF/XML, the importers of a slice of a vocabulary, of an OSCAL control catalog and of a JSON Schema, and the exporters of SHACL, JSON Schema, SKOS and SQL are built, the other importers and exporters are specified. `changes/` and `changes.ts` (0020-ifccm) are the change-control check: the commit rules, the declaration and its phase, the chain from an issue to a run and the view of capabilities by rung, with a host layer that takes a `githost/` client as an argument; `changes.ts --capability-trace` makes the same chain offline, from commit trailers, specifications, the ontology's `mz:definedBy`, `Spec:` and `Proves:` lines and quality records, with no Git host. `versions.ts` (0026-works-versioning) judges the versions of works, and `checkVersions`, `readWorks` and `./ts/mizan/versions` give a consumer its check as data and as a command.",
       mayImport: [
         "node: builtins",
         "kernel/",
@@ -103,6 +103,10 @@ export const about: About = {
       does: "Runs the linter with the ifc rules (bunfig.toml [lint]).",
     },
     { run: "bun run test", does: "Runs the suite under Bun." },
+    {
+      run: "bun mizan/changes.ts --capability-trace --range A..B [--issues FILE] [--terms FILE] [--rungs FILE]",
+      does: "Offline, with no Git host: for each capability the commits of the range serve, its requirements and, for each, the terms, code and tests on each rung and the stage where the chain ends, as a table or as JSON (`--format json`).",
+    },
     { run: "bun run test:node", does: "Runs the suite under Node 26." },
     {
       run: "bun quality/quality.ts record|verify|render",

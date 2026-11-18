@@ -525,7 +525,7 @@ proves(
       .map((e) => e.name)
       .sort();
     assert(files.length >= 9, files.join(","));
-    const host = new Set(["git-log.ts", "strict.ts"]);
+    const host = new Set(["git-log.ts", "strict.ts", "terms-file.ts"]);
     for (const name of files) {
       const text = readTextFileSync(join(CHANGES, name));
       const code = text.replace(/\/\*\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
