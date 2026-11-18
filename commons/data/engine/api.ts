@@ -1,16 +1,8 @@
-/** @module The engine's public surface (spike). */
-import { ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
-
-/** A contribution point: a named place a layer lets extensions fill. */
-export interface ContributionPoint<T> {
-  readonly name: string;
-  readonly __t?: T;
-}
-
-/** Declares a contribution point. */
-export const point = <T>(name: string): ContributionPoint<T> => ({ name });
-
-/** Says what the engine is, as a value that can fail. */
-export const engineName = (): Result<string, never> => ok("engine");
-
-export { internalSecret } from "./internal.ts";
+// Spec: 0001-layers FR-009; 0002-engine FR-002
+/**
+ * The engine's public surface (`@intellectual-frontiers/data/engine`): the extension host every layer and every extension stands on. Only
+ * the declaration of a contribution point is built; the manifest, `compose` and activation follow (commons data 0002-engine).
+ *
+ * @module
+ */
+export { type ContributionPoint, point, type PointName } from "./point.ts";

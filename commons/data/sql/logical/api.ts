@@ -1,5 +1,7 @@
-/** @module The logical layer's public surface (spike): imports governance by package name. */
-import { vocabulary } from "@intellectual-frontiers/data/governance";
-
-/** The contribution point the logical layer reads governance from. */
-export const logicalFromGovernance = vocabulary.name;
+// Spec: 0001-layers FR-002, FR-009
+/**
+ * The logical schema, the second layer: made from governance, knowing the kind of database but no engine (0001-layers FR-002). Built after governance. Its public surface is `@intellectual-frontiers/data/sql/logical`; nothing is built here yet.
+ *
+ * @module
+ */
+export {};

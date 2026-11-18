@@ -15,7 +15,7 @@
 - **FR-003**: A citation in a library's files (a `// Spec:` line, a `proves(` call, the `spec` of an ontology term) MUST be read against that library's spec kit alone, so that a slug both have (their numbers are independent) means the library's.
 - **FR-004**: A library MUST import the packages of commons it uses (the kernel first) by package name, as 0005-typescript-runtime says, and MUST NOT import by a relative path a file outside its own folder.
 - **FR-005**: A library's `verify` script MUST run from the library's folder with no argument, and MUST fail if any of its parts fails: the TypeScript compiler on the library, the specification checker on its spec kit (`bun ../tools/mizan-check.ts --root spec-kit`), the Mizan rules on it (`bun ../ts/mizan/check.ts --root spec-kit`) and the library's tests.
-- **FR-006**: A library's `verify` script MUST also run the trace of its sources and tests to its own specifications (0015-trace) and the check of its layers, held by a baseline of its own.
+- **FR-006**: A library's `verify` script MUST also run `tools/check.ts`, the trace of its sources and tests to its own specifications (0015-trace) and the check of its layers, whose findings are held by a baseline of its own (`trace.baseline.txt`).
 
 ## What this repository knows
 
@@ -43,13 +43,13 @@
 - A library specification whose slug is also a slug here, cited by a library file: it means the library's, per FR-003.
 - A library file that imports `../../ts/kernel/mod.ts`: found, per FR-004.
 - A library whose `verify` leaves out the specification checker: found, per FR-005.
-- A library with sources and tests but no trace in its `verify`: found once the trace is built, per FR-006.
+- A library whose `verify` does not run `tools/check.ts`: found, per FR-006.
 - A library folder with no workflow: found, per FR-010.
 - A library's spec kit that the documentation does not name: published without it, found, per FR-009.
 
 ## Assumptions
 
-- The requirement of FR-006 is Planned: `commons/data` has its first specifications of its own next, and the trace and layer tools are added to its `verify` with them; until then the register says so.
+- `tools/check.ts` of a library is the library's own: `commons/data` reads its trace and layers with commons' kernel and runtime, and another library may keep a different check as long as its `verify` runs it under that name.
 - A library imports the kernel by package name through a path link (`link:../ts` in its `devDependencies`); how and why is 0005-typescript-runtime's, which records the findings of the first library so that no one repeats them.
 - The existing folders of commons migrate to this form later, after what `commons/data` teaches (OQ-1).
 

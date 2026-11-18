@@ -1,3 +1,23 @@
 # What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
 # mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
 requirement	mechanism	by	note
+0001-layers FR-001	none	-	Planned: governance is built next (phase 3 of the library); its imports are held by FR-004 already
+0001-layers FR-002	none	-	Planned: the logical schema is built after governance; its imports are held by FR-004 already
+0001-layers FR-003	none	-	Planned: the physical schema is built after the logical one; its imports are held by FR-004 already
+0001-layers FR-004	check	.github: cd commons/data && bun run verify	suite/layers.test.ts: each unit may import only the units of the table, and an import that climbs or reaches around is layers/above or layers/around, by package name and by path
+0001-layers FR-005	check	.github: cd commons/data && bun run verify	suite/layers.test.ts: layers 1 to 3 and the engine import only the kernel and the library, and a driver or node:fs is layers/external
+0001-layers FR-006	none	-	Planned: identities are built with governance and the logical schema
+0001-layers FR-007	none	-	Planned: the flow report is built with the logical schema
+0001-layers FR-008	check	.github: cd commons/data && bun run verify	suite/layers.test.ts: every file of the real tree is in a unit, and one in no unit is layers/unclassified
+0001-layers FR-009	check	.github: cd commons/data && bun run verify	suite/layers.test.ts: the four layer entries of exports are the api.ts of their folders, and an import of a subpath exports does not name is layers/private
+0001-layers FR-010	check	.github: cd commons/data && bun run verify	suite/layers.test.ts: a relative import into another unit is layers/relative, and one inside the unit is not
+0001-layers FR-011	check	.github: cd commons/data && bun run verify	suite/layers.test.ts: the check finds nothing in the real tree, each rule is found in a copy, and verify runs tools/check.ts
+0002-engine FR-001	check	.github: cd commons/data && bun run verify	suite/layers.test.ts: the engine imports nothing of the library, and only the kernel by package name
+0002-engine FR-002	check	.github: cd commons/data && bun run verify	suite/engine.test.ts: a point carries its name and is frozen, and a name with no namespace does not compile
+0002-engine FR-003	none	-	Planned: the manifest, compose, activation and handles are built in phase 2 of the library
+0002-engine FR-004	none	-	Planned: the manifest, compose, activation and handles are built in phase 2 of the library
+0002-engine FR-005	none	-	Planned: the manifest, compose, activation and handles are built in phase 2 of the library
+0002-engine FR-006	none	-	Planned: the manifest, compose, activation and handles are built in phase 2 of the library
+0002-engine FR-007	none	-	Planned: the manifest, compose, activation and handles are built in phase 2 of the library
+0002-engine FR-008	none	-	Planned: the manifest, compose, activation and handles are built in phase 2 of the library
+0002-engine FR-009	none	-	Planned: the manifest, compose, activation and handles are built in phase 2 of the library

@@ -16,6 +16,7 @@ const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..")
 const SPEC = "0027-commons-libraries";
 const PARTS = ["registry.tsv", "enforcement.tsv", "mizan.baseline.txt", "specs"] as const;
 const VERIFY_PARTS = ["tsc", "mizan-check.ts --root spec-kit", "mizan/check.ts --root spec-kit", "test"] as const;
+const TRACE_PART = "tools/check.ts";
 
 const read = (file: string): string => readFileSync(file, "utf8");
 const isDir = (p: string): boolean => existsSync(p) && statSync(p).isDirectory();
@@ -90,6 +91,7 @@ export function libraryFindings(repo: string): readonly string[] {
       const verify = pkg.scripts?.["verify"];
       if (verify === undefined) found.push(`commons/${name}/package.json has no verify script (FR-001)`);
       else for (const part of VERIFY_PARTS) if (!verify.includes(part)) found.push(`commons/${name}'s verify lacks ${part} (FR-005)`);
+      if (verify !== undefined && !verify.includes(TRACE_PART)) found.push(`commons/${name}'s verify lacks ${TRACE_PART} (FR-006)`);
     }
     if (existsSync(`${dir}/spec-kit/registry.tsv`)) {
       const slugs = read(`${dir}/spec-kit/registry.tsv`)
@@ -220,9 +222,24 @@ proves([`${SPEC} FR-005`], "a verify that leaves out the compiler, a checker or 
   }
 });
 
+proves([`${SPEC} FR-006`], "a verify that does not run the trace and layers check is found", () => {
+  using c = copyOf();
+  const pkg = JSON.parse(read(`${c.repo}/commons/data/package.json`)) as { scripts: Record<string, string> };
+  pkg.scripts["verify"] = (pkg.scripts["verify"] ?? "")
+    .split(" && ")
+    .filter((s) => !s.includes(TRACE_PART))
+    .join(" && ");
+  writeFileSync(`${c.repo}/commons/data/package.json`, JSON.stringify(pkg));
+  assertStringIncludes(libraryFindings(c.repo).join("\n"), `verify lacks ${TRACE_PART}`);
+});
+
 proves([`${SPEC} FR-007`], "a requirement for a library whose enforcement is not its verify is found", () => {
   using c = copyOf();
-  edit(`${c.repo}/commons/spec-kit/enforcement.tsv`, `.github: cd commons/data && bun run verify`, `.github: bun test ./tests/`);
+  edit(
+    `${c.repo}/commons/spec-kit/enforcement.tsv`,
+    `${SPEC} FR-011\tcheck\t.github: cd commons/data && bun run verify`,
+    `${SPEC} FR-011\tcheck\t.github: bun test ./tests/`,
+  );
   assertStringIncludes(libraryFindings(c.repo).join("\n"), `${SPEC} FR-011 is not a check row that runs the verify of commons/data`);
 });
 
