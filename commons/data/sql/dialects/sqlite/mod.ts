@@ -37,6 +37,28 @@ export const dialect: Dialect = {
   quote: quoteName,
   literal: standardLiteral,
   type,
+  catalog: {
+    compares: ["tables", "columns (type, nullability)", "primary keys", "indexes"],
+    read: async (query) => {
+      const tables = await query(`SELECT name n FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name`);
+      const idx = await query(`SELECT tbl_name t, name n FROM sqlite_master WHERE type = 'index' AND sql IS NOT NULL`);
+      const out = [];
+      for (const t of tables) {
+        const name = String(t["n"]);
+        const cols = await query(`SELECT name c, type d, "notnull" nn, pk FROM pragma_table_info(${standardLiteral(name)})`);
+        out.push({
+          name,
+          columns: cols.map((c) => ({ name: String(c["c"]), type: String(c["d"]), nullable: Number(c["nn"]) === 0 })),
+          primaryKey: cols
+            .filter((c) => Number(c["pk"]) > 0)
+            .sort((a, b) => Number(a["pk"]) - Number(b["pk"]))
+            .map((c) => String(c["c"])),
+          indexes: idx.filter((i) => i["t"] === name).map((i) => String(i["n"])),
+        });
+      }
+      return out;
+    },
+  },
   rebuild: { prelude: ["PRAGMA defer_foreign_keys = ON;"], blockedByParents: false },
   ifExists: ["dropTable", "dropIndex"],
   probes: {
