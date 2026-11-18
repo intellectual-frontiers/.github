@@ -206,3 +206,21 @@ proves(
     assert(readLibraries(ROOT).some((l) => l.dir === "data" && "library" in l && l.library.level === "L1"));
   },
 );
+
+proves(
+  [`${SPEC} FR-011`],
+  "a checkout with CRLF line ends (a Windows one) finds the markers and the section as it does with LF: the files made are stale only by their text, never by their line ends",
+  async () => {
+    await repo((root) => {
+      assertEquals(synchronize(root, true).problems, []);
+      assertEquals(synchronize(root, false), { stale: [], problems: [] });
+      for (const file of [
+        join(root, "commons", "spec-kit", "specs", SPEC, "spec.md"),
+        join(root, "commons", "spec-kit", "enforcement.tsv"),
+      ]) {
+        writeTextFileSync(file, readTextFileSync(file).replace(/\n/g, "\r\n"));
+      }
+      assertEquals(synchronize(root, false), { stale: [], problems: [] });
+    });
+  },
+);

@@ -294,8 +294,8 @@ export function synchronize(repo: string, write: boolean): { readonly stale: rea
     ...manifestFindings(root),
   ];
   const libraries = have.flatMap((f) => ("library" in f ? [f.library] : []));
-  const spec = readTextFileSync(SPEC_FILE(root));
-  const enforcement = readTextFileSync(ENFORCEMENT_FILE(root));
+  const spec = readTextFileSync(SPEC_FILE(root)).replace(/\r\n/g, "\n"); // a Windows checkout may hold CRLF; the markers are found on lines of LF
+  const enforcement = readTextFileSync(ENFORCEMENT_FILE(root)).replace(/\r\n/g, "\n");
   const made = generated(spec, enforcement, libraries);
   if (made.kind === "err") return { stale: [], problems: [...problems, made.error] };
   const stale: string[] = [];
