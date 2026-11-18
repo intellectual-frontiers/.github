@@ -21,6 +21,20 @@
  * }
  * ```
  *
+ * @remarks
+ * A library of this repository (`commons/data`, commons 0027-commons-libraries) reaches the kernel by package name, not by a relative path, through a
+ * path link in its `devDependencies`: `"@intellectual-frontiers/commons": "link:../ts"` (commons 0005-typescript-runtime FR-074 to FR-077). The findings,
+ * run by `tests/node/linked-library.test.ts` so that no one repeats them:
+ *
+ * - `link:` makes a symbolic link to `commons/ts`; `file:` makes a copy under `node_modules`, which Node 26 refuses
+ *   (`ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING`) and which does not follow the source. Use `link:`.
+ * - Node resolves a link to its real path, so a linked `.ts` runs on Node 26 with no `--import` of the hook, on Bun and under the TypeScript 7 compiler
+ *   (`nodenext`). The hook (`node/register.mjs`) is for a consumer that installs a copy.
+ * - A library imports its own modules by its own package name through its `exports` (one entry for each public surface); a file `exports` does not name
+ *   cannot be imported, by the runtimes or by the compiler, so `exports` is the library's boundary.
+ * - `layers.ts` reads relative imports only, so an import by package name is never one of its findings: a library checks its own layers, by resolving
+ *   each specifier through its `exports`.
+ *
  * @module
  */
 export { absurd } from "./absurd.ts";

@@ -33,7 +33,7 @@ import { terminalWriters } from "./rules/terminal-writers.ts";
 
 /** The plugin: `ifc`, the prefix of its rules' ids, and its rules. */
 const plugin: Plugin = {
-  meta: { name: "ifc", version: "0.4.0" },
+  meta: { name: "ifc", version: "0.5.0" },
   rules: {
     "no-vendor-api": noVendorApi,
     "no-registry-import": noRegistryImport,

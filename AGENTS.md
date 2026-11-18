@@ -6,7 +6,7 @@ This repository is small on purpose: the organization's public profile (`profile
 - Work spec first: change the specification (`274-agora` in `erga` for the installers, `commons/spec-kit/` for commons), then the code, then the tests. Every requirement has a test or says why it has none.
 - Bun is the default TypeScript 7 runtime and Node 26 the backup (commons 0005-typescript-runtime). Every program and every test is TypeScript, and a test is `<kebab-case>.test.ts` on IFC TypeScript (`commons/ts/runtime/test.ts`, `proves`), found by `bun test` and `node --test` with no configuration.
   A test runs the real programs: real `git`, real `sh`, the real tools, never a stand-in for Git or GitHub CLI (a remote is a real temporary repository); what needs an account, a browser or administrator rights is left untested, and the header of the test says so.
-  Before you push, in `commons/ts` run `bun run check` (TypeScript 7 on IFC TypeScript, on commons' tools and ontology, and on this repository's tests), `bun fmt --check . ../tools ../../tests` and the linter as `.github/workflows/tests.yml` runs it; at the root run
+  Before you push, in `commons/ts` run `bun run check` (TypeScript 7 on IFC TypeScript, on commons' tools and ontology, and on this repository's tests), `bun fmt --check . ../tools ../../tests ../data` and the linter as `.github/workflows/tests.yml` runs it; at the root run
   `bun test ./tests/` and `node --test "tests/*.test.ts"`, `bun commons/tools/generate-packaging.ts --check`, `bun commons/ts/mizan/generate-ontology.ts --check`, `bun commons/ts/mizan/check.ts` (the rules Mizan adds, held by `commons/spec-kit/mizan.baseline.txt`, which only shrinks) and `bun commons/tools/mizan-check.ts`. `.github/workflows/tests.yml` runs all of them on every push and pull request. A test fails if a new top-level entry appears in the repository.
 - A file under `commons/generated/` is generated (`bun commons/tools/generate-packaging.ts`, `bun commons/ts/mizan/generate-ontology.ts`): change the ontology under `commons/ontology/`, never the file, and run the tool before you push; a
   test fails where it is stale. Commons specs are worked spec first, like every other (`commons/spec-kit/`).
@@ -19,6 +19,10 @@ This repository is small on purpose: the organization's public profile (`profile
   a library built with SQL Aide imports `sql-aide/mod.ts` alone; everything is configured in TypeScript, never in YAML, XML or JSON; every exported declaration carries a
   TSDoc comment, which is also what the SQL documentation says (`bun run docs` writes the maps again); and what a model emits is committed under `suite/**/golden/`, so that a
   change shows as a diff of SQL.
+- A top-level folder of commons that has a `spec-kit/` of its own is an independent library (`commons/data` first; commons 0027-commons-libraries): its specifications are numbered from 0001 in its own
+  registry and are never listed or proved here; this repository knows it as one requirement of 0027, proved by `bun run verify` in its folder (the compiler, the specification checker and the rules on its
+  spec kit, its tests), and it imports the kernel by package name (a `link:` dependency, never `file:`), never by a relative path out of its folder. Work spec first there too, in its own `spec-kit/`.
+  The existing folders (`ts`, `docs`, `ontology`, `tools`) are not libraries in this sense yet: their specifications stay in `commons/spec-kit/`.
 - Commons is consumed as a Git dependency, never as a release (commons 0005-typescript-runtime FR-029, FR-070): the root `package.json` is the package
   `@intellectual-frontiers/commons`, which another repository adds at a commit (`bun add github:intellectual-frontiers/.github#<commit>`, its `bun.lock` then holds the
   commit) and imports from its `.ts` sources (`@intellectual-frontiers/commons/ts/kernel`, `.../ts/runtime`, `.../docs`, the commands `ifc` and `ifc-docs`); Bun runs them

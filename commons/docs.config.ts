@@ -21,7 +21,10 @@ export const config: DocsConfig = {
     { dir: "commons/ts/data", slug: "data" },
     { dir: "commons/docs", slug: "docs" },
   ],
-  specKits: [{ layout: "commons", dir: "commons/spec-kit" }],
+  specKits: [
+    { layout: "commons", dir: "commons/spec-kit" },
+    { layout: "commons", dir: "commons/data/spec-kit" },
+  ],
   citations: { prefix: "commons", digits: 4, text: ["erga", "archon", "stolos", "thyra"] },
   lenses: [sqlAide, fileAide],
   lintRules: "commons/ts/lint/rules",

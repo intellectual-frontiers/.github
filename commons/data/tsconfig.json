@@ -1,0 +1,5 @@
+{
+  "extends": "../ts/tsconfig.json",
+  "compilerOptions": { "skipLibCheck": true },
+  "include": ["about.ts", "engine/**/*.ts", "governance/**/*.ts", "sql/**/*.ts", "extensions/**/*.ts", "suite/**/*.ts"]
+}
