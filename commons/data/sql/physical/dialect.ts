@@ -33,6 +33,12 @@ export type Feature =
   | "updatable-views"
   | "instead-of-triggers";
 
+/** How a database file is attached for reading, and detached. */
+export interface Attach {
+  attach(file: string, alias: string): string;
+  detach(alias: string): string;
+}
+
 /** The forms of `DROP` and `ADD COLUMN` that a dialect writes with `IF [NOT] EXISTS` (0012-sql-idempotency FR-001). */
 export type IfExistsForm = "addColumn" | "dropColumn" | "dropConstraint" | "dropTable" | "dropIndex";
 
@@ -127,6 +133,8 @@ export interface Dialect {
   readonly catalog?: Catalog;
   /** How the dialect keeps one instance applying at a time; none where there is only one. */
   readonly advisory?: Advisory;
+  /** How a database file of the same engine is attached for reading and let go; none where the engine cannot (0022-sql-integrations). */
+  readonly attach?: Attach;
   /** How a table is made again where the dialect cannot change it in place (0017-sql-rewrite). */
   readonly rebuild?: Rebuild;
   /** How the dialect asks for its locks with a limit; none where it has no such thing. */

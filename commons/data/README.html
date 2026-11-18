@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>@intellectual-frontiers/data</title>
+<meta name="description" content="Governance, a logical schema, a physical schema for PostgreSQL, SQLite and DuckDB, the lifecycle that changes a database, and the extensions to each.">
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #fbfaf7; --surface: #ffffff; --surface2: #f2efe8; --text: #1d1f23; --muted: #5c6068;
+  --line: #ddd8cc; --accent: #1b5e9b; --accent-soft: #e3eef8; --code-bg: #f3f1ea; --code-text: #23262b;
+  --ok: #2d7a4f; --warn: #a65f00; --bad: #b3362b;
+  --c1: #dfe9f5; --c2: #e5f1e3; --c3: #f6ecd6; --c4: #f1e1ea; --c5: #e6e3f4; --stroke: #6b7280;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14161a; --surface: #1b1e24; --surface2: #22262e; --text: #e6e7ea; --muted: #9ba0aa;
+    --line: #333843; --accent: #7db4ea; --accent-soft: #1f2e40; --code-bg: #101216; --code-text: #d7dae0;
+    --ok: #66c08a; --warn: #e0a24a; --bad: #ef8a80;
+    --c1: #24374d; --c2: #264030; --c3: #4a3d20; --c4: #4a2c3b; --c5: #34315a; --stroke: #8b93a1;
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.65 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+a { color: var(--accent); }
+.wrap { max-width: 78rem; margin: 0 auto; padding: 0 16px; display: grid; grid-template-columns: 15.5rem minmax(0, 1fr); gap: 2.5rem; }
+nav.toc { position: sticky; top: 0; align-self: start; max-height: 100vh; overflow-y: auto; padding: 1.5rem 0; font-size: 0.88rem; }
+nav.toc strong { display: block; font-size: 0.75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: .5rem; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li a { display: block; padding: .22rem .6rem; border-left: 2px solid var(--line); color: var(--muted); text-decoration: none; }
+nav.toc li a:hover { color: var(--accent); border-left-color: var(--accent); }
+nav.toc details > summary { display: none; }
+main { min-width: 0; padding: 1.5rem 0 5rem; }
+header.hero { padding: 2.5rem 0 1.5rem; border-bottom: 1px solid var(--line); margin-bottom: 1rem; }
+header.hero code.pkg { font-size: .95rem; color: var(--accent); }
+h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); line-height: 1.15; margin: .4rem 0 .8rem; letter-spacing: -.02em; }
+h2 { font-size: 1.55rem; margin: 3.2rem 0 .6rem; padding-top: .4rem; border-top: 1px solid var(--line); letter-spacing: -.01em; }
+h3 { font-size: 1.12rem; margin: 2rem 0 .3rem; }
+p, li { max-width: 46rem; }
+.lede { font-size: 1.12rem; color: var(--muted); max-width: 44rem; }
+code, pre { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+code { background: var(--code-bg); color: var(--code-text); padding: .08em .35em; border-radius: 4px; font-size: .9em; }
+pre { background: var(--code-bg); color: var(--code-text); padding: .9rem 1rem; border-radius: 8px; overflow-x: auto; font-size: .84rem; line-height: 1.5; border: 1px solid var(--line); }
+pre code { background: none; padding: 0; font-size: inherit; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.2rem; margin: 1rem 0; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem; margin: 1rem 0; }
+.grid .card { margin: 0; }
+.tag { display: inline-block; font-size: .72rem; padding: .08rem .5rem; border-radius: 99px; background: var(--accent-soft); color: var(--accent); border: 1px solid var(--line); vertical-align: middle; margin-left: .3rem; }
+.tag.warn { color: var(--warn); } .tag.ok { color: var(--ok); }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; margin: 1rem 0; display: block; overflow-x: auto; }
+th, td { text-align: left; padding: .5rem .7rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { background: var(--surface2); font-weight: 600; }
+figure { margin: 1.5rem 0; }
+figure svg { width: 100%; height: auto; display: block; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+figcaption { font-size: .85rem; color: var(--muted); margin-top: .4rem; }
+svg text { fill: var(--text); font-family: system-ui, sans-serif; }
+svg .sub { fill: var(--muted); }
+svg .box { stroke: var(--stroke); stroke-width: 1.2; }
+svg .arrow { stroke: var(--stroke); stroke-width: 1.5; fill: none; }
+svg .head { fill: var(--stroke); }
+svg .c1 { fill: var(--c1); } svg .c2 { fill: var(--c2); } svg .c3 { fill: var(--c3); } svg .c4 { fill: var(--c4); } svg .c5 { fill: var(--c5); }
+.note { border-left: 3px solid var(--warn); padding: .1rem 1rem; background: var(--surface2); border-radius: 0 8px 8px 0; margin: 1rem 0; }
+.note.ok { border-left-color: var(--ok); }
+.small { font-size: .85rem; color: var(--muted); }
+footer { margin-top: 4rem; padding-top: 1rem; border-top: 1px solid var(--line); color: var(--muted); font-size: .85rem; }
+@media (max-width: 860px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  nav.toc { position: sticky; top: 0; z-index: 5; max-height: none; padding: 0; background: var(--bg); border-bottom: 1px solid var(--line); }
+  nav.toc details > summary { display: block; cursor: pointer; padding: .7rem 0; font-weight: 600; list-style: none; }
+  nav.toc details[open] { max-height: 70vh; overflow-y: auto; }
+  nav.toc strong { display: none; }
+  nav.toc li a { padding: .4rem .6rem; }
+  html { scroll-padding-top: 3.5rem; }
+}
+@media print { nav.toc { display: none; } .wrap { display: block; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="toc" aria-label="Contents">
+<details open>
+<summary>Contents</summary>
+<strong>Contents</strong>
+<ol>
+<li><a href="#purpose">Purpose</a></li>
+<li><a href="#quick">A first example</a></li>
+<li><a href="#layers">The layers</a></li>
+<li><a href="#engine">Engine</a></li>
+<li><a href="#governance">Governance</a></li>
+<li><a href="#logical">Logical schema</a></li>
+<li><a href="#physical">Physical schema</a></li>
+<li><a href="#dialects">Dialects</a></li>
+<li><a href="#lifecycle">Lifecycle</a></li>
+<li><a href="#extensions">Extensions</a></li>
+<li><a href="#strategies">Strategies</a></li>
+<li><a href="#presets">Presets</a></li>
+<li><a href="#verification">Verification</a></li>
+<li><a href="#limits">Known limits</a></li>
+<li><a href="#roadmap">Roadmap</a></li>
+<li><a href="#specs">The specifications</a></li>
+</ol>
+</details>
+</nav>
+
+<main>
+<header class="hero">
+<code class="pkg">@intellectual-frontiers/data</code>
+<h1>Governance in, SQL out, and a safe way to change the database</h1>
+<p class="lede">A library of Intellectual Frontiers commons. A governance layer says what a business domain is and what must be true of its data; a logical schema is made from it; a physical schema for PostgreSQL, SQLite or DuckDB is made from that; a lifecycle layer changes a database from one physical schema to the next; and extensions add the rest.</p>
+<p class="small">Version 0.0.0, conformance level L1, private package, Node &ge; 26 (Bun is the default runtime). Specifications 0001 to 0022 are in force, in <code>spec-kit/</code>.</p>
+</header>
+
+<section id="purpose">
+<h2>Purpose</h2>
+<p>The summary the library gives of itself (<code>about.ts</code>): governance (what a business domain is and what must be true of its data), a logical schema made from it, and a physical schema for PostgreSQL, SQLite or DuckDB made from that, with extensions to each, and the lifecycle that changes a database from one physical schema to the next. It is a library of commons with its own specifications, and the manifest (<code>library.ts</code>) says the same: a governance layer, a logical schema and a physical schema, and the extensions to each, produce SQL for PostgreSQL, SQLite and DuckDB.</p>
+<div class="grid">
+<div class="card"><strong>One source of truth</strong><br>A domain is TypeScript. Documentation, privacy, security, ownership, quality and requirements are annotations on it, and they reach the database, the generated files and the plan report.</div>
+<div class="card"><strong>One direction</strong><br>Each layer imports only the layers below it and the engine. A check of the library holds every import to that table.</div>
+<div class="card"><strong>Values, not side effects</strong><br>Failures are <code>Result</code> values, a plan is a pure function, and nothing registers by being imported.</div>
+</div>
+<p>The package declares no <code>dependencies</code>; its <code>devDependencies</code> are the kernel of IFC TypeScript (<code>@intellectual-frontiers/commons</code>, linked), the compiler, <code>fast-check</code>, <code>zod</code>, and the engines the tests run on (DuckDB, PGlite; SQLite is the runtime's <code>node:sqlite</code>).</p>
+</section>
+
+<section id="quick">
+<h2>A first example</h2>
+<p>A domain of one concept, made into a logical schema and bound to the SQLite dialect. Every name below is an export of the package's <code>exports</code> map.</p>
+<pre><code>import { attribute, concept, domain, identifier, text } from "@intellectual-frontiers/data/governance";
+import { projectDomain } from "@intellectual-frontiers/data/sql/logical";
+import { bind, render } from "@intellectual-frontiers/data/sql/physical";
+import { dialect } from "@intellectual-frontiers/data/sql/dialects/sqlite";
+
+const book = concept("book", { definition: "A written work", identifiedBy: ["id"], attributes: {
+  id: attribute(identifier(), { definition: "What identifies it" }),
+  title: attribute(text(), { definition: "What it is called" }) } });
+const d = domain("library", { definition: "Books", concepts: [book] });
+if (d.kind === "err") throw new Error("domain");
+const p = projectDomain(d.value);
+if (p.kind === "err") throw new Error("projection");
+const sql = bind(p.value.schema, { dialect });
+if (sql.kind === "ok") console.log(render(sql.value));</code></pre>
+<p>This prints (checked against the real code):</p>
+<pre><code>CREATE TABLE IF NOT EXISTS "book" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "title" TEXT NOT NULL
+);</code></pre>
+<p>Swap the import for <code>.../sql/dialects/postgres</code> or <code>.../sql/dialects/duckdb</code> and the same domain makes the SQL of that engine.</p>
+</section>
+
+<section id="layers">
+<h2>The layers</h2>
+<p>IFC data is three layers and an engine that extends them (0001-layers). Governance knows no database. The logical schema knows the kind of database (relational), not an engine. The physical schema is the only layer that knows an engine. The lifecycle sits between the physical schema and the extensions that use it. The table of what each may import is data in <code>tools/layers.ts</code> (<code>MAY_IMPORT</code>), and <code>bun run verify</code> runs it.</p>
+
+<figure>
+<svg viewBox="0 0 720 470" role="img" aria-labelledby="t-layers d-layers">
+<title id="t-layers">The layer stack</title>
+<desc id="d-layers">Engine at the bottom, then governance, logical, physical, lifecycle, then dialects, extensions, models and presets, and the command line on top. Each box imports only the boxes below it.</desc>
+<defs><marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" class="head"/></marker></defs>
+<rect class="box c5" x="40" y="410" width="640" height="44" rx="8"/><text x="360" y="437" text-anchor="middle" font-size="15" font-weight="600">engine/ — contribution points, manifests, compose</text>
+<rect class="box c1" x="40" y="352" width="640" height="44" rx="8"/><text x="360" y="379" text-anchor="middle" font-size="15" font-weight="600">governance/ — domains, vocabularies, lint, trace</text>
+<rect class="box c2" x="40" y="294" width="640" height="44" rx="8"/><text x="360" y="321" text-anchor="middle" font-size="15" font-weight="600">sql/logical/ — projection, tables, columns, keys</text>
+<rect class="box c3" x="40" y="236" width="640" height="44" rx="8"/><text x="360" y="263" text-anchor="middle" font-size="15" font-weight="600">sql/physical/ — dialect, case style, bind, statements</text>
+<rect class="box c4" x="40" y="178" width="640" height="44" rx="8"/><text x="360" y="205" text-anchor="middle" font-size="15" font-weight="600">sql/lifecycle/ — state, diff, plan, ledger, execute</text>
+<rect class="box c3" x="40" y="104" width="196" height="60" rx="8"/><text x="138" y="130" text-anchor="middle" font-size="14" font-weight="600">sql/dialects/</text><text x="138" y="148" text-anchor="middle" font-size="12" class="sub">postgres, sqlite, duckdb</text>
+<rect class="box c4" x="262" y="104" width="196" height="60" rx="8"/><text x="360" y="130" text-anchor="middle" font-size="14" font-weight="600">sql/extensions/</text><text x="360" y="148" text-anchor="middle" font-size="12" class="sub">14 features and strategies</text>
+<rect class="box c1" x="484" y="104" width="196" height="60" rx="8"/><text x="582" y="130" text-anchor="middle" font-size="14" font-weight="600">models/, extensions/</text><text x="582" y="148" text-anchor="middle" font-size="12" class="sub">arca; need no database</text>
+<rect class="box c5" x="262" y="52" width="196" height="40" rx="8"/><text x="360" y="77" text-anchor="middle" font-size="14" font-weight="600">sql/presets/</text>
+<rect class="box" x="262" y="4" width="196" height="38" rx="8" fill="none" stroke-dasharray="5 4"/><text x="360" y="28" text-anchor="middle" font-size="14" font-weight="600">sql/cli/ (not yet a folder)</text>
+<path class="arrow" d="M360 404 V396" marker-end="url(#ah)"/>
+<path class="arrow" d="M360 346 V338" marker-end="url(#ah)"/>
+<path class="arrow" d="M360 288 V280" marker-end="url(#ah)"/>
+<path class="arrow" d="M360 230 V222" marker-end="url(#ah)"/>
+<path class="arrow" d="M360 172 V164" marker-end="url(#ah)"/>
+<path class="arrow" d="M360 98 V92" marker-end="url(#ah)"/>
+<path class="arrow" d="M360 50 V42" marker-end="url(#ah)"/>
+</svg>
+<figcaption>Arrows point at what a unit may import (everything below it that the table allows; see the table). Dialects and extensions are drawn side by side because neither imports the other.</figcaption>
+</figure>
+
+<table>
+<thead><tr><th>Layer (folder)</th><th>What it is</th><th>May import</th></tr></thead>
+<tbody>
+<tr><td><code>engine/</code></td><td>The extension host: contribution points, manifests, <code>compose</code>, lazy activation</td><td>the kernel only</td></tr>
+<tr><td><code>governance/</code></td><td>Domains, code lists, annotations, vocabularies, identity, trace graph, lint</td><td>engine</td></tr>
+<tr><td><code>sql/logical/</code></td><td>A relational schema made from governance by a projection</td><td>governance, engine</td></tr>
+<tr><td><code>sql/physical/</code></td><td>A logical schema bound to a dialect and a case style, as statements</td><td>logical, governance, engine</td></tr>
+<tr><td><code>sql/lifecycle/</code></td><td>State and hash, diff, plan, ledger, execute</td><td>physical, logical, governance, engine</td></tr>
+<tr><td><code>sql/dialects/*</code></td><td>PostgreSQL, SQLite and DuckDB, each an extension</td><td>physical, logical, governance, engine</td></tr>
+<tr><td><code>sql/extensions/*</code></td><td>Features and strategies</td><td>lifecycle, physical, logical, governance, engine</td></tr>
+<tr><td><code>sql/presets/</code></td><td>Four named compositions of a strategy and its features</td><td>extensions, lifecycle, physical, logical, governance, engine</td></tr>
+<tr><td><code>models/*</code>, <code>extensions/*</code></td><td>Typical data models as governance (Arca); extensions that need no database</td><td>governance, engine</td></tr>
+<tr><td><code>sql/cli/</code></td><td>The command line. It is in the layers table; the folder does not exist yet</td><td>every unit above</td></tr>
+</tbody>
+</table>
+<p>Rules held by <code>tools/layers.ts</code>: layers 1 to 3 and the engine import no package but the kernel and the library's own (0001 FR-005); a unit imports another by the package name through an entry of <code>exports</code>, never by a relative path (FR-010); the findings are <code>layers/unclassified</code>, <code>layers/relative</code>, <code>layers/private</code>, <code>layers/external</code>, <code>layers/above</code> and <code>layers/around</code>. The suite, examples and tools are the library's own checking and may import any file.</p>
+
+<h3>Public surfaces</h3>
+<p>The <code>exports</code> of <code>package.json</code> (and of <code>library.ts</code>) are the public surface. There are 24 entries:</p>
+<table>
+<tbody>
+<tr><td><code>./engine</code>, <code>./governance</code>, <code>./sql/logical</code>, <code>./sql/physical</code>, <code>./sql/lifecycle</code></td><td>the layers</td></tr>
+<tr><td><code>./models/arca</code></td><td>the party model</td></tr>
+<tr><td><code>./sql/dialects/postgres</code>, <code>/sqlite</code>, <code>/duckdb</code></td><td>the dialects</td></tr>
+<tr><td><code>./sql/extensions/</code> <code>documentation views access routines partitions generators idempotency protected-access safety plan-report rewrite history convergence rollout integrations</code></td><td>the extensions (15)</td></tr>
+<tr><td><code>./sql/presets</code></td><td>the four presets</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="engine">
+<h2>Engine</h2>
+<p>The engine (0002) is the small part every layer and extension stands on, in the manner of an editor's extension host: a layer declares a <em>contribution point</em>, an extension declares in a typed <em>manifest</em> what it adds and what it needs, a project passes an explicit list to <code>compose</code>, and each extension starts only when wanted. It has no registry that code can reach without being handed it, and nothing registers by being imported. It does not sandbox code that runs in the same process (0002 FR-009).</p>
+<p>Exports of <code>./engine</code>: <code>point</code>, <code>contribute</code>, <code>defineExtension</code>, <code>lazyExtension</code>, <code>extensionId</code>, <code>compose</code>, <code>provide</code>, <code>handle</code> and <code>CONTRACT</code>. <code>compose</code> returns every mistake together as a <code>ComposeError</code> (<code>duplicate</code>, <code>missing</code>, <code>cycle</code>, <code>contract</code>, <code>unprovided</code>), and a lazy extension is activated once when <code>fire</code> is given one of its events.</p>
+<pre><code>import { contribute, defineExtension, extensionId, point } from "@intellectual-frontiers/data/engine";
+const terms = point&lt;{ readonly term: string }&gt;("governance.vocabulary");
+const id = extensionId("privacy");
+export const privacy = id.kind === "ok"
+  ? defineExtension({ id: id.value, version: "1.0.0", contributes: [contribute(terms, { term: "email" })] })
+  : undefined;</code></pre>
+<p>The points the layers declare, as found in the code: <code>logical.projection</code> (<code>projectionPoint</code>), <code>physical.caseStyle</code> (<code>caseStylePoint</code>), <code>physical.generators</code> (<code>generatorsPoint</code>), <code>statementsPoint</code> and <code>tableClausesPoint</code> for statements and table clauses, <code>lifecycle.transform</code> (<code>transformPoint</code>) and <code>lifecycle.fallback</code> (<code>fallbackPoint</code>), plus <code>vocabularyPoint</code> and <code>dialectPoint</code>.</p>
+</section>
+
+<section id="governance">
+<h2>Governance</h2>
+<p>Governance (0003) is a business domain and what must be true of its data, in terms that name no database. A <code>domain</code> is made of <code>concept</code>s (with <code>attribute</code>s, the attributes that identify them, and <code>relationship</code>s), <code>codeList</code>s, and annotations on any of them. Every element has an identity that follows its names (<code>conceptId</code>, <code>attributeId</code>, <code>relationshipId</code>, <code>codeListId</code>, <code>codeId</code>, <code>domainId</code>), so the trace graph (<code>traceGraph</code>, <code>elementsOf</code>) can be drawn from a concept to a column to a table. A domain is TypeScript, not a syntax of its own.</p>
+<p>Business datatypes: <code>identifier</code>, <code>text</code>, <code>integer</code>, <code>decimal</code>, <code>boolean</code>, <code>date</code>, <code>instant</code>, <code>binary</code>, <code>structured</code>, <code>vector</code>, and <code>codeOf(list)</code> for a code list.</p>
+
+<h3>Vocabularies</h3>
+<p>An annotation is a typed value of a kind that a vocabulary defines (<code>annotationKind</code>, <code>annotate</code>). <code>defaultVocabularies</code> holds eight, in the order lint runs them; a vocabulary is also what an extension can add (<code>vocabularyExtension</code>, <code>vocabulariesFrom</code>).</p>
+<table>
+<thead><tr><th>Vocabulary</th><th>Kinds</th><th>Says</th></tr></thead>
+<tbody>
+<tr><td><code>docs</code></td><td><code>synonym</code>, <code>example</code>, <code>note</code></td><td>what a definition does not</td></tr>
+<tr><td><code>requirements</code></td><td><code>cites</code></td><td>which requirements an element serves, as <code>NNNN-slug FR-nnn</code></td></tr>
+<tr><td><code>privacy</code></td><td><code>personal</code></td><td>holds personal data; category from the W3C Data Privacy Vocabulary (DPV-PD); purposes</td></tr>
+<tr><td><code>security</code></td><td><code>classification</code>, <code>access</code>, <code>scope</code>, <code>mask</code></td><td>sensitivity (public, internal, confidential, restricted); read and write roles; the attribute that partitions rows; how a value is hidden (redact, hash, partial)</td></tr>
+<tr><td><code>ownership</code></td><td><code>owner</code>, <code>steward</code></td><td>who answers for it, who looks after it</td></tr>
+<tr><td><code>quality</code></td><td><code>pattern</code>, <code>range</code>, <code>retention</code>, <code>deprecated</code>, <code>defaultValue</code>, <code>unique</code>, <code>differs</code>, <code>audited</code>, <code>openness</code></td><td>what a value must look like, how long it is kept, that it is on its way out</td></tr>
+<tr><td><code>usage</code></td><td><code>lookup</code></td><td>how records are usually found</td></tr>
+<tr><td><code>lifecycle</code></td><td><code>renamedFrom</code>, <code>since</code></td><td>what the layers below cannot know of an element's past</td></tr>
+</tbody>
+</table>
+<pre><code>import { annotate, vocabularies } from "@intellectual-frontiers/data/governance";
+annotate(vocabularies.security.classification, "confidential");</code></pre>
+<p><code>lint(domain, vocabularies)</code> returns, as data, where the domain falls short of its own vocabularies: the core rules first (<code>coreRules</code>: an element with no definition, an annotation of a kind that no vocabulary given has), then each vocabulary's rules.</p>
+<p>Names are TypeScript identifiers in lower camel case and nothing about a database (0005): <code>words</code> splits one into a list of words, which is how a name crosses the layers.</p>
+
+<h3>Arca</h3>
+<p><code>./models/arca</code> (0004) is the first of Arca's typical data models, the <em>party</em> model, as governance. It exports <code>partyDomain</code> (a <code>Result</code>) and, among others, the concepts <code>party</code>, <code>person</code>, <code>organization</code>, <code>partyRole</code>, <code>partyRelation</code>, <code>partyIdentifier</code>, <code>electronicContact</code> and <code>postalAddress</code>, and the code lists <code>partyKind</code>, <code>partyRoleKind</code>, <code>partyRelationKind</code>, <code>partyIdentifierKind</code>, <code>contactMedium</code> and <code>addressPurpose</code>. Other models, such as products and orders, are later; Data Vault is not part of this library (0004).</p>
+</section>
+
+<section id="logical">
+<h2>Logical schema</h2>
+<p>The logical schema (0006) is a relational schema made from governance by a <em>projection</em>, in terms of tables, columns, keys, constraints and indexes, and of no engine. <code>projectDomain(domain, projection = normalized)</code> returns a <code>Result</code> of <code>{ schema, flow }</code>, or every error together. A <code>Projection</code> is a value, so another can take the place of the default (<code>normalized</code>, from <code>normalizedProjection(options)</code>); one is contributed at <code>projectionPoint</code>.</p>
+<ul>
+<li>One table for each concept and for each open code list; the columns, keys, constraints and indexes follow from the attributes, relationships and vocabularies (for example <code>quality.unique</code>, <code>usage.lookup</code>).</li>
+<li>Every element carries the identity of the governance element it was made from (<code>LogicalId</code>, <code>tableId</code>, <code>columnId</code>, <code>constraintId</code>), so a column links back to its attribute.</li>
+<li>Names are lists of words (<code>Words</code>), which the physical layer writes in a case style.</li>
+<li><strong>Nothing governance says is silently dropped</strong> (0001 FR-007): each annotation is <code>expressed</code>, <code>carried</code> (it stays on the table or column, read with <code>carriedOf</code>) or <code>unexpressed</code>, and the report of the flow (<code>FlowEntry</code>, <code>Disposition</code>) says which.</li>
+<li>Row types are derived at the type level: <code>RowOf</code>, <code>InsertOf</code>, <code>KeyOf</code>, <code>ValueOf</code> and related types (<code>sql/logical/rows.ts</code>).</li>
+</ul>
+</section>
+
+<section id="physical">
+<h2>Physical schema</h2>
+<p>The physical schema (0007) is a logical schema bound to one engine. <code>bind(schema, { dialect, naming?, sources?, schema?, tableClauses? })</code> returns a <code>Result</code> of <code>Physical</code> (the dialect, the naming and the ordered <code>statements</code>), or every <code>PhysicalError</code> together. <code>render</code> writes the statements as a script. A table follows the tables its foreign keys refer to, indexes follow tables and data follows both, every statement carries the logical elements it was made from, and what a dialect cannot express is an error value that names the element, never SQL that fails when loaded. The same input gives the same text.</p>
+
+<h3>Naming and case styles</h3>
+<p>The logical schema chooses the words, the physical schema writes them. <code>snake</code> is the default, with <code>camel</code> and <code>pascal</code> beside it; a case style is an extension (<code>caseStylePoint</code>), and <code>naming(names, codes)</code> chooses one for names and one for codes. The same domain therefore gives <code>given_name</code> in one database and <code>GIVEN_NAME</code> in another where an extension supplies that style. A name that is too long for the dialect, or two names that become alike, is an error value.</p>
+
+<h3>Schema-qualified names</h3>
+<p>Give <code>schema</code> to <code>bind</code> once (0013) and every table is made, referred to, indexed, loaded, described and changed there. Where the engine has schemas (PostgreSQL, DuckDB) the names are qualified (<code>"data"."book"</code>, written by <code>qualified(dialect, schema, name)</code>) and the schema is made first; where it has none (SQLite) the schema's words are written before each table's own by the case style (<code>data_book</code>, <code>dataBook</code>). Nothing changes for a project that gives no schema.</p>
+
+<h3>Generating files</h3>
+<p><code>generate(schema, { generators, naming?, dialect? })</code> runs <code>Generator</code>s and returns <code>Artifact</code>s (<code>{ path, text }</code>); a generator reads only what it is given and gives the same text for the same input. Writing the files to disk is not a generator's job.</p>
+</section>
+
+<section id="dialects">
+<h2>Dialects</h2>
+<p>A dialect says how an engine writes what a logical schema says: its types, quoting, literals, the longest name, and the <code>features</code> it has. Each of <code>./sql/dialects/postgres</code>, <code>/sqlite</code> and <code>/duckdb</code> exports <code>dialect</code> and <code>extension</code> (<code>dialectExtension(dialect)</code>), so that a fourth is added without changing the physical layer. The features below are the ones each <code>dialect</code> value declares.</p>
+<table>
+<thead><tr><th>Feature</th><th>PostgreSQL</th><th>SQLite</th><th>DuckDB</th></tr></thead>
+<tbody>
+<tr><td>maximum name length</td><td>63</td><td>1024</td><td>255</td></tr>
+<tr><td><code>comment-on</code></td><td>yes</td><td>no</td><td>yes</td></tr>
+<tr><td><code>regex-check</code></td><td>yes</td><td>no</td><td>yes</td></tr>
+<tr><td><code>add-constraint</code></td><td>yes</td><td>no</td><td>no</td></tr>
+<tr><td><code>or-replace-view</code></td><td>yes</td><td>no</td><td>yes</td></tr>
+<tr><td><code>alter-column</code></td><td>yes</td><td>no</td><td>yes</td></tr>
+<tr><td><code>schemas</code></td><td>yes</td><td>no</td><td>yes</td></tr>
+<tr><td><code>row-security</code>, <code>grants</code>, <code>routines</code>, <code>partitions</code>, <code>updatable-views</code></td><td>yes</td><td>no</td><td>no</td></tr>
+<tr><td><code>instead-of-triggers</code></td><td>no</td><td>yes</td><td>no</td></tr>
+</tbody>
+</table>
+<p>Beyond features, a dialect may carry hooks the extensions use: <code>catalog</code> (reading its own catalog), <code>advisory</code> (one instance applying at a time), <code>locks</code>, <code>rebuild</code>, and <code>attach</code> (attaching a database file for reading, on SQLite and DuckDB, used by integrations).</p>
+<p>Extensions check the features: partitions on a dialect without <code>partitions</code> is an error value; access on a dialect without row security is carried as data by the governance tables, or an error where <code>unsupported: "error"</code> says so. The dialect also carries the catalog queries that the lifecycle needs (probes for idempotency, a reader for convergence, an advisory lock where there is one).</p>
+</section>
+
+<section id="lifecycle">
+<h2>Lifecycle</h2>
+<p>A database outlives the schema it was made from, so what changes it from one physical schema to the next is a layer of its own (0011). It names no tool or workflow; it makes what every workflow needs.</p>
+
+<figure>
+<svg viewBox="0 0 760 250" role="img" aria-labelledby="t-life d-life">
+<title id="t-life">The lifecycle flow</title>
+<desc id="d-life">A logical schema becomes a wanted state with a hash. Diff against the state the database is in gives changes, plan turns them into classified steps, execute applies each step in a transaction with a ledger entry, and the ledger chain is verified.</desc>
+<defs><marker id="ah2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" class="head"/></marker></defs>
+<rect class="box c2" x="8" y="20" width="140" height="64" rx="8"/><text x="78" y="46" text-anchor="middle" font-size="14" font-weight="600">snapshotOf</text><text x="78" y="64" text-anchor="middle" font-size="11" class="sub">state + stateHash</text>
+<rect class="box c3" x="172" y="20" width="120" height="64" rx="8"/><text x="232" y="46" text-anchor="middle" font-size="14" font-weight="600">diff</text><text x="232" y="64" text-anchor="middle" font-size="11" class="sub">changes by identity</text>
+<rect class="box c4" x="316" y="20" width="140" height="64" rx="8"/><text x="386" y="46" text-anchor="middle" font-size="14" font-weight="600">plan</text><text x="386" y="64" text-anchor="middle" font-size="11" class="sub">classified steps</text>
+<rect class="box c1" x="480" y="20" width="130" height="64" rx="8"/><text x="545" y="46" text-anchor="middle" font-size="14" font-weight="600">execute</text><text x="545" y="64" text-anchor="middle" font-size="11" class="sub">BEGIN … COMMIT</text>
+<rect class="box c5" x="634" y="20" width="118" height="64" rx="8"/><text x="693" y="46" text-anchor="middle" font-size="14" font-weight="600">ledger</text><text x="693" y="64" text-anchor="middle" font-size="11" class="sub">hash chain</text>
+<path class="arrow" d="M148 52 H170" marker-end="url(#ah2)"/><path class="arrow" d="M292 52 H314" marker-end="url(#ah2)"/><path class="arrow" d="M456 52 H478" marker-end="url(#ah2)"/><path class="arrow" d="M610 52 H632" marker-end="url(#ah2)"/>
+<text x="20" y="122" font-size="13" font-weight="600">Inside one step of execute</text>
+<rect class="box" x="8" y="136" width="108" height="46" rx="6" fill="none"/><text x="62" y="156" text-anchor="middle" font-size="12">before: capture</text><text x="62" y="171" text-anchor="middle" font-size="11" class="sub">values</text>
+<rect class="box" x="134" y="136" width="108" height="46" rx="6" fill="none"/><text x="188" y="156" text-anchor="middle" font-size="12">statements</text><text x="188" y="171" text-anchor="middle" font-size="11" class="sub">guard may skip</text>
+<rect class="box" x="260" y="136" width="108" height="46" rx="6" fill="none"/><text x="314" y="156" text-anchor="middle" font-size="12">verify after</text><text x="314" y="171" text-anchor="middle" font-size="11" class="sub">checks</text>
+<rect class="box" x="386" y="136" width="108" height="46" rx="6" fill="none"/><text x="440" y="156" text-anchor="middle" font-size="12">ledger entry</text><text x="440" y="171" text-anchor="middle" font-size="11" class="sub">inserted</text>
+<rect class="box c2" x="512" y="136" width="90" height="46" rx="6"/><text x="557" y="164" text-anchor="middle" font-size="12">COMMIT</text>
+<rect class="box c4" x="620" y="136" width="132" height="46" rx="6"/><text x="686" y="156" text-anchor="middle" font-size="12">any failure:</text><text x="686" y="171" text-anchor="middle" font-size="12">ROLLBACK</text>
+<path class="arrow" d="M116 159 H132" marker-end="url(#ah2)"/><path class="arrow" d="M242 159 H258" marker-end="url(#ah2)"/><path class="arrow" d="M368 159 H384" marker-end="url(#ah2)"/><path class="arrow" d="M494 159 H510" marker-end="url(#ah2)"/>
+<text x="20" y="214" font-size="12" class="sub">A failed step leaves the database and the ledger as they were; run again, the plan resumes after the last entry.</text>
+</svg>
+<figcaption>The flow of 0011, with the step transaction of <code>execute</code> in <code>sql/lifecycle/run.ts</code>.</figcaption>
+</figure>
+
+<h3>State and hash</h3>
+<p>The state of a database (<code>State</code>, made by <code>snapshotOf(schema, { dialect, naming?, schema?, tableClauses? })</code>) is the written structure of its tables as a plain value. <code>stateHash</code> is the SHA-256 of its canonical JSON (<code>canonical</code>, <code>hashOf</code>, <code>sha256Hex</code>), so a state is addressed by its content and never by a number; two states of the same structure are one state whatever order their tables were made in, and another dialect or naming is another state. <code>emptyState(dialect, naming, qualifier?)</code> is the state of an empty database. What governance said of the past (<code>lifecycle.renamedFrom</code>) is a hint beside the structure, not part of it.</p>
+
+<h3>Diff and plan</h3>
+<p><code>diff(from, to)</code> finds what differs <em>by the identity of each element</em>, not by its name, so a change of case style is a rename; <code>applyChange</code> and <code>applyChanges</code> compute the state a change leads to. The kinds of change (<code>ChangeKind</code>) are: <code>renameTable</code>, <code>renameColumn</code>, <code>dropConstraint</code>, <code>renameConstraint</code>, <code>addColumn</code>, <code>dropColumn</code>, <code>alterType</code>, <code>alterNullable</code>, <code>alterDefault</code>, <code>alterPrimaryKey</code>, <code>alterClause</code>, <code>createTable</code>, <code>addConstraint</code>, <code>upsertRows</code>, <code>removeRows</code> and <code>dropTable</code>.</p>
+<p><code>plan(from, schema, desired, options)</code> returns a <code>Result</code> of a <code>Plan</code> (<code>from</code> and <code>to</code> hashes and ordered <code>steps</code>), or every <code>PlanError</code> together (<code>write</code>, <code>dialect</code>, <code>schema</code>, <code>refused</code>, <code>manual</code>, <code>unresolved</code>, <code>not-idempotent</code>, <code>inconsistent</code>). Each step carries statements to do it (<code>up</code>) and to undo it (<code>down</code>), the hash of the state it needs (<code>from</code>) and leaves (<code>to</code>), the logical elements it is made from (<code>of</code>), and an identifier made of its content, so a step names the one database it is for.</p>
+
+<h3>Step classes and reversibility</h3>
+<table>
+<thead><tr><th><code>StepClass</code></th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td><code>safe</code></td><td>loses nothing</td></tr>
+<tr><td><code>data-dependent</code></td><td>may fail or lose depending on the rows (a required column added, a column made required, a constraint added)</td></tr>
+<tr><td><code>destructive</code></td><td>removes data (a dropped column or table); refused unless <code>allow: { destructive: true }</code></td></tr>
+<tr><td><code>manual</code></td><td>a person wrote its statements (<code>options.manual</code>, a <code>ManualStep</code> with <code>resolves</code> naming the change)</td></tr>
+</tbody>
+</table>
+<table>
+<thead><tr><th><code>Reversibility</code></th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td><code>lossless</code></td><td>the step can be undone and nothing is lost</td></tr>
+<tr><td><code>quarantine</code></td><td>what it removes is kept in a quarantine table (see safety)</td></tr>
+<tr><td><code>irreversible</code></td><td>it cannot be undone</td></tr>
+</tbody>
+</table>
+<p>What the dialect cannot change in place (for example a primary key, or the type of a column) is refused as an error value that says a person writes the step, unless a <code>fallback</code> (the rewrite extension) makes it.</p>
+
+<h3>Repeatables</h3>
+<p>What extensions add to a schema (comments, views, policies, routines) is <code>Repeatable</code>: a key, the hash of its text, its statements and the elements it is made from. A repeatable is applied again whenever its text changes, or when a step changes one of its elements (<code>dueRepeatables</code>). A statement group <code>setup</code> (a schema, for example) is run before the steps; the other repeatables run after them.</p>
+
+<h3>Ledger</h3>
+<p>The ledger (<code>lifecycle_ledger</code> by default) records what was applied, in order. Each <code>LedgerEntry</code> (<code>seq</code>, <code>kind</code> <code>step</code> or <code>repeatable</code>, <code>key</code>, <code>from</code>, <code>to</code>, <code>hash</code>, <code>chain</code>, <code>appliedAt</code>, <code>appliedBy</code>) holds the chain hash of the entry before it (<code>chainOf</code>, <code>nextEntry</code>, starting at <code>GENESIS</code>). An entry that is changed, removed, added or moved breaks the chain from there on, and <code>verifyChain</code> finds the first break.</p>
+
+<h3>Execute and resume</h3>
+<pre><code>import { emptyState, execute, stateHash } from "@intellectual-frontiers/data/sql/lifecycle";
+// driver: { exec(sql): Promise&lt;void&gt;; query(sql): Promise&lt;Record&lt;string, unknown&gt;[]&gt; }
+const r = await execute(pl.value, driver, dialect, { empty: stateHash(emptyState(dialect.name, { names: "snake", codes: "snake" })) });</code></pre>
+<p><code>execute(plan, driver, dialect, options)</code> runs on a <code>Driver</code> (<code>exec</code> and <code>query</code>). Each step runs in a transaction together with its ledger entry; verification checks run inside it, so a step that did not do what it said is rolled back and not recorded. The ledger is verified first and a broken chain is refused (<code>RunError</code> kind <code>ledger</code>). The database is found among the plan's states by the ledger; one that is in none of them is refused (kind <code>base</code>), so a plan only runs on the database it was made for. <strong>Resume</strong>: steps the ledger already holds are skipped, so a plan that stopped at a failed step runs on from there when run again, and a plan run twice does nothing the second time. <code>RunOptions</code> also takes <code>before</code> (statements at the start of each transaction), <code>retry</code>, <code>by</code>, <code>now</code> and <code>ledgerTable</code>.</p>
+</section>
+
+<section id="extensions">
+<h2>Extensions</h2>
+<p>An extension is a feature of the physical schema or of the lifecycle, never part of a core. Each is switched on by composing it, or by passing its source, transform or fallback directly; each is checked against the dialect's features. Every example below uses exports that exist in the source.</p>
+
+<h3>Documentation <span class="tag">0008</span></h3>
+<p>Governance is the documentation of everything below it, so it must reach the database. Three sources, all on by default: <code>commentsSource</code> (<code>COMMENT ON</code> where the engine has it), <code>documentationTableSource</code> (a table of descriptions where there is no <code>COMMENT</code>, by default for SQLite) and <code>governanceTablesSource</code> (every annotation as a row of JSON, and a trace from each table and column to its governance element). <code>defaultDocumentation(settings)</code> gives the three as extensions.</p>
+<pre><code>import { documentationSources } from "@intellectual-frontiers/data/sql/extensions/documentation";
+bind(schema, { dialect, sources: documentationSources() });</code></pre>
+
+<h3>Views <span class="tag">0009</span></h3>
+<p>A view is derived, so not governance; it is made from a typed definition by governance names. <code>viewsSource(definitions)</code>, or <code>viewsExtension</code> (<code>sql.features.views</code>). A definition has <code>name</code>, <code>description</code>, <code>from</code>, <code>joins</code>, <code>columns</code> and <code>where</code> conditions.</p>
+<pre><code>bind(schema, { dialect, sources: [viewsSource([{ name: "personDirectory", description: "The people in use", from: "party", columns: [{ table: "party", column: "partyId" }] }])] });</code></pre>
+
+<h3>Access <span class="tag">0009</span></h3>
+<p>What governance says of who may see what becomes what the engine enforces. A column with <code>security.scope</code> makes its table's rows visible only where the column equals the setting of the scope; a concept with <code>security.access</code> grants its read roles <code>SELECT</code> and its write roles <code>INSERT</code>, <code>UPDATE</code> and <code>DELETE</code>. The policy reads <code>current_setting('&lt;prefix&gt;.&lt;scope&gt;', true)</code>, PostgreSQL's way. Roles are named, never created.</p>
+<pre><code>const p = bind(schema, { dialect: postgres, sources: [accessSource()] });
+const loud = accessSource({ unsupported: "error" }); // an error value where the dialect lacks row security</code></pre>
+<p>Settings: <code>unsupported</code> (<code>carry</code> by default, or <code>error</code>), <code>settingPrefix</code> (<code>app</code>), <code>viewsSchema</code>.</p>
+
+<h3>Routines <span class="tag">0009</span></h3>
+<p>Functions and procedures written with typed references to tables, columns and parameters (<code>table</code>, <code>column</code>, <code>columnName</code>, <code>param</code>). The SQL between the references is the author's and is not read; the engine refuses it. Only PostgreSQL has the <code>routines</code> feature.</p>
+<pre><code>routinesSource([{ kind: "function", name: "authorCount", description: "How many authors there are",
+  returns: { type: { kind: "integer" } }, language: "sql", volatility: "stable",
+  body: ["SELECT count(*)::int FROM ", table("author")] }]);</code></pre>
+
+<h3>Partitions <span class="tag">0009</span></h3>
+<p><code>partitions(divisions)</code> returns <code>{ clause, source }</code> (a table clause and a statement source); <code>partitionsExtension</code> contributes both. Strategies: <code>range</code>, <code>list</code>, <code>hash</code>. PostgreSQL only.</p>
+<pre><code>const { clause, source } = partitions([{ table: "event", key: ["happenedOn"], strategy: "range",
+  partitions: [{ name: "y2025", from: ["2025-01-01"], to: ["2026-01-01"] }] }]);
+bind(schema, { dialect: postgres, sources: [source], tableClauses: [clause] });</code></pre>
+<p>Vectors are a business datatype (<code>vector</code>) whose storage each dialect says (0009).</p>
+
+<h3>Generators <span class="tag">0010</span></h3>
+<p>Files made from the logical schema, never written beside it: an entity-relationship diagram in Mermaid (<code>mermaid</code>) and D2 (<code>d2</code>), the data dictionary in Markdown (<code>dictionary</code>) and HTML (<code>dictionaryHtml</code>), row types in Rust (<code>rust</code>) and Zod (<code>zod</code>), and a register of personal data and security (<code>register</code>). <code>generators</code> is all seven; <code>generatorExtensions()</code> is each as an extension <code>sql.generate.&lt;name&gt;</code>.</p>
+<pre><code>const files = generate(schema, { generators });
+// library.erd.mmd, library.erd.d2, library.dictionary.md, library.dictionary.html, library.rs, library.zod.ts, library.register.md</code></pre>
+
+<h3>Idempotency <span class="tag">0012</span></h3>
+<p>On by default: every generated step is safe to repeat, in one of three ways that the step names (<code>Step.idempotency</code>). <code>natural</code>: the engine has a form (<code>IF NOT EXISTS</code>, <code>IF EXISTS</code>, an upsert). <code>guarded</code>: the statement carries a <code>Guard</code>, a catalog query that says its work is done, which the runner honours (<code>guardInline</code> can write it as a block where the engine has one). <code>ledger-only</code>: neither is possible, and only the ledger keeps it from running twice; <code>unguardable: "refuse"</code> (<code>requireIdempotent</code>) turns that into an error value.</p>
+<pre><code>plan(from, schema, { dialect }, { transforms: [idempotency()] });</code></pre>
+
+<h3>Protected access <span class="tag">0014</span></h3>
+<p>Nothing reaches a table except through a layer that can change without changing the table, and nothing changes a table except the lifecycle. <code>protection(settings)</code> gives what a project passes on: tables in a schema (<code>data</code> by default), a view of each in another (<code>api</code>), roles granted on the views only, and, where the engine can enforce it (PostgreSQL), row policies and a guard that refuses to alter or drop a table outside a migration (<code>lifecycle.migrating</code> by default). Where it cannot (SQLite, DuckDB) the schemas and views are a convention, and <code>capabilities(dialect)</code> says so; a project that asks for <code>enforcement: "enforced"</code> there is told it cannot have it. Views also keep a renamed column under its old name for as long as governance says, and carry <code>security.mask</code>.</p>
+<pre><code>const p = protection({ tablesSchema: "data", viewsSchema: "api" });
+bind(schema, { dialect, ...p.bind });
+plan(from, schema, { dialect, ...p.desired }, { transforms: p.transforms });
+execute(plan, driver, dialect, { empty, before: p.session(dialect) });</code></pre>
+
+<h3>Safety and quarantine <span class="tag">0015</span></h3>
+<p>Three features, on by default, each a transform of the lifecycle. <strong>Quarantine</strong>: a dropped column or table is never destroyed by the step that removes it: its values are copied to a quarantine table (<code>quarantine</code> and <code>quarantined</code> suffixes), or the table is renamed away, so the step can be undone; <code>purge</code> is the step a person asks for to destroy one. <strong>Lock discipline</strong> (<code>lockTimeouts</code>, <code>lockRetry</code>, <code>validateLater</code>): locks are asked for with a timeout (5000 ms by default) and tried again (3 attempts), and a constraint is added without checking rows and then validated, so the strongest lock is short. <strong>Verification</strong> (<code>verification</code>): every step says what must be true after it, such as the number of rows, and the run checks it in the step's transaction.</p>
+<pre><code>const s = safety();
+plan(from, schema, { dialect }, { transforms: s.transforms });
+execute(plan, driver, dialect, { empty, retry: s.retry(dialect) });</code></pre>
+
+<h3>Plan report <span class="tag">0016</span></h3>
+<p>What a plan does in the words of governance, for the person who approves it. <code>reportArtifacts({ plan, before?, after, dialect })</code> returns Markdown (<code>&lt;domain&gt;.plan.md</code>) and JSON (<code>&lt;domain&gt;.plan.json</code>), the same content and the same every time. It says each step's class, reversibility, idempotency and lock; what governance says of every element a step is made from; what governance itself changes; who must approve and why (<code>privacy</code> for personal data, <code>security</code> for a restricted element, <code>owner</code> for a destructive or hand-written step, by default; the steward is routed to); and what is new. <code>recordStatements</code> records it in a table (<code>governance_migration</code> by default).</p>
+<pre><code>const files = reportArtifacts({ plan: pl.value, after: schema, dialect });</code></pre>
+
+<h3>Rewrite <span class="tag">0017</span></h3>
+<p>SQLite and DuckDB cannot change a column's nullability or default, a primary key or a constraint of a table that exists, and PostgreSQL will not change a type without a cast. <code>rewrite</code> is the <code>fallback</code> of <code>plan</code> that makes the table again from the state after the change (new table, rows copied, old dropped, new renamed, indexes made) in the step's own transaction. A change of type is cast in place where the engine can and by making the table again where it cannot, when <code>casts: "allow"</code> (the default is <code>refuse</code>, which leaves it to a person). It never remakes a table in PostgreSQL where PostgreSQL can alter in place.</p>
+<pre><code>plan(from, schema, { dialect }, { fallback: rewrite({ casts: "allow" }) });</code></pre>
+
+<h3>History and convergence <span class="tag">0018, 0019</span></h3>
+<p>The two strategies, in their <a href="#strategies">own section</a>.</p>
+
+<h3>Rollout, parallel versions <span class="tag">0020</span></h3>
+<p>Two versions of an application meet one database for a while. The tables hold what every live version needs; each live version has a schema of views (<code>api_v2</code>, <code>api_v3</code> by default, from the pattern <code>api_{label}</code>) with its own table and column names, so a renamed column is read under its old name by the older version and the new one by the newer, with nothing copied. <code>expandSchema(latest, olderVersions)</code> is what the tables hold during the overlap: nothing that destroys, columns an older version uses kept, and what only the latest needs made optional. <code>versionViews(versions)</code> makes the schemas of views; <code>retireStatements</code> ends a version. The expand and the contract are the ordinary plans, so every strategy and feature applies.</p>
+<pre><code>const during = expandSchema(v3, [v2]);
+plan(from, during, { dialect, sources: [versionViews([{ label: "v2", schema: v2 }, { label: "v3", schema: v3 }])] });</code></pre>
+<h3>Integrations <span class="tag">0022</span></h3>
+<p>Rows come into a model's tables from outside: reference data written in code, CSV text, a table of another database file, or an adapter (an API, a queue). An integration names its table and columns by the words of their names (so it is the same for every dialect and schema qualifier), its source, its strategy (<code>append</code>, <code>upsert</code> by default, <code>replace</code> or <code>snapshot</code>) and its key (the primary key by default). <code>loader(schema, spec, { dialect })</code> resolves it; <code>load(driver, loader)</code> lands the rows in a typed temporary table, then, in one transaction, checks, counts, loads and records them.</p>
+<ul>
+<li><strong>Checked before it touches a table.</strong> Duplicate keys in the landing, a null in a column the target requires, an empty snapshot, and a snapshot that would delete more than half of the target (a setting) are refused as error values, and the target is as it was. A failure rolls back, and the landing is dropped either way.</li>
+<li><strong>Recorded.</strong> Each load is a row of a ledger table (<code>integration_run</code>) with its counts and the hash of what it landed; an <code>append</code> of rows that have not changed since the last load does nothing, which is what stops a re-run from doubling rows. When it skips is a setting (<code>append</code>, <code>all</code> or <code>none</code>).</li>
+<li><strong>Sources.</strong> CSV text is parsed by the library (quoted fields, a delimiter setting, an empty field is null) and cast to the target's types, so it works on every engine. A table of another database file is attached for the load and detached after it, on SQLite and DuckDB (a dialect says it can); PostgreSQL gives an error value. An adapter that fails, or gives a column the contract lacks, is an error value.</li>
+<li><strong>Lineage.</strong> <code>lineageOf(loader)</code> gives the edges from source to landing to target, and <code>upstream(edges, node)</code> what reaches a node.</li>
+</ul>
+<pre><code>const l = loader(schema, { name: "authors", table: "author",
+  source: { kind: "csv", text: "id,name\na1,Ann" }, strategy: "upsert" }, { dialect });
+if (l.kind === "ok") await load(driver, l.value); // { outcome: "loaded", landed: 1, inserted: 1, ... }</code></pre>
+</section>
+
+<section id="strategies">
+<h2>Strategies</h2>
+<p>A strategy is how a plan reaches a database. There are two, and a preset names the features each needs.</p>
+
+<figure>
+<svg viewBox="0 0 760 300" role="img" aria-labelledby="t-str d-str">
+<title id="t-str">History and convergence</title>
+<desc id="d-str">History freezes one plan into files replayed in every environment. Convergence reads each database's own state and computes a plan for it, reviewed or autonomous.</desc>
+<defs><marker id="ah3" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" class="head"/></marker></defs>
+<text x="10" y="22" font-size="14" font-weight="700">History</text>
+<rect class="box c1" x="10" y="34" width="130" height="50" rx="8"/><text x="75" y="64" text-anchor="middle" font-size="13">plan, once</text>
+<rect class="box c3" x="180" y="34" width="150" height="50" rx="8"/><text x="255" y="64" text-anchor="middle" font-size="13">freeze → files</text>
+<rect class="box c2" x="370" y="22" width="170" height="30" rx="6"/><text x="455" y="42" text-anchor="middle" font-size="12">pipeline: replay</text>
+<rect class="box c2" x="370" y="56" width="170" height="30" rx="6"/><text x="455" y="76" text-anchor="middle" font-size="12">release package</text>
+<rect class="box c2" x="370" y="90" width="170" height="30" rx="6"/><text x="455" y="110" text-anchor="middle" font-size="12">installer in database</text>
+<path class="arrow" d="M140 59 H178" marker-end="url(#ah3)"/><path class="arrow" d="M330 59 H368" marker-end="url(#ah3)"/>
+<text x="560" y="64" font-size="12" class="sub">same files, same order, same hash</text>
+<text x="10" y="162" font-size="14" font-weight="700">Convergence</text>
+<rect class="box c1" x="10" y="174" width="150" height="50" rx="8"/><text x="85" y="196" text-anchor="middle" font-size="13">readState</text><text x="85" y="213" text-anchor="middle" font-size="11" class="sub">from the catalog</text>
+<rect class="box c3" x="200" y="174" width="130" height="50" rx="8"/><text x="265" y="204" text-anchor="middle" font-size="13">plan to wanted</text>
+<rect class="box c4" x="370" y="162" width="190" height="30" rx="6"/><text x="465" y="182" text-anchor="middle" font-size="12">reviewed: propose, approve</text>
+<rect class="box c4" x="370" y="204" width="190" height="30" rx="6"/><text x="465" y="224" text-anchor="middle" font-size="12">autonomous: connect, policy</text>
+<path class="arrow" d="M160 199 H198" marker-end="url(#ah3)"/><path class="arrow" d="M330 199 H368" marker-end="url(#ah3)"/>
+<text x="580" y="186" font-size="12" class="sub">pinned to a state and hash</text>
+<text x="580" y="226" font-size="12" class="sub">held if any step is not trusted</text>
+<text x="10" y="272" font-size="12" class="sub">versionGate refuses to start an application whose database is not in the state it expects.</text>
+</svg>
+<figcaption>History computes a plan once and replays the files; convergence computes a plan for each database it meets.</figcaption>
+</figure>
+
+<h3>History <span class="tag">0018</span></h3>
+<p>A plan is computed once and frozen into files that never change: one file for each step (statements to do it and undo it, what must be true after it) and a manifest that chains them by hash. Every environment replays the same files in the same order and ends in the same state, provable by the hash. A change to a frozen file is found, never silently applied. Exports: <code>freeze</code>, <code>replay</code>, <code>historyPlan</code>, <code>checkHistory</code>, <code>renderManifest</code>, <code>renderStep</code>, <code>parseStep</code>, <code>releasePackage</code>, <code>installer</code>. <code>freeze</code> returns <code>migrations/NNNN_&lt;slug&gt;.sql</code>, <code>manifest.json</code> and <code>repeatable.json</code> files.</p>
+<table>
+<thead><tr><th><code>delivery</code></th><th>How the files reach the database</th></tr></thead>
+<tbody>
+<tr><td><code>pipeline</code> (default)</td><td>the files and a <code>replay</code>, through the pipeline of the team that owns the application</td></tr>
+<tr><td><code>release-package</code></td><td>one package for a DBA to run with a SQL client: an installer, a preflight, a verification, a back-out and a runbook (<code>releasePackage</code>)</td></tr>
+<tr><td><code>in-database</code></td><td>a procedure inside the database that applies its own history, keeps its own ledger and refuses what does not follow (<code>installer</code>; schema <code>lifecycle</code> by default)</td></tr>
+</tbody>
+</table>
+<p>Settings (<code>HistorySettings</code>): <code>delivery</code>, <code>folder</code> (<code>migrations</code>), <code>release</code>, <code>unguardable</code> (<code>refuse</code> or <code>leave-out</code>) and <code>runnerSchema</code>.</p>
+<pre><code>const files = freeze(existing, plan, { folder: "migrations", state });
+await replay([...existing, ...files.value], driver, dialect, { empty });</code></pre>
+
+<h3>Convergence <span class="tag">0019</span></h3>
+<p>The state is read from the database's own catalog (<code>readState</code>), so a database made by hand or restored from a backup is met as it is: drift is a plan, not a surprise. How the plan is approved is the setting <code>approval</code>:</p>
+<ul>
+<li><strong>Reviewed</strong> (the default): <code>propose</code> writes a pinned proposal (<code>renderProposal</code>, <code>proposalText</code>) that a person reads; <code>applyProposal(text, approved, driver, dialect, wanted)</code> applies it only if the text hashes to the approved hash and the database is still in the state it was computed from (otherwise <code>unapproved</code> or <code>stale</code>).</li>
+<li><strong>Autonomous</strong>: <code>connect(driver, dialect, schema, desired, settings, options)</code> on first access takes an advisory lock where the dialect has one, computes the plan and applies it only if every step is allowed by the <code>Policy</code> (by default <code>safe</code>, <code>lossless</code>, and only <code>createTable</code>, <code>addColumn</code>, <code>addConstraint</code>, <code>upsertRows</code>). Otherwise nothing is changed and the plan is held (<code>held</code>, with why); a failed step leaves the database at the step before and the next access resumes. An optional <code>rehearse</code> callback can say no. The result is <code>current</code>, <code>applied</code>, <code>held</code> or <code>failed</code>.</li>
+<li><strong>Version gate</strong>: <code>versionGate(driver, dialect, expected)</code> returns the hash or why the application should not start.</li>
+</ul>
+<p>Settings (<code>ConvergenceSettings</code>): <code>approval</code>, <code>policy</code>, <code>ledgerTable</code> and <code>ignore</code> (tables the reader leaves out).</p>
+</section>
+
+<section id="presets">
+<h2>Presets <span class="tag">0021</span></h2>
+<p>A preset is named for how a team works. It is a composition of one strategy with the features that approach needs (idempotency, quarantine, lock discipline, generated verification, the plan report), with the settings the approach calls for. It is data: nothing is applied by choosing one. <code>preset(name, changes?)</code> returns a <code>Result</code> of a <code>Preset</code> (<code>strategy</code>, <code>roles</code>, <code>history</code> or <code>convergence</code>, <code>safety</code>, <code>idempotency</code>, <code>report</code>, <code>planOptions</code>, <code>runOptions(dialect)</code>), or a <code>PresetError</code> (<code>unknown</code>, <code>not-used</code>). Every setting is the default of the thing it sets and a project may change it.</p>
+<table>
+<thead><tr><th>Preset</th><th>Strategy</th><th>Who does what</th><th>Settings it calls for</th></tr></thead>
+<tbody>
+<tr><td><code>team-managed</code></td><td>history</td><td>the application's team writes the SQL, a reviewer approves it in the change, the pipeline applies it</td><td><code>delivery: "pipeline"</code></td></tr>
+<tr><td><code>dba-managed</code></td><td>history</td><td>people write the SQL, a DBA checks the release package and runs it by hand, possibly twice</td><td><code>delivery: "release-package"</code>, <code>unguardable: "refuse"</code> for history and idempotency</td></tr>
+<tr><td><code>reviewed-convergence</code></td><td>convergence</td><td>a tool computes the SQL from the database as it is, a person approves the text, it is applied only if the database is unchanged</td><td><code>approval: "reviewed"</code></td></tr>
+<tr><td><code>autonomous-convergence</code></td><td>convergence</td><td>a tool computes the SQL on first access and applies what only adds; anything else is held and nothing is changed</td><td><code>approval: "autonomous"</code>, <code>lockTimeoutMs: 2000</code>, <code>attempts: 5</code></td></tr>
+</tbody>
+</table>
+<pre><code>const p = must(preset("autonomous-convergence"));
+connect(driver, dialect, schema, { dialect }, p.convergence!, { ...p.planOptions, run: p.runOptions(dialect) });</code></pre>
+<p>Passing <code>history</code> settings to a convergence preset (or the reverse) is the <code>not-used</code> error. With quarantine on, the convergence reader leaves out the quarantine tables so they are not drift.</p>
+</section>
+
+<section id="verification">
+<h2>How it is verified</h2>
+<p>From the repository root:</p>
+<pre><code>cd commons/data &amp;&amp; bun run verify</code></pre>
+<p>which runs, in order (<code>package.json</code>): the TypeScript compiler (<code>tsc -p tsconfig.json</code>); the specification checker on <code>spec-kit/</code> (<code>mizan-check.ts --root spec-kit</code>); the Mizan rules at level L1 on it; <code>tools/check.ts</code>, the trace of sources and tests to the specifications and the layers check, held against <code>trace.baseline.txt</code>, which only shrinks; and <code>bun test suite/</code>. <code>bun run test:node</code> runs the same tests under <code>node --test</code>.</p>
+<ul>
+<li><strong>Spec kit.</strong> Twenty-two specifications, <code>0001-layers</code> to <code>0022-sql-integrations</code>, each <code>spec-kit/specs/&lt;number-slug&gt;/spec.md</code> with an input paragraph, numbered requirements (<code>FR-nnn</code>), edge cases, success criteria and an out-of-scope list; <code>registry.tsv</code> lists them, all in force.</li>
+<li><strong><code>enforcement.tsv</code>.</strong> Says what enforces each requirement (0024-spec-format): a <code>mechanism</code> of <code>check</code>, <code>gate</code>, <code>review</code> or <code>none</code>, and by what. At the time of writing 230 of its rows are a <code>check</code> by <code>cd commons/data &amp;&amp; bun run verify</code>, and one (0001 FR-012, the logical and physical naming conventions) is marked <code>none</code> with the note <em>Planned</em>.</li>
+<li><strong><code>proves()</code>.</strong> A test is <code>suite/&lt;kebab-case&gt;.test.ts</code> on IFC TypeScript, and <code>proves(["0001-layers FR-004"], "what it shows", fn)</code> names the requirements it proves, which the trace joins to the specifications. The sources carry <code>// Spec:</code> headers for the same join.</li>
+<li><strong>Real engines.</strong> <code>suite/engines-fixture.ts</code> opens SQLite (the runtime's <code>node:sqlite</code>), DuckDB (<code>@duckdb/node-api</code>) and PostgreSQL (PGlite, in process), in memory, and the tests load what <code>bind</code> and <code>execute</code> make and read the structure back. There is no stand-in for an engine.</li>
+<li><strong>Golden and property tests.</strong> The DDL of small domains is written out in <code>physical-bind.test.ts</code>; the lifecycle uses <code>fast-check</code> to check that applying the changes of <code>diff(a, b)</code> to <code>a</code> reaches <code>b</code>.</li>
+</ul>
+<p>The tests include (<code>suite/</code>): layers, naming, governance, logical and physical, lifecycle, idempotency, safety, plan report, rewrite, history, convergence, rollout, presets, protected access, qualified names, generators and features.</p>
+</section>
+
+<section id="limits">
+<h2>Known limits</h2>
+<p>Taken from the out-of-scope sections of the specifications and from the source.</p>
+<ul>
+<li><strong>Layers.</strong> Only relational databases; a graph or document store would be a later folder beside <code>sql/</code> (0001). The <code>sql/cli/</code> unit is in the table but not yet built; generators return text and writing files is the command line's (0010, 0018).</li>
+<li><strong>Engine.</strong> No sandbox for code in the same process; extensions are listed by the project, not found (0002).</li>
+<li><strong>Governance.</strong> A name is ASCII; an identity follows its names, so renaming keeps the identity only through <code>lifecycle.renamedFrom</code> (0003, 0005, open question OQ-1 of 0003).</li>
+<li><strong>Features.</strong> Routine bodies are text and typed references, not a query algebra; no materialized views, triggers, sequences or domains; roles are named and never created; no vector or mask indexes (a mask is carried as data until then) (0009, 0014).</li>
+<li><strong>Lifecycle.</strong> A primary key, a table clause or a type changed in place is a hand-written step unless the rewrite is used; a constraint or index renamed with its table is dropped and made again; an index cannot be made without blocking writes because the run has no steps outside a transaction (0011, 0015). The ledger's table is in the connection's default schema (0013).</li>
+<li><strong>Idempotency.</strong> A step the engine cannot repeat and that has no probe (a constraint of SQLite) is <code>ledger-only</code> (0012).</li>
+<li><strong>Quarantine.</strong> Purging is a step a person asks for; there is no schedule (0015).</li>
+<li><strong>Rewrite.</strong> A table made again takes its lock for the length of the step; there is no type change that proves it loses nothing yet (0017).</li>
+<li><strong>Convergence.</strong> Defaults, the text of checks and partitions are not compared with the catalog; signing the approval is the project's workflow; each database is met on its own (0019).</li>
+<li><strong>Parallel versions.</strong> A type change, split or merge of columns that needs a trigger is a later specification; choosing when to retire a version and routing a client are the project's (0020).</li>
+<li><strong>Access.</strong> The policy is PostgreSQL's; no other dialect has <code>row-security</code> yet.</li>
+</ul>
+</section>
+
+<section id="roadmap">
+<h2>Roadmap</h2>
+<p>As <code>about.ts</code> states it: views that leave out removed rows, a type change that proves it loses nothing, masks and vector indexes as features, and interchange formats for other migration tools (Flyway, Liquibase and Atlas exports).</p>
+<ul>
+<li>Views that leave out the rows marked as removed (Arca's <code>deleted_at</code>) (0014).</li>
+<li>Changing a column's type without loss: a second column, a check that every value survives the cast, a swap (0015, 0017).</li>
+<li>Masks (<code>security.mask</code>) and vector indexes (<code>hnsw</code>, <code>ivfflat</code>) as features (0009).</li>
+<li>Interchange formats of Flyway, Liquibase and Atlas, as exports of the history files (0018, 0021).</li>
+<li><strong>Phase 10.</strong> Integrations are built (0022). Still to come: transforms, queries, the ephemeral target build, rows made from a CSV as a typed kinds file, and the osquery ATC catalog.</li>
+</ul>
+</section>
+
+<section id="specs">
+<h2>The specifications</h2>
+<table>
+<thead><tr><th>No.</th><th>Slug</th><th>Covers</th></tr></thead>
+<tbody>
+<tr><td>0001</td><td>layers</td><td>the layers and what each imports; the check</td></tr>
+<tr><td>0002</td><td>engine</td><td>contribution points, manifests, compose, lazy activation</td></tr>
+<tr><td>0003</td><td>governance</td><td>domains, annotations, vocabularies, identity, lint, trace</td></tr>
+<tr><td>0004</td><td>arca</td><td>the party model</td></tr>
+<tr><td>0005</td><td>naming</td><td>names as lists of words, case styles</td></tr>
+<tr><td>0006</td><td>logical</td><td>the projection and the logical schema</td></tr>
+<tr><td>0007</td><td>physical</td><td>dialects, bind, statements</td></tr>
+<tr><td>0008</td><td>sql-documentation</td><td>comments, documentation tables, governance tables</td></tr>
+<tr><td>0009</td><td>sql-features</td><td>views, access, routines, partitions, vectors</td></tr>
+<tr><td>0010</td><td>sql-generators</td><td>diagrams, dictionary, row types, register</td></tr>
+<tr><td>0011</td><td>sql-lifecycle</td><td>state, diff, plan, ledger, execute</td></tr>
+<tr><td>0012</td><td>sql-idempotency</td><td>steps safe to repeat</td></tr>
+<tr><td>0013</td><td>sql-qualified-names</td><td>schema-qualified names</td></tr>
+<tr><td>0014</td><td>sql-protected-access</td><td>tables, views, rights, guard</td></tr>
+<tr><td>0015</td><td>sql-safety</td><td>quarantine, lock discipline, verification</td></tr>
+<tr><td>0016</td><td>sql-plan-report</td><td>the plan in the words of governance</td></tr>
+<tr><td>0017</td><td>sql-rewrite</td><td>tables made again, casts</td></tr>
+<tr><td>0018</td><td>sql-history</td><td>frozen history and its deliveries</td></tr>
+<tr><td>0019</td><td>sql-convergence</td><td>plan from the live state, reviewed or autonomous</td></tr>
+<tr><td>0020</td><td>sql-parallel-versions</td><td>two versions on one database</td></tr>
+<tr><td>0021</td><td>sql-presets</td><td>the four presets</td></tr>
+<tr><td>0022</td><td>sql-integrations</td><td>rows from outside, landed, checked, loaded and recorded</td></tr>
+</tbody>
+</table>
+<footer>This page is written by hand from <code>about.ts</code>, <code>library.ts</code>, <code>package.json</code>, the specifications in <code>spec-kit/specs/</code> and the sources under <code>engine/</code>, <code>governance/</code>, <code>models/</code> and <code>sql/</code>. The short introduction is <code>README.md</code>.</footer>
+</section>
+</main>
+</div>
+</body>
+</html>

@@ -16,6 +16,7 @@ export {
   type Feature,
   type IfExistsForm,
   type Advisory,
+  type Attach,
   type Catalog,
   type Locks,
   type LiveColumn,

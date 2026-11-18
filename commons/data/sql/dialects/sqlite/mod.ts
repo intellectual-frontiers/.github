@@ -32,6 +32,10 @@ const type = (t: LogicalType): string => {
 export const dialect: Dialect = {
   name: "sqlite",
   features: ["instead-of-triggers"],
+  attach: {
+    attach: (file, alias) => `ATTACH DATABASE '${file.replaceAll("'", "''")}' AS "${alias.replaceAll('"', '""')}";`,
+    detach: (alias) => `DETACH DATABASE "${alias.replaceAll('"', '""')}";`,
+  },
   maxName: 1024,
   now: "CURRENT_TIMESTAMP",
   quote: quoteName,

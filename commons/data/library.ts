@@ -35,6 +35,7 @@ export const library = {
     "./sql/extensions/history",
     "./sql/extensions/convergence",
     "./sql/extensions/rollout",
+    "./sql/extensions/integrations",
     "./sql/presets",
   ],
   summary:
