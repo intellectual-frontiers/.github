@@ -6,7 +6,7 @@
 **Domain:** commons
 **Part of:** 0003-mizan
 
-**Input:** Mizan asks of a harness everything at once: the format, the rules, the audit of terms, change control, release control. A library, a service or a small tool that wants to be known by commons, and to be proved, should not have to start there. Four conformance levels, stated once as typed data in Mizan's ontology, say how much of Mizan a subject is held to: L0 registered (it is known), L1 core (it keeps and proves its own specifications), L2 standards (its terms rest on standards first) and L3 governed (its changes and its releases are controlled). Each level adds to the one below it. A harness declares its level and the check runs only the rules that level entails; a harness that declares none is at L3, which is what every harness is held to today, so that nothing changes for one that does not ask. What kind of thing a subject is, and what a specification of each kind must say, is the specification of subject profiles.
+**Input:** Mizan asks of a harness everything at once: the format, the rules, the audit of terms, change control, release control. A library, a service or a small tool that wants to be known by commons, and to be proved, should not have to start there. Four conformance levels, stated once as typed data in Mizan's ontology, say how much of Mizan a subject is held to: L0 registered (it is known), L1 core (it keeps and proves its own specifications), L2 standards (its terms rest on standards first) and L3 governed (its changes and its releases are controlled). Each level adds to the one below it. A harness declares its level and the check runs only the rules that level entails; a harness that declares none is at L3, which is what every harness is held to today, so that nothing changes for one that does not ask. What kind of thing a subject is, and what a specification of each kind must say, is 0029-subject-profiles.
 
 ## The levels
 
@@ -21,7 +21,7 @@
 ## Checking by level
 
 - **FR-008**: `holdHarness` MUST take an optional `level` (`L0`, `L1`, `L2` or `L3`) and MUST take `L3` where it is not given; at `L3` its findings, its use of the baseline and its exit status MUST be what they were before levels existed, so that a harness that declares no level sees no change.
-- **FR-009**: WHEN a harness declares a level below L3, the check MUST run only the rules that level entails: a rule is run at a level when a requirement of that level or a lower one names it, a rule that no requirement names (a rule a harness adds, `mizan/authority-citation`, the checks of the specification of subject profiles) MUST run at L1 and above, and at L0 no rule MUST run.
+- **FR-009**: WHEN a harness declares a level below L3, the check MUST run only the rules that level entails: a rule is run at a level when a requirement of that level or a lower one names it, a rule that no requirement names (a rule a harness adds, `mizan/authority-citation`, the checks of 0029-subject-profiles) MUST run at L1 and above, and at L0 no rule MUST run.
 - **FR-010**: A line of the baseline for a rule that the level does not run MUST be neither new nor stale, and `--write-baseline` MUST keep it, so that lowering a level never loses a held finding and raising it again finds it where it was.
 - **FR-011**: `commons/ts/mizan/check.ts` MUST take `--level L0|L1|L2|L3`, MUST hold commons' own folder at L3 where it is not given, and IF the level is not one of the four, THEN it MUST exit 2 and name the four.
 - **FR-012**: `check.ts` MUST, with `--all`, also run the `verify` of every library that a manifest declares (0027-commons-libraries FR-012), each from its own folder, report the status of each by name and exit 1 where any fails; without `--all` it MUST stay fast: it MUST run no library's `verify` and MUST NOT read inside a library's folder.
@@ -37,7 +37,7 @@
 
 ## Out of scope
 
-- What kind of thing a subject is and what its specifications say of it: the specification of subject profiles.
+- What kind of thing a subject is and what its specifications say of it: 0029-subject-profiles.
 - How a library declares its level and is registered: 0027-commons-libraries (the manifest).
 - Splitting commons' TypeScript into packages, and any change to a consumer: a harness that declares no level is at L3 and sees no change.
 
@@ -61,7 +61,7 @@
 
 ## Open questions
 
-- **OQ-1**: Whether an L3 subject must also pass the checks of the specification of subject profiles in the gate phase of IFCCM and not only as warnings held by a baseline: to be settled when the first service is specified.
+- **OQ-1**: Whether an L3 subject must also pass the checks of 0029-subject-profiles in the gate phase of IFCCM and not only as warnings held by a baseline: to be settled when the first service is specified.
 
 ## Key entities
 

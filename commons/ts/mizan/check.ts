@@ -21,6 +21,7 @@ import process from "node:process";
 import { stdio } from "../runtime/mod.ts";
 import { packagingTerms } from "../../ontology/audit/mod.ts";
 import {
+  audienceModels,
   bases,
   classes,
   conformanceLevels,
@@ -28,6 +29,7 @@ import {
   jurisdictionLevels,
   integrationDirections,
   rungKinds,
+  subjectKinds,
   mz,
   terms,
 } from "../../ontology/mizan/mod.ts";
@@ -174,6 +176,8 @@ export function main(
                 ...Object.keys(rungKinds),
                 ...Object.keys(conformanceLevels),
                 ...Object.keys(conformanceRequirements),
+                ...Object.keys(subjectKinds),
+                ...Object.keys(audienceModels),
               ]),
               pm: new Set(Object.keys(pm)),
               ifws: ifwsOntology.termNames,

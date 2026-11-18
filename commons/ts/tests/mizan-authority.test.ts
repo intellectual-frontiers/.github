@@ -64,13 +64,15 @@ proves(
 
 proves(
   ["0018-standards-first FR-015"],
-  "commons' ontology gives the authorities of 21 CFR Part 820 and Part 11 as the identifiers a requirement names",
+  "commons' ontology gives the authorities of 21 CFR Part 820 and Part 11 and, for consumer privacy, the GDPR and the CCPA as the identifiers a requirement names",
   () => {
     assertEquals(
       commonsAuthorities.map((a) => [a.id, a.citation]),
       [
         ["mzid:authority-21-cfr-820", "21 CFR Part 820"],
         ["mzid:authority-21-cfr-11", "21 CFR Part 11"],
+        ["mzid:authority-gdpr", "Regulation (EU) 2016/679"],
+        ["mzid:authority-ccpa", "California Civil Code section 1798.100 and following"],
       ],
     );
   },

@@ -11,7 +11,7 @@ import { run, execPath } from "../runtime/proc.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
 import { earsPatternOf, mizanFindings, rulePlugins, type RulePlugin, type SpecText } from "../mizan/rules.ts";
 import { AUDITED_ON, packagingTerms } from "../../ontology/audit/mod.ts";
-import { bases, conformanceLevels, conformanceRequirements, MZ, MZV, mz } from "../../ontology/mizan/mod.ts";
+import { audienceModels, bases, conformanceLevels, conformanceRequirements, MZ, MZV, mz, subjectKinds } from "../../ontology/mizan/mod.ts";
 import { en, named, iriIn, OWL, OwlOntology, ontologyOf, RDFS, triplesOf, turtle } from "../kernel/rdf.ts";
 import { exportHtmlView } from "../mizan/integrations/pure/export-html.ts";
 import { pm } from "../../ontology/supply-chain/packaging/mod.ts";
@@ -277,7 +277,13 @@ proves(
   () => {
     const specs = readSpecTexts(`${dirname(fromFileUrl(import.meta.url))}/../../spec-kit`);
     const known = {
-      mz: new Set([...Object.keys(mz), ...Object.keys(conformanceLevels), ...Object.keys(conformanceRequirements)]),
+      mz: new Set([
+        ...Object.keys(mz),
+        ...Object.keys(conformanceLevels),
+        ...Object.keys(conformanceRequirements),
+        ...Object.keys(subjectKinds),
+        ...Object.keys(audienceModels),
+      ]),
       pm: new Set(Object.keys(pm)),
     };
     assertEquals(specTermFindings(specs, known), []);
