@@ -222,12 +222,48 @@ export function parseCitation(text: string, line: number): readonly Citation[] {
   return out;
 }
 
-/** Every citation of a file's `// Spec:` lines (FR-005). */
+/**
+ * The text of each line of a file that is a comment line (FR-005, FR-012), with its line number: a line that begins with two slashes and a space gives what follows; a line inside a block comment
+ * (from a line that begins with a slash and an asterisk to the asterisk and slash that close it) gives what follows its leading asterisk, without the closing pair. A line of code that holds a
+ * comment after the code is not a comment line.
+ */
+export function commentLines(text: string): readonly { readonly line: number; readonly body: string }[] {
+  const out: { line: number; body: string }[] = [];
+  let inBlock = false;
+  for (const [i, raw] of text.split("\n").entries()) {
+    let body: string | undefined;
+    let line = raw.replace(/\r$/, "");
+    if (!inBlock) {
+      const slashes = /^\s*\/\/ (.*)$/.exec(line);
+      if (slashes?.[1] !== undefined) {
+        out.push({ line: i + 1, body: slashes[1] });
+        continue;
+      }
+      const open = /^\s*\/\*+\s?(.*)$/.exec(line);
+      if (open?.[1] === undefined) continue;
+      inBlock = true;
+      line = open[1];
+      body = line;
+    } else {
+      const slashes = /^\s*\/\/ (.*)$/.exec(line);
+      body = slashes?.[1] ?? line.replace(/^\s*\*(?!\/)\s?/, "").replace(/^\s+/, "");
+    }
+    const close = body.indexOf("*/");
+    if (close >= 0) {
+      body = body.slice(0, close);
+      inBlock = false;
+    }
+    out.push({ line: i + 1, body: body.trimEnd() });
+  }
+  return out;
+}
+
+/** Every citation of a file's `Spec:` lines (FR-005, FR-012): `// Spec: ...`, and `Spec: ...` as a line of a block comment. */
 export function specLines(text: string): readonly Citation[] {
   const out: Citation[] = [];
-  for (const [i, raw] of text.split("\n").entries()) {
-    const m = /^\s*\/\/ Spec: (.*)$/.exec(raw);
-    if (m?.[1] !== undefined) out.push(...parseCitation(m[1], i + 1));
+  for (const c of commentLines(text)) {
+    const m = /^Spec: (.*)$/.exec(c.body);
+    if (m?.[1] !== undefined) out.push(...parseCitation(m[1], c.line));
   }
   return out;
 }
@@ -292,7 +328,7 @@ function asProof(text: string, line: number): Proof | undefined {
   return m?.[1] === undefined || m[2] === undefined ? undefined : { line, spec: m[1], requirement: { kind: "one", id: m[2] } };
 }
 
-/** Every requirement a test file proves (FR-006): in the array a `proves(` call opens, and on its `// Proves:` lines. */
+/** Every requirement a test file proves (FR-006, FR-012): in the array a `proves(` call opens, and on its `// Proves:` lines and the `Proves:` lines of its block comments. */
 export function proofsOf(text: string): readonly Proof[] {
   const out: Proof[] = [];
   const consts = constants(text);
@@ -322,10 +358,10 @@ export function proofsOf(text: string): readonly Proof[] {
       }
     }
   }
-  for (const [i, raw] of text.split("\n").entries()) {
-    const m = /^\s*\/\/ Proves: (.*)$/.exec(raw);
+  for (const l of commentLines(text)) {
+    const m = /^Proves: (.*)$/.exec(l.body);
     if (m?.[1] === undefined) continue;
-    for (const c of parseCitation(m[1], i + 1)) for (const r of c.requirements) out.push({ line: i + 1, spec: c.spec, requirement: r });
+    for (const c of parseCitation(m[1], l.line)) for (const r of c.requirements) out.push({ line: l.line, spec: c.spec, requirement: r });
   }
   return out;
 }

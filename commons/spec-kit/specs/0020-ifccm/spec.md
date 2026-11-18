@@ -80,6 +80,10 @@
 
 - **FR-033**: A commit that departs from a specification MUST say so on a line of its own as `Departs: NNNN-slug FR-nnn` and name the Decision that authorizes it on a line of its own as `Decision: <id>`; a harness MUST state its Decisions (each with its identifier, the role that approved it, and the requirements it authorizes or `gate-relaxed <revision>`) and the role of each author by email in the typed file that holds its declaration, read as data and never run; and the `changes` check MUST report, besides the findings of FR-032, `changes/early-close` (FR-006), `changes/issue-shape` (FR-003), `changes/no-parent` (FR-002), `changes/no-decision` (FR-019), `changes/self-approved` (FR-020) and `changes/declaration` (FR-010), the last of them as a gate whatever the day, since a declaration wrong by itself is refused.
 - **FR-034**: WHERE a repository has no Git host account, it MAY keep its change requests as a typed file in Git, read as data and never run, so that `--strict` has change requests to ask; such a file is the plain-Git counterpart of the host adapter of FR-028 and answers the same four questions.
+- **FR-035**: WHERE a harness has no Git host account, `changes.ts --capability-trace --range A..B` MUST give, with no network and no host, for each capability the commits of the range serve (a change request that a `Refs #N` or `Closes #N` line names, FR-005) the requirements that concern it and the chain of each (FR-014): the requirements a commit's message names, those whose lines in a `spec.md` a commit added or edited, those of the change request's `Done when` where its body is given, and those a `Spec:` line cites or a `proves` call or `Proves:` line proves in a file a commit changed; a commit that names no change request of this repository (one that names only another repository's) MUST be listed apart and be in no capability (amended 2026-11-18).
+- **FR-036**: The offline trace MUST read only files the harness keeps and the repository's Git: the change requests as a JSON file (`--issues`, a list of objects with `number` and, where kept, `title` and `body`), the citations of the ontology's terms (`--terms`, a JSON file, or a module loaded by the `file:` URL of its path so that it loads on Windows, that exports `terms` as objects with `term`, `cites` and `file` or as the records of an audit of terms; `commons` for commons' own ontologies), the rungs with their homes (`--rungs`, `export const rungs`, each with `id`, `label`, `provedBy` and, for the trace, `homes`), the cases of a quality record (`--runs`, 0021-ifqs) and the specifications (`--specs`); `--trace` MUST read `--terms` as well, so that the chain of a `Done when` follows a harness's own terms (amended 2026-11-18).
+- **FR-037**: The offline trace MUST give, for each requirement of each capability, the stages of its chain, the first stage with no link (FR-015) and the specification, the terms, the code and the tests placed on the rung whose home matches each most specifically (0015-trace FR-009, `-` where none does), as a table of text by default or as JSON with `--format json`, the same text for the same input (sorted, with no clock, with LF), and written to a file with `--output FILE` (amended 2026-11-18).
+- **FR-038**: WHERE `--document FILE` is given with `--capability-trace`, the command MUST derive the capabilities of the view of FR-016 from the commits (the rungs their changed files are on, and the last commit of each) and write the view between the document's markers, or with `--check` fail where the document differs; and the offline trace MUST exit with 1 where a capability that a commit says `Closes` has a requirement whose chain ends before its quality run (a capability that is not closed is in progress), 2 for a usage error and 3 where an input cannot be read (amended 2026-11-18).
 
 ## Acceptance scenarios
 
@@ -92,6 +96,8 @@
 7. **Given** a declaration whose production day was moved from last month to next month, **When** the check runs, **Then** it reports `changes/gate-relaxed` until a Decision clears it, per FR-012 and FR-019.
 8. **Given** a requirement named in a `Done when` that has a term and code but no test, **When** the chain is asked for, **Then** it ends at the test stage, per FR-014 and FR-015.
 9. **Given** an issue labelled `approved` and no Decision, **When** a change departs from a specification, **Then** the departure is not authorized, per FR-019.
+10. **Given** a repository on plain Git whose commits say `Refs #3` and name a requirement, with a terms file, **When** `changes.ts --capability-trace --range A..B --terms FILE` runs, **Then** the chain of the requirement is printed on its rungs and ends at the first stage with no link, with no host asked, per FR-035 to FR-037.
+11. **Given** the same range and `--document ARCH.md`, **When** the command runs and then runs with `--check`, **Then** the view is written between the markers and the check finds no difference, per FR-038.
 
 ## Out of scope
 
@@ -102,6 +108,10 @@
 ## Edge cases
 
 - A commit that names two issues, `Refs #10` and `Refs #12`: it serves both, per FR-005.
+- A commit that names only `Refs owner/other#7`, in the offline trace: listed with the commits that name no change request, and in no capability, per FR-035.
+- A terms file that does not exist, or a module that exports no `terms`: exit 3 with the reason, and no table, per FR-036 and FR-038.
+- A `--terms` module in a folder whose name has a space, on Windows: loaded by its `file:` URL, per FR-036.
+- A capability that a commit closes and whose requirement has no passing run: the trace exits 1; an open capability with the same chain exits 0, per FR-038.
 - A commit that names `Refs intellectual-frontiers/.github#10`: read as that repository's change request, and `--strict` asks that repository's host, per FR-005 and FR-009.
 - A merge commit whose two parents each name an issue: exempt, per FR-007.
 - A revert commit with no issue: reported, because a revert is a change, per FR-007.

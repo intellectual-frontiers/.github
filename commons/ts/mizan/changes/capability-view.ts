@@ -29,8 +29,13 @@ export const BEGIN = "<!-- capabilities:begin -->";
 /** The marker that closes it. */
 export const END = "<!-- capabilities:end -->";
 
-/** A rung as the view reads it: its identifier, its label and the commands that prove it. */
-export type RungRecord = { readonly id: string; readonly label: string; readonly provedBy: readonly string[] };
+/** A rung as the view reads it: its identifier, its label, the commands that prove it and, where the offline trace places files on it, its homes (0020-ifccm FR-035). */
+export type RungRecord = {
+  readonly id: string;
+  readonly label: string;
+  readonly provedBy: readonly string[];
+  readonly homes?: readonly string[];
+};
 
 /** A capability as the view reads it: its change request's number, its title, the rungs it touches and the last revision of its work. */
 export type CapabilityRecord = {
@@ -107,7 +112,7 @@ export function viewIsCurrent(document: string, view: string): Result<boolean, V
   return r.kind === "err" ? r : ok(r.value === document);
 }
 
-const rungDecoder = object({ id: string, label: string, provedBy: array(string) });
+const rungDecoder = object({ id: string, label: string, provedBy: array(string) }, { homes: array(string) });
 const capabilityDecoder = object({ id: integer, title: string, touchesRung: array(string), lastRevision: string });
 const runDecoder = object({ command: string, revision: string, passed: boolean });
 
@@ -133,13 +138,14 @@ function readList<T>(
 }
 
 /**
- * The record of a harness's capabilities read from its file's text (`export const rungs`, `export const capabilities` and, where it has them, `export const runs`), as data and never run.
+ * The record of a harness's capabilities read from its file's text (`export const rungs`, `export const capabilities` and, where it has them, `export const runs`), as data and never run. The offline
+ * view derives its capabilities from the commits (0020-ifccm FR-035), and then the file needs no `capabilities` (`capabilitiesRequired` false).
  * The runs are stated here until the quality records of 0021-ifqs are read in their place.
  */
-export function decodeViewRecord(source: string): Result<ViewRecord, string> {
+export function decodeViewRecord(source: string, capabilitiesRequired = true): Result<ViewRecord, string> {
   const rungs = readList(source, "rungs", array(rungDecoder), true);
   if (rungs.kind === "err") return rungs;
-  const capabilities = readList(source, "capabilities", array(capabilityDecoder), true);
+  const capabilities = readList(source, "capabilities", array(capabilityDecoder), capabilitiesRequired);
   if (capabilities.kind === "err") return capabilities;
   const runs = readList(source, "runs", array(runDecoder), false);
   if (runs.kind === "err") return runs;

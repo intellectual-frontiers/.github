@@ -10,6 +10,10 @@
  *                                                                        write the view of capabilities by rung into the document, or with --check fail where it differs
  *     bun commons/ts/mizan/changes.ts --trace ISSUE_BODY_FILE [--runs RECORD] [--specs DIR]
  *                                                                        follow each requirement of a `Done when` from its term to the run, and say where the chain ends
+ *     bun commons/ts/mizan/changes.ts --capability-trace --range A..B [--issues FILE] [--terms FILE|commons] [--rungs FILE] [--runs RECORD] [--specs DIR] [--format text|json] [--output FILE]
+ *                                                                        offline: from the commits' `Refs`/`Closes #N` lines, the specifications' requirements, the ontology's `mz:definedBy`, the `Spec:`/`Proves:` lines
+ *                                                                        and a quality record, the chain of each requirement of each capability (terms, code, tests) on each rung, as a table or as JSON;
+ *                                                                        with --document FILE [--check] the view of capabilities by rung is made from the commits and written between its markers
  *     other flags: --repo DIR (the repository, the working folder by default), --today YYYY-MM-DD, --baseline FILE (`changes.baseline.txt` of the repository by default), --write-baseline
  *
  * Exit status: 0 clean, 1 findings (or a stale baseline line, or a chain that breaks, or a view that differs), 2 usage, 3 environment (no `git`, not a repository, a file that cannot be read).
@@ -27,9 +31,28 @@ import { formatGitError } from "../runtime/git.ts";
 import { cwd } from "../runtime/proc.ts";
 import { join, relative, resolve } from "../runtime/path.ts";
 import { stdio } from "../runtime/mod.ts";
-import { decodeViewRecord, formatViewError, spliceView, viewIsCurrent, viewOf } from "./changes/capability-view.ts";
+import {
+  capabilityTrace,
+  type CapabilityTraceResult,
+  type IssueFact,
+  NO_RUNG,
+  parseIssues,
+  traceOutput,
+  type TraceFormat,
+} from "./changes/capability-trace.ts";
+import {
+  type CapabilityRecord,
+  decodeViewRecord,
+  formatViewError,
+  type RungRecord,
+  spliceView,
+  viewIsCurrent,
+  viewOf,
+  type ViewRecord,
+} from "./changes/capability-view.ts";
 import { dayOf, decodeHarnessRecord, formatRecordError, type HarnessRecord, phaseOf, relaxations } from "./changes/declaration.ts";
-import { declarationHistory, readRange } from "./changes/git-log.ts";
+import { declarationHistory, readRange, readRangeFacts } from "./changes/git-log.ts";
+import { readTermsFile } from "./changes/terms-file.ts";
 import { doneWhenRequirements, parseIssueBody } from "./changes/issue-body.ts";
 import {
   CHANGES_RULES,
@@ -43,6 +66,7 @@ import {
 } from "./changes/rules.ts";
 import { askHost, NO_CLIENT } from "./changes/strict.ts";
 import { type RunCase, traceLines, traceOf, firstBreak } from "./changes/trace.ts";
+import type { OntologyCitation } from "../kernel/trace.ts";
 import { readSpecTexts } from "./spec-files.ts";
 import { packagingTerms } from "../../ontology/audit/mod.ts";
 import * as ifccmOntology from "../../ontology/ifccm/mod.ts";
@@ -99,8 +123,13 @@ const VALUE_FLAGS = [
   "--trace",
   "--runs",
   "--specs",
+  "--issues",
+  "--terms",
+  "--rungs",
+  "--format",
+  "--output",
 ] as const;
-const SWITCH_FLAGS = ["--strict", "--check", "--write-baseline"] as const;
+const SWITCH_FLAGS = ["--strict", "--check", "--write-baseline", "--capability-trace"] as const;
 
 /** The flags of a command line, or the sentence that says what is wrong with it. */
 function parseFlags(argv: readonly string[]): Flags | string {
@@ -135,13 +164,117 @@ function sourcesUnder(root: string): readonly { readonly path: string; readonly 
   return out;
 }
 
-/** The citations of requirements by the terms of commons' own ontologies (`mz:definedBy`), for the chain's third stage. */
+/** The citations of requirements by the terms of commons' own ontologies (`mz:definedBy`), for the chain's third stage (`--terms commons`, and the default of `--trace`). */
 function termCitations(): readonly { readonly term: string; readonly cites: readonly string[]; readonly file: string }[] {
   return [...terms, ...packagingTerms, ...ifccmOntology.terms, ...ifqsOntology.terms, ...ifwsOntology.terms].map((t) => ({
     term: t.values.termIri,
     cites: t.values.definedBy ?? [],
     file: "commons/ontology",
   }));
+}
+
+/** The ontology's citations a command line names: commons' own where `--terms commons` (and, for `--trace`, where none is named), else the file's. */
+async function termsOf(
+  named: string | undefined,
+  repo: string,
+  log: (t: string) => void,
+  fallback: "commons" | "none" = "commons",
+): Promise<readonly OntologyCitation[] | number> {
+  if (named === undefined) return fallback === "commons" ? termCitations() : [];
+  if (named === "commons") return termCitations();
+  const r = await readTermsFile(resolve(repo, named));
+  if (r.kind === "err") {
+    log(`changes: --terms: ${r.error}\n`);
+    return 3;
+  }
+  return r.value;
+}
+
+/** The view's capabilities made from a trace: a number, a title, the rungs its files are on and its last commit; the rungs and runs are the record's. */
+function viewOfTrace(t: CapabilityTraceResult, record: ViewRecord): ViewRecord {
+  const capabilities: readonly CapabilityRecord[] = t.capabilities.map((c) => ({
+    id: c.number,
+    title: c.title ?? `#${c.number}`,
+    touchesRung: c.rungs.filter((r) => r !== NO_RUNG),
+    lastRevision: c.commits[c.commits.length - 1] ?? "",
+  }));
+  return { rungs: record.rungs, capabilities, runs: record.runs };
+}
+
+/** The offline trace of a range: its commits, specifications, terms, files, runs, change requests and rungs read, or the exit code and the reason it could not be. */
+async function offlineTrace(
+  repo: string,
+  value: (name: string) => string | undefined,
+  log: (t: string) => void,
+): Promise<{ readonly result: CapabilityTraceResult; readonly record: ViewRecord } | number> {
+  const read = await readRangeFacts(repo, value("--range") ?? "");
+  if (read.kind === "err") {
+    log(`changes: ${formatGitError(read.error)}\n`);
+    return 3;
+  }
+  const exists = (name: string): string | undefined => {
+    const f = value(name);
+    if (f === undefined) return undefined;
+    const path = resolve(repo, f);
+    if (existsSync(path)) return path;
+    log(`changes: ${name} ${path} does not exist\n`);
+    return "";
+  };
+  let issues: readonly IssueFact[] = [];
+  const issuesFile = exists("--issues");
+  if (issuesFile === "") return 3;
+  if (issuesFile !== undefined) {
+    const r = parseIssues(readTextFileSync(issuesFile));
+    if (r.kind === "err") {
+      log(`changes: ${issuesFile}: ${r.error}\n`);
+      return 3;
+    }
+    issues = r.value;
+  }
+  let record: ViewRecord = { rungs: [], capabilities: [], runs: [] };
+  const rungsFile = exists("--rungs") ?? exists("--capabilities");
+  if (rungsFile === "") return 3;
+  if (rungsFile !== undefined) {
+    const r = decodeViewRecord(readTextFileSync(rungsFile), false);
+    if (r.kind === "err") {
+      log(`changes: ${rungsFile}: ${r.error}\n`);
+      return 3;
+    }
+    record = r.value;
+  }
+  let cases: readonly RunCase[] = [];
+  const runsFile = exists("--runs");
+  if (runsFile === "") return 3;
+  if (runsFile !== undefined) {
+    const rec = readRecord(readTextFileSync(runsFile));
+    if (rec.kind === "err") {
+      log(`changes: ${runsFile} is not a test record\n`);
+      return 3;
+    }
+    cases = rec.value.tests.map((t) => ({ requirements: t.requirements, outcome: t.outcome }));
+  }
+  const terms = await termsOf(value("--terms"), repo, log, "none");
+  if (typeof terms === "number") return terms;
+  const specsRoot =
+    value("--specs") !== undefined
+      ? resolve(repo, value("--specs") ?? "")
+      : existsSync(join(repo, "specs"))
+        ? repo
+        : join(repo, "commons", "spec-kit");
+  const files = sourcesUnder(repo);
+  const rungs: readonly RungRecord[] = record.rungs;
+  const result = capabilityTrace({
+    commits: read.value,
+    issues,
+    specs: readSpecTexts(specsRoot).map((s) => ({ slug: s.slug, spec: s.spec })),
+    terms,
+    sources: files.filter((f) => !f.path.endsWith(".test.ts")),
+    tests: files.filter((f) => f.path.endsWith(".test.ts")),
+    cases,
+    rungs: rungs.map((r) => ({ id: r.id, label: r.label, homes: r.homes ?? [] })),
+    specPath: (slug) => relative(repo, join(specsRoot, "specs", slug, "spec.md")).replaceAll("\\", "/"),
+  });
+  return { result, record };
 }
 
 /** Run the command; the exit status (0 clean, 1 findings, 2 usage, 3 environment). */
@@ -155,7 +288,7 @@ export async function run(
   const flags = parseFlags(argv);
   if (typeof flags === "string") {
     log(
-      `changes: ${flags}\nusage: changes.ts [--range A..B] [--strict] [--declaration FILE] [--check] [--capabilities FILE --document FILE] [--trace BODY] [--repo DIR] [--today DAY] [--baseline FILE] [--write-baseline]\n`,
+      `changes: ${flags}\nusage: changes.ts [--range A..B] [--strict] [--declaration FILE] [--check] [--capabilities FILE --document FILE] [--trace BODY] [--capability-trace --range A..B [--issues FILE] [--terms FILE] [--rungs FILE] [--runs RECORD] [--format text|json] [--output FILE]] [--repo DIR] [--today DAY] [--baseline FILE] [--write-baseline]\n`,
     );
     return 2;
   }
@@ -171,10 +304,21 @@ export async function run(
     log("changes: --strict asks the host about the commits of a range: give --range\n");
     return 2;
   }
-  if (has("--check") && (value("--capabilities") === undefined || value("--document") === undefined)) {
-    log("changes: --check needs --capabilities FILE and --document FILE\n");
+  const offline = has("--capability-trace");
+  if (offline && value("--range") === undefined) {
+    log("changes: --capability-trace reads the commits of a range: give --range\n");
     return 2;
   }
+  if (has("--check") && ((value("--capabilities") === undefined && !offline) || value("--document") === undefined)) {
+    log("changes: --check needs --capabilities FILE and --document FILE (or --capability-trace and --document FILE)\n");
+    return 2;
+  }
+  const asked = value("--format") ?? "text";
+  if (asked !== "text" && asked !== "json") {
+    log(`changes: --format ${asked} is not text or json\n`);
+    return 2;
+  }
+  const format: TraceFormat = asked;
 
   // the harness's record
   const recordPath = value("--declaration") !== undefined ? resolve(repo, value("--declaration") ?? "") : join(repo, RECORD_FILE);
@@ -277,22 +421,48 @@ export async function run(
   if (has("--strict") && notRun !== undefined)
     for (const c of ruleCases(findings, notRun)) if (c.outcome === "not_run") log(`${c.rule}: not_run: ${c.reason}\n`);
 
+  // the capabilities and their chains, from the commits and the files alone (0020-ifccm FR-035 to FR-038)
+  let traced: { readonly result: CapabilityTraceResult; readonly record: ViewRecord } | undefined;
+  if (offline) {
+    const made = await offlineTrace(repo, value, log);
+    if (typeof made === "number") return made;
+    traced = made;
+    const text = traceOutput(made.result, format);
+    const to = value("--output");
+    if (to === undefined) out(text);
+    else {
+      writeTextFileSync(resolve(repo, to), text);
+      out(`${to}: the trace of ${made.result.capabilities.length} capabilities is written\n`);
+    }
+    // a capability that says Closes is whole: each of its requirements is linked to its run (an open capability is in progress)
+    if (made.result.capabilities.some((c) => c.closed && c.requirements.some((r) => r.endsAt !== undefined))) failed = true;
+  }
+
   // the view of capabilities by rung
   const capabilities = value("--capabilities");
   const document = value("--document");
-  if (capabilities !== undefined && document !== undefined) {
-    const file = resolve(repo, capabilities);
+  if (document !== undefined && (capabilities !== undefined || traced !== undefined)) {
     const docFile = resolve(repo, document);
-    if (!existsSync(file) || !existsSync(docFile)) {
-      log(`changes: ${existsSync(file) ? docFile : file} does not exist\n`);
+    let record: ViewRecord;
+    if (traced !== undefined) record = viewOfTrace(traced.result, traced.record);
+    else {
+      const file = resolve(repo, capabilities ?? "");
+      if (!existsSync(file) || !existsSync(docFile)) {
+        log(`changes: ${existsSync(file) ? docFile : file} does not exist\n`);
+        return 3;
+      }
+      const view = decodeViewRecord(readTextFileSync(file));
+      if (view.kind === "err") {
+        log(`changes: ${file}: ${view.error}\n`);
+        return 3;
+      }
+      record = view.value;
+    }
+    if (!existsSync(docFile)) {
+      log(`changes: ${docFile} does not exist\n`);
       return 3;
     }
-    const view = decodeViewRecord(readTextFileSync(file));
-    if (view.kind === "err") {
-      log(`changes: ${file}: ${view.error}\n`);
-      return 3;
-    }
-    const text = viewOf(view.value.rungs, view.value.capabilities, view.value.runs);
+    const text = viewOf(record.rungs, record.capabilities, record.runs);
     const current = readTextFileSync(docFile).replaceAll("\r\n", "\n");
     if (has("--check")) {
       const same = viewIsCurrent(current, text);
@@ -302,7 +472,7 @@ export async function run(
       }
       if (!same.value) {
         log(
-          `${document}: the view of capabilities by rung differs from what is generated; run changes.ts --capabilities ${capabilities} --document ${document}\n`,
+          `${document}: the view of capabilities by rung differs from what is generated; run changes.ts ${traced === undefined ? `--capabilities ${capabilities}` : "--capability-trace"} --document ${document}\n`,
         );
         failed = true;
       }
@@ -348,10 +518,12 @@ export async function run(
       }
       cases = rec.value.tests.map((t) => ({ requirements: t.requirements, outcome: t.outcome }));
     }
+    const citations = await termsOf(value("--terms"), repo, log);
+    if (typeof citations === "number") return citations;
     const traces = wanted.map((r) =>
       traceOf(r, {
         specs: readSpecTexts(specsRoot).map((s) => ({ slug: s.slug, spec: s.spec })),
-        terms: termCitations(),
+        terms: citations,
         sources: sources.filter((s) => !s.path.endsWith(".test.ts")),
         tests: sources.filter((s) => s.path.endsWith(".test.ts")),
         cases,

@@ -185,7 +185,7 @@ proves(
   () => {
     assertEquals(
       authorities.map((a) => a.values.citation),
-      ["21 CFR Part 820", "21 CFR Part 11"],
+      ["21 CFR Part 820", "21 CFR Part 11", "Regulation (EU) 2016/679", "California Civil Code section 1798.100 and following"],
     );
     assertEquals(cfr820.values.effective, "2026-02-02");
     assertEquals(cfr820.values.incorporates, ["ISO 13485:2016"]);

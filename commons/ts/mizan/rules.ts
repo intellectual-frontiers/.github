@@ -22,29 +22,34 @@
  * @module
  */
 import { type Keyed, parseSpec } from "../kernel/trace.ts";
-import { authorities, MZID } from "../../ontology/mizan/mod.ts";
+import { audienceModels, authorities, MZID, subjectKinds } from "../../ontology/mizan/mod.ts";
 import type { ChangesRule } from "./changes/rules.ts";
 import type { Phase } from "./changes/declaration.ts";
 import type { VersionsRule } from "./versions/rules.ts";
 
-/** The ids of the rules Mizan adds (0003-mizan FR-013 to FR-015, 0018-standards-first FR-009). */
-export type MizanRule =
-  | "mizan/requirement-keyword"
-  | "mizan/requirement-ears"
-  | "mizan/scenario-form"
-  | "mizan/standards-considered"
-  | "mizan/term-standard"
-  | "mizan/unaligned-justification"
-  | "mizan/decision-missing"
-  | "mizan/decision-overdue"
-  | "mizan/term-basis-missing"
-  | "mizan/spec-term-unknown"
-  | "mizan/spec-term-deprecated"
-  | "mizan/deprecated-no-replacement"
-  | "mizan/authority-citation"
-  | "mizan/standard-newer"
-  | ChangesRule
-  | VersionsRule;
+/** The ids of the rules Mizan adds (0003-mizan FR-013 to FR-015, 0018-standards-first FR-009), in the order a report lists them. */
+export const MIZAN_RULES = [
+  "mizan/requirement-keyword",
+  "mizan/requirement-ears",
+  "mizan/scenario-form",
+  "mizan/standards-considered",
+  "mizan/term-standard",
+  "mizan/unaligned-justification",
+  "mizan/decision-missing",
+  "mizan/decision-overdue",
+  "mizan/term-basis-missing",
+  "mizan/spec-term-unknown",
+  "mizan/spec-term-deprecated",
+  "mizan/term-not-defined-by",
+  "mizan/deprecated-no-replacement",
+  "mizan/authority-citation",
+  "mizan/standard-newer",
+  "mizan/profile-unknown",
+  "mizan/profile-section-missing",
+] as const;
+
+/** The id of a rule Mizan adds, or of the change-control and release checks. */
+export type MizanRule = (typeof MIZAN_RULES)[number] | ChangesRule | VersionsRule;
 
 /**
  * A finding of one of Mizan's rules: the same shape as the trace's, with a rule that is Mizan's. A finding of the `changes` check (commons 0020-ifccm) also carries its phase: a `gate`
@@ -263,12 +268,103 @@ export function authorityCitation(known: readonly AuthorityRecord[]): RulePlugin
   };
 }
 
+/** A profile as the check reads it (0029-subject-profiles FR-001, FR-008): the key a specification declares it by and the sections it asks for. */
+export type ProfileRecord = { readonly key: string; readonly sections: readonly string[] };
+
+/** The profiles of the kinds of subject in commons' ontology. */
+export const commonsSubjectProfiles: readonly ProfileRecord[] = Object.values(subjectKinds).map((k) => ({
+  key: k.values.label.value,
+  sections: k.values.requiresSection ?? [],
+}));
+
+/** The profiles of the audience models in commons' ontology. */
+export const commonsAudienceProfiles: readonly ProfileRecord[] = Object.values(audienceModels).map((a) => ({
+  key: a.values.label.value,
+  sections: a.values.requiresSection ?? [],
+}));
+
+/** The key a specification declares in its head with `**Subject:**` or `**Audience:**`, in lower case, and the line it is on; the first such line counts (0029-subject-profiles FR-002, FR-008). */
+export function declaredIn(spec: string, field: "Subject" | "Audience"): { readonly value: string; readonly line: number } | undefined {
+  const lines = spec.split("\n");
+  const end = lines.findIndex((l) => /^##\s/.test(l));
+  const head = end < 0 ? lines : lines.slice(0, end);
+  const at = head.findIndex((l) => new RegExp(`^\\*\\*${field}:\\*\\*`, "i").test(l));
+  return at < 0
+    ? undefined
+    : {
+        value: (head[at] ?? "")
+          .replace(new RegExp(`^\\*\\*${field}:\\*\\*`, "i"), "")
+          .trim()
+          .toLowerCase(),
+        line: at + 1,
+      };
+}
+
+/** A specification that declares a kind of subject or an audience that is none of the ontology's is found (0029-subject-profiles FR-002, FR-008). */
+export function profileKind(subjects: readonly ProfileRecord[], audiences: readonly ProfileRecord[]): RulePlugin {
+  return {
+    id: "mizan/profile-unknown",
+    check(s) {
+      const file = `specs/${s.slug}/spec.md`;
+      return (["Subject", "Audience"] as const).flatMap((field) => {
+        const d = declaredIn(s.spec, field);
+        const known = field === "Subject" ? subjects : audiences;
+        return d === undefined || known.some((k) => k.key === d.value)
+          ? []
+          : [
+              finding(
+                "mizan/profile-unknown",
+                file,
+                d.line,
+                `**${field}:** ${d.value === "" ? "names nothing" : `names ${d.value}, which is not one of ${known.map((k) => k.key).join(", ")}`}`,
+                `${field} ${d.value}`,
+              ),
+            ];
+      });
+    },
+  };
+}
+
+/** A specification lacks a section that the profile of its kind of subject or its audience asks for (0029-subject-profiles FR-011): none where it declares nothing, because a library asks for none. */
+export function profileSections(subjects: readonly ProfileRecord[], audiences: readonly ProfileRecord[]): RulePlugin {
+  return {
+    id: "mizan/profile-section-missing",
+    check(s) {
+      const file = `specs/${s.slug}/spec.md`;
+      const headings = s.spec.split("\n").flatMap((l) => /^#{2,3}\s+(.+?)\s*$/.exec(l)?.[1]?.toLowerCase() ?? []);
+      const wanted = (["Subject", "Audience"] as const).flatMap((field) => {
+        const d = declaredIn(s.spec, field);
+        const profile = (field === "Subject" ? subjects : audiences).find((k) => k.key === d?.value);
+        return d === undefined || profile === undefined
+          ? []
+          : profile.sections.map((section) => ({ key: profile.key, section, line: d.line }));
+      });
+      const seen = new Set<string>();
+      return wanted.flatMap((w) => {
+        if (seen.has(w.section) || headings.some((h) => h.startsWith(w.section.toLowerCase()))) return [];
+        seen.add(w.section);
+        return [
+          finding(
+            "mizan/profile-section-missing",
+            file,
+            w.line,
+            `a ${w.key} specification has a section ${JSON.stringify(w.section)}, and this one has none`,
+            `${w.key} ${w.section}`,
+          ),
+        ];
+      });
+    },
+  };
+}
+
 /** Mizan's own rules, as plugins, in the order they run: a harness with authorities of its own passes `authorityCitation` with them in place of the last. */
 export const rulePlugins: readonly RulePlugin[] = [
   requirementKeyword,
   requirementEars,
   scenarioForm,
   standardsConsidered,
+  profileKind(commonsSubjectProfiles, commonsAudienceProfiles),
+  profileSections(commonsSubjectProfiles, commonsAudienceProfiles),
   authorityCitation(commonsAuthorities),
 ];
 

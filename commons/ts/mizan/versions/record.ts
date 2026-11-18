@@ -82,6 +82,8 @@ export type Release = {
   readonly repository?: string;
   /** Paths of the folder that are not the work's files (FR-009). */
   readonly exclude?: readonly string[];
+  /** Paths outside the folder, from the root of the repository, whose files are also the work's: a change there needs a new version too (FR-039). */
+  readonly paths?: readonly string[];
   readonly snapshot?: Snapshot;
   readonly approval?: Approval;
   /** An ISO 8601 duration, from the release's day (FR-027). */
@@ -105,6 +107,7 @@ export const RECORD_FIELDS = [
   "identifier",
   "repository",
   "exclude",
+  "paths",
   "snapshot",
   "approval",
   "retention",
@@ -165,6 +168,7 @@ const body = object(
     identifier: nonEmpty,
     repository: nonEmpty,
     exclude: array(folderPath),
+    paths: array(folderPath),
     snapshot: snapshotDecoder,
     approval: approvalDecoder,
     retention,
@@ -227,6 +231,7 @@ export function decodeRelease(input: unknown): Result<Release, RecordError> {
     ...(v.identifier === undefined ? {} : { identifier: v.identifier }),
     ...(v.repository === undefined ? {} : { repository: v.repository }),
     ...(v.exclude === undefined ? {} : { exclude: v.exclude }),
+    ...(v.paths === undefined ? {} : { paths: v.paths }),
     ...(v.snapshot === undefined ? {} : { snapshot: v.snapshot }),
     ...(v.approval === undefined ? {} : { approval: v.approval }),
     ...(v.retention === undefined ? {} : { retention: v.retention }),
@@ -273,6 +278,7 @@ function literalOf(r: Release): Literal {
     identifier: r.identifier,
     repository: r.repository,
     exclude: r.exclude === undefined ? undefined : [...r.exclude],
+    paths: r.paths === undefined ? undefined : [...r.paths],
     snapshot:
       r.snapshot === undefined
         ? undefined
@@ -294,7 +300,7 @@ function literalOf(r: Release): Literal {
 
 /** The header every record carries. */
 const HEADER =
-  "/** The release record of this work (commons 0026-works-versioning): data, read and never run. `versions bump` writes it; never edit it by hand. */\n";
+  "/**\n * The release record of this work (commons 0026-works-versioning): data, read and never run. `versions bump` writes it; never edit it by hand.\n *\n * @module\n */\n";
 
 /** The text of a record's file, by the one template (FR-008): the header, `export const release = { ... };`, fields in the order of {@link RECORD_FIELDS}, a newline at the end. */
 export function releaseSource(r: Release): string {

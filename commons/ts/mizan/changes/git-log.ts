@@ -24,6 +24,7 @@ import { NotFound } from "../../runtime/errors.ts";
 import { type GitError } from "../../runtime/git.ts";
 import { output } from "../../runtime/proc.ts";
 import { type DeclarationVersion, dayOf, decodeHarnessRecord } from "./declaration.ts";
+import type { CapabilityCommit } from "./capability-trace.ts";
 import type { CommitFacts } from "./rules.ts";
 
 const ENV: Readonly<Record<string, string>> = {
@@ -111,4 +112,65 @@ export async function declarationHistory(
     if (record.kind === "ok") out.push({ revision, day, declaration: record.value.declaration });
   }
   return ok(out);
+}
+
+/** The requirement a line of a `spec.md` states, as an added line of a diff reads it. */
+const ADDED_REQUIREMENT = /^\+\s*-\s*\*\*(FR-\d{3}[a-z]?)\*\*/;
+
+/**
+ * The commits of a range as the offline trace reads them (0020-ifccm FR-035): each with its subject, its whole message, the files it changed and the requirements (`NNNN-slug FR-nnn`) whose
+ * lines in a `specs/<slug>/spec.md` it added or edited. Three reads of the one range, each by an argument vector.
+ */
+export async function readRangeFacts(repo: string, range: string): Promise<Result<readonly CapabilityCommit[], GitError>> {
+  const commits = await readRange(repo, range);
+  if (commits.kind === "err") return commits;
+  const files = await gitText(repo, ["log", "--reverse", `--format=${RECORD}%H`, "--name-only", "--no-renames", range, "--"]);
+  if (files.kind === "err") return files;
+  const changed = new Map<string, string[]>();
+  for (const block of files.value.split(RECORD)) {
+    const [sha = "", ...names] = block.split("\n").map((l) => l.trim());
+    if (sha !== "")
+      changed.set(
+        sha,
+        names.filter((n) => n !== ""),
+      );
+  }
+  const diffs = await gitText(repo, [
+    "log",
+    "--reverse",
+    `--format=${RECORD}%H`,
+    "-p",
+    "-U0",
+    "--no-color",
+    "--no-ext-diff",
+    "--no-renames",
+    range,
+    "--",
+    "*spec.md",
+  ]);
+  if (diffs.kind === "err") return diffs;
+  const added = new Map<string, Set<string>>();
+  for (const block of diffs.value.split(RECORD)) {
+    const lines = block.split("\n");
+    const sha = (lines[0] ?? "").trim();
+    let slug: string | undefined;
+    for (const line of lines.slice(1)) {
+      if (line.startsWith("+++ ")) slug = /\bspecs\/([^/\s]+)\/spec\.md$/.exec(line)?.[1];
+      const id = slug === undefined ? undefined : ADDED_REQUIREMENT.exec(line)?.[1];
+      if (id !== undefined && slug !== undefined) {
+        const set = added.get(sha) ?? new Set<string>();
+        set.add(`${slug} ${id}`);
+        added.set(sha, set);
+      }
+    }
+  }
+  return ok(
+    commits.value.map((c) => ({
+      sha: c.sha,
+      subject: c.message.split("\n")[0] ?? "",
+      message: c.message,
+      files: changed.get(c.sha) ?? [],
+      requirements: [...(added.get(c.sha) ?? [])].sort(),
+    })),
+  );
 }

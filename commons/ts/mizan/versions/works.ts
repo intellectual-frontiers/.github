@@ -1,13 +1,14 @@
 /**
  * Which files are a work's (commons 0026-works-versioning FR-009): a work is a folder that holds a `release.ts`; its files are every file Git tracks under the folder except those of a work nested
- * in it, its own `release.ts` and `CITATION.cff`, and the paths its record names in `exclude`. Every judgement of a version is scoped to those files and to no others (path-scoped).
+ * in it, its own `release.ts` and `CITATION.cff`, and the paths its record names in `exclude`, and, besides, every tracked file under the paths its record names in `paths` (folders or files
+ * outside its folder, from the root of the repository: FR-039). Every judgement of a version is scoped to those files and to no others (path-scoped).
  *
  * @remarks
  * Pure: it works on lists of paths (as `git ls-files` or `git ls-tree` gives them, with `/`), so the same code scopes a tree at the head and at the base. A path is a work's by its place alone, so
  * a file that was deleted is still told as the work's it was. A work of a repository of one work keeps its record at the root, and its folder is `""`.
  *
  * @limits
- * It does not read a record: `exclude` is an argument.
+ * It does not read a record: `exclude` and `paths` are arguments.
  *
  * @example
  * ```ts
@@ -45,24 +46,32 @@ export function isUnder(path: string, under: string): boolean {
 }
 
 /**
- * Whether a path is a file of the work in `folder` (FR-009): under the folder, not under another work's folder nested in it, not its `release.ts` or `CITATION.cff`, and not under a path of
- * `exclude` (paths of the folder).
+ * Whether a path is a file of the work in `folder` (FR-009, FR-039): under the folder, not under another work's folder nested in it, not its `release.ts` or `CITATION.cff`, and not under a path of
+ * `exclude` (paths of the folder); or, whatever the folder, under one of `paths` (paths of the repository that the record adds to the work's files), its own two files apart.
  */
-export function scopeOf(folder: string, folders: readonly string[], exclude: readonly string[]): (path: string) => boolean {
+export function scopeOf(
+  folder: string,
+  folders: readonly string[],
+  exclude: readonly string[],
+  paths: readonly string[] = [],
+): (path: string) => boolean {
   const nested = folders.filter((f) => f !== folder && f !== "" && isUnder(f, folder));
   const own = new Set([recordPathOf(folder), folder === "" ? CITATION_FILE : `${folder}/${CITATION_FILE}`]);
   const excluded = exclude.map((e) => (folder === "" ? e : `${folder}/${e}`));
   return (path) =>
-    isUnder(path, folder) && !own.has(path) && !nested.some((n) => isUnder(path, n)) && !excluded.some((e) => isUnder(path, e));
+    !own.has(path) &&
+    ((isUnder(path, folder) && !nested.some((n) => isUnder(path, n)) && !excluded.some((e) => isUnder(path, e))) ||
+      paths.some((x) => isUnder(path, x)));
 }
 
 /** The paths of a work among tracked paths. */
 export function filesOf(
-  paths: readonly string[],
+  tracked: readonly string[],
   folder: string,
   folders: readonly string[],
   exclude: readonly string[],
+  extra: readonly string[] = [],
 ): readonly string[] {
-  const inScope = scopeOf(folder, folders, exclude);
-  return paths.filter(inScope);
+  const inScope = scopeOf(folder, folders, exclude, extra);
+  return tracked.filter(inScope);
 }
