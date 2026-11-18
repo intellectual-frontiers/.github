@@ -9,7 +9,7 @@
 import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
 import type { Dialect } from "@intellectual-frontiers/data/sql/physical";
 import { type LedgerEntry, nextEntry, verifyChain, type ChainBreak } from "./ledger.ts";
-import { type Plan, type Repeatable, type StepStatement, type Verification, dueRepeatables } from "./plan.ts";
+import { type RunPlan, type Repeatable, type StepStatement, type Verification, dueRepeatables } from "./plan.ts";
 
 /** A way to run statements on a database and read rows back. */
 export interface Driver {
@@ -136,7 +136,7 @@ export async function readLedger(driver: Driver, dialect: Dialect, table = LEDGE
  * @returns what was applied, or why it was not
  */
 export async function execute(
-  plan: Plan,
+  plan: RunPlan,
   driver: Driver,
   dialect: Dialect,
   options: RunOptions,

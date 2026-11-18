@@ -116,6 +116,34 @@ export interface Repeatable {
   readonly of: readonly LogicalId[];
 }
 
+/** What a run needs of a step: a frozen step, read back from a file, has no more than this. */
+export interface RunStep {
+  readonly id: string;
+  readonly name: string;
+  readonly from: string;
+  readonly to: string;
+  readonly up: readonly StepStatement[];
+  readonly verify?: Verification;
+  readonly of: readonly LogicalId[];
+}
+
+/** What a run needs of a plan. */
+export interface RunPlan {
+  readonly from: string;
+  readonly to: string;
+  readonly steps: readonly RunStep[];
+  readonly repeatable: readonly Repeatable[];
+}
+
+/** The identifier of a step, made of what it does: the states, its key, its statements with their guards and what must be true after it. */
+export const stepIdOf = (s: {
+  readonly from: string;
+  readonly to: string;
+  readonly key: string;
+  readonly up: readonly StepStatement[];
+  readonly verify?: Verification | undefined;
+}): string => hashOf({ from: s.from, to: s.to, key: s.key, up: s.up.map((x) => [x.sql, x.guard]), verify: s.verify });
+
 /** A plan. */
 export interface Plan {
   readonly dialect: string;
@@ -660,7 +688,7 @@ export function plan(
     state = applyChange(state, change);
     const last = i === drafts.length - 1;
     const next = stateHash(last ? { ...state, naming: to.naming } : state);
-    const id = hashOf({ from: at, to: next, key: draft.key, up: draft.up.map((s) => [s.sql, s.guard]), verify: draft.verify });
+    const id = stepIdOf({ from: at, to: next, key: draft.key, up: draft.up, verify: draft.verify });
     steps.push({ ...draft, id, from: at, to: next });
     at = next;
   });

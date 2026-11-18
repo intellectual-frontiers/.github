@@ -27,7 +27,8 @@
     "./sql/extensions/protected-access": "./sql/extensions/protected-access/mod.ts",
     "./sql/extensions/safety": "./sql/extensions/safety/mod.ts",
     "./sql/extensions/plan-report": "./sql/extensions/plan-report/mod.ts",
-    "./sql/extensions/rewrite": "./sql/extensions/rewrite/mod.ts"
+    "./sql/extensions/rewrite": "./sql/extensions/rewrite/mod.ts",
+    "./sql/extensions/history": "./sql/extensions/history/mod.ts"
   },
   "scripts": {
     "check": "tsc -p tsconfig.json",

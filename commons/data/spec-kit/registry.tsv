@@ -16,3 +16,4 @@ number	slug	state
 0015	sql-safety	in force
 0016	sql-plan-report	in force
 0017	sql-rewrite	in force
+0018	sql-history	in force
