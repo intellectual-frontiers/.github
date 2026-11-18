@@ -23,3 +23,4 @@ number	slug	state
 0022	sql-integrations	in force
 0023	sql-transforms	in force
 0024	sql-queries	in force
+0025	sql-target	in force

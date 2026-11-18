@@ -38,6 +38,7 @@ export const library = {
     "./sql/extensions/integrations",
     "./sql/extensions/transforms",
     "./sql/extensions/queries",
+    "./sql/extensions/target",
     "./sql/presets",
   ],
   summary:

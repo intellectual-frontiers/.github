@@ -1,6 +1,6 @@
 # @intellectual-frontiers/data
 
-Governance (what a business domain is and what must be true of its data), a logical schema made from it, and a physical schema for PostgreSQL, SQLite or DuckDB made from that, with extensions to each, and the lifecycle that changes a database from one physical schema to the next. It is an independent library of commons with its own specifications (`spec-kit/`, 0001 to 0024).
+Governance (what a business domain is and what must be true of its data), a logical schema made from it, and a physical schema for PostgreSQL, SQLite or DuckDB made from that, with extensions to each, and the lifecycle that changes a database from one physical schema to the next. It is an independent library of commons with its own specifications (`spec-kit/`, 0001 to 0025).
 
 **Full documentation: [README.html](https://htmlpreview.github.io/?https://github.com/intellectual-frontiers/.github/blob/main/commons/data/README.html)** (diagrams, every extension with an example, strategies, presets, limits and roadmap).
 
@@ -29,7 +29,7 @@ Each layer imports only the layers below it and the engine; a check of the libra
 - `sql/physical/`: a logical schema bound to a dialect and a case style, as statements.
 - `sql/lifecycle/`: state and hash, diff and plan, the hash-chained ledger, `execute`.
 - `sql/dialects/`: PostgreSQL, SQLite and DuckDB.
-- `sql/extensions/`: documentation, views, access, routines, partitions, generators, idempotency, protected-access, safety, plan-report, rewrite, history, convergence, rollout, integrations (rows, CSV, an attached database or an adapter, loaded by append, upsert, replace or snapshot in one transaction, with a ledger), transforms (models built in order, each with its tests in one transaction, published only if they pass), queries (read-only, typed parameters, checked between schema versions).
+- `sql/extensions/`: documentation, views, access, routines, partitions, generators, idempotency, protected-access, safety, plan-report, rewrite, history, convergence, rollout, integrations (rows, CSV, an attached database or an adapter, loaded by append, upsert, replace or snapshot in one transaction, with a ledger), transforms (models built in order, each with its tests in one transaction, published only if they pass), queries (read-only, typed parameters, checked between schema versions), target (a database as a build product: one deterministic SQL file).
 - `sql/presets/`: team-managed, dba-managed, reviewed-convergence and autonomous-convergence.
 - `sql/cli/`: the command line; in the layers table, not yet built.
 

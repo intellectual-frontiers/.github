@@ -34,6 +34,7 @@
     "./sql/extensions/integrations": "./sql/extensions/integrations/mod.ts",
     "./sql/extensions/transforms": "./sql/extensions/transforms/mod.ts",
     "./sql/extensions/queries": "./sql/extensions/queries/mod.ts",
+    "./sql/extensions/target": "./sql/extensions/target/mod.ts",
     "./sql/presets": "./sql/presets/mod.ts"
   },
   "scripts": {
