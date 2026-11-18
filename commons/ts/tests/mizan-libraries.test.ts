@@ -18,11 +18,11 @@ import {
   synchronize,
 } from "../mizan/libraries.ts";
 import { mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "../runtime/fs.ts";
-import { join, resolve } from "../runtime/path.ts";
+import { fromFileUrl, join, resolve } from "../runtime/path.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
 
 const SPEC = "0027-commons-libraries";
-const ROOT = resolve(new URL("../../..", import.meta.url).pathname);
+const ROOT = resolve(fromFileUrl(new URL("../../..", import.meta.url)));
 
 const manifest = (o: Readonly<Record<string, unknown>> = {}): string =>
   `export const library = ${JSON.stringify({ name: "alpha", level: "L1", specKit: "spec-kit", verify: "bun run verify", version: "0.2.0", exports: ["./a", "./b"], ...o })};\n`;
