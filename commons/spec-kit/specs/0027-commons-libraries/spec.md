@@ -37,7 +37,7 @@ The requirements below are generated (FR-011); change a manifest and run `bun co
 
 <!-- libraries:begin -->
 
-- **FR-101**: `commons/data` MUST be a library at conformance level L1 (`mz:Core`): the package `@intellectual-frontiers/data` at version `0.0.0`, its spec kit at `commons/data/spec-kit`, exporting `./engine`, `./governance`, `./sql/logical`, `./sql/physical`, `./models/arca`, `./sql/dialects/postgres`, `./sql/dialects/sqlite` and `./sql/dialects/duckdb`, proved by `cd commons/data && bun run verify`. A governance layer, a logical schema and a physical schema, and the extensions to each, produce SQL for PostgreSQL, SQLite and DuckDB; its own specifications say what it does.
+- **FR-101**: `commons/data` MUST be a library at conformance level L1 (`mz:Core`): the package `@intellectual-frontiers/data` at version `0.0.0`, its spec kit at `commons/data/spec-kit`, exporting `./engine`, `./governance`, `./sql/logical`, `./sql/physical`, `./models/arca`, `./sql/dialects/postgres`, `./sql/dialects/sqlite`, `./sql/dialects/duckdb` and `./sql/extensions/documentation`, proved by `cd commons/data && bun run verify`. A governance layer, a logical schema and a physical schema, and the extensions to each, produce SQL for PostgreSQL, SQLite and DuckDB; its own specifications say what it does.
 
 <!-- libraries:end -->
 
