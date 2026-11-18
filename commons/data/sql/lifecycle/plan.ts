@@ -72,6 +72,8 @@ export interface Step {
   readonly verify?: Verification;
   /** How it is safe to run twice, where an idempotency transform has said. */
   readonly idempotency?: Idempotency;
+  /** Whether the table is made again and the old one dropped (0017-sql-rewrite FR-003). */
+  readonly rebuild?: boolean;
   /** The change it makes, which an extension of the lifecycle reads. */
   readonly change: Change;
   /** The logical elements it is made from. */
@@ -177,12 +179,37 @@ export interface Desired {
 }
 
 /** What a plan is allowed. */
+/** What an extension makes of a change that the core cannot make in place: the step's draft, or none (0017-sql-rewrite FR-001). */
+export type Fallback = (
+  change: Change,
+  why: string,
+  context: StepContext,
+) => Omit<StepDraft, "name" | "kind" | "key" | "manual" | "change"> | undefined;
+
 export interface PlanOptions {
   readonly allow?: { readonly destructive?: boolean };
+  /** Makes what the core cannot make in place, such as a table that is made again. */
+  readonly fallback?: Fallback;
   readonly manual?: readonly ManualStep[];
   readonly transforms?: readonly StepTransform[];
   /** Refuse, as an error value, a step that is only safe to run twice because of the ledger (0012-sql-idempotency FR-007). */
   readonly requireIdempotent?: boolean;
+}
+
+/** The contribution point an extension of the lifecycle fills to make what the core cannot make in place. */
+export const fallbackPoint = point<Fallback>("lifecycle.fallback");
+
+/**
+ * The fallbacks of a composition as one: the first that makes the change wins.
+ *
+ * @param composition - the project's composition
+ * @returns the fallback, or none where no extension contributes one
+ */
+export function fallbackFrom(composition: Composition): Fallback | undefined {
+  const all = composition.contributions(fallbackPoint);
+  return all.length === 0
+    ? undefined
+    : (change, why, context) => all.reduce<ReturnType<Fallback>>((made, f) => made ?? f(change, why, context), undefined);
 }
 
 /** The contribution point an extension of the lifecycle fills to change the steps of a plan before they are hashed. */
@@ -579,7 +606,11 @@ export function plan(
   const drafts: { readonly draft: StepDraft; readonly change: Change }[] = [];
   for (const [index, c] of changes.entries()) {
     const sc: StepContext = { ...context, ...(between[index] ?? { before: start, after: start }) };
-    const made = make(c);
+    let made = make(c);
+    if ("manualNeeded" in made && options.fallback !== undefined && !manual.has(c.key)) {
+      const f = options.fallback(c, made.manualNeeded, sc);
+      if (f !== undefined) made = f;
+    }
     const base = { kind: c.kind, key: c.key, name: nameOf(c) };
     const m = manual.get(c.key);
     if (m !== undefined) {

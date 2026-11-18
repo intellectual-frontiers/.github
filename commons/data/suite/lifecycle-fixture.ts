@@ -34,7 +34,13 @@ const genre = (codes: readonly string[]) =>
 const governedAuthor = [annotate(ownership.steward, "librarian"), annotate(requirements.cites, ["0004-arca FR-001"])];
 
 /** The domain at a version: 1 is the first, 2 adds columns, a table and a code, 3 renames a column and drops one. */
-export function libraryAt(version: 1 | 2 | 3, shim = true, scratch = false, governed = false): LogicalSchema {
+/** What a test may change in the domain: the title may be null, the number of pages is required. */
+export interface Variant {
+  readonly looseTitle?: boolean;
+  readonly requiredPages?: boolean;
+}
+
+export function libraryAt(version: 1 | 2 | 3, shim = true, scratch = false, governed = false, variant: Variant = {}): LogicalSchema {
   const g = genre(version === 1 ? ["fiction", "poetry"] : ["fiction", "poetry", "drama"]);
   const author = concept("author", {
     definition: "Someone who writes",
@@ -86,9 +92,19 @@ export function libraryAt(version: 1 | 2 | 3, shim = true, scratch = false, gove
     definition: "A written work",
     attributes: {
       id: attribute(identifier(), { definition: "What identifies it" }),
-      title: attribute(text(), { definition: "What it is called" }),
+      title:
+        variant.looseTitle === true
+          ? attribute(text(), { definition: "What it is called", multiplicity: "optional" })
+          : attribute(text(), { definition: "What it is called" }),
       genre: attribute(codeOf(g), { definition: "What it is" }),
-      ...(version >= 2 ? { pages: attribute(integer(), { definition: "How long it is", multiplicity: "optional" }) } : {}),
+      ...(version >= 2
+        ? {
+            pages:
+              variant.requiredPages === true
+                ? attribute(integer(), { definition: "How long it is" })
+                : attribute(integer(), { definition: "How long it is", multiplicity: "optional" }),
+          }
+        : {}),
     },
     identifiedBy: ["id"],
     relationships: { author: relationship(a, { cardinality: "one", definition: "Who wrote it" }) },

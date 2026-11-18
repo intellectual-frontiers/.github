@@ -16,6 +16,7 @@ export {
   type Feature,
   type IfExistsForm,
   type Locks,
+  type Rebuild,
   type Probes,
   type Literal,
   quoteName,

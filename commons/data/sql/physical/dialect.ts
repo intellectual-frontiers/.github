@@ -46,6 +46,13 @@ export interface Probes {
   validConstraint?(table: string, name: string, schema?: string): string;
 }
 
+/** What a dialect needs to make a table again: statements to run first (so that rows that refer to it are not checked until the end) and whether tables that refer to it stop it. */
+export interface Rebuild {
+  readonly prelude: readonly string[];
+  /** Whether a table that other tables' foreign keys refer to cannot be dropped. */
+  readonly blockedByParents: boolean;
+}
+
 /** How a dialect asks for its locks with a limit, and how its error for giving up is told (0015-sql-safety FR-008). */
 export interface Locks {
   /** The statements that make the rest of the transaction wait at most so long for a lock and run at most so long. */
@@ -82,6 +89,8 @@ export interface Dialect {
   }): string | undefined;
   /** Which forms of `DROP` and `ADD COLUMN` the dialect writes with `IF [NOT] EXISTS`. */
   readonly ifExists?: readonly IfExistsForm[];
+  /** How a table is made again where the dialect cannot change it in place (0017-sql-rewrite). */
+  readonly rebuild?: Rebuild;
   /** How the dialect asks for its locks with a limit; none where it has no such thing. */
   readonly locks?: Locks;
   /** Whether a foreign key or a check can be added without checking the rows that are there, and checked afterwards. */

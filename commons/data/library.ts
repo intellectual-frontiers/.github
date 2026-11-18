@@ -31,6 +31,7 @@ export const library = {
     "./sql/extensions/protected-access",
     "./sql/extensions/safety",
     "./sql/extensions/plan-report",
+    "./sql/extensions/rewrite",
   ],
   summary:
     "A governance layer, a logical schema and a physical schema, and the extensions to each, produce SQL for PostgreSQL, SQLite and DuckDB; its own specifications say what it does.",

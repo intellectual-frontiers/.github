@@ -37,6 +37,7 @@ export const dialect: Dialect = {
   quote: quoteName,
   literal: standardLiteral,
   type,
+  rebuild: { prelude: ["PRAGMA defer_foreign_keys = ON;"], blockedByParents: false },
   ifExists: ["dropTable", "dropIndex"],
   probes: {
     table: (t) => `SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ${standardLiteral(t)}`,

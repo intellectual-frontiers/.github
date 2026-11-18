@@ -45,6 +45,7 @@ export const dialect: Dialect = {
   quote: quoteName,
   literal: standardLiteral,
   type,
+  rebuild: { prelude: [], blockedByParents: true },
   hash: (t) => `md5(${t})`,
   ifExists: ["addColumn", "dropColumn", "dropTable", "dropIndex"],
   probes: {

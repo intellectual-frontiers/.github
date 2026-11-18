@@ -56,7 +56,7 @@ function tablesOf(draft: StepDraft, context: StepContext): { readonly before?: S
  */
 export function protectionTransform(settings: Protection): StepTransform {
   return (draft, context): StepDraft => {
-    if (!WRAPPED.has(draft.kind)) return draft;
+    if (!WRAPPED.has(draft.kind) && draft.rebuild !== true) return draft;
     const { enforced } = enforcement(context.dialect, {
       ...settings,
       enforcement: settings.enforcement === "enforced" ? "auto" : settings.enforcement,
