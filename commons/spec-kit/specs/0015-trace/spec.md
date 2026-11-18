@@ -29,6 +29,7 @@
 ## The runtime
 
 - **FR-011**: `runtime/trace.ts` (exported by `runtime/mod.ts` as `trace`) MUST read what the kernel judges: the specifications of a folder (`specs/NNN-slug/spec.md` and `reviewed.tsv`), the `.ts` files under roots (leaving out `node_modules`), as paths relative to the repository with `/`; and MUST hold findings against a baseline file (`holdBaseline`): read it (a missing file is an empty baseline), judge, and give the lines of FR-003 and an exit status (0 when nothing is new or stale, 1 otherwise), or, with `write`, write the baseline from the findings and give 0. It MUST print nothing itself: the harness's tool prints the lines. Every path it gives is relative to the repository and `/`-separated on every system, Windows included, so a ladder's homes and a baseline's keys match the same files everywhere.
+- **FR-012**: WHERE a file holds a block comment, the kernel MUST read `Spec: ` and `Proves: ` lines in it as it reads `// Spec: ` and `// Proves: ` (FR-005, FR-006): a line of the block comment whose text, after its leading asterisk, begins with the word and a colon, and a block comment on one line that holds one; and it MUST NOT read a line of code that holds the words, in a string or in a comment after code (amended 2026-11-18).
 
 ## Out of scope
 
@@ -40,6 +41,8 @@
 ## Edge cases
 
 - A file `// Spec: 097-controller FR-001, FR-003 to FR-005`: four requirements cited, per FR-005.
+- A line ` * Spec: 097-controller FR-001` inside a block comment, and `Proves:` likewise: cited and proved, as with two slashes, per FR-012.
+- A string `"Spec: 097-controller FR-001"` or a comment after code that says it: not a citation, per FR-012.
 - A file with two lines `// Spec: 097-controller` and `// Spec: 098-pair FR-002`: both cited, per FR-005.
 - A file that cites `065-console`, a spec no folder holds: `trace/unknown-spec`, per FR-007.
 - A range `FR-010 to FR-003`, or one whose end the spec does not have: `trace/unknown-requirement`, per FR-005 and FR-007.
