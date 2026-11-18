@@ -16,7 +16,11 @@
     "./sql/dialects/postgres": "./sql/dialects/postgres/mod.ts",
     "./sql/dialects/sqlite": "./sql/dialects/sqlite/mod.ts",
     "./sql/dialects/duckdb": "./sql/dialects/duckdb/mod.ts",
-    "./sql/extensions/documentation": "./sql/extensions/documentation/mod.ts"
+    "./sql/extensions/documentation": "./sql/extensions/documentation/mod.ts",
+    "./sql/extensions/views": "./sql/extensions/views/mod.ts",
+    "./sql/extensions/access": "./sql/extensions/access/mod.ts",
+    "./sql/extensions/routines": "./sql/extensions/routines/mod.ts",
+    "./sql/extensions/partitions": "./sql/extensions/partitions/mod.ts"
   },
   "scripts": {
     "check": "tsc -p tsconfig.json",

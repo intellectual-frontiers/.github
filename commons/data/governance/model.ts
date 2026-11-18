@@ -204,7 +204,8 @@ export type DomainError =
       readonly attribute?: string;
       readonly why: "missing" | "unknown" | "not-required";
     }
-  | { readonly kind: "annotation"; readonly element: ElementId; readonly annotation: string; readonly about: readonly ElementKind[] };
+  | { readonly kind: "annotation"; readonly element: ElementId; readonly annotation: string; readonly about: readonly ElementKind[] }
+  | { readonly kind: "dimensions"; readonly element: ElementId; readonly dimensions: number };
 
 /**
  * Makes a domain, or says everything that is wrong with it.
@@ -237,6 +238,8 @@ export function domain(name: string, spec: DomainSpec): Result<Domain, readonly 
       const aid = attributeId(name, c.name, key);
       checkName(aid, key);
       checkAnnotations(aid, "attribute", a.annotations);
+      if (a.type.kind === "vector" && (!Number.isInteger(a.type.dimensions) || a.type.dimensions < 1))
+        errors.push({ kind: "dimensions", element: aid, dimensions: a.type.dimensions });
       if (a.type.kind === "code" && !codeLists.includes(a.type.list))
         errors.push({ kind: "unresolved", from: aid, to: a.type.list.name, what: "codelist" });
     }

@@ -91,3 +91,21 @@ requirement	mechanism	by	note
 0008-sql-documentation FR-007	check	.github: cd commons/data && bun run verify	suite/documentation.test.ts: the extension tables are bound by the physical schema's own machinery, a name collision is an error value
 0008-sql-documentation FR-008	check	.github: cd commons/data && bun run verify	suite/documentation.test.ts: loading twice leaves the same rows, and reloading after a change leaves the new ones
 0008-sql-documentation FR-009	check	.github: cd commons/data && bun run verify	suite/documentation.test.ts: every annotation of the domain is a row of governance_annotation, an unknown kind included
+0009-sql-features FR-001	check	.github: cd commons/data && bun run verify	suite/features.test.ts: the groups run setup first, then tables, then what features add, and policy last
+0009-sql-features FR-002	check	.github: cd commons/data && bun run verify	suite/features.test.ts: the dialects name the features they have, and an extension asks for the feature
+0009-sql-features FR-003	check	.github: cd commons/data && bun run verify	suite/features.test.ts: a dialect refuses a type with a reason, and runs setup statements for the types a schema uses
+0009-sql-features FR-004	check	.github: cd commons/data && bun run verify	suite/features.test.ts: an extension adds a clause to a table through physical.tableClauses
+0009-sql-features FR-005	check	.github: cd commons/data && bun run verify	suite/features.test.ts: a view is made from a typed definition by governance names and returns the rows its conditions give on three engines
+0009-sql-features FR-006	check	.github: cd commons/data && bun run verify	suite/features.test.ts: a view is replaced or dropped and made again by the dialect, with its description as a comment where there is one
+0009-sql-features FR-007	check	.github: cd commons/data && bun run verify	suite/features.test.ts: a view that names what the schema lacks is an error value, and its statement carries what it reads
+0009-sql-features FR-008	check	.github: cd commons/data && bun run verify	suite/features.test.ts: a scoped table shows a role only the rows of its scope on PostgreSQL, and applying twice leaves the same policies
+0009-sql-features FR-009	check	.github: cd commons/data && bun run verify	suite/features.test.ts: grants follow the roles of security.access and a policy is made for each role's operations
+0009-sql-features FR-010	check	.github: cd commons/data && bun run verify	suite/features.test.ts: where the dialect lacks the feature nothing is written, or an error value where the setting says
+0009-sql-features FR-011	check	.github: cd commons/data && bun run verify	suite/features.test.ts: a routine is made by CREATE OR REPLACE on PostgreSQL and an error value elsewhere
+0009-sql-features FR-012	check	.github: cd commons/data && bun run verify	suite/features.test.ts: a body of text and typed references is written with the names of the case style, and a bad reference is an error value
+0009-sql-features FR-013	check	.github: cd commons/data && bun run verify	suite/features.test.ts: a routine's description is its comment with the parameter types
+0009-sql-features FR-014	check	.github: cd commons/data && bun run verify	suite/features.test.ts: a partitioned table keeps each row in the partition of its bounds, by range, list and hash
+0009-sql-features FR-015	check	.github: cd commons/data && bun run verify	suite/features.test.ts: a division whose key is not a column or not in the primary key, or whose dialect cannot partition, is an error value
+0009-sql-features FR-016	check	.github: cd commons/data && bun run verify	suite/features.test.ts: a vector is VECTOR(n) after the extension on PostgreSQL, FLOAT[n] on DuckDB and refused on SQLite
+0009-sql-features FR-017	check	.github: cd commons/data && bun run verify	suite/features.test.ts: a vector of fewer than one dimension, or not a whole number, is an error value from domain()
+0009-sql-features FR-018	check	.github: cd commons/data && bun run verify	suite/features.test.ts: each feature does what it says on a real engine

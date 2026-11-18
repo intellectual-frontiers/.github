@@ -30,18 +30,21 @@ const type = (t: LogicalType): string => {
       return "JSONB";
     case "bytes":
       return "BYTEA";
+    case "vector":
+      return `VECTOR(${t.dimensions})`;
   }
 };
 
 /** PostgreSQL. */
 export const dialect: Dialect = {
   name: "postgres",
-  features: ["comment-on", "regex-check", "add-constraint"],
+  features: ["comment-on", "regex-check", "add-constraint", "or-replace-view", "row-security", "grants", "routines", "partitions"],
   maxName: 63,
   now: "CURRENT_TIMESTAMP",
   quote: quoteName,
   literal: standardLiteral,
   type,
+  setup: (types) => (types.some((t) => t.kind === "vector") ? ["CREATE EXTENSION IF NOT EXISTS vector;"] : []),
   pattern: (column, pattern) => `${column} ~ ${standardLiteral(pattern)}`,
 };
 

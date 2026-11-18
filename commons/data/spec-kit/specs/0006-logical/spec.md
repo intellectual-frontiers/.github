@@ -10,7 +10,7 @@
 ## The logical schema
 
 - **FR-001**: A logical schema MUST be plain data that names no engine: value sets (the closed code lists) and tables, each with its name as words, its comment, its columns (name as words, logical type, nullability, default, comment), its primary key, its foreign keys, its unique constraints, its checks and its indexes, and for a code table its rows; every element MUST carry an identity of its own, made of its words, and the identity of the governance element it was made from.
-- **FR-002**: A column's type MUST be one of the logical types: text (with its longest), integer, decimal (with precision and scale), boolean, date, timestamp (with whether it has a zone), json and bytes; none MUST name a type of an engine.
+- **FR-002**: A column's type MUST be one of the logical types: text (with its longest), integer, decimal (with precision and scale), boolean, date, timestamp (with whether it has a zone), json, bytes and vector (with its dimensions); none MUST name a type of an engine.
 - **FR-003**: `project` MUST return the logical schema of a domain, or every error of the projection together, as values; the projection MUST be a value (`normalized` is the library's own), given to `project` or contributed through the engine's point `logical.projection`, so that another takes its place.
 
 ## What the normalized projection makes

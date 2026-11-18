@@ -7,7 +7,14 @@
  * @module
  */
 import type { Brand } from "@intellectual-frontiers/commons/ts/kernel";
-import { type Annotation, type AnnotationKind, annotationsOf, type ElementId, type Words } from "@intellectual-frontiers/data/governance";
+import {
+  type Annotation,
+  type AnnotationKind,
+  annotationsOf,
+  type ElementId,
+  type Words,
+  words,
+} from "@intellectual-frontiers/data/governance";
 
 /** The identity of an element of a logical schema, made of its words. */
 export type LogicalId = Brand<string, "LogicalId">;
@@ -25,6 +32,10 @@ export const columnId = (table: Words, column: Words): LogicalId => made(`column
 export type ConstraintKind = "pk" | "fk" | "uq" | "ck" | "ix";
 /** The identity of a value set: a closed code list. */
 export const valueSetId = (name: Words): LogicalId => made(`valueset:${name.join(".")}`);
+/** What a feature of an extension makes: the identity of a thing the schema does not have (0009-sql-features). */
+export type FeatureKind = "view" | "routine" | "policy" | "partition" | "grant";
+/** The identity of what a feature of an extension makes, by its kind and name. */
+export const featureId = (kind: FeatureKind, name: Words): LogicalId => made(`${kind}:${name.join(".")}`);
 /** The identity of a constraint or an index. */
 export const constraintId = (kind: ConstraintKind, name: Words): LogicalId => made(`${kind}:${name.join(".")}`);
 
@@ -37,7 +48,8 @@ export type LogicalType =
   | { readonly kind: "date" }
   | { readonly kind: "timestamp"; readonly zone: boolean }
   | { readonly kind: "json" }
-  | { readonly kind: "bytes" };
+  | { readonly kind: "bytes" }
+  | { readonly kind: "vector"; readonly dimensions: number };
 
 /** What a column takes where no value is given: a literal, the moment of the insert, or a code of a list (by its name). */
 export type LogicalDefault =
@@ -167,4 +179,28 @@ export const sameWords = (a: Words, b: Words): boolean => a.length === b.length 
  */
 export function carriedOf<T>(element: { readonly governance: readonly Annotation[] }, kind: AnnotationKind<T>): readonly T[] {
   return annotationsOf({ annotations: element.governance }, kind);
+}
+
+/**
+ * The table of a schema that governance names (`party`, `partyIdentifier`).
+ *
+ * @param schema - the logical schema
+ * @param name - the name as governance writes it, lower camel case
+ * @returns the table, or none
+ */
+export function tableNamed(schema: LogicalSchema, name: string): Table | undefined {
+  const w = words(name);
+  return schema.tables.find((t) => sameWords(t.name, w));
+}
+
+/**
+ * The column of a table that governance names (`partyId`, `givenName`).
+ *
+ * @param table - the table
+ * @param name - the name as governance writes it, lower camel case
+ * @returns the column, or none
+ */
+export function columnNamed(table: Table, name: string): Column | undefined {
+  const w = words(name);
+  return table.columns.find((c) => sameWords(c.name, w));
 }

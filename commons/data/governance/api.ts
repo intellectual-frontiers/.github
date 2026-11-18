@@ -36,6 +36,8 @@ export {
   integer,
   type IntegerType,
   structured,
+  vector,
+  type VectorType,
   type StructuredType,
   text,
   type TextType,

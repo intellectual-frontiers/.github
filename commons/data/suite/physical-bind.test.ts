@@ -166,7 +166,11 @@ proves(["0007-physical FR-004"], "the three dialects are extensions that contrib
     );
   same(
     [sqlite.features, duckdb.features, postgres.features],
-    [[], ["comment-on", "regex-check"], ["comment-on", "regex-check", "add-constraint"]],
+    [
+      [],
+      ["comment-on", "regex-check", "or-replace-view"],
+      ["comment-on", "regex-check", "add-constraint", "or-replace-view", "row-security", "grants", "routines", "partitions"],
+    ],
   );
   same(
     [sqlite.quote('a"b'), postgres.literal("it's"), postgres.literal(true), duckdb.literal(null), sqlite.literal(3)],

@@ -180,6 +180,7 @@ function defaultFindings(domain: string, c: AnyConcept): readonly Finding[] {
           break;
         case "structured":
         case "binary":
+        case "vector":
           bad("is not possible for this datatype");
           break;
         default:

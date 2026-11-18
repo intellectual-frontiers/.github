@@ -141,6 +141,8 @@ const typeOf = (t: Datatype): LogicalType => {
       return { kind: "json" };
     case "binary":
       return { kind: "bytes" };
+    case "vector":
+      return { kind: "vector", dimensions: t.dimensions };
   }
 };
 

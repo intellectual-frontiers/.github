@@ -21,6 +21,10 @@ export const library = {
     "./sql/dialects/sqlite",
     "./sql/dialects/duckdb",
     "./sql/extensions/documentation",
+    "./sql/extensions/views",
+    "./sql/extensions/access",
+    "./sql/extensions/routines",
+    "./sql/extensions/partitions",
   ],
   summary:
     "A governance layer, a logical schema and a physical schema, and the extensions to each, produce SQL for PostgreSQL, SQLite and DuckDB; its own specifications say what it does.",

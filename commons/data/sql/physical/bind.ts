@@ -18,6 +18,7 @@ import type {
   ForeignKey,
   LogicalDefault,
   LogicalId,
+  LogicalType,
   LogicalSchema,
   Table,
 } from "@intellectual-frontiers/data/sql/logical";
@@ -25,6 +26,7 @@ import { type Naming, naming as defaultNaming, writeCode } from "./case.ts";
 import type { Dialect } from "./dialect.ts";
 import { upsert } from "./upsert.ts";
 import {
+  type TableClause,
   GROUPS,
   type BindContext,
   type Group,
@@ -42,6 +44,8 @@ export interface BindOptions {
   readonly naming?: Naming;
   /** What extensions add, in order. */
   readonly sources?: readonly StatementSource[];
+  /** What extensions add to the end of a table, in order. */
+  readonly tableClauses?: readonly TableClause[];
 }
 
 const indent = "    ";
@@ -136,6 +140,15 @@ export function bind(schema: LogicalSchema, options: BindOptions): Result<Physic
   const fkClause = (f: ForeignKey): string =>
     `CONSTRAINT ${q(constraints.get(f.id) ?? "")} FOREIGN KEY (${list(f.columns)}) REFERENCES ${q(naming.names.write(f.references.table))} (${list(f.references.columns)})`;
 
+  // what the dialect cannot store, and what it must run first
+  const used: LogicalType[] = [];
+  for (const t of schema.tables)
+    for (const c of t.columns) {
+      const why = dialect.unsupported?.(c.type);
+      if (why !== undefined) errors.push({ kind: "unsupported", element: c.id, why });
+      else if (!used.some((u) => JSON.stringify(u) === JSON.stringify(c.type))) used.push(c.type);
+    }
+
   // the order of the tables: each after the tables its foreign keys refer to
   const byName = new Map(schema.tables.map((t) => [t.name.join("."), t]));
   const order: Table[] = [];
@@ -168,6 +181,8 @@ export function bind(schema: LogicalSchema, options: BindOptions): Result<Physic
     f.references.table.join(".") !== t.name.join(".");
 
   const statements: { group: Group; sql: string; of: readonly LogicalId[] }[] = [];
+  for (const sql of dialect.setup?.(used) ?? []) statements.push({ group: "setup", sql, of: [] });
+  const context: BindContext = { schema, dialect, naming, written };
   for (const t of order) {
     const lines: string[] = t.columns.map((c) => columnLine(t, c));
     if (t.primaryKey.length > 1) lines.push(`PRIMARY KEY (${list(t.primaryKey)})`);
@@ -177,9 +192,15 @@ export function bind(schema: LogicalSchema, options: BindOptions): Result<Physic
       const expr = checkOf(c);
       if (expr !== undefined) lines.push(`CONSTRAINT ${q(constraints.get(c.id) ?? "")} CHECK (${expr})`);
     }
+    const clauses: string[] = [];
+    for (const clause of options.tableClauses ?? []) {
+      const r = clause(context, t);
+      if (r.kind === "err") errors.push(...r.error);
+      else if (r.value !== undefined) clauses.push(r.value);
+    }
     statements.push({
       group: "table",
-      sql: `CREATE TABLE IF NOT EXISTS ${q(tables.get(t.id) ?? "")} (\n${lines.map((l) => `${indent}${l}`).join(",\n")}\n);`,
+      sql: `CREATE TABLE IF NOT EXISTS ${q(tables.get(t.id) ?? "")} (\n${lines.map((l) => `${indent}${l}`).join(",\n")}\n)${clauses.map((c) => ` ${c}`).join("")};`,
       of: [
         t.id,
         ...t.columns.map((c) => c.id),
@@ -210,7 +231,6 @@ export function bind(schema: LogicalSchema, options: BindOptions): Result<Physic
     statements.push({ group: "data", sql: upsert(dialect, tables.get(t.id) ?? "", names, key, rows), of: [t.id] });
   }
 
-  const context: BindContext = { schema, dialect, naming, written };
   for (const source of options.sources ?? []) {
     const r = source(context);
     if (r.kind === "err") errors.push(...r.error);

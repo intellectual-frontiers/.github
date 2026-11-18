@@ -8,15 +8,15 @@
  */
 import type { Result } from "@intellectual-frontiers/commons/ts/kernel";
 import { type Composition, point } from "@intellectual-frontiers/data/engine";
-import type { LogicalId, LogicalSchema } from "@intellectual-frontiers/data/sql/logical";
+import type { LogicalId, LogicalSchema, Table } from "@intellectual-frontiers/data/sql/logical";
 import type { Dialect } from "./dialect.ts";
 import type { Naming } from "./case.ts";
 
 /** Where a statement goes: tables, then what is added to them, then indexes, then the reference data, then documentation, then policies. */
-export type Group = "table" | "constraint" | "index" | "data" | "documentation" | "policy";
+export type Group = "setup" | "table" | "constraint" | "index" | "data" | "view" | "routine" | "documentation" | "policy";
 
 /** The groups in the order their statements are run. */
-export const GROUPS: readonly Group[] = ["table", "constraint", "index", "data", "documentation", "policy"];
+export const GROUPS: readonly Group[] = ["setup", "table", "constraint", "index", "data", "view", "routine", "documentation", "policy"];
 
 /** One piece of SQL, ending in `;`. */
 export interface Statement {
@@ -50,6 +50,22 @@ export interface BindContext {
 
 /** What an extension gives `bind`: statements for a bound schema, or its errors. */
 export type StatementSource = (context: BindContext) => Result<readonly Statement[], readonly PhysicalError[]>;
+
+/** What an extension gives `bind` to add to the end of a table's `CREATE TABLE`: a clause, nothing for a table it has none for, or its errors (0009-sql-features FR-004). */
+export type TableClause = (context: BindContext, table: Table) => Result<string | undefined, readonly PhysicalError[]>;
+
+/** The contribution point an extension fills to add a clause to a table. */
+export const tableClausesPoint = point<TableClause>("physical.tableClauses");
+
+/**
+ * The table clauses of a composition, in its order.
+ *
+ * @param composition - the project's composition
+ * @returns the clauses its extensions contribute
+ */
+export function clausesFrom(composition: Composition): readonly TableClause[] {
+  return composition.contributions(tableClausesPoint);
+}
 
 /** The contribution point an extension fills to add statements. */
 export const statementsPoint = point<StatementSource>("physical.statements");

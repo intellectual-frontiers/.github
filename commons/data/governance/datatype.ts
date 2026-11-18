@@ -29,9 +29,22 @@ export type StructuredType = { readonly kind: "structured" };
 /** Bytes. */
 export type BinaryType = { readonly kind: "binary" };
 
+/** A vector of numbers of a fixed number of dimensions: what a model makes of a text or an image, to be compared by distance. */
+export type VectorType = { readonly kind: "vector"; readonly dimensions: number };
+
 /** A business datatype. */
 export type Datatype =
-  TextType | IntegerType | DecimalType | BooleanType | DateType | InstantType | IdentifierType | CodeType | StructuredType | BinaryType;
+  | TextType
+  | IntegerType
+  | DecimalType
+  | BooleanType
+  | DateType
+  | InstantType
+  | IdentifierType
+  | CodeType
+  | StructuredType
+  | BinaryType
+  | VectorType;
 
 /** Text, with the longest it may be where that matters. */
 export const text = (options: { readonly max?: number } = {}): TextType =>
@@ -53,6 +66,8 @@ export const identifier = (): IdentifierType => Object.freeze({ kind: "identifie
 export const codeOf = <L extends AnyCodeList>(list: L): CodeType<L> => Object.freeze({ kind: "code", list });
 /** A structured document of no fixed shape. */
 export const structured = (): StructuredType => Object.freeze({ kind: "structured" });
+/** A vector of a number of dimensions (a whole number of at least one, which `domain()` checks). */
+export const vector = (dimensions: number): VectorType => Object.freeze({ kind: "vector", dimensions });
 /** Bytes. */
 export const binary = (): BinaryType => Object.freeze({ kind: "binary" });
 
@@ -86,6 +101,8 @@ export function describeDatatype(d: Datatype): string {
       return "a structured document";
     case "binary":
       return "bytes";
+    case "vector":
+      return `a vector of ${d.dimensions} numbers`;
     default:
       return absurd(d);
   }

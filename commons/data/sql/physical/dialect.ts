@@ -19,7 +19,8 @@ import {
 import type { LogicalType } from "@intellectual-frontiers/data/sql/logical";
 
 /** What a dialect can do beyond the common ground. */
-export type Feature = "comment-on" | "regex-check" | "add-constraint";
+export type Feature =
+  "comment-on" | "regex-check" | "add-constraint" | "or-replace-view" | "row-security" | "grants" | "routines" | "partitions";
 
 /** A literal a statement may hold. */
 export type Literal = string | number | boolean | null;
@@ -35,6 +36,10 @@ export interface Dialect {
   quote(name: string): string;
   literal(value: Literal): string;
   type(type: LogicalType): string;
+  /** Why the dialect cannot store a type, or nothing where it can (0009-sql-features FR-003). */
+  unsupported?(type: LogicalType): string | undefined;
+  /** Statements to run before the tables, for the types a schema uses (0009-sql-features FR-003). */
+  setup?(types: readonly LogicalType[]): readonly string[];
   /** A check that a column matches a regular expression, or none where the engine has no way to say it. */
   pattern?(column: string, pattern: string): string;
 }

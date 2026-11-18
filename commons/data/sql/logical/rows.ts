@@ -27,7 +27,9 @@ export type ValueOf<T extends Datatype> = T extends { readonly kind: "text" | "i
           ? unknown
           : T extends { readonly kind: "binary" }
             ? Uint8Array
-            : never;
+            : T extends { readonly kind: "vector" }
+              ? readonly number[]
+              : never;
 
 /** The concept a target gives. */
 export type TargetOf<T extends Target> = T extends () => infer C ? (C extends AnyConcept ? C : never) : T extends AnyConcept ? T : never;

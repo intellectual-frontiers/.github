@@ -31,13 +31,15 @@ const type = (t: LogicalType): string => {
       return "JSON";
     case "bytes":
       return "BLOB";
+    case "vector":
+      return `FLOAT[${t.dimensions}]`;
   }
 };
 
 /** DuckDB. */
 export const dialect: Dialect = {
   name: "duckdb",
-  features: ["comment-on", "regex-check"],
+  features: ["comment-on", "regex-check", "or-replace-view"],
   maxName: 255,
   now: "CURRENT_TIMESTAMP",
   quote: quoteName,

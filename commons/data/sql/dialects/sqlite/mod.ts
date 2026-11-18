@@ -23,6 +23,8 @@ const type = (t: LogicalType): string => {
       return "NUMERIC";
     case "bytes":
       return "BLOB";
+    case "vector":
+      return "BLOB"; // refused by `unsupported` before it is written
   }
 };
 
@@ -35,6 +37,7 @@ export const dialect: Dialect = {
   quote: quoteName,
   literal: standardLiteral,
   type,
+  unsupported: (t) => (t.kind === "vector" ? "SQLite has no vector type" : undefined),
 };
 
 /** The extension that contributes the dialect, or why its identifier is not one. */
