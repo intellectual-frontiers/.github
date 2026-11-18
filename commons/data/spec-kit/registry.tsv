@@ -10,3 +10,4 @@ number	slug	state
 0009	sql-features	in force
 0010	sql-generators	in force
 0011	sql-lifecycle	in force
+0012	sql-idempotency	in force

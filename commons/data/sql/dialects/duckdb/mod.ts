@@ -45,6 +45,14 @@ export const dialect: Dialect = {
   quote: quoteName,
   literal: standardLiteral,
   type,
+  ifExists: ["addColumn", "dropColumn", "dropTable", "dropIndex"],
+  probes: {
+    table: (t) => `SELECT 1 FROM duckdb_tables() WHERE schema_name = current_schema() AND table_name = ${standardLiteral(t)}`,
+    column: (t, c) =>
+      `SELECT 1 FROM duckdb_columns() WHERE schema_name = current_schema() AND table_name = ${standardLiteral(t)} AND column_name = ${standardLiteral(c)}`,
+    constraint: () => undefined,
+    index: (n) => `SELECT 1 FROM duckdb_indexes() WHERE schema_name = current_schema() AND index_name = ${standardLiteral(n)}`,
+  },
   pattern: (column, pattern) => `regexp_matches(${column}, ${standardLiteral(pattern)})`,
 };
 

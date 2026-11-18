@@ -14,6 +14,8 @@ export {
   dialectPoint,
   dialectsFrom,
   type Feature,
+  type IfExistsForm,
+  type Probes,
   type Literal,
   quoteName,
   standardLiteral,

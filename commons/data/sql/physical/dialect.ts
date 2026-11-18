@@ -30,6 +30,17 @@ export type Feature =
   | "partitions"
   | "alter-column";
 
+/** The forms of `DROP` and `ADD COLUMN` that a dialect writes with `IF [NOT] EXISTS` (0012-sql-idempotency FR-001). */
+export type IfExistsForm = "addColumn" | "dropColumn" | "dropConstraint" | "dropTable" | "dropIndex";
+
+/** Queries on a dialect's catalog that return a row if and only if the thing exists, or none where the engine cannot say (0012-sql-idempotency FR-001). */
+export interface Probes {
+  table(table: string): string;
+  column(table: string, column: string): string;
+  constraint(table: string, name: string): string | undefined;
+  index(name: string): string;
+}
+
 /** A literal a statement may hold. */
 export type Literal = string | number | boolean | null;
 
@@ -52,6 +63,10 @@ export interface Dialect {
     readonly nullable: boolean;
     readonly default?: LogicalDefault;
   }): string | undefined;
+  /** Which forms of `DROP` and `ADD COLUMN` the dialect writes with `IF [NOT] EXISTS`. */
+  readonly ifExists?: readonly IfExistsForm[];
+  /** How to ask the catalog whether a table, column, constraint or index exists. */
+  readonly probes?: Probes;
   /** Statements to run before the tables, for the types a schema uses (0009-sql-features FR-003). */
   setup?(types: readonly LogicalType[]): readonly string[];
   /** A check that a column matches a regular expression, or none where the engine has no way to say it. */

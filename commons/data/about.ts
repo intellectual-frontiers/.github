@@ -33,7 +33,7 @@ export const about: About = {
     },
     {
       path: "sql/lifecycle/",
-      what: "What changes a database from one physical schema to the next: the hashed state of a database, the changes between two states, the plan of classified steps, the hash-chained ledger and the run on a driver. Strategies and features of migration are extensions of it.",
+      what: "What changes a database from one physical schema to the next: the hashed state of a database, the changes between two states, the plan of classified steps, the hash-chained ledger and the run on a driver. Strategies and features of migration (idempotency first) are extensions of it.",
       mayImport: ["sql/physical/, sql/logical/, governance/, engine/, by package name"],
     },
     { path: "extensions/", what: "Extensions that need no database.", mayImport: ["governance/, engine/, by package name"] },

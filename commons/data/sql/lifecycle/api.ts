@@ -11,6 +11,8 @@ export { chainOf, type ChainBreak, type EntryKind, GENESIS, type LedgerEntry, ne
 export {
   type Desired,
   dueRepeatables,
+  type Guard,
+  type Idempotency,
   type ManualStep,
   plan,
   type Plan,
@@ -22,9 +24,12 @@ export {
   type Step,
   type StepClass,
   type StepDraft,
+  type StepStatement,
   type StepTransform,
+  transformPoint,
+  transformsFrom,
 } from "./plan.ts";
-export { type Applied, type Driver, execute, ledgerDdl, readLedger, type RunError, type RunOptions } from "./run.ts";
+export { type Applied, applyStatement, type Driver, execute, ledgerDdl, readLedger, type RunError, type RunOptions } from "./run.ts";
 export {
   canonicalState,
   emptyState,

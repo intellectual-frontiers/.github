@@ -9,12 +9,28 @@
 import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
 import type { Dialect } from "@intellectual-frontiers/data/sql/physical";
 import { type LedgerEntry, nextEntry, verifyChain, type ChainBreak } from "./ledger.ts";
-import { type Plan, type Repeatable, dueRepeatables } from "./plan.ts";
+import { type Plan, type Repeatable, type StepStatement, dueRepeatables } from "./plan.ts";
 
 /** A way to run statements on a database and read rows back. */
 export interface Driver {
   exec(sql: string): Promise<void>;
   query(sql: string): Promise<readonly Record<string, unknown>[]>;
+}
+
+/**
+ * Runs one statement of a step, unless its guard says its work is done.
+ *
+ * @param driver - the database
+ * @param statement - the statement
+ * @returns whether it was run
+ */
+export async function applyStatement(driver: Driver, statement: StepStatement): Promise<boolean> {
+  if (statement.guard !== undefined) {
+    const rows = await driver.query(statement.guard.query);
+    if (rows.length > 0 === (statement.guard.skipWhen === "rows")) return false;
+  }
+  await driver.exec(statement.sql);
+  return true;
 }
 
 /** What a run is given besides the plan. */
@@ -128,12 +144,12 @@ export async function execute(
   const todo = plan.steps.slice(Math.max(at, 0));
   const applied: string[] = [];
   const run = async (
-    statements: readonly string[],
+    statements: readonly StepStatement[],
     entry: Omit<LedgerEntry, "seq" | "chain" | "appliedAt" | "appliedBy">,
   ): Promise<RunError | undefined> => {
     try {
       await driver.exec("BEGIN");
-      for (const sql of statements) await driver.exec(sql);
+      for (const st of statements) await applyStatement(driver, st);
       const e = nextEntry(ledger, { ...entry, appliedAt: now(), appliedBy: by });
       await driver.exec(insert(dialect, table, e));
       await driver.exec("COMMIT");
@@ -149,10 +165,7 @@ export async function execute(
     }
   };
   for (const s of todo) {
-    const failed = await run(
-      s.up.map((x) => x.sql),
-      { kind: "step", key: s.id, name: s.name, from: s.from, to: s.to, hash: s.id },
-    );
+    const failed = await run(s.up, { kind: "step", key: s.id, name: s.name, from: s.from, to: s.to, hash: s.id });
     if (failed !== undefined) return err([failed]);
     applied.push(s.name);
   }
@@ -161,10 +174,7 @@ export async function execute(
   const due: readonly Repeatable[] = dueRepeatables(plan.repeatable, last);
   const repeated: string[] = [];
   for (const r of due) {
-    const failed = await run(
-      r.statements.map((x) => x.sql),
-      { kind: "repeatable", key: r.key, name: r.key, from: "", to: "", hash: r.hash },
-    );
+    const failed = await run(r.statements, { kind: "repeatable", key: r.key, name: r.key, from: "", to: "", hash: r.hash });
     if (failed !== undefined) return err([failed]);
     repeated.push(r.key);
   }

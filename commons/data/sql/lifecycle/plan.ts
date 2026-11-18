@@ -7,6 +7,7 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { type Composition, point } from "@intellectual-frontiers/data/engine";
 import { sameWords, type Column, type LogicalId, type LogicalSchema, type Table } from "@intellectual-frontiers/data/sql/logical";
 import {
   bind,
@@ -30,6 +31,19 @@ export type StepClass = "safe" | "data-dependent" | "destructive" | "manual";
 /** Whether a step can be undone. */
 export type Reversibility = "lossless" | "quarantine" | "irreversible";
 
+/** A query on the catalog and the answer that means a statement's work is done and it is to be skipped (0012-sql-idempotency FR-002). */
+export interface Guard {
+  readonly query: string;
+  /** `rows`: skip the statement when the query returns a row; `none`: skip it when the query returns none. */
+  readonly skipWhen: "rows" | "none";
+}
+
+/** A statement of a step, which may carry a guard. */
+export type StepStatement = Statement & { readonly guard?: Guard };
+
+/** How a step is safe to run twice: `natural` (every statement is), `guarded` (some are guarded and none is left) or `ledger-only` (some cannot be, so only the ledger keeps it from running twice). */
+export type Idempotency = "natural" | "guarded" | "ledger-only";
+
 /** A step: a change made into statements, from the state it needs to the state it leaves. */
 export interface Step {
   /** Made of the step's content: the states, the key and the statements. */
@@ -47,8 +61,12 @@ export interface Step {
   readonly from: string;
   /** The hash of the state it leaves. */
   readonly to: string;
-  readonly up: readonly Statement[];
-  readonly down?: readonly Statement[];
+  readonly up: readonly StepStatement[];
+  readonly down?: readonly StepStatement[];
+  /** How it is safe to run twice, where an idempotency transform has said. */
+  readonly idempotency?: Idempotency;
+  /** The change it makes, which an extension of the lifecycle reads. */
+  readonly change: Change;
   /** The logical elements it is made from. */
   readonly of: readonly LogicalId[];
   /** Whether a person wrote its statements. */
@@ -81,6 +99,7 @@ export type PlanError =
   | { readonly kind: "refused"; readonly key: string; readonly name: string; readonly class: StepClass; readonly why: string }
   | { readonly kind: "manual"; readonly key: string; readonly name: string; readonly why: string }
   | { readonly kind: "unresolved"; readonly resolves: string }
+  | { readonly kind: "not-idempotent"; readonly key: string; readonly name: string }
   | { readonly kind: "inconsistent"; readonly expected: string; readonly got: string };
 
 /** A step a person wrote, for a change the lifecycle cannot or may not make by itself. */
@@ -90,6 +109,8 @@ export interface ManualStep {
   readonly name: string;
   readonly up: readonly string[];
   readonly down?: readonly string[];
+  /** A guard for every statement of the step, which makes it safe to run twice. */
+  readonly guard?: Guard;
 }
 
 /** What a transform is given. */
@@ -118,7 +139,20 @@ export interface PlanOptions {
   readonly allow?: { readonly destructive?: boolean };
   readonly manual?: readonly ManualStep[];
   readonly transforms?: readonly StepTransform[];
+  /** Refuse, as an error value, a step that is only safe to run twice because of the ledger (0012-sql-idempotency FR-007). */
+  readonly requireIdempotent?: boolean;
 }
+
+/** The contribution point an extension of the lifecycle fills to change the steps of a plan before they are hashed. */
+export const transformPoint = point<StepTransform>("lifecycle.transform");
+
+/**
+ * The transforms of a composition, in its order.
+ *
+ * @param composition - the project's composition
+ * @returns the transforms its extensions contribute
+ */
+export const transformsFrom = (composition: Composition): readonly StepTransform[] => composition.contributions(transformPoint);
 
 /**
  * The steps that take a database from one state to the schema wanted.
@@ -176,7 +210,7 @@ export function plan(
   const stmt = (group: Statement["group"], sql: string, of: readonly LogicalId[]): Statement => ({ group, origin: "core", sql, of });
   const can = (f: Dialect["features"][number]): boolean => dialect.features.includes(f);
 
-  type Made = Omit<StepDraft, "name" | "kind" | "key" | "manual"> | { readonly manualNeeded: string };
+  type Made = Omit<StepDraft, "name" | "kind" | "key" | "manual" | "change"> | { readonly manualNeeded: string };
   const make = (c: Change): Made => {
     const T = (t: TableRef): string => q(t.name);
     const sql = (...parts: string[]): string => `${parts.join(" ")};`;
@@ -476,6 +510,12 @@ export function plan(
     }
   };
 
+  const handWritten =
+    (of: readonly LogicalId[], guard: Guard | undefined) =>
+    (s: string): StepStatement => ({
+      ...stmt("table", s.trim().endsWith(";") ? s.trim() : `${s.trim()};`, of),
+      ...(guard === undefined ? {} : { guard }),
+    });
   const manual = new Map((options.manual ?? []).map((m) => [m.resolves, m]));
   const used = new Set<string>();
   const drafts: { readonly draft: StepDraft; readonly change: Change }[] = [];
@@ -486,22 +526,23 @@ export function plan(
     if (m !== undefined) {
       used.add(c.key);
       const of = "of" in made ? made.of : [];
-      drafts.push({
+      let written: StepDraft = {
+        ...base,
+        name: m.name,
+        class: "manual",
+        why: "written by a person",
+        reversibility: m.down === undefined ? "irreversible" : "lossless",
+        up: m.up.map(handWritten(of, m.guard)),
+        ...(m.down === undefined ? {} : { down: m.down.map(handWritten(of, m.guard)) }),
+        ...(m.guard === undefined ? {} : { idempotency: "guarded" as const }),
         change: c,
-        draft: {
-          ...base,
-          name: m.name,
-          class: "manual",
-          why: "written by a person",
-          reversibility: m.down === undefined ? "irreversible" : "lossless",
-          up: m.up.map((s) => stmt("table", s.trim().endsWith(";") ? s.trim() : `${s.trim()};`, of)),
-          ...(m.down === undefined
-            ? {}
-            : { down: m.down.map((s) => stmt("table", s.trim().endsWith(";") ? s.trim() : `${s.trim()};`, of)) }),
-          of,
-          manual: true,
-        },
-      });
+        of,
+        manual: true,
+      };
+      for (const t of options.transforms ?? []) written = t(written, context);
+      if (options.requireIdempotent === true && written.idempotency === "ledger-only")
+        errors.push({ kind: "not-idempotent", key: written.key, name: written.name });
+      drafts.push({ change: c, draft: written });
       continue;
     }
     if ("manualNeeded" in made) {
@@ -510,8 +551,10 @@ export function plan(
     }
     if (made.class === "destructive" && options.allow?.destructive !== true)
       errors.push({ kind: "refused", key: c.key, name: base.name, class: made.class, why: made.why ?? "it loses data" });
-    let draft: StepDraft = { ...base, ...made, manual: false };
+    let draft: StepDraft = { ...base, ...made, change: c, manual: false };
     for (const t of options.transforms ?? []) draft = t(draft, context);
+    if (options.requireIdempotent === true && draft.idempotency === "ledger-only")
+      errors.push({ kind: "not-idempotent", key: draft.key, name: draft.name });
     drafts.push({ change: c, draft });
   }
   for (const k of manual.keys()) if (!used.has(k)) errors.push({ kind: "unresolved", resolves: k });
@@ -526,7 +569,7 @@ export function plan(
     state = applyChange(state, change);
     const last = i === drafts.length - 1;
     const next = stateHash(last ? { ...state, naming: to.naming } : state);
-    const id = hashOf({ from: at, to: next, key: draft.key, up: draft.up.map((s) => s.sql) });
+    const id = hashOf({ from: at, to: next, key: draft.key, up: draft.up.map((s) => [s.sql, s.guard]) });
     steps.push({ ...draft, id, from: at, to: next });
     at = next;
   });

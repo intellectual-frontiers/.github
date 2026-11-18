@@ -22,7 +22,8 @@
     "./sql/extensions/access": "./sql/extensions/access/mod.ts",
     "./sql/extensions/routines": "./sql/extensions/routines/mod.ts",
     "./sql/extensions/partitions": "./sql/extensions/partitions/mod.ts",
-    "./sql/extensions/generators": "./sql/extensions/generators/mod.ts"
+    "./sql/extensions/generators": "./sql/extensions/generators/mod.ts",
+    "./sql/extensions/idempotency": "./sql/extensions/idempotency/mod.ts"
   },
   "scripts": {
     "check": "tsc -p tsconfig.json",

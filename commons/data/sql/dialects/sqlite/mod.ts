@@ -37,6 +37,13 @@ export const dialect: Dialect = {
   quote: quoteName,
   literal: standardLiteral,
   type,
+  ifExists: ["dropTable", "dropIndex"],
+  probes: {
+    table: (t) => `SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ${standardLiteral(t)}`,
+    column: (t, c) => `SELECT 1 FROM pragma_table_info(${standardLiteral(t)}) WHERE name = ${standardLiteral(c)}`,
+    constraint: () => undefined,
+    index: (n) => `SELECT 1 FROM sqlite_master WHERE type = 'index' AND name = ${standardLiteral(n)}`,
+  },
   addColumnRefusal: (c) =>
     !c.nullable && c.default === undefined
       ? "SQLite cannot add a required column that has no default to a table"
