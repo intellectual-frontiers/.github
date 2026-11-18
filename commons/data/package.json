@@ -4,7 +4,9 @@
   "version": "0.0.0",
   "description": "Intellectual Frontiers data: governance, a logical and a physical schema, and extensions, built on IFC TypeScript's kernel. Phase 0 spike.",
   "type": "module",
-  "engines": { "node": ">=26" },
+  "engines": {
+    "node": ">=26"
+  },
   "exports": {
     "./engine": "./engine/api.ts",
     "./governance": "./governance/api.ts",
@@ -14,7 +16,8 @@
   "scripts": {
     "check": "tsc -p tsconfig.json",
     "test": "bun test suite/",
-    "test:node": "node --test \"suite/**/*.test.ts\""
+    "test:node": "node --test \"suite/**/*.test.ts\"",
+    "verify": "tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../ts/mizan/check.ts --root spec-kit && bun test suite/"
   },
   "devDependencies": {
     "@intellectual-frontiers/commons": "link:../ts",
