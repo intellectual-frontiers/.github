@@ -179,3 +179,13 @@ requirement	mechanism	by	note
 0015-sql-safety FR-010	check	.github: cd commons/data && bun run verify	suite/safety.test.ts: each step says what must be true after it, and a structural step finds the same number of rows
 0015-sql-safety FR-011	check	.github: cd commons/data && bun run verify	suite/safety.test.ts: every feature is on by default and every setting can be changed
 0015-sql-safety FR-012	check	.github: cd commons/data && bun run verify	suite/safety.test.ts: with the protection layer and idempotency, a column dropped on three engines is kept in quarantine and the steps are safe to run twice
+0016-sql-plan-report FR-001	check	.github: cd commons/data && bun run verify	suite/plan-report.test.ts: the report gives the dialect, the states, the counts and each step's class, reversibility and idempotency
+0016-sql-plan-report FR-002	check	.github: cd commons/data && bun run verify	suite/plan-report.test.ts: each step's lock is an estimate from what the engine documents, and says the engine allows one writer where it has no locks
+0016-sql-plan-report FR-003	check	.github: cd commons/data && bun run verify	suite/plan-report.test.ts: for what a step removes the report says what governance said of it: personal data, classification, retention
+0016-sql-plan-report FR-004	check	.github: cd commons/data && bun run verify	suite/plan-report.test.ts: the report says what governance itself changes between the schemas
+0016-sql-plan-report FR-005	check	.github: cd commons/data && bun run verify	suite/plan-report.test.ts: the report names the approvers of each step with the reason: steward or owner, and the roles for personal data, restricted and destructive steps
+0016-sql-plan-report FR-006	check	.github: cd commons/data && bun run verify	suite/plan-report.test.ts: the report says what is new, with the descriptions governance gave
+0016-sql-plan-report FR-007	check	.github: cd commons/data && bun run verify	suite/plan-report.test.ts: the report is Markdown and JSON with the same content, the same every time, escaped, and given as files
+0016-sql-plan-report FR-008	check	.github: cd commons/data && bun run verify	suite/plan-report.test.ts: where the schema before is not given the report says it does not know
+0016-sql-plan-report FR-009	check	.github: cd commons/data && bun run verify	suite/plan-report.test.ts: the settings are typed with defaults and can be changed
+0016-sql-plan-report FR-010	check	.github: cd commons/data && bun run verify	suite/plan-report.test.ts: the report is recorded in a table, one row for each step, loaded twice with the same rows, on three engines

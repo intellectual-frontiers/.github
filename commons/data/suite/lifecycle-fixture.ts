@@ -22,7 +22,7 @@ import type { Driver } from "@intellectual-frontiers/data/sql/lifecycle";
 import type { Engine } from "./engines-fixture.ts";
 import { projected } from "./logical-fixture.ts";
 
-const { lifecycle, quality } = vocabularies;
+const { lifecycle, quality, privacy, security, ownership, requirements } = vocabularies;
 
 const genre = (codes: readonly string[]) =>
   codeList("genre", {
@@ -31,8 +31,10 @@ const genre = (codes: readonly string[]) =>
     annotations: [annotate(quality.openness, "open")],
   });
 
+const governedAuthor = [annotate(ownership.steward, "librarian"), annotate(requirements.cites, ["0004-arca FR-001"])];
+
 /** The domain at a version: 1 is the first, 2 adds columns, a table and a code, 3 renames a column and drops one. */
-export function libraryAt(version: 1 | 2 | 3, shim = true, scratch = false): LogicalSchema {
+export function libraryAt(version: 1 | 2 | 3, shim = true, scratch = false, governed = false): LogicalSchema {
   const g = genre(version === 1 ? ["fiction", "poetry"] : ["fiction", "poetry", "drama"]);
   const author = concept("author", {
     definition: "Someone who writes",
@@ -45,6 +47,7 @@ export function libraryAt(version: 1 | 2 | 3, shim = true, scratch = false): Log
       ...(version === 2 ? { born: attribute(date(), { definition: "The day it was born", multiplicity: "optional" }) } : {}),
     },
     identifiedBy: ["id"],
+    annotations: governed ? governedAuthor : [],
   });
   // the version 1 name of the column is `name`: a renamed attribute keeps its key in governance, so the first versions call it `name`
   const authorV1 = concept("author", {
@@ -54,15 +57,29 @@ export function libraryAt(version: 1 | 2 | 3, shim = true, scratch = false): Log
       name: attribute(text(), { definition: "What it is called" }),
     },
     identifiedBy: ["id"],
+    annotations: governed ? governedAuthor : [],
   });
   const authorV2 = concept("author", {
     definition: "Someone who writes",
     attributes: {
       id: attribute(identifier(), { definition: "What identifies it" }),
       name: attribute(text(), { definition: "What it is called" }),
-      born: attribute(date(), { definition: "The day it was born", multiplicity: "optional" }),
+      born: attribute(date(), {
+        definition: "The day it was born",
+        multiplicity: "optional",
+        ...(governed
+          ? {
+              annotations: [
+                annotate(privacy.personal, { category: "BirthDate", purposes: ["catalogue"] }),
+                annotate(security.classification, "restricted"),
+                annotate(quality.retention, { days: 365 }),
+              ],
+            }
+          : {}),
+      }),
     },
     identifiedBy: ["id"],
+    annotations: governed ? governedAuthor : [],
   });
   const a = version === 1 ? authorV1 : version === 2 ? authorV2 : author;
   const book = concept("book", {

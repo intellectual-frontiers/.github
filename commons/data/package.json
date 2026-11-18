@@ -25,7 +25,8 @@
     "./sql/extensions/generators": "./sql/extensions/generators/mod.ts",
     "./sql/extensions/idempotency": "./sql/extensions/idempotency/mod.ts",
     "./sql/extensions/protected-access": "./sql/extensions/protected-access/mod.ts",
-    "./sql/extensions/safety": "./sql/extensions/safety/mod.ts"
+    "./sql/extensions/safety": "./sql/extensions/safety/mod.ts",
+    "./sql/extensions/plan-report": "./sql/extensions/plan-report/mod.ts"
   },
   "scripts": {
     "check": "tsc -p tsconfig.json",
