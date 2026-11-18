@@ -13,7 +13,7 @@ export const about: About = {
   title: "Data",
   summary:
     "Governance (what a business domain is and what must be true of its data), a logical schema made from it, and a physical schema for " +
-    "PostgreSQL, SQLite or DuckDB made from that, with extensions to each, and the lifecycle that changes a database from one physical schema to the next. A library of commons with its own specifications. Roadmap: views that leave out removed rows, a type change that proves it loses nothing, masks and vector indexes as features, and interchange formats for other migration tools (Flyway, Liquibase and Atlas exports).",
+    "PostgreSQL, SQLite or DuckDB made from that, with extensions to each, and the lifecycle that changes a database from one physical schema to the next. Modules (governance/module.ts: a subject area as a value that a project composes with others into one domain, so that a module not listed has no table) let a project adopt only the models it needs. A library of commons with its own specifications. Roadmap: views that leave out removed rows, a type change that proves it loses nothing, masks and vector indexes as features, and interchange formats for other migration tools (Flyway, Liquibase and Atlas exports).",
   folders: [
     { path: "spec-kit/", what: "The library's own specifications, numbered from 0001.", mayImport: ["nothing: Markdown and TSV"] },
     {

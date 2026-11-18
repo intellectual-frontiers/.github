@@ -42,7 +42,7 @@ export type UnitClass =
 export type Unit = { readonly name: string; readonly class: UnitClass };
 
 /** The rules of this check. */
-export type LayerRule = "layers/unclassified" | "layers/relative" | "layers/private" | "layers/external" | "layers/above" | "layers/around";
+export type LayerRule = "layers/unclassified" | "layers/relative" | "layers/private" | "layers/external" | "layers/above" | "layers/around" | "layers/cycle";
 
 /** A finding of this check, in the shape the kernel's baseline holds (`trace.Keyed`). */
 export type LayerFinding = trace.Keyed & { readonly rule: LayerRule };
@@ -77,7 +77,7 @@ export const MAY_IMPORT: Readonly<Record<UnitClass, readonly UnitClass[]>> = {
   dialect: ["physical", "logical", "governance", "engine"],
   sqlextension: ["lifecycle", "physical", "logical", "governance", "engine"],
   preset: ["sqlextension", "lifecycle", "physical", "logical", "governance", "engine"],
-  model: ["governance", "engine"],
+  model: ["governance", "engine", "model"],
   extension: ["governance", "engine"],
   cli: ["preset", "sqlextension", "dialect", "lifecycle", "physical", "logical", "governance", "engine", "extension", "model"],
   suite: ["engine", "governance", "logical", "physical", "lifecycle", "dialect", "sqlextension", "preset", "model", "extension", "cli", "examples"],
@@ -157,6 +157,8 @@ function make(rule: LayerRule, file: string, line: number, message: string, abou
  */
 export function layerFindings(files: readonly trace.SourceFile[], exportsMap: Readonly<Record<string, string>>): readonly LayerFinding[] {
   const out: LayerFinding[] = [];
+  // the imports of one model by another (0028-modules FR-006): they must not make a cycle
+  const among = new Map<string, Map<string, { readonly file: string; readonly line: number }>>();
   for (const file of files) {
     const here = unitOf(file.path);
     if (here === undefined) {
@@ -186,6 +188,11 @@ export function layerFindings(files: readonly trace.SourceFile[], exportsMap: Re
           out.push(make("layers/private", file.path, line, `it imports ${specifier}, which exports does not name`, specifier));
           continue;
         }
+        if (here.class === "model" && target.class === "model" && target.name !== here.name) {
+          const to = among.get(here.name) ?? new Map<string, { readonly file: string; readonly line: number }>();
+          if (!to.has(target.name)) to.set(target.name, { file: file.path, line });
+          among.set(here.name, to);
+        }
         if (target.name === here.name || MAY_IMPORT[here.class].includes(target.class)) continue;
         const climbs = LEVEL[target.class] > LEVEL[here.class];
         out.push(
@@ -206,5 +213,18 @@ export function layerFindings(files: readonly trace.SourceFile[], exportsMap: Re
       }
     }
   }
+  // a cycle among models: found once, at the import that closes it
+  const state = new Map<string, "visiting" | "done">();
+  const walk = (from: string, path: readonly string[]): void => {
+    state.set(from, "visiting");
+    for (const [to, at] of among.get(from) ?? []) {
+      if (state.get(to) === "visiting") {
+        const loop = [...path.slice(path.indexOf(to)), to];
+        out.push(make("layers/cycle", at.file, at.line, `${from} imports ${to}, which imports ${from} again: ${loop.join(" -> ")}`, loop.join(">")));
+      } else if (state.get(to) === undefined) walk(to, [...path, to]);
+    }
+    state.set(from, "done");
+  };
+  for (const from of [...among.keys()].sort()) if (state.get(from) === undefined) walk(from, [from]);
   return out;
 }

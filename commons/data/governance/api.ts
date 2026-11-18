@@ -16,6 +16,7 @@ export {
   annotationsOf,
 } from "./annotation.ts";
 export { type AnyCodeList, type CodeList, type CodeListSpec, type CodeSpec, codeList } from "./codelist.ts";
+export { type ComposeError, composeModules, defineModule, type Module, moduleOf, type ModuleSpec, withRequired } from "./module.ts";
 export {
   binary,
   type BinaryType,

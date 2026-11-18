@@ -110,7 +110,7 @@ footer { margin-top: 4rem; padding-top: 1rem; border-top: 1px solid var(--line);
 <code class="pkg">@intellectual-frontiers/data</code>
 <h1>Governance in, SQL out, and a safe way to change the database</h1>
 <p class="lede">A library of Intellectual Frontiers commons. A governance layer says what a business domain is and what must be true of its data; a logical schema is made from it; a physical schema for PostgreSQL, SQLite or DuckDB is made from that; a lifecycle layer changes a database from one physical schema to the next; and extensions add the rest.</p>
-<p class="small">Version 0.0.0, conformance level L1, private package, Node &ge; 26 (Bun is the default runtime). Specifications 0001 to 0027 are in force, in <code>spec-kit/</code>.</p>
+<p class="small">Version 0.0.0, conformance level L1, private package, Node &ge; 26 (Bun is the default runtime). Specifications 0001 to 0028 are in force, in <code>spec-kit/</code>.</p>
 </header>
 
 <section id="purpose">
@@ -275,6 +275,16 @@ annotate(vocabularies.security.classification, "confidential");</code></pre>
 
 <h3>References for text written by people</h3>
 <p><code>refsOf(schema, dialect, naming, inSchema?)</code> (0007) gives the written, quoted, qualified name of a table or column from the words of its name, in any case style, and keeps what is not there as an error value. Transforms use it; so can any SQL a person writes.</p>
+
+<h3>Modules</h3>
+<p>Arca is one domain. A general-purpose business model is many subject areas, and a project wants some of them. A <strong>module</strong> (<code>governance/module.ts</code>, 0028) is one subject area as a value: <code>defineModule({ name, requires, concepts, codeLists })</code>, or <code>moduleOf(domain)</code> for a domain that is already valid (Arca). Its concepts may refer to the concepts of the modules it requires, so a module is not validated alone; <code>composeModules(name, spec, modules)</code> makes <em>one</em> domain of the modules a project lists, validated whole, and projecting that makes tables only for the listed modules, so there is nothing to prune and no dangling foreign key.</p>
+<ul>
+<li><strong>Nothing is added for the project.</strong> A required module that is not listed, a cycle, two modules with one name and a concept that two modules both define are error values. <code>withRequired(all, ["invoicing"])</code> gives the closure in order, as a plain list a project can read.</li>
+<li><strong>References run down the requirement only.</strong> A concept may refer only to concepts and code lists of its own module or of one it requires, directly or through what those require; a reference sideways, even to a listed peer, is an <code>undeclared-dependency</code> error. An optional link between two peers is therefore a module of its own that requires both (a bridge), not an optional column in either.</li>
+<li><strong>Layers.</strong> A model may import the models it requires, through its entry of <code>exports</code>; the check reports a cycle among models (<code>layers/cycle</code>). The composed domain carries the project's name, so a project keeps one name for it.</li>
+</ul>
+<pre><code>const billing = defineModule({ name: "billing", requires: ["arcaParty"], concepts: [billingAccount], codeLists: [accountStatus] });
+const app = composeModules("shop", { definition: "A shop" }, [moduleOf(partyDomain.value), billing]);</code></pre>
 
 <h3>Generating files</h3>
 <p><code>generate(schema, { generators, naming?, dialect? })</code> runs <code>Generator</code>s and returns <code>Artifact</code>s (<code>{ path, text }</code>); a generator reads only what it is given and gives the same text for the same input. Writing the files to disk is not a generator's job.</p>
@@ -563,7 +573,7 @@ connect(driver, dialect, schema, { dialect }, p.convergence!, { ...p.planOptions
 <pre><code>cd commons/data &amp;&amp; bun run verify</code></pre>
 <p>which runs, in order (<code>package.json</code>): the TypeScript compiler (<code>tsc -p tsconfig.json</code>); the specification checker on <code>spec-kit/</code> (<code>mizan-check.ts --root spec-kit</code>); the Mizan rules at level L1 on it; <code>tools/check.ts</code>, the trace of sources and tests to the specifications and the layers check, held against <code>trace.baseline.txt</code>, which only shrinks; and <code>bun test suite/</code>. <code>bun run test:node</code> runs the same tests under <code>node --test</code>.</p>
 <ul>
-<li><strong>Spec kit.</strong> Twenty-seven specifications, <code>0001-layers</code> to <code>0027-sql-osquery-atc</code>, each <code>spec-kit/specs/&lt;number-slug&gt;/spec.md</code> with an input paragraph, numbered requirements (<code>FR-nnn</code>), edge cases, success criteria and an out-of-scope list; <code>registry.tsv</code> lists them, all in force.</li>
+<li><strong>Spec kit.</strong> Twenty-eight specifications, <code>0001-layers</code> to <code>0028-modules</code>, each <code>spec-kit/specs/&lt;number-slug&gt;/spec.md</code> with an input paragraph, numbered requirements (<code>FR-nnn</code>), edge cases, success criteria and an out-of-scope list; <code>registry.tsv</code> lists them, all in force.</li>
 <li><strong><code>enforcement.tsv</code>.</strong> Says what enforces each requirement (0024-spec-format): a <code>mechanism</code> of <code>check</code>, <code>gate</code>, <code>review</code> or <code>none</code>, and by what. At the time of writing 230 of its rows are a <code>check</code> by <code>cd commons/data &amp;&amp; bun run verify</code>, and one (0001 FR-012, the logical and physical naming conventions) is marked <code>none</code> with the note <em>Planned</em>.</li>
 <li><strong><code>proves()</code>.</strong> A test is <code>suite/&lt;kebab-case&gt;.test.ts</code> on IFC TypeScript, and <code>proves(["0001-layers FR-004"], "what it shows", fn)</code> names the requirements it proves, which the trace joins to the specifications. The sources carry <code>// Spec:</code> headers for the same join.</li>
 <li><strong>Real engines.</strong> <code>suite/engines-fixture.ts</code> opens SQLite (the runtime's <code>node:sqlite</code>), DuckDB (<code>@duckdb/node-api</code>) and PostgreSQL (PGlite, in process), in memory, and the tests load what <code>bind</code> and <code>execute</code> make and read the structure back. There is no stand-in for an engine.</li>
@@ -634,6 +644,7 @@ connect(driver, dialect, schema, { dialect }, p.convergence!, { ...p.planOptions
 <tr><td>0025</td><td>sql-target</td><td>a database that is a build product: one deterministic SQL file</td></tr>
 <tr><td>0026</td><td>sql-kinds</td><td>reference data kept as CSV, typed rows, a TypeScript module</td></tr>
 <tr><td>0027</td><td>sql-osquery-atc</td><td>the osquery auto_table_construction configuration</td></tr>
+<tr><td>0028</td><td>modules</td><td>subject areas composed by a project into one domain</td></tr>
 </tbody>
 </table>
 <footer>This page is written by hand from <code>about.ts</code>, <code>library.ts</code>, <code>package.json</code>, the specifications in <code>spec-kit/specs/</code> and the sources under <code>engine/</code>, <code>governance/</code>, <code>models/</code> and <code>sql/</code>. The short introduction is <code>README.md</code>.</footer>
