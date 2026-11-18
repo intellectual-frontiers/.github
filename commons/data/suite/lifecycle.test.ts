@@ -388,7 +388,7 @@ proves(
     };
     const one = mk(1);
     assert(
-      one.repeatable.length > 0 && one.repeatable.every((r) => r.key !== "" && /^[0-9a-f]{64}$/.test(r.hash) && r.statements.length === 1),
+      one.repeatable.length > 0 && one.repeatable.every((r) => r.key !== "" && /^[0-9a-f]{64}$/.test(r.hash) && r.statements.length >= 1),
     );
     same(new Set(one.repeatable.map((r) => r.key)).size, one.repeatable.length);
     const applied = new Map(one.repeatable.map((r) => [r.key, r.hash]));
@@ -397,6 +397,18 @@ proves(
     const due = dueRepeatables(two.repeatable, applied);
     assert(due.length > 0 && due.length < two.repeatable.length + 1);
     assert(dueRepeatables(two.repeatable, new Map()).length === two.repeatable.length);
+    // what is made from an element a step changed is due again, whatever its text
+    const first = one.repeatable.find((r) => r.of.length > 0);
+    assert(first !== undefined);
+    if (first !== undefined) {
+      same(
+        dueRepeatables(one.repeatable, applied, new Set(first.of.slice(0, 1)))
+          .map((r) => r.key)
+          .includes(first.key),
+        true,
+      );
+      same(dueRepeatables(one.repeatable, applied, new Set(["table:nowhere"])).length, 0);
+    }
     // the core's own tables are steps and never repeatable
     assert(two.repeatable.every((r) => r.statements.every((s) => s.origin === "extension" || s.group === "setup")));
   },

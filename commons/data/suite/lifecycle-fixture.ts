@@ -32,7 +32,7 @@ const genre = (codes: readonly string[]) =>
   });
 
 /** The domain at a version: 1 is the first, 2 adds columns, a table and a code, 3 renames a column and drops one. */
-export function libraryAt(version: 1 | 2 | 3): LogicalSchema {
+export function libraryAt(version: 1 | 2 | 3, shim = true): LogicalSchema {
   const g = genre(version === 1 ? ["fiction", "poetry"] : ["fiction", "poetry", "drama"]);
   const author = concept("author", {
     definition: "Someone who writes",
@@ -40,7 +40,7 @@ export function libraryAt(version: 1 | 2 | 3): LogicalSchema {
       id: attribute(identifier(), { definition: "What identifies it" }),
       fullName: attribute(text(), {
         definition: "What it is called",
-        ...(version === 3 ? { annotations: [annotate(lifecycle.renamedFrom, "name")] } : {}),
+        ...(version === 3 && shim ? { annotations: [annotate(lifecycle.renamedFrom, "name")] } : {}),
       }),
       ...(version === 2 ? { born: attribute(date(), { definition: "The day it was born", multiplicity: "optional" }) } : {}),
     },

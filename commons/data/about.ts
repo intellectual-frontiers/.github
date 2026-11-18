@@ -13,7 +13,7 @@ export const about: About = {
   title: "Data",
   summary:
     "Governance (what a business domain is and what must be true of its data), a logical schema made from it, and a physical schema for " +
-    "PostgreSQL, SQLite or DuckDB made from that, with extensions to each. A library of commons with its own specifications; the engine and governance are built, the logical and physical schemas follow.",
+    "PostgreSQL, SQLite or DuckDB made from that, with extensions to each, and the lifecycle that changes a database from one physical schema to the next. A library of commons with its own specifications. Roadmap: views that leave out removed rows, parallel versions of an API, quarantine instead of drop, the strategies (history and convergence), and interchange formats for other migration tools.",
   folders: [
     { path: "spec-kit/", what: "The library's own specifications, numbered from 0001.", mayImport: ["nothing: Markdown and TSV"] },
     {
@@ -28,7 +28,7 @@ export const about: About = {
     },
     {
       path: "sql/",
-      what: "The logical schema (tables, columns, keys and indexes made from governance by a projection, with the report of the flow and the types of rows), the physical schema (a logical schema bound to a dialect and a case style, as statements) and the dialects of PostgreSQL, SQLite and DuckDB, which are extensions; the extensions are in sql/extensions/: documentation (comments, documentation tables, governance tables), views, access (row-level security and grants from governance), routines and partitions; names that carry a schema are in sql/physical/; the generators (diagrams in Mermaid and D2, the data dictionary in Markdown and HTML, row types in Rust and Zod, the register of personal data and security) are in sql/extensions/generators/",
+      what: "The logical schema (tables, columns, keys and indexes made from governance by a projection, with the report of the flow and the types of rows), the physical schema (a logical schema bound to a dialect and a case style, as statements) and the dialects of PostgreSQL, SQLite and DuckDB, which are extensions; the extensions are in sql/extensions/: documentation (comments, documentation tables, governance tables), views, access (row-level security and grants from governance), routines and partitions; names that carry a schema are in sql/physical/; protected access (tables in a schema, views over them, rights and a guard) is in sql/extensions/protected-access/; the generators (diagrams in Mermaid and D2, the data dictionary in Markdown and HTML, row types in Rust and Zod, the register of personal data and security) are in sql/extensions/generators/",
       mayImport: ["governance/, engine/, by package name"],
     },
     {

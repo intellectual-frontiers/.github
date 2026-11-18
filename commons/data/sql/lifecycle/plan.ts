@@ -79,7 +79,10 @@ export interface Repeatable {
   readonly key: string;
   /** The hash of its text. */
   readonly hash: string;
+  /** The statements that make it, applied together. */
   readonly statements: readonly Statement[];
+  /** The elements it is made from: when a step changes one, it is applied again. */
+  readonly of: readonly LogicalId[];
 }
 
 /** A plan. */
@@ -126,7 +129,13 @@ export interface PlanContext {
 export type StepDraft = Omit<Step, "id" | "from" | "to">;
 
 /** A change an extension makes to the steps of a plan before they are hashed (idempotency, safety). */
-export type StepTransform = (draft: StepDraft, context: PlanContext) => StepDraft;
+export type StepTransform = (draft: StepDraft, context: StepContext) => StepDraft;
+
+/** What a transform is given: the plan's context and the states a step is between, so that it can write what depends on the tables it changes (0014-sql-protected-access FR-010). */
+export interface StepContext extends PlanContext {
+  readonly before: State;
+  readonly after: State;
+}
 
 /** What a plan is made for. */
 export interface Desired {
@@ -208,6 +217,16 @@ export function plan(
   const names = writeNames(schema, dialect, naming, [], desired.schema);
   const x = expressor(dialect, naming, names, []);
   const context: PlanContext = { dialect, naming, schema };
+  // the state before and after each change, for the transforms
+  const between: { readonly before: State; readonly after: State }[] = [];
+  {
+    let s = start;
+    for (const c of changes) {
+      const next = applyChange(s, c);
+      between.push({ before: s, after: next });
+      s = next;
+    }
+  }
   const q = (n: string): string => dialect.quote(n);
   const tableByWords = (words: readonly string[]): Table | undefined => schema.tables.find((t) => sameWords(t.name, words));
   const idOfTable = (words: readonly string[]): LogicalId[] => {
@@ -529,7 +548,8 @@ export function plan(
   const manual = new Map((options.manual ?? []).map((m) => [m.resolves, m]));
   const used = new Set<string>();
   const drafts: { readonly draft: StepDraft; readonly change: Change }[] = [];
-  for (const c of changes) {
+  for (const [index, c] of changes.entries()) {
+    const sc: StepContext = { ...context, ...(between[index] ?? { before: start, after: start }) };
     const made = make(c);
     const base = { kind: c.kind, key: c.key, name: nameOf(c) };
     const m = manual.get(c.key);
@@ -549,7 +569,7 @@ export function plan(
         of,
         manual: true,
       };
-      for (const t of options.transforms ?? []) written = t(written, context);
+      for (const t of options.transforms ?? []) written = t(written, sc);
       if (options.requireIdempotent === true && written.idempotency === "ledger-only")
         errors.push({ kind: "not-idempotent", key: written.key, name: written.name });
       drafts.push({ change: c, draft: written });
@@ -562,7 +582,7 @@ export function plan(
     if (made.class === "destructive" && options.allow?.destructive !== true)
       errors.push({ kind: "refused", key: c.key, name: base.name, class: made.class, why: made.why ?? "it loses data" });
     let draft: StepDraft = { ...base, ...made, change: c, manual: false };
-    for (const t of options.transforms ?? []) draft = t(draft, context);
+    for (const t of options.transforms ?? []) draft = t(draft, sc);
     if (options.requireIdempotent === true && draft.idempotency === "ledger-only")
       errors.push({ kind: "not-idempotent", key: draft.key, name: draft.name });
     drafts.push({ change: c, draft });
@@ -587,25 +607,35 @@ export function plan(
     errors.push({ kind: "inconsistent", expected: toHash, got: at });
   if (errors.length > 0) return err(errors);
 
-  // what extensions add, and the setup, which are applied again when their text changes
-  const seen = new Map<string, number>();
-  const repeatable: Repeatable[] = [];
+  // what extensions add, and the setup, which are applied again when their text changes: the statements of one group that are made from the same elements are one unit
+  const units = new Map<string, { statements: Statement[]; of: Set<LogicalId> }>();
   for (const s of bound.value.statements) {
     if (!(s.origin === "extension" || s.group === "setup")) continue;
-    const base = `${s.group}:${s.of.join(",")}`;
-    const n = seen.get(base) ?? 0;
-    seen.set(base, n + 1);
-    repeatable.push({ key: `${base}:${n}`, hash: hashOf(s.sql), statements: [s] });
+    const key = `${s.group}:${s.of.join(",")}`;
+    const unit = units.get(key) ?? { statements: [], of: new Set<LogicalId>() };
+    unit.statements.push(s);
+    for (const id of s.of) unit.of.add(id);
+    units.set(key, unit);
   }
+  const repeatable: Repeatable[] = [...units].map(([key, u]) => ({
+    key,
+    hash: hashOf(u.statements.map((x) => x.sql)),
+    statements: u.statements,
+    of: [...u.of],
+  }));
   return ok({ dialect: dialect.name, from: fromHash, to: toHash, steps, repeatable });
 }
 
 /**
- * The repeatable objects whose text is not the one last applied.
+ * The repeatable objects that are due: those whose text is not the one last applied, and those that are made from an element a step has just changed.
  *
  * @param repeatable - the plan's repeatable objects
  * @param applied - the hash last applied, by key
+ * @param touched - the elements the steps of this run changed
  * @returns those to apply, in the plan's order
  */
-export const dueRepeatables = (repeatable: readonly Repeatable[], applied: ReadonlyMap<string, string>): readonly Repeatable[] =>
-  repeatable.filter((r) => applied.get(r.key) !== r.hash);
+export const dueRepeatables = (
+  repeatable: readonly Repeatable[],
+  applied: ReadonlyMap<string, string>,
+  touched: ReadonlySet<string> = new Set(),
+): readonly Repeatable[] => repeatable.filter((r) => applied.get(r.key) !== r.hash || r.of.some((id) => touched.has(id)));

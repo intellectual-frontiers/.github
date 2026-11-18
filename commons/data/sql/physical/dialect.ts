@@ -29,7 +29,9 @@ export type Feature =
   | "routines"
   | "partitions"
   | "alter-column"
-  | "schemas";
+  | "schemas"
+  | "updatable-views"
+  | "instead-of-triggers";
 
 /** The forms of `DROP` and `ADD COLUMN` that a dialect writes with `IF [NOT] EXISTS` (0012-sql-idempotency FR-001). */
 export type IfExistsForm = "addColumn" | "dropColumn" | "dropConstraint" | "dropTable" | "dropIndex";
@@ -56,6 +58,10 @@ export interface Dialect {
   quote(name: string): string;
   literal(value: Literal): string;
   type(type: LogicalType): string;
+  /** The expression that hashes a text expression, or none where the engine has no hash (0014-sql-protected-access FR-011). */
+  hash?(text: string): string | undefined;
+  /** A condition that is true when the role that reads is a member of a role, or none where the engine has no way to say it. */
+  hasRole?(role: string): string | undefined;
   /** Why the dialect cannot store a type, or nothing where it can (0009-sql-features FR-003). */
   unsupported?(type: LogicalType): string | undefined;
   /** Why the dialect cannot add a column like this to a table that exists, or nothing where it can (0011-sql-lifecycle FR-006). */

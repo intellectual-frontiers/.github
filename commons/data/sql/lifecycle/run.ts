@@ -41,6 +41,8 @@ export interface RunOptions {
   readonly by?: string;
   /** The moment, as text; the clock by default. */
   readonly now?: () => string;
+  /** Statements run at the start of each transaction, such as a setting that says a migration is running (0014-sql-protected-access FR-009). */
+  readonly before?: readonly string[];
   /** The hash of the empty state, for a database that has no ledger yet. */
   readonly empty: string;
 }
@@ -149,6 +151,7 @@ export async function execute(
   ): Promise<RunError | undefined> => {
     try {
       await driver.exec("BEGIN");
+      for (const sql of options.before ?? []) await driver.exec(sql);
       for (const st of statements) await applyStatement(driver, st);
       const e = nextEntry(ledger, { ...entry, appliedAt: now(), appliedBy: by });
       await driver.exec(insert(dialect, table, e));
@@ -167,7 +170,8 @@ export async function execute(
   // the setup comes before the steps (a schema, an extension the types need); what extensions add comes after
   const last = new Map<string, string>();
   for (const e of ledger) if (e.kind === "repeatable") last.set(e.key, e.hash);
-  const due: readonly Repeatable[] = dueRepeatables(plan.repeatable, last);
+  const touched = new Set<string>(todo.flatMap((s) => s.of));
+  const due: readonly Repeatable[] = dueRepeatables(plan.repeatable, last, touched);
   const repeated: string[] = [];
   const runRepeatable = async (r: Repeatable): Promise<RunError | undefined> => {
     const failed = await run(r.statements, { kind: "repeatable", key: r.key, name: r.key, from: "", to: "", hash: r.hash });

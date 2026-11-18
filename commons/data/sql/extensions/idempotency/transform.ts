@@ -37,7 +37,7 @@ interface Made {
 const RANK: Readonly<Record<Idempotency, number>> = { natural: 0, guarded: 1, "ledger-only": 2 };
 const worst = (levels: readonly Idempotency[]): Idempotency => levels.reduce<Idempotency>((a, b) => (RANK[b] > RANK[a] ? b : a), "natural");
 
-function make(s: StepStatement, dialect: Dialect): Made {
+function make(s: StepStatement, dialect: Dialect, dropped: ReadonlySet<string>): Made {
   const natural = (sql: string = s.sql): Made => ({ statement: { ...s, sql }, level: "natural" });
   const ledgerOnly = (): Made => ({ statement: s, level: "ledger-only" });
   const guarded = (query: string | undefined, skipWhen: Guard["skipWhen"]): Made =>
@@ -48,13 +48,17 @@ function make(s: StepStatement, dialect: Dialect): Made {
   let m: RegExpMatchArray | null;
 
   if (
-    /^(CREATE TABLE IF NOT EXISTS|CREATE INDEX IF NOT EXISTS|CREATE UNIQUE INDEX IF NOT EXISTS|INSERT |DELETE FROM |COMMENT ON |CREATE OR REPLACE |DROP POLICY IF EXISTS |CREATE EXTENSION IF NOT EXISTS )/.test(
+    /^(CREATE TABLE IF NOT EXISTS|CREATE INDEX IF NOT EXISTS|CREATE UNIQUE INDEX IF NOT EXISTS|INSERT |DELETE FROM |COMMENT ON |CREATE OR REPLACE |DROP POLICY IF EXISTS |CREATE EXTENSION IF NOT EXISTS |CREATE SCHEMA IF NOT EXISTS |GRANT |REVOKE )/.test(
       sql,
     )
   )
     return natural();
+  if (/^ALTER (TABLE|VIEW|SCHEMA) .+ OWNER TO /.test(sql)) return natural();
   if (/^ALTER TABLE .+ ALTER COLUMN .+ (SET|DROP) (NOT NULL|DEFAULT)/.test(sql)) return natural();
   if (/ ADD COLUMN IF NOT EXISTS /.test(sql) || /^DROP \w+ IF EXISTS /.test(sql)) return natural();
+  // a view or a trigger made after the same view was dropped in the step is made again whenever the step is run
+  if ((m = sql.match(new RegExp(`^CREATE (?:OR REPLACE )?VIEW (${REF})`))) && dropped.has(m[1] ?? "")) return natural();
+  if ((m = sql.match(new RegExp(`^CREATE TRIGGER ${ID} INSTEAD OF \\w+ ON (${REF})`))) && dropped.has(m[1] ?? "")) return natural();
   if (probes === undefined) return ledgerOnly();
 
   if ((m = sql.match(new RegExp(`^ALTER TABLE (${REF}) ADD COLUMN (${ID})`)))) {
@@ -101,8 +105,10 @@ export function idempotency(settings: IdempotencySettings = {}): StepTransform {
   return (draft: StepDraft, context): StepDraft => {
     // a step a person wrote is only as safe as the person made it
     if (draft.manual) return { ...draft, idempotency: draft.idempotency ?? "ledger-only" };
-    const up = draft.up.map((s) => make(s, context.dialect));
-    const down = draft.down?.map((s) => make(s, context.dialect));
+    const droppedViews = (ss: readonly StepStatement[] | undefined): ReadonlySet<string> =>
+      new Set((ss ?? []).flatMap((s) => [...s.sql.matchAll(new RegExp(`^DROP VIEW IF EXISTS (${REF});$`, "g"))].map((m) => m[1] ?? "")));
+    const up = draft.up.map((s) => make(s, context.dialect, droppedViews(draft.up)));
+    const down = draft.down?.map((s) => make(s, context.dialect, droppedViews(draft.down)));
     return {
       ...draft,
       up: up.map((m) => m.statement),

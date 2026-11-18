@@ -12,7 +12,13 @@
 import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
 import { vocabularies, words } from "@intellectual-frontiers/data/governance";
 import { carriedOf, featureId, type LogicalId, type Table } from "@intellectual-frontiers/data/sql/logical";
-import type { BindContext, PhysicalError, Statement, StatementSource } from "@intellectual-frontiers/data/sql/physical";
+import {
+  type BindContext,
+  type PhysicalError,
+  qualified,
+  type Statement,
+  type StatementSource,
+} from "@intellectual-frontiers/data/sql/physical";
 
 /** What a project says of access; what is not said is the default. */
 export interface AccessSettings {
@@ -20,6 +26,8 @@ export interface AccessSettings {
   readonly unsupported?: "carry" | "error";
   /** The prefix of the settings a policy reads; `app` by default. */
   readonly settingPrefix?: string;
+  /** Set where the tables are wrapped by views (0014-sql-protected-access): the rights are then the views' to grant, so none is granted here, and a table with a scope has one policy that names no role, forced on its owner. */
+  readonly viewsSchema?: string;
 }
 
 const { security } = vocabularies;
@@ -38,6 +46,11 @@ export function accessSource(settings: AccessSettings = {}): StatementSource {
     const q = (n: string): string => dialect.quote(n);
     const errors: PhysicalError[] = [];
     const out: Statement[] = [];
+    const usage = new Set<string>();
+    const target = (t: Table): string =>
+      settings.viewsSchema === undefined
+        ? written.ref(t.id)
+        : qualified(dialect, dialect.features.includes("schemas") ? settings.viewsSchema : undefined, naming.names.write(t.name));
     const canPolicy = dialect.features.includes("row-security");
     const canGrant = dialect.features.includes("grants");
     for (const t of schema.tables) {
@@ -56,14 +69,15 @@ export function accessSource(settings: AccessSettings = {}): StatementSource {
         return name;
       };
       const list = (rs: readonly string[]): string => rs.map(q).join(", ");
-      if (roles !== undefined) {
+      if (roles !== undefined && settings.viewsSchema === undefined) {
         if (!canGrant) {
           if (onUnsupported === "error") refuse("its access (security.access)");
         } else {
           const of: LogicalId[] = [t.id];
-          if (roles.read.length > 0) out.push({ group: "policy", sql: `GRANT SELECT ON ${written.ref(t.id)} TO ${list(roles.read)};`, of });
+          for (const r of [...roles.read, ...roles.write]) usage.add(r);
+          if (roles.read.length > 0) out.push({ group: "policy", sql: `GRANT SELECT ON ${target(t)} TO ${list(roles.read)};`, of });
           if (roles.write.length > 0)
-            out.push({ group: "policy", sql: `GRANT INSERT, UPDATE, DELETE ON ${written.ref(t.id)} TO ${list(roles.write)};`, of });
+            out.push({ group: "policy", sql: `GRANT INSERT, UPDATE, DELETE ON ${target(t)} TO ${list(roles.write)};`, of });
         }
       }
       for (const { column, scope } of scoped) {
@@ -76,6 +90,8 @@ export function accessSource(settings: AccessSettings = {}): StatementSource {
         const test = `${q(col)}::text = current_setting(${dialect.literal(`${prefix}.${scope}`)}, true)`;
         const of = [t.id, column.id, featureId("policy", [...t.name, ...words(scope)])];
         out.push({ group: "policy", sql: `ALTER TABLE ${written.ref(t.id)} ENABLE ROW LEVEL SECURITY;`, of });
+        if (settings.viewsSchema !== undefined)
+          out.push({ group: "policy", sql: `ALTER TABLE ${written.ref(t.id)} FORCE ROW LEVEL SECURITY;`, of });
         const policy = (op: string, kind: string, to: readonly string[], using: boolean, check: boolean): void => {
           const name = policyName(scope, op);
           out.push({ group: "policy", sql: `DROP POLICY IF EXISTS ${q(name)} ON ${written.ref(t.id)};`, of });
@@ -85,7 +101,7 @@ export function accessSource(settings: AccessSettings = {}): StatementSource {
             of,
           });
         };
-        if (roles === undefined) policy("all", "ALL", [], true, true);
+        if (roles === undefined || settings.viewsSchema !== undefined) policy("all", "ALL", [], true, true);
         else {
           if (roles.read.length > 0) policy("select", "SELECT", roles.read, true, false);
           if (roles.write.length > 0) {
@@ -96,6 +112,8 @@ export function accessSource(settings: AccessSettings = {}): StatementSource {
         }
       }
     }
+    if (settings.viewsSchema !== undefined && usage.size > 0 && canGrant && dialect.features.includes("schemas"))
+      out.push({ group: "policy", sql: `GRANT USAGE ON SCHEMA ${q(settings.viewsSchema)} TO ${[...usage].map(q).join(", ")};`, of: [] });
     return errors.length > 0 ? err(errors) : ok(out);
   };
 }

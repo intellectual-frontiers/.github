@@ -49,12 +49,15 @@ export const dialect: Dialect = {
     "partitions",
     "alter-column",
     "schemas",
+    "updatable-views",
   ],
   maxName: 63,
   now: "CURRENT_TIMESTAMP",
   quote: quoteName,
   literal: standardLiteral,
   type,
+  hash: (t) => `md5(${t})`,
+  hasRole: (r) => `pg_has_role(current_user, ${standardLiteral(r)}, 'member')`,
   ifExists: ["addColumn", "dropColumn", "dropConstraint", "dropTable", "dropIndex"],
   probes: {
     table: (t, s) =>

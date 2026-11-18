@@ -132,7 +132,7 @@ proves(
     for (const f of ["or-replace-view", "row-security", "grants", "routines", "partitions"] as const)
       assert(postgres.features.includes(f), f);
     assert(duckdb.features.includes("or-replace-view") && !duckdb.features.includes("routines"));
-    assert(sqlite.features.length === 0);
+    assert(!sqlite.features.includes("routines") && !sqlite.features.includes("grants"));
   },
 );
 

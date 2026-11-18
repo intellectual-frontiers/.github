@@ -31,7 +31,7 @@ const type = (t: LogicalType): string => {
 /** SQLite. */
 export const dialect: Dialect = {
   name: "sqlite",
-  features: [],
+  features: ["instead-of-triggers"],
   maxName: 1024,
   now: "CURRENT_TIMESTAMP",
   quote: quoteName,

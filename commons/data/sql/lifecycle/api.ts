@@ -23,6 +23,7 @@ export {
   type Reversibility,
   type Step,
   type StepClass,
+  type StepContext,
   type StepDraft,
   type StepStatement,
   type StepTransform,
