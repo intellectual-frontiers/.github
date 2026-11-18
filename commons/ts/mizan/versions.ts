@@ -173,32 +173,50 @@ function select(l: Loaded, name: string, s: Say): ReadRecord | number {
   );
 }
 
+/** What `checkVersions` found, or why it could not run (`not_run`, FR-031): the findings, the number of works judged and what they were judged against. */
+export type VersionsCheck =
+  | { readonly kind: "judged"; readonly findings: readonly VersionsFinding[]; readonly works: number; readonly from: string }
+  | { readonly kind: "not_run"; readonly reason: string };
+
+/**
+ * The version check as data (0026-works-versioning FR-022, FR-040): every work of the repository at `repo` judged against the merge base with `rev` (`origin/main` where not given). It reads only
+ * Git, so it runs offline: no host, no network, a base that is any revision the repository holds (a branch, a tag or a commit). A consumer calls this, or `run(["check", "--base", rev, "--repo", repo])`.
+ */
+export async function checkVersions(repo: string, rev = "origin/main"): Promise<VersionsCheck> {
+  const notRunBecause = (reason: string): VersionsCheck => ({ kind: "not_run", reason });
+  const inside = await isRepository(repo);
+  if (inside.kind === "err") return notRunBecause(formatGitError(inside.error));
+  if (!inside.value) return notRunBecause(`${repo} is not a Git repository`);
+  const base = await findBase(repo, rev);
+  if (base.kind === "err") return notRunBecause(base.error.kind === "git" ? formatGitError(base.error.error) : base.error.reason);
+  const head = await readTree(repo, "HEAD");
+  if (head.kind === "err") return notRunBecause(formatGitError(head.error));
+  const headCommit = await resolveCommit(repo, "HEAD");
+  if (headCommit.kind === "err") return notRunBecause(formatGitError(headCommit.error));
+  const baseTree =
+    base.value.kind === "commit" ? await readTree(repo, base.value.commit) : ok<TreeFacts>({ paths: [], records: new Map() });
+  if (baseTree.kind === "err") return notRunBecause(formatGitError(baseTree.error));
+  const changed =
+    base.value.kind === "commit" ? await changedBetween(repo, base.value.commit, headCommit.value) : ok<readonly string[]>([]);
+  if (changed.kind === "err") return notRunBecause(formatGitError(changed.error));
+  const editions = await editionFacts(repo, editionsNeeded(head.value, baseTree.value), headCommit.value);
+  if (editions.kind === "err") return notRunBecause(formatGitError(editions.error));
+  return {
+    kind: "judged",
+    findings: sortFindings(judgeWorks({ head: head.value, base: baseTree.value, changed: changed.value, editions: editions.value })),
+    works: workFolders(head.value.paths).length,
+    from: base.value.kind === "commit" ? `the base ${base.value.commit.slice(0, 12)}` : "no base (the first commit)",
+  };
+}
+
 async function runCheck(rest: readonly string[], s: Say): Promise<number> {
   const p = parseArgs(rest, CHECK);
   if (p.kind === "err") return usage(s, formatUsageError(p.error, "versions check"));
   if (p.value.kind === "help") return help(s, "check", helpText("versions check", HELP_SUMMARY.check, CHECK));
   const repo = resolve(p.value.options.repo);
-  const rev = p.value.options.base ?? "origin/main";
-  const inside = await isRepository(repo);
-  if (inside.kind === "err") return notRun(s, formatGitError(inside.error));
-  if (!inside.value) return notRun(s, `${repo} is not a Git repository`);
-  const base = await findBase(repo, rev);
-  if (base.kind === "err") return notRun(s, base.error.kind === "git" ? formatGitError(base.error.error) : base.error.reason);
-  const head = await readTree(repo, "HEAD");
-  if (head.kind === "err") return notRun(s, formatGitError(head.error));
-  const headCommit = await resolveCommit(repo, "HEAD");
-  if (headCommit.kind === "err") return notRun(s, formatGitError(headCommit.error));
-  const baseTree =
-    base.value.kind === "commit" ? await readTree(repo, base.value.commit) : ok<TreeFacts>({ paths: [], records: new Map() });
-  if (baseTree.kind === "err") return notRun(s, formatGitError(baseTree.error));
-  const changed =
-    base.value.kind === "commit" ? await changedBetween(repo, base.value.commit, headCommit.value) : ok<readonly string[]>([]);
-  if (changed.kind === "err") return notRun(s, formatGitError(changed.error));
-  const editions = await editionFacts(repo, editionsNeeded(head.value, baseTree.value), headCommit.value);
-  if (editions.kind === "err") return notRun(s, formatGitError(editions.error));
-  const found = sortFindings(judgeWorks({ head: head.value, base: baseTree.value, changed: changed.value, editions: editions.value }));
-  const works = workFolders(head.value.paths).length;
-  const from = base.value.kind === "commit" ? `the base ${base.value.commit.slice(0, 12)}` : "no base (the first commit)";
+  const judged = await checkVersions(repo, p.value.options.base ?? "origin/main");
+  if (judged.kind === "not_run") return notRun(s, judged.reason);
+  const { findings: found, works, from } = judged;
   if (found.length === 0) {
     s.out(`versions: ${works} ${works === 1 ? "work" : "works"} judged against ${from}: nothing found\n`);
     return 0;
@@ -265,7 +283,7 @@ async function runBump(rest: readonly string[], s: Say, now: () => Date): Promis
         const last = lastRelease(led.value.entries, r, merged.value);
         const commits = await commitsSince(l.repo, last?.tag);
         if (commits.kind === "err") return notRun(s, formatGitError(commits.error));
-        const inScope = scopeOf(w.folder, workFolders(l.tree.paths), r.exclude ?? []);
+        const inScope = scopeOf(w.folder, workFolders(l.tree.paths), r.exclude ?? [], r.paths ?? []);
         const found = impactOfCommits(commits.value.filter((c) => c.files.some(inScope)));
         if (found === undefined)
           return usage(
@@ -421,7 +439,7 @@ async function runNotes(rest: readonly string[], s: Say): Promise<number> {
   }
   const commits = await commitsSince(l.repo, from);
   if (commits.kind === "err") return notRun(s, formatGitError(commits.error));
-  const inScope = scopeOf(w.folder, workFolders(l.tree.paths), r.exclude ?? []);
+  const inScope = scopeOf(w.folder, workFolders(l.tree.paths), r.exclude ?? [], r.paths ?? []);
   s.out(notesOf({ slug: r.slug, title: r.title, version: r.version, from, commits: commits.value.filter((c) => c.files.some(inScope)) }));
   return 0;
 }

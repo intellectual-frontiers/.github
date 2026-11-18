@@ -96,6 +96,16 @@ export function recordFindings(
   const release = d.value;
   const slug: string = release.slug;
   const found: VersionsFinding[] = versionProblems(release).map((m) => finding("versions/scheme-mismatch", file, slug, m));
+  for (const p of release.paths ?? [])
+    if (isUnder(p, folder))
+      found.push(
+        finding(
+          "versions/record-invalid",
+          file,
+          slug,
+          `paths names ${p}, which is ${folder === "" ? "in the root, where the work already holds every file" : `inside the folder ${folder}, which the work already holds`}: paths names what is outside the folder`,
+        ),
+      );
   if (release.kind === "ControlledDocument" && release.approval === undefined)
     found.push(
       finding(
@@ -357,8 +367,8 @@ export function judgeWorks(input: CheckInput): readonly VersionsFinding[] {
           `the position of the volume changed from ${was.position} to ${now.position ?? "none"}: a position never changes`,
         ),
       );
-    const inHead = scopeOf(h.folder, headFolders, now.exclude ?? []);
-    const inBase = scopeOf(b.folder, baseFolders, was.exclude ?? []);
+    const inHead = scopeOf(h.folder, headFolders, now.exclude ?? [], now.paths ?? []);
+    const inBase = scopeOf(b.folder, baseFolders, was.exclude ?? [], was.paths ?? []);
     const filesChanged = changed.filter((p) => inHead(p) || inBase(p));
     out.push(...judgeGrowth(h, b, filesChanged, changed, editions));
   }
@@ -366,6 +376,6 @@ export function judgeWorks(input: CheckInput): readonly VersionsFinding[] {
 }
 
 /** The files of a work at a tree, for the commands that list them. */
-export function workFiles(tree: TreeFacts, folder: string, exclude: readonly string[]): readonly string[] {
-  return filesOf(tree.paths, folder, workFolders(tree.paths), exclude);
+export function workFiles(tree: TreeFacts, folder: string, exclude: readonly string[], paths: readonly string[] = []): readonly string[] {
+  return filesOf(tree.paths, folder, workFolders(tree.paths), exclude, paths);
 }

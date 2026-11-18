@@ -9,9 +9,13 @@
 export { BASELINE_COMMENTS, readSpecTexts } from "./spec-files.ts";
 export { holdHarness, type HarnessInput } from "./harness.ts";
 export { termRecordsOf } from "./check.ts";
-export { type KnownTerms, specTermFindings } from "./spec-terms.ts";
+export { definitionsOf, type KnownTerms, specTermFindings, termDefinedByFindings, type TermDefinitions } from "./spec-terms.ts";
 export * as integrations from "./integrations/mod.ts";
 export * as changes from "./changes/mod.ts";
+export * as versions from "./versions/mod.ts";
+export { checkVersions, run as runVersions, type VersionsCheck } from "./versions.ts";
+export { readWorks } from "./versions/scan.ts";
+export type { WorkFile } from "./versions/plugin.ts";
 export { digestOf, findingsOf, RUN, TURTLE_PATH, turtleOf } from "./generate-ontology.ts";
 export { COMPONENT_FILE, registerDocuments, registerRows, RESULTS_FILE, type RegisterInput, type RegisterRow } from "./oscal-register.ts";
 export { staleFindings, type Fetched, type LatestManifest } from "./newer.ts";

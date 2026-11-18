@@ -8,6 +8,6 @@ export const release = {
       name: "Intellectual Frontiers",
     },
   ],
-  version: "0.4.0",
+  version: "0.5.0",
   repository: "https://github.com/intellectual-frontiers/.github",
 };

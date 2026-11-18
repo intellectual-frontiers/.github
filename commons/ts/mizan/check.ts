@@ -180,7 +180,7 @@ export function main(
               ]),
             },
             deprecated: deprecatedTerms(),
-            // the requirement-to-term stage (0003-mizan FR-044) is opt-in for commons' own folder: its 229 findings are not put in the baseline, which only shrinks
+            // the requirement-to-term stage (0003-mizan FR-044) is opt-in for commons' own folder: its findings are not put in the baseline, which only shrinks
             ...(argv.includes("--defined-by") ? { definitions: definitionsOf(mizanTermRecords(), PREFIXES) } : {}),
           },
         }
