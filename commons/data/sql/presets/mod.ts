@@ -14,6 +14,7 @@ import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel"
 import { type Convergence, type ConvergenceSettings, settingsOf as convergenceOf } from "@intellectual-frontiers/data/sql/extensions/convergence";
 import { type History, type HistorySettings, settingsOf as historyOf } from "@intellectual-frontiers/data/sql/extensions/history";
 import { LEDGER as LOAD_LEDGER } from "@intellectual-frontiers/data/sql/extensions/integrations";
+import { LEDGER as TRANSFORM_LEDGER } from "@intellectual-frontiers/data/sql/extensions/transforms";
 import { idempotency, type IdempotencySettings } from "@intellectual-frontiers/data/sql/extensions/idempotency";
 import { type Report, type ReportSettings, settingsOf as reportOf } from "@intellectual-frontiers/data/sql/extensions/plan-report";
 import { safety, type SafetyKit, type SafetySettings } from "@intellectual-frontiers/data/sql/extensions/safety";
@@ -109,7 +110,7 @@ export function preset(name: string, changes: PresetChanges = {}): Result<Preset
     if (changes[s] !== undefined && base.strategy !== s) return err({ kind: "not-used", preset: named, settings: s });
   const kit = safety({ ...base.safety, ...changes.safety });
   // what quarantine keeps and what loads record is not drift: the reader leaves out the tables they make
-  const kept = [...(kit.settings.quarantine ? [`*${kit.settings.suffixes.column}`, `*${kit.settings.suffixes.table}`] : []), LOAD_LEDGER];
+  const kept = [...(kit.settings.quarantine ? [`*${kit.settings.suffixes.column}`, `*${kit.settings.suffixes.table}`] : []), LOAD_LEDGER, TRANSFORM_LEDGER];
   const idem = { ...base.idempotency, ...changes.idempotency };
   return ok({
     name: named,

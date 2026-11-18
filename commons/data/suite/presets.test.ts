@@ -47,7 +47,7 @@ proves(
       same(p.planOptions.transforms?.length, 5, `${p.name}: quarantine, locks, validation, verification, idempotency`);
       assert(p.roles.length > 0);
     }
-    same(auto.convergence?.ignore, ["lifecycle_ledger", "*quarantine", "*quarantined", "integration_run"], "quarantine is not drift");
+    same(auto.convergence?.ignore, ["lifecycle_ledger", "*quarantine", "*quarantined", "integration_run", "transform_run"], "quarantine is not drift");
     assert(get("reviewed-convergence", { safety: { quarantine: "off" } }).convergence?.ignore.every((n) => !n.startsWith("*")));
     const bad = preset("flyway");
     assert(bad.kind === "err" && bad.error.kind === "unknown" && bad.error.known.includes("team-managed"));

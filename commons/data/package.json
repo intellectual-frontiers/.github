@@ -32,6 +32,7 @@
     "./sql/extensions/convergence": "./sql/extensions/convergence/mod.ts",
     "./sql/extensions/rollout": "./sql/extensions/rollout/mod.ts",
     "./sql/extensions/integrations": "./sql/extensions/integrations/mod.ts",
+    "./sql/extensions/transforms": "./sql/extensions/transforms/mod.ts",
     "./sql/presets": "./sql/presets/mod.ts"
   },
   "scripts": {

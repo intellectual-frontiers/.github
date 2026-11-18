@@ -110,7 +110,7 @@ footer { margin-top: 4rem; padding-top: 1rem; border-top: 1px solid var(--line);
 <code class="pkg">@intellectual-frontiers/data</code>
 <h1>Governance in, SQL out, and a safe way to change the database</h1>
 <p class="lede">A library of Intellectual Frontiers commons. A governance layer says what a business domain is and what must be true of its data; a logical schema is made from it; a physical schema for PostgreSQL, SQLite or DuckDB is made from that; a lifecycle layer changes a database from one physical schema to the next; and extensions add the rest.</p>
-<p class="small">Version 0.0.0, conformance level L1, private package, Node &ge; 26 (Bun is the default runtime). Specifications 0001 to 0022 are in force, in <code>spec-kit/</code>.</p>
+<p class="small">Version 0.0.0, conformance level L1, private package, Node &ge; 26 (Bun is the default runtime). Specifications 0001 to 0023 are in force, in <code>spec-kit/</code>.</p>
 </header>
 
 <section id="purpose">
@@ -203,7 +203,7 @@ if (sql.kind === "ok") console.log(render(sql.value));</code></pre>
 <tr><td><code>./engine</code>, <code>./governance</code>, <code>./sql/logical</code>, <code>./sql/physical</code>, <code>./sql/lifecycle</code></td><td>the layers</td></tr>
 <tr><td><code>./models/arca</code></td><td>the party model</td></tr>
 <tr><td><code>./sql/dialects/postgres</code>, <code>/sqlite</code>, <code>/duckdb</code></td><td>the dialects</td></tr>
-<tr><td><code>./sql/extensions/</code> <code>documentation views access routines partitions generators idempotency protected-access safety plan-report rewrite history convergence rollout integrations</code></td><td>the extensions (15)</td></tr>
+<tr><td><code>./sql/extensions/</code> <code>documentation views access routines partitions generators idempotency protected-access safety plan-report rewrite history convergence rollout integrations transforms</code></td><td>the extensions (16)</td></tr>
 <tr><td><code>./sql/presets</code></td><td>the four presets</td></tr>
 </tbody>
 </table>
@@ -272,6 +272,9 @@ annotate(vocabularies.security.classification, "confidential");</code></pre>
 
 <h3>Schema-qualified names</h3>
 <p>Give <code>schema</code> to <code>bind</code> once (0013) and every table is made, referred to, indexed, loaded, described and changed there. Where the engine has schemas (PostgreSQL, DuckDB) the names are qualified (<code>"data"."book"</code>, written by <code>qualified(dialect, schema, name)</code>) and the schema is made first; where it has none (SQLite) the schema's words are written before each table's own by the case style (<code>data_book</code>, <code>dataBook</code>). Nothing changes for a project that gives no schema.</p>
+
+<h3>References for text written by people</h3>
+<p><code>refsOf(schema, dialect, naming, inSchema?)</code> (0007) gives the written, quoted, qualified name of a table or column from the words of its name, in any case style, and keeps what is not there as an error value. Transforms use it; so can any SQL a person writes.</p>
 
 <h3>Generating files</h3>
 <p><code>generate(schema, { generators, naming?, dialect? })</code> runs <code>Generator</code>s and returns <code>Artifact</code>s (<code>{ path, text }</code>); a generator reads only what it is given and gives the same text for the same input. Writing the files to disk is not a generator's job.</p>
@@ -446,6 +449,17 @@ plan(from, during, { dialect, sources: [versionViews([{ label: "v2", schema: v2 
 <pre><code>const l = loader(schema, { name: "authors", table: "author",
   source: { kind: "csv", text: "id,name\na1,Ann" }, strategy: "upsert" }, { dialect });
 if (l.kind === "ok") await load(driver, l.value); // { outcome: "loaded", landed: 1, inserted: 1, ... }</code></pre>
+<h3>Transforms <span class="tag">0023</span></h3>
+<p>A model is a query whose result is kept as a <code>view</code> (the default), a <code>table</code>, an <code>incremental</code> table or nothing at all (<code>ephemeral</code>, written into the SQL of the models that read it). The SQL is written by a person but its names are not: the model's function is given <code>Refs</code> (from <code>sql/physical</code>), and <code>r.table("author")</code> and <code>r.column("author", "name")</code> give the written, quoted, qualified names for the dialect, so an unknown name is an error value when the project is made and the same model runs on every dialect. <code>transformer(schema, models, { dialect })</code> puts the models in the order of what they read (a cycle is an error value) and gives their lineage; <code>build(driver, project)</code> builds them.</p>
+<ul>
+<li><strong>Published only if it passes.</strong> Each model is built in one transaction together with its tests (<code>unique</code>, <code>not-null</code>, <code>accepted-values</code>, <code>relationship</code>, <code>custom</code>). If a test of severity <code>error</code> finds a row, the transaction is rolled back, so the table or view that was published before is still there; the models that read it are reported as blocked and not built. A <code>warn</code> is reported and does not stop the build. A finding gives the count and a sample of the wrong rows.</li>
+<li><strong>Tables are made again under their views</strong> with <code>CASCADE</code> where the dialect has it, and a build of some models also builds everything that reads them. An incremental model adds the rows whose key it does not hold and never changes a row it holds.</li>
+<li><strong>Recorded.</strong> Each built model is a row of a ledger table (<code>transform_run</code>) with the hash of its definition and its row count. Models are best written in a schema of their own (a setting) so that convergence does not read them as drift.</li>
+</ul>
+<pre><code>const p = transformer(schema, [{ name: "author names", materialization: "table",
+  select: (r) =&gt; `SELECT ${r.column("author", "id")} AS id, ${r.column("author", "name")} AS name FROM ${r.table("author")}`,
+  tests: [{ kind: "unique", columns: ["id"] }] }], { dialect });
+if (p.kind === "ok") await build(driver, p.value); // { ok: true, models: [{ outcome: "built", rows: 3, ... }] }</code></pre>
 </section>
 
 <section id="strategies">
@@ -525,7 +539,7 @@ connect(driver, dialect, schema, { dialect }, p.convergence!, { ...p.planOptions
 <pre><code>cd commons/data &amp;&amp; bun run verify</code></pre>
 <p>which runs, in order (<code>package.json</code>): the TypeScript compiler (<code>tsc -p tsconfig.json</code>); the specification checker on <code>spec-kit/</code> (<code>mizan-check.ts --root spec-kit</code>); the Mizan rules at level L1 on it; <code>tools/check.ts</code>, the trace of sources and tests to the specifications and the layers check, held against <code>trace.baseline.txt</code>, which only shrinks; and <code>bun test suite/</code>. <code>bun run test:node</code> runs the same tests under <code>node --test</code>.</p>
 <ul>
-<li><strong>Spec kit.</strong> Twenty-two specifications, <code>0001-layers</code> to <code>0022-sql-integrations</code>, each <code>spec-kit/specs/&lt;number-slug&gt;/spec.md</code> with an input paragraph, numbered requirements (<code>FR-nnn</code>), edge cases, success criteria and an out-of-scope list; <code>registry.tsv</code> lists them, all in force.</li>
+<li><strong>Spec kit.</strong> Twenty-three specifications, <code>0001-layers</code> to <code>0023-sql-transforms</code>, each <code>spec-kit/specs/&lt;number-slug&gt;/spec.md</code> with an input paragraph, numbered requirements (<code>FR-nnn</code>), edge cases, success criteria and an out-of-scope list; <code>registry.tsv</code> lists them, all in force.</li>
 <li><strong><code>enforcement.tsv</code>.</strong> Says what enforces each requirement (0024-spec-format): a <code>mechanism</code> of <code>check</code>, <code>gate</code>, <code>review</code> or <code>none</code>, and by what. At the time of writing 230 of its rows are a <code>check</code> by <code>cd commons/data &amp;&amp; bun run verify</code>, and one (0001 FR-012, the logical and physical naming conventions) is marked <code>none</code> with the note <em>Planned</em>.</li>
 <li><strong><code>proves()</code>.</strong> A test is <code>suite/&lt;kebab-case&gt;.test.ts</code> on IFC TypeScript, and <code>proves(["0001-layers FR-004"], "what it shows", fn)</code> names the requirements it proves, which the trace joins to the specifications. The sources carry <code>// Spec:</code> headers for the same join.</li>
 <li><strong>Real engines.</strong> <code>suite/engines-fixture.ts</code> opens SQLite (the runtime's <code>node:sqlite</code>), DuckDB (<code>@duckdb/node-api</code>) and PostgreSQL (PGlite, in process), in memory, and the tests load what <code>bind</code> and <code>execute</code> make and read the structure back. There is no stand-in for an engine.</li>
@@ -560,7 +574,7 @@ connect(driver, dialect, schema, { dialect }, p.convergence!, { ...p.planOptions
 <li>Changing a column's type without loss: a second column, a check that every value survives the cast, a swap (0015, 0017).</li>
 <li>Masks (<code>security.mask</code>) and vector indexes (<code>hnsw</code>, <code>ivfflat</code>) as features (0009).</li>
 <li>Interchange formats of Flyway, Liquibase and Atlas, as exports of the history files (0018, 0021).</li>
-<li><strong>Phase 10.</strong> Integrations are built (0022). Still to come: transforms, queries, the ephemeral target build, rows made from a CSV as a typed kinds file, and the osquery ATC catalog.</li>
+<li><strong>Phase 10.</strong> Integrations (0022) and transforms (0023) are built. Still to come: queries, the ephemeral target build, rows made from a CSV as a typed kinds file, and the osquery ATC catalog.</li>
 </ul>
 </section>
 
@@ -591,6 +605,7 @@ connect(driver, dialect, schema, { dialect }, p.convergence!, { ...p.planOptions
 <tr><td>0020</td><td>sql-parallel-versions</td><td>two versions on one database</td></tr>
 <tr><td>0021</td><td>sql-presets</td><td>the four presets</td></tr>
 <tr><td>0022</td><td>sql-integrations</td><td>rows from outside, landed, checked, loaded and recorded</td></tr>
+<tr><td>0023</td><td>sql-transforms</td><td>models built in order with their tests, published only if the tests pass</td></tr>
 </tbody>
 </table>
 <footer>This page is written by hand from <code>about.ts</code>, <code>library.ts</code>, <code>package.json</code>, the specifications in <code>spec-kit/specs/</code> and the sources under <code>engine/</code>, <code>governance/</code>, <code>models/</code> and <code>sql/</code>. The short introduction is <code>README.md</code>.</footer>

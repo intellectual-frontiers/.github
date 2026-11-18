@@ -40,6 +40,7 @@ export {
 } from "./generate.ts";
 export { type Expressor, expressor, type Names, writeNames } from "./express.ts";
 export { qualified } from "./qualify.ts";
+export { type RefError, refsOf, type Refs, type RefsKit } from "./refs.ts";
 export { upsert } from "./upsert.ts";
 export {
   type BindContext,

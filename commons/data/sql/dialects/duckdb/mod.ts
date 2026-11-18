@@ -40,6 +40,7 @@ const type = (t: LogicalType): string => {
 export const dialect: Dialect = {
   name: "duckdb",
   features: ["comment-on", "regex-check", "or-replace-view", "alter-column", "schemas"],
+  cascade: true,
   attach: { attach: (file, alias) => `ATTACH '${file.replaceAll("'", "''")}' AS "${alias.replaceAll('"', '""')}" (READ_ONLY);`, detach: (alias) => `DETACH "${alias.replaceAll('"', '""')}";` },
   maxName: 255,
   now: "CURRENT_TIMESTAMP",

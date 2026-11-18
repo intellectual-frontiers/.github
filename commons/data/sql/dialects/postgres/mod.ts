@@ -56,6 +56,7 @@ export const dialect: Dialect = {
   quote: quoteName,
   literal: standardLiteral,
   type,
+  cascade: true,
   advisory: { acquire: (k) => `SELECT pg_advisory_lock(${k});`, release: (k) => `SELECT pg_advisory_unlock(${k});` },
   catalog: {
     compares: ["tables", "columns (type, nullability)", "primary keys", "indexes", "foreign keys, uniques and checks (by name)"],

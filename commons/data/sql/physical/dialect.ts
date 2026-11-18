@@ -133,6 +133,8 @@ export interface Dialect {
   readonly catalog?: Catalog;
   /** How the dialect keeps one instance applying at a time; none where there is only one. */
   readonly advisory?: Advisory;
+  /** Whether `DROP TABLE` and `DROP VIEW` take `CASCADE`, so that a table can be made again under views that read it (0023-sql-transforms). */
+  readonly cascade?: boolean;
   /** How a database file of the same engine is attached for reading and let go; none where the engine cannot (0022-sql-integrations). */
   readonly attach?: Attach;
   /** How a table is made again where the dialect cannot change it in place (0017-sql-rewrite). */

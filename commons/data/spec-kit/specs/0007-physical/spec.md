@@ -34,6 +34,7 @@
 ## Extension
 
 - **FR-013**: The physical schema's own code MUST name no engine: the name of an engine MUST appear only in its own dialect's folder, so that a fourth dialect is added without a change to this layer, and a dialect MUST NOT name another's engine.
+- **FR-014**: `refsOf` MUST give, for SQL that a person writes, the written, quoted and qualified name of a table and of a column from the words of their names (in any case style), the name of a table of the caller's own written by the schema's naming, and the tables asked for in the order first asked; and a table or column that the schema does not have MUST be an error value that names it, so that a name that does not exist is found when the SQL is made.
 
 ## Out of scope
 
