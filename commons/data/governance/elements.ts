@@ -98,7 +98,13 @@ export function traceGraph(d: Domain): TraceGraph {
   for (const n of nodes) if (n.parent !== undefined) edges.push({ from: n.parent, to: n.id, kind: "contains" });
   for (const c of d.concepts) {
     const cid = conceptId(d.name, c.name);
-    for (const key of c.identifiedBy) edges.push({ from: cid, to: attributeId(d.name, c.name, key), kind: "identifies" });
+    for (const key of c.identifiedBy) {
+      edges.push({
+        from: cid,
+        to: key in c.attributes ? attributeId(d.name, c.name, key) : relationshipId(d.name, c.name, key),
+        kind: "identifies",
+      });
+    }
     for (const [key, r] of Object.entries(c.relationships)) {
       edges.push({ from: relationshipId(d.name, c.name, key), to: conceptId(d.name, resolve(r.to).name), kind: "references" });
     }

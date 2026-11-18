@@ -32,6 +32,11 @@ export const about: About = {
       mayImport: ["governance/, engine/, by package name"],
     },
     { path: "extensions/", what: "Extensions that need no database.", mayImport: ["governance/, engine/, by package name"] },
+    {
+      path: "models/",
+      what: "Arca's typical data models as governance: the party model first.",
+      mayImport: ["governance/, engine/, by package name"],
+    },
     { path: "suite/", what: "The tests.", mayImport: ["anything here"] },
   ],
   commands: [{ run: "bun run verify", does: "The compiler, the specification checker and the rules on spec-kit/, and the tests." }],

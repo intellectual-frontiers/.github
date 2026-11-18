@@ -12,8 +12,16 @@ import {
   type AnyConcept,
   attribute,
   codeList,
+  binary,
+  boolean,
+  codeOf,
   concept,
+  type Datatype,
+  date,
+  decimal,
   defaultVocabularies,
+  integer,
+  structured,
   domain,
   type Domain,
   identifier,
@@ -25,7 +33,7 @@ import {
 } from "@intellectual-frontiers/data/governance";
 import { same } from "./governance-fixture.ts";
 
-const { docs, ownership, privacy, quality, requirements, security } = vocabularies;
+const { docs, ownership, privacy, quality, requirements, security, usage } = vocabularies;
 
 /** What a test puts on which element of a small domain `d` (concept `c` with attribute `v`, relationship `me` and code list `l`). */
 interface Put {
@@ -216,7 +224,17 @@ proves(
   () => {
     same(
       quality.vocabulary.kinds.map((k) => k.name),
-      ["quality.pattern", "quality.range", "quality.retention", "quality.deprecated"],
+      [
+        "quality.pattern",
+        "quality.range",
+        "quality.retention",
+        "quality.deprecated",
+        "quality.default",
+        "quality.unique",
+        "quality.differs",
+        "quality.audited",
+        "quality.openness",
+      ],
     );
     assert(
       placed({
@@ -242,5 +260,83 @@ proves(
       "quality/deprecated-no-replacement d/c.v",
     ]);
     same(found(quality.vocabulary, { attribute: [annotate(quality.deprecated, { since: "2026-11-18", replacedBy: "d/c.w" })] }), []);
+  },
+);
+
+proves(
+  ["0003-governance FR-016"],
+  "unique, differs, audited, openness and default go where they say, and a member the concept lacks or a default that does not fit is found",
+  () => {
+    const u = (members: readonly string[]) => annotate(quality.unique, { members });
+    assert(
+      placed({
+        concept: [
+          u(["id", "v"]),
+          annotate(quality.differs, { name: "v_w_differ", members: ["v", "w"] }),
+          annotate(quality.audited, { removal: "mark" }),
+        ],
+        domain: [annotate(quality.audited, { removal: "delete" })],
+        list: [annotate(quality.openness, "open")],
+      }),
+    );
+    assert(!placed({ attribute: [u(["v"])] }), "a uniqueness is for a concept");
+    assert(!placed({ domain: [annotate(quality.openness, "closed")] }), "openness is for a code list");
+    assert(!placed({ list: [annotate(quality.audited, { removal: "mark" })] }), "a code list is not audited");
+    assert(!placed({ concept: [annotate(quality.defaultValue, true)] }), "a default is for an attribute");
+    same(found(quality.vocabulary, { concept: [u(["id", "me", "v"])] }), []);
+    same(found(quality.vocabulary, { concept: [u(["id", "nope"]), annotate(quality.differs, { name: "x", members: ["v", "ghost"] })] }), [
+      "quality/member-unknown d/c",
+      "quality/member-unknown d/c",
+    ]);
+    const def = (value: string | number | boolean): Put => ({ attribute: [annotate(quality.defaultValue, value)] });
+    same(found(quality.vocabulary, def("hello")), []);
+    same(found(quality.vocabulary, def(3)), ["quality/default-invalid d/c.v"]);
+    same(found(quality.vocabulary, { second: [annotate(quality.defaultValue, true)] }), ["quality/default-invalid d/c.w"]);
+  },
+);
+
+proves(["0003-governance FR-016"], "a default is held to its datatype: text, whole numbers, true or false, and a code of its list", () => {
+  const kinds = codeList("kinds", { definition: "k", codes: { a: { label: "A" } } });
+  const make = (type: Datatype, value: string | number | boolean): readonly string[] => {
+    const c = concept("c", {
+      definition: "c",
+      attributes: {
+        id: attribute(identifier(), { definition: "id" }),
+        v: attribute(type, { definition: "v", annotations: [annotate(quality.defaultValue, value)] }),
+      },
+      identifiedBy: ["id"],
+    });
+    const r = domain("d", { definition: "d", concepts: [c], codeLists: [kinds] });
+    if (r.kind === "err") throw new Error(JSON.stringify(r.error));
+    return lint(r.value, defaultVocabularies)
+      .filter((f) => f.rule === "quality/default-invalid")
+      .map((f) => f.message);
+  };
+  same(make(integer(), 3), []);
+  same(make(integer(), 3.5).length, 1);
+  same(make(decimal(), 3.5), []);
+  same(make(decimal(), "3.5").length, 1);
+  same(make(boolean(), false), []);
+  same(make(boolean(), "no").length, 1);
+  same(make(date(), "2026-11-18"), []);
+  same(make(codeOf(kinds), "a"), []);
+  same(make(codeOf(kinds), "b"), ['the default "b" of v is not a code of kinds']);
+  same(make(structured(), "x").length, 1);
+  same(make(binary(), 1).length, 1);
+});
+
+proves(
+  ["0003-governance FR-017"],
+  "a lookup goes on a concept and says its members, and one that names a member the concept lacks is found",
+  () => {
+    const l = (members: readonly string[]) => annotate(usage.lookup, { members });
+    assert(placed({ concept: [l(["v", "me"]), l(["w"])] }));
+    assert(!placed({ attribute: [l(["v"])] }), "a lookup is for a concept");
+    same(
+      usage.vocabulary.kinds.map((k) => k.name),
+      ["usage.lookup"],
+    );
+    same(found(usage.vocabulary, { concept: [l(["v", "me"])] }), []);
+    same(found(usage.vocabulary, { concept: [l(["v", "nope"])] }), ["usage/member-unknown d/c"]);
   },
 );

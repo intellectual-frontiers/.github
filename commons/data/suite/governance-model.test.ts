@@ -192,3 +192,41 @@ proves(
     assert(text.includes('{"kind":"identifier","concept":"d/forged","attribute":"ghost","why":"unknown"}'), text);
   },
 );
+
+proves(
+  ["0003-governance FR-001", "0003-governance FR-003", "0003-governance FR-004"],
+  "a concept may be identified by a relationship of cardinality one, which makes it a specialization, and by no other",
+  () => {
+    const base = concept("base", { attributes: { id: attribute(identifier()) }, identifiedBy: ["id"] });
+    const special = concept("special", {
+      attributes: {},
+      identifiedBy: ["base"],
+      relationships: { base: relationship(base, { cardinality: "one" }) },
+    });
+    assert(domain("d", { concepts: [base, special] }).kind === "ok");
+    same(special.identifiedBy, ["base"]);
+    const many = concept("many", {
+      attributes: {},
+      identifiedBy: ["base"],
+      relationships: { base: relationship(base, { cardinality: "many" }) },
+    });
+    const optional = concept("optional", {
+      attributes: {},
+      identifiedBy: ["base"],
+      relationships: { base: relationship(base, { cardinality: "optional" }) },
+    });
+    const text = JSON.stringify(errorsOf(domain("d", { concepts: [base, many, optional] })));
+    assert(text.includes('{"kind":"identifier","concept":"d/many","attribute":"base","why":"not-required"}'), text);
+    assert(text.includes('{"kind":"identifier","concept":"d/optional","attribute":"base","why":"not-required"}'), text);
+    const bad = concept("bad", {
+      attributes: {},
+      // @ts-expect-error neither an attribute nor a relationship of the concept is called ghost
+      identifiedBy: ["ghost"],
+      relationships: { base: relationship(base, { cardinality: "one" }) },
+    });
+    same(bad.identifiedBy, ["ghost"]);
+    // @ts-expect-error a concept with no relationships has none to identify it by
+    const bare = concept("bare", { attributes: { id: attribute(identifier()) }, identifiedBy: ["base"] });
+    same(bare.identifiedBy, ["base"]);
+  },
+);

@@ -9,15 +9,15 @@
 
 ## The model
 
-- **FR-001**: A domain MUST be made of concepts, code lists and the annotations on them, in terms that name no database: a concept has a name, a definition, attributes (each a business datatype that is required, optional or many), the attributes that identify it, and relationships to other concepts, each with a cardinality (one, optional or many). The constructors (`concept`, `attribute`, `relationship`, `codeList`) MUST be total, and `domain` MUST return the domain or all its errors, as values.
+- **FR-001**: A domain MUST be made of concepts, code lists and the annotations on them, in terms that name no database: a concept has a name, a definition, attributes (each a business datatype that is required, optional or many), the attributes, or the relationships, that identify it, and relationships to other concepts, each with a cardinality (one, optional or many). A concept identified by a relationship of cardinality one is a specialization: its identity is the identity of what it points to, as a person is a party. The constructors (`concept`, `attribute`, `relationship`, `codeList`) MUST be total, and `domain` MUST return the domain or all its errors, as values.
 - **FR-002**: A business datatype MUST be one case of a tagged union (text, integer, decimal, boolean, date, instant, identifier, code, structured, binary) that a `switch` matches exhaustively; `code` names a code list; no case names a type of a database.
-- **FR-003**: The attribute names, the relationship names and the identifying attributes of a concept MUST be literal types, so that an identifying attribute the concept does not have does not compile.
-- **FR-004**: `domain` MUST find, and return together, each name that is not lower-case snake (`[a-z][a-z0-9_]*`), each duplicate name (two concepts, two code lists, or an attribute and a relationship of a concept with one name), each relationship to a concept that is not in the domain, each attribute of a code list that is not in the domain, each concept with no identifying attribute and each identifying attribute that is not required, and each annotation on an element it may not be on.
+- **FR-003**: The attribute names, the relationship names and the identifying members of a concept MUST be literal types, so that an identifying attribute or relationship the concept does not have does not compile.
+- **FR-004**: `domain` MUST find, and return together, each name that is not lower-case snake (`[a-z][a-z0-9_]*`), each duplicate name (two concepts, two code lists, or an attribute and a relationship of a concept with one name), each relationship to a concept that is not in the domain, each attribute of a code list that is not in the domain, each concept with no identifying member, each identifying attribute that is not required and each identifying relationship whose cardinality is not one, and each annotation on an element it may not be on.
 
 ## Identity and the trace graph
 
 - **FR-005**: Every element MUST have an identity made of its names and no more: the domain `d`, a concept `d/c`, an attribute `d/c.a`, a relationship `d/c>r`, a code list `d/list:l` and a code `d/list:l.k`; `elementsOf` MUST list every element, in a fixed order (the domain, then each concept with its attributes and relationships, then each code list with its codes), with its identity, kind, name, definition, parent and annotations.
-- **FR-006**: `traceGraph` MUST give the elements as nodes and as edges (`contains`, from an element to what it holds; `identifies`, from a concept to its identifying attributes; `references`, from a relationship to the concept it points to and from an attribute of a code list to the list), as data.
+- **FR-006**: `traceGraph` MUST give the elements as nodes and as edges (`contains`, from an element to what it holds; `identifies`, from a concept to its identifying attributes and relationships; `references`, from a relationship to the concept it points to and from an attribute of a code list to the list), as data.
 
 ## Annotations, vocabularies and lint
 
@@ -33,7 +33,8 @@
 - **FR-013**: The terms of DPV-PD MUST be the vocabulary's own: `tools/generate-dpv.ts` MUST write `governance/vocabularies/dpv.auto.ts` from the vocabulary's CSV at the pinned version, which it MUST refuse where its SHA-256 is not the pinned one, and its `--check` MUST fail where the file is not what the CSV makes; no term is written by hand.
 - **FR-014**: A security vocabulary MUST give the kinds `security.classification` (public, internal, confidential or restricted), `security.access` (the roles that may read and the roles that may write), `security.scope` (an attribute that partitions a concept's data, which access is filtered by) and `security.mask` (redact, hash or partial); its rules find a concept with more than one scope (an error), restricted data with no access (a warning), and personal data that is not classified confidential or restricted (a warning).
 - **FR-015**: An ownership vocabulary MUST give the kinds `ownership.owner` and `ownership.steward`, roles that answer for a domain, a concept or a code list; its rule finds a concept with no owner where the domain has none (a warning).
-- **FR-016**: A quality and lifecycle vocabulary MUST give the kinds `quality.pattern`, `quality.range`, `quality.retention` and `quality.deprecated`; its rules find a pattern that is not a regular expression, a range whose minimum is above its maximum, a retention that is not a positive number of days (each an error), and an element deprecated with no replacement (a warning).
+- **FR-016**: A quality and lifecycle vocabulary MUST give the kinds `quality.pattern`, `quality.range`, `quality.retention` and `quality.deprecated`; `quality.default` (the value an attribute takes where none is given), `quality.unique` (attributes or relationships of a concept that are unique together), `quality.differs` (a named rule that two attributes or relationships of a concept must differ), `quality.audited` (a domain or a concept keeps who made, changed and removed each record and when, and removes by marking or for good) and `quality.openness` (a code list is open, the business adds codes of its own, or closed, only the model changes it); its rules find a pattern that is not a regular expression, a range whose minimum is above its maximum, a retention that is not a positive number of days, a default that does not fit its datatype or is not a code of its list, and a member named in `unique` or `differs` that the concept lacks (each an error), and an element deprecated with no replacement (a warning).
+- **FR-017**: A usage vocabulary MUST give the kind `usage.lookup`, the attributes or relationships of a concept by which its records are usually found; its rule finds a member the concept lacks (an error).
 
 ## Out of scope
 
@@ -53,11 +54,15 @@
 - An annotation of a kind no vocabulary given has: a finding, not an error, per FR-009.
 - `identifiedBy: ["nope"]` where the concept has no attribute `nope`: does not compile, per FR-003.
 - A DPV CSV whose SHA-256 is not the pinned one: the generator refuses and writes nothing, per FR-013.
+- A person identified by its relationship to a party of cardinality one: allowed, a specialization; identified by a relationship of cardinality many: returned, per FR-004.
+- A `quality.unique` naming `party` and `kind` where the concept has that relationship and that attribute: allowed; naming `nope`: an error, per FR-016.
+- A `quality.default` of `"yes"` on a boolean attribute, or of `"x"` on a code attribute whose list has no such code: an error, per FR-016.
 - A personal attribute with no category: a warning, per FR-012; with a category that is not a term of DPV-PD: does not compile, per FR-012.
 
 ## Assumptions
 
 - An identity is the path of names, so a renamed element is a new element; a way to carry identity across a rename (`was`) is not built (OQ-1).
+- Indexes, views, routines and the names of constraints are not governance: a lookup says how data is found and a later layer chooses what serves it (0001-layers FR-002, FR-003).
 - The vocabularies of this specification are the library's own starting set, held in `governance/vocabularies/`; a project adds others by extension (FR-008).
 - DPV 2.3 is the version pinned, and its terms are used under the vocabulary's licence (CC BY 4.0), with the source and its digest in the generated file.
 

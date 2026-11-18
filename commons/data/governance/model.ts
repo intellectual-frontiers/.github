@@ -121,8 +121,11 @@ export type AnyConcept = Concept<string, Attrs, Rels>;
 export interface ConceptSpec<A extends Attrs, R extends Rels> {
   readonly definition?: string;
   readonly attributes: A;
-  /** The attributes that identify it: names of its own attributes, or it does not compile. */
-  readonly identifiedBy: readonly (keyof A & string)[];
+  /**
+   * What identifies it: names of its own attributes, or of its own relationships of cardinality one, which make it a specialization of what they point to, or it does not
+   * compile.
+   */
+  readonly identifiedBy: readonly ((keyof NoInfer<A> | keyof NoInfer<R>) & string)[];
   readonly relationships?: R;
   readonly annotations?: readonly Annotation[];
 }
@@ -149,6 +152,9 @@ export function concept<const N extends string, const A extends Attrs, const R e
     annotations: Object.freeze([...(spec.annotations ?? [])]),
   });
 }
+
+/** The names of the members of a concept: its attributes, then its relationships. */
+export const membersOf = (c: AnyConcept): readonly string[] => [...Object.keys(c.attributes), ...Object.keys(c.relationships)];
 
 /** The concept a target gives. */
 export function resolve(target: Target): AnyConcept {
@@ -231,8 +237,12 @@ export function domain(name: string, spec: DomainSpec): Result<Domain, readonly 
     if (c.identifiedBy.length === 0) errors.push({ kind: "identifier", concept: cid, why: "missing" });
     for (const key of c.identifiedBy) {
       const a = c.attributes[key];
-      if (a === undefined) errors.push({ kind: "identifier", concept: cid, attribute: key, why: "unknown" });
-      else if (a.multiplicity !== "required") errors.push({ kind: "identifier", concept: cid, attribute: key, why: "not-required" });
+      const r = c.relationships[key];
+      if (a !== undefined) {
+        if (a.multiplicity !== "required") errors.push({ kind: "identifier", concept: cid, attribute: key, why: "not-required" });
+      } else if (r !== undefined) {
+        if (r.cardinality !== "one") errors.push({ kind: "identifier", concept: cid, attribute: key, why: "not-required" });
+      } else errors.push({ kind: "identifier", concept: cid, attribute: key, why: "unknown" });
     }
   }
   const seenLists = new Set<string>();

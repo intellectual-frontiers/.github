@@ -7,12 +7,17 @@
  */
 import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 import {
+  attribute,
   attributeId,
   codeId,
   codeListId,
+  concept,
   conceptId,
+  domain,
   domainId,
   elementsOf,
+  identifier,
+  relationship,
   relationshipId,
   traceGraph,
 } from "@intellectual-frontiers/data/governance";
@@ -95,5 +100,23 @@ proves(["0003-governance FR-006"], "the trace graph has the elements as nodes an
   assert(
     g.edges.every((e) => g.nodes.some((n) => n.id === e.from) && g.nodes.some((n) => n.id === e.to)),
     "every edge joins two nodes",
+  );
+});
+
+proves(["0003-governance FR-006"], "a concept identified by a relationship has an identifies edge to the relationship", () => {
+  const base = concept("base", { definition: "b", attributes: { id: attribute(identifier(), { definition: "i" }) }, identifiedBy: ["id"] });
+  const special = concept("special", {
+    definition: "s",
+    attributes: {},
+    identifiedBy: ["base"],
+    relationships: { base: relationship(base, { cardinality: "one", definition: "r" }) },
+  });
+  const r = domain("d", { definition: "d", concepts: [base, special] });
+  assert(r.kind === "ok");
+  if (r.kind !== "ok") return;
+  const g = traceGraph(r.value);
+  same(
+    g.edges.filter((e) => e.kind === "identifies").map((e) => `${e.from} -> ${e.to}`),
+    ["d/base -> d/base.id", "d/special -> d/special>base"],
   );
 });

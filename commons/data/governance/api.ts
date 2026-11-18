@@ -48,6 +48,7 @@ export {
   type DomainError,
   type DomainSpec,
   type Multiplicity,
+  membersOf,
   type Relationship,
   type RelationshipOptions,
   relationship,
