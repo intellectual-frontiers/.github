@@ -12,7 +12,10 @@
     "./governance": "./governance/api.ts",
     "./sql/logical": "./sql/logical/api.ts",
     "./sql/physical": "./sql/physical/api.ts",
-    "./models/arca": "./models/arca/mod.ts"
+    "./models/arca": "./models/arca/mod.ts",
+    "./sql/dialects/postgres": "./sql/dialects/postgres/mod.ts",
+    "./sql/dialects/sqlite": "./sql/dialects/sqlite/mod.ts",
+    "./sql/dialects/duckdb": "./sql/dialects/duckdb/mod.ts"
   },
   "scripts": {
     "check": "tsc -p tsconfig.json",
@@ -22,6 +25,8 @@
     "check:layers": "bun tools/check.ts"
   },
   "devDependencies": {
+    "@duckdb/node-api": "2.0.0-r.1",
+    "@electric-sql/pglite": "0.5.16",
     "@intellectual-frontiers/commons": "link:../ts",
     "@types/node": "26.6.6",
     "typescript": "7.0.2"
