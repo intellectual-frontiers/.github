@@ -18,6 +18,7 @@ export {
   quoteName,
   standardLiteral,
 } from "./dialect.ts";
+export { upsert } from "./upsert.ts";
 export {
   type BindContext,
   GROUPS,

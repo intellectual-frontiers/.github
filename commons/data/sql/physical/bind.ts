@@ -23,6 +23,7 @@ import type {
 } from "@intellectual-frontiers/data/sql/logical";
 import { type Naming, naming as defaultNaming, writeCode } from "./case.ts";
 import type { Dialect } from "./dialect.ts";
+import { upsert } from "./upsert.ts";
 import {
   GROUPS,
   type BindContext,
@@ -203,19 +204,10 @@ export function bind(schema: LogicalSchema, options: BindOptions): Result<Physic
   }
   for (const t of order) {
     if (t.rows === undefined || t.rows.length === 0) continue;
-    const key = t.primaryKey.map((k) => q(naming.names.write(k)));
-    const names = t.columns.map((c) => q(columns.get(c.id) ?? ""));
-    const set = t.columns
-      .filter((c) => !t.primaryKey.some((k) => k.join(".") === c.name.join(".")))
-      .map((c) => `${q(columns.get(c.id) ?? "")} = excluded.${q(columns.get(c.id) ?? "")}`);
-    const rows = t.rows.map(
-      (r) => `(${[dialect.literal(writeCode(naming, r.code)), dialect.literal(r.label), dialect.literal(r.description)].join(", ")})`,
-    );
-    statements.push({
-      group: "data",
-      sql: `INSERT INTO ${q(tables.get(t.id) ?? "")} (${names.join(", ")}) VALUES\n${rows.join(",\n")}\nON CONFLICT (${key.join(", ")}) DO UPDATE SET ${set.join(", ")};`,
-      of: [t.id],
-    });
+    const names = t.columns.map((c) => columns.get(c.id) ?? "");
+    const key = t.primaryKey.map((k) => naming.names.write(k));
+    const rows = t.rows.map((r) => [writeCode(naming, r.code), r.label, r.description]);
+    statements.push({ group: "data", sql: upsert(dialect, tables.get(t.id) ?? "", names, key, rows), of: [t.id] });
   }
 
   const context: BindContext = { schema, dialect, naming, written };

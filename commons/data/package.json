@@ -15,7 +15,8 @@
     "./models/arca": "./models/arca/mod.ts",
     "./sql/dialects/postgres": "./sql/dialects/postgres/mod.ts",
     "./sql/dialects/sqlite": "./sql/dialects/sqlite/mod.ts",
-    "./sql/dialects/duckdb": "./sql/dialects/duckdb/mod.ts"
+    "./sql/dialects/duckdb": "./sql/dialects/duckdb/mod.ts",
+    "./sql/extensions/documentation": "./sql/extensions/documentation/mod.ts"
   },
   "scripts": {
     "check": "tsc -p tsconfig.json",

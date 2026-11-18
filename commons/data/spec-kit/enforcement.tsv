@@ -7,7 +7,7 @@ requirement	mechanism	by	note
 0001-layers FR-004	check	.github: cd commons/data && bun run verify	suite/layers.test.ts: each unit may import only the units of the table, and an import that climbs or reaches around is layers/above or layers/around, by package name and by path
 0001-layers FR-005	check	.github: cd commons/data && bun run verify	suite/layers.test.ts: layers 1 to 3 and the engine import only the kernel and the library, and a driver or node:fs is layers/external
 0001-layers FR-006	check	.github: cd commons/data && bun run verify	suite/logical-project.test.ts: every logical element carries the identity of its governance element (from); suite/physical-bind.test.ts: every statement carries the logical elements it was made from (of)
-0001-layers FR-007	none	-	Planned: the logical flow report is built (0006-logical FR-011); the physical layer completes it, where a carried annotation becomes a table or a policy
+0001-layers FR-007	check	.github: cd commons/data && bun run verify	suite/documentation.test.ts: every annotation is a row of governance_annotation (carried) or a comment (expressed), and the logical flow report names what is unexpressed
 0001-layers FR-008	check	.github: cd commons/data && bun run verify	suite/layers.test.ts: every file of the real tree is in a unit, and one in no unit is layers/unclassified
 0001-layers FR-009	check	.github: cd commons/data && bun run verify	suite/layers.test.ts: the four layer entries of exports are the api.ts of their folders, and an import of a subpath exports does not name is layers/private
 0001-layers FR-010	check	.github: cd commons/data && bun run verify	suite/layers.test.ts: a relative import into another unit is layers/relative, and one inside the unit is not
@@ -82,3 +82,12 @@ requirement	mechanism	by	note
 0007-physical FR-011	check	.github: cd commons/data && bun run verify	suite/physical-bind.test.ts: an extension adds statements through physical.statements, is given the written names, and its errors are returned with bind's
 0007-physical FR-012	check	.github: cd commons/data && bun run verify	suite/physical-engines.test.ts: on SQLite, DuckDB and PostgreSQL (PGlite) the engine holds the logical schema's tables, columns, nullability, primary keys and indexes, refuses what its constraints forbid, and keeps the reference data stable
 0007-physical FR-013	check	.github: cd commons/data && bun run verify	suite/physical-neutral.test.ts: the code of the physical core names no engine, and each dialect names its own and no other
+0008-sql-documentation FR-001	check	.github: cd commons/data && bun run verify	suite/documentation.test.ts: the comments extension writes COMMENT ON for each table and column where the dialect has it, quotes doubled
+0008-sql-documentation FR-002	check	.github: cd commons/data && bun run verify	suite/documentation.test.ts: the documentation table holds one row per described table and column, and only where the settings ask for it
+0008-sql-documentation FR-003	check	.github: cd commons/data && bun run verify	suite/documentation.test.ts: the governance tables hold the annotations and the trace of each written column
+0008-sql-documentation FR-004	check	.github: cd commons/data && bun run verify	suite/documentation.test.ts: a comment holds the human description alone
+0008-sql-documentation FR-005	check	.github: cd commons/data && bun run verify	suite/documentation.test.ts: the settings are a typed value with the defaults the spec gives
+0008-sql-documentation FR-006	check	.github: cd commons/data && bun run verify	suite/documentation.test.ts: each extension contributes a statement source to physical.statements and can be left out
+0008-sql-documentation FR-007	check	.github: cd commons/data && bun run verify	suite/documentation.test.ts: the extension tables are bound by the physical schema's own machinery, a name collision is an error value
+0008-sql-documentation FR-008	check	.github: cd commons/data && bun run verify	suite/documentation.test.ts: loading twice leaves the same rows, and reloading after a change leaves the new ones
+0008-sql-documentation FR-009	check	.github: cd commons/data && bun run verify	suite/documentation.test.ts: every annotation of the domain is a row of governance_annotation, an unknown kind included

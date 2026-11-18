@@ -28,7 +28,7 @@ export const about: About = {
     },
     {
       path: "sql/",
-      what: "The logical schema (tables, columns, keys and indexes made from governance by a projection, with the report of the flow and the types of rows), the physical schema (a logical schema bound to a dialect and a case style, as statements) and the dialects of PostgreSQL, SQLite and DuckDB, which are extensions.",
+      what: "The logical schema (tables, columns, keys and indexes made from governance by a projection, with the report of the flow and the types of rows), the physical schema (a logical schema bound to a dialect and a case style, as statements) and the dialects of PostgreSQL, SQLite and DuckDB, which are extensions; the documentation extensions (comments, documentation tables, governance tables) are in sql/extensions/documentation/.",
       mayImport: ["governance/, engine/, by package name"],
     },
     { path: "extensions/", what: "Extensions that need no database.", mayImport: ["governance/, engine/, by package name"] },
