@@ -35,7 +35,7 @@ export const about: About = {
     },
     {
       path: "data/",
-      what: "IFC data, an independent library with a spec kit of its own (commons 0027-commons-libraries): governance, a logical and a physical schema, and extensions. Proved by `bun run verify` in its folder.",
+      what: "IFC data, an independent library with a spec kit and a manifest (`library.ts`) of its own (commons 0027-commons-libraries): governance, a logical and a physical schema, and extensions. Proved by `bun run verify` in its folder.",
       mayImport: ["its own about.ts"],
     },
     { path: "ts/", what: "IFC TypeScript, and the data libraries built on it (`ts/data/`).", mayImport: ["see its own about.ts"] },
@@ -66,6 +66,14 @@ export const about: About = {
     {
       run: "bun ts/mizan/oscal-register.ts",
       does: "Writes the proof register of `spec-kit/` as OSCAL 1.2.3 (`generated/mizan-register.auto.oscal.json`, `generated/mizan-register-results.auto.oscal.json`); with `--check` it fails where a file is stale.",
+    },
+    {
+      run: "bun ts/mizan/libraries.ts [--check]",
+      does: "Writes the requirements of the libraries (0027-commons-libraries) and their rows of the register from each library's manifest, `commons/<name>/library.ts`; with `--check` it fails where they are stale or a manifest and its folder disagree.",
+    },
+    {
+      run: "bun ts/mizan/check.ts [--level L0|L1|L2|L3] [--all]",
+      does: "Checks a folder against the rules Mizan adds, held by a baseline that only shrinks, at the conformance level it declares (0028-conformance-levels); with `--all` it also runs every library's `verify`.",
     },
     {
       run: "bun ts/mizan/newer.ts",

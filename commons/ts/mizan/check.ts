@@ -7,6 +7,8 @@
  *     bun commons/ts/mizan/check.ts --defined-by          also hold commons' own terms to the requirement-to-term stage (0003-mizan FR-044), which a harness turns on with `specTerms.definitions`
  *     bun commons/ts/mizan/check.ts --baseline FILE       hold the findings against FILE
  *     bun commons/ts/mizan/check.ts --write-baseline      write the baseline from today's findings (to start it, or to shrink it: never to add a line to pass)
+ *     bun commons/ts/mizan/check.ts --level L0|L1|L2|L3   hold the folder to the rules of that conformance level only (commons 0028-conformance-levels; L3, every rule, where it is not given)
+ *     bun commons/ts/mizan/check.ts --all [--repo DIR]     also run the `verify` of every library a manifest declares, each from its folder (the libraries of DIR, this repository by default); without it nothing inside a library is read
  *     bun commons/ts/mizan/check.ts --today YYYY-MM-DD    count the 90 days of a decision from that day (for a test); commons' own folder also holds its ontologies' terms to 0018-standards-first FR-003 to FR-005
  *
  * It prints every new finding and every stale baseline line on standard error, writes nothing without `--write-baseline`, and exits 1 where a finding is new or a baseline
@@ -16,8 +18,19 @@
  */
 import { fileURLToPath } from "node:url";
 import process from "node:process";
+import { stdio } from "../runtime/mod.ts";
 import { packagingTerms } from "../../ontology/audit/mod.ts";
-import { bases, classes, jurisdictionLevels, integrationDirections, rungKinds, mz, terms } from "../../ontology/mizan/mod.ts";
+import {
+  bases,
+  classes,
+  conformanceLevels,
+  conformanceRequirements,
+  jurisdictionLevels,
+  integrationDirections,
+  rungKinds,
+  mz,
+  terms,
+} from "../../ontology/mizan/mod.ts";
 import * as ifccmOntology from "../../ontology/ifccm/mod.ts";
 import * as ifrOntology from "../../ontology/ifr/mod.ts";
 import * as ifqsOntology from "../../ontology/ifqs/mod.ts";
@@ -25,6 +38,8 @@ import * as ifwsOntology from "../../ontology/ifws/mod.ts";
 import { pm } from "../../ontology/supply-chain/packaging/mod.ts";
 import { type RulePlugin, rulePlugins } from "./rules.ts";
 import { holdHarness } from "./harness.ts";
+import { DEFAULT_LEVEL, LEVELS, levelOf } from "./levels.ts";
+import { verifyAll } from "./libraries.ts";
 import { readWorks } from "./versions/scan.ts";
 import { BASELINE_COMMENTS, readSpecTexts } from "./spec-files.ts";
 import { definitionsOf } from "./spec-terms.ts";
@@ -102,7 +117,14 @@ export function main(
   };
   const root = arg("--root") ?? fileURLToPath(new URL("../../spec-kit", import.meta.url));
   const own = arg("--root") === undefined;
+  const asked = arg("--level");
+  const level = asked === undefined ? DEFAULT_LEVEL : levelOf(asked);
+  if (level === undefined) {
+    stdio.stderr.writeSync(`check: --level ${asked ?? ""} is not a conformance level; the levels are ${LEVELS.join(", ")}\n`);
+    return 2;
+  }
   return holdHarness({
+    level,
     root,
     baselineFile: arg("--baseline") ?? `${(arg("--register") ?? root).replace(/[\\/]$/, "")}/mizan.baseline.txt`,
     today: arg("--today") ?? today,
@@ -150,6 +172,8 @@ export function main(
                 ...Object.keys(jurisdictionLevels),
                 ...Object.keys(integrationDirections),
                 ...Object.keys(rungKinds),
+                ...Object.keys(conformanceLevels),
+                ...Object.keys(conformanceRequirements),
               ]),
               pm: new Set(Object.keys(pm)),
               ifws: ifwsOntology.termNames,
@@ -188,4 +212,15 @@ export function main(
   });
 }
 
-if (import.meta.main) process.exitCode = main(process.argv.slice(2));
+/** The command, with `--all` (0028-conformance-levels FR-012): the check, and then the `verify` of every library a manifest declares, each named with its status. Returns the exit status. */
+export async function run(argv: readonly string[]): Promise<number> {
+  const checked = main(argv);
+  if (!argv.includes("--all")) return checked;
+  const at = argv.indexOf("--repo");
+  const repo = at >= 0 ? (argv[at + 1] ?? ".") : fileURLToPath(new URL("../../..", import.meta.url));
+  const results = await verifyAll(repo);
+  for (const r of results) stdio.stderr.writeSync(`verify ${r.name}: ${r.code === 0 ? "passed" : `FAILED (exit ${r.code})`}\n`);
+  return checked === 0 && results.every((r) => r.code === 0) ? 0 : checked === 2 ? 2 : 1;
+}
+
+if (import.meta.main) process.exitCode = await run(process.argv.slice(2));

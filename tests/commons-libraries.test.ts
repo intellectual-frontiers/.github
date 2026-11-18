@@ -3,7 +3,8 @@
  * knows it as one requirement proved by its own `verify`. The findings are made by `libraryFindings` over a repository's files; the real tree must have none, and each rule
  * is broken in a copy of the real files, in a temporary folder, and named. The specification checker is the real tool, run as a program (`--root` its spec kit).
  *
- * `libraryFindings` is a function of this test for now: it moves to commons' tools when a second library needs it.
+ * A library declares itself with a manifest, `library.ts` (0027-commons-libraries FR-012): the check of a manifest against its folder and the generator of the section "The libraries" are
+ * `commons/ts/mizan/libraries.ts`. `libraryFindings` is a function of this test for now: it moves to commons' tools when a second library needs it.
  *
  * @module
  */
@@ -11,6 +12,7 @@ import { cpSync, existsSync, readdirSync, readFileSync, statSync, writeFileSync 
 import { fs, path, proc } from "../commons/ts/runtime/mod.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../commons/ts/runtime/test.ts";
 import { check, message } from "../commons/tools/mizan-check.ts";
+import { manifestFindings, synchronize } from "../commons/ts/mizan/libraries.ts";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
 const SPEC = "0027-commons-libraries";
@@ -68,6 +70,8 @@ export function libraryFindings(repo: string): readonly string[] {
   );
   const docs = read(`${repo}/commons/docs.config.ts`);
   const libraries = librariesOf(repo);
+  for (const f of manifestFindings(repo)) found.push(f);
+  for (const stale of synchronize(repo, false).stale) found.push(`${stale} is not what the manifests make (FR-011)`);
   for (const name of named.keys())
     if (!libraries.includes(name)) found.push(`${SPEC} names commons/${name}, which has no spec-kit/ (FR-008)`);
   for (const name of libraries) {
@@ -153,7 +157,7 @@ proves(
   () => {
     assertEquals(libraryFindings(ROOT), []);
     assert(librariesOf(ROOT).includes("data"));
-    assertEquals(namedLibraries(read(`${ROOT}/commons/spec-kit/specs/${SPEC}/spec.md`)).get("data"), "FR-011");
+    assertEquals(namedLibraries(read(`${ROOT}/commons/spec-kit/specs/${SPEC}/spec.md`)).get("data"), "FR-101");
   },
 );
 
@@ -169,10 +173,12 @@ proves([`${SPEC} FR-008`], "a requirement that names a folder with no spec kit i
   using c = copyOf();
   edit(
     `${c.repo}/commons/spec-kit/specs/${SPEC}/spec.md`,
-    "## Out of scope",
-    "- **FR-012**: `commons/nope` MUST be a library.\n\n## Out of scope",
+    "\n<!-- libraries:end -->\n",
+    "\n- **FR-102**: `commons/nope` MUST be a library.\n\n<!-- libraries:end -->\n",
   );
-  assertStringIncludes(libraryFindings(c.repo).join("\n"), "names commons/nope, which has no spec-kit/");
+  const text = libraryFindings(c.repo).join("\n");
+  assertStringIncludes(text, "names commons/nope, which has no spec-kit/");
+  assertStringIncludes(text, "is not what the manifests make (FR-011)");
 });
 
 proves([`${SPEC} FR-001`], "a library without an about.ts, or with another package name, is found", () => {
@@ -191,7 +197,7 @@ proves(
     using c = copyOf();
     fs.mkdirSync(`${c.repo}/commons/data/spec-kit/specs/0002-layers`, { recursive: true });
     writeFileSync(`${c.repo}/commons/data/spec-kit/registry.tsv`, "number\tslug\tstate\n0002\tlayers\tin force\n");
-    writeFileSync(`${c.repo}/commons/spec-kit/registry.tsv`, `${read(`${c.repo}/commons/spec-kit/registry.tsv`)}0028\tlayers\tin force\n`);
+    writeFileSync(`${c.repo}/commons/spec-kit/registry.tsv`, `${read(`${c.repo}/commons/spec-kit/registry.tsv`)}0030\tlayers\tin force\n`);
     const text = libraryFindings(c.repo).join("\n");
     assertStringIncludes(text, "the registry of commons lists layers, a specification of commons/data");
     assertStringIncludes(text, "starts at 0002, not 0001");
@@ -237,10 +243,10 @@ proves([`${SPEC} FR-007`], "a requirement for a library whose enforcement is not
   using c = copyOf();
   edit(
     `${c.repo}/commons/spec-kit/enforcement.tsv`,
-    `${SPEC} FR-011\tcheck\t.github: cd commons/data && bun run verify`,
-    `${SPEC} FR-011\tcheck\t.github: bun test ./tests/`,
+    `${SPEC} FR-101\tcheck\t.github: cd commons/data && bun run verify`,
+    `${SPEC} FR-101\tcheck\t.github: bun test ./tests/`,
   );
-  assertStringIncludes(libraryFindings(c.repo).join("\n"), `${SPEC} FR-011 is not a check row that runs the verify of commons/data`);
+  assertStringIncludes(libraryFindings(c.repo).join("\n"), `${SPEC} FR-101 is not a check row that runs the verify of commons/data`);
 });
 
 proves(
