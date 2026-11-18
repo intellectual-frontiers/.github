@@ -11,13 +11,14 @@ import { findConfig, loadConfig, main, parseArgs } from "../cli.ts";
 import { normalDir, resolveConfig, under } from "../config.ts";
 import { CONFIG, ROOT } from "./helpers.ts";
 
-proves(["0011-documentation FR-023"], "commons' configuration resolves: its root, its packages, its spec kit, its citations, its lenses and its output", () => {
+proves(["0011-documentation FR-023"], "commons' configuration resolves: its root, its packages, its spec kits, its citations, its lenses and its output", () => {
   assertEquals(CONFIG.root, ROOT);
   assertEquals(CONFIG.fileFromRoot, "commons/docs.config.ts");
   assertEquals([CONFIG.name, CONFIG.subject, CONFIG.branch], ["IF Commons", "commons", "main"]);
   assertEquals(CONFIG.home, { dir: "commons", slug: "home", about: { kind: "file", file: "commons/about.ts" } });
   assertEquals(CONFIG.packages.map((p) => [p.dir, p.slug]), [["commons/ts", "ifc-typescript"], ["commons/ts/data", "data"], ["commons/docs", "docs"]]);
-  assertEquals(CONFIG.specKits, [{ layout: "commons", dir: "commons/spec-kit" }]);
+  // commons' own spec kit, then the spec kit of each library of commons (commons 0027-commons-libraries FR-009)
+  assertEquals(CONFIG.specKits, [{ layout: "commons", dir: "commons/spec-kit" }, { layout: "commons", dir: "commons/data/spec-kit" }]);
   assertEquals([CONFIG.citations.prefix, CONFIG.citations.digits], ["commons", 4]);
   assertEquals(CONFIG.lenses.map((l) => l.name), ["sql-aide", "file-aide"]);
   assertEquals(CONFIG.out, path.join(ROOT, "_site"));
