@@ -13,7 +13,7 @@ export const about: About = {
   title: "Data",
   summary:
     "Governance (what a business domain is and what must be true of its data), a logical schema made from it, and a physical schema for " +
-    "PostgreSQL, SQLite or DuckDB made from that, with extensions to each. A library of commons with its own specifications; the engine is built, the layers follow.",
+    "PostgreSQL, SQLite or DuckDB made from that, with extensions to each. A library of commons with its own specifications; the engine and governance are built, the logical and physical schemas follow.",
   folders: [
     { path: "spec-kit/", what: "The library's own specifications, numbered from 0001.", mayImport: ["nothing: Markdown and TSV"] },
     {
@@ -21,7 +21,11 @@ export const about: About = {
       what: "The extension host: contribution points and handles that layers declare, manifests, `compose` and lazy activation.",
       mayImport: ["the kernel, by package name"],
     },
-    { path: "governance/", what: "The governance layer.", mayImport: ["engine/, by package name"] },
+    {
+      path: "governance/",
+      what: "The governance layer: domains of concepts and code lists, typed annotations, the vocabularies (documentation, requirements, privacy, security, ownership, quality), identity, the trace graph and lint.",
+      mayImport: ["engine/, by package name"],
+    },
     {
       path: "sql/",
       what: "The logical and the physical schema for SQL, with dialects and extensions.",

@@ -1,12 +1,12 @@
 # What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
 # mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
 requirement	mechanism	by	note
-0001-layers FR-001	none	-	Planned: governance is built next (phase 3 of the library); its imports are held by FR-004 already
+0001-layers FR-001	check	.github: cd commons/data && bun run verify	suite/governance-neutral.test.ts: the code of governance names no engine and no part of a relational schema; its imports are held by FR-004 (engine and kernel only)
 0001-layers FR-002	none	-	Planned: the logical schema is built after governance; its imports are held by FR-004 already
 0001-layers FR-003	none	-	Planned: the physical schema is built after the logical one; its imports are held by FR-004 already
 0001-layers FR-004	check	.github: cd commons/data && bun run verify	suite/layers.test.ts: each unit may import only the units of the table, and an import that climbs or reaches around is layers/above or layers/around, by package name and by path
 0001-layers FR-005	check	.github: cd commons/data && bun run verify	suite/layers.test.ts: layers 1 to 3 and the engine import only the kernel and the library, and a driver or node:fs is layers/external
-0001-layers FR-006	none	-	Planned: identities are built with governance and the logical schema
+0001-layers FR-006	none	-	Planned: the identities of governance are built (0003-governance FR-005); the links from the logical and the physical schema come with them
 0001-layers FR-007	none	-	Planned: the flow report is built with the logical schema
 0001-layers FR-008	check	.github: cd commons/data && bun run verify	suite/layers.test.ts: every file of the real tree is in a unit, and one in no unit is layers/unclassified
 0001-layers FR-009	check	.github: cd commons/data && bun run verify	suite/layers.test.ts: the four layer entries of exports are the api.ts of their folders, and an import of a subpath exports does not name is layers/private
@@ -21,3 +21,19 @@ requirement	mechanism	by	note
 0002-engine FR-007	check	.github: cd commons/data && bun run verify	suite/engine-compose.test.ts: the contributions of a point come back typed and in the order of the composition
 0002-engine FR-008	check	.github: cd commons/data && bun run verify	suite/engine-activation.test.ts: start activates in order once, a lazy extension loads and activates once on its event (two at once too) after what it requires, and a bad load, a failed load and a throwing activate are values that stay
 0002-engine FR-009	check	.github: cd commons/data && bun run verify	suite/engine-activation.test.ts: use gives only a declared and provided handle, typed by it; undeclared and unprovided are error values, for a lazy extension too
+0003-governance FR-001	check	.github: cd commons/data && bun run verify	suite/governance-model.test.ts: the constructors are total and the pieces are frozen data with their defaults; a domain is the domain when nothing is wrong
+0003-governance FR-002	check	.github: cd commons/data && bun run verify	suite/governance-model.test.ts: every case of the datatype union is described, and none names a database
+0003-governance FR-003	check	.github: cd commons/data && bun run verify	suite/governance-model.test.ts: the names of a concept are literal types, and an identifying attribute it lacks does not compile (@ts-expect-error, checked by the compiler in verify)
+0003-governance FR-004	check	.github: cd commons/data && bun run verify	suite/governance-model.test.ts: a bad name, a duplicate, an annotation out of place, an unresolved relationship or code list, and a bad identifier come back together as values; a relationship given as a function allows a cycle
+0003-governance FR-005	check	.github: cd commons/data && bun run verify	suite/governance-elements.test.ts: an identity is made of names, and every element is listed in a fixed order with its kind, name, definition and parent
+0003-governance FR-006	check	.github: cd commons/data && bun run verify	suite/governance-elements.test.ts: the trace graph has the elements as nodes and contains, identifies and references as edges, each joining two nodes
+0003-governance FR-007	check	.github: cd commons/data && bun run verify	suite/governance-annotations.test.ts: an annotation is typed by its kind, says where it may be, and is read back typed (@ts-expect-error, checked in verify)
+0003-governance FR-008	check	.github: cd commons/data && bun run verify	suite/governance-annotations.test.ts: an extension contributes a vocabulary through the engine and the composition gives them in order
+0003-governance FR-009	check	.github: cd commons/data && bun run verify	suite/governance-annotations.test.ts: lint returns data, the core rules first (a missing definition, an unknown kind) and then each vocabulary's in order
+0003-governance FR-010	check	.github: cd commons/data && bun run verify	suite/governance-vocabularies.test.ts: the documentation kinds go where they say and the vocabulary has no rule
+0003-governance FR-011	check	.github: cd commons/data && bun run verify	suite/governance-vocabularies.test.ts: a citation is NNNN-slug FR-nnn, requirementsOf says who cites what, and the uncited and malformed rules fire and stay quiet
+0003-governance FR-012	check	.github: cd commons/data && bun run verify	suite/governance-vocabularies.test.ts: personal data names a DPV-PD term (a term that is not one does not compile), dpvClassOf and dpvIri, and the category and purpose rules
+0003-governance FR-013	check	.github: cd commons/data && bun run verify	suite/governance-dpv.test.ts: a CSV that is not the pinned one is refused and the generated file carries the pinned source and digest; the live --check against the CSV runs in .github/workflows/data.yml
+0003-governance FR-014	check	.github: cd commons/data && bun run verify	suite/governance-vocabularies.test.ts: the security kinds go where they say, and the scope, restricted-access and personal-unprotected rules fire and stay quiet
+0003-governance FR-015	check	.github: cd commons/data && bun run verify	suite/governance-vocabularies.test.ts: owner and steward go on a domain, a concept or a code list, and the owner-missing rule fires and stays quiet
+0003-governance FR-016	check	.github: cd commons/data && bun run verify	suite/governance-vocabularies.test.ts: the quality kinds go where they say, and the pattern, range, retention and deprecation rules fire and stay quiet
