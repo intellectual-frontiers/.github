@@ -16,7 +16,7 @@ export const about: About = {
     "Windows. It is OpenTelemetry-native (commons 0006-signals), carries the primitives of GRC engineering (commons 0007-grc) and records each " +
     "test run as compliance evidence (commons 0008-test-evidence). A harness depends on this repository's root package, " +
     "`@intellectual-frontiers/commons`, by Git at a commit its lockfile holds, and imports the `.ts` sources (`@intellectual-frontiers/commons/ts/kernel`): " +
-    "Bun runs them as they are, and Node 26 with the hook `--import @intellectual-frontiers/commons/ts/node`. There is no release and no build. " +
+    "Bun runs them as they are, and Node 26 with the hook `--import @intellectual-frontiers/commons/ts/node`. There is no release and no build. A library of this repository (`commons/data`) links it by `link:../ts` and imports it by package name, with no hook (FR-074 to FR-077). " +
     "It has one core dependency, " +
     "TypeScript 7; every other tool is Bun, pinned in commons' pins (`BUN_VERSION`), and CI (`ifc-typescript.yml`) runs every command " +
     "below on Linux, macOS and Windows.",

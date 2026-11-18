@@ -106,6 +106,15 @@ What converting a harness (Stolos first) showed it still wrote for itself, taken
 - **FR-072**: The kernel MUST give a command tree declared once as data (`kernel/commands.ts`): a command of groups and verbs, each with a name (lower case, `[a-z][a-z0-9-]*`), a summary, and for a verb its options (FR-047's declaration) and arguments, to any depth; MUST resolve an argument vector to the verb it names and the arguments left for it, or to the group or verb whose help is asked for (`--help`, `-h`, or a group named with no verb), or to a typed error that says which word was not known at which level, the words that are known there and the nearest of them by FR-047's `suggest`; and MUST render a command's, a group's and a verb's help from that declaration alone, so that help never runs a verb.
 - **FR-073**: `fs.symlink` and `fs.symlinkSync` MUST take the type `junction` for a folder: on Windows a directory junction, which any account may make (a symbolic link needs administrator rights or Developer Mode there), its target made absolute as Windows requires; on Linux and macOS an ordinary symbolic link. A harness that links a folder for its own use (a scratch tree sharing `node_modules`) MUST use it, so it works for a person without administrator rights.
 
+## A library of commons that uses IFC TypeScript
+
+What the first library of commons (`commons/data`, 0027-commons-libraries) found when it took the kernel by package name; recorded here so that no one runs the experiment again.
+
+- **FR-074**: A library of commons in this repository MUST reach IFC TypeScript by package name (`@intellectual-frontiers/commons/ts/kernel` and the other entry points of FR-029) through a path link in its `devDependencies`, `"@intellectual-frontiers/commons": "link:../ts"`, which Bun installs as a symbolic link to `commons/ts` and writes to its `bun.lock`, so that `bun install --frozen-lockfile` makes the same link; it MUST NOT use a `file:` dependency, which Bun installs as a copy under `node_modules` that Node 26 refuses (FR-070) and that does not follow the source.
+- **FR-075**: Node resolves a module to its real path, so a `.ts` of a linked package is not under `node_modules`: Node 26 MUST run it with no `--import` of the hook and no flag, Bun MUST run it, and the TypeScript 7 compiler MUST check it under `module` and `moduleResolution` of `nodenext`; the hook (FR-070) is for a consumer that installs a copy (FR-029).
+- **FR-076**: A library's own modules MUST import one another by the library's package name through the `exports` of its `package.json`, one entry for each public surface (a package names itself); a file that `exports` does not name MUST NOT be importable by that name, on Node, on Bun and for the compiler, so that `exports` is the boundary of the library's public surface.
+- **FR-077**: The layers check (`kernel/layers.ts`, 0015-trace FR-010) reads relative imports only, so an import by package name is never a finding; a library that imports its own layers by package name MUST check their order itself, by resolving each specifier through the `exports` of its package.
+
 ## Out of scope
 
 - Converting `erga` or `stolos` to IFC TypeScript: each is a later, one-pass change of its own, after this one is reviewed (issue #7).
@@ -157,6 +166,10 @@ What converting a harness (Stolos first) showed it still wrote for itself, taken
 - A consumer that names the dependency otherwise (`"ifc": "github:intellectual-frontiers/.github#<commit>"`): Bun installs it under that name and it is imported by it (`ifc/ts/kernel`), per FR-029.
 - `node app.ts` that imports `@intellectual-frontiers/commons/ts/kernel` without the hook: Node refuses the `.ts` under `node_modules` (`ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING`); with `--import @intellectual-frontiers/commons/ts/node` it runs, per FR-070 and FR-030.
 - A file at `file:///C:/w/node_modules/x/mod.ts`, or a `.ts` file outside `node_modules`: the first is stripped by the hook, the second left to Node, per FR-070.
+- A library that depends on `"file:../ts"`: Bun copies `commons/ts` into its `node_modules`, Node 26 refuses the copy, and the copy is not the source, per FR-074.
+- A library that depends on `"link:../ts"`: a symbolic link, resolved to `commons/ts` by Node, which runs the kernel with no hook, per FR-074 and FR-075.
+- `import "@intellectual-frontiers/data/engine/internal"` where `exports` names `./engine` only: refused on Node, Bun and by the compiler, per FR-076.
+- A file of rung 1 that imports a file of rung 5 by package name: no finding of `layers/above`, the library's own check finds it, per FR-077.
 - `fs.remove` on a folder that is not empty without `recursive`: `DirectoryNotEmpty` (or `AlreadyExists`, which some systems give), per FR-019 and FR-020.
 - `fs.readTextFile` on a `file:` URL on Windows: the URL is turned into a Windows path, per FR-020.
 - A program that does not exist: `NotFound` with code `ENOENT`, never a status of 127 that a caller could mistake for the program's own, per FR-019 and FR-022.
@@ -201,6 +214,7 @@ What converting a harness (Stolos first) showed it still wrote for itself, taken
 - Node 26 and Bun 1.4 each implement `node:fs`, `node:child_process`, `node:http`, `node:test` and `node:assert/strict` well enough for this suite; where one does not, the suite shows it and the gap is written here before it is worked around.
 - TypeScript 7.0 ships no compiler API, so a type tester that needs one (TSTyche) waits for 7.1; the compiler itself is enough for the type-level tests here.
 - Per-test permissions and resource sanitizers are not needed: tests close what they open (FR-060).
+- Bun 1.4 installs a `file:` dependency on a folder as a copy and a `link:` dependency on a folder as a symbolic link; if a later Bun changes either, the test of FR-074 says so first.
 - `node:sqlite` is in Node 26 and Bun 1.4, so a harness's SQLite code needs nothing of its own here.
 
 ## Open questions

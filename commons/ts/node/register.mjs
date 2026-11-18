@@ -9,6 +9,11 @@
  * node --import @intellectual-frontiers/commons/ts/node app.ts
  * ```
  *
+ * @remarks
+ * Only a copy needs it. A library of this repository links `commons/ts` (`"@intellectual-frontiers/commons": "link:../ts"`): Node resolves the link to its real path,
+ * which is not under `node_modules`, so Node 26 strips the types by itself and the library needs no hook (commons 0005-typescript-runtime FR-074, FR-075). A `file:`
+ * dependency is a copy under `node_modules`, and a copy needs the hook. `tests/node/linked-library.test.ts` runs both.
+ *
  * @module
  */
 import { readFileSync } from "node:fs";
