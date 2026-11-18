@@ -22,7 +22,7 @@
 
 ## Folders and public surfaces
 
-- **FR-008**: Every `.ts` file of the library MUST belong to exactly one unit of the table the check holds (`engine/`, `governance/`, `sql/logical/`, `sql/physical/`, `sql/lifecycle/`, each folder of `models/`, `extensions/`, `sql/dialects/` and `sql/extensions/`, `sql/cli/`, `suite/`, `examples/`, `tools/` and the files of the library's root), and a file that belongs to none MUST be a finding.
+- **FR-008**: Every `.ts` file of the library MUST belong to exactly one unit of the table the check holds (`engine/`, `governance/`, `sql/logical/`, `sql/physical/`, `sql/lifecycle/`, `sql/presets/`, each folder of `models/`, `extensions/`, `sql/dialects/` and `sql/extensions/`, `sql/cli/`, `suite/`, `examples/`, `tools/` and the files of the library's root), and a file that belongs to none MUST be a finding.
 - **FR-009**: The public surface of each layer MUST be one entry of the `exports` of the library's `package.json`: `./engine`, `./governance`, `./sql/logical` and `./sql/physical`, each the `api.ts` of its folder; an import by the package's name of a subpath that `exports` does not name MUST be a finding.
 - **FR-010**: A file of a layer, a model, an extension, a dialect or the command line MUST import a file of another unit by the package's name, through an entry of `exports`, and MUST NOT import it by a relative path; a relative import that reaches another unit MUST be a finding. The suite, the examples, the tools and the files of the root are the library's own checking, not its layers, and MAY import any file of the library by a relative path.
 

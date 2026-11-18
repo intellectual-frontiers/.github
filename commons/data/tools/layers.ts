@@ -27,6 +27,7 @@ export type UnitClass =
   | "logical"
   | "physical"
   | "lifecycle"
+  | "preset"
   | "dialect"
   | "sqlextension"
   | "model"
@@ -57,6 +58,7 @@ const FOLDERS: readonly Folder[] = [
   { prefix: "sql/lifecycle/", class: "lifecycle", instances: false },
   { prefix: "sql/dialects/", class: "dialect", instances: true },
   { prefix: "sql/extensions/", class: "sqlextension", instances: true },
+  { prefix: "sql/presets/", class: "preset", instances: false },
   { prefix: "sql/cli/", class: "cli", instances: false },
   { prefix: "models/", class: "model", instances: true },
   { prefix: "extensions/", class: "extension", instances: true },
@@ -74,11 +76,12 @@ export const MAY_IMPORT: Readonly<Record<UnitClass, readonly UnitClass[]>> = {
   lifecycle: ["physical", "logical", "governance", "engine"],
   dialect: ["physical", "logical", "governance", "engine"],
   sqlextension: ["lifecycle", "physical", "logical", "governance", "engine"],
+  preset: ["sqlextension", "lifecycle", "physical", "logical", "governance", "engine"],
   model: ["governance", "engine"],
   extension: ["governance", "engine"],
-  cli: ["sqlextension", "dialect", "lifecycle", "physical", "logical", "governance", "engine", "extension", "model"],
-  suite: ["engine", "governance", "logical", "physical", "lifecycle", "dialect", "sqlextension", "model", "extension", "cli", "examples"],
-  examples: ["engine", "governance", "logical", "physical", "lifecycle", "dialect", "sqlextension", "model", "extension", "cli"],
+  cli: ["preset", "sqlextension", "dialect", "lifecycle", "physical", "logical", "governance", "engine", "extension", "model"],
+  suite: ["engine", "governance", "logical", "physical", "lifecycle", "dialect", "sqlextension", "preset", "model", "extension", "cli", "examples"],
+  examples: ["engine", "governance", "logical", "physical", "lifecycle", "dialect", "sqlextension", "preset", "model", "extension", "cli"],
   tools: [],
   root: [],
 };
@@ -92,6 +95,7 @@ const LEVEL: Readonly<Record<UnitClass, number>> = {
   lifecycle: 3.5,
   dialect: 4,
   sqlextension: 4,
+  preset: 4.5,
   model: 4,
   extension: 4,
   cli: 5,

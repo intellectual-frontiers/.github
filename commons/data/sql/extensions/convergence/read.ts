@@ -71,7 +71,7 @@ export type ReadError = { readonly kind: "unsupported"; readonly why: string };
  * @param driver - the database
  * @param dialect - its dialect, which reads its catalog
  * @param desired - the state wanted, which names are matched to and types and what the dialect cannot list are taken from
- * @param options - the names to leave out
+ * @param options - the names to leave out, where one that begins with `*` is a suffix
  * @returns the state, or why the dialect cannot read
  */
 export async function readState(
@@ -83,12 +83,15 @@ export async function readState(
   if (dialect.catalog === undefined) return err([{ kind: "unsupported", why: `${dialect.name} cannot read its own catalog` }]);
   const live = await dialect.catalog.read((sql) => driver.query(sql), desired.qualifier);
   const skip = new Set(options.ignore ?? []);
+  // a name that begins with `*` leaves out every table whose name ends with the rest of it (case aside)
+  const tails = [...skip].filter((n) => n.startsWith("*")).map((n) => n.slice(1).toLowerCase());
+  const left = (name: string): boolean => skip.has(name) || tails.some((x) => name.toLowerCase().endsWith(x));
   // the words the schema put before a table's own, where the dialect has no schemas
   const first = desired.tables[0];
   const prefix = first === undefined ? [] : words(first.name).slice(0, Math.max(0, words(first.name).length - first.words.length));
   const tables: StateTable[] = [];
   for (const t of live) {
-    if (skip.has(t.name)) continue;
+    if (left(t.name)) continue;
     const want = desired.tables.find((d) => d.name === t.name);
     const w =
       want?.words ??
