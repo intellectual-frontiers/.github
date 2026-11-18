@@ -18,6 +18,16 @@ export {
   quoteName,
   standardLiteral,
 } from "./dialect.ts";
+export {
+  type Artifact,
+  generate,
+  type GenerateContext,
+  type GenerateError,
+  type GenerateOptions,
+  type Generator,
+  generatorsFrom,
+  generatorsPoint,
+} from "./generate.ts";
 export { upsert } from "./upsert.ts";
 export {
   type BindContext,

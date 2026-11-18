@@ -20,7 +20,8 @@
     "./sql/extensions/views": "./sql/extensions/views/mod.ts",
     "./sql/extensions/access": "./sql/extensions/access/mod.ts",
     "./sql/extensions/routines": "./sql/extensions/routines/mod.ts",
-    "./sql/extensions/partitions": "./sql/extensions/partitions/mod.ts"
+    "./sql/extensions/partitions": "./sql/extensions/partitions/mod.ts",
+    "./sql/extensions/generators": "./sql/extensions/generators/mod.ts"
   },
   "scripts": {
     "check": "tsc -p tsconfig.json",
@@ -34,6 +35,7 @@
     "@electric-sql/pglite": "0.5.16",
     "@intellectual-frontiers/commons": "link:../ts",
     "@types/node": "26.6.6",
-    "typescript": "7.0.2"
+    "typescript": "7.0.2",
+    "zod": "4.1.12"
   }
 }

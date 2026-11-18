@@ -8,3 +8,4 @@ number	slug	state
 0007	physical	in force
 0008	sql-documentation	in force
 0009	sql-features	in force
+0010	sql-generators	in force

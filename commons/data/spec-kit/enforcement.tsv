@@ -109,3 +109,17 @@ requirement	mechanism	by	note
 0009-sql-features FR-016	check	.github: cd commons/data && bun run verify	suite/features.test.ts: a vector is VECTOR(n) after the extension on PostgreSQL, FLOAT[n] on DuckDB and refused on SQLite
 0009-sql-features FR-017	check	.github: cd commons/data && bun run verify	suite/features.test.ts: a vector of fewer than one dimension, or not a whole number, is an error value from domain()
 0009-sql-features FR-018	check	.github: cd commons/data && bun run verify	suite/features.test.ts: each feature does what it says on a real engine
+0010-sql-generators FR-001	check	.github: cd commons/data && bun run verify	suite/generators.test.ts: extensions contribute generators through the engine, and generate returns every file in order or every error
+0010-sql-generators FR-002	check	.github: cd commons/data && bun run verify	suite/generators.test.ts: the same input gives the same files, each ending in one newline, and the generators read nothing but what they are given
+0010-sql-generators FR-003	check	.github: cd commons/data && bun run verify	suite/generators.test.ts: the path is made from the domain, and a path made twice is an error value
+0010-sql-generators FR-004	check	.github: cd commons/data && bun run verify	suite/generators.test.ts: names are written by the case style, and no generator reads anything but its input
+0010-sql-generators FR-005	check	.github: cd commons/data && bun run verify	suite/generators.test.ts: the Mermaid and D2 diagrams hold every table, type, key mark and foreign key, and a closed list is an enum
+0010-sql-generators FR-006	check	.github: cd commons/data && bun run verify	suite/generators.test.ts: the dictionary holds each table's description, owner, key and columns with type, null, target, description and personal data
+0010-sql-generators FR-007	check	.github: cd commons/data && bun run verify	suite/generators.test.ts: the page has the dictionary with links, no script and no outside resource
+0010-sql-generators FR-008	check	.github: cd commons/data && bun run verify	suite/generators.test.ts: Rust has a struct with Options and an enum for a closed list
+0010-sql-generators FR-009	check	.github: cd commons/data && bun run verify	suite/generators.test.ts: Zod has a schema with nullable and z.enum
+0010-sql-generators FR-010	check	.github: cd commons/data && bun run verify	suite/generators.test.ts: the register lists personal data and security
+0010-sql-generators FR-011	check	.github: cd commons/data && bun run verify	suite/generators.test.ts: every logical type has a form in Rust and Zod
+0010-sql-generators FR-012	check	.github: cd commons/data && bun run verify	suite/generators.test.ts: a text of governance is escaped for Markdown, HTML and documentation comments
+0010-sql-generators FR-013	check	.github: cd commons/data && bun run verify	suite/generators.test.ts: the Zod module validates rows and refuses what does not fit, and the Rust file compiles
+0010-sql-generators FR-014	check	.github: cd commons/data && bun run verify	suite/generators.test.ts: the files of Arca's party model hold every table, column and foreign key of the schema and nothing more
