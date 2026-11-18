@@ -42,6 +42,16 @@ export interface Probes {
   column(table: string, column: string, schema?: string): string;
   constraint(table: string, name: string, schema?: string): string | undefined;
   index(name: string, schema?: string): string;
+  /** A query that returns a row if and only if the constraint exists and its rows have been checked (0015-sql-safety FR-009). */
+  validConstraint?(table: string, name: string, schema?: string): string;
+}
+
+/** How a dialect asks for its locks with a limit, and how its error for giving up is told (0015-sql-safety FR-008). */
+export interface Locks {
+  /** The statements that make the rest of the transaction wait at most so long for a lock and run at most so long. */
+  timeouts(lockMs: number, statementMs: number): readonly string[];
+  /** Whether an error message is the engine giving up on a lock. */
+  timedOut(message: string): boolean;
 }
 
 /** A literal a statement may hold. */
@@ -72,6 +82,10 @@ export interface Dialect {
   }): string | undefined;
   /** Which forms of `DROP` and `ADD COLUMN` the dialect writes with `IF [NOT] EXISTS`. */
   readonly ifExists?: readonly IfExistsForm[];
+  /** How the dialect asks for its locks with a limit; none where it has no such thing. */
+  readonly locks?: Locks;
+  /** Whether a foreign key or a check can be added without checking the rows that are there, and checked afterwards. */
+  readonly deferredValidation?: boolean;
   /** How to ask the catalog whether a table, column, constraint or index exists. */
   readonly probes?: Probes;
   /** Statements to run before the tables, for the types a schema uses (0009-sql-features FR-003). */

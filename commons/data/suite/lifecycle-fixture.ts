@@ -32,7 +32,7 @@ const genre = (codes: readonly string[]) =>
   });
 
 /** The domain at a version: 1 is the first, 2 adds columns, a table and a code, 3 renames a column and drops one. */
-export function libraryAt(version: 1 | 2 | 3, shim = true): LogicalSchema {
+export function libraryAt(version: 1 | 2 | 3, shim = true, scratch = false): LogicalSchema {
   const g = genre(version === 1 ? ["fiction", "poetry"] : ["fiction", "poetry", "drama"]);
   const author = concept("author", {
     definition: "Someone who writes",
@@ -91,7 +91,16 @@ export function libraryAt(version: 1 | 2 | 3, shim = true): LogicalSchema {
             identifiedBy: ["id"],
           }),
         ];
-  const d = domain("library", { definition: "Books and who wrote them", concepts, codeLists: [g] });
+  const extra = scratch
+    ? [
+        concept("scratch", {
+          definition: "A table that is not kept",
+          attributes: { id: attribute(identifier(), { definition: "What identifies it" }) },
+          identifiedBy: ["id"],
+        }),
+      ]
+    : [];
+  const d = domain("library", { definition: "Books and who wrote them", concepts: [...concepts, ...extra], codeLists: [g] });
   if (d.kind === "err") throw new Error(JSON.stringify(d.error));
   return projected(d.value).schema;
 }

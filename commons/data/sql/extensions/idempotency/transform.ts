@@ -46,6 +46,7 @@ function make(s: StepStatement, dialect: Dialect, dropped: ReadonlySet<string>):
   const probes = dialect.probes;
   const sql = s.sql;
   let m: RegExpMatchArray | null;
+  if (s.natural === true) return natural();
 
   if (
     /^(CREATE TABLE IF NOT EXISTS|CREATE INDEX IF NOT EXISTS|CREATE UNIQUE INDEX IF NOT EXISTS|INSERT |DELETE FROM |COMMENT ON |CREATE OR REPLACE |DROP POLICY IF EXISTS |CREATE EXTENSION IF NOT EXISTS |CREATE SCHEMA IF NOT EXISTS |GRANT |REVOKE )/.test(
@@ -53,7 +54,8 @@ function make(s: StepStatement, dialect: Dialect, dropped: ReadonlySet<string>):
     )
   )
     return natural();
-  if (/^ALTER (TABLE|VIEW|SCHEMA) .+ OWNER TO /.test(sql)) return natural();
+  if (/^ALTER (TABLE|VIEW|SCHEMA) .+ OWNER TO /.test(sql) || /^ALTER TABLE .+ VALIDATE CONSTRAINT /.test(sql)) return natural();
+  if (/^SELECT set_config\(/.test(sql)) return natural();
   if (/^ALTER TABLE .+ ALTER COLUMN .+ (SET|DROP) (NOT NULL|DEFAULT)/.test(sql)) return natural();
   if (/ ADD COLUMN IF NOT EXISTS /.test(sql) || /^DROP \w+ IF EXISTS /.test(sql)) return natural();
   // a view or a trigger made after the same view was dropped in the step is made again whenever the step is run

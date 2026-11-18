@@ -9,9 +9,12 @@ export { applyChange, applyChanges, type Change, type ChangeKind, diff, type Tab
 export { canonical, hashOf, sha256Hex } from "./hash.ts";
 export { chainOf, type ChainBreak, type EntryKind, GENESIS, type LedgerEntry, nextEntry, verifyChain } from "./ledger.ts";
 export {
+  type Capture,
+  type Check,
   type Desired,
   dueRepeatables,
   type Guard,
+  type Expect,
   type Idempotency,
   type ManualStep,
   plan,
@@ -28,6 +31,7 @@ export {
   type StepStatement,
   type StepTransform,
   transformPoint,
+  type Verification,
   transformsFrom,
 } from "./plan.ts";
 export { type Applied, applyStatement, type Driver, execute, ledgerDdl, readLedger, type RunError, type RunOptions } from "./run.ts";

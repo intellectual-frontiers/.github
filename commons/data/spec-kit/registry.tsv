@@ -13,3 +13,4 @@ number	slug	state
 0012	sql-idempotency	in force
 0013	sql-qualified-names	in force
 0014	sql-protected-access	in force
+0015	sql-safety	in force

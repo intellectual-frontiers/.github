@@ -9,7 +9,7 @@
 import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
 import type { Dialect } from "@intellectual-frontiers/data/sql/physical";
 import { type LedgerEntry, nextEntry, verifyChain, type ChainBreak } from "./ledger.ts";
-import { type Plan, type Repeatable, type StepStatement, dueRepeatables } from "./plan.ts";
+import { type Plan, type Repeatable, type StepStatement, type Verification, dueRepeatables } from "./plan.ts";
 
 /** A way to run statements on a database and read rows back. */
 export interface Driver {
@@ -43,6 +43,14 @@ export interface RunOptions {
   readonly now?: () => string;
   /** Statements run at the start of each transaction, such as a setting that says a migration is running (0014-sql-protected-access FR-009). */
   readonly before?: readonly string[];
+  /** Try a step again when its error is of a kind the project names, such as a lock timeout (0015-sql-safety FR-002). */
+  readonly retry?: {
+    readonly attempts: number;
+    readonly delayMs: number;
+    readonly when: (message: string) => boolean;
+    /** Waits; the clock by default. */
+    readonly sleep?: (ms: number) => Promise<void>;
+  };
   /** The hash of the empty state, for a database that has no ledger yet. */
   readonly empty: string;
 }
@@ -61,6 +69,9 @@ export interface Applied {
 }
 
 const LEDGER = "lifecycle_ledger";
+
+const firstValue = (rows: readonly Record<string, unknown>[]): unknown => Object.values(rows[0] ?? {})[0];
+const sameValue = (a: unknown, b: unknown): boolean => String(a) === String(b);
 
 /** The statement that makes the ledger's table where there is none. */
 export function ledgerDdl(dialect: Dialect, table = LEDGER): string {
@@ -141,18 +152,37 @@ export async function execute(
   // where the database is among the states of the plan
   const current = [...ledger].reverse().find((e) => e.kind === "step")?.to ?? options.empty;
   const states = [plan.from, ...plan.steps.map((s) => s.to)];
-  const at = states.lastIndexOf(current);
+  // a step the ledger holds is done, whatever states it moved between; else the database is found by its state
+  const done = new Set(ledger.filter((e) => e.kind === "step").map((e) => e.hash));
+  let finished = -1;
+  plan.steps.forEach((s, i) => {
+    if (done.has(s.id)) finished = i;
+  });
+  const at = finished >= 0 ? finished + 1 : states.indexOf(current);
   if (at < 0 && !(plan.steps.length === 0 && current === plan.to)) return err([{ kind: "base", found: current, expected: states }]);
   const todo = plan.steps.slice(Math.max(at, 0));
   const applied: string[] = [];
   const run = async (
     statements: readonly StepStatement[],
     entry: Omit<LedgerEntry, "seq" | "chain" | "appliedAt" | "appliedBy">,
+    verify?: Verification,
   ): Promise<RunError | undefined> => {
     try {
       await driver.exec("BEGIN");
       for (const sql of options.before ?? []) await driver.exec(sql);
+      const captured = new Map<string, unknown>();
+      for (const c of verify?.before ?? []) captured.set(c.key, firstValue(await driver.query(c.query)));
       for (const st of statements) await applyStatement(driver, st);
+      for (const check of verify?.after ?? []) {
+        const rows = await driver.query(check.query);
+        const ok =
+          check.expect === "rows"
+            ? rows.length > 0
+            : check.expect === "none"
+              ? rows.length === 0
+              : sameValue(firstValue(rows), captured.get(check.expect.sameAs));
+        if (!ok) throw new Error(`verification failed: ${check.describe}`);
+      }
       const e = nextEntry(ledger, { ...entry, appliedAt: now(), appliedBy: by });
       await driver.exec(insert(dialect, table, e));
       await driver.exec("COMMIT");
@@ -183,7 +213,19 @@ export async function execute(
     if (failed !== undefined) return err([failed]);
   }
   for (const s of todo) {
-    const failed = await run(s.up, { kind: "step", key: s.id, name: s.name, from: s.from, to: s.to, hash: s.id });
+    let failed = await run(s.up, { kind: "step", key: s.id, name: s.name, from: s.from, to: s.to, hash: s.id }, s.verify);
+    // a step that failed in a way the project names is tried again
+    for (
+      let tried = 1;
+      failed !== undefined &&
+      options.retry !== undefined &&
+      tried < options.retry.attempts &&
+      options.retry.when(failed.kind === "step" ? failed.message : "");
+      tried++
+    ) {
+      await (options.retry.sleep ?? ((ms: number) => new Promise<void>((r) => setTimeout(r, ms))))(options.retry.delayMs * tried);
+      failed = await run(s.up, { kind: "step", key: s.id, name: s.name, from: s.from, to: s.to, hash: s.id }, s.verify);
+    }
     if (failed !== undefined) return err([failed]);
     applied.push(s.name);
   }

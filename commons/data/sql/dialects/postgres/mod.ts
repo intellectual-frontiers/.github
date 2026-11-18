@@ -56,6 +56,14 @@ export const dialect: Dialect = {
   quote: quoteName,
   literal: standardLiteral,
   type,
+  locks: {
+    timeouts: (lockMs, statementMs) => [
+      `SELECT set_config('lock_timeout', '${lockMs}', true);`,
+      `SELECT set_config('statement_timeout', '${statementMs}', true);`,
+    ],
+    timedOut: (message) => message.includes("lock timeout") || message.includes("lock_not_available"),
+  },
+  deferredValidation: true,
   hash: (t) => `md5(${t})`,
   hasRole: (r) => `pg_has_role(current_user, ${standardLiteral(r)}, 'member')`,
   ifExists: ["addColumn", "dropColumn", "dropConstraint", "dropTable", "dropIndex"],
@@ -66,6 +74,8 @@ export const dialect: Dialect = {
       `SELECT 1 FROM information_schema.columns WHERE table_schema = ${s === undefined ? "current_schema()" : standardLiteral(s)} AND table_name = ${standardLiteral(t)} AND column_name = ${standardLiteral(c)}`,
     constraint: (t, n, s) =>
       `SELECT 1 FROM pg_constraint c JOIN pg_class r ON r.oid = c.conrelid JOIN pg_namespace s ON s.oid = r.relnamespace WHERE s.nspname = ${s === undefined ? "current_schema()" : standardLiteral(s)} AND r.relname = ${standardLiteral(t)} AND c.conname = ${standardLiteral(n)}`,
+    validConstraint: (t, n, s) =>
+      `SELECT 1 FROM pg_constraint c JOIN pg_class r ON r.oid = c.conrelid JOIN pg_namespace s ON s.oid = r.relnamespace WHERE s.nspname = ${s === undefined ? "current_schema()" : standardLiteral(s)} AND r.relname = ${standardLiteral(t)} AND c.conname = ${standardLiteral(n)} AND c.convalidated`,
     index: (n, s) =>
       `SELECT 1 FROM pg_indexes WHERE schemaname = ${s === undefined ? "current_schema()" : standardLiteral(s)} AND indexname = ${standardLiteral(n)}`,
   },

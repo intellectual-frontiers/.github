@@ -40,7 +40,11 @@ export interface Guard {
 }
 
 /** A statement of a step, which may carry a guard. */
-export type StepStatement = Statement & { readonly guard?: Guard };
+export type StepStatement = Statement & {
+  readonly guard?: Guard;
+  /** Set by whoever wrote it, where it knows the statement does no harm run twice (a restore of values). */
+  readonly natural?: boolean;
+};
 
 /** How a step is safe to run twice: `natural` (every statement is), `guarded` (some are guarded and none is left) or `ledger-only` (some cannot be, so only the ledger keeps it from running twice). */
 export type Idempotency = "natural" | "guarded" | "ledger-only";
@@ -64,6 +68,8 @@ export interface Step {
   readonly to: string;
   readonly up: readonly StepStatement[];
   readonly down?: readonly StepStatement[];
+  /** What must be true after it, which the run checks in its transaction. */
+  readonly verify?: Verification;
   /** How it is safe to run twice, where an idempotency transform has said. */
   readonly idempotency?: Idempotency;
   /** The change it makes, which an extension of the lifecycle reads. */
@@ -72,6 +78,29 @@ export interface Step {
   readonly of: readonly LogicalId[];
   /** Whether a person wrote its statements. */
   readonly manual: boolean;
+}
+
+/** A value to read before a step, to be compared after it (0015-sql-safety FR-001). */
+export interface Capture {
+  readonly key: string;
+  /** A query that returns one row of one value. */
+  readonly query: string;
+}
+
+/** What a check expects of its query: a row, no row, or the value captured under a key. */
+export type Expect = "rows" | "none" | { readonly sameAs: string };
+
+/** What must be true after a step. */
+export interface Check {
+  readonly describe: string;
+  readonly query: string;
+  readonly expect: Expect;
+}
+
+/** What a step says must be true of the database after it, checked in its transaction (0015-sql-safety FR-001). */
+export interface Verification {
+  readonly before?: readonly Capture[];
+  readonly after: readonly Check[];
 }
 
 /** What an extension adds to the schema, applied again whenever its text changes. */
@@ -579,10 +608,11 @@ export function plan(
       errors.push({ kind: "manual", key: c.key, name: base.name, why: made.manualNeeded });
       continue;
     }
-    if (made.class === "destructive" && options.allow?.destructive !== true)
-      errors.push({ kind: "refused", key: c.key, name: base.name, class: made.class, why: made.why ?? "it loses data" });
     let draft: StepDraft = { ...base, ...made, change: c, manual: false };
     for (const t of options.transforms ?? []) draft = t(draft, sc);
+    // what a transform has made safe is not refused
+    if (draft.class === "destructive" && options.allow?.destructive !== true)
+      errors.push({ kind: "refused", key: c.key, name: base.name, class: draft.class, why: draft.why ?? "it loses data" });
     if (options.requireIdempotent === true && draft.idempotency === "ledger-only")
       errors.push({ kind: "not-idempotent", key: draft.key, name: draft.name });
     drafts.push({ change: c, draft });
@@ -599,7 +629,7 @@ export function plan(
     state = applyChange(state, change);
     const last = i === drafts.length - 1;
     const next = stateHash(last ? { ...state, naming: to.naming } : state);
-    const id = hashOf({ from: at, to: next, key: draft.key, up: draft.up.map((s) => [s.sql, s.guard]) });
+    const id = hashOf({ from: at, to: next, key: draft.key, up: draft.up.map((s) => [s.sql, s.guard]), verify: draft.verify });
     steps.push({ ...draft, id, from: at, to: next });
     at = next;
   });
