@@ -44,16 +44,16 @@ proves(["0003-governance FR-005"], "every element is listed in a fixed order wit
     [
       "domain arca",
       "concept arca/party",
-      "attribute arca/party.party_id",
+      "attribute arca/party.partyId",
       "attribute arca/party.kind",
-      "attribute arca/party.display_name",
+      "attribute arca/party.displayName",
       "concept arca/person",
-      "attribute arca/person.person_id",
+      "attribute arca/person.personId",
       "attribute arca/person.born",
       "relationship arca/person>party",
-      "codelist arca/list:party_kind",
-      "code arca/list:party_kind.person",
-      "code arca/list:party_kind.organization",
+      "codelist arca/list:partyKind",
+      "code arca/list:partyKind.person",
+      "code arca/list:partyKind.organization",
     ],
   );
   same(
@@ -69,15 +69,15 @@ proves(["0003-governance FR-005"], "every element is listed in a fixed order wit
       "arca/person",
       "arca/person",
       "arca",
-      "arca/list:party_kind",
-      "arca/list:party_kind",
+      "arca/list:partyKind",
+      "arca/list:partyKind",
     ],
   );
   const born = els.find((e) => e.id === "arca/person.born");
   same([born?.name, born?.definition], ["born", "The day it was born"]);
-  const organization = els.find((e) => e.id === "arca/list:party_kind.organization");
+  const organization = els.find((e) => e.id === "arca/list:partyKind.organization");
   same(organization?.definition, "A body of people acting together");
-  const personCode = els.find((e) => e.id === "arca/list:party_kind.person");
+  const personCode = els.find((e) => e.id === "arca/list:partyKind.person");
   same(personCode?.definition, "Person");
   assert(!("parent" in (els[0] ?? { parent: 1 })), "the domain has no parent");
   same(
@@ -90,13 +90,11 @@ proves(["0003-governance FR-006"], "the trace graph has the elements as nodes an
   const g = traceGraph(arca());
   same(g.nodes.length, 12);
   const edge = (kind: string): string[] => g.edges.filter((e) => e.kind === kind).map((e) => `${e.from} -> ${e.to}`);
-  same(edge("identifies"), ["arca/party -> arca/party.party_id", "arca/person -> arca/person.person_id"]);
+  same(edge("identifies"), ["arca/party -> arca/party.partyId", "arca/person -> arca/person.personId"]);
   // by concept in the domain's order: its relationships, then its attributes of a code list
-  same(edge("references"), ["arca/party.kind -> arca/list:party_kind", "arca/person>party -> arca/party"]);
+  same(edge("references"), ["arca/party.kind -> arca/list:partyKind", "arca/person>party -> arca/party"]);
   same(edge("contains").length, 11);
-  assert(
-    edge("contains").includes("arca -> arca/party") && edge("contains").includes("arca/list:party_kind -> arca/list:party_kind.person"),
-  );
+  assert(edge("contains").includes("arca -> arca/party") && edge("contains").includes("arca/list:partyKind -> arca/list:partyKind.person"));
   assert(
     g.edges.every((e) => g.nodes.some((n) => n.id === e.from) && g.nodes.some((n) => n.id === e.to)),
     "every edge joins two nodes",

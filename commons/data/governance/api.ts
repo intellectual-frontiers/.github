@@ -1,4 +1,4 @@
-// Spec: 0001-layers FR-001, FR-009; 0003-governance FR-001, FR-002, FR-005, FR-006, FR-007, FR-008, FR-009
+// Spec: 0001-layers FR-001, FR-009, FR-012; 0003-governance FR-001, FR-002, FR-004, FR-005, FR-006, FR-007, FR-008, FR-009; 0005-naming FR-001, FR-002
 /**
  * The public surface of governance (`@intellectual-frontiers/data/governance`), the first layer: a business domain (concepts, attributes, relationships, code lists), what must be true
  * of its data (annotations of the kinds a vocabulary defines), the identity of every element, the graph they make, and lint. It names no database; the logical schema is made from it.
@@ -31,8 +31,9 @@ export {
   text,
 } from "./datatype.ts";
 export { type Edge, type EdgeKind, type Element, elementsOf, type TraceGraph, traceGraph } from "./elements.ts";
-export { attributeId, codeId, codeListId, conceptId, domainId, type ElementId, type ElementKind, NAME, relationshipId } from "./id.ts";
+export { attributeId, codeId, codeListId, conceptId, domainId, type ElementId, type ElementKind, relationshipId } from "./id.ts";
 export { coreRules, lint } from "./lint.ts";
+export { NAME, words } from "./names.ts";
 export {
   type Attribute,
   type AttributeOptions,

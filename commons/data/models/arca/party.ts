@@ -39,7 +39,7 @@ const open = annotate(quality.openness, "open");
 const closed = annotate(quality.openness, "closed");
 
 /** The kinds of party: a person or an organization. */
-export const partyKind = codeList("party_kind", {
+export const partyKind = codeList("partyKind", {
   definition: "The kinds of party: a person or an organization",
   codes: {
     person: { label: "Person", definition: "A human being" },
@@ -49,7 +49,7 @@ export const partyKind = codeList("party_kind", {
 });
 
 /** The roles a party may play: customer, supplier, employee, and whatever else a business names. */
-export const partyRoleKind = codeList("party_role_kind", {
+export const partyRoleKind = codeList("partyRoleKind", {
   definition: "The roles a party may play, such as customer, supplier or employee",
   codes: {
     customer: { label: "Customer", definition: "Buys from the business" },
@@ -61,36 +61,36 @@ export const partyRoleKind = codeList("party_role_kind", {
 });
 
 /** The ways one party may be related to another: employed by, parent company of, married to. */
-export const partyRelationKind = codeList("party_relation_kind", {
+export const partyRelationKind = codeList("partyRelationKind", {
   definition: "The ways one party may be related to another",
   codes: {
-    employed_by: { label: "Employed by", definition: "A person works for an organization" },
-    member_of: { label: "Member of", definition: "A party belongs to an organization" },
-    subsidiary_of: { label: "Subsidiary of", definition: "An organization is controlled by another" },
+    employedBy: { label: "Employed by", definition: "A person works for an organization" },
+    memberOf: { label: "Member of", definition: "A party belongs to an organization" },
+    subsidiaryOf: { label: "Subsidiary of", definition: "An organization is controlled by another" },
   },
   annotations: [open, cites("FR-006")],
 });
 
 /** The kinds of identifier a party may hold: a tax number, a passport number, a company registration. */
-export const partyIdentifierKind = codeList("party_identifier_kind", {
+export const partyIdentifierKind = codeList("partyIdentifierKind", {
   definition: "The kinds of identifier a party may hold",
   codes: {
-    tax_number: { label: "Tax number", definition: "A number a tax authority issued" },
-    passport_number: { label: "Passport number", definition: "The number of a passport a state issued" },
-    company_registration: { label: "Company registration", definition: "The number a register of companies issued" },
+    taxNumber: { label: "Tax number", definition: "A number a tax authority issued" },
+    passportNumber: { label: "Passport number", definition: "The number of a passport a state issued" },
+    companyRegistration: { label: "Company registration", definition: "The number a register of companies issued" },
   },
   annotations: [open, cites("FR-006")],
 });
 
 /** The media by which a party may be reached over a network. */
-export const contactMedium = codeList("contact_medium", {
+export const contactMedium = codeList("contactMedium", {
   definition: "The media by which a party may be reached over a network",
   codes: { email: { label: "Email" }, telephone: { label: "Telephone" }, web: { label: "Web" } },
   annotations: [closed, cites("FR-006")],
 });
 
 /** What a postal address is used for. */
-export const addressPurpose = codeList("address_purpose", {
+export const addressPurpose = codeList("addressPurpose", {
   definition: "What a postal address is used for: where a party lives, works, is billed or receives deliveries",
   codes: { home: { label: "Home" }, work: { label: "Work" }, billing: { label: "Billing" }, delivery: { label: "Delivery" } },
   annotations: [closed, cites("FR-006")],
@@ -103,14 +103,14 @@ export const addressPurpose = codeList("address_purpose", {
 export const party = concept("party", {
   definition: "Anyone or anything a business deals with as one, whether a person or an organization",
   attributes: {
-    party_id: attribute(identifier(), { definition: "What identifies the party, made by the application when the party is created" }),
+    partyId: attribute(identifier(), { definition: "What identifies the party, made by the application when the party is created" }),
     kind: attribute(codeOf(partyKind), { definition: "Whether the party is a person or an organization" }),
-    display_name: attribute(text(), {
+    displayName: attribute(text(), {
       definition: "The name the party is shown by, whatever its parts are",
       annotations: [held("Name", "show who the party is")],
     }),
   },
-  identifiedBy: ["party_id"],
+  identifiedBy: ["partyId"],
   annotations: [confidential, cites("FR-002", "FR-003", "FR-005")],
 });
 
@@ -118,15 +118,15 @@ export const party = concept("party", {
 export const person = concept("person", {
   definition: "A party who is a human being; what is true of a person and not of every party",
   attributes: {
-    given_name: attribute(text(), {
+    givenName: attribute(text(), {
       definition: "The name a person is given, as they write it",
       annotations: [held("Name", "address the person by name")],
     }),
-    family_name: attribute(text(), {
+    familyName: attribute(text(), {
       definition: "The name a person shares with their family, as they write it",
       annotations: [held("Name", "address the person by name")],
     }),
-    birth_date: attribute(date(), {
+    birthDate: attribute(date(), {
       definition: "The day the person was born",
       multiplicity: "optional",
       annotations: [held("BirthDate", "know the person's age and what they may do")],
@@ -137,7 +137,7 @@ export const person = concept("person", {
   annotations: [
     confidential,
     cites("FR-002", "FR-003", "FR-005", "FR-008"),
-    annotate(usage.lookup, { members: ["family_name", "given_name"] }),
+    annotate(usage.lookup, { members: ["familyName", "givenName"] }),
   ],
 });
 
@@ -145,8 +145,8 @@ export const person = concept("person", {
 export const organization = concept("organization", {
   definition: "A party that is a company, an agency, a club or any other body",
   attributes: {
-    legal_name: attribute(text(), { definition: "The name the organization is registered under" }),
-    founded_on: attribute(date(), { definition: "The day the organization was founded", multiplicity: "optional" }),
+    legalName: attribute(text(), { definition: "The name the organization is registered under" }),
+    foundedOn: attribute(date(), { definition: "The day the organization was founded", multiplicity: "optional" }),
   },
   identifiedBy: ["party"],
   relationships: { party: relationship(party, { cardinality: "one", definition: "The party the organization is" }) },
@@ -154,74 +154,74 @@ export const organization = concept("organization", {
 });
 
 /** A role a party plays for a time: the same party may be a customer and a supplier at once. */
-export const partyRole = concept("party_role", {
+export const partyRole = concept("partyRole", {
   definition: "A role a party plays for a time: the same party may be a customer and a supplier at once",
   attributes: {
-    party_role_id: attribute(identifier(), { definition: "What identifies this playing of a role" }),
+    partyRoleId: attribute(identifier(), { definition: "What identifies this playing of a role" }),
     kind: attribute(codeOf(partyRoleKind), { definition: "The role played" }),
-    valid_from: attribute(date(), { definition: "The first day the party played the role" }),
-    valid_to: attribute(date(), {
+    validFrom: attribute(date(), { definition: "The first day the party played the role" }),
+    validTo: attribute(date(), {
       definition: "The last day the party played the role; empty while they still do",
       multiplicity: "optional",
     }),
   },
-  identifiedBy: ["party_role_id"],
+  identifiedBy: ["partyRoleId"],
   relationships: { party: relationship(party, { cardinality: "one", definition: "The party who plays the role" }) },
   annotations: [cites("FR-002", "FR-008"), annotate(usage.lookup, { members: ["party", "kind"] })],
 });
 
 /** A relation between two parties for a time, read from the first to the second: Ada is employed by Analytical Engines. */
-export const partyRelation = concept("party_relation", {
+export const partyRelation = concept("partyRelation", {
   definition: "A relation between two parties for a time, read from the first to the second: Ada is employed by Analytical Engines",
   attributes: {
-    party_relation_id: attribute(identifier(), { definition: "What identifies the relation" }),
+    partyRelationId: attribute(identifier(), { definition: "What identifies the relation" }),
     kind: attribute(codeOf(partyRelationKind), { definition: "The way the first party is related to the second" }),
-    valid_from: attribute(date(), { definition: "The first day the relation held" }),
-    valid_to: attribute(date(), { definition: "The last day the relation held; empty while it still does", multiplicity: "optional" }),
+    validFrom: attribute(date(), { definition: "The first day the relation held" }),
+    validTo: attribute(date(), { definition: "The last day the relation held; empty while it still does", multiplicity: "optional" }),
   },
-  identifiedBy: ["party_relation_id"],
+  identifiedBy: ["partyRelationId"],
   relationships: {
     from: relationship(party, { cardinality: "one", definition: "The party the relation is read from" }),
     to: relationship(party, { cardinality: "one", definition: "The party the relation is read to" }),
   },
   annotations: [
     cites("FR-002", "FR-008"),
-    annotate(quality.differs, { name: "parties_differ", members: ["from", "to"] }),
+    annotate(quality.differs, { name: "partiesDiffer", members: ["from", "to"] }),
     annotate(usage.lookup, { members: ["from"] }),
     annotate(usage.lookup, { members: ["to"] }),
   ],
 });
 
 /** An identifier a party holds, as someone else issued it: a tax number, a passport number. A party holds one of a kind once. */
-export const partyIdentifier = concept("party_identifier", {
+export const partyIdentifier = concept("partyIdentifier", {
   definition: "An identifier a party holds, as someone else issued it: a tax number, a passport number; a party holds one of a kind once",
   attributes: {
-    party_identifier_id: attribute(identifier(), { definition: "What identifies the identifier as Arca keeps it" }),
+    partyIdentifierId: attribute(identifier(), { definition: "What identifies the identifier as Arca keeps it" }),
     kind: attribute(codeOf(partyIdentifierKind), { definition: "The kind of identifier" }),
     identifier: attribute(text(), {
       definition: "The identifier itself, as it was issued",
       annotations: [held("Identifier", "identify the party to authorities and counterparties")],
     }),
-    issued_by: attribute(text(), { definition: "Who issued the identifier", multiplicity: "optional" }),
+    issuedBy: attribute(text(), { definition: "Who issued the identifier", multiplicity: "optional" }),
   },
-  identifiedBy: ["party_identifier_id"],
+  identifiedBy: ["partyIdentifierId"],
   relationships: { party: relationship(party, { cardinality: "one", definition: "The party who holds the identifier" }) },
   annotations: [confidential, cites("FR-002", "FR-005", "FR-008"), annotate(quality.unique, { members: ["party", "kind"] })],
 });
 
 /** A way to reach a party over a network: an email address, a telephone number, a web address. */
-export const electronicContact = concept("electronic_contact", {
+export const electronicContact = concept("electronicContact", {
   definition: "A way to reach a party over a network: an email address, a telephone number, a web address",
   attributes: {
-    electronic_contact_id: attribute(identifier(), { definition: "What identifies the contact point" }),
+    electronicContactId: attribute(identifier(), { definition: "What identifies the contact point" }),
     medium: attribute(codeOf(contactMedium), { definition: "Whether this is an email address, a telephone number or a web address" }),
     address: attribute(text(), { definition: "The address or number itself", annotations: [held("Contact", "reach the party")] }),
-    is_primary: attribute(boolean(), {
+    isPrimary: attribute(boolean(), {
       definition: "Whether this is the first way to try for its medium",
       annotations: [annotate(quality.defaultValue, false)],
     }),
   },
-  identifiedBy: ["electronic_contact_id"],
+  identifiedBy: ["electronicContactId"],
   relationships: { party: relationship(party, { cardinality: "one", definition: "The party reached this way" }) },
   annotations: [confidential, cites("FR-002", "FR-005", "FR-008"), annotate(usage.lookup, { members: ["party", "medium"] })],
 });
@@ -234,24 +234,24 @@ const addressPart = (definition: string, optional = false) =>
   });
 
 /** A place a party receives post or may be visited. */
-export const postalAddress = concept("postal_address", {
+export const postalAddress = concept("postalAddress", {
   definition: "A place a party receives post or may be visited",
   attributes: {
-    postal_address_id: attribute(identifier(), { definition: "What identifies the address" }),
+    postalAddressId: attribute(identifier(), { definition: "What identifies the address" }),
     purpose: attribute(codeOf(addressPurpose), {
       definition: "What the address is used for: where the party lives, is billed or receives deliveries",
     }),
-    line_1: addressPart("The first line: usually the building and the street"),
-    line_2: addressPart("The second line, where there is one", true),
+    line1: addressPart("The first line: usually the building and the street"),
+    line2: addressPart("The second line, where there is one", true),
     locality: addressPart("The town or city"),
     region: addressPart("The state, province or county, where the country uses one", true),
-    postal_code: addressPart("The postal code, where the country uses one", true),
-    country_code: attribute(text({ max: 2 }), {
+    postalCode: addressPart("The postal code, where the country uses one", true),
+    countryCode: attribute(text({ max: 2 }), {
       definition: "The country, as its two-letter ISO 3166-1 code",
       annotations: [held("Country", "address the party")],
     }),
   },
-  identifiedBy: ["postal_address_id"],
+  identifiedBy: ["postalAddressId"],
   relationships: { party: relationship(party, { cardinality: "one", definition: "The party found at the address" }) },
   annotations: [confidential, cites("FR-002", "FR-005", "FR-008"), annotate(usage.lookup, { members: ["party"] })],
 });
@@ -259,7 +259,7 @@ export const postalAddress = concept("postal_address", {
 /**
  * The party model as a governance domain, or what is wrong with it: it is a `Result`, never a throw, so that a project holds it to the rules it holds its own to.
  */
-export const partyDomain: Result<Domain, readonly DomainError[]> = domain("arca_party", {
+export const partyDomain: Result<Domain, readonly DomainError[]> = domain("arcaParty", {
   definition:
     "The people and organizations a business deals with, how they relate, what roles they play, how they are identified and how they are reached",
   concepts: [party, person, organization, partyRole, partyRelation, partyIdentifier, electronicContact, postalAddress],

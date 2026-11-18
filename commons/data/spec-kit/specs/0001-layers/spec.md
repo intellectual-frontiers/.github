@@ -30,6 +30,10 @@
 
 - **FR-011**: `tools/layers.ts` MUST find each of the above as data (`layers/unclassified`, `layers/relative`, `layers/private`, `layers/external`, `layers/above` and `layers/around`), reading every import of every file of the library, relative or by package name; `tools/check.ts` MUST run it with the trace of the library's sources and tests to these specifications (commons 0015-trace), hold the findings against `trace.baseline.txt`, and be part of `bun run verify`.
 
+## Names
+
+- **FR-012**: A name MUST cross the layers as a list of words: governance's names MUST be lower camel case and `words` MUST split them, the logical schema MUST choose the words of each element of a relational schema, and the physical schema MUST write the words in the case style of its target (0005-naming); a name of governance MUST NOT hold a database's convention.
+
 ## Out of scope
 
 - What each layer does: governance, the logical schema and the physical schema have specifications of their own; this one says only how they are laid out and what each may import.

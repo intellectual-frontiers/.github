@@ -87,7 +87,7 @@ proves(["0003-governance FR-002"], "a datatype names no database, and every case
     "a calendar day",
     "a moment in time",
     "an identifier",
-    "a code of party_kind",
+    "a code of partyKind",
     "a structured document",
     "bytes",
   ]);
@@ -112,7 +112,7 @@ proves(
 
 proves(
   ["0003-governance FR-004"],
-  "a name that is not lower-case snake, a duplicate and an annotation out of place are returned together",
+  "a name that is not lower camel case, a duplicate and an annotation out of place are returned together",
   () => {
     const bad = concept("Bad Name", { attributes: { OK: attribute(identifier()) }, identifiedBy: ["OK"] });
     const twin = concept("twin", { attributes: { id: attribute(identifier()) }, identifiedBy: ["id"] });

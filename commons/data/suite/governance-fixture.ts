@@ -21,7 +21,7 @@ import {
 export const same: (actual: unknown, expected: unknown, message?: string) => void = strictEquals;
 
 /** The kinds of party. */
-export const partyKind = codeList("party_kind", {
+export const partyKind = codeList("partyKind", {
   definition: "The kinds of party: a person or an organization",
   codes: { person: { label: "Person" }, organization: { label: "Organization", definition: "A body of people acting together" } },
 });
@@ -30,21 +30,21 @@ export const partyKind = codeList("party_kind", {
 export const party = concept("party", {
   definition: "A person or an organization we deal with",
   attributes: {
-    party_id: attribute(identifier(), { definition: "What identifies it" }),
+    partyId: attribute(identifier(), { definition: "What identifies it" }),
     kind: attribute(codeOf(partyKind), { definition: "Whether it is a person or an organization" }),
-    display_name: attribute(text({ max: 200 }), { definition: "What it is called" }),
+    displayName: attribute(text({ max: 200 }), { definition: "What it is called" }),
   },
-  identifiedBy: ["party_id"],
+  identifiedBy: ["partyId"],
 });
 
 /** A person, who is a party. */
 export const person = concept("person", {
   definition: "A party that is a human being",
   attributes: {
-    person_id: attribute(identifier(), { definition: "What identifies it" }),
+    personId: attribute(identifier(), { definition: "What identifies it" }),
     born: attribute(date(), { definition: "The day it was born", multiplicity: "optional" }),
   },
-  identifiedBy: ["person_id"],
+  identifiedBy: ["personId"],
   relationships: { party: relationship(party, { cardinality: "one", definition: "The party it is" }) },
 });
 

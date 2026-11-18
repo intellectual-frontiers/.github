@@ -272,7 +272,7 @@ proves(
       placed({
         concept: [
           u(["id", "v"]),
-          annotate(quality.differs, { name: "v_w_differ", members: ["v", "w"] }),
+          annotate(quality.differs, { name: "vWDiffer", members: ["v", "w"] }),
           annotate(quality.audited, { removal: "mark" }),
         ],
         domain: [annotate(quality.audited, { removal: "delete" })],

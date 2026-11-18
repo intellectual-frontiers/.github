@@ -20,7 +20,8 @@ import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel"
 import type { Annotation } from "./annotation.ts";
 import type { AnyCodeList } from "./codelist.ts";
 import type { Datatype } from "./datatype.ts";
-import { attributeId, codeId, codeListId, conceptId, domainId, type ElementId, type ElementKind, NAME, relationshipId } from "./id.ts";
+import { attributeId, codeId, codeListId, conceptId, domainId, type ElementId, type ElementKind, relationshipId } from "./id.ts";
+import { NAME } from "./names.ts";
 
 /** Whether an attribute is held once and always, at most once, or any number of times. */
 export type Multiplicity = "required" | "optional" | "many";

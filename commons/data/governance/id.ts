@@ -7,14 +7,13 @@
  */
 import type { Brand } from "@intellectual-frontiers/commons/ts/kernel";
 
+export { NAME } from "./names.ts";
+
 /** The identity of an element. */
 export type ElementId = Brand<string, "ElementId">;
 
 /** The kinds of element. */
 export type ElementKind = "domain" | "concept" | "attribute" | "relationship" | "codelist" | "code";
-
-/** A name of an element: lower-case words joined by `_`. */
-export const NAME = /^[a-z][a-z0-9_]*$/;
 
 // the one place a text becomes an ElementId: the functions below build it from names, and nothing else does
 const made = (text: string): ElementId => text as ElementId;

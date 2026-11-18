@@ -15,7 +15,9 @@ import {
   type Domain,
   elementsOf,
   lint,
+  NAME,
   vocabularies,
+  words,
 } from "@intellectual-frontiers/data/governance";
 import { partyDomain } from "@intellectual-frontiers/data/models/arca";
 import { same } from "./governance-fixture.ts";
@@ -33,9 +35,9 @@ const conceptOf = (name: string): AnyConcept => {
   return c;
 };
 
-proves(["0004-arca FR-001"], "the party model is a valid domain named arca_party, given as a result", () => {
+proves(["0004-arca FR-001"], "the party model is a valid domain named arcaParty, given as a result", () => {
   assert(partyDomain.kind === "ok");
-  same(arca().name, "arca_party");
+  same(arca().name, "arcaParty");
 });
 
 proves(
@@ -44,32 +46,32 @@ proves(
   () => {
     same(
       arca().concepts.map((c) => c.name),
-      ["party", "person", "organization", "party_role", "party_relation", "party_identifier", "electronic_contact", "postal_address"],
+      ["party", "person", "organization", "partyRole", "partyRelation", "partyIdentifier", "electronicContact", "postalAddress"],
     );
     same(
       arca().codeLists.map((l) => l.name),
-      ["party_kind", "party_role_kind", "party_relation_kind", "party_identifier_kind", "contact_medium", "address_purpose"],
+      ["partyKind", "partyRoleKind", "partyRelationKind", "partyIdentifierKind", "contactMedium", "addressPurpose"],
     );
     const members = (name: string): string[] => {
       const c = conceptOf(name);
       return [...Object.keys(c.attributes), ...Object.keys(c.relationships)];
     };
-    same(members("party"), ["party_id", "kind", "display_name"]);
-    same(members("person"), ["given_name", "family_name", "birth_date", "party"]);
-    same(members("organization"), ["legal_name", "founded_on", "party"]);
-    same(members("party_role"), ["party_role_id", "kind", "valid_from", "valid_to", "party"]);
-    same(members("party_relation"), ["party_relation_id", "kind", "valid_from", "valid_to", "from", "to"]);
-    same(members("party_identifier"), ["party_identifier_id", "kind", "identifier", "issued_by", "party"]);
-    same(members("electronic_contact"), ["electronic_contact_id", "medium", "address", "is_primary", "party"]);
-    same(members("postal_address"), [
-      "postal_address_id",
+    same(members("party"), ["partyId", "kind", "displayName"]);
+    same(members("person"), ["givenName", "familyName", "birthDate", "party"]);
+    same(members("organization"), ["legalName", "foundedOn", "party"]);
+    same(members("partyRole"), ["partyRoleId", "kind", "validFrom", "validTo", "party"]);
+    same(members("partyRelation"), ["partyRelationId", "kind", "validFrom", "validTo", "from", "to"]);
+    same(members("partyIdentifier"), ["partyIdentifierId", "kind", "identifier", "issuedBy", "party"]);
+    same(members("electronicContact"), ["electronicContactId", "medium", "address", "isPrimary", "party"]);
+    same(members("postalAddress"), [
+      "postalAddressId",
       "purpose",
-      "line_1",
-      "line_2",
+      "line1",
+      "line2",
       "locality",
       "region",
-      "postal_code",
-      "country_code",
+      "postalCode",
+      "countryCode",
       "party",
     ]);
   },
@@ -90,8 +92,8 @@ proves(
         ["one", "party"],
       );
     }
-    for (const name of ["party", "party_role", "party_relation", "party_identifier", "electronic_contact", "postal_address"])
-      same(conceptOf(name).identifiedBy, [`${name}_id`]);
+    for (const name of ["party", "partyRole", "partyRelation", "partyIdentifier", "electronicContact", "postalAddress"])
+      same(conceptOf(name).identifiedBy, [`${name}Id`]);
   },
 );
 
@@ -109,23 +111,23 @@ proves(
       .filter((e) => e.kind === "attribute")
       .flatMap((e) => annotationsOf(e, privacy.personal).map((p) => `${e.id} ${p.category}`));
     same(held, [
-      "arca_party/party.display_name Name",
-      "arca_party/person.given_name Name",
-      "arca_party/person.family_name Name",
-      "arca_party/person.birth_date BirthDate",
-      "arca_party/party_identifier.identifier Identifier",
-      "arca_party/electronic_contact.address Contact",
-      "arca_party/postal_address.line_1 PhysicalAddress",
-      "arca_party/postal_address.line_2 PhysicalAddress",
-      "arca_party/postal_address.locality PhysicalAddress",
-      "arca_party/postal_address.region PhysicalAddress",
-      "arca_party/postal_address.postal_code PhysicalAddress",
-      "arca_party/postal_address.country_code Country",
+      "arcaParty/party.displayName Name",
+      "arcaParty/person.givenName Name",
+      "arcaParty/person.familyName Name",
+      "arcaParty/person.birthDate BirthDate",
+      "arcaParty/partyIdentifier.identifier Identifier",
+      "arcaParty/electronicContact.address Contact",
+      "arcaParty/postalAddress.line1 PhysicalAddress",
+      "arcaParty/postalAddress.line2 PhysicalAddress",
+      "arcaParty/postalAddress.locality PhysicalAddress",
+      "arcaParty/postalAddress.region PhysicalAddress",
+      "arcaParty/postalAddress.postalCode PhysicalAddress",
+      "arcaParty/postalAddress.countryCode Country",
     ]);
     for (const e of elementsOf(arca()))
       for (const p of annotationsOf(e, privacy.personal))
         assert(p.category !== undefined && p.category in privacy.pd && (p.purposes ?? []).length > 0, e.id);
-    const holders = ["party", "person", "party_identifier", "electronic_contact", "postal_address"];
+    const holders = ["party", "person", "partyIdentifier", "electronicContact", "postalAddress"];
     for (const name of holders) same(annotationsOf(conceptOf(name), security.classification), ["confidential"], name);
     same(
       arca()
@@ -147,31 +149,31 @@ proves(
     };
     const codes = (name: string): [string, string, string | undefined][] =>
       Object.entries(list(name).codes).map(([k, v]) => [k, v.label, v.definition]);
-    same(codes("party_kind"), [
+    same(codes("partyKind"), [
       ["person", "Person", "A human being"],
       ["organization", "Organization", "A company, agency, club or any other body"],
     ]);
-    same(codes("party_role_kind"), [
+    same(codes("partyRoleKind"), [
       ["customer", "Customer", "Buys from the business"],
       ["supplier", "Supplier", "Sells to the business"],
       ["employee", "Employee", "Works for the business under a contract of employment"],
       ["contact", "Contact", "Speaks for another party"],
     ]);
-    same(codes("party_relation_kind"), [
-      ["employed_by", "Employed by", "A person works for an organization"],
-      ["member_of", "Member of", "A party belongs to an organization"],
-      ["subsidiary_of", "Subsidiary of", "An organization is controlled by another"],
+    same(codes("partyRelationKind"), [
+      ["employedBy", "Employed by", "A person works for an organization"],
+      ["memberOf", "Member of", "A party belongs to an organization"],
+      ["subsidiaryOf", "Subsidiary of", "An organization is controlled by another"],
     ]);
-    same(codes("party_identifier_kind"), [
-      ["tax_number", "Tax number", "A number a tax authority issued"],
-      ["passport_number", "Passport number", "The number of a passport a state issued"],
-      ["company_registration", "Company registration", "The number a register of companies issued"],
+    same(codes("partyIdentifierKind"), [
+      ["taxNumber", "Tax number", "A number a tax authority issued"],
+      ["passportNumber", "Passport number", "The number of a passport a state issued"],
+      ["companyRegistration", "Company registration", "The number a register of companies issued"],
     ]);
-    same(Object.keys(list("contact_medium").codes), ["email", "telephone", "web"]);
-    same(Object.keys(list("address_purpose").codes), ["home", "work", "billing", "delivery"]);
-    for (const name of ["party_kind", "party_role_kind", "party_relation_kind", "party_identifier_kind"])
+    same(Object.keys(list("contactMedium").codes), ["email", "telephone", "web"]);
+    same(Object.keys(list("addressPurpose").codes), ["home", "work", "billing", "delivery"]);
+    for (const name of ["partyKind", "partyRoleKind", "partyRelationKind", "partyIdentifierKind"])
       same(annotationsOf(list(name), quality.openness), ["open"], name);
-    for (const name of ["contact_medium", "address_purpose"]) same(annotationsOf(list(name), quality.openness), ["closed"], name);
+    for (const name of ["contactMedium", "addressPurpose"]) same(annotationsOf(list(name), quality.openness), ["closed"], name);
   },
 );
 
@@ -184,17 +186,17 @@ proves(
   ["0004-arca FR-008"],
   "the business structure is governance: one identifier of a kind, two parties that differ, a default, and the ways the data is found",
   () => {
-    same(annotationsOf(conceptOf("party_identifier"), quality.unique), [{ members: ["party", "kind"] }]);
-    same(annotationsOf(conceptOf("party_relation"), quality.differs), [{ name: "parties_differ", members: ["from", "to"] }]);
-    same(annotationsOf(conceptOf("electronic_contact").attributes["is_primary"] ?? conceptOf("party"), quality.defaultValue), [false]);
+    same(annotationsOf(conceptOf("partyIdentifier"), quality.unique), [{ members: ["party", "kind"] }]);
+    same(annotationsOf(conceptOf("partyRelation"), quality.differs), [{ name: "partiesDiffer", members: ["from", "to"] }]);
+    same(annotationsOf(conceptOf("electronicContact").attributes["isPrimary"] ?? conceptOf("party"), quality.defaultValue), [false]);
     const lookups = arca().concepts.flatMap((c) => annotationsOf(c, usage.lookup).map((l) => `${c.name}: ${l.members.join(", ")}`));
     same(lookups, [
-      "person: family_name, given_name",
-      "party_role: party, kind",
-      "party_relation: from",
-      "party_relation: to",
-      "electronic_contact: party, medium",
-      "postal_address: party",
+      "person: familyName, givenName",
+      "partyRole: party, kind",
+      "partyRelation: from",
+      "partyRelation: to",
+      "electronicContact: party, medium",
+      "postalAddress: party",
     ]);
   },
 );
@@ -239,28 +241,41 @@ const OLD_TABLES: Readonly<Record<string, readonly string[]>> = {
   postal_address: ["postal_address_id", "party_id", "purpose", "line_1", "line_2", "locality", "region", "postal_code", "country_code"],
 };
 
+/** A name written in snake case, as the model it replaces wrote its names: the words of a governance name joined by an underscore. */
+const snake = (name: string): string => words(name).join("_");
+
 proves(
-  ["0004-arca FR-002", "0004-arca FR-006"],
-  "every table and column of the model it replaces is accounted for by the domain and the conventions a layer below must follow",
+  ["0004-arca FR-002", "0004-arca FR-006", "0004-arca FR-010"],
+  "every table and column of the model it replaces is what the words of this domain's names make in snake case",
   () => {
     const openLists = arca()
       .codeLists.filter((l) => annotationsOf(l, quality.openness)[0] === "open")
       .map((l) => l.name);
-    same(openLists, ["party_kind", "party_role_kind", "party_relation_kind", "party_identifier_kind"]);
+    same(openLists, ["partyKind", "partyRoleKind", "partyRelationKind", "partyIdentifierKind"]);
     // an open code list is a table of its own (code, label, description); a closed one is a check on the column
-    const tables = [...openLists, ...arca().concepts.map((c) => c.name)].sort();
-    same(tables, [...openLists, ...Object.keys(OLD_TABLES)].sort());
+    const tables = [...openLists, ...arca().concepts.map((c) => c.name)].map(snake).sort();
+    same(tables, [...openLists.map(snake), ...Object.keys(OLD_TABLES)].sort());
     for (const c of arca().concepts) {
       const columns = [
         ...Object.entries(c.attributes).map(([name, a]) =>
-          a.type.kind === "code" && openLists.includes(a.type.list.name) ? `${a.type.list.name}_code` : name,
+          a.type.kind === "code" && openLists.includes(a.type.list.name) ? `${snake(a.type.list.name)}_code` : snake(name),
         ),
         ...Object.entries(c.relationships).map(([name, r]) => {
           const target = (r.to as AnyConcept).name;
-          return name === target ? `${target}_id` : `${name}_${target}_id`;
+          return name === target ? `${snake(target)}_id` : `${snake(name)}_${snake(target)}_id`;
         }),
       ];
-      same([...new Set(columns)].sort(), [...(OLD_TABLES[c.name] ?? [])].sort(), c.name);
+      same([...new Set(columns)].sort(), [...(OLD_TABLES[snake(c.name)] ?? [])].sort(), c.name);
     }
   },
 );
+
+proves(["0004-arca FR-010"], "every name in the domain is lower camel case, and splits into the words of the old model's names", () => {
+  const names = elementsOf(arca()).map((e) => e.name);
+  assert(names.length > 60);
+  for (const n of names) assert(NAME.test(n), n);
+  same(words("line1"), ["line", "1"]);
+  same(snake("partiesDiffer"), "parties_differ");
+  same(snake("postalAddress"), "postal_address");
+  same(snake("isPrimary"), "is_primary");
+});

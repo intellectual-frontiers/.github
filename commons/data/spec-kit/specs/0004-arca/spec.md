@@ -9,18 +9,20 @@
 
 ## The domain
 
-- **FR-001**: Arca's party model MUST be a governance domain named `arca_party`, kept in `models/arca/` and written with the public surface of governance alone (0001-layers FR-004), and MUST be given as a `Result` (the domain or its errors), never by throwing, so that a project holds it to the same rules as its own.
-- **FR-002**: The domain MUST have the concepts `party`, `person`, `organization`, `party_role`, `party_relation`, `party_identifier`, `electronic_contact` and `postal_address`, and the code lists `party_kind`, `party_role_kind`, `party_relation_kind`, `party_identifier_kind`, `contact_medium` and `address_purpose`, each with the attributes and relationships that the model it replaces gave its tables and columns, in business terms.
-- **FR-003**: A person and an organization MUST each be identified by their relationship of cardinality one to a party, which they specialize; every other concept MUST be identified by an attribute of its own named for it (`party_role_id`).
+- **FR-001**: Arca's party model MUST be a governance domain named `arcaParty`, kept in `models/arca/` and written with the public surface of governance alone (0001-layers FR-004), and MUST be given as a `Result` (the domain or its errors), never by throwing, so that a project holds it to the same rules as its own.
+- **FR-002**: The domain MUST have the concepts `party`, `person`, `organization`, `partyRole`, `partyRelation`, `partyIdentifier`, `electronicContact` and `postalAddress`, and the code lists `partyKind`, `partyRoleKind`, `partyRelationKind`, `partyIdentifierKind`, `contactMedium` and `addressPurpose`, each with the attributes and relationships that the model it replaces gave its tables and columns, in business terms.
+- **FR-003**: A person and an organization MUST each be identified by their relationship of cardinality one to a party, which they specialize; every other concept MUST be identified by an attribute of its own named for it (`partyRoleId`).
 - **FR-004**: Every element of the domain MUST have a definition, and `lint` with the library's vocabularies MUST find nothing in it: Arca is a model that holds itself to its own vocabularies.
 
 ## What is true of the data
 
 - **FR-005**: Each attribute that holds personal data MUST say so with a category of DPV-PD that exists (`Name`, `BirthDate`, `Identifier`, `Contact`, `PhysicalAddress`, `Country`) and what it is held for, and each concept that holds personal data MUST be classified confidential.
-- **FR-006**: The four reference code lists (`party_kind`, `party_role_kind`, `party_relation_kind`, `party_identifier_kind`) MUST carry the codes that the model it replaces loaded as reference data, each with its label and what it means, and MUST be open, so that a business adds its own; `contact_medium` and `address_purpose` MUST be closed, with their codes.
+- **FR-006**: The four reference code lists (`partyKind`, `partyRoleKind`, `partyRelationKind`, `partyIdentifierKind`) MUST carry the codes that the model it replaces loaded as reference data, each with its label and what it means, and MUST be open, so that a business adds its own; `contactMedium` and `addressPurpose` MUST be closed, with their codes.
 - **FR-007**: The domain MUST be audited with removal by marking (who made, changed and removed each record, and when), and MUST say who answers for it.
-- **FR-008**: The business structure of the model MUST be said as governance and not as tables: a party holds one identifier of a kind (`quality.unique`), the two parties of a relation differ (`parties_differ`, `quality.differs`), a contact point is by default not primary (`quality.default`), and each way the data is usually found is a `usage.lookup`.
+- **FR-008**: The business structure of the model MUST be said as governance and not as tables: a party holds one identifier of a kind (`quality.unique`), the two parties of a relation differ (`partiesDiffer`, `quality.differs`), a contact point is by default not primary (`quality.default`), and each way the data is usually found is a `usage.lookup`.
 - **FR-009**: Every concept MUST cite the requirements of this specification that it serves, and every citation in the domain MUST name a requirement that exists in this library's specifications, so that the way from a requirement to the model, and back, is whole.
+
+- **FR-010**: Every name in the domain MUST be lower camel case, as a TypeScript identifier (0005-naming FR-001), and the names the model it replaces gave its tables and columns MUST be what the logical and the physical schema write from them in snake case (`givenName` as `given_name`), which a test holds.
 
 ## Out of scope
 
@@ -34,7 +36,7 @@
 - A person with no party: not possible, the relationship has cardinality one and identifies, per FR-003.
 - An address with no `region` or `line_2`: optional attributes, per FR-002.
 - Two identifiers of one kind for a party: refused by the uniqueness the domain says, per FR-008.
-- A relation from a party to itself: refused by the rule `parties_differ`, per FR-008.
+- A relation from a party to itself: refused by the rule `partiesDiffer`, per FR-008.
 - A business that adds a role of its own, `partner`: the code list is open, per FR-006.
 - A medium `fax`: not allowed, the code list is closed, per FR-006.
 - A citation of a requirement this library does not have: found by the test that holds citations to the specifications, per FR-009.
