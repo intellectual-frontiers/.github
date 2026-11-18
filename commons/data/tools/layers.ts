@@ -20,12 +20,13 @@ export const PACKAGE = "@intellectual-frontiers/data";
 /** The kernel's entry point, the one package the lower layers may import. */
 export const KERNEL = "@intellectual-frontiers/commons/ts/kernel";
 
-/** The kinds of unit of the table (0001-layers FR-004, FR-008). */
+/** The kinds of unit of the table (0001-layers FR-004, FR-008, 0011-sql-lifecycle FR-001). */
 export type UnitClass =
   | "engine"
   | "governance"
   | "logical"
   | "physical"
+  | "lifecycle"
   | "dialect"
   | "sqlextension"
   | "model"
@@ -53,6 +54,7 @@ const FOLDERS: readonly Folder[] = [
   { prefix: "governance/", class: "governance", instances: false },
   { prefix: "sql/logical/", class: "logical", instances: false },
   { prefix: "sql/physical/", class: "physical", instances: false },
+  { prefix: "sql/lifecycle/", class: "lifecycle", instances: false },
   { prefix: "sql/dialects/", class: "dialect", instances: true },
   { prefix: "sql/extensions/", class: "sqlextension", instances: true },
   { prefix: "sql/cli/", class: "cli", instances: false },
@@ -69,13 +71,14 @@ export const MAY_IMPORT: Readonly<Record<UnitClass, readonly UnitClass[]>> = {
   governance: ["engine"],
   logical: ["governance", "engine"],
   physical: ["logical", "governance", "engine"],
+  lifecycle: ["physical", "logical", "governance", "engine"],
   dialect: ["physical", "logical", "governance", "engine"],
-  sqlextension: ["physical", "logical", "governance", "engine"],
+  sqlextension: ["lifecycle", "physical", "logical", "governance", "engine"],
   model: ["governance", "engine"],
   extension: ["governance", "engine"],
-  cli: ["sqlextension", "dialect", "physical", "logical", "governance", "engine", "extension", "model"],
-  suite: ["engine", "governance", "logical", "physical", "dialect", "sqlextension", "model", "extension", "cli", "examples"],
-  examples: ["engine", "governance", "logical", "physical", "dialect", "sqlextension", "model", "extension", "cli"],
+  cli: ["sqlextension", "dialect", "lifecycle", "physical", "logical", "governance", "engine", "extension", "model"],
+  suite: ["engine", "governance", "logical", "physical", "lifecycle", "dialect", "sqlextension", "model", "extension", "cli", "examples"],
+  examples: ["engine", "governance", "logical", "physical", "lifecycle", "dialect", "sqlextension", "model", "extension", "cli"],
   tools: [],
   root: [],
 };
@@ -86,6 +89,7 @@ const LEVEL: Readonly<Record<UnitClass, number>> = {
   governance: 1,
   logical: 2,
   physical: 3,
+  lifecycle: 3.5,
   dialect: 4,
   sqlextension: 4,
   model: 4,

@@ -123,3 +123,17 @@ requirement	mechanism	by	note
 0010-sql-generators FR-012	check	.github: cd commons/data && bun run verify	suite/generators.test.ts: a text of governance is escaped for Markdown, HTML and documentation comments
 0010-sql-generators FR-013	check	.github: cd commons/data && bun run verify	suite/generators.test.ts: the Zod module validates rows and refuses what does not fit, and the Rust file compiles
 0010-sql-generators FR-014	check	.github: cd commons/data && bun run verify	suite/generators.test.ts: the files of Arca's party model hold every table, column and foreign key of the schema and nothing more
+0011-sql-lifecycle FR-001	check	.github: cd commons/data && bun run verify	suite/lifecycle.test.ts: the lifecycle is a unit with a public surface, and its files name no engine
+0011-sql-lifecycle FR-002	check	.github: cd commons/data && bun run verify	suite/lifecycle.test.ts: a state is a hashed value, the same for the same structure in any order, and the hash is the kernel's SHA-256
+0011-sql-lifecycle FR-003	check	.github: cd commons/data && bun run verify	suite/lifecycle.test.ts: bind marks what it makes as the core's and what an extension adds as the extension's
+0011-sql-lifecycle FR-004	check	.github: cd commons/data && bun run verify	suite/lifecycle.test.ts: tables and columns are matched by their words, so a change of case style is a rename, and renamedFrom makes a rename
+0011-sql-lifecycle FR-005	check	.github: cd commons/data && bun run verify	suite/lifecycle.test.ts: the changes of any two states lead from the first to the second (property test)
+0011-sql-lifecycle FR-006	check	.github: cd commons/data && bun run verify	suite/lifecycle.test.ts: changes are classified by what they could lose and whether they can be undone
+0011-sql-lifecycle FR-007	check	.github: cd commons/data && bun run verify	suite/lifecycle.test.ts: a plan has the ordered steps with the state hashes each needs and leaves, content identifiers, and none between equal states
+0011-sql-lifecycle FR-008	check	.github: cd commons/data && bun run verify	suite/lifecycle.test.ts: destructive steps are refused unless allowed, what the dialect cannot do needs a person's step, and all errors are returned together
+0011-sql-lifecycle FR-009	check	.github: cd commons/data && bun run verify	suite/lifecycle.test.ts: what extensions add is repeatable with a key and a hash, and only what changed is due
+0011-sql-lifecycle FR-010	check	.github: cd commons/data && bun run verify	suite/lifecycle.test.ts: a ledger whose entry was changed, taken out, put in or moved fails its chain
+0011-sql-lifecycle FR-011	check	.github: cd commons/data && bun run verify	suite/lifecycle.test.ts: a plan runs on three real engines step by step with the ledger, does nothing run again, refuses another base, rolls back a failed step and finds a touched ledger
+0011-sql-lifecycle FR-012	check	.github: cd commons/data && bun run verify	suite/lifecycle.test.ts: the plans from empty and from each version to the next leave the database bind makes for the last version, on three engines
+0011-sql-lifecycle FR-013	check	.github: cd commons/data && bun run verify	suite/lifecycle.test.ts: for any two states applying the diff reaches the second, and the diff of a state with itself is empty (property test)
+0011-sql-lifecycle FR-014	check	.github: cd commons/data && bun run verify	suite/lifecycle.test.ts: the lifecycle vocabulary exists and lint finds a renamedFrom that is not a name or is the element's own

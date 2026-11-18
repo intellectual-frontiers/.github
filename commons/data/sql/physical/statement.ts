@@ -18,9 +18,14 @@ export type Group = "setup" | "table" | "constraint" | "index" | "data" | "view"
 /** The groups in the order their statements are run. */
 export const GROUPS: readonly Group[] = ["setup", "table", "constraint", "index", "data", "view", "routine", "documentation", "policy"];
 
+/** Whether a statement is the core's, made from the logical schema, or an extension's (0011-sql-lifecycle FR-003). */
+export type Origin = "core" | "extension";
+
 /** One piece of SQL, ending in `;`. */
 export interface Statement {
   readonly group: Group;
+  /** Who made it: `bind` sets it, so an extension never has to. */
+  readonly origin?: Origin;
   readonly sql: string;
   /** The elements of the logical schema it was made from. */
   readonly of: readonly LogicalId[];

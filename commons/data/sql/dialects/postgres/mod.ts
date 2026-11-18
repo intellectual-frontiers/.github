@@ -38,7 +38,17 @@ const type = (t: LogicalType): string => {
 /** PostgreSQL. */
 export const dialect: Dialect = {
   name: "postgres",
-  features: ["comment-on", "regex-check", "add-constraint", "or-replace-view", "row-security", "grants", "routines", "partitions"],
+  features: [
+    "comment-on",
+    "regex-check",
+    "add-constraint",
+    "or-replace-view",
+    "row-security",
+    "grants",
+    "routines",
+    "partitions",
+    "alter-column",
+  ],
   maxName: 63,
   now: "CURRENT_TIMESTAMP",
   quote: quoteName,

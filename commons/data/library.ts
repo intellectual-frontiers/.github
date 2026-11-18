@@ -20,6 +20,7 @@ export const library = {
     "./sql/dialects/postgres",
     "./sql/dialects/sqlite",
     "./sql/dialects/duckdb",
+    "./sql/lifecycle",
     "./sql/extensions/documentation",
     "./sql/extensions/views",
     "./sql/extensions/access",

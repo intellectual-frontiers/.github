@@ -16,11 +16,19 @@ import {
   type IdError,
   point,
 } from "@intellectual-frontiers/data/engine";
-import type { LogicalType } from "@intellectual-frontiers/data/sql/logical";
+import type { LogicalDefault, LogicalType } from "@intellectual-frontiers/data/sql/logical";
 
 /** What a dialect can do beyond the common ground. */
 export type Feature =
-  "comment-on" | "regex-check" | "add-constraint" | "or-replace-view" | "row-security" | "grants" | "routines" | "partitions";
+  | "comment-on"
+  | "regex-check"
+  | "add-constraint"
+  | "or-replace-view"
+  | "row-security"
+  | "grants"
+  | "routines"
+  | "partitions"
+  | "alter-column";
 
 /** A literal a statement may hold. */
 export type Literal = string | number | boolean | null;
@@ -38,6 +46,12 @@ export interface Dialect {
   type(type: LogicalType): string;
   /** Why the dialect cannot store a type, or nothing where it can (0009-sql-features FR-003). */
   unsupported?(type: LogicalType): string | undefined;
+  /** Why the dialect cannot add a column like this to a table that exists, or nothing where it can (0011-sql-lifecycle FR-006). */
+  addColumnRefusal?(column: {
+    readonly type: LogicalType;
+    readonly nullable: boolean;
+    readonly default?: LogicalDefault;
+  }): string | undefined;
   /** Statements to run before the tables, for the types a schema uses (0009-sql-features FR-003). */
   setup?(types: readonly LogicalType[]): readonly string[];
   /** A check that a column matches a regular expression, or none where the engine has no way to say it. */

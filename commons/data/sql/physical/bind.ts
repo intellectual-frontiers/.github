@@ -10,19 +10,9 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
-import type { Words } from "@intellectual-frontiers/data/governance";
-import type {
-  Check,
-  CheckExpression,
-  Column,
-  ForeignKey,
-  LogicalDefault,
-  LogicalId,
-  LogicalType,
-  LogicalSchema,
-  Table,
-} from "@intellectual-frontiers/data/sql/logical";
+import type { Column, ForeignKey, LogicalId, LogicalType, LogicalSchema, Table } from "@intellectual-frontiers/data/sql/logical";
 import { type Naming, naming as defaultNaming, writeCode } from "./case.ts";
+import { expressor, writeNames } from "./express.ts";
 import type { Dialect } from "./dialect.ts";
 import { upsert } from "./upsert.ts";
 import {
@@ -30,6 +20,7 @@ import {
   GROUPS,
   type BindContext,
   type Group,
+  type Origin,
   type Physical,
   type PhysicalError,
   type Statement,
@@ -62,83 +53,12 @@ export function bind(schema: LogicalSchema, options: BindOptions): Result<Physic
   const naming = options.naming ?? defaultNaming();
   const errors: PhysicalError[] = [];
   const q = (name: string): string => dialect.quote(name);
-  const write = (words: Words, element: LogicalId): string => {
-    const name = naming.names.write(words);
-    if (name.length > dialect.maxName) errors.push({ kind: "length", element, name, max: dialect.maxName });
-    return name;
-  };
-
-  // the names, written once, and any that are alike
-  const tables = new Map<LogicalId, string>();
-  const columns = new Map<LogicalId, string>();
-  const constraints = new Map<LogicalId, string>();
-  const seenTables = new Map<string, LogicalId>();
-  const seenConstraints = new Map<string, LogicalId>();
-  for (const t of schema.tables) {
-    const tn = write(t.name, t.id);
-    tables.set(t.id, tn);
-    const other = seenTables.get(tn);
-    if (other !== undefined) errors.push({ kind: "collision", name: tn, first: other, second: t.id });
-    else seenTables.set(tn, t.id);
-    const seenColumns = new Map<string, LogicalId>();
-    for (const c of t.columns) {
-      const cn = write(c.name, c.id);
-      columns.set(c.id, cn);
-      const o = seenColumns.get(cn);
-      if (o !== undefined) errors.push({ kind: "collision", name: cn, table: tn, first: o, second: c.id });
-      else seenColumns.set(cn, c.id);
-    }
-    for (const x of [...t.foreignKeys, ...t.uniques, ...t.checks, ...t.indexes]) {
-      const xn = write(x.name, x.id);
-      constraints.set(x.id, xn);
-      const o = seenConstraints.get(xn);
-      if (o !== undefined) errors.push({ kind: "collision", name: xn, table: tn, first: o, second: x.id });
-      else seenConstraints.set(xn, x.id);
-    }
-  }
-  const written: Written = { table: (id) => tables.get(id), column: (id) => columns.get(id), constraint: (id) => constraints.get(id) };
-  const list = (ws: readonly Words[]): string => ws.map((w) => q(naming.names.write(w))).join(", ");
-
-  const defaultOf = (d: LogicalDefault): string => {
-    switch (d.kind) {
-      case "literal":
-        return dialect.literal(d.value);
-      case "now":
-        return dialect.now;
-      case "code":
-        return dialect.literal(writeCode(naming, d.name));
-    }
-  };
-  const checkOf = (c: Check): string | undefined => {
-    const e: CheckExpression = c.expression;
-    const col = (w: Words): string => q(naming.names.write(w));
-    switch (e.kind) {
-      case "differs":
-        return `${col(e.columns[0])} <> ${col(e.columns[1])}`;
-      case "oneOf":
-        return `${col(e.column)} IN (${e.codes.map((x) => dialect.literal(writeCode(naming, x))).join(", ")})`;
-      case "range": {
-        const parts = [
-          ...(e.min === undefined ? [] : [`${col(e.column)} >= ${dialect.literal(e.min)}`]),
-          ...(e.max === undefined ? [] : [`${col(e.column)} <= ${dialect.literal(e.max)}`]),
-        ];
-        return parts.join(" AND ");
-      }
-      case "pattern": {
-        if (dialect.pattern === undefined) {
-          errors.push({ kind: "unsupported", element: c.id, why: `${dialect.name} has no regular expression to check a pattern with` });
-          return undefined;
-        }
-        return dialect.pattern(col(e.column), e.pattern);
-      }
-    }
-  };
-  const columnLine = (t: Table, c: Column): string => {
-    const inlineKey = t.primaryKey.length === 1 && t.primaryKey[0]?.join(".") === c.name.join(".");
-    return `${q(columns.get(c.id) ?? "")} ${dialect.type(c.type)}${c.nullable ? "" : " NOT NULL"}${c.default === undefined ? "" : ` DEFAULT ${defaultOf(c.default)}`}${inlineKey ? " PRIMARY KEY" : ""}`;
-  };
-  const fkClause = (f: ForeignKey): string =>
-    `CONSTRAINT ${q(constraints.get(f.id) ?? "")} FOREIGN KEY (${list(f.columns)}) REFERENCES ${q(naming.names.write(f.references.table))} (${list(f.references.columns)})`;
+  const names = writeNames(schema, dialect, naming, errors);
+  const { tables, columns, constraints } = names;
+  const written: Written = names;
+  const x = expressor(dialect, naming, names, errors);
+  const { list, columnLine, fkClause } = x;
+  const columnOf = (t: Table, c: Column): string => columnLine(t, c);
 
   // what the dialect cannot store, and what it must run first
   const used: LogicalType[] = [];
@@ -180,17 +100,17 @@ export function bind(schema: LogicalSchema, options: BindOptions): Result<Physic
     cyclic.has(f.references.table.join(".")) &&
     f.references.table.join(".") !== t.name.join(".");
 
-  const statements: { group: Group; sql: string; of: readonly LogicalId[] }[] = [];
-  for (const sql of dialect.setup?.(used) ?? []) statements.push({ group: "setup", sql, of: [] });
+  const statements: { group: Group; origin: Origin; sql: string; of: readonly LogicalId[] }[] = [];
+  for (const sql of dialect.setup?.(used) ?? []) statements.push({ group: "setup", origin: "core", sql, of: [] });
   const context: BindContext = { schema, dialect, naming, written };
   for (const t of order) {
-    const lines: string[] = t.columns.map((c) => columnLine(t, c));
+    const lines: string[] = t.columns.map((c) => columnOf(t, c));
     if (t.primaryKey.length > 1) lines.push(`PRIMARY KEY (${list(t.primaryKey)})`);
     for (const f of t.foreignKeys) if (!deferred(f, t)) lines.push(fkClause(f));
-    for (const u of t.uniques) lines.push(`CONSTRAINT ${q(constraints.get(u.id) ?? "")} UNIQUE (${list(u.columns)})`);
+    for (const u of t.uniques) lines.push(x.uniqueClause(u));
     for (const c of t.checks) {
-      const expr = checkOf(c);
-      if (expr !== undefined) lines.push(`CONSTRAINT ${q(constraints.get(c.id) ?? "")} CHECK (${expr})`);
+      const clause = x.checkClause(c);
+      if (clause !== undefined) lines.push(clause);
     }
     const clauses: string[] = [];
     for (const clause of options.tableClauses ?? []) {
@@ -200,6 +120,7 @@ export function bind(schema: LogicalSchema, options: BindOptions): Result<Physic
     }
     statements.push({
       group: "table",
+      origin: "core",
       sql: `CREATE TABLE IF NOT EXISTS ${q(tables.get(t.id) ?? "")} (\n${lines.map((l) => `${indent}${l}`).join(",\n")}\n)${clauses.map((c) => ` ${c}`).join("")};`,
       of: [
         t.id,
@@ -211,13 +132,19 @@ export function bind(schema: LogicalSchema, options: BindOptions): Result<Physic
     });
     for (const f of t.foreignKeys) {
       if (deferred(f, t))
-        statements.push({ group: "constraint", sql: `ALTER TABLE ${q(tables.get(t.id) ?? "")} ADD ${fkClause(f)};`, of: [f.id] });
+        statements.push({
+          group: "constraint",
+          origin: "core",
+          sql: `ALTER TABLE ${q(tables.get(t.id) ?? "")} ADD ${fkClause(f)};`,
+          of: [f.id],
+        });
     }
   }
   for (const t of order) {
     for (const i of t.indexes) {
       statements.push({
         group: "index",
+        origin: "core",
         sql: `CREATE INDEX IF NOT EXISTS ${q(constraints.get(i.id) ?? "")} ON ${q(tables.get(t.id) ?? "")} (${list(i.columns)});`,
         of: [i.id],
       });
@@ -228,13 +155,13 @@ export function bind(schema: LogicalSchema, options: BindOptions): Result<Physic
     const names = t.columns.map((c) => columns.get(c.id) ?? "");
     const key = t.primaryKey.map((k) => naming.names.write(k));
     const rows = t.rows.map((r) => [writeCode(naming, r.code), r.label, r.description]);
-    statements.push({ group: "data", sql: upsert(dialect, tables.get(t.id) ?? "", names, key, rows), of: [t.id] });
+    statements.push({ group: "data", origin: "core", sql: upsert(dialect, tables.get(t.id) ?? "", names, key, rows), of: [t.id] });
   }
 
   for (const source of options.sources ?? []) {
     const r = source(context);
     if (r.kind === "err") errors.push(...r.error);
-    else statements.push(...r.value);
+    else statements.push(...r.value.map((st) => ({ ...st, origin: "extension" as const })));
   }
   if (errors.length > 0) return err(errors);
   const ordered: Statement[] = GROUPS.flatMap((g) => statements.filter((s) => s.group === g));

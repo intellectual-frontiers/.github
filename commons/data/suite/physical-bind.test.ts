@@ -168,8 +168,18 @@ proves(["0007-physical FR-004"], "the three dialects are extensions that contrib
     [sqlite.features, duckdb.features, postgres.features],
     [
       [],
-      ["comment-on", "regex-check", "or-replace-view"],
-      ["comment-on", "regex-check", "add-constraint", "or-replace-view", "row-security", "grants", "routines", "partitions"],
+      ["comment-on", "regex-check", "or-replace-view", "alter-column"],
+      [
+        "comment-on",
+        "regex-check",
+        "add-constraint",
+        "or-replace-view",
+        "row-security",
+        "grants",
+        "routines",
+        "partitions",
+        "alter-column",
+      ],
     ],
   );
   same(

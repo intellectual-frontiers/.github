@@ -39,7 +39,7 @@ const type = (t: LogicalType): string => {
 /** DuckDB. */
 export const dialect: Dialect = {
   name: "duckdb",
-  features: ["comment-on", "regex-check", "or-replace-view"],
+  features: ["comment-on", "regex-check", "or-replace-view", "alter-column"],
   maxName: 255,
   now: "CURRENT_TIMESTAMP",
   quote: quoteName,

@@ -13,6 +13,7 @@
  */
 import type { Vocabulary } from "../vocabulary.ts";
 import * as docs from "./docs.ts";
+import * as lifecycle from "./lifecycle.ts";
 import * as ownership from "./ownership.ts";
 import * as privacy from "./privacy.ts";
 import * as quality from "./quality.ts";
@@ -20,7 +21,7 @@ import * as requirements from "./requirements.ts";
 import * as security from "./security.ts";
 import * as usage from "./usage.ts";
 
-export { docs, ownership, privacy, quality, requirements, security, usage };
+export { docs, lifecycle, ownership, privacy, quality, requirements, security, usage };
 
 /** The vocabularies of this library, in the order lint runs them. */
 export const defaultVocabularies: readonly Vocabulary[] = [
@@ -31,4 +32,5 @@ export const defaultVocabularies: readonly Vocabulary[] = [
   ownership.vocabulary,
   quality.vocabulary,
   usage.vocabulary,
+  lifecycle.vocabulary,
 ];

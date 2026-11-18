@@ -31,6 +31,11 @@ export const about: About = {
       what: "The logical schema (tables, columns, keys and indexes made from governance by a projection, with the report of the flow and the types of rows), the physical schema (a logical schema bound to a dialect and a case style, as statements) and the dialects of PostgreSQL, SQLite and DuckDB, which are extensions; the extensions are in sql/extensions/: documentation (comments, documentation tables, governance tables), views, access (row-level security and grants from governance), routines and partitions; the generators (diagrams in Mermaid and D2, the data dictionary in Markdown and HTML, row types in Rust and Zod, the register of personal data and security) are in sql/extensions/generators/",
       mayImport: ["governance/, engine/, by package name"],
     },
+    {
+      path: "sql/lifecycle/",
+      what: "What changes a database from one physical schema to the next: the hashed state of a database, the changes between two states, the plan of classified steps, the hash-chained ledger and the run on a driver. Strategies and features of migration are extensions of it.",
+      mayImport: ["sql/physical/, sql/logical/, governance/, engine/, by package name"],
+    },
     { path: "extensions/", what: "Extensions that need no database.", mayImport: ["governance/, engine/, by package name"] },
     {
       path: "models/",

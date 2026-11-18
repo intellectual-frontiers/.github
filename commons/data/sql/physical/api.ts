@@ -28,11 +28,13 @@ export {
   generatorsFrom,
   generatorsPoint,
 } from "./generate.ts";
+export { type Expressor, expressor, type Names, writeNames } from "./express.ts";
 export { upsert } from "./upsert.ts";
 export {
   type BindContext,
   GROUPS,
   type Group,
+  type Origin,
   type Physical,
   type PhysicalError,
   clausesFrom,

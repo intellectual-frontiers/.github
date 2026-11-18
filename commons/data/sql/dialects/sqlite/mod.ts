@@ -37,6 +37,12 @@ export const dialect: Dialect = {
   quote: quoteName,
   literal: standardLiteral,
   type,
+  addColumnRefusal: (c) =>
+    !c.nullable && c.default === undefined
+      ? "SQLite cannot add a required column that has no default to a table"
+      : c.default?.kind === "now"
+        ? "SQLite cannot add a column whose default is not a constant"
+        : undefined,
   unsupported: (t) => (t.kind === "vector" ? "SQLite has no vector type" : undefined),
 };
 
