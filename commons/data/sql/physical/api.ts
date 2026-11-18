@@ -39,6 +39,7 @@ export {
   generatorsPoint,
 } from "./generate.ts";
 export { type Expressor, expressor, type Names, writeNames } from "./express.ts";
+export { parseCsv } from "./csv.ts";
 export { qualified } from "./qualify.ts";
 export { type RefError, refsOf, type Refs, type RefsKit } from "./refs.ts";
 export { upsert } from "./upsert.ts";

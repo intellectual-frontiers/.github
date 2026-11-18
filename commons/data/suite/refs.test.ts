@@ -7,7 +7,7 @@
 import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 import { dialect as postgres } from "@intellectual-frontiers/data/sql/dialects/postgres";
 import { dialect as sqlite } from "@intellectual-frontiers/data/sql/dialects/sqlite";
-import { naming, refsOf } from "@intellectual-frontiers/data/sql/physical";
+import { naming, parseCsv, refsOf } from "@intellectual-frontiers/data/sql/physical";
 import { same } from "./governance-fixture.ts";
 import { libraryAt } from "./lifecycle-fixture.ts";
 
@@ -30,3 +30,9 @@ proves(
     same(prefixed.used(), [{ name: "author", via: "schema" }, { name: "model", via: "relation" }]);
   },
 );
+
+proves(["0007-physical FR-015"], "CSV text is read as RFC 4180 does, with quotes, doubled quotes, any line end and a delimiter that is a parameter", () => {
+  same(parseCsv('a,b\n"x, y","say ""hi"""\r\nlast,\n'), [["a", "b"], ["x, y", 'say "hi"'], ["last", ""]]);
+  same(parseCsv("a;b\r1;2\r", ";"), [["a", "b"], ["1", "2"]]);
+  same(parseCsv(""), []);
+});

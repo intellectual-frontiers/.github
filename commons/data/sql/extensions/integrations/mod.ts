@@ -10,7 +10,7 @@
  *
  * @module
  */
-export { parseCsv } from "./csv.ts";
+export { parseCsv } from "@intellectual-frontiers/data/sql/physical";
 export {
   type ContractColumn,
   type IntegrationError,

@@ -1,6 +1,6 @@
-// Spec: 0022-sql-integrations FR-002
+// Spec: 0007-physical FR-015
 /**
- * CSV text (commons data 0022-sql-integrations FR-002): parsed as RFC 4180 does, a quoted field holding the delimiter, a newline or a doubled quote.
+ * CSV text (commons data 0007-physical FR-015): parsed as RFC 4180 does, a quoted field holding the delimiter, a newline or a doubled quote.
  *
  * @module
  */

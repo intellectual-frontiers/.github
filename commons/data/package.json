@@ -35,6 +35,8 @@
     "./sql/extensions/transforms": "./sql/extensions/transforms/mod.ts",
     "./sql/extensions/queries": "./sql/extensions/queries/mod.ts",
     "./sql/extensions/target": "./sql/extensions/target/mod.ts",
+    "./sql/extensions/kinds": "./sql/extensions/kinds/mod.ts",
+    "./sql/extensions/osquery-atc": "./sql/extensions/osquery-atc/mod.ts",
     "./sql/presets": "./sql/presets/mod.ts"
   },
   "scripts": {

@@ -24,3 +24,5 @@ number	slug	state
 0023	sql-transforms	in force
 0024	sql-queries	in force
 0025	sql-target	in force
+0026	sql-kinds	in force
+0027	sql-osquery-atc	in force

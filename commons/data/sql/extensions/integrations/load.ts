@@ -8,8 +8,7 @@
 import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
 import { words } from "@intellectual-frontiers/data/governance";
 import { type Driver, hashOf } from "@intellectual-frontiers/data/sql/lifecycle";
-import type { Literal } from "@intellectual-frontiers/data/sql/physical";
-import { parseCsv } from "./csv.ts";
+import { type Literal, parseCsv } from "@intellectual-frontiers/data/sql/physical";
 import { type ContractColumn, type Loader, sourceLabel } from "./integration.ts";
 import { type IntegrationSettings, settingsOf } from "./settings.ts";
 
