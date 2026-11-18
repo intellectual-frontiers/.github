@@ -29,7 +29,8 @@
     "./sql/extensions/plan-report": "./sql/extensions/plan-report/mod.ts",
     "./sql/extensions/rewrite": "./sql/extensions/rewrite/mod.ts",
     "./sql/extensions/history": "./sql/extensions/history/mod.ts",
-    "./sql/extensions/convergence": "./sql/extensions/convergence/mod.ts"
+    "./sql/extensions/convergence": "./sql/extensions/convergence/mod.ts",
+    "./sql/extensions/rollout": "./sql/extensions/rollout/mod.ts"
   },
   "scripts": {
     "check": "tsc -p tsconfig.json",
