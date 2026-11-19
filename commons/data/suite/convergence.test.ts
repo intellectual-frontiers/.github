@@ -254,7 +254,7 @@ proves(
   async () => {
     const settings = settingsOf({ approval: "autonomous" });
     same(settings.policy, defaultPolicy);
-    same([settings.approval, settings.ledgerTable, settings.ignore], ["autonomous", "lifecycle_ledger", ["lifecycle_ledger"]]);
+    same([settings.approval, settings.ledgerTable, settings.ignore], ["autonomous", "lifecycle_ledger", ["lifecycle_ledger", "*quarantine", "*quarantined"]]);
     for (const { name, dialect } of DIALECTS) {
       const e = await dbAt(name, dialect, 1);
       try {

@@ -39,7 +39,9 @@ export const principal: AnyConcept = concept("principal", {
     principalId: key("the principal"),
     kind: req(codeOf(c.principalKind), "Whether the principal is a user, a machine, a device, an agent or a group"),
     displayName: opt(text(), "The name the principal is shown by", held("Name", "show who did something")),
-    status: req(codeOf(c.principalStatus), "Where the principal is in its life; making it disabled denies everything it could do, at once"),
+    status: req(codeOf(c.principalStatus), "Where the principal is in its life; making it disabled denies everything it could do, at once", annotate(quality.transitions, {
+      allowed: { pending: ["active", "disabled", "deleted"], active: ["suspended", "disabled", "deleted"], suspended: ["active", "disabled", "deleted"], disabled: ["active", "deleted"], deleted: [] },
+    })),
     statusReason: opt(text(), "Why the principal is in the status it is in"),
     statusChangedAt: req(instant(), "When the principal's status last changed"),
     createdAt: req(instant(), "When the principal was made"),
@@ -437,6 +439,7 @@ export const auditEvent = concept("auditEvent", {
   definition: "Something that was done, or tried, kept in a chain of hashes so that it cannot be changed without showing",
   attributes: {
     auditEventId: key("the event"),
+    sequence: req(integer(), "Which event of the trail it is, counted from one: each follows the one before it, so that none is left out and none is put between"),
     occurredAt: req(instant(), "When it happened"),
     actorKind: req(codeOf(c.actorKind), "What did it: a person, a machine, a device, an agent, the platform or someone acting as another"),
     decision: opt(codeOf(c.decision), "What the decision was, for an event that records one"),
@@ -464,7 +467,15 @@ export const auditEvent = concept("auditEvent", {
     actor: maybe(principal, "Who did it, where a principal did"),
     onBehalfOf: maybe(principal, "The person or group accountable at the root of the chain the actor acted in"),
   },
-  annotations: [restricted, keep(365), cites("FR-010"), unique("eventHash"), lookup("occurredAt")],
+  annotations: [
+    restricted,
+    keep(365),
+    cites("FR-010"),
+    unique("eventHash"),
+    unique("sequence"),
+    annotate(quality.appendOnly, { chain: { hash: "eventHash", previous: "previousHash", sequence: "sequence", genesis: "genesis" } }),
+    lookup("occurredAt"),
+  ],
 });
 
 /** Every concept of the core, in the order they are written. */

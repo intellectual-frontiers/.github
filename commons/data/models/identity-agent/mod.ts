@@ -10,9 +10,11 @@ import { type AnyConcept, codeOf, concept, defineModule, instant, integer, struc
 import { tenant } from "@intellectual-frontiers/data/models/arca-tenancy";
 import { accessRole, permission, riskLevel, sideEffect } from "@intellectual-frontiers/data/models/identity-access";
 import { delegation } from "@intellectual-frontiers/data/models/identity-delegation";
+import { annotate, vocabularies } from "@intellectual-frontiers/data/governance";
 import { citing, confidential, internal, key, keep, list, lookup, maybe, one, opt, principal, req, unique, useStatus } from "@intellectual-frontiers/data/models/identity";
 
 const cites = citing("0040-identity-agent");
+const { quality } = vocabularies;
 export const autonomyLevel = list("autonomyLevel", "How much an agent may do without a person", { observe: "It may only read", suggest: "It may propose, and a person acts", actWithApproval: "It may act, and a person approves what is risky", autonomous: "It may act within its grants and budgets" });
 export const versionStatus = list("versionStatus", "Where a version of an agent is", { candidate: "Made, not yet approved", approved: "Approved to run", active: "Running in production", retired: "No longer used", revoked: "Pulled: no run may start on it" });
 export const runStatus = list("runStatus", "Where a run of an agent is", { running: "Running", succeeded: "Ended well", failed: "Ended badly", cancelled: "Stopped by its caller", killed: "Stopped by the kill switch", expired: "Ended because its time was up" });
@@ -55,7 +57,7 @@ export const agentVersion = concept("agentVersion", {
     promptHash: req(text(), "A hash of the system prompt; the prompt is not kept here"),
     toolManifestHash: req(text(), "A hash of the tools it is given"),
     codeRef: opt(text(), "The commit of its code"),
-    status: req(codeOf(versionStatus), "Where the version is"),
+    status: req(codeOf(versionStatus), "Where the version is", annotate(quality.transitions, { allowed: { candidate: ["approved", "revoked"], approved: ["active", "retired", "revoked"], active: ["retired", "revoked"], retired: ["revoked"], revoked: [] } })),
     approvedAt: opt(instant(), "When it was approved"),
     createdAt: req(instant(), "When it was made"),
     versionKey: req(text(), "A hash of the agent and the label, unique"),
@@ -105,7 +107,7 @@ export const agentRun: AnyConcept = concept("agentRun", {
     runId: key("the run"),
     startedAt: req(instant(), "When it started"),
     endedAt: opt(instant(), "When it ended"),
-    status: req(codeOf(runStatus), "Where it is"),
+    status: req(codeOf(runStatus), "Where it is", annotate(quality.transitions, { allowed: { running: ["succeeded", "failed", "cancelled", "killed", "expired"], succeeded: [], failed: [], cancelled: [], killed: [], expired: [] } })),
     traceId: opt(text(), "The trace it is part of"),
     purpose: opt(text(), "What it is for"),
     inputHash: opt(text(), "A hash of its input"),
@@ -165,7 +167,7 @@ export const agentBudget = concept("agentBudget", {
   },
   identifiedBy: ["budgetId"],
   relationships: { agent: one(agent, "The agent"), delegation: maybe(delegation, "The delegation it is for"), run: maybe(agentRun, "The run it is for") },
-  annotations: [internal, cites("FR-004"), unique("budgetKey")],
+  annotations: [internal, cites("FR-004"), unique("budgetKey"), annotate(quality.atMost, { member: "used", other: "limitValue" })],
 });
 
 /** A request for a person to approve one call, bound to a hash of its arguments, usable once. */
@@ -180,7 +182,7 @@ export const approvalRequest = concept("approvalRequest", {
     summary: req(text(), "What will happen, redacted"),
     riskLevel: req(codeOf(riskLevel), "How risky it is"),
     approverRule: req(codeOf(approverRule), "Who may approve"),
-    status: req(codeOf(approvalStatus), "Where the request is"),
+    status: req(codeOf(approvalStatus), "Where the request is", annotate(quality.transitions, { allowed: { pending: ["approved", "denied", "expired", "cancelled"], approved: ["consumed", "expired", "cancelled"], denied: [], expired: [], cancelled: [], consumed: [] } })),
     requestedAt: req(instant(), "When it was asked for"),
     expiresAt: req(instant(), "When it stops being valid"),
     decidedAt: opt(instant(), "When it was decided"),

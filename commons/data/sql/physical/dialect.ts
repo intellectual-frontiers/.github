@@ -31,7 +31,9 @@ export type Feature =
   | "alter-column"
   | "schemas"
   | "updatable-views"
-  | "instead-of-triggers";
+  | "instead-of-triggers"
+  | "triggers"
+  | "event-triggers";
 
 /** How a database file is attached for reading, and detached. */
 export interface Attach {

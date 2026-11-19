@@ -14,6 +14,7 @@ export const GENESIS = "genesis";
 /** What an event's hash is made of, in this order. */
 export interface HashedFields {
   readonly previous: string;
+  readonly sequence: number;
   readonly id: string;
   readonly at: string;
   readonly actorKind: string;
@@ -32,7 +33,7 @@ export interface HashedFields {
 
 /** The hash of an event: of its fields and of the hash of the event before it, so that a change to any field, or to the order, shows. */
 export const eventHashOf = (f: HashedFields): string =>
-  sha256Hex(canonical([f.previous, f.id, f.at, f.actorKind, f.actor ?? null, f.onBehalfOf ?? null, f.tenant ?? null, f.action, f.outcome, f.decision ?? null, f.targetConcept ?? null, f.targetKey ?? null, f.reason ?? null, f.policyRefs ?? null, f.chain ?? null]));
+  sha256Hex(canonical([f.previous, f.sequence, f.id, f.at, f.actorKind, f.actor ?? null, f.onBehalfOf ?? null, f.tenant ?? null, f.action, f.outcome, f.decision ?? null, f.targetConcept ?? null, f.targetKey ?? null, f.reason ?? null, f.policyRefs ?? null, f.chain ?? null]));
 
 /** An audit event, with what the identity trail adds: on whose behalf, through what, and what decided. */
 export interface IdentityAuditEvent extends AuditEvent {
@@ -49,15 +50,16 @@ export const identityAuditSink: AuditSink = {
   table: "audit event",
   async record(tx: Tx, event: AuditEvent, context: Context): Promise<string> {
     const e = event as IdentityAuditEvent;
-    const heads = await tx.query(
-      (r) => `SELECT ${r.col("audit event", "eventHash")} AS h FROM ${r.table("audit event")} a WHERE NOT EXISTS (SELECT 1 FROM ${r.table("audit event")} b WHERE b.${r.col("audit event", "previousHash")} = a.${r.col("audit event", "eventHash")})`,
-    );
-    const previous = heads.length === 0 ? GENESIS : String(heads[0]?.["h"]);
+    // the last record of the chain, found by its number: one step of an index, however long the trail is
+    const last = (await tx.query((r) => `SELECT ${r.col("audit event", "sequence")} AS s, ${r.col("audit event", "eventHash")} AS h FROM ${r.table("audit event")} ORDER BY ${r.col("audit event", "sequence")} DESC LIMIT 1`))[0];
+    const previous = last === undefined ? GENESIS : String(last["h"]);
+    const sequence = last === undefined ? 1 : Number(last["s"]) + 1;
     const id = context.newId();
     const at = context.now();
-    const hash = eventHashOf({ previous, id, at, actorKind: e.actorKind, actor: e.actor, onBehalfOf: e.onBehalfOf, tenant: e.tenant, action: e.action, outcome: e.outcome, decision: e.decision, targetConcept: e.targetConcept, targetKey: e.targetKey, reason: e.reason, policyRefs: e.policyRefs, chain: e.chain });
+    const hash = eventHashOf({ previous, sequence, id, at, actorKind: e.actorKind, actor: e.actor, onBehalfOf: e.onBehalfOf, tenant: e.tenant, action: e.action, outcome: e.outcome, decision: e.decision, targetConcept: e.targetConcept, targetKey: e.targetKey, reason: e.reason, policyRefs: e.policyRefs, chain: e.chain });
     await tx.insert("audit event", {
       auditEventId: id,
+      sequence,
       occurredAt: at,
       actorKind: e.actorKind,
       action: e.action,
@@ -91,10 +93,9 @@ export type ChainProblem = { readonly kind: "broken"; readonly at: string } | { 
  */
 export async function verifyAuditChain(tx: Tx): Promise<{ readonly length: number; readonly problems: readonly ChainProblem[] }> {
   const rows = await tx.select("audit event", {
-    columns: ["auditEventId", "occurredAt", "actorKind", "actor", "onBehalfOf", "tenant", "action", "outcome", "decision", "targetConcept", "targetKey", "reason", "policyRefs", "chain", "previousHash", "eventHash"],
+    columns: ["auditEventId", "sequence", "occurredAt", "actorKind", "actor", "onBehalfOf", "tenant", "action", "outcome", "decision", "targetConcept", "targetKey", "reason", "policyRefs", "chain", "previousHash", "eventHash"],
+    orderBy: [["sequence", "asc"]],
   });
-  const next = new Map<string, Record<string, unknown>[]>();
-  for (const r of rows) next.set(String(r["previousHash"]), [...(next.get(String(r["previousHash"])) ?? []), r]);
   const parsed = (v: unknown): unknown => {
     if (typeof v !== "string") return v ?? null;
     try {
@@ -105,17 +106,17 @@ export async function verifyAuditChain(tx: Tx): Promise<{ readonly length: numbe
   };
   const text = (v: unknown): string | null => (v === null || v === undefined ? null : String(v));
   const problems: ChainProblem[] = [];
-  let walked = 0;
   let at = GENESIS;
-  for (;;) {
-    const following = next.get(at) ?? [];
-    if (following.length === 0) break;
-    if (following.length > 1) problems.push({ kind: "forked", at });
-    const e = following[0] as Record<string, unknown>;
-    // the hash is made again from what the event holds: an event changed in place does not match its own hash
+  let expected = 1;
+  for (const e of rows) {
+    const id = String(e["auditEventId"]);
+    // each event is number one more than the last, names the hash of the last, and holds the hash of its own fields
+    if (Number(e["sequence"]) !== expected) problems.push({ kind: Number(e["sequence"]) < expected ? "forked" : "broken", at: id });
+    if (String(e["previousHash"]) !== at) problems.push({ kind: "broken", at: id });
     const again = eventHashOf({
       previous: String(e["previousHash"]),
-      id: String(e["auditEventId"]),
+      sequence: Number(e["sequence"]),
+      id,
       at: e["occurredAt"] instanceof Date ? e["occurredAt"].toISOString() : new Date(String(e["occurredAt"])).toISOString(),
       actorKind: String(e["actorKind"]),
       actor: text(e["actor"]),
@@ -130,10 +131,9 @@ export async function verifyAuditChain(tx: Tx): Promise<{ readonly length: numbe
       policyRefs: parsed(e["policyRefs"]),
       chain: parsed(e["chain"]),
     });
-    if (again !== String(e["eventHash"])) problems.push({ kind: "hash-mismatch", at: String(e["auditEventId"]) });
-    walked++;
+    if (again !== String(e["eventHash"])) problems.push({ kind: "hash-mismatch", at: id });
     at = String(e["eventHash"]);
+    expected = Number(e["sequence"]) + 1;
   }
-  if (walked !== rows.length) problems.push({ kind: "broken", at });
-  return { length: walked, problems };
+  return { length: rows.length, problems };
 }

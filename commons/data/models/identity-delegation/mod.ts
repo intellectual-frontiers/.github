@@ -31,7 +31,7 @@ export const delegation: AnyConcept = concept("delegation", {
     maxDepth: req(integer(), "How many more delegations may be added below it; less than the one above it"),
     validFrom: req(instant(), "When it starts"),
     expiresAt: req(instant(), "When it ends: a delegation always ends, and never after the one above it"),
-    status: req(codeOf(delegationStatus), "Where it is"),
+    status: req(codeOf(delegationStatus), "Where it is", annotate(vocabularies.quality.transitions, { allowed: { active: ["revoked", "expired"], revoked: [], expired: [] } })),
     revokedAt: opt(instant(), "When it was ended early"),
     revokeReason: opt(text(), "Why it was ended early"),
   },

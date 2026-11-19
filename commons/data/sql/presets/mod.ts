@@ -22,8 +22,12 @@ import type { PlanOptions, RunOptions } from "@intellectual-frontiers/data/sql/l
 import type { Dialect } from "@intellectual-frontiers/data/sql/physical";
 
 /** The four ways a team works. */
-export const presetNames = ["team-managed", "dba-managed", "reviewed-convergence", "autonomous-convergence"] as const;
+/** The ways a team works, the primary ones first: convergence computes each database's plan from the state it is in, and history replays files that people prepared. */
+export const presetNames = ["reviewed-convergence", "autonomous-convergence", "team-managed", "dba-managed"] as const;
 export type PresetName = (typeof presetNames)[number];
+
+/** The preset a project gets when it names none: convergence, reviewed by a person, is the primary way. */
+export const defaultPreset: PresetName = "reviewed-convergence";
 
 /** What a project changes of a preset; what is not said is the preset's. */
 export interface PresetChanges {
@@ -102,7 +106,7 @@ const BASES: Readonly<Record<PresetName, Base>> = {
  * @param changes - what a project changes
  * @returns the preset with every setting, or why not
  */
-export function preset(name: string, changes: PresetChanges = {}): Result<Preset, PresetError> {
+export function preset(name: string = defaultPreset, changes: PresetChanges = {}): Result<Preset, PresetError> {
   const base = (presetNames as readonly string[]).includes(name) ? BASES[name as PresetName] : undefined;
   if (base === undefined) return err({ kind: "unknown", name, known: presetNames });
   const named = name as PresetName;

@@ -34,7 +34,7 @@
 
 ## Settings
 
-- **FR-011**: The approval (`reviewed` or `autonomous`), the policy, the ledger's table and the names the reader leaves out (a name that begins with `*` leaving out every table whose name ends with the rest of it, so that what a feature keeps aside is not read as drift) MUST each have a default and be changeable.
+- **FR-011**: The approval (`reviewed` or `autonomous`), the policy, the ledger's table and the names the reader leaves out (by default the ledger's table and the tables that quarantine makes by its default suffixes, so that what the library keeps aside is not read as drift; a name that begins with `*` leaving out every table whose name ends with the rest of it, so that what a feature keeps aside is not read as drift) MUST each have a default and be changeable.
 
 ## What the database holds
 

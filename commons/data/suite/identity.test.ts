@@ -348,12 +348,13 @@ proves(
         assert(await refused(e, `INSERT INTO "invitation_role" ("invitation_id", "role_access_role_role_id") VALUES ('i1', 'r1')`), `${name}: a role of an invitation once`);
         await e.run(`INSERT INTO "lockout_policy" ("lockout_policy_id", "failed_attempts", "window_minutes", "lock_minutes", "unlock_mode") VALUES ('lp1', 5, 15, 30, 'timer')`);
         assert(await refused(e, `INSERT INTO "lockout_policy" ("lockout_policy_id", "failed_attempts", "window_minutes", "lock_minutes", "unlock_mode") VALUES ('lp2', 5, 15, 30, 'never')`), `${name}: an unlock mode is checked`);
-        const audit = (id: string, prev: string, h: string, kind = "agent") =>
-          `INSERT INTO "audit_event" ("audit_event_id", "occurred_at", "actor_kind", "action", "outcome", "previous_hash", "event_hash", "decision", "actor_principal_id", "on_behalf_of_principal_id") VALUES ('${id}', ${AT}, '${kind}', 'invoice.paid', 'success', '${prev}', '${h}', 'allow', 'u1', 'u1')`;
-        await e.run(audit("e1", "genesis", "h-e1"));
-        await e.run(audit("e2", "h-e1", "h-e2"));
-        assert(await refused(e, audit("e3", "h-e2", "h-e2")), `${name}: an event hash is unique`);
-        assert(await refused(e, audit("e4", "h-e2", "h-e4", "robot")), `${name}: an actor kind is checked`);
+        const audit = (id: string, seq: number, prev: string, h: string, kind = "agent") =>
+          `INSERT INTO "audit_event" ("audit_event_id", "sequence", "occurred_at", "actor_kind", "action", "outcome", "previous_hash", "event_hash", "decision", "actor_principal_id", "on_behalf_of_principal_id") VALUES ('${id}', ${seq}, ${AT}, '${kind}', 'invoice.paid', 'success', '${prev}', '${h}', 'allow', 'u1', 'u1')`;
+        await e.run(audit("e1", 1, "genesis", "h-e1"));
+        await e.run(audit("e2", 2, "h-e1", "h-e2"));
+        assert(await refused(e, audit("e3", 3, "h-e2", "h-e2")), `${name}: an event hash is unique`);
+        assert(await refused(e, audit("e5", 2, "h-e2", "h-e5")), `${name}: a place in the trail is taken once`);
+        assert(await refused(e, audit("e4", 3, "h-e2", "h-e4", "robot")), `${name}: an actor kind is checked`);
       } finally {
         await e.close();
       }

@@ -73,6 +73,32 @@ export interface Audited {
 /** The records of a domain or a concept are audited. */
 export const audited = annotationKind<Audited>("quality.audited", ["domain", "concept"]);
 
+/** A concept whose records are only ever added: never changed, never removed. Where it says so, they also form a chain, each naming the one before it. */
+export interface AppendOnly {
+  /** The records form a hash chain: the members that hold the hash of the record, the hash of the one before it and its place in the chain. */
+  readonly chain?: { readonly hash: string; readonly previous: string; readonly sequence: string; readonly genesis: string };
+}
+
+/** The records of a concept are added and never changed or removed, and may be a chain. */
+export const appendOnly = annotationKind<AppendOnly>("quality.appendOnly", ["concept"]);
+
+/** The moves a code attribute may make: from each code, the codes it may become. A code that is not a key may not be left. */
+export interface Transitions {
+  readonly allowed: Readonly<Record<string, readonly string[]>>;
+}
+
+/** Which moves from one code to another an attribute may make. */
+export const transitions = annotationKind<Transitions>("quality.transitions", ["attribute"]);
+
+/** A number that may never be above another of the same record: what is used and what it may be. */
+export interface AtMost {
+  readonly member: string;
+  readonly other: string;
+}
+
+/** A member that may never be above another member of the same concept. */
+export const atMost = annotationKind<AtMost>("quality.atMost", ["concept"]);
+
 /** A code list is open (the business adds codes of its own) or closed (only the model changes it). */
 export type Openness = "open" | "closed";
 
@@ -91,7 +117,7 @@ const valid = (source: string): boolean => {
 /** The vocabulary: its kinds and its rules. */
 export const vocabulary: Vocabulary = {
   id: "quality",
-  kinds: [pattern, range, retention, deprecated, defaultValue, unique, differs, audited, openness],
+  kinds: [pattern, range, retention, deprecated, defaultValue, unique, differs, audited, openness, appendOnly, transitions, atMost],
   rules: [
     {
       id: "quality/pattern-invalid",
@@ -133,6 +159,31 @@ export const vocabulary: Vocabulary = {
           return named
             .filter((m) => !has.has(m))
             .map((m) => finding("quality/member-unknown", conceptId(d.name, c.name), `the concept ${c.name} has no member ${m}`, "error"));
+        }),
+    },
+    {
+      id: "quality/invariant-member-unknown",
+      describe: "A member named in appendOnly's chain or in atMost that the concept does not have, or a transition between codes that the attribute's list does not have.",
+      check: (d) =>
+        d.concepts.flatMap((c) => {
+          const has = new Set(membersOf(c));
+          const out: Finding[] = [];
+          const at = conceptId(d.name, c.name);
+          for (const a of annotationsOf(c, appendOnly))
+            if (a.chain !== undefined)
+              for (const m of [a.chain.hash, a.chain.previous, a.chain.sequence]) if (!has.has(m)) out.push(finding("quality/invariant-member-unknown", at, `the chain of ${c.name} names ${m}, which it does not have`, "error"));
+          for (const a of annotationsOf(c, atMost)) for (const m of [a.member, a.other]) if (!has.has(m)) out.push(finding("quality/invariant-member-unknown", at, `atMost of ${c.name} names ${m}, which it does not have`, "error"));
+          for (const [key, attr] of Object.entries(c.attributes))
+            for (const tr of annotationsOf(attr, transitions)) {
+              if (attr.type.kind !== "code") {
+                out.push(finding("quality/invariant-member-unknown", attributeId(d.name, c.name, key), `transitions are for a code attribute, and ${key} is not one`, "error"));
+                continue;
+              }
+              const codes = new Set(Object.keys(attr.type.list.codes));
+              for (const [from, tos] of Object.entries(tr.allowed))
+                for (const code of [from, ...tos]) if (!codes.has(code)) out.push(finding("quality/invariant-member-unknown", attributeId(d.name, c.name, key), `${code} is not a code of the list of ${key}`, "error"));
+            }
+          return out;
         }),
     },
     {

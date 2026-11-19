@@ -7,7 +7,7 @@
  */
 import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 import { applyProposal, connect, desiredState, propose, proposalText } from "@intellectual-frontiers/data/sql/extensions/convergence";
-import { preset, presetNames, type Preset } from "@intellectual-frontiers/data/sql/presets";
+import { defaultPreset, preset, presetNames, type Preset } from "@intellectual-frontiers/data/sql/presets";
 import { sha256Hex } from "@intellectual-frontiers/data/sql/lifecycle";
 import { bind, type Dialect } from "@intellectual-frontiers/data/sql/physical";
 import { DIALECTS, load, openEngine, type Engine } from "./engines-fixture.ts";
@@ -32,8 +32,9 @@ proves(
   ["0021-sql-presets FR-001", "0021-sql-presets FR-002", "0021-sql-presets FR-003"],
   "each of the four presets is a strategy with its features and settings, a name that is not one of them is refused, and every preset has the safety features and idempotency on",
   () => {
-    same(presetNames, ["team-managed", "dba-managed", "reviewed-convergence", "autonomous-convergence"]);
-    const [team, dba, reviewed, auto] = presetNames.map((n) => get(n)) as [Preset, Preset, Preset, Preset];
+    same(presetNames, ["reviewed-convergence", "autonomous-convergence", "team-managed", "dba-managed"], "convergence first");
+    same(get(undefined as never).name, defaultPreset, "and the default");
+    const [reviewed, auto, team, dba] = presetNames.map((n) => get(n)) as [Preset, Preset, Preset, Preset];
     same([team.strategy, team.history?.delivery, team.convergence], ["history", "pipeline", undefined]);
     same([dba.strategy, dba.history?.delivery, dba.history?.unguardable, dba.planOptions.requireIdempotent], ["history", "release-package", "refuse", true]);
     same([team.planOptions.requireIdempotent, reviewed.planOptions.requireIdempotent], [false, false]);
@@ -48,7 +49,8 @@ proves(
       assert(p.roles.length > 0);
     }
     same(auto.convergence?.ignore, ["lifecycle_ledger", "*quarantine", "*quarantined", "integration_run", "transform_run"], "quarantine is not drift");
-    assert(get("reviewed-convergence", { safety: { quarantine: "off" } }).convergence?.ignore.every((n) => !n.startsWith("*")));
+    assert(get("reviewed-convergence", { safety: { quarantine: "off" } }).convergence?.ignore.includes("*quarantine"), "a database may hold quarantine tables from before");
+    assert(get("reviewed-convergence", { safety: { suffixes: { column: "kept" } } }).convergence?.ignore.includes("*kept"), "and the suffix the project chose");
     const bad = preset("flyway");
     assert(bad.kind === "err" && bad.error.kind === "unknown" && bad.error.known.includes("team-managed"));
   },

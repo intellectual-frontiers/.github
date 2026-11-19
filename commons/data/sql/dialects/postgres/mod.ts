@@ -50,6 +50,8 @@ export const dialect: Dialect = {
     "alter-column",
     "schemas",
     "updatable-views",
+    "triggers",
+    "event-triggers",
   ],
   maxName: 63,
   now: "CURRENT_TIMESTAMP",

@@ -234,6 +234,9 @@ proves(
         "quality.differs",
         "quality.audited",
         "quality.openness",
+        "quality.appendOnly",
+        "quality.transitions",
+        "quality.atMost",
       ],
     );
     assert(

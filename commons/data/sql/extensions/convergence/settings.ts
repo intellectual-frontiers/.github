@@ -56,6 +56,7 @@ export function settingsOf(given: ConvergenceSettings = {}): Convergence {
     approval: given.approval ?? "reviewed",
     policy: { ...defaultPolicy, ...given.policy },
     ledgerTable,
-    ignore: [ledgerTable, ...(given.ignore ?? [])],
+    // what the library keeps aside is not drift: the ledger, and the tables that quarantine makes by its default suffixes
+    ignore: [...new Set([ledgerTable, "*quarantine", "*quarantined", ...(given.ignore ?? [])])],
   };
 }

@@ -110,7 +110,7 @@ footer { margin-top: 4rem; padding-top: 1rem; border-top: 1px solid var(--line);
 <code class="pkg">@intellectual-frontiers/data</code>
 <h1>Governance in, SQL out, and a safe way to change the database</h1>
 <p class="lede">A library of Intellectual Frontiers commons. A governance layer says what a business domain is and what must be true of its data; a logical schema is made from it; a physical schema for PostgreSQL, SQLite or DuckDB is made from that; a lifecycle layer changes a database from one physical schema to the next; and extensions add the rest.</p>
-<p class="small">Version 0.0.0, conformance level L1, private package, Node &ge; 26 (Bun is the default runtime). Specifications 0001 to 0042 are in force, in <code>spec-kit/</code>.</p>
+<p class="small">Version 0.0.0, conformance level L1, private package, Node &ge; 26 (Bun is the default runtime). Specifications 0001 to 0043 are in force, in <code>spec-kit/</code>.</p>
 </header>
 
 <section id="purpose">
@@ -203,7 +203,7 @@ if (sql.kind === "ok") console.log(render(sql.value));</code></pre>
 <tr><td><code>./engine</code>, <code>./governance</code>, <code>./sql/logical</code>, <code>./sql/physical</code>, <code>./sql/lifecycle</code></td><td>the layers</td></tr>
 <tr><td><code>./models/arca</code></td><td>the party model</td></tr>
 <tr><td><code>./sql/dialects/postgres</code>, <code>/sqlite</code>, <code>/duckdb</code></td><td>the dialects</td></tr>
-<tr><td><code>./sql/extensions/</code> <code>documentation views access routines partitions generators idempotency protected-access safety plan-report rewrite history convergence rollout integrations transforms queries target kinds osquery-atc operations</code></td><td>the extensions (21)</td></tr>
+<tr><td><code>./sql/extensions/</code> <code>documentation views access routines partitions generators idempotency protected-access safety plan-report rewrite history convergence rollout integrations transforms queries target kinds osquery-atc operations invariants</code></td><td>the extensions (22)</td></tr>
 <tr><td><code>./sql/presets</code></td><td>the four presets</td></tr>
 </tbody>
 </table>
@@ -315,6 +315,27 @@ const app = composeModules("shop", { definition: "A shop" }, [moduleOf(partyDoma
 <li><strong>The audit trail is a chain.</strong> <code>identityAuditSink</code> writes each event in the transaction of what it records with the hash of the one before it (and who, on whose behalf, through which delegation and run, and what decided); <code>verifyAuditChain</code> reports a fork or a break, so a change to an event shows.</li>
 </ul>
 <p>These run on SQLite and PostgreSQL (DuckDB cannot update a row another row refers to). The tests drive them through the operations runtime: delegation chains, attenuation, derived revocation, approvals, budgets, the kill switch and a tampered chain. Two calls at the same instant cannot be shown by these in-process engines; the single conditional update of each operation is what decides.</p>
+
+<h3>What the database enforces, and on which engine <span class="tag">0043</span></h3>
+<p>A guarantee enforced only by the application that is meant to keep it can be stepped around by any other client: a second service, a statement typed by hand, a table's owner. Where the database can refuse what is wrong, the library makes it refuse, for every client. Where the engine cannot, the library says so and the application's runtime enforces it. Engines differ, and the library judges each by what it can do:</p>
+<table>
+<thead><tr><th>Mechanism</th><th>PostgreSQL</th><th>SQLite</th><th>DuckDB</th></tr></thead>
+<tbody>
+<tr><td>Checks, foreign keys, uniqueness, transactional DDL</td><td>yes</td><td>yes</td><td>yes</td></tr>
+<tr><td>Triggers (append-only, chains, status moves, caps)</td><td>yes</td><td>yes</td><td>no</td></tr>
+<tr><td>Stored routines</td><td>yes</td><td>no</td><td>no</td></tr>
+<tr><td>Row-level security</td><td>yes</td><td>no</td><td>no</td></tr>
+<tr><td>Roles and grants (least privilege)</td><td>yes</td><td>no</td><td>no</td></tr>
+<tr><td>Event triggers (refuse weakening security)</td><td>yes</td><td>no</td><td>no</td></tr>
+<tr><td>Advisory locks (one runner)</td><td>yes</td><td>one writer at a time</td><td>one writer at a time</td></tr>
+<tr><th>Tier</th><th>full</th><th>standard</th><th>basic</th></tr>
+</tbody></table>
+<ul>
+<li><strong>PostgreSQL</strong> can enforce all of it in the database, so any guarantee it does not enforce there is a defect of the library, and weaknesses in the PostgreSQL embodiment are the highest priority.</li>
+<li><strong>SQLite</strong> can enforce checks, keys and triggers, and has no roles or row security: row isolation and least privilege are the application's, and that is not a defect.</li>
+<li><strong>DuckDB</strong> can enforce checks and keys only: invariants are carried as data and enforced by the operations runtime, and DuckDB cannot update a row another row refers to. Neither is a defect of the engine or of the library, and the library says so.</li>
+</ul>
+<p>The quality vocabulary says what must always be true of the records of a concept: <code>appendOnly</code> (never changed or removed; optionally a hash chain, where each record is the next in number and names the hash of the one before it, so that none is left out, put between or forked), <code>transitions</code> (a status moves only along the moves it may make; a code with no moves is terminal) and <code>atMost</code> (a number is never above another of the same record). <code>invariants()</code> writes them as triggers for PostgreSQL and SQLite; on a dialect without triggers it is an error value unless the project says to carry them. <code>enforcementOf(dialect)</code> gives a dialect's tier and what it can and cannot do, <code>where(dialect, need)</code> says whether the database or the application enforces a guarantee, and <code>placed(tables, dialect)</code> says it for each invariant of a schema. The identity model declares its invariants this way: the audit trail is append-only and a chain, a budget never exceeds its limit, an approval, a delegation, a run, an agent version and a principal move only along their moves. The tests attack the database with raw statements that never pass through the application, on SQLite and PostgreSQL.</p>
 
 <h3>Operations <span class="tag">0031</span></h3>
 <p>A model is tables; a business is what is done to them. SQL has no portable control flow (a refresh token that is found to have been used already must revoke its whole family <em>and still commit and tell the caller</em>; an exception would roll the revocation back), so the business operations of a model are done in the application's language, in one transaction, in three parts.</p>
@@ -591,6 +612,7 @@ await replay([...existing, ...files.value], driver, dialect, { empty });</code><
 
 <section id="presets">
 <h2>Presets <span class="tag">0021</span></h2>
+<p><strong>Convergence is the primary strategy and <code>reviewed-convergence</code> is the default preset</strong> (<code>defaultPreset</code>; <code>preset()</code> with no name gives it): it reads each database's own state and computes the plan from there, so it cannot be fooled by a history the database has left. History (<code>team-managed</code>, <code>dba-managed</code>) is for teams that must hand files to a pipeline or to a database administrator; its weaknesses are tracked, and lower priority.</p>
 <p>A preset is named for how a team works. It is a composition of one strategy with the features that approach needs (idempotency, quarantine, lock discipline, generated verification, the plan report), with the settings the approach calls for. It is data: nothing is applied by choosing one. <code>preset(name, changes?)</code> returns a <code>Result</code> of a <code>Preset</code> (<code>strategy</code>, <code>roles</code>, <code>history</code> or <code>convergence</code>, <code>safety</code>, <code>idempotency</code>, <code>report</code>, <code>planOptions</code>, <code>runOptions(dialect)</code>), or a <code>PresetError</code> (<code>unknown</code>, <code>not-used</code>). Every setting is the default of the thing it sets and a project may change it.</p>
 <table>
 <thead><tr><th>Preset</th><th>Strategy</th><th>Who does what</th><th>Settings it calls for</th></tr></thead>
@@ -612,7 +634,7 @@ connect(driver, dialect, schema, { dialect }, p.convergence!, { ...p.planOptions
 <pre><code>cd commons/data &amp;&amp; bun run verify</code></pre>
 <p>which runs, in order (<code>package.json</code>): the TypeScript compiler (<code>tsc -p tsconfig.json</code>); the specification checker on <code>spec-kit/</code> (<code>mizan-check.ts --root spec-kit</code>); the Mizan rules at level L1 on it; <code>tools/check.ts</code>, the trace of sources and tests to the specifications and the layers check, held against <code>trace.baseline.txt</code>, which only shrinks; and <code>bun test suite/</code>. <code>bun run test:node</code> runs the same tests under <code>node --test</code>.</p>
 <ul>
-<li><strong>Spec kit.</strong> Forty-two specifications, <code>0001-layers</code> to <code>0042-identity-agent-operations</code>, each <code>spec-kit/specs/&lt;number-slug&gt;/spec.md</code> with an input paragraph, numbered requirements (<code>FR-nnn</code>), edge cases, success criteria and an out-of-scope list; <code>registry.tsv</code> lists them, all in force.</li>
+<li><strong>Spec kit.</strong> Forty-three specifications, <code>0001-layers</code> to <code>0043-sql-invariants</code>, each <code>spec-kit/specs/&lt;number-slug&gt;/spec.md</code> with an input paragraph, numbered requirements (<code>FR-nnn</code>), edge cases, success criteria and an out-of-scope list; <code>registry.tsv</code> lists them, all in force.</li>
 <li><strong><code>enforcement.tsv</code>.</strong> Says what enforces each requirement (0024-spec-format): a <code>mechanism</code> of <code>check</code>, <code>gate</code>, <code>review</code> or <code>none</code>, and by what. At the time of writing 230 of its rows are a <code>check</code> by <code>cd commons/data &amp;&amp; bun run verify</code>, and one (0001 FR-012, the logical and physical naming conventions) is marked <code>none</code> with the note <em>Planned</em>.</li>
 <li><strong><code>proves()</code>.</strong> A test is <code>suite/&lt;kebab-case&gt;.test.ts</code> on IFC TypeScript, and <code>proves(["0001-layers FR-004"], "what it shows", fn)</code> names the requirements it proves, which the trace joins to the specifications. The sources carry <code>// Spec:</code> headers for the same join.</li>
 <li><strong>Real engines.</strong> <code>suite/engines-fixture.ts</code> opens SQLite (the runtime's <code>node:sqlite</code>), DuckDB (<code>@duckdb/node-api</code>) and PostgreSQL (PGlite, in process), in memory, and the tests load what <code>bind</code> and <code>execute</code> make and read the structure back. There is no stand-in for an engine.</li>
@@ -698,6 +720,7 @@ connect(driver, dialect, schema, { dialect }, p.convergence!, { ...p.planOptions
 <tr><td>0040</td><td>identity-agent</td><td>AI agents</td></tr>
 <tr><td>0041</td><td>identity-authorize</td><td>one decision for every kind of principal</td></tr>
 <tr><td>0042</td><td>identity-agent-operations</td><td>delegation, tool calls, approvals, the kill switch</td></tr>
+<tr><td>0043</td><td>sql-invariants</td><td>what must always be true, enforced by the database where it can</td></tr>
 </tbody>
 </table>
 <footer>This page is written by hand from <code>about.ts</code>, <code>library.ts</code>, <code>package.json</code>, the specifications in <code>spec-kit/specs/</code> and the sources under <code>engine/</code>, <code>governance/</code>, <code>models/</code> and <code>sql/</code>. The short introduction is <code>README.md</code>.</footer>

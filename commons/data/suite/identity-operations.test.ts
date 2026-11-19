@@ -1,4 +1,4 @@
-// Spec: 0041-identity-authorize FR-001, FR-002, FR-003, FR-004, FR-005, FR-006; 0042-identity-agent-operations FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007
+// Spec: 0043-sql-invariants FR-001, FR-002, FR-003, FR-004, FR-005; 0041-identity-authorize FR-001, FR-002, FR-003, FR-004, FR-005, FR-006; 0042-identity-agent-operations FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007
 /**
  * The decision engine and the operations of delegation and agents (commons data 0041, 0042), on SQLite and PostgreSQL (DuckDB cannot update a row another row refers to, so these operations are
  * not run on it): one decision for a person, a machine, a device, an agent or a group; delegation that can only attenuate and is revoked from the top; a tool call that is decided, budgeted and
@@ -19,7 +19,8 @@ import { identityDelegationModule } from "@intellectual-frontiers/data/models/id
 import { identityRebacModule } from "@intellectual-frontiers/data/models/identity-rebac";
 import { agentImplementations, checkExpr, decide, evaluate, type Expr, identityAuditSink, type Implementation, operations, type Runtime, verifyAuditChain } from "@intellectual-frontiers/data/sql/extensions/operations";
 import { projectDomain } from "@intellectual-frontiers/data/sql/logical";
-import { bind } from "@intellectual-frontiers/data/sql/physical";
+import { invariants, invariantsOf } from "@intellectual-frontiers/data/sql/extensions/invariants";
+import { bind, type StatementSource } from "@intellectual-frontiers/data/sql/physical";
 import { DIALECTS, load, openEngine, type Engine } from "./engines-fixture.ts";
 import { same } from "./governance-fixture.ts";
 import { driverOf } from "./lifecycle-fixture.ts";
@@ -35,6 +36,14 @@ const schema = (() => {
   if (p.kind === "err") throw new Error(JSON.stringify(p.error));
   return p.value.schema;
 })();
+const refused = async (e: Engine, sql: string): Promise<boolean> => {
+  try {
+    await e.run(sql);
+    return false;
+  } catch {
+    return true;
+  }
+};
 const ENGINES = DIALECTS.filter((d) => d.name !== "duckdb");
 const NOW = "2026-06-01T00:00:00.000Z";
 const AT = "'2026-01-01T00:00:00Z'";
@@ -57,11 +66,11 @@ const decideImpl: Implementation = async (tx, i) => {
 };
 const chainImpl: Implementation = async (tx) => ({ status: "checked", ...(await verifyAuditChain(tx)) });
 
-const world = async (name: Engine["name"]): Promise<{ e: Engine; rt: Runtime }> => {
+const world = async (name: Engine["name"], sources: readonly StatementSource[] = []): Promise<{ e: Engine; rt: Runtime }> => {
   const e = await openEngine(name);
   const dialect = DIALECTS.find((x) => x.name === name)!.dialect;
-  const b = bind(schema, { dialect });
-  assert(b.kind === "ok");
+  const b = bind(schema, { dialect, sources });
+  assert(b.kind === "ok", JSON.stringify(b));
   if (b.kind === "ok") await load(e, b.value);
   const sql = [
     `INSERT INTO "tenant" ("tenant_id", "kind", "slug", "display_name", "ancestry", "status", "isolation", "created_at") VALUES ('t1', 'business', 'acme', 'Acme', '/t1', 'active', 'shared', ${AT})`,
@@ -387,5 +396,76 @@ proves(
         await e.close();
       }
     }
+  },
+);
+
+proves(
+  ["0043-sql-invariants FR-001", "0043-sql-invariants FR-002", "0043-sql-invariants FR-003", "0043-sql-invariants FR-004"],
+  "with the invariants in the database, a statement typed by hand is refused what governance forbids: the audit trail cannot be changed, removed, forked or truncated, a status moves only along its moves, a budget cannot go above its limit, and the operations still work",
+  async () => {
+    for (const { name } of ENGINES) {
+      const { e, rt } = await world(name, [invariants()]);
+      try {
+        // the operations work through the triggers: delegation, a tool call, an approval, the budget, the kill switch
+        const dg = String((await delegate(rt, {}))["delegation"]);
+        await e.run(`INSERT INTO "agent_run" ("run_id", "started_at", "status", "agent_principal_id", "version_agent_version_id", "tenant_id", "initiator_principal_id", "delegation_id") VALUES ('r1', ${AT}, 'running', 'a1', 'v1', 't1', 'u1', '${dg}')`);
+        await e.run(`INSERT INTO "agent_budget" ("budget_id", "meter", "window_kind", "limit_value", "used", "window_start", "version", "status", "budget_key", "agent_principal_id", "run_agent_run_run_id") VALUES ('b1', 'tool_calls', 'run', 2, 0, ${AT}, 0, 'active', 'bk1', 'a1', 'r1')`);
+        const call = (idx: number, tool: string, over: Record<string, unknown> = {}) => run(rt, "recordToolCall", { run: "r1", tool, callIndex: idx, argsHash: `ah${idx}`, ...over });
+        same((await call(1, "tl-read"))["status"], "allowed", `${name}: through the triggers`);
+        const waiting = await call(2, "tl-pay", { argsHash: "p1", argsSummary: "Pay", resourceType: "invoice", resourceId: "i1" });
+        const ap = String(waiting["approvalRequest"]);
+        same((await run(rt, "decideApproval", { approvalRequest: ap, decidedBy: "u1", approve: true }))["status"], "approved");
+        same((await call(3, "tl-pay", { argsHash: "p1", resourceType: "invoice", resourceId: "i1", approval: ap }))["status"], "allowed");
+        same((await call(4, "tl-read"))["status"], "denied", `${name}: the budget is spent`);
+        same((await run(rt, "killAgent", { agent: "a1", by: "u1", reason: "done" }))["status"], "killed");
+        const chain = await run(rt, "verifyChainForTest", {});
+        assert(Number(chain["length"]) >= 4 && (chain["problems"] as unknown[]).length === 0, `${name}: ${JSON.stringify(chain)}`);
+        // raw statements, never through the application
+        assert(await refused(e, `UPDATE "audit_event" SET "action" = 'forged' WHERE "sequence" = 1`), `${name}: an event cannot be changed`);
+        assert(await refused(e, `DELETE FROM "audit_event" WHERE "sequence" = (SELECT max("sequence") FROM "audit_event")`), `${name}: the tail cannot be removed`);
+        assert(await refused(e, `DELETE FROM "audit_event"`), `${name}: nor can the trail`);
+        const next = Number((await e.rows(`SELECT max("sequence") m FROM "audit_event"`))[0]?.["m"]) + 1;
+        const head = String((await e.rows(`SELECT "event_hash" h FROM "audit_event" ORDER BY "sequence" DESC LIMIT 1`))[0]?.["h"]);
+        const ins = (seq: number, prev: string, hash: string) => `INSERT INTO "audit_event" ("audit_event_id", "sequence", "occurred_at", "actor_kind", "action", "outcome", "previous_hash", "event_hash") VALUES ('raw${hash}', ${seq}, ${AT}, 'system', 'x.y', 'success', '${prev}', '${hash}')`;
+        assert(await refused(e, ins(next + 1, head, "gap")), `${name}: no event can be left out`);
+        assert(await refused(e, ins(next, "not-the-head", "wrong")), `${name}: an event follows the last by its hash`);
+        assert(await refused(e, ins(next - 1, head, "fork")), `${name}: the trail cannot fork`);
+        await e.run(ins(next, head, "good"));
+        if (name === "postgres") assert(await refused(e, `TRUNCATE "audit_event"`), `${name}: the table cannot be emptied`);
+        // a status moves only along its moves
+        assert(await refused(e, `UPDATE "principal" SET "status" = 'active' WHERE "principal_id" = 'a1'`) === false, `${name}: a disabled principal may be made active by an administrator`);
+        await e.run(`UPDATE "principal" SET "status" = 'deleted' WHERE "principal_id" = 'a2'`);
+        assert(await refused(e, `UPDATE "principal" SET "status" = 'active' WHERE "principal_id" = 'a2'`), `${name}: a deleted principal stays deleted`);
+        assert(await refused(e, `UPDATE "approval_request" SET "status" = 'approved' WHERE "approval_request_id" = '${ap}'`), `${name}: a used approval is not made usable again`);
+        const pend = (id: string) => `INSERT INTO "approval_request" ("approval_request_id", "action_key", "args_hash", "summary", "risk_level", "approver_rule", "status", "requested_at", "expires_at", "run_agent_run_run_id", "agent_principal_id") VALUES ('${id}', 'invoice:pay', 'h', 's', 'high', 'owner', 'pending', ${AT}, '2027-01-01T00:00:00Z', 'r1', 'a1')`;
+        await e.run(pend("ap-x"));
+        assert(await refused(e, `UPDATE "approval_request" SET "status" = 'consumed' WHERE "approval_request_id" = 'ap-x'`), `${name}: an approval is approved before it is used`);
+        await e.run(`UPDATE "approval_request" SET "status" = 'approved' WHERE "approval_request_id" = 'ap-x'`);
+        await e.run(`UPDATE "approval_request" SET "status" = 'consumed' WHERE "approval_request_id" = 'ap-x'`);
+        // a budget cannot go above its limit, by any statement
+        assert(await refused(e, `UPDATE "agent_budget" SET "used" = 99 WHERE "budget_id" = 'b1'`), `${name}: a budget cannot be set above its limit`);
+        assert(await refused(e, `INSERT INTO "agent_budget" ("budget_id", "meter", "window_kind", "limit_value", "used", "window_start", "version", "status", "budget_key", "agent_principal_id") VALUES ('b2', 'tokens', 'day', 1, 5, ${AT}, 0, 'active', 'bk2', 'a1')`), `${name}: nor created above it`);
+      } finally {
+        await e.close();
+      }
+    }
+  },
+);
+
+proves(
+  ["0043-sql-invariants FR-005"],
+  "a dialect without triggers is an error value naming what it cannot enforce unless the project says to carry it, and the invariants a schema declares can be listed",
+  async () => {
+    const listed = invariantsOf(schema.tables).map((i) => `${i.table}:${i.kind}`);
+    for (const x of ["audit event:append-only", "audit event:chain", "agent budget:at-most", "approval request:transitions", "delegation:transitions", "principal:transitions", "agent run:transitions", "agent version:transitions"]) assert(listed.includes(x), `${x} is declared: ${listed.join(", ")}`);
+    const duck = DIALECTS.find((d) => d.name === "duckdb")!.dialect;
+    const refusedBind = bind(schema, { dialect: duck, sources: [invariants()] });
+    assert(refusedBind.kind === "err" && refusedBind.error.some((x) => x.kind === "unsupported" && x.why.includes("no triggers")), JSON.stringify(refusedBind).slice(0, 300));
+    const carried = bind(schema, { dialect: duck, sources: [invariants({ unsupported: "carry" })] });
+    assert(carried.kind === "ok", "carried, it binds");
+    if (carried.kind === "ok") assert(!carried.value.statements.some((s) => /TRIGGER/i.test(s.sql)), "and makes no trigger");
+    const sqlite = bind(schema, { dialect: DIALECTS[0].dialect, sources: [invariants()] });
+    assert(sqlite.kind === "ok");
+    if (sqlite.kind === "ok") assert(sqlite.value.statements.filter((s) => s.group === "routine" && /CREATE TRIGGER/.test(s.sql)).length > 8, "triggers for SQLite");
   },
 );

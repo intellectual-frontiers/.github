@@ -52,6 +52,7 @@ export const library = {
     "./sql/extensions/kinds",
     "./sql/extensions/osquery-atc",
     "./sql/extensions/operations",
+    "./sql/extensions/invariants",
     "./sql/presets",
   ],
   summary:

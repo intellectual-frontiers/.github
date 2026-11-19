@@ -40,6 +40,7 @@ export {
 } from "./generate.ts";
 export { type Expressor, expressor, type Names, writeNames } from "./express.ts";
 export { parseCsv } from "./csv.ts";
+export { type Enforcement, enforcementOf, type Mechanism, type Need, type Tier, where } from "./enforcement.ts";
 export { qualified } from "./qualify.ts";
 export { type RefError, refsOf, type Refs, type RefsKit } from "./refs.ts";
 export { upsert } from "./upsert.ts";

@@ -42,7 +42,8 @@ const sink: AuditSink = {
   table: "audit event",
   async record(tx, event, c) {
     const id = c.newId();
-    await tx.insert("audit event", { auditEventId: id, occurredAt: c.now(), actorKind: event.actorKind, action: event.action, outcome: event.outcome, previousHash: "x", eventHash: `h-${id}` });
+    const sequence = Number((await tx.query((r) => `SELECT COUNT(*) AS n FROM ${r.table("audit event")}`))[0]?.["n"]) + 1;
+    await tx.insert("audit event", { auditEventId: id, sequence, occurredAt: c.now(), actorKind: event.actorKind, action: event.action, outcome: event.outcome, previousHash: "x", eventHash: `h-${id}` });
     return `h-${id}`;
   },
 };
