@@ -16,7 +16,7 @@
 import { array, boolean, formatDecodeError, integer, object, string, unknownValue } from "@intellectual-frontiers/commons/ts/kernel";
 import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
 import { sha256Of } from "@intellectual-frontiers/commons/ts/kernel";
-import { describeRemoteError, hostKindOf, type HostKinds, parseRemote, cloneUrlOf } from "@intellectual-frontiers/commons/ts/githost";
+import { describeRemoteError, hostKindOf, type HostKinds, readRemote, cloneUrlOf } from "@intellectual-frontiers/commons/ts/githost";
 import type { RepoRef } from "@intellectual-frontiers/commons/ts/githost";
 import type { Finding } from "./findings.ts";
 import { describeLayoutError, repoPathOf, worktreePathOf } from "./layout.ts";
@@ -207,7 +207,7 @@ export function decodeManifest(
   const named: { id: string; path: string }[] = [];
   for (const [i, entry] of raw.repositories.entries()) {
     const at = `$.repositories[${i}]`;
-    const remote = parseRemote(entry.remote, hostKinds);
+    const remote = readRemote(entry.remote, hostKinds);
     if (remote.kind === "err") {
       issues.push({
         rule: "ergonex/manifest-remote",
@@ -216,7 +216,7 @@ export function decodeManifest(
       });
       continue;
     }
-    const ref = remote.value;
+    const ref = remote.value.ref;
     // GitHub is `github.com` alone (FR-019): a host the manifest names as GitLab is read as GitLab by `parseRemote`, so no other kind is possible here
     const path = repoPathOf(ref);
     if (path.kind === "err") {
@@ -235,8 +235,9 @@ export function decodeManifest(
       });
     }
     let branch: BranchName | undefined;
-    if (entry.branch !== undefined) {
-      const b = branchName(entry.branch);
+    const wantedBranch = entry.branch ?? remote.value.branch; // a page's address (`.../tree/main`) names the branch
+    if (wantedBranch !== undefined) {
+      const b = branchName(wantedBranch);
       if (b.kind === "err")
         issues.push({
           rule: "ergonex/manifest-branch",
