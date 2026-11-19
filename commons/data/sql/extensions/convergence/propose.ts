@@ -57,6 +57,8 @@ export interface Proposal {
   /** The hash of the state the plan ends in. */
   readonly to: string;
   readonly steps: readonly ProposalStep[];
+  /** What is in the database and not in the model, and is held: no step touches it. */
+  readonly held?: readonly string[];
   readonly repeatable: readonly {
     readonly key: string;
     readonly hash: string;
@@ -114,8 +116,10 @@ export async function propose(
 > {
   const wanted = desiredState(schema, desired);
   if (wanted === undefined) return err([{ kind: "plan", errors: [{ kind: "write", errors: [] }] }]);
+  const held: string[] = [];
   const live = await readState(driver, desired.dialect, wanted, {
     ignore: [options.ledgerTable ?? "lifecycle_ledger", ...(options.ignore ?? [])],
+    held,
   });
   if (live.kind === "err") return err([{ kind: "read", errors: live.error }]);
   const { ignore: _ignore, ledgerTable: _ledger, ...planOptions } = options;
@@ -126,6 +130,7 @@ export async function propose(
     dialect: desired.dialect.name,
     base: stateHash(live.value),
     to: p.value.to,
+    ...(held.length === 0 ? {} : { held }),
     steps: p.value.steps.map((s, i) => ({
       number: i + 1,
       id: s.id,

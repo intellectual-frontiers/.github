@@ -1,7 +1,7 @@
 # Feature Specification: Idempotent migrations
 
 **Spec ID:** 0012-sql-idempotency
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

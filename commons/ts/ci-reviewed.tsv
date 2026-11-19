@@ -1,7 +1,7 @@
-0005-typescript-runtime FR-017	proven by the check job of .github/workflows/ifc-typescript.yml, which runs tsc 7 on both configurations
-0006-signals FR-020	proven by the otel-conformance job of .github/workflows/ifc-typescript.yml, against the pinned OpenTelemetry Collector
-0008-test-evidence FR-014	proven by the test job of .github/workflows/ifc-typescript.yml, which runs this suite through ifc test and keeps the record and reports
-0005-typescript-runtime FR-062	proven by the compile job of .github/workflows/ifc-typescript.yml, which builds a small program with Bun on each system and runs it
-0005-typescript-runtime FR-074	proven by the test job of .github/workflows/ifc-typescript.yml on Linux and macOS, on both runtimes; its symbolic links are not run on Windows
-0005-typescript-runtime FR-075	proven by the test job of .github/workflows/ifc-typescript.yml on Linux and macOS, on both runtimes; its symbolic links are not run on Windows
-0005-typescript-runtime FR-076	proven by the test job of .github/workflows/ifc-typescript.yml on Linux and macOS, on both runtimes; its symbolic links are not run on Windows
+0005-typescript-runtime FR-017	proven by the check job of .github/workflows/ifc-typescript.auto.yml, which runs tsc 7 on both configurations
+0006-signals FR-020	proven by the otel-conformance job of .github/workflows/ifc-typescript.auto.yml, against the pinned OpenTelemetry Collector
+0008-test-evidence FR-014	proven by the test job of .github/workflows/ifc-typescript.auto.yml, which runs this suite through ifc test and keeps the record and reports
+0005-typescript-runtime FR-062	proven by the compile job of .github/workflows/ifc-typescript.auto.yml, which builds a small program with Bun on each system and runs it
+0005-typescript-runtime FR-074	proven by the test job of .github/workflows/ifc-typescript.auto.yml on Linux and macOS, on both runtimes; its symbolic links are not run on Windows
+0005-typescript-runtime FR-075	proven by the test job of .github/workflows/ifc-typescript.auto.yml on Linux and macOS, on both runtimes; its symbolic links are not run on Windows
+0005-typescript-runtime FR-076	proven by the test job of .github/workflows/ifc-typescript.auto.yml on Linux and macOS, on both runtimes; its symbolic links are not run on Windows

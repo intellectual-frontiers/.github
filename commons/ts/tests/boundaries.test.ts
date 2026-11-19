@@ -308,12 +308,15 @@ proves(
       "./ts/mizan": "./mizan/mod.ts",
       "./ts/mizan/integrations": "./mizan/integrations/mod.ts",
       "./ts/mizan/changes": "./mizan/changes.ts",
+      "./ts/mizan/changes/commit-message": "./mizan/changes/commit-message.ts",
+      "./ts/mizan/changes/declaration": "./mizan/changes/declaration.ts",
       "./ts/mizan/check": "./mizan/check.ts",
       "./ts/mizan/oscal-register": "./mizan/oscal-register.ts",
       "./ts/mizan/versions": "./mizan/versions.ts",
       "./ts/quality": "./quality/mod.ts",
       "./ts/workspaces": "./workspaces/mod.ts",
       "./ts/githost": "./githost/mod.ts",
+      "./ts/githost/workflows": "./githost/workflows/mod.ts",
       "./ts/node": "./node/register.mjs",
     });
     for (const target of Object.values(m.exports)) assert(existsSync(join(ROOT, target)), target);

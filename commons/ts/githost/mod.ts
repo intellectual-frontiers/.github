@@ -28,6 +28,8 @@ export {
   hostKindOf,
   type HostKinds,
   parseRemote,
+  readRemote,
+  type ReadRemote,
   type RemoteError,
   sameRepository,
 } from "./remote.ts";

@@ -19,7 +19,7 @@ import { identityDelegationModule } from "@intellectual-frontiers/data/models/id
 import { identityRebacModule } from "@intellectual-frontiers/data/models/identity-rebac";
 import { agentImplementations, checkExpr, decide, evaluate, type Expr, identityAuditSink, type Implementation, operations, type Runtime, verifyAuditChain } from "@intellectual-frontiers/data/sql/extensions/operations";
 import { projectDomain } from "@intellectual-frontiers/data/sql/logical";
-import { invariants, invariantsOf } from "@intellectual-frontiers/data/sql/extensions/invariants";
+import { guardKeyOf, invariants, invariantsOf, unlockStatement } from "@intellectual-frontiers/data/sql/extensions/invariants";
 import { bind, type StatementSource } from "@intellectual-frontiers/data/sql/physical";
 import { DIALECTS, load, openEngine, type Engine } from "./engines-fixture.ts";
 import { same } from "./governance-fixture.ts";
@@ -50,8 +50,8 @@ const AT = "'2026-01-01T00:00:00Z'";
 const LATER = "2027-01-01T00:00:00.000Z";
 const FIXED = { now: () => NOW, newId: (() => { let n = 0; return () => `gen${++n}`; })() };
 
-const decideOp = operation("decideForTest", { definition: "Decides, for the tests", kind: "query", input: { principal: "text", action: "text", tenant: "text", resourceType: { type: "text", optional: true }, resourceId: { type: "text", optional: true }, delegation: { type: "text", optional: true }, context: { type: "text", optional: true } }, reads: ["principal", "roleAssignment", "accessRole", "rolePermission", "permission", "accessPolicy"], runsAs: "service", idempotent: true });
-const chainOp = operation("verifyChainForTest", { definition: "Verifies the audit chain, for the tests", kind: "query", input: {}, reads: ["auditEvent"], runsAs: "service", idempotent: true });
+const decideOp = operation("decideForTest", { definition: "Decides, for the tests", kind: "query", input: { principal: "text", action: "text", tenant: "text", resourceType: { type: "text", optional: true }, resourceId: { type: "text", optional: true }, delegation: { type: "text", optional: true }, context: { type: "text", optional: true } }, reads: ["principal", "roleAssignment", "accessRole", "rolePermission", "permission", "accessPolicy"], public: true, runsAs: "service", idempotent: true });
+const chainOp = operation("verifyChainForTest", { definition: "Verifies the audit chain, for the tests", kind: "query", input: {}, reads: ["auditEvent"], public: true, runsAs: "service", idempotent: true });
 const decideImpl: Implementation = async (tx, i) => {
   const d = await decide(tx, {
     principal: String(i["principal"]),
@@ -192,6 +192,8 @@ proves(
         same(await d("a2", "invoice:read", { resourceType: "folder", resourceId: "f2" }), "deny", `${name}: for that object only`);
         await e.run(`UPDATE "relation_tuple" SET "expires_at" = '2026-05-01T00:00:00Z'`);
         same(await d("a2", "invoice:read", { resourceType: "folder", resourceId: "f1" }), "deny", `${name}: until it expires`);
+        await e.run(`UPDATE "relation_tuple" SET "expires_at" = NULL, "caveat" = 'office_hours'`);
+        same(await d("a2", "invoice:read", { resourceType: "folder", resourceId: "f1" }), "deny", `${name}: a caveat that is not evaluated never allows`);
         // disabled: nothing
         await e.run(`UPDATE "principal" SET "status" = 'disabled' WHERE "principal_id" = 'u1'`);
         same(await d("u1", "invoice:read"), "deny", `${name}: a disabled principal can do nothing`);
@@ -467,5 +469,154 @@ proves(
     const sqlite = bind(schema, { dialect: DIALECTS[0].dialect, sources: [invariants()] });
     assert(sqlite.kind === "ok");
     if (sqlite.kind === "ok") assert(sqlite.value.statements.filter((s) => s.group === "routine" && /CREATE TRIGGER/.test(s.sql)).length > 8, "triggers for SQLite");
+  },
+);
+
+proves(
+  ["0043-sql-invariants FR-007"],
+  "on PostgreSQL the owner of a table cannot weaken the invariants: dropping, disabling, renaming or replacing a trigger or its function, or dropping the table, is refused unless the session holds the unlock secret, and with the guard left out it is not",
+  async () => {
+    const SECRET = "a-long-secret-kept-outside-the-database";
+    const attacks = [
+      `DROP TRIGGER "inv_audit_event_append_only" ON "audit_event"`,
+      `ALTER TABLE "audit_event" DISABLE TRIGGER "inv_audit_event_append_only"`,
+      `ALTER TABLE "audit_event" DISABLE TRIGGER ALL`,
+      `ALTER TRIGGER "inv_audit_event_append_only" ON "audit_event" RENAME TO "harmless"`,
+      `CREATE OR REPLACE FUNCTION "inv_audit_event_append_only"() RETURNS trigger LANGUAGE plpgsql AS $x$ BEGIN RETURN NEW; END $x$`,
+      `DROP FUNCTION "inv_audit_event_append_only"() CASCADE`,
+      `DROP TABLE "audit_event" CASCADE`,
+      `CREATE OR REPLACE FUNCTION "inv_guard_drop"() RETURNS event_trigger LANGUAGE plpgsql AS $x$ BEGIN RETURN; END $x$`,
+    ];
+    const { e } = await world("postgres", [invariants({ guard: { unlock: guardKeyOf(SECRET) } })]);
+    try {
+      for (const a of attacks) assert(await refused(e, a), `refused: ${a}`);
+      same(Number((await e.rows(`SELECT count(*) n FROM pg_trigger WHERE tgname = 'inv_audit_event_append_only' AND tgenabled = 'O'`))[0]?.["n"]), 1, "and the trigger is still there, enabled");
+      await e.run(unlockStatement("a-wrong-secret", false));
+      assert(await refused(e, attacks[0] as string), "a wrong secret does not unlock it");
+      await e.run(unlockStatement(SECRET, false));
+      await e.run(attacks[0] as string);
+      await e.run(`ALTER TABLE "audit_event" DISABLE TRIGGER ALL`);
+      await e.run(unlockStatement("", false));
+      assert(await refused(e, `DROP TRIGGER "inv_audit_event_append_only_t" ON "audit_event"`), "locked again");
+    } finally {
+      await e.close();
+    }
+    const open = await world("postgres", [invariants({ guard: false })]);
+    try {
+      await open.e.run(`DROP TRIGGER "inv_audit_event_append_only" ON "audit_event"`);
+    } finally {
+      await open.e.close();
+    }
+    const unlockless = await world("postgres", [invariants()]);
+    try {
+      assert(await refused(unlockless.e, `DROP TRIGGER "inv_audit_event_append_only" ON "audit_event"`), "with no unlock secret nothing opens it");
+    } finally {
+      await unlockless.e.close();
+    }
+  },
+);
+
+const T2 = `INSERT INTO "tenant" ("tenant_id", "kind", "slug", "display_name", "ancestry", "status", "isolation", "created_at") VALUES ('t2', 'business', 'beta', 'Beta', '/t2', 'active', 'shared', ${AT})`;
+const newPrincipal = (id: string, kind: string) => `INSERT INTO "principal" ("principal_id", "kind", "status", "status_changed_at", "created_at") VALUES ('${id}', '${kind}', 'active', ${AT}, ${AT})`;
+const newGroup = (id: string) => `INSERT INTO "user_group" ("principal_id", "name", "source", "tenant_id") VALUES ('${id}', '${id}', 'local', 't1')`;
+const member = (group: string, who: string) => `INSERT INTO "group_member" ("group_user_group_principal_id", "member_principal_id", "added_at") VALUES ('${group}', '${who}', ${AT})`;
+const RUN = (dg: string) => `INSERT INTO "agent_run" ("run_id", "started_at", "status", "agent_principal_id", "version_agent_version_id", "tenant_id", "initiator_principal_id", "delegation_id") VALUES ('r1', ${AT}, 'running', 'a1', 'v1', 't1', 'u1', '${dg}')`;
+
+proves(
+  ["0041-identity-authorize FR-001", "0041-identity-authorize FR-005"],
+  "what a group passes on reaches a member three groups down and not one six down, and a delegation made in one tenant gives nothing in another though its root holds the role there",
+  async () => {
+    for (const { name } of ENGINES) {
+      const { e, rt } = await world(name);
+      try {
+        // g1 holds the privileged role; each group is a member of the one above, a user is the last
+        const chain = ["g2", "g3", "g4", "g5", "g6", "g7"];
+        for (const g of chain) await e.run(newPrincipal(g, "group"));
+        for (const g of chain) await e.run(newGroup(g));
+        await e.run(member("g1", "g2"));
+        for (let i = 1; i < chain.length; i++) await e.run(member(chain[i - 1] as string, chain[i] as string));
+        await e.run(newPrincipal("deep3", "user"));
+        await e.run(newPrincipal("deep7", "user"));
+        await e.run(member("g4", "deep3"));
+        await e.run(member("g7", "deep7"));
+        const status = async (who: string) => (await ask(rt, who, "invoice:audit"))["status"];
+        same(await status("deep3"), "allow", `${name}: three groups down`);
+        same(await status("deep7"), "deny", `${name}: seven groups down is past the depth the engine follows`);
+        // a delegation of tenant t1 asked in t2, where its root holds the role too
+        await e.run(T2);
+        await e.run(`INSERT INTO "role_assignment" ("role_assignment_id", "valid_from", "status", "via", "assignment_key", "principal_id", "role_access_role_role_id", "tenant_id", "granted_by_principal_id") VALUES ('ra9', ${AT}, 'active', 'direct', 'k9', 'u1', 'r-pay', 't2', 'u1')`);
+        const dg = String((await delegate(rt, {}))["delegation"]);
+        same((await ask(rt, "a1", "invoice:pay", { delegation: dg }))["status"], "allow", `${name}: in its own tenant`);
+        same((await ask(rt, "a1", "invoice:pay", { delegation: dg, tenant: "t2" }))["status"], "deny", `${name}: not in another`);
+      } finally {
+        await e.close();
+      }
+    }
+  },
+);
+
+proves(
+  ["0042-identity-agent-operations FR-003", "0042-identity-agent-operations FR-004"],
+  "an approval that has expired cannot be decided or used, an approver who no longer holds the permission cannot approve, and a grant's call limit and end are exact",
+  async () => {
+    for (const { name } of ENGINES) {
+      const { e, rt } = await world(name);
+      try {
+        const dg = String((await delegate(rt, {}))["delegation"]);
+        await e.run(RUN(dg));
+        const call = (idx: number, tool: string, over: Record<string, unknown> = {}) => run(rt, "recordToolCall", { run: "r1", tool, callIndex: idx, argsHash: `ah${idx}`, ...over });
+        const pay = { resourceType: "invoice", resourceId: "i1", argsSummary: "Pay" };
+        // expired before it is decided
+        const w1 = String((await call(1, "tl-pay", { ...pay, argsHash: "p1" }))["approvalRequest"]);
+        await e.run(`UPDATE "approval_request" SET "expires_at" = '2025-01-01T00:00:00Z' WHERE "approval_request_id" = '${w1}'`);
+        same((await run(rt, "decideApproval", { approvalRequest: w1, decidedBy: "u1", approve: true }))["status"], "expired", `${name}: too late to decide`);
+        // approved, then expired before it is used
+        const w2 = String((await call(2, "tl-pay", { ...pay, argsHash: "p2" }))["approvalRequest"]);
+        same((await run(rt, "decideApproval", { approvalRequest: w2, decidedBy: "u1", approve: true }))["status"], "approved");
+        await e.run(`UPDATE "approval_request" SET "expires_at" = '2025-01-01T00:00:00Z' WHERE "approval_request_id" = '${w2}'`);
+        same((await call(3, "tl-pay", { ...pay, argsHash: "p2", approval: w2 }))["status"], "denied", `${name}: too late to use`);
+        // an approver who has lost what they would approve
+        const w3 = String((await call(4, "tl-pay", { ...pay, argsHash: "p3" }))["approvalRequest"]);
+        await e.run(`UPDATE "role_assignment" SET "status" = 'revoked' WHERE "role_assignment_id" = 'ra1'`);
+        same((await run(rt, "decideApproval", { approvalRequest: w3, decidedBy: "u1", approve: true }))["status"], "approver-lacks-authority", `${name}: approval never lends authority`);
+        await e.run(`UPDATE "role_assignment" SET "status" = 'active' WHERE "role_assignment_id" = 'ra1'`);
+        // the call limit counts the calls the run has made: two more, and the third is refused
+        const made = Number((await e.rows(`SELECT count(*) AS n FROM "tool_call" WHERE "run_agent_run_run_id" = 'r1'`))[0]?.["n"]);
+        await e.run(`UPDATE "tool_grant" SET "max_calls_per_run" = ${made + 2} WHERE "tool_agent_tool_id" = 'tl-read'`);
+        same((await call(5, "tl-read"))["status"], "allowed");
+        same((await call(6, "tl-read"))["status"], "allowed");
+        same((await call(7, "tl-read"))["status"], "denied", `${name}: the limit is the limit`);
+        // a grant that ends at this instant is over
+        await e.run(`UPDATE "tool_grant" SET "max_calls_per_run" = NULL, "valid_to" = '${NOW}' WHERE "tool_agent_tool_id" = 'tl-read'`);
+        same((await call(8, "tl-read"))["status"], "denied", `${name}: it ends when it ends`);
+      } finally {
+        await e.close();
+      }
+    }
+  },
+);
+
+proves(
+  ["0041-identity-authorize FR-001", "0041-identity-authorize FR-007"],
+  "a permission is for people, machines and groups unless it names the kinds it is for, and a role that names the kinds that may hold it is not held by another kind",
+  async () => {
+    for (const { name } of ENGINES) {
+      const { e, rt } = await world(name);
+      try {
+        const status = async (who: string, action: string) => (await ask(rt, who, action))["status"];
+        await e.run(`INSERT INTO "role_assignment" ("role_assignment_id", "valid_from", "status", "via", "assignment_key", "principal_id", "role_access_role_role_id", "tenant_id", "granted_by_principal_id") VALUES ('ra20', ${AT}, 'active', 'direct', 'k20', 'a2', 'r-view', 't1', 'u1')`);
+        same(await status("u2", "invoice:read"), "allow", `${name}: a person reads`);
+        same(await status("a2", "invoice:read"), "deny", `${name}: an agent is not given a permission that does not say it is for agents`);
+        await e.run(`INSERT INTO "permission_applies_to" ("permission_id", "applies_to") VALUES ('p-read', 'agent')`);
+        same(await status("a2", "invoice:read"), "allow", `${name}: until it says so`);
+        same(await status("u2", "invoice:read"), "deny", `${name}: and then it is for agents alone`);
+        await e.run(`INSERT INTO "permission_applies_to" ("permission_id", "applies_to") VALUES ('p-read', 'user')`);
+        await e.run(`INSERT INTO "access_role_applies_to" ("access_role_role_id", "applies_to") VALUES ('r-view', 'user')`);
+        same(await status("u2", "invoice:read"), "allow", `${name}: a role for people is held by a person`);
+        same(await status("a2", "invoice:read"), "deny", `${name}: and not by an agent`);
+      } finally {
+        await e.close();
+      }
+    }
   },
 );

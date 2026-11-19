@@ -24,6 +24,7 @@ export const config: DocsConfig = {
   specKits: [
     { layout: "commons", dir: "commons/spec-kit" },
     { layout: "commons", dir: "commons/data/spec-kit" },
+    { layout: "commons", dir: "commons/ergonex/spec-kit" },
   ],
   citations: { prefix: "commons", digits: 4, text: ["erga", "archon", "stolos", "thyra"] },
   lenses: [sqlAide, fileAide],

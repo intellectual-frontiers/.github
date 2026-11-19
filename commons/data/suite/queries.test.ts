@@ -54,6 +54,8 @@ proves(
     same(bad(() => "DELETE FROM author"), ["not-read-only: it is not a SELECT or WITH"]);
     same(bad(() => "SELECT 1; DROP TABLE author"), ["not-read-only: it holds more than one statement"]);
     same(bad(() => "WITH x AS (DELETE FROM author RETURNING id) SELECT * FROM x"), ["not-read-only: it holds DELETE"]);
+    for (const w of ["TRUNCATE", "GRANT", "ATTACH", "COPY", "PRAGMA", "MERGE", "CALL", "INSTALL", "EXPORT", "VACUUM", "REINDEX", "ALTER", "CREATE", "DROP"])
+      same(bad(() => `WITH t AS (SELECT 1) ${w} author`), [`not-read-only: it holds ${w}`], `${w} is not read-only`);
     same(bad(() => "SELECT 1 /* ; */ -- DROP\n"), ["ok"], "comments are left out");
     same(bad(() => "SELECT 'delete; drop' AS note, \"insert\" FROM author"), ["ok"], "so are strings and quoted names");
     same(readOnly("select 1"), undefined);

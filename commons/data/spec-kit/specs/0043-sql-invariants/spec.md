@@ -1,7 +1,7 @@
 # Feature Specification: Invariants in the database
 
 **Spec ID:** 0043-sql-invariants
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 
@@ -15,16 +15,19 @@
 - **FR-004**: The database MUST refuse a change of a status to a code that its attribute's moves do not allow (a code with no moves is terminal), and a record in which a member is above the member it may not be above; and the operations of the identity model MUST run through these triggers.
 - **FR-005**: Where a dialect has no triggers, the statement source MUST give an error value naming what it cannot enforce, unless the project says to carry the invariants, in which case it MUST make no trigger; and the invariants a schema declares MUST be listable.
 - **FR-006**: `enforcementOf` MUST say, for a dialect, its tier (full, standard or basic), what it can make the database do and what it cannot and why; `where` MUST say, for a guarantee, whether the database or the application's runtime enforces it for that dialect, and how; and `placed` MUST say it for each invariant of a schema, so that on a dialect that can the database enforces each of the identity model's invariants and on one that cannot each says why it is the application's.
+- **FR-007**: Where the dialect has event triggers (PostgreSQL), the invariants MUST come with a guard, unless the project leaves it out, that refuses to drop a trigger or function of an invariant (alone, with its table or by cascade), to disable one, to rename one and to replace one, for any session that does not hold an unlock secret (kept outside the database; the database holds only its hash); the guard's own functions MUST be named as an invariant's so that they are guarded too; and with no secret given nothing but a superuser's disabling of the guard MUST open it.
 
 ## Out of scope
 
-- Row-level security as a sealed scope, the guard against weakening security, and roles and grants: separate guarantees, and the weaknesses found in them are tracked as defects of the PostgreSQL embodiment.
+- Row-level security as a sealed scope, and roles and grants: separate guarantees, and the weaknesses found in them are tracked as defects of the PostgreSQL embodiment.
+- A superuser: one can disable an event trigger, as one can change anything; the guard is against the owners of tables and the roles of applications.
 - Enforcement by the application's runtime: the operations runtime (0031), whose limits are said there.
 - Concurrency: the tests cannot show two connections acting at once.
 
 ## Edge cases
 
-- A trigger that must also hold for a table owner: a table's owner can drop a trigger; the guard against weakening security is the remedy, per FR-002.
+- A trigger that must also hold for a table owner: a table's owner can drop a trigger; the guard of FR-007 refuses it, and a migration that must change an invariant unlocks the guard for its transaction.
+- Event triggers belong to the database, not a schema: the guard's names are the database's, and an invariant's names begin `inv_`, per FR-007.
 - A dialect that gains triggers later: its tier changes with its features and nothing else does, per FR-006.
 - DuckDB: the invariants are carried as data and enforced by the runtime, and the report says so, per FR-005.
 
@@ -35,7 +38,7 @@
 
 ## Open questions
 
-- **OQ-1**: Whether the trigger that refuses weakening (dropping an invariant's trigger) should be an event trigger of the same extension on PostgreSQL.
+- **OQ-1**: Whether the unlock should also be bound to a role and not only to a secret that the session holds.
 
 ## Key entities
 

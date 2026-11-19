@@ -39,7 +39,8 @@ export type SetupError =
   | { readonly kind: "no-contract"; readonly operation: string }
   | { readonly kind: "unknown-table"; readonly operation: string; readonly table: string }
   | { readonly kind: "no-authorizer"; readonly operation: string }
-  | { readonly kind: "no-audit"; readonly operation: string };
+  | { readonly kind: "no-audit"; readonly operation: string }
+  | { readonly kind: "no-permission"; readonly operation: string };
 
 /** What a runtime is made with. */
 export interface RuntimeOptions {
@@ -132,6 +133,7 @@ export function operations(
       } catch {
         errors.push({ kind: "unknown-table", operation: c.name, table: t });
       }
+    if (c.spec.requires === undefined && c.spec.public !== true && c.spec.checkedBy === undefined) errors.push({ kind: "no-permission", operation: c.name });
     if (c.spec.requires !== undefined && options.authorize === undefined) errors.push({ kind: "no-authorizer", operation: c.name });
     if (c.spec.emits.length > 0 && options.audit === undefined) errors.push({ kind: "no-audit", operation: c.name });
   }

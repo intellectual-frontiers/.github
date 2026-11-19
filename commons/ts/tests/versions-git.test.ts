@@ -580,8 +580,8 @@ proves(
     };
     const ts = decode("commons/ts/release.ts");
     const docs = decode("commons/docs/release.ts");
-    assertEquals([ts.slug, ts.version], ["ifc-ts", "0.6.3"]);
-    assertEquals([docs.slug, docs.version], ["ifc-docs", "0.1.2"]);
+    assertEquals([ts.slug, ts.version], ["ifc-ts", "0.12.2"]);
+    assertEquals([docs.slug, docs.version], ["ifc-docs", "0.1.4"]);
     for (const [dirName, r] of [
       ["ts", ts],
       ["docs", docs],
@@ -592,7 +592,7 @@ proves(
     }
     const tags = await spawn(["git", "-C", ROOT, "tag", "-l", "ifc-ts-v0.4.0", "ifc-docs-v0.1.0"]);
     if (tags.stdout.trim() === "") return; // a clone with no tags (a shallow checkout) cannot say; the check job fetches them
-    const workflow = readTextFileSync(join(ROOT, ".github", "workflows", "tests.yml"));
+    const workflow = readTextFileSync(join(ROOT, ".github", "workflows", "tests.auto.yml"));
     assertStringIncludes(workflow, "fetch-depth: 0");
     assertStringIncludes(workflow, "bun commons/ts/mizan/versions.ts check\n");
     assertStringIncludes(workflow, "node commons/ts/mizan/versions.ts check\n");

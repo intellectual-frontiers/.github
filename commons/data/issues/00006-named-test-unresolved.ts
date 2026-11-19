@@ -12,7 +12,11 @@ export default issue({
   goals: ["G1", "G5"],
   appliesTo: { engines: "all" },
   status: {
-    "kind": "open"
+    kind: "fixed",
+    proof: [
+      { kind: "test", file: "suite/enforcement-notes.test.ts", name: "the notes of the table of enforcement are the tests that carry the requirement's tag" },
+      { kind: "file", path: "tools/enforcement.ts" },
+    ],
   },
   size: "s",
   cites: [

@@ -1,7 +1,7 @@
 # Feature Specification: Queries
 
 **Spec ID:** 0024-sql-queries
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

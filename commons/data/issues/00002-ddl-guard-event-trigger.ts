@@ -12,7 +12,11 @@ export default issue({
   goals: ["G1", "G2"],
   appliesTo: { engines: ["postgres"] },
   status: {
-    "kind": "open"
+    kind: "fixed",
+    proof: [
+      { kind: "test", file: "suite/identity-operations.test.ts", name: "on PostgreSQL the owner of a table cannot weaken the invariants" },
+      { kind: "file", path: "sql/extensions/invariants/mod.ts" },
+    ],
   },
   size: "m",
   cites: [

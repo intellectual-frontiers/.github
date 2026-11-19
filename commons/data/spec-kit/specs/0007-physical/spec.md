@@ -1,7 +1,7 @@
 # Feature Specification: The physical schema
 
 **Spec ID:** 0007-physical
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

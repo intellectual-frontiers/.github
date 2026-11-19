@@ -1,7 +1,7 @@
 # Feature Specification: The engine
 
 **Spec ID:** 0002-engine
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

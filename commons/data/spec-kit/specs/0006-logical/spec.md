@@ -1,7 +1,7 @@
 # Feature Specification: The logical schema
 
 **Spec ID:** 0006-logical
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

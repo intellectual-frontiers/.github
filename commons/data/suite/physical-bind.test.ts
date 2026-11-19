@@ -227,7 +227,7 @@ proves(
   },
 );
 
-proves(["0007-physical FR-009"], "every statement carries the logical elements it was made from", () => {
+proves(["0007-physical FR-009", "0001-layers FR-006"], "every statement carries the logical elements it was made from", () => {
   const s = arcaSchema();
   const ids = new Set<string>();
   for (const t of s.tables) {
@@ -251,7 +251,7 @@ proves(["0007-physical FR-009"], "every statement carries the logical elements i
   ]);
 });
 
-proves(["0007-physical FR-001", "0007-physical FR-007"], "the case style writes every name, and a snake case schema is the default", () => {
+proves(["0007-physical FR-001", "0007-physical FR-007", "0005-naming FR-004", "0001-layers FR-012"], "the case style writes every name, and a snake case schema is the default", () => {
   const s = arcaSchema();
   const defaults = render(bound(s, sqlite));
   const snakeCase = render(bound(s, sqlite, { naming: naming(snake) }));

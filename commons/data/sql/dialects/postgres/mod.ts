@@ -61,14 +61,14 @@ export const dialect: Dialect = {
   cascade: true,
   advisory: { acquire: (k) => `SELECT pg_advisory_lock(${k});`, release: (k) => `SELECT pg_advisory_unlock(${k});` },
   catalog: {
-    compares: ["tables", "columns (type, nullability)", "primary keys", "indexes", "foreign keys, uniques and checks (by name)"],
+    compares: ["tables", "columns (type, nullability, default)", "primary keys", "indexes", "foreign keys, uniques and checks (by name)"],
     read: async (query, schema) => {
       const s = schema === undefined ? "current_schema()" : standardLiteral(schema);
       const tables = await query(
         `SELECT table_name n FROM information_schema.tables WHERE table_schema = ${s} AND table_type = 'BASE TABLE' ORDER BY table_name`,
       );
       const cols = await query(
-        `SELECT table_name t, column_name c, data_type d, character_maximum_length l, numeric_precision p, numeric_scale sc, udt_name u, is_nullable n FROM information_schema.columns WHERE table_schema = ${s} ORDER BY table_name, ordinal_position`,
+        `SELECT table_name t, column_name c, data_type d, character_maximum_length l, numeric_precision p, numeric_scale sc, udt_name u, is_nullable n, column_default df FROM information_schema.columns WHERE table_schema = ${s} ORDER BY table_name, ordinal_position`,
       );
       const pks = await query(
         `SELECT tc.table_name t, kcu.column_name c FROM information_schema.table_constraints tc JOIN information_schema.key_column_usage kcu ON tc.constraint_name = kcu.constraint_name AND tc.table_schema = kcu.table_schema WHERE tc.constraint_type = 'PRIMARY KEY' AND tc.table_schema = ${s} ORDER BY kcu.ordinal_position`,
@@ -89,7 +89,7 @@ export const dialect: Dialect = {
         const name = String(t["n"]);
         return {
           name,
-          columns: cols.filter((c) => c["t"] === name).map((c) => ({ name: String(c["c"]), type: typeOf(c), nullable: c["n"] === "YES" })),
+          columns: cols.filter((c) => c["t"] === name).map((c) => ({ name: String(c["c"]), type: typeOf(c), nullable: c["n"] === "YES", ...(c["df"] === null || c["df"] === undefined ? {} : { default: String(c["df"]) }) })),
           primaryKey: pks.filter((k) => k["t"] === name).map((k) => String(k["c"])),
           indexes: idx.filter((i) => i["t"] === name).map((i) => String(i["n"])),
           constraints: cons

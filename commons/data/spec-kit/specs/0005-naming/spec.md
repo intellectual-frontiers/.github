@@ -1,7 +1,7 @@
 # Feature Specification: Names
 
 **Spec ID:** 0005-naming
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

@@ -6,7 +6,7 @@
  * @module
  */
 import { CAPABILITIES, maxDepth, supports, unsupported } from "../githost/capabilities.ts";
-import { cloneUrlOf, describeRemoteError, hostKindOf, parseRemote, sameRepository } from "../githost/remote.ts";
+import { cloneUrlOf, describeRemoteError, hostKindOf, parseRemote, readRemote, sameRepository } from "../githost/remote.ts";
 import type { Capability, HostKind, RepoRef } from "../githost/types.ts";
 import { gitCapabilities, gitManagerKinds } from "../../ontology/ifws/mod.ts";
 import { assert, assertEquals, proves } from "../runtime/test.ts";
@@ -120,5 +120,44 @@ proves(
     assertEquals(maxDepth("Git"), 2);
     assertEquals(maxDepth("Gitlab"), Number.POSITIVE_INFINITY);
     assert(!supports("Github", "NestedGroups") && supports("Gitlab", "NestedGroups") && !supports("Git", "Issues"));
+  },
+);
+
+proves(
+  ["0023-if-workspaces FR-019"],
+  "a remote as a person writes it needs no scheme where the domain says the rest, `owner/repo` is GitHub, the address of a branch's page is the repository and the branch, and a path on this computer is still no remote",
+  () => {
+    const read = (text: string, kinds: Readonly<Record<string, HostKind>> = {}) => {
+      const r = readRemote(text, kinds);
+      if (r.kind === "err") throw new Error(`${text}: ${describeRemoteError(r.error)}`);
+      return r.value;
+    };
+    const hello = { kind: "Github", host: "github.com", path: ["octocat", "Hello-World"] } as const;
+    for (const f of [
+      "github.com/octocat/Hello-World",
+      "GitHub.com/octocat/Hello-World.git",
+      "octocat/Hello-World",
+      "github:octocat/Hello-World",
+      "https://github.com/octocat/Hello-World.git",
+      "git@github.com:octocat/Hello-World.git",
+      "github.com:octocat/Hello-World",
+    ])
+      assertEquals(read(f), { ref: hello }, f);
+    assertEquals(read("github.com/octocat/Hello-World/tree/main"), { ref: hello, branch: "main" });
+    assertEquals(read("https://github.com/octocat/Hello-World/blob/dev/README.md"), { ref: hello, branch: "dev" });
+    assertEquals(read("gitlab.com/gitlab-org/ci-cd/runner"), {
+      ref: { kind: "Gitlab", host: "gitlab.com", path: ["gitlab-org", "ci-cd", "runner"] },
+    });
+    assertEquals(read("gitlab:gitlab-org/ci-cd/runner"), read("gitlab.com/gitlab-org/ci-cd/runner"));
+    assertEquals(read("https://gitlab.com/g/s/r/-/tree/feature"), {
+      ref: { kind: "Gitlab", host: "gitlab.com", path: ["g", "s", "r"] },
+      branch: "feature",
+    });
+    assertEquals(read("gitlab.example.com/team/sub/app", { "gitlab.example.com": "Gitlab" }).ref.kind, "Gitlab");
+    assertEquals(read("gitlab.example.com/team/app").ref.kind, "Git");
+    assertEquals(read("bitbucket.org/atlassian/repo").ref, { kind: "Git", host: "bitbucket.org", path: ["atlassian", "repo"] });
+    assertEquals(read("https://user:secret@github.com/octocat/Hello-World"), { ref: hello });
+    for (const f of ["/tmp/x", "./x/y", "~/x", "C:\\src\\x", "file:///tmp/x", "", "github.com/octocat", "octocat"])
+      assert(readRemote(f).kind === "err", f);
   },
 );

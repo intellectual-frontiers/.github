@@ -122,7 +122,7 @@ proves(
 );
 
 proves(
-  ["0008-sql-documentation FR-002", "0008-sql-documentation FR-005"],
+  ["0008-sql-documentation FR-002", "0008-sql-documentation FR-005", "0001-layers FR-007"],
   "the documentation table is made where there is no comment, everywhere, or nowhere, as its setting says",
   async () => {
     const s = arcaSchema();

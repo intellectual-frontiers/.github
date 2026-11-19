@@ -1,7 +1,7 @@
 # Feature Specification: The lifecycle of a physical schema
 
 **Spec ID:** 0011-sql-lifecycle
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

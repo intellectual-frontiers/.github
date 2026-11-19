@@ -6,13 +6,17 @@ export default issue({
   id: 4,
   slug: "requires-or-public",
   title: "An operation need not require a permission",
-  summary: "A command may declare no permission and still be callable, and nothing tells a public operation from a forgotten one. Add a `requires` or an explicit public flag and have lint refuse neither.",
+  summary: "A command may declare no permission and still be callable, and nothing tells a public operation from a forgotten one. Say how it is decided who may call it: a permission, public, or what its implementation checks; lint and the runtime refuse none.",
   severity: "high",
   priority: "P1",
   goals: ["G1", "G2"],
   appliesTo: { engines: "all" },
   status: {
-    "kind": "open"
+    kind: "fixed",
+    proof: [
+      { kind: "test", file: "suite/operations.test.ts", name: "an operation requires a permission or says it is public" },
+      { kind: "spec", id: "0031-operations" },
+    ],
   },
   size: "s",
   cites: [

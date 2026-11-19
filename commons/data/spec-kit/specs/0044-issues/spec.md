@@ -1,7 +1,7 @@
 # Feature Specification: Issues as typed code
 
 **Spec ID:** 0044-issues
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 
@@ -15,6 +15,8 @@
 - **FR-004**: Two versions of a set MUST be checked against each other so that an issue is never lost: one taken out, one whose number now names another issue and a status that moves along a path the moves do not allow MUST each be found; a finished issue MUST be able only to be reopened.
 - **FR-005**: The issues still to be done (open, in progress, deferred) MUST be listed most pressing first, by priority, then severity, then number.
 - **FR-006**: The check of the library MUST hold every `issues/` folder in `bun run verify`: the files as FR-002 says, each issue the one its file is named for, every set sound as FR-003 says, and the proof of a fixed issue resolving (a file that exists, a test whose title is in its file, a specification that exists, a commit that exists).
+- **FR-007**: The note of a requirement that is checked, in the table of enforcement, MUST be the tests that carry its tag (`file: title`, read from the tests), so that a note cannot name a test that is not there or that does not prove it; a note that is not so MUST be found, and the table MUST be writable from the tests.
+- **FR-008**: Every specification of the library MUST be in force and none Draft, so that the trace holds each requirement to a test that proves it or a reviewed reason; a Draft specification MUST be found.
 
 ## Out of scope
 

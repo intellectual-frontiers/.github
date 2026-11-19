@@ -377,3 +377,22 @@ proves(
     same(["challenge", "loginAttempt", "knownBrowser", "loginSession", "refreshToken", "auditEvent", "deviceAttestation", "devicePosture", "deviceSession", "delegation", "agentRun", "toolCall", "approvalRequest"].map((n) => days.get(n)), [1, 30, 180, 90, 30, 365, 90, 30, 90, 365, 365, 365, 365]);
   },
 );
+
+proves(
+  ["0030-identity FR-002", "0030-identity FR-005", "0030-identity FR-006"],
+  "the identity model's uniques are in the database: one login in a tenant, one name for a group in a tenant, one passkey credential id, one hash for a refresh token, one verified domain, one membership of a user in a tenant",
+  () => {
+    const b = bind(schemaOf(full), { dialect: DIALECTS[0].dialect });
+    assert(b.kind === "ok");
+    const uniques = (table: string): string[] => {
+      const sql = b.kind === "ok" ? (b.value.statements.find((s) => s.group === "table" && s.sql.startsWith(`CREATE TABLE IF NOT EXISTS "${table}" `))?.sql ?? "") : "";
+      return [...sql.matchAll(/UNIQUE \(([^)]*)\)/g)].map((m) => (m[1] ?? "").replaceAll('"', "").replaceAll(" ", ""));
+    };
+    same(uniques("user_account").some((u) => u.includes("login_identifier")), true, "login");
+    same(uniques("user_group").some((u) => u === "tenant_id,name"), true, "group name");
+    same(uniques("passkey"), ["credential_id_value"], "passkey credential id");
+    same(uniques("refresh_token"), ["token_hash"], "refresh token hash");
+    same(uniques("verified_domain"), ["domain"], "verified domain");
+    same(uniques("membership").length, 1, "one membership");
+  },
+);

@@ -6,6 +6,7 @@
  * @module
  */
 import { vocabularies } from "@intellectual-frontiers/data/governance";
+import { sha256Hex } from "@intellectual-frontiers/data/sql/lifecycle";
 import { carriedOf, type LogicalSchema } from "@intellectual-frontiers/data/sql/logical";
 import { type Dialect, featureId, type PhysicalError, qualified, type Statement } from "./deps.ts";
 import type { Protection } from "./settings.ts";
@@ -68,9 +69,13 @@ export function guard(dialect: Dialect, settings: Protection): readonly Statemen
   const fn = qualified(dialect, settings.tablesSchema, "ddl_guard");
   const flag = dialect.literal(settings.migratingSetting);
   const schema = dialect.literal(settings.tablesSchema);
+  const migrating =
+    settings.migratingSecret === undefined
+      ? `coalesce(current_setting(${flag}, true), '') = 'on'`
+      : `encode(sha256(convert_to(coalesce(current_setting(${flag}, true), ''), 'UTF8')), 'hex') = ${dialect.literal(sha256Hex(settings.migratingSecret))}`;
   const body = `DECLARE r record;
 BEGIN
-    IF coalesce(current_setting(${flag}, true), '') = 'on' THEN RETURN; END IF;
+    IF ${migrating} THEN RETURN; END IF;
     IF TG_EVENT = 'sql_drop' THEN
         FOR r IN SELECT object_type, schema_name, object_identity FROM pg_event_trigger_dropped_objects() LOOP
             IF (r.schema_name = ${schema} OR r.object_identity LIKE ${dialect.literal(`${settings.tablesSchema}.%`)}) AND r.object_type IN ('table', 'table column') THEN
@@ -115,5 +120,5 @@ export function migrationSession(dialect: Dialect, settings: Protection): readon
     ...settings,
     enforcement: settings.enforcement === "enforced" ? "auto" : settings.enforcement,
   });
-  return enforced && settings.guard ? [`SELECT set_config(${dialect.literal(settings.migratingSetting)}, 'on', true);`] : [];
+  return enforced && settings.guard ? [`SELECT set_config(${dialect.literal(settings.migratingSetting)}, ${dialect.literal(settings.migratingSecret ?? "on")}, true);`] : [];
 }

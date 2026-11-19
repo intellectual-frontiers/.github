@@ -118,12 +118,13 @@ export function libraryFindings(repo: string): readonly string[] {
           found.push(`${path.relative(repo, file)} imports ${m[1]}, outside commons/${name} (FR-004)`);
       }
     }
-    const workflow = `${repo}/.github/workflows/${name}.yml`;
-    if (!existsSync(workflow)) found.push(`.github/workflows/${name}.yml is missing (FR-010)`);
+    const workflow = `${repo}/.github/workflows/${name}.auto.yml`;
+    if (!existsSync(workflow)) found.push(`.github/workflows/${name}.auto.yml is missing (FR-010)`);
     else {
       const w = read(workflow);
-      if (!w.includes(`"commons/${name}/**"`)) found.push(`.github/workflows/${name}.yml is not triggered by commons/${name}/** (FR-010)`);
-      if (!w.includes("bun run verify")) found.push(`.github/workflows/${name}.yml does not run verify (FR-010)`);
+      if (!w.includes(`"commons/${name}/**"`))
+        found.push(`.github/workflows/${name}.auto.yml is not triggered by commons/${name}/** (FR-010)`);
+      if (!w.includes("bun run verify")) found.push(`.github/workflows/${name}.auto.yml does not run verify (FR-010)`);
     }
     if (docs.split(`dir: "commons/${name}/spec-kit"`).length !== 2)
       found.push(`commons/docs.config.ts does not name commons/${name}/spec-kit exactly once (FR-009)`);
@@ -272,8 +273,8 @@ proves([`${SPEC} FR-009`], "a library whose spec kit the documentation does not 
 
 proves([`${SPEC} FR-010`], "a library with no workflow, or one not triggered by its folder, is found", () => {
   using c = copyOf();
-  edit(`${c.repo}/.github/workflows/data.yml`, "bun run verify", "bun test");
-  assertStringIncludes(libraryFindings(c.repo).join("\n"), "data.yml does not run verify");
-  fs.removeSync(`${c.repo}/.github/workflows/data.yml`);
-  assertStringIncludes(libraryFindings(c.repo).join("\n"), ".github/workflows/data.yml is missing");
+  edit(`${c.repo}/.github/workflows/data.auto.yml`, "bun run verify", "bun test");
+  assertStringIncludes(libraryFindings(c.repo).join("\n"), "data.auto.yml does not run verify");
+  fs.removeSync(`${c.repo}/.github/workflows/data.auto.yml`);
+  assertStringIncludes(libraryFindings(c.repo).join("\n"), ".github/workflows/data.auto.yml is missing");
 });

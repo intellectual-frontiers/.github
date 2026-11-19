@@ -1,7 +1,7 @@
 # Feature Specification: Identity
 
 **Spec ID:** 0030-identity
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

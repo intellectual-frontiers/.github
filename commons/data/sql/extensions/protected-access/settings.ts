@@ -25,6 +25,8 @@ export interface ProtectionSettings {
   readonly unmaskedRoles?: readonly string[];
   /** The setting a migration sets to tell the guard it is one; `lifecycle.migrating` by default. */
   readonly migratingSetting?: string;
+  /** A secret that seals the flag: the guard then holds only its hash and a migration sets the secret, so that a session that does not know it cannot say it is a migration; without one, `on` says so and any session can. */
+  readonly migratingSecret?: string;
   /** The role that owns the schemas, the tables and the views, so that a view runs with its rights and row-level security applies to it; none by default, which leaves ownership to whoever runs the plan. */
   readonly owner?: string;
 }
@@ -38,6 +40,7 @@ export interface Protection {
   readonly masks: boolean;
   readonly unmaskedRoles: readonly string[];
   readonly migratingSetting: string;
+  readonly migratingSecret: string | undefined;
   readonly owner: string | undefined;
 }
 
@@ -50,6 +53,7 @@ export const defaultSettings: Protection = {
   masks: true,
   unmaskedRoles: [],
   migratingSetting: "lifecycle.migrating",
+  migratingSecret: undefined,
   owner: undefined,
 };
 
@@ -68,6 +72,7 @@ export function settingsOf(given: ProtectionSettings = {}): Protection {
     masks: (given.masks ?? "on") === "on",
     unmaskedRoles: given.unmaskedRoles ?? defaultSettings.unmaskedRoles,
     migratingSetting: given.migratingSetting ?? defaultSettings.migratingSetting,
+    migratingSecret: given.migratingSecret,
     owner: given.owner,
   };
 }

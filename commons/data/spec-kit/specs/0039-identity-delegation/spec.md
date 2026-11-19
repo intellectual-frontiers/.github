@@ -1,7 +1,7 @@
 # Feature Specification: Identity delegation
 
 **Spec ID:** 0039-identity-delegation
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

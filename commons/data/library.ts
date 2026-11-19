@@ -11,6 +11,7 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.0.0",
+  distribution: ["github"],
   exports: [
     "./engine",
     "./governance",
@@ -57,6 +58,7 @@ export const library = {
     "./sql/extensions/invariants",
     "./sql/extensions/issues",
     "./sql/presets",
+    "./sql/cli",
   ],
   summary:
     "A governance layer, a logical schema and a physical schema, and the extensions to each, produce SQL for PostgreSQL, SQLite and DuckDB; its own specifications say what it does.",

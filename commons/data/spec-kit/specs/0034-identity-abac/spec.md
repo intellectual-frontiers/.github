@@ -1,7 +1,7 @@
 # Feature Specification: Identity ABAC
 
 **Spec ID:** 0034-identity-abac
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

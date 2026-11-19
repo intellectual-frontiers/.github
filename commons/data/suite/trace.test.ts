@@ -21,7 +21,7 @@ proves(["0001-layers FR-011"], "a citation is read against this library's specif
     ontology: [],
     specsFolder: "spec-kit/specs",
   });
-  const rules = (text: string): readonly string[] => trace.traceFindings(input(text)).map((f) => f.rule);
+  const rules = (text: string): readonly string[] => trace.traceFindings(input(text)).map((f) => f.rule).filter((r) => r !== "trace/unproved");
   assertEquals(rules("// Spec: 0001-layers FR-004\n"), []);
   assertEquals(rules("// Spec: 0027-commons-libraries FR-001\n"), ["trace/unknown-spec"]);
   assertEquals(rules("// Spec: 0001-layers FR-099\n"), ["trace/unknown-requirement"]);

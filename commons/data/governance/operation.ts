@@ -33,6 +33,10 @@ export interface OperationSpec {
   readonly writes?: readonly string[];
   /** The permission the caller must hold, as `resource:action`. */
   readonly requires?: string;
+  /** Says that anyone may call it, with no permission. */
+  readonly public?: boolean;
+  /** Says what its implementation checks to decide who may call it, where that is more than a permission (for example, that the caller is the one the input names): in words. A contract has exactly one of `requires`, `public` and `checkedBy` (0031-operations FR-009). */
+  readonly checkedBy?: string;
   /** The input that holds the tenant the permission is held in. */
   readonly scope?: string;
   /** What it records in the audit trail, each as `subject.verb`; a command that records none says so by leaving this empty. */
@@ -49,7 +53,7 @@ export interface OperationSpec {
 export interface Operation {
   readonly kind: "operation";
   readonly name: string;
-  readonly spec: Required<Omit<OperationSpec, "requires" | "scope" | "serves">> & Pick<OperationSpec, "requires" | "scope" | "serves">;
+  readonly spec: Required<Omit<OperationSpec, "requires" | "scope" | "serves" | "public" | "checkedBy">> & Pick<OperationSpec, "requires" | "scope" | "serves" | "public" | "checkedBy">;
   /** Its inputs, each with its type and whether it is optional. */
   readonly input: Readonly<Record<string, Required<Input>>>;
 }
@@ -74,7 +78,7 @@ export function operation(name: string, spec: OperationSpec): Operation {
 }
 
 /** What the lint holds an operation to. */
-export type OperationRule = "operation/unknown-concept" | "operation/query-writes" | "operation/permission-form" | "operation/emit-form" | "operation/restricted-as-caller" | "operation/duplicate" | "operation/scope-unknown" | "operation/command-silent";
+export type OperationRule = "operation/unknown-concept" | "operation/query-writes" | "operation/permission-form" | "operation/emit-form" | "operation/restricted-as-caller" | "operation/duplicate" | "operation/scope-unknown" | "operation/command-silent" | "operation/no-permission" | "operation/access-ambiguous";
 
 const PERMISSION = /^[a-z][A-Za-z0-9]*:[a-z][A-Za-z0-9.]*$/;
 const ACTION = /^[a-z][A-Za-z0-9]*\.[a-z][A-Za-z0-9]*$/;
@@ -98,6 +102,9 @@ export function lintOperations(d: Domain, operations: readonly Operation[]): rea
     for (const n of [...o.spec.reads, ...o.spec.writes]) if (!concepts.has(n)) out.push(finding("operation/unknown-concept", id, `${o.name} names the concept ${n}, which the domain does not have`, "error"));
     if (o.spec.kind === "query" && o.spec.writes.length > 0) out.push(finding("operation/query-writes", id, `the query ${o.name} says it writes ${o.spec.writes.join(", ")}`, "error"));
     if (o.spec.requires !== undefined && !PERMISSION.test(o.spec.requires)) out.push(finding("operation/permission-form", id, `${o.name} requires ${o.spec.requires}, which is not \`resource:action\``, "error"));
+    const ways = [o.spec.requires !== undefined, o.spec.public === true, o.spec.checkedBy !== undefined].filter(Boolean).length;
+    if (ways === 0) out.push(finding("operation/no-permission", id, `${o.name} requires no permission and is not said to be public or checked by its implementation: name the permission, say \`public: true\`, or say what \`checkedBy\` it`, "error"));
+    if (ways > 1) out.push(finding("operation/access-ambiguous", id, `${o.name} says more than one of requires, public and checkedBy: it is one of them`, "error"));
     for (const a of o.spec.emits) if (!ACTION.test(a)) out.push(finding("operation/emit-form", id, `${o.name} emits ${a}, which is not \`subject.verb\``, "error"));
     if (o.spec.scope !== undefined && !(o.spec.scope in o.input)) out.push(finding("operation/scope-unknown", id, `${o.name} is scoped by ${o.spec.scope}, which is not one of its inputs`, "error"));
     if (o.spec.kind === "command" && o.spec.writes.length > 0 && o.spec.emits.length === 0) out.push(finding("operation/command-silent", id, `the command ${o.name} writes and records nothing in the audit trail`, "warning"));

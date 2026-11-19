@@ -1,7 +1,7 @@
 # Feature Specification: Presets
 
 **Spec ID:** 0021-sql-presets
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

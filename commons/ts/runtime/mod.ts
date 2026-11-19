@@ -21,6 +21,7 @@
  */
 export * as acme from "./acme.ts";
 export * as compile from "./compile.ts";
+export * as dirs from "./dirs.ts";
 export * as discover from "./discover.ts";
 export * as dns from "./dns.ts";
 export * as fs from "./fs.ts";

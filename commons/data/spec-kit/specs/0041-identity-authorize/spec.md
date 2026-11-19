@@ -1,7 +1,7 @@
 # Feature Specification: Identity authorize
 
 **Spec ID:** 0041-identity-authorize
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 
@@ -15,6 +15,7 @@
 - **FR-004**: The expression language MUST be a closed tree (`and`, `or`, `not`, `eq`, `ne`, `lt`, `le`, `gt`, `ge`, `in`, `contains`, `startsWith`, `exists`, attributes by key, literals) that evaluates to true, false or unknown, where a missing attribute and a comparison of different types are unknown, and MUST refuse as unknown anything that is not a well-formed expression.
 - **FR-005**: For a principal acting under a delegation, `decide` MUST require every delegation of the chain to be active, in force, in the tenant, to the one who holds it, passing on the permission, limited to a resource that includes the one asked about and with a condition that holds, and MUST then require the delegator at the root of the chain to be allowed the action itself, so that a delegation never adds.
 - **FR-006**: The identity audit sink MUST write each event in the transaction of what it records with the hash of the event before it, and `verifyAuditChain` MUST make each event's hash again from the fields the event holds and report a chain that is forked or broken or an event whose hash is not the one it holds, so that a change to a field of an event, and not only to a link, shows.
+- **FR-007**: The decision MUST read every column of the access models that says who or when: a permission is for people, machines and groups unless it names the kinds it is for, a role that names the kinds that may hold it is not held by another kind, and a relationship that holds only under a caveat, which the engine does not evaluate, MUST NOT allow.
 
 ## Out of scope
 

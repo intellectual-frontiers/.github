@@ -1,7 +1,7 @@
 # Feature Specification: Identity agent operations
 
 **Spec ID:** 0042-identity-agent-operations
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

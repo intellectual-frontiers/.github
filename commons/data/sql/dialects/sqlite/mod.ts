@@ -42,17 +42,17 @@ export const dialect: Dialect = {
   literal: standardLiteral,
   type,
   catalog: {
-    compares: ["tables", "columns (type, nullability)", "primary keys", "indexes"],
+    compares: ["tables", "columns (type, nullability, default)", "primary keys", "indexes"],
     read: async (query) => {
       const tables = await query(`SELECT name n FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name`);
       const idx = await query(`SELECT tbl_name t, name n FROM sqlite_master WHERE type = 'index' AND sql IS NOT NULL`);
       const out = [];
       for (const t of tables) {
         const name = String(t["n"]);
-        const cols = await query(`SELECT name c, type d, "notnull" nn, pk FROM pragma_table_info(${standardLiteral(name)})`);
+        const cols = await query(`SELECT name c, type d, "notnull" nn, pk, dflt_value df FROM pragma_table_info(${standardLiteral(name)})`);
         out.push({
           name,
-          columns: cols.map((c) => ({ name: String(c["c"]), type: String(c["d"]), nullable: Number(c["nn"]) === 0 })),
+          columns: cols.map((c) => ({ name: String(c["c"]), type: String(c["d"]), nullable: Number(c["nn"]) === 0, ...(c["df"] === null || c["df"] === undefined ? {} : { default: String(c["df"]) }) })),
           primaryKey: cols
             .filter((c) => Number(c["pk"]) > 0)
             .sort((a, b) => Number(a["pk"]) - Number(b["pk"]))
@@ -69,6 +69,7 @@ export const dialect: Dialect = {
     table: (t) => `SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ${standardLiteral(t)}`,
     column: (t, c) => `SELECT 1 FROM pragma_table_info(${standardLiteral(t)}) WHERE name = ${standardLiteral(c)}`,
     constraint: () => undefined,
+    triggers: (t) => `SELECT COUNT(*) FROM sqlite_master WHERE type = 'trigger' AND tbl_name = ${standardLiteral(t)}`,
     index: (n) => `SELECT 1 FROM sqlite_master WHERE type = 'index' AND name = ${standardLiteral(n)}`,
   },
   addColumnRefusal: (c) =>

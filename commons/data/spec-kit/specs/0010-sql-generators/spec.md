@@ -1,7 +1,7 @@
 # Feature Specification: Generators
 
 **Spec ID:** 0010-sql-generators
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 
