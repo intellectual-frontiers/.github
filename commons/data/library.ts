@@ -17,6 +17,8 @@ export const library = {
     "./sql/logical",
     "./sql/physical",
     "./models/arca",
+    "./models/arca-tenancy",
+    "./models/identity",
     "./sql/dialects/postgres",
     "./sql/dialects/sqlite",
     "./sql/dialects/duckdb",

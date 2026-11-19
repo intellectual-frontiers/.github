@@ -110,7 +110,7 @@ footer { margin-top: 4rem; padding-top: 1rem; border-top: 1px solid var(--line);
 <code class="pkg">@intellectual-frontiers/data</code>
 <h1>Governance in, SQL out, and a safe way to change the database</h1>
 <p class="lede">A library of Intellectual Frontiers commons. A governance layer says what a business domain is and what must be true of its data; a logical schema is made from it; a physical schema for PostgreSQL, SQLite or DuckDB is made from that; a lifecycle layer changes a database from one physical schema to the next; and extensions add the rest.</p>
-<p class="small">Version 0.0.0, conformance level L1, private package, Node &ge; 26 (Bun is the default runtime). Specifications 0001 to 0028 are in force, in <code>spec-kit/</code>.</p>
+<p class="small">Version 0.0.0, conformance level L1, private package, Node &ge; 26 (Bun is the default runtime). Specifications 0001 to 0030 are in force, in <code>spec-kit/</code>.</p>
 </header>
 
 <section id="purpose">
@@ -285,6 +285,18 @@ annotate(vocabularies.security.classification, "confidential");</code></pre>
 </ul>
 <pre><code>const billing = defineModule({ name: "billing", requires: ["arcaParty"], concepts: [billingAccount], codeLists: [accountStatus] });
 const app = composeModules("shop", { definition: "A shop" }, [moduleOf(partyDomain.value), billing]);</code></pre>
+
+<h3>Tenancy and identity <span class="tag">0029, 0030</span></h3>
+<p>Two modules on top of Arca's party model, for a business that serves businesses (B2B) and the consumers of those businesses (B2B2C). <code>models/arca-tenancy</code> is the <code>tenant</code>: a boundary that keeps one customer's data from another's, in a hierarchy (<code>platform</code>, <code>reseller</code>, <code>business</code>, <code>consumerPool</code>) with a unique slug, a materialized ancestry, a status and an isolation, and a constraint that it is not its own parent. A WorkOS organization or an Okta org is a <code>business</code> tenant. It requires the party model and nothing else, so billing, orders or content can require it for a scope without depending on identity.</p>
+<p><code>models/identity</code> is the core of what Okta, Auth0 and WorkOS keep, as the module <code>identityModule</code> (it requires <code>arcaParty</code> and <code>arcaTenancy</code>): 33 concepts and about 35 code lists.</p>
+<ul>
+<li><strong>Principals and accounts.</strong> A <code>principal</code> is the supertype of users, service accounts and groups (as a party is of people and organizations). A <code>userAccount</code> is identified by its principal, refers to Arca's <code>person</code>, and joins tenants through <code>membership</code>; groups nest through <code>groupMember</code>.</li>
+<li><strong>Authorization.</strong> Permissions (<code>resource:action</code>), roles (a tenant's, or the platform's), role grants for a tenant, one resource and a time, tenant entitlements, attribute-based policies (stored and versioned, decided by the application) and a Zanzibar-style relationship model with unique facts.</li>
+<li><strong>Credentials with no secret in the clear.</strong> A password is a PHC hash; a passkey is the public key; a one-time-code secret is ciphertext with the name of a key held outside the database and the last time step used; recovery codes, challenges (reset links, magic links, codes) and sign-in attempts (identifier hashed with a pepper) are hashes. A test holds the model to it: no attribute is named like a secret in the clear, and any concept that holds a secret, token or ciphertext is classified <code>restricted</code>.</li>
+<li><strong>Sessions.</strong> Devices, sessions (assurance level in the sense of NIST SP 800-63B, how it was authenticated, idle and absolute expiry, why it ended) and refresh tokens that keep a family and the token that replaced them, so a reuse can end the family. Short-lived data says how many days it is kept (challenges 1, sign-in attempts 30, sessions 90, devices 180, audit events 365).</li>
+<li><strong>Invitations, domains, policies, audit.</strong> Invitations with the roles to grant; domain claims and verified domains (unique across tenants); typed policies for passwords, lockout, sessions and second factors; and an <code>auditEvent</code> kept in a chain of hashes (each event holds the hash of the one before it).</li>
+</ul>
+<p>Federation (identity providers, directories), OAuth, machine identities and privileged access are modules still to come, as are the stored procedures and functions that do the business operations. The model is tested by composing it with the party model and tenancy, projecting it, binding it for each dialect and loading it into SQLite, DuckDB and PostgreSQL, where inserts that break a unique, a check or a foreign key are refused.</p>
 
 <h3>Generating files</h3>
 <p><code>generate(schema, { generators, naming?, dialect? })</code> runs <code>Generator</code>s and returns <code>Artifact</code>s (<code>{ path, text }</code>); a generator reads only what it is given and gives the same text for the same input. Writing the files to disk is not a generator's job.</p>
@@ -573,7 +585,7 @@ connect(driver, dialect, schema, { dialect }, p.convergence!, { ...p.planOptions
 <pre><code>cd commons/data &amp;&amp; bun run verify</code></pre>
 <p>which runs, in order (<code>package.json</code>): the TypeScript compiler (<code>tsc -p tsconfig.json</code>); the specification checker on <code>spec-kit/</code> (<code>mizan-check.ts --root spec-kit</code>); the Mizan rules at level L1 on it; <code>tools/check.ts</code>, the trace of sources and tests to the specifications and the layers check, held against <code>trace.baseline.txt</code>, which only shrinks; and <code>bun test suite/</code>. <code>bun run test:node</code> runs the same tests under <code>node --test</code>.</p>
 <ul>
-<li><strong>Spec kit.</strong> Twenty-eight specifications, <code>0001-layers</code> to <code>0028-modules</code>, each <code>spec-kit/specs/&lt;number-slug&gt;/spec.md</code> with an input paragraph, numbered requirements (<code>FR-nnn</code>), edge cases, success criteria and an out-of-scope list; <code>registry.tsv</code> lists them, all in force.</li>
+<li><strong>Spec kit.</strong> Thirty specifications, <code>0001-layers</code> to <code>0030-identity</code>, each <code>spec-kit/specs/&lt;number-slug&gt;/spec.md</code> with an input paragraph, numbered requirements (<code>FR-nnn</code>), edge cases, success criteria and an out-of-scope list; <code>registry.tsv</code> lists them, all in force.</li>
 <li><strong><code>enforcement.tsv</code>.</strong> Says what enforces each requirement (0024-spec-format): a <code>mechanism</code> of <code>check</code>, <code>gate</code>, <code>review</code> or <code>none</code>, and by what. At the time of writing 230 of its rows are a <code>check</code> by <code>cd commons/data &amp;&amp; bun run verify</code>, and one (0001 FR-012, the logical and physical naming conventions) is marked <code>none</code> with the note <em>Planned</em>.</li>
 <li><strong><code>proves()</code>.</strong> A test is <code>suite/&lt;kebab-case&gt;.test.ts</code> on IFC TypeScript, and <code>proves(["0001-layers FR-004"], "what it shows", fn)</code> names the requirements it proves, which the trace joins to the specifications. The sources carry <code>// Spec:</code> headers for the same join.</li>
 <li><strong>Real engines.</strong> <code>suite/engines-fixture.ts</code> opens SQLite (the runtime's <code>node:sqlite</code>), DuckDB (<code>@duckdb/node-api</code>) and PostgreSQL (PGlite, in process), in memory, and the tests load what <code>bind</code> and <code>execute</code> make and read the structure back. There is no stand-in for an engine.</li>
@@ -645,6 +657,8 @@ connect(driver, dialect, schema, { dialect }, p.convergence!, { ...p.planOptions
 <tr><td>0026</td><td>sql-kinds</td><td>reference data kept as CSV, typed rows, a TypeScript module</td></tr>
 <tr><td>0027</td><td>sql-osquery-atc</td><td>the osquery auto_table_construction configuration</td></tr>
 <tr><td>0028</td><td>modules</td><td>subject areas composed by a project into one domain</td></tr>
+<tr><td>0029</td><td>arca-tenancy</td><td>tenants and their hierarchy, for B2B and B2B2C</td></tr>
+<tr><td>0030</td><td>identity</td><td>principals, credentials, sessions, roles, policies and audit</td></tr>
 </tbody>
 </table>
 <footer>This page is written by hand from <code>about.ts</code>, <code>library.ts</code>, <code>package.json</code>, the specifications in <code>spec-kit/specs/</code> and the sources under <code>engine/</code>, <code>governance/</code>, <code>models/</code> and <code>sql/</code>. The short introduction is <code>README.md</code>.</footer>
