@@ -52,7 +52,8 @@
     "./sql/extensions/osquery-atc": "./sql/extensions/osquery-atc/mod.ts",
     "./sql/extensions/operations": "./sql/extensions/operations/mod.ts",
     "./sql/extensions/invariants": "./sql/extensions/invariants/mod.ts",
-    "./sql/presets": "./sql/presets/mod.ts"
+    "./sql/presets": "./sql/presets/mod.ts",
+    "./sql/cli": "./sql/cli/mod.ts"
   },
   "scripts": {
     "check": "tsc -p tsconfig.json",
@@ -69,5 +70,16 @@
     "fast-check": "4.10.2",
     "typescript": "7.0.2",
     "zod": "4.1.12"
+  },
+  "bin": {
+    "arcactl": "./sql/cli/arcactl.ts"
+  },
+  "peerDependencies": {
+    "pg": ">=8"
+  },
+  "peerDependenciesMeta": {
+    "pg": {
+      "optional": true
+    }
   }
 }
