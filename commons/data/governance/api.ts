@@ -1,4 +1,4 @@
-// Spec: 0001-layers FR-001, FR-009, FR-012; 0003-governance FR-001, FR-002, FR-004, FR-005, FR-006, FR-007, FR-008, FR-009; 0005-naming FR-001, FR-002
+// Spec: 0001-layers FR-001, FR-009, FR-012; 0003-governance FR-001, FR-002, FR-004, FR-005, FR-006, FR-007, FR-008, FR-009; 0005-naming FR-001, FR-002; 0044-issues FR-001
 /**
  * The public surface of governance (`@intellectual-frontiers/data/governance`), the first layer: a business domain (concepts, attributes, relationships, code lists), what must be true
  * of its data (annotations of the kinds a vocabulary defines), the identity of every element, the graph they make, and lint. It names no database; the logical schema is made from it.
@@ -16,6 +16,31 @@ export {
   annotationsOf,
 } from "./annotation.ts";
 export { type AnyCodeList, type CodeList, type CodeListSpec, type CodeSpec, codeList } from "./codelist.ts";
+export {
+  type AppliesTo,
+  canMove,
+  checkIssueMoves,
+  checkIssueSet,
+  type Evidence,
+  type IssueGoal,
+  isLive,
+  type Issue,
+  issue,
+  type IssueFinding,
+  type IssueRule,
+  type IssueSet,
+  issueSet,
+  type IssueSpec,
+  type Link,
+  liveIssues,
+  MOVES,
+  type IssuePriority,
+  type IssueSeverity,
+  type IssueSize,
+  STATUS_KINDS,
+  type Status,
+  type StatusKind,
+} from "./issue.ts";
 export { type ComposeError, composeModules, defineModule, type Module, moduleOf, type ModuleSpec, withRequired } from "./module.ts";
 export {
   binary,

@@ -1,0 +1,16 @@
+// Spec: 0044-issues FR-002
+/**
+ * The known issues of data (commons data 0044-issues): one file for each, numbered, listed here in order. Add an issue by adding its file and listing it; close it by changing its status, never by deleting it.
+ *
+ * @module
+ */
+import { issueSet } from "@intellectual-frontiers/data/governance";
+import i1 from "./00001-enforcement-in-application.ts";
+import i2 from "./00002-ddl-guard-event-trigger.ts";
+import i3 from "./00003-sealed-row-security-scope.ts";
+import i4 from "./00004-trace-gate-inert.ts";
+import i5 from "./00005-mutation-survivors.ts";
+import i6 from "./00006-named-test-unresolved.ts";
+import i7 from "./00007-issues-not-in-code.ts";
+
+export const issues = issueSet("data", [i1, i2, i3, i4, i5, i6, i7]);

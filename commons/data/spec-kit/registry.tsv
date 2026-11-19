@@ -42,3 +42,5 @@ number	slug	state
 0041	identity-authorize	in force
 0042	identity-agent-operations	in force
 0043	sql-invariants	in force
+0044	issues	in force
+0045	issues-model	in force

@@ -26,7 +26,7 @@ const COMMENTS = [
 /** Every finding of the library at `root`: the trace first, then the layers. */
 export async function findings(root: string): Promise<readonly kernel.Keyed[]> {
   const pkg = JSON.parse(await fs.readTextFile(path.join(root, "package.json"))) as { exports?: Record<string, string> };
-  const sources = await runtime.readSources(root, ["about.ts", "engine", "governance", "models", "extensions", "sql", "tools", "examples"]);
+  const sources = await runtime.readSources(root, ["about.ts", "engine", "governance", "issues", "models", "extensions", "sql", "tools", "examples"]);
   const tests = await runtime.readSources(root, ["suite"]);
   const specs = await runtime.readSpecs(root, "spec-kit/specs");
   const traced = kernel.traceFindings({ specs, sources, tests, ontology: [], specsFolder: "spec-kit/specs" });

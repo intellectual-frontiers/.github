@@ -30,6 +30,7 @@ export type UnitClass =
   | "preset"
   | "dialect"
   | "sqlextension"
+  | "issues"
   | "model"
   | "extension"
   | "cli"
@@ -60,6 +61,7 @@ const FOLDERS: readonly Folder[] = [
   { prefix: "sql/extensions/", class: "sqlextension", instances: true },
   { prefix: "sql/presets/", class: "preset", instances: false },
   { prefix: "sql/cli/", class: "cli", instances: false },
+  { prefix: "issues/", class: "issues", instances: false },
   { prefix: "models/", class: "model", instances: true },
   { prefix: "extensions/", class: "extension", instances: true },
   { prefix: "suite/", class: "suite", instances: false },
@@ -77,6 +79,7 @@ export const MAY_IMPORT: Readonly<Record<UnitClass, readonly UnitClass[]>> = {
   dialect: ["physical", "logical", "governance", "engine"],
   sqlextension: ["lifecycle", "physical", "logical", "governance", "engine"],
   preset: ["sqlextension", "lifecycle", "physical", "logical", "governance", "engine"],
+  issues: ["governance", "engine"],
   model: ["governance", "engine", "model"],
   extension: ["governance", "engine"],
   cli: ["preset", "sqlextension", "dialect", "lifecycle", "physical", "logical", "governance", "engine", "extension", "model"],
@@ -96,6 +99,7 @@ const LEVEL: Readonly<Record<UnitClass, number>> = {
   dialect: 4,
   sqlextension: 4,
   preset: 4.5,
+  issues: 4,
   model: 4,
   extension: 4,
   cli: 5,

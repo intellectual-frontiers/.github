@@ -1,6 +1,6 @@
 # @intellectual-frontiers/data
 
-Governance (what a business domain is and what must be true of its data), a logical schema made from it, and a physical schema for PostgreSQL, SQLite or DuckDB made from that, with extensions to each, and the lifecycle that changes a database from one physical schema to the next. It is an independent library of commons with its own specifications (`spec-kit/`, 0001 to 0043).
+Governance (what a business domain is and what must be true of its data), a logical schema made from it, and a physical schema for PostgreSQL, SQLite or DuckDB made from that, with extensions to each, and the lifecycle that changes a database from one physical schema to the next. It is an independent library of commons with its own specifications (`spec-kit/`, 0001 to 0045).
 
 **Full documentation: [README.html](https://htmlpreview.github.io/?https://github.com/intellectual-frontiers/.github/blob/main/commons/data/README.html)** (diagrams, every extension with an example, strategies, presets, limits and roadmap).
 
@@ -35,6 +35,7 @@ Each layer imports only the layers below it and the engine; a check of the libra
 - Models: `models/arca` (party), `models/arca-tenancy` (tenants, for B2B and B2B2C) and the identity modules (`models/identity`, `identity-access`, `-abac`, `-rebac`, `-pki`, `-machine`, `-device`, `-delegation`, `-agent`): one principal of five kinds (person, machine, device, AI agent, group) with roles, attributes, relationships, delegation and agent provenance, each a module a project composes only if it needs it. `sql/extensions/operations/identity` holds the decision engine (`decide`: roles, groups, relationships and policies; refusal wins, unknown never allows; a delegation never adds), the hash-chained audit sink and the operations of delegation and agents (tool calls with budgets and single-use approvals, the kill switch).
 - Operations: contracts in `governance/operation.ts`, run by `sql/extensions/operations` in one transaction with typed row operations, an authorizer and an audit sink.
 - Invariants and enforcement: `quality.appendOnly`, `transitions` and `atMost` say what must always be true of the records of a concept; `sql/extensions/invariants` writes them as triggers (PostgreSQL, SQLite); `enforcementOf` and `where` say, per dialect, what the database can enforce and what is left to the application (PostgreSQL all of it, SQLite triggers but no roles, DuckDB checks and keys only).
+- Issues as code: `governance/issue.ts` makes an issue a typed value (a `fixed` status carries its proof, a duplicate its original, a refused one its reason), kept as `issues/00001-<slug>.ts` files listed by `issues/mod.ts` in the library and in each module, checked by `bun run verify` (numbers, moves, proofs that resolve); `models/issues` and `sql/extensions/issues` keep a copy in a database (`syncIssues`: add, rewrite by hash, withdraw, reopen, one transaction, a ledger).
 - `sql/cli/`: the command line; in the layers table, not yet built.
 
 ## Verify
