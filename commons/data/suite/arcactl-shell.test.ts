@@ -49,7 +49,7 @@ const make = (shell: Shell, over: Partial<ShellInput> = {}): string => {
 function inShell(shell: Shell, scripts: readonly string[], snippet: (out: string) => string, extra: Record<string, string> = {}): { out: string; code: number; stderr: string } {
   const dir = mkdtempSync(join(work, "run-"));
   const files = scripts.map((s, i) => {
-    const f = join(dir, `s${i}`);
+    const f = join(dir, `s${i}${shell === "pwsh" ? ".ps1" : shell === "nu" ? ".nu" : ""}`);
     writeFileSync(f, s);
     return f;
   });
