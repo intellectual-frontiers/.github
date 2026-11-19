@@ -5,36 +5,23 @@
  *
  * @module
  */
-import { annotate, codeList, vocabularies } from "@intellectual-frontiers/data/governance";
-
-const { quality, requirements } = vocabularies;
-
-/** A code list from its codes and their definitions; the label of a code is its words, capitalised. */
-const list = (name: string, definition: string, codes: Readonly<Record<string, string>>, open = false) =>
-  codeList(name, {
-    definition,
-    codes: Object.fromEntries(
-      Object.entries(codes).map(([code, d]) => [
-        code,
-        { label: code.replace(/([A-Z])/g, " $1").replace(/^./, (c) => c.toUpperCase()), definition: d },
-      ]),
-    ),
-    annotations: [annotate(quality.openness, open ? "open" : "closed"), annotate(requirements.cites, ["0030-identity FR-004"])],
-  });
+import { list } from "./kit.ts";
 
 export const principalKind = list("principalKind", "What can be granted a role, own a key or act", {
   user: "A person who signs in",
-  serviceAccount: "A program that acts for itself",
+  machine: "A service, a workload, a pipeline or an integration: a program that acts for itself",
+  device: "A managed endpoint, a server or a thing: hardware that has an identity",
+  agent: "An AI agent: software that decides for itself what to do, and is accountable to an owner",
   group: "A set of principals, granted what its members are",
 });
-export const userStatus = list("userStatus", "Where a user account is in its life", {
-  pending: "Made, and not yet proved to be the person's",
-  active: "In use by the account",
-  suspended: "Held by an administrator",
-  locked: "Held because of failed sign-ins, until a time or an administrator frees it",
-  deprovisioned: "Removed by the directory it came from",
+export const principalStatus = list("principalStatus", "Where a principal is in its life", {
+  pending: "Made, and not yet usable",
+  active: "In use, and able to act",
+  suspended: "Held by an administrator, with nothing lost",
+  disabled: "Switched off: it can do nothing, and its credentials and delegations stop working",
   deleted: "Ended, with what is personal erased and the record kept for the audit trail",
 });
+export const decision = list("decision", "What an authorization decision was", { allow: "It was allowed", deny: "It was refused" });
 export const createdVia = list("createdVia", "How a user account came to be", {
   invited: "By an invitation that was accepted",
   selfSignup: "By the person signing up",
@@ -56,15 +43,10 @@ export const membershipSource = list("membershipSource", "How a user came to be 
   admin: "Added by an administrator",
 });
 export const groupSource = list("groupSource", "Where a group is kept", { local: "Made and kept here", directory: "Kept by a directory and mirrored here" });
-export const roleKind = list("roleKind", "Whether a role is the platform's or a tenant's", { system: "Made by the platform and the same for every tenant", custom: "Made by a tenant" });
-export const effect = list("effect", "What a policy decides", { allow: "Allows what it matches", deny: "Refuses what it matches, whatever else allows it" });
-export const conditionLanguage = list(
-  "conditionLanguage",
-  "The language a policy's condition is written in",
-  { cedar: "The Cedar policy language", cel: "The Common Expression Language", rego: "Open Policy Agent's Rego language", jsonLogic: "Rules written as JSON Logic" },
-  true,
-);
-export const enabledStatus = list("enabledStatus", "Whether a thing that can be turned off is in use", { active: "In use, and applied", disabled: "Turned off, and kept" });
+
+
+
+
 export const credentialKind = list("credentialKind", "What a principal proves itself with", {
   password: "A secret the person remembers",
   passkey: "A key pair held by the person's device, signed with by WebAuthn",
@@ -74,7 +56,12 @@ export const credentialKind = list("credentialKind", "What a principal proves it
   emailOtp: "A code sent by email",
   recoveryCode: "A code kept for when the other ways are lost",
   pushDevice: "A device that is asked to approve",
-});
+  apiKey: "A random secret that a program presents, kept as a keyed hash",
+  clientSecret: "A secret that an OAuth client presents, kept as a hash",
+  keyPair: "A key pair, of which only the public half is kept",
+  certificate: "A certificate, of which only the public half is kept",
+  workloadAttestation: "What a platform says of the workload that runs",
+}, true);
 export const credentialStatus = list("credentialStatus", "Where a credential is", { active: "In use, and trusted", revoked: "Ended by a person or a policy", expired: "Ended by time" });
 export const passwordAlgorithm = list("passwordAlgorithm", "How a password is hashed", { argon2id: "The memory-hard Argon2id hash", scrypt: "The memory-hard scrypt hash", bcrypt: "The bcrypt hash", pbkdf2: "The PBKDF2 key derivation" }, true);
 export const otpAlgorithm = list("otpAlgorithm", "The hash a one-time code is made with", { sha1: "The SHA-1 hash, the default of authenticator apps", sha256: "The SHA-256 hash", sha512: "The SHA-512 hash" });
@@ -127,12 +114,14 @@ export const domainPolicy = list("domainPolicy", "What a verified domain makes o
 });
 export const unlockMode = list("unlockMode", "How a locked account is freed", { timer: "By time passing", admin: "By an administrator", selfService: "By the user proving who they are" });
 export const mfaRequirement = list("mfaRequirement", "Whether a second factor is needed", { none: "Never asked for", optional: "Asked for if the user chooses to", required: "Always asked for", adaptive: "Asked for when the risk calls for it" });
-export const actorKind = list("actorKind", "What did something", { user: "A person acting for themselves", serviceAccount: "A program", system: "The platform itself, with no one acting", impersonator: "A person acting as another, with leave" });
+export const actorKind = list("actorKind", "What did something", { user: "A person acting for themselves", machine: "A program", device: "A device", agent: "An AI agent", system: "The platform itself, with no one acting", impersonator: "A person acting as another, with leave" });
 export const auditOutcome = list("auditOutcome", "How something that was tried ended", { success: "It was done", failure: "It failed", denied: "It was refused" });
-export const entitlementSource = list("entitlementSource", "Where a tenant's entitlement comes from", { plan: "A plan it is on", contract: "An agreement", grant: "Given by the platform" }, true);
+
 export const verificationMethod = list("verificationMethod", "How an address was proved to be a person's", {
   emailLink: "By a link sent to it",
   otp: "By a code sent to it",
   directoryAsserted: "By the directory it came from",
   admin: "By an administrator",
 });
+
+export const useStatus = list("useStatus", "Whether a thing is in use", { active: "In use, and applied", retired: "No longer applied, and kept for the record" });

@@ -11,6 +11,7 @@ import { concepts } from "./concepts.ts";
 
 export * from "./codes.ts";
 export * from "./concepts.ts";
+export * from "./kit.ts";
 
 /** The identity module: principals and accounts, authorization, credentials, sessions, invitations, domains, policies and audit. */
 export const identityModule = defineModule({

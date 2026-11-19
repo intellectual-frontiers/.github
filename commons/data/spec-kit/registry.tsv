@@ -30,3 +30,12 @@ number	slug	state
 0029	arca-tenancy	in force
 0030	identity	in force
 0031	operations	in force
+0032	identity-principals	in force
+0033	identity-access	in force
+0034	identity-abac	in force
+0035	identity-rebac	in force
+0036	identity-pki	in force
+0037	identity-machine	in force
+0038	identity-device	in force
+0039	identity-delegation	in force
+0040	identity-agent	in force

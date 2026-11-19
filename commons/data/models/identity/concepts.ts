@@ -1,4 +1,4 @@
-// Spec: 0030-identity FR-001, FR-002, FR-003, FR-005, FR-006, FR-007
+// Spec: 0030-identity FR-001, FR-002, FR-005, FR-006, FR-007, FR-008, FR-009, FR-010
 /**
  * The concepts of the identity model (commons data 0030-identity): who may do what, and how they prove it. A principal (a user, a service account or a group) plays the part for identity that a
  * party plays for Arca. Secrets are never stored in the clear: a password is a hash, a one-time-code secret is ciphertext under a key kept outside the database, and a token or a key is a hash of a
@@ -9,7 +9,6 @@
 import {
   type AnyConcept,
   annotate,
-  attribute,
   binary,
   boolean,
   codeOf,
@@ -17,7 +16,6 @@ import {
   identifier,
   instant,
   integer,
-  relationship,
   structured,
   text,
   vocabularies,
@@ -26,43 +24,38 @@ import { electronicContact, person } from "@intellectual-frontiers/data/models/a
 import { tenant } from "@intellectual-frontiers/data/models/arca-tenancy";
 import * as c from "./codes.ts";
 
-const { quality, requirements, security, usage, privacy } = vocabularies;
-const cites = (...frs: readonly string[]) =>
-  annotate(
-    requirements.cites,
-    frs.map((fr) => `0030-identity ${fr}`),
-  );
-const restricted = annotate(security.classification, "restricted");
-const confidential = annotate(security.classification, "confidential");
-const internal = annotate(security.classification, "internal");
-const keep = (days: number) => annotate(quality.retention, { days });
-const held = (category: vocabularies.privacy.PdTerm, ...purposes: readonly string[]) => annotate(privacy.personal, { category, purposes });
-const unique = (...members: readonly string[]) => annotate(quality.unique, { members });
-const lookup = (...members: readonly string[]) => annotate(usage.lookup, { members });
-
-type Attr = ReturnType<typeof attribute>;
-const req = (type: Parameters<typeof attribute>[0], definition: string, ...annotations: readonly ReturnType<typeof annotate>[]): Attr => attribute(type, { definition, annotations });
-const opt = (type: Parameters<typeof attribute>[0], definition: string, ...annotations: readonly ReturnType<typeof annotate>[]): Attr =>
-  attribute(type, { definition, multiplicity: "optional", annotations });
-const many = (type: Parameters<typeof attribute>[0], definition: string, ...annotations: readonly ReturnType<typeof annotate>[]): Attr =>
-  attribute(type, { definition, multiplicity: "many", annotations });
-const key = (what: string): Attr => attribute(identifier(), { definition: `What identifies ${what}, made by the application` });
-const one = (to: AnyConcept | (() => AnyConcept), definition: string) => relationship(to, { cardinality: "one", definition });
-const maybe = (to: AnyConcept | (() => AnyConcept), definition: string) => relationship(to, { cardinality: "optional", definition });
+const { quality } = vocabularies;
+import { citing, confidential, cites, held, internal, keep, key, lookup, many, maybe, one, opt, req, restricted, unique } from "./kit.ts";
 
 // ---------------------------------------------------------------- principals and accounts
 
-/** Anyone or anything that can be granted a role, own a key or act: a user, a service account or a group. */
-export const principal = concept("principal", {
-  definition: "Anyone or anything that can be granted a role, own a key or act: a user, a service account or a group",
+/**
+ * Anyone or anything that can be granted a role, own a key or act: a person, a machine, a device, an AI agent or a group. What every kind has (a lifecycle, an owner, credentials, roles, attributes,
+ * policies and a place in the audit trail) is attached to the principal; what is specific to a kind is in a concept of its own, in the module of that kind.
+ */
+export const principal: AnyConcept = concept("principal", {
+  definition: "Anyone or anything that can be granted a role, own a key or act: a person, a machine, a device, an AI agent or a group",
   attributes: {
     principalId: key("the principal"),
-    kind: req(codeOf(c.principalKind), "Whether the principal is a user, a service account or a group"),
+    kind: req(codeOf(c.principalKind), "Whether the principal is a user, a machine, a device, an agent or a group"),
     displayName: opt(text(), "The name the principal is shown by", held("Name", "show who did something")),
+    status: req(codeOf(c.principalStatus), "Where the principal is in its life; making it disabled denies everything it could do, at once"),
+    statusReason: opt(text(), "Why the principal is in the status it is in"),
+    statusChangedAt: req(instant(), "When the principal's status last changed"),
     createdAt: req(instant(), "When the principal was made"),
   },
   identifiedBy: ["principalId"],
-  annotations: [confidential, cites("FR-001", "FR-002")],
+  relationships: {
+    tenant: maybe(tenant, "The tenant that owns the principal; empty for a user who joins tenants by membership"),
+    owner: maybe(() => principal, "The person or group accountable for the principal; required of a machine, a device and an agent by the operation that makes them"),
+  },
+  annotations: [
+    confidential,
+    citing("0032-identity-principals")("FR-001", "FR-002"),
+    annotate(quality.differs, { name: "principal_not_its_own_owner", members: ["principalId", "owner"] }),
+    lookup("kind", "status"),
+    lookup("owner"),
+  ],
 });
 
 /** A user account: a person's way in. Its identity is its principal's. */
@@ -70,7 +63,6 @@ export const userAccount = concept("userAccount", {
   definition: "A person's way in: who signs in, and where it stands",
   attributes: {
     loginIdentifier: req(text(), "What the user signs in by, unique within its home tenant", held("Username", "let the user sign in")),
-    status: req(codeOf(c.userStatus), "Where the account is in its life"),
     createdVia: req(codeOf(c.createdVia), "How the account came to be"),
     lockedUntil: opt(instant(), "Until when the account is locked, where it is"),
     lastAuthenticatedAt: opt(instant(), "When the user last proved who they are"),
@@ -135,140 +127,6 @@ export const groupMember = concept("groupMember", {
   identifiedBy: ["group", "member"],
   relationships: { group: one(userGroup, "The group"), member: one(principal, "The user or the group that is a member") },
   annotations: [internal, cites("FR-001"), lookup("member")],
-});
-
-// ---------------------------------------------------------------- authorization
-
-/** A thing that can be done, named `resource:action`; each module registers its own. */
-export const permission = concept("permission", {
-  definition: "A thing that can be done, named by its resource and its action",
-  attributes: {
-    permissionId: key("the permission"),
-    permissionKey: req(text(), "The permission as `resource:action`, unique"),
-    definition: req(text(), "What the permission lets a principal do"),
-    ownerModule: req(text(), "The module that registered the permission"),
-  },
-  identifiedBy: ["permissionId"],
-  annotations: [internal, cites("FR-003"), unique("permissionKey")],
-});
-
-/** A role: a set of permissions that is granted together. */
-export const accessRole = concept("accessRole", {
-  definition: "A set of permissions that is granted together",
-  attributes: {
-    roleId: key("the role"),
-    key: req(text(), "The role's short name, unique within its tenant"),
-    name: req(text(), "What the role is called"),
-    kind: req(codeOf(c.roleKind), "Whether the platform or a tenant made it"),
-    definition: req(text(), "What a holder of the role does"),
-  },
-  identifiedBy: ["roleId"],
-  relationships: { tenant: maybe(tenant, "The tenant that made the role; empty for a role of the platform, usable in every tenant") },
-  annotations: [internal, cites("FR-003"), unique("tenant", "key")],
-});
-
-/** A permission that a role holds. */
-export const rolePermission = concept("rolePermission", {
-  definition: "A permission that a role holds",
-  attributes: {},
-  identifiedBy: ["role", "permission"],
-  relationships: { role: one(accessRole, "The role"), permission: one(permission, "The permission") },
-  annotations: [internal, cites("FR-003")],
-});
-
-/** A role granted to a principal, in a tenant, perhaps for one resource and for a time. */
-export const roleAssignment = concept("roleAssignment", {
-  definition: "A role granted to a principal, in a tenant, perhaps for one resource and for a time",
-  attributes: {
-    roleAssignmentId: key("the grant"),
-    resourceType: opt(text(), "The kind of the one resource the grant is limited to, where it is"),
-    resourceId: opt(text(), "The one resource the grant is limited to, where it is"),
-    validFrom: req(instant(), "When the grant starts"),
-    validTo: opt(instant(), "When the grant ends, where it does"),
-    reason: opt(text(), "Why it was granted"),
-  },
-  identifiedBy: ["roleAssignmentId"],
-  relationships: {
-    principal: one(principal, "Who holds the role"),
-    role: one(accessRole, "The role"),
-    tenant: one(tenant, "The tenant the grant is in"),
-    grantedBy: one(principal, "Who granted it"),
-  },
-  annotations: [confidential, cites("FR-003"), lookup("principal", "tenant")],
-});
-
-/** What a tenant may use, as distinct from what a user may do. */
-export const entitlement = concept("entitlement", {
-  definition: "What a tenant may use, as distinct from what a user may do",
-  attributes: {
-    entitlementId: key("the entitlement"),
-    featureKey: req(text(), "The feature the tenant may use"),
-    limitValue: opt(integer(), "How much of it, where it is limited"),
-    validFrom: req(instant(), "When it starts"),
-    validTo: opt(instant(), "When it ends, where it does"),
-    source: req(codeOf(c.entitlementSource), "Where it comes from"),
-  },
-  identifiedBy: ["entitlementId"],
-  relationships: { tenant: one(tenant, "The tenant") },
-  annotations: [internal, cites("FR-003"), lookup("tenant", "featureKey")],
-});
-
-/** A rule of attribute-based access control: stored and versioned here, decided by the application. */
-export const accessPolicy = concept("accessPolicy", {
-  definition: "A rule of attribute-based access control: stored and versioned here, decided by the application",
-  attributes: {
-    accessPolicyId: key("the policy"),
-    name: req(text(), "What the policy is called"),
-    effect: req(codeOf(c.effect), "What the policy decides"),
-    resourceType: req(text(), "The kind of resource it is about"),
-    action: req(text(), "The action it is about"),
-    condition: req(text(), "When it applies, written in its language"),
-    conditionLanguage: req(codeOf(c.conditionLanguage), "The language of the condition"),
-    priority: req(integer(), "Which policy wins where two apply: the lower number"),
-    status: req(codeOf(c.enabledStatus), "Whether it is in use"),
-    version: req(integer(), "Which version of the policy this is"),
-  },
-  identifiedBy: ["accessPolicyId"],
-  relationships: { tenant: maybe(tenant, "The tenant it is for; empty for the platform's") },
-  annotations: [internal, cites("FR-003"), unique("tenant", "name", "version")],
-});
-
-/** The definition of a relationship-based access model, in the style of Zanzibar. */
-export const authorizationModel = concept("authorizationModel", {
-  definition: "The definition of a relationship-based access model: its types and relations",
-  attributes: {
-    authorizationModelId: key("the model"),
-    version: req(integer(), "Which version of the model this is"),
-    definition: req(structured(), "The types and relations"),
-    status: req(codeOf(c.enabledStatus), "Whether it is in use"),
-  },
-  identifiedBy: ["authorizationModelId"],
-  relationships: { tenant: maybe(tenant, "The tenant it is for; empty for the platform's") },
-  annotations: [internal, cites("FR-003")],
-});
-
-/** A fact of relationship-based access: this subject has this relation to this object. */
-export const relationTuple = concept("relationTuple", {
-  definition: "A fact of relationship-based access: this subject has this relation to this object",
-  attributes: {
-    relationTupleId: key("the fact"),
-    tupleKey: req(text(), "A hash of the tenant, the object, the relation and the subject, unique, so that a fact is not recorded twice"),
-    objectType: req(text(), "The kind of the object"),
-    objectId: req(text(), "The object"),
-    relation: req(text(), "The relation"),
-    subjectType: req(text(), "The kind of the subject"),
-    subjectId: req(text(), "The subject"),
-    subjectRelation: opt(text(), "The relation of the subject that is meant, where a set is"),
-    createdAt: req(instant(), "When the fact was recorded"),
-  },
-  identifiedBy: ["relationTupleId"],
-  relationships: { tenant: one(tenant, "The tenant the fact is in") },
-  annotations: [
-    internal,
-    cites("FR-003"),
-    unique("tupleKey"),
-    lookup("objectType", "objectId", "relation"),
-  ],
 });
 
 // ---------------------------------------------------------------- credentials
@@ -385,18 +243,18 @@ export const loginAttempt = concept("loginAttempt", {
 
 // ---------------------------------------------------------------- sessions
 
-/** A device a principal signs in from. */
-export const device = concept("device", {
-  definition: "A device a principal signs in from",
+/** A browser or app that a principal signs in from, recognised by a hash of what it says it is. */
+export const knownBrowser = concept("knownBrowser", {
+  definition: "A browser or app that a principal signs in from, recognised by a hash of what it says it is",
   attributes: {
-    deviceId: key("the device"),
+    knownBrowserId: key("the browser"),
     fingerprintHash: req(text(), "A hash of what the browser says it is", held("BrowserFingerprint", "recognise a device the user has used")),
     label: opt(text(), "What the person calls it"),
     firstSeenAt: req(instant(), "When it was first seen"),
     lastSeenAt: req(instant(), "When it was last seen"),
     trustedUntil: opt(instant(), "Until when it is trusted not to be asked for a second factor"),
   },
-  identifiedBy: ["deviceId"],
+  identifiedBy: ["knownBrowserId"],
   relationships: { principal: one(principal, "Whose it is") },
   annotations: [confidential, keep(180), cites("FR-006")],
 });
@@ -424,7 +282,7 @@ export const loginSession = concept("loginSession", {
   relationships: {
     principal: one(principal, "Who is signed in"),
     tenant: maybe(tenant, "The tenant the session is working in"),
-    device: maybe(device, "The device it is on"),
+    knownBrowser: maybe(knownBrowser, "The browser or app it is on"),
   },
   annotations: [confidential, keep(90), cites("FR-006"), lookup("principal", "status")],
 });
@@ -470,15 +328,6 @@ export const invitation = concept("invitation", {
     acceptedBy: maybe(userAccount, "Who took it up"),
   },
   annotations: [restricted, cites("FR-008"), lookup("tenant", "email")],
-});
-
-/** A role that an invitation grants when it is accepted. */
-export const invitationRole = concept("invitationRole", {
-  definition: "A role that an invitation grants when it is accepted",
-  attributes: {},
-  identifiedBy: ["invitation", "role"],
-  relationships: { invitation: one(invitation, "The invitation"), role: one(accessRole, "The role") },
-  annotations: [internal, cites("FR-008")],
 });
 
 /** A claim on a domain, waiting to be proved. */
@@ -589,7 +438,13 @@ export const auditEvent = concept("auditEvent", {
   attributes: {
     auditEventId: key("the event"),
     occurredAt: req(instant(), "When it happened"),
-    actorKind: req(codeOf(c.actorKind), "What did it"),
+    actorKind: req(codeOf(c.actorKind), "What did it: a person, a machine, a device, an agent, the platform or someone acting as another"),
+    decision: opt(codeOf(c.decision), "What the decision was, for an event that records one"),
+    delegationKey: opt(text(), "The delegation it was done under; not a reference, so that the trail outlives it"),
+    runKey: opt(text(), "The run of an agent it was done in; not a reference, so that the trail outlives it"),
+    traceId: opt(text(), "The trace it is part of"),
+    chain: opt(structured(), "The principals between the person accountable and the actor, root first"),
+    policyRefs: opt(structured(), "The roles, policies and grants that decided"),
     action: req(text(), "What was done, named `subject.verb`; each module adds its own"),
     outcome: req(codeOf(c.auditOutcome), "How it ended"),
     targetConcept: opt(text(), "The kind of thing it was done to"),
@@ -604,17 +459,20 @@ export const auditEvent = concept("auditEvent", {
     eventHash: req(text(), "The hash of this event and the one before"),
   },
   identifiedBy: ["auditEventId"],
-  relationships: { tenant: maybe(tenant, "The tenant it was in"), actor: maybe(principal, "Who did it, where a principal did") },
+  relationships: {
+    tenant: maybe(tenant, "The tenant it was in"),
+    actor: maybe(principal, "Who did it, where a principal did"),
+    onBehalfOf: maybe(principal, "The person or group accountable at the root of the chain the actor acted in"),
+  },
   annotations: [restricted, keep(365), cites("FR-010"), unique("eventHash"), lookup("occurredAt")],
 });
 
-/** Every concept of the model, in the order they are written. */
+/** Every concept of the core, in the order they are written. */
 export const concepts: readonly AnyConcept[] = [
   principal, userAccount, contactVerification, membership, userGroup, groupMember,
-  permission, accessRole, rolePermission, roleAssignment, entitlement, accessPolicy, authorizationModel, relationTuple,
   credential, passwordCredential, passkey, otpSecret, recoveryCode, challenge, loginAttempt,
-  device, loginSession, refreshToken,
-  invitation, invitationRole, domainClaim, verifiedDomain,
+  knownBrowser, loginSession, refreshToken,
+  invitation, domainClaim, verifiedDomain,
   passwordPolicy, lockoutPolicy, sessionPolicy, mfaPolicy,
   auditEvent,
 ];
