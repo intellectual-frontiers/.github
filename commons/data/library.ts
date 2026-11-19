@@ -17,6 +17,7 @@ export const library = {
     "./sql/logical",
     "./sql/physical",
     "./models/arca",
+    "./issues",
     "./models/arca-tenancy",
     "./models/identity",
     "./models/identity-access",
@@ -27,6 +28,7 @@ export const library = {
     "./models/identity-device",
     "./models/identity-delegation",
     "./models/identity-agent",
+    "./models/issues",
     "./sql/dialects/postgres",
     "./sql/dialects/sqlite",
     "./sql/dialects/duckdb",
@@ -53,6 +55,7 @@ export const library = {
     "./sql/extensions/osquery-atc",
     "./sql/extensions/operations",
     "./sql/extensions/invariants",
+    "./sql/extensions/issues",
     "./sql/presets",
   ],
   summary:
