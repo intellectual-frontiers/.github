@@ -23,7 +23,8 @@ import {
 import { dialect as duckdb } from "@intellectual-frontiers/data/sql/dialects/duckdb";
 import { dialect as postgres } from "@intellectual-frontiers/data/sql/dialects/postgres";
 import { dialect as sqlite } from "@intellectual-frontiers/data/sql/dialects/sqlite";
-import { accessSource } from "@intellectual-frontiers/data/sql/extensions/access";
+import { accessSource, scopeStatement, sealedScope } from "@intellectual-frontiers/data/sql/extensions/access";
+import { sha256Hex } from "@intellectual-frontiers/data/sql/lifecycle";
 import { partitions } from "@intellectual-frontiers/data/sql/extensions/partitions";
 import { column, columnName, param, routinesSource, table } from "@intellectual-frontiers/data/sql/extensions/routines";
 import { viewsSource } from "@intellectual-frontiers/data/sql/extensions/views";
@@ -276,6 +277,47 @@ proves(
       const sql = render(p);
       assert(sql.includes('GRANT SELECT ON "document" TO "reader", "writer";'));
       assert(!sql.includes('ALTER TABLE "ledger"'), "no scope, no row-level security");
+    });
+  },
+);
+
+proves(
+  ["0009-sql-features FR-019"],
+  "a sealed scope is trusted only with the mark of the issuer that holds the key: a session that sets the scope itself, forges its mark or reuses another's sees nothing, cannot read the key or make a mark, and the owner of the table cannot weaken row security without the unlock secret",
+  async () => {
+    const KEY = "issuer-key-kept-outside-the-database";
+    const UNLOCK = "unlock-secret";
+    const schema = schemaOf(document, ledger);
+    await withEngine("postgres", async (e) => {
+      const p = must(postgres, schema, { sources: [accessSource({ seal: { key: KEY, unlock: sha256Hex(UNLOCK) } })] });
+      await e.run("CREATE ROLE reader; CREATE ROLE writer;");
+      await load(e, p);
+      await e.run(`INSERT INTO "document" VALUES ('d1', 'a', 'Alpha'), ('d2', 'b', 'Beta')`);
+      const ids = async () => (await e.rows(`SELECT id FROM "document" ORDER BY id`)).map((r) => r["id"]);
+      await e.run("SET ROLE reader");
+      await e.run("SET app.tenant = 'a'");
+      same(await ids(), [], "a scope the session set itself is not trusted");
+      await e.run("SET app.tenant = 'a.0000000000000000000000000000000000000000000000000000000000000000'");
+      same(await ids(), [], "a forged mark is not trusted");
+      await e.run(scopeStatement(KEY, "tenant", "a", "app", false));
+      same(await ids(), ["d1"], "the issuer's mark is");
+      await e.run(`SET app.tenant = 'b.${sealedScope(KEY, "tenant", "a").slice(2)}'`);
+      same(await ids(), [], "the mark of one value is not the mark of another");
+      await e.run(scopeStatement(KEY, "tenant", "b", "app", false));
+      same(await ids(), ["d2"]);
+      assert(await refuses(e, `SELECT "secret" FROM "ifc_seal"."key"`), "the key cannot be read");
+      assert(await refuses(e, `SELECT "ifc_seal"."mac"('tenant=a')`), "a mark cannot be made");
+      assert(await refuses(e, `INSERT INTO "ifc_seal"."key" VALUES (true, 'mine')`), "the key cannot be replaced");
+      await e.run("RESET ROLE");
+      for (const attack of [
+        `ALTER TABLE "document" DISABLE ROW LEVEL SECURITY`,
+        `ALTER TABLE "document" NO FORCE ROW LEVEL SECURITY`,
+        `DROP POLICY "document_tenant_select" ON "document"`,
+        `DROP TABLE "document" CASCADE`,
+      ])
+        assert(await refuses(e, attack), `refused: ${attack}`);
+      await e.run(`SELECT set_config('ifc.ddl_unlock', '${UNLOCK}', false)`);
+      await e.run(`DROP POLICY "document_tenant_select" ON "document"`);
     });
   },
 );

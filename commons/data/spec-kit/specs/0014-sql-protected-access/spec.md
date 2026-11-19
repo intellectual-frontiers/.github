@@ -35,7 +35,7 @@
 
 ## What the database holds
 
-- **FR-012**: On PostgreSQL with roles that own nothing, a role that governance lets read MUST see through the view only the rows of its scope and MUST NOT be able to read the table; a role that governance lets write MUST be able to insert through the view in its scope and MUST NOT be able to outside it; and the guard MUST refuse `ALTER TABLE` and `DROP TABLE` in the schema of the tables outside a migration and allow them in one.
+- **FR-012**: On PostgreSQL with roles that own nothing, a role that governance lets read MUST see through the view only the rows of its scope and MUST NOT be able to read the table; a role that governance lets write MUST be able to insert through the view in its scope and MUST NOT be able to outside it; and the guard MUST refuse `ALTER TABLE` and `DROP TABLE` in the schema of the tables outside a migration and allow them in one. Where a project gives a secret that seals the flag (`migratingSecret`), the guard MUST hold only its hash, a session that says `on` or guesses MUST NOT be taken for a migration, and one that holds the secret MUST be.
 - **FR-013**: On SQLite, DuckDB and PostgreSQL, the plans from empty and from each version of a domain to the next, run with the layer, MUST leave the tables in their schema, a view of each with the columns of the last version, the reference rows and no table of the views' schema.
 
 ## Out of scope

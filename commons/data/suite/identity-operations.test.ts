@@ -19,7 +19,7 @@ import { identityDelegationModule } from "@intellectual-frontiers/data/models/id
 import { identityRebacModule } from "@intellectual-frontiers/data/models/identity-rebac";
 import { agentImplementations, checkExpr, decide, evaluate, type Expr, identityAuditSink, type Implementation, operations, type Runtime, verifyAuditChain } from "@intellectual-frontiers/data/sql/extensions/operations";
 import { projectDomain } from "@intellectual-frontiers/data/sql/logical";
-import { invariants, invariantsOf } from "@intellectual-frontiers/data/sql/extensions/invariants";
+import { guardKeyOf, invariants, invariantsOf, unlockStatement } from "@intellectual-frontiers/data/sql/extensions/invariants";
 import { bind, type StatementSource } from "@intellectual-frontiers/data/sql/physical";
 import { DIALECTS, load, openEngine, type Engine } from "./engines-fixture.ts";
 import { same } from "./governance-fixture.ts";
@@ -50,8 +50,8 @@ const AT = "'2026-01-01T00:00:00Z'";
 const LATER = "2027-01-01T00:00:00.000Z";
 const FIXED = { now: () => NOW, newId: (() => { let n = 0; return () => `gen${++n}`; })() };
 
-const decideOp = operation("decideForTest", { definition: "Decides, for the tests", kind: "query", input: { principal: "text", action: "text", tenant: "text", resourceType: { type: "text", optional: true }, resourceId: { type: "text", optional: true }, delegation: { type: "text", optional: true }, context: { type: "text", optional: true } }, reads: ["principal", "roleAssignment", "accessRole", "rolePermission", "permission", "accessPolicy"], runsAs: "service", idempotent: true });
-const chainOp = operation("verifyChainForTest", { definition: "Verifies the audit chain, for the tests", kind: "query", input: {}, reads: ["auditEvent"], runsAs: "service", idempotent: true });
+const decideOp = operation("decideForTest", { definition: "Decides, for the tests", kind: "query", input: { principal: "text", action: "text", tenant: "text", resourceType: { type: "text", optional: true }, resourceId: { type: "text", optional: true }, delegation: { type: "text", optional: true }, context: { type: "text", optional: true } }, reads: ["principal", "roleAssignment", "accessRole", "rolePermission", "permission", "accessPolicy"], public: true, runsAs: "service", idempotent: true });
+const chainOp = operation("verifyChainForTest", { definition: "Verifies the audit chain, for the tests", kind: "query", input: {}, reads: ["auditEvent"], public: true, runsAs: "service", idempotent: true });
 const decideImpl: Implementation = async (tx, i) => {
   const d = await decide(tx, {
     principal: String(i["principal"]),
@@ -467,5 +467,49 @@ proves(
     const sqlite = bind(schema, { dialect: DIALECTS[0].dialect, sources: [invariants()] });
     assert(sqlite.kind === "ok");
     if (sqlite.kind === "ok") assert(sqlite.value.statements.filter((s) => s.group === "routine" && /CREATE TRIGGER/.test(s.sql)).length > 8, "triggers for SQLite");
+  },
+);
+
+proves(
+  ["0043-sql-invariants FR-007"],
+  "on PostgreSQL the owner of a table cannot weaken the invariants: dropping, disabling, renaming or replacing a trigger or its function, or dropping the table, is refused unless the session holds the unlock secret, and with the guard left out it is not",
+  async () => {
+    const SECRET = "a-long-secret-kept-outside-the-database";
+    const attacks = [
+      `DROP TRIGGER "inv_audit_event_append_only" ON "audit_event"`,
+      `ALTER TABLE "audit_event" DISABLE TRIGGER "inv_audit_event_append_only"`,
+      `ALTER TABLE "audit_event" DISABLE TRIGGER ALL`,
+      `ALTER TRIGGER "inv_audit_event_append_only" ON "audit_event" RENAME TO "harmless"`,
+      `CREATE OR REPLACE FUNCTION "inv_audit_event_append_only"() RETURNS trigger LANGUAGE plpgsql AS $x$ BEGIN RETURN NEW; END $x$`,
+      `DROP FUNCTION "inv_audit_event_append_only"() CASCADE`,
+      `DROP TABLE "audit_event" CASCADE`,
+      `CREATE OR REPLACE FUNCTION "inv_guard_drop"() RETURNS event_trigger LANGUAGE plpgsql AS $x$ BEGIN RETURN; END $x$`,
+    ];
+    const { e } = await world("postgres", [invariants({ guard: { unlock: guardKeyOf(SECRET) } })]);
+    try {
+      for (const a of attacks) assert(await refused(e, a), `refused: ${a}`);
+      same(Number((await e.rows(`SELECT count(*) n FROM pg_trigger WHERE tgname = 'inv_audit_event_append_only' AND tgenabled = 'O'`))[0]?.["n"]), 1, "and the trigger is still there, enabled");
+      await e.run(unlockStatement("a-wrong-secret", false));
+      assert(await refused(e, attacks[0] as string), "a wrong secret does not unlock it");
+      await e.run(unlockStatement(SECRET, false));
+      await e.run(attacks[0] as string);
+      await e.run(`ALTER TABLE "audit_event" DISABLE TRIGGER ALL`);
+      await e.run(unlockStatement("", false));
+      assert(await refused(e, `DROP TRIGGER "inv_audit_event_append_only_t" ON "audit_event"`), "locked again");
+    } finally {
+      await e.close();
+    }
+    const open = await world("postgres", [invariants({ guard: false })]);
+    try {
+      await open.e.run(`DROP TRIGGER "inv_audit_event_append_only" ON "audit_event"`);
+    } finally {
+      await open.e.close();
+    }
+    const unlockless = await world("postgres", [invariants()]);
+    try {
+      assert(await refused(unlockless.e, `DROP TRIGGER "inv_audit_event_append_only" ON "audit_event"`), "with no unlock secret nothing opens it");
+    } finally {
+      await unlockless.e.close();
+    }
   },
 );

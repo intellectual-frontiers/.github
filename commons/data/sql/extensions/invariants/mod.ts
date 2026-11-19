@@ -7,6 +7,7 @@
  * @module
  */
 import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
+import { sha256Hex } from "@intellectual-frontiers/data/sql/lifecycle";
 import { vocabularies, words } from "@intellectual-frontiers/data/governance";
 import { carriedOf, type Column, type LogicalId, type Table } from "@intellectual-frontiers/data/sql/logical";
 import { type BindContext, type Dialect, type Need, type PhysicalError, qualified, type Statement, type StatementSource, where, writeCode } from "@intellectual-frontiers/data/sql/physical";
@@ -17,7 +18,18 @@ const { quality } = vocabularies;
 export interface InvariantSettings {
   /** What to do where the dialect has no triggers: `refuse` (an error value, the default) or `carry` (no statements; the invariant is only declared). */
   readonly unsupported?: "refuse" | "carry";
+  /**
+   * Where the dialect has event triggers (PostgreSQL), the guard that refuses to weaken the invariants (0043-sql-invariants FR-007): on by default, `false` to leave it out. `unlock` is the hash of a
+   * secret (`guardKeyOf`) that lets a session that knows it change them (`unlockStatement`), as a migration must; without one nothing but a superuser's disabling of the guard can.
+   */
+  readonly guard?: false | { readonly unlock?: string };
 }
+
+/** The hash of a secret that unlocks the guard, to give as `guard.unlock`; the secret itself is kept outside the database. */
+export const guardKeyOf = (secret: string): string => sha256Hex(secret);
+
+/** The statement that unlocks the guard for the session (or, where `local`, for the transaction) that runs it. */
+export const unlockStatement = (secret: string, local = true): string => `SELECT set_config('ifc.ddl_unlock', '${secret.replaceAll("'", "''")}', ${local ? "true" : "false"});`;
 
 /** One invariant of the schema. */
 export interface Invariant {
@@ -166,8 +178,34 @@ export function invariants(given: InvariantSettings = {}): StatementSource {
         }
       }
     }
+    if (dialect.name === "postgres" && given.guard !== false && dialect.features.includes("event-triggers")) out.push(...guardStatements(context, declared.map((t) => t.id), given.guard?.unlock));
     return errors.length > 0 ? err(errors) : ok(out);
   };
+}
+
+/**
+ * The guard (0043-sql-invariants FR-007): event triggers that refuse, unless the session holds the unlock secret, to drop a trigger or function of an invariant (alone, with its table or with its schema), to
+ * disable one, to rename one or to replace one, so that the owner of a table cannot weaken what the database enforces. The guard's own functions are named as an invariant's, so they are guarded too.
+ */
+function guardStatements(context: BindContext, of: LogicalId[], unlock: string | undefined): Statement[] {
+  const { dialect, written } = context;
+  const lit = (s: string): string => dialect.literal(s);
+  const fn = (n: string): string => qualified(dialect, written.qualifier, n);
+  const open = unlock === undefined ? "FALSE" : `encode(sha256(convert_to(coalesce(current_setting('ifc.ddl_unlock', true), ''), 'UTF8')), 'hex') = ${lit(unlock)}`;
+  const body = (inner: string): string => `AS $g$\nDECLARE o record;\nBEGIN\n  IF ${open} THEN RETURN; END IF;\n${inner}END\n$g$;`;
+  const refuse = (what: string): string => `RAISE EXCEPTION '%: %', ${lit(what)}, o.object_identity USING ERRCODE = 'insufficient_privilege', HINT = 'the invariants of the database are changed by a session that holds the unlock secret';`;
+  const s = (sql: string): Statement => ({ group: "routine", of, sql });
+  return [
+    s(`CREATE OR REPLACE FUNCTION ${fn("inv_guard_drop")}() RETURNS event_trigger LANGUAGE plpgsql ${body(`  FOR o IN SELECT object_type, object_identity FROM pg_event_trigger_dropped_objects() LOOP\n    IF o.object_type IN ('trigger', 'function') AND o.object_identity ~ '(^|[ .])inv_' THEN ${refuse("an invariant of the database cannot be dropped")} END IF;\n  END LOOP;\n`)}`),
+    s(`CREATE OR REPLACE FUNCTION ${fn("inv_guard_end")}() RETURNS event_trigger LANGUAGE plpgsql ${body(`  FOR o IN SELECT command_tag, object_identity, objid FROM pg_event_trigger_ddl_commands() LOOP\n    IF o.command_tag = 'ALTER TABLE' AND EXISTS (SELECT 1 FROM pg_trigger WHERE tgrelid = o.objid AND tgname ~ '^inv_' AND tgenabled <> 'O') THEN ${refuse("an invariant of the database cannot be disabled")} END IF;\n    IF o.command_tag IN ('CREATE FUNCTION', 'ALTER FUNCTION') AND o.object_identity ~ '(^|[.])inv_' THEN ${refuse("an invariant of the database cannot be replaced")} END IF;\n  END LOOP;\n`)}`),
+    s(`CREATE OR REPLACE FUNCTION ${fn("inv_guard_start")}() RETURNS event_trigger LANGUAGE plpgsql AS $g$\nBEGIN\n  IF ${open} THEN RETURN; END IF;\n  RAISE EXCEPTION 'a trigger cannot be renamed: it may be an invariant of the database' USING ERRCODE = 'insufficient_privilege';\nEND\n$g$;`),
+    s("DROP EVENT TRIGGER IF EXISTS inv_guard_drop;"),
+    s(`CREATE EVENT TRIGGER inv_guard_drop ON sql_drop EXECUTE FUNCTION ${fn("inv_guard_drop")}();`),
+    s("DROP EVENT TRIGGER IF EXISTS inv_guard_end;"),
+    s(`CREATE EVENT TRIGGER inv_guard_end ON ddl_command_end WHEN TAG IN ('ALTER TABLE', 'CREATE FUNCTION', 'ALTER FUNCTION') EXECUTE FUNCTION ${fn("inv_guard_end")}();`),
+    s("DROP EVENT TRIGGER IF EXISTS inv_guard_start;"),
+    s(`CREATE EVENT TRIGGER inv_guard_start ON ddl_command_start WHEN TAG IN ('ALTER TRIGGER') EXECUTE FUNCTION ${fn("inv_guard_start")}();`),
+  ];
 }
 
 

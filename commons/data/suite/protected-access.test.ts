@@ -630,3 +630,23 @@ proves(
     }
   },
 );
+
+proves(
+  ["0014-sql-protected-access FR-012"],
+  "with a secret that seals the flag, a session that sets the flag to on is not a migration, and one that holds the secret is",
+  async () => {
+    await withEngine("postgres", async (e) => {
+      await e.run("CREATE ROLE migrator; CREATE ROLE reader; CREATE ROLE writer;");
+      const p = protection({ owner: "migrator", migratingSecret: "the-migrators-secret" });
+      const b = must(bind(documents, { dialect: postgres, ...p.bind, sources: [accessSource({ viewsSchema: p.settings.viewsSchema }), ...p.bind.sources] }));
+      await load(e, b);
+      await e.run(`SELECT set_config('lifecycle.migrating', 'on', false)`);
+      assert(await refuses(e, `ALTER TABLE "data"."document" ADD COLUMN "x" INTEGER`), "saying so is not enough");
+      await e.run(`SELECT set_config('lifecycle.migrating', 'a-guess', false)`);
+      assert(await refuses(e, `ALTER TABLE "data"."document" ADD COLUMN "x" INTEGER`), "nor is a guess");
+      for (const s of p.session(postgres)) await e.run(s.replace(", true)", ", false)"));
+      await e.run(`ALTER TABLE "data"."document" ADD COLUMN "x" INTEGER`);
+      same(p.session(postgres), ["SELECT set_config('lifecycle.migrating', 'the-migrators-secret', true);"]);
+    });
+  },
+);

@@ -60,7 +60,7 @@ const rename = operation("renameTenant", {
   runsAs: "caller",
   idempotent: true,
 });
-const count = operation("countTenants", { definition: "How many tenants there are", kind: "query", input: {}, reads: ["tenant"], runsAs: "caller", idempotent: true });
+const count = operation("countTenants", { definition: "How many tenants there are", kind: "query", input: {}, reads: ["tenant"], public: true, runsAs: "caller", idempotent: true });
 const impls: Record<string, Implementation> = {
   async renameTenant(tx, input) {
     const n = await tx.update("tenant", { displayName: input["displayName"] as string }, { tenantId: input["tenant"] as string });
@@ -85,16 +85,35 @@ proves(
     same(rename.input["tenant"], { type: "text", optional: false });
     same(lintOperations(domain, [rename, count]), []);
     const rules = (...o: Parameters<typeof operation>[]): string[] => lintOperations(domain, o.map(([n, s]) => operation(n, s))).map((f) => f.rule);
-    const base = { definition: "x", kind: "command", input: {}, reads: [], runsAs: "service", idempotent: false } as const;
+    const base = { definition: "x", kind: "command", input: {}, reads: [], public: true, runsAs: "service", idempotent: false } as const;
     same(rules(["a", { ...base, reads: ["nothing"] }]), ["operation/unknown-concept"]);
     same(rules(["a", { ...base, kind: "query", writes: ["tenant"], reads: ["tenant"] }]), ["operation/query-writes"]);
-    same(rules(["a", { ...base, requires: "BAD", writes: ["tenant"], emits: ["tenant.x"] }]), ["operation/permission-form"]);
+    same(rules(["a", { ...base, public: false, requires: "BAD", writes: ["tenant"], emits: ["tenant.x"] }]), ["operation/permission-form"]);
     same(rules(["a", { ...base, writes: ["tenant"], emits: ["Tenant-x"] }]), ["operation/emit-form"]);
     same(rules(["a", { ...base, input: { t: "text" }, scope: "nope", writes: ["tenant"], emits: ["a.b"] }]), ["operation/scope-unknown"]);
     same(rules(["a", base], ["a", base]), ["operation/duplicate", "operation/duplicate"].slice(0, 1));
     same(rules(["a", { ...base, writes: ["credential"], emits: ["a.b"], runsAs: "caller" }]), ["operation/restricted-as-caller"]);
     const silent = lintOperations(domain, [operation("a", { ...base, writes: ["tenant"] })]);
     same(silent.map((f) => [f.rule, f.severity]), [["operation/command-silent", "warning"]]);
+  },
+);
+
+proves(
+  ["0031-operations FR-009"],
+  "an operation requires a permission or says it is public, and a contract that does neither is found by the lint and refused by the runtime",
+  () => {
+    const mk = (spec: Record<string, unknown>) => operation("a", { definition: "x", kind: "query", input: {}, reads: ["tenant"], runsAs: "service", idempotent: true, ...spec });
+    const rules = (o: ReturnType<typeof operation>) => lintOperations(domain, [o]).map((f) => f.rule);
+    same(rules(mk({})), ["operation/no-permission"], "none of the three");
+    same(rules(mk({ requires: "tenant:read" })), []);
+    same(rules(mk({ public: true })), []);
+    same(rules(mk({ checkedBy: "the caller is the tenant's owner" })), []);
+    same(rules(mk({ requires: "tenant:read", public: true })), ["operation/access-ambiguous"]);
+    same(rules(mk({ public: true, checkedBy: "x" })), ["operation/access-ambiguous"]);
+    for (const e of DIALECTS.slice(0, 1)) {
+      const r = operations(schema, e.dialect, { exec: async () => undefined, query: async () => [] }, [mk({})], { a: async () => ({ status: "ok" }) }, {});
+      same(r.kind === "err" ? r.error.map((x) => x.kind) : [], ["no-permission"], "no runtime is made for it");
+    }
   },
 );
 
@@ -110,7 +129,7 @@ proves(
     same(make([rename, count], impls, options(true)), ["ok"]);
     same(make([rename, count], { countTenants: impls["countTenants"]! }, options(true)), ["no-implementation"]);
     same(make([count], impls, options(true)), ["no-contract"]);
-    same(make([operation("x", { definition: "d", kind: "query", input: {}, reads: ["nope"], runsAs: "caller", idempotent: true })], { x: impls["countTenants"]! }), ["unknown-table"]);
+    same(make([operation("x", { definition: "d", kind: "query", input: {}, reads: ["nope"], public: true, runsAs: "caller", idempotent: true })], { x: impls["countTenants"]! }), ["unknown-table"]);
     same(make([rename], { renameTenant: impls["renameTenant"]! }, { audit: sink }), ["no-authorizer"]);
     same(make([rename], { renameTenant: impls["renameTenant"]! }, { authorize: async () => true }), ["no-audit"]);
   },

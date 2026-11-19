@@ -45,6 +45,7 @@
 ## What the database holds
 
 - **FR-018**: On a real engine, each feature MUST do what it says: a view returns the rows its conditions give; a scoped table shows a role only the rows of its scope and refuses it a row of another; a routine runs and returns what its body says; a partitioned table keeps each row in the partition of its bounds and refuses one that has none; a vector is stored and read back.
+- **FR-019**: Where a scope is sealed (PostgreSQL), a policy MUST trust the setting of a scope only where it carries the mark that only a holder of the key can make, so that a session that sets the scope itself, forges its mark or reuses the mark of another value sees nothing; the key MUST be kept where no role but its owner can read it and a mark MUST NOT be possible to make without it; row security MUST be forced on the owner of the table; and a guard MUST refuse to disable it, to drop a policy or to drop a table of it, for a session that does not hold the unlock secret, whose hash alone the database holds.
 
 ## Out of scope
 

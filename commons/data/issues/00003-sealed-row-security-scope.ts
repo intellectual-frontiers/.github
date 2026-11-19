@@ -12,7 +12,11 @@ export default issue({
   goals: ["G1", "G2"],
   appliesTo: { engines: ["postgres"] },
   status: {
-    "kind": "open"
+    kind: "fixed",
+    proof: [
+      { kind: "test", file: "suite/features.test.ts", name: "a sealed scope is trusted only with the mark of the issuer that holds the key" },
+      { kind: "spec", id: "0009-sql-features" },
+    ],
   },
   size: "m",
   cites: [],
