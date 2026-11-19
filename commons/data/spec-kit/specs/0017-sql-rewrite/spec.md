@@ -1,7 +1,7 @@
 # Feature Specification: Making a table again
 
 **Spec ID:** 0017-sql-rewrite
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

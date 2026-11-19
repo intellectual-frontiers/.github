@@ -1,7 +1,7 @@
 # Feature Specification: Identity principals
 
 **Spec ID:** 0032-identity-principals
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

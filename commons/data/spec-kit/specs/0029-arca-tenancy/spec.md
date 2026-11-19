@@ -1,7 +1,7 @@
 # Feature Specification: Arca tenancy
 
 **Spec ID:** 0029-arca-tenancy
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

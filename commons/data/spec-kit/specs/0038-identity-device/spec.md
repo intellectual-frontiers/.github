@@ -1,7 +1,7 @@
 # Feature Specification: Identity devices
 
 **Spec ID:** 0038-identity-device
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

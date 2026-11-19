@@ -54,7 +54,7 @@ const { quality, usage } = vocabularies;
 const AUDIT = ["created_at", "created_by", "updated_at", "updated_by", "deleted_at", "deleted_by"];
 
 proves(
-  ["0006-logical FR-001", "0006-logical FR-010"],
+  ["0006-logical FR-001", "0006-logical FR-010", "0001-layers FR-006"],
   "the schema is plain data whose elements have identities of their own and trace to governance elements",
   () => {
     const { schema } = projected(arcaDomain());
@@ -116,7 +116,7 @@ proves(["0006-logical FR-002"], "a column's type is a logical type, and none nam
 });
 
 proves(
-  ["0006-logical FR-003"],
+  ["0006-logical FR-003", "0001-layers FR-002"],
   "project returns the schema as a value, and a projection is a value given to it or contributed through the engine",
   () => {
     const r = projectDomain(arcaDomain());
@@ -187,7 +187,7 @@ proves(
 );
 
 proves(
-  ["0006-logical FR-005"],
+  ["0006-logical FR-005", "0005-naming FR-003", "0001-layers FR-012"],
   "the columns of every table of the model it replaces are what the words of the attributes and relationships make, the key first",
   () => {
     const s = arcaSchema();
@@ -429,7 +429,7 @@ proves(["0006-logical FR-008"], "the comment of a table and of a column is the d
 });
 
 proves(
-  ["0006-logical FR-009"],
+  ["0006-logical FR-009", "0005-naming FR-007"],
   "two tables, two columns of a table, or two constraints that are named alike are returned with the elements that clash",
   () => {
     const clashTable = projectionErrors(world([thing("kinds")], [openKinds]));

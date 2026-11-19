@@ -1,7 +1,7 @@
 # Feature Specification: Invariants in the database
 
 **Spec ID:** 0043-sql-invariants
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

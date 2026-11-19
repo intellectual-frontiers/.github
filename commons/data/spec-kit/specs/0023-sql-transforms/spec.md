@@ -1,7 +1,7 @@
 # Feature Specification: Transforms
 
 **Spec ID:** 0023-sql-transforms
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

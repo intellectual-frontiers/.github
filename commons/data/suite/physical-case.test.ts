@@ -49,7 +49,7 @@ proves(["0007-physical FR-001"], "the words of a valid name written in camel are
   assert(checked > 400, `${checked} names`);
 });
 
-proves(["0007-physical FR-001"], "an extension adds a case style through the engine, and snake case is the default naming", () => {
+proves(["0007-physical FR-001", "0005-naming FR-005"], "an extension adds a case style through the engine, and snake case is the default naming", () => {
   const shout: CaseStyle = { name: "shout", write: (w) => w.join("_").toUpperCase() };
   const id = extensionId("sql.case.shout");
   assert(id.kind === "ok");
@@ -62,7 +62,7 @@ proves(["0007-physical FR-001"], "an extension adds a case style through the eng
   same([naming(camel).names, naming(camel).codes], [camel, camel]);
 });
 
-proves(["0007-physical FR-002"], "a code is stored by the style of the codes by default, by another style, or as its name", () => {
+proves(["0007-physical FR-002", "0005-naming FR-006"], "a code is stored by the style of the codes by default, by another style, or as its name", () => {
   same(writeCode(naming(), "employedBy"), "employed_by");
   same(writeCode(naming(camel), "employedBy"), "employedBy");
   same(writeCode(naming(snake, camel), "employedBy"), "employedBy");

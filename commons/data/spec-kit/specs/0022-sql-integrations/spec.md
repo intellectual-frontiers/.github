@@ -1,7 +1,7 @@
 # Feature Specification: Integrations
 
 **Spec ID:** 0022-sql-integrations
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

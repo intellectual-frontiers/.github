@@ -1,7 +1,7 @@
 # Feature Specification: Convergence
 
 **Spec ID:** 0019-sql-convergence
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

@@ -269,6 +269,7 @@ proves(
       await e.run("SET app.tenant = 'a'");
       await e.run(`INSERT INTO "document" VALUES ('d4', 'a', 'Mine')`);
       assert(await refuses(e, `INSERT INTO "document" VALUES ('d5', 'b', 'Theirs')`), "a row of another scope is refused");
+      assert(await refuses(e, `UPDATE "document" SET "tenant" = 'b' WHERE "id" = 'd4'`), "a row cannot be moved to another scope by an update");
       await e.run("RESET ROLE");
       const grants = await e.rows(
         `SELECT grantee, privilege_type FROM information_schema.role_table_grants WHERE table_name = 'ledger' AND grantee IN ('reader','writer')`,

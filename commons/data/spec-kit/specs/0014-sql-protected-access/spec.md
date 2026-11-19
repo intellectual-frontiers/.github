@@ -1,7 +1,7 @@
 # Feature Specification: Protected access
 
 **Spec ID:** 0014-sql-protected-access
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

@@ -1,7 +1,7 @@
 # Feature Specification: SQL features as extensions
 
 **Spec ID:** 0009-sql-features
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

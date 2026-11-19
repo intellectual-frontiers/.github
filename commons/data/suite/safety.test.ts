@@ -411,6 +411,11 @@ proves(
       add?.up.slice(0, 2).map((x) => x.sql),
       ["SELECT set_config('lock_timeout', '5000', true);", "SELECT set_config('statement_timeout', '60000', true);"],
     );
+    same(
+      add?.down?.slice(0, 2).map((x) => x.sql),
+      ["SELECT set_config('lock_timeout', '5000', true);", "SELECT set_config('statement_timeout', '60000', true);"],
+      "undoing asks for the locks too",
+    );
     assert(
       !p.steps.find((x) => x.kind === "createTable")?.up.some((x) => x.sql.includes("lock_timeout")),
       "a table that is made needs no timeout",

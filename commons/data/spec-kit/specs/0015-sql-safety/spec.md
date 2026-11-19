@@ -1,7 +1,7 @@
 # Feature Specification: Safe migrations
 
 **Spec ID:** 0015-sql-safety
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

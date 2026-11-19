@@ -12,7 +12,11 @@ export default issue({
   goals: ["G1", "G5"],
   appliesTo: { engines: "all" },
   status: {
-    "kind": "open"
+    kind: "fixed",
+    proof: [
+      { kind: "test", file: "suite/enforcement-notes.test.ts", name: "every specification of the library is in force" },
+      { kind: "file", path: "tools/check.ts" },
+    ],
   },
   size: "m",
   cites: [

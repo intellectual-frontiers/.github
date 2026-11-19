@@ -1,7 +1,7 @@
 # Feature Specification: Identity authorize
 
 **Spec ID:** 0041-identity-authorize
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

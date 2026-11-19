@@ -1,7 +1,7 @@
 # Feature Specification: Documentation in the database
 
 **Spec ID:** 0008-sql-documentation
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

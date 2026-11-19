@@ -1,7 +1,7 @@
 # Feature Specification: Parallel versions
 
 **Spec ID:** 0020-sql-parallel-versions
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

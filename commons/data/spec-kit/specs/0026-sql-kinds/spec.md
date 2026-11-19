@@ -1,7 +1,7 @@
 # Feature Specification: Kinds
 
 **Spec ID:** 0026-sql-kinds
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

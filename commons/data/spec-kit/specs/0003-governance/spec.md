@@ -1,7 +1,7 @@
 # Feature Specification: Governance
 
 **Spec ID:** 0003-governance
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

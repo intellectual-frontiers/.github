@@ -1,7 +1,7 @@
 # Feature Specification: The plan report
 
 **Spec ID:** 0016-sql-plan-report
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

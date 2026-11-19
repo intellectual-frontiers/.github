@@ -1,7 +1,7 @@
 # Feature Specification: Identity access
 
 **Spec ID:** 0033-identity-access
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

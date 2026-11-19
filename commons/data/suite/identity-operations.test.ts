@@ -513,3 +513,83 @@ proves(
     }
   },
 );
+
+const T2 = `INSERT INTO "tenant" ("tenant_id", "kind", "slug", "display_name", "ancestry", "status", "isolation", "created_at") VALUES ('t2', 'business', 'beta', 'Beta', '/t2', 'active', 'shared', ${AT})`;
+const newPrincipal = (id: string, kind: string) => `INSERT INTO "principal" ("principal_id", "kind", "status", "status_changed_at", "created_at") VALUES ('${id}', '${kind}', 'active', ${AT}, ${AT})`;
+const newGroup = (id: string) => `INSERT INTO "user_group" ("principal_id", "name", "source", "tenant_id") VALUES ('${id}', '${id}', 'local', 't1')`;
+const member = (group: string, who: string) => `INSERT INTO "group_member" ("group_user_group_principal_id", "member_principal_id", "added_at") VALUES ('${group}', '${who}', ${AT})`;
+const RUN = (dg: string) => `INSERT INTO "agent_run" ("run_id", "started_at", "status", "agent_principal_id", "version_agent_version_id", "tenant_id", "initiator_principal_id", "delegation_id") VALUES ('r1', ${AT}, 'running', 'a1', 'v1', 't1', 'u1', '${dg}')`;
+
+proves(
+  ["0041-identity-authorize FR-001", "0041-identity-authorize FR-005"],
+  "what a group passes on reaches a member three groups down and not one six down, and a delegation made in one tenant gives nothing in another though its root holds the role there",
+  async () => {
+    for (const { name } of ENGINES) {
+      const { e, rt } = await world(name);
+      try {
+        // g1 holds the privileged role; each group is a member of the one above, a user is the last
+        const chain = ["g2", "g3", "g4", "g5", "g6", "g7"];
+        for (const g of chain) await e.run(newPrincipal(g, "group"));
+        for (const g of chain) await e.run(newGroup(g));
+        await e.run(member("g1", "g2"));
+        for (let i = 1; i < chain.length; i++) await e.run(member(chain[i - 1] as string, chain[i] as string));
+        await e.run(newPrincipal("deep3", "user"));
+        await e.run(newPrincipal("deep7", "user"));
+        await e.run(member("g4", "deep3"));
+        await e.run(member("g7", "deep7"));
+        const status = async (who: string) => (await ask(rt, who, "invoice:audit"))["status"];
+        same(await status("deep3"), "allow", `${name}: three groups down`);
+        same(await status("deep7"), "deny", `${name}: seven groups down is past the depth the engine follows`);
+        // a delegation of tenant t1 asked in t2, where its root holds the role too
+        await e.run(T2);
+        await e.run(`INSERT INTO "role_assignment" ("role_assignment_id", "valid_from", "status", "via", "assignment_key", "principal_id", "role_access_role_role_id", "tenant_id", "granted_by_principal_id") VALUES ('ra9', ${AT}, 'active', 'direct', 'k9', 'u1', 'r-pay', 't2', 'u1')`);
+        const dg = String((await delegate(rt, {}))["delegation"]);
+        same((await ask(rt, "a1", "invoice:pay", { delegation: dg }))["status"], "allow", `${name}: in its own tenant`);
+        same((await ask(rt, "a1", "invoice:pay", { delegation: dg, tenant: "t2" }))["status"], "deny", `${name}: not in another`);
+      } finally {
+        await e.close();
+      }
+    }
+  },
+);
+
+proves(
+  ["0042-identity-agent-operations FR-003", "0042-identity-agent-operations FR-004"],
+  "an approval that has expired cannot be decided or used, an approver who no longer holds the permission cannot approve, and a grant's call limit and end are exact",
+  async () => {
+    for (const { name } of ENGINES) {
+      const { e, rt } = await world(name);
+      try {
+        const dg = String((await delegate(rt, {}))["delegation"]);
+        await e.run(RUN(dg));
+        const call = (idx: number, tool: string, over: Record<string, unknown> = {}) => run(rt, "recordToolCall", { run: "r1", tool, callIndex: idx, argsHash: `ah${idx}`, ...over });
+        const pay = { resourceType: "invoice", resourceId: "i1", argsSummary: "Pay" };
+        // expired before it is decided
+        const w1 = String((await call(1, "tl-pay", { ...pay, argsHash: "p1" }))["approvalRequest"]);
+        await e.run(`UPDATE "approval_request" SET "expires_at" = '2025-01-01T00:00:00Z' WHERE "approval_request_id" = '${w1}'`);
+        same((await run(rt, "decideApproval", { approvalRequest: w1, decidedBy: "u1", approve: true }))["status"], "expired", `${name}: too late to decide`);
+        // approved, then expired before it is used
+        const w2 = String((await call(2, "tl-pay", { ...pay, argsHash: "p2" }))["approvalRequest"]);
+        same((await run(rt, "decideApproval", { approvalRequest: w2, decidedBy: "u1", approve: true }))["status"], "approved");
+        await e.run(`UPDATE "approval_request" SET "expires_at" = '2025-01-01T00:00:00Z' WHERE "approval_request_id" = '${w2}'`);
+        same((await call(3, "tl-pay", { ...pay, argsHash: "p2", approval: w2 }))["status"], "denied", `${name}: too late to use`);
+        // an approver who has lost what they would approve
+        const w3 = String((await call(4, "tl-pay", { ...pay, argsHash: "p3" }))["approvalRequest"]);
+        await e.run(`UPDATE "role_assignment" SET "status" = 'revoked' WHERE "role_assignment_id" = 'ra1'`);
+        same((await run(rt, "decideApproval", { approvalRequest: w3, decidedBy: "u1", approve: true }))["status"], "approver-lacks-authority", `${name}: approval never lends authority`);
+        await e.run(`UPDATE "role_assignment" SET "status" = 'active' WHERE "role_assignment_id" = 'ra1'`);
+        // the call limit counts the calls the run has made: two more, and the third is refused
+        const made = Number((await e.rows(`SELECT count(*) AS n FROM "tool_call" WHERE "run_agent_run_run_id" = 'r1'`))[0]?.["n"]);
+        await e.run(`UPDATE "tool_grant" SET "max_calls_per_run" = ${made + 2} WHERE "tool_agent_tool_id" = 'tl-read'`);
+        same((await call(5, "tl-read"))["status"], "allowed");
+        same((await call(6, "tl-read"))["status"], "allowed");
+        same((await call(7, "tl-read"))["status"], "denied", `${name}: the limit is the limit`);
+        // a grant that ends at this instant is over
+        await e.run(`UPDATE "tool_grant" SET "max_calls_per_run" = NULL, "valid_to" = '${NOW}' WHERE "tool_agent_tool_id" = 'tl-read'`);
+        same((await call(8, "tl-read"))["status"], "denied", `${name}: it ends when it ends`);
+      } finally {
+        await e.close();
+      }
+    }
+  },
+);

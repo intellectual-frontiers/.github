@@ -1,7 +1,7 @@
 # Feature Specification: Identity agents
 
 **Spec ID:** 0040-identity-agent
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

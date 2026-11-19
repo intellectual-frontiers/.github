@@ -1,7 +1,7 @@
 # Feature Specification: History
 
 **Spec ID:** 0018-sql-history
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

@@ -1,7 +1,7 @@
 # Feature Specification: Identity machines
 
 **Spec ID:** 0037-identity-machine
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

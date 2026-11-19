@@ -1,7 +1,7 @@
 # Feature Specification: The layers
 
 **Spec ID:** 0001-layers
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

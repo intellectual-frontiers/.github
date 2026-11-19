@@ -1,7 +1,7 @@
 # Feature Specification: Identity ReBAC
 
 **Spec ID:** 0035-identity-rebac
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

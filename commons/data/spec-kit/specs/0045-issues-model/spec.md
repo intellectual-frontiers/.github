@@ -1,7 +1,7 @@
 # Feature Specification: The issues model and its synchronisation
 
 **Spec ID:** 0045-issues-model
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

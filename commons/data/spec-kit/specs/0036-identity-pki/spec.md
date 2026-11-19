@@ -1,7 +1,7 @@
 # Feature Specification: Identity PKI
 
 **Spec ID:** 0036-identity-pki
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

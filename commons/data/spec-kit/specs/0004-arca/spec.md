@@ -1,7 +1,7 @@
 # Feature Specification: Arca, the party model
 
 **Spec ID:** 0004-arca
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

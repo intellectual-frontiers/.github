@@ -1,7 +1,7 @@
 # Feature Specification: Ephemeral targets
 
 **Spec ID:** 0025-sql-target
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

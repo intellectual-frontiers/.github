@@ -1,7 +1,7 @@
 # Feature Specification: osquery ATC
 
 **Spec ID:** 0027-sql-osquery-atc
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

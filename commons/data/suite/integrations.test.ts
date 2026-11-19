@@ -138,6 +138,8 @@ proves(
         assert(most[0]?.kind === "delete-share" && most[0].share === 0.75 && most[0].max === 0.5, `${name}: ${JSON.stringify(most)}`);
         same(await names(e), before, `${name}: the target is as it was`);
         same(counts(await run(e, make(dialect, spec({ strategy: "snapshot", source: { kind: "rows", rows: people("a1", "a2", "a3") } })))), [3, 0, 3, 1], `${name}: a smaller share is allowed`);
+        await run(e, make(dialect, spec({ source: { kind: "rows", rows: people("a1", "a2", "a3", "a4") } })));
+        same(counts(await run(e, make(dialect, spec({ strategy: "snapshot", source: { kind: "rows", rows: people("a1", "a2") } })))), [2, 0, 2, 2], `${name}: exactly half is the most that is allowed`);
       } finally {
         await e.close();
       }

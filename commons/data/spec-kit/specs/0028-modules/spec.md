@@ -1,7 +1,7 @@
 # Feature Specification: Modules
 
 **Spec ID:** 0028-modules
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 

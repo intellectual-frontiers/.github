@@ -1,7 +1,7 @@
 # Feature Specification: Operations
 
 **Spec ID:** 0031-operations
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** data
 
