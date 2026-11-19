@@ -192,6 +192,8 @@ proves(
         same(await d("a2", "invoice:read", { resourceType: "folder", resourceId: "f2" }), "deny", `${name}: for that object only`);
         await e.run(`UPDATE "relation_tuple" SET "expires_at" = '2026-05-01T00:00:00Z'`);
         same(await d("a2", "invoice:read", { resourceType: "folder", resourceId: "f1" }), "deny", `${name}: until it expires`);
+        await e.run(`UPDATE "relation_tuple" SET "expires_at" = NULL, "caveat" = 'office_hours'`);
+        same(await d("a2", "invoice:read", { resourceType: "folder", resourceId: "f1" }), "deny", `${name}: a caveat that is not evaluated never allows`);
         // disabled: nothing
         await e.run(`UPDATE "principal" SET "status" = 'disabled' WHERE "principal_id" = 'u1'`);
         same(await d("u1", "invoice:read"), "deny", `${name}: a disabled principal can do nothing`);
@@ -587,6 +589,31 @@ proves(
         // a grant that ends at this instant is over
         await e.run(`UPDATE "tool_grant" SET "max_calls_per_run" = NULL, "valid_to" = '${NOW}' WHERE "tool_agent_tool_id" = 'tl-read'`);
         same((await call(8, "tl-read"))["status"], "denied", `${name}: it ends when it ends`);
+      } finally {
+        await e.close();
+      }
+    }
+  },
+);
+
+proves(
+  ["0041-identity-authorize FR-001", "0041-identity-authorize FR-007"],
+  "a permission is for people, machines and groups unless it names the kinds it is for, and a role that names the kinds that may hold it is not held by another kind",
+  async () => {
+    for (const { name } of ENGINES) {
+      const { e, rt } = await world(name);
+      try {
+        const status = async (who: string, action: string) => (await ask(rt, who, action))["status"];
+        await e.run(`INSERT INTO "role_assignment" ("role_assignment_id", "valid_from", "status", "via", "assignment_key", "principal_id", "role_access_role_role_id", "tenant_id", "granted_by_principal_id") VALUES ('ra20', ${AT}, 'active', 'direct', 'k20', 'a2', 'r-view', 't1', 'u1')`);
+        same(await status("u2", "invoice:read"), "allow", `${name}: a person reads`);
+        same(await status("a2", "invoice:read"), "deny", `${name}: an agent is not given a permission that does not say it is for agents`);
+        await e.run(`INSERT INTO "permission_applies_to" ("permission_id", "applies_to") VALUES ('p-read', 'agent')`);
+        same(await status("a2", "invoice:read"), "allow", `${name}: until it says so`);
+        same(await status("u2", "invoice:read"), "deny", `${name}: and then it is for agents alone`);
+        await e.run(`INSERT INTO "permission_applies_to" ("permission_id", "applies_to") VALUES ('p-read', 'user')`);
+        await e.run(`INSERT INTO "access_role_applies_to" ("access_role_role_id", "applies_to") VALUES ('r-view', 'user')`);
+        same(await status("u2", "invoice:read"), "allow", `${name}: a role for people is held by a person`);
+        same(await status("a2", "invoice:read"), "deny", `${name}: and not by an agent`);
       } finally {
         await e.close();
       }

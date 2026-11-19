@@ -48,14 +48,14 @@ export const dialect: Dialect = {
   literal: standardLiteral,
   type,
   catalog: {
-    compares: ["tables", "columns (type, nullability)", "primary keys", "indexes"],
+    compares: ["tables", "columns (type, nullability, default)", "primary keys", "indexes"],
     read: async (query, schema) => {
       const s = schema === undefined ? "current_schema()" : standardLiteral(schema);
       const tables = await query(`SELECT table_name n FROM duckdb_tables() WHERE schema_name = ${s} ORDER BY table_name`);
       const names = new Set(tables.map((t) => String(t["n"])));
       const cols = (
         await query(
-          `SELECT table_name t, column_name c, data_type d, is_nullable n FROM duckdb_columns() WHERE schema_name = ${s} AND NOT internal ORDER BY table_name, column_index`,
+          `SELECT table_name t, column_name c, data_type d, is_nullable n, column_default df FROM duckdb_columns() WHERE schema_name = ${s} AND NOT internal ORDER BY table_name, column_index`,
         )
       ).filter((c) => names.has(String(c["t"])));
       const pks = await query(
@@ -68,7 +68,7 @@ export const dialect: Dialect = {
           name,
           columns: cols
             .filter((c) => c["t"] === name)
-            .map((c) => ({ name: String(c["c"]), type: String(c["d"]), nullable: c["n"] === true || c["n"] === "YES" })),
+            .map((c) => ({ name: String(c["c"]), type: String(c["d"]), nullable: c["n"] === true || c["n"] === "YES", ...(c["df"] === null || c["df"] === undefined ? {} : { default: String(c["df"]) }) })),
           primaryKey: pks.filter((k) => k["t"] === name).flatMap((k) => (Array.isArray(k["c"]) ? (k["c"] as unknown[]).map(String) : [])),
           indexes: idx.filter((i) => i["t"] === name).map((i) => String(i["n"])),
         };

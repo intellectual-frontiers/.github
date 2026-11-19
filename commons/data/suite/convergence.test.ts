@@ -6,6 +6,8 @@
  * @module
  */
 import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { annotate, attribute, boolean, concept, domain, identifier, integer, text, vocabularies } from "@intellectual-frontiers/data/governance";
+import { projectDomain } from "@intellectual-frontiers/data/sql/logical";
 import { dialect as duckdb } from "@intellectual-frontiers/data/sql/dialects/duckdb";
 import { dialect as postgres } from "@intellectual-frontiers/data/sql/dialects/postgres";
 import { dialect as sqlite } from "@intellectual-frontiers/data/sql/dialects/sqlite";
@@ -400,6 +402,72 @@ proves(
           `${name}: behind`,
         );
       });
+    }
+  },
+);
+
+const settingConcept = concept("setting", {
+  definition: "A named setting with defaults",
+  attributes: {
+    id: attribute(identifier(), { definition: "What identifies it" }),
+    mode: attribute(text(), { definition: "How it works", annotations: [annotate(vocabularies.quality.defaultValue, "open")] }),
+    count: attribute(integer(), { definition: "How many", annotations: [annotate(vocabularies.quality.defaultValue, 5)] }),
+    live: attribute(boolean(), { definition: "Whether it is on", annotations: [annotate(vocabularies.quality.defaultValue, true)] }),
+  },
+  identifiedBy: ["id"],
+});
+const settingsSchema = (() => {
+  const d = domain("settings", { definition: "Settings", concepts: [settingConcept] });
+  if (d.kind === "err") throw new Error(JSON.stringify(d.error));
+  const p = projectDomain(d.value);
+  if (p.kind === "err") throw new Error(JSON.stringify(p.error));
+  return p.value.schema;
+})();
+
+proves(
+  ["0019-sql-convergence FR-013"],
+  "a default changed by hand is drift on the engines that can change one, and the defaults the model made are not drift on any engine",
+  async () => {
+    for (const { name, dialect } of DIALECTS) {
+      const e = await openEngine(name);
+      try {
+        const b = bind(settingsSchema, { dialect });
+        assert(b.kind === "ok");
+        if (b.kind === "ok") await load(e, b.value);
+        const wanted = must({ kind: "ok" as const, value: desiredState(settingsSchema, { dialect }) as NonNullable<ReturnType<typeof desiredState>> });
+        assert(wanted.tables[0]?.columns.some((c) => c.default !== undefined), "the model has defaults");
+        same(stateHash(must(await readState(driverOf(e), dialect, wanted))), stateHash(wanted), `${name}: the defaults it made are the defaults it has`);
+        if (name === "sqlite") continue;
+        await e.run(`ALTER TABLE "setting" ALTER COLUMN "mode" SET DEFAULT 'closed'`);
+        assert(stateHash(must(await readState(driverOf(e), dialect, wanted))) !== stateHash(wanted), `${name}: a changed default is drift`);
+        const r = must(await propose(driverOf(e), settingsSchema, { dialect }, { transforms }));
+        same(r.plan.steps.map((x) => x.kind), ["alterDefault"], `${name}: and is put right`);
+      } finally {
+        await e.close();
+      }
+    }
+  },
+);
+
+proves(
+  ["0019-sql-convergence FR-013"],
+  "what a person made outside the model is held, not dropped, where the project says to hold it: a table, a column and an index are left alone and named, and the plan has no step for them",
+  async () => {
+    for (const { name, dialect } of DIALECTS) {
+      const e = await dbAt(name, dialect, 2);
+      try {
+        await e.run(`ALTER TABLE "author" ADD COLUMN "nickname" TEXT`);
+        await e.run(`CREATE TABLE "scratch" ("id" TEXT NOT NULL PRIMARY KEY)`);
+        await e.run(`CREATE INDEX "dba_author_nickname" ON "author" ("nickname")`);
+        const dropped = must(await propose(driverOf(e), libraryAt(2), { dialect }, { transforms }));
+        assert(dropped.plan.steps.some((x) => x.kind === "dropTable") && dropped.proposal.held === undefined, `${name}: dropped by default, with approval`);
+        const held = must(await propose(driverOf(e), libraryAt(2), { dialect }, { transforms, ignore: settingsOf({ unmanaged: "hold" }).ignore }));
+        same(held.plan.steps, [], `${name}: nothing to do`);
+        same([...(held.proposal.held ?? [])].toSorted(), ["column author.nickname", "index author.dba_author_nickname", "table scratch"], `${name}: and what is held is said`);
+        assert((await names(e)).includes("scratch"), `${name}: the table is still there`);
+      } finally {
+        await e.close();
+      }
     }
   },
 );

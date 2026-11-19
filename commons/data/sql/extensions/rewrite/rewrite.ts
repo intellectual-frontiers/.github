@@ -83,6 +83,19 @@ function rebuild(
   ];
 }
 
+/** What makes a table made again fail where it would lose its triggers (which the engine drops with the table): their number is the same after as before. */
+function triggersKept(dialect: Dialect, table: string, qualifier: string | undefined): Pick<StepDraft, "verify"> {
+  const probe = dialect.probes?.triggers;
+  if (probe === undefined) return {};
+  const query = probe(table, qualifier);
+  return {
+    verify: {
+      before: [{ key: "triggers", query }],
+      after: [{ describe: `the triggers of ${table} are as many as they were: a table made again loses the triggers it had, and they are not made again here`, query, expect: { sameAs: "triggers" } }],
+    },
+  };
+}
+
 const ELIGIBLE = new Set(["addColumn", "alterNullable", "alterDefault", "alterPrimaryKey", "addConstraint", "dropConstraint"]);
 
 /**
@@ -119,7 +132,7 @@ export function rewrite(given: RewriteSettings = {}): Fallback {
       )
         return undefined;
       const up = rebuild(before, after, context.after.qualifier, dialect, naming, dialect.rebuild, settings);
-      return up === undefined ? undefined : ({ ...note, reversibility: "irreversible", up, of: [], rebuild: true } as ReturnType<Fallback>);
+      return up === undefined ? undefined : ({ ...note, reversibility: "irreversible", up, of: [], rebuild: true, ...triggersKept(dialect, before.name, context.after.qualifier) } as ReturnType<Fallback>);
     }
     const rb = dialect.rebuild;
     if (rb === undefined || !ELIGIBLE.has(change.kind) || !("table" in change) || !("words" in change.table)) return undefined;
@@ -149,6 +162,7 @@ export function rewrite(given: RewriteSettings = {}): Fallback {
       ...(down === undefined ? {} : { down }),
       of: [],
       rebuild: true,
+      ...triggersKept(dialect, before.name, context.after.qualifier),
     };
     return draft;
   };

@@ -19,6 +19,6 @@ export {
   proposalText,
   renderProposal,
 } from "./propose.ts";
-export { normalizeType, readState, type ReadError, sameType, spell } from "./read.ts";
+export { HOLD, normalDefault, normalizeType, readState, type ReadError, sameType, spell } from "./read.ts";
 export { type Convergence, type ConvergenceSettings, defaultPolicy, type Policy, settingsOf } from "./settings.ts";
 export type { Held } from "./plan.ts";

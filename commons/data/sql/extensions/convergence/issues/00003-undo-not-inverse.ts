@@ -6,14 +6,13 @@ export default issue({
   id: 3,
   slug: "undo-not-inverse",
   title: "The undo statements of some steps are not exact inverses",
-  summary: "Undo SQL of a step that rebuilds a table does not rebuild the triggers and indexes that were read before it.",
+  summary:
+    "A table made again loses the triggers it had, which includes the triggers of the invariants on SQLite. The step now says the number of triggers must be the same after as before, so it fails and rolls back instead of losing them silently (0017-sql-rewrite FR-009). Still to do: make the triggers again, which needs the triggers in the state, and the undo of a step that rebuilds an index the model did not name.",
   severity: "medium",
   priority: "P2",
   goals: ["G1"],
   appliesTo: { engines: "all" },
-  status: {
-    "kind": "open"
-  },
+  status: { kind: "in-progress", by: "claude" },
   size: "m",
   cites: [],
   evidence: [

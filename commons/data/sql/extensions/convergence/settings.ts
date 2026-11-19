@@ -6,6 +6,7 @@
  * @module
  */
 import type { Reversibility, StepClass } from "@intellectual-frontiers/data/sql/lifecycle";
+import { HOLD } from "./read.ts";
 
 /** What may be applied on first access with no one's approval. */
 export interface Policy {
@@ -26,6 +27,8 @@ export interface ConvergenceSettings {
   readonly ledgerTable?: string;
   /** The names of tables the reader leaves out, besides the ledger's. */
   readonly ignore?: readonly string[];
+  /** What to do with what is in the database and not in the model (a table, a column, an index or a constraint a person made): `drop` it, with approval (the default), or `hold` it, which leaves it alone and says so. */
+  readonly unmanaged?: "drop" | "hold";
 }
 
 /** The settings with every default filled. */
@@ -34,6 +37,7 @@ export interface Convergence {
   readonly policy: Policy;
   readonly ledgerTable: string;
   readonly ignore: readonly string[];
+  readonly unmanaged: "drop" | "hold";
 }
 
 /** The default policy: only what adds, and loses nothing. */
@@ -57,6 +61,7 @@ export function settingsOf(given: ConvergenceSettings = {}): Convergence {
     policy: { ...defaultPolicy, ...given.policy },
     ledgerTable,
     // what the library keeps aside is not drift: the ledger, and the tables that quarantine makes by its default suffixes
-    ignore: [...new Set([ledgerTable, "*quarantine", "*quarantined", ...(given.ignore ?? [])])],
+    ignore: [...new Set([ledgerTable, "*quarantine", "*quarantined", ...(given.ignore ?? []), ...(given.unmanaged === "hold" ? [HOLD] : [])])],
+    unmanaged: given.unmanaged ?? "drop",
   };
 }

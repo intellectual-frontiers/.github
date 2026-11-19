@@ -29,6 +29,7 @@
 ## What the database holds
 
 - **FR-008**: On SQLite and DuckDB, a constraint added to or taken from a table, a column made required and a type cast, each by making the table again, MUST leave the table with its rows, its indexes, its new definition enforced and the tables that refer to it still referring to it (where the dialect lets the table be dropped), and a step whose rows do not meet the change MUST be rolled back whole, leaving the old table; and the protection layer's views MUST be dropped before and made again after.
+- **FR-009**: A step that makes a table again on an engine that drops a table's triggers with it MUST say, in its verification, that the number of the table's triggers is the same after as before, so that a table that has triggers is not made again without them: the step fails, is rolled back whole, and the triggers are as they were.
 
 ## Out of scope
 

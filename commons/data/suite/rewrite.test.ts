@@ -402,3 +402,25 @@ proves(
     assert(sql.findIndex((s) => s.startsWith("DROP TABLE")) < sql.findIndex((s) => s.startsWith("ALTER TABLE")), "dropped before renamed");
   },
 );
+
+proves(
+  ["0017-sql-rewrite FR-009"],
+  "a table that has triggers is not made again without them: the step fails its verification, is rolled back whole, and the trigger and the rows are as they were",
+  async () => {
+    await withEngine("sqlite", async (e) => {
+      await reach(e, sqlite, 2);
+      await e.run(`INSERT INTO "author" ("id", "name") VALUES ('a1', 'Ann')`);
+      await e.run(`INSERT INTO "book" ("id", "title", "genre_code", "author_id") VALUES ('b1', 'One', 'fiction', 'a1')`);
+      await e.run(`CREATE TRIGGER "book_keep" BEFORE DELETE ON "book" BEGIN SELECT RAISE(ABORT, 'books are kept'); END`);
+      const noFk = edit(stateOf(sqlite, 2), "book", (t) => ({ ...t, constraints: t.constraints.filter((c) => c.kind !== "foreignKey") }));
+      const p = must(planOf(sqlite, noFk, 2, {}));
+      const rebuilt = p.steps.find((s) => s.rebuild === true);
+      assert(rebuilt?.verify?.after.some((c) => c.describe.includes("triggers")), "the step says the triggers must be kept");
+      const r = await execute(p, driverOf(e), sqlite, { empty: stateHash(noFk), ledgerTable: "changes" });
+      assert(r.kind === "err" && JSON.stringify(r.error).includes("triggers of book"), `it does not go on and lose the trigger: ${JSON.stringify(r)}`);
+      same((await e.rows(`SELECT name FROM sqlite_master WHERE type = 'trigger' AND tbl_name = 'book'`)).map((x) => x["name"]), ["book_keep"], "the trigger is still there");
+      same((await e.rows(`SELECT COUNT(*) AS n FROM "book"`))[0]?.["n"], 1, "and the rows");
+      assert(await refuses(e, `DELETE FROM "book"`), "and it still refuses");
+    });
+  },
+);

@@ -194,9 +194,21 @@ export async function decide(tx: Tx, req: Request): Promise<Decision> {
       reasons.push(`the role ${String(r["roleKey"])} is privileged and an agent may not hold it`);
       continue;
     }
+    // a role that names the kinds of principal that may hold it is not held by another kind
+    const kinds = (await tx.select("access role applies to", { where: { accessRole: role }, columns: ["appliesTo"] })).map((k) => String(k["appliesTo"]));
+    if (kinds.length > 0 && !kinds.includes(kind)) {
+      reasons.push(`the role ${String(r["roleKey"])} is not for a ${kind}`);
+      continue;
+    }
     for (const rp of await tx.select("role permission", { where: { role }, columns: ["permission"] })) {
       const p = (await tx.select("permission", { where: { permissionId: String(rp["permission"]) }, columns: ["permissionKey", "featureKey"] }))[0];
       if (p === undefined || p["permissionKey"] !== req.action) continue;
+      // a permission is for people, machines and groups unless it names the kinds it is for
+      const forKinds = (await tx.select("permission applies to", { where: { permission: String(rp["permission"]) }, columns: ["appliesTo"] })).map((k) => String(k["appliesTo"]));
+      if (!(forKinds.length === 0 ? ["user", "machine", "group"] : forKinds).includes(kind)) {
+        reasons.push(`the permission ${String(p["permissionKey"])} is not for a ${kind}`);
+        continue;
+      }
       const feature = p["featureKey"];
       if (typeof feature === "string") {
         const ent = await tx.select("entitlement", { where: { tenant: req.tenant, featureKey: feature }, columns: ["validFrom", "validTo"] });
@@ -214,8 +226,13 @@ export async function decide(tx: Tx, req: Request): Promise<Decision> {
     if (perm !== undefined)
       for (const pr of await tx.select("permission relation", { where: { permission: String(perm["permissionId"]), objectType: req.resource.type }, columns: ["relation"] }))
         for (const p of principals)
-          for (const t of await tx.select("relation tuple", { where: { tenant: req.tenant, objectType: req.resource.type, objectId: req.resource.id, relation: String(pr["relation"]), subjectId: p }, columns: ["relationTupleId", "expiresAt"] })) {
+          for (const t of await tx.select("relation tuple", { where: { tenant: req.tenant, objectType: req.resource.type, objectId: req.resource.id, relation: String(pr["relation"]), subjectId: p }, columns: ["relationTupleId", "expiresAt", "caveat"] })) {
             const exp = iso(t["expiresAt"]);
+            // a tuple that holds only under a caveat is not evaluated here, and what is not known never allows
+            if (t["caveat"] !== null && t["caveat"] !== undefined) {
+              reasons.push(`the relationship ${String(pr["relation"])} holds only under the caveat ${String(t["caveat"])}, which is not evaluated`);
+              continue;
+            }
             if (exp !== undefined && before(exp, req.now)) continue;
             permitted.push(`relation:${String(pr["relation"])}`);
             refs.push(`tuple:${String(t["relationTupleId"])}`);

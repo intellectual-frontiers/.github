@@ -39,6 +39,7 @@
 ## What the database holds
 
 - **FR-012**: On SQLite, DuckDB and PostgreSQL, a database made by `bind` for one version of a domain (outside the lifecycle) MUST be read as the state of that version, drift made by hand MUST be found, reviewed convergence to the next version MUST leave the database as `bind` makes it for that version, autonomous convergence MUST apply what only adds and hold what does not, and a stale proposal MUST be refused.
+- **FR-013**: The reader MUST read each column's default as the catalog says it and compare it with the state wanted after casts, outer parentheses, spaces and case outside quotes are set aside, so that a default changed by hand is a difference and a default the model made is not; and where a project says `unmanaged: hold`, a table, a column, an index or a constraint that is in the database and not in the model MUST be left out of the state read, so that no step touches it, and MUST be named in the proposal as held.
 
 ## Out of scope
 

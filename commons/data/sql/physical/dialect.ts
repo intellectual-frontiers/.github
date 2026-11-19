@@ -52,6 +52,8 @@ export interface Probes {
   index(name: string, schema?: string): string;
   /** A query that returns a row if and only if the constraint exists and its rows have been checked (0015-sql-safety FR-009). */
   validConstraint?(table: string, name: string, schema?: string): string;
+  /** A query that returns one row of one number: how many triggers the table has (0017-sql-rewrite FR-009). */
+  triggers?(table: string, schema?: string): string;
 }
 
 /** What a dialect needs to make a table again: statements to run first (so that rows that refer to it are not checked until the end) and whether tables that refer to it stop it. */
@@ -66,6 +68,8 @@ export interface LiveColumn {
   readonly name: string;
   readonly type: string;
   readonly nullable: boolean;
+  /** The default as the catalog says it, where the dialect can list it (0019-sql-convergence FR-001). */
+  readonly default?: string;
 }
 
 /** A table as a database's catalog says it is. */

@@ -62,6 +62,36 @@ export function spell(dialect: Dialect, live: string): string {
   return live;
 }
 
+/**
+ * A default as text, in the form two engines agree on: casts taken off, outer parentheses and spaces dropped, and what is not in quotes in lower case, so that `'x'::text`, `('x')` and `'x'` are one,
+ * and `CURRENT_TIMESTAMP` and `current_timestamp` are one.
+ */
+export function normalDefault(text: string): string {
+  let t = text.trim();
+  t = t.replace(/::[a-z_][a-z0-9_ ]*(\(\d+(,\d+)?\))?(\[\])?/gi, "");
+  for (;;) {
+    const m = /^\((.*)\)$/s.exec(t);
+    if (m === null) break;
+    t = (m[1] ?? "").trim();
+  }
+  return t
+    .split(/('(?:[^']|'')*')/)
+    .map((part, i) => (i % 2 === 1 ? part : part.toLowerCase().replace(/\s+/g, " ")))
+    .join("");
+}
+
+/** The default a read reports: what the database has, said as the state says it where the two are the same default, and none where the database has none. */
+function defaultOf(live: string | undefined, wanted: string | undefined): { readonly default?: string } {
+  if (live === undefined) return {};
+  return wanted !== undefined && normalDefault(wanted) === normalDefault(live) ? { default: wanted } : { default: live };
+}
+
+/**
+ * The entry of `ignore` that says to hold what the model does not name: a table, a column, an index or a constraint that is in the database and not in the state wanted is left out of the state read, so
+ * a plan never drops it, and is named in `held`. It is an entry of `ignore` so that every place that reads the database (the proposal, its application, the version gate and the automatic run) agrees.
+ */
+export const HOLD = "@hold";
+
 /** What is wrong with a read. */
 export type ReadError = { readonly kind: "unsupported"; readonly why: string };
 
@@ -78,11 +108,13 @@ export async function readState(
   driver: Driver,
   dialect: Dialect,
   desired: State,
-  options: { readonly ignore?: readonly string[] } = {},
+  options: { readonly ignore?: readonly string[]; readonly held?: string[] } = {},
 ): Promise<Result<State, readonly ReadError[]>> {
   if (dialect.catalog === undefined) return err([{ kind: "unsupported", why: `${dialect.name} cannot read its own catalog` }]);
   const live = await dialect.catalog.read((sql) => driver.query(sql), desired.qualifier);
-  const skip = new Set(options.ignore ?? []);
+  const hold = (options.ignore ?? []).includes(HOLD);
+  const skip = new Set((options.ignore ?? []).filter((n) => n !== HOLD));
+  const held = options.held ?? [];
   // a name that begins with `*` leaves out every table whose name ends with the rest of it (case aside)
   const tails = [...skip].filter((n) => n.startsWith("*")).map((n) => n.slice(1).toLowerCase());
   const left = (name: string): boolean => skip.has(name) || tails.some((x) => name.toLowerCase().endsWith(x));
@@ -93,12 +125,20 @@ export async function readState(
   for (const t of live) {
     if (left(t.name)) continue;
     const want = desired.tables.find((d) => d.name === t.name);
+    if (hold && want === undefined) {
+      held.push(`table ${t.name}`);
+      continue;
+    }
     const w =
       want?.words ??
       (prefix.length > 0 && words(t.name).slice(0, prefix.length).join(".") === prefix.join(".")
         ? words(t.name).slice(prefix.length)
         : words(t.name));
-    const columns: StateColumn[] = t.columns.map((c) => {
+    const columns: StateColumn[] = t.columns.filter((c) => {
+      if (!hold || want === undefined || want.columns.some((x) => x.name === c.name || x.renamedFrom?.join(".") === words(c.name).join("."))) return true;
+      held.push(`column ${t.name}.${c.name}`);
+      return false;
+    }).map((c) => {
       const d = want?.columns.find((x) => x.name === c.name);
       // a column that governance says was renamed is still under its old name here: its type is compared with the new one's
       const renamed = d === undefined ? want?.columns.find((x) => x.renamedFrom?.join(".") === words(c.name).join(".")) : undefined;
@@ -109,7 +149,7 @@ export async function readState(
         name: c.name,
         type: typed !== undefined && sameType(typed.type, c.type) ? typed.type : spell(dialect, c.type),
         nullable: c.nullable,
-        ...(d?.default === undefined ? {} : { default: d.default }),
+        ...defaultOf(c.default, d?.default),
       };
     });
     const kinds = ["foreignKey", "unique", "check"] as const;
@@ -117,7 +157,11 @@ export async function readState(
     for (const k of kinds) {
       if (t.constraints === undefined) constraints.push(...(want?.constraints.filter((c) => c.kind === k) ?? []));
       else
-        for (const c of t.constraints.filter((x) => x.kind === k))
+        for (const c of t.constraints.filter((x) => x.kind === k)) {
+          if (hold && want !== undefined && !want.constraints.some((d) => d.kind === k && d.name === c.name)) {
+            held.push(`${k} ${t.name}.${c.name}`);
+            continue;
+          }
           constraints.push(
             want?.constraints.find((d) => d.kind === k && d.name === c.name) ?? {
               id: `${k}:${c.name}`,
@@ -127,8 +171,13 @@ export async function readState(
               text: "",
             },
           );
+        }
     }
-    for (const name of t.indexes)
+    for (const name of t.indexes) {
+      if (hold && want !== undefined && !want.constraints.some((d) => d.kind === "index" && d.name === name)) {
+        held.push(`index ${t.name}.${name}`);
+        continue;
+      }
       constraints.push(
         want?.constraints.find((d) => d.kind === "index" && d.name === name) ?? {
           id: `ix:${name}`,
@@ -138,6 +187,7 @@ export async function readState(
           text: "",
         },
       );
+    }
     // the rows of a code table are part of the state
     let rows: StateRow[] = [];
     if (want !== undefined && want.rows.length > 0 && columns.length >= 3) {
