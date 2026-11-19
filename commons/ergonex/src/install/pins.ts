@@ -12,7 +12,7 @@ export const BUN_VERSION = "1.4.4";
 /** Where Bun's own installer is. */
 export const BUN_INSTALLER = "https://bun.sh/install";
 
-/** The WinGet package identifiers of the prerequisites on Windows (to verify against the WinGet repository before a release): the runtimes, Git and GitHub CLI. */
+/** The WinGet package identifiers of the prerequisites on Windows (checked against the WinGet repository): the runtimes, Git and GitHub CLI. */
 export const WINGET = {
   bun: "Oven-sh.Bun",
   node: "OpenJS.NodeJS",

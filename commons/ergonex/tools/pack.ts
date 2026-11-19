@@ -24,11 +24,11 @@ export function publishedManifest(own: Readonly<Record<string, unknown>>): Reado
     name: text("name"),
     version: text("version"),
     description: text("description"),
-    license: "UNLICENSED",
+    license: "MIT",
     type: "module",
     bin: { ergonex: "./ergonex.mjs" },
     engines: { node: ">=26" },
-    files: ["ergonex.mjs", "README.md", "CREDITS.md"],
+    files: ["ergonex.mjs", "README.md", "CREDITS.md", "LICENSE"],
     repository: {
       type: "git",
       url: "git+https://github.com/intellectual-frontiers/.github.git",
@@ -74,6 +74,7 @@ export async function stage(): Promise<string> {
     ].join("\n"),
   );
   await fs.writeTextFile(path.join(STAGE, "CREDITS.md"), await fs.readTextFile(path.join(ROOT, "CREDITS.md")));
+  await fs.writeTextFile(path.join(STAGE, "LICENSE"), await fs.readTextFile(path.join(ROOT, "LICENSE")));
   return STAGE;
 }
 
