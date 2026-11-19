@@ -35,7 +35,18 @@ export function outputs(repo: string): { readonly files: ReadonlyMap<string, str
   const libraries: LibraryFacts[] = [];
   for (const f of readLibraries(root)) {
     if ("problem" in f) problems.push(`commons/${f.dir}/library.ts: ${f.problem}`);
-    else libraries.push({ name: f.library.name, verify: f.library.verify, paths: inputsOf(root, f.library.name).paths });
+    else {
+      if (f.library.distribution.includes("npm") && !existsSync(`${root}/commons/${f.library.name}/tools/pack.ts`))
+        problems.push(
+          `commons/${f.library.name} is published to npm and has no tools/pack.ts, which its publish workflow runs (0030-generated-workflows FR-009)`,
+        );
+      libraries.push({
+        name: f.library.name,
+        verify: f.library.verify,
+        paths: inputsOf(root, f.library.name).paths,
+        distribution: f.library.distribution,
+      });
+    }
   }
   const files = new Map<string, string>();
   for (const w of workflows(libraries)) {

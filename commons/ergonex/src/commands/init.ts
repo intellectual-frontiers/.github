@@ -5,19 +5,50 @@
  *
  * @module
  */
-import { ok } from "@intellectual-frontiers/commons/ts/kernel";
-import { exists, mkdir, writeTextFile } from "../platform/r-fs.ts";
-import { err } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
+import { flag } from "../platform/k-args.ts";
+import { chmod, exists, mkdir, readTextFile, writeTextFile } from "../platform/r-fs.ts";
 import { GLOBAL_OPTIONS, defineCommand, type ErgonexModule } from "../modules/types.ts";
 import { AREA, manifestPath } from "../host/workspace.ts";
 import { starterManifest } from "../setup/starter.ts";
-import { join } from "../platform/r-path.ts";
+import { launchFor } from "../setup/onpath.ts";
+import { putOnPath, type PathDeps } from "../setup/host/path.ts";
+import { ERGONEX_VERSION } from "../state-record.ts";
+import { dirname, fromFileUrl, join } from "../platform/r-path.ts";
+import { run as runProgram, runtimeName, which } from "../platform/r-proc.ts";
+
+/** The files that run now: the launcher of this package, where it is. */
+const ENTRY = join(dirname(fromFileUrl(import.meta.url)), "..", "..", "bin", "ergonex.mjs");
+
+/** The host as the step of the path uses it. */
+const hostDeps: PathDeps = {
+  which: (name) => which(name),
+  run: (argv) => runProgram(argv),
+  read: async (path) => ((await exists(path)) ? await readTextFile(path) : undefined),
+  write: async (path, text, executable) => {
+    await writeTextFile(path, text);
+    if (executable) await chmod(path, 0o755);
+  },
+  mkdir: async (path) => {
+    await mkdir(path, { recursive: true });
+  },
+};
+
+const OPTIONS = {
+  ...GLOBAL_OPTIONS,
+  noInstall: flag({
+    help: "Make the root only: do not put ergonex on the path.",
+  }),
+  noPath: flag({
+    help: "On Windows, do not add the folder of the command files to your path.",
+  }),
+};
 
 const init = defineCommand({
   name: "init",
-  summary: "Make the root and the workspace's own area, and write a starter manifest where there is none.",
-  options: { ...GLOBAL_OPTIONS },
-  run: async (ctx) => {
+  summary: "Make the root and the workspace's own area, write a starter manifest where there is none, and put ergonex on your path.",
+  options: OPTIONS,
+  run: async (ctx, args) => {
     if (ctx.home === undefined)
       return err({
         kind: "environment",
@@ -46,12 +77,35 @@ const init = defineCommand({
     const lines =
       made.length === 0
         ? [`${home} is already a workspace; nothing changed`]
-        : [
-            `made ${made.length} thing${made.length === 1 ? "" : "s"} in ${home}:`,
-            ...made.map((m) => `  ${m}`),
-            "next: name your repositories in .ergonex/workspace.ts, then run `ergonex plan`",
-          ];
-    return ok({ text: lines.join("\n"), data: { home, made }, findings: [] });
+        : [`made ${made.length} thing${made.length === 1 ? "" : "s"} in ${home}:`, ...made.map((m) => `  ${m}`)];
+    let onPath:
+      | {
+          readonly how: string;
+          readonly files: readonly string[];
+          readonly pathChanged: boolean;
+        }
+      | undefined;
+    if (!args.options.noInstall) {
+      const r = await putOnPath(hostDeps, {
+        bin: join(home, AREA, "bin").replaceAll("\\", "/"),
+        launch: launchFor({
+          runtime: runtimeName(),
+          entry: ENTRY,
+          version: ERGONEX_VERSION,
+        }),
+        windows: ctx.platform.windows,
+        shellVar: ctx.env["SHELL"],
+        changePath: !args.options.noPath,
+      });
+      lines.push(...r.lines);
+      onPath = r.data;
+    }
+    lines.push("next: name your repositories in .ergonex/workspace.ts, then run `ergonex plan`");
+    return ok({
+      text: lines.join("\n"),
+      data: { home, made, onPath: onPath ?? null },
+      findings: [],
+    });
   },
 });
 

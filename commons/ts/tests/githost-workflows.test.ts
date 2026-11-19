@@ -28,6 +28,11 @@ function repo(root: string, libraries: readonly string[] = ["alpha"]): void {
   mkdirSync(join(root, ".github", "workflows"), { recursive: true });
 }
 
+const put = (root: string, file: string, text: string): void => {
+  mkdirSync(join(root, file, ".."), { recursive: true });
+  writeTextFileSync(join(root, file), text);
+};
+
 const tiny: Workflow = {
   file: "tiny",
   name: "tiny",
@@ -103,7 +108,9 @@ proves(
     const table: readonly string[] = Object.values(PIN);
     const used = [
       ...workflows(
-        readLibraries(ROOT).flatMap((f) => ("library" in f ? [{ name: f.library.name, verify: f.library.verify, paths: [] }] : [])),
+        readLibraries(ROOT).flatMap((f) =>
+          "library" in f ? [{ name: f.library.name, verify: f.library.verify, paths: [], distribution: f.library.distribution }] : [],
+        ),
       ).flatMap((w) => Object.values(w.jobs).flatMap((j) => j.steps)),
       ...ACTIONS.flatMap((a) => a.steps),
     ].flatMap((s) => (s.kind === "uses" ? [s.uses] : []));
@@ -209,3 +216,36 @@ proves([`${SPEC} FR-008`], "the composite action is written with the line that s
     return Promise.resolve();
   });
 });
+
+proves(
+  [`${SPEC} FR-009`],
+  "a library that is published to npm is given a workflow that publishes it on its tag: the tag is checked against the version, the package is built by its tools/pack.ts, npm gets it with provenance and no token and the GitHub package registry with the workflow's own token; a library with no npm has none, and one with npm and no pack.ts is a finding",
+  async () => {
+    await withTempDir((dir) => {
+      repo(dir, ["alpha", "beta"]);
+      writeTextFileSync(join(dir, "commons", "beta", "library.ts"), manifest({ name: "beta", distribution: ["github", "npm"] }));
+      // npm and no tools/pack.ts: a finding, and nothing is written
+      assertEquals(main(["--repo", dir]), 1);
+      assertStringIncludes(outputs(dir).problems.join("\n"), "commons/beta is published to npm and has no tools/pack.ts");
+      put(dir, "commons/beta/tools/pack.ts", "export {};\n");
+      assertEquals(main(["--repo", dir]), 0);
+      const w = readTextFileSync(join(dir, ".github", "workflows", "beta-publish.auto.yml"));
+      assertStringIncludes(w, '- "beta-v*"');
+      assertStringIncludes(w, 'test "$GITHUB_REF_NAME" = "beta-v$version"');
+      assertStringIncludes(w, "run: bun tools/pack.ts");
+      assertStringIncludes(w, "provenance");
+      assertStringIncludes(w, "id-token: write");
+      assertStringIncludes(w, "packages: write");
+      assertStringIncludes(w, "NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}");
+      assert(!/secrets\.(?!GITHUB_TOKEN)/.test(w), "a secret that is not the workflow's own token");
+      assert(
+        !existsSync(join(dir, ".github", "workflows", "alpha-publish.auto.yml")),
+        "a library with no npm is not published by a workflow of its own",
+      );
+      return Promise.resolve();
+    });
+    // the real repository: ergonex is, data is not
+    assert(existsSync(join(ROOT, ".github", "workflows", "ergonex-publish.auto.yml")));
+    assert(!existsSync(join(ROOT, ".github", "workflows", "data-publish.auto.yml")));
+  },
+);

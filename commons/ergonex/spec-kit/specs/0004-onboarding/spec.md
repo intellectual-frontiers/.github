@@ -19,7 +19,7 @@
 ## On every system
 
 - **FR-007**: Every command MUST give the same report on Windows (Windows PowerShell 5.1 and PowerShell 7, `cmd` and Git Bash), macOS and Linux, and a program MUST be run by its arguments, never through a shell's parsing of a line, so that a path with a space, a quote or a character outside ASCII is one argument.
-- **FR-008**: The installers `ergonex-install.ps1` and `ergonex-install.sh` MUST install Bun at the version commons pins, checked by its SHA-256, or Node 26 where Bun cannot run, and then run the command of FR-001, the one for Windows first; a script for Windows PowerShell 5.1 MUST carry a byte order mark or be ASCII, so that it is read as it is written.
+- **FR-008**: The installers `ergonex-install.ps1` and `ergonex-install.sh` MUST install Bun at the version commons pins, checked by its SHA-256, or Node 26 where Bun cannot run, and then run the command of FR-001, the one for Windows first; a script for Windows PowerShell 5.1 MUST carry a byte order mark or be ASCII, so that it is read as it is written, and the generated installers keep the line ends of generated files (LF).
 - **FR-009**: The library's own checks MUST run on Windows, macOS and Linux in CI, Windows first, on Bun and on Node 26.
 
 ## Acceptance scenarios

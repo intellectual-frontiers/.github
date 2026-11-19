@@ -26,7 +26,13 @@ export async function findings(root: string): Promise<readonly kernel.Keyed[]> {
   const sources = await runtime.readSources(root, ["about.ts", "src", "tools", "bin"]);
   const tests = await runtime.readSources(root, ["suite"]);
   const specs = await runtime.readSpecs(root, "spec-kit/specs");
-  return kernel.traceFindings({ specs, sources, tests, ontology: [], specsFolder: "spec-kit/specs" });
+  return kernel.traceFindings({
+    specs,
+    sources,
+    tests,
+    ontology: [],
+    specsFolder: "spec-kit/specs",
+  });
 }
 
 /** The command line: the exit status, and what to print. */
@@ -34,11 +40,17 @@ export async function main(argv: readonly string[]): Promise<{ readonly code: 0 
   const found = await findings(ROOT);
   if (argv.includes("--write-baseline")) {
     await fs.writeTextFile(path.join(ROOT, BASELINE), kernel.formatBaseline(found, COMMENTS));
-    return { code: 0, lines: [`ergonex-check: wrote ${BASELINE} (${found.length} findings held)`] };
+    return {
+      code: 0,
+      lines: [`ergonex-check: wrote ${BASELINE} (${found.length} findings held)`],
+    };
   }
   const text = await fs.readTextFile(path.join(ROOT, BASELINE)).catch(() => "");
   const judged = kernel.judge(found, kernel.parseBaseline(text));
-  return { code: kernel.passes(judged) ? 0 : 1, lines: kernel.report(judged, "ergonex-check", BASELINE) };
+  return {
+    code: kernel.passes(judged) ? 0 : 1,
+    lines: kernel.report(judged, "ergonex-check", BASELINE),
+  };
 }
 
 if (import.meta.main) {

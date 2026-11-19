@@ -41,6 +41,8 @@ export type SnippetFacts = {
 
 /** The folder below the root where the pinned tools and the shims of `ergonex-*` modules are. */
 export const TOOLS_BIN = ".ergonex/tools/bin";
+/** The folder below the root where `ergonex init` writes the command files that start ergonex (ergonex 0004-onboarding FR-002). */
+export const COMMAND_BIN = ".ergonex/bin";
 
 const posixQuote = (s: string): string => `'${s.replaceAll("'", `'\\''`)}'`;
 const fishQuote = (s: string): string => `'${s.replaceAll("\\", "\\\\").replaceAll("'", "\\'")}'`;
@@ -89,6 +91,10 @@ function posix(f: SnippetFacts, shell: "bash" | "zsh"): string {
     `  *":$ERGONEX_HOME/${TOOLS_BIN}:"*) ;;`,
     `  *) export PATH="$ERGONEX_HOME/${TOOLS_BIN}:$PATH" ;;`,
     "esac",
+    'case ":$PATH:" in',
+    `  *":$ERGONEX_HOME/${COMMAND_BIN}:"*) ;;`,
+    `  *) export PATH="$ERGONEX_HOME/${COMMAND_BIN}:$PATH" ;;`,
+    "esac",
     "# the person's GitHub sign-in as the token for reading packages, kept in the environment of this shell and never in a file (ergonex 0004-onboarding FR-004).",
     'if [ -z "${ERGONEX_GITHUB_TOKEN:-}" ] && command -v gh >/dev/null 2>&1; then',
     '  if ERGONEX_GITHUB_TOKEN="$(gh auth token 2>/dev/null)" && [ -n "$ERGONEX_GITHUB_TOKEN" ]; then export ERGONEX_GITHUB_TOKEN; else unset ERGONEX_GITHUB_TOKEN; fi',
@@ -115,7 +121,7 @@ function fish(f: SnippetFacts): string {
   return [
     "# IF Workspaces (ergonex): the root, the pinned tools on the PATH, the completions of ergonex, and wcd.",
     `set -q ERGONEX_HOME; or set -gx ERGONEX_HOME ${home}`,
-    `fish_add_path -g "$ERGONEX_HOME/${TOOLS_BIN}"`,
+    `fish_add_path -g "$ERGONEX_HOME/${TOOLS_BIN}" "$ERGONEX_HOME/${COMMAND_BIN}"`,
     "# the person's GitHub sign-in as the token for reading packages, kept in the environment of this shell and never in a file (ergonex 0004-onboarding FR-004).",
     "if not set -q ERGONEX_GITHUB_TOKEN; and command -q gh",
     '    set -l token (gh auth token 2>/dev/null); and test -n "$token"; and set -gx ERGONEX_GITHUB_TOKEN $token',
@@ -146,6 +152,8 @@ function pwsh(f: SnippetFacts): string {
     `if (-not $env:ERGONEX_HOME) { $env:ERGONEX_HOME = ${home} }`,
     `$ergonexBin = Join-Path $env:ERGONEX_HOME '${TOOLS_BIN}'`,
     "if (($env:PATH -split [IO.Path]::PathSeparator) -notcontains $ergonexBin) { $env:PATH = $ergonexBin + [IO.Path]::PathSeparator + $env:PATH }",
+    `$ergonexCommands = Join-Path $env:ERGONEX_HOME '${COMMAND_BIN}'`,
+    "if (($env:PATH -split [IO.Path]::PathSeparator) -notcontains $ergonexCommands) { $env:PATH = $ergonexCommands + [IO.Path]::PathSeparator + $env:PATH }",
     "# the person's GitHub sign-in as the token for reading packages, kept in the environment of this shell and never in a file (ergonex 0004-onboarding FR-004).",
     "if (-not $env:ERGONEX_GITHUB_TOKEN -and (Get-Command gh -ErrorAction SilentlyContinue)) {",
     "    $ergonexToken = (& gh auth token 2>$null)",
@@ -178,6 +186,8 @@ function nu(f: SnippetFacts): string {
     `$env.ERGONEX_HOME = ($env.ERGONEX_HOME? | default ${home})`,
     `let ergonex_bin = ($env.ERGONEX_HOME | path join ".ergonex" "tools" "bin")`,
     "$env.PATH = ($env.PATH | split row (char esep) | where { |p| $p != $ergonex_bin } | prepend $ergonex_bin)",
+    `let ergonex_commands = ($env.ERGONEX_HOME | path join ".ergonex" "bin")`,
+    "$env.PATH = ($env.PATH | split row (char esep) | where { |p| $p != $ergonex_commands } | prepend $ergonex_commands)",
     "# the person's GitHub sign-in as the token for reading packages, kept in the environment of this shell and never in a file (ergonex 0004-onboarding FR-004).",
     'if (($env.ERGONEX_GITHUB_TOKEN? | default "") == "") and (which gh | is-not-empty) {',
     "    let result = (do { gh auth token } | complete)",

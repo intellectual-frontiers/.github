@@ -10,7 +10,9 @@
  * @module
  */
 import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
-import { build, runtimeName, runtimeVersion } from "../platform/r-proc.ts";
+import { build, run as runProgram, runtimeName, runtimeVersion, which } from "../platform/r-proc.ts";
+import { flag } from "../platform/k-args.ts";
+import { scopesOf, tokenChecks } from "../token.ts";
 import { type Check, findingsOf, fsCheck, hookChecks, type HookFacts, pathChecks, repoPathChecks, runtimeChecks } from "../doctor.ts";
 import { discoverModules } from "../host/discovery.ts";
 import { fileFacts } from "../host/files.ts";
@@ -167,11 +169,38 @@ const longPathsCheck: DoctorCheck = async (ctx, loaded) => {
 /** The checks added to the doctor's own, in order: the policy scans of `workspaces/scan/` and the long-path finding of `setup/windows.ts`. */
 export const DOCTOR_CHECKS: readonly DoctorCheck[] = [secretsCheck, signaturesCheck, modulesCheck, longPathsCheck];
 
+const OPTIONS = {
+  ...GLOBAL_OPTIONS,
+  fetch: flag({
+    help: "Ask GitHub whether the token for reading packages may read them (the one check that uses the network).",
+  }),
+};
+
+/** The token's facts: set or not, GitHub CLI there or not, and with `--fetch` the rights GitHub says it has (the token goes to `gh` in its environment and is never printed). */
+async function tokenFacts(ctx: Context, fetch: boolean) {
+  const token = ctx.env["ERGONEX_GITHUB_TOKEN"];
+  const tokenSet = token !== undefined && token !== "";
+  const gh = which("gh", ctx.env["PATH"]);
+  let scopes: readonly string[] | undefined;
+  if (fetch && tokenSet && gh !== undefined) {
+    const r = await runProgram([gh, "api", "-i", "user"], {
+      env: { GH_TOKEN: token },
+    }).catch(() => undefined);
+    scopes = r === undefined ? undefined : scopesOf(r.stdout);
+  }
+  return {
+    tokenSet,
+    ghInstalled: gh !== undefined,
+    fetched: fetch && tokenSet && gh !== undefined,
+    scopes,
+  };
+}
+
 const doctor = defineCommand({
   name: "doctor",
   summary: "Check the runtime and tools, the layout, the file system, the hooks and the generated files, and say what to do about each.",
-  options: { ...GLOBAL_OPTIONS },
-  run: (ctx) =>
+  options: OPTIONS,
+  run: (ctx, args) =>
     withWorkspace(ctx, async (loaded) => {
       const checks: Check[] = [];
       const runtime = runtimeName();
@@ -254,6 +283,7 @@ const doctor = defineCommand({
         });
 
       for (const extra of DOCTOR_CHECKS) checks.push(...(await extra(ctx, loaded)));
+      checks.push(...tokenChecks(await tokenFacts(ctx, args.options.fetch)));
 
       const findings = findingsOf(checks, ctx.today);
       const lines = checks.map((c) => `${c.level.padEnd(7)} ${c.subject}: ${c.message}`);

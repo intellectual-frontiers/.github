@@ -80,8 +80,8 @@ export type Permissions = Readonly<
   >
 >;
 
-/** The branches and paths a push or a pull request is run for; none is every one. */
-export type Filter = { readonly branches?: readonly string[]; readonly paths?: readonly string[] };
+/** The branches, paths and tags a push or a pull request is run for; none is every one. */
+export type Filter = { readonly branches?: readonly string[]; readonly paths?: readonly string[]; readonly tags?: readonly string[] };
 
 export type Triggers = {
   readonly push?: Filter;

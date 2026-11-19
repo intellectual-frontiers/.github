@@ -95,7 +95,10 @@ proves(
         assertStringIncludes(r.stderr, "not a module name");
         assertStringIncludes(r.stderr, "nothing was run");
       }
-      assertEquals((await w.ergonex()).code, 2);
+      // no command at all is not an error: it says what to do next, in plain words (0004-onboarding FR-003)
+      const bare = await w.ergonex();
+      assertEquals(bare.code, 0);
+      assertStringIncludes(bare.stdout, "ergonex");
       assertEquals((await w.ergonex("--nope")).code, 2);
       const option = await w.ergonex("list", "--nope");
       assertEquals(option.code, 2);

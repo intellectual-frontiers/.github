@@ -30,6 +30,7 @@ import { build, cwd as workingFolder, env as processEnv, runtimeName, runtimeVer
 import { stderr, stdin, stdout } from "./platform/r-stdio.ts";
 import { BUILTIN_MODULES } from "./commands/mod.ts";
 import { topHelp } from "./commands/list.ts";
+import { guidanceFor } from "./commands/guidance.ts";
 import { writeEvidence } from "./host/evidence.ts";
 import { discoverModules, runExternal } from "./host/discovery.ts";
 import { terminalInteract } from "./host/interact.ts";
@@ -125,11 +126,17 @@ export async function main(argv: readonly string[], deps: MainDeps = {}): Promis
 
   const [first, ...rest] = argv;
   if (first === undefined) {
-    note(line(topHelp(builtins)));
-    outcome = err({
-      kind: "usage",
-      message: "no module is named; the modules are listed above",
-    });
+    // a person who types the name and nothing else is told what to do next, in plain words (0004-onboarding FR-003)
+    const root = homeFor(undefined);
+    out(
+      line(
+        guidanceFor({
+          home: root,
+          hasWorkspace: root !== undefined && existsSync(join(root, AREA)),
+        }),
+      ),
+    );
+    return 0;
   } else if (first === "--help" || first === "-h") {
     out(line(topHelp(builtins)));
     return 0;

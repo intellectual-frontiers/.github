@@ -20,6 +20,7 @@ export const PIN = {
   setupNode: "actions/setup-node@v4",
   cache: "actions/cache@v4",
   uploadArtifact: "actions/upload-artifact@v4",
+  downloadArtifact: "actions/download-artifact@v4",
   uploadPages: "actions/upload-pages-artifact@v3",
   deployPages: "actions/deploy-pages@v4",
   bun: "./.github/actions/bun",
@@ -63,6 +64,8 @@ export type LibraryFacts = {
   readonly verify: string;
   /** The paths whose change affects it, which the library's workflow runs on (0027-commons-libraries FR-022). */
   readonly paths: readonly string[];
+  /** Where it is published (0027-commons-libraries FR-015 to FR-017): the registries, `github` and, where a decision says so, `npm`. */
+  readonly distribution: readonly string[];
 };
 
 /** What a library's CI needs that its manifest does not say. */
@@ -565,11 +568,109 @@ const tests: Workflow = {
   },
 };
 
+/**
+ * The workflow that publishes a library to the registries its manifest names (0030-generated-workflows FR-009): on a tag `<name>-v<version>` it checks the tag is the version, proves the library, packs it
+ * with its `tools/pack.ts` and sends the tarball to npm, with provenance and no token (npm's trusted publishing), and to the GitHub package registry with the workflow's own token.
+ */
+export function publishWorkflow(l: LibraryFacts): Workflow {
+  const folder = `commons/${l.name}`;
+  const tarball = 'npm publish "$(ls ./*.tgz)"';
+  const sendNpm = l.distribution.includes("npm");
+  return {
+    file: `${l.name}-publish`,
+    name: `${l.name}-publish`,
+    comment: lines(
+      `Publishes ${l.name} (commons 0027-commons-libraries FR-015, FR-016): a tag \`${l.name}-v<version>\` (made by \`versions tag\`, commons 0026-works-versioning) is checked against the package's version, the library is proved and packed by its own`,
+      "tools/pack.ts, and the tarball goes to the registries its manifest names: npm with provenance and no token (trusted publishing, which the owner of the npm scope sets up once for this workflow's file), and",
+      "the GitHub package registry with this workflow's own token.",
+    ).trimEnd(),
+    on: { push: { tags: [`${l.name}-v*`] } },
+    permissions: { contents: "read" },
+    jobs: {
+      build: job({
+        runsOn: "ubuntu-latest",
+        timeoutMinutes: 15,
+        steps: [
+          checkout(),
+          bun(),
+          setupNode(),
+          tools(folder),
+          run(
+            lines(
+              `version=$(node -p "require('./package.json').version")`,
+              `test "$GITHUB_REF_NAME" = "${l.name}-v$version" || { echo "the tag $GITHUB_REF_NAME is not ${l.name}-v$version"; exit 1; }`,
+            ),
+            {
+              name: "The tag is the version of the package",
+              workingDirectory: folder,
+              shell: "bash",
+            },
+          ),
+          run("bun run verify", { name: "verify", workingDirectory: folder }),
+          run("bun tools/pack.ts", { name: "The package that is published", workingDirectory: folder }),
+          use(PIN.uploadArtifact, {
+            name: "The tarball, kept for the jobs that publish it",
+            with: { name: `${l.name}-package`, path: `${folder}/dist/*.tgz`, "if-no-files-found": "error" },
+          }),
+        ],
+      }),
+      ...(sendNpm
+        ? {
+            "publish-npm": job({
+              needs: ["build"],
+              runsOn: "ubuntu-latest",
+              timeoutMinutes: 10,
+              permissions: { contents: "read", "id-token": "write" },
+              environment: { name: "npm" },
+              steps: [
+                use(PIN.downloadArtifact, { name: "The tarball", with: { name: `${l.name}-package`, path: "package" } }),
+                use(PIN.setupNode, { with: { "node-version": expr("env.NODE_VERSION"), "registry-url": "https://registry.npmjs.org" } }),
+                run(tarball + " --access public --provenance", {
+                  name: "Published to npm, with provenance and no token",
+                  workingDirectory: "package",
+                  shell: "bash",
+                }),
+              ],
+            }),
+          }
+        : {}),
+      "publish-github": job({
+        needs: ["build"],
+        runsOn: "ubuntu-latest",
+        timeoutMinutes: 10,
+        permissions: { contents: "read", packages: "write" },
+        steps: [
+          use(PIN.downloadArtifact, { name: "The tarball", with: { name: `${l.name}-package`, path: "package" } }),
+          use(PIN.setupNode, {
+            with: {
+              "node-version": expr("env.NODE_VERSION"),
+              "registry-url": "https://npm.pkg.github.com",
+              scope: "@intellectual-frontiers",
+            },
+          }),
+          run(tarball, {
+            name: "Published to the GitHub package registry",
+            workingDirectory: "package",
+            shell: "bash",
+            env: { NODE_AUTH_TOKEN: expr("secrets.GITHUB_TOKEN") },
+          }),
+        ],
+      }),
+    },
+    env: { NODE_VERSION },
+  };
+}
+
 /** Every workflow, the libraries' made from their manifests, in the order of their files' names. */
 export function workflows(libraries: readonly LibraryFacts[]): readonly Workflow[] {
-  return [...libraries.map(libraryWorkflow), docs, ifcTypescript, sqlAide, tests].sort((a, b) =>
-    a.file < b.file ? -1 : a.file > b.file ? 1 : 0,
-  );
+  return [
+    ...libraries.map(libraryWorkflow),
+    ...libraries.filter((l) => l.distribution.includes("npm")).map(publishWorkflow),
+    docs,
+    ifcTypescript,
+    sqlAide,
+    tests,
+  ].sort((a, b) => (a.file < b.file ? -1 : a.file > b.file ? 1 : 0));
 }
 
 /** The composite actions of `.github/actions/`: the pinned Bun, which every workflow uses. */

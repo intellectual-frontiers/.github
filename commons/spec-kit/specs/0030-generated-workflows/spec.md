@@ -18,6 +18,7 @@
 - **FR-006**: The workflow of each library of commons MUST be made from the library's manifest (its name, its folder and its `verify` command) and its record of the facts of CI that a manifest does not hold, so that a library is given a workflow by being registered, with no file written by hand.
 - **FR-007**: The workflow that plans which libraries a change affects, and the one job that gates the rest, MUST be made by the same model when they are added.
 - **FR-008**: The composite actions of `.github/actions/` MUST be made by the same generator from the same model, and a file whose name GitHub fixes (`action.yml`), which cannot carry `.auto.`, MUST begin with the line that says it is generated and by what, and be compared by `--check` like the others.
+- **FR-009**: A library whose manifest names npm among its registries MUST be given a workflow, `<name>-publish.auto.yml`, made by the same model, that runs on a tag `<name>-v*`, checks the tag against the version of the package, proves the library, packs it with the library's own `tools/pack.ts` and sends the tarball to npm with provenance and no token, and to the GitHub package registry with the workflow's own token, and the generator MUST find a library published to npm that has no `tools/pack.ts`.
 
 ## Acceptance scenarios
 
@@ -29,6 +30,7 @@
 6. **Given** a folder `commons/alpha/` with a manifest, **When** the generator runs, **Then** `alpha.auto.yml` is written with a job that runs the manifest's `verify` in `commons/alpha`, and it runs when that folder or what the library imports changes, per FR-006.
 7. **Given** the files the generator wrote, **When** a JSON Schema validator that is not this repository's reads each against the schema of GitHub workflows, **Then** none has an error, per FR-003.
 8. **Given** the composite action `bun`, **When** the generator runs, **Then** `.github/actions/bun/action.yml` begins with the line that says it is generated, and `--check` compares it, per FR-008.
+9. **Given** a library whose manifest names npm and that has a `tools/pack.ts`, **When** the generator runs, **Then** `<name>-publish.auto.yml` runs on its tag, checks the version, packs it and sends it to npm and to the GitHub package registry, and a library with no `tools/pack.ts` is a finding, per FR-009.
 
 ## Out of scope
 
@@ -46,6 +48,8 @@
 - A step that runs a script in a composite action and names no shell: found, per FR-002.
 - An action pinned by a branch (`@main`): found, per FR-005.
 - A library with no record of CI facts: given the job `verify` alone, per FR-006.
+- A library that names npm and has no `tools/pack.ts`: found, and nothing is written, per FR-009.
+- A tag that is not `<name>-v<version>` of the package: the publish workflow stops before anything is sent, per FR-009.
 
 ## Assumptions
 

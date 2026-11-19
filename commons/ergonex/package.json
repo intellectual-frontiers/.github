@@ -17,7 +17,8 @@
     "check": "tsc -p tsconfig.json",
     "test": "bun test suite/",
     "test:node": "node --test \"suite/**/*.test.ts\"",
-    "verify": "tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../ts/mizan/check.ts --root spec-kit --level L1 && bun tools/check.ts && bun test suite/"
+    "verify": "tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../ts/mizan/check.ts --root spec-kit --level L1 && bun tools/check.ts && bun tools/generate-installers.ts --check && bun test suite/",
+    "pack": "bun tools/pack.ts"
   },
   "devDependencies": {
     "@intellectual-frontiers/commons": "link:../ts",

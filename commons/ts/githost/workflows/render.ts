@@ -80,6 +80,7 @@ function filter(k: string, f: Filter | undefined, n: number): string[] {
   const inner = [
     ...(f.branches === undefined ? [] : flowList("branches", f.branches, n + 2)),
     ...(f.paths === undefined ? [] : list("paths", f.paths, n + 2)),
+    ...(f.tags === undefined ? [] : list("tags", f.tags, n + 2)),
   ];
   return inner.length === 0 ? [`${pad(n)}${key(k)}:`] : [`${pad(n)}${key(k)}:`, ...inner];
 }

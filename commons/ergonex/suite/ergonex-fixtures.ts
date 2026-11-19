@@ -142,7 +142,9 @@ export async function withWorld(f: (w: World) => Promise<void>): Promise<void> {
       env,
       ergonex: (...words) => world.ergonexOn(execPath(), Ergonex, words),
       ergonexOn: async (program, entry, words, extra = {}) => {
-        const r = await run([program, entry, ...words], {
+        // a test of the workspace never puts ergonex on the path of the computer it runs on (0004-onboarding FR-002): the tests of that are in ergonex-onboarding.test.ts
+        const given = words[0] === "init" && !words.includes("--no-install") ? [...words, "--no-install"] : words;
+        const r = await run([program, entry, ...given], {
           env: { ...env, ...extra },
           cwd: dir,
         });
