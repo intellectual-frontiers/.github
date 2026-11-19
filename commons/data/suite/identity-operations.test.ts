@@ -1,4 +1,4 @@
-// Spec: 0041-identity-authorize FR-001, FR-002, FR-003, FR-004, FR-005, FR-006; 0042-identity-agent-operations FR-001, FR-002, FR-003, FR-004, FR-005, FR-006
+// Spec: 0041-identity-authorize FR-001, FR-002, FR-003, FR-004, FR-005, FR-006; 0042-identity-agent-operations FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007
 /**
  * The decision engine and the operations of delegation and agents (commons data 0041, 0042), on SQLite and PostgreSQL (DuckDB cannot update a row another row refers to, so these operations are
  * not run on it): one decision for a person, a machine, a device, an agent or a group; delegation that can only attenuate and is revoked from the top; a tool call that is decided, budgeted and
@@ -100,8 +100,10 @@ const ask = async (rt: Runtime, principal: string, action: string, more: Record<
   assert(r.kind === "ok", JSON.stringify(r));
   return r.kind === "ok" ? r.value : (undefined as never);
 };
-const run = async (rt: Runtime, name: string, input: Record<string, unknown>) => {
-  const r = await rt.run(name, input);
+const ACTOR: Readonly<Record<string, string>> = { delegate: "delegator", revokeDelegation: "revokedBy", decideApproval: "decidedBy", killAgent: "by" };
+const run = async (rt: Runtime, name: string, input: Record<string, unknown>, caller?: string) => {
+  const actor = caller ?? (ACTOR[name] === undefined ? undefined : String(input[ACTOR[name] as string]));
+  const r = await rt.run(name, input, actor);
   if (r.kind === "err") throw new Error(`${name}: ${JSON.stringify(r.error)}`);
   return r.value;
 };
@@ -351,6 +353,37 @@ proves(
         await e.run(`UPDATE "audit_event" SET "action" = 'tool.forged' WHERE "audit_event_id" = (SELECT "audit_event_id" FROM "audit_event" ORDER BY "occurred_at", "audit_event_id" LIMIT 1)`);
         const after = await run(rt, "verifyChainForTest", {});
         assert((after["problems"] as { kind: string }[]).some((p) => p.kind === "hash-mismatch"), `${name}: ${JSON.stringify(after)}`);
+      } finally {
+        await e.close();
+      }
+    }
+  },
+);
+
+proves(
+  ["0042-identity-agent-operations FR-007"],
+  "the identity of the actor is the caller's and never what an input says: a forged delegator, decider or killer is refused, no caller is refused, and only the one who answers for an agent, or who may, can switch it off or end a delegation",
+  async () => {
+    for (const { name } of ENGINES) {
+      const { e, rt } = await world(name);
+      try {
+        const forged = await rt.run("delegate", { tenant: "t1", delegator: "u1", delegate: "a1", purpose: "p", permissions: ["invoice:read"], redelegable: false, maxDepth: 0, expiresAt: LATER }, "u2");
+        same(forged, { kind: "ok", value: { status: "caller-mismatch", caller: "u2", claimed: "u1" } }, `${name}: u2 cannot delegate as u1`);
+        same((await rt.run("delegate", { tenant: "t1", delegator: "u1", delegate: "a1", purpose: "p", permissions: ["invoice:read"], redelegable: false, maxDepth: 0, expiresAt: LATER })) as unknown, { kind: "ok", value: { status: "unauthenticated" } }, `${name}: no caller`);
+        same(Number((await e.rows(`SELECT count(*) n FROM "delegation"`))[0]?.["n"]), 0, `${name}: nothing was made`);
+        const dg = String((await delegate(rt, {}))["delegation"]);
+        same((await run(rt, "revokeDelegation", { delegation: dg, revokedBy: "u2", reason: "x" }))["status"], "not-allowed", `${name}: someone else cannot end it`);
+        same((await run(rt, "killAgent", { agent: "a1", by: "u2", reason: "x" }))["status"], "not-allowed", `${name}: someone else cannot switch the agent off`);
+        same((await rt.run("killAgent", { agent: "a1", by: "u1", reason: "x" }, "u2")) as unknown, { kind: "ok", value: { status: "caller-mismatch", caller: "u2", claimed: "u1" } });
+        same(Number((await e.rows(`SELECT count(*) n FROM "principal" WHERE "status" = 'disabled'`))[0]?.["n"]), 0, `${name}: nothing was switched off`);
+        // someone who may revoke, or kill, in the tenant, can
+        await e.run(`INSERT INTO "permission" ("permission_id", "permission_key", "definition", "owner_module", "risk_level", "side_effect") VALUES ('p-kill', 'agent:kill', 'Kill', 'ops', 'high', 'write'), ('p-rev', 'delegation:revoke', 'Revoke', 'ops', 'high', 'write')`);
+        await e.run(`INSERT INTO "access_role" ("role_id", "role_key", "name", "kind", "definition", "is_privileged", "status") VALUES ('r-ops', 'ops', 'Ops', 'system', 'Operates', false, 'active')`);
+        await e.run(`INSERT INTO "role_permission" ("role_access_role_role_id", "permission_id") VALUES ('r-ops', 'p-kill'), ('r-ops', 'p-rev')`);
+        await e.run(`INSERT INTO "role_assignment" ("role_assignment_id", "valid_from", "status", "via", "assignment_key", "principal_id", "role_access_role_role_id", "tenant_id", "granted_by_principal_id") VALUES ('ra-ops', ${AT}, 'active', 'direct', 'k-ops', 'u2', 'r-ops', 't1', 'u1')`);
+        same((await run(rt, "revokeDelegation", { delegation: dg, revokedBy: "u2", reason: "ops" }))["status"], "revoked", `${name}: one who may revoke in the tenant`);
+        await e.run(`UPDATE "principal" SET "tenant_id" = 't1' WHERE "principal_id" = 'a2'`);
+        same((await run(rt, "killAgent", { agent: "a2", by: "u2", reason: "ops" }))["status"], "killed", `${name}: one who may switch agents off in the tenant`);
       } finally {
         await e.close();
       }

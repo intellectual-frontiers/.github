@@ -57,6 +57,12 @@ proves(
     same(bad(() => "SELECT 1 /* ; */ -- DROP\n"), ["ok"], "comments are left out");
     same(bad(() => "SELECT 'delete; drop' AS note, \"insert\" FROM author"), ["ok"], "so are strings and quoted names");
     same(readOnly("select 1"), undefined);
+    same(bad(() => "SELECT '--', 1; DELETE FROM author"), ["not-read-only: it holds more than one statement"], "a comment marker in a string is not a comment");
+    same(bad(() => "SELECT 1 /* it's */ ; DROP TABLE author"), ["not-read-only: it holds more than one statement"], "a quote in a comment is not a string");
+    same(bad(() => "SELECT 1 INTO scratch FROM author"), ["not-read-only: it holds INTO"], "a SELECT that makes a table");
+    same(bad(() => "WITH x AS (INSERT INTO author VALUES (1) RETURNING 1) SELECT * FROM x"), ["not-read-only: it holds INSERT"]);
+    same(bad(() => "SELECT $$;DROP TABLE author$$ AS note"), ["ok"], "a dollar-quoted string is a string");
+    same(bad(() => "SELECT $t$ ; $$ $t$ AS note"), ["ok"], "and so is a tagged one");
     const dup = queries(schema, [byName, byName], { dialect: d });
     assert(dup.kind === "err" && dup.error[0]?.kind === "duplicate");
   },

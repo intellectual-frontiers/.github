@@ -66,19 +66,65 @@ export interface CatalogOptions {
 }
 
 const MARK = "\u0001";
-const FORBIDDEN = ["INSERT", "UPDATE", "DELETE", "DROP", "CREATE", "ALTER", "TRUNCATE", "GRANT", "ATTACH", "COPY", "PRAGMA"];
+const FORBIDDEN = ["INSERT", "UPDATE", "DELETE", "DROP", "CREATE", "ALTER", "TRUNCATE", "GRANT", "ATTACH", "COPY", "PRAGMA", "INTO", "MERGE", "CALL", "INSTALL", "EXPORT", "VACUUM", "REINDEX"];
 
-/** The text of a query with its string literals, quoted names and comments left out. */
-const bare = (sql: string): string =>
-  sql
-    .replace(/--[^\n]*/g, " ")
-    .replace(/\/\*[\s\S]*?\*\//g, " ")
-    .replace(/'(?:[^']|'')*'/g, "''")
-    .replace(/"(?:[^"]|"")*"/g, '""');
+/**
+ * The code of a query: what is left when its string literals, quoted names, dollar-quoted strings and comments are left out, found by reading it once from the start so that a comment marker inside a
+ * string, or a quote inside a comment, is read as what it is.
+ */
+export function code(sql: string): string {
+  let out = "";
+  let i = 0;
+  while (i < sql.length) {
+    const c = sql[i] as string;
+    const rest = sql.slice(i);
+    if (c === "'" || c === '"') {
+      let j = i + 1;
+      while (j < sql.length) {
+        if (sql[j] === c) {
+          if (sql[j + 1] === c) j += 2;
+          else break;
+        } else j++;
+      }
+      out += `${c}${c}`;
+      i = j + 1;
+    } else if (rest.startsWith("--")) {
+      const j = sql.indexOf("\n", i);
+      out += " ";
+      i = j === -1 ? sql.length : j + 1;
+    } else if (rest.startsWith("/*")) {
+      // block comments nest in PostgreSQL and DuckDB; read them so
+      let depth = 1;
+      let j = i + 2;
+      while (j < sql.length && depth > 0) {
+        if (sql.startsWith("/*", j)) {
+          depth++;
+          j += 2;
+        } else if (sql.startsWith("*/", j)) {
+          depth--;
+          j += 2;
+        } else j++;
+      }
+      out += " ";
+      i = j;
+    } else {
+      const tag = /^\$([A-Za-z_][A-Za-z0-9_]*)?\$/.exec(rest);
+      if (tag !== null) {
+        const close = sql.indexOf(tag[0], i + tag[0].length);
+        out += "''";
+        i = close === -1 ? sql.length : close + tag[0].length;
+      } else {
+        out += c;
+        i++;
+      }
+    }
+  }
+  return out;
+}
 
 /** Why a query is not read-only, or nothing. */
 export function readOnly(sql: string): string | undefined {
-  const s = bare(sql).replace(new RegExp(`${MARK}[^${MARK}]*${MARK}`, "g"), "?").trim();
+  const s = code(sql).replace(new RegExp(`${MARK}[^${MARK}]*${MARK}`, "g"), "?").trim();
   if (!/^(SELECT|WITH)\b/i.test(s)) return "it is not a SELECT or WITH";
   if (s.includes(";")) return "it holds more than one statement";
   const word = FORBIDDEN.find((w) => new RegExp(`\\b${w}\\b`, "i").test(s));

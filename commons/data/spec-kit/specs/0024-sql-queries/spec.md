@@ -11,7 +11,7 @@
 
 - **FR-001**: `queries` MUST make a catalog from a logical schema, a dialect, a naming and query specs (a name, parameters each with a type and whether it may be null, and a function from references and parameters to SQL) and MUST give errors as values for a table or column the schema does not have, two queries with one name, and a query that is not read-only (FR-003).
 - **FR-002**: A parameter MUST be `text`, `integer`, `number` or `boolean`, and a value MUST enter a query only as a literal that the dialect writes for it; `render` MUST refuse, as errors as values, a value of another type, a missing value, a null for a parameter that may not be null, and a value for a parameter that was not declared.
-- **FR-003**: A query MUST be a single `SELECT` or `WITH` statement; with the text of string literals, quoted names and comments left out, a query that holds `;` or any of `INSERT`, `UPDATE`, `DELETE`, `DROP`, `CREATE`, `ALTER`, `TRUNCATE`, `GRANT`, `ATTACH`, `COPY` or `PRAGMA` as a word MUST be refused as an error value.
+- **FR-003**: A query MUST be a single `SELECT` or `WITH` statement; with the text of string literals, quoted names, dollar-quoted strings and comments left out (the query read once from its start, so that a comment marker in a string and a quote in a comment are read as what they are), a query that holds `;` or any of `INSERT`, `UPDATE`, `DELETE`, `DROP`, `CREATE`, `ALTER`, `TRUNCATE`, `GRANT`, `ATTACH`, `COPY`, `PRAGMA`, `INTO`, `MERGE`, `CALL`, `INSTALL`, `EXPORT`, `VACUUM` or `REINDEX` as a word MUST be refused as an error value.
 
 ## Running
 

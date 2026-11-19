@@ -37,7 +37,13 @@ const narrower = (childType: unknown, childId: unknown, parentType: unknown, par
   return matches(String(parentId), String(childId).endsWith("*") ? String(childId).slice(0, -1) : String(childId)) && (!String(childId).endsWith("*") || String(parentId).endsWith("*"));
 };
 
+/** Whether the caller is the principal the input says is acting: the identity is the caller's, which the project authenticated, and never what an input says. */
+const actingAs = (ctx: Context, claimed: string): Outcome | undefined =>
+  ctx.caller === undefined ? { status: "unauthenticated" } : ctx.caller !== claimed ? { status: "caller-mismatch", caller: ctx.caller, claimed } : undefined;
+
 export const delegateImpl: Implementation = async (tx, input, ctx): Promise<Outcome> => {
+  const who = actingAs(ctx, String(input["delegator"]));
+  if (who !== undefined) return who;
   const now = ctx.now();
   const delegator = String(input["delegator"]);
   const delegate = String(input["delegate"]);
@@ -104,9 +110,13 @@ export const delegateImpl: Implementation = async (tx, input, ctx): Promise<Outc
 };
 
 export const revokeDelegationImpl: Implementation = async (tx, input, ctx): Promise<Outcome> => {
+  const who = actingAs(ctx, String(input["revokedBy"]));
+  if (who !== undefined) return who;
   const id = String(input["delegation"]);
-  const start = (await tx.select("delegation", { where: { delegationId: id }, columns: ["status"] }))[0];
+  const start = (await tx.select("delegation", { where: { delegationId: id }, columns: ["status", "tenant", "delegator"] }))[0];
   if (start === undefined) return { status: "not-found" };
+  // only the one who delegated, or someone who may revoke delegations in the tenant
+  if (String(start["delegator"]) !== ctx.caller && (await decide(tx, { principal: String(ctx.caller), action: "delegation:revoke", tenant: String(start["tenant"]), now: ctx.now() })).effect !== "allow") return { status: "not-allowed" };
   const all = [id];
   for (let i = 0; i < all.length; i++) for (const c of await tx.select("delegation", { where: { parent: all[i] as string }, columns: ["delegationId"] })) all.push(String(c["delegationId"]));
   let n = 0;
@@ -230,6 +240,8 @@ export const recordToolCallImpl: Implementation = async (tx, input, ctx: Context
 };
 
 export const decideApprovalImpl: Implementation = async (tx, input, ctx): Promise<Outcome> => {
+  const who0 = actingAs(ctx, String(input["decidedBy"]));
+  if (who0 !== undefined) return who0;
   const now = ctx.now();
   const req = (await tx.select("approval request", { where: { approvalRequestId: String(input["approvalRequest"]) }, columns: ["approvalRequestId", "status", "expiresAt", "approverRule", "run", "agent", "actionKey", "resourceType", "resourceId"] }))[0];
   if (req === undefined) return { status: "not-found" };
@@ -269,10 +281,16 @@ export const decideApprovalImpl: Implementation = async (tx, input, ctx): Promis
 };
 
 export const killAgentImpl: Implementation = async (tx, input, ctx): Promise<Outcome> => {
+  const who = actingAs(ctx, String(input["by"]));
+  if (who !== undefined) return who;
   const now = ctx.now();
   const id = String(input["agent"]);
-  const p = (await tx.select("principal", { where: { principalId: id }, columns: ["kind", "status", "tenant"] }))[0];
+  const p = (await tx.select("principal", { where: { principalId: id }, columns: ["kind", "status", "tenant", "owner"] }))[0];
   if (p === undefined || p["kind"] !== "agent") return { status: "not-an-agent" };
+  // the one who answers for the agent, or someone who may switch agents off in its tenant
+  const tenantOf = p["tenant"] === null || p["tenant"] === undefined ? undefined : String(p["tenant"]);
+  const mayKill = String(p["owner"]) === ctx.caller || (tenantOf !== undefined && (await decide(tx, { principal: String(ctx.caller), action: "agent:kill", tenant: tenantOf, now })).effect === "allow");
+  if (!mayKill) return { status: "not-allowed" };
   const reason = String(input["reason"]);
   const disabled = await tx.update("principal", { status: "disabled", statusReason: reason, statusChangedAt: now }, { principalId: id, status: { ne: "disabled" } });
   let runs = 0;

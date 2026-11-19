@@ -16,6 +16,8 @@
 - **FR-005**: `decideApproval` MUST refuse a decider that is not an active person (an agent never decides), one that is not the one who answers for the agent (its owner, or the person at the root of its delegation, or a holder of a named role) and one that cannot do the thing themselves, MUST decide a pending request once, and MUST say so where it is not pending or has run out.
 - **FR-006**: `killAgent` MUST, in one transaction, disable the agent, stop its running runs, end its delegations and those below them, revoke its credentials and cancel what waits for approval, say how many of each, say that it is already off where nothing changed, and refuse a principal that is not an agent.
 
+- **FR-007**: The operations of delegation and agents MUST take the identity of the one acting from the caller the project authenticated and never from an input: `delegate`, `revokeDelegation`, `decideApproval` and `killAgent` MUST refuse as a status a caller that is not the principal an input names as acting (`caller-mismatch`) and a call with no caller (`unauthenticated`); `revokeDelegation` MUST be allowed only to the one who delegated or to one who may `delegation:revoke` in the tenant; and `killAgent` MUST be allowed only to the one who answers for the agent or to one who may `agent:kill` in its tenant.
+
 ## Out of scope
 
 - A generated typed client and a server: the runtime is a function.

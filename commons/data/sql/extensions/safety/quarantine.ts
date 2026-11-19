@@ -36,6 +36,12 @@ function keptFor(context: StepContext, tableWords: readonly string[], columnWord
 export const quarantineName = (naming: Naming, table: string, column: readonly string[] | undefined, suffix: string): string =>
   naming.names.write([...words(table), ...(column ?? []), suffix]);
 
+/** A fingerprint of the values of a column: how many rows, how long the values are in all, and the least and the greatest, as one text, so that the values kept can be told from the values dropped. */
+const fingerprint = (dialect: Dialect, table: string, column: string): string => {
+  const v = `CAST(${dialect.quote(column)} AS VARCHAR)`;
+  return `SELECT CAST(COUNT(*) AS VARCHAR) || ':' || CAST(COALESCE(SUM(LENGTH(${v})), 0) AS VARCHAR) || ':' || COALESCE(MIN(${v}), '') || ':' || COALESCE(MAX(${v}), '') FROM ${table}`;
+};
+
 /**
  * The quarantine transform.
  *
@@ -93,10 +99,19 @@ export function quarantine(settings: Safety): StepTransform {
         ...(keys.length > 0 ? { down: [readd, ...restore] } : {}),
         verify: {
           ...draft.verify,
-          before: [...(draft.verify?.before ?? []), { key: "quarantine-rows", query: `SELECT COUNT(*) FROM ${table}` }],
+          before: [
+            ...(draft.verify?.before ?? []),
+            { key: "quarantine-rows", query: `SELECT COUNT(*) FROM ${table}` },
+            { key: "quarantine-content", query: fingerprint(dialect, table, c.column.name) },
+          ],
           after: [
             ...(draft.verify?.after ?? []),
             ...checks,
+            {
+              describe: `the quarantine table of ${c.column.name} holds the values the column held, not the values of an earlier drop of a column of the same name: purge ${qn} first where it is old`,
+              query: fingerprint(dialect, qt, c.column.name),
+              expect: { sameAs: "quarantine-content" },
+            },
             {
               describe: `the quarantine table of ${c.column.name} holds a row for each row of the table`,
               query: `SELECT COUNT(*) FROM ${qt}`,
