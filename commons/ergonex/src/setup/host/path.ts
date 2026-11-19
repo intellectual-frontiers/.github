@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { type Launch, globalInstall } from "../onpath.ts";
+import { type Launch, globalInstall, isRegistryCopy } from "../onpath.ts";
 
 /** What the step needs of the host, so that a test can give it what it likes. */
 export type PathDeps = {
@@ -34,7 +34,9 @@ const firstLine = (s: string): string =>
 
 /** Puts `ergonex` on the path, in the order that asks least of the person: already there, then the runtime's global install; a checkout is not installed. */
 export async function putOnPath(deps: PathDeps, launch: Launch): Promise<PathResult> {
-  const there = deps.which("ergonex");
+  // `bunx` and `npx` put their own temporary copy first on the PATH of the run: that copy is gone with the cache, so it is not an install
+  const found = deps.which("ergonex");
+  const there = found !== undefined && launch.kind === "registry" && isRegistryCopy(found) ? undefined : found;
   if (there !== undefined)
     return {
       lines: [`ergonex is already on your path (${there})`],
