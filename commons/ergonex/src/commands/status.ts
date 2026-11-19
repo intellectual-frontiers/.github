@@ -16,6 +16,7 @@ import { classify, type RepoState } from "../state.ts";
 import { defineCommand, GLOBAL_OPTIONS, type ErgonexModule } from "../modules/types.ts";
 import { foldKey } from "../portable.ts";
 import { observeFacts } from "../host/observe.ts";
+import { findUnmanaged } from "../host/unmanaged.ts";
 import { native } from "../host/workspace.ts";
 import { jsonOf, textOf, withWorkspace } from "./common.ts";
 
@@ -142,6 +143,25 @@ const status = defineCommand({
           default:
             return absurd(state);
         }
+      }
+      // a repository under the root that the manifest does not name is not unseen (0005-repositories FR-010)
+      for (const u of await findUnmanaged(
+        loaded.home,
+        repos.map((r) => r.path),
+        loaded.manifest.hostKinds,
+      )) {
+        findings.push({
+          ruleId: "ergonex/unmanaged-repository",
+          severity: "Informational",
+          message:
+            u.kind === "adoptable"
+              ? `${u.path} is a repository the manifest does not name; \`ergonex adopt --apply\` adds it`
+              : u.kind === "misplaced"
+                ? `${u.path} is a repository the manifest does not name and is not at the path its remote makes (${u.belongsAt}); see \`ergonex adopt\``
+                : `${u.path} is a repository the manifest does not name; see \`ergonex adopt\``,
+          subject: u.path,
+          firstSeen: ctx.today,
+        });
       }
       const width = Math.max(0, ...rows.map((r) => r.path.length));
       const lines = rows.map(

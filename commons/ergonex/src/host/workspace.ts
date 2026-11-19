@@ -21,6 +21,7 @@ import { movedPath, type Places } from "../places.ts";
 import type { Finding } from "../findings.ts";
 import { decodeManifest, issueFinding, type Manifest } from "../manifest.ts";
 import { nativePath } from "../portable.ts";
+import { entriesOf, REPOSITORIES_FILE, type RepoEntry, withEntries } from "../repositories.ts";
 import { type Desired, type Observed, type ObservedFile, type ObservedRepo, plan, type Plan, planDigest } from "../plan.ts";
 import { describeGenerateError, type GeneratedFile, type GenerateError } from "../render.ts";
 import type { RepoState } from "../state.ts";
@@ -99,26 +100,51 @@ export function manifestPath(home: string): string {
   return join(home, AREA, "workspace.ts");
 }
 
-/** The manifest value `workspace.ts` exports as its default, or why it cannot be had. */
-async function importManifest(path: string): Promise<Result<unknown, string>> {
+/** The value a file of the workspace's folder exports as its default, or why it cannot be had. */
+async function importDefault(path: string, name: string, shape: string): Promise<Result<unknown, string>> {
   try {
     const s = statSync(path);
     const url = `${toFileUrl(path).href}?v=${s.size}-${s.mtime?.getTime() ?? 0}`;
     const mod: unknown = await import(url);
     const value: unknown = typeof mod === "object" && mod !== null ? Reflect.get(mod, "default") : undefined;
-    if (value === undefined)
-      return err("workspace.ts has no default export; it exports the manifest as its default (`export default { repositories: [...] }`)");
+    if (value === undefined) return err(`${name} has no default export; it exports ${shape} as its default`);
     return ok(value);
   } catch (e) {
-    return err(`workspace.ts could not be loaded: ${e instanceof Error ? e.message : String(e)}`);
+    return err(`${name} could not be loaded: ${e instanceof Error ? e.message : String(e)}`);
   }
+}
+
+const importManifest = (path: string): Promise<Result<unknown, string>> =>
+  importDefault(path, "workspace.ts", "the manifest (`export default { repositories: [...] }`)");
+
+/** Where the list of repositories that `ergonex add` keeps is (0005-repositories FR-001). */
+export function repositoriesPath(home: string): string {
+  return join(home, AREA, REPOSITORIES_FILE);
+}
+
+/** The entries of `.ergonex/repositories.ts`: none where there is no file, or why the file cannot be read. */
+export async function readRepositoryList(home: string): Promise<Result<readonly RepoEntry[], string>> {
+  const path = repositoriesPath(home);
+  if (!existsSync(path)) return ok([]);
+  const imported = await importDefault(path, "repositories.ts", "an array of repositories");
+  return imported.kind === "err" ? imported : entriesOf(imported.value);
+}
+
+/** The manifest value `workspace.ts` exports, as it is, and the entries of the list beside it. */
+export async function readRawManifest(
+  home: string,
+): Promise<Result<{ readonly base: unknown; readonly list: readonly RepoEntry[] }, string>> {
+  const imported = await importManifest(manifestPath(home));
+  if (imported.kind === "err") return imported;
+  const list = await readRepositoryList(home);
+  return list.kind === "err" ? list : ok({ base: imported.value, list: list.value });
 }
 
 /** Reads and decodes the manifest of a root, or says why it cannot be had: absent, or findings that name each field. */
 export async function readManifest(home: string, today: string, loopbackHttp = false): Promise<Result<Manifest, LoadFailure>> {
   const path = manifestPath(home);
   if (!existsSync(path)) return err({ kind: "no-manifest", path });
-  const imported = await importManifest(path);
+  const imported = await readRawManifest(home);
   if (imported.kind === "err")
     return err({
       kind: "manifest",
@@ -132,7 +158,7 @@ export async function readManifest(home: string, today: string, loopbackHttp = f
         },
       ],
     });
-  const decoded = decodeManifest(imported.value, { loopbackHttp });
+  const decoded = decodeManifest(withEntries(imported.value.base, imported.value.list), { loopbackHttp });
   if (decoded.kind === "err")
     return err({
       kind: "manifest",

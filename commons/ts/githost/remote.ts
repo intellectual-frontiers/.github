@@ -117,6 +117,48 @@ export function parseRemote(url: string, hostKinds: HostKinds = {}): Result<Repo
   return refOf(hostOfAuthority(text.slice(0, colon)), text.slice(colon + 1), hostKinds);
 }
 
+/** A remote as a person writes it: the repository, and the branch where the text is the address of a branch's page. */
+export type ReadRemote = { readonly ref: RepoRef; readonly branch?: string };
+
+const HOSTNAME = /^[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)+(?::\d+)?$/;
+
+/** The page of a repository's branch or file on a host's web site (`/tree/main`, `/blob/main/x`, GitLab's `/-/tree/main`): the path of the repository, and the branch. */
+function webPage(path: string): { readonly path: string; readonly branch?: string } {
+  const m = /^(.*?)\/(?:-\/)?(?:tree|blob|commits|raw)\/([^/?#]+)(?:[/?#].*)?$/s.exec(path);
+  if (m === null) return { path };
+  const branch = safeDecode(m[2] ?? "");
+  return branch === undefined ? { path } : { path: m[1] ?? path, branch };
+}
+
+/**
+ * A remote as a person writes it, where the domain says the rest: `github.com/owner/repo` and `gitlab.example.com/group/sub/repo` need no `https://`, `owner/repo` is a repository of GitHub,
+ * `github:owner/repo` and `gitlab:group/sub/repo` name the host's kind, and the address of a branch's page (`.../tree/main`) is the repository and that branch. Every form `parseRemote` reads is read as it does.
+ * A text that begins with `/`, `.` or `~`, a Windows drive or a `file:` URL is a path on this computer and an error, as it is there.
+ */
+export function readRemote(input: string, hostKinds: HostKinds = {}): Result<ReadRemote, RemoteError> {
+  const text = input.trim();
+  const strict = parseRemote(text, hostKinds);
+  const asIs = (): Result<ReadRemote, RemoteError> => (strict.kind === "err" ? strict : ok({ ref: strict.value }));
+  const viaPage = (origin: string, path: string): Result<ReadRemote, RemoteError> => {
+    const page = webPage(path);
+    const r = parseRemote(`${origin}${page.path}`, hostKinds);
+    return r.kind === "err" ? r : ok(page.branch === undefined ? { ref: r.value } : { ref: r.value, branch: page.branch });
+  };
+  const scheme = /^([A-Za-z][A-Za-z0-9+.-]*):\/\/([^/]*)(\/.*)?$/.exec(text);
+  if (scheme !== null)
+    return strict.kind === "err" && scheme[1]?.toLowerCase() === "file" ? strict : viaPage(`${scheme[1]}://${scheme[2]}`, scheme[3] ?? "");
+  if (text === "" || /^[A-Za-z]:[\\/]/.test(text) || /^[/.~]/.test(text)) return asIs();
+  const named = /^(github|gitlab):([^/].*)$/i.exec(text);
+  if (named !== null) return viaPage(`https://${(named[1] ?? "").toLowerCase()}.com/`, named[2] ?? "");
+  const colon = text.indexOf(":");
+  const slash = text.indexOf("/");
+  if (colon >= 0 && (slash < 0 || colon < slash)) return asIs(); // the scp-like form
+  const first = slash < 0 ? text : text.slice(0, slash);
+  if (slash >= 0 && HOSTNAME.test(first)) return viaPage(`https://${first}`, text.slice(slash));
+  if (/^[^/\s]+\/[^/\s]+$/.test(text)) return viaPage("https://github.com/", text);
+  return asIs();
+}
+
 /** The HTTPS URL a repository is cloned from, with no credential in it. */
 export function cloneUrlOf(ref: RepoRef): string {
   return `https://${ref.host}/${ref.path.map(encodeURIComponent).join("/")}.git`;

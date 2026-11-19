@@ -223,3 +223,29 @@ proves(
     );
   },
 );
+
+proves(
+  ["0003-host FR-001"],
+  "a remote in the manifest needs no https:// where the domain says the rest, `owner/repo` is GitHub, and the address of a branch's page names the repository and its branch unless the entry names one",
+  () => {
+    const r = decodeManifest({
+      repositories: [
+        { remote: "github.com/octo/hello" },
+        { remote: "gitlab.com/g/s/deep/proj/-/tree/feature" },
+        { remote: "octo/other" },
+        { remote: "github.com/octo/third/tree/dev", branch: "main" },
+      ],
+    });
+    assert(r.kind === "ok");
+    if (r.kind !== "ok") return;
+    assertEquals(
+      r.value.repositories.map((x) => [x.path, x.cloneUrl, x.branch]),
+      [
+        ["github.com/octo/hello", "https://github.com/octo/hello.git", undefined],
+        ["gitlab.com/g/s/deep/proj", "https://gitlab.com/g/s/deep/proj.git", "feature"],
+        ["github.com/octo/other", "https://github.com/octo/other.git", undefined],
+        ["github.com/octo/third", "https://github.com/octo/third.git", "main"],
+      ],
+    );
+  },
+);

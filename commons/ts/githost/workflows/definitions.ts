@@ -580,11 +580,11 @@ export function publishWorkflow(l: LibraryFacts): Workflow {
     file: `${l.name}-publish`,
     name: `${l.name}-publish`,
     comment: lines(
-      `Publishes ${l.name} (commons 0027-commons-libraries FR-015, FR-016): a tag \`${l.name}-v<version>\` (made by \`versions tag\`, commons 0026-works-versioning) is checked against the package's version, the library is proved and packed by its own`,
+      `Publishes ${l.name} (commons 0027-commons-libraries FR-015, FR-016): a tag \`${l.name}-v<version>\` (made by \`versions tag\`, commons 0026-works-versioning), or a run by hand from main, is checked against the package's version, the library is proved and packed by its own`,
       "tools/pack.ts, and the tarball goes to the registries its manifest names: npm with provenance and no token (trusted publishing, which the owner of the npm scope sets up once for this workflow's file), and",
       "the GitHub package registry with this workflow's own token.",
     ).trimEnd(),
-    on: { push: { tags: [`${l.name}-v*`] } },
+    on: { push: { tags: [`${l.name}-v*`] }, workflowDispatch: true },
     permissions: { contents: "read" },
     jobs: {
       build: job({
@@ -598,10 +598,14 @@ export function publishWorkflow(l: LibraryFacts): Workflow {
           run(
             lines(
               `version=$(node -p "require('./package.json').version")`,
-              `test "$GITHUB_REF_NAME" = "${l.name}-v$version" || { echo "the tag $GITHUB_REF_NAME is not ${l.name}-v$version"; exit 1; }`,
+              `if [ "$GITHUB_REF_TYPE" = tag ]; then`,
+              `  test "$GITHUB_REF_NAME" = "${l.name}-v$version" || { echo "the tag $GITHUB_REF_NAME is not ${l.name}-v$version"; exit 1; }`,
+              `else`,
+              `  test "$GITHUB_REF" = refs/heads/main || { echo "a run by hand publishes only from main, not $GITHUB_REF"; exit 1; }`,
+              `fi`,
             ),
             {
-              name: "The tag is the version of the package",
+              name: "The tag, or main for a run by hand, is the version of the package",
               workingDirectory: folder,
               shell: "bash",
             },

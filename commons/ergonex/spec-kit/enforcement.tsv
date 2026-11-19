@@ -115,3 +115,13 @@ requirement	mechanism	by	note
 0004-onboarding FR-008	check	.github: cd commons/ergonex && bun test suite/	ergonex-install.test.ts: the installers are what the generator makes; the Windows script installs with winget by identifier, downloads nothing, is ASCII with a byte order mark and parses; the sh script runs ergonex with the Bun there and asks Bun's own installer for the pinned version where there is none
 0004-onboarding FR-009	gate	.github: .github/workflows/ergonex.auto.yml	the workflow runs the library's verify and its tests on Node on windows-latest, macos-latest and ubuntu-latest
 0004-onboarding FR-010	check	.github: cd commons/ergonex && bun test suite/	ergonex-locations.test.ts: ergonex paths names the workspace, .ergonex/, the state, data and tools folders and the shims
+0005-repositories FR-001	check	.github: cd commons/ergonex && bun test suite/	ergonex-repositories.test.ts: the manifest reads the entries of repositories.ts and workspace.ts as one list, and a repeated path is a collision
+0005-repositories FR-002	check	.github: cd commons/ergonex && bun test suite/	ergonex-repositories.test.ts: a command writes the file whole and leaves workspace.ts as it was
+0005-repositories FR-003	check	.github: cd commons/ergonex && bun test suite/	ergonex-repositories.test.ts: add reads the forms a person writes, records the https address and the branch, and reports a repository already held
+0005-repositories FR-004	check	.github: cd commons/ergonex && bun test suite/	ergonex-repositories.test.ts: add decodes the manifest with its change first and writes nothing the manifest would refuse
+0005-repositories FR-005	check	.github: cd commons/ergonex && bun test suite/	ergonex-repositories.test.ts: add --apply clones
+0005-repositories FR-006	check	.github: cd commons/ergonex && bun test suite/	ergonex-repositories.test.ts: remove takes an entry out of the list, leaves the folder, and refuses one named in workspace.ts
+0005-repositories FR-007	check	.github: cd commons/ergonex && bun test suite/	ergonex-repositories.test.ts: remove --delete deletes a clean folder and refuses, changing nothing, where there is work
+0005-repositories FR-008	check	.github: cd commons/ergonex && bun test suite/	ergonex-repositories.test.ts: adopt lists adoptable, misplaced and remoteless repositories and changes nothing
+0005-repositories FR-009	check	.github: cd commons/ergonex && bun test suite/	ergonex-repositories.test.ts: adopt --apply adds the adoptable ones only
+0005-repositories FR-010	check	.github: cd commons/ergonex && bun test suite/	ergonex-repositories.test.ts: status notes each unmanaged repository

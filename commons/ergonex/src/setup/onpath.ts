@@ -24,13 +24,15 @@ export const PACKAGE = "@intellectual-frontiers/ergonex";
 
 /** Whether the files that run are a copy a package manager keeps (a registry install, `bunx` or `npx`) and not a checkout. */
 export function isRegistryCopy(entry: string): boolean {
-  return /(^|[\\/])(node_modules|_npx)([\\/]|$)|[\\/]\.bun[\\/]install[\\/]cache[\\/]/.test(entry);
+  return /(^|[\\/])(node_modules|_npx)([\\/]|$)|[\\/]\.bun[\\/]install[\\/]cache[\\/]|[\\/]\.?bunx-[^\\/]*[\\/]/.test(entry);
 }
 
 /** How the command is started again, from what runs now. */
 export function launchFor(f: { readonly runtime: "bun" | "node"; readonly entry: string; readonly version: string }): Launch {
+  // `bunx` runs the package's launcher by its `node` line, so a run from Bun's cache is the person's Bun choosing: it is installed with Bun, whichever runtime ran it
+  const runtime = /[\\/]\.bun[\\/]install[\\/]cache[\\/]|[\\/]\.?bunx-[^\\/]*[\\/]/.test(f.entry) ? "bun" : f.runtime;
   return isRegistryCopy(f.entry)
-    ? { kind: "registry", runtime: f.runtime, spec: `${PACKAGE}@${f.version}` }
+    ? { kind: "registry", runtime, spec: `${PACKAGE}@${f.version}` }
     : { kind: "local", runtime: f.runtime, entry: f.entry };
 }
 

@@ -37,6 +37,7 @@ Five products are specified in Mizan's form; four are built (Ergonex as a librar
   ```sh
   bunx @intellectual-frontiers/ergonex init      # the root, the starter manifest, and `ergonex` on your path for every terminal
   ergonex shell bash                              # what a shell needs: the root, the tools, completions, `wcd`, and ERGONEX_GITHUB_TOKEN from `gh auth token`
+  ergonex add --apply github.com/owner/repo       # add a repository to the workspace and clone it (`remove`, `adopt` and `status` keep the list)
   ergonex doctor                                  # what is wrong, and what to do about it (`--fetch` also asks GitHub whether your token may read packages)
   ```
 
@@ -55,7 +56,7 @@ This assumes `@intellectual-frontiers/ergonex` is on npm. Do the steps in order 
 bunx @intellectual-frontiers/ergonex init
 ```
 
-Expect: it names the folder it made (`workspaces` in your home folder, or `$ERGONEX_HOME`) with a `.ergonex/workspace.ts` inside, installs `ergonex` globally so every terminal finds it (open a new terminal if `ergonex` is not found: Bun's `bin` folder must be on your PATH, which Bun's installer does), and ends with "next: name your repositories in .ergonex/workspace.ts, then run `ergonex plan`". Running it again changes nothing. `ergonex` on its own says in plain words what to do next.
+Expect: it names the folder it made (`workspaces` in your home folder, or `$ERGONEX_HOME`) with a `.ergonex/workspace.ts` inside, installs `ergonex` globally so every terminal finds it (open a new terminal if `ergonex` is not found: Bun's `bin` folder must be on your PATH, which Bun's installer does), and ends with "next: add a repository with `ergonex add github.com/owner/repo --apply`". Running it again changes nothing. `ergonex` on its own says in plain words what to do next.
 
 **3. See where things go.** `ergonex paths` lists the workspace, `.ergonex/` (the manifest, the generated Git configuration and hooks: what you edit and other tools read), and three places that follow the system's conventions, with no `~/.ergonex`: state (what it remembers), data (the tools it installs, with shims in `~/.local/bin`) and cache. They are `$XDG_STATE_HOME/ergonex`, `$XDG_DATA_HOME/ergonex` and `$XDG_CACHE_HOME/ergonex`, defaulting to `~/.local/state`, `~/.local/share` and `~/.cache` on macOS and Linux (as `git` and `gh` do) and to `%LOCALAPPDATA%\ergonex` on Windows. Set one `XDG_*` variable and run `ergonex paths` again: the place moves, on Windows too.
 
@@ -63,7 +64,7 @@ Expect: it names the folder it made (`workspaces` in your home folder, or `$ERGO
 
 **5. Ask the doctor.** `ergonex doctor` lists `ok`, `warn` and `suggest` lines, each saying what to do. Right after `init` it is normal to see "is not written yet; run `ergonex render`" for the generated files. Run `ergonex render`, then `ergonex doctor` again: the warnings go. `ergonex doctor --fetch` also asks GitHub whether your token may read the organization's packages.
 
-**6. Use it.** Name a repository in `.ergonex/workspace.ts`, then `ergonex plan` (shows what would change, changes nothing), `ergonex setup` (a dry run), `ergonex setup --apply` (does it) and `ergonex status`. `ergonex help` lists the rest.
+**6. Add repositories.** `ergonex add github.com/octocat/Hello-World` records it in `.ergonex/repositories.ts` (no `https://` needed; `octocat/Hello-World`, `gitlab:group/sub/repo`, `git@github.com:o/r.git`, an https address or the address of a branch's page all work), and `ergonex add --apply octocat/Hello-World` also clones it to `github.com/octocat/Hello-World` below your workspace. `ergonex plan` shows what would change and changes nothing, `ergonex apply` brings the workspace to it, and `ergonex status` lists each repository with its state. `ergonex remove octocat/Hello-World` takes it out of the list and leaves its folder; with `--delete` it deletes the folder too, but only a clean, fully pushed one. Clone a repository by hand into the right path (or leave one from an older setup), run `ergonex adopt` to see it, and `ergonex adopt --apply` to add it. A private repository is the same command: it signs in with your Git credentials, `gh` or `ERGONEX_GITHUB_TOKEN`. `ergonex help` lists the rest.
 
 **What to send me:** the step number, your operating system and shell, what you typed, and what you saw if it was not what is written here. Once you say it works, I remove IFWS and everything that belongs to it. The one-command installers in `commons/ergonex/install/` are an alternative for a machine with nothing installed.
 

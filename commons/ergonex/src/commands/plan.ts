@@ -9,7 +9,8 @@
 import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
 import { flag } from "../platform/k-args.ts";
 import { applyPlan } from "../host/apply.ts";
-import { situate } from "../host/workspace.ts";
+import { type Loaded, situate } from "../host/workspace.ts";
+import type { Context, Outcome } from "../modules/types.ts";
 import { describeAction, isSettled } from "../plan.ts";
 import { defineCommand, GLOBAL_OPTIONS, type ErgonexModule } from "../modules/types.ts";
 import { jsonOf, planFindings, textOf, withWorkspace } from "./common.ts";
@@ -60,56 +61,62 @@ const APPLY_OPTIONS = {
   }),
 };
 
+/** What `apply` does on a loaded workspace: the plan, observed again before each action, carried out. `add --apply` and `adopt --apply` end with it. */
+export async function applyLoaded(
+  ctx: Context,
+  loaded: Loaded,
+  flags: { readonly fetch: boolean; readonly allowDestructive: boolean; readonly force: boolean; readonly wait: boolean },
+): Promise<Outcome> {
+  const s = await situate(ctx, loaded, { fetch: flags.fetch });
+  if (s.kind === "err")
+    return err({
+      kind: "environment",
+      message: `git cannot be run (${s.error.program} is not installed or not on the PATH)`,
+    });
+  const done = await applyPlan(s.value, ctx, {
+    allowDestructive: flags.allowDestructive,
+    force: flags.force,
+    wait: flags.wait,
+  });
+  if (done.kind === "err")
+    return err({
+      kind: "environment",
+      message: `another run of ergonex holds the workspace: ${done.error.holder}; run again when it ends, or give --wait`,
+    });
+  const steps = done.value.steps;
+  const lines = steps
+    .filter((x) => x.status !== "skipped" || x.action.kind !== "Skip")
+    .map((x) => `  ${x.status.padEnd(7)} ${describeAction(x.action)}${x.detail === "" ? "" : ` (${x.detail})`}`);
+  const changed = steps.filter((x) => x.status === "done").length;
+  const findings = done.value.findings;
+  return ok({
+    text: textOf(
+      [`apply ${s.value.planSha.slice(0, 12)}: ${changed} done, ${steps.filter((x) => x.status === "failed").length} failed`, ...lines],
+      findings,
+    ),
+    data: {
+      planSha256: s.value.planSha,
+      steps: jsonOf(
+        steps.map((x) => ({
+          kind: x.action.kind,
+          status: x.status,
+          detail: x.detail,
+        })),
+      ),
+    },
+    findings,
+    facts: {
+      planSha256: s.value.planSha,
+      stateSha256: done.value.recordSha,
+    },
+  });
+}
+
 const apply = defineCommand({
   name: "apply",
   summary: "Carry out the plan: clone, fast-forward, configure and write generated files; never delete work, never change the host.",
   options: APPLY_OPTIONS,
-  run: (ctx, args) =>
-    withWorkspace(ctx, async (loaded) => {
-      const s = await situate(ctx, loaded, { fetch: args.options.fetch });
-      if (s.kind === "err")
-        return err({
-          kind: "environment",
-          message: `git cannot be run (${s.error.program} is not installed or not on the PATH)`,
-        });
-      const done = await applyPlan(s.value, ctx, {
-        allowDestructive: args.options.allowDestructive,
-        force: args.options.force,
-        wait: args.options.wait,
-      });
-      if (done.kind === "err")
-        return err({
-          kind: "environment",
-          message: `another run of ergonex holds the workspace: ${done.error.holder}; run again when it ends, or give --wait`,
-        });
-      const steps = done.value.steps;
-      const lines = steps
-        .filter((x) => x.status !== "skipped" || x.action.kind !== "Skip")
-        .map((x) => `  ${x.status.padEnd(7)} ${describeAction(x.action)}${x.detail === "" ? "" : ` (${x.detail})`}`);
-      const changed = steps.filter((x) => x.status === "done").length;
-      const findings = done.value.findings;
-      return ok({
-        text: textOf(
-          [`apply ${s.value.planSha.slice(0, 12)}: ${changed} done, ${steps.filter((x) => x.status === "failed").length} failed`, ...lines],
-          findings,
-        ),
-        data: {
-          planSha256: s.value.planSha,
-          steps: jsonOf(
-            steps.map((x) => ({
-              kind: x.action.kind,
-              status: x.status,
-              detail: x.detail,
-            })),
-          ),
-        },
-        findings,
-        facts: {
-          planSha256: s.value.planSha,
-          stateSha256: done.value.recordSha,
-        },
-      });
-    }),
+  run: (ctx, args) => withWorkspace(ctx, (loaded) => applyLoaded(ctx, loaded, args.options)),
 });
 
 /** The module `ergonex plan`. */
