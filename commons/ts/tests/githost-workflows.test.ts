@@ -102,9 +102,9 @@ proves(
     // every action of the model's workflows is of its table, and each version is written once
     const table: readonly string[] = Object.values(PIN);
     const used = [
-      ...workflows(readLibraries(ROOT).flatMap((f) => ("library" in f ? [f.library] : []))).flatMap((w) =>
-        Object.values(w.jobs).flatMap((j) => j.steps),
-      ),
+      ...workflows(
+        readLibraries(ROOT).flatMap((f) => ("library" in f ? [{ name: f.library.name, verify: f.library.verify, paths: [] }] : [])),
+      ).flatMap((w) => Object.values(w.jobs).flatMap((j) => j.steps)),
       ...ACTIONS.flatMap((a) => a.steps),
     ].flatMap((s) => (s.kind === "uses" ? [s.uses] : []));
     assert(
@@ -167,7 +167,7 @@ proves(
       assertEquals(main(["--repo", dir]), 0);
       const alpha = readTextFileSync(join(dir, ".github", "workflows", "alpha.auto.yml"));
       assertStringIncludes(alpha, '- "commons/alpha/**"');
-      assertStringIncludes(alpha, '- "commons/ts/kernel/**"');
+      assertStringIncludes(alpha, '- "commons/tools/**"');
       assertStringIncludes(alpha, "- .github/workflows/alpha.auto.yml");
       assertStringIncludes(alpha, "working-directory: commons/alpha");
       assertStringIncludes(alpha, "run: bun run verify");

@@ -17,10 +17,11 @@
  * @module
  */
 import process from "node:process";
-import { ACTIONS, workflows } from "../githost/workflows/definitions.ts";
+import { ACTIONS, type LibraryFacts, workflows } from "../githost/workflows/definitions.ts";
 import { validateAction, validateWorkflow } from "../githost/workflows/model.ts";
 import { renderAction, renderWorkflow } from "../githost/workflows/render.ts";
-import { type Library, readLibraries } from "../mizan/libraries.ts";
+import { inputsOf } from "../mizan/affected.ts";
+import { readLibraries } from "../mizan/libraries.ts";
 import { existsSync, readDirSync, readTextFileSync, writeTextFileSync, mkdirSync } from "../runtime/fs.ts";
 import { stdio } from "../runtime/mod.ts";
 
@@ -31,10 +32,10 @@ const FOLDER = ".github/workflows";
 export function outputs(repo: string): { readonly files: ReadonlyMap<string, string>; readonly problems: readonly string[] } {
   const root = repo.replace(/[\\/]$/, "");
   const problems: string[] = [];
-  const libraries: Library[] = [];
+  const libraries: LibraryFacts[] = [];
   for (const f of readLibraries(root)) {
     if ("problem" in f) problems.push(`commons/${f.dir}/library.ts: ${f.problem}`);
-    else libraries.push(f.library);
+    else libraries.push({ name: f.library.name, verify: f.library.verify, paths: inputsOf(root, f.library.name).paths });
   }
   const files = new Map<string, string>();
   for (const w of workflows(libraries)) {

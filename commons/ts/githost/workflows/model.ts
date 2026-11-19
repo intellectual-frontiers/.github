@@ -126,7 +126,7 @@ export type Workflow = {
   readonly on: Triggers;
   readonly permissions?: Permissions;
   readonly env?: Readonly<Record<string, Scalar>>;
-  readonly concurrency?: { readonly group: string; readonly cancelInProgress: boolean };
+  readonly concurrency?: { readonly group: string; readonly cancelInProgress: boolean | Expr };
   /** The jobs by id, in the order they are written. */
   readonly jobs: Readonly<Record<string, Job>>;
 };

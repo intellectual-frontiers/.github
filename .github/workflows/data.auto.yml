@@ -7,28 +7,48 @@ name: data
 on:
   push:
     paths:
-      - "commons/data/**"
-      - "commons/ts/kernel/**"
-      - "commons/ts/runtime/**"
-      - "commons/ts/mizan/**"
-      - "commons/tools/**"
+      - ".github/actions/**"
       - .github/workflows/data.auto.yml
-      - ".github/actions/bun/**"
+      - "commons/data/**"
+      - "commons/ontology/audit/**"
+      - "commons/ontology/ifccm/**"
+      - "commons/ontology/ifqs/**"
+      - "commons/ontology/ifr/**"
+      - "commons/ontology/ifws/**"
+      - "commons/ontology/mizan/**"
+      - "commons/ontology/supply-chain/**"
+      - "commons/tools/**"
+      - "commons/ts/githost/**"
+      - "commons/ts/kernel/**"
+      - "commons/ts/mizan/**"
+      - "commons/ts/runtime/**"
   pull_request:
     paths:
-      - "commons/data/**"
-      - "commons/ts/kernel/**"
-      - "commons/ts/runtime/**"
-      - "commons/ts/mizan/**"
-      - "commons/tools/**"
+      - ".github/actions/**"
       - .github/workflows/data.auto.yml
-      - ".github/actions/bun/**"
+      - "commons/data/**"
+      - "commons/ontology/audit/**"
+      - "commons/ontology/ifccm/**"
+      - "commons/ontology/ifqs/**"
+      - "commons/ontology/ifr/**"
+      - "commons/ontology/ifws/**"
+      - "commons/ontology/mizan/**"
+      - "commons/ontology/supply-chain/**"
+      - "commons/tools/**"
+      - "commons/ts/githost/**"
+      - "commons/ts/kernel/**"
+      - "commons/ts/mizan/**"
+      - "commons/ts/runtime/**"
 
 permissions:
   contents: read
 
 env:
   NODE_VERSION: "26.13.1"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   verify:

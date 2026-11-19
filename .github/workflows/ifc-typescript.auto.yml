@@ -31,6 +31,10 @@ env:
   NODE_VERSION: "26.13.1"
   BUN_LINT_VERSION: "1.4.4-canary.20261115.1"
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   check:
     runs-on: ubuntu-latest

@@ -18,6 +18,7 @@ import { type CompositeAction, expr, job, run, type Step, use, type Workflow } f
 export const PIN = {
   checkout: "actions/checkout@v4",
   setupNode: "actions/setup-node@v4",
+  cache: "actions/cache@v4",
   uploadArtifact: "actions/upload-artifact@v4",
   uploadPages: "actions/upload-pages-artifact@v3",
   deployPages: "actions/deploy-pages@v4",
@@ -41,6 +42,14 @@ const setupNode = (when?: string): Step =>
 const tools = (workingDirectory: string, name = "The development tools, from bun.lock"): Step =>
   run("bun install --frozen-lockfile", { name, workingDirectory });
 
+/**
+ * A run that a newer push to the same branch replaces is stopped, except on main, where each commit keeps its own result.
+ */
+const supersedable = {
+  group: `${expr("github.workflow")}-${expr("github.ref")}`,
+  cancelInProgress: expr("github.ref != 'refs/heads/main'"),
+} as const;
+
 /** A script from its lines, ending with a newline as a literal block does. */
 const lines = (...l: readonly string[]): string => `${l.join("\n")}\n`;
 
@@ -48,8 +57,13 @@ const lines = (...l: readonly string[]): string => `${l.join("\n")}\n`;
 const BUN_ACTION = ".github/actions/bun/**";
 const own = (file: string): string => `.github/workflows/${file}.auto.yml`;
 
-/** What a library's manifest gives its workflow (0027-commons-libraries FR-012): the folder's name and the command that proves it. Another module's `Library` has more, and is accepted as it is. */
-export type LibraryFacts = { readonly name: string; readonly verify: string };
+/** What a library's manifest gives its workflow (0027-commons-libraries FR-012): the folder's name, the command that proves it and the paths it reads. Another module's `Library` has more, and is accepted as it is. */
+export type LibraryFacts = {
+  readonly name: string;
+  readonly verify: string;
+  /** The paths whose change affects it, which the library's workflow runs on (0027-commons-libraries FR-022). */
+  readonly paths: readonly string[];
+};
 
 /** What a library's CI needs that its manifest does not say. */
 export type LibraryCi = {
@@ -83,15 +97,7 @@ export const LIBRARY_CI: Readonly<Record<string, LibraryCi>> = {
 export function libraryWorkflow(l: LibraryFacts): Workflow {
   const folder = `commons/${l.name}`;
   const ci = LIBRARY_CI[l.name];
-  const paths = [
-    `${folder}/**`,
-    "commons/ts/kernel/**",
-    "commons/ts/runtime/**",
-    "commons/ts/mizan/**",
-    "commons/tools/**",
-    own(l.name),
-    BUN_ACTION,
-  ];
+  const paths = l.paths;
   const verify = job({
     runsOn: "ubuntu-latest",
     timeoutMinutes: 15,
@@ -126,6 +132,7 @@ export function libraryWorkflow(l: LibraryFacts): Workflow {
     on: { push: { paths }, pullRequest: { paths } },
     permissions: { contents: "read" },
     env: { NODE_VERSION },
+    concurrency: supersedable,
     jobs: { verify, ...node },
   };
 }
@@ -151,6 +158,7 @@ const ifcTypescript: Workflow = {
   on: { push: { paths: ifcTypescriptPaths }, pullRequest: { paths: ifcTypescriptPaths } },
   permissions: { contents: "read" },
   env: { NODE_VERSION, BUN_LINT_VERSION },
+  concurrency: supersedable,
   jobs: {
     check: job({
       runsOn: "ubuntu-latest",
@@ -322,6 +330,7 @@ const sqlAide: Workflow = {
   ).trimEnd(),
   on: { push: { paths: sqlAidePaths }, pullRequest: { paths: sqlAidePaths } },
   permissions: { contents: "read" },
+  concurrency: supersedable,
   jobs: {
     data: job({
       runsOn: "ubuntu-24.04",
@@ -442,6 +451,7 @@ const tests: Workflow = {
   on: { push: { branches: ["main"] }, pullRequest: {} },
   permissions: { contents: "read" },
   env: { NODE_VERSION, BUN_LINT_VERSION },
+  concurrency: supersedable,
   jobs: {
     check: job({
       runsOn: "ubuntu-latest",
@@ -557,6 +567,13 @@ export const ACTIONS: readonly CompositeAction[] = [
     inputs: { "node-version": { description: "The Node that runs the installer.", default: NODE_VERSION } },
     steps: [
       use(PIN.setupNode, { with: { "node-version": expr("inputs.node-version") } }),
+      use(PIN.cache, {
+        name: "The pinned Bun's download, kept between runs (the installer checks its SHA-256 whatever the cache holds)",
+        with: {
+          path: `${expr("runner.temp")}/bun/cache`,
+          key: `${expr("runner.os")}-${expr("runner.arch")}-bun-${expr("hashFiles('commons/generated/pins.auto.env')")}`,
+        },
+      }),
       run('node commons/ts/tools/install-bun.ts "$RUNNER_TEMP/bun"', { name: "Bun, pinned and checked", shell: "bash" }),
     ],
   },
