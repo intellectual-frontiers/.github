@@ -47,6 +47,7 @@ options:
   --check <ids>       only these checks, as ARCA-D001,ARCA-D005
   --json              machine-readable output
   --url <url>         connection URL; prefer ARCA_DATABASE_URL (or ARCA_DATABASE_URL_FILE), since arguments show in the process list
+  --driver <bun|pg>   the client: Bun's own (default on Bun) or pg (default on Node); also ARCA_DRIVER
   --non-interactive   run as a server (pipelines, containers): nothing is asked and no home file is written; also ARCA_MODE=server, CI=true, or no terminal
   -h, --help
 
@@ -119,7 +120,9 @@ export async function main(argv: readonly string[], io: Io): Promise<Outcome> {
   if (unknown.length > 0) return fail(`no such check: ${unknown.join(", ")} (they are ${checkIds.join(", ")})`);
   let connection: Connection;
   try {
-    connection = await (io.connect ?? realConnect)({ ...(url === undefined ? {} : { url }) });
+    const driver = flag(given, "--driver") ?? io.env["ARCA_DRIVER"];
+    if (driver !== undefined && driver !== "bun" && driver !== "pg") return fail(`--driver is bun or pg, not ${driver}`);
+    connection = await (io.connect ?? realConnect)({ ...(url === undefined ? {} : { url }), ...(driver === undefined ? {} : { driver }) });
   } catch (thrown) {
     return fail(`could not connect: ${thrown instanceof Error ? thrown.message : String(thrown)}`);
   }

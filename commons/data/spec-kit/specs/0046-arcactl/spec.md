@@ -9,7 +9,7 @@
 
 ## Requirements
 
-- **FR-001**: `arcactl` MUST run on one PostgreSQL connection: Bun's own client (`Bun.SQL`) on Bun, which needs no dependency, and `pg`, an optional peer dependency loaded only on Node, elsewhere; with no URL the driver MUST read libpq's own environment, and a password MUST come from libpq's files or `ARCA_DATABASE_URL` and never from an option of its own; a failure to connect MUST be said, with exit code 2.
+- **FR-001**: `arcactl` MUST run on one PostgreSQL connection: Bun's own client (`Bun.SQL`) on Bun, which needs no dependency, and `pg`, an optional peer dependency loaded only on Node, elsewhere; with no URL the driver MUST read libpq's own environment, and a password MUST come from libpq's files or `ARCA_DATABASE_URL` and never from an option of its own; a failure to connect MUST be said, with exit code 2; and either client MUST be chosen by `--driver` or `ARCA_DRIVER` (`pg` can be used on Bun too), and each MUST connect to a server over a socket and give the report that an in-process database gives.
 - **FR-002**: The configuration (`arca.config.ts`, `defineArca`) MUST be typed data with defaults and no secret; it MUST name models of the arca family (the party, tenancy and identity models) or the issues model, bring what they require with them, and refuse a model, a schema name or an empty list that is not valid.
 - **FR-003**: `doctor` MUST be read-only (it may set the session's search path, and run a query in a transaction that it rolls back, and nothing else), MUST give a result for each check of pass, warn, fail or could not be checked, with what it found and what to do, in text or JSON; its exit code MUST be 0 where every check passed and 1 where any did not, and 2 for a command that is wrong or a database that cannot be reached; a check that lacks a privilege MUST say it could not check and MUST NOT pass.
 - **FR-004**: `doctor` MUST say that a database has not been initialised for the models (nothing in the schema), find a table of the models that is missing, and not compare what is not there.
@@ -19,12 +19,14 @@
 - **FR-008**: `doctor` MUST verify the audit chain by recomputing it, so that an event whose hash is not that of its fields is found, and MUST say there is no trail where the models have none.
 - **FR-009**: `arcactl` MUST NOT print a password: it MUST take it out of every URL and setting in what it says, including the error of a driver that quotes the URL, and out of any secret it was given.
 - **FR-010**: `doctor` MUST say what PostgreSQL enforces in the database for the invariants of the models and what the application's runtime enforces.
+- **FR-011**: The package `@intellectual-frontiers/arcactl` MUST be a build target of this library and not a folder of its own: `tools/pack.ts` MUST bundle the command into one file for Node and Bun that holds none of the test tools and nothing of the machine it was built on, write the manifest that is published (the version of this library, the file as its `bin`, `pg` as an optional dependency, a public access, nothing of the library's own scripts or dependencies) and pack it; the `package.json` of this folder MUST stay private; and the tarball MUST install into an empty project and its command run there on Bun with Bun's own client and on Node with `pg`, give the report the sources give, and say what to install where `pg` is missing.
 
 ## Out of scope
 
-- `init`, `shell` and a `--fix` mode: later parts; `doctor` writes nothing.
+- `init` and a `--fix` mode: later parts; `doctor` writes nothing.
+- The publishing itself: the generated workflow of this library (`data-publish.auto.yml`, from a tag `data-v<version>`) sends the tarball to npm and the GitHub package registry; the owner of the npm scope sets up trusted publishing once.
 - Roles and grants against what the models say each role may do, and the issues model's synchronisation: checks to come.
-- A server over the network in this library's tests: they run on PGlite, which is in process. The Bun and `pg` clients are reached only to see that a failure to connect is said; they are not shown against a server here.
+- A PostgreSQL server of the full product in this library's tests: they run on PGlite, in process and served on a socket (which has one session at a time, no authentication of its own, and ignores the `options` startup parameter). A server that asks for a password is a small one of the tests' own, which shows what a client sends.
 
 ## Edge cases
 
@@ -36,7 +38,7 @@
 ## Assumptions
 
 - The tables are in one schema, `arca` by default.
-- PGlite stands for PostgreSQL in the tests, as it does in the rest of this library.
+- PGlite stands for PostgreSQL in the tests, as it does in the rest of this library, in process and on a socket.
 
 ## Open questions
 

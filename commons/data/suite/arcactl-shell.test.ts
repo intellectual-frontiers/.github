@@ -14,6 +14,7 @@ import { fileURLToPath } from "node:url";
 import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 import { commands, envJson, main, quoteFish, quoteNu, quotePosix, quotePwsh, type Shell, type ShellInput, shellScript, shells, variablesOf } from "@intellectual-frontiers/data/sql/cli";
 import { same } from "./governance-fixture.ts";
+import { bunPath } from "./net-fixtures.ts";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const BIN: Record<Shell, string> = { bash: "bash", sh: "sh", zsh: "zsh", fish: "fish", pwsh: "pwsh", nu: "nu" };
@@ -33,10 +34,10 @@ const bin = join(work, "bin");
 mkdirSync(bin);
 writeFileSync(
   join(bin, "arcactl"),
-  `#!/bin/sh\nif [ -n "$ARCACTL_STUB_LOG" ] && [ "$1" != shell ]; then for a in "$@"; do printf '[%s]' "$a"; done > "$ARCACTL_STUB_LOG"; exit 0; fi\nexec bun ${JSON.stringify(join(ROOT, "sql/cli/arcactl.ts"))} "$@"\n`,
+  `#!/bin/sh\nif [ -n "$ARCACTL_STUB_LOG" ] && [ "$1" != shell ]; then for a in "$@"; do printf '[%s]' "$a"; done > "$ARCACTL_STUB_LOG"; exit 0; fi\nexec ${JSON.stringify(bunPath())} ${JSON.stringify(join(ROOT, "sql/cli/arcactl.ts"))} "$@"\n`,
 );
 chmodSync(join(bin, "arcactl"), 0o755);
-const bunDir = dirname(process.execPath);
+const bunDir = dirname(bunPath());
 
 const make = (shell: Shell, over: Partial<ShellInput> = {}): string => {
   const r = shellScript({ shell, schema: "arca", instance: "prod-main", env: "prod", service: "prod-main", ...over });

@@ -244,8 +244,8 @@ proves(
       );
       return Promise.resolve();
     });
-    // the real repository: ergonex is, data is not
+    // the real repository: ergonex is, and data is (it publishes the package `@intellectual-frontiers/arcactl`, a build target of its sources)
     assert(existsSync(join(ROOT, ".github", "workflows", "ergonex-publish.auto.yml")));
-    assert(!existsSync(join(ROOT, ".github", "workflows", "data-publish.auto.yml")));
+    assert(existsSync(join(ROOT, ".github", "workflows", "data-publish.auto.yml")));
   },
 );

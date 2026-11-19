@@ -6,6 +6,8 @@
  * @module
  */
 import { spawn } from "node:child_process";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { createServer, type Server, type Socket } from "node:net";
 import { PGlite } from "@electric-sql/pglite";
 import { PGLiteSocketServer } from "@electric-sql/pglite-socket";
@@ -112,7 +114,7 @@ export async function pgliteServer(statements: readonly string[] = []): Promise<
   const db = await PGlite.create();
   for (const s of statements) await db.exec(s);
   const port = await freePort();
-  const server = new PGLiteSocketServer({ db, port, host: "127.0.0.1" });
+  const server = new PGLiteSocketServer({ db, port, host: "127.0.0.1", maxConnections: 8 });
   await server.start();
   return {
     port,
@@ -125,9 +127,9 @@ export async function pgliteServer(statements: readonly string[] = []): Promise<
 }
 
 /** Runs a program without blocking this process (a server in it has to answer while the program runs), and gives what it wrote. */
-export function run(command: string, args: readonly string[], env: Readonly<Record<string, string>>, input?: string, timeoutMs = 30000): Promise<{ readonly code: number; readonly out: string; readonly err: string }> {
+export function run(command: string, args: readonly string[], env: Readonly<Record<string, string>>, input?: string, timeoutMs = 30000, cwd?: string): Promise<{ readonly code: number; readonly out: string; readonly err: string }> {
   return new Promise((resolve) => {
-    const child = spawn(command, [...args], { env: { ...env }, stdio: ["pipe", "pipe", "pipe"] });
+    const child = spawn(command, [...args], { env: { ...env }, stdio: ["pipe", "pipe", "pipe"], ...(cwd === undefined ? {} : { cwd }) });
     let out = "";
     let err = "";
     child.stdout.on("data", (d: Buffer) => (out += d.toString("utf8")));
@@ -140,3 +142,19 @@ export function run(command: string, args: readonly string[], env: Readonly<Reco
     child.stdin.end(input ?? "");
   });
 }
+
+/** A program on the PATH of this process, where there is one. */
+export function which(command: string): string | undefined {
+  for (const d of (process.env["PATH"] ?? "").split(process.platform === "win32" ? ";" : ":")) if (d !== "" && existsSync(join(d, command))) return join(d, command);
+  return undefined;
+}
+
+/** Bun, which the tests run on or find on the PATH (the suite also runs on Node, where the tests that need Bun look for it). */
+export function bunPath(): string {
+  const found = (globalThis as { Bun?: unknown }).Bun !== undefined ? process.execPath : which("bun");
+  if (found === undefined) throw new Error("this test needs bun, which is neither running it nor on the PATH");
+  return found;
+}
+
+/** Whether this test is running on Bun. */
+export const onBun = (): boolean => (globalThis as { Bun?: unknown }).Bun !== undefined;

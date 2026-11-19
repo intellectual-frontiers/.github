@@ -24,6 +24,8 @@ export interface ConnectOptions {
   readonly url?: string;
   /** Seconds to wait to connect. */
   readonly connectTimeout?: number;
+  /** Which client: Bun's where this is Bun, `pg` elsewhere, unless this says (`pg` can be used on Bun too). */
+  readonly driver?: "bun" | "pg";
 }
 
 type Row = Record<string, unknown>;
@@ -47,7 +49,8 @@ interface PgClient {
 /** Connects with Bun's client where this is Bun, and with `pg` where it is not. */
 export async function connect(options: ConnectOptions = {}): Promise<Connection> {
   const bun = (globalThis as { Bun?: { SQL?: new (...a: unknown[]) => BunSql } }).Bun;
-  if (bun?.SQL !== undefined) {
+  if (options.driver === "bun" && bun?.SQL === undefined) throw new Error("Bun's client was asked for and this is not Bun");
+  if (bun?.SQL !== undefined && options.driver !== "pg") {
     const sql = options.url === undefined ? new bun.SQL({ max: 1 }) : new bun.SQL(options.url, { max: 1, ...(options.connectTimeout === undefined ? {} : { connectionTimeout: options.connectTimeout }) });
     const one = await sql.reserve();
     return {
