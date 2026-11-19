@@ -84,6 +84,10 @@ proves(
     const r1 = await putOnPath(there.deps, registry);
     assertEquals([r1.data.how, there.ran.length], ["already", 0]);
     assertStringIncludes(r1.lines.join("\n"), "/usr/local/bin/ergonex");
+    // the temporary copy that bunx and npx put on the PATH is not an install: it is installed for every terminal all the same
+    const tmp = fakeHost({ which: "/home/a/.bun/install/cache/.bunx-0/@intellectual-frontiers/ergonex@latest/node_modules/.bin/ergonex" });
+    const r1b = await putOnPath(tmp.deps, registry);
+    assertEquals([r1b.data.how, tmp.ran.length], ["installed", 1]);
     // from a registry: the global install by the runtime that ran it, and that is all
     const inst = fakeHost();
     const r2 = await putOnPath(inst.deps, registry);
