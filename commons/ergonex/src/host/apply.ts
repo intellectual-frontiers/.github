@@ -17,7 +17,7 @@ import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel"
 import { type Sha256, sha256 } from "@intellectual-frontiers/commons/ts/kernel";
 import { existsSync, mkdir, readTextFile, remove, rename, sha256File, writeTextFile } from "../platform/r-fs.ts";
 import { acquireLock, describeHolder, readHolder } from "../platform/r-lock.ts";
-import { dirname, join } from "../platform/r-path.ts";
+import { dirname } from "../platform/r-path.ts";
 import { run } from "../platform/r-proc.ts";
 import type { Finding } from "../findings.ts";
 import { type Action, describeAction, isDestructive, isHostChange, isSettled } from "../plan.ts";
@@ -102,8 +102,8 @@ async function configure(folder: string, settings: Readonly<Record<string, strin
 
 /** Carries out the plan of a situation. Takes the lock of the workspace first; where another run holds it, nothing is done and the holder is named. */
 export async function applyPlan(s: Situation, ctx: Context, options: ApplyOptions): Promise<Result<Applied, ApplyError>> {
-  const home = s.loaded.home;
-  const lockPath = join(home, AREA, "ergonex.lock");
+  const lockPath = native(s.loaded, `${AREA}/ergonex.lock`);
+  await mkdir(dirname(lockPath), { recursive: true });
   const held = await acquireLock(lockPath, {
     wait: options.wait,
     command: "ergonex apply",
@@ -123,7 +123,7 @@ export async function applyPlan(s: Situation, ctx: Context, options: ApplyOption
 }
 
 async function carryOut(s: Situation, ctx: Context, options: ApplyOptions): Promise<Applied> {
-  const home = s.loaded.home;
+  const site = s.loaded;
   const repos = new Map(s.desired.repos.map((r) => [r.path as string, r]));
   const files = new Map(s.loaded.files.map((f) => [f.path as string, f]));
   const steps: Step[] = [];
@@ -132,7 +132,7 @@ async function carryOut(s: Situation, ctx: Context, options: ApplyOptions): Prom
   const state = async (repo: string): Promise<RepoState | undefined> => {
     const r = repos.get(repo);
     if (r === undefined) return undefined;
-    const seen = await observe(native(home, repo), r.ref);
+    const seen = await observe(native(site, repo), r.ref);
     return seen.kind === "ok" ? seen.value : undefined;
   };
   const push = (action: Action, status: StepStatus, detail: string): void => void steps.push({ action, status, detail });
@@ -142,7 +142,7 @@ async function carryOut(s: Situation, ctx: Context, options: ApplyOptions): Prom
   const write = async (action: Action, target: string): Promise<void> => {
     const file = files.get(target);
     if (file === undefined) return push(action, "refused", "the templates no longer make this file");
-    const disk = native(home, target);
+    const disk = native(site, target);
     const onDisk = existsSync(disk) ? await sha256File(disk) : undefined;
     const recorded = record.files[target]?.sha256;
     const wanted = await sha256(file.content);
@@ -175,7 +175,7 @@ async function carryOut(s: Situation, ctx: Context, options: ApplyOptions): Prom
             changed(action, "the folder is no longer empty");
             break;
           }
-          const folder = native(home, action.target);
+          const folder = native(site, action.target);
           await mkdir(dirname(folder), { recursive: true });
           const r = await git(undefined, [
             "clone",
@@ -194,7 +194,7 @@ async function carryOut(s: Situation, ctx: Context, options: ApplyOptions): Prom
             changed(action, "the repository is no longer only behind its remote");
             break;
           }
-          const r = await git(native(home, action.target), ["merge", "--ff-only", "--quiet", "@{upstream}"]);
+          const r = await git(native(site, action.target), ["merge", "--ff-only", "--quiet", "@{upstream}"]);
           if (r.kind === "ok") push(action, "done", `fast-forwarded by ${now.commits} commit${now.commits === 1 ? "" : "s"}`);
           else push(action, "failed", r.error);
           break;
@@ -211,7 +211,7 @@ async function carryOut(s: Situation, ctx: Context, options: ApplyOptions): Prom
             changed(action, `the repository is ${now?.kind ?? "not in the manifest"}`);
             break;
           }
-          const r = await configure(native(home, action.target), action.settings);
+          const r = await configure(native(site, action.target), action.settings);
           if (r.kind === "ok") push(action, "done", r.value);
           else push(action, "failed", r.error);
           break;
@@ -228,7 +228,7 @@ async function carryOut(s: Situation, ctx: Context, options: ApplyOptions): Prom
             changed(action, `the repository is ${base?.kind ?? "not in the manifest"}`);
             break;
           }
-          const made = await createWorktree(native(home, action.repo), native(home, action.target), action.branch);
+          const made = await createWorktree(native(site, action.repo), native(site, action.target), action.branch);
           if (made.kind === "ok") push(action, "done", made.value);
           else push(action, "failed", made.error);
           break;
@@ -241,7 +241,7 @@ async function carryOut(s: Situation, ctx: Context, options: ApplyOptions): Prom
             push(action, "skipped", "it is destructive and the run did not say --allow-destructive");
             break;
           }
-          const disk = native(home, action.target);
+          const disk = native(site, action.target);
           const recorded = record.files[action.target]?.sha256;
           if (!existsSync(disk)) {
             record = withoutFile(record, action.target);
@@ -274,7 +274,7 @@ async function carryOut(s: Situation, ctx: Context, options: ApplyOptions): Prom
   if (options.recordPlan !== false && !isSettled(s.plan)) record = { ...record, plan: s.planSha };
   record = { ...record, ergonex: ERGONEX_VERSION };
   const text = encodeStateRecord(record);
-  const recordPath = native(home, STATE_RECORD_PATH);
+  const recordPath = native(site, STATE_RECORD_PATH);
   const before = existsSync(recordPath) ? await readTextFile(recordPath) : undefined;
   if (before !== text) await writeAtomic(recordPath, text, "0644");
 

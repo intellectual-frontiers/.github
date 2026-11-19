@@ -8,6 +8,7 @@
  *
  * @module
  */
+import { movedPath, type Places } from "../../places.ts";
 import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
 import { parseSpanId, parseTraceId, type SpanId, type TraceId } from "../../platform/k-otel.ts";
 import { installationFromEnv } from "../../platform/k-test-record.ts";
@@ -22,6 +23,8 @@ import { caseCount, evidenceFileName, holdsCredential, runRules, type RunFacts }
 /** What is needed to write the evidence of a run. */
 export type EvidenceDeps = {
   readonly home: string;
+  /** Where Ergonex keeps what it remembers: the evidence is in the state folder. */
+  readonly places: Places;
   /** The run's start and end, nanoseconds since the Unix epoch, read from the clock by the caller. */
   readonly start: bigint;
   readonly end: bigint;
@@ -93,7 +96,7 @@ export async function writeRunEvidence(deps: EvidenceDeps, facts: RunFacts): Pro
   });
   if (record.kind === "err") return err(formatQualityError(record.error));
   if (holdsCredential(record.value.text)) return err("the evidence of this run would hold a credential; it was not written");
-  const dir = join(deps.home, ".ergonex", "evidence");
+  const dir = movedPath(deps.places, ".ergonex/evidence") ?? join(deps.home, ".ergonex", "evidence");
   const path = join(dir, evidenceFileName(isoOf(deps.end), made.value.traceId));
   await mkdir(dir, { recursive: true });
   const w = await writeOnce(path, record.value.text);

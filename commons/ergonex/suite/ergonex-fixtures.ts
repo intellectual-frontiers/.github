@@ -19,6 +19,7 @@ import {
 } from "../src/platform/r-fs.ts";
 import { dirname, fromFileUrl, join, resolve } from "../src/platform/r-path.ts";
 import { build, execPath, run, which } from "../src/platform/r-proc.ts";
+import type { Places } from "../src/places.ts";
 import { assert } from "@intellectual-frontiers/commons/ts/runtime/test";
 import { sha256 } from "@intellectual-frontiers/commons/ts/kernel";
 
@@ -56,6 +57,10 @@ export type World = {
   readonly home: string;
   /** The user's home: its sentinel files must not change. */
   readonly user: string;
+  /** Where ergonex keeps what it remembers and installs, apart from the user's home (0031-install-locations): the state, the data and the tools. */
+  readonly state: string;
+  readonly data: string;
+  readonly tools: string;
   /** The bare repository that stands as the remote. */
   readonly bare: string;
   /** The folder of the managed repository, once cloned. */
@@ -112,6 +117,10 @@ export async function withWorld(f: (w: World) => Promise<void>): Promise<void> {
       GIT_CONFIG_VALUE_0: REMOTE,
       GIT_TERMINAL_PROMPT: "0",
       ERGONEX_HOME: home,
+      // what ergonex remembers and installs is in the XDG folders, which a world keeps apart from the user's home so that a test can show the home is not touched
+      XDG_STATE_HOME: join(dir, "xdg", "state"),
+      XDG_DATA_HOME: join(dir, "xdg", "data"),
+      XDG_CACHE_HOME: join(dir, "xdg", "cache"),
       // Bun keeps a cache of what it transpiles under the user's home by default: not ergonex's doing, and not wanted in a test of what ergonex writes there
       BUN_RUNTIME_TRANSPILER_CACHE_PATH: "0",
     };
@@ -137,6 +146,9 @@ export async function withWorld(f: (w: World) => Promise<void>): Promise<void> {
       dir,
       home,
       user,
+      state: join(dir, "xdg", "state", "ergonex"),
+      data: join(dir, "xdg", "data", "ergonex"),
+      tools: join(dir, "xdg", "data", "ergonex", "tools"),
       bare,
       repo: join(home, "git.example.org", "team", "tool"),
       env,
@@ -175,9 +187,22 @@ export const ONE_REPOSITORY = {
   repositories: [{ remote: REMOTE, group: "core", branch: "main" }],
 };
 
-/** The paths of every evidence record under a workspace, oldest first. */
-export function evidenceFiles(home: string): string[] {
-  const root = join(home, ".ergonex", "evidence");
+/** The folders of ergonex's own files for a test that makes no world: below `dir`, apart from every other folder of the test (0031-install-locations). */
+export function fakePlaces(dir: string): Places {
+  const data = join(dir, "xdg", "data", "ergonex");
+  return {
+    os: build.os === "windows" ? "windows" : build.os === "darwin" ? "darwin" : "linux",
+    data,
+    state: join(dir, "xdg", "state", "ergonex"),
+    cache: join(dir, "xdg", "cache", "ergonex"),
+    tools: join(data, "tools"),
+    shims: join(dir, "bin"),
+  };
+}
+
+/** The paths of every evidence record in a state folder, oldest first. */
+export function evidenceFiles(state: string): string[] {
+  const root = join(state, "evidence");
   if (!existsSync(root)) return [];
   const out: string[] = [];
   const walk = (dir: string): void => {

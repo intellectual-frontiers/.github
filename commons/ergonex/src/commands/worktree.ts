@@ -12,8 +12,8 @@
  */
 import { flag } from "../platform/k-args.ts";
 import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
-import { existsSync, realPath } from "../platform/r-fs.ts";
-import { join } from "../platform/r-path.ts";
+import { existsSync, mkdir, realPath } from "../platform/r-fs.ts";
+import { dirname } from "../platform/r-path.ts";
 import type { Finding } from "../findings.ts";
 import { worktreePathOf, worktreeWanted } from "../layout.ts";
 import type { ManifestRepo } from "../manifest.ts";
@@ -86,7 +86,7 @@ const create = defineCommand({
       const found = resolveRepo(loaded.manifest.repositories, word);
       if ("problem" in found) return err({ kind: "usage", message: found.problem });
       const repo = found.repo;
-      const folder = native(loaded.home, repo.path);
+      const folder = native(loaded, repo.path);
       const state = await observe(folder, repo.ref);
       if (state.kind === "err")
         return err({
@@ -123,8 +123,9 @@ const create = defineCommand({
           kind: "usage",
           message: `the branch ${branch.value} cannot be a worktree's folder on every system`,
         });
-      const target = native(loaded.home, path.value);
-      const lockPath = join(loaded.home, AREA, "ergonex.lock");
+      const target = native(loaded, path.value);
+      const lockPath = native(loaded, `${AREA}/ergonex.lock`);
+      await mkdir(dirname(lockPath), { recursive: true });
       const held = await acquireLock(lockPath, {
         wait: false,
         command: "ergonex worktree create",
@@ -166,7 +167,7 @@ const list = defineCommand({
         readonly branch: string;
       }[] = [];
       for (const repo of loaded.manifest.repositories) {
-        const folder = native(loaded.home, repo.path);
+        const folder = native(loaded, repo.path);
         if (!existsSync(folder)) continue;
         const all = await listWorktrees(folder);
         if (all.kind === "err") continue;
@@ -207,7 +208,7 @@ const prune = defineCommand({
       const lines: string[] = [];
       const done: string[] = [];
       for (const repo of loaded.manifest.repositories) {
-        const folder = native(loaded.home, repo.path);
+        const folder = native(loaded, repo.path);
         if (!existsSync(folder)) continue;
         const all = await listWorktrees(folder);
         if (all.kind === "err") continue;

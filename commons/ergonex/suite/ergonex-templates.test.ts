@@ -249,9 +249,9 @@ proves(
   () => {
     assert(!filesOf(dataOf(BASE, false)).has(".envrc.auto"));
     const found = filesOf(dataOf({ ...BASE, direnv: true }, true)).get(".envrc.auto");
-    assertStringIncludes(found?.content ?? "", "PATH_add .ergonex/tools/bin");
+    assertStringIncludes(found?.content ?? "", 'PATH_add "$HOME/.local/bin"');
     const body = (found?.content ?? "").split("\n").filter((l) => l !== "" && !l.startsWith("#"));
-    assertEquals(body, ["PATH_add .ergonex/tools/bin"]);
+    assertEquals(body, ['PATH_add "$HOME/.local/bin"']);
     // the manifest's wish alone does not make it: the probe must find direnv
     assert(
       !filesOf({

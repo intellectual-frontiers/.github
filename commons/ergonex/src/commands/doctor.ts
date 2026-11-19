@@ -78,7 +78,7 @@ const signaturesCheck: DoctorCheck = async (ctx, loaded) => {
   const commits: CommitSignature[] = [];
   let looked = 0;
   for (const r of loaded.manifest.repositories) {
-    const folder = native(loaded.home, r.path);
+    const folder = native(loaded, r.path);
     if (!existsSync(join(folder, ".git"))) continue;
     const ahead = await commitSignatures(folder, "@{upstream}..HEAD", 50);
     const said = ahead.kind === "ok" ? ahead : await commitSignatures(folder, "HEAD", 20);
@@ -126,7 +126,7 @@ const modulesCheck: DoctorCheck = async (ctx, loaded) => {
     ...modulesOnPath(ctx.env["PATH"] ?? "", seen, ctx.today, ctx.platform.windows).filter((m) => !names.has(m.name)),
   ];
   const findings = moduleSourceFindings(loaded.manifest.catalog, found, ctx.today, loaded.manifest.policy.unapprovedGraceDays);
-  await rememberSeen(loaded.home, Object.fromEntries(findings.map((f) => [f.subject, f.firstSeen])));
+  await rememberSeen(loaded, Object.fromEntries(findings.map((f) => [f.subject, f.firstSeen])));
   return findings.length > 0
     ? findings.map(asCheck)
     : [

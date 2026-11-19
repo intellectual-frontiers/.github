@@ -105,13 +105,14 @@ proves(
         }
       };
       walk(w.home);
-      const times = ["core.auto.code-workspace", "AGENTS.auto.md", ".ergonex/state.auto.json"].map((f) => mtime(join(w.home, f)));
+      const watched = [join(w.home, "core.auto.code-workspace"), join(w.home, "AGENTS.auto.md"), join(w.state, "state.auto.json")];
+      const times = watched.map((f) => mtime(f));
       await new Promise((resolve) => setTimeout(resolve, 30));
       const again = await w.ergonex("render");
       assertEquals(again.code, 0);
       assertStringIncludes(again.stdout, "nothing written");
       assertEquals(
-        ["core.auto.code-workspace", "AGENTS.auto.md", ".ergonex/state.auto.json"].map((f) => mtime(join(w.home, f))),
+        watched.map((f) => mtime(f)),
         times,
       );
       // no repository was cloned by render
@@ -163,7 +164,7 @@ proves(
       await w.manifest(TWO_GROUPS);
       assertEquals((await w.ergonex("render")).code, 0);
       assertEquals((await w.ergonex("verify")).code, 0);
-      const record = JSON.parse(await readTextFile(join(w.home, ".ergonex", "state.auto.json"))) as {
+      const record = JSON.parse(await readTextFile(join(w.state, "state.auto.json"))) as {
         files: Record<string, { sha256: string; generator: string }>;
       };
       assertEquals(Object.keys(record.files).includes("AGENTS.auto.md"), true);
@@ -276,7 +277,7 @@ proves(
         PATH: `${bin}:${w.env["PATH"] ?? process.env["PATH"] ?? ""}`,
       });
       assertEquals(found.code, 0, found.stderr);
-      assertStringIncludes(await readTextFile(join(w.home, ".envrc.auto")), "PATH_add .ergonex/tools/bin");
+      assertStringIncludes(await readTextFile(join(w.home, ".envrc.auto")), 'PATH_add "$HOME/.local/bin"');
       await w.manifest({ ...ONE_REPOSITORY, direnv: false });
       const off = await w.ergonexOn(execPath(), Ergonex, ["plan"], {
         PATH: `${bin}:${w.env["PATH"] ?? process.env["PATH"] ?? ""}`,
@@ -297,7 +298,7 @@ proves(
       assertEquals((await w.ergonex("apply")).code, 0);
       const bin = await toolsWith(w, ["git", "sh", "dirname"]);
       const path = `${bin}:${w.env["PATH"] ?? process.env["PATH"] ?? ""}`;
-      const records = evidenceFiles(w.home).length;
+      const records = evidenceFiles(w.state).length;
       const none = await commit(w, "a change that names no issue", path);
       assertEquals(none.code !== 0, true, none.stderr);
       assertStringIncludes(none.stderr, "names no issue");
@@ -308,7 +309,7 @@ proves(
       assertEquals(good.code, 0, good.stderr);
       assertEquals(await w.git(w.repo, "log", "-1", "--format=%s"), "a change");
       // a hook only reads: it wrote no evidence record
-      assertEquals(evidenceFiles(w.home).length, records);
+      assertEquals(evidenceFiles(w.state).length, records);
     });
   },
   needsWorld,

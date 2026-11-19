@@ -10,7 +10,7 @@
 ## From nothing to a workspace
 
 - **FR-001**: The package `@intellectual-frontiers/ergonex` MUST run from npm with `bunx @intellectual-frontiers/ergonex <command>` on Bun and with `npx @intellectual-frontiers/ergonex <command>` on Node 26, on Windows, macOS and Linux, without a token, and MUST be published to the GitHub package registry as well (commons 0027-commons-libraries FR-015, FR-016).
-- **FR-002**: `ergonex init` MUST make the workspace root and the workspace's own area, write the starter manifest where there is none, and put the command `ergonex` on the person's path for the shells they open later (a global install by the runtime that ran it, or a shim in `<root>/.ergonex/bin` where that is not possible), MUST change nothing else on the host and MUST say each thing it did in plain words.
+- **FR-002**: `ergonex init` MUST make the workspace root and the workspace's own area, write the starter manifest where there is none, and put the command `ergonex` on the person's path for the shells they open later by the runtime's own global install (`bun add -g`, or `npm install -g` where Node ran it) and no command file or shim of its own, MUST change nothing else on the host (`--no-install` makes the root only) and MUST say each thing it did in plain words, and a run from a checkout, which is not installed, MUST say how to run it.
 - **FR-003**: IF `ergonex` is run with no command, THEN it MUST say in plain words what to do next (`init` where there is no workspace, `doctor` where there is one) and MUST NOT print a stack trace or an internal name.
 - **FR-004**: `ergonex shell <shell>` MUST set `ERGONEX_GITHUB_TOKEN` from the person's GitHub sign-in (`gh auth token`, run when the shell starts), only where `gh` is installed and signed in and the variable is not set already, MUST NOT write the token to a file and MUST NOT set `GITHUB_TOKEN` or `GH_TOKEN`, which `gh` itself would then use in place of its own sign-in.
 - **FR-005**: The configuration of a package manager that this library writes or reads MUST refer to the token by the name `ERGONEX_GITHUB_TOKEN` and MUST NOT hold its value.
@@ -19,8 +19,9 @@
 ## On every system
 
 - **FR-007**: Every command MUST give the same report on Windows (Windows PowerShell 5.1 and PowerShell 7, `cmd` and Git Bash), macOS and Linux, and a program MUST be run by its arguments, never through a shell's parsing of a line, so that a path with a space, a quote or a character outside ASCII is one argument.
-- **FR-008**: The installers `ergonex-install.ps1` and `ergonex-install.sh` MUST install Bun at the version commons pins, checked by its SHA-256, or Node 26 where Bun cannot run, and then run the command of FR-001, the one for Windows first; a script for Windows PowerShell 5.1 MUST carry a byte order mark or be ASCII, so that it is read as it is written, and the generated installers keep the line ends of generated files (LF).
+- **FR-008**: The installers `ergonex-install.ps1` and `ergonex-install.sh` MUST use the Bun that is there (or Node 26 where a person asks for it) and where there is none install it the way the platform installs programs, with `winget` by package identifier on Windows (Git and GitHub CLI too) and with Bun's own installer at the version commons pins on Linux and macOS, downloading nothing for themselves and putting nothing in a folder of their own (commons 0031-install-locations FR-006), and then run the command of FR-001, the one for Windows first; a script for Windows PowerShell 5.1 MUST carry a byte order mark or be ASCII, so that it is read as it is written, and the generated installers keep the line ends of generated files (LF).
 - **FR-009**: The library's own checks MUST run on Windows, macOS and Linux in CI, Windows first, on Bun and on Node 26.
+- **FR-010**: `ergonex paths` MUST say where ergonex keeps its files, so that a person who knows XDG or Windows' folders finds each where they expect it: the workspace, its own folder beside the repositories, the state folder, the data folder, the tools folder, the folder of the shims and the cache.
 
 ## Acceptance scenarios
 
@@ -30,6 +31,7 @@
 4. **Given** `gh` not installed, **When** a shell sources the snippet, **Then** nothing is set and nothing is said, per FR-004.
 5. **Given** a token with no scope for packages, **When** `ergonex doctor` runs, **Then** it says that it cannot read packages and gives the command that adds the scope, per FR-006.
 6. **Given** a folder whose name has a space and a letter outside ASCII, **When** a command runs on Windows, **Then** it works on that folder as it does on Linux, per FR-007.
+7. **Given** a workspace, **When** `ergonex paths` runs, **Then** it names the workspace, `.ergonex/` beside the repositories, and the state, data, tools, shims and cache folders, per FR-010.
 
 ## Out of scope
 
@@ -41,7 +43,8 @@
 - `ERGONEX_GITHUB_TOKEN` already set: left as it is, per FR-004.
 - `gh auth token` fails or prints nothing: the variable is left unset, per FR-004.
 - A shell that is not one of the five (bash, zsh, fish, PowerShell, Nushell): refused with the five named, per FR-003.
-- No global install is possible (no write right on the runtime's folder): the shim in `<root>/.ergonex/bin` is used and the path of the next shell gets it, per FR-002.
+- No global install is possible (no write right on the runtime's folder, or a package that is not published yet): it says so with the command to run by hand and `bunx` or `npx` as the other way, and writes no command file of its own, per FR-002.
+- A run from a checkout, which is not installed: it says how to run it, per FR-002.
 - A path with a space, a quote or a character outside ASCII: one argument, per FR-007.
 - Windows PowerShell 5.1 reading a script with no byte order mark: the script is ASCII or carries one, per FR-008.
 

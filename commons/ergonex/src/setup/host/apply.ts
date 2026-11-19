@@ -15,6 +15,7 @@
  *
  * @module
  */
+import { movedPath, type Places } from "../../places.ts";
 import { absurd } from "@intellectual-frontiers/commons/ts/kernel";
 import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
 import { sha256 } from "@intellectual-frontiers/commons/ts/kernel";
@@ -51,6 +52,8 @@ import { longPathsCommand, repoLongPathsCommand } from "../windows.ts";
 export type SetupDeps = {
   /** The workspace's root. */
   readonly root: string;
+  /** Where Ergonex keeps what it remembers and installs (0031-install-locations). */
+  readonly places: Places;
   readonly os: ToolOs;
   readonly arch: ToolArch;
   /** Today, `YYYY-MM-DD`: nothing here reads a clock. */
@@ -121,10 +124,10 @@ async function observe(deps: SetupDeps): Promise<SetupFacts> {
   const manifestPath = manifest.kind === "ok" ? manifest.value : `${deps.root}/${MANIFEST_FILE}`;
   const installed: string[] = [];
   for (const t of deps.catalog.tools) {
-    const v = await verifyTool(deps.root, t, deps.os, deps.arch);
+    const v = await verifyTool(deps.places, t, deps.os, deps.arch);
     if (v.kind === "ok" && v.value.length === 0) installed.push(`${t.name}@${t.version}`);
   }
-  const rootText = await readTextOr(join(deps.root, ".ergonex", "state.auto.json"));
+  const rootText = await readTextOr(movedPath(deps.places, ".ergonex/state.auto.json") ?? join(deps.root, ".ergonex", "state.auto.json"));
   const rootExists = rootText !== undefined || (await readTextOr(manifestPath)) !== undefined || (await exists(deps.root));
   return {
     root: deps.root,
@@ -141,6 +144,7 @@ async function observe(deps: SetupDeps): Promise<SetupFacts> {
     elevated: deps.windows?.elevated ?? false,
     windowsPaths: deps.repos.map((r) => `${deps.root}\\${r.replaceAll("/", "\\")}`),
     gitIncludeFile: deps.gitIncludeFile,
+    toolsRoot: deps.places.tools,
   };
 }
 
@@ -189,7 +193,7 @@ async function applyStep(deps: SetupDeps, args: SetupArgs, step: SetupStep, find
       if (tool === undefined) return failed(`${step.tool} is not in the catalog`, "ergonex/setup-install", step.tool);
       const r = await installTool(
         {
-          home: deps.root,
+          places: deps.places,
           transport: deps.transport,
           os: deps.os,
           arch: deps.arch,
@@ -297,7 +301,9 @@ export async function setup(args: SetupArgs, deps: SetupDeps): Promise<Result<Se
   if (args.apply) {
     await mkdir(deps.root, { recursive: true });
     await mkdir(join(deps.root, ".ergonex"), { recursive: true });
-    const held = await acquireLock(join(deps.root, ".ergonex", "ergonex.lock"), { wait: false, command: "setup" });
+    const lockPath = movedPath(deps.places, ".ergonex/ergonex.lock") ?? join(deps.root, ".ergonex", "ergonex.lock");
+    await mkdir(dirname(lockPath), { recursive: true });
+    const held = await acquireLock(lockPath, { wait: false, command: "setup" });
     if (held === undefined)
       return err({
         kind: "environment",

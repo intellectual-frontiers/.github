@@ -180,9 +180,9 @@ export function artifactFor(tool: Tool, os: ToolOs, arch: ToolArch): ToolArtifac
   return tool.artifacts.find((a) => a.os === os && a.arch === arch);
 }
 
-/** The folder of an installed tool below the workspace's home, `.ergonex/tools/<name>/<version>` (0002-workspace-model FR-039), with `/` between parts. */
+/** The folder of an installed tool below the tools folder (`<data>/tools`, 0002-workspace-model FR-039 and 0031-install-locations), `<name>/<version>`, with `/` between parts. */
 export function installDirOf(tool: Pick<Tool, "name" | "version">): string {
-  return `.ergonex/tools/${tool.name}/${tool.version}`;
+  return `${tool.name}/${tool.version}`;
 }
 
 /** Whether a name is a command that a tool of the catalog provides (the catalog's `provides`, with each tool's own name). */

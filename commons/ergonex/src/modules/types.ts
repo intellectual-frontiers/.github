@@ -27,6 +27,7 @@ import type { Json } from "@intellectual-frontiers/commons/ts/kernel";
 import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
 import type { Sha256 } from "@intellectual-frontiers/commons/ts/kernel";
 import type { Finding } from "../findings.ts";
+import type { Places } from "../places.ts";
 import type { RunFacts } from "../setup/evidence.ts";
 
 /** How a run ends: the keys of the code list `ergonex:ExitStatus`. */
@@ -165,6 +166,8 @@ export type BaseContext = {
   /** The UTC day of the run, `YYYY-MM-DD`. */
   readonly today: string;
   readonly platform: Platform;
+  /** The folders Ergonex keeps its own files in (0031-install-locations); undefined where no home can be found. */
+  readonly places: Places | undefined;
   /** The typed modules the command holds, which `list` and `help` read. */
   readonly builtins: readonly ErgonexModule[];
   readonly interact: Interact;

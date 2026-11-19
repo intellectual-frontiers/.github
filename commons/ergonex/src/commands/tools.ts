@@ -52,7 +52,7 @@ const toolsCommand = defineCommand({
           message: `ergonex tools has no pinned tools for ${ctx.platform.os} ${ctx.platform.arch}`,
         });
       const done = await tools(parsed.value, {
-        home: loaded.home,
+        places: loaded.places,
         catalog: loaded.manifest.catalog,
         os: target.os,
         arch: target.arch,
@@ -65,7 +65,7 @@ const toolsCommand = defineCommand({
       });
       if (done.kind === "err") return err({ kind: "usage", message: done.error.message });
       const r = done.value;
-      await rememberSeen(loaded.home, r.seen);
+      await rememberSeen(loaded, r.seen);
       const findings: readonly Finding[] = r.findings;
       const lines =
         r.document !== undefined

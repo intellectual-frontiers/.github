@@ -23,7 +23,7 @@
 
 ## The state record, verify and render
 
-- **FR-009**: The state record (`ergonex:StateRecord`) MUST be `<home>/.ergonex/state.auto.json`, decoded as typed data, and MUST hold the path, the SHA-256 and the generator of each generated file as it was written, the hash of the last plan, the version of Ergonex, and the day each tool or module outside the catalog was first seen.
+- **FR-009**: The state record (`ergonex:StateRecord`) MUST be `<state>/state.auto.json`, in the state folder of commons 0031-install-locations, decoded as typed data, and MUST hold the path, the SHA-256 and the generator of each generated file as it was written, the hash of the last plan, the version of Ergonex, and the day each tool or module outside the catalog was first seen.
 - **FR-010**: `ergonex verify` MUST compare the disk with the record and the record with what the templates give now, and MUST report: a generated file whose bytes differ from the record (a hand edit) as an `ergonex:Error`, a recorded file that is missing, an `.auto.` file the record does not hold, and a file the templates would now write differently (a drift) each as an `ergonex:Warning`; it MUST change nothing.
 - **FR-011**: IF a generated file's bytes differ from the state record, THEN `render` and `apply` MUST NOT overwrite or remove it and MUST report it as refused with its path, unless the run says `--force`.
 - **FR-012**: `ergonex render` MUST write the generated files, and `ergonex render --check` MUST write nothing, name each file that would change and end with the exit status `ergonex:Findings`, and `--diff` MUST show the difference as a unified diff.
@@ -38,7 +38,7 @@
 ## The shell snippet
 
 - **FR-017**: `ergonex shell <bash|zsh|fish|pwsh|nu>` MUST print the snippet for that shell on standard output and nothing else, MUST write no file and change nothing, and MUST exit 2 for another shell.
-- **FR-018**: The snippet MUST do four things and no more: export `ERGONEX_HOME` where it is not set, add `<home>/.ergonex/tools/bin` to the `PATH` so that `ergonex-*` modules and the pinned tools resolve, define the completions of `ergonex`, and define one function, `wcd`, that changes to a repository of the workspace by its name.
+- **FR-018**: The snippet MUST do four things and no more: export `ERGONEX_HOME` where it is not set, add `~/.local/bin` (on Windows, `<data>/tools/bin`), where the shims of the pinned tools and of the `ergonex-*` modules are, to the `PATH`, define the completions of `ergonex`, and define one function, `wcd`, that changes to a repository of the workspace by its name.
 - **FR-019**: `ergonex shell --install` MUST show a unified diff of one block between the lines `# >>> ergonex >>>` and `# <<< ergonex <<<` in the shell's start-up file (`~/.bashrc`, `~/.zshrc`, `~/.config/fish/conf.d/ergonex.fish`, the PowerShell `$PROFILE`, or the Nushell `config.nu`, or the file `--rc` names) and ask, MUST write only after a yes (and exit 2 where there is no terminal and no `--yes`), MUST leave one block where it is run twice, and `--uninstall` MUST remove exactly that block and nothing else.
 
 ## What is not managed
@@ -52,7 +52,7 @@
 ## Generated guidance
 
 - **FR-022**: `AGENTS.auto.md` MUST tell an agent the layout of the workspace, its rules (plan before apply, fast-forward only, one issue for every commit, no credential in a file) and its commands, from the manifest, with no secret and no absolute path of the user's computer.
-- **FR-023**: `.envrc.auto` MUST be generated only where the manifest says `direnv` is wanted and a probe finds `direnv`, and it MUST only add `<home>/.ergonex/tools/bin` to the `PATH`.
+- **FR-023**: `.envrc.auto` MUST be generated only where the manifest says `direnv` is wanted and a probe finds `direnv`, and it MUST only add `~/.local/bin` to the `PATH`.
 - **FR-024**: The templates MUST also generate `lefthook.auto.yml` at the root, which calls the three generated hooks by their relative path and holds no checker of its own, for a person who runs lefthook in the workspace's own repository.
 - **FR-025**: A generated hook MUST run `ergonex hook <name>` with `--home` the root it finds from its own place (it holds no absolute path), MUST send what it prints to standard error, and MUST read its status as 0 (go on), 1 (stop) or anything else (it cannot run its checker, FR-015).
 - **FR-026**: `ergonex shell --install` MUST NOT create a start-up file that does not exist: where the shell's start-up file is absent it MUST write nothing and say how to create it (the command to run and the path), and `--uninstall` MUST NOT create one either.

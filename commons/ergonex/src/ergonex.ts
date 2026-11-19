@@ -34,7 +34,9 @@ import { guidanceFor } from "./commands/guidance.ts";
 import { writeEvidence } from "./host/evidence.ts";
 import { discoverModules, runExternal } from "./host/discovery.ts";
 import { terminalInteract } from "./host/interact.ts";
-import { readManifest, AREA, LOOPBACK_NOTICE, loopbackAllowed, loopbackFinding } from "./host/workspace.ts";
+import { readManifest, LOOPBACK_NOTICE, loopbackAllowed, loopbackFinding } from "./host/workspace.ts";
+import { placesOf } from "./host/locations.ts";
+import { AREA } from "./host/workspace.ts";
 import { writeRunEvidence } from "./setup/host/evidence.ts";
 import type { RunFacts } from "./setup/evidence.ts";
 import { exitStatusOf, toSarif } from "./findings.ts";
@@ -105,11 +107,13 @@ export async function main(argv: readonly string[], deps: MainDeps = {}): Promis
     });
     return h.kind === "ok" ? h.value : undefined;
   };
+  const placed = placesOf((name) => environment[name], build.os === "darwin" ? "darwin" : build.os === "windows" ? "windows" : "linux");
   const base: BaseContext = {
     env: environment,
     cwd,
     today,
     platform: { os: build.os, arch: build.arch, windows },
+    places: placed.kind === "ok" ? placed.value : undefined,
     builtins,
     interact: deps.interact ?? terminalInteract(),
     homeFor,
@@ -270,7 +274,8 @@ export async function main(argv: readonly string[], deps: MainDeps = {}): Promis
 
   // the evidence record, where the workspace has a place for it
   const home = homeFor(globals.home);
-  if (!noEvidence && home !== undefined && existsSync(join(home, AREA))) {
+  const places = placed.kind === "ok" ? placed.value : undefined;
+  if (!noEvidence && home !== undefined && places !== undefined && existsSync(join(home, AREA))) {
     const policy = await readManifest(home, today, loopbackAllowed(environment));
     const regulated = policy.kind === "ok" && policy.value.policy.regulatedDomain.length > 0;
     const tools = [...(facts?.tools ?? []), { name: runtimeName(), version: runtimeVersion() }];
@@ -283,11 +288,11 @@ export async function main(argv: readonly string[], deps: MainDeps = {}): Promis
     // the evidence of `setup` and `tools` is made by the setup module's writer from the facts of the run; every other run's by this one's
     const failure: string | undefined =
       runFacts !== undefined
-        ? await writeRunEvidence({ home, start, end, env: environment }, { ...runFacts, exit: status }).then((w) =>
+        ? await writeRunEvidence({ home, places: places, start, end, env: environment }, { ...runFacts, exit: status }).then((w) =>
             w.kind === "err" ? w.error : undefined,
           )
         : await writeEvidence(
-            home,
+            { home, places },
             {
               command,
               words,

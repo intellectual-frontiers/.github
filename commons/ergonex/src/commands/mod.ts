@@ -12,6 +12,7 @@ import { doctorModule } from "./doctor.ts";
 import { helpModule, listModule } from "./list.ts";
 import { hookModule } from "./hook.ts";
 import { initModule } from "./init.ts";
+import { pathsModule } from "./paths.ts";
 import { setupModule } from "./setup.ts";
 import { shellModule } from "./shell.ts";
 import { statusModule } from "./status.ts";
@@ -32,6 +33,7 @@ export const BUILTIN_MODULES: readonly ErgonexModule[] = [
   listModule,
   helpModule,
   shellModule,
+  pathsModule,
   setupModule,
   toolsModule,
   hookModule,

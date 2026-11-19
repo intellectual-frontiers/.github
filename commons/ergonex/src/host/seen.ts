@@ -6,12 +6,12 @@
  *
  * @module
  */
-import { existsSync, readTextFile } from "../platform/r-fs.ts";
+import { existsSync, mkdir, readTextFile } from "../platform/r-fs.ts";
 import { acquireLock } from "../platform/r-lock.ts";
-import { join } from "../platform/r-path.ts";
+import { dirname, join } from "../platform/r-path.ts";
 import { decodeStateRecord, EMPTY_RECORD, encodeStateRecord, STATE_RECORD_PATH } from "../state-record.ts";
 import { writeAtomic } from "./apply.ts";
-import { AREA, native } from "./workspace.ts";
+import { AREA, native, type Site } from "./workspace.ts";
 
 /** The first-seen days of a record with `seen` added: an existing day is kept, a day that is not a day is replaced. */
 export function mergeSeen(
@@ -22,15 +22,17 @@ export function mergeSeen(
 }
 
 /** Writes the days to the state record of the root. Returns whether the record changed. A damaged record is left as it is. */
-export async function rememberSeen(home: string, seen: Readonly<Record<string, string>>): Promise<boolean> {
-  if (Object.keys(seen).length === 0 || !existsSync(join(home, AREA))) return false;
-  const held = await acquireLock(join(home, AREA, "ergonex.lock"), {
+export async function rememberSeen(site: Site, seen: Readonly<Record<string, string>>): Promise<boolean> {
+  if (Object.keys(seen).length === 0 || !existsSync(join(site.home, AREA))) return false;
+  const lock = native(site, `${AREA}/ergonex.lock`);
+  await mkdir(dirname(lock), { recursive: true });
+  const held = await acquireLock(lock, {
     wait: false,
     command: "ergonex (first seen)",
   });
   if (held === undefined) return false;
   try {
-    const path = native(home, STATE_RECORD_PATH);
+    const path = native(site, STATE_RECORD_PATH);
     const text = existsSync(path) ? await readTextFile(path) : undefined;
     const read = text === undefined ? { kind: "ok" as const, value: EMPTY_RECORD } : decodeStateRecord(text);
     if (read.kind === "err") return false;

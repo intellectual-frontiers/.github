@@ -33,7 +33,7 @@
 
 ## Out of scope
 
-- Where a person keeps the repositories of a workspace (`~/workspaces`, which a person chooses): it is the person's work, not a program's files.
+- Where a person keeps the repositories of a workspace (`~/workspaces`, which a person chooses): it is the person's work, not a program's files. A workspace's own folder beside the repositories (Ergonex's `.ergonex/`) holds what a person edits and other tools read (the manifest, the generated Git configuration, the hooks), as `.vscode/` does; it is a project folder, not a folder under the home folder, and what a program only remembers or installs is not in it.
 - The files a shell reads at its start (`~/.bashrc`, a PowerShell profile): they are the shell's, and a program edits them only on a person's request.
 
 ## Edge cases

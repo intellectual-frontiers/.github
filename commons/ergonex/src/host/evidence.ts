@@ -21,7 +21,7 @@ import { writeOnce } from "@intellectual-frontiers/commons/ts/quality";
 import type { Finding } from "../findings.ts";
 import { type EvidenceFacts, type ExitStatus, exitCodeOf } from "../modules/types.ts";
 import { ERGONEX_VERSION } from "../state-record.ts";
-import { AREA } from "./workspace.ts";
+import { AREA, native, type Site } from "./workspace.ts";
 
 /** What a run is recorded as. */
 export type RunFacts = {
@@ -104,7 +104,7 @@ export function resourceAttributes(run: RunFacts, regulated: boolean): Attribute
 }
 
 /** Writes the record of a run under the root's evidence folder, and returns its path. Never overwrites: the name holds the run's time and a fresh identifier. */
-export async function writeEvidence(home: string, run: RunFacts, regulated: boolean): Promise<Result<string, EvidenceError>> {
+export async function writeEvidence(site: Site, run: RunFacts, regulated: boolean): Promise<Result<string, EvidenceError>> {
   const rules = rulesOf(run);
   const cases = rules.reduce((n, r) => n + (r.notRun !== undefined ? 0 : Math.max(1, r.findings.length)), 0);
   const made = await checkRun({
@@ -127,7 +127,7 @@ export async function writeEvidence(home: string, run: RunFacts, regulated: bool
   });
   if (made.kind === "err") return err({ kind: "record", reason: JSON.stringify(made.error) });
   const day = new Date(Number(run.end / 1_000_000n)).toISOString().slice(0, 10).split("-");
-  const folder = join(home, AREA, "evidence", ...day);
+  const folder = native(site, `${AREA}/evidence/${day.join("/")}`);
   const file = join(folder, `${stamp(run.end)}-${made.value.record.traceId}.otlp.json`);
   try {
     await mkdir(folder, { recursive: true });

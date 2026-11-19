@@ -67,7 +67,7 @@ async function pending(loaded: Loaded): Promise<
   }[] = [];
   for (const f of loaded.files) {
     const fact = facts.find((x) => x.path === f.path);
-    const disk = native(loaded.home, f.path);
+    const disk = native(loaded, f.path);
     const before = existsSync(disk) ? await readTextFile(disk) : "";
     if (fact?.onDisk === fact?.wanted && fact?.onDisk !== undefined) continue;
     out.push({

@@ -70,12 +70,17 @@ proves(
       await w.ergonex("init");
       await w.manifest(ONE_REPOSITORY);
       assertEquals((await w.ergonex("apply")).code, 0);
-      const files = [".ergonex/state.auto.json", "AGENTS.auto.md", "core.auto.code-workspace", ".ergonex/hooks/commit-msg"];
-      const first = await Promise.all(files.map((f) => readTextFile(join(w.home, f))));
+      const files = [
+        join(w.state, "state.auto.json"),
+        join(w.home, "AGENTS.auto.md"),
+        join(w.home, "core.auto.code-workspace"),
+        join(w.home, ".ergonex", "hooks", "commit-msg"),
+      ];
+      const first = await Promise.all(files.map((f) => readTextFile(f)));
       const config = await readTextFile(join(w.repo, ".git", "config"));
       await new Promise((r) => setTimeout(r, 20));
       assertEquals((await w.ergonex("apply")).code, 0);
-      assertEquals(await Promise.all(files.map((f) => readTextFile(join(w.home, f)))), first);
+      assertEquals(await Promise.all(files.map((f) => readTextFile(f))), first);
       assertEquals(await readTextFile(join(w.repo, ".git", "config")), config);
       // the root holds the repositories' hosts and the workspace's own area, and the area holds what the specification names
       const allowedRoot = [".ergonex", "git.example.org", "AGENTS.auto.md", "core.auto.code-workspace", "lefthook.auto.yml"];
@@ -88,7 +93,8 @@ proves(
       const area = readDirSync(join(w.home, ".ergonex"))
         .map((e) => e.name)
         .sort();
-      assertEquals(area, ["evidence", "git.auto.conf", "hooks", "modules.auto.json", "state.auto.json", "tools.auto.json", "workspace.ts"]);
+      // what ergonex remembers (the state record, the evidence) is in its state folder, not in the workspace (0031-install-locations)
+      assertEquals(area, ["git.auto.conf", "hooks", "modules.auto.json", "tools.auto.json", "workspace.ts"]);
     });
   },
   needsWorld,
@@ -271,7 +277,7 @@ proves(
     await withWorld(async (w) => {
       await w.ergonex("init");
       await w.manifest(ONE_REPOSITORY);
-      const lockPath = join(w.home, ".ergonex", "ergonex.lock");
+      const lockPath = join(w.state, "ergonex.lock");
       const held = await acquireLock(lockPath, {
         wait: false,
         command: "ergonex apply (the first run)",
@@ -407,11 +413,11 @@ proves(
     await withWorld(async (w) => {
       await w.ergonex("init");
       await w.manifest(ONE_REPOSITORY);
-      const before = evidenceFiles(w.home).length;
+      const before = evidenceFiles(w.state).length;
       await w.ergonex("plan");
       await w.ergonex("apply");
       await w.ergonex("status");
-      assertEquals(evidenceFiles(w.home).length, before + 3);
+      assertEquals(evidenceFiles(w.state).length, before + 3);
     });
   },
   needsWorld,

@@ -19,6 +19,10 @@ export const isAbsolute = path.isAbsolute;
 export const join = path.join;
 /** `path.relative`. */
 export const relative = path.relative;
+/** `path.posix`. */
+export const posix = path.posix;
+/** `path.win32`. */
+export const win32 = path.win32;
 /** `path.resolve`. */
 export const resolve = path.resolve;
 /** `path.sep`. */

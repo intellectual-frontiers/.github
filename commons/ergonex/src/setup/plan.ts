@@ -87,6 +87,8 @@ export type SetupStep =
       readonly arch: ToolArch;
       readonly url: string;
       readonly sha256: string;
+      /** The folder it is installed into, `<data>/tools/<name>/<version>`. */
+      readonly into: string;
     }
   | {
       readonly kind: "SkipTool";
@@ -127,7 +129,7 @@ export function describeStep(step: SetupStep): string {
     case "VerifyTool":
       return `verify ${describeProbe(step.probe)} (probed, never installed)`;
     case "InstallTool":
-      return `install ${step.tool} ${step.version} for ${step.os} ${step.arch} from ${step.url} (SHA-256 ${step.sha256}) into .ergonex/tools/${step.tool}/${step.version}/`;
+      return `install ${step.tool} ${step.version} for ${step.os} ${step.arch} from ${step.url} (SHA-256 ${step.sha256}) into ${step.into}/`;
     case "SkipTool":
       return `skip ${step.tool}: ${step.reason}`;
     case "SetRepoLongPaths":
@@ -164,6 +166,8 @@ export type SetupFacts = {
   readonly windowsPaths: readonly string[];
   /** The file the global Git include would include. */
   readonly gitIncludeFile: string;
+  /** The tools folder, `<data>/tools`, which the installs go into. */
+  readonly toolsRoot: string;
 };
 
 /** The plan of `ergonex setup`: its steps in a fixed order, and the findings it makes. */
@@ -213,6 +217,7 @@ export function setupPlan(args: SetupArgs, facts: SetupFacts, today: string): Se
       arch: a.arch,
       url: a.url,
       sha256: a.sha256,
+      into: `${facts.toolsRoot}/${tool.name}/${tool.version}`,
     });
   }
   let left = false;

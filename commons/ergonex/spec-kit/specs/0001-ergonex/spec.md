@@ -76,7 +76,7 @@
 - **Given** a typo of a module name, **When** it is run, **Then** the status is 2 and the nearest names are listed (FR-006, FR-010).
 - **Given** a workspace with a warning, **When** `ergonex doctor` runs, **Then** the status is 1, and with only informational findings it is 0 (FR-010, FR-014).
 - **Given** any state, **When** `ergonex setup` runs with no option, **Then** it shows its plan, installs nothing and changes nothing (FR-017).
-- **Given** a catalog with a tool pinned for this system, **When** `ergonex setup --apply` runs, **Then** the tool is in `.ergonex/tools/`, `git` was only probed, and an `ergonex:Setup` with `ergonex:applied` true was recorded (FR-017, FR-018).
+- **Given** a catalog with a tool pinned for this system, **When** `ergonex setup --apply` runs, **Then** the tool is in the tools folder of ergonex's data (`<data>/tools/`, commons 0031-install-locations), `git` was only probed, and an `ergonex:Setup` with `ergonex:applied` true was recorded (FR-017, FR-018).
 - **Given** a repository that needs no worktree, **When** `ergonex worktree create` runs, **Then** it says the repository's own checkout is the place and makes none (FR-016).
 - **Given** a Bun and a Node 26 runtime, **When** `ergonex status` runs on each, **Then** the report is the same (FR-024).
 

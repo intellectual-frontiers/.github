@@ -65,12 +65,12 @@
 
 - **FR-037**: The tool catalog (`ergonex:ToolCatalog`) MUST be in the manifest and MUST hold, for each `ergonex:Tool`, its name, one pinned version (never `latest` and never a range), what it provides and, for each operating system and architecture, an `https` URL and a SHA-256; WHERE the environment sets `ERGONEX_ALLOW_LOOPBACK_HTTP=1`, an `http` URL to the loopback interface MAY be pinned too (the SHA-256 is still checked), every command that honors the switch MUST write on standard error the one line `ergonex: ERGONEX_ALLOW_LOOPBACK_HTTP is set: http to the loopback interface is accepted (the SHA-256 is still checked)`, and the report of the run MUST hold a finding of severity informational (`ergonex/loopback-http`).
 - **FR-038**: Ergonex MUST verify `git`, `bun` and `node` by a probe of their versions and MUST NOT install them; Bun is the default runtime, Node 26 the backup, and Deno is not a runtime of Ergonex.
-- **FR-039**: Ergonex MUST install a tool only from a pinned artifact of the catalog, into `<home>/.ergonex/tools/<name>/<version>/`, after the SHA-256 of the downloaded bytes equals the pin, and MUST refuse, writing nothing, an artifact whose hash differs.
+- **FR-039**: Ergonex MUST install a tool only from a pinned artifact of the catalog, into `<data>/tools/<name>/<version>/` (the tools folder of the data folder of commons 0031-install-locations: `$XDG_DATA_HOME/ergonex` or `~/.local/share/ergonex`, and `%LOCALAPPDATA%\ergonex` on Windows), with the shims of its commands in `~/.local/bin` (on Windows, `<data>/tools/bin`), after the SHA-256 of the downloaded bytes equals the pin, and MUST refuse, writing nothing, an artifact whose hash differs.
 - **FR-040**: The catalog MUST be expressible as OSCAL `inventory-item`s and the inventory of what is installed as SPDX and as CycloneDX, so that the workspace's configuration and its tools can be given to an assessor in those forms.
 
 ## Evidence
 
-- **FR-041**: Every run of every command MUST write one evidence record under `<home>/.ergonex/evidence/`, in the shape of an IFQS test record (`commons 0021-ifqs`), named by the run's UTC time and identifier, never overwritten; a check that did not run is recorded as `not_run` with its reason.
+- **FR-041**: Every run of every command MUST write one evidence record under `<state>/evidence/` (the state folder of commons 0031-install-locations: `$XDG_STATE_HOME/ergonex` or `~/.local/state/ergonex`, and `%LOCALAPPDATA%\ergonex\state` on Windows), in the shape of an IFQS test record (`commons 0021-ifqs`), named by the run's UTC time and identifier, never overwritten; a check that did not run is recorded as `not_run` with its reason.
 - **FR-042**: An evidence record MUST name the command and its options, the plan's hash, the version of each tool probed or installed, the state record's hash, the findings and the exit status, and MUST NOT hold a credential or the content of a file.
 - **FR-043**: WHERE the manifest names a regulated domain, the evidence of a run MUST name the version of every tool it used, so that the validation of the software used in the quality system, which 21 CFR Part 820 (the QMSR, incorporating ISO 13485:2016) requires and the FDA's Computer Software Assurance guidance describes, can cite it. Authority: mzid:authority-21-cfr-820.
 
@@ -127,7 +127,7 @@
 - **Given** a GitHub manager, **When** nested groups are asked for, **Then** the answer is that they are unsupported, naming GitHub and the capability (FR-017).
 - **Given** a manifest that names a regulated domain, **When** a commit that is not signed is in a managed repository, **Then** `ergonex doctor` reports an error, and where no domain is named it reports a warning (FR-032).
 - **Given** a tool on the path that the catalog does not list, first seen 91 days ago, **When** `ergonex doctor` runs, **Then** it reports a warning, and 89 days ago it reported an informational finding (FR-033).
-- **Given** any command, **When** it ends, **Then** one evidence record is under `.ergonex/evidence/` and holds no credential (FR-041, FR-042).
+- **Given** any command, **When** it ends, **Then** one evidence record is in the state folder (`<state>/evidence/`) and holds no credential (FR-041, FR-042).
 
 ## Assumptions
 

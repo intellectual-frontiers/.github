@@ -739,6 +739,6 @@ requirement	mechanism	by	note
 0031-install-locations FR-002	check	.github: cd commons/ts && bun test tests/	runtime/dirs.test.ts: an XDG variable is honored where it is an absolute path, on Windows too, and ignored where it is not
 0031-install-locations FR-003	check	.github: cd commons/ts && bun test tests/	runtime/dirs.test.ts: macOS gives the folders Linux gives and never ~/Library
 0031-install-locations FR-004	check	.github: cd commons/ts && bun test tests/	runtime/dirs.test.ts: no home and no variable give undefined folders
-0031-install-locations FR-005	none	-	Planned: Ergonex stops writing command files and shims of its own (init uses the runtime's global install) and puts the tools it installs in the data folder and their shims in ~/.local/bin; the check of it comes with that change
-0031-install-locations FR-006	none	-	Planned: the installer for Windows installs Bun or Node and the other prerequisites with winget, by identifier, and downloads nothing of its own
+0031-install-locations FR-005	check	.github: cd commons/ergonex && bun test suite/	ergonex-locations.test.ts: Ergonex's state record, evidence and lock are in the state folder and its tools in the data folder, nothing is written below the user's home, no folder or command file of its own is made; ergonex-onboarding.test.ts: init writes no command file
+0031-install-locations FR-006	check	.github: cd commons/ergonex && bun test suite/	ergonex-install.test.ts: the Windows installer installs its prerequisites with winget by package identifier and downloads nothing; the Linux and macOS one asks Bun's own installer
 0031-install-locations FR-007	none	-	Planned: a WinGet manifest, as typed code made into YAML, comes with the first release that has a binary

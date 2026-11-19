@@ -80,7 +80,7 @@ const status = defineCommand({
         foldKey(a.path) < foldKey(b.path) ? -1 : foldKey(a.path) > foldKey(b.path) ? 1 : 0,
       );
       for (const r of repos) {
-        const folder = native(loaded.home, r.path);
+        const folder = native(loaded, r.path);
         const facts = await observeFacts(folder, { fetch: args.options.fetch });
         if (facts.kind === "err")
           return err({

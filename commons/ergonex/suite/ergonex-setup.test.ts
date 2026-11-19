@@ -28,6 +28,7 @@ import { judgeProbe } from "../src/tools/probe.ts";
 import type { ToolArch, ToolOs } from "../src/tools/catalog.ts";
 import { repoPath } from "../src/portable.ts";
 import { artifactServer, catalogOf, pinned, tarball } from "./ergonex-tools-fixtures.ts";
+import { fakePlaces } from "./ergonex-fixtures.ts";
 import { git, needsGit, repositoryWithCommit } from "./quality-fixtures.ts";
 
 const OS: ToolOs = build.os === "darwin" ? "macos" : build.os === "windows" ? "windows" : "linux";
@@ -76,6 +77,7 @@ proves(
       const said: string[] = [];
       const deps: SetupDeps = {
         root,
+        places: fakePlaces(parent),
         os: OS,
         arch: ARCH,
         today: TODAY,
@@ -118,7 +120,7 @@ proves(
 
 proves(
   ["0001-ergonex FR-018", "0002-workspace-model FR-039"],
-  "setup --apply creates the root and a starter manifest, installs only the pinned artifact into .ergonex/tools/, and only probes git, bun and node",
+  "setup --apply creates the root and a starter manifest, installs only the pinned artifact into the tools folder of ergonex's data, and only probes git, bun and node",
   async () => {
     const parent = await makeTempDir({ prefix: "ergonex-setup-" });
     const art = tarball("hello", "1.0.0");
@@ -128,6 +130,7 @@ proves(
       const tool = await pinned("hello", "1.0.0", art, `${base}${PATH}`, OS, ARCH);
       const deps: SetupDeps = {
         root,
+        places: fakePlaces(parent),
         os: OS,
         arch: ARCH,
         today: TODAY,
@@ -145,15 +148,15 @@ proves(
       assertEquals(r.value.exit, "Ok");
       assertEquals(requests, [`GET ${PATH}`]);
       assertEquals(await readTextFile(join(root, "workspace.ts")), starterManifest());
-      assert(await exists(join(root, ".ergonex", "tools", "hello", "1.0.0", "hello-1.0.0", "bin", "hello")));
+      assert(await exists(join(fakePlaces(parent).tools, "hello", "1.0.0", "hello-1.0.0", "bin", "hello")));
       // the three probed tools are told and never installed
       assertEquals(
         r.value.outcomes.filter((o) => o.step.kind === "VerifyTool").map((o) => o.result),
         ["skipped", "skipped", "skipped"],
       );
-      assertEquals(await exists(join(root, ".ergonex", "tools", "git")), false);
-      assertEquals(await exists(join(root, ".ergonex", "tools", "bun")), false);
-      assertEquals(await exists(join(root, ".ergonex", "tools", "node")), false);
+      assertEquals(await exists(join(fakePlaces(parent).tools, "git")), false);
+      assertEquals(await exists(join(fakePlaces(parent).tools, "bun")), false);
+      assertEquals(await exists(join(fakePlaces(parent).tools, "node")), false);
       assertEquals(r.value.facts.tools["hello"], "1.0.0");
       assertEquals(r.value.facts.tools["git"], "2.43.0");
       // a second apply installs nothing and fetches nothing, and keeps the manifest
@@ -185,6 +188,7 @@ proves(
       const tool = await pinned("hello", "1.0.0", art, `${base}${PATH}`, OS, ARCH, "f".repeat(64));
       const r = await setup(APPLY, {
         root,
+        places: fakePlaces(parent),
         os: OS,
         arch: ARCH,
         today: TODAY,
@@ -204,7 +208,7 @@ proves(
         [["ergonex/setup-install", "Error", "hello"]],
       );
       assertStringIncludes(r.value.findings[0]?.message ?? "", "nothing was written");
-      assertEquals(await listing(join(root, ".ergonex", "tools")), []);
+      assertEquals(await listing(join(fakePlaces(parent).tools)), []);
       assertEquals(await exists(join(root, ".ergonex", "bin")), false);
     } finally {
       await server.shutdown();
@@ -224,6 +228,7 @@ proves(
         Promise.resolve([judgeProbe("git", undefined), judgeProbe("bun", "1.4.4"), judgeProbe("node", "v22.1.0")]);
       const r = await setup(APPLY, {
         root,
+        places: fakePlaces(parent),
         os: OS,
         arch: ARCH,
         today: TODAY,
@@ -245,7 +250,7 @@ proves(
       );
       assertStringIncludes(r.value.findings[0]?.message ?? "", "git-scm.com");
       assertStringIncludes(r.value.findings[1]?.message ?? "", "nodejs.org");
-      assertEquals(await listing(join(root, ".ergonex", "tools")), []);
+      assertEquals(await listing(join(fakePlaces(parent).tools)), []);
     } finally {
       await remove(parent, { recursive: true });
     }
@@ -265,6 +270,7 @@ proves(
       const calls: string[] = [];
       const deps: SetupDeps = {
         root,
+        places: fakePlaces(parent),
         os: "windows",
         arch: "x64",
         today: TODAY,
@@ -317,6 +323,7 @@ proves(
       const root = join(parent, "ws");
       const deps: SetupDeps = {
         root,
+        places: fakePlaces(parent),
         os: "windows",
         arch: "x64",
         today: TODAY,
@@ -409,6 +416,7 @@ proves(
       const questions: string[] = [];
       const base: SetupDeps = {
         root,
+        places: fakePlaces(parent),
         os: OS,
         arch: ARCH,
         today: TODAY,
@@ -518,6 +526,7 @@ proves(
         arch: "x64",
         url: "https://e.org/t",
         sha256: "a".repeat(64),
+        into: "/d/tools/t/1.0.0",
       }),
       SetSystemLongPaths: stepChangesHost({ kind: "SetSystemLongPaths" }),
       AddGitInclude: stepChangesHost({ kind: "AddGitInclude", file: "/f" }),
@@ -545,6 +554,7 @@ proves(
       const tool = await pinned("hello", "1.0.0", art, `${base}${PATH}`, OS, ARCH, "e".repeat(64));
       const r = await setup(APPLY, {
         root,
+        places: fakePlaces(parent),
         os: OS,
         arch: ARCH,
         today: TODAY,
@@ -567,7 +577,13 @@ proves(
         firstSeen: TODAY,
       };
       const end = 1_800_000_000_000_000_000n;
-      const deps = { home: root, start: end - 5_000_000_000n, end, env: {} };
+      const deps = {
+        home: root,
+        places: fakePlaces(parent),
+        start: end - 5_000_000_000n,
+        end,
+        env: {},
+      };
       const w = await writeRunEvidence(deps, {
         ...r.value.facts,
         argv: ["--apply", "--home=/secret/place", "positional"],
@@ -575,7 +591,7 @@ proves(
         stateSha256: "c".repeat(64),
       });
       assert(w.kind === "ok", JSON.stringify(w));
-      assertEquals(w.value.path.startsWith(join(root, ".ergonex", "evidence")), true);
+      assertEquals(w.value.path.startsWith(join(fakePlaces(parent).state, "evidence")), true);
       assert(/\d{8}T\d{6}(?:\.\d{3})?Z-[0-9a-f]{32}\.otlp\.json$/.test(w.value.path), w.value.path);
       assert(!w.value.text.includes(token), "the record holds the token");
       assert(!w.value.text.includes("/secret/place"), "the record holds an option's value");
@@ -601,7 +617,7 @@ proves(
       assert(w2.kind === "ok");
       assert(w2.value.path !== w.value.path);
       assertEquals(await readTextFile(w.value.path), w.value.text);
-      assertEquals((await walkFiles(join(root, ".ergonex", "evidence"))).length, 2);
+      assertEquals((await walkFiles(join(fakePlaces(parent).state, "evidence"))).length, 2);
       assertEquals(isoOf(end), "2027-01-15T08:00:00.000Z");
     } finally {
       await server.shutdown();
@@ -616,6 +632,7 @@ proves(["0002-workspace-model FR-041"], "a check that did not run is recorded as
     const root = join(parent, "ws");
     const r = await setup(NONE, {
       root,
+      places: fakePlaces(parent),
       os: OS,
       arch: ARCH,
       today: TODAY,
@@ -628,7 +645,7 @@ proves(["0002-workspace-model FR-041"], "a check that did not run is recorded as
     });
     assert(r.kind === "ok");
     const end = 1_800_000_000_000_000_000n;
-    const w = await writeRunEvidence({ home: parent, start: end, end, env: {} }, r.value.facts);
+    const w = await writeRunEvidence({ home: parent, places: fakePlaces(parent), start: end, end, env: {} }, r.value.facts);
     assert(w.kind === "ok", JSON.stringify(w));
     const q = readQuality(JSON.parse(w.value.text));
     assert(q.kind === "ok");

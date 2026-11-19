@@ -10,9 +10,10 @@
  *
  * @module
  */
+import type { Places } from "../../places.ts";
 import { ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
 import { listDirs } from "../../platform/r-fs.ts";
-import { join } from "../../platform/r-path.ts";
+
 import { type Finding, exitStatusOf, firstSeenOf } from "../../findings.ts";
 import { type ToolsArgs, type UsageError } from "../args.ts";
 import { type Tool, type ToolArch, type ToolCatalog, type ToolOs, artifactFor, toolNamed } from "../catalog.ts";
@@ -23,7 +24,8 @@ import { installedTools, verifyTool } from "./install.ts";
 
 /** What `ergonex tools` needs from the host. */
 export type ToolsDeps = {
-  readonly home: string;
+  /** Where the tools are installed (0031-install-locations). */
+  readonly places: Places;
   readonly catalog: ToolCatalog;
   readonly os: ToolOs;
   readonly arch: ToolArch;
@@ -77,7 +79,7 @@ async function rowOf(deps: ToolsDeps, tool: Tool): Promise<{ readonly row: ToolR
       findings: [],
     };
   }
-  const v = await verifyTool(deps.home, tool, deps.os, deps.arch);
+  const v = await verifyTool(deps.places, tool, deps.os, deps.arch);
   if (v.kind === "err")
     return {
       row: {
@@ -118,7 +120,7 @@ async function rowOf(deps: ToolsDeps, tool: Tool): Promise<{ readonly row: ToolR
 
 /** The folders of the tools directory that the catalog does not list (a tool put there by hand). */
 async function strangers(deps: ToolsDeps): Promise<readonly string[]> {
-  const names = await listDirs(join(deps.home, ".ergonex", "tools"));
+  const names = await listDirs(deps.places.tools);
   return names.filter((n) => toolNamed(deps.catalog, n) === undefined);
 }
 
@@ -150,7 +152,7 @@ export async function tools(args: ToolsArgs, deps: ToolsDeps): Promise<Result<To
 
   let document: Readonly<Record<string, unknown>> | undefined;
   if (args.command === "export") {
-    const installed: readonly InstalledTool[] = await installedTools(deps.home);
+    const installed: readonly InstalledTool[] = await installedTools(deps.places);
     document = await exportDocument(args.format, deps.catalog, installed, deps.at, deps.workspace);
   }
   const exit = args.command === "export" ? "Ok" : exitStatusOf(findings);

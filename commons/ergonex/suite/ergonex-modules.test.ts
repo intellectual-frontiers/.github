@@ -210,6 +210,7 @@ const BASE: BaseContext = {
   cwd: "/",
   today: "2026-11-17",
   platform: { os: "linux", arch: "x86_64", windows: false },
+  places: undefined,
   builtins: [],
   interact: { terminal: false, ask: () => Promise.resolve(undefined) },
   homeFor: (o) => o ?? "/home",

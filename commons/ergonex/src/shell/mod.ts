@@ -17,5 +17,4 @@ export {
   SHELLS,
   snippetFor,
   type SnippetFacts,
-  TOOLS_BIN,
 } from "./snippet.ts";

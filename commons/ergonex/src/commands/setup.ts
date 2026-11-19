@@ -64,6 +64,8 @@ const setupCommand = defineCommand({
         kind: "environment",
         message: "no root can be found: set ERGONEX_HOME, or HOME (USERPROFILE on Windows), or give --home",
       });
+    const places = ctx.places;
+    if (places === undefined) return loadFailureOutcome({ kind: "no-places" }, ctx);
     const target = hostTarget(ctx.platform);
     if (target === undefined)
       return err({
@@ -87,6 +89,7 @@ const setupCommand = defineCommand({
     const globalGit = ctx.env["GIT_CONFIG_GLOBAL"] ?? (ctx.env["HOME"] === undefined ? undefined : join(ctx.env["HOME"], ".gitconfig"));
     const deps: SetupDeps = {
       root: home,
+      places,
       os: target.os,
       arch: target.arch,
       today: ctx.today,

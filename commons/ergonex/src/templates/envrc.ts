@@ -16,7 +16,7 @@ export const envrcTemplate: Template = {
     if (!data.direnv) return ok([]);
     const file = generated(
       ".envrc.auto",
-      { format: "envrc", text: "PATH_add .ergonex/tools/bin" },
+      { format: "envrc", text: 'PATH_add "$HOME/.local/bin"' },
       { generator: "ergonex templates/envrc" },
     );
     return file.kind === "err" ? err([file.error]) : ok([file.value]);

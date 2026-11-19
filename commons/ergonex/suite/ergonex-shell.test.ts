@@ -28,14 +28,13 @@ const skipBash =
 
 proves(
   ["0003-host FR-018"],
-  "each snippet exports the root where it is not set, adds the tools folder to the PATH, completes ergonex and defines wcd, and nothing else",
+  "each snippet exports the root where it is not set, adds ~/.local/bin (the shims of the tools) to the PATH, completes ergonex and defines wcd, and nothing else",
   () => {
     for (const shell of SHELLS) {
       const text = snippetFor(shell, facts);
       assert(text.endsWith("\n") && !text.endsWith("\n\n"), shell);
       assertStringIncludes(text, "ERGONEX_HOME");
-      assertStringIncludes(text, ".ergonex");
-      assertStringIncludes(text, "tools");
+      assertStringIncludes(text, ".local");
       assertStringIncludes(text, "wcd");
       assertStringIncludes(
         text,
@@ -112,14 +111,13 @@ proves(
 
 proves(
   ["0003-host FR-018", "0003-host FR-017"],
-  "sourced by a real bash, the snippet sets the root once, puts the tools folder on the PATH once, and wcd changes to a repository by its name and says when it cannot",
+  "sourced by a real bash, the snippet sets the root once, puts ~/.local/bin, where the shims of the tools are, on the PATH once, and wcd changes to a repository by its name and says when it cannot",
   async () => {
     await withTempDir(async (dir) => {
       const home = join(dir, "work space");
       for (const repo of ["github.com/acme/app", "github.com/acme/lib", "gitlab.com/g/s/lib", ".worktrees/github.com/acme/app/b"]) {
         await mkdir(join(home, repo, ".git"), { recursive: true });
       }
-      await mkdir(join(home, ".ergonex", "tools", "bin"), { recursive: true });
       const snippet = join(dir, "snippet.sh");
       await writeTextFile(
         snippet,
@@ -139,8 +137,8 @@ proves(
       const entries = path.stdout
         .trim()
         .split(":")
-        .filter((e) => e === join(home, ".ergonex/tools/bin"));
-      assertEquals(entries.length, 1, "the tools folder is on the PATH more than once after two sources");
+        .filter((e) => e === join(dir, ".local/bin"));
+      assertEquals(entries.length, 1, "~/.local/bin (the shims of the tools) is on the PATH more than once after two sources");
       assertEquals((await go('echo "$ERGONEX_HOME"')).stdout.trim(), home);
       // where it is set, it is kept
       const kept = await run([bash, "-c", script('echo "$ERGONEX_HOME"', true)], {

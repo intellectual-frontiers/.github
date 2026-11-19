@@ -33,7 +33,7 @@ export function agentsText(data: TemplateData): string {
     "",
     "- The root is `$ERGONEX_HOME` (the folder this file is in). A repository is at `<host>/<path>/<repo>` below it and mirrors its remote.",
     "- A worktree is at `.worktrees/<host>/<path>/<repo>/<branch>`. Make one only where another person or agent, or uncommitted work, is on the repository; otherwise work in the repository's own checkout.",
-    "- The workspace's own area is `.ergonex/`: the manifest `workspace.ts` (the source of everything generated), the state record, the evidence of every run, the hooks and the pinned tools.",
+    "- The workspace's own folder is `.ergonex/`: the manifest `workspace.ts` (the source of everything generated), the generated Git configuration, the hooks and the lists of tools and modules. What ergonex remembers (the state record, the evidence of every run) is in its state folder, and the tools it installs are in its data folder (`ergonex paths` says where).",
     "- A file whose name carries `.auto.` is generated. Do not edit it: change `workspace.ts` and run `ergonex render`.",
     "",
     "## The repositories",
@@ -62,7 +62,7 @@ export function agentsText(data: TemplateData): string {
     "- `ergonex worktree create|list|prune`: worktrees, named for their issue.",
     "- `ergonex list`, `ergonex help`: the modules.",
     "",
-    "Every run writes one evidence record under `.ergonex/evidence/`; none holds a credential.",
+    "Every run writes one evidence record into ergonex's state folder (`ergonex paths` says where); none holds a credential.",
   ].join("\n");
 }
 

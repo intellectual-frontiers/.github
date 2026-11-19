@@ -69,7 +69,7 @@ async function withTool(
   return {
     requests: server.requests,
     stop: () => server.server.shutdown(),
-    dir: join(w.home, ".ergonex", "tools", "hello-tool", "1.0.0"),
+    dir: join(w.tools, "hello-tool", "1.0.0"),
   };
 }
 
@@ -108,7 +108,7 @@ proves(
         assertEquals(both.code, 2);
         assertEquals(tool.requests, []);
         // the first of the two files of this run's evidence is the dry run's: not_run for the apply
-        assertEquals(evidenceFiles(w.home).filter((f) => f.includes("otlp")).length >= 3, true);
+        assertEquals(evidenceFiles(w.state).filter((f) => f.includes("otlp")).length >= 3, true);
 
         const applied = await on(w, "setup", "--apply");
         assertEquals(applied.code, 0, applied.stderr + applied.stdout);
@@ -126,7 +126,7 @@ proves(
         assertStringIncludes(spdx.stdout, "hello-tool");
         assertEquals(JSON.parse((await on(w, "tools", "export", "oscal")).stdout) !== null, true);
         // what setup and tools did is in their own records, which name no credential
-        const records = await Promise.all(evidenceFiles(w.home).map((f) => readTextFile(f)));
+        const records = await Promise.all(evidenceFiles(w.state).map((f) => readTextFile(f)));
         assert(records.some((t) => t.includes("ergonex/run: ergonex setup --apply")));
         assert(records.some((t) => t.includes("ergonex/run: ergonex tools")));
         assert(records.some((t) => t.includes("ergonex/tool: hello-tool 1.0.0")));
@@ -158,7 +158,7 @@ proves(
         assertEquals(r.code, 1, r.stdout + r.stderr);
         assertStringIncludes(r.stdout, "failed");
         assert(!existsSync(tool.dir), "a wrong hash wrote something");
-        assert(!existsSync(join(w.home, ".ergonex", "tools")) || readDirSync(join(w.home, ".ergonex", "tools")).length === 0);
+        assert(!existsSync(w.tools) || readDirSync(w.tools).length === 0);
         assertStringIncludes(r.stdout, "verify git");
         assertStringIncludes(r.stdout, "never installed");
         assertEquals((await on(w, "tools", "export", "cyclonedx")).code, 0);
@@ -215,7 +215,7 @@ proves(
     await withWorld(async (w) => {
       await w.ergonex("init");
       await w.manifest(ONE_REPOSITORY);
-      const held = await acquireLock(join(w.home, ".ergonex", "ergonex.lock"), {
+      const held = await acquireLock(join(w.state, "ergonex.lock"), {
         wait: false,
         command: "the first run",
       });
@@ -254,7 +254,7 @@ proves(
       assertStringIncludes(found.stdout, "error");
       assertStringIncludes(found.stdout, ".git/config");
       assert(!found.stdout.includes(token) && !found.stderr.includes(token), "doctor printed the token");
-      for (const f of evidenceFiles(w.home)) assert(!(await readTextFile(f)).includes(token), "a record holds the token");
+      for (const f of evidenceFiles(w.state)) assert(!(await readTextFile(f)).includes(token), "a record holds the token");
       const sarif = JSON.parse((await w.ergonex("doctor", "--sarif")).stdout) as {
         runs: { results: { ruleId: string; level: string }[] }[];
       };
@@ -324,7 +324,7 @@ proves(
           ...LOOPBACK,
           PATH: path,
         });
-      const record = join(w.home, ".ergonex", "state.auto.json");
+      const record = join(w.state, "state.auto.json");
       const seenOf = async (): Promise<string | undefined> =>
         (
           JSON.parse(await readTextFile(record)) as {
@@ -363,7 +363,7 @@ proves(
         await tool.stop();
       }
       // a tool put in the tools folder by hand is told by ergonex tools, with its day kept in the same record
-      await mkdir(join(w.home, ".ergonex", "tools", "stranger"), {
+      await mkdir(join(w.tools, "stranger"), {
         recursive: true,
       });
       const t = await on(w, "tools");

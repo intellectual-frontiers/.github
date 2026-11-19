@@ -12,6 +12,7 @@
  *
  * @module
  */
+import type { Places } from "../../places.ts";
 import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
 import {
   sha256File,
@@ -34,7 +35,6 @@ import {
   type InstallError,
   type InstallRecord,
   INSTALL_RECORD,
-  SHIM_DIR,
   installDrift,
   installRecordOf,
   pinProblem,
@@ -47,8 +47,8 @@ import type { InstalledTool } from "../inventory.ts";
 
 /** What an install needs from the host. */
 export type InstallDeps = {
-  /** The workspace's root: the tools are below `<home>/.ergonex/tools/`. */
-  readonly home: string;
+  /** Where the tools are installed and their shims are put (0031-install-locations): `<data>/tools/` and the shim folder. */
+  readonly places: Places;
   readonly transport: Transport;
   readonly os: ToolOs;
   readonly arch: ToolArch;
@@ -70,14 +70,14 @@ export type Installed = {
   readonly already: boolean;
 };
 
-/** The folder of a tool below the home, as an absolute path. */
-export function toolDir(home: string, tool: Pick<Tool, "name" | "version">): string {
-  return join(home, ...installDirOf(tool).split("/"));
+/** The folder of a tool below the tools folder, as an absolute path. */
+export function toolDir(places: Places, tool: Pick<Tool, "name" | "version">): string {
+  return join(places.tools, ...installDirOf(tool).split("/"));
 }
 
-/** The folder of the shims below the home. */
-export function shimDir(home: string): string {
-  return join(home, ...SHIM_DIR.split("/"));
+/** The folder of the shims: `~/.local/bin` on Linux and macOS, the tools folder's `bin` on Windows. */
+export function shimDir(places: Places): string {
+  return places.shims;
 }
 
 /** The SHA-256 of every file under a folder, by its path inside it, the install record left out. */
@@ -88,7 +88,7 @@ async function hashes(dir: string): Promise<Record<string, string>> {
 }
 
 async function writeShims(deps: InstallDeps, tool: Tool, exe: string): Promise<Result<readonly string[], InstallError>> {
-  const dir = shimDir(deps.home);
+  const dir = shimDir(deps.places);
   const written: string[] = [];
   for (const command of tool.provides) {
     const shim = shimOf(deps.os, command, exe);
@@ -123,10 +123,10 @@ export async function installTool(deps: InstallDeps, tool: Tool): Promise<Result
     });
   const problem = pinProblem(tool, artifact, deps.loopbackHttp === true);
   if (problem !== undefined) return err({ kind: "unpinned", tool: tool.name, reason: problem });
-  const dir = toolDir(deps.home, tool);
+  const dir = toolDir(deps.places, tool);
   const exe = join(dir, ...artifact.bin.split("/"));
 
-  const before = await verifyTool(deps.home, tool, deps.os, deps.arch);
+  const before = await verifyTool(deps.places, tool, deps.os, deps.arch);
   if (before.kind === "ok" && before.value.length === 0) {
     const shims = await writeShims(deps, tool, exe);
     return shims.kind === "err"
@@ -216,8 +216,8 @@ export async function installTool(deps: InstallDeps, tool: Tool): Promise<Result
 export type Verified = Result<readonly InstallDrift[], "not-installed" | "no-record">;
 
 /** Reads an installed tool back: the SHA-256 of each of its files against its install record, and the record against the catalog's pin for this system. */
-export async function verifyTool(home: string, tool: Tool, os: ToolOs, arch: ToolArch): Promise<Verified> {
-  const dir = toolDir(home, tool);
+export async function verifyTool(places: Places, tool: Tool, os: ToolOs, arch: ToolArch): Promise<Verified> {
+  const dir = toolDir(places, tool);
   if (!(await exists(dir))) return err("not-installed");
   const text = await readTextOr(join(dir, INSTALL_RECORD));
   if (text === undefined) return err("no-record");
@@ -234,9 +234,9 @@ export async function installRecordOfDir(dir: string): Promise<InstallRecord | u
   return r.kind === "ok" ? r.value : undefined;
 }
 
-/** Every tool installed below the home, by its install record (a folder with none is not listed). */
-export async function installedTools(home: string): Promise<readonly InstalledTool[]> {
-  const root = join(home, ".ergonex", "tools");
+/** Every tool installed below the tools folder, by its install record (a folder with none is not listed). */
+export async function installedTools(places: Places): Promise<readonly InstalledTool[]> {
+  const root = places.tools;
   const out: InstalledTool[] = [];
   for (const name of await listDirs(root)) {
     for (const version of await listDirs(join(root, name))) {

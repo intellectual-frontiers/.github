@@ -6,6 +6,7 @@
  *
  * @module
  */
+import { fakePlaces } from "./ergonex-fixtures.ts";
 import { readdirSync } from "node:fs";
 import { readFile, readTextFile, writeTextFile, exists, walkFiles, makeTempDir, mkdir, remove } from "../src/platform/r-fs.ts";
 import { liveTransport, recordedTransport } from "../src/platform/r-http-client.ts";
@@ -81,7 +82,7 @@ proves(
     assert(hello !== undefined);
     assertEquals(artifactFor(hello, "linux", "x64")?.kind, "tar.gz");
     assertEquals(artifactFor(hello, "linux", "arm64"), undefined);
-    assertEquals(installDirOf(hello), ".ergonex/tools/hello/1.2.3");
+    assertEquals(installDirOf(hello), "hello/1.2.3");
   },
 );
 
@@ -217,7 +218,7 @@ const SERVED_PATH = "/releases/hello-1.0.0.tar.gz";
 
 proves(
   ["0002-workspace-model FR-039", "0001-ergonex FR-018"],
-  "a pinned artifact is fetched, its hash checked and the tool installed under .ergonex/tools/<name>/<version>/ with a shim and an install record",
+  "a pinned artifact is fetched, its hash checked and the tool installed under the tools folder of ergonex's data, <name>/<version>/, with a shim and an install record",
   async () => {
     const home = await makeTempDir({ prefix: "ergonex-tools-" });
     const art = tarball("hello", "1.0.0");
@@ -226,7 +227,7 @@ proves(
       const tool = await pinned("hello", "1.0.0", art, `${base}${SERVED_PATH}`, OS, ARCH);
       const r = await installTool(
         {
-          home,
+          places: fakePlaces(home),
           transport: liveTransport(),
           os: OS,
           arch: ARCH,
@@ -236,8 +237,8 @@ proves(
       );
       assert(r.kind === "ok", r.kind === "err" ? describeInstallError(r.error) : "");
       assertEquals(requests, [`GET ${SERVED_PATH}`]);
-      const dir = toolDir(home, tool);
-      assertEquals(dir, join(home, ".ergonex", "tools", "hello", "1.0.0"));
+      const dir = toolDir(fakePlaces(home), tool);
+      assertEquals(dir, join(fakePlaces(home).tools, "hello", "1.0.0"));
       assertEquals(await readTextFile(join(dir, "hello-1.0.0", "bin", "hello")), "#!/bin/sh\necho hello\n");
       assertEquals(await readTextFile(join(dir, "hello-1.0.0", "README")), "a tool\n");
       assert(await exists(join(dir, INSTALL_RECORD)));
@@ -247,7 +248,7 @@ proves(
       // a second install fetches nothing: the tool is whole
       const again = await installTool(
         {
-          home,
+          places: fakePlaces(home),
           transport: liveTransport(),
           os: OS,
           arch: ARCH,
@@ -257,12 +258,12 @@ proves(
       );
       assert(again.kind === "ok" && again.value.already);
       assertEquals(requests.length, 1);
-      assertEquals(await verifyTool(home, tool, OS, ARCH), {
+      assertEquals(await verifyTool(fakePlaces(home), tool, OS, ARCH), {
         kind: "ok",
         value: [],
       });
       assertEquals(
-        (await installedTools(home)).map((t) => [t.name, t.version]),
+        (await installedTools(fakePlaces(home))).map((t) => [t.name, t.version]),
         [["hello", "1.0.0"]],
       );
     } finally {
@@ -291,7 +292,7 @@ proves(
       for (const t of [zt, bt]) {
         const r = await installTool(
           {
-            home,
+            places: fakePlaces(home),
             transport: liveTransport(),
             os: OS,
             arch: ARCH,
@@ -302,7 +303,7 @@ proves(
         assert(r.kind === "ok", r.kind === "err" ? describeInstallError(r.error) : "");
         assert(await exists(r.value.exe), r.value.exe);
       }
-      assertEquals((await installedTools(home)).map((t) => t.name).sort(), ["barefile", "zed"]);
+      assertEquals((await installedTools(fakePlaces(home))).map((t) => t.name).sort(), ["barefile", "zed"]);
     } finally {
       await server.shutdown();
       await remove(home, { recursive: true });
@@ -321,7 +322,7 @@ proves(
       const wrong = await pinned("hello", "1.0.0", art, `${base}${SERVED_PATH}`, OS, ARCH, "0".repeat(64));
       const r = await installTool(
         {
-          home,
+          places: fakePlaces(home),
           transport: liveTransport(),
           os: OS,
           arch: ARCH,
@@ -336,7 +337,7 @@ proves(
       const right = await pinned("hello", "1.0.0", art, `${base}${SERVED_PATH}`, OS, ARCH);
       const ok = await installTool(
         {
-          home,
+          places: fakePlaces(home),
           transport: liveTransport(),
           os: OS,
           arch: ARCH,
@@ -392,16 +393,16 @@ proves(
           bytes: art.bytes,
         },
       ]);
-      const r = await installTool({ home, transport: recorded, os: OS, arch: ARCH }, tool);
+      const r = await installTool({ places: fakePlaces(home), transport: recorded, os: OS, arch: ARCH }, tool);
       assert(r.kind === "ok", r.kind === "err" ? describeInstallError(r.error) : "");
 
       const other = await makeTempDir({ prefix: "ergonex-tools-" });
       const gone = recordedTransport([{ method: "GET", url, status: 404, headers: {}, body: "no" }]);
-      const f = await installTool({ home: other, transport: gone, os: OS, arch: ARCH }, tool);
+      const f = await installTool({ places: fakePlaces(other), transport: gone, os: OS, arch: ARCH }, tool);
       assert(f.kind === "err" && f.error.kind === "fetch" && f.error.reason.includes("404"));
       const nosystem = await installTool(
         {
-          home: other,
+          places: fakePlaces(other),
           transport: gone,
           os: OS === "linux" ? "windows" : "linux",
           arch: ARCH,
@@ -412,7 +413,7 @@ proves(
       const a = tool.artifacts[0];
       assert(a !== undefined);
       const latest = await installTool(
-        { home: other, transport: gone, os: OS, arch: ARCH },
+        { places: fakePlaces(other), transport: gone, os: OS, arch: ARCH },
         {
           ...tool,
           artifacts: [{ ...a, url: "https://example.org/latest/hello.tgz" }],
@@ -420,7 +421,7 @@ proves(
       );
       assert(latest.kind === "err" && latest.error.kind === "unpinned", JSON.stringify(latest));
       const http = await installTool(
-        { home: other, transport: gone, os: OS, arch: ARCH },
+        { places: fakePlaces(other), transport: gone, os: OS, arch: ARCH },
         { ...tool, artifacts: [{ ...a, url: "http://example.org/hello.tgz" }] },
       );
       assert(http.kind === "err" && http.error.kind === "unpinned");
@@ -444,7 +445,7 @@ proves(
       const catalog = catalogOf(tool);
       const r = await installTool(
         {
-          home,
+          places: fakePlaces(home),
           transport: liveTransport(),
           os: OS,
           arch: ARCH,
@@ -454,7 +455,7 @@ proves(
       );
       assert(r.kind === "ok");
       const deps = {
-        home,
+        places: fakePlaces(home),
         catalog,
         os: OS,
         arch: ARCH,
@@ -505,12 +506,12 @@ proves(
     // in the real folder: a tool put there by hand is found, its first day taken from the state record and kept
     const home = await makeTempDir({ prefix: "ergonex-tools-" });
     try {
-      await mkdir(join(home, ".ergonex", "tools", "mystery", "1.0.0"), {
+      await mkdir(join(fakePlaces(home).tools, "mystery", "1.0.0"), {
         recursive: true,
       });
-      await writeTextFile(join(home, ".ergonex", "tools", "mystery", "1.0.0", "x"), "x");
+      await writeTextFile(join(fakePlaces(home).tools, "mystery", "1.0.0", "x"), "x");
       const base = {
-        home,
+        places: fakePlaces(home),
         catalog,
         os: OS,
         arch: ARCH,
@@ -621,7 +622,7 @@ proves(
       const r = await tools(
         { command: "list" },
         {
-          home,
+          places: fakePlaces(home),
           catalog: catalogOf(tool),
           os: OS,
           arch: ARCH,
@@ -675,7 +676,7 @@ proves(["0002-workspace-model FR-039"], "a real installed shim runs the real exe
     const tool = await pinned("hello", "1.0.0", art, `${base}${SERVED_PATH}`, OS, ARCH);
     const r = await installTool(
       {
-        home,
+        places: fakePlaces(home),
         transport: liveTransport(),
         os: OS,
         arch: ARCH,

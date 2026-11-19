@@ -17,6 +17,7 @@ import { existsSync, readDirSync, readTextFile, sha256File, statSync } from "../
 import { join, sep, toFileUrl } from "../platform/r-path.ts";
 import { run } from "../platform/r-proc.ts";
 import { desiredOf } from "../desired.ts";
+import { movedPath, type Places } from "../places.ts";
 import type { Finding } from "../findings.ts";
 import { decodeManifest, issueFinding, type Manifest } from "../manifest.ts";
 import { nativePath } from "../portable.ts";
@@ -30,11 +31,8 @@ import type { Context, Outcome } from "../modules/types.ts";
 import { direnvFound } from "./probe.ts";
 import { type ObserveError, observe } from "./observe.ts";
 
-/** The workspace's own area, below the root. */
-export const AREA = ".ergonex";
-
 /** Everything read of the workspace before anything is observed. */
-export type Loaded = {
+export type Loaded = Site & {
   /** The root, as the system writes it. */
   readonly home: string;
   readonly manifest: Manifest;
@@ -50,15 +48,24 @@ export type Loaded = {
 /** Why the workspace could not be loaded. */
 export type LoadFailure =
   | { readonly kind: "no-home" }
+  | { readonly kind: "no-places" }
   | { readonly kind: "no-root"; readonly home: string }
   | { readonly kind: "no-manifest"; readonly path: string }
   | { readonly kind: "manifest"; readonly findings: readonly Finding[] }
   | { readonly kind: "generate"; readonly errors: readonly GenerateError[] }
   | { readonly kind: "record"; readonly reason: string };
 
-/** The folder of a path of the workspace, as the system writes it. */
-export function native(home: string, path: string): string {
-  return nativePath(home, path as RepoPath, sep === "\\" ? "\\" : "/"); // a path of the workspace is made only of portable segments
+/** Where a run reads and writes: the root, which holds the repositories and the files that sit beside them, and the folders of Ergonex's own files (0031-install-locations). */
+export type Site = { readonly home: string; readonly places: Places };
+
+/** The workspace's own folder, below the root: the manifest and what is generated for tools to read. */
+export const AREA = ".ergonex";
+
+/** The folder of a path of the workspace, as the system writes it: what Ergonex remembers or installs is in the state or the data folder (0031-install-locations), any other path is below the root. */
+export function native(site: Site, path: string): string {
+  const moved = movedPath(site.places, path);
+  if (moved !== undefined) return moved;
+  return nativePath(site.home, path as RepoPath, sep === "\\" ? "\\" : "/"); // a path of the workspace is made only of portable segments
 }
 
 /**
@@ -137,7 +144,9 @@ export async function readManifest(home: string, today: string, loopbackHttp = f
 /** Reads the root: its manifest, the generated files and the state record. */
 export async function loadWorkspace(ctx: Context): Promise<Result<Loaded, LoadFailure>> {
   const home = ctx.home;
+  const places = ctx.places;
   if (home === undefined) return err({ kind: "no-home" });
+  if (places === undefined) return err({ kind: "no-places" });
   if (!existsSync(home)) return err({ kind: "no-root", home });
   const read = await readManifest(home, ctx.today, loopbackAllowed(ctx.env));
   if (read.kind === "err") return read;
@@ -151,7 +160,7 @@ export async function loadWorkspace(ctx: Context): Promise<Result<Loaded, LoadFa
   if (rendered.kind === "err") return err({ kind: "generate", errors: rendered.error });
   let record: StateRecord = EMPTY_RECORD;
   let recordSha: Sha256 | undefined;
-  const recordPath = native(home, STATE_RECORD_PATH);
+  const recordPath = native({ home, places }, STATE_RECORD_PATH);
   if (existsSync(recordPath)) {
     const text = await readTextFile(recordPath);
     const read = decodeStateRecord(text);
@@ -159,7 +168,15 @@ export async function loadWorkspace(ctx: Context): Promise<Result<Loaded, LoadFa
     record = read.value;
     recordSha = await sha256(text);
   }
-  return ok({ home, manifest, data, files: rendered.value, record, recordSha });
+  return ok({
+    home,
+    places,
+    manifest,
+    data,
+    files: rendered.value,
+    record,
+    recordSha,
+  });
 }
 
 /** What a failure to load is as the outcome of a command: a host that cannot do it (3), or findings that stop the run (1). */
@@ -169,6 +186,12 @@ export function loadFailureOutcome(f: LoadFailure, ctx: Context): Outcome {
       return err({
         kind: "environment",
         message: "no root can be found: set ERGONEX_HOME, or HOME (USERPROFILE on Windows), or give --home",
+      });
+    case "no-places":
+      return err({
+        kind: "environment",
+        message:
+          "no folder can be found to keep what ergonex remembers and installs: set HOME (USERPROFILE on Windows), or XDG_DATA_HOME and XDG_STATE_HOME",
       });
     case "no-root":
       return err({
@@ -264,7 +287,7 @@ export async function situate(
   });
   const repos: Record<string, ObservedRepo> = {};
   for (const r of desired.repos) {
-    const folder = native(loaded.home, r.path);
+    const folder = native(loaded, r.path);
     const state = await observe(folder, r.ref, { fetch: options.fetch });
     if (state.kind === "err") return state;
     const present = state.value.kind !== "Missing" && state.value.kind !== "NotARepo" && state.value.kind !== "WrongRemote";
@@ -276,13 +299,13 @@ export async function situate(
   }
   const worktrees: Record<string, RepoState> = {};
   for (const w of desired.worktrees) {
-    const folder = native(loaded.home, w.path);
+    const folder = native(loaded, w.path);
     worktrees[w.path] = existsSync(folder) && readDirSync(folder).length > 0 ? { kind: "Clean" } : { kind: "Missing" };
   }
   const files: Record<string, ObservedFile> = {};
   const paths = new Set([...desired.files.map((f) => f.path as string), ...Object.keys(loaded.record.files)]);
   for (const p of paths) {
-    const disk = native(loaded.home, p);
+    const disk = native(loaded, p);
     files[p] = {
       onDisk: existsSync(disk) ? await sha256File(disk) : undefined,
       recorded: loaded.record.files[p]?.sha256,

@@ -332,12 +332,12 @@ proves(
       const on = (...words: string[]) => w.ergonexOn(execPath(), Ergonex, words, env);
       assertEquals((await on("init")).code, 0);
       await w.manifest(ONE_REPOSITORY);
-      const before = evidenceFiles(w.home).length;
+      const before = evidenceFiles(w.state).length;
       assertEquals((await on("plan")).code, 0);
       assertEquals((await on("plan", "--nope")).code, 2);
       assertEquals((await on("list")).code, 0);
       assertEquals((await on("verify")).code, 1);
-      const files = evidenceFiles(w.home);
+      const files = evidenceFiles(w.state);
       assertEquals(files.length, before + 4, "a run did not write exactly one record");
       const names = new Set(files);
       assertEquals(names.size, files.length, "a record was overwritten or named twice");
@@ -365,7 +365,7 @@ proves(
         policy: { regulatedDomain: ["FDA"] },
       });
       await on("status");
-      const last = await readTextFile(evidenceFiles(w.home).at(-1) ?? "");
+      const last = await readTextFile(evidenceFiles(w.state).at(-1) ?? "");
       assertStringIncludes(last, "ergonex.tool.git.version");
       assertStringIncludes(last, "ergonex.regulated");
     });
@@ -380,7 +380,7 @@ proves(
     await withWorld(async (w) => {
       await w.ergonex("init");
       const digest = await w.userDigest();
-      const evidence = evidenceFiles(w.home).length;
+      const evidence = evidenceFiles(w.state).length;
       const files = readDirSync(w.home)
         .map((e) => e.name)
         .sort();
@@ -398,7 +398,7 @@ proves(
           .sort(),
         files,
       );
-      assertEquals(evidenceFiles(w.home).length, evidence, "printing a snippet wrote an evidence record");
+      assertEquals(evidenceFiles(w.state).length, evidence, "printing a snippet wrote an evidence record");
       const bad = await w.ergonex("shell", "tcsh");
       assertEquals(bad.code, 2);
       assertStringIncludes(bad.stderr, "bash, zsh, fish, pwsh, nu");
