@@ -22,7 +22,7 @@
 - **FR-007**: This repository MUST know each library by its manifest (FR-012) as exactly one requirement of this specification, in the section "The libraries", named by the library's folder, whose enforcement is the library's own `verify` (a `check` row that runs `cd commons/<name> && bun run verify`); no requirement of a library MUST be a requirement of this repository (amended 2026-11-18: the requirement is made from the manifest, FR-011, and no longer written by hand).
 - **FR-008**: A test of this repository MUST find every folder `commons/*` that has a manifest or a spec kit and fail where a spec kit has no manifest, where the section "The libraries" or its rows are not what the manifests make (FR-011), where a manifest and its folder disagree (FR-013), where a library lacks a part FR-001 names, where its `verify` lacks a part FR-005 names, where a file of the library imports by a relative path outside its folder (FR-004), or where the specification checker finds anything in its spec kit (amended 2026-11-18).
 - **FR-009**: The documentation of commons (`commons/docs.config.ts`) MUST name each library's spec kit among its spec kits, so that the specifications of a library are published with those of commons and none is published twice.
-- **FR-010**: Each library MUST have a workflow (`.github/workflows/<name>.yml`) that runs its `verify` on every push and pull request that changes its folder or what it imports, on the runtimes 0005-typescript-runtime names.
+- **FR-010**: Each library MUST have a workflow (`.github/workflows/<name>.auto.yml`, made from its manifest (0030-generated-workflows FR-006)) that runs its `verify` on every push and pull request that changes its folder or what it imports, on the runtimes 0005-typescript-runtime names.
 
 ## The manifest
 
@@ -38,6 +38,13 @@
 - **FR-017**: A manifest MUST declare where its library is published in `distribution`, a list of registries from `github` and `npm`, each once, which is `["github"]` where the manifest declares none, and the section "The libraries" MUST name the registries in each requirement.
 - **FR-018**: A manifest and this specification MUST name a registry by its kind alone (`github`, `npm`) and MUST NOT name the host of a private registry, a token or a credential; the configuration a consumer needs to install from a registry belongs in the consumer's own repository.
 
+## What a change affects
+
+- **FR-019**: A library's dependencies on other folders of commons MUST be read from its `package.json`, a dependency whose version is a `link:`, `file:` or `workspace:` path, and MUST NOT be written a second time in its manifest.
+- **FR-020**: The inputs of a library, the files its checks read, MUST be its folder, `commons/tools/**`, `.github/actions/**`, its own workflow, the entries of each dependency that its sources import (the file that the dependency's `exports` gives each import) and the paths to other folders that its scripts run, and every file that those files import by a relative path, followed file by file; an import that the dependency's `exports` does not give MUST take the whole dependency.
+- **FR-021**: `commons/ts/mizan/affected.ts` MUST print, for the files changed (`--base REF` from Git, from the merge base with the head, or `--files`), the libraries they affect as `{"include":[{"name","folder","verify"}]}` in the order of the folders' names, where a library is affected if a changed file is among its inputs or a library it depends on is affected, and MUST print every library with `--all` and where Git cannot say what changed.
+- **FR-022**: The paths that a library's generated workflow runs on MUST be its inputs as folders (0030-generated-workflows FR-006), so that what a workflow's filter admits and what the planner affects are the same.
+
 ## The libraries
 
 The requirements below are generated (FR-011); change a manifest and run `bun commons/ts/mizan/libraries.ts`, never this section.
@@ -45,6 +52,7 @@ The requirements below are generated (FR-011); change a manifest and run `bun co
 <!-- libraries:begin -->
 
 - **FR-101**: `commons/data` MUST be a library at conformance level L1 (`mz:Core`): the package `@intellectual-frontiers/data` at version `0.0.0`, its spec kit at `commons/data/spec-kit`, exporting `./engine`, `./governance`, `./sql/logical`, `./sql/physical`, `./models/arca`, `./issues`, `./models/arca-tenancy`, `./models/identity`, `./models/identity-access`, `./models/identity-abac`, `./models/identity-rebac`, `./models/identity-pki`, `./models/identity-machine`, `./models/identity-device`, `./models/identity-delegation`, `./models/identity-agent`, `./models/issues`, `./sql/dialects/postgres`, `./sql/dialects/sqlite`, `./sql/dialects/duckdb`, `./sql/lifecycle`, `./sql/extensions/documentation`, `./sql/extensions/views`, `./sql/extensions/access`, `./sql/extensions/routines`, `./sql/extensions/partitions`, `./sql/extensions/generators`, `./sql/extensions/idempotency`, `./sql/extensions/protected-access`, `./sql/extensions/safety`, `./sql/extensions/plan-report`, `./sql/extensions/rewrite`, `./sql/extensions/history`, `./sql/extensions/convergence`, `./sql/extensions/rollout`, `./sql/extensions/integrations`, `./sql/extensions/transforms`, `./sql/extensions/queries`, `./sql/extensions/target`, `./sql/extensions/kinds`, `./sql/extensions/osquery-atc`, `./sql/extensions/operations`, `./sql/extensions/invariants`, `./sql/extensions/issues`, `./sql/presets` and `./sql/cli`, published to the GitHub package registry, proved by `cd commons/data && bun run verify`. A governance layer, a logical schema and a physical schema, and the extensions to each, produce SQL for PostgreSQL, SQLite and DuckDB; its own specifications say what it does.
+- **FR-102**: `commons/ergonex` MUST be a library at conformance level L1 (`mz:Core`): the package `@intellectual-frontiers/ergonex` at version `0.2.0`, its spec kit at `commons/ergonex/spec-kit`, exporting `.`, published to the GitHub package registry and npm, proved by `cd commons/ergonex && bun run verify`. The workspaces management of Intellectual Frontiers: one command, `ergonex`, that sets up and operates a team's repositories, tools and shell on Windows, macOS and Linux, with its own specifications.
 
 <!-- libraries:end -->
 
@@ -55,6 +63,9 @@ The requirements below are generated (FR-011); change a manifest and run `bun co
 3. **Given** a library with a spec kit and no `library.ts`, **When** the test of this repository runs, **Then** it fails and names the folder, per FR-008 and FR-012.
 4. **Given** a manifest that declares L0 and no spec kit, **When** it is read, **Then** it is accepted and no `verify` of the Mizan check is asked of it, per FR-012 and FR-013.
 5. **Given** a manifest whose `distribution` is `["npm"]`, **When** it is read, **Then** it is refused and the field is named, and a manifest of `["github", "npm"]` is accepted and its requirement says it is published to the GitHub package registry and npm, per FR-015 to FR-017.
+6. **Given** a library that imports one file of the kernel, which imports another, **When** the other file changes, **Then** the library is affected, and when a file of the runtime that it does not import changes, it is not, per FR-020 and FR-021.
+7. **Given** a library whose package depends on another library by path, **When** the other library is affected, **Then** it is too, per FR-019 and FR-021.
+8. **Given** a library's inputs, **When** its workflow is generated, **Then** the workflow runs on those folders, per FR-022.
 
 ## Out of scope
 
@@ -79,6 +90,13 @@ The requirements below are generated (FR-011); change a manifest and run `bun co
 - A library whose `verify` leaves out the specification checker: found, per FR-005.
 - A library whose `verify` does not run `tools/check.ts`: found, per FR-006.
 - A manifest whose `distribution` leaves out `github`, lists a registry twice, is empty or names a registry that is neither `github` nor `npm`: refused with the field named, per FR-015 to FR-017.
+- A dependency by a registry version (`^1.0.0`) or outside commons: not a dependency on a folder of commons, per FR-019.
+- An import of a dependency that its `exports` does not give: the whole dependency is an input, per FR-020.
+- A script that runs `bun ../ts/mizan/check.ts`: that file and what it imports are inputs, per FR-020.
+- A change to `.github/actions/**` or `commons/tools/**`: every library is affected, per FR-021.
+- A change to a file that no library reads: no library is affected and the matrix is empty, per FR-021.
+- A library whose dependency library is affected by a change: affected too, per FR-021.
+- A base that Git does not know: every library is affected, and the reason is said, per FR-021.
 - A library folder with no workflow: found, per FR-010.
 - A library's spec kit that the documentation does not name: published without it, found, per FR-009.
 

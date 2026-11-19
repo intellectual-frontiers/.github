@@ -9,7 +9,7 @@ import { assert, assertStringIncludes, proves } from "../../ts/runtime/test.ts";
 import { ROOT } from "./helpers.ts";
 
 proves(["0011-documentation FR-020"], "docs.yml tests and checks on pull requests and pushes, and publishes from main with GitHub's Pages actions", async () => {
-  const yml = await fs.readTextFile(path.join(ROOT, ".github/workflows/docs.yml"));
+  const yml = await fs.readTextFile(path.join(ROOT, ".github/workflows/docs.auto.yml"));
   for (const needed of ["pull_request:", "push:", "bun run verify", "actions/upload-pages-artifact@", "actions/deploy-pages@", "pages: write", "id-token: write", "github.ref == 'refs/heads/main'", "bun main.ts build --out"]) {
     assertStringIncludes(yml, needed);
   }
@@ -17,7 +17,7 @@ proves(["0011-documentation FR-020"], "docs.yml tests and checks on pull request
 });
 
 proves(["0011-documentation FR-022"], "ifc-typescript.yml's git-dependency job runs both smoke tests from git+file: on three systems, and nothing releases", async () => {
-  const yml = await fs.readTextFile(path.join(ROOT, ".github/workflows/ifc-typescript.yml"));
+  const yml = await fs.readTextFile(path.join(ROOT, ".github/workflows/ifc-typescript.auto.yml"));
   const job = yml.slice(yml.indexOf("\n  git-dependency:"));
   assert(job.length > 0 && yml.includes("\n  git-dependency:"), "ifc-typescript.yml has the job git-dependency");
   for (const needed of [
