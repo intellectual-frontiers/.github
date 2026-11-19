@@ -1,6 +1,6 @@
 {
   "name": "@intellectual-frontiers/arcactl",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "arcactl: check, set up and maintain the arca data models in PostgreSQL, from a terminal or a pipeline.",
   "license": "MIT",
   "type": "module",

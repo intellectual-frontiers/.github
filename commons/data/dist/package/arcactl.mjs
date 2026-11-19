@@ -4505,7 +4505,7 @@ __export(exports_codes2, {
 });
 
 // sql/cli/main.ts
-import { existsSync } from "node:fs";
+import { existsSync as existsSync7 } from "node:fs";
 import { resolve as resolve2 } from "node:path";
 
 // sql/cli/config.ts
@@ -7501,7 +7501,54 @@ init_mod();
 
 // sql/cli/workstation.ts
 init_mod();
+import { posix, win32 } from "node:path";
 var shells = ["bash", "zsh", "fish", "pwsh", "nu", "sh"];
+var set = (v) => v === undefined || v === "" ? undefined : v;
+function pathsOf(host) {
+  const e = host.env;
+  const win = host.platform === "win32";
+  const p = win ? win32 : posix;
+  const home = win ? set(e["USERPROFILE"]) ?? (set(e["HOMEDRIVE"]) !== undefined && set(e["HOMEPATH"]) !== undefined ? `${e["HOMEDRIVE"]}${e["HOMEPATH"]}` : undefined) : set(e["HOME"]);
+  if (home === undefined)
+    return err(win ? "the home directory is not known: USERPROFILE is not set" : "the home directory is not known: HOME is not set");
+  const appdata = set(e["APPDATA"]) ?? p.join(home, "AppData", "Roaming");
+  const local = set(e["LOCALAPPDATA"]) ?? p.join(home, "AppData", "Local");
+  const xdgConfig = set(e["XDG_CONFIG_HOME"]) ?? p.join(home, ".config");
+  const config = win ? p.join(appdata, "arcactl") : p.join(xdgConfig, "arcactl");
+  const cache = win ? p.join(local, "arcactl", "cache") : p.join(set(e["XDG_CACHE_HOME"]) ?? p.join(home, ".cache"), "arcactl");
+  const state = win ? p.join(local, "arcactl", "state") : p.join(set(e["XDG_STATE_HOME"]) ?? p.join(home, ".local", "state"), "arcactl");
+  const pgdir = p.join(appdata, "postgresql");
+  const profiles = {
+    bash: host.platform === "darwin" ? { files: [p.join(home, ".bash_profile"), p.join(home, ".bashrc")], policy: "first-existing" } : { files: [p.join(home, ".bashrc")], policy: "all" },
+    zsh: { files: [p.join(set(e["ZDOTDIR"]) ?? home, ".zshrc")], policy: "all" },
+    fish: { files: [p.join(xdgConfig, "fish", "conf.d", "arcactl.fish")], policy: "all" },
+    pwsh: win ? { files: [p.join(home, "Documents", "PowerShell", "Microsoft.PowerShell_profile.ps1"), p.join(home, "Documents", "WindowsPowerShell", "Microsoft.PowerShell_profile.ps1")], policy: "all" } : { files: [p.join(xdgConfig, "powershell", "Microsoft.PowerShell_profile.ps1")], policy: "all" },
+    nu: { files: [win ? p.join(appdata, "nushell", "config.nu") : p.join(xdgConfig, "nushell", "config.nu")], policy: "all" },
+    sh: { files: [p.join(home, ".profile")], policy: "all" }
+  };
+  const pwshOverride = set(e["ARCACTL_PWSH_PROFILE"]);
+  if (pwshOverride !== undefined)
+    profiles.pwsh = { files: [pwshOverride], policy: "all" };
+  return ok({
+    platform: host.platform,
+    home,
+    config,
+    cache,
+    state,
+    pgpass: set(e["PGPASSFILE"]) ?? (win ? p.join(pgdir, "pgpass.conf") : p.join(home, ".pgpass")),
+    pgServiceFile: set(e["PGSERVICEFILE"]) ?? (win ? p.join(pgdir, ".pg_service.conf") : p.join(home, ".pg_service.conf")),
+    psqlrc: set(e["PSQLRC"]) ?? (win ? p.join(pgdir, "psqlrc.conf") : p.join(home, ".psqlrc")),
+    arcaPsqlrc: p.join(config, "psqlrc"),
+    instances: p.join(config, "instances.json"),
+    profiles
+  });
+}
+function profileTargets(profile, exists) {
+  if (profile.policy === "all")
+    return profile.files;
+  const first = profile.files.find(exists) ?? profile.files[0];
+  return first === undefined ? [] : [first];
+}
 function shellOf(name) {
   if (name === undefined)
     return;
@@ -7584,7 +7631,7 @@ var FN_PROMPT = "arca-prompt";
 var MANAGED = ["ARCA_INSTANCE", "ARCA_ENV", "ARCA_SCHEMA", "ARCA_MODELS", "ARCA_CONFIG", "ARCA_HOME", "ARCA_SERVICE", "ARCA_DATABASE_URL", "ARCA_PGOPTIONS"];
 var header = (shell) => `# arcactl shell for ${shell}: source this; arca-off takes it away`;
 var wordsOf = (xs) => xs.join(" ");
-function posix(i, vars) {
+function posix2(i, vars) {
   const q = quotePosix;
   const sh = i.shell === "sh";
   const name = (n) => sh ? n.replaceAll("-", "_") : n;
@@ -7713,7 +7760,7 @@ function shellScript(input) {
     case "bash":
     case "zsh":
     case "sh":
-      return ok(posix(input, vars));
+      return ok(posix2(input, vars));
     case "fish":
       return ok(fish(input, vars));
     case "pwsh":
@@ -7730,17 +7777,1179 @@ function envJson(input) {
   return ok(JSON.stringify(all));
 }
 
+// sql/cli/init.ts
+import { existsSync as existsSync6 } from "node:fs";
+
+// sql/cli/discover.ts
+import { existsSync as existsSync3, readdirSync, readFileSync as readFileSync4, statSync as statSync3 } from "node:fs";
+import { join as join2 } from "node:path";
+
+// sql/cli/libpq.ts
+init_mod();
+import { chmodSync as chmodSync2, existsSync as existsSync2, readFileSync as readFileSync3, statSync as statSync2 } from "node:fs";
+
+// sql/cli/blocks.ts
+init_mod();
+var NAME2 = /^[a-z][a-z0-9-]*$/;
+var markers = (name, style) => ({
+  open: `${style} >>> arcactl:${name} >>>`,
+  close: `${style} <<< arcactl:${name} <<<`
+});
+var eolOf = (text) => text.includes(`\r
+`) ? `\r
+` : `
+`;
+function find(text, name, style) {
+  if (!NAME2.test(name))
+    return err({ kind: "name", name });
+  const m = markers(name, style);
+  const lines = [];
+  let at = 0;
+  while (at <= text.length) {
+    const nl = text.indexOf(`
+`, at);
+    const stop = nl === -1 ? text.length : nl;
+    lines.push({ at, line: text.slice(at, stop).replace(/\r$/, ""), next: nl === -1 ? text.length : nl + 1 });
+    if (nl === -1)
+      break;
+    at = nl + 1;
+  }
+  const opens = lines.filter((l) => l.line.trimEnd() === m.open);
+  const closes = lines.filter((l) => l.line.trimEnd() === m.close);
+  if (opens.length === 0 && closes.length === 0)
+    return ok(undefined);
+  if (opens.length > 1 || closes.length > 1)
+    return err({ kind: "duplicate", name });
+  const open = opens[0];
+  const close = closes[0];
+  if (open === undefined)
+    return err({ kind: "unbalanced", name, why: "there is a closing marker and no opening one" });
+  if (close === undefined)
+    return err({ kind: "unbalanced", name, why: "there is an opening marker and no closing one" });
+  if (close.at < open.at)
+    return err({ kind: "unbalanced", name, why: "the closing marker is before the opening one" });
+  return ok({ start: open.at, end: close.next, body: text.slice(open.next, close.at) });
+}
+function blockOf(text, name, style) {
+  const f = find(text, name, style);
+  return f.kind === "err" ? f : ok(f.value === undefined ? undefined : f.value.body.replace(/\r?\n$/, ""));
+}
+function withBlock(text, name, style, body) {
+  const f = find(text, name, style);
+  if (f.kind === "err")
+    return f;
+  const eol = eolOf(text);
+  const m = markers(name, style);
+  const inside = body === "" ? "" : `${body.replace(/\r?\n/g, eol)}${eol}`;
+  const block = `${m.open}${eol}${inside}${m.close}${eol}`;
+  if (f.value !== undefined)
+    return ok(text.slice(0, f.value.start) + block + text.slice(f.value.end));
+  if (text === "")
+    return ok(block);
+  return ok(`${text}${text.endsWith(`
+`) ? "" : eol}${eol}${block}`);
+}
+function withoutBlock(text, name, style) {
+  const f = find(text, name, style);
+  if (f.kind === "err")
+    return f;
+  if (f.value === undefined)
+    return ok(text);
+  const eol = eolOf(text);
+  let before = text.slice(0, f.value.start);
+  const after = text.slice(f.value.end);
+  if (before.endsWith(`${eol}${eol}`))
+    before = before.slice(0, -eol.length);
+  return ok(before + after);
+}
+
+// sql/cli/files.ts
+init_mod();
+import { chmodSync, existsSync, lstatSync, mkdirSync, readFileSync as readFileSync2, realpathSync, renameSync, statSync, unlinkSync, writeFileSync } from "node:fs";
+import { basename, dirname, join } from "node:path";
+function planBlock(path, name, style, want, mode = 420) {
+  let target = path;
+  let through = false;
+  let before;
+  try {
+    if (existsSync(path) || lstatSync(path, { throwIfNoEntry: false }) !== undefined) {
+      if (lstatSync(path).isSymbolicLink()) {
+        target = realpathSync(path);
+        through = true;
+      }
+      if (statSync(target).isDirectory())
+        return err({ kind: "unreadable", path, why: "it is a directory" });
+      before = readFileSync2(target, "utf8");
+    }
+  } catch (thrown) {
+    return err({ kind: "unreadable", path, why: thrown instanceof Error ? thrown.message : String(thrown) });
+  }
+  const text = before ?? "";
+  const next = want === "absent" ? withoutBlock(text, name, style) : withBlock(text, name, style, want.body);
+  if (next.kind === "err")
+    return err({ kind: "block", path, error: next.error });
+  const action = before === undefined ? want === "absent" || next.value === "" ? "unchanged" : "create" : next.value === before ? "unchanged" : "update";
+  return ok({ path, target, through, action, before, after: next.value, mode });
+}
+function planWhole(path, text, mode = 420) {
+  let target = path;
+  let through = false;
+  let before;
+  try {
+    if (lstatSync(path, { throwIfNoEntry: false }) !== undefined) {
+      if (lstatSync(path).isSymbolicLink()) {
+        target = realpathSync(path);
+        through = true;
+      }
+      if (statSync(target).isDirectory())
+        return err({ kind: "unreadable", path, why: "it is a directory" });
+      before = readFileSync2(target, "utf8");
+    }
+  } catch (thrown) {
+    return err({ kind: "unreadable", path, why: thrown instanceof Error ? thrown.message : String(thrown) });
+  }
+  return ok({ path, target, through, action: before === undefined ? "create" : before === text ? "unchanged" : "update", before, after: text, mode });
+}
+function planRemoveFile(path) {
+  try {
+    const st = lstatSync(path, { throwIfNoEntry: false });
+    if (st === undefined)
+      return ok({ path, target: path, through: false, action: "unchanged", before: undefined, after: "", mode: 420 });
+    if (st.isDirectory())
+      return err({ kind: "unreadable", path, why: "it is a directory" });
+    return ok({ path, target: path, through: false, action: "remove", before: st.isSymbolicLink() ? "" : readFileSync2(path, "utf8"), after: "", mode: st.mode & 4095 });
+  } catch (thrown) {
+    return err({ kind: "unreadable", path, why: thrown instanceof Error ? thrown.message : String(thrown) });
+  }
+}
+function diffOf(before, after) {
+  const a = before === undefined || before === "" ? [] : before.split(/\r?\n/);
+  const b = after === "" ? [] : after.split(/\r?\n/);
+  if (a.at(-1) === "")
+    a.pop();
+  if (b.at(-1) === "")
+    b.pop();
+  const n = a.length;
+  const m = b.length;
+  const lcs = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
+  for (let i = n - 1;i >= 0; i--)
+    for (let j = m - 1;j >= 0; j--)
+      lcs[i][j] = a[i] === b[j] ? lcs[i + 1][j + 1] + 1 : Math.max(lcs[i + 1][j], lcs[i][j + 1]);
+  const out = [];
+  let i = 0;
+  let j = 0;
+  while (i < n || j < m) {
+    if (i < n && j < m && a[i] === b[j]) {
+      out.push(`  ${a[i]}`);
+      i++;
+      j++;
+    } else if (j < m && (i === n || lcs[i][j + 1] >= lcs[i + 1][j]))
+      out.push(`+ ${b[j++]}`);
+    else
+      out.push(`- ${a[i++]}`);
+  }
+  const keep = out.map((l, k) => l[0] !== " " || out[k - 1]?.[0] !== " " && out[k - 1] !== undefined || out[k + 1]?.[0] !== " " && out[k + 1] !== undefined);
+  return out.filter((_, k) => keep[k]).join(`
+`);
+}
+function applyChange2(change) {
+  if (change.action === "unchanged")
+    return { path: change.path, action: "unchanged" };
+  if (change.action === "remove") {
+    unlinkSync(change.path);
+    return { path: change.path, action: "remove" };
+  }
+  mkdirSync(dirname(change.target), { recursive: true });
+  let backup;
+  let mode = change.mode;
+  if (change.before !== undefined) {
+    mode = statSync(change.target).mode & 4095;
+    const copy = `${change.target}.arcactl-bak`;
+    if (!existsSync(copy)) {
+      writeFileSync(copy, change.before, { mode });
+      backup = copy;
+    }
+  }
+  const temp = join(dirname(change.target), `.${basename(change.target)}.arcactl-${process.pid}-${Date.now()}`);
+  try {
+    writeFileSync(temp, change.after, { mode });
+    chmodSync(temp, mode);
+    renameSync(temp, change.target);
+  } catch (thrown) {
+    try {
+      unlinkSync(temp);
+    } catch {}
+    throw thrown;
+  }
+  return { path: change.path, action: change.action, ...backup === undefined ? {} : { backup } };
+}
+var pgpassModeOk = (mode) => (mode & 63) === 0;
+
+// sql/cli/libpq.ts
+var SSLMODES = ["disable", "allow", "prefer", "require", "verify-ca", "verify-full"];
+var NO_LINE = /[\r\n\0]/;
+var bad = (what, why) => ({ kind: "invalid", what, why });
+function checkInstance(i) {
+  const out = [];
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,62}$/.test(i.name))
+    out.push(bad("name", `${JSON.stringify(i.name)} is not letters, digits, dots, dashes and underscores`));
+  for (const [k, v] of [["host", i.host], ["database", i.database], ["user", i.user]])
+    if (v !== undefined && (v === "" || NO_LINE.test(v) || v !== v.trim()))
+      out.push(bad(k, `${JSON.stringify(v)} is empty, has a line ending or surrounding space`));
+  if (i.port !== undefined && !(Number.isInteger(i.port) && i.port >= 1 && i.port <= 65535))
+    out.push(bad("port", `${String(i.port)} is not a port`));
+  if (i.sslmode !== undefined && !SSLMODES.includes(i.sslmode))
+    out.push(bad("sslmode", `${i.sslmode} is not one of ${SSLMODES.join(", ")}`));
+  if (i.schema !== undefined && !/^[a-z][a-z0-9_]{0,62}$/.test(i.schema))
+    out.push(bad("schema", `${JSON.stringify(i.schema)} is not a lower-case name`));
+  return out;
+}
+function checkCredential(c) {
+  const out = [];
+  for (const k of ["host", "port", "database", "user"])
+    if (c[k] === "" || NO_LINE.test(c[k]))
+      out.push(bad(k, "it is empty or has a line ending"));
+  if (c.port !== "*" && !/^\d{1,5}$/.test(c.port))
+    out.push(bad("port", `${JSON.stringify(c.port)} is not a port or *`));
+  if (c.password === "" || NO_LINE.test(c.password))
+    out.push(bad("password", "it is empty or has a line ending, which `.pgpass` cannot hold"));
+  return out;
+}
+var field = (v) => v === "*" ? "*" : v.replaceAll("\\", "\\\\").replaceAll(":", "\\:");
+var pgpassLine = (c) => [c.host, c.port, c.database, c.user, c.password].map((v, i) => i === 4 ? v.replaceAll("\\", "\\\\").replaceAll(":", "\\:") : field(v)).join(":");
+function splitPgpass(line) {
+  const parts = [];
+  let cur = "";
+  for (let i = 0;i < line.length; i++) {
+    const ch = line[i];
+    if (ch === "\\" && i + 1 < line.length)
+      cur += line[++i];
+    else if (ch === ":") {
+      parts.push(cur);
+      cur = "";
+    } else
+      cur += ch;
+  }
+  parts.push(cur);
+  return parts.length === 5 ? parts : undefined;
+}
+function parsePgpass(text) {
+  const credentials = [];
+  const other = [];
+  for (const raw of text.split(/\r?\n/)) {
+    if (raw.trim() === "" || raw.startsWith("#"))
+      continue;
+    const f = splitPgpass(raw);
+    if (f === undefined)
+      other.push(raw);
+    else
+      credentials.push({ host: f[0], port: f[1], database: f[2], user: f[3], password: f[4] });
+  }
+  return { credentials, other };
+}
+var sameKey = (a, b) => a.host === b.host && a.port === b.port && a.database === b.database && a.user === b.user;
+var matches2 = (c, place) => ["host", "port", "database", "user"].every((k) => c[k] === "*" || c[k] === place[k]);
+var readText = (path) => {
+  try {
+    return existsSync2(path) ? readFileSync3(path, "utf8") : undefined;
+  } catch {
+    return;
+  }
+};
+var lines = (text) => text.split(/\r?\n/);
+function outside(text, name, style) {
+  const open = `${style} >>> arcactl:${name} >>>`;
+  const close = `${style} <<< arcactl:${name} <<<`;
+  const out = [];
+  let inside = false;
+  for (const l of lines(text)) {
+    if (l.trimEnd() === open)
+      inside = true;
+    else if (l.trimEnd() === close)
+      inside = false;
+    else if (!inside)
+      out.push(l);
+  }
+  return out.join(`
+`);
+}
+function planPgpass(paths, change) {
+  const errors = (change.set ?? []).flatMap((c) => checkCredential(c));
+  if (errors.length > 0)
+    return err(errors);
+  const text = readText(paths.pgpass) ?? "";
+  const inside = blockOf(text, "credentials", "#");
+  if (inside.kind === "err")
+    return err([{ kind: "block", path: paths.pgpass, error: inside.error }]);
+  const mine = parsePgpass(inside.value ?? "");
+  if (mine.other.length > 0)
+    return err([bad("credentials block", `it has a line that is not a credential: ${mine.other[0]?.replace(/:[^:]*$/, ":***")}`)]);
+  const wanted = change.set ?? [];
+  const kept = mine.credentials.filter((c) => !(change.remove ?? []).some((k) => sameKey(c, k))).map((c) => wanted.find((w) => sameKey(w, c)) ?? c);
+  const creds = [...kept, ...wanted.filter((w) => !kept.some((c) => sameKey(c, w)))];
+  const planned = planBlock(paths.pgpass, "credentials", "#", creds.length === 0 ? "absent" : { body: creds.map(pgpassLine).join(`
+`) }, 384);
+  if (planned.kind === "err")
+    return err([planned.error]);
+  const warnings = [];
+  const theirs = parsePgpass(outside(text, "credentials", "#")).credentials;
+  for (const c of change.set ?? []) {
+    const first = theirs.find((t) => matches2(t, c));
+    if (first !== undefined)
+      warnings.push(`a line of your own in ${paths.pgpass} for ${first.host}:${first.port}:${first.database}:${first.user} comes before the one arcactl wrote, and libpq reads the first that matches`);
+  }
+  const modes = [];
+  if (paths.platform !== "win32" && existsSync2(planned.value.target)) {
+    const mode = statSync2(planned.value.target).mode & 511;
+    if (!pgpassModeOk(mode))
+      modes.push({ path: planned.value.target, from: mode, to: 384 });
+  }
+  return ok({ changes: [planned.value], warnings, modes });
+}
+function serviceSection(i) {
+  const kv = [];
+  if (i.host !== undefined)
+    kv.push(["host", i.host]);
+  if (i.port !== undefined)
+    kv.push(["port", String(i.port)]);
+  if (i.database !== undefined)
+    kv.push(["dbname", i.database]);
+  if (i.user !== undefined)
+    kv.push(["user", i.user]);
+  if (i.sslmode !== undefined)
+    kv.push(["sslmode", i.sslmode]);
+  if (i.schema !== undefined)
+    kv.push(["options", `-c search_path=${i.schema},public`]);
+  return [`[${i.name}]`, ...kv.map(([k, v]) => `${k}=${v}`)].join(`
+`);
+}
+function parseServices(text) {
+  const out = [];
+  for (const raw of lines(text)) {
+    const l = raw.trim();
+    if (l === "" || l.startsWith("#") || l.startsWith(";"))
+      continue;
+    const m = /^\[(.+)\]$/.exec(l);
+    if (m !== null)
+      out.push({ name: m[1], settings: {} });
+    else {
+      const eq = l.indexOf("=");
+      if (eq > 0 && out.length > 0)
+        out[out.length - 1].settings[l.slice(0, eq).trim()] = l.slice(eq + 1).trim();
+    }
+  }
+  return out;
+}
+function readInstances(paths) {
+  const text = readText(paths.pgServiceFile) ?? "";
+  const body = blockOf(text, "services", "#");
+  if (body.kind === "err")
+    return err([{ kind: "block", path: paths.pgServiceFile, error: body.error }]);
+  return ok(parseServices(body.value ?? "").map((s) => {
+    const schema = /search_path=([a-z][a-z0-9_]*),public/.exec(s.settings["options"] ?? "")?.[1];
+    return {
+      name: s.name,
+      ...s.settings["host"] === undefined ? {} : { host: s.settings["host"] },
+      ...s.settings["port"] === undefined ? {} : { port: Number(s.settings["port"]) },
+      ...s.settings["dbname"] === undefined ? {} : { database: s.settings["dbname"] },
+      ...s.settings["user"] === undefined ? {} : { user: s.settings["user"] },
+      ...s.settings["sslmode"] === undefined ? {} : { sslmode: s.settings["sslmode"] },
+      ...schema === undefined ? {} : { schema }
+    };
+  }));
+}
+function planServices(paths, instances) {
+  const errors = instances.flatMap((i) => checkInstance(i));
+  const dup = instances.find((x, n) => instances.findIndex((y) => y.name === x.name) !== n);
+  if (dup !== undefined)
+    errors.push(bad("name", `${dup.name} is there twice`));
+  const text = readText(paths.pgServiceFile) ?? "";
+  const theirs = new Set(parseServices(outside(text, "services", "#")).map((s) => s.name));
+  for (const i of instances)
+    if (theirs.has(i.name))
+      errors.push({ kind: "conflict", service: i.name, why: `${i.name} is already a service in ${paths.pgServiceFile}, outside the block arcactl owns: rename one of them` });
+  if (errors.length > 0)
+    return err(errors);
+  const planned = planBlock(paths.pgServiceFile, "services", "#", instances.length === 0 ? "absent" : { body: instances.map(serviceSection).join(`
+
+`) });
+  return planned.kind === "err" ? err([planned.error]) : ok({ changes: [planned.value], warnings: [], modes: [] });
+}
+var psqlrcBody = () => [
+  "-- psql for arca instances: the prompt names the instance, and a few queries are one word away (:tables :invariants :guard :audit)",
+  "\\set QUIET 1",
+  "\\getenv arca_instance ARCA_INSTANCE",
+  "\\getenv arca_env ARCA_ENV",
+  "\\set PROMPT1 '%[%033[1m%]%:arca_instance:%[%033[0m%] %/%R%# '",
+  "\\set PROMPT2 '%R> '",
+  "\\x auto",
+  "\\pset null '(null)'",
+  "\\pset linestyle unicode",
+  "\\pset border 1",
+  "\\set HISTFILE ~/.psql_history- :DBNAME",
+  "\\set HISTCONTROL ignoredups",
+  "\\set COMP_KEYWORD_CASE upper",
+  "\\set tables 'SELECT table_name FROM information_schema.tables WHERE table_schema = current_schema() ORDER BY 1;'",
+  `\\set invariants 'SELECT c.relname AS "table", t.tgname AS trigger, t.tgenabled AS enabled FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid WHERE c.relnamespace = current_schema()::regnamespace AND t.tgname LIKE ''inv\\\\_%'' ORDER BY 1, 2;'`,
+  "\\set guard 'SELECT evtname, evtenabled FROM pg_event_trigger WHERE evtname LIKE ''inv\\\\_guard\\\\_%'' OR evtname LIKE ''ifc\\\\_seal\\\\_guard\\\\_%'' ORDER BY 1;'",
+  "\\set audit 'SELECT sequence, occurred_at, actor_kind, action, outcome FROM audit_event ORDER BY sequence DESC LIMIT 20;'",
+  "\\unset QUIET"
+].join(`
+`);
+var psqlPath = (p) => p.replaceAll("\\", "/");
+function planPsql(paths) {
+  const own = planBlock(paths.arcaPsqlrc, "psql", "--", { body: psqlrcBody() });
+  if (own.kind === "err")
+    return err([own.error]);
+  const include = planBlock(paths.psqlrc, "psql", "--", { body: `\\i ${psqlPath(paths.arcaPsqlrc)}` });
+  if (include.kind === "err")
+    return err([include.error]);
+  return ok({ changes: [own.value, include.value], warnings: [], modes: [] });
+}
+function planUndo(paths) {
+  const changes = [];
+  const errors = [];
+  for (const [path, name, style] of [
+    [paths.pgpass, "credentials", "#"],
+    [paths.pgServiceFile, "services", "#"],
+    [paths.psqlrc, "psql", "--"],
+    [paths.arcaPsqlrc, "psql", "--"]
+  ]) {
+    const c = planBlock(path, name, style, "absent");
+    if (c.kind === "err")
+      errors.push(c.error);
+    else
+      changes.push(c.value);
+  }
+  return errors.length > 0 ? err(errors) : ok({ changes, warnings: [], modes: [] });
+}
+function fixModes(plan) {
+  const done = [];
+  for (const m of plan.modes) {
+    chmodSync2(m.path, m.to);
+    done.push(`${m.path}: ${m.from.toString(8)} to ${m.to.toString(8)}`);
+  }
+  return done;
+}
+
+// sql/cli/discover.ts
+var read = (p) => {
+  try {
+    return existsSync3(p) ? readFileSync4(p, "utf8") : "";
+  } catch {
+    return "";
+  }
+};
+var concrete = (host) => host !== undefined && host !== "" && host !== "*";
+var portOf = (v) => v !== undefined && /^\d{1,5}$/.test(v) ? Number(v) : undefined;
+var keyOf = (c) => `${c.host ?? ""}|${c.port ?? 5432}|${c.database ?? ""}`;
+var derived = (c) => `${(c.host ?? "local").replace(/[^A-Za-z0-9._-]/g, "-")}${c.port === undefined || c.port === 5432 ? "" : `-${c.port}`}`;
+function workspaceConfigs(root, depth = 4) {
+  const out = [];
+  const walk = (dir, d) => {
+    let entries;
+    try {
+      entries = readdirSync(dir).toSorted();
+    } catch {
+      return;
+    }
+    for (const name of entries) {
+      if (name === "node_modules" || name === ".git" || name === ".worktrees" || name === "dist")
+        continue;
+      const full = join2(dir, name);
+      if (name === "arca.config.ts")
+        out.push(full);
+      else if (d > 0) {
+        try {
+          if (statSync3(full).isDirectory())
+            walk(full, d - 1);
+        } catch {}
+      }
+    }
+  };
+  if (existsSync3(root))
+    walk(root, depth);
+  return out;
+}
+function discover(i) {
+  const found = [];
+  const add = (c) => void found.push(c);
+  if (i.url !== undefined) {
+    try {
+      const u = new URL(i.url);
+      add({ name: i.env["ARCA_INSTANCE"] ?? "given", sources: ["the connection URL"], host: u.hostname, ...u.port === "" ? {} : { port: Number(u.port) }, ...u.pathname.length > 1 ? { database: decodeURIComponent(u.pathname.slice(1)) } : {}, ...u.username === "" ? {} : { user: decodeURIComponent(u.username) }, ...u.searchParams.get("sslmode") === null ? {} : { sslmode: u.searchParams.get("sslmode") } });
+    } catch {}
+  }
+  const e = i.env;
+  if (concrete(e["PGHOST"]))
+    add({ name: e["PGSERVICE"] ?? "libpq-env", sources: ["libpq's environment"], host: e["PGHOST"], ...portOf(e["PGPORT"]) === undefined ? {} : { port: portOf(e["PGPORT"]) }, ...e["PGDATABASE"] === undefined ? {} : { database: e["PGDATABASE"] }, ...e["PGUSER"] === undefined ? {} : { user: e["PGUSER"] }, ...e["PGSSLMODE"] === undefined ? {} : { sslmode: e["PGSSLMODE"] } });
+  const own = new Set(i.state.instances.filter((k) => k.ownsService === true).map((k) => k.name));
+  for (const s of parseServices(read(i.paths.pgServiceFile))) {
+    const host = s.settings["host"];
+    if (!concrete(host))
+      continue;
+    add({ name: s.name, sources: [own.has(s.name) ? "pg_service.conf (arcactl's)" : "pg_service.conf"], host, ...portOf(s.settings["port"]) === undefined ? {} : { port: portOf(s.settings["port"]) }, ...s.settings["dbname"] === undefined ? {} : { database: s.settings["dbname"] }, ...s.settings["user"] === undefined ? {} : { user: s.settings["user"] }, ...s.settings["sslmode"] === undefined ? {} : { sslmode: s.settings["sslmode"] }, ...own.has(s.name) ? {} : { userService: true } });
+  }
+  for (const c of parsePgpass(read(i.paths.pgpass)).credentials) {
+    if (!concrete(c.host))
+      continue;
+    add({ name: "", sources: [".pgpass"], host: c.host, ...portOf(c.port) === undefined ? {} : { port: portOf(c.port) }, ...c.database === "*" ? {} : { database: c.database }, ...c.user === "*" ? {} : { user: c.user } });
+  }
+  for (const k of i.state.instances)
+    if (concrete(k.host))
+      add({ name: k.name, sources: ["arcactl"], host: k.host, ...k.port === undefined ? {} : { port: k.port }, ...k.database === undefined ? {} : { database: k.database }, ...k.user === undefined ? {} : { user: k.user }, ...k.sslmode === undefined ? {} : { sslmode: k.sslmode } });
+  if (i.local === true)
+    add({ name: "local", sources: ["this machine"], host: "127.0.0.1", port: 5432 });
+  const merged = new Map;
+  for (const c of found) {
+    const k = keyOf(c);
+    const had = merged.get(k);
+    if (had === undefined) {
+      merged.set(k, c);
+      continue;
+    }
+    const pick = (f) => {
+      const v = had[f] ?? c[f];
+      return v === undefined ? {} : { [f]: v };
+    };
+    merged.set(k, {
+      name: had.name !== "" && !(c.name !== "" && (c.sources[0] ?? "").startsWith("pg_service")) ? had.name : c.name !== "" ? c.name : had.name,
+      sources: [...new Set([...had.sources, ...c.sources])],
+      ...pick("host"),
+      ...pick("port"),
+      ...pick("database"),
+      ...pick("user"),
+      ...pick("sslmode"),
+      ...had.userService === true || c.userService === true ? { userService: true } : {}
+    });
+  }
+  const named = [...merged.values()].map((c) => c.name === "" ? { ...c, name: derived(c) } : c);
+  const seen = new Map;
+  const unique = named.map((c) => {
+    const n = seen.get(c.name) ?? 0;
+    seen.set(c.name, n + 1);
+    return n === 0 ? c : { ...c, name: `${c.name}-${derived(c)}` };
+  });
+  return { candidates: unique, configs: i.workspace === undefined ? [] : workspaceConfigs(i.workspace) };
+}
+function passwordFor(paths, c) {
+  const want = { host: c.host ?? "", port: String(c.port ?? 5432), database: c.database ?? "postgres", user: c.user ?? "" };
+  const hit = parsePgpass(read(paths.pgpass)).credentials.find((p) => ["host", "port", "database", "user"].every((k) => p[k] === "*" || p[k] === want[k]));
+  return hit?.password;
+}
+function urlOf(c, password) {
+  const auth = c.user === undefined ? "" : `${encodeURIComponent(c.user)}${password === undefined ? "" : `:${encodeURIComponent(password)}`}@`;
+  const q = c.sslmode === undefined ? "" : `?sslmode=${encodeURIComponent(c.sslmode)}`;
+  return `postgres://${auth}${c.host ?? "127.0.0.1"}:${c.port ?? 5432}/${encodeURIComponent(c.database ?? "postgres")}${q}`;
+}
+var modelTables = new Map;
+function tablesOfModel(m) {
+  const had = modelTables.get(m);
+  if (had !== undefined)
+    return had;
+  const c = settingsOf({ models: [m] });
+  const s = c.kind === "ok" ? schemaOf(c.value) : undefined;
+  const set = new Set(s?.kind === "ok" ? s.value.schema.tables.map((t) => t.name.join("_")) : []);
+  modelTables.set(m, set);
+  return set;
+}
+async function probe(connect, c, password, schema = "arca") {
+  const none = (error) => ({ reachable: false, error, level: "none", arca: { schema, exists: false, tables: 0, models: [] } });
+  let conn;
+  try {
+    conn = await connect({ url: urlOf(c, password), connectTimeout: 3 });
+  } catch (thrown) {
+    return none(redact(thrown instanceof Error ? thrown.message : String(thrown), password === undefined ? [] : [password]));
+  }
+  try {
+    const q = (sql) => conn.driver.query(sql);
+    const lit = (s) => `'${s.replaceAll("'", "''")}'`;
+    const me = (await q(`SELECT version() AS v, current_user AS u, coalesce((SELECT rolsuper FROM pg_roles WHERE rolname = current_user), false) AS su, has_database_privilege(current_database(), 'CREATE') AS cdb`))[0];
+    const tables = (await q(`SELECT table_name AS t FROM information_schema.tables WHERE table_schema = ${lit(schema)}`)).map((r) => String(r["t"]));
+    const exists = (await q(`SELECT 1 AS x FROM information_schema.schemata WHERE schema_name = ${lit(schema)}`)).length > 0;
+    const there = new Set(tables);
+    const models = modelNames.filter((m) => {
+      const want = tablesOfModel(m);
+      return want.size > 0 && [...want].every((t) => there.has(t));
+    });
+    const create = exists ? (await q(`SELECT has_schema_privilege(current_user, ${lit(schema)}, 'CREATE') AS ok`))[0]?.["ok"] === true : me?.["cdb"] === true;
+    const superuser = me?.["su"] === true;
+    return {
+      reachable: true,
+      version: String(me?.["v"]).split(" on ")[0],
+      user: String(me?.["u"]),
+      superuser,
+      level: superuser ? "migrate+guard" : create ? "migrate" : "read",
+      arca: { schema, exists, tables: tables.length, models }
+    };
+  } catch (thrown) {
+    return none(redact(thrown instanceof Error ? thrown.message : String(thrown), password === undefined ? [] : [password]));
+  } finally {
+    await conn.close().catch(() => {
+      return;
+    });
+  }
+}
+
+// sql/cli/profile.ts
+import { join as join3 } from "node:path";
+var cacheOf = (paths, shell) => join3(paths.cache, `shell.${shell === "pwsh" ? "ps1" : shell}`);
+function inputOf(shell, paths, known) {
+  return {
+    shell,
+    schema: known?.schema ?? "arca",
+    home: paths.config,
+    ...known === undefined ? {} : { instance: known.name, service: known.name },
+    ...known?.env === undefined ? {} : { env: known.env },
+    ...known?.models === undefined ? {} : { models: known.models }
+  };
+}
+function scriptFor(shell, paths, known) {
+  const r = shellScript(inputOf(shell, paths, known));
+  if (r.kind === "err")
+    throw new Error(r.error.join("; "));
+  return r.value;
+}
+function profileBody(shell, cache) {
+  switch (shell) {
+    case "bash":
+    case "zsh":
+    case "sh":
+      return `[ -r ${quotePosix(cache)} ] && . ${quotePosix(cache)}`;
+    case "fish":
+      return `test -r ${quoteFish(cache)}; and source ${quoteFish(cache)}`;
+    case "pwsh":
+      return `if (Test-Path ${quotePwsh(cache)}) { . ${quotePwsh(cache)} }`;
+    case "nu":
+      return `source ${quoteNu(cache.replaceAll("\\", "/"))}`;
+  }
+}
+
+// sql/cli/prompt.ts
+var silent = { interactive: false, ask: async () => {
+  return;
+}, secret: async () => {
+  return;
+}, confirm: async () => false };
+
+// sql/cli/state.ts
+init_mod();
+import { existsSync as existsSync4, readFileSync as readFileSync5 } from "node:fs";
+var emptyState2 = { version: 1, instances: [], profiles: [] };
+var str2 = (v) => typeof v === "string" && v !== "" ? v : undefined;
+function readState2(paths) {
+  if (!existsSync4(paths.instances))
+    return ok(emptyState2);
+  let raw;
+  try {
+    raw = JSON.parse(readFileSync5(paths.instances, "utf8"));
+  } catch (thrown) {
+    return err(`${paths.instances} is not JSON: ${thrown instanceof Error ? thrown.message : String(thrown)}`);
+  }
+  if (typeof raw !== "object" || raw === null || raw.version !== 1)
+    return err(`${paths.instances} is not a state file of version 1`);
+  const o = raw;
+  const instances = [];
+  for (const i of Array.isArray(o.instances) ? o.instances : []) {
+    const x = i;
+    const name = str2(x["name"]);
+    if (name === undefined)
+      return err(`${paths.instances}: an instance has no name`);
+    instances.push({
+      name,
+      ...str2(x["env"]) === undefined ? {} : { env: str2(x["env"]) },
+      ...str2(x["schema"]) === undefined ? {} : { schema: str2(x["schema"]) },
+      ...Array.isArray(x["models"]) ? { models: x["models"].filter((m) => typeof m === "string") } : {},
+      ...str2(x["host"]) === undefined ? {} : { host: str2(x["host"]) },
+      ...typeof x["port"] === "number" ? { port: x["port"] } : {},
+      ...str2(x["database"]) === undefined ? {} : { database: str2(x["database"]) },
+      ...str2(x["user"]) === undefined ? {} : { user: str2(x["user"]) },
+      ...str2(x["sslmode"]) === undefined ? {} : { sslmode: str2(x["sslmode"]) },
+      ...x["ownsService"] === true ? { ownsService: true } : {}
+    });
+  }
+  const profiles = [];
+  for (const p of Array.isArray(o.profiles) ? o.profiles : []) {
+    const x = p;
+    const shell = str2(x["shell"]);
+    if (shell === undefined || !shells.includes(shell) || !Array.isArray(x["files"]) || str2(x["cache"]) === undefined)
+      return err(`${paths.instances}: a profile is not one`);
+    profiles.push({ shell, files: x["files"].filter((f) => typeof f === "string"), cache: str2(x["cache"]) });
+  }
+  return ok({ version: 1, ...str2(o.default) === undefined ? {} : { default: str2(o.default) }, instances, profiles });
+}
+var stateText = (s) => `${JSON.stringify({ version: 1, ...s.default === undefined ? {} : { default: s.default }, instances: [...s.instances].sort((a, b) => a.name.localeCompare(b.name)), profiles: [...s.profiles].sort((a, b) => a.shell.localeCompare(b.shell)) }, null, 2)}
+`;
+var planState = (paths, s) => planWhole(paths.instances, stateText(s));
+function withInstance(s, k, makeDefault) {
+  const rest = s.instances.filter((i) => i.name !== k.name);
+  return { ...s, instances: [...rest, k], ...makeDefault || s.default === undefined ? { default: k.name } : {} };
+}
+
+// sql/cli/workstation-checks.ts
+import { spawnSync } from "node:child_process";
+import { existsSync as existsSync5, readFileSync as readFileSync6, statSync as statSync4 } from "node:fs";
+var readOr = (p) => {
+  try {
+    return existsSync5(p) ? readFileSync6(p, "utf8") : "";
+  } catch {
+    return "";
+  }
+};
+function realPsqlVersion() {
+  const r = spawnSync("psql", ["--version"], { encoding: "utf8", timeout: 5000 });
+  return r.status === 0 ? r.stdout.trim() : undefined;
+}
+var defaultOf2 = (s) => s.instances.find((i) => i.name === s.default);
+var checks2 = [
+  {
+    id: "ARCA-W001",
+    title: "psql",
+    async run(w) {
+      const text = (w.psqlVersion ?? realPsqlVersion)();
+      if (text === undefined)
+        return { status: "fail", detail: "psql is not on the PATH", next: "install the PostgreSQL client (postgresql-client, or libpq's psql)" };
+      const major = Number(/(\d+)(?:\.\d+)*\s*(?:\(|$|\n)/.exec(text.replace(/^psql \(PostgreSQL\)\s*/, ""))?.[1] ?? "0");
+      return major >= 15 ? { status: "pass", detail: text } : { status: "warn", detail: `${text}: the helper file of arcactl needs psql 15 or later (\\getenv)`, next: "install psql 15 or later" };
+    }
+  },
+  {
+    id: "ARCA-W002",
+    title: "passwords (.pgpass)",
+    async run(w, known) {
+      const text = readOr(w.paths.pgpass);
+      if (blockOf(text, "credentials", "#").kind === "err")
+        return { status: "fail", detail: `the arcactl block of ${w.paths.pgpass} is broken (a marker is missing or twice)`, next: "repair or remove the block, then run arcactl init" };
+      const mine = blockOf(text, "credentials", "#");
+      const body = mine.kind === "ok" ? mine.value : undefined;
+      if (body === undefined)
+        return { status: "pass", detail: "arcactl stores no password: libpq will use its own sources (trust, peer, a service, your own .pgpass lines)" };
+      if (w.paths.platform !== "win32" && existsSync5(w.paths.pgpass) && !pgpassModeOk(statSync4(w.paths.pgpass).mode))
+        return { status: "fail", detail: `${w.paths.pgpass} can be read by the group or others: libpq ignores it`, next: "run arcactl init, or chmod 600 the file" };
+      const creds = parsePgpass(body).credentials;
+      if (known?.host !== undefined && !creds.some((c) => c.host === known.host))
+        return { status: "warn", detail: `arcactl has no password for ${known.host} (the default instance ${known.name})`, next: "run arcactl init --instance with the password, if it needs one" };
+      return { status: "pass", detail: `${creds.length} credential${creds.length === 1 ? "" : "s"} of arcactl's, in a file libpq will use` };
+    }
+  },
+  {
+    id: "ARCA-W003",
+    title: "the service of the default instance",
+    async run(w, known) {
+      if (known === undefined)
+        return { status: "warn", detail: "there is no default instance", next: "run arcactl init --instance <name> --host <host> ..." };
+      const has = parseServices(readOr(w.paths.pgServiceFile)).some((s) => s.name === known.name);
+      return has ? { status: "pass", detail: `${known.name} is a service in ${w.paths.pgServiceFile}` } : { status: "fail", detail: `${known.name} is not a service in ${w.paths.pgServiceFile}`, next: "run arcactl init to write it" };
+    }
+  },
+  {
+    id: "ARCA-W004",
+    title: "psql settings",
+    async run(w) {
+      const inc = blockOf(readOr(w.paths.psqlrc), "psql", "--");
+      const own = blockOf(readOr(w.paths.arcaPsqlrc), "psql", "--");
+      if (inc.kind === "err" || own.kind === "err")
+        return { status: "fail", detail: "a block of the psqlrc files is broken", next: "repair or remove it, then run arcactl init" };
+      if (inc.value === undefined)
+        return { status: "warn", detail: `${w.paths.psqlrc} does not include arcactl's settings`, next: "run arcactl init" };
+      if (own.value !== psqlrcBody())
+        return { status: "fail", detail: `${w.paths.arcaPsqlrc} is not as this arcactl writes it`, next: "run arcactl init" };
+      return { status: "pass", detail: "psql includes arcactl's prompt, settings and helper queries" };
+    }
+  },
+  {
+    id: "ARCA-W005",
+    title: "shell profiles",
+    async run(w, known) {
+      if (w.state.profiles.length === 0)
+        return { status: "warn", detail: "arcactl has not put its script into any shell profile", next: "run arcactl init --shell auto" };
+      const problems = [];
+      for (const p of w.state.profiles) {
+        const cache = cacheOf(w.paths, p.shell);
+        for (const f of p.files) {
+          const b = blockOf(readOr(f), "shell", "#");
+          if (b.kind === "err" || b.value === undefined)
+            problems.push(`${f} has no arcactl block`);
+          else if (b.value !== profileBody(p.shell, cache))
+            problems.push(`${f}: the block is not as this arcactl writes it`);
+        }
+        if (!existsSync5(cache))
+          problems.push(`${cache} is missing`);
+        else if (readFileSync6(cache, "utf8") !== scriptFor(p.shell, w.paths, known))
+          problems.push(`${cache} is not the script for ${known?.name ?? "no instance"} as it is made now`);
+      }
+      return problems.length === 0 ? { status: "pass", detail: `${w.state.profiles.map((p) => p.shell).join(", ")}: the profile sources a current script` } : { status: "fail", detail: problems.join("; "), next: "run arcactl init to write them again" };
+    }
+  },
+  {
+    id: "ARCA-W006",
+    title: "the default instance can be reached",
+    async run(w, known) {
+      if (known?.host === undefined)
+        return { status: "unknown", detail: "there is no default instance with a host to reach" };
+      if (w.connect === undefined)
+        return { status: "unknown", detail: "no connection was made" };
+      const c = { name: known.name, sources: [], host: known.host, ...known.port === undefined ? {} : { port: known.port }, ...known.database === undefined ? {} : { database: known.database }, ...known.user === undefined ? {} : { user: known.user }, ...known.sslmode === undefined ? {} : { sslmode: known.sslmode } };
+      const p = await probe(w.connect, c, passwordFor(w.paths, c), known.schema);
+      return p.reachable ? { status: "pass", detail: `${known.name}: ${p.version} as ${p.user}` } : { status: "fail", detail: `${known.name} is not reached: ${p.error}`, next: "check the host, the port, the password in .pgpass and the network" };
+    }
+  }
+];
+var workstationIds = checks2.map((c) => c.id);
+async function workstationChecks(w, only) {
+  const known = defaultOf2(w.state);
+  const results = [];
+  for (const c of checks2) {
+    if (only !== undefined && !only.includes(c.id))
+      continue;
+    try {
+      results.push({ id: c.id, title: c.title, ...await c.run(w, known) });
+    } catch (thrown) {
+      results.push({ id: c.id, title: c.title, status: "unknown", detail: `could not check: ${thrown instanceof Error ? thrown.message : String(thrown)}` });
+    }
+  }
+  const summary = { pass: 0, warn: 0, fail: 0, unknown: 0 };
+  for (const r of results)
+    summary[r.status]++;
+  return { results, summary, code: summary.warn + summary.fail + summary.unknown === 0 ? 0 : 1 };
+}
+
+// sql/cli/init.ts
+var SWITCHES = new Set(["--discover", "--local", "--no-psql", "--dry-run", "--yes", "-y", "--undo", "--password-stdin", "--json", "--interactive", "--non-interactive"]);
+function parse(argv) {
+  const values = new Map;
+  const switches = new Set;
+  const unknown = [];
+  const takes = new Set(["--instance", "--host", "--port", "--database", "--user", "--sslmode", "--env", "--schema", "--models", "--shell", "--url"]);
+  for (let i = 0;i < argv.length; i++) {
+    const a = argv[i];
+    if (SWITCHES.has(a))
+      switches.add(a === "-y" ? "--yes" : a);
+    else if (takes.has(a) && argv[i + 1] !== undefined)
+      values.set(a, argv[++i]);
+    else
+      unknown.push(a);
+  }
+  return { values, switches, unknown };
+}
+var maskPgpass = (text) => text.split(`
+`).map((l) => /^[^#].*:.*:.*:.*:/.test(l) ? l.replace(/:[^:]*$/, ":***") : l).join(`
+`);
+function describe2(c, paths) {
+  if (c.action === "unchanged")
+    return `  unchanged  ${c.path}`;
+  const mask = c.path === paths.pgpass ? maskPgpass : (t) => t;
+  const body = c.action === "remove" ? "" : diffOf(c.before === undefined ? undefined : mask(c.before), mask(c.after)).split(`
+`).map((l) => `      ${l}`).join(`
+`);
+  return `  ${c.action.padEnd(9)}  ${c.path}${c.through ? ` (through the link to ${c.target})` : ""}${body === "" ? "" : `
+${body}`}`;
+}
+var errorText = (e) => {
+  switch (e.kind) {
+    case "invalid":
+      return `${e.what}: ${e.why}`;
+    case "conflict":
+      return e.why;
+    case "block":
+      return `${e.path}: the markers of the arcactl block do not make sense (${e.error.kind}); it was not changed`;
+    case "unreadable":
+      return `${e.path}: ${e.why}`;
+  }
+};
+function shellsWanted(spec, io) {
+  if (spec === "none")
+    return [];
+  if (spec === "all")
+    return [...shells];
+  if (spec === undefined || spec === "auto") {
+    const s = shellOf(io.env["SHELL"]) ?? (io.platform === "win32" ? "pwsh" : undefined);
+    return s === undefined ? [] : [s];
+  }
+  const out = [];
+  for (const n of spec.split(",").map((x) => x.trim())) {
+    const s = shellOf(n);
+    if (s === undefined)
+      return `${n} is not a shell (${shells.join(", ")}, all, auto, none)`;
+    if (!out.includes(s))
+      out.push(s);
+  }
+  return out;
+}
+function table(rows) {
+  if (rows.length === 0)
+    return "no instances were found";
+  const head = ["instance", "from", "host:port", "status", "as", "could", "arca"];
+  const body = rows.map(({ c, p }) => [
+    c.name,
+    c.sources.join(", "),
+    `${c.host ?? "?"}:${c.port ?? 5432}`,
+    p === undefined ? "not looked at" : p.reachable ? p.version ?? "reached" : `not reached: ${(p.error ?? "").slice(0, 60)}`,
+    p?.user ?? "",
+    p === undefined || !p.reachable ? "" : p.level,
+    p === undefined || !p.reachable ? "" : p.arca.models.length > 0 ? p.arca.models.join(", ") : p.arca.exists ? `${p.arca.schema} (${p.arca.tables} tables)` : "none"
+  ]);
+  const w = head.map((h, i) => Math.max(h.length, ...body.map((r) => r[i].length)));
+  return [head, ...body].map((r) => r.map((cell, i) => cell.padEnd(w[i])).join("  ").trimEnd()).join(`
+`);
+}
+async function runInit(argv, io) {
+  const a = parse(argv);
+  const fail = (m) => ({ code: 2, out: "", err: `${m}
+` });
+  if (a.unknown.length > 0)
+    return fail(`init has no option ${a.unknown[0]}`);
+  const mode = modeOf(argv, io.env, io.tty);
+  if (mode.mode === "server")
+    return fail(`init sets up a person's workstation and writes files in a home directory: this run is a server (${mode.why}). In a pipeline, give the environment instead (ARCA_DATABASE_URL, ARCA_DATABASE_URL_FILE); to run init anyway, say --interactive`);
+  const paths = pathsOf({ platform: io.platform, env: io.env });
+  if (paths.kind === "err")
+    return fail(paths.error);
+  const P = paths.value;
+  const read = readState2(P);
+  if (read.kind === "err")
+    return fail(read.error);
+  let state = read.value;
+  const prompt = io.prompt ?? silent;
+  const connect2 = io.connect ?? connect;
+  const json = a.switches.has("--json");
+  const log = [];
+  const say = (s = "") => void log.push(s);
+  const apply = async (changes, modes, what) => {
+    say(`${what}:`);
+    for (const c of changes)
+      say(describe2(c, P));
+    if (changes.every((c) => c.action === "unchanged") && modes.length === 0) {
+      say("  nothing to change");
+      return true;
+    }
+    if (a.switches.has("--dry-run")) {
+      say("  (dry run: nothing was written)");
+      return true;
+    }
+    if (!a.switches.has("--yes")) {
+      if (!prompt.interactive) {
+        say("  nothing was written: run it again with --yes to make these changes");
+        return false;
+      }
+      if (!await prompt.confirm("Make these changes?")) {
+        say("  nothing was written");
+        return false;
+      }
+    }
+    for (const c of changes)
+      applyChange2(c);
+    fixModes({ changes, warnings: [], modes });
+    for (const m of modes)
+      say(`  mode of ${m.path} put right`);
+    for (const c of changes)
+      if (c.action !== "unchanged")
+        say(`  done      ${c.path}`);
+    return true;
+  };
+  const finish = (code, extra = {}) => ({ code, out: json ? `${JSON.stringify({ mode: mode.mode, log, ...extra }, null, 2)}
+` : `${log.join(`
+`)}
+`, err: "" });
+  if (a.switches.has("--undo")) {
+    const plan = planUndo(P);
+    if (plan.kind === "err")
+      return fail(plan.error.map(errorText).join(`
+`));
+    const changes = [...plan.value.changes];
+    const errors = [];
+    for (const sh of shells)
+      for (const f of P.profiles[sh].files) {
+        const c = planBlock(f, "shell", "#", "absent");
+        if (c.kind === "err")
+          errors.push(c.error);
+        else
+          changes.push(c.value);
+      }
+    for (const sh of shells) {
+      const c = planRemoveFile(cacheOf(P, sh));
+      if (c.kind === "err")
+        errors.push(c.error);
+      else
+        changes.push(c.value);
+    }
+    const st = planRemoveFile(P.instances);
+    if (st.kind === "ok")
+      changes.push(st.value);
+    if (errors.length > 0)
+      return fail(errors.map(errorText).join(`
+`));
+    const ok = await apply(changes, [], "Taking away what arcactl init put in");
+    return finish(ok ? 0 : 1);
+  }
+  const urlGiven = a.values.get("--url") ?? (() => {
+    const r = secretOf(io.env, "ARCA_DATABASE_URL");
+    return r.kind === "ok" ? r.value : undefined;
+  })();
+  const found = discover({ paths: P, env: io.env, ...urlGiven === undefined ? {} : { url: urlGiven }, ...a.switches.has("--local") ? { local: true } : {}, state, ...io.env["ERGONEX_HOME"] === undefined ? {} : { workspace: io.env["ERGONEX_HOME"] } });
+  let candidates = [...found.candidates];
+  const wanted = a.values.get("--instance") ?? (candidates.length === 1 && !a.switches.has("--discover") ? undefined : undefined);
+  const looking = a.switches.has("--discover") || wanted === undefined;
+  const rows = [];
+  for (const c of candidates)
+    rows.push({ c, p: looking ? await probe(connect2, c, passwordFor(P, c), a.values.get("--schema") ?? "arca") : undefined });
+  if (looking) {
+    say("Instances you can reach:");
+    say(table(rows));
+    if (found.configs.length > 0)
+      say(`
+In your Ergonex workspace: ${found.configs.join(", ")}`);
+    say();
+  }
+  let name = wanted ?? (prompt.interactive && rows.length > 0 ? await prompt.ask("Which instance is your default? (a name from the list, or a new one)", state.default ?? candidates[0]?.name) : undefined);
+  name = name ?? state.default;
+  let known;
+  let password;
+  let writeService = false;
+  if (name !== undefined) {
+    const have = candidates.find((c) => c.name === name);
+    const host = a.values.get("--host") ?? have?.host ?? (prompt.interactive ? await prompt.ask(`Host of ${name}?`) : undefined);
+    if (host === undefined)
+      return fail(`${name} is not a place arcactl knows, and no --host was given`);
+    const portText = a.values.get("--port") ?? (have?.port === undefined ? undefined : String(have.port));
+    const port = portText === undefined ? undefined : Number(portText);
+    const env = a.values.get("--env") ?? state.instances.find((i) => i.name === name)?.env ?? (prompt.interactive ? await prompt.ask("What is it for? (dev, staging, prod)", "dev") : undefined);
+    const models = a.values.get("--models")?.split(",").map((m) => m.trim()).filter((m) => m !== "");
+    const bad = (models ?? []).find((m) => !modelNames.includes(m));
+    if (bad !== undefined)
+      return fail(`the model ${bad} is not one of: ${modelNames.join(", ")}`);
+    const database = a.values.get("--database") ?? have?.database;
+    const user = a.values.get("--user") ?? have?.user;
+    const sslmode = a.values.get("--sslmode") ?? have?.sslmode;
+    const schema = a.values.get("--schema") ?? state.instances.find((i) => i.name === name)?.schema;
+    known = {
+      name,
+      host,
+      ...port === undefined ? {} : { port },
+      ...database === undefined ? {} : { database },
+      ...user === undefined ? {} : { user },
+      ...sslmode === undefined ? {} : { sslmode },
+      ...env === undefined ? {} : { env },
+      ...schema === undefined ? {} : { schema },
+      ...models === undefined ? state.instances.find((i) => i.name === name)?.models === undefined ? {} : { models: state.instances.find((i) => i.name === name)?.models } : { models }
+    };
+    const inst = { name, host, ...port === undefined ? {} : { port }, ...database === undefined ? {} : { database }, ...user === undefined ? {} : { user }, ...sslmode === undefined ? {} : { sslmode }, ...schema === undefined ? {} : { schema } };
+    const errs = checkInstance(inst);
+    if (errs.length > 0)
+      return fail(errs.map(errorText).join(`
+`));
+    writeService = have?.userService !== true;
+    if (a.switches.has("--password-stdin")) {
+      if (io.stdin === undefined)
+        return fail("--password-stdin needs standard input");
+      password = (await io.stdin()).replace(/\r?\n$/, "");
+    } else if (prompt.interactive && user !== undefined && passwordFor(P, { host, ...port === undefined ? {} : { port }, ...database === undefined ? {} : { database }, user }) === undefined) {
+      const typed = await prompt.secret(`Password of ${user}@${host} (nothing to keep none)`);
+      password = typed === undefined || typed === "" ? undefined : typed;
+    }
+    if (password !== undefined && user === undefined)
+      return fail("a password needs --user, so that .pgpass can say whose it is");
+  }
+  const secrets = password === undefined ? [] : [password];
+  const targets = shellsWanted(a.values.get("--shell"), io);
+  if (typeof targets === "string")
+    return fail(targets);
+  const changes = [];
+  const modes = [];
+  const warnings = [];
+  const errors = [];
+  const take = (r) => {
+    if (r.kind === "err")
+      errors.push(...r.error);
+    else {
+      changes.push(...r.value.changes);
+      warnings.push(...r.value.warnings);
+      modes.push(...r.value.modes);
+    }
+  };
+  if (known !== undefined && password !== undefined && known.user !== undefined) {
+    const cred = { host: known.host, port: String(known.port ?? 5432), database: known.database ?? "*", user: known.user, password };
+    const ce = checkCredential(cred);
+    if (ce.length > 0)
+      return fail(ce.map(errorText).join(`
+`));
+    take(planPgpass(P, { set: [cred] }));
+  }
+  if (known !== undefined && writeService) {
+    const ours = readInstances(P);
+    if (ours.kind === "err")
+      errors.push(...ours.error);
+    else {
+      const inst = { name: known.name, host: known.host, ...known.port === undefined ? {} : { port: known.port }, ...known.database === undefined ? {} : { database: known.database }, ...known.user === undefined ? {} : { user: known.user }, ...known.sslmode === undefined ? {} : { sslmode: known.sslmode }, ...known.schema === undefined ? {} : { schema: known.schema } };
+      take(planServices(P, [...ours.value.filter((i) => i.name !== known?.name), inst]));
+    }
+  }
+  if (!a.switches.has("--no-psql"))
+    take(planPsql(P));
+  if (known !== undefined)
+    state = withInstance(state, { ...known, ...writeService ? { ownsService: true } : {} }, true);
+  const installed = state.profiles.filter((p) => !targets.includes(p.shell));
+  const current = state.instances.find((i) => i.name === state.default);
+  for (const sh of targets) {
+    const cache = cacheOf(P, sh);
+    const cc = planWhole(cache, scriptFor(sh, P, current));
+    if (cc.kind === "err")
+      errors.push(cc.error);
+    else
+      changes.push(cc.value);
+    const files = profileTargets(P.profiles[sh], existsSync6);
+    for (const f of files) {
+      const b = planBlock(f, "shell", "#", { body: profileBody(sh, cache) });
+      if (b.kind === "err")
+        errors.push(b.error);
+      else
+        changes.push(b.value);
+    }
+    installed.push({ shell: sh, files, cache });
+  }
+  for (const p of installed.filter((x) => !targets.includes(x.shell))) {
+    const cc = planWhole(p.cache, scriptFor(p.shell, P, current));
+    if (cc.kind === "ok")
+      changes.push(cc.value);
+  }
+  state = { ...state, profiles: installed };
+  const stateChange = planState(P, state);
+  if (stateChange.kind === "err")
+    errors.push(stateChange.error);
+  else
+    changes.push(stateChange.value);
+  if (errors.length > 0)
+    return fail(errors.map((e) => redact(errorText(e), secrets)).join(`
+`));
+  for (const w of warnings)
+    say(`note: ${w}`);
+  const done = await apply(changes, modes, "Setting up your workstation");
+  if (!done)
+    return finish(1);
+  if (a.switches.has("--dry-run"))
+    return finish(0);
+  say();
+  say("Checking your workstation:");
+  const report = await workstationChecks({ paths: P, state, connect: connect2, ...io.psqlVersion === undefined ? {} : { psqlVersion: io.psqlVersion } });
+  for (const r of report.results)
+    say(`  ${r.status === "pass" ? "PASS" : r.status === "warn" ? "WARN" : r.status === "fail" ? "FAIL" : "?   "}  ${r.id}  ${r.title}: ${redact(r.detail, secrets)}${r.next === undefined ? "" : `
+        next: ${r.next}`}`);
+  return finish(report.code, { checks: report.results });
+}
+
 // sql/cli/main.ts
 var USAGE = `arcactl: manage and check an arca database in PostgreSQL
 
   arcactl doctor [options]     check the database against the models (read-only)
   arcactl shell [options]      print the script that sets up this shell (source it; writes nothing)
+  arcactl init [options]       set up your workstation (not a database): find your instances, .pgpass, pg_service.conf, psql and shell profiles
 
 options:
   --config <file>     arca.config.ts (default: ./arca.config.ts where there is one)
   --models <a,b,...>  the models wanted, where there is no config: ${modelNames.join(", ")}
   --schema <name>     the schema the tables are in (default: arca)
-  --check <ids>       only these checks, as ARCA-D001,ARCA-D005
+  --check <ids>       only these checks, as ARCA-D001,ARCA-D005 (ARCA-W001... are the workstation's)
+  --scope <s>         instance (the database, the default), workstation (your files and tools) or all
   --json              machine-readable output
   --url <url>         connection URL; prefer ARCA_DATABASE_URL (or ARCA_DATABASE_URL_FILE), since arguments show in the process list
   --driver <bun|pg>   the client: Bun's own (default on Bun) or pg (default on Node); also ARCA_DRIVER
@@ -7774,6 +8983,9 @@ function shellCommand(given, io) {
 `) ? r.value : `${r.value}
 `, err: "" };
 }
+var MARKS = { pass: "PASS", warn: "WARN", fail: "FAIL", unknown: "?   " };
+var renderWorkstation = (results, r) => [...results.flatMap((x) => [`${MARKS[x.status]}  ${x.id}  ${x.title}`, `      ${x.detail}`, ...x.next === undefined ? [] : [`      next: ${x.next}`]]), "", `${r.summary.pass} passed, ${r.summary.warn} warned, ${r.summary.fail} failed, ${r.summary.unknown} could not be checked`].join(`
+`);
 var opt4 = (k, v) => v === undefined || v === "" ? {} : { [k]: v };
 var flag = (argv, name) => {
   const i = argv.indexOf(name);
@@ -7786,6 +8998,10 @@ async function main(argv, io) {
     return { code: command === undefined ? 2 : 0, out: command === undefined ? "" : USAGE, err: command === undefined ? USAGE : "" };
   if (command === "shell")
     return shellCommand(argv.slice(1), io);
+  if (command === "init") {
+    const plat = io.platform ?? (process.platform === "win32" ? "win32" : process.platform === "darwin" ? "darwin" : "linux");
+    return runInit(argv.slice(1), { env: io.env, platform: plat, cwd: io.cwd, tty: io.tty ?? false, ...io.prompt === undefined ? {} : { prompt: io.prompt }, ...io.stdin === undefined ? {} : { stdin: io.stdin }, ...io.connect === undefined ? {} : { connect: io.connect }, ...io.psqlVersion === undefined ? {} : { psqlVersion: io.psqlVersion } });
+  }
   if (command !== "doctor")
     return { code: 2, out: "", err: `arcactl has no command ${command}
 
@@ -7799,13 +9015,35 @@ ${USAGE}` };
 ` });
   if (fromEnv.kind === "err")
     return fail(fromEnv.error);
-  const file = flag(given, "--config") ?? (existsSync(resolve2(io.cwd, "arca.config.ts")) ? "arca.config.ts" : undefined);
+  const file = flag(given, "--config") ?? (existsSync7(resolve2(io.cwd, "arca.config.ts")) ? "arca.config.ts" : undefined);
   let base;
   if (file !== undefined) {
     const loaded = await loadConfig(resolve2(io.cwd, file));
     if (loaded.kind === "err")
       return fail(loaded.error);
     base = loaded.value;
+  }
+  const scope = flag(given, "--scope") ?? "instance";
+  if (scope !== "instance" && scope !== "workstation" && scope !== "all")
+    return fail(`--scope is instance, workstation or all, not ${scope}`);
+  let workstation;
+  if (scope !== "instance") {
+    if (mode.mode === "server")
+      return fail("the workstation checks are for a person's workstation: this run is a server (the checks of the database are --scope instance)");
+    const plat = io.platform ?? (process.platform === "win32" ? "win32" : process.platform === "darwin" ? "darwin" : "linux");
+    const paths = pathsOf({ platform: plat, env: io.env });
+    if (paths.kind === "err")
+      return fail(paths.error);
+    const st = readState2(paths.value);
+    if (st.kind === "err")
+      return fail(st.error);
+    const only = flag(given, "--check")?.split(",").map((x) => x.trim()).filter((x) => workstationIds.includes(x));
+    workstation = await workstationChecks({ paths: paths.value, state: st.value, connect: io.connect ?? connect, ...io.psqlVersion === undefined ? {} : { psqlVersion: io.psqlVersion } }, scope === "workstation" ? only : only);
+    if (scope === "workstation") {
+      const text = given.includes("--json") ? JSON.stringify({ ...workstation, mode: mode.mode, scope }, null, 2) : renderWorkstation(workstation.results, workstation);
+      return { code: workstation.code, out: `${redact(text, secrets)}
+`, err: "" };
+    }
   }
   const models = flag(given, "--models")?.split(",").map((m) => m.trim()).filter((m) => m !== "");
   const schema = flag(given, "--schema");
@@ -7820,7 +9058,7 @@ ${USAGE}` };
     return fail(made.error.map(says).join(`
 `));
   const only = flag(given, "--check")?.split(",").map((s) => s.trim());
-  const unknown = (only ?? []).filter((c) => !checkIds.includes(c));
+  const unknown = (only ?? []).filter((c) => !checkIds.includes(c) && !workstationIds.includes(c));
   if (unknown.length > 0)
     return fail(`no such check: ${unknown.join(", ")} (they are ${checkIds.join(", ")})`);
   let connection;
@@ -7833,7 +9071,8 @@ ${USAGE}` };
     return fail(`could not connect: ${thrown instanceof Error ? thrown.message : String(thrown)}`);
   }
   try {
-    const report = await doctor(connection.driver, config.value, made.value.schema, { secrets, ...only === undefined ? {} : { only } });
+    const instance = await doctor(connection.driver, config.value, made.value.schema, { secrets, ...only === undefined ? {} : { only: only.filter((c) => checkIds.includes(c)) } });
+    const report = workstation === undefined ? instance : { results: [...workstation.results, ...instance.results], summary: { pass: workstation.summary.pass + instance.summary.pass, warn: workstation.summary.warn + instance.summary.warn, fail: workstation.summary.fail + instance.summary.fail, unknown: workstation.summary.unknown + instance.summary.unknown }, code: workstation.code === 0 && instance.code === 0 ? 0 : 1 };
     const text = given.includes("--json") ? JSON.stringify({ ...report, mode: mode.mode, schema: config.value.schema, models: config.value.models }, null, 2) : renderReport(report);
     return { code: report.code, out: `${redact(text, secrets)}
 `, err: "" };
@@ -7842,8 +9081,50 @@ ${USAGE}` };
   }
 }
 
+// sql/cli/prompt.ts
+import { createInterface } from "node:readline";
+import { Writable } from "node:stream";
+function terminalPrompter() {
+  const line = (question, hide) => new Promise((resolve) => {
+    let muted = false;
+    const output = new Writable({
+      write(chunk, enc, cb) {
+        if (!muted)
+          process.stderr.write(chunk, enc);
+        cb();
+      }
+    });
+    const rl = createInterface({ input: process.stdin, output, terminal: true });
+    rl.question(question, (answer) => {
+      rl.close();
+      if (hide)
+        process.stderr.write(`
+`);
+      resolve(answer);
+    });
+    muted = hide;
+    rl.on("close", () => resolve(undefined));
+  });
+  return {
+    interactive: true,
+    ask: async (q, fallback) => {
+      const a = await line(fallback === undefined ? `${q} ` : `${q} [${fallback}] `, false);
+      return a === undefined ? undefined : a.trim() === "" ? fallback : a.trim();
+    },
+    secret: (q) => line(`${q} `, true),
+    confirm: async (q) => /^y(es)?$/i.test((await line(`${q} [y/N] `, false))?.trim() ?? "")
+  };
+}
+
 // sql/cli/arcactl.ts
-var result = await main(process.argv.slice(2), { env: process.env, cwd: process.cwd() });
+var tty = process.stdin.isTTY === true && process.stdout.isTTY === true;
+var readStdin = async () => {
+  const chunks = [];
+  for await (const c of process.stdin)
+    chunks.push(c);
+  return Buffer.concat(chunks).toString("utf8");
+};
+var result = await main(process.argv.slice(2), { env: process.env, cwd: process.cwd(), tty, ...tty ? { prompt: terminalPrompter() } : {}, stdin: readStdin });
 if (result.out !== "")
   process.stdout.write(result.out);
 if (result.err !== "")

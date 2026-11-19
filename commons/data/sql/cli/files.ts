@@ -13,7 +13,7 @@ import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel"
 import { type BlockError, type Style, withBlock, withoutBlock } from "./blocks.ts";
 
 /** What a planned change does to a file. */
-export type Action = "create" | "update" | "unchanged";
+export type Action = "create" | "update" | "unchanged" | "remove";
 
 /** A change to one file, planned and not made. */
 export interface Change {
@@ -69,6 +69,45 @@ export function planBlock(path: string, name: string, style: Style, want: Want, 
   return ok({ path, target, through, action, before, after: next.value, mode });
 }
 
+/**
+ * Plans the change of a file that `arcactl` owns whole (its state, its cache): the file is the text, or is made.
+ *
+ * @param path - the file
+ * @param text - what the file is to hold
+ * @param mode - the mode of a file that is made new
+ * @returns the change
+ */
+export function planWhole(path: string, text: string, mode = 0o644): Result<Change, FileError> {
+  let target = path;
+  let through = false;
+  let before: string | undefined;
+  try {
+    if (lstatSync(path, { throwIfNoEntry: false }) !== undefined) {
+      if (lstatSync(path).isSymbolicLink()) {
+        target = realpathSync(path);
+        through = true;
+      }
+      if (statSync(target).isDirectory()) return err({ kind: "unreadable", path, why: "it is a directory" });
+      before = readFileSync(target, "utf8");
+    }
+  } catch (thrown) {
+    return err({ kind: "unreadable", path, why: thrown instanceof Error ? thrown.message : String(thrown) });
+  }
+  return ok({ path, target, through, action: before === undefined ? "create" : before === text ? "unchanged" : "update", before, after: text, mode });
+}
+
+/** Plans removing a file that `arcactl` owns whole: nothing where it is not there. A directory is refused. */
+export function planRemoveFile(path: string): Result<Change, FileError> {
+  try {
+    const st = lstatSync(path, { throwIfNoEntry: false });
+    if (st === undefined) return ok({ path, target: path, through: false, action: "unchanged", before: undefined, after: "", mode: 0o644 });
+    if (st.isDirectory()) return err({ kind: "unreadable", path, why: "it is a directory" });
+    return ok({ path, target: path, through: false, action: "remove", before: st.isSymbolicLink() ? "" : readFileSync(path, "utf8"), after: "", mode: st.mode & 0o7777 });
+  } catch (thrown) {
+    return err({ kind: "unreadable", path, why: thrown instanceof Error ? thrown.message : String(thrown) });
+  }
+}
+
 /** The difference between two texts as lines, `-` for a line that goes and `+` for one that comes (a line common to both is left out, with a line of context kept around a change). */
 export function diffOf(before: string | undefined, after: string): string {
   const a = before === undefined || before === "" ? [] : before.split(/\r?\n/);
@@ -110,6 +149,10 @@ export interface Applied {
  */
 export function applyChange(change: Change): Applied {
   if (change.action === "unchanged") return { path: change.path, action: "unchanged" };
+  if (change.action === "remove") {
+    unlinkSync(change.path);
+    return { path: change.path, action: "remove" };
+  }
   mkdirSync(dirname(change.target), { recursive: true });
   let backup: string | undefined;
   let mode = change.mode;

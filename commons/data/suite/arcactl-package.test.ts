@@ -69,7 +69,7 @@ proves(
       const staged = await stage();
       const pack = await run(bun, ["pm", "pack", "--destination", work], { PATH: dirname(bun) }, undefined, 120000, staged);
       assert(pack.code === 0, pack.err);
-      const tgz = join(work, "intellectual-frontiers-arcactl-0.1.0.tgz");
+      const tgz = join(work, `intellectual-frontiers-arcactl-${library.version}.tgz`);
       assert(existsSync(tgz), `${tgz} is made`);
       const url = `postgres://postgres@127.0.0.1:${db.port}/postgres?sslmode=disable`;
       const args = ["doctor", "--models", "identityAgent", "--url", url, "--json"];
@@ -82,7 +82,7 @@ proves(
       assert(install.code === 0, install.err);
       const command = join(project, "node_modules", ".bin", "arcactl");
       assert(existsSync(command), "npm made the command");
-      same(readFileSync(join(project, "node_modules", PACKAGE, "package.json"), "utf8").includes('"version": "0.1.0"'), true);
+      same(readFileSync(join(project, "node_modules", PACKAGE, "package.json"), "utf8").includes(`"version": "${library.version}"`), true);
       // on Bun: the command, which `bun` runs from the file
       const bundle = join(project, "node_modules", PACKAGE, "arcactl.mjs");
       const help = await run(bun, [bundle, "--help"], env);

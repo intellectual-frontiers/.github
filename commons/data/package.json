@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/data",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Intellectual Frontiers data: governance, a logical and a physical schema, and extensions, built on IFC TypeScript's kernel. Phase 0 spike.",
   "type": "module",
   "engines": {

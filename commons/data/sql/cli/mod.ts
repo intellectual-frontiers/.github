@@ -15,3 +15,10 @@ export { type Chosen, mayAsk, mayWriteHome, type Mode, modeOf, type Read, secret
 export { type Host, isPlatform, type Paths, pathsOf, type Platform, type Profile, profileTargets, type Shell, shellOf, shells } from "./workstation.ts";
 export { type Command, commands, envJson, pgoptionsOf, quoteFish, quoteNu, quotePosix, quotePwsh, type ShellInput, shellScript, variablesOf } from "./shell.ts";
 export { type Credential, checkCredential, checkInstance, fixModes, type Instance, type Key, type Plan, type PgpassChange, parsePgpass, parseServices, pgpassLine, planPgpass, planPsql, planServices, planUndo, psqlrcBody, readInstances, serviceSection, splitPgpass, type WriteError } from "./libpq.ts";
+export { type Candidate, discover, type Level, passwordFor, type Probe, probe, tablesOfModel, urlOf, workspaceConfigs } from "./discover.ts";
+export { type InitIo, runInit } from "./init.ts";
+export { cacheOf, inputOf, profileBody, scriptFor } from "./profile.ts";
+export { type Prompter, silent, terminalPrompter } from "./prompt.ts";
+export { emptyState, type Installed, type Known, planState, readState, type State, stateText, withInstance } from "./state.ts";
+export { type Workstation, workstationChecks, workstationIds } from "./workstation-checks.ts";
+export { planRemoveFile, planWhole } from "./files.ts";
