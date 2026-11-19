@@ -12,11 +12,16 @@ import { type ArcaConfig, type ConfigError, loadConfig, type ModelName, modelNam
 import { type Connection, connect as realConnect, type ConnectOptions } from "./connection.ts";
 import { checkIds, doctor, renderReport } from "./doctor.ts";
 import { passwordOf, redact } from "./redact.ts";
+import { modeOf, secretOf } from "./server.ts";
 
 /** What the command line is given besides its arguments. */
 export interface Io {
   readonly env: Readonly<Record<string, string | undefined>>;
   readonly cwd: string;
+  /** Whether input and output are a terminal, which decides between the workstation and the server (0047-arcactl-init FR-004). */
+  readonly tty?: boolean;
+  /** Reads a file, for a secret given as `<NAME>_FILE`. */
+  readonly read?: (path: string) => string;
   /** Makes the connection; the real one by default, and a test's own where a test gives one. */
   readonly connect?: (o: ConnectOptions) => Promise<Connection>;
 }
@@ -38,7 +43,8 @@ options:
   --schema <name>     the schema the tables are in (default: arca)
   --check <ids>       only these checks, as ARCA-D001,ARCA-D005
   --json              machine-readable output
-  --url <url>         connection URL; prefer ARCA_DATABASE_URL, since arguments show in the process list
+  --url <url>         connection URL; prefer ARCA_DATABASE_URL (or ARCA_DATABASE_URL_FILE), since arguments show in the process list
+  --non-interactive   run as a server (pipelines, containers): nothing is asked and no home file is written; also ARCA_MODE=server, CI=true, or no terminal
   -h, --help
 
 The connection comes from ARCA_DATABASE_URL, or from libpq's own environment (PGHOST, PGUSER, PGDATABASE, ...) and files (.pgpass, pg_service.conf), as psql does. A password is never an option.`;
@@ -57,9 +63,12 @@ export async function main(argv: readonly string[], io: Io): Promise<Outcome> {
   if (command === undefined || command === "-h" || command === "--help" || command === "help") return { code: command === undefined ? 2 : 0, out: command === undefined ? "" : USAGE, err: command === undefined ? USAGE : "" };
   if (command !== "doctor") return { code: 2, out: "", err: `arcactl has no command ${command}\n\n${USAGE}` };
   const given = argv.slice(1);
-  const url = flag(given, "--url") ?? io.env["ARCA_DATABASE_URL"];
+  const mode = modeOf(argv, io.env, io.tty ?? false);
+  const fromEnv = secretOf(io.env, "ARCA_DATABASE_URL", io.read);
+  const url = flag(given, "--url") ?? (fromEnv.kind === "ok" ? fromEnv.value : undefined);
   const secrets = [passwordOf(url), io.env["PGPASSWORD"]].filter((s): s is string => s !== undefined);
   const fail = (m: string): Outcome => ({ code: 2, out: "", err: `${redact(m, secrets)}\n` });
+  if (fromEnv.kind === "err") return fail(fromEnv.error);
   // the configuration: the file, then the flags over it
   const file = flag(given, "--config") ?? (existsSync(resolve(io.cwd, "arca.config.ts")) ? "arca.config.ts" : undefined);
   let base: ArcaConfig | undefined;
@@ -86,7 +95,7 @@ export async function main(argv: readonly string[], io: Io): Promise<Outcome> {
   }
   try {
     const report = await doctor(connection.driver, config.value, made.value.schema, { secrets, ...(only === undefined ? {} : { only }) });
-    const text = given.includes("--json") ? JSON.stringify({ ...report, schema: config.value.schema, models: config.value.models }, null, 2) : renderReport(report);
+    const text = given.includes("--json") ? JSON.stringify({ ...report, mode: mode.mode, schema: config.value.schema, models: config.value.models }, null, 2) : renderReport(report);
     return { code: report.code, out: `${redact(text, secrets)}\n`, err: "" };
   } finally {
     await connection.close();
