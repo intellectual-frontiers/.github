@@ -13,6 +13,7 @@
  * @module
  */
 import process from "node:process";
+import { readdirSync, rmSync } from "node:fs";
 import { fs, path, proc } from "@intellectual-frontiers/commons/ts/runtime";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
@@ -92,6 +93,8 @@ if (import.meta.main) {
     process.exit(0);
   }
   const bun = proc.which("bun") ?? "bun";
+  // one tarball in dist/: an older one would be published with it
+  for (const f of readdirSync(path.join(ROOT, "dist"))) if (f.endsWith(".tgz")) rmSync(path.join(ROOT, "dist", f));
   const packed = await proc.run([bun, "pm", "pack", "--destination", path.join(ROOT, "dist")], { cwd: dir });
   if (packed.code !== 0) {
     console.error(`bun pm pack stopped: ${packed.stderr || packed.stdout}`);
