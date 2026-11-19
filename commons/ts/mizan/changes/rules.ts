@@ -43,7 +43,6 @@ export type ChangesRule =
   | "changes/gate-relaxed"
   | "changes/early-close"
   | "changes/issue-shape"
-  | "changes/no-parent"
   | "changes/no-decision"
   | "changes/self-approved"
   | "changes/declaration";
@@ -57,7 +56,6 @@ export const CHANGES_RULES: readonly ChangesRule[] = [
   "changes/gate-relaxed",
   "changes/early-close",
   "changes/issue-shape",
-  "changes/no-parent",
   "changes/no-decision",
   "changes/self-approved",
   "changes/declaration",
@@ -69,7 +67,6 @@ export const STRICT_RULES: readonly ChangesRule[] = [
   "changes/closed-issue",
   "changes/early-close",
   "changes/issue-shape",
-  "changes/no-parent",
 ];
 
 /** A finding of the `changes` check: a Mizan finding with the phase it was found in. */
@@ -231,7 +228,7 @@ export const CAPABILITY_LABEL = "capability";
 
 /**
  * The strict findings (0020-ifccm FR-006, FR-009): a change request that does not exist, a `Refs` on one already closed, a `Closes` on one whose checkbox items are not all ticked, and a `Closes` on a
- * capability whose sections are missing or out of order, and one that has no parent (0020-ifccm FR-002). `answers` is keyed by `owner/repo#N` or `#N` as `namedIssues` writes it; a reference with no answer, or a `not_run`, is judged by no rule.
+ * capability whose sections are missing or out of order, (0020-ifccm FR-003). `answers` is keyed by `owner/repo#N` or `#N` as `namedIssues` writes it; a reference with no answer, or a `not_run`, is judged by no rule.
  */
 export function strictFindings(
   commits: readonly CommitFacts[],
@@ -265,16 +262,6 @@ export function strictFindings(
             phase,
             c.sha,
             `Closes ${id}, but ${open.length} item${open.length === 1 ? " is" : "s are"} not ticked: "${open[0]?.text.slice(0, 50) ?? ""}"`,
-            id,
-          ),
-        );
-      if (a.issue.labels.includes(CAPABILITY_LABEL) && a.issue.parent === undefined)
-        out.push(
-          found(
-            "changes/no-parent",
-            phase,
-            c.sha,
-            `Closes ${id}, a capability that is not a child change request of the parent of its area`,
             id,
           ),
         );

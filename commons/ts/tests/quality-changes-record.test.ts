@@ -76,13 +76,7 @@ proves(
           ["pass"],
           rule,
         );
-      for (const rule of [
-        "changes/unknown-issue",
-        "changes/closed-issue",
-        "changes/early-close",
-        "changes/issue-shape",
-        "changes/no-parent",
-      ]) {
+      for (const rule of ["changes/unknown-issue", "changes/closed-issue", "changes/early-close", "changes/issue-shape"]) {
         const c = byRule(q, rule);
         assertEquals(
           c.map((x) => x.outcome),
@@ -91,7 +85,7 @@ proves(
         );
         assertEquals(c[0]?.reason, "--strict was not given, so the host was not asked", rule);
       }
-      assertEquals([q.counts.failed, q.counts.notRun], [1, 5]);
+      assertEquals([q.counts.failed, q.counts.notRun], [1, 4]);
       // the finding renders as a SARIF result with its rule
       const results = list(at(parsed(sarif(q)), "runs", 0, "results"));
       assertEquals(
@@ -103,7 +97,7 @@ proves(
       const strict = await changes("--repo", repo, "--range", `${first}..HEAD`, "--strict");
       assertEquals(strict.code, 1, strict.stderr);
       const s = leftRecord(repo);
-      for (const rule of ["changes/unknown-issue", "changes/early-close", "changes/no-parent"]) {
+      for (const rule of ["changes/unknown-issue", "changes/early-close"]) {
         const c = byRule(s, rule);
         assertEquals(
           c.map((x) => x.outcome),

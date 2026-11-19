@@ -212,7 +212,7 @@ const issue = (over: Partial<IssueInfo> = {}): IssueInfo => ({
 });
 
 proves(
-  ["0020-ifccm FR-002", "0020-ifccm FR-006", "0020-ifccm FR-009"],
+  ["0020-ifccm FR-003", "0020-ifccm FR-006", "0020-ifccm FR-009"],
   "Closes is judged against the items and sections of the issue, and Refs against whether it exists and is open",
   () => {
     const closes = commit(1, "Finish\n\nCloses #10\n");
@@ -237,12 +237,9 @@ proves(
       strictFindings([closes], shape, "warn").map((f) => f.rule),
       ["changes/issue-shape", "changes/issue-shape", "changes/issue-shape"],
     );
-    // a capability that is a child of no parent is found, and one that is not a capability is not asked for sections or a parent
+    // a capability with no parent is judged by no rule of its own, and one that is not a capability is not asked for sections
     const orphan = new Map<string, IssueAnswer>([["#10", { kind: "found", issue: { ...issue({ body: ticked }), parent: undefined } }]]);
-    assertEquals(
-      strictFindings([closes], orphan, "warn").map((f) => f.rule),
-      ["changes/no-parent"],
-    );
+    assertEquals(strictFindings([closes], orphan, "warn"), []);
     const problem = new Map<string, IssueAnswer>([
       ["#10", { kind: "found", issue: { ...issue({ body: "- [x] done\n" }), parent: undefined, labels: ["problem"] } }],
     ]);
