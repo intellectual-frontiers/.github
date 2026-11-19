@@ -275,7 +275,6 @@ proves(
         // every call is a row, by index, with the arguments only as a hash
         const calls = await e.rows(`SELECT "call_index" i, "decision" d FROM "tool_call" ORDER BY "call_index"`);
         same(calls.map((c) => [Number(c["i"]), c["d"]]), [[1, "allowed"], [2, "approval_required"], [3, "denied"], [4, "allowed"], [5, "denied"], [6, "allowed"], [7, "budget_exceeded"]], name);
-        assert(!JSON.stringify(await e.rows(`SELECT * FROM "tool_call"`)).includes("OTHER") || true);
         // a version that is revoked is pulled from every run
         await e.run(`UPDATE "agent_version" SET "status" = 'revoked' WHERE "agent_version_id" = 'v1'`);
         same((await call(8, "tl-read"))["status"], "version-not-allowed", `${name}: revoking a version pulls it from the run`);
