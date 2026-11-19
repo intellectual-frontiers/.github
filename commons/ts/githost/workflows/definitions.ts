@@ -73,6 +73,8 @@ export type LibraryCi = {
   readonly afterVerify?: readonly Step[];
   /** The command that runs the tests on Node 26, the backup runtime, in a job of its own. */
   readonly nodeTests?: string;
+  /** The systems the library's jobs run on, in order of their importance to it; the first only (Linux) where it names none. */
+  readonly systems?: readonly ("windows-latest" | "macos-latest" | "ubuntu-latest")[];
 };
 
 /** The facts of CI of the libraries that have more than `verify`, by the library's name. */
@@ -91,6 +93,14 @@ export const LIBRARY_CI: Readonly<Record<string, LibraryCi>> = {
     ],
     nodeTests: 'node --test "suite/**/*.test.ts"',
   },
+  ergonex: {
+    comment: lines(
+      "Ergonex, the workspaces management of Intellectual Frontiers, a library of commons (commons 0027-commons-libraries FR-010): its own `verify` on Bun and its tests on Node 26, the backup runtime,",
+      "on Windows first, then macOS and Linux (ergonex 0004-onboarding): a person on any of them installs the command from npm and runs it.",
+    ).trimEnd(),
+    nodeTests: 'node --test "suite/**/*.test.ts"',
+    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
+  },
 };
 
 /** The workflow of a library of commons, made from its manifest (FR-006): its `verify` on Bun when its folder or what it imports changes, and its tests on Node where its record says so. */
@@ -98,8 +108,13 @@ export function libraryWorkflow(l: LibraryFacts): Workflow {
   const folder = `commons/${l.name}`;
   const ci = LIBRARY_CI[l.name];
   const paths = l.paths;
+  const systems = ci?.systems;
+  const onSystems =
+    systems === undefined
+      ? { runsOn: "ubuntu-latest" as const }
+      : { runsOn: expr("matrix.os"), strategy: { failFast: false, matrix: { os: systems } } };
   const verify = job({
-    runsOn: "ubuntu-latest",
+    ...onSystems,
     timeoutMinutes: 15,
     steps: [
       checkout(),
@@ -114,7 +129,7 @@ export function libraryWorkflow(l: LibraryFacts): Workflow {
       ? {}
       : {
           node: job({
-            runsOn: "ubuntu-latest",
+            ...onSystems,
             timeoutMinutes: 15,
             steps: [
               checkout(),

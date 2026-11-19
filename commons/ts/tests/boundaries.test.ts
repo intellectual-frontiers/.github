@@ -308,6 +308,8 @@ proves(
       "./ts/mizan": "./mizan/mod.ts",
       "./ts/mizan/integrations": "./mizan/integrations/mod.ts",
       "./ts/mizan/changes": "./mizan/changes.ts",
+      "./ts/mizan/changes/commit-message": "./mizan/changes/commit-message.ts",
+      "./ts/mizan/changes/declaration": "./mizan/changes/declaration.ts",
       "./ts/mizan/check": "./mizan/check.ts",
       "./ts/mizan/oscal-register": "./mizan/oscal-register.ts",
       "./ts/mizan/versions": "./mizan/versions.ts",
