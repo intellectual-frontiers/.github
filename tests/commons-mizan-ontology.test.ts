@@ -63,7 +63,7 @@ proves(
     const expected = [
       "generated/mizan-audit-packaging.auto.ttl",
       "generated/mizan-catalog.auto.ttl",
-      ...["mizan", "ifccm", "ifqs", "ifws", "ifr"].flatMap((name) => [
+      ...["mizan", "ifccm", "ifqs", "ifr"].flatMap((name) => [
         `generated/${name}-code-lists.auto.skos.ttl`,
         `generated/${name}-code-lists.auto.sql`,
         `generated/${name}-mappings.auto.sssom.tsv`,
@@ -307,7 +307,7 @@ for dataset in datasets:
         assert (d, DCT.license, None) in cat and (d, DCT.title, None) in cat
         by_file[url.split("/")[-1]] = media[len(IANA):]
     assert by_file[name + ".auto.rdf"] == "application/rdf+xml" and by_file[name + ".auto.ttl"] == "text/turtle" and by_file[name + "-schemas.auto.json"] == "application/schema+json", by_file
-assert names == {"mizan", "ifccm", "ifqs", "ifws", "ifr"}, names
+assert names == {"mizan", "ifccm", "ifqs", "ifr"}, names
 print("independent tools agree")
 `;
 

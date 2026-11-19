@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** Intellectual Frontiers Workspaces (Ergonex, `commons/ts/workspaces/`) is the managed place on a person's or an agent's computer where the repositories, worktrees, approved tools, policy and generated workspace files of Intellectual Frontiers live: one root, a layout that mirrors the Git remotes, paths that are valid on Linux, macOS and Windows alike, a plan that is shown before anything is done, and evidence of every run. It is rung 10 of the ladder (commons 0016-ladder), the rung of the environment the other rungs are worked in. "Mizan" names only the specifications and ontology strategy this specification is written in; the product is Ergonex and its command is `ergonex` (0001-ergonex).
+**Input:** Intellectual Frontiers Workspaces (Ergonex, `commons/ergonex/`) is the managed place on a person's or an agent's computer where the repositories, worktrees, approved tools, policy and generated workspace files of Intellectual Frontiers live: one root, a layout that mirrors the Git remotes, paths that are valid on Linux, macOS and Windows alike, a plan that is shown before anything is done, and evidence of every run. It is rung 10 of the ladder (commons 0016-ladder), the rung of the environment the other rungs are worked in. "Mizan" names only the specifications and ontology strategy this specification is written in; the product is Ergonex and its command is `ergonex` (0001-ergonex).
 
 ## The workspace
 
@@ -13,7 +13,7 @@
 - **FR-002**: The workspace's own area MUST be `<home>/.ergonex/`, holding the typed manifest `workspace.ts`, the generated files (`*.auto.*`), the state record, the evidence records (`evidence/`), the installed tools (`tools/`), the Git hooks (`hooks/`) and `modules.auto.json`; nothing else of Ergonex MAY be outside the repositories and worktrees.
 - **FR-003**: Ergonex MUST read and write only inside the root, with these exceptions, each opt-in and each the work of `ergonex setup` alone (0001-ergonex FR-017, FR-020): the shell snippet block and the global Git include of 0003-host, and the Windows long-path setting of 0001-ergonex; it MUST NOT read a private key, a credential store or any file of `~/.ssh`.
 - **FR-004**: Ergonex MUST manage only the workspace: it MUST NOT be a dotfiles or user-profile manager, and the scope statement of `ergonex` is that it manages only Intellectual Frontiers Workspaces, is not a general IFC or Mizan controller and does not front `ifc` (0001-ergonex FR-002).
-- **FR-005**: The library, its command and its templates MUST live in `commons/ts/workspaces/` and be on rung 10 of the ladder, whose kind is environment (commons 0016-ladder FR-010); a rung below MUST NOT import it.
+- **FR-005**: The library, its command and its templates MUST live in `commons/ergonex/` and be on rung 10 of the ladder, whose kind is environment (commons 0016-ladder FR-010); a rung below MUST NOT import it.
 
 ## Layout
 

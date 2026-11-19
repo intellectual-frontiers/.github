@@ -56,21 +56,11 @@ export const about: About = {
     },
     {
       path: "githost/",
-      what: "The one interface to a Git host (commons 0023-if-workspaces): the types and the reading of a remote URL (pure), and the adapters for GitHub (REST v3), GitLab (REST v4, groups to any depth) and plain Git, with `clientFor`, the one place that reads a token, and only from the environment it is given.",
+      what: "The one interface to a Git host (commons 0020-ifccm): the types and the reading of a remote URL (pure), and the adapters for GitHub (REST v3), GitLab (REST v4, groups to any depth) and plain Git, with `clientFor`, the one place that reads a token, and only from the environment it is given.",
       mayImport: [
         "kernel/",
         "runtime/ (the adapters; the types, the table of capabilities and the remote reader import the kernel alone)",
         "githost/",
-      ],
-    },
-    {
-      path: "workspaces/",
-      what: "IF Workspaces, rung 10 of the ladder (commons 0023-if-workspaces, 0024-ifws-host, 0025-ifws): the branded types, the layout from a remote to a path, the portability of paths, the manifest, the state of a repository, the plan as a pure function, the findings and the policy, the typed templates and the generated files, the state record, the module contract and its discovery, the shell snippet and its one block, and the doctor's checks, all pure; `host/` (git, files, the lock, the evidence record, discovery), `commands/` (the typed built-in modules of `ifws`) and `ifws.ts` (the controller) are the host layer, which runs the real `git`.",
-      mayImport: [
-        "kernel/",
-        "githost/ (types, capabilities and the remote reader)",
-        "workspaces/ (the pure part imports no host layer)",
-        "runtime/, quality/ and mizan/changes/ (the host layer alone: host/, commands/, ifws.ts)",
       ],
     },
     {
@@ -80,8 +70,8 @@ export const about: About = {
     },
     {
       path: "node/",
-      what: "The Node hook that strips the types of this package's sources under `node_modules`, and the commands `ifc` and `ifws`, in JavaScript.",
-      mayImport: ["node: builtins", "tools/test.ts and workspaces/ifws.ts, once the hook is registered"],
+      what: "The Node hook that strips the types of this package's sources under `node_modules`, and the command `ifc`, in JavaScript.",
+      mayImport: ["node: builtins", "tools/test.ts, once the hook is registered"],
     },
     {
       path: "tools/",
@@ -123,10 +113,6 @@ export const about: About = {
     {
       run: "bun quality/quality.ts trust|pack|verify-pack|plan|sample|mutation|agents",
       does: "Tier 2 of the quality system: writes the Trust page for an audience (public, assessor, internal) and checks it, writes the signed assessor pack and verifies one offline (the verifier is inside the pack), registers a test plan before its run, draws a sample by a seed and records a person's attestation of it, records a mutation report and shows the strength of each proof beside its grade, and judges the sampling of the agents' reviews.",
-    },
-    {
-      run: "bun workspaces/ifws.ts <module> (or ifws, the package's bin)",
-      does: "The command of IF Workspaces: init, plan, apply, status, doctor, verify, render, worktree, list, help, shell, setup (the one command that installs a pinned tool or changes the host) and tools, each a typed module, and modules registered by the workspace or named ifws-* on the PATH; it manages only Intellectual Frontiers Workspaces and does not front ifc. Exit status 0 ok, 1 findings, 2 usage, 3 environment.",
     },
     {
       run: "bun run test:evidence",

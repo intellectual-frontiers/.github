@@ -71,7 +71,6 @@ import { readSpecTexts } from "./spec-files.ts";
 import { packagingTerms } from "../../ontology/audit/mod.ts";
 import * as ifccmOntology from "../../ontology/ifccm/mod.ts";
 import * as ifqsOntology from "../../ontology/ifqs/mod.ts";
-import * as ifwsOntology from "../../ontology/ifws/mod.ts";
 import { terms } from "../../ontology/mizan/mod.ts";
 
 /** One rule's result in a run of the check (0020-ifccm FR-031): its findings, or the reason it did not run. Its shape is the quality system's `CheckRule`, so a caller keeps it as a record without this file knowing the quality system. */
@@ -166,7 +165,7 @@ function sourcesUnder(root: string): readonly { readonly path: string; readonly 
 
 /** The citations of requirements by the terms of commons' own ontologies (`mz:definedBy`), for the chain's third stage (`--terms commons`, and the default of `--trace`). */
 function termCitations(): readonly { readonly term: string; readonly cites: readonly string[]; readonly file: string }[] {
-  return [...terms, ...packagingTerms, ...ifccmOntology.terms, ...ifqsOntology.terms, ...ifwsOntology.terms].map((t) => ({
+  return [...terms, ...packagingTerms, ...ifccmOntology.terms, ...ifqsOntology.terms].map((t) => ({
     term: t.values.termIri,
     cites: t.values.definedBy ?? [],
     file: "commons/ontology",

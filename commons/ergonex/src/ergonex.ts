@@ -5,7 +5,7 @@
  * Workspaces: it is not a general IFC or Mizan controller and does not front `ifc`.
  *
  * ```sh
- * bun commons/ts/workspaces/ergonex.ts <module> [options]     # or: ergonex <module> (the package's bin, on Bun or Node 26)
+ * bun commons/ergonex/src/ergonex.ts <module> [options]     # or: ergonex <module> (the package's bin, on Bun or Node 26)
  * ```
  *
  * @remarks

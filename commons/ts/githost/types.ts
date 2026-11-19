@@ -1,8 +1,8 @@
 /**
- * The one interface to a Git host (commons 0020-ifccm FR-027 to FR-030, 0023-if-workspaces FR-016 to FR-021): GitHub, GitLab and plain Git are read through it, so that a check of change
+ * The one interface to a Git host (commons 0020-ifccm FR-027 to FR-030, 0020-ifccm FR-040 to FR-044): GitHub, GitLab and plain Git are read through it, so that a check of change
  * control and a workspace never name a host's own word. The types here are pure; the adapters (`github.ts`, `gitlab.ts`, `git.ts`) are the only code that does.
  *
- * A host answers only what it has: a capability it lacks is `unsupported`, never a guess (0023-if-workspaces FR-017). A private repository is asked with a credential from the
+ * A host answers only what it has: a capability it lacks is `unsupported`, never a guess (0020-ifccm FR-041). A private repository is asked with a credential from the
  * environment or a credential helper, never from a file; a refusal for want of one is `unauthorized`, which is a finding for a person to act on, not a retry.
  *
  * @module
@@ -10,10 +10,10 @@
 import { absurd } from "../kernel/absurd.ts";
 import type { Result } from "../kernel/result.ts";
 
-/** The kinds of host: the keys of the code list `ifws:GitManagerKind`, the one list of Git host kinds (`ifccm:hostedOn` ranges over it). */
+/** The kinds of host: the keys of the code list `ifccm:GitManagerKind`, the one list of Git host kinds (`ifccm:hostedOn` ranges over it). */
 export type HostKind = "Github" | "Gitlab" | "Git";
 
-/** The capabilities a host may offer: the keys of the code list `ifws:GitCapability`. */
+/** The capabilities a host may offer: the keys of the code list `ifccm:GitCapability`. */
 export type Capability =
   "CloneUrl" | "Credentials" | "DefaultBranch" | "SignedCommits" | "ProtectedBranches" | "Issues" | "ChangeRequests" | "NestedGroups";
 

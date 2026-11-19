@@ -1,5 +1,5 @@
 /**
- * What each kind of Git host offers (commons 0023-if-workspaces FR-016, FR-017): the table of `ifws:GitManagerKind` and its `ifws:supports`, as the pure types the adapters and the
+ * What each kind of Git host offers (commons 0020-ifccm FR-040, FR-017): the table of `ifccm:GitManagerKind` and its `ifccm:supports`, as the pure types the adapters and the
  * workspace read, and the typed answer for a capability a kind lacks. A test holds this table equal to the ontology's.
  *
  * @module
@@ -7,7 +7,7 @@
 import { err, type Result } from "../kernel/result.ts";
 import type { Capability, HostFailure, HostKind } from "./types.ts";
 
-/** The four capabilities every kind offers (`ifws:CloneUrl`, `ifws:Credentials`, `ifws:DefaultBranch`, `ifws:SignedCommits`). */
+/** The four capabilities every kind offers (`ifccm:CloneUrl`, `ifccm:Credentials`, `ifccm:DefaultBranch`, `ifccm:SignedCommits`). */
 export const COMMON_CAPABILITIES: readonly Capability[] = ["CloneUrl", "Credentials", "DefaultBranch", "SignedCommits"];
 
 const HOSTED: readonly Capability[] = [...COMMON_CAPABILITIES, "ProtectedBranches", "Issues", "ChangeRequests"];
@@ -24,7 +24,7 @@ export function supports(kind: HostKind, capability: Capability): boolean {
   return CAPABILITIES[kind].has(capability);
 }
 
-/** The answer for a capability that a kind of host does not offer: typed, naming the host and the capability, never a guess (0023-if-workspaces FR-017). */
+/** The answer for a capability that a kind of host does not offer: typed, naming the host and the capability, never a guess (0020-ifccm FR-041). */
 export function unsupported(host: HostKind, capability: Capability): Result<never, HostFailure> {
   return err({ kind: "unsupported", capability, host });
 }

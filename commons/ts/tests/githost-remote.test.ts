@@ -1,5 +1,5 @@
 /**
- * Tests of `githost/remote.ts` and `githost/capabilities.ts` (commons 0023-if-workspaces FR-017, FR-019, FR-020): every spelling of a remote gives the same repository, a credential in a URL is
+ * Tests of `githost/remote.ts` and `githost/capabilities.ts` (commons 0020-ifccm FR-041, FR-019, FR-020): every spelling of a remote gives the same repository, a credential in a URL is
  * dropped and never appears in a result or an error, the kind of host is GitHub, GitLab or plain Git by the rule of FR-019, and the table of what each kind offers is the ontology's.
  * Pure: no program, no network.
  *
@@ -8,7 +8,7 @@
 import { CAPABILITIES, maxDepth, supports, unsupported } from "../githost/capabilities.ts";
 import { cloneUrlOf, describeRemoteError, hostKindOf, parseRemote, readRemote, sameRepository } from "../githost/remote.ts";
 import type { Capability, HostKind, RepoRef } from "../githost/types.ts";
-import { gitCapabilities, gitManagerKinds } from "../../ontology/ifws/mod.ts";
+import { gitCapabilities, gitManagerKinds } from "../../ontology/ifccm/mod.ts";
 import { assert, assertEquals, proves } from "../runtime/test.ts";
 
 const ref = (text: string, kinds: Readonly<Record<string, HostKind>> = {}): RepoRef => {
@@ -17,7 +17,7 @@ const ref = (text: string, kinds: Readonly<Record<string, HostKind>> = {}): Repo
   return r.value;
 };
 
-proves(["0023-if-workspaces FR-019"], "https, ssh, scp-like and git forms of one remote are one repository", () => {
+proves(["0020-ifccm FR-043"], "https, ssh, scp-like and git forms of one remote are one repository", () => {
   const forms = [
     "https://github.com/octo/hello.git",
     "https://github.com/octo/hello",
@@ -37,7 +37,7 @@ proves(["0023-if-workspaces FR-019"], "https, ssh, scp-like and git forms of one
 });
 
 proves(
-  ["0023-if-workspaces FR-019"],
+  ["0020-ifccm FR-043"],
   "the kind of host is GitHub, GitLab or plain Git by the rule, and a self-managed GitLab is named, never guessed",
   () => {
     assertEquals(hostKindOf("github.com"), "Github");
@@ -54,7 +54,7 @@ proves(
   },
 );
 
-proves(["0023-if-workspaces FR-018"], "a credential in a remote is dropped, and no result and no error holds it", () => {
+proves(["0020-ifccm FR-042"], "a credential in a remote is dropped, and no result and no error holds it", () => {
   const secret = "ghp_SECRETSECRETSECRET0123456789";
   for (const url of [
     `https://user:${secret}@github.com/octo/hello.git`,
@@ -80,7 +80,7 @@ proves(["0023-if-workspaces FR-018"], "a credential in a remote is dropped, and 
   }
 });
 
-proves(["0023-if-workspaces FR-019"], "a text that is not a remote of a host is told by what is wrong with it", () => {
+proves(["0020-ifccm FR-043"], "a text that is not a remote of a host is told by what is wrong with it", () => {
   const kind = (t: string): string => {
     const r = parseRemote(t);
     return r.kind === "ok" ? "ok" : r.error.kind;
@@ -103,7 +103,7 @@ proves(["0023-if-workspaces FR-019"], "a text that is not a remote of a host is 
 });
 
 proves(
-  ["0023-if-workspaces FR-017", "0023-if-workspaces FR-020"],
+  ["0020-ifccm FR-041", "0020-ifccm FR-044"],
   "the table of what each kind offers is the ontology's, and a capability a kind lacks is a typed answer naming both",
   () => {
     const all = Object.keys(gitCapabilities) as Capability[];
@@ -124,7 +124,7 @@ proves(
 );
 
 proves(
-  ["0023-if-workspaces FR-019"],
+  ["0020-ifccm FR-043"],
   "a remote as a person writes it needs no scheme where the domain says the rest, `owner/repo` is GitHub, the address of a branch's page is the repository and the branch, and a path on this computer is still no remote",
   () => {
     const read = (text: string, kinds: Readonly<Record<string, HostKind>> = {}) => {

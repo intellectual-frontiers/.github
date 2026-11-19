@@ -11,7 +11,6 @@ import { assert, assertEquals, proves } from "../runtime/test.ts";
 import { ifccmOntology } from "../../ontology/ifccm/mod.ts";
 import { ifqsOntology } from "../../ontology/ifqs/mod.ts";
 import { ifrOntology, versionSchemes } from "../../ontology/ifr/mod.ts";
-import { ifwsOntology } from "../../ontology/ifws/mod.ts";
 import { mizanOntology } from "../../ontology/mizan/mod.ts";
 import { packagingOntology } from "../../ontology/supply-chain/packaging/mod.ts";
 
@@ -24,7 +23,6 @@ const ONTOLOGIES = [
   { name: "mizan", ontology: mizanOntology, prefix: "mzv" },
   { name: "ifccm", ontology: ifccmOntology, prefix: "ifccmv" },
   { name: "ifqs", ontology: ifqsOntology, prefix: "ifqsv" },
-  { name: "ifws", ontology: ifwsOntology, prefix: "ifwsv" },
   { name: "ifr", ontology: ifrOntology, prefix: "ifrv" },
   { name: "packaging", ontology: packagingOntology, prefix: "pmv" },
 ] as const;
@@ -54,9 +52,9 @@ proves(
       assert(ttl.includes('owl:versionInfo "1.0.0"'), `${name}: the version`);
       assert(!/owl:versionInfo "[0-9]+"/.test(ttl), `${name}: no integer version`);
     }
-    // the catalog lists the five published ontologies, each at 1.0.0
+    // the catalog lists the four published ontologies, each at 1.0.0
     const catalog = text("generated/mizan-catalog.auto.ttl");
-    assertEquals((catalog.match(/dcat:version "1\.0\.0"/g) ?? []).length, 5);
+    assertEquals((catalog.match(/dcat:version "1\.0\.0"/g) ?? []).length, 4);
     assert(!/dcat:version "[0-9]+"/.test(catalog));
   },
 );
@@ -75,7 +73,7 @@ proves(
       "import sys, rdflib",
       "from rdflib.namespace import OWL",
       "root = sys.argv[1]",
-      "for name in ['mizan', 'ifccm', 'ifqs', 'ifws', 'ifr', 'packaging']:",
+      "for name in ['mizan', 'ifccm', 'ifqs', 'ifr', 'packaging']:",
       "    g = rdflib.Graph()",
       "    g.parse(root + '/generated/' + name + '.auto.ttl', format='turtle')",
       "    iri = rdflib.URIRef('https://www.intellectualfrontiers.com/ontology/' + name)",

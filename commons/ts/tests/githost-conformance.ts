@@ -1,5 +1,5 @@
 /**
- * The conformance tests the three Git host adapters share (commons 0023-if-workspaces FR-015): one function that asks a `GitHostClient` the same questions whatever host is behind it, and
+ * The conformance tests the three Git host adapters share (commons 0020-ifccm FR-039): one function that asks a `GitHostClient` the same questions whatever host is behind it, and
  * holds the answers to the contract of `githost/types.ts`. The interface is not fixed until GitHub, GitLab and plain Git pass all of them.
  *
  * @module

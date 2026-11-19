@@ -36,7 +36,6 @@ import {
 import * as ifccmOntology from "../../ontology/ifccm/mod.ts";
 import * as ifrOntology from "../../ontology/ifr/mod.ts";
 import * as ifqsOntology from "../../ontology/ifqs/mod.ts";
-import * as ifwsOntology from "../../ontology/ifws/mod.ts";
 import { pm } from "../../ontology/supply-chain/packaging/mod.ts";
 import { type RulePlugin, rulePlugins } from "./rules.ts";
 import { holdHarness } from "./harness.ts";
@@ -72,21 +71,13 @@ export function termRecordsOf(audit: readonly (typeof terms)[number][]): readonl
 
 /** Mizan's own terms and the packaging ontology's as the rules read them. */
 export function mizanTermRecords(): readonly TermRecord[] {
-  return termRecordsOf([
-    ...terms,
-    ...packagingTerms,
-    ...ifccmOntology.terms,
-    ...ifqsOntology.terms,
-    ...ifwsOntology.terms,
-    ...ifrOntology.terms,
-  ]);
+  return termRecordsOf([...terms, ...packagingTerms, ...ifccmOntology.terms, ...ifqsOntology.terms, ...ifrOntology.terms]);
 }
 
 /** The prefixes of commons' own ontologies and their namespaces. */
 const PREFIXES = {
   mz: "https://www.intellectualfrontiers.com/ontology/mizan#",
   pm: "https://www.intellectualfrontiers.com/ontology/packaging#",
-  ifws: ifwsOntology.IFWS.iri,
   ifccm: ifccmOntology.IFCCM.iri,
   ifqs: ifqsOntology.IFQS.iri,
   ifr: ifrOntology.IFR.iri,
@@ -101,8 +92,8 @@ function curieOf(iri: string): string {
 /** The deprecated terms of commons' own ontologies, by CURIE, with what replaces each (0018-standards-first): a specification that names one is found. */
 export function deprecatedTerms(): ReadonlyMap<string, string> {
   return new Map(
-    [...terms, ...packagingTerms, ...ifccmOntology.terms, ...ifqsOntology.terms, ...ifwsOntology.terms, ...ifrOntology.terms].flatMap(
-      (t) => (t.values.deprecatedOn === undefined ? [] : [[curieOf(t.values.termIri), curieOf(t.values.replacedBy ?? "")] as const]),
+    [...terms, ...packagingTerms, ...ifccmOntology.terms, ...ifqsOntology.terms, ...ifrOntology.terms].flatMap((t) =>
+      t.values.deprecatedOn === undefined ? [] : [[curieOf(t.values.termIri), curieOf(t.values.replacedBy ?? "")] as const],
     ),
   );
 }
@@ -156,11 +147,6 @@ export function main(
               recorded: ifqsOntology.terms.map((t) => t.values.termIri),
             },
             {
-              file: "commons/ontology/ifws/ifws.ts",
-              ontology: ifwsOntology.classes.map((c) => c.iri),
-              recorded: ifwsOntology.terms.map((t) => t.values.termIri),
-            },
-            {
               file: "commons/ontology/ifr/ifr.ts",
               ontology: ifrOntology.classes.map((c) => c.iri),
               recorded: ifrOntology.terms.map((t) => t.values.termIri),
@@ -180,7 +166,6 @@ export function main(
                 ...Object.keys(audienceModels),
               ]),
               pm: new Set(Object.keys(pm)),
-              ifws: ifwsOntology.termNames,
               ifr: ifrOntology.termNames,
               ifccm: new Set([
                 ...Object.keys(ifccmOntology.ifccm),
@@ -192,6 +177,8 @@ export function main(
                   ifccmOntology.regulatedDomains,
                   ifccmOntology.traceStages,
                   ifccmOntology.authorityFunctions,
+                  ifccmOntology.gitCapabilities,
+                  ifccmOntology.gitManagerKinds,
                 ].flatMap((l) => Object.keys(l)),
               ]),
               ifqs: new Set([

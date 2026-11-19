@@ -1,5 +1,5 @@
 /**
- * GitHub behind the one interface (commons 0023-if-workspaces FR-015 to FR-018, 0020-ifccm FR-027 to FR-030): REST API v3 over the runtime's `Transport`, public and private repositories,
+ * GitHub behind the one interface (commons 0020-ifccm FR-039 to FR-042, 0020-ifccm FR-027 to FR-030): REST API v3 over the runtime's `Transport`, public and private repositories,
  * issues with their parent and sub-issues, pull requests, protected branches and whether a commit's signature is verified.
  *
  * @remarks

@@ -9,7 +9,7 @@
 
 ## The command
 
-- **FR-001**: The controller MUST be `commons/ts/workspaces/ergonex.ts`, the library MUST be in the same folder, `commons/ts/workspaces/`, the commands in `commons/ts/workspaces/commands/` and the module contract in `commons/ts/workspaces/modules/`, and the package's `bin` MUST gain `ergonex`.
+- **FR-001**: The controller MUST be `commons/ergonex/src/ergonex.ts`, the library MUST be in the same folder, `commons/ergonex/src/`, the commands in `commons/ergonex/src/commands/` and the module contract in `commons/ergonex/src/modules/`, and the package's `bin` MUST be `ergonex`.
 - **FR-002**: `ergonex` manages only Intellectual Frontiers Workspaces; it is not a general IFC or Mizan controller and does not front `ifc`, and `ergonex --help` MUST say so in these words.
 - **FR-003**: `ergonex <name> [arguments]` MUST run the module `ergonex-<name>` with the arguments, `ergonex help` MUST describe the command and `ergonex list` MUST list every module with its name, its source (`ergonex:BuiltIn`, `ergonex:Registered` or `ergonex:Path`) and its summary.
 

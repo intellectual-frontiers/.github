@@ -314,7 +314,6 @@ proves(
       "./ts/mizan/oscal-register": "./mizan/oscal-register.ts",
       "./ts/mizan/versions": "./mizan/versions.ts",
       "./ts/quality": "./quality/mod.ts",
-      "./ts/workspaces": "./workspaces/mod.ts",
       "./ts/githost": "./githost/mod.ts",
       "./ts/githost/workflows": "./githost/workflows/mod.ts",
       "./ts/node": "./node/register.mjs",

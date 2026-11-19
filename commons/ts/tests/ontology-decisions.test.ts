@@ -1,6 +1,6 @@
 /**
  * The Decision records of the terms kept unaligned by the owner's decision of 2026-11-17 (issue #10), across the four ontologies (commons 0018-standards-first FR-005):
- * twelve terms each have an `mz:Decision` that names them, the audit record of each points to it, the individuals reach the Turtle, and the standards rules find no
+ * six terms each have an `mz:Decision` that names them, the audit record of each points to it, the individuals reach the Turtle, and the standards rules find no
  * decision missing or overdue on any day. Pure functions over the typed ontologies and the generated files; no network and no program.
  *
  * @module
@@ -12,36 +12,29 @@ import { termRecordsOf } from "../mizan/check.ts";
 import { termFindings } from "../mizan/standards.ts";
 import * as ifccm from "../../ontology/ifccm/mod.ts";
 import * as ifqs from "../../ontology/ifqs/mod.ts";
-import * as ifws from "../../ontology/ifws/mod.ts";
 import * as mizan from "../../ontology/mizan/mod.ts";
 
 const GENERATED = resolve(dirname(fromFileUrl(import.meta.url)), "../../generated");
 
-/** The twelve terms the owner decided to keep unaligned, by the IRI of each. */
+/** The six terms the owner decided to keep unaligned, by the IRI of each. */
 const KEPT: readonly string[] = [
   mizan.mz.RungKind.iri,
   ifccm.ifccm.Capability.iri,
+  ifccm.ifccm.GitManagerKind.iri,
+  ifccm.ifccm.GitCapability.iri,
   ifqs.ifqs.QualityObjective.iri,
   ifqs.ifqs.ReviewDebt.iri,
-  ifws.ifws.Workspace.iri,
-  ifws.ifws.GitManager.iri,
-  ifws.ifws.GitManagerKind.iri,
-  ifws.ifws.GitCapability.iri,
-  ifws.ifws.RepoState.iri,
-  ifws.ifws.ActionKind.iri,
-  ifws.ifws.ModuleSource.iri,
-  ifws.ifws.ExitStatus.iri,
 ];
 
 const text = (name: string): string => readFileSync(resolve(GENERATED, name), "utf8").replace(/\r\n/g, "\n");
 
 proves(
   ["0018-standards-first FR-005"],
-  "twelve unaligned terms are kept so by the owner's decision of 2026-11-17: each has a Decision naming it, the record points to it, and no day makes one missing or overdue",
+  "six unaligned terms are kept so by the owner's decision of 2026-11-17: each has a Decision naming it, the record points to it, and no day makes one missing or overdue",
   () => {
-    const terms = [...mizan.terms, ...ifccm.terms, ...ifqs.terms, ...ifws.terms];
-    const decisions = [...mizan.decisions, ...ifccm.decisions, ...ifqs.decisions, ...ifws.decisions];
-    assertEquals(decisions.length, 12);
+    const terms = [...mizan.terms, ...ifccm.terms, ...ifqs.terms];
+    const decisions = [...mizan.decisions, ...ifccm.decisions, ...ifqs.decisions];
+    assertEquals(decisions.length, 6);
     for (const iri of KEPT) {
       const t = terms.find((x) => x.values.termIri === iri);
       assert(t !== undefined, `${iri} has an audit record`);
@@ -52,22 +45,21 @@ proves(
       assertEquals(d.values.record, "owner decision of 2026-11-17 in issue #10: keep the term unaligned; reviewed again by 2027-02-15");
       assertEquals(t.values.basis.iri, mizan.bases.Unaligned.iri);
     }
-    // the rules of the standards, on the records of the twelve: nothing missing and nothing overdue, however late the day
+    // the rules of the standards, on the records of the six: nothing missing and nothing overdue, however late the day
     const kept = termRecordsOf(terms).filter((r) => KEPT.includes(r.iri));
-    assertEquals(kept.length, 12);
+    assertEquals(kept.length, 6);
     for (const day of ["2026-11-17", "2027-02-16", "2030-01-01"]) assertEquals(termFindings(kept, day), []);
   },
 );
 
 proves(
   ["0018-standards-first FR-005"],
-  "the Decisions of the twelve terms are individuals of the generated Turtle, each with its day and its record",
+  "the Decisions of the six terms are individuals of the generated Turtle, each with its day and its record",
   () => {
     const files = [
       ["mizan.auto.ttl", 1],
-      ["ifccm.auto.ttl", 1],
+      ["ifccm.auto.ttl", 3],
       ["ifqs.auto.ttl", 2],
-      ["ifws.auto.ttl", 8],
     ] as const;
     let total = 0;
     for (const [name, count] of files) {
@@ -77,6 +69,6 @@ proves(
       total += found.length;
       assertEquals((ttl.match(/mz:decidedOn "2026-11-17"/g) ?? []).length, count, name);
     }
-    assertEquals(total, 12);
+    assertEquals(total, 6);
   },
 );

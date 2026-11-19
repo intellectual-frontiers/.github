@@ -44,7 +44,6 @@ import {
   XSD,
   xsd,
 } from "../../ts/kernel/rdf.ts";
-import { IFWS, ifws } from "../ifws/ifws.ts";
 import { bases, cfr11, cfr820, KEPT_UNALIGNED_SENTENCE, keptUnalignedDecision, keptUnalignedDecisionId, MZ, MZID, mz, OntologyTerm } from "../mizan/mizan.ts";
 
 /** The namespace of IFCCM's terms. */
@@ -73,6 +72,9 @@ export const ifccm = vocabulary(IFCCM, {
   EnforcementPhase: "owl:Class",
   TraceStage: "owl:Class",
   AuthorityFunction: "owl:Class",
+  GitManagerKind: "owl:Class",
+  GitCapability: "owl:Class",
+  supports: "owl:ObjectProperty",
   area: "owl:DatatypeProperty",
   parentRequest: "owl:ObjectProperty",
   touchesRung: "owl:ObjectProperty",
@@ -248,13 +250,64 @@ export const Capability = classSchema(ifccm.Capability, {
   satisfiesControl: many(ifccm.satisfiesControl, range.string),
 });
 
+/** What a Git host may offer through the one interface (0020-ifccm FR-027 to FR-030): the common capabilities and the ones a host may lack. */
+export const gitCapabilities = codes(classSchema(ifccm.GitCapability, CODE), IFCCM, {
+  CloneUrl: { label: en("clone URL"), definition: en("The URL a repository is cloned from, for a path of the workspace and the reverse.") },
+  Credentials: {
+    label: en("credentials"),
+    definition: en("Authentication through a Git credential helper, the host's command-line tool or a token from the environment, never a secret stored in a file."),
+  },
+  DefaultBranch: { label: en("default branch"), definition: en("The name of the branch the remote presents as its default.") },
+  SignedCommits: { label: en("signed commits"), definition: en("Whether a commit's signature, OpenPGP or SSH, can be seen as verified.") },
+  ProtectedBranches: { label: en("protected branches"), definition: en("Whether a branch can be asked about as protected: no push, no force, review required.") },
+  Issues: { label: en("issues"), definition: en("Issues of the repository, behind the interface.") },
+  ChangeRequests: { label: en("change requests"), definition: en("A pull request (GitHub) or a merge request (GitLab), behind the interface.") },
+  NestedGroups: { label: en("nested groups"), definition: en("Groups to any depth between the host and the repository (GitLab); a host without them has one owner level.") },
+});
+
+/** The kinds of Git host, and what each supports (0020-ifccm FR-027 to FR-030): a capability a kind does not list is unsupported. */
+export const gitManagerKinds = codes(classSchema(ifccm.GitManagerKind, { ...CODE, supports: many(ifccm.supports, range.ref<"ifccm:GitCapability">()) }), IFCCM, {
+  Github: {
+    label: en("GitHub"),
+    definition: en("GitHub, public and private repositories: an owner and a repository."),
+    supports: [
+      gitCapabilities.CloneUrl,
+      gitCapabilities.Credentials,
+      gitCapabilities.DefaultBranch,
+      gitCapabilities.SignedCommits,
+      gitCapabilities.ProtectedBranches,
+      gitCapabilities.Issues,
+      gitCapabilities.ChangeRequests,
+    ],
+  },
+  Gitlab: {
+    label: en("GitLab"),
+    definition: en("GitLab, public and private repositories, in groups to any depth."),
+    supports: [
+      gitCapabilities.CloneUrl,
+      gitCapabilities.Credentials,
+      gitCapabilities.DefaultBranch,
+      gitCapabilities.SignedCommits,
+      gitCapabilities.ProtectedBranches,
+      gitCapabilities.Issues,
+      gitCapabilities.ChangeRequests,
+      gitCapabilities.NestedGroups,
+    ],
+  },
+  Git: {
+    label: en("plain Git"),
+    definition: en("Any other Git remote: what Git itself offers and nothing a host adds."),
+    supports: [gitCapabilities.CloneUrl, gitCapabilities.Credentials, gitCapabilities.DefaultBranch, gitCapabilities.SignedCommits],
+  },
+});
+
 /** The schema of a change request (`ifccm:ChangeRequest`): an issue, in the words of the section headings of a capability's issue. */
 export const ChangeRequest = classSchema(ifccm.ChangeRequest, {
   label: one(rdfs.label, range.langString),
   reference: one(ifccm.reference, range.string),
   requestKind: one(ifccm.requestKind, range.ref<"ifccm:ChangeRequestKind">()),
   requestState: one(ifccm.requestState, range.ref<"ifccm:ChangeRequestState">()),
-  hostedOn: one(ifccm.hostedOn, range.ref<"ifws:GitManagerKind">()),
+  hostedOn: one(ifccm.hostedOn, range.ref<"ifccm:GitManagerKind">()),
   subRequestOf: optional(ifccm.subRequestOf, range.ref<"ifccm:ChangeRequest">()),
   requestsCapability: optional(ifccm.requestsCapability, range.ref<"ifccm:Capability">()),
   why: optional(ifccm.why, range.string),
@@ -310,6 +363,8 @@ export const classes = [
     subClassOf: [oslcCm.ChangeRequest],
     definition: en("An issue on a Git host that plans a capability or reports a problem; it plans and traces and authorizes nothing."),
   }),
+  OwlClass.make(ifccm.GitManagerKind, { label: en("Git manager kind"), definition: en("GitHub, GitLab or plain Git, with the capabilities each supports.") }),
+  OwlClass.make(ifccm.GitCapability, { label: en("Git capability"), definition: en("One thing a Git host may offer through the interface.") }),
   OwlClass.make(ifccm.ChangeRequestKind, {
     label: en("Change request kind"),
     subClassOf: [skos.Concept],
@@ -377,7 +432,8 @@ export const properties = [
   DatatypeProperty.make(ifccm.reference, { domain: ifccm.ChangeRequest, range: xsd.string, label: en("reference"), definition: en("How a commit names the change request: `#N`, or `owner/repo#N` for another repository.") }),
   ObjectProperty.make(ifccm.requestKind, { domain: ifccm.ChangeRequest, range: ifccm.ChangeRequestKind, label: en("request kind"), definition: en("capability request or problem.") }),
   ObjectProperty.make(ifccm.requestState, { domain: ifccm.ChangeRequest, range: ifccm.ChangeRequestState, label: en("request state"), definition: en("open or closed.") }),
-  ObjectProperty.make(ifccm.hostedOn, { domain: ifccm.ChangeRequest, range: ifws.GitManagerKind, label: en("hosted on"), definition: en("The kind of Git host that keeps the change request.") }),
+  ObjectProperty.make(ifccm.supports, { label: en("supports"), domain: ifccm.GitManagerKind, range: ifccm.GitCapability, definition: en("A capability the kind of Git host supports; one it does not list is unsupported.") }),
+  ObjectProperty.make(ifccm.hostedOn, { domain: ifccm.ChangeRequest, range: ifccm.GitManagerKind, label: en("hosted on"), definition: en("The kind of Git host that keeps the change request.") }),
   ObjectProperty.make(ifccm.subRequestOf, { domain: ifccm.ChangeRequest, range: ifccm.ChangeRequest, label: en("sub-request of"), definition: en("The parent change request of a child change request (a sub-issue).") }),
   ObjectProperty.make(ifccm.requestsCapability, { domain: ifccm.ChangeRequest, range: ifccm.Capability, label: en("requests capability"), definition: en("The capability the change request asks for.") }),
   DatatypeProperty.make(ifccm.why, { domain: ifccm.ChangeRequest, range: xsd.string, label: en("why"), definition: en("Why the capability is wanted: the first section of its issue.") }),
@@ -456,15 +512,33 @@ export const terms = [
   specializes("EnforcementPhase", SKOS_CONCEPT, "0020-ifccm FR-011"),
   specializes("TraceStage", SKOS_CONCEPT, "0020-ifccm FR-014"),
   specializes("AuthorityFunction", SKOS_CONCEPT, "0020-ifccm FR-018"),
+  OntologyTerm.make(term(MZID, "term-ifccm-GitManagerKind"), {
+    label: en("ifccm:GitManagerKind"),
+    termIri: ifccm.GitManagerKind.iri,
+    basis: bases.Unaligned,
+    justification: `Examined: GitHub, GitLab and Git are products and projects, and no standard vocabulary lists them as a code list; SPDX 3 and DOAP name a repository's kind of version control, not the host (to verify). ${KEPT_UNALIGNED_SENTENCE}`,
+    decision: keptUnalignedDecisionId("ifccm", "GitManagerKind"),
+    addedOn: DAY,
+    definedBy: ["0020-ifccm FR-027"],
+  }),
+  OntologyTerm.make(term(MZID, "term-ifccm-GitCapability"), {
+    label: en("ifccm:GitCapability"),
+    termIri: ifccm.GitCapability.iri,
+    basis: bases.Unaligned,
+    justification: `Examined: OpenAPI describes the operations of one API, not a list of capabilities that hosts support or lack; ForgeFed models forge objects, not what a client may ask (to verify). ${KEPT_UNALIGNED_SENTENCE}`,
+    decision: keptUnalignedDecisionId("ifccm", "GitCapability"),
+    addedOn: DAY,
+    definedBy: ["0020-ifccm FR-027"],
+  }),
 ] as const;
 
 /** The decisions of the terms kept unaligned (the owner's decision of 2026-11-17, issue #10). */
-export const decisions = [keptUnalignedDecision("ifccm", "Capability")] as const;
+export const decisions = [keptUnalignedDecision("ifccm", "Capability"), keptUnalignedDecision("ifccm", "GitManagerKind"), keptUnalignedDecision("ifccm", "GitCapability")] as const;
 
 /** The file this module states: its name, its prefixes and its individuals. */
 export const file: OntologyFile = {
   name: "ifccm",
-  prefixes: [IFCCM, IFCCMV, IFWS, MZ, MZID, OSLC_CM, OWL, PROV, RDFS, SKOS, XSD],
+  prefixes: [IFCCM, IFCCMV, MZ, MZID, OSLC_CM, OWL, PROV, RDFS, SKOS, XSD],
   individuals: [
     ifccmOntology,
     ...classes,
@@ -476,6 +550,8 @@ export const file: OntologyFile = {
     ...Object.values(regulatedDomains),
     ...Object.values(traceStages),
     ...Object.values(authorityFunctions),
+    ...Object.values(gitCapabilities),
+    ...Object.values(gitManagerKinds),
     ...terms,
     ...decisions,
   ],

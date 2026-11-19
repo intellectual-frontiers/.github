@@ -21,9 +21,9 @@ number	slug	state
 0020	ifccm	in force
 0021	ifqs	in force
 0022	trust	in force
-0023	if-workspaces	in force
-0024	ifws-host	in force
-0025	ifws	in force
+0023	if-workspaces	retired
+0024	ifws-host	retired
+0025	ifws	retired
 0026	works-versioning	in force
 0027	commons-libraries	in force
 0028	conformance-levels	in force

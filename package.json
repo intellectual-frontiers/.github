@@ -20,7 +20,6 @@
     "./ts/mizan/oscal-register": "./commons/ts/mizan/oscal-register.ts",
     "./ts/mizan/versions": "./commons/ts/mizan/versions.ts",
     "./ts/quality": "./commons/ts/quality/mod.ts",
-    "./ts/workspaces": "./commons/ts/workspaces/mod.ts",
     "./ts/githost": "./commons/ts/githost/mod.ts",
     "./ts/githost/workflows": "./commons/ts/githost/workflows/mod.ts",
     "./ts/node": "./commons/ts/node/register.mjs",
@@ -29,7 +28,6 @@
   },
   "bin": {
     "ifc": "./commons/ts/node/ifc.mjs",
-    "ifws": "./commons/ts/node/ifws.mjs",
     "ifc-docs": "./commons/docs/ifc-docs.mjs"
   },
   "engines": {

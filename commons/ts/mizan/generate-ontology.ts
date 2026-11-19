@@ -35,7 +35,6 @@ import {
 import * as ifccmOntology from "../../ontology/ifccm/mod.ts";
 import * as ifrOntology from "../../ontology/ifr/mod.ts";
 import * as ifqsOntology from "../../ontology/ifqs/mod.ts";
-import * as ifwsOntology from "../../ontology/ifws/mod.ts";
 import { formatRdfFinding, type OntologyFile, validate } from "../kernel/rdf.ts";
 import { stdio } from "../runtime/mod.ts";
 import { exportDcat } from "./integrations/pure/export-dcat.ts";
@@ -100,55 +99,6 @@ export const MIZAN: OntologyPublication = {
   license: CC0,
 };
 
-/** The ontology of Intellectual Frontiers Workspaces (commons 0023-if-workspaces, 0024-ifws-host, 0025-ifws), as it is published. */
-export const IFWS: OntologyPublication = {
-  name: "ifws",
-  ns: { prefix: "ifws", iri: ifwsOntology.IFWS.iri },
-  idNs: { prefix: "mzid", iri: MZID.iri },
-  curies: [
-    ["ifws", ifwsOntology.IFWS.iri],
-    ["mz", MZ.iri],
-    ["xsd", "http://www.w3.org/2001/XMLSchema#"],
-    ["rdfs", "http://www.w3.org/2000/01/rdf-schema#"],
-    ["skos", "http://www.w3.org/2004/02/skos/core#"],
-    ["dcterms", "http://purl.org/dc/terms/"],
-    ["prov", "http://www.w3.org/ns/prov#"],
-    ["dcat", "http://www.w3.org/ns/dcat#"],
-    ["schema", "https://schema.org/"],
-  ],
-  files: ifwsOntology.files,
-  ontology: ifwsOntology.ifwsOntology,
-  classes: ifwsOntology.classes,
-  properties: ifwsOntology.properties,
-  terms: ifwsOntology.terms,
-  schemas: [
-    ifwsOntology.Tool,
-    ifwsOntology.WorkspacePolicy,
-    ifwsOntology.Finding,
-    ifwsOntology.Action,
-    ifwsOntology.GeneratedFile,
-    ifwsOntology.Module,
-  ],
-  lists: listsOf("ifws", Object.entries(ifwsOntology.codeLists)),
-  source: "commons/ontology/ifws/*.ts",
-  run: RUN,
-  shapes: { prefix: "ifwssh", iri: "https://www.intellectualfrontiers.com/ontology/ifws-shapes#" },
-  schemasIri: "https://www.intellectualfrontiers.com/ontology/ifws-schemas",
-  sssomSetId: "https://www.intellectualfrontiers.com/ontology/ifws-mappings",
-  sssomCuries: {
-    dcterms: "http://purl.org/dc/terms/",
-    prov: "http://www.w3.org/ns/prov#",
-    dcat: "http://www.w3.org/ns/dcat#",
-    schema: "https://schema.org/",
-    doap: "http://usefulinc.com/ns/doap#",
-    odrl: "http://www.w3.org/ns/odrl/2/",
-    gitdocs: "https://git-scm.com/docs/",
-    sarif: "https://docs.oasis-open.org/sarif/sarif/v2.1.0/errata01/os/schemas/sarif-schema-2.1.0.json#/definitions/",
-  },
-  viewTitle: "Intellectual Frontiers Workspaces: the ontology",
-  license: CC0,
-};
-
 /** The ontology of Intellectual Frontiers Capabilities Configuration Management (commons 0020-ifccm), as it is published. */
 export const IFCCM: OntologyPublication = {
   name: "ifccm",
@@ -188,6 +138,8 @@ export const IFCCM: OntologyPublication = {
     ["RegulatedDomain", ifccmOntology.regulatedDomains],
     ["TraceStage", ifccmOntology.traceStages],
     ["AuthorityFunction", ifccmOntology.authorityFunctions],
+    ["GitCapability", ifccmOntology.gitCapabilities],
+    ["GitManagerKind", ifccmOntology.gitManagerKinds],
   ]),
   source: "commons/ontology/ifccm/*.ts",
   run: RUN,
@@ -288,7 +240,7 @@ export const IFR: OntologyPublication = {
 };
 
 /** The ontologies of commons that are published, each from its own typed modules: Mizan's, then the ones its specifications define. */
-export const publications: readonly OntologyPublication[] = [MIZAN, IFCCM, IFQS, IFWS, IFR];
+export const publications: readonly OntologyPublication[] = [MIZAN, IFCCM, IFQS, IFR];
 
 /** Where the generated files are downloaded from: this repository's `commons/` folder on its default branch. */
 const DOWNLOAD_BASE = "https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/";

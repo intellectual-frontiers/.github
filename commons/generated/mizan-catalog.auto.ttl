@@ -58,23 +58,6 @@
         <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-ifr-ifr.auto.ttl> ;
     dcat:version "1.0.0" .
 
-<https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-ifws> a dcat:Dataset ;
-    dcterms:description "The vocabulary of Intellectual Frontiers Workspaces: the workspace and its repositories, Git managers, tools, policy, plans, findings, generated files and modules."@en ;
-    dcterms:identifier "https://www.intellectualfrontiers.com/ontology/ifws" ;
-    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
-    dcterms:publisher <https://www.intellectualfrontiers.com/> ;
-    dcterms:title "Intellectual Frontiers Workspaces"@en ;
-    dcat:distribution <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-ifws-ifws-code-lists.auto.skos.ttl>,
-        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-ifws-ifws-code-lists.auto.sql>,
-        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-ifws-ifws-mappings.auto.sssom.tsv>,
-        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-ifws-ifws-ontology.auto.html>,
-        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-ifws-ifws-schemas.auto.json>,
-        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-ifws-ifws-shapes.auto.ttl>,
-        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-ifws-ifws.auto.ofn>,
-        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-ifws-ifws.auto.rdf>,
-        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-ifws-ifws.auto.ttl> ;
-    dcat:version "1.0.0" .
-
 <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-mizan> a dcat:Dataset ;
     dcterms:description "The shared vocabulary of Mizan, the IF Spec Profile: the ladder, specifications and requirements, standards, laws and the basis of every term."@en ;
     dcterms:identifier "https://www.intellectualfrontiers.com/ontology/mizan" ;
@@ -320,82 +303,6 @@
     dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/ifr.auto.ttl> ;
     dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> .
 
-<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-ifws-ifws-code-lists.auto.skos.ttl> a dcat:Distribution ;
-    dcterms:conformsTo <https://www.w3.org/TR/skos-reference/> ;
-    dcterms:format <https://www.iana.org/assignments/media-types/text/turtle> ;
-    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
-    dcterms:title "Intellectual Frontiers Workspaces code lists, SKOS"@en ;
-    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/ifws-code-lists.auto.skos.ttl> ;
-    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/ifws-code-lists.auto.skos.ttl> ;
-    dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> .
-
-<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-ifws-ifws-code-lists.auto.sql> a dcat:Distribution ;
-    dcterms:format <https://www.iana.org/assignments/media-types/application/sql> ;
-    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
-    dcterms:title "Intellectual Frontiers Workspaces code lists, SQL"@en ;
-    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/ifws-code-lists.auto.sql> ;
-    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/ifws-code-lists.auto.sql> ;
-    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sql> .
-
-<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-ifws-ifws-mappings.auto.sssom.tsv> a dcat:Distribution ;
-    dcterms:conformsTo <https://mapping-commons.github.io/sssom/spec/> ;
-    dcterms:format <https://www.iana.org/assignments/media-types/text/tab-separated-values> ;
-    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
-    dcterms:title "Intellectual Frontiers Workspaces mappings to standards, SSSOM"@en ;
-    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/ifws-mappings.auto.sssom.tsv> ;
-    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/ifws-mappings.auto.sssom.tsv> ;
-    dcat:mediaType <https://www.iana.org/assignments/media-types/text/tab-separated-values> .
-
-<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-ifws-ifws-ontology.auto.html> a dcat:Distribution ;
-    dcterms:format <https://www.iana.org/assignments/media-types/text/html> ;
-    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
-    dcterms:title "Intellectual Frontiers Workspaces ontology, HTML view"@en ;
-    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/ifws-ontology.auto.html> ;
-    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/ifws-ontology.auto.html> ;
-    dcat:mediaType <https://www.iana.org/assignments/media-types/text/html> .
-
-<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-ifws-ifws-schemas.auto.json> a dcat:Distribution ;
-    dcterms:conformsTo <https://json-schema.org/draft/2020-12/schema> ;
-    dcterms:format <https://www.iana.org/assignments/media-types/application/schema+json> ;
-    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
-    dcterms:title "Intellectual Frontiers Workspaces JSON Schema"@en ;
-    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/ifws-schemas.auto.json> ;
-    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/ifws-schemas.auto.json> ;
-    dcat:mediaType <https://www.iana.org/assignments/media-types/application/schema+json> .
-
-<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-ifws-ifws-shapes.auto.ttl> a dcat:Distribution ;
-    dcterms:conformsTo <https://www.w3.org/TR/shacl/> ;
-    dcterms:format <https://www.iana.org/assignments/media-types/text/turtle> ;
-    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
-    dcterms:title "Intellectual Frontiers Workspaces SHACL shapes"@en ;
-    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/ifws-shapes.auto.ttl> ;
-    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/ifws-shapes.auto.ttl> ;
-    dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> .
-
-<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-ifws-ifws.auto.ofn> a dcat:Distribution ;
-    dcterms:format <https://www.iana.org/assignments/media-types/text/owl-functional> ;
-    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
-    dcterms:title "Intellectual Frontiers Workspaces ontology, OWL 2 functional syntax"@en ;
-    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/ifws.auto.ofn> ;
-    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/ifws.auto.ofn> ;
-    dcat:mediaType <https://www.iana.org/assignments/media-types/text/owl-functional> .
-
-<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-ifws-ifws.auto.rdf> a dcat:Distribution ;
-    dcterms:format <https://www.iana.org/assignments/media-types/application/rdf+xml> ;
-    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
-    dcterms:title "Intellectual Frontiers Workspaces ontology, RDF/XML"@en ;
-    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/ifws.auto.rdf> ;
-    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/ifws.auto.rdf> ;
-    dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> .
-
-<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-ifws-ifws.auto.ttl> a dcat:Distribution ;
-    dcterms:format <https://www.iana.org/assignments/media-types/text/turtle> ;
-    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
-    dcterms:title "Intellectual Frontiers Workspaces ontology, Turtle"@en ;
-    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/ifws.auto.ttl> ;
-    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/ifws.auto.ttl> ;
-    dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> .
-
 <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-mizan-mizan-code-lists.auto.skos.ttl> a dcat:Distribution ;
     dcterms:conformsTo <https://www.w3.org/TR/skos-reference/> ;
     dcterms:format <https://www.iana.org/assignments/media-types/text/turtle> ;
@@ -480,5 +387,4 @@
     dcat:dataset <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-ifccm>,
         <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-ifqs>,
         <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-ifr>,
-        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-ifws>,
         <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-mizan> .

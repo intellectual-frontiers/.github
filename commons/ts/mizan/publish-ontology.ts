@@ -1,6 +1,6 @@
 /**
  * Publish a typed ontology (commons 0019-mizan-integrations FR-010 to FR-019): one function that makes every file an ontology of Intellectual Frontiers is published as, from
- * the typed values it is written in, so that Mizan's own ontology and each ontology a specification of commons defines (IFCCM, IFQS, IFWS) are published the same way.
+ * the typed values it is written in, so that Mizan's own ontology and each ontology a specification of commons defines (IFCCM, IFQS, IFR) are published the same way.
  *
  * An ontology is described once, as an {@link OntologyPublication}; {@link publishedFiles} returns its files by path from commons' folder: canonical Turtle, RDF/XML, OWL 2
  * functional syntax, SHACL shapes, a JSON Schema, SKOS concept schemes and SQL tables for its code lists, SSSOM mappings to the standards it maps to, and an HTML view. Nothing

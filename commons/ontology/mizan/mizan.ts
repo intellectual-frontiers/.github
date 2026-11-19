@@ -822,7 +822,7 @@ export const termRung = OntologyTerm.make(term(MZID, "term-Rung"), {
   definedBy: ["0016-ladder FR-001"],
 });
 
-/** The day of the owner's decision to keep twelve terms unaligned (issue #10), and the day it is reviewed again by. */
+/** The day of the owner's decision to keep six terms unaligned (issue #10), and the day it is reviewed again by. */
 export const KEPT_UNALIGNED_ON = "2026-11-17";
 /** The day by which a term kept unaligned is looked at again. */
 export const KEPT_UNALIGNED_REVIEW_BY = "2027-02-15";
@@ -834,7 +834,7 @@ export const KEPT_UNALIGNED_SENTENCE = `Kept unaligned by the owner's decision o
  * The `mz:Decision` of a term kept unaligned (0018-standards-first FR-005): the individual `decision-<ontology>-<local>`, which says of the term with the record
  * `term-<ontology>-<local>` (`term-<local>` for Mizan's own) that it stays unaligned; the audit record of the term points to it with `mz:decision`.
  */
-export function keptUnalignedDecision(ontology: "mz" | "ifccm" | "ifqs" | "ifws", local: string): ReturnType<typeof Decision.make> {
+export function keptUnalignedDecision(ontology: "mz" | "ifccm" | "ifqs", local: string): ReturnType<typeof Decision.make> {
   return Decision.make(term<"mz:Decision">(MZID, `decision-${ontology}-${local}`), {
     label: en(`Keep ${ontology}:${local} unaligned`),
     decisionOf: term<"mz:OntologyTerm">(MZID, ontology === "mz" ? `term-${local}` : `term-${ontology}-${local}`),
@@ -844,7 +844,7 @@ export function keptUnalignedDecision(ontology: "mz" | "ifccm" | "ifqs" | "ifws"
 }
 
 /** The identifier of the decision of a term kept unaligned, for the audit record to point to (`mz:decision`). */
-export function keptUnalignedDecisionId(ontology: "mz" | "ifccm" | "ifqs" | "ifws", local: string): Named<"mz:Decision"> {
+export function keptUnalignedDecisionId(ontology: "mz" | "ifccm" | "ifqs", local: string): Named<"mz:Decision"> {
   return term<"mz:Decision">(MZID, `decision-${ontology}-${local}`);
 }
 

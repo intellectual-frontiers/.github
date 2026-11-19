@@ -1,5 +1,5 @@
 /**
- * Plain Git behind the one interface (commons 0023-if-workspaces FR-015 to FR-017): any Git remote that is not GitHub or GitLab, read by running `git`. It answers the four common
+ * Plain Git behind the one interface (commons 0020-ifccm FR-039 to FR-041): any Git remote that is not GitHub or GitLab, read by running `git`. It answers the four common
  * capabilities (the clone URL, credentials, the default branch and whether a commit's signature verifies) and returns `unsupported` for the rest: protected branches, issues and change
  * requests are what a host adds, and plain Git has none.
  *

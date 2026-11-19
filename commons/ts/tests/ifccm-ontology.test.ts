@@ -23,6 +23,8 @@ import {
   file,
   files,
   HarnessDeclaration,
+  gitCapabilities,
+  gitManagerKinds,
   ifccm,
   issueReferenceKinds,
   properties,
@@ -32,7 +34,6 @@ import {
 } from "../../ontology/ifccm/mod.ts";
 import { cfr11, cfr820 } from "../../ontology/mizan/mod.ts";
 import * as ifccmModule from "../../ontology/ifccm/mod.ts";
-import { gitManagerKinds } from "../../ontology/ifws/mod.ts";
 
 const HERE = dirname(fromFileUrl(import.meta.url));
 const SPEC = readTextFileSync(resolve(HERE, "..", "..", "spec-kit", "specs", "0020-ifccm", "spec.md"));
@@ -192,7 +193,7 @@ proves(["0020-ifccm FR-027"], "the host is one of GitHub, GitLab or plain Git, a
     names.filter((n) => /pull|merge|PR$|MR$/.test(n)),
     [],
   );
-  // the one list of host kinds is IFWS's: IFCCM defines none of its own, and a change request is hosted on one of its kinds
+  // the one list of host kinds is IFCCM's own, and a change request is hosted on one of its kinds
   assertEquals(keys(gitManagerKinds), ["Github", "Gitlab", "Git"]);
   assertEquals(
     Object.keys(ifccmModule).filter((k) => /host.?kind/i.test(k)),
@@ -201,7 +202,7 @@ proves(["0020-ifccm FR-027"], "the host is one of GitHub, GitLab or plain Git, a
   assertEquals(ifccmModule.ChangeRequest.fields.hostedOn.cardinality, "one");
   const ttl = readTextFileSync(resolve(HERE, "..", "..", "generated", "ifccm.auto.ttl")).replaceAll("\r\n", "\n");
   assertEquals(ttl.includes("GitHostKind"), false);
-  assertEquals(/ifccm:hostedOn[\s\S]*?rdfs:range ifws:GitManagerKind/.test(ttl), true);
+  assertEquals(/ifccm:hostedOn[\s\S]*?rdfs:range ifccm:GitManagerKind/.test(ttl), true);
 });
 
 test("a harness's declaration states its regulated domains and, optionally, the day it declares production", () => {
@@ -256,7 +257,7 @@ proves(
     }
     assertEquals(
       terms.filter((t) => t.values.basis.iri === bases.Unaligned.iri).map((t) => t.values.termIri),
-      [ifccm.Capability.iri],
+      [ifccm.Capability.iri, ifccm.GitManagerKind.iri, ifccm.GitCapability.iri],
     );
   },
 );
@@ -278,6 +279,8 @@ test("a specification of IFCCM names only terms the ontology defines", () => {
       regulatedDomains,
       traceStages,
       authorityFunctions,
+      gitCapabilities,
+      gitManagerKinds,
     ].flatMap(keys),
   ]);
   const named = [...SPEC.matchAll(/`ifccm:([A-Za-z][A-Za-z0-9_]*)`/g)].map((m) => m[1] ?? "");

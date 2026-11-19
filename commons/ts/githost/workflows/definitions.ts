@@ -554,7 +554,7 @@ const tests: Workflow = {
         ),
         run(
           lines(
-            "for n in mizan ifccm ifqs ifws ifr; do",
+            "for n in mizan ifccm ifqs ifr; do",
             '  java -jar "$RUNNER_TEMP/robot.jar" convert --input "commons/generated/$n.auto.ofn" --format owl --output "$RUNNER_TEMP/$n.owl"',
             '  java -jar "$RUNNER_TEMP/robot.jar" convert --input "commons/generated/$n.auto.ttl" --format ofn --output "$RUNNER_TEMP/$n-from-ttl.ofn"',
             '  java -jar "$RUNNER_TEMP/robot.jar" reason --reasoner ELK --input "commons/generated/$n.auto.ofn"',

@@ -1,5 +1,5 @@
 /**
- * Tests of the three Git host adapters behind `GitHostClient` (commons 0023-if-workspaces FR-015 to FR-018, FR-020, 0020-ifccm FR-027 to FR-030). GitHub and GitLab are asked through the runtime's
+ * Tests of the three Git host adapters behind `GitHostClient` (commons 0020-ifccm FR-039 to FR-042, FR-020, 0020-ifccm FR-027 to FR-030). GitHub and GitLab are asked through the runtime's
  * `recordedTransport` with exchanges written by hand from the documented answers of REST API v3 and v4 (real JSON bodies, the statuses and messages the hosts document): they reach no host. Plain Git
  * is asked of a real bare repository in a temporary folder with the real `git`, and a signed commit is made with a key `ssh-keygen` generates (skipped, with the reason, where it is not installed).
  * All three pass the same conformance function. What needs an account (a real private repository on either host) is not tested; the header of `githost-live.test.ts` says what is.
@@ -116,7 +116,7 @@ const github: Exchange[] = [
 
 const ghRef = (...path: string[]): RepoRef => ({ kind: "Github", host: "github.com", path });
 
-proves(["0023-if-workspaces FR-015", "0023-if-workspaces FR-017"], "the GitHub adapter passes the shared conformance tests", async () => {
+proves(["0020-ifccm FR-039", "0020-ifccm FR-041"], "the GitHub adapter passes the shared conformance tests", async () => {
   const token = "ghp_ConformanceTokenNeverSaid0123456789";
   await conformance({
     client: githubClient({ transport: recordedTransport(github), token }),
@@ -131,7 +131,7 @@ proves(["0023-if-workspaces FR-015", "0023-if-workspaces FR-017"], "the GitHub a
 });
 
 proves(
-  ["0023-if-workspaces FR-016", "0020-ifccm FR-027"],
+  ["0020-ifccm FR-040", "0020-ifccm FR-027"],
   "GitHub: issues with their parent and sub-issues, pull requests, protected branches and signatures",
   async () => {
     const c = githubClient({ transport: recordedTransport(github) });
@@ -187,7 +187,7 @@ proves(
 );
 
 proves(
-  ["0023-if-workspaces FR-018"],
+  ["0020-ifccm FR-042"],
   "GitHub: a private repository asked with no credential is not-found, as GitHub says, and every refusal is typed",
   async () => {
     const anon = githubClient({ transport: recordedTransport(github) });
@@ -297,7 +297,7 @@ const gitlab: Exchange[] = [
 const glRef = (...path: string[]): RepoRef => ({ kind: "Gitlab", host: "gitlab.com", path });
 
 proves(
-  ["0023-if-workspaces FR-015", "0023-if-workspaces FR-020"],
+  ["0020-ifccm FR-039", "0020-ifccm FR-044"],
   "the GitLab adapter passes the shared conformance tests, groups to any depth included",
   async () => {
     const token = "glpat-ConformanceTokenNeverSaid0123456789";
@@ -315,7 +315,7 @@ proves(
 );
 
 proves(
-  ["0023-if-workspaces FR-016", "0020-ifccm FR-027"],
+  ["0020-ifccm FR-040", "0020-ifccm FR-027"],
   "GitLab: issues and merge requests, protected branches and signatures, as the API offers them",
   async () => {
     const c = gitlabClient({ transport: recordedTransport(gitlab) });
@@ -360,7 +360,7 @@ proves(
 );
 
 proves(
-  ["0023-if-workspaces FR-018"],
+  ["0020-ifccm FR-042"],
   "GitLab: a private project asked with no credential is not-found, as GitLab says, and every refusal is typed",
   async () => {
     const anon = gitlabClient({ transport: recordedTransport(gitlab) });
@@ -394,7 +394,7 @@ async function git(cwd: string, ...args: string[]): Promise<string> {
 }
 
 proves(
-  ["0023-if-workspaces FR-015", "0023-if-workspaces FR-017"],
+  ["0020-ifccm FR-039", "0020-ifccm FR-041"],
   "the plain Git adapter passes the shared conformance tests on a real repository and a real signature",
   async () => {
     await withTempDir(async (dir) => {
@@ -453,7 +453,7 @@ proves(
 );
 
 proves(
-  ["0023-if-workspaces FR-017", "0023-if-workspaces FR-018"],
+  ["0020-ifccm FR-041", "0020-ifccm FR-042"],
   "plain Git: a remote that wants a credential is unauthorized, never a prompt, and the program missing is unreachable",
   async () => {
     const askCredential = plainGitClient({ remoteOf: () => "https://127.0.0.1:1/never/there.git" });

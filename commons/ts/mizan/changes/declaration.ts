@@ -243,7 +243,7 @@ export function covers(decision: DecisionRecord, thing: string): boolean {
   });
 }
 
-/** The word a Decision's `covers` entry starts with when it waives the signed-commit rule for a bot account that signs through the host: `signing-waiver <account> <key>` (0023-if-workspaces FR-049). */
+/** The word a Decision's `covers` entry starts with when it waives the signed-commit rule for a bot account that signs through the host: `signing-waiver <account> <key>` (ergonex 0002-workspace-model FR-049, which reads the entries this module decodes). */
 export const SIGNING_WAIVER = "signing-waiver";
 
 /** A waiver of the signed-commit rule for one account and one key, with the Decision that authorizes it. */
@@ -259,7 +259,7 @@ export type SigningWaiver = {
 };
 
 /**
- * The waivers of the signed-commit rule that the Decisions of a harness record make (0023-if-workspaces FR-049): each entry of a Decision's `covers` written `signing-waiver <account> <key>`.
+ * The waivers of the signed-commit rule that the Decisions of a harness record make (ergonex 0002-workspace-model FR-049, which reads the entries this module decodes): each entry of a Decision's `covers` written `signing-waiver <account> <key>`.
  * An entry that names no account or no key waives nothing, and a Decision that says only `signing-waiver` or names the account alone waives no one.
  */
 export function signingWaivers(decisions: readonly DecisionRecord[]): readonly SigningWaiver[] {

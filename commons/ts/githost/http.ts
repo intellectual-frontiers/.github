@@ -1,6 +1,6 @@
 /**
  * What the REST adapters (`github.ts`, `gitlab.ts`) share: one GET over the runtime's `Transport`, and a host's refusal told as the contract's `HostFailure` the same way for both
- * (commons 0023-if-workspaces FR-015, FR-018). A credential is only ever put in a request's headers; no failure, no message and no result holds a header, a URL's query or a token.
+ * (commons 0020-ifccm FR-039, FR-018). A credential is only ever put in a request's headers; no failure, no message and no result holds a header, a URL's query or a token.
  *
  * @module
  */
