@@ -17,6 +17,7 @@ import { identityAbacModule } from "@intellectual-frontiers/data/models/identity
 import { identityAccessModule } from "@intellectual-frontiers/data/models/identity-access";
 import { identityAgentModule } from "@intellectual-frontiers/data/models/identity-agent";
 import { identityDelegationModule } from "@intellectual-frontiers/data/models/identity-delegation";
+import { identityRebacModule } from "@intellectual-frontiers/data/models/identity-rebac";
 import { projectDomain } from "@intellectual-frontiers/data/sql/logical";
 import { DIALECTS } from "./engines-fixture.ts";
 import { same } from "./governance-fixture.ts";
@@ -41,7 +42,7 @@ proves(
     same([where(postgres, "no-weakening").by, where(sqlite, "no-weakening").by], ["database", "application"]);
     same([where(postgres, "least-privilege").by, where(sqlite, "least-privilege").by], ["database", "application"]);
     // the identity model: every invariant is enforced in the database where the dialect can
-    const d = composeModules("app", {}, [moduleOf(partyDomain.kind === "ok" ? partyDomain.value : (undefined as never)), tenancyModule, identityModule, identityAccessModule, identityAbacModule, identityDelegationModule, identityAgentModule]);
+    const d = composeModules("app", {}, [moduleOf(partyDomain.kind === "ok" ? partyDomain.value : (undefined as never)), tenancyModule, identityModule, identityAccessModule, identityAbacModule, identityRebacModule, identityDelegationModule, identityAgentModule]);
     assert(d.kind === "ok");
     if (d.kind !== "ok") return;
     const p = projectDomain(d.value);

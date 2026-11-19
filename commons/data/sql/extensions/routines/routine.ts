@@ -18,7 +18,13 @@ export type Ref =
   | { readonly ref: "table"; readonly table: string }
   | { readonly ref: "column"; readonly table: string; readonly column: string }
   | { readonly ref: "columnName"; readonly table: string; readonly column: string }
-  | { readonly ref: "param"; readonly param: string };
+  | { readonly ref: "param"; readonly param: string }
+  /** A variable of a block, by its name as governance writes names (0050-sql-plpgsql). */
+  | { readonly ref: "var"; readonly name: string }
+  /** A type, written for the dialect. */
+  | { readonly ref: "type"; readonly type: LogicalType }
+  /** A column of a record a loop gives, by the table it is a row of. */
+  | { readonly ref: "field"; readonly record: string; readonly table: string; readonly column: string };
 
 /** A reference to a table, as governance names it. */
 export const table = (name: string): Ref => ({ ref: "table", table: name });
@@ -111,6 +117,21 @@ export function routinesSource(definitions: readonly RoutineDefinition[]): State
             case "param": {
               if (!params.some((p) => p.name === part.param)) return bad(`it has no parameter ${part.param}`);
               return `${q(name)}.${q(w(part.param))}`;
+            }
+            case "var":
+              return q(w(part.name));
+            case "type": {
+              const t = dialect.unsupported?.(part.type);
+              if (t !== undefined) return bad(t);
+              return dialect.type(part.type);
+            }
+            case "field": {
+              const t = tableNamed(schema, part.table);
+              const c = t === undefined ? undefined : columnNamed(t, part.column);
+              const cn = c === undefined ? undefined : written.column(c.id);
+              if (t === undefined || c === undefined || cn === undefined) return bad(`the schema has no column ${part.table}.${part.column}`);
+              used.push(t.id, c.id);
+              return `${q(w(part.record))}.${q(cn)}`;
             }
           }
         })

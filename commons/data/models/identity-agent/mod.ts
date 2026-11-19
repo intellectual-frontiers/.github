@@ -203,7 +203,7 @@ export const concepts: readonly AnyConcept[] = [agent, agentVersion, agentTool, 
 export const identityAgentModule = defineModule({
   name: "identityAgent",
   definition: "AI agents: provenance, tools, runs, budgets and approvals",
-  requires: ["identityDelegation"],
+  requires: ["identityDelegation", "identityRebac"],
   concepts,
   codeLists: [autonomyLevel, versionStatus, runStatus, toolApproval, callDecision, callStatus, meter, windowKind, approvalStatus, approverRule],
 });

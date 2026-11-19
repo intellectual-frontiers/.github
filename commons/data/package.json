@@ -52,6 +52,9 @@
     "./sql/extensions/osquery-atc": "./sql/extensions/osquery-atc/mod.ts",
     "./sql/extensions/operations": "./sql/extensions/operations/mod.ts",
     "./sql/extensions/invariants": "./sql/extensions/invariants/mod.ts",
+    "./sql/extensions/objects": "./sql/extensions/objects/mod.ts",
+    "./sql/extensions/assertions": "./sql/extensions/assertions/mod.ts",
+    "./sql/quality": "./sql/quality/mod.ts",
     "./sql/presets": "./sql/presets/mod.ts",
     "./sql/cli": "./sql/cli/mod.ts"
   },
@@ -65,6 +68,7 @@
   "devDependencies": {
     "@duckdb/node-api": "2.0.0-r.1",
     "@electric-sql/pglite": "0.5.16",
+    "@electric-sql/pglite-pgtap": "0.0.18",
     "@electric-sql/pglite-socket": "0.2.20",
     "@intellectual-frontiers/commons": "link:../ts",
     "@types/node": "26.6.6",

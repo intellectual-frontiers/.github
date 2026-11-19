@@ -61,6 +61,68 @@ export const commands: readonly Command[] = [
     ],
   },
   {
+    name: "sql",
+    help: "write the DDL of the models",
+    flags: [
+      { name: "--models", help: "the models", values: modelNames },
+      { name: "--config", help: "arca.config.ts" },
+      { name: "--module", help: "a module of your own" },
+      { name: "--schema", help: "the schema" },
+      { name: "--dialect", help: "the dialect", values: ["postgres", "sqlite", "duckdb"] },
+      { name: "--no-invariants", help: "leave out the triggers", switch: true },
+    ],
+  },
+  {
+    name: "lint",
+    help: "hold the models to governance's rules",
+    flags: [
+      { name: "--models", help: "the models", values: modelNames },
+      { name: "--config", help: "arca.config.ts" },
+      { name: "--module", help: "a module of your own" },
+      { name: "--strict", help: "a warning fails too", switch: true },
+    ],
+  },
+  {
+    name: "generate",
+    help: "write what a generator makes",
+    flags: [
+      { name: "--models", help: "the models", values: modelNames },
+      { name: "--config", help: "arca.config.ts" },
+      { name: "--module", help: "a module of your own" },
+      { name: "--dialect", help: "the dialect", values: ["postgres", "sqlite", "duckdb"] },
+    ],
+  },
+  {
+    name: "list",
+    help: "list generators, models, tables, codes, invariants",
+    flags: [
+      { name: "--models", help: "the models", values: modelNames },
+      { name: "--config", help: "arca.config.ts" },
+      { name: "--module", help: "a module of your own" },
+    ],
+  },
+  {
+    name: "init",
+    help: "set up your workstation",
+    flags: [
+      { name: "--instance", help: "the instance" },
+      { name: "--host", help: "its host" },
+      { name: "--port", help: "its port" },
+      { name: "--database", help: "its database" },
+      { name: "--user", help: "its user" },
+      { name: "--sslmode", help: "SSL mode" },
+      { name: "--env", help: "dev, staging or prod", values: ["dev", "staging", "prod"] },
+      { name: "--shell", help: "the shells", values: [...shells, "all", "auto", "none"] },
+      { name: "--discover", help: "look at every instance found", switch: true },
+      { name: "--local", help: "look for PostgreSQL on this machine", switch: true },
+      { name: "--password-stdin", help: "read the password from standard input", switch: true },
+      { name: "--dry-run", help: "show the changes and write nothing", switch: true },
+      { name: "--yes", help: "make the changes without asking", switch: true },
+      { name: "--undo", help: "take away what init put in", switch: true },
+      { name: "--no-psql", help: "leave the psql files alone", switch: true },
+    ],
+  },
+  {
     name: "shell",
     help: "print the script that sets up this shell",
     flags: [

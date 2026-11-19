@@ -78,7 +78,7 @@ proves(
     same(tenancyModule.requires, ["arcaParty"]);
     same(identityModule.requires, ["arcaParty", "arcaTenancy"]);
     same([identityAccessModule.requires, identityAbacModule.requires, identityRebacModule.requires, identityPkiModule.requires], [["identity"], ["identityAccess"], ["identityAccess"], ["identity"]]);
-    same([identityMachineModule.requires, identityDeviceModule.requires, identityDelegationModule.requires, identityAgentModule.requires], [["identityPki"], ["identityPki"], ["identityAccess", "identityAbac"], ["identityDelegation"]]);
+    same([identityMachineModule.requires, identityDeviceModule.requires, identityDelegationModule.requires, identityAgentModule.requires], [["identityPki"], ["identityPki"], ["identityAccess", "identityAbac"], ["identityDelegation", "identityRebac"]]);
     const r = composeModules("app", {}, [arca, identityModule]);
     assert(r.kind === "err" && r.error.some((e) => e.kind === "missing" && e.requires === "arcaTenancy"));
     const core = tableNames(wanted("identity"));
@@ -86,10 +86,10 @@ proves(
     const access = tableNames(wanted("identityAccess"));
     assert(access.includes("access.role") && access.includes("role.assignment") && !access.includes("attribute.definition") && !access.includes("agent.run"));
     const agent = tableNames(wanted("identityAgent"));
-    assert(agent.includes("agent.run") && agent.includes("delegation") && agent.includes("attribute.definition") && !agent.includes("device") && !agent.includes("api.key") && !agent.includes("relation.tuple"), "an agent needs delegation and attributes, not devices, keys or tuples");
+    assert(agent.includes("agent.run") && agent.includes("delegation") && agent.includes("attribute.definition") && !agent.includes("device") && !agent.includes("api.key"), "an agent needs delegation, attributes and relations, not devices or keys");
     const order = withRequired(everything, ["identityAgent"]);
     assert(order.kind === "ok");
-    if (order.kind === "ok") same(order.value.map((m) => m.name), ["arcaParty", "arcaTenancy", "identity", "identityAccess", "identityAbac", "identityDelegation", "identityAgent"]);
+    if (order.kind === "ok") same(order.value.map((m) => m.name), ["arcaParty", "arcaTenancy", "identity", "identityAccess", "identityAbac", "identityDelegation", "identityRebac", "identityAgent"]);
   },
 );
 

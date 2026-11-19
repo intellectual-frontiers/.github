@@ -15,6 +15,7 @@ import { passwordOf, redact } from "./redact.ts";
 import { modeOf, secretOf } from "./server.ts";
 import { envJson, shellScript } from "./shell.ts";
 import { runInit } from "./init.ts";
+import { projectCommand, type ProjectCommand, projectCommands } from "./project.ts";
 import type { Prompter } from "./prompt.ts";
 import { readState } from "./state.ts";
 import { workstationChecks, workstationIds } from "./workstation-checks.ts";
@@ -52,12 +53,20 @@ export const USAGE = `arcactl: manage and check an arca database in PostgreSQL
 
   arcactl doctor [options]     check the database against the models (read-only)
   arcactl shell [options]      print the script that sets up this shell (source it; writes nothing)
+  arcactl sql [options]        write the DDL of the models for a dialect (to standard output)
+  arcactl lint [options]       hold the models (and their operations) to governance's rules
+  arcactl generate NAME        write what a generator makes: mermaid, d2, dictionary, rust, zod, register
+  arcactl list [WHAT]          generators (default), models, dialects, tables, codes, invariants, operations
   arcactl init [options]       set up your workstation (not a database): find your instances, .pgpass, pg_service.conf, psql and shell profiles
 
 options:
   --config <file>     arca.config.ts (default: ./arca.config.ts where there is one)
   --models <a,b,...>  the models wanted, where there is no config: ${modelNames.join(", ")}
   --schema <name>     the schema the tables are in (default: arca)
+  --module <file>     a module of your own whose default export is a domain, a module or a list of modules (sql, lint, generate, list)
+  --dialect <d>       postgres (default), sqlite or duckdb (sql, generate)
+  --no-invariants     sql: leave out the triggers of the invariants
+  --strict            lint: a warning fails too
   --check <ids>       only these checks, as ARCA-D001,ARCA-D005 (ARCA-W001... are the workstation's)
   --scope <s>         instance (the database, the default), workstation (your files and tools) or all
   --json              machine-readable output
@@ -111,6 +120,7 @@ export async function main(argv: readonly string[], io: Io): Promise<Outcome> {
   const [command] = argv;
   if (command === undefined || command === "-h" || command === "--help" || command === "help") return { code: command === undefined ? 2 : 0, out: command === undefined ? "" : USAGE, err: command === undefined ? USAGE : "" };
   if (command === "shell") return shellCommand(argv.slice(1), io);
+  if ((projectCommands as readonly string[]).includes(command)) return projectCommand(command as ProjectCommand, argv.slice(1), io.cwd);
   if (command === "init") {
     const plat = io.platform ?? ((process.platform === "win32" ? "win32" : process.platform === "darwin" ? "darwin" : "linux") as Platform);
     return runInit(argv.slice(1), { env: io.env, platform: plat, cwd: io.cwd, tty: io.tty ?? false, ...(io.prompt === undefined ? {} : { prompt: io.prompt }), ...(io.stdin === undefined ? {} : { stdin: io.stdin }), ...(io.connect === undefined ? {} : { connect: io.connect }), ...(io.psqlVersion === undefined ? {} : { psqlVersion: io.psqlVersion }) });

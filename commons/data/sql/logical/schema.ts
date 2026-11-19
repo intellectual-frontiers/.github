@@ -33,7 +33,7 @@ export type ConstraintKind = "pk" | "fk" | "uq" | "ck" | "ix";
 /** The identity of a value set: a closed code list. */
 export const valueSetId = (name: Words): LogicalId => made(`valueset:${name.join(".")}`);
 /** What a feature of an extension makes: the identity of a thing the schema does not have (0009-sql-features). */
-export type FeatureKind = "view" | "routine" | "policy" | "partition" | "grant";
+export type FeatureKind = "view" | "routine" | "policy" | "partition" | "grant" | "object";
 /** The identity of what a feature of an extension makes, by its kind and name. */
 export const featureId = (kind: FeatureKind, name: Words): LogicalId => made(`${kind}:${name.join(".")}`);
 /** The identity of a constraint or an index. */

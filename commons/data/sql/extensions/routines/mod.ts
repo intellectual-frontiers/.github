@@ -25,3 +25,32 @@ export function routinesExtension(definitions: readonly RoutineDefinition[], ver
     ? err(id.error)
     : ok(defineExtension({ id: id.value, version, contributes: [contribute(statementsPoint, routinesSource(definitions))] }));
 }
+export {
+  attempt,
+  block,
+  type BlockError,
+  done,
+  type Declared,
+  expr,
+  type Expr,
+  forEach,
+  found,
+  loop,
+  notice,
+  type Of,
+  type Part,
+  raise,
+  raiseCode,
+  ref,
+  ret,
+  retQuery,
+  run,
+  set,
+  type Shape,
+  type Stmt,
+  val,
+  variable,
+  type Var,
+  when,
+} from "./plpgsql.ts";
+export { column as columnOf, param as paramOf, table as tableOf } from "./plpgsql.ts";

@@ -46,3 +46,8 @@ number	slug	state
 0045	issues-model	in force
 0046	arcactl	in force
 0047	arcactl-init	in force
+0048	sql-objects	in force
+0049	sql-assertions	in force
+0050	sql-plpgsql	in force
+0051	project-cli	in force
+0052	sql-quality	in force

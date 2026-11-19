@@ -49,7 +49,7 @@ proves(
     const file = join(dir, "arcactl.mjs");
     const text = readFileSync(file, "utf8");
     assert(text.startsWith("#!/usr/bin/env node\n") && (statSync(file).mode & 0o111) !== 0, "an executable that starts from the shebang of Node");
-    assert(!text.includes("/home/") && !text.includes(ROOT) && !text.includes("pglite") && !text.includes("duckdb") && !/from ["']bun:test/.test(text), "none of this machine and none of the test tools");
+    assert(!text.includes("/home/") && !text.includes(ROOT) && !text.includes("@electric-sql/pglite") && !text.includes("@duckdb/node-api") && !/from ["']bun:test/.test(text), "none of this machine and none of the test tools");
     assert(statSync(file).size < 1_000_000, `${statSync(file).size} bytes`);
     same(JSON.parse(readFileSync(join(dir, "package.json"), "utf8")), m);
     assert(readFileSync(join(dir, "LICENSE"), "utf8").startsWith("MIT License") && readFileSync(join(dir, "README.md"), "utf8").includes("arcactl doctor"));

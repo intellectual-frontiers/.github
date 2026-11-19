@@ -118,7 +118,7 @@ export const allModules = (): readonly Module[] => [
 export function schemaOf(config: Arca): Result<{ readonly domain: Domain; readonly schema: LogicalSchema }, readonly ConfigError[]> {
   const picked = withRequired(allModules(), config.models);
   if (picked.kind === "err") return err([{ kind: "compose", errors: picked.error }]);
-  const domain = composeModules("arca", {}, picked.value);
+  const domain = composeModules("arca", { definition: `The arca data models: ${config.models.join(", ")}` }, picked.value);
   if (domain.kind === "err") return err([{ kind: "compose", errors: domain.error }]);
   const projected = projectDomain(domain.value);
   if (projected.kind === "err") return err([{ kind: "project", why: JSON.stringify(projected.error).slice(0, 300) }]);
