@@ -87,6 +87,32 @@ async function repo(
 }
 
 proves(
+  [`${SPEC} FR-015`, `${SPEC} FR-016`, `${SPEC} FR-017`, `${SPEC} FR-018`],
+  "a library is published to GitHub and, where a decision says so, to npm as well: the default, the refusals, and the registries in the requirement",
+  () => {
+    const plain = decodeLibrarySource(manifest());
+    assert(plain.kind === "ok");
+    assertEquals(plain.value.distribution, ["github"]);
+    const both = decodeLibrarySource(manifest({ distribution: ["github", "npm"] }));
+    assert(both.kind === "ok");
+    assertEquals(both.value.distribution, ["github", "npm"]);
+    for (const [bad, needle] of [
+      [{ distribution: ["npm"] }, "includes github"],
+      [{ distribution: [] }, "at least one"],
+      [{ distribution: ["github", "github"] }, "once"],
+      [{ distribution: ["github", "registry.example.com"] }, "distribution"],
+    ] as const) {
+      const r = decodeLibrarySource(manifest(bad));
+      assert(r.kind === "err", `refused: ${JSON.stringify(bad)}`);
+      assertStringIncludes(r.error, needle);
+    }
+    const text = generated("x\n<!-- libraries:begin -->\n\n<!-- libraries:end -->\ny\n", "", [both.value]);
+    assert(text.kind === "ok");
+    assertStringIncludes(text.value.spec, "published to the GitHub package registry and npm, proved by");
+  },
+);
+
+proves(
   [`${SPEC} FR-013`, "0028-conformance-levels FR-013"],
   "a manifest that agrees with its folder and package has no finding, and each disagreement is named",
   async () => {
@@ -188,7 +214,7 @@ proves(
       writeTextFileSync(join(root, "commons", "spec-kit", "specs", SPEC, "spec.md"), "## The libraries\n");
       assertStringIncludes(synchronize(root, false).problems.join("\n"), "has no <!-- libraries:begin -->");
     });
-    const lib = { name: "a", level: "L1" as const, verify: "bun run verify", version: "1", exports: [] };
+    const lib = { name: "a", level: "L1" as const, verify: "bun run verify", version: "1", exports: [], distribution: ["github" as const] };
     const libs = [lib];
     assertEquals([...idsFor(libs, new Map()).values()], [`FR-${FIRST_GENERATED}`]);
     assertEquals([...idsFor(libs, new Map([["a", "FR-150"]])).values()], ["FR-150"]);
