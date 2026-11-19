@@ -47,6 +47,7 @@ export { type Words } from "./names.ts";
 export { type Edge, type EdgeKind, type Element, elementsOf, type TraceGraph, traceGraph } from "./elements.ts";
 export { attributeId, codeId, codeListId, conceptId, domainId, type ElementId, type ElementKind, relationshipId } from "./id.ts";
 export { coreRules, lint } from "./lint.ts";
+export { type Input, type InputType, lintOperations, operation, type Operation, type OperationRule, type OperationSpec } from "./operation.ts";
 export { NAME, words } from "./names.ts";
 export {
   type Attribute,

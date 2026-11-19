@@ -43,6 +43,7 @@ export const library = {
     "./sql/extensions/target",
     "./sql/extensions/kinds",
     "./sql/extensions/osquery-atc",
+    "./sql/extensions/operations",
     "./sql/presets",
   ],
   summary:

@@ -1,6 +1,6 @@
 # @intellectual-frontiers/data
 
-Governance (what a business domain is and what must be true of its data), a logical schema made from it, and a physical schema for PostgreSQL, SQLite or DuckDB made from that, with extensions to each, and the lifecycle that changes a database from one physical schema to the next. It is an independent library of commons with its own specifications (`spec-kit/`, 0001 to 0030).
+Governance (what a business domain is and what must be true of its data), a logical schema made from it, and a physical schema for PostgreSQL, SQLite or DuckDB made from that, with extensions to each, and the lifecycle that changes a database from one physical schema to the next. It is an independent library of commons with its own specifications (`spec-kit/`, 0001 to 0031).
 
 **Full documentation: [README.html](https://htmlpreview.github.io/?https://github.com/intellectual-frontiers/.github/blob/main/commons/data/README.html)** (diagrams, every extension with an example, strategies, presets, limits and roadmap).
 
@@ -33,6 +33,7 @@ Each layer imports only the layers below it and the engine; a check of the libra
 - `sql/presets/`: team-managed, dba-managed, reviewed-convergence and autonomous-convergence.
 - Modules: `governance/module.ts` composes the subject areas a project lists into one domain, so a module that is not listed has no table.
 - Models: `models/arca` (party), `models/arca-tenancy` (tenants, for B2B and B2B2C) and `models/identity` (principals, credentials with no secret in the clear, sessions, roles and permissions, policies, an audit chain), each a module a project composes.
+- Operations: contracts in `governance/operation.ts`, run by `sql/extensions/operations` in one transaction with typed row operations, an authorizer and an audit sink.
 - `sql/cli/`: the command line; in the layers table, not yet built.
 
 ## Verify
