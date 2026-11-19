@@ -18,7 +18,7 @@ import { type GeneratedFile } from "./render.ts";
 import { headerText } from "./render.ts";
 
 /** The version of Ergonex the record names. */
-export const ERGONEX_VERSION = "0.2.0";
+export const ERGONEX_VERSION = "0.2.1";
 
 /** Where the state record is, below the root. */
 export const STATE_RECORD_PATH = ".ergonex/state.auto.json";
@@ -165,7 +165,13 @@ export function verifyFindings(facts: readonly FileFacts[], today: string): read
     const edited = f.recorded !== undefined && f.onDisk !== undefined && f.onDisk !== f.recorded;
     const missing = f.recorded !== undefined && f.onDisk === undefined;
     if (f.wanted !== undefined && f.onDisk !== f.wanted && !edited && !missing) {
-      at("ergonex/generated-drift", "Warning", `${f.path} would be written differently by the templates now; run \`ergonex render\``);
+      at(
+        "ergonex/generated-drift",
+        "Warning",
+        f.onDisk === undefined
+          ? `${f.path} is not written yet; run \`ergonex render\``
+          : `${f.path} would be written differently by the templates now; run \`ergonex render\``,
+      );
     }
   }
   return out;

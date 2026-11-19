@@ -43,4 +43,48 @@ Five products are specified in Mizan's form; four are built (Ergonex as a librar
 - **IFWS**, Intellectual Frontiers Workspaces (the original, which Ergonex replaces and which is removed once Ergonex is tested) (`0023-if-workspaces`, `0024-ifws-host`, `0025-ifws`): the `ifws` command manages one workspace root, `$IFC_WORKSPACES_HOME`, with the repositories laid out like their remotes, on GitHub, GitLab or plain Git behind one interface, and a plan that is shown before anything changes. `ifws setup` is a dry run unless given `--apply`. It credits [chezmoi](https://www.chezmoi.io/) for ideas only; see [`commons/ts/workspaces/CREDITS.md`](commons/ts/workspaces/CREDITS.md).
 - **IFR**, Intellectual Frontiers Releases (`0026-works-versioning`): one scheme of version for each kind of work (Semantic Versioning for software, libraries, ontologies and schemas, the commit-date edition for published prose, a snapshot date for data, an integer revision with an approval for a controlled document, none for a specification), a release that is a signed annotated Git tag, and a ledger and release notes derived from the tags and from the capabilities closed. The ontology `ifr:` is built; the tool is next.
 
+### Try Ergonex (acceptance test)
+
+Ergonex is not published to npm yet (the first publish is the owner's), so until then you run it from a checkout. Do the steps in order on Windows first, then macOS, then Linux, and report for each step what you saw against what is written here. Nothing below changes anything outside your home folder and the folders `ergonex paths` names.
+
+**1. What you need.** Git, the GitHub CLI signed in (`gh auth login`), and [Bun](https://bun.sh) (Node 26 also works). On Windows: `winget install Git.Git GitHub.cli Oven-sh.Bun` (the ids are to be verified; tell me if one is not found). On macOS: `brew install git gh oven-sh/bun/bun`. On Linux: your package manager, and `curl -fsSL https://bun.sh/install | bash` for Bun. Open a new terminal afterwards and check `git --version`, `gh auth status` and `bun --version`.
+
+**2. Get it and pack it.**
+
+```sh
+git clone https://github.com/intellectual-frontiers/.github.git
+cd .github/commons/ergonex
+bun install
+bun tools/pack.ts
+```
+
+You see `Packed size` and a file `dist/intellectual-frontiers-ergonex-0.2.1.tgz`.
+
+**3. Install it as a person would.**
+
+```sh
+bun add -g ./dist/intellectual-frontiers-ergonex-0.2.1.tgz
+ergonex
+```
+
+A new terminal is needed if `ergonex` is not found: Bun's folder (`~/.bun/bin`, `%USERPROFILE%\.bun\bin` on Windows) must be on your PATH, which Bun's installer does. Expect: "Ergonex sets up and looks after the repositories you work on. You have no workspace yet. To make one, run: ergonex init", and exit status 0.
+
+**4. Make the workspace.**
+
+```sh
+ergonex init
+```
+
+Expect: it names the folder it made (`workspaces` in your home folder, or `$ERGONEX_HOME`), a `.ergonex/workspace.ts` inside it, says `ergonex` is already on your path, and ends with "next: name your repositories in .ergonex/workspace.ts, then run `ergonex plan`". Running it a second time changes nothing.
+
+**5. See where things go.** `ergonex paths` lists the workspace, `.ergonex/` (the manifest, the generated Git configuration and hooks: what you edit and other tools read), and three places that follow the system's conventions and nothing in your home folder named after Ergonex: state (what it remembers), data (the tools it installs, with shims in `~/.local/bin`) and cache. They are `$XDG_STATE_HOME/ergonex`, `$XDG_DATA_HOME/ergonex` and `$XDG_CACHE_HOME/ergonex`, which default to `~/.local/state`, `~/.local/share` and `~/.cache` on macOS and Linux (as `git` and `gh` do), and to `%LOCALAPPDATA%\ergonex` (with `state` and `cache` below it) on Windows. Set one `XDG_*` variable, run `ergonex paths` again, and the place moves, on Windows too. There must be no `~/.ergonex`.
+
+**6. Set up your terminal.** `ergonex shell bash` (or `zsh`, `fish`, `pwsh`, `nu`) prints the snippet: `ERGONEX_HOME`, the tools' folder on the PATH, completions, `wcd`, and `ERGONEX_GITHUB_TOKEN` taken from `gh auth token` (the token is never written to a file, and `GITHUB_TOKEN` is never touched). Add `--install` to put it in your shell's startup file (it never creates one: if the file is missing it prints the command that makes it, run that and `--install` again), open a new terminal, and run `echo $ERGONEX_GITHUB_TOKEN | head -c 4` (PowerShell: `$env:ERGONEX_GITHUB_TOKEN.Substring(0,4)`): it should begin `gho_` or `ghp_`. The zsh, fish, PowerShell and Nushell snippets have been read, not run: that is what you are testing.
+
+**7. Ask the doctor.** `ergonex doctor` lists `ok`, `warn` and `suggest` lines, each saying what to do. Right after `init` it is normal to see "is not written yet; run `ergonex render`" for the generated files and, before step 6, a suggestion about `ERGONEX_GITHUB_TOKEN`. Run `ergonex render`, then `ergonex doctor` again: the warnings should be gone. `ergonex doctor --fetch` also asks GitHub whether your token may read the organization's packages.
+
+**8. Use it.** Name a repository in `.ergonex/workspace.ts`, then `ergonex plan` (shows what would change, changes nothing), `ergonex setup` (a dry run) and `ergonex setup --apply` (does it), and `ergonex status`. `ergonex help` lists the rest.
+
+**What to send me:** the step number, your operating system and shell, what you typed, and what you saw if it was not what is written here. Once you say it works, I remove IFWS and everything that belongs to it. The one-command installers (`commons/ergonex/install/`) and `bunx @intellectual-frontiers/ergonex init` can only be tried after the first publish.
+
 **Status:** the specifications are `0003-mizan` and `0016` to `0026` in [`commons/spec-kit/`](commons/spec-kit/); all are Draft. Built and tested: M0 to M7 (the checks, importers and exporters, the four ontologies, IFCCM, the IFQS evidence record and Tier 1, and IFWS with its Git hosts, command, tools and setup, now ported to the library Ergonex, which also has `init` on the path, the plain-words guidance, the doctor's token check, the installers and the package; its first publish and the removal of IFWS are next); M9 (IFQS Tier 2) is in progress; M10 is these credits and the Decisions. Not yet verified: some tests on Windows, private repositories on GitHub and GitLab, and the zsh, fish, PowerShell and Nushell snippets (read, not run). Nothing here claims compliance with any regulation; it records evidence. The plan and its progress are in [issue #10](https://github.com/intellectual-frontiers/.github/issues/10), and the first audit is in [`commons/spec-kit/audits/`](commons/spec-kit/audits/2026-11-standards-audit.md). [`MIZAN.html`](https://htmlpreview.github.io/?https://github.com/intellectual-frontiers/.github/blob/main/MIZAN.html) is the full strategy and implementation document (a rendered preview of `main`).
