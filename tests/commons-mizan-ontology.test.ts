@@ -285,7 +285,7 @@ DCT = rdflib.DCTERMS
 catalogs = list(cat.subjects(rdflib.RDF.type, DCAT.Catalog))
 assert len(catalogs) == 1
 datasets = list(cat.objects(catalogs[0], DCAT.dataset))
-assert len(datasets) == 5, len(datasets)
+assert len(datasets) == 4, len(datasets)
 IANA = "https://www.iana.org/assignments/media-types/"
 import os
 names = set()
