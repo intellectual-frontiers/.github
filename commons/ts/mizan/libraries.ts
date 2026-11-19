@@ -9,7 +9,7 @@
  *
  * @remarks
  * A manifest declares the library's `name` (its folder), its conformance `level` (`L1` where it declares none, 0028-conformance-levels), the path of its spec kit, its `verify` command, its
- * `version` and its `exports` (the keys of the package's `exports`). The section "The libraries" of the specification is between the markers `<!-- libraries:begin -->` and `<!-- libraries:end -->`,
+ * `version`, its `exports` (the keys of the package's `exports`) and its `distribution` (the registries it is published to: `github`, the default, and `npm` as well where a decision about that package has made it so; FR-015 to FR-018). The section "The libraries" of the specification is between the markers `<!-- libraries:begin -->` and `<!-- libraries:end -->`,
  * one requirement for each library numbered from FR-101, an id kept for the life of the library; the rows of those requirements are in `enforcement.tsv`. Adding a library is adding a folder with a manifest and
  * running this command.
  *
@@ -68,7 +68,15 @@ export type Library = {
   readonly exports: readonly string[];
   /** What it is, in a sentence, for the requirement made of it. */
   readonly summary?: string;
+  /** Where it is published: always `github` (the GitHub package registry of the organization), and `npm` as well where a decision about that package has made it so (FR-015 and FR-016). */
+  readonly distribution: readonly Registry[];
 };
+
+/** The registries a library may be published to: the kinds only, never a host or a credential (0027-commons-libraries FR-018). */
+export const REGISTRIES = ["github", "npm"] as const;
+export type Registry = (typeof REGISTRIES)[number];
+/** Where a manifest that declares no distribution is published. */
+export const DEFAULT_DISTRIBUTION: readonly Registry[] = ["github"];
 
 const nonEmpty: Decoder<string> = (input, path = "$") => {
   const r = string(input, path);
@@ -84,9 +92,9 @@ const nameDecoder: Decoder<string> = (input, path = "$") => {
 };
 const body = object(
   { name: nameDecoder, verify: nonEmpty, version: nonEmpty, exports: array(nonEmpty) },
-  { level: literal(...LEVELS), specKit: nonEmpty, summary: nonEmpty },
+  { level: literal(...LEVELS), specKit: nonEmpty, summary: nonEmpty, distribution: array(literal(...REGISTRIES)) },
 );
-const FIELDS = ["name", "level", "specKit", "verify", "version", "exports", "summary"] as const;
+const FIELDS = ["name", "level", "specKit", "verify", "version", "exports", "summary", "distribution"] as const;
 
 /** The manifest read from the text of its file: `export const library = { ... }` and no other export, read as data and never run (0027-commons-libraries FR-012). */
 export function decodeLibrarySource(source: string): Result<Library, string> {
@@ -103,6 +111,13 @@ export function decodeLibrarySource(source: string): Result<Library, string> {
   const r = body(input, "library");
   if (r.kind === "err") return err(formatDecodeError(r.error));
   const v = r.value;
+  const distribution = v.distribution ?? DEFAULT_DISTRIBUTION;
+  if (distribution.length === 0 || new Set(distribution).size !== distribution.length)
+    return err("library.distribution lists each registry once and at least one (FR-015)");
+  if (!distribution.includes("github"))
+    return err(
+      "library.distribution includes github: a library is published to the GitHub package registry whatever else it is published to (FR-015, FR-016)",
+    );
   return ok({
     name: v.name,
     level: v.level ?? DEFAULT_LIBRARY_LEVEL,
@@ -111,6 +126,7 @@ export function decodeLibrarySource(source: string): Result<Library, string> {
     version: v.version,
     exports: v.exports,
     ...(v.summary === undefined ? {} : { summary: v.summary }),
+    distribution,
   });
 }
 
@@ -221,6 +237,9 @@ function scriptText(file: string, script: string): string {
 /** The ontology's name for a level of a manifest: `mz:Registered`, `mz:Core`, `mz:Standards` or `mz:Governed`. */
 const LEVEL_TERM: Readonly<Record<LevelKey, string>> = { L0: "mz:Registered", L1: "mz:Core", L2: "mz:Standards", L3: "mz:Governed" };
 
+/** How a registry is named in the requirement of a library. */
+const REGISTRY_NAME: Readonly<Record<Registry, string>> = { github: "the GitHub package registry", npm: "npm" };
+
 const list = (items: readonly string[]): string => {
   const quoted = items.map((i) => `\`${i}\``);
   return quoted.length <= 1 ? (quoted[0] ?? "no exports") : `${quoted.slice(0, -1).join(", ")} and ${quoted[quoted.length - 1] ?? ""}`;
@@ -230,7 +249,8 @@ const list = (items: readonly string[]): string => {
 export function requirementOf(id: string, l: Library): string {
   const kit = l.specKit === undefined ? "" : `, its spec kit at \`commons/${l.name}/${l.specKit}\``;
   const summary = l.summary === undefined ? "" : ` ${l.summary}`;
-  return `- **${id}**: \`commons/${l.name}\` MUST be a library at conformance level ${l.level} (\`${LEVEL_TERM[l.level]}\`): the package \`@intellectual-frontiers/${l.name}\` at version \`${l.version}\`${kit}, exporting ${list(l.exports)}, proved by \`cd commons/${l.name} && ${l.verify}\`.${summary}`;
+  const where = l.distribution.map((r) => REGISTRY_NAME[r]).join(" and ");
+  return `- **${id}**: \`commons/${l.name}\` MUST be a library at conformance level ${l.level} (\`${LEVEL_TERM[l.level]}\`): the package \`@intellectual-frontiers/${l.name}\` at version \`${l.version}\`${kit}, exporting ${list(l.exports)}, published to ${where}, proved by \`cd commons/${l.name} && ${l.verify}\`.${summary}`;
 }
 
 /** The row of `enforcement.tsv` of a library's requirement. */
