@@ -168,7 +168,7 @@ export function operations(
         const declared = new Set([...o.spec.writes, ...(options.audit === undefined ? [] : [options.audit.table])].map((w) => words(w).join(".")));
         const stray = [...kept.writes()].filter((w) => !declared.has(w));
         if (stray.length > 0) return err({ kind: "undeclared-write", tables: stray });
-        if (outcome.commit !== false && kept.writes().size > 0 && o.spec.emits.length > 0 && !kept.actions().some((a) => o.spec.emits.includes(a)))
+        if (outcome.commit !== false && kept.changed().size > 0 && o.spec.emits.length > 0 && !kept.actions().some((a) => o.spec.emits.includes(a)))
           return err({ kind: "missing-audit", emits: o.spec.emits });
       }
       if (outcome.commit === false || o.spec.kind === "query") await driver.exec("ROLLBACK");

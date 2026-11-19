@@ -19,3 +19,4 @@ export {
   type SetupError,
 } from "./runtime.ts";
 export type { AuditEvent, AuditSink, Cell, Context, Row, Test, Tx, TxRefs, Where } from "./tx.ts";
+export * from "./identity/mod.ts";

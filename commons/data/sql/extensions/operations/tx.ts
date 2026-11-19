@@ -8,7 +8,7 @@
 import { words } from "@intellectual-frontiers/data/governance";
 import type { Driver } from "@intellectual-frontiers/data/sql/lifecycle";
 import type { LogicalSchema, Table } from "@intellectual-frontiers/data/sql/logical";
-import { type Dialect, type Literal, type Naming, writeNames } from "@intellectual-frontiers/data/sql/physical";
+import { type Dialect, type Literal, type Naming, writeCode, writeNames } from "@intellectual-frontiers/data/sql/physical";
 
 export type Cell = string | number | boolean | null;
 export type Row = Readonly<Record<string, unknown>>;
@@ -20,7 +20,7 @@ export type Where = Readonly<Record<string, Test>>;
 export interface AuditEvent {
   readonly action: string;
   readonly outcome: "success" | "failure" | "denied";
-  readonly actorKind: "user" | "serviceAccount" | "system" | "impersonator";
+  readonly actorKind: "user" | "machine" | "device" | "agent" | "system" | "impersonator";
   readonly actor?: string;
   readonly tenant?: string;
   readonly targetConcept?: string;
@@ -59,6 +59,8 @@ export interface TxRefs {
   /** A column of a table, written and quoted, by the words of its name or the key of the relationship it holds. */
   col(table: string, key: string): string;
   lit(value: Cell): string;
+  /** A code of a code list as the database holds it, written by the naming layer from the words of the code. */
+  code(value: string): string;
 }
 
 /** A transaction. */
@@ -80,8 +82,10 @@ export interface Tx extends TxRefs {
 /** What the runner keeps of a transaction. */
 export interface Tracked {
   readonly tx: Tx;
-  /** The tables written, by the words of their names. */
+  /** The tables an operation tried to write, by the words of their names: what its contract is held to. */
   writes(): ReadonlySet<string>;
+  /** The tables in which a row was changed: what must be recorded in the audit trail. */
+  changed(): ReadonlySet<string>;
   /** The actions recorded in the audit trail. */
   actions(): readonly string[];
 }
@@ -96,6 +100,7 @@ export interface Resolver {
   /** The column of a table for a key, as logical and as written. */
   column(table: Table, key: string): { readonly written: string; readonly key: string };
   readonly written: ReturnType<typeof writeNames>;
+  readonly naming: Naming;
 }
 
 /**
@@ -129,8 +134,9 @@ export function resolver(schema: LogicalSchema, dialect: Dialect, naming: Naming
     table: (name) => names.ref(tableOf(name).id),
     col: (table, key) => q(column(tableOf(table), key).written),
     lit: (v) => dialect.literal(v as Literal),
+    code: (v) => writeCode(naming, v),
   };
-  return { refs, tableOf, column, written: names };
+  return { refs, tableOf, column, written: names, naming };
 }
 
 /**
@@ -146,12 +152,17 @@ export function resolver(schema: LogicalSchema, dialect: Dialect, naming: Naming
  */
 export function track(driver: Driver, r: Resolver, dialect: Dialect, kind: "command" | "query", sink: AuditSink | undefined, context: Context): Tracked {
   const written = new Set<string>();
+  const changed = new Set<string>();
   const actions: string[] = [];
   const q = (n: string): string => dialect.quote(n);
   const lit = (v: Cell): string => dialect.literal(v as Literal);
-  const writable = (table: string): void => {
+  const mayWrite = (table: string): void => {
     if (kind === "query") throw new Error(`a query may not write ${table}`);
     written.add(words(table).join("."));
+  };
+  const writable = (table: string): void => {
+    mayWrite(table);
+    changed.add(words(table).join("."));
   };
   const cond = (t: Table, where: Where): string => {
     const parts = Object.entries(where).map(([k, test]) => {
@@ -177,15 +188,19 @@ export function track(driver: Driver, r: Resolver, dialect: Dialect, kind: "comm
       await driver.exec(`INSERT INTO ${r.refs.table(table)} (${cols.map(q).join(", ")}) VALUES (${Object.values(values).map(lit).join(", ")});`);
     },
     async update(table, set, where) {
-      writable(table);
+      mayWrite(table);
       const t = r.tableOf(table);
       const sets = Object.entries(set).map(([k, v]) => `${q(r.column(t, k).written)} = ${lit(v)}`);
-      return (await driver.query(`UPDATE ${r.refs.table(table)} SET ${sets.join(", ")} WHERE ${cond(t, where)} RETURNING 1 AS n;`)).length;
+      const n = (await driver.query(`UPDATE ${r.refs.table(table)} SET ${sets.join(", ")} WHERE ${cond(t, where)} RETURNING 1 AS n;`)).length;
+      if (n > 0) changed.add(words(table).join("."));
+      return n;
     },
     async remove(table, where) {
-      writable(table);
+      mayWrite(table);
       const t = r.tableOf(table);
-      return (await driver.query(`DELETE FROM ${r.refs.table(table)} WHERE ${cond(t, where)} RETURNING 1 AS n;`)).length;
+      const n = (await driver.query(`DELETE FROM ${r.refs.table(table)} WHERE ${cond(t, where)} RETURNING 1 AS n;`)).length;
+      if (n > 0) changed.add(words(table).join("."));
+      return n;
     },
     async select(table, options = {}) {
       const t = r.tableOf(table);
@@ -208,5 +223,5 @@ export function track(driver: Driver, r: Resolver, dialect: Dialect, kind: "comm
       return sink.record(tx, event, context);
     },
   };
-  return { tx, writes: () => written, actions: () => actions };
+  return { tx, writes: () => written, changed: () => changed, actions: () => actions };
 }

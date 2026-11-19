@@ -39,3 +39,5 @@ number	slug	state
 0038	identity-device	in force
 0039	identity-delegation	in force
 0040	identity-agent	in force
+0041	identity-authorize	in force
+0042	identity-agent-operations	in force

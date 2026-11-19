@@ -205,3 +205,4 @@ export const identityAgentModule = defineModule({
   concepts,
   codeLists: [autonomyLevel, versionStatus, runStatus, toolApproval, callDecision, callStatus, meter, windowKind, approvalStatus, approverRule],
 });
+export * from "./operations.ts";
