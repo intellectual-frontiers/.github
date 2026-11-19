@@ -59397,12 +59397,12 @@
             ],
             "relevant-evidence": [
               {
-                "description": "evidence of SHA-256 3cc1d654defeb9fed8aa5789a6edbffe1cd867f3c261f015d3d86919a6490d11",
+                "description": "evidence of SHA-256 ba1bf320536b6442233ed728aba7a093fa43949566a5a023097d71cb8be6fb7e",
                 "props": [
                   {
                     "name": "sha256",
                     "ns": "https://www.intellectualfrontiers.com/ontology/mizan-register#",
-                    "value": "3cc1d654defeb9fed8aa5789a6edbffe1cd867f3c261f015d3d86919a6490d11"
+                    "value": "ba1bf320536b6442233ed728aba7a093fa43949566a5a023097d71cb8be6fb7e"
                   }
                 ]
               }

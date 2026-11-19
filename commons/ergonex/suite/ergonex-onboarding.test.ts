@@ -70,6 +70,32 @@ proves(
       }),
       { kind: "local", runtime: "node", entry: "/w/ergonex/bin/ergonex.mjs" },
     );
+    // bunx runs the launcher under Node by its shebang: a run from Bun's cache is installed with Bun
+    assertEquals(
+      launchFor({
+        runtime: "node",
+        entry:
+          "/home/a/.bun/install/cache/.bunx-0/@intellectual-frontiers/ergonex@latest/node_modules/@intellectual-frontiers/ergonex/ergonex.mjs",
+        version: "0.1.0",
+      }),
+      registry,
+    );
+    assertEquals(
+      launchFor({
+        runtime: "node",
+        entry: "/tmp/bunx-1000-@intellectual-frontiers/ergonex@latest/node_modules/@intellectual-frontiers/ergonex/ergonex.mjs",
+        version: "0.1.0",
+      }),
+      registry,
+    );
+    assertEquals(
+      launchFor({
+        runtime: "node",
+        entry: "C:\\Users\\a\\.bun\\install\\cache\\.bunx-0\\x\\node_modules\\y\\ergonex.mjs",
+        version: "0.1.0",
+      }),
+      registry,
+    );
     assertEquals(globalInstall(registry), ["bun", "add", "-g", "@intellectual-frontiers/ergonex@0.1.0"]);
     assertEquals(globalInstall({ ...registry, runtime: "node" }), ["npm", "install", "-g", "@intellectual-frontiers/ergonex@0.1.0"]);
   },
