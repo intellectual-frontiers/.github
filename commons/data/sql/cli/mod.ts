@@ -13,3 +13,4 @@ export { type Action, type Applied, applyChange, type Change, diffOf, type FileE
 export { type BlockError, blockOf, markers, type Style, withBlock, withoutBlock } from "./blocks.ts";
 export { type Chosen, mayAsk, mayWriteHome, type Mode, modeOf, type Read, secretOf, type ServerSettings, serverSettings } from "./server.ts";
 export { type Host, isPlatform, type Paths, pathsOf, type Platform, type Profile, profileTargets, type Shell, shellOf, shells } from "./workstation.ts";
+export { type Command, commands, envJson, pgoptionsOf, quoteFish, quoteNu, quotePosix, quotePwsh, type ShellInput, shellScript, variablesOf } from "./shell.ts";

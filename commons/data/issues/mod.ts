@@ -13,5 +13,6 @@ import i5 from "./00005-mutation-survivors.ts";
 import i6 from "./00006-named-test-unresolved.ts";
 import i7 from "./00007-issues-not-in-code.ts";
 import i8 from "./00008-migration-flag-is-forgeable.ts";
+import i9 from "./00009-ci-lacks-shells.ts";
 
-export const issues = issueSet("data", [i1, i2, i3, i4, i5, i6, i7, i8]);
+export const issues = issueSet("data", [i1, i2, i3, i4, i5, i6, i7, i8, i9]);

@@ -13,6 +13,8 @@ import { type Connection, connect as realConnect, type ConnectOptions } from "./
 import { checkIds, doctor, renderReport } from "./doctor.ts";
 import { passwordOf, redact } from "./redact.ts";
 import { modeOf, secretOf } from "./server.ts";
+import { envJson, shellScript } from "./shell.ts";
+import { type Shell, shellOf, shells } from "./workstation.ts";
 
 /** What the command line is given besides its arguments. */
 export interface Io {
@@ -36,6 +38,7 @@ export interface Outcome {
 export const USAGE = `arcactl: manage and check an arca database in PostgreSQL
 
   arcactl doctor [options]     check the database against the models (read-only)
+  arcactl shell [options]      print the script that sets up this shell (source it; writes nothing)
 
 options:
   --config <file>     arca.config.ts (default: ./arca.config.ts where there is one)
@@ -49,6 +52,32 @@ options:
 
 The connection comes from ARCA_DATABASE_URL, or from libpq's own environment (PGHOST, PGUSER, PGDATABASE, ...) and files (.pgpass, pg_service.conf), as psql does. A password is never an option.`;
 
+/** `arcactl shell`: the script for a shell, from the options and the environment, and nothing else; it connects to nothing and writes nothing. */
+function shellCommand(given: readonly string[], io: Io): Outcome {
+  const bad = (m: string): Outcome => ({ code: 2, out: "", err: `${m}\n` });
+  const named = flag(given, "--shell");
+  const detected: Shell | undefined =
+    shellOf(named) ?? (named === undefined ? (shellOf(io.env["SHELL"]) ?? (io.env["PSModulePath"] !== undefined && io.env["SHELL"] === undefined ? "pwsh" : io.env["NU_VERSION"] !== undefined ? "nu" : undefined)) : undefined);
+  if (detected === undefined) return bad(named === undefined ? `which shell? give --shell (${shells.join(", ")})` : `${named} is not a shell this is made for (${shells.join(", ")})`);
+  const models = flag(given, "--models")?.split(",").map((m) => m.trim()).filter((m) => m !== "") ?? (io.env["ARCA_MODELS"]?.split(","));
+  // what belongs to an instance (its label, its service) is not carried from the one the shell is on to the one it is switched to
+  const switching = flag(given, "--instance") !== undefined;
+  const input = {
+    shell: detected,
+    schema: flag(given, "--schema") ?? io.env["ARCA_SCHEMA"] ?? "arca",
+    ...opt("instance", flag(given, "--instance") ?? io.env["ARCA_INSTANCE"]),
+    ...opt("env", flag(given, "--env") ?? (switching ? undefined : io.env["ARCA_ENV"])),
+    ...opt("service", flag(given, "--service") ?? flag(given, "--instance") ?? io.env["ARCA_SERVICE"]),
+    ...opt("config", flag(given, "--config") ?? io.env["ARCA_CONFIG"]),
+    ...opt("home", io.env["ARCA_HOME"]),
+    ...(models === undefined ? {} : { models }),
+    ...(given.includes("--prompt") ? { prompt: true } : {}),
+  };
+  const r = given.includes("--env-json") ? envJson(input) : shellScript(input);
+  return r.kind === "err" ? bad(r.error.join("\n")) : { code: 0, out: r.value.endsWith("\n") ? r.value : `${r.value}\n`, err: "" };
+}
+const opt = <K extends string>(k: K, v: string | undefined): { [P in K]?: string } => (v === undefined || v === "" ? {} : ({ [k]: v } as { [P in K]?: string }));
+
 const flag = (argv: readonly string[], name: string): string | undefined => {
   const i = argv.indexOf(name);
   return i >= 0 ? argv[i + 1] : undefined;
@@ -61,6 +90,7 @@ const says = (e: ConfigError): string =>
 export async function main(argv: readonly string[], io: Io): Promise<Outcome> {
   const [command] = argv;
   if (command === undefined || command === "-h" || command === "--help" || command === "help") return { code: command === undefined ? 2 : 0, out: command === undefined ? "" : USAGE, err: command === undefined ? USAGE : "" };
+  if (command === "shell") return shellCommand(argv.slice(1), io);
   if (command !== "doctor") return { code: 2, out: "", err: `arcactl has no command ${command}\n\n${USAGE}` };
   const given = argv.slice(1);
   const mode = modeOf(argv, io.env, io.tty ?? false);
