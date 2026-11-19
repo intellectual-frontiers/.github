@@ -16,10 +16,15 @@
 - **FR-005**: A server run MUST be given its secrets (the connection URL, the seal key, the unlock secret) as a variable or as the file a `<NAME>_FILE` variable names, MUST refuse both at once and a file that cannot be read, MUST NOT take a line ending at the end of a file as part of a secret, and MUST NOT print a password it was given either way.
 - **FR-006**: `arcactl shell` MUST print one script, for bash, zsh, fish, PowerShell, nushell or `sh`, made from its input alone: the `ARCA_*` variables, `PGSERVICE`, and `PGOPTIONS` with the search path, each value quoted by the rules of its shell so that any text arrives as it is and nothing in it is run; `PGOPTIONS` MUST stay a person's own where they have set it; the script MUST hold no password and MUST be refused input that has one, or a name that is not safe; and the command MUST connect to nothing, write nothing, name the shell it is for, and give the same script each time.
 - **FR-007**: The script MUST define `arca`, `arca-doctor`, `arca-psql`, `arca-use` and `arca-off` (and `arca-prompt` where asked) that call `arcactl` or `psql` with their arguments as they are, and completions of the commands, their options and their values made from the one table of commands; sourcing it twice MUST be the same as once; `arca-off` MUST take away what the script set and its functions and MUST leave a person's own variables; and `arca-use` MUST switch the instance without carrying the label or the service of the last instance over.
+- **FR-008**: The writer of `.pgpass` MUST write each credential as libpq reads it (a colon and a backslash escaped, a lone `*` a wildcard) inside a managed block of a file made `0600`; MUST replace the password of a place that is there where it is, add a new place at the end, and take one out, without touching the credentials of other places or a line the person wrote; MUST say where a line of the person's own that matches comes before the block, since libpq reads the first that matches; MUST find a file whose mode libpq would ignore (the group or others can read it) and put it right; MUST refuse a password or field that `.pgpass` cannot hold, and MUST NOT print a password in an error.
+- **FR-009**: The writer of `pg_service.conf` MUST write the instances it is given as the services of a managed block (host, port, `dbname`, user, `sslmode`, and the search path as `options`), read them back, refuse an instance that is not valid and a service the person defined outside the block (libpq reads the first, so the one written would be ignored), and take the block out where it is given none.
+- **FR-010**: The writer of `psqlrc` MUST write a file of its own (the prompt naming the instance, display settings, and the helper queries `:tables`, `:invariants`, `:guard` and `:audit`) that makes no output at start, and a managed block in the person's `psqlrc` that includes it by an absolute path with forward slashes; and an undo MUST take every block and credential of these writers out and leave the person's own lines as they were.
 
 ## Out of scope
 
-- Discovery and probing of instances, the `init` flows, the writers of `.pgpass`, `pg_service.conf` and `.psqlrc`, and the workstation checks of `doctor`: later requirements of this specification.
+- Discovery and probing of instances, the `init` flows and the workstation checks of `doctor`: later requirements of this specification.
+- The password prompt: the writers are given a password and write it to `.pgpass` alone; where it comes from (a prompt without echo, standard input) is `init`'s.
+- The helper file needs `psql` 15 or later (`\\getenv`); an older `psql` shows an error at start.
 - `arca-scope` (a sealed scope for the shell): it needs a command that makes the mark, and comes with it.
 - The completions of zsh, PowerShell and nushell are checked for syntax only (zsh needs a completion system loaded); fish's and bash's are run.
 - `arcactl ensure`, which acts on a database: its own specification.
@@ -27,6 +32,10 @@
 
 ## Edge cases
 
+- A password with a colon, a backslash, a quote or a space: written escaped, and read back exactly by the real libpq, per FR-008.
+- A `.pgpass` of mode `0644`: libpq says it has group or world access and ignores it; the writer puts the mode right, per FR-008.
+- A service the person already has, with the name of an instance: refused, and the file is not changed, per FR-009.
+- PGlite served over a socket ignores the `options` startup parameter, so the search path from `options` is seen in the file and not in a PGlite session, per FR-009.
 - A value with a quote, a `$`, a backtick or a line ending in a path: it arrives as it is, per FR-006.
 - A person who has their own `PGOPTIONS`: it is kept, and `arca-off` does not remove it, per FR-006 and FR-007.
 - `sh` (dash) has no function name with a dash: it gets `arca_doctor` and the rest with underscores, per FR-007.
