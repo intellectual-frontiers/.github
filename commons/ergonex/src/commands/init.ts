@@ -82,7 +82,7 @@ const init = defineCommand({
       lines.push(...r.lines);
       onPath = r.data;
     }
-    lines.push("next: name your repositories in .ergonex/workspace.ts, then run `ergonex plan`");
+    lines.push("next: add a repository with `ergonex add github.com/owner/repo --apply`");
     return ok({
       text: lines.join("\n"),
       data: { home, made, onPath: onPath ?? null },

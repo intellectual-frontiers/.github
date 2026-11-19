@@ -8,6 +8,7 @@
  */
 import type { ErgonexModule } from "../modules/types.ts";
 import { applyModule, planModule } from "./plan.ts";
+import { addModule, adoptModule, removeModule } from "./repos.ts";
 import { doctorModule } from "./doctor.ts";
 import { helpModule, listModule } from "./list.ts";
 import { hookModule } from "./hook.ts";
@@ -23,6 +24,9 @@ import { worktreeModule } from "./worktree.ts";
 /** The modules `ergonex` holds, built in, in the order `ergonex list` names them. `setup` is the only one that changes the host (0001-ergonex FR-017). */
 export const BUILTIN_MODULES: readonly ErgonexModule[] = [
   initModule,
+  addModule,
+  removeModule,
+  adoptModule,
   planModule,
   applyModule,
   statusModule,
