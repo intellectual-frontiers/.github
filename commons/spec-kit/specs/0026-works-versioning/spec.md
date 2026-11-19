@@ -56,7 +56,7 @@
 - **FR-032**: Mizan's harness check MUST run a rule plugin of the tool for what a folder can judge offline: that every `release.ts` under the root decodes, that each version matches the pattern of its kind's scheme, that a `Specification` has none and that a controlled document's revision has its approval; the comparison with a base is the command's.
 - **FR-033**: The tool MUST be TypeScript 7 on the runtime of 0005-typescript-runtime (Bun by default, Node 26 as the backup, the same code and the same tests), strict, with no `any`, no non-null `!`, errors as values (`Result`), tagged unions and exhaustive `switch` statements, and no third-party runtime module, and its tests MUST use real temporary Git repositories and real annotated tags, signing with an SSH key made by `ssh-keygen` where it is present.
 - **FR-034**: Commons' own works MUST have records: `commons/ts/release.ts` and `commons/docs/release.ts`, the packages `@intellectual-frontiers/commons` for the TypeScript and for the documentation, whose versions MUST be those of their latest tags, `ifc-ts-v0.4.0` and `ifc-docs-v0.1.0`, or greater where a change has been made since and the owner has not yet tagged it (`commons/ts` is at 0.5.0, for the harness requests of 2026-11-18), and whose `package.json` `version` fields MUST equal their records.
-- **FR-035**: The `check` job of `.github/workflows/tests.yml` MUST run `versions check`, offline and path-scoped, and it MUST pass on this repository as it is.
+- **FR-035**: The `check` job of `.github/workflows/tests.auto.yml` MUST run `versions check`, offline and path-scoped, and it MUST pass on this repository as it is.
 
 ## Migration from the schemes in use
 

@@ -20,6 +20,7 @@
     "./ts/quality": "./commons/ts/quality/mod.ts",
     "./ts/workspaces": "./commons/ts/workspaces/mod.ts",
     "./ts/githost": "./commons/ts/githost/mod.ts",
+    "./ts/githost/workflows": "./commons/ts/githost/workflows/mod.ts",
     "./ts/node": "./commons/ts/node/register.mjs",
     "./docs": "./commons/docs/mod.ts",
     "./ontology/mizan": "./commons/ontology/mizan/mod.ts"

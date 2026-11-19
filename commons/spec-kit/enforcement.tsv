@@ -68,12 +68,12 @@ requirement	mechanism	by	note
 0005-typescript-runtime FR-010	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/archive.test.ts: round trips of tar, zip and gzip, fixed bytes, unsafe and damaged archives, deflated zip read and written, pax and GNU names
 0005-typescript-runtime FR-011	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/text.test.ts: literals written and read back, keys, comments, refusals
 0005-typescript-runtime FR-012	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/http.test.ts: Link headers, Retry-After in both forms, safe methods
-0005-typescript-runtime FR-013	check	.github: .github/workflows/ifc-typescript.yml	runtime/test.test.ts: the assertions and proves; the same tests pass under bun test and node --test in CI
+0005-typescript-runtime FR-013	check	.github: .github/workflows/ifc-typescript.auto.yml	runtime/test.test.ts: the assertions and proves; the same tests pass under bun test and node --test in CI
 0005-typescript-runtime FR-014	check	.github: cd commons/ts && npx tsc -p tsconfig.json	the type-level tests (expectType, @ts-expect-error) with their negative controls compile; the laws are property-tested with fast-check in the kernel tests
 0005-typescript-runtime FR-015	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: every file has an @module block and every export has JSDoc
 0005-typescript-runtime FR-016	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: the development dependencies are exact, the lockfile agrees, no run-time dependency
 0005-typescript-runtime FR-017	check	.github: cd commons/ts && npx tsc -p tsconfig.json	tsc 7 with the strict configuration on every file; boundaries.test.ts checks that TypeScript is 7
-0005-typescript-runtime FR-018	gate	.github: .github/workflows/ifc-typescript.yml	the CI matrix: tsc 7 on both configurations, the suite on Bun (the default) and Node 26 (the backup), on Linux, macOS and Windows
+0005-typescript-runtime FR-018	gate	.github: .github/workflows/ifc-typescript.auto.yml	the CI matrix: tsc 7 on both configurations, the suite on Bun (the default) and Node 26 (the backup), on Linux, macOS and Windows
 0005-typescript-runtime FR-019	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/fs.test.ts: each Node error code becomes its class with code, path and cause; NotFound, AlreadyExists, IsADirectory, AddrInUse are thrown where the host refuses
 0005-typescript-runtime FR-020	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/fs.test.ts: every call on a real temporary folder, the refusals, Stolos's helpers
 0005-typescript-runtime FR-021	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/proc.test.ts: both platforms' rules and file URLs
@@ -81,11 +81,11 @@ requirement	mechanism	by	note
 0005-typescript-runtime FR-023	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/net.test.ts: the look for each environment, terminal detection, raw mode refused without a terminal
 0005-typescript-runtime FR-024	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/net.test.ts: classification, waits, Retry-After, retries against a local server, resume with Range, the SHA-256 check
 0005-typescript-runtime FR-025	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/net.test.ts: a real server on a free port: bodies, cookies, HEAD, a handler that throws, AddrInUse, shutdown by signal
-0005-typescript-runtime FR-026	gate	.github: .github/workflows/ifc-typescript.yml	the jobs take Bun's version from commons/generated/pins.auto.env; boundaries.test.ts: no npm, Prettier, ESLint, dprint or Vitest dependency
-0005-typescript-runtime FR-027	gate	.github: .github/workflows/ifc-typescript.yml	the lint job runs bun fmt --check
-0005-typescript-runtime FR-028	gate	.github: .github/workflows/ifc-typescript.yml	the lint job runs bun lint --type-aware --max-warnings 0 with bunfig.toml's rules; boundaries.test.ts: the rules FR-028 names are errors in bunfig.toml
+0005-typescript-runtime FR-026	gate	.github: .github/workflows/ifc-typescript.auto.yml	the jobs take Bun's version from commons/generated/pins.auto.env; boundaries.test.ts: no npm, Prettier, ESLint, dprint or Vitest dependency
+0005-typescript-runtime FR-027	gate	.github: .github/workflows/ifc-typescript.auto.yml	the lint job runs bun fmt --check
+0005-typescript-runtime FR-028	gate	.github: .github/workflows/ifc-typescript.auto.yml	the lint job runs bun lint --type-aware --max-warnings 0 with bunfig.toml's rules; boundaries.test.ts: the rules FR-028 names are errors in bunfig.toml
 0005-typescript-runtime FR-029	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: the root package.json (its name, private, the ./ts entry points into commons/ts, ./ts/node, the bin ifc, the dependencies exact and those of commons/docs) and commons/ts/package.json's same name and entry points; no release workflow, no tarball tool
-0005-typescript-runtime FR-030	gate	.github: .github/workflows/ifc-typescript.yml	the git-dependency job installs the commit it checks by a git+file: URL into an empty project and runs tools/smoke.ts (the kernel, the runtime and the test registration by the package's name and ifc test run on a small suite, on Bun and Node 26; tsc 7 on a consumer), on Linux, macOS and Windows
+0005-typescript-runtime FR-030	gate	.github: .github/workflows/ifc-typescript.auto.yml	the git-dependency job installs the commit it checks by a git+file: URL into an empty project and runs tools/smoke.ts (the kernel, the runtime and the test registration by the package's name and ifc test run on a small suite, on Bun and Node 26; tsc 7 on a consumer), on Linux, macOS and Windows
 0005-typescript-runtime FR-031	check	.github: cd commons/ts && bun test tests/	kernel/formats.test.ts: round trips with JSON and with the writer, the specification's examples, __proto__, refusals with line and column
 0005-typescript-runtime FR-032	check	.github: cd commons/ts && bun test tests/	kernel/formats.test.ts: random trees written and read back, entities, CDATA, prefixes, the finders, refusals with line and column, no entity expansion
 0005-typescript-runtime FR-033	check	.github: cd commons/ts && bun test tests/	kernel/graph.test.ts: random acyclic graphs ordered and scheduled with random outcomes and job limits, cycles, a node that rejects
@@ -116,7 +116,7 @@ requirement	mechanism	by	note
 0005-typescript-runtime FR-059	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/archive.test.ts: untarStream equals untar, damaged headers refused
 0005-typescript-runtime FR-060	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test.test.ts: only, steps and the three asserts
 0005-typescript-runtime FR-061	check	.github: cd commons/ts && node --test tests/**/*.test.ts	lint/*.test.ts: each rule against code it refuses and accepts, through bun lint
-0005-typescript-runtime FR-062	check	.github: .github/workflows/ifc-typescript.yml compile job	CI builds a small program on each system and runs it; runtime/compile.test.ts checks the arguments
+0005-typescript-runtime FR-062	check	.github: .github/workflows/ifc-typescript.auto.yml compile job	CI builds a small program on each system and runs it; runtime/compile.test.ts checks the arguments
 0005-typescript-runtime FR-063	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/text.test.ts: tsLiteral takes an interface with no index signature, refuses a Date, a function, undefined in an array (type-level, with negative controls)
 0005-typescript-runtime FR-064	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/objects.test.ts: compact leaves out undefined fields, its type exact under exactOptionalPropertyTypes
 0005-typescript-runtime FR-065	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test.test.ts: the gives back the value narrowed, and fails on null and undefined
@@ -152,7 +152,7 @@ requirement	mechanism	by	note
 0006-signals FR-017	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: the current span across await, and the parent from TRACEPARENT
 0006-signals FR-018	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: proc, http client and serve spans, with traceparent passed on
 0006-signals FR-019	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: the receiver decodes, refuses protobuf (415) and bad JSON (400)
-0006-signals FR-020	check	.github: .github/workflows/ifc-typescript.yml otel-conformance job	CI sends the suite's OTLP to the pinned OpenTelemetry Collector and compares its file export
+0006-signals FR-020	check	.github: .github/workflows/ifc-typescript.auto.yml otel-conformance job	CI sends the suite's OTLP to the pinned OpenTelemetry Collector and compares its file export
 0006-signals FR-021	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/render.test.ts: the reducer in each mode, snapshots through the terminal emulator
 0006-signals FR-022	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/palette.test.ts: the palette's roles, marks and their ASCII fallbacks, colour only where allowed
 0006-signals FR-023	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/width.test.ts and render.test.ts: lines cut by display width, elapsed time and progress
@@ -195,7 +195,7 @@ requirement	mechanism	by	note
 0008-test-evidence FR-011	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test-run.test.ts: the ledger entry and a signed in-toto Test Result
 0008-test-evidence FR-012	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test-run.test.ts: verify fails on a changed record, a broken chain, a bad signature
 0008-test-evidence FR-013	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test-run.test.ts: --require-review for high-risk requirements
-0008-test-evidence FR-014	check	.github: .github/workflows/ifc-typescript.yml test job	CI runs the suite through ifc test on each runtime and system and uploads the record and reports
+0008-test-evidence FR-014	check	.github: .github/workflows/ifc-typescript.auto.yml test job	CI runs the suite through ifc test on each runtime and system and uploads the record and reports
 0009-sql-aide FR-001	check	.github: cd commons/ts/data && bun run verify	conventions.test.ts: the package and the compiler's options; every test registers through runtime/test.ts
 0009-sql-aide FR-002	check	.github: cd commons/ts/data && bun run verify	Conventions: no dependencies, and what a file imports
 0009-sql-aide FR-003	check	.github: cd commons/ts/data && bun run verify	Conventions: erasable syntax, no any, no non-null assertion; the compiler's erasableSyntaxOnly
@@ -669,7 +669,7 @@ requirement	mechanism	by	note
 0026-works-versioning FR-032	check	.github: cd commons/ts && bun test tests/	versions-pure.test.ts: the rule plugin finds a record that does not decode, a version that does not match its scheme, a specification with a version, a controlled document with no approval and a repeated slug, once, for the anchored specification; mizan/check.ts passes the records under the root to holdHarness
 0026-works-versioning FR-033	check	.github: cd commons/ts && bun test tests/	versions-pure.test.ts, versions-git.test.ts: the tool is strict TypeScript with no any or non-null assertion (tsc, and the lint of the mizan folder in CI), and its tests use real repositories, real annotated tags and an ssh-keygen key where present
 0026-works-versioning FR-034	check	.github: cd commons/ts && bun test tests/	versions-git.test.ts: commons/ts/release.ts and commons/docs/release.ts decode, name ifc-ts 0.4.0 and ifc-docs 0.1.0, equal the package.json versions, and the real tags are in the ledger
-0026-works-versioning FR-035	check	.github: cd commons/ts && bun test tests/	versions-git.test.ts: the check job of .github/workflows/tests.yml runs versions check with the history fetched, and the ledger of this repository finds nothing
+0026-works-versioning FR-035	check	.github: cd commons/ts && bun test tests/	versions-git.test.ts: the check job of .github/workflows/tests.auto.yml runs versions check with the history fetched, and the ledger of this repository finds nothing
 0026-works-versioning FR-036	review	0026-works-versioning FR-036	A reviewer checks that a harness that adopts this specification keeps one scheme for each kind of its works and maps its present schemes as the table of the Assumptions says
 0026-works-versioning FR-037	check	.github: cd commons/ts && bun test tests/	versions-pure.test.ts: migratedFrom names the scheme it came from and the first version of the new one, the old tags stay in the ledger and are compared only with each other
 0026-works-versioning FR-038	check	.github: cd commons/ts && bun test tests/	versions-git.test.ts: bump of an edition, of data and of a controlled document needs no impact, tag takes --tier and --declaration, and the ledger reads the commons tags that are not annotated
@@ -721,3 +721,11 @@ requirement	mechanism	by	note
 0029-subject-profiles FR-012	check	.github: cd commons/ts && bun test tests/	mizan-profiles.test.ts: a specification that declares nothing, or a library, has no finding; the check runs from L1 and not at L0
 0029-subject-profiles FR-013	check	.github: cd commons/ts && bun test tests/	mizan-profiles.test.ts: every standard of a profile carries its edition or is marked to verify, and no profile names a company
 0029-subject-profiles FR-014	check	.github: cd commons/ts && bun test tests/	mizan-profiles.test.ts: the GDPR and the CCPA are mz:Authority individuals a requirement may cite
+0030-generated-workflows FR-001	check	.github: cd commons/ts && bun test tests/	githost-workflows.test.ts: a file in .github/workflows that is not <name>.auto.yml is found and named, and this repository's folder holds only generated files
+0030-generated-workflows FR-002	check	.github: cd commons/ts && bun test tests/	githost-workflows.test.ts: a job that needs a job that is not there, a step that runs nothing, a workflow with no trigger and a composite step with no shell are findings; the generator writes nothing while there is one
+0030-generated-workflows FR-003	check	.github: bun test ./tests/	commons-workflows-schema.test.ts: every generated file is valid by the schema of SchemaStore, read by Python's jsonschema, and a broken workflow is refused by it
+0030-generated-workflows FR-004	check	.github: cd commons/ts && bun test tests/	githost-workflows.test.ts: --check writes nothing and exits 1 naming a file that was edited and a generated file that no workflow makes; the tests workflow runs --check
+0030-generated-workflows FR-005	check	.github: cd commons/ts && bun test tests/	githost-workflows.test.ts: an action with no version or pinned by a branch is a finding, and every action of the model's workflows is one of its table
+0030-generated-workflows FR-006	check	.github: cd commons/ts && bun test tests/	githost-workflows.test.ts: a folder with a manifest is given a workflow that runs its verify in its folder when it or what it imports changes, and a library with no record of CI has the job verify alone
+0030-generated-workflows FR-007	none	-	Planned, Phase 2 of the per-library CI plan: the planner and the gate are not built yet
+0030-generated-workflows FR-008	check	.github: cd commons/ts && bun test tests/	githost-workflows.test.ts: the composite action is written with the line that says it is generated, and --check compares it
