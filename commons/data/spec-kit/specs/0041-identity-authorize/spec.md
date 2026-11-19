@@ -14,7 +14,7 @@
 - **FR-003**: `decide` MUST apply policies so that a refusal wins over any permit, an allow whose condition is unknown allows nothing, a refusal whose condition cannot be told not to apply refuses, and a stored attribute that is older than its definition allows is unknown.
 - **FR-004**: The expression language MUST be a closed tree (`and`, `or`, `not`, `eq`, `ne`, `lt`, `le`, `gt`, `ge`, `in`, `contains`, `startsWith`, `exists`, attributes by key, literals) that evaluates to true, false or unknown, where a missing attribute and a comparison of different types are unknown, and MUST refuse as unknown anything that is not a well-formed expression.
 - **FR-005**: For a principal acting under a delegation, `decide` MUST require every delegation of the chain to be active, in force, in the tenant, to the one who holds it, passing on the permission, limited to a resource that includes the one asked about and with a condition that holds, and MUST then require the delegator at the root of the chain to be allowed the action itself, so that a delegation never adds.
-- **FR-006**: The identity audit sink MUST write each event in the transaction of what it records with the hash of the event before it, and `verifyAuditChain` MUST report a chain that is forked or broken, so that a change to an event shows.
+- **FR-006**: The identity audit sink MUST write each event in the transaction of what it records with the hash of the event before it, and `verifyAuditChain` MUST make each event's hash again from the fields the event holds and report a chain that is forked or broken or an event whose hash is not the one it holds, so that a change to a field of an event, and not only to a link, shows.
 
 ## Out of scope
 

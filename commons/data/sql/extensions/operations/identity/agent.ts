@@ -116,17 +116,32 @@ export const revokeDelegationImpl: Implementation = async (tx, input, ctx): Prom
   return { status: "revoked", revoked: n };
 };
 
-/** Takes one unit of a budget, or says it cannot: one conditional update, so that two calls cannot both take the last unit. */
-async function spend(tx: Tx, run: string, agent: string, meter: string, amount: number, now: string): Promise<"ok" | "exceeded"> {
-  const budgets = await tx.select("agent budget", { where: { run, meter, status: "active" }, columns: ["budgetId", "limitValue", "used", "version"] });
-  const more = await tx.select("agent budget", { where: { agent, meter, status: "active" }, columns: ["budgetId", "limitValue", "used", "version", "run"] });
-  for (const b of [...budgets, ...more.filter((x) => x["run"] === null || x["run"] === undefined)]) {
+/** The budgets that apply to a call: the run's, and the agent's that are not for one run. */
+async function budgetsFor(tx: Tx, run: string, agent: string, meter: string): Promise<Record<string, unknown>[]> {
+  const mine = await tx.select("agent budget", { where: { run, meter, status: "active" }, columns: ["budgetId", "limitValue", "used", "version", "run"] });
+  const wider = await tx.select("agent budget", { where: { agent, meter, status: "active" }, columns: ["budgetId", "limitValue", "used", "version", "run"] });
+  return [...mine, ...wider.filter((x) => x["run"] === null || x["run"] === undefined)];
+}
+
+/** Whether every budget has room, changing nothing. */
+const hasRoom = async (tx: Tx, run: string, agent: string, meter: string, amount: number): Promise<boolean> =>
+  (await budgetsFor(tx, run, agent, meter)).every((b) => Number(b["used"]) + amount <= Number(b["limitValue"]));
+
+/**
+ * Takes one unit of every budget, or none: each by one conditional update, so that two calls cannot both take the last unit, and if one fails those already taken are given back.
+ */
+async function spend(tx: Tx, run: string, agent: string, meter: string, amount: number): Promise<"ok" | "exceeded"> {
+  const taken: { id: string; used: number; version: number }[] = [];
+  for (const b of await budgetsFor(tx, run, agent, meter)) {
     const used = Number(b["used"]);
-    if (used + amount > Number(b["limitValue"])) return "exceeded";
-    const n = await tx.update("agent budget", { used: used + amount, version: Number(b["version"]) + 1 }, { budgetId: String(b["budgetId"]), version: Number(b["version"]), used });
-    if (n !== 1) return "exceeded";
+    const version = Number(b["version"]);
+    const n = used + amount <= Number(b["limitValue"]) ? await tx.update("agent budget", { used: used + amount, version: version + 1 }, { budgetId: String(b["budgetId"]), version, used }) : 0;
+    if (n !== 1) {
+      for (const g of taken) await tx.update("agent budget", { used: g.used, version: g.version + 2 }, { budgetId: g.id, version: g.version + 1 });
+      return "exceeded";
+    }
+    taken.push({ id: String(b["budgetId"]), used, version });
   }
-  void now;
   return "ok";
 }
 
@@ -199,11 +214,16 @@ export const recordToolCallImpl: Implementation = async (tx, input, ctx: Context
       await tx.audit({ action: "tool.called", outcome: "denied", actorKind: "agent", actor: agentId, tenant, targetConcept: "approvalRequest", targetKey: id, reason: "approval required", ...({ decision: "allow", runKey: runId } as object) });
       return { status: "approval-required", approvalRequest: id };
     }
+    // the budget is looked at before the approval is used, so that a refused call uses nothing up
+    if (!(await hasRoom(tx, runId, agentId, "tool_calls", 1))) return deny("the budget for calls is spent", "budgetExceeded");
     // one conditional update uses an approval once, and only for exactly these arguments
     const used = await tx.update("approval request", { status: "consumed", consumedAt: now }, { approvalRequestId: wanted, status: "approved", argsHash: String(input["argsHash"]), actionKey: action, expiresAt: { gt: now } });
     if (used !== 1) return deny("the approval is not for this call, or has been used, or has run out");
-  }
-  if ((await spend(tx, runId, agentId, "tool_calls", 1, now)) === "exceeded") return deny("the budget for calls is spent", "budgetExceeded");
+    if ((await spend(tx, runId, agentId, "tool_calls", 1)) === "exceeded") {
+      await tx.update("approval request", { status: "approved", consumedAt: null }, { approvalRequestId: wanted, status: "consumed" });
+      return deny("the budget for calls is spent", "budgetExceeded");
+    }
+  } else if ((await spend(tx, runId, agentId, "tool_calls", 1)) === "exceeded") return deny("the budget for calls is spent", "budgetExceeded");
   const id = await record("allowed");
   await tx.audit({ action: "tool.called", outcome: "success", actorKind: "agent", actor: agentId, tenant, targetConcept: "agentTool", targetKey: String(tool["agentToolId"]), ...({ decision: "allow", runKey: runId, policyRefs: d.refs } as object) });
   return { status: "allowed", toolCall: id, obligations: d.obligations };

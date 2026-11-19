@@ -317,3 +317,43 @@ proves(
     }
   },
 );
+
+proves(
+  ["0042-identity-agent-operations FR-004", "0041-identity-authorize FR-006"],
+  "a refused call uses nothing up: an approval is not consumed and no budget is spent when another budget has no room, and an event whose fields were changed shows in the chain though its links are intact",
+  async () => {
+    for (const { name } of ENGINES) {
+      const { e, rt } = await world(name);
+      try {
+        const dg = String((await delegate(rt, {}))["delegation"]);
+        await e.run(`INSERT INTO "agent_run" ("run_id", "started_at", "status", "agent_principal_id", "version_agent_version_id", "tenant_id", "initiator_principal_id", "delegation_id") VALUES ('r1', ${AT}, 'running', 'a1', 'v1', 't1', 'u1', '${dg}')`);
+        // two budgets for the same meter: the run's has room, the agent's is spent
+        const budget = (id: string, key: string, limit: number, used: number, scope: string) =>
+          `INSERT INTO "agent_budget" ("budget_id", "meter", "window_kind", "limit_value", "used", "window_start", "version", "status", "budget_key", "agent_principal_id"${scope === "run" ? ', "run_agent_run_run_id"' : ""}) VALUES ('${id}', 'tool_calls', '${scope === "run" ? "run" : "day"}', ${limit}, ${used}, ${AT}, 0, 'active', '${key}', 'a1'${scope === "run" ? ", 'r1'" : ""})`;
+        await e.run(budget("b-run", "k1", 5, 0, "run"));
+        await e.run(budget("b-agent", "k2", 1, 1, "agent"));
+        const call = (idx: number, tool: string, over: Record<string, unknown> = {}) => run(rt, "recordToolCall", { run: "r1", tool, callIndex: idx, argsHash: `ah${idx}`, ...over });
+        same((await call(1, "tl-read"))["status"], "denied", `${name}: the agent's budget has no room`);
+        same(Number((await e.rows(`SELECT "used" u FROM "agent_budget" WHERE "budget_id" = 'b-run'`))[0]?.["u"]), 0, `${name}: so the run's was not spent either`);
+        // an approved call that is refused for the budget does not use its approval up
+        const waiting = await call(2, "tl-pay", { argsHash: "pay-1", argsSummary: "Pay", resourceType: "invoice", resourceId: "i1" });
+        const ap = String(waiting["approvalRequest"]);
+        same((await run(rt, "decideApproval", { approvalRequest: ap, decidedBy: "u1", approve: true }))["status"], "approved");
+        same((await call(3, "tl-pay", { argsHash: "pay-1", resourceType: "invoice", resourceId: "i1", approval: ap }))["status"], "denied");
+        same((await e.rows(`SELECT "status" s FROM "approval_request" WHERE "approval_request_id" = '${ap}'`))[0]?.["s"], "approved", `${name}: the approval is still there to use`);
+        await e.run(`UPDATE "agent_budget" SET "limit_value" = 10 WHERE "budget_id" = 'b-agent'`);
+        same((await call(4, "tl-pay", { argsHash: "pay-1", resourceType: "invoice", resourceId: "i1", approval: ap }))["status"], "allowed", `${name}: and it is used when the call can be made`);
+        same((await e.rows(`SELECT "status" s FROM "approval_request" WHERE "approval_request_id" = '${ap}'`))[0]?.["s"], "consumed");
+        same(Number((await e.rows(`SELECT sum("used") u FROM "agent_budget"`))[0]?.["u"]), 3, `${name}: one unit from each of the two budgets`);
+        // a field of an event changed in place, with every link intact, is found by its hash
+        const before = await run(rt, "verifyChainForTest", {});
+        same(before["problems"], [], name);
+        await e.run(`UPDATE "audit_event" SET "action" = 'tool.forged' WHERE "audit_event_id" = (SELECT "audit_event_id" FROM "audit_event" ORDER BY "occurred_at", "audit_event_id" LIMIT 1)`);
+        const after = await run(rt, "verifyChainForTest", {});
+        assert((after["problems"] as { kind: string }[]).some((p) => p.kind === "hash-mismatch"), `${name}: ${JSON.stringify(after)}`);
+      } finally {
+        await e.close();
+      }
+    }
+  },
+);
