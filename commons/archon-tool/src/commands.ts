@@ -49,6 +49,7 @@ function stateOf(a: Analysis, id: string): string {
 
 /** The commands of the branch `tool`, over the fleet's configuration. */
 export function toolCommands(config: ToolPluginConfig): readonly Node[] {
+  const program = config.program ?? "archon";
   const list = command({
     name: "list",
     summary: "List the tools the fleet declares, with the phases that need them, how exactly each is pinned, and the dialect and version each resolves to here.",
@@ -108,7 +109,7 @@ export function toolCommands(config: ToolPluginConfig): readonly Node[] {
       const rows = a.value.plan.entries.map((e) => {
         const n = String(e.id).replace(/^tool\./, "");
         const state = e.action === "none" ? "as asked" : e.action === "create" ? "missing" : "differs";
-        if (e.action !== "none") problems.push(problem("pending", `${n} is ${state}`, { fix: `archon tool ensure ${n}`, code: `P-TOOL-${state === "missing" ? "MISSING" : "DIFFERS"}` }));
+        if (e.action !== "none") problems.push(problem("pending", `${n} is ${state}`, { fix: `${program} tool ensure ${n}`, code: `P-TOOL-${state === "missing" ? "MISSING" : "DIFFERS"}` }));
         return { tool: n, state };
       });
       const text = rows.length === 0 ? "no tool is selected" : rows.map((r) => `${r.state === "as asked" ? "ok     " : r.state === "missing" ? "missing" : "differs"} ${r.tool}`).join("\n");
@@ -135,7 +136,7 @@ export function toolCommands(config: ToolPluginConfig): readonly Node[] {
       const combined = await sha256(hashes.sort().join("\n"));
       const summary = pending.length === 0 ? "every selected tool is as the fleet asks" : `${pending.length} of ${a.value.plan.entries.length} tool${a.value.plan.entries.length === 1 ? "" : "s"} would change: ${pending.map((e) => String(e.id).replace(/^tool\./, "")).join(", ")}`;
       if (pending.length === 0) return outcomeOf({ planHash: combined, changed: 0 }, { text: summary });
-      if (ctx.mode === "dry-run") return outcomeOf({ planHash: combined, changed: pending.length }, { text: `${summary}\nplan hash ${combined}`, next: [`archon tool ensure ${sel.names.join(" ")}`.trim()] });
+      if (ctx.mode === "dry-run") return outcomeOf({ planHash: combined, changed: pending.length }, { text: `${summary}\nplan hash ${combined}`, next: [`${program} tool ensure ${sel.names.join(" ")}`.trim()] });
       const given = args.options.planHash;
       if (given !== undefined && given !== combined) return fail(`the plan is not the one approved: it has the hash ${combined}, and ${given} was given`, "read the plan again with --check, then approve its hash");
       const lines: string[] = [];
@@ -149,8 +150,8 @@ export function toolCommands(config: ToolPluginConfig): readonly Node[] {
           continue;
         }
         lines.push(`${share.runtime.tool.id}: ${result.value.outcome} (${result.value.steps.length} step${result.value.steps.length === 1 ? "" : "s"})`);
-        if (result.value.outcome === "failed" || result.value.outcome === "incomplete") problems.push(problem("fail", `${share.runtime.tool.id}: ${result.value.outcome}`, { fix: "archon tool doctor" }));
-        else if (result.value.outcome === "changed") problems.push(problem("pending", `${share.runtime.tool.id}: something would change`, { fix: `archon tool ensure ${sel.names.join(" ")}`.trim() }));
+        if (result.value.outcome === "failed" || result.value.outcome === "incomplete") problems.push(problem("fail", `${share.runtime.tool.id}: ${result.value.outcome}`, { fix: `${program} tool doctor` }));
+        else if (result.value.outcome === "changed") problems.push(problem("pending", `${share.runtime.tool.id}: something would change`, { fix: `${program} tool ensure ${sel.names.join(" ")}`.trim() }));
       }
       const exit = problems.some((p) => p.level === "fail") ? ("findings" as const) : problems.length > 0 ? ("pending" as const) : undefined;
       return outcomeOf({ planHash: combined, changed: pending.length }, { text: [summary, `plan hash ${combined}`, ...lines].join("\n"), problems, ...(exit === undefined ? {} : { exit }) });

@@ -17,6 +17,27 @@ export const CHECKOUT = path.resolve(path.dirname(path.fromFileUrl(import.meta.u
 /** The `node_modules` that holds the compiler the tests use: the root's where the root is installed, else this library's own (a job that installed only this library has no other). */
 export const TOOLS_MODULES: string = fs.existsSync(path.join(CHECKOUT, "node_modules", ".bin")) ? path.join(CHECKOUT, "node_modules") : path.join(CHECKOUT, "commons/repoctl/node_modules");
 
+/** Whether the root of the checkout is installed: a library job installs only its own folder, and the checks that run the root's compiler (`E-TYPES`) cannot run there. */
+export const ROOT_INSTALLED: boolean = fs.existsSync(path.join(CHECKOUT, "node_modules", "typescript"));
+
+/**
+ * What `check --json` ended with, as a sentence that is empty where it ended as it must: with 0 where the root is installed, and, where only a library is (the library job of CI), with 1 and no failure but those of `E-TYPES`,
+ * the checks that run the root's compiler.
+ */
+export function checkVerdict(status: number, report: string): string {
+  if (ROOT_INSTALLED) return status === 0 ? "" : `check ended with ${status}: ${report}`;
+  const doc: unknown = (() => {
+    try {
+      return JSON.parse(report);
+    } catch {
+      return undefined;
+    }
+  })();
+  const problems: readonly unknown[] = typeof doc === "object" && doc !== null && "problems" in doc && Array.isArray(doc.problems) ? doc.problems : [];
+  const others = problems.filter((p) => typeof p === "object" && p !== null && "level" in p && p.level === "fail" && !("code" in p && p.code === "E-TYPES"));
+  return others.length === 0 ? "" : `check found more than the root's compiler: ${JSON.stringify(others)}`;
+}
+
 /** Runs `git` in a folder as a test identity and gives its output; a failure throws, so that a test never goes on from a step that did not happen. */
 export async function git(dir: string, ...args: readonly string[]): Promise<string> {
   const r = await systemProcess.run(["git", "-C", dir, "-c", "user.name=Test", "-c", "user.email=test@example.test", "-c", "commit.gpgsign=false", "-c", "init.defaultBranch=main", ...args]);
@@ -60,7 +81,7 @@ export function configInput(extra: Partial<ConfigInput> = {}): ConfigInput {
 }
 
 /** The settings of libraries a test world reads manifests with. */
-export const LIBRARIES: Pick<Config, "libraries"> = { libraries: { folder: "commons", specKit: undefined, versionConstants: false, linker: undefined, roleFile: undefined } };
+export const LIBRARIES: Pick<Config, "libraries"> = { libraries: { folder: "commons", specKit: undefined, versionConstants: false, declaredDependencies: false, linker: undefined, roleFile: undefined } };
 
 /** A generator of a test that is a plain record: it is run as the program `<id>.ts`. */
 export function genOf(id: string, inputs: readonly string[], outputs: readonly string[]): Generator {

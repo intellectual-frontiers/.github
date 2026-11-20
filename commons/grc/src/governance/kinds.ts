@@ -9,7 +9,7 @@
  *
  * @module
  */
-import { array, type Decoded, type Decoder, err, integer, literal, object, ok, string } from "@intellectual-frontiers/core";
+import { array, boolean, type Decoded, type Decoder, err, integer, literal, object, ok, string } from "@intellectual-frontiers/core";
 import { defineKind, instant } from "./document.ts";
 import { instantMs, parseDuration } from "./time.ts";
 
@@ -181,7 +181,7 @@ export const LEVELS = ["very-low", "low", "moderate", "high", "very-high"] as co
 /** A level. */
 export type Level = (typeof LEVELS)[number];
 
-/** An exception, with the risk it accepts: it expires. */
+/** An exception, with the risk it accepts: it expires. It excuses the entities its subjects name, and the subtenants of an entity (0012-grc-subtenants) only where `inheritable` is true. */
 export const exception = defineKind(
   "grc.exception",
   "1",
@@ -193,7 +193,7 @@ export const exception = defineKind(
     grantedAt: instant,
     expiresAt: instant,
   },
-  { acceptedRisk: object({ owner: string, level: literal(...LEVELS), reviewBy: instant }) },
+  { acceptedRisk: object({ owner: string, level: literal(...LEVELS), reviewBy: instant }), inheritable: boolean },
   (e) => {
     const g = instantMs(e.grantedAt);
     const x = instantMs(e.expiresAt);

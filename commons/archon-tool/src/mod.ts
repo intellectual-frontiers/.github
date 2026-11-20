@@ -22,7 +22,7 @@ export * from "./config.ts";
 /** The plugin that contributes `archon tool`, over the fleet's configuration, or everything wrong with its definition. */
 export function toolPlugin(config: ToolPluginConfig): Result<Plugin, readonly PluginProblem[]> {
   return definePlugin({
-    program: "archon",
+    program: config.program ?? "archon",
     noun: "tool",
     version: config.version,
     summary: "The tools a computer needs to do its work: list them, show how each is resolved, ensure them, find what drifted, clean what can be got again.",

@@ -48,6 +48,7 @@ export const KINDS: readonly KindSpec[] = [
   kind("timer", "A scheduled job.", COMPUTERS, true),
   kind("firewall-rule", "A rule of a host or device firewall.", [...COMPUTERS, "device"], true),
   kind("sysctl", "A setting of the kernel.", ["machine"], false),
+  kind("system-setting", "A named setting of the operating system that is not a file or a kernel parameter: the time zone, the locale, the keyboard layout, the host name.", COMPUTERS, false),
   kind("ssh-authorized-key", "A public key that may sign in as a user.", COMPUTERS, true),
   kind("mount", "A file system mounted at a path.", ["machine"], true),
   kind("network-setting", "A setting of a network device: an address, a VLAN, a wireless network.", ["device"], false),

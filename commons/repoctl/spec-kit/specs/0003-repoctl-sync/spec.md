@@ -18,6 +18,7 @@
 - **FR-007**: `check` MUST run the check of every generator, the format check of the specification kit of commons, the rules of Mizan, the versions, the format check and the rules of the specification kit of each library at its level, and the check of the constants that say a version, MUST write nothing, and MUST give one report in which each finding has a code of `ProblemCode` and the command that fixes it, ending with 1 where any finding fails and 0 where none does.
 - **FR-008**: `check` MUST find every constant of the sources of a library that is named `<LIBRARY>_VERSION` (the library's name in capitals, a hyphen as an underscore) or named by the manifest in `versionConstants`, whose text is not the version of the library (`E-VERSION-CONSTANT`), and MUST find a constant the manifest names that is not in its file.
 - **FR-009**: `explain <code>` MUST say, for every code of the program, its title, what happened, the likely cause and the fix, and for a text that is no code MUST say so and name the nearest.
+- **FR-010**: Where the configuration's `libraries.declaredDependencies` is on, `check` MUST find every package that a TypeScript file of a library's `src/`, `suite/`, `tools/` or its `about.ts` imports by name, and every `node:` import (which needs `@types/node`), that the library's `package.json` declares in none of `dependencies`, `devDependencies`, `peerDependencies` and `optionalDependencies` (`E-UNDECLARED-DEPENDENCY`), naming the file, the line and the line to add; the package of the library itself, relative and `bun:` imports and imports inside a block comment are not findings. A library job installs only its own folder, so what its checkout finds by the install of the whole repository is missing there.
 
 ## Acceptance scenarios
 
@@ -32,6 +33,7 @@
 9. **Given** two branches that changed one line of a source differently, **When** `merge` runs, **Then** the file is named and left with Git's markers, the merge is not committed and the status is 1, per FR-005 and FR-006.
 10. **Given** a library whose version is 0.4.7 and a constant that says 0.4.6, **When** `check` runs, **Then** the constant is a finding with the file and the line, per FR-008.
 11. **Given** `explain E-STALE-GENERATED`, **When** it runs, **Then** it says the title, the cause and `repoctl sync`, per FR-009.
+12. **Given** a library whose test imports `node:fs` and whose manifest has no `@types/node`, **When** `check` runs, **Then** `E-UNDECLARED-DEPENDENCY` names the file, the line and the devDependency to add, per FR-010.
 
 ## Out of scope
 

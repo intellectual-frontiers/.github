@@ -13,6 +13,7 @@
  */
 import { type Config, stepText } from "@intellectual-frontiers/repoctl/governance";
 import { constantFindings, type Source } from "./constants.ts";
+import { type DeclaredInput, undeclaredFindings } from "./declared.ts";
 import { finding, type Finding, tailLines } from "./findings.ts";
 import { fixOf } from "./order.ts";
 import { pool } from "./pool.ts";
@@ -81,6 +82,22 @@ async function sourcesOf(w: Pick<World, "files" | "repo">, libs: readonly Librar
   return out;
 }
 
+/** The manifest and the TypeScript of each library, as the check of declared dependencies reads them: its `src/`, `suite/`, `tools/` and `about.ts`. */
+async function declaredInputs(w: Pick<World, "files" | "repo">, libs: readonly LibraryInfo[]): Promise<readonly DeclaredInput[]> {
+  const out: DeclaredInput[] = [];
+  for (const lib of libs) {
+    const base = `${w.repo}/${lib.folder}`;
+    const walked = await Promise.all(["src", "suite", "tools"].map(async (d) => (await w.files.walk(`${base}/${d}`)).filter((p) => p.endsWith(".ts")).map((p) => `${d}/${p}`)));
+    const sources: Source[] = [];
+    for (const path of [...walked.flat(), "about.ts"].sort()) {
+      const text = await w.files.read(`${base}/${path}`);
+      if (text !== undefined) sources.push({ path: `${lib.folder}/${path}`, text });
+    }
+    out.push({ name: lib.name, folder: lib.folder, manifest: (await w.files.read(`${base}/package.json`)) ?? "", sources });
+  }
+  return out;
+}
+
 /** Runs every check of the configuration: the generators', its named checks, and, where it has libraries, the specification kit of each and the constants that say a version. */
 export async function runCheck(w: World, config: Pick<Config, "generators" | "checks" | "libraries">): Promise<CheckReport> {
   const sections: Section[] = [];
@@ -99,5 +116,6 @@ export async function runCheck(w: World, config: Pick<Config, "generators" | "ch
   const specKit = config.libraries.specKit;
   if (specKit !== undefined) for (const s of await pool(libs.value.filter((l) => l.specKit !== undefined), 6, (l) => specKitSection(w, specKit, l))) sections.push(s);
   if (config.libraries.versionConstants) sections.push({ id: "version-constants", title: "The constants of the sources that say a version", findings: constantFindings(libs.value, await sourcesOf(w, libs.value)) });
+  if (config.libraries.declaredDependencies) sections.push({ id: "declared-dependencies", title: "The packages each library imports and declares", findings: undeclaredFindings(await declaredInputs(w, libs.value)) });
   return { sections };
 }

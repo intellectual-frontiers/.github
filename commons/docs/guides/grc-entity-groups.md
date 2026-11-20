@@ -19,10 +19,13 @@ A group is a document of kind `grc.entity-group`: each entity has an identifier 
 The scope is a document of kind `grc.control-scope`. A rule names a control and an entity selector (`all`, `only` or `except`); a control no rule names applies to every entity ([commons grc 0009-grc-groups FR-003](../../grc/spec-kit/specs/0009-grc-groups/spec.md)).
 
 ```ts
-import { applicability, entityGroup, controlScope, scopeProblems } from "@intellectual-frontiers/grc/governance";
+import { applicability, entityGroup, entityTree, controlScope, scopeProblems } from "@intellectual-frontiers/grc/governance";
 
 // group and scope are documents decoded with entityGroup.decode and controlScope.decode
-const matrix = applicability(group, scope, controls); // one cell per control and entity
+const built = entityTree(group); // the entities as a tree, or why they are not one
+if (built.kind === "ok") {
+  const matrix = applicability(built.value, scope, controls); // one cell per control and entity
+}
 const problems = scopeProblems(group, scope, controls); // [] for a sound scope
 ```
 
@@ -38,11 +41,50 @@ import { entityReader } from "@intellectual-frontiers/grc/physical";
 
 const readers = new Map([[unitA, entityReader(portsOfUnitA, material)]]);
 const readings = await readGroup(group, readers, at); // an entity with no reader, or that fails, is unread
-const view = groupView({ group, scope, controls, readings, exceptions: [], at });
+const view = groupView({ tree, scope, controls, readings, exceptions: [], at });
 view.overall.worst; // "pending" while an entity cannot be read, never "pass"
 ```
 
 An entity that cannot be read gives `pending` and the coverage `unknown`; it is never assumed to pass ([commons grc 0009-grc-groups FR-008](../../grc/spec-kit/specs/0009-grc-groups/spec.md)). Your own way of making readers is proved with `groupConformance`, which runs it over per-entity ports that throw when another entity's reader touches them ([commons grc 0009-grc-groups FR-011](../../grc/spec-kit/specs/0009-grc-groups/spec.md)).
+
+## Subtenants
+
+An entity may have one `parent`, so that the entities of a group form a tree of parents and subtenants. The decoder of `grc.entity-group` refuses a parent the group does not hold and a cycle of parents (a self-parent is a cycle), and `entityTree(group)` is the one constructor of the `EntityTree` that the rest of the model takes: it gives an entity's parent, children, ancestors and descendants in the order of the identifiers, or the fault `duplicate-entity`, `unknown-parent` or `cycle` ([commons grc 0012-grc-subtenants FR-001](../../grc/spec-kit/specs/0012-grc-subtenants/spec.md), [FR-002](../../grc/spec-kit/specs/0012-grc-subtenants/spec.md)).
+
+```mermaid
+flowchart LR
+  org["org"] --> a["unit-a"]
+  org --> b["unit-b"]
+  a --> a1["unit-a1"]
+  a --> a2["unit-a2"]
+  a1 -->|"snapshot"| rollup["Roll-up: own status joined with the subtenants'"]
+  a2 -->|"snapshot"| rollup
+  rollup --> a
+```
+
+A control scoped to a parent reaches its subtenants. The nearest explicit rule decides: a rule may state `for` an entity, and it then ranges over that entity and its descendants, so the word of a subtenant wins over the word of its parent; a name in a selector stands for its descendants unless the rule says `inherit: false` ([commons grc 0012-grc-subtenants FR-004](../../grc/spec-kit/specs/0012-grc-subtenants/spec.md), [FR-005](../../grc/spec-kit/specs/0012-grc-subtenants/spec.md)).
+
+```json
+{
+  "rules": [
+    { "control": "urn:grc:ex:1:A-2", "entities": { "kind": "only", "entities": ["unit-a"] } },
+    { "control": "urn:grc:ex:1:A-2", "for": "unit-a2", "entities": { "kind": "only", "entities": [] } }
+  ]
+}
+```
+
+Here the control applies to `unit-a` and `unit-a1`, and not to `unit-a2`. An exception is not inherited: it excuses the entities its subjects name, and their subtenants only where it says `inheritable: true` ([commons grc 0012-grc-subtenants FR-007](../../grc/spec-kit/specs/0012-grc-subtenants/spec.md)).
+
+The group view gives each entity its own status and its rolled-up status, the join of its own and its subtenants', with the coverage in the same way, and the roots of the tree. It is made from the snapshots alone, so no evidence is read, and a subtenant that cannot be read is `pending` with the coverage `unknown`, never a pass. Adding a subtenant that fails or cannot be read never improves its ancestors, and entities that are not its ancestors are unchanged ([commons grc 0012-grc-subtenants FR-008](../../grc/spec-kit/specs/0012-grc-subtenants/spec.md), [FR-009](../../grc/spec-kit/specs/0012-grc-subtenants/spec.md), [FR-010](../../grc/spec-kit/specs/0012-grc-subtenants/spec.md)).
+
+```ts
+const v = groupView({ tree, scope, controls, readings, exceptions: [], at });
+const unitA = v.entities.find((e) => e.entity === unitAId);
+unitA?.own; // the status of unit-a itself
+unitA?.rolledUp; // the join of unit-a and its subtenants
+```
+
+Nothing needs the data of a parent and a subtenant in one store: each reader learns only its own entity's ports, and `groupConformance` refuses a group that is not a tree, checks the roll-up of every entity, and finds a reader that touches the ports of its parent, a sibling or a subtenant ([commons grc 0012-grc-subtenants FR-011](../../grc/spec-kit/specs/0012-grc-subtenants/spec.md), [FR-012](../../grc/spec-kit/specs/0012-grc-subtenants/spec.md)).
 
 ## The state at an instant
 

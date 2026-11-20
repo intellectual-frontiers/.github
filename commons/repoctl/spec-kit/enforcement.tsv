@@ -22,6 +22,7 @@ requirement	mechanism	by	note
 0003-repoctl-sync FR-007	check	.github: cd commons/repoctl && bun run verify	suite/check.test.ts: one report with a code and a fix for each finding, the real repository passes, nothing is written
 0003-repoctl-sync FR-008	check	.github: cd commons/repoctl && bun run verify	suite/check.test.ts: a constant that disagrees with its library's version is found, and so is one the manifest names that is missing
 0003-repoctl-sync FR-009	check	.github: cd commons/repoctl && bun run verify	suite/check.test.ts: every code is explained and a text that is no code names the nearest
+0003-repoctl-sync FR-010	check	.github: cd commons/repoctl && bun run verify	suite/declared.test.ts: a package or a node: import that the manifest does not declare is found with its file and line; the library itself, relative and bun: imports and block comments are not; the real repository declares every import
 0004-repoctl-status-release FR-001	check	.github: cd commons/repoctl && bun run verify	suite/status-release.test.ts: a row has the three versions and a state, as a table and as JSON, from a real repository with real tags
 0004-repoctl-status-release FR-002	check	.github: cd commons/repoctl && bun run verify	suite/status-release.test.ts: --offline asks no registry and reads the local tags
 0004-repoctl-status-release FR-003	check	.github: cd commons/repoctl && bun run verify	suite/status-release.test.ts: a version npm does not list is shown as not listed, and an unreachable registry is a warning

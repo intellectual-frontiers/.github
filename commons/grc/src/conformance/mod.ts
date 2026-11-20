@@ -1,6 +1,7 @@
 // Spec: 0001-grc-layers FR-009
+// Spec: 0012-grc-subtenants FR-010, FR-011, FR-012
 /**
- * The conformance suites of the ports (0001-grc-layers FR-009; 0004-grc-documents FR-011, 0005-grc-runners FR-010, 0006-grc-evidence FR-008, 0009-grc-groups FR-011): functions a third party runs against its own runner, store, signer or serializer, each
+ * The conformance suites of the ports (0001-grc-layers FR-009; 0004-grc-documents FR-011, 0005-grc-runners FR-010, 0006-grc-evidence FR-008, 0009-grc-groups FR-011, 0012-grc-subtenants FR-012): functions a third party runs against its own runner, store, signer or serializer, each
  * returning every failed expectation as data (an empty list is a pass) and never throwing. This library runs them on every extension it ships.
  *
  * @example
@@ -12,7 +13,7 @@
  * @module
  */
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
-import type { Check, ControlScope, EntityGroup, EntityId, Exception, Json } from "@intellectual-frontiers/grc/governance";
+import { type Check, type ControlScope, type EntityGroup, type EntityId, entityTree, type Exception, type Json, treeFaultMessage } from "@intellectual-frontiers/grc/governance";
 import {
   type Assessment,
   canonicalize,
@@ -27,6 +28,11 @@ import {
   GENESIS,
   entityOf,
   type EntityReading,
+  type GroupCoverage,
+  type GroupView,
+  joinAll,
+  joinCoverage,
+  STATUSES,
 } from "@intellectual-frontiers/grc/logical";
 import { type EntityPorts, entityReader, type EvidenceStore, type GroupMaterial, type Runner, type Signer, type Subject } from "@intellectual-frontiers/grc/physical";
 
@@ -208,6 +214,9 @@ export async function groupConformance(
   c: GroupCase,
   make: (ports: EntityPorts, material: GroupMaterial) => EntityReader = entityReader,
 ): Promise<readonly Failure[]> {
+  const built = entityTree(c.group);
+  if (built.kind === "err") return [{ suite: "group", name: "the entities form a tree", message: treeFaultMessage(built.error) }];
+  const tree = built.value;
   const controls = c.material.frameworks.flatMap((f) => f.controls.map((x) => `urn:grc:${f.id}:${f.version}:${x.id}`));
   const breaches: Breach[] = [];
   let active: EntityId | undefined;
@@ -252,7 +261,7 @@ export async function groupConformance(
     }
     return m;
   };
-  const view = (readings: readonly EntityReading[]) => groupView({ group: c.group, scope: c.scope, controls, readings, exceptions: c.exceptions, at: c.at });
+  const view = (readings: readonly EntityReading[]) => groupView({ tree, scope: c.scope, controls, readings, exceptions: c.exceptions, at: c.at });
   const out: Failure[] = [];
   const direct = async (): Promise<readonly EntityReading[]> => {
     const readings: EntityReading[] = [];
@@ -272,18 +281,37 @@ export async function groupConformance(
       const r = await readGroup(c.group, readers(), c.at);
       return canonicalize(view(r)) === canonicalize(view(await direct())) ? undefined : "the view differs from the one made from each entity's own snapshot";
     })),
-    ...(await guarded("group", "an entity that cannot be read is pending", async () => {
-      const [first] = [...c.data.keys()];
-      if (first === undefined) return undefined;
+    ...(await guarded("group", "an entity that cannot be read is pending, and only its ancestors show it", async () => {
       const all = view(await readGroup(c.group, readers(), c.at));
-      down = first;
-      const r = await readGroup(c.group, readers(), c.at);
-      down = undefined;
-      const v = view(r);
-      const mine = v.cells.filter((x) => x.entity === first && x.status !== "not-applicable");
-      if (mine.some((x) => x.status !== "pending")) return `${first} was not read and a cell of it is not pending`;
-      const others = (x: typeof v): string => canonicalize(x.cells.filter((cell) => cell.entity !== first));
-      return others(v) === others(all) ? undefined : "an entity that could not be read changed the cells of the others";
+      for (const entity of c.data.keys()) {
+        down = entity;
+        let v: GroupView;
+        try {
+          v = view(await readGroup(c.group, readers(), c.at));
+        } finally {
+          down = undefined;
+        }
+        const mine = v.cells.filter((x) => x.entity === entity && x.status !== "not-applicable");
+        if (mine.some((x) => x.status !== "pending")) return `${entity} was not read and a cell of it is not pending`;
+        const ancestors = new Set(tree.ancestorsOf(entity));
+        const quiet = (x: GroupView): string => canonicalize({ cells: x.cells.filter((cell) => cell.entity !== entity), entities: x.entities.filter((e) => e.entity !== entity && !ancestors.has(e.entity)) });
+        if (quiet(v) !== quiet(all)) return `${entity} could not be read and changed what is shown of an entity that is not its ancestor`;
+        const worse = v.entities.filter((e) => mine.length > 0 && ancestors.has(e.entity) && STATUSES.indexOf(e.rolledUp) < STATUSES.indexOf("pending"));
+        if (worse.length > 0) return `${entity} could not be read and ${worse.map((e) => e.entity).join(", ")} is better than pending`;
+      }
+      return undefined;
+    })),
+    ...(await guarded("group", "the roll-up is the join of an entity and its subtenants", async () => {
+      const v = view(await readGroup(c.group, readers(), c.at));
+      const of = new Map(v.entities.map((e) => [e.entity, e]));
+      const coverageOf = (xs: readonly (GroupCoverage | "not-applicable")[]): GroupCoverage | "not-applicable" =>
+        xs.reduce<GroupCoverage | "not-applicable">((a, b) => (a === "not-applicable" ? b : b === "not-applicable" ? a : joinCoverage(a, b)), "not-applicable");
+      for (const e of v.entities) {
+        const family = [e, ...tree.descendantsOf(e.entity).flatMap((d) => of.get(d) ?? [])];
+        if (e.rolledUp !== joinAll(family.map((x) => x.own))) return `the status rolled up to ${e.entity} is not the join of it and its subtenants`;
+        if (e.rolledUpCoverage !== coverageOf(family.map((x) => x.ownCoverage))) return `the coverage rolled up to ${e.entity} is not the join of it and its subtenants`;
+      }
+      return undefined;
     })),
     ...(await guarded("group", "no reader touches another entity's ports", async () => {
       breaches.length = 0;

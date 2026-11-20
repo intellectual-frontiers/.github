@@ -354,8 +354,8 @@ proves(["0012-ontology FR-015"], "a code list of 5,000 entries type-checks with 
         "node",
         `${dir}/list.ts`,
       ],
-      { cwd: root },
-    ); // `--types node` is found from the package's own folder, wherever the tests are run from
+      { cwd: `${root}/commons/mizan` },
+    ); // `--types node` is found from the library's own install (its devDependencies), wherever the tests are run from
     assertEquals([o.code, o.stdout.trim()], [0, ""], o.stderr);
     assert(Date.now() - started < 30_000, `5,000 entries took ${Date.now() - started} ms`);
   } finally {

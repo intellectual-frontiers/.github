@@ -301,6 +301,39 @@ export type PackOptions = {
   readonly signing?: PackSource["signing"];
 };
 
+/** The two source files of the verifier that every pack carries (FR-066). */
+export type VerifierFile = "verify-pack.ts" | "verify.ts";
+
+/** A verifier file that is in none of the places it is looked for, with the places. */
+export type VerifierError = { readonly kind: "verifier-missing"; readonly file: VerifierFile; readonly tried: readonly string[] };
+
+/** A verifier error as one sentence. */
+export function formatVerifierError(e: VerifierError): string {
+  return `the verifier file ${e.file} is in none of ${e.tried.join(", ")}: the package is incomplete (it ships src/assessor/)`;
+}
+
+/**
+ * Where a verifier file may be, from the folder of the module that asks: beside the module (the source layout, and Bun's `bun` condition on a published package),
+ * then in the `src/assessor/` of the package that the compiled module `dist/assessor/` belongs to (the published layout under Node, where only `.js` and `.d.ts` are compiled).
+ */
+export function verifierCandidates(here: string, file: VerifierFile): readonly string[] {
+  return [join(here, file), join(here, "..", "..", "src", "assessor", file)];
+}
+
+/** The verifier's two files read from the first place each is found, from the folder of the module that asks (FR-066, FR-069). */
+export async function verifierSources(here: string): Promise<Result<PackSource["verifier"], VerifierError>> {
+  const read = async (file: VerifierFile): Promise<Result<string, VerifierError>> => {
+    const tried = verifierCandidates(here, file);
+    for (const at of tried) if (await exists(at)) return ok(await readTextFile(at));
+    return err({ kind: "verifier-missing", file, tried });
+  };
+  const pack = await read("verify-pack.ts");
+  if (pack.kind === "err") return pack;
+  const main = await read("verify.ts");
+  if (main.kind === "err") return main;
+  return ok({ pack: pack.value, main: main.value });
+}
+
 /** The pack's source from what was collected, with the verifier's own files read from where this program is (FR-066). */
 export async function packSourceOf(c: Collected, options: PackOptions): Promise<Result<PackSource, CollectError>> {
   const g = c.gathered;
@@ -316,7 +349,8 @@ export async function packSourceOf(c: Collected, options: PackOptions): Promise<
     const q = readQuality(f.text);
     if (q.kind === "ok") oscal.push({ traceId: q.value.traceId, text: await oscalAssessmentResults(q.value.run) });
   }
-  const here = dirname(fromFileUrl(import.meta.url));
+  const verifier = await verifierSources(dirname(fromFileUrl(import.meta.url)));
+  if (verifier.kind === "err") return err({ kind: "refused", reason: formatVerifierError(verifier.error) });
   return ok({
     harness: options.harness,
     revision: c.revision,
@@ -330,7 +364,7 @@ export async function packSourceOf(c: Collected, options: PackOptions): Promise<
     matrix: matrixTsv(g.register, input.requirements),
     index: built.value.text,
     oscal,
-    verifier: { pack: await readTextFile(join(here, "verify-pack.ts")), main: await readTextFile(join(here, "verify.ts")) },
+    verifier: verifier.value,
     ...(options.signing === undefined ? {} : { signing: options.signing }),
   });
 }

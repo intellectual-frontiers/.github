@@ -28,6 +28,7 @@ import {
   type Config,
 } from "@intellectual-frontiers/repoctl/governance";
 import { loadConfigFile } from "@intellectual-frontiers/repoctl/physical";
+import { ROOT_INSTALLED } from "./world.ts";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "../../..");
 
@@ -130,7 +131,8 @@ proves(["0002-repoctl-governance FR-006"], "the checks of the repository's confi
   assertEquals(checks.map((c) => c.id), ["specs", "rules", "versions", "types", "tools-types"]);
   for (const c of checks) {
     const program = c.run.kind === "program" ? c.run.argv[1] : undefined;
-    assert(await fs.exists(path.join(ROOT, program ?? "")), `${c.id}: ${program} is a program of the repository`);
+    // the compiler of the root is the root's install, which a library job has not made
+    if (program?.startsWith("node_modules/") !== true || ROOT_INSTALLED) assert(await fs.exists(path.join(ROOT, program ?? "")), `${c.id}: ${program} is a program of the repository`);
     assert(isProblemCode(c.code), c.code);
   }
 });
