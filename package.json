@@ -1,6 +1,7 @@
 {
   "name": "@intellectual-frontiers/commons",
   "private": true,
+  "license": "PolyForm-Noncommercial-1.0.0",
   "description": "Intellectual Frontiers Commons, consumed as a Git dependency pinned by commit: IFC TypeScript's kernel, runtime and lint plugin, the Node hook that runs them from node_modules, and IFC Docs (commons 0005-typescript-runtime FR-029, 0011-documentation FR-021).",
   "type": "module",
   "exports": {

@@ -178,14 +178,14 @@ proves(
       put(dir, "commons/top/suite/two.test.ts", 'import { expect, test } from "bun:test";\nimport { two } from "../src/mod.ts";\ntest("two", () => expect(two).toBe(2));\n');
       // the compiler this library is developed with serves the temporary repository, as the root's install serves the real one
       symlinkSync(join(ROOT, "commons", "libraries", "node_modules"), join(dir, "node_modules"), { type: "junction" });
-      assertEquals(await main(["--repo", dir, "--files", "commons/base/src/mod.ts"]), 0);
-      assertEquals(await main(["--repo", dir, "--files", "commons/base/src/mod.ts", "--list"]), 0);
+      assertEquals(await main(["--repo", dir, "--no-license", "--files", "commons/base/src/mod.ts"]), 0);
+      assertEquals(await main(["--repo", dir, "--no-license", "--files", "commons/base/src/mod.ts", "--list"]), 0);
       put(dir, "commons/top/suite/two.test.ts", 'import { expect, test } from "bun:test";\nimport { two } from "../src/mod.ts";\ntest("two", () => expect(two).toBe(3));\n');
-      assertEquals(await main(["--repo", dir, "--only", "top", "--no-types"]), 1, "a failing test");
+      assertEquals(await main(["--repo", dir, "--no-license", "--only", "top", "--no-types"]), 1, "a failing test");
       put(dir, "commons/top/src/mod.ts", 'import { one } from "@intellectual-frontiers/base";\nexport const two: number = one + "x";\n');
-      assertEquals(await main(["--repo", dir, "--only", "top", "--no-tests"]), 1, "a type error");
-      assertEquals(await main(["--repo", dir, "--nonsense"]), 2);
-      assertEquals(await main(["--repo", dir, "--only", "nope"]), 2);
+      assertEquals(await main(["--repo", dir, "--no-license", "--only", "top", "--no-tests"]), 1, "a type error");
+      assertEquals(await main(["--repo", dir, "--no-license", "--nonsense"]), 2);
+      assertEquals(await main(["--repo", dir, "--no-license", "--only", "nope"]), 2);
     });
   },
 );

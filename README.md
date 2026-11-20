@@ -127,4 +127,12 @@ Work spec first: change the specification, then the code, then the tests.
 
 ## License
 
-Every library carries its own MIT license in its folder (for example [`commons/ergonex/LICENSE`](commons/ergonex/LICENSE)). Nothing here claims compliance with any regulation; it records evidence.
+The code is public to read and is licensed by Intellectual Frontiers LLC under the [PolyForm Noncommercial License 1.0.0](LICENSE) (SPDX `PolyForm-Noncommercial-1.0.0`), for every library in `commons/` and every other part of this repository.
+
+- **Free**: personal use, research, education, and use by charitable, educational, public research, public safety or health, environmental protection and government organizations, as the license defines them.
+- **Needs a commercial license**: any commercial use, hosting, embedding, reselling and building a competing product. Open an issue titled **Commercial license** at <https://github.com/intellectual-frontiers/.github/issues>.
+- **Where to read more**: [`LICENSING.md`](LICENSING.md) (in plain words), [`COMMERCIAL.md`](COMMERCIAL.md) (what a commercial license covers), [`NOTICE`](NOTICE), [`CONTRIBUTING.md`](CONTRIBUTING.md) (contributions are licensed to the LLC under the public and commercial licenses; sign off with `git commit -s`) and [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
+
+Every library folder carries the same `LICENSE`, and every published package declares the same identifier; `bun commons/libraries/src/license.ts` writes them and `--check` proves them. The names Ergonex, Mizan, Kanon, Archon and Stolos and the logos are not licensed beyond saying what the software is.
+
+Nothing here claims compliance with any regulation; it records evidence.

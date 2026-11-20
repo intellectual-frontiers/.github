@@ -7,7 +7,7 @@
  *     bun run dev:check --files a.ts,b/c.ts      the libraries these files affect (paths from the repository's root)
  *     bun run dev:check --all                    every library
  *     bun run dev:check --list                   say what is affected and run nothing
- *     other flags: --base REF (origin/main by default), --no-types, --no-tests, --bail (stop at the first failing test), --repo DIR
+ *     other flags: --base REF (origin/main by default), --no-types, --no-tests, --no-license, --bail (stop at the first failing test), --repo DIR
  *
  * @remarks
  * Nothing is installed per library. The repository's root installs the packages every library shares (`bun install`, once), the libraries are linked under `commons/node_modules` (a link for each folder whose package
@@ -40,6 +40,7 @@ import { flag, formatUsageError, helpText, many, parseArgs, value } from "@intel
 import { label, paint } from "@intellectual-frontiers/terminal/palette";
 import { affectedBy, changedSince, everyLibrary } from "./affected.ts";
 import { linkAll } from "./link.ts";
+import { judge as judgeLicense, sentence as licenseSentence } from "./license.ts";
 import type { Library } from "./libraries.ts";
 
 /** What the loop is asked about: what changed since a revision, a list of files, named libraries or everything. */
@@ -217,6 +218,14 @@ export async function typeCheck(repo: string, libs: readonly Lib[], width: numbe
   };
 }
 
+/** The license of the repository and of each library, as the check of `license.ts` finds it: a library with no `LICENSE` fails here, and the sentence says the command that writes it. */
+export async function licenseStage(repo: string): Promise<Outcome> {
+  const t0 = performance.now();
+  const { findings } = await judgeLicense(repo);
+  if (findings.length === 0) return { kind: "passed", detail: `every LICENSE is the official text in ${seconds(t0)}` };
+  return { kind: "failed", detail: plural(findings.length, "finding", "findings"), output: findings.map(licenseSentence) };
+}
+
 /** The sum of counts. */
 export const addCounts = (a: Counts, b: Counts): Counts => ({ pass: a.pass + b.pass, skip: a.skip + b.skip, fail: a.fail + b.fail, files: a.files + b.files });
 
@@ -291,6 +300,7 @@ const OPTIONS = {
   list: flag({ help: "Say what is affected and run nothing." }),
   types: flag({ help: "Type-check the libraries (on by default).", negatable: true, default: true }),
   tests: flag({ help: "Run their tests (on by default).", negatable: true, default: true }),
+  license: flag({ help: "Check the license files of the repository (on by default).", negatable: true, default: true }),
   bail: flag({ help: "Stop the tests at the first one that fails." }),
   repo: value({ help: "The repository (the working folder, or the one above it that has commons/, by default).", valueName: "DIR" }),
 };
@@ -361,6 +371,7 @@ export async function main(argv: readonly string[]): Promise<number> {
     ]);
     stages.push({ name: "types", outcome: types }, { name: "tests", outcome: tests });
   }
+  if (!o.list && o.license) stages.push({ name: "license", outcome: await licenseStage(repo) });
   for (const l of summaryLines(look, { why, libs: names }, stages, notes, seconds(t0))) stdio.stdout.writeSync(`${l}\n`);
   return stages.some((s) => s.outcome.kind === "failed") ? 1 : 0;
 }

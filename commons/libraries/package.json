@@ -16,6 +16,7 @@
     "./generate-ontology": "./src/generate-ontology.ts",
     "./generate-workflows": "./src/generate-workflows.ts",
     "./libraries": "./src/libraries.ts",
+    "./license": "./src/license.ts",
     "./link": "./src/link.ts",
     "./newer": "./src/newer.ts",
     "./oscal-register": "./src/oscal-register.ts",
@@ -35,7 +36,7 @@
     "check": "tsc -p tsconfig.json",
     "test": "bun test suite/",
     "test:node": "node --test \"suite/**/*.test.ts\"",
-    "verify": "bun x bun@1.4.4-canary.20261115.1 --version && tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../libraries/src/check.ts --root spec-kit --level L1 && bun tools/check.ts && bun src/readme.ts --check --repo ../.. && bun test suite/ && bun tools/pack.ts --check",
+    "verify": "bun x bun@1.4.4-canary.20261115.1 --version && tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../libraries/src/check.ts --root spec-kit --level L1 && bun tools/check.ts && bun src/readme.ts --check --repo ../.. && bun src/license.ts --check --repo ../.. && bun test suite/ && bun tools/pack.ts --check",
     "pack": "bun tools/pack.ts"
   },
   "devDependencies": {

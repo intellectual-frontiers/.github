@@ -641,3 +641,15 @@ requirement	mechanism	by	note
 0011-documentation FR-032	check	.github: cd commons/docs && bun run verify	guides.test.ts: a guide that cannot be read is a finding, the sections are in order, every section has its guides with links resolved
 0011-documentation FR-033	check	.github: cd commons/docs && bun run verify	guides.test.ts: the library map and the imports of each library are read from the sources
 0011-documentation FR-034	check	.github: cd commons/docs && bun run verify	theme.test.ts: dark tokens for the system and for a choice, the button and the script that sets the theme first, the keyboard shortcuts and the print style
+0035-licensing FR-001	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: the default is PolyForm-Noncommercial-1.0.0, no LICENSE of the repository is the MIT license, and the manifest, the packer and the generator read the one identifier
+0035-licensing FR-002	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: the official text is the one recorded by its standard (SHA-256), and a changed text is refused naming both hashes
+0035-licensing FR-003	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: a manifest license of the closed list is read and one that is not is refused naming it
+0035-licensing FR-004	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: every LICENSE begins with the required notice and ends with the official text unchanged
+0035-licensing FR-005	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: every library folder and the root hold the LICENSE the generator makes, and a hand edit is found
+0035-licensing FR-006	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: --check writes nothing and exits 1 naming a library with no LICENSE and the command, and the generator writes it
+0035-licensing FR-007	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: the verify of libraries and the dev loop run the check, and tests/commons-licensing.test.ts runs it on the real repository
+0035-licensing FR-008	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: a missing or empty LICENSING.md, COMMERCIAL.md, NOTICE, CONTRIBUTING.md or CITATION.cff, and one that lacks its facts, is found
+0035-licensing FR-009	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: CONTRIBUTING.md asks for git commit -s and Refs #N, and the trademark paragraph names the five names
+0035-licensing FR-010	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: THIRD_PARTY_NOTICES.md is what the record makes, and a vendored path that is gone is found
+0035-licensing FR-011	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: the README License section names the license, and AGENTS.md names the generator's command
+0035-licensing FR-012	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: the packer writes the SPDX id, packs the LICENSE and refuses a library that has none
