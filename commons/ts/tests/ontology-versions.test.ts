@@ -11,6 +11,7 @@ import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { ifccmOntology } from "@intellectual-frontiers/ontology/ifccm";
 import { ifqsOntology } from "@intellectual-frontiers/ontology/ifqs";
 import { ifrOntology, versionSchemes } from "@intellectual-frontiers/ontology/ifr";
+import { kanonOntology } from "@intellectual-frontiers/ontology/kanon";
 import { mizanOntology } from "@intellectual-frontiers/ontology/mizan";
 import { packagingOntology } from "@intellectual-frontiers/ontology/supply-chain/packaging";
 
@@ -24,6 +25,7 @@ const ONTOLOGIES = [
   { name: "ifccm", ontology: ifccmOntology, prefix: "ifccmv" },
   { name: "ifqs", ontology: ifqsOntology, prefix: "ifqsv" },
   { name: "ifr", ontology: ifrOntology, prefix: "ifrv" },
+  { name: "kanon", ontology: kanonOntology, prefix: "kanonv" },
   { name: "packaging", ontology: packagingOntology, prefix: "pmv" },
 ] as const;
 
@@ -52,9 +54,9 @@ proves(
       assert(ttl.includes('owl:versionInfo "1.0.0"'), `${name}: the version`);
       assert(!/owl:versionInfo "[0-9]+"/.test(ttl), `${name}: no integer version`);
     }
-    // the catalog lists the four published ontologies, each at 1.0.0
+    // the catalog lists the five published ontologies, each at 1.0.0
     const catalog = text("generated/mizan-catalog.auto.ttl");
-    assertEquals((catalog.match(/dcat:version "1\.0\.0"/g) ?? []).length, 4);
+    assertEquals((catalog.match(/dcat:version "1\.0\.0"/g) ?? []).length, 5);
     assert(!/dcat:version "[0-9]+"/.test(catalog));
   },
 );

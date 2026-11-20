@@ -27,6 +27,7 @@
   | 3 | test | runtime/test, kernel/test-record |
   | 4 | quality | quality/, kernel/test-report, runtime/test-run |
   | 2 | ontology | the folders of `commons/ontology`: mizan, audit, ifccm, ifr, ifqs, supply-chain, standards |
+  | 2 | kanon | the table of layers and the import check, lifted from the layers checks of `commons/data` and `commons/headless` (0033-kanon), and the types-only LayeredModel (new: no module of `commons/ts`) |
   | 3 | mizan | mizan/integrations, mizan/rules, mizan/levels, mizan/harness, mizan/standards, mizan/spec-files, mizan/spec-terms, mizan/newer, mizan/changes (the change-control rules of IFCCM, as plugins), mizan/versions (the release rules of IFR, as plugins), kernel/trace, kernel/layers, runtime/trace |
   | 3 | githost | githost/capabilities, githost/git, githost/github, githost/gitlab, githost/http, githost/mod, githost/remote, githost/types |
   | 4 | libraries | mizan/libraries, mizan/affected, mizan/check, mizan/changes.ts, mizan/versions.ts, mizan/generate-ontology, mizan/publish-ontology, mizan/oscal-register, mizan/imports (the importers of standards), workflows (the folder `githost/workflows` before the lift of githost), tools/generate-workflows, tools/pins, tools/install-bun, tools/pack-library |

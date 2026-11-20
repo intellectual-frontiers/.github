@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/data",
   "private": true,
-  "version": "0.5.0",
+  "version": "0.7.0",
   "description": "Intellectual Frontiers data: governance, a logical and a physical schema, and extensions, built on IFC TypeScript's kernel. Phase 0 spike.",
   "type": "module",
   "engines": {
@@ -49,6 +49,7 @@
     "./sql/extensions/queries": "./sql/extensions/queries/mod.ts",
     "./sql/extensions/target": "./sql/extensions/target/mod.ts",
     "./sql/extensions/kinds": "./sql/extensions/kinds/mod.ts",
+    "./sql/extensions/osquery": "./sql/extensions/osquery/mod.ts",
     "./sql/extensions/osquery-atc": "./sql/extensions/osquery-atc/mod.ts",
     "./sql/extensions/operations": "./sql/extensions/operations/mod.ts",
     "./sql/extensions/invariants": "./sql/extensions/invariants/mod.ts",
@@ -59,6 +60,7 @@
     "./sql/typed": "./sql/typed/mod.ts",
     "./sql/loads": "./sql/loads/mod.ts",
     "./sql/describe": "./sql/describe/mod.ts",
+    "./sql/federate": "./sql/federate/mod.ts",
     "./sql/typed/generate": "./sql/typed/generate.ts",
     "./sql/typed/models": "./sql/typed/models/mod.ts",
     "./sql/presets": "./sql/presets/mod.ts",

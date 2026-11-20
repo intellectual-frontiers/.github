@@ -1,4 +1,5 @@
 // Spec: 0005-reach-and-targets FR-004, FR-009
+// Spec: 0007-ssh-coverage FR-003, FR-004
 /**
  * Where a command runs, as a port (commons headless 0005-reach-and-targets FR-004): an `Executor` takes an argument vector and options and gives how the program
  * ended, in the shapes of the system's `proc` (`RunOptions` and `Output`, the same fields, so that the system's own functions are executors without a
@@ -41,8 +42,49 @@ export type Output = {
   readonly stderr: Uint8Array;
 };
 
-/** Runs a program, here or elsewhere: `exec(argv, opts) -> Output`. */
-export type Executor = { exec(argv: readonly string[], opts?: RunOptions): Promise<Output> };
+/** What a program started for a session is given: the fields of the system's `SpawnOptions`, with the streams always piped. */
+export type SpawnOptions = {
+  readonly cwd?: string;
+  readonly env?: Readonly<Record<string, string>>;
+  readonly clearEnv?: boolean;
+  readonly signal?: AbortSignal;
+  readonly killAfterMs?: number;
+};
+
+/** How a program ended, once it ends: the fields of the system's `Status`. */
+export type SessionStatus = { readonly code: number; readonly success: boolean; readonly signal: string | null };
+
+/**
+ * A program that runs while it is talked to (a tool server over ssh, newline-delimited JSON-RPC on its standard input and output): its three streams, how it ended, a way to stop it,
+ * and its whole output where that is wanted at the end. The system's `Child` is one.
+ */
+export type Session = {
+  /** Its standard input; closing the stream closes its input. */
+  readonly stdin: WritableStream<Uint8Array> | null;
+  readonly stdout: ReadableStream<Uint8Array> | null;
+  readonly stderr: ReadableStream<Uint8Array> | null;
+  /** How it ended, once it ends. */
+  readonly status: Promise<SessionStatus>;
+  /** Sends it a signal (SIGTERM by default). */
+  kill(signal?: "SIGTERM" | "SIGKILL" | "SIGINT"): void;
+  /** Its whole output and error, read from the streams, and its status, once it ends. */
+  output(): Promise<Output>;
+};
+
+/**
+ * Runs a program, here or elsewhere: `exec(argv, opts) -> Output`, which gives its output when it has ended (it does not stream). Besides: `put` copies files into a folder there and
+ * `get` copies a file from there, each by argument vectors with no shell between; `spawn` starts a program with piped streams and gives the session, for a protocol that is talked
+ * over its standard input and output. An executor that cannot do one of these leaves it out.
+ */
+export type Executor = {
+  exec(argv: readonly string[], opts?: RunOptions): Promise<Output>;
+  /** Copies the local files into the folder `remoteDir` there. */
+  put?(files: readonly string[], remoteDir: string, opts?: RunOptions): Promise<Output>;
+  /** Copies the file `remote` there to the local path. */
+  get?(remote: string, local: string, opts?: RunOptions): Promise<Output>;
+  /** Starts the program there with piped streams. */
+  spawn?(argv: readonly string[], opts?: SpawnOptions): Session;
+};
 
 /** The executor for a target by its id, where there is one. */
 export type ExecutorFor = (targetId: string) => Executor | undefined;

@@ -1,0 +1,145 @@
+# Feature Specification: Kanon
+
+**Spec ID:** 0033-kanon
+**Status:** Draft
+**Owner:** if
+**Domain:** commons
+**Part of:** 0003-mizan
+
+**Input:** Several libraries of commons state one thing once, as governance (what a thing is and what it may do), and then project it down into a logical layer (the model a program reasons with) and a physical layer (the tables, commands, tools and routes that carry it out): `commons/data` does it for data (governance, logical and physical schemas, dialects), `commons/headless` for programs with no window (governance, logical, surfaces). Each kept its own table of layers, its own import checker and its own words. This specification names the pattern **Kanon**, after the Greek *kanon*, the measuring rule (the source of "canon", and, through the Arabic *qanun*, of "law"), a sibling to Mizan, the balance: Mizan weighs a harness against its specifications, Kanon is the rule a library is built to, one rule, projected down, nothing lost. The layers keep their plain names (Governance, Logical, Physical); only the pattern is branded. The tagline is "One rule, projected down, nothing lost."
+
+## The six rules
+
+- **FR-001**: A library that is Kanon MUST be built in three layers, in this order from the top: Governance (what a thing is and what it may do, stated once, in the words of its domain), Logical (the model a program reasons with, made from Governance) and Physical (what carries it out in a place: a dialect, a table, a command, a tool, a route, called a surface where it faces a caller); each unit of the library (a folder, FR-010) MUST be in exactly one layer, except the library's own checking (its tests, tools and examples), which is in none.
+- **FR-002**: Projection, not copying: WHEN a layer needs what the layer above says, it MUST derive it by code (a projection: a function from the elements above to the elements of this layer) and MUST NOT restate it by hand; a lower layer MUST hold no copy of a governance sentence that it cannot trace to its source by FR-003.
+- **FR-003**: Identity survives as a trace graph: every element of every layer MUST have an id that is stable across builds, and every element of the Logical and Physical layers MUST have at least one trace edge to the element it was projected from; the edges MUST make a graph that is acyclic and runs only from a layer to the one below it, so that from any physical element the governance that says why it exists can be found.
+- **FR-004**: Imports run one way, with a check: a unit MUST import only units of a layer above its own, and units of its own layer only where its row of the table lists them (Logical may import Governance, Physical may import Logical and Governance, Governance imports no unit of the library, and a surface imports no other surface), and the library MUST pass the import check of `@intellectual-frontiers/kanon` (FR-012) with no finding that is not held by its baseline.
+- **FR-005**: Nothing is silently dropped: each annotation that Governance gives an element (a property of it: its effect, its audience, its retention) MUST end in one of three ways, and the model MUST say which: expressed (a trace edge to the lower element that enforces it), carried (it is passed on as data of a lower element, for a program to read at run time) or unexpressed (it is named, with the reason, as one that no lower layer enforces yet); an annotation with none of the three is a finding, `kanon/dropped`.
+- **FR-006**: Extensions use only public surfaces: a unit that extends the library (a model, a dialect, a tool of another package) MUST reach the library only through its package's `exports` and MUST NOT import a file of it by a relative path or by a path `exports` does not name; the import check MUST name such an import (`layers/relative`, `layers/private`).
+
+## The vocabulary
+
+- **FR-007**: These terms MUST mean what this requirement says in every specification, ontology and page of commons, and a document that uses one for another thing MUST be corrected:
+  - **Kanon**: the pattern of FR-001 to FR-006, the name of this specification and of the library `@intellectual-frontiers/kanon`.
+  - **Layer**: one of Governance, Logical, Physical, each with a rank (Governance 1, Logical 2, Physical 3; a higher rank imports a lower).
+  - **Unit**: a folder of a library that is in one layer; a class of units that has instances (a dialect, a surface, a model) is one unit for each of its folders.
+  - **Element**: one thing a layer says (a concept, an action, a table, a command), with a stable id, a kind, a name, a definition, a source and properties.
+  - **Projection**: the derivation of the elements of one layer from those of the layer above (FR-002).
+  - **Trace edge**: the record that one element was made from another, with how (FR-003).
+  - **Surface**: a physical unit that faces a caller: the command line, a tool server, a REST service; a surface imports Logical and Governance and nothing of another surface.
+  - **Finding**: a sentence about a breach of a rule, with a code (FR-011), a file, a line and a key that a baseline can hold.
+  - **Table**: a library's list of units, each with its layer and what it may import, as data (FR-010).
+
+## The alignment to standards
+
+- **FR-008**: This specification MUST carry the alignment of Kanon's terms to the standards that name something near them (0018-standards-first FR-001), each row saying what the standard is, what it says, how close Kanon's term is (`closeMatch`, `narrowMatch`, `broadMatch`) or that it is `unaligned`, and MUST be the source of the individuals of the ontology `kanon` (FR-015). A term for which no standard was found MUST be marked `unaligned`, never left out, and a standard that could not be verified MUST be marked so.
+
+  | Kanon term | Standard and term | Relation | Verified |
+  |---|---|---|---|
+  | Layer: Governance | OMG Model Driven Architecture Guide, Revision 2.0 (OMG document ormsc/14-06-01, 2014): the Computation Independent Model (CIM), the view of a system that hides the details of its structure and processing | `closeMatch` (CIM is business and requirements; Governance is the policy and the facts of a thing, in the words of its domain, so it holds the CIM's concerns and some of the PIM's) | document and its adoption in 2014 verified; the wording of the three viewpoints is that of the MDA Guide as commonly cited and was not re-read in this work |
+  | Layer: Logical | the same guide: the Platform Independent Model (PIM) | `closeMatch` | as above |
+  | Layer: Physical | the same guide: the Platform Specific Model (PSM) | `closeMatch` (a surface or a dialect is a platform) | as above |
+  | Projection | OMG Meta Object Facility Query/View/Transformation (QVT), version 1.3 (formal/16-06-03, June 2016): a transformation of a model into another | `closeMatch` (Kanon says that a layer is made from the one above by code; it does not adopt QVT's languages) | document and version verified |
+  | The three layers as a whole | ANSI/X3/SPARC three-schema architecture (1975, interim report of the Study Group on DBMS), published by ISO as ISO/IEC TR 9007:1987 (Concepts and terminology for the conceptual schema and the information base): external, conceptual and internal schemas | `unaligned` for the layers (the external schema is a view for a user, and Kanon's three are not that; the nearest is the conceptual schema to Governance and the internal to Physical); the report is a Type 3 technical report that endorses the three-level architecture | the report and its title verified |
+  | Governance, Logical, Physical as the conceptual, logical and physical levels of data modeling | no standard names these three levels: it is the practice of data modeling; ANSI/X3/SPARC's three levels are not the same three | `unaligned` | searched, none found |
+  | Trace edge | W3C PROV-O (Recommendation, 2013): `prov:Derivation`, `prov:wasDerivedFrom` | `narrowMatch` (an edge is a derivation of an element from an element) | in use by commons' own ontologies (0012-ontology) |
+  | Element | W3C PROV-O: `prov:Entity` | `narrowMatch` | as above |
+  | Finding | W3C SHACL (Recommendation, 2017): `sh:ValidationResult` | `closeMatch` | the term is of the Recommendation; its wording was not re-read in this work |
+  | Unit, Surface, Table | none found: a folder of a library and what it may import | `unaligned` | searched, none found |
+  | Conformance of a library to Kanon | ISO/IEC/IEEE 42010 (architecture description) describes views and correspondences between them | `broadMatch`, not verified | not verified |
+
+  A correspondence to a standard that is `unaligned` MUST be recorded by a Decision of the owner (0018-standards-first FR-005) before it is a term of the ontology; the terms of the ontology `kanon` that this table maps are therefore stated as specializations of PROV-O and SKOS terms, and the five `unaligned` rows above are open to the owner.
+
+## What conforms
+
+- **FR-009**: Where a library is Kanon, the library's own specifications MUST say which of its folders are in which layer (FR-010), and a library that is not Kanon MUST NOT use the names Governance, Logical and Physical for its folders. The libraries that are Kanon are: `commons/data` (governance, the logical and physical schemas, with the vault of its secrets as a unit of it), and `commons/headless` (governance, logical, surfaces), and the libraries planned as Kanon are `grc` (governance of controls, the logical model, the OSCAL and OCSF forms as physical), `integrations`, and signing; the libraries that are not Kanon are the single-level utility libraries `core`, `crypto`, `formats`, `rdf`, `system`, `terminal`, `telemetry` and `net`. The libraries `mizan`, `ontology`, `docs`, `quality`, `test`, `githost`, `libraries`, `lint` and `ergonex` are not classified by this specification (OQ-3).
+
+## The table and the check
+
+- **FR-010**: A library that is Kanon MUST declare its table in its manifest `library.ts`, as the optional field `kanon` (0027-commons-libraries FR-012): `package` (the package name, which its units import each other by) and `units`, each with its `folder`, its `layer` (or `own: true` for the library's own checking, which is in no layer and may import any file of the library by a relative path), `instances` (true where each folder under it is a unit of its own), `mayImport` (the exact list of the other units it may import, in place of the units of the layers above) and `packages` (the packages and subpaths it may import by name, where it is restricted); a library that does not declare `kanon` MUST be read as not Kanon, and the manifest MUST be refused where the field is not of this form or a unit names a layer that is not one of the three.
+- **FR-011**: The import check MUST find, from a table and a root and with no other input, every import of every file as data (a finding of this form: code, file, line, one sentence and a key) with these codes: `layers/unclassified` (a file in no unit of the table), `layers/relative` (a file of another unit imported by a relative path), `layers/private` (an import of the package by a path its `exports` does not name), `layers/external` (an import of a package the unit's row does not allow), `layers/above` (an import of a unit that stands below it in rank, that is, a climb), `layers/around` (an import of another unit of its own layer that its row does not list), `layers/cycle` (units of one class that import each other in a loop) and `kanon/dropped` (FR-005).
+- **FR-012**: The library `@intellectual-frontiers/kanon` MUST hold the type of the table, the import check (FR-011) lifted from the checks of `commons/data/tools/layers.ts` and `commons/headless/tools/layers.ts`, the check of FR-005 and the types-only contract of FR-013, and MUST be a utility library of a single level in the sense of FR-009 that is itself not Kanon where it has fewer than two levels; the check MUST be pure (given the files and the `exports` map, it returns findings) and MUST NOT read the file system but in the entry `host` of its package.
+- **FR-013**: The contract `LayeredModel` MUST be types only (no value that a program runs but the constants of its kinds and the builders of the ids) and MUST be the shape of the layered model of the documentation generator (0011-documentation FR-029: its layers, elements, trace edges and findings), so that a Kanon library's model is read by that generator as it is: a `LayeredModel` has `layers`, `elements` (each with `id`, `layer`, `kind`, `name`, `definition`, optional `parent`, `source` with the file and the line, and `properties`), `trace` (edges from one element to another, with how) and `findings`, and adds `dispositions` (FR-005). The kinds MUST be those agreed by Data and Headless: `action`, `verb`, `option`, `operand`, `problem-code` and `outcome`, and the projections `cli-command`, `mcp-tool` and `rest-route`; the ids MUST be `headless:<program>/<verb-path>`, `cli:<program> <verb path>`, `mcp:<tool_name>`, `rest:<METHOD> <path>`, and, for an option or an operand, the id of its verb followed by `#--flag` or `#<operand>`.
+- **FR-014**: A library that declares `kanon` MUST pass the check (FR-011): its `verify` script MUST run the check of `@intellectual-frontiers/kanon` on its own table (`kanon/src/check.ts` of this repository), and the check of the manifests (0027-commons-libraries FR-013) MUST find a library that declares `kanon` and whose `verify` does not run it; and a conformance level (0028-conformance-levels) MAY entail the declaration, in which case the level states it as a requirement of Mizan's ontology and a library that declares that level and no `kanon` is found by the check of the manifests, which this specification does not yet make of any level (OQ-1).
+
+## The ontology and what it replaces
+
+- **FR-015**: The ontology of commons MUST have a namespace `kanon` beside `ifr`, `ifccm`, `ifqs` and `mizan`, with the classes `kanon:Layer`, `kanon:Projection`, `kanon:Element`, `kanon:TraceEdge`, `kanon:Surface` and `kanon:Finding`, the three layers as the members of the code list `kanon:Layer` each with its rank, its MDA viewpoint (`CIM`, `PIM`, `PSM`) and its level of data modeling (`conceptual`, `logical`, `physical`) as data, and each class MUST have a record of the standard it rests on (0018-standards-first FR-003).
+- **FR-016**: This specification MUST supersede, by citation only, the layers text of the first specification of the spec kit of `commons/data` and of the specifications of the spec kit of `commons/headless` about their layers, in this sense: where one of them states the three layers, the one-way import, the table or the check, it is an instance of FR-001 to FR-006 and its own text stays, in its own kit, until its owner changes it to cite this specification; no requirement of another library's kit is edited by this specification.
+
+## The relation to the ladder
+
+- **FR-017**: The ladder (0016-ladder) and Kanon MUST be kept apart and cross-referenced: the ladder is the rule of a whole harness that a rung relies only on the rungs below it, and Kanon is the same rule applied inside one library (a unit relies only on units of its layer or above), with the two things the ladder does not say, projection (FR-002) and identity (FR-003); the ladder's rung numbers and Kanon's layer ranks MUST NOT be compared. Whether the two are one rule stated twice is OQ-2.
+
+## The typing discipline
+
+- **FR-018**: A Kanon library SHOULD be typed as an algebra: a closed union for each thing with a fixed set of cases (the layers, the finding codes, the kinds of a unit, the ways an annotation ends), a product type for each record, an identity as a branded type made only by a smart constructor that returns a `Result` (parse, don't validate), every field `readonly`, a registry as a typed map with one entry for each case, a port as a typed record of functions, and a pure core with effects at the edge; and the Governance and Logical layers MUST match every union exhaustively (a `default` that passes the value to `absurd`, so that a new case fails to compile where it is not handled), MUST NOT throw for a failure that is expected (it is a `Result`), MUST NOT use `any`, a non-null assertion or an `enum`, and MUST hold no effect (no file, no clock, no network: a port is given to it).
+
+## Acceptance scenarios
+
+1. **Given** a library whose logical unit imports a file of a physical unit by a relative path, **When** the check runs, **Then** it reports `layers/relative` naming the file and the line, per FR-004 and FR-011.
+2. **Given** a governance unit that imports a logical unit by the package's name, **When** the check runs, **Then** it reports `layers/above`, per FR-004 and FR-011.
+3. **Given** a model whose governance element has an annotation that no trace edge, no carried property and no unexpressed record names, **When** the model is checked, **Then** it reports `kanon/dropped` naming the element and the annotation, per FR-005.
+4. **Given** the same annotation named as unexpressed with its reason, **When** the model is checked, **Then** there is no finding, per FR-005.
+5. **Given** a manifest that declares `kanon` with a unit in a fourth layer, **When** the manifest is read, **Then** it is refused, per FR-010.
+6. **Given** a library that declares `kanon` and a `verify` that does not run the check, **When** the manifests are checked, **Then** the check finds it, per FR-014.
+7. **Given** a `LayeredModel` of a Kanon library, **When** the documentation generator reads it, **Then** it reads it as its own layered model, per FR-013.
+8. **Given** the ontology of commons, **When** it is read, **Then** it has the namespace `kanon` with the six classes and the three layers with their MDA viewpoints, per FR-015.
+9. **Given** an extension that imports a file of a library by a path its `exports` does not name, **When** the check runs, **Then** it reports `layers/private`, per FR-006 and FR-011.
+10. **Given** a cycle of imports among the models of a library, **When** the check runs, **Then** it reports `layers/cycle` once, at the import that closes it, per FR-011.
+11. **Given** a union of finding codes to which a code is added and a match that does not handle it, **When** the library is compiled, **Then** the compiler fails, per FR-018.
+
+## Out of scope
+
+- Moving the copies of the check that `commons/data` and `commons/headless` keep: they switch to the library later (see the migration note below), and each stays in force until then.
+- Renaming or editing the constitution of a company or a harness: the article is drafted in the appendix for the owner to decide.
+- Clearing the name Kanon as a trademark in any jurisdiction: see OQ-4.
+- Any commons library that is not named in FR-009.
+
+## Edge cases
+
+- A library with two levels that is nevertheless a utility (`system`: files and processes): it is not Kanon, per FR-009, and has no table.
+- A surface with no unit of its own in the table: `layers/unclassified`, per FR-011, so that a surface cannot appear without saying what it may import.
+- A unit of a class with instances (a dialect, a model) that imports another instance of its class: allowed only where its row lists the class, and a loop of them is `layers/cycle`, per FR-011.
+- A library with an annotation that nothing yet enforces: it is named unexpressed, with a reason, and the check passes; it is a finding when it is not named, per FR-005.
+- The name Kanon found, inside this repository's ontology, to clash with a term: Strata is the fallback; no such clash was found when this specification was written (the repository was searched for `kanon` and `strata` in its ontologies, specifications and code).
+
+## Migration note for the libraries that keep their own check
+
+`commons/data` and `commons/headless` switch when their owners choose: replace the `UnitClass`, `FOLDERS`, `MAY_IMPORT`, `LEVEL`, `OWN` and `STRICT` values of `tools/layers.ts` by a table in `library.ts` (`kanon`, FR-010), delete `layerFindings` and `specifiersOf` and call `findings` of `@intellectual-frontiers/kanon/host` from `tools/check.ts` (it reads the manifest's table and the folder), keep the findings' keys (they are the same: `layers/<code> <file> <about>`) so that `trace.baseline.txt` stays valid, and add `@intellectual-frontiers/kanon` to `devDependencies`.
+
+## Assumptions
+
+- The three layers are enough for every library of commons that is Kanon: Headless's surfaces and Data's dialects are Physical.
+- A single rank per layer is enough to say a climb from a reach-around, as the two existing checks do with a level per class.
+
+## Open questions
+
+- **OQ-1**: Whether a conformance level (0028-conformance-levels) requires `kanon` of a library, and which.
+- **OQ-2**: Whether the ladder (0016-ladder) and Kanon are one rule, and what the one specification would be; the two are cross-referenced and not unified.
+- **OQ-3**: Which of `mizan`, `ontology`, `docs`, `quality`, `test`, `githost`, `libraries`, `lint` and `ergonex` are Kanon.
+- **OQ-4**: An external collision search for the name Kanon (trademark registers and software and package registries, in the classes of software and services) is an open item for the owner: this repository can show only that no term of its own clashes. If it finds a conflict the fallback is Strata, and the change is the name in this specification, the ontology namespace and the library, with no alias kept.
+- **OQ-5**: The five `unaligned` rows of the alignment table need Decisions of the owner (0018-standards-first FR-005), and the MDA wording and the SHACL and 42010 rows need verifying against the documents themselves.
+
+## Key entities
+
+- **Kanon** - the pattern: three layers, projection, a trace graph, one-way imports, nothing dropped, public surfaces only.
+- **Layer, Unit, Element, Projection, Trace edge, Surface, Finding, Table** - as FR-007.
+- **LayeredModel** - the types-only contract of a Kanon library's model.
+
+## Success criteria
+
+- **SC-001**: A Kanon library's table is data in its manifest, and the check that holds its imports is the one in `@intellectual-frontiers/kanon`, with no copy in the library.
+- **SC-002**: From any element of a Physical layer a reader can follow the trace edges up to the Governance element that says why it is there, and no annotation of Governance is missing from the model's account.
+
+## Appendix: the constitution article (a draft, for the owner to decide)
+
+No constitution document is edited by this specification. The article that a constitution might carry, if the owner adopts the pattern:
+
+> **Article: Kanon.** A library of ours that states a thing once and carries it out in more than one place is built to Kanon: Governance says what the thing is and what it may do; Logical is made from Governance by code, never copied; Physical is made from Logical by code, in each place it is carried out. Every element keeps its identity from the layer above, so that what was said can be found where it is carried out; imports run from a layer to the layers above it only, and a machine checks that they do; no annotation of Governance is dropped without being named; and whatever extends the library reaches it through its public surface alone. One rule, projected down, nothing lost.
+
+## Review & acceptance checklist
+
+- [x] Every requirement is testable (MUST / MUST NOT), not aspirational
+- [x] No company fact is asserted here
+- [x] Every open item is marked, not silently decided
