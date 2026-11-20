@@ -12,7 +12,7 @@ export const library = {
   verify: "bun run verify",
   version: "0.1.0",
   distribution: ["github", "npm"],
-  exports: [".", "./install"],
+  exports: [".", "./install", "./pin"],
   family: { host: "archon", role: "dialect" },
   summary:
     "The default dialect of tools for Archon: the programs a computer needs, as their publishers released them, pinned by the SHA-256 of the artifact, in a folder of the user's own, with no administrator rights and no package manager; never built from source.",

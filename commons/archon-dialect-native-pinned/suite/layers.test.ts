@@ -1,6 +1,6 @@
 /**
  * Tests of the layers of the dialect (commons archon-dialect-native-pinned 0001-native-pinned-layers FR-001 to FR-006): the shared checker of Kanon finds nothing in the real tree of a member of the
- * Archon family, the package exports the dialect and the pure install logic, no source imports another dialect or a plugin, `verify` runs every check, the release record agrees with the manifest,
+ * Archon family, the package exports the dialect, the pure install logic and the pin tool, no source imports another dialect or a plugin, `verify` runs every check, the release record agrees with the manifest,
  * and no source runs a package manager, asks for administrator rights or runs a compiler.
  *
  * @module
@@ -37,9 +37,9 @@ proves(["0001-native-pinned-layers FR-002"], "no source imports another dialect 
   }
 });
 
-proves(["0001-native-pinned-layers FR-003"], "the package exports the dialect and the pure install logic", async () => {
+proves(["0001-native-pinned-layers FR-003"], "the package exports the dialect, the pure install logic and the pin tool", async () => {
   const pkg = JSON.parse(await fs.readTextFile(path.join(ROOT, "package.json"))) as { name: string; version: string; exports: Record<string, string> };
-  assertEquals(pkg.exports, { ".": "./src/mod.ts", "./install": "./src/install.ts" });
+  assertEquals(pkg.exports, { ".": "./src/mod.ts", "./install": "./src/install.ts", "./pin": "./src/pin.ts" });
   assertEquals(pkg.name, `@intellectual-frontiers/${library.name}`);
   assertEquals(pkg.version, library.version);
   assertEquals(Object.keys(pkg.exports), [...library.exports]);
