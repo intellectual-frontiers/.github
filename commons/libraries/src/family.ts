@@ -42,6 +42,7 @@ export const RESERVED: readonly Reservation[] = [
   { match: { kind: "exact", name: "signing" }, host: "signing", reason: "held for the signing library of the fleet libraries (intellectual-frontiers/.github#11)" },
   { match: { kind: "exact", name: "gitops" }, host: "gitops", reason: "held for the gitops library of the fleet libraries (intellectual-frontiers/.github#11)" },
   { match: { kind: "exact", name: "estate" }, host: "estate", reason: "held for the estate library of the fleet libraries (intellectual-frontiers/.github#11)" },
+  { match: { kind: "exact", name: "toolchain" }, host: "toolchain", reason: "held for the toolchain library of the fleet libraries (intellectual-frontiers/.github#11)" },
 ];
 
 /** Whether a library name is one a match holds. */
