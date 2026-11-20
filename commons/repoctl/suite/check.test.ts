@@ -8,7 +8,7 @@ import { assert, assertEquals, assertStringIncludes, proves } from "@intellectua
 import { CATALOGUE, PROBLEM_CODES } from "@intellectual-frontiers/repoctl/governance";
 import { constantFindings, constantsIn, conventionName, findingsOfProgram, type LibraryInfo, reportOk, sectionOk } from "@intellectual-frontiers/repoctl/logical";
 import { main } from "@intellectual-frontiers/repoctl";
-import { CAN_RUN, CHECKOUT, git } from "./world.ts";
+import { CAN_RUN, CHECKOUT, checkVerdict, git } from "./world.ts";
 
 const lib = (name: string, version: string, over: Partial<LibraryInfo> = {}): LibraryInfo => ({ name, package: `@intellectual-frontiers/${name}`, folder: `commons/${name}`, version, level: "L1", specKit: undefined, npm: true, held: undefined, versionConstants: [], ...over });
 
@@ -54,7 +54,7 @@ proves(["0003-repoctl-sync FR-007", "0003-repoctl-sync FR-008", "0003-repoctl-sy
   const err: string[] = [];
   const before = await git(CHECKOUT, "status", "--porcelain");
   const status = await main(["check", "--json"], { cwd: CHECKOUT, out: (t) => void out.push(t), err: (t) => void err.push(t) });
-  assertEquals(status, 0, `${out.join("")}${err.join("")}`);
+  assertEquals(checkVerdict(status, out.join("")), "", err.join(""));
   assertEquals(await git(CHECKOUT, "status", "--porcelain"), before, "check writes nothing");
   const doc: unknown = JSON.parse(out.join(""));
   const ids = (typeof doc === "object" && doc !== null && "data" in doc && typeof doc.data === "object" && doc.data !== null && "sections" in doc.data && Array.isArray(doc.data.sections) ? doc.data.sections : []).map((s: unknown) => (typeof s === "object" && s !== null && "id" in s ? String(s.id) : ""));

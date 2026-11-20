@@ -12,7 +12,7 @@ import { type CommitPolicy, type DoctorPolicy, DEFAULT_ALLOWED_PATHS, DEFAULT_FO
 import { acceptName, diagnose, type Facts, filesOf, forbidden, gatherFacts, type Held, majorOf, messageOf, messageText, type Process, ROLES, secretLike, titleOf, withRole, type World } from "@intellectual-frontiers/repoctl/logical";
 import { systemProcess, systemWorld } from "@intellectual-frontiers/repoctl/physical";
 import { main } from "@intellectual-frontiers/repoctl";
-import { CAN_RUN, CHECKOUT, execute, git, hostOf, LIBRARIES, put, TEST_CO_AUTHOR, TEST_IDENTITY, withRepo } from "./world.ts";
+import { CAN_RUN, CHECKOUT, checkVerdict, execute, git, hostOf, LIBRARIES, put, TEST_CO_AUTHOR, TEST_IDENTITY, withRepo } from "./world.ts";
 
 const CO_AUTHOR = TEST_CO_AUTHOR;
 const IDENTITY = TEST_IDENTITY;
@@ -116,7 +116,8 @@ proves(["0005-repoctl-library-commit-doctor FR-001", "0005-repoctl-library-commi
     const verified = await systemProcess.run(["bun", "run", "verify"], { cwd: lib });
     assertEquals(verified.code, 0, `${verified.stdout}\n${verified.stderr}`);
     out.length = 0;
-    assertEquals(await main(["check"], io), 0, `${out.join("")}${err.join("")}`);
+    const checked = await main(["check", "--json"], io);
+    assertEquals(checkVerdict(checked, out.join("")), "", err.join(""));
     assertEquals(await main(["new", "library", "probe", "--summary", "again"], io), 1, "a second time the library exists");
   });
 }, { timeout: 300_000 });
