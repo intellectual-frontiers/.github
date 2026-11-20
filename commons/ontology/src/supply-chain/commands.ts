@@ -45,22 +45,21 @@ export type Operation = (typeof OPERATIONS)[number];
 export type CommandName = Operation | "ExactVersion";
 /** A command as words, run without a shell. */
 export type Words = readonly string[];
-/** A variable a manager's commands run with. */
-export type EnvVar = { readonly name: string; readonly value: string };
 
 /** One command of one manager, as the ontology states it. */
 export type CommandSpec = {
   readonly manager: ManagerId;
-  readonly operation: CommandName;
   /** The program the manager is (`apt-get` for `apt`); the words of a template start with the program of its own form, which may be another (`apt`). */
   readonly executable: string;
-  /** The variables the commands of the manager run with; empty where it has none. */
-  readonly environment: readonly EnvVar[];
+  /** The variables the manager's commands run with, as the ontology holds them (`NAME=value`, words separated by spaces); absent where it has none. */
+  readonly environment?: string;
   readonly needsAdministrator: boolean;
   /** The command a person runs, with `{package}`, `{packages}` and `{version}` where names and versions stand. */
   readonly template: Words;
   /** The form a harness runs without a question, where the ontology states one. */
   readonly nonInteractive?: Words;
+  /** Of `QueryInstalled`, the exit status that says the package is not installed; absent where the ontology states none. */
+  readonly missingExitStatus?: number;
   /** True only where the command carries `pm:verifiedOn`: it was run on a real computer. */
   readonly verified: boolean;
 };
@@ -141,16 +140,12 @@ function wordsOf(template: string): Result<Words, string> {
   return out.length === 0 ? err("the template is empty") : ok(out);
 }
 
-/** The variables of a manager's `environment` (`NAME=value` words), or why they are none. */
-function environmentOf(text: string | undefined): Result<readonly EnvVar[], string> {
-  if (text === undefined) return ok([]);
-  const vars: EnvVar[] = [];
-  for (const word of text.split(/\s+/).filter((w) => w !== "")) {
-    const at = word.indexOf("=");
-    if (at < 1) return err(`the environment word ${word} is not NAME=value`);
-    vars.push({ name: word.slice(0, at), value: word.slice(at + 1) });
-  }
-  return ok(vars);
+/** The `environment` of a manager (`NAME=value` words), or why it is none. */
+function environmentOf(text: string | undefined): Result<string | undefined, string> {
+  if (text === undefined) return ok(undefined);
+  for (const word of text.split(/\s+/).filter((w) => w !== ""))
+    if (word.indexOf("=") < 1) return err(`the environment word ${word} is not NAME=value`);
+  return ok(text);
 }
 
 function commandNamed(manager: ManagerId, name: CommandName): Result<CommandSpec, CommandError> {
@@ -168,12 +163,12 @@ function commandNamed(manager: ManagerId, name: CommandName): Result<CommandSpec
   if (environment.kind === "err") return malformed(environment.error);
   return ok({
     manager,
-    operation: name,
     executable: m.values.executable,
-    environment: environment.value,
+    ...(environment.value === undefined ? {} : { environment: environment.value }),
     needsAdministrator: m.values.needsAdministrator,
     template: template.value,
     ...(quiet === undefined ? {} : { nonInteractive: quiet.value }),
+    ...(c.values.missingExitStatus === undefined ? {} : { missingExitStatus: c.values.missingExitStatus }),
     verified: c.values.verifiedOn !== undefined,
   });
 }
@@ -184,7 +179,7 @@ function commandNamed(manager: ManagerId, name: CommandName): Result<CommandSpec
  * @example
  * ```ts
  * const apt = parseManagerId("apt");
- * if (apt.kind === "ok") commandOf(apt.value, "Install"); // ok: { executable: "apt-get", environment: [{ name: "DEBIAN_FRONTEND", value: "noninteractive" }], verified: true, ... }
+ * if (apt.kind === "ok") commandOf(apt.value, "Install"); // ok: { executable: "apt-get", environment: "DEBIAN_FRONTEND=noninteractive", verified: true, ... }
  * ```
  */
 export function commandOf(manager: ManagerId, operation: Operation): Result<CommandSpec, CommandError> {

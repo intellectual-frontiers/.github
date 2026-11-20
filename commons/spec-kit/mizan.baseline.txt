@@ -47,6 +47,7 @@ mizan/decision-missing https://www.intellectualfrontiers.com/ontology/packaging#
 mizan/decision-missing https://www.intellectualfrontiers.com/ontology/packaging#harnessInstallsPackages
 mizan/decision-missing https://www.intellectualfrontiers.com/ontology/packaging#harnessUse
 mizan/decision-missing https://www.intellectualfrontiers.com/ontology/packaging#kind
+mizan/decision-missing https://www.intellectualfrontiers.com/ontology/packaging#missingExitStatus
 mizan/decision-missing https://www.intellectualfrontiers.com/ontology/packaging#needsAdministrator
 mizan/decision-missing https://www.intellectualfrontiers.com/ontology/packaging#nonInteractive
 mizan/decision-missing https://www.intellectualfrontiers.com/ontology/packaging#note

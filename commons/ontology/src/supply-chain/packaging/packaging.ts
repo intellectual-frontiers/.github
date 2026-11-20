@@ -75,6 +75,7 @@ export const pm = vocabulary(PM, {
   operation: "owl:ObjectProperty",
   template: "owl:DatatypeProperty",
   nonInteractive: "owl:DatatypeProperty",
+  missingExitStatus: "owl:DatatypeProperty",
   origin: "owl:DatatypeProperty",
   verifiedOn: "owl:DatatypeProperty",
   prohibitionOf: "owl:ObjectProperty",
@@ -214,6 +215,7 @@ export const Command = classSchema(pm.Command, {
   operation: one(pm.operation, range.ref<"pm:Operation">()),
   template: one(pm.template, range.string),
   nonInteractive: optional(pm.nonInteractive, range.string),
+  missingExitStatus: optional(pm.missingExitStatus, range.integer),
   origin: one(pm.origin, range.oneOf(ORIGINS)),
   verifiedOn: optional(pm.verifiedOn, range.string),
 });
@@ -460,6 +462,13 @@ export const properties = [
     domain: pm.Command,
     range: xsd.string,
     definition: en("The same command in the form a script runs without asking anyone."),
+  }),
+  DatatypeProperty.make(pm.missingExitStatus, {
+    domain: pm.Command,
+    range: xsd.integer,
+    definition: en(
+      "Of a query-installed command, the exit status that says the package is not installed (as opposed to a failure of the manager).",
+    ),
   }),
   DatatypeProperty.make(pm.origin, {
     domain: pm.Command,

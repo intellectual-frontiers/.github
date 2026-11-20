@@ -427,6 +427,7 @@ export const commands = [
     commandOf: managerApt,
     operation: operations.QueryInstalled,
     template: "dpkg-query -W -f=${Status} {package}",
+    missingExitStatus: 1,
     origin: "archon",
     verifiedOn: "Debian 13 under WSL 2, by archon-bootstrap.sh and archon update, 2026-10-16",
   }),
@@ -1638,6 +1639,7 @@ export const commands = [
     commandOf: managerBrew,
     operation: operations.QueryInstalled,
     template: "brew list --formula {package}",
+    missingExitStatus: 1,
     origin: "archon",
   }),
   Command.make(term(PMID, "cmd-brew-query-candidate"), {
