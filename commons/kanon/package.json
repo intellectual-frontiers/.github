@@ -1,0 +1,34 @@
+{
+  "name": "@intellectual-frontiers/kanon",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Kanon, the pattern of a library built in three layers (governance, logical, physical): the type of a library's table of layers, the import check that holds it, the check that no annotation of governance is dropped, and the types-only LayeredModel contract. One rule, projected down, nothing lost.",
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "exports": {
+    ".": "./src/mod.ts",
+    "./check": "./src/check.ts",
+    "./host": "./src/host.ts"
+  },
+  "scripts": {
+    "check": "tsc -p tsconfig.json",
+    "test": "bun test suite/",
+    "test:node": "node --test \"suite/**/*.test.ts\"",
+    "verify": "tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../libraries/src/check.ts --root spec-kit --level L1 && bun tools/check.ts && bun test suite/ && bun tools/pack.ts --check",
+    "pack": "bun tools/pack.ts"
+  },
+  "devDependencies": {
+    "@intellectual-frontiers/commons": "link:../ts",
+    "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/formats": "link:../formats",
+    "@intellectual-frontiers/libraries": "link:../libraries",
+    "@intellectual-frontiers/mizan": "link:../mizan",
+    "@intellectual-frontiers/system": "link:../system",
+    "@intellectual-frontiers/test": "link:../test",
+    "@types/node": "26.6.6",
+    "fast-check": "4.10.2",
+    "typescript": "7.0.2"
+  }
+}
