@@ -31,6 +31,7 @@ export type UnitClass =
   | "dialect"
   | "sqlextension"
   | "quality"
+  | "typed"
   | "issues"
   | "model"
   | "extension"
@@ -61,6 +62,7 @@ const FOLDERS: readonly Folder[] = [
   { prefix: "sql/dialects/", class: "dialect", instances: true },
   { prefix: "sql/extensions/", class: "sqlextension", instances: true },
   { prefix: "sql/quality/", class: "quality", instances: false },
+  { prefix: "sql/typed/", class: "typed", instances: false },
   { prefix: "sql/presets/", class: "preset", instances: false },
   { prefix: "sql/cli/", class: "cli", instances: false },
   { prefix: "issues/", class: "issues", instances: false },
@@ -80,14 +82,15 @@ export const MAY_IMPORT: Readonly<Record<UnitClass, readonly UnitClass[]>> = {
   lifecycle: ["physical", "logical", "governance", "engine"],
   dialect: ["physical", "logical", "governance", "engine"],
   sqlextension: ["lifecycle", "physical", "logical", "governance", "engine"],
+  typed: ["lifecycle", "physical", "logical", "governance", "engine"],
   quality: ["sqlextension", "lifecycle", "physical", "logical", "governance", "engine"],
   preset: ["sqlextension", "lifecycle", "physical", "logical", "governance", "engine"],
   issues: ["governance", "engine"],
   model: ["governance", "engine", "model"],
   extension: ["governance", "engine"],
-  cli: ["preset", "quality", "sqlextension", "dialect", "lifecycle", "physical", "logical", "governance", "engine", "extension", "model"],
-  suite: ["engine", "governance", "logical", "physical", "lifecycle", "dialect", "sqlextension", "quality", "preset", "model", "extension", "cli", "examples"],
-  examples: ["engine", "governance", "logical", "physical", "lifecycle", "dialect", "sqlextension", "quality", "preset", "model", "extension", "cli"],
+  cli: ["preset", "quality", "typed", "sqlextension", "dialect", "lifecycle", "physical", "logical", "governance", "engine", "extension", "model"],
+  suite: ["engine", "governance", "logical", "physical", "lifecycle", "dialect", "sqlextension", "quality", "typed", "preset", "model", "extension", "cli", "examples"],
+  examples: ["engine", "governance", "logical", "physical", "lifecycle", "dialect", "sqlextension", "quality", "typed", "preset", "model", "extension", "cli"],
   tools: [],
   root: [],
 };
@@ -102,6 +105,7 @@ const LEVEL: Readonly<Record<UnitClass, number>> = {
   dialect: 4,
   sqlextension: 4,
   quality: 4.4,
+  typed: 4.4,
   preset: 4.5,
   issues: 4,
   model: 4,

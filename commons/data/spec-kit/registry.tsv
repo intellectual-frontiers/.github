@@ -51,3 +51,4 @@ number	slug	state
 0050	sql-plpgsql	in force
 0051	project-cli	in force
 0052	sql-quality	in force
+0053	sql-typed	in force
