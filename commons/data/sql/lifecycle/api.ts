@@ -7,6 +7,8 @@
  */
 export { applyChange, applyChanges, type Change, type ChangeKind, diff, type TableRef } from "./change.ts";
 export { canonical, hashOf, sha256Hex } from "./hash.ts";
+export { adopt, type AdoptError } from "./adopt.ts";
+export { drift, type Drift, expectedOf, introspect, type IntrospectOptions, logicalOf, type Observed, type ObservedColumn, type ObservedTable } from "./introspect.ts";
 export { chainOf, type ChainBreak, type EntryKind, GENESIS, type LedgerEntry, nextEntry, verifyChain } from "./ledger.ts";
 export {
   type Capture,

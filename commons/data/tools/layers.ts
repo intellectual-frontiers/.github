@@ -31,6 +31,7 @@ export type UnitClass =
   | "dialect"
   | "sqlextension"
   | "quality"
+  | "drivers"
   | "typed"
   | "loads"
   | "issues"
@@ -63,6 +64,7 @@ const FOLDERS: readonly Folder[] = [
   { prefix: "sql/dialects/", class: "dialect", instances: true },
   { prefix: "sql/extensions/", class: "sqlextension", instances: true },
   { prefix: "sql/quality/", class: "quality", instances: false },
+  { prefix: "sql/drivers/", class: "drivers", instances: false },
   { prefix: "sql/typed/", class: "typed", instances: false },
   { prefix: "sql/loads/", class: "loads", instances: false },
   { prefix: "sql/presets/", class: "preset", instances: false },
@@ -85,15 +87,16 @@ export const MAY_IMPORT: Readonly<Record<UnitClass, readonly UnitClass[]>> = {
   dialect: ["physical", "logical", "governance", "engine"],
   sqlextension: ["lifecycle", "physical", "logical", "governance", "engine"],
   loads: ["quality", "typed", "lifecycle", "physical", "logical", "governance", "engine"],
+  drivers: ["lifecycle", "physical", "logical", "governance", "engine"],
   typed: ["lifecycle", "physical", "logical", "governance", "engine"],
   quality: ["sqlextension", "lifecycle", "physical", "logical", "governance", "engine"],
   preset: ["sqlextension", "lifecycle", "physical", "logical", "governance", "engine"],
   issues: ["governance", "engine"],
   model: ["governance", "engine", "model"],
   extension: ["governance", "engine"],
-  cli: ["preset", "loads", "quality", "typed", "sqlextension", "dialect", "lifecycle", "physical", "logical", "governance", "engine", "extension", "model"],
-  suite: ["engine", "governance", "logical", "physical", "lifecycle", "dialect", "sqlextension", "loads", "quality", "typed", "preset", "model", "extension", "cli", "examples"],
-  examples: ["engine", "governance", "logical", "physical", "lifecycle", "dialect", "sqlextension", "loads", "quality", "typed", "preset", "model", "extension", "cli"],
+  cli: ["preset", "drivers", "loads", "quality", "typed", "sqlextension", "dialect", "lifecycle", "physical", "logical", "governance", "engine", "extension", "model"],
+  suite: ["engine", "governance", "logical", "physical", "lifecycle", "dialect", "sqlextension", "drivers", "loads", "quality", "typed", "preset", "model", "extension", "cli", "examples"],
+  examples: ["engine", "governance", "logical", "physical", "lifecycle", "dialect", "sqlextension", "drivers", "loads", "quality", "typed", "preset", "model", "extension", "cli"],
   tools: [],
   root: [],
 };
@@ -109,6 +112,7 @@ const LEVEL: Readonly<Record<UnitClass, number>> = {
   sqlextension: 4,
   quality: 4.4,
   typed: 4.4,
+  drivers: 3.6,
   loads: 4.6,
   preset: 4.5,
   issues: 4,

@@ -59,6 +59,7 @@ export const library = {
     "./sql/extensions/objects",
     "./sql/extensions/assertions",
     "./sql/quality",
+    "./sql/drivers",
     "./sql/typed",
     "./sql/loads",
     "./sql/typed/generate",

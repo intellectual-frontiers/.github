@@ -55,6 +55,7 @@
     "./sql/extensions/objects": "./sql/extensions/objects/mod.ts",
     "./sql/extensions/assertions": "./sql/extensions/assertions/mod.ts",
     "./sql/quality": "./sql/quality/mod.ts",
+    "./sql/drivers": "./sql/drivers/mod.ts",
     "./sql/typed": "./sql/typed/mod.ts",
     "./sql/loads": "./sql/loads/mod.ts",
     "./sql/typed/generate": "./sql/typed/generate.ts",
