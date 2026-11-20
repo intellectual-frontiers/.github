@@ -29,8 +29,8 @@ export type Context = {
   readonly systemCopy: "minimum" | "never";
 };
 
-/** Where the downloads of pins come from: the version, the address, the SHA-256, the format and the folder of a pin on a platform, or nothing where it has none. */
-export type PinSource = { readonly lookup: (pin: PinId, platform: Platform) => Download | undefined };
+/** Where the downloads of pins come from: the version, the address, the SHA-256, the format and the folder of a pin on a platform, or the reason it has none. */
+export type PinSource = { readonly lookup: (pin: PinId, platform: Platform) => Result<Download, string> };
 
 /** Where a tool comes from, by the dialect chosen. */
 export type Source =
@@ -66,8 +66,9 @@ function tryDialect(tool: Tool, d: ToolDialect, pins: PinSource, ctx: Context): 
   if (g.binds === "pin") {
     const binding = tool.bindings.find((b) => b.kind === "pin");
     if (binding === undefined || binding.kind !== "pin") return { reason: "the tool has no pin binding" };
-    const download = pins.lookup(binding.pin, ctx.platform);
-    if (download === undefined) return { reason: `the pin ${binding.pin} has no download for ${ctx.platform}` };
+    const found = pins.lookup(binding.pin, ctx.platform);
+    if (found.kind === "err") return { reason: `the pin ${binding.pin} has no download for ${ctx.platform}: ${found.error}` };
+    const download = found.value;
     if (tool.minimum !== undefined && compareVersions(download.version, tool.minimum) < 0) return { reason: `the pin ${binding.pin} is version ${download.version}, below the minimum ${tool.minimum}` };
     return { source: { kind: "download", pin: binding.pin, download }, version: download.version };
   }

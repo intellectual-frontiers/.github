@@ -33,7 +33,7 @@ export function defineCatalog(tools: readonly Tool[]): Result<Catalog, readonly 
   const providers = new Map<string, ToolName>();
   for (const t of byName.values()) {
     for (const n of t.needs) if (!byName.has(n)) problems.push(`${t.name} needs ${n}, which is not in the catalog`);
-    for (const p of [t.program, ...t.provides]) {
+    for (const p of [t.program, ...t.provides, ...t.alsoNamed]) {
       const other = providers.get(p);
       if (other !== undefined && other !== t.name) problems.push(`the program ${p} is provided by ${other} and by ${t.name}`);
       providers.set(p, t.name);

@@ -13,11 +13,13 @@
 - **FR-002**: `defineTool` MUST return a tool or every reason it is not one: it MUST refuse a tool with no summary, no program, no phase, a phase that is not one of `core`, `dev`, `test`, `stage` and `publish`, a scope that is not `user` or `system`, no binding, a need that is not a tool name, and a variable of its environment whose name is not made of upper case letters, digits and underscores.
 - **FR-003**: A tool MUST state how strictly it is pinned, `exact`, `release-line` or `rolling`, and MAY state the least version a copy found on the computer may be (`minimum`), which MUST NOT be above the version of a package binding that names one.
 - **FR-004**: A download that a pin gives for a platform (made by `defineDownload`) MUST have a version, an address that is `https` with no user name or password in it, a SHA-256 of 64 hexadecimal digits, a format of `zip`, `tar` or `file`, and the folder of its programs as a path inside the unpacked folder (empty for the root, never absolute, never with `..`), and its platform MUST be one of `linux-x64`, `linux-arm64`, `macos-x64`, `macos-arm64` and `windows-x64`.
-- **FR-005**: A tool MUST have at least one binding, either one pin binding (a pin of the packaging ontology, named by its id `pin-<name>`) or package bindings (a package manager of the ontology named by its id `manager-<name>`, at least one package name each and a version where one is named), and MUST NOT have more than one pin binding or more than one package binding for the same manager.
+- **FR-005**: A tool MUST have at least one binding, either one pin binding (a pin of the packaging ontology, named as the ontology names it, such as `bun` or `rustup-init`) or package bindings (a package manager of the ontology named by its id `manager-<name>`, at least one package name each and a version where one is named), and MUST NOT have more than one pin binding or more than one package binding for the same manager.
 - **FR-006**: No text of a tool's environment or program MUST look like a secret (the guard of Archon's governance), because a catalog is committed and published.
 - **FR-007**: `defineCatalog` MUST return a catalog or every reason it is not one: it MUST refuse two tools of one name, a need that is not a tool of the catalog, a cycle of needs (naming the tools in it) and a program provided by two tools, and a catalog MUST give its tools in an order where each comes after the tools it needs.
 
 - **FR-008**: A tool MUST NOT hold the version or a hash of a pin: a pin binding names the pin by its id, and the version, the addresses and the checksums are the ontology's, written once.
+
+- **FR-009**: A tool MAY name other names a copy of its program may go by (`alsoNamed`), each a program name with no path in it, and a catalog MUST refuse a name that is the program, a provided program or another name of a second tool.
 
 ## Acceptance scenarios
 

@@ -59,18 +59,18 @@ export function compareVersions(a: string, b: string): number {
   return x.pre < y.pre ? -1 : x.pre > y.pre ? 1 : 0;
 }
 
-/** The identity of a pin of the packaging ontology (`pin-bun`): a program's pinned download, whose version and checksums the ontology holds. */
+/** The name of a pin of the packaging ontology (`bun`, `rustup-init`): a program's pinned download, whose version and checksums the ontology holds. */
 export type PinId = Brand<string, "toolchain pin id">;
 /** The identity of a package manager of the packaging ontology (`manager-apt`). */
 export type ManagerId = Brand<string, "toolchain manager id">;
 
-const pinId = refine(string, "toolchain pin id", (t) => t.length <= 80 && /^pin-[a-z0-9]+(-[a-z0-9]+)*$/.test(t));
+const pinId = refine(string, "toolchain pin id", (t) => t.length <= 80 && /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/.test(t));
 const managerId = refine(string, "toolchain manager id", (t) => t.length <= 80 && /^manager-[a-z0-9]+(-[a-z0-9]+)*$/.test(t));
 
-/** A pin id from text: `pin-` and lower case words joined by hyphens. */
+/** A pin id from text: lower case words joined by hyphens, starting with a letter, as the packaging ontology names a pin. */
 export function parsePinId(text: string): Result<PinId, string> {
   const r = pinId(text);
-  return r.kind === "ok" ? ok(r.value) : err(`${JSON.stringify(text)} is not a pin id: pin- and lower case words joined by hyphens, as the packaging ontology names a pin`);
+  return r.kind === "ok" ? ok(r.value) : err(`${JSON.stringify(text)} is not a pin id: lower case words joined by hyphens, starting with a letter, as the packaging ontology names a pin`);
 }
 
 /** A manager id from text: `manager-` and lower case words joined by hyphens, as the packaging ontology names a package manager. */

@@ -16,7 +16,7 @@
  *   versionArgs: ["--version"],
  *   phases: ["core"],
  *   scope: "user",
- *   bindings: [{ kind: "pin", pin: "pin-jq" }, { kind: "package", manager: "manager-brew", packages: ["jq"] }],
+ *   bindings: [{ kind: "pin", pin: "jq" }, { kind: "package", manager: "manager-brew", packages: ["jq"] }],
  * });
  * r.kind; // "ok"
  * ```
@@ -75,6 +75,8 @@ export type Tool = {
   readonly env: Readonly<Record<string, string>>;
   /** The other programs it provides. */
   readonly provides: readonly string[];
+  /** The other names a copy of its program may go by on a computer (Chromium is also `chrome` and `google-chrome`), tried after the program's own. */
+  readonly alsoNamed: readonly string[];
   readonly phases: readonly Phase[];
   readonly scope: Scope;
   readonly bindings: readonly Binding[];
@@ -99,6 +101,7 @@ export type ToolInput = {
   readonly needs?: readonly string[];
   readonly env?: Readonly<Record<string, string>>;
   readonly provides?: readonly string[];
+  readonly alsoNamed?: readonly string[];
   readonly phases: readonly string[];
   readonly scope: string;
   readonly bindings: readonly BindingInput[];
@@ -168,6 +171,7 @@ export function defineTool(input: ToolInput): Result<Tool, readonly string[]> {
     for (const f of findSecretLike(v, "$", k)) problems.push(`the variable ${k} holds what looks like a secret (${f.why})`);
   }
   for (const f of findSecretLike(input.program)) problems.push(`the program holds what looks like a secret (${f.why})`);
+  for (const n of input.alsoNamed ?? []) if (n.trim() === "" || /[\\/]/.test(n)) problems.push(`the other name ${JSON.stringify(n)} is a program name, with no path in it`);
 
   if (input.bindings.length === 0) problems.push("a tool has at least one binding");
   const bindings: Binding[] = [];
@@ -203,6 +207,6 @@ export function defineTool(input: ToolInput): Result<Tool, readonly string[]> {
   }
 
   if (problems.length > 0 || name.kind === "err" || pin === undefined || scope === undefined) return err(problems.length > 0 ? problems : ["the tool is incomplete"]);
-  const base = { name: name.value, summary: input.summary, pin, program: input.program, versionArgs: input.versionArgs, needs, env, provides: input.provides ?? [], phases, scope, bindings };
+  const base = { name: name.value, summary: input.summary, pin, program: input.program, versionArgs: input.versionArgs, needs, env, provides: input.provides ?? [], alsoNamed: input.alsoNamed ?? [], phases, scope, bindings };
   return ok(minimum === undefined ? base : { ...base, minimum });
 }

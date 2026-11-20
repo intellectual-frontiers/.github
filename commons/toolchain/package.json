@@ -10,7 +10,8 @@
   "exports": {
     ".": "./src/mod.ts",
     "./governance": "./src/governance/mod.ts",
-    "./logical": "./src/logical/mod.ts"
+    "./logical": "./src/logical/mod.ts",
+    "./ontology": "./src/physical/ontology/mod.ts"
   },
   "scripts": {
     "check": "tsc -p tsconfig.json",
@@ -29,6 +30,7 @@
     "@intellectual-frontiers/kanon": "link:../kanon",
     "@intellectual-frontiers/libraries": "link:../libraries",
     "@intellectual-frontiers/mizan": "link:../mizan",
+    "@intellectual-frontiers/ontology": "link:../ontology",
     "@intellectual-frontiers/system": "link:../system",
     "@intellectual-frontiers/test": "link:../test",
     "@types/node": "26.6.6",

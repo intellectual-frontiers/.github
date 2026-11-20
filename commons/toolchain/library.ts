@@ -12,7 +12,7 @@ export const library = {
   verify: "bun run verify",
   version: "0.1.0",
   distribution: ["github", "npm"],
-  exports: [".", "./governance", "./logical"],
+  exports: [".", "./governance", "./logical", "./ontology"],
   family: { host: "toolchain", role: "host" },
   summary:
     "Toolchain in the layers of Kanon: which programs a computer needs to do its work, declared once (a pinned version, a pin policy, a scope, the phase that needs it, and the bindings by which each dialect obtains it), resolved to the dialect that carries each out and planned; dialects are packages on the port of Archon.",
@@ -34,6 +34,14 @@ export const library = {
         packages: [
           { name: "@intellectual-frontiers/core", subpaths: [] },
           { name: "@intellectual-frontiers/archon", subpaths: ["governance"] },
+        ],
+      },
+      {
+        folder: "src/physical/ontology/",
+        layer: "physical",
+        packages: [
+          { name: "@intellectual-frontiers/core", subpaths: [] },
+          { name: "@intellectual-frontiers/ontology", subpaths: ["supply-chain/downloads"] },
         ],
       },
       { folder: "src/", own: true },
