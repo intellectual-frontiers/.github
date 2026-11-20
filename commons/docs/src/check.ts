@@ -25,6 +25,7 @@ export type Problem =
   | { readonly kind: "broken-link"; readonly href: string }
   | { readonly kind: "duplicate-spec"; readonly id: string }
   | { readonly kind: "diagram-undrawable"; readonly first: string }
+  | { readonly kind: "book-part-empty"; readonly volume: string; readonly part: string }
   | { readonly kind: "retired-name"; readonly name: string }
   | { readonly kind: "forbidden-word"; readonly word: string };
 
@@ -69,6 +70,8 @@ export function message(p: Problem): string {
       return `holds ${p.id}, which a spec kit before it holds too`;
     case "diagram-undrawable":
       return `has a diagram that cannot be drawn (it is not a flowchart, state, sequence, class or entity-relationship diagram, or it is not valid): ${p.first}`;
+    case "book-part-empty":
+      return `has a part, ${p.part}, of the volume ${p.volume} that selects no page`;
     case "retired-name":
       return `names ${p.name}, which is retired`;
     case "forbidden-word":

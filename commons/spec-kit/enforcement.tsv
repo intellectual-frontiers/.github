@@ -638,3 +638,4 @@ requirement	mechanism	by	note
 0011-documentation FR-037	check	.github: cd commons/docs && bun run verify	highlight.test.ts: each language cut into tokens with its colour for both schemes, the same runs every time, and the diagram drawn into the page
 0011-documentation FR-038	check	.github: cd commons/docs && bun run verify	ai-guides.test.ts: the AI guides have the headings and a prompt block, and every path, repoctl command, script and specification they name exists
 0011-documentation FR-039	check	.github: cd commons/docs && bun run verify	specs.test.ts: the matrix is split by library within the row budget; guides.test.ts: the sections, Programs among them
+0011-documentation FR-040	check	.github: cd commons/docs && bun run verify	book.test.ts: commons' five volumes of the Commons Manuals have chapters, anchors that resolve, and no matrix or register, and the same pages give the same files

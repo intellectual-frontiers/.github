@@ -6,7 +6,7 @@
  * @module
  */
 import { existsSync, readdirSync, readFileSync } from "node:fs";
-import type { About, DocsConfig, PackageConfig } from "./docs/src/config.ts";
+import type { About, BooksConfig, DocsConfig, PackageConfig } from "./docs/src/config.ts";
 import { layeredLens } from "./docs/src/lens/layered.ts";
 import { DEFAULT_LICENSE } from "./libraries/src/license/standard.ts";
 import { guidesLens } from "./docs/src/lens/guides.ts";
@@ -15,6 +15,7 @@ import { programLens } from "./docs/src/lens/program.ts";
 import { ergonexProgram, type ProgramHost } from "./ergonex/src/mod.ts";
 import { describe } from "./headless/src/describe/mod.ts";
 import { INERT_HOST as REPOCTL_INERT_HOST, repoctlProgram } from "./repoctl/src/mod.ts";
+import { SUBJECTS } from "./data/governance/api.ts";
 import { allModules } from "./data/sql/cli/config.ts";
 import { describeModels } from "./data/sql/describe/mod.ts";
 import { dialect as duckdb } from "./data/sql/dialects/duckdb/mod.ts";
@@ -127,6 +128,51 @@ const guides = guidesLens({
 /** The record of the next release: which libraries it publishes, at which version, under which tag. */
 const releases = releasesLens({ name: "releases", file: "commons/generated/release.auto.json" });
 
+/** The volumes of the series Commons Manuals (commons 0011-documentation FR-040): the pages of the site as the chapter sources of books of `erga`, a volume to a book (`works/book/<id>/generated/<id>.adoc`). The traceability matrix and the register are for the screen and are not in print. */
+const books: BooksConfig = {
+  site: "https://intellectual-frontiers.github.io/.github/",
+  volumes: [
+    {
+      id: "commons-guide",
+      title: "Commons Guide",
+      about: "What commons is, how its parts fit, and how to do the common jobs with it.",
+      parts: [
+        { title: "Start here", select: [{ section: "start" }] },
+        { title: "Concepts", select: [{ section: "concepts" }] },
+        { title: "The libraries", select: [{ section: "overview" }] },
+        { title: "How to", select: [{ section: "howto" }] },
+      ],
+    },
+    {
+      id: "commons-api-reference",
+      title: "Commons API Reference",
+      about: "Every export of every library of commons, read from its TypeScript.",
+      parts: [{ title: "The API", select: [{ section: "api" }], perGroup: true }],
+    },
+    {
+      id: "commons-data-models",
+      title: "Commons Data Models",
+      about: "The data models of commons, by subject: what each means, how it is made logical, and how it is made physical.",
+      parts: [
+        { title: "The models together", select: [{ section: "models", group: "Models" }] },
+        ...SUBJECTS.map((s) => ({ title: s.title, about: s.about, select: [{ section: "models" as const, group: s.title }] })),
+      ],
+    },
+    {
+      id: "commons-specifications",
+      title: "Commons Specifications",
+      about: "The specifications in force, each with its requirements and what enforces them.",
+      parts: [{ title: "The specifications", select: [{ section: "specs", exclude: ["specs/index.html", "specs/matrix"] }], perGroup: true }],
+    },
+    {
+      id: "commons-programs",
+      title: "Commons Programs",
+      about: "The programs built on headless: every command of each, by tier.",
+      parts: [{ title: "The programs", select: [{ section: "programs" }], perGroup: true }],
+    },
+  ],
+};
+
 /** Commons' site: its packages, its spec kit, how its specifications are cited, and its lenses. */
 export const config: DocsConfig = {
   name: "IF Commons",
@@ -180,6 +226,7 @@ export const config: DocsConfig = {
   retired: ["SQL Aide", "sql-aide", "File Aide", "IFRFS"],
   forbiddenInGuides: ["formerly", "previously", "legacy", "deprecated", "replaces", "replaced", "migration", "backward", "backwards", "acceptance test", "history", "no longer"],
   out: "_site",
+  books,
 };
 
 export default config;

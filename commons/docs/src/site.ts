@@ -8,13 +8,13 @@
  * @module
  */
 import { absurd } from "@intellectual-frontiers/core";
-import { fs, path } from "@intellectual-frontiers/system";
+import { fs } from "@intellectual-frontiers/system";
 import { Build } from "./build.ts";
 import type { Finding } from "./check.ts";
-import { type Config, under } from "./config.ts";
-import { diagramSources, document, drawable } from "./emit/html.ts";
-import { llmsIndex, markdownOf, twinOf } from "./emit/markdown.ts";
-import { searchIndex } from "./emit/search.ts";
+import { type Config, type PresentationId, under } from "./config.ts";
+import { diagramSources, drawable } from "./emit/html.ts";
+import { markdownOf } from "./emit/markdown.ts";
+import { presentationFiles, writeFiles } from "./presentation.ts";
 import { readApi } from "./extract/api.ts";
 import { readSpecKits } from "./extract/specs.ts";
 import type { LensPages, SiteFile } from "./lens.ts";
@@ -241,45 +241,20 @@ export async function buildSite(config: Config): Promise<Built> {
   return { pages: b.pages, found: b.found, files };
 }
 
-/** The files of the theme (beside this module, in the source and in the package alike), and where the site serves them. */
-function assets(): readonly (readonly [string, string])[] {
-  const theme = (f: string): string => path.fromFileUrl(new URL(`./theme/${f}`, import.meta.url));
-  return [
-    [theme("site.css"), "assets/site.css"],
-    [theme("site.js"), "assets/site.js"],
-  ];
-}
-
 /**
- * A built site written into a folder, which is emptied first.
+ * A built site written into a folder, which is emptied first where the presentations include the site (the web), and not otherwise (a book's files are written into the
+ * folder of the books of a repository that holds other things).
  *
  * @param config - the configuration
  * @param built - the site
  * @param out - the folder
+ * @param presentations - what is written; the configuration's by default
+ * @returns what was found while the presentations were made (a part of a book that takes no page)
  */
-export async function writeSite(config: Config, built: Built, out: string): Promise<void> {
-  await fs.remove(out, { recursive: true }).catch(() => {});
+export async function writeSite(config: Config, built: Built, out: string, presentations: readonly PresentationId[] = config.presentations): Promise<readonly Finding[]> {
+  const made = presentationFiles(config, built, presentations);
+  if (presentations.includes("web")) await fs.remove(out, { recursive: true }).catch(() => {});
   await fs.ensureDir(out);
-  const sections = [...new Set(built.pages.map((p) => p.section))];
-  const site = { name: config.name, repository: config.repository, pages: built.pages, sections };
-  for (const p of [...built.pages].sort((a, b) => (a.path < b.path ? -1 : 1))) {
-    const file = path.join(out, p.path);
-    await fs.ensureDir(path.dirname(file));
-    await fs.writeTextFile(file, document(p, site));
-    // the Markdown twin of the page, beside it (FR-028)
-    await fs.writeTextFile(path.join(out, twinOf(p.path)), markdownOf(p));
-  }
-  for (const f of [...built.files].sort((a, b) => (a.path < b.path ? -1 : 1))) {
-    const file = path.join(out, f.path);
-    await fs.ensureDir(path.dirname(file));
-    await fs.writeTextFile(file, f.text);
-  }
-  await fs.writeTextFile(path.join(out, "llms.txt"), llmsIndex(config.name, built.pages, built.files.map((f) => [f.path, f.what] as const)));
-  for (const [from, to] of assets()) {
-    const file = path.join(out, to);
-    await fs.ensureDir(path.dirname(file));
-    await fs.copyFile(from, file);
-  }
-  await fs.writeTextFile(path.join(out, "search.json"), `${JSON.stringify(searchIndex(built.pages))}\n`);
-  await fs.writeTextFile(path.join(out, ".nojekyll"), "");
+  await writeFiles(out, made.files);
+  return made.found;
 }
