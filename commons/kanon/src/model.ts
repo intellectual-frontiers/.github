@@ -16,6 +16,7 @@
  * @module
  */
 import { type Brand, err, ok, refine, type Result, string } from "@intellectual-frontiers/core";
+import type { InstanceName } from "./family.ts";
 import type { Layer } from "./table.ts";
 
 /** The identity of an element, stable across builds: a scheme, a colon and what names it (`headless:arcactl/db migrate`). Made only by `parseElementId`. */
@@ -58,6 +59,8 @@ export interface ModelElement {
   readonly definition: string;
   /** The element that holds it (an option's verb, a column's table). */
   readonly parent?: ElementId;
+  /** The instance (a dialect) of a unit kind that it belongs to, for an element of a physical layer that is one instance's (0033-kanon FR-019). */
+  readonly instance?: InstanceName;
   readonly source: SourceLocation;
   /** What is said of it, by name: for an element of Governance, each property is an annotation that must end expressed, carried or unexpressed (`dispositions`). */
   readonly properties: { readonly [name: string]: string | number | boolean | readonly string[] | null };
@@ -79,11 +82,17 @@ export interface ModelFinding {
   readonly message: string;
 }
 
-/** How an annotation of Governance ends (0033-kanon FR-005): expressed by a lower element, carried as data of one, or named as unexpressed with the reason. */
+/** What every disposition says: which annotation of which element, and for which instance (0033-kanon FR-022); with no instance it holds for every instance of the model. */
+type DispositionBase = { readonly element: ElementId; readonly annotation: string; readonly instance?: InstanceName };
+
+/**
+ * How an annotation of Governance ends (0033-kanon FR-005, FR-022): expressed by a lower element, carried as data of one, or named as unexpressed with the reason. A sum with one case for each way,
+ * which a model gives for each instance, or once for all of them.
+ */
 export type Disposition =
-  | { readonly element: ElementId; readonly annotation: string; readonly outcome: "expressed"; readonly target: ElementId }
-  | { readonly element: ElementId; readonly annotation: string; readonly outcome: "carried"; readonly target: ElementId }
-  | { readonly element: ElementId; readonly annotation: string; readonly outcome: "unexpressed"; readonly reason: string };
+  | (DispositionBase & { readonly outcome: "expressed"; readonly target: ElementId })
+  | (DispositionBase & { readonly outcome: "carried"; readonly target: ElementId })
+  | (DispositionBase & { readonly outcome: "unexpressed"; readonly reason: string });
 
 /** The layered model of a Kanon library. */
 export interface LayeredModel {
@@ -98,6 +107,8 @@ export interface LayeredModel {
   readonly trace: readonly TraceEdge[];
   readonly findings: readonly ModelFinding[];
   readonly dispositions: readonly Disposition[];
+  /** The instances (dialects) the model has, each of which every annotation of Governance is accounted for (0033-kanon FR-022); none where the model has no instances of a unit kind. */
+  readonly instances: readonly InstanceName[];
 }
 
 /** The kinds of element that a program says (0033-kanon FR-013). */

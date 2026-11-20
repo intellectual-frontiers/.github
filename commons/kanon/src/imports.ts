@@ -1,4 +1,4 @@
-// Spec: 0001-kanon-checker FR-002, FR-003, FR-004
+// Spec: 0001-kanon-checker FR-002, FR-003, FR-004, FR-012
 /**
  * The import check of Kanon (commons 0033-kanon FR-004, FR-006, FR-011): given a table and the files of a library, every import of every file as data: which unit each file is in, and a
  * finding for each import that does not follow the table. It reads every import, relative or by package name, because an import by package name is invisible to a check of relative imports; it
@@ -27,7 +27,11 @@
  * @module
  */
 import { absurd } from "@intellectual-frontiers/core";
+import { classify, rootPackage } from "./family.ts";
 import { type Allowed, type Layer, RANK, type Table, type Unit } from "./table.ts";
+
+/** An `exports` map: each subpath to its target, a string or an object of conditions of strings. */
+export type ExportsMap = Readonly<Record<string, string | { readonly [condition: string]: string }>>;
 
 /** The codes of this check (0033-kanon FR-011); `kanon/dropped` is the check of a model's annotations (`dropped.ts`). */
 export type Rule =
@@ -38,6 +42,12 @@ export type Rule =
   | "layers/above"
   | "layers/around"
   | "layers/cycle"
+  | "instances/sibling"
+  | "instances/undeclared"
+  | "plugins/inverted"
+  | "plugins/undeclared"
+  | "plugins/contract"
+  | "family/name"
   | "kanon/dropped";
 
 /** The codes in one list, for a program that walks them. */
@@ -49,6 +59,12 @@ export const RULES = [
   "layers/above",
   "layers/around",
   "layers/cycle",
+  "instances/sibling",
+  "instances/undeclared",
+  "plugins/inverted",
+  "plugins/undeclared",
+  "plugins/contract",
+  "family/name",
   "kanon/dropped",
 ] as const satisfies readonly Rule[];
 
@@ -61,11 +77,17 @@ export const RULE_SUMMARY: Readonly<Record<Rule, string>> = {
   "layers/above": "an import of a unit that stands below the importer",
   "layers/around": "an import of another unit of the same layer that the row does not list",
   "layers/cycle": "units of one class that import each other in a loop",
+  "instances/sibling": "an instance of a unit kind that imports another instance of it",
+  "instances/undeclared": "a folder under a unit with declared instances that the table does not declare as an instance",
+  "plugins/inverted": "a host that imports a package that extends it",
+  "plugins/undeclared": "an extension that imports another member of the family it does not declare a dependency on",
+  "plugins/contract": "a plugin contract that the host does not export, or a plugin that does not import it",
+  "family/name": "a package that extends a host and is not named and declared by the host's family rule",
   "kanon/dropped": "an annotation of Governance that ends neither expressed, nor carried, nor named unexpressed",
 };
 
 /** The family of a code: the import check's or the model's; an exhaustive match, so that a code added to the union fails to compile here until it is placed. */
-export function familyOf(rule: Rule): "layers" | "kanon" {
+export function familyOf(rule: Rule): "layers" | "instances" | "plugins" | "family" | "kanon" {
   switch (rule) {
     case "layers/unclassified":
     case "layers/relative":
@@ -75,6 +97,15 @@ export function familyOf(rule: Rule): "layers" | "kanon" {
     case "layers/around":
     case "layers/cycle":
       return "layers";
+    case "instances/sibling":
+    case "instances/undeclared":
+      return "instances";
+    case "plugins/inverted":
+    case "plugins/undeclared":
+    case "plugins/contract":
+      return "plugins";
+    case "family/name":
+      return "family";
     case "kanon/dropped":
       return "kanon";
     default:
@@ -123,6 +154,19 @@ export function unitOf(table: Table, path: string): Placed | undefined {
   return best;
 }
 
+/** Whether a relative specifier climbs out of the library's root from the file that imports it. */
+export function escapesRoot(from: string, specifier: string): boolean {
+  let depth = from.split("/").length - 1;
+  for (const p of specifier.split("/")) {
+    if (p === "" || p === ".") continue;
+    if (p === "..") {
+      depth -= 1;
+      if (depth < 0) return true;
+    } else depth += 1;
+  }
+  return false;
+}
+
 /** The path a relative specifier names, from the file that imports it. */
 export function resolveImport(from: string, specifier: string): string {
   const parts = from.split("/").slice(0, -1);
@@ -161,7 +205,7 @@ export function allowedExternal(allowed: readonly Allowed[], specifier: string):
 }
 
 /** The target of an `exports` entry: a string, or the `default` or `bun` of an object; none for anything else. */
-function entryOf(map: Readonly<Record<string, string | { readonly [condition: string]: string }>>, key: string): string | undefined {
+export function entryOf(map: ExportsMap, key: string): string | undefined {
   const v = map[key];
   if (typeof v === "string") return v;
   if (v === undefined) return undefined;
@@ -169,7 +213,7 @@ function entryOf(map: Readonly<Record<string, string | { readonly [condition: st
 }
 
 /** The layer of a unit; none for the library's own checking. An exhaustive match over the two kinds of unit. */
-function layerOf(u: Unit): Layer | undefined {
+export function layerOf(u: Unit): Layer | undefined {
   switch (u.kind) {
     case "layered":
       return u.layer;
@@ -181,7 +225,7 @@ function layerOf(u: Unit): Layer | undefined {
 }
 
 /** Whether a unit may import another unit of the library (0033-kanon FR-004): its own folder, the units its row lists, or by default a unit of a layer above its own. */
-function mayReach(from: Placed, to: Placed): boolean {
+export function mayReach(from: Placed, to: Placed): boolean {
   if (to.name === from.name) return true;
   const list = from.unit.mayImport;
   if (list !== undefined) return list.some((m) => m === to.name || m === to.unit.folder);
@@ -191,7 +235,7 @@ function mayReach(from: Placed, to: Placed): boolean {
 }
 
 /** Whether an import of `to` from `from` climbs: it stands below `from` in the layers. */
-function climbs(from: Placed, to: Placed): boolean {
+export function climbs(from: Placed, to: Placed): boolean {
   const a = layerOf(from.unit);
   const b = layerOf(to.unit);
   return a !== undefined && b !== undefined && RANK[b] > RANK[a];
@@ -208,9 +252,11 @@ function climbs(from: Placed, to: Placed): boolean {
 export function importFindings(
   table: Table,
   files: readonly SourceFile[],
-  exportsMap: Readonly<Record<string, string | { readonly [condition: string]: string }>>,
+  exportsMap: ExportsMap,
 ): readonly Finding[] {
   const out: Finding[] = [];
+  const undeclared = new Set<string>();
+  const hasDeclared = (folder: string): boolean => table.instances.some((i) => i.kind === "folder" && i.instanceOf === folder);
   const among = new Map<string, Map<string, { readonly file: string; readonly line: number }>>();
   const pkg: string = table.package;
   for (const file of files) {
@@ -219,8 +265,24 @@ export function importFindings(
       out.push(finding("layers/unclassified", file.path, 1, "no unit of the table holds it: put it in one, or add the unit to the table"));
       continue;
     }
+    if (here.unit.instances && hasDeclared(here.unit.folder) && !table.instances.some((i) => i.kind === "folder" && i.folder === here.name) && !undeclared.has(here.name)) {
+      undeclared.add(here.name);
+      out.push(
+        finding(
+          "instances/undeclared",
+          file.path,
+          1,
+          `${here.name} is a folder of ${here.unit.folder}, whose instances the table declares, and it declares none named so`,
+          here.name,
+        ),
+      );
+    }
     for (const { line, specifier } of specifiersOf(file.text)) {
       if (specifier.startsWith("./") || specifier.startsWith("../")) {
+        if (escapesRoot(file.path, specifier)) {
+          out.push(finding("layers/relative", file.path, line, `it imports ${specifier}, which leaves the package: import it by its package name`, specifier));
+          continue;
+        }
         const target = unitOf(table, resolveImport(file.path, specifier));
         if (target !== undefined && target.name !== here.name && here.unit.kind !== "own")
           out.push(
@@ -234,6 +296,19 @@ export function importFindings(
           );
         continue;
       }
+      const member = table.family === undefined ? undefined : classify(table.family, table.package, rootPackage(specifier));
+      if (member !== undefined && member.kind !== "host" && here.unit.kind !== "own") {
+        out.push(
+          finding(
+            "plugins/inverted",
+            file.path,
+            line,
+            `${here.name} imports ${specifier}, a ${member.kind} of its own family: a host never imports what extends it`,
+            specifier,
+          ),
+        );
+        continue;
+      }
       if (specifier === pkg || specifier.startsWith(`${pkg}/`)) {
         const entry = entryOf(exportsMap, `.${specifier.slice(pkg.length)}`);
         const target = entry === undefined ? undefined : unitOf(table, entry.replace(/^\.\//, ""));
@@ -242,6 +317,18 @@ export function importFindings(
           continue;
         }
         if (here.unit.kind === "own") continue;
+        if (target.name !== here.name && target.unit.instances && target.unit.folder === here.unit.folder && hasDeclared(here.unit.folder)) {
+          out.push(
+            finding(
+              "instances/sibling",
+              file.path,
+              line,
+              `${here.name} imports ${specifier}, ${target.name}, another instance of ${here.unit.folder}: an instance imports only the layers it extends`,
+              specifier,
+            ),
+          );
+          continue;
+        }
         if (target.name !== here.name && target.unit.instances && target.unit.folder === here.unit.folder && mayReach(here, target)) {
           const to = among.get(here.name) ?? new Map<string, { readonly file: string; readonly line: number }>();
           if (!to.has(target.name)) to.set(target.name, { file: file.path, line });
@@ -273,6 +360,9 @@ export function importFindings(
         );
     }
   }
+  const contract = table.family?.contract;
+  if (contract !== undefined && entryOf(exportsMap, contract) === undefined)
+    out.push(finding("plugins/contract", "library.ts", 1, `the family names ${contract} as the plugin contract and the package's exports do not`, contract));
   // a cycle among instances of one class: found once, at the import that closes it
   const state = new Map<string, "visiting" | "done">();
   const walk = (from: string, path: readonly string[]): void => {

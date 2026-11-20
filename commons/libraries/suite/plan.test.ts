@@ -4,9 +4,10 @@
  *
  * @module
  */
-import { main, outputsOf, planOf } from "../src/plan.ts";
+import { exportsLine, main, outputsOf, packsFor, planOf } from "../src/plan.ts";
 import { LIBRARY_CI } from "../src/workflows/definitions.ts";
-import { readTextFileSync, withTempDir } from "@intellectual-frontiers/system/fs";
+import { mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { proc } from "@intellectual-frontiers/system";
 import { fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
@@ -83,5 +84,52 @@ proves(
       for (const os of c.systems ?? []) assert(os === "windows-latest" || os === "macos-latest", `${name} asks for ${os}`);
     }
     return Promise.resolve();
+  },
+);
+
+proves(
+  [`${SPEC} FR-012`],
+  "the packing is checked in the cells of the libraries that changed their exports or where the packer changed, and in none of the others: the exports are compared as data, in any order, against the merge base",
+  async () => {
+    assertEquals(exportsLine('{"exports":{"./b":"./b.ts",".":"./a.ts"}}'), exportsLine('{"name":"x","exports":{".":"./a.ts","./b":"./b.ts"}}'));
+    assert(exportsLine('{"exports":{".":"./a.ts"}}') !== exportsLine('{"exports":{".":"./c.ts"}}'));
+    assertEquals(exportsLine("not json"), "unreadable");
+    const p = planOf([lib("core"), lib("net")], new Set(["net"]));
+    assertEquals(
+      p.linux.include.map((c) => `${c.name} ${c.pack}`),
+      ["core false", "net true"],
+    );
+    assert(
+      p.systems.include.every((c) => c.name === "net" && c.pack),
+      "the cells of the other systems carry it too",
+    );
+    const git = proc.which("git");
+    if (git === undefined) return;
+    await withTempDir(async (dir) => {
+      const g = (...a: string[]) => proc.run([git, "-C", dir, "-c", "user.name=t", "-c", "user.email=t@t", "-c", "commit.gpgsign=false", ...a]);
+      const put = (f: string, t: string): void => {
+        mkdirSync(join(dir, f, ".."), { recursive: true });
+        writeTextFileSync(join(dir, f), t);
+      };
+      const pkg = (e: Record<string, string>): string => JSON.stringify({ name: "x", exports: e });
+      put("commons/a/package.json", pkg({ ".": "./a.ts" }));
+      put("commons/b/package.json", pkg({ ".": "./b.ts" }));
+      await g("init", "-q", "-b", "main");
+      await g("add", ".");
+      await g("commit", "-q", "-m", "base");
+      await g("checkout", "-q", "-b", "work");
+      put("commons/a/package.json", pkg({ ".": "./a.ts", "./more": "./more.ts" }));
+      put("commons/b/other.ts", "export {};\n");
+      put("commons/c/package.json", pkg({ ".": "./c.ts" }));
+      await g("add", ".");
+      await g("commit", "-q", "-m", "work");
+      const libs = ["a", "b", "c"].map(lib);
+      assertEquals([...(await packsFor(dir, "main", libs))].sort(), ["a", "c"], "a changed its exports and c is new; b did not");
+      put("commons/libraries/src/pack-library.ts", "export {};\n");
+      await g("add", ".");
+      await g("commit", "-q", "-m", "packer");
+      assertEquals([...(await packsFor(dir, "main", libs))].sort(), ["a", "b", "c"], "the packer changed: every library");
+      assertEquals((await packsFor(dir, "no-such-base", libs)).size, 3, "Git cannot say: every library");
+    });
   },
 );

@@ -1,13 +1,16 @@
+// Spec: 0001-ontologies FR-001
 /**
  * The vocabulary of Kanon (commons 0033-kanon), the pattern of a library built in three layers: the Layer (Governance, Logical, Physical, the members of its code list, each with its rank and
  * its alignment to the Model Driven Architecture viewpoints and to the levels of data modeling), the Element a layer says, the TraceEdge that makes an element of one layer out of one of the
- * layer above, the Projection that derives a layer from the one above, the Surface that faces a caller and the Finding of the check.
+ * layer above, the Projection that derives a layer from the one above, the Surface that faces a caller, the Finding of the check, the Instance of a unit kind (a dialect), the Plugin that extends a host, the Family
+ * of a host and its extensions, and the Matrix of requirement by instance.
  *
  * @remarks
  * It stands on PROV-O (an element is a `prov:Entity`, a projection a `prov:Activity`, a trace edge a `prov:Derivation`) and SHACL (a finding specializes `sh:ValidationResult`), and a layer is a
  * SKOS concept. The alignment to OMG's Model Driven Architecture is data of the layer, `kanon:mdaViewpoint` (`CIM`, `PIM`, `PSM`), with the relation `closeMatch` stated in the specification
  * (0033-kanon FR-008): OMG publishes no IRI for the viewpoints, so the alignment is a string and no IRI is invented. Every class has a record of its basis (0018-standards-first FR-003): the
- * audit of this ontology; none is `unaligned`, so none needs a Decision of the owner.
+ * audit of this ontology; none is `unaligned`, so none needs a Decision of the owner. An Instance, a Plugin and a Matrix are entities that something was made as (`prov:Entity`); a Family is a `skos:Collection`
+ * of its host and its extensions.
  *
  * @limits
  * The properties do not yet carry a basis of their own (the baseline holds them until the schemas require it). A Surface is a class with no standard to rest on but PROV-O's entity.
@@ -62,6 +65,10 @@ export const kanon = vocabulary(KANON, {
   TraceEdge: "owl:Class",
   Surface: "owl:Class",
   Finding: "owl:Class",
+  Instance: "owl:Class",
+  Plugin: "owl:Class",
+  Family: "owl:Class",
+  Matrix: "owl:Class",
   layerRank: "owl:DatatypeProperty",
   mdaViewpoint: "owl:DatatypeProperty",
   dataModelingLevel: "owl:DatatypeProperty",
@@ -76,6 +83,16 @@ export const kanon = vocabulary(KANON, {
   surfaceLayer: "owl:ObjectProperty",
   rule: "owl:DatatypeProperty",
   about: "owl:ObjectProperty",
+  instanceName: "owl:DatatypeProperty",
+  instanceOfUnit: "owl:DatatypeProperty",
+  instanceFamily: "owl:ObjectProperty",
+  elementInstance: "owl:ObjectProperty",
+  pluginNoun: "owl:DatatypeProperty",
+  pluginFamily: "owl:ObjectProperty",
+  dependsOn: "owl:ObjectProperty",
+  familyHost: "owl:DatatypeProperty",
+  matrixFamily: "owl:ObjectProperty",
+  matrixOutcome: "owl:DatatypeProperty",
 });
 
 // ---- the code list: the layers
@@ -151,6 +168,34 @@ export const classes = [
     label: en("Finding"),
     subClassOf: [shMore.ValidationResult],
     definition: en("A breach of the rules of Kanon, with its code, the element or file it is about and one sentence."),
+  }),
+  OwlClass.make(kanon.Instance, {
+    label: en("Instance"),
+    subClassOf: [prov.Entity],
+    definition: en(
+      "One of several occurrences of a kind of unit in the Physical layer (a dialect), declared by its host with the unit it is an instance of; it imports only the layers it extends, through the host's public exports, and never another instance.",
+    ),
+  }),
+  OwlClass.make(kanon.Plugin, {
+    label: en("Plugin"),
+    subClassOf: [prov.Entity],
+    definition: en(
+      "A package that extends one host through the host's public exports and the plugin contract only; the host never imports it, and it imports another plugin only by a declared dependency.",
+    ),
+  }),
+  OwlClass.make(kanon.Family, {
+    label: en("Family"),
+    subClassOf: [skos.Collection],
+    definition: en(
+      "A host with its dialects and plugins, and the naming rule of their packages (<host>-dialect-<tool>, <host>-<noun>), as data of the host's table.",
+    ),
+  }),
+  OwlClass.make(kanon.Matrix, {
+    label: en("Matrix"),
+    subClassOf: [prov.Entity],
+    definition: en(
+      "The table of requirement by instance: for each annotation of Governance and each instance, whether it is expressed, carried or unexpressed with its reason, or dropped.",
+    ),
   }),
 ] as const;
 
@@ -237,7 +282,7 @@ export const properties = [
     range: xsd.string,
     label: en("rule"),
     definition: en(
-      "The code of the finding: layers/unclassified, layers/relative, layers/private, layers/external, layers/above, layers/around, layers/cycle or kanon/dropped.",
+      "The code of the finding: layers/unclassified, layers/relative, layers/private, layers/external, layers/above, layers/around, layers/cycle, instances/sibling, instances/undeclared, plugins/inverted, plugins/undeclared, plugins/contract, family/name or kanon/dropped.",
     ),
   }),
   ObjectProperty.make(kanon.about, {
@@ -246,13 +291,73 @@ export const properties = [
     label: en("about"),
     definition: en("The element the finding is about, where it is about one."),
   }),
+  DatatypeProperty.make(kanon.instanceName, {
+    domain: kanon.Instance,
+    range: xsd.string,
+    label: en("instance name"),
+    definition: en("The name of the instance, as ansible."),
+  }),
+  DatatypeProperty.make(kanon.instanceOfUnit, {
+    domain: kanon.Instance,
+    range: xsd.string,
+    label: en("instance of unit"),
+    definition: en("The folder of the unit of which this is an instance."),
+  }),
+  ObjectProperty.make(kanon.instanceFamily, {
+    domain: kanon.Instance,
+    range: kanon.Family,
+    label: en("instance family"),
+    definition: en("The family whose host declares the instance."),
+  }),
+  ObjectProperty.make(kanon.elementInstance, {
+    domain: kanon.Element,
+    range: kanon.Instance,
+    label: en("element instance"),
+    definition: en("The instance an element of a physical layer belongs to."),
+  }),
+  DatatypeProperty.make(kanon.pluginNoun, {
+    domain: kanon.Plugin,
+    range: xsd.string,
+    label: en("plugin noun"),
+    definition: en("The noun the plugin adds to the host's command, as server."),
+  }),
+  ObjectProperty.make(kanon.pluginFamily, {
+    domain: kanon.Plugin,
+    range: kanon.Family,
+    label: en("plugin family"),
+    definition: en("The family whose host declares the plugin."),
+  }),
+  ObjectProperty.make(kanon.dependsOn, {
+    domain: kanon.Plugin,
+    range: kanon.Plugin,
+    label: en("depends on"),
+    definition: en("A plugin this one declares a dependency on, and may import."),
+  }),
+  DatatypeProperty.make(kanon.familyHost, {
+    domain: kanon.Family,
+    range: xsd.string,
+    label: en("family host"),
+    definition: en("The package of the host library of the family."),
+  }),
+  ObjectProperty.make(kanon.matrixFamily, {
+    domain: kanon.Matrix,
+    range: kanon.Family,
+    label: en("matrix family"),
+    definition: en("The family whose instances are the columns of the matrix."),
+  }),
+  DatatypeProperty.make(kanon.matrixOutcome, {
+    domain: kanon.Matrix,
+    range: xsd.string,
+    label: en("matrix outcome"),
+    definition: en("How a cell of the matrix ends: expressed, carried, unexpressed or dropped."),
+  }),
 ] as const;
 
 /** The ontology itself: its label, description and version. */
 export const kanonOntology = OwlOntology.make(ontologyOf(KANON), {
   label: en("Kanon"),
   description: en(
-    "The vocabulary of Kanon, the pattern of a library built in three layers: the layers, the elements they say, the projections that derive one from the other, the trace edges that keep identity, the surfaces and the findings of the check.",
+    "The vocabulary of Kanon, the pattern of a library built in three layers: the layers, the elements they say, the projections that derive one from the other, the trace edges that keep identity, the surfaces, the findings of the check, the instances of a unit kind, the plugins, the families and the matrix of requirement by instance.",
   ),
   versionInfo: "1.0.0",
   versionIri: named<"owl:Ontology">(iriIn(KANONV, "1.0.0")),
@@ -280,6 +385,10 @@ export const terms = [
   specializes("TraceEdge", provMore.Derivation.iri, "0033-kanon FR-015"),
   specializes("Surface", prov.Entity.iri, "0033-kanon FR-015"),
   specializes("Finding", shMore.ValidationResult.iri, "0033-kanon FR-015"),
+  specializes("Instance", prov.Entity.iri, "0033-kanon FR-015"),
+  specializes("Plugin", prov.Entity.iri, "0033-kanon FR-015"),
+  specializes("Family", skos.Collection.iri, "0033-kanon FR-015"),
+  specializes("Matrix", prov.Entity.iri, "0033-kanon FR-015"),
 ] as const;
 
 /** The file this module states: its name, its prefixes and its individuals. */

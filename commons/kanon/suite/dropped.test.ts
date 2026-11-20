@@ -45,6 +45,7 @@ function model(dispositions: readonly Disposition[]): LayeredModel {
     trace: [{ from: id("headless:demo/run"), to: id("cli:demo run"), how: "projects to" }],
     findings: [],
     dispositions,
+    instances: [],
   };
 }
 

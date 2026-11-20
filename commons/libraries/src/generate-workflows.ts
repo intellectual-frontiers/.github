@@ -19,10 +19,9 @@
  * @module
  */
 import process from "node:process";
-import { ACTIONS, type LibraryFacts, workflows } from "./workflows/definitions.ts";
+import { ACTIONS, workflows } from "./workflows/definitions.ts";
 import { validateAction, validateWorkflow } from "./workflows/model.ts";
 import { renderAction, renderWorkflow } from "./workflows/render.ts";
-import { inputsOf } from "./affected.ts";
 import { readLibraries } from "./libraries.ts";
 import { existsSync, readDirSync, readTextFileSync, writeTextFileSync, mkdirSync } from "@intellectual-frontiers/system/fs";
 import { stdio } from "@intellectual-frontiers/system";
@@ -34,24 +33,17 @@ const FOLDER = ".github/workflows";
 export function outputs(repo: string): { readonly files: ReadonlyMap<string, string>; readonly problems: readonly string[] } {
   const root = repo.replace(/[\\/]$/, "");
   const problems: string[] = [];
-  const libraries: LibraryFacts[] = [];
   for (const f of readLibraries(root)) {
     if ("problem" in f) problems.push(`commons/${f.dir}/library.ts: ${f.problem}`);
     else {
       if (f.library.distribution.includes("npm") && !existsSync(`${root}/commons/${f.library.name}/tools/pack.ts`))
         problems.push(
-          `commons/${f.library.name} is published to npm and has no tools/pack.ts, which its publish workflow runs (0030-generated-workflows FR-009)`,
+          `commons/${f.library.name} is published to npm and has no tools/pack.ts, which the release workflow runs (0030-generated-workflows FR-009)`,
         );
-      libraries.push({
-        name: f.library.name,
-        verify: f.library.verify,
-        paths: inputsOf(root, f.library.name).paths,
-        distribution: f.library.distribution,
-      });
     }
   }
   const files = new Map<string, string>();
-  for (const w of workflows(libraries)) {
+  for (const w of workflows()) {
     problems.push(...validateWorkflow(w));
     files.set(`${FOLDER}/${w.file}.auto.yml`, renderWorkflow(w));
   }

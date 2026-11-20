@@ -25,7 +25,7 @@
 import { chmod, readTextFile, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { existsSync, mkdirSync, readDirSync, readTextFileSync, removeSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { basename, dirname, join, relative, resolve, toPosix } from "@intellectual-frontiers/system/path";
-import { run, which } from "@intellectual-frontiers/system/proc";
+import { env, run, which } from "@intellectual-frontiers/system/proc";
 
 /** The scope of the packages of commons. */
 export const SCOPE = "@intellectual-frontiers";
@@ -514,6 +514,11 @@ export async function packLibrary(root: string, options: PackOptions = {}): Prom
 
 /** The command line of a library's `tools/pack.ts`: pack, print what was found (or the tarball) and the exit status. */
 export async function main(root: string, argv: readonly string[], options: PackOptions = {}): Promise<number> {
+  // the check inside `verify` is left out where CI says the exports did not change (`IFC_SKIP_PACK`); the packing for a publication is never skipped
+  if (argv.includes("--check") && (env.get("IFC_SKIP_PACK") ?? "") !== "") {
+    console.log("pack check skipped: the exports of this library did not change in this push (IFC_SKIP_PACK); the release packs it");
+    return 0;
+  }
   const r = await packLibrary(root, options);
   for (const f of r.findings) console.error(f);
   if (r.tarball === undefined) return 1;

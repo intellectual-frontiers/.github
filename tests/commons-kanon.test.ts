@@ -1,15 +1,19 @@
 /**
  * Kanon, the pattern of a library built in three layers (commons 0033-kanon): the import check finds each code from a table, nothing of Governance is silently dropped, a manifest may declare the
- * table and a library that does must run the check, a model is the shape of the documentation generator's layered model, and the ontology `kanon` has the six classes and the three layers with their
- * alignment. Each rule is broken in a copy and named.
+ * table and a library that does must run the check, a model is the shape of the documentation generator's layered model, and the ontology `kanon` has the ten classes and the three layers with their
+ * alignment, and a host with dialects and plugins is held by the same check, the matrix and the manifests. Each rule is broken in a copy and named.
  *
  * @module
  */
 import { fs, path } from "../commons/system/src/mod.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../commons/test/src/test.ts";
 import {
+  buildMatrix,
   decodeTable,
   droppedFindings,
+  extensionFindings,
+  matrixMarkdown,
+  parseInstanceName,
   type ElementId,
   importFindings,
   type LayeredModel,
@@ -17,6 +21,7 @@ import {
 } from "../commons/kanon/src/mod.ts";
 import type { LayeredModel as DocsLayeredModel } from "@intellectual-frontiers/commons/docs";
 import { decodeLibrarySource, manifestFindings } from "../commons/libraries/src/libraries.ts";
+import { reservationFindings } from "../commons/libraries/src/family.ts";
 import { classes, layers, terms } from "../commons/ontology/src/kanon/mod.ts";
 
 const PKG = "@intellectual-frontiers/demo";
@@ -113,6 +118,7 @@ function model(dispositions: LayeredModel["dispositions"]): LayeredModel {
     trace: [{ from: id("headless:demo/run"), to: id("cli:demo run"), how: "projects to" }],
     findings: [],
     dispositions,
+    instances: [],
   };
 }
 
@@ -207,10 +213,21 @@ proves(
 
 proves(
   ["0033-kanon FR-015"],
-  "the ontology kanon has the six classes, the three layers with their rank and MDA viewpoint, and a record of the basis of each class",
+  "the ontology kanon has the ten classes, the three layers with their rank and MDA viewpoint, and a record of the basis of each class",
   () => {
     const labels = classes.map((c) => c.values.label?.value);
-    assertEquals(labels, ["Layer", "Element", "Projection", "Trace edge", "Surface", "Finding"]);
+    assertEquals(labels, [
+      "Layer",
+      "Element",
+      "Projection",
+      "Trace edge",
+      "Surface",
+      "Finding",
+      "Instance",
+      "Plugin",
+      "Family",
+      "Matrix",
+    ]);
     assertEquals(
       Object.values(layers).map((l) => [l.values.layerRank, l.values.mdaViewpoint, l.values.dataModelingLevel]),
       [
@@ -219,7 +236,79 @@ proves(
         [3, "PSM", "physical"],
       ],
     );
-    assertEquals(terms.length, 6);
+    assertEquals(terms.length, 10);
     for (const t of terms) assertEquals(t.values.mappingRelation, "subClassOf");
   },
 );
+
+const HOST_PKG = "@intellectual-frontiers/fleet";
+const host = decodeTable({
+  package: HOST_PKG,
+  family: { dialect: "{host}-dialect-{name}", plugin: "{host}-{name}", contract: "./plugin" },
+  units: [
+    { folder: "src/governance/", layer: "governance" },
+    { folder: "src/dialect/", layer: "physical" },
+  ],
+  instances: [
+    { name: "ansible", instanceOf: "src/dialect/", placement: "package" },
+    { name: "dsc", instanceOf: "src/dialect/", placement: "package" },
+  ],
+  plugins: [{ noun: "server" }],
+});
+assert(host.kind === "ok", "the host's table is one");
+const HOST_EXPORTS = { "./governance": "./src/governance/mod.ts", "./dialect": "./src/dialect/mod.ts" };
+const ansible = decodeTable({ package: `${HOST_PKG}-dialect-ansible`, extends: HOST_PKG, units: [{ folder: "src/", layer: "physical" }] });
+assert(ansible.kind === "ok", "the dialect's table is one");
+
+proves(["0033-kanon FR-019", "0033-kanon FR-020"], "an instance that imports another instance, and a host that imports its extension, are found by their codes", () => {
+  const sibling = [{ path: "src/mod.ts", text: `import { a } from "${HOST_PKG}-dialect-dsc";\n` }];
+  assertEquals(
+    extensionFindings(host.value, HOST_EXPORTS, ansible.value, sibling, { ".": "./src/mod.ts" }).map((f) => f.rule),
+    ["instances/sibling"],
+  );
+  const via = [{ path: "src/mod.ts", text: `import { g } from "${HOST_PKG}/governance";\n` }];
+  assertEquals(extensionFindings(host.value, HOST_EXPORTS, ansible.value, via, { ".": "./src/mod.ts" }), []);
+  const deep = [{ path: "src/mod.ts", text: `import { g } from "${HOST_PKG}/src/governance/mod.ts";\n` }];
+  assertEquals(
+    extensionFindings(host.value, HOST_EXPORTS, ansible.value, deep, { ".": "./src/mod.ts" }).map((f) => f.rule),
+    ["layers/private"],
+  );
+  const inverted = [{ path: "src/governance/mod.ts", text: `import { a } from "${HOST_PKG}-dialect-ansible";\n` }];
+  assertEquals(
+    importFindings(host.value, inverted, HOST_EXPORTS).map((f) => f.rule),
+    ["plugins/inverted", "plugins/contract"],
+  );
+});
+
+proves(["0033-kanon FR-021"], "a family's rule is data: the package of a member is made from it and a noun that reads as a dialect is refused", () => {
+  assertEquals(
+    host.value.instances.map((i) => (i.kind === "package" ? String(i.package) : "")),
+    [`${HOST_PKG}-dialect-ansible`, `${HOST_PKG}-dialect-dsc`],
+  );
+  assertEquals(host.value.plugins.map((p) => String(p.package)), [`${HOST_PKG}-server`]);
+  const bad = decodeTable({
+    package: HOST_PKG,
+    family: { dialect: "{host}-dialect-{name}", plugin: "{host}-{name}" },
+    units: [{ folder: "src/a/", layer: "physical" }],
+    plugins: [{ noun: "dialect-x" }],
+  });
+  assert(bad.kind === "err");
+});
+
+proves(["0033-kanon FR-022", "0033-kanon FR-023"], "an annotation accounted for in one dialect and not the other is dropped for the other, and the matrix says so", () => {
+  const ansibleName = parseInstanceName("ansible");
+  const dscName = parseInstanceName("dsc");
+  assert(ansibleName.kind === "ok" && dscName.kind === "ok");
+  const base = model([{ element: id("headless:demo/run"), annotation: "effect", outcome: "expressed", target: id("cli:demo run"), instance: ansibleName.value }]);
+  const m: LayeredModel = { ...base, instances: [ansibleName.value, dscName.value] };
+  const found = droppedFindings(m);
+  assertEquals(found.length, 1);
+  assertStringIncludes(found[0]?.message ?? "", "dsc");
+  const table = matrixMarkdown(buildMatrix(m));
+  assertStringIncludes(table, "| expressed (cli:demo run) | dropped |");
+});
+
+proves(["0033-kanon FR-024"], "the names held for the fleet libraries are refused to a library of no family, with no folder", () => {
+  assertEquals(reservationFindings([{ name: "archon-dialect-x" }]).length, 1);
+  assertEquals(reservationFindings([{ name: "estate", family: { host: "estate", role: "host" } }]), []);
+});
