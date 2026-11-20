@@ -76,7 +76,7 @@ proves(["0005-integrations-observe FR-004"], "defineConnector refuses a connecto
   const spec = { probe: () => Promise.reject(new Error("unused")), observe: () => Promise.reject(new Error("unused")), policies: [] as readonly PosturePolicy[] };
   const refused = defineConnector({ ...spec, governance: sampleGovernance({ scope: { grants: [] } }) });
   assert(refused.kind === "err" && refused.error.kind === "governance");
-  const p: PosturePolicy = { id: "p1", title: "P", fact: "f", want: { kind: "present" }, severity: "warn", fix: "x" };
+  const p: PosturePolicy = { id: "p1", title: "P", fact: "f", want: { kind: "non-empty" }, severity: "low", onMiss: "warn", controls: [], fix: "x" };
   const twice = defineConnector({ ...spec, governance: sampleGovernance(), policies: [p, p] });
   assert(twice.kind === "err" && twice.error.kind === "duplicate-policy");
   const reserved = defineConnector({ ...spec, governance: sampleGovernance(), policies: [{ ...p, id: "observation-fresh" }] });
@@ -97,17 +97,20 @@ proves(["0005-integrations-observe FR-005"], "a denied field and an undeclared e
 
 const at = (posture: Observation["posture"]): Observation => ({ at: NOW, provider: "p", account: "a", assets: [], posture, gaps: [] });
 
-proves(["0005-integrations-observe FR-006"], "evaluatePolicy over each expectation", () => {
-  const p = (want: PosturePolicy["want"], severity: PosturePolicy["severity"] = "fail"): PosturePolicy => ({ id: "x", title: "X", fact: "f", want, severity, fix: "fix" });
-  assertEquals(evaluatePolicy(p({ kind: "is-true" }), at({})).status, "unknown");
-  assertEquals(evaluatePolicy(p({ kind: "is-true" }), at({ f: true })).status, "pass");
-  assertEquals(evaluatePolicy(p({ kind: "is-true" }), at({ f: false })).status, "fail");
-  assertEquals(evaluatePolicy(p({ kind: "is-false" }, "warn"), at({ f: true })).status, "warn");
-  assertEquals(evaluatePolicy(p({ kind: "at-least", value: 2 }), at({ f: 2 })).status, "pass");
-  assertEquals(evaluatePolicy(p({ kind: "at-least", value: 2 }), at({ f: 1 })).status, "fail");
-  assertEquals(evaluatePolicy(p({ kind: "at-most", value: 2 }), at({ f: 3 })).status, "fail");
+proves(["0005-integrations-observe FR-006"], "evaluatePolicy over each expectation, by the evaluation of GRC", () => {
+  const p = (want: PosturePolicy["want"], onMiss: PosturePolicy["onMiss"] = "fail"): PosturePolicy => ({ id: "x", title: "X", fact: "f", want, severity: "high", onMiss, controls: ["urn:grc:tests:1:c"], fix: "fix" });
+  const t = { kind: "equals", value: true } as const;
+  assertEquals(evaluatePolicy(p(t), at({})).status, "pending");
+  assertEquals(evaluatePolicy(p(t), at({ f: true })).status, "pass");
+  assertEquals(evaluatePolicy(p(t), at({ f: false })).status, "fail");
+  assertEquals(evaluatePolicy(p({ kind: "equals", value: false }, "warn"), at({ f: true })).status, "warn");
+  const ge = { kind: "every", field: "value", op: "ge", value: 2 } as const;
+  assertEquals(evaluatePolicy(p(ge), at({ f: 2 })).status, "pass");
+  assertEquals(evaluatePolicy(p(ge), at({ f: 1 })).status, "fail");
+  assertEquals(evaluatePolicy(p({ kind: "every", field: "value", op: "le", value: 2 }), at({ f: 3 })).status, "fail");
   assertEquals(evaluatePolicy(p({ kind: "equals", value: "on" }), at({ f: "on" })).status, "pass");
-  assertEquals(evaluatePolicy(p({ kind: "present" }), at({ f: 0 })).status, "pass");
+  assertEquals(evaluatePolicy(p({ kind: "non-empty" }), at({ f: 0 })).status, "pass");
+  assertEquals(evaluatePolicy(p(t), at({ f: true })).controls, ["urn:grc:tests:1:c"]);
 });
 
 proves(["0005-integrations-observe FR-007"], "a stale observation fails the freshness policy", async () => {

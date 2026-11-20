@@ -14,7 +14,7 @@
 - **FR-003**: A `Connector` MUST have `describe`, `probe` and `observe` as methods and `check` for its policies; `describe` MUST be derived from the governance so that it cannot differ, and MUST hold no credential value.
 - **FR-004**: `defineConnector` MUST refuse governance with a problem and a policy id twice, and MUST wrap `observe` so that governance is enforced on what any connector returns.
 - **FR-005**: Enforcement MUST remove from every record's properties and unmapped data each field the denylist denies, and MUST remove an entity kind the connector did not declare and name it as a gap, whatever the connector returned.
-- **FR-006**: A posture policy MUST be structural data (`id`, `title`, `fact`, an expectation of the closed union, a severity, a fix) and `evaluatePolicy` MUST be total: `unknown` where the fact was not observed, `pass` where met, else the severity; controls and their catalogues are attached by the consumer through the id (and adopt the check and result types of commons/grc 0.2.0 when it is on main).
+- **FR-006**: A posture policy MUST be data in the vocabulary of GRC (`@intellectual-frontiers/grc`): an `id`, a `title`, the `fact`, an `Expectation` and a `Severity` of GRC, the status a miss has, the control urns it bears on and a fix; `evaluatePolicy` MUST be total and give a GRC `Status`: `pending` where the fact was not observed, else GRC's own evaluation (a pass, the status of a miss, or `error`).
 - **FR-007**: Every connector MUST have the policy `observation-fresh`, failing where the observation is older than its cadence allows.
 - **FR-008**: A persisted observation MUST be a document with `kind` and `schema`; reading one of another kind or schema, or a field of the wrong type, MUST be an error with its path.
 

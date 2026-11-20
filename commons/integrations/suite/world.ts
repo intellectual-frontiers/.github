@@ -109,7 +109,7 @@ export function sampleConnector(extra: Partial<ConnectorGovernance> = {}, leaky 
         ...(leaky ? { entities: { people: [{ email: "a@example.test", status: "active" as const }], repositories: names.map((n) => ({ system: "sample-host", name: n, private: true })) } } : {}),
       });
     },
-    policies: [{ id: "two-factor-required", title: "Two-factor is required", fact: "two-factor", want: { kind: "is-true" }, severity: "fail", fix: "turn it on" }],
+    policies: [{ id: "two-factor-required", title: "Two-factor is required", fact: "two-factor", want: { kind: "equals", value: true }, severity: "high", onMiss: "fail", controls: ["urn:grc:tests:1:mfa"], fix: "turn it on" }],
   });
   return must(r);
 }

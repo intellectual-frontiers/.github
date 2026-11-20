@@ -19,7 +19,14 @@ export const library = {
     package: "@intellectual-frontiers/integrations",
     units: [
       { folder: "src/governance/", layer: "governance", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }] },
-      { folder: "src/logical/", layer: "logical", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }] },
+      {
+        folder: "src/logical/",
+        layer: "logical",
+        packages: [
+          { name: "@intellectual-frontiers/core", subpaths: [] },
+          { name: "@intellectual-frontiers/grc", subpaths: ["governance", "logical"] },
+        ],
+      },
       {
         folder: "src/physical/http/",
         layer: "physical",

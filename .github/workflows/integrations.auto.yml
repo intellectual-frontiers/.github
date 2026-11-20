@@ -9,8 +9,10 @@ on:
       - ".github/actions/**"
       - .github/workflows/integrations.auto.yml
       - "commons/core/src/**"
+      - "commons/grc/src/**"
       - "commons/headless/src/**"
       - "commons/integrations/**"
+      - "commons/kanon/src/**"
       - "commons/libraries/src/**"
       - "commons/mizan/src/**"
       - "commons/net/src/**"
@@ -24,8 +26,10 @@ on:
       - ".github/actions/**"
       - .github/workflows/integrations.auto.yml
       - "commons/core/src/**"
+      - "commons/grc/src/**"
       - "commons/headless/src/**"
       - "commons/integrations/**"
+      - "commons/kanon/src/**"
       - "commons/libraries/src/**"
       - "commons/mizan/src/**"
       - "commons/net/src/**"
