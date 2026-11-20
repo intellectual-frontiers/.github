@@ -614,3 +614,24 @@ requirement	mechanism	by	note
 0033-kanon FR-023	check	.github: bun test ./tests/	commons-kanon.test.ts: the matrix is built and rendered as Markdown; commons/kanon/suite holds the JSON and the property test
 0033-kanon FR-024	check	.github: bun test ./tests/	commons-kanon.test.ts: the reserved names are refused to a library of no family; commons/libraries/suite/family.test.ts
 0011-documentation FR-030	check	.github: cd commons/docs && bun run verify	pending
+0034-archon FR-001	review	0034-archon FR-001	a reviewer checks that no package, folder or command of commons is named stolos and that what the retired engine did that is general is done by a library
+0034-archon FR-002	review	0034-archon FR-002	a reviewer checks that no library carries a shim, re-export or migration path for the retired engine
+0034-archon FR-003	review	0034-archon FR-003	a reviewer checks that a fleet repository names its libraries by package at exact versions and holds its own data and composition root
+0034-archon FR-004	review	0034-archon FR-004	a reviewer checks the manifest and the Kanon table of archon: governance, logical and physical hold what FR-004 says
+0034-archon FR-005	review	0034-archon FR-005	a reviewer checks the names and the family field of each dialect and plugin package; the import check of 0033-kanon holds the public-exports rule
+0034-archon FR-006	review	0034-archon FR-006	a reviewer checks that one program is composed from the command branches of the chosen plugins and that reach and tier are governance, not code
+0034-archon FR-007	review	0034-archon FR-007	a reviewer checks that archon renders, runs through the Executor port and reads results, and holds no engine, module library or state store
+0034-archon FR-008	review	0034-archon FR-008	a reviewer checks that each dialect declares its guarantees as data and that the model gives expressed, carried or unexpressed per annotation and dialect
+0034-archon FR-009	review	0034-archon FR-009	a reviewer checks that the choice of dialect is policy and that the presets are named for the approach
+0034-archon FR-010	review	0034-archon FR-010	a reviewer checks that no client both reads and writes the same system
+0034-archon FR-011	review	0034-archon FR-011	a reviewer checks that rendered output is generated, marked as such and not edited by hand
+0034-archon FR-012	review	0034-archon FR-012	a reviewer checks each dialect's pins and that its conformance suite runs the real tool, including applying an order twice
+0034-archon FR-013	review	0034-archon FR-013	a reviewer checks the first dialects and what each says its tool is and is not used for
+0034-archon FR-014	review	0034-archon FR-014	a reviewer checks that the three profiles and their controls are requirements, that a control can be overridden with a recorded reason, and that no profile is chosen without telling the person
+0034-archon FR-015	review	0034-archon FR-015	a reviewer checks the floor: no secret, no stored passphrase, no agent approval, destructive actions need the marker and a typed confirmation
+0034-archon FR-016	review	0034-archon FR-016	a reviewer checks that the profile in force is the last approved tip's, with a test of a commit that lowers its own profile
+0034-archon FR-017	review	0034-archon FR-017	a reviewer checks the questions of initialization, the recommendation, the plain statement of what the profile allows and the report of weaker profiles as decisions
+0034-archon FR-018	review	0034-archon FR-018	a reviewer checks that each library has its own spec kit and release name and that each adversarial review's findings are closed or recorded as Decisions
+0034-archon FR-019	review	0034-archon FR-019	a reviewer checks that the first release waits for the slice in lab virtual machines and that the first dialect's measures are in its specification
+0034-archon FR-020	review	0034-archon FR-020	a reviewer checks that the old repository is archived, backed up and deleted only at the owner's request, with its tickets moved or closed one by one
+0034-archon FR-021	review	0034-archon FR-021	a reviewer checks that the work is one parent ticket with checklist items and comments, and that no ticket exists for a library, phase or sub-task
