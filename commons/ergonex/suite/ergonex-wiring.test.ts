@@ -335,14 +335,14 @@ proves(
 
       const first = await doctor();
       assertEquals(first.code, 0, first.stdout + first.stderr);
-      assertStringIncludes(first.all, "[!] ergonex-foo");
+      assertStringIncludes(first.all, "ergonex-foo is found on the PATH");
       assertEquals(await seenOf(), day(0));
       await setSeen(day(89));
       assertEquals((await doctor()).code, 0);
       await setSeen(day(91));
       const late = await doctor();
       assertEquals(late.code, 1, late.stdout);
-      assertStringIncludes(late.all, "[x] ergonex-foo");
+      assertStringIncludes(late.all, "ergonex-foo is found on the PATH");
       assertEquals(await seenOf(), day(91), "the day was restarted");
       // a tool of the catalog that provides it
       const tool = await withTool(w, {
