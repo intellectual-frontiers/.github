@@ -38,6 +38,9 @@ proves(["0011-documentation FR-036"], "five questions a newcomer asks are answer
   // 4. where is a command of ergonex described, with the tools and routes it is drawn as?
   assert(find(rows, "ergonex administrator").length > 0, "the programs are found by search");
   assertStringIncludes(text("programs/ergonex-administrator/verb-doctor.html"), "Governance: the action");
+  // the license is on the page of every library, and the licensing page is in the site
+  assertStringIncludes(text("overview/core.html"), "PolyForm-Noncommercial-1.0.0");
+  assertStringIncludes(text("start/licensing.html"), "PolyForm Noncommercial License");
   // 5. how is a release made?
   assertStringIncludes(text("how-to/cut-a-release.html"), "bun run release apply");
   assertStringIncludes(text("concepts/release-loop.html"), "dev:check");

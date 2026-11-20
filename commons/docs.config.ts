@@ -8,6 +8,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import type { About, DocsConfig, PackageConfig } from "./docs/config.ts";
 import { layeredLens } from "./docs/lens/layered.ts";
+import { DEFAULT_LICENSE } from "./libraries/src/license/standard.ts";
 import { guidesLens } from "./docs/lens/guides.ts";
 import { releasesLens } from "./docs/lens/releases.ts";
 import { programLens } from "./docs/lens/program.ts";
@@ -63,7 +64,7 @@ async function libraryPackage(name: string): Promise<PackageConfig> {
   const pkg = JSON.parse(readFileSync(new URL(`./${name}/package.json`, import.meta.url), "utf8")) as { readonly exports?: Readonly<Record<string, string | { readonly default?: string; readonly import?: string }>>; readonly description?: string };
   const targets = Object.values(pkg.exports ?? {}).map((t) => (typeof t === "string" ? t : (t.default ?? t.import ?? ""))).filter((t) => t.endsWith(".ts")).map((t) => t.replace(/^\.\//, ""));
   const { about: written } = (await import(`./${name}/about.ts`)) as { readonly about: About };
-  const { library } = (await import(`./${name}/library.ts`)) as { readonly library: { readonly version?: string; readonly level?: string; readonly distribution?: readonly string[]; readonly kanon?: { readonly units: readonly { readonly folder: string; readonly layer?: string; readonly mayImport?: readonly string[] }[] } } };
+  const { library } = (await import(`./${name}/library.ts`)) as { readonly library: { readonly version?: string; readonly level?: string; readonly distribution?: readonly string[]; readonly license?: string; readonly kanon?: { readonly units: readonly { readonly folder: string; readonly layer?: string; readonly mayImport?: readonly string[] }[] } } };
   const about: About = {
     ...written,
     ...(library.kanon === undefined ? {} : { layers: library.kanon.units.filter((u) => typeof u.layer === "string").map((u) => ({ folder: u.folder, layer: u.layer ?? "", ...(u.mayImport === undefined ? {} : { mayImport: u.mayImport }) })) }),
@@ -71,6 +72,7 @@ async function libraryPackage(name: string): Promise<PackageConfig> {
       ...(library.version === undefined ? [] : [{ label: "Version", value: `\`${library.version}\`` }]),
       ...(library.level === undefined ? [] : [{ label: "Conformance level", value: `\`${library.level}\`` }]),
       ...(library.distribution === undefined ? [] : [{ label: "Distributed", value: library.distribution.join(", ") }]),
+      { label: "License", value: `\`${library.license ?? DEFAULT_LICENSE}\`, source-available: free for noncommercial use, commercial use needs a license from the owner (see Licensing in Start here)` },
       { label: "Import it as", value: `\`@intellectual-frontiers/${name}\`` },
     ],
   };
@@ -87,6 +89,9 @@ const guides = guidesLens({
     { file: "commons/docs/guides/contributor.md", path: "start/contributor.html", section: "start", group: "Start here", order: 2 },
     { file: "commons/docs/guides/agent.md", path: "start/agent.html", section: "start", group: "Start here", order: 3 },
     { file: "commons/docs/guides/auditor.md", path: "start/auditor.html", section: "start", group: "Start here", order: 4 },
+    { file: "LICENSING.md", path: "start/licensing.html", section: "start", group: "Licensing", order: 0 },
+    { file: "COMMERCIAL.md", path: "start/commercial.html", section: "start", group: "Licensing", order: 1 },
+    { file: "THIRD_PARTY_NOTICES.md", path: "start/third-party-notices.html", section: "start", group: "Licensing", order: 2 },
     { file: "commons/docs/guides/concepts-index.md", path: "concepts/index.html", section: "concepts", group: "Concepts", order: 0 },
     { file: "commons/docs/guides/concept-mizan.md", path: "concepts/mizan.html", section: "concepts", group: "Concepts", order: 1 },
     { file: "commons/docs/guides/concept-kanon.md", path: "concepts/kanon.html", section: "concepts", group: "Concepts", order: 2 },
