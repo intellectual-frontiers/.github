@@ -76,13 +76,14 @@
   const dialog = document.querySelector("dialog.search");
   const input = dialog?.querySelector("input");
   const list = dialog?.querySelector(".results");
+  const kind = dialog?.querySelector(".search-kind");
   let index = null;
   let selected = 0;
   const load = async () => {
     if (index) return index;
     try {
       const r = await fetch(`${root}search.json`);
-      index = (await r.json()).map(([title, url, where, kind]) => ({ title, url, where, kind, key: title.toLowerCase() }));
+      index = (await r.json()).map(([title, url, where, kind]) => ({ title, url, where, kind, group: kind.replace(/ of .*$/, "").replace(/\s*\(.*\)$/, "").trim(), key: title.toLowerCase() }));
     } catch {
       index = [];
     }
@@ -97,8 +98,10 @@
       return;
     }
     const words = q.split(/\s+/);
+    const only = kind?.value ?? "";
     const scored = [];
     for (const e of all) {
+      if (only !== "" && e.group !== only) continue;
       const hay = `${e.key} ${e.where.toLowerCase()}`;
       if (!words.every((w) => hay.includes(w))) continue;
       const s = e.key === q ? 0 : e.key.startsWith(q) ? 1 : e.key.includes(q) ? 2 : 3;
@@ -114,8 +117,13 @@
     if (!dialog) return;
     dialog.showModal();
     input.select();
-    void load();
+    void load().then((all) => {
+      if (kind && kind.options.length === 1) {
+        for (const k of [...new Set(all.map((e) => e.group))].sort()) kind.add(new Option(k, k));
+      }
+    });
   };
+  kind?.addEventListener("change", () => void render());
   document.querySelector(".search-button")?.addEventListener("click", open);
   document.addEventListener("keydown", (e) => {
     const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName ?? "");

@@ -9,6 +9,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import type { About, DocsConfig, PackageConfig } from "./docs/config.ts";
 import { layeredLens } from "./docs/lens/layered.ts";
 import { guidesLens } from "./docs/lens/guides.ts";
+import { releasesLens } from "./docs/lens/releases.ts";
 import { programLens } from "./docs/lens/program.ts";
 import { ergonexProgram, type ProgramHost } from "./ergonex/src/mod.ts";
 import { describe } from "./headless/src/describe/mod.ts";
@@ -62,9 +63,10 @@ async function libraryPackage(name: string): Promise<PackageConfig> {
   const pkg = JSON.parse(readFileSync(new URL(`./${name}/package.json`, import.meta.url), "utf8")) as { readonly exports?: Readonly<Record<string, string | { readonly default?: string; readonly import?: string }>>; readonly description?: string };
   const targets = Object.values(pkg.exports ?? {}).map((t) => (typeof t === "string" ? t : (t.default ?? t.import ?? ""))).filter((t) => t.endsWith(".ts")).map((t) => t.replace(/^\.\//, ""));
   const { about: written } = (await import(`./${name}/about.ts`)) as { readonly about: About };
-  const { library } = (await import(`./${name}/library.ts`)) as { readonly library: { readonly version?: string; readonly level?: string; readonly distribution?: readonly string[] } };
+  const { library } = (await import(`./${name}/library.ts`)) as { readonly library: { readonly version?: string; readonly level?: string; readonly distribution?: readonly string[]; readonly kanon?: { readonly units: readonly { readonly folder: string; readonly layer?: string; readonly mayImport?: readonly string[] }[] } } };
   const about: About = {
     ...written,
+    ...(library.kanon === undefined ? {} : { layers: library.kanon.units.filter((u) => typeof u.layer === "string").map((u) => ({ folder: u.folder, layer: u.layer ?? "", ...(u.mayImport === undefined ? {} : { mayImport: u.mayImport }) })) }),
     facts: [
       ...(library.version === undefined ? [] : [{ label: "Version", value: `\`${library.version}\`` }]),
       ...(library.level === undefined ? [] : [{ label: "Conformance level", value: `\`${library.level}\`` }]),
@@ -102,6 +104,9 @@ const guides = guidesLens({
     { file: "commons/docs/guides/cut-a-release.md", path: "how-to/cut-a-release.html", section: "howto", group: "How-to", order: 4 },
   ],
 });
+
+/** The record of the next release: which libraries it publishes, at which version, under which tag. */
+const releases = releasesLens({ name: "releases", file: "commons/generated/release.auto.json" });
 
 /** Commons' site: its packages, its spec kit, how its specifications are cited, and its lenses. */
 export const config: DocsConfig = {
@@ -141,7 +146,7 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/kanon/spec-kit" },
   ],
   citations: { prefix: "commons", digits: 4, text: ["erga", "archon", "stolos", "thyra"] },
-  lenses: [guides, dataModels, programs],
+  lenses: [guides, releases, dataModels, programs],
   lintRules: "commons/lint/src/rules",
   out: "_site",
 };

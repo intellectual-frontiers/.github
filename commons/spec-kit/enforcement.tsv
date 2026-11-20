@@ -648,6 +648,7 @@ requirement	mechanism	by	note
 0011-documentation FR-032	check	.github: cd commons/docs && bun run verify	guides.test.ts: a guide that cannot be read is a finding, the sections are in order, every section has its guides with links resolved
 0011-documentation FR-033	check	.github: cd commons/docs && bun run verify	guides.test.ts: the library map and the imports of each library are read from the sources
 0011-documentation FR-034	check	.github: cd commons/docs && bun run verify	theme.test.ts: dark tokens for the system and for a choice, the button and the script that sets the theme first, the keyboard shortcuts and the print style
+0011-documentation FR-035	check	.github: cd commons/docs && bun run verify	explorers.test.ts: the trace under a requirement, the layers of a library, the releases page, and the search filter
 0035-licensing FR-001	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: the default is PolyForm-Noncommercial-1.0.0, no LICENSE of the repository is the MIT license, and the manifest, the packer and the generator read the one identifier
 0035-licensing FR-002	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: the official text is the one recorded by its standard (SHA-256), and a changed text is refused naming both hashes
 0035-licensing FR-003	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: a manifest license of the closed list is read and one that is not is refused naming it

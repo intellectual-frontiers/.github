@@ -261,3 +261,7 @@ dialog.search input { width: 100%; border: 0; border-bottom: 1px solid var(--bor
 }
 .theme-button { width: 36px; height: 36px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--page); color: var(--muted); cursor: pointer; font: 16px/1 var(--sans); }
 .theme-button:hover { border-color: var(--border-strong); color: var(--text); }
+
+.search-kind { margin: 0 12px 8px; padding: 6px 8px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--page); color: var(--text); font: 13px var(--sans); }
+dialog.search form { display: flex; flex-wrap: wrap; align-items: center; }
+dialog.search form input[type="search"] { flex: 1 1 60%; }

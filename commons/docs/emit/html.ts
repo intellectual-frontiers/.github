@@ -334,7 +334,7 @@ ${blocks(page.blocks, from)}
 </main>
 ${tocHtml}
 </div>
-<dialog class="search" aria-label="Search"><form method="dialog"><input type="search" placeholder="Search the documentation" aria-label="Search" autocomplete="off"></form><ul class="results" role="listbox"></ul><p class="search-hint">Titles, headings, exports, tables, columns and requirements. <kbd>Esc</kbd> closes.</p></dialog>
+<dialog class="search" aria-label="Search"><form method="dialog"><input type="search" placeholder="Search the documentation" aria-label="Search" autocomplete="off"><select class="search-kind" aria-label="Filter by kind"><option value="">Everything</option></select></form><ul class="results" role="listbox"></ul><p class="search-hint">Titles, headings, exports, tables, columns and requirements. <kbd>Esc</kbd> closes.</p></dialog>
 </body>
 </html>
 `;
