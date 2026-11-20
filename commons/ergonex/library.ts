@@ -10,7 +10,7 @@ export const library = {
   level: "L1",
   specKit: "spec-kit",
   verify: "bun run verify",
-  version: "0.3.0",
+  version: "0.3.1",
   distribution: ["github", "npm"],
   exports: ["."],
   summary:

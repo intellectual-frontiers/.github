@@ -112,6 +112,14 @@ export const LIBRARY_CI: Readonly<Record<string, LibraryCi>> = {
     nodeTests: 'node --test "suite/**/*.test.ts"',
     systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
   },
+  terminal: {
+    comment: lines(
+      "Terminal, the command line and the console as pure code, a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the specification checker, the trace, its tests and the",
+      "package with the inspection of its declarations) on Bun and its tests on Node 26, on Windows, macOS and Linux, because the package runs on all three.",
+    ).trimEnd(),
+    nodeTests: 'node --test "suite/**/*.test.ts"',
+    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
+  },
   ergonex: {
     comment: lines(
       "Ergonex, the workspaces management of Intellectual Frontiers, a library of commons (commons 0027-commons-libraries FR-010): its own `verify` on Bun and its tests on Node 26, the backup runtime,",

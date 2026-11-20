@@ -19,8 +19,8 @@
   | 1 | formats | kernel/json5, kernel/yaml, kernel/toml, kernel/xml, kernel/csv, kernel/base64, kernel/cbor, kernel/der, kernel/archive, kernel/png, kernel/ts-literal, kernel/glob, kernel/semver, kernel/media-types, kernel/http |
   | 1 | crypto | kernel/sha256, kernel/md5, kernel/crypt, kernel/sigv4, kernel/uuid, kernel/cms, kernel/cose, kernel/dsse, kernel/webauthn, runtime/sign |
   | 1 | rdf | kernel/rdf, kernel/rdf-term, kernel/rdf-schema, kernel/rdf-vocabularies, kernel/rdf-write |
-  | 1 | terminal | kernel/args, kernel/commands, kernel/vt, kernel/width, kernel/palette, runtime/tty, runtime/stdio |
-  | 1 | system | runtime/fs, runtime/path, runtime/dirs, runtime/lock, runtime/watch, runtime/discover, runtime/errors, runtime/proc, runtime/git, runtime/compile, runtime/schedule, kernel/schedule |
+  | 1 | terminal | kernel/args, kernel/commands, kernel/vt, kernel/width, kernel/palette |
+  | 1 | system | runtime/fs, runtime/path, runtime/dirs, runtime/lock, runtime/watch, runtime/discover, runtime/errors, runtime/proc, runtime/git, runtime/compile, runtime/schedule, runtime/tty, runtime/stdio, kernel/schedule |
   | 1 | net | runtime/net, runtime/tcp, runtime/dns, runtime/http-client, runtime/serve, runtime/acme |
   | 2 | telemetry | kernel/otel, kernel/otlp, kernel/signals, kernel/render, runtime/otel, runtime/console, runtime/trace |
   | 2 | grc | kernel/grc, kernel/assess, kernel/evidence, kernel/oscal, kernel/ocsf, kernel/ocsf-types.auto, kernel/attest, runtime/grc |
@@ -55,6 +55,7 @@
   | FR-033 (graphs of work) | core |
   | FR-064 (objects for exact optional properties) | core |
   | 0012-ontology FR-001 to FR-007 (RDF as typed values, vocabularies, schemas, code lists, checks, writers, no reader) | rdf |
+  | FR-047 (the typed command-line parser), FR-072 (command trees); 0006-signals FR-022 (the palette), FR-025 (the terminal emulator) | terminal |
 
 - **FR-011**: The consumers of the packages, `erga` and `stolos`, MUST import a library by its package name once it is published and MUST NOT import `commons/ts/*` for what a library holds.
 - **FR-012**: A move of modules MUST rewrite, in the same commit, every importer of them in this repository (relative paths and the barrel `@intellectual-frontiers/commons/ts/kernel` alike) to the package name of their library, MUST add the dependency to each package that imports it, and MUST leave no re-export of the moved modules behind.

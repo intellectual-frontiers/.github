@@ -1,3 +1,4 @@
+// Spec: 0001-terminal FR-004
 /**
  * Display width: how many columns of a terminal a text takes, and a text cut to a number of columns (commons 0006-signals FR-023). An
  * escape sequence takes none and is never split; a grapheme (what a person sees as one character, found with `Intl.Segmenter`) is never

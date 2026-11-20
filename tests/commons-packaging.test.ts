@@ -383,7 +383,7 @@ type Ran = { readonly code: number; readonly stdout: string; readonly stderr: st
 /** What of commons the generator and the type checker need: the ontology, the tools, the generated files and the kernel the ontology is typed by. */
 const COPIED = ["about.ts", "generated", "ontology", "tools", "ts/kernel"];
 /** The libraries lifted out of the kernel, which it and the ontology import (a copy of each, linked by package name). */
-const LIFTED = ["core", "rdf"];
+const LIFTED = ["core", "rdf", "terminal"];
 
 class Copy {
   readonly root: string;

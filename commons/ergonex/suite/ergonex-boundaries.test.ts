@@ -53,6 +53,7 @@ const isHostLayer = (f: string): boolean =>
 /** The packages of commons the pure core may import: the foundation (core), the kernel, and the Git host (its types and the reading of a remote). */
 const PURE_PACKAGES = [
   "@intellectual-frontiers/core",
+  "@intellectual-frontiers/terminal/args",
   "@intellectual-frontiers/commons/ts/kernel",
   "@intellectual-frontiers/commons/ts/githost",
 ];

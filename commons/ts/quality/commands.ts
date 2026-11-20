@@ -12,7 +12,7 @@
  *
  * @module
  */
-import { flag, formatUsageError, helpText, parseArgs, type Parser, value } from "../kernel/args.ts";
+import { flag, formatUsageError, helpText, parseArgs, type Parser, value } from "@intellectual-frontiers/terminal/args";
 import { err, ok } from "@intellectual-frontiers/core";
 import { exists, readTextFile, writeTextFile } from "../runtime/fs.ts";
 import { build, runtimeName, runtimeVersion } from "../runtime/proc.ts";

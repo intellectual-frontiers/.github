@@ -1,17 +1,17 @@
 /**
  * Tests of `kernel/width.ts`: display widths of wide characters, emoji and escape sequences, and texts cut to a width without splitting a
- * grapheme or an escape sequence, with properties over arbitrary text (commons 0006-signals FR-023).
+ * grapheme or an escape sequence, with properties over arbitrary text (commons 0001-terminal FR-004).
  *
  * @module
  */
 import fc from "fast-check";
 import { plain } from "@intellectual-frontiers/core";
-import { cutToWidth, displayWidth, graphemes, graphemeWidth, RESET, sgrParams, splitAtWidth, tokens } from "../../kernel/width.ts";
-import { assert, assertEquals, proves } from "../../runtime/test.ts";
+import { cutToWidth, displayWidth, graphemes, graphemeWidth, RESET, sgrParams, splitAtWidth, tokens } from "../src/width.ts";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 
 const E = "\u001b";
 
-proves(["0006-signals FR-023"], "wide characters and emoji take two columns, marks and escape sequences none", () => {
+proves(["0001-terminal FR-004"], "wide characters and emoji take two columns, marks and escape sequences none", () => {
   for (const two of [
     "✅",
     "❌",
@@ -43,7 +43,7 @@ proves(["0006-signals FR-023"], "wide characters and emoji take two columns, mar
   assertEquals(graphemeWidth(""), 0);
 });
 
-proves(["0006-signals FR-023"], "a line holding ✅ 测试 at a width of 6 is cut after 测", () => {
+proves(["0001-terminal FR-004"], "a line holding ✅ 测试 at a width of 6 is cut after 测", () => {
   assertEquals(displayWidth("✅ 测试"), 7);
   assertEquals(cutToWidth("✅ 测试", 6), "✅ 测");
   assertEquals(cutToWidth("✅ 测试", 7), "✅ 测试", "a text that fits is kept");
@@ -53,7 +53,7 @@ proves(["0006-signals FR-023"], "a line holding ✅ 测试 at a width of 6 is cu
   assertEquals(cutToWidth("abcdef", 3, "..."), "...");
 });
 
-proves(["0006-signals FR-023"], "escape sequences are kept whole, and a style open at the cut is reset", () => {
+proves(["0001-terminal FR-004"], "escape sequences are kept whole, and a style open at the cut is reset", () => {
   assertEquals(cutToWidth(`${E}[31mfailed badly${E}[0m`, 7, "…"), `${E}[31mfailed…${RESET}`);
   assertEquals(cutToWidth(`${E}[1mab${E}[0mcdef`, 3), `${E}[1mab${E}[0mc`, "no reset where none is open");
   assertEquals(cutToWidth(`${E}[38;5;0mabcdef`, 2), `${E}[38;5;0mab${RESET}`, "a colour whose last parameter is 0 is still a colour");
@@ -79,7 +79,7 @@ const piece = fc.oneof(
 );
 const line = fc.array(piece, { maxLength: 12 }).map((ps) => ps.join(""));
 
-proves(["0006-signals FR-023"], "a text cut fits its width, and its head and tail make the text and its width again (property)", () => {
+proves(["0001-terminal FR-004"], "a text cut fits its width, and its head and tail make the text and its width again (property)", () => {
   fc.assert(
     fc.property(line, fc.nat(30), (text, width) => {
       const cut = cutToWidth(text, width);

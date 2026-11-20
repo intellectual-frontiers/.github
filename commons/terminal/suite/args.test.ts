@@ -22,12 +22,11 @@ import {
   suggest,
   type UsageError,
   value,
-} from "../../kernel/args.ts";
+} from "../src/args.ts";
 import { literal, err, ok, type Result, type Equal, expectType } from "@intellectual-frontiers/core";
-import { assertEquals, fail, proves } from "../../runtime/test.ts";
+import { assertEquals, fail, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 
-const FR = "0005-typescript-runtime FR-047";
-const TYPES = "0005-typescript-runtime FR-014";
+const FR = "0001-terminal FR-001";
 
 const spec = {
   verbose: flag({ short: "v", help: "Say more." }),
@@ -259,7 +258,7 @@ proves([FR], "the help: summary, usage, options aligned with defaults and notes,
   );
 });
 
-proves([FR, TYPES], "the parsed options' type is inferred from the declaration", () => {
+proves([FR], "the parsed options' type is inferred from the declaration", () => {
   const r = parseArgs([], spec);
   const options = args(r).options;
   expectType<
@@ -290,7 +289,7 @@ proves([FR, TYPES], "the parsed options' type is inferred from the declaration",
   assertEquals(options, NONE);
 });
 
-proves([FR, TYPES], "a malformed declaration does not compile (negative controls)", () => {
+proves([FR], "a malformed declaration does not compile (negative controls)", () => {
   // @ts-expect-error -- a short option is one letter
   flag({ short: "vv", help: "x" });
   // @ts-expect-error -- the letter h is help's
@@ -324,7 +323,7 @@ const word = fc.string({ maxLength: 8 }).filter((s) => s !== "--help" && !/^-[A-
 /** An argument: a word that does not start with a dash. */
 const argument = fc.string({ maxLength: 8 }).filter((s) => !s.startsWith("-"));
 
-proves([FR, TYPES], "declared options written into a command line in any valid form parse back to the same values (round trip)", () => {
+proves([FR], "declared options written into a command line in any valid form parse back to the same values (round trip)", () => {
   const operands: readonly Operand[] = [{ name: "FILE", help: "Files.", arity: "many" }];
   const arb = fc.record({
     verbose: fc.boolean(),

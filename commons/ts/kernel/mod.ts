@@ -64,12 +64,10 @@ export {
 } from "./archive.ts";
 export type { ArchiveError, Files, TarEntry, TarHeader, TarStreamEntry, ZipEntry } from "./archive.ts";
 export { fromBase64, fromBase64Url, toBase64, toBase64Url } from "./base64.ts";
-export * as args from "./args.ts";
 export * as assess from "./assess.ts";
 export * as attest from "./attest.ts";
 export * as cms from "./cms.ts";
 export * as cbor from "./cbor.ts";
-export * as commands from "./commands.ts";
 export * as cose from "./cose.ts";
 export { csvField, formatCsvError, parseCsv, parseCsvRecords, toCsv } from "./csv.ts";
 export type { CsvError, CsvOptions } from "./csv.ts";
@@ -117,7 +115,6 @@ export * as ocsf from "./ocsf.ts";
 export * as oscal from "./oscal.ts";
 export * as otel from "./otel.ts";
 export * as otlp from "./otlp.ts";
-export * as palette from "./palette.ts";
 export * as png from "./png.ts";
 export * as render from "./render.ts";
 export * as jobs from "./schedule.ts";
@@ -132,9 +129,7 @@ export type { TomlDateTime, TomlError, TomlTable, TomlValue } from "./toml.ts";
 export { BARE_KEY, exportedLiteral, parseTsLiteral, tsKey, tsLiteral } from "./ts-literal.ts";
 export type { Literal, LiteralError, LiteralShape } from "./ts-literal.ts";
 export * as uuid from "./uuid.ts";
-export * as vt from "./vt.ts";
 export * as webauthn from "./webauthn.ts";
-export * as width from "./width.ts";
 export {
   attribute,
   child,

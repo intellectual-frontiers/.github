@@ -51,9 +51,9 @@ import {
   type SpanEvent,
 } from "./otel.ts";
 import { encodeLogs } from "./otlp.ts";
-import { type Capabilities, label, type MarkKind, mark, paint } from "./palette.ts";
+import { type Capabilities, label, type MarkKind, mark, paint } from "@intellectual-frontiers/terminal/palette";
 import { type Declarations, type Registry, type Role, roleOf, type Source, type SpanStart } from "./signals.ts";
-import { cutToWidth } from "./width.ts";
+import { cutToWidth } from "@intellectual-frontiers/terminal/width";
 
 /** How the console writes: see the module. */
 export type Mode = "attended" | "plain" | "quiet" | "silent" | "json";

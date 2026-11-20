@@ -1,13 +1,13 @@
 /**
  * Tests of `kernel/vt.ts`: the terminal emulator that snapshot tests read the console through, against what xterm shows for the same
- * bytes (commons 0006-signals FR-025), with properties: plain text comes out wrapped at the width, and a cut line never wraps (FR-023).
+ * bytes (commons 0001-terminal FR-005), with properties: plain text comes out wrapped at the width, and a cut line never wraps (FR-023).
  *
  * @module
  */
 import fc from "fast-check";
-import { createScreen, describeStyle, type Screen } from "../../kernel/vt.ts";
-import { cutToWidth, graphemes, graphemeWidth } from "../../kernel/width.ts";
-import { assertEquals, proves } from "../../runtime/test.ts";
+import { createScreen, describeStyle, type Screen } from "../src/vt.ts";
+import { cutToWidth, graphemes, graphemeWidth } from "../src/width.ts";
+import { assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 
 const E = "\u001b";
 const BEL = String.fromCharCode(7);
@@ -20,7 +20,7 @@ const styleAt = (s: Screen, row: number, col: number): string => {
 const runs = (s: Screen): readonly (readonly (readonly [string, string])[])[] =>
   s.styled().map((l) => l.map((r) => [r.text, describeStyle(r.style)] as const));
 
-proves(["0006-signals FR-025"], "carriage return, line feed, backspace and tab", () => {
+proves(["0001-terminal FR-005"], "carriage return, line feed, backspace and tab", () => {
   const s = createScreen({ width: 20 });
   s.write("hello\rj");
   assertEquals(s.text(), "jello");
@@ -35,7 +35,7 @@ proves(["0006-signals FR-025"], "carriage return, line feed, backspace and tab",
   assertEquals(crlf.text(), "ab\ncd");
 });
 
-proves(["0006-signals FR-025"], "cursor movement and erase in line and in display redraw a live region in place", () => {
+proves(["0001-terminal FR-005"], "cursor movement and erase in line and in display redraw a live region in place", () => {
   const s = createScreen({ width: 30 });
   s.write("done one\nrunning two 1s\nrunning three 0s\n");
   s.write(`${E}[2A${E}[2Krunning two 2s\n${E}[2K✅ three\n`);
@@ -58,7 +58,7 @@ proves(["0006-signals FR-025"], "cursor movement and erase in line and in displa
   assertEquals(s.text(), " ".repeat(29) + "z", "movement stops at the edges");
 });
 
-proves(["0006-signals FR-025"], "colour sequences are kept apart from the text, cell by cell", () => {
+proves(["0001-terminal FR-005"], "colour sequences are kept apart from the text, cell by cell", () => {
   const s = createScreen({ width: 40 });
   s.write(`${E}[1;32m✅ ok${E}[0m plain ${E}[2mdim${E}[22m ${E}[38;5;208mo${E}[38;2;1;2;3mr${E}[39m ${E}[41;97mbg${E}[m`);
   assertEquals(s.text(), "✅ ok plain dim or bg");
@@ -84,7 +84,7 @@ proves(["0006-signals FR-025"], "colour sequences are kept apart from the text, 
   assertEquals(styled.text(), "");
 });
 
-proves(["0006-signals FR-025"], "wide characters, emoji and combining marks by display width", () => {
+proves(["0001-terminal FR-005"], "wide characters, emoji and combining marks by display width", () => {
   const s = createScreen({ width: 6 });
   s.write("✅ 测试");
   assertEquals(s.text(), "✅ 测\n试", "a wide character that does not fit wraps whole");
@@ -101,7 +101,7 @@ proves(["0006-signals FR-025"], "wide characters, emoji and combining marks by d
   assertEquals(exact.text(), "abcd\nefgh\ni");
 });
 
-proves(["0006-signals FR-025"], "a screen of a given height scrolls", () => {
+proves(["0001-terminal FR-005"], "a screen of a given height scrolls", () => {
   const s = createScreen({ width: 5, height: 2 });
   s.write("one\ntwo\nthree");
   assertEquals(s.lines(), ["two", "three"]);
@@ -111,7 +111,7 @@ proves(["0006-signals FR-025"], "a screen of a given height scrolls", () => {
   assertEquals(s.cell(2, 0), undefined);
 });
 
-proves(["0006-signals FR-025"], "cursor shown and hidden; OSC, unknown and split sequences ignored safely", () => {
+proves(["0001-terminal FR-005"], "cursor shown and hidden; OSC, unknown and split sequences ignored safely", () => {
   const s = createScreen({ width: 20 });
   s.write(`${E}[?25l`);
   assertEquals(s.cursor().visible, false);
@@ -159,7 +159,7 @@ const plainText = fc
   .array(fc.constantFrom("a", "b", " ", "测", "✅", "é", "e\u{301}", "\u{26a0}\u{fe0f}", "\n", "xyz"), { maxLength: 40 })
   .map((ps) => ps.join(""));
 
-proves(["0006-signals FR-025"], "plain text written to a screen reads back wrapped at its width (property)", () => {
+proves(["0001-terminal FR-005"], "plain text written to a screen reads back wrapped at its width (property)", () => {
   fc.assert(
     fc.property(plainText, fc.integer({ min: 2, max: 12 }), (text, width) => {
       const s = createScreen({ width });
@@ -169,7 +169,7 @@ proves(["0006-signals FR-025"], "plain text written to a screen reads back wrapp
   );
 });
 
-proves(["0006-signals FR-023", "0006-signals FR-025"], "a line cut to the width never wraps, and leaves no style on (property)", () => {
+proves(["0001-terminal FR-004", "0001-terminal FR-005"], "a line cut to the width never wraps, and leaves no style on (property)", () => {
   const piece = fc.oneof(
     fc.constantFrom("a", " ", "测", "✅", "e\u{301}", "\u{26a0}\u{fe0f}", "word"),
     fc.constantFrom(`${E}[31m`, `${E}[1;42m`, `${E}[0m`, `${E}[38;5;0m`),

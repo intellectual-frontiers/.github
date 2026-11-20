@@ -254,7 +254,7 @@ proves(
   ["0032-lifting-libraries FR-009"],
   "the publish workflow of a library skips a registry that has the version already, and tags the version from the main branch once it is on its registry, with the runner's token, whoever put it there",
   () => {
-    for (const lib of ["core", "rdf", "ergonex"]) {
+    for (const lib of ["core", "rdf", "terminal", "ergonex"]) {
       const w = readTextFileSync(join(ROOT, ".github", "workflows", `${lib}-publish.auto.yml`));
       // each registry's job asks the registry first and publishes only where the version is not there
       assertStringIncludes(w, "id: have");

@@ -14,8 +14,8 @@ import { SEVERITY } from "../../kernel/otel.ts";
 import { decodeLogs } from "../../kernel/otlp.ts";
 import { chooseMode, duration, initial, type Input, type Mode, parseMode, progressText, render, type State } from "../../kernel/render.ts";
 import { createTelemetry, defineSignals, type FlushResult, type Processor } from "../../kernel/signals.ts";
-import { createScreen, describeStyle, type Screen } from "../../kernel/vt.ts";
-import { cutToWidth } from "../../kernel/width.ts";
+import { createScreen, describeStyle, type Screen } from "@intellectual-frontiers/terminal/vt";
+import { cutToWidth } from "@intellectual-frontiers/terminal/width";
 import { assert, assertEquals, proves } from "../../runtime/test.ts";
 
 const MODES = "0006-signals FR-021";

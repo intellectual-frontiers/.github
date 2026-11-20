@@ -1,3 +1,4 @@
+// Spec: 0001-terminal FR-003
 /**
  * The console's one palette (commons 0006-signals FR-022): the colour roles as a union type, and the marks a person reads at a glance,
  * each with an ASCII fallback for a terminal with no emoji. Whether colour and emoji may be used is the terminal's (commons

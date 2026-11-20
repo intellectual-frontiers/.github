@@ -316,6 +316,8 @@ export async function packLibrary(root: string, options: PackOptions = {}): Prom
           outDir: "out",
           types: options.types ?? [],
           skipLibCheck: true,
+          // another library of commons is read where the package manager linked it (under node_modules), so that a declaration names it by its package and its entry and never by the path of its sources
+          preserveSymlinks: true,
           // a bundle's declarations are made from the sources of the packages of commons that are not on npm, which the compiler emits only when it reads them as sources and not through node_modules
           ...(bundle === undefined ? {} : { paths: commonsPaths(commons, dist) }),
         },

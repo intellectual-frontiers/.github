@@ -1,3 +1,4 @@
+// Spec: 0001-terminal FR-002
 /**
  * A command tree declared once as data (commons 0005-typescript-runtime FR-072): a command of groups and verbs to any depth, each with a
  * name and a summary, and each verb with its options (`./args.ts`'s declaration) and its arguments. From that declaration alone it

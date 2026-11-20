@@ -1,3 +1,4 @@
+// Spec: 0001-terminal FR-005
 /**
  * A small terminal emulator for snapshot tests (commons 0006-signals FR-025): a screen a given number of columns wide, either growing as it
  * is written to (no height) or a given number of rows high and scrolling, that is fed what a program writes and shows what a person would

@@ -7,6 +7,7 @@
       "dependencies": {
         "@intellectual-frontiers/core": "link:../core",
         "@intellectual-frontiers/rdf": "link:../rdf",
+        "@intellectual-frontiers/terminal": "link:../terminal",
       },
       "devDependencies": {
         "@types/node": "26.6.6",
@@ -19,6 +20,8 @@
     "@intellectual-frontiers/core": ["@intellectual-frontiers/core@link:../core", {}],
 
     "@intellectual-frontiers/rdf": ["@intellectual-frontiers/rdf@link:../rdf", {}],
+
+    "@intellectual-frontiers/terminal": ["@intellectual-frontiers/terminal@link:../terminal", {}],
 
     "@types/node": ["@types/node@26.6.6", "", { "dependencies": { "undici-types": "~8.9.0" } }, "sha512-MzQj+8Kx3XI40OmUAE6Qoh58ZMNstNNMwn2nfd3qWsfe7nDNSqJNzes4njhz6AHwrSHOffSLwXU6yb474Q4aog=="],
 

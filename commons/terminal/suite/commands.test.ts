@@ -5,11 +5,11 @@
  *
  * @module
  */
-import { flag } from "../../kernel/args.ts";
-import { commandHelp, formatCommandError, group, resolveCommand, treeProblems, validCommandName, verb } from "../../kernel/commands.ts";
-import { assert, assertEquals, assertStringIncludes, fail, proves } from "../../runtime/test.ts";
+import { flag } from "../src/args.ts";
+import { commandHelp, formatCommandError, group, resolveCommand, treeProblems, validCommandName, verb } from "../src/commands.ts";
+import { assert, assertEquals, assertStringIncludes, fail, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 
-const FR = "0005-typescript-runtime FR-072";
+const FR = "0001-terminal FR-002";
 
 const build = verb({
   name: "build",

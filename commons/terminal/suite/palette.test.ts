@@ -1,17 +1,17 @@
 /**
  * Tests of `kernel/palette.ts`: the marks and their ASCII fallbacks, colour only where allowed, and the roles as a closed union
- * (commons 0006-signals FR-022).
+ * (commons 0001-terminal FR-003).
  *
  * @module
  */
 import fc from "fast-check";
-import { type Capabilities, label, MARK_KINDS, MARKS, type MarkKind, mark, paint, type Role, ROLES, sgrOf } from "../../kernel/palette.ts";
+import { type Capabilities, label, MARK_KINDS, MARKS, type MarkKind, mark, paint, type Role, ROLES, sgrOf } from "../src/palette.ts";
 import { plain, type Equal, expectType } from "@intellectual-frontiers/core";
-import { createScreen, describeStyle } from "../../kernel/vt.ts";
-import { displayWidth } from "../../kernel/width.ts";
-import { assert, assertEquals, proves } from "../../runtime/test.ts";
+import { createScreen, describeStyle } from "../src/vt.ts";
+import { displayWidth } from "../src/width.ts";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 
-proves(["0006-signals FR-022"], "every mark is one emoji of two columns, with its ASCII fallback where there are no emoji", () => {
+proves(["0001-terminal FR-003"], "every mark is one emoji of two columns, with its ASCII fallback where there are no emoji", () => {
   const expected: Readonly<Record<MarkKind, readonly [string, string]>> = {
     done: ["✅", "[ok]"],
     failed: ["❌", "[x]"],
@@ -30,7 +30,7 @@ proves(["0006-signals FR-022"], "every mark is one emoji of two columns, with it
   assertEquals(Object.keys(MARKS).sort(), [...MARK_KINDS].sort());
 });
 
-proves(["0006-signals FR-022"], "colour only where it is allowed, always reset after, never for plain or an empty text", () => {
+proves(["0001-terminal FR-003"], "colour only where it is allowed, always reset after, never for plain or an empty text", () => {
   assertEquals(paint("failure", "3 failed", { colour: true }), "\u001b[31m3 failed\u001b[0m");
   assertEquals(paint("failure", "3 failed", { colour: false }), "3 failed");
   assertEquals(paint("plain", "x", { colour: true }), "x");
@@ -52,7 +52,7 @@ proves(["0006-signals FR-022"], "colour only where it is allowed, always reset a
   );
 });
 
-proves(["0006-signals FR-022"], "a painted text without colour is the text, and with colour reads back as the text (property)", () => {
+proves(["0001-terminal FR-003"], "a painted text without colour is the text, and with colour reads back as the text (property)", () => {
   fc.assert(
     fc.property(fc.constantFrom(...ROLES), fc.string(), fc.boolean(), (role, text, colour) => {
       const out = paint(role, text, { colour });
@@ -63,7 +63,7 @@ proves(["0006-signals FR-022"], "a painted text without colour is the text, and 
   );
 });
 
-proves(["0006-signals FR-022"], "the roles and marks are closed unions, and a runtime Look is a Capabilities", () => {
+proves(["0001-terminal FR-003"], "the roles and marks are closed unions, and a runtime Look is a Capabilities", () => {
   expectType<Equal<Role, "success" | "failure" | "skipped" | "cancelled" | "hint" | "warning" | "dim" | "accent" | "plain">>();
   expectType<Equal<MarkKind, "done" | "failed" | "skipped" | "cancelled" | "hint" | "warning" | "pending" | "action">>();
   const look = { tty: true, colour: true, emoji: false, columns: 80 };
