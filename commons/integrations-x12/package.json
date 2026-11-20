@@ -1,0 +1,32 @@
+{
+  "name": "@intellectual-frontiers/integrations-x12",
+  "private": true,
+  "version": "0.1.0",
+  "description": "The X12 envelope and acknowledgement skeleton of Integrations: the entries of X12 and of the HIPAA 5010 and purchasing transaction sets with their licence as data, a codec for the fixed-width ISA envelope and its ISA, GS and ST levels, control counts checked as findings, TA1 and 999 made and read, and a loader of a schema from the user's own transcription of a licensed guide. It embeds no standard.",
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "exports": {
+    ".": "./src/mod.ts"
+  },
+  "scripts": {
+    "check": "tsc -p tsconfig.json",
+    "test": "bun test suite/",
+    "test:node": "node --test \"suite/**/*.test.ts\"",
+    "verify": "tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../libraries/src/check.ts --root spec-kit --level L1 && bun tools/check.ts && bun test suite/ && bun tools/pack.ts --check",
+    "pack": "bun tools/pack.ts"
+  },
+  "devDependencies": {
+    "@intellectual-frontiers/commons": "link:../ts",
+    "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/integrations": "link:../integrations",
+    "@intellectual-frontiers/libraries": "link:../libraries",
+    "@intellectual-frontiers/mizan": "link:../mizan",
+    "@intellectual-frontiers/system": "link:../system",
+    "@intellectual-frontiers/test": "link:../test",
+    "@types/node": "26.6.6",
+    "fast-check": "4.10.2",
+    "typescript": "7.0.2"
+  }
+}

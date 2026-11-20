@@ -43,11 +43,22 @@ export function statusOf(a: Acknowledgement): AckStatus {
           return absurd(a.code);
       }
     case "fhir-operation-outcome":
-      return a.issues.some((i) => i.severity === "error") ? "rejected" : a.issues.length > 0 ? "accepted-with-errors" : "accepted";
+      return a.issues.some((i) => i.severity === "error") ? "rejected" : a.issues.some((i) => i.severity === "warning") ? "accepted-with-errors" : "accepted";
     default:
       return absurd(a);
   }
 }
+
+const ACK_KIND_TABLE: Readonly<Record<Acknowledgement["kind"], true>> = { "x12-ta1": true, "x12-999": true, "hl7-ack": true, "fhir-operation-outcome": true };
+
+/** Every kind of acknowledgement, as a closed list of strings a consumer may carry as data. */
+export const ACK_KINDS: readonly Acknowledgement["kind"][] = Object.keys(ACK_KIND_TABLE).filter((k): k is Acknowledgement["kind"] => Object.hasOwn(ACK_KIND_TABLE, k));
+
+/** Every acknowledgement status. */
+export const ACK_STATUSES: readonly AckStatus[] = ["accepted", "accepted-with-errors", "rejected"];
+
+/** Every reason a message is rejected: the partner said no (`nack`), or it was invalid on receipt (`invalid`). */
+export const REJECTION_KINDS: readonly (Extract<ExchangeState, { kind: "rejected" }>["reason"])[] = ["nack", "invalid"];
 
 /** Where a message is in its life. */
 export type ExchangeState =

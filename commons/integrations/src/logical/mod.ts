@@ -10,6 +10,7 @@
 export * from "./conformance.ts";
 export * from "./constraints.ts";
 export * from "./exchange.ts";
+export * from "./ledger.ts";
 export * from "./mapping.ts";
 export * from "./observe.ts";
 export * from "./plugin.ts";

@@ -1,0 +1,9 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-integrations-x12-skeleton FR-001	check	.github: cd commons/integrations-x12 && bun run verify	suite/x12.test.ts: the entries refuse embedding
+0001-integrations-x12-skeleton FR-002	check	.github: cd commons/integrations-x12 && bun run verify	suite/x12.test.ts: the envelope round-trips
+0001-integrations-x12-skeleton FR-003	check	.github: cd commons/integrations-x12 && bun run verify	suite/x12.test.ts: conformance
+0001-integrations-x12-skeleton FR-004	check	.github: cd commons/integrations-x12 && bun run verify	suite/x12.test.ts: syntax failures by code
+0001-integrations-x12-skeleton FR-005	check	.github: cd commons/integrations-x12 && bun run verify	suite/x12.test.ts: control counts
+0001-integrations-x12-skeleton FR-006	check	.github: cd commons/integrations-x12 && bun run verify	suite/x12.test.ts: TA1, 999 and the loader

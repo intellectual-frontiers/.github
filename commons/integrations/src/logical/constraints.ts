@@ -35,6 +35,27 @@ export type FindingCode =
   | "lossy-mapping"
   | "mapping-target-conflict";
 
+const FINDING_CODE_TABLE: Readonly<Record<FindingCode, true>> = {
+  "syntax-error": true,
+  "unknown-path": true,
+  "cardinality-min": true,
+  "cardinality-max": true,
+  "value-pattern": true,
+  "value-fixed": true,
+  "code-not-in-terminology": true,
+  "terminology-unavailable": true,
+  "business-rule": true,
+  "unmapped-source-field": true,
+  "lossy-mapping": true,
+  "mapping-target-conflict": true,
+};
+
+/** Every finding code, as a closed list of strings a consumer may carry as data; the compiler holds it complete against `FindingCode`. */
+export const FINDING_CODES: readonly FindingCode[] = Object.keys(FINDING_CODE_TABLE).filter((k): k is FindingCode => Object.hasOwn(FINDING_CODE_TABLE, k));
+
+/** Every level of a finding. */
+export const FINDING_LEVELS: readonly FindingLevel[] = ["syntax", "schema", "profile", "terminology", "business-rule"];
+
 /** A finding: never a value of the payload. */
 export type Finding = { readonly level: FindingLevel; readonly severity: Severity; readonly code: FindingCode; readonly path: string; readonly message: string };
 
@@ -118,7 +139,7 @@ export function validate(t: Transaction, schema: Schema, options: { readonly pro
   if (t.id !== schema.transaction) out.push(finding("schema", "error", "unknown-path", t.id, "the transaction is not the schema's"));
   const known = new Set(schema.paths);
   for (const p of pathsOf(t)) {
-    if (!known.has(p) && ![...known].some((k) => p.startsWith(`${k}.`))) out.push(finding("schema", "error", "unknown-path", p));
+    if (!known.has(p) && ![...known].some((k) => k !== t.id && p.startsWith(`${k}.`))) out.push(finding("schema", "error", "unknown-path", p));
   }
   for (const c of schema.constraints) out.push(...checkConstraint(c, "schema", t, terms));
   if (options.profile !== undefined) for (const c of options.profile.constraints) out.push(...checkConstraint(c, "profile", t, terms));

@@ -19,12 +19,14 @@ export type Segment = { readonly kind: "segment"; readonly id: string; readonly 
 export type Loop = { readonly kind: "loop"; readonly id: string; readonly children: readonly Part[] };
 /** What a loop or a transaction holds. */
 export type Part = Segment | Loop;
+/** The segments that open and close a node, where its syntax has them (X12's ISA and IEA, GS and GE, ST and SE): kept so that what was read is written back and its control counts can be checked. */
+export type Envelope = { readonly header: readonly Segment[]; readonly trailer: readonly Segment[] };
 /** A transaction: one message or document (an 837, an ADT^A01, a FHIR resource). */
-export type Transaction = { readonly kind: "transaction"; readonly id: string; readonly control: string; readonly children: readonly Part[] };
+export type Transaction = { readonly kind: "transaction"; readonly id: string; readonly control: string; readonly children: readonly Part[]; readonly envelope?: Envelope };
 /** A group of transactions of one kind. */
-export type Group = { readonly kind: "group"; readonly id: string; readonly control: string; readonly transactions: readonly Transaction[] };
+export type Group = { readonly kind: "group"; readonly id: string; readonly control: string; readonly transactions: readonly Transaction[]; readonly envelope?: Envelope };
 /** An interchange: what is sent in one go, in one syntax. */
-export type Interchange = { readonly kind: "interchange"; readonly syntax: Ref<"syntax">; readonly control: string; readonly groups: readonly Group[] };
+export type Interchange = { readonly kind: "interchange"; readonly syntax: Ref<"syntax">; readonly control: string; readonly groups: readonly Group[]; readonly envelope?: Envelope };
 /** Any node of the tree. */
 export type TreeNode = Interchange | Group | Transaction | Part | Element;
 
@@ -111,6 +113,8 @@ export function occurrences(t: Transaction, path: string): readonly (readonly [s
 /** Every distinct value of a tree, longest first: what a scrub of a text must hide. */
 export function valuesOf(i: Interchange): readonly string[] {
   const out = new Set<string>();
+  const envelopes = [i.envelope, ...i.groups.flatMap((g) => [g.envelope, ...g.transactions.map((t) => t.envelope)])];
+  for (const env of envelopes) for (const s of [...(env?.header ?? []), ...(env?.trailer ?? [])]) for (const e of s.elements) if (e.value.trim() !== "") out.add(e.value.trim());
   for (const t of transactionsOf(i)) for (const e of entries(t)) if (e.value !== "") out.add(e.value);
   return [...out].sort((a, b) => b.length - a.length);
 }

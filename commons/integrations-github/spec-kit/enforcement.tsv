@@ -1,0 +1,7 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-integrations-github-connector FR-001	check	.github: cd commons/integrations-github && bun run verify	suite/github.test.ts: the governance is read-only, scoped and valid
+0001-integrations-github-connector FR-002	check	.github: cd commons/integrations-github && bun run verify	suite/github.test.ts: conformance finds nothing
+0001-integrations-github-connector FR-003	check	.github: cd commons/integrations-github && bun run verify	suite/github.test.ts: a failed policy and a gap
+0001-integrations-github-connector FR-004	check	.github: cd commons/integrations-github && bun run verify	suite/github.test.ts: no personal or secret field is kept
