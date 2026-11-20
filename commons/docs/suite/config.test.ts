@@ -25,7 +25,7 @@ proves(["0011-documentation FR-023"], "commons' configuration resolves: its root
   assertEquals([...kits.slice(1)].sort(), libraries.sort(), "every library that has a spec kit is named, and none that has not");
   assert(CONFIG.specKits.every((k) => k.layout === "commons"));
   assertEquals([CONFIG.citations.prefix, CONFIG.citations.digits], ["commons", 4]);
-  assertEquals(CONFIG.lenses.map((l) => l.name), ["data-models"]);
+  assertEquals(CONFIG.lenses.map((l) => l.name), ["data-models", "programs"]);
   assertEquals(CONFIG.out, path.join(ROOT, "_site"));
 });
 
