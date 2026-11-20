@@ -164,6 +164,7 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/archon-dialect-homebrew/spec-kit" },
     { layout: "commons", dir: "commons/archon-dialect-mise/spec-kit" },
     { layout: "commons", dir: "commons/archon-dialect-winget/spec-kit" },
+    { layout: "commons", dir: "commons/archon-tool/spec-kit" },
     { layout: "commons", dir: "commons/integrations-fhir/spec-kit" },
     { layout: "commons", dir: "commons/integrations-x12/spec-kit" },
     { layout: "commons", dir: "commons/kanon/spec-kit" },
