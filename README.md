@@ -45,6 +45,7 @@ flowchart TB
 - **IFQS** (Quality System): what is true of a system is what it reports when it runs, kept as evidence with a grade from E0 to E5. [`0021-ifqs`](commons/spec-kit/specs/0021-ifqs/spec.md)
 - **IFCCM** (Capabilities Configuration Management): the capability is the unit of change, and every commit names its issue on a line of its own. [`0020-ifccm`](commons/spec-kit/specs/0020-ifccm/spec.md)
 - **Headless**: an action is defined once, with what it may do, and drawn as a command line, a tool server (MCP), a REST service or an SSH-reached command, so a program has no window it cannot do without. [`commons/headless`](commons/headless/about.ts)
+- **Repoctl** is the operations program of this repository: the `repoctl` command makes every generated file in dependency order, merges without hand-resolving one, runs every check in one report, tells each library's version in the repository, on npm and in its tag, plans and publishes a release, scaffolds a library and makes the commit, as a person types it or as an AI agent calls it through a tool server, by audience tier. [`commons/repoctl`](commons/repoctl/about.ts)
 - **Ergonex** is the front door: the `ergonex` command sets up and runs a team's workspace (repositories, pinned tools, shell) on Windows, macOS and Linux, and shows its plan before it changes anything. [`commons/ergonex`](commons/ergonex/about.ts)
 
 ```sh
@@ -88,7 +89,7 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/integrations-github`](https://www.npmjs.com/package/@intellectual-frontiers/integrations-github) | Program | The reference connector of Integrations for the posture of one organization of a code host | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/libraries`](https://www.npmjs.com/package/@intellectual-frontiers/libraries) | Program | The tools of a repository of commons | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/package-managers`](https://www.npmjs.com/package/@intellectual-frontiers/package-managers) | Program | The shared kit of the dialects that drive a package manager | layers | L1 | GitHub, npm |
-| [`@intellectual-frontiers/repoctl`](https://www.npmjs.com/package/@intellectual-frontiers/repoctl) | Program | The one command, `repoctl` | layers | L1 | GitHub, npm |
+| [`@intellectual-frontiers/repoctl`](https://www.npmjs.com/package/@intellectual-frontiers/repoctl) | Program | The operations program of this repository | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/toolchain`](https://www.npmjs.com/package/@intellectual-frontiers/toolchain) | Program | A Kanon library of the tools a computer needs | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/integrations-fhir`](https://www.npmjs.com/package/@intellectual-frontiers/integrations-fhir) | Standard | The FHIR plugin of Integrations | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/integrations-x12`](https://www.npmjs.com/package/@intellectual-frontiers/integrations-x12) | Standard | The X12 envelope and acknowledgement skeleton of Integrations | - | L1 | GitHub, npm |
@@ -117,20 +118,20 @@ A comment says what a thing is. It cannot show how a model is layered or what a 
 
 - **The documentation site: <https://intellectual-frontiers.github.io/.github/>**, with every package, every specification and the generated API pages.
 - **A new developer:** start with the site's overview, then [`AGENTS.md`](AGENTS.md) for how the repository works, and the spec kit of the library you care about.
-- **A contributor:** [`AGENTS.md`](AGENTS.md) is the working agreement; the commons specifications are in [`commons/spec-kit/specs/`](commons/spec-kit/specs/) and each library's in its own `spec-kit/`.
-- **An AI agent:** read [`AGENTS.md`](AGENTS.md), then the site's [`llms.txt`](https://intellectual-frontiers.github.io/.github/llms.txt); every page of the site has a Markdown twin (`.md` beside the `.html`), and the models and programs have a JSON twin.
+- **A contributor:** [`AGENTS.md`](AGENTS.md) is the working agreement, and `bun run repoctl` is the command that operates the repository ([`commons/repoctl`](commons/repoctl/about.ts)); the commons specifications are in [`commons/spec-kit/specs/`](commons/spec-kit/specs/) and each library's in its own `spec-kit/`.
+- **An AI agent:** read [`AGENTS.md`](AGENTS.md), then the site's [`llms.txt`](https://intellectual-frontiers.github.io/.github/llms.txt); every page of the site has a Markdown twin (`.md` beside the `.html`), and the models and programs have a JSON twin. `repoctl mcp` serves the repository's operations as tools of a tool server, by audience tier.
 
 ## Contributing in five commands
 
 ```sh
-bun install                    # once, at the root
-bun run dev:check              # type-check and test what your change touches
-git commit -m "... Refs #N"    # every commit names its issue on a line of its own
-bun run release plan           # what the release would do, from the tags (writes nothing)
-ls commons/spec-kit/specs      # specifications live here, and in each library's spec-kit/
+bun install                                   # once, at the root
+bun run repoctl check                         # every check of the repository in one report, with a code for `repoctl explain <code>`
+bun run repoctl sync                          # every generated file, in dependency order (`sync --check` writes nothing; hooks run it)
+bun run repoctl commit -m "Subject" --refs N  # the commit with the repository's identity and trailers (`Refs #N` on a line of its own)
+bun run repoctl release plan                  # what the release would do, from the tags (writes nothing)
 ```
 
-Work spec first: change the specification, then the code, then the tests.
+`bun run dev:check` type-checks and tests what your change touches, and `bun run repoctl doctor` says what is wrong with a checkout. A branch is brought up to date with `bun run repoctl merge origin/main`, which makes a conflicting generated file again instead of leaving it to be resolved by hand. Work spec first: change the specification, then the code, then the tests (`commons/spec-kit/specs/`, and each library's own `spec-kit/`).
 
 ## License
 

@@ -160,7 +160,7 @@ export const releasePublishVerb = defineVerb({
   options: { confirm: value<never>({ help: "The confirmation the preview printed (`publish <n> <digest>`), typed by the person who publishes.", valueName: "PHRASE" }) },
   examples: [
     { args: ["--dry-run"], says: "The releases that would be sent, and the confirmation to type." },
-    { args: ["--yes", "--confirm", "publish 3 1a2b3c4d"], says: "Send them to npm, with the confirmation the preview printed (the releaser tier, INFRO_NPMJS_TOKEN in the environment)." },
+    { args: ["--yes", "--confirm", "'publish 3 1a2b3c4d'"], says: "Send them to npm, with the confirmation the preview printed (the releaser tier, INFRO_NPMJS_TOKEN in the environment)." },
   ],
   run: async (args, ctx, w) => {
     const file = await w.files.read(`${w.repo}/${RECORD_PATH}`);

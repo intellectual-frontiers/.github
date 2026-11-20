@@ -51,7 +51,7 @@ export function titleOf(name: string): string {
 const q = (s: string): string => JSON.stringify(s);
 
 /** An import line of a file that is written out: made here, so that the text of a scaffold is not read as an import of this file. */
-const imp = (what: string, from: string): string => `import ${what} from "${from}";`;
+const imp = (what: string, from: string): string => `import ${what} from ${JSON.stringify(from)};`;
 
 /** The files of a new library. */
 export function filesOf(l: NewLibrary): readonly NewFile[] {

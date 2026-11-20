@@ -14,6 +14,7 @@ import { releasesLens } from "./docs/lens/releases.ts";
 import { programLens } from "./docs/lens/program.ts";
 import { ergonexProgram, type ProgramHost } from "./ergonex/src/mod.ts";
 import { describe } from "./headless/src/describe/mod.ts";
+import { INERT_HOST as REPOCTL_INERT_HOST, repoctlProgram } from "./repoctl/src/mod.ts";
 import { allModules } from "./data/sql/cli/config.ts";
 import { describeModels } from "./data/sql/describe/mod.ts";
 import { dialect as duckdb } from "./data/sql/dialects/duckdb/mod.ts";
@@ -41,8 +42,8 @@ const dataModels = layeredLens({
 /** A host that does nothing: the tree of a program is made from it without reading anything, and `describe` never runs a command. */
 const INERT_HOST: ProgramHost = { env: {}, cwd: "/", today: "2026-11-20", platform: { os: "linux", arch: "x86_64", windows: false }, places: undefined, homeFor: () => undefined, stdin: () => Promise.resolve(""), argv: [], now: () => 0 } as unknown as ProgramHost;
 
-/** The programs built on headless, documented by tier from their own descriptions: ergonex, the workspaces tool. */
-const programs = programLens({ name: "programs", source: () => describe(ergonexProgram(INERT_HOST)) });
+/** The programs built on headless, documented by tier from their own descriptions: ergonex, the workspaces tool, and repoctl, the operations program of this repository. */
+const programs = programLens({ name: "programs", source: () => [...describe(ergonexProgram(INERT_HOST)), ...describe(repoctlProgram(REPOCTL_INERT_HOST))] });
 
 /** The libraries of commons: each folder with a manifest (`library.ts`), a `package.json` and an `about.ts`, in order of name. */
 const libraryNames: readonly string[] = readdirSync(new URL("./", import.meta.url), { withFileTypes: true })
@@ -155,6 +156,7 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/integrations-fhir/spec-kit" },
     { layout: "commons", dir: "commons/integrations-x12/spec-kit" },
     { layout: "commons", dir: "commons/kanon/spec-kit" },
+    { layout: "commons", dir: "commons/repoctl/spec-kit" },
   ],
   citations: { prefix: "commons", digits: 4, text: ["erga", "archon", "stolos", "thyra"] },
   lenses: [guides, releases, dataModels, programs],

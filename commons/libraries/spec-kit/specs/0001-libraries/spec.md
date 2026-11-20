@@ -67,7 +67,7 @@
 11. **Given** a host whose table declares a dialect and a library of that dialect's name that declares its family, **When** the manifests are checked, **Then** there is no finding, and for a dialect nobody registered or a registered one nobody declared there is one, per FR-016.
 12. **Given** a folder `commons/x/` with a manifest and no `LICENSE`, **When** `license.ts --check` runs, **Then** it exits 1, names `commons/x/LICENSE` and the command `bun commons/libraries/src/license.ts`, and running that command writes the file, per FR-019.
 13. **Given** a library whose manifest names the constant `X_VERSION` of `src/v.ts` and is raised by `apply`, **When** its version is written, **Then** the constant holds the new version, and a missing file or constant is a sentence that names it, per FR-020.
-14. **Given** a section in which two libraries hold the number FR-130, **When** the section is made again, **Then** the first keeps it and the second has the next number after the greatest, per FR-021.
+14. **Given** a section in which two libraries hold one generated number, **When** the section is made again, **Then** the first keeps it and the second has the next number after the greatest, per FR-021.
 
 ## Out of scope
 

@@ -11,7 +11,7 @@ import type { About } from "@intellectual-frontiers/commons/ts/kernel";
 export const about: About = {
   title: "Repoctl",
   summary:
-    "The one command, `repoctl`, that operates this repository: it makes every generated file in dependency order and rerurns only the stale ones (`sync`, and `sync --check` for CI and hooks), merges a reference and makes a conflicting generated file again instead of resolving it by hand (`merge`), " +
+    "The operations program of this repository, `repoctl`: one command that makes every generated file in dependency order and reruns only the stale ones (`sync`, and `sync --check` for CI and hooks), merges a reference and makes a conflicting generated file again instead of resolving it by hand (`merge`), " +
     "runs every check in one calm report with problem codes that `repoctl explain` explains (`check`), tells each library's version in the repository, on npm and in its tag (`status`), plans, makes and publishes a release behind the releaser tier and a typed confirmation (`release plan|apply|publish`), " +
     "scaffolds a library of commons (`new library`), makes the commit with the repository's identity and trailers and refuses what must not be committed (`commit`), and says what is wrong with a checkout (`doctor`). " +
     "It is a headless program in the layers of Kanon: its verbs are governance actions with reach policies and audience tiers (public, contributor, releaser), run through the command line, and served as tools by `repoctl mcp`, so that a person and an AI agent run the same deterministic repository operations. A library of commons with its own specifications.",

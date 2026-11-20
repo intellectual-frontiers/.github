@@ -16,7 +16,7 @@ export const library = {
   exports: [".", "./governance", "./logical", "./physical"],
   versionConstants: [{ file: "src/governance/version.ts", name: "REPOCTL_VERSION" }],
   summary:
-    "Repoctl, the operations program of this repository: one command, `repoctl`, that makes the generated files in dependency order and checks them, merges without hand-resolving a generated file, runs every check in one calm report, tells the version of each library in the repository, on npm and in its tag, plans and publishes a release behind a typed confirmation, scaffolds a library, makes the commit with its identity and trailers, and says what is wrong with a checkout, in the layers of Kanon on Headless, with a tool server by audience tier.",
+    "The operations program of this repository, `repoctl`: one command that makes the generated files in dependency order and checks them, merges without hand-resolving a generated file, runs every check in one calm report, tells the version of each library in the repository, on npm and in its tag, plans and publishes a release behind a typed confirmation, scaffolds a library, makes the commit with its identity and trailers, and says what is wrong with a checkout, in the layers of Kanon on Headless, with a tool server by audience tier.",
   kanon: {
     package: "@intellectual-frontiers/repoctl",
     units: [
