@@ -129,7 +129,8 @@ export function libraryFindings(repo: string): readonly string[] {
   if (!existsSync(ci)) found.push(".github/workflows/ci.auto.yml is missing (FR-010)");
   else {
     const w = read(ci);
-    if (!w.includes("commons/libraries/src/plan.ts")) found.push(".github/workflows/ci.auto.yml does not plan the libraries a change affects (FR-010)");
+    if (!w.includes("commons/libraries/src/plan.ts"))
+      found.push(".github/workflows/ci.auto.yml does not plan the libraries a change affects (FR-010)");
     if (!w.includes("run: ${{ matrix.verify }}")) found.push(".github/workflows/ci.auto.yml does not run verify (FR-010)");
     if (!w.includes('- "commons/**"')) found.push(".github/workflows/ci.auto.yml is not triggered by commons/** (FR-010)");
   }
@@ -276,16 +277,20 @@ proves([`${SPEC} FR-009`], "a library whose spec kit the documentation does not 
   assertStringIncludes(libraryFindings(c.repo).join("\n"), "docs.config.ts does not name commons/data/spec-kit exactly once");
 });
 
-proves([`${SPEC} FR-010`], "the libraries are proved by the one workflow ci, which plans and runs verify; a missing one, one that does not plan or run verify, and a library with a workflow of its own are found", () => {
-  using c = copyOf();
-  assertEquals(libraryFindings(c.repo), []);
-  edit(`${c.repo}/.github/workflows/ci.auto.yml`, "run: ${{ matrix.verify }}", "run: bun test");
-  edit(`${c.repo}/.github/workflows/ci.auto.yml`, "run: ${{ matrix.verify }}", "run: bun test");
-  assertStringIncludes(libraryFindings(c.repo).join("\n"), "ci.auto.yml does not run verify");
-  edit(`${c.repo}/.github/workflows/ci.auto.yml`, "commons/libraries/src/plan.ts", "commons/libraries/src/other.ts");
-  assertStringIncludes(libraryFindings(c.repo).join("\n"), "ci.auto.yml does not plan the libraries");
-  writeFileSync(`${c.repo}/.github/workflows/data.auto.yml`, "name: data\n");
-  assertStringIncludes(libraryFindings(c.repo).join("\n"), "data.auto.yml is a workflow of a library of its own");
-  fs.removeSync(`${c.repo}/.github/workflows/ci.auto.yml`);
-  assertStringIncludes(libraryFindings(c.repo).join("\n"), ".github/workflows/ci.auto.yml is missing");
-});
+proves(
+  [`${SPEC} FR-010`],
+  "the libraries are proved by the one workflow ci, which plans and runs verify; a missing one, one that does not plan or run verify, and a library with a workflow of its own are found",
+  () => {
+    using c = copyOf();
+    assertEquals(libraryFindings(c.repo), []);
+    edit(`${c.repo}/.github/workflows/ci.auto.yml`, "run: ${{ matrix.verify }}", "run: bun test");
+    edit(`${c.repo}/.github/workflows/ci.auto.yml`, "run: ${{ matrix.verify }}", "run: bun test");
+    assertStringIncludes(libraryFindings(c.repo).join("\n"), "ci.auto.yml does not run verify");
+    edit(`${c.repo}/.github/workflows/ci.auto.yml`, "commons/libraries/src/plan.ts", "commons/libraries/src/other.ts");
+    assertStringIncludes(libraryFindings(c.repo).join("\n"), "ci.auto.yml does not plan the libraries");
+    writeFileSync(`${c.repo}/.github/workflows/data.auto.yml`, "name: data\n");
+    assertStringIncludes(libraryFindings(c.repo).join("\n"), "data.auto.yml is a workflow of a library of its own");
+    fs.removeSync(`${c.repo}/.github/workflows/ci.auto.yml`);
+    assertStringIncludes(libraryFindings(c.repo).join("\n"), ".github/workflows/ci.auto.yml is missing");
+  },
+);
