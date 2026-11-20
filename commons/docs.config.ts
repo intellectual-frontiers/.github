@@ -8,6 +8,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import type { About, DocsConfig, PackageConfig } from "./docs/config.ts";
 import { layeredLens } from "./docs/lens/layered.ts";
+import { guidesLens } from "./docs/lens/guides.ts";
 import { programLens } from "./docs/lens/program.ts";
 import { ergonexProgram, type ProgramHost } from "./ergonex/src/mod.ts";
 import { describe } from "./headless/src/describe/mod.ts";
@@ -75,6 +76,33 @@ async function libraryPackage(name: string): Promise<PackageConfig> {
   return { dir: `commons/${name}`, slug: name, about: entryPoints.length === 0 ? about : { ...about, areas: [{ title: about.title, slug: name, entryPoints, folder: commonFolder(entryPoints) }] } };
 }
 
+/** The pages people write for a newcomer: a path for each kind of reader, the concepts, and how to do the common things. */
+const guides = guidesLens({
+  name: "guides",
+  guides: [
+    { file: "commons/docs/guides/start-index.md", path: "start/index.html", section: "start", group: "Start here", order: 0 },
+    { file: "commons/docs/guides/new-developer.md", path: "start/new-developer.html", section: "start", group: "Start here", order: 1 },
+    { file: "commons/docs/guides/contributor.md", path: "start/contributor.html", section: "start", group: "Start here", order: 2 },
+    { file: "commons/docs/guides/agent.md", path: "start/agent.html", section: "start", group: "Start here", order: 3 },
+    { file: "commons/docs/guides/auditor.md", path: "start/auditor.html", section: "start", group: "Start here", order: 4 },
+    { file: "commons/docs/guides/concepts-index.md", path: "concepts/index.html", section: "concepts", group: "Concepts", order: 0 },
+    { file: "commons/docs/guides/concept-mizan.md", path: "concepts/mizan.html", section: "concepts", group: "Concepts", order: 1 },
+    { file: "commons/docs/guides/concept-kanon.md", path: "concepts/kanon.html", section: "concepts", group: "Concepts", order: 2 },
+    { file: "commons/docs/guides/concept-ladder.md", path: "concepts/ladder.html", section: "concepts", group: "Concepts", order: 3 },
+    { file: "commons/docs/guides/concept-standards-first.md", path: "concepts/standards-first.html", section: "concepts", group: "Concepts", order: 4 },
+    { file: "commons/docs/guides/concept-ifr.md", path: "concepts/ifr.html", section: "concepts", group: "Concepts", order: 5 },
+    { file: "commons/docs/guides/concept-ifqs.md", path: "concepts/ifqs.html", section: "concepts", group: "Concepts", order: 6 },
+    { file: "commons/docs/guides/concept-ifccm.md", path: "concepts/ifccm.html", section: "concepts", group: "Concepts", order: 7 },
+    { file: "commons/docs/guides/concept-lenses.md", path: "concepts/lenses.html", section: "concepts", group: "Concepts", order: 8 },
+    { file: "commons/docs/guides/concept-release-loop.md", path: "concepts/release-loop.html", section: "concepts", group: "Concepts", order: 9 },
+    { file: "commons/docs/guides/how-to-index.md", path: "how-to/index.html", section: "howto", group: "How-to", order: 0 },
+    { file: "commons/docs/guides/where-does-x-live.md", path: "how-to/where-does-x-live.html", section: "howto", group: "How-to", order: 1 },
+    { file: "commons/docs/guides/add-a-library.md", path: "how-to/add-a-library.html", section: "howto", group: "How-to", order: 2 },
+    { file: "commons/docs/guides/add-a-verb.md", path: "how-to/add-a-verb.html", section: "howto", group: "How-to", order: 3 },
+    { file: "commons/docs/guides/cut-a-release.md", path: "how-to/cut-a-release.html", section: "howto", group: "How-to", order: 4 },
+  ],
+});
+
 /** Commons' site: its packages, its spec kit, how its specifications are cited, and its lenses. */
 export const config: DocsConfig = {
   name: "IF Commons",
@@ -112,7 +140,7 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/kanon/spec-kit" },
   ],
   citations: { prefix: "commons", digits: 4, text: ["erga", "archon", "stolos", "thyra"] },
-  lenses: [dataModels, programs],
+  lenses: [guides, dataModels, programs],
   lintRules: "commons/lint/src/rules",
   out: "_site",
 };

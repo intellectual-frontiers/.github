@@ -39,13 +39,13 @@ proves(["0011-documentation FR-018"], "a link to a page or an anchor that is not
   assertEquals(report(found), ["a.html: links to a.html#gone, which is not a page or an anchor of the site", "a.html: links to b.html, which is not a page or an anchor of the site"]);
 });
 
-proves(["0011-documentation FR-003", "0011-documentation FR-009"], "the site of commons builds with no finding, the same twice, with its four sections", async () => {
+proves(["0011-documentation FR-003", "0011-documentation FR-009"], "the site of commons builds with no finding, the same twice, with its sections", async () => {
   const one = await buildSite(CONFIG);
   const two = await buildSite(CONFIG);
   assertEquals(report(one.found), []);
   const html = (b: typeof one): string[] => b.pages.map((p) => document(p, { name: "N", repository: "r", pages: b.pages }));
   assertEquals(html(one), html(two));
-  assertEquals([...new Set(one.pages.map((p) => p.section))].sort(), ["api", "models", "overview", "specs"]);
+  assertEquals([...new Set(one.pages.map((p) => p.section))].sort(), ["api", "concepts", "howto", "models", "overview", "specs", "start"]);
   for (const needed of ["index.html", "specs/matrix.html", "api/kernel/index.html", "models/index.html", "models/layers.html", "models/arca-party/person.html"]) {
     assert(one.pages.some((p) => p.path === needed), `the site has ${needed}`);
   }

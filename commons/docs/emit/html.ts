@@ -25,7 +25,10 @@ export interface Site {
 
 /** The names of the sections, in the order the top bar shows them, and the page each opens on. */
 export const SECTIONS: readonly { readonly section: Section; readonly label: string; readonly home: string }[] = [
-  { section: "overview", label: "Overview", home: "index.html" },
+  { section: "start", label: "Start here", home: "start/index.html" },
+  { section: "concepts", label: "Concepts", home: "concepts/index.html" },
+  { section: "overview", label: "Libraries", home: "index.html" },
+  { section: "howto", label: "How-to", home: "how-to/index.html" },
   { section: "specs", label: "Specifications", home: "specs/index.html" },
   { section: "api", label: "API", home: "api/index.html" },
   { section: "models", label: "Models", home: "models/index.html" },

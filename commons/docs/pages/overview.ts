@@ -11,7 +11,7 @@ import type { Build } from "../build.ts";
 import { type About, type AboutEnforcer, under } from "../config.ts";
 import { specPage } from "../links.ts";
 import { type Block, type Card, type Inline, possessive } from "../model.ts";
-import type { Area, Package } from "../sources.ts";
+import { type Area, areaFiles, type Package } from "../sources.ts";
 import { exampleBlocks } from "./areas.ts";
 import { numberOf } from "./specs.ts";
 
@@ -23,6 +23,35 @@ export function firstSentence(t: string, max = 240): string {
   if (s.length <= max) return s;
   const cut = s.slice(0, max);
   return `${cut.slice(0, Math.max(cut.lastIndexOf(" "), max - 20))}…`;
+}
+
+/**
+ * What each package imports and what imports it, among the packages of the site: the packages its own sources (not its tests, tools or manifest) import by name, by slug.
+ */
+export function dependenciesOf(b: Build, packages: readonly Package[]): { readonly uses: ReadonlyMap<string, readonly string[]>; readonly usedBy: ReadonlyMap<string, readonly string[]> } {
+  const nameOf = (p: Package): string => {
+    const file = under(p.dir, "package.json");
+    if (!b.exists(file)) return "";
+    return (JSON.parse(b.read(file)) as { name?: string }).name ?? "";
+  };
+  const slugOf = new Map(packages.map((p) => [nameOf(p), p.slug] as const).filter(([n]) => n !== ""));
+  const uses = new Map<string, string[]>();
+  const usedBy = new Map<string, string[]>();
+  for (const p of packages) {
+    const found = new Set<string>();
+    for (const f of areaFiles(b.root, p.dir)) {
+      const rel = f.slice(p.dir.length + 1);
+      if (/^(suite|tools|tests|node_modules|dist)\//.test(rel) || /^(library|about|release)\.ts$/.test(rel)) continue;
+      for (const m of b.read(f).matchAll(/from\s+"(@intellectual-frontiers\/[a-z0-9-]+)[/"]/g)) {
+        const other = slugOf.get(m[1] ?? "");
+        if (other !== undefined && other !== p.slug) found.add(other);
+      }
+    }
+    const mine = [...found].sort();
+    uses.set(p.slug, mine);
+    for (const o of mine) usedBy.set(o, [...(usedBy.get(o) ?? []), p.slug].sort());
+  }
+  return { uses, usedBy };
 }
 
 /** The page of a package. */
@@ -143,6 +172,39 @@ export function overviewPages(b: Build, top: Package, packages: readonly Package
       ...aboutTables(b, top.about, top.file, home),
     ],
   });
+  const libraries = packages.filter((p) => b.exists(under(p.dir, "library.ts")));
+  const { uses, usedBy } = dependenciesOf(b, libraries);
+  const bySlug = new Map(libraries.map((p) => [p.slug, p] as const));
+  const linkList = (slugs: readonly string[]): Block => ({
+    kind: "paragraph",
+    inlines: slugs.flatMap((sl, i): Inline[] => {
+      const q = bySlug.get(sl);
+      return [...(i === 0 ? [] : [{ kind: "text", text: ", " } as Inline]), q === undefined ? { kind: "code", text: sl } : { kind: "link", href: { kind: "page", path: packagePage(q) }, children: [{ kind: "text", text: q.about.title }] }];
+    }),
+  });
+  if (libraries.length > 0) {
+    b.add({
+      path: "overview/map.html",
+      title: "Library map",
+      description: "What each library imports, and what imports it.",
+      section: "overview",
+      group: "Libraries",
+      order: 9,
+      blocks: [
+        { kind: "paragraph", inlines: [{ kind: "text", text: "A library imports another by its package name, and only the ones it lists here. Libraries at the top of a column import nothing of the others." }] },
+        { kind: "diagram", source: `flowchart LR\n${libraries.flatMap((p) => (uses.get(p.slug) ?? []).map((u) => `  ${p.slug.replaceAll("-", "_")}[${p.about.title}] --> ${u.replaceAll("-", "_")}[${bySlug.get(u)?.about.title ?? u}]`)).join("\n")}`, caption: "Which library imports which" },
+        {
+          kind: "table",
+          head: ["Library", "Imports", "Imported by"].map((h) => [{ kind: "text", text: h } as Inline]),
+          rows: libraries.map((p) => [
+            [{ kind: "link", href: { kind: "page", path: packagePage(p) }, children: [{ kind: "text", text: p.about.title }] }],
+            (uses.get(p.slug) ?? []).flatMap((u, i): Inline[] => [...(i === 0 ? [] : [{ kind: "text", text: ", " } as Inline]), { kind: "code", text: u }]),
+            (usedBy.get(p.slug) ?? []).flatMap((u, i): Inline[] => [...(i === 0 ? [] : [{ kind: "text", text: ", " } as Inline]), { kind: "code", text: u }]),
+          ]),
+        },
+      ],
+    });
+  }
   packages.forEach((p, i) => {
     const page = packagePage(p);
     const file = p.file;
@@ -168,6 +230,8 @@ export function overviewPages(b: Build, top: Package, packages: readonly Package
         })),
       });
     }
+    if ((uses.get(p.slug) ?? []).length > 0) blocks.push(heading("imports", "Imports"), linkList(uses.get(p.slug) ?? []));
+    if ((usedBy.get(p.slug) ?? []).length > 0) blocks.push(heading("imported-by", "Imported by"), linkList(usedBy.get(p.slug) ?? []));
     if (specs.length > 0) {
       blocks.push(heading("specifications", "Specifications"), {
         kind: "table",

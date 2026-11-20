@@ -1,0 +1,37 @@
+/**
+ * The guides lens and the library map (commons 0011-documentation FR-032, FR-033): the guides are pages of the sections Start here, Concepts and How-to, their citations and links are resolved and a guide that cannot be read is a
+ * finding; and the library map says what each library imports and what imports it.
+ *
+ * @module
+ */
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
+import { SECTIONS } from "../emit/html.ts";
+import { buildSite } from "../site.ts";
+import { guidesLens } from "../lens/guides.ts";
+import { freshBuild } from "./helpers.ts";
+import { CONFIG } from "./helpers.ts";
+
+proves(["0011-documentation FR-032"], "a guide that cannot be read is a finding, and the sections are in the order of a newcomer's path", async () => {
+  const lens = guidesLens({ name: "g", guides: [{ file: "nowhere/none.md", path: "start/index.html", section: "start", group: "Start here", order: 0 }] });
+  const b = freshBuild();
+  const make = await lens.read(b, [], []);
+  make(b, 10);
+  assertEquals(b.pages.length, 0);
+  assertEquals(b.found.map((f) => f.problem.kind), ["undescribed"]);
+  assertEquals(SECTIONS.map((s) => s.section), ["start", "concepts", "overview", "howto", "specs", "api", "models"]);
+});
+
+proves(["0011-documentation FR-032", "0011-documentation FR-033"], "commons' site has the guides of every section with their citations and links resolved to pages, and a library map that names what each library imports", async () => {
+  const built = await buildSite(CONFIG);
+  assertEquals(built.found, []);
+  const bySection = (s: string) => built.pages.filter((p) => p.section === s).map((p) => p.path);
+  assert(bySection("start").length >= 5 && bySection("concepts").length >= 10 && bySection("howto").length >= 5, "the guides are there");
+  const kanon = built.pages.find((p) => p.path === "concepts/kanon.html");
+  const text = JSON.stringify(kanon?.blocks);
+  assertStringIncludes(text, "specs/0033-kanon.html");
+  assertStringIncludes(text, "overview/kanon.html");
+  const map = built.pages.find((p) => p.path === "overview/map.html");
+  assertStringIncludes(JSON.stringify(map?.blocks), "flowchart LR");
+  const headless = built.pages.find((p) => p.path === "overview/headless.html");
+  assertStringIncludes(JSON.stringify(headless?.blocks), "Imports");
+});

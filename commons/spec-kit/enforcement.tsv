@@ -637,3 +637,5 @@ requirement	mechanism	by	note
 0034-archon FR-020	review	0034-archon FR-020	a reviewer checks that the old repository is archived, backed up and deleted only at the owner's request, with its tickets moved or closed one by one
 0034-archon FR-021	review	0034-archon FR-021	a reviewer checks that the work is one parent ticket with checklist items and comments, and that no ticket exists for a library, phase or sub-task
 0011-documentation FR-031	check	.github: cd commons/docs && bun run verify	library-site.test.ts: a module comment after a // header, kit and area folders, a page and an API for every library, specifications grouped by library
+0011-documentation FR-032	check	.github: cd commons/docs && bun run verify	guides.test.ts: a guide that cannot be read is a finding, the sections are in order, every section has its guides with links resolved
+0011-documentation FR-033	check	.github: cd commons/docs && bun run verify	guides.test.ts: the library map and the imports of each library are read from the sources
