@@ -10,7 +10,7 @@
         "@intellectual-frontiers/formats": "0.1.0",
         "@intellectual-frontiers/githost": "0.1.0",
         "@intellectual-frontiers/grc": "0.1.0",
-        "@intellectual-frontiers/headless": "0.2.2",
+        "@intellectual-frontiers/headless": "0.3.0",
         "@intellectual-frontiers/mizan": "0.1.0",
         "@intellectual-frontiers/net": "0.1.0",
         "@intellectual-frontiers/ontology": "0.1.2",
@@ -46,7 +46,7 @@
 
     "@intellectual-frontiers/grc": ["@intellectual-frontiers/grc@0.1.0", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.2", "@intellectual-frontiers/crypto": "0.1.2", "@intellectual-frontiers/formats": "0.1.2", "@intellectual-frontiers/system": "0.1.2", "@intellectual-frontiers/telemetry": "0.1.2" } }, "sha512-dTuDZPdDwUjlSptYzApZPPEkXA2bexmIYTxYC1f9KwhgshajVAXs46MzsLj8eQ/gDgPt5lmAgbFgOn+FbiqVbg=="],
 
-    "@intellectual-frontiers/headless": ["@intellectual-frontiers/headless@0.2.2", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.4", "@intellectual-frontiers/system": "0.1.6", "@intellectual-frontiers/telemetry": "0.1.4", "@intellectual-frontiers/terminal": "0.1.6" } }, "sha512-bIFACsJG6OFt/hfS0t11JbDr4LiDmIiuHW6AvFZdOFMt8ZjlIHvX99kREPOipD06yppcm/Da/JFsqKKNnNdnig=="],
+    "@intellectual-frontiers/headless": ["@intellectual-frontiers/headless@0.3.0", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.4", "@intellectual-frontiers/system": "0.1.6", "@intellectual-frontiers/telemetry": "0.1.4", "@intellectual-frontiers/terminal": "0.1.6" } }, "sha512-qMtGgmPxYJj37W6VBAag0RpdLRFRM/5JhLR7NFaQfk1OkwOxXDurDj+qIVrqAhlc2vP8zpg4sW7W3gSTEK9Mrg=="],
 
     "@intellectual-frontiers/mizan": ["@intellectual-frontiers/mizan@0.1.0", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.3", "@intellectual-frontiers/crypto": "0.1.3", "@intellectual-frontiers/formats": "0.1.3", "@intellectual-frontiers/githost": "0.1.1", "@intellectual-frontiers/ontology": "0.1.0", "@intellectual-frontiers/rdf": "0.1.3", "@intellectual-frontiers/system": "0.1.3" } }, "sha512-qWmOKIgFBKETNFkgY7oytJ4N9QzF/VjGRHv+KIG2E+XFO6bsDZBNBC4jvtPaCSZS+jHFzfhLXYQwyzuumO7Abg=="],
 
