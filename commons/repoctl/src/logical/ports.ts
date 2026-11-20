@@ -57,6 +57,8 @@ export type Credentials = { readonly npmToken: () => Secret | undefined };
 /** What a library says of itself, read from its manifest. */
 export type LibraryInfo = {
   readonly name: string;
+  /** The package it publishes: `@intellectual-frontiers/<name>`, or the one its manifest names in `publishes` (commons 0036-distribution FR-009). */
+  readonly package: string;
   /** Its folder from the repository's root. */
   readonly folder: string;
   readonly version: string;

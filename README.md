@@ -97,9 +97,38 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/ontology`](https://www.npmjs.com/package/@intellectual-frontiers/ontology) | Standard | The ontologies of Intellectual Frontiers Commons | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/quality`](https://www.npmjs.com/package/@intellectual-frontiers/quality) | Standard | The run of a suite of tests as evidence (one OTLP record of the run, its reports as TAP, JUnit, CTRF, SARIF, OSCAL and the documents of ISO/IEC/IEEE 29119-3, and its signed ledger entry) | - | L1 | GitHub, npm |
 
+Metapackages: no code of their own, each depends on a set of the libraries above at exact versions (commons 0036-distribution). Install one of them, or a library.
+
+| Metapackage | What it holds |
+| --- | --- |
+| [`@intellectual-frontiers/commons`](https://www.npmjs.com/package/@intellectual-frontiers/commons) | Every consumer-facing library of commons as one install, each at an exact version |
+| [`@intellectual-frontiers/foundation`](https://www.npmjs.com/package/@intellectual-frontiers/foundation) | The foundation libraries as one install, each at an exact version |
+| [`@intellectual-frontiers/patterns`](https://www.npmjs.com/package/@intellectual-frontiers/patterns) | The pattern libraries as one install, each at an exact version |
+| [`@intellectual-frontiers/programs`](https://www.npmjs.com/package/@intellectual-frontiers/programs) | The program libraries as one install, each at an exact version |
+| [`@intellectual-frontiers/standards`](https://www.npmjs.com/package/@intellectual-frontiers/standards) | The standards libraries as one install, each at an exact version |
+
 <!-- libraries-map:end -->
 
 This table is generated from the manifests (`library.ts`) and the summaries (`about.ts`) of `commons/` by `bun commons/libraries/src/readme.ts`; a test fails where it is stale.
+
+## How other repositories use commons
+
+A repository other than this one gets commons code only by **installing a published package** (commons [0036-distribution](commons/spec-kit/specs/0036-distribution/spec.md)): a public library from npm, a private package (one of a private repository) from the GitHub package registry. It has no Git dependency on this repository, no `file:` or `link:` into a checkout of commons, no vendored copy and no fetch of raw source.
+
+Five **metapackages** install commons as a set, each depending on its libraries at exact versions, so that one version of a metapackage is one coherent release: `@intellectual-frontiers/commons` (every consumer-facing library) and, by role, `foundation`, `patterns`, `programs` and `standards`. Their dependencies are generated from the manifests, never edited by hand. `repoctl hygiene` (`bunx @intellectual-frontiers/repoctl hygiene`, `--json` for CI) runs in any repository and finds a Git or path dependency on commons, a relative import into a copy of it, a vendored copy, two installed copies of one library and a dependency that is not an exact version.
+
+```sh
+bun add --exact @intellectual-frontiers/commons@<version>      # or: npm install --save-exact @intellectual-frontiers/commons@<version>
+```
+
+A private package comes from the GitHub package registry: a scoped line in `.npmrc` and a token that may read packages in the environment (`ERGONEX_GITHUB_TOKEN`).
+
+```sh
+@intellectual-frontiers:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${ERGONEX_GITHUB_TOKEN}
+```
+
+The guide [Consuming commons](https://intellectual-frontiers.github.io/.github/guides/consuming-commons.html) says how to install the set, how to upgrade it and how to read a finding of the check.
 
 ## Documentation from the code: JSDoc, and lenses
 

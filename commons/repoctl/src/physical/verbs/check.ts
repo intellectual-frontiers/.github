@@ -12,7 +12,7 @@
  *
  * @module
  */
-import { diagnose, findingsOfStatus, gatherFacts, reportOk, runCheck, runStatus, type CheckReport, tableOf } from "@intellectual-frontiers/repoctl/logical";
+import { countsOf, diagnose, findingsOfStatus, gatherFacts, gatherHygieneFacts, hygiene, type HygieneFinding, reportOk, runCheck, runStatus, type CheckReport, tableOf } from "@intellectual-frontiers/repoctl/logical";
 import { flag } from "@intellectual-frontiers/terminal/args";
 import { defineVerb, generatorsOf, outcomeOfDone, outcomeOfEnvironment } from "../define.ts";
 
@@ -91,6 +91,37 @@ export const doctorVerb = defineVerb({
       findings,
       next: first === undefined ? [] : [first.fix],
       title: "This checkout is in order",
+    });
+  },
+});
+
+/** The lines of a hygiene report for a person: each finding with its path, and one line for the counts. */
+export function hygieneText(findings: readonly HygieneFinding[], repository: "commons" | "consumer"): string {
+  const { failures, warnings } = countsOf(findings);
+  const head = repository === "commons" ? "this is the repository of commons: its own packages are not reported\n" : "";
+  const lines = findings.map((f) => `${f.level === "fail" ? "FAIL" : "warn"}  ${f.code}  ${f.message}`);
+  return `${head}${[...lines, `${failures} failure${failures === 1 ? "" : "s"}, ${warnings} warning${warnings === 1 ? "" : "s"}`].join("\n")}`;
+}
+
+/** `repoctl hygiene`. */
+export const hygieneVerb = defineVerb({
+  name: "hygiene",
+  id: "hygiene",
+  options: {},
+  examples: [
+    { args: [], says: "Say whether this repository consumes commons only as published packages: findings with their code and path, and the exit status 1 where one fails." },
+    { args: ["--json"], says: "The same as one JSON document: the repository, the findings with their code, level, path, message and fix, and the counts." },
+  ],
+  run: async (_args, _ctx, w) => {
+    const facts = await gatherHygieneFacts(w);
+    const findings = hygiene(facts);
+    const first = findings.find((f) => f.level === "fail") ?? findings[0];
+    return outcomeOfDone({
+      data: { repository: facts.repository, ...countsOf(findings), findings },
+      text: hygieneText(findings, facts.repository),
+      findings,
+      next: first === undefined ? [] : [first.fix, `repoctl explain ${first.code}`],
+      title: "This repository consumes commons as published packages",
     });
   },
 });

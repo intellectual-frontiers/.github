@@ -10,7 +10,7 @@ import { constantFindings, constantsIn, conventionName, findingsOfProgram, type 
 import { main } from "@intellectual-frontiers/repoctl";
 import { CAN_RUN, CHECKOUT, git } from "./world.ts";
 
-const lib = (name: string, version: string, over: Partial<LibraryInfo> = {}): LibraryInfo => ({ name, folder: `commons/${name}`, version, level: "L1", specKit: undefined, npm: true, versionConstants: [], ...over });
+const lib = (name: string, version: string, over: Partial<LibraryInfo> = {}): LibraryInfo => ({ name, package: `@intellectual-frontiers/${name}`, folder: `commons/${name}`, version, level: "L1", specKit: undefined, npm: true, versionConstants: [], ...over });
 
 proves(["0003-repoctl-sync FR-007"], "a check program's end is findings: none for 0, a finding for each line it said for 1 (with the code and the fix), and a warning that it did not run for any other status", () => {
   assertEquals(findingsOfProgram({ code: 0, stdout: "", stderr: "" }, "E-SPEC-KIT", "fix it"), []);

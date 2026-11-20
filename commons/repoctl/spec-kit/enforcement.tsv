@@ -46,3 +46,8 @@ requirement	mechanism	by	note
 0006-repoctl-surfaces FR-004	check	.github: cd commons/repoctl && bun run verify	suite/surfaces.test.ts: the reach of each action, and the confirmation is for a person alone
 0006-repoctl-surfaces FR-005	check	.github: cd commons/repoctl && bun run verify	suite/surfaces.test.ts: the tier is the host's, an unknown word ends with 2 and a verb of a higher tier is not there
 0006-repoctl-surfaces FR-006	check	.github: cd commons/repoctl && bun run verify	suite/surfaces.test.ts: the root package has the script and the bin, and the launcher is there
+0007-repoctl-hygiene FR-001	check	.github: cd commons/repoctl && bun run verify	suite/hygiene.test.ts: the verb is declared once with its facts and its examples and each code has an explanation
+0007-repoctl-hygiene FR-002	check	.github: cd commons/repoctl && bun run verify	suite/hygiene.test.ts: each of the six findings is made from facts, in the order of the codes, and the repository of commons is not reported for its own packages
+0007-repoctl-hygiene FR-003	check	.github: cd commons/repoctl && bun run verify	suite/hygiene.test.ts: bun.lock and package-lock.json give the same copies, the installed tree is read through the port and a lockfile that cannot be read is a finding
+0007-repoctl-hygiene FR-004	check	.github: cd commons/repoctl && bun run verify	suite/hygiene.test.ts: the exit status is 1 only for a failure and --json is one document
+0007-repoctl-hygiene FR-005	check	.github: cd commons/repoctl && bun run verify	suite/hygiene.test.ts: status asks npm for the package a library publishes

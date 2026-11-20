@@ -15,7 +15,7 @@
  */
 
 /** The name of every generator: a closed union. */
-export type GeneratorId = "libraries" | "packaging" | "ontology" | "workflows" | "register" | "readme" | "license" | "installers";
+export type GeneratorId = "libraries" | "metapackages" | "packaging" | "ontology" | "workflows" | "register" | "readme" | "license" | "installers";
 
 /** A generator: what it is, the command that makes its files, and what it reads and writes. */
 export type Generator = {
@@ -40,6 +40,13 @@ export const GENERATORS: readonly Generator[] = [
     inputs: ["commons/*/library.ts", "commons/*/package.json"],
     outputs: ["commons/spec-kit/specs/0027-commons-libraries/spec.md", "commons/spec-kit/enforcement.tsv"],
     mixed: ["commons/spec-kit/specs/0027-commons-libraries/spec.md", "commons/spec-kit/enforcement.tsv"],
+  },
+  {
+    id: "metapackages",
+    summary: "The exact dependencies of each metapackage, from the manifests of the libraries of its set.",
+    command: ["commons/libraries/src/pack-metapackage.ts"],
+    inputs: ["commons/*/library.ts", "commons/libraries/src/metapackages.ts", "commons/libraries/src/readme.ts"],
+    outputs: ["commons/*/dependencies.auto.json"],
   },
   {
     id: "packaging",

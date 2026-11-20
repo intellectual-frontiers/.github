@@ -1,0 +1,31 @@
+{
+  "generated": "bun commons/libraries/src/pack-metapackage.ts; do not edit (commons 0036-distribution FR-007)",
+  "set": "commons",
+  "dependencies": {
+    "@intellectual-frontiers/arcactl": "0.9.0",
+    "@intellectual-frontiers/core": "0.1.5",
+    "@intellectual-frontiers/crypto": "0.1.5",
+    "@intellectual-frontiers/ergonex": "0.4.7",
+    "@intellectual-frontiers/formats": "0.1.5",
+    "@intellectual-frontiers/githost": "0.1.3",
+    "@intellectual-frontiers/grc": "0.2.2",
+    "@intellectual-frontiers/headless": "0.4.2",
+    "@intellectual-frontiers/integrations": "0.1.3",
+    "@intellectual-frontiers/integrations-fhir": "0.1.2",
+    "@intellectual-frontiers/integrations-github": "0.1.1",
+    "@intellectual-frontiers/integrations-x12": "0.1.2",
+    "@intellectual-frontiers/kanon": "0.2.1",
+    "@intellectual-frontiers/libraries": "0.4.1",
+    "@intellectual-frontiers/lint": "0.1.3",
+    "@intellectual-frontiers/mizan": "0.1.2",
+    "@intellectual-frontiers/net": "0.1.6",
+    "@intellectual-frontiers/ontology": "0.3.1",
+    "@intellectual-frontiers/quality": "0.2.1",
+    "@intellectual-frontiers/rdf": "0.1.5",
+    "@intellectual-frontiers/repoctl": "0.1.0",
+    "@intellectual-frontiers/system": "0.1.7",
+    "@intellectual-frontiers/telemetry": "0.1.5",
+    "@intellectual-frontiers/terminal": "0.1.7",
+    "@intellectual-frontiers/test": "0.1.4"
+  }
+}

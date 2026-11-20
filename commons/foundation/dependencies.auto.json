@@ -1,0 +1,17 @@
+{
+  "generated": "bun commons/libraries/src/pack-metapackage.ts; do not edit (commons 0036-distribution FR-007)",
+  "set": "foundation",
+  "dependencies": {
+    "@intellectual-frontiers/core": "0.1.5",
+    "@intellectual-frontiers/crypto": "0.1.5",
+    "@intellectual-frontiers/formats": "0.1.5",
+    "@intellectual-frontiers/githost": "0.1.3",
+    "@intellectual-frontiers/lint": "0.1.3",
+    "@intellectual-frontiers/net": "0.1.6",
+    "@intellectual-frontiers/rdf": "0.1.5",
+    "@intellectual-frontiers/system": "0.1.7",
+    "@intellectual-frontiers/telemetry": "0.1.5",
+    "@intellectual-frontiers/terminal": "0.1.7",
+    "@intellectual-frontiers/test": "0.1.4"
+  }
+}
