@@ -11,7 +11,8 @@ import * as runtime from "@intellectual-frontiers/mizan/host/trace";
 import { problem } from "../src/governance/mod.ts";
 import { type Context, machineVerbs, modelProblems, outcomeOf, placedCommands, programOf, target, validCheckId, type Outcome, type Target } from "../src/logical/mod.ts";
 import { run } from "../src/surfaces/cli/run.ts";
-import { layerFindings } from "../tools/layers.ts";
+import { decodeTable, importFindings } from "@intellectual-frontiers/kanon";
+import { library } from "../library.ts";
 import { world } from "./world.ts";
 import { isOk } from "@intellectual-frontiers/core";
 
@@ -115,9 +116,12 @@ proves(["0006-machine-verbs FR-003"], "no unit of the library names data, grc or
   const pkg = JSON.parse(await fs.readTextFile(path.join(ROOT, "package.json"))) as { dependencies?: Record<string, string>; devDependencies: Record<string, string> };
   assert(Object.keys({ ...pkg.dependencies, ...pkg.devDependencies }).every((n) => !/\/(data|grc|ontology)$/.test(n)));
   const exportsMap = { "./logical": "./src/logical/mod.ts" };
+  const decoded = decodeTable(library.kanon);
+  if (decoded.kind === "err") throw new Error(decoded.error);
+  const table = decoded.value;
   for (const unit of ["src/governance/a.ts", "src/logical/a.ts", "src/surfaces/cli/a.ts", "src/targets/ssh/a.ts", "src/surfaces/ssh-inbound/a.ts", "src/otel/a.ts"]) {
     for (const lib of ["data", "grc", "ontology"]) {
-      assertEquals(layerFindings([{ path: unit, text: `import { x } from "@intellectual-frontiers/${lib}";\n` }], exportsMap).map((f) => f.rule), ["layers/external"], `${unit} / ${lib}`);
+      assertEquals(importFindings(table, [{ path: unit, text: `import { x } from "@intellectual-frontiers/${lib}";\n` }], exportsMap).map((f) => f.rule), ["layers/external"], `${unit} / ${lib}`);
     }
   }
   const verbs = await fs.readTextFile(path.join(ROOT, "src", "logical", "machine.ts"));
