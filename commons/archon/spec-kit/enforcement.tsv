@@ -27,3 +27,7 @@ requirement	mechanism	by	note
 0004-archon-dialects FR-004	check	.github: cd commons/archon && bun run verify	suite/dialects.test.ts: the matrix and its totals and unexpressed annotations
 0004-archon-dialects FR-005	check	.github: cd commons/archon && bun run verify	suite/dialects.test.ts: the plan of steps names the digest and refuses a destructive step with no check
 0004-archon-dialects FR-006	check	.github: cd commons/archon && bun run verify	suite/dialects.test.ts: rendered files say they are generated and their digest is stable
+0005-archon-assembly FR-001	check	.github: cd commons/archon && bun run verify	suite/assembly.test.ts
+0005-archon-assembly FR-002	check	.github: cd commons/archon && bun run verify	suite/assembly.test.ts
+0005-archon-assembly FR-003	check	.github: cd commons/archon && bun run verify	suite/assembly.test.ts
+0005-archon-assembly FR-004	check	.github: cd commons/archon && bun run verify	suite/assembly.test.ts

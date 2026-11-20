@@ -3,6 +3,7 @@
   "set": "commons",
   "dependencies": {
     "@intellectual-frontiers/arcactl": "0.9.0",
+    "@intellectual-frontiers/archon-tool": "0.1.0",
     "@intellectual-frontiers/core": "0.1.5",
     "@intellectual-frontiers/crypto": "0.1.5",
     "@intellectual-frontiers/ergonex": "0.4.7",
