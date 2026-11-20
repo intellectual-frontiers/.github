@@ -1,5 +1,5 @@
 /**
- * The families of libraries and the names held for them (commons 0027-commons-libraries FR-023, FR-024; libraries 0001-libraries FR-013): the manifest's `family` field is decoded, the reserved names are
+ * The families of libraries and the names held for them (commons 0027-commons-libraries FR-023, FR-024; libraries 0001-libraries FR-016): the manifest's `family` field is decoded, the reserved names are
  * found from data with no folder, and each side of a family held against the host's table is found by the check of the manifests.
  *
  * @module
@@ -40,7 +40,7 @@ const GOOD: readonly Entry[] = [
 const manifest = (o: Readonly<Record<string, unknown>>): string =>
   `export const library = ${JSON.stringify({ name: "archon", verify: "bun run verify", version: "0.1.0", exports: ["."], ...o })};\n`;
 
-proves(["0001-libraries FR-013"], "a manifest's family is decoded and refused where it is not a host and a role", () => {
+proves(["0001-libraries FR-016"], "a manifest's family is decoded and refused where it is not a host and a role", () => {
   const r = decodeLibrarySource(manifest({ family: { host: "archon", role: "dialect" } }));
   assert(r.kind === "ok");
   assertEquals(r.value.family, { host: "archon", role: "dialect" });
@@ -52,12 +52,12 @@ proves(["0001-libraries FR-013"], "a manifest's family is decoded and refused wh
   assertEquals(decodeFamily({ host: "x", role: "host" }).kind, "ok");
 });
 
-proves(["0001-libraries FR-013"], "a host, a dialect and a plugin of one family that declare each other have no finding", () => {
+proves(["0001-libraries FR-016"], "a host, a dialect and a plugin of one family that declare each other have no finding", () => {
   assertEquals(familyFindings(GOOD), []);
   assertEquals(reservationFindings(GOOD), []);
 });
 
-proves(["0001-libraries FR-013"], "a name the host's rule does not read as the role, a member nobody declared and a declared member nobody registered are found", () => {
+proves(["0001-libraries FR-016"], "a name the host's rule does not read as the role, a member nobody declared and a declared member nobody registered are found", () => {
   const swapped = GOOD.map((l) => (l.name === "archon-server" ? { ...l, family: { host: "archon", role: "dialect" as const } } : l));
   assert(familyFindings(swapped).some((s) => s.includes("does not read the name as a dialect")));
   const undeclared: readonly Entry[] = [
@@ -68,7 +68,7 @@ proves(["0001-libraries FR-013"], "a name the host's rule does not read as the r
   assert(familyFindings(GOOD.filter((l) => l.name !== "archon-dialect-ansible")).some((s) => s.includes("no library of that name")));
 });
 
-proves(["0001-libraries FR-013"], "a member whose table does not extend the host, a host that is not a host and a member with no family are found", () => {
+proves(["0001-libraries FR-016"], "a member whose table does not extend the host, a host that is not a host and a member with no family are found", () => {
   const stray = GOOD.map((l) => (l.name === "archon-server" ? { ...l, kanon: extension("archon-server", `${SCOPE}other`) } : l));
   assert(familyFindings(stray).some((s) => s.includes("extends:")));
   const noTable = GOOD.map((l) => (l.name === "archon-server" ? { name: l.name, ...(l.family === undefined ? {} : { family: l.family }) } : l));
@@ -81,7 +81,7 @@ proves(["0001-libraries FR-013"], "a member whose table does not extend the host
   assert(familyFindings(bare).some((s) => s.includes("declares no family")));
 });
 
-proves(["0001-libraries FR-013"], "the names held are data, and a library of the family may hold them and no other", () => {
+proves(["0001-libraries FR-016"], "the names held are data, and a library of the family may hold them and no other", () => {
   const names = (n: string): readonly string[] => reservationFindings([{ name: n }]);
   for (const held of ["archon", "archon-dialect-x", "archon-server", "signing", "gitops", "estate"]) assertEquals(names(held).length, 1, held);
   for (const free of ["archonic", "signing-tools", "gitops2", "estates", "data", "arch"]) assertEquals(names(free), [], free);

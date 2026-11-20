@@ -88,9 +88,9 @@ jobs:
           python3 -m venv "$RUNNER_TEMP/venv"
           "$RUNNER_TEMP/venv/bin/pip" install -q rdflib==7.6.0 pyshacl==0.40.2 jsonschema==4.26.0 pyyaml==6.0.3
           echo "$RUNNER_TEMP/venv/bin" >> "$GITHUB_PATH"
-      - name: The tests on Bun
+      - name: "The tests on Bun (tests/release/ is the release's: it packs, installs and type-checks every library)"
         if: "matrix.runtime == 'bun'"
-        run: bun test ./tests/
+        run: "bun test ./tests/*.test.ts"
       - name: The tests on Node 26
         if: "matrix.runtime == 'node'"
         run: "node --test \"tests/*.test.ts\""

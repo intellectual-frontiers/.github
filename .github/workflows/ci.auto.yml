@@ -75,8 +75,10 @@ jobs:
       - name: "The development tools, from bun.lock (the kernel is linked from commons/ts)"
         run: bun install --frozen-lockfile
         working-directory: ${{ matrix.folder }}
-      - name: verify
+      - name: "verify (its packing is checked where the exports changed, and by the release)"
         run: ${{ matrix.verify }}
+        env:
+          IFC_SKIP_PACK: ${{ matrix.pack == false && '1' || '' }}
         working-directory: ${{ matrix.folder }}
       - name: After verify
         if: "matrix.after != ''"
@@ -104,8 +106,10 @@ jobs:
       - name: "The development tools, from bun.lock (the kernel is linked from commons/ts)"
         run: bun install --frozen-lockfile
         working-directory: ${{ matrix.folder }}
-      - name: verify
+      - name: "verify (its packing is checked where the exports changed, and by the release)"
         run: ${{ matrix.verify }}
+        env:
+          IFC_SKIP_PACK: ${{ matrix.pack == false && '1' || '' }}
         working-directory: ${{ matrix.folder }}
       - name: After verify
         if: "matrix.after != ''"

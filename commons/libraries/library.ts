@@ -26,6 +26,7 @@ export const library = {
     "./oscal-register",
     "./pack",
     "./pins",
+    "./releasing",
     "./plan",
     "./publish-ontology",
     "./versions",

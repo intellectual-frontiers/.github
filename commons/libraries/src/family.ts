@@ -8,7 +8,7 @@
  * dialects and plugins are and how their packages are named (`@intellectual-frontiers/kanon`: `family`, `instances`, `plugins`), so the name of a member is checked against the host's rule and
  * never against a rule written here. A reservation is data: an exact name or a prefix, and the host that may hold it. It reserves a name without a folder, so that no empty library is created to hold one.
  *
- * Spec: 0001-libraries FR-013
+ * Spec: 0001-libraries FR-016
  *
  * @module
  */

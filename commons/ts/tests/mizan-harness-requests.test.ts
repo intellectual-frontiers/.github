@@ -268,7 +268,7 @@ proves(
 
 proves(
   ["0026-works-versioning FR-039", "0026-works-versioning FR-040"],
-  "a change in a path the record names is judged as a change of the work, offline, against any base revision, and the library gives the findings as data",
+  "a version that went back is found, offline, against any base revision, and the library gives the findings as data; a change in a path the record names is the work's change for the release",
   async () => {
     await withTempDir(async (dir) => {
       const repo = await newRepo(dir);
@@ -291,10 +291,15 @@ proves(
       if (found.kind !== "judged") return;
       assertEquals(
         found.findings.map((f) => f.rule),
-        ["versions/not-grown"],
+        [],
+        "a version grows at the release, so a change of the work's files is no finding of a push",
       );
-      assertStringIncludes(found.findings[0]?.message ?? "", "shared/x.ts");
       assertEquals(found.works, 1);
+      // a version that went back is
+      await commit(repo, "Back\n\nRefs #1", { "lib/release.ts": record({ paths: ["shared"], version: "0.0.1" }) });
+      const back = await checkVersions(repo, base);
+      assertEquals(back.kind === "judged" ? back.findings.map((f) => f.rule) : "not run", ["versions/not-grown"]);
+      assertStringIncludes(back.kind === "judged" ? (back.findings[0]?.message ?? "") : "", "went back");
       // a change in a path no record names is nobody's
       await commit(repo, "Change other\n\nRefs #1", { "other/y.ts": "2\n" });
       await git(repo, ["checkout", "-q", "-b", "side", base]);

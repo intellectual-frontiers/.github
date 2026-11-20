@@ -18,7 +18,7 @@
 - **FR-006**: The libraries MUST be proved by one workflow, `ci.auto.yml`, made from the libraries' manifests (the name, the folder and the `verify` command of each) and the record of the facts of CI that a manifest does not hold (the tests on Node 26, a command after `verify`, and the systems other than Linux where the library has code of its own), so that a library is given its place in CI by being registered, with no file written by hand and no workflow of its own: a job `plan` says which libraries the push or the pull request affects (commons 0001-libraries FR-012), a matrix of those runs `verify` and the tests on Linux, a second matrix runs the libraries whose record names Windows or macOS on those systems, and a job `ci` is the one result that fails where a job failed.
 - **FR-007**: The workflow that plans which libraries a change affects, and the one job that gates the rest, MUST be made by the same model, as the jobs `plan` and `ci` of the workflow of FR-006.
 - **FR-008**: The composite actions of `.github/actions/` MUST be made by the same generator from the same model, and a file whose name GitHub fixes (`action.yml`), which cannot carry `.auto.`, MUST begin with the line that says it is generated and by what, and be compared by `--check` like the others.
-- **FR-009**: A library whose manifest names npm among its registries MUST be given a workflow, `<name>-publish.auto.yml`, made by the same model, that runs on a tag `<name>-v*`, checks the tag against the version of the package, proves the library, packs it with the library's own `tools/pack.ts` and sends the tarball to npm with provenance and no token, and to the GitHub package registry with the workflow's own token, and the generator MUST find a library published to npm that has no `tools/pack.ts`.
+- **FR-009**: The libraries whose manifests name npm among their registries MUST be published by one workflow, `release.auto.yml`, made by the same model and run by hand from main (never by a push or a tag), that reads the release record (`commons/generated/release.auto.json`, commons libraries 0001-libraries FR-014), leaves out what is tagged, proves each library and packs it with the library's own `tools/pack.ts`, and, where the run is asked to publish, sends the tarballs in the order of the record (a library after the libraries it imports) to npm with provenance by npm's trusted publishing (the run's id-token), or with the repository's secret `INFRO_NPMJS_TOKEN` where the repository has it, and to the GitHub package registry with the workflow's own token, skips a version a registry has already, and makes the tag `<name>-v<version>` with the runner's token; the generator MUST find a library published to npm that has no `tools/pack.ts`, and MUST write no workflow of a library's own.
 
 ## Acceptance scenarios
 
@@ -30,7 +30,7 @@
 6. **Given** folders `commons/alpha/` and `commons/beta/` with manifests, **When** the generator runs, **Then** one `ci.auto.yml` is written, whose plan names the libraries a change affects, whose matrix runs the manifest's `verify` in the folder of each, and no `alpha.auto.yml` or `beta.auto.yml` is written, per FR-006.
 7. **Given** the files the generator wrote, **When** a JSON Schema validator that is not this repository's reads each against the schema of GitHub workflows, **Then** none has an error, per FR-003.
 8. **Given** the composite action `bun`, **When** the generator runs, **Then** `.github/actions/bun/action.yml` begins with the line that says it is generated, and `--check` compares it, per FR-008.
-9. **Given** a library whose manifest names npm and that has a `tools/pack.ts`, **When** the generator runs, **Then** `<name>-publish.auto.yml` runs on its tag, checks the version, packs it and sends it to npm and to the GitHub package registry, and a library with no `tools/pack.ts` is a finding, per FR-009.
+9. **Given** a library whose manifest names npm and that has a `tools/pack.ts`, **When** the generator runs, **Then** the one `release.auto.yml` proves and packs it, and publishes and tags it in the order of the record when it is run by hand from main and asked to publish, and a library with no `tools/pack.ts` is a finding, per FR-009.
 
 ## Out of scope
 
@@ -49,7 +49,7 @@
 - An action pinned by a branch (`@main`): found, per FR-005.
 - A library with no record of CI facts: `verify` on Linux alone, per FR-006.
 - A library that names npm and has no `tools/pack.ts`: found, and nothing is written, per FR-009.
-- A tag that is not `<name>-v<version>` of the package: the publish workflow stops before anything is sent, per FR-009.
+- A run of the release workflow from a branch other than main: it stops before anything is sent, per FR-009.
 
 ## Assumptions
 

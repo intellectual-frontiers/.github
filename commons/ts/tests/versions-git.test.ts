@@ -20,6 +20,7 @@ import { execPath, run as spawn } from "@intellectual-frontiers/system/proc";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { run as versions } from "@intellectual-frontiers/libraries/versions";
 import { decodeReleaseSource } from "@intellectual-frontiers/mizan/versions/record";
+import { compareVersions, parseVersion } from "@intellectual-frontiers/mizan/versions/scheme";
 import { needsGit, needsSshKeygen, sshSigning } from "./git-fixtures.ts";
 
 const HERE = dirname(fromFileUrl(import.meta.url));
@@ -105,7 +106,7 @@ async function libraryRepo(dir: string, over: Readonly<Record<string, Literal | 
 
 proves(
   ["0026-works-versioning FR-022", "0026-works-versioning FR-009", "0026-works-versioning FR-010", "0026-works-versioning FR-031"],
-  "check against the merge base: a change of a work's files with no version growth is versions/not-grown (exit 1), a change outside them or under exclude is not, a bump makes it pass, and a plain Git repository is enough",
+  "check against the merge base: a version grows at the release, so a change of a work's files with no version growth is no finding, a version that went back is versions/not-grown (exit 1) and a bump clears it, and a plain Git repository is enough",
   async () => {
     await withTempDir(async (dir) => {
       const repo = await libraryRepo(dir, { exclude: ["docs"] });
@@ -117,20 +118,25 @@ proves(
       assertEquals(clean.code, 0);
       assertStringIncludes(clean.out, "1 work judged");
       await commit(repo, "Change\n\nRefs #10", DAY(13), { "lib/a.ts": "2\n" });
+      assertEquals((await v(repo, "check", "--base", "main")).code, 0, "the files changed and the version did not: it grows at the release");
+      const bumped = await v(repo, "bump", "lib", "--impact", "minor");
+      assertEquals([bumped.code, decodeReleaseSource(readTextFileSync(join(repo, "lib", "release.ts"))).kind], [0, "ok"]);
+      const raised = readTextFileSync(join(repo, "lib", "release.ts"));
+      await commit(repo, "Bump\n\nRefs #10", DAY(14), { "lib/release.ts": raised });
+      assertEquals((await v(repo, "check", "--base", "main")).code, 0, "the version grew");
+      // a version that went back is found, the one change of a record that the push still judges
+      await commit(repo, "Back\n\nRefs #10", DAY(15), { "lib/release.ts": raised.replace(/version: "[^"]*"/, 'version: "0.0.1"') });
       const found = await v(repo, "check", "--base", "main");
       assertEquals(found.code, 1);
       assertStringIncludes(found.err, "lib/release.ts: versions/not-grown");
-      assertStringIncludes(found.err, "lib/a.ts");
-      const bumped = await v(repo, "bump", "lib", "--impact", "minor");
-      assertEquals([bumped.code, decodeReleaseSource(readTextFileSync(join(repo, "lib", "release.ts"))).kind], [0, "ok"]);
-      await commit(repo, "Bump\n\nRefs #10", DAY(14), { "lib/release.ts": readTextFileSync(join(repo, "lib", "release.ts")) });
-      assertEquals((await v(repo, "check", "--base", "main")).code, 0, "the version grew");
+      assertStringIncludes(found.err, "went back");
+      await commit(repo, "Restored\n\nRefs #10", DAY(16), { "lib/release.ts": raised });
       // the head is the base's own revision: its first parent is the base (a push to the branch itself)
       await git(repo, ["checkout", "-q", "main"]);
       await git(repo, ["merge", "-q", "--ff-only", "feature"]);
       assertEquals((await v(repo, "check", "--base", "main")).code, 0, "main as the base of itself: the head's first parent");
-      await commit(repo, "Unbumped\n\nRefs #10", DAY(15), { "lib/a.ts": "3\n" });
-      assertEquals((await v(repo, "check", "--base", "main")).code, 1, "a push that changed the work and did not bump it");
+      await commit(repo, "Unbumped\n\nRefs #10", DAY(17), { "lib/a.ts": "3\n" });
+      assertEquals((await v(repo, "check", "--base", "main")).code, 0, "a push that changed the work and did not bump it: the release bumps");
     });
   },
   needsGit,
@@ -556,6 +562,7 @@ proves(
       const run = (...args: string[]) => spawn([execPath(), VERSIONS, ...args, "--repo", repo], { env: { GIT_TERMINAL_PROMPT: "0" } });
       assertEquals((await run("check", "--base", "main")).code, 0);
       await commit(repo, "Change\n\nRefs #10", DAY(11), { "lib/a.ts": "2\n" });
+      await commit(repo, "Back\n\nRefs #10", DAY(12), { "lib/release.ts": record({ version: "0.0.1" }) });
       const found = await run("check", "--base", "main");
       assertEquals(found.code, 1);
       assertStringIncludes(found.stderr, "versions/not-grown");
@@ -588,8 +595,16 @@ proves(
     };
     const ts = decode("commons/ts/release.ts");
     const docs = decode("commons/docs/release.ts");
-    assertEquals([ts.slug, ts.version], ["ifc-ts", "0.28.1"]);
-    assertEquals([docs.slug, docs.version], ["ifc-docs", "0.1.7"]);
+    assertEquals([ts.slug, docs.slug], ["ifc-ts", "ifc-docs"]);
+    // a version grows at the release, so the tests do not pin it: it is a Semantic Version no lower than the first tag of its work
+    for (const [r, first] of [
+      [ts, "0.4.0"],
+      [docs, "0.1.0"],
+    ] as const) {
+      const now = parseVersion("SemVer", r.version ?? "");
+      const was = parseVersion("SemVer", first);
+      assert(now.kind === "ok" && was.kind === "ok" && (compareVersions(now.value, was.value) ?? -1) >= 0, `${r.slug} is ${r.version ?? "none"}`);
+    }
     for (const [dirName, r] of [
       ["ts", ts],
       ["docs", docs],
