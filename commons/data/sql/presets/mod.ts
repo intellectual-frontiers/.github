@@ -24,6 +24,7 @@ import type { Dialect } from "@intellectual-frontiers/data/sql/physical";
 /** The four ways a team works. */
 /** The ways a team works, the primary ones first: convergence computes each database's plan from the state it is in, and history replays files that people prepared. */
 export const presetNames = ["reviewed-convergence", "autonomous-convergence", "team-managed", "dba-managed"] as const;
+/** The name of a preset: a ready-made choice of models and settings. */
 export type PresetName = (typeof presetNames)[number];
 
 /** The preset a project gets when it names none: convergence, reviewed by a person, is the primary way. */
@@ -55,6 +56,7 @@ export interface Preset {
   runOptions(dialect: Dialect): Omit<RunOptions, "empty">;
 }
 
+/** Why a preset cannot be applied, as a value. */
 export type PresetError =
   | { readonly kind: "unknown"; readonly name: string; readonly known: readonly string[] }
   | { readonly kind: "not-used"; readonly preset: PresetName; readonly settings: "history" | "convergence" };

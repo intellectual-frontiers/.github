@@ -25,18 +25,22 @@ function parseWith<B extends string>(what: B, pattern: RegExp, expected: string,
 
 /** The id of a connector: `^[a-z][a-z0-9-]{1,39}$`. */
 export type ConnectorId = Brand<string, "ConnectorId">;
+/** Reads the id of a connector: a lower-case name of 2 to 40 characters. */
 export const parseConnectorId = (text: string): Result<ConnectorId, IdError> => parseWith("ConnectorId", /^[a-z][a-z0-9-]{1,39}$/, "a lower-case name of 2 to 40 letters, digits and dashes", text);
 
 /** The id of a trading partner. */
 export type PartnerId = Brand<string, "PartnerId">;
+/** Reads the id of a partner: a lower-case name of 2 to 64 characters. */
 export const parsePartnerId = (text: string): Result<PartnerId, IdError> => parseWith("PartnerId", /^[a-z][a-z0-9-]{1,63}$/, "a lower-case name of 2 to 64 letters, digits and dashes", text);
 
 /** The id of an exchange agreement. */
 export type AgreementId = Brand<string, "AgreementId">;
+/** Reads the id of an agreement: a lower-case name of 2 to 80 characters. */
 export const parseAgreementId = (text: string): Result<AgreementId, IdError> => parseWith("AgreementId", /^[a-z][a-z0-9-]{1,79}$/, "a lower-case name of 2 to 80 letters, digits and dashes", text);
 
 /** The urn of a standard: `urn:standard:<issuer>:<name>:<version>` (commons 0018-standards-first FR-006). */
 export type StandardUrn = Brand<string, "StandardUrn">;
+/** Reads the URN of a standard that a message is written to. */
 export const parseStandardUrn = (text: string): Result<StandardUrn, IdError> =>
   parseWith("StandardUrn", /^urn:standard:[a-z0-9][a-z0-9.-]*:[a-z0-9][a-z0-9._-]*:[A-Za-z0-9][A-Za-z0-9._-]*$/, "urn:standard:<issuer>:<name>:<version>", text);
 
@@ -54,15 +58,18 @@ export const standardUrn = (p: StandardParts): Result<StandardUrn, IdError> => p
 
 /** A reference to a secret in a vault: `vault://<store>/<name>`. Never the secret; a refusal never repeats its input. */
 export type CredentialRef = Brand<string, "CredentialRef">;
+/** Reads a reference to a credential, never the credential itself. */
 export const parseCredentialRef = (text: string): Result<CredentialRef, IdError> =>
   parseWith("CredentialRef", /^vault:\/\/[a-z][a-z0-9-]{0,31}\/[a-z][a-z0-9._/-]{0,95}$/, "vault://<store>/<name>", text, false);
 
 /** A SHA-256 digest as 64 lower-case hexadecimal digits. */
 export type Sha256 = Brand<string, "Sha256">;
+/** Reads a SHA-256 digest: 64 lower-case hexadecimal digits. */
 export const parseSha256 = (text: string): Result<Sha256, IdError> => parseWith("Sha256", /^[0-9a-f]{64}$/, "64 lower-case hexadecimal digits", text);
 
 /** A moment in UTC as an ISO 8601 text with a `Z`: `2026-11-20T10:00:00.000Z`. */
 export type Instant = Brand<string, "Instant">;
+/** Reads an instant as an ISO 8601 timestamp in UTC. */
 export function parseInstant(text: string): Result<Instant, IdError> {
   const t = Date.parse(text);
   if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/.test(text) || Number.isNaN(t)) return err({ kind: "id", what: "Instant", expected: "an ISO 8601 moment in UTC, such as 2026-11-20T10:00:00Z", input: text });

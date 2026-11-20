@@ -14,6 +14,7 @@ import { citing, confidential, key, keep, list, lookup, maybe, one, opt, princip
 import { annotate, vocabularies } from "@intellectual-frontiers/data/governance";
 
 const cites = citing("0039-identity-delegation");
+/** One principal acting on behalf of another, for a time and for some permissions, never more than the one above it. */
 export const delegationStatus = list("delegationStatus", "Where a delegation is", { active: "In force", revoked: "Ended by a person, or by the end of the delegation above it", expired: "Ended by time" });
 
 /** One principal acting on behalf of another, for a time, for some permissions: attenuated at every step. */
@@ -65,4 +66,5 @@ export const delegationPermission = concept("delegationPermission", {
 });
 
 export const concepts: readonly AnyConcept[] = [delegation, delegationPermission];
+/** One principal acting on behalf of another, with attenuation. */
 export const identityDelegationModule = defineModule({ name: "identityDelegation", definition: "One principal acting on behalf of another, with attenuation", requires: ["identityAccess", "identityAbac"], concepts, codeLists: [delegationStatus] });

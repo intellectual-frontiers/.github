@@ -99,6 +99,7 @@ export async function listCommits(
   return ok(out);
 }
 
+/** The text of a file at a commit of a repository, read with Git. */
 export async function blobAt(repo: string, commit: string, path: string): Promise<Result<string, HostError>> {
   const r = await git(repo, ["cat-file", "blob", `${commit}:${path}`]);
   return r.kind === "ok" ? ok(text(r.value)) : r;
@@ -161,6 +162,7 @@ async function lastFile(repo: string, tip: string): Promise<Result<KeptFile | un
   return body.kind === "ok" ? ok({ path, text: body.value }) : body;
 }
 
+/** Whether a commit carries a signature that Git verifies. */
 export async function signedCommit(repo: string, commit: string): Promise<Result<boolean, HostError>> {
   const raw = await gitText(repo, ["cat-file", "commit", commit]);
   if (raw.kind === "err") return raw;
@@ -186,6 +188,7 @@ async function testedCommit(
   return ok(text(r.value.stdout).trim());
 }
 
+/** Writes a commit on the evidence branch with Git's plumbing, guarded by the tip it was made on. */
 export async function writeCommit(
   repo: string,
   tip: string | undefined,
@@ -223,6 +226,7 @@ export async function writeCommit(
   }
 }
 
+/** Whether the repository's Git configuration asks for commits to be signed. */
 export async function signingFollowsConfig(repo: string): Promise<boolean> {
   const r = await gitRaw(repo, ["config", "--type=bool", "--get", "commit.gpgsign"]);
   return r.kind === "ok" && r.value.code === 0 && text(r.value.stdout).trim() === "true";

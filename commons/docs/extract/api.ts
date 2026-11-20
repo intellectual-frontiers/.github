@@ -241,7 +241,12 @@ export async function readApi(root: string, areas: readonly AreaEntry[], dirs: r
     const kinds = kindsOf(target.flags);
     if (kinds.length === 0) return undefined;
     const { file, text } = await sourceOf(target);
-    const { doc, documented } = await docOfSymbol(target);
+    let { doc, documented } = await docOfSymbol(target);
+    if (!documented && target.flags & VALUE_MODULE && file.endsWith(".ts")) {
+      // a namespace (`export * as docs from "./docs.ts"`) is documented by the module comment of the file it names
+      const module = moduleComment(textOf(file));
+      if (module !== undefined) ({ doc, documented } = { doc: module, documented: true });
+    }
     let signature: string;
     let members: ApiMember[] = [];
     const typeText = async (): Promise<string> => checker.typeToString(await checker.getTypeOfSymbol(target), undefined, NO_TRUNCATION);

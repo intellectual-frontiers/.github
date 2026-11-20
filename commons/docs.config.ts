@@ -5,8 +5,8 @@
  *
  * @module
  */
-import { readdirSync } from "node:fs";
-import type { DocsConfig } from "./docs/config.ts";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import type { About, DocsConfig, PackageConfig } from "./docs/config.ts";
 import { layeredLens } from "./docs/lens/layered.ts";
 import { programLens } from "./docs/lens/program.ts";
 import { ergonexProgram, type ProgramHost } from "./ergonex/src/mod.ts";
@@ -41,6 +41,40 @@ const INERT_HOST: ProgramHost = { env: {}, cwd: "/", today: "2026-11-20", platfo
 /** The programs built on headless, documented by tier from their own descriptions: ergonex, the workspaces tool. */
 const programs = programLens({ name: "programs", source: () => describe(ergonexProgram(INERT_HOST)) });
 
+/** The libraries of commons: each folder with a manifest (`library.ts`), a `package.json` and an `about.ts`, in order of name. */
+const libraryNames: readonly string[] = readdirSync(new URL("./", import.meta.url), { withFileTypes: true })
+  .filter((e) => e.isDirectory() && ["library.ts", "package.json", "about.ts"].every((f) => existsSync(new URL(`./${e.name}/${f}`, import.meta.url))))
+  .map((e) => e.name)
+  .sort();
+
+/** The folder that holds every one of the files: their longest shared path of folders (empty where they share none). */
+function commonFolder(files: readonly string[]): string {
+  const dirs = files.map((f) => f.split("/").slice(0, -1));
+  const first = dirs[0] ?? [];
+  let n = first.length;
+  for (const d of dirs) while (n > 0 && d.slice(0, n).join("/") !== first.slice(0, n).join("/")) n--;
+  return first.slice(0, n).join("/");
+}
+
+/** A library as a package of the site: its own `about.ts`, with one area whose entry points are the files its `package.json` exports. */
+async function libraryPackage(name: string): Promise<PackageConfig> {
+  const pkg = JSON.parse(readFileSync(new URL(`./${name}/package.json`, import.meta.url), "utf8")) as { readonly exports?: Readonly<Record<string, string | { readonly default?: string; readonly import?: string }>>; readonly description?: string };
+  const targets = Object.values(pkg.exports ?? {}).map((t) => (typeof t === "string" ? t : (t.default ?? t.import ?? ""))).filter((t) => t.endsWith(".ts")).map((t) => t.replace(/^\.\//, ""));
+  const { about: written } = (await import(`./${name}/about.ts`)) as { readonly about: About };
+  const { library } = (await import(`./${name}/library.ts`)) as { readonly library: { readonly version?: string; readonly level?: string; readonly distribution?: readonly string[] } };
+  const about: About = {
+    ...written,
+    facts: [
+      ...(library.version === undefined ? [] : [{ label: "Version", value: `\`${library.version}\`` }]),
+      ...(library.level === undefined ? [] : [{ label: "Conformance level", value: `\`${library.level}\`` }]),
+      ...(library.distribution === undefined ? [] : [{ label: "Distributed", value: library.distribution.join(", ") }]),
+      { label: "Import it as", value: `\`@intellectual-frontiers/${name}\`` },
+    ],
+  };
+  const entryPoints = [...new Set(targets)].filter((t) => existsSync(new URL(`./${name}/${t}`, import.meta.url)));
+  return { dir: `commons/${name}`, slug: name, about: entryPoints.length === 0 ? about : { ...about, areas: [{ title: about.title, slug: name, entryPoints, folder: commonFolder(entryPoints) }] } };
+}
+
 /** Commons' site: its packages, its spec kit, how its specifications are cited, and its lenses. */
 export const config: DocsConfig = {
   name: "IF Commons",
@@ -48,10 +82,7 @@ export const config: DocsConfig = {
   root: "..",
   repository: "https://github.com/intellectual-frontiers/.github",
   home: { dir: "commons" },
-  packages: [
-    { dir: "commons/ts", slug: "ifc-typescript" },
-    { dir: "commons/docs", slug: "docs" },
-  ],
+  packages: [{ dir: "commons/ts", slug: "ifc-typescript" }, ...(await Promise.all(libraryNames.map(libraryPackage)))],
   specKits: [
     { layout: "commons", dir: "commons/spec-kit" },
     { layout: "commons", dir: "commons/core/spec-kit" },

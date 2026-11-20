@@ -11,13 +11,21 @@ import { identityPkiModule } from "@intellectual-frontiers/data/models/identity-
 import { citing, confidential, held, key, keep, list, lookup, one, opt, loginSession, principal, req } from "@intellectual-frontiers/data/models/identity";
 
 const cites = citing("0038-identity-device");
+/** What kind of device it is. */
 export const deviceKind = list("deviceKind", "What kind of device it is", { laptop: "A laptop", phone: "A phone", tablet: "A tablet", server: "A server", iot: "A thing with a network connection", other: "Something else" });
+/** What a device runs. */
 export const platform = list("platform", "What a device runs", { windows: "Windows", macos: "Apple's macOS", linux: "Linux, of any distribution", ios: "Apple's iOS", android: "Android", other: "Something else" }, true);
+/** How far an organization manages a device. */
 export const managementState = list("managementState", "How far an organization manages a device", { unmanaged: "Not known to the organization", registered: "Known, and not managed", managed: "Managed by the organization", retired: "No longer in use" });
+/** Whose a device is. */
 export const ownership = list("ownership", "Whose a device is", { corporate: "The organization's", personal: "The person's own", shared: "Shared by several people" });
+/** What a device proves about itself. */
 export const attestationKind = list("attestationKind", "What a device proves about itself", { tpm: "A trusted platform module's quote", platformAttestation: "The platform's attestation", webauthnAttestation: "A WebAuthn authenticator's attestation", spiffeNode: "A SPIFFE node attestation", cloudInstance: "A cloud instance's identity document", mdmEnrollment: "An enrollment in device management" });
+/** Hardware that has an identity and an owner: an endpoint, a server or a thing. */
 export const attestationResult = list("attestationResult", "How an attestation was judged", { passed: "It passed", failed: "It failed", unknown: "It could not be judged" });
+/** Hardware that has an identity and an owner: an endpoint, a server or a thing. */
 export const postureSource = list("postureSource", "What reported a device's posture", { mdm: "Device management", edr: "Endpoint detection and response", agent: "An agent on the device", manual: "A person" });
+/** Hardware that has an identity and an owner: an endpoint, a server or a thing. */
 export const compliance = list("compliance", "Whether a device meets what is asked of it", { compliant: "It does", noncompliant: "It does not", unknown: "It is not known whether it does" });
 
 /** A device: hardware that has an identity and an owner. Its identity is its principal's. */
@@ -91,6 +99,7 @@ export const deviceSession = concept("deviceSession", {
 });
 
 export const concepts: readonly AnyConcept[] = [device, deviceAttestation, devicePosture, deviceSession];
+/** Device identities: endpoints, servers and things. */
 export const identityDeviceModule = defineModule({
   name: "identityDevice",
   definition: "Device identities: endpoints, servers and things",

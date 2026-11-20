@@ -15,15 +15,25 @@ import { citing, confidential, internal, key, keep, list, lookup, maybe, one, op
 
 const cites = citing("0040-identity-agent");
 const { quality } = vocabularies;
+/** How much an agent may do without a person. */
 export const autonomyLevel = list("autonomyLevel", "How much an agent may do without a person", { observe: "It may only read", suggest: "It may propose, and a person acts", actWithApproval: "It may act, and a person approves what is risky", autonomous: "It may act within its grants and budgets" });
+/** Where a version of an agent is. */
 export const versionStatus = list("versionStatus", "Where a version of an agent is", { candidate: "Made, not yet approved", approved: "Approved to run", active: "Running in production", retired: "No longer used", revoked: "Pulled: no run may start on it" });
+/** Where a run of an agent is. */
 export const runStatus = list("runStatus", "Where a run of an agent is", { running: "Running", succeeded: "Ended well", failed: "Ended badly", cancelled: "Stopped by its caller", killed: "Stopped by the kill switch", expired: "Ended because its time was up" });
+/** Whether a tool grant needs approval. */
 export const toolApproval = list("toolApproval", "Whether a tool grant needs approval", { inherit: "As the risk of the tool and the agent's threshold say", always: "Every call needs approval" });
+/** What was decided about a tool call. */
 export const callDecision = list("callDecision", "What was decided about a tool call", { allowed: "It was allowed", denied: "It was refused", approvalRequired: "It waits for a person", budgetExceeded: "It would exceed a budget" });
+/** Where a tool call is. */
 export const callStatus = list("callStatus", "Where a tool call is", { requested: "Asked for", running: "Running", succeeded: "Ended well", failed: "Ended badly" });
+/** What a budget counts. */
 export const meter = list("meter", "What a budget counts", { toolCalls: "Calls of tools", tokens: "Tokens of a model", costMicros: "Cost, in millionths of a currency unit", writes: "Calls that change something" });
+/** How long a budget lasts. */
 export const windowKind = list("windowKind", "How long a budget lasts", { run: "One run", hour: "An hour", day: "A day of 24 hours", month: "A month", lifetime: "For good" });
+/** A program that decides for itself what to do, accountable to an owner and limited by its level of autonomy. */
 export const approvalStatus = list("approvalStatus", "Where a request for approval is", { pending: "Waiting for a person", approved: "Approved, and not yet used", denied: "Refused", expired: "Left until it ran out", cancelled: "Withdrawn", consumed: "Approved and used once" });
+/** A program that decides for itself what to do, accountable to an owner and limited by its level of autonomy. */
 export const approverRule = list("approverRule", "Who may approve", { owner: "The agent's owner", delegator: "The person the agent acts for", roleHolder: "A holder of a named role" });
 
 /** An agent: a principal that decides for itself what to do, accountable to an owner. Its identity is its principal's. */
@@ -200,6 +210,7 @@ export const approvalRequest = concept("approvalRequest", {
 });
 
 export const concepts: readonly AnyConcept[] = [agent, agentVersion, agentTool, toolGrant, agentRun, toolCall, agentBudget, approvalRequest];
+/** AI agents: provenance, tools, runs, budgets and approvals. */
 export const identityAgentModule = defineModule({
   name: "identityAgent",
   definition: "AI agents: provenance, tools, runs, budgets and approvals",

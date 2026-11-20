@@ -11,9 +11,11 @@ import type { LogicalSchema, Table } from "@intellectual-frontiers/data/sql/logi
 import { type Dialect, type Literal, type Naming, writeCode, writeNames } from "@intellectual-frontiers/data/sql/physical";
 
 export type Cell = string | number | boolean | null;
+/** A row as an operation reads and writes it: column names to values. */
 export type Row = Readonly<Record<string, unknown>>;
 /** A condition on a column: equal to a value (null meaning is null), or compared. */
 export type Test = Cell | { readonly gt?: Cell; readonly ge?: Cell; readonly lt?: Cell; readonly le?: Cell; readonly ne?: Cell };
+/** The conditions that pick rows in an operation: a test for each column named. */
 export type Where = Readonly<Record<string, Test>>;
 
 /** What audit sinks are given: one thing that was done, or tried. */

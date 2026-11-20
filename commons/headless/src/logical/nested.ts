@@ -49,6 +49,7 @@ export function summaryOf(o: Outcome): RunSummary {
   return { fails: c.fail, warns: c.warn, pending: c.pending, actions: c.action, problems: o.problems, outcomes: o.outcomes };
 }
 
+/** Reads a problem as a program gives it, from `unknown` to a typed value. */
 export const problemDecoder = object(
   { level: literal("fail", "warn", "pending", "action"), message: string },
   { phase: string, fix: string, code: string, raw: string, logLine: integer },

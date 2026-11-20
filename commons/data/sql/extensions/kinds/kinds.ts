@@ -10,6 +10,7 @@ import { words } from "@intellectual-frontiers/data/governance";
 import type { LogicalSchema } from "@intellectual-frontiers/data/sql/logical";
 import { parseCsv } from "@intellectual-frontiers/data/sql/physical";
 
+/** The type of a member of a kind: text, integer, number or boolean. */
 export type KindType = "text" | "integer" | "number" | "boolean";
 export type Cell = string | number | boolean | null;
 
@@ -33,6 +34,7 @@ export interface Kinds {
   readonly key: readonly string[];
 }
 
+/** Why a kind cannot be defined or used, as a value. */
 export type KindsError =
   | { readonly kind: "header"; readonly why: string }
   | { readonly kind: "fields"; readonly line: number; readonly expected: number; readonly found: number }
@@ -110,6 +112,7 @@ export function kindsFromCsv(text: string, options: KindsOptions): Result<Kinds,
   });
 }
 
+/** Why a seed that a kind defines does not hold, as a value. */
 export type CheckError =
   | { readonly kind: "unknown-table"; readonly table: string }
   | { readonly kind: "unknown-column"; readonly table: string; readonly column: string }

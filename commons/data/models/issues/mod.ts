@@ -39,9 +39,13 @@ const list = (name: string, definition: string, codes: Readonly<Record<string, s
     annotations: [annotate(quality.openness, "closed"), cites("FR-001")],
   });
 
+/** How bad an issue is. */
 export const severity = list("issueSeverity", "How bad an issue is", { critical: "Breaks a promise", high: "Weakens a promise", medium: "Costs something", low: "Minor" });
+/** When it is to be done. */
 export const priority = list("issuePriority", "When it is to be done", { p1: "Before the next release", p2: "The release after", p3: "When convenient" });
+/** How much work the fix is. */
 export const size = list("issueSize", "How much work the fix is", { xs: "Hours", s: "A day", m: "A few days", l: "A week or more", xl: "A project" });
+/** Where an issue is. */
 export const statusKind = list("issueStatusKind", "Where an issue is", {
   open: "To be done",
   inProgress: "Being done",
@@ -51,10 +55,15 @@ export const statusKind = list("issueStatusKind", "Where an issue is", {
   duplicate: "Another issue says the same",
   deferred: "Later, with a reason",
 });
+/** Whether the code still has the issue. */
 export const presence = list("issuePresence", "Whether the code still has the issue", { present: "It is in the code", withdrawn: "It is no longer in the code" });
+/** What kind of evidence. */
 export const evidenceKind = list("issueEvidenceKind", "What kind of evidence", { commit: "A commit", test: "A test", spec: "A specification", file: "A place in a file", review: "A review" });
+/** How two issues are related. */
 export const linkKind = list("issueLinkKind", "How two issues are related", { blocks: "One must be done first", relates: "They touch the same thing", causedBy: "One is the cause of the other" });
+/** What the library is meant to be. */
 export const goal = list("issueGoal", "What the library is meant to be", { g1: "Reliable", g2: "Secure", g3: "Type safe", g4: "Portable", g5: "Verifiable", g6: "Usable", g7: "Evolvable", g8: "Operable" });
+/** One known weakness of a library or a module, as the code of the repository says it. */
 export const syncOutcome = list("issueSyncOutcome", "What a synchronisation did", { synced: "Records were changed", unchanged: "The records already matched" });
 
 const key = (what: string) => attribute(identifier(), { definition: `What identifies ${what}` });
@@ -99,13 +108,17 @@ const child = (name: string, definition: string, attributes: Record<string, Retu
     annotations: [internal, keep(3650), cites("FR-002"), lookup("issue"), ...more],
   });
 
+/** How an issue is related to another of its scope. */
 export const issueGoal: AnyConcept = child("issueGoal", "A goal an issue is held against", { goal: req(codeOf(goal), "The goal") }, unique("issue", "goal"));
+/** How an issue is related to another of its scope. */
 export const issueEngine: AnyConcept = child("issueEngine", "An engine an issue is about", { engine: req(text(), "The engine, as a dialect is named") }, unique("issue", "engine"));
+/** How an issue is related to another of its scope. */
 export const issueEvidence: AnyConcept = child("issueEvidence", "A piece of evidence of an issue", {
   position: req(integer(), "Its place among the evidence"),
   kind: req(codeOf(evidenceKind), "What kind"),
   reference: req(text(), "A sha, a test's file and title, a specification, a place in a file or a review"),
 });
+/** How an issue is related to another of its scope. */
 export const issueLink: AnyConcept = concept("issueLink", {
   definition: "How an issue is related to another of its scope",
   attributes: { issueLinkId: key("the link"), kind: req(codeOf(linkKind), "How they are related") },
@@ -113,6 +126,7 @@ export const issueLink: AnyConcept = concept("issueLink", {
   relationships: { issue: one(issue, "The issue"), target: one(issue, "The issue it is related to") },
   annotations: [internal, keep(3650), cites("FR-002"), lookup("issue", "target")],
 });
+/** One synchronisation of the records with the code, kept as a ledger. */
 export const issueSync: AnyConcept = concept("issueSync", {
   definition: "One synchronisation of the records with the code, kept as a ledger",
   attributes: {

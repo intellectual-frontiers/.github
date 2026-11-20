@@ -49,6 +49,7 @@ export interface Outcome {
   readonly err: string;
 }
 
+/** The text that `arcactl --help` prints: its commands, options and exit statuses. */
 export const USAGE = `arcactl: manage and check an arca database in PostgreSQL
 
   arcactl doctor [options]     check the database against the models (read-only)

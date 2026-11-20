@@ -88,6 +88,7 @@ export type Filter = { readonly branches?: readonly string[]; readonly paths?: r
 /** A question a run by hand asks: a yes or no with its default. */
 export type DispatchInput = { readonly description: string; readonly type: "boolean"; readonly default: boolean };
 
+/** What starts a generated workflow: pushes, pull requests, dispatch and schedule. */
 export type Triggers = {
   readonly push?: Filter;
   readonly pullRequest?: Filter;
@@ -100,11 +101,13 @@ export type Triggers = {
 /** The cells of a matrix: the values of each axis, or an expression that gives the whole matrix (`expr("fromJSON(needs.plan.outputs.linux)")`), which a job reads from the output of another. */
 export type Matrix = Readonly<Record<string, readonly (string | number)[]>> | Expr;
 
+/** The matrix strategy of a job of a generated workflow. */
 export type Strategy = {
   readonly failFast?: boolean;
   readonly matrix: Matrix;
 };
 
+/** A job of a generated workflow. */
 export type Job = {
   readonly name?: string;
   readonly runsOn: Runner;
@@ -126,6 +129,7 @@ export type Job = {
 /** A job, written as a function so that its steps are read as a non-empty tuple. */
 export const job = (j: Job): Job => j;
 
+/** A generated workflow: its name, triggers, permissions and jobs. */
 export type Workflow = {
   /** The file's name without its directory and extension: `data` is `.github/workflows/data.auto.yml`. */
   readonly file: string;

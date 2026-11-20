@@ -16,6 +16,7 @@ import type { AgreementId, CredentialRef, Duration, PartnerId, Sha256, StandardU
 
 /** The four levels a standard is at. */
 export type Level = "syntax" | "schema" | "profile" | "terminology";
+/** The levels of validation a message passes, in order: syntax, schema, profile and terminology. */
 export const LEVELS: readonly Level[] = ["syntax", "schema", "profile", "terminology"];
 
 /** A reference to a standard at one level; the level is in the type so that a schema cannot stand where a terminology is wanted. */
@@ -86,6 +87,7 @@ export function sourceAllowed(license: License, source: Source): boolean {
 
 /** How sensitive what is exchanged is. */
 export type Classification = "public" | "internal" | "confidential" | "protected-health-information";
+/** The classifications of data an agreement may name, from public to protected health information. */
 export const CLASSIFICATIONS: readonly Classification[] = ["public", "internal", "confidential", "protected-health-information"];
 
 /** Where a payload of a classification may appear: only a `public` one in a log, a hint or a trace; no other, ever. */

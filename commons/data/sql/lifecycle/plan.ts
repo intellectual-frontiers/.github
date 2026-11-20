@@ -214,6 +214,7 @@ export type Fallback = (
   context: StepContext,
 ) => Omit<StepDraft, "name" | "kind" | "key" | "manual" | "change"> | undefined;
 
+/** What a plan is told: the dialect, the schema and what it may change. */
 export interface PlanOptions {
   readonly allow?: { readonly destructive?: boolean };
   /** Makes what the core cannot make in place, such as a table that is made again. */

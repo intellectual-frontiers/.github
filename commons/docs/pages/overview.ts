@@ -126,7 +126,7 @@ export function overviewPages(b: Build, top: Package, packages: readonly Package
     order: 0,
     blocks: [
       ...b.md(top.about.summary, homeScope),
-      heading("packages", "Packages"),
+      heading("libraries", "Libraries"),
       {
         kind: "cards",
         cards: packages.map((p) => ({
@@ -152,6 +152,11 @@ export function overviewPages(b: Build, top: Package, packages: readonly Package
     if (p.about.spec !== undefined) {
       blocks.push({ kind: "paragraph", inlines: [{ kind: "text", text: "Specification: " }, ...b.line(`${p.about.spec.repo} ${p.about.spec.id}`, scope)] });
     }
+    if (p.about.facts !== undefined && p.about.facts.length > 0) {
+      blocks.push({ kind: "table", head: [[{ kind: "text", text: "Fact" }], [{ kind: "text", text: "Value" }]], rows: p.about.facts.map((f) => [[{ kind: "text", text: f.label }], b.line(f.value, scope)]) });
+    }
+    const kit = b.kit.sources.find((k) => k.dir === under(p.dir, "spec-kit"));
+    const specs = kit === undefined ? [] : b.kit.specs.filter((sp) => sp.file.startsWith(`${kit.dir}/`));
     if (own.length > 0) {
       blocks.push(heading("areas", "Areas"), {
         kind: "cards",
@@ -163,9 +168,16 @@ export function overviewPages(b: Build, top: Package, packages: readonly Package
         })),
       });
     }
+    if (specs.length > 0) {
+      blocks.push(heading("specifications", "Specifications"), {
+        kind: "table",
+        head: [[{ kind: "text", text: "Number" }], [{ kind: "text", text: "Specification" }], [{ kind: "text", text: "Requirements" }]],
+        rows: specs.map((sp) => [[{ kind: "code", text: numberOf(sp.id) }], [{ kind: "link", href: { kind: "page", path: specPage(sp.id) }, children: [{ kind: "text", text: sp.title }] }], [{ kind: "text", text: String(sp.requirements.length) }]]),
+      });
+    }
     blocks.push(...aboutTables(b, p.about, file, page));
     if ((p.about.examples ?? []).length > 0) blocks.push(heading("examples", "Examples"));
     for (const x of p.about.examples ?? []) blocks.push(...exampleBlocks(b, under(p.dir, x.file), x.file, x.what, scope));
-    b.add({ path: page, title: p.about.title, description: firstSentence(p.about.summary), section: "overview", group: "Packages", order: 10 + i, blocks });
+    b.add({ path: page, title: p.about.title, description: firstSentence(p.about.summary), section: "overview", group: "Libraries", order: 10 + i, blocks });
   });
 }

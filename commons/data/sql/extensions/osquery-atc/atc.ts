@@ -46,6 +46,7 @@ export interface Atc {
   readonly json: string;
 }
 
+/** Why an automatic table construction cannot be made, as a value. */
 export type AtcError =
   | { readonly kind: "unsupported"; readonly why: string }
   | { readonly kind: "unknown-table"; readonly entry: string; readonly table: string }
@@ -67,6 +68,7 @@ export interface AtcOptions {
 
 /** A path on POSIX, and one on Windows (a drive or a share). */
 export const POSIX_PATH = /^\/\S/;
+/** Matches a Windows path: a drive letter and a separator, or a UNC share. */
 export const WINDOWS_PATH = /^(?:[A-Za-z]:[\\/]|\\\\)\S/;
 
 /**

@@ -118,12 +118,12 @@ export function parseComment(inside: string): DocComment {
 }
 
 /**
- * The module comment of a source file: its first `/** ... *\/` comment, where that comment says `@module`.
+ * The module comment of a source file: its first `/** ... *\/` comment (after any `//` lines, such as a `// Spec:` header), where that comment says `@module`.
  *
  * @param source - the file's text
  */
 export function moduleComment(source: string): DocComment | undefined {
-  const m = /^\s*(?:#![^\n]*\n\s*)?\/\*\*([\s\S]*?)\*\//.exec(source);
+  const m = /^\s*(?:#![^\n]*\n\s*)?(?:\/\/[^\n]*\n\s*)*\/\*\*([\s\S]*?)\*\//.exec(source);
   if (m === null) return undefined;
   const doc = parseComment(m[1] ?? "");
   return doc.isModule ? doc : undefined;

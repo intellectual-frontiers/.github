@@ -13,12 +13,19 @@ import { citing, confidential, internal, key, list, lookup, many, maybe, one, op
 
 const cites = citing("0034-identity-abac");
 
+/** What an attribute is an attribute of. */
 export const attributeCategory = list("attributeCategory", "What an attribute is an attribute of", { subject: "The principal that acts", resource: "The thing acted on", environment: "The circumstances of the request", action: "What is being done" });
+/** The type of the values of an attribute. */
 export const attributeValueType = list("attributeValueType", "The type of the values of an attribute", { text: "Free text", integer: "A whole number", boolean: "True or false", instant: "A point in time", textSet: "A set of texts" });
+/** Where the values of an attribute come from. */
 export const attributeSource = list("attributeSource", "Where the values of an attribute come from", { stored: "Kept here", request: "Given with the request", posture: "Reported by a device's posture", directory: "Pushed by a directory", derived: "Computed from others" });
+/** How sensitive the values of an attribute are. */
 export const sensitivityLevel = list("sensitivityLevel", "How sensitive the values of an attribute are", { public: "Anyone may see them", internal: "Staff may", confidential: "Those who need them may", restricted: "Very few may" });
+/** What a policy decides. */
 export const policyEffect = list("policyEffect", "What a policy decides", { allow: "Allows what it matches", deny: "Refuses what it matches, whatever else allows it" });
+/** An attribute that decisions may use, with its type, where its values come from and how old they may be. */
 export const obligation = list("obligation", "What must happen before an allowed action is done", { none: "Nothing", stepUp: "The principal proves who they are again", approval: "A person approves it" });
+/** An attribute that decisions may use, with its type, where its values come from and how old they may be. */
 export const expressionLanguage = list("expressionLanguage", "The language a condition is written in", { expr: "The library's own closed expression tree", cedar: "The Cedar policy language", cel: "The Common Expression Language", rego: "Open Policy Agent's Rego language" }, true);
 
 /** An attribute that decisions may use, with its type, where its values come from and how old they may be. */
@@ -108,6 +115,7 @@ export const accessPolicy = concept("accessPolicy", {
 });
 
 export const concepts: readonly AnyConcept[] = [attributeDefinition, principalAttribute, resourceAttribute, accessPolicy];
+/** Attribute-based access for every kind of principal. */
 export const identityAbacModule = defineModule({
   name: "identityAbac",
   definition: "Attribute-based access for every kind of principal",

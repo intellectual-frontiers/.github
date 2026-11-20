@@ -70,6 +70,7 @@ export interface Loader {
   readonly tableNameOf: (name: string) => string;
 }
 
+/** Why an integration cannot be made or run, as a value. */
 export type IntegrationError =
   | { readonly kind: "unknown-table"; readonly table: string }
   | { readonly kind: "unknown-column"; readonly table: string; readonly column: string }

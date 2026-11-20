@@ -7,6 +7,7 @@
  */
 import { list } from "./kit.ts";
 
+/** What can be granted a role, own a key or act. */
 export const principalKind = list("principalKind", "What can be granted a role, own a key or act", {
   user: "A person who signs in",
   machine: "A service, a workload, a pipeline or an integration: a program that acts for itself",
@@ -14,6 +15,7 @@ export const principalKind = list("principalKind", "What can be granted a role, 
   agent: "An AI agent: software that decides for itself what to do, and is accountable to an owner",
   group: "A set of principals, granted what its members are",
 });
+/** Where a principal is in its life. */
 export const principalStatus = list("principalStatus", "Where a principal is in its life", {
   pending: "Made, and not yet usable",
   active: "In use, and able to act",
@@ -22,6 +24,7 @@ export const principalStatus = list("principalStatus", "Where a principal is in 
   deleted: "Ended, with what is personal erased and the record kept for the audit trail",
 });
 export const decision = list("decision", "What an authorization decision was", { allow: "It was allowed", deny: "It was refused" });
+/** How a user account came to be. */
 export const createdVia = list("createdVia", "How a user account came to be", {
   invited: "By an invitation that was accepted",
   selfSignup: "By the person signing up",
@@ -29,12 +32,14 @@ export const createdVia = list("createdVia", "How a user account came to be", {
   federated: "By signing in through an identity provider for the first time",
   admin: "By an administrator",
 });
+/** Where a membership is. */
 export const membershipStatus = list("membershipStatus", "Where a membership is", {
   invited: "Offered and not yet accepted",
   active: "In force, and the user is a member",
   suspended: "Held by an administrator, and nothing is lost",
   removed: "Ended, and the user is no longer a member",
 });
+/** How a user came to be a member of a tenant. */
 export const membershipSource = list("membershipSource", "How a user came to be a member of a tenant", {
   invited: "By an invitation that was accepted",
   directory: "Pushed by a directory",
@@ -42,11 +47,13 @@ export const membershipSource = list("membershipSource", "How a user came to be 
   selfJoin: "Joined on their own",
   admin: "Added by an administrator",
 });
+/** Where a group is kept. */
 export const groupSource = list("groupSource", "Where a group is kept", { local: "Made and kept here", directory: "Kept by a directory and mirrored here" });
 
 
 
 
+/** What a principal proves itself with. */
 export const credentialKind = list("credentialKind", "What a principal proves itself with", {
   password: "A secret the person remembers",
   passkey: "A key pair held by the person's device, signed with by WebAuthn",
@@ -62,9 +69,13 @@ export const credentialKind = list("credentialKind", "What a principal proves it
   certificate: "A certificate, of which only the public half is kept",
   workloadAttestation: "What a platform says of the workload that runs",
 }, true);
+/** Where a credential is. */
 export const credentialStatus = list("credentialStatus", "Where a credential is", { active: "In use, and trusted", revoked: "Ended by a person or a policy", expired: "Ended by time" });
+/** How a password is hashed. */
 export const passwordAlgorithm = list("passwordAlgorithm", "How a password is hashed", { argon2id: "The memory-hard Argon2id hash", scrypt: "The memory-hard scrypt hash", bcrypt: "The bcrypt hash", pbkdf2: "The PBKDF2 key derivation" }, true);
+/** The hash a one-time code is made with. */
 export const otpAlgorithm = list("otpAlgorithm", "The hash a one-time code is made with", { sha1: "The SHA-1 hash, the default of authenticator apps", sha256: "The SHA-256 hash", sha512: "The SHA-512 hash" });
+/** What a challenge is for. */
 export const challengePurpose = list("challengePurpose", "What a challenge is for", {
   login: "Signing in",
   emailVerification: "Proving an address is the person's",
@@ -74,6 +85,7 @@ export const challengePurpose = list("challengePurpose", "What a challenge is fo
   passkeyRegistration: "Registering a passkey",
   passkeyAuthentication: "Signing in with a passkey",
 });
+/** How a sign-in attempt ended. */
 export const loginOutcome = list("loginOutcome", "How a sign-in attempt ended", {
   success: "It succeeded",
   wrongSecret: "The secret was wrong",
@@ -82,12 +94,15 @@ export const loginOutcome = list("loginOutcome", "How a sign-in attempt ended", 
   mfaFailed: "The second factor failed",
   blocked: "A policy refused it",
 });
+/** Where a session is. */
 export const sessionStatus = list("sessionStatus", "Where a session is", { active: "In use, and valid", expired: "Ended by time", revoked: "Ended by a person or a policy", signedOut: "Ended by the user" });
+/** How sure a session is of who it is for, in the sense of NIST SP 800-63B. */
 export const assuranceLevel = list("assuranceLevel", "How sure a session is of who it is for, in the sense of NIST SP 800-63B", {
   aal1: "One factor",
   aal2: "Two factors",
   aal3: "Two factors, one a hardware key",
 });
+/** How a session was authenticated. */
 export const authMethod = list("authMethod", "How a session was authenticated", {
   password: "By a password",
   passkey: "By a passkey",
@@ -96,6 +111,7 @@ export const authMethod = list("authMethod", "How a session was authenticated", 
   recoveryCode: "By a recovery code",
   magicLink: "By a link",
 });
+/** Why a session ended early. */
 export const revokedReason = list("revokedReason", "Why a session ended early", {
   user: "The user ended it",
   admin: "An administrator ended it",
@@ -104,19 +120,28 @@ export const revokedReason = list("revokedReason", "Why a session ended early", 
   passwordChange: "The password was changed",
   risk: "A risk signal ended it",
 });
+/** Where an invitation is. */
 export const invitationStatus = list("invitationStatus", "Where an invitation is", { pending: "Sent, and waiting to be taken up", accepted: "Taken up by the person invited", expired: "Left until it ran out", revoked: "Withdrawn" });
+/** How a domain is proved to be a tenant's. */
 export const claimMethod = list("claimMethod", "How a domain is proved to be a tenant's", { dnsTxt: "By a DNS TXT record", httpFile: "By a file on the domain's site", email: "By an email to an address of the domain" });
+/** Where a claim on a domain is. */
 export const claimStatus = list("claimStatus", "Where a claim on a domain is", { pending: "Waiting to be proved", failed: "Not proved", expired: "Left until it ran out" });
+/** What a verified domain makes of those who sign in with it. */
 export const domainPolicy = list("domainPolicy", "What a verified domain makes of those who sign in with it", {
   none: "Nothing follows from it",
   captureUsers: "Their accounts join the tenant",
   enforceSso: "They must sign in through the tenant's identity provider",
 });
+/** How a locked account is freed. */
 export const unlockMode = list("unlockMode", "How a locked account is freed", { timer: "By time passing", admin: "By an administrator", selfService: "By the user proving who they are" });
+/** Whether a second factor is needed. */
 export const mfaRequirement = list("mfaRequirement", "Whether a second factor is needed", { none: "Never asked for", optional: "Asked for if the user chooses to", required: "Always asked for", adaptive: "Asked for when the risk calls for it" });
+/** What did something. */
 export const actorKind = list("actorKind", "What did something", { user: "A person acting for themselves", machine: "A program", device: "A device", agent: "An AI agent", system: "The platform itself, with no one acting", impersonator: "A person acting as another, with leave" });
+/** How something that was tried ended. */
 export const auditOutcome = list("auditOutcome", "How something that was tried ended", { success: "It was done", failure: "It failed", denied: "It was refused" });
 
+/** How an address was proved to be a person's. */
 export const verificationMethod = list("verificationMethod", "How an address was proved to be a person's", {
   emailLink: "By a link sent to it",
   otp: "By a code sent to it",
@@ -124,4 +149,5 @@ export const verificationMethod = list("verificationMethod", "How an address was
   admin: "By an administrator",
 });
 
+/** Whether a thing is in use. */
 export const useStatus = list("useStatus", "Whether a thing is in use", { active: "In use, and applied", retired: "No longer applied, and kept for the record" });

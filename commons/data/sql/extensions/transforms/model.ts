@@ -82,6 +82,7 @@ export interface Project {
   readonly ledger: { readonly ref: string; readonly schema: string | undefined; readonly table: string };
 }
 
+/** Why a transform cannot be defined or applied, as a value. */
 export type TransformError =
   | RefError
   | { readonly kind: "duplicate"; readonly name: string }

@@ -12,6 +12,7 @@ import { concepts } from "./concepts.ts";
 export * from "./codes.ts";
 export * from "./concepts.ts";
 
+/** Role-based access for every kind of principal. */
 export const identityAccessModule = defineModule({
   name: "identityAccess",
   definition: "Role-based access for every kind of principal",

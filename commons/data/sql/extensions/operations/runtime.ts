@@ -22,6 +22,7 @@ export type Implementation = (tx: Tx, input: Readonly<Record<string, unknown>>, 
 /** Whether a caller holds a permission in a tenant; the model's, given by the project. */
 export type Authorize = (tx: Tx, caller: string, permission: string, tenant: string | undefined) => Promise<boolean>;
 
+/** Why an operation refuses its input, as a value. */
 export type InputError =
   | { readonly kind: "missing"; readonly input: string }
   | { readonly kind: "unknown"; readonly input: string }
@@ -34,6 +35,7 @@ export type RunError =
   | { readonly kind: "missing-audit"; readonly emits: readonly string[] }
   | { readonly kind: "failed"; readonly message: string };
 
+/** Why an operation cannot be set up on a database, as a value. */
 export type SetupError =
   | { readonly kind: "no-implementation"; readonly operation: string }
   | { readonly kind: "no-contract"; readonly operation: string }

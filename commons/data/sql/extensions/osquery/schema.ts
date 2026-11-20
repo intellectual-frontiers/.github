@@ -15,6 +15,7 @@ import { classify } from "./classify.ts";
 
 /** The platforms osquery runs on, as this library names them. */
 export type Platform = "linux" | "darwin" | "windows";
+/** The platforms osquery tables are for: linux, darwin and windows. */
 export const PLATFORMS: readonly Platform[] = ["linux", "darwin", "windows"];
 
 /** The types of an osquery column. */

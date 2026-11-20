@@ -59,4 +59,5 @@ export const permissionRelation = concept("permissionRelation", {
 });
 
 export const concepts: readonly AnyConcept[] = [authorizationModel, relationTuple, permissionRelation];
+/** Relationship-based access. */
 export const identityRebacModule = defineModule({ name: "identityRebac", definition: "Relationship-based access", requires: ["identityAccess"], concepts, codeLists: [] });

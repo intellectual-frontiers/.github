@@ -43,6 +43,7 @@ export interface TargetOptions {
   readonly batch?: number;
 }
 
+/** Why a target cannot be made from its description, as a value. */
 export type TargetError =
   | { readonly kind: "physical"; readonly errors: readonly PhysicalError[] }
   | { readonly kind: "unknown-table"; readonly table: string }

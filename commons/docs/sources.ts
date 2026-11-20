@@ -72,7 +72,7 @@ export async function readPackage(root: string, src: PackageSource, configFile: 
 
 /** The areas of the packages, in order. */
 export function areasOf(packages: readonly Package[]): Area[] {
-  return packages.flatMap((pkg) => (pkg.about.areas ?? []).map((a) => ({ ...a, pkg, dir: under(pkg.dir, (a.entryPoints[0] ?? "").split("/").slice(0, -1).join("/")) })));
+  return packages.flatMap((pkg) => (pkg.about.areas ?? []).map((a) => ({ ...a, pkg, dir: under(pkg.dir, a.folder ?? (a.entryPoints[0] ?? "").split("/").slice(0, -1).join("/")) })));
 }
 
 /** The scripts of a package's `package.json`. */

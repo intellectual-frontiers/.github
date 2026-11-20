@@ -65,6 +65,7 @@ export const modelNames = [
   "operations",
   "proof",
 ] as const;
+/** The name of a model that a configuration may ask for. */
 export type ModelName = (typeof modelNames)[number];
 
 /** The configuration, as the compiler checks it. */

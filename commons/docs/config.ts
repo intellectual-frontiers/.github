@@ -96,6 +96,8 @@ export interface AboutArea {
   readonly slug: string;
   /** Its entry points, relative to `about.ts`; the first one's module comment is the area's overview. */
   readonly entryPoints: readonly string[];
+  /** The folder, relative to `about.ts`, that holds the files of the area; where it is not given, the folder of the first entry point. */
+  readonly folder?: string;
   /** The specification it implements, where it has its own. */
   readonly spec?: AboutSpec;
   /** Its phases, where it is built a phase at a time. */
@@ -122,6 +124,16 @@ export interface About {
   readonly areas?: readonly AboutArea[];
   /** Its examples that belong to no one area. */
   readonly examples?: readonly AboutExample[];
+  /** Facts its page shows in a small table beside the summary: a label and its value, as a version or a conformance level. */
+  readonly facts?: readonly AboutFact[];
+}
+
+/** One fact of a package: a label and its value. */
+export interface AboutFact {
+  /** What it is: `Version`. */
+  readonly label: string;
+  /** Its value, in Markdown: `0.9.0`. */
+  readonly value: string;
 }
 
 /** A package the site shows: its folder, its name in the site's addresses, and its `About`. */

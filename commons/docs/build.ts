@@ -37,6 +37,8 @@ export class Build {
   readonly entityPages: Map<string, string> = new Map();
   /** The pages that cite each specification (key `0009-sql-aide`) and each requirement (key `0009-sql-aide FR-001`). */
   readonly citations: Map<string, Set<string>> = new Map();
+  /** The title of each package, by its slug: what the pages of its specifications and the register call it. */
+  readonly packageTitles: Map<string, string> = new Map();
   /** What links can reach. */
   readonly index: LinkIndex;
 

@@ -14,6 +14,7 @@ import type { Interchange } from "./tree.ts";
 
 /** Why a text is not of a syntax: a code and an offset, never the text. */
 export type SyntaxCode = "empty" | "bad-envelope" | "bad-delimiter" | "bad-character" | "bad-structure" | "unbalanced" | "too-long" | "unexpected-end";
+/** A problem of the first level of validation: the offset at which the text could not be read. */
 export type SyntaxProblem = { readonly kind: "syntax"; readonly code: SyntaxCode; readonly offset: number };
 
 /** The codec port of one syntax: parse a text to the tree and serialize the tree to a text. */

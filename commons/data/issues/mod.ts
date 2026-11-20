@@ -20,4 +20,5 @@ import i12 from "./00012-sql-aide-leftovers.ts";
 import i13 from "./00013-observe-and-converge-overlap.ts";
 import i14 from "./00014-book-becomes-documentation.ts";
 
+/** The open issues of this library, as data: each says what is wrong or missing and what would close it. */
 export const issues = issueSet("data", [i1, i2, i3, i4, i5, i6, i7, i8, i9, i10, i11, i12, i13, i14]);

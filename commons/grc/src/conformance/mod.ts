@@ -1,6 +1,6 @@
 // Spec: 0001-grc-layers FR-009
 /**
- * The conformance suites of the ports (0001-grc-layers FR-009; 0004 FR-011, 0005 FR-010, 0006 FR-008): functions a third party runs against its own runner, store, signer or serializer, each
+ * The conformance suites of the ports (0001-grc-layers FR-009; 0004-grc-documents FR-011, 0005-grc-runners FR-010, 0006-grc-evidence FR-008): functions a third party runs against its own runner, store, signer or serializer, each
  * returning every failed expectation as data (an empty list is a pass) and never throwing. This library runs them on every extension it ships.
  *
  * @example

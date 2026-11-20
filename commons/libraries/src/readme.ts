@@ -37,6 +37,7 @@ export const END = "<!-- libraries-map:end -->";
 
 /** What a library is for in the whole: a closed union. */
 export const ROLES = ["foundation", "pattern", "program", "standard"] as const;
+/** A role a reader of the README may be in, as the generated library map names them. */
 export type Role = (typeof ROLES)[number];
 
 /** The heading of a role in the table. */

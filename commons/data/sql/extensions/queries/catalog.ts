@@ -38,12 +38,14 @@ export interface Query {
   render(values?: Readonly<Record<string, unknown>>): Result<string, readonly ParamError[]>;
 }
 
+/** Why a parameter of a catalogued query is refused, as a value. */
 export type ParamError =
   | { readonly kind: "missing"; readonly param: string }
   | { readonly kind: "unknown"; readonly param: string }
   | { readonly kind: "type"; readonly param: string; readonly expected: ParamType }
   | { readonly kind: "null"; readonly param: string };
 
+/** Why a catalogued query cannot be found or run, as a value. */
 export type QueryError =
   | RefError
   | { readonly kind: "duplicate"; readonly name: string }

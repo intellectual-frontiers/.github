@@ -309,4 +309,5 @@ export const killAgentImpl: Implementation = async (tx, input, ctx): Promise<Out
   return { status: "killed", disabled, runs, delegations, credentials, approvals };
 };
 
+/** The code of each agent operation, by its name, to be run in a transaction. */
 export const agentImplementations = { delegate: delegateImpl, revokeDelegation: revokeDelegationImpl, recordToolCall: recordToolCallImpl, decideApproval: decideApprovalImpl, killAgent: killAgentImpl } as const;

@@ -58,6 +58,7 @@ export const LIBRARIES_SPEC = "0027-commons-libraries";
 export const FIRST_GENERATED = 101;
 /** The marker that opens the generated section, and the one that closes it. */
 export const BEGIN = "<!-- libraries:begin -->";
+/** The marker that ends the generated section of the libraries in a document. */
 export const END = "<!-- libraries:end -->";
 
 /** Where the generated section begins and ends: the markers on lines of their own (a requirement may name them in its text). */
@@ -96,6 +97,7 @@ export const KANON_REQUIRED_FROM: LevelKey | undefined = undefined;
 
 /** The registries a library may be published to: the kinds only, never a host or a credential (0027-commons-libraries FR-018). */
 export const REGISTRIES = ["github", "npm"] as const;
+/** A registry a library is distributed to: github or npm. */
 export type Registry = (typeof REGISTRIES)[number];
 /** Where a manifest that declares no distribution is published. */
 export const DEFAULT_DISTRIBUTION: readonly Registry[] = ["github"];

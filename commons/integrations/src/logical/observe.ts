@@ -67,9 +67,13 @@ export type ObservedRecord = {
 /** Whether a person is employed. */
 export type PersonStatus = "active" | "terminated" | "leave" | "unknown";
 
+/** A person, as an observer reports them. */
 export type Person = { readonly email: string; readonly name?: string; readonly status: PersonStatus; readonly start?: string; readonly end?: string; readonly manager?: string; readonly type?: string };
+/** An account in a system, as an observer reports it. */
 export type Account = { readonly system: string; readonly id: string; readonly name: string; readonly email?: string; readonly active: boolean; readonly admin?: boolean; readonly mfa?: boolean; readonly lastLogin?: string; readonly service?: boolean };
+/** A device, as an observer reports it. */
 export type Device = { readonly source: string; readonly id: string; readonly name: string; readonly owner?: string; readonly os?: string; readonly serial?: string; readonly encrypted?: boolean; readonly managed: boolean; readonly seen?: string };
+/** A code repository, as an observer reports it. */
 export type Repository = { readonly system: string; readonly name: string; readonly private: boolean; readonly protected?: boolean; readonly reviews?: boolean; readonly secretScanning?: boolean; readonly dependencyAlerts?: boolean };
 
 /** The entities of an observation, by kind. */

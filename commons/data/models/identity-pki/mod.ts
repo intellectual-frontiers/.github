@@ -10,6 +10,7 @@ import { tenant } from "@intellectual-frontiers/data/models/arca-tenancy";
 import { citing, credential, internal, key, list, lookup, many, maybe, one, opt, req, restricted, unique, useStatus } from "@intellectual-frontiers/data/models/identity";
 
 const cites = citing("0036-identity-pki");
+/** What certificates and keys are checked against: a certificate authority, or a set of public keys. */
 export const trustAnchorKind = list("trustAnchorKind", "What a trust anchor is", { x509: "A certificate authority's certificate", jwks: "A set of public keys published at an address" });
 
 /** What certificates and keys are checked against. */
@@ -48,4 +49,5 @@ export const certificate = concept("certificate", {
 });
 
 export const concepts: readonly AnyConcept[] = [trustAnchor, certificate];
+/** Public-key credentials. */
 export const identityPkiModule = defineModule({ name: "identityPki", definition: "Public-key credentials", requires: ["identity"], concepts, codeLists: [trustAnchorKind] });

@@ -11,7 +11,7 @@ import { under } from "../config.ts";
 import type { Enforcement, KitSource, Spec } from "../extract/specs.ts";
 import { specPage } from "../links.ts";
 import type { Badge, Block, Inline, Page, Tone } from "../model.ts";
-import { plain } from "../model.ts";
+import { plain, slugOf } from "../model.ts";
 
 const toneOf = (mechanism: Enforcement["mechanism"] | undefined): Tone =>
   mechanism === "check" || mechanism === "gate" ? "good" : mechanism === "review" ? "info" : "warn";
@@ -19,6 +19,19 @@ const toneOf = (mechanism: Enforcement["mechanism"] | undefined): Tone =>
 const statusTone = (s: string): Tone => (s === "Adopted" ? "good" : s === "Superseded" ? "warn" : "neutral");
 
 const ITEM = /^((?:FR|SC)-\d{3}[a-z]?|OQ-\d+)$/;
+
+/** The folder that holds a kit's specifications, from the root, of the kit a specification was read from: `commons/core/spec-kit` for `commons/core/spec-kit/specs/0001-core/spec.md`. */
+export function kitDirOf(b: Build, spec: Spec): string {
+  return b.kit.sources.find((k) => spec.file.startsWith(`${k.dir}/`))?.dir ?? "";
+}
+
+/** The library a spec kit belongs to, by the name of the folder that holds `spec-kit`: `core` for `commons/core/spec-kit`, and `commons` for the repository's own kit. */
+export function kitNameOf(dir: string): string {
+  const parts = dir.split("/").filter((x) => x !== "");
+  const last = parts[parts.length - 1];
+  const owner = last === "spec-kit" || last === "specs" ? parts[parts.length - 2] : last;
+  return owner ?? "";
+}
 
 /** The number of a specification's id: `0009` of `0009-sql-aide`. */
 export const numberOf = (id: string): string => id.split("-")[0] ?? id;
@@ -70,6 +83,13 @@ function itemEntries(b: Build, spec: Spec, list: Extract<Block, { kind: "list" }
   return entries;
 }
 
+/** The title of the library whose spec kit holds a specification: the title of its package where the site has one, else its folder's name. */
+function libraryTitle(b: Build, spec: Spec): string {
+  const name = kitNameOf(kitDirOf(b, spec));
+  if (name === "" || name === "commons") return "Commons";
+  return b.packageTitles.get(name) ?? name;
+}
+
 /** A specification's page, without the pages that cite it, which `citedBy` adds once every page is made. */
 function specPageOf(b: Build, spec: Spec, order: number): Page {
   const page = specPage(spec.id);
@@ -102,7 +122,7 @@ function specPageOf(b: Build, spec: Spec, order: number): Page {
     title: spec.title,
     description: plain(b.line(lead, scope)).slice(0, 240),
     section: "specs",
-    group: "Specifications",
+    group: libraryTitle(b, spec),
     order,
     badges: [{ text: numberOf(spec.id), tone: "neutral" }, ...(spec.status === "" ? [] : [{ text: spec.status, tone: statusTone(spec.status) }])],
     blocks,
@@ -143,17 +163,26 @@ export function specPages(b: Build): void {
         kind: "paragraph",
         inlines: [{ kind: "text", text: `Every specification of ${subject} in force, ${joined(b.kit.sources.map(registerSource))}.` }],
       },
-      {
-        kind: "table",
-        head: ["Number", "Specification", "Status", "Part of", "Requirements"].map((h) => [{ kind: "text", text: h }]),
-        rows: b.kit.specs.map((s) => [
-          [{ kind: "code", text: numberOf(s.id) }],
-          [{ kind: "link", href: { kind: "page", path: specPage(s.id) }, children: [{ kind: "text", text: s.title }] }],
-          [{ kind: "text", text: s.status }],
-          s.partOf === undefined ? [] : [{ kind: "link", href: { kind: "page", path: specPage(s.partOf) }, children: [{ kind: "code", text: s.partOf }] }],
-          [{ kind: "text", text: String(s.requirements.length) }],
-        ]),
-      },
+      ...b.kit.sources.flatMap((k): Block[] => {
+        const here = b.kit.specs.filter((s) => kitDirOf(b, s) === k.dir);
+        if (here.length === 0) return [];
+        const name = kitNameOf(k.dir);
+        const title = name === "" || name === "commons" ? "Commons" : (b.packageTitles.get(name) ?? name);
+        return [
+          { kind: "heading", level: 2, id: slugOf(name === "" ? "specifications" : name), text: [{ kind: "text", text: title }] },
+          {
+            kind: "table",
+            head: ["Number", "Specification", "Status", "Part of", "Requirements"].map((h) => [{ kind: "text", text: h }]),
+            rows: here.map((s) => [
+              [{ kind: "code", text: numberOf(s.id) }],
+              [{ kind: "link", href: { kind: "page", path: specPage(s.id) }, children: [{ kind: "text", text: s.title }] }],
+              [{ kind: "text", text: s.status }],
+              s.partOf === undefined ? [] : [{ kind: "link", href: { kind: "page", path: specPage(s.partOf) }, children: [{ kind: "code", text: s.partOf }] }],
+              [{ kind: "text", text: String(s.requirements.length) }],
+            ]),
+          },
+        ];
+      }),
     ],
   });
   const rows = b.kit.specs.flatMap((s) =>

@@ -277,6 +277,7 @@ function commonsPaths(commons: string, dist: string): Record<string, readonly st
   return out;
 }
 
+/** What packing a library made: the staging folder, the tarball, the findings and the manifest. */
 export type Packed = { readonly stage: string; readonly tarball: string | undefined; readonly findings: Findings; readonly manifest: Json };
 
 /** What a package adds to the common form. */
@@ -292,6 +293,7 @@ function namesNodeTypes(folder: string): boolean {
   return false;
 }
 
+/** What packing a library is told: its folder, where to stage it and whether to make the tarball. */
 export type PackOptions = {
   /** Types the compiler is given (`["node"]` for a library that names Node's). */
   readonly types?: readonly string[];

@@ -198,6 +198,7 @@ export async function buildSite(config: Config): Promise<Built> {
     const p = await readPackage(root, src, config.fileFromRoot, b.found);
     if (p === undefined) continue;
     packages.push(p);
+    b.packageTitles.set(p.slug, p.about.title);
     b.found.push(...checkAbout(root, p, config.lintRules));
   }
   if (top !== undefined) b.found.push(...checkAbout(root, top, config.lintRules));

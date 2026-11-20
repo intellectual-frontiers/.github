@@ -15,6 +15,7 @@ import { brand, durationMs, parseDuration, type ConnectorId, type CredentialRef,
 
 /** What a connector connects to. */
 export type ConnectorClass = "cloud" | "identity" | "code-host" | "hr" | "endpoint" | "ticketing" | "network-device" | "vulnerability";
+/** The classes of system a connector observes: cloud, identity, code host, HR, endpoint and the like. */
 export const CONNECTOR_CLASSES: readonly ConnectorClass[] = ["cloud", "identity", "code-host", "hr", "endpoint", "ticketing", "network-device", "vulnerability"];
 
 /** The service models of NIST SP 800-145. */
@@ -37,6 +38,7 @@ export type ReadOnlyContract = { readonly writes: "never"; readonly tokenEndpoin
 
 /** The kinds of entity an observation may carry. */
 export type EntityKind = "person" | "account" | "device" | "repository";
+/** The kinds of entity that observing produces: person, account, device and repository. */
 export const ENTITY_KINDS: readonly EntityKind[] = ["person", "account", "device", "repository"];
 
 /** What the denylist matches: a field name exactly, or a field name containing the text, ignoring case. */

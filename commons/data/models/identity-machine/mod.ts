@@ -10,8 +10,11 @@ import { identityPkiModule } from "@intellectual-frontiers/data/models/identity-
 import { citing, confidential, credential, key, list, lookup, many, maybe, one, opt, principal, req, restricted, unique, useStatus } from "@intellectual-frontiers/data/models/identity";
 
 const cites = citing("0037-identity-machine");
+/** What kind of program a machine is. */
 export const machineKind = list("machineKind", "What kind of program a machine is", { service: "A service that others call", workload: "A workload that a platform runs", pipeline: "A pipeline that builds or deploys", integration: "An integration with another system", bot: "A bot that acts on a schedule or an event" });
+/** A program that acts for itself, with a person or a group accountable for it. */
 export const environment = list("environment", "Where a machine runs", { production: "Production", staging: "Staging", development: "Development", test: "Testing, with nothing real in it" }, true);
+/** A program that acts for itself, with a person or a group accountable for it. */
 export const issuerKind = list("issuerKind", "What vouches for a workload", { spiffe: "A SPIFFE trust domain", kubernetes: "A Kubernetes cluster", oidc: "An OpenID Connect issuer", cloud: "A cloud provider's workload identity", mtls: "A certificate" });
 
 /** A machine: a program that acts for itself, with a person or a group accountable for it. Its identity is its principal's. */
@@ -78,6 +81,7 @@ export const keyCredential = concept("keyCredential", {
 });
 
 export const concepts: readonly AnyConcept[] = [machine, workloadIdentity, apiKey, keyCredential];
+/** Machine identities: services, workloads, pipelines and integrations. */
 export const identityMachineModule = defineModule({
   name: "identityMachine",
   definition: "Machine identities: services, workloads, pipelines and integrations",

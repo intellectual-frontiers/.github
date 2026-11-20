@@ -13,6 +13,7 @@ import { err, ok, type Result } from "@intellectual-frontiers/core";
 export type Platform = "linux" | "darwin" | "win32";
 /** The shells a profile can be made for. */
 export type Shell = "bash" | "zsh" | "fish" | "pwsh" | "nu" | "sh";
+/** The shells that a workstation setup writes a start-up snippet for. */
 export const shells: readonly Shell[] = ["bash", "zsh", "fish", "pwsh", "nu", "sh"];
 
 /** What a person's machine says of itself. */

@@ -11,22 +11,23 @@ import type { About } from "./ts/kernel/mod.ts";
 export const about: About = {
   title: "Intellectual Frontiers Commons",
   summary:
-    "What any company or harness of Intellectual Frontiers may use. A capability goes here when more than one harness (today `archon`, " +
-    "tomorrow another) should read the same facts instead of keeping its own copy. It holds no company fact and no secret: this repository " +
-    "is public. A harness reads `generated/`, and keeps no fact of its own that the ontology holds.",
+    "Everything that any company or harness of Intellectual Frontiers may use, as independent libraries. Each library is built in layers (Kanon): governance says what a thing is and may do, the logical layer is the model a program reasons with, " +
+    "and the physical layer is what runs (tables, commands, tools, routes). Each has its own specifications, tests and package, and is proved by one command, `bun run verify`, in its folder. " +
+    "Start with `ergonex`, the front-door command: it sets up a workspace of the repositories, tools and shell a person needs, shows a plan before it changes anything, and checks the result. " +
+    "Read the libraries below for what each is for, the API reference to call them, the specifications for what each promises and how it is checked, and the models and programs for what the libraries say about themselves. " +
+    "This repository holds no company fact and no secret: it is public.",
   folders: [
     {
       path: "ontology/src/supply-chain/packaging/",
       what:
-        "The packaging vocabulary (`packaging.ts`) and its data (`managers.ts`, `families.ts`, `programs.ts`, `pins.ts`, `rules.ts`, " +
-        "`record.ts`), seeded from the tables of [`upt`](https://github.com/sigoden/upt) (MIT or Apache-2.0) and from what `archon` runs. It is " +
-        "TypeScript, typed by the RDF library (`rdf/src/mod.ts`, commons 0012-ontology and rdf 0001-rdf); its Turtle is generated, never a source.",
+        "The packaging vocabulary (`packaging.ts`) and its data (`managers.ts`, `families.ts`, `programs.ts`, `pins.ts`, `rules.ts`, `record.ts`), seeded from the tables of [`upt`](https://github.com/sigoden/upt) (MIT or Apache-2.0) and from what `archon` runs. " +
+        "It is TypeScript, typed by the RDF library; its Turtle is generated, never a source.",
       mayImport: ["rdf/src/mod.ts", "ontology/"],
     },
     {
       path: "tools/",
       what: "The tools, in TypeScript that Bun runs (Node 26 too): the generator of `generated/`, the spec-kit checker and the shell portability checker.",
-      mayImport: ["tools/", "ontology/ (the generator, which reads its typed values)", "ts/kernel/toml.ts (the shell portability checker)"],
+      mayImport: ["tools/", "ontology/ (the generator, which reads its typed values)"],
     },
     {
       path: "generated/",
@@ -34,19 +35,13 @@ export const about: About = {
       mayImport: ["nothing: generated"],
     },
     {
-      path: "data/",
-      what: "IFC data, an independent library with a spec kit and a manifest (`library.ts`) of its own (commons 0027-commons-libraries): governance, a logical and a physical schema, and extensions. Proved by `bun run verify` in its folder.",
-      mayImport: ["its own about.ts"],
-    },
-    { path: "ts/", what: "IFC TypeScript.", mayImport: ["see its own about.ts"] },
-    {
       path: "docs/",
-      what: "The generator of this documentation, IFC Docs, which any repository uses by depending on commons by Git; it reads only commons' TypeScript and the spec kit, as `docs.config.ts` names them.",
+      what: "The generator of this documentation, IFC Docs, which any repository uses by depending on commons; it reads TypeScript and the spec kits as `docs.config.ts` names them.",
       mayImport: ["see its own about.ts"],
     },
     {
       path: "spec-kit/",
-      what: "The specifications of the capabilities, the register of their numbers and of what enforces each requirement.",
+      what: "The specifications that belong to commons as a whole, the register of their numbers and of what enforces each requirement. Each library keeps its own in its own `spec-kit/`.",
       mayImport: ["nothing: Markdown and TSV"],
     },
   ],

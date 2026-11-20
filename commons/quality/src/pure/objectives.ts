@@ -3,7 +3,7 @@
  * Quality objectives (commons 0001-quality-evidence FR-037 to FR-039): a success criterion of a specification (`SC-nnn`) read as an objective with a
  * metric named as OpenTelemetry names one (0006-signals FR-013), a target, a unit, an error budget and the window it is spent in; its measure
  * is computed from the evidence and never typed in; WHEN the budget is spent within the window the system opens a nonconformance, and WHILE
- * budget remains the remainder is shown with the objective. The quality system's own objectives (FR-039) are the suggested set here.
+ * budget remains the remainder is shown with the objective. The quality system's own objectives (0001-quality-evidence FR-039) are the suggested set here.
  *
  * - A **measure** is one of a few computations over the evidence (the share of requirements at a grade, the review debt, the count of
  *   `not_run` cases, the age of the oldest open nonconformance, the number of stale proofs, the number of figures shown with no grade).
@@ -104,7 +104,7 @@ export function objectiveProblem(o: Objective): string | undefined {
   return undefined;
 }
 
-/** The quality system's own objectives, suggested to a harness (FR-039): the share at `E3` or above, the review debt, `not_run`, the age of the oldest open nonconformance and the stale proofs. */
+/** The quality system's own objectives, suggested to a harness (0001-quality-evidence FR-039): the share at `E3` or above, the review debt, `not_run`, the age of the oldest open nonconformance and the stale proofs. */
 export const SUGGESTED_OBJECTIVES: readonly Objective[] = [
   {
     id: "share-tested",

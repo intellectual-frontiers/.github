@@ -2,7 +2,7 @@
 /**
  * Versions: semantic versions by the rules of semver.org 2.0.0 (parsed, printed, ordered and bumped), and the looser dotted versions that
  * programs print (`2.9.8`, `1.4.4`, `26.13.1`), compared part by part (commons 0001-formats FR-015); and npm's ranges, read and
- * satisfied as node-semver reads them (FR-067). Taken from erga's kernel (`semver.ts`) and toolchain (`atLeast`), Stolos's
+ * satisfied as node-semver reads them (commons 0005-typescript-runtime FR-067). Taken from erga's kernel (`semver.ts`) and toolchain (`atLeast`), Stolos's
  * `tools/version.ts` and the machine setup.
  *
  * @example
@@ -151,7 +151,7 @@ export function versionIn(text: string): string | undefined {
 }
 
 // ---------------------------------------------------------------------------------------------------------------------------------
-// Ranges (FR-067), as npm's node-semver reads them
+// Ranges (commons 0005-typescript-runtime FR-067), as npm's node-semver reads them
 // ---------------------------------------------------------------------------------------------------------------------------------
 
 /** How a comparator compares a version with its bound. */
@@ -302,7 +302,7 @@ function set(text: string): Result<readonly Comparator[], string> {
 }
 
 /**
- * Text read as an npm range (FR-067), by node-semver's grammar and its desugaring: comparators (`<`, `<=`, `>`, `>=`, `=`) joined by
+ * Text read as an npm range (commons 0005-typescript-runtime FR-067), by node-semver's grammar and its desugaring: comparators (`<`, `<=`, `>`, `>=`, `=`) joined by
  * spaces, sets joined by `||`, hyphen ranges (`1.2.3 - 2.3.4`), x-ranges (`*`, `x`, `X` or a missing part), tilde (`~`, `~>`) and caret
  * (`^`) ranges, a space allowed after an operator, a leading `v` and builds ignored. Anything else is an error naming the part.
  */
@@ -345,7 +345,7 @@ function holds(c: Comparator, v: SemVer): boolean {
 export type SatisfiesOptions = { readonly includePrerelease?: boolean };
 
 /**
- * Whether a version satisfies a range (FR-067): every comparator of one of its sets holds. A pre-release version satisfies a set only where
+ * Whether a version satisfies a range (commons 0005-typescript-runtime FR-067): every comparator of one of its sets holds. A pre-release version satisfies a set only where
  * one of its comparators is a pre-release of the same major, minor and patch (`1.2.3-beta.4` satisfies `^1.2.3-beta.2`, `1.2.4-beta`
  * does not satisfy `^1.2.3`), as node-semver has it, unless `includePrerelease` is given, when the comparators alone decide.
  */

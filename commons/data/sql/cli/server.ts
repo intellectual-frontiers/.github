@@ -97,4 +97,5 @@ export function serverSettings(env: Readonly<Record<string, string | undefined>>
 
 /** What a mode may do: a server writes no file of a home directory and asks no question. */
 export const mayWriteHome = (mode: Mode): boolean => mode === "workstation";
+/** Whether the command may ask a person a question: only in the workstation mode. */
 export const mayAsk = (mode: Mode): boolean => mode === "workstation";
