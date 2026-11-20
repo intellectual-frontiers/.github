@@ -10,9 +10,9 @@
 
 <urn:ifc:mizan:import:nist-sp-800-53:64ca6b4161de51ab6af098a7d101d326f14c95e1abf721396cd8a049e8115eeb> a prov:Activity ;
     prov:used <urn:sha256:64ca6b4161de51ab6af098a7d101d326f14c95e1abf721396cd8a049e8115eeb> ;
-    prov:wasAssociatedWith <urn:ifc:mizan:generator:commons:ts:mizan:integrations:pure:import-oscal-catalog.ts> .
+    prov:wasAssociatedWith <urn:ifc:mizan:generator:commons:mizan:src:integrations:pure:import-oscal-catalog.ts> .
 
-<urn:ifc:mizan:generator:commons:ts:mizan:integrations:pure:import-oscal-catalog.ts> a prov:SoftwareAgent .
+<urn:ifc:mizan:generator:commons:mizan:src:integrations:pure:import-oscal-catalog.ts> a prov:SoftwareAgent .
 
 <urn:sha256:64ca6b4161de51ab6af098a7d101d326f14c95e1abf721396cd8a049e8115eeb> a prov:Entity ;
     dcterms:title "NIST SP 800-53 Rev. 5.2.0 (OSCAL catalog)" ;
