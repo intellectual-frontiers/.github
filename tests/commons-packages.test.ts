@@ -48,8 +48,8 @@ proves(
       for (const lib of npmLibraries()) {
         let installLog = "";
         // a library packs from its own installed tools (the compiler, the links to the libraries it depends on): a job that has not installed it does so, as a person's first `bun run verify` does
-        // (an install of a folder that links to it leaves a `node_modules` of its own behind, so the compiler is what says the tools are there)
-        if (!fs.existsSync(path.join(lib.dir, "node_modules", "typescript"))) {
+        // always installed from the lockfile (a no-op where it is done): a folder that others link to can hold a half of an install, without the compiler's binary for this platform
+        {
           const installed = await sh([bun, "install", "--frozen-lockfile"], lib.dir);
           assertEquals(installed.code, 0, `${lib.name}: bun install: ${installed.out}`);
           installLog = installed.out;
