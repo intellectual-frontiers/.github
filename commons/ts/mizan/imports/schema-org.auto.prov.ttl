@@ -1,10 +1,10 @@
-# AUTO-GENERATED with ../../../ontology/supply-chain/packaging/schema.auto.ts by commons/ts/mizan/integrations/pure/import-vocabulary.ts (commons 0019-mizan-integrations FR-009). Do not edit.
+# AUTO-GENERATED with ../../../ontology/src/supply-chain/packaging/schema.auto.ts by commons/ts/mizan/integrations/pure/import-vocabulary.ts (commons 0019-mizan-integrations FR-009). Do not edit.
 
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix prov: <http://www.w3.org/ns/prov#> .
 
 <urn:ifc:mizan:module:schema-org> a prov:Entity ;
-    dcterms:source "../../../ontology/supply-chain/packaging/schema.auto.ts" ;
+    dcterms:source "../../../ontology/src/supply-chain/packaging/schema.auto.ts" ;
     prov:wasGeneratedBy <urn:ifc:mizan:import:schema-org:7f15ca89398c4f235f478a4b3b8d1f975d63c5a860b77c8a8fce01f791b7ae2f> ;
     prov:wasDerivedFrom <urn:sha256:7f15ca89398c4f235f478a4b3b8d1f975d63c5a860b77c8a8fce01f791b7ae2f> .
 

@@ -326,7 +326,7 @@ proves(
       "@intellectual-frontiers/grc": "0.1.0",
       "@intellectual-frontiers/mizan": "0.1.0",
       "@intellectual-frontiers/net": "0.1.0",
-      "@intellectual-frontiers/ontology": "0.1.1",
+      "@intellectual-frontiers/ontology": "0.1.2",
       "@intellectual-frontiers/rdf": "0.1.0",
       "@intellectual-frontiers/system": "0.1.0",
       "@intellectual-frontiers/telemetry": "0.1.0",

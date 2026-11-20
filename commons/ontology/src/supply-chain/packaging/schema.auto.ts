@@ -19,3 +19,4 @@ export const schema = vocabulary(SCHEMA, {
   processorRequirements: "rdf:Property",
   softwareVersion: "rdf:Property",
 });
+

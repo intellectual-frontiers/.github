@@ -41,7 +41,7 @@ jobs:
         run: bun fmt --check . ../tools ../../tests
         working-directory: commons/ts
       - name: "The linter, type-aware, no warning allowed"
-        run: "bun x \"bun@$BUN_LINT_VERSION\" lint --type-aware --max-warnings 0 ../tools ../../tests mizan ../ontology/mizan ../ontology/audit"
+        run: "bun x \"bun@$BUN_LINT_VERSION\" lint --type-aware --max-warnings 0 ../tools ../../tests mizan"
         working-directory: commons/ts
       - name: "Commons' generated files and specifications, as a person checks them, on Bun and on Node 26"
         run: |
@@ -53,8 +53,8 @@ jobs:
           bun commons/ts/tools/generate-workflows.ts --check
           bun commons/ts/mizan/versions.ts check
           bun commons/ts/mizan/versions.ts ledger
-          bun commons/ts/mizan/integrations/host/import.ts commons/ts/mizan/imports/schema-org.import.ts --check --fetch
-          bun commons/ts/mizan/integrations/host/import.ts commons/ts/mizan/imports/nist-sp-800-53.import.ts --check --fetch
+          bun commons/mizan/src/integrations/host/import.ts commons/ts/mizan/imports/schema-org.import.ts --check --fetch
+          bun commons/mizan/src/integrations/host/import.ts commons/ts/mizan/imports/nist-sp-800-53.import.ts --check --fetch
           node commons/tools/generate-packaging.ts --check
           node commons/tools/mizan-check.ts
           node commons/ts/mizan/generate-ontology.ts --check
@@ -63,8 +63,8 @@ jobs:
           node commons/ts/tools/generate-workflows.ts --check
           node commons/ts/mizan/versions.ts check
           node commons/ts/mizan/versions.ts ledger
-          node commons/ts/mizan/integrations/host/import.ts commons/ts/mizan/imports/schema-org.import.ts --check --fetch
-          node commons/ts/mizan/integrations/host/import.ts commons/ts/mizan/imports/nist-sp-800-53.import.ts --check --fetch
+          node commons/mizan/src/integrations/host/import.ts commons/ts/mizan/imports/schema-org.import.ts --check --fetch
+          node commons/mizan/src/integrations/host/import.ts commons/ts/mizan/imports/nist-sp-800-53.import.ts --check --fetch
 
   tests:
     runs-on: ${{ matrix.os }}

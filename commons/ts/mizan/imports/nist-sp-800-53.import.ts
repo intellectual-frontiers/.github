@@ -30,5 +30,5 @@ export const manifest = {
   slice: ["cm-2", "cm-3", "cm-4", "cm-5", "cm-6", "cm-7", "cm-8", "cm-9", "cm-10", "sa-10", "si-7", "ia-5"],
   out: "../../../ontology/src/standards/nist-sp-800-53/controls.auto.ts",
   provOut: "nist-sp-800-53.auto.prov.ttl",
-  rdfImport: "../../../rdf/src/mod.ts",
+  rdfImport: "@intellectual-frontiers/rdf",
 } as const;

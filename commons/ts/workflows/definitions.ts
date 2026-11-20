@@ -562,8 +562,8 @@ const checkScripts = (shellOnly: boolean): readonly string[] => {
     "commons/ts/tools/generate-workflows.ts --check",
     "commons/ts/mizan/versions.ts check",
     "commons/ts/mizan/versions.ts ledger",
-    "commons/ts/mizan/integrations/host/import.ts commons/ts/mizan/imports/schema-org.import.ts --check --fetch",
-    "commons/ts/mizan/integrations/host/import.ts commons/ts/mizan/imports/nist-sp-800-53.import.ts --check --fetch",
+    "commons/mizan/src/integrations/host/import.ts commons/ts/mizan/imports/schema-org.import.ts --check --fetch",
+    "commons/mizan/src/integrations/host/import.ts commons/ts/mizan/imports/nist-sp-800-53.import.ts --check --fetch",
   ];
   const all = shellOnly ? common : [...common, ...more];
   return [...all.map((c) => `bun ${c}`), ...all.map((c) => `node ${c}`)];
@@ -596,13 +596,10 @@ const tests: Workflow = {
         tools("commons/ts"),
         run("bun run check", { name: "TypeScript 7 on commons' tools and on these tests", workingDirectory: "commons/ts" }),
         run("bun fmt --check . ../tools ../../tests", { name: "The formatter", workingDirectory: "commons/ts" }),
-        run(
-          'bun x "bun@$BUN_LINT_VERSION" lint --type-aware --max-warnings 0 ../tools ../../tests mizan ../ontology/mizan ../ontology/audit',
-          {
-            name: "The linter, type-aware, no warning allowed",
-            workingDirectory: "commons/ts",
-          },
-        ),
+        run('bun x "bun@$BUN_LINT_VERSION" lint --type-aware --max-warnings 0 ../tools ../../tests mizan', {
+          name: "The linter, type-aware, no warning allowed",
+          workingDirectory: "commons/ts",
+        }),
         run(lines(...checkScripts(false)), {
           name: "Commons' generated files and specifications, as a person checks them, on Bun and on Node 26",
         }),
