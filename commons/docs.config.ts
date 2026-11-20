@@ -110,6 +110,7 @@ const guides = guidesLens({
     { file: "commons/docs/guides/add-a-verb.md", path: "how-to/add-a-verb.html", section: "howto", group: "How-to", order: 3 },
     { file: "commons/docs/guides/cut-a-release.md", path: "how-to/cut-a-release.html", section: "howto", group: "How-to", order: 4 },
     { file: "commons/docs/guides/consuming-commons.md", path: "how-to/consuming-commons.html", section: "howto", group: "How-to", order: 5 },
+    { file: "commons/docs/guides/repoctl-in-your-repo.md", path: "how-to/repoctl-in-your-repo.html", section: "howto", group: "How-to", order: 6 },
     { file: "commons/docs/guides/ai-start.md", path: "how-to/ai-start.html", section: "howto", group: "With an AI assistant", order: 0 },
     { file: "commons/docs/guides/ai-add-a-library.md", path: "how-to/ai-add-a-library.html", section: "howto", group: "With an AI assistant", order: 1 },
     { file: "commons/docs/guides/ai-fix-a-failing-check.md", path: "how-to/ai-fix-a-failing-check.html", section: "howto", group: "With an AI assistant", order: 2 },

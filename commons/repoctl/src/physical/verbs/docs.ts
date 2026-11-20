@@ -1,6 +1,6 @@
 // Spec: 0011-repoctl-docs FR-001
 /**
- * `repoctl docs build`, `serve` and `check` on Headless (commons repoctl 0011-repoctl-docs FR-001 to FR-005): the verbs that wrap the documentation generator `ifc-docs` of `@intellectual-frontiers/docs`, which a repository installs beside repoctl
+ * `repoctl docs build`, `serve` and `check` on Headless (commons repoctl 0011-repoctl-docs FR-001 to FR-004): the verbs that wrap the documentation generator `ifc-docs` of `@intellectual-frontiers/docs`, which a repository installs beside repoctl
  * and which is loaded where it is, by its package name, never carried. `build` writes the site into the folder the configuration's `docs.out` names, `check` builds it into a temporary folder and says every finding, and `serve` builds it and serves it
  * on a loopback port of this computer until it is stopped. Nothing is uploaded anywhere.
  *

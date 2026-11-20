@@ -45,6 +45,7 @@ proves(R, "the repository has only the top-level entries it is meant to have", a
     "commons",
     "package.json",
     "profile",
+    "repoctl.config.ts",
     "tests",
   ]);
   for (const t of top) assert(allowed.has(t ?? ""), `a new top-level entry: ${t}`);

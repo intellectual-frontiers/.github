@@ -45,7 +45,7 @@ flowchart TB
 - **IFQS** (Quality System): what is true of a system is what it reports when it runs, kept as evidence with a grade from E0 to E5. [`0021-ifqs`](commons/spec-kit/specs/0021-ifqs/spec.md)
 - **IFCCM** (Capabilities Configuration Management): the capability is the unit of change, and every commit names its issue on a line of its own. [`0020-ifccm`](commons/spec-kit/specs/0020-ifccm/spec.md)
 - **Headless**: an action is defined once, with what it may do, and drawn as a command line, a tool server (MCP), a REST service or an SSH-reached command, so a program has no window it cannot do without. [`commons/headless`](commons/headless/about.ts)
-- **Repoctl** is the operations program of this repository: the `repoctl` command makes every generated file in dependency order, merges without hand-resolving one, runs every check in one report, tells each library's version in the repository, on npm and in its tag, plans and publishes a release, scaffolds a library and makes the commit, as a person types it or as an AI agent calls it through a tool server, by audience tier. [`commons/repoctl`](commons/repoctl/about.ts)
+- **Repoctl** is the operations program of a repository, driven by a typed `repoctl.config.ts` at its root: the `repoctl` command makes every generated file in dependency order, merges without hand-resolving one, runs every named check in one report, makes the commit with the repository's identity and trailers and says what is wrong with a checkout; where the configuration turns them on it also tells each library's version in the repository, on npm and in its tag, plans and publishes a release, scaffolds a library, proves a change by its blast radius and builds the documentation, as a person types it or as an AI agent calls it through a tool server, by audience tier. It is published to npm, so a repository of your own installs it and writes its own configuration ([the guide](commons/docs/guides/repoctl-in-your-repo.md)). [`commons/repoctl`](commons/repoctl/about.ts)
 - **Ergonex** is the front door: the `ergonex` command sets up and runs a team's workspace (repositories, pinned tools, shell) on Windows, macOS and Linux, and shows its plan before it changes anything. [`commons/ergonex`](commons/ergonex/about.ts)
 
 ```sh
@@ -206,6 +206,16 @@ bun run repoctl release plan                  # what the release would do, from 
 ```
 
 `bun run dev:check` type-checks and tests what your change touches, and `bun run repoctl doctor` says what is wrong with a checkout. A branch is brought up to date with `bun run repoctl merge origin/main`, which makes a conflicting generated file again instead of leaving it to be resolved by hand. Work spec first: change the specification, then the code, then the tests (`commons/spec-kit/specs/`, and each library's own `spec-kit/`).
+
+**Use repoctl in a repository of your own.** Install the package and write the configuration at the root of the repository; the host knows nothing else of it:
+
+```sh
+npm install --save-dev @intellectual-frontiers/repoctl   # repoctl.config.ts: export default defineConfig({ repo, commit, generators, checks })
+npx repoctl doctor                                       # what is wrong with this checkout, and the command for each
+npx repoctl sync --check                                 # which generated files are stale (the generators are the ones you declared)
+```
+
+The configuration names the generators, the checks, the commit rules and the optional verbs of that repository (`release`, `new library`, `status`, `prove`, `docs`); [`repoctl.config.ts`](repoctl.config.ts) at the root of this repository is a full example.
 
 ## License
 

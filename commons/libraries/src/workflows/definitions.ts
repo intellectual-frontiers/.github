@@ -266,6 +266,7 @@ const ifcTypescript: Workflow = {
         checkout(),
         bun(),
         tools("commons/ts"),
+        tools("commons/docs", "The documentation generator's dependencies, which the sources of commons/ts's check reach"),
         run("bun x tsc --version && bun run check", {
           name: "TypeScript 7 on everything, then the kernel with no host types",
           workingDirectory: "commons/ts",
@@ -503,6 +504,7 @@ const tests: Workflow = {
         }),
         bun(),
         tools("commons/ts"),
+        tools("commons/docs", "The documentation generator's dependencies, which the tests of the root import"),
         run("bun run check", { name: "TypeScript 7 on commons' tools and on these tests", workingDirectory: "commons/ts" }),
         run("bun fmt --check . ../tools ../../tests", { name: "The formatter", workingDirectory: "commons/ts" }),
         run('bun x "bun@$BUN_LINT_VERSION" lint --type-aware --max-warnings 0 ../tools ../../tests', {

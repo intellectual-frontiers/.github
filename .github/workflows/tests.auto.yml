@@ -34,6 +34,9 @@ jobs:
       - name: "The development tools, from bun.lock"
         run: bun install --frozen-lockfile
         working-directory: commons/ts
+      - name: "The documentation generator's dependencies, which the tests of the root import"
+        run: bun install --frozen-lockfile
+        working-directory: commons/docs
       - name: "TypeScript 7 on commons' tools and on these tests"
         run: bun run check
         working-directory: commons/ts
