@@ -67,6 +67,7 @@ import {
 import { completions, helpFor, isShell, manPage, SHELLS } from "./help.ts";
 import type { Io, RunEnd, RunEvents, RunResult } from "./io.ts";
 import { promptOf } from "./prompts.ts";
+import { forwardedArgs, runEntry, runOn } from "./remote-run.ts";
 import { renderClosing } from "./render.ts";
 import { Reporter } from "./reporter.ts";
 import { guarded } from "./signals.ts";
@@ -148,6 +149,7 @@ export async function run(program: Program, argv: readonly string[], io: Io): Pr
     writeOut(completions(program, shell));
     return end(exitCodeOf("ok"));
   }
+  if (first === "run") return await runEntry(program, argv.slice(1), io, (words) => run(program, words, io));
   if (first === "man") {
     writeOut(manPage(program));
     return end(exitCodeOf("ok"));
@@ -165,7 +167,7 @@ export async function run(program: Program, argv: readonly string[], io: Io): Pr
   const placed: Placed | undefined = placedCommands(program.children).find((p) => p.path.length === below.length && p.path.every((w, i) => w === below[i]));
   if (placed === undefined) return usage(`${below.join(" ")} is not a command of ${program.name}`);
 
-  const spec: Spec = { ...placed.command.options, ...standardOptions(placed.facts) };
+  const spec: Spec = { ...placed.command.options, ...standardOptions(placed.facts, placed.reach) };
   const parsed = parseArgs<Spec>(r.args, spec as never, placed.command.operands);
   if (isErr(parsed)) return usage(formatUsageError(parsed.error, [program.name, ...below].join(" ")));
   if (parsed.value.kind === "help") {
@@ -191,6 +193,16 @@ export async function run(program: Program, argv: readonly string[], io: Io): Pr
   if (decision.kind === "ask") {
     const yes = await prompt.confirm(`${placed.id} destroys something and it cannot be undone. Go on?`);
     if (yes !== true) return usage("Not confirmed: nothing was changed.");
+  }
+
+  const onTargets = standard["on"];
+  if (typeof onTargets === "string") {
+    const forwarded = forwardedArgs(r.args);
+    const withYes = placed.facts.effect === "destructive" && !forwarded.includes("--yes") && decision.kind !== "preview" ? ["--yes", ...forwarded] : forwarded;
+    const done = await runOn({ program, io, placed, selector: onTargets, args: withYes, verbosity: verbosity.value, look, sarif: flag("sarif"), below });
+    writeOut(done.out);
+    writeErr(done.err);
+    return end(done.code);
   }
 
   const info = { program: program.name, version: program.version, command: placed.id };

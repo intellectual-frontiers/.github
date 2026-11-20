@@ -3,3 +3,6 @@ number	slug	state
 0002	headless-governance	in force
 0003	headless-output	in force
 0004	headless-cli	in force
+0005	reach-and-targets	in force
+0006	machine-verbs	in force
+0007	ssh-coverage	in force

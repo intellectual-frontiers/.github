@@ -64,7 +64,7 @@ export function helpFor(program: Program, path: readonly string[]): string | und
   const tree = treeOf(program);
   const placed = placedAt(program, path);
   if (placed !== undefined) {
-    const verb = { ...verbOf(placed.command), options: { ...placed.command.options, ...standardOptions(placed.facts) } };
+    const verb = { ...verbOf(placed.command), options: { ...placed.command.options, ...standardOptions(placed.facts, placed.reach) } };
     return [commandHelp([program.name, ...path], verb), "", ...effectLines(placed.facts)].join("\n");
   }
   let node: Group | undefined = tree;
@@ -103,7 +103,7 @@ export function completionTable(program: Program): readonly Completion[] {
   out.push({ path: [], words: [...program.children.map((c) => c.name), ...BUILT_IN, "--help", "--version"] });
   walk(program.children, []);
   for (const p of placedCommands(program.children)) {
-    out.push({ path: p.path, words: ["--help", ...optionWords({ ...p.command.options, ...standardOptions(p.facts) })] });
+    out.push({ path: p.path, words: ["--help", ...optionWords({ ...p.command.options, ...standardOptions(p.facts, p.reach) })] });
   }
   return out;
 }
@@ -197,7 +197,7 @@ export function manPage(program: Program): string {
   for (const p of placedCommands(program.children)) {
     lines.push(".TP", `.B ${roff([program.name, ...p.path].join(" "))}`, roff(p.command.summary));
     for (const l of effectLines(p.facts)) lines.push(".br", roff(l));
-    const spec = { ...p.command.options, ...standardOptions(p.facts) };
+    const spec = { ...p.command.options, ...standardOptions(p.facts, p.reach) };
     for (const k of Object.keys(spec)) {
       const o = spec[k];
       if (o === undefined) continue;

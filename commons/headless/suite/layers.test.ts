@@ -13,11 +13,16 @@ import { allowedExternal, externalsOf, layerFindings, MAY_IMPORT, specifiersOf, 
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
 const PKG = "@intellectual-frontiers/headless";
+/** A step up, written so that this file does not itself read as an import of a file outside the library. */
+const UP = "../";
 const EXPORTS: Record<string, string> = {
   ".": "./src/mod.ts",
   "./governance": "./src/governance/mod.ts",
   "./logical": "./src/logical/mod.ts",
   "./cli": "./src/surfaces/cli/mod.ts",
+  "./targets/local": "./src/targets/local/mod.ts",
+  "./targets/ssh": "./src/targets/ssh/mod.ts",
+  "./ssh-inbound": "./src/surfaces/ssh-inbound/mod.ts",
   "./otel": "./src/otel/mod.ts",
 };
 const at = (path: string, text: string) => ({ path, text });
@@ -77,7 +82,7 @@ proves(["0001-headless-layers FR-002"], "imports point one way: below may not im
 
 proves(["0001-headless-layers FR-003"], "a file of one unit reaches another through the package's exports, never by a relative path, and a name exports does not name is layers/private", () => {
   assertEquals(rules([at("src/logical/a.ts", `import { x } from "../governance/action.ts";\n`)]), ["layers/relative"]);
-  assertEquals(rules([at("src/surfaces/cli/a.ts", `import { x } from "../../logical/model.ts";\n`)]), ["layers/relative"]);
+  assertEquals(rules([at("src/surfaces/cli/a.ts", `import { x } from "${UP}${UP}logical/model.ts";\n`)]), ["layers/relative"]);
   assertEquals(rules([at("src/logical/a.ts", `import { x } from "./model.ts";\n`)]), [], "inside the unit a relative import is fine");
   assertEquals(rules([at("src/logical/a.ts", `import { x } from "${PKG}/governance/action";\n`)]), ["layers/private"]);
   assertEquals(rules([at("src/logical/a.ts", `import { x } from "${PKG}/nothing";\n`)]), ["layers/private"]);
@@ -117,7 +122,7 @@ proves(["0001-headless-layers FR-005"], "the command-line surface may not import
 });
 
 proves(["0001-headless-layers FR-006"], "a surface is one folder with one row of the table; a folder with no row is layers/unclassified, and its row says what it may import", () => {
-  assertEquals(Object.keys(SURFACES), ["cli"]);
+  assertEquals(Object.keys(SURFACES), ["cli", "ssh-inbound"]);
   assertEquals(rules([at("src/surfaces/mcp/server.ts", `export const x = 1;\n`)]), ["layers/unclassified"]);
   assertEquals(rules([at("src/surfaces/rest/routes.ts", `import { x } from "${PKG}/logical";\n`)]), ["layers/unclassified"]);
   assertEquals(rules([at("src/surfaces/cli/a.ts", `import { x } from "${PKG}/logical";\n`)]), []);

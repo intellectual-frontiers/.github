@@ -49,7 +49,7 @@ export function summaryOf(o: Outcome): RunSummary {
   return { fails: c.fail, warns: c.warn, pending: c.pending, actions: c.action, problems: o.problems, outcomes: o.outcomes };
 }
 
-const problemDecoder = object(
+export const problemDecoder = object(
   { level: literal("fail", "warn", "pending", "action"), message: string },
   { phase: string, fix: string, code: string, raw: string, logLine: integer },
 );

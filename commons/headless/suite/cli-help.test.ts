@@ -18,7 +18,7 @@ const p = sample();
 proves(["0004-headless-cli FR-010"], "the help of every level is made from the declaration, and a verb's help says its effect, its repetition and its audience, with the options of its effect", () => {
   const top = helpFor(p, []) ?? "";
   for (const c of ["status", "sync", "wipe", "work"]) assertStringIncludes(top, c);
-  assertStringIncludes(top, "Built in: help, explain, completions, man, --version");
+  assertStringIncludes(top, "Built in: help, explain, completions, man, run, --version");
   assertStringIncludes(helpFor(p, ["work"]) ?? "", "build");
   assertEquals(helpFor(p, ["work", "nope"]), undefined);
   assertEquals(helpFor(p, ["nope"]), undefined);
@@ -40,14 +40,14 @@ proves(["0004-headless-cli FR-010"], "the help of every level is made from the d
 /** Every word of a command line the parser accepts for a placed command: its long options with their negations, and its short letters. */
 function acceptedWords(id: string): readonly string[] {
   const placed = placedCommands(p.children).find((x) => x.id === id)!;
-  const spec = { ...placed.command.options, ...standardOptions(placed.facts) };
+  const spec = { ...placed.command.options, ...standardOptions(placed.facts, placed.reach) };
   return Object.entries(spec).flatMap(([k, o]) => [longName(k), ...(o.kind === "flag" && o.negatable ? [`--no-${longName(k).slice(2)}`] : []), ...(o.short === undefined ? [] : [`-${o.short}`])]);
 }
 
 proves(["0004-headless-cli FR-010"], "the completion table has every command and every option of the tree, and its words are all words the parser accepts", () => {
   const table = completionTable(p);
   const at = (...path: string[]) => table.find((c) => c.path.join(" ") === path.join(" "))?.words;
-  assertEquals(at(), ["status", "sync", "wipe", "work", "help", "explain", "completions", "man", "--help", "--version"]);
+  assertEquals(at(), ["status", "sync", "wipe", "work", "help", "explain", "completions", "man", "run", "--help", "--version"]);
   assertEquals(at("work"), ["build", "plan", "--help"]);
   for (const placed of placedCommands(p.children)) {
     const words = at(...placed.path) ?? [];

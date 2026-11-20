@@ -10,9 +10,9 @@ export const library = {
   level: "L1",
   specKit: "spec-kit",
   verify: "bun run verify",
-  version: "0.1.0",
+  version: "0.3.0",
   distribution: ["github", "npm"],
-  exports: [".", "./governance", "./logical", "./cli", "./otel"],
+  exports: [".", "./governance", "./logical", "./cli", "./targets/local", "./targets/ssh", "./ssh-inbound", "./otel"],
   summary:
     "Headless programs as one contract in layers: the governance of an action (kind, effect, audience, confirmation, problems, exit statuses, redaction), the logical layer (the command model, the typed outcome, the closing block, JSON and SARIF, explain, hints, nested runs) and the command-line surface (calm output, prompts, the run log, signals, help, completions, man pages), with an OpenTelemetry adapter of its own.",
 };

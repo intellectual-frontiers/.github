@@ -18,6 +18,7 @@ import { DEFAULT_GENERIC_CODES, type GenericCodes } from "@intellectual-frontier
 import type { Catalogue, GuideLinks, RawPattern } from "./explain.ts";
 import type { FixCommands } from "./fix.ts";
 import type { Node } from "./model.ts";
+import type { Target } from "./remote.ts";
 import { nestedNames, type NestedNames } from "./nested.ts";
 
 /** What a program gives. */
@@ -38,6 +39,10 @@ export type ProgramConfig = {
   readonly generic?: GenericCodes;
   /** The secret values the program holds: redacted wherever they would be written. */
   readonly secrets?: () => readonly string[];
+  /** The targets `--on` can name. */
+  readonly targets?: readonly Target[];
+  /** How a run over targets is bounded: how many at once (4) and how long each may take (30 s). */
+  readonly remote?: { readonly concurrency?: number; readonly perHostTimeoutMs?: number };
   /** The words to run where none are given (`status`); none by default, and the help is shown. */
   readonly defaultCommand?: readonly string[];
 };
@@ -58,6 +63,8 @@ export type Program = {
   readonly generic: GenericCodes;
   readonly secrets: () => readonly string[];
   readonly defaultCommand: readonly string[];
+  readonly targets: readonly Target[];
+  readonly remote: { readonly concurrency: number; readonly perHostTimeoutMs: number };
 };
 
 /** The program with the defaults of everything it did not give. */
@@ -78,5 +85,7 @@ export function programOf(c: ProgramConfig): Program {
     generic: c.generic ?? DEFAULT_GENERIC_CODES,
     secrets: c.secrets ?? (() => []),
     defaultCommand: c.defaultCommand ?? [],
+    targets: c.targets ?? [],
+    remote: { concurrency: c.remote?.concurrency ?? 4, perHostTimeoutMs: c.remote?.perHostTimeoutMs ?? 30_000 },
   };
 }

@@ -318,6 +318,7 @@ proves(
       "@intellectual-frontiers/formats": "0.1.0",
       "@intellectual-frontiers/githost": "0.1.0",
       "@intellectual-frontiers/grc": "0.1.0",
+      "@intellectual-frontiers/headless": "0.2.2",
       "@intellectual-frontiers/mizan": "0.1.0",
       "@intellectual-frontiers/net": "0.1.0",
       "@intellectual-frontiers/ontology": "0.1.2",
