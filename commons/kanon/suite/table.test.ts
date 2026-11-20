@@ -86,9 +86,9 @@ proves(["0001-kanon-checker FR-001", "0001-kanon-checker FR-009"], "a unit is a 
 });
 
 proves(["0001-kanon-checker FR-004", "0001-kanon-checker FR-009"], "the codes are a closed union with a summary and a family for each", () => {
-  assertEquals(RULES.length, 8);
+  assertEquals(RULES.length, 14);
   for (const rule of RULES) {
     assert(RULE_SUMMARY[rule].length > 0, rule);
-    assertEquals(familyOf(rule), rule.startsWith("layers/") ? "layers" : "kanon");
+    assertEquals(familyOf(rule), rule.split("/")[0]);
   }
 });

@@ -1,3 +1,4 @@
+// Spec: 0001-ontologies FR-001
 /**
  * The ontology of Kanon (commons 0033-kanon), as the typed values the generator reads (commons 0012-ontology FR-008): its file, and what it states by kind.
  *

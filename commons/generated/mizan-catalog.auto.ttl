@@ -59,7 +59,7 @@
     dcat:version "1.0.0" .
 
 <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-kanon> a dcat:Dataset ;
-    dcterms:description "The vocabulary of Kanon, the pattern of a library built in three layers: the layers, the elements they say, the projections that derive one from the other, the trace edges that keep identity, the surfaces and the findings of the check."@en ;
+    dcterms:description "The vocabulary of Kanon, the pattern of a library built in three layers: the layers, the elements they say, the projections that derive one from the other, the trace edges that keep identity, the surfaces, the findings of the check, the instances of a unit kind, the plugins, the families and the matrix of requirement by instance."@en ;
     dcterms:identifier "https://www.intellectualfrontiers.com/ontology/kanon" ;
     dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
     dcterms:publisher <https://www.intellectualfrontiers.com/> ;

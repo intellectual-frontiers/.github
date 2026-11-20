@@ -16,3 +16,4 @@ requirement	mechanism	by	note
 0001-libraries FR-013	check	.github: cd commons/libraries && bun test suite/	releasing.test.ts: each rule of the plan on facts, and on a real repository with tags and commits
 0001-libraries FR-014	check	.github: cd commons/libraries && bun test suite/	releasing.test.ts: apply writes the versions, makes the generated files once, writes the record and publishes and tags nothing; matrix leaves out what is tagged
 0001-libraries FR-015	check	.github: cd commons/libraries && bun test suite/	workflows.test.ts: the release workflow is by hand from main, in the order of the record, with provenance and the token only where there is one
+0001-libraries FR-016	check	.github: cd commons/libraries && bun test suite/	family.test.ts: the family field is decoded, the reserved names are found as data with no folder, and each side of a family held against the host's table is found
