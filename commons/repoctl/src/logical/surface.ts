@@ -193,7 +193,7 @@ export function declarationsOf(file: string, text: string): readonly Declaration
 export function fingerprintOf(declarations: readonly Declaration[], hash: (text: string) => string): Fingerprint {
   const byName = new Map<string, string[]>();
   for (const d of declarations) byName.set(d.name, [...(byName.get(d.name) ?? []), hash(d.text)]);
-  return new Map([...byName].sort(([a], [b]) => (a < b ? -1 : 1)).map(([name, hashes]) => [name, hash([...hashes].sort().join(","))]));
+  return new Map([...byName].sort(([a], [b]) => (a < b ? -1 : 1)).map(([name, hashes]) => [name, [...hashes].sort().join(",")]));
 }
 
 /** The names whose hash differs, that appeared or that went away between two fingerprints, sorted. */
