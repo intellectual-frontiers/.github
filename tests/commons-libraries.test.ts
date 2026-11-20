@@ -13,6 +13,7 @@ import { fs, path, proc } from "../commons/system/src/mod.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../commons/test/src/test.ts";
 import { check, message } from "../commons/tools/mizan-check.ts";
 import { manifestFindings, synchronize } from "../commons/libraries/src/libraries.ts";
+import { synchronize as readmeSync } from "../commons/libraries/src/readme.ts";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
 const SPEC = "0027-commons-libraries";
@@ -292,5 +293,15 @@ proves(
     assertStringIncludes(libraryFindings(c.repo).join("\n"), "data.auto.yml is a workflow of a library of its own");
     fs.removeSync(`${c.repo}/.github/workflows/ci.auto.yml`);
     assertStringIncludes(libraryFindings(c.repo).join("\n"), ".github/workflows/ci.auto.yml is missing");
+  },
+);
+
+proves(
+  [`${SPEC} FR-011`],
+  "the table of the libraries in the root README is what the manifests make: a library added, removed or reworded without the README regenerated fails here",
+  () => {
+    const r = readmeSync(ROOT, false);
+    assertEquals(r.problems, []);
+    assertEquals(r.stale, false);
   },
 );

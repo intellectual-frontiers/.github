@@ -30,6 +30,7 @@ export const library = {
     "./releasing",
     "./plan",
     "./publish-ontology",
+    "./readme",
     "./versions",
     "./workflows",
     "./workflows/definitions",

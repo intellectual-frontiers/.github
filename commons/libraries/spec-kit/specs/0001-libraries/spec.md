@@ -38,6 +38,11 @@
 
 - **FR-016**: The decoder of the manifest MUST read the optional field `family` (a `host`, a library name, and a `role` of `host`, `dialect` or `plugin`), and the check of the manifests MUST find, as one sentence each: a library whose name a reservation holds and whose family is not the host the reservation names (the reservations are data of the library, an exact name or a prefix with the host that may hold it, and hold `archon`, `archon-*`, `signing`, `gitops` and `estate`, with no folder); a host that is not named as its family; a dialect or plugin whose host is not a library that declares role `host` and a `kanon` table; a name the host's family rule does not read as its role; a member the host's table does not declare, and a member the host's table declares that no library declares; a member whose `kanon` table does not extend the host; and a library whose name the family rule of a host reads as a member and that declares no family.
 
+## The map of the libraries in the README
+
+- **FR-017**: The library MUST make, from the manifests and the `summary` of each library's `about.ts` (read as data, no library run), the table of the libraries in the root `README.md` between the markers `<!-- libraries-map:begin -->` and `<!-- libraries-map:end -->` (`readme.ts`, exported as `./readme`): one row for each library, sorted by role (foundation, pattern, program, standard) and then by name, with the package (linked to npm where it is published there), the first clause of the first sentence of its summary, its Kanon shape where its manifest declares a table, its level and its registries; it MUST name a library that has no role as a problem, MUST fail with `--check` (and write nothing) where the README is not what the manifests make, and `verify` and the tests of the repository MUST run that check.
+- **FR-018**: The root `README.md` MUST describe what is and nothing that was: it MUST NOT contain the words formerly, previously, legacy, deprecated, backward, migration, UAT, acceptance test or agora, and every link of it whose target is a path in the repository MUST name a file or folder that exists.
+
 ## Acceptance scenarios
 
 1. **Given** a folder `commons/x/` with a manifest, **When** the section of the libraries is made, **Then** it holds one requirement for `x` and its row, and `--check` fails where either differs, per FR-001 and FR-002.
