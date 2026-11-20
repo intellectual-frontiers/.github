@@ -37,7 +37,10 @@ async function project(kind: "link" | "file"): Promise<string> {
       },
     }),
   );
-  await put("a.ts", 'import { ok } from "@intellectual-frontiers/core";\nexport const r = ok(42);\n');
+  await put(
+    "a.ts",
+    'import { ok } from "@intellectual-frontiers/core";\nimport * as kernel from "@intellectual-frontiers/commons/ts/kernel";\nexport const r = typeof kernel === "object" ? ok(42) : ok(0);\n',
+  );
   await put("internal.ts", 'export const secret = "internal";\n');
   await put("main.ts", 'import { r } from "@intellectual-frontiers/probe/a";\nconsole.log(`${r.kind}:${r.value}`);\n');
   await put("deep.ts", 'import("@intellectual-frontiers/probe/internal").then(() => process.exit(0), () => process.exit(7));\n');
