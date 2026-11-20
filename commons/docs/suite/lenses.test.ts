@@ -5,8 +5,8 @@
  * @module
  */
 import { assertEquals, proves } from "@intellectual-frontiers/test";
-import { readApi } from "../extract/api.ts";
-import type { Lens } from "../lens.ts";
+import { readApi } from "../src/extract/api.ts";
+import type { Lens } from "../src/lens.ts";
 import { fixtureArea, freshBuild, ROOT } from "./helpers.ts";
 
 const demo: Lens = {

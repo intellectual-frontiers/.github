@@ -5,9 +5,9 @@
  * @module
  */
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
-import { SECTIONS } from "../emit/html.ts";
-import { buildSite } from "../site.ts";
-import { guidesLens } from "../lens/guides.ts";
+import { SECTIONS } from "../src/emit/html.ts";
+import { buildSite } from "../src/site.ts";
+import { guidesLens } from "../src/lens/guides.ts";
 import { freshBuild } from "./helpers.ts";
 import { CONFIG } from "./helpers.ts";
 

@@ -5,10 +5,10 @@
  */
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { fs, path } from "@intellectual-frontiers/system";
-import { document } from "../emit/html.ts";
-import { releasesLens } from "../lens/releases.ts";
-import { traceOf } from "../pages/specs.ts";
-import { buildSite } from "../site.ts";
+import { document } from "../src/emit/html.ts";
+import { releasesLens } from "../src/lens/releases.ts";
+import { traceOf } from "../src/pages/specs.ts";
+import { buildSite } from "../src/site.ts";
 import { CONFIG, freshBuild, ROOT } from "./helpers.ts";
 
 proves(["0011-documentation FR-035"], "a requirement says which tests name it and which files are written to it, and the page of a specification shows them as links", async () => {
@@ -47,7 +47,7 @@ proves(["0011-documentation FR-035"], "the releases page lists the record in its
 proves(["0011-documentation FR-035"], "the search has a filter by kind, which the script fills from the index", async () => {
   const html = document({ path: "index.html", title: "T", description: "D", section: "overview", group: "G", order: 0, blocks: [] }, { name: "N", repository: "r", pages: [] });
   assertStringIncludes(html, 'class="search-kind"');
-  const js = await fs.readTextFile(path.join(ROOT, "commons/docs/theme/site.js"));
+  const js = await fs.readTextFile(path.join(ROOT, "commons/docs/src/theme/site.js"));
   assertStringIncludes(js, "e.group !== only");
   assert(traceOf !== undefined);
 });

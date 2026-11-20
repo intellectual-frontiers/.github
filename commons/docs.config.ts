@@ -6,12 +6,12 @@
  * @module
  */
 import { existsSync, readdirSync, readFileSync } from "node:fs";
-import type { About, DocsConfig, PackageConfig } from "./docs/config.ts";
-import { layeredLens } from "./docs/lens/layered.ts";
+import type { About, DocsConfig, PackageConfig } from "./docs/src/config.ts";
+import { layeredLens } from "./docs/src/lens/layered.ts";
 import { DEFAULT_LICENSE } from "./libraries/src/license/standard.ts";
-import { guidesLens } from "./docs/lens/guides.ts";
-import { releasesLens } from "./docs/lens/releases.ts";
-import { programLens } from "./docs/lens/program.ts";
+import { guidesLens } from "./docs/src/lens/guides.ts";
+import { releasesLens } from "./docs/src/lens/releases.ts";
+import { programLens } from "./docs/src/lens/program.ts";
 import { ergonexProgram, type ProgramHost } from "./ergonex/src/mod.ts";
 import { describe } from "./headless/src/describe/mod.ts";
 import { INERT_HOST as REPOCTL_INERT_HOST, repoctlProgram } from "./repoctl/src/mod.ts";
@@ -150,6 +150,7 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/crypto/spec-kit" },
     { layout: "commons", dir: "commons/formats/spec-kit" },
     { layout: "commons", dir: "commons/data/spec-kit" },
+    { layout: "commons", dir: "commons/docs/spec-kit" },
     { layout: "commons", dir: "commons/ergonex/spec-kit" },
     { layout: "commons", dir: "commons/libraries/spec-kit" },
     { layout: "commons", dir: "commons/quality/spec-kit" },

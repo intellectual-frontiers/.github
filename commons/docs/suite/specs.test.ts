@@ -5,8 +5,8 @@
  * @module
  */
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
-import { parseSpec } from "../extract/specs.ts";
-import { citedBy, specPages } from "../pages/specs.ts";
+import { parseSpec } from "../src/extract/specs.ts";
+import { citedBy, specPages } from "../src/pages/specs.ts";
 import { freshBuild } from "./helpers.ts";
 
 proves(["0011-documentation FR-015"], "a specification is read into its header, input and requirements", () => {

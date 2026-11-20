@@ -299,6 +299,11 @@ function namesNodeTypes(folder: string): boolean {
 export type PackOptions = {
   /** Types the compiler is given (`["node"]` for a library that names Node's). */
   readonly types?: readonly string[];
+  /**
+   * Commands of a package that is not a bundle: each command's name and the module, in `src/`, whose `main(argv)` gives the exit status; the package gets a one-line launcher for each (`<command>.mjs`, which Node and Bun run), made
+   * from the compiled module. The files under `src/` that are not TypeScript (a stylesheet a module reads beside itself) are published beside the sources and beside the compiled modules.
+   */
+  readonly launchers?: Readonly<Record<string, string>>;
   /** A bundled package: the code of each entry and of each command is one file (`bun build`), and only the declarations the entries reach are published. */
   readonly bundle?: {
     /** The commands: their name, and the source that is the command's entry from the library's folder. */
@@ -394,10 +399,15 @@ export async function packLibrary(root: string, options: PackOptions = {}): Prom
   // the sources, for the `bun` condition (a bundle has no source to offer: what it imports is not on npm)
   if (bundle === undefined) {
     for (const f of filesUnder(join(root, "src"))) {
-      if (!f.endsWith(".ts")) continue;
       const target = join(stage, "src", f);
       mkdirSync(dirname(target), { recursive: true });
       copyFileSync(join(root, "src", f), target);
+      if (!f.endsWith(".ts")) {
+        // a file that is not TypeScript is read beside the module that reads it, from the sources and from the compiled modules alike
+        const compiled = join(stage, "dist", f);
+        mkdirSync(dirname(compiled), { recursive: true });
+        copyFileSync(join(root, "src", f), compiled);
+      }
     }
   }
   // the entries: each names its declarations, its source (Bun) and its compiled file
@@ -421,6 +431,13 @@ export async function packLibrary(root: string, options: PackOptions = {}): Prom
   }
   // the commands of a bundle: one file each, with the line that runs it under Node
   const binOut: Record<string, string> = {};
+  for (const [cmd, source] of Object.entries(options.launchers ?? {})) {
+    const rel = toPosix(source).replace(/^\.?\/?(src\/)?/, "").replace(/\.ts$/, "");
+    const file = join(stage, `${cmd}.mjs`);
+    await writeTextFile(file, `#!/usr/bin/env node\nimport { main } from "./dist/${rel}.js";\n\nprocess.exit(await main(process.argv.slice(2)));\n`);
+    await chmod(file, 0o755);
+    binOut[cmd] = `./${cmd}.mjs`;
+  }
   for (const [cmd, source] of Object.entries(bundle?.bin ?? {})) {
     const file = join(stage, `${cmd}.mjs`);
     const bundled = await run([bun, "build", join(root, source), "--target=node", "--format=esm", "--outfile", file], { cwd: root });

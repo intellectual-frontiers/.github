@@ -5,10 +5,10 @@
  * @module
  */
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
-import type { LayeredModel } from "../layered.ts";
-import { programLens } from "../lens/program.ts";
-import { markdownOf } from "../emit/markdown.ts";
-import { brokenLinks } from "../site.ts";
+import type { LayeredModel } from "../src/layered.ts";
+import { programLens } from "../src/lens/program.ts";
+import { markdownOf } from "../src/emit/markdown.ts";
+import { brokenLinks } from "../src/site.ts";
 import { freshBuild } from "./helpers.ts";
 
 const layers = [

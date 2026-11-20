@@ -7,10 +7,10 @@
  */
 import { path } from "@intellectual-frontiers/system";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { Build } from "../build.ts";
-import type { Finding } from "../check.ts";
-import { parsePlainSpec, parseReviewed, readPlainKit, readSpecKits } from "../extract/specs.ts";
-import { CONSTITUTION_PAGE, specPages } from "../pages/specs.ts";
+import { Build } from "../src/build.ts";
+import type { Finding } from "../src/check.ts";
+import { parsePlainSpec, parseReviewed, readPlainKit, readSpecKits } from "../src/extract/specs.ts";
+import { CONSTITUTION_PAGE, specPages } from "../src/pages/specs.ts";
 import { resolved, ROOT } from "./helpers.ts";
 
 const FIXTURE = path.join(ROOT, "commons/docs/suite/fixture-repo");

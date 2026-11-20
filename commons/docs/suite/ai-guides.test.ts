@@ -6,7 +6,7 @@
  */
 import { fs, path, proc } from "@intellectual-frontiers/system";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { buildSite } from "../site.ts";
+import { buildSite } from "../src/site.ts";
 import { CONFIG, ROOT } from "./helpers.ts";
 
 const GUIDES = path.join(ROOT, "commons/docs/guides");

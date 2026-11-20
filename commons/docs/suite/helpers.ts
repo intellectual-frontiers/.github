@@ -6,11 +6,10 @@
  */
 import { fs, path, proc } from "@intellectual-frontiers/system";
 import { assertEquals } from "@intellectual-frontiers/test";
-import { config as commons } from "../../docs.config.ts";
-import { Build } from "../build.ts";
-import { type About, type Config, resolveConfig } from "../config.ts";
-import { readSpecKits } from "../extract/specs.ts";
-import type { Area, Package } from "../sources.ts";
+import { Build } from "../src/build.ts";
+import { type About, type Config, resolveConfig } from "../src/config.ts";
+import { readSpecKits } from "../src/extract/specs.ts";
+import type { Area, Package } from "../src/sources.ts";
 
 /** The checkout's root. */
 export const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "../../..");
@@ -25,8 +24,11 @@ export function resolved(value: unknown, file: string): Config {
   return r.value;
 }
 
-/** Commons' configuration, checked. */
-export const CONFIG: Config = resolved(commons, COMMONS_CONFIG);
+/**
+ * Commons' configuration, checked. The generator's tests document a real repository, commons itself, as their corpus (a library, a spec kit, a program, a data model of each kind): its configuration is read by a path built here at run time, so
+ * that the library keeps no import of a file outside its folder, and the tests that need it are the ones that need a repository to document.
+ */
+export const CONFIG: Config = resolved((await import(path.toFileUrl(COMMONS_CONFIG).href) as { config: unknown }).config, COMMONS_CONFIG);
 
 /** A build of the checkout, with nothing made yet. */
 export const freshBuild = (): Build => new Build(CONFIG, readSpecKits(ROOT, CONFIG.specKits));

@@ -5,9 +5,9 @@
  * @module
  */
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
-import { markdownOf } from "../emit/markdown.ts";
-import { searchIndex } from "../emit/search.ts";
-import { buildSite, wordFindings } from "../site.ts";
+import { markdownOf } from "../src/emit/markdown.ts";
+import { searchIndex } from "../src/emit/search.ts";
+import { buildSite, wordFindings } from "../src/site.ts";
 import { CONFIG } from "./helpers.ts";
 
 const find = (rows: ReturnType<typeof searchIndex>, query: string): string[] => {

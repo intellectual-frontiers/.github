@@ -8,7 +8,7 @@
     "./ts/kernel": "./commons/ts/kernel/mod.ts",
     "./ts/runtime": "./commons/ts/runtime/mod.ts",
     "./ts/node": "./commons/ts/node/register.mjs",
-    "./docs": "./commons/docs/mod.ts",
+    "./docs": "./commons/docs/src/mod.ts",
     "./ontology/mizan": "./commons/ontology/src/mizan/mod.ts"
   },
   "scripts": {

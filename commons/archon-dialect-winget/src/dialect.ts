@@ -15,6 +15,7 @@ import type { Dialect } from "@intellectual-frontiers/archon/dialect";
 import type { JsonValue, Requirement, RequirementId } from "@intellectual-frontiers/archon/governance";
 import { managerDialect, observeRequirements as observe, toolDialectOf, type CommandSource, type DialectOptions, type ManagerSpec, type Run } from "@intellectual-frontiers/package-managers";
 import { parseManagerId } from "@intellectual-frontiers/toolchain/governance";
+import type { ToolDialect } from "@intellectual-frontiers/toolchain/logical";
 
 /** The id of the dialect. */
 export const DIALECT_ID = "winget";
@@ -35,7 +36,7 @@ export const SPEC: ManagerSpec = {
 };
 
 /** The dialect as Toolchain reads it. */
-export const TOOL_DIALECT = toolDialectOf(SPEC);
+export const TOOL_DIALECT: ToolDialect = toolDialectOf(SPEC);
 
 /** The dialect, made from the commands of the packaging ontology (the reader of `supply-chain/commands`, as a function); `elevate` is the program that raises the rights, where the manager needs them. */
 export function winget(commands: CommandSource, options: DialectOptions = {}): Dialect {

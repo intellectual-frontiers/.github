@@ -6,10 +6,10 @@
  */
 import { fs, path, proc } from "@intellectual-frontiers/system";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { message, report } from "../check.ts";
-import { document } from "../emit/html.ts";
-import { brokenLinks, buildSite } from "../site.ts";
-import { checkAbout } from "../sources.ts";
+import { message, report } from "../src/check.ts";
+import { document } from "../src/emit/html.ts";
+import { brokenLinks, buildSite } from "../src/site.ts";
+import { checkAbout } from "../src/sources.ts";
 import { CONFIG, FIXTURE_PACKAGE, ROOT } from "./helpers.ts";
 
 proves(["0011-documentation FR-005", "0011-documentation FR-018"], "an about that names what is not there is a finding of each kind", () => {
@@ -53,7 +53,7 @@ proves(["0011-documentation FR-003", "0011-documentation FR-009"], "the site of 
 
 proves(["0011-documentation FR-003"], "check writes nothing in the checkout and exits 0 on commons", async () => {
   const before = fs.existsSync(path.join(ROOT, "_site")) ? (await fs.stat(path.join(ROOT, "_site"))).mtime?.getTime() : undefined;
-  const r = await proc.run([proc.execPath(), "main.ts", "check"], { cwd: path.join(ROOT, "commons/docs") });
+  const r = await proc.run([proc.execPath(), "src/main.ts", "check"], { cwd: path.join(ROOT, "commons/docs") });
   assertEquals(r.code, 0, r.stderr);
   const after = fs.existsSync(path.join(ROOT, "_site")) ? (await fs.stat(path.join(ROOT, "_site"))).mtime?.getTime() : undefined;
   assertEquals(after, before);

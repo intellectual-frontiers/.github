@@ -5,9 +5,9 @@
  * @module
  */
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import type { Finding } from "../check.ts";
-import { cite, hrefFor, type LinkIndex, linkFor } from "../links.ts";
-import { plain } from "../model.ts";
+import type { Finding } from "../src/check.ts";
+import { cite, hrefFor, type LinkIndex, linkFor } from "../src/links.ts";
+import { plain } from "../src/model.ts";
 
 const index: LinkIndex = {
   specs: new Map([["0009-sql-aide", new Set(["FR-001", "FR-026"])], ["0011-documentation", new Set(["FR-010"])]]),

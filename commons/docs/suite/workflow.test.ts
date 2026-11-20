@@ -8,15 +8,15 @@ import { fs, path } from "@intellectual-frontiers/system";
 import { assert, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { ROOT } from "./helpers.ts";
 
-proves(["0011-documentation FR-020"], "docs.yml tests and checks on pull requests and pushes, and publishes from main with GitHub's Pages actions", async () => {
-  const yml = await fs.readTextFile(path.join(ROOT, ".github/workflows/docs.auto.yml"));
-  for (const needed of ["pull_request:", "push:", "bun run verify", "actions/upload-pages-artifact@", "actions/deploy-pages@", "pages: write", "id-token: write", "github.ref == 'refs/heads/main'", "bun main.ts build --out"]) {
+proves(["0011-documentation FR-020"], "site.yml tests and checks on pull requests and pushes, and publishes from main with GitHub's Pages actions", async () => {
+  const yml = await fs.readTextFile(path.join(ROOT, ".github/workflows/site.auto.yml"));
+  for (const needed of ["pull_request:", "push:", "bun run verify", "actions/upload-pages-artifact@", "actions/deploy-pages@", "pages: write", "id-token: write", "github.ref == 'refs/heads/main'", "bun src/main.ts build --out"]) {
     assertStringIncludes(yml, needed);
   }
   assert(!/git (add|commit|push)/.test(yml), "the site is never committed");
 });
 
-proves(["0011-documentation FR-022"], "ifc-typescript.yml's git-dependency job runs both smoke tests from git+file: on three systems, and nothing releases", async () => {
+proves(["0011-documentation FR-022"], "ifc-typescript.yml's git-dependency job runs the smoke test of IFC TypeScript from git+file: on three systems, and nothing releases", async () => {
   const yml = await fs.readTextFile(path.join(ROOT, ".github/workflows/ifc-typescript.auto.yml"));
   const job = yml.slice(yml.indexOf("\n  git-dependency:"));
   assert(job.length > 0 && yml.includes("\n  git-dependency:"), "ifc-typescript.yml has the job git-dependency");
@@ -26,7 +26,6 @@ proves(["0011-documentation FR-022"], "ifc-typescript.yml's git-dependency job r
     "node-version: ${{ env.NODE_VERSION }}",
     'bun tools/smoke.ts --repo "$GITHUB_WORKSPACE" --commit "$GITHUB_SHA"',
     "working-directory: commons/ts",
-    "working-directory: commons/docs",
   ]) {
     assertStringIncludes(job, needed);
   }

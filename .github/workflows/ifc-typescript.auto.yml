@@ -182,9 +182,3 @@ jobs:
           node --version
           bun tools/smoke.ts --repo "$GITHUB_WORKSPACE" --commit "$GITHUB_SHA"
         working-directory: commons/ts
-      - name: "IFC Docs as a Git dependency, ifc-docs check and build on a fixture repository on Bun and Node 26"
-        shell: bash
-        run: |
-          bun install --frozen-lockfile
-          bun tools/smoke.ts --repo "$GITHUB_WORKSPACE" --commit "$GITHUB_SHA"
-        working-directory: commons/docs

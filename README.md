@@ -84,6 +84,7 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/archon-dialect-winget`](commons/archon-dialect-winget) | Program | The dialect of tools that installs them with WinGet | layers, extension | L1 | GitHub |
 | [`@intellectual-frontiers/archon-tool`](commons/archon-tool) | Program | The plugin that gives `archon` its verbs for tools | layers, extension | L1 | GitHub |
 | [`@intellectual-frontiers/data`](https://www.npmjs.com/package/@intellectual-frontiers/data) | Program | Governance (what a business domain is and what must be true of its data) | - | L1 | GitHub, npm |
+| [`@intellectual-frontiers/docs`](https://www.npmjs.com/package/@intellectual-frontiers/docs) | Program | The generator of a repository's documentation site | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/ergonex`](https://www.npmjs.com/package/@intellectual-frontiers/ergonex) | Program | The one command, `ergonex` | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/grc`](https://www.npmjs.com/package/@intellectual-frontiers/grc) | Program | Governance, risk and compliance in layers | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/integrations`](https://www.npmjs.com/package/@intellectual-frontiers/integrations) | Program | Two families on one skeleton of Kanon layers | layers | L1 | GitHub, npm |

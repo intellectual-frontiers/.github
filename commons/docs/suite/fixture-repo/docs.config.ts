@@ -5,7 +5,7 @@
  *
  * @module
  */
-import type { DocsConfig } from "@intellectual-frontiers/commons/docs";
+import type { DocsConfig } from "@intellectual-frontiers/docs";
 
 /** The fixture's site. */
 export const config: DocsConfig = {
