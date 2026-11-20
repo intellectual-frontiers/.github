@@ -99,9 +99,21 @@ export type Library = {
   readonly versionConstants?: readonly VersionConstant[];
   /** The package the library publishes where it is not `@intellectual-frontiers/<name>` (the `data` library publishes `@intellectual-frontiers/arcactl`; commons 0036-distribution FR-009). */
   readonly publishes?: PackageName;
+  /** Why the library is kept out of the release: it is verified and packed like any other, and has no release record entry, no tag, no set and no registry (FR-0xx of 0001-libraries). */
+  readonly held?: HeldReason;
   /** The set the library is, where it is a metapackage: a folder with no code of its own whose package depends on the libraries of the set at exact versions (commons 0036-distribution FR-005). */
   readonly bundle?: BundleName;
 };
+
+/** The reason a library is held out of the release: a non-empty sentence, made only by {@link parseHeldReason}. */
+export type HeldReason = Brand<string, "held reason">;
+const heldDecoder = refine(string, "held reason", (t) => t.trim() !== "" && t.trim() === t && !t.includes("\n"));
+
+/** A held reason from text, or why the text is not one. */
+export function parseHeldReason(text: string): Result<HeldReason, string> {
+  const r = heldDecoder(text, "held");
+  return r.kind === "ok" ? ok(r.value) : err("library.held is one non-empty line that says why the library is kept out of the release");
+}
 
 /** The scope of the packages of commons. */
 export const PACKAGE_SCOPE = "@intellectual-frontiers/";
@@ -160,9 +172,9 @@ const constantName: Decoder<string> = (input, path = "$") => {
 };
 const body = object(
   { name: nameDecoder, verify: nonEmpty, version: nonEmpty, exports: array(nonEmpty) },
-  { level: literal(...LEVELS), specKit: nonEmpty, summary: nonEmpty, distribution: array(literal(...REGISTRIES)), kanon: unknownValue, family: object({ host: nonEmpty, role: literal(...ROLES) }), license: nonEmpty, versionConstants: array(object({ file: nonEmpty, name: constantName })), publishes: nonEmpty, bundle: literal(...BUNDLES) },
+  { level: literal(...LEVELS), specKit: nonEmpty, summary: nonEmpty, distribution: array(literal(...REGISTRIES)), kanon: unknownValue, family: object({ host: nonEmpty, role: literal(...ROLES) }), license: nonEmpty, versionConstants: array(object({ file: nonEmpty, name: constantName })), publishes: nonEmpty, bundle: literal(...BUNDLES), held: string },
 );
-const FIELDS = ["name", "level", "specKit", "verify", "version", "exports", "summary", "distribution", "kanon", "family", "license", "versionConstants", "publishes", "bundle"] as const;
+const FIELDS = ["name", "level", "specKit", "verify", "version", "exports", "summary", "distribution", "kanon", "family", "license", "versionConstants", "publishes", "bundle", "held"] as const;
 
 /** The manifest read from the text of its file: `export const library = { ... }` and no other export, read as data and never run (0027-commons-libraries FR-012). */
 export function decodeLibrarySource(source: string): Result<Library, string> {
@@ -180,9 +192,16 @@ export function decodeLibrarySource(source: string): Result<Library, string> {
   if (r.kind === "err") return err(formatDecodeError(r.error));
   const v = r.value;
   const distribution = v.distribution ?? DEFAULT_DISTRIBUTION;
-  if (distribution.length === 0 || new Set(distribution).size !== distribution.length)
+  let held: HeldReason | undefined;
+  if (v.held !== undefined) {
+    const h = parseHeldReason(v.held);
+    if (h.kind === "err") return err(h.error);
+    held = h.value;
+    if (v.publishes !== undefined || v.bundle !== undefined) return err("library.held is not given with library.publishes or library.bundle: a held library is published nowhere");
+  }
+  if (held === undefined && (distribution.length === 0 || new Set(distribution).size !== distribution.length))
     return err("library.distribution lists each registry once and at least one (FR-015)");
-  if (!distribution.includes("github"))
+  if (held === undefined && !distribution.includes("github"))
     return err(
       "library.distribution includes github: a library is published to the GitHub package registry whatever else it is published to (FR-015, FR-016)",
     );
@@ -228,6 +247,7 @@ export function decodeLibrarySource(source: string): Result<Library, string> {
     ...(v.versionConstants === undefined ? {} : { versionConstants: v.versionConstants }),
     ...(publishes === undefined ? {} : { publishes }),
     ...(v.bundle === undefined ? {} : { bundle: v.bundle }),
+    ...(held === undefined ? {} : { held }),
   });
 }
 
@@ -358,7 +378,7 @@ const list = (items: readonly string[]): string => {
 export function requirementOf(id: string, l: Library): string {
   const kit = l.specKit === undefined ? "" : `, its spec kit at \`commons/${l.name}/${l.specKit}\``;
   const summary = l.summary === undefined ? "" : ` ${l.summary}`;
-  const where = l.distribution.map((r) => REGISTRY_NAME[r]).join(" and ");
+  const where = l.held === undefined ? l.distribution.map((r) => REGISTRY_NAME[r]).join(" and ") : `no registry (held out of the release: ${l.held})`;
   const own = l.publishes === undefined ? `@intellectual-frontiers/${l.name}` : l.publishes;
   const sets = l.bundle === undefined ? "" : `, a metapackage with no code of its own (the set ${l.bundle}, 0036-distribution FR-005)`;
   return `- **${id}**: \`commons/${l.name}\` MUST be a library at conformance level ${l.level} (\`${LEVEL_TERM[l.level]}\`): the package \`${own}\`${sets} at version \`${l.version}\`${kit}, exporting ${list(l.exports)}, published to ${where}, proved by \`cd commons/${l.name} && ${l.verify}\`.${summary}`;

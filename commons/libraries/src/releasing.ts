@@ -375,7 +375,7 @@ export async function factsOf(repo: string, registry: Registry = realRegistry(re
   const head = await resolveCommit(repo, "HEAD");
   if (head.kind === "err") return err(formatGitError(head.error));
   const folders = workFolders(tree.value.paths);
-  const libs = everyLibrary(repo);
+  const libs = everyLibrary(repo).filter((l) => l.held === undefined);
   const slugs = new Map<string, Slug>();
   for (const l of libs) {
     const s = slugOf(l.name);

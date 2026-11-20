@@ -121,6 +121,8 @@ export type Row = {
   readonly level: string;
   readonly distribution: readonly Registry[];
   readonly published: boolean;
+  /** Why the library is held out of the release, where it is. */
+  readonly held: string | undefined;
 };
 
 /**
@@ -206,7 +208,8 @@ export function rowOf(l: Library, summary: string): Result<Row, string> {
     shape: shapeOf(l),
     level: l.level,
     distribution: l.distribution,
-    published: l.distribution.includes("npm"),
+    published: l.held === undefined && l.distribution.includes("npm"),
+    held: l.held,
   });
 }
 
@@ -219,7 +222,7 @@ export function tableOf(rows: readonly Row[]): string {
   const body = sorted.map((r) => {
     const pkg = `@intellectual-frontiers/${r.name}`;
     const href = r.published ? `https://www.npmjs.com/package/${pkg}` : `commons/${r.name}`;
-    return `| [\`${pkg}\`](${href}) | ${ROLE_TITLE[r.role]} | ${r.purpose} | ${r.shape} | ${r.level} | ${r.distribution.map((d) => REGISTRY_TITLE[d]).join(", ")} |`;
+    return `| [\`${pkg}\`](${href}) | ${ROLE_TITLE[r.role]} | ${r.purpose} | ${r.shape} | ${r.level} | ${r.held === undefined ? r.distribution.map((d) => REGISTRY_TITLE[d]).join(", ") : "held"} |`;
   });
   return [...head, ...body].join("\n");
 }
