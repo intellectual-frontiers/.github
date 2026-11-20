@@ -1,0 +1,36 @@
+{
+  "name": "@intellectual-frontiers/headless",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Headless programs as one contract: the governance of an action (kind, effect, audience, confirmation, problems, exit statuses, redaction), the logical layer (the command model, the typed outcome, the closing block, JSON and SARIF, explain, hints, nested runs) and the command-line surface (calm output, prompts, the run log, signals, help, completions and man pages); a tool server and a REST surface slot in beside it.",
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "exports": {
+    ".": "./src/mod.ts",
+    "./governance": "./src/governance/mod.ts",
+    "./logical": "./src/logical/mod.ts",
+    "./cli": "./src/surfaces/cli/mod.ts",
+    "./otel": "./src/otel/mod.ts"
+  },
+  "scripts": {
+    "check": "tsc -p tsconfig.json",
+    "test": "bun test suite/",
+    "test:node": "node --test \"suite/**/*.test.ts\"",
+    "verify": "tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../ts/mizan/check.ts --root spec-kit --level L1 && bun tools/check.ts && bun test suite/ && bun tools/pack.ts --check",
+    "pack": "bun tools/pack.ts"
+  },
+  "devDependencies": {
+    "@intellectual-frontiers/commons": "link:../ts",
+    "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/mizan": "link:../mizan",
+    "@intellectual-frontiers/system": "link:../system",
+    "@intellectual-frontiers/telemetry": "link:../telemetry",
+    "@intellectual-frontiers/terminal": "link:../terminal",
+    "@intellectual-frontiers/test": "link:../test",
+    "@types/node": "26.6.6",
+    "fast-check": "4.10.2",
+    "typescript": "7.0.2"
+  }
+}
