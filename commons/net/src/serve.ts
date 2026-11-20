@@ -1,6 +1,7 @@
+// Spec: 0001-net FR-002
 /**
  * An HTTP server whose handler takes a web `Request` and gives a web `Response` on `node:http`, so the same handler
- * runs on Bun and Node (commons 0005-typescript-runtime FR-025). Request bodies and response bodies stream; a client that goes away
+ * runs on Bun and Node (commons 0001-net FR-002). Request bodies and response bodies stream; a client that goes away
  * aborts `request.signal`. `serve` returns a promise, settled once the port is bound, so `addr` is known.
  *
  * @example
@@ -107,7 +108,7 @@ export function serve(options: ServeOptions, handler: ServeHandler): Promise<Ser
     void (async () => {
       let response: Response;
       try {
-        // Where a telemetry pipeline is installed, an `http.server` span, the child of the request's `traceparent` (0006-signals FR-018).
+        // Where a telemetry pipeline is installed, an `http.server` span, the child of the request's `traceparent` (0001-net FR-016).
         response = await traceServer(request, () => handler(request, { remoteAddr }), handler);
       } catch (e) {
         response = await onError(e);

@@ -27,7 +27,7 @@ import {
   ok,
   type Result,
 } from "@intellectual-frontiers/core";
-import type { Exchange, Transport } from "../runtime/http-client.ts";
+import type { Exchange, Transport } from "@intellectual-frontiers/net/http-client";
 import { CAPABILITIES, unsupported } from "./capabilities.ts";
 import { describeRef } from "./remote.ts";
 import { decodeBody, failureOf, get, getDecoded, usableToken } from "./http.ts";

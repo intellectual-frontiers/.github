@@ -15,12 +15,12 @@ import { formatTraceparent, SEVERITY, type SpanData } from "@intellectual-fronti
 import type { LogBatch, MetricBatch, TraceBatch } from "@intellectual-frontiers/telemetry/otlp";
 import { defineSignals, memoryProcessor } from "@intellectual-frontiers/telemetry/signals";
 import { installed, otlpReceiver, type Started, startTelemetry, untraced } from "@intellectual-frontiers/telemetry/host/otel";
-import { liveTransport } from "../../runtime/http-client.ts";
-import { serve, type Server } from "../../runtime/serve.ts";
-import { assert, assertEquals, proves } from "../../runtime/test.ts";
+import { liveTransport } from "../src/http-client.ts";
+import { serve, type Server } from "../src/serve.ts";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 
-const OWN = "0006-signals FR-018";
-const RECEIVER = "0006-signals FR-019";
+const OWN = "0001-net FR-016";
+const RECEIVER = "0001-net FR-016";
 
 const registry = defineSignals({
   "test.step": { signal: "span", role: "step", attributes: { target: "string" } },

@@ -1,0 +1,37 @@
+{
+  "name": "@intellectual-frontiers/net",
+  "private": true,
+  "version": "0.1.0",
+  "description": "The network as one typed library: downloads that retry and resume, an HTTP server over web Request and Response, typed HTTP clients with recorded transports and AWS signing, TCP and TLS, DNS records, and ACME certificates by DNS-01; the same code on Bun and Node 26.",
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "exports": {
+    ".": "./src/mod.ts",
+    "./net": "./src/net.ts",
+    "./tcp": "./src/tcp.ts",
+    "./dns": "./src/dns.ts",
+    "./http-client": "./src/http-client.ts",
+    "./serve": "./src/serve.ts",
+    "./acme": "./src/acme.ts"
+  },
+  "scripts": {
+    "check": "tsc -p tsconfig.json",
+    "test": "bun test suite/",
+    "test:node": "node --test \"suite/**/*.test.ts\"",
+    "verify": "tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../ts/mizan/check.ts --root spec-kit --level L1 && bun tools/check.ts && bun test suite/ && bun tools/pack.ts --check",
+    "pack": "bun tools/pack.ts"
+  },
+  "devDependencies": {
+    "@intellectual-frontiers/commons": "link:../ts",
+    "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/crypto": "link:../crypto",
+    "@intellectual-frontiers/formats": "link:../formats",
+    "@intellectual-frontiers/system": "link:../system",
+    "@intellectual-frontiers/telemetry": "link:../telemetry",
+    "@types/node": "26.6.6",
+    "fast-check": "4.10.2",
+    "typescript": "7.0.2"
+  }
+}

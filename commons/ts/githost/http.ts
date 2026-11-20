@@ -5,7 +5,7 @@
  * @module
  */
 import { type Decoder, formatDecodeError, json, err, ok, type Result } from "@intellectual-frontiers/core";
-import type { Exchange, Transport } from "../runtime/http-client.ts";
+import type { Exchange, Transport } from "@intellectual-frontiers/net/http-client";
 import type { HostFailure } from "./types.ts";
 
 /** One GET, its answer whatever the status, or why the host was not reached. */

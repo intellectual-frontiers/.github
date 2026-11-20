@@ -6,7 +6,7 @@
  * @module
  */
 import { gitlabClient } from "../githost/gitlab.ts";
-import { type Exchange, recordedTransport } from "../runtime/http-client.ts";
+import { type Exchange, recordedTransport } from "@intellectual-frontiers/net/http-client";
 import { assertEquals, proves } from "../runtime/test.ts";
 
 const answer: Exchange = {

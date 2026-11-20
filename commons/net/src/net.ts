@@ -1,5 +1,6 @@
+// Spec: 0001-net FR-001
 /**
- * Downloads over a network that fails now and works in a minute (commons 0005-typescript-runtime FR-024), on the web standard `fetch` and
+ * Downloads over a network that fails now and works in a minute (commons 0001-net FR-001), on the web standard `fetch` and
  * `node:fs`. Taken from the machine setup's `net.ts`: a failure is classified (the name, the connection, a busy server, a certificate),
  * retried only where another try can help, with a longer wait each time (or as long as the server's `Retry-After` asks, up to the cap) and every retry said; a download that stops part way is resumed
  * with `Range`; and a file is kept only where its SHA-256 is the one expected. A download that fails is an expected outcome, so these

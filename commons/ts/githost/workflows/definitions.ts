@@ -120,6 +120,14 @@ export const LIBRARY_CI: Readonly<Record<string, LibraryCi>> = {
     nodeTests: 'node --test "suite/**/*.test.ts"',
     systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
   },
+  net: {
+    comment: lines(
+      "Net, the network as one typed library (downloads, an HTTP server and clients, TCP and TLS, DNS and ACME), a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the specification checker, the trace, its tests and the",
+      "packing of its package with the inspection of its declarations) on Bun and its tests on Node 26, on Windows, macOS and Linux, because the package runs on all three.",
+    ).trimEnd(),
+    nodeTests: 'node --test "suite/**/*.test.ts"',
+    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
+  },
   telemetry: {
     comment: lines(
       "Telemetry, OpenTelemetry-native signals as one typed library, a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the specification checker, the trace, its tests and the",

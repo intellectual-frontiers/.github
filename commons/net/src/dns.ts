@@ -1,5 +1,6 @@
+// Spec: 0001-net FR-007
 /**
- * Names on the network (commons 0005-typescript-runtime FR-056). `resolveDns` asks for `A`, `AAAA`, `CNAME`, `MX`, `NS`, `TXT` and `SRV`
+ * Names on the network (commons 0001-net FR-007). `resolveDns` asks for `A`, `AAAA`, `CNAME`, `MX`, `NS`, `TXT` and `SRV`
  * records, with the records in these shapes (`MX` as `{ preference, exchange }`, `TXT` as each record's
  * strings, `SRV` as `{ priority, weight, port, target }`), and answers with a `Result` whose error says whether the name does not exist,
  * has no such record, or could not be asked: a name that does not resolve is an expected outcome, not an exception.

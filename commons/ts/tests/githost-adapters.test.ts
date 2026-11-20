@@ -11,7 +11,7 @@ import { plainGitClient } from "../githost/git.ts";
 import { gitlabClient } from "../githost/gitlab.ts";
 import type { RepoRef } from "../githost/types.ts";
 import { mkdir, withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
-import { type Exchange, recordedTransport } from "../runtime/http-client.ts";
+import { type Exchange, recordedTransport } from "@intellectual-frontiers/net/http-client";
 import { join } from "@intellectual-frontiers/system/path";
 import { run, which } from "@intellectual-frontiers/system/proc";
 import { assert, assertEquals, proves } from "../runtime/test.ts";

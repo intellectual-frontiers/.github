@@ -1,8 +1,8 @@
 /**
- * Tests of `runtime/dns.ts` (commons 0005-typescript-runtime FR-056), with no Internet: a small DNS server on a free UDP port of 127.0.0.1,
+ * Tests of `runtime/dns.ts` (commons 0001-net FR-007), with no Internet: a small DNS server on a free UDP port of 127.0.0.1,
  * made here on `node:dgram`, answers from a fixed zone, and `resolveDns` is pointed at it by `nameServer`. Each record type comes back in
  * the shapes of records (`MX` as `{ preference, exchange }`, ...); a name that does not exist, a name without the record asked for, a server failure and a server that does not
- * answer each give their own error; TXT strings round-trip whatever they hold; and the interface list has a loopback.
+ * answer each give their own error; and TXT strings round-trip whatever they hold.
  *
  * @module
  */
@@ -10,11 +10,10 @@ import { Buffer } from "node:buffer";
 import * as dgram from "node:dgram";
 import * as net from "node:net";
 import fc from "fast-check";
-import { type NetworkInterfaceInfo, networkInterfaces } from "@intellectual-frontiers/system/proc";
-import { resolveDns } from "../../runtime/dns.ts";
-import { assert, assertEquals, proves } from "../../runtime/test.ts";
+import { resolveDns } from "../src/dns.ts";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 
-const DNS = "0005-typescript-runtime FR-056";
+const DNS = "0001-net FR-007";
 
 type Answer = { readonly type: number; readonly data: Uint8Array };
 type Zone = (name: string, type: number) => { readonly rcode: number; readonly answers: readonly Answer[] };
@@ -229,19 +228,4 @@ proves([DNS], "AAAA addresses are written as RFC 5952 says (the URL standard's f
     }),
     { numRuns: 25 },
   );
-});
-
-proves([DNS], "networkInterfaces gives each address's name, family, address, netmask and internal, a loopback among them", () => {
-  const all = networkInterfaces();
-  const loopback = all.filter((i: NetworkInterfaceInfo) => i.internal);
-  assert(
-    loopback.some((i) => i.address === "127.0.0.1" || i.address === "::1"),
-    `a loopback: ${JSON.stringify(all)}`,
-  );
-  for (const i of all) {
-    assert(i.name !== "");
-    assert(i.family === "IPv4" ? i.address.includes(".") : i.address.includes(":"), JSON.stringify(i));
-    assert(i.netmask !== "");
-    assertEquals(typeof i.internal, "boolean");
-  }
 });

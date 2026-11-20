@@ -28,6 +28,7 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/terminal/spec-kit" },
     { layout: "commons", dir: "commons/system/spec-kit" },
     { layout: "commons", dir: "commons/telemetry/spec-kit" },
+    { layout: "commons", dir: "commons/net/spec-kit" },
     { layout: "commons", dir: "commons/crypto/spec-kit" },
     { layout: "commons", dir: "commons/formats/spec-kit" },
     { layout: "commons", dir: "commons/data/spec-kit" },

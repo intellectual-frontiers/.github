@@ -10,8 +10,8 @@ import { clientFor } from "../githost/mod.ts";
 import { githubClient } from "../githost/github.ts";
 import { gitlabClient } from "../githost/gitlab.ts";
 import type { RepoRef } from "../githost/types.ts";
-import { liveTransport } from "../runtime/http-client.ts";
-import { serve, type Server } from "../runtime/serve.ts";
+import { liveTransport } from "@intellectual-frontiers/net/http-client";
+import { serve, type Server } from "@intellectual-frontiers/net/serve";
 import { assert, assertEquals, proves } from "../runtime/test.ts";
 
 const TOKEN = "ghp_LoopbackTokenThatMustNeverBeSaid0123";

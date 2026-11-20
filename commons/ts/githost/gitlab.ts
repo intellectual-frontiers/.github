@@ -15,7 +15,7 @@
  * @module
  */
 import { array, boolean, integer, literal, nullable, object, string, err, ok, type Result } from "@intellectual-frontiers/core";
-import type { Transport } from "../runtime/http-client.ts";
+import type { Transport } from "@intellectual-frontiers/net/http-client";
 import { CAPABILITIES } from "./capabilities.ts";
 import { describeRef } from "./remote.ts";
 import { failureOf, get, getDecoded, messageOf, usableToken, decodeBody } from "./http.ts";

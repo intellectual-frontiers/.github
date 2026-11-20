@@ -10,7 +10,7 @@
  * @module
  */
 import { absurd } from "@intellectual-frontiers/core";
-import { liveTransport, type Transport, withBackoff } from "../runtime/http-client.ts";
+import { liveTransport, type Transport, withBackoff } from "@intellectual-frontiers/net/http-client";
 import { githubClient } from "./github.ts";
 import { plainGitClient, type PlainGitOptions } from "./git.ts";
 import { gitlabClient } from "./gitlab.ts";

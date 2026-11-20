@@ -1,13 +1,11 @@
 /**
- * Tests of `runtime/http-client.ts` and `runtime/lock.ts`: a client against a real local server (credentials refused unless allowed,
- * read-only, backoff with `Retry-After`, typed failures, both kinds of paging, recorded exchanges), and a lock taken, refused, waited for,
- * taken over from a holder that no longer runs, inherited and released.
+ * Tests of `http-client`: a client against a real local server (credentials refused unless allowed, read-only, backoff with `Retry-After`,
+ * typed failures, both kinds of paging, recorded exchanges).
  *
  * @module
  */
 import { array, integer, nullable, object, string } from "@intellectual-frontiers/core";
 import { sign } from "@intellectual-frontiers/crypto/sigv4";
-import { exists, readTextFile, withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
 import {
   bearer,
   carriesCredential,
@@ -24,15 +22,11 @@ import {
   recordedTransport,
   withBackoff,
   withSigV4,
-} from "../../runtime/http-client.ts";
-import { acquireLock, describeHolder, processRuns, readHolder } from "@intellectual-frontiers/system/lock";
-import { join } from "@intellectual-frontiers/system/path";
-import { serve, type ServeHandler } from "../../runtime/serve.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "../../runtime/test.ts";
-import process from "node:process";
+} from "../src/http-client.ts";
+import { serve, type ServeHandler } from "../src/serve.ts";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 
-const CLIENT = "0005-typescript-runtime FR-040";
-const LOCK = "0005-typescript-runtime FR-039";
+const CLIENT = "0001-net FR-003";
 
 async function withServer(handler: ServeHandler, f: (base: string) => Promise<void>): Promise<void> {
   const server = await serve({ port: 0 }, handler);
@@ -99,41 +93,37 @@ proves([CLIENT], "a credential is refused before anything is sent unless the tra
   );
 });
 
-proves(
-  ["0005-typescript-runtime FR-066"],
-  "read-only lets through the POSTs its predicate says only read, and refuses every other write",
-  async () => {
-    const sent: string[] = [];
-    await withServer(
-      async (req) => {
-        sent.push(`${req.method} ${new URL(req.url).pathname} ${await req.text()}`);
-        return Response.json({ data: {} });
-      },
-      async (base) => {
-        // a GraphQL query reads; a mutation writes; an AWS-style JSON API names its action in a header
-        const readPost: ReadPost = (r) =>
-          (r.url === `${base}/graphql` && /^\s*(query\b|\{)/.test(r.body ?? "")) ||
-          (r.url === `${base}/` && /^Service\.(Describe|Get|List)[A-Za-z]+$/.test(r.headers["x-amz-target"] ?? ""));
-        const ro = readOnly(liveTransport(), [], readPost);
-        const post = (url: string, body: string, headers: Readonly<Record<string, string>> = {}) =>
-          ro.send({ method: "POST", url, headers, body });
-        assertEquals((await post(`${base}/graphql`, "query { viewer { login } }")).kind, "ok");
-        assertEquals((await post(`${base}/graphql`, "{ viewer { login } }")).kind, "ok");
-        const mutation = await post(`${base}/graphql`, "mutation { deleteRepository }");
-        assert(mutation.kind === "err" && mutation.error.kind === "refused" && mutation.error.message.startsWith("read-only: POST"));
-        assertEquals((await post(`${base}/`, "{}", { "x-amz-target": "Service.DescribeTrails" })).kind, "ok");
-        assertEquals((await post(`${base}/`, "{}", { "x-amz-target": "Service.DeleteTrail" })).kind, "err");
-        for (const method of ["PUT", "PATCH", "DELETE"] as const) {
-          assertEquals((await ro.send({ method, url: `${base}/graphql`, headers: {}, body: "query { x }" })).kind, "err", method);
-        }
-        assertEquals(sent, ["POST /graphql query { viewer { login } }", "POST /graphql { viewer { login } }", "POST / {}"]);
-      },
-    );
-  },
-);
+proves(["0001-net FR-004"], "read-only lets through the POSTs its predicate says only read, and refuses every other write", async () => {
+  const sent: string[] = [];
+  await withServer(
+    async (req) => {
+      sent.push(`${req.method} ${new URL(req.url).pathname} ${await req.text()}`);
+      return Response.json({ data: {} });
+    },
+    async (base) => {
+      // a GraphQL query reads; a mutation writes; an AWS-style JSON API names its action in a header
+      const readPost: ReadPost = (r) =>
+        (r.url === `${base}/graphql` && /^\s*(query\b|\{)/.test(r.body ?? "")) ||
+        (r.url === `${base}/` && /^Service\.(Describe|Get|List)[A-Za-z]+$/.test(r.headers["x-amz-target"] ?? ""));
+      const ro = readOnly(liveTransport(), [], readPost);
+      const post = (url: string, body: string, headers: Readonly<Record<string, string>> = {}) =>
+        ro.send({ method: "POST", url, headers, body });
+      assertEquals((await post(`${base}/graphql`, "query { viewer { login } }")).kind, "ok");
+      assertEquals((await post(`${base}/graphql`, "{ viewer { login } }")).kind, "ok");
+      const mutation = await post(`${base}/graphql`, "mutation { deleteRepository }");
+      assert(mutation.kind === "err" && mutation.error.kind === "refused" && mutation.error.message.startsWith("read-only: POST"));
+      assertEquals((await post(`${base}/`, "{}", { "x-amz-target": "Service.DescribeTrails" })).kind, "ok");
+      assertEquals((await post(`${base}/`, "{}", { "x-amz-target": "Service.DeleteTrail" })).kind, "err");
+      for (const method of ["PUT", "PATCH", "DELETE"] as const) {
+        assertEquals((await ro.send({ method, url: `${base}/graphql`, headers: {}, body: "query { x }" })).kind, "err", method);
+      }
+      assertEquals(sent, ["POST /graphql query { viewer { login } }", "POST /graphql { viewer { login } }", "POST / {}"]);
+    },
+  );
+});
 
 proves(
-  ["0005-typescript-runtime FR-069", CLIENT],
+  ["0001-net FR-005", CLIENT],
   "a SigV4 transport signs each request as it is sent, and the live transport refuses it unless allowed",
   async () => {
     const seen: { authorization: string | null; date: string | null; token: string | null }[] = [];
@@ -254,51 +244,4 @@ proves([CLIENT], "a recorded transport answers what was recorded and names what 
   assertEquals(decodeRecorded(text), { kind: "ok", value: x });
   assertEquals(decodeRecorded("{").kind, "err");
   assertEquals(decodeRecorded('{method: "TRACE", url: "", status: 1, headers: {}, body: ""}').kind, "err");
-});
-
-proves([LOCK], "a lock is taken once, refused or waited for while held, and given back", async () => {
-  await withTempDir(async (dir) => {
-    const path = join(dir, "run.lock");
-    const held = await acquireLock(path, { wait: false, command: "update" });
-    assert(held !== undefined);
-    const holder = await readHolder(path);
-    assertEquals([holder?.pid, holder?.command], [process.pid, "update"]);
-    assertStringIncludes(describeHolder(held.holder, Date.parse(held.holder.since) + 192_000), "update (pid ");
-    assertStringIncludes(describeHolder(held.holder, Date.parse(held.holder.since) + 192_000), "for 3m 12s)");
-    assertEquals(await acquireLock(path, { wait: false }), undefined);
-    assertEquals(await acquireLock(path, { wait: true, pollMs: 10, timeoutMs: 50 }), undefined);
-    let waitedFor = "";
-    const waiting = acquireLock(path, { wait: true, pollMs: 10, onWait: (h) => (waitedFor = h?.command ?? "") });
-    setTimeout(() => held.release(), 60);
-    const second = await waiting;
-    assert(second !== undefined);
-    assertEquals(waitedFor, "update");
-    second.release();
-    second.release();
-    assert(!(await exists(path)));
-  });
-});
-
-proves([LOCK], "a lock whose holder no longer runs, or whose file is unreadable, is taken over; a child inherits it", async () => {
-  await withTempDir(async (dir) => {
-    const path = join(dir, "run.lock");
-    let dead = 2_000_000;
-    while (processRuns(dead)) dead++;
-    await writeTextFile(path, JSON.stringify({ pid: dead, command: "gone", since: new Date().toISOString(), token: "t" }));
-    const taken = await acquireLock(path, { wait: false });
-    assert(taken !== undefined);
-    assertStringIncludes(await readTextFile(path), taken.holder.token);
-    taken.release();
-    await writeTextFile(path, "not json");
-    const again = await acquireLock(path, { wait: false, inheritEnv: "IFC_TS_TEST_LOCK" });
-    assert(again !== undefined);
-    assertEquals(process.env["IFC_TS_TEST_LOCK"], "1");
-    const child = await acquireLock(path, { wait: false, inheritEnv: "IFC_TS_TEST_LOCK" });
-    assert(child !== undefined);
-    child.release();
-    assert(await exists(path), "the inherited release leaves the parent's lock");
-    again.release();
-    assertEquals(process.env["IFC_TS_TEST_LOCK"], undefined);
-    assert(processRuns(process.pid));
-  });
 });

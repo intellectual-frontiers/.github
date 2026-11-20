@@ -1,0 +1,20 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-net FR-001	check	.github: cd commons/net && bun test suite/	net.test.ts: classification, waits, Retry-After, retries against a local server, resume with Range, the SHA-256 check
+0001-net FR-002	check	.github: cd commons/net && bun test suite/	net.test.ts: a real server on a free port: bodies, cookies, HEAD, a handler that throws, AddrInUse, shutdown by signal
+0001-net FR-003	check	.github: cd commons/net && bun test suite/	http-client.test.ts: against a local server: decoded reads, denials, statuses, credentials refused and allowed, read-only, backoff with Retry-After and the cap, Link and cursor paging, recorded exchanges
+0001-net FR-004	check	.github: cd commons/net && bun test suite/	http-client.test.ts: readOnly lets through the POSTs its predicate says only read, and refuses every other write
+0001-net FR-005	check	.github: cd commons/net && bun test suite/	http-client.test.ts: a SigV4 transport signs each request to a recorded server, and the live transport still refuses it unless allowed
+0001-net FR-006	check	.github: cd commons/net && bun test suite/	tcp.test.ts: listen, connect, TLS with a test certificate
+0001-net FR-007	check	.github: cd commons/net && bun test suite/	dns.test.ts: resolution and its errors against a small DNS server on a free UDP port
+0001-net FR-008	check	.github: cd commons/net && bun test suite/	acme.test.ts: a name and its wildcard issued by a fake CA, the TXT values computed from its tokens and the account key
+0001-net FR-009	check	.github: cd commons/net && bun test suite/	acme.test.ts: the fake CA verifies every JWS (ES256, nonce spent once, url, jwk only for newAccount, kid after), badNonce retried
+0001-net FR-010	check	.github: cd commons/net && bun test suite/	acme.test.ts: an account made with no key, found again with the key it gave back, asked for then made for an unknown key
+0001-net FR-011	check	.github: cd commons/net && bun test suite/	acme.test.ts: records removed after success and after an invalid authorization; a removal that fails is a warning
+0001-net FR-012	check	.github: cd commons/net && bun test suite/	acme.test.ts: the directory down, an invalid authorization, the DNS throwing, the network failing, the wait running out: each a Result with one sentence
+0001-net FR-013	check	.github: cd commons/net && bun test suite/	acme.test.ts: the CSR's signature verified with its own SPKI, its common name and SANs read back
+0001-net FR-014	check	.github: cd commons/net && bun test suite/	acme.test.ts: notAfter of certificates made with der in UTCTime and GeneralizedTime, the first of a chain, needsRenewal at the edges
+0001-net FR-015	check	.github: cd commons/net && bun test suite/	acme.test.ts: cloudflareDns against a fake API on a local server: zone by name, a quoted TXT added and deleted, the errors
+0001-net FR-016	check	.github: cd commons/net && bun test suite/	otel-net.test.ts: with no pipeline the client and serve make no span and pass no traceparent; with one, the server's span is the client's child and the URL is redacted; the receiver makes no span of its own
+0001-net FR-017	check	.github: cd commons/net && bun run verify	the package is built, inspected and packed by tools/pack.ts; tests/commons-packages.test.ts installs the tarball and runs every entry on Node 26 and Bun and type-checks a consumer

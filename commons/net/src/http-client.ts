@@ -1,5 +1,6 @@
+// Spec: 0001-net FR-003
 /**
- * How a typed client reaches a system over HTTP (commons 0005-typescript-runtime FR-040): a transport, live (`fetch`) or recorded (the
+ * How a typed client reaches a system over HTTP (commons 0001-net FR-003): a transport, live (`fetch`) or recorded (the
  * exchanges a test keeps, so it reaches no host), and over it the guards and helpers every client otherwise rewrites: a read-only guard
  * (safe methods only, POST to the token endpoints named, and the POSTs a predicate says only read, FR-066), AWS Signature Version 4 on each
  * request (FR-069), backoff on 429 and 503 that honours `Retry-After`, a JSON read decoded at the boundary with typed failures (a denied
@@ -117,7 +118,7 @@ export function liveTransport(options: LiveOptions = {}): Transport {
         const why = carriesCredential(r);
         if (why !== undefined) return err({ kind: "refused", message: why });
       }
-      // Where a telemetry pipeline is installed, the request is an `http.client` span and carries `traceparent` (0006-signals FR-018).
+      // Where a telemetry pipeline is installed, the request is an `http.client` span and carries `traceparent` (0001-net FR-016).
       return traceHttpClient(
         r.method,
         r.url,

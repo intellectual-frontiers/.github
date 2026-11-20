@@ -1,5 +1,6 @@
+// Spec: 0001-net FR-006
 /**
- * TCP connections, plain and over TLS (commons 0005-typescript-runtime FR-055), on `node:net` and `node:tls`: `listen`,
+ * TCP connections, plain and over TLS (commons 0001-net FR-006), on `node:net` and `node:tls`: `listen`,
  * `listenTls`, `connect` and `connectTls`. A {@link Listener} gives its
  * address and its connections as an async iterable and closes by `close()`, an abort signal or `using`; a {@link Conn} gives its local and
  * remote addresses, a web `ReadableStream` and `WritableStream` (made here by hand over the socket, the same on Bun and Node),

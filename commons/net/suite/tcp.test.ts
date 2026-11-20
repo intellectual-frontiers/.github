@@ -1,5 +1,5 @@
 /**
- * Tests of `runtime/tcp.ts` (commons 0005-typescript-runtime FR-055): an echo server on a free local port answers over web streams, with
+ * Tests of `runtime/tcp.ts` (commons 0001-net FR-006): an echo server on a free local port answers over web streams, with
  * half-close; a port with nothing on it refuses; a taken port is `AddrInUse`; a listener closes by call, abort signal and `using`; and a TLS
  * listener's certificate, made for the test by `openssl` with a root of its own, is accepted with that root and refused without it.
  *
@@ -9,10 +9,10 @@ import { errors } from "@intellectual-frontiers/system/errors";
 import { readTextFile, withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { join } from "@intellectual-frontiers/system/path";
 import { must, which } from "@intellectual-frontiers/system/proc";
-import { type Conn, connect, connectTls, listen, listenTls, type Listener } from "../../runtime/tcp.ts";
-import { assert, assertEquals, assertInstanceOf, assertRejects, proves } from "../../runtime/test.ts";
+import { type Conn, connect, connectTls, listen, listenTls, type Listener } from "../src/tcp.ts";
+import { assert, assertEquals, assertInstanceOf, assertRejects, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 
-const TCP = "0005-typescript-runtime FR-055";
+const TCP = "0001-net FR-006";
 const enc = new TextEncoder();
 const dec = new TextDecoder();
 

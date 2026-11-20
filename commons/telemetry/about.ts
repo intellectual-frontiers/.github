@@ -30,11 +30,7 @@ export const about: About = {
     {
       path: "suite/",
       what: "The tests: the model, the encoding, the signals, the renderer, the exporter against servers the tests start, the console as a child process, and the conformance with the OpenTelemetry Collector.",
-      mayImport: [
-        "src/",
-        "fast-check",
-        "the test module of commons' runtime and the HTTP client and server of commons' runtime until `net` is lifted",
-      ],
+      mayImport: ["src/", "fast-check", "the test module of commons' runtime, by package name"],
     },
     {
       path: "tools/",

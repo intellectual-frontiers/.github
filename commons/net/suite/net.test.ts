@@ -1,7 +1,6 @@
 /**
- * Tests of `runtime/serve.ts`, `runtime/net.ts` and `runtime/tty.ts`: a real server on a free local port answers web requests; downloads
- * are retried only where another try can help, resumed, and kept only where their SHA-256 is the one expected; and the look of the output
- * follows the environment.
+ * Tests of `serve` and `net`: a real server on a free local port answers web requests; downloads are retried only where another try can help,
+ * resumed, and kept only where their SHA-256 is the one expected.
  *
  * @module
  */
@@ -19,14 +18,13 @@ import {
   reach,
   Retries,
   retryable,
-} from "../../runtime/net.ts";
+} from "../src/net.ts";
 import { join } from "@intellectual-frontiers/system/path";
-import { serve, type ServeHandler } from "../../runtime/serve.ts";
-import { consoleSize, currentLook, isTerminal, lookOf, setRaw } from "@intellectual-frontiers/system/tty";
-import { assert, assertEquals, assertRejects, assertStringIncludes, assertThrows, proves } from "../../runtime/test.ts";
+import { serve, type ServeHandler } from "../src/serve.ts";
+import { assert, assertEquals, assertRejects, assertStringIncludes, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 
-const SERVE = "0005-typescript-runtime FR-025";
-const NET = "0005-typescript-runtime FR-024";
+const SERVE = "0001-net FR-002";
+const NET = "0001-net FR-001";
 
 async function withServer(handler: ServeHandler, f: (base: string) => Promise<void>): Promise<void> {
   const server = await serve({ port: 0 }, handler);
@@ -78,7 +76,7 @@ proves([SERVE], "a handler of web Requests answers with web Responses: method, p
   );
 });
 
-proves([SERVE, "0005-typescript-runtime FR-019"], "a port in use is AddrInUse; an aborted signal shuts the server down", async () => {
+proves([SERVE], "a port in use is AddrInUse; an aborted signal shuts the server down", async () => {
   const ctl = new AbortController();
   const server = await serve({ port: 0, signal: ctl.signal }, () => new Response("ok"));
   await assertRejects(() => serve({ port: server.addr.port }, () => new Response("")), errors.AddrInUse);
@@ -207,28 +205,4 @@ proves([NET], "a .part file is resumed with a Range request", async () => {
       });
     },
   );
-});
-
-proves(["0005-typescript-runtime FR-023"], "colour, emoji and width follow the environment and the terminal", () => {
-  const look = (env: Record<string, string>, terminal = true, os: "linux" | "darwin" | "windows" = "linux", columns?: number) =>
-    lookOf({ env, terminal, os, ...(columns === undefined ? {} : { columns }) });
-  assertEquals(look({ LANG: "en_US.UTF-8" }, true, "linux", 120), { tty: true, colour: true, emoji: true, columns: 120 });
-  assertEquals(look({ LANG: "C" }, false), { tty: false, colour: false, emoji: false, columns: 80 });
-  assertEquals(look({ NO_COLOR: "1", LANG: "C.utf8" }).colour, false);
-  assertEquals(look({ NO_COLOR: "", LANG: "C" }).colour, true);
-  assertEquals(look({ FORCE_COLOR: "1" }, false).colour, true);
-  assertEquals(look({ FORCE_COLOR: "1", NO_COLOR: "1" }, false).colour, false);
-  assertEquals(look({ TERM: "dumb" }).tty, false);
-  assertEquals(look({ WT_SESSION: "x" }, true, "windows").emoji, true);
-  assertEquals(look({ ConEmuANSI: "ON" }, true, "windows").emoji, true);
-  assertEquals(look({}, true, "windows").emoji, false);
-  assertEquals(look({ TERM_PROGRAM: "iTerm.app" }, true, "darwin").emoji, true);
-  assertEquals(look({ LC_ALL: "C", LANG: "en_US.UTF-8" }).emoji, false);
-  assertEquals(look({}, true, "linux", 20).columns, 80);
-  const now = currentLook();
-  assertEquals(typeof now.colour, "boolean");
-  assertEquals(typeof isTerminal("stdout"), "boolean");
-  const size = consoleSize();
-  assert(size === undefined || size.columns > 0);
-  if (!isTerminal("stdin")) assertThrows(() => setRaw(true), errors.NotSupported);
 });

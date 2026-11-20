@@ -1,3 +1,4 @@
+// Spec: 0001-net FR-008
 /**
  * An ACME client (RFC 8555) that gets a certificate by the DNS-01 challenge (commons 0013-acme): an account (made, or found again by its
  * key with `onlyReturnExisting`), an order for the names, a TXT record `_acme-challenge.<name>` holding the base64url SHA-256 of each key

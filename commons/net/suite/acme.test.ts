@@ -26,18 +26,18 @@ import {
   needsRenewal,
   notAfterOf,
   pem,
-} from "../../runtime/acme.ts";
-import { serve } from "../../runtime/serve.ts";
-import { assert, assertEquals, assertStringIncludes, proves, the } from "../../runtime/test.ts";
+} from "../src/acme.ts";
+import { serve } from "../src/serve.ts";
+import { assert, assertEquals, assertStringIncludes, proves, the } from "@intellectual-frontiers/commons/ts/runtime/test";
 
-const FLOW = "0013-acme FR-001";
-const JWS = "0013-acme FR-002";
-const ACCOUNT = "0013-acme FR-003";
-const CLEANUP = "0013-acme FR-004";
-const FAILURE = "0013-acme FR-005";
-const CSR = "0013-acme FR-006";
-const VALIDITY = "0013-acme FR-007";
-const CLOUDFLARE = "0013-acme FR-008";
+const FLOW = "0001-net FR-008";
+const JWS = "0001-net FR-009";
+const ACCOUNT = "0001-net FR-010";
+const CLEANUP = "0001-net FR-011";
+const FAILURE = "0001-net FR-012";
+const CSR = "0001-net FR-013";
+const VALIDITY = "0001-net FR-014";
+const CLOUDFLARE = "0001-net FR-015";
 
 const BASE = "https://acme.test";
 const DIRECTORY = `${BASE}/directory`;
