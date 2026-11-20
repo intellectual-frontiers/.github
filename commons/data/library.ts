@@ -10,7 +10,7 @@ export const library = {
   level: "L1",
   specKit: "spec-kit",
   verify: "bun run verify",
-  version: "0.6.0",
+  version: "0.7.0",
   distribution: ["github", "npm"],
   exports: [
     "./engine",
@@ -64,6 +64,7 @@ export const library = {
     "./sql/typed",
     "./sql/loads",
     "./sql/describe",
+    "./sql/federate",
     "./sql/typed/generate",
     "./sql/typed/models",
     "./sql/extensions/issues",

@@ -180,3 +180,18 @@ export function osqueryDriver(options: OsqueryOptions): Driver {
     },
   };
 }
+
+/** A machine that a fan-out (0059) can ask: a name, its platform and the read-only driver; the shape of a federation target, without depending on it. */
+export interface MachineTarget {
+  readonly id: string;
+  readonly platform: Platform;
+  readonly driver: Driver;
+}
+
+/**
+ * A machine as a target of a fan-out: `osqueryDriver` for it, with the platform it runs on.
+ *
+ * @param id - what the machine is called in results
+ * @param options - how to run `osqueryi` on it (the runner, usually `ssh host` as a prefix of the program), the schema and its platform
+ */
+export const osqueryTarget = (id: string, options: OsqueryOptions): MachineTarget => ({ id, platform: options.platform, driver: osqueryDriver(options) });

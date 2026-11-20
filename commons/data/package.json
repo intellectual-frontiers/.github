@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/data",
   "private": true,
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Intellectual Frontiers data: governance, a logical and a physical schema, and extensions, built on IFC TypeScript's kernel. Phase 0 spike.",
   "type": "module",
   "engines": {
@@ -60,6 +60,7 @@
     "./sql/typed": "./sql/typed/mod.ts",
     "./sql/loads": "./sql/loads/mod.ts",
     "./sql/describe": "./sql/describe/mod.ts",
+    "./sql/federate": "./sql/federate/mod.ts",
     "./sql/typed/generate": "./sql/typed/generate.ts",
     "./sql/typed/models": "./sql/typed/models/mod.ts",
     "./sql/presets": "./sql/presets/mod.ts",

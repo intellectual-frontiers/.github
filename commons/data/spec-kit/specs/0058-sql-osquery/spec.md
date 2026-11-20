@@ -15,6 +15,7 @@
 - **FR-004**: The driver MUST run only a SELECT, or a WITH that ends in one, of one statement: anything that writes, more than one statement, an empty statement and anything else MUST be refused as an error value before a process is started, with words in strings and comments not counted as code; `exec` MUST always be refused.
 - **FR-005**: A table that acts on the world and not only reports it (`carves`, `curl`, `curl_certificate`) and any table the caller denies MUST be refused as an error value that names it, before a process is started.
 - **FR-006**: A SELECT MUST be run as `osqueryi --json "<sql>"` through the function the caller gives that runs a program (so that the library depends on no runtime, and `ssh host osqueryi` is a prefix), its rows MUST have the types of the schema (osquery prints every value as text), a table that is not on the platform MUST be a typed error that says where it is, and what osquery says (a table it does not have, a failure, output that is not a list of rows) MUST be an error value; the driver MUST reject with the typed error.
+- **FR-007**: A machine MUST be usable as a target of a fan-out (0059): `osqueryTarget` MUST give its name, its platform and the read-only driver, and `redactPersonal` MUST hide the columns that FR-003 marks as personal, so that a result of many machines does not carry what identifies a person.
 
 ## Out of scope
 
