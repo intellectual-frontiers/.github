@@ -1,0 +1,29 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-archon-layers FR-001	check	.github: cd commons/archon && bun run verify	suite/layers.test.ts: every file of the real tree is in a unit and a file in none is layers/unclassified
+0001-archon-layers FR-002	check	.github: cd commons/archon && bun run verify	suite/layers.test.ts: below may not import above and each unit imports only what its row allows
+0001-archon-layers FR-003	check	.github: cd commons/archon && bun run verify	suite/layers.test.ts: the package exports the library, its layers and the dialect port
+0001-archon-layers FR-004	check	.github: cd commons/archon && bun run verify	suite/layers.test.ts: verify runs every check of the library
+0001-archon-layers FR-005	check	.github: cd commons/archon && bun run verify	suite/layers.test.ts: the release record agrees with the manifest and the package
+0002-archon-governance FR-001	check	.github: cd commons/archon && bun run verify	suite/governance.test.ts: names are made only by their functions
+0002-archon-governance FR-002	check	.github: cd commons/archon && bun run verify	suite/governance.test.ts: the catalogue has kinds for machines, zones and cloud accounts
+0002-archon-governance FR-003	check	.github: cd commons/archon && bun run verify	suite/governance.test.ts: a requirement is defined or refused with every reason
+0002-archon-governance FR-004	check	.github: cd commons/archon && bun run verify	suite/governance.test.ts: text that looks like a secret is found by its path
+0002-archon-governance FR-005	check	.github: cd commons/archon && bun run verify	suite/governance.test.ts: each profile gives every control and the profiles are ranked
+0002-archon-governance FR-006	check	.github: cd commons/archon && bun run verify	suite/governance.test.ts: an override has a reason and a date and is kept
+0002-archon-governance FR-007	check	.github: cd commons/archon && bun run verify	suite/governance.test.ts: the floor is data and no control or override lowers it
+0002-archon-governance FR-008	check	.github: cd commons/archon && bun run verify	suite/governance.test.ts: a change of assurance is judged by the assurance in force
+0003-archon-logical FR-001	check	.github: cd commons/archon && bun run verify	suite/logical.test.ts: the order keeps what matches and refuses a requirement twice in a layer
+0003-archon-logical FR-002	check	.github: cd commons/archon && bun run verify	suite/logical.test.ts: a higher layer replaces a lower one and the order records it
+0003-archon-logical FR-003	check	.github: cd commons/archon && bun run verify	suite/logical.test.ts: the order is sequenced after dependencies and a missing dependency and a cycle are refused
+0003-archon-logical FR-004	check	.github: cd commons/archon && bun run verify	suite/logical.test.ts: the plan says none, create, update or remove for each requirement
+0003-archon-logical FR-005	check	.github: cd commons/archon && bun run verify	suite/logical.test.ts: the canonical text and digest of a plan are stable and change with any entry
+0003-archon-logical FR-006	check	.github: cd commons/archon && bun run verify	suite/logical.test.ts: the approvals a plan needs follow its destructive entries, tiers and the assurance
+0003-archon-logical FR-007	check	.github: cd commons/archon && bun run verify	suite/logical.test.ts: the gate opens only when each approval needed is given
+0004-archon-dialects FR-001	check	.github: cd commons/archon && bun run verify	suite/dialects.test.ts: a dialect is a value of the port
+0004-archon-dialects FR-002	check	.github: cd commons/archon && bun run verify	suite/dialects.test.ts: a dialect's guarantees are data
+0004-archon-dialects FR-003	check	.github: cd commons/archon && bun run verify	suite/dialects.test.ts: what a dialect expresses of a requirement
+0004-archon-dialects FR-004	check	.github: cd commons/archon && bun run verify	suite/dialects.test.ts: the matrix and its totals and unexpressed annotations
+0004-archon-dialects FR-005	check	.github: cd commons/archon && bun run verify	suite/dialects.test.ts: the plan of steps names the digest and refuses a destructive step with no check
+0004-archon-dialects FR-006	check	.github: cd commons/archon && bun run verify	suite/dialects.test.ts: rendered files say they are generated and their digest is stable
