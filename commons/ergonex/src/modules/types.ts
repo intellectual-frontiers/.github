@@ -1,28 +1,16 @@
 // Spec: 0001-ergonex FR-007
 /**
- * The typed contract of a module of `ergonex` (commons 0001-ergonex FR-007, FR-010, FR-022): a module is `ErgonexModule` (its name, its summary and its commands); a command is declared once as data
- * (`defineCommand`: its name, its options with the five every command accepts, its arguments and `run`), parsed once at the boundary into a typed value, and returns a `Result` of a `Report` or a
- * `Failure`; a run ends in one of four statuses. There is no `any`, and a `switch` over a union of statuses or sources is exhaustive.
+ * The typed values every command of `ergonex` shares (commons 0001-ergonex FR-007, FR-010, FR-022): what a command's body returns (`Report`, or a `Failure`), the facts of the run it is given (`Context`), and the four statuses of the
+ * evidence record. A command is declared once with Headless (`commands/define.ts`), which parses its words, draws its output and gives its exit status; its body returns a `Result` of a `Report` or a `Failure`. There is no `any`, and a
+ * `switch` over a union of statuses or sources is exhaustive.
  *
  * @remarks
- * Pure: a command is given everything the host holds (the environment, the working folder, the day, the platform, where to write and whether to ask) in its `Context`, and does its work through
- * the ports of that context and the host layer it imports, so that the same command is run in a test with a context of the test's making and by the controller with the real one. A module is
- * built in (a value of this type that the compiler checks), registered by the workspace or found on the `PATH`; the last two are programs, which answer `--ergonex-manifest` (see `external.ts`).
+ * Pure: a command is given everything the host holds (the environment, the working folder, the day, the platform, where to write and whether to ask) in its `Context`, and does its work through the ports of that context and the host layer
+ * it imports, so that the same command is run in a test with a context of the test's making and by the program with the real one.
  *
  * @module
  */
-import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
-import {
-  type Args,
-  flag,
-  formatUsageError,
-  helpOf,
-  type Operand,
-  parseArgs,
-  type Spec,
-  type SpecCheck,
-  value,
-} from "../platform/k-args.ts";
+import { absurd, type Result } from "@intellectual-frontiers/core";
 import type { Json } from "@intellectual-frontiers/formats";
 import type { Sha256 } from "@intellectual-frontiers/crypto";
 import type { Finding } from "../findings.ts";
@@ -85,7 +73,11 @@ export type Report = {
   readonly facts?: EvidenceFacts;
   /** The facts of a run whose evidence is the setup module's (`setup/host/evidence.ts`): `setup` and `tools`. Where it is given the controller writes the record from it. */
   readonly runFacts?: RunFacts;
-  /** The run writes no evidence record: `ergonex shell <shell>` writes no file (0003-host FR-017), and a hook only reads (FR-015). */
+  /** The step the run suggests next, as a command (`ergonex plan`): the closing of an action shows it. */
+  readonly next?: readonly string[];
+  /** What the verdict says where all is well (`Workspace made`); Headless says `Up to date` where there is none. */
+  readonly title?: string;
+  /** The run writes no evidence record: `ergonex shell print <shell>` writes no file (0003-host FR-017), and a hook only reads (FR-015). */
   readonly noEvidence?: boolean;
 };
 
@@ -114,34 +106,15 @@ export type Failure = {
 /** What a command gives back. */
 export type Outcome = Result<Report, Failure>;
 
-/** The five options every command accepts (0001-ergonex FR-022); `--help` is the parser's own. */
-export const GLOBAL_OPTIONS = {
-  home: value({
-    help: "The root of the workspace for this run (else $ERGONEX_HOME, else $HOME/workspaces).",
-    valueName: "DIR",
-  }),
-  json: flag({ help: "Write the report as JSON." }),
-  sarif: flag({ help: "Write the findings as a SARIF 2.1.0 log." }),
-  noColor: flag({ help: "Write no colour." }),
-};
-
-/** The five options, as they were given. */
+/** The options of a command that are its own to all commands: the root of the workspace for the run. */
 export type Globals = {
   readonly home?: string;
-  readonly json: boolean;
-  readonly sarif: boolean;
-  readonly noColor: boolean;
 };
 
 /** The globals out of the options a command parsed (a decoder at the boundary: the one place that reads them). */
 export function globalsOf(options: Readonly<Record<string, unknown>>): Globals {
   const home = options["home"];
-  return {
-    ...(typeof home === "string" && home !== "" ? { home } : {}),
-    json: options["json"] === true,
-    sarif: options["sarif"] === true,
-    noColor: options["noColor"] === true,
-  };
+  return typeof home === "string" && home !== "" ? { home } : {};
 }
 
 /** The computer a run is on. */
@@ -151,11 +124,20 @@ export type Platform = {
   readonly windows: boolean;
 };
 
-/** How a command asks a person a question: only where a terminal is there to answer. */
+/** A command of the program, as the discovery of modules sees it: the built-in modules are the words of the program's own tree. */
+export type ErgonexModule = {
+  readonly name: string;
+  readonly summary: string;
+  /** The words below it, where it is a branch (`worktree create`); none for a command. */
+  readonly commands: readonly string[];
+};
+
+/** How a command asks a person a question: only where a person can be asked. */
 export type Interact = {
+  /** Whether a person can be asked now. */
   readonly terminal: boolean;
-  /** The line the person typed, or undefined at the end of the input. */
-  readonly ask: (question: string) => Promise<string | undefined>;
+  /** The yes or no the person gave; undefined where there is no one to ask. */
+  readonly confirm: (question: string) => Promise<boolean | undefined>;
 };
 
 /** What the controller gives every command, besides its words. */
@@ -167,14 +149,14 @@ export type BaseContext = {
   readonly platform: Platform;
   /** The folders Ergonex keeps its own files in (0031-install-locations); undefined where no home can be found. */
   readonly places: Places | undefined;
-  /** The typed modules the command holds, which `list` and `help` read. */
+  /** The commands of the program's tree that are built in, which `modules` and the shell snippet read. */
   readonly builtins: readonly ErgonexModule[];
   readonly interact: Interact;
   /** The root of the workspace for a run that says `--home` (or not): that, else `$ERGONEX_HOME`, else `$HOME/workspaces`; undefined where none can be found. */
   readonly homeFor: (override: string | undefined) => string | undefined;
   /** What is on standard input, read once (a Git hook is given its refs there). */
   readonly stdin: () => Promise<string>;
-  /** Where a run writes what is not its report: a diff or a line of progress, to standard error. */
+  /** Where a run tells a line that is not its report: a diff or a notice; the run shows it with its closing block. */
   readonly note: (text: string) => void;
 };
 
@@ -183,123 +165,6 @@ export type Context = BaseContext & {
   readonly globals: Globals;
   /** The root of the workspace: `--home`, else `$ERGONEX_HOME`, else `$HOME/workspaces`; undefined where none can be found. */
   readonly home: string | undefined;
+  /** Whether the run is a preview (`--dry-run`), a check (`--check`) or neither. */
+  readonly mode: "apply" | "dry-run" | "check";
 };
-
-/** What a command did, with the options it was given where they were read. */
-export type Executed = {
-  readonly outcome: Outcome;
-  readonly globals?: Globals;
-  readonly command: string;
-};
-
-/** A command of a module: declared once, run on words. */
-export type Command = {
-  readonly name: string;
-  readonly summary: string;
-  /** The help, from the declaration. */
-  readonly help: (program: string) => string;
-  /** Parses the words, and runs the command where they fit; where they do not, the outcome is a usage failure. */
-  readonly execute: (words: readonly string[], base: BaseContext) => Promise<Executed>;
-};
-
-/** A module of `ergonex`: `ergonex <name>` runs it. */
-export type ErgonexModule = {
-  readonly name: string;
-  readonly summary: string;
-  readonly commands: readonly Command[];
-};
-
-/** The options every command accepts, and the type of a command's own. */
-type GlobalSpec = typeof GLOBAL_OPTIONS;
-
-/** What a command is declared with. */
-export type CommandDefinition<S extends Spec & GlobalSpec> = {
-  readonly name: string;
-  readonly summary: string;
-  /** Its options: the five of `GLOBAL_OPTIONS` (spread them in) and its own. */
-  readonly options: S & SpecCheck<S>;
-  readonly operands?: readonly Operand[];
-  readonly run: (ctx: Context, args: Args<S>) => Promise<Outcome>;
-};
-
-/**
- * A command from its declaration: the words are parsed against the options once, here; help is answered and runs nothing; a word that does not fit is a usage failure; and the command runs only on
- * what decoded. The type of what `run` is given is inferred from the declaration.
- */
-export function defineCommand<S extends Spec & GlobalSpec>(d: CommandDefinition<S>): Command {
-  const operands = d.operands ?? [];
-  const help = (program: string): string => helpOf(program, d.summary, d.options, operands);
-  return {
-    name: d.name,
-    summary: d.summary,
-    help,
-    execute: async (words, base) => {
-      const program = `ergonex ${d.name}`;
-      const parsed = parseArgs<S>(words, d.options, operands);
-      if (parsed.kind === "err") {
-        return {
-          command: d.name,
-          outcome: err({
-            kind: "usage",
-            message: `${formatUsageError(parsed.error, program)}\n\n${help(program)}`,
-          }),
-        };
-      }
-      if (parsed.value.kind === "help") {
-        return {
-          command: d.name,
-          outcome: ok({
-            text: help(program),
-            data: null,
-            findings: [],
-            noEvidence: true,
-          }),
-        };
-      }
-      const globals = globalsOf(parsed.value.options);
-      const ctx: Context = {
-        ...base,
-        globals,
-        home: base.homeFor(globals.home),
-      };
-      return {
-        command: d.name,
-        globals,
-        outcome: await d.run(ctx, parsed.value),
-      };
-    },
-  };
-}
-
-/** The module's command a word names, and the words left for it. */
-export type Dispatch =
-  | {
-      readonly kind: "command";
-      readonly command: Command;
-      readonly words: readonly string[];
-    }
-  | { readonly kind: "help" }
-  | {
-      readonly kind: "unknown";
-      readonly word: string;
-      readonly known: readonly string[];
-    };
-
-/**
- * The command of a module that words name: a module with one command of its own name (`plan`) takes every word; a module of several (`worktree create`) takes its first word as the command's name,
- * asks for its help where there is none or `--help` is first, and says what is unknown.
- */
-export function dispatch(m: ErgonexModule, words: readonly string[]): Dispatch {
-  const only = m.commands.length === 1 ? m.commands[0] : undefined;
-  if (only !== undefined && only.name === m.name) return { kind: "command", command: only, words };
-  const [first, ...rest] = words;
-  if (first === undefined || first === "--help" || first === "-h") return { kind: "help" };
-  const command = m.commands.find((c) => c.name === first);
-  if (command === undefined)
-    return {
-      kind: "unknown",
-      word: first,
-      known: m.commands.map((c) => c.name),
-    };
-  return { kind: "command", command, words: rest };
-}

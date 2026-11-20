@@ -1,7 +1,7 @@
 // Spec: 0001-ergonex FR-004
 /**
  * The module convention of `ergonex` (commons 0001-ergonex FR-004 to FR-011): the name of a module and the nearest names to a typo, the order of the three sources and what a later source hides, the modules a
- * workspace registers, the answer of an external module to `--ergonex-manifest` with its JSON Schema, and the typed contract of a module and a command with its four exit statuses. All pure.
+ * workspace registers, the answer of an external module to `--ergonex-manifest` with its JSON Schema, and the typed values a command shares and the four statuses of its evidence record. All pure.
  *
  * @module
  */
@@ -28,19 +28,12 @@ export {
 } from "./registry.ts";
 export {
   type BaseContext,
-  type Command,
-  type CommandDefinition,
   type Context,
-  defineCommand,
-  type Dispatch,
-  dispatch,
   EXIT_STATUSES,
   type EvidenceFacts,
-  type Executed,
   type ExitStatus,
   exitCodeOf,
   type Failure,
-  GLOBAL_OPTIONS,
   type Globals,
   globalsOf,
   type ErgonexModule,

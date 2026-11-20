@@ -14,26 +14,24 @@ import type { Finding } from "../findings.ts";
 import { applyPlan } from "../host/apply.ts";
 import { fileFacts } from "../host/files.ts";
 import { type Loaded, native, situate } from "../host/workspace.ts";
-import { defineCommand, GLOBAL_OPTIONS, type ErgonexModule } from "../modules/types.ts";
+import { defineCommand } from "./define.ts";
+import { changes, HOME, reads } from "./options.ts";
 import { verifyFindings } from "../state-record.ts";
-import { jsonOf, textOf, withWorkspace } from "./common.ts";
+import { jsonOf, withWorkspace } from "./common.ts";
 
 const verify = defineCommand({
   name: "verify",
   summary: "Compare the generated files with the state record and with what the templates give now; change nothing.",
-  options: { ...GLOBAL_OPTIONS },
+  options: { ...HOME },
+  action: reads(),
+  examples: [{ args: [], says: "Say which generated files drifted, were edited or are missing." }],
   run: (ctx) =>
     withWorkspace(ctx, async (loaded) => {
       const facts = await fileFacts(loaded);
       const findings = verifyFindings(facts, ctx.today);
       const clean = facts.filter((f) => f.onDisk !== undefined && f.onDisk === f.recorded && f.onDisk === f.wanted).length;
       return ok({
-        text: textOf(
-          [
-            `${facts.length} generated file${facts.length === 1 ? "" : "s"} checked, ${clean} as written and as the templates give them now`,
-          ],
-          findings,
-        ),
+        text: `${facts.length} generated file${facts.length === 1 ? "" : "s"} checked, ${clean} as written and as the templates give them now`,
         data: {
           files: jsonOf(
             facts.map((f) => ({
@@ -81,13 +79,7 @@ async function pending(loaded: Loaded): Promise<
 }
 
 const RENDER_OPTIONS = {
-  ...GLOBAL_OPTIONS,
-  check: flag({
-    help: "Write nothing; name each file that would change and end with findings if any would.",
-  }),
-  diff: flag({
-    help: "Write nothing; show each difference as a unified diff.",
-  }),
+  ...HOME,
   force: flag({ help: "Replace a generated file that was edited by hand." }),
   wait: flag({
     help: "Wait for another run of ergonex on this workspace instead of refusing.",
@@ -96,20 +88,26 @@ const RENDER_OPTIONS = {
 
 const render = defineCommand({
   name: "render",
-  summary: "Write the generated files from the manifest; --check names what would change and writes nothing, --diff shows it.",
+  summary: "Write the generated files from the manifest; --dry-run shows each difference as a diff, --check ends with findings where a file would change.",
   options: RENDER_OPTIONS,
+  action: changes({ idempotent: true, dryRun: true, check: true }),
+  examples: [
+    { args: [], says: "Write the generated files." },
+    { args: ["--dry-run"], says: "Show each difference as a unified diff and write nothing." },
+    { args: ["--check"], says: "Write nothing; end with findings if a file would change." },
+  ],
   run: (ctx, args) =>
     withWorkspace(ctx, async (loaded) => {
       const todo = await pending(loaded);
       const findings: Finding[] = [];
       const lines: string[] = [];
-      if (args.options.check || args.options.diff) {
+      if (ctx.mode !== "apply") {
         for (const p of todo) {
           lines.push(
             `would ${p.before === "" ? "write" : "change"} ${p.path}${p.edited ? " (edited by hand: render refuses without --force)" : ""}`,
           );
-          if (args.options.diff) lines.push(unifiedDiff(p.path, p.before, p.after).trimEnd());
-          if (args.options.check)
+          if (ctx.mode === "dry-run") lines.push(unifiedDiff(p.path, p.before, p.after).trimEnd());
+          if (ctx.mode === "check")
             findings.push({
               ruleId: "ergonex/render-would-change",
               severity: "Warning",
@@ -123,7 +121,8 @@ const render = defineCommand({
           text: lines.filter((l) => l !== "").join("\n"),
           data: { wouldChange: todo.map((p) => p.path) },
           findings,
-          ...(args.options.check && todo.length > 0 ? { status: "Findings" as const } : {}),
+          ...(ctx.mode === "check" && todo.length > 0 ? { status: "Findings" as const } : {}),
+          noEvidence: ctx.mode === "dry-run",
         });
       }
       const s = await situate(ctx, loaded, { fetch: false });
@@ -160,7 +159,7 @@ const render = defineCommand({
         lines.push(`${x.status} ${"target" in x.action ? x.action.target : ""}${x.detail === "" ? "" : ` (${x.detail})`}`);
       if (mine.length === 0) lines.push("every generated file is as the templates give it; nothing written");
       return ok({
-        text: textOf(lines, done.value.findings),
+        text: lines.join("\n"),
         data: {
           written: done.value.steps.filter((x) => x.status === "done").length,
         },
@@ -170,16 +169,8 @@ const render = defineCommand({
     }),
 });
 
-/** The module `ergonex verify`. */
-export const verifyModule: ErgonexModule = {
-  name: "verify",
-  summary: verify.summary,
-  commands: [verify],
-};
+/** The command `ergonex verify`. */
+export const verifyCommand = verify;
 
-/** The module `ergonex render`. */
-export const renderModule: ErgonexModule = {
-  name: "render",
-  summary: render.summary,
-  commands: [render],
-};
+/** The command `ergonex render`. */
+export const renderCommand = render;

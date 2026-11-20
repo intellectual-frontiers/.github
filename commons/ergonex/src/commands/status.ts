@@ -12,12 +12,13 @@ import { existsSync } from "../platform/r-fs.ts";
 import { run } from "../platform/r-proc.ts";
 import type { Finding } from "../findings.ts";
 import { classify, type RepoState } from "../state.ts";
-import { defineCommand, GLOBAL_OPTIONS, type ErgonexModule } from "../modules/types.ts";
+import { defineCommand } from "./define.ts";
+import { HOME, reads } from "./options.ts";
 import { foldKey } from "../portable.ts";
 import { observeFacts } from "../host/observe.ts";
 import { findUnmanaged } from "../host/unmanaged.ts";
 import { native } from "../host/workspace.ts";
-import { jsonOf, textOf, withWorkspace } from "./common.ts";
+import { jsonOf, withWorkspace } from "./common.ts";
 
 const GIT_ENV = {
   GIT_TERMINAL_PROMPT: "0",
@@ -54,7 +55,7 @@ function describeState(s: RepoState): string {
 }
 
 const OPTIONS = {
-  ...GLOBAL_OPTIONS,
+  ...HOME,
   fetch: flag({
     help: "Fetch each repository's remote first (the only use of the network).",
   }),
@@ -64,6 +65,11 @@ const status = defineCommand({
   name: "status",
   summary: "List every repository of the manifest with its state, how far it is ahead and behind, its stashes, untracked files and lock.",
   options: OPTIONS,
+  action: reads(),
+  examples: [
+    { args: [], says: "List every repository of the workspace and its state." },
+    { args: ["--fetch"], says: "Fetch each remote first, so that ahead and behind are as the remote is now." },
+  ],
   run: (ctx, args) =>
     withWorkspace(ctx, async (loaded) => {
       const rows: {
@@ -154,10 +160,10 @@ const status = defineCommand({
           severity: "Informational",
           message:
             u.kind === "adoptable"
-              ? `${u.path} is a repository the manifest does not name; \`ergonex adopt --apply\` adds it`
+              ? `${u.path} is a repository the manifest does not name; \`ergonex repos adopt\` adds it`
               : u.kind === "misplaced"
-                ? `${u.path} is a repository the manifest does not name and is not at the path its remote makes (${u.belongsAt}); see \`ergonex adopt\``
-                : `${u.path} is a repository the manifest does not name; see \`ergonex adopt\``,
+                ? `${u.path} is a repository the manifest does not name and is not at the path its remote makes (${u.belongsAt}); see \`ergonex repos adopt\``
+                : `${u.path} is a repository the manifest does not name; see \`ergonex repos adopt\``,
           subject: u.path,
           firstSeen: ctx.today,
         });
@@ -168,7 +174,7 @@ const status = defineCommand({
           `${r.path.padEnd(width)}  ${describeState(r.state).padEnd(12)} ahead ${r.ahead} behind ${r.behind}  stashes ${r.stashes}  untracked ${r.untracked}  ${r.locked ? "locked" : "unlocked"}`,
       );
       return ok({
-        text: textOf(rows.length === 0 ? ["the manifest names no repository"] : lines, findings),
+        text: rows.length === 0 ? "the manifest names no repository" : lines.join("\n"),
         data: {
           repositories: jsonOf(rows.map((r) => ({ ...r, state: r.state.kind }))),
         },
@@ -177,9 +183,5 @@ const status = defineCommand({
     }),
 });
 
-/** The module `ergonex status`. */
-export const statusModule: ErgonexModule = {
-  name: "status",
-  summary: status.summary,
-  commands: [status],
-};
+/** The command `ergonex status`. */
+export const statusCommand = status;

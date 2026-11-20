@@ -1,6 +1,6 @@
 // Spec: 0003-host FR-012
 /**
- * A unified diff of two texts (commons 0003-host FR-012, FR-019): what `ergonex render --diff` shows of a generated file that would change, and what `ergonex shell --install` shows of the one
+ * A unified diff of two texts (commons 0003-host FR-012, FR-019): what `ergonex render --dry-run` shows of a generated file that would change, and what `ergonex shell install` shows of the one
  * block it would write, so that a person sees the exact change before it is made.
  *
  * @remarks

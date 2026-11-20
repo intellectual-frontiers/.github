@@ -5,7 +5,7 @@
  * folder of its own that is renamed into place, writes the install record and the shims, and reads an installed tool back to find what changed since.
  *
  * @remarks
- * Only `ergonex setup --apply` calls `installTool` (0001-ergonex FR-017); `ergonex tools` only reads (`installedTools`, `verifyTool`). The transport refuses a request that carries a credential, so a
+ * Only `ergonex setup` calls `installTool` (0001-ergonex FR-017); `ergonex tools` only reads (`installedTools`, `verifyTool`). The transport refuses a request that carries a credential, so a
  * pinned URL never sends one.
  *
  * @limits Every command a tool provides is shimmed to the one executable the catalog names for the tool.

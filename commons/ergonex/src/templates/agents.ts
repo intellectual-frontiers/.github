@@ -60,7 +60,7 @@ export function agentsText(data: TemplateData): string {
     "- `ergonex render`, `ergonex verify`: write the generated files, and check them against the state record.",
     "- `ergonex doctor`: check the runtime, the layout, the file system, the policy and the generated files.",
     "- `ergonex worktree create|list|prune`: worktrees, named for their issue.",
-    "- `ergonex list`, `ergonex help`: the modules.",
+    "- `ergonex modules`, `ergonex help`: the modules and the commands.",
     "",
     "Every run writes one evidence record into ergonex's state folder (`ergonex paths` says where); none holds a credential.",
   ].join("\n");

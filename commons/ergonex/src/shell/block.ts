@@ -1,6 +1,6 @@
 // Spec: 0003-host FR-019
 /**
- * The one marked block of a start-up file (commons 0003-host FR-019): `ergonex shell --install` writes a block between the lines `# >>> ergonex >>>` and `# <<< ergonex <<<`, leaves one block where it is
+ * The one marked block of a start-up file (commons 0003-host FR-019): `ergonex shell install` writes a block between the lines `# >>> ergonex >>>` and `# <<< ergonex <<<`, leaves one block where it is
  * run twice, and `--uninstall` removes exactly that block and nothing else, so that a file that had other text is, after both, as it was.
  *
  * @remarks

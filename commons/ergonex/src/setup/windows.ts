@@ -82,7 +82,7 @@ export const LONG_PATH_STEPS: readonly string[] = [
   "Open PowerShell as Administrator (right-click it and choose Run as administrator).",
   `Run: reg add "${LONG_PATHS_REGISTRY.key}" /v ${LONG_PATHS_REGISTRY.name} /t ${LONG_PATHS_REGISTRY.type} /d ${LONG_PATHS_REGISTRY.data} /f`,
   "Close and reopen your terminal and your editor so that they read the setting.",
-  "Run `ergonex setup --apply` again (the repositories keep `core.longpaths` either way).",
+  "Run `ergonex setup` again (the repositories keep `core.longpaths` either way).",
 ];
 
 /** The local Git configuration `ergonex setup` sets in each managed repository on Windows: an argument vector for `git -C <repo>`. */

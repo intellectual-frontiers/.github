@@ -1,7 +1,6 @@
 // Spec: 0001-ergonex FR-017
 /**
- * `ergonex setup` (commons 0001-ergonex FR-017 to FR-020): the one command that installs a tool or changes the host. `--dry-run` is the default and shows the plan; `--apply` is required to change anything and
- * with `--dry-run` is a usage error; it makes the root and the starter manifest, installs only the pinned artifacts of the catalog, probes `git`, `bun` and `node` and never installs them, on Windows
+ * `ergonex setup` (commons 0001-ergonex FR-017 to FR-020): the one command that installs a tool or changes the host. `--dry-run` shows the plan and changes nothing; without it the plan is carried out; it makes the root and the starter manifest, installs only the pinned artifacts of the catalog, probes `git`, `bun` and `node` and never installs them, on Windows
  * sets `core.longpaths` (and the system setting where elevated, else prints the steps), and with `--git-include` adds one marked `[include]` of the generated `git.auto.conf` to the global Git
  * configuration after showing the exact change and asking. This module wraps `setup/host/apply.ts`, which does the work, as a typed module and gives it the facts of this host.
  *
@@ -19,8 +18,9 @@ import { type Finding } from "../findings.ts";
 import { policyOf } from "../policy.ts";
 import { probeAll } from "../tools/host/probe.ts";
 import { setup, setSystemLongPathsOnWindows, type SetupDeps } from "../setup/host/apply.ts";
-import { parseSetupArgs } from "../setup/plan.ts";
-import { defineCommand, GLOBAL_OPTIONS, type ErgonexModule } from "../modules/types.ts";
+import type { SetupArgs } from "../setup/plan.ts";
+import { defineCommand } from "./define.ts";
+import { changes, HOME } from "./options.ts";
 import { AREA, loadFailureOutcome, loopbackAllowed, readManifest } from "../host/workspace.ts";
 import { isElevated, probeLongPaths } from "../host/probe.ts";
 import type { ToolCatalog } from "../tools/catalog.ts";
@@ -29,35 +29,26 @@ import { hostTarget } from "./tools.ts";
 import { jsonOf } from "./common.ts";
 
 const OPTIONS = {
-  ...GLOBAL_OPTIONS,
-  apply: flag({
-    help: "Carry the plan out: make the root, install the pinned tools, set what the host needs. Without it nothing is changed.",
-  }),
-  dryRun: flag({
-    help: "Show the plan and change nothing (the default; with --apply it is a usage error).",
-  }),
+  ...HOME,
   gitInclude: flag({
-    help: "Add one marked [include] of the generated git.auto.conf to your global Git configuration, after showing the change and asking.",
-  }),
-  yes: flag({
-    help: "Answer yes to the question of --git-include, for a run with no terminal.",
+    help: "Add one marked [include] of the generated git.auto.conf to your global Git configuration, after showing the change and, where a person can be asked, asking.",
   }),
 };
 
-const setupCommand = defineCommand({
+/** The command `ergonex setup`. */
+export const setupCommand = defineCommand({
   name: "setup",
-  summary:
-    "Show the plan to set the workspace up (dry run by default); with --apply, make the root, install the pinned tools and set the host.",
+  summary: "Make the root, install the pinned tools and set what the host needs; --dry-run shows the plan and changes nothing.",
   options: OPTIONS,
+  action: changes({ idempotent: true, dryRun: true }),
+  examples: [
+    { args: ["--dry-run"], says: "Show the plan and change nothing." },
+    { args: [], says: "Carry the plan out." },
+    { args: ["--git-include"], says: "Also add the generated Git configuration to yours, after showing the change." },
+  ],
   run: async (ctx, args) => {
     const o = args.options;
-    const parsed = parseSetupArgs([
-      ...(o.apply ? ["--apply"] : []),
-      ...(o.dryRun ? ["--dry-run"] : []),
-      ...(o.gitInclude ? ["--git-include"] : []),
-      ...(o.yes ? ["--yes"] : []),
-    ]);
-    if (parsed.kind === "err") return err({ kind: "usage", message: parsed.error.message });
+    const asked: SetupArgs = { mode: ctx.mode === "dry-run" ? "dry-run" : "apply", gitInclude: o.gitInclude };
     const home = ctx.home;
     if (home === undefined)
       return err({
@@ -110,11 +101,7 @@ const setupCommand = defineCommand({
       setSystemLongPaths: setSystemLongPathsOnWindows,
       globalGitConfig: globalGit ?? join(home, ".gitconfig-not-found"),
       gitIncludeFile: join(home, AREA, "git.auto.conf"),
-      ...(ctx.interact.terminal
-        ? {
-            confirm: async (q: string): Promise<boolean> => /^\s*y(es)?\s*$/i.test((await ctx.interact.ask(`${q} [y/N] `)) ?? ""),
-          }
-        : {}),
+      ...(ctx.interact.terminal ? { confirm: async (q: string): Promise<boolean> => (await ctx.interact.confirm(q)) === true } : {}),
       // the plan is the report (standard output); what else is said, the exact change to a file, goes to standard error
       say: (t) => {
         if (!t.startsWith("ergonex setup")) ctx.note(t);
@@ -125,7 +112,7 @@ const setupCommand = defineCommand({
         kind: "environment",
         message: "the global Git configuration cannot be found: HOME is not set",
       });
-    const done = await setup(parsed.value, deps);
+    const done = await setup(asked, deps);
     if (done.kind === "err") return err(done.error);
     const r = done.value;
     const lines = r.outcomes.map((x) => `  ${x.result.padEnd(8)} ${x.message}`);
@@ -150,10 +137,3 @@ const setupCommand = defineCommand({
     });
   },
 });
-
-/** The module `ergonex setup`. */
-export const setupModule: ErgonexModule = {
-  name: "setup",
-  summary: setupCommand.summary,
-  commands: [setupCommand],
-};

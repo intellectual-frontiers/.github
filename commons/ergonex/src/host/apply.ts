@@ -8,7 +8,7 @@
  * Fast-forward only: the one way a branch moves is `git merge --ff-only` of its upstream; there is no rebase, reset, merge, force or discard here. A folder that holds local work is never deleted: the
  * only thing `apply` removes is a generated file whose bytes are still the ones the state record holds, and only with `--allow-destructive`. A Git lock file is never removed (the repository is
  * `Locked` and skipped). A generated file whose bytes are not the recorded ones was edited by hand and is refused unless the run says `--force`. An action of a kind that changes the host (`InstallTool`,
- * `ConfigureHost`) is refused: only `ergonex setup --apply` carries one out. The state record is written last, by the same atomic write, and only where it changed, so that a second run changes nothing.
+ * `ConfigureHost`) is refused: only `ergonex setup` carries one out. The state record is written last, by the same atomic write, and only where it changed, so that a second run changes nothing.
  *
  * @module
  */
@@ -258,8 +258,8 @@ async function carryOut(s: Situation, ctx: Context, options: ApplyOptions): Prom
         }
         case "ConfigureHost":
         case "InstallTool":
-          // a change of the host belongs to `ergonex setup --apply` alone (0002-workspace-model FR-030)
-          push(action, "refused", isHostChange(action) ? "only `ergonex setup --apply` changes the host" : "not carried out");
+          // a change of the host belongs to `ergonex setup` alone (0002-workspace-model FR-030)
+          push(action, "refused", isHostChange(action) ? "only `ergonex setup` changes the host" : "not carried out");
           break;
         default:
           return absurd(action);

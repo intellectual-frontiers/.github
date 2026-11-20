@@ -9,7 +9,7 @@
  * `Diverged`, `Locked` or `Detached` is skipped with the reason; one on the wrong remote or not a repository is refused, never overwritten. A generated file is written where it is absent or still
  * the bytes the state record holds, and refused where it was edited by hand. A repository has one action for its state (the state's default) and a `ConfigureRepo` where its local Git
  * configuration differs from the manifest's; a worktree is planned only where another worker or uncommitted work is on the repository (FR-007). A change of the host outside the workspace
- * (`ConfigureHost`, `InstallTool`) is in a plan only for `ergonex setup --apply` (FR-030). The actions are in the order of their paths, folded, so that the same inputs give the same plan.
+ * (`ConfigureHost`, `InstallTool`) is in a plan only for `ergonex setup` (FR-030). The actions are in the order of their paths, folded, so that the same inputs give the same plan.
  *
  * @module
  */
@@ -42,7 +42,7 @@ export type DesiredWorktree = {
 /** A generated file the templates give: its path and the SHA-256 of its bytes. */
 export type DesiredFile = { readonly path: RepoPath; readonly sha256: Sha256 };
 
-/** A change of the host outside the workspace, which only `ergonex setup --apply` may plan. */
+/** A change of the host outside the workspace, which only `ergonex setup` may plan. */
 export type HostChange =
   | {
       readonly kind: "ConfigureHost";
@@ -183,7 +183,7 @@ export function isDestructive(action: Action | ActionKind): boolean {
   }
 }
 
-/** Whether an action changes the host outside the workspace (`ergonex:hostChange`): `ConfigureHost` and `InstallTool`, which only `ergonex setup --apply` carries out (FR-030). */
+/** Whether an action changes the host outside the workspace (`ergonex:hostChange`): `ConfigureHost` and `InstallTool`, which only `ergonex setup` carries out (FR-030). */
 export function isHostChange(action: Action | ActionKind): boolean {
   const kind = typeof action === "string" ? action : action.kind;
   switch (kind) {
@@ -353,7 +353,7 @@ const byPath = <T extends { readonly path: string }>(a: T, b: T): number =>
 
 /** What a plan is made under. */
 export type PlanOptions = {
-  /** True only for `ergonex setup --apply`: the only run whose plan may hold a change of the host (FR-030). */
+  /** True only for `ergonex setup`: the only run whose plan may hold a change of the host (FR-030). */
   readonly setupApply?: boolean;
 };
 

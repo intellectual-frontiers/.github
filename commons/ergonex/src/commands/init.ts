@@ -7,7 +7,8 @@
 import { err, ok } from "@intellectual-frontiers/core";
 import { flag } from "../platform/k-args.ts";
 import { exists, mkdir, writeTextFile } from "../platform/r-fs.ts";
-import { GLOBAL_OPTIONS, defineCommand, type ErgonexModule } from "../modules/types.ts";
+import { defineCommand } from "./define.ts";
+import { changes, HOME } from "./options.ts";
 import { AREA, manifestPath } from "../host/workspace.ts";
 import { starterManifest } from "../setup/starter.ts";
 import { launchFor } from "../setup/onpath.ts";
@@ -26,7 +27,7 @@ const hostDeps: PathDeps = {
 };
 
 const OPTIONS = {
-  ...GLOBAL_OPTIONS,
+  ...HOME,
   noInstall: flag({
     help: "Make the root only: do not put ergonex on the path.",
   }),
@@ -39,6 +40,11 @@ const init = defineCommand({
   name: "init",
   summary: "Make the root and the workspace's own area, write a starter manifest where there is none, and put ergonex on your path.",
   options: OPTIONS,
+  action: changes({ idempotent: true }),
+  examples: [
+    { args: [], says: "Make the workspace at $ERGONEX_HOME (else $HOME/workspaces) and put ergonex on your path." },
+    { args: ["--no-install"], says: "Make the workspace and leave your path as it is." },
+  ],
   run: async (ctx, args) => {
     if (ctx.home === undefined)
       return err({
@@ -82,18 +88,15 @@ const init = defineCommand({
       lines.push(...r.lines);
       onPath = r.data;
     }
-    lines.push("next: add a repository with `ergonex add github.com/owner/repo --apply`");
     return ok({
       text: lines.join("\n"),
       data: { home, made, onPath: onPath ?? null },
       findings: [],
+      title: made.length === 0 ? "Already a workspace" : "Workspace made",
+      next: ["ergonex repos add github.com/owner/repo"],
     });
   },
 });
 
-/** The module `ergonex init`. */
-export const initModule: ErgonexModule = {
-  name: "init",
-  summary: init.summary,
-  commands: [init],
-};
+/** The command `ergonex init`. */
+export const initCommand = init;

@@ -116,7 +116,7 @@ async function importDefault(path: string, name: string, shape: string): Promise
 const importManifest = (path: string): Promise<Result<unknown, string>> =>
   importDefault(path, "workspace.ts", "the manifest (`export default { repositories: [...] }`)");
 
-/** Where the list of repositories that `ergonex add` keeps is (0005-repositories FR-001). */
+/** Where the list of repositories that `ergonex repos add` keeps is (0005-repositories FR-001). */
 export function repositoriesPath(home: string): string {
   return join(home, AREA, REPOSITORIES_FILE);
 }
