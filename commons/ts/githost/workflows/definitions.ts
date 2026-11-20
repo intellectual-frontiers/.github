@@ -788,7 +788,7 @@ export const ACTIONS: readonly CompositeAction[] = [
         },
       }),
       run(
-        "node -e \"const fs=require('fs'),p=require('path');fs.mkdirSync('commons/ts/node_modules/@intellectual-frontiers',{recursive:true});for(const n of ['core','rdf','terminal'])fs.symlinkSync(p.resolve('commons/'+n),'commons/ts/node_modules/@intellectual-frontiers/'+n,'junction')\"",
+        "node -e \"const fs=require('fs'),p=require('path');fs.mkdirSync('commons/ts/node_modules/@intellectual-frontiers',{recursive:true});const L=['core','rdf','terminal'];for(const n of L)fs.symlinkSync(p.resolve('commons/'+n),'commons/ts/node_modules/@intellectual-frontiers/'+n,'junction');for(const n of L.slice(1)){fs.mkdirSync('commons/'+n+'/node_modules/@intellectual-frontiers',{recursive:true});fs.symlinkSync(p.resolve('commons/core'),'commons/'+n+'/node_modules/@intellectual-frontiers/core','junction')}\"",
         {
           name: "The libraries lifted out of the kernel, linked where the kernel looks for them (the installer runs before any package is installed, and a library's compiler reads the kernel; Bun links them again later)",
           shell: "bash",
