@@ -16,6 +16,7 @@
  */
 import type { dirs } from "@intellectual-frontiers/system";
 import type { Counts, Problem } from "@intellectual-frontiers/headless/governance";
+import type { ExecutorFor } from "@intellectual-frontiers/headless/logical";
 import type { StateStore } from "./state.ts";
 
 /** A signal a run is stopped by. */
@@ -69,6 +70,8 @@ export type Io = {
   readonly signals?: SignalPort;
   readonly timer?: TimerPort;
   readonly observer?: RunObserver;
+  /** Where `--on <target>` runs a command: the executor of each target by its id (the ssh executor of `targets/ssh`, given by the program that wires them). */
+  readonly executors?: ExecutorFor;
   /** Output as it is written (the host streams it; a test leaves it out and reads the result). */
   readonly sink?: Sink;
 };

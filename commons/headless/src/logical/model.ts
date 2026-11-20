@@ -19,15 +19,18 @@
  *
  * @module
  */
-import { flag, type Args, type Operand, type Spec, type SpecCheck } from "@intellectual-frontiers/terminal/args";
+import { flag, value, type Args, type Operand, type Spec, type SpecCheck } from "@intellectual-frontiers/terminal/args";
 import { group, treeProblems, type CommandNode, type Example, type Group, type TreeProblem, type Verb } from "@intellectual-frontiers/terminal/commands";
-import { actionProblems, defineAction, type ActionDefinition, type ActionFacts, type ActionProblem, type Mode, type Problem, type ProblemFields } from "@intellectual-frontiers/headless/governance";
+import { actionProblems, defineAction, reachConformance, type ActionDefinition, type ActionFacts, type ActionProblem, type Mode, type Problem, type ProblemFields, type ReachPolicy, type ReachProblem } from "@intellectual-frontiers/headless/governance";
 import { problem } from "@intellectual-frontiers/headless/governance";
 import type { Hint, Outcome } from "./outcome.ts";
 import type { Verbosity } from "./verbosity.ts";
 
 /** What a command is as an action, besides its identity (the path of its words and its summary are the tree's). */
-export type ActionTraits = Omit<ActionDefinition, "id" | "summary">;
+export type ActionTraits = Omit<ActionDefinition, "id" | "summary"> & {
+  /** Where it may be reached from and run (commons headless 0005-reach-and-targets): required of every action by the conformance rule `model/no-reach-policy`. */
+  readonly reach?: ReachPolicy;
+};
 
 /** What a command is told about its run. */
 export type Context = {
@@ -172,7 +175,7 @@ export function branch(b: { readonly name: string; readonly summary: string; rea
 }
 
 /** A command together with the path of its words. */
-export type Placed = { readonly path: readonly string[]; readonly id: string; readonly command: Command; readonly facts: ActionFacts };
+export type Placed = { readonly path: readonly string[]; readonly id: string; readonly command: Command; readonly facts: ActionFacts; readonly reach: ReachPolicy | undefined };
 
 /** The commands of a tree, each with its path and the facts of its action (its id is its words below the program, joined by spaces). */
 export function placedCommands(children: readonly Node[], path: readonly string[] = []): readonly Placed[] {
@@ -180,7 +183,7 @@ export function placedCommands(children: readonly Node[], path: readonly string[
     const here = [...path, n.name];
     if (n.kind === "branch") return placedCommands(n.children, here);
     const id = here.join(" ");
-    return [{ path: here, id, command: n, facts: defineAction({ ...n.action, id, summary: n.summary }) }];
+    return [{ path: here, id, command: n, facts: defineAction({ ...n.action, id, summary: n.summary }), reach: n.action.reach }];
   });
 }
 
@@ -199,16 +202,16 @@ export function verbOf(c: Command): Verb {
 }
 
 /** The words of the program's own place that the surface answers itself (help, explain, completions, man): a program's tree may not use them for a command. */
-export const BUILT_IN_WORDS = ["help", "explain", "completions", "man"] as const;
+export const BUILT_IN_WORDS = ["help", "explain", "completions", "man", "run"] as const;
 
 /** The options of the model, by their keys. */
-export const STANDARD_KEYS = ["json", "sarif", "quiet", "verbose", "color", "nonInteractive", "dryRun", "check", "yes"] as const;
+export const STANDARD_KEYS = ["json", "sarif", "quiet", "verbose", "color", "nonInteractive", "dryRun", "check", "yes", "on"] as const;
 
 /** One of the model's standard option keys. */
 export type StandardKey = (typeof STANDARD_KEYS)[number];
 
 /** The options every command takes, and those its action's facts add: `--dry-run` where it can preview, `--check` where it can check, `--yes` where it destroys. */
-export function standardOptions(facts: ActionFacts): Spec {
+export function standardOptions(facts: ActionFacts, reach?: ReachPolicy): Spec {
   return {
     json: flag({ help: "Write one JSON document and nothing else for a person." }),
     ...(facts.kind === "report" ? { sarif: flag({ help: "Write the findings as SARIF 2.1.0 and nothing else." }) } : {}),
@@ -216,6 +219,7 @@ export function standardOptions(facts: ActionFacts): Spec {
     verbose: flag({ short: "v", help: "Show every step as it happens." }),
     color: flag({ negatable: true, default: true, help: "Use colour where the terminal shows it (--no-color turns it off)." }),
     nonInteractive: flag({ help: "Never ask a question: where one is needed, fail and say so." }),
+    ...(reach?.channels.includes("ssh") === true ? { on: value({ help: "Run it on these targets instead of here: ids joined by commas, `class:<class>` or `all`." }) } : {}),
     ...(facts.dryRun ? { dryRun: flag({ help: "Show what would change and change nothing." }) } : {}),
     ...(facts.check ? { check: flag({ help: "Change nothing; end with findings where something would change." }) } : {}),
     ...(facts.effect === "destructive" ? { yes: flag({ short: "y", help: "Confirm the destruction without asking." }) } : {}),
@@ -229,23 +233,27 @@ export type ModelProblem =
   | { readonly rule: "model/reserved-option"; readonly id: string; readonly option: string }
   | { readonly rule: "model/reserved-short"; readonly id: string; readonly option: string; readonly short: string }
   | { readonly rule: "model/built-in-word"; readonly word: string }
+  | { readonly rule: "model/no-reach-policy"; readonly id: string }
+  | { readonly rule: "model/reach"; readonly id: string; readonly problem: ReachProblem }
   | { readonly rule: "model/human-only-unknown"; readonly id: string; readonly option: string };
 
 /**
  * Everything wrong with a program's tree: what the terminal finds in its names (a duplicate, a bad name), what the governance finds in each action's
  * facts, an option of a command named as one of the model's standard options, and a human-only option the command does not declare.
  */
-export function modelProblems(program: { readonly name: string; readonly summary: string; readonly children: readonly Node[] }): readonly ModelProblem[] {
+export function modelProblems(program: { readonly name: string; readonly summary: string; readonly children: readonly Node[] }, options: { readonly requireReach?: boolean } = {}): readonly ModelProblem[] {
   const out: ModelProblem[] = treeProblems(treeOf(program)).map((problem): ModelProblem => ({ rule: "model/tree", problem }));
   for (const n of program.children) {
     if ((BUILT_IN_WORDS as readonly string[]).includes(n.name)) out.push({ rule: "model/built-in-word", word: n.name });
   }
   for (const p of placedCommands(program.children)) {
-    const standard = standardOptions(p.facts);
+    const standard = standardOptions(p.facts, p.reach);
     const taken = new Set(Object.values(standard).flatMap((o) => (o.short === undefined ? [] : [o.short])));
     for (const [key, o] of Object.entries(p.command.options)) {
       if (o.short !== undefined && taken.has(o.short)) out.push({ rule: "model/reserved-short", id: p.id, option: key, short: o.short });
     }
+    if (p.reach !== undefined) for (const rp of reachConformance([{ facts: p.facts, reach: p.reach }])) out.push({ rule: "model/reach", id: p.id, problem: rp });
+    else if (options.requireReach === true) out.push({ rule: "model/no-reach-policy", id: p.id });
     for (const a of actionProblems(p.facts)) out.push({ rule: "model/action", id: p.id, problem: a });
     for (const key of Object.keys(p.command.options)) {
       if ((STANDARD_KEYS as readonly string[]).includes(key)) out.push({ rule: "model/reserved-option", id: p.id, option: key });

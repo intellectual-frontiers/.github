@@ -141,7 +141,7 @@ proves(["0004-headless-cli FR-011"], "the surface answers --version, help, expla
   const top = await go([]);
   assertEquals(top.code, 0);
   assertStringIncludes(top.out, "Commands:");
-  assertStringIncludes(top.out, "Built in: help, explain, completions, man, --version");
+  assertStringIncludes(top.out, "Built in: help, explain, completions, man, run, --version");
   assertEquals((await go(["help"])).out, top.out);
   assertEquals((await go(["--help"])).out, top.out.replace(/\n$/, "") + "\n");
   const verbHelp = await go(["sync", "--help"]);

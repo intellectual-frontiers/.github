@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/headless",
   "private": true,
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Headless programs as one contract: the governance of an action (kind, effect, audience, confirmation, problems, exit statuses, redaction), the logical layer (the command model, the typed outcome, the closing block, JSON and SARIF, explain, hints, nested runs) and the command-line surface (calm output, prompts, the run log, signals, help, completions and man pages); a tool server and a REST surface slot in beside it.",
   "type": "module",
   "engines": {
@@ -12,6 +12,9 @@
     "./governance": "./src/governance/mod.ts",
     "./logical": "./src/logical/mod.ts",
     "./cli": "./src/surfaces/cli/mod.ts",
+    "./targets/local": "./src/targets/local/mod.ts",
+    "./targets/ssh": "./src/targets/ssh/mod.ts",
+    "./ssh-inbound": "./src/surfaces/ssh-inbound/mod.ts",
     "./otel": "./src/otel/mod.ts"
   },
   "scripts": {

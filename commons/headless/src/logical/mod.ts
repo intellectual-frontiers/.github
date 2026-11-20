@@ -16,12 +16,15 @@
  */
 export * from "./closing.ts";
 export * from "./envelope.ts";
+export * from "./executor.ts";
 export * from "./explain.ts";
 export * from "./fix.ts";
 export * from "./hints.ts";
+export * from "./machine.ts";
 export * from "./model.ts";
 export * from "./nested.ts";
 export * from "./outcome.ts";
 export * from "./program.ts";
 export * from "./redaction.ts";
+export * from "./remote.ts";
 export * from "./verbosity.ts";

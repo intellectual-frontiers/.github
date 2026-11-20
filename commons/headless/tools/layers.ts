@@ -24,7 +24,7 @@ export const PACKAGE = "@intellectual-frontiers/headless";
 export const CORE = "@intellectual-frontiers/core";
 
 /** The kinds of unit of the table. */
-export type UnitClass = "governance" | "logical" | "surface" | "adapter" | "suite" | "tools" | "root";
+export type UnitClass = "governance" | "logical" | "surface" | "target" | "adapter" | "suite" | "tools" | "root";
 
 /** A unit: a folder of the table. A class with instances (`surfaces/`) has one unit for each of its folders. */
 export type Unit = { readonly name: string; readonly class: UnitClass };
@@ -49,6 +49,20 @@ export const SURFACES: Readonly<Record<string, readonly Allowed[]>> = {
     { name: TERMINAL, subpaths: "any" },
     { name: SYSTEM, subpaths: "any" },
   ],
+  // the generator of authorized_keys lines and sshd blocks writes text from governance: it needs nothing of the host
+  "ssh-inbound": [{ name: CORE, subpaths: [] }],
+};
+
+/** The targets there are (the executors of `src/targets/`): one row each, with what the executor may import besides the layers below it. They hold no SSH protocol: they run the system's own client. */
+export const TARGETS: Readonly<Record<string, readonly Allowed[]>> = {
+  local: [
+    { name: CORE, subpaths: [] },
+    { name: SYSTEM, subpaths: "any" },
+  ],
+  ssh: [
+    { name: CORE, subpaths: [] },
+    { name: SYSTEM, subpaths: "any" },
+  ],
 };
 
 /** What each class may import by package name, besides this package's other units. A surface's row is its own (`SURFACES`). */
@@ -59,6 +73,7 @@ const EXTERNAL: Readonly<Record<UnitClass, readonly Allowed[]>> = {
     { name: TERMINAL, subpaths: ["args", "commands"] },
   ],
   surface: [],
+  target: [],
   adapter: [
     { name: CORE, subpaths: [] },
     { name: TELEMETRY, subpaths: "any" },
@@ -73,14 +88,15 @@ export const MAY_IMPORT: Readonly<Record<UnitClass, readonly UnitClass[]>> = {
   governance: [],
   logical: ["governance"],
   surface: ["logical", "governance"],
+  target: ["logical", "governance"],
   adapter: ["surface", "logical", "governance"],
-  suite: ["governance", "logical", "surface", "adapter", "root"],
+  suite: ["governance", "logical", "surface", "target", "adapter", "root"],
   tools: [],
   root: [],
 };
 
 /** How high a class stands: an import of a higher level climbs (`layers/above`), of the same or a lower one that is not allowed reaches around (`layers/around`). */
-const LEVEL: Readonly<Record<UnitClass, number>> = { governance: 1, logical: 2, surface: 3, adapter: 4, root: 5, suite: 6, tools: 6 };
+const LEVEL: Readonly<Record<UnitClass, number>> = { governance: 1, logical: 2, surface: 3, target: 3, adapter: 4, root: 5, suite: 6, tools: 6 };
 
 /** The checking of the library itself, which may import any file of the library by a relative path. */
 const OWN: ReadonlySet<UnitClass> = new Set<UnitClass>(["suite", "tools", "root"]);
@@ -91,6 +107,12 @@ export function unitOf(path: string): Unit | undefined {
   if (path === "src/mod.ts") return { name: "(entry)", class: "root" };
   if (path.startsWith("src/governance/")) return { name: "src/governance/", class: "governance" };
   if (path.startsWith("src/logical/")) return { name: "src/logical/", class: "logical" };
+  if (path.startsWith("src/targets/")) {
+    const rest = path.slice("src/targets/".length);
+    const slash = rest.indexOf("/");
+    const name = slash > 0 ? rest.slice(0, slash) : undefined;
+    return name !== undefined && TARGETS[name] !== undefined ? { name: `src/targets/${name}/`, class: "target" } : undefined;
+  }
   if (path.startsWith("src/otel/")) return { name: "src/otel/", class: "adapter" };
   if (path.startsWith("src/surfaces/")) {
     const rest = path.slice("src/surfaces/".length);
@@ -138,6 +160,7 @@ export function allowedExternal(allowed: readonly Allowed[], specifier: string):
 
 /** What a unit may import by package name besides this package: its class's row, or for a surface the row of the surface. */
 export function externalsOf(unit: Unit): readonly Allowed[] {
+  if (unit.class === "target") return TARGETS[unit.name.replace(/^src\/targets\//, "").replace(/\/$/, "")] ?? [];
   if (unit.class === "surface") return SURFACES[unit.name.replace(/^src\/surfaces\//, "").replace(/\/$/, "")] ?? [];
   return EXTERNAL[unit.class];
 }

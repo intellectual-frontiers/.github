@@ -17,4 +17,5 @@
 export * from "./action.ts";
 export * from "./exits.ts";
 export * from "./problems.ts";
+export * from "./reach.ts";
 export * from "./redact.ts";
