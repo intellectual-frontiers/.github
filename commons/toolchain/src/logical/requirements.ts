@@ -1,7 +1,7 @@
 // Spec: 0003-toolchain-logical FR-006
 /**
  * The requirements of Archon for a resolution: one of kind `tool` for each resolved tool, with the id `tool.<name>`, a dependency on the requirement of each tool it needs, and as its desired state
- * data that names the tool, the version it is carried out at, its program, its scope, its phases, the dialect and the source (the download a pin gave, or the packages). They are made, never
+ * data that names the tool, the version it is carried out at, its program, its other names, its minimum, its scope, its phases, the dialect and the source (the download a pin gave, or the packages). They are made, never
  * written: the version and the hash in them come from the pin, and Archon orders and plans them for the dialect that was chosen.
  *
  * @example
@@ -28,6 +28,8 @@ function desiredOf(r: ResolvedTool): JsonValue {
     version: r.version ?? null,
     pinPolicy: r.tool.pin,
     program: r.tool.program,
+    alsoNamed: [...r.tool.alsoNamed],
+    minimum: r.tool.minimum ?? null,
     versionArgs: [...r.tool.versionArgs],
     scope: r.tool.scope,
     phases: [...r.tool.phases],

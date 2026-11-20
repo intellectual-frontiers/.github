@@ -41,17 +41,33 @@ export type ToolPlanEntry = {
 /** The plan of tools. */
 export type ToolPlan = { readonly platform: string; readonly entries: readonly ToolPlanEntry[] };
 
+/** What the rule that decides an action reads. */
+export type ActionInput = {
+  readonly seen: ObservedTool | undefined;
+  /** The version the tool is carried out at; none where nothing pins one. */
+  readonly version: string | undefined;
+  /** The least version of a copy found on the path that may be taken. */
+  readonly minimum: string | undefined;
+  readonly systemCopy: Context["systemCopy"];
+  readonly integrity: Context["integrity"];
+};
+
+/** The action for one tool: absent is `install`; a copy on the path counts only where the policy allows a system copy and the fleet does not ask for exact, hashed tools, and then at the least version (the pinned version where none is stated); a copy of the store or of a manager counts at the pinned version only, and any version counts where nothing pins one. The one rule, used by the plan and by the dialects. */
+export function actionFor(i: ActionInput): ToolAction {
+  if (i.seen === undefined) return "install";
+  if (i.seen.from === "path") {
+    const floor = i.minimum ?? i.version;
+    const allowed = i.systemCopy === "minimum" && i.integrity !== "exact-hashed";
+    return allowed && (floor === undefined || compareVersions(i.seen.version, floor) >= 0) ? "none" : "replace";
+  }
+  return i.version === undefined || compareVersions(i.seen.version, i.version) === 0 ? "none" : "replace";
+}
+
 /** The plan for a resolution and what is observed. */
 export function planTools(resolution: Resolution, observed: ObservedTools, ctx: Context): ToolPlan {
-  const systemCopy = ctx.systemCopy === "minimum" && ctx.integrity !== "exact-hashed";
   const entries = resolution.entries.map((r): ToolPlanEntry => {
     const seen = observed.get(r.tool.name);
-    let action: ToolAction;
-    if (seen === undefined) action = "install";
-    else if (seen.from === "path") {
-      const floor = r.tool.minimum ?? r.version;
-      action = systemCopy && (floor === undefined || compareVersions(seen.version, floor) >= 0) ? "none" : "replace";
-    } else action = r.version === undefined || compareVersions(seen.version, r.version) === 0 ? "none" : "replace";
+    const action = actionFor({ seen, version: r.version, minimum: r.tool.minimum, systemCopy: ctx.systemCopy, integrity: ctx.integrity });
     return { tool: r.tool.name, version: r.version, dialect: r.dialect, action, observed: seen };
   });
   return { platform: resolution.platform, entries };

@@ -23,6 +23,7 @@
     "./mizan": "./src/mizan/mod.ts",
     "./mizan/mizan": "./src/mizan/mizan.ts",
     "./standards/nist-sp-800-53/controls.auto": "./src/standards/nist-sp-800-53/controls.auto.ts",
+    "./supply-chain/commands": "./src/supply-chain/commands.ts",
     "./supply-chain/downloads": "./src/supply-chain/downloads.ts",
     "./supply-chain/packaging": "./src/supply-chain/packaging/mod.ts",
     "./supply-chain/packaging/families": "./src/supply-chain/packaging/families.ts",

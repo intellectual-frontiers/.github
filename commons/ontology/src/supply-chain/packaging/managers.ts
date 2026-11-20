@@ -1694,6 +1694,30 @@ export const commands = [
     template: "mise ls",
     origin: "memory",
   }),
+  Command.make(term(PMID, "cmd-apt-install-exact"), {
+    commandOf: managerApt,
+    operation: operations.InstallExact,
+    template: "apt install {package}={version}",
+    origin: "memory",
+  }),
+  Command.make(term(PMID, "cmd-brew-install-exact"), {
+    commandOf: managerBrew,
+    operation: operations.InstallExact,
+    template: "brew install {package}@{version}",
+    origin: "memory",
+  }),
+  Command.make(term(PMID, "cmd-winget-install-exact"), {
+    commandOf: managerWinget,
+    operation: operations.InstallExact,
+    template: "winget install --exact --id {package} --version {version}",
+    origin: "memory",
+  }),
+  Command.make(term(PMID, "cmd-mise-install-exact"), {
+    commandOf: managerMise,
+    operation: operations.InstallExact,
+    template: "mise install {package}@{version}",
+    origin: "memory",
+  }),
 ] as const;
 
 /** The commands no harness may run, each with its reason. */
