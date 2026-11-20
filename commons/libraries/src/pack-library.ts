@@ -188,12 +188,14 @@ export function rewriteDeclarationSpecifiers(source: string): string {
 export const tarballName = (name: string, version: string): string => `${name.replace(/^@/, "").replace("/", "-")}-${version}.tgz`;
 
 /** The version of a library of commons, from its `package.json`, and whether it is published to npm (its manifest names that). */
-function libraryOf(commons: string, name: string): { readonly version: string; readonly npm: boolean } | undefined {
+function libraryOf(commons: string, name: string): { readonly version: string; readonly npm: boolean; readonly held: boolean } | undefined {
   const pkg = join(commons, name, "package.json");
   if (!existsSync(pkg)) return undefined;
   const lib = join(commons, name, "library.ts");
-  const npm = existsSync(lib) && /distribution:\s*\[[^\]]*"npm"/.test(readTextFileSync(lib));
-  return { version: text((JSON.parse(readTextFileSync(pkg)) as Json)["version"]), npm };
+  const source = existsSync(lib) ? readTextFileSync(lib) : "";
+  const npm = /distribution:\s*\[[^\]]*"npm"/.test(source);
+  const held = /\bheld:\s*"/.test(source);
+  return { version: text((JSON.parse(readTextFileSync(pkg)) as Json)["version"]), npm, held };
 }
 
 /**
@@ -437,7 +439,7 @@ export async function packLibrary(root: string, options: PackOptions = {}): Prom
       if (pkg.startsWith(`${SCOPE}/`) && pkg !== `${SCOPE}/commons`) {
         const lib = libraryOf(commons, pkg.slice(SCOPE.length + 1));
         if (lib === undefined) findings.push(`${file} imports ${pkg}, which is no library of commons`);
-        else if (!lib.npm) findings.push(`${file} imports ${pkg}, which is not published to npm`);
+        else if (!lib.npm && !(libraryOf(commons, short)?.held === true && lib.held)) findings.push(`${file} imports ${pkg}, which is not published to npm`);
         else dependencies[pkg] = lib.version;
       } else if (pkg !== `${SCOPE}/commons`) {
         const v = declaredDeps[pkg];

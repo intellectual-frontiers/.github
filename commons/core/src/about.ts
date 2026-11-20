@@ -1,3 +1,4 @@
+// Spec: 0001-core FR-008
 /**
  * The typed facts of a package of commons that its documentation shows (commons 0011-documentation FR-005, FR-008): what the package is, the specification it implements, its folders and what each may import,
  * the commands that work on it, the rules it keeps and what enforces each, its areas (each with its entry points, its specification, its phases and its examples), its layers and its facts. Each package

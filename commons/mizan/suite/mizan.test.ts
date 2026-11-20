@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { makeTempDirSync, mkdirSync, readTextFileSync, removeSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { existsSync, makeTempDirSync, mkdirSync, readTextFileSync, removeSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { fromFileUrl, dirname, resolve } from "@intellectual-frontiers/system/path";
 import { run, execPath } from "@intellectual-frontiers/system/proc";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
@@ -309,7 +309,9 @@ proves(
 
 proves(["0012-ontology FR-015"], "a code list of 5,000 entries type-checks with a key type of its entries, within 30 seconds", async () => {
   const root = resolve(dirname(fromFileUrl(import.meta.url)), "..", "..", "..").replaceAll("\\", "/"); // forward slashes: the path is written into a TypeScript string
-  const tsc = `${root}/node_modules/typescript/bin/tsc`;
+  // the compiler of this library's own install (a library job installs only its folder), else the repository's
+  const own = `${root}/commons/mizan/node_modules/typescript/bin/tsc`;
+  const tsc = existsSync(own) ? own : `${root}/node_modules/typescript/bin/tsc`;
   const dir = makeTempDirSync({ prefix: "mizan-codes-" });
   try {
     const rows = Array.from(

@@ -47,7 +47,10 @@ function manifest(rel: string): Manifest {
 /** The folders of commons that are packages with a manifest of their own (the libraries and the metapackages). */
 const PACKAGES: readonly string[] = fs
   .readDirSync(COMMONS)
-  .filter((e) => e.isDirectory && fs.existsSync(path.join(COMMONS, e.name, "library.ts")) && fs.existsSync(path.join(COMMONS, e.name, "package.json")))
+  .filter(
+    (e) =>
+      e.isDirectory && fs.existsSync(path.join(COMMONS, e.name, "library.ts")) && fs.existsSync(path.join(COMMONS, e.name, "package.json")),
+  )
   .map((e) => e.name)
   .sort();
 
@@ -104,20 +107,30 @@ function codeLines(text: string): { readonly line: number; readonly text: string
   return out;
 }
 
-proves(["0005-typescript-practice FR-001"], "every package is an ES module for Node 26 or later, and the base configuration keeps the sources to erasable TypeScript", () => {
-  assert(PACKAGES.length > 30, `${PACKAGES.length} packages`);
-  const bad: string[] = [];
-  for (const rel of ["package.json", ...PACKAGES.map((p) => `commons/${p}/package.json`)]) {
-    const m = manifest(rel);
-    if (m.type !== "module") bad.push(`${rel}: "type" is ${m.type}`);
-    if (m.engines["node"] !== ">=26") bad.push(`${rel}: engines.node is ${m.engines["node"] ?? "absent"}`);
-  }
-  assertEquals(bad, []);
-  assertEquals(JSON.parse(read("commons/tsconfig.base.json")).compilerOptions.erasableSyntaxOnly, true);
-});
+proves(
+  ["0005-typescript-practice FR-001"],
+  "every package is an ES module for Node 26 or later, and the base configuration keeps the sources to erasable TypeScript",
+  () => {
+    assert(PACKAGES.length > 30, `${PACKAGES.length} packages`);
+    const bad: string[] = [];
+    for (const rel of ["package.json", ...PACKAGES.map((p) => `commons/${p}/package.json`)]) {
+      const m = manifest(rel);
+      if (m.type !== "module") bad.push(`${rel}: "type" is ${m.type}`);
+      if (m.engines["node"] !== ">=26") bad.push(`${rel}: engines.node is ${m.engines["node"] ?? "absent"}`);
+    }
+    assertEquals(bad, []);
+    assertEquals(JSON.parse(read("commons/tsconfig.base.json")).compilerOptions.erasableSyntaxOnly, true);
+  },
+);
 
 /** The vendor globals the lint rule `no-vendor-api` refuses, as expressions that find a member of one, and the registries and URLs it does not allow. */
-const VENDOR = [...VENDOR_GLOBALS.map((g) => new RegExp(`\\b${g}\\s*\\.`)), /["']jsr:/, /["']npm:/, /["']@std\//, /["']https?:\/\/[^"']*\.(?:ts|js|mjs)["']/];
+const VENDOR = [
+  ...VENDOR_GLOBALS.map((g) => new RegExp(`\\b${g}\\s*\\.`)),
+  /["']jsr:/,
+  /["']npm:/,
+  /["']@std\//,
+  /["']https?:\/\/[^"']*\.(?:ts|js|mjs)["']/,
+];
 /** The files that name a vendor's API on purpose: the rule's own list, the library that builds a binary with Bun and the installers' texts, which say what they install. */
 const VENDOR_ALLOWED = /^commons\/(lint\/|system\/src\/compile\.ts|ergonex\/src\/install\/)/;
 
@@ -128,118 +141,155 @@ proves(["0005-typescript-practice FR-004"], "no source of a library uses a vendo
     for (const { line, text } of codeLines(read(f))) for (const re of VENDOR) if (re.test(text)) bad.push(`${f}:${line}: ${text.trim()}`);
   }
   assertEquals(bad, []);
-  assert(VENDOR.some((re) => re.test('import x from "jsr:@std/path";')), "the check sees a registry import");
+  assert(
+    VENDOR.some((re) => re.test('import x from "jsr:@std/path";')),
+    "the check sees a registry import",
+  );
   assertEquals(codeLines("/**\n * Bun.file\n */\n// Bun.x\nBun.exit();"), [{ line: 5, text: "Bun.exit();" }]);
 });
 
-proves(["0005-typescript-practice FR-015"], "every file of a library's src/ and suite/ begins with a TSDoc block that says @module, and every export of src/ has TSDoc", () => {
-  const bad: string[] = [];
-  for (const f of [...SRC, ...SUITE]) {
-    if (f.endsWith(".auto.ts")) continue; // generated, with the line that says so
-    const text = read(f);
-    const head = /^(?:\/\/[^\n]*\n|#![^\n]*\n)*\/\*\*[\s\S]*?\*\//.exec(text);
-    if (head === null || !head[0].includes("@module")) bad.push(`${f}: no @module block at the top`);
-    if (!f.includes("/src/")) continue;
-    const lines = text.split("\n");
-    for (const [i, l] of lines.entries()) {
-      if (!/^export\s+(?:declare\s+)?(?:async\s+)?(?:function\*?|const|let|class|type\s+\w|interface|abstract\s+class)\b/.test(l)) continue;
-      let j = i - 1;
-      while (j >= 0 && (lines[j] ?? "").trim() === "") j--;
-      if (!(lines[j] ?? "").trim().endsWith("*/")) bad.push(`${f}:${i + 1}: ${l.trim().slice(0, 60)} has no TSDoc`);
+proves(
+  ["0005-typescript-practice FR-015"],
+  "every file of a library's src/ and suite/ begins with a TSDoc block that says @module, and every export of src/ has TSDoc",
+  () => {
+    const bad: string[] = [];
+    for (const f of [...SRC, ...SUITE]) {
+      if (f.endsWith(".auto.ts")) continue; // generated, with the line that says so
+      const text = read(f);
+      const head = /^(?:\/\/[^\n]*\n|#![^\n]*\n)*\/\*\*[\s\S]*?\*\//.exec(text);
+      if (head === null || !head[0].includes("@module")) bad.push(`${f}: no @module block at the top`);
+      if (!f.includes("/src/")) continue;
+      const lines = text.split("\n");
+      for (const [i, l] of lines.entries()) {
+        if (!/^export\s+(?:declare\s+)?(?:async\s+)?(?:function\*?|const|let|class|type\s+\w|interface|abstract\s+class)\b/.test(l))
+          continue;
+        let j = i - 1;
+        while (j >= 0 && (lines[j] ?? "").trim() === "") j--;
+        if (!(lines[j] ?? "").trim().endsWith("*/")) bad.push(`${f}:${i + 1}: ${l.trim().slice(0, 60)} has no TSDoc`);
+      }
     }
-  }
-  assertEquals(bad, []);
-});
+    assertEquals(bad, []);
+  },
+);
 
 /** Whether a dependency is pinned exactly: a version, an alias of a version, or a link to a package of this repository. */
-const pinned = (v: string): boolean => /^\d+\.\d+\.\d+(-[\w.]+)?$/.test(v) || v.startsWith("link:") || /^npm:[\w@/.-]+@\d+\.\d+\.\d+(-[\w.]+)?$/.test(v);
+const pinned = (v: string): boolean =>
+  /^\d+\.\d+\.\d+(-[\w.]+)?$/.test(v) || v.startsWith("link:") || /^npm:[\w@/.-]+@\d+\.\d+\.\d+(-[\w.]+)?$/.test(v);
 
-proves(["0005-typescript-practice FR-016"], "the dependencies of the root and of every library are exact or links, and the root has its lockfile", () => {
-  const bad: string[] = [];
-  for (const rel of ["package.json", ...PACKAGES.map((p) => `commons/${p}/package.json`)]) {
-    const m = manifest(rel);
-    for (const [n, v] of [...Object.entries(m.dependencies), ...Object.entries(m.devDependencies)]) if (!pinned(v)) bad.push(`${rel}: ${n} is ${v}`);
-  }
-  assertEquals(bad, []);
-  assert(fs.existsSync(path.join(ROOT, "bun.lock")), "the root's bun.lock");
-  for (const gone of ["package-lock.json", "yarn.lock", "pnpm-lock.yaml"]) assert(!fs.existsSync(path.join(ROOT, gone)), gone);
-  assert(/^7\./.test(manifest("package.json").dependencies["typescript"] ?? ""), "the root's TypeScript is 7");
-});
+proves(
+  ["0005-typescript-practice FR-016"],
+  "the dependencies of the root and of every library are exact or links, and the root has its lockfile",
+  () => {
+    const bad: string[] = [];
+    for (const rel of ["package.json", ...PACKAGES.map((p) => `commons/${p}/package.json`)]) {
+      const m = manifest(rel);
+      for (const [n, v] of [...Object.entries(m.dependencies), ...Object.entries(m.devDependencies)])
+        if (!pinned(v)) bad.push(`${rel}: ${n} is ${v}`);
+    }
+    assertEquals(bad, []);
+    assert(fs.existsSync(path.join(ROOT, "bun.lock")), "the root's bun.lock");
+    for (const gone of ["package-lock.json", "yarn.lock", "pnpm-lock.yaml"]) assert(!fs.existsSync(path.join(ROOT, gone)), gone);
+    assert(/^7\./.test(manifest("package.json").dependencies["typescript"] ?? ""), "the root's TypeScript is 7");
+  },
+);
 
-proves(["0005-typescript-practice FR-017"], "the base configuration sets the strict options and every tsconfig of the repository extends it", () => {
-  const base: unknown = JSON.parse(read("commons/tsconfig.base.json"));
-  const options = isRecord(base) && isRecord(base["compilerOptions"]) ? base["compilerOptions"] : {};
-  for (const flag of [
-    "strict",
-    "noEmit",
-    "allowImportingTsExtensions",
-    "erasableSyntaxOnly",
-    "verbatimModuleSyntax",
-    "isolatedModules",
-    "noUncheckedIndexedAccess",
-    "exactOptionalPropertyTypes",
-    "noImplicitReturns",
-    "noImplicitOverride",
-    "noFallthroughCasesInSwitch",
-    "noPropertyAccessFromIndexSignature",
-    "noUnusedLocals",
-    "noUnusedParameters",
-  ])
-    assertEquals(options[flag], true, flag);
-  assertEquals(options["module"], "nodenext");
-  assertEquals(options["types"], ["node"]);
-  const bad: string[] = [];
-  const configs = [
-    ...PACKAGES.flatMap((p) => fs.readDirSync(path.join(COMMONS, p)).filter((e) => /^tsconfig.*\.json$/.test(e.name)).map((e) => `commons/${p}/${e.name}`)),
-    "tests/tsconfig.json",
-    "commons/tools/tsconfig.json",
-  ];
-  assert(configs.length > 30, `${configs.length} configurations`);
-  for (const rel of configs) {
-    const c: unknown = JSON.parse(read(rel));
-    const ext = isRecord(c) && typeof c["extends"] === "string" ? c["extends"] : "";
-    if (path.resolve(path.join(ROOT, path.dirname(rel)), ext) !== path.join(COMMONS, "tsconfig.base.json")) bad.push(`${rel} extends ${ext}`);
-  }
-  assertEquals(bad, []);
-});
+proves(
+  ["0005-typescript-practice FR-017"],
+  "the base configuration sets the strict options and every tsconfig of the repository extends it",
+  () => {
+    const base: unknown = JSON.parse(read("commons/tsconfig.base.json"));
+    const options = isRecord(base) && isRecord(base["compilerOptions"]) ? base["compilerOptions"] : {};
+    for (const flag of [
+      "strict",
+      "noEmit",
+      "allowImportingTsExtensions",
+      "erasableSyntaxOnly",
+      "verbatimModuleSyntax",
+      "isolatedModules",
+      "noUncheckedIndexedAccess",
+      "exactOptionalPropertyTypes",
+      "noImplicitReturns",
+      "noImplicitOverride",
+      "noFallthroughCasesInSwitch",
+      "noPropertyAccessFromIndexSignature",
+      "noUnusedLocals",
+      "noUnusedParameters",
+    ])
+      assertEquals(options[flag], true, flag);
+    assertEquals(options["module"], "nodenext");
+    assertEquals(options["types"], ["node"]);
+    const bad: string[] = [];
+    const configs = [
+      ...PACKAGES.flatMap((p) =>
+        fs
+          .readDirSync(path.join(COMMONS, p))
+          .filter((e) => /^tsconfig.*\.json$/.test(e.name))
+          .map((e) => `commons/${p}/${e.name}`),
+      ),
+      "tests/tsconfig.json",
+      "commons/tools/tsconfig.json",
+    ];
+    assert(configs.length > 30, `${configs.length} configurations`);
+    for (const rel of configs) {
+      const c: unknown = JSON.parse(read(rel));
+      const ext = isRecord(c) && typeof c["extends"] === "string" ? c["extends"] : "";
+      if (path.resolve(path.join(ROOT, path.dirname(rel)), ext) !== path.join(COMMONS, "tsconfig.base.json"))
+        bad.push(`${rel} extends ${ext}`);
+    }
+    assertEquals(bad, []);
+  },
+);
 
-proves(["0005-typescript-practice FR-026"], "no formatter, linter, test framework or package manager but Bun is a dependency, and the pins name Bun", () => {
-  const tools =
-    /^(prettier|eslint|@typescript-eslint\/.*|dprint|@dprint\/.*|biome|@biomejs\/.*|oxlint|vitest|jest|mocha|ava|tsx|ts-node|npm|pnpm|yarn)$/;
-  const found: string[] = [];
-  for (const rel of ["package.json", ...PACKAGES.map((p) => `commons/${p}/package.json`)]) {
-    const m = manifest(rel);
-    for (const n of [...Object.keys(m.dependencies), ...Object.keys(m.devDependencies)]) if (tools.test(n)) found.push(`${rel}: ${n}`);
-  }
-  assertEquals(found, []);
-  assert(/^BUN_VERSION=\d+\.\d+\.\d+/m.test(read("commons/generated/pins.auto.env")), "the pins name Bun's version");
-});
+proves(
+  ["0005-typescript-practice FR-026"],
+  "no formatter, linter, test framework or package manager but Bun is a dependency, and the pins name Bun",
+  () => {
+    const tools =
+      /^(prettier|eslint|@typescript-eslint\/.*|dprint|@dprint\/.*|biome|@biomejs\/.*|oxlint|vitest|jest|mocha|ava|tsx|ts-node|npm|pnpm|yarn)$/;
+    const found: string[] = [];
+    for (const rel of ["package.json", ...PACKAGES.map((p) => `commons/${p}/package.json`)]) {
+      const m = manifest(rel);
+      for (const n of [...Object.keys(m.dependencies), ...Object.keys(m.devDependencies)]) if (tools.test(n)) found.push(`${rel}: ${n}`);
+    }
+    assertEquals(found, []);
+    assert(/^BUN_VERSION=\d+\.\d+\.\d+/m.test(read("commons/generated/pins.auto.env")), "the pins name Bun's version");
+  },
+);
 
-proves(["0005-typescript-practice FR-027", "0005-typescript-practice FR-028"], "bunfig.toml sets the formatter and makes an error of every rule FR-028 names", () => {
-  const config = read("bunfig.toml");
-  assert(/^\[fmt\]/m.test(config) && /^printWidth = 140$/m.test(config) && /^\[lint\]/m.test(config) && /^typeAware = true$/m.test(config));
-  const rules = [
-    "typescript/no-explicit-any",
-    "typescript/no-non-null-assertion",
-    "typescript/explicit-module-boundary-types",
-    "typescript/switch-exhaustiveness-check",
-    "typescript/no-floating-promises",
-    "typescript/no-misused-promises",
-    "typescript/consistent-type-imports",
-    "typescript/only-throw-error",
-    "typescript/no-unnecessary-type-assertion",
-    "typescript/ban-ts-comment",
-    "eslint/eqeqeq",
-    "ifc/no-vendor-api",
-    "ifc/no-registry-import",
-    "ifc/module-doc",
-    "ifc/switch-absurd",
-  ];
-  for (const r of rules) assert(new RegExp(`^"${r}" = (?:"error"|\\["error")`, "m").test(config), `${r} is not an error in bunfig.toml`);
-  assert(fs.existsSync(path.join(ROOT, "commons/lint/src/plugin.ts")), "the plugin bunfig.toml loads is there");
-  const workflow = read(".github/workflows/tests.auto.yml");
-  assert(workflow.includes("bun fmt --check") && workflow.includes("--max-warnings 0"), "the check job runs the formatter and the linter");
-});
+proves(
+  ["0005-typescript-practice FR-027", "0005-typescript-practice FR-028"],
+  "bunfig.toml sets the formatter and makes an error of every rule FR-028 names",
+  () => {
+    const config = read("bunfig.toml");
+    assert(
+      /^\[fmt\]/m.test(config) && /^printWidth = 140$/m.test(config) && /^\[lint\]/m.test(config) && /^typeAware = true$/m.test(config),
+    );
+    const rules = [
+      "typescript/no-explicit-any",
+      "typescript/no-non-null-assertion",
+      "typescript/explicit-module-boundary-types",
+      "typescript/switch-exhaustiveness-check",
+      "typescript/no-floating-promises",
+      "typescript/no-misused-promises",
+      "typescript/consistent-type-imports",
+      "typescript/only-throw-error",
+      "typescript/no-unnecessary-type-assertion",
+      "typescript/ban-ts-comment",
+      "eslint/eqeqeq",
+      "ifc/no-vendor-api",
+      "ifc/no-registry-import",
+      "ifc/module-doc",
+      "ifc/switch-absurd",
+    ];
+    for (const r of rules) assert(new RegExp(`^"${r}" = (?:"error"|\\["error")`, "m").test(config), `${r} is not an error in bunfig.toml`);
+    assert(fs.existsSync(path.join(ROOT, "commons/lint/src/plugin.ts")), "the plugin bunfig.toml loads is there");
+    const workflow = read(".github/workflows/tests.auto.yml");
+    assert(
+      workflow.includes("bun fmt --check") && workflow.includes("--max-warnings 0"),
+      "the check job runs the formatter and the linter",
+    );
+  },
+);
 
 proves(["0005-typescript-practice FR-076"], "a library imports its own package only through the entries its exports name", () => {
   const bad: string[] = [];

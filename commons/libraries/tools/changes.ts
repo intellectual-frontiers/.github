@@ -1,3 +1,4 @@
+// Spec: 0001-libraries FR-008
 /**
  * The change-control check with a Git host (commons 0020-ifccm FR-009, FR-028 to FR-031): `commons/libraries/src/changes.ts` judges commits and, with `--strict`, asks the host about each issue they name,
  * but it is given its host's client and never makes one. This command makes it from the repository's `origin` (`githost`'s `parseRemote` reads the remote, its `clientFor` makes the client,
