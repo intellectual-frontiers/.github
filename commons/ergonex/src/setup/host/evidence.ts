@@ -12,12 +12,12 @@ import { movedPath, type Places } from "../../places.ts";
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { parseSpanId, parseTraceId, type SpanId, type TraceId } from "../../platform/k-otel.ts";
 import { installationFromEnv } from "../../platform/k-test-record.ts";
-import { checkRun, formatQualityError } from "@intellectual-frontiers/commons/ts/quality";
+import { checkRun, formatQualityError } from "@intellectual-frontiers/quality";
 import { mkdir } from "../../platform/r-fs.ts";
 import { join } from "../../platform/r-path.ts";
 import { build, runtimeName, runtimeVersion } from "../../platform/r-proc.ts";
-import { formatHostError } from "@intellectual-frontiers/commons/ts/quality";
-import { writeOnce } from "@intellectual-frontiers/commons/ts/quality";
+import { formatHostError } from "@intellectual-frontiers/quality";
+import { writeOnce } from "@intellectual-frontiers/quality";
 import { caseCount, evidenceFileName, holdsCredential, runRules, type RunFacts } from "../evidence.ts";
 
 /** What is needed to write the evidence of a run. */

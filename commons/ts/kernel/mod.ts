@@ -34,7 +34,6 @@
  *
  * @module
  */
-export * as testReport from "./test-report.ts";
 export type {
   About,
   AboutArea,

@@ -11,7 +11,7 @@ import "./register.mjs";
 const USAGE = "usage: ifc test run|sign|verify|render [OPTIONS] (--help for each)";
 const [command, ...rest] = process.argv.slice(2);
 if (command === "test") {
-  const { main } = await import("../tools/test.ts");
+  const { main } = await import("@intellectual-frontiers/quality/test-cli");
   process.exit(await main(rest));
 } else {
   console.error(command === undefined ? USAGE : `ifc: ${command} is not a command; ${USAGE}`);

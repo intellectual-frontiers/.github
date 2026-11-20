@@ -10,7 +10,10 @@
         "@intellectual-frontiers/formats": "link:../formats",
         "@intellectual-frontiers/githost": "link:../githost",
         "@intellectual-frontiers/grc": "link:../grc",
+        "@intellectual-frontiers/mizan": "link:../mizan",
         "@intellectual-frontiers/net": "link:../net",
+        "@intellectual-frontiers/ontology": "link:../ontology",
+        "@intellectual-frontiers/quality": "link:../quality",
         "@intellectual-frontiers/rdf": "link:../rdf",
         "@intellectual-frontiers/system": "link:../system",
         "@intellectual-frontiers/telemetry": "link:../telemetry",
@@ -18,8 +21,6 @@
         "@intellectual-frontiers/test": "link:../test",
       },
       "devDependencies": {
-        "@intellectual-frontiers/mizan": "link:../mizan",
-        "@intellectual-frontiers/ontology": "link:../ontology",
         "@types/node": "26.6.6",
         "fast-check": "4.10.2",
         "typescript": "7.0.2",
@@ -42,6 +43,8 @@
     "@intellectual-frontiers/net": ["@intellectual-frontiers/net@link:../net", {}],
 
     "@intellectual-frontiers/ontology": ["@intellectual-frontiers/ontology@link:../ontology", {}],
+
+    "@intellectual-frontiers/quality": ["@intellectual-frontiers/quality@link:../quality", {}],
 
     "@intellectual-frontiers/rdf": ["@intellectual-frontiers/rdf@link:../rdf", {}],
 

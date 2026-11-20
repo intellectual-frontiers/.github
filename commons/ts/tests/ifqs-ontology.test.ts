@@ -36,6 +36,7 @@ const HERE = dirname(fromFileUrl(import.meta.url));
 const specOf = (slug: string): string => readTextFileSync(resolve(HERE, "..", "..", "spec-kit", "specs", slug, "spec.md"));
 const IFQS = specOf("0021-ifqs");
 const TRUST = specOf("0022-trust");
+const QUALITY = readTextFileSync(resolve(HERE, "..", "..", "quality", "spec-kit", "specs", "0001-quality-evidence", "spec.md"));
 
 const keys = (list: object): string[] => Object.keys(list);
 
@@ -193,16 +194,17 @@ test("the ontology states no subject twice and breaks no rule of the kernel", ()
   assert(properties.length > 40);
 });
 
-test("the specifications of IFQS and Trust name only terms the ontology defines", () => {
+test("the specifications of IFQS and Trust, and of the library `quality`, name only terms the ontology defines", () => {
   const defined = new Set([
     ...keys(ifqs),
     ...[evidenceGrades, testOutcomes, freshnessStates, nonconformanceStates, capaStates, qualityTiers, audiences].flatMap(keys),
   ]);
-  for (const spec of [IFQS, TRUST]) {
-    const named = [...spec.matchAll(/`ifqs:([A-Za-z][A-Za-z0-9_]*)`/g)].map((m) => m[1] ?? "");
-    assert(named.length > 5);
+  // the requirements of the quality system moved to the library's specification; the two here keep the ones that stayed, which are fewer
+  const namedIn = (spec: string): string[] => [...spec.matchAll(/`ifqs:([A-Za-z][A-Za-z0-9_]*)`/g)].map((m) => m[1] ?? "");
+  assert(namedIn(QUALITY).length > 5);
+  for (const spec of [IFQS, TRUST, QUALITY]) {
     assertEquals(
-      named.filter((n) => !defined.has(n)),
+      namedIn(spec).filter((n) => !defined.has(n)),
       [],
     );
   }

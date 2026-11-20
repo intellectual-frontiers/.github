@@ -25,7 +25,7 @@
 import process from "node:process";
 import type { GitHostClient, RepoRef } from "@intellectual-frontiers/githost/types";
 import { formatBaseline, judge, parseBaseline, passes, report } from "@intellectual-frontiers/mizan/trace";
-import { readRecord } from "../kernel/test-report.ts";
+import { readRecord } from "@intellectual-frontiers/quality/test-report";
 import { existsSync, readDirSync, readTextFileSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { formatGitError } from "@intellectual-frontiers/system/git";
 import { cwd } from "@intellectual-frontiers/system/proc";

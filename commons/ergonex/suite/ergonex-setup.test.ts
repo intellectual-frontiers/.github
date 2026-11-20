@@ -14,7 +14,7 @@ import { join } from "../src/platform/r-path.ts";
 import { build, run } from "../src/platform/r-proc.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { err, ok } from "@intellectual-frontiers/core";
-import { formatQualityError, readQuality } from "@intellectual-frontiers/commons/ts/quality";
+import { formatQualityError, readQuality } from "@intellectual-frontiers/quality";
 import { type Finding } from "../src/findings.ts";
 import { policyOf } from "../src/policy.ts";
 import { type SetupDeps, setup } from "../src/setup/host/apply.ts";

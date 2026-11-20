@@ -58,6 +58,7 @@ const PURE_PACKAGES = [
   "@intellectual-frontiers/crypto",
   "@intellectual-frontiers/formats",
   "@intellectual-frontiers/test/record",
+  "@intellectual-frontiers/quality/test-report",
   "@intellectual-frontiers/commons/ts/kernel",
   "@intellectual-frontiers/githost",
 ];

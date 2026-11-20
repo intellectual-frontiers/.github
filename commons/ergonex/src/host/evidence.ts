@@ -16,8 +16,8 @@ import { parseSpanId, parseTraceId, type SpanId, type TraceId, type Attributes }
 import { mkdir } from "../platform/r-fs.ts";
 import { build, runtimeName, runtimeVersion } from "../platform/r-proc.ts";
 import { join } from "../platform/r-path.ts";
-import { checkRun, type CheckRule } from "@intellectual-frontiers/commons/ts/quality";
-import { writeOnce } from "@intellectual-frontiers/commons/ts/quality";
+import { checkRun, type CheckRule } from "@intellectual-frontiers/quality";
+import { writeOnce } from "@intellectual-frontiers/quality";
 import type { Finding } from "../findings.ts";
 import { type EvidenceFacts, type ExitStatus, exitCodeOf } from "../modules/types.ts";
 import { ERGONEX_VERSION } from "../state-record.ts";

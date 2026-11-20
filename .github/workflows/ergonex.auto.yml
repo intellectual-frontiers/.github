@@ -15,6 +15,7 @@ on:
       - "commons/githost/src/**"
       - "commons/mizan/src/**"
       - "commons/net/src/**"
+      - "commons/quality/src/**"
       - "commons/system/src/**"
       - "commons/telemetry/src/**"
       - "commons/terminal/src/**"
@@ -23,7 +24,6 @@ on:
       - "commons/ts/kernel/**"
       - "commons/ts/mizan/**"
       - "commons/ts/node/**"
-      - "commons/ts/quality/**"
       - "commons/ts/tools/**"
   pull_request:
     paths:
@@ -36,6 +36,7 @@ on:
       - "commons/githost/src/**"
       - "commons/mizan/src/**"
       - "commons/net/src/**"
+      - "commons/quality/src/**"
       - "commons/system/src/**"
       - "commons/telemetry/src/**"
       - "commons/terminal/src/**"
@@ -44,7 +45,6 @@ on:
       - "commons/ts/kernel/**"
       - "commons/ts/mizan/**"
       - "commons/ts/node/**"
-      - "commons/ts/quality/**"
       - "commons/ts/tools/**"
 
 permissions:

@@ -1,19 +1,17 @@
 {
   "name": "@intellectual-frontiers/commons",
   "private": true,
-  "version": "0.27.2",
+  "version": "0.28.0",
   "description": "IFC TypeScript, for the development of commons/ts: the pure kernel and the host runtime of Intellectual Frontiers Commons, on web standards and node: builtins (commons 0005-typescript-runtime). A consumer depends on the repository's root package by Git, under the same name and entry points.",
   "type": "module",
   "exports": {
     "./ts/kernel": "./kernel/mod.ts",
     "./ts/runtime": "./runtime/mod.ts",
-    "./ts/runtime/test-run": "./runtime/test-run.ts",
     "./ts/mizan": "./mizan/mod.ts",
     "./ts/mizan/changes": "./mizan/changes.ts",
     "./ts/mizan/check": "./mizan/check.ts",
     "./ts/mizan/oscal-register": "./mizan/oscal-register.ts",
     "./ts/mizan/versions": "./mizan/versions.ts",
-    "./ts/quality": "./quality/mod.ts",
     "./ts/workflows": "./workflows/mod.ts",
     "./ts/tools/pack-library": "./tools/pack-library.ts",
     "./ts/node": "./node/register.mjs"
@@ -26,8 +24,8 @@
     "test": "bun test tests/",
     "test:node": "node --test \"tests/**/*.test.ts\"",
     "smoke": "bun tools/smoke.ts",
-    "test:evidence": "bun tools/test.ts run --runtime bun,node --out test-results --report tap,junit,ctrf,sarif,md,html,oscal --requirements ../spec-kit/enforcement.tsv --spec 0005-typescript-runtime --ledger test-results/ledger.jsonl tests",
-    "test:verify": "bun tools/test.ts verify --record"
+    "test:evidence": "bun ../quality/src/test-cli.ts run --runtime bun,node --out test-results --report tap,junit,ctrf,sarif,md,html,oscal --requirements ../spec-kit/enforcement.tsv --spec 0005-typescript-runtime --ledger test-results/ledger.jsonl tests",
+    "test:verify": "bun ../quality/src/test-cli.ts verify --record"
   },
   "devDependencies": {
     "@types/node": "26.6.6",
@@ -48,6 +46,7 @@
     "@intellectual-frontiers/mizan": "link:../mizan",
     "@intellectual-frontiers/net": "link:../net",
     "@intellectual-frontiers/ontology": "link:../ontology",
+    "@intellectual-frontiers/quality": "link:../quality",
     "@intellectual-frontiers/rdf": "link:../rdf",
     "@intellectual-frontiers/system": "link:../system",
     "@intellectual-frontiers/telemetry": "link:../telemetry",

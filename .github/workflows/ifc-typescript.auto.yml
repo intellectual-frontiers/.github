@@ -81,7 +81,7 @@ jobs:
         shell: bash
         run: |
           grep -E '^000[5-8]-' ../spec-kit/enforcement.tsv >"$RUNNER_TEMP/requirements.tsv"
-          bun tools/test.ts run --runtime ${{ matrix.runtime }} --out test-results \
+          bun ../quality/src/test-cli.ts run --runtime ${{ matrix.runtime }} --out test-results \
             --report tap,junit,ctrf,sarif,md,html,oscal \
             --requirements "$RUNNER_TEMP/requirements.tsv" --reviewed ci-reviewed.tsv \
             --ledger test-results/ledger.jsonl tests
