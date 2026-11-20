@@ -43,6 +43,7 @@ export const KINDS: readonly KindSpec[] = [
   kind("group", "A group of users.", COMPUTERS, true),
   kind("file", "A file with its content, owner and mode.", [...COMPUTERS, "device"], true),
   kind("directory", "A directory with its owner and mode.", COMPUTERS, true),
+  kind("tool", "A program a computer needs at a pinned version: a compiler, a command line tool, a runtime. What it is, its pin and where it comes from are declared by the toolchain library.", COMPUTERS, true),
   kind("service", "A service that runs, or does not, and starts at boot, or does not.", COMPUTERS, false),
   kind("timer", "A scheduled job.", COMPUTERS, true),
   kind("firewall-rule", "A rule of a host or device firewall.", [...COMPUTERS, "device"], true),
