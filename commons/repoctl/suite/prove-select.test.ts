@@ -10,7 +10,7 @@ import { fs, path } from "@intellectual-frontiers/system";
 import { FOUNDATION, type LibraryName, parseLibraryName, parseQuarantine } from "@intellectual-frontiers/repoctl/governance";
 import { applyQuarantine, cacheKeyOf, planProof, provesOf, readsTheTree, seedsOf, selectSeam, selectTests, specIdsOf, specOfPath, type LibraryNode, type TestReach, type World } from "@intellectual-frontiers/repoctl/logical";
 import { makePlan, runPlan, systemFiles, systemWorld } from "@intellectual-frontiers/repoctl/physical";
-import { CAN_RUN, CHECKOUT, git, put } from "./world.ts";
+import { CAN_RUN, CHECKOUT, git, put, LIBRARIES } from "./world.ts";
 
 const lib = (name: string): LibraryName => {
   const r = parseLibraryName(name);
@@ -109,8 +109,8 @@ proves(["0008-repoctl-prove FR-011", "0008-repoctl-prove FR-013"], "over a real 
     await git(dir, "commit", "-q", "-m", "base");
     await git(dir, "branch", "-M", "main");
     const world: World = {
-      ...systemWorld(dir, () => undefined),
-      libraries: { list: () => Promise.resolve(ok([{ name: "prov", folder: "commons/prov", version: "0.1.0", level: "L1", specKit: undefined, npm: false, versionConstants: [], package: "@intellectual-frontiers/prov" }])) },
+      ...systemWorld(dir, () => undefined, LIBRARIES),
+      libraries: { list: () => Promise.resolve(ok([{ name: "prov", folder: "commons/prov", version: "0.1.0", level: "L1", specKit: undefined, npm: false, held: undefined, versionConstants: [], package: "@intellectual-frontiers/prov" }])) },
     };
     const cache = { folder: path.join(dir, "..", `cache-${path.basename(dir)}`), runtime: "test" };
     const run = async (quarantine = parseQuarantine("[]")) => {

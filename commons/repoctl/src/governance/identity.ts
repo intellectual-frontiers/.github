@@ -1,26 +1,27 @@
 // Spec: 0005-repoctl-library-commit-doctor FR-004
 /**
- * The identity of a commit of this repository (commons repoctl 0005-repoctl-library-commit-doctor FR-004, FR-005): the author and committer are one person, and the trailers that follow the subject are fixed lines. They are data, here and nowhere
- * else; the merge and the commit read them.
+ * The names a commit of any repository shares (commons repoctl 0005-repoctl-library-commit-doctor FR-004, FR-005; 0009-repoctl-config FR-004): the variable that holds the address of the session and the arguments of `git` that make a commit as
+ * the identity a repository's configuration names. The identity itself, the trailers and the issue reference are the repository's, in its `repoctl.config.ts`; nothing about one repository is here.
  *
  * @example
  * ```ts
- * import { IDENTITY, CO_AUTHOR } from "./identity.ts";
- * IDENTITY.email; // "47497+shah@users.noreply.github.com"
- * CO_AUTHOR; // "Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
+ * import { identityArgs } from "./identity.ts";
+ * identityArgs({ name: "A B", email: "a@example.test" }); // ["-c", "user.name=A B", "-c", "user.email=a@example.test"]
  * ```
  *
  * @module
  */
 
 /** The name and the address a commit is made with. */
-export const IDENTITY = { name: "Shahid Shah", email: "47497+shah@users.noreply.github.com" } as const;
-
-/** The trailer that credits the agent, which follows `Refs #N` and precedes `Claude-Session`. */
-export const CO_AUTHOR = "Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>";
+export type Identity = { readonly name: string; readonly email: string };
 
 /** The environment variable that holds the address of the session. */
 export const SESSION_VARIABLE = "CLAUDE_SESSION_URL";
 
+/** The environment variable that holds the line that credits the agent, where the command line does not give `--co-author`. */
+export const CO_AUTHOR_VARIABLE = "REPOCTL_CO_AUTHOR";
+
 /** The arguments of `git` that make the commit as the identity, whatever the checkout's own configuration says. */
-export const IDENTITY_ARGS: readonly string[] = ["-c", `user.name=${IDENTITY.name}`, "-c", `user.email=${IDENTITY.email}`];
+export function identityArgs(identity: Identity): readonly string[] {
+  return ["-c", `user.name=${identity.name}`, "-c", `user.email=${identity.email}`];
+}

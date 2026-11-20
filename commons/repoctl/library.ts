@@ -37,6 +37,7 @@ export const library = {
           { name: "@intellectual-frontiers/system", subpaths: "any" },
           { name: "@intellectual-frontiers/libraries", subpaths: ["libraries", "family", "license", "releasing", "link", "affected", "workflows/definitions"] },
           { name: "@intellectual-frontiers/crypto", subpaths: ["sha256"] },
+          { name: "@intellectual-frontiers/net", subpaths: ["serve"] },
         ],
       },
       { folder: "src/", own: true },

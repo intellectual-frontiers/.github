@@ -6,14 +6,13 @@
  * @example
  * ```ts
  * import { partitionConflicts } from "./merge.ts";
- * import { GENERATORS } from "@intellectual-frontiers/repoctl/governance";
- * partitionConflicts(GENERATORS, ["README.md", "commons/core/src/mod.ts"]); // { generated: ["README.md"], written: ["commons/core/src/mod.ts"] }
+ * partitionConflicts([], ["README.md"]); // { generated: [], written: ["README.md"] }
  * ```
  *
  * @module
  */
 import type { Generator, GitRef } from "@intellectual-frontiers/repoctl/governance";
-import { IDENTITY_ARGS } from "@intellectual-frontiers/repoctl/governance";
+import { identityArgs, type Identity } from "@intellectual-frontiers/repoctl/governance";
 import { matches } from "./glob.ts";
 import { generatorOf } from "./order.ts";
 import type { World } from "./ports.ts";
@@ -78,9 +77,9 @@ async function union(w: Pick<World, "files" | "process" | "repo">, path: string)
 }
 
 /** Merges `ref` into the checkout, in the order the generators are given. */
-export async function runMerge(w: Pick<World, "files" | "process" | "repo">, ref: GitRef, order: readonly Generator[]): Promise<MergeReport> {
+export async function runMerge(w: Pick<World, "files" | "process" | "repo">, ref: GitRef, order: readonly Generator[], identity: Identity): Promise<MergeReport> {
   const here = { cwd: w.repo };
-  const git = (...args: readonly string[]) => w.process.run(["git", ...IDENTITY_ARGS, ...args], here);
+  const git = (...args: readonly string[]) => w.process.run(["git", ...identityArgs(identity), ...args], here);
   const merged = await git("merge", "--no-edit", ref);
   if (merged.code === 0) return { kind: "merged", sync: await runSync(w, "check", order) };
   const unmerged = lines((await git("diff", "--name-only", "--diff-filter=U")).stdout);

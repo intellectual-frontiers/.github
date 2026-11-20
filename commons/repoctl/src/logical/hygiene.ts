@@ -1,6 +1,6 @@
 // Spec: 0007-repoctl-hygiene FR-002
 /**
- * The hygiene of a repository that consumes commons (commons repoctl 0007-repoctl-hygiene FR-002, FR-003; commons 0036-distribution FR-001, FR-002, FR-010, FR-011, FR-013): a pure function from the facts of a repository (its `package.json` files,
+ * The hygiene of a repository that consumes commons (commons repoctl 0007-repoctl-hygiene FR-002, FR-003; 0009-repoctl-config FR-005; commons 0036-distribution FR-001, FR-002, FR-010, FR-011, FR-013): a pure function from the facts of a repository (its `package.json` files,
  * its lockfiles, what is installed, the relative imports of its sources) to the findings of the rule that commons reaches a repository only as a published package. Nothing here reads a file: `hygiene-facts.ts` gathers the
  * facts through the ports, and the verb draws the findings.
  *
@@ -16,17 +16,16 @@
  * @example
  * ```ts
  * import { hygiene } from "./hygiene.ts";
- * hygiene({ repository: "consumer", packages: [], locks: [], installed: new Map(), imports: [], workspaces: [] }); // []
+ * const policy = { scope: "@acme/", gitSources: ["acme/platform"], pathSegment: "platform", sourceMarker: "", allow: { paths: [], packages: [] } };
+ * hygiene({ repository: "consumer", packages: [], locks: [], installed: new Map(), imports: [], workspaces: [] }, policy); // []
  * ```
  *
  * @module
  */
 import { absurd } from "@intellectual-frontiers/core";
+import type { HygienePolicy } from "@intellectual-frontiers/repoctl/governance";
 import type { Finding } from "./findings.ts";
 import { matches } from "./glob.ts";
-
-/** The scope of the packages of commons. */
-export const SCOPE = "@intellectual-frontiers/";
 
 /** A dependency a `package.json` declares: its name and what it asks for. */
 export type Dependency = { readonly name: string; readonly spec: string };
@@ -45,8 +44,8 @@ export type LockFacts =
 /** A relative import of a source: the file and the specifier as written. */
 export type ImportFact = { readonly file: string; readonly specifier: string };
 
-/** Whose repository it is: the repository of commons, or a repository that consumes it. */
-export type Repository = "commons" | "consumer";
+/** Whose repository it is: the repository the family's packages are made in (the policy's source marker is there), or a repository that consumes them. */
+export type Repository = "source" | "consumer";
 
 /** Everything the check reads of a repository. */
 export type HygieneFacts = {
@@ -71,9 +70,10 @@ export function isExactVersion(spec: string): boolean {
   return EXACT.test(spec);
 }
 
-/** Whether a dependency specifier is a dependency by Git on the repository of commons. */
-export function isGitOfCommons(spec: string): boolean {
-  return spec.toLowerCase().includes("intellectual-frontiers/.github");
+/** Whether a dependency specifier is a dependency by Git on the family's own repository (a fragment of the policy's `gitSources` is in it). */
+export function isGitOfFamily(policy: HygienePolicy, spec: string): boolean {
+  const lower = spec.toLowerCase();
+  return policy.gitSources.some((g) => lower.includes(g));
 }
 
 /** The kind of a path dependency: `file:` or `link:` and the path, or nothing where the specifier is none. */
@@ -87,11 +87,12 @@ function segments(path: string): readonly string[] {
   return path.split(/[\\/]/).filter((s) => s !== "" && s !== "." && s !== "..");
 }
 
-/** Whether a path goes through a folder named `commons` that holds something: `commons` is a segment and is not the last. */
-export function intoCommons(path: string): boolean {
+/** Whether a path goes through the policy's folder name and the folder holds something: the name is a segment and is not the last. A policy with no folder name has no such path. */
+export function intoFamily(policy: HygienePolicy, path: string): boolean {
+  if (policy.pathSegment === "") return false;
   const s = segments(path);
-  const at = s.indexOf("commons");
-  return at >= 0 && at < s.length - 1;
+  const at = s.indexOf(policy.pathSegment);
+  return at >= 0 && at < s.length - 1 && !policy.allow.paths.some((g) => matches(g, path.replace(/\\/g, "/")));
 }
 
 const dirOf = (file: string): string => file.slice(0, Math.max(0, file.lastIndexOf("/")));
@@ -106,26 +107,27 @@ function isOwn(p: PackageFacts, workspaces: readonly string[]): boolean {
 const ORDER: readonly string[] = ["E-HYGIENE-GIT", "E-HYGIENE-PATH", "E-HYGIENE-IMPORT", "E-HYGIENE-VENDORED", "E-HYGIENE-DUPLICATE", "E-HYGIENE-RANGE", "E-ENVIRONMENT"];
 
 /** The findings of a repository, in the order of the codes and then of the paths. */
-export function hygiene(facts: HygieneFacts): readonly HygieneFinding[] {
+export function hygiene(facts: HygieneFacts, policy: HygienePolicy): readonly HygieneFinding[] {
   const out: HygieneFinding[] = [];
-  const own = facts.repository === "commons";
+  const own = facts.repository === "source";
+  const SCOPE = policy.scope;
   for (const p of facts.packages) {
     for (const d of p.dependencies) {
-      if (isGitOfCommons(d.spec))
-        out.push({ level: "fail", code: "E-HYGIENE-GIT", path: p.path, message: `${p.path}: ${d.name} is a Git dependency on the repository of commons (${d.spec}): install a published package instead`, fix: "bun add @intellectual-frontiers/commons@<version> --exact" });
+      if (isGitOfFamily(policy, d.spec))
+        out.push({ level: "fail", code: "E-HYGIENE-GIT", path: p.path, message: `${p.path}: ${d.name} is a Git dependency on the family's own repository (${d.spec}): install a published package instead`, fix: `bun add ${SCOPE}<package>@<version> --exact` });
       const target = pathOf(d.spec);
-      if (!own && target !== undefined && intoCommons(target))
-        out.push({ level: "fail", code: "E-HYGIENE-PATH", path: p.path, message: `${p.path}: ${d.name} is a ${d.spec.slice(0, d.spec.indexOf(":"))}: dependency into a checkout of commons (${target}): install a published package instead`, fix: "bun add @intellectual-frontiers/commons@<version> --exact" });
-      if (d.name.startsWith(SCOPE) && target === undefined && !isGitOfCommons(d.spec) && !d.spec.startsWith("workspace:") && !isExactVersion(d.spec))
+      if (!own && target !== undefined && intoFamily(policy, target))
+        out.push({ level: "fail", code: "E-HYGIENE-PATH", path: p.path, message: `${p.path}: ${d.name} is a ${d.spec.slice(0, d.spec.indexOf(":"))}: dependency into a checkout of the family (${target}): install a published package instead`, fix: `bun add ${SCOPE}<package>@<version> --exact` });
+      if (d.name.startsWith(SCOPE) && target === undefined && !isGitOfFamily(policy, d.spec) && !d.spec.startsWith("workspace:") && !isExactVersion(d.spec))
         out.push({ level: "warn", code: "E-HYGIENE-RANGE", path: p.path, message: `${p.path}: ${d.name} is "${d.spec}", which is not an exact version`, fix: `bun add ${d.name}@<version> --exact` });
     }
-    if (!own && p.name !== undefined && p.name.startsWith(SCOPE) && !isOwn(p, facts.workspaces))
-      out.push({ level: "fail", code: "E-HYGIENE-VENDORED", path: p.path, message: `${p.path}: a folder of this repository carries the package ${p.name}, which is a copy of a library of commons: remove it and install the published package`, fix: `bun add ${p.name}@<version> --exact` });
+    if (!own && p.name !== undefined && p.name.startsWith(SCOPE) && !policy.allow.packages.includes(p.name) && !isOwn(p, facts.workspaces))
+      out.push({ level: "fail", code: "E-HYGIENE-VENDORED", path: p.path, message: `${p.path}: a folder of this repository carries the package ${p.name}, which is a copy of a package of the family: remove it and install the published package`, fix: `bun add ${p.name}@<version> --exact` });
   }
   if (!own)
     for (const i of facts.imports)
-      if (i.specifier.startsWith(".") && intoCommons(i.specifier))
-        out.push({ level: "fail", code: "E-HYGIENE-IMPORT", path: i.file, message: `${i.file}: imports ${i.specifier}, which reaches into a copy of commons: import the package by its name`, fix: "import from @intellectual-frontiers/<library>" });
+      if (i.specifier.startsWith(".") && intoFamily(policy, i.specifier))
+        out.push({ level: "fail", code: "E-HYGIENE-IMPORT", path: i.file, message: `${i.file}: imports ${i.specifier}, which reaches into a copy of the family: import the package by its name`, fix: "import from @intellectual-frontiers/<library>" });
   const copies = new Map<string, Copy[]>();
   const add = (pkg: string, c: Copy): void => void copies.set(pkg, [...(copies.get(pkg) ?? []), c]);
   for (const l of facts.locks) if (l.kind === "read") for (const [pkg, cs] of l.copies) for (const c of cs) add(pkg, c);

@@ -10,8 +10,6 @@ import { catalogueProblems } from "@intellectual-frontiers/headless/logical";
 import { fs, path } from "@intellectual-frontiers/system";
 import {
   CATALOGUE,
-  CHECKS,
-  GENERATORS,
   isProblemCode,
   LADDER,
   parseGitRef,
@@ -27,7 +25,9 @@ import {
   VERBS,
   verbIds,
   type VerbId,
+  type Config,
 } from "@intellectual-frontiers/repoctl/governance";
+import { loadConfigFile } from "@intellectual-frontiers/repoctl/physical";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "../../..");
 
@@ -102,23 +102,35 @@ async function generatorFiles(): Promise<readonly string[]> {
   return out;
 }
 
-proves(["0002-repoctl-governance FR-005"], "the table of generators names a command, inputs and outputs for each, and every generator with a --check of the repository is in it", async () => {
-  assertEquals(new Set(GENERATORS.map((g) => g.id)).size, GENERATORS.length);
-  for (const g of GENERATORS) {
-    assert(g.command.length > 0 && g.inputs.length > 0 && g.outputs.length > 0, `${g.id} says its command, inputs and outputs`);
-    assert(await fs.exists(path.join(ROOT, g.command[0] ?? "")), `${g.id}: ${g.command[0]} is a program of the repository`);
+/** The repository's own configuration, loaded as the host loads it. */
+async function realConfig(): Promise<Config> {
+  const loaded = await loadConfigFile(path.join(ROOT, "repoctl.config.ts"));
+  if (loaded.kind === "err") throw new Error(loaded.error.message);
+  return loaded.value.config;
+}
+
+proves(["0002-repoctl-governance FR-005"], "the generators of the repository's configuration name a command, inputs and outputs for each, and every generator with a --check of the repository is in it", async () => {
+  const { generators } = await realConfig();
+  assertEquals(new Set(generators.map((g) => g.id)).size, generators.length);
+  const programs = generators.map((g) => (g.run.kind === "program" ? g.run.argv[1] : undefined));
+  for (const g of generators) {
+    assert(g.run.kind === "program" && g.inputs.length > 0 && g.outputs.length > 0, `${g.id} says its command, inputs and outputs`);
+    const program = g.run.kind === "program" ? g.run.argv[1] : undefined;
+    assert(await fs.exists(path.join(ROOT, program ?? "")), `${g.id}: ${program} is a program of the repository`);
   }
-  const commands = new Set(GENERATORS.map((g) => g.command[0]));
+  const commands = new Set(programs);
   // generate-dpv reads a CSV from the network, so it is no generator of an offline sync
   for (const f of await generatorFiles()) if (!f.endsWith("generate-dpv.ts")) assert(commands.has(f), `${f} is a generator and is not in the table`);
   for (const f of ["commons/libraries/src/libraries.ts", "commons/libraries/src/readme.ts", "commons/libraries/src/license.ts", "commons/libraries/src/oscal-register.ts", "commons/libraries/src/generate-ontology.ts", "commons/libraries/src/generate-workflows.ts"])
     assert(commands.has(f), `${f} is in the table`);
 });
 
-proves(["0002-repoctl-governance FR-006"], "the table of checks has a command and a code for each", async () => {
-  assertEquals(CHECKS.map((c) => c.id), ["specs", "rules", "versions"]);
-  for (const c of CHECKS) {
-    assert(await fs.exists(path.join(ROOT, c.command[0] ?? "")), `${c.id}: ${c.command[0]} is a program of the repository`);
+proves(["0002-repoctl-governance FR-006"], "the checks of the repository's configuration have a command and a code for each", async () => {
+  const { checks } = await realConfig();
+  assertEquals(checks.map((c) => c.id), ["specs", "rules", "versions"]);
+  for (const c of checks) {
+    const program = c.run.kind === "program" ? c.run.argv[1] : undefined;
+    assert(await fs.exists(path.join(ROOT, program ?? "")), `${c.id}: ${program} is a program of the repository`);
     assert(isProblemCode(c.code), c.code);
   }
 });

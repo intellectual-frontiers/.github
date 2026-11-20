@@ -17,26 +17,23 @@ import { serve, stdioTransport } from "@intellectual-frontiers/headless/mcp";
 import { hostIo, run as runCli } from "@intellectual-frontiers/headless/cli";
 import { problem, type TierName } from "@intellectual-frontiers/headless/governance";
 import { branch, command, type Node, outcomeOf, type Program, programOf } from "@intellectual-frontiers/headless/logical";
-import { CATALOGUE, LADDER, REPOCTL_VERSION, tierOf } from "@intellectual-frontiers/repoctl/governance";
+import { CATALOGUE, LADDER, REPOCTL_VERSION, tierOf, type Config } from "@intellectual-frontiers/repoctl/governance";
 import { NPM_TOKEN_VARIABLE } from "./adapters.ts";
 import { type Host, traitsOf } from "./define.ts";
+import { describedConfig } from "./config-load.ts";
 import { checkVerb, doctorVerb, hygieneVerb, statusVerb } from "./verbs/check.ts";
+import { docsBuildVerb, docsCheckVerb, docsServeVerb } from "./verbs/docs.ts";
 import { commitVerb, newLibraryVerb } from "./verbs/library.ts";
 import { proveVerb } from "./verbs/prove.ts";
 import { releaseApplyVerb, releasePlanVerb, releasePublishVerb } from "./verbs/releasing.ts";
 import { mergeVerb, syncVerb } from "./verbs/sync.ts";
 
-/** The variable that fixes the tier the host holds. */
-export const TIER_VARIABLE = "REPOCTL_TIER";
-/** The variable that says the key of the tool server may only read. */
-export const READ_ONLY_VARIABLE = "REPOCTL_READ_ONLY";
+/** A host that does nothing: the tree of a program is made from it without reading anything, and `describe` never runs a verb. Its configuration is the bare one, so the verbs of every repository are in the tree; a repository's capabilities add theirs. */
+export const INERT_HOST: Host = { env: () => undefined, world: () => err("the program is only described: there is no checkout"), config: describedConfig() };
 
-/** A host that does nothing: the tree of a program is made from it without reading anything, and `describe` never runs a verb. */
-export const INERT_HOST: Host = { env: () => undefined, world: () => err("the program is only described: there is no checkout") };
-
-/** The held tier of a host: the one the variable names, the ladder's default where it says nothing, or the word that is no tier. */
-export function heldTier(env: (name: string) => string | undefined): { readonly tier: TierName } | { readonly unknown: string } {
-  const word = env(TIER_VARIABLE);
+/** The held tier of a host: the one the configuration's variable names, the ladder's default where it says nothing, or the word that is no tier. */
+export function heldTier(env: (name: string) => string | undefined, config: Pick<Config, "tierVariable">): { readonly tier: TierName } | { readonly unknown: string } {
+  const word = env(config.tierVariable);
   if (word === undefined || word === "") return { tier: LADDER.default };
   const tier = tierOf(word);
   return tier === undefined ? { unknown: word } : { tier };
@@ -44,17 +41,19 @@ export function heldTier(env: (name: string) => string | undefined): { readonly 
 
 /** `repoctl` as a Headless program, for the host it runs on. */
 export function repoctlProgram(host: Host): Program {
+  const on = host.config.capabilities;
   const verbs: readonly Node[] = [
     checkVerb(host),
     syncVerb(host),
     mergeVerb(host),
-    statusVerb(host),
-    hygieneVerb(host),
-    branch({ name: "release", summary: "Plan a release of the libraries, make it, and send it to npm.", children: [releasePlanVerb(host), releaseApplyVerb(host), releasePublishVerb(host)] }),
-    branch({ name: "new", summary: "Make something new in the repository.", children: [newLibraryVerb(host)] }),
+    ...(on.status ? [statusVerb(host)] : []),
+    ...(host.config.hygiene === undefined ? [] : [hygieneVerb(host)]),
+    ...(on.release ? [branch({ name: "release", summary: "Plan a release of the libraries, make it, and send it to npm.", children: [releasePlanVerb(host), releaseApplyVerb(host), releasePublishVerb(host)] })] : []),
+    ...(on.newLibrary ? [branch({ name: "new", summary: "Make something new in the repository.", children: [newLibraryVerb(host)] })] : []),
     commitVerb(host),
     doctorVerb(host),
-    proveVerb(host),
+    ...(on.prove ? [proveVerb(host)] : []),
+    ...(host.config.docs === undefined ? [] : [branch({ name: "docs", summary: "Build, check and serve the documentation site with the documentation generator.", children: [docsBuildVerb(host), docsCheckVerb(host), docsServeVerb(host)] })]),
   ];
   const mcp = command({
     name: "mcp",
@@ -63,17 +62,17 @@ export function repoctlProgram(host: Host): Program {
     examples: [{ args: [], says: "Serve the tools of the tier the host holds (REPOCTL_TIER; REPOCTL_READ_ONLY=1 serves only what reads)." }],
     action: traitsOf("mcp"),
     run: async () => {
-      const held = heldTier(host.env);
+      const held = heldTier(host.env, host.config);
       if ("unknown" in held) return outcomeOf(null, { problems: [problem("fail", `${held.unknown} is not a tier`, { code: "E-USAGE", fix: "REPOCTL_TIER=public, contributor or releaser" })] });
       // standard output is the protocol's: a call's output is given back to the caller, never written there, and a call keeps no log of its own
       const { sink: _sink, state: _state, ...io } = hostIo();
-      await serve({ program, tier: held.tier, mayOnlyRead: (host.env(READ_ONLY_VARIABLE) ?? "") !== "", run: (argv) => runCli(program, argv, { ...io, tier: held.tier, env: (n) => host.env(n) }) }, stdioTransport());
+      await serve({ program, tier: held.tier, mayOnlyRead: (host.env(host.config.readOnlyVariable) ?? "") !== "", run: (argv) => runCli(program, argv, { ...io, tier: held.tier, env: (n) => host.env(n) }) }, stdioTransport());
       return outcomeOf(null);
     },
   });
   const program: Program = programOf({
     name: "repoctl",
-    summary: "The operations program of this repository: it makes the generated files, merges, checks, tells the versions, releases, scaffolds a library, commits and says what is wrong with a checkout.",
+    summary: "The operations program of a repository, driven by its repoctl.config.ts: it makes the generated files, merges, checks, commits and says what is wrong with a checkout, and where the configuration turns them on tells the versions, releases, scaffolds a library, proves a change and builds the documentation.",
     version: REPOCTL_VERSION,
     children: [...verbs, mcp],
     envPrefix: "REPOCTL",

@@ -20,21 +20,23 @@ import { TIERS, VERBS, type VerbId } from "@intellectual-frontiers/repoctl/gover
 import type { Finding, World } from "@intellectual-frontiers/repoctl/logical";
 import type { Result } from "@intellectual-frontiers/core";
 import type { Host as ReleasingHost } from "@intellectual-frontiers/libraries/releasing";
-import { GENERATORS, type Generator } from "@intellectual-frontiers/repoctl/governance";
+import type { Config, Generator } from "@intellectual-frontiers/repoctl/governance";
 
 /** What the program holds for every run of its verbs: the environment, and the world, made where it is needed (it needs the repository's root, which a documentation lens has not got). */
 export type Host = {
   readonly env: (name: string) => string | undefined;
   readonly world: () => Result<World, string>;
-  /** The generators of the repository, in place of the table of Governance: for a repository that has its own, and for a test. */
-  readonly generators?: readonly Generator[];
+  /** The repository's configuration, read and checked: everything the verbs know of it. Where there is none (or it is wrong) it is the bare one and `configProblem` says why. */
+  readonly config: Config;
+  /** Why the configuration could not be had: a verb that needs it ends with this, and `doctor` reports it. */
+  readonly configProblem?: { readonly code: "E-CONFIG-MISSING" | "E-CONFIG-LOAD" | "E-CONFIG-INVALID"; readonly message: string };
   /** What `release apply` runs besides the planner (the generators of the release and the tests that pack): the real ones where it is not given. */
   readonly releasing?: ReleasingHost;
 };
 
-/** The generators a host runs: its own where it gives them, the table of Governance otherwise. */
+/** The generators a host runs: those of the configuration, in the order it declared them. */
 export function generatorsOf(host: Host): readonly Generator[] {
-  return host.generators ?? GENERATORS;
+  return host.config.generators;
 }
 
 /** A verb, once it is given the host it runs on. */
@@ -84,6 +86,11 @@ export function outcomeOfEnvironment(message: string): Outcome {
   return withExit(outcomeOf(null, { problems: [problem("fail", message, { code: "E-ENVIRONMENT", fix: "repoctl doctor" })] }), "environment");
 }
 
+/** A run that cannot be made because the repository has no usable configuration. */
+export function outcomeOfConfig(p: NonNullable<Host["configProblem"]>): Outcome {
+  return withExit(outcomeOf(null, { problems: [problem("fail", p.message, { code: p.code, fix: p.code === "E-CONFIG-MISSING" ? "write repoctl.config.ts at the root of the repository" : "repoctl doctor" })] }), "environment");
+}
+
 /** A run whose command line does not fit what the verb takes. */
 export function outcomeOfUsage(message: string, code: "E-USAGE" | "E-COMMIT-SUBJECT" | "E-COMMIT-REFS" | "E-COMMIT-SESSION" | "E-LIBRARY-NAME" = "E-USAGE", fix = "repoctl help"): Outcome {
   return withExit(outcomeOf(null, { problems: [problem("fail", message, { code, fix })] }), "usage");
@@ -97,6 +104,8 @@ export type VerbDefinition<S extends Spec> = {
   readonly operands?: readonly Operand[];
   readonly examples: readonly Example[];
   readonly run: (args: Args<S>, ctx: Context, world: World, host: Host) => Promise<Outcome>;
+  /** Whether the verb is run only where the repository has a valid configuration (the default); `doctor` is not, since it is what says there is none. */
+  readonly needsConfig?: boolean;
 };
 
 /** A verb from its declaration: its summary and traits are the table's, and its body runs in the world of the host, or ends with the sentence that says the checkout was not found. */
@@ -110,6 +119,7 @@ export function defineVerb<S extends Spec>(d: VerbDefinition<S>): Make {
       examples: d.examples,
       action: traitsOf(d.id),
       run: (args, ctx) => {
+        if (host.configProblem !== undefined && d.needsConfig !== false) return Promise.resolve(outcomeOfConfig(host.configProblem));
         const world = host.world();
         return world.kind === "err" ? Promise.resolve(outcomeOfEnvironment(world.error)) : d.run(args, ctx, world.value, host);
       },

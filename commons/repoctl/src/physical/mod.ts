@@ -13,12 +13,14 @@
  * @module
  */
 export * from "./adapters.ts";
+export * from "./config-load.ts";
 export * from "./define.ts";
 export * from "./prove.ts";
 export * from "./prove-run.ts";
 export * from "./program.ts";
 export * from "./tests.ts";
 export * from "./verbs/check.ts";
+export * from "./verbs/docs.ts";
 export * from "./verbs/library.ts";
 export * from "./verbs/prove.ts";
 export * from "./verbs/releasing.ts";

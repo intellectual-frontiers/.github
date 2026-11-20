@@ -37,7 +37,7 @@ import {
   type World,
 } from "@intellectual-frontiers/repoctl/logical";
 import { makePlan, systemFiles, systemWorld } from "@intellectual-frontiers/repoctl/physical";
-import { CAN_RUN, CHECKOUT, execute, git, hostOf, put } from "./world.ts";
+import { CAN_RUN, CHECKOUT, execute, git, hostOf, put, LIBRARIES } from "./world.ts";
 
 const lib = (name: string): LibraryName => {
   const r = parseLibraryName(name);
@@ -223,11 +223,11 @@ async function withLibraries<T>(use: (dir: string, world: World) => Promise<T>):
     await git(dir, "add", "-A");
     await git(dir, "commit", "-q", "-m", "base");
     await git(dir, "branch", "-M", "main");
-    const real = systemWorld(dir, () => undefined);
+    const real = systemWorld(dir, () => undefined, LIBRARIES);
     const names = ["prov", "user", "idle"];
     const world: World = {
       ...real,
-      libraries: { list: () => Promise.resolve(ok(names.map((n) => ({ name: n, folder: `commons/${n}`, version: "0.1.0", level: "L1", specKit: undefined, npm: false, versionConstants: [], package: `@intellectual-frontiers/${n}` })))) },
+      libraries: { list: () => Promise.resolve(ok(names.map((n) => ({ name: n, folder: `commons/${n}`, version: "0.1.0", level: "L1", specKit: undefined, npm: false, held: undefined, versionConstants: [], package: `@intellectual-frontiers/${n}` })))) },
     };
     return await use(dir, world);
   });

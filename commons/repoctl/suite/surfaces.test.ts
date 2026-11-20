@@ -13,7 +13,7 @@ import { fs, path } from "@intellectual-frontiers/system";
 import { PROBLEM_CODES, TIERS, VERBS, verbIds, type VerbId } from "@intellectual-frontiers/repoctl/governance";
 import { INERT_HOST, repoctlProgram, systemWorld, traitsOf } from "@intellectual-frontiers/repoctl/physical";
 import { main } from "@intellectual-frontiers/repoctl";
-import { CAN_RUN, CHECKOUT, execute, hostOf } from "./world.ts";
+import { CAN_RUN, CHECKOUT, execute, hostOf, LIBRARIES, configOf } from "./world.ts";
 
 const program = repoctlProgram(INERT_HOST);
 
@@ -43,8 +43,8 @@ const names = (tier: keyof typeof TIERS): readonly string[] => {
 };
 
 proves(["0006-repoctl-surfaces FR-003", "0006-repoctl-surfaces FR-005"], "the tools a tier sees are the verbs of that tier and below that come through the tool server", () => {
-  assertEquals(names("public"), ["repoctl_check", "repoctl_status", "repoctl_hygiene", "repoctl_release_plan", "repoctl_doctor", "repoctl_prove"]);
-  assertEquals(names("contributor"), ["repoctl_check", "repoctl_sync", "repoctl_merge", "repoctl_status", "repoctl_hygiene", "repoctl_release_plan", "repoctl_release_apply", "repoctl_new_library", "repoctl_commit", "repoctl_doctor", "repoctl_prove"]);
+  assertEquals(names("public"), ["repoctl_check", "repoctl_status", "repoctl_hygiene", "repoctl_release_plan", "repoctl_doctor", "repoctl_prove", "repoctl_docs_check"]);
+  assertEquals(names("contributor"), ["repoctl_check", "repoctl_sync", "repoctl_merge", "repoctl_status", "repoctl_hygiene", "repoctl_release_plan", "repoctl_release_apply", "repoctl_new_library", "repoctl_commit", "repoctl_doctor", "repoctl_prove", "repoctl_docs_build", "repoctl_docs_check"]);
   assertEquals(names("releaser"), [...names("contributor").slice(0, 7), "repoctl_release_publish", ...names("contributor").slice(7)]);
   assert(!names("releaser").includes("repoctl_mcp"), "the tool server does not serve itself");
   const publish = served(program, TIERS.releaser);
@@ -58,7 +58,7 @@ proves(["0006-repoctl-surfaces FR-003", "0006-repoctl-surfaces FR-005"], "the to
 proves(["0006-repoctl-surfaces FR-003", "0006-repoctl-surfaces FR-004"], "a tool the tier does not see is refused with the reason, a destruction is only a preview, the confirmation is for a person alone and a key that may only read changes nothing", async () => {
   if (!CAN_RUN) return;
   await fs.withTempDir(async (dir) => {
-    const host = hostOf(systemWorld(dir, () => undefined));
+    const host = hostOf(systemWorld(dir, () => undefined, LIBRARIES));
     const real = repoctlProgram(host);
     const ran: string[][] = [];
     const config = (tier: keyof typeof TIERS, mayOnlyRead = false) => ({
@@ -127,7 +127,7 @@ proves(["0006-repoctl-surfaces FR-005"], "the tier is the host's: an unknown wor
   out.length = 0;
   assertEquals(await run(["release", "--help"], undefined), 0, "the tier of a caller who says nothing is contributor");
   assert(!/^\s+publish\b/m.test(out.join("")));
-  const real = await execute({ env: () => undefined, world: () => err("no checkout") }, ["check"]);
+  const real = await execute({ env: () => undefined, world: () => err("no checkout"), config: configOf() }, ["check"]);
   assertEquals(real.code, 3, "a host that has no checkout ends with 3");
 });
 
@@ -144,7 +144,7 @@ proves(["0006-repoctl-surfaces FR-003"], "a real tool server on standard input a
   const r = await proc.run(["bun", path.join(CHECKOUT, "commons/repoctl/src/repoctl.ts"), "mcp"], { cwd: CHECKOUT, input: `${lines.map((l) => JSON.stringify(l)).join("\n")}\n`, env: { REPOCTL_TIER: "public" } });
   const replies = r.stdout.split("\n").filter((l) => l.trim() !== "").map((l) => JSON.parse(l) as { id: number; result?: { tools?: { name: string }[]; isError?: boolean; structuredContent?: { data?: { rows?: unknown[] }; refusal?: string } } });
   assertEquals(replies.map((x) => x.id), [1, 2, 3, 4]);
-  assertEquals(replies[1]?.result?.tools?.map((t) => t.name), ["repoctl_check", "repoctl_status", "repoctl_hygiene", "repoctl_release_plan", "repoctl_doctor", "repoctl_prove"]);
+  assertEquals(replies[1]?.result?.tools?.map((t) => t.name), ["repoctl_check", "repoctl_status", "repoctl_hygiene", "repoctl_release_plan", "repoctl_doctor", "repoctl_prove", "repoctl_docs_check"]);
   assertEquals(replies[2]?.result?.isError, false);
   assert((replies[2]?.result?.structuredContent?.data?.rows?.length ?? 0) > 20, "the status of every library");
   assertEquals(replies[3]?.result?.structuredContent, { refusal: "tier-too-low" });

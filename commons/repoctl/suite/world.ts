@@ -7,7 +7,7 @@ import { ok } from "@intellectual-frontiers/core";
 import { run as runCli, hostIo } from "@intellectual-frontiers/headless/cli";
 import type { TierName } from "@intellectual-frontiers/headless/governance";
 import { fs, path, proc } from "@intellectual-frontiers/system";
-import { type Generator, TIERS } from "@intellectual-frontiers/repoctl/governance";
+import { type Config, type ConfigInput, type Generator, parseConfig, parseStepId, type StepId, TIERS } from "@intellectual-frontiers/repoctl/governance";
 import { type Host, repoctlProgram, systemFiles, systemProcess, systemWorld } from "@intellectual-frontiers/repoctl/physical";
 import type { World } from "@intellectual-frontiers/repoctl/logical";
 
@@ -31,13 +31,57 @@ writeFileSync(${JSON.stringify(out)}, made);
 `;
 }
 
+/** A step id from a word a test knows to be one. */
+export function sid(word: string): StepId {
+  const r = parseStepId(word);
+  if (r.kind === "err") throw new Error(r.error);
+  return r.value;
+}
+
+/** The identity and the trailers a test repository commits with (what a repository's configuration says; nothing of the host). */
+export const TEST_IDENTITY = { name: "Test Author", email: "author@example.test" } as const;
+/** The line that credits the agent in a test repository. */
+export const TEST_CO_AUTHOR = "Co-Authored-By: A Helper <helper@example.test>";
+
+/** The input of a minimal configuration, which a test completes with what it exercises. */
+export function configInput(extra: Partial<ConfigInput> = {}): ConfigInput {
+  return {
+    repo: "fixture",
+    commit: { identity: TEST_IDENTITY, issue: { prefix: "Refs #", required: false }, trailers: ["issue", "co-author", "session"], coAuthor: TEST_CO_AUTHOR },
+    capabilities: { release: true, newLibrary: true, status: true, prove: true },
+    libraries: { folder: "commons" },
+    docs: {},
+    hygiene: { scope: "@family/", gitSources: ["family/platform"], pathSegment: "platform", sourceMarker: "platform/marker.ts" },
+    ...extra,
+  };
+}
+
+/** The settings of libraries a test world reads manifests with. */
+export const LIBRARIES: Pick<Config, "libraries"> = { libraries: { folder: "commons", specKit: undefined, versionConstants: false, linker: undefined, roleFile: undefined } };
+
+/** A generator of a test that is a plain record: it is run as the program `<id>.ts`. */
+export function genOf(id: string, inputs: readonly string[], outputs: readonly string[]): Generator {
+  const argv = ["bun", `${id}.ts`] as const;
+  return { id: sid(id), summary: id, run: { kind: "program", argv }, check: { kind: "program", argv: [...argv, "--check"] }, inputs, outputs, after: [], mixed: [] };
+}
+
+/** A configuration made from an input, or the failure of the test. */
+export function configOf(extra: Partial<ConfigInput> = {}): Config {
+  const r = parseConfig(configInput(extra));
+  if (r.kind === "err") throw new Error(r.error.join("; "));
+  return r.value;
+}
+
 /** A generator of the table of a test repository: its script is in the repository, it reads `from` and writes `out`. */
-export function generator(id: Generator["id"], script: string, out: string, from: readonly string[]): Generator {
-  return { id, summary: `the ${id} of a test`, command: [script], inputs: [...from], outputs: [out] };
+export function generator(id: string, script: string, out: string, from: readonly string[]): Generator {
+  const config = configOf({ generators: [{ id, summary: `the ${id} of a test`, command: ["bun", script], inputs: [...from], outputs: [out] }] });
+  const g = config.generators[0];
+  if (g === undefined) throw new Error("no generator");
+  return g;
 }
 
 /** A fresh repository with the generators' scripts committed, and its world; the folder is removed when `use` ends. */
-export async function withRepo<T>(table: readonly { readonly id: Generator["id"]; readonly out: string; readonly from: readonly string[] }[], use: (dir: string, world: World, generators: readonly Generator[]) => Promise<T>): Promise<T> {
+export async function withRepo<T>(table: readonly { readonly id: string; readonly out: string; readonly from: readonly string[] }[], use: (dir: string, world: World, generators: readonly Generator[]) => Promise<T>): Promise<T> {
   return await fs.withTempDir(async (dir) => {
     await git(dir, "init", "-q");
     const generators: Generator[] = [];
@@ -46,7 +90,7 @@ export async function withRepo<T>(table: readonly { readonly id: Generator["id"]
       await systemFiles.write(path.join(dir, script), generatorScript(t.out, t.from));
       generators.push(generator(t.id, script, t.out, t.from));
     }
-    const world: World = { ...systemWorld(dir, () => undefined), process: systemProcess };
+    const world: World = { ...systemWorld(dir, () => undefined, LIBRARIES), process: systemProcess };
     return await use(dir, world, generators);
   });
 }
@@ -64,9 +108,11 @@ export async function execute(host: Host, argv: readonly string[], options: { re
   return await runCli(repoctlProgram(host), argv, { ...io, env: (n) => (env[n] === "" ? undefined : env[n]), tier: options.tier ?? TIERS.contributor, terminal: { stdin: false, stdout: false, stderr: false }, columns: 120 });
 }
 
-/** A host for a world, with generators of its own (none by default, so that a verb makes nothing the test did not give it). */
-export function hostOf(world: World, extra: Partial<Host> = {}): Host {
-  return { env: () => undefined, world: () => ok(world), generators: [], ...extra };
+/** A host for a world, with generators of its own (none by default, so that a verb makes nothing the test did not give it) and the configuration the test names. */
+export function hostOf(world: World, extra: Partial<Omit<Host, "config">> & { readonly generators?: readonly Generator[]; readonly config?: Partial<ConfigInput> } = {}): Host {
+  const { generators, config, ...host } = extra;
+  const base = configOf(config);
+  return { env: () => undefined, world: () => ok(world), ...host, config: { ...base, generators: generators ?? base.generators } };
 }
 
 /** The text of a file written to a path, made where it is not (a convenience of the tests that build a repository). */

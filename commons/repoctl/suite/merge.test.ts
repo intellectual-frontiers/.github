@@ -6,10 +6,12 @@
  */
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { fs, path } from "@intellectual-frontiers/system";
-import { IDENTITY, parseGitRef } from "@intellectual-frontiers/repoctl/governance";
+import { parseGitRef } from "@intellectual-frontiers/repoctl/governance";
 import { findingsOfSync, orderGenerators, partitionConflicts, runMerge, runSync } from "@intellectual-frontiers/repoctl/logical";
 import { mergeDone } from "@intellectual-frontiers/repoctl/physical";
-import { CAN_RUN, git, withRepo } from "./world.ts";
+import { CAN_RUN, genOf, git, TEST_IDENTITY, withRepo } from "./world.ts";
+
+const IDENTITY = TEST_IDENTITY;
 
 const TABLE = [{ id: "readme", out: "README.md", from: ["a.txt", "b.txt"] }] as const;
 
@@ -43,7 +45,7 @@ async function diverged(dir: string, world: Parameters<typeof runSync>[0], order
 }
 
 proves(["0003-repoctl-sync FR-005"], "the conflicted paths are split into the ones a generator writes and the ones a person wrote", () => {
-  const table = [{ id: "readme" as const, summary: "", command: ["x"], inputs: [], outputs: ["README.md", "commons/*/LICENSE"] }];
+  const table = [genOf("readme", [], ["README.md", "commons/*/LICENSE"])];
   assertEquals(partitionConflicts(table, ["README.md", "commons/core/LICENSE", "commons/core/src/a.ts"]), { generated: ["README.md", "commons/core/LICENSE"], written: ["commons/core/src/a.ts"] });
 });
 
@@ -53,7 +55,7 @@ proves(["0003-repoctl-sync FR-005", "0003-repoctl-sync FR-006"], "a generated fi
     const ordered = orderGenerators(generators);
     assert(ordered.kind === "ok");
     await diverged(dir, world, ordered.value, false);
-    const r = await runMerge(world, ref("feature"), ordered.value);
+    const r = await runMerge(world, ref("feature"), ordered.value, TEST_IDENTITY);
     assert(r.kind === "conflicts", `a conflict: ${JSON.stringify(r)}`);
     assertEquals([r.regenerated, r.unioned, r.unresolved, r.written, r.committed], [["README.md"], [], [], [], true]);
     assertEquals(await fs.readTextFile(path.join(dir, "README.md")), "a=2 b=3\n");
@@ -72,7 +74,7 @@ proves(["0003-repoctl-sync FR-005", "0003-repoctl-sync FR-006"], "a conflict in 
     const ordered = orderGenerators(generators);
     assert(ordered.kind === "ok");
     await diverged(dir, world, ordered.value, true);
-    const r = await runMerge(world, ref("feature"), ordered.value);
+    const r = await runMerge(world, ref("feature"), ordered.value, TEST_IDENTITY);
     assert(r.kind === "conflicts");
     assertEquals([r.regenerated, r.unioned, r.unresolved, r.written, r.committed], [["README.md"], [], [], ["notes.txt"], false]);
     assertStringIncludes(await fs.readTextFile(path.join(dir, "notes.txt")), "<<<<<<<");
@@ -120,7 +122,7 @@ proves(["0003-repoctl-sync FR-005"], "a generated file that a person also writes
     await runSync(world, "write", ordered.value);
     await git(dir, "add", ".");
     await git(dir, "commit", "-q", "-m", "Main");
-    const r = await runMerge(world, ref("feature"), ordered.value);
+    const r = await runMerge(world, ref("feature"), ordered.value, TEST_IDENTITY);
     assert(r.kind === "conflicts", JSON.stringify(r));
     assertEquals([r.regenerated, r.unioned, r.written, r.committed], [["README.md"], ["README.md"], [], true]);
     const text = await fs.readTextFile(path.join(dir, "README.md"));
@@ -147,11 +149,11 @@ proves(["0003-repoctl-sync FR-006"], "a clean merge reports the generated files 
     await write("a.txt", "2\n");
     await git(dir, "commit", "-q", "-am", "A source changes and its generated file does not");
     await git(dir, "checkout", "-q", "main");
-    const merged = await runMerge(world, ref("feature"), ordered.value);
+    const merged = await runMerge(world, ref("feature"), ordered.value, TEST_IDENTITY);
     assert(merged.kind === "merged");
     assertEquals(findingsOfSync(merged.sync).map((f) => f.code), ["E-STALE-GENERATED"]);
     assertEquals(mergeDone(merged, "feature").next, ["repoctl sync"]);
-    const refused = await runMerge(world, ref("no-such-branch"), ordered.value);
+    const refused = await runMerge(world, ref("no-such-branch"), ordered.value, TEST_IDENTITY);
     assert(refused.kind === "refused");
     const done = mergeDone(refused, "no-such-branch");
     assertEquals(done.findings.map((f) => f.code), ["E-MERGE-FAILED"]);

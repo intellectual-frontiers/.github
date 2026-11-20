@@ -26,12 +26,18 @@ export type SessionUrl = Brand<string, "session url">;
 export type CommitSubject = Brand<string, "commit subject">;
 /** A name Git accepts for a branch, a tag or a remote reference, which does not begin with a dash. */
 export type GitRef = Brand<string, "git ref">;
+/** The name of a generator or of a check of a repository's configuration: lower-case words, digits, hyphens and colons. */
+export type StepId = Brand<string, "step id">;
+/** The name of an environment variable: capitals, digits and underscores, not starting with a digit. */
+export type VariableName = Brand<string, "variable name">;
 
 const LIBRARY = refine(string, "library name", (t) => /^[a-z][a-z0-9-]*$/.test(t) && t.length <= 60);
 const SEMVER = refine(string, "semver", (t) => /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/.test(t));
 const ISSUE = refine(string, "issue number", (t) => /^[1-9]\d{0,8}$/.test(t));
 const SESSION = refine(string, "session url", (t) => /^https:\/\/[A-Za-z0-9.-]+(?:\/[A-Za-z0-9._~%/-]*)?$/.test(t));
 const SUBJECT = refine(string, "commit subject", (t) => t.trim() === t && t !== "" && !t.includes("\n") && t.length <= 100 && !t.endsWith("."));
+const STEP = refine(string, "step id", (t) => /^[a-z][a-z0-9:-]*$/.test(t) && t.length <= 60);
+const VARIABLE = refine(string, "variable name", (t) => /^[A-Z][A-Z0-9_]*$/.test(t) && t.length <= 80);
 const REF = refine(string, "git ref", (t) => t !== "" && !t.startsWith("-") && !/[\s~^:?*[\\]|\.\.|@\{|\/\/|\.lock$|\/$/.test(t));
 
 /** A library name from text, or why the text is not one. */
@@ -68,4 +74,16 @@ export function parseSubject(text: string): Result<CommitSubject, string> {
 export function parseGitRef(text: string): Result<GitRef, string> {
   const r = REF(text, "ref");
   return r.kind === "ok" ? ok(r.value) : err(`${JSON.stringify(text)} is not a name Git accepts for a reference`);
+}
+
+/** The name of a generator or of a check from text, or why the text is not one. */
+export function parseStepId(text: string): Result<StepId, string> {
+  const r = STEP(text, "id");
+  return r.kind === "ok" ? ok(r.value) : err(`${JSON.stringify(text)} is not an id: lower-case letters, digits, hyphens and colons, starting with a letter, at most 60 characters`);
+}
+
+/** The name of an environment variable from text, or why the text is not one. */
+export function parseVariableName(text: string): Result<VariableName, string> {
+  const r = VARIABLE(text, "variable");
+  return r.kind === "ok" ? ok(r.value) : err(`${JSON.stringify(text)} is not the name of an environment variable: capitals, digits and underscores, starting with a capital`);
 }

@@ -6,12 +6,12 @@
  */
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { fs, path } from "@intellectual-frontiers/system";
-import { GENERATORS, type Generator } from "@intellectual-frontiers/repoctl/governance";
+import { loadConfigFile } from "@intellectual-frontiers/repoctl/physical";
 import { classify, findingsOfSync, generatorOf, matches, orderGenerators, overlap, reads, runSync, tailLines } from "@intellectual-frontiers/repoctl/logical";
 import { main } from "@intellectual-frontiers/repoctl";
-import { CAN_RUN, CHECKOUT, generator, withRepo } from "./world.ts";
+import { CAN_RUN, CHECKOUT, generator, genOf, sid, withRepo } from "./world.ts";
 
-const g = (id: Generator["id"], inputs: readonly string[], outputs: readonly string[]): Generator => ({ id, summary: id, command: [`${id}.ts`], inputs, outputs });
+const g = genOf;
 
 proves(["0003-repoctl-sync FR-001"], "a glob matches a path by segments, and two globs overlap where one path could match both", () => {
   assertEquals(matches("README.md", "README.md"), true);
@@ -26,7 +26,7 @@ proves(["0003-repoctl-sync FR-001"], "a glob matches a path by segments, and two
   assertEquals(overlap("README.md", "commons/**"), false);
 });
 
-proves(["0003-repoctl-sync FR-001"], "the order puts a reader after its writer, keeps the table's order where the globs do not order two, and refuses generators that wait for each other", () => {
+proves(["0003-repoctl-sync FR-001"], "the order puts a reader after its writer, keeps the table's order where the globs do not order two, and refuses generators that wait for each other", async () => {
   const writer = g("libraries", ["a/*.txt"], ["gen/out.txt"]);
   const reader = g("register", ["gen/*.txt"], ["gen/report.json"]);
   const free = g("readme", ["z.txt"], ["README.md"]);
@@ -40,6 +40,9 @@ proves(["0003-repoctl-sync FR-001"], "the order puts a reader after its writer, 
   const b = g("register", ["a/*"], ["b/out"]);
   const cycle = orderGenerators([a, b]);
   assertEquals(cycle.kind === "err" ? [...cycle.error].sort() : [], ["libraries", "register"]);
+  const loaded = await loadConfigFile(`${CHECKOUT}/repoctl.config.ts`);
+  assert(loaded.kind === "ok", "the repository has a configuration");
+  const GENERATORS = loaded.value.config.generators;
   const real = orderGenerators(GENERATORS);
   assert(real.kind === "ok", "the repository's own table is an order");
   const at = (id: string): number => real.value.findIndex((x) => x.id === id);
@@ -83,8 +86,8 @@ proves(["0003-repoctl-sync FR-002", "0003-repoctl-sync FR-003", "0003-repoctl-sy
     assertEquals(found.map((f) => `${f.code} ${f.level} ${f.fix}`), ["E-STALE-GENERATED fail bun gen-readme.mjs"]);
     assertStringIncludes(found[0]?.message ?? "", "readme");
     // --only runs only what it names
-    const some = await runSync(world, "write", ordered.value, ["license"]);
-    assertEquals(some.outcomes.map((o) => o.id), ["license"]);
+    const some = await runSync(world, "write", ordered.value, [sid("license")]);
+    assertEquals(some.outcomes.map((o) => o.id), [sid("license")]);
     assertEquals(await fs.readTextFile(path.join(dir, "two.txt")), "b=1\n");
     const rest = await runSync(world, "write", ordered.value);
     assertEquals(rest.outcomes.map((o) => o.kind), ["fresh", "regenerated", "fresh"]);
@@ -101,7 +104,7 @@ proves(["0003-repoctl-sync FR-002"], "a generator that cannot be made is a failu
     const r = await runSync(world, "write", ordered.value);
     assertEquals(r.outcomes.map((o) => `${o.id} ${o.kind}`), ["libraries regenerated", "readme failed", "license failed"], "a generator still stale after it ran is failed too");
     assertEquals(findingsOfSync(r).map((f) => f.code), ["E-GENERATOR-FAILED", "E-GENERATOR-FAILED"]);
-    assertEquals(generator("readme", "x", "y", ["z"]).command, ["x"]);
+    assertEquals(generator("readme", "x", "y", ["z"]).run, { kind: "program", argv: ["bun", "x"] });
   });
 });
 

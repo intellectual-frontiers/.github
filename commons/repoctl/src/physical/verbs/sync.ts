@@ -12,15 +12,15 @@
  *
  * @module
  */
-import { type Generator, type GeneratorId, parseGitRef } from "@intellectual-frontiers/repoctl/governance";
+import { type Generator, parseGitRef, type StepId } from "@intellectual-frontiers/repoctl/governance";
 import { findingsOfSync, type Finding, finding, type MergeReport, orderGenerators, runMerge, runSync, type SyncReport } from "@intellectual-frontiers/repoctl/logical";
 import { value } from "@intellectual-frontiers/terminal/args";
 import { type Done, defineVerb, generatorsOf, outcomeOfDone, outcomeOfEnvironment, outcomeOfUsage } from "../define.ts";
 
 /** The ids a comma-separated list names, or the one that is not a generator. */
-function idsOf(table: readonly Generator[], text: string | undefined): { readonly ids: readonly GeneratorId[] } | { readonly unknown: string } {
+function idsOf(table: readonly Generator[], text: string | undefined): { readonly ids: readonly StepId[] } | { readonly unknown: string } {
   if (text === undefined || text === "") return { ids: [] };
-  const ids: GeneratorId[] = [];
+  const ids: StepId[] = [];
   for (const word of text.split(",").map((w) => w.trim())) {
     const g = table.find((x) => x.id === word);
     if (g === undefined) return { unknown: word };
@@ -58,7 +58,7 @@ export function syncData(r: SyncReport): unknown {
 export const syncVerb = defineVerb({
   name: "sync",
   id: "sync",
-  options: { only: value<never>({ help: "Only these generators, as ids separated by commas (libraries, packaging, ontology, workflows, register, readme, license, installers).", valueName: "ID[,ID]" }) },
+  options: { only: value<never>({ help: "Only these generators, as ids separated by commas (those of the configuration).", valueName: "ID[,ID]" }) },
   examples: [
     { args: [], says: "Make every generated file that is stale, in dependency order." },
     { args: ["--check"], says: "Write nothing; exit 1 naming each stale generator and the command that fixes it (what CI and the hooks run)." },
@@ -134,7 +134,7 @@ export const mergeVerb = defineVerb({
     if (ref.kind === "err") return outcomeOfUsage(ref.error, "E-USAGE", "repoctl merge --help");
     const order = orderGenerators(generatorsOf(host));
     if (order.kind === "err") return outcomeOfEnvironment(`the table of generators waits for itself: ${order.error.join(", ")}`);
-    return outcomeOfDone(mergeDone(await runMerge(w, ref.value, order.value), ref.value));
+    return outcomeOfDone(mergeDone(await runMerge(w, ref.value, order.value, host.config.commit.identity), ref.value));
   },
 });
 

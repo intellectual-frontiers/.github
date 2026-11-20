@@ -30,7 +30,7 @@ import {
   type World,
 } from "@intellectual-frontiers/repoctl/logical";
 import { manifestLibraries, systemFiles, systemProcess, systemWorld } from "@intellectual-frontiers/repoctl/physical";
-import { CAN_RUN, execute, git, hostOf, put } from "./world.ts";
+import { CAN_RUN, execute, git, hostOf, put, LIBRARIES, genOf } from "./world.ts";
 
 const TOKEN = `npm_${"A1b2C3d4E5f6G7h8I9j0K1l2M3n4O5p6Q7r8"}`;
 
@@ -56,13 +56,13 @@ proves(["0004-repoctl-status-release FR-001"], "versions are ordered by their nu
   assertEquals([...tags.entries()], [["core", ["0.1.0", "0.2.0"]], ["integrations-github", ["1.2.3-rc.1"]]]);
   const found = { kind: "found", latest: "0.1.0", hasRepoVersion: true } as const;
   const tagged = { kind: "found", latest: "0.1.0", hasRepoVersion: true, source: "remote" } as const;
-  assertEquals(stateOf({ npm: true }, found, tagged), "released");
-  assertEquals(stateOf({ npm: true }, { ...found, hasRepoVersion: false }, tagged), "unpublished");
-  assertEquals(stateOf({ npm: true }, { kind: "absent" }, tagged), "unpublished");
-  assertEquals(stateOf({ npm: false }, { kind: "not-published" }, { ...tagged, hasRepoVersion: false }), "untagged");
-  assertEquals(stateOf({ npm: true }, found, { kind: "none", source: "remote" }), "untagged");
-  assertEquals(stateOf({ npm: true }, { kind: "skipped" }, tagged), "unknown");
-  assertEquals(stateOf({ npm: true }, { kind: "unreachable", why: "x" }, tagged), "unknown");
+  assertEquals(stateOf({ npm: true, held: undefined }, found, tagged), "released");
+  assertEquals(stateOf({ npm: true, held: undefined }, { ...found, hasRepoVersion: false }, tagged), "unpublished");
+  assertEquals(stateOf({ npm: true, held: undefined }, { kind: "absent" }, tagged), "unpublished");
+  assertEquals(stateOf({ npm: false, held: undefined }, { kind: "not-published" }, { ...tagged, hasRepoVersion: false }), "untagged");
+  assertEquals(stateOf({ npm: true, held: undefined }, found, { kind: "none", source: "remote" }), "untagged");
+  assertEquals(stateOf({ npm: true, held: undefined }, { kind: "skipped" }, tagged), "unknown");
+  assertEquals(stateOf({ npm: true, held: undefined }, { kind: "unreachable", why: "x" }, tagged), "unknown");
 });
 
 /** A repository with a bare remote, two libraries and tags pushed to the remote. */
@@ -84,7 +84,7 @@ async function withRemote<T>(use: (dir: string, world: World) => Promise<T>): Pr
     await git(dir, "tag", "gamma-v0.3.0");
     await git(dir, "push", "-q", "origin", "HEAD:main", "--tags");
     await git(dir, "tag", "-d", "gamma-v0.3.0");
-    return await use(dir, systemWorld(dir, () => undefined));
+    return await use(dir, systemWorld(dir, () => undefined, LIBRARIES));
   });
 }
 
@@ -158,7 +158,7 @@ proves(["0004-repoctl-status-release FR-004", "0004-repoctl-status-release FR-00
     await put(dir, "commons/alpha/src/mod.ts", "export const alpha = 2;\n");
     await git(dir, "commit", "-q", "-am", "Change alpha\n\nImpact: minor");
     const before = await git(dir, "status", "--porcelain");
-    const host = hostOf(systemWorld(dir, () => undefined));
+    const host = hostOf(systemWorld(dir, () => undefined, LIBRARIES));
     const plan = await execute(host, ["release", "plan", "--offline", "--json"]);
     assertEquals(plan.code, 0, plan.err);
     const doc = JSON.parse(plan.out) as { data: { steps: { library: string; from: string; to: string }[] } };
@@ -190,12 +190,12 @@ proves(["0004-repoctl-status-release FR-005"], "apply raises the version into th
     await git(dir, "commit", "-q", "-am", "Change\n\nImpact: minor");
     const made: string[] = [];
     const releasing = { generate: () => Promise.resolve(ok(undefined)), prove: () => Promise.resolve(ok(undefined)) };
-    const generators = [{ id: "readme" as const, summary: "the readme of a test", command: ["make-readme.mjs"], inputs: ["commons/*/library.ts"], outputs: ["README.md"] }];
+    const generators = [{ ...genOf("readme", ["commons/*/library.ts"], ["README.md"]), run: { kind: "program" as const, argv: ["bun", "make-readme.mjs"] }, check: { kind: "program" as const, argv: ["bun", "make-readme.mjs", "--check"] } }];
     await put(dir, "make-readme.mjs", `import { writeFileSync, readFileSync } from "node:fs";\nconst v = readFileSync("commons/libraries/src/version.ts", "utf8").match(/"([^"]+)"/)?.[1];\nconst text = "libraries " + v + "\\n";\nif (process.argv.includes("--check")) process.exit(readFileSync("README.md", "utf8") === text ? 0 : 1);\nwriteFileSync("README.md", text);\n`);
     await put(dir, "README.md", "libraries 0.1.0\n");
     await git(dir, "add", ".");
     await git(dir, "commit", "-q", "-m", "The README");
-    const out = await execute(hostOf(systemWorld(dir, () => undefined), { generators, releasing }), ["release", "apply", "--offline", "--no-tests"]);
+    const out = await execute(hostOf(systemWorld(dir, () => undefined, LIBRARIES), { generators, releasing }), ["release", "apply", "--offline", "--no-tests"]);
     assertEquals(out.code, 0, out.err);
     made.push(await fs.readTextFile(path.join(dir, `commons/${name}/src/version.ts`)));
     assertEquals(made[0], 'export const LIBRARIES_VERSION = "0.2.0";\n');
@@ -235,7 +235,7 @@ function npmProcess(calls: { argv: readonly string[]; mode: number; inside: bool
 proves(["0004-repoctl-status-release FR-006"], "the phrase confirms what the plan names, a plan says why a release cannot be sent, and the gate refuses a wrong phrase and a missing token", async () => {
   if (!CAN_RUN) return;
   await withRecord(async (dir, entries) => {
-    const world = systemWorld(dir, () => undefined);
+    const world = systemWorld(dir, () => undefined, LIBRARIES);
     const plan = await planPublish({ ...world, registry: registryOf({ "@intellectual-frontiers/c": { latest: "1.0.0", versions: ["1.0.0"] } }) }, entries, new Set());
     assertEquals(plan.items.map((i) => `${i.entry.slug} ${i.kind}`), ["a ready", "b ready", "c present", "d no-tarball"], "e names no npm, so it is no item");
     assertEquals(plan.phrase, confirmationPhrase(entries));
@@ -256,7 +256,7 @@ proves(["0004-repoctl-status-release FR-006", "0004-repoctl-status-release FR-00
   if (!CAN_RUN) return;
   await withRecord(async (dir) => {
     const calls: { argv: readonly string[]; mode: number; inside: boolean; content: string }[] = [];
-    const base = systemWorld(dir, () => undefined);
+    const base = systemWorld(dir, () => undefined, LIBRARIES);
     const world: World = { ...base, process: npmProcess(calls, [], dir), registry: registryOf({}), credentials: { npmToken: () => secretOf(TOKEN) } };
     const host = hostOf(world);
     const preview = await execute(host, ["release", "publish", "--dry-run", "--json"], { tier: TIERS.releaser });
@@ -288,7 +288,7 @@ proves(["0004-repoctl-status-release FR-007", "0004-repoctl-status-release FR-00
   if (!CAN_RUN) return;
   await withRecord(async (dir) => {
     const calls: { argv: readonly string[]; mode: number; inside: boolean; content: string }[] = [];
-    const base = systemWorld(dir, () => undefined);
+    const base = systemWorld(dir, () => undefined, LIBRARIES);
     const world: World = { ...base, process: npmProcess(calls, ["intellectual-frontiers-b-1.0.0.tgz"], dir), registry: registryOf({ "@intellectual-frontiers/c": { latest: "1.0.0", versions: ["1.0.0"] } }), credentials: { npmToken: () => secretOf(TOKEN) } };
     const host = hostOf(world, { env: (n) => (n === "INFRO_NPMJS_TOKEN" ? TOKEN : undefined) });
     const pre = await execute(host, ["release", "publish", "--dry-run", "--json"], { tier: TIERS.releaser });
@@ -326,7 +326,7 @@ proves(["0004-repoctl-status-release FR-008"], "the private file is removed afte
   if (!CAN_RUN) return;
   await withRecord(async (dir) => {
     const calls: { argv: readonly string[]; mode: number; inside: boolean; content: string }[] = [];
-    const base = systemWorld(dir, () => undefined);
+    const base = systemWorld(dir, () => undefined, LIBRARIES);
     const world: World = { ...base, process: npmProcess(calls, ["intellectual-frontiers-a-1.0.0.tgz", "intellectual-frontiers-b-1.0.0.tgz", "intellectual-frontiers-c-1.0.0.tgz"], dir), registry: registryOf({}), credentials: { npmToken: () => secretOf(TOKEN) } };
     const host = hostOf(world);
     const pre = await execute(host, ["release", "publish", "--dry-run", "--json"], { tier: TIERS.releaser });
@@ -341,7 +341,7 @@ proves(["0004-repoctl-status-release FR-008"], "the private file is removed afte
 });
 
 proves(["0004-repoctl-status-release FR-001"], "the manifests of the real repository are read as libraries with their versions", async () => {
-  const r = await manifestLibraries(path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "../../..")).list();
+  const r = await manifestLibraries(path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "../../.."), true).list();
   assert(r.kind === "ok");
   const me = r.value.find((l) => l.name === "repoctl");
   assertEquals([me?.folder, me?.npm, me?.specKit, me?.versionConstants], ["commons/repoctl", true, "spec-kit", [{ file: "src/governance/version.ts", name: "REPOCTL_VERSION" }]]);

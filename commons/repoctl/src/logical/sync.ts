@@ -14,17 +14,18 @@
  * @module
  */
 import { absurd } from "@intellectual-frontiers/core";
-import type { Generator, GeneratorId } from "@intellectual-frontiers/repoctl/governance";
+import { type Generator, type StepId } from "@intellectual-frontiers/repoctl/governance";
 import { finding, type Finding, tailLines } from "./findings.ts";
 import { fixOf } from "./order.ts";
 import type { Run, World } from "./ports.ts";
+import { runStep } from "./step.ts";
 
 /** What a generator did in a run of `sync`. */
 export type Outcome =
-  | { readonly kind: "fresh"; readonly id: GeneratorId }
-  | { readonly kind: "regenerated"; readonly id: GeneratorId }
-  | { readonly kind: "stale"; readonly id: GeneratorId; readonly fix: string; readonly detail: readonly string[] }
-  | { readonly kind: "failed"; readonly id: GeneratorId; readonly fix: string; readonly detail: readonly string[] };
+  | { readonly kind: "fresh"; readonly id: StepId }
+  | { readonly kind: "regenerated"; readonly id: StepId }
+  | { readonly kind: "stale"; readonly id: StepId; readonly fix: string; readonly detail: readonly string[] }
+  | { readonly kind: "failed"; readonly id: StepId; readonly fix: string; readonly detail: readonly string[] };
 
 /** Whether `sync` writes, or only checks. */
 export type Mode = "write" | "check";
@@ -40,20 +41,19 @@ export function classify(run: Run): "fresh" | "stale" | "failed" {
 const linesOf = (run: Run): readonly string[] => tailLines(`${run.stdout}\n${run.stderr}`, 8);
 
 /** Runs `sync` over the generators, which are given in the order to run them. `only` limits it to some of them. */
-export async function runSync(w: Pick<World, "process" | "repo">, mode: Mode, order: readonly Generator[], only: readonly GeneratorId[] = []): Promise<SyncReport> {
+export async function runSync(w: Pick<World, "process" | "repo">, mode: Mode, order: readonly Generator[], only: readonly StepId[] = []): Promise<SyncReport> {
   const outcomes: Outcome[] = [];
   for (const g of order) {
     if (only.length > 0 && !only.includes(g.id)) continue;
-    const here = { cwd: w.repo };
-    const checked = await w.process.run(["bun", ...g.command, "--check"], here);
+    const checked = await runStep(w, g.check);
     const state = classify(checked);
     const fix = fixOf(g);
     if (state === "fresh") outcomes.push({ kind: "fresh", id: g.id });
     else if (state === "failed") outcomes.push({ kind: "failed", id: g.id, fix, detail: linesOf(checked) });
     else if (mode === "check") outcomes.push({ kind: "stale", id: g.id, fix, detail: linesOf(checked) });
     else {
-      const wrote = await w.process.run(["bun", ...g.command], here);
-      const again = wrote.code === 0 ? await w.process.run(["bun", ...g.command, "--check"], here) : wrote;
+      const wrote = await runStep(w, g.run);
+      const again = wrote.code === 0 ? await runStep(w, g.check) : wrote;
       outcomes.push(again.code === 0 ? { kind: "regenerated", id: g.id } : { kind: "failed", id: g.id, fix, detail: linesOf(again) });
     }
   }
