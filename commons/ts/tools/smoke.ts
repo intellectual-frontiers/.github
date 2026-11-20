@@ -18,7 +18,8 @@ import { args, execPath, exit, run, runtimeName, which } from "../runtime/proc.t
 const NAME = "@intellectual-frontiers/commons";
 
 const PROGRAM = `
-import { ok, sha256, tar, untar, filesOf } from "${NAME}/ts/kernel";
+import { ok } from "@intellectual-frontiers/core";
+import { sha256, tar, untar, filesOf } from "${NAME}/ts/kernel";
 import { fs, proc, path } from "${NAME}/ts/runtime";
 import { assertEquals } from "${NAME}/ts/runtime/test";
 assertEquals(ok(1), { kind: "ok", value: 1 });
