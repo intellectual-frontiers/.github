@@ -4,7 +4,7 @@
  * is broken in a copy of the real files, in a temporary folder, and named. The specification checker is the real tool, run as a program (`--root` its spec kit).
  *
  * A library declares itself with a manifest, `library.ts` (0027-commons-libraries FR-012): the check of a manifest against its folder and the generator of the section "The libraries" are
- * `commons/ts/mizan/libraries.ts`. `libraryFindings` is a function of this test for now: it moves to commons' tools when a second library needs it.
+ * `commons/libraries/src/libraries.ts`. `libraryFindings` is a function of this test for now: it moves to commons' tools when a second library needs it.
  *
  * @module
  */
@@ -12,12 +12,12 @@ import { cpSync, existsSync, readdirSync, readFileSync, statSync, writeFileSync 
 import { fs, path, proc } from "../commons/system/src/mod.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../commons/test/src/test.ts";
 import { check, message } from "../commons/tools/mizan-check.ts";
-import { manifestFindings, synchronize } from "../commons/ts/mizan/libraries.ts";
+import { manifestFindings, synchronize } from "../commons/libraries/src/libraries.ts";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
 const SPEC = "0027-commons-libraries";
 const PARTS = ["registry.tsv", "enforcement.tsv", "mizan.baseline.txt", "specs"] as const;
-const VERIFY_PARTS = ["tsc", "mizan-check.ts --root spec-kit", "mizan/check.ts --root spec-kit", "test"] as const;
+const VERIFY_PARTS = ["tsc", "mizan-check.ts --root spec-kit", "libraries/src/check.ts --root spec-kit", "test"] as const;
 const TRACE_PART = "tools/check.ts";
 
 const read = (file: string): string => readFileSync(file, "utf8");

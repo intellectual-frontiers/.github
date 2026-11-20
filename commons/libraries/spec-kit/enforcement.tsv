@@ -1,0 +1,13 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-libraries FR-001	check	.github: cd commons/libraries && bun test suite/	libraries.test.ts: the manifest is read as data and never run, an unknown field and a second export are refused, and the check names where the manifest and its folder disagree
+0001-libraries FR-002	check	.github: cd commons/libraries && bun test suite/	libraries.test.ts: the section of the libraries and the rows of enforcement.tsv are what the manifests make, and --check names the file that is not
+0001-libraries FR-003	check	.github: cd commons/libraries && bun test suite/	affected.test.ts: the libraries a change affects by folder and by dependency, the inputs of a library, and the matrix a workflow reads
+0001-libraries FR-004	check	.github: cd commons/libraries && bun test suite/	workflows.test.ts: the typed model, its validation findings and the rendering of the YAML, the same bytes for the same values
+0001-libraries FR-005	check	.github: cd commons/libraries && bun test suite/	workflows.test.ts: the generator makes the files, finds a hand-written workflow and a missing packer, and the publish workflow tags a version that is already on the registry
+0001-libraries FR-006	check	.github: cd commons/libraries && bun test suite/	pins.test.ts: the pins of an env file and the release asset of each platform; the installer is run by the workflows of this repository
+0001-libraries FR-007	check	.github: cd commons/libraries && bun run verify	the package is built, inspected and packed by tools/pack.ts; tests/commons-packages.test.ts packs every library of npm, refuses one with no declaration for an export and type-checks a consumer
+0001-libraries FR-008	check	.github: cd commons/ts && bun test tests/	mizan.test.ts, mizan-levels.test.ts, mizan-oscal-register.test.ts, mizan-changes-git.test.ts, versions-git.test.ts and mizan-newer.test.ts: each command run on real folders and repositories
+0001-libraries FR-009	check	.github: cd commons/ts && bun test tests/	mizan-nist-import.test.ts: the committed module names the controls the specifications cite with the titles of the pinned catalog, and the offline check passes
+0001-libraries FR-010	check	.github: cd commons/libraries && bun run verify	the package is built, inspected and packed by tools/pack.ts; the commands run as bun commons/libraries/src/<command>.ts in the workflows of this repository

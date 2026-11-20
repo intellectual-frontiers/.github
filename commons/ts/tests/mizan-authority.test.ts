@@ -9,7 +9,7 @@ import { makeTempDirSync, mkdirSync, readTextFileSync, removeSync, writeTextFile
 import { dirname, fromFileUrl, resolve } from "@intellectual-frontiers/system/path";
 import { execPath, run } from "@intellectual-frontiers/system/proc";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
-import { readSpecTexts } from "../mizan/check.ts";
+import { readSpecTexts } from "@intellectual-frontiers/libraries/check";
 import {
   authorityCitation,
   commonsAuthorities,
@@ -22,7 +22,7 @@ import {
 } from "@intellectual-frontiers/mizan/rules";
 
 const HERE = dirname(fromFileUrl(import.meta.url));
-const CHECK = resolve(HERE, "..", "mizan", "check.ts");
+const CHECK = resolve(HERE, "..", "..", "libraries", "src", "check.ts");
 const SPEC_KIT = resolve(HERE, "..", "..", "spec-kit");
 
 const spec = (slug: string, ...requirements: string[]): SpecText => ({

@@ -10,9 +10,9 @@
 
 ## What a workflow is
 
-- **FR-001**: Every file in `.github/workflows/` MUST be made by `commons/ts/tools/generate-workflows.ts` and named `<name>.auto.yml`, and a check MUST fail, naming the file, where the folder holds a file that is not.
+- **FR-001**: Every file in `.github/workflows/` MUST be made by `commons/libraries/src/generate-workflows.ts` and named `<name>.auto.yml`, and a check MUST fail, naming the file, where the folder holds a file that is not.
 - **FR-002**: A workflow MUST be written as a typed value (`Workflow`, with its triggers, its jobs, their steps, matrices, permissions and concurrency), in which a step is a `uses` step or a `run` step, a job has at least one step, a permission is `read`, `write` or `none` and an expression is a value of its own type, and a mistake that the types do not say (a job that needs a job that is not there, a step that runs nothing, a workflow with no trigger) MUST be a finding of the model's validation, which stops the generator before it writes.
-- **FR-003**: The files that the generator writes MUST be valid by the JSON Schema of GitHub workflows that SchemaStore publishes (`https://json.schemastore.org/github-workflow.json`, the copy kept in `commons/ts/workflows/schema/`), and a test MUST check each file against it with a validator that is not this repository's.
+- **FR-003**: The files that the generator writes MUST be valid by the JSON Schema of GitHub workflows that SchemaStore publishes (`https://json.schemastore.org/github-workflow.json`, the copy kept in `commons/libraries/src/workflows/schema/`), and a test MUST check each file against it with a validator that is not this repository's.
 - **FR-004**: `generate-workflows.ts --check` MUST write nothing and exit with status 1, naming each file that is not what the model makes and each generated file that no workflow makes, and the `check` job of the `tests` workflow MUST run it.
 - **FR-005**: The version of every action a workflow uses MUST be written once, in one table of the model, and each `uses` of a workflow MUST be `./path` or `owner/name@version` with the version a tag or a commit, and the model's validation MUST find one that is not.
 - **FR-006**: The workflow of each library of commons MUST be made from the library's manifest (its name, its folder and its `verify` command) and its record of the facts of CI that a manifest does not hold, so that a library is given a workflow by being registered, with no file written by hand.
@@ -65,8 +65,8 @@
 ## Key entities
 
 - **Workflow** - a typed value: its name, its triggers, its jobs by id, their steps, matrices, permissions and concurrency.
-- **Model** - `commons/ts/workflows/`: the types, the validation, the YAML writer and the workflows of this repository.
-- **Generator** - `commons/ts/tools/generate-workflows.ts`: writes the files, or with `--check` compares them.
+- **Model** - `commons/libraries/src/workflows/`: the types, the validation, the YAML writer and the workflows of this repository.
+- **Generator** - `commons/libraries/src/generate-workflows.ts`: writes the files, or with `--check` compares them.
 - **Library CI record** - the facts of a library's CI that its manifest does not hold (the steps after `verify`, the command that runs its tests on Node).
 
 ## Success criteria

@@ -19,7 +19,7 @@ import type {
   RepoRef,
 } from "@intellectual-frontiers/githost/types";
 import { err, ok } from "@intellectual-frontiers/core";
-import { run as changes, RECORD_FILE } from "../mizan/changes.ts";
+import { run as changes, RECORD_FILE } from "@intellectual-frontiers/libraries/changes";
 import { dayOf, decodeHarnessRecord, relaxations } from "@intellectual-frontiers/mizan/changes/declaration";
 import { declarationHistory, readRange } from "@intellectual-frontiers/mizan/changes/git-log";
 import { commitFindings, relaxationFindings } from "@intellectual-frontiers/mizan/changes/rules";
@@ -30,7 +30,7 @@ import { execPath, run, which } from "@intellectual-frontiers/system/proc";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
 const HERE = dirname(fromFileUrl(import.meta.url));
-const CHANGES = resolve(HERE, "..", "mizan", "changes.ts");
+const CHANGES = resolve(HERE, "..", "..", "libraries", "src", "changes.ts");
 const skip = which("git") === undefined ? { skip: "git is not installed" } : {};
 
 /** git run in `repo` as a throwaway committer, failing the test where it fails. */

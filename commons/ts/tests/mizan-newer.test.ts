@@ -11,13 +11,13 @@ import { makeTempDirSync, mkdirSync, readTextFileSync, removeSync, writeTextFile
 import { dirname, fromFileUrl, resolve } from "@intellectual-frontiers/system/path";
 import { execPath, run } from "@intellectual-frontiers/system/proc";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
-import { staleFindings } from "../mizan/newer.ts";
+import { staleFindings } from "@intellectual-frontiers/libraries/newer";
 
 const HERE = dirname(fromFileUrl(import.meta.url));
-const NEWER = resolve(HERE, "..", "mizan", "newer.ts");
+const NEWER = resolve(HERE, "..", "..", "libraries", "src", "newer.ts");
 const IMPORT = resolve(HERE, "..", "..", "mizan", "src", "integrations", "host", "import.ts");
-const CHECK = resolve(HERE, "..", "mizan", "check.ts");
-const SCHEMA_ORG = resolve(HERE, "..", "mizan", "imports", "schema-org.import.ts");
+const CHECK = resolve(HERE, "..", "..", "libraries", "src", "check.ts");
+const SCHEMA_ORG = resolve(HERE, "..", "..", "libraries", "src", "imports", "schema-org.import.ts");
 
 const V1 = "@prefix ex: <https://example.org/> .\nex:Thing a ex:Class .\n";
 const V2 = "@prefix ex: <https://example.org/> .\nex:Thing a ex:Class .\nex:Widget a ex:Class .\n";

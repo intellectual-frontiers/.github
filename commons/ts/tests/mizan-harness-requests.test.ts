@@ -7,13 +7,13 @@
  */
 import { capabilityTrace, parseIssues, traceJson, traceTable } from "@intellectual-frontiers/mizan/changes/capability-trace";
 import { proofsOf, specLines, traceFindings, parseSpec } from "@intellectual-frontiers/mizan/trace";
-import { run as changes } from "../mizan/changes.ts";
+import { run as changes } from "@intellectual-frontiers/libraries/changes";
 import { holdHarness } from "@intellectual-frontiers/mizan/harness";
-import * as mizan from "../mizan/mod.ts";
+import * as mizan from "@intellectual-frontiers/libraries";
 import * as mizanLibrary from "@intellectual-frontiers/mizan";
-import { readRegisterInput, registerDocuments } from "../mizan/oscal-register.ts";
+import { readRegisterInput, registerDocuments } from "@intellectual-frontiers/libraries/oscal-register";
 import { definitionsOf, termDefinedByFindings } from "@intellectual-frontiers/mizan/spec-terms";
-import { checkVersions } from "../mizan/versions.ts";
+import { checkVersions } from "@intellectual-frontiers/libraries/versions";
 import { decodeReleaseSource, releaseSource } from "@intellectual-frontiers/mizan/versions/record";
 import { recordFindings } from "@intellectual-frontiers/mizan/versions/judge";
 import { existsSync, mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
@@ -320,10 +320,10 @@ proves(
   ["0026-works-versioning FR-040"],
   "the package exports the versions command, the check, the register and readWorks, and readWorks finds the records of a folder",
   async () => {
-    const root = new URL("../package.json", import.meta.url);
+    const root = new URL("../../libraries/package.json", import.meta.url);
     const pkg: unknown = JSON.parse(readTextFileSync(root));
     const exported: unknown = typeof pkg === "object" && pkg !== null ? Reflect.get(pkg, "exports") : undefined;
-    for (const key of ["./ts/mizan/versions", "./ts/mizan/check", "./ts/mizan/changes", "./ts/mizan/oscal-register"]) {
+    for (const key of ["./versions", "./check", "./changes", "./oscal-register"]) {
       const target: unknown = typeof exported === "object" && exported !== null ? Reflect.get(exported, key) : undefined;
       assert(typeof target === "string" && existsSync(new URL(target, root)), `${key} is exported and its file is there`);
     }

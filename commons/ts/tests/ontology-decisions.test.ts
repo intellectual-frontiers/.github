@@ -8,7 +8,7 @@
 import { readFileSync } from "node:fs";
 import { dirname, fromFileUrl, resolve } from "@intellectual-frontiers/system/path";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { termRecordsOf } from "../mizan/check.ts";
+import { termRecordsOf } from "@intellectual-frontiers/libraries/check";
 import { termFindings } from "@intellectual-frontiers/mizan/standards";
 import * as ifccm from "@intellectual-frontiers/ontology/ifccm";
 import * as ifqs from "@intellectual-frontiers/ontology/ifqs";

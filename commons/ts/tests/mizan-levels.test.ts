@@ -6,10 +6,10 @@
  * @module
  */
 import { conformanceLevels, conformanceRequirements } from "@intellectual-frontiers/ontology/mizan";
-import { run as runCheck } from "../mizan/check.ts";
+import { run as runCheck } from "@intellectual-frontiers/libraries/check";
 import { holdHarness } from "@intellectual-frontiers/mizan/harness";
 import { DEFAULT_LEVEL, entailedBy, LEVELS, levelOf, levelOfRule, ruleMatches, ruleRunsAt } from "@intellectual-frontiers/mizan/levels";
-import { verifyAll } from "../mizan/libraries.ts";
+import { verifyAll } from "@intellectual-frontiers/libraries/libraries";
 import { CHANGES_RULES } from "@intellectual-frontiers/mizan/changes/rules";
 import { MIZAN_RULES } from "@intellectual-frontiers/mizan/rules";
 import { VERSIONS_RULES } from "@intellectual-frontiers/mizan/versions/rules";

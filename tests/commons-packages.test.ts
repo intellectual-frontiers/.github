@@ -7,8 +7,8 @@
  */
 import { fs, path, proc } from "../commons/system/src/mod.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../commons/test/src/test.ts";
-import { inspectPackage } from "../commons/ts/tools/pack-library.ts";
-import { readLibraries } from "../commons/ts/mizan/libraries.ts";
+import { inspectPackage } from "../commons/libraries/src/pack-library.ts";
+import { readLibraries } from "../commons/libraries/src/libraries.ts";
 import { linter } from "../commons/lint/src/test-rule.ts";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");

@@ -5,14 +5,14 @@
  *
  * @module
  */
-import { main as mizanRules } from "../commons/ts/mizan/check.ts";
+import { main as mizanRules } from "../commons/libraries/src/check.ts";
 import { fs, path, proc } from "../commons/system/src/mod.ts";
 import { assertEquals, assertStringIncludes, proves } from "../commons/test/src/test.ts";
 import { check, message } from "../commons/tools/mizan-check.ts";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
 const TOOL = `${ROOT}/commons/tools/mizan-check.ts`;
-const CHECK = `${ROOT}/commons/ts/mizan/check.ts`;
+const CHECK = `${ROOT}/commons/libraries/src/check.ts`;
 
 /** The text of a specification in the commons form, named `name`, with one requirement. */
 function spec(name: string, extra = ""): string {

@@ -18,12 +18,12 @@ import {
 import { dirname, fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
 import { execPath, run as spawn } from "@intellectual-frontiers/system/proc";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
-import { run as versions } from "../mizan/versions.ts";
+import { run as versions } from "@intellectual-frontiers/libraries/versions";
 import { decodeReleaseSource } from "@intellectual-frontiers/mizan/versions/record";
 import { needsGit, needsSshKeygen, sshSigning } from "./quality-fixtures.ts";
 
 const HERE = dirname(fromFileUrl(import.meta.url));
-const VERSIONS = resolve(HERE, "..", "mizan", "versions.ts");
+const VERSIONS = resolve(HERE, "..", "..", "libraries", "src", "versions.ts");
 const ROOT = resolve(HERE, "..", "..", "..");
 
 // ------------------------------------------------------------------------------------------------------------------------------- fixtures
@@ -602,8 +602,8 @@ proves(
     if (tags.stdout.trim() === "") return; // a clone with no tags (a shallow checkout) cannot say; the check job fetches them
     const workflow = readTextFileSync(join(ROOT, ".github", "workflows", "tests.auto.yml"));
     assertStringIncludes(workflow, "fetch-depth: 0");
-    assertStringIncludes(workflow, "bun commons/ts/mizan/versions.ts check\n");
-    assertStringIncludes(workflow, "node commons/ts/mizan/versions.ts check\n");
+    assertStringIncludes(workflow, "bun commons/libraries/src/versions.ts check\n");
+    assertStringIncludes(workflow, "node commons/libraries/src/versions.ts check\n");
     const ledger = await v(ROOT, "ledger", "--json");
     assertEquals(ledger.code, 0, ledger.err);
     assertStringIncludes(ledger.out, '"tag": "ifc-ts-v0.4.0"');

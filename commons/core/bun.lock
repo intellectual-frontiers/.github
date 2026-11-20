@@ -6,6 +6,7 @@
       "name": "@intellectual-frontiers/core",
       "devDependencies": {
         "@intellectual-frontiers/commons": "link:../ts",
+        "@intellectual-frontiers/libraries": "link:../libraries",
         "@intellectual-frontiers/mizan": "link:../mizan",
         "@intellectual-frontiers/system": "link:../system",
         "@intellectual-frontiers/test": "link:../test",
@@ -17,6 +18,8 @@
   },
   "packages": {
     "@intellectual-frontiers/commons": ["@intellectual-frontiers/commons@link:../ts", {}],
+
+    "@intellectual-frontiers/libraries": ["@intellectual-frontiers/libraries@link:../libraries", {}],
 
     "@intellectual-frontiers/mizan": ["@intellectual-frontiers/mizan@link:../mizan", {}],
 

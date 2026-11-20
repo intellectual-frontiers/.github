@@ -294,13 +294,7 @@ proves(
       "./ts/runtime": "./runtime/mod.ts",
       "./ts/runtime/test-run": "./runtime/test-run.ts",
       "./ts/mizan": "./mizan/mod.ts",
-      "./ts/mizan/changes": "./mizan/changes.ts",
-      "./ts/mizan/check": "./mizan/check.ts",
-      "./ts/mizan/oscal-register": "./mizan/oscal-register.ts",
-      "./ts/mizan/versions": "./mizan/versions.ts",
       "./ts/quality": "./quality/mod.ts",
-      "./ts/workflows": "./workflows/mod.ts",
-      "./ts/tools/pack-library": "./tools/pack-library.ts",
       "./ts/node": "./node/register.mjs",
     });
     for (const target of Object.values(m.exports)) assert(existsSync(join(ROOT, target)), target);

@@ -80,15 +80,15 @@ export const about: About = {
     },
     { run: "bun run test", does: "Runs the suite under Bun." },
     {
-      run: "bun mizan/libraries.ts [--check] [--repo DIR]",
+      run: "bun ../libraries/src/libraries.ts [--check] [--repo DIR]",
       does: 'Writes the section "The libraries" of 0027-commons-libraries and its rows of the register again from the manifests (`commons/<name>/library.ts`); with `--check` it fails where either file is not what they make or a manifest and its folder disagree.',
     },
     {
-      run: "bun mizan/check.ts [--level L0|L1|L2|L3] [--all]",
+      run: "bun ../libraries/src/check.ts [--level L0|L1|L2|L3] [--all]",
       does: "Holds a spec kit to the rules of a conformance level (0028-conformance-levels; L3, every rule, where none is given); with `--all` it also runs the `verify` of every library a manifest declares.",
     },
     {
-      run: "bun mizan/changes.ts --capability-trace --range A..B [--issues FILE] [--terms FILE] [--rungs FILE]",
+      run: "bun ../libraries/src/changes.ts --capability-trace --range A..B [--issues FILE] [--terms FILE] [--rungs FILE]",
       does: "Offline, with no Git host: for each capability the commits of the range serve, its requirements and, for each, the terms, code and tests on each rung and the stage where the chain ends, as a table or as JSON (`--format json`).",
     },
     { run: "bun run test:node", does: "Runs the suite under Node 26." },

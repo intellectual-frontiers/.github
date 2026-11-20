@@ -60,23 +60,23 @@ export const about: About = {
       does: "Checks `spec-kit/` against the format of 0003-mizan; a harness whose registers are in another folder names it with `--register`, and its numbers may have three digits or four.",
     },
     {
-      run: "bun ts/mizan/generate-ontology.ts",
+      run: "bun libraries/src/generate-ontology.ts",
       does: "Writes `generated/mizan.auto.ttl` from Mizan's ontology; with `--check` it fails where the file is stale.",
     },
     {
-      run: "bun ts/mizan/oscal-register.ts",
+      run: "bun libraries/src/oscal-register.ts",
       does: "Writes the proof register of `spec-kit/` as OSCAL 1.2.3 (`generated/mizan-register.auto.oscal.json`, `generated/mizan-register-results.auto.oscal.json`); with `--check` it fails where a file is stale.",
     },
     {
-      run: "bun ts/mizan/libraries.ts [--check]",
+      run: "bun libraries/src/libraries.ts [--check]",
       does: "Writes the requirements of the libraries (0027-commons-libraries) and their rows of the register from each library's manifest, `commons/<name>/library.ts`; with `--check` it fails where they are stale or a manifest and its folder disagree.",
     },
     {
-      run: "bun ts/mizan/check.ts [--level L0|L1|L2|L3] [--all]",
+      run: "bun libraries/src/check.ts [--level L0|L1|L2|L3] [--all]",
       does: "Checks a folder against the rules Mizan adds, held by a baseline that only shrinks, at the conformance level it declares (0028-conformance-levels); with `--all` it also runs every library's `verify`.",
     },
     {
-      run: "bun ts/mizan/newer.ts",
+      run: "bun libraries/src/newer.ts",
       does: "Fetches the `latest` source of each import manifest and finds a standard whose newest bytes differ from its pin; needs the network, so it is opt-in and `check.ts` never runs it.",
     },
     { run: "bun tools/shell-portability-check.ts FILE...", does: "Finds what only GNU tools have in shell scripts." },

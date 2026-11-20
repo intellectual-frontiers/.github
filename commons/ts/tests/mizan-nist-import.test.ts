@@ -8,11 +8,11 @@ import { controls } from "@intellectual-frontiers/ontology/standards/nist-sp-800
 import { dirname, fromFileUrl, resolve } from "@intellectual-frontiers/system/path";
 import { execPath, run } from "@intellectual-frontiers/system/proc";
 import { assertEquals, proves } from "@intellectual-frontiers/test";
-import { manifest } from "../mizan/imports/nist-sp-800-53.import.ts";
+import { manifest } from "../../libraries/src/imports/nist-sp-800-53.import.ts";
 
 const HERE = dirname(fromFileUrl(import.meta.url));
 const IMPORT = resolve(HERE, "..", "..", "mizan", "src", "integrations", "host", "import.ts");
-const MANIFEST = resolve(HERE, "..", "mizan", "imports", "nist-sp-800-53.import.ts");
+const MANIFEST = resolve(HERE, "..", "..", "libraries", "src", "imports", "nist-sp-800-53.import.ts");
 
 proves(
   ["0019-mizan-integrations FR-030"],

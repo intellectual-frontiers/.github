@@ -4,7 +4,7 @@
  * property, and the rest are `unaligned`, each with the candidates still to examine and the day the audit was made, from which its decision is due within 90 days.
  *
  * @remarks
- * The packaging ontology itself is unchanged: this file describes its terms, and the check (`commons/ts/mizan/check.ts`) fails where a term of the ontology has no record here.
+ * The packaging ontology itself is unchanged: this file describes its terms, and the check (`commons/libraries/src/check.ts`) fails where a term of the ontology has no record here.
  * The standards a term maps to are terms of the pinned schema.org import (`../supply-chain/packaging/schema.auto.ts`), so a mapping to a term that import does not hold does not compile.
  *
  * @limits

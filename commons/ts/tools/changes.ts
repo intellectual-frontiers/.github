@@ -1,5 +1,5 @@
 /**
- * The change-control check with a Git host (commons 0020-ifccm FR-009, FR-028 to FR-031): `mizan/changes.ts` judges commits and, with `--strict`, asks the host about each issue they name,
+ * The change-control check with a Git host (commons 0020-ifccm FR-009, FR-028 to FR-031): `commons/libraries/src/changes.ts` judges commits and, with `--strict`, asks the host about each issue they name,
  * but it is given its host's client and never makes one. This command makes it from the repository's `origin` (`githost`'s `parseRemote` reads the remote, its `clientFor` makes the client,
  * with a token only from the environment) and runs the check, so that `--strict` asks GitHub or GitLab and a plain Git remote is `not_run` with its reason.
  *
@@ -7,7 +7,7 @@
  * not run (the strict rules on plain Git, with no host client or without `--strict`; the commit rules without a `--range`) a case that is `not_run` with its reason, never a pass. The record is
  * written to `test-results/changes-<trace id>.otlp.json` of the repository, and kept on the `quality` branch with `--keep-record`.
  *
- *     bun commons/ts/tools/changes.ts [--repo DIR] [--strict] [--range A..B] ...    every flag of `mizan/changes.ts`
+ *     bun commons/ts/tools/changes.ts [--repo DIR] [--strict] [--range A..B] ...    every flag of `commons/libraries/src/changes.ts`
  *     bun commons/ts/tools/changes.ts --record-dir DIR                              where the record is written (the repository's `test-results` by default)
  *     bun commons/ts/tools/changes.ts --keep-record                                 also keep it as evidence on the `quality` branch (signed where Git is set to sign)
  *
@@ -15,8 +15,9 @@
  */
 import process from "node:process";
 import { clientFor, parseRemote } from "@intellectual-frontiers/githost";
-import { type Deps, type RuleResult, run as changes } from "../mizan/changes.ts";
+import { type Deps, type RuleResult, run as changes } from "@intellectual-frontiers/libraries/changes";
 import { parseSpanId, parseTraceId, type SpanId, type TraceId } from "@intellectual-frontiers/telemetry/otel";
+import { readRecord } from "../kernel/test-report.ts";
 import { keepRun, writeOnce } from "../quality/host/branch.ts";
 import { checkRun } from "../quality/pure/record.ts";
 import { mkdir } from "@intellectual-frontiers/system/fs";
@@ -46,7 +47,7 @@ function spanId(): SpanId {
 
 const nowNanos = (): bigint => BigInt(Date.now()) * 1_000_000n;
 
-/** The flags this command adds to those of `mizan/changes.ts`, taken out of the command line. */
+/** The flags this command adds to those of `commons/libraries/src/changes.ts`, taken out of the command line. */
 function split(argv: readonly string[]): {
   readonly rest: readonly string[];
   readonly recordDir?: string;
@@ -135,7 +136,7 @@ export async function main(argv: readonly string[]): Promise<number> {
   const i = s.rest.indexOf("--repo");
   const repo = resolve((i >= 0 ? s.rest[i + 1] : undefined) ?? process.cwd());
   let captured: readonly RuleResult[] | undefined;
-  let deps: Deps = { onRules: (r) => void (captured = r) };
+  let deps: Deps = { onRules: (r) => void (captured = r), readTestRecord: readRecord };
   if (s.rest.includes("--strict")) {
     const origin = await run(["git", "-C", repo, "remote", "get-url", "origin"]);
     const parsed = origin.code === 0 ? parseRemote(origin.stdout.trim()) : undefined;

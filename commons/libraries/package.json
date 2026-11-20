@@ -1,0 +1,55 @@
+{
+  "name": "@intellectual-frontiers/libraries",
+  "private": true,
+  "version": "0.1.0",
+  "description": "The libraries of a repository of commons as code: the manifest of a library and the check that it and its folder agree, which libraries a change affects, the typed workflows of GitHub Actions and their generator, the pinned Bun, the packer that builds, inspects and packs a library for npm with its declarations, and the commands that hold a whole repository to Mizan (check, change control, versions, the register and the ontologies).",
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "exports": {
+    ".": "./src/mod.ts",
+    "./affected": "./src/affected.ts",
+    "./changes": "./src/changes.ts",
+    "./check": "./src/check.ts",
+    "./generate-ontology": "./src/generate-ontology.ts",
+    "./generate-workflows": "./src/generate-workflows.ts",
+    "./install-bun": "./src/install-bun.ts",
+    "./libraries": "./src/libraries.ts",
+    "./newer": "./src/newer.ts",
+    "./oscal-register": "./src/oscal-register.ts",
+    "./pack": "./src/pack-library.ts",
+    "./pins": "./src/pins.ts",
+    "./publish-ontology": "./src/publish-ontology.ts",
+    "./versions": "./src/versions.ts",
+    "./workflows": "./src/workflows/mod.ts",
+    "./workflows/definitions": "./src/workflows/definitions.ts",
+    "./workflows/model": "./src/workflows/model.ts",
+    "./workflows/render": "./src/workflows/render.ts"
+  },
+  "scripts": {
+    "check": "tsc -p tsconfig.json",
+    "test": "bun test suite/",
+    "test:node": "node --test \"suite/**/*.test.ts\"",
+    "verify": "bun x bun@1.4.4-canary.20261115.1 --version && tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../libraries/src/check.ts --root spec-kit --level L1 && bun tools/check.ts && bun test suite/ && bun tools/pack.ts --check",
+    "pack": "bun tools/pack.ts"
+  },
+  "devDependencies": {
+    "@intellectual-frontiers/commons": "link:../ts",
+    "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/crypto": "link:../crypto",
+    "@intellectual-frontiers/formats": "link:../formats",
+    "@intellectual-frontiers/githost": "link:../githost",
+    "@intellectual-frontiers/grc": "link:../grc",
+    "@intellectual-frontiers/mizan": "link:../mizan",
+    "@intellectual-frontiers/net": "link:../net",
+    "@intellectual-frontiers/ontology": "link:../ontology",
+    "@intellectual-frontiers/rdf": "link:../rdf",
+    "@intellectual-frontiers/system": "link:../system",
+    "@intellectual-frontiers/terminal": "link:../terminal",
+    "@intellectual-frontiers/test": "link:../test",
+    "@types/node": "26.6.6",
+    "fast-check": "4.10.2",
+    "typescript": "7.0.2"
+  }
+}

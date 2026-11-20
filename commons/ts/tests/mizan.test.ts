@@ -27,9 +27,9 @@ import { pm } from "@intellectual-frontiers/ontology/supply-chain/packaging";
 import { basisMissing, daysBetween, termFindings } from "@intellectual-frontiers/mizan/standards";
 import { holdHarness } from "@intellectual-frontiers/mizan/harness";
 import { specTermFindings } from "@intellectual-frontiers/mizan/spec-terms";
-import { readSpecTexts } from "../mizan/check.ts";
+import { readSpecTexts } from "@intellectual-frontiers/libraries/check";
 
-const CHECK = resolve(dirname(fromFileUrl(import.meta.url)), "..", "mizan", "check.ts");
+const CHECK = resolve(dirname(fromFileUrl(import.meta.url)), "..", "..", "libraries", "src", "check.ts");
 
 /** A specification in the commons form, with the requirement lines given. */
 const spec = (slug: string, ...requirements: string[]): SpecText => ({
