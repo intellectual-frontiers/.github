@@ -39,6 +39,8 @@ import {
   string,
   err,
   ok,
+  refine,
+  type Brand,
   type Result,
 } from "@intellectual-frontiers/core";
 import { parseSpdxId, type SpdxId } from "./license/standard.ts";
@@ -95,7 +97,34 @@ export type Library = {
   readonly license?: SpdxId;
   /** The constants of its sources that say its own version (`ERGONEX_VERSION`), each a file from the library's folder and the name of the constant: the release rewrites them with the version, and a check finds one that disagrees. */
   readonly versionConstants?: readonly VersionConstant[];
+  /** The package the library publishes where it is not `@intellectual-frontiers/<name>` (the `data` library publishes `@intellectual-frontiers/arcactl`; commons 0036-distribution FR-009). */
+  readonly publishes?: PackageName;
+  /** The set the library is, where it is a metapackage: a folder with no code of its own whose package depends on the libraries of the set at exact versions (commons 0036-distribution FR-005). */
+  readonly bundle?: BundleName;
 };
+
+/** The scope of the packages of commons. */
+export const PACKAGE_SCOPE = "@intellectual-frontiers/";
+
+/** The sets that a metapackage is: the whole of commons, and the four roles of the libraries; a closed union, and the name of the folder and of the package of each. */
+export const BUNDLES = ["commons", "foundation", "patterns", "programs", "standards"] as const;
+/** The name of a set of libraries a metapackage is. */
+export type BundleName = (typeof BUNDLES)[number];
+
+/** The name of a package of commons: `@intellectual-frontiers/` and a name, made only by {@link parsePackageName}. */
+export type PackageName = Brand<string, "package name">;
+const packageNameDecoder = refine(string, "package name", (t) => /^@intellectual-frontiers\/[a-z][a-z0-9-]*$/.test(t));
+
+/** A package name of commons from text, or why the text is not one. */
+export function parsePackageName(text: string): Result<PackageName, string> {
+  const r = packageNameDecoder(text, "package");
+  return r.kind === "ok" ? ok(r.value) : err(`${JSON.stringify(text)} is not a package of commons (@intellectual-frontiers/ and a name of lower-case letters, digits and hyphens)`);
+}
+
+/** The package a library publishes: the one its manifest names in `publishes`, else `@intellectual-frontiers/<name>` (commons 0036-distribution FR-009). */
+export function publishedPackage(l: Pick<Library, "name" | "publishes">): string {
+  return l.publishes ?? `${PACKAGE_SCOPE}${l.name}`;
+}
 
 /** A constant of a library's sources that holds the library's version: the file (from the library's folder) and the constant's name. */
 export type VersionConstant = { readonly file: string; readonly name: string };
@@ -131,9 +160,9 @@ const constantName: Decoder<string> = (input, path = "$") => {
 };
 const body = object(
   { name: nameDecoder, verify: nonEmpty, version: nonEmpty, exports: array(nonEmpty) },
-  { level: literal(...LEVELS), specKit: nonEmpty, summary: nonEmpty, distribution: array(literal(...REGISTRIES)), kanon: unknownValue, family: object({ host: nonEmpty, role: literal(...ROLES) }), license: nonEmpty, versionConstants: array(object({ file: nonEmpty, name: constantName })) },
+  { level: literal(...LEVELS), specKit: nonEmpty, summary: nonEmpty, distribution: array(literal(...REGISTRIES)), kanon: unknownValue, family: object({ host: nonEmpty, role: literal(...ROLES) }), license: nonEmpty, versionConstants: array(object({ file: nonEmpty, name: constantName })), publishes: nonEmpty, bundle: literal(...BUNDLES) },
 );
-const FIELDS = ["name", "level", "specKit", "verify", "version", "exports", "summary", "distribution", "kanon", "family", "license", "versionConstants"] as const;
+const FIELDS = ["name", "level", "specKit", "verify", "version", "exports", "summary", "distribution", "kanon", "family", "license", "versionConstants", "publishes", "bundle"] as const;
 
 /** The manifest read from the text of its file: `export const library = { ... }` and no other export, read as data and never run (0027-commons-libraries FR-012). */
 export function decodeLibrarySource(source: string): Result<Library, string> {
@@ -175,6 +204,15 @@ export function decodeLibrarySource(source: string): Result<Library, string> {
     if (l.kind === "err") return err(`library.license: ${l.error}`);
     license = l.value;
   }
+  let publishes: PackageName | undefined;
+  if (v.publishes !== undefined) {
+    const p = parsePackageName(v.publishes);
+    if (p.kind === "err") return err(`library.publishes: ${p.error}`);
+    publishes = p.value;
+  }
+  if (v.bundle !== undefined && v.bundle !== v.name)
+    return err(`library.bundle ${v.bundle} is the set of the metapackage of that name: the folder is named ${v.bundle}, and this one is ${v.name} (0036-distribution FR-005)`);
+  if (v.bundle !== undefined && publishes !== undefined) return err("library.bundle and library.publishes are not both given: a metapackage publishes the package of its folder (0036-distribution FR-005)");
   return ok({
     name: v.name,
     level: v.level ?? DEFAULT_LIBRARY_LEVEL,
@@ -188,6 +226,8 @@ export function decodeLibrarySource(source: string): Result<Library, string> {
     ...(family === undefined ? {} : { family }),
     ...(license === undefined ? {} : { license }),
     ...(v.versionConstants === undefined ? {} : { versionConstants: v.versionConstants }),
+    ...(publishes === undefined ? {} : { publishes }),
+    ...(v.bundle === undefined ? {} : { bundle: v.bundle }),
   });
 }
 
@@ -319,7 +359,9 @@ export function requirementOf(id: string, l: Library): string {
   const kit = l.specKit === undefined ? "" : `, its spec kit at \`commons/${l.name}/${l.specKit}\``;
   const summary = l.summary === undefined ? "" : ` ${l.summary}`;
   const where = l.distribution.map((r) => REGISTRY_NAME[r]).join(" and ");
-  return `- **${id}**: \`commons/${l.name}\` MUST be a library at conformance level ${l.level} (\`${LEVEL_TERM[l.level]}\`): the package \`@intellectual-frontiers/${l.name}\` at version \`${l.version}\`${kit}, exporting ${list(l.exports)}, published to ${where}, proved by \`cd commons/${l.name} && ${l.verify}\`.${summary}`;
+  const own = l.publishes === undefined ? `@intellectual-frontiers/${l.name}` : l.publishes;
+  const sets = l.bundle === undefined ? "" : `, a metapackage with no code of its own (the set ${l.bundle}, 0036-distribution FR-005)`;
+  return `- **${id}**: \`commons/${l.name}\` MUST be a library at conformance level ${l.level} (\`${LEVEL_TERM[l.level]}\`): the package \`${own}\`${sets} at version \`${l.version}\`${kit}, exporting ${list(l.exports)}, published to ${where}, proved by \`cd commons/${l.name} && ${l.verify}\`.${summary}`;
 }
 
 /** The row of `enforcement.tsv` of a library's requirement. */

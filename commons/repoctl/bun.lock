@@ -7,6 +7,7 @@
       "devDependencies": {
         "@intellectual-frontiers/commons": "link:../ts",
         "@intellectual-frontiers/core": "link:../core",
+        "@intellectual-frontiers/crypto": "link:../crypto",
         "@intellectual-frontiers/headless": "link:../headless",
         "@intellectual-frontiers/kanon": "link:../kanon",
         "@intellectual-frontiers/libraries": "link:../libraries",
@@ -24,6 +25,8 @@
     "@intellectual-frontiers/commons": ["@intellectual-frontiers/commons@link:../ts", {}],
 
     "@intellectual-frontiers/core": ["@intellectual-frontiers/core@link:../core", {}],
+
+    "@intellectual-frontiers/crypto": ["@intellectual-frontiers/crypto@link:../crypto", {}],
 
     "@intellectual-frontiers/headless": ["@intellectual-frontiers/headless@link:../headless", {}],
 

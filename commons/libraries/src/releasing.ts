@@ -47,7 +47,8 @@ import { compareVersions, greaterImpact, type Impact, nextSemVer, parseVersion }
 import { scopeOf, workFolders } from "@intellectual-frontiers/mizan/versions/works";
 import { inputsOf } from "./affected.ts";
 import { exportsLine } from "./plan.ts";
-import { decodeLibrarySource, LIBRARY_FILE, type VersionConstant } from "./libraries.ts";
+import { decodeLibrarySource, LIBRARY_FILE, publishedPackage, type VersionConstant } from "./libraries.ts";
+import { membersOf } from "./metapackages.ts";
 import { everyLibrary } from "./affected.ts";
 
 /** The record of the release, from the repository's root. */
@@ -57,6 +58,8 @@ export const RECORD_PATH = "commons/generated/release.auto.json";
 export type Facts = {
   readonly slug: Slug;
   readonly folder: string;
+  /** The package the library publishes: `@intellectual-frontiers/<slug>`, or the one its manifest names in `publishes` (commons 0036-distribution FR-009). */
+  readonly package: string;
   readonly version: string;
   /** The libraries (by slug) whose package its own sources import. */
   readonly imports: readonly Slug[];
@@ -91,6 +94,7 @@ export type Decision =
 export type Step = {
   readonly slug: Slug;
   readonly folder: string;
+  readonly package: string;
   readonly from: string;
   readonly to: string;
   readonly tag: string;
@@ -196,7 +200,7 @@ export function planRelease(facts: readonly Facts[], raise: ReadonlyMap<string, 
     const d = decided.get(slug);
     if (f === undefined || d === undefined || d.kind === "unchanged") continue;
     const to = d.kind === "as-is" ? f.version : d.to;
-    steps.push({ slug, folder: f.folder, from: f.version, to, tag: tagOf(slug, to), publish: f.publish, decision: d });
+    steps.push({ slug, folder: f.folder, package: f.package, from: f.version, to, tag: tagOf(slug, to), publish: f.publish, decision: d });
   }
   return ok({ steps, unchanged: facts.filter((f) => decided.get(f.slug)?.kind === "unchanged").map((f) => f.slug) });
 }
@@ -209,12 +213,12 @@ function compare(a: string, b: string): number | undefined {
 
 /** The record the workflow reads, as the bytes of its file: the steps that publish or tag, in order. */
 export function recordText(plan: Plan): string {
-  const releases = plan.steps.map((s) => ({ slug: s.slug, version: s.to, folder: s.folder, tag: s.tag, publish: s.publish }));
+  const releases = plan.steps.map((s) => ({ slug: s.slug, package: s.package, version: s.to, folder: s.folder, tag: s.tag, publish: s.publish }));
   return `${JSON.stringify({ generated: "bun commons/libraries/src/releasing.ts apply; do not edit (commons 0001-libraries FR-014)", releases }, null, 2)}\n`;
 }
 
 /** One entry of the record, as the workflow reads it. */
-export type Entry = { readonly slug: string; readonly version: string; readonly folder: string; readonly tag: string; readonly publish: boolean };
+export type Entry = { readonly slug: string; readonly package: string; readonly version: string; readonly folder: string; readonly tag: string; readonly publish: boolean };
 
 /** The entries of a record's text, or why it is not one. */
 export function readRecord(text: string): Result<readonly Entry[], string> {
@@ -231,9 +235,10 @@ export function readRecord(text: string): Result<readonly Entry[], string> {
     if (typeof e !== "object" || e === null) return err(`${RECORD_PATH}: an entry is not an object`);
     const o = Object.fromEntries(Object.entries(e));
     const { slug, version, folder, tag, publish } = o;
-    if (typeof slug !== "string" || typeof version !== "string" || typeof folder !== "string" || typeof tag !== "string" || typeof publish !== "boolean")
-      return err(`${RECORD_PATH}: an entry lacks its slug, version, folder, tag or publish`);
-    out.push({ slug, version, folder, tag, publish });
+    const pkg = o["package"];
+    if (typeof slug !== "string" || typeof pkg !== "string" || typeof version !== "string" || typeof folder !== "string" || typeof tag !== "string" || typeof publish !== "boolean")
+      return err(`${RECORD_PATH}: an entry lacks its slug, package, version, folder, tag or publish`);
+    out.push({ slug, package: pkg, version, folder, tag, publish });
   }
   return ok(out);
 }
@@ -331,13 +336,13 @@ export function driftOf(published: Tarball, local: { readonly hash: (path: strin
 }
 
 /** Compares a library's version with what npm holds of it. */
-export type Registry = (slug: string, version: string, folder: string) => Promise<Drift>;
+export type Registry = (pkg: string, version: string, folder: string) => Promise<Drift>;
 
 /** The registry of npm itself, read over HTTPS: the metadata of the version, its tarball, and the library's files under `repo`; anything that goes wrong is `unknown`, never a guess. */
 export function realRegistry(repo: string): Registry {
-  return async (slug, version, folder) => {
+  return async (name, version, folder) => {
     try {
-      const meta = await fetch(`https://registry.npmjs.org/@intellectual-frontiers%2F${slug}/${version}`, { signal: AbortSignal.timeout(30_000) });
+      const meta = await fetch(`https://registry.npmjs.org/${name.replace("/", "%2F")}/${version}`, { signal: AbortSignal.timeout(30_000) });
       if (meta.status === 404) return "absent";
       if (!meta.ok) return "unknown";
       const json: unknown = await meta.json();
@@ -408,7 +413,7 @@ export async function factsOf(repo: string, registry: Registry = realRegistry(re
     let drift: Drift = "unknown";
     let sinceVersion = { changed: false, impact: "patch" as Impact };
     if (ahead) {
-      if (l.distribution.includes("npm")) drift = await registry(slug, l.version, l.folder);
+      if (l.distribution.includes("npm")) drift = await registry(publishedPackage(l), l.version, l.folder);
       const raisedAt = await run(["git", "-C", repo, "log", "-1", "--format=%H", '-G"version"', "--", `${l.folder}/package.json`]);
       const commit = raisedAt.code === 0 ? raisedAt.stdout.trim() : "";
       if (commit !== "") {
@@ -422,13 +427,16 @@ export async function factsOf(repo: string, registry: Registry = realRegistry(re
         };
       }
     }
-    const imports = inputsOf(repo, l.name).imports.flatMap((n) => {
+    // a metapackage has no code to import: it depends on each member of its set, which is what raises it where a member is raised (0036-distribution FR-008)
+    const members = l.bundle === undefined ? undefined : membersOf(l.bundle, libs);
+    const imports = (members?.kind === "ok" ? members.value.map((m) => m.library) : inputsOf(repo, l.name).imports).flatMap((n) => {
       const s = slugs.get(n);
       return s === undefined ? [] : [s];
     });
     out.push({
       slug,
       folder: l.folder,
+      package: publishedPackage(l),
       version: l.version,
       imports,
       last: last === undefined ? undefined : { version: last.version, tag: last.tag },
@@ -445,6 +453,7 @@ export async function factsOf(repo: string, registry: Registry = realRegistry(re
 /** The commands that make the generated files, in the order they are made: the section of the libraries first, the register last. Each is run once, by `apply`. */
 export const GENERATORS: readonly (readonly string[])[] = [
   ["commons/libraries/src/libraries.ts"],
+  ["commons/libraries/src/pack-metapackage.ts"],
   ["commons/tools/generate-packaging.ts"],
   ["commons/libraries/src/generate-ontology.ts"],
   ["commons/libraries/src/generate-workflows.ts"],
@@ -549,7 +558,7 @@ export async function publishAll(entries: readonly Entry[], tools: Tools): Promi
     let npm: Outcome["npm"] = "not-published";
     let registry: Outcome["registry"] = "not-published";
     if (e.publish) {
-      if (await tools.onNpm(`@intellectual-frontiers/${e.slug}`, e.version)) npm = "present";
+      if (await tools.onNpm(e.package, e.version)) npm = "present";
       else {
         const sent = await tools.npm(e);
         npm = sent.kind === "ok" ? "published" : "failed";
@@ -611,11 +620,11 @@ export function realTools(dir: string): Tools {
       });
       return r.code === 0
         ? ok(undefined)
-        : err(`${e.slug} ${e.version} is not on npm and could not be published (${token === "" ? "no INFRO_NPMJS_TOKEN, so trusted publishing was tried" : "with INFRO_NPMJS_TOKEN"}; configure a trusted publisher for @intellectual-frontiers/${e.slug} or publish it by hand): ${tail(`${r.stderr}${r.stdout}`)}`);
+        : err(`${e.slug} ${e.version} is not on npm and could not be published (${token === "" ? "no INFRO_NPMJS_TOKEN, so trusted publishing was tried" : "with INFRO_NPMJS_TOKEN"}; configure a trusted publisher for ${e.package} or publish it by hand): ${tail(`${r.stderr}${r.stdout}`)}`);
     },
     github: async (e) => {
       const auth = [`--registry=https://npm.pkg.github.com`, `--//npm.pkg.github.com/:_authToken=${github}`];
-      if (await view(`@intellectual-frontiers/${e.slug}`, e.version, auth)) return ok(undefined);
+      if (await view(e.package, e.version, auth)) return ok(undefined);
       const f = tarball(e.slug);
       if (f === undefined) return err(`${e.slug}: no tarball was built for it`);
       const r = await run(["npm", "publish", join(dir, `package-${e.slug}`, f), ...auth]);

@@ -1202,7 +1202,7 @@ proves(
       }
     }
     assert(defined > 20 && missing > 0, `${defined} defined, ${missing} not defined`);
-    assertEquals(managerIds().length, Object.keys(t.managers).length);
+    assertEquals(managerIds().length, entries(t.managers).length);
     // the four managers a dialect is written for
     const apt = commandOf(managerOf("apt"), "Install");
     assert(apt.kind === "ok");

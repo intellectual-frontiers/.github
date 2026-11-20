@@ -17,7 +17,7 @@ import type { Channel, ConfirmationClass, Effect, Kind } from "@intellectual-fro
 import type { TierId } from "./tiers.ts";
 
 /** The words of every verb, as a person types them: a closed union. */
-export type VerbId = "sync" | "merge" | "check" | "status" | "release plan" | "release apply" | "release publish" | "new library" | "commit" | "doctor" | "mcp";
+export type VerbId = "sync" | "merge" | "check" | "status" | "hygiene" | "release plan" | "release apply" | "release publish" | "new library" | "commit" | "doctor" | "prove" | "mcp";
 
 /** What a verb is. */
 export type VerbFacts = {
@@ -85,6 +85,19 @@ export const VERBS: Readonly<Record<VerbId, VerbFacts>> = {
   status: {
     id: "status",
     summary: "Tell, for each library, its version in the repository, on npm and in its tag.",
+    kind: "report",
+    effect: "read",
+    idempotent: true,
+    dryRun: false,
+    check: false,
+    tier: "public",
+    channels: ["local", "mcp"],
+    confirmation: "none",
+    humanOnly: [],
+  },
+  hygiene: {
+    id: "hygiene",
+    summary: "Say whether this repository consumes commons as published packages: no Git or path dependency, no vendored copy, one copy of each library, exact versions.",
     kind: "report",
     effect: "read",
     idempotent: true,
@@ -173,6 +186,19 @@ export const VERBS: Readonly<Record<VerbId, VerbFacts>> = {
     confirmation: "none",
     humanOnly: [],
   },
+  prove: {
+    id: "prove",
+    summary: "Compute the proof a change needs from its blast radius (the tiers, the tests and why each skipped proof is safe) and run it.",
+    kind: "report",
+    effect: "read",
+    idempotent: true,
+    dryRun: false,
+    check: false,
+    tier: "public",
+    channels: ["local", "mcp"],
+    confirmation: "none",
+    humanOnly: [],
+  },
   mcp: {
     id: "mcp",
     summary: "Serve the verbs the held tier sees as tools of a tool server on standard input and output.",
@@ -190,5 +216,5 @@ export const VERBS: Readonly<Record<VerbId, VerbFacts>> = {
 
 /** The words of every verb, in the order the help lists them. */
 export function verbIds(): readonly VerbId[] {
-  return ["check", "sync", "merge", "status", "release plan", "release apply", "release publish", "new library", "commit", "doctor", "mcp"];
+  return ["check", "sync", "merge", "status", "hygiene", "release plan", "release apply", "release publish", "new library", "commit", "doctor", "prove", "mcp"];
 }

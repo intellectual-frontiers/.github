@@ -233,6 +233,7 @@ export function rowsOf(repo: string): { readonly rows: readonly Row[]; readonly 
       problems.push(`commons/${f.dir}/library.ts: ${f.problem}`);
       continue;
     }
+    if (f.library.bundle !== undefined) continue; // a metapackage has no about.ts and is listed by {@link bundlesOf}
     const file = `${root}/commons/${f.dir}/about.ts`;
     if (!existsSync(file)) {
       problems.push(`commons/${f.dir}/about.ts is missing: the table takes its purpose from the summary there`);
@@ -250,6 +251,32 @@ export function rowsOf(repo: string): { readonly rows: readonly Row[]; readonly 
   return { rows, problems };
 }
 
+/** One row of the table of the metapackages: the package and what it is. */
+export type BundleRow = { readonly name: string; readonly purpose: string };
+
+/** The rows of the metapackages of a repository, in the order of their folders' names: each the package and the first clause of the summary its manifest gives. */
+export function bundlesOf(repo: string): readonly BundleRow[] {
+  const rows: BundleRow[] = [];
+  for (const f of readLibraries(repo.replace(/[\\/]$/, ""))) {
+    if ("problem" in f || f.library.bundle === undefined) continue;
+    rows.push({ name: f.library.name, purpose: firstClause(f.library.summary ?? "").replace(/\|/g, "\\|") });
+  }
+  return rows;
+}
+
+/** The table of the metapackages, as Markdown, with the sentence that introduces it; nothing where a repository has none. */
+export function bundlesTableOf(rows: readonly BundleRow[]): string {
+  if (rows.length === 0) return "";
+  const body = rows.map((r) => `| [\`@intellectual-frontiers/${r.name}\`](https://www.npmjs.com/package/@intellectual-frontiers/${r.name}) | ${r.purpose} |`);
+  return [
+    "Metapackages: no code of their own, each depends on a set of the libraries above at exact versions (commons 0036-distribution). Install one of them, or a library.",
+    "",
+    "| Metapackage | What it holds |",
+    "| --- | --- |",
+    ...body,
+  ].join("\n");
+}
+
 /** The README made again from its text and the table: the text between the markers (on lines of their own) replaced; an error where the markers are missing. */
 export function withTable(readme: string, table: string): Result<string, string> {
   const from = readme.indexOf(`\n${BEGIN}\n`);
@@ -265,7 +292,8 @@ export function synchronize(repo: string, write: boolean): { readonly stale: boo
   const { rows, problems } = rowsOf(root);
   if (!existsSync(file)) return { stale: false, problems: [...problems, "README.md is missing"] };
   const text = readTextFileSync(file).replace(/\r\n/g, "\n");
-  const made = withTable(text, tableOf(rows));
+  const bundles = bundlesTableOf(bundlesOf(root));
+  const made = withTable(text, bundles === "" ? tableOf(rows) : `${tableOf(rows)}\n\n${bundles}`);
   if (made.kind === "err") return { stale: false, problems: [...problems, made.error] };
   const stale = made.value !== text;
   if (stale && write && problems.length === 0) writeTextFileSync(file, made.value);

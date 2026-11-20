@@ -1,0 +1,17 @@
+{
+  "name": "@intellectual-frontiers/standards",
+  "private": true,
+  "version": "0.1.0",
+  "description": "The standards libraries as one install, each at an exact version. Mizan, the ontologies, the quality standards and the standards of integrations.",
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "exports": {
+    ".": "./index.js"
+  },
+  "scripts": {
+    "verify": "bun ../libraries/src/pack-metapackage.ts --check && bun tools/pack.ts --check",
+    "pack": "bun tools/pack.ts"
+  }
+}

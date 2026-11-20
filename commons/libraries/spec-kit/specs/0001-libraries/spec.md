@@ -50,6 +50,8 @@
 - **FR-020**: A manifest MAY declare `versionConstants`, a list of the constants of the library's sources that say its own version, each a `file` from the library's folder and the `name` of the constant (`ERGONEX_VERSION`); `apply` MUST write the new version into each of them, together with the record, the manifest and the package, and MUST stop with a sentence naming the file where it is missing or does not say the constant as `NAME = "<version>"`, so that no constant is left behind at the version a library had.
 
 - **FR-021**: A number of the section of the libraries MUST belong to one library: where two libraries hold the same number in the specification (two branches each gave the next number to a library and a merge kept both), the first in the section MUST keep it and the second MUST be given the next number after the greatest, so that the generator makes the section and the rows again with one number for each library.
+- **FR-022**: A manifest MAY declare `publishes`, a package of commons (`@intellectual-frontiers/<name>`), and `bundle`, one of `commons`, `foundation`, `patterns`, `programs` and `standards`, equal to the library's own name; the decoder MUST refuse a `publishes` that is no package of commons, a `bundle` that is not the library's name and a manifest that has both. The release (the plan, the record and the publication) MUST use the package the manifest publishes (commons 0036-distribution FR-005, FR-009).
+- **FR-023**: The library MUST make the metapackages of commons (`metapackages.ts`, `pack-metapackage.ts`, exported as `./metapackages` and `./pack-metapackage`): the members of each set from the manifests and `ROLE_OF`, their exact dependencies written to `dependencies.auto.json` (`--check` writes nothing and exits 1 where a file is stale), and the tarball of a package with no code, which passes the inspection of every library's package; and the release MUST raise a metapackage after the libraries it depends on whenever one of them is raised (commons 0036-distribution FR-006 to FR-008).
 
 ## Acceptance scenarios
 
@@ -68,6 +70,8 @@
 12. **Given** a folder `commons/x/` with a manifest and no `LICENSE`, **When** `license.ts --check` runs, **Then** it exits 1, names `commons/x/LICENSE` and the command `bun commons/libraries/src/license.ts`, and running that command writes the file, per FR-019.
 13. **Given** a library whose manifest names the constant `X_VERSION` of `src/v.ts` and is raised by `apply`, **When** its version is written, **Then** the constant holds the new version, and a missing file or constant is a sentence that names it, per FR-020.
 14. **Given** a section in which two libraries hold one generated number, **When** the section is made again, **Then** the first keeps it and the second has the next number after the greatest, per FR-021.
+15. **Given** a manifest with `publishes: "@intellectual-frontiers/arcactl"` and a manifest whose `bundle` is not its name, **When** they are read, **Then** the first gives its package to the release and the second is refused, per FR-022.
+16. **Given** the manifests of this repository, **When** the metapackages are made, **Then** each set holds the libraries of its role at their versions and the files are what the manifests make, per FR-023.
 
 ## Out of scope
 

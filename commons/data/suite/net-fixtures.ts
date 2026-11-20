@@ -139,6 +139,7 @@ export function run(command: string, args: readonly string[], env: Readonly<Reco
       clearTimeout(timer);
       resolve({ code: code ?? -1, out, err });
     });
+    child.stdin.on("error", () => undefined); // a program that exits before it reads its input closes the pipe: EPIPE is not a failure of the run
     child.stdin.end(input ?? "");
   });
 }

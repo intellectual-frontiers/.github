@@ -19,6 +19,7 @@ export * from "./generators.ts";
 export * from "./identity.ts";
 export * from "./ids.ts";
 export * from "./problems.ts";
+export * from "./proof.ts";
 export * from "./tiers.ts";
 export * from "./verbs.ts";
 export * from "./version.ts";

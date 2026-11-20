@@ -120,7 +120,7 @@ proves([`${SPEC} FR-008`, `${SPEC} FR-009`, `${SPEC} FR-011`], "a missing hand-w
 
 proves([`${SPEC} FR-010`], "THIRD_PARTY_NOTICES.md is what the record makes, says unverified where it was not checked, and a vendored path that is gone is found", async () => {
   const t = thirdPartyNotices(THIRD_PARTY);
-  assertEquals(read("THIRD_PARTY_NOTICES.md"), t);
+  assertEquals(read("THIRD_PARTY_NOTICES.md").replaceAll("\r\n", "\n"), t); // a Windows checkout may hold the file with CRLF line ends
   assertStringIncludes(t, "unverified:");
   for (const i of THIRD_PARTY) assertStringIncludes(t, i.license);
   await withTempDir(async (dir) => {

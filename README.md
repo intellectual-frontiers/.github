@@ -98,9 +98,38 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/ontology`](https://www.npmjs.com/package/@intellectual-frontiers/ontology) | Standard | The ontologies of Intellectual Frontiers Commons | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/quality`](https://www.npmjs.com/package/@intellectual-frontiers/quality) | Standard | The run of a suite of tests as evidence (one OTLP record of the run, its reports as TAP, JUnit, CTRF, SARIF, OSCAL and the documents of ISO/IEC/IEEE 29119-3, and its signed ledger entry) | - | L1 | GitHub, npm |
 
+Metapackages: no code of their own, each depends on a set of the libraries above at exact versions (commons 0036-distribution). Install one of them, or a library.
+
+| Metapackage | What it holds |
+| --- | --- |
+| [`@intellectual-frontiers/commons`](https://www.npmjs.com/package/@intellectual-frontiers/commons) | Every consumer-facing library of commons as one install, each at an exact version |
+| [`@intellectual-frontiers/foundation`](https://www.npmjs.com/package/@intellectual-frontiers/foundation) | The foundation libraries as one install, each at an exact version |
+| [`@intellectual-frontiers/patterns`](https://www.npmjs.com/package/@intellectual-frontiers/patterns) | The pattern libraries as one install, each at an exact version |
+| [`@intellectual-frontiers/programs`](https://www.npmjs.com/package/@intellectual-frontiers/programs) | The program libraries as one install, each at an exact version |
+| [`@intellectual-frontiers/standards`](https://www.npmjs.com/package/@intellectual-frontiers/standards) | The standards libraries as one install, each at an exact version |
+
 <!-- libraries-map:end -->
 
 This table is generated from the manifests (`library.ts`) and the summaries (`about.ts`) of `commons/` by `bun commons/libraries/src/readme.ts`; a test fails where it is stale.
+
+## How other repositories use commons
+
+A repository other than this one gets commons code only by **installing a published package** (commons [0036-distribution](commons/spec-kit/specs/0036-distribution/spec.md)): a public library from npm, a private package (one of a private repository) from the GitHub package registry. It has no Git dependency on this repository, no `file:` or `link:` into a checkout of commons, no vendored copy and no fetch of raw source.
+
+Five **metapackages** install commons as a set, each depending on its libraries at exact versions, so that one version of a metapackage is one coherent release: `@intellectual-frontiers/commons` (every consumer-facing library) and, by role, `foundation`, `patterns`, `programs` and `standards`. Their dependencies are generated from the manifests, never edited by hand. `repoctl hygiene` (`bunx @intellectual-frontiers/repoctl hygiene`, `--json` for CI) runs in any repository and finds a Git or path dependency on commons, a relative import into a copy of it, a vendored copy, two installed copies of one library and a dependency that is not an exact version.
+
+```sh
+bun add --exact @intellectual-frontiers/commons@<version>      # or: npm install --save-exact @intellectual-frontiers/commons@<version>
+```
+
+A private package comes from the GitHub package registry: a scoped line in `.npmrc` and a token that may read packages in the environment (`ERGONEX_GITHUB_TOKEN`).
+
+```sh
+@intellectual-frontiers:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${ERGONEX_GITHUB_TOKEN}
+```
+
+The guide [Consuming commons](https://intellectual-frontiers.github.io/.github/guides/consuming-commons.html) says how to install the set, how to upgrade it and how to read a finding of the check.
 
 ## Documentation from the code: JSDoc, and lenses
 
@@ -121,6 +150,49 @@ A comment says what a thing is. It cannot show how a model is layered or what a 
 - **A new developer:** start with the site's overview, then [`AGENTS.md`](AGENTS.md) for how the repository works, and the spec kit of the library you care about.
 - **A contributor:** [`AGENTS.md`](AGENTS.md) is the working agreement, and `bun run repoctl` is the command that operates the repository ([`commons/repoctl`](commons/repoctl/about.ts)); the commons specifications are in [`commons/spec-kit/specs/`](commons/spec-kit/specs/) and each library's in its own `spec-kit/`.
 - **An AI agent:** read [`AGENTS.md`](AGENTS.md), then the site's [`llms.txt`](https://intellectual-frontiers.github.io/.github/llms.txt); every page of the site has a Markdown twin (`.md` beside the `.html`), and the models and programs have a JSON twin. `repoctl mcp` serves the repository's operations as tools of a tool server, by audience tier.
+
+## Proof proportional to blast radius
+
+A change proves what it can break, and nothing more. `bun run repoctl prove` classifies each changed file, fingerprints the public type surface of the libraries it touches, and computes a **proof plan**: which tiers apply, which tests run and why every skipped proof is safe to skip. The same plan drives the local run and CI.
+
+```mermaid
+flowchart LR
+  change["working tree vs base"] --> classify["classify each file"]
+  classify --> plan["proof plan"]
+  plan --> t0["T0 static, seconds"]
+  plan --> t1["T1 library suite"]
+  plan --> t2["T2 seam: importers of changed symbols"]
+  plan --> t3["T3 packaging"]
+  plan --> t4["T4 end to end"]
+  plan --> t5["T5 platform"]
+  plan --> t6["T6 release"]
+  plan -. "class needs none / surface unchanged / symbols unused" .-> skip["skipped, with the reason"]
+  t4 -. "main, nightly, release" .-> safety["safety net"]
+  t5 -.-> safety
+  t6 -.-> safety
+```
+
+| The change is | It proves |
+| --- | --- |
+| a comment, TSDoc or prose | the documentation check |
+| specification text, requirement identifiers unchanged | the specification and trace checks |
+| a generated file | `sync --check`: the bytes equal the generators' |
+| a version or the release record | the versions check |
+| inside a library, public types unchanged | T0 and T1 of that library; dependents skip |
+| a public signature | T0 and T2 for the importers of the changed symbols only |
+| a foundation library (`core`, `system`, ...) | its own proofs and a smoke gate, wider only if the gate fails |
+| `exports`, `package.json`, the packer | T3: pack, install, import, type-check |
+| the planner, the generators, the tier rules | everything, always |
+
+This is test impact analysis (what a change can reach, from imports and a fingerprint of declarations) joined with consumer-driven contract testing (a consumer declares what it uses by importing it, and a provider's change reaches only those consumers). Results are content-addressed, so an identical key is never run twice, and the end-to-end flows are hermetic. A nightly full run and the release gate remain the safety net, and a plan never skips for a change to the planner itself.
+
+```sh
+bun run repoctl prove            # prove what your tree changes since origin/main (tiers T0 to T3 that apply)
+bun run repoctl prove --why      # the same, with the reason each proof runs and each skipped proof is safe
+bun run repoctl prove --plan     # the plan as JSON, running nothing (what CI reads)
+```
+
+[How to read a plan, add a test to the right tier and extend a class](https://intellectual-frontiers.github.io/.github/concepts/proof-by-blast-radius.html).
 
 ## Contributing in five commands
 

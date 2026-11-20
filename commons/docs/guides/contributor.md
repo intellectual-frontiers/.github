@@ -9,3 +9,5 @@ A change is made capability by capability, and each step leaves something a chec
 5. **Check it.** `bun run dev:check` at the root while you work; `bun run verify` in the library before you push. Versions are raised at the release, never by hand on every change; see [the release loop](concept-release-loop.md).
 
 **Your first small task:** pick a library, add a missing `TSDoc` comment to an export that the API reference shows without a description, and run `bun run verify` in that library.
+
+**Prove only what your change can break.** `bun run repoctl prove --why` classifies your change, runs the proofs it needs and says why each skipped proof is safe; see [proof by blast radius](proof-by-blast-radius.md).

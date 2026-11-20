@@ -10,3 +10,5 @@ A library is a folder of `commons/` that declares itself; registering one is add
 6. Run `bun commons/libraries/src/libraries.ts`: it writes the one requirement that commons keeps for the library and its row of the register, from the manifest.
 
 This site picks the library up by itself: it has a page, an API reference for every export and its specifications as soon as it has a manifest, a `package.json` and an `about.ts`, and the build fails where an export has no description.
+
+The library is then proved by what its changes reach, not by everything: its own suite when a change stays inside it, its importers' seam tests when a public symbol changes, and a tarball when its `exports` change. Put each test where it belongs and read the plan with `bun run repoctl prove --why` ([proof by blast radius](proof-by-blast-radius.md)).

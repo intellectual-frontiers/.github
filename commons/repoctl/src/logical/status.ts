@@ -85,7 +85,7 @@ export async function runStatus(w: World, options: { readonly offline: boolean }
   const tags = listed.code === 0 ? tagsOf(listed.stdout) : undefined;
   const why = `git could not list the tags (${listed.stderr.trim().split("\n").slice(-1)[0] ?? "no message"})`;
   const rows = await pool([...libs.value].sort((a, b) => (a.name < b.name ? -1 : 1)), 8, async (lib): Promise<Row> => {
-    const npm: NpmCell = !lib.npm ? { kind: "not-published" } : options.offline ? { kind: "skipped" } : npmCell(lib, await w.registry.view(`@intellectual-frontiers/${lib.name}`));
+    const npm: NpmCell = !lib.npm ? { kind: "not-published" } : options.offline ? { kind: "skipped" } : npmCell(lib, await w.registry.view(lib.package));
     const versions = tags?.get(lib.name) ?? [];
     const latest = greatest(versions);
     const tag: TagCell = tags === undefined ? { kind: "unreachable", why } : latest === undefined ? { kind: "none", source } : { kind: "found", latest, hasRepoVersion: versions.includes(lib.version), source };

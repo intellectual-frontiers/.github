@@ -12,6 +12,7 @@ export const library = {
   verify: "bun run verify",
   version: "0.9.0",
   distribution: ["github", "npm"],
+  publishes: "@intellectual-frontiers/arcactl",
   exports: [
     "./engine",
     "./governance",

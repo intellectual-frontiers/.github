@@ -210,9 +210,9 @@ proves(["0004-repoctl-status-release FR-005"], "apply raises the version into th
 async function withRecord<T>(use: (dir: string, entries: readonly ReleaseEntry[]) => Promise<T>, pack: readonly string[] = ["a", "b", "c"]): Promise<T> {
   return await fs.withTempDir(async (dir) => {
     await git(dir, "init", "-q");
-    const entries: ReleaseEntry[] = ["a", "b", "c", "d", "e"].map((slug) => ({ slug, version: "1.0.0", folder: `commons/${slug}`, tag: `${slug}-v1.0.0`, publish: slug !== "e" }));
+    const entries: ReleaseEntry[] = ["a", "b", "c", "d", "e"].map((slug) => ({ slug, package: `@intellectual-frontiers/${slug}`, version: "1.0.0", folder: `commons/${slug}`, tag: `${slug}-v1.0.0`, publish: slug !== "e" }));
     for (const e of entries) if (pack.includes(e.slug)) await put(dir, `${e.folder}/dist/intellectual-frontiers-${e.slug}-${e.version}.tgz`, "tarball");
-    const record = { generated: "test", releases: entries.map(({ slug, version, folder, tag, publish }) => ({ slug, version, folder, tag, publish })) };
+    const record = { generated: "test", releases: entries.map(({ slug, package: pkg, version, folder, tag, publish }) => ({ slug, package: pkg, version, folder, tag, publish })) };
     await put(dir, "commons/generated/release.auto.json", `${JSON.stringify(record, null, 2)}\n`);
     return await use(dir, entries);
   });
