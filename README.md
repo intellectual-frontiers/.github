@@ -141,8 +141,8 @@ A comment says what a thing is. It cannot show how a model is layered or what a 
 | Reader | What it reads | What it shows |
 | --- | --- | --- |
 | **API** (TSDoc) | The exports of each package, their types and comments | One page per package and entity, with signatures, examples and links between them |
-| **Layered model** ([`lens/layered.ts`](commons/docs/lens/layered.ts)) | The governance, logical and physical values of a Kanon library, such as the data models of `commons/data` | Each model layer by layer, every element with a stable id, where it is written, and the trace from governance down to the table |
-| **Program** ([`lens/program.ts`](commons/docs/lens/program.ts)) | A program built on `headless`, such as Ergonex, described by `describe(program)` | One page set for each audience tier: every command with its options, operands and examples, and its CLI, MCP and REST forms; a command a tier cannot see is listed with the reason |
+| **Layered model** ([`lens/layered.ts`](commons/docs/src/lens/layered.ts)) | The governance, logical and physical values of a Kanon library, such as the data models of `commons/data` | Each model layer by layer, every element with a stable id, where it is written, and the trace from governance down to the table |
+| **Program** ([`lens/program.ts`](commons/docs/src/lens/program.ts)) | A program built on `headless`, such as Ergonex, described by `describe(program)` | One page set for each audience tier: every command with its options, operands and examples, and its CLI, MCP and REST forms; a command a tier cannot see is listed with the reason |
 | **Specifications** | The spec kit of each library | Every requirement with its identifier, so that code and tests that cite it link back |
 
 ## Where to go
