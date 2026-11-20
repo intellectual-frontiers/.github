@@ -76,13 +76,13 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/test`](https://www.npmjs.com/package/@intellectual-frontiers/test) | Foundation | Tests that run unchanged under `bun test` and `node --test` | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/headless`](https://www.npmjs.com/package/@intellectual-frontiers/headless) | Pattern | The contract of a program that has no window | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/kanon`](https://www.npmjs.com/package/@intellectual-frontiers/kanon) | Pattern | The pattern of a library built in three layers | - | L1 | GitHub, npm |
-| [`@intellectual-frontiers/archon`](commons/archon) | Program | A Kanon library that orders subjects: a machine, a device, a workstation or a cloud account | layers, instances, plugins | L1 | GitHub |
-| [`@intellectual-frontiers/archon-dialect-apt`](commons/archon-dialect-apt) | Program | The dialect of tools that installs them with apt | layers, extension | L1 | GitHub |
-| [`@intellectual-frontiers/archon-dialect-homebrew`](commons/archon-dialect-homebrew) | Program | The dialect of tools that installs them with Homebrew | layers, extension | L1 | GitHub |
-| [`@intellectual-frontiers/archon-dialect-mise`](commons/archon-dialect-mise) | Program | The dialect of tools that installs them with mise | layers, extension | L1 | GitHub |
-| [`@intellectual-frontiers/archon-dialect-native-pinned`](commons/archon-dialect-native-pinned) | Program | The default dialect of tools | layers, extension | L1 | GitHub |
-| [`@intellectual-frontiers/archon-dialect-winget`](commons/archon-dialect-winget) | Program | The dialect of tools that installs them with WinGet | layers, extension | L1 | GitHub |
-| [`@intellectual-frontiers/archon-tool`](commons/archon-tool) | Program | The plugin that gives `archon` its verbs for tools | layers, extension | L1 | GitHub |
+| [`@intellectual-frontiers/archon`](commons/archon) | Program | A Kanon library that orders subjects: a machine, a device, a workstation or a cloud account | layers, instances, plugins | L1 | held |
+| [`@intellectual-frontiers/archon-dialect-apt`](commons/archon-dialect-apt) | Program | The dialect of tools that installs them with apt | layers, extension | L1 | held |
+| [`@intellectual-frontiers/archon-dialect-homebrew`](commons/archon-dialect-homebrew) | Program | The dialect of tools that installs them with Homebrew | layers, extension | L1 | held |
+| [`@intellectual-frontiers/archon-dialect-mise`](commons/archon-dialect-mise) | Program | The dialect of tools that installs them with mise | layers, extension | L1 | held |
+| [`@intellectual-frontiers/archon-dialect-native-pinned`](commons/archon-dialect-native-pinned) | Program | The default dialect of tools | layers, extension | L1 | held |
+| [`@intellectual-frontiers/archon-dialect-winget`](commons/archon-dialect-winget) | Program | The dialect of tools that installs them with WinGet | layers, extension | L1 | held |
+| [`@intellectual-frontiers/archon-tool`](commons/archon-tool) | Program | The plugin that gives `archon` its verbs for tools | layers, extension | L1 | held |
 | [`@intellectual-frontiers/data`](https://www.npmjs.com/package/@intellectual-frontiers/data) | Program | Governance (what a business domain is and what must be true of its data) | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/docs`](https://www.npmjs.com/package/@intellectual-frontiers/docs) | Program | The generator of a repository's documentation site | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/ergonex`](https://www.npmjs.com/package/@intellectual-frontiers/ergonex) | Program | The one command, `ergonex` | - | L1 | GitHub, npm |
@@ -90,9 +90,9 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/integrations`](https://www.npmjs.com/package/@intellectual-frontiers/integrations) | Program | Two families on one skeleton of Kanon layers | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/integrations-github`](https://www.npmjs.com/package/@intellectual-frontiers/integrations-github) | Program | The reference connector of Integrations for the posture of one organization of a code host | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/libraries`](https://www.npmjs.com/package/@intellectual-frontiers/libraries) | Program | The tools of a repository of commons | - | L1 | GitHub, npm |
-| [`@intellectual-frontiers/package-managers`](commons/package-managers) | Program | The shared kit of the dialects that drive a package manager | layers | L1 | GitHub |
+| [`@intellectual-frontiers/package-managers`](commons/package-managers) | Program | The shared kit of the dialects that drive a package manager | layers | L1 | held |
 | [`@intellectual-frontiers/repoctl`](https://www.npmjs.com/package/@intellectual-frontiers/repoctl) | Program | The operations program of this repository | layers | L1 | GitHub, npm |
-| [`@intellectual-frontiers/toolchain`](commons/toolchain) | Program | A Kanon library of the tools a computer needs | layers | L1 | GitHub |
+| [`@intellectual-frontiers/toolchain`](commons/toolchain) | Program | A Kanon library of the tools a computer needs | layers | L1 | held |
 | [`@intellectual-frontiers/integrations-fhir`](https://www.npmjs.com/package/@intellectual-frontiers/integrations-fhir) | Standard | The FHIR plugin of Integrations | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/integrations-x12`](https://www.npmjs.com/package/@intellectual-frontiers/integrations-x12) | Standard | The X12 envelope and acknowledgement skeleton of Integrations | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/mizan`](https://www.npmjs.com/package/@intellectual-frontiers/mizan) | Standard | Mizan, the IF Spec Profile, as code | - | L1 | GitHub, npm |

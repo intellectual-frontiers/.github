@@ -12,6 +12,7 @@ export const library = {
   verify: "bun run verify",
   version: "0.1.0",
   distribution: ["github"],
+  held: "built and verified but not released: the owner publishes the archon libraries together, when the first fleet runs on them",
   exports: [".", "./governance", "./logical", "./ontology"],
   family: { host: "toolchain", role: "host" },
   summary:
