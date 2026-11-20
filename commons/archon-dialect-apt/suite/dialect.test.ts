@@ -9,6 +9,7 @@ import { parseSubjectName } from "@intellectual-frontiers/archon/governance";
 import { readPlanFile, type CommandSource } from "@intellectual-frontiers/package-managers";
 import { defineCatalog, defineTool, requirementsFor, resolveTools } from "@intellectual-frontiers/toolchain";
 import { err, ok } from "@intellectual-frontiers/core";
+import { commandOf, exactVersionOf, parseManagerId } from "@intellectual-frontiers/ontology/supply-chain/commands";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { apt, DIALECT_ID, SPEC, TOOL_DIALECT } from "../src/dialect.ts";
 
@@ -87,4 +88,17 @@ proves(["0002-apt-dialect FR-004"], "Toolchain chooses the dialect only for the 
       assert(how === "pin" ? reasons.includes("pins") : reasons.includes("hash"), reasons);
     }
   }
+});
+
+proves(["0002-apt-dialect FR-001", "0002-apt-dialect FR-003"], "against the real ontology: the way it writes a version and the status of its check agree with what the ontology states", () => {
+  const id = parseManagerId("apt");
+  assert(id.kind === "ok");
+  const exact = exactVersionOf(id.value);
+  assert(exact.kind === "ok");
+  const words = exact.value.template;
+  const joiner = SPEC.versioning.kind === "joined" ? SPEC.versioning.joiner : "?";
+  assert(words.includes(`{package}${joiner}{version}`), words.join(" "));
+  const installed = commandOf(id.value, "QueryInstalled");
+  assertEquals(installed.kind === "ok" ? installed.value.missingExitStatus : undefined, SPEC.missingExit, "the status that means missing is the ontology's, or neither states one");
+  assertEquals(String(SPEC.manager), `manager-${id.value}`);
 });

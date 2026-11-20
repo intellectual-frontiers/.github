@@ -16,6 +16,7 @@
 - **FR-005**: `observeRequirements` MUST give Archon the desired state itself for a tool installed at the version asked (or any version where none is asked), a state with the version found and `installedFrom` `manager` for a tool at another version, and nothing for a tool that is absent, cannot be asked, or whose answer holds no version.
 - **FR-006**: The program that raises the rights MUST come from the options of the dialect and be put before only the commands of a manager that needs rights; where none is given none is put.
 - **FR-007**: The program MUST run only the commands of the plan file it is given and refuse a file that is not one; `check` MUST change nothing and end with 2 where a package is missing or cannot be asked; `apply` MUST install what is missing and, where the manager can be asked, MUST leave an installed package alone, so that a second `apply` changes nothing; and a failure MUST name the tool, the step, what it saw and the one action that is next.
+- **FR-008**: `commandsFromOntology` MUST give a source of commands that reads the packaging ontology only through its reader of commands, names the manager as Toolchain does (`manager-apt` for `apt`), gives each command with its words joined by single spaces and its environment, rights, non-interactive form and whether it was tried, and gives the ontology's own reason where it states no command; it MUST hold no template of its own.
 
 ## Acceptance scenarios
 
@@ -29,9 +30,10 @@
 7. **Given** a plan file, **When** `check` runs with a package missing, installed and unaskable, **Then** it changes nothing and ends with 2; **When** `apply` runs twice, **Then** the second changes nothing, per FR-007.
 8. **Given** an install that fails and a check that answers with another status, **When** the program runs, **Then** each failure names the tool, the step and the next action, per FR-007.
 
+9. **Given** the ontology, **When** the commands of apt, Homebrew, WinGet and mise are asked, **Then** each is the ontology's, and a command it does not state is its reason, per FR-008.
+
 ## Out of scope
 
-- Reading the commands from the ontology: the source of commands is a function the dialect is given.
 - Proving idempotence on a real manager: the conformance suite of each dialect on a machine that has it.
 
 ## Edge cases

@@ -28,6 +28,7 @@
     "@intellectual-frontiers/kanon": "link:../kanon",
     "@intellectual-frontiers/libraries": "link:../libraries",
     "@intellectual-frontiers/mizan": "link:../mizan",
+    "@intellectual-frontiers/ontology": "link:../ontology",
     "@intellectual-frontiers/system": "link:../system",
     "@intellectual-frontiers/test": "link:../test",
     "@intellectual-frontiers/toolchain": "link:../toolchain",

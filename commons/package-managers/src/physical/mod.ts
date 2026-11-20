@@ -5,5 +5,6 @@
  * @module
  */
 export * from "./dialect.ts";
+export * from "./ontology.ts";
 export * from "./runner.ts";
 export { main as program, type Io } from "./bin.ts";
