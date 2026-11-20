@@ -40,7 +40,7 @@ This repository is small on purpose: the organization's public profile (`profile
   does not do; an area's typed facts (folders and what each may import, commands, rules, phases, examples) are its `about.ts`. When you change code, change its
   documentation in the same commit, in the module it is about. In `commons/docs` run `bun run verify` (the compiler, the tests, `check` on commons) before you push,
   and `bun run smoke` when the package changes; `bun main.ts build --out ../../_site` builds the
-  site, which is never committed. The root `README.md` stays a short overview of Mizan's tenets and a pointer to the site, kept by hand; `MIZAN.html` is the one self-contained strategy and implementation document of Mizan (embedded CSS, no external resource), kept by hand in step with `commons/spec-kit/`.
+  site, which is never committed. The root `README.md` is the repository's front page (what it is, its big ideas, where to go): its table of the libraries is generated between `<!-- libraries-map:begin -->` and `<!-- libraries-map:end -->` by `bun commons/libraries/src/readme.ts` (`--check` fails where it is stale; commons 0001-libraries FR-017, FR-018), so run it after a manifest or an `about.ts` summary changes, and write the rest of it as what is, with no history; `MIZAN.html` is the one self-contained strategy and implementation document of Mizan (embedded CSS, no external resource), kept by hand in step with `commons/spec-kit/`.
 - Never put a secret, a token or a person's data in this repository: it is public.
 
 Every commit's author and committer is Shahid Shah <shahid@shah.org> unless a person expressly authorizes an agent to be the author of that commit in its message; an agent's part is a
