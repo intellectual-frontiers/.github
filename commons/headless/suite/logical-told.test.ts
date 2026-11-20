@@ -47,6 +47,9 @@ proves(["0003-headless-output FR-006"], "toJson never throws and gives what JSON
   );
   const hostile = JSON.parse('{"__proto__": {"x": 1}, "a": 1}') as unknown;
   assertEquals(JSON.stringify(toJson(hostile)), '{"__proto__":{"x":1},"a":1}', "a key named __proto__ is data");
+  // the counterexample of fast-check (seed -1644160708, path 62:1:2:3:2): JSON cannot carry a negative zero, so the value is the zero its text says
+  assertEquals(toJson({ "": -0 }), { "": 0 });
+  assertEquals(Object.is(toJson(-0), 0), true);
   assertEquals(toJson(() => 1), null);
   assertEquals(toJson(Symbol("s")), null);
   assertEquals(toJson({ f: () => 1, s: Symbol("x"), u: undefined, k: 1 }), { k: 1 });

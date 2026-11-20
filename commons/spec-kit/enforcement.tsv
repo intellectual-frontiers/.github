@@ -613,3 +613,4 @@ requirement	mechanism	by	note
 0033-kanon FR-022	check	.github: bun test ./tests/	commons-kanon.test.ts: an annotation accounted for in one dialect and not the other is kanon/dropped for the other; commons/kanon/suite
 0033-kanon FR-023	check	.github: bun test ./tests/	commons-kanon.test.ts: the matrix is built and rendered as Markdown; commons/kanon/suite holds the JSON and the property test
 0033-kanon FR-024	check	.github: bun test ./tests/	commons-kanon.test.ts: the reserved names are refused to a library of no family; commons/libraries/suite/family.test.ts
+0011-documentation FR-030	check	.github: cd commons/docs && bun run verify	pending

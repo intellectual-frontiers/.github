@@ -8,6 +8,9 @@
 import { readdirSync } from "node:fs";
 import type { DocsConfig } from "./docs/config.ts";
 import { layeredLens } from "./docs/lens/layered.ts";
+import { programLens } from "./docs/lens/program.ts";
+import { ergonexProgram, type ProgramHost } from "./ergonex/src/mod.ts";
+import { describe } from "./headless/src/describe/mod.ts";
 import { allModules } from "./data/sql/cli/config.ts";
 import { describeModels } from "./data/sql/describe/mod.ts";
 import { dialect as duckdb } from "./data/sql/dialects/duckdb/mod.ts";
@@ -31,6 +34,12 @@ const dataModels = layeredLens({
     return r.value;
   },
 });
+
+/** A host that does nothing: the tree of a program is made from it without reading anything, and `describe` never runs a command. */
+const INERT_HOST: ProgramHost = { env: {}, cwd: "/", today: "2026-11-20", platform: { os: "linux", arch: "x86_64", windows: false }, places: undefined, homeFor: () => undefined, stdin: () => Promise.resolve(""), argv: [], now: () => 0 } as unknown as ProgramHost;
+
+/** The programs built on headless, documented by tier from their own descriptions: ergonex, the workspaces tool. */
+const programs = programLens({ name: "programs", source: () => describe(ergonexProgram(INERT_HOST)) });
 
 /** Commons' site: its packages, its spec kit, how its specifications are cited, and its lenses. */
 export const config: DocsConfig = {
@@ -71,7 +80,7 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/kanon/spec-kit" },
   ],
   citations: { prefix: "commons", digits: 4, text: ["erga", "archon", "stolos", "thyra"] },
-  lenses: [dataModels],
+  lenses: [dataModels, programs],
   lintRules: "commons/lint/src/rules",
   out: "_site",
 };
