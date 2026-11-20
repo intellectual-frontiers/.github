@@ -18,7 +18,12 @@ proves(["0011-documentation FR-023"], "commons' configuration resolves: its root
   assertEquals(CONFIG.home, { dir: "commons", slug: "home", about: { kind: "file", file: "commons/about.ts" } });
   assertEquals(CONFIG.packages.map((p) => [p.dir, p.slug]), [["commons/ts", "ifc-typescript"], ["commons/docs", "docs"]]);
   // a library's spec kit is named beside commons' own, so that it is published with it and never twice (0027-commons-libraries FR-009)
-  assertEquals(CONFIG.specKits, [{ layout: "commons", dir: "commons/spec-kit" }, { layout: "commons", dir: "commons/data/spec-kit" }, { layout: "commons", dir: "commons/ergonex/spec-kit" }]);
+  const kits = CONFIG.specKits.map((k) => k.dir);
+  assertEquals(kits[0], "commons/spec-kit");
+  assertEquals(new Set(kits).size, kits.length, "no kit twice");
+  const libraries = [...fs.readDirSync(path.join(ROOT, "commons"))].filter((e) => e.isDirectory && fs.existsSync(path.join(ROOT, "commons", e.name, "spec-kit", "registry.tsv"))).map((e) => `commons/${e.name}/spec-kit`);
+  assertEquals([...kits.slice(1)].sort(), libraries.sort(), "every library that has a spec kit is named, and none that has not");
+  assert(CONFIG.specKits.every((k) => k.layout === "commons"));
   assertEquals([CONFIG.citations.prefix, CONFIG.citations.digits], ["commons", 4]);
   assertEquals(CONFIG.lenses.map((l) => l.name), []);
   assertEquals(CONFIG.out, path.join(ROOT, "_site"));

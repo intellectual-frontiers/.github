@@ -33,7 +33,11 @@ proves(["0011-documentation FR-022"], "ifc-typescript.yml's git-dependency job r
   assertStringIncludes(yml, 'NODE_VERSION: "26.');
   for (const f of fs.readDirSync(path.join(ROOT, ".github/workflows"))) {
     const text = await fs.readTextFile(path.join(ROOT, ".github/workflows", f.name));
-    assert(!/gh release (create|upload)|softprops\/action-gh-release|contents: write/.test(text), `${f.name} makes a release`);
+    assert(!/gh release (create|upload)|softprops\/action-gh-release/.test(text), `${f.name} makes a release`);
+    // the write permission is for the job that makes the tag of a published version, in the workflow a library is published by, and for nothing else
+    const tag = text.indexOf("\n  tag:\n");
+    const rest = tag < 0 || !f.name.endsWith("-publish.auto.yml") ? text : text.slice(0, tag) + text.slice(tag).replace(/^\n {2}tag:\n[\s\S]*?(?=\n {2}[a-z][\w-]*:\n|$)/, "");
+    assert(!/contents: write/.test(rest), `${f.name} has a write permission that is not the tag job's`);
   }
   assert(!/git (add|commit|push)/.test(job), "the job commits nothing");
 });

@@ -53,35 +53,35 @@
 
   | Requirement of 0005-typescript-runtime | Library |
   |---|---|
-  | FR-033 (graphs of work) | core |
-  | FR-064 (objects for exact optional properties) | core |
+  | 0005-typescript-runtime FR-033 (graphs of work) | core |
+  | 0005-typescript-runtime FR-064 (objects for exact optional properties) | core |
   | 0012-ontology FR-001 to FR-007 (RDF as typed values, vocabularies, schemas, code lists, checks, writers, no reader) | rdf |
-  | FR-047 (the typed command-line parser), FR-072 (command trees); 0006-signals FR-022 (the palette), FR-025 (the terminal emulator) | terminal |
-  | FR-019 (typed errors), FR-020 (files), FR-021 (paths), FR-022 (the process), FR-023 (the terminal's state), FR-039 (one run at a time), FR-046 (scheduled jobs), FR-048 to FR-050 (more of `fs`), FR-051 (watching), FR-052 and FR-053 (programs and `selfCommand`), FR-054 (the standard streams), FR-062 (a program built into one binary), FR-071 (programs found by prefix), FR-073 (junctions); 0007-grc FR-021 (Git); 0031-install-locations FR-001 to FR-004 (the folders of a program) | system |
-  | FR-007 (semantic versions) | formats |
-  | FR-010 (archives) | formats |
-  | FR-011 (TypeScript literals) | formats |
-  | FR-012 (HTTP headers) | formats |
-  | FR-031 (JSON5) | formats |
-  | FR-032 (XML) | formats |
-  | FR-035 (TOML) | formats |
-  | FR-036 (CSV) | formats |
-  | FR-037 (media types) | formats |
-  | FR-038 (YAML) | formats |
-  | FR-041 (ASN.1 DER) | formats |
-  | FR-042 (base64) | formats |
-  | FR-043 (PNG) | formats |
-  | FR-058 (path globs) | formats |
-  | FR-059 (tar as a stream) | formats |
-  | FR-063 (typed TypeScript literals) | formats |
-  | FR-067 (version ranges) | formats |
-  | FR-008 (SHA-256) | crypto |
-  | FR-034 (SHA-512 crypt) | crypto |
-  | FR-044 (CMS) | crypto |
-  | FR-045 (in-toto and DSSE) | crypto |
-  | FR-057 (MD5) | crypto |
-  | FR-068 (AWS Signature Version 4) | crypto |
-  | FR-013 (test registration), FR-060 (only, steps), FR-065 (the); 0008-test-evidence FR-001 to FR-003 (the record of a test) | test |
+  | 0005-typescript-runtime FR-047 (the typed command-line parser), 0005-typescript-runtime FR-072 (command trees); 0006-signals FR-022 (the palette), FR-025 (the terminal emulator) | terminal |
+  | 0005-typescript-runtime FR-019 (typed errors), 0005-typescript-runtime FR-020 (files), 0005-typescript-runtime FR-021 (paths), 0005-typescript-runtime FR-022 (the process), 0005-typescript-runtime FR-023 (the terminal's state), 0005-typescript-runtime FR-039 (one run at a time), 0005-typescript-runtime FR-046 (scheduled jobs), 0005-typescript-runtime FR-048 to 0005-typescript-runtime FR-050 (more of `fs`), 0005-typescript-runtime FR-051 (watching), 0005-typescript-runtime FR-052 and 0005-typescript-runtime FR-053 (programs and `selfCommand`), 0005-typescript-runtime FR-054 (the standard streams), 0005-typescript-runtime FR-062 (a program built into one binary), 0005-typescript-runtime FR-071 (programs found by prefix), 0005-typescript-runtime FR-073 (junctions); 0007-grc FR-021 (Git); 0031-install-locations FR-001 to FR-004 (the folders of a program) | system |
+  | 0005-typescript-runtime FR-007 (semantic versions) | formats |
+  | 0005-typescript-runtime FR-010 (archives) | formats |
+  | 0005-typescript-runtime FR-011 (TypeScript literals) | formats |
+  | 0005-typescript-runtime FR-012 (HTTP headers) | formats |
+  | 0005-typescript-runtime FR-031 (JSON5) | formats |
+  | 0005-typescript-runtime FR-032 (XML) | formats |
+  | 0005-typescript-runtime FR-035 (TOML) | formats |
+  | 0005-typescript-runtime FR-036 (CSV) | formats |
+  | 0005-typescript-runtime FR-037 (media types) | formats |
+  | 0005-typescript-runtime FR-038 (YAML) | formats |
+  | 0005-typescript-runtime FR-041 (ASN.1 DER) | formats |
+  | 0005-typescript-runtime FR-042 (base64) | formats |
+  | 0005-typescript-runtime FR-043 (PNG) | formats |
+  | 0005-typescript-runtime FR-058 (path globs) | formats |
+  | 0005-typescript-runtime FR-059 (tar as a stream) | formats |
+  | 0005-typescript-runtime FR-063 (typed TypeScript literals) | formats |
+  | 0005-typescript-runtime FR-067 (version ranges) | formats |
+  | 0005-typescript-runtime FR-008 (SHA-256) | crypto |
+  | 0005-typescript-runtime FR-034 (SHA-512 crypt) | crypto |
+  | 0005-typescript-runtime FR-044 (CMS) | crypto |
+  | 0005-typescript-runtime FR-045 (in-toto and DSSE) | crypto |
+  | 0005-typescript-runtime FR-057 (MD5) | crypto |
+  | 0005-typescript-runtime FR-068 (AWS Signature Version 4) | crypto |
+  | 0005-typescript-runtime FR-013 (test registration), 0005-typescript-runtime FR-060 (only, steps), 0005-typescript-runtime FR-065 (the); 0008-test-evidence FR-001 to FR-003 (the record of a test) | test |
   | 0007-grc FR-001 to FR-020 and FR-022 (every requirement of GRC engineering but the one on running a program, which is the system's) | grc |
 
 Inversions that make the layers true: `runtime/proc` used the telemetry (`traceProcess`) and `runtime/dns` held `networkInterfaces`, which `proc` re-exported: the first would have made `system` depend on `telemetry` and the second on `net`, both above it. The map is made true by inversion: `proc.setProcessTracer` is the port the telemetry installs when its module is loaded (a program is run with nothing added where none is installed), and `networkInterfaces` and its type live in `proc`, where `dns` no longer has them. The telemetry's own `traceProcess` stays in `runtime/otel`. `test` is above `telemetry` (its registration installs a record on the telemetry's pipeline) and below `quality`: the record of a test (`kernel/test-record`) is the test's, and the run of a suite and the renderings of a record (`runtime/test-run`, `kernel/test-report`) depend on the evidence, OSCAL and signing, so they go with `quality`, which depends on `test`, not the reverse; the one thing the record took of `grc` (`roleOf`, a pattern) is held in the record, and a test of the whole keeps the two the same.

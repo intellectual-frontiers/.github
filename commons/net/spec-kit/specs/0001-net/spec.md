@@ -39,7 +39,7 @@
 
 ## Signals and the package
 
-- **FR-016**: WHEN a pipeline of Telemetry is installed, the HTTP client MUST make a `client` span for each request (`http.request.method`, `url.full` redacted, `server.address`, `http.response.status_code`) that sends `traceparent`, and `serve` a `server` span whose parent is the request's `traceparent`, as Telemetry requires of the runtime's own modules (telemetry FR-018); where none is installed they MUST make no span and send no `traceparent`; an OTLP receiver over `serve` MUST make no span of its own, so that a pipeline exporting to it does not feed itself (telemetry FR-019).
+- **FR-016**: WHEN a pipeline of Telemetry is installed, the HTTP client MUST make a `client` span for each request (`http.request.method`, `url.full` redacted, `server.address`, `http.response.status_code`) that sends `traceparent`, and `serve` a `server` span whose parent is the request's `traceparent`, as Telemetry requires of the runtime's own modules (commons 0001-telemetry FR-018); where none is installed they MUST make no span and send no `traceparent`; an OTLP receiver over `serve` MUST make no span of its own, so that a pipeline exporting to it does not feed itself (commons 0001-telemetry FR-019).
 - **FR-017**: Net MUST depend on Core, Formats, Crypto, System and Telemetry alone, MUST name `node:` builtins and no vendor's global, and MUST be published as compiled modules with their declarations as `@intellectual-frontiers/net` (commons 0032-lifting-libraries FR-005, FR-013), one entry for the package and one for each module, importable by Node 26 and by Bun from `node_modules`, with `@types/node` as a peer.
 
 ## Acceptance scenarios

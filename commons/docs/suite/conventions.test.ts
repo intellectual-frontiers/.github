@@ -46,12 +46,14 @@ proves(["0011-documentation FR-001"], "the root package's name and ./docs, TypeS
   const deps = entries(pkg, "dependencies");
   const dev = entries(pkg, "devDependencies");
   assertEquals(deps.map(([n]) => n).sort(), ["mermaid", "typescript"]);
-  assertEquals(dev.map(([n]) => n).sort(), ["@types/node"]);
-  for (const [n, v] of [...deps, ...dev]) assert(/^\d+\.\d+\.\d+(-[\w.]+)?$/.test(v), `${n} is pinned exactly`);
+  assertEquals(dev.map(([n]) => n).sort(), ["@intellectual-frontiers/core", "@intellectual-frontiers/system", "@intellectual-frontiers/test", "@types/node"]);
+  for (const [n, v] of dev) if (n.startsWith("@intellectual-frontiers/")) assertEquals(v, `link:../${n.split("/")[1]}`, `${n} is a link to its library`);
+  for (const [n, v] of [...deps, ...dev]) if (!v.startsWith("link:")) assert(/^\d+\.\d+\.\d+(-[\w.]+)?$/.test(v), `${n} is pinned exactly`);
   assert(deps.some(([n, v]) => n === "typescript" && v === "7.1.0-beta"));
-  assertEquals(entries(root, "dependencies"), deps, "the root package's dependencies are the generator's");
+  const rootDeps = new Map(entries(root, "dependencies"));
+  for (const [n, v] of deps) assertEquals(rootDeps.get(n), v, `the root package depends on the generator's ${n} at the same version`);
   const lock = read("commons/docs/bun.lock");
-  for (const [n, v] of [...deps, ...dev]) assert(lock.includes(`["${n}@${v}", "", `), `the lockfile holds ${n}@${v} and its integrity`);
+  for (const [n, v] of [...deps, ...dev]) if (!v.startsWith("link:")) assert(lock.includes(`["${n}@${v}", "", `), `the lockfile holds ${n}@${v} and its integrity`);
 });
 
 proves(["0011-documentation FR-001"], "nothing outside commons/docs imports a file of it but commons' configuration", () => {
@@ -68,6 +70,8 @@ proves(["0011-documentation FR-001"], "nothing outside commons/docs imports a fi
 });
 
 const PACKAGES = new Set(["typescript/async"]);
+/** The libraries lifted out of IFC TypeScript, which the generator imports by package name (0032-lifting-libraries FR-003). */
+const LIFTED = /^@intellectual-frontiers\/(core|system|test)$/;
 const IFC_TS = new Set(["ts/kernel/mod.ts", "ts/runtime/mod.ts", "ts/runtime/test.ts"]);
 
 proves(["0011-documentation FR-002"], "a file imports the generator, IFC TypeScript by relative path and typescript/async; a lens also the libraries' entry points", () => {
@@ -75,7 +79,7 @@ proves(["0011-documentation FR-002"], "a file imports the generator, IFC TypeScr
   for (const f of mine) {
     const fixture = f.startsWith("commons/docs/suite/fixture-repo/");
     for (const s of specifiers(read(f))) {
-      if (PACKAGES.has(s) || (fixture && s === "@intellectual-frontiers/commons/docs")) continue;
+      if (PACKAGES.has(s) || LIFTED.test(s) || (fixture && s === "@intellectual-frontiers/commons/docs")) continue;
       assert(s.startsWith("."), `${f} imports ${s}`);
       const target = path.relative(path.join(ROOT, "commons"), path.resolve(path.dirname(path.join(ROOT, f)), s)).split(path.sep).join("/");
       if (IFC_TS.has(target) && (target !== "ts/runtime/test.ts" || f.startsWith("commons/docs/suite/"))) continue;
@@ -132,5 +136,7 @@ proves(["0011-documentation FR-004"], "commons keeps no README", () => {
       const rel = `${dir}/${e.name}`;
       return e.isDirectory ? readmes(rel) : e.name.toLowerCase() === "readme.md" ? [rel] : [];
     });
-  assertEquals(readmes("commons").filter((r) => !r.includes("/tree/") && !r.includes("/fixtures/")), []);
+  // a library's own README is the page its package shows (commons/<library>/README.md); no other folder keeps one
+  const own = (r: string): boolean => /^commons\/[a-z-]+\/README\.md$/.test(r) && fs.existsSync(path.join(ROOT, r.replace(/README\.md$/, "package.json")));
+  assertEquals(readmes("commons").filter((r) => !r.includes("/tree/") && !r.includes("/fixtures/") && !own(r)), []);
 });
