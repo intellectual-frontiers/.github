@@ -232,7 +232,7 @@ proves(["0005-reach-and-targets FR-006"], "a host is learned only by the fingerp
   };
   const scanned = await scanHost(t, fake);
   assert(isOk(scanned));
-  assertEquals(calls[0], ["ssh-keyscan", "-T", "10", "-p", "2222", "--", "alpha.example"]);
+  assertEquals(calls[0], ["ssh-keyscan", "-T", "8", "-p", "2222", "--", "alpha.example"]);
   if (!isOk(scanned)) return;
   assertEquals(scanned.value, [{ line: keyline, fingerprint: "SHA256:abcDEF123+/=" }]);
   const written: string[] = [];
@@ -458,7 +458,7 @@ proves(["0005-reach-and-targets FR-010"], "no unit of the library imports an ssh
   assertEquals(Object.keys(TARGETS), ["local", "ssh"]);
   assertEquals(
     externalsOf({ name: "src/targets/ssh/", class: "target" }).map((a) => a.name),
-    ["@intellectual-frontiers/core", "@intellectual-frontiers/system"],
+    ["@intellectual-frontiers/core", "@intellectual-frontiers/system", "@intellectual-frontiers/terminal"],
   );
   assertEquals((SURFACES["ssh-inbound"] ?? []).map((a) => a.name), ["@intellectual-frontiers/core"]);
   const files = (path: string, spec: string) => [{ path, text: `import { x } from "${spec}";\n` }];

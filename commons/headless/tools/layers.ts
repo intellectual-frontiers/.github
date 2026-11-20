@@ -59,9 +59,11 @@ export const TARGETS: Readonly<Record<string, readonly Allowed[]>> = {
     { name: CORE, subpaths: [] },
     { name: SYSTEM, subpaths: "any" },
   ],
+  // the verb of first contact declares its option with the terminal's `args`, as every command does
   ssh: [
     { name: CORE, subpaths: [] },
     { name: SYSTEM, subpaths: "any" },
+    { name: TERMINAL, subpaths: ["args"] },
   ],
 };
 

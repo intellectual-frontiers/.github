@@ -1,4 +1,5 @@
 // Spec: 0005-reach-and-targets FR-001, FR-002, FR-003
+// Spec: 0007-ssh-coverage FR-001
 /**
  * Where an action may be reached from and run, as governance (commons headless 0005-reach-and-targets): a reach policy for each action (the channels it
  * may come through, whether it is read-only and idempotent, whether it needs a terminal, whom it runs as, how it is confirmed), the classes of target there
@@ -133,6 +134,11 @@ export function reachProblems(a: ActionFacts, r: ReachPolicy): readonly ReachPro
     out.push({ rule: "reach/human-only-remote", message: `${a.id} is for a person, so it may come through the local channel only` });
   }
   return out;
+}
+
+/** Whether a call may be interactive (the client may ask, a terminal may be given): only where the action's reach policy says it needs a terminal, which is explicit and never the default. */
+export function interactiveAllowed(r: ReachPolicy): boolean {
+  return r.needsTty;
 }
 
 /** An action with its reach policy, or without one. */
