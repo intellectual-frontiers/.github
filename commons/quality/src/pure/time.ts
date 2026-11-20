@@ -7,7 +7,7 @@
  */
 import { type Decoder, refine, string, err, ok, type Result } from "@intellectual-frontiers/core";
 import type { Brand } from "@intellectual-frontiers/core";
-import { type Instant, instantOf } from "@intellectual-frontiers/grc/grc";
+import { type Instant, instantOf } from "./primitives.ts";
 
 /** A UTC day, `YYYY-MM-DD`, that exists on the calendar. */
 export type Day = Brand<string, "Day">;

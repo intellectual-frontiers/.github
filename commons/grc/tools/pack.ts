@@ -1,4 +1,4 @@
-// Spec: 0001-grc-engineering FR-001
+// Spec: 0001-grc-layers FR-001
 /**
  * The package that is published (commons 0032-lifting-libraries FR-005, FR-013): `bun tools/pack.ts` compiles the sources of GRC with the TypeScript 7 compiler into modules and declarations, writes the
  * `package.json` that is published (each entry with its `types`, the source for Bun and the compiled file for the rest), inspects the package and packs it into `dist/intellectual-frontiers-grc-<version>.tgz`,

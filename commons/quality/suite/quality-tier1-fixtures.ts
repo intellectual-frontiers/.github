@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { type Instant, instantOf } from "@intellectual-frontiers/grc/grc";
+import { type Instant, instantOf } from "../src/pure/primitives.ts";
 import { DEFAULT_CADENCES, type FreshnessVerdict, freshnessOf } from "../src/pure/freshness.ts";
 import { type Evidence, gradeOfEvidence, type Judged } from "../src/pure/ladder.ts";
 import { canonicalize, type QualityRecord } from "../src/pure/record.ts";

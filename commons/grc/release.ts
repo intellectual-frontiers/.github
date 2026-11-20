@@ -6,12 +6,12 @@
 export const release = {
   slug: "grc",
   kind: "Software",
-  title: "GRC: governance, risk and compliance as code for Intellectual Frontiers Commons",
+  title: "GRC: governance, risk and compliance in layers for Intellectual Frontiers Commons",
   authors: [
     {
       name: "Intellectual Frontiers",
     },
   ],
-  version: "0.1.2",
+  version: "0.2.0",
   repository: "https://github.com/intellectual-frontiers/.github",
 };

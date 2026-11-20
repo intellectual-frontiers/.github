@@ -10,7 +10,7 @@
  *
  * @module
  */
-import { GENESIS } from "@intellectual-frontiers/grc/evidence";
+import { GENESIS } from "../pure/primitives.ts";
 import { formatAssuranceError, foldAssurance } from "../attestation/rules.ts";
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { type Sha256, sha256 } from "@intellectual-frontiers/crypto/sha256";

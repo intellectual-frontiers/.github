@@ -7,7 +7,7 @@
  *
  * @module
  */
-import { GENESIS } from "@intellectual-frontiers/grc/evidence";
+import { GENESIS } from "../src/pure/primitives.ts";
 import { makeTempDir, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { join } from "@intellectual-frontiers/system/path";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
