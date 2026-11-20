@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { ok } from "@intellectual-frontiers/commons/ts/kernel";
+import { ok } from "@intellectual-frontiers/core";
 import { vocabularies } from "@intellectual-frontiers/data/governance";
 import { carriedOf } from "@intellectual-frontiers/data/sql/logical";
 import type { Generator } from "@intellectual-frontiers/data/sql/physical";

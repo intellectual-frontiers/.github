@@ -4,7 +4,7 @@
  * @module
  */
 import { fs, proc } from "../../runtime/mod.ts";
-import { assertEquals } from "../../runtime/test.ts";
+import { assertEquals } from "@intellectual-frontiers/test";
 
 /**
  * Holds text to a committed file: the test fails where they differ, so that a change to what is emitted shows as a diff of SQL. With

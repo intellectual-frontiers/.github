@@ -6,7 +6,7 @@
  *
  * @module
  */
-import type { Brand } from "@intellectual-frontiers/commons/ts/kernel";
+import type { Brand } from "@intellectual-frontiers/core";
 import {
   type Annotation,
   type AnnotationKind,

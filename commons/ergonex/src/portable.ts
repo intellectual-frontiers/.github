@@ -14,8 +14,7 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/commons/ts/kernel";
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import type { PortableSegment, RepoPath } from "./types.ts";
 
 /** Why a text is not a portable path segment. */

@@ -12,11 +12,11 @@
  *
  * @module
  */
-import { flag, formatUsageError, helpText, parseArgs, type Parser, value } from "../kernel/args.ts";
-import { err, ok } from "../kernel/result.ts";
-import { exists, readTextFile, writeTextFile } from "../runtime/fs.ts";
-import { build, runtimeName, runtimeVersion } from "../runtime/proc.ts";
-import { stderr, stdout } from "../runtime/stdio.ts";
+import { flag, formatUsageError, helpText, parseArgs, type Parser, value } from "@intellectual-frontiers/terminal/args";
+import { err, ok } from "@intellectual-frontiers/core";
+import { exists, readTextFile, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { build, runtimeName, runtimeVersion } from "@intellectual-frontiers/system/proc";
+import { stderr, stdout } from "@intellectual-frontiers/system/stdio";
 import { appendEvents, formatLedgerHostError, readLedger } from "./host/ledger-branch.ts";
 import { authorOf, formatGatherError, gather, isAfter } from "./host/gather.ts";
 import { evaluateObjectives, indexOf, openings } from "./host/report.ts";

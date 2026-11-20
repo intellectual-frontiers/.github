@@ -10,8 +10,8 @@
  *
  * @module
  */
-import { instantOf } from "../../kernel/grc.ts";
-import { err, ok, type Result } from "../../kernel/result.ts";
+import { instantOf } from "@intellectual-frontiers/grc/grc";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { type Cadences, DEFAULT_CADENCES, freshnessOf } from "../pure/freshness.ts";
 import { buildIndex } from "../pure/index-file.ts";
 import { gradeOfEvidence, judgeRequirement, type Judged, nonconformancesFrom, summarize, superseding } from "../pure/ladder.ts";

@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { err, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, type Result } from "@intellectual-frontiers/core";
 import { checkFiles, type GeneratedFile, type GenerateError } from "../render.ts";
 import { agentsTemplate } from "./agents.ts";
 import { codeWorkspaceTemplate } from "./code-workspace.ts";

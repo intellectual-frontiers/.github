@@ -10,7 +10,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { words } from "@intellectual-frontiers/data/governance";
 import type { LogicalSchema } from "@intellectual-frontiers/data/sql/logical";
 import { type Dialect, type Naming, naming as defaultNaming, writeNames } from "@intellectual-frontiers/data/sql/physical";

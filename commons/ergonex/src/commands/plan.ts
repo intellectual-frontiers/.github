@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok } from "@intellectual-frontiers/core";
 import { flag } from "../platform/k-args.ts";
 import { applyPlan } from "../host/apply.ts";
 import { type Loaded, situate } from "../host/workspace.ts";

@@ -6,8 +6,8 @@
  *
  * @module
  */
-import { fs, path, proc } from "../commons/ts/runtime/mod.ts";
-import { assert, assertEquals, proves } from "../commons/ts/runtime/test.ts";
+import { fs, path, proc } from "../commons/system/src/mod.ts";
+import { assert, assertEquals, proves } from "../commons/test/src/test.ts";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
 const SH = path.join(ROOT, "bin", "agora-install.sh");

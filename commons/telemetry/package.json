@@ -1,0 +1,39 @@
+{
+  "name": "@intellectual-frontiers/telemetry",
+  "private": true,
+  "version": "0.1.3",
+  "description": "OpenTelemetry-native signals for TypeScript, written from the specification itself with no OpenTelemetry package: the data model, W3C Trace Context, OTLP/HTTP JSON, typed signals, a pure renderer of the console, and a host that exports, journals and shows them; the same code on Bun and Node 26.",
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "exports": {
+    ".": "./src/mod.ts",
+    "./otel": "./src/otel.ts",
+    "./otlp": "./src/otlp.ts",
+    "./signals": "./src/signals.ts",
+    "./render": "./src/render.ts",
+    "./host": "./src/host/mod.ts",
+    "./host/otel": "./src/host/otel.ts",
+    "./host/console": "./src/host/console.ts"
+  },
+  "scripts": {
+    "check": "tsc -p tsconfig.json",
+    "test": "bun test suite/",
+    "test:node": "node --test \"suite/**/*.test.ts\"",
+    "verify": "tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../ts/mizan/check.ts --root spec-kit --level L1 && bun tools/check.ts && bun test suite/ && bun tools/pack.ts --check",
+    "pack": "bun tools/pack.ts"
+  },
+  "devDependencies": {
+    "@intellectual-frontiers/commons": "link:../ts",
+    "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/formats": "link:../formats",
+    "@intellectual-frontiers/mizan": "link:../mizan",
+    "@intellectual-frontiers/system": "link:../system",
+    "@intellectual-frontiers/terminal": "link:../terminal",
+    "@intellectual-frontiers/test": "link:../test",
+    "@types/node": "26.6.6",
+    "fast-check": "4.10.2",
+    "typescript": "7.0.2"
+  }
+}

@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { assertEquals, proves } from "../runtime/test.ts";
+import { assertEquals, proves } from "@intellectual-frontiers/test";
 import { quarter, textOrNothing } from "../examples/use.ts";
 
 proves(["0011-documentation FR-005"], "the example of using the package runs by the package's own name", async () => {

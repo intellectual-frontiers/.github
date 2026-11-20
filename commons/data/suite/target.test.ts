@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, proves } from "@intellectual-frontiers/test";
 import { materialize, type Rows, sizeFindings, staleness, targetBuild, type TargetBuild, type TargetOptions } from "@intellectual-frontiers/data/sql/extensions/target";
 import { DIALECTS, openEngine } from "./engines-fixture.ts";
 import { same } from "./governance-fixture.ts";

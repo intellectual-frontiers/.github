@@ -9,10 +9,10 @@
  *
  * @module
  */
-import { GENESIS } from "../../kernel/evidence.ts";
+import { GENESIS } from "@intellectual-frontiers/grc/evidence";
 import { formatAssuranceError, foldAssurance } from "../attestation/rules.ts";
-import { err, ok, type Result } from "../../kernel/result.ts";
-import { type Sha256, sha256 } from "../../kernel/sha256.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
+import { type Sha256, sha256 } from "@intellectual-frontiers/crypto/sha256";
 import {
   emptyLedger,
   formatLedgerError,

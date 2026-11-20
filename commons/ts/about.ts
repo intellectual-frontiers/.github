@@ -13,7 +13,7 @@ export const about: About = {
   summary:
     "The TypeScript part of Intellectual Frontiers Commons. It rests only on what belongs to no vendor (TypeScript 7, ECMAScript, the web " +
     "standards and the `node:` modules that Bun and Node both implement), so the same code runs on Bun, the default runtime, and on Node 26, the backup, on Linux, macOS and " +
-    "Windows. It is OpenTelemetry-native (commons 0006-signals), carries the primitives of GRC engineering (commons 0007-grc) and records each " +
+    "Windows. It is OpenTelemetry-native (commons 0006-signals), carries the primitives of GRC engineering (the library `grc`, commons 0007-grc) and records each " +
     "test run as compliance evidence (commons 0008-test-evidence). A harness depends on this repository's root package, " +
     "`@intellectual-frontiers/commons`, by Git at a commit its lockfile holds, and imports the `.ts` sources (`@intellectual-frontiers/commons/ts/kernel`): " +
     "Bun runs them as they are, and Node 26 with the hook `--import @intellectual-frontiers/commons/ts/node`. There is no release and no build. A library of this repository (`commons/data`) links it by `link:../ts` and imports it by package name, with no hook (FR-074 to FR-077). " +
@@ -25,26 +25,21 @@ export const about: About = {
     {
       path: "kernel/",
       what: "Pure code that has no effect on the host and runs in a browser or a Worker.",
-      mayImport: ["kernel/ only"],
+      mayImport: ["kernel/", "the libraries lifted out of it (core, formats, crypto), by package name"],
     },
     {
       path: "runtime/",
-      what: "The host: files, paths, processes, the network, serving, typed errors, OpenTelemetry export, the terminal, signing, Git and GRC.",
-      mayImport: ["node: builtins", "kernel/", "runtime/"],
-    },
-    {
-      path: "runtime/test.ts",
-      what: "Test registration on `node:test`, assertions under `@std/assert`'s names, and `proves`, which records every test as evidence.",
-      mayImport: ["node: builtins"],
+      what: "What is left of the host: the reader of the files the trace check judges (`trace`) and the run of a suite of tests as evidence (`test-run`). The files, paths and processes are the library `system`, the network is `net`, the signals are `telemetry`, tests are `test` and GRC engineering, with its loaders and signers, is `grc`, each imported by package name.",
+      mayImport: ["node: builtins", "kernel/", "runtime/", "the lifted libraries, by package name"],
     },
     {
       path: "mizan/",
-      what: "Mizan, the IF Spec Profile, as code (commons 0003-mizan): the rules it adds to the format of a specification (as plugins), the command that holds them against a baseline, the generator of its ontology's Turtle, and `integrations/` (0019-mizan-integrations): the registry, the readers of Turtle, N-Triples, JSON-LD and RDF/XML, the importers of a slice of a vocabulary, of an OSCAL control catalog and of a JSON Schema, and the exporters of SHACL, JSON Schema, SKOS and SQL are built, the other importers and exporters are specified. `changes/` and `changes.ts` (0020-ifccm) are the change-control check: the commit rules, the declaration and its phase, the chain from an issue to a run and the view of capabilities by rung, with a host layer that takes a `githost/` client as an argument; `changes.ts --capability-trace` makes the same chain offline, from commit trailers, specifications, the ontology's `mz:definedBy`, `Spec:` and `Proves:` lines and quality records, with no Git host. `versions.ts` (0026-works-versioning) judges the versions of works, and `checkVersions`, `readWorks` and `./ts/mizan/versions` give a consumer its check as data and as a command. `levels.ts` (0028-conformance-levels) says which rules a conformance level, L0 to L3, runs (`holdHarness` takes a `level`, L3 where none is given), `rules.ts` reads the head of a specification (`**Subject:**`, `**Audience:**`) and reports the sections its profile asks for that it lacks (0029-subject-profiles), and `libraries.ts` (0027-commons-libraries) reads the manifest of a library of commons and makes the requirements that name it.",
+      what: "Mizan, the IF Spec Profile, as code (commons 0003-mizan): the rules it adds to the format of a specification (as plugins), the command that holds them against a baseline, the generator of its ontology's Turtle, and `integrations/` (0019-mizan-integrations): the registry, the readers of Turtle, N-Triples, JSON-LD and RDF/XML, the importers of a slice of a vocabulary, of an OSCAL control catalog and of a JSON Schema, and the exporters of SHACL, JSON Schema, SKOS and SQL are built, the other importers and exporters are specified. `changes/` and `changes.ts` (0020-ifccm) are the change-control check: the commit rules, the declaration and its phase, the chain from an issue to a run and the view of capabilities by rung, with a host layer that takes a client of the library `githost` as an argument; `changes.ts --capability-trace` makes the same chain offline, from commit trailers, specifications, the ontology's `mz:definedBy`, `Spec:` and `Proves:` lines and quality records, with no Git host. `versions.ts` (0026-works-versioning) judges the versions of works, and `checkVersions`, `readWorks` and `./ts/mizan/versions` give a consumer its check as data and as a command. `levels.ts` (0028-conformance-levels) says which rules a conformance level, L0 to L3, runs (`holdHarness` takes a `level`, L3 where none is given), `rules.ts` reads the head of a specification (`**Subject:**`, `**Audience:**`) and reports the sections its profile asks for that it lacks (0029-subject-profiles), and `libraries.ts` (0027-commons-libraries) reads the manifest of a library of commons and makes the requirements that name it.",
       mayImport: [
         "node: builtins",
         "kernel/",
         "runtime/",
-        "githost/ (its types)",
+        "githost, by package name (its types)",
         "mizan/",
         "../ontology/ (the ontology it generates from)",
       ],
@@ -55,18 +50,9 @@ export const about: About = {
       mayImport: ["node: builtins", "kernel/", "runtime/", "quality/"],
     },
     {
-      path: "githost/",
-      what: "The one interface to a Git host (commons 0020-ifccm): the types and the reading of a remote URL (pure), and the adapters for GitHub (REST v3), GitLab (REST v4, groups to any depth) and plain Git, with `clientFor`, the one place that reads a token, and only from the environment it is given.",
-      mayImport: [
-        "kernel/",
-        "runtime/ (the adapters; the types, the table of capabilities and the remote reader import the kernel alone)",
-        "githost/",
-      ],
-    },
-    {
-      path: "lint/",
-      what: "The lint plugin `bun lint --plugin` loads, and its rules.",
-      mayImport: ["node: builtins", "kernel/", "lint/", "runtime/"],
+      path: "workflows/",
+      what: "The typed model of GitHub Actions workflows and composite actions (commons 0030-generated-workflows): the model, its rendering to YAML, the workflows of this repository as values, and the copy of the schema of GitHub's workflows. It moves with the library `libraries` (commons 0032-lifting-libraries).",
+      mayImport: ["kernel/", "runtime/", "workflows/"],
     },
     {
       path: "node/",
@@ -122,10 +108,6 @@ export const about: About = {
       run: "bun run smoke",
       does: "Installs the checkout's HEAD as a Git dependency into an empty project, uses it and runs ifc test on Bun and Node 26, and checks a consumer with tsc 7.",
     },
-    {
-      run: "bun tools/ocsf-gen.ts --check",
-      does: "Checks that kernel/ocsf-types.auto.ts is what the pinned OCSF 1.9.0 schema gives (needs the network; run by hand).",
-    },
   ],
   rules: [
     {
@@ -166,8 +148,7 @@ export const about: About = {
   ],
   areas: [
     { title: "Kernel", slug: "kernel", entryPoints: ["kernel/mod.ts"] },
-    { title: "Runtime", slug: "runtime", entryPoints: ["runtime/mod.ts", "runtime/test.ts", "runtime/test-run.ts"] },
-    { title: "Lint plugin", slug: "lint", entryPoints: ["lint/plugin.ts", "lint/rule.ts", "lint/test-rule.ts"] },
+    { title: "Runtime", slug: "runtime", entryPoints: ["runtime/mod.ts", "runtime/test-run.ts"] },
   ],
   examples: [{ file: "examples/use.ts", what: "What a harness imports once it depends on commons by Git." }],
 };

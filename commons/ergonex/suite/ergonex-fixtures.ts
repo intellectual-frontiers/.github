@@ -20,8 +20,8 @@ import {
 import { dirname, fromFileUrl, join, resolve } from "../src/platform/r-path.ts";
 import { build, execPath, run, which } from "../src/platform/r-proc.ts";
 import type { Places } from "../src/places.ts";
-import { assert } from "@intellectual-frontiers/commons/ts/runtime/test";
-import { sha256 } from "@intellectual-frontiers/commons/ts/kernel";
+import { assert } from "@intellectual-frontiers/test";
+import { sha256 } from "@intellectual-frontiers/crypto";
 
 /** The package folder (`commons/ergonex`). */
 export const PACKAGE = resolve(dirname(fromFileUrl(import.meta.url)), "..");

@@ -10,7 +10,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { existsSync, readTextFile, sha256File } from "../platform/r-fs.ts";
 import { discoverPrograms } from "../platform/r-discover.ts";
 import { run, which } from "../platform/r-proc.ts";

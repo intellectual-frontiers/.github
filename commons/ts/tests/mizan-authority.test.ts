@@ -5,10 +5,10 @@
  *
  * @module
  */
-import { makeTempDirSync, mkdirSync, readTextFileSync, removeSync, writeTextFileSync } from "../runtime/fs.ts";
-import { dirname, fromFileUrl, resolve } from "../runtime/path.ts";
-import { execPath, run } from "../runtime/proc.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { makeTempDirSync, mkdirSync, readTextFileSync, removeSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { dirname, fromFileUrl, resolve } from "@intellectual-frontiers/system/path";
+import { execPath, run } from "@intellectual-frontiers/system/proc";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { readSpecTexts } from "../mizan/check.ts";
 import {
   authorityCitation,
@@ -19,7 +19,7 @@ import {
   type RulePlugin,
   rulePlugins,
   type SpecText,
-} from "../mizan/rules.ts";
+} from "@intellectual-frontiers/mizan/rules";
 
 const HERE = dirname(fromFileUrl(import.meta.url));
 const CHECK = resolve(HERE, "..", "mizan", "check.ts");

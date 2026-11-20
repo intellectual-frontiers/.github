@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { absurd } from "../../ts/kernel/mod.ts";
+import { absurd } from "@intellectual-frontiers/core";
 import type { Build } from "../build.ts";
 import { type About, type AboutEnforcer, under } from "../config.ts";
 import { specPage } from "../links.ts";

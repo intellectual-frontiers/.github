@@ -7,7 +7,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, proves } from "@intellectual-frontiers/test";
 import { noteOf, type Proof, proofsOf, staleRows } from "../tools/enforcement.ts";
 import { same } from "./governance-fixture.ts";
 

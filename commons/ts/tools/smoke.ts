@@ -11,16 +11,18 @@
  * @module
  */
 import { decodeManifest } from "./manifest.ts";
-import { existsSync, makeTempDir, mkdir, readDirSync, readTextFileSync, remove, writeTextFile } from "../runtime/fs.ts";
-import { dirname, fromFileUrl, join, resolve, toFileUrl } from "../runtime/path.ts";
-import { args, execPath, exit, run, runtimeName, which } from "../runtime/proc.ts";
+import { existsSync, makeTempDir, mkdir, readDirSync, readTextFileSync, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { dirname, fromFileUrl, join, resolve, toFileUrl } from "@intellectual-frontiers/system/path";
+import { args, execPath, exit, run, runtimeName, which } from "@intellectual-frontiers/system/proc";
 
 const NAME = "@intellectual-frontiers/commons";
 
 const PROGRAM = `
-import { ok, sha256, tar, untar, filesOf } from "${NAME}/ts/kernel";
-import { fs, proc, path } from "${NAME}/ts/runtime";
-import { assertEquals } from "${NAME}/ts/runtime/test";
+import { ok } from "@intellectual-frontiers/core";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
+import { tar, untar, filesOf } from "@intellectual-frontiers/formats/archive";
+import { fs, proc, path } from "@intellectual-frontiers/system";
+import { assertEquals } from "@intellectual-frontiers/test";
 assertEquals(ok(1), { kind: "ok", value: 1 });
 assertEquals(await sha256("abc"), "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
 const t = tar(new Map([["a/b.txt", new TextEncoder().encode("hi")]]));
@@ -36,14 +38,18 @@ console.log("ok on " + proc.runtimeName() + " " + proc.runtimeVersion());
 `;
 
 const SUITE = `
-import { assertEquals, proves } from "${NAME}/ts/runtime/test";
-import { ok } from "${NAME}/ts/kernel";
+import { assertEquals, proves } from "@intellectual-frontiers/test";
+import { ok } from "@intellectual-frontiers/core";
 proves(["0005-typescript-runtime FR-030"], "a consumer's test, run by ifc test", () => assertEquals(ok(2), { kind: "ok", value: 2 }));
 `;
 
+/** The libraries the program and the consumer import, which a consumer names too, at the versions the root package depends on (commons 0032-lifting-libraries FR-011). */
+const LIBRARIES = ["core", "crypto", "formats", "system", "test"] as const;
+
 const CONSUMER = `
-import { andThen, ok, type Result, type Sha256, sha256 } from "${NAME}/ts/kernel";
-import { errors, fs } from "${NAME}/ts/runtime";
+import { andThen, ok, type Result } from "@intellectual-frontiers/core";
+import { type Sha256, sha256 } from "@intellectual-frontiers/crypto/sha256";
+import { errors, fs } from "@intellectual-frontiers/system";
 const r: Result<number, string> = andThen(ok(1), (n: number) => ok(n + 1));
 const s: Sha256 = await sha256("abc");
 const t: string = await fs.readTextFile("x").catch((e: unknown) => (e instanceof errors.NotFound ? "" : String(e)));
@@ -75,6 +81,12 @@ const url = `git+${toFileUrl(repo).href}#${commit}`;
 
 const root = decodeManifest(readTextFileSync(join(repo, "package.json")));
 if (root.kind === "err") stop(root.error);
+/** The version of a library of commons that the root package depends on (exact, from npm): the one a consumer names. */
+function libraryVersion(name: string): string {
+  const v = root.kind === "ok" ? root.value.dependencies?.[`@intellectual-frontiers/${name}`] : undefined;
+  if (v === undefined) return stop(`the root package depends on no @intellectual-frontiers/${name}`);
+  return v;
+}
 const dir = await makeTempDir({ prefix: "ifc-ts-smoke-" });
 let failed = false;
 const fail = (message: string): void => {
@@ -84,7 +96,12 @@ const fail = (message: string): void => {
 try {
   await writeTextFile(
     join(dir, "package.json"),
-    JSON.stringify({ name: "smoke", private: true, type: "module", dependencies: { [NAME]: url } }),
+    JSON.stringify({
+      name: "smoke",
+      private: true,
+      type: "module",
+      dependencies: { [NAME]: url, ...Object.fromEntries(LIBRARIES.map((n) => [`@intellectual-frontiers/${n}`, libraryVersion(n)])) },
+    }),
   );
   await writeTextFile(join(dir, "check.ts"), PROGRAM);
   await mkdir(join(dir, "tests"));

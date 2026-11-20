@@ -6,18 +6,18 @@
  *
  * @module
  */
-import { decodeTraces } from "../../kernel/otlp.ts";
-import { sha256 } from "../../kernel/sha256.ts";
-import { toBase64 } from "../../kernel/base64.ts";
-import { readTextFile, readFile, remove, symlink, writeFile, writeTextFile, makeTempDir } from "../../runtime/fs.ts";
-import { dirname, fromFileUrl, join, resolve, toFileUrl } from "../../runtime/path.ts";
-import { build, execPath, run, runtimeName } from "../../runtime/proc.ts";
+import { decodeTraces } from "@intellectual-frontiers/telemetry/otlp";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
+import { toBase64 } from "@intellectual-frontiers/formats/base64";
+import { readTextFile, readFile, remove, symlink, writeFile, writeTextFile, makeTempDir } from "@intellectual-frontiers/system/fs";
+import { dirname, fromFileUrl, join, resolve, toFileUrl } from "@intellectual-frontiers/system/path";
+import { build, execPath, run, runtimeName } from "@intellectual-frontiers/system/proc";
 import { readLedger, REPORT_FORMATS, type Runtime, runTests, signRun, verifyRun, writeReports } from "../../runtime/test-run.ts";
-import { assert, assertEquals, assertExists, assertStringIncludes, proves } from "../../runtime/test.ts";
+import { assert, assertEquals, assertExists, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
 const FR = (n: string): `0008-test-evidence FR-${string}` => `0008-test-evidence FR-${n}`;
 const ROOT = resolve(dirname(fromFileUrl(import.meta.url)), "../..");
-const TEST_TS = toFileUrl(join(ROOT, "runtime", "test.ts")).href;
+const TEST_TS = toFileUrl(join(ROOT, "..", "test", "src", "test.ts")).href;
 const RUNTIME: Runtime = runtimeName();
 const POSIX = build.os !== "windows";
 

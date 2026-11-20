@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok } from "@intellectual-frontiers/core";
 import { words } from "@intellectual-frontiers/data/governance";
 import { columnNamed, featureId, type LogicalId, tableNamed } from "@intellectual-frontiers/data/sql/logical";
 import type { BindContext, Literal, PhysicalError, Statement, StatementSource } from "@intellectual-frontiers/data/sql/physical";

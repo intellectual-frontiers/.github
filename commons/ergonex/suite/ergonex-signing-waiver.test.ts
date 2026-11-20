@@ -7,11 +7,11 @@
  *
  * @module
  */
-import { decodeHarnessRecord, signingWaivers, type SigningWaiver } from "@intellectual-frontiers/commons/ts/mizan/changes/declaration";
+import { decodeHarnessRecord, signingWaivers, type SigningWaiver } from "@intellectual-frontiers/mizan/changes/declaration";
 import { makeTempDir, remove, writeTextFile } from "../src/platform/r-fs.ts";
 import { join } from "../src/platform/r-path.ts";
 import { run } from "../src/platform/r-proc.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { policyOf } from "../src/policy.ts";
 import { commitSignatures } from "../src/scan/host/scan.ts";
 import { readSigningWaivers } from "../src/scan/host/waivers.ts";

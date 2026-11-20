@@ -1,0 +1,10 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-test FR-001	check	.github: cd commons/test && bun test suite/	test.test.ts: the assertions and proves; the same tests pass under bun test and node --test in CI
+0001-test FR-002	check	.github: cd commons/test && bun test suite/	test.test.ts: only, steps and the three asserts
+0001-test FR-003	check	.github: cd commons/test && bun test suite/	test.test.ts: the gives back the value narrowed, and fails on null and undefined
+0001-test FR-004	check	.github: cd commons/test && bun test suite/	test.test.ts: a test's record with its outcome, values, risk and attempt
+0001-test FR-005	check	.github: cd commons/test && bun test suite/	test.test.ts: a test span and log record with the test.* conventions
+0001-test FR-006	check	.github: cd commons/test && bun test suite/	test.test.ts: the installation record, and a person's name refused
+0001-test FR-007	check	.github: cd commons/test && bun run verify	the package is built, inspected and packed by tools/pack.ts; tests/commons-packages.test.ts installs the tarball, runs every entry on Node 26 and Bun and type-checks a consumer

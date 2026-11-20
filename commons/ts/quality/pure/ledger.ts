@@ -26,8 +26,8 @@
  *
  * @module
  */
-import { absurd } from "../../kernel/absurd.ts";
 import {
+  absurd,
   boolean,
   type Decoded,
   type Decoder,
@@ -39,10 +39,12 @@ import {
   refine,
   string,
   tagged,
-} from "../../kernel/decode.ts";
-import { canonicalize as jcs, GENESIS } from "../../kernel/evidence.ts";
-import { err, ok, type Result } from "../../kernel/result.ts";
-import { type Sha256, sha256 } from "../../kernel/sha256.ts";
+  err,
+  ok,
+  type Result,
+} from "@intellectual-frontiers/core";
+import { canonicalize as jcs, GENESIS } from "@intellectual-frontiers/grc/evidence";
+import { type Sha256, sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { redactEvidence } from "./record.ts";
 import { TIER2_EVENTS } from "./tier2-events.ts";
 import { type Day, dayDecoder } from "./time.ts";

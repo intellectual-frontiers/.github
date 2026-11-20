@@ -6,7 +6,7 @@
  *
  * @module
  */
-import type { Result } from "@intellectual-frontiers/commons/ts/kernel";
+import type { Result } from "@intellectual-frontiers/core";
 import type { Manifest } from "../manifest.ts";
 import type { GeneratedFile, GenerateError } from "../render.ts";
 import type { Tool } from "../tools/catalog.ts";

@@ -9,7 +9,7 @@
  * @module
  */
 import process from "node:process";
-import { formatTomlError, parseToml } from "../ts/kernel/toml.ts";
+import { formatTomlError, parseToml } from "../formats/src/toml.ts";
 import { err, ok, pathOfUrl, PY_SPACE, readText, type Result, splitLines, writeAll } from "./core.ts";
 
 export const RULES = pathOfUrl(new URL("../generated/rules.auto.toml", import.meta.url));

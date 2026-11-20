@@ -9,7 +9,7 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/commons/ts/kernel";
+import { absurd } from "@intellectual-frontiers/core";
 import { readTextFile, realPath } from "../platform/r-fs.ts";
 import { build, run, which } from "../platform/r-proc.ts";
 import type { FsProbe, LongPaths, ToolProbe } from "../doctor.ts";

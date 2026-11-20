@@ -11,7 +11,7 @@
  *
  * @module
  */
-import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok } from "@intellectual-frontiers/core";
 import { hookFailsWhenUnableToCheck } from "../policy.ts";
 import { generated, type GeneratedFile, type GenerateError, HOOKS_FOLDER } from "../render.ts";
 import type { Template } from "./data.ts";

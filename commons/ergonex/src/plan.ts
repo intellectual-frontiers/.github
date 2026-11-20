@@ -13,9 +13,9 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/commons/ts/kernel";
-import { type Sha256, sha256 } from "@intellectual-frontiers/commons/ts/kernel";
-import type { RepoRef } from "@intellectual-frontiers/commons/ts/githost";
+import { absurd } from "@intellectual-frontiers/core";
+import { type Sha256, sha256 } from "@intellectual-frontiers/crypto";
+import type { RepoRef } from "@intellectual-frontiers/githost";
 import { foldKey } from "./portable.ts";
 import { holdsLocalWork, type RepoState } from "./state.ts";
 import type { BranchName, RepoPath, Version } from "./types.ts";

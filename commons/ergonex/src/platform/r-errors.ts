@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { errors } from "@intellectual-frontiers/commons/ts/runtime";
+import { errors } from "@intellectual-frontiers/system";
 
 /** `errors.NotFound`. */
 export const NotFound = errors.NotFound;

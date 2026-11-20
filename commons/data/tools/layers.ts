@@ -13,12 +13,15 @@
  *
  * @module
  */
-import { layers, type trace } from "@intellectual-frontiers/commons/ts/kernel";
+import * as layers from "@intellectual-frontiers/mizan/layers";
+import * as trace from "@intellectual-frontiers/mizan/trace";
 
 /** The package's own name, which a file uses to import another unit. */
 export const PACKAGE = "@intellectual-frontiers/data";
 /** The kernel's entry point, the one package the lower layers may import. */
 export const KERNEL = "@intellectual-frontiers/commons/ts/kernel";
+/** The foundation, a package of commons of its own (commons 0032-lifting-libraries): the layers hold what the kernel was held to for it. */
+export const CORE = "@intellectual-frontiers/core";
 
 /** The kinds of unit of the table (0001-layers FR-004, FR-008, 0011-sql-lifecycle FR-001). */
 export type UnitClass =
@@ -226,9 +229,9 @@ export function layerFindings(files: readonly trace.SourceFile[], exportsMap: Re
         );
         continue;
       }
-      if (STRICT.has(here.class) && specifier !== KERNEL) {
+      if (STRICT.has(here.class) && specifier !== KERNEL && specifier !== CORE) {
         out.push(
-          make("layers/external", file.path, line, `${here.name} imports ${specifier}: only the kernel and this package`, specifier),
+          make("layers/external", file.path, line, `${here.name} imports ${specifier}: only the kernel, core and this package`, specifier),
         );
       }
     }

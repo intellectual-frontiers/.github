@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, proves } from "@intellectual-frontiers/test";
 import { annotate, attribute, codeList, codeOf, concept, domain, identifier, integer, lint, vocabularies } from "@intellectual-frontiers/data/governance";
 import { placed } from "@intellectual-frontiers/data/sql/extensions/invariants";
 import { enforcementOf, where } from "@intellectual-frontiers/data/sql/physical";

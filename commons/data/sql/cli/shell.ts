@@ -11,7 +11,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { modelNames } from "./config.ts";
 import { checkIds } from "./doctor.ts";
 import { passwordOf } from "./redact.ts";

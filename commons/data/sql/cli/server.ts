@@ -8,7 +8,7 @@
  * @module
  */
 import { readFileSync } from "node:fs";
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 
 /** The two ways `arcactl` runs. */
 export type Mode = "workstation" | "server";

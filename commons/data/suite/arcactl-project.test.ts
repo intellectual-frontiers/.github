@@ -6,7 +6,7 @@
  */
 import { PGlite } from "@electric-sql/pglite";
 import { join } from "node:path";
-import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, proves } from "@intellectual-frontiers/test";
 import { main } from "@intellectual-frontiers/data/sql/cli";
 import { DIALECTS, openEngine } from "./engines-fixture.ts";
 import { same } from "./governance-fixture.ts";

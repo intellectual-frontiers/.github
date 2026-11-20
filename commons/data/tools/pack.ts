@@ -14,7 +14,7 @@
  */
 import process from "node:process";
 import { readdirSync, rmSync } from "node:fs";
-import { fs, path, proc } from "@intellectual-frontiers/commons/ts/runtime";
+import { fs, path, proc } from "@intellectual-frontiers/system";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
 const STAGE = path.join(ROOT, "dist", "package");

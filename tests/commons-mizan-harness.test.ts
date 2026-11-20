@@ -6,8 +6,8 @@
  * @module
  */
 import { main as mizanRules } from "../commons/ts/mizan/check.ts";
-import { fs, path, proc } from "../commons/ts/runtime/mod.ts";
-import { assertEquals, assertStringIncludes, proves } from "../commons/ts/runtime/test.ts";
+import { fs, path, proc } from "../commons/system/src/mod.ts";
+import { assertEquals, assertStringIncludes, proves } from "../commons/test/src/test.ts";
 import { check, message } from "../commons/tools/mizan-check.ts";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");

@@ -3,7 +3,7 @@
  *
  * @module
  */
-import { assertEquals as strictEquals } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assertEquals as strictEquals } from "@intellectual-frontiers/test";
 import {
   attribute,
   codeList,

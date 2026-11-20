@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok } from "@intellectual-frontiers/core";
 import { flag } from "../platform/k-args.ts";
 import { exists, mkdir, writeTextFile } from "../platform/r-fs.ts";
 import { GLOBAL_OPTIONS, defineCommand, type ErgonexModule } from "../modules/types.ts";

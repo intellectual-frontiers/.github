@@ -5,17 +5,17 @@
  *
  * @module
  */
-import { conformanceLevels, conformanceRequirements } from "../../ontology/mizan/mod.ts";
+import { conformanceLevels, conformanceRequirements } from "@intellectual-frontiers/ontology/mizan";
 import { run as runCheck } from "../mizan/check.ts";
-import { holdHarness } from "../mizan/harness.ts";
-import { DEFAULT_LEVEL, entailedBy, LEVELS, levelOf, levelOfRule, ruleMatches, ruleRunsAt } from "../mizan/levels.ts";
+import { holdHarness } from "@intellectual-frontiers/mizan/harness";
+import { DEFAULT_LEVEL, entailedBy, LEVELS, levelOf, levelOfRule, ruleMatches, ruleRunsAt } from "@intellectual-frontiers/mizan/levels";
 import { verifyAll } from "../mizan/libraries.ts";
-import { CHANGES_RULES } from "../mizan/changes/rules.ts";
-import { MIZAN_RULES } from "../mizan/rules.ts";
-import { VERSIONS_RULES } from "../mizan/versions/rules.ts";
-import { mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "../runtime/fs.ts";
-import { join } from "../runtime/path.ts";
-import { assert, assertEquals, proves } from "../runtime/test.ts";
+import { CHANGES_RULES } from "@intellectual-frontiers/mizan/changes/rules";
+import { MIZAN_RULES } from "@intellectual-frontiers/mizan/rules";
+import { VERSIONS_RULES } from "@intellectual-frontiers/mizan/versions/rules";
+import { mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { join } from "@intellectual-frontiers/system/path";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const SPEC = "0028-conformance-levels";
 const keys = (level: (typeof LEVELS)[number], only: "all" | "added" = "all"): readonly string[] =>

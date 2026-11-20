@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { dirsOf, type Env, type Os } from "../platform/r-dirs.ts";
 import { posix, win32 } from "../platform/r-path.ts";
 import type { Places } from "../places.ts";

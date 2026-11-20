@@ -1,46 +1,17 @@
 /**
- * The runtime of IFC TypeScript (commons 0005-typescript-runtime): the one part that touches the host, on `node:` builtins and web standards
- * alone, so the same code runs on Bun, the default runtime, and on Node 26, the backup, on Linux, macOS and Windows. Its modules have short, plain names
- * (`fs.readTextFile`, `proc.env.get`, `errors.NotFound`, `serve`); `http` is the typed HTTP client,
- * `lock` one run at a time, and `discover` finds programs by the prefix of their name, as Git finds its commands; `acme` gets certificates by
- * ACME's DNS-01 challenge (commons 0013-acme), and `trace` reads the files the kernel's trace and layers checks judge and holds
- * their findings against a baseline (commons 0015-trace). Tests import `./test.ts` on its own.
+ * The runtime of IFC TypeScript (commons 0005-typescript-runtime): what still touches the host in this package, on `node:` builtins and web standards alone, so the same code runs on Bun, the default runtime, and on Node 26, the
+ * backup, on Linux, macOS and Windows. The host's files, paths, processes, Git, locks, watching and scheduled jobs are the library `system` (`@intellectual-frontiers/system`, commons 0032-lifting-libraries), which this runtime
+ * and its tests import by package name; the network (the typed HTTP client, `serve`, `net`, `tcp`, `dns` and `acme`, which gets certificates by ACME's DNS-01 challenge, commons 0013-acme) is the library `net`
+ * (`@intellectual-frontiers/net`). The signals (the pipeline that exports them and the console that renders them) are the library `telemetry` (`@intellectual-frontiers/telemetry`, commons 0032-lifting-libraries),
+ * the governance, risk and compliance primitives, their loaders and the signers are the library `grc` (`@intellectual-frontiers/grc`, commons 0032-lifting-libraries),
+ * Tests import the library `test` (`@intellectual-frontiers/test`, commons 0032-lifting-libraries), which loads no test runner for a program that does not test.
  *
  * @example
  * ```ts
- * import { errors, fs, proc } from "./mod.ts";
+ * import { fs, proc } from "@intellectual-frontiers/system";
  * const home = proc.env.get("HOME") ?? proc.homeDir();
- * try {
- *   console.log(await fs.readTextFile(`${home}/.profile`));
- * } catch (e) {
- *   if (!(e instanceof errors.NotFound)) throw e;
- * }
+ * console.log(await fs.readTextFile(`${home}/.profile`));
  * ```
  *
  * @module
  */
-export * as acme from "./acme.ts";
-export * as compile from "./compile.ts";
-export * as dirs from "./dirs.ts";
-export * as discover from "./discover.ts";
-export * as dns from "./dns.ts";
-export * as fs from "./fs.ts";
-export * as git from "./git.ts";
-export * as grc from "./grc.ts";
-export * as http from "./http-client.ts";
-export * as lock from "./lock.ts";
-export * as net from "./net.ts";
-export * as otel from "./otel.ts";
-export * as path from "./path.ts";
-export * as proc from "./proc.ts";
-export * as sign from "./sign.ts";
-export * as jobs from "./schedule.ts";
-export * as stdio from "./stdio.ts";
-export * as tcp from "./tcp.ts";
-export * as terminal from "./console.ts";
-export * as trace from "./trace.ts";
-export * as watch from "./watch.ts";
-export * as tty from "./tty.ts";
-export { errors, mapError, RuntimeError, toError } from "./errors.ts";
-export { serve } from "./serve.ts";
-export type { NetAddr, Server, ServeHandler, ServeInfo, ServeOptions } from "./serve.ts";

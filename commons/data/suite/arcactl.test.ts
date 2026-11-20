@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, proves } from "@intellectual-frontiers/test";
 import { dialect as postgres } from "@intellectual-frontiers/data/sql/dialects/postgres";
 import { invariants } from "@intellectual-frontiers/data/sql/extensions/invariants";
 import { GENESIS } from "@intellectual-frontiers/data/sql/extensions/operations";

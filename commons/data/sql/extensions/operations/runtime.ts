@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { type Operation, words } from "@intellectual-frontiers/data/governance";
 import { sha256Hex, type Driver } from "@intellectual-frontiers/data/sql/lifecycle";
 import type { LogicalSchema } from "@intellectual-frontiers/data/sql/logical";

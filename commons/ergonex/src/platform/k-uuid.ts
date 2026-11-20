@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { uuid } from "@intellectual-frontiers/commons/ts/kernel";
+import { uuid } from "@intellectual-frontiers/crypto";
 /** `uuid.NAMESPACE_URL`. */
 export const NAMESPACE_URL = uuid.NAMESPACE_URL;
 /** `uuid.uuidUrn`. */

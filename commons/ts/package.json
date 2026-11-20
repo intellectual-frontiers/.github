@@ -1,28 +1,21 @@
 {
   "name": "@intellectual-frontiers/commons",
   "private": true,
-  "version": "0.14.0",
+  "version": "0.27.2",
   "description": "IFC TypeScript, for the development of commons/ts: the pure kernel and the host runtime of Intellectual Frontiers Commons, on web standards and node: builtins (commons 0005-typescript-runtime). A consumer depends on the repository's root package by Git, under the same name and entry points.",
   "type": "module",
   "exports": {
     "./ts/kernel": "./kernel/mod.ts",
     "./ts/runtime": "./runtime/mod.ts",
-    "./ts/runtime/test": "./runtime/test.ts",
     "./ts/runtime/test-run": "./runtime/test-run.ts",
-    "./ts/lint": "./lint/plugin.ts",
-    "./ts/lint/rule": "./lint/rule.ts",
-    "./ts/lint/test-rule": "./lint/test-rule.ts",
     "./ts/mizan": "./mizan/mod.ts",
-    "./ts/mizan/integrations": "./mizan/integrations/mod.ts",
     "./ts/mizan/changes": "./mizan/changes.ts",
-    "./ts/mizan/changes/commit-message": "./mizan/changes/commit-message.ts",
-    "./ts/mizan/changes/declaration": "./mizan/changes/declaration.ts",
     "./ts/mizan/check": "./mizan/check.ts",
     "./ts/mizan/oscal-register": "./mizan/oscal-register.ts",
     "./ts/mizan/versions": "./mizan/versions.ts",
     "./ts/quality": "./quality/mod.ts",
-    "./ts/githost": "./githost/mod.ts",
-    "./ts/githost/workflows": "./githost/workflows/mod.ts",
+    "./ts/workflows": "./workflows/mod.ts",
+    "./ts/tools/pack-library": "./tools/pack-library.ts",
     "./ts/node": "./node/register.mjs"
   },
   "engines": {
@@ -45,5 +38,20 @@
     "type": "git",
     "url": "git+https://github.com/intellectual-frontiers/.github.git",
     "directory": "commons/ts"
+  },
+  "dependencies": {
+    "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/crypto": "link:../crypto",
+    "@intellectual-frontiers/formats": "link:../formats",
+    "@intellectual-frontiers/githost": "link:../githost",
+    "@intellectual-frontiers/grc": "link:../grc",
+    "@intellectual-frontiers/mizan": "link:../mizan",
+    "@intellectual-frontiers/net": "link:../net",
+    "@intellectual-frontiers/ontology": "link:../ontology",
+    "@intellectual-frontiers/rdf": "link:../rdf",
+    "@intellectual-frontiers/system": "link:../system",
+    "@intellectual-frontiers/telemetry": "link:../telemetry",
+    "@intellectual-frontiers/terminal": "link:../terminal",
+    "@intellectual-frontiers/test": "link:../test"
   }
 }

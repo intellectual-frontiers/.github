@@ -5,19 +5,28 @@
  *
  * @module
  */
-import { makeTempDirSync, mkdirSync, readTextFileSync, removeSync, writeTextFileSync } from "../runtime/fs.ts";
-import { fromFileUrl, dirname, resolve } from "../runtime/path.ts";
-import { run, execPath } from "../runtime/proc.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
-import { earsPatternOf, mizanFindings, rulePlugins, type RulePlugin, type SpecText } from "../mizan/rules.ts";
-import { AUDITED_ON, packagingTerms } from "../../ontology/audit/mod.ts";
-import { audienceModels, bases, conformanceLevels, conformanceRequirements, MZ, MZV, mz, subjectKinds } from "../../ontology/mizan/mod.ts";
-import { en, named, iriIn, OWL, OwlOntology, ontologyOf, RDFS, triplesOf, turtle } from "../kernel/rdf.ts";
-import { exportHtmlView } from "../mizan/integrations/pure/export-html.ts";
-import { pm } from "../../ontology/supply-chain/packaging/mod.ts";
-import { basisMissing, daysBetween, termFindings } from "../mizan/standards.ts";
-import { holdHarness } from "../mizan/harness.ts";
-import { specTermFindings } from "../mizan/spec-terms.ts";
+import { makeTempDirSync, mkdirSync, readTextFileSync, removeSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { fromFileUrl, dirname, resolve } from "@intellectual-frontiers/system/path";
+import { run, execPath } from "@intellectual-frontiers/system/proc";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
+import { earsPatternOf, mizanFindings, rulePlugins, type RulePlugin, type SpecText } from "@intellectual-frontiers/mizan/rules";
+import { AUDITED_ON, packagingTerms } from "@intellectual-frontiers/ontology/audit";
+import {
+  audienceModels,
+  bases,
+  conformanceLevels,
+  conformanceRequirements,
+  MZ,
+  MZV,
+  mz,
+  subjectKinds,
+} from "@intellectual-frontiers/ontology/mizan";
+import { en, named, iriIn, OWL, OwlOntology, ontologyOf, RDFS, triplesOf, turtle } from "@intellectual-frontiers/rdf";
+import { exportHtmlView } from "@intellectual-frontiers/mizan/integrations/pure/export-html";
+import { pm } from "@intellectual-frontiers/ontology/supply-chain/packaging";
+import { basisMissing, daysBetween, termFindings } from "@intellectual-frontiers/mizan/standards";
+import { holdHarness } from "@intellectual-frontiers/mizan/harness";
+import { specTermFindings } from "@intellectual-frontiers/mizan/spec-terms";
 import { readSpecTexts } from "../mizan/check.ts";
 
 const CHECK = resolve(dirname(fromFileUrl(import.meta.url)), "..", "mizan", "check.ts");
@@ -304,7 +313,7 @@ proves(["0012-ontology FR-015"], "a code list of 5,000 entries type-checks with 
     writeTextFileSync(
       `${dir}/list.ts`,
       [
-        `import { classSchema, codes, en, namespace, one, optional, range, rdfs, skos, vocabulary } from "${root}/kernel/rdf.ts";`,
+        `import { classSchema, codes, en, namespace, one, optional, range, rdfs, skos, vocabulary } from "${root}/../rdf/src/mod.ts";`,
         `const NS = namespace("t", "https://example.org/t#");`,
         `const t = vocabulary(NS, { Code: "owl:Class" });`,
         `const CODE = { label: one(rdfs.label, range.langString), definition: optional(skos.definition, range.langString) } as const;`,

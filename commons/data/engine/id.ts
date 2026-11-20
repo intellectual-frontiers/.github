@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { type Brand, err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { type Brand, err, ok, type Result } from "@intellectual-frontiers/core";
 
 /** The identifier of an extension. */
 export type ExtensionId = Brand<string, "ExtensionId">;

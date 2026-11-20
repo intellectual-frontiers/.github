@@ -26,13 +26,23 @@
  * @module
  */
 import process from "node:process";
-import { array, type Decoder, describe, formatDecodeError, literal, object, string } from "../kernel/decode.ts";
-import { err, ok, type Result } from "../kernel/result.ts";
-import { exportedLiteral } from "../kernel/ts-literal.ts";
-import { existsSync, readDirSync, readTextFileSync, writeTextFileSync } from "../runtime/fs.ts";
-import { stdio } from "../runtime/mod.ts";
-import { spawn } from "../runtime/proc.ts";
-import { DEFAULT_LIBRARY_LEVEL, LEVELS, type LevelKey, rankOf } from "./levels.ts";
+import {
+  array,
+  type Decoder,
+  describe,
+  formatDecodeError,
+  literal,
+  object,
+  string,
+  err,
+  ok,
+  type Result,
+} from "@intellectual-frontiers/core";
+import { exportedLiteral } from "@intellectual-frontiers/formats/ts-literal";
+import { existsSync, readDirSync, readTextFileSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { stdio } from "@intellectual-frontiers/system";
+import { spawn } from "@intellectual-frontiers/system/proc";
+import { DEFAULT_LIBRARY_LEVEL, LEVELS, type LevelKey, rankOf } from "@intellectual-frontiers/mizan/levels";
 
 /** The name of a library's manifest in its folder. */
 export const LIBRARY_FILE = "library.ts";
@@ -293,9 +303,11 @@ export function generated(
   if (b === undefined)
     return err(`${LIBRARIES_SPEC} has no ${BEGIN} and ${END}, each on a line of its own, around the section "The libraries"`);
   const ids = idsFor(libraries, idsIn(spec));
-  const lines = libraries.map((l) => requirementOf(ids.get(l.name) ?? "", l));
+  // in the order of their numbers, which a library keeps for its life: a library added later is after those that were there, whatever its name
+  const byNumber = [...libraries].sort((a, b) => Number((ids.get(a.name) ?? "").slice(3)) - Number((ids.get(b.name) ?? "").slice(3)));
+  const lines = byNumber.map((l) => requirementOf(ids.get(l.name) ?? "", l));
   const newSpec = `${spec.slice(0, b.from + BEGIN.length)}\n\n${lines.join("\n")}\n\n${spec.slice(b.to)}`;
-  const rows = libraries.map((l) => rowOf(ids.get(l.name) ?? "", l));
+  const rows = byNumber.map((l) => rowOf(ids.get(l.name) ?? "", l));
   const kept = enforcement.split("\n").filter((l) => l !== "" && !new RegExp(`^${LIBRARIES_SPEC} FR-(?:[1-9]\\d{2,})\\t`).test(l));
   const last = kept.map((l, i) => (l.startsWith(`${LIBRARIES_SPEC} `) ? i : -1)).reduce((a, b) => Math.max(a, b), -1);
   const at = last < 0 ? kept.length : last + 1;

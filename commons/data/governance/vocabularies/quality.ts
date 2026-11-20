@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/commons/ts/kernel";
+import { absurd } from "@intellectual-frontiers/core";
 import { annotationKind, annotationsOf } from "../annotation.ts";
 import { elementsOf } from "../elements.ts";
 import { conceptId, attributeId } from "../id.ts";

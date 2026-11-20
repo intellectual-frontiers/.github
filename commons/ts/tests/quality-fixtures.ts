@@ -5,8 +5,8 @@
  *
  * @module
  */
-import type { JsonObject } from "../kernel/json5.ts";
-import { parseSpanId, parseTraceId, type SpanId, type TraceId } from "../kernel/otel.ts";
+import type { JsonObject } from "@intellectual-frontiers/formats/json5";
+import { parseSpanId, parseTraceId, type SpanId, type TraceId } from "@intellectual-frontiers/telemetry/otel";
 import { assembleRecord } from "../kernel/test-report.ts";
 import {
   type Installation,
@@ -18,11 +18,11 @@ import {
   testCaseLog,
   testCaseSpan,
   testId,
-} from "../kernel/test-record.ts";
-import { readTextFile, writeTextFile } from "../runtime/fs.ts";
-import { join } from "../runtime/path.ts";
-import { run, which } from "../runtime/proc.ts";
-import { assert } from "../runtime/test.ts";
+} from "@intellectual-frontiers/test/record";
+import { readTextFile, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { join } from "@intellectual-frontiers/system/path";
+import { run, which } from "@intellectual-frontiers/system/proc";
+import { assert } from "@intellectual-frontiers/test";
 
 /** Where git is, or the reason a test of it is skipped. */
 export const needsGit = which("git") === undefined ? { skip: "git is not installed" } : {};

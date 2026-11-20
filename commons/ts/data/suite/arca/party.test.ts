@@ -6,7 +6,7 @@
  */
 import type { Brand, Equal, Result } from "../../../kernel/mod.ts";
 import { expectType } from "../../../kernel/mod.ts";
-import { assert, assertEquals, assertRejects, proves } from "../../../runtime/test.ts";
+import { assert, assertEquals, assertRejects, proves } from "@intellectual-frontiers/test";
 import {
   electronicContact,
   party,

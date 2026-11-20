@@ -6,12 +6,12 @@
  *
  * @module
  */
-import { lf } from "../kernel/text.ts";
-import { VENDOR_GLOBALS } from "../lint/rules/no-vendor-api.ts";
+import { lf } from "@intellectual-frontiers/core";
+import { VENDOR_GLOBALS } from "../../lint/src/rules/no-vendor-api.ts";
 import { decodeManifest, type Manifest, PACKAGE_NAME, rootEntries } from "../tools/manifest.ts";
-import { existsSync, readDirSync, readTextFile, readTextFileSync, statSync } from "../runtime/fs.ts";
-import { dirname, fromFileUrl, join, relative, resolve, toPosix } from "../runtime/path.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { existsSync, readDirSync, readTextFile, readTextFileSync, statSync } from "@intellectual-frontiers/system/fs";
+import { dirname, fromFileUrl, join, relative, resolve, toPosix } from "@intellectual-frontiers/system/path";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
 const ROOT = resolve(dirname(fromFileUrl(import.meta.url)), "..");
 
@@ -62,11 +62,34 @@ export function codeLines(text: string): { readonly line: number; readonly text:
   return out;
 }
 
+/** The one package that code of commons may import by name: the foundation (commons 0032-lifting-libraries FR-003). */
+const CORE = "@intellectual-frontiers/core";
+/** The packages of commons that code in this folder may import by name: the libraries lifted out of it. */
+const LIFTED = new Set([
+  CORE,
+  "@intellectual-frontiers/crypto",
+  "@intellectual-frontiers/formats",
+  "@intellectual-frontiers/githost",
+  "@intellectual-frontiers/grc",
+  "@intellectual-frontiers/mizan",
+  "@intellectual-frontiers/net",
+  "@intellectual-frontiers/ontology",
+  "@intellectual-frontiers/rdf",
+  "@intellectual-frontiers/system",
+  "@intellectual-frontiers/telemetry",
+  "@intellectual-frontiers/terminal",
+  "@intellectual-frontiers/test",
+]);
+/** Whether a specifier is a lifted library or one of its entries (`@intellectual-frontiers/terminal/args`). */
+const isLifted = (s: string): boolean => [...LIFTED].some((p) => s === p || s.startsWith(`${p}/`));
+/** The host library: it touches the host, so the pure code of this folder does not import it (the kernel and the pure layers). */
+const SYSTEM = "@intellectual-frontiers/system";
+const isPureLifted = (s: string): boolean => isLifted(s) && s !== SYSTEM && !s.startsWith(`${SYSTEM}/`);
+
 const KERNEL = sources("kernel");
 const RUNTIME = sources("runtime");
 const TESTS = sources("tests");
 const TOOLS = sources("tools");
-const LINT = sources("lint");
 const MIZAN = sources("mizan");
 
 proves(
@@ -77,14 +100,10 @@ proves(
     const bad: string[] = [];
     for (const f of MIZAN) {
       for (const s of specifiers(readTextFileSync(join(ROOT, f)))) {
-        if (s.startsWith("node:")) continue;
+        if (s.startsWith("node:") || isLifted(s)) continue;
         const target = toPosix(relative(ROOT, resolve(ROOT, dirname(f), s)));
         const ok =
-          target.startsWith("mizan/") ||
-          target.startsWith("kernel/") ||
-          target.startsWith("runtime/") ||
-          target.startsWith("../ontology/") ||
-          target === "githost/types.ts";
+          target.startsWith("mizan/") || target.startsWith("kernel/") || target.startsWith("runtime/") || target.startsWith("../ontology/");
         if (!ok) bad.push(`${f}: ${s}`);
       }
     }
@@ -92,33 +111,12 @@ proves(
   },
 );
 
-proves(
-  ["0019-mizan-integrations FR-001"],
-  "the integrations module has a pure layer that imports only the kernel and itself, and a host layer",
-  () => {
-    const pure = sources("mizan/integrations/pure");
-    assert(pure.length >= 3);
-    assert(sources("mizan/integrations/host").length >= 1);
-    const bad: string[] = [];
-    for (const f of pure) {
-      for (const s of specifiers(readTextFileSync(join(ROOT, f)))) {
-        if (s.startsWith("node:")) {
-          bad.push(`${f}: ${s}`);
-          continue;
-        }
-        const target = toPosix(relative(ROOT, resolve(ROOT, dirname(f), s)));
-        if (!target.startsWith("kernel/") && !target.startsWith("mizan/integrations/pure/")) bad.push(`${f}: ${s}`);
-      }
-    }
-    assertEquals(bad, []);
-  },
-);
-
-proves(["0005-typescript-runtime FR-002"], "the kernel imports nothing outside kernel/", () => {
-  assert(KERNEL.length > 5);
+proves(["0005-typescript-runtime FR-002"], "the kernel imports nothing outside kernel/ but core, the foundation", () => {
+  assert(KERNEL.length > 1);
   const bad: string[] = [];
   for (const f of KERNEL) {
     for (const s of specifiers(readTextFileSync(join(ROOT, f)))) {
+      if (isPureLifted(s)) continue;
       const target = toPosix(relative(ROOT, resolve(ROOT, dirname(f), s)));
       if (!s.startsWith("./") || !target.startsWith("kernel/")) bad.push(`${f}: ${s}`);
     }
@@ -127,38 +125,17 @@ proves(["0005-typescript-runtime FR-002"], "the kernel imports nothing outside k
 });
 
 proves(["0005-typescript-runtime FR-003"], "the runtime imports only node: builtins, kernel/ and runtime/", () => {
-  assert(RUNTIME.length > 5);
+  assert(RUNTIME.length > 1);
   const bad: string[] = [];
   for (const f of RUNTIME) {
     for (const s of specifiers(readTextFileSync(join(ROOT, f)))) {
-      if (s.startsWith("node:")) continue;
+      if (s.startsWith("node:") || isLifted(s)) continue;
       const target = toPosix(relative(ROOT, resolve(ROOT, dirname(f), s)));
       if (!s.startsWith(".") || !(target.startsWith("kernel/") || target.startsWith("runtime/"))) bad.push(`${f}: ${s}`);
     }
   }
   assertEquals(bad, []);
 });
-
-proves(
-  ["0005-typescript-runtime FR-061", "0005-typescript-runtime FR-003"],
-  "the lint plugin imports only node: builtins, kernel/, lint/ and runtime/",
-  () => {
-    assert(LINT.length > 3);
-    const bad: string[] = [];
-    for (const f of LINT) {
-      for (const s of specifiers(
-        codeLines(readTextFileSync(join(ROOT, f)))
-          .map((l) => l.text)
-          .join("\n"),
-      )) {
-        if (s.startsWith("node:")) continue;
-        const target = toPosix(relative(ROOT, resolve(ROOT, dirname(f), s)));
-        if (!s.startsWith(".") || !["kernel/", "lint/", "runtime/"].some((p) => target.startsWith(p))) bad.push(`${f}: ${s}`);
-      }
-    }
-    assertEquals(bad, []);
-  },
-);
 
 /** The vendor globals the lint rule `no-vendor-api` refuses, as expressions that find a member of one. */
 const VENDOR_MEMBER = VENDOR_GLOBALS.map((g) => new RegExp(`\\b${g}\\s*\\.`));
@@ -181,7 +158,7 @@ proves(
   "no code uses a vendor global, a registry or a URL import; the kernel names no host global",
   () => {
     const bad: string[] = [];
-    for (const f of [...KERNEL, ...RUNTIME, ...LINT, ...TESTS, ...TOOLS]) {
+    for (const f of [...KERNEL, ...RUNTIME, ...TESTS, ...TOOLS]) {
       for (const { line, text } of codeLines(readTextFileSync(join(ROOT, f)))) {
         for (const re of VENDOR) if (re.test(text) && !f.startsWith("tests/boundaries")) bad.push(`${f}:${line}: ${text.trim()}`);
         if (f.startsWith("kernel/"))
@@ -208,7 +185,7 @@ proves(["0005-typescript-runtime FR-004"], "the checks see what they look for (n
 
 proves(["0005-typescript-runtime FR-015"], "every file begins with a JSDoc block that says @module, and every export has JSDoc", () => {
   const bad: string[] = [];
-  for (const f of [...KERNEL, ...RUNTIME, ...LINT, ...TESTS, ...TOOLS]) {
+  for (const f of [...KERNEL, ...RUNTIME, ...TESTS, ...TOOLS]) {
     const text = readTextFileSync(join(ROOT, f));
     const head = /^\/\*\*[\s\S]*?\*\//.exec(text);
     if (head === null || !head[0].includes("@module")) bad.push(`${f}: no @module block at the top`);
@@ -243,7 +220,22 @@ proves(
     assertEquals(pins.map(([k]) => k).sort(), ["@types/node", "fast-check", "typescript"]);
     for (const [name, v] of pins) assert(/^\d+\.\d+\.\d+$/.test(v), `${name} is not pinned exactly: ${v}`);
     assert(/^7\./.test(m.devDependencies["typescript"] ?? ""), "TypeScript is 7");
-    assertEquals(m.dependencies, undefined);
+    // the one run-time dependency is core, the foundation (commons 0032-lifting-libraries FR-003), linked in this repository
+    assertEquals(m.dependencies, {
+      "@intellectual-frontiers/core": "link:../core",
+      "@intellectual-frontiers/crypto": "link:../crypto",
+      "@intellectual-frontiers/formats": "link:../formats",
+      "@intellectual-frontiers/githost": "link:../githost",
+      "@intellectual-frontiers/grc": "link:../grc",
+      "@intellectual-frontiers/mizan": "link:../mizan",
+      "@intellectual-frontiers/net": "link:../net",
+      "@intellectual-frontiers/ontology": "link:../ontology",
+      "@intellectual-frontiers/rdf": "link:../rdf",
+      "@intellectual-frontiers/system": "link:../system",
+      "@intellectual-frontiers/telemetry": "link:../telemetry",
+      "@intellectual-frontiers/terminal": "link:../terminal",
+      "@intellectual-frontiers/test": "link:../test",
+    });
     const lock = text("bun.lock");
     for (const [name, v] of pins) {
       assertStringIncludes(lock, `"${name}": "${v}"`);
@@ -300,22 +292,15 @@ proves(
     assertEquals(m.exports, {
       "./ts/kernel": "./kernel/mod.ts",
       "./ts/runtime": "./runtime/mod.ts",
-      "./ts/runtime/test": "./runtime/test.ts",
       "./ts/runtime/test-run": "./runtime/test-run.ts",
-      "./ts/lint": "./lint/plugin.ts",
-      "./ts/lint/rule": "./lint/rule.ts",
-      "./ts/lint/test-rule": "./lint/test-rule.ts",
       "./ts/mizan": "./mizan/mod.ts",
-      "./ts/mizan/integrations": "./mizan/integrations/mod.ts",
       "./ts/mizan/changes": "./mizan/changes.ts",
-      "./ts/mizan/changes/commit-message": "./mizan/changes/commit-message.ts",
-      "./ts/mizan/changes/declaration": "./mizan/changes/declaration.ts",
       "./ts/mizan/check": "./mizan/check.ts",
       "./ts/mizan/oscal-register": "./mizan/oscal-register.ts",
       "./ts/mizan/versions": "./mizan/versions.ts",
       "./ts/quality": "./quality/mod.ts",
-      "./ts/githost": "./githost/mod.ts",
-      "./ts/githost/workflows": "./githost/workflows/mod.ts",
+      "./ts/workflows": "./workflows/mod.ts",
+      "./ts/tools/pack-library": "./tools/pack-library.ts",
       "./ts/node": "./node/register.mjs",
     });
     for (const target of Object.values(m.exports)) assert(existsSync(join(ROOT, target)), target);
@@ -326,12 +311,28 @@ proves(
     assert(!("version" in json), "the commit is the version: the root package has none");
     const ts = Object.fromEntries(Object.entries(root.exports).filter(([k]) => k.startsWith("./ts/")));
     assertEquals(ts, rootEntries(m));
-    assertEquals(root.exports["./ontology/mizan"], "./commons/ontology/mizan/mod.ts");
-    assert(existsSync(join(ROOT, "..", "ontology", "mizan", "mod.ts")), "the shared ontology the root exports is there");
+    assertEquals(root.exports["./ontology/mizan"], "./commons/ontology/src/mizan/mod.ts");
+    assert(existsSync(join(ROOT, "..", "ontology", "src", "mizan", "mod.ts")), "the shared ontology the root exports is there");
     assertEquals(root.bin?.["ifc"], "./commons/ts/node/ifc.mjs");
     const deps = Object.entries(root.dependencies ?? {});
     for (const [name, v] of deps) assert(/^\d+\.\d+\.\d+(-[\w.]+)?$/.test(v), `${name} is not pinned exactly: ${v}`);
-    assertEquals(root.dependencies, manifestAt("commons/docs/package.json").dependencies);
+    // the root package's run-time dependencies are docs' and core, which the kernel imports (exact, from npm)
+    assertEquals(root.dependencies, {
+      ...manifestAt("commons/docs/package.json").dependencies,
+      "@intellectual-frontiers/core": "0.1.0",
+      "@intellectual-frontiers/crypto": "0.1.0",
+      "@intellectual-frontiers/formats": "0.1.0",
+      "@intellectual-frontiers/githost": "0.1.0",
+      "@intellectual-frontiers/grc": "0.1.0",
+      "@intellectual-frontiers/mizan": "0.1.0",
+      "@intellectual-frontiers/net": "0.1.0",
+      "@intellectual-frontiers/ontology": "0.1.2",
+      "@intellectual-frontiers/rdf": "0.1.0",
+      "@intellectual-frontiers/system": "0.1.0",
+      "@intellectual-frontiers/telemetry": "0.1.0",
+      "@intellectual-frontiers/terminal": "0.1.0",
+      "@intellectual-frontiers/test": "0.1.0",
+    });
     assertEquals(root.devDependencies, {});
     const lock = readTextFileSync(join(ROOT, "..", "..", "bun.lock"));
     for (const [name, v] of deps) assertStringIncludes(lock, `["${name}@${v}"`);
@@ -353,7 +354,6 @@ proves(
     for (const f of [
       "kernel/mod.ts",
       "runtime/mod.ts",
-      "runtime/test.ts",
       "package.json",
       "bun.lock",
       "bunfig.toml",

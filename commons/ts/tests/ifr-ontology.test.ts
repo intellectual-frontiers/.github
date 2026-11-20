@@ -8,18 +8,18 @@
  */
 import { existsSync } from "node:fs";
 import process from "node:process";
-import { triplesOf, turtle, validate } from "../kernel/rdf.ts";
-import { readTextFileSync } from "../runtime/fs.ts";
-import { dirname, fromFileUrl, resolve } from "../runtime/path.ts";
-import * as proc from "../runtime/proc.ts";
-import { assert, assertEquals, proves } from "../runtime/test.ts";
+import { triplesOf, turtle, validate } from "@intellectual-frontiers/rdf";
+import { readTextFileSync } from "@intellectual-frontiers/system/fs";
+import { dirname, fromFileUrl, resolve } from "@intellectual-frontiers/system/path";
+import * as proc from "@intellectual-frontiers/system/proc";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { termRecordsOf } from "../mizan/check.ts";
 import { wanted } from "../mizan/generate-ontology.ts";
-import { authorityCitation, commonsAuthorities, mizanFindings, rulePlugins } from "../mizan/rules.ts";
-import { readSpecTexts } from "../mizan/spec-files.ts";
-import { specTermFindings } from "../mizan/spec-terms.ts";
-import { basisMissing, termFindings } from "../mizan/standards.ts";
-import { ifqs, qualityTiers } from "../../ontology/ifqs/mod.ts";
+import { authorityCitation, commonsAuthorities, mizanFindings, rulePlugins } from "@intellectual-frontiers/mizan/rules";
+import { readSpecTexts } from "@intellectual-frontiers/mizan/spec-files";
+import { specTermFindings } from "@intellectual-frontiers/mizan/spec-terms";
+import { basisMissing, termFindings } from "@intellectual-frontiers/mizan/standards";
+import { ifqs, qualityTiers } from "@intellectual-frontiers/ontology/ifqs";
 import {
   AUDITED_ON,
   CLASS_NAMES,
@@ -37,8 +37,8 @@ import {
   terms,
   versionSchemes,
   workKinds,
-} from "../../ontology/ifr/mod.ts";
-import { bases, MZ, mz } from "../../ontology/mizan/mod.ts";
+} from "@intellectual-frontiers/ontology/ifr";
+import { bases, MZ, mz } from "@intellectual-frontiers/ontology/mizan";
 
 const COMMONS = resolve(dirname(fromFileUrl(import.meta.url)), "..", "..");
 const SPEC_KIT = resolve(COMMONS, "spec-kit");

@@ -17,12 +17,12 @@
  *
  * @module
  */
-import { flag, formatUsageError, helpText, many, parseArgs, type Parser, value } from "../kernel/args.ts";
-import { err, ok, type Result } from "../kernel/result.ts";
-import { mkdir, readTextFile, writeTextFile } from "../runtime/fs.ts";
-import { join } from "../runtime/path.ts";
-import { args, exit } from "../runtime/proc.ts";
-import { stderr, stdout } from "../runtime/stdio.ts";
+import { flag, formatUsageError, helpText, many, parseArgs, type Parser, value } from "@intellectual-frontiers/terminal/args";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
+import { mkdir, readTextFile, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { join } from "@intellectual-frontiers/system/path";
+import { args, exit } from "@intellectual-frontiers/system/proc";
+import { stderr, stdout } from "@intellectual-frontiers/system/stdio";
 import { formatKeepError, gradeOfCommit, keepRun, readKeptRun, verifyBranch, formatVerifyError } from "./host/branch.ts";
 import {
   archiveCommand,

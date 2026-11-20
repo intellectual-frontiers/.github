@@ -1,29 +1,20 @@
 // Spec: 0002-workspace-model FR-005
 /**
- * The kernel's `args`, by the package name of commons (commons 0027-commons-libraries FR-004): what this library uses of it, each name as the runtime's namespace gives it.
+ * The command-line parser of the library `terminal`, by its package name (commons 0027-commons-libraries FR-004, 0032-lifting-libraries FR-003): what this library uses of it, each name once, re-exported so that
+ * the declarations of this package name the library and not the path of its sources.
  *
  * @module
  */
-import { args } from "@intellectual-frontiers/commons/ts/kernel";
-/** `args.editDistance`. */
-export const editDistance = args.editDistance;
-/** `args.flag`. */
-export const flag = args.flag;
-/** `args.formatUsageError`. */
-export const formatUsageError = args.formatUsageError;
-/** `args.helpOf`. */
-export const helpOf = args.helpOf;
-/** `args.parseArgs`. */
-export const parseArgs = args.parseArgs;
-/** `args.value`. */
-export const value = args.value;
-/** `args.Args`. */
-export type Args<S extends args.Spec> = args.Args<S>;
-/** `args.Operand`. */
-export type Operand = args.Operand;
-/** `args.Parser`. */
-export type Parser<T> = args.Parser<T>;
-/** `args.Spec`. */
-export type Spec = args.Spec;
-/** `args.SpecCheck`. */
-export type SpecCheck<S> = args.SpecCheck<S>;
+export {
+  editDistance,
+  flag,
+  formatUsageError,
+  helpOf,
+  parseArgs,
+  value,
+  type Args,
+  type Operand,
+  type Parser,
+  type Spec,
+  type SpecCheck,
+} from "@intellectual-frontiers/terminal/args";

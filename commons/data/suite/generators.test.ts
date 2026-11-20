@@ -9,8 +9,8 @@
 import { spawnSync } from "node:child_process";
 import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
-import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { err, ok } from "@intellectual-frontiers/core";
+import { assert, proves } from "@intellectual-frontiers/test";
 import { compose } from "@intellectual-frontiers/data/engine";
 import {
   annotate,

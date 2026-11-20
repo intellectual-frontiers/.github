@@ -5,8 +5,8 @@
  *
  * @module
  */
-import type { Json } from "@intellectual-frontiers/commons/ts/kernel";
-import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
+import type { Json } from "@intellectual-frontiers/formats";
+import { err, ok } from "@intellectual-frontiers/core";
 import { generated, type GeneratedFile, type GenerateError } from "../render.ts";
 import { segmentsOf } from "../portable.ts";
 import type { Template } from "./data.ts";

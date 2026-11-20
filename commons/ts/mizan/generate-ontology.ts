@@ -4,7 +4,7 @@
  *     bun commons/ts/mizan/generate-ontology.ts           write commons/generated/mizan.auto.ttl
  *     bun commons/ts/mizan/generate-ontology.ts --check   exit 1, writing nothing, where the file is not what the ontology makes
  *
- * The ontology (commons/ontology/mizan/*.ts) is the source, read as the typed values it is; the Turtle is never edited by hand. The ontology is checked first: a rule
+ * The ontology (commons/ontology/src/mizan/*.ts) is the source, read as the typed values it is; the Turtle is never edited by hand. The ontology is checked first: a rule
  * it breaks stops the run (exit 2) with every finding named.
  *
  * @module
@@ -12,7 +12,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
-import { files as auditFiles, packagingTerms } from "../../ontology/audit/mod.ts";
+import { files as auditFiles, packagingTerms } from "@intellectual-frontiers/ontology/audit";
 import {
   Authority,
   bases,
@@ -31,13 +31,13 @@ import {
   Rung,
   Standard,
   terms,
-} from "../../ontology/mizan/mod.ts";
-import * as ifccmOntology from "../../ontology/ifccm/mod.ts";
-import * as ifrOntology from "../../ontology/ifr/mod.ts";
-import * as ifqsOntology from "../../ontology/ifqs/mod.ts";
-import { formatRdfFinding, type OntologyFile, validate } from "../kernel/rdf.ts";
-import { stdio } from "../runtime/mod.ts";
-import { exportDcat } from "./integrations/pure/export-dcat.ts";
+} from "@intellectual-frontiers/ontology/mizan";
+import * as ifccmOntology from "@intellectual-frontiers/ontology/ifccm";
+import * as ifrOntology from "@intellectual-frontiers/ontology/ifr";
+import * as ifqsOntology from "@intellectual-frontiers/ontology/ifqs";
+import { formatRdfFinding, type OntologyFile, validate } from "@intellectual-frontiers/rdf";
+import { stdio } from "@intellectual-frontiers/system";
+import { exportDcat } from "@intellectual-frontiers/mizan/integrations/pure/export-dcat";
 import {
   CC0,
   digestOf as digestOfFiles,
@@ -85,7 +85,7 @@ export const MIZAN: OntologyPublication = {
     { name: "RungKind", table: "mizan_rung_kind", members: membersOf(rungKinds) },
     { name: "IntegrationDirection", table: "mizan_integration_direction", members: membersOf(integrationDirections) },
   ],
-  source: "commons/ontology/mizan/*.ts (commons 0016-ladder, 0018-standards-first, 0012-ontology FR-011)",
+  source: "commons/ontology/src/mizan/*.ts (commons 0016-ladder, 0018-standards-first, 0012-ontology FR-011)",
   run: RUN,
   shapes: { prefix: "mzsh", iri: "https://www.intellectualfrontiers.com/ontology/mizan-shapes#" },
   schemasIri: "https://www.intellectualfrontiers.com/ontology/mizan-schemas",
@@ -141,7 +141,7 @@ export const IFCCM: OntologyPublication = {
     ["GitCapability", ifccmOntology.gitCapabilities],
     ["GitManagerKind", ifccmOntology.gitManagerKinds],
   ]),
-  source: "commons/ontology/ifccm/*.ts",
+  source: "commons/ontology/src/ifccm/*.ts",
   run: RUN,
   shapes: { prefix: "ifccmsh", iri: "https://www.intellectualfrontiers.com/ontology/ifccm-shapes#" },
   schemasIri: "https://www.intellectualfrontiers.com/ontology/ifccm-schemas",
@@ -191,7 +191,7 @@ export const IFQS: OntologyPublication = {
     ["QualityTier", ifqsOntology.qualityTiers],
     ["Audience", ifqsOntology.audiences],
   ]),
-  source: "commons/ontology/ifqs/*.ts",
+  source: "commons/ontology/src/ifqs/*.ts",
   run: RUN,
   shapes: { prefix: "ifqssh", iri: "https://www.intellectualfrontiers.com/ontology/ifqs-shapes#" },
   schemasIri: "https://www.intellectualfrontiers.com/ontology/ifqs-schemas",
@@ -224,7 +224,7 @@ export const IFR: OntologyPublication = {
   terms: ifrOntology.terms,
   schemas: [ifrOntology.ReleaseTag, ifrOntology.ApprovalRecord, ifrOntology.Retention],
   lists: listsOf("ifr", Object.entries(ifrOntology.codeLists)),
-  source: "commons/ontology/ifr/*.ts",
+  source: "commons/ontology/src/ifr/*.ts",
   run: RUN,
   shapes: { prefix: "ifrsh", iri: "https://www.intellectualfrontiers.com/ontology/ifr-shapes#" },
   schemasIri: "https://www.intellectualfrontiers.com/ontology/ifr-schemas",
@@ -254,7 +254,7 @@ export async function exportsOf(auditDigest: string): Promise<ReadonlyMap<string
   }
   out.set(
     "generated/mizan-audit-packaging.auto.ttl",
-    turtleOf(auditFiles, auditDigest, "commons/ontology/audit/*.ts (commons 0018-standards-first FR-003)"),
+    turtleOf(auditFiles, auditDigest, "commons/ontology/src/audit/*.ts (commons 0018-standards-first FR-003)"),
   );
   out.set(
     "generated/mizan-catalog.auto.ttl",
@@ -307,7 +307,7 @@ export function findingsOf(of: readonly OntologyFile[]): readonly string[] {
 export function turtleOf(
   of: readonly OntologyFile[],
   digest: string,
-  source = "commons/ontology/mizan/*.ts (commons 0016-ladder, 0018-standards-first, 0012-ontology FR-011)",
+  source = "commons/ontology/src/mizan/*.ts (commons 0016-ladder, 0018-standards-first, 0012-ontology FR-011)",
 ): string {
   return turtleOfFiles(of, RUN, digest, source);
 }

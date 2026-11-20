@@ -8,7 +8,7 @@
  */
 import { chmod, existsSync, mkdir, readTextFile, writeTextFile } from "../src/platform/r-fs.ts";
 import { join } from "../src/platform/r-path.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { execPath } from "../src/platform/r-proc.ts";
 import { main } from "../src/ergonex.ts";
 import { MANIFEST_TIMEOUT_MS } from "../src/modules/external.ts";

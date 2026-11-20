@@ -5,20 +5,21 @@
  *
  * @module
  */
-import { capabilityTrace, parseIssues, traceJson, traceTable } from "../mizan/changes/capability-trace.ts";
-import { proofsOf, specLines, traceFindings, parseSpec } from "../kernel/trace.ts";
+import { capabilityTrace, parseIssues, traceJson, traceTable } from "@intellectual-frontiers/mizan/changes/capability-trace";
+import { proofsOf, specLines, traceFindings, parseSpec } from "@intellectual-frontiers/mizan/trace";
 import { run as changes } from "../mizan/changes.ts";
-import { holdHarness } from "../mizan/harness.ts";
+import { holdHarness } from "@intellectual-frontiers/mizan/harness";
 import * as mizan from "../mizan/mod.ts";
+import * as mizanLibrary from "@intellectual-frontiers/mizan";
 import { readRegisterInput, registerDocuments } from "../mizan/oscal-register.ts";
-import { definitionsOf, termDefinedByFindings } from "../mizan/spec-terms.ts";
+import { definitionsOf, termDefinedByFindings } from "@intellectual-frontiers/mizan/spec-terms";
 import { checkVersions } from "../mizan/versions.ts";
-import { decodeReleaseSource, releaseSource } from "../mizan/versions/record.ts";
-import { recordFindings } from "../mizan/versions/judge.ts";
-import { existsSync, mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "../runtime/fs.ts";
-import { dirname, join } from "../runtime/path.ts";
-import { run as spawn } from "../runtime/proc.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { decodeReleaseSource, releaseSource } from "@intellectual-frontiers/mizan/versions/record";
+import { recordFindings } from "@intellectual-frontiers/mizan/versions/judge";
+import { existsSync, mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { dirname, join } from "@intellectual-frontiers/system/path";
+import { run as spawn } from "@intellectual-frontiers/system/proc";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { needsGit } from "./quality-fixtures.ts";
 
 // ------------------------------------------------------------------------------------------------------------------------------- fixtures
@@ -328,14 +329,14 @@ proves(
     }
     assertEquals(typeof mizan.runVersions, "function");
     assertEquals(typeof mizan.checkVersions, "function");
-    assertEquals(typeof mizan.versions.readWorks, "function");
+    assertEquals(typeof mizanLibrary.versions.readWorks, "function");
     await withTempDir((dir) => {
       mkdirSync(join(dir, "lib"), { recursive: true });
       mkdirSync(join(dir, "node_modules", "x"), { recursive: true });
       writeTextFileSync(join(dir, "lib", "release.ts"), record());
       writeTextFileSync(join(dir, "node_modules", "x", "release.ts"), "skipped\n");
       assertEquals(
-        mizan.readWorks(dir).map((w) => w.path),
+        mizanLibrary.readWorks(dir).map((w) => w.path),
         ["lib/release.ts"],
       );
       return Promise.resolve();

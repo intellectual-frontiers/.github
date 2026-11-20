@@ -19,7 +19,7 @@
  */
 import type { Driver } from "@intellectual-frontiers/data/sql/lifecycle";
 import type { Dialect } from "@intellectual-frontiers/data/sql/physical";
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { compileSelect, decoderOf, TypedError } from "./compile.ts";
 import { and, type Expr, type Node, type Order, outOf, subNode, type ValueOf } from "./expr.ts";
 import { type Columns, derivedTable, type NullableColumns, type Table } from "./table.ts";

@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok } from "@intellectual-frontiers/core";
 import { join } from "../platform/r-path.ts";
 import { AREA } from "../host/workspace.ts";
 import { GLOBAL_OPTIONS, defineCommand, type ErgonexModule } from "../modules/types.ts";

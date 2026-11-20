@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import type { Repeatable, Step } from "@intellectual-frontiers/data/sql/lifecycle";
 import { type Artifact, canonical, sha256Hex } from "./deps.ts";
 import { frozenOf, pathOf, renderStep } from "./format.ts";

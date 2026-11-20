@@ -44,7 +44,7 @@ import {
   type OscalComponentDefinition,
   type OscalOptions,
   renderOscal,
-} from "../kernel/oscal.ts";
+} from "@intellectual-frontiers/grc/oscal";
 import {
   type Assessment,
   type ControlSummary,
@@ -53,14 +53,14 @@ import {
   instantOf,
   type Status,
   type SubjectRef,
-} from "../kernel/grc.ts";
-import { sha256 } from "../kernel/sha256.ts";
-import { type Cited, parseSpec, proofsOf, type SourceFile } from "../kernel/trace.ts";
-import { NAMESPACE_URL, uuidV5 } from "../kernel/uuid.ts";
-import { existsSync, mkdirSync, readDirSync, readTextFileSync, writeTextFileSync } from "../runtime/fs.ts";
-import { stdio } from "../runtime/mod.ts";
-import { readSources } from "../runtime/trace.ts";
-import { sentenceOf, type SpecText } from "./rules.ts";
+} from "@intellectual-frontiers/grc/grc";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
+import { type Cited, parseSpec, proofsOf, type SourceFile } from "@intellectual-frontiers/mizan/trace";
+import { NAMESPACE_URL, uuidV5 } from "@intellectual-frontiers/crypto/uuid";
+import { existsSync, mkdirSync, readDirSync, readTextFileSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { stdio } from "@intellectual-frontiers/system";
+import { readSources } from "@intellectual-frontiers/mizan/host/trace";
+import { sentenceOf, type SpecText } from "@intellectual-frontiers/mizan/rules";
 
 /** What the register says enforces a requirement (0003-mizan FR-005): a check, a gate, a person's review, or nothing. */
 export type Mechanism = "check" | "gate" | "review" | "none";

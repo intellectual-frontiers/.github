@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, proves } from "@intellectual-frontiers/test";
 import { bind, type Physical } from "@intellectual-frontiers/data/sql/physical";
 import { DIALECTS, type Engine, load, openEngine, refuses, structure, type Structure } from "./engines-fixture.ts";
 import { same } from "./governance-fixture.ts";

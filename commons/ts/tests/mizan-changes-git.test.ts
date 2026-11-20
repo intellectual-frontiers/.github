@@ -2,7 +2,7 @@
  * The host layer and the command of the `changes` check (commons 0020-ifccm), run on real programs: real `git` repositories in temporary folders with real commits, merges and reverts; the
  * command itself, in this process and as a program on the runtime this test runs on. The one thing that is not real is the Git host: `fakeHost` below is an in-memory fake of the HOST's
  * answers (a GitHub or GitLab account is outside the code under test, and the adapters that speak to a real one are another agent's, tested with recorded exchanges), made to the
- * `GitHostClient` interface of `githost/types.ts`; the code under test is given it as an argument, as it is in use. What needs an account is left untested here.
+ * `GitHostClient` interface of `@intellectual-frontiers/githost`; the code under test is given it as an argument, as it is in use. What needs an account is left untested here.
  *
  * @module
  */
@@ -17,17 +17,17 @@ import type {
   IssueInfo,
   RepoInfo,
   RepoRef,
-} from "../githost/types.ts";
-import { err, ok } from "../kernel/result.ts";
+} from "@intellectual-frontiers/githost/types";
+import { err, ok } from "@intellectual-frontiers/core";
 import { run as changes, RECORD_FILE } from "../mizan/changes.ts";
-import { dayOf, decodeHarnessRecord, relaxations } from "../mizan/changes/declaration.ts";
-import { declarationHistory, readRange } from "../mizan/changes/git-log.ts";
-import { commitFindings, relaxationFindings } from "../mizan/changes/rules.ts";
-import { askHost, NO_HOST_API } from "../mizan/changes/strict.ts";
-import { mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "../runtime/fs.ts";
-import { dirname, fromFileUrl, join, resolve } from "../runtime/path.ts";
-import { execPath, run, which } from "../runtime/proc.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { dayOf, decodeHarnessRecord, relaxations } from "@intellectual-frontiers/mizan/changes/declaration";
+import { declarationHistory, readRange } from "@intellectual-frontiers/mizan/changes/git-log";
+import { commitFindings, relaxationFindings } from "@intellectual-frontiers/mizan/changes/rules";
+import { askHost, NO_HOST_API } from "@intellectual-frontiers/mizan/changes/strict";
+import { mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { dirname, fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
+import { execPath, run, which } from "@intellectual-frontiers/system/proc";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
 const HERE = dirname(fromFileUrl(import.meta.url));
 const CHANGES = resolve(HERE, "..", "mizan", "changes.ts");

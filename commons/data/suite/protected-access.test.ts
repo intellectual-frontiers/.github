@@ -7,7 +7,7 @@
  * @module
  */
 import { createHash } from "node:crypto";
-import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, proves } from "@intellectual-frontiers/test";
 import { compose } from "@intellectual-frontiers/data/engine";
 import { annotate, attribute, concept, domain, identifier, integer, text, vocabularies } from "@intellectual-frontiers/data/governance";
 import { dialect as duckdb } from "@intellectual-frontiers/data/sql/dialects/duckdb";

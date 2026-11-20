@@ -5,7 +5,7 @@
  * @module
  */
 import { fs, path, proc } from "../../../runtime/mod.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "../../../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { electronicContact, party, partyDocs, partyKind, partyModel, partyReference, partyTables, person } from "../../arca/mod.ts";
 import {
   context,

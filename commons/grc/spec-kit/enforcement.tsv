@@ -1,0 +1,24 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-grc-engineering FR-001	check	.github: cd commons/grc && bun test suite/	grc.test.ts: catalogs with @ts-expect-error for an unknown control id, STRM mappings
+0001-grc-engineering FR-002	check	.github: cd commons/grc && bun test suite/	grc.test.ts: controls and packs over typed subjects, a throwing check gives error
+0001-grc-engineering FR-003	check	.github: cd commons/grc && bun test suite/	grc.test.ts: the status semilattice laws with fast-check
+0001-grc-engineering FR-004	check	.github: cd commons/grc && bun test suite/	grc.test.ts: one finding type and sections
+0001-grc-engineering FR-005	check	.github: cd commons/grc && bun test suite/	grc.test.ts: waivers refused without expiry, expired ones not applied, error and gap never accepted
+0001-grc-engineering FR-006	check	.github: cd commons/grc && bun test suite/	evidence.test.ts: JCS against RFC 8785's examples, digests
+0001-grc-engineering FR-007	check	.github: cd commons/grc && bun test suite/	evidence.test.ts: the ledger chain, every kind of tampering named
+0001-grc-engineering FR-008	check	.github: cd commons/grc && bun test suite/	evidence.test.ts: manifests verified, signature by a given function
+0001-grc-engineering FR-009	check	.github: cd commons/grc && bun test suite/	evidence.test.ts: bundles byte for byte, a file added refused
+0001-grc-engineering FR-010	check	.github: cd commons/grc && bun test suite/	assess.test.ts: coverage roll-up
+0001-grc-engineering FR-011	check	.github: cd commons/grc && bun test suite/	assess.test.ts: freshness against cadences
+0001-grc-engineering FR-012	check	.github: cd commons/grc && bun test suite/	assess.test.ts: drift between two views
+0001-grc-engineering FR-013	check	.github: cd commons/grc && bun test suite/	assess.test.ts: the change-impact gate
+0001-grc-engineering FR-014	check	.github: cd commons/grc && bun test suite/	assess.test.ts: the risk register and NIST SP 800-30's matrix
+0001-grc-engineering FR-015	check	.github: cd commons/grc && bun test suite/	assess.test.ts: the requirement trace
+0001-grc-engineering FR-016	check	.github: cd commons/grc && bun test suite/	compliance-formats.test.ts: OCSF 1.9.0 compliance and vulnerability findings, device, user and cloud resources inventories
+0001-grc-engineering FR-017	check	.github: cd commons/grc && bun test suite/	compliance-formats.test.ts and uuid.test.ts of crypto: OSCAL 1.2.3 documents, UUIDv5 against RFC 9562's example, determinism
+0001-grc-engineering FR-018	check	.github: cd commons/grc && bun test suite/	compliance-formats.test.ts: CycloneDX declarations and in-toto statements
+0001-grc-engineering FR-019	check	.github: cd commons/grc && bun test suite/	host-grc-signals.test.ts: a pack's run as spans and OCSF log records, the same result as the kernel's run
+0001-grc-engineering FR-020	check	.github: cd commons/grc && bun test suite/	host-sign.test.ts: ssh-keygen -Y sign and verify (where ssh-keygen is), Web Crypto DSSE
+0001-grc-engineering FR-021	check	.github: cd commons/grc && bun test suite/	host-grc.test.ts: loaders from TOML, YAML, JSON and JSON5, errors naming file and path

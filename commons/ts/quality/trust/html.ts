@@ -10,7 +10,7 @@
  *
  * @module
  */
-import { absurd } from "../../kernel/absurd.ts";
+import { absurd } from "@intellectual-frontiers/core";
 import { showGrade } from "../pure/names.ts";
 import { showStrength } from "../attestation/mutation.ts";
 import type { TrustCapa, TrustFailure, TrustNonconformance, TrustView } from "./view.ts";

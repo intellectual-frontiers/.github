@@ -8,7 +8,7 @@
  *
  * @module
  */
-import { fs, path } from "../../ts/runtime/mod.ts";
+import { fs, path } from "@intellectual-frontiers/system";
 import type { Finding } from "../check.ts";
 import { type SpecKitSource, under } from "../config.ts";
 

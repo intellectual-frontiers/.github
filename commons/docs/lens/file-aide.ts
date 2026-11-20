@@ -7,7 +7,7 @@
  * @module
  */
 import type { AnySegment, Codec, Entry } from "../../ts/data/file-aide/mod.ts";
-import { absurd } from "../../ts/kernel/mod.ts";
+import { absurd } from "@intellectual-frontiers/core";
 import { type Area, type AreaApi, areaPage, type Block, type Build, firstSentence, type Inline, type Lens, moduleComment, slugOf, type TreeNode, under } from "../mod.ts";
 
 /** An entry of a layout, by its export name. */

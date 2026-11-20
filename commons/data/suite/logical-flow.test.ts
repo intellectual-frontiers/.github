@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, proves } from "@intellectual-frontiers/test";
 import { annotate, annotationKind, elementsOf, vocabularies } from "@intellectual-frontiers/data/governance";
 import { carriedOf, normalizedProjection, projectDomain } from "@intellectual-frontiers/data/sql/logical";
 import { same } from "./governance-fixture.ts";

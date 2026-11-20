@@ -1,0 +1,23 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-formats FR-001	check	.github: cd commons/formats && bun test suite/	formats.test.ts: round trips with JSON and with the writer, the specification's examples, __proto__, refusals with line and column
+0001-formats FR-002	check	.github: cd commons/formats && bun test suite/	data.test.ts: random values written and read back, a front matter with every construct, failsafe, every refusal with its place and reason
+0001-formats FR-003	check	.github: cd commons/formats && bun test suite/	data.test.ts: random tables written and read back, TOML 1.0's examples, every rule broken and named with its place
+0001-formats FR-004	check	.github: cd commons/formats && bun test suite/	formats.test.ts: random trees written and read back, entities, CDATA, prefixes, the finders, refusals with line and column, no entity expansion
+0001-formats FR-005	check	.github: cd commons/formats && bun test suite/	data.test.ts: random records written and read back with each separator and line ending, RFC 4180's cases, refusals
+0001-formats FR-006	check	.github: cd commons/formats && bun test suite/	ts-literal.test.ts: literals written and read back, keys, comments, refusals
+0001-formats FR-007	check	.github: cd commons/formats && bun test suite/	ts-literal.test.ts: tsLiteral takes an interface with no index signature, refuses a Date, a function, undefined in an array (type-level, with negative controls)
+0001-formats FR-008	check	.github: cd commons/formats && bun test suite/	der.test.ts: RFC 4648's vectors in both alphabets, random bytes read back, malformed text refused
+0001-formats FR-009	check	.github: cd commons/formats && bun test suite/	der.test.ts: X.690's encodings, random integers, OIDs and structures read back, every malformed input named at its byte
+0001-formats FR-010	check	.github: cd commons/formats && bun test suite/	archive.test.ts: round trips of tar, zip and gzip, fixed bytes, unsafe and damaged archives, deflated zip read and written, pax and GNU names
+0001-formats FR-011	check	.github: cd commons/formats && bun test suite/	archive.test.ts: untarStream equals untar, damaged headers refused
+0001-formats FR-012	check	.github: cd commons/formats && bun test suite/	png.test.ts: random pictures written and read back, hand-built PNGs of every filter, colour type and depth with tRNS, every corrupt and hostile file refused by its kind, resize and composite laws, ICO round trips
+0001-formats FR-013	check	.github: cd commons/formats && bun test suite/	hex.test.ts: toHex and fromHex round trip as a property, an odd length and a non-digit refused
+0001-formats FR-014	check	.github: cd commons/formats && bun test suite/	cbor.test.ts: RFC 8949 Appendix A's examples, the deterministic encoding, every malformed input at its byte
+0001-formats FR-015	check	.github: cd commons/formats && bun test suite/	semver.test.ts: semver.org's example order, round trip, order laws, bumps, dotted versions
+0001-formats FR-016	check	.github: cd commons/formats && bun test suite/	semver.test.ts: ranges against npm's documented desugaring and laws (caret, tilde, x-range, hyphen, union), pre-releases
+0001-formats FR-017	check	.github: cd commons/formats && bun test suite/	glob.test.ts: globs against @std/path's cases; expandGlob
+0001-formats FR-018	check	.github: cd commons/formats && bun test suite/	data.test.ts: the types and charsets of paths and extensions, unknown extensions
+0001-formats FR-019	check	.github: cd commons/formats && bun test suite/	http.test.ts: Link headers, Retry-After in both forms, safe methods
+0001-formats FR-020	check	.github: cd commons/formats && bun run verify	the package is built, inspected and packed by tools/pack.ts; tests/commons-packages.test.ts installs the tarball and runs it on Node 26 and Bun and type-checks a consumer of every entry

@@ -1,0 +1,11 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-rdf FR-001	check	.github: cd commons/rdf && bun test suite/	rdf.test.ts: IRIs parsed or refused, namespaces, literals and their tags, triples and quads; type-level tests that an individual of one class is not another's
+0001-rdf FR-002	check	.github: cd commons/rdf && bun test suite/	rdf.test.ts: the eight vocabularies give the IRIs of their specifications, and a vocabulary is made from local names
+0001-rdf FR-003	check	.github: cd commons/rdf && bun test suite/	rdf.test.ts: an individual's values typed from its schema, its triples in the schema's order, and type-level tests of a missing field, a wrong range and a wrong class
+0001-rdf FR-004	check	.github: cd commons/rdf && bun test suite/	rdf.test.ts: the OWL schemas, a code list and its union, a SKOS scheme and its notations
+0001-rdf FR-005	check	.github: cd commons/rdf && bun test suite/	rdf.test.ts: a non-integer, a word not of its list, a subject stated twice and a bad namespace are named
+0001-rdf FR-006	check	.github: cd commons/rdf && bun test suite/	rdf.test.ts: the writers' output for known statements, escapes, and the same bytes for random orders of the same statements (fast-check)
+0001-rdf FR-007	check	.github: cd commons/rdf && bun test suite/	rdf.test.ts: the package exports no reader
+0001-rdf FR-008	check	.github: cd commons/rdf && bun run verify	the package is built, inspected and packed by tools/pack.ts; tests/commons-packages.test.ts installs the tarball and runs it on Node 26 and Bun and type-checks a consumer

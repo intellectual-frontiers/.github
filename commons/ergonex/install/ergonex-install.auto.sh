@@ -7,14 +7,14 @@
 #
 #   curl -fsSL <this file's address> | sh
 #
-# ERGONEX_RUNTIME=node uses Node 26 instead of Bun. ERGONEX_VERSION=<version> installs another version of ergonex than 0.2.7. Anything after `--` is
+# ERGONEX_RUNTIME=node uses Node 26 instead of Bun. ERGONEX_VERSION=<version> installs another version of ergonex than 0.3.8. Anything after `--` is
 # given to `ergonex init`.
 set -eu
 
 say() { printf '%s\n' "$*"; }
 stop() { printf 'ergonex install: %s\n' "$1" >&2; if [ -n "${2:-}" ]; then printf '  %s\n' "$2" >&2; fi; exit 1; }
 
-version="${ERGONEX_VERSION:-0.2.7}"
+version="${ERGONEX_VERSION:-0.3.8}"
 runtime="${ERGONEX_RUNTIME:-bun}"
 
 case "$runtime" in

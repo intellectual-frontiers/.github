@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, proves } from "@intellectual-frontiers/test";
 import { codeList } from "@intellectual-frontiers/data/governance";
 import { enumOf, enumType, extension, objectsExtension, objectsSource, pgDomain, schema, sequence, statementOf } from "@intellectual-frontiers/data/sql/extensions/objects";
 import { bind, type BindOptions, type Dialect } from "@intellectual-frontiers/data/sql/physical";

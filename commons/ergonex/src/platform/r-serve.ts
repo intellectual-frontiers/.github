@@ -4,5 +4,5 @@
  *
  * @module
  */
-export { serve } from "@intellectual-frontiers/commons/ts/runtime";
-export type { Server } from "@intellectual-frontiers/commons/ts/runtime";
+export { serve } from "@intellectual-frontiers/net";
+export type { Server } from "@intellectual-frontiers/net";

@@ -9,7 +9,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, proves } from "@intellectual-frontiers/test";
 import { canMove, checkIssueMoves, checkIssueSet, type Issue, issue, type IssueSet, issueSet, type IssueSpec, liveIssues, MOVES, STATUS_KINDS } from "@intellectual-frontiers/data/governance";
 import { discover, folderFindings } from "../tools/issues.ts";
 import { same } from "./governance-fixture.ts";

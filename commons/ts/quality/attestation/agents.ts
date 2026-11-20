@@ -12,7 +12,7 @@
  *
  * @module
  */
-import { absurd } from "../../kernel/absurd.ts";
+import { absurd } from "@intellectual-frontiers/core";
 import type { LedgerEvent } from "../pure/ledger.ts";
 import { type Assurance, recordId } from "./rules.ts";
 

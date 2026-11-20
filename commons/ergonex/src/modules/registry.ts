@@ -9,10 +9,8 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/commons/ts/kernel";
-import { array, formatDecodeError, json, object, string } from "@intellectual-frontiers/commons/ts/kernel";
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
-import { type Sha256, sha256Of } from "@intellectual-frontiers/commons/ts/kernel";
+import { absurd, array, formatDecodeError, json, object, string, err, ok, type Result } from "@intellectual-frontiers/core";
+import { type Sha256, sha256Of } from "@intellectual-frontiers/crypto";
 import type { Finding } from "../findings.ts";
 import { moduleName } from "./name.ts";
 import { type ModuleSource, MODULE_SOURCES, precedenceOf } from "./types.ts";

@@ -6,14 +6,14 @@
  *
  * @module
  */
-import { decodeLogs } from "../kernel/otlp.ts";
-import { GENESIS } from "../kernel/evidence.ts";
-import { sha256 } from "../kernel/sha256.ts";
-import { OUTCOMES } from "../kernel/test-record.ts";
-import { readTextFileSync } from "../runtime/fs.ts";
-import { dirname, fromFileUrl, join, relative, resolve, toPosix } from "../runtime/path.ts";
-import { assert, assertEquals, assertStringIncludes, proves, recorded, test } from "../runtime/test.ts";
-import { evidenceGrades, testOutcomes } from "../../ontology/ifqs/mod.ts";
+import { decodeLogs } from "@intellectual-frontiers/telemetry/otlp";
+import { GENESIS } from "@intellectual-frontiers/grc/evidence";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
+import { OUTCOMES } from "@intellectual-frontiers/test/record";
+import { readTextFileSync } from "@intellectual-frontiers/system/fs";
+import { dirname, fromFileUrl, join, relative, resolve, toPosix } from "@intellectual-frontiers/system/path";
+import { assert, assertEquals, assertStringIncludes, proves, recorded, test } from "@intellectual-frontiers/test";
+import { evidenceGrades, testOutcomes } from "@intellectual-frontiers/ontology/ifqs";
 import { GRADES, QUALITY_OUTCOMES, CHARACTERISTICS, DOCUMENTS, ATTR, gradeRank, higherGrade, showGrade } from "../quality/pure/names.ts";
 import { canonicalize, checkRun, qualityCounts, readQuality } from "../quality/pure/record.ts";
 import {
@@ -326,7 +326,7 @@ test("the quality folder's pure layer imports only the kernel and itself, and it
   assertEquals(bad, []);
 });
 
-import { readDirSync } from "../runtime/fs.ts";
+import { readDirSync } from "@intellectual-frontiers/system/fs";
 function readDirNames(dir: string): string[] {
   return readDirSync(dir).map((e) => e.name);
 }

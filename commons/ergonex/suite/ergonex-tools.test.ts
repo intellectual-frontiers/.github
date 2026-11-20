@@ -12,7 +12,7 @@ import { readFile, readTextFile, writeTextFile, exists, walkFiles, makeTempDir, 
 import { liveTransport, recordedTransport } from "../src/platform/r-http-client.ts";
 import { join } from "../src/platform/r-path.ts";
 import { build, run, which } from "../src/platform/r-proc.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { decodeCatalog, artifactFor, installDirOf, urlProblem, type ToolCatalog, type ToolOs } from "../src/tools/catalog.ts";
 import { installTool, installedTools, toolDir, verifyTool } from "../src/tools/host/install.ts";
 import { probeAll, probeTool } from "../src/tools/host/probe.ts";

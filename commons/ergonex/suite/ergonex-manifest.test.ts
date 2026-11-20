@@ -6,7 +6,7 @@
  * @module
  */
 import { decodeManifest, issueFinding, type ManifestIssue } from "../src/manifest.ts";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const issues = (input: unknown): readonly ManifestIssue[] => {
   const r = decodeManifest(input);

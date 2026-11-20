@@ -9,7 +9,7 @@
 import { mkdir, withTempDir, writeTextFile } from "../src/platform/r-fs.ts";
 import { join } from "../src/platform/r-path.ts";
 import { build, run, which } from "../src/platform/r-proc.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { BEGIN, describeBlockError, END, installBlock, removeBlock } from "../src/shell/block.ts";
 import { createCommand, rcFileFor, SHELLS, snippetFor, type Completions, type Shell } from "../src/shell/snippet.ts";
 

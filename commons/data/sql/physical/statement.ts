@@ -6,7 +6,7 @@
  *
  * @module
  */
-import type { Result } from "@intellectual-frontiers/commons/ts/kernel";
+import type { Result } from "@intellectual-frontiers/core";
 import { type Composition, point } from "@intellectual-frontiers/data/engine";
 import type { LogicalId, LogicalSchema, Table } from "@intellectual-frontiers/data/sql/logical";
 import type { Dialect } from "./dialect.ts";

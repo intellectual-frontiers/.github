@@ -7,11 +7,11 @@
  * @module
  */
 import fc from "fast-check";
-import { signStatement } from "../../kernel/dsse.ts";
-import { appendEntry, type LedgerEntry } from "../../kernel/evidence.ts";
-import { type Instant, instantOf } from "../../kernel/grc.ts";
-import { parseSpanId, parseTraceId, type SpanId, type TraceId } from "../../kernel/otel.ts";
-import { sha256 } from "../../kernel/sha256.ts";
+import { signStatement } from "@intellectual-frontiers/crypto/dsse";
+import { appendEntry, type LedgerEntry } from "@intellectual-frontiers/grc/evidence";
+import { type Instant, instantOf } from "@intellectual-frontiers/grc/grc";
+import { parseSpanId, parseTraceId, type SpanId, type TraceId } from "@intellectual-frontiers/telemetry/otel";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import {
   assembleRecord,
   completionHtml,
@@ -51,9 +51,9 @@ import {
   testCaseSpan,
   testId,
   testStartLog,
-} from "../../kernel/test-record.ts";
-import { attribute, children, descendants, readXml } from "../../kernel/xml.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "../../runtime/test.ts";
+} from "@intellectual-frontiers/test/record";
+import { attribute, children, descendants, readXml } from "@intellectual-frontiers/formats/xml";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
 const FR = (n: string): `0008-test-evidence FR-${string}` => `0008-test-evidence FR-${n}`;
 

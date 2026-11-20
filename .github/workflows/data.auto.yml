@@ -9,34 +9,30 @@ on:
     paths:
       - ".github/actions/**"
       - .github/workflows/data.auto.yml
+      - "commons/core/src/**"
+      - "commons/crypto/src/**"
       - "commons/data/**"
-      - "commons/ontology/audit/**"
-      - "commons/ontology/ifccm/**"
-      - "commons/ontology/ifqs/**"
-      - "commons/ontology/ifr/**"
-      - "commons/ontology/mizan/**"
-      - "commons/ontology/supply-chain/**"
+      - "commons/formats/src/**"
+      - "commons/mizan/src/**"
+      - "commons/system/src/**"
+      - "commons/test/src/**"
       - "commons/tools/**"
-      - "commons/ts/githost/**"
       - "commons/ts/kernel/**"
       - "commons/ts/mizan/**"
-      - "commons/ts/runtime/**"
   pull_request:
     paths:
       - ".github/actions/**"
       - .github/workflows/data.auto.yml
+      - "commons/core/src/**"
+      - "commons/crypto/src/**"
       - "commons/data/**"
-      - "commons/ontology/audit/**"
-      - "commons/ontology/ifccm/**"
-      - "commons/ontology/ifqs/**"
-      - "commons/ontology/ifr/**"
-      - "commons/ontology/mizan/**"
-      - "commons/ontology/supply-chain/**"
+      - "commons/formats/src/**"
+      - "commons/mizan/src/**"
+      - "commons/system/src/**"
+      - "commons/test/src/**"
       - "commons/tools/**"
-      - "commons/ts/githost/**"
       - "commons/ts/kernel/**"
       - "commons/ts/mizan/**"
-      - "commons/ts/runtime/**"
 
 permissions:
   contents: read

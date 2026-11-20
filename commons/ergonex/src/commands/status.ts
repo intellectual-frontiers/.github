@@ -6,9 +6,8 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/commons/ts/kernel";
+import { absurd, err, ok } from "@intellectual-frontiers/core";
 import { flag } from "../platform/k-args.ts";
-import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
 import { existsSync } from "../platform/r-fs.ts";
 import { run } from "../platform/r-proc.ts";
 import type { Finding } from "../findings.ts";

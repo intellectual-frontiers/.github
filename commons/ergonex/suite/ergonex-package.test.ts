@@ -1,14 +1,15 @@
 /**
- * The package that is published (commons ergonex 0004-onboarding FR-001): the one file that `tools/pack.ts` bundles runs as it is, from an empty folder with nothing installed beside it, on Bun and on Node 26; its
- * `package.json` has no dependency, the version of the library, the one file as its `bin` and the right to be public; and the `package.json` of this folder stays private.
+ * The package that is published (commons ergonex 0004-onboarding FR-001, commons 0032-lifting-libraries FR-013): the one file that `tools/pack.ts` bundles for the command runs as it is, from an empty folder with nothing
+ * installed beside it, on Bun and on Node 26; its `package.json` has the version of the library, the one file as its `bin`, an `exports` whose entry names its declarations, the packages of commons it depends on and the right
+ * to be public; and the `package.json` of this folder stays private.
  *
  * @module
  */
-import { makeTempDir, readFile, readTextFile, remove } from "../src/platform/r-fs.ts";
+import { makeTempDir, readTextFile, remove } from "../src/platform/r-fs.ts";
 import { dirname, fromFileUrl, join, resolve } from "../src/platform/r-path.ts";
 import { run, which } from "../src/platform/r-proc.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
-import { publishedManifest, stage } from "../tools/pack.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
+import { pack } from "../tools/pack.ts";
 
 const ROOT = resolve(dirname(fromFileUrl(import.meta.url)), "..");
 const bun = which("bun");
@@ -17,14 +18,23 @@ const needsBun = bun === undefined ? { skip: "bun is not installed" } : {};
 
 proves(
   ["0004-onboarding FR-001"],
-  "the package that is published has no dependency, the version of the library, one file as its bin, a public access and a repository with its folder, and the package.json of this folder is private",
+  "the package that is published has the version of the library, one file as its bin, an entry with its declarations, only packages of commons as dependencies, a public access and a repository with its folder, and the package.json of this folder is private",
   async () => {
     const own = JSON.parse(await readTextFile(join(ROOT, "package.json"))) as Record<string, unknown>;
     assertEquals(own["private"], true, "nothing is published from this folder by hand");
-    const m = publishedManifest(own);
+    const packed = await pack();
+    assertEquals(packed.findings, []);
+    const m = packed.manifest;
     assertEquals([m["name"], m["version"]], ["@intellectual-frontiers/ergonex", own["version"]]);
     assertEquals(m["bin"], { ergonex: "./ergonex.mjs" });
-    assert(!("dependencies" in m) && !("devDependencies" in m) && !("private" in m) && !("scripts" in m), "nothing to install beside it");
+    assertEquals(m["exports"], { ".": { types: "./dist/mod.d.ts", default: "./dist/mod.js" } });
+    assertEquals(m["types"], "./dist/mod.d.ts");
+    const deps = Object.keys((m["dependencies"] ?? {}) as Record<string, string>);
+    assert(
+      deps.every((d) => d.startsWith("@intellectual-frontiers/") && d !== "@intellectual-frontiers/commons"),
+      `dependencies: ${deps.join(", ")}`,
+    );
+    assert(!("devDependencies" in m) && !("private" in m) && !("scripts" in m), "nothing of the repository's own");
     assertEquals(m["publishConfig"], { access: "public" });
     assertEquals((m["repository"] as { directory: string }).directory, "commons/ergonex");
     const release = await readTextFile(join(ROOT, "release.ts"));
@@ -39,9 +49,10 @@ proves(
   async () => {
     const dir = await makeTempDir();
     try {
-      const staged = await stage();
-      const file = join(staged, "ergonex.mjs");
-      const text = new TextDecoder().decode((await readFile(file)).slice(0, 20));
+      const packed = await pack();
+      assertEquals(packed.findings, []);
+      const file = join(packed.stage, "ergonex.mjs");
+      const text = (await readTextFile(file)).slice(0, 20);
       assert(text.startsWith("#!/usr/bin/env node\n"), "the file starts from a shebang");
       const runtimes = [
         { name: "bun", program: bun },

@@ -11,7 +11,7 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/commons/ts/kernel";
+import { absurd } from "@intellectual-frontiers/core";
 
 /** The shells `ergonex shell` knows. */
 export type Shell = "bash" | "zsh" | "fish" | "pwsh" | "nu";

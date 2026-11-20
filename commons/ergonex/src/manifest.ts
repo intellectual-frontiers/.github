@@ -13,11 +13,21 @@
  *
  * @module
  */
-import { array, boolean, formatDecodeError, integer, object, string, unknownValue } from "@intellectual-frontiers/commons/ts/kernel";
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
-import { sha256Of } from "@intellectual-frontiers/commons/ts/kernel";
-import { describeRemoteError, hostKindOf, type HostKinds, readRemote, cloneUrlOf } from "@intellectual-frontiers/commons/ts/githost";
-import type { RepoRef } from "@intellectual-frontiers/commons/ts/githost";
+import {
+  array,
+  boolean,
+  formatDecodeError,
+  integer,
+  object,
+  string,
+  unknownValue,
+  err,
+  ok,
+  type Result,
+} from "@intellectual-frontiers/core";
+import { sha256Of } from "@intellectual-frontiers/crypto";
+import { describeRemoteError, hostKindOf, type HostKinds, readRemote, cloneUrlOf } from "@intellectual-frontiers/githost";
+import type { RepoRef } from "@intellectual-frontiers/githost";
 import type { Finding } from "./findings.ts";
 import { describeLayoutError, repoPathOf, worktreePathOf } from "./layout.ts";
 import { describeNameError, moduleName } from "./modules/name.ts";

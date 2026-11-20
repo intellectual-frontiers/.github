@@ -11,9 +11,9 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/commons/ts/kernel";
-import { describeRef, parseRemote, sameRepository } from "@intellectual-frontiers/commons/ts/githost";
-import type { RepoRef } from "@intellectual-frontiers/commons/ts/githost";
+import { absurd } from "@intellectual-frontiers/core";
+import { describeRef, parseRemote, sameRepository } from "@intellectual-frontiers/githost";
+import type { RepoRef } from "@intellectual-frontiers/githost";
 
 /** What a host layer read of a path. */
 export type RepoFacts =

@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/commons/ts/kernel";
+import { absurd } from "@intellectual-frontiers/core";
 import { type Dialect, qualified } from "@intellectual-frontiers/data/sql/physical";
 import type { Node } from "./expr.ts";
 import type { SelectAst } from "./select.ts";

@@ -7,11 +7,11 @@
  *
  * @module
  */
-import { layerFindings, type Ladder } from "../../kernel/layers.ts";
-import { lstat, makeTempDir, mkdir, realPath, remove, writeTextFile } from "../../runtime/fs.ts";
-import { dirname, fromFileUrl, join, resolve } from "../../runtime/path.ts";
-import { run, runtimeName, which } from "../../runtime/proc.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "../../runtime/test.ts";
+import { layerFindings, type Ladder } from "@intellectual-frontiers/mizan/layers";
+import { lstat, makeTempDir, mkdir, realPath, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { dirname, fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
+import { run, runtimeName, which } from "@intellectual-frontiers/system/proc";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
 const ROOT = resolve(dirname(fromFileUrl(import.meta.url)), "../..");
 const SKIP = process.platform === "win32" ? "symbolic links are not run on Windows" : false;
@@ -30,10 +30,17 @@ async function project(kind: "link" | "file"): Promise<string> {
       private: true,
       type: "module",
       exports: { "./a": "./a.ts" },
-      devDependencies: { "@intellectual-frontiers/commons": `${kind}:${ROOT}` },
+      // the kernel imports core by package name, so the project that reaches the kernel has core installed beside it
+      devDependencies: {
+        "@intellectual-frontiers/commons": `${kind}:${ROOT}`,
+        "@intellectual-frontiers/core": `link:${resolve(ROOT, "..", "core")}`,
+      },
     }),
   );
-  await put("a.ts", 'import { ok } from "@intellectual-frontiers/commons/ts/kernel";\nexport const r = ok(42);\n');
+  await put(
+    "a.ts",
+    'import { ok } from "@intellectual-frontiers/core";\nimport * as kernel from "@intellectual-frontiers/commons/ts/kernel";\nexport const r = typeof kernel === "object" ? ok(42) : ok(0);\n',
+  );
   await put("internal.ts", 'export const secret = "internal";\n');
   await put("main.ts", 'import { r } from "@intellectual-frontiers/probe/a";\nconsole.log(`${r.kind}:${r.value}`);\n');
   await put("deep.ts", 'import("@intellectual-frontiers/probe/internal").then(() => process.exit(0), () => process.exit(7));\n');

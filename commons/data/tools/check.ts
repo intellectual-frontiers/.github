@@ -11,8 +11,9 @@
  *
  * @module
  */
-import { trace as kernel } from "@intellectual-frontiers/commons/ts/kernel";
-import { fs, path, trace as runtime } from "@intellectual-frontiers/commons/ts/runtime";
+import * as kernel from "@intellectual-frontiers/mizan/trace";
+import { fs, path } from "@intellectual-frontiers/system";
+import * as runtime from "@intellectual-frontiers/mizan/host/trace";
 import { type LayerFinding, layerFindings } from "./layers.ts";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");

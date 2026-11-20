@@ -1,0 +1,52 @@
+{
+  "name": "@intellectual-frontiers/ontology",
+  "private": true,
+  "version": "0.1.2",
+  "description": "The ontologies of Intellectual Frontiers Commons as typed TypeScript: Mizan, IFCCM, IFQS, IFR, the audit of packaging and the software supply chain.",
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "exports": {
+    ".": "./src/mod.ts",
+    "./audit": "./src/audit/mod.ts",
+    "./audit/packaging": "./src/audit/packaging.ts",
+    "./ifccm": "./src/ifccm/mod.ts",
+    "./ifccm/ifccm": "./src/ifccm/ifccm.ts",
+    "./ifqs": "./src/ifqs/mod.ts",
+    "./ifqs/ifqs": "./src/ifqs/ifqs.ts",
+    "./ifr": "./src/ifr/mod.ts",
+    "./ifr/audit": "./src/ifr/audit.ts",
+    "./ifr/ifr": "./src/ifr/ifr.ts",
+    "./mizan": "./src/mizan/mod.ts",
+    "./mizan/mizan": "./src/mizan/mizan.ts",
+    "./standards/nist-sp-800-53/controls.auto": "./src/standards/nist-sp-800-53/controls.auto.ts",
+    "./supply-chain/packaging": "./src/supply-chain/packaging/mod.ts",
+    "./supply-chain/packaging/families": "./src/supply-chain/packaging/families.ts",
+    "./supply-chain/packaging/managers": "./src/supply-chain/packaging/managers.ts",
+    "./supply-chain/packaging/packaging": "./src/supply-chain/packaging/packaging.ts",
+    "./supply-chain/packaging/pins": "./src/supply-chain/packaging/pins.ts",
+    "./supply-chain/packaging/programs": "./src/supply-chain/packaging/programs.ts",
+    "./supply-chain/packaging/record": "./src/supply-chain/packaging/record.ts",
+    "./supply-chain/packaging/rules": "./src/supply-chain/packaging/rules.ts",
+    "./supply-chain/packaging/schema.auto": "./src/supply-chain/packaging/schema.auto.ts"
+  },
+  "scripts": {
+    "check": "tsc -p tsconfig.json",
+    "test": "bun test suite/",
+    "test:node": "node --test \"suite/**/*.test.ts\"",
+    "verify": "tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../ts/mizan/check.ts --root spec-kit --level L1 && bun tools/check.ts && bun test suite/ && bun tools/pack.ts --check",
+    "pack": "bun tools/pack.ts"
+  },
+  "devDependencies": {
+    "@intellectual-frontiers/commons": "link:../ts",
+    "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/mizan": "link:../mizan",
+    "@intellectual-frontiers/rdf": "link:../rdf",
+    "@intellectual-frontiers/system": "link:../system",
+    "@intellectual-frontiers/test": "link:../test",
+    "@types/node": "26.6.6",
+    "fast-check": "4.10.2",
+    "typescript": "7.0.2"
+  }
+}

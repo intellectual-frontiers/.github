@@ -10,7 +10,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import type { LogicalType } from "@intellectual-frontiers/data/sql/logical";
 import { standardLiteral } from "@intellectual-frontiers/data/sql/physical";
 import type { Ref } from "./routine.ts";

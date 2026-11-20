@@ -9,7 +9,7 @@
  *
  * @module
  */
-import { decodeHarnessRecord, formatRecordError, signingWaivers } from "@intellectual-frontiers/commons/ts/mizan/changes/declaration";
+import { decodeHarnessRecord, formatRecordError, signingWaivers } from "@intellectual-frontiers/mizan/changes/declaration";
 import type { SigningWaiver, SigningWaivers } from "../policy-scans.ts";
 import { readInside } from "./scan.ts";
 

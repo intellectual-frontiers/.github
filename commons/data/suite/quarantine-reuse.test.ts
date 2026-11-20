@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, proves } from "@intellectual-frontiers/test";
 import { idempotency } from "@intellectual-frontiers/data/sql/extensions/idempotency";
 import { safety } from "@intellectual-frontiers/data/sql/extensions/safety";
 import { execute, plan, snapshotOf, stateHash, type StepTransform } from "@intellectual-frontiers/data/sql/lifecycle";

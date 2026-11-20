@@ -7,10 +7,10 @@
  *
  * @module
  */
-import { GENESIS } from "../kernel/evidence.ts";
-import { makeTempDir, remove, writeTextFile } from "../runtime/fs.ts";
-import { join } from "../runtime/path.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { GENESIS } from "@intellectual-frontiers/grc/evidence";
+import { makeTempDir, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { join } from "@intellectual-frontiers/system/path";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { verifyBranch, writeCommit, keepRun } from "../quality/host/branch.ts";
 import { verifications } from "../quality/commands.ts";
 import { type Gathered, gather, isAfter } from "../quality/host/gather.ts";

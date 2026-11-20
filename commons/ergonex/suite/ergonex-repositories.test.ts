@@ -8,7 +8,7 @@
 import { existsSync, readTextFile, writeTextFile, mkdir } from "../src/platform/r-fs.ts";
 import { join } from "../src/platform/r-path.ts";
 import { run } from "../src/platform/r-proc.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { needsWorld, REMOTE, withWorld } from "./ergonex-fixtures.ts";
 
 const LIST = (home: string): string => join(home, ".ergonex", "repositories.ts");

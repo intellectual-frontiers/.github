@@ -6,8 +6,8 @@
  *
  * @module
  */
-import { fs, path } from "../../ts/runtime/mod.ts";
-import { assert, assertEquals, proves } from "../../ts/runtime/test.ts";
+import { fs, path } from "@intellectual-frontiers/system";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { ROOT } from "./helpers.ts";
 
 const DOCS = path.join(ROOT, "commons/docs");

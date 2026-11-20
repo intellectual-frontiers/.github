@@ -4,13 +4,13 @@
  *
  * @module
  */
-import { ACTIONS, LIBRARY_CI, PIN, workflows } from "../githost/workflows/definitions.ts";
-import { expr, job, type Permissions, run, use, validateAction, validateWorkflow, type Workflow } from "../githost/workflows/model.ts";
-import { renderAction, renderWorkflow, scalar } from "../githost/workflows/render.ts";
+import { ACTIONS, LIBRARY_CI, PIN, workflows } from "../workflows/definitions.ts";
+import { expr, job, type Permissions, run, use, validateAction, validateWorkflow, type Workflow } from "../workflows/model.ts";
+import { renderAction, renderWorkflow, scalar } from "../workflows/render.ts";
 import { readLibraries } from "../mizan/libraries.ts";
-import { existsSync, mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "../runtime/fs.ts";
-import { fromFileUrl, join, resolve } from "../runtime/path.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { existsSync, mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { main, outputs, synchronize } from "../tools/generate-workflows.ts";
 
 const SPEC = "0030-generated-workflows";
@@ -247,5 +247,30 @@ proves(
     // the real repository: ergonex is, and data is (it publishes the package `@intellectual-frontiers/arcactl`, a build target of its sources)
     assert(existsSync(join(ROOT, ".github", "workflows", "ergonex-publish.auto.yml")));
     assert(existsSync(join(ROOT, ".github", "workflows", "data-publish.auto.yml")));
+  },
+);
+
+proves(
+  ["0032-lifting-libraries FR-009"],
+  "the publish workflow of a library skips a registry that has the version already, and tags the version from the main branch once it is on its registry, with the runner's token, whoever put it there",
+  () => {
+    for (const lib of ["core", "rdf", "terminal", "ergonex"]) {
+      const w = readTextFileSync(join(ROOT, ".github", "workflows", `${lib}-publish.auto.yml`));
+      // each registry's job asks the registry first and publishes only where the version is not there
+      assertStringIncludes(w, "id: have");
+      assertStringIncludes(w, "if: \"steps.have.outputs.have != 'true'\"");
+      assertStringIncludes(w, 'npm view "$name@$version" version >/dev/null 2>&1');
+      assertStringIncludes(w, 'npm view "$name@$version" version --registry https://npm.pkg.github.com');
+      // the tag job runs after the others whether they published or skipped, from the main branch only, and makes the tag once
+      assertStringIncludes(w, "tag:");
+      assertStringIncludes(w, "needs: [build, publish-npm, publish-github]");
+      assertStringIncludes(w, "if: \"always() && needs.build.result == 'success' && github.ref_type == 'branch'\"");
+      assertStringIncludes(w, "contents: write");
+      assertStringIncludes(w, `tag="${lib}-v$version"`);
+      assertStringIncludes(w, `npm view "@intellectual-frontiers/${lib}@$version" version >/dev/null 2>&1`);
+      assertStringIncludes(w, "repos/$GITHUB_REPOSITORY/git/refs");
+      assertStringIncludes(w, "is already there");
+      assert(!/secrets\.(?!GITHUB_TOKEN)/.test(w), "a secret that is not the workflow's own token");
+    }
   },
 );

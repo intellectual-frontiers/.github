@@ -24,7 +24,7 @@ import {
   type Statement,
   upsert,
 } from "@intellectual-frontiers/data/sql/physical";
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 
 /** A column of a table of an extension. */
 export interface ColumnSpec {

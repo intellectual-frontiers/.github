@@ -7,12 +7,12 @@
  *
  * @module
  */
-import { fs, path, proc } from "../commons/ts/runtime/mod.ts";
-import { assert, assertEquals, proves } from "../commons/ts/runtime/test.ts";
-import { sha256 } from "../commons/ts/kernel/sha256.ts";
-import { importJsonSchema, readJsonLd, readRdfXml, type Read } from "../commons/ts/mizan/integrations/mod.ts";
-import type { Result } from "../commons/ts/kernel/result.ts";
-import type { IntegrationFinding } from "../commons/ts/mizan/integrations/mod.ts";
+import { fs, path, proc } from "../commons/system/src/mod.ts";
+import { assert, assertEquals, proves } from "../commons/test/src/test.ts";
+import { sha256 } from "../commons/crypto/src/sha256.ts";
+import { importJsonSchema, readJsonLd, readRdfXml, type Read } from "../commons/mizan/src/integrations/mod.ts";
+import type { Result } from "../commons/core/src/mod.ts";
+import type { IntegrationFinding } from "../commons/mizan/src/integrations/mod.ts";
 
 const RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 

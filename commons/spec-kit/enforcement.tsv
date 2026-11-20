@@ -60,131 +60,131 @@ requirement	mechanism	by	note
 0005-typescript-runtime FR-002	check	.github: cd commons/ts && npx tsc -p tsconfig.kernel.json	the kernel type-checks with no host types; boundaries.test.ts: the kernel imports nothing outside kernel/ and names no host global
 0005-typescript-runtime FR-003	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: the runtime imports only node: builtins, kernel/ and runtime/
 0005-typescript-runtime FR-004	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: no vendor global, jsr:, npm:, @std, @erga or URL import in code, with negative controls; tsc fails on a vendor global (types: node)
-0005-typescript-runtime FR-005	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/result.test.ts and text.test.ts: Result's helpers, absurd with a switch that leaves an alternative out, brands kept apart
-0005-typescript-runtime FR-006	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/decode.test.ts: each decoder, its error path and the JSON round trip
-0005-typescript-runtime FR-007	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/semver.test.ts: semver.org's example order, round trip, order laws, bumps, dotted versions
-0005-typescript-runtime FR-008	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/sha256.test.ts: FIPS 180-2 vectors, hexadecimal round trip, the brand, SHASUMS files
-0005-typescript-runtime FR-009	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/text.test.ts: lf, plain, splitArgs and quoteArgs, and their round trip
-0005-typescript-runtime FR-010	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/archive.test.ts: round trips of tar, zip and gzip, fixed bytes, unsafe and damaged archives, deflated zip read and written, pax and GNU names
-0005-typescript-runtime FR-011	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/text.test.ts: literals written and read back, keys, comments, refusals
-0005-typescript-runtime FR-012	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/http.test.ts: Link headers, Retry-After in both forms, safe methods
-0005-typescript-runtime FR-013	check	.github: .github/workflows/ifc-typescript.auto.yml	runtime/test.test.ts: the assertions and proves; the same tests pass under bun test and node --test in CI
-0005-typescript-runtime FR-014	check	.github: cd commons/ts && npx tsc -p tsconfig.json	the type-level tests (expectType, @ts-expect-error) with their negative controls compile; the laws are property-tested with fast-check in the kernel tests
+0005-typescript-runtime FR-005	review	0032-lifting-libraries FR-010	kept by the library core: core 0001-core FR-001
+0005-typescript-runtime FR-006	review	0032-lifting-libraries FR-010	kept by the library core: core 0001-core FR-002
+0005-typescript-runtime FR-007	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-013
+0005-typescript-runtime FR-008	review	0032-lifting-libraries FR-010	kept by the library crypto: crypto 0001-crypto FR-001
+0005-typescript-runtime FR-009	review	0032-lifting-libraries FR-010	kept by the library core: core 0001-core FR-003
+0005-typescript-runtime FR-010	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-010
+0005-typescript-runtime FR-011	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-006
+0005-typescript-runtime FR-012	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-017
+0005-typescript-runtime FR-013	review	0032-lifting-libraries FR-010	kept by the library test: 0001-test FR-001
+0005-typescript-runtime FR-014	review	0032-lifting-libraries FR-010	kept by the library core: core 0001-core FR-004
 0005-typescript-runtime FR-015	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: every file has an @module block and every export has JSDoc
 0005-typescript-runtime FR-016	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: the development dependencies are exact, the lockfile agrees, no run-time dependency
 0005-typescript-runtime FR-017	check	.github: cd commons/ts && npx tsc -p tsconfig.json	tsc 7 with the strict configuration on every file; boundaries.test.ts checks that TypeScript is 7
 0005-typescript-runtime FR-018	gate	.github: .github/workflows/ifc-typescript.auto.yml	the CI matrix: tsc 7 on both configurations, the suite on Bun (the default) and Node 26 (the backup), on Linux, macOS and Windows
-0005-typescript-runtime FR-019	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/fs.test.ts: each Node error code becomes its class with code, path and cause; NotFound, AlreadyExists, IsADirectory, AddrInUse are thrown where the host refuses
-0005-typescript-runtime FR-020	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/fs.test.ts: every call on a real temporary folder, the refusals, Stolos's helpers
-0005-typescript-runtime FR-021	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/proc.test.ts: both platforms' rules and file URLs
-0005-typescript-runtime FR-022	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/proc.test.ts: the environment, the platform's names, which, a program with its input and output, lines, NotFound, abort
-0005-typescript-runtime FR-023	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/net.test.ts: the look for each environment, terminal detection, raw mode refused without a terminal
-0005-typescript-runtime FR-024	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/net.test.ts: classification, waits, Retry-After, retries against a local server, resume with Range, the SHA-256 check
-0005-typescript-runtime FR-025	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/net.test.ts: a real server on a free port: bodies, cookies, HEAD, a handler that throws, AddrInUse, shutdown by signal
+0005-typescript-runtime FR-019	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-001
+0005-typescript-runtime FR-020	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-002
+0005-typescript-runtime FR-021	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-003
+0005-typescript-runtime FR-022	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-009
+0005-typescript-runtime FR-023	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-018
+0005-typescript-runtime FR-024	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-001
+0005-typescript-runtime FR-025	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-002
 0005-typescript-runtime FR-026	gate	.github: .github/workflows/ifc-typescript.auto.yml	the jobs take Bun's version from commons/generated/pins.auto.env; boundaries.test.ts: no npm, Prettier, ESLint, dprint or Vitest dependency
 0005-typescript-runtime FR-027	gate	.github: .github/workflows/ifc-typescript.auto.yml	the lint job runs bun fmt --check
 0005-typescript-runtime FR-028	gate	.github: .github/workflows/ifc-typescript.auto.yml	the lint job runs bun lint --type-aware --max-warnings 0 with bunfig.toml's rules; boundaries.test.ts: the rules FR-028 names are errors in bunfig.toml
 0005-typescript-runtime FR-029	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: the root package.json (its name, private, the ./ts entry points into commons/ts, ./ts/node, the bin ifc, the dependencies exact and those of commons/docs) and commons/ts/package.json's same name and entry points; no release workflow, no tarball tool
 0005-typescript-runtime FR-030	gate	.github: .github/workflows/ifc-typescript.auto.yml	the git-dependency job installs the commit it checks by a git+file: URL into an empty project and runs tools/smoke.ts (the kernel, the runtime and the test registration by the package's name and ifc test run on a small suite, on Bun and Node 26; tsc 7 on a consumer), on Linux, macOS and Windows
-0005-typescript-runtime FR-031	check	.github: cd commons/ts && bun test tests/	kernel/formats.test.ts: round trips with JSON and with the writer, the specification's examples, __proto__, refusals with line and column
-0005-typescript-runtime FR-032	check	.github: cd commons/ts && bun test tests/	kernel/formats.test.ts: random trees written and read back, entities, CDATA, prefixes, the finders, refusals with line and column, no entity expansion
-0005-typescript-runtime FR-033	check	.github: cd commons/ts && bun test tests/	kernel/graph.test.ts: random acyclic graphs ordered and scheduled with random outcomes and job limits, cycles, a node that rejects
-0005-typescript-runtime FR-034	check	.github: cd commons/ts && bun test tests/	kernel/graph.test.ts: glibc's own hashes, clamped rounds, verification, random salts from bytes
-0005-typescript-runtime FR-035	check	.github: cd commons/ts && bun test tests/	kernel/data.test.ts: random tables written and read back, TOML 1.0's examples, every rule broken and named with its place
-0005-typescript-runtime FR-036	check	.github: cd commons/ts && bun test tests/	kernel/data.test.ts: random records written and read back with each separator and line ending, RFC 4180's cases, refusals
-0005-typescript-runtime FR-037	check	.github: cd commons/ts && bun test tests/	kernel/data.test.ts: the types and charsets of paths and extensions, unknown extensions
-0005-typescript-runtime FR-038	check	.github: cd commons/ts && bun test tests/	kernel/data.test.ts: random values written and read back, a front matter with every construct, failsafe, every refusal with its place and reason
-0005-typescript-runtime FR-039	check	.github: cd commons/ts && bun test tests/	runtime/client.test.ts: taken, refused, waited for, timed out, taken over from a dead holder and an unreadable file, inherited, released twice
-0005-typescript-runtime FR-040	check	.github: cd commons/ts && bun test tests/	runtime/client.test.ts: against a local server: decoded reads, denials, statuses, credentials refused and allowed, read-only, backoff with Retry-After and the cap, Link and cursor paging, recorded exchanges
-0005-typescript-runtime FR-041	check	.github: cd commons/ts && bun test tests/	kernel/der.test.ts: X.690's encodings, random integers, OIDs and structures read back, every malformed input named at its byte
-0005-typescript-runtime FR-042	check	.github: cd commons/ts && bun test tests/	kernel/der.test.ts: RFC 4648's vectors in both alphabets, random bytes read back, malformed text refused
-0005-typescript-runtime FR-044	check	.github: cd commons/ts && bun test tests/	kernel/cms.test.ts: certificates built at run time with the kernel's DER; random content encrypted to two recipients and opened by each; RFC 5083's structure; OAEP parameters with NULL or absent SHA-256; a changed message, a wrong key, another recipient and an EC certificate refused (interoperability with OpenSSL 3 checked by hand both ways)
-0005-typescript-runtime FR-045	check	.github: cd commons/ts && bun test tests/	kernel/dsse.test.ts: the DSSE specification's PAE example, sign and verify with six algorithms, a threshold of two over random payloads, every refusal by its kind, statements and their subjects' sha256
-0005-typescript-runtime FR-043	check	.github: cd commons/ts && bun test tests/	kernel/png.test.ts: random pictures written and read back, hand-built PNGs of every filter, colour type and depth with tRNS, every corrupt and hostile file refused by its kind, resize and composite laws, ICO round trips
-0005-typescript-runtime FR-047	check	.github: cd commons/ts && bun test tests/	kernel/args.test.ts: every grammar rule and error kind with its sentence and suggestion, the help text, type inference with negative controls, random argument vectors in random forms parsed back to their values
-0005-typescript-runtime FR-048	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/fs-more.test.ts: readDir async, chown, symlinkSync
-0005-typescript-runtime FR-049	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/fs-more.test.ts: file handles, seek, streams, using
-0005-typescript-runtime FR-050	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/fs-more.test.ts: copy and walk
-0005-typescript-runtime FR-051	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/watch.test.ts: events joined, recursive, stopped by abort
-0005-typescript-runtime FR-052	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/spawn.test.ts: streams in and out, kill, status, NotFound
-0005-typescript-runtime FR-053	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/spawn.test.ts: ppid, build.target, unrefTimer, selfCommand
-0005-typescript-runtime FR-054	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/stdio.test.ts and console.test.ts: machine output, and the two writers
-0005-typescript-runtime FR-055	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/tcp.test.ts: listen, connect, TLS with a test certificate
-0005-typescript-runtime FR-056	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/dns.test.ts: resolution and its errors, network interfaces
-0005-typescript-runtime FR-057	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/md5.test.ts: RFC 1321's examples
-0005-typescript-runtime FR-058	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/glob.test.ts: globs against @std/path's cases; expandGlob
-0005-typescript-runtime FR-059	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/archive.test.ts: untarStream equals untar, damaged headers refused
-0005-typescript-runtime FR-060	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test.test.ts: only, steps and the three asserts
-0005-typescript-runtime FR-061	check	.github: cd commons/ts && node --test tests/**/*.test.ts	lint/*.test.ts: each rule against code it refuses and accepts, through bun lint
-0005-typescript-runtime FR-062	check	.github: .github/workflows/ifc-typescript.auto.yml compile job	CI builds a small program on each system and runs it; runtime/compile.test.ts checks the arguments
-0005-typescript-runtime FR-063	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/text.test.ts: tsLiteral takes an interface with no index signature, refuses a Date, a function, undefined in an array (type-level, with negative controls)
-0005-typescript-runtime FR-064	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/objects.test.ts: compact leaves out undefined fields, its type exact under exactOptionalPropertyTypes
-0005-typescript-runtime FR-065	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test.test.ts: the gives back the value narrowed, and fails on null and undefined
-0005-typescript-runtime FR-066	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/client.test.ts: readOnly lets through the POSTs its predicate says only read, and refuses every other write
-0005-typescript-runtime FR-067	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/semver.test.ts: ranges against npm's documented desugaring and laws (caret, tilde, x-range, hyphen, union), pre-releases
-0005-typescript-runtime FR-068	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/sigv4.test.ts: AWS's published Signature Version 4 examples, canonical request and string to sign, a web Request signed
-0005-typescript-runtime FR-069	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/client.test.ts: a SigV4 transport signs each request to a recorded server, and the live transport still refuses it unless allowed
+0005-typescript-runtime FR-031	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-001
+0005-typescript-runtime FR-032	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-004
+0005-typescript-runtime FR-033	review	0032-lifting-libraries FR-010	kept by the library core: core 0001-core FR-005
+0005-typescript-runtime FR-034	review	0032-lifting-libraries FR-010	kept by the library crypto: crypto 0001-crypto FR-003
+0005-typescript-runtime FR-035	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-003
+0005-typescript-runtime FR-036	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-005
+0005-typescript-runtime FR-037	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-016
+0005-typescript-runtime FR-038	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-002
+0005-typescript-runtime FR-039	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-015
+0005-typescript-runtime FR-040	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-003
+0005-typescript-runtime FR-047	review	0032-lifting-libraries FR-010	kept by the library terminal: terminal 0001-terminal FR-001
+0005-typescript-runtime FR-041	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-009
+0005-typescript-runtime FR-042	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-008
+0005-typescript-runtime FR-044	review	0032-lifting-libraries FR-010	kept by the library crypto: crypto 0001-crypto FR-005
+0005-typescript-runtime FR-045	review	0032-lifting-libraries FR-010	kept by the library crypto: crypto 0001-crypto FR-006
+0005-typescript-runtime FR-043	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-012
+0005-typescript-runtime FR-048	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-004
+0005-typescript-runtime FR-049	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-005
+0005-typescript-runtime FR-050	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-006
+0005-typescript-runtime FR-051	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-016
+0005-typescript-runtime FR-052	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-010
+0005-typescript-runtime FR-053	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-011
+0005-typescript-runtime FR-054	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-019
+0005-typescript-runtime FR-055	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-006
+0005-typescript-runtime FR-056	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-007
+0005-typescript-runtime FR-057	review	0032-lifting-libraries FR-010	kept by the library crypto: crypto 0001-crypto FR-002
+0005-typescript-runtime FR-058	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-015
+0005-typescript-runtime FR-059	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-011
+0005-typescript-runtime FR-060	review	0032-lifting-libraries FR-010	kept by the library test: 0001-test FR-002
+0005-typescript-runtime FR-061	review	0032-lifting-libraries FR-010	kept by the library lint: 0001-lint FR-001 to FR-010
+0005-typescript-runtime FR-062	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-013
+0005-typescript-runtime FR-063	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-007
+0005-typescript-runtime FR-064	review	0032-lifting-libraries FR-010	kept by the library core: core 0001-core FR-006
+0005-typescript-runtime FR-065	review	0032-lifting-libraries FR-010	kept by the library test: 0001-test FR-003
+0005-typescript-runtime FR-066	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-004
+0005-typescript-runtime FR-067	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-014
+0005-typescript-runtime FR-068	review	0032-lifting-libraries FR-010	kept by the library crypto: crypto 0001-crypto FR-004
+0005-typescript-runtime FR-069	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-005
 0005-typescript-runtime FR-070	check	.github: cd commons/ts && node --test tests/**/*.test.ts	node/register.test.ts: a .ts under node_modules runs on Node 26 with the hook and is refused without it, a file outside is left to Node, the URL's segments decide (Windows' too), and the commands ifc and ifc-docs register it first; runtime/test-run.test.ts: node --test is given it
-0005-typescript-runtime FR-071	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/discover.test.ts: programs found by prefix on a given path, first wins, directories and unrunnable files skipped, Windows PATHEXT
-0005-typescript-runtime FR-072	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/commands.test.ts: a tree resolved to its verb, help asked at every level, unknown words with suggestions, help rendered from the declaration
-0005-typescript-runtime FR-073	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/fs.test.ts: a folder linked as a junction is read through it (on Windows, without administrator rights)
-0005-typescript-runtime FR-046	check	.github: cd commons/ts && bun test tests/	kernel/schedule.test.ts and runtime/schedule.test.ts: exact units, plist and .cmd per OS, quoting round trips against reference splitters, every schedule kind read back, refusals; install and remove into a temporary home with a fake runner (CI runs them on Linux, macOS and Windows)
+0005-typescript-runtime FR-071	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-012
+0005-typescript-runtime FR-072	review	0032-lifting-libraries FR-010	kept by the library terminal: terminal 0001-terminal FR-002
+0005-typescript-runtime FR-073	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-007
+0005-typescript-runtime FR-046	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-017
 0005-typescript-runtime FR-074	check	.github: cd commons/ts && node --test tests/**/*.test.ts	node/linked-library.test.ts: Bun installs a link: dependency on commons/ts as a symbolic link to it and a file: dependency as a copy, and a lockfile with the link installs the same link again
 0005-typescript-runtime FR-075	check	.github: cd commons/ts && node --test tests/**/*.test.ts	node/linked-library.test.ts: a program of a project that links commons/ts imports the kernel by package name and runs on the runtime running the test with no hook; a copy is refused on Node and runs on Bun; the compiler checks it
 0005-typescript-runtime FR-076	check	.github: cd commons/ts && node --test tests/**/*.test.ts	node/linked-library.test.ts: a library imports its own modules by its package name through exports, and a file that exports does not name is refused by the runtime and by the compiler
 0005-typescript-runtime FR-077	check	.github: cd commons/ts && node --test tests/**/*.test.ts	node/linked-library.test.ts: layerFindings finds a climbing import by relative path and none by package name; a library's own check by its exports is proved in that library's suite (commons/data)
-0006-signals FR-001	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: the model's types (type-level tests) and the values an attribute can hold
-0006-signals FR-002	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: ids from given bytes, zeros refused, brands kept apart
-0006-signals FR-003	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: traceparent and tracestate against the W3C examples, with property round trips
-0006-signals FR-004	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otlp.test.ts: OTLP JSON encode and decode, round-trip properties, int64 as strings, unknown fields ignored
-0006-signals FR-005	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: configuration from OTEL_* records, invalid values warned and defaulted
-0006-signals FR-006	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: redaction of secret attributes, URLs, tokens, name=value pairs, provider token formats, exact secrets and process arguments
-0006-signals FR-007	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: attribute, event and link limits with dropped counts
-0006-signals FR-008	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: the samplers, ratio decided by the trace id alone
-0006-signals FR-009	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/signals.test.ts: defineSignals, with @ts-expect-error for undeclared kinds and wrong attributes
-0006-signals FR-010	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/signals.test.ts: span ends by its Result, exceptions recorded and rethrown, one end only
-0006-signals FR-011	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/signals.test.ts: an exact span tree from a fixed clock and random source
-0006-signals FR-012	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/signals.test.ts: in-memory, simple and batch processors, drops counted, flush bounded
-0006-signals FR-013	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/signals.test.ts: counter, up-down, gauge and histogram aggregation
-0006-signals FR-014	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: export to a local receiver, retries on 503 with Retry-After, never throws
-0006-signals FR-015	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: the probe gives up within 150 ms, the exit wait within a second
-0006-signals FR-016	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: the journal writes OTLP lines, rotates and removes files past their age
-0006-signals FR-017	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: the current span across await, and the parent from TRACEPARENT
-0006-signals FR-018	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: proc, http client and serve spans, with traceparent passed on
-0006-signals FR-019	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: the receiver decodes, refuses protobuf (415) and bad JSON (400)
-0006-signals FR-020	check	.github: .github/workflows/ifc-typescript.auto.yml otel-conformance job	CI sends the suite's OTLP to the pinned OpenTelemetry Collector and compares its file export
-0006-signals FR-021	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/render.test.ts: the reducer in each mode, snapshots through the terminal emulator
-0006-signals FR-022	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/palette.test.ts: the palette's roles, marks and their ASCII fallbacks, colour only where allowed
-0006-signals FR-023	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/width.test.ts and render.test.ts: lines cut by display width, elapsed time and progress
-0006-signals FR-024	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/render.test.ts: the export warning said once, dimmed, at the end
-0006-signals FR-025	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/vt.test.ts: the terminal emulator's sequences
-0006-signals FR-026	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/console.test.ts and boundaries.test.ts: the console is the only writer, its modes, uncaught errors recorded
-0006-signals FR-027	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/palette.test.ts and kernel/render.test.ts: the ⏳ and ⚡ marks and roles; a pending or an action is no warning or failure
-0007-grc FR-001	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/grc.test.ts: catalogs with @ts-expect-error for an unknown control id, STRM mappings
-0007-grc FR-002	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/grc.test.ts: controls and packs over typed subjects, a throwing check gives error
-0007-grc FR-003	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/grc.test.ts: the status semilattice laws with fast-check
-0007-grc FR-004	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/grc.test.ts: one finding type and sections
-0007-grc FR-005	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/grc.test.ts: waivers refused without expiry, expired ones not applied, error and gap never accepted
-0007-grc FR-006	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/evidence.test.ts: JCS against RFC 8785's examples, digests
-0007-grc FR-007	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/evidence.test.ts: the ledger chain, every kind of tampering named
-0007-grc FR-008	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/evidence.test.ts: manifests verified, signature by a given function
-0007-grc FR-009	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/evidence.test.ts: bundles byte for byte, a file added refused
-0007-grc FR-010	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/assess.test.ts: coverage roll-up
-0007-grc FR-011	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/assess.test.ts: freshness against cadences
-0007-grc FR-012	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/assess.test.ts: drift between two views
-0007-grc FR-013	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/assess.test.ts: the change-impact gate
-0007-grc FR-014	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/assess.test.ts: the risk register and NIST SP 800-30's matrix
-0007-grc FR-015	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/assess.test.ts: the requirement trace
-0007-grc FR-016	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/compliance-formats.test.ts: OCSF 1.9.0 compliance and vulnerability findings, device, user and cloud resources inventories
-0007-grc FR-017	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/compliance-formats.test.ts and uuid.test.ts: OSCAL 1.2.3 documents, UUIDv5 against RFC 9562's example, determinism
-0007-grc FR-018	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/compliance-formats.test.ts: CycloneDX declarations and in-toto statements
-0007-grc FR-019	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/grc-signals.test.ts: a pack's run as spans and OCSF log records, the same result as the kernel's run
-0007-grc FR-020	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/sign.test.ts: ssh-keygen -Y sign and verify (where ssh-keygen is), Web Crypto DSSE
-0007-grc FR-021	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/git.test.ts: HEAD, cleanliness, changed paths and files at a revision in a temporary repository
-0007-grc FR-022	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/grc.test.ts: loaders from TOML, YAML, JSON and JSON5, errors naming file and path
-0008-test-evidence FR-001	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test.test.ts: a test's record with its outcome, values, risk and attempt
-0008-test-evidence FR-002	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test.test.ts: a test span and log record with the test.* conventions
-0008-test-evidence FR-003	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test.test.ts: the installation record, and a person's name refused
+0006-signals FR-001	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-001
+0006-signals FR-002	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-002
+0006-signals FR-003	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-003
+0006-signals FR-004	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-004
+0006-signals FR-005	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-005
+0006-signals FR-006	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-006
+0006-signals FR-007	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-007
+0006-signals FR-008	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-008
+0006-signals FR-009	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-009
+0006-signals FR-010	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-010
+0006-signals FR-011	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-011
+0006-signals FR-012	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-012
+0006-signals FR-013	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-013
+0006-signals FR-014	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-014
+0006-signals FR-015	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-015
+0006-signals FR-016	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-016
+0006-signals FR-017	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-017
+0006-signals FR-018	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-018
+0006-signals FR-019	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-019
+0006-signals FR-020	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-020
+0006-signals FR-021	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-021
+0006-signals FR-022	review	0032-lifting-libraries FR-010	kept by the library terminal: terminal 0001-terminal FR-003
+0006-signals FR-023	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-022
+0006-signals FR-024	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-023
+0006-signals FR-025	review	0032-lifting-libraries FR-010	kept by the library terminal: terminal 0001-terminal FR-005
+0006-signals FR-026	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-024
+0006-signals FR-027	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-025
+0007-grc FR-001	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-001
+0007-grc FR-002	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-002
+0007-grc FR-003	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-003
+0007-grc FR-004	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-004
+0007-grc FR-005	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-005
+0007-grc FR-006	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-006
+0007-grc FR-007	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-007
+0007-grc FR-008	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-008
+0007-grc FR-009	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-009
+0007-grc FR-010	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-010
+0007-grc FR-011	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-011
+0007-grc FR-012	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-012
+0007-grc FR-013	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-013
+0007-grc FR-014	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-014
+0007-grc FR-015	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-015
+0007-grc FR-016	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-016
+0007-grc FR-017	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-017
+0007-grc FR-018	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-018
+0007-grc FR-019	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-019
+0007-grc FR-020	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-020
+0007-grc FR-021	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-014
+0007-grc FR-022	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-021
+0008-test-evidence FR-001	review	0032-lifting-libraries FR-010	kept by the library test: 0001-test FR-004
+0008-test-evidence FR-002	review	0032-lifting-libraries FR-010	kept by the library test: 0001-test FR-005
+0008-test-evidence FR-003	review	0032-lifting-libraries FR-010	kept by the library test: 0001-test FR-006
 0008-test-evidence FR-004	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test-run.test.ts: records appended per test, a killed process gives cancelled
 0008-test-evidence FR-005	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test-run.test.ts: one record file per run, gathered from child processes
 0008-test-evidence FR-006	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test-run.test.ts: the exit rule, an unproven requirement fails
@@ -318,13 +318,13 @@ requirement	mechanism	by	note
 0011-documentation FR-025	check	.github: cd commons/docs && bun run verify	links.test.ts: the own prefix and digits, a linked repository's citation to its site, a text-only one, and a possessive qualifier
 0011-documentation FR-026	check	.github: cd commons/docs && bun run verify	conventions.test.ts: what ./docs and ifc-docs reach imports no data library and no lens; lenses.test.ts: the lenses as values of Lens
 0011-documentation FR-027	check	.github: cd commons/docs && bun run verify	fixture-repo.test.ts: a fixture repository with no about.ts and a plain spec kit builds with no finding
-0012-ontology FR-001	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: IRIs parsed or refused, namespaces, literals and their tags, triples and quads; type-level tests that an individual of one class is not another's
-0012-ontology FR-002	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: the eight vocabularies give the IRIs of their specifications, and a vocabulary is made from local names
-0012-ontology FR-003	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: an individual's values typed from its schema, its triples in the schema's order, and type-level tests of a missing field, a wrong range and a wrong class
-0012-ontology FR-004	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: the OWL schemas, a code list and its union, a SKOS scheme and its notations
-0012-ontology FR-005	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: a non-integer, a word not of its list, a subject stated twice and a bad namespace are named
-0012-ontology FR-006	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: the writers' output for known statements, escapes, and the same bytes for random orders of the same statements (fast-check)
-0012-ontology FR-007	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: the kernel's RDF exports no reader
+0012-ontology FR-001	review	0032-lifting-libraries FR-010	kept by the library rdf: rdf 0001-rdf FR-001
+0012-ontology FR-002	review	0032-lifting-libraries FR-010	kept by the library rdf: rdf 0001-rdf FR-002
+0012-ontology FR-003	review	0032-lifting-libraries FR-010	kept by the library rdf: rdf 0001-rdf FR-003
+0012-ontology FR-004	review	0032-lifting-libraries FR-010	kept by the library rdf: rdf 0001-rdf FR-004
+0012-ontology FR-005	review	0032-lifting-libraries FR-010	kept by the library rdf: rdf 0001-rdf FR-005
+0012-ontology FR-006	review	0032-lifting-libraries FR-010	kept by the library rdf: rdf 0001-rdf FR-006
+0012-ontology FR-007	review	0032-lifting-libraries FR-010	kept by the library rdf: rdf 0001-rdf FR-007
 0012-ontology FR-008	check	.github: bun test ./tests/	Ontology: the modules import only the kernel's RDF and one another, list their files, and no .ttl is under commons/ontology
 0012-ontology FR-009	check	.github: bun test ./tests/	Ontology: no IRI is written as free text in a module; the code lists are the tools' unions
 0012-ontology FR-010	check	.github: bun test ./tests/	Ontology: tsc 7 refuses copies with a missing field, a wrong range and a wrong class; Generator: the rules a type cannot state are named and nothing is written
@@ -334,14 +334,14 @@ requirement	mechanism	by	note
 0012-ontology FR-014	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: a term with no record is found and fails whatever the baseline holds; every term of the packaging ontology and of Mizan's vocabulary has a record; the mappings name terms of the pinned schema.org import (the compiler)
 0012-ontology FR-015	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: a code list of 5,000 entries is written to a folder and tsc 7 checks it, with its key type, within 30 seconds
 0012-ontology FR-016	check	.github: cd commons/ts && bun test tests/	tests/commons-mizan-ontology.test.ts: the generated Turtle names owl:versionInfo and owl:versionIRI; rdflib reads the version IRI back; mizan.test.ts: the kernel's OwlOntology takes a version IRI
-0013-acme FR-001	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/acme.test.ts: a name and its wildcard issued by a fake CA, the TXT values computed from its tokens and the account's thumbprint, the wait after every set, the chain, the key whose SPKI the CSR carried, notAfter; the directories named
-0013-acme FR-002	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/acme.test.ts: the fake CA verifies every JWS (ES256, nonce spent once, url, jwk only for newAccount, kid after); badNonce retried once, and given up after five
-0013-acme FR-003	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/acme.test.ts: an account made with no key, found again with the key it gave back, asked for then made for an unknown key, a non-ES256 key refused
-0013-acme FR-004	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/acme.test.ts: records removed after success and after an invalid authorization; a removal that fails is a warning, or joined to the error
-0013-acme FR-005	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/acme.test.ts: the directory down, an invalid authorization, the DNS throwing, the network failing, the wait running out and no names, each one sentence
-0013-acme FR-006	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/acme.test.ts: the CSR's signature verified with its own SPKI, its common name and SANs read back, a tampered CSR refused; the fake CA checks the SANs against the order
-0013-acme FR-007	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/acme.test.ts: notAfter of certificates made with der in UTCTime and GeneralizedTime, the first of a chain, needsRenewal at 30 and 20 days, after the end and on what is not a certificate
-0013-acme FR-008	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/acme.test.ts: cloudflareDns against a fake API on a local server: zone by name, a quoted TXT added and deleted, one bearer token, a record of another run removed by content, refusals without the token
+0013-acme FR-001	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-008
+0013-acme FR-002	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-009
+0013-acme FR-003	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-010
+0013-acme FR-004	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-011
+0013-acme FR-005	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-012
+0013-acme FR-006	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-013
+0013-acme FR-007	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-014
+0013-acme FR-008	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-015
 0014-webauthn FR-001	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/cbor.test.ts: RFC 8949 Appendix A vectors read and written back, sorted map keys, an item with its end, each refusal with its byte, a round-trip property
 0014-webauthn FR-002	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/webauthn.test.ts: ES256 and Ed25519 COSE keys read, written, from and to JWK, signatures verified; RS256, a wrong curve, a short coordinate and malformed DER signatures refused
 0014-webauthn FR-003	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/webauthn.test.ts: the creation and request options as JSON, and the RangeErrors of a short challenge, a long user id and a bad credential id
@@ -465,12 +465,12 @@ requirement	mechanism	by	note
 0020-ifccm FR-036	check	.github: cd commons/ts && bun test tests/	mizan-harness-requests.test.ts: the change requests as JSON, the terms as JSON or as a module loaded by the file URL of a path with a space (audit records too), the rungs with homes and the specs are read; a missing file, a module with no terms and a bad format are named; --trace reads --terms
 0020-ifccm FR-037	check	.github: cd commons/ts && bun test tests/	mizan-harness-requests.test.ts: each requirement's stages, the stage where its chain ends and its spec, terms, code and tests on each rung are given as a table and as JSON, the same bytes twice, with LF, and written to --output
 0020-ifccm FR-038	check	.github: cd commons/ts && bun test tests/	mizan-harness-requests.test.ts: the view of capabilities by rung is made from the commits between the markers of a document and --check finds no difference after it; the exit status is 1 for a closed capability whose chain stops before its run, 0 for an open one, 2 and 3 for usage and inputs
-0020-ifccm FR-039	check	.github: cd commons/ts && bun test tests/	githost-adapters.test.ts, githost-live.test.ts: GitHub, GitLab and plain Git pass the same conformance function (tests/githost-conformance.ts) over recorded exchanges, a loopback server and a real repository
-0020-ifccm FR-040	check	.github: cd commons/ts && bun test tests/	githost-remote.test.ts: the kinds Github, Gitlab and Git each support the four common capabilities, and GitHub and GitLab protected branches, issues and change requests
-0020-ifccm FR-041	check	.github: cd commons/ts && bun test tests/	githost-adapters.test.ts, githost-remote.test.ts: a capability a kind lacks is a typed unsupported result naming the host and the capability, and the table is the ontology's
-0020-ifccm FR-042	none	-	Planned: the adapters read a token only from the environment they are handed, send it to the one host they serve, and hold it in no result, URL or file (githost-live.test.ts, githost-remote.test.ts); the host's own command-line tools (gh, glab) are not wrapped yet
-0020-ifccm FR-043	check	.github: cd commons/ts && bun test tests/	githost-remote.test.ts: GitHub for github.com, GitLab for gitlab.com and the hosts a map names, plain Git for every other, and a self-hosted GitLab is never guessed from a URL
-0020-ifccm FR-044	check	.github: cd commons/ts && bun test tests/	githost-remote.test.ts: maxDepth is two for a kind without nested groups and unbounded for GitLab
+0020-ifccm FR-039	review	0032-lifting-libraries FR-010	kept by the library githost: githost 0001-githost FR-001
+0020-ifccm FR-040	review	0032-lifting-libraries FR-010	kept by the library githost: githost 0001-githost FR-002
+0020-ifccm FR-041	review	0032-lifting-libraries FR-010	kept by the library githost: githost 0001-githost FR-003
+0020-ifccm FR-042	review	0032-lifting-libraries FR-010	kept by the library githost: githost 0001-githost FR-004
+0020-ifccm FR-043	review	0032-lifting-libraries FR-010	kept by the library githost: githost 0001-githost FR-005
+0020-ifccm FR-044	review	0032-lifting-libraries FR-010	kept by the library githost: githost 0001-githost FR-006
 0021-ifqs FR-001	none	-	Planned, M3 of issue #10: a principle held by the requirements under it: what runs is graded above what is stated (FR-021); the grade list exists (ifqs-ontology.test.ts)
 0021-ifqs FR-002	check	.github: cd commons/ts && bun test tests/	quality-branch.test.ts: the quality branch holds OTLP records and nothing else (a result as JUnit XML is refused by the chain); that no other channel carries a result in a run's pipeline stays with 0006-signals
 0021-ifqs FR-003	check	.github: cd commons/ts && bun test tests/	quality-ledger.test.ts, quality-system.test.ts: a CAPA is closed only by a named person: an automated run, an agent, the one that opened it and, where a regulated domain is declared, the author of the corrective change (read from Git) are each refused
@@ -601,6 +601,20 @@ requirement	mechanism	by	note
 0027-commons-libraries FR-022	check	.github: cd commons/ts && bun test tests/	mizan-affected.test.ts: the generated workflow of a library runs on its inputs as folders, and this repository's data workflow runs on all of them
 0027-commons-libraries FR-101	check	.github: cd commons/data && bun run verify	commons/data: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-102	check	.github: cd commons/ergonex && bun run verify	commons/ergonex: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-103	check	.github: cd commons/core && bun run verify	commons/core: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-104	check	.github: cd commons/rdf && bun run verify	commons/rdf: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-105	check	.github: cd commons/terminal && bun run verify	commons/terminal: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-106	check	.github: cd commons/crypto && bun run verify	commons/crypto: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-107	check	.github: cd commons/formats && bun run verify	commons/formats: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-108	check	.github: cd commons/system && bun run verify	commons/system: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-109	check	.github: cd commons/telemetry && bun run verify	commons/telemetry: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-110	check	.github: cd commons/net && bun run verify	commons/net: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-111	check	.github: cd commons/test && bun run verify	commons/test: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-112	check	.github: cd commons/lint && bun run verify	commons/lint: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-113	check	.github: cd commons/grc && bun run verify	commons/grc: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-114	check	.github: cd commons/githost && bun run verify	commons/githost: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-115	check	.github: cd commons/mizan && bun run verify	commons/mizan: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-116	check	.github: cd commons/ontology && bun run verify	commons/ontology: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0028-conformance-levels FR-001	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: Mizan's ontology holds the four levels with ranks 0 to 3, each entailing what it and the levels below it add
 0028-conformance-levels FR-002	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: every requirement is added by exactly one level and names a rule or says what else proves it
 0028-conformance-levels FR-003	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: L0 adds a manifest, a verify command and a version
@@ -637,10 +651,23 @@ requirement	mechanism	by	note
 0030-generated-workflows FR-007	none	-	Planned, Phase 2 of the per-library CI plan: the planner and the gate are not built yet
 0030-generated-workflows FR-008	check	.github: cd commons/ts && bun test tests/	githost-workflows.test.ts: the composite action is written with the line that says it is generated, and --check compares it
 0030-generated-workflows FR-009	check	.github: cd commons/ts && bun test tests/	githost-workflows.test.ts: a library with npm among its registries is given a workflow that runs on its tag, checks the version, packs it and sends it to npm with provenance and no token and to GitHub with its own token; none for a library with no npm; a library with npm and no tools/pack.ts is a finding
-0031-install-locations FR-001	check	.github: cd commons/ts && bun test tests/	runtime/dirs.test.ts: the folders on Linux, macOS and Windows from the environment, with the home, the app data folders and the binary folder
-0031-install-locations FR-002	check	.github: cd commons/ts && bun test tests/	runtime/dirs.test.ts: an XDG variable is honored where it is an absolute path, on Windows too, and ignored where it is not
-0031-install-locations FR-003	check	.github: cd commons/ts && bun test tests/	runtime/dirs.test.ts: macOS gives the folders Linux gives and never ~/Library
-0031-install-locations FR-004	check	.github: cd commons/ts && bun test tests/	runtime/dirs.test.ts: no home and no variable give undefined folders
+0031-install-locations FR-001	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-008
+0031-install-locations FR-002	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-008
+0031-install-locations FR-003	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-008
+0031-install-locations FR-004	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-008
 0031-install-locations FR-005	check	.github: cd commons/ergonex && bun test suite/	ergonex-locations.test.ts: Ergonex's state record, evidence and lock are in the state folder and its tools in the data folder, nothing is written below the user's home, no folder or command file of its own is made; ergonex-onboarding.test.ts: init writes no command file
 0031-install-locations FR-006	check	.github: cd commons/ergonex && bun test suite/	ergonex-install.test.ts: the Windows installer installs its prerequisites with winget by package identifier and downloads nothing; the Linux and macOS one asks Bun's own installer
 0031-install-locations FR-007	none	-	Planned: a WinGet manifest, as typed code made into YAML, comes with the first release that has a binary
+0032-lifting-libraries FR-001	check	.github: bun test ./tests/	commons-lift.test.ts: every folder of commons that is a library is named for its concern and its package is @intellectual-frontiers/<folder>; no folder is named for a language once the lift is complete
+0032-lifting-libraries FR-002	check	.github: bun test ./tests/	commons-lift.test.ts: the table of the map is read, and each library that exists is in it with the modules it takes
+0032-lifting-libraries FR-003	check	.github: bun test ./tests/	commons-lift.test.ts: the dependencies of each library are declared, acyclic and run to a lower layer, and no library imports a file outside its folder by a relative path
+0032-lifting-libraries FR-004	review	0032-lifting-libraries FR-004	a reviewer checks that no library is named for a technical layer
+0032-lifting-libraries FR-005	check	.github: bun test ./tests/	commons-packages.test.ts: the tarball of each library is installed under node_modules and run on Node 26 with no hook and on Bun
+0032-lifting-libraries FR-006	check	.github: bun test ./tests/	commons-packages.test.ts: Node 26 runs the compiled files of an installed package; the sources are erasable TypeScript only (tsconfig erasableSyntaxOnly)
+0032-lifting-libraries FR-007	check	.github: bun test ./tests/	commons-lift.test.ts: each lifted library has a suite/ that its verify runs
+0032-lifting-libraries FR-008	review	0032-lifting-libraries FR-008	a reviewer checks that the ontology of a library is in its folder
+0032-lifting-libraries FR-009	check	.github: bun test ./tests/	githost-workflows.test.ts: the publish workflow skips a version already on its registry and tags the version, from main
+0032-lifting-libraries FR-010	review	0032-lifting-libraries FR-010	a reviewer checks that the requirements of a lifted library are in its spec kit and that 0005 points at it
+0032-lifting-libraries FR-011	review	0032-lifting-libraries FR-011	a reviewer checks the importers of erga and stolos
+0032-lifting-libraries FR-012	check	.github: cd commons/ts && bunx tsc -p tsconfig.json	the compiler fails on any importer of a moved path; commons-lift.test.ts finds no import of a moved module's old path
+0032-lifting-libraries FR-013	check	.github: bun test ./tests/	commons-packages.test.ts: every npm library is packed, its tarball inspected, installed and a consumer of every entry type-checked with tsc 7 under nodenext

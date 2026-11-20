@@ -5,8 +5,9 @@
  *
  * @module
  */
-import { path, trace } from "@intellectual-frontiers/commons/ts/runtime";
-import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { path } from "@intellectual-frontiers/system";
+import * as trace from "@intellectual-frontiers/mizan/host/trace";
+import { assert, proves } from "@intellectual-frontiers/test";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
 const ENGINES = ["postgres", "postgresql", "sqlite", "duckdb", "mysql", "mariadb", "oracle", "mssql", "pglite"] as const;

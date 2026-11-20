@@ -14,7 +14,7 @@
  *
  * @module
  */
-import { array, type Decoded, integer, literal, object, refine, string } from "../../kernel/decode.ts";
+import { array, type Decoded, integer, literal, object, refine, string } from "@intellectual-frontiers/core";
 import { dayDecoder } from "./time.ts";
 
 const requirement = refine(string, "RequirementId", (s) => /^\S+ (?:FR|SC)-\d{3}[a-z]?$/.test(s));

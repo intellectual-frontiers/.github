@@ -4,15 +4,15 @@
  *
  * @module
  */
-import { readTextFileSync } from "../runtime/fs.ts";
-import { dirname, fromFileUrl, resolve } from "../runtime/path.ts";
-import * as proc from "../runtime/proc.ts";
-import { assert, assertEquals, proves } from "../runtime/test.ts";
-import { ifccmOntology } from "../../ontology/ifccm/mod.ts";
-import { ifqsOntology } from "../../ontology/ifqs/mod.ts";
-import { ifrOntology, versionSchemes } from "../../ontology/ifr/mod.ts";
-import { mizanOntology } from "../../ontology/mizan/mod.ts";
-import { packagingOntology } from "../../ontology/supply-chain/packaging/mod.ts";
+import { readTextFileSync } from "@intellectual-frontiers/system/fs";
+import { dirname, fromFileUrl, resolve } from "@intellectual-frontiers/system/path";
+import * as proc from "@intellectual-frontiers/system/proc";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
+import { ifccmOntology } from "@intellectual-frontiers/ontology/ifccm";
+import { ifqsOntology } from "@intellectual-frontiers/ontology/ifqs";
+import { ifrOntology, versionSchemes } from "@intellectual-frontiers/ontology/ifr";
+import { mizanOntology } from "@intellectual-frontiers/ontology/mizan";
+import { packagingOntology } from "@intellectual-frontiers/ontology/supply-chain/packaging";
 
 const COMMONS = resolve(dirname(fromFileUrl(import.meta.url)), "..", "..");
 const text = (rel: string): string => readTextFileSync(resolve(COMMONS, rel)).replaceAll("\r\n", "\n");

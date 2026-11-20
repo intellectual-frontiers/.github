@@ -6,7 +6,7 @@
  * @module
  */
 import { existsSync, readDirSync, sha256File } from "../platform/r-fs.ts";
-import { type Sha256, sha256 } from "@intellectual-frontiers/commons/ts/kernel";
+import { type Sha256, sha256 } from "@intellectual-frontiers/crypto";
 import { HOOKS_FOLDER, isAutoName } from "../render.ts";
 import { type FileFacts, STATE_RECORD_PATH } from "../state-record.ts";
 import { AREA, type Loaded, native, type Site } from "./workspace.ts";

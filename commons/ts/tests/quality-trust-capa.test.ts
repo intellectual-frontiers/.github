@@ -5,7 +5,7 @@
  * @module
  */
 import { trustViewOf, type TrustInput } from "../quality/trust/view.ts";
-import { assert, assertEquals, proves } from "../runtime/test.ts";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const INPUT: TrustInput = {
   harness: "demo",

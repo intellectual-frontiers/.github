@@ -11,7 +11,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { parseSpanId, parseTraceId, type SpanId, type TraceId, type Attributes } from "../platform/k-otel.ts";
 import { mkdir } from "../platform/r-fs.ts";
 import { build, runtimeName, runtimeVersion } from "../platform/r-proc.ts";

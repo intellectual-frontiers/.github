@@ -11,11 +11,11 @@ import { collect, packOf, packSourceOf, readPackFolder, readPackTar, writePack }
 import { buildPack } from "../quality/assessor/pack.ts";
 import { allowedSignersLine, figuresOf, parseAllowedSigners, type PackFiles, verifyPack } from "../quality/assessor/verify-pack.ts";
 import { generateTrust } from "../quality/trust/host.ts";
-import { makeTempDir, readFile, readTextFile, remove, writeTextFile } from "../runtime/fs.ts";
-import { join } from "../runtime/path.ts";
-import { execPath, run, which } from "../runtime/proc.ts";
-import { sha256 } from "../kernel/sha256.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { makeTempDir, readFile, readTextFile, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { join } from "@intellectual-frontiers/system/path";
+import { execPath, run, which } from "@intellectual-frontiers/system/proc";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { at, list, needsGit, needsSshKeygen, parsed } from "./quality-fixtures.ts";
 import { demoEvidence, demoRepository, MARKER, signingKey } from "./quality-trust-fixtures.ts";
 

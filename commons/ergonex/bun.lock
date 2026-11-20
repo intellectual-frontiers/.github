@@ -6,6 +6,16 @@
       "name": "@intellectual-frontiers/ergonex",
       "devDependencies": {
         "@intellectual-frontiers/commons": "link:../ts",
+        "@intellectual-frontiers/core": "link:../core",
+        "@intellectual-frontiers/crypto": "link:../crypto",
+        "@intellectual-frontiers/formats": "link:../formats",
+        "@intellectual-frontiers/githost": "link:../githost",
+        "@intellectual-frontiers/mizan": "link:../mizan",
+        "@intellectual-frontiers/net": "link:../net",
+        "@intellectual-frontiers/system": "link:../system",
+        "@intellectual-frontiers/telemetry": "link:../telemetry",
+        "@intellectual-frontiers/terminal": "link:../terminal",
+        "@intellectual-frontiers/test": "link:../test",
         "@types/node": "26.6.6",
         "fast-check": "4.10.2",
         "typescript": "7.0.2",
@@ -14,6 +24,26 @@
   },
   "packages": {
     "@intellectual-frontiers/commons": ["@intellectual-frontiers/commons@link:../ts", {}],
+
+    "@intellectual-frontiers/core": ["@intellectual-frontiers/core@link:../core", {}],
+
+    "@intellectual-frontiers/crypto": ["@intellectual-frontiers/crypto@link:../crypto", {}],
+
+    "@intellectual-frontiers/formats": ["@intellectual-frontiers/formats@link:../formats", {}],
+
+    "@intellectual-frontiers/githost": ["@intellectual-frontiers/githost@link:../githost", {}],
+
+    "@intellectual-frontiers/mizan": ["@intellectual-frontiers/mizan@link:../mizan", {}],
+
+    "@intellectual-frontiers/net": ["@intellectual-frontiers/net@link:../net", {}],
+
+    "@intellectual-frontiers/system": ["@intellectual-frontiers/system@link:../system", {}],
+
+    "@intellectual-frontiers/telemetry": ["@intellectual-frontiers/telemetry@link:../telemetry", {}],
+
+    "@intellectual-frontiers/terminal": ["@intellectual-frontiers/terminal@link:../terminal", {}],
+
+    "@intellectual-frontiers/test": ["@intellectual-frontiers/test@link:../test", {}],
 
     "@types/node": ["@types/node@26.6.6", "", { "dependencies": { "undici-types": "~8.9.0" } }, "sha512-MzQj+8Kx3XI40OmUAE6Qoh58ZMNstNNMwn2nfd3qWsfe7nDNSqJNzes4njhz6AHwrSHOffSLwXU6yb474Q4aog=="],
 

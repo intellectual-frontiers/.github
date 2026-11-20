@@ -6,7 +6,7 @@
  * @module
  */
 import { existsSync, readFileSync } from "node:fs";
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { type Change, planWhole } from "./files.ts";
 import type { Paths, Shell } from "./workstation.ts";
 import { shells } from "./workstation.ts";

@@ -8,7 +8,7 @@
  *
  * @module
  */
-import { nTriples, type OntologyFile, owl, triplesOf, turtle } from "../kernel/rdf.ts";
+import { nTriples, type OntologyFile, owl, triplesOf, turtle } from "@intellectual-frontiers/rdf";
 import {
   type AnySchema,
   type CodeMember,
@@ -18,11 +18,11 @@ import {
   exportSqlCodeList,
   exportSssom,
   type Mapping,
-} from "./integrations/pure/export.ts";
-import { exportHtmlView, type ViewBasis, type ViewTerm } from "./integrations/pure/export-html.ts";
-import { exportOwl, type OwlText } from "./integrations/pure/export-owl.ts";
-import { describeFinding } from "./integrations/pure/types.ts";
-import { exportRdfXml } from "./integrations/pure/export-rdfxml.ts";
+} from "@intellectual-frontiers/mizan/integrations/pure/export";
+import { exportHtmlView, type ViewBasis, type ViewTerm } from "@intellectual-frontiers/mizan/integrations/pure/export-html";
+import { exportOwl, type OwlText } from "@intellectual-frontiers/mizan/integrations/pure/export-owl";
+import { describeFinding } from "@intellectual-frontiers/mizan/integrations/pure/types";
+import { exportRdfXml } from "@intellectual-frontiers/mizan/integrations/pure/export-rdfxml";
 
 type Lang = { readonly value: string; readonly language: string };
 

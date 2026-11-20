@@ -1,0 +1,191 @@
+/**
+ * The first importer (commons 0019-mizan-integrations FR-005 to FR-009): a slice of an outside vocabulary, read from Turtle, N-Triples, JSON-LD or RDF/XML, written as a generated TypeScript
+ * module of a typed vocabulary, whose terms have the basis `adopts` (0018-standards-first FR-003).
+ *
+ * @remarks
+ * The import takes only the terms of the slice, never the whole standard. It refuses a source whose SHA-256 differs from its record, and a standard that has no license or may
+ * not be copied. Each term's class comes from its `rdf:type` (`owl:Class`, `rdfs:Class`, `owl:ObjectProperty`, `owl:DatatypeProperty`, `rdf:Property`); what the typed form
+ * cannot hold (a blank-node value, a collection) is a finding, and so is a term of the slice that the source does not have. The output is deterministic: the same source and
+ * slice give the same text, so a generated file can be checked for staleness.
+ *
+ * @limits
+ * It states each term's class only. It carries no labels, comments, domains or ranges, which a harness states about the terms it uses in its own ontology.
+ *
+ * @example
+ * ```ts
+ * import { importVocabulary } from "./import-vocabulary.ts";
+ * // importVocabulary({ standard, sourceText, format: "turtle", namespace: { prefix: "ex", iri: "https://example.org/" }, slice: ["Thing"], rdfImport: "@intellectual-frontiers/rdf" })
+ * ```
+ *
+ * @module
+ */
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
+import { readJsonLd } from "./read-json-ld.ts";
+import { readNTriples, readTurtle, type Read, TYPE } from "./read-rdf.ts";
+import { readRdfXml } from "./read-rdf-xml.ts";
+import type { IntegrationFinding, StandardRecord } from "./types.ts";
+
+/** The kinds of term a typed vocabulary states, in the order a term's types are looked at. */
+const KINDS = [
+  ["http://www.w3.org/2002/07/owl#Class", "owl:Class"],
+  ["http://www.w3.org/2000/01/rdf-schema#Class", "rdfs:Class"],
+  ["http://www.w3.org/2002/07/owl#ObjectProperty", "owl:ObjectProperty"],
+  ["http://www.w3.org/2002/07/owl#DatatypeProperty", "owl:DatatypeProperty"],
+  ["http://www.w3.org/1999/02/22-rdf-syntax-ns#Property", "rdf:Property"],
+] as const;
+
+/** The kind of a term in a typed vocabulary. */
+export type TermKind = (typeof KINDS)[number][1];
+
+/** What an import needs. */
+export type ImportInput = {
+  readonly standard: StandardRecord;
+  /** The source, as the pinned bytes read as UTF-8 text. */
+  readonly sourceText: string;
+  readonly format: "turtle" | "n-triples" | "json-ld" | "rdf-xml";
+  /** The namespace the slice's terms are in: its prefix and IRI. */
+  readonly namespace: { readonly prefix: string; readonly iri: string };
+  /** The local names of the terms to take, never the whole standard. */
+  readonly slice: readonly string[];
+  /** The specifier of the module that exports `namespace` and `vocabulary` (the kernel's `rdf.ts`, or a package path to it). */
+  readonly rdfImport: string;
+  /** The name the vocabulary is exported as (the prefix by default). */
+  readonly exportName?: string;
+};
+
+/** The provenance of one import (0019-mizan-integrations FR-009): what was imported, from where, by which generator, with which hash, and which terms. It carries no date, so that the output is deterministic. */
+export type ImportRecordData = {
+  readonly standard: string;
+  readonly name: string;
+  readonly issuer: string;
+  readonly version: string;
+  readonly location: string;
+  readonly license: string;
+  readonly sha256: string;
+  readonly generator: string;
+  readonly slice: readonly string[];
+};
+
+/** What an import gives: the generated module's text, its provenance, and the terms it states. */
+export type ImportOutput = {
+  readonly module: string;
+  readonly record: ImportRecordData;
+  readonly terms: readonly { readonly iri: string; readonly kind: TermKind | "control" | "code-list" | "field-names" }[];
+  readonly findings: readonly IntegrationFinding[];
+};
+
+/** The generator's name, as the provenance and the header of a generated module give it. */
+export const GENERATOR = "commons/ts/mizan/integrations/pure/import-vocabulary.ts";
+
+function kindOf(types: ReadonlySet<string>): TermKind | undefined {
+  for (const [iri, kind] of KINDS) if (types.has(iri)) return kind;
+  return undefined;
+}
+
+function recordOf(i: ImportInput, slice: readonly string[]): ImportRecordData {
+  const s = i.standard;
+  return {
+    standard: s.id,
+    name: s.name,
+    issuer: s.issuer,
+    version: s.version,
+    location: s.location,
+    license: s.license,
+    sha256: s.sha256,
+    generator: GENERATOR,
+    slice: [...slice],
+  };
+}
+
+/** The text of the generated module: its header says where it came from, and nothing in it is edited by hand. */
+function moduleText(i: ImportInput, terms: readonly { readonly local: string; readonly kind: TermKind }[]): string {
+  const name = i.exportName ?? i.namespace.prefix;
+  const s = i.standard;
+  const body = terms
+    .map((t) => `  ${/^[A-Za-z_][A-Za-z0-9_]*$/.test(t.local) ? t.local : JSON.stringify(t.local)}: "${t.kind}",`)
+    .join("\n");
+  return [
+    `// AUTO-GENERATED by ${GENERATOR} (commons 0019-mizan-integrations FR-006). Do not edit: change the slice and import again.`,
+    `// source: ${s.name}, ${s.issuer}, version ${s.version}, ${s.location}`,
+    `// license: ${s.license}`,
+    `// source_sha256=${s.sha256}`,
+    `// basis: adopts (0018-standards-first FR-003)`,
+    ``,
+    `import { namespace, vocabulary } from ${JSON.stringify(i.rdfImport)};`,
+    ``,
+    `/** The namespace of ${s.name}, whose terms this module takes: only those a specification uses. */`,
+    `export const ${name.toUpperCase()} = namespace(${JSON.stringify(i.namespace.prefix)}, ${JSON.stringify(i.namespace.iri)});`,
+    ``,
+    `/** The terms of ${s.name} that commons states, each of its kind in the source (basis: adopts). */`,
+    `export const ${name} = vocabulary(${name.toUpperCase()}, {`,
+    body,
+    `});`,
+    ``,
+    ``,
+  ].join("\n");
+}
+
+/** The source's triples by its format; a relative IRI of JSON-LD or RDF/XML resolves against the location the standard is published at. */
+function readSourceText(i: ImportInput): Result<Read, readonly IntegrationFinding[]> {
+  switch (i.format) {
+    case "turtle":
+      return readTurtle(i.sourceText);
+    case "n-triples":
+      return readNTriples(i.sourceText);
+    case "json-ld":
+      return readJsonLd(i.sourceText, i.standard.location);
+    case "rdf-xml":
+      return readRdfXml(i.sourceText, i.standard.location);
+    default:
+      return absurd(i.format);
+  }
+}
+
+/** A slice of an outside vocabulary as a generated typed-vocabulary module, or what stops it. */
+export async function importVocabulary(i: ImportInput): Promise<Result<ImportOutput, readonly IntegrationFinding[]>> {
+  const s = i.standard;
+  if (s.license === "") return err([{ kind: "no-license", standard: s.id }]);
+  if (!s.redistributable) return err([{ kind: "not-redistributable", standard: s.id }]);
+  const actual = await sha256(i.sourceText);
+  if (actual !== s.sha256) return err([{ kind: "pin-mismatch", standard: s.id, expected: s.sha256, actual }]);
+  if (i.slice.length === 0) return err([{ kind: "slice-empty" }]);
+  const read: Result<Read, readonly IntegrationFinding[]> = readSourceText(i);
+  if (read.kind === "err") return err(read.error);
+  const findings: IntegrationFinding[] = [];
+  const taken: { local: string; kind: TermKind }[] = [];
+  for (const local of [...new Set(i.slice)].sort()) {
+    const iri = i.namespace.iri + local;
+    const about = read.value.triples.filter((t) => t.subject.kind === "iri" && t.subject.value === iri);
+    if (about.length === 0) {
+      findings.push({ kind: "term-missing", iri });
+      continue;
+    }
+    const types = new Set(
+      about.filter((t) => t.predicate === TYPE && t.object.kind === "iri").map((t) => (t.object.kind === "iri" ? t.object.value : "")),
+    );
+    const kind = kindOf(types);
+    if (kind === undefined) {
+      findings.push({ kind: "term-untyped", iri });
+      continue;
+    }
+    for (const t of about)
+      if (t.object.kind === "blank")
+        findings.push({ kind: "loss", what: "blank-node-object", line: t.line, about: `${iri} ${t.predicate}` });
+    taken.push({ local, kind });
+  }
+  const takenIris = taken.map((t) => i.namespace.iri + t.local);
+  for (const f of read.value.findings)
+    if (f.kind !== "loss" || f.about === "" || takenIris.some((iri) => f.about.startsWith(`${iri} `))) findings.push(f);
+  if (findings.some((f) => f.kind === "term-missing" || f.kind === "term-untyped")) return err(findings);
+  const terms = taken.map((t) => ({ iri: i.namespace.iri + t.local, kind: t.kind }));
+  return ok({
+    module: moduleText(i, taken),
+    record: recordOf(
+      i,
+      taken.map((t) => t.local),
+    ),
+    terms,
+    findings,
+  });
+}

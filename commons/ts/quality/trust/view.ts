@@ -18,7 +18,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "../../kernel/result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import type { Figures } from "../assessor/verify-pack.ts";
 import type { Grade } from "../pure/names.ts";
 import type { Nonconformance } from "../pure/ledger.ts";

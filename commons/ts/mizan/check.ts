@@ -18,8 +18,8 @@
  */
 import { fileURLToPath } from "node:url";
 import process from "node:process";
-import { stdio } from "../runtime/mod.ts";
-import { packagingTerms } from "../../ontology/audit/mod.ts";
+import { stdio } from "@intellectual-frontiers/system";
+import { packagingTerms } from "@intellectual-frontiers/ontology/audit";
 import {
   audienceModels,
   bases,
@@ -32,19 +32,19 @@ import {
   subjectKinds,
   mz,
   terms,
-} from "../../ontology/mizan/mod.ts";
-import * as ifccmOntology from "../../ontology/ifccm/mod.ts";
-import * as ifrOntology from "../../ontology/ifr/mod.ts";
-import * as ifqsOntology from "../../ontology/ifqs/mod.ts";
-import { pm } from "../../ontology/supply-chain/packaging/mod.ts";
-import { type RulePlugin, rulePlugins } from "./rules.ts";
-import { holdHarness } from "./harness.ts";
-import { DEFAULT_LEVEL, LEVELS, levelOf } from "./levels.ts";
+} from "@intellectual-frontiers/ontology/mizan";
+import * as ifccmOntology from "@intellectual-frontiers/ontology/ifccm";
+import * as ifrOntology from "@intellectual-frontiers/ontology/ifr";
+import * as ifqsOntology from "@intellectual-frontiers/ontology/ifqs";
+import { pm } from "@intellectual-frontiers/ontology/supply-chain/packaging";
+import { type RulePlugin, rulePlugins } from "@intellectual-frontiers/mizan/rules";
+import { holdHarness } from "@intellectual-frontiers/mizan/harness";
+import { DEFAULT_LEVEL, LEVELS, levelOf } from "@intellectual-frontiers/mizan/levels";
 import { verifyAll } from "./libraries.ts";
-import { readWorks } from "./versions/scan.ts";
-import { BASELINE_COMMENTS, readSpecTexts } from "./spec-files.ts";
-import { definitionsOf } from "./spec-terms.ts";
-import type { BasisKind, TermRecord } from "./standards.ts";
+import { readWorks } from "@intellectual-frontiers/mizan/versions/scan";
+import { BASELINE_COMMENTS, readSpecTexts } from "@intellectual-frontiers/mizan/spec-files";
+import { definitionsOf } from "@intellectual-frontiers/mizan/spec-terms";
+import type { BasisKind, TermRecord } from "@intellectual-frontiers/mizan/standards";
 
 export { BASELINE_COMMENTS, readSpecTexts };
 
@@ -131,23 +131,27 @@ export function main(
           termsFile: "commons/ontology",
           completeness: [
             {
-              file: "commons/ontology/audit/packaging.ts",
+              file: "commons/ontology/src/audit/packaging.ts",
               ontology: Object.values(pm).map((t) => t.iri),
               recorded: packagingTerms.map((t) => t.values.termIri),
             },
-            { file: "commons/ontology/mizan/mizan.ts", ontology: classes.map((c) => c.iri), recorded: terms.map((t) => t.values.termIri) },
             {
-              file: "commons/ontology/ifccm/ifccm.ts",
+              file: "commons/ontology/src/mizan/mizan.ts",
+              ontology: classes.map((c) => c.iri),
+              recorded: terms.map((t) => t.values.termIri),
+            },
+            {
+              file: "commons/ontology/src/ifccm/ifccm.ts",
               ontology: ifccmOntology.classes.map((c) => c.iri),
               recorded: ifccmOntology.terms.map((t) => t.values.termIri),
             },
             {
-              file: "commons/ontology/ifqs/ifqs.ts",
+              file: "commons/ontology/src/ifqs/ifqs.ts",
               ontology: ifqsOntology.classes.map((c) => c.iri),
               recorded: ifqsOntology.terms.map((t) => t.values.termIri),
             },
             {
-              file: "commons/ontology/ifr/ifr.ts",
+              file: "commons/ontology/src/ifr/ifr.ts",
               ontology: ifrOntology.classes.map((c) => c.iri),
               recorded: ifrOntology.terms.map((t) => t.values.termIri),
             },

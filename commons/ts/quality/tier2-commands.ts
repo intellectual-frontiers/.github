@@ -15,11 +15,11 @@
  *
  * @module
  */
-import { flag, formatUsageError, helpText, many, parseArgs, type Parser, value } from "../kernel/args.ts";
-import { err, ok } from "../kernel/result.ts";
-import { mkdir, readTextFile, writeTextFile } from "../runtime/fs.ts";
-import { dirname } from "../runtime/path.ts";
-import { stderr, stdout } from "../runtime/stdio.ts";
+import { flag, formatUsageError, helpText, many, parseArgs, type Parser, value } from "@intellectual-frontiers/terminal/args";
+import { err, ok } from "@intellectual-frontiers/core";
+import { mkdir, readTextFile, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { dirname } from "@intellectual-frontiers/system/path";
+import { stderr, stdout } from "@intellectual-frontiers/system/stdio";
 import { collect, formatCollectError, loadSigningKey, packOf, readPackFolder, readPackTar, writePack } from "./assessor/host.ts";
 import { showReport, verifyPack } from "./assessor/verify-pack.ts";
 import { formatAgentFinding } from "./attestation/agents.ts";

@@ -17,9 +17,8 @@
  *
  * @module
  */
-import { array, type Decoded, formatDecodeError, json, literal, object, string } from "../../kernel/decode.ts";
-import { err, ok, type Result } from "../../kernel/result.ts";
-import type { Declaration } from "../../mizan/changes/declaration.ts";
+import { array, type Decoded, formatDecodeError, json, literal, object, string, err, ok, type Result } from "@intellectual-frontiers/core";
+import type { Declaration } from "@intellectual-frontiers/mizan/changes/declaration";
 import { regulatedInProduction } from "../pure/ladder.ts";
 import type { LedgerEvent } from "../pure/ledger.ts";
 import { type Grade, gradeRank, GRADES } from "../pure/names.ts";

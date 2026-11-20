@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, proves } from "@intellectual-frontiers/test";
 import { annotate, attribute, boolean, concept, domain, identifier, integer, text, vocabularies } from "@intellectual-frontiers/data/governance";
 import { projectDomain } from "@intellectual-frontiers/data/sql/logical";
 import { dialect as duckdb } from "@intellectual-frontiers/data/sql/dialects/duckdb";

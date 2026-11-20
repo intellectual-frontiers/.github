@@ -21,12 +21,11 @@
  *
  * @module
  */
-import { absurd } from "../../kernel/absurd.ts";
-import type { Instant } from "../../kernel/grc.ts";
-import { instantFromEpochMs } from "../../kernel/grc.ts";
-import { err, ok, type Result } from "../../kernel/result.ts";
-import type { Risk } from "../../kernel/test-record.ts";
-import { type Declaration, isRegulated, phaseOf } from "../../mizan/changes/declaration.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
+import type { Instant } from "@intellectual-frontiers/grc/grc";
+import { instantFromEpochMs } from "@intellectual-frontiers/grc/grc";
+import type { Risk } from "@intellectual-frontiers/test/record";
+import { type Declaration, isRegulated, phaseOf } from "@intellectual-frontiers/mizan/changes/declaration";
 import { type FreshnessState, type FreshnessVerdict, counts as stateCounts } from "./freshness.ts";
 import { applyEvent, type Attestation, type Ledger, type LedgerEvent, openNonconformance } from "./ledger.ts";
 import { type Grade, GRADES, gradeRank, higherGrade, NO_GRADE, showGrade } from "./names.ts";

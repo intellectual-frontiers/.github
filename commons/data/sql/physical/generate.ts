@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { type Composition, point } from "@intellectual-frontiers/data/engine";
 import type { LogicalId, LogicalSchema } from "@intellectual-frontiers/data/sql/logical";
 import { type Naming, naming as defaultNaming } from "./case.ts";

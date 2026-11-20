@@ -9,40 +9,40 @@
 
 ## Catalogs, controls and verdicts (kernel)
 
-- **FR-001**: `kernel/grc.ts` MUST give `defineCatalog(id, version, controls)` over a constant tuple of controls, so that a control id the catalog does not hold MUST NOT compile where a control of that catalog is wanted; and mappings between catalogs by Set Theory Relationship Mapping (NIST IR 8477: `equal`, `subset-of`, `superset-of`, `intersects-with`, `no-relationship`, with a strength from 1 to 10), each mapping's two ends typed by their catalogs.
-- **FR-002**: `defineControl` MUST declare a control that is generic over the subject it judges (`Control<S>`): its id, title, the catalog controls it implements, its severity, its cadence, and a check from a subject and a context to verdicts. `definePack` MUST group controls over one subject type, and running a pack MUST run every control over every subject, a control that throws giving `error` for that subject and never stopping the others.
-- **FR-003**: A verdict's status MUST be one union, `pass | fail | warn | error | not-applicable | gap`, and the outcome after waivers MUST add `accepted`; severity MUST be `info | low | medium | high | critical`. Combining statuses MUST be a join-semilattice (associative, commutative, idempotent, `pass` its identity among the applicable) in the order `not-applicable < pass < accepted < warn < gap < fail < error`, so that a roll-up does not depend on the order it is taken in.
-- **FR-004**: A finding MUST be one type for every harness: the control, the subject (kind and id), the status and outcome, the severity, a title, the detail, the digests of its evidence, a remediation, the waiver that accepted it if any, and the time; findings MUST be grouped into sections by a pure function.
-- **FR-005**: A waiver MUST name its control, the subjects it covers (an exact id or a glob), the reason, the role that approved it, when it was granted and when it expires; a waiver with no expiry, or an expiry before its grant, MUST be refused; an expired waiver MUST NOT apply; an applying waiver MUST turn `fail` or `warn` into `accepted` and keep its id on the finding, and MUST NOT turn `error` or `gap`.
+- **FR-001**: GRC engineering MUST take catalogs and mappings from the library `grc` (`@intellectual-frontiers/grc`, grc FR-001), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
+- **FR-002**: GRC engineering MUST take controls from the library `grc` (`@intellectual-frontiers/grc`, grc FR-002), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
+- **FR-003**: GRC engineering MUST take verdicts and severities from the library `grc` (`@intellectual-frontiers/grc`, grc FR-003), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
+- **FR-004**: GRC engineering MUST take findings from the library `grc` (`@intellectual-frontiers/grc`, grc FR-004), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
+- **FR-005**: GRC engineering MUST take waivers from the library `grc` (`@intellectual-frontiers/grc`, grc FR-005), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
 
 ## Evidence (kernel)
 
-- **FR-006**: `kernel/evidence.ts` MUST give JSON's canonical form (RFC 8785, JCS) and address a piece of evidence by the SHA-256 of that form, so that the same evidence has one digest on every runtime.
-- **FR-007**: A ledger MUST be append-only and hash-chained: each entry has its sequence number, the digest of the entry before it (64 zeros for the first), its time, its kind, its subject and the digest of its evidence, and its own digest is the SHA-256 of the canonical form of the rest; it MUST be written and read as JSON lines, and verifying it MUST name the first entry that was changed, removed, inserted or reordered.
-- **FR-008**: A manifest MUST list files by path, size and SHA-256 in the byte order of their paths, and verifying a set of files against it MUST name each file that is missing, extra or different; its signature MUST be verified by a function the caller gives (0005-typescript-runtime FR-045), so the kernel holds no key.
-- **FR-009**: An evidence bundle MUST be written with the kernel's archive writer (0005-typescript-runtime FR-010) with its manifest at its head, the same bytes every time for the same files, and read back with the manifest checked.
+- **FR-006**: GRC engineering MUST take the canonical form and the digests of evidence from the library `grc` (`@intellectual-frontiers/grc`, grc FR-006), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
+- **FR-007**: GRC engineering MUST take the evidence ledger from the library `grc` (`@intellectual-frontiers/grc`, grc FR-007), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
+- **FR-008**: GRC engineering MUST take manifests from the library `grc` (`@intellectual-frontiers/grc`, grc FR-008), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
+- **FR-009**: GRC engineering MUST take evidence bundles from the library `grc` (`@intellectual-frontiers/grc`, grc FR-009), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
 
 ## Assessment (kernel)
 
-- **FR-010**: Coverage MUST roll up per requirement or control as `gap` (no control implements it), `untested` (implemented, never assessed), `partial` (some subjects not passing), `addressed` (every subject passing or accepted, at least one accepted) or `covered` (every subject passing).
-- **FR-011**: Freshness MUST compare the time of the newest evidence with the control's cadence (an ISO 8601 duration such as `P1D`, `P30D`, `P1Y`) at a given time, saying `fresh`, `due` (within a tenth of the cadence of its end) or `stale` and when it falls due.
-- **FR-012**: Drift MUST compare two views of keyed records (what is declared and what is observed) and give what was added, removed and changed, each change naming the path of the field and both values, in key order.
-- **FR-013**: A change-impact gate MUST read declarations mapping paths (globs) to the controls they bear on, and judge a change (the paths it touches) as `allowed` or `blocked`, blocking where a touched path is declared for a control whose newest verdict is `fail`, `error` or `gap`, or where the change says it needs a review that has not been given, and naming each reason.
-- **FR-014**: A risk register MUST hold risks with a likelihood and an impact on NIST SP 800-30's five levels (`very-low` to `very-high`), the level computed by its Table I-2, a treatment (`accept | mitigate | transfer | avoid`), the role that owns it and its review date; a risk past its review date MUST be reported.
-- **FR-015**: A trace MUST relate each requirement to the mechanisms that enforce it and the evidence they gave, and say which requirements have none.
+- **FR-010**: GRC engineering MUST take coverage from the library `grc` (`@intellectual-frontiers/grc`, grc FR-010), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
+- **FR-011**: GRC engineering MUST take freshness from the library `grc` (`@intellectual-frontiers/grc`, grc FR-011), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
+- **FR-012**: GRC engineering MUST take drift from the library `grc` (`@intellectual-frontiers/grc`, grc FR-012), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
+- **FR-013**: GRC engineering MUST take the change-impact gate from the library `grc` (`@intellectual-frontiers/grc`, grc FR-013), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
+- **FR-014**: GRC engineering MUST take the risk register from the library `grc` (`@intellectual-frontiers/grc`, grc FR-014), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
+- **FR-015**: GRC engineering MUST take the requirement trace from the library `grc` (`@intellectual-frontiers/grc`, grc FR-015), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
 
 ## Formats (kernel)
 
-- **FR-016**: Findings MUST be written as OCSF (version 1.9.0): a Compliance Finding (class 2003) with its `type_uid`, `status_id` and `severity_id` mapped from the verdict and severity, the control in `compliance`, and `metadata.product`; and, for what a harness reports beside its findings, a Vulnerability Finding (class 2002), and a Device (5001), User (5003) or Cloud Resources (5023) Inventory Info event, each with the metadata the caller adds (`tenant_uid`, `uid`, `correlation_uid`, `labels`). Every event is typed by types generated from the OCSF schema at that version (`tools/ocsf-gen.ts` writes `kernel/ocsf-types.auto.ts`; every response it reads is pinned by its SHA-256 in the generator, it is run by hand and its output committed), so a missing required attribute does not compile.
-- **FR-017**: Assessments MUST be written as OSCAL 1.2.3 JSON (`assessment-results`, `plan-of-action-and-milestones`, `component-definition`, and a `system-security-plan` of what is implemented), every `uuid` a version 5 UUID of a namespace and a stable name, so the same input gives the same document.
-- **FR-018**: Attestations MUST be written as CycloneDX 1.6 `declarations` (assessors, attestations, claims, evidence and targets) and as in-toto Statement v1 with a predicate type the caller names, ready for a DSSE envelope (0005-typescript-runtime FR-045).
+- **FR-016**: GRC engineering MUST take findings as OCSF from the library `grc` (`@intellectual-frontiers/grc`, grc FR-016), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
+- **FR-017**: GRC engineering MUST take assessments as OSCAL from the library `grc` (`@intellectual-frontiers/grc`, grc FR-017), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
+- **FR-018**: GRC engineering MUST take attestations from the library `grc` (`@intellectual-frontiers/grc`, grc FR-018), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
 
 ## The host (runtime)
 
-- **FR-019**: Running a pack MUST make signals (0006-signals): a span for the run and one for each control, with `grc.control.id`, `grc.subject.kind`, `grc.subject.id` and the status, and each finding as an OTLP log record whose body is its OCSF document, with a severity from its severity.
-- **FR-020**: `runtime/sign.ts` MUST sign and verify with `ssh-keygen -Y` (namespace given, the key a file the caller names, the allowed signers a file), and with Web Crypto keys through DSSE, behind one signer interface; it MUST NOT read a key it was not given.
-- **FR-021**: `runtime/git.ts` MUST read a repository by running `git` with an argument vector: the commit at `HEAD`, whether the tree is clean, the paths changed between two revisions, and a file as it is at a revision; each a `Result`, a repository that is not there an `Err`.
-- **FR-022**: The runtime MUST load the settings of packs (by a decoder the harness gives, since a pack holds code), waivers, risk registers and impact declarations from TOML, YAML, JSON or JSON5 files through the kernel's decoders, naming the file and the path of what does not decode.
+- **FR-019**: GRC engineering MUST take the run of a pack as signals from the library `grc` (`@intellectual-frontiers/grc`, grc FR-019), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
+- **FR-020**: GRC engineering MUST take signing and verifying from the library `grc` (`@intellectual-frontiers/grc`, grc FR-020), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
+- **FR-021**: The runtime MUST take Git, read by running it from the library `system` (`@intellectual-frontiers/system`, system FR-014), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
+- **FR-022**: GRC engineering MUST take the loaders of settings from the library `grc` (`@intellectual-frontiers/grc`, grc FR-021), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
 
 ## Out of scope
 

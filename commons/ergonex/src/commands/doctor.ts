@@ -9,7 +9,7 @@
  *
  * @module
  */
-import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok } from "@intellectual-frontiers/core";
 import { build, run as runProgram, runtimeName, runtimeVersion, which } from "../platform/r-proc.ts";
 import { flag } from "../platform/k-args.ts";
 import { scopesOf, tokenChecks } from "../token.ts";

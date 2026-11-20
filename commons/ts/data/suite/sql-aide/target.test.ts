@@ -8,7 +8,7 @@
 import type { Equal } from "../../../kernel/mod.ts";
 import { expectType } from "../../../kernel/mod.ts";
 import { fs, path, proc } from "../../../runtime/mod.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "../../../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import {
   apply,
   buildSql,

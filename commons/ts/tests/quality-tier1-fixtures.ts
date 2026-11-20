@@ -5,11 +5,11 @@
  *
  * @module
  */
-import { type Instant, instantOf } from "../kernel/grc.ts";
+import { type Instant, instantOf } from "@intellectual-frontiers/grc/grc";
 import { DEFAULT_CADENCES, type FreshnessVerdict, freshnessOf } from "../quality/pure/freshness.ts";
 import { type Evidence, gradeOfEvidence, type Judged } from "../quality/pure/ladder.ts";
 import { canonicalize, type QualityRecord } from "../quality/pure/record.ts";
-import { assert } from "../runtime/test.ts";
+import { assert } from "@intellectual-frontiers/test";
 import { assembledRun, type CaseSpec, noon } from "./quality-fixtures.ts";
 
 /** The day the tests judge at: the evening of 2026-11-17, the day `noon` makes the runs end on. */

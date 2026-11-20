@@ -1,6 +1,6 @@
 /**
  * The change-control check with a Git host (commons 0020-ifccm FR-009, FR-028 to FR-031): `mizan/changes.ts` judges commits and, with `--strict`, asks the host about each issue they name,
- * but it is given its host's client and never makes one. This command makes it from the repository's `origin` (`githost/remote.ts` reads the remote, `githost/mod.ts` makes the client,
+ * but it is given its host's client and never makes one. This command makes it from the repository's `origin` (`githost`'s `parseRemote` reads the remote, its `clientFor` makes the client,
  * with a token only from the environment) and runs the check, so that `--strict` asks GitHub or GitLab and a plain Git remote is `not_run` with its reason.
  *
  * Each run leaves its result as a quality record (0021-ifqs FR-015, 0020-ifccm FR-031): each rule a case, each finding a failed case with its rule, file and line, and each rule that could
@@ -14,15 +14,15 @@
  * @module
  */
 import process from "node:process";
-import { clientFor, parseRemote } from "../githost/mod.ts";
+import { clientFor, parseRemote } from "@intellectual-frontiers/githost";
 import { type Deps, type RuleResult, run as changes } from "../mizan/changes.ts";
-import { parseSpanId, parseTraceId, type SpanId, type TraceId } from "../kernel/otel.ts";
+import { parseSpanId, parseTraceId, type SpanId, type TraceId } from "@intellectual-frontiers/telemetry/otel";
 import { keepRun, writeOnce } from "../quality/host/branch.ts";
 import { checkRun } from "../quality/pure/record.ts";
-import { mkdir } from "../runtime/fs.ts";
-import { join, resolve } from "../runtime/path.ts";
-import { build, env, run, runtimeName, runtimeVersion } from "../runtime/proc.ts";
-import { stderr } from "../runtime/stdio.ts";
+import { mkdir } from "@intellectual-frontiers/system/fs";
+import { join, resolve } from "@intellectual-frontiers/system/path";
+import { build, env, run, runtimeName, runtimeVersion } from "@intellectual-frontiers/system/proc";
+import { stderr } from "@intellectual-frontiers/system/stdio";
 
 function randomHex(bytes: number): string {
   const b = new Uint8Array(bytes);

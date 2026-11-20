@@ -5,8 +5,8 @@
  *
  * @module
  */
-import { path } from "../../ts/runtime/mod.ts";
-import { assert, assertEquals, proves } from "../../ts/runtime/test.ts";
+import { path } from "@intellectual-frontiers/system";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { Build } from "../build.ts";
 import type { Finding } from "../check.ts";
 import { parsePlainSpec, parseReviewed, readPlainKit, readSpecKits } from "../extract/specs.ts";

@@ -5,10 +5,9 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/commons/ts/kernel";
-import type { Brand } from "@intellectual-frontiers/commons/ts/kernel";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
+import type { Brand } from "@intellectual-frontiers/core";
 import { editDistance } from "../platform/k-args.ts";
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
 
 /** The name of a module: `ergonex <name>` runs the module `ergonex-<name>`. */
 export type ModuleName = Brand<string, "ModuleName">;

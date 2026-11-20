@@ -7,7 +7,7 @@
  * @module
  */
 import { posix, win32 } from "node:path";
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 
 /** The platforms whose rules are known. */
 export type Platform = "linux" | "darwin" | "win32";

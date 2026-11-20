@@ -5,7 +5,7 @@
  * @module
  */
 import { fs, path as hostPath } from "../../../runtime/mod.ts";
-import { assert, assertArrayIncludes, assertEquals, assertStringIncludes, proves } from "../../../runtime/test.ts";
+import { assert, assertArrayIncludes, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import {
   catalog,
   type Capability,

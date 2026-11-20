@@ -12,10 +12,9 @@
  *
  * @module
  */
-import { absurd } from "../../kernel/absurd.ts";
-import { err, ok, type Result } from "../../kernel/result.ts";
-import { NotFound } from "../../runtime/errors.ts";
-import { output } from "../../runtime/proc.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
+import { NotFound } from "@intellectual-frontiers/system/errors";
+import { output } from "@intellectual-frontiers/system/proc";
 
 /** Why the quality branch could not be read or written. */
 export type HostError =

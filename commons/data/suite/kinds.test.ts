@@ -8,7 +8,7 @@
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, proves } from "@intellectual-frontiers/test";
 import { checkKinds, kindsFromCsv, kindsModule, type Kinds, rowsOf } from "@intellectual-frontiers/data/sql/extensions/kinds";
 import { materialize, targetBuild } from "@intellectual-frontiers/data/sql/extensions/target";
 import { DIALECTS, openEngine } from "./engines-fixture.ts";

@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/commons/ts/kernel";
+import { absurd } from "@intellectual-frontiers/core";
 import type { AnyCodeList } from "./codelist.ts";
 
 /** Text. */

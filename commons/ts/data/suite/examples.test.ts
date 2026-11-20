@@ -5,7 +5,7 @@
  * @module
  */
 import { path } from "../../runtime/mod.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "../../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { asPostgres, asSqlite } from "../examples/getting-started.ts";
 import { markdown, pdfsIn, same } from "../examples/file-aide.ts";
 

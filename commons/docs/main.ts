@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { proc } from "../ts/runtime/mod.ts";
+import { proc } from "@intellectual-frontiers/system";
 import { main } from "./cli.ts";
 
 if (import.meta.main) proc.exit(await main(proc.args));

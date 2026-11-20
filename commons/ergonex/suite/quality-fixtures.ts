@@ -5,7 +5,7 @@
  *
  * @module
  */
-import type { JsonObject } from "@intellectual-frontiers/commons/ts/kernel";
+import type { JsonObject } from "@intellectual-frontiers/formats";
 import { parseSpanId, parseTraceId, type SpanId, type TraceId } from "../src/platform/k-otel.ts";
 import { assembleRecord } from "../src/platform/k-test-report.ts";
 import {
@@ -22,7 +22,7 @@ import {
 import { readTextFile, writeTextFile } from "../src/platform/r-fs.ts";
 import { join } from "../src/platform/r-path.ts";
 import { run, which } from "../src/platform/r-proc.ts";
-import { assert } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert } from "@intellectual-frontiers/test";
 
 /** Where git is, or the reason a test of it is skipped. */
 export const needsGit = which("git") === undefined ? { skip: "git is not installed" } : {};

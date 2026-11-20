@@ -1,0 +1,7 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-ontologies FR-001	check	.github: cd commons/ontology && bun run verify	the package is built, inspected and packed, the suite runs, and the library's own trace and spec kit are held
+0001-ontologies FR-002	check	.github: cd commons/ontology && bun test suite/	ifccm-ontology.test.ts: the classes and properties of IFCCM are values of the library, and the tests of the other ontologies in commons/ts/tests read them by package name
+0001-ontologies FR-003	check	.github: cd commons/ontology && bun test suite/	ontology-boundaries.test.ts: the modules import only core and rdf and the library's own modules
+0001-ontologies FR-004	check	.github: cd commons/ontology && bun run verify	the package is built, inspected and packed by tools/pack.ts; tests/commons-packages.test.ts installs the tarball, runs every entry on Node 26 and Bun and type-checks a consumer

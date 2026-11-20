@@ -5,13 +5,21 @@
  *
  * @module
  */
-import { type Literal, tsLiteral } from "../kernel/ts-literal.ts";
-import { sha256File, makeTempDir, mkdirSync, readTextFileSync, remove, withTempDir, writeTextFileSync } from "../runtime/fs.ts";
-import { dirname, fromFileUrl, join, resolve } from "../runtime/path.ts";
-import { execPath, run as spawn } from "../runtime/proc.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { type Literal, tsLiteral } from "@intellectual-frontiers/formats/ts-literal";
+import {
+  sha256File,
+  makeTempDir,
+  mkdirSync,
+  readTextFileSync,
+  remove,
+  withTempDir,
+  writeTextFileSync,
+} from "@intellectual-frontiers/system/fs";
+import { dirname, fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
+import { execPath, run as spawn } from "@intellectual-frontiers/system/proc";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { run as versions } from "../mizan/versions.ts";
-import { decodeReleaseSource } from "../mizan/versions/record.ts";
+import { decodeReleaseSource } from "@intellectual-frontiers/mizan/versions/record";
 import { needsGit, needsSshKeygen, sshSigning } from "./quality-fixtures.ts";
 
 const HERE = dirname(fromFileUrl(import.meta.url));
@@ -580,8 +588,8 @@ proves(
     };
     const ts = decode("commons/ts/release.ts");
     const docs = decode("commons/docs/release.ts");
-    assertEquals([ts.slug, ts.version], ["ifc-ts", "0.13.0"]);
-    assertEquals([docs.slug, docs.version], ["ifc-docs", "0.1.4"]);
+    assertEquals([ts.slug, ts.version], ["ifc-ts", "0.27.2"]);
+    assertEquals([docs.slug, docs.version], ["ifc-docs", "0.1.7"]);
     for (const [dirName, r] of [
       ["ts", ts],
       ["docs", docs],

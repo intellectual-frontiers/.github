@@ -9,12 +9,12 @@
  *
  * @module
  */
-import { formatArchiveError, unzip } from "../kernel/archive.ts";
-import { sha256Of } from "../kernel/sha256.ts";
-import { chmod, ensureDir, readFile, readTextFile, writeFile, writeTextFile } from "../runtime/fs.ts";
-import { downloadVerified, Retries } from "../runtime/net.ts";
-import { dirname, fromFileUrl, join, resolve } from "../runtime/path.ts";
-import { args, build, env, exit } from "../runtime/proc.ts";
+import { formatArchiveError, unzip } from "@intellectual-frontiers/formats/archive";
+import { sha256Of } from "@intellectual-frontiers/crypto/sha256";
+import { chmod, ensureDir, readFile, readTextFile, writeFile, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { downloadVerified, Retries } from "@intellectual-frontiers/net/net";
+import { dirname, fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
+import { args, build, env, exit } from "@intellectual-frontiers/system/proc";
 import { bunTarget, readEnvFile } from "./pins.ts";
 
 /** Stop with a message and status 1. */

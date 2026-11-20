@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, proves } from "@intellectual-frontiers/test";
 import { composeModules, lintOperations, moduleOf, operation } from "@intellectual-frontiers/data/governance";
 import { partyDomain } from "@intellectual-frontiers/data/models/arca";
 import { tenancyModule } from "@intellectual-frontiers/data/models/arca-tenancy";

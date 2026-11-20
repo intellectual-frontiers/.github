@@ -10,7 +10,7 @@
  *
  * @module
  */
-import { type Sha256 } from "@intellectual-frontiers/commons/ts/kernel";
+import { type Sha256 } from "@intellectual-frontiers/crypto";
 import type { Manifest } from "./manifest.ts";
 import type { Desired, DesiredFile, DesiredRepo, DesiredWorktree } from "./plan.ts";
 import { fileDigest, type GeneratedFile } from "./render.ts";

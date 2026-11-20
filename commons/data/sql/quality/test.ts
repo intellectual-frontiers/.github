@@ -10,7 +10,7 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/commons/ts/kernel";
+import { absurd } from "@intellectual-frontiers/core";
 import { type Dialect, qualified } from "@intellectual-frontiers/data/sql/physical";
 
 /** A table or a view by the name it has in the database. */

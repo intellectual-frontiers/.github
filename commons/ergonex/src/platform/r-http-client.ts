@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { http } from "@intellectual-frontiers/commons/ts/runtime";
+import { http } from "@intellectual-frontiers/net";
 /** `http.liveTransport`. */
 export const liveTransport = http.liveTransport;
 /** `http.recordedTransport`. */

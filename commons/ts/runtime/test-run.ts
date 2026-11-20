@@ -17,14 +17,21 @@
  * @module
  */
 import { appendFile } from "node:fs/promises";
-import { fromBase64 } from "../kernel/base64.ts";
-import { type DsseEnvelope, type DsseKey, parseEnvelope, signStatement } from "../kernel/dsse.ts";
-import { appendEntry, formatLedgerParseError, type LedgerEntry, type LedgerRecord, ledgerLines, parseLedger } from "../kernel/evidence.ts";
-import { type Instant, instantFromEpochMs, roleOf } from "../kernel/grc.ts";
-import { type SpanId, spanIdFrom, type TraceId, traceIdFrom } from "../kernel/otel.ts";
-import type { LogBatch, TraceBatch } from "../kernel/otlp.ts";
-import { err, ok, type Result } from "../kernel/result.ts";
-import { type Sha256, sha256 } from "../kernel/sha256.ts";
+import { fromBase64 } from "@intellectual-frontiers/formats/base64";
+import { type DsseEnvelope, type DsseKey, parseEnvelope, signStatement } from "@intellectual-frontiers/crypto/dsse";
+import {
+  appendEntry,
+  formatLedgerParseError,
+  type LedgerEntry,
+  type LedgerRecord,
+  ledgerLines,
+  parseLedger,
+} from "@intellectual-frontiers/grc/evidence";
+import { type Instant, instantFromEpochMs, roleOf } from "@intellectual-frontiers/grc/grc";
+import { type SpanId, spanIdFrom, type TraceId, traceIdFrom } from "@intellectual-frontiers/telemetry/otel";
+import type { LogBatch, TraceBatch } from "@intellectual-frontiers/telemetry/otlp";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
+import { type Sha256, sha256 } from "@intellectual-frontiers/crypto/sha256";
 import {
   assembleRecord,
   completionHtml,
@@ -48,10 +55,20 @@ import {
   type Verification,
   verifyEvidence,
 } from "../kernel/test-report.ts";
-import { closeOrphans, decodeLines, formatRecordError, installationFromEnv, type RunnerOutcome } from "../kernel/test-record.ts";
-import { exists, makeTempDir, mkdir, readFile, readTextFile, remove, stat, walkFiles, writeTextFile } from "./fs.ts";
-import { basename, dirname, join, resolve } from "./path.ts";
-import { build, env, execPath, output, runtimeName, runtimeVersion, which } from "./proc.ts";
+import { closeOrphans, decodeLines, formatRecordError, installationFromEnv, type RunnerOutcome } from "@intellectual-frontiers/test/record";
+import {
+  exists,
+  makeTempDir,
+  mkdir,
+  readFile,
+  readTextFile,
+  remove,
+  stat,
+  walkFiles,
+  writeTextFile,
+} from "@intellectual-frontiers/system/fs";
+import { basename, dirname, join, resolve } from "@intellectual-frontiers/system/path";
+import { build, env, execPath, output, runtimeName, runtimeVersion, which } from "@intellectual-frontiers/system/proc";
 
 /** A runtime whose runner a run uses. */
 export type Runtime = "bun" | "node";

@@ -7,11 +7,11 @@
  *
  * @module
  */
-import { sha256 } from "../kernel/sha256.ts";
-import { mkdir, readTextFile, withTempDir, writeTextFile } from "../runtime/fs.ts";
-import { join } from "../runtime/path.ts";
-import { run } from "../runtime/proc.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
+import { mkdir, readTextFile, withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { join } from "@intellectual-frontiers/system/path";
+import { run } from "@intellectual-frontiers/system/proc";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { parseNotes } from "../quality/pure/chain.ts";
 import { NOTES_REF, QUALITY_BRANCH } from "../quality/pure/names.ts";
 import {

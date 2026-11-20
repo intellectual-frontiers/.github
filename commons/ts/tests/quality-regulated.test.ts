@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { decodeDeclaration, type Declaration } from "../mizan/changes/declaration.ts";
+import { decodeDeclaration, type Declaration } from "@intellectual-frontiers/mizan/changes/declaration";
 import { gradeAfterMutation, mutationFloor, strengthPermille } from "../quality/attestation/mutation.ts";
 import { readDeclaration } from "../quality/host/declaration.ts";
 import { keepRun } from "../quality/host/branch.ts";
@@ -20,10 +20,10 @@ import {
   regulatedInProduction,
 } from "../quality/pure/ladder.ts";
 import { judgeTier, tierRequirements } from "../quality/pure/tier.ts";
-import { makeTempDir, mkdir, remove, writeTextFile } from "../runtime/fs.ts";
+import { makeTempDir, mkdir, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { tierCommand } from "../quality/commands.ts";
-import { join } from "../runtime/path.ts";
-import { assert, assertEquals, proves } from "../runtime/test.ts";
+import { join } from "@intellectual-frontiers/system/path";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { assembledRun, needsGit, repositoryWithCommit } from "./quality-fixtures.ts";
 import { judge, recordOf, TODAY } from "./quality-tier1-fixtures.ts";
 

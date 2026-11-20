@@ -10,15 +10,14 @@
  *
  * @module
  */
-import { type Decoder, formatDecodeError, json, object, record, string } from "@intellectual-frontiers/commons/ts/kernel";
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
-import { type Sha256, sha256Of } from "@intellectual-frontiers/commons/ts/kernel";
+import { type Decoder, formatDecodeError, json, object, record, string, err, ok, type Result } from "@intellectual-frontiers/core";
+import { type Sha256, sha256Of } from "@intellectual-frontiers/crypto";
 import { dayNumber, type Finding } from "./findings.ts";
 import { type GeneratedFile } from "./render.ts";
 import { headerText } from "./render.ts";
 
 /** The version of Ergonex the record names. */
-export const ERGONEX_VERSION = "0.2.7";
+export const ERGONEX_VERSION = "0.3.8";
 
 /** Where the state record is, below the root. */
 export const STATE_RECORD_PATH = ".ergonex/state.auto.json";

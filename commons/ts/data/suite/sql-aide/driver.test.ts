@@ -7,7 +7,7 @@
  */
 import type { Brand, Equal } from "../../../kernel/mod.ts";
 import { expectType } from "../../../kernel/mod.ts";
-import { assert, assertEquals, proves } from "../../../runtime/test.ts";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import {
   apply,
   arrayOf,

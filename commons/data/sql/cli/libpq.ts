@@ -7,7 +7,7 @@
  * @module
  */
 import { chmodSync, existsSync, readFileSync, statSync } from "node:fs";
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { blockOf, type BlockError } from "./blocks.ts";
 import { type Change, type FileError, pgpassModeOk, planBlock } from "./files.ts";
 import type { Paths } from "./workstation.ts";

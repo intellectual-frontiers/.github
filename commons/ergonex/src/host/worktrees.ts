@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { existsSync, mkdir } from "../platform/r-fs.ts";
 import { dirname } from "../platform/r-path.ts";
 import { run } from "../platform/r-proc.ts";

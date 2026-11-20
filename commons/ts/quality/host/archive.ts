@@ -11,8 +11,7 @@
  *
  * @module
  */
-import { absurd } from "../../kernel/absurd.ts";
-import { err, ok, type Result } from "../../kernel/result.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import { parseEvidencePath } from "../pure/chain.ts";
 import { judgeRetention, type RetentionJudgement, tagNameProblem } from "../pure/retention.ts";
 import { branchTip, listCommits } from "./branch.ts";

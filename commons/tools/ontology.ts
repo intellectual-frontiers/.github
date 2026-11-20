@@ -1,7 +1,7 @@
 /**
  * The packaging ontology decoded once into typed records (commons 0002-packaging, 0004-rules, 0012-ontology), with every rule of it the data breaks.
  *
- * This is the tools' decode boundary. The ontology is TypeScript (commons/ontology/supply-chain/packaging/), whose values the compiler has already checked against
+ * This is the tools' decode boundary. The ontology is TypeScript (commons/ontology/src/supply-chain/packaging/), whose values the compiler has already checked against
  * their class schemas; here its code lists become the tools' unions (a kind, a status, an assurance, an operation...) through tables the compiler holds complete,
  * its identifiers become branded ones, and what a type cannot state is checked. Everything after it works on the `Table`. The order in which things are read, and so
  * the order of the findings and of every list, is the order the Python generator (rdflib) gave: subjects sorted by IRI, a property's values in the order written.
@@ -25,7 +25,7 @@ import {
   supportStatuses,
   tiers,
   validate,
-} from "../ontology/supply-chain/packaging/mod.ts";
+} from "../ontology/src/supply-chain/packaging/mod.ts";
 import { words } from "./shlex.ts";
 
 export type FamilyId = Brand<string, "FamilyId">;

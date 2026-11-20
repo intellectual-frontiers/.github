@@ -5,8 +5,8 @@
  *
  * @module
  */
-import { path } from "../../ts/runtime/mod.ts";
-import { assert, assertEquals, proves } from "../../ts/runtime/test.ts";
+import { path } from "@intellectual-frontiers/system";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { report } from "../check.ts";
 import { loadConfig } from "../cli.ts";
 import { document } from "../emit/html.ts";

@@ -10,8 +10,8 @@
  */
 import { cpSync } from "node:fs";
 import { basename } from "node:path";
-import { parseToml } from "../commons/ts/kernel/toml.ts";
-import { fs, path, proc } from "../commons/ts/runtime/mod.ts";
+import { parseToml } from "../commons/formats/src/toml.ts";
+import { fs, path, proc } from "../commons/system/src/mod.ts";
 import {
   assert,
   assertEquals,
@@ -21,14 +21,14 @@ import {
   assertStringIncludes,
   proves,
   test,
-} from "../commons/ts/runtime/test.ts";
+} from "../commons/test/src/test.ts";
 import * as mod from "../commons/generated/packaging.auto.ts";
 import { rules as portabilityRules, scan } from "../commons/tools/shell-portability-check.ts";
 import { words } from "../commons/tools/shlex.ts";
 import { pyJson } from "../commons/tools/emit.ts";
 import { digestOf } from "../commons/tools/generate-packaging.ts";
 import { OPS } from "../commons/tools/ontology.ts";
-import { files, operations } from "../commons/ontology/supply-chain/packaging/mod.ts";
+import { files, operations } from "../commons/ontology/src/supply-chain/packaging/mod.ts";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
 const COMMONS = `${ROOT}/commons`;
@@ -36,7 +36,7 @@ const TOML_PATH = `${COMMONS}/generated/packaging.auto.toml`;
 const SH_FRAGMENT = `${COMMONS}/generated/packaging.auto.sh`;
 const RULES_PATH = `${COMMONS}/generated/rules.auto.toml`;
 const RECORD_PATH = `${COMMONS}/generated/install-record.auto.toml`;
-const ONTOLOGY = "ontology/supply-chain/packaging";
+const ONTOLOGY = "ontology/src/supply-chain/packaging";
 const FIXTURES = `${ROOT}/tests/fixtures/upt`;
 
 // ---- reading TOML as a consumer does: the values checked where they are used, with no cast ----------------------------------------------------------------
@@ -349,7 +349,7 @@ proves(["0004-rules FR-003"], "Rules: the portability tool reports a GNU-only li
 proves(["0004-rules FR-003"], "Rules: the portability tool needs the kernel's TOML reader and the tools' core alone", () => {
   const text = fs.readTextFileSync(`${COMMONS}/tools/shell-portability-check.ts`);
   for (const m of text.matchAll(/^import [^;]*? from "([^"]+)";/gm))
-    assert(["node:process", "../ts/kernel/toml.ts", "./core.ts"].includes(m[1] ?? ""), m[0]);
+    assert(["node:process", "../formats/src/toml.ts", "./core.ts"].includes(m[1] ?? ""), m[0]);
 });
 
 proves(["0004-rules SC-001"], "Rules: the installer script has no line the tool reports", () => {
@@ -382,6 +382,8 @@ type Ran = { readonly code: number; readonly stdout: string; readonly stderr: st
 
 /** What of commons the generator and the type checker need: the ontology, the tools, the generated files and the kernel the ontology is typed by. */
 const COPIED = ["about.ts", "generated", "ontology", "tools", "ts/kernel"];
+/** The libraries lifted out of the kernel, which it and the ontology import (a copy of each, linked by package name). */
+const LIFTED = ["core", "crypto", "formats", "rdf", "telemetry", "terminal", "test"];
 
 class Copy {
   readonly root: string;
@@ -392,6 +394,15 @@ class Copy {
     fs.writeTextFileSync(`${tmp}/package.json`, '{ "type": "module" }\n');
     for (const rel of COPIED)
       cpSync(`${COMMONS}/${rel}`, `${this.root}/${rel}`, { recursive: true, filter: (src) => basename(src) !== "node_modules" });
+    // the kernel imports the foundation by package name (commons 0032-lifting-libraries FR-003): a link to a copy of it is where Node and the compiler look for it (Node does not strip the types of a file under node_modules, and a link's real path is not)
+    fs.mkdirSync(`${tmp}/node_modules/@intellectual-frontiers`, { recursive: true });
+    for (const lib of LIFTED) {
+      cpSync(`${COMMONS}/${lib}`, `${this.root}/${lib}`, {
+        recursive: true,
+        filter: (src) => basename(src) !== "node_modules" && basename(src) !== "dist",
+      });
+      fs.symlinkSync(`${this.root}/${lib}`, `${tmp}/node_modules/@intellectual-frontiers/${lib}`, { type: "dir" });
+    }
   }
   static make(): Copy {
     return new Copy(fs.makeTempDirSync({ prefix: "commons-generator-" }));
@@ -536,7 +547,7 @@ proves(["0002-packaging FR-010"], "Generator: it names every rule the ontology b
   await refused(
     (c) => {
       c.edit("families.ts", /\s*verifiedOn: "Debian 13 under WSL 2, by archon-bootstrap.sh and archon update, 2026-10-16",/, "");
-      c.edit("families.ts", 'detectedBy: ["ubuntu", ', 'detectedBy: ["ubuntu", "fedora", ');
+      c.edit("families.ts", /detectedBy: \[\s*"ubuntu",/, 'detectedBy: ["ubuntu", "fedora",');
       c.edit("families.ts", /\s*removalHint: "sudo userdel -r NAME",/, "");
     },
     "  - family debian is verified but says no where or when\n",
@@ -745,7 +756,7 @@ proves(
   ["0012-ontology FR-008"],
   "Ontology: the modules import only the kernel's RDF and one another, mod.ts lists every file, and no Turtle is a source",
   () => {
-    const all = walk(`${COMMONS}/ontology`);
+    const all = walk(`${COMMONS}/ontology/src`);
     assertEquals(
       all.filter((f) => !f.endsWith(".ts")),
       [],
@@ -764,7 +775,7 @@ proves(
       assertMatch(text, /^\/\/ source_sha256=[0-9a-f]{64}$/m);
       assertMatch(text, /^\/\/ license: \S+$/m);
       for (const i of text.matchAll(/^import[^;]*? from "([^"]+)";/gm))
-        assertEquals(i[1], "../../../ts/kernel/rdf.ts", `${m} imports the kernel's RDF alone`);
+        assertEquals(i[1], "@intellectual-frontiers/rdf", `${m} imports the RDF library alone`);
     }
     const modules = everything.filter((m) => !m.endsWith(".auto.ts"));
     assertEquals(modules, ["families.ts", "managers.ts", "mod.ts", "packaging.ts", "pins.ts", "programs.ts", "record.ts", "rules.ts"]);
@@ -773,7 +784,7 @@ proves(
       assert(text.startsWith("/**") && text.includes("@module"), `${m} has a module comment`);
       for (const i of text.matchAll(/^(?:import|export)[^;]*? from "([^"]+)";/gm)) {
         const spec = i[1] ?? "";
-        assert(spec === "../../../ts/kernel/rdf.ts" || /^\.\/[a-z.-]+\.ts$/.test(spec), `${m} imports ${spec}`);
+        assert(spec === "@intellectual-frontiers/rdf" || /^\.\/[a-z.-]+\.ts$/.test(spec), `${m} imports ${spec}`);
       }
     }
     assertEquals(
@@ -831,7 +842,7 @@ proves(
 
 proves(["0012-ontology FR-011"], "Ontology: the Turtle export says it is generated and by what, and holds every triple once", () => {
   const ttl = fs.readTextFileSync(`${COMMONS}/generated/packaging.auto.ttl`);
-  assert(ttl.startsWith("# AUTO-GENERATED by commons/tools/generate-packaging.ts from commons/ontology/supply-chain/packaging/*.ts"));
+  assert(ttl.startsWith("# AUTO-GENERATED by commons/tools/generate-packaging.ts from commons/ontology/src/supply-chain/packaging/*.ts"));
   assertStringIncludes(ttl, "@prefix pm: <https://www.intellectualfrontiers.com/ontology/packaging#> .\n");
   assertStringIncludes(ttl, "pmid:family-debian a pm:SystemFamily ;\n");
   assertEquals(
@@ -904,8 +915,9 @@ test("commons' tools are strongly typed: no any, no non-null escape, one audited
     if (/\bswitch \(/.test(c)) assertStringIncludes(c, "absurd(", `${name} has a switch with no exhaustiveness check`);
     for (const m of text.matchAll(/^(?:import|export)[^;]*? from "([^"]+)";/gm)) {
       const spec = m[1] ?? "";
-      const ontology = spec === "../ontology/supply-chain/packaging/mod.ts" && (name === "ontology.ts" || name === "generate-packaging.ts");
-      const toml = name === "shell-portability-check.ts" && spec === "../ts/kernel/toml.ts";
+      const ontology =
+        spec === "../ontology/src/supply-chain/packaging/mod.ts" && (name === "ontology.ts" || name === "generate-packaging.ts");
+      const toml = name === "shell-portability-check.ts" && spec === "../formats/src/toml.ts";
       assert(
         spec.startsWith("./") || spec === "node:fs" || spec === "node:process" || ontology || toml,
         `${name} imports ${spec}: the tools have no dependency`,

@@ -10,9 +10,8 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/commons/ts/kernel";
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
-import { type Sha256, sha256 } from "@intellectual-frontiers/commons/ts/kernel";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
+import { type Sha256, sha256 } from "@intellectual-frontiers/crypto";
 import { existsSync, readDirSync, readTextFile, sha256File, statSync } from "../platform/r-fs.ts";
 import { join, sep, toFileUrl } from "../platform/r-path.ts";
 import { run } from "../platform/r-proc.ts";

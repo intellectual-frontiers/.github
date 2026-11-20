@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import type { Dialect } from "@intellectual-frontiers/data/sql/physical";
 import { type LedgerEntry, nextEntry, verifyChain, type ChainBreak } from "./ledger.ts";
 import { type RunPlan, type Repeatable, type StepStatement, type Verification, dueRepeatables } from "./plan.ts";

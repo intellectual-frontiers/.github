@@ -4,14 +4,14 @@
  *
  * @module
  */
-import { controls } from "../../ontology/standards/nist-sp-800-53/controls.auto.ts";
-import { dirname, fromFileUrl, resolve } from "../runtime/path.ts";
-import { execPath, run } from "../runtime/proc.ts";
-import { assertEquals, proves } from "../runtime/test.ts";
+import { controls } from "@intellectual-frontiers/ontology/standards/nist-sp-800-53/controls.auto";
+import { dirname, fromFileUrl, resolve } from "@intellectual-frontiers/system/path";
+import { execPath, run } from "@intellectual-frontiers/system/proc";
+import { assertEquals, proves } from "@intellectual-frontiers/test";
 import { manifest } from "../mizan/imports/nist-sp-800-53.import.ts";
 
 const HERE = dirname(fromFileUrl(import.meta.url));
-const IMPORT = resolve(HERE, "..", "mizan", "integrations", "host", "import.ts");
+const IMPORT = resolve(HERE, "..", "..", "mizan", "src", "integrations", "host", "import.ts");
 const MANIFEST = resolve(HERE, "..", "mizan", "imports", "nist-sp-800-53.import.ts");
 
 proves(

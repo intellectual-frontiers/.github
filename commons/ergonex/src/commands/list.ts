@@ -7,11 +7,10 @@
  * @module
  */
 import { flag, type Parser, value } from "../platform/k-args.ts";
-import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, absurd } from "@intellectual-frontiers/core";
 import type { Finding } from "../findings.ts";
 import { MANIFEST_TIMEOUT_MS } from "../modules/external.ts";
 import { discoverModules, probeModule } from "../host/discovery.ts";
-import { absurd } from "@intellectual-frontiers/commons/ts/kernel";
 import { hiddenFindings, resolveAll } from "../modules/registry.ts";
 import { defineCommand, dispatch, GLOBAL_OPTIONS, type ErgonexModule } from "../modules/types.ts";
 import { nearestNames } from "../modules/name.ts";

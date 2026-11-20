@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok } from "@intellectual-frontiers/core";
 import type { Annotation, ElementId } from "@intellectual-frontiers/data/governance";
 import type { BindContext, Literal, Statement, StatementSource } from "@intellectual-frontiers/data/sql/physical";
 import { createTables, INTEGER, JSON_TYPE, reload, TEXT } from "./fragment.ts";

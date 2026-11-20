@@ -10,8 +10,8 @@
 import { chmod, existsSync, readDirSync, readTextFile, writeTextFile, mkdir } from "../src/platform/r-fs.ts";
 import { join } from "../src/platform/r-path.ts";
 import { execPath, run, which } from "../src/platform/r-proc.ts";
-import { sha256 } from "@intellectual-frontiers/commons/ts/kernel";
-import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { sha256 } from "@intellectual-frontiers/crypto";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { readQuality } from "@intellectual-frontiers/commons/ts/quality";
 import { BEGIN, END } from "../src/shell/block.ts";
 import { BUILTIN_MODULES } from "../src/commands/mod.ts";

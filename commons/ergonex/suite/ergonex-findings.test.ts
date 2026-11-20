@@ -22,7 +22,7 @@ import {
   worst,
 } from "../src/findings.ts";
 import { hookFailsWhenUnableToCheck, hostAllowed, policyOf, unsignedCommitSeverity } from "../src/policy.ts";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const finding = (severity: Severity, ruleId = "ergonex/x", subject = "github.com/o/r"): Finding => ({
   ruleId,

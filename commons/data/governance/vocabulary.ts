@@ -15,7 +15,7 @@ import {
   type IdError,
   point,
 } from "@intellectual-frontiers/data/engine";
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import type { AnnotationKind } from "./annotation.ts";
 import type { ElementId } from "./id.ts";
 import type { Domain } from "./model.ts";

@@ -22,14 +22,13 @@
  *
  * @module
  */
-import { absurd } from "../../kernel/absurd.ts";
-import { GENESIS } from "../../kernel/evidence.ts";
-import type { Attributes } from "../../kernel/otel.ts";
-import { err, ok, type Result } from "../../kernel/result.ts";
-import type { Sha256 } from "../../kernel/sha256.ts";
-import { AlreadyExists } from "../../runtime/errors.ts";
-import { makeTempDir, remove, writeTextFile } from "../../runtime/fs.ts";
-import { join } from "../../runtime/path.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
+import { GENESIS } from "@intellectual-frontiers/grc/evidence";
+import type { Attributes } from "@intellectual-frontiers/telemetry/otel";
+import type { Sha256 } from "@intellectual-frontiers/crypto/sha256";
+import { AlreadyExists } from "@intellectual-frontiers/system/errors";
+import { makeTempDir, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { join } from "@intellectual-frontiers/system/path";
 import {
   type ChainBreak,
   type EvidenceNote,

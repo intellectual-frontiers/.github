@@ -25,8 +25,8 @@
  *
  * @module
  */
-import { absurd } from "../../kernel/absurd.ts";
-import { redactText } from "../../kernel/otel.ts";
+import { absurd } from "@intellectual-frontiers/core";
+import { redactText } from "@intellectual-frontiers/telemetry/otel";
 
 /** Who a rendering is for (`ifqs:Public`, `ifqs:Assessor`, `ifqs:Internal`). */
 export type Audience = "Public" | "Assessor" | "Internal";

@@ -17,8 +17,8 @@
  *
  * @module
  */
-import { type Duration, duration, type Instant } from "../../kernel/grc.ts";
-import { freshness } from "../../kernel/assess.ts";
+import { type Duration, duration, type Instant } from "@intellectual-frontiers/grc/grc";
+import { freshness } from "@intellectual-frontiers/grc/assess";
 
 /** The state of a proof's freshness, in the words of the ontology (`ifqs:Fresh`, `ifqs:Due`, `ifqs:Stale`). */
 export type FreshnessState = "Fresh" | "Due" | "Stale";

@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/commons/ts/kernel";
+import { absurd } from "@intellectual-frontiers/core";
 
 /** Why a test was not counted as it ran. */
 export type Directive = { readonly kind: "skip"; readonly reason: string } | { readonly kind: "todo"; readonly reason: string };

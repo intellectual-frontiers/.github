@@ -5,6 +5,19 @@
     "": {
       "name": "@intellectual-frontiers/commons",
       "dependencies": {
+        "@intellectual-frontiers/core": "0.1.0",
+        "@intellectual-frontiers/crypto": "0.1.0",
+        "@intellectual-frontiers/formats": "0.1.0",
+        "@intellectual-frontiers/githost": "0.1.0",
+        "@intellectual-frontiers/grc": "0.1.0",
+        "@intellectual-frontiers/mizan": "0.1.0",
+        "@intellectual-frontiers/net": "0.1.0",
+        "@intellectual-frontiers/ontology": "0.1.2",
+        "@intellectual-frontiers/rdf": "0.1.0",
+        "@intellectual-frontiers/system": "0.1.0",
+        "@intellectual-frontiers/telemetry": "0.1.0",
+        "@intellectual-frontiers/terminal": "0.1.0",
+        "@intellectual-frontiers/test": "0.1.0",
         "mermaid": "11.17.2",
         "typescript": "7.1.0-beta",
       },
@@ -20,6 +33,32 @@
     "@iconify/types": ["@iconify/types@2.0.0", "", {}, "sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg=="],
 
     "@iconify/utils": ["@iconify/utils@3.1.7", "", { "dependencies": { "@antfu/install-pkg": "^2.0.1", "@iconify/types": "^2.0.0", "import-meta-resolve": "^4.2.0" } }, "sha512-JZHlwdID+dy+lTgbYC8NEC4zeugqeYsc6jewvzb4c58kHauJn+X7rNwQjxz5p2qSjqaEeQoLkCIQ9v/H4PK0/w=="],
+
+    "@intellectual-frontiers/core": ["@intellectual-frontiers/core@0.1.0", "", {}, "sha512-tOdJKL/vsHJYxUuizWLnaI58mOXojBll1zgaKXw6QIoMK7dHhA+jsfBdherG3jK+EijipzRYBNXqNvWhNIoGHA=="],
+
+    "@intellectual-frontiers/crypto": ["@intellectual-frontiers/crypto@0.1.0", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.0", "@intellectual-frontiers/formats": "0.1.0" } }, "sha512-JVT43ISlUP5rfq+SXKy1oCe9TYjsjFE9FhC0pOUhwW/ewoXi0meNjgT2Ginb8oMg1XfWLnYQ/Nzj5FXcJ2xtcg=="],
+
+    "@intellectual-frontiers/formats": ["@intellectual-frontiers/formats@0.1.0", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.0" } }, "sha512-22YoAXzh8T6zNpYov+9xQLfmVgYxUOkWMv+TqnT4Bm2WzbEjm1nMNA0WINzjVq+hDGiuPQU/SkJ/F6v3THr9uA=="],
+
+    "@intellectual-frontiers/githost": ["@intellectual-frontiers/githost@0.1.0", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.2", "@intellectual-frontiers/net": "0.1.1", "@intellectual-frontiers/system": "0.1.2" } }, "sha512-2lmmg4M/+yBYlg41VLRQYTeBdTeA1d+EgLbRBFisGjSBOfwzPCc8R+AlrtrD+5JZfKuRzQ5ReYgYZOxJoyPgAg=="],
+
+    "@intellectual-frontiers/grc": ["@intellectual-frontiers/grc@0.1.0", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.2", "@intellectual-frontiers/crypto": "0.1.2", "@intellectual-frontiers/formats": "0.1.2", "@intellectual-frontiers/system": "0.1.2", "@intellectual-frontiers/telemetry": "0.1.2" } }, "sha512-dTuDZPdDwUjlSptYzApZPPEkXA2bexmIYTxYC1f9KwhgshajVAXs46MzsLj8eQ/gDgPt5lmAgbFgOn+FbiqVbg=="],
+
+    "@intellectual-frontiers/mizan": ["@intellectual-frontiers/mizan@0.1.0", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.3", "@intellectual-frontiers/crypto": "0.1.3", "@intellectual-frontiers/formats": "0.1.3", "@intellectual-frontiers/githost": "0.1.1", "@intellectual-frontiers/ontology": "0.1.0", "@intellectual-frontiers/rdf": "0.1.3", "@intellectual-frontiers/system": "0.1.3" } }, "sha512-qWmOKIgFBKETNFkgY7oytJ4N9QzF/VjGRHv+KIG2E+XFO6bsDZBNBC4jvtPaCSZS+jHFzfhLXYQwyzuumO7Abg=="],
+
+    "@intellectual-frontiers/net": ["@intellectual-frontiers/net@0.1.0", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.1", "@intellectual-frontiers/crypto": "0.1.1", "@intellectual-frontiers/formats": "0.1.1", "@intellectual-frontiers/system": "0.1.1", "@intellectual-frontiers/telemetry": "0.1.1" } }, "sha512-ZUKbf/XnmnVHSWrP4KExWKWRm3l+u7PAjeDKL4LcWvez+axZRZpVs/JiBljciwwZagGj5002GkEwTgnq1L6+iQ=="],
+
+    "@intellectual-frontiers/ontology": ["@intellectual-frontiers/ontology@0.1.2", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.3", "@intellectual-frontiers/rdf": "0.1.3" } }, "sha512-e6vtnwHJfO6KNsr4JSNZbZRNCzMn28lSz5OrnGFudBdOPfsQ5oqysgK65EnH62YCH7f2mz4CKiGoVQEhHm2WSQ=="],
+
+    "@intellectual-frontiers/rdf": ["@intellectual-frontiers/rdf@0.1.0", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.0" } }, "sha512-D/dpkvn5N+vdvEXg7dB6Pqe2MCTxgo5ejtQuRDPzZziXhFSFn/HJxUig1ELRFS/byx67kpbS6K2E39TE5iDKRg=="],
+
+    "@intellectual-frontiers/system": ["@intellectual-frontiers/system@0.1.0", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.1", "@intellectual-frontiers/crypto": "0.1.1", "@intellectual-frontiers/formats": "0.1.1" }, "peerDependencies": { "@types/node": ">=26" } }, "sha512-YoD6seQNw07sz4haAOC82iNHlPXO6bGfqG7yEZDv4CHhAd9XZozn1BP46AovQLPHrEju9+2PwagKHx9y/FR/nA=="],
+
+    "@intellectual-frontiers/telemetry": ["@intellectual-frontiers/telemetry@0.1.0", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.1", "@intellectual-frontiers/formats": "0.1.1", "@intellectual-frontiers/system": "0.1.0", "@intellectual-frontiers/terminal": "0.1.1" } }, "sha512-JjDLdYVwxLiDYnm/XuzKGjKVmhKqHgK67t3ypaQzb7/EBySMBkoq7Pw8ufg+FPsXezQyrk71CQIcDw0IcpfxjQ=="],
+
+    "@intellectual-frontiers/terminal": ["@intellectual-frontiers/terminal@0.1.0", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.0" } }, "sha512-YbAhZorkoWCqRFoy3biJorx9hbxryWClqXYOcNAN0rMNxKcTK9A7o6QM5UoKCeLRIkE+kyHvqEltbZEpMMHNDA=="],
+
+    "@intellectual-frontiers/test": ["@intellectual-frontiers/test@0.1.0", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.2", "@intellectual-frontiers/crypto": "0.1.2", "@intellectual-frontiers/system": "0.1.2", "@intellectual-frontiers/telemetry": "0.1.2" } }, "sha512-r/Zh2yxxnvcxBhzFjcAyckGjMBfUc/n+OXNpbA8ViAN7nTEpnUc0A/kgoiMsUVgr830cBuEXN+F3PTXdEZsjhQ=="],
 
     "@mermaid-js/parser": ["@mermaid-js/parser@1.2.1", "", { "dependencies": { "@chevrotain/types": "~11.1.2" } }, "sha512-n12NohV3mrUyUL2o93IgG/ifeW9FTyeJn3zDxkhwa8MJ9Fxg3HQMlA3RiGmD/3UnJvheztkjjQAjA2T4LmUcpw=="],
 
@@ -86,6 +125,8 @@
     "@types/d3-zoom": ["@types/d3-zoom@3.0.9", "", { "dependencies": { "@types/d3-interpolate": "*", "@types/d3-selection": "*" } }, "sha512-0sE1406XBYJGiqD3AusTl9ZqC//2mIXix51tbom25gDCA8ri4xnSZg28CaSE8Srl6FClqABUKfsn0qghgdepMA=="],
 
     "@types/geojson": ["@types/geojson@7946.0.16", "", {}, "sha512-6C8nqWur3j98U6+lXDfTUWIfgvZU+EumvpHKcYjujKH7woYyLj2sUmff0tRhrqM7BohUw7Pz3ZB1jj2gW9Fvmg=="],
+
+    "@types/node": ["@types/node@26.6.6", "", { "dependencies": { "undici-types": "~8.9.0" } }, "sha512-MzQj+8Kx3XI40OmUAE6Qoh58ZMNstNNMwn2nfd3qWsfe7nDNSqJNzes4njhz6AHwrSHOffSLwXU6yb474Q4aog=="],
 
     "@types/trusted-types": ["@types/trusted-types@2.0.7", "", {}, "sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw=="],
 
@@ -265,7 +306,73 @@
 
     "typescript": ["typescript@7.1.0-beta", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.1.0-beta", "@typescript/typescript-android-arm64": "7.1.0-beta", "@typescript/typescript-darwin-arm64": "7.1.0-beta", "@typescript/typescript-darwin-x64": "7.1.0-beta", "@typescript/typescript-freebsd-arm64": "7.1.0-beta", "@typescript/typescript-freebsd-x64": "7.1.0-beta", "@typescript/typescript-linux-arm": "7.1.0-beta", "@typescript/typescript-linux-arm64": "7.1.0-beta", "@typescript/typescript-linux-loong64": "7.1.0-beta", "@typescript/typescript-linux-mips64el": "7.1.0-beta", "@typescript/typescript-linux-ppc64": "7.1.0-beta", "@typescript/typescript-linux-riscv64": "7.1.0-beta", "@typescript/typescript-linux-s390x": "7.1.0-beta", "@typescript/typescript-linux-x64": "7.1.0-beta", "@typescript/typescript-netbsd-arm64": "7.1.0-beta", "@typescript/typescript-netbsd-x64": "7.1.0-beta", "@typescript/typescript-openbsd-arm64": "7.1.0-beta", "@typescript/typescript-openbsd-x64": "7.1.0-beta", "@typescript/typescript-sunos-x64": "7.1.0-beta", "@typescript/typescript-win32-arm64": "7.1.0-beta", "@typescript/typescript-win32-x64": "7.1.0-beta" }, "bin": { "tsc": "bin/tsc" } }, "sha512-cjWjZAJDsmZzsNC5GwHNlW0YPM65jZa5oR0KyQcYX3KSVIfTvtBq//vewISyatKk4OLi5grZjHhIVE9fdrw1UQ=="],
 
+    "undici-types": ["undici-types@8.9.0", "", {}, "sha512-KTDyRTYX8sWmKXAikPHHSyc63CRPETMctyjKFupcC6OBLXT3xsN0e9aF7m+mIXutFWpUXuedtowG7iLOzp0kQg=="],
+
     "uuid": ["uuid@14.0.3", "", { "bin": { "uuid": "dist-node/bin/uuid" } }, "sha512-Sc5u1VVln93y1Xnz4R+CunOZc7R9LUcTmhj7Rc7Eg3HVcf7rVn2FOoa812fe0W8p3jD7xeoGSYbfqCGGH2B6xw=="],
+
+    "@intellectual-frontiers/githost/@intellectual-frontiers/core": ["@intellectual-frontiers/core@0.1.2", "", {}, "sha512-odZq/SOVlKtyNaXYTF9aKM/DHXWiiUU2QJ496hu/EGGXaeM2hTl0FXqjR2KUWlawpBECwwcqvhUMx/4CJMja1g=="],
+
+    "@intellectual-frontiers/githost/@intellectual-frontiers/net": ["@intellectual-frontiers/net@0.1.1", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.2", "@intellectual-frontiers/crypto": "0.1.2", "@intellectual-frontiers/formats": "0.1.2", "@intellectual-frontiers/system": "0.1.2", "@intellectual-frontiers/telemetry": "0.1.2" } }, "sha512-SxPDzmLnkMXIRMnzLUog04+GiCK6lN3PPWZOTozQ4MUF/sSp5EuDuHEBvNFcETgDfcmUfJ7KkJ0w5cY+GNKpOQ=="],
+
+    "@intellectual-frontiers/githost/@intellectual-frontiers/system": ["@intellectual-frontiers/system@0.1.2", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.2", "@intellectual-frontiers/crypto": "0.1.2", "@intellectual-frontiers/formats": "0.1.2" }, "peerDependencies": { "@types/node": ">=26" } }, "sha512-WBb/eBdm7ISapweWujI+Gss22+cdKmUORCkRC4tyleCZmNPy9lSh4pdW6FM6Sst+BJdrHgGsWbITW378g0aDHQ=="],
+
+    "@intellectual-frontiers/grc/@intellectual-frontiers/core": ["@intellectual-frontiers/core@0.1.2", "", {}, "sha512-odZq/SOVlKtyNaXYTF9aKM/DHXWiiUU2QJ496hu/EGGXaeM2hTl0FXqjR2KUWlawpBECwwcqvhUMx/4CJMja1g=="],
+
+    "@intellectual-frontiers/grc/@intellectual-frontiers/crypto": ["@intellectual-frontiers/crypto@0.1.2", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.2", "@intellectual-frontiers/formats": "0.1.2" } }, "sha512-Sjcu7cVBLGLSRcH/qlDbJKfA/hiZk1zzmttLy9Jx/k0LHh2GCjA951hiowMLyfQnFoVc07dzm1i6gPv+4muGsQ=="],
+
+    "@intellectual-frontiers/grc/@intellectual-frontiers/formats": ["@intellectual-frontiers/formats@0.1.2", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.2" } }, "sha512-vd8uq8U9Bt6Vrnmdlet16cauCTjil9tXMwTXlemFERA5BeJrHL4V79cGzf5LVbr4kwlB06LrZJACgBlQvrFEpw=="],
+
+    "@intellectual-frontiers/grc/@intellectual-frontiers/system": ["@intellectual-frontiers/system@0.1.2", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.2", "@intellectual-frontiers/crypto": "0.1.2", "@intellectual-frontiers/formats": "0.1.2" }, "peerDependencies": { "@types/node": ">=26" } }, "sha512-WBb/eBdm7ISapweWujI+Gss22+cdKmUORCkRC4tyleCZmNPy9lSh4pdW6FM6Sst+BJdrHgGsWbITW378g0aDHQ=="],
+
+    "@intellectual-frontiers/grc/@intellectual-frontiers/telemetry": ["@intellectual-frontiers/telemetry@0.1.2", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.2", "@intellectual-frontiers/formats": "0.1.2", "@intellectual-frontiers/system": "0.1.2", "@intellectual-frontiers/terminal": "0.1.2" } }, "sha512-pG2FNHxeylvbXQXY8qtdn8lamXtoZ53B0Lj6/lqv3rCCMdac3mVqdhIjjaTALHo77vdGKMtQxcHfMRJbJj+Fjw=="],
+
+    "@intellectual-frontiers/mizan/@intellectual-frontiers/core": ["@intellectual-frontiers/core@0.1.3", "", {}, "sha512-EQQqFtGdIdNSt3yqxyFW0nuEEuV+bIBI3tj7nCDhf1RsBWMDY9emrOdQ8Tp8QgG4JUcS/ytqisszFIeFEdiaDA=="],
+
+    "@intellectual-frontiers/mizan/@intellectual-frontiers/crypto": ["@intellectual-frontiers/crypto@0.1.3", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.3", "@intellectual-frontiers/formats": "0.1.3" } }, "sha512-8paq7/i+7dJK7+sNXKwffuMpBTvktl8fObsYVrZTgOM+3PjjeOImfJhFpSGjdhUwl0MJ2iiQRrbU78//4Jt4tg=="],
+
+    "@intellectual-frontiers/mizan/@intellectual-frontiers/formats": ["@intellectual-frontiers/formats@0.1.3", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.3" } }, "sha512-Z100HNGqc2k8PoAJDjz2JEQzyhfMjvQVGmKdALjhbkBXlhsEtP14SC4jI7gc3Paw/aUQ6u+sj8ZxNLSC2mCz9w=="],
+
+    "@intellectual-frontiers/mizan/@intellectual-frontiers/githost": ["@intellectual-frontiers/githost@0.1.1", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.3", "@intellectual-frontiers/net": "0.1.2", "@intellectual-frontiers/system": "0.1.3" } }, "sha512-m1iUkqOji+QUjotpVPIhyMXdEv14ISeXhI1sFbu6tXRQT7rQOYWKixOXETe/OC2VVhaWu2ZhAHg3y/Bqe3COTQ=="],
+
+    "@intellectual-frontiers/mizan/@intellectual-frontiers/ontology": ["@intellectual-frontiers/ontology@0.1.0", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.3", "@intellectual-frontiers/rdf": "0.1.3" } }, "sha512-x1nF8BpgHNs3k5vtSA+zLWFKaV28VxCEsK/SqHSR91d+pN6ccpf9o36Ti9StmrUJODlxPp24zATIru+dwyH55w=="],
+
+    "@intellectual-frontiers/mizan/@intellectual-frontiers/rdf": ["@intellectual-frontiers/rdf@0.1.3", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.3" } }, "sha512-h70Bx+tBnbfUZKiy04na44LHOaiqaJBNZSOBMB4/2DV7sAcwqKup87mnelahzp+F7s9aeMPerMy2ldSCezcAcQ=="],
+
+    "@intellectual-frontiers/mizan/@intellectual-frontiers/system": ["@intellectual-frontiers/system@0.1.3", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.3", "@intellectual-frontiers/crypto": "0.1.3", "@intellectual-frontiers/formats": "0.1.3" }, "peerDependencies": { "@types/node": ">=26" } }, "sha512-pVj0+e4Xp0eWaN3ktIhIZ1rk6Tambn8KbGTZiNnLjU6bzop6Ek6ZjCUrB1fK10Rs7/a7Mi8tC4OIKXu5eBdn6A=="],
+
+    "@intellectual-frontiers/net/@intellectual-frontiers/core": ["@intellectual-frontiers/core@0.1.1", "", {}, "sha512-2CRWnO8kSVnsNemWJJUfbILnFuUzMKNAVdra8J4ZXS1O7pDubZw/OM4egq2iWo9+VP45cblxNVjIvV43c7fwSQ=="],
+
+    "@intellectual-frontiers/net/@intellectual-frontiers/crypto": ["@intellectual-frontiers/crypto@0.1.1", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.1", "@intellectual-frontiers/formats": "0.1.1" } }, "sha512-dIVy8N0ttrjDNq/P3MLmb50dRTGNKJ+xdlKw4rDBTerYSScqDoQar8DS3GfIBQwNx7uqCkRNNBS/xl2Nn+PVnw=="],
+
+    "@intellectual-frontiers/net/@intellectual-frontiers/formats": ["@intellectual-frontiers/formats@0.1.1", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.1" } }, "sha512-1vucbLz1Lpv69wLN/RAezPpI6YwANY+twPSSjknnJ72+D2ixsUyICTABv3v6+DYZAUiYyXiNPMGdAVu80eizmQ=="],
+
+    "@intellectual-frontiers/net/@intellectual-frontiers/system": ["@intellectual-frontiers/system@0.1.1", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.1", "@intellectual-frontiers/crypto": "0.1.1", "@intellectual-frontiers/formats": "0.1.1" }, "peerDependencies": { "@types/node": ">=26" } }, "sha512-9AxGJpoLMjO85F7qb7/TJs/wy+FKCffXC4pxo+iTlaq4HXV80B+E9HZoEhMHEc0uPFpih6eP7VJjAkYE0+Fdfg=="],
+
+    "@intellectual-frontiers/net/@intellectual-frontiers/telemetry": ["@intellectual-frontiers/telemetry@0.1.1", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.1", "@intellectual-frontiers/formats": "0.1.1", "@intellectual-frontiers/system": "0.1.1", "@intellectual-frontiers/terminal": "0.1.1" } }, "sha512-eoV8lNQFczAlx2OYa/m7zM/gLEywlzKDloDbS+Z4SVR46SbTkVGb1NF9m712uxa4xadqYaJR9/7am2iAjKPzNQ=="],
+
+    "@intellectual-frontiers/ontology/@intellectual-frontiers/core": ["@intellectual-frontiers/core@0.1.3", "", {}, "sha512-EQQqFtGdIdNSt3yqxyFW0nuEEuV+bIBI3tj7nCDhf1RsBWMDY9emrOdQ8Tp8QgG4JUcS/ytqisszFIeFEdiaDA=="],
+
+    "@intellectual-frontiers/ontology/@intellectual-frontiers/rdf": ["@intellectual-frontiers/rdf@0.1.3", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.3" } }, "sha512-h70Bx+tBnbfUZKiy04na44LHOaiqaJBNZSOBMB4/2DV7sAcwqKup87mnelahzp+F7s9aeMPerMy2ldSCezcAcQ=="],
+
+    "@intellectual-frontiers/system/@intellectual-frontiers/core": ["@intellectual-frontiers/core@0.1.1", "", {}, "sha512-2CRWnO8kSVnsNemWJJUfbILnFuUzMKNAVdra8J4ZXS1O7pDubZw/OM4egq2iWo9+VP45cblxNVjIvV43c7fwSQ=="],
+
+    "@intellectual-frontiers/system/@intellectual-frontiers/crypto": ["@intellectual-frontiers/crypto@0.1.1", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.1", "@intellectual-frontiers/formats": "0.1.1" } }, "sha512-dIVy8N0ttrjDNq/P3MLmb50dRTGNKJ+xdlKw4rDBTerYSScqDoQar8DS3GfIBQwNx7uqCkRNNBS/xl2Nn+PVnw=="],
+
+    "@intellectual-frontiers/system/@intellectual-frontiers/formats": ["@intellectual-frontiers/formats@0.1.1", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.1" } }, "sha512-1vucbLz1Lpv69wLN/RAezPpI6YwANY+twPSSjknnJ72+D2ixsUyICTABv3v6+DYZAUiYyXiNPMGdAVu80eizmQ=="],
+
+    "@intellectual-frontiers/telemetry/@intellectual-frontiers/core": ["@intellectual-frontiers/core@0.1.1", "", {}, "sha512-2CRWnO8kSVnsNemWJJUfbILnFuUzMKNAVdra8J4ZXS1O7pDubZw/OM4egq2iWo9+VP45cblxNVjIvV43c7fwSQ=="],
+
+    "@intellectual-frontiers/telemetry/@intellectual-frontiers/formats": ["@intellectual-frontiers/formats@0.1.1", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.1" } }, "sha512-1vucbLz1Lpv69wLN/RAezPpI6YwANY+twPSSjknnJ72+D2ixsUyICTABv3v6+DYZAUiYyXiNPMGdAVu80eizmQ=="],
+
+    "@intellectual-frontiers/telemetry/@intellectual-frontiers/terminal": ["@intellectual-frontiers/terminal@0.1.1", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.1" } }, "sha512-AyfjvpsWzVkeAHQGwkDgJlCjpORgrocahJ1Q0iGbnkP6OP5VXpqyPv2fFJtaWCbYS1F956vj39UNV3Omp60HaA=="],
+
+    "@intellectual-frontiers/test/@intellectual-frontiers/core": ["@intellectual-frontiers/core@0.1.2", "", {}, "sha512-odZq/SOVlKtyNaXYTF9aKM/DHXWiiUU2QJ496hu/EGGXaeM2hTl0FXqjR2KUWlawpBECwwcqvhUMx/4CJMja1g=="],
+
+    "@intellectual-frontiers/test/@intellectual-frontiers/crypto": ["@intellectual-frontiers/crypto@0.1.2", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.2", "@intellectual-frontiers/formats": "0.1.2" } }, "sha512-Sjcu7cVBLGLSRcH/qlDbJKfA/hiZk1zzmttLy9Jx/k0LHh2GCjA951hiowMLyfQnFoVc07dzm1i6gPv+4muGsQ=="],
+
+    "@intellectual-frontiers/test/@intellectual-frontiers/system": ["@intellectual-frontiers/system@0.1.2", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.2", "@intellectual-frontiers/crypto": "0.1.2", "@intellectual-frontiers/formats": "0.1.2" }, "peerDependencies": { "@types/node": ">=26" } }, "sha512-WBb/eBdm7ISapweWujI+Gss22+cdKmUORCkRC4tyleCZmNPy9lSh4pdW6FM6Sst+BJdrHgGsWbITW378g0aDHQ=="],
+
+    "@intellectual-frontiers/test/@intellectual-frontiers/telemetry": ["@intellectual-frontiers/telemetry@0.1.2", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.2", "@intellectual-frontiers/formats": "0.1.2", "@intellectual-frontiers/system": "0.1.2", "@intellectual-frontiers/terminal": "0.1.2" } }, "sha512-pG2FNHxeylvbXQXY8qtdn8lamXtoZ53B0Lj6/lqv3rCCMdac3mVqdhIjjaTALHo77vdGKMtQxcHfMRJbJj+Fjw=="],
 
     "cytoscape-fcose/cose-base": ["cose-base@2.2.0", "", { "dependencies": { "layout-base": "^2.0.0" } }, "sha512-AzlgcsCbUMymkADOJtQm3wO9S3ltPfYOFD5033keQn9NJzIbtnZj+UdBJe7DYml/8TdbtHJW3j58SOnKhWY/5g=="],
 
@@ -275,8 +382,38 @@
 
     "d3-sankey/d3-shape": ["d3-shape@1.3.7", "", { "dependencies": { "d3-path": "1" } }, "sha512-EUkvKjqPFUAZyOlhY5gzCxCeI0Aep04LwIRpsZ/mLFelJiUfnK56jo5JMDSE7yyP2kLSb6LtF+S5chMk7uqPqw=="],
 
+    "@intellectual-frontiers/githost/@intellectual-frontiers/net/@intellectual-frontiers/crypto": ["@intellectual-frontiers/crypto@0.1.2", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.2", "@intellectual-frontiers/formats": "0.1.2" } }, "sha512-Sjcu7cVBLGLSRcH/qlDbJKfA/hiZk1zzmttLy9Jx/k0LHh2GCjA951hiowMLyfQnFoVc07dzm1i6gPv+4muGsQ=="],
+
+    "@intellectual-frontiers/githost/@intellectual-frontiers/net/@intellectual-frontiers/formats": ["@intellectual-frontiers/formats@0.1.2", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.2" } }, "sha512-vd8uq8U9Bt6Vrnmdlet16cauCTjil9tXMwTXlemFERA5BeJrHL4V79cGzf5LVbr4kwlB06LrZJACgBlQvrFEpw=="],
+
+    "@intellectual-frontiers/githost/@intellectual-frontiers/net/@intellectual-frontiers/telemetry": ["@intellectual-frontiers/telemetry@0.1.2", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.2", "@intellectual-frontiers/formats": "0.1.2", "@intellectual-frontiers/system": "0.1.2", "@intellectual-frontiers/terminal": "0.1.2" } }, "sha512-pG2FNHxeylvbXQXY8qtdn8lamXtoZ53B0Lj6/lqv3rCCMdac3mVqdhIjjaTALHo77vdGKMtQxcHfMRJbJj+Fjw=="],
+
+    "@intellectual-frontiers/githost/@intellectual-frontiers/system/@intellectual-frontiers/crypto": ["@intellectual-frontiers/crypto@0.1.2", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.2", "@intellectual-frontiers/formats": "0.1.2" } }, "sha512-Sjcu7cVBLGLSRcH/qlDbJKfA/hiZk1zzmttLy9Jx/k0LHh2GCjA951hiowMLyfQnFoVc07dzm1i6gPv+4muGsQ=="],
+
+    "@intellectual-frontiers/githost/@intellectual-frontiers/system/@intellectual-frontiers/formats": ["@intellectual-frontiers/formats@0.1.2", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.2" } }, "sha512-vd8uq8U9Bt6Vrnmdlet16cauCTjil9tXMwTXlemFERA5BeJrHL4V79cGzf5LVbr4kwlB06LrZJACgBlQvrFEpw=="],
+
+    "@intellectual-frontiers/grc/@intellectual-frontiers/telemetry/@intellectual-frontiers/terminal": ["@intellectual-frontiers/terminal@0.1.2", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.2" } }, "sha512-ZxexX0jj3jOwo7I4lo0mCFrHsrT2OYNBHBvAFN0//HfgCHTf6QR2hhnFEuUbu5qnhR1Ol0Y2/6kCgirIBhUSSg=="],
+
+    "@intellectual-frontiers/mizan/@intellectual-frontiers/githost/@intellectual-frontiers/net": ["@intellectual-frontiers/net@0.1.2", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.3", "@intellectual-frontiers/crypto": "0.1.3", "@intellectual-frontiers/formats": "0.1.3", "@intellectual-frontiers/system": "0.1.3", "@intellectual-frontiers/telemetry": "0.1.3" } }, "sha512-niPDMpNO/KHZFWVQMrb4QL/xISN8Um6WRrvT0KdP3wT5UF0uiqB6g+zkXe2XVATm0a7rjSkYJIzVgE+YsZCJXQ=="],
+
+    "@intellectual-frontiers/net/@intellectual-frontiers/telemetry/@intellectual-frontiers/terminal": ["@intellectual-frontiers/terminal@0.1.1", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.1" } }, "sha512-AyfjvpsWzVkeAHQGwkDgJlCjpORgrocahJ1Q0iGbnkP6OP5VXpqyPv2fFJtaWCbYS1F956vj39UNV3Omp60HaA=="],
+
+    "@intellectual-frontiers/test/@intellectual-frontiers/crypto/@intellectual-frontiers/formats": ["@intellectual-frontiers/formats@0.1.2", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.2" } }, "sha512-vd8uq8U9Bt6Vrnmdlet16cauCTjil9tXMwTXlemFERA5BeJrHL4V79cGzf5LVbr4kwlB06LrZJACgBlQvrFEpw=="],
+
+    "@intellectual-frontiers/test/@intellectual-frontiers/system/@intellectual-frontiers/formats": ["@intellectual-frontiers/formats@0.1.2", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.2" } }, "sha512-vd8uq8U9Bt6Vrnmdlet16cauCTjil9tXMwTXlemFERA5BeJrHL4V79cGzf5LVbr4kwlB06LrZJACgBlQvrFEpw=="],
+
+    "@intellectual-frontiers/test/@intellectual-frontiers/telemetry/@intellectual-frontiers/formats": ["@intellectual-frontiers/formats@0.1.2", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.2" } }, "sha512-vd8uq8U9Bt6Vrnmdlet16cauCTjil9tXMwTXlemFERA5BeJrHL4V79cGzf5LVbr4kwlB06LrZJACgBlQvrFEpw=="],
+
+    "@intellectual-frontiers/test/@intellectual-frontiers/telemetry/@intellectual-frontiers/terminal": ["@intellectual-frontiers/terminal@0.1.2", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.2" } }, "sha512-ZxexX0jj3jOwo7I4lo0mCFrHsrT2OYNBHBvAFN0//HfgCHTf6QR2hhnFEuUbu5qnhR1Ol0Y2/6kCgirIBhUSSg=="],
+
     "cytoscape-fcose/cose-base/layout-base": ["layout-base@2.0.1", "", {}, "sha512-dp3s92+uNI1hWIpPGH3jK2kxE2lMjdXdr+DH8ynZHpd6PUlH6x6cbuXnoMmiNumznqaNO31xu9e79F0uuZ0JFg=="],
 
     "d3-sankey/d3-shape/d3-path": ["d3-path@1.0.9", "", {}, "sha512-VLaYcn81dtHVTjEHd8B+pbe9yHWpXKZUC87PzoFmsFrJqgFwDe/qxfp5MlfsfM1V5E/iVt0MmEbWQ7FVIXh/bg=="],
+
+    "@intellectual-frontiers/githost/@intellectual-frontiers/net/@intellectual-frontiers/telemetry/@intellectual-frontiers/terminal": ["@intellectual-frontiers/terminal@0.1.2", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.2" } }, "sha512-ZxexX0jj3jOwo7I4lo0mCFrHsrT2OYNBHBvAFN0//HfgCHTf6QR2hhnFEuUbu5qnhR1Ol0Y2/6kCgirIBhUSSg=="],
+
+    "@intellectual-frontiers/mizan/@intellectual-frontiers/githost/@intellectual-frontiers/net/@intellectual-frontiers/telemetry": ["@intellectual-frontiers/telemetry@0.1.3", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.3", "@intellectual-frontiers/formats": "0.1.3", "@intellectual-frontiers/system": "0.1.3", "@intellectual-frontiers/terminal": "0.1.3" } }, "sha512-HoEtqLl+gqSNKsKvpmFm6HXjDP+LzIAzBgY4AbuqvE2zSRseDVjisl+NYr1GcHuD9UHDkikhzy8PLrvtCQTqzQ=="],
+
+    "@intellectual-frontiers/mizan/@intellectual-frontiers/githost/@intellectual-frontiers/net/@intellectual-frontiers/telemetry/@intellectual-frontiers/terminal": ["@intellectual-frontiers/terminal@0.1.3", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.3" } }, "sha512-+LI62CAr8tgkl8eNvxPtqC15/TYFdSsz71Rjgh27OziSYBqAN799Y5rHrqvMYF9D+gw5DioUeHFKbDAKizFAXQ=="],
   }
 }

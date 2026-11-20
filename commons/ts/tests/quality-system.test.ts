@@ -8,13 +8,13 @@
  *
  * @module
  */
-import { decodeMetrics } from "../kernel/otlp.ts";
+import { decodeMetrics } from "@intellectual-frontiers/telemetry/otlp";
 import { keepRun } from "../quality/host/branch.ts";
 import { gather } from "../quality/host/gather.ts";
-import { makeTempDir, mkdir, readTextFile, remove, writeTextFile } from "../runtime/fs.ts";
-import { dirname, fromFileUrl, join, resolve } from "../runtime/path.ts";
-import { execPath, run } from "../runtime/proc.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { makeTempDir, mkdir, readTextFile, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { dirname, fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
+import { execPath, run } from "@intellectual-frontiers/system/proc";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { assembledRun, at, git, list, needsGit, parsed, repositoryWithCommit } from "./quality-fixtures.ts";
 
 const ROOT = resolve(dirname(fromFileUrl(import.meta.url)), "..");

@@ -25,14 +25,14 @@
  */
 import process from "node:process";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { err, ok, type Result } from "../kernel/result.ts";
-import { sha256 } from "../kernel/sha256.ts";
-import { formatBaseline, judge, parseBaseline, passes, report } from "../kernel/trace.ts";
-import { existsSync, readDirSync, readTextFileSync, writeTextFileSync } from "../runtime/fs.ts";
-import { stdio } from "../runtime/mod.ts";
-import { resolve } from "../runtime/path.ts";
-import { decodeManifest, isUrl } from "./integrations/host/import.ts";
-import type { MizanFinding } from "./rules.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
+import { formatBaseline, judge, parseBaseline, passes, report } from "@intellectual-frontiers/mizan/trace";
+import { existsSync, readDirSync, readTextFileSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { stdio } from "@intellectual-frontiers/system";
+import { resolve } from "@intellectual-frontiers/system/path";
+import { decodeManifest, isUrl } from "@intellectual-frontiers/mizan/integrations/host/import";
+import type { MizanFinding } from "@intellectual-frontiers/mizan/rules";
 
 /** A manifest that names a `latest` source: its file, the standard it pins (id, version, SHA-256) and the URL that always serves the newest. */
 export type LatestManifest = {

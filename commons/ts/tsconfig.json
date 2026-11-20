@@ -27,13 +27,11 @@
     "runtime/**/*.ts",
     "mizan/**/*.ts",
     "quality/**/*.ts",
-    "githost/**/*.ts",
+    "workflows/**/*.ts",
     "workspaces/**/*.ts",
-    "lint/**/*.ts",
     "tests/**/*.ts",
     "tools/**/*.ts",
     "examples/**/*.ts",
-    "../tools/**/*.ts",
-    "../ontology/**/*.ts"
+    "../tools/**/*.ts"
   ]
 }

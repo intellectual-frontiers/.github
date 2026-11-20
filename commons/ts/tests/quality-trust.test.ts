@@ -6,15 +6,15 @@
  *
  * @module
  */
-import { audiences } from "../../ontology/ifqs/ifqs.ts";
+import { audiences } from "@intellectual-frontiers/ontology/ifqs/ifqs";
 import { collect } from "../quality/assessor/host.ts";
 import { AUDIENCES, redactFor } from "../quality/trust/audience.ts";
 import { conformityClaim, DEFAULT_SCOPE } from "../quality/trust/view.ts";
 import { checkTrust, generateTrust, type TrustPage } from "../quality/trust/host.ts";
 import { NO_REQUIREMENT_TEXT, readRequirementTexts, requirementsOf, requirementTextOf } from "../quality/trust/requirement-text.ts";
-import { makeTempDir, readTextFile, remove, writeTextFile } from "../runtime/fs.ts";
-import { join } from "../runtime/path.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { makeTempDir, readTextFile, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { join } from "@intellectual-frontiers/system/path";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { needsGit, parsed, at, list } from "./quality-fixtures.ts";
 import { DAY, demoEvidence, demoRepository, MARKER } from "./quality-trust-fixtures.ts";
 
