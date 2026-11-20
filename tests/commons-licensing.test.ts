@@ -16,12 +16,17 @@ proves(["0035-licensing FR-007"], "license.ts --check finds nothing on this repo
   assertEquals(r.stderr.trim(), "");
 });
 
-proves(["0035-licensing FR-001", "0035-licensing FR-005"], "every LICENSE of the root and of a library folder is the PolyForm Noncommercial text and none is the MIT license", async () => {
-  const folders = ["."];
-  for await (const e of fs.readDir(path.join(ROOT, "commons"))) if (e.isDirectory && fs.existsSync(path.join(ROOT, "commons", e.name, "library.ts"))) folders.push(`commons/${e.name}`);
-  for (const f of folders) {
-    const text = await fs.readTextFile(path.join(ROOT, f, "LICENSE"));
-    assert(text.includes("# PolyForm Noncommercial License 1.0.0"), f);
-    assert(!text.includes("MIT License") && !text.includes("Permission is hereby granted"), f);
-  }
-});
+proves(
+  ["0035-licensing FR-001", "0035-licensing FR-005"],
+  "every LICENSE of the root and of a library folder is the PolyForm Noncommercial text and none is the MIT license",
+  async () => {
+    const folders = ["."];
+    for await (const e of fs.readDir(path.join(ROOT, "commons")))
+      if (e.isDirectory && fs.existsSync(path.join(ROOT, "commons", e.name, "library.ts"))) folders.push(`commons/${e.name}`);
+    for (const f of folders) {
+      const text = await fs.readTextFile(path.join(ROOT, f, "LICENSE"));
+      assert(text.includes("# PolyForm Noncommercial License 1.0.0"), f);
+      assert(!text.includes("MIT License") && !text.includes("Permission is hereby granted"), f);
+    }
+  },
+);

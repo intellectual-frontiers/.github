@@ -14,6 +14,9 @@ import type { World } from "@intellectual-frontiers/repoctl/logical";
 /** The root of the real checkout this library is in. */
 export const CHECKOUT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "../../..");
 
+/** The `node_modules` that holds the compiler the tests use: the root's where the root is installed, else this library's own (a job that installed only this library has no other). */
+export const TOOLS_MODULES: string = fs.existsSync(path.join(CHECKOUT, "node_modules", ".bin")) ? path.join(CHECKOUT, "node_modules") : path.join(CHECKOUT, "commons/repoctl/node_modules");
+
 /** Runs `git` in a folder as a test identity and gives its output; a failure throws, so that a test never goes on from a step that did not happen. */
 export async function git(dir: string, ...args: readonly string[]): Promise<string> {
   const r = await systemProcess.run(["git", "-C", dir, "-c", "user.name=Test", "-c", "user.email=test@example.test", "-c", "commit.gpgsign=false", "-c", "init.defaultBranch=main", ...args]);

@@ -10,7 +10,7 @@ import { fs, path } from "@intellectual-frontiers/system";
 import { FOUNDATION, type LibraryName, parseLibraryName, parseQuarantine } from "@intellectual-frontiers/repoctl/governance";
 import { applyQuarantine, cacheKeyOf, planProof, provesOf, readsTheTree, seedsOf, selectSeam, selectTests, specIdsOf, specOfPath, type LibraryNode, type TestReach, type World } from "@intellectual-frontiers/repoctl/logical";
 import { makePlan, runPlan, systemFiles, systemWorld } from "@intellectual-frontiers/repoctl/physical";
-import { CAN_RUN, CHECKOUT, git, put, LIBRARIES } from "./world.ts";
+import { CAN_RUN, CHECKOUT, git, put, LIBRARIES, TOOLS_MODULES } from "./world.ts";
 
 const lib = (name: string): LibraryName => {
   const r = parseLibraryName(name);
@@ -104,7 +104,7 @@ proves(["0008-repoctl-prove FR-011", "0008-repoctl-prove FR-013"], "over a real 
     await put(dir, "commons/prov/src/other.ts", "export const b = 1;\n");
     await put(dir, "commons/prov/suite/a.test.ts", 'import { expect, test } from "bun:test";\nimport { a } from "../src/mod.ts";\ntest("a", () => expect(a).toBeGreaterThan(0));\n');
     await put(dir, "commons/prov/suite/b.test.ts", 'import { expect, test } from "bun:test";\nimport { b } from "../src/other.ts";\ntest("b", () => expect(b).toBeGreaterThan(0));\n');
-    await fs.symlink(path.join(CHECKOUT, "node_modules"), path.join(dir, "node_modules"), { type: "junction" });
+    await fs.symlink(TOOLS_MODULES, path.join(dir, "node_modules"), { type: "junction" });
     await git(dir, "add", "-A");
     await git(dir, "commit", "-q", "-m", "base");
     await git(dir, "branch", "-M", "main");

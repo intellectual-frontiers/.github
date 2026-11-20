@@ -101,7 +101,10 @@ proves(
         // a package of commons depends on packages of commons that are packed here and, where it is not a bundle, on packages of npm, which the project installs below
         for (const [dep, version] of Object.entries(obj(manifest["dependencies"]))) {
           if (dep.startsWith("@intellectual-frontiers/")) continue;
-          assert(typeof version === "string" && /^\d+\.\d+\.\d+(-[\w.]+)?$/.test(version), `${name} depends on ${dep} at ${String(version)}, which is not an exact version of npm`);
+          assert(
+            typeof version === "string" && /^\d+\.\d+\.\d+(-[\w.]+)?$/.test(version),
+            `${name} depends on ${dep} at ${String(version)}, which is not an exact version of npm`,
+          );
           external[dep] = version;
         }
         published.push({ name, manifest });
@@ -118,7 +121,10 @@ proves(
       }
       // the packages of npm that a package depends on, installed into the project beside the packages of commons that were unpacked there
       if (Object.keys(external).length > 0) {
-        await fs.writeTextFile(path.join(project, "package.json"), `${JSON.stringify({ name: "consumer", private: true, type: "module", dependencies: external }, null, 2)}\n`);
+        await fs.writeTextFile(
+          path.join(project, "package.json"),
+          `${JSON.stringify({ name: "consumer", private: true, type: "module", dependencies: external }, null, 2)}\n`,
+        );
         const installed = await sh([bun, "install"], project);
         assertEquals(installed.code, 0, `the packages of npm: ${installed.out}`);
       }

@@ -37,7 +37,7 @@ import {
   type World,
 } from "@intellectual-frontiers/repoctl/logical";
 import { makePlan, systemFiles, systemWorld } from "@intellectual-frontiers/repoctl/physical";
-import { CAN_RUN, CHECKOUT, execute, git, hostOf, put, LIBRARIES } from "./world.ts";
+import { CAN_RUN, execute, git, hostOf, put, LIBRARIES, TOOLS_MODULES } from "./world.ts";
 
 const lib = (name: string): LibraryName => {
   const r = parseLibraryName(name);
@@ -219,7 +219,7 @@ async function withLibraries<T>(use: (dir: string, world: World) => Promise<T>):
       await put(dir, `commons/${name}/tsconfig.json`, JSON.stringify({ extends: "../ts/tsconfig.json", include: ["src/**/*.ts"] }));
       for (const [f, text] of Object.entries(files)) await put(dir, `commons/${name}/${f}`, text);
     }
-    await fs.symlink(path.join(CHECKOUT, "node_modules"), path.join(dir, "node_modules"), { type: "junction" });
+    await fs.symlink(TOOLS_MODULES, path.join(dir, "node_modules"), { type: "junction" });
     await git(dir, "add", "-A");
     await git(dir, "commit", "-q", "-m", "base");
     await git(dir, "branch", "-M", "main");

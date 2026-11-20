@@ -88,7 +88,7 @@ proves([`${DIST} FR-005`, `${DIST} FR-006`, `${DIST} FR-007`, `${SPEC} FR-023`],
   const found = readLibraries(ROOT);
   const libraries = found.flatMap((f) => ("library" in f ? [f.library] : []));
   assertEquals(found.filter((f) => "problem" in f).length, 0);
-  for (const l of libraries) assertEquals([...l.distribution], ["github", "npm"], `${l.name}: none of our libraries is private`);
+  for (const l of libraries) if (l.held === undefined) assertEquals([...l.distribution], ["github", "npm"], `${l.name}: none of our libraries is private; one that is not published says why with held`);
   assertEquals(metapackagesOf(ROOT).map((m) => m.bundle).sort(), [...BUNDLES].sort());
   for (const m of metapackagesOf(ROOT)) {
     assertEquals(m.bundle, m.name);
