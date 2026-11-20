@@ -1,6 +1,6 @@
-// Spec: 0007-repoctl-prove FR-002
+// Spec: 0008-repoctl-prove FR-002
 /**
- * The facts of proof proportional to blast radius (commons repoctl 0007-repoctl-prove FR-002 to FR-005, FR-009): the seven tiers of proof with their budgets, the change classes with the proofs each one needs, the proofs
+ * The facts of proof proportional to blast radius (commons repoctl 0008-repoctl-prove FR-002 to FR-005, FR-009): the seven tiers of proof with their budgets, the change classes with the proofs each one needs, the proofs
  * as a closed union (each belongs to exactly one tier by an exhaustive function), the reasons a proof is left out, the foundation libraries and the files whose change is every proof's change. The planner of the Logical layer
  * reads these tables and decides nothing of its own that is not here.
  *

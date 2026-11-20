@@ -44,6 +44,7 @@ const slug = (n: string) => {
 const facts = (name: string, over: Partial<Facts> = {}): Facts => ({
   slug: slug(name),
   folder: `commons/${name}`,
+  package: `@intellectual-frontiers/${name}`,
   version: "0.1.0",
   imports: [],
   last: { version: "0.1.0", tag: `${name}-v0.1.0` },
@@ -279,7 +280,7 @@ proves(
   [`${SPEC} FR-015`],
   "a release is published and tagged by itself: a version already on npm is not sent again and is tagged, one that is not is sent, one that cannot be sent is reported and not tagged while the others go on, a library that names no npm is only tagged, a tag that is there is kept, and any failure fails the run after every release was tried",
   async () => {
-    const entries = ["a", "b", "c", "d", "e"].map((slug) => ({ slug, version: "1.0.0", folder: `commons/${slug}`, tag: `${slug}-v1.0.0`, publish: slug !== "e" }));
+    const entries = ["a", "b", "c", "d", "e"].map((slug) => ({ slug, package: `@intellectual-frontiers/${slug}`, version: "1.0.0", folder: `commons/${slug}`, tag: `${slug}-v1.0.0`, publish: slug !== "e" }));
     const calls: string[] = [];
     const tools = (over: Partial<Tools> = {}): Tools => ({
       onNpm: (name) => {
@@ -428,7 +429,7 @@ proves(
         `export const library = ${JSON.stringify({ name: "k", level: "L0", verify: "bun run verify", version: "0.1.0", exports: ["."], versionConstants: constants })};\n`;
       put("commons/k/package.json", `${JSON.stringify({ name: "@x/k", version: "0.1.0" }, null, 2)}\n`);
       put("commons/k/src/v.ts", `export const K_VERSION = "0.1.0";\nexport const OTHER_VERSION = "9.9.9";\n`);
-      const step = { slug: slug("k"), folder: "commons/k", from: "0.1.0", to: "0.2.0", tag: "k-v0.2.0", publish: true, decision: { kind: "raised", to: "0.2.0", impact: "minor", why: "changed" } } as const;
+      const step = { slug: slug("k"), folder: "commons/k", package: "@intellectual-frontiers/k", from: "0.1.0", to: "0.2.0", tag: "k-v0.2.0", publish: true, decision: { kind: "raised", to: "0.2.0", impact: "minor", why: "changed" } } as const;
       put("commons/k/library.ts", manifest([{ file: "src/v.ts", name: "K_VERSION" }]));
       const done = writeVersion(dir, step);
       assertEquals(done.kind === "ok" ? done.value : [], ["commons/k/library.ts", "commons/k/package.json", "commons/k/src/v.ts"]);

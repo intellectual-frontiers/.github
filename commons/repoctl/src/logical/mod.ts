@@ -31,3 +31,5 @@ export * from "./semver.ts";
 export * from "./status.ts";
 export * from "./surface.ts";
 export * from "./sync.ts";
+export * from "./hygiene.ts";
+export * from "./hygiene-facts.ts";

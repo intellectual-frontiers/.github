@@ -51,6 +51,12 @@ export type ProblemCode =
   | "E-DOCTOR-NODE"
   | "E-DOCTOR-BUN"
   | "E-DOCTOR-GIT"
+  | "E-HYGIENE-GIT"
+  | "E-HYGIENE-PATH"
+  | "E-HYGIENE-IMPORT"
+  | "E-HYGIENE-VENDORED"
+  | "E-HYGIENE-DUPLICATE"
+  | "E-HYGIENE-RANGE"
   | "E-PROVE-FAILED"
   | "E-PROVE-QUARANTINE";
 
@@ -89,6 +95,12 @@ export const PROBLEM_CODES: readonly ProblemCode[] = [
   "E-DOCTOR-NODE",
   "E-DOCTOR-BUN",
   "E-DOCTOR-GIT",
+  "E-HYGIENE-GIT",
+  "E-HYGIENE-PATH",
+  "E-HYGIENE-IMPORT",
+  "E-HYGIENE-VENDORED",
+  "E-HYGIENE-DUPLICATE",
+  "E-HYGIENE-RANGE",
   "E-PROVE-FAILED",
   "E-PROVE-QUARANTINE",
 ];
@@ -297,6 +309,42 @@ export const CATALOGUE: Readonly<Record<ProblemCode, Explained>> = {
     what: "`git` does not run here, or the folder is not a Git working tree with an origin.",
     why: "Git is not installed, or the folder is not a clone.",
     fix: "git --version",
+  },
+  "E-HYGIENE-GIT": {
+    title: "A dependency by Git on the repository of commons",
+    what: "A package.json depends on intellectual-frontiers/.github by Git (github:, git+https:, git: or ssh:, at a commit or not).",
+    why: "Commons reaches a repository only as a published package; a Git dependency installs sources that are not a release and is not the rule.",
+    fix: "bun add @intellectual-frontiers/commons@<version> --exact",
+  },
+  "E-HYGIENE-PATH": {
+    title: "A path dependency into a checkout of commons",
+    what: "A package.json has a file: or link: dependency whose path goes through a folder named commons.",
+    why: "A checkout of commons next to the repository was linked in place of installing the published package.",
+    fix: "bun add @intellectual-frontiers/commons@<version> --exact",
+  },
+  "E-HYGIENE-IMPORT": {
+    title: "A relative import into a copy of commons",
+    what: "A source imports a relative path that goes through a folder named commons.",
+    why: "A copy of commons sits in the repository and its files are imported by path.",
+    fix: "import from @intellectual-frontiers/<library>, installed from a registry",
+  },
+  "E-HYGIENE-VENDORED": {
+    title: "A vendored copy of a library of commons",
+    what: "A folder of the repository, outside node_modules, carries a package named @intellectual-frontiers/<name> and is not the root package or a workspace the root declares.",
+    why: "A library of commons was copied into the repository.",
+    fix: "remove the folder and install the published package with --exact",
+  },
+  "E-HYGIENE-DUPLICATE": {
+    title: "Two installed copies of one library",
+    what: "The lockfile or node_modules holds one @intellectual-frontiers package at two versions.",
+    why: "Two dependencies ask for different versions of it, or one is pinned and another is a range.",
+    fix: "pin one version with overrides in package.json and install again",
+  },
+  "E-HYGIENE-RANGE": {
+    title: "A dependency that is not an exact version",
+    what: "An @intellectual-frontiers dependency is a range, a tag or latest.",
+    why: "Commons is installed as one coherent set per release; a range lets two releases meet in one tree.",
+    fix: "bun add <package>@<version> --exact",
   },
   "E-PROVE-FAILED": {
     title: "A proof of the plan failed",

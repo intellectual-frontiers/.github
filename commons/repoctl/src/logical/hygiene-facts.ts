@@ -1,0 +1,173 @@
+// Spec: 0007-repoctl-hygiene FR-003
+/**
+ * The facts of a repository for the hygiene check, gathered through the ports (commons repoctl 0007-repoctl-hygiene FR-003; commons 0036-distribution FR-011): the lockfiles read as data (`bun.lock` is JSON with comments and trailing commas,
+ * `package-lock.json` is JSON of lockfile versions 2 and 3), the `package.json` files outside `node_modules`, the packages installed under `node_modules` (a folder of the scope, nested ones and Bun's `.bun` store) and the relative imports of the sources.
+ * The parsers are pure; only `gatherHygieneFacts` of this module reads, and only through `Files`.
+ *
+ * @example
+ * ```ts
+ * import { parseNpmLock } from "./hygiene-facts.ts";
+ * const r = parseNpmLock('{ "packages": { "node_modules/@intellectual-frontiers/core": { "version": "0.1.5" } } }', "package-lock.json");
+ * r.kind; // "read"
+ * ```
+ *
+ * @module
+ */
+import { err, ok, type Result } from "@intellectual-frontiers/core";
+import type { Copy, Dependency, HygieneFacts, ImportFact, LockFacts, PackageFacts } from "./hygiene.ts";
+import { SCOPE } from "./hygiene.ts";
+import type { Files, World } from "./ports.ts";
+
+/** The text of a JSON with comments and trailing commas as JSON: comments and the commas before `}` and `]` are removed, and strings are left as they are. */
+export function stripJsonc(text: string): string {
+  let out = "";
+  for (let i = 0; i < text.length; i++) {
+    const c = text.charAt(i);
+    const next = text.charAt(i + 1);
+    if (c === '"') {
+      let j = i + 1;
+      while (j < text.length && text.charAt(j) !== '"') j += text.charAt(j) === "\\" ? 2 : 1;
+      out += text.slice(i, j + 1);
+      i = j;
+    } else if (c === "/" && next === "/") {
+      while (i < text.length && text.charAt(i) !== "\n") i++;
+      out += "\n";
+    } else if (c === "/" && next === "*") {
+      const end = text.indexOf("*/", i + 2);
+      i = end < 0 ? text.length : end + 1;
+    } else out += c;
+  }
+  return out.replace(/,(\s*[}\]])/g, "$1");
+}
+
+const record = (v: unknown): Readonly<Record<string, unknown>> => (typeof v === "object" && v !== null && !Array.isArray(v) ? Object.fromEntries(Object.entries(v)) : {});
+const text = (v: unknown): string | undefined => (typeof v === "string" ? v : undefined);
+
+const add = (into: Map<string, Copy[]>, name: string, c: Copy): void => void into.set(name, [...(into.get(name) ?? []), c]);
+
+/** The copies of the packages of commons a `bun.lock` holds: each entry of `packages` is `[ "name@version", ... ]` under a key that says where it is nested. */
+export function parseBunLock(source: string, file: string): LockFacts {
+  let json: unknown;
+  try {
+    json = JSON.parse(stripJsonc(source));
+  } catch (e) {
+    return { kind: "unreadable", file, why: e instanceof Error ? e.message : String(e) };
+  }
+  const packages = record(record(json)["packages"]);
+  const copies = new Map<string, Copy[]>();
+  for (const [key, value] of Object.entries(packages)) {
+    const head = Array.isArray(value) ? text(value[0]) : undefined;
+    const at = head === undefined ? -1 : head.lastIndexOf("@");
+    if (head === undefined || at <= 0) continue;
+    const name = head.slice(0, at);
+    const version = head.slice(at + 1);
+    if (name.startsWith(SCOPE) && /^\d/.test(version)) add(copies, name, { version, where: `${file}: ${key}` });
+  }
+  return { kind: "read", file, copies };
+}
+
+/** The copies of the packages of commons a `package-lock.json` (versions 2 and 3: `packages` keyed by path) holds. */
+export function parseNpmLock(source: string, file: string): LockFacts {
+  let json: unknown;
+  try {
+    json = JSON.parse(source);
+  } catch (e) {
+    return { kind: "unreadable", file, why: e instanceof Error ? e.message : String(e) };
+  }
+  const packages = record(record(json)["packages"]);
+  const copies = new Map<string, Copy[]>();
+  for (const [key, value] of Object.entries(packages)) {
+    const at = key.lastIndexOf("node_modules/");
+    if (at < 0) continue;
+    const name = key.slice(at + "node_modules/".length);
+    const version = text(record(value)["version"]);
+    if (name.startsWith(SCOPE) && version !== undefined) add(copies, name, { version, where: `${file}: ${key}` });
+  }
+  return { kind: "read", file, copies };
+}
+
+const SECTIONS = ["dependencies", "devDependencies", "peerDependencies", "optionalDependencies"] as const;
+
+/** The facts of one `package.json`'s text: its name and its dependencies of every section; the workspaces it declares are the second part. */
+export function parsePackage(source: string, path: string): Result<{ readonly facts: PackageFacts; readonly workspaces: readonly string[] }, string> {
+  let json: unknown;
+  try {
+    json = JSON.parse(source);
+  } catch (e) {
+    return err(`${path} is not JSON (${e instanceof Error ? e.message : String(e)})`);
+  }
+  const o = record(json);
+  const dependencies: Dependency[] = [];
+  for (const section of SECTIONS)
+    for (const [name, spec] of Object.entries(record(o[section]))) if (typeof spec === "string") dependencies.push({ name, spec });
+  const ws = o["workspaces"];
+  const nested = record(ws)["packages"];
+  const globs: readonly unknown[] = Array.isArray(ws) ? ws : Array.isArray(nested) ? nested : [];
+  return ok({ facts: { path, name: text(o["name"]), dependencies }, workspaces: globs.flatMap((g) => (typeof g === "string" ? [g] : [])) });
+}
+
+/** The relative specifiers a source imports, with the specifier as written. */
+export function relativeImports(source: string): readonly string[] {
+  return [...source.matchAll(/(?:\bfrom\s+|\bimport\s+|\bimport\(\s*|\brequire\(\s*)["'](\.[^"']*)["']/g)].map((m) => m[1] ?? "").filter((s) => s !== "");
+}
+
+const SOURCE = /\.(?:ts|tsx|mts|cts|js|jsx|mjs|cjs)$/;
+
+/** The copies of the packages of commons installed under a folder `node_modules`, and under the `node_modules` of each package in it (and of Bun's `.bun` store). */
+async function installedUnder(files: Files, root: string, nm: string, into: Map<string, Copy[]>, depth: number): Promise<void> {
+  if (depth > 4) return;
+  for (const entry of await files.list(`${root}/${nm}`)) {
+    if (entry === ".bun") {
+      for (const store of await files.list(`${root}/${nm}/.bun`)) await installedUnder(files, root, `${nm}/.bun/${store}/node_modules`, into, depth + 1);
+      continue;
+    }
+    if (entry.startsWith(".")) continue;
+    const names = entry.startsWith("@") ? (await files.list(`${root}/${nm}/${entry}`)).map((n) => `${entry}/${n}`) : [entry];
+    for (const name of names) {
+      const dir = `${nm}/${name}`;
+      const manifest = await files.read(`${root}/${dir}/package.json`);
+      if (manifest !== undefined && name.startsWith(SCOPE)) {
+        const r = parsePackage(manifest, `${dir}/package.json`);
+        const version = (() => {
+          try {
+            return text(record(JSON.parse(manifest))["version"]);
+          } catch {
+            return undefined;
+          }
+        })();
+        if (r.kind === "ok" && version !== undefined) add(into, name, { version, where: dir });
+      }
+      await installedUnder(files, root, `${dir}/node_modules`, into, depth + 1);
+    }
+  }
+}
+
+/** Gathers the facts of the repository of a world: the only reads of the check. */
+export async function gatherHygieneFacts(w: World): Promise<HygieneFacts> {
+  const all = (await w.files.walk(w.repo)).filter((p) => !p.startsWith(".git/"));
+  const packages: PackageFacts[] = [];
+  let workspaces: readonly string[] = [];
+  const imports: ImportFact[] = [];
+  for (const p of all) {
+    if (p === "package.json" || p.endsWith("/package.json")) {
+      const read = await w.files.read(`${w.repo}/${p}`);
+      if (read === undefined) continue;
+      const parsed = parsePackage(read, p);
+      if (parsed.kind === "err") continue;
+      packages.push(parsed.value.facts);
+      if (p === "package.json") workspaces = parsed.value.workspaces;
+    } else if (SOURCE.test(p)) {
+      const read = await w.files.read(`${w.repo}/${p}`);
+      if (read !== undefined) for (const specifier of relativeImports(read)) imports.push({ file: p, specifier });
+    }
+  }
+  const locks: LockFacts[] = [];
+  for (const [file, parse] of [["bun.lock", parseBunLock], ["package-lock.json", parseNpmLock]] as const) {
+    const read = await w.files.read(`${w.repo}/${file}`);
+    if (read !== undefined) locks.push(parse(read, file));
+  }
+  const installed = new Map<string, Copy[]>();
+  await installedUnder(w.files, w.repo, "node_modules", installed, 0);
+  const repository = (await w.files.exists(`${w.repo}/commons/libraries/library.ts`)) ? "commons" : "consumer";
+  return { repository, packages, locks, installed, imports, workspaces };
+}

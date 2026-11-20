@@ -1,6 +1,6 @@
 # Feature Specification: Repoctl prove
 
-**Spec ID:** 0007-repoctl-prove
+**Spec ID:** 0008-repoctl-prove
 **Status:** Active
 **Owner:** if
 **Domain:** commons

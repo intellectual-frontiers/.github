@@ -1,6 +1,6 @@
-// Spec: 0007-repoctl-prove FR-011
+// Spec: 0008-repoctl-prove FR-011
 /**
- * Tests selected and run through a result cache (commons repoctl 0007-repoctl-prove FR-011, FR-012): the imports of each test file followed to every source it reads (relative imports, and the packages of the libraries through their
+ * Tests selected and run through a result cache (commons repoctl 0008-repoctl-prove FR-011, FR-012): the imports of each test file followed to every source it reads (relative imports, and the packages of the libraries through their
  * `exports`), what the files of its library import of other libraries, the selection of the Logical layer applied, and each selected test run as its own program, its pass kept under a key that is the hash of the test, of the sources it
  * imports and of the runtime. A key that is in the cache is not run again; a test that reads the checkout is never cached.
  *
@@ -43,9 +43,9 @@ const SPECIFIER = /(?:\bimport|\bexport)\s+(?:type\s+)?(?:[^'";]*?\s+from\s+)?["
 const SOURCE = /\.(?:ts|mts|mjs|js)$/;
 
 /** The packages of the libraries (and of `commons/ts`) with what their `exports` map each subpath to. */
-export async function packageIndexOf(w: World, libraries: readonly { readonly name: string; readonly folder: string }[]): Promise<PackageIndex> {
+export async function packageIndexOf(w: World, libraries: readonly { readonly package: string; readonly folder: string }[]): Promise<PackageIndex> {
   const index = new Map<string, { folder: string; exports: Map<string, string> }>();
-  for (const l of [...libraries, { name: "commons", folder: "commons/ts" }]) {
+  for (const l of [...libraries, { package: "@intellectual-frontiers/commons", folder: "commons/ts" }]) {
     const text = await w.files.read(join(w.repo, l.folder, "package.json"));
     const exports = new Map<string, string>();
     if (text !== undefined) {
@@ -61,7 +61,7 @@ export async function packageIndexOf(w: World, libraries: readonly { readonly na
         // an unreadable package names no export: its importers depend on its folder
       }
     }
-    index.set(`@intellectual-frontiers/${l.name}`, { folder: l.folder, exports });
+    index.set(l.package, { folder: l.folder, exports });
   }
   return index;
 }

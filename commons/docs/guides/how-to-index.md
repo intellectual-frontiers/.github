@@ -6,3 +6,4 @@ Short answers to the things people do most often.
 - [Add a library](add-a-library.md): the folder, the manifest and the specification a library starts with.
 - [Add a command to Ergonex](add-a-verb.md): declare it, put it in the tree, prove it.
 - [Cut a release](cut-a-release.md): plan, apply, push, publish.
+- [Work with an AI assistant](ai-start.md): what to give an assistant, what to ask, and how to tell the result is right, with a prompt for each common task.

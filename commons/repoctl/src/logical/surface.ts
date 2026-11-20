@@ -1,6 +1,6 @@
-// Spec: 0007-repoctl-prove FR-007
+// Spec: 0008-repoctl-prove FR-007
 /**
- * The public type surface of a library as values (commons repoctl 0007-repoctl-prove FR-006 to FR-008): the declarations a compiler emitted for its sources, read statement by statement, each exported one with the declarations local to
+ * The public type surface of a library as values (commons repoctl 0008-repoctl-prove FR-006 to FR-008): the declarations a compiler emitted for its sources, read statement by statement, each exported one with the declarations local to
  * its file that it can mention; the fingerprint of the surface (a hash of each declaration, by name); the names that changed between two fingerprints; and what a source imports from a package, by name. The functions are pure: the
  * Physical layer emits the declarations and hashes the texts, and these decide what changed and who uses it.
  *

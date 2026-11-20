@@ -1,0 +1,11 @@
+{
+  "generated": "bun commons/libraries/src/pack-metapackage.ts; do not edit (commons 0036-distribution FR-007)",
+  "set": "standards",
+  "dependencies": {
+    "@intellectual-frontiers/integrations-fhir": "0.1.2",
+    "@intellectual-frontiers/integrations-x12": "0.1.2",
+    "@intellectual-frontiers/mizan": "0.1.2",
+    "@intellectual-frontiers/ontology": "0.3.1",
+    "@intellectual-frontiers/quality": "0.2.1"
+  }
+}

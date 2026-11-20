@@ -1,6 +1,6 @@
-// Spec: 0007-repoctl-prove FR-001
+// Spec: 0008-repoctl-prove FR-001
 /**
- * `repoctl prove` on Headless (commons repoctl 0007-repoctl-prove FR-001, FR-009): the proof a change needs, from its blast radius. It prints the plan (`--plan` as one JSON document, `--why` with the sentence for every proof and every
+ * `repoctl prove` on Headless (commons repoctl 0008-repoctl-prove FR-001, FR-009): the proof a change needs, from its blast radius. It prints the plan (`--plan` as one JSON document, `--why` with the sentence for every proof and every
  * proof left out) and runs the proofs of the tiers T0 to T3 that apply (`--tier N` one tier, `--all` every proof of every tier planned and the cheap ones run), each proof as one program in its folder, the tiers in order and the proofs of a
  * tier several at a time.
  *

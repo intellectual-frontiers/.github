@@ -1,6 +1,6 @@
 # Proof proportional to blast radius
 
-Running every test after every change costs minutes and teaches nothing when the change can only break a small part of the repository. `repoctl prove` makes the proof as large as the change's blast radius: it works out what a change can reach, runs the proofs that cover that and nothing else, and says why each proof it leaves out is safe to leave out. The same plan drives a local run and the plan job of CI ([commons repoctl 0007-repoctl-prove FR-001](../../repoctl/spec-kit/specs/0007-repoctl-prove/spec.md)).
+Running every test after every change costs minutes and teaches nothing when the change can only break a small part of the repository. `repoctl prove` makes the proof as large as the change's blast radius: it works out what a change can reach, runs the proofs that cover that and nothing else, and says why each proof it leaves out is safe to leave out. The same plan drives a local run and the plan job of CI ([commons repoctl 0008-repoctl-prove FR-001](../../repoctl/spec-kit/specs/0008-repoctl-prove/spec.md)).
 
 ## The problem
 
@@ -8,7 +8,7 @@ A comment edit in `core` and a changed signature in `core` look alike to a tool 
 
 ## The tiers and their budgets
 
-Seven tiers of proof, cheapest first. A proof belongs to exactly one ([commons repoctl 0007-repoctl-prove FR-002](../../repoctl/spec-kit/specs/0007-repoctl-prove/spec.md)).
+Seven tiers of proof, cheapest first. A proof belongs to exactly one ([commons repoctl 0008-repoctl-prove FR-002](../../repoctl/spec-kit/specs/0008-repoctl-prove/spec.md)).
 
 ```mermaid
 flowchart LR
@@ -65,7 +65,7 @@ Each changed file is classified by its path and by its text at the base and now,
 | the planner, the generators, the workflow definitions, the tier rules | `planner` | every proof of every tier |
 | a file in no library that is none of these | `outside` | the checks of the repository, the libraries that read it and the end-to-end flows |
 
-A plan never skips what it cannot show safe. A change to the planner, a file Git cannot compare, or `--all` plans every proof of every tier ([commons repoctl 0007-repoctl-prove FR-005](../../repoctl/spec-kit/specs/0007-repoctl-prove/spec.md)).
+A plan never skips what it cannot show safe. A change to the planner, a file Git cannot compare, or `--all` plans every proof of every tier ([commons repoctl 0008-repoctl-prove FR-005](../../repoctl/spec-kit/specs/0008-repoctl-prove/spec.md)).
 
 ## Reading a plan
 
@@ -143,10 +143,10 @@ flowchart LR
 
 ## How each mechanism is built
 
-1. **Reach by symbol and file, not by package.** The public type surface of a library is fingerprinted: the compiler emits the declarations of the library's entries, comments removed, and the hash of each exported declaration (with the declarations local to its file) is its fingerprint ([`surface.ts`](../../repoctl/src/logical/surface.ts), [commons repoctl 0007-repoctl-prove FR-007](../../repoctl/spec-kit/specs/0007-repoctl-prove/spec.md)). The changed symbols are the names whose hash differs between the base and now. A body change that keeps the declared types has the same fingerprint. Importers are found by reading what each library's sources import, by name, from each library's package ([commons repoctl 0007-repoctl-prove FR-008](../../repoctl/spec-kit/specs/0007-repoctl-prove/spec.md)). Reach is followed through importers whose own declarations mention a changed symbol. Test selection is file-level: a test runs where anything it transitively imports changed, with the requirements named on a `// Spec:` line as a second selector, each requirement naming the tests that prove it ([`select.ts`](../../repoctl/src/logical/select.ts), [FR-011](../../repoctl/spec-kit/specs/0007-repoctl-prove/spec.md)).
+1. **Reach by symbol and file, not by package.** The public type surface of a library is fingerprinted: the compiler emits the declarations of the library's entries, comments removed, and the hash of each exported declaration (with the declarations local to its file) is its fingerprint ([`surface.ts`](../../repoctl/src/logical/surface.ts), [commons repoctl 0008-repoctl-prove FR-007](../../repoctl/spec-kit/specs/0008-repoctl-prove/spec.md)). The changed symbols are the names whose hash differs between the base and now. A body change that keeps the declared types has the same fingerprint. Importers are found by reading what each library's sources import, by name, from each library's package ([commons repoctl 0008-repoctl-prove FR-008](../../repoctl/spec-kit/specs/0008-repoctl-prove/spec.md)). Reach is followed through importers whose own declarations mention a changed symbol. Test selection is file-level: a test runs where anything it transitively imports changed, with the requirements named on a `// Spec:` line as a second selector, each requirement naming the tests that prove it ([`select.ts`](../../repoctl/src/logical/select.ts), [FR-011](../../repoctl/spec-kit/specs/0008-repoctl-prove/spec.md)).
 2. **A content-addressed result cache.** A passing test is kept under the hash of the runtime, the test and every source it imports, in a folder outside the repository (the cache folder of XDG, or `REPOCTL_CACHE`). An identical key is not run again; a failure is never cached; a test that reads the checkout is never cached nor left out ([`tests.ts`](../../repoctl/src/physical/tests.ts)). A shared cache for CI is not built yet.
 3. **Seam tests.** A consumer declares what it uses by importing it. When a provider's surface changes, the tests of a consumer whose library imports a changed symbol run as T2; the others are skipped with `symbols-unused`. Provider conformance suites are the provider's own T1.
-4. **A foundation smoke gate.** `core`, `formats`, `crypto`, `system`, `terminal`, `kanon` and `libraries` stand under everything. A change inside one runs the suites of all seven first (about twenty seconds together), and a failure there is seen before any wider proof ([commons repoctl 0007-repoctl-prove FR-012](../../repoctl/spec-kit/specs/0007-repoctl-prove/spec.md)).
+4. **A foundation smoke gate.** `core`, `formats`, `crypto`, `system`, `terminal`, `kanon` and `libraries` stand under everything. A change inside one runs the suites of all seven first (about twenty seconds together), and a failure there is seen before any wider proof ([commons repoctl 0008-repoctl-prove FR-012](../../repoctl/spec-kit/specs/0008-repoctl-prove/spec.md)).
 
 The plan itself is a value, a closed vocabulary all the way down:
 
@@ -174,9 +174,9 @@ tierOfProof({ kind: "sync-check" }); // "T0"
 
 - A nightly full run and the release gate remain: `ci` runs on a schedule (03:17 UTC) and on dispatch with the plan `--all`, which plans every tier, and the release runs everything once.
 - A change to the planner, the generators, the workflow definitions or the tier rules plans everything, always.
-- Main keeps its affected set: the plan job of CI writes the proof plan to the summary of its run and gates nothing on it, so what main proves is never less than before ([commons repoctl 0007-repoctl-prove FR-014](../../repoctl/spec-kit/specs/0007-repoctl-prove/spec.md)).
+- Main keeps its affected set: the plan job of CI writes the proof plan to the summary of its run and gates nothing on it, so what main proves is never less than before ([commons repoctl 0008-repoctl-prove FR-014](../../repoctl/spec-kit/specs/0008-repoctl-prove/spec.md)).
 - A failing property test prints its seed and counterexample in the failure.
-- A flaky test is quarantined in `commons/repoctl/quarantine.json` with an owner and an expiry day. It is reported by every plan that would have run it, and it runs again when the expiry passes and the run warns ([commons repoctl 0007-repoctl-prove FR-013](../../repoctl/spec-kit/specs/0007-repoctl-prove/spec.md)).
+- A flaky test is quarantined in `commons/repoctl/quarantine.json` with an owner and an expiry day. It is reported by every plan that would have run it, and it runs again when the expiry passes and the run warns ([commons repoctl 0008-repoctl-prove FR-013](../../repoctl/spec-kit/specs/0008-repoctl-prove/spec.md)).
 
 ## Add a test to the right tier
 

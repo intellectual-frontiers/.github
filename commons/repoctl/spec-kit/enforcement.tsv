@@ -46,17 +46,22 @@ requirement	mechanism	by	note
 0006-repoctl-surfaces FR-004	check	.github: cd commons/repoctl && bun run verify	suite/surfaces.test.ts: the reach of each action, and the confirmation is for a person alone
 0006-repoctl-surfaces FR-005	check	.github: cd commons/repoctl && bun run verify	suite/surfaces.test.ts: the tier is the host's, an unknown word ends with 2 and a verb of a higher tier is not there
 0006-repoctl-surfaces FR-006	check	.github: cd commons/repoctl && bun run verify	suite/surfaces.test.ts: the root package has the script and the bin, and the launcher is there
-0007-repoctl-prove FR-001	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: the verb prints the plan as JSON, refuses a tier that is none with 2, and ends with 1 where a proof fails
-0007-repoctl-prove FR-002	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: the tiers are a closed set with a budget and each proof belongs to exactly one
-0007-repoctl-prove FR-003	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: a changed file is classified by its path and its content at the base and now
-0007-repoctl-prove FR-004	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: each class plans the proofs its row says, and only those
-0007-repoctl-prove FR-005	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: a change to the planner or what Git cannot say plans every proof of every tier
-0007-repoctl-prove FR-006	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: a source change with the same surface proves its library alone, over a real repository too
-0007-repoctl-prove FR-007	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: the fingerprint ignores comments and bodies and names the declarations that changed
-0007-repoctl-prove FR-008	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: a changed symbol reaches its importers by name through the surfaces that mention it
-0007-repoctl-prove FR-009	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: every skipped proof has a reason of the closed union and a sentence; the plan is the same twice
-0007-repoctl-prove FR-010	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: --all plans every tier and a change to the planner plans the same
-0007-repoctl-prove FR-011	check	.github: cd commons/repoctl && bun run verify	suite/prove-select.test.ts: selection by imports, trace and symbols, environmental tests never left out, the cache keeps passes under an exact key and a second run takes them
-0007-repoctl-prove FR-012	check	.github: cd commons/repoctl && bun run verify	suite/prove-select.test.ts: a foundation change plans the suites of every foundation library
-0007-repoctl-prove FR-013	check	.github: cd commons/repoctl && bun run verify	suite/prove-select.test.ts: the quarantine record, its expiry, and the seeds of a failing property test
-0007-repoctl-prove FR-014	check	.github: cd commons/repoctl && bun run verify	suite/prove-select.test.ts: the plan job writes the proof plan to the summary, the matrices are the planner of libraries and the full run is scheduled
+0007-repoctl-hygiene FR-001	check	.github: cd commons/repoctl && bun run verify	suite/hygiene.test.ts: the verb is declared once with its facts and its examples and each code has an explanation
+0007-repoctl-hygiene FR-002	check	.github: cd commons/repoctl && bun run verify	suite/hygiene.test.ts: each of the six findings is made from facts, in the order of the codes, and the repository of commons is not reported for its own packages
+0007-repoctl-hygiene FR-003	check	.github: cd commons/repoctl && bun run verify	suite/hygiene.test.ts: bun.lock and package-lock.json give the same copies, the installed tree is read through the port and a lockfile that cannot be read is a finding
+0007-repoctl-hygiene FR-004	check	.github: cd commons/repoctl && bun run verify	suite/hygiene.test.ts: the exit status is 1 only for a failure and --json is one document
+0007-repoctl-hygiene FR-005	check	.github: cd commons/repoctl && bun run verify	suite/hygiene.test.ts: status asks npm for the package a library publishes
+0008-repoctl-prove FR-001	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: the verb prints the plan as JSON, refuses a tier that is none with 2, and ends with 1 where a proof fails
+0008-repoctl-prove FR-002	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: the tiers are a closed set with a budget and each proof belongs to exactly one
+0008-repoctl-prove FR-003	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: a changed file is classified by its path and its content at the base and now
+0008-repoctl-prove FR-004	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: each class plans the proofs its row says, and only those
+0008-repoctl-prove FR-005	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: a change to the planner or what Git cannot say plans every proof of every tier
+0008-repoctl-prove FR-006	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: a source change with the same surface proves its library alone, over a real repository too
+0008-repoctl-prove FR-007	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: the fingerprint ignores comments and bodies and names the declarations that changed
+0008-repoctl-prove FR-008	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: a changed symbol reaches its importers by name through the surfaces that mention it
+0008-repoctl-prove FR-009	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: every skipped proof has a reason of the closed union and a sentence; the plan is the same twice
+0008-repoctl-prove FR-010	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: --all plans every tier and a change to the planner plans the same
+0008-repoctl-prove FR-011	check	.github: cd commons/repoctl && bun run verify	suite/prove-select.test.ts: selection by imports, trace and symbols, environmental tests never left out, the cache keeps passes under an exact key and a second run takes them
+0008-repoctl-prove FR-012	check	.github: cd commons/repoctl && bun run verify	suite/prove-select.test.ts: a foundation change plans the suites of every foundation library
+0008-repoctl-prove FR-013	check	.github: cd commons/repoctl && bun run verify	suite/prove-select.test.ts: the quarantine record, its expiry, and the seeds of a failing property test
+0008-repoctl-prove FR-014	check	.github: cd commons/repoctl && bun run verify	suite/prove-select.test.ts: the plan job writes the proof plan to the summary, the matrices are the planner of libraries and the full run is scheduled

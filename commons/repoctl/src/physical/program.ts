@@ -20,7 +20,7 @@ import { branch, command, type Node, outcomeOf, type Program, programOf } from "
 import { CATALOGUE, LADDER, REPOCTL_VERSION, tierOf } from "@intellectual-frontiers/repoctl/governance";
 import { NPM_TOKEN_VARIABLE } from "./adapters.ts";
 import { type Host, traitsOf } from "./define.ts";
-import { checkVerb, doctorVerb, statusVerb } from "./verbs/check.ts";
+import { checkVerb, doctorVerb, hygieneVerb, statusVerb } from "./verbs/check.ts";
 import { commitVerb, newLibraryVerb } from "./verbs/library.ts";
 import { proveVerb } from "./verbs/prove.ts";
 import { releaseApplyVerb, releasePlanVerb, releasePublishVerb } from "./verbs/releasing.ts";
@@ -49,6 +49,7 @@ export function repoctlProgram(host: Host): Program {
     syncVerb(host),
     mergeVerb(host),
     statusVerb(host),
+    hygieneVerb(host),
     branch({ name: "release", summary: "Plan a release of the libraries, make it, and send it to npm.", children: [releasePlanVerb(host), releaseApplyVerb(host), releasePublishVerb(host)] }),
     branch({ name: "new", summary: "Make something new in the repository.", children: [newLibraryVerb(host)] }),
     commitVerb(host),

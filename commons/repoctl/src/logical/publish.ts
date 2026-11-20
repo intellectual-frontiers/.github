@@ -8,7 +8,7 @@
  * @example
  * ```ts
  * import { confirmationPhrase } from "./publish.ts";
- * confirmationPhrase([{ slug: "core", version: "0.1.0", folder: "commons/core", tag: "core-v0.1.0", publish: true }]).startsWith("publish 1 "); // true
+ * confirmationPhrase([{ slug: "core", package: "@intellectual-frontiers/core", version: "0.1.0", folder: "commons/core", tag: "core-v0.1.0", publish: true }]).startsWith("publish 1 "); // true
  * ```
  *
  * @module
@@ -19,7 +19,7 @@ import { finding, type Finding, tailLines } from "./findings.ts";
 import type { World } from "./ports.ts";
 
 /** One release of the record: a library, its version, its folder and its tag, and whether it goes to npm. */
-export type ReleaseEntry = { readonly slug: string; readonly version: string; readonly folder: string; readonly tag: string; readonly publish: boolean };
+export type ReleaseEntry = { readonly slug: string; readonly package: string; readonly version: string; readonly folder: string; readonly tag: string; readonly publish: boolean };
 
 /** What is to happen to one release. */
 export type Item =
@@ -38,9 +38,9 @@ export type Published =
   | { readonly kind: "failed"; readonly entry: ReleaseEntry; readonly detail: readonly string[] }
   | { readonly kind: "not-run"; readonly entry: ReleaseEntry; readonly why: string };
 
-/** The absolute path of the tarball the packer makes for a release: `dist/intellectual-frontiers-<slug>-<version>.tgz` in the library's folder. */
+/** The absolute path of the tarball the packer makes for a release: `dist/<scope>-<package>-<version>.tgz` in the library's folder. */
 export function tarballPath(repo: string, e: ReleaseEntry): string {
-  return `${repo}/${e.folder}/dist/intellectual-frontiers-${e.slug}-${e.version}.tgz`;
+  return `${repo}/${e.folder}/dist/${e.package.replace(/^@/, "").replace("/", "-")}-${e.version}.tgz`;
 }
 
 /** The phrase that confirms a publication: the word, how many packages go, and the start of a digest of which (`publish 3 1a2b3c4d`), so that what was reviewed is what is sent. */
@@ -54,7 +54,7 @@ export async function planPublish(w: Pick<World, "files" | "registry" | "repo">,
   const todo = entries.filter((e) => e.publish && !tagged.has(e.tag));
   const items: Item[] = [];
   for (const entry of todo) {
-    const seen = await w.registry.view(`@intellectual-frontiers/${entry.slug}`);
+    const seen = await w.registry.view(entry.package);
     if (seen.kind === "err") {
       items.push({ kind: "unknown", entry, why: seen.error });
       continue;

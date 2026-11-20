@@ -44,6 +44,12 @@ function tsFiles(dir: string): readonly string[] {
   return out;
 }
 
+/** Whether a folder is a metapackage (commons 0036-distribution FR-005): a library whose manifest names `bundle` and which has no spec kit of its own. */
+function isMetapackage(repo: string, name: string): boolean {
+  const manifest = `${repo}/commons/${name}/library.ts`;
+  return existsSync(manifest) && /\bbundle:\s*"/.test(read(manifest)) && !isDir(`${repo}/commons/${name}/spec-kit`);
+}
+
 /** The libraries this specification names: every `commons/<name>` of a requirement of its section "The libraries". */
 function namedLibraries(spec: string): ReadonlyMap<string, string> {
   const out = new Map<string, string>();
@@ -74,7 +80,7 @@ export function libraryFindings(repo: string): readonly string[] {
   for (const f of manifestFindings(repo)) found.push(f);
   for (const stale of synchronize(repo, false).stale) found.push(`${stale} is not what the manifests make (FR-011)`);
   for (const name of named.keys())
-    if (!libraries.includes(name)) found.push(`${SPEC} names commons/${name}, which has no spec-kit/ (FR-008)`);
+    if (!libraries.includes(name) && !isMetapackage(repo, name)) found.push(`${SPEC} names commons/${name}, which has no spec-kit/ (FR-008)`);
   for (const name of libraries) {
     const dir = `${repo}/commons/${name}`;
     const fr = named.get(name);
@@ -148,6 +154,7 @@ function copyOf(): { readonly repo: string; readonly [Symbol.dispose]: () => voi
   const skip = (src: string): boolean => !src.split("/").some((part) => part === "node_modules" || part === "dist");
   cpSync(`${ROOT}/commons/spec-kit`, `${repo}/commons/spec-kit`, { recursive: true });
   for (const name of librariesOf(ROOT)) cpSync(`${ROOT}/commons/${name}`, `${repo}/commons/${name}`, { recursive: true, filter: skip });
+  for (const name of readdirSync(`${ROOT}/commons`).filter((n) => isMetapackage(ROOT, n))) cpSync(`${ROOT}/commons/${name}`, `${repo}/commons/${name}`, { recursive: true, filter: skip });
   cpSync(`${ROOT}/commons/docs.config.ts`, `${repo}/commons/docs.config.ts`);
   cpSync(`${ROOT}/.github/workflows`, `${repo}/.github/workflows`, { recursive: true });
   return { repo, [Symbol.dispose]: () => fs.removeSync(repo, { recursive: true }) };

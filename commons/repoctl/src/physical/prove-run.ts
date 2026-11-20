@@ -1,6 +1,6 @@
-// Spec: 0007-repoctl-prove FR-011
+// Spec: 0008-repoctl-prove FR-011
 /**
- * The run of a proof plan (commons repoctl 0007-repoctl-prove FR-001, FR-011, FR-012): the proofs of the tiers that run here, each a program in its folder, except the proofs of tests, whose tests are selected by what changed (the imports
+ * The run of a proof plan (commons repoctl 0008-repoctl-prove FR-001, FR-011, FR-012): the proofs of the tiers that run here, each a program in its folder, except the proofs of tests, whose tests are selected by what changed (the imports
  * of each test, the requirements the changed files name, the symbols a seam's library imports), left out where a quarantine holds them, taken from the cache where their key is in it, and run each as its own program. The tiers run in
  * order, and the proofs of a tier several at a time.
  *

@@ -1,6 +1,6 @@
-// Spec: 0007-repoctl-prove FR-001
+// Spec: 0008-repoctl-prove FR-001
 /**
- * What `repoctl prove` does in the world (commons repoctl 0007-repoctl-prove FR-001, FR-006 to FR-008): it asks Git what changed (the files and their text at the merge base and now), reads the import graph of the libraries from their
+ * What `repoctl prove` does in the world (commons repoctl 0008-repoctl-prove FR-001, FR-006 to FR-008): it asks Git what changed (the files and their text at the merge base and now), reads the import graph of the libraries from their
  * sources, has the compiler emit the declarations of a library at the base and now so that their fingerprints can be compared, asks the planner of the Logical layer for the plan (again, where it needs a surface it was not given), and runs
  * the proofs of the tiers that run on this machine. Each proof is one program run in the folder it belongs to.
  *
@@ -52,9 +52,6 @@ import {
 /** The revision a plan compares with where none is given. */
 export const DEFAULT_BASE = "origin/main";
 
-/** The package name of a library of the repository. */
-const packageNameOf = (name: string): string => `@intellectual-frontiers/${name}`;
-
 /** What Git says changed: the merge base and the files with their text there and now, or that it cannot say. */
 export type Changes = { readonly known: true; readonly mergeBase: string; readonly changed: readonly ChangedFile[] } | { readonly known: false; readonly why: string };
 
@@ -83,7 +80,8 @@ export async function readGraph(w: World): Promise<Result<readonly LibraryNode[]
     const n = parseLibraryName(l.name);
     return n.kind === "ok" ? [{ info: l, name: n.value }] : [];
   });
-  const byPackage = new Map(named.map((n) => [packageNameOf(n.name), n.name]));
+  // the metapackage `commons` has no code: what imports `@intellectual-frontiers/commons` imports the kernel, which is no library
+  const byPackage = new Map(named.filter((n) => n.name !== "commons").map((n) => [n.info.package, n.name]));
   const nodes = await pool(named, 8, async ({ info, name }): Promise<LibraryNode> => {
     const files = (await w.files.walk(join(w.repo, info.folder))).filter((f) => /\.(?:ts|mts|mjs)$/.test(f));
     const merged = new Map<LibraryName, { all: boolean; names: Set<string> }>();
@@ -99,7 +97,7 @@ export async function readGraph(w: World): Promise<Result<readonly LibraryNode[]
     }
     const uses: readonly Use[] = [...merged].sort(([a], [b]) => (a < b ? -1 : 1)).map(([provider, e]) => ({ provider, usage: { all: e.all, names: [...e.names].sort() } }));
     const systems = (LIBRARY_CI[name]?.systems ?? []).map((s) => (s === "windows-latest" ? ("windows" as const) : ("macos" as const)));
-    return { name, folder: info.folder, foundation: FOUNDATION.includes(name), uses, systems };
+    return { name, package: info.package, folder: info.folder, foundation: FOUNDATION.includes(name), uses, systems };
   });
   return ok(nodes);
 }

@@ -1,5 +1,5 @@
 /**
- * Tests of `repoctl prove` (commons repoctl 0007-repoctl-prove FR-001 to FR-009): the classes of changed files and the proofs of each, the tiers, the planner that never skips a change to itself, the fingerprint of a public surface and the
+ * Tests of `repoctl prove` (commons repoctl 0008-repoctl-prove FR-001 to FR-009): the classes of changed files and the proofs of each, the tiers, the planner that never skips a change to itself, the fingerprint of a public surface and the
  * reach of a changed symbol, and a plan over a real Git repository with real libraries, whose declarations the real compiler emits at the base and now.
  *
  * @module
@@ -47,6 +47,7 @@ const lib = (name: string): LibraryName => {
 
 const node = (name: string, uses: readonly [string, readonly string[]][] = [], foundation = false, systems: LibraryNode["systems"] = []): LibraryNode => ({
   name: lib(name),
+  package: `@intellectual-frontiers/${name}`,
   folder: `commons/${name}`,
   foundation,
   uses: uses.map(([p, names]) => ({ provider: lib(p), usage: { all: false, names } })),
@@ -74,7 +75,7 @@ const planOf = (i: ProofInput): ProofPlan => {
 
 const kinds = (p: ProofPlan): readonly string[] => p.proofs.map((x) => proofKey(x.proof));
 
-proves(["0007-repoctl-prove FR-002"], "the tiers are a closed set with a budget and each proof belongs to exactly one tier", () => {
+proves(["0008-repoctl-prove FR-002"], "the tiers are a closed set with a budget and each proof belongs to exactly one tier", () => {
   assertEquals(PROOF_TIER_IDS, ["T0", "T1", "T2", "T3", "T4", "T5", "T6"]);
   for (const t of PROOF_TIER_IDS) assert(PROOF_TIERS[t].budgetSeconds > 0 && PROOF_TIERS[t].runsOn.length > 0, t);
   assertEquals(parseProofTier("3"), parseProofTier("T3"));
@@ -94,7 +95,7 @@ proves(["0007-repoctl-prove FR-002"], "the tiers are a closed set with a budget 
   assertEquals(new Set(sample.map(proofKey)).size, sample.length);
 });
 
-proves(["0007-repoctl-prove FR-003"], "a changed file is classified by its path and its content at the base and now", () => {
+proves(["0008-repoctl-prove FR-003"], "a changed file is classified by its path and its content at the base and now", () => {
   const of = (path: string, before: string | undefined, after: string | undefined) => classifyFile({ path, before, after }, libraryOfPath(NODES)).class;
   assertEquals(of("commons/core/src/text.ts", "// c\nexport const a = 1;\n", "// d\nexport const a = 1;\n"), "prose");
   assertEquals(of("commons/core/src/text.ts", "/** a { */\nexport const a = '//';\n", "/** b } */\nexport const a = '//';\n"), "prose");
@@ -118,7 +119,7 @@ proves(["0007-repoctl-prove FR-003"], "a changed file is classified by its path 
   for (const c of CHANGE_CLASSES) assertEquals(CLASS_RULES[c].class, c);
 });
 
-proves(["0007-repoctl-prove FR-004"], "each class plans the proofs its row says, and only those", () => {
+proves(["0008-repoctl-prove FR-004"], "each class plans the proofs its row says, and only those", () => {
   const change = (path: string, before: string, after: string): ProofPlan => planOf(input([{ path, before, after }]));
   assertEquals(kinds(change("commons/core/src/text.ts", "// a\nconst x = 1;", "// b\nconst x = 1;")), ["docs-check"]);
   assertEquals(kinds(change("commons/core/spec-kit/specs/0001-core/spec.md", "- **FR-001**: a", "- **FR-001**: b")), ["spec-check:core", "trace-check:core"]);
@@ -130,7 +131,7 @@ proves(["0007-repoctl-prove FR-004"], "each class plans the proofs its row says,
   assertEquals(kinds(outside), ["spec-check:repository", "types:core", "suite:core", "end-to-end"]);
 });
 
-proves(["0007-repoctl-prove FR-005"], "a change to the planner, to the generators or to what Git cannot say plans every proof of every tier", () => {
+proves(["0008-repoctl-prove FR-005"], "a change to the planner, to the generators or to what Git cannot say plans every proof of every tier", () => {
   const everything = planOf(input([{ path: "commons/repoctl/src/logical/prove.ts", before: "a", after: "b" }]));
   for (const t of PROOF_TIER_IDS) assert(everything.proofs.some((p) => p.tier === t), `${t} is planned`);
   assert(everything.proofs.some((p) => p.proof.kind === "release-gate"));
@@ -139,14 +140,14 @@ proves(["0007-repoctl-prove FR-005"], "a change to the planner, to the generator
   assertEquals(planOf(input([{ path: "commons/repoctl/src/governance/generators.ts", before: "a", after: "b" }])).proofs.some((p) => p.tier === "T6"), true);
 });
 
-proves(["0007-repoctl-prove FR-010"], "--all plans every tier, and a change to the planner plans exactly that", () => {
+proves(["0008-repoctl-prove FR-010"], "--all plans every tier, and a change to the planner plans exactly that", () => {
   const all = planOf(input([], new Map(), { all: true }));
   const planner = planOf(input([{ path: "commons/repoctl/src/logical/prove.ts", before: "a", after: "b" }]));
   assertEquals(planner.proofs.map((p) => proofKey(p.proof)), all.proofs.map((p) => proofKey(p.proof)));
   for (const t of PROOF_TIER_IDS) assert(all.proofs.some((p) => p.tier === t), t);
 });
 
-proves(["0007-repoctl-prove FR-006"], "a source change with the same surface proves its library alone and skips its importers with the reason", () => {
+proves(["0008-repoctl-prove FR-006"], "a source change with the same surface proves its library alone and skips its importers with the reason", () => {
   const surfaces = new Map<LibraryName, LibrarySurface>([[lib("leaf"), { delta: { kind: "same" }, mentions: [] }]]);
   const plan = planOf(input([{ path: "commons/leaf/src/a.ts", before: "export const a = 1;", after: "export const a = 2;" }], surfaces));
   assertEquals(kinds(plan), ["trace-check:leaf", "types:leaf", "suite:leaf"]);
@@ -157,7 +158,7 @@ proves(["0007-repoctl-prove FR-006"], "a source change with the same surface pro
   assertEquals(planProof(input([{ path: "commons/leaf/src/a.ts", before: "a", after: "b" }])), { kind: "needs", libraries: [lib("leaf")] });
 });
 
-proves(["0007-repoctl-prove FR-007"], "the fingerprint of a surface ignores comments and bodies and names the declarations that changed", () => {
+proves(["0008-repoctl-prove FR-007"], "the fingerprint of a surface ignores comments and bodies and names the declarations that changed", () => {
   const hash = (t: string): string => `h${t.length}:${t.split("").reduce((n, c) => (n * 31 + c.charCodeAt(0)) % 1000003, 7)}`;
   const dts = (text: string) => fingerprintOf(declarationsOf("a.d.ts", text), hash);
   const base = dts("export declare function f(x: number): string;\nexport interface A {\n  a: { b: 1 };\n}\nexport type B = { x: 1 } & A;\ndeclare const local: unique symbol;\nexport {};\n");
@@ -172,7 +173,7 @@ proves(["0007-repoctl-prove FR-007"], "the fingerprint of a surface ignores comm
   assertEquals(reexports, ["*", "a", "C", "ns"]);
 });
 
-proves(["0007-repoctl-prove FR-008"], "a changed symbol reaches the libraries that import it by name, a namespace or a re-export, through the surfaces that mention it", () => {
+proves(["0008-repoctl-prove FR-008"], "a changed symbol reaches the libraries that import it by name, a namespace or a re-export, through the surfaces that mention it", () => {
   assertEquals(importsOf('import { ok, type Result as R } from "@x/core/sub";\nimport * as c from "@x/core";\nimport d from "@x/other";', "@x/core"), { all: true, names: ["Result", "ok"] });
   assertEquals(importsOf('export { a } from "@x/core";\n// import { z } from "@x/core"\n', "@x/core"), { all: false, names: ["a"] });
   assertEquals(importsOf('const m = await import("@x/core/y");', "@x/core").all, true);
@@ -191,7 +192,7 @@ proves(["0007-repoctl-prove FR-008"], "a changed symbol reaches the libraries th
   assert(kinds(unknown).includes("seam:core>other"), "a surface that cannot be compared reaches every importer");
 });
 
-proves(["0007-repoctl-prove FR-009"], "every skipped proof carries a reason of the closed union and a sentence, and the plan is the same twice", () => {
+proves(["0008-repoctl-prove FR-009"], "every skipped proof carries a reason of the closed union and a sentence, and the plan is the same twice", () => {
   const i = input([{ path: "commons/core/src/text.ts", before: "// a\nconst x = 1;", after: "// b\nconst x = 1;" }]);
   const a = planOf(i);
   assertEquals(JSON.stringify(a), JSON.stringify(planOf(i)));
@@ -226,13 +227,13 @@ async function withLibraries<T>(use: (dir: string, world: World) => Promise<T>):
     const names = ["prov", "user", "idle"];
     const world: World = {
       ...real,
-      libraries: { list: () => Promise.resolve(ok(names.map((n) => ({ name: n, folder: `commons/${n}`, version: "0.1.0", level: "L1", specKit: undefined, npm: false, versionConstants: [] })))) },
+      libraries: { list: () => Promise.resolve(ok(names.map((n) => ({ name: n, folder: `commons/${n}`, version: "0.1.0", level: "L1", specKit: undefined, npm: false, versionConstants: [], package: `@intellectual-frontiers/${n}` })))) },
     };
     return await use(dir, world);
   });
 }
 
-proves(["0007-repoctl-prove FR-006", "0007-repoctl-prove FR-007", "0007-repoctl-prove FR-008"], "over a real repository the compiler's declarations decide who is proved again", async () => {
+proves(["0008-repoctl-prove FR-006", "0008-repoctl-prove FR-007", "0008-repoctl-prove FR-008"], "over a real repository the compiler's declarations decide who is proved again", async () => {
   if (!CAN_RUN) return;
   await withLibraries(async (dir, world) => {
     const plan = async (): Promise<ProofPlan> => {
@@ -256,7 +257,7 @@ proves(["0007-repoctl-prove FR-006", "0007-repoctl-prove FR-007", "0007-repoctl-
   });
 });
 
-proves(["0007-repoctl-prove FR-001"], "the verb prints the plan as JSON, refuses a tier that is none and ends with 2, and ends with 0 where every proof passed", async () => {
+proves(["0008-repoctl-prove FR-001"], "the verb prints the plan as JSON, refuses a tier that is none and ends with 2, and ends with 0 where every proof passed", async () => {
   if (!CAN_RUN) return;
   await withLibraries(async (dir, world) => {
     const host = hostOf(world);

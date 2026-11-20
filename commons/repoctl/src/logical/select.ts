@@ -1,6 +1,6 @@
-// Spec: 0007-repoctl-prove FR-011
+// Spec: 0008-repoctl-prove FR-011
 /**
- * Which tests a change must run, and which it may leave out (commons repoctl 0007-repoctl-prove FR-011, FR-012, FR-014): a test runs when anything it transitively imports changed (the selector by imports), when a requirement named by
+ * Which tests a change must run, and which it may leave out (commons repoctl 0008-repoctl-prove FR-011, FR-012, FR-014): a test runs when anything it transitively imports changed (the selector by imports), when a requirement named by
  * a changed file's `// Spec:` line is proved by it (the selector by the trace register), or, for a seam, when its library imports a changed symbol of the provider; a test of a suite that reads the tree is never left out (a seam is about symbols, so it runs the tests that import them); a quarantined test is
  * reported and not run until its expiry; and the key of a result in the cache is a hash of everything that decides it.
  *
@@ -63,7 +63,7 @@ export function provesOf(text: string): readonly string[] {
   return [...ids].sort();
 }
 
-/** The specification a path of a specification's own folder names (`.../specs/0007-repoctl-prove/spec.md`), where it is one. */
+/** The specification a path of a specification's own folder names (`.../specs/0008-repoctl-prove/spec.md`), where it is one. */
 export function specOfPath(path: string): string | undefined {
   return /\/specs\/(\d{4}-[a-z0-9-]+)\//.exec(path)?.[1];
 }

@@ -1,6 +1,6 @@
-// Spec: 0007-repoctl-prove FR-003
+// Spec: 0008-repoctl-prove FR-003
 /**
- * The proof plan as a pure function (commons repoctl 0007-repoctl-prove FR-003 to FR-009): each changed file is classified by its path and its content at the base and now; the classes give the proofs of the tiers; a change
+ * The proof plan as a pure function (commons repoctl 0008-repoctl-prove FR-003 to FR-009): each changed file is classified by its path and its content at the base and now; the classes give the proofs of the tiers; a change
  * inside a library asks the fingerprint of its public surface (and of the surfaces of the importers it reaches) to decide who must be proved again; every proof left out says why. Nothing here reads a file or runs a program: the
  * Physical layer gives the changed files, the import graph and the surfaces, and asks again where the planner says it needs a surface it was not given.
  *
@@ -48,6 +48,7 @@ export type Use = { readonly provider: LibraryName; readonly usage: Usage };
 /** A library as the planner reads it: its place, what it imports from other libraries, whether it is foundation, and the systems it has code of its own for. */
 export type LibraryNode = {
   readonly name: LibraryName;
+  readonly package: string;
   readonly folder: string;
   readonly foundation: boolean;
   readonly uses: readonly Use[];

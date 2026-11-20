@@ -15,7 +15,7 @@
  */
 import { err, ok } from "@intellectual-frontiers/core";
 import { secretOf } from "@intellectual-frontiers/headless/logical";
-import { readLibraries } from "@intellectual-frontiers/libraries/libraries";
+import { publishedPackage, readLibraries } from "@intellectual-frontiers/libraries/libraries";
 import { makeTempDir, mkdirSync, readDirSync, readTextFileSync, removeSync, writeTextFileSync, existsSync, statSync } from "@intellectual-frontiers/system/fs";
 import { dirname, join } from "@intellectual-frontiers/system/path";
 import { run } from "@intellectual-frontiers/system/proc";
@@ -123,6 +123,7 @@ export function manifestLibraries(repo: string): Libraries {
               ? [
                   {
                     name: f.library.name,
+                    package: publishedPackage(f.library),
                     folder: `commons/${f.dir}`,
                     version: f.library.version,
                     level: f.library.level,
