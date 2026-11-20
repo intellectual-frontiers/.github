@@ -10,7 +10,7 @@
  */
 import { cpSync } from "node:fs";
 import { basename } from "node:path";
-import { parseToml } from "@intellectual-frontiers/formats/toml";
+import { parseToml } from "../commons/formats/src/toml.ts";
 import { fs, path, proc } from "../commons/ts/runtime/mod.ts";
 import {
   assert,
