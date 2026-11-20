@@ -126,10 +126,12 @@ function jobLines(id: string, j: Job): string[] {
     if (j.environment.url !== undefined) out.push(...entry("url", j.environment.url, 6));
   }
   out.push(...mapping("env", j.env, 4));
+  out.push(...mapping("outputs", j.outputs, 4));
   if (j.strategy !== undefined) {
     out.push("    strategy:");
     if (j.strategy.failFast !== undefined) out.push(...entry("fail-fast", j.strategy.failFast, 6));
-    out.push("      matrix:", ...Object.entries(j.strategy.matrix).flatMap(([k, v]) => flowList(k, v, 8)));
+    const m = j.strategy.matrix;
+    out.push(...(typeof m === "string" ? entry("matrix", m, 6) : ["      matrix:", ...Object.entries(m).flatMap(([k, v]) => flowList(k, v, 8))]));
   }
   out.push("    steps:", ...j.steps.flatMap((s) => step(s, 6)));
   return out;

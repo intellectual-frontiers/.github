@@ -5,15 +5,12 @@
  * @module
  */
 import { affectedBy, changedSince, inputsOf, main, matches, matrixOf } from "../src/affected.ts";
-import { readLibraries } from "../src/libraries.ts";
 import { mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
-import { fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
+import { join } from "@intellectual-frontiers/system/path";
 import { proc } from "@intellectual-frontiers/system";
-import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
-import { main as generate } from "../src/generate-workflows.ts";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const SPEC = "0027-commons-libraries";
-const ROOT = resolve(fromFileUrl(new URL("../../..", import.meta.url)));
 
 const put = (root: string, file: string, text: string): void => {
   mkdirSync(join(root, file, ".."), { recursive: true });
@@ -46,6 +43,8 @@ function repo(root: string): void {
     }),
   );
   put(root, "commons/alpha/api.ts", 'import { util } from "@x/commons/ts/kernel";\nexport const a = util;\n');
+  put(root, "commons/alpha/src/mod.ts", 'import { util } from "@x/commons/ts/kernel";\nexport const m = util;\n');
+  put(root, "commons/beta/src/mod.ts", 'import { a } from "@x/alpha/api";\nexport const b2 = a;\n');
   put(root, "commons/beta/library.ts", lib("beta"));
   put(
     root,
@@ -69,10 +68,13 @@ proves(
       assertEquals(a.dependsOn, ["ts"], "link:../ts is a dependency and ^1.0.0 is not");
       assertEquals(a.files, ["commons/tools/check.ts", "commons/ts/kernel/mod.ts", "commons/ts/kernel/util.ts"]);
       assert(a.paths.includes("commons/alpha/**") && a.paths.includes("commons/ts/kernel/**") && a.paths.includes("commons/tools/**"));
-      assert(a.paths.includes(".github/actions/**") && a.paths.includes(".github/workflows/alpha.auto.yml"));
+      assert(a.paths.includes(".github/actions/**") && a.paths.includes(".github/workflows/ci.auto.yml"));
+      assertEquals(a.imports, [], "the kernel is not a library");
+      assert(a.codePaths.includes("commons/ts/kernel/**") && !a.codePaths.includes("commons/tools/**"), "the code reads what it imports and no tool");
       assert(!a.paths.includes("commons/ts/runtime/**") && !a.paths.includes("commons/ts/**"), "the runtime is not imported");
       const b = inputsOf(dir, "beta");
       assertEquals(b.dependsOn, ["alpha", "ts"]);
+      assertEquals(b.imports, ["alpha"], "the libraries its own code imports by name");
       assert(b.paths.includes("commons/ts/**"), "an import the exports do not give takes the whole dependency");
       assert(b.paths.includes("commons/alpha/**"), "a dependency library's entry is an input");
       assertEquals(matches(a.paths, "commons/ts/kernel/util.ts"), true);
@@ -136,20 +138,21 @@ proves(
 
 proves(
   [`${SPEC} FR-022`],
-  "a library's generated workflow runs on its inputs as folders, and this repository's data workflow runs on every one of data's inputs",
+  "the development loop reads the same planner with the reach of a library's own code: what its sources import and who imports it, and neither a tool its scripts run nor a workflow",
   async () => {
     await withTempDir((dir) => {
       repo(dir);
-      assertEquals(generate(["--repo", dir]), 0);
-      const w = readTextFileSync(join(dir, ".github", "workflows", "alpha.auto.yml"));
-      for (const p of inputsOf(dir, "alpha").paths) assertStringIncludes(w, p);
-      assert(!w.includes("commons/ts/runtime/**"), "the workflow does not run on what the library does not read");
+      const code = (files: readonly string[]): readonly string[] => affectedBy(dir, files, "code").map((l) => l.name);
+      const verify = (files: readonly string[]): readonly string[] => affectedBy(dir, files, "verify").map((l) => l.name);
+      assertEquals(code(["commons/ts/kernel/util.ts"]), ["alpha", "beta"], "what alpha's own code imports, and beta, which imports alpha");
+      assertEquals(code(["commons/alpha/api.ts"]), ["alpha", "beta"]);
+      assertEquals(code(["commons/beta/main.ts"]), ["beta"]);
+      assertEquals(code(["commons/tools/check.ts"]), [], "a tool that a script runs is read by verify, not by the types and the tests");
+      assertEquals(verify(["commons/tools/check.ts"]), ["alpha", "beta"]);
+      assertEquals(code([".github/actions/bun/action.yml", ".github/workflows/ci.auto.yml"]), []);
+      assertEquals(verify([".github/workflows/ci.auto.yml"]), ["alpha", "beta"], "the workflow of CI is an input of every library's verify");
+      assertEquals(code(["commons/ts/other/thing.ts"]), [], "beta takes the whole runtime only in a file that is not its own code");
       return Promise.resolve();
     });
-    const data = readTextFileSync(join(ROOT, ".github", "workflows", "data.auto.yml"));
-    assert(readLibraries(ROOT).some((f) => f.dir === "data"));
-    for (const p of inputsOf(ROOT, "data").paths) assertStringIncludes(data, p);
-    assertStringIncludes(data, "commons/libraries/src/**");
-    await Promise.resolve();
   },
 );

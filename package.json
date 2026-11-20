@@ -10,6 +10,9 @@
     "./docs": "./commons/docs/mod.ts",
     "./ontology/mizan": "./commons/ontology/src/mizan/mod.ts"
   },
+  "scripts": {
+    "dev:check": "bun commons/libraries/src/dev.ts"
+  },
   "bin": {
     "ifc": "./commons/ts/node/ifc.mjs",
     "ifc-docs": "./commons/docs/ifc-docs.mjs"
@@ -39,5 +42,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/intellectual-frontiers/.github.git"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.6",
+    "fast-check": "4.10.2"
   }
 }

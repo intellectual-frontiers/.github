@@ -94,9 +94,12 @@ export type Triggers = {
   readonly workflowCall?: true;
 };
 
+/** The cells of a matrix: the values of each axis, or an expression that gives the whole matrix (`expr("fromJSON(needs.plan.outputs.linux)")`), which a job reads from the output of another. */
+export type Matrix = Readonly<Record<string, readonly (string | number)[]>> | Expr;
+
 export type Strategy = {
   readonly failFast?: boolean;
-  readonly matrix: Readonly<Record<string, readonly (string | number)[]>>;
+  readonly matrix: Matrix;
 };
 
 export type Job = {
@@ -109,6 +112,8 @@ export type Job = {
   readonly permissions?: Permissions;
   readonly environment?: { readonly name: string; readonly url?: string };
   readonly env?: Readonly<Record<string, Scalar>>;
+  /** What the job gives the jobs that need it, by name: an expression of its steps' outputs. */
+  readonly outputs?: Readonly<Record<string, Expr>>;
   readonly strategy?: Strategy;
   readonly steps: readonly [Step, ...Step[]];
   /** A comment written above the job. */

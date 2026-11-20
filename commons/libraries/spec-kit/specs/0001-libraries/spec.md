@@ -26,13 +26,20 @@
 - **FR-009**: The library MUST keep the importers of standards, each a module that fetches or reads a standard at a pinned address and writes the typed module and the provenance of what it read, with `--check` for whether what is committed is what the standard gives (commons 0019-mizan-integrations).
 - **FR-010**: The library MUST be published to npm as compiled modules with their declarations, one entry for the package and one for each tool above, and each of its commands MUST run as `bun commons/libraries/src/<command>.ts` in this repository.
 
+## The development loop and the plan of CI
+
+- **FR-011**: The library MUST give a development loop, one command (`bun run dev:check` at the root), that finds the libraries the working tree changes since a revision (origin/main by default, the files not yet committed included) or that are named, and the libraries whose own sources import them, from the same planner as `affected` with the narrower reach of a library's own code (its folder and the packages its `about.ts` and `src/` import); that links the libraries of the repository under `commons/node_modules` so that a library imports another by its package name and reads the checkout's source, installs the packages that the root shares once and those a library has of its own; that type-checks each affected library with TypeScript 7, several at a time, and runs the tests of each in a `bun test` process of its own, several at a time; and that prints a short summary in the marks and colours of the terminal library (what it looked at, one line for each stage, what failed under it) and exits 1 where a stage failed. It MUST prove less than `verify` and say so, and never be the release.
+- **FR-012**: The library MUST give the plan of CI, `plan.ts`: from the same planner (the reach of `verify`: what a library's `verify` reads and what depends on it) and the record of CI of each library, the cells of a matrix on Linux, one for each library affected, and the cells of a matrix on the systems besides Linux, one for each affected library whose record names one, as the outputs of a step a workflow reads; and the one workflow `ci` of this repository MUST be made from it (commons 0030-generated-workflows FR-006, FR-007), so that a push or a pull request runs `verify` and the tests on Node 26 for the libraries it affects, on Windows and macOS only for the libraries that have code of their own for them, and nothing else.
+
 ## Acceptance scenarios
 
 1. **Given** a folder `commons/x/` with a manifest, **When** the section of the libraries is made, **Then** it holds one requirement for `x` and its row, and `--check` fails where either differs, per FR-001 and FR-002.
 2. **Given** a change to a file of one library, **When** the affected libraries are asked for, **Then** that library and each that depends on it are in the matrix and no other, per FR-003.
 3. **Given** the typed workflows of the repository, **When** the generator runs with `--check`, **Then** each file is what the model makes and a hand-written workflow is a finding, per FR-005.
 4. **Given** a library that is published to npm, **When** the packer runs, **Then** every export has its declaration in the tarball and a consumer type-checks against it, per FR-007.
-5. **Given** the repository, **When** `check --all` runs, **Then** the `verify` of every library runs and a failing one fails the run, per FR-008.
+5. **Given** a change to a file of one library, **When** `bun run dev:check` runs, **Then** that library and the libraries whose own sources import it are type-checked and tested, and nothing else, per FR-011.
+6. **Given** a push, **When** the workflow `ci` runs, **Then** its plan names the libraries the push affects, a library that is not affected has no job, and the systems besides Linux are asked for only by a library whose record names them, per FR-012.
+7. **Given** the repository, **When** `check --all` runs, **Then** the `verify` of every library runs and a failing one fails the run, per FR-008.
 
 ## Out of scope
 

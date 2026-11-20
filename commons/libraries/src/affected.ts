@@ -43,6 +43,10 @@ export type Inputs = {
   readonly dependsOn: readonly string[];
   /** Every file of another folder that it reads, from the repository's root, in order. */
   readonly files: readonly string[];
+  /** The libraries whose package its sources import by name: what its types and its tests read, which its scripts do not add. */
+  readonly imports: readonly string[];
+  /** The paths its types and its tests read: its folder and what its imports reach (no tool its scripts run, no workflow). */
+  readonly codePaths: readonly string[];
 };
 
 /** The folders whose change is every library's change: the tools that check a library and the action that installs Bun. */
@@ -149,8 +153,11 @@ export function inputsOf(repo: string, name: string): Inputs {
   const sources = sourcesUnder(root, folder);
   const texts = sources.map((f) => ({ f, text: readTextFileSync(join(root, f)) }));
   const entries = new Set<string>();
+  const codeEntries = new Set<string>();
   const whole = new Set<string>();
+  const codeWhole = new Set<string>();
   const dependsOn = new Set<string>();
+  const imports = new Set<string>();
   // a dependency by path: its folder, what the library's sources import from it, and the entries it maps them to
   for (const [dep, spec] of pkg?.dependencies ?? []) {
     const m = /^(?:link|file|workspace):(.+)$/.exec(spec);
@@ -159,15 +166,26 @@ export function inputsOf(repo: string, name: string): Inputs {
     if (dir.startsWith("..") || !existsSync(join(root, dir))) continue;
     const depPkg = readPackage(join(root, dir));
     dependsOn.add(dir.split("/")[1] ?? dir);
-    const imported = new Set<string>();
-    for (const { text } of texts)
-      for (const s of specifiersOf(text))
-        if (s === dep || s.startsWith(`${dep}/`)) imported.add(s === dep ? "." : `.${s.slice(dep.length)}`);
-    for (const key of imported) {
-      const target = depPkg?.exports.get(key);
-      if (target === undefined) whole.add(`${dir}/**`);
-      else entries.add(posix(join(dir, target)));
-    }
+    const importedBy = (own: readonly { readonly f: string; readonly text: string }[]): ReadonlySet<string> => {
+      const found = new Set<string>();
+      for (const { text } of own)
+        for (const s of specifiersOf(text))
+          if (s === dep || s.startsWith(`${dep}/`)) found.add(s === dep ? "." : `.${s.slice(dep.length)}`);
+      return found;
+    };
+    // what its types and tests read is what its own code (`about.ts` and `src/`) imports; its suite and its tools also read the packages their scripts run
+    const imported = importedBy(texts);
+    const ownCode = importedBy(texts.filter((t) => t.f === `${folder}/about.ts` || t.f.startsWith(`${folder}/src/`)));
+    if (ownCode.size > 0 && existsSync(join(root, dir, "library.ts"))) imports.add(dir.split("/")[1] ?? dir);
+    for (const [keys, into, all] of [
+      [imported, entries, whole],
+      [ownCode, codeEntries, codeWhole],
+    ] as const)
+      for (const key of keys) {
+        const target = depPkg?.exports.get(key);
+        if (target === undefined) all.add(`${dir}/**`);
+        else into.add(posix(join(dir, target)));
+      }
   }
   // a path to another folder in a script of the package: `bun ../libraries/src/check.ts`
   for (const script of pkg?.scripts ?? [])
@@ -176,12 +194,18 @@ export function inputsOf(repo: string, name: string): Inputs {
       if (!p.startsWith("..") && existsSync(join(root, p)) && SOURCE.test(p)) entries.add(p);
     }
   const files = [...closure(root, [...entries])].filter((f) => !f.startsWith(`${folder}/`)).sort();
-  const paths = [`${folder}/**`, ...new Set([...files.map(folderOf), ...whole, ...SHARED, `.github/workflows/${name}.auto.yml`])].sort();
+  const paths = [`${folder}/**`, ...new Set([...files.map(folderOf), ...whole, ...SHARED, ".github/workflows/ci.auto.yml"])].sort();
   for (const f of files) {
     const d = f.split("/")[1];
     if (d !== undefined && d !== name && existsSync(join(root, "commons", d, "library.ts"))) dependsOn.add(d);
   }
-  return { paths, dependsOn: [...dependsOn].sort(), files };
+  const codeFiles = [...closure(root, [...codeEntries])].filter((f) => !f.startsWith(`${folder}/`));
+  for (const f of codeFiles) {
+    const d = f.split("/")[1];
+    if (d !== undefined && d !== name && existsSync(join(root, "commons", d, "library.ts"))) imports.add(d);
+  }
+  const codePaths = [`${folder}/**`, ...new Set([...codeFiles.map(folderOf), ...codeWhole])].sort();
+  return { paths, dependsOn: [...dependsOn].sort(), files, imports: [...imports].sort(), codePaths };
 }
 
 /** Whether a path of the repository is among the paths of an input: `dir/**` is the folder and what is under it, anything else the file. */
@@ -189,16 +213,29 @@ export function matches(paths: readonly string[], file: string): boolean {
   return paths.some((p) => (p.endsWith("/**") ? file.startsWith(p.slice(0, -2)) : p === file));
 }
 
+/** Every library of the repository, with its folder. */
+export function everyLibrary(repo: string): readonly (Library & { readonly folder: string })[] {
+  return readLibraries(repo).flatMap((f) => ("library" in f ? [{ ...f.library, folder: `commons/${f.dir}` }] : []));
+}
+
+/**
+ * What a change reaches: `verify`, everything the library's `verify` reads (its scripts' tools, the shared tools, its workflow: what CI runs), or `code`, what its types and its tests read (its folder and the
+ * packages its sources import, which is what the development loop runs).
+ */
+export type Reach = "verify" | "code";
+
 /** The libraries that a list of changed files affects (FR-021): those with a changed file among their inputs, and those that depend on one of these, in order of their names. */
-export function affectedBy(repo: string, changed: readonly string[]): readonly (Library & { readonly folder: string })[] {
+export function affectedBy(repo: string, changed: readonly string[], reach: Reach = "verify"): readonly (Library & { readonly folder: string })[] {
   const root = repo.replace(/[\\/]$/, "");
   const libs = readLibraries(root).flatMap((f) => ("library" in f ? [f.library] : []));
   const inputs = new Map(libs.map((l) => [l.name, inputsOf(root, l.name)]));
-  const hit = new Set(libs.filter((l) => changed.some((c) => matches(inputs.get(l.name)?.paths ?? [], c))).map((l) => l.name));
+  const pathsOf = (n: string): readonly string[] => (reach === "verify" ? inputs.get(n)?.paths : inputs.get(n)?.codePaths) ?? [];
+  const depsOf = (n: string): readonly string[] => (reach === "verify" ? inputs.get(n)?.dependsOn : inputs.get(n)?.imports) ?? [];
+  const hit = new Set(libs.filter((l) => changed.some((c) => matches(pathsOf(l.name), c))).map((l) => l.name));
   for (let grew = true; grew;) {
     grew = false;
     for (const l of libs) {
-      if (!hit.has(l.name) && (inputs.get(l.name)?.dependsOn ?? []).some((d) => hit.has(d))) {
+      if (!hit.has(l.name) && depsOf(l.name).some((d) => hit.has(d))) {
         hit.add(l.name);
         grew = true;
       }
@@ -207,14 +244,16 @@ export function affectedBy(repo: string, changed: readonly string[]): readonly (
   return libs.filter((l) => hit.has(l.name)).map((l) => ({ ...l, folder: `commons/${l.name}` }));
 }
 
-/** The files changed since the merge base of `base` and the head, tracked files of the working tree included; undefined where Git cannot say. */
+/** The files changed since the merge base of `base` and the head, the working tree's tracked and new files included; undefined where Git cannot say. */
 export async function changedSince(repo: string, base: string): Promise<readonly string[] | undefined> {
   const root = resolve(repo);
   try {
     const mb = await run(["git", "-C", root, "merge-base", base, "HEAD"]);
     if (mb.code !== 0) return undefined;
     const d = await run(["git", "-C", root, "diff", "--name-only", mb.stdout.trim()]);
-    return d.code === 0 ? d.stdout.split("\n").filter((l) => l !== "") : undefined;
+    const fresh = await run(["git", "-C", root, "ls-files", "--others", "--exclude-standard"]);
+    if (d.code !== 0 || fresh.code !== 0) return undefined;
+    return [...new Set([...d.stdout.split("\n"), ...fresh.stdout.split("\n")])].filter((l) => l !== "");
   } catch {
     return undefined;
   }
@@ -238,7 +277,7 @@ export async function main(argv: readonly string[]): Promise<number> {
     stdio.stdout.writeSync(`${[...i.paths, ...i.files.map((f) => `  ${f}`)].join("\n")}\n`);
     return 0;
   }
-  const everything = readLibraries(repo).flatMap((f) => ("library" in f ? [{ ...f.library, folder: `commons/${f.dir}` }] : []));
+  const everything = everyLibrary(repo);
   const files = arg("--files");
   const base = arg("--base");
   if (argv.includes("--all")) stdio.stdout.writeSync(`${matrixOf(everything)}\n`);

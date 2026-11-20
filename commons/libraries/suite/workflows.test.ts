@@ -144,15 +144,15 @@ proves(
     await withTempDir((dir) => {
       repo(dir);
       assertEquals(main(["--check", "--repo", dir]), 1);
-      assert(!existsSync(join(dir, ".github", "workflows", "alpha.auto.yml")), "--check wrote");
+      assert(!existsSync(join(dir, ".github", "workflows", "ci.auto.yml")), "--check wrote");
       assertEquals(main(["--repo", dir]), 0);
-      const file = join(dir, ".github", "workflows", "alpha.auto.yml");
+      const file = join(dir, ".github", "workflows", "ci.auto.yml");
       assertEquals(main(["--check", "--repo", dir]), 0);
       const text = readTextFileSync(file);
       writeTextFileSync(file, text.replace(/\n/g, "\r\n"));
       assertEquals(synchronize(dir, false).stale, [], "a CRLF checkout is the file");
-      writeTextFileSync(file, text.replace("timeout-minutes: 15", "timeout-minutes: 99"));
-      assertEquals(synchronize(dir, false).stale, [".github/workflows/alpha.auto.yml"]);
+      writeTextFileSync(file, text.replace("timeout-minutes: 20", "timeout-minutes: 99"));
+      assertEquals(synchronize(dir, false).stale, [".github/workflows/ci.auto.yml"]);
       assertEquals(main(["--check", "--repo", dir]), 1);
       assertEquals(readTextFileSync(file).includes("timeout-minutes: 99"), true, "--check wrote");
       writeTextFileSync(join(dir, ".github", "workflows", "old.auto.yml"), "name: old\n");
@@ -166,32 +166,36 @@ proves(
 );
 
 proves(
-  [`${SPEC} FR-006`],
-  "a folder with a manifest is given a workflow that runs its verify in its folder when it or what it imports changes, a manifest that cannot be read stops the generator, and a library with no record of CI has the job verify alone",
+  [`${SPEC} FR-006`, `${SPEC} FR-007`],
+  "the libraries are proved by one workflow, ci, made from the manifests: a plan, a matrix of the libraries a change affects and one for the systems besides Linux, and one result; a library has no workflow of its own, a manifest that cannot be read stops the generator, and a library with no record of CI has verify on Linux alone",
   async () => {
     await withTempDir((dir) => {
       repo(dir, ["alpha", "beta"]);
       assertEquals(main(["--repo", dir]), 0);
-      const alpha = readTextFileSync(join(dir, ".github", "workflows", "alpha.auto.yml"));
-      assertStringIncludes(alpha, '- "commons/alpha/**"');
-      assertStringIncludes(alpha, '- "commons/tools/**"');
-      assertStringIncludes(alpha, "- .github/workflows/alpha.auto.yml");
-      assertStringIncludes(alpha, "working-directory: commons/alpha");
-      assertStringIncludes(alpha, "run: bun run verify");
-      assert(!alpha.includes("\n  node:"), "a library with no record of CI has the job verify alone");
-      assert(existsSync(join(dir, ".github", "workflows", "beta.auto.yml")));
+      const ci = readTextFileSync(join(dir, ".github", "workflows", "ci.auto.yml"));
+      assertStringIncludes(ci, "bun commons/libraries/src/plan.ts");
+      assertStringIncludes(ci, "matrix: ${{ fromJSON(needs.plan.outputs.linux) }}");
+      assertStringIncludes(ci, "matrix: ${{ fromJSON(needs.plan.outputs.systems) }}");
+      assertStringIncludes(ci, "run: ${{ matrix.verify }}");
+      assertStringIncludes(ci, "working-directory: ${{ matrix.folder }}");
+      assertStringIncludes(ci, "needs: [plan, verify, systems]");
+      assert(!ci.includes("commons/alpha"), "no library is named in the workflow: the plan says which are affected");
+      assert(!existsSync(join(dir, ".github", "workflows", "alpha.auto.yml")) && !existsSync(join(dir, ".github", "workflows", "beta.auto.yml")));
       assertEquals(LIBRARY_CI["alpha"], undefined);
       // a manifest that cannot be read stops the generator before it writes
       writeTextFileSync(join(dir, "commons", "beta", "library.ts"), "export const library = { nope: 1 };\n");
       writeTextFileSync(join(dir, "commons", "alpha", "library.ts"), manifest({ verify: "bun run verify --all" }));
       assertEquals(main(["--repo", dir]), 1);
-      assertEquals(readTextFileSync(join(dir, ".github", "workflows", "alpha.auto.yml")).includes("--all"), false);
+      assertEquals(readTextFileSync(join(dir, ".github", "workflows", "ci.auto.yml")).includes("--all\n"), false);
       return Promise.resolve();
     });
-    // the real library's workflow keeps its extra steps and its job on Node
-    const data = readTextFileSync(join(ROOT, ".github", "workflows", "data.auto.yml"));
-    assertStringIncludes(data, "run: bun run verify");
-    assertStringIncludes(data, "node --test");
+    // the real repository: no library has a workflow of its own, and the systems besides Linux are asked for by the libraries with code of their own for them only
+    const real = outputs(ROOT).files;
+    assertEquals([...real.keys()].filter((p) => /\/(?:core|data|system)\.auto\.yml$/.test(p)), []);
+    assert(real.has(".github/workflows/ci.auto.yml"));
+    const withSystems = Object.entries(LIBRARY_CI).filter(([, c]) => (c.systems ?? []).length > 0).map(([n]) => n);
+    assert(withSystems.includes("system") && !withSystems.includes("core"));
+    assertEquals(LIBRARY_CI["data"]?.after, "bun tools/generate-dpv.ts --check");
   },
 );
 
