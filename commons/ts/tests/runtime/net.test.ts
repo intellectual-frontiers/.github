@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { type Sha256, sha256 } from "../../kernel/sha256.ts";
+import { type Sha256, sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { errors } from "../../runtime/errors.ts";
 import { exists, readTextFile, withTempDir, writeTextFile } from "../../runtime/fs.ts";
 import {

@@ -23,7 +23,7 @@
  *
  * @module
  */
-import { globToRegExp, isGlob } from "./glob.ts";
+import { globToRegExp, isGlob } from "@intellectual-frontiers/formats/glob";
 import { finding, type Finding, type SourceFile } from "./trace.ts";
 
 /** A rung of a ladder: its number, its name, its homes (globs; a trailing `/` is everything under a folder) and the rungs it may rely on. */

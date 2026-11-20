@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { type Literal, tsLiteral } from "../kernel/ts-literal.ts";
+import { type Literal, tsLiteral } from "@intellectual-frontiers/formats/ts-literal";
 import { sha256File, makeTempDir, mkdirSync, readTextFileSync, remove, withTempDir, writeTextFileSync } from "../runtime/fs.ts";
 import { dirname, fromFileUrl, join, resolve } from "../runtime/path.ts";
 import { execPath, run as spawn } from "../runtime/proc.ts";
@@ -580,7 +580,7 @@ proves(
     };
     const ts = decode("commons/ts/release.ts");
     const docs = decode("commons/docs/release.ts");
-    assertEquals([ts.slug, ts.version], ["ifc-ts", "0.17.2"]);
+    assertEquals([ts.slug, ts.version], ["ifc-ts", "0.18.0"]);
     assertEquals([docs.slug, docs.version], ["ifc-docs", "0.1.5"]);
     for (const [dirName, r] of [
       ["ts", ts],

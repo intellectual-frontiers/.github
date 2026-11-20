@@ -25,7 +25,7 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import { sha256 } from "../../../kernel/sha256.ts";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import type { ImportOutput, ImportRecordData } from "./import-vocabulary.ts";
 import type { IntegrationFinding, StandardRecord } from "./types.ts";
 

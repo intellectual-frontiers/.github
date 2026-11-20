@@ -16,8 +16,8 @@
  */
 import { absurd, describe, err, ok, type Result } from "@intellectual-frontiers/core";
 import type { DecodeError, Decoder } from "@intellectual-frontiers/core";
-import { fromBase64, toBase64 } from "./base64.ts";
-import type { Json, JsonObject } from "./json5.ts";
+import { fromBase64, toBase64 } from "@intellectual-frontiers/formats/base64";
+import type { Json, JsonObject } from "@intellectual-frontiers/formats/json5";
 import {
   type AnyValue,
   type AttributeValue,

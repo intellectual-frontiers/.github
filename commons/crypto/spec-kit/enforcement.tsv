@@ -1,0 +1,12 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-crypto FR-001	check	.github: cd commons/crypto && bun test suite/	sha256.test.ts: FIPS 180-2 vectors, hexadecimal round trip, the brand, SHASUMS files
+0001-crypto FR-002	check	.github: cd commons/crypto && bun test suite/	md5.test.ts: RFC 1321's examples
+0001-crypto FR-003	check	.github: cd commons/crypto && bun test suite/	graph.test.ts: glibc's own hashes, clamped rounds, verification, random salts from bytes
+0001-crypto FR-004	check	.github: cd commons/crypto && bun test suite/	sigv4.test.ts: AWS's published Signature Version 4 examples, canonical request and string to sign, a web Request signed
+0001-crypto FR-005	check	.github: cd commons/crypto && bun test suite/	cms.test.ts: certificates built at run time with the kernel's DER; random content encrypted to two recipients and opened by each; RFC 5083's structure; OAEP parameters with NULL or absent SHA-256; a changed message, a wrong key, another recipient and an EC certificate refused (interoperability with OpenSSL 3 checked by hand both ways)
+0001-crypto FR-006	check	.github: cd commons/crypto && bun test suite/	dsse.test.ts: the DSSE specification's PAE example, sign and verify with six algorithms, a threshold of two over random payloads, every refusal by its kind, statements and their subjects' sha256
+0001-crypto FR-007	check	.github: cd commons/crypto && bun test suite/	uuid.test.ts: RFC 9562's examples, version 5 and its namespaces, the text form
+0001-crypto FR-008	check	.github: cd commons/crypto && bun test suite/	webauthn.test.ts: a registration and an authentication of ES256 verified and every refusal named
+0001-crypto FR-009	check	.github: cd commons/crypto && bun run verify	the package is built, inspected and packed by tools/pack.ts; tests/commons-packages.test.ts installs the tarball and runs it on Node 26 and Bun and type-checks a consumer of every entry

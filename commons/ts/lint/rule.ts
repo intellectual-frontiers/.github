@@ -33,7 +33,7 @@ import {
   err,
   ok,
 } from "@intellectual-frontiers/core";
-import { formatGlobError, globToRegExp } from "../kernel/glob.ts";
+import { formatGlobError, globToRegExp } from "@intellectual-frontiers/formats/glob";
 
 // ---------------------------------------------------------------------------------------------------------------------------- ESTree
 

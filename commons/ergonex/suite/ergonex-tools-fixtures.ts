@@ -5,8 +5,8 @@
  *
  * @module
  */
-import { gzip, tar, zip } from "@intellectual-frontiers/commons/ts/kernel";
-import { sha256, sha256Of } from "@intellectual-frontiers/commons/ts/kernel";
+import { gzip, tar, zip } from "@intellectual-frontiers/formats";
+import { sha256, sha256Of } from "@intellectual-frontiers/crypto";
 import { serve, type Server } from "../src/platform/r-serve.ts";
 import { assert } from "@intellectual-frontiers/commons/ts/runtime/test";
 import type { ArtifactKind, Tool, ToolArch, ToolCatalog, ToolOs } from "../src/tools/catalog.ts";

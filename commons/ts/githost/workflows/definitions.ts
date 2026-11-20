@@ -120,6 +120,22 @@ export const LIBRARY_CI: Readonly<Record<string, LibraryCi>> = {
     nodeTests: 'node --test "suite/**/*.test.ts"',
     systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
   },
+  formats: {
+    comment: lines(
+      "Formats, a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the specification checker, the trace, its tests and the packing of its",
+      "package with the inspection of its declarations) on Bun and its tests on Node 26, on Windows, macOS and Linux, because the package runs on all three.",
+    ).trimEnd(),
+    nodeTests: 'node --test "suite/**/*.test.ts"',
+    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
+  },
+  crypto: {
+    comment: lines(
+      "Crypto, a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the specification checker, the trace, its tests and the packing of its",
+      "package with the inspection of its declarations) on Bun and its tests on Node 26, on Windows, macOS and Linux, because the package runs on all three.",
+    ).trimEnd(),
+    nodeTests: 'node --test "suite/**/*.test.ts"',
+    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
+  },
   ergonex: {
     comment: lines(
       "Ergonex, the workspaces management of Intellectual Frontiers, a library of commons (commons 0027-commons-libraries FR-010): its own `verify` on Bun and its tests on Node 26, the backup runtime,",
@@ -788,9 +804,9 @@ export const ACTIONS: readonly CompositeAction[] = [
         },
       }),
       run(
-        "node -e \"const fs=require('fs'),p=require('path');fs.mkdirSync('commons/ts/node_modules/@intellectual-frontiers',{recursive:true});const L=['core','rdf','terminal'];for(const n of L)fs.symlinkSync(p.resolve('commons/'+n),'commons/ts/node_modules/@intellectual-frontiers/'+n,'junction');for(const n of L.slice(1)){fs.mkdirSync('commons/'+n+'/node_modules/@intellectual-frontiers',{recursive:true});fs.symlinkSync(p.resolve('commons/core'),'commons/'+n+'/node_modules/@intellectual-frontiers/core','junction')}\"",
+        "node -e \"const fs=require('fs'),p=require('path'),d='commons/node_modules/@intellectual-frontiers';fs.mkdirSync(d,{recursive:true});for(const n of fs.readdirSync('commons')){const f=p.join('commons',n,'package.json');if(fs.existsSync(f)&&JSON.parse(fs.readFileSync(f,'utf8')).name==='@intellectual-frontiers/'+n)fs.symlinkSync(p.resolve('commons',n),p.join(d,n),'junction')}\"",
         {
-          name: "The libraries lifted out of the kernel, linked where the kernel looks for them (the installer runs before any package is installed, and a library's compiler reads the kernel; Bun links them again later)",
+          name: "The libraries of commons, linked in one place that every file of commons finds them (the installer runs before any package is installed; Bun links them again later)",
           shell: "bash",
         },
       ),

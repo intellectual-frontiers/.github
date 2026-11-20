@@ -46,7 +46,7 @@ import {
   type Result,
 } from "@intellectual-frontiers/core";
 import type { Brand } from "@intellectual-frontiers/core";
-import type { Sha256 } from "./sha256.ts";
+import type { Sha256 } from "@intellectual-frontiers/crypto/sha256";
 
 // ---------------------------------------------------------------------------------------------------------------------------- time
 

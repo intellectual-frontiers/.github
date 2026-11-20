@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { sha256 } from "../../kernel/sha256.ts";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { errors, mapError, RuntimeError } from "../../runtime/errors.ts";
 import * as fs from "../../runtime/fs.ts";
 import { tmpdir } from "node:os";

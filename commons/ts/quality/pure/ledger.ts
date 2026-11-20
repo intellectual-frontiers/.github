@@ -44,7 +44,7 @@ import {
   type Result,
 } from "@intellectual-frontiers/core";
 import { canonicalize as jcs, GENESIS } from "../../kernel/evidence.ts";
-import { type Sha256, sha256 } from "../../kernel/sha256.ts";
+import { type Sha256, sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { redactEvidence } from "./record.ts";
 import { TIER2_EVENTS } from "./tier2-events.ts";
 import { type Day, dayDecoder } from "./time.ts";

@@ -54,9 +54,9 @@ import {
   type Status,
   type SubjectRef,
 } from "../kernel/grc.ts";
-import { sha256 } from "../kernel/sha256.ts";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { type Cited, parseSpec, proofsOf, type SourceFile } from "../kernel/trace.ts";
-import { NAMESPACE_URL, uuidV5 } from "../kernel/uuid.ts";
+import { NAMESPACE_URL, uuidV5 } from "@intellectual-frontiers/crypto/uuid";
 import { existsSync, mkdirSync, readDirSync, readTextFileSync, writeTextFileSync } from "../runtime/fs.ts";
 import { stdio } from "../runtime/mod.ts";
 import { readSources } from "../runtime/trace.ts";

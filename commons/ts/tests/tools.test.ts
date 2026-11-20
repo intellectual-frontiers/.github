@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { sha256Of } from "../kernel/sha256.ts";
+import { sha256Of } from "@intellectual-frontiers/crypto/sha256";
 import { readTextFile } from "../runtime/fs.ts";
 import { dirname, fromFileUrl, join, resolve } from "../runtime/path.ts";
 import { assert, assertEquals, proves } from "../runtime/test.ts";

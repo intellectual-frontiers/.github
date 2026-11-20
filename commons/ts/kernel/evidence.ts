@@ -36,9 +36,21 @@ import {
   ok,
   type Result,
 } from "@intellectual-frontiers/core";
-import { type ArchiveError, type Files, concat, filesOf, gunzip, gzip, isSafePath, sortedPaths, tar, tarHeader, untar } from "./archive.ts";
+import {
+  type ArchiveError,
+  type Files,
+  concat,
+  filesOf,
+  gunzip,
+  gzip,
+  isSafePath,
+  sortedPaths,
+  tar,
+  tarHeader,
+  untar,
+} from "@intellectual-frontiers/formats/archive";
 import { type Instant, type SubjectRef, instantDecoder } from "./grc.ts";
-import { type Sha256, sha256, sha256Of } from "./sha256.ts";
+import { type Sha256, sha256, sha256Of } from "@intellectual-frontiers/crypto/sha256";
 
 // ---------------------------------------------------------------------------------------------------------------------------- JCS (FR-006)
 

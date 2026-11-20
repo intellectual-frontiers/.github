@@ -25,7 +25,7 @@ export const about: About = {
     {
       path: "kernel/",
       what: "Pure code that has no effect on the host and runs in a browser or a Worker.",
-      mayImport: ["kernel/ only"],
+      mayImport: ["kernel/", "the libraries lifted out of it (core, formats, crypto), by package name"],
     },
     {
       path: "runtime/",

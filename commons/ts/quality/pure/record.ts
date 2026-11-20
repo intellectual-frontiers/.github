@@ -22,7 +22,7 @@
 import { absurd, formatDecodeError, err, ok, type Result } from "@intellectual-frontiers/core";
 import type { DecodeError } from "@intellectual-frontiers/core";
 import { GENESIS } from "../../kernel/evidence.ts";
-import type { JsonObject } from "../../kernel/json5.ts";
+import type { JsonObject } from "@intellectual-frontiers/formats/json5";
 import {
   type AnyMap,
   type AnyValue,
@@ -40,7 +40,7 @@ import {
   type TraceId,
 } from "../../kernel/otel.ts";
 import { decodeLogs, decodeTraces, encodeLogs, encodeTraces, type LogBatch, type TraceBatch } from "../../kernel/otlp.ts";
-import { type Sha256, sha256Of } from "../../kernel/sha256.ts";
+import { type Sha256, sha256Of } from "@intellectual-frontiers/crypto/sha256";
 import {
   assembleRecord,
   type Counts,

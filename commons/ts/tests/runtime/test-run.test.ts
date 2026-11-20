@@ -7,8 +7,8 @@
  * @module
  */
 import { decodeTraces } from "../../kernel/otlp.ts";
-import { sha256 } from "../../kernel/sha256.ts";
-import { toBase64 } from "../../kernel/base64.ts";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
+import { toBase64 } from "@intellectual-frontiers/formats/base64";
 import { readTextFile, readFile, remove, symlink, writeFile, writeTextFile, makeTempDir } from "../../runtime/fs.ts";
 import { dirname, fromFileUrl, join, resolve, toFileUrl } from "../../runtime/path.ts";
 import { build, execPath, run, runtimeName } from "../../runtime/proc.ts";

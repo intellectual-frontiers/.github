@@ -36,6 +36,8 @@
   },
   "dependencies": {
     "@intellectual-frontiers/core": "0.1.0",
+    "@intellectual-frontiers/crypto": "0.1.0",
+    "@intellectual-frontiers/formats": "0.1.0",
     "@intellectual-frontiers/rdf": "0.1.0",
     "@intellectual-frontiers/terminal": "0.1.0",
     "mermaid": "11.17.2",

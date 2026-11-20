@@ -9,7 +9,7 @@
  */
 import { posix } from "node:path";
 import { array, string } from "@intellectual-frontiers/core";
-import { globToRegExp } from "../../kernel/glob.ts";
+import { globToRegExp } from "@intellectual-frontiers/formats/glob";
 import { allowedFor, allowList, defineRule, fileOf, isIdentifier, type Node, type Rule, stringOf } from "../rule.ts";
 
 /** The folder of `file` that is its package: the longest of `roots` whose segments match its leading folders; undefined where none does. */

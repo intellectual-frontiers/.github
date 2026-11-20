@@ -8,9 +8,9 @@
  *
  * @module
  */
-import { fromBase64, fromBase64Url, toBase64Url } from "../../kernel/base64.ts";
-import { ecdsaDerToRaw } from "../../kernel/cose.ts";
-import * as der from "../../kernel/der.ts";
+import { fromBase64, fromBase64Url, toBase64Url } from "@intellectual-frontiers/formats/base64";
+import { ecdsaDerToRaw } from "@intellectual-frontiers/crypto/cose";
+import * as der from "@intellectual-frontiers/formats/der";
 import type { Result } from "@intellectual-frontiers/core";
 import {
   challengeName,

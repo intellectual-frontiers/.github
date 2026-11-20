@@ -7,6 +7,8 @@
       "devDependencies": {
         "@intellectual-frontiers/commons": "link:../ts",
         "@intellectual-frontiers/core": "link:../core",
+        "@intellectual-frontiers/crypto": "link:../crypto",
+        "@intellectual-frontiers/formats": "link:../formats",
         "@intellectual-frontiers/terminal": "link:../terminal",
         "@types/node": "26.6.6",
         "fast-check": "4.10.2",
@@ -18,6 +20,10 @@
     "@intellectual-frontiers/commons": ["@intellectual-frontiers/commons@link:../ts", {}],
 
     "@intellectual-frontiers/core": ["@intellectual-frontiers/core@link:../core", {}],
+
+    "@intellectual-frontiers/crypto": ["@intellectual-frontiers/crypto@link:../crypto", {}],
+
+    "@intellectual-frontiers/formats": ["@intellectual-frontiers/formats@link:../formats", {}],
 
     "@intellectual-frontiers/terminal": ["@intellectual-frontiers/terminal@link:../terminal", {}],
 

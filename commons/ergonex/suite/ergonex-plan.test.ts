@@ -9,7 +9,7 @@
 import fc from "fast-check";
 import { parseRemote } from "@intellectual-frontiers/commons/ts/githost";
 import type { RepoRef } from "@intellectual-frontiers/commons/ts/githost";
-import { sha256, type Sha256 } from "@intellectual-frontiers/commons/ts/kernel";
+import { sha256, type Sha256 } from "@intellectual-frontiers/crypto";
 import { actionKinds, repoStates } from "./vocabulary.ts";
 import {
   type Action,

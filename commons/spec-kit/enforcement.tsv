@@ -62,12 +62,12 @@ requirement	mechanism	by	note
 0005-typescript-runtime FR-004	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: no vendor global, jsr:, npm:, @std, @erga or URL import in code, with negative controls; tsc fails on a vendor global (types: node)
 0005-typescript-runtime FR-005	review	0032-lifting-libraries FR-010	kept by the library core: core 0001-core FR-001
 0005-typescript-runtime FR-006	review	0032-lifting-libraries FR-010	kept by the library core: core 0001-core FR-002
-0005-typescript-runtime FR-007	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/semver.test.ts: semver.org's example order, round trip, order laws, bumps, dotted versions
-0005-typescript-runtime FR-008	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/sha256.test.ts: FIPS 180-2 vectors, hexadecimal round trip, the brand, SHASUMS files
+0005-typescript-runtime FR-007	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-013
+0005-typescript-runtime FR-008	review	0032-lifting-libraries FR-010	kept by the library crypto: crypto 0001-crypto FR-001
 0005-typescript-runtime FR-009	review	0032-lifting-libraries FR-010	kept by the library core: core 0001-core FR-003
-0005-typescript-runtime FR-010	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/archive.test.ts: round trips of tar, zip and gzip, fixed bytes, unsafe and damaged archives, deflated zip read and written, pax and GNU names
-0005-typescript-runtime FR-011	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/text.test.ts: literals written and read back, keys, comments, refusals
-0005-typescript-runtime FR-012	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/http.test.ts: Link headers, Retry-After in both forms, safe methods
+0005-typescript-runtime FR-010	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-010
+0005-typescript-runtime FR-011	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-006
+0005-typescript-runtime FR-012	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-017
 0005-typescript-runtime FR-013	check	.github: .github/workflows/ifc-typescript.auto.yml	runtime/test.test.ts: the assertions and proves; the same tests pass under bun test and node --test in CI
 0005-typescript-runtime FR-014	review	0032-lifting-libraries FR-010	kept by the library core: core 0001-core FR-004
 0005-typescript-runtime FR-015	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: every file has an @module block and every export has JSDoc
@@ -86,22 +86,22 @@ requirement	mechanism	by	note
 0005-typescript-runtime FR-028	gate	.github: .github/workflows/ifc-typescript.auto.yml	the lint job runs bun lint --type-aware --max-warnings 0 with bunfig.toml's rules; boundaries.test.ts: the rules FR-028 names are errors in bunfig.toml
 0005-typescript-runtime FR-029	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: the root package.json (its name, private, the ./ts entry points into commons/ts, ./ts/node, the bin ifc, the dependencies exact and those of commons/docs) and commons/ts/package.json's same name and entry points; no release workflow, no tarball tool
 0005-typescript-runtime FR-030	gate	.github: .github/workflows/ifc-typescript.auto.yml	the git-dependency job installs the commit it checks by a git+file: URL into an empty project and runs tools/smoke.ts (the kernel, the runtime and the test registration by the package's name and ifc test run on a small suite, on Bun and Node 26; tsc 7 on a consumer), on Linux, macOS and Windows
-0005-typescript-runtime FR-031	check	.github: cd commons/ts && bun test tests/	kernel/formats.test.ts: round trips with JSON and with the writer, the specification's examples, __proto__, refusals with line and column
-0005-typescript-runtime FR-032	check	.github: cd commons/ts && bun test tests/	kernel/formats.test.ts: random trees written and read back, entities, CDATA, prefixes, the finders, refusals with line and column, no entity expansion
+0005-typescript-runtime FR-031	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-001
+0005-typescript-runtime FR-032	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-004
 0005-typescript-runtime FR-033	review	0032-lifting-libraries FR-010	kept by the library core: core 0001-core FR-005
-0005-typescript-runtime FR-034	check	.github: cd commons/ts && bun test tests/	kernel/graph.test.ts: glibc's own hashes, clamped rounds, verification, random salts from bytes
-0005-typescript-runtime FR-035	check	.github: cd commons/ts && bun test tests/	kernel/data.test.ts: random tables written and read back, TOML 1.0's examples, every rule broken and named with its place
-0005-typescript-runtime FR-036	check	.github: cd commons/ts && bun test tests/	kernel/data.test.ts: random records written and read back with each separator and line ending, RFC 4180's cases, refusals
-0005-typescript-runtime FR-037	check	.github: cd commons/ts && bun test tests/	kernel/data.test.ts: the types and charsets of paths and extensions, unknown extensions
-0005-typescript-runtime FR-038	check	.github: cd commons/ts && bun test tests/	kernel/data.test.ts: random values written and read back, a front matter with every construct, failsafe, every refusal with its place and reason
+0005-typescript-runtime FR-034	review	0032-lifting-libraries FR-010	kept by the library crypto: crypto 0001-crypto FR-003
+0005-typescript-runtime FR-035	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-003
+0005-typescript-runtime FR-036	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-005
+0005-typescript-runtime FR-037	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-016
+0005-typescript-runtime FR-038	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-002
 0005-typescript-runtime FR-039	check	.github: cd commons/ts && bun test tests/	runtime/client.test.ts: taken, refused, waited for, timed out, taken over from a dead holder and an unreadable file, inherited, released twice
 0005-typescript-runtime FR-040	check	.github: cd commons/ts && bun test tests/	runtime/client.test.ts: against a local server: decoded reads, denials, statuses, credentials refused and allowed, read-only, backoff with Retry-After and the cap, Link and cursor paging, recorded exchanges
-0005-typescript-runtime FR-041	check	.github: cd commons/ts && bun test tests/	kernel/der.test.ts: X.690's encodings, random integers, OIDs and structures read back, every malformed input named at its byte
-0005-typescript-runtime FR-042	check	.github: cd commons/ts && bun test tests/	kernel/der.test.ts: RFC 4648's vectors in both alphabets, random bytes read back, malformed text refused
-0005-typescript-runtime FR-044	check	.github: cd commons/ts && bun test tests/	kernel/cms.test.ts: certificates built at run time with the kernel's DER; random content encrypted to two recipients and opened by each; RFC 5083's structure; OAEP parameters with NULL or absent SHA-256; a changed message, a wrong key, another recipient and an EC certificate refused (interoperability with OpenSSL 3 checked by hand both ways)
-0005-typescript-runtime FR-045	check	.github: cd commons/ts && bun test tests/	kernel/dsse.test.ts: the DSSE specification's PAE example, sign and verify with six algorithms, a threshold of two over random payloads, every refusal by its kind, statements and their subjects' sha256
-0005-typescript-runtime FR-043	check	.github: cd commons/ts && bun test tests/	kernel/png.test.ts: random pictures written and read back, hand-built PNGs of every filter, colour type and depth with tRNS, every corrupt and hostile file refused by its kind, resize and composite laws, ICO round trips
 0005-typescript-runtime FR-047	review	0032-lifting-libraries FR-010	kept by the library terminal: terminal 0001-terminal FR-001
+0005-typescript-runtime FR-041	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-009
+0005-typescript-runtime FR-042	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-008
+0005-typescript-runtime FR-044	review	0032-lifting-libraries FR-010	kept by the library crypto: crypto 0001-crypto FR-005
+0005-typescript-runtime FR-045	review	0032-lifting-libraries FR-010	kept by the library crypto: crypto 0001-crypto FR-006
+0005-typescript-runtime FR-043	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-012
 0005-typescript-runtime FR-048	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/fs-more.test.ts: readDir async, chown, symlinkSync
 0005-typescript-runtime FR-049	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/fs-more.test.ts: file handles, seek, streams, using
 0005-typescript-runtime FR-050	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/fs-more.test.ts: copy and walk
@@ -111,18 +111,18 @@ requirement	mechanism	by	note
 0005-typescript-runtime FR-054	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/stdio.test.ts and console.test.ts: machine output, and the two writers
 0005-typescript-runtime FR-055	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/tcp.test.ts: listen, connect, TLS with a test certificate
 0005-typescript-runtime FR-056	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/dns.test.ts: resolution and its errors, network interfaces
-0005-typescript-runtime FR-057	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/md5.test.ts: RFC 1321's examples
-0005-typescript-runtime FR-058	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/glob.test.ts: globs against @std/path's cases; expandGlob
-0005-typescript-runtime FR-059	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/archive.test.ts: untarStream equals untar, damaged headers refused
+0005-typescript-runtime FR-057	review	0032-lifting-libraries FR-010	kept by the library crypto: crypto 0001-crypto FR-002
+0005-typescript-runtime FR-058	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-015
+0005-typescript-runtime FR-059	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-011
 0005-typescript-runtime FR-060	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test.test.ts: only, steps and the three asserts
 0005-typescript-runtime FR-061	check	.github: cd commons/ts && node --test tests/**/*.test.ts	lint/*.test.ts: each rule against code it refuses and accepts, through bun lint
 0005-typescript-runtime FR-062	check	.github: .github/workflows/ifc-typescript.auto.yml compile job	CI builds a small program on each system and runs it; runtime/compile.test.ts checks the arguments
-0005-typescript-runtime FR-063	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/text.test.ts: tsLiteral takes an interface with no index signature, refuses a Date, a function, undefined in an array (type-level, with negative controls)
+0005-typescript-runtime FR-063	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-007
 0005-typescript-runtime FR-064	review	0032-lifting-libraries FR-010	kept by the library core: core 0001-core FR-006
 0005-typescript-runtime FR-065	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test.test.ts: the gives back the value narrowed, and fails on null and undefined
 0005-typescript-runtime FR-066	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/client.test.ts: readOnly lets through the POSTs its predicate says only read, and refuses every other write
-0005-typescript-runtime FR-067	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/semver.test.ts: ranges against npm's documented desugaring and laws (caret, tilde, x-range, hyphen, union), pre-releases
-0005-typescript-runtime FR-068	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/sigv4.test.ts: AWS's published Signature Version 4 examples, canonical request and string to sign, a web Request signed
+0005-typescript-runtime FR-067	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-014
+0005-typescript-runtime FR-068	review	0032-lifting-libraries FR-010	kept by the library crypto: crypto 0001-crypto FR-004
 0005-typescript-runtime FR-069	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/client.test.ts: a SigV4 transport signs each request to a recorded server, and the live transport still refuses it unless allowed
 0005-typescript-runtime FR-070	check	.github: cd commons/ts && node --test tests/**/*.test.ts	node/register.test.ts: a .ts under node_modules runs on Node 26 with the hook and is refused without it, a file outside is left to Node, the URL's segments decide (Windows' too), and the commands ifc and ifc-docs register it first; runtime/test-run.test.ts: node --test is given it
 0005-typescript-runtime FR-071	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/discover.test.ts: programs found by prefix on a given path, first wins, directories and unrunnable files skipped, Windows PATHEXT
@@ -604,6 +604,8 @@ requirement	mechanism	by	note
 0027-commons-libraries FR-103	check	.github: cd commons/core && bun run verify	commons/core: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-104	check	.github: cd commons/rdf && bun run verify	commons/rdf: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-105	check	.github: cd commons/terminal && bun run verify	commons/terminal: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-106	check	.github: cd commons/crypto && bun run verify	commons/crypto: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-107	check	.github: cd commons/formats && bun run verify	commons/formats: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0028-conformance-levels FR-001	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: Mizan's ontology holds the four levels with ranks 0 to 3, each entailing what it and the levels below it add
 0028-conformance-levels FR-002	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: every requirement is added by exactly one level and names a rule or says what else proves it
 0028-conformance-levels FR-003	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: L0 adds a manifest, a verify command and a version

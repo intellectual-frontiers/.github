@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { type Literal, tsLiteral } from "../kernel/ts-literal.ts";
+import { type Literal, tsLiteral } from "@intellectual-frontiers/formats/ts-literal";
 import { RELEASE_TIERS, decodeDeclaration } from "../mizan/changes/declaration.ts";
 import { citationOf } from "../mizan/versions/cite.ts";
 import { isReleaseTier, releaseGate } from "../mizan/versions/gate.ts";

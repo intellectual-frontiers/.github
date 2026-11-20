@@ -13,7 +13,7 @@
  * @module
  */
 import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
-import { type Sha256, sha256 } from "@intellectual-frontiers/commons/ts/kernel";
+import { type Sha256, sha256 } from "@intellectual-frontiers/crypto";
 import { existsSync, mkdir, readTextFile, remove, rename, sha256File, writeTextFile } from "../platform/r-fs.ts";
 import { acquireLock, describeHolder, readHolder } from "../platform/r-lock.ts";
 import { dirname } from "../platform/r-path.ts";

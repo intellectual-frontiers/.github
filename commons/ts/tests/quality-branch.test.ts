@@ -7,7 +7,7 @@
  *
  * @module
  */
-import { sha256 } from "../kernel/sha256.ts";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { mkdir, readTextFile, withTempDir, writeTextFile } from "../runtime/fs.ts";
 import { join } from "../runtime/path.ts";
 import { run } from "../runtime/proc.ts";

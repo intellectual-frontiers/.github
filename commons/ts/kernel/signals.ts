@@ -32,7 +32,7 @@
  * @module
  */
 import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
-import { toBase64 } from "./base64.ts";
+import { toBase64 } from "@intellectual-frontiers/formats/base64";
 import {
   type AnyValue,
   type Attributes,

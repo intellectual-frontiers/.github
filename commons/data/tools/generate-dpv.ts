@@ -12,7 +12,8 @@
  *
  * @module
  */
-import { formatCsvError, parseCsvRecords, sha256 } from "@intellectual-frontiers/commons/ts/kernel";
+import { formatCsvError, parseCsvRecords } from "@intellectual-frontiers/formats";
+import { sha256 } from "@intellectual-frontiers/crypto";
 import { fs, path } from "@intellectual-frontiers/commons/ts/runtime";
 
 /** Where the CSV is, and which version. */

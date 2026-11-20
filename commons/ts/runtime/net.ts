@@ -8,7 +8,7 @@
  * @example
  * ```ts
  * import { downloadVerified, Retries } from "./net.ts";
- * import { sha256Of } from "../kernel/sha256.ts";
+ * import { sha256Of } from "@intellectual-frontiers/crypto/sha256";
  * const sum = sha256Of("…64 hex digits…");
  * if (sum !== undefined) {
  *   const r = await downloadVerified(new Retries({ tries: 5, base: 2, cap: 30 }, console.error), "https://example.com/tool.tgz", sum, "/tmp/cache");
@@ -21,8 +21,8 @@
 import * as fsp from "node:fs/promises";
 import { join } from "node:path";
 import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
-import { retryAfterMs } from "../kernel/http.ts";
-import type { Sha256 } from "../kernel/sha256.ts";
+import { retryAfterMs } from "@intellectual-frontiers/formats/http";
+import type { Sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { exists, mkdir, remove, rename, sha256File, stat } from "./fs.ts";
 
 /** Why a request failed, as far as the network is concerned. */

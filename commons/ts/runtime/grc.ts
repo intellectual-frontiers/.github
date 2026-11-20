@@ -60,12 +60,12 @@ import {
   type Waiver,
   waiverDecoder,
 } from "../kernel/grc.ts";
-import { parseJson5 } from "../kernel/json5.ts";
+import { parseJson5 } from "@intellectual-frontiers/formats/json5";
 import { complianceFinding, type OcsfComplianceFinding, type OcsfProduct } from "../kernel/ocsf.ts";
 import { type AnyMap, type AnyValue, SEVERITY, type Scope, type SeverityNumber } from "../kernel/otel.ts";
 import { defineSignals, type Telemetry } from "../kernel/signals.ts";
-import { isTomlDateTime, parseToml, type TomlValue } from "../kernel/toml.ts";
-import { parseYaml } from "../kernel/yaml.ts";
+import { isTomlDateTime, parseToml, type TomlValue } from "@intellectual-frontiers/formats/toml";
+import { parseYaml } from "@intellectual-frontiers/formats/yaml";
 import { readTextFile } from "./fs.ts";
 import { installed, type Pipeline } from "./otel.ts";
 

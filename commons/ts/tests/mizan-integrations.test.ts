@@ -8,7 +8,7 @@
 import { createServer } from "node:http";
 import { files } from "../../ontology/mizan/mod.ts";
 import { nTriples, triplesOf } from "@intellectual-frontiers/rdf";
-import { sha256 } from "../kernel/sha256.ts";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { makeTempDirSync, readTextFileSync, removeSync, writeTextFileSync } from "../runtime/fs.ts";
 import { pathToFileURL } from "node:url";
 import { dirname, fromFileUrl, resolve } from "../runtime/path.ts";

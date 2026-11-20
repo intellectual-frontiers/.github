@@ -6,6 +6,8 @@
       "name": "@intellectual-frontiers/commons",
       "dependencies": {
         "@intellectual-frontiers/core": "0.1.0",
+        "@intellectual-frontiers/crypto": "0.1.0",
+        "@intellectual-frontiers/formats": "0.1.0",
         "@intellectual-frontiers/rdf": "0.1.0",
         "@intellectual-frontiers/terminal": "0.1.0",
         "mermaid": "11.17.2",
@@ -25,6 +27,10 @@
     "@iconify/utils": ["@iconify/utils@3.1.7", "", { "dependencies": { "@antfu/install-pkg": "^2.0.1", "@iconify/types": "^2.0.0", "import-meta-resolve": "^4.2.0" } }, "sha512-JZHlwdID+dy+lTgbYC8NEC4zeugqeYsc6jewvzb4c58kHauJn+X7rNwQjxz5p2qSjqaEeQoLkCIQ9v/H4PK0/w=="],
 
     "@intellectual-frontiers/core": ["@intellectual-frontiers/core@0.1.0", "", {}, "sha512-tOdJKL/vsHJYxUuizWLnaI58mOXojBll1zgaKXw6QIoMK7dHhA+jsfBdherG3jK+EijipzRYBNXqNvWhNIoGHA=="],
+
+    "@intellectual-frontiers/crypto": ["@intellectual-frontiers/crypto@0.1.0", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.0", "@intellectual-frontiers/formats": "0.1.0" } }, "sha512-JVT43ISlUP5rfq+SXKy1oCe9TYjsjFE9FhC0pOUhwW/ewoXi0meNjgT2Ginb8oMg1XfWLnYQ/Nzj5FXcJ2xtcg=="],
+
+    "@intellectual-frontiers/formats": ["@intellectual-frontiers/formats@0.1.0", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.0" } }, "sha512-22YoAXzh8T6zNpYov+9xQLfmVgYxUOkWMv+TqnT4Bm2WzbEjm1nMNA0WINzjVq+hDGiuPQU/SkJ/F6v3THr9uA=="],
 
     "@intellectual-frontiers/rdf": ["@intellectual-frontiers/rdf@0.1.0", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.0" } }, "sha512-D/dpkvn5N+vdvEXg7dB6Pqe2MCTxgo5ejtQuRDPzZziXhFSFn/HJxUig1ELRFS/byx67kpbS6K2E39TE5iDKRg=="],
 

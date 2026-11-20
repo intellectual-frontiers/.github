@@ -6,7 +6,7 @@
  * @module
  */
 import { createServer, type Server } from "node:http";
-import { sha256 } from "../kernel/sha256.ts";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { makeTempDirSync, mkdirSync, readTextFileSync, removeSync, writeTextFileSync } from "../runtime/fs.ts";
 import { dirname, fromFileUrl, resolve } from "../runtime/path.ts";
 import { execPath, run } from "../runtime/proc.ts";

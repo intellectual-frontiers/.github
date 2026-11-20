@@ -8,7 +8,7 @@
  */
 import { decodeLogs } from "../kernel/otlp.ts";
 import { GENESIS } from "../kernel/evidence.ts";
-import { sha256 } from "../kernel/sha256.ts";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { OUTCOMES } from "../kernel/test-record.ts";
 import { readTextFileSync } from "../runtime/fs.ts";
 import { dirname, fromFileUrl, join, relative, resolve, toPosix } from "../runtime/path.ts";

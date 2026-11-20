@@ -18,7 +18,7 @@ import {
   type TypedStatement,
 } from "../../kernel/attest.ts";
 import { object, string, unknownValue, type Equal, expectType } from "@intellectual-frontiers/core";
-import { signStatement, verifyStatement } from "../../kernel/dsse.ts";
+import { signStatement, verifyStatement } from "@intellectual-frontiers/crypto/dsse";
 import { canonicalize } from "../../kernel/evidence.ts";
 import {
   type Assessment,
@@ -62,8 +62,8 @@ import {
   type VulnerabilityFindingEvent,
 } from "../../kernel/ocsf.ts";
 import { assessmentResults, componentDefinition, type OscalOptions, poam, renderOscal, systemSecurityPlan } from "../../kernel/oscal.ts";
-import { type Sha256, sha256 } from "../../kernel/sha256.ts";
-import { NAMESPACE_URL, uuidOf, uuidV5, uuidVersion } from "../../kernel/uuid.ts";
+import { type Sha256, sha256 } from "@intellectual-frontiers/crypto/sha256";
+import { NAMESPACE_URL, uuidOf, uuidV5, uuidVersion } from "@intellectual-frontiers/crypto/uuid";
 import { assert, assertEquals, assertNotEquals, proves } from "../../runtime/test.ts";
 
 const OCSF = "0007-grc FR-016";

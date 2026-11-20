@@ -6,7 +6,7 @@
  * @module
  */
 import { array, integer, nullable, object, string } from "@intellectual-frontiers/core";
-import { sign } from "../../kernel/sigv4.ts";
+import { sign } from "@intellectual-frontiers/crypto/sigv4";
 import { exists, readTextFile, withTempDir, writeTextFile } from "../../runtime/fs.ts";
 import {
   bearer,

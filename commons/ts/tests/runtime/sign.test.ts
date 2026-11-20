@@ -7,7 +7,7 @@
  * @module
  */
 import fc from "fast-check";
-import { type DsseKey, signEnvelope, verifyEnvelope } from "../../kernel/dsse.ts";
+import { type DsseKey, signEnvelope, verifyEnvelope } from "@intellectual-frontiers/crypto/dsse";
 import { readBundle, writeBundle } from "../../kernel/evidence.ts";
 import { readTextFile, withTempDir, writeTextFile } from "../../runtime/fs.ts";
 import { join } from "../../runtime/path.ts";

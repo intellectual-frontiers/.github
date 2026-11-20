@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { sha256 } from "../kernel/sha256.ts";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { makeTempDirSync, readTextFileSync, removeSync, writeTextFileSync } from "../runtime/fs.ts";
 import { pathToFileURL } from "node:url";
 import { dirname, fromFileUrl, resolve } from "../runtime/path.ts";

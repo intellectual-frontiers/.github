@@ -22,7 +22,7 @@
  * @example
  * ```ts
  * import { assessmentResults, renderOscal } from "./oscal.ts";
- * import { NAMESPACE_URL, uuidV5 } from "./uuid.ts";
+ * import { NAMESPACE_URL, uuidV5 } from "@intellectual-frontiers/crypto/uuid";
  * // const namespace = await uuidV5(NAMESPACE_URL, "https://example.com/assessments");
  * // renderOscal(await assessmentResults(assessment, { namespace, lastModified: assessment.at, version: "1", propNamespace: "https://example.com/ns" }));
  * ```
@@ -43,7 +43,7 @@ import {
   findingKey,
   joinAll,
 } from "./grc.ts";
-import { type Uuid, uuidV5Of } from "./uuid.ts";
+import { type Uuid, uuidV5Of } from "@intellectual-frontiers/crypto/uuid";
 
 /** The OSCAL version written. */
 export const OSCAL_VERSION = "1.2.3";

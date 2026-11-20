@@ -6,6 +6,8 @@
       "name": "@intellectual-frontiers/commons",
       "dependencies": {
         "@intellectual-frontiers/core": "link:../core",
+        "@intellectual-frontiers/crypto": "link:../crypto",
+        "@intellectual-frontiers/formats": "link:../formats",
         "@intellectual-frontiers/rdf": "link:../rdf",
         "@intellectual-frontiers/terminal": "link:../terminal",
       },
@@ -18,6 +20,10 @@
   },
   "packages": {
     "@intellectual-frontiers/core": ["@intellectual-frontiers/core@link:../core", {}],
+
+    "@intellectual-frontiers/crypto": ["@intellectual-frontiers/crypto@link:../crypto", {}],
+
+    "@intellectual-frontiers/formats": ["@intellectual-frontiers/formats@link:../formats", {}],
 
     "@intellectual-frontiers/rdf": ["@intellectual-frontiers/rdf@link:../rdf", {}],
 

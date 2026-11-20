@@ -65,7 +65,13 @@ export function codeLines(text: string): { readonly line: number; readonly text:
 /** The one package that code of commons may import by name: the foundation (commons 0032-lifting-libraries FR-003). */
 const CORE = "@intellectual-frontiers/core";
 /** The packages of commons that code in this folder may import by name: the libraries lifted out of it. */
-const LIFTED = new Set([CORE, "@intellectual-frontiers/rdf", "@intellectual-frontiers/terminal"]);
+const LIFTED = new Set([
+  CORE,
+  "@intellectual-frontiers/crypto",
+  "@intellectual-frontiers/formats",
+  "@intellectual-frontiers/rdf",
+  "@intellectual-frontiers/terminal",
+]);
 /** Whether a specifier is a lifted library or one of its entries (`@intellectual-frontiers/terminal/args`). */
 const isLifted = (s: string): boolean => [...LIFTED].some((p) => s === p || s.startsWith(`${p}/`));
 
@@ -255,6 +261,8 @@ proves(
     // the one run-time dependency is core, the foundation (commons 0032-lifting-libraries FR-003), linked in this repository
     assertEquals(m.dependencies, {
       "@intellectual-frontiers/core": "link:../core",
+      "@intellectual-frontiers/crypto": "link:../crypto",
+      "@intellectual-frontiers/formats": "link:../formats",
       "@intellectual-frontiers/rdf": "link:../rdf",
       "@intellectual-frontiers/terminal": "link:../terminal",
     });
@@ -350,6 +358,8 @@ proves(
     assertEquals(root.dependencies, {
       ...manifestAt("commons/docs/package.json").dependencies,
       "@intellectual-frontiers/core": "0.1.0",
+      "@intellectual-frontiers/crypto": "0.1.0",
+      "@intellectual-frontiers/formats": "0.1.0",
       "@intellectual-frontiers/rdf": "0.1.0",
       "@intellectual-frontiers/terminal": "0.1.0",
     });

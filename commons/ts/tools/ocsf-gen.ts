@@ -26,7 +26,7 @@ import {
   record,
   string,
 } from "@intellectual-frontiers/core";
-import { sha256 } from "../kernel/sha256.ts";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { readTextFile, remove, writeTextFile } from "../runtime/fs.ts";
 import { dirname, fromFileUrl, join, resolve } from "../runtime/path.ts";
 import { args, execPath, exit, run, runtimeName, which } from "../runtime/proc.ts";

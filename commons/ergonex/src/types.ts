@@ -11,7 +11,7 @@
  */
 import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import type { Brand } from "@intellectual-frontiers/core";
-import { parseSemVer } from "@intellectual-frontiers/commons/ts/kernel";
+import { parseSemVer } from "@intellectual-frontiers/formats";
 
 /** One name in a path, valid on every operating system (made only by `segment` in `portable.ts`). */
 export type PortableSegment = Brand<string, "PortableSegment">;

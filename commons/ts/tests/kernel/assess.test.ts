@@ -37,8 +37,8 @@ import {
   type Outcome,
   roleOf,
 } from "../../kernel/grc.ts";
-import { type Json, parseJson5 } from "../../kernel/json5.ts";
-import { sha256 } from "../../kernel/sha256.ts";
+import { type Json, parseJson5 } from "@intellectual-frontiers/formats/json5";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { assert, assertEquals, proves } from "../../runtime/test.ts";
 
 const FR = (n: string): `0007-grc FR-${string}` => `0007-grc FR-${n}`;

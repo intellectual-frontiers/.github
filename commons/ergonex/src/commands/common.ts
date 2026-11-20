@@ -5,7 +5,7 @@
  * @module
  */
 import { absurd } from "@intellectual-frontiers/core";
-import { type Json, parseJson5 } from "@intellectual-frontiers/commons/ts/kernel";
+import { type Json, parseJson5 } from "@intellectual-frontiers/formats";
 import type { Finding } from "../findings.ts";
 import { describeAction, type Plan } from "../plan.ts";
 import type { Context, Outcome } from "../modules/types.ts";

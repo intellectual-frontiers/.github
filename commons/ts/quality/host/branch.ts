@@ -25,7 +25,7 @@
 import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import { GENESIS } from "../../kernel/evidence.ts";
 import type { Attributes } from "../../kernel/otel.ts";
-import type { Sha256 } from "../../kernel/sha256.ts";
+import type { Sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { AlreadyExists } from "../../runtime/errors.ts";
 import { makeTempDir, remove, writeTextFile } from "../../runtime/fs.ts";
 import { join } from "../../runtime/path.ts";

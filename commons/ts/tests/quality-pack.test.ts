@@ -14,7 +14,7 @@ import { generateTrust } from "../quality/trust/host.ts";
 import { makeTempDir, readFile, readTextFile, remove, writeTextFile } from "../runtime/fs.ts";
 import { join } from "../runtime/path.ts";
 import { execPath, run, which } from "../runtime/proc.ts";
-import { sha256 } from "../kernel/sha256.ts";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
 import { at, list, needsGit, needsSshKeygen, parsed } from "./quality-fixtures.ts";
 import { demoEvidence, demoRepository, MARKER, signingKey } from "./quality-trust-fixtures.ts";

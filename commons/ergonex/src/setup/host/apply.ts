@@ -17,7 +17,7 @@
  */
 import { movedPath, type Places } from "../../places.ts";
 import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
-import { sha256 } from "@intellectual-frontiers/commons/ts/kernel";
+import { sha256 } from "@intellectual-frontiers/crypto";
 import { exists, mkdir, readTextOr, writeTextFile } from "../../platform/r-fs.ts";
 import type { Transport } from "../../platform/r-http-client.ts";
 import { acquireLock } from "../../platform/r-lock.ts";

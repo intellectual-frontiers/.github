@@ -7,7 +7,7 @@
  * @module
  */
 import { array, type Decoder, formatDecodeError, integer, json, object, string, err, ok, type Result } from "@intellectual-frontiers/core";
-import type { JsonObject } from "@intellectual-frontiers/commons/ts/kernel";
+import type { JsonObject } from "@intellectual-frontiers/formats";
 import { moduleName } from "./name.ts";
 
 /** The version of this contract an external module names. */

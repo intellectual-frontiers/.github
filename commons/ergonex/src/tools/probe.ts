@@ -10,7 +10,7 @@
  * @module
  */
 import { absurd } from "@intellectual-frontiers/core";
-import { atLeast, versionIn } from "@intellectual-frontiers/commons/ts/kernel";
+import { atLeast, versionIn } from "@intellectual-frontiers/formats";
 import type { Finding } from "../findings.ts";
 
 /** The tools that are probed, never installed. */

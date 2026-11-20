@@ -12,8 +12,8 @@
  * @module
  */
 import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
-import type { JsonObject } from "@intellectual-frontiers/commons/ts/kernel";
-import { type Sha256, sha256 } from "@intellectual-frontiers/commons/ts/kernel";
+import type { JsonObject } from "@intellectual-frontiers/formats";
+import { type Sha256, sha256 } from "@intellectual-frontiers/crypto";
 import { collisions, describePortableError, foldKey, repoPath } from "./portable.ts";
 import type { RepoPath } from "./types.ts";
 

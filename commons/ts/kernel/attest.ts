@@ -25,12 +25,13 @@
  * @module
  */
 import { newestFindings } from "./assess.ts";
-import { toBase64Url } from "./base64.ts";
-import { type ResourceDescriptor, type Statement, statement } from "./dsse.ts";
+import { toBase64Url } from "@intellectual-frontiers/formats/base64";
+import { type ResourceDescriptor, type Statement, statement } from "@intellectual-frontiers/crypto/dsse";
 import { canonicalize } from "./evidence.ts";
 import { type Assessment, type ControlSummary, type Finding, type Instant, findingKey } from "./grc.ts";
-import { type Sha256, fromHex, sha256 } from "./sha256.ts";
-import { type Uuid, uuidUrn, uuidV5Of } from "./uuid.ts";
+import { fromHex } from "@intellectual-frontiers/formats/hex";
+import { type Sha256, sha256 } from "@intellectual-frontiers/crypto/sha256";
+import { type Uuid, uuidUrn, uuidV5Of } from "@intellectual-frontiers/crypto/uuid";
 
 // ---------------------------------------------------------------------------------------------------------------------------- CycloneDX types
 

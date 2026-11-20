@@ -32,7 +32,7 @@ import {
   ok,
   type Result,
 } from "@intellectual-frontiers/core";
-import { exportedLiteral } from "../../kernel/ts-literal.ts";
+import { exportedLiteral } from "@intellectual-frontiers/formats/ts-literal";
 
 /** The marker that opens the generated view. */
 export const BEGIN = "<!-- capabilities:begin -->";

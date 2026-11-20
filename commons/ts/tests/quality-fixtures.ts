@@ -5,7 +5,7 @@
  *
  * @module
  */
-import type { JsonObject } from "../kernel/json5.ts";
+import type { JsonObject } from "@intellectual-frontiers/formats/json5";
 import { parseSpanId, parseTraceId, type SpanId, type TraceId } from "../kernel/otel.ts";
 import { assembleRecord } from "../kernel/test-report.ts";
 import {

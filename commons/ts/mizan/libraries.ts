@@ -38,7 +38,7 @@ import {
   ok,
   type Result,
 } from "@intellectual-frontiers/core";
-import { exportedLiteral } from "../kernel/ts-literal.ts";
+import { exportedLiteral } from "@intellectual-frontiers/formats/ts-literal";
 import { existsSync, readDirSync, readTextFileSync, writeTextFileSync } from "../runtime/fs.ts";
 import { stdio } from "../runtime/mod.ts";
 import { spawn } from "../runtime/proc.ts";

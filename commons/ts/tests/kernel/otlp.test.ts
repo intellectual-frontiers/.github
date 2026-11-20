@@ -44,7 +44,7 @@ import {
   type MetricBatch,
   type TraceBatch,
 } from "../../kernel/otlp.ts";
-import { toHex } from "../../kernel/sha256.ts";
+import { toHex } from "@intellectual-frontiers/formats/hex";
 import { assertEquals, proves } from "../../runtime/test.ts";
 
 const FR = "0006-signals FR-004";

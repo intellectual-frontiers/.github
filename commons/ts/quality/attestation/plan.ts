@@ -21,7 +21,7 @@ import { absurd, formatDecodeError, json, err, ok, type Result } from "@intellec
 import { canonicalize as jcs } from "../../kernel/evidence.ts";
 import { decodeTraces } from "../../kernel/otlp.ts";
 import { attributeText } from "../../kernel/test-record.ts";
-import { type Sha256, sha256 } from "../../kernel/sha256.ts";
+import { type Sha256, sha256 } from "@intellectual-frontiers/crypto/sha256";
 import type { LedgerEvent } from "../pure/ledger.ts";
 import type { NotRun } from "../pure/record.ts";
 import { dayOfText } from "../pure/time.ts";

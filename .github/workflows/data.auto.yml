@@ -10,7 +10,9 @@ on:
       - ".github/actions/**"
       - .github/workflows/data.auto.yml
       - "commons/core/src/**"
+      - "commons/crypto/src/**"
       - "commons/data/**"
+      - "commons/formats/src/**"
       - "commons/ontology/audit/**"
       - "commons/ontology/ifccm/**"
       - "commons/ontology/ifqs/**"
@@ -28,7 +30,9 @@ on:
       - ".github/actions/**"
       - .github/workflows/data.auto.yml
       - "commons/core/src/**"
+      - "commons/crypto/src/**"
       - "commons/data/**"
+      - "commons/formats/src/**"
       - "commons/ontology/audit/**"
       - "commons/ontology/ifccm/**"
       - "commons/ontology/ifqs/**"

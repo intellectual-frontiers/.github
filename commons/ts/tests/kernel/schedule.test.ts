@@ -27,7 +27,7 @@ import {
   type Weekday,
   type When,
 } from "../../kernel/schedule.ts";
-import { child, children, readXml, textOf, type XmlElement } from "../../kernel/xml.ts";
+import { child, children, readXml, textOf, type XmlElement } from "@intellectual-frontiers/formats/xml";
 import type { Result } from "@intellectual-frontiers/core";
 import { assert, assertEquals, fail, proves } from "../../runtime/test.ts";
 

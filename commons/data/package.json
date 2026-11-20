@@ -76,6 +76,8 @@
     "@electric-sql/pglite-socket": "0.2.20",
     "@intellectual-frontiers/commons": "link:../ts",
     "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/crypto": "link:../crypto",
+    "@intellectual-frontiers/formats": "link:../formats",
     "@types/node": "26.6.6",
     "@types/pg": "8.23.1",
     "fast-check": "4.10.2",

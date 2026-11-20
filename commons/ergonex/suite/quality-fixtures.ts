@@ -5,7 +5,7 @@
  *
  * @module
  */
-import type { JsonObject } from "@intellectual-frontiers/commons/ts/kernel";
+import type { JsonObject } from "@intellectual-frontiers/formats";
 import { parseSpanId, parseTraceId, type SpanId, type TraceId } from "../src/platform/k-otel.ts";
 import { assembleRecord } from "../src/platform/k-test-report.ts";
 import {

@@ -22,7 +22,7 @@
  * @module
  */
 import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
-import { bump, compareSemVer, formatSemVer, parseSemVer, type SemVer } from "../../kernel/semver.ts";
+import { bump, compareSemVer, formatSemVer, parseSemVer, type SemVer } from "@intellectual-frontiers/formats/semver";
 import { dayOf } from "../changes/declaration.ts";
 
 /** The kinds of work (`ifr:WorkKind`; a test holds the two lists equal). */

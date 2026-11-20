@@ -43,7 +43,7 @@ import {
   waiverDecoder,
   waiverState,
 } from "../../kernel/grc.ts";
-import { sha256 } from "../../kernel/sha256.ts";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { type Equal, expectType } from "@intellectual-frontiers/core";
 import { assert, assertEquals, assertThrows, proves } from "../../runtime/test.ts";
 

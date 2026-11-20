@@ -40,8 +40,8 @@ import {
   latestInstant,
   roleDecoder,
 } from "./grc.ts";
-import type { Json } from "./json5.ts";
-import type { Sha256 } from "./sha256.ts";
+import type { Json } from "@intellectual-frontiers/formats/json5";
+import type { Sha256 } from "@intellectual-frontiers/crypto/sha256";
 
 const byText = (a: string, b: string): number => (a < b ? -1 : a > b ? 1 : 0);
 

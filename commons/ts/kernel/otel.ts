@@ -18,8 +18,8 @@
  */
 import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import type { Brand } from "@intellectual-frontiers/core";
-import { fromBase64 } from "./base64.ts";
-import { toHex } from "./sha256.ts";
+import { fromBase64 } from "@intellectual-frontiers/formats/base64";
+import { toHex } from "@intellectual-frontiers/formats/hex";
 
 // ---------------------------------------------------------------------------------------------------------------------------------
 // Values (FR-001)

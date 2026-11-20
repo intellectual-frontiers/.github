@@ -531,7 +531,7 @@ proves(
       for (const spec of imports) {
         const target = toPosix(relative(CHANGES, resolve(CHANGES, spec)));
         const allowed =
-          spec === "@intellectual-frontiers/core" ||
+          /^@intellectual-frontiers\/(core|formats)(\/|$)/.test(spec) ||
           target.startsWith("../../kernel/") ||
           target === "../../githost/types.ts" ||
           (!target.startsWith("..") && !target.includes("/"));

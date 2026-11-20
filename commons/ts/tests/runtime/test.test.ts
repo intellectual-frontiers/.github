@@ -36,7 +36,7 @@ import {
 import { relative } from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
-import { sha256 } from "../../kernel/sha256.ts";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { STEP_SPAN, decodeLines, installationOf } from "../../kernel/test-record.ts";
 import { assembleRecord, junitXml, readRecord, tap14, testsOf } from "../../kernel/test-report.ts";
 import { parseSpanId, parseTraceId } from "../../kernel/otel.ts";

@@ -25,7 +25,7 @@ import {
   ok,
   type Result,
 } from "@intellectual-frontiers/core";
-import { sha256Of } from "@intellectual-frontiers/commons/ts/kernel";
+import { sha256Of } from "@intellectual-frontiers/crypto";
 import { describeRemoteError, hostKindOf, type HostKinds, readRemote, cloneUrlOf } from "@intellectual-frontiers/commons/ts/githost";
 import type { RepoRef } from "@intellectual-frontiers/commons/ts/githost";
 import type { Finding } from "./findings.ts";

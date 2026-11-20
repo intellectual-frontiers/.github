@@ -31,8 +31,8 @@
  *
  * @module
  */
-import { fromBase64, toBase64, toBase64Url } from "../kernel/base64.ts";
-import * as der from "../kernel/der.ts";
+import { fromBase64, toBase64, toBase64Url } from "@intellectual-frontiers/formats/base64";
+import * as der from "@intellectual-frontiers/formats/der";
 import {
   array,
   boolean,

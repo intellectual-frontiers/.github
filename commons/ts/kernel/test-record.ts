@@ -32,7 +32,7 @@ import {
   type TraceId,
 } from "./otel.ts";
 import { decodeLogs, decodeTraces, encodeLogs, encodeTraces, type LogBatch, type TraceBatch } from "./otlp.ts";
-import { type Sha256, sha256 } from "./sha256.ts";
+import { type Sha256, sha256 } from "@intellectual-frontiers/crypto/sha256";
 
 // ---------------------------------------------------------------------------------------------------------------------------- the model
 

@@ -26,6 +26,8 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/core/spec-kit" },
     { layout: "commons", dir: "commons/rdf/spec-kit" },
     { layout: "commons", dir: "commons/terminal/spec-kit" },
+    { layout: "commons", dir: "commons/crypto/spec-kit" },
+    { layout: "commons", dir: "commons/formats/spec-kit" },
     { layout: "commons", dir: "commons/data/spec-kit" },
     { layout: "commons", dir: "commons/ergonex/spec-kit" },
   ],

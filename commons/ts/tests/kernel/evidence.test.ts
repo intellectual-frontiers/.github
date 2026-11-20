@@ -7,7 +7,7 @@
  * @module
  */
 import fc from "fast-check";
-import { concat, gzip, tar, tarHeader, untar, gunzip } from "../../kernel/archive.ts";
+import { concat, gzip, tar, tarHeader, untar, gunzip } from "@intellectual-frontiers/formats/archive";
 import {
   appendEntry,
   BUNDLE_MANIFEST,
@@ -31,7 +31,7 @@ import {
   writeBundle,
 } from "../../kernel/evidence.ts";
 import { type Instant, instantOf } from "../../kernel/grc.ts";
-import { sha256 } from "../../kernel/sha256.ts";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { assert, assertEquals, proves } from "../../runtime/test.ts";
 
 const FR = (n: string): `0007-grc FR-${string}` => `0007-grc FR-${n}`;

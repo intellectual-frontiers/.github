@@ -10,7 +10,7 @@
  */
 import { cpSync } from "node:fs";
 import { basename } from "node:path";
-import { parseToml } from "../commons/ts/kernel/toml.ts";
+import { parseToml } from "@intellectual-frontiers/formats/toml";
 import { fs, path, proc } from "../commons/ts/runtime/mod.ts";
 import {
   assert,
@@ -349,7 +349,7 @@ proves(["0004-rules FR-003"], "Rules: the portability tool reports a GNU-only li
 proves(["0004-rules FR-003"], "Rules: the portability tool needs the kernel's TOML reader and the tools' core alone", () => {
   const text = fs.readTextFileSync(`${COMMONS}/tools/shell-portability-check.ts`);
   for (const m of text.matchAll(/^import [^;]*? from "([^"]+)";/gm))
-    assert(["node:process", "../ts/kernel/toml.ts", "./core.ts"].includes(m[1] ?? ""), m[0]);
+    assert(["node:process", "../formats/src/toml.ts", "./core.ts"].includes(m[1] ?? ""), m[0]);
 });
 
 proves(["0004-rules SC-001"], "Rules: the installer script has no line the tool reports", () => {
@@ -383,7 +383,7 @@ type Ran = { readonly code: number; readonly stdout: string; readonly stderr: st
 /** What of commons the generator and the type checker need: the ontology, the tools, the generated files and the kernel the ontology is typed by. */
 const COPIED = ["about.ts", "generated", "ontology", "tools", "ts/kernel"];
 /** The libraries lifted out of the kernel, which it and the ontology import (a copy of each, linked by package name). */
-const LIFTED = ["core", "rdf", "terminal"];
+const LIFTED = ["core", "crypto", "formats", "rdf", "terminal"];
 
 class Copy {
   readonly root: string;
@@ -916,7 +916,7 @@ test("commons' tools are strongly typed: no any, no non-null escape, one audited
     for (const m of text.matchAll(/^(?:import|export)[^;]*? from "([^"]+)";/gm)) {
       const spec = m[1] ?? "";
       const ontology = spec === "../ontology/supply-chain/packaging/mod.ts" && (name === "ontology.ts" || name === "generate-packaging.ts");
-      const toml = name === "shell-portability-check.ts" && spec === "../ts/kernel/toml.ts";
+      const toml = name === "shell-portability-check.ts" && spec === "../formats/src/toml.ts";
       assert(
         spec.startsWith("./") || spec === "node:fs" || spec === "node:process" || ontology || toml,
         `${name} imports ${spec}: the tools have no dependency`,

@@ -24,11 +24,11 @@
  *
  * @module
  */
-import { type DsseKey, signStatement, statement } from "../../kernel/dsse.ts";
+import { type DsseKey, signStatement, statement } from "@intellectual-frontiers/crypto/dsse";
 import { redactText } from "../../kernel/otel.ts";
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import { sha256 } from "../../kernel/sha256.ts";
-import { tar } from "../../kernel/archive.ts";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
+import { tar } from "@intellectual-frontiers/formats/archive";
 import { redactFor } from "../trust/audience.ts";
 import type { TrustRequirement } from "../trust/view.ts";
 import { digestOf, type Figures, figuresOf, GENESIS_DIGEST, type PackFiles } from "./verify-pack.ts";

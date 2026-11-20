@@ -27,7 +27,7 @@ import * as nfs from "node:fs";
 import { dirname } from "node:path";
 import process from "node:process";
 import { absurd, formatDecodeError, err, ok, type Result } from "@intellectual-frontiers/core";
-import { retryAfterMs } from "../kernel/http.ts";
+import { retryAfterMs } from "@intellectual-frontiers/formats/http";
 import {
   type AttributeValue,
   commandShape,

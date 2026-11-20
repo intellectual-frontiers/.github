@@ -8,7 +8,7 @@
  */
 import { flag } from "../src/platform/k-args.ts";
 import { err, ok } from "@intellectual-frontiers/core";
-import { sha256 } from "@intellectual-frontiers/commons/ts/kernel";
+import { sha256 } from "@intellectual-frontiers/crypto";
 import { exitStatuses, moduleSources } from "./vocabulary.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 import { CONTRACT_VERSION, decodeExternalManifest, externalManifestSchema } from "../src/modules/external.ts";

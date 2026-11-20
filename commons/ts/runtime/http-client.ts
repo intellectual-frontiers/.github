@@ -33,9 +33,9 @@ import {
   ok,
   type Result,
 } from "@intellectual-frontiers/core";
-import { isSafeMethod, nextLink, retryAfterMs } from "../kernel/http.ts";
-import { formatJson5Error, parseJson5, toJson5 } from "../kernel/json5.ts";
-import { type AwsCredentials, sign } from "../kernel/sigv4.ts";
+import { isSafeMethod, nextLink, retryAfterMs } from "@intellectual-frontiers/formats/http";
+import { formatJson5Error, parseJson5, toJson5 } from "@intellectual-frontiers/formats/json5";
+import { type AwsCredentials, sign } from "@intellectual-frontiers/crypto/sigv4";
 import { traceHttpClient } from "./otel.ts";
 import { sleep } from "./proc.ts";
 

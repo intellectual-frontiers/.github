@@ -24,11 +24,12 @@
  * @module
  */
 import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
-import { fromBase64, toBase64 } from "../kernel/base64.ts";
-import { children, integer, readTlv, sequence, TAG } from "../kernel/der.ts";
-import { type DsseAlgorithm, type DsseEnvelope, pae, signatureAlgorithm } from "../kernel/dsse.ts";
+import { fromBase64, toBase64 } from "@intellectual-frontiers/formats/base64";
+import { children, integer, readTlv, sequence, TAG } from "@intellectual-frontiers/formats/der";
+import { type DsseAlgorithm, type DsseEnvelope, pae, signatureAlgorithm } from "@intellectual-frontiers/crypto/dsse";
 import type { Sign, VerifySignature } from "../kernel/evidence.ts";
-import { fromHex, sha256 } from "../kernel/sha256.ts";
+import { fromHex } from "@intellectual-frontiers/formats/hex";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { NotFound } from "./errors.ts";
 import { exists, withTempDir, writeFile } from "./fs.ts";
 import { join } from "./path.ts";

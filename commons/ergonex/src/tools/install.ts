@@ -12,16 +12,8 @@
  * @module
  */
 import { absurd, type Decoder, formatDecodeError, json, object, record, string, err, ok, type Result } from "@intellectual-frontiers/core";
-import {
-  type ArchiveError,
-  type Files,
-  filesOf,
-  formatArchiveError,
-  gunzip,
-  untar,
-  unzip,
-} from "@intellectual-frontiers/commons/ts/kernel";
-import { sameSha256, sha256, type Sha256 } from "@intellectual-frontiers/commons/ts/kernel";
+import { type ArchiveError, type Files, filesOf, formatArchiveError, gunzip, untar, unzip } from "@intellectual-frontiers/formats";
+import { sameSha256, sha256, type Sha256 } from "@intellectual-frontiers/crypto";
 import { urlProblem, type Tool, type ToolArtifact, type ToolOs } from "./catalog.ts";
 
 /** Why a tool was not installed; nothing is written for any of them. */

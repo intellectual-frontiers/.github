@@ -17,7 +17,7 @@
  * @module
  */
 import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
-import type { Sha256 } from "../kernel/sha256.ts";
+import type { Sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { exists, sha256File } from "./fs.ts";
 import { resolve } from "./path.ts";
 import { build, cwd as processCwd, type Arch, type Os, output, which } from "./proc.ts";

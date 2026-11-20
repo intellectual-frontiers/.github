@@ -36,7 +36,7 @@ import {
   type Result,
 } from "@intellectual-frontiers/core";
 import type { Brand } from "@intellectual-frontiers/core";
-import { type Literal, exportedLiteral } from "../../kernel/ts-literal.ts";
+import { type Literal, exportedLiteral } from "@intellectual-frontiers/formats/ts-literal";
 
 /** The names of the regulated domains a harness may claim: the keys of `ifccm:RegulatedDomain` (a test holds the two lists equal). */
 export const REGULATED_DOMAINS = ["FederalSecurity", "DeviceQuality", "ElectronicRecords", "DeviceSoftware", "TrustServices"] as const;

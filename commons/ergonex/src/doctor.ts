@@ -11,7 +11,7 @@
  * @module
  */
 import { absurd } from "@intellectual-frontiers/core";
-import { parseSemVer } from "@intellectual-frontiers/commons/ts/kernel";
+import { parseSemVer } from "@intellectual-frontiers/formats";
 import type { Finding, Severity } from "./findings.ts";
 import { checkPathLength, nativePath, REPO_PATH_ROOM, repoPathLength, WINDOWS_PATH_LIMIT } from "./portable.ts";
 import type { RepoPath } from "./types.ts";

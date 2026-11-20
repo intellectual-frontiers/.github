@@ -12,9 +12,9 @@
  * @module
  */
 import { filesAt } from "../host/ledger-branch.ts";
-import { untar, filesOf } from "../../kernel/archive.ts";
+import { untar, filesOf } from "@intellectual-frontiers/formats/archive";
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import { sha256 } from "../../kernel/sha256.ts";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { mkdir, readFile, readTextFile, walkFiles, writeFile, exists } from "../../runtime/fs.ts";
 import { dirname, fromFileUrl, join } from "../../runtime/path.ts";
 import { type AgentStanding, agentStanding } from "../attestation/agents.ts";

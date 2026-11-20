@@ -9,7 +9,7 @@
  */
 import { fs, path, proc } from "../commons/ts/runtime/mod.ts";
 import { assert, assertEquals, proves } from "../commons/ts/runtime/test.ts";
-import { sha256 } from "../commons/ts/kernel/sha256.ts";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { importJsonSchema, readJsonLd, readRdfXml, type Read } from "../commons/ts/mizan/integrations/mod.ts";
 import type { Result } from "../commons/core/src/mod.ts";
 import type { IntegrationFinding } from "../commons/ts/mizan/integrations/mod.ts";

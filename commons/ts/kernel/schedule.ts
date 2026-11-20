@@ -63,7 +63,7 @@
  */
 import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import type { Brand } from "@intellectual-frontiers/core";
-import { el, writeXml, type XmlElement, type XmlNode } from "./xml.ts";
+import { el, writeXml, type XmlElement, type XmlNode } from "@intellectual-frontiers/formats/xml";
 
 /** The schedulers a job can be planned for: systemd on Linux, launchd on macOS, Task Scheduler on Windows. */
 export type SchedulerOs = "linux" | "darwin" | "windows";

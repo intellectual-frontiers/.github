@@ -36,7 +36,7 @@ import {
   type Result,
 } from "@intellectual-frontiers/core";
 import type { Brand } from "@intellectual-frontiers/core";
-import { exportedLiteral, type Literal, tsLiteral } from "../../kernel/ts-literal.ts";
+import { exportedLiteral, type Literal, tsLiteral } from "@intellectual-frontiers/formats/ts-literal";
 import { dayOf, type Day, type RecordError } from "../changes/declaration.ts";
 import { companionOf, SCHEMES, type Scheme, schemeOf, type WorkKind, WORK_KINDS } from "./scheme.ts";
 

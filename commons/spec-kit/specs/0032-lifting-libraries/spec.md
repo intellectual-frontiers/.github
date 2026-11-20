@@ -16,14 +16,14 @@
   | Layer | Library | Takes |
   |---|---|---|
   | 0 | core | kernel/absurd, kernel/brand, kernel/result, kernel/types, kernel/decode, kernel/objects, kernel/text, kernel/graph |
-  | 1 | formats | kernel/json5, kernel/yaml, kernel/toml, kernel/xml, kernel/csv, kernel/base64, kernel/cbor, kernel/der, kernel/archive, kernel/png, kernel/ts-literal, kernel/glob, kernel/semver, kernel/media-types, kernel/http |
-  | 1 | crypto | kernel/sha256, kernel/md5, kernel/crypt, kernel/sigv4, kernel/uuid, kernel/cms, kernel/cose, kernel/dsse, kernel/webauthn, runtime/sign |
+  | 1 | formats | kernel/json5, kernel/yaml, kernel/toml, kernel/xml, kernel/csv, kernel/base64, kernel/hex (made from kernel/sha256's toHex and fromHex, so that the digests depend on formats and not the reverse), kernel/cbor, kernel/der, kernel/archive, kernel/png, kernel/ts-literal, kernel/glob, kernel/semver, kernel/media-types, kernel/http |
+  | 1 | crypto | kernel/sha256, kernel/md5, kernel/crypt, kernel/sigv4, kernel/uuid, kernel/cms, kernel/cose, kernel/dsse, kernel/webauthn |
   | 1 | rdf | kernel/rdf, kernel/rdf-term, kernel/rdf-schema, kernel/rdf-vocabularies, kernel/rdf-write |
   | 1 | terminal | kernel/args, kernel/commands, kernel/vt, kernel/width, kernel/palette |
   | 1 | system | runtime/fs, runtime/path, runtime/dirs, runtime/lock, runtime/watch, runtime/discover, runtime/errors, runtime/proc, runtime/git, runtime/compile, runtime/schedule, runtime/tty, runtime/stdio, kernel/schedule |
   | 1 | net | runtime/net, runtime/tcp, runtime/dns, runtime/http-client, runtime/serve, runtime/acme |
   | 2 | telemetry | kernel/otel, kernel/otlp, kernel/signals, kernel/render, runtime/otel, runtime/console, runtime/trace |
-  | 2 | grc | kernel/grc, kernel/assess, kernel/evidence, kernel/oscal, kernel/ocsf, kernel/ocsf-types.auto, kernel/attest, runtime/grc |
+  | 2 | grc | kernel/grc, kernel/assess, kernel/evidence, kernel/oscal, kernel/ocsf, kernel/ocsf-types.auto, kernel/attest, runtime/grc, runtime/sign |
   | 2 | test | runtime/test, runtime/test-run |
   | 3 | quality | quality/, kernel/test-record, kernel/test-report |
   | 3 | mizan | mizan/integrations, mizan/rules, mizan/levels, mizan/check, mizan/harness, mizan/standards, mizan/spec-files, mizan/spec-terms, mizan/newer, mizan/imports, mizan/mod, mizan/generate-ontology, mizan/publish-ontology, mizan/oscal-register, kernel/trace, kernel/layers |
@@ -56,6 +56,29 @@
   | FR-064 (objects for exact optional properties) | core |
   | 0012-ontology FR-001 to FR-007 (RDF as typed values, vocabularies, schemas, code lists, checks, writers, no reader) | rdf |
   | FR-047 (the typed command-line parser), FR-072 (command trees); 0006-signals FR-022 (the palette), FR-025 (the terminal emulator) | terminal |
+  | FR-007 (semantic versions) | formats |
+  | FR-010 (archives) | formats |
+  | FR-011 (TypeScript literals) | formats |
+  | FR-012 (HTTP headers) | formats |
+  | FR-031 (JSON5) | formats |
+  | FR-032 (XML) | formats |
+  | FR-035 (TOML) | formats |
+  | FR-036 (CSV) | formats |
+  | FR-037 (media types) | formats |
+  | FR-038 (YAML) | formats |
+  | FR-041 (ASN.1 DER) | formats |
+  | FR-042 (base64) | formats |
+  | FR-043 (PNG) | formats |
+  | FR-058 (path globs) | formats |
+  | FR-059 (tar as a stream) | formats |
+  | FR-063 (typed TypeScript literals) | formats |
+  | FR-067 (version ranges) | formats |
+  | FR-008 (SHA-256) | crypto |
+  | FR-034 (SHA-512 crypt) | crypto |
+  | FR-044 (CMS) | crypto |
+  | FR-045 (in-toto and DSSE) | crypto |
+  | FR-057 (MD5) | crypto |
+  | FR-068 (AWS Signature Version 4) | crypto |
 
 - **FR-011**: The consumers of the packages, `erga` and `stolos`, MUST import a library by its package name once it is published and MUST NOT import `commons/ts/*` for what a library holds.
 - **FR-012**: A move of modules MUST rewrite, in the same commit, every importer of them in this repository (relative paths and the barrel `@intellectual-frontiers/commons/ts/kernel` alike) to the package name of their library, MUST add the dependency to each package that imports it, and MUST leave no re-export of the moved modules behind.
