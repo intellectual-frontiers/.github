@@ -10,8 +10,10 @@
  */
 import { absurd, type Brand, brand, compareText, err, isOneOf, ok, type Result, sortedBy, sortedText } from "./core.ts";
 import {
+  ARCHIVE_FORMATS,
   assurances,
   codeOf,
+  expandAddress,
   FIELD_TYPES,
   formatRdfFinding,
   type Iri,
@@ -71,11 +73,12 @@ const ASSURANCE: { readonly [K in keyof typeof assurances]: Assurance } = {
   Untested: "untested",
   NoAssurance: "none",
 };
-export type ManagerKind = "system" | "helper" | "universal";
+export type ManagerKind = "system" | "helper" | "universal" | "tool";
 const KIND: { readonly [K in keyof typeof managerKinds]: ManagerKind } = {
   SystemKind: "system",
   HelperKind: "helper",
   UniversalKind: "universal",
+  ToolKind: "tool",
 };
 export type Tier = "required" | "comfort";
 const TIER: { readonly [K in keyof typeof tiers]: Tier } = { Required: "required", Comfort: "comfort" };
@@ -131,13 +134,29 @@ export type Prohibition = {
 };
 export type Program = { readonly tier: Tier; readonly order: number; readonly names: ReadonlyMap<FamilyId, string> };
 export type Platform = { readonly os: string; readonly processor: string; readonly suffix: string; readonly label: string };
+/** The formats of what a pin's address gives (commons 0002-packaging FR-017). */
+export type ArchiveFormat = (typeof ARCHIVE_FORMATS)[number];
+/** A pin on one platform: downloadable, with its address, format and folder, or unpinned, with the reason it has no address (commons 0002-packaging FR-017). */
+export type PinPlatform<H extends string = Sha256> =
+  | {
+      readonly state: "pinned";
+      readonly sha256: H;
+      /** The https address, the version already in it. */
+      readonly downloadUrl: string;
+      readonly archiveFormat: ArchiveFormat;
+      /** The folder of the programs inside the unpacked artifact; empty for the root. */
+      readonly binPath: string;
+    }
+  | { readonly state: "unpinned"; readonly sha256: H; readonly reason: string };
 export type Pin = {
   readonly key: string;
   readonly version: string;
   readonly label: string;
   readonly note: string;
-  readonly sha256: ReadonlyMap<PlatformName, Sha256>;
+  readonly platforms: ReadonlyMap<PlatformName, PinPlatform>;
 };
+/** What is wrong with an address of a pin (commons 0002-packaging FR-018). */
+export type AddressProblem = "not-an-address" | "not-https" | "credentials";
 export type Rule = {
   readonly id: string;
   readonly set: RuleSet;
@@ -205,11 +224,17 @@ export type Finding =
   | { readonly kind: "checksum-incomplete"; readonly subject: Iri }
   | { readonly kind: "checksum-not-hex"; readonly pin: PinName; readonly platform: PlatformName }
   | { readonly kind: "checksum-twice"; readonly pin: PinName; readonly platform: PlatformName }
+  | { readonly kind: "checksum-shape"; readonly pin: PinName; readonly platform: PlatformName; readonly why: ShapeProblem }
+  | { readonly kind: "checksum-address"; readonly pin: PinName; readonly platform: PlatformName; readonly problem: AddressProblem }
+  | { readonly kind: "checksum-format"; readonly pin: PinName; readonly platform: PlatformName; readonly format: string }
+  | { readonly kind: "checksum-bin-path"; readonly pin: PinName; readonly platform: PlatformName; readonly path: string }
   | { readonly kind: "rule-incomplete"; readonly rule: string }
   | { readonly kind: "rule-pattern"; readonly rule: string; readonly why: string }
   | { readonly kind: "rule-twice"; readonly rule: string }
   | { readonly kind: "field-incomplete"; readonly subject: Iri }
   | { readonly kind: "field-repeated"; readonly field: string };
+/** How a checksum fails to be one of the two forms of FR-017. */
+export type ShapeProblem = "partial" | "both" | "neither";
 export type Form = "template" | "non-interactive form";
 
 /** The sentence a finding is printed with (the Python generator's, word for word). */
@@ -289,6 +314,14 @@ export function describe(f: Finding): string {
       return `the checksum of ${f.pin} on ${f.platform} is not 64 lower-case hexadecimal digits`;
     case "checksum-twice":
       return `${f.pin} has two checksums for ${f.platform}`;
+    case "checksum-shape":
+      return `the checksum of ${f.pin} on ${f.platform} ${shapeSentence(f.why)}`;
+    case "checksum-address":
+      return `the address of ${f.pin} on ${f.platform} ${addressSentence(f.problem)}`;
+    case "checksum-format":
+      return `the format of ${f.pin} on ${f.platform} is ${JSON.stringify(f.format)}, and a format is one of ${ARCHIVE_FORMATS.join(", ")}`;
+    case "checksum-bin-path":
+      return `the folder of the programs of ${f.pin} on ${f.platform}, ${JSON.stringify(f.path)}, must be relative to the unpacked artifact, with no backslash and no .. word`;
     case "rule-incomplete":
       return `rule ${f.rule} needs a set (one of ${RULE_SETS.join(", ")}), a pattern, a name and a reason`;
     case "rule-pattern":
@@ -305,6 +338,46 @@ export function describe(f: Finding): string {
 }
 
 // ---- reading the typed values ---------------------------------------------------------------------------------------------------------------------------
+
+/** What a checksum that is not one of the two forms of FR-017 says of itself. */
+function shapeSentence(why: ShapeProblem): string {
+  switch (why) {
+    case "partial":
+      return "has some of an address, a format and a folder but not all three, which go together";
+    case "both":
+      return "has an address and an unpinned reason, and a platform is either one or the other";
+    case "neither":
+      return "has no address and no unpinned reason: say where the artifact is, or why it is not known";
+    default:
+      return absurd(why);
+  }
+}
+
+/** What an address that is not acceptable says of itself. */
+function addressSentence(p: AddressProblem): string {
+  switch (p) {
+    case "not-an-address":
+      return "is not an address";
+    case "not-https":
+      return "is not https";
+    case "credentials":
+      return "holds a user name or a password";
+    default:
+      return absurd(p);
+  }
+}
+
+/** The way an address of a pin is not acceptable (commons 0002-packaging FR-018), or nothing where it is. */
+function addressProblem(url: string): AddressProblem | undefined {
+  if (!URL.canParse(url)) return "not-an-address";
+  const u = new URL(url);
+  if (u.protocol !== "https:") return "not-https";
+  if (u.username !== "" || u.password !== "") return "credentials";
+  return undefined;
+}
+
+/** Whether a folder is inside the unpacked artifact: relative, no backslash and no `..` word. */
+const binPathInside = (p: string): boolean => !p.startsWith("/") && !p.includes("\\") && !p.split("/").includes("..");
 
 /** A text that is there: Python's truthiness of a `str | None`. */
 const given = (s: string | null | undefined): s is string => s !== null && s !== undefined && s !== "";
@@ -323,7 +396,7 @@ const ident = (s: Named, identifier: string): string => (given(identifier) ? ide
 
 type DraftFamily = Omit<Family, "status" | "assurance"> & { readonly status: SupportStatus | null; readonly assurance: Assurance | null };
 type DraftManager = Omit<Manager, "kind" | "commands"> & { readonly kind: ManagerKind | null; readonly commands: Map<Op, Command> };
-type DraftPin = Omit<Pin, "sha256"> & { readonly sha256: Map<PlatformName, string> };
+type DraftPin = Omit<Pin, "platforms"> & { readonly platforms: Map<PlatformName, PinPlatform<string>> };
 type DraftProgram = Omit<Program, "names"> & { readonly names: Map<FamilyId, string> };
 
 /** The table the ontology makes, or every rule it breaks, in the order the Python generator named them. */
@@ -558,7 +631,7 @@ export function decode(o: Ontology): Result<Table, Finding[]> {
     keys.add(key);
     const id = brand<"PinName">(name);
     pinOf.set(pn.iri, id);
-    pins.set(id, { key, version, label: given(v.label.value) ? v.label.value : name, note: v.note?.value ?? "", sha256: new Map() });
+    pins.set(id, { key, version, label: given(v.label.value) ? v.label.value : name, note: v.note?.value ?? "", platforms: new Map() });
   }
   for (const c of byIri(o.checksums)) {
     const pin = pinOf.get(c.values.forPin.iri);
@@ -570,8 +643,23 @@ export function decode(o: Ontology): Result<Table, Finding[]> {
       continue;
     }
     if (!HEX64.test(digest)) bad.push({ kind: "checksum-not-hex", pin, platform });
-    if (p.sha256.has(platform)) bad.push({ kind: "checksum-twice", pin, platform });
-    p.sha256.set(platform, digest);
+    if (p.platforms.has(platform)) bad.push({ kind: "checksum-twice", pin, platform });
+    const { downloadUrl: url, archiveFormat: format, binPath, unpinnedReason: reason } = c.values;
+    const stated = [url, format, binPath].filter((x) => x !== undefined).length;
+    const unpinned = reason !== undefined && given(reason.value);
+    if (stated > 0 && stated < 3) bad.push({ kind: "checksum-shape", pin, platform, why: "partial" });
+    else if (stated === 3 && unpinned) bad.push({ kind: "checksum-shape", pin, platform, why: "both" });
+    else if (stated === 0 && !unpinned) bad.push({ kind: "checksum-shape", pin, platform, why: "neither" });
+    if (url !== undefined && format !== undefined && binPath !== undefined) {
+      const address = expandAddress(url, p.version);
+      const problem = addressProblem(address);
+      if (problem !== undefined) bad.push({ kind: "checksum-address", pin, platform, problem });
+      if (!isOneOf(ARCHIVE_FORMATS, format)) bad.push({ kind: "checksum-format", pin, platform, format });
+      if (!binPathInside(binPath)) bad.push({ kind: "checksum-bin-path", pin, platform, path: binPath });
+      if (isOneOf(ARCHIVE_FORMATS, format))
+        p.platforms.set(platform, { state: "pinned", sha256: digest, downloadUrl: address, archiveFormat: format, binPath });
+      else p.platforms.set(platform, { state: "unpinned", sha256: digest, reason: "" });
+    } else p.platforms.set(platform, { state: "unpinned", sha256: digest, reason: reason?.value ?? "" });
   }
 
   const rules: Rule[] = [];
@@ -633,12 +721,13 @@ function complete(
   }
   const ps = new Map<PinName, Pin>();
   for (const [id, p] of pins) {
-    const sums = new Map<PlatformName, Sha256>();
-    for (const [platform, digest] of p.sha256) {
-      if (!HEX64.test(digest)) return err([{ kind: "checksum-not-hex", pin: id, platform }]);
-      sums.set(platform, brand<"Sha256">(digest));
+    const sums = new Map<PlatformName, PinPlatform>();
+    for (const [platform, entry] of p.platforms) {
+      if (!HEX64.test(entry.sha256)) return err([{ kind: "checksum-not-hex", pin: id, platform }]);
+      const sha256 = brand<"Sha256">(entry.sha256);
+      sums.set(platform, entry.state === "pinned" ? { ...entry, sha256 } : { ...entry, sha256 });
     }
-    ps.set(id, { ...p, sha256: sums });
+    ps.set(id, { ...p, platforms: sums });
   }
   return ok({ managers: ms, families: fs, programs, prohibitions, platforms, pins: ps, rules, record });
 }
