@@ -18,7 +18,7 @@ import type { Resolution, ResolvedTool, Source } from "./resolve.ts";
 
 function sourceOf(source: Source): JsonValue {
   return source.kind === "download"
-    ? { kind: "download", pin: source.pin, version: source.download.version, url: source.download.url, sha256: source.download.sha256, format: source.download.format, bin: source.download.bin }
+    ? { kind: "download", pin: source.pin, version: source.download.version, downloadUrl: source.download.downloadUrl, sha256: source.download.sha256, archiveFormat: source.download.archiveFormat, binPath: source.download.binPath }
     : { kind: "package", manager: source.manager, packages: [...source.packages] };
 }
 

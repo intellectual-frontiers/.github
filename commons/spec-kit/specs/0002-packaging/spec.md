@@ -8,8 +8,8 @@
 
 **Input:** The packaging ontology of the software supply chain capability (0001-software-supply-chain): the package managers and system families of every computer a harness may meet, the
 commands that drive each manager, the package each family calls a program, what a harness must never run, and how far each family has been tried. It is seeded from the tables of `upt`
-(a universal package-management tool) and from what `archon` runs; a tool generates from it the TOML table a harness reads, the shell fragment a script carries and the TypeScript module a harness's setup reads. It exists so that
-`archon` and `erga` read one set of facts, and so that a new family is a change to data and a run on a real computer, not new branches in two languages.
+(a universal package-management tool) and from what the retired Stolos engine ran (its tables are the origin `archon`; the name `archon` is now the commons library of 0034-archon); a tool generates from it the TOML table a harness reads, the shell fragment a script carries and the TypeScript module a harness's setup reads. It exists so that
+the harnesses (`archon`, `toolchain`) and `erga` read one set of facts, and so that a new family is a change to data and a run on a real computer, not new branches in two languages.
 
 ## The ontology
 
@@ -17,12 +17,12 @@ commands that drive each manager, the package each family calls a program, what 
   `managers.ts`, `families.ts`, `programs.ts`, `pins.ts`, `rules.ts` and `record.ts` beside it, with individuals in `https://www.intellectualfrontiers.com/id/packaging/` (`pmid:`), each a TypeScript module of 0012-ontology FR-008 (amended 2026-11-16: the files were Turtle). A class MUST specialize a schema.org class
   where schema.org has one; every term MUST have a label and a definition.
 - **FR-002**: The data MUST hold every package manager and every operating-system row of the tables of `upt`, whatever the platform (Linux, the BSDs, macOS, Windows, Android and Haiku), so that
-  a future harness is not limited to the families `archon` runs on. A test MUST fail where a manager or a row of `tests/fixtures/upt/` is missing.
+  a future harness is not limited to the families the retired engine ran on. A test MUST fail where a manager or a row of `tests/fixtures/upt/` is missing.
 - **FR-003**: The data seeded from `upt` MUST say so, with its licence (MIT or Apache-2.0) and the identifier it leaves out (`oubes`, which is not an `os-release` ID). A command MUST say where it
-  comes from (`pm:origin`: `upt`, `archon`, or `upt+memory` where the non-interactive form was written from knowledge), and a command, a family or a flag run on a real computer MUST say where and
+  comes from (`pm:origin`: `upt`, `archon` (the commands the retired Stolos engine ran, before `commons/archon` of 0034-archon replaced it), `memory` (written from knowledge) or `upt+memory` where the non-interactive form was written from knowledge), and a command, a family or a flag run on a real computer MUST say where and
   when (`pm:verifiedOn`); one with none is unverified (0001-software-supply-chain FR-006).
 - **FR-004**: A family MUST be `supported` where a harness acts on it and `catalogued` where it is only known, and MUST have an assurance: `verified`, `stand-in`, `untested` or `none`. A supported
-  family that installs packages MUST have a preferred manager whose install command has a non-interactive form that comes from a harness (`archon`), a command that says whether a package
+  family that installs packages MUST have a preferred manager whose install command has a non-interactive form that comes from a harness (origin `archon`), a command that says whether a package
   is installed, the command a person with administrator rights runs, and a removal hint; one that installs none (a Mac) MUST say so. A `verified` family MUST say where and when.
 - **FR-005**: A command that must never be run MUST be a `pm:Prohibition` with its reason, and MUST NOT appear as a usable command: `pacman -Sy` (a refresh alone leaves a rolling release
   partly upgraded) and every command of an AUR helper (it runs the build scripts of packages nobody reviewed).
@@ -52,11 +52,34 @@ commands that drive each manager, the package each family calls a program, what 
 
 - **FR-016**: The ontology MUST name the fields of the record a setup keeps of how an account was set up (`~/.config/erga/install.toml`): each with a name, a type (`text`, `boolean` or `date`), an order and a definition, and the values it may hold where it may hold only some; the tool MUST write them, in order, to `commons/generated/install-record.auto.toml`, and the setup that writes the record MUST write exactly those fields in that order, so that what writes the record and what reads it cannot drift.
 
+## The download of a pin
+
+- **FR-017**: A checksum (`pm:Checksum`, a pin on a platform) MUST say what a download of it needs, so that the pin is the one source of where a program comes from: `pm:downloadUrl` (the `https` address of the publisher's artifact for that pin and platform, in which `{version}` stands for the pin's version, so that a version is written once), `pm:archiveFormat` (`zip`, `tar` or `file`: a zip archive, a tar archive plain or compressed, or the one file itself) and `pm:binPath` (the folder of the programs inside the unpacked artifact, relative to its root; empty for the root). A platform whose address is not known MUST NOT be given one: it MUST carry `pm:unpinnedReason`, the sentence that says why, and none of the three, so that a script and a harness see it is not downloadable and no address is invented. Exactly one of the two forms MUST be present.
+- **FR-018**: The tool MUST refuse, naming the pin and the platform, an address that is not `https` (after `{version}` is replaced), an address with a user name or a password, an address that is not an address, an archive format that is none of the three, a `binPath` that is absolute, holds `\` or has a `..` word, a checksum with some but not all of the three, a checksum with both an address and an unpinned reason and with neither, and more than one checksum for the same pin and platform (FR-010).
+- **FR-019**: The generated files MUST carry what FR-017 says, written from the pins and nowhere else: `pins.auto.env` MUST add to each pinned platform of a pin the lines `KEY_URL_SUFFIX` (the address, `{version}` replaced), `KEY_FORMAT_SUFFIX` and `KEY_BINPATH_SUFFIX`, and the TOML and the TypeScript module MUST hold, for each pin, each platform as `{ state: "pinned", sha256, downloadUrl, archiveFormat, binPath }` or `{ state: "unpinned", sha256, reason }` (a closed union; the module's `pins` entry has `platforms` and no separate `sha256` map). A program of this repository that downloads a pin (the Bun installer of CI, the OpenTelemetry Collector step of the conformance job) MUST read the address, the format and the folder from `pins.auto.env` and MUST NOT write them again, so that a change of pin is made in `pins.ts` and in no other file.
+- **FR-020**: The ontology MUST export, for a reader that holds no pin of its own (`commons/toolchain`), the downloads as typed values: `downloadOf(pin, platform)` of `@intellectual-frontiers/ontology/supply-chain/downloads`, which MUST give for a pin id (`mise`, `python`, `uv`, `rustup-init`, `gh`, `jq`, `bun`, `otelcol-contrib`) and a platform name (`linux-x64`, `linux-arm64`, `macos-x64`, `macos-arm64`, `windows-x64`) a `Result` of `{ version, downloadUrl, sha256, archiveFormat, binPath }`, or the reason the platform is unpinned, or that the pin or platform is unknown; each a value of a closed union and each id a branded smart-constructed value.
+- **FR-021**: The package managers MUST include `manager-mise` (`mise`, a tool manager: the kind `tool`, which is no family's manager), with the commands install, query version and list installed as words, each of origin `memory` and unverified (FR-003), so that nothing acts on them until they are run on a real computer.
+- **FR-022**: Each of the managers `apt`, `pacman`, `dnf`, `brew` and `winget` (those of the Linux, macOS and Windows families a harness meets first) MUST have a command for the operation query version, which says the version of one installed package for an SBOM; where one was not yet in the table it MUST be added with origin `memory` and no verification (FR-003). The query version of `brew` (`brew list --versions {package}`) and of `winget` (`winget list --exact --id {package}`) are of that kind.
+- **FR-023**: The name `archon` MUST be used in the ontology, its generated files and this specification only for `commons/archon` (0034-archon) and for the origin `archon` of FR-003; a sentence MUST NOT call it a harness the ontology's data was taken from.
+
 ## Out of scope
 
-- Acting on a family: what a harness does with the table (`archon`'s machine bootstrap specification).
+- Acting on a family: what a harness does with the table (`commons/archon`, 0034-archon, and `erga`'s machine bootstrap specification).
+- Downloading, unpacking and installing a pin: `commons/toolchain` reads the addresses and hashes of the pins through the ontology's exports and holds no version or hash of its own; the pin only says where the publisher's artifact is.
+- The `download` entries of `erga`'s catalog: reviewed by a person later, not generated here.
 - A command for a manager nobody has run: it is recorded unverified and used by no one.
 - Package versions and the repositories' contents.
+
+## Acceptance scenarios
+
+1. **Given** a pin whose checksum names `http://` as its address, **When** the tool runs, **Then** it exits 2 and names the pin and the platform and says the address is not https, and writes nothing, per FR-018.
+2. **Given** an address `https://user:secret@example.com/x`, **When** the tool runs, **Then** it exits 2 and says the address holds a user name or a password, per FR-018.
+3. **Given** a `binPath` of `../x` or `/usr/bin`, or an archive format `rar`, **When** the tool runs, **Then** it exits 2 naming each, per FR-018.
+4. **Given** a checksum with an address and no format, **When** the tool runs, **Then** it exits 2 and says the three go together, per FR-017 and FR-018.
+5. **Given** a platform with no known address and an unpinned reason, **When** the tool runs, **Then** it writes the platform as unpinned with its reason in the TOML and the module and no `KEY_URL_` line in `pins.auto.env`, per FR-017 and FR-019.
+6. **Given** the committed pins, **When** `pins.auto.env` is read, **Then** the Bun address of each of its five platforms is there, and the Bun installer takes its address from it, per FR-019.
+7. **Given** the ontology's exports, **When** `downloadOf` is asked for Bun on `linux-x64`, **Then** it gives the version, the address with the version in it, the SHA-256, `zip` and `bun-linux-x64`, and for a platform that is unpinned it gives the reason, per FR-020.
+8. **Given** the table of managers, **When** it is read, **Then** `mise` is there with three commands of origin `memory` and no verification, and apt, brew and winget each have a query-version command, per FR-021 and FR-022.
 
 ## Edge cases
 
@@ -80,6 +103,7 @@ commands that drive each manager, the package each family calls a program, what 
 
 ## Key entities
 
+- **Checksum** - a pin on a platform, with the address, format and folder of its download (`pm:Checksum`).
 - **Package manager** - a program that installs software (`pm:PackageManager`).
 - **System family** - the computers that share a manager and package names (`pm:SystemFamily`).
 - **Command** - one operation of a manager as a list of words (`pm:Command`).

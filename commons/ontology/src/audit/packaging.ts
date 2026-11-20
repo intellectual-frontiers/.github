@@ -21,7 +21,14 @@ import { schema } from "../supply-chain/packaging/schema.auto.ts";
 /** The day the audit was made, from which the decision of each `unaligned` term is due (0018-standards-first FR-005). */
 export const AUDITED_ON = "2026-11-17";
 
-type Standard = { readonly iri: string; readonly relation: "subClassOf" | "closeMatch" };
+type Standard = { readonly iri: string; readonly relation: "subClassOf" | "closeMatch" | "narrowMatch" };
+
+/** The terms of DCAT 3 (https://www.w3.org/ns/dcat3.ttl, W3C Recommendation) the download terms of a checksum map to: the address of a download, and the format of the package it gives. */
+const DCAT = { downloadURL: "http://www.w3.org/ns/dcat#downloadURL", packageFormat: "http://www.w3.org/ns/dcat#packageFormat" } as const;
+/** The `subpath` of the Package URL standard (Ecma-427): the path inside a package, relative to its root, with no `.` or `..` segment, which is what the folder of programs inside an unpacked artifact is. */
+const PURL_SUBPATH = "https://github.com/package-url/purl-spec#subpath";
+/** SKOS's `note`, of which the sentence that says why a platform is unpinned is a narrower kind. */
+const SKOS_NOTE = "http://www.w3.org/2004/02/skos/core#note";
 
 /** The terms of the packaging ontology that rest on a schema.org term, with the relation. */
 const STANDARD: Readonly<Record<string, Standard>> = {
@@ -35,6 +42,10 @@ const STANDARD: Readonly<Record<string, Standard>> = {
   programName: { iri: schema.name.iri, relation: "closeMatch" },
   operatingSystem: { iri: schema.operatingSystem.iri, relation: "closeMatch" },
   processor: { iri: schema.processorRequirements.iri, relation: "closeMatch" },
+  downloadUrl: { iri: DCAT.downloadURL, relation: "closeMatch" },
+  archiveFormat: { iri: DCAT.packageFormat, relation: "closeMatch" },
+  binPath: { iri: PURL_SUBPATH, relation: "closeMatch" },
+  unpinnedReason: { iri: SKOS_NOTE, relation: "narrowMatch" },
 };
 
 /** What is still to examine for a term no standard is adopted for. */

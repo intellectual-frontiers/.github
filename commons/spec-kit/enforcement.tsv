@@ -52,6 +52,13 @@ requirement	mechanism	by	note
 0003-mizan FR-043	check	.github: cd commons/ts && bun test tests/	mizan-harness-requests.test.ts: the proof register is read from a path given as an option, with Windows line ends, and the two OSCAL documents are the same bytes as from enforcement.tsv beside the specifications; a path that is not there is an error
 0003-mizan FR-044	check	.github: cd commons/ts && bun test tests/	mizan-harness-requests.test.ts: a requirement that names a term which does not cite it back is a finding (once for each requirement and term, ranges read, the whole specification not), the stage runs only where definitions are given, and its findings are held by the baseline and go stale when fixed
 0002-packaging FR-016	check	.github: bun test ./tests/	Record: the fields, their order and their values, as the TypeScript module carries them; Generator: a bad field is refused
+0002-packaging FR-017	check	.github: bun test ./tests/	Pins: a pinned platform has an address, a format and a folder, an unpinned one says why, and the pins state each
+0002-packaging FR-018	check	.github: bun test ./tests/	Generator: an address that is not https, holds a user name, a format that is none of three, a folder that leaves its root, a half-stated checksum and a checksum twice are each refused
+0002-packaging FR-019	check	.github: bun test ./tests/	Pins: the env file, the TOML and the module carry the addresses of the pins, and the Bun installer and the conformance job read them
+0002-packaging FR-020	check	.github: bun test ./tests/	Pins: downloadOf gives the version, address, SHA-256, format and folder of a pin on a platform, or why it is unpinned
+0002-packaging FR-021	check	.github: bun test ./tests/	Managers: mise is a tool manager with three unverified commands of origin memory
+0002-packaging FR-022	check	.github: bun test ./tests/	Managers: apt, pacman, dnf, brew and winget each have a query-version command
+0002-packaging FR-023	check	.github: bun test ./tests/	Names: the ontology and its generated files say archon only of commons/archon and of the origin archon
 0004-rules FR-001	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
 0004-rules FR-002	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
 0004-rules FR-003	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script

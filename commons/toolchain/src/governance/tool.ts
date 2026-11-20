@@ -48,10 +48,10 @@ export type ArtifactFormat = "zip" | "tar" | "file";
 /** What a pin gives for one platform: the version, the address, the SHA-256 of what is there, its format and the folder of its programs inside it. */
 export type Download = {
   readonly version: Version;
-  readonly url: string;
+  readonly downloadUrl: string;
   readonly sha256: Sha256;
-  readonly format: ArtifactFormat;
-  readonly bin: string;
+  readonly archiveFormat: ArtifactFormat;
+  readonly binPath: string;
 };
 
 /** How a dialect obtains a tool: the download a pin of the ontology gives, or the names of the packages a package manager of the ontology knows (at a version, where one is named). */
@@ -81,7 +81,7 @@ export type Tool = {
 };
 
 /** A download as a source of pins gives it. */
-export type DownloadInput = { readonly version: string; readonly url: string; readonly sha256: string; readonly format: string; readonly bin: string };
+export type DownloadInput = { readonly version: string; readonly downloadUrl: string; readonly sha256: string; readonly archiveFormat: string; readonly binPath: string };
 
 /** A binding as written. */
 export type BindingInput =
@@ -115,21 +115,21 @@ export function defineDownload(input: DownloadInput): Result<Download, readonly 
   if (version.kind === "err") problems.push(version.error);
   let url: URL | undefined;
   try {
-    url = new URL(input.url);
+    url = new URL(input.downloadUrl);
   } catch {
-    problems.push(`${JSON.stringify(input.url)} is not an address`);
+    problems.push(`${JSON.stringify(input.downloadUrl)} is not an address`);
   }
   if (url !== undefined) {
-    if (url.protocol !== "https:") problems.push(`the address is https, and ${JSON.stringify(input.url)} is not`);
+    if (url.protocol !== "https:") problems.push(`the address is https, and ${JSON.stringify(input.downloadUrl)} is not`);
     if (url.username !== "" || url.password !== "") problems.push("the address holds a user name or a password");
   }
   const hash = sha256Of(input.sha256);
   if (hash === undefined) problems.push(`${JSON.stringify(input.sha256)} is not a SHA-256 (64 hexadecimal digits)`);
-  const format = oneOf<ArtifactFormat>(["zip", "tar", "file"], input.format);
-  if (format === undefined) problems.push(`${JSON.stringify(input.format)} is not a format (zip, tar, file)`);
-  if (input.bin.startsWith("/") || input.bin.includes("\\") || input.bin.split("/").includes("..")) problems.push(`the folder of programs ${JSON.stringify(input.bin)} is not a path inside the unpacked folder`);
+  const format = oneOf<ArtifactFormat>(["zip", "tar", "file"], input.archiveFormat);
+  if (format === undefined) problems.push(`${JSON.stringify(input.archiveFormat)} is not a format (zip, tar, file)`);
+  if (input.binPath.startsWith("/") || input.binPath.includes("\\") || input.binPath.split("/").includes("..")) problems.push(`the folder of programs ${JSON.stringify(input.binPath)} is not a path inside the unpacked folder`);
   if (problems.length > 0 || version.kind === "err" || hash === undefined || format === undefined) return err(problems);
-  return ok({ version: version.value, url: input.url, sha256: hash, format, bin: input.bin });
+  return ok({ version: version.value, downloadUrl: input.downloadUrl, sha256: hash, archiveFormat: format, binPath: input.binPath });
 }
 
 /** A tool, or every reason the input is not one. */

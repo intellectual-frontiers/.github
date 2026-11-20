@@ -105,6 +105,10 @@ export const pm = vocabulary(PM, {
   forPin: "owl:ObjectProperty",
   forPlatform: "owl:ObjectProperty",
   sha256: "owl:DatatypeProperty",
+  downloadUrl: "owl:DatatypeProperty",
+  archiveFormat: "owl:DatatypeProperty",
+  binPath: "owl:DatatypeProperty",
+  unpinnedReason: "owl:DatatypeProperty",
   ruleSet: "owl:DatatypeProperty",
   pattern: "owl:DatatypeProperty",
   fieldName: "owl:DatatypeProperty",
@@ -124,6 +128,12 @@ export const DETECT_SOURCES = ["os-release", "platform", "any"] as const;
 export const ORIGINS = ["upt", "archon", "memory", "upt+memory"] as const;
 /** The operating systems of a platform (commons 0002-packaging FR-014). */
 export const OPERATING_SYSTEMS = ["linux", "macos", "windows"] as const;
+/** The formats of what a download gives (commons 0002-packaging FR-017): a zip archive, a tar archive (plain or compressed) or the one file itself. */
+export const ARCHIVE_FORMATS = ["zip", "tar", "file"] as const;
+/** The address a pin states (`pm:downloadUrl`) with `{version}` replaced by the pin's version: the one place that puts it in (commons 0002-packaging FR-017). */
+export function expandAddress(template: string, version: string): string {
+  return template.replaceAll("{version}", version);
+}
 /** The processors of a platform, as `uname -m` says them (commons 0002-packaging FR-014). */
 export const PROCESSORS = ["x86_64", "aarch64"] as const;
 /** How a harness may use a manager, where it may not drive it as any other. */
@@ -168,6 +178,7 @@ export const managerKinds = codes(classSchema(pm.ManagerKind, CODE), PM, {
   SystemKind: { label: en("system") },
   HelperKind: { label: en("helper") },
   UniversalKind: { label: en("universal") },
+  ToolKind: { label: en("tool") },
 });
 
 /** The tiers of a program: a code list, whose keys are the union the tools branch on. */
@@ -264,6 +275,10 @@ export const Checksum = classSchema(pm.Checksum, {
   forPin: one(pm.forPin, range.ref<"pm:PinnedDownload">()),
   forPlatform: one(pm.forPlatform, range.ref<"pm:Platform">()),
   sha256: one(pm.sha256, range.string),
+  downloadUrl: optional(pm.downloadUrl, range.string),
+  archiveFormat: optional(pm.archiveFormat, range.oneOf(ARCHIVE_FORMATS)),
+  binPath: optional(pm.binPath, range.string),
+  unpinnedReason: optional(pm.unpinnedReason, range.langString),
 });
 
 /** The schema of a rule (`pm:Rule`). */
@@ -345,7 +360,12 @@ export const classes = [
       "A program a script fetches before any harness exists, at one version, whose download is accepted only with the SHA-256 pinned for the platform.",
     ),
   }),
-  OwlClass.make(pm.Checksum, { label: en("Checksum"), definition: en("The SHA-256 of one pinned download on one platform.") }),
+  OwlClass.make(pm.Checksum, {
+    label: en("Checksum"),
+    definition: en(
+      "A pin on one platform: the SHA-256 of one pinned download there and, where the publisher's address is known, what a download needs (its address, the format of what it gives and the folder of its programs); where it is not known, why the platform is unpinned.",
+    ),
+  }),
   OwlClass.make(pm.Rule, {
     label: en("Rule"),
     definition: en(
@@ -376,7 +396,7 @@ export const classes = [
   OwlClass.make(pm.ManagerKind, {
     label: en("Manager kind"),
     definition: en(
-      "system (the computer's own), helper (a front end to another manager or to a user repository) or universal (works on many systems).",
+      "system (the computer's own), helper (a front end to another manager or to a user repository), universal (works on many systems) or tool (manages the tools a project or an account uses, in the account's own folder, and is no family's manager).",
     ),
   }),
   OwlClass.make(pm.Tier, {
@@ -438,7 +458,7 @@ export const properties = [
   DatatypeProperty.make(pm.origin, {
     domain: pm.Command,
     range: xsd.string,
-    definition: en("Where the command comes from: upt, archon (what a harness runs) or memory (written from knowledge, unverified)."),
+    definition: en("Where the command comes from: upt, archon (what the retired Stolos engine ran, before commons/archon replaced it), memory (written from knowledge, unverified) or upt+memory."),
   }),
   DatatypeProperty.make(pm.verifiedOn, {
     definition: en("Where and when it was run for real, in words. Without it, a command, a family or a flag is not verified."),
@@ -560,6 +580,30 @@ export const properties = [
     domain: pm.Checksum,
     range: xsd.string,
     definition: en("The SHA-256 of the download, in lower-case hexadecimal."),
+  }),
+  DatatypeProperty.make(pm.downloadUrl, {
+    domain: pm.Checksum,
+    range: xsd.string,
+    definition: en(
+      "The https address of the publisher's artifact for the pin on the platform, with {version} where the pin's version stands; no user name, no password.",
+    ),
+  }),
+  DatatypeProperty.make(pm.archiveFormat, {
+    domain: pm.Checksum,
+    range: xsd.string,
+    definition: en("What the address gives: zip (a zip archive), tar (a tar archive, plain or compressed) or file (the one file itself)."),
+  }),
+  DatatypeProperty.make(pm.binPath, {
+    domain: pm.Checksum,
+    range: xsd.string,
+    definition: en(
+      "The folder of the programs inside the unpacked artifact, relative to its root, never absolute and never with a .. word; empty for the root.",
+    ),
+  }),
+  DatatypeProperty.make(pm.unpinnedReason, {
+    domain: pm.Checksum,
+    range: xsd.string,
+    definition: en("Why the platform has no address: the sentence a platform with a checksum and no known address carries instead of one."),
   }),
   DatatypeProperty.make(pm.ruleSet, {
     domain: pm.Rule,

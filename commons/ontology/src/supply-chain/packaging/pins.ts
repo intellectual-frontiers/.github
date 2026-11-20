@@ -1,5 +1,5 @@
 /**
- * The platforms a harness runs on and the downloads it pins (commons 0002-packaging FR-014, FR-015): one version and one SHA-256 per platform for each program a script fetches
+ * The platforms a harness runs on and the downloads it pins (commons 0002-packaging FR-014, FR-015, FR-017): one version and, per platform, one SHA-256 and the address, format and folder of the publisher's artifact (or why the platform has no address) for each program a script fetches
  * before any harness exists. The shell fragment and the env file are generated from this; change a pin here and nowhere else.
  *
  * @module
@@ -54,7 +54,7 @@ export const platformMacosArm64 = Platform.make(term(PMID, "platform-macos-arm64
 
 /** The pinned download `pin-mise`. */
 export const pinMise = PinnedDownload.make(term(PMID, "pin-mise"), {
-  label: en("mise, the one program archon installs everything else with"),
+  label: en("mise, the tool manager that installs the other programs of a computer"),
   programName: "mise",
   pinKey: "MISE",
   version: "2026.10.3",
@@ -63,7 +63,7 @@ export const pinMise = PinnedDownload.make(term(PMID, "pin-mise"), {
 
 /** The pinned download `pin-python`. */
 export const pinPython = PinnedDownload.make(term(PMID, "pin-python"), {
-  label: en("the Python archon runs on"),
+  label: en("the Python a harness runs on"),
   programName: "python",
   pinKey: "PYTHON",
   version: "3.14.8",
@@ -71,7 +71,7 @@ export const pinPython = PinnedDownload.make(term(PMID, "pin-python"), {
 
 /** The pinned download `pin-uv`. */
 export const pinUv = PinnedDownload.make(term(PMID, "pin-uv"), {
-  label: en("uv, the launcher archon starts Python with"),
+  label: en("uv, the launcher a harness starts Python with"),
   programName: "uv",
   pinKey: "UV",
   version: "0.12.23",
@@ -84,7 +84,7 @@ export const pinRustupInit = PinnedDownload.make(term(PMID, "pin-rustup-init"), 
   pinKey: "RUSTUP_INIT",
   version: "1.29.2",
   note: en(
-    "From https://static.rust-lang.org/rustup/archive/VERSION/TARGET/rustup-init, checked against the .sha256 beside it (erga 009-machine-bootstrap FR-025, FR-026, FR-078).",
+    "Checked against the .sha256 the publisher keeps beside each rustup-init (erga 009-machine-bootstrap FR-025, FR-026, FR-078).",
   ),
 });
 
@@ -117,7 +117,7 @@ export const pinBun = PinnedDownload.make(term(PMID, "pin-bun"), {
   pinKey: "BUN",
   version: "1.4.4",
   note: en(
-    "From https://github.com/oven-sh/bun/releases/download/bun-vVERSION/bun-TARGET.zip (TARGET linux-x64, linux-aarch64, darwin-x64, darwin-aarch64, windows-x64), checksums from the release's SHASUMS256.txt. IFC TypeScript's CI takes its version from here (commons 0005-typescript-runtime FR-026).",
+    "Checksums from the release's SHASUMS256.txt. IFC TypeScript's CI takes its version and its address from here (commons 0005-typescript-runtime FR-026).",
   ),
 });
 
@@ -130,7 +130,7 @@ export const pinOtelcolContrib = PinnedDownload.make(term(PMID, "pin-otelcol-con
   pinKey: "OTELCOL_CONTRIB",
   version: "0.165.0",
   note: en(
-    "From https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/vVERSION/otelcol-contrib_VERSION_linux_amd64.tar.gz. Used only by the conformance job on Linux x64 (commons 0006-signals FR-020); the checksum was taken from the release asset when it was pinned.",
+    "Used only by the conformance job on Linux x64 (commons 0006-signals FR-020); the checksum was taken from the release asset when it was pinned.",
   ),
 });
 
@@ -146,106 +146,169 @@ export const checksums = [
     forPin: pinMise,
     forPlatform: platformLinuxX64,
     sha256: "ff0870ddad7f8c5ba673ceb3e7659f0353da8263eabe8b82220f5816a772c786",
+    unpinnedReason: en(
+      "The publisher's address for this platform is not stated anywhere in this repository (only its checksum is), and none is invented here: a person adds it from the publisher's release, with its format and folder.",
+    ),
   }),
   Checksum.make(term(PMID, "sum-mise-linux-arm64"), {
     forPin: pinMise,
     forPlatform: platformLinuxArm64,
     sha256: "a5141f834d883239c2542b9a2136e75428779b2040206537399714d8c534d91f",
+    unpinnedReason: en(
+      "The publisher's address for this platform is not stated anywhere in this repository (only its checksum is), and none is invented here: a person adds it from the publisher's release, with its format and folder.",
+    ),
   }),
   Checksum.make(term(PMID, "sum-mise-macos-arm64"), {
     forPin: pinMise,
     forPlatform: platformMacosArm64,
     sha256: "5372494c3027260ddf8efa79504c4d968bbe671a58248ec575f57e1472e5d9c2",
+    unpinnedReason: en(
+      "The publisher's address for this platform is not stated anywhere in this repository (only its checksum is), and none is invented here: a person adds it from the publisher's release, with its format and folder.",
+    ),
   }),
   Checksum.make(term(PMID, "sum-uv-linux-x64"), {
     forPin: pinUv,
     forPlatform: platformLinuxX64,
     sha256: "9167d72b3319674b6303c4cbe071854bba13ebdf3d76b1a7cbdc175471fb66d6",
+    unpinnedReason: en(
+      "The publisher's address for this platform is not stated anywhere in this repository (only its checksum is), and none is invented here: a person adds it from the publisher's release, with its format and folder.",
+    ),
   }),
   Checksum.make(term(PMID, "sum-uv-linux-arm64"), {
     forPin: pinUv,
     forPlatform: platformLinuxArm64,
     sha256: "6524bd338177ed50d035d39354e12545e993bbeba2ecbddf0480c5b3a81d313f",
+    unpinnedReason: en(
+      "The publisher's address for this platform is not stated anywhere in this repository (only its checksum is), and none is invented here: a person adds it from the publisher's release, with its format and folder.",
+    ),
   }),
   Checksum.make(term(PMID, "sum-uv-macos-arm64"), {
     forPin: pinUv,
     forPlatform: platformMacosArm64,
     sha256: "50487ae565ccd96e499056b4674d438f4c53170202617b4c759defe0c6a1b544",
+    unpinnedReason: en(
+      "The publisher's address for this platform is not stated anywhere in this repository (only its checksum is), and none is invented here: a person adds it from the publisher's release, with its format and folder.",
+    ),
   }),
   Checksum.make(term(PMID, "sum-rustup-init-linux-x64"), {
     forPin: pinRustupInit,
     forPlatform: platformLinuxX64,
     sha256: "5be191e8c70a5007074254cb74d78dbfdd25cd5a61c27de7b8e5410122ec24f4",
+    downloadUrl: "https://static.rust-lang.org/rustup/archive/{version}/x86_64-unknown-linux-gnu/rustup-init",
+    archiveFormat: "file",
+    binPath: "",
   }),
   Checksum.make(term(PMID, "sum-rustup-init-linux-arm64"), {
     forPin: pinRustupInit,
     forPlatform: platformLinuxArm64,
     sha256: "a9c168dbea81a84671c6b7a5c1795cb0eb699020110d107ddfca427bd797e697",
+    downloadUrl: "https://static.rust-lang.org/rustup/archive/{version}/aarch64-unknown-linux-gnu/rustup-init",
+    archiveFormat: "file",
+    binPath: "",
   }),
   Checksum.make(term(PMID, "sum-rustup-init-macos-arm64"), {
     forPin: pinRustupInit,
     forPlatform: platformMacosArm64,
     sha256: "f7c7e11eb2e07f006e532a8aaac77b32f4527d305ac386c0c633ca6133d35ca9",
+    downloadUrl: "https://static.rust-lang.org/rustup/archive/{version}/aarch64-apple-darwin/rustup-init",
+    archiveFormat: "file",
+    binPath: "",
   }),
   Checksum.make(term(PMID, "sum-gh-linux-x64"), {
     forPin: pinGh,
     forPlatform: platformLinuxX64,
     sha256: "bb766f710eef8ede859c18578c72c327597cd4c8a85b06001b1f3843c6019386",
+    unpinnedReason: en(
+      "The publisher's address for this platform is not stated anywhere in this repository (only its checksum is), and none is invented here: a person adds it from the publisher's release, with its format and folder.",
+    ),
   }),
   Checksum.make(term(PMID, "sum-gh-linux-arm64"), {
     forPin: pinGh,
     forPlatform: platformLinuxArm64,
     sha256: "7862c86c72f43df3a2d93ddde6f473285b4e2af61b494849846827e513ef6484",
+    unpinnedReason: en(
+      "The publisher's address for this platform is not stated anywhere in this repository (only its checksum is), and none is invented here: a person adds it from the publisher's release, with its format and folder.",
+    ),
   }),
   Checksum.make(term(PMID, "sum-gh-macos-arm64"), {
     forPin: pinGh,
     forPlatform: platformMacosArm64,
     sha256: "da922c20d1792e5b2cbf375593d7a658acf034c12c84e007e71c76ef959c337e",
+    unpinnedReason: en(
+      "The publisher's address for this platform is not stated anywhere in this repository (only its checksum is), and none is invented here: a person adds it from the publisher's release, with its format and folder.",
+    ),
   }),
   Checksum.make(term(PMID, "sum-jq-linux-x64"), {
     forPin: pinJq,
     forPlatform: platformLinuxX64,
     sha256: "b1c22172dd303f3be49e935aa56aa48a8b7a46e0bc838b4997d3bb451495870f",
+    unpinnedReason: en(
+      "The publisher's address for this platform is not stated anywhere in this repository (only its checksum is), and none is invented here: a person adds it from the publisher's release, with its format and folder.",
+    ),
   }),
   Checksum.make(term(PMID, "sum-jq-linux-arm64"), {
     forPin: pinJq,
     forPlatform: platformLinuxArm64,
     sha256: "8b85c817833814ddca00a144c33705546355afccf0cf39b188f3cdb48b852309",
+    unpinnedReason: en(
+      "The publisher's address for this platform is not stated anywhere in this repository (only its checksum is), and none is invented here: a person adds it from the publisher's release, with its format and folder.",
+    ),
   }),
   Checksum.make(term(PMID, "sum-jq-macos-arm64"), {
     forPin: pinJq,
     forPlatform: platformMacosArm64,
     sha256: "2d75340ba57a4b4b4c8708a21c2dc8e958a48aaa8bba13b27f77f6e4c0eca07e",
+    unpinnedReason: en(
+      "The publisher's address for this platform is not stated anywhere in this repository (only its checksum is), and none is invented here: a person adds it from the publisher's release, with its format and folder.",
+    ),
   }),
   Checksum.make(term(PMID, "sum-bun-linux-x64"), {
     forPin: pinBun,
     forPlatform: platformLinuxX64,
     sha256: "bf8ccbfb2b0b80159e0f9a6d15c55317add8077534dbc6130a3edb52fccb395c",
+    downloadUrl: "https://github.com/oven-sh/bun/releases/download/bun-v{version}/bun-linux-x64.zip",
+    archiveFormat: "zip",
+    binPath: "bun-linux-x64",
   }),
   Checksum.make(term(PMID, "sum-bun-linux-arm64"), {
     forPin: pinBun,
     forPlatform: platformLinuxArm64,
     sha256: "baa6bb36f51d6e58561e02bbea825038a9df454f673d6d776e8bbf86f8c7850e",
+    downloadUrl: "https://github.com/oven-sh/bun/releases/download/bun-v{version}/bun-linux-aarch64.zip",
+    archiveFormat: "zip",
+    binPath: "bun-linux-aarch64",
   }),
   Checksum.make(term(PMID, "sum-bun-macos-x64"), {
     forPin: pinBun,
     forPlatform: platformMacosX64,
     sha256: "50a3491f73abc2fe81673171a85762d3bc2cc1680ccecadd983de99adf77977e",
+    downloadUrl: "https://github.com/oven-sh/bun/releases/download/bun-v{version}/bun-darwin-x64.zip",
+    archiveFormat: "zip",
+    binPath: "bun-darwin-x64",
   }),
   Checksum.make(term(PMID, "sum-bun-macos-arm64"), {
     forPin: pinBun,
     forPlatform: platformMacosArm64,
     sha256: "c240d7f0ccb90c263a849fcdb09b7ee62630d921348ed6aafda86b9d577bc510",
+    downloadUrl: "https://github.com/oven-sh/bun/releases/download/bun-v{version}/bun-darwin-aarch64.zip",
+    archiveFormat: "zip",
+    binPath: "bun-darwin-aarch64",
   }),
   Checksum.make(term(PMID, "sum-bun-windows-x64"), {
     forPin: pinBun,
     forPlatform: platformWindowsX64,
     sha256: "cd2c0fccc78f3ede1f50ca827a15f063eda13d4d150a3d0674f4f6e323d864a5",
+    downloadUrl: "https://github.com/oven-sh/bun/releases/download/bun-v{version}/bun-windows-x64.zip",
+    archiveFormat: "zip",
+    binPath: "bun-windows-x64",
   }),
   Checksum.make(term(PMID, "sum-otelcol-contrib-linux-x64"), {
     forPin: pinOtelcolContrib,
     forPlatform: platformLinuxX64,
     sha256: "bd6e73d94bf3359ad6fac25529a8ee308adb9b0b8a0e8af034ed3891fbe5aa33",
+    downloadUrl: "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v{version}/otelcol-contrib_{version}_linux_amd64.tar.gz",
+    archiveFormat: "tar",
+    binPath: "",
   }),
 ] as const;
 

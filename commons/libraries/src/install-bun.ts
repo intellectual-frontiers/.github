@@ -1,6 +1,6 @@
 /**
- * Bun at the version commons pins (`BUN_VERSION` and its SHA-256 per platform in `commons/generated/pins.auto.env`, commons
- * 0005-typescript-runtime FR-026), fetched from Bun's release with retries, kept only where its SHA-256 is the pinned one, unpacked by the
+ * Bun at the version commons pins (its version, address, SHA-256, format and folder per platform in `commons/generated/pins.auto.env`, commons
+ * 0005-typescript-runtime FR-026, 0002-packaging FR-019), fetched from that address with retries, kept only where its SHA-256 is the pinned one, unpacked by the
  * kernel's own zip reader and put in a folder; nothing but IFC TypeScript itself, so it runs on Node 26 (or Bun) on Linux, macOS
  * and Windows with no shell, no Python and no unzip. CI's `.github/actions/bun` runs it.
  *
@@ -17,7 +17,7 @@ import { chmod, ensureDir, readFile, readTextFile, writeFile, writeTextFile } fr
 import { downloadVerified, Retries } from "@intellectual-frontiers/net/net";
 import { dirname, fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
 import { args, build, env, exit } from "@intellectual-frontiers/system/proc";
-import { bunTarget, readEnvFile } from "./pins.ts";
+import { describePinProblem, pinDownload, pinSuffix, readEnvFile } from "./pins.ts";
 
 /** Stop with a message and status 1. */
 function stop(message: string): never {
@@ -30,21 +30,24 @@ const given = args[0];
 if (given === undefined) stop("give the folder to put Bun in");
 const dest = resolve(given);
 const pins = readEnvFile(await readTextFile(join(ROOT, "commons", "generated", "pins.auto.env")));
-const platform = bunTarget(build.os, build.arch);
-if (platform === undefined) stop(`Bun has no build for ${build.os} on ${build.arch}`);
-const version = pins.get("BUN_VERSION");
-const sum = sha256Of(pins.get(`BUN_SHA256_${platform.key}`) ?? "");
-if (version === undefined || sum === undefined) stop(`commons pins no Bun for ${platform.key}`);
+const suffix = pinSuffix(build.os, build.arch);
+if (suffix === undefined) stop(`Bun has no build for ${build.os} on ${build.arch}`);
+const pin = pinDownload(pins, "BUN", suffix);
+if (pin.kind === "err") stop(describePinProblem(pin.error));
+const download = pin.value;
+if (download.format !== "zip") stop(`commons pins Bun as ${download.format}, and this installer unpacks a zip`);
+const sum = sha256Of(download.sha256);
+if (sum === undefined) stop(`commons pins no SHA-256 of Bun for ${suffix}`);
 const retries = new Retries({ tries: 5, base: 2, cap: 30 }, (line) => console.error(line));
-const url = `https://github.com/oven-sh/bun/releases/download/bun-v${version}/bun-${platform.target}.zip`;
-const zip = await downloadVerified(retries, url, sum, join(dest, "cache"));
+const zip = await downloadVerified(retries, download.url, sum, join(dest, "cache"));
 if (zip.kind === "err") stop(zip.error);
 const files = await unzip(await readFile(zip.value));
 if (files.kind === "err") stop(formatArchiveError(files.error));
 const exe = build.os === "windows" ? "bun.exe" : "bun";
-const bytes = files.value.get(`bun-${platform.target}/${exe}`);
-if (bytes === undefined) stop(`the zip holds no bun-${platform.target}/${exe}`);
-const bin = join(dest, `bun-${version}`);
+const inside = download.binPath === "" ? exe : `${download.binPath}/${exe}`;
+const bytes = files.value.get(inside);
+if (bytes === undefined) stop(`the zip holds no ${inside}`);
+const bin = join(dest, `bun-${download.version}`);
 await ensureDir(bin);
 await writeFile(join(bin, exe), bytes);
 await chmod(join(bin, exe), 0o755);
