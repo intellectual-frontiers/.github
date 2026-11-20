@@ -59,3 +59,7 @@ number	slug	state
 0058	sql-osquery	in force
 0059	sql-federate	in force
 0060	flow-ledger	in force
+0061	meaning-registers	in force
+0062	contracts-time-control	in force
+0063	operating-model	in force
+0064	recovery-proof-identity	in force

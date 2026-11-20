@@ -99,6 +99,16 @@ export interface AtMost {
 /** A member that may never be above another member of the same concept. */
 export const atMost = annotationKind<AtMost>("quality.atMost", ["concept"]);
 
+/** A concept whose records hold between two instants: the members that say from when and until when, so that "as of" can be asked of it. */
+export interface Temporal {
+  readonly validFrom: string;
+  /** The member that holds the end; where not named the records have no end and are replaced. */
+  readonly validTo?: string;
+}
+
+/** The records of a concept are effective-dated: each holds from an instant, and until one where it ends. */
+export const temporal = annotationKind<Temporal>("quality.temporal", ["concept"]);
+
 /** A code list is open (the business adds codes of its own) or closed (only the model changes it). */
 export type Openness = "open" | "closed";
 
@@ -117,7 +127,7 @@ const valid = (source: string): boolean => {
 /** The vocabulary: its kinds and its rules. */
 export const vocabulary: Vocabulary = {
   id: "quality",
-  kinds: [pattern, range, retention, deprecated, defaultValue, unique, differs, audited, openness, appendOnly, transitions, atMost],
+  kinds: [pattern, range, retention, deprecated, defaultValue, unique, differs, audited, openness, appendOnly, transitions, atMost, temporal],
   rules: [
     {
       id: "quality/pattern-invalid",
@@ -172,6 +182,7 @@ export const vocabulary: Vocabulary = {
           for (const a of annotationsOf(c, appendOnly))
             if (a.chain !== undefined)
               for (const m of [a.chain.hash, a.chain.previous, a.chain.sequence]) if (!has.has(m)) out.push(finding("quality/invariant-member-unknown", at, `the chain of ${c.name} names ${m}, which it does not have`, "error"));
+          for (const a of annotationsOf(c, temporal)) for (const m of [a.validFrom, ...(a.validTo === undefined ? [] : [a.validTo])]) if (!has.has(m)) out.push(finding("quality/invariant-member-unknown", at, `temporal of ${c.name} names ${m}, which it does not have`, "error"));
           for (const a of annotationsOf(c, atMost)) for (const m of [a.member, a.other]) if (!has.has(m)) out.push(finding("quality/invariant-member-unknown", at, `atMost of ${c.name} names ${m}, which it does not have`, "error"));
           for (const [key, attr] of Object.entries(c.attributes))
             for (const tr of annotationsOf(attr, transitions)) {
