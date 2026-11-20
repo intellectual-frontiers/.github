@@ -38,6 +38,8 @@ export type Controls = {
   readonly secondApprover: "never" | "tier-and-destructive";
   /** Whether an approval must name the hash of the plan. */
   readonly planHash: "optional" | "required";
+  /** How strictly the tools of a computer are pinned: any current version, a release line, or one exact version with the hash of its artifact. */
+  readonly toolIntegrity: "rolling" | "release-line" | "exact-hashed";
 };
 
 /** The name of a control. */
@@ -53,12 +55,13 @@ const ORDER: { readonly [K in ControlName]: readonly Controls[K][] } = {
   exposure: ["lan-only", "passkeys", "passkeys-mfa"],
   secondApprover: ["never", "tier-and-destructive"],
   planHash: ["optional", "required"],
+  toolIntegrity: ["rolling", "release-line", "exact-hashed"],
 };
 
 const VALUES: Readonly<Record<ControlName, readonly string[]>> = ORDER;
 
 /** The names of the controls. */
-export const CONTROL_NAMES: readonly ControlName[] = ["approval", "keyCustody", "tipAccept", "recovery", "audit", "exposure", "secondApprover", "planHash"];
+export const CONTROL_NAMES: readonly ControlName[] = ["approval", "keyCustody", "tipAccept", "recovery", "audit", "exposure", "secondApprover", "planHash", "toolIntegrity"];
 
 /** The rank of a value of a control (0 is the least strict), or -1 where it is not a value of it. */
 export function rankOf(control: ControlName, value: string): number {
@@ -76,6 +79,7 @@ export const PROFILES: Readonly<Record<ProfileName, Controls>> = {
     exposure: "lan-only",
     secondApprover: "never",
     planHash: "optional",
+    toolIntegrity: "rolling",
   },
   team: {
     approval: "signed-commit",
@@ -86,6 +90,7 @@ export const PROFILES: Readonly<Record<ProfileName, Controls>> = {
     exposure: "passkeys",
     secondApprover: "never",
     planHash: "optional",
+    toolIntegrity: "release-line",
   },
   regulated: {
     approval: "signed-commit-second-approver",
@@ -96,6 +101,7 @@ export const PROFILES: Readonly<Record<ProfileName, Controls>> = {
     exposure: "passkeys-mfa",
     secondApprover: "tier-and-destructive",
     planHash: "required",
+    toolIntegrity: "exact-hashed",
   },
 };
 

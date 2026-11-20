@@ -64,7 +64,7 @@ proves(["0002-archon-governance FR-001"], "names are made only by their function
 });
 
 proves(["0002-archon-governance FR-002"], "the catalogue has kinds for machines, zones and cloud accounts, each with its classes and whether it can destroy", () => {
-  for (const id of ["package", "user", "file", "service", "firewall-rule", "ssh-authorized-key", "dns-record", "cloud-resource"]) assert(kindOf(id) !== undefined, `${id} is in the catalogue`);
+  for (const id of ["package", "user", "file", "service", "firewall-rule", "ssh-authorized-key", "dns-record", "cloud-resource", "tool"]) assert(kindOf(id) !== undefined, `${id} is in the catalogue`);
   assertEquals(kindOf("package")?.subjects, ["machine", "workstation"]);
   assertEquals(kindOf("cloud-resource")?.subjects, ["cloud-account"]);
   assertEquals(kindOf("service")?.canDestroy, false);
@@ -109,6 +109,8 @@ proves(["0002-archon-governance FR-005"], "each profile gives every control, and
   assertEquals(PROFILES.solo.approval, "authenticated-push");
   assertEquals(PROFILES.regulated.keyCustody, "hardware-required");
   assertEquals(PROFILES.regulated.secondApprover, "tier-and-destructive");
+  assertEquals(PROFILE_NAMES.map((p) => PROFILES[p].toolIntegrity), ["rolling", "release-line", "exact-hashed"]);
+  assertEquals(kindOf("tool")?.subjects, ["machine", "workstation"]);
 });
 
 proves(["0002-archon-governance FR-006"], "an override has a reason and a date, names a control it has and a value it has, and is kept in the assurance", () => {

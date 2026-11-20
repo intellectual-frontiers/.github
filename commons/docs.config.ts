@@ -135,6 +135,7 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/integrations/spec-kit" },
     { layout: "commons", dir: "commons/integrations-github/spec-kit" },
     { layout: "commons", dir: "commons/archon/spec-kit" },
+    { layout: "commons", dir: "commons/toolchain/spec-kit" },
     { layout: "commons", dir: "commons/integrations-fhir/spec-kit" },
     { layout: "commons", dir: "commons/integrations-x12/spec-kit" },
     { layout: "commons", dir: "commons/kanon/spec-kit" },
