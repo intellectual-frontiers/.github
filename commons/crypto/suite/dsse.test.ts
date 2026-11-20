@@ -27,7 +27,7 @@ import {
   verifyStatement,
 } from "../src/dsse.ts";
 import { sha256 } from "../src/sha256.ts";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const DSSE = "0001-crypto FR-006";
 const LAWS = "0005-typescript-runtime FR-014";

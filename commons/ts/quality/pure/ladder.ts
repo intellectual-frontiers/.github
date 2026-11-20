@@ -24,7 +24,7 @@
 import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import type { Instant } from "../../kernel/grc.ts";
 import { instantFromEpochMs } from "../../kernel/grc.ts";
-import type { Risk } from "../../kernel/test-record.ts";
+import type { Risk } from "@intellectual-frontiers/test/record";
 import { type Declaration, isRegulated, phaseOf } from "../../mizan/changes/declaration.ts";
 import { type FreshnessState, type FreshnessVerdict, counts as stateCounts } from "./freshness.ts";
 import { applyEvent, type Attestation, type Ledger, type LedgerEvent, openNonconformance } from "./ledger.ts";

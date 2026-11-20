@@ -6,7 +6,7 @@
  * @module
  */
 import { ok } from "../../../kernel/mod.ts";
-import { assert, assertEquals, assertStringIncludes, assertThrows, proves } from "../../../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, assertThrows, proves } from "@intellectual-frontiers/test";
 import { partyDocs, partyModel, partyTables } from "../../arca/mod.ts";
 import {
   cli,

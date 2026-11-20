@@ -8,7 +8,7 @@
 import { chmod, exists, makeTempDir, mkdir, readFile, readTextFile, remove, writeTextFile } from "../src/platform/r-fs.ts";
 import { dirname, join, resolve, fromFileUrl } from "../src/platform/r-path.ts";
 import { build, run, which } from "../src/platform/r-proc.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { BUN_INSTALLER, BUN_VERSION, WINGET } from "../src/install/pins.ts";
 import { installerPs1, installerSh, withBom } from "../src/install/scripts.ts";
 import { ERGONEX_VERSION } from "../src/state-record.ts";

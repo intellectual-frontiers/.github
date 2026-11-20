@@ -7,7 +7,7 @@
  */
 import { lf } from "@intellectual-frontiers/core";
 import { fs, path } from "@intellectual-frontiers/system";
-import { assert, assertEquals, proves } from "../../ts/runtime/test.ts";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { PAGES } from "../tools/smoke.ts";
 import { ROOT } from "./helpers.ts";
 

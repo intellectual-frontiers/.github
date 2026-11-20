@@ -1,3 +1,4 @@
+// Spec: 0001-test FR-001
 /**
  * Tests that run unchanged under `bun test` and `node --test` (commons 0005-typescript-runtime FR-013): registration on
  * `node:test`, assertions on `node:assert/strict`, with short plain names (`assert`, `assertEquals`, `assertStringIncludes`, ...). `proves` names the
@@ -75,7 +76,7 @@ import {
   testStartLog,
   reviewLog,
   warningLog,
-} from "../kernel/test-record.ts";
+} from "./record.ts";
 import { installed } from "@intellectual-frontiers/telemetry/host/otel";
 import { build, runtimeName, runtimeVersion } from "@intellectual-frontiers/system/proc";
 

@@ -18,7 +18,7 @@ import {
   segmentsOf,
   WINDOWS_PATH_LIMIT,
 } from "../src/portable.ts";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const refusedAs = (text: string): string => {
   const r = segment(text);

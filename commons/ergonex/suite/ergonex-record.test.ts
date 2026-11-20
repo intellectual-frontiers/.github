@@ -7,7 +7,7 @@
  * @module
  */
 import { sha256 } from "@intellectual-frontiers/crypto";
-import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { unifiedDiff } from "../src/diff.ts";
 import { classifyFs, findingsOf, fsCheck, hookChecks, pathChecks, runtimeChecks, severityOf } from "../src/doctor.ts";
 import { repoPath } from "../src/portable.ts";

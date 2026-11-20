@@ -8,10 +8,10 @@
  */
 import { type FreshnessStatus } from "../kernel/assess.ts";
 import { validate } from "@intellectual-frontiers/rdf";
-import { OUTCOMES } from "../kernel/test-record.ts";
+import { OUTCOMES } from "@intellectual-frontiers/test/record";
 import { readTextFileSync } from "@intellectual-frontiers/system/fs";
 import { dirname, fromFileUrl, resolve } from "@intellectual-frontiers/system/path";
-import { assert, assertEquals, proves, test } from "../runtime/test.ts";
+import { assert, assertEquals, proves, test } from "@intellectual-frontiers/test";
 import { bases } from "../../ontology/mizan/mod.ts";
 import {
   audiences,

@@ -11,7 +11,7 @@ import { GENESIS } from "../kernel/evidence.ts";
 import { decodeMetrics } from "@intellectual-frontiers/telemetry/otlp";
 import { readTextFileSync } from "@intellectual-frontiers/system/fs";
 import { dirname, fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { DEFAULT_CADENCES, freshnessOf } from "../quality/pure/freshness.ts";
 import {
   type Evidence,

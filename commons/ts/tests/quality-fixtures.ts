@@ -18,11 +18,11 @@ import {
   testCaseLog,
   testCaseSpan,
   testId,
-} from "../kernel/test-record.ts";
+} from "@intellectual-frontiers/test/record";
 import { readTextFile, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { join } from "@intellectual-frontiers/system/path";
 import { run, which } from "@intellectual-frontiers/system/proc";
-import { assert } from "../runtime/test.ts";
+import { assert } from "@intellectual-frontiers/test";
 
 /** Where git is, or the reason a test of it is skipped. */
 export const needsGit = which("git") === undefined ? { skip: "git is not installed" } : {};

@@ -32,7 +32,7 @@ import {
 } from "../../kernel/evidence.ts";
 import { type Instant, instantOf } from "../../kernel/grc.ts";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
-import { assert, assertEquals, proves } from "../../runtime/test.ts";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const FR = (n: string): `0007-grc FR-${string}` => `0007-grc FR-${n}`;
 const enc = new TextEncoder();

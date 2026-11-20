@@ -79,6 +79,7 @@
     "@intellectual-frontiers/crypto": "link:../crypto",
     "@intellectual-frontiers/formats": "link:../formats",
     "@intellectual-frontiers/system": "link:../system",
+    "@intellectual-frontiers/test": "link:../test",
     "@types/node": "26.6.6",
     "@types/pg": "8.23.1",
     "fast-check": "4.10.2",

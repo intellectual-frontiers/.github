@@ -4,7 +4,7 @@
  * @module
  */
 import { type NetworkInterfaceInfo, networkInterfaces } from "../src/proc.ts";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 proves(
   ["0001-system FR-009"],

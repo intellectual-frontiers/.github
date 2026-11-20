@@ -8,7 +8,7 @@
 import { makeTempDirSync, mkdirSync, readTextFileSync, removeSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { dirname, fromFileUrl, resolve } from "@intellectual-frontiers/system/path";
 import { execPath, run } from "@intellectual-frontiers/system/proc";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { readSpecTexts } from "../mizan/check.ts";
 import {
   authorityCitation,

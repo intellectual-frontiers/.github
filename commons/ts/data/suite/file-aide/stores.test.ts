@@ -5,7 +5,7 @@
  * @module
  */
 import { fs, path as host } from "../../../runtime/mod.ts";
-import { assert, assertEquals, proves } from "../../../runtime/test.ts";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { type Capability, type ConditionFor, memoryStore, type MemoryCapability, type Store, widen } from "../../file-aide/mod.ts";
 import { type PosixCapability, posixStore, TEMPORARY } from "../../file-aide/runtime/mod.ts";
 import { type Equal, expectType } from "../../../kernel/mod.ts";

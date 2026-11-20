@@ -48,7 +48,7 @@ import {
   type Verification,
   verifyEvidence,
 } from "../kernel/test-report.ts";
-import { closeOrphans, decodeLines, formatRecordError, installationFromEnv, type RunnerOutcome } from "../kernel/test-record.ts";
+import { closeOrphans, decodeLines, formatRecordError, installationFromEnv, type RunnerOutcome } from "@intellectual-frontiers/test/record";
 import {
   exists,
   makeTempDir,

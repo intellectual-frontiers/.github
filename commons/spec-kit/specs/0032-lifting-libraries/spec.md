@@ -24,8 +24,8 @@
   | 1 | net | runtime/net, runtime/tcp, runtime/dns, runtime/http-client, runtime/serve, runtime/acme |
   | 2 | telemetry | kernel/otel, kernel/otlp, kernel/signals, kernel/render, runtime/otel, runtime/console, runtime/trace |
   | 2 | grc | kernel/grc, kernel/assess, kernel/evidence, kernel/oscal, kernel/ocsf, kernel/ocsf-types.auto, kernel/attest, runtime/grc, runtime/sign |
-  | 2 | test | runtime/test, runtime/test-run |
-  | 3 | quality | quality/, kernel/test-record, kernel/test-report |
+  | 3 | test | runtime/test, kernel/test-record |
+  | 4 | quality | quality/, kernel/test-report, runtime/test-run |
   | 3 | mizan | mizan/integrations, mizan/rules, mizan/levels, mizan/check, mizan/harness, mizan/standards, mizan/spec-files, mizan/spec-terms, mizan/newer, mizan/imports, mizan/mod, mizan/generate-ontology, mizan/publish-ontology, mizan/oscal-register, kernel/trace, kernel/layers |
   | 3 | ifccm | mizan/changes, mizan/changes.ts |
   | 3 | ifr | mizan/versions, mizan/versions.ts |
@@ -80,8 +80,9 @@
   | FR-045 (in-toto and DSSE) | crypto |
   | FR-057 (MD5) | crypto |
   | FR-068 (AWS Signature Version 4) | crypto |
+  | FR-013 (test registration), FR-060 (only, steps), FR-065 (the); 0008-test-evidence FR-001 to FR-003 (the record of a test) | test |
 
-Inversions that make the layers true: `runtime/proc` used the telemetry (`traceProcess`) and `runtime/dns` held `networkInterfaces`, which `proc` re-exported: the first would have made `system` depend on `telemetry` and the second on `net`, both above it. The map is made true by inversion: `proc.setProcessTracer` is the port the telemetry installs when its module is loaded (a program is run with nothing added where none is installed), and `networkInterfaces` and its type live in `proc`, where `dns` no longer has them. The telemetry's own `traceProcess` stays in `runtime/otel`.
+Inversions that make the layers true: `runtime/proc` used the telemetry (`traceProcess`) and `runtime/dns` held `networkInterfaces`, which `proc` re-exported: the first would have made `system` depend on `telemetry` and the second on `net`, both above it. The map is made true by inversion: `proc.setProcessTracer` is the port the telemetry installs when its module is loaded (a program is run with nothing added where none is installed), and `networkInterfaces` and its type live in `proc`, where `dns` no longer has them. The telemetry's own `traceProcess` stays in `runtime/otel`. `test` is above `telemetry` (its registration installs a record on the telemetry's pipeline) and below `quality`: the record of a test (`kernel/test-record`) is the test's, and the run of a suite and the renderings of a record (`runtime/test-run`, `kernel/test-report`) depend on the evidence, OSCAL and signing, so they go with `quality`, which depends on `test`, not the reverse; the one thing the record took of `grc` (`roleOf`, a pattern) is held in the record, and a test of the whole keeps the two the same.
 
 - **FR-011**: The consumers of the packages, `erga` and `stolos`, MUST import a library by its package name once it is published and MUST NOT import `commons/ts/*` for what a library holds.
 - **FR-012**: A move of modules MUST rewrite, in the same commit, every importer of them in this repository (relative paths and the barrel `@intellectual-frontiers/commons/ts/kernel` alike) to the package name of their library, MUST add the dependency to each package that imports it, and MUST leave no re-export of the moved modules behind.

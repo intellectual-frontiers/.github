@@ -12,7 +12,7 @@ import type { Json } from "../src/json5.ts";
 import { contentType, extensionOf, isTextual, mediaType } from "../src/media-types.ts";
 import { formatTomlError, isTomlDateTime, isTomlTable, parseToml, type TomlTable, type TomlValue, toToml } from "../src/toml.ts";
 import { formatYamlError, isPlainSafe, parseYaml, resolveCore, toYaml } from "../src/yaml.ts";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const TOML = "0001-formats FR-003";
 const CSV = "0001-formats FR-005";

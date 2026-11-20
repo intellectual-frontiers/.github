@@ -11,7 +11,7 @@ import { acquireLock } from "../src/platform/r-lock.ts";
 import { join } from "../src/platform/r-path.ts";
 import { build, execPath, run, which } from "../src/platform/r-proc.ts";
 import { sha256 } from "@intellectual-frontiers/crypto";
-import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { hostTarget } from "../src/commands/tools.ts";
 import { evidenceFiles, Ergonex, needsWorld, ONE_REPOSITORY, withWorld, type World } from "./ergonex-fixtures.ts";
 import { artifactServer, tarball } from "./ergonex-tools-fixtures.ts";

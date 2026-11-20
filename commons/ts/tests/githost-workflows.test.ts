@@ -10,7 +10,7 @@ import { renderAction, renderWorkflow, scalar } from "../githost/workflows/rende
 import { readLibraries } from "../mizan/libraries.ts";
 import { existsSync, mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { main, outputs, synchronize } from "../tools/generate-workflows.ts";
 
 const SPEC = "0030-generated-workflows";

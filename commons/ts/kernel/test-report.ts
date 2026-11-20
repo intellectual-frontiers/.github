@@ -78,7 +78,7 @@ import {
   TEST_SCOPE,
   TEST_SPAN,
   warningLog,
-} from "./test-record.ts";
+} from "@intellectual-frontiers/test/record";
 import { toYaml } from "@intellectual-frontiers/formats/yaml";
 
 // ---------------------------------------------------------------------------------------------------------------------------- the model

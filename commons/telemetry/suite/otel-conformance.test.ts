@@ -17,7 +17,7 @@ import { readTextFile, withTempDir, writeTextFile } from "@intellectual-frontier
 import { otlpExporter, systemClock, systemRandom } from "../src/host/otel.ts";
 import { join } from "@intellectual-frontiers/system/path";
 import * as proc from "@intellectual-frontiers/system/proc";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const FR = "0001-telemetry FR-020";
 const COLLECTOR = proc.env.get("IFC_OTELCOL");

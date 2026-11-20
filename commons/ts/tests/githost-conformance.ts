@@ -6,7 +6,7 @@
  */
 import { CAPABILITIES } from "../githost/capabilities.ts";
 import type { Capability, GitHostClient, HostResult, RepoRef } from "../githost/types.ts";
-import { assert, assertEquals } from "../runtime/test.ts";
+import { assert, assertEquals } from "@intellectual-frontiers/test";
 
 /** What a conformance run needs to know of the host behind a client. */
 export type ConformanceFixture = {

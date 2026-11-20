@@ -7,7 +7,7 @@
 import fc from "fast-check";
 import { plain } from "@intellectual-frontiers/core";
 import { cutToWidth, displayWidth, graphemes, graphemeWidth, RESET, sgrParams, splitAtWidth, tokens } from "../src/width.ts";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const E = "\u001b";
 

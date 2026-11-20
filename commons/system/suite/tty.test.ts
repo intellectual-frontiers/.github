@@ -5,7 +5,7 @@
  */
 import { errors } from "../src/errors.ts";
 import { consoleSize, currentLook, isTerminal, lookOf, setRaw } from "../src/tty.ts";
-import { assert, assertEquals, assertThrows, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertThrows, proves } from "@intellectual-frontiers/test";
 
 proves(["0001-system FR-018"], "colour, emoji and width follow the environment and the terminal", () => {
   const look = (env: Record<string, string>, terminal = true, os: "linux" | "darwin" | "windows" = "linux", columns?: number) =>

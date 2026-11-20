@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/commons",
   "private": true,
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "IFC Docs, for the development of commons/docs: the generator of a repository's documentation site, made from its TypeScript and its spec kit alone (commons 0011-documentation). A repository depends on the repository's root package by Git and imports it as @intellectual-frontiers/commons/docs.",
   "type": "module",
   "exports": {
@@ -25,6 +25,7 @@
   "devDependencies": {
     "@intellectual-frontiers/core": "link:../core",
     "@intellectual-frontiers/system": "link:../system",
+    "@intellectual-frontiers/test": "link:../test",
     "@types/node": "26.6.6"
   },
   "repository": {

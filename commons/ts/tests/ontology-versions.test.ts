@@ -7,7 +7,7 @@
 import { readTextFileSync } from "@intellectual-frontiers/system/fs";
 import { dirname, fromFileUrl, resolve } from "@intellectual-frontiers/system/path";
 import * as proc from "@intellectual-frontiers/system/proc";
-import { assert, assertEquals, proves } from "../runtime/test.ts";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { ifccmOntology } from "../../ontology/ifccm/mod.ts";
 import { ifqsOntology } from "../../ontology/ifqs/mod.ts";
 import { ifrOntology, versionSchemes } from "../../ontology/ifr/mod.ts";

@@ -36,7 +36,7 @@ import {
   type TelemetryOptions,
   type Timer,
 } from "../src/signals.ts";
-import { assert, assertEquals, assertRejects, assertThrows, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertRejects, assertThrows, proves } from "@intellectual-frontiers/test";
 
 const REGISTRY = "0001-telemetry FR-009";
 const SPANS = "0001-telemetry FR-010";

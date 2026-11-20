@@ -11,7 +11,7 @@ import type { RepoRef } from "@intellectual-frontiers/commons/ts/githost";
 import { mkdir, withTempDir, writeTextFile } from "../src/platform/r-fs.ts";
 import { join } from "../src/platform/r-path.ts";
 import { run, which } from "../src/platform/r-proc.ts";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { observe, observeFacts } from "../src/host/observe.ts";
 import { plan } from "../src/plan.ts";
 import { repoPath } from "../src/portable.ts";

@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { assert, assertEquals as strictEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals as strictEquals, proves } from "@intellectual-frontiers/test";
 
 /** Deep equality of values whose types differ only by a brand: the expected side is written as plain text. */
 const assertEquals: (actual: unknown, expected: unknown, message?: string) => void = strictEquals;

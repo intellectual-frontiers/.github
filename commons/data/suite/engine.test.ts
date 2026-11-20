@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { type ContributionPoint, point } from "@intellectual-frontiers/data/engine";
 
 proves(["0002-engine FR-002"], "a point carries its name and is frozen, and a name with no namespace does not compile", () => {

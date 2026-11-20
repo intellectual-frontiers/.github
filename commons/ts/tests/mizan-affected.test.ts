@@ -9,7 +9,7 @@ import { readLibraries } from "../mizan/libraries.ts";
 import { mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
 import { proc } from "@intellectual-frontiers/system";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { main as generate } from "../tools/generate-workflows.ts";
 
 const SPEC = "0027-commons-libraries";

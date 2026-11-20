@@ -27,7 +27,7 @@ import {
   utf8String,
 } from "../src/der.ts";
 import { fromHex, toHex } from "../src/hex.ts";
-import { assert, assertEquals, assertThrows, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertThrows, proves } from "@intellectual-frontiers/test";
 
 const DER = "0001-formats FR-009";
 const B64 = "0001-formats FR-008";

@@ -24,7 +24,7 @@ import {
   value,
 } from "../src/args.ts";
 import { literal, err, ok, type Result, type Equal, expectType } from "@intellectual-frontiers/core";
-import { assertEquals, fail, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assertEquals, fail, proves } from "@intellectual-frontiers/test";
 
 const FR = "0001-terminal FR-001";
 

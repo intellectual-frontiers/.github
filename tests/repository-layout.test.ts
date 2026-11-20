@@ -6,7 +6,7 @@
  * @module
  */
 import { fs, path, proc } from "../commons/system/src/mod.ts";
-import { assert, proves } from "../commons/ts/runtime/test.ts";
+import { assert, proves } from "../commons/test/src/test.ts";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
 const R = ["erga 009-machine-bootstrap FR-088"] as const;

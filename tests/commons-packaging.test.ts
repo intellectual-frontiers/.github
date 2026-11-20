@@ -21,7 +21,7 @@ import {
   assertStringIncludes,
   proves,
   test,
-} from "../commons/ts/runtime/test.ts";
+} from "../commons/test/src/test.ts";
 import * as mod from "../commons/generated/packaging.auto.ts";
 import { rules as portabilityRules, scan } from "../commons/tools/shell-portability-check.ts";
 import { words } from "../commons/tools/shlex.ts";
@@ -383,7 +383,7 @@ type Ran = { readonly code: number; readonly stdout: string; readonly stderr: st
 /** What of commons the generator and the type checker need: the ontology, the tools, the generated files and the kernel the ontology is typed by. */
 const COPIED = ["about.ts", "generated", "ontology", "tools", "ts/kernel"];
 /** The libraries lifted out of the kernel, which it and the ontology import (a copy of each, linked by package name). */
-const LIFTED = ["core", "crypto", "formats", "rdf", "telemetry", "terminal"];
+const LIFTED = ["core", "crypto", "formats", "rdf", "telemetry", "terminal", "test"];
 
 class Copy {
   readonly root: string;

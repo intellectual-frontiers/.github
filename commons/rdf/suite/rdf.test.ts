@@ -57,7 +57,7 @@ import {
   xsd,
 } from "../src/mod.ts";
 import { type Equal, expectType, type Extends, type Not } from "@intellectual-frontiers/core";
-import { assert, assertEquals, assertThrows, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertThrows, proves } from "@intellectual-frontiers/test";
 
 const EX = namespace("ex", "https://example.org/terms#");
 const ID = namespace("id", "https://example.org/id/");

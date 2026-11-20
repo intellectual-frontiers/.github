@@ -6,7 +6,7 @@
  * @module
  */
 import { blank, en, lang, named, namespace, parseIri, plain, RDF_TYPE, typed, type Triple } from "@intellectual-frontiers/rdf";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import {
   type DcatCatalogInput,
   type DcatDatasetInput,

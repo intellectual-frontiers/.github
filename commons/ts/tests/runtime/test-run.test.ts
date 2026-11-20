@@ -13,11 +13,11 @@ import { readTextFile, readFile, remove, symlink, writeFile, writeTextFile, make
 import { dirname, fromFileUrl, join, resolve, toFileUrl } from "@intellectual-frontiers/system/path";
 import { build, execPath, run, runtimeName } from "@intellectual-frontiers/system/proc";
 import { readLedger, REPORT_FORMATS, type Runtime, runTests, signRun, verifyRun, writeReports } from "../../runtime/test-run.ts";
-import { assert, assertEquals, assertExists, assertStringIncludes, proves } from "../../runtime/test.ts";
+import { assert, assertEquals, assertExists, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
 const FR = (n: string): `0008-test-evidence FR-${string}` => `0008-test-evidence FR-${n}`;
 const ROOT = resolve(dirname(fromFileUrl(import.meta.url)), "../..");
-const TEST_TS = toFileUrl(join(ROOT, "runtime", "test.ts")).href;
+const TEST_TS = toFileUrl(join(ROOT, "..", "test", "src", "test.ts")).href;
 const RUNTIME: Runtime = runtimeName();
 const POSIX = build.os !== "windows";
 

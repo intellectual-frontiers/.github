@@ -21,7 +21,7 @@ import {
 import { ruleRunsAt } from "../mizan/levels.ts";
 import { mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { join } from "@intellectual-frontiers/system/path";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
 const SPEC = "0029-subject-profiles";
 const kind = (key: string) => Object.values(subjectKinds).find((k) => k.values.label.value === key);

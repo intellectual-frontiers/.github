@@ -10,14 +10,7 @@ import * as fs from "../src/fs.ts";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve, toFileUrl } from "../src/path.ts";
 import { build } from "../src/proc.ts";
-import {
-  assert,
-  assertEquals,
-  assertInstanceOf,
-  assertRejects,
-  assertThrows,
-  proves,
-} from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertInstanceOf, assertRejects, assertThrows, proves } from "@intellectual-frontiers/test";
 
 const FR = "0001-system FR-002";
 const ERR = "0001-system FR-001";

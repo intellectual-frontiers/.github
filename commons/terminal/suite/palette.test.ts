@@ -9,7 +9,7 @@ import { type Capabilities, label, MARK_KINDS, MARKS, type MarkKind, mark, paint
 import { plain, type Equal, expectType } from "@intellectual-frontiers/core";
 import { createScreen, describeStyle } from "../src/vt.ts";
 import { displayWidth } from "../src/width.ts";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 proves(["0001-terminal FR-003"], "every mark is one emoji of two columns, with its ASCII fallback where there are no emoji", () => {
   const expected: Readonly<Record<MarkKind, readonly [string, string]>> = {

@@ -5,7 +5,7 @@
  * @module
  */
 import { fs, path } from "../../../runtime/mod.ts";
-import { assert, assertEquals, proves } from "../../../runtime/test.ts";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const DATA = path.fromFileUrl(new URL("../..", import.meta.url));
 

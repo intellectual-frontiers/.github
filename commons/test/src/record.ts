@@ -1,3 +1,4 @@
+// Spec: 0001-test FR-004
 /**
  * The capture half of test evidence (commons 0008-test-evidence FR-001 to FR-004), kept apart from the reports so that every test process
  * loads only this: the model of a test case and of an installation, a test case as its `test` span and log record with the `test.*`
@@ -10,7 +11,7 @@
  *
  * @example
  * ```ts
- * import { installationFromEnv, installationResource, recordLine, testCaseSpan } from "./test-record.ts";
+ * import { installationFromEnv, installationResource, recordLine, testCaseSpan } from "./record.ts";
  * const { installation } = installationFromEnv({ runtime: "node", runtimeVersion: "26.0.0", os: "linux", arch: "x86_64" }, { CI: "true" });
  * // recordLine(installationResource(installation), { spans: [testCaseSpan(test, context)] }) is one line of IFC_TEST_RECORD
  * ```
@@ -18,7 +19,6 @@
  * @module
  */
 import { absurd, type DecodeError, formatDecodeError, err, ok, type Result } from "@intellectual-frontiers/core";
-import { roleOf } from "./grc.ts";
 import {
   type AttributeValue,
   type Attributes,
@@ -33,6 +33,10 @@ import {
 } from "@intellectual-frontiers/telemetry/otel";
 import { decodeLogs, decodeTraces, encodeLogs, encodeTraces, type LogBatch, type TraceBatch } from "@intellectual-frontiers/telemetry/otlp";
 import { type Sha256, sha256 } from "@intellectual-frontiers/crypto/sha256";
+
+/** A role (lower-case words joined by `-`, `_`, `.` or `/`), never a person: the rule of `grc`'s `roleOf`, held here so that the record depends on nothing above it (a test of the whole keeps the two the same). */
+const ROLE = /^[a-z][a-z0-9]*(?:[-_./][a-z0-9]+)*$/;
+const roleOf = (text: string): string | undefined => (ROLE.test(text) ? text : undefined);
 
 // ---------------------------------------------------------------------------------------------------------------------------- the model
 

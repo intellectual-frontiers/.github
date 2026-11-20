@@ -7,7 +7,7 @@
  */
 import { PGlite } from "@electric-sql/pglite";
 import { pgtap } from "@electric-sql/pglite-pgtap";
-import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, proves } from "@intellectual-frontiers/test";
 import { type Assertion, describeAssertion, failed, fails, fromLines, pass, pgTapScript, rows, runAssertions, skipped, structuralTests, tally, tapQuery, tapText } from "@intellectual-frontiers/data/sql/extensions/assertions";
 import { snapshotOf } from "@intellectual-frontiers/data/sql/lifecycle";
 import { bind, type Dialect } from "@intellectual-frontiers/data/sql/physical";

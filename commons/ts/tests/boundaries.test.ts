@@ -11,7 +11,7 @@ import { VENDOR_GLOBALS } from "../lint/rules/no-vendor-api.ts";
 import { decodeManifest, type Manifest, PACKAGE_NAME, rootEntries } from "../tools/manifest.ts";
 import { existsSync, readDirSync, readTextFile, readTextFileSync, statSync } from "@intellectual-frontiers/system/fs";
 import { dirname, fromFileUrl, join, relative, resolve, toPosix } from "@intellectual-frontiers/system/path";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
 const ROOT = resolve(dirname(fromFileUrl(import.meta.url)), "..");
 
@@ -74,6 +74,7 @@ const LIFTED = new Set([
   "@intellectual-frontiers/system",
   "@intellectual-frontiers/telemetry",
   "@intellectual-frontiers/terminal",
+  "@intellectual-frontiers/test",
 ]);
 /** Whether a specifier is a lifted library or one of its entries (`@intellectual-frontiers/terminal/args`). */
 const isLifted = (s: string): boolean => [...LIFTED].some((p) => s === p || s.startsWith(`${p}/`));
@@ -148,7 +149,7 @@ proves(["0005-typescript-runtime FR-002"], "the kernel imports nothing outside k
 });
 
 proves(["0005-typescript-runtime FR-003"], "the runtime imports only node: builtins, kernel/ and runtime/", () => {
-  assert(RUNTIME.length > 5);
+  assert(RUNTIME.length > 3);
   const bad: string[] = [];
   for (const f of RUNTIME) {
     for (const s of specifiers(readTextFileSync(join(ROOT, f)))) {
@@ -274,6 +275,7 @@ proves(
       "@intellectual-frontiers/system": "link:../system",
       "@intellectual-frontiers/telemetry": "link:../telemetry",
       "@intellectual-frontiers/terminal": "link:../terminal",
+      "@intellectual-frontiers/test": "link:../test",
     });
     const lock = text("bun.lock");
     for (const [name, v] of pins) {
@@ -331,7 +333,6 @@ proves(
     assertEquals(m.exports, {
       "./ts/kernel": "./kernel/mod.ts",
       "./ts/runtime": "./runtime/mod.ts",
-      "./ts/runtime/test": "./runtime/test.ts",
       "./ts/runtime/test-run": "./runtime/test-run.ts",
       "./ts/lint": "./lint/plugin.ts",
       "./ts/lint/rule": "./lint/rule.ts",
@@ -374,6 +375,7 @@ proves(
       "@intellectual-frontiers/system": "0.1.0",
       "@intellectual-frontiers/telemetry": "0.1.0",
       "@intellectual-frontiers/terminal": "0.1.0",
+      "@intellectual-frontiers/test": "0.1.0",
     });
     assertEquals(root.devDependencies, {});
     const lock = readTextFileSync(join(ROOT, "..", "..", "bun.lock"));
@@ -396,7 +398,6 @@ proves(
     for (const f of [
       "kernel/mod.ts",
       "runtime/mod.ts",
-      "runtime/test.ts",
       "package.json",
       "bun.lock",
       "bunfig.toml",

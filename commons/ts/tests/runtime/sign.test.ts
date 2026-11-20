@@ -23,7 +23,7 @@ import {
   webCryptoSigner,
   webCryptoVerifier,
 } from "../../runtime/sign.ts";
-import { assert, assertEquals, assertRejects, proves } from "../../runtime/test.ts";
+import { assert, assertEquals, assertRejects, proves } from "@intellectual-frontiers/test";
 
 const FR = "0007-grc FR-020";
 const enc = new TextEncoder();

@@ -24,7 +24,7 @@ import {
   withSigV4,
 } from "../src/http-client.ts";
 import { serve, type ServeHandler } from "../src/serve.ts";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const CLIENT = "0001-net FR-003";
 

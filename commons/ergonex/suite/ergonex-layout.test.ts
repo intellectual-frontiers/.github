@@ -20,7 +20,7 @@ import {
   worktreeWanted,
 } from "../src/layout.ts";
 import { branchName, gitHost, sha, version } from "../src/types.ts";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const ref = (url: string, kinds: Readonly<Record<string, "Gitlab" | "Github">> = {}): RepoRef => {
   const r = parseRemote(url, kinds);

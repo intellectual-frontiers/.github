@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, proves } from "@intellectual-frontiers/test";
 import { composeModules, type Issue, issue, issueSet, type IssueSet, type IssueSpec } from "@intellectual-frontiers/data/governance";
 import { issuesModule } from "@intellectual-frontiers/data/models/issues";
 import { syncIssues } from "@intellectual-frontiers/data/sql/extensions/issues";

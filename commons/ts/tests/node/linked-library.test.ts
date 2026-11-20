@@ -11,7 +11,7 @@ import { layerFindings, type Ladder } from "../../kernel/layers.ts";
 import { lstat, makeTempDir, mkdir, realPath, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { dirname, fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
 import { run, runtimeName, which } from "@intellectual-frontiers/system/proc";
-import { assert, assertEquals, assertStringIncludes, proves } from "../../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
 const ROOT = resolve(dirname(fromFileUrl(import.meta.url)), "../..");
 const SKIP = process.platform === "win32" ? "symbolic links are not run on Windows" : false;

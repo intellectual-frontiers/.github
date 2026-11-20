@@ -68,7 +68,7 @@ import {
   testCaseLog,
   testCaseSpan,
   testId,
-} from "../../kernel/test-record.ts";
+} from "@intellectual-frontiers/test/record";
 import { ATTR, CASE_EVENT, type Grade, isGrade, isQualityOutcome, NO_GRADE, type QualityOutcome, RUN_GRADE } from "./names.ts";
 
 // ---------------------------------------------------------------------------------------------------------------------------- the model

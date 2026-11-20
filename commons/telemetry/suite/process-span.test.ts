@@ -10,7 +10,7 @@ import { withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { join } from "@intellectual-frontiers/system/path";
 import * as proc from "@intellectual-frontiers/system/proc";
 import { startTelemetry } from "../src/host/otel.ts";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const SPAWN = "0005-typescript-runtime FR-052";
 const decoder = new TextDecoder();

@@ -10,7 +10,7 @@ import { exists, readTextFile, stat, withTempDir } from "../src/fs.ts";
 import { join } from "../src/path.ts";
 import { build } from "../src/proc.ts";
 import { formatJobError, installJob, type JobOptions, type Outcome, removeJob, type StepRunner } from "../src/schedule.ts";
-import { assert, assertEquals, fail, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, fail, proves } from "@intellectual-frontiers/test";
 
 const FR = "0001-system FR-017";
 const posix = build.os !== "windows";

@@ -1,10 +1,10 @@
 // Spec: 0002-workspace-model FR-005
 /**
- * The kernel's `test-record`, by the package name of commons (commons 0027-commons-libraries FR-004): what this library uses of it, each name as the runtime's namespace gives it.
+ * The record of a test of the library `test` (`@intellectual-frontiers/test/record`): what this library uses of it, each name as the runtime's namespace gives it.
  *
  * @module
  */
-import { testRecord } from "@intellectual-frontiers/commons/ts/kernel";
+import * as testRecord from "@intellectual-frontiers/test/record";
 /** `testRecord.TEST_SCOPE`. */
 export const TEST_SCOPE = testRecord.TEST_SCOPE;
 /** `testRecord.installationFromEnv`. */

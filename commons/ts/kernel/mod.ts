@@ -44,7 +44,6 @@ export * as grc from "./grc.ts";
 export * as ocsf from "./ocsf.ts";
 export * as oscal from "./oscal.ts";
 export * as layers from "./layers.ts";
-export * as testRecord from "./test-record.ts";
 export * as testReport from "./test-report.ts";
 export * as trace from "./trace.ts";
 export type {

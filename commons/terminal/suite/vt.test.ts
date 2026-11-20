@@ -7,7 +7,7 @@
 import fc from "fast-check";
 import { createScreen, describeStyle, type Screen } from "../src/vt.ts";
 import { cutToWidth, graphemes, graphemeWidth } from "../src/width.ts";
-import { assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assertEquals, proves } from "@intellectual-frontiers/test";
 
 const E = "\u001b";
 const BEL = String.fromCharCode(7);

@@ -8,7 +8,7 @@
  */
 import { cpSync } from "node:fs";
 import { fs, path, proc } from "../commons/system/src/mod.ts";
-import { assert, assertEquals, assertStringIncludes, assertThrows, proves } from "../commons/ts/runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, assertThrows, proves } from "../commons/test/src/test.ts";
 import { classes, rungs, terms, authorities, cfr820, bases } from "../commons/ontology/mizan/mod.ts";
 import { files } from "../commons/ontology/mizan/mod.ts";
 import { digestOf, ExportRefused, findingsOf, main, textOf, TURTLE_PATH, turtleOf, wanted } from "../commons/ts/mizan/generate-ontology.ts";

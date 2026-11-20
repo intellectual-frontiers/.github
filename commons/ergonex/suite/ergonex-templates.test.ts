@@ -9,7 +9,7 @@
 import { mkdir, readDirSync, readTextFileSync, withTempDir, writeTextFile } from "../src/platform/r-fs.ts";
 import { dirname, fromFileUrl, join, resolve } from "../src/platform/r-path.ts";
 import { build, run, which } from "../src/platform/r-proc.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { settingsOf } from "../src/desired.ts";
 import { decodeManifest, type Manifest } from "../src/manifest.ts";
 import { checkFiles, generated, headerText } from "../src/render.ts";

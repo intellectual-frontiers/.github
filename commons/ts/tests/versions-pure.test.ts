@@ -39,7 +39,7 @@ import { impacts, versionSchemes, workKinds } from "../../ontology/ifr/mod.ts";
 import { qualityTiers } from "../../ontology/ifqs/mod.ts";
 import { mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { join } from "@intellectual-frontiers/system/path";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { holdHarness } from "../mizan/harness.ts";
 import { readWorks } from "../mizan/versions/scan.ts";
 

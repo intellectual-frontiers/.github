@@ -5,7 +5,7 @@
  * @module
  */
 import { dirsOf, homeOf } from "../src/dirs.ts";
-import { assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assertEquals, proves } from "@intellectual-frontiers/test";
 
 const env =
   (vars: Readonly<Record<string, string>>) =>

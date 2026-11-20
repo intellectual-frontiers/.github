@@ -11,7 +11,7 @@ import { appendEvents } from "../quality/host/ledger-branch.ts";
 import { attest, emptyLedger, openNonconformance } from "../quality/pure/ledger.ts";
 import { mkdir, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { join } from "@intellectual-frontiers/system/path";
-import { assert } from "../runtime/test.ts";
+import { assert } from "@intellectual-frontiers/test";
 import { assembledRun, git, repositoryWithCommit } from "./quality-fixtures.ts";
 
 /** A name that must never reach the public: a customer's, as a failure message would hold it. */

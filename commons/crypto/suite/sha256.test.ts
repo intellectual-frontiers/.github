@@ -6,7 +6,7 @@
 import fc from "fast-check";
 import { fromHex, toHex } from "@intellectual-frontiers/formats/hex";
 import { parseSha256Sums, sameSha256, type Sha256, sha256, sha256Of } from "../src/sha256.ts";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const FR = "0001-crypto FR-001";
 

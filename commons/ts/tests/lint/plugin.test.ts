@@ -13,7 +13,7 @@ import { linter, lintFiles, type LintRun, type Problem } from "../../lint/test-r
 import { type Equal, expectType } from "@intellectual-frontiers/core";
 import { makeTempDir, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { join } from "@intellectual-frontiers/system/path";
-import { assert, assertEquals, assertStringIncludes, proves } from "../../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
 const FR = "0005-typescript-runtime FR-061";
 const ready = await linter();

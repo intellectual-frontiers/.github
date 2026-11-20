@@ -11,7 +11,7 @@ import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, wr
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, proves } from "@intellectual-frontiers/test";
 import { commands, envJson, main, quoteFish, quoteNu, quotePosix, quotePwsh, type Shell, type ShellInput, shellScript, shells, variablesOf } from "@intellectual-frontiers/data/sql/cli";
 import { same } from "./governance-fixture.ts";
 import { bunPath } from "./net-fixtures.ts";

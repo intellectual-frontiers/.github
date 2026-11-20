@@ -16,7 +16,7 @@ import { chooseMode, duration, initial, type Input, type Mode, parseMode, progre
 import { createTelemetry, defineSignals, type FlushResult, type Processor } from "../src/signals.ts";
 import { createScreen, describeStyle, type Screen } from "@intellectual-frontiers/terminal/vt";
 import { cutToWidth } from "@intellectual-frontiers/terminal/width";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const MODES = "0001-telemetry FR-021";
 const PALETTE = "0001-telemetry FR-022";

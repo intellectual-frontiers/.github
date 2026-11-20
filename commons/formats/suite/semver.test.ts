@@ -21,7 +21,7 @@ import {
   type SemVer,
   versionIn,
 } from "../src/semver.ts";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const FR = "0001-formats FR-015";
 

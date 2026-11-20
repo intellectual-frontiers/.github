@@ -6,7 +6,7 @@
 import fc from "fast-check";
 import { exportedLiteral, type Literal, type LiteralShape, parseTsLiteral, tsKey, tsLiteral } from "../src/ts-literal.ts";
 import { expectType, type Extends, type Not } from "@intellectual-frontiers/core";
-import { assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assertEquals, proves } from "@intellectual-frontiers/test";
 
 const literal: fc.Arbitrary<Literal> = fc.jsonValue().map((v) => JSON.parse(JSON.stringify(v)) as Literal);
 

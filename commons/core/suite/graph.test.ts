@@ -7,7 +7,7 @@
  */
 import fc from "fast-check";
 import { type Graph, order, schedule } from "../src/graph.ts";
-import { assert, assertEquals, assertRejects, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertRejects, proves } from "@intellectual-frontiers/test";
 
 const GRAPH = "0001-core FR-005";
 

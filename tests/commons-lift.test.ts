@@ -6,7 +6,7 @@
  * @module
  */
 import { fs, path } from "../commons/system/src/mod.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "../commons/ts/runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "../commons/test/src/test.ts";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
 const SPEC = "commons/spec-kit/specs/0032-lifting-libraries/spec.md";
@@ -135,7 +135,7 @@ proves(
         .map((r) => r.layer)
         .filter((l, i, a) => a.indexOf(l) === i)
         .sort(),
-      [0, 1, 2, 3],
+      [0, 1, 2, 3, 4],
     );
     assertEquals(liftFindings(ROOT), []);
   },

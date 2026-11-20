@@ -11,11 +11,11 @@ import { makeTempDir, readTextFile, remove, writeTextFile } from "@intellectual-
 import { dirname, fromFileUrl, join, resolve, toFileUrl } from "@intellectual-frontiers/system/path";
 import { execPath, run, runtimeName } from "@intellectual-frontiers/system/proc";
 import { runTests } from "../runtime/test-run.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { needsGit, repositoryWithCommit } from "./quality-fixtures.ts";
 
 const ROOT = resolve(dirname(fromFileUrl(import.meta.url)), "..");
-const TEST_TS = toFileUrl(join(ROOT, "runtime", "test.ts")).href;
+const TEST_TS = toFileUrl(join(ROOT, "..", "test", "src", "test.ts")).href;
 const QUALITY = join(ROOT, "quality", "quality.ts");
 
 const SUITE = `

@@ -34,7 +34,7 @@ import { STAGES, firstBreak, traceLines, traceOf, type TraceInput } from "../miz
 import { BEGIN, END, decodeViewRecord, isProved, spliceView, viewIsCurrent, viewOf } from "../mizan/changes/capability-view.ts";
 import { mkdirSync, readDirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { dirname, fromFileUrl, join, relative, resolve, toPosix } from "@intellectual-frontiers/system/path";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
 const HERE = dirname(fromFileUrl(import.meta.url));
 const CHANGES = resolve(HERE, "..", "mizan", "changes");

@@ -11,7 +11,7 @@ import { errors } from "../src/errors.ts";
 import * as fs from "../src/fs.ts";
 import { join } from "../src/path.ts";
 import { build } from "../src/proc.ts";
-import { assert, assertEquals, assertRejects, assertThrows, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertRejects, assertThrows, proves } from "@intellectual-frontiers/test";
 
 const R48 = "0001-system FR-004";
 const R49 = "0001-system FR-005";

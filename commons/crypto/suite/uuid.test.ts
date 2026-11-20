@@ -22,7 +22,7 @@ import {
   uuidV5Of,
   uuidVersion,
 } from "../src/uuid.ts";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const OSCAL = "0007-grc FR-017";
 const CDX = "0007-grc FR-018";

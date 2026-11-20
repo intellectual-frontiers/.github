@@ -43,7 +43,7 @@ import {
   systemClock,
   untraced,
 } from "../src/host/otel.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
 /** What the tests use of a server: the port it listens on, and its end. */
 type Server = { readonly addr: { readonly port: number }; shutdown(): Promise<void> };

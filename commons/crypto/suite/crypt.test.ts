@@ -5,7 +5,7 @@
  */
 import fc from "fast-check";
 import { CRYPT_ROUNDS, cryptSalt, sha512Crypt, verifySha512Crypt } from "../src/crypt.ts";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const CRYPT = "0001-crypto FR-003";
 

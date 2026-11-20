@@ -7,7 +7,7 @@
  * @module
  */
 import { fs, path } from "@intellectual-frontiers/system";
-import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, proves } from "@intellectual-frontiers/test";
 import { vocabularies } from "@intellectual-frontiers/data/governance";
 import { OUT, PINNED_SHA256, render, SOURCE, VERSION } from "../tools/generate-dpv.ts";
 import { same } from "./governance-fixture.ts";

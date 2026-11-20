@@ -29,7 +29,7 @@ import {
 } from "../src/job-plan.ts";
 import { child, children, readXml, textOf, type XmlElement } from "@intellectual-frontiers/formats/xml";
 import type { Result } from "@intellectual-frontiers/core";
-import { assert, assertEquals, fail, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, fail, proves } from "@intellectual-frontiers/test";
 
 const FR = "0001-system FR-017";
 const PROPERTY = "0005-typescript-runtime FR-014";

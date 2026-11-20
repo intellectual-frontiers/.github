@@ -22,7 +22,7 @@ import { ok } from "@intellectual-frontiers/core";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { tar, untar, filesOf } from "@intellectual-frontiers/formats/archive";
 import { fs, proc, path } from "@intellectual-frontiers/system";
-import { assertEquals } from "${NAME}/ts/runtime/test";
+import { assertEquals } from "@intellectual-frontiers/test";
 assertEquals(ok(1), { kind: "ok", value: 1 });
 assertEquals(await sha256("abc"), "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
 const t = tar(new Map([["a/b.txt", new TextEncoder().encode("hi")]]));
@@ -38,13 +38,13 @@ console.log("ok on " + proc.runtimeName() + " " + proc.runtimeVersion());
 `;
 
 const SUITE = `
-import { assertEquals, proves } from "${NAME}/ts/runtime/test";
+import { assertEquals, proves } from "@intellectual-frontiers/test";
 import { ok } from "@intellectual-frontiers/core";
 proves(["0005-typescript-runtime FR-030"], "a consumer's test, run by ifc test", () => assertEquals(ok(2), { kind: "ok", value: 2 }));
 `;
 
 /** The libraries the program and the consumer import, which a consumer names too, at the versions the root package depends on (commons 0032-lifting-libraries FR-011). */
-const LIBRARIES = ["core", "crypto", "formats", "system"] as const;
+const LIBRARIES = ["core", "crypto", "formats", "system", "test"] as const;
 
 const CONSUMER = `
 import { andThen, ok, type Result } from "@intellectual-frontiers/core";

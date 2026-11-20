@@ -8,7 +8,7 @@ import { absurd } from "../src/absurd.ts";
 import type { Brand } from "../src/brand.ts";
 import { lf, plain, quoteArgs, splitArgs } from "../src/text.ts";
 import { type Equal, expectType, type Extends, type Not } from "../src/types.ts";
-import { assertEquals, assertThrows, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assertEquals, assertThrows, proves } from "@intellectual-frontiers/test";
 
 proves(["0001-core FR-003"], "lf, plain, splitArgs and quoteArgs", () => {
   assertEquals(lf("a\r\nb\r\n"), "a\nb\n");

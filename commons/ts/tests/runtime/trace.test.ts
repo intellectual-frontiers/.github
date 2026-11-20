@@ -8,7 +8,7 @@ import { traceFindings } from "../../kernel/trace.ts";
 import { mkdir, readTextFile, withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { join } from "@intellectual-frontiers/system/path";
 import { holdBaseline, posixPath, readSources, readSpecs } from "../../runtime/trace.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "../../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
 async function put(root: string, rel: string, text: string): Promise<void> {
   await mkdir(join(root, ...rel.split("/").slice(0, -1)), { recursive: true });

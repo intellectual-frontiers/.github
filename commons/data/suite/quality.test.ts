@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, proves } from "@intellectual-frontiers/test";
 import { tally, tapText } from "@intellectual-frontiers/data/sql/extensions/assertions";
 import { snapshotOf } from "@intellectual-frontiers/data/sql/lifecycle";
 import { bind, type Dialect } from "@intellectual-frontiers/data/sql/physical";

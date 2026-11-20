@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/crypto",
   "private": true,
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Crypto: SHA-256, MD5, SHA-512 crypt, UUIDs, AWS Signature Version 4, CMS, DSSE, COSE and WebAuthn, in pure code on Web Crypto, with core and formats as its dependencies.",
   "type": "module",
   "engines": {
@@ -31,6 +31,7 @@
     "@intellectual-frontiers/core": "link:../core",
     "@intellectual-frontiers/formats": "link:../formats",
     "@intellectual-frontiers/system": "link:../system",
+    "@intellectual-frontiers/test": "link:../test",
     "@types/node": "26.6.6",
     "fast-check": "4.10.2",
     "typescript": "7.0.2"

@@ -9,7 +9,7 @@
  * @module
  */
 import { makeTempDir, remove } from "@intellectual-frontiers/system/fs";
-import { assert, assertEquals, proves } from "../runtime/test.ts";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { keepRun } from "../quality/host/branch.ts";
 import { appendEvents, readLedger } from "../quality/host/ledger-branch.ts";
 import { type LedgerEvent, readLedgerFile, redactEvent } from "../quality/pure/ledger.ts";

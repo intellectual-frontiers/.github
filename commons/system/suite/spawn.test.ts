@@ -14,7 +14,7 @@ import { errors } from "../src/errors.ts";
 import { withTempDir, writeTextFile } from "../src/fs.ts";
 import { basename, join } from "../src/path.ts";
 import * as proc from "../src/proc.ts";
-import { assert, assertEquals, assertThrows, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertThrows, proves } from "@intellectual-frontiers/test";
 
 const SPAWN = "0001-system FR-010";
 const PROC = "0001-system FR-011";

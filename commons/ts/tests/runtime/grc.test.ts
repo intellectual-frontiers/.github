@@ -14,7 +14,7 @@ import { toYaml } from "@intellectual-frontiers/formats/yaml";
 import { withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { formatLoadError, formatOf, loadData, loadImpactDeclarations, loadRisks, loadWaivers, type LoadError } from "../../runtime/grc.ts";
 import { join } from "@intellectual-frontiers/system/path";
-import { assert, assertEquals, assertStringIncludes, proves } from "../../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
 const FR = "0007-grc FR-022";
 

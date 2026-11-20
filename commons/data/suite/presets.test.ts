@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, proves } from "@intellectual-frontiers/test";
 import { applyProposal, connect, desiredState, propose, proposalText } from "@intellectual-frontiers/data/sql/extensions/convergence";
 import { defaultPreset, preset, presetNames, type Preset } from "@intellectual-frontiers/data/sql/presets";
 import { sha256Hex } from "@intellectual-frontiers/data/sql/lifecycle";

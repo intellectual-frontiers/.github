@@ -6,7 +6,7 @@
  * @module
  */
 import { fs, path } from "../../../runtime/mod.ts";
-import { assert, assertEquals, assertThrows, proves } from "../../../runtime/test.ts";
+import { assert, assertEquals, assertThrows, proves } from "@intellectual-frontiers/test";
 import {
   atcConfig,
   atcJson,

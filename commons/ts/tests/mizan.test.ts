@@ -8,7 +8,7 @@
 import { makeTempDirSync, mkdirSync, readTextFileSync, removeSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { fromFileUrl, dirname, resolve } from "@intellectual-frontiers/system/path";
 import { run, execPath } from "@intellectual-frontiers/system/proc";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { earsPatternOf, mizanFindings, rulePlugins, type RulePlugin, type SpecText } from "../mizan/rules.ts";
 import { AUDITED_ON, packagingTerms } from "../../ontology/audit/mod.ts";
 import { audienceModels, bases, conformanceLevels, conformanceRequirements, MZ, MZV, mz, subjectKinds } from "../../ontology/mizan/mod.ts";

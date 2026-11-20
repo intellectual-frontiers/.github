@@ -1,13 +1,12 @@
 {
   "name": "@intellectual-frontiers/commons",
   "private": true,
-  "version": "0.21.0",
+  "version": "0.22.0",
   "description": "IFC TypeScript, for the development of commons/ts: the pure kernel and the host runtime of Intellectual Frontiers Commons, on web standards and node: builtins (commons 0005-typescript-runtime). A consumer depends on the repository's root package by Git, under the same name and entry points.",
   "type": "module",
   "exports": {
     "./ts/kernel": "./kernel/mod.ts",
     "./ts/runtime": "./runtime/mod.ts",
-    "./ts/runtime/test": "./runtime/test.ts",
     "./ts/runtime/test-run": "./runtime/test-run.ts",
     "./ts/lint": "./lint/plugin.ts",
     "./ts/lint/rule": "./lint/rule.ts",
@@ -55,6 +54,7 @@
     "@intellectual-frontiers/rdf": "link:../rdf",
     "@intellectual-frontiers/system": "link:../system",
     "@intellectual-frontiers/telemetry": "link:../telemetry",
-    "@intellectual-frontiers/terminal": "link:../terminal"
+    "@intellectual-frontiers/terminal": "link:../terminal",
+    "@intellectual-frontiers/test": "link:../test"
   }
 }

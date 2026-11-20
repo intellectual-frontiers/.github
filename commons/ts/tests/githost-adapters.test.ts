@@ -14,7 +14,7 @@ import { mkdir, withTempDir, writeTextFile } from "@intellectual-frontiers/syste
 import { type Exchange, recordedTransport } from "@intellectual-frontiers/net/http-client";
 import { join } from "@intellectual-frontiers/system/path";
 import { run, which } from "@intellectual-frontiers/system/proc";
-import { assert, assertEquals, proves } from "../runtime/test.ts";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { conformance } from "./githost-conformance.ts";
 
 const JSON_TYPE = { "content-type": "application/json; charset=utf-8" };

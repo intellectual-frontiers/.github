@@ -7,7 +7,7 @@
  * @module
  */
 import { execPath, which } from "../src/platform/r-proc.ts";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { LOOPBACK_NOTICE, loopbackAllowed, loopbackFinding } from "../src/host/workspace.ts";
 import { Ergonex, needsWorld, withWorld } from "./ergonex-fixtures.ts";
 

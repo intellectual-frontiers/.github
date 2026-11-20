@@ -1,8 +1,8 @@
 /**
- * Tests of `runtime/test.ts`: the assertions fail where they should, `proves` keeps what each test proves, a skipped test is skipped,
+ * Tests of `src/test.ts`: the assertions fail where they should, `proves` keeps what each test proves, a skipped test is skipped,
  * and every test is recorded in memory by the module's own code with its id, file, requirements, risk, times, outcome and reason
- * (0008-test-evidence FR-001, FR-004; the failures, the redaction, the record file and the cancelled test are proven through a run in
- * `test-run.test.ts`); `only`, steps and the assertions 0005-typescript-runtime FR-060 adds, steps through a child process of this
+ * (0001-test FR-004 and 0008-test-evidence FR-004; the failures, the redaction, the record file and the cancelled test are proven through a run in
+ * `test-run.test.ts`); `only`, steps and the assertions 0001-test FR-002 adds, steps through a child process of this
  * file's own runner where they must fail or where `only` is at stake, as `only` affects a whole file.
  *
  * @module
@@ -32,20 +32,21 @@ import {
   reviews,
   test,
   the,
-} from "../../runtime/test.ts";
+} from "../src/test.ts";
 import { relative } from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
-import { STEP_SPAN, decodeLines, installationOf } from "../../kernel/test-record.ts";
-import { assembleRecord, junitXml, readRecord, tap14, testsOf } from "../../kernel/test-report.ts";
+import { STEP_SPAN, decodeLines, installationOf } from "../src/record.ts";
+import { testReport } from "@intellectual-frontiers/commons/ts/kernel";
+const { assembleRecord, junitXml, readRecord, tap14, testsOf } = testReport;
 import { parseSpanId, parseTraceId } from "@intellectual-frontiers/telemetry/otel";
 import { type Equal, expectType } from "@intellectual-frontiers/core";
 import { makeTempDir, readTextFile, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { join } from "@intellectual-frontiers/system/path";
 import { env, execPath, run, runtimeName } from "@intellectual-frontiers/system/proc";
 
-const FR = "0005-typescript-runtime FR-013";
+const FR = "0001-test FR-001";
 
 proves([FR], "each assertion passes on what it describes and throws on what it does not", async () => {
   assert(true);
@@ -110,23 +111,19 @@ proves([FR], "each assertion passes on what it describes and throws on what it d
 
 reviewed("example-spec FR-001", "an example of a review declared in code");
 
-proves(
-  ["0005-typescript-runtime FR-065", "0005-typescript-runtime FR-014"],
-  "the gives the value back narrowed, and fails on null and undefined",
-  () => {
-    const roles = new Map([["lead", { name: "operator" }]]);
-    const lead = the(roles.get("lead"));
-    expectType<Equal<typeof lead, { name: string }>>();
-    assertEquals(lead.name, "operator");
-    assertEquals(the(0), 0);
-    assertEquals(the(""), "");
-    assertThrows(() => the(roles.get("none")), Error, "expected a value");
-    assertThrows(() => the(null, "the lead is named"), Error, "the lead is named");
-    const maybe: string | undefined = roles.has("lead") ? "x" : undefined;
-    assertExists(maybe);
-    expectType<Equal<typeof maybe, string>>();
-  },
-);
+proves(["0001-test FR-003", "0005-typescript-runtime FR-014"], "the gives the value back narrowed, and fails on null and undefined", () => {
+  const roles = new Map([["lead", { name: "operator" }]]);
+  const lead = the(roles.get("lead"));
+  expectType<Equal<typeof lead, { name: string }>>();
+  assertEquals(lead.name, "operator");
+  assertEquals(the(0), 0);
+  assertEquals(the(""), "");
+  assertThrows(() => the(roles.get("none")), Error, "expected a value");
+  assertThrows(() => the(null, "the lead is named"), Error, "the lead is named");
+  const maybe: string | undefined = roles.has("lead") ? "x" : undefined;
+  assertExists(maybe);
+  expectType<Equal<typeof maybe, string>>();
+});
 
 proves([FR], "proves names the test for its requirements and keeps them; reviewed keeps the reason", () => {
   const mine = proofs.find((p) => p.test.endsWith("keeps the reason"));
@@ -144,7 +141,9 @@ test(
   { timeout: 10_000 },
 );
 
-const EV = (n: string): string => `0008-test-evidence FR-${n}`;
+/** The requirements of the capture: the record of a test is 0001-test FR-004 to FR-006, where it is kept is 0008-test-evidence FR-004. */
+const EV = (n: string): string =>
+  n === "004" ? "0008-test-evidence FR-004" : n === "001" ? "0001-test FR-004" : `0001-test FR-00${Number(n) + 3}`;
 const HERE = relative(process.cwd(), fileURLToPath(import.meta.url)).replaceAll("\\", "/");
 const heard: string[] = [];
 const stopListening = onTestRecord((e) => heard.push(e.test.name));
@@ -179,8 +178,8 @@ const url = (rel: string): string => JSON.stringify(new URL(rel, import.meta.url
 const PIPED = `
 import { appendFileSync } from "node:fs";
 import process from "node:process";
-import { createPipeline, install } from ${url("../../../telemetry/src/host/otel.ts")};
-import { reviewed, test } from ${url("../../runtime/test.ts")};
+import { createPipeline, install } from ${url("../../telemetry/src/host/otel.ts")};
+import { reviewed, test } from ${url("../src/test.ts")};
 const out = process.env["PIPE_OUT"] ?? "";
 const done = () => Promise.resolve({ kind: "done" });
 install(createPipeline({ resource: { attributes: {} }, processors: [{
@@ -217,7 +216,7 @@ proves([EV("004")], "without IFC_TEST_RECORD, each test goes to the installed pi
 
 // ---------------------------------------------------------------------------------------------------------------------------- FR-060
 
-const F60 = "0005-typescript-runtime FR-060";
+const F60 = "0001-test FR-002";
 
 proves([F60], "assertAlmostEquals, assertNotMatch and assertNotStrictEquals keep @std/assert's meaning", () => {
   assertAlmostEquals(0.1 + 0.2, 0.3);
@@ -295,7 +294,7 @@ function childEnv(extra: Readonly<Record<string, string>>): Record<string, strin
 const ONLY = `
 import { appendFileSync } from "node:fs";
 import process from "node:process";
-import { proves, test } from ${url("../../runtime/test.ts")};
+import { proves, test } from ${url("../src/test.ts")};
 const ran = (n) => appendFileSync(process.env["ONLY_OUT"] ?? "", n + "\\n");
 test("before", () => ran("before"));
 proves(["fixture FR-001"], "alone", async (t) => { await t.step("its step", () => ran("step")); ran("alone"); }, { only: true });
@@ -349,7 +348,7 @@ proves([F60], "a test marked only runs alone on this runner, and the others of i
 });
 
 const STEPS = `
-import { test } from ${url("../../runtime/test.ts")};
+import { test } from ${url("../src/test.ts")};
 test("stepped", async (t) => {
   await t.step("passes", () => undefined);
   await t.step("outer", async (o) => {

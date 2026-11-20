@@ -24,7 +24,7 @@ import {
 } from "../src/compile.ts";
 import { fromFileUrl, join } from "../src/path.ts";
 import * as proc from "../src/proc.ts";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const FR = "0001-system FR-013";
 const SELF = "0001-system FR-011";

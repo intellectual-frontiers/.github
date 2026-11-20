@@ -12,7 +12,7 @@ import { withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { join } from "@intellectual-frontiers/system/path";
 import * as proc from "@intellectual-frontiers/system/proc";
 import { stdinOf } from "@intellectual-frontiers/system/stdio";
-import { assert, assertEquals, proves } from "../../runtime/test.ts";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const FR = "0005-typescript-runtime FR-054";
 const E = "\u001b";

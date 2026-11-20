@@ -68,7 +68,7 @@ requirement	mechanism	by	note
 0005-typescript-runtime FR-010	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-010
 0005-typescript-runtime FR-011	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-006
 0005-typescript-runtime FR-012	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-017
-0005-typescript-runtime FR-013	check	.github: .github/workflows/ifc-typescript.auto.yml	runtime/test.test.ts: the assertions and proves; the same tests pass under bun test and node --test in CI
+0005-typescript-runtime FR-013	review	0032-lifting-libraries FR-010	kept by the library test: 0001-test FR-001
 0005-typescript-runtime FR-014	review	0032-lifting-libraries FR-010	kept by the library core: core 0001-core FR-004
 0005-typescript-runtime FR-015	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: every file has an @module block and every export has JSDoc
 0005-typescript-runtime FR-016	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: the development dependencies are exact, the lockfile agrees, no run-time dependency
@@ -114,12 +114,12 @@ requirement	mechanism	by	note
 0005-typescript-runtime FR-057	review	0032-lifting-libraries FR-010	kept by the library crypto: crypto 0001-crypto FR-002
 0005-typescript-runtime FR-058	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-015
 0005-typescript-runtime FR-059	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-011
-0005-typescript-runtime FR-060	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test.test.ts: only, steps and the three asserts
+0005-typescript-runtime FR-060	review	0032-lifting-libraries FR-010	kept by the library test: 0001-test FR-002
 0005-typescript-runtime FR-061	check	.github: cd commons/ts && node --test tests/**/*.test.ts	lint/*.test.ts: each rule against code it refuses and accepts, through bun lint
 0005-typescript-runtime FR-062	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-013
 0005-typescript-runtime FR-063	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-007
 0005-typescript-runtime FR-064	review	0032-lifting-libraries FR-010	kept by the library core: core 0001-core FR-006
-0005-typescript-runtime FR-065	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test.test.ts: the gives back the value narrowed, and fails on null and undefined
+0005-typescript-runtime FR-065	review	0032-lifting-libraries FR-010	kept by the library test: 0001-test FR-003
 0005-typescript-runtime FR-066	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-004
 0005-typescript-runtime FR-067	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-014
 0005-typescript-runtime FR-068	review	0032-lifting-libraries FR-010	kept by the library crypto: crypto 0001-crypto FR-004
@@ -182,9 +182,9 @@ requirement	mechanism	by	note
 0007-grc FR-020	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/sign.test.ts: ssh-keygen -Y sign and verify (where ssh-keygen is), Web Crypto DSSE
 0007-grc FR-021	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-014
 0007-grc FR-022	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/grc.test.ts: loaders from TOML, YAML, JSON and JSON5, errors naming file and path
-0008-test-evidence FR-001	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test.test.ts: a test's record with its outcome, values, risk and attempt
-0008-test-evidence FR-002	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test.test.ts: a test span and log record with the test.* conventions
-0008-test-evidence FR-003	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test.test.ts: the installation record, and a person's name refused
+0008-test-evidence FR-001	review	0032-lifting-libraries FR-010	kept by the library test: 0001-test FR-004
+0008-test-evidence FR-002	review	0032-lifting-libraries FR-010	kept by the library test: 0001-test FR-005
+0008-test-evidence FR-003	review	0032-lifting-libraries FR-010	kept by the library test: 0001-test FR-006
 0008-test-evidence FR-004	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test-run.test.ts: records appended per test, a killed process gives cancelled
 0008-test-evidence FR-005	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test-run.test.ts: one record file per run, gathered from child processes
 0008-test-evidence FR-006	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test-run.test.ts: the exit rule, an unproven requirement fails
@@ -609,6 +609,7 @@ requirement	mechanism	by	note
 0027-commons-libraries FR-108	check	.github: cd commons/system && bun run verify	commons/system: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-109	check	.github: cd commons/telemetry && bun run verify	commons/telemetry: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-110	check	.github: cd commons/net && bun run verify	commons/net: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-111	check	.github: cd commons/test && bun run verify	commons/test: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0028-conformance-levels FR-001	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: Mizan's ontology holds the four levels with ranks 0 to 3, each entailing what it and the levels below it add
 0028-conformance-levels FR-002	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: every requirement is added by exactly one level and names a rule or says what else proves it
 0028-conformance-levels FR-003	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: L0 adds a manifest, a verify command and a version

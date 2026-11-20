@@ -9,7 +9,7 @@ import { changedPaths, commitIdOf, fileAt, formatGitError, head, isClean } from 
 import { mkdir, remove, rename, withTempDir, writeFile, writeTextFile } from "../src/fs.ts";
 import { join } from "../src/path.ts";
 import { run, which } from "../src/proc.ts";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const FR = "0001-system FR-014";
 const skip = which("git") === undefined ? { skip: "git is not installed" } : {};

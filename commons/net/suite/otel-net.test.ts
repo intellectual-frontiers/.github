@@ -17,7 +17,7 @@ import { defineSignals, memoryProcessor } from "@intellectual-frontiers/telemetr
 import { installed, otlpReceiver, type Started, startTelemetry, untraced } from "@intellectual-frontiers/telemetry/host/otel";
 import { liveTransport } from "../src/http-client.ts";
 import { serve, type Server } from "../src/serve.ts";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const OWN = "0001-net FR-016";
 const RECEIVER = "0001-net FR-016";

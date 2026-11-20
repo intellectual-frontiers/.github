@@ -7,7 +7,7 @@
  */
 import { type Equal, expectType } from "../../../kernel/mod.ts";
 import { fs, proc } from "../../../runtime/mod.ts";
-import { assert, assertEquals, assertStringIncludes, proves, test } from "../../../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves, test } from "@intellectual-frontiers/test";
 import {
   bytes,
   type Capability,

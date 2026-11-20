@@ -9,7 +9,7 @@
 import fc from "fast-check";
 import { sha256 } from "../src/sha256.ts";
 import { amzDate, canonicalPath, canonicalQuery, sign, type SigV4Options, signRequest, uriEncode, UNSIGNED_PAYLOAD } from "../src/sigv4.ts";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const FR = "0001-crypto FR-004";
 

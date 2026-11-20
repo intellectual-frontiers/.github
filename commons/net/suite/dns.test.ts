@@ -11,7 +11,7 @@ import * as dgram from "node:dgram";
 import * as net from "node:net";
 import fc from "fast-check";
 import { resolveDns } from "../src/dns.ts";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const DNS = "0001-net FR-007";
 

@@ -14,7 +14,7 @@ import { readDeclaration } from "../quality/host/declaration.ts";
 import { addDays, judgeRetention, showRetention, tagNameProblem } from "../quality/pure/retention.ts";
 import { makeTempDir, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { join } from "@intellectual-frontiers/system/path";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { assembledRun, git, needsGit, repositoryWithCommit } from "./quality-fixtures.ts";
 
 proves(

@@ -8,7 +8,7 @@
 import { chmodSync, existsSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, proves } from "@intellectual-frontiers/test";
 import { dialect as postgres } from "@intellectual-frontiers/data/sql/dialects/postgres";
 import { invariants } from "@intellectual-frontiers/data/sql/extensions/invariants";
 import { bind } from "@intellectual-frontiers/data/sql/physical";

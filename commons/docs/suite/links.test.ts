@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { assert, assertEquals, proves } from "../../ts/runtime/test.ts";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import type { Finding } from "../check.ts";
 import { cite, hrefFor, type LinkIndex, linkFor } from "../links.ts";
 import { plain } from "../model.ts";

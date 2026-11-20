@@ -14,7 +14,7 @@ import { checkTrust, generateTrust, type TrustPage } from "../quality/trust/host
 import { NO_REQUIREMENT_TEXT, readRequirementTexts, requirementsOf, requirementTextOf } from "../quality/trust/requirement-text.ts";
 import { makeTempDir, readTextFile, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { join } from "@intellectual-frontiers/system/path";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { needsGit, parsed, at, list } from "./quality-fixtures.ts";
 import { DAY, demoEvidence, demoRepository, MARKER } from "./quality-trust-fixtures.ts";
 

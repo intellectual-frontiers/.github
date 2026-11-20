@@ -29,7 +29,7 @@ import {
 } from "../src/decode.ts";
 import { err, ok } from "../src/result.ts";
 import { type Equal, expectType, type Extends } from "../src/types.ts";
-import { assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assertEquals, proves } from "@intellectual-frontiers/test";
 
 const FR = "0001-core FR-002";
 

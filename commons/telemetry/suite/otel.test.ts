@@ -42,7 +42,7 @@ import {
 } from "../src/otel.ts";
 import { toHex } from "@intellectual-frontiers/formats/hex";
 import { type Equal, expectType } from "@intellectual-frontiers/core";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const MODEL = "0001-telemetry FR-001";
 const IDS = "0001-telemetry FR-002";

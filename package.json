@@ -6,7 +6,6 @@
   "exports": {
     "./ts/kernel": "./commons/ts/kernel/mod.ts",
     "./ts/runtime": "./commons/ts/runtime/mod.ts",
-    "./ts/runtime/test": "./commons/ts/runtime/test.ts",
     "./ts/runtime/test-run": "./commons/ts/runtime/test-run.ts",
     "./ts/lint": "./commons/ts/lint/plugin.ts",
     "./ts/lint/rule": "./commons/ts/lint/rule.ts",
@@ -43,6 +42,7 @@
     "@intellectual-frontiers/system": "0.1.0",
     "@intellectual-frontiers/telemetry": "0.1.0",
     "@intellectual-frontiers/terminal": "0.1.0",
+    "@intellectual-frontiers/test": "0.1.0",
     "mermaid": "11.17.2",
     "typescript": "7.1.0-beta"
   },

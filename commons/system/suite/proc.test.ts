@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { assert, assertEquals, assertInstanceOf, assertRejects, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertInstanceOf, assertRejects, proves } from "@intellectual-frontiers/test";
 import { errors } from "../src/errors.ts";
 import { withTempDir, writeTextFile } from "../src/fs.ts";
 import { basename, delimiter, dirname, fromFileUrl, join, posix, toFileUrl, toPosix, win32 } from "../src/path.ts";

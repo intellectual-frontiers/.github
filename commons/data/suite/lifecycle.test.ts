@@ -8,7 +8,7 @@
  */
 import { readdirSync, readFileSync } from "node:fs";
 import { sha256 } from "@intellectual-frontiers/crypto";
-import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, proves } from "@intellectual-frontiers/test";
 import fc from "fast-check";
 import {
   lint,

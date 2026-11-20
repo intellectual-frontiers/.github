@@ -28,7 +28,7 @@ import {
 } from "../src/archive.ts";
 import { createHash } from "node:crypto";
 import { ok } from "@intellectual-frontiers/core";
-import { assert, assertEquals, assertInstanceOf, assertRejects, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertInstanceOf, assertRejects, proves } from "@intellectual-frontiers/test";
 
 const FR = "0001-formats FR-010";
 const enc = new TextEncoder();

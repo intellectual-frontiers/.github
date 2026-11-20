@@ -17,7 +17,7 @@
  * @module
  */
 import { absurd } from "@intellectual-frontiers/core";
-import { OUTCOMES, type Outcome } from "../../kernel/test-record.ts";
+import { OUTCOMES, type Outcome } from "@intellectual-frontiers/test/record";
 
 /** What became of a case: 0008-test-evidence's five outcomes and `not_run`, a planned case that never started, with its reason (0021-ifqs FR-014). */
 export type QualityOutcome = Outcome | "not_run";

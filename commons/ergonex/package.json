@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/ergonex",
   "private": true,
-  "version": "0.3.5",
+  "version": "0.3.6",
   "description": "Ergonex, the workspaces management of Intellectual Frontiers: one command that sets up, configures and operates a team's software repositories, package registries and builds, on Windows, macOS and Linux, with Bun by default and Node 26 as the backup.",
   "type": "module",
   "engines": {
@@ -29,6 +29,7 @@
     "@intellectual-frontiers/system": "link:../system",
     "@intellectual-frontiers/telemetry": "link:../telemetry",
     "@intellectual-frontiers/terminal": "link:../terminal",
+    "@intellectual-frontiers/test": "link:../test",
     "@types/node": "26.6.6",
     "fast-check": "4.10.2",
     "typescript": "7.0.2"

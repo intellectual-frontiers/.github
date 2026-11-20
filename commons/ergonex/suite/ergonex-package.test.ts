@@ -8,7 +8,7 @@
 import { makeTempDir, readTextFile, remove } from "../src/platform/r-fs.ts";
 import { dirname, fromFileUrl, join, resolve } from "../src/platform/r-path.ts";
 import { run, which } from "../src/platform/r-proc.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { pack } from "../tools/pack.ts";
 
 const ROOT = resolve(dirname(fromFileUrl(import.meta.url)), "..");

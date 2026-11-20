@@ -9,7 +9,7 @@ import { chmod, mkdir, withTempDir, writeTextFile } from "../src/fs.ts";
 import { discoverPrograms, pathExtensions, skipReasonText } from "../src/discover.ts";
 import { join } from "../src/path.ts";
 import { build } from "../src/proc.ts";
-import { assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assertEquals, proves } from "@intellectual-frontiers/test";
 
 const FR = "0001-system FR-012";
 

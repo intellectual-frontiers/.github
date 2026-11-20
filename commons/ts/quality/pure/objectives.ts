@@ -21,7 +21,7 @@
 import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import { type Attributes, type Metric, type Resource } from "@intellectual-frontiers/telemetry/otel";
 import { encodeMetrics, type MetricBatch } from "@intellectual-frontiers/telemetry/otlp";
-import { TEST_SCOPE } from "../../kernel/test-record.ts";
+import { TEST_SCOPE } from "@intellectual-frontiers/test/record";
 import { type Grade } from "./names.ts";
 import { type Summary, shareAtOrAbove } from "./ladder.ts";
 import { daysBetween } from "./ledger.ts";

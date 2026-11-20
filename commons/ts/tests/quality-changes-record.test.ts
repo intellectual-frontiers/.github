@@ -14,7 +14,7 @@ import { sarif } from "../quality/pure/render.ts";
 import { makeTempDir, readDirSync, readTextFileSync, remove, removeSync, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { dirname, fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
 import { execPath, run } from "@intellectual-frontiers/system/proc";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { at, list, parsed } from "./quality-fixtures.ts";
 import { git, needsGit, repositoryWithCommit } from "./quality-fixtures.ts";
 

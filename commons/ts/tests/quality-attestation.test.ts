@@ -35,7 +35,7 @@ import { evidenceOfLedger, gradeOfEvidence } from "../quality/pure/ladder.ts";
 import { attest } from "../quality/pure/ledger.ts";
 import { RUN_GRADE, gradeRank } from "../quality/pure/names.ts";
 import { makeTempDir, remove } from "@intellectual-frontiers/system/fs";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { assembledRun, needsGit, repositoryWithCommit } from "./quality-fixtures.ts";
 
 const DAY = "2026-11-17";

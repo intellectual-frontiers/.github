@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/formats",
   "private": true,
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Formats: JSON5, YAML, TOML, XML, CSV, base64, hexadecimal, ASN.1 DER, CBOR, archives, PNG, TypeScript literals, globs, semantic versions, media types and HTTP headers, read and written in pure code with one dependency, core.",
   "type": "module",
   "engines": {
@@ -37,6 +37,7 @@
     "@intellectual-frontiers/commons": "link:../ts",
     "@intellectual-frontiers/core": "link:../core",
     "@intellectual-frontiers/system": "link:../system",
+    "@intellectual-frontiers/test": "link:../test",
     "@types/node": "26.6.6",
     "fast-check": "4.10.2",
     "typescript": "7.0.2"

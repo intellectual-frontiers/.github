@@ -8,7 +8,7 @@
  */
 import { findingsOf, repoPathChecks } from "../src/doctor.ts";
 import { REPO_PATH_ROOM, repoPath, repoPathLength, WINDOWS_PATH_LIMIT } from "../src/portable.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { needsWorld, withWorld } from "./ergonex-fixtures.ts";
 
 /** A repository path under `github.com/o/` whose whole path under `home` has exactly `total` characters when written with `separator`. */

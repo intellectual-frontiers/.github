@@ -6,7 +6,7 @@
  */
 import fc from "fast-check";
 import { type Equal, expectType } from "../../../kernel/mod.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "../../../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import {
   type AnySegment,
   bytes,

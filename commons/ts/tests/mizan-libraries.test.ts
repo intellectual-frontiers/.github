@@ -19,7 +19,7 @@ import {
 } from "../mizan/libraries.ts";
 import { mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
 const SPEC = "0027-commons-libraries";
 const ROOT = resolve(fromFileUrl(new URL("../../..", import.meta.url)));

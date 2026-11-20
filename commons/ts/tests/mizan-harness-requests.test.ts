@@ -18,7 +18,7 @@ import { recordFindings } from "../mizan/versions/judge.ts";
 import { existsSync, mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { dirname, join } from "@intellectual-frontiers/system/path";
 import { run as spawn } from "@intellectual-frontiers/system/proc";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { needsGit } from "./quality-fixtures.ts";
 
 // ------------------------------------------------------------------------------------------------------------------------------- fixtures

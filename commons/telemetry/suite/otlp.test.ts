@@ -45,7 +45,7 @@ import {
   type TraceBatch,
 } from "../src/otlp.ts";
 import { toHex } from "@intellectual-frontiers/formats/hex";
-import { assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assertEquals, proves } from "@intellectual-frontiers/test";
 
 const FR = "0001-telemetry FR-004";
 const MODEL = "0001-telemetry FR-001";

@@ -21,7 +21,7 @@ import {
 } from "../src/net.ts";
 import { join } from "@intellectual-frontiers/system/path";
 import { serve, type ServeHandler } from "../src/serve.ts";
-import { assert, assertEquals, assertRejects, assertStringIncludes, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertRejects, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
 const SERVE = "0001-net FR-002";
 const NET = "0001-net FR-001";

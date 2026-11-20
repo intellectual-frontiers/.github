@@ -7,7 +7,7 @@
 import fc from "fast-check";
 import { Md5, md5, md5Hex, md5Stream } from "../src/md5.ts";
 import { toBase64 } from "@intellectual-frontiers/formats/base64";
-import { assertEquals, assertThrows, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assertEquals, assertThrows, proves } from "@intellectual-frontiers/test";
 
 const FR = "0001-crypto FR-002";
 

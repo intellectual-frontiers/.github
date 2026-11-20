@@ -33,11 +33,6 @@ export const about: About = {
       mayImport: ["node: builtins", "kernel/", "runtime/", "the lifted libraries, by package name"],
     },
     {
-      path: "runtime/test.ts",
-      what: "Test registration on `node:test`, assertions under `@std/assert`'s names, and `proves`, which records every test as evidence.",
-      mayImport: ["node: builtins"],
-    },
-    {
       path: "mizan/",
       what: "Mizan, the IF Spec Profile, as code (commons 0003-mizan): the rules it adds to the format of a specification (as plugins), the command that holds them against a baseline, the generator of its ontology's Turtle, and `integrations/` (0019-mizan-integrations): the registry, the readers of Turtle, N-Triples, JSON-LD and RDF/XML, the importers of a slice of a vocabulary, of an OSCAL control catalog and of a JSON Schema, and the exporters of SHACL, JSON Schema, SKOS and SQL are built, the other importers and exporters are specified. `changes/` and `changes.ts` (0020-ifccm) are the change-control check: the commit rules, the declaration and its phase, the chain from an issue to a run and the view of capabilities by rung, with a host layer that takes a `githost/` client as an argument; `changes.ts --capability-trace` makes the same chain offline, from commit trailers, specifications, the ontology's `mz:definedBy`, `Spec:` and `Proves:` lines and quality records, with no Git host. `versions.ts` (0026-works-versioning) judges the versions of works, and `checkVersions`, `readWorks` and `./ts/mizan/versions` give a consumer its check as data and as a command. `levels.ts` (0028-conformance-levels) says which rules a conformance level, L0 to L3, runs (`holdHarness` takes a `level`, L3 where none is given), `rules.ts` reads the head of a specification (`**Subject:**`, `**Audience:**`) and reports the sections its profile asks for that it lacks (0029-subject-profiles), and `libraries.ts` (0027-commons-libraries) reads the manifest of a library of commons and makes the requirements that name it.",
       mayImport: [
@@ -166,7 +161,7 @@ export const about: About = {
   ],
   areas: [
     { title: "Kernel", slug: "kernel", entryPoints: ["kernel/mod.ts"] },
-    { title: "Runtime", slug: "runtime", entryPoints: ["runtime/mod.ts", "runtime/test.ts", "runtime/test-run.ts"] },
+    { title: "Runtime", slug: "runtime", entryPoints: ["runtime/mod.ts", "runtime/test-run.ts"] },
     { title: "Lint plugin", slug: "lint", entryPoints: ["lint/plugin.ts", "lint/rule.ts", "lint/test-rule.ts"] },
   ],
   examples: [{ file: "examples/use.ts", what: "What a harness imports once it depends on commons by Git." }],

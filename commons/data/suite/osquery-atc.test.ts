@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, proves } from "@intellectual-frontiers/test";
 import { dialect as postgres } from "@intellectual-frontiers/data/sql/dialects/postgres";
 import { dialect as sqlite } from "@intellectual-frontiers/data/sql/dialects/sqlite";
 import { atc, type AtcEntry, POSIX_PATH, WINDOWS_PATH } from "@intellectual-frontiers/data/sql/extensions/osquery-atc";

@@ -32,7 +32,7 @@ import { decodeLogs, encodeLogs } from "@intellectual-frontiers/telemetry/otlp";
 import { createTelemetry, memoryProcessor } from "@intellectual-frontiers/telemetry/signals";
 import { FINDING_SEVERITY, fromAnyValue, GRC_SCOPE, GRC_SIGNALS, installedGrcTelemetry, runPackObserved } from "../../runtime/grc.ts";
 import { createPipeline, install, installed, uninstall } from "@intellectual-frontiers/telemetry/host/otel";
-import { assert, assertEquals, proves } from "../../runtime/test.ts";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const FR = "0007-grc FR-019";
 

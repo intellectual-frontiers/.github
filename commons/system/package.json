@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/system",
   "private": true,
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "The host system as one typed library: files, paths, the folders of a program, one run at a time, file watching, programs found by prefix, processes and their streams, Git, a program built into one binary, the operating system's scheduled jobs, and the terminal's streams; the same code on Bun and Node 26.",
   "type": "module",
   "engines": {
@@ -36,6 +36,7 @@
     "@intellectual-frontiers/core": "link:../core",
     "@intellectual-frontiers/crypto": "link:../crypto",
     "@intellectual-frontiers/formats": "link:../formats",
+    "@intellectual-frontiers/test": "link:../test",
     "@types/node": "26.6.6",
     "fast-check": "4.10.2",
     "typescript": "7.0.2"

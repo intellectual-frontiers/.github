@@ -32,7 +32,7 @@ import {
   writePng,
 } from "../src/png.ts";
 import type { Result } from "@intellectual-frontiers/core";
-import { assert, assertEquals, assertRejects, assertThrows, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertRejects, assertThrows, proves } from "@intellectual-frontiers/test";
 
 const FR = "0001-formats FR-012";
 const LAW = "0005-typescript-runtime FR-014";

@@ -10,7 +10,7 @@ import { readTextFile, withTempDir, writeTextFile } from "@intellectual-frontier
 import { join } from "@intellectual-frontiers/system/path";
 import { must, which } from "@intellectual-frontiers/system/proc";
 import { type Conn, connect, connectTls, listen, listenTls, type Listener } from "../src/tcp.ts";
-import { assert, assertEquals, assertInstanceOf, assertRejects, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertInstanceOf, assertRejects, proves } from "@intellectual-frontiers/test";
 
 const TCP = "0001-net FR-006";
 const enc = new TextEncoder();

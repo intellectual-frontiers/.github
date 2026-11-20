@@ -24,7 +24,7 @@ import {
   verifyAuthentication,
   verifyRegistration,
 } from "../src/webauthn.ts";
-import { assert, assertEquals, assertStringIncludes, assertThrows, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertStringIncludes, assertThrows, proves } from "@intellectual-frontiers/test";
 
 const COSE = "0014-webauthn FR-002";
 const OPTIONS = "0014-webauthn FR-003";

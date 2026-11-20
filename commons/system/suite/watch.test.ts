@@ -11,7 +11,7 @@
 import { errors } from "../src/errors.ts";
 import * as fs from "../src/fs.ts";
 import { join, toFileUrl } from "../src/path.ts";
-import { assert, assertEquals, fail, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, fail, proves } from "@intellectual-frontiers/test";
 import { type FsEvent, type FsWatcher, watchFs } from "../src/watch.ts";
 
 const FR = "0001-system FR-016";

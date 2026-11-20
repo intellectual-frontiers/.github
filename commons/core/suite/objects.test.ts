@@ -7,7 +7,7 @@
 import fc from "fast-check";
 import { type Compact, compact } from "../src/objects.ts";
 import { type Equal, expectType, type Extends, type Not } from "../src/types.ts";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const FR = "0001-core FR-006";
 

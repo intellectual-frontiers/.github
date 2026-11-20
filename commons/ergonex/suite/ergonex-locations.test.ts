@@ -7,7 +7,7 @@
  */
 import { existsSync, readDirSync } from "../src/platform/r-fs.ts";
 import { join } from "../src/platform/r-path.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { placesOf } from "../src/host/locations.ts";
 import { type Places, movedKind, movedPath } from "../src/places.ts";
 import { ONE_REPOSITORY, evidenceFiles, needsWorld, withWorld } from "./ergonex-fixtures.ts";

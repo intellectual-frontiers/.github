@@ -9,7 +9,7 @@
 import fc from "fast-check";
 import { type CborKey, type CborValue, decodeCbor, decodeCborItem, encodeCbor, formatCborError } from "../src/cbor.ts";
 import { fromHex, toHex } from "../src/hex.ts";
-import { assert, assertEquals, assertThrows, proves, the } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertThrows, proves, the } from "@intellectual-frontiers/test";
 
 const FR = "0014-webauthn FR-001";
 

@@ -6,7 +6,7 @@
  * @module
  */
 import { fs, path, proc } from "../commons/system/src/mod.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "../commons/ts/runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "../commons/test/src/test.ts";
 import { inspectPackage } from "../commons/ts/tools/pack-library.ts";
 import { readLibraries } from "../commons/ts/mizan/libraries.ts";
 

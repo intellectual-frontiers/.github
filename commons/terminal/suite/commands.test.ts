@@ -7,7 +7,7 @@
  */
 import { flag } from "../src/args.ts";
 import { commandHelp, formatCommandError, group, resolveCommand, treeProblems, validCommandName, verb } from "../src/commands.ts";
-import { assert, assertEquals, assertStringIncludes, fail, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertStringIncludes, fail, proves } from "@intellectual-frontiers/test";
 
 const FR = "0001-terminal FR-002";
 

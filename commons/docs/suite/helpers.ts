@@ -5,7 +5,7 @@
  * @module
  */
 import { fs, path, proc } from "@intellectual-frontiers/system";
-import { assertEquals } from "../../ts/runtime/test.ts";
+import { assertEquals } from "@intellectual-frontiers/test";
 import { config as commons } from "../../docs.config.ts";
 import { Build } from "../build.ts";
 import { type About, type Config, resolveConfig } from "../config.ts";

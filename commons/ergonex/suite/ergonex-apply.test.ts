@@ -10,7 +10,7 @@
 import { existsSync, mkdir, readDirSync, readTextFile, remove, writeTextFile } from "../src/platform/r-fs.ts";
 import { join } from "../src/platform/r-path.ts";
 import { acquireLock } from "../src/platform/r-lock.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { evidenceFiles, needsWorld, ONE_REPOSITORY, REMOTE, withWorld } from "./ergonex-fixtures.ts";
 
 const SKIPS_ONLY = /\n {2}(?!skip )\S/;

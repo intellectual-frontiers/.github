@@ -9,7 +9,7 @@ import { CAPABILITIES, maxDepth, supports, unsupported } from "../githost/capabi
 import { cloneUrlOf, describeRemoteError, hostKindOf, parseRemote, readRemote, sameRepository } from "../githost/remote.ts";
 import type { Capability, HostKind, RepoRef } from "../githost/types.ts";
 import { gitCapabilities, gitManagerKinds } from "../../ontology/ifccm/mod.ts";
-import { assert, assertEquals, proves } from "../runtime/test.ts";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const ref = (text: string, kinds: Readonly<Record<string, HostKind>> = {}): RepoRef => {
   const r = parseRemote(text, kinds);

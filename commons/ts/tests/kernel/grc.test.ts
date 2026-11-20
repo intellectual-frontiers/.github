@@ -45,7 +45,7 @@ import {
 } from "../../kernel/grc.ts";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { type Equal, expectType } from "@intellectual-frontiers/core";
-import { assert, assertEquals, assertThrows, proves } from "../../runtime/test.ts";
+import { assert, assertEquals, assertThrows, proves } from "@intellectual-frontiers/test";
 
 const FR = (n: string): `0007-grc FR-${string}` => `0007-grc FR-${n}`;
 

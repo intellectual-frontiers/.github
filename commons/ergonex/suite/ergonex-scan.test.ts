@@ -9,7 +9,7 @@
 import { mkdir, makeTempDir, remove, symlink, writeTextFile, withTempDir } from "../src/platform/r-fs.ts";
 import { join } from "../src/platform/r-path.ts";
 import { build } from "../src/platform/r-proc.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { forbiddenRead, isInside, readablePath, resolveInside } from "../src/scan/boundary.ts";
 import { commitSignatures, gitConfigFilesOf, modulesOnPath, readInside, scanRoot } from "../src/scan/host/scan.ts";
 import { moduleSourceFindings, signedCommitFindings, signatureLetter, type FoundModule } from "../src/scan/policy-scans.ts";

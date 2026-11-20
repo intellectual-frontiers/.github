@@ -7,7 +7,7 @@
 import { exists, makeTempDir, mkdir, readTextFile, remove, withTempDir } from "../src/platform/r-fs.ts";
 import { dirname, join } from "../src/platform/r-path.ts";
 import { run, which } from "../src/platform/r-proc.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { guidanceFor } from "../src/commands/guidance.ts";
 import { type Launch, globalInstall, isRegistryCopy, launchFor } from "../src/setup/onpath.ts";
 import { type PathDeps, putOnPath } from "../src/setup/host/path.ts";

@@ -28,7 +28,7 @@ import {
   pem,
 } from "../src/acme.ts";
 import { serve } from "../src/serve.ts";
-import { assert, assertEquals, assertStringIncludes, proves, the } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertStringIncludes, proves, the } from "@intellectual-frontiers/test";
 
 const FLOW = "0001-net FR-008";
 const JWS = "0001-net FR-009";

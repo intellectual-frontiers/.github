@@ -23,7 +23,7 @@ import {
   type XmlElement,
   type XmlNode,
 } from "../src/xml.ts";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const J5 = "0001-formats FR-001";
 const XML = "0001-formats FR-004";

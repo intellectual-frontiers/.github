@@ -9,7 +9,7 @@
 import { chmod, existsSync, mkdir, readDirSync, readTextFile, remove, statSync, symlink, writeTextFile } from "../src/platform/r-fs.ts";
 import { join } from "../src/platform/r-path.ts";
 import { execPath, run, which } from "../src/platform/r-proc.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { evidenceFiles, Ergonex, mtime, needsWorld, ONE_REPOSITORY, REMOTE, withWorld, type World } from "./ergonex-fixtures.ts";
 
 const TWO_GROUPS = {

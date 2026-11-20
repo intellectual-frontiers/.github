@@ -10,7 +10,7 @@ import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { makeTempDirSync, mkdirSync, readTextFileSync, removeSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { dirname, fromFileUrl, resolve } from "@intellectual-frontiers/system/path";
 import { execPath, run } from "@intellectual-frontiers/system/proc";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { staleFindings } from "../mizan/newer.ts";
 
 const HERE = dirname(fromFileUrl(import.meta.url));

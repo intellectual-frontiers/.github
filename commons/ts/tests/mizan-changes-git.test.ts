@@ -27,7 +27,7 @@ import { askHost, NO_HOST_API } from "../mizan/changes/strict.ts";
 import { mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { dirname, fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
 import { execPath, run, which } from "@intellectual-frontiers/system/proc";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
 const HERE = dirname(fromFileUrl(import.meta.url));
 const CHANGES = resolve(HERE, "..", "mizan", "changes.ts");

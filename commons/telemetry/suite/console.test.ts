@@ -15,7 +15,7 @@ import { consoleProcessor, exceptionOf, type UncaughtTarget, uncaughtSignals } f
 import { readDir, readTextFile, withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { fromFileUrl, join } from "@intellectual-frontiers/system/path";
 import * as proc from "@intellectual-frontiers/system/proc";
-import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
 const FR = "0001-telemetry FR-024";
 const E = "\u001b";

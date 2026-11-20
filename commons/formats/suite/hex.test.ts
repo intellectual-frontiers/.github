@@ -5,7 +5,7 @@
  */
 import fc from "fast-check";
 import { fromHex, toHex } from "../src/hex.ts";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 proves(["0001-formats FR-013"], "toHex writes two lower-case digits for each byte and fromHex reads them back", () => {
   assertEquals(toHex(new Uint8Array([0, 1, 15, 16, 255])), "00010f10ff");

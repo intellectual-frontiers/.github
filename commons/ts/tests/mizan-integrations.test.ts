@@ -13,7 +13,7 @@ import { makeTempDirSync, readTextFileSync, removeSync, writeTextFileSync } from
 import { pathToFileURL } from "node:url";
 import { dirname, fromFileUrl, resolve } from "@intellectual-frontiers/system/path";
 import { execPath, run } from "@intellectual-frontiers/system/proc";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import {
   describeFinding,
   emptyRegistry,

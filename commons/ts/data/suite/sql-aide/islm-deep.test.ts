@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { assertEquals, proves } from "../../../runtime/test.ts";
+import { assertEquals, proves } from "@intellectual-frontiers/test";
 import {
   apply,
   context,

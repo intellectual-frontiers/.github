@@ -6,7 +6,7 @@
  */
 import { readDirSync, readTextFileSync } from "../src/platform/r-fs.ts";
 import { dirname, join, relative, resolve, toPosix, fromFileUrl } from "../src/platform/r-path.ts";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const ROOT = resolve(dirname(fromFileUrl(import.meta.url)), "..");
 
@@ -50,13 +50,14 @@ const WORKSPACES = sources("src");
 /** The host layer of the library: a folder named `host` anywhere below workspaces/ (`host/`, `tools/host/`, `setup/host/`, `scan/host/`), and what runs `git`, reads and writes files and the environment, and the command that does so. */
 const isHostLayer = (f: string): boolean =>
   f.split("/").includes("host") || f.startsWith("src/commands/") || f === "src/ergonex.ts" || f.startsWith("src/platform/r-");
-/** The packages of commons the pure core may import: the foundation (core), the kernel, and the Git host (its types and the reading of a remote). */
+/** The packages of commons the pure core may import: the foundation (core), the record of a test, the kernel, and the Git host (its types and the reading of a remote). */
 const PURE_PACKAGES = [
   "@intellectual-frontiers/core",
   "@intellectual-frontiers/terminal/args",
   "@intellectual-frontiers/telemetry",
   "@intellectual-frontiers/crypto",
   "@intellectual-frontiers/formats",
+  "@intellectual-frontiers/test/record",
   "@intellectual-frontiers/commons/ts/kernel",
   "@intellectual-frontiers/commons/ts/githost",
 ];

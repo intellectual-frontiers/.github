@@ -51,9 +51,9 @@ import {
   testCaseSpan,
   testId,
   testStartLog,
-} from "../../kernel/test-record.ts";
+} from "@intellectual-frontiers/test/record";
 import { attribute, children, descendants, readXml } from "@intellectual-frontiers/formats/xml";
-import { assert, assertEquals, assertStringIncludes, proves } from "../../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
 const FR = (n: string): `0008-test-evidence FR-${string}` => `0008-test-evidence FR-${n}`;
 

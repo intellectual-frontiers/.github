@@ -7,7 +7,7 @@
  */
 import { gitlabClient } from "../githost/gitlab.ts";
 import { type Exchange, recordedTransport } from "@intellectual-frontiers/net/http-client";
-import { assertEquals, proves } from "../runtime/test.ts";
+import { assertEquals, proves } from "@intellectual-frontiers/test";
 
 const answer: Exchange = {
   method: "GET",

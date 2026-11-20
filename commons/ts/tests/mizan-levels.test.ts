@@ -15,7 +15,7 @@ import { MIZAN_RULES } from "../mizan/rules.ts";
 import { VERSIONS_RULES } from "../mizan/versions/rules.ts";
 import { mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { join } from "@intellectual-frontiers/system/path";
-import { assert, assertEquals, proves } from "../runtime/test.ts";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const SPEC = "0028-conformance-levels";
 const keys = (level: (typeof LEVELS)[number], only: "all" | "added" = "all"): readonly string[] =>

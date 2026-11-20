@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/terminal",
   "private": true,
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "The terminal as pure code: a typed command-line parser and command trees, the one palette of colour roles and marks, display width and cutting by columns, and a small terminal emulator for snapshot tests; no host, the same code on Bun, Node 26 and in a browser.",
   "type": "module",
   "engines": {
@@ -26,6 +26,7 @@
     "@intellectual-frontiers/commons": "link:../ts",
     "@intellectual-frontiers/core": "link:../core",
     "@intellectual-frontiers/system": "link:../system",
+    "@intellectual-frontiers/test": "link:../test",
     "@types/node": "26.6.6",
     "fast-check": "4.10.2",
     "typescript": "7.0.2"

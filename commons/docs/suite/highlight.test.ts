@@ -3,7 +3,7 @@
  *
  * @module
  */
-import { assertEquals, proves } from "../../ts/runtime/test.ts";
+import { assertEquals, proves } from "@intellectual-frontiers/test";
 import { tokens } from "../highlight.ts";
 
 const classes = (code: string, lang: Parameters<typeof tokens>[1]): string[] => tokens(code, lang).filter((t) => t.cls !== "plain" && t.cls !== "punct").map((t) => `${t.cls}:${t.text}`);

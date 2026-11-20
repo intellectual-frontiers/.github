@@ -12,7 +12,7 @@ import { triplesOf, turtle, validate } from "@intellectual-frontiers/rdf";
 import { readTextFileSync } from "@intellectual-frontiers/system/fs";
 import { dirname, fromFileUrl, resolve } from "@intellectual-frontiers/system/path";
 import * as proc from "@intellectual-frontiers/system/proc";
-import { assert, assertEquals, proves } from "../runtime/test.ts";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { termRecordsOf } from "../mizan/check.ts";
 import { wanted } from "../mizan/generate-ontology.ts";
 import { authorityCitation, commonsAuthorities, mizanFindings, rulePlugins } from "../mizan/rules.ts";

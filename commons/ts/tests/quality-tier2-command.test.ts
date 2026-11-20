@@ -9,7 +9,7 @@
 import { makeTempDir, readTextFile, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { dirname, fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
 import { execPath, run } from "@intellectual-frontiers/system/proc";
-import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { needsGit } from "./quality-fixtures.ts";
 import { demoEvidence, demoRepository, MARKER } from "./quality-trust-fixtures.ts";
 

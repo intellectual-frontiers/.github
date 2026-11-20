@@ -11,7 +11,7 @@ import { makeTempDir, mkdir, readTextFileSync, remove, writeTextFile } from "@in
 import { dirname, fromFileUrl, join, resolve, toFileUrl } from "@intellectual-frontiers/system/path";
 import { run, which } from "@intellectual-frontiers/system/proc";
 import { NODE_HOOK } from "../../runtime/test-run.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "../../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
 const FR = "0005-typescript-runtime FR-070";
 const ROOT = resolve(dirname(fromFileUrl(import.meta.url)), "../..");

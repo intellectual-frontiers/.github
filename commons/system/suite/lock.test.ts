@@ -6,7 +6,7 @@
 import { exists, readTextFile, withTempDir, writeTextFile } from "../src/fs.ts";
 import { acquireLock, describeHolder, processRuns, readHolder } from "../src/lock.ts";
 import { join } from "../src/path.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import process from "node:process";
 
 const LOCK = "0001-system FR-015";
