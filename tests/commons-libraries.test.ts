@@ -138,7 +138,7 @@ export function libraryFindings(repo: string): readonly string[] {
 /** A copy of what the rule reads, in a temporary folder: commons' spec kit, the libraries, the documentation's configuration and the workflows. */
 function copyOf(): { readonly repo: string; readonly [Symbol.dispose]: () => void } {
   const repo = fs.makeTempDirSync({ prefix: "commons-libraries-" });
-  const skip = (src: string): boolean => !src.split("/").includes("node_modules");
+  const skip = (src: string): boolean => !src.split("/").some((part) => part === "node_modules" || part === "dist");
   cpSync(`${ROOT}/commons/spec-kit`, `${repo}/commons/spec-kit`, { recursive: true });
   for (const name of librariesOf(ROOT)) cpSync(`${ROOT}/commons/${name}`, `${repo}/commons/${name}`, { recursive: true, filter: skip });
   cpSync(`${ROOT}/commons/docs.config.ts`, `${repo}/commons/docs.config.ts`);
