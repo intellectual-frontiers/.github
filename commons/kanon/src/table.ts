@@ -1,4 +1,4 @@
-// Spec: 0001-kanon-checker FR-001
+// Spec: 0001-kanon-checker FR-001, FR-010
 /**
  * The table of a library that is Kanon (commons 0033-kanon FR-010): its units, each in one of the three layers or the library's own checking, as data a manifest declares and a program reads. This
  * module holds the types of the table, the ranks of the layers and the decoder that reads a table from the `kanon` field of a manifest.
@@ -23,9 +23,10 @@
  * @module
  */
 import {
+  absurd,
   array,
   boolean,
-  type Brand,
+  type Decoded,
   type Decoder,
   describe,
   err,
@@ -34,10 +35,22 @@ import {
   object,
   ok,
   oneOf,
-  refine,
   type Result,
   string,
 } from "@intellectual-frontiers/core";
+import {
+  classify,
+  type FamilyRule,
+  type InstanceName,
+  memberPackage,
+  parseInstanceName,
+  parseNameTemplate,
+  parsePluginNoun,
+  type PluginNoun,
+} from "./family.ts";
+import { type FolderName, type PackageName, parseFolder, parsePackageName } from "./names.ts";
+
+export { type FolderName, type PackageName, parseFolder, parsePackageName };
 
 /** The layers of Kanon, from the top (0033-kanon FR-001). */
 export const LAYERS = ["governance", "logical", "physical"] as const;
@@ -46,30 +59,6 @@ export type Layer = (typeof LAYERS)[number];
 
 /** How far down a layer stands: Governance 1, Logical 2, Physical 3; a higher rank imports a lower (0033-kanon FR-007). A registry: one entry for each layer, which the compiler holds. */
 export const RANK: Readonly<Record<Layer, number>> = { governance: 1, logical: 2, physical: 3 };
-
-/** A folder of a library from its root, with a trailing `/` (`./` for the files at the root): made only by `parseFolder`. */
-export type FolderName = Brand<string, "kanon folder">;
-/** A package's name, as `@scope/name` or `name`: made only by `parsePackageName`. */
-export type PackageName = Brand<string, "kanon package name">;
-
-const folderDecoder = refine(
-  string,
-  "kanon folder",
-  (t) => t === "./" || (/^[A-Za-z0-9_-][A-Za-z0-9._-]*(\/[A-Za-z0-9_-][A-Za-z0-9._-]*)*\/$/.test(t) && !t.split("/").includes("..")),
-);
-const packageDecoder = refine(string, "kanon package name", (t) => /^(@[a-z0-9][a-z0-9._-]*\/)?[a-z0-9][a-z0-9._-]*$/.test(t));
-
-/** A folder from text, or why the text is not one: the one way a `FolderName` is made. */
-export function parseFolder(text: string): Result<FolderName, string> {
-  const r = folderDecoder(text, "folder");
-  return r.kind === "ok" ? ok(r.value) : err(`${JSON.stringify(text)} is not a folder: it ends with a slash, as ./ or src/governance/`);
-}
-
-/** A package name from text, or why the text is not one: the one way a `PackageName` is made. */
-export function parsePackageName(text: string): Result<PackageName, string> {
-  const r = packageDecoder(text, "package");
-  return r.kind === "ok" ? ok(r.value) : err(`${JSON.stringify(text)} is not a package name, as @scope/name`);
-}
 
 /** A package a unit may import, with the subpaths it may reach: `any` (the package and every entry of it), `[]` (the package's own entry only) or the listed subpaths. */
 export type Allowed = { readonly name: string; readonly subpaths: "any" | readonly string[] };
@@ -92,11 +81,34 @@ export type OwnUnit = UnitBase & { readonly kind: "own" };
 /** A unit of the table: a sum, so that a unit is a layered one or an own one and never both or neither. */
 export type Unit = LayeredUnit | OwnUnit;
 
+/**
+ * One instance of a unit kind that a host declares (0033-kanon FR-019): a dialect, in a folder under the unit it is an instance of or in a package of its own. A sum, so that an instance is in a folder or
+ * in a package and never both; the package of a package instance is made by the family's rule.
+ */
+export type Instance =
+  | { readonly kind: "folder"; readonly name: InstanceName; readonly instanceOf: FolderName; readonly folder: FolderName }
+  | { readonly kind: "package"; readonly name: InstanceName; readonly instanceOf: FolderName; readonly package: PackageName };
+
+/** One plugin of a host (0033-kanon FR-020): a package of its own, named by the family's rule, with the plugins it declares it depends on. */
+export type Plugin = {
+  readonly noun: PluginNoun;
+  readonly package: PackageName;
+  readonly dependsOn: readonly PackageName[];
+};
+
 /** The table of a library that is Kanon. */
 export type Table = {
   /** The package's own name, which a unit uses to import another unit. */
   readonly package: PackageName;
   readonly units: readonly Unit[];
+  /** The naming rule of the packages that extend this library, where it has any (0033-kanon FR-021). */
+  readonly family?: FamilyRule;
+  /** The instances of its units that it declares (0033-kanon FR-019). */
+  readonly instances: readonly Instance[];
+  /** The plugins it declares (0033-kanon FR-020). */
+  readonly plugins: readonly Plugin[];
+  /** The host library this package extends, as a dialect or a plugin of it: a package is a host or an extension, never both (0033-kanon FR-020). */
+  readonly extends?: PackageName;
 };
 
 const nonEmpty: Decoder<string> = (input, path = "$") => {
@@ -109,7 +121,13 @@ const unitForm = object(
   { folder: nonEmpty },
   { layer: literal(...LAYERS), instances: boolean, own: boolean, mayImport: array(nonEmpty), packages: array(allowed) },
 );
-const body = object({ package: nonEmpty, units: array(unitForm) });
+const familyForm = object({ dialect: nonEmpty, plugin: nonEmpty }, { contract: nonEmpty });
+const instanceForm = object({ name: nonEmpty, instanceOf: nonEmpty, placement: literal("folder", "package") });
+const pluginForm = object({ noun: nonEmpty }, { dependsOn: array(nonEmpty) });
+const body = object(
+  { package: nonEmpty, units: array(unitForm) },
+  { family: familyForm, instances: array(instanceForm), plugins: array(pluginForm), extends: nonEmpty },
+);
 
 /** The table read from the `kanon` field of a manifest, or one sentence saying what is wrong with it (0033-kanon FR-010). */
 export function decodeTable(input: unknown): Result<Table, string> {
@@ -150,5 +168,112 @@ export function decodeTable(input: unknown): Result<Table, string> {
       ...(form?.packages === undefined ? {} : { packages: form.packages }),
     });
   }
-  return ok({ package: pkg.value, units: out });
+  const members = decodeMembers(r.value, pkg.value, out);
+  if (members.kind === "err") return members;
+  const extended = r.value.extends === undefined ? undefined : parsePackageName(r.value.extends);
+  if (extended?.kind === "err") return err(`kanon.extends: ${extended.error}`);
+  if (extended !== undefined && (members.value.family !== undefined || members.value.instances.length + members.value.plugins.length > 0))
+    return err("kanon: a package is a host (family, instances, plugins) or an extension (extends), never both");
+  return ok({ package: pkg.value, units: out, ...members.value, ...(extended === undefined ? {} : { extends: extended.value }) });
+}
+
+type Form = Decoded<typeof body>;
+
+/** The family, instances and plugins of a table: what each names must exist, no name is declared twice, and the dependencies among plugins are a graph with no loop. */
+function decodeMembers(
+  form: Form,
+  host: PackageName,
+  units: readonly Unit[],
+): Result<{ readonly family?: FamilyRule; readonly instances: readonly Instance[]; readonly plugins: readonly Plugin[] }, string> {
+  const declared = (form.instances ?? []).length + (form.plugins ?? []).length;
+  if (form.family === undefined) {
+    return declared === 0 ? ok({ instances: [], plugins: [] }) : err("kanon.family: instances and plugins need a naming rule (family)");
+  }
+  const dialect = parseNameTemplate(form.family.dialect);
+  if (dialect.kind === "err") return err(`kanon.family.dialect: ${dialect.error}`);
+  const plugin = parseNameTemplate(form.family.plugin);
+  if (plugin.kind === "err") return err(`kanon.family.plugin: ${plugin.error}`);
+  if (dialect.value === plugin.value) return err("kanon.family: the dialect and the plugin templates are the same, so a package would be both");
+  const contract = form.family.contract;
+  if (contract !== undefined && !/^\.\/[A-Za-z0-9_./-]+$/.test(contract))
+    return err(`kanon.family.contract: ${JSON.stringify(contract)} is not an export subpath, as ./plugin`);
+  const family: FamilyRule = { dialect: dialect.value, plugin: plugin.value, ...(contract === undefined ? {} : { contract }) };
+  const instances: Instance[] = [];
+  const seen = new Set<string>();
+  for (const [i, f] of (form.instances ?? []).entries()) {
+    const at = `kanon.instances[${i}]`;
+    const name = parseInstanceName(f.name);
+    if (name.kind === "err") return err(`${at}.name: ${name.error}`);
+    const unit = parseFolder(f.instanceOf);
+    if (unit.kind === "err") return err(`${at}.instanceOf: ${unit.error}`);
+    const row = units.find((u) => u.folder === unit.value);
+    if (row === undefined || row.kind !== "layered") return err(`${at}.instanceOf ${JSON.stringify(f.instanceOf)} is no layered unit of the table`);
+    if (seen.has(name.value)) return err(`${at}.name ${JSON.stringify(f.name)} is declared twice`);
+    seen.add(name.value);
+    switch (f.placement) {
+      case "folder": {
+        if (!row.instances) return err(`${at}: ${f.instanceOf} has no instances: true, so a folder under it is no instance`);
+        const folder = parseFolder(`${unit.value}${name.value}/`);
+        if (folder.kind === "err") return err(`${at}: ${folder.error}`);
+        instances.push({ kind: "folder", name: name.value, instanceOf: unit.value, folder: folder.value });
+        break;
+      }
+      case "package": {
+        const pkg = memberPackage(family, host, { kind: "dialect", name: name.value });
+        if (pkg.kind === "err") return err(`${at}: ${pkg.error}`);
+        instances.push({ kind: "package", name: name.value, instanceOf: unit.value, package: pkg.value });
+        break;
+      }
+      default:
+        return absurd(f.placement);
+    }
+  }
+  const nouns = new Map<string, { readonly noun: PluginNoun; readonly package: PackageName; readonly deps: readonly string[] }>();
+  for (const [i, f] of (form.plugins ?? []).entries()) {
+    const noun = parsePluginNoun(f.noun);
+    if (noun.kind === "err") return err(`kanon.plugins[${i}].noun: ${noun.error}`);
+    if (nouns.has(noun.value)) return err(`kanon.plugins[${i}].noun ${JSON.stringify(f.noun)} is declared twice`);
+    const pkg = memberPackage(family, host, { kind: "plugin", noun: noun.value });
+    if (pkg.kind === "err") return err(`kanon.plugins[${i}]: ${pkg.error}`);
+    nouns.set(noun.value, { noun: noun.value, package: pkg.value, deps: f.dependsOn ?? [] });
+  }
+  const plugins: Plugin[] = [];
+  for (const [noun, p] of nouns) {
+    const dependsOn: PackageName[] = [];
+    for (const d of p.deps) {
+      const target = nouns.get(d);
+      if (d === noun) return err(`kanon.plugins ${noun} depends on itself`);
+      if (target === undefined) return err(`kanon.plugins ${noun} depends on ${JSON.stringify(d)}, which is no plugin of the table`);
+      dependsOn.push(target.package);
+    }
+    plugins.push({ noun: p.noun, package: p.package, dependsOn });
+  }
+  const loop = dependencyLoop(plugins);
+  if (loop !== undefined) return err(`kanon.plugins depend on each other in a loop: ${loop.join(" -> ")}`);
+  if (classify(family, host, host)?.kind !== "host") return err("kanon.family: the host's own name is not read as the host");
+  return ok({ family, instances, plugins });
+}
+
+/** The first loop among the plugins' declared dependencies, as the packages in order; none where there is no loop. */
+function dependencyLoop(plugins: readonly Plugin[]): readonly string[] | undefined {
+  const by = new Map(plugins.map((p) => [p.package as string, p.dependsOn]));
+  const state = new Map<string, "visiting" | "done">();
+  const walk = (from: string, path: readonly string[]): readonly string[] | undefined => {
+    state.set(from, "visiting");
+    for (const to of by.get(from) ?? []) {
+      if (state.get(to) === "visiting") return [...path.slice(path.indexOf(to)), to];
+      if (state.get(to) === undefined) {
+        const found = walk(to, [...path, to]);
+        if (found !== undefined) return found;
+      }
+    }
+    state.set(from, "done");
+    return undefined;
+  };
+  for (const p of plugins) {
+    if (state.get(p.package) !== undefined) continue;
+    const found = walk(p.package, [p.package]);
+    if (found !== undefined) return found;
+  }
+  return undefined;
 }

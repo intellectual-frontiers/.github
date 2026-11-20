@@ -13,9 +13,28 @@
  *
  * @module
  */
+export { accountOf, type Cell, OUTCOMES } from "./account.ts";
 export { droppedFindings } from "./dropped.ts";
+export { extensionFindings, roleOf } from "./extensions.ts";
+export {
+  classify,
+  type FamilyRule,
+  type InstanceName,
+  type Member,
+  memberPackage,
+  type NameTemplate,
+  parseInstanceName,
+  parseNameTemplate,
+  parsePluginNoun,
+  type PluginNoun,
+  rootPackage,
+  splitPackage,
+} from "./family.ts";
+export { buildMatrix, cellText, type Matrix, type MatrixCell, type MatrixRow, matrixJson, matrixMarkdown, matrixTotals } from "./matrix.ts";
 export {
   allowedExternal,
+  type ExportsMap,
+  escapesRoot,
   type Finding,
   familyOf,
   finding,
@@ -46,11 +65,13 @@ export {
   type Allowed,
   decodeTable,
   type FolderName,
+  type Instance,
   LAYERS,
   type Layer,
   type LayeredUnit,
   type OwnUnit,
   type PackageName,
+  type Plugin,
   parseFolder,
   parsePackageName,
   RANK,

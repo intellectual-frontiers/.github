@@ -14,5 +14,5 @@ export const library = {
   distribution: ["github", "npm"],
   exports: [".", "./check", "./host"],
   summary:
-    "Kanon, the pattern of a library built in three layers (governance, logical, physical): the type of a library's table of layers, the import check that holds it, the check that no annotation of governance is dropped, and the types-only LayeredModel contract; one rule, projected down, nothing lost.",
+    "Kanon, the pattern of a library built in three layers (governance, logical, physical): the type of a library's table of layers, the import check that holds it, the check that no annotation of governance is dropped (for each instance), the instances, plugins and family of a host and the check of the packages that extend it, the matrix of requirement by instance, and the types-only LayeredModel contract; one rule, projected down, nothing lost.",
 };
