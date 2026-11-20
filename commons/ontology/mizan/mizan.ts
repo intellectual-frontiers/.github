@@ -44,7 +44,7 @@ import {
   vocabulary,
   XSD,
   xsd,
-} from "../../ts/kernel/rdf.ts";
+} from "../../rdf/src/mod.ts";
 
 /** The namespace of Mizan's terms. */
 export const MZ = namespace("mz", "https://www.intellectualfrontiers.com/ontology/mizan#");

@@ -22,8 +22,8 @@ import {
   type TraceInput,
 } from "../../kernel/trace.ts";
 import { importsOf, layerFindings, type Ladder, placeOf, resolveImport } from "../../kernel/layers.ts";
-import { classSchema, en, many, namespace, one, range, term, vocabulary } from "../../kernel/rdf.ts";
-import { rdfs } from "../../kernel/rdf-vocabularies.ts";
+import { classSchema, en, many, namespace, one, range, term, vocabulary } from "@intellectual-frontiers/rdf";
+import { rdfs } from "@intellectual-frontiers/rdf";
 import { assert, assertEquals, proves } from "../../runtime/test.ts";
 
 const DEMO = [

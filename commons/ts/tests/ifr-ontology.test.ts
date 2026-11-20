@@ -8,7 +8,7 @@
  */
 import { existsSync } from "node:fs";
 import process from "node:process";
-import { triplesOf, turtle, validate } from "../kernel/rdf.ts";
+import { triplesOf, turtle, validate } from "@intellectual-frontiers/rdf";
 import { readTextFileSync } from "../runtime/fs.ts";
 import { dirname, fromFileUrl, resolve } from "../runtime/path.ts";
 import * as proc from "../runtime/proc.ts";

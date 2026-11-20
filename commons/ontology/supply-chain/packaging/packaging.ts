@@ -37,7 +37,7 @@ import {
   vocabulary,
   XSD,
   xsd,
-} from "../../../ts/kernel/rdf.ts";
+} from "../../../rdf/src/mod.ts";
 import { SCHEMA, schema } from "./schema.auto.ts";
 
 /** The namespace of the packaging vocabulary's terms. */

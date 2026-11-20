@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { en, type OntologyFile, RDFS, SKOS, term } from "../../../ts/kernel/rdf.ts";
+import { en, type OntologyFile, RDFS, SKOS, term } from "../../../rdf/src/mod.ts";
 import { Checksum, PinnedDownload, Platform, PM, PMID } from "./packaging.ts";
 
 /** The platform `platform-linux-x64`. */

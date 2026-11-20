@@ -4,7 +4,7 @@
  *
  * @module
  */
-import type { OntologyFile } from "../../ts/kernel/rdf.ts";
+import type { OntologyFile } from "../../rdf/src/mod.ts";
 import * as ifqs from "./ifqs.ts";
 
 export * from "./ifqs.ts";

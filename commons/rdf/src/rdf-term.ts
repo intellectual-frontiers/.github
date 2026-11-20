@@ -1,3 +1,4 @@
+// Spec: 0001-rdf FR-001
 /**
  * RDF terms as typed values (commons 0012-ontology FR-001, FR-002): an IRI branded once checked, a namespace that pairs a prefix with
  * its IRI, a named node branded with the classes its term is an individual of, blank nodes, literals typed by their language or their

@@ -318,13 +318,13 @@ requirement	mechanism	by	note
 0011-documentation FR-025	check	.github: cd commons/docs && bun run verify	links.test.ts: the own prefix and digits, a linked repository's citation to its site, a text-only one, and a possessive qualifier
 0011-documentation FR-026	check	.github: cd commons/docs && bun run verify	conventions.test.ts: what ./docs and ifc-docs reach imports no data library and no lens; lenses.test.ts: the lenses as values of Lens
 0011-documentation FR-027	check	.github: cd commons/docs && bun run verify	fixture-repo.test.ts: a fixture repository with no about.ts and a plain spec kit builds with no finding
-0012-ontology FR-001	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: IRIs parsed or refused, namespaces, literals and their tags, triples and quads; type-level tests that an individual of one class is not another's
-0012-ontology FR-002	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: the eight vocabularies give the IRIs of their specifications, and a vocabulary is made from local names
-0012-ontology FR-003	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: an individual's values typed from its schema, its triples in the schema's order, and type-level tests of a missing field, a wrong range and a wrong class
-0012-ontology FR-004	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: the OWL schemas, a code list and its union, a SKOS scheme and its notations
-0012-ontology FR-005	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: a non-integer, a word not of its list, a subject stated twice and a bad namespace are named
-0012-ontology FR-006	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: the writers' output for known statements, escapes, and the same bytes for random orders of the same statements (fast-check)
-0012-ontology FR-007	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: the kernel's RDF exports no reader
+0012-ontology FR-001	review	0032-lifting-libraries FR-010	kept by the library rdf: rdf 0001-rdf FR-001
+0012-ontology FR-002	review	0032-lifting-libraries FR-010	kept by the library rdf: rdf 0001-rdf FR-002
+0012-ontology FR-003	review	0032-lifting-libraries FR-010	kept by the library rdf: rdf 0001-rdf FR-003
+0012-ontology FR-004	review	0032-lifting-libraries FR-010	kept by the library rdf: rdf 0001-rdf FR-004
+0012-ontology FR-005	review	0032-lifting-libraries FR-010	kept by the library rdf: rdf 0001-rdf FR-005
+0012-ontology FR-006	review	0032-lifting-libraries FR-010	kept by the library rdf: rdf 0001-rdf FR-006
+0012-ontology FR-007	review	0032-lifting-libraries FR-010	kept by the library rdf: rdf 0001-rdf FR-007
 0012-ontology FR-008	check	.github: bun test ./tests/	Ontology: the modules import only the kernel's RDF and one another, list their files, and no .ttl is under commons/ontology
 0012-ontology FR-009	check	.github: bun test ./tests/	Ontology: no IRI is written as free text in a module; the code lists are the tools' unions
 0012-ontology FR-010	check	.github: bun test ./tests/	Ontology: tsc 7 refuses copies with a missing field, a wrong range and a wrong class; Generator: the rules a type cannot state are named and nothing is written
@@ -602,6 +602,7 @@ requirement	mechanism	by	note
 0027-commons-libraries FR-101	check	.github: cd commons/data && bun run verify	commons/data: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-102	check	.github: cd commons/ergonex && bun run verify	commons/ergonex: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-103	check	.github: cd commons/core && bun run verify	commons/core: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-104	check	.github: cd commons/rdf && bun run verify	commons/rdf: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0028-conformance-levels FR-001	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: Mizan's ontology holds the four levels with ranks 0 to 3, each entailing what it and the levels below it add
 0028-conformance-levels FR-002	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: every requirement is added by exactly one level and names a rule or says what else proves it
 0028-conformance-levels FR-003	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: L0 adds a manifest, a verify command and a version

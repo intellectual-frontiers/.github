@@ -1,5 +1,5 @@
 /**
- * Tests of `kernel/rdf.ts` (commons 0012-ontology FR-001 to FR-007): IRIs checked or refused, namespaces and vocabularies, literals and
+ * Tests of `kernel/rdf.ts` (commons 0001-rdf FR-001 to FR-007): IRIs checked or refused, namespaces and vocabularies, literals and
  * their tags, class schemas whose individuals' types and triples come from them (with type-level tests of what must not compile), the
  * OWL schemas, code lists and SKOS schemes, the checks a type cannot state, and the writers, whose bytes do not depend on the order
  * statements are given in (property-tested).
@@ -7,7 +7,7 @@
  * @module
  */
 import fc from "fast-check";
-import * as rdfModule from "../../kernel/rdf.ts";
+import * as rdfModule from "../src/mod.ts";
 import {
   blank,
   classSchema,
@@ -55,9 +55,9 @@ import {
   validate,
   vocabulary,
   xsd,
-} from "../../kernel/rdf.ts";
+} from "../src/mod.ts";
 import { type Equal, expectType, type Extends, type Not } from "@intellectual-frontiers/core";
-import { assert, assertEquals, assertThrows, proves } from "../../runtime/test.ts";
+import { assert, assertEquals, assertThrows, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 
 const EX = namespace("ex", "https://example.org/terms#");
 const ID = namespace("id", "https://example.org/id/");
@@ -92,34 +92,30 @@ const git = Tool.make(term(ID, "tool-git"), {
 });
 const top = Shelf.make(term(ID, "shelf-top"), { holds: [git] });
 
-proves(
-  ["0012-ontology FR-001"],
-  "an IRI is checked: absolute, with no character N-Triples cannot write; a namespace makes its terms",
-  () => {
-    assertEquals<unknown>(parseIri("https://example.org/a#b"), { kind: "ok", value: "https://example.org/a#b" });
-    assertEquals(parseIri("urn:x:y").kind, "ok");
-    const relative = parseIri("relative/path");
-    assert(relative.kind === "err");
-    assertEquals(formatIriError(relative.error), '"relative/path" is not an absolute IRI: it has no scheme');
-    for (const bad of [
-      "https://e.org/a b",
-      "https://e.org/<a>",
-      'https://e.org/"',
-      "https://e.org/{x}",
-      "https://e.org/a\\b",
-      "https://e.org/\u0001",
-    ]) {
-      const r = parseIri(bad);
-      assert(r.kind === "err" && r.error.kind === "forbidden-character", bad);
-    }
-    assertEquals(ex.Tool.iri, "https://example.org/terms#Tool");
-    assertEquals(ex.Tool.curie, "ex:Tool");
-    assertEquals(term(ID, "x").iri, "https://example.org/id/x");
-    assertEquals(ontologyOf(EX).iri, "https://example.org/terms");
-  },
-);
+proves(["0001-rdf FR-001"], "an IRI is checked: absolute, with no character N-Triples cannot write; a namespace makes its terms", () => {
+  assertEquals<unknown>(parseIri("https://example.org/a#b"), { kind: "ok", value: "https://example.org/a#b" });
+  assertEquals(parseIri("urn:x:y").kind, "ok");
+  const relative = parseIri("relative/path");
+  assert(relative.kind === "err");
+  assertEquals(formatIriError(relative.error), '"relative/path" is not an absolute IRI: it has no scheme');
+  for (const bad of [
+    "https://e.org/a b",
+    "https://e.org/<a>",
+    'https://e.org/"',
+    "https://e.org/{x}",
+    "https://e.org/a\\b",
+    "https://e.org/\u0001",
+  ]) {
+    const r = parseIri(bad);
+    assert(r.kind === "err" && r.error.kind === "forbidden-character", bad);
+  }
+  assertEquals(ex.Tool.iri, "https://example.org/terms#Tool");
+  assertEquals(ex.Tool.curie, "ex:Tool");
+  assertEquals(term(ID, "x").iri, "https://example.org/id/x");
+  assertEquals(ontologyOf(EX).iri, "https://example.org/terms");
+});
 
-proves(["0012-ontology FR-001"], "literals are typed by their language or their datatype; blank nodes, triples and quads", () => {
+proves(["0001-rdf FR-001"], "literals are typed by their language or their datatype; blank nodes, triples and quads", () => {
   assertEquals<unknown>(en("install"), { kind: "lang", value: "install", language: "en" });
   assertEquals<unknown>(lang("x", "en-GB"), { kind: "ok", value: { kind: "lang", value: "x", language: "en-gb" } });
   assertEquals(lang("x", "not a tag").kind, "err");
@@ -140,7 +136,7 @@ proves(["0012-ontology FR-001"], "literals are typed by their language or their 
 });
 
 proves(
-  ["0012-ontology FR-001", "0012-ontology FR-003"],
+  ["0001-rdf FR-001", "0001-rdf FR-003"],
   "the compiler refuses an individual of another class, a missing field and a wrong range",
   () => {
     // what compiles, and what does not, is the test; tsc runs it
@@ -163,7 +159,7 @@ proves(
   },
 );
 
-proves(["0012-ontology FR-002"], "the eight vocabularies give the IRIs of their specifications", () => {
+proves(["0001-rdf FR-002"], "the eight vocabularies give the IRIs of their specifications", () => {
   assertEquals(
     [rdf.type, rdfs.label, owl.Class, xsd.integer, skos.definition, dcterms.identifier, prov.wasGeneratedBy, sh.NodeShape].map(
       (t) => t.iri,
@@ -183,7 +179,7 @@ proves(["0012-ontology FR-002"], "the eight vocabularies give the IRIs of their 
 });
 
 proves(
-  ["0012-ontology FR-003"],
+  ["0001-rdf FR-003"],
   "an individual's triples are its type, then its fields in the schema's order, values in the order given",
   () => {
     const two = Tool.make(term(ID, "tool-two"), { label: en("two"), runs: "two", tier: tiers.Comfort });
@@ -204,7 +200,7 @@ proves(
   },
 );
 
-proves(["0012-ontology FR-004"], "the OWL schemas, a code list and its union, a SKOS scheme and its notations", () => {
+proves(["0001-rdf FR-004"], "the OWL schemas, a code list and its union, a SKOS scheme and its notations", () => {
   const cls = OwlClass.make(ex.Tool, { label: en("Tool"), subClassOf: [owl.Thing], definition: en("A program.") });
   const p = DatatypeProperty.make(ex.runs, { domain: cls, range: xsd.string, definition: en("What is run.") });
   const o = ObjectProperty.make(ex.holds, { domain: ex.Shelf, range: ex.Tool });
@@ -226,7 +222,7 @@ proves(["0012-ontology FR-004"], "the OWL schemas, a code list and its union, a 
   assertEquals(triplesOf(levels.individuals).filter((x) => x.predicate.iri === skos.inScheme.iri).length, 2);
 });
 
-proves(["0012-ontology FR-005"], "a non-integer, a word not of its list, a subject stated twice and a bad namespace are named", () => {
+proves(["0001-rdf FR-005"], "a non-integer, a word not of its list, a subject stated twice and a bad namespace are named", () => {
   const odd = Tool.make(term(ID, "tool-odd"), { label: en("odd"), runs: "odd", size: 1.5, tier: tiers.Comfort });
   const findings = validate([git, odd, git]);
   assertEquals(
@@ -277,7 +273,7 @@ ex:Required a ex:Tier ;
     rdfs:label "required"@en .
 `;
 
-proves(["0012-ontology FR-006"], "Turtle, N-Triples and JSON-LD of known statements, with their escapes", () => {
+proves(["0001-rdf FR-006"], "Turtle, N-Triples and JSON-LD of known statements, with their escapes", () => {
   const all = [top, git, tiers.Required, tiers.Comfort];
   const doc = { comments: ["AUTO-GENERATED by a test.", ""], prefixes: [SKOS, EX, ID, RDFS], triples: triplesOf(all) };
   assertEquals(turtle(doc), EXPECTED_TURTLE);
@@ -318,7 +314,7 @@ proves(["0012-ontology FR-006"], "Turtle, N-Triples and JSON-LD of known stateme
   );
 });
 
-proves(["0012-ontology FR-006"], "the same statements in any order give the same bytes in every syntax", () => {
+proves(["0001-rdf FR-006"], "the same statements in any order give the same bytes in every syntax", () => {
   const triples: readonly Triple[] = triplesOf([top, git, tiers.Required, tiers.Comfort]);
   const once = [nTriples(triples), turtle({ prefixes: [EX, ID], triples }), jsonLd(triples)];
   fc.assert(
@@ -329,7 +325,7 @@ proves(["0012-ontology FR-006"], "the same statements in any order give the same
   );
 });
 
-proves(["0012-ontology FR-007"], "the kernel's RDF writes and reads nothing else: it exports no reader", () => {
+proves(["0001-rdf FR-007"], "RDF writes and reads nothing else: it exports no reader", () => {
   const names = Object.keys(rdfModule);
   assertEquals(
     names.filter((n) => /^(parse|read)(?!Iri$)/i.test(n)),

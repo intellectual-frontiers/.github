@@ -20,8 +20,8 @@ export const about: About = {
       what:
         "The packaging vocabulary (`packaging.ts`) and its data (`managers.ts`, `families.ts`, `programs.ts`, `pins.ts`, `rules.ts`, " +
         "`record.ts`), seeded from the tables of [`upt`](https://github.com/sigoden/upt) (MIT or Apache-2.0) and from what `archon` runs. It is " +
-        "TypeScript, typed by IFC TypeScript's RDF (`ts/kernel/rdf.ts`, commons 0012-ontology); its Turtle is generated, never a source.",
-      mayImport: ["ts/kernel/rdf.ts", "ontology/"],
+        "TypeScript, typed by the RDF library (`rdf/src/mod.ts`, commons 0012-ontology and rdf 0001-rdf); its Turtle is generated, never a source.",
+      mayImport: ["rdf/src/mod.ts", "ontology/"],
     },
     {
       path: "tools/",

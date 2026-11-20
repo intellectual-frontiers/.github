@@ -1,3 +1,4 @@
+// Spec: 0001-rdf FR-006
 /**
  * The RDF writers (commons 0012-ontology FR-006, FR-007): N-Triples and N-Quads, Turtle in one canonical form, and JSON-LD in its
  * expanded form. Each writes the same bytes for the same statements whatever the order they were stated in, so a generated file changes

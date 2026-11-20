@@ -13,7 +13,7 @@
  *
  * @module
  */
-import { en, type OntologyFile, RDFS, SKOS, term, XSD } from "../../ts/kernel/rdf.ts";
+import { en, type OntologyFile, RDFS, SKOS, term, XSD } from "../../rdf/src/mod.ts";
 import { bases, MZ, MZID, OntologyTerm } from "../mizan/mizan.ts";
 import { pm } from "../supply-chain/packaging/packaging.ts";
 import { schema } from "../supply-chain/packaging/schema.auto.ts";

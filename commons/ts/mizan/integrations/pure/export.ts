@@ -21,8 +21,8 @@
  * @module
  */
 import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
-import type { Fields } from "../../../kernel/rdf-schema.ts";
-import type { Named } from "../../../kernel/rdf-term.ts";
+import type { Fields } from "@intellectual-frontiers/rdf";
+import type { Named } from "@intellectual-frontiers/rdf";
 import type { IntegrationFinding } from "./types.ts";
 
 /** A class schema as an exporter reads it: the class and its fields, whatever their types. */

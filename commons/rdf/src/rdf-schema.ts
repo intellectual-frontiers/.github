@@ -1,3 +1,4 @@
+// Spec: 0001-rdf FR-003
 /**
  * Class schemas and the individuals they make (commons 0012-ontology FR-003 to FR-005). A schema names a class and its fields, each a
  * property, a range and a cardinality; the type of an individual's values is derived from it, so a required field left out, a value of

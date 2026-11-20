@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { DCTERMS, OWL, PROV, RDFS, SKOS, XSD, type OntologyFile } from "../../ts/kernel/rdf.ts";
+import { DCTERMS, OWL, PROV, RDFS, SKOS, XSD, type OntologyFile } from "../../rdf/src/mod.ts";
 import { MZ, MZID } from "../mizan/mizan.ts";
 import { SCHEMA } from "../supply-chain/packaging/schema.auto.ts";
 import { IFQS } from "../ifqs/ifqs.ts";

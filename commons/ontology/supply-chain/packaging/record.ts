@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { en, type OntologyFile, RDFS, SKOS, term, XSD } from "../../../ts/kernel/rdf.ts";
+import { en, type OntologyFile, RDFS, SKOS, term, XSD } from "../../../rdf/src/mod.ts";
 import { PM, PMID, RecordField } from "./packaging.ts";
 
 /** The fields of the record of how an account was set up, in the order written. */

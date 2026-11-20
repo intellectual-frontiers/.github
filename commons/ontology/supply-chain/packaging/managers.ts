@@ -8,7 +8,7 @@
  *
  * @module
  */
-import { DCTERMS, en, type OntologyFile, RDFS, SKOS, term, XSD } from "../../../ts/kernel/rdf.ts";
+import { DCTERMS, en, type OntologyFile, RDFS, SKOS, term, XSD } from "../../../rdf/src/mod.ts";
 import { Command, Manager, managerKinds, operations, PM, PMID, Prohibition } from "./packaging.ts";
 
 /** The manager `manager-apk`. */

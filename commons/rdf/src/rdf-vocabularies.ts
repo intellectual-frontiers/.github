@@ -1,3 +1,4 @@
+// Spec: 0001-rdf FR-002
 /**
  * The standard vocabularies a commons ontology states its terms with (commons 0012-ontology FR-002): RDF, RDFS, OWL, XSD, SKOS, Dublin
  * Core terms, PROV-O and SHACL, each its namespace and only the terms some user of commons states, so a term not listed here does not

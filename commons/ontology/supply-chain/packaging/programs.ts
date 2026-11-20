@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { DCTERMS, en, type OntologyFile, RDFS, SKOS, term, XSD } from "../../../ts/kernel/rdf.ts";
+import { DCTERMS, en, type OntologyFile, RDFS, SKOS, term, XSD } from "../../../rdf/src/mod.ts";
 import { familyArch, familyDebian } from "./families.ts";
 import { PackageName, PM, PMID, Program, tiers } from "./packaging.ts";
 

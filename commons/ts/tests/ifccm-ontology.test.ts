@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { validate } from "../kernel/rdf.ts";
+import { validate } from "@intellectual-frontiers/rdf";
 import { readTextFileSync } from "../runtime/fs.ts";
 import { dirname, fromFileUrl, resolve } from "../runtime/path.ts";
 import { assert, assertEquals, proves, test } from "../runtime/test.ts";

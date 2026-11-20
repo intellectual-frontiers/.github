@@ -7,7 +7,7 @@
  */
 import { createServer } from "node:http";
 import { files } from "../../ontology/mizan/mod.ts";
-import { nTriples, triplesOf } from "../kernel/rdf.ts";
+import { nTriples, triplesOf } from "@intellectual-frontiers/rdf";
 import { sha256 } from "../kernel/sha256.ts";
 import { makeTempDirSync, readTextFileSync, removeSync, writeTextFileSync } from "../runtime/fs.ts";
 import { pathToFileURL } from "node:url";
@@ -40,7 +40,7 @@ import {
 const HERE = dirname(fromFileUrl(import.meta.url));
 const IMPORT = resolve(HERE, "..", "mizan", "integrations", "host", "import.ts");
 // a file URL, not a path: it is written into a generated module as an import specifier, and a Windows path is not one
-const KERNEL_RDF = pathToFileURL(resolve(HERE, "..", "kernel", "rdf.ts")).href;
+const KERNEL_RDF = pathToFileURL(resolve(HERE, "..", "..", "rdf", "src", "mod.ts")).href;
 const TURTLE = resolve(HERE, "..", "..", "generated", "mizan.auto.ttl");
 
 const keys = (ts: readonly RdfTriple[]): string[] => [...new Set(ts.map(tripleKey))].sort();
@@ -142,7 +142,7 @@ proves(
       format: "turtle",
       namespace: NS,
       slice: ["Widget", "Thing", "madeBy", "size"],
-      rdfImport: "../kernel/rdf.ts",
+      rdfImport: "@intellectual-frontiers/rdf",
     } as const;
     const a = await importVocabulary(input);
     assert(a.kind === "ok");
@@ -165,7 +165,13 @@ proves(
   ["0019-mizan-integrations FR-006"],
   "a source whose SHA-256 differs, a standard with no license and one that may not be copied are refused",
   async () => {
-    const base = { sourceText: SOURCE, format: "turtle", namespace: NS, slice: ["Thing"], rdfImport: "../kernel/rdf.ts" } as const;
+    const base = {
+      sourceText: SOURCE,
+      format: "turtle",
+      namespace: NS,
+      slice: ["Thing"],
+      rdfImport: "@intellectual-frontiers/rdf",
+    } as const;
     const pin = await importVocabulary({ ...base, standard: await standard({ sha256: "0".repeat(64) }) });
     assert(pin.kind === "err");
     assertEquals(pin.error[0]?.kind, "pin-mismatch");
@@ -186,7 +192,7 @@ proves(
       sourceText: SOURCE,
       format: "turtle",
       namespace: NS,
-      rdfImport: "../kernel/rdf.ts",
+      rdfImport: "@intellectual-frontiers/rdf",
     } as const;
     const missing = await importVocabulary({ ...base, slice: ["Nothing", "plain"] });
     assert(missing.kind === "err");
@@ -412,7 +418,7 @@ proves(
       format: "turtle",
       namespace: NS,
       slice: ["Thing", "Widget"],
-      rdfImport: "../kernel/rdf.ts",
+      rdfImport: "@intellectual-frontiers/rdf",
     } as const;
     const made = await importVocabulary(input);
     assert(made.kind === "ok");

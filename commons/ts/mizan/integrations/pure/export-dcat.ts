@@ -22,9 +22,9 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import { en, formatIriError, named, namespace, parseIri, plain, RDF_TYPE } from "../../../kernel/rdf-term.ts";
-import type { Named, Term, Triple } from "../../../kernel/rdf-term.ts";
-import { turtle } from "../../../kernel/rdf-write.ts";
+import { en, formatIriError, named, namespace, parseIri, plain, RDF_TYPE } from "@intellectual-frontiers/rdf";
+import type { Named, Term, Triple } from "@intellectual-frontiers/rdf";
+import { turtle } from "@intellectual-frontiers/rdf";
 
 /** One file generated from an ontology. */
 export type DcatDistributionInput = {

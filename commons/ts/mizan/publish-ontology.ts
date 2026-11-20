@@ -8,7 +8,7 @@
  *
  * @module
  */
-import { nTriples, type OntologyFile, owl, triplesOf, turtle } from "../kernel/rdf.ts";
+import { nTriples, type OntologyFile, owl, triplesOf, turtle } from "@intellectual-frontiers/rdf";
 import {
   type AnySchema,
   type CodeMember,

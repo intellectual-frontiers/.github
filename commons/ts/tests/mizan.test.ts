@@ -12,7 +12,7 @@ import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/t
 import { earsPatternOf, mizanFindings, rulePlugins, type RulePlugin, type SpecText } from "../mizan/rules.ts";
 import { AUDITED_ON, packagingTerms } from "../../ontology/audit/mod.ts";
 import { audienceModels, bases, conformanceLevels, conformanceRequirements, MZ, MZV, mz, subjectKinds } from "../../ontology/mizan/mod.ts";
-import { en, named, iriIn, OWL, OwlOntology, ontologyOf, RDFS, triplesOf, turtle } from "../kernel/rdf.ts";
+import { en, named, iriIn, OWL, OwlOntology, ontologyOf, RDFS, triplesOf, turtle } from "@intellectual-frontiers/rdf";
 import { exportHtmlView } from "../mizan/integrations/pure/export-html.ts";
 import { pm } from "../../ontology/supply-chain/packaging/mod.ts";
 import { basisMissing, daysBetween, termFindings } from "../mizan/standards.ts";
@@ -304,7 +304,7 @@ proves(["0012-ontology FR-015"], "a code list of 5,000 entries type-checks with 
     writeTextFileSync(
       `${dir}/list.ts`,
       [
-        `import { classSchema, codes, en, namespace, one, optional, range, rdfs, skos, vocabulary } from "${root}/kernel/rdf.ts";`,
+        `import { classSchema, codes, en, namespace, one, optional, range, rdfs, skos, vocabulary } from "${root}/../rdf/src/mod.ts";`,
         `const NS = namespace("t", "https://example.org/t#");`,
         `const t = vocabulary(NS, { Code: "owl:Class" });`,
         `const CODE = { label: one(rdfs.label, range.langString), definition: optional(skos.definition, range.langString) } as const;`,

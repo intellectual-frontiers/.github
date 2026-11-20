@@ -23,9 +23,9 @@
  * @module
  */
 import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
-import { namespace, nTriplesTerm, RDF_TYPE, XSD_STRING } from "../../../kernel/rdf-term.ts";
-import type { Namespace, Subject, Term, Triple } from "../../../kernel/rdf-term.ts";
-import { compareCodePoints } from "../../../kernel/rdf-write.ts";
+import { namespace, nTriplesTerm, RDF_TYPE, XSD_STRING } from "@intellectual-frontiers/rdf";
+import type { Namespace, Subject, Term, Triple } from "@intellectual-frontiers/rdf";
+import { compareCodePoints } from "@intellectual-frontiers/rdf";
 
 /** What the document is made of: the prefixes it may declare, its triples and the comment lines of its head. */
 export type RdfXmlDocument = {

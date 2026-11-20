@@ -7,7 +7,7 @@
  * @module
  */
 import { type FreshnessStatus } from "../kernel/assess.ts";
-import { validate } from "../kernel/rdf.ts";
+import { validate } from "@intellectual-frontiers/rdf";
 import { OUTCOMES } from "../kernel/test-record.ts";
 import { readTextFileSync } from "../runtime/fs.ts";
 import { dirname, fromFileUrl, resolve } from "../runtime/path.ts";

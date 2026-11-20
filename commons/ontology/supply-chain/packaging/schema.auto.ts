@@ -4,7 +4,7 @@
 // source_sha256=7f15ca89398c4f235f478a4b3b8d1f975d63c5a860b77c8a8fce01f791b7ae2f
 // basis: adopts (0018-standards-first FR-003)
 
-import { namespace, vocabulary } from "../../../ts/kernel/rdf.ts";
+import { namespace, vocabulary } from "../../../rdf/src/mod.ts";
 
 /** The namespace of schema.org, whose terms this module takes: only those a specification uses. */
 export const SCHEMA = namespace("schema", "https://schema.org/");

@@ -26,7 +26,7 @@ import {
 const HERE = dirname(fromFileUrl(import.meta.url));
 const IMPORT = resolve(HERE, "..", "mizan", "integrations", "host", "import.ts");
 // a file URL, not a path: it is written into a generated module as an import specifier, and a Windows path is not one
-const KERNEL_RDF = pathToFileURL(resolve(HERE, "..", "kernel", "rdf.ts")).href;
+const KERNEL_RDF = pathToFileURL(resolve(HERE, "..", "..", "rdf", "src", "mod.ts")).href;
 
 const keys = (ts: readonly RdfTriple[]): string[] => ts.map(tripleKey).sort();
 const RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
@@ -273,7 +273,7 @@ proves(
         format,
         namespace: NS,
         slice: ["Widget", "Thing", "madeBy", "Odd"],
-        rdfImport: "../kernel/rdf.ts",
+        rdfImport: "@intellectual-frontiers/rdf",
       });
       assert(made.kind === "ok", format);
       assertEquals(
@@ -300,7 +300,7 @@ proves(
       format: "json-ld",
       namespace: NS,
       slice: ["Thing"],
-      rdfImport: "../kernel/rdf.ts",
+      rdfImport: "@intellectual-frontiers/rdf",
     });
     assert(pinned.kind === "err" && pinned.error[0]?.kind === "pin-mismatch");
     const broken = await importVocabulary({
@@ -309,7 +309,7 @@ proves(
       format: "rdf-xml",
       namespace: NS,
       slice: ["Thing"],
-      rdfImport: "../kernel/rdf.ts",
+      rdfImport: "@intellectual-frontiers/rdf",
     });
     assert(broken.kind === "err" && broken.error[0]?.kind === "syntax");
   },

@@ -16,7 +16,7 @@
  * @module
  */
 import { absurd } from "../../core/src/mod.ts";
-import { en, type Named, prov, skos, term } from "../../ts/kernel/rdf.ts";
+import { en, type Named, prov, skos, term } from "../../rdf/src/mod.ts";
 import { bases, type Decision, type MAPPING_RELATIONS, MZID, OntologyTerm } from "../mizan/mizan.ts";
 import { CLASS_NAMES, ifr, schemaWork } from "./ifr.ts";
 

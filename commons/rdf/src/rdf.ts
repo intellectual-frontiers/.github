@@ -1,3 +1,4 @@
+// Spec: 0001-rdf FR-004
 /**
  * RDF as algebraically typed values, and the writers of its syntaxes (commons 0012-ontology): IRIs branded once checked, namespaces and
  * typed vocabularies (RDF, RDFS, OWL, XSD, SKOS, Dublin Core terms, PROV-O, SHACL), named nodes branded with their classes, literals typed

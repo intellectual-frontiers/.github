@@ -382,6 +382,8 @@ type Ran = { readonly code: number; readonly stdout: string; readonly stderr: st
 
 /** What of commons the generator and the type checker need: the ontology, the tools, the generated files and the kernel the ontology is typed by. */
 const COPIED = ["about.ts", "generated", "ontology", "tools", "ts/kernel"];
+/** The libraries lifted out of the kernel, which it and the ontology import (a copy of each, linked by package name). */
+const LIFTED = ["core", "rdf"];
 
 class Copy {
   readonly root: string;
@@ -393,12 +395,14 @@ class Copy {
     for (const rel of COPIED)
       cpSync(`${COMMONS}/${rel}`, `${this.root}/${rel}`, { recursive: true, filter: (src) => basename(src) !== "node_modules" });
     // the kernel imports the foundation by package name (commons 0032-lifting-libraries FR-003): a link to a copy of it is where Node and the compiler look for it (Node does not strip the types of a file under node_modules, and a link's real path is not)
-    cpSync(`${COMMONS}/core`, `${this.root}/core`, {
-      recursive: true,
-      filter: (src) => basename(src) !== "node_modules" && basename(src) !== "dist",
-    });
     fs.mkdirSync(`${tmp}/node_modules/@intellectual-frontiers`, { recursive: true });
-    fs.symlinkSync(`${this.root}/core`, `${tmp}/node_modules/@intellectual-frontiers/core`, { type: "dir" });
+    for (const lib of LIFTED) {
+      cpSync(`${COMMONS}/${lib}`, `${this.root}/${lib}`, {
+        recursive: true,
+        filter: (src) => basename(src) !== "node_modules" && basename(src) !== "dist",
+      });
+      fs.symlinkSync(`${this.root}/${lib}`, `${tmp}/node_modules/@intellectual-frontiers/${lib}`, { type: "dir" });
+    }
   }
   static make(): Copy {
     return new Copy(fs.makeTempDirSync({ prefix: "commons-generator-" }));
@@ -771,7 +775,7 @@ proves(
       assertMatch(text, /^\/\/ source_sha256=[0-9a-f]{64}$/m);
       assertMatch(text, /^\/\/ license: \S+$/m);
       for (const i of text.matchAll(/^import[^;]*? from "([^"]+)";/gm))
-        assertEquals(i[1], "../../../ts/kernel/rdf.ts", `${m} imports the kernel's RDF alone`);
+        assertEquals(i[1], "../../../rdf/src/mod.ts", `${m} imports the RDF library alone`);
     }
     const modules = everything.filter((m) => !m.endsWith(".auto.ts"));
     assertEquals(modules, ["families.ts", "managers.ts", "mod.ts", "packaging.ts", "pins.ts", "programs.ts", "record.ts", "rules.ts"]);
@@ -780,7 +784,7 @@ proves(
       assert(text.startsWith("/**") && text.includes("@module"), `${m} has a module comment`);
       for (const i of text.matchAll(/^(?:import|export)[^;]*? from "([^"]+)";/gm)) {
         const spec = i[1] ?? "";
-        assert(spec === "../../../ts/kernel/rdf.ts" || /^\.\/[a-z.-]+\.ts$/.test(spec), `${m} imports ${spec}`);
+        assert(spec === "../../../rdf/src/mod.ts" || /^\.\/[a-z.-]+\.ts$/.test(spec), `${m} imports ${spec}`);
       }
     }
     assertEquals(

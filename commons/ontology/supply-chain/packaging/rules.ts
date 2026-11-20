@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { en, type OntologyFile, RDFS, SKOS, term } from "../../../ts/kernel/rdf.ts";
+import { en, type OntologyFile, RDFS, SKOS, term } from "../../../rdf/src/mod.ts";
 import { PM, PMID, Rule } from "./packaging.ts";
 
 /** The rules a harness applies to its scripts, its CI and its code. */

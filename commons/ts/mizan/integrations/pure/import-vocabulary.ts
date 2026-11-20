@@ -14,7 +14,7 @@
  * @example
  * ```ts
  * import { importVocabulary } from "./import-vocabulary.ts";
- * // importVocabulary({ standard, sourceText, format: "turtle", namespace: { prefix: "ex", iri: "https://example.org/" }, slice: ["Thing"], rdfImport: "../kernel/rdf.ts" })
+ * // importVocabulary({ standard, sourceText, format: "turtle", namespace: { prefix: "ex", iri: "https://example.org/" }, slice: ["Thing"], rdfImport: "@intellectual-frontiers/rdf" })
  * ```
  *
  * @module

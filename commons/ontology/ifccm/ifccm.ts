@@ -43,7 +43,7 @@ import {
   vocabulary,
   XSD,
   xsd,
-} from "../../ts/kernel/rdf.ts";
+} from "../../rdf/src/mod.ts";
 import { bases, cfr11, cfr820, KEPT_UNALIGNED_SENTENCE, keptUnalignedDecision, keptUnalignedDecisionId, MZ, MZID, mz, OntologyTerm } from "../mizan/mizan.ts";
 
 /** The namespace of IFCCM's terms. */

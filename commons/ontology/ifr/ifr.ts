@@ -35,7 +35,7 @@ import {
   skos,
   vocabulary,
   xsd,
-} from "../../ts/kernel/rdf.ts";
+} from "../../rdf/src/mod.ts";
 import { ifqs } from "../ifqs/ifqs.ts";
 import { mz } from "../mizan/mizan.ts";
 import { SCHEMA } from "../supply-chain/packaging/schema.auto.ts";

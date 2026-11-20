@@ -24,7 +24,7 @@
  *
  * @module
  */
-import type { AnyIndividual, Fields } from "./rdf-schema.ts";
+import type { AnyIndividual, Fields } from "@intellectual-frontiers/rdf";
 
 /** The rules of the trace check (FR-007). */
 export type TraceRule =

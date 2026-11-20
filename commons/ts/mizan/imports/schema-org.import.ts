@@ -25,5 +25,5 @@ export const manifest = {
   slice: ["Action", "SoftwareApplication", "Thing", "name", "operatingSystem", "processorRequirements", "softwareVersion"],
   out: "../../../ontology/supply-chain/packaging/schema.auto.ts",
   provOut: "schema-org.auto.prov.ttl",
-  rdfImport: "../../../ts/kernel/rdf.ts",
+  rdfImport: "../../../rdf/src/mod.ts",
 } as const;

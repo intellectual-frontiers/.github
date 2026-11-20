@@ -4,7 +4,7 @@
  *
  * @module
  */
-import type { OntologyFile } from "../../../ts/kernel/rdf.ts";
+import type { OntologyFile } from "../../../rdf/src/mod.ts";
 import * as families from "./families.ts";
 import * as managers from "./managers.ts";
 import * as packaging from "./packaging.ts";
@@ -38,6 +38,6 @@ export const ontology = {
 /** The packaging ontology, as the generator reads it. */
 export type Ontology = typeof ontology;
 
-export { codeOf, formatRdfFinding, nTriples, triplesOf, turtle, validate } from "../../../ts/kernel/rdf.ts";
-export type { Iri, Named, Namespace, OntologyFile, RdfFinding } from "../../../ts/kernel/rdf.ts";
-export { DCTERMS, OWL, owl, RDFS, SKOS, XSD } from "../../../ts/kernel/rdf.ts";
+export { codeOf, formatRdfFinding, nTriples, triplesOf, turtle, validate } from "../../../rdf/src/mod.ts";
+export type { Iri, Named, Namespace, OntologyFile, RdfFinding } from "../../../rdf/src/mod.ts";
+export { DCTERMS, OWL, owl, RDFS, SKOS, XSD } from "../../../rdf/src/mod.ts";

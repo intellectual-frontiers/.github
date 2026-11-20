@@ -64,6 +64,8 @@ export function codeLines(text: string): { readonly line: number; readonly text:
 
 /** The one package that code of commons may import by name: the foundation (commons 0032-lifting-libraries FR-003). */
 const CORE = "@intellectual-frontiers/core";
+/** The packages of commons that code in this folder may import by name: the libraries lifted out of it. */
+const LIFTED = new Set([CORE, "@intellectual-frontiers/rdf"]);
 
 const KERNEL = sources("kernel");
 const RUNTIME = sources("runtime");
@@ -80,7 +82,7 @@ proves(
     const bad: string[] = [];
     for (const f of MIZAN) {
       for (const s of specifiers(readTextFileSync(join(ROOT, f)))) {
-        if (s.startsWith("node:") || s === CORE) continue;
+        if (s.startsWith("node:") || LIFTED.has(s)) continue;
         const target = toPosix(relative(ROOT, resolve(ROOT, dirname(f), s)));
         const ok =
           target.startsWith("mizan/") ||
@@ -105,7 +107,7 @@ proves(
     const bad: string[] = [];
     for (const f of pure) {
       for (const s of specifiers(readTextFileSync(join(ROOT, f)))) {
-        if (s === CORE) continue;
+        if (LIFTED.has(s)) continue;
         if (s.startsWith("node:")) {
           bad.push(`${f}: ${s}`);
           continue;
@@ -123,7 +125,7 @@ proves(["0005-typescript-runtime FR-002"], "the kernel imports nothing outside k
   const bad: string[] = [];
   for (const f of KERNEL) {
     for (const s of specifiers(readTextFileSync(join(ROOT, f)))) {
-      if (s === CORE) continue;
+      if (LIFTED.has(s)) continue;
       const target = toPosix(relative(ROOT, resolve(ROOT, dirname(f), s)));
       if (!s.startsWith("./") || !target.startsWith("kernel/")) bad.push(`${f}: ${s}`);
     }
@@ -136,7 +138,7 @@ proves(["0005-typescript-runtime FR-003"], "the runtime imports only node: built
   const bad: string[] = [];
   for (const f of RUNTIME) {
     for (const s of specifiers(readTextFileSync(join(ROOT, f)))) {
-      if (s.startsWith("node:") || s === CORE) continue;
+      if (s.startsWith("node:") || LIFTED.has(s)) continue;
       const target = toPosix(relative(ROOT, resolve(ROOT, dirname(f), s)));
       if (!s.startsWith(".") || !(target.startsWith("kernel/") || target.startsWith("runtime/"))) bad.push(`${f}: ${s}`);
     }
@@ -156,7 +158,7 @@ proves(
           .map((l) => l.text)
           .join("\n"),
       )) {
-        if (s.startsWith("node:") || s === CORE) continue;
+        if (s.startsWith("node:") || LIFTED.has(s)) continue;
         const target = toPosix(relative(ROOT, resolve(ROOT, dirname(f), s)));
         if (!s.startsWith(".") || !["kernel/", "lint/", "runtime/"].some((p) => target.startsWith(p))) bad.push(`${f}: ${s}`);
       }
@@ -249,7 +251,7 @@ proves(
     for (const [name, v] of pins) assert(/^\d+\.\d+\.\d+$/.test(v), `${name} is not pinned exactly: ${v}`);
     assert(/^7\./.test(m.devDependencies["typescript"] ?? ""), "TypeScript is 7");
     // the one run-time dependency is core, the foundation (commons 0032-lifting-libraries FR-003), linked in this repository
-    assertEquals(m.dependencies, { "@intellectual-frontiers/core": "link:../core" });
+    assertEquals(m.dependencies, { "@intellectual-frontiers/core": "link:../core", "@intellectual-frontiers/rdf": "link:../rdf" });
     const lock = text("bun.lock");
     for (const [name, v] of pins) {
       assertStringIncludes(lock, `"${name}": "${v}"`);
@@ -339,7 +341,11 @@ proves(
     const deps = Object.entries(root.dependencies ?? {});
     for (const [name, v] of deps) assert(/^\d+\.\d+\.\d+(-[\w.]+)?$/.test(v), `${name} is not pinned exactly: ${v}`);
     // the root package's run-time dependencies are docs' and core, which the kernel imports (exact, from npm)
-    assertEquals(root.dependencies, { ...manifestAt("commons/docs/package.json").dependencies, "@intellectual-frontiers/core": "0.1.0" });
+    assertEquals(root.dependencies, {
+      ...manifestAt("commons/docs/package.json").dependencies,
+      "@intellectual-frontiers/core": "0.1.0",
+      "@intellectual-frontiers/rdf": "0.1.0",
+    });
     assertEquals(root.devDependencies, {});
     const lock = readTextFileSync(join(ROOT, "..", "..", "bun.lock"));
     for (const [name, v] of deps) assertStringIncludes(lock, `["${name}@${v}"`);
