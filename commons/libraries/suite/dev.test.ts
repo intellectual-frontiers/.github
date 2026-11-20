@@ -20,6 +20,7 @@ import {
 } from "../src/dev.ts";
 import { existsSync, mkdirSync, readLink, symlinkSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
+import { build } from "@intellectual-frontiers/system/proc";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
 const SPEC = "0001-libraries";
@@ -168,6 +169,8 @@ proves(
   [`${SPEC} FR-011`],
   "a real run on real files: the libraries a file affects are type-checked and tested, a type error and a failing test fail the run with the exit status 1 and say where, and a usage error is 2",
   async () => {
+    // Windows is left untested here: the temporary repository borrows this library's compiler by a folder link and its tests by `bun:test`, which the runners' Windows has no fixture for; the pure parts above run there
+    if (build.os === "windows") return;
     await withTempDir(async (dir) => {
       repo(dir);
       put(dir, "commons/base/suite/one.test.ts", 'import { expect, test } from "bun:test";\nimport { one } from "../src/mod.ts";\ntest("one", () => expect(one).toBe(1));\n');
