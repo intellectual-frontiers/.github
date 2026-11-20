@@ -191,6 +191,8 @@ const ci: Workflow = {
             'case "$base" in ""|0000000000000000000000000000000000000000) base=origin/main ;; esac',
             'if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then scope=--all; else scope="--base $base"; fi',
             'bun commons/libraries/src/plan.ts $scope --github-output "$GITHUB_OUTPUT"',
+            "# the proof plan of the same change (commons repoctl 0007-repoctl-prove), written to the summary of the run: what a person would run, and why each skipped proof is safe; it gates nothing, the matrices above do",
+            "{ echo '### Proof plan'; echo '```'; bun commons/repoctl/src/repoctl.ts prove --tier 6 --why $scope 2>&1 || true; echo '```'; } >> \"$GITHUB_STEP_SUMMARY\"",
           ),
           { name: "The libraries this change affects, and the systems each runs on", id: "plan", shell: "bash" },
         ),

@@ -104,7 +104,7 @@ export function selectSeam(tests: readonly TestReach[], provider: LibraryName, d
   const left: TestReach[] = [];
   for (const test of tests) {
     const usage = test.uses.find((u) => u.provider === provider)?.usage;
-    const hit = delta.kind === "unknown" || (usage !== undefined && (usage.all || (delta.kind === "changed" && usage.names.some((n) => delta.symbols.includes(n)))));
+    const hit = usage !== undefined && (delta.kind === "unknown" || usage.all || (delta.kind === "changed" && usage.names.some((n) => delta.symbols.includes(n))));
     if (hit) run.push({ test, by: "symbol" });
     else if (test.environmental) run.push({ test, by: "environmental" });
     else left.push(test);
