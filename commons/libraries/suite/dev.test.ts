@@ -11,15 +11,16 @@ import {
   failureLines,
   head,
   linkLibraries,
-  linksOf,
   main,
   ownPackages,
   pool,
   repoRootOf,
   summaryLines,
 } from "../src/dev.ts";
-import { existsSync, mkdirSync, readLink, symlinkSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { copyFile, existsSync, mkdirSync, readLink, symlinkSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { linksOf } from "../src/link.ts";
 import { fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
+import { proc } from "@intellectual-frontiers/system";
 import { build } from "@intellectual-frontiers/system/proc";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
@@ -185,6 +186,45 @@ proves(
       assertEquals(await main(["--repo", dir, "--only", "top", "--no-tests"]), 1, "a type error");
       assertEquals(await main(["--repo", dir, "--nonsense"]), 2);
       assertEquals(await main(["--repo", dir, "--only", "nope"]), 2);
+    });
+  },
+);
+
+proves(
+  [`${SPEC} FR-011`],
+  "a fresh checkout, with no link under commons/node_modules and only the root's packages installed, links the libraries by name with a command that imports none, and then runs dev:check --list and release plan --offline",
+  async () => {
+    // Left untested where the root has no install (the libraries' own CI job installs only the library's packages): there is no root `node_modules` to lend the copy.
+    if (!existsSync(join(ROOT, "node_modules", "typescript")) || build.os === "windows") return;
+    const git = proc.which("git");
+    if (git === undefined) return;
+    const listed = await proc.run([git, "-C", ROOT, "ls-files", "-co", "--exclude-standard"]);
+    assertEquals(listed.code, 0);
+    await withTempDir(async (dir) => {
+      for (const f of listed.stdout.split("\n").filter((x) => x !== "" && existsSync(join(ROOT, x)))) {
+        mkdirSync(join(dir, f, ".."), { recursive: true });
+        await copyFile(join(ROOT, f), join(dir, f));
+      }
+      assert(!existsSync(join(dir, "commons", "node_modules")), "a fresh checkout has no links");
+      // what a fresh clone has after `bun install` at the root: its packages, which are old copies of the libraries and have no kanon
+      symlinkSync(join(ROOT, "node_modules"), join(dir, "node_modules"), { type: "junction" });
+      const g = (...a: string[]) => proc.run([git, "-C", dir, "-c", "user.name=t", "-c", "user.email=t@t", "-c", "commit.gpgsign=false", ...a]);
+      await g("init", "-q", "-b", "main");
+      await g("add", "-A", "--", ".", ":!node_modules");
+      await g("commit", "-q", "-m", "fresh");
+      const bun = proc.execPath();
+      const before = await proc.run([bun, "commons/libraries/src/dev.ts", "--list"], { cwd: dir });
+      assert(before.code !== 0 || before.stdout.includes("affected"), "without the links it either fails or, where the root has them, works");
+      const linked = await proc.run([bun, "commons/libraries/src/link.ts"], { cwd: dir });
+      assertEquals(linked.code, 0, linked.stderr);
+      assert(existsSync(join(dir, "commons", "node_modules", "@intellectual-frontiers", "kanon", "package.json")));
+      assert(existsSync(join(dir, "commons", "node_modules", "@intellectual-frontiers", "commons", "package.json")), "commons/ts is linked as commons");
+      const list = await proc.run([bun, "commons/libraries/src/dev.ts", "--list", "--all"], { cwd: dir });
+      assertEquals(list.code, 0, list.stderr);
+      assertStringIncludes(list.stdout, "affected");
+      const plan = await proc.run([bun, "commons/libraries/src/releasing.ts", "plan", "--offline"], { cwd: dir });
+      assertEquals(plan.code, 0, plan.stderr);
+      assertStringIncludes(plan.stdout, "released as it is");
     });
   },
 );

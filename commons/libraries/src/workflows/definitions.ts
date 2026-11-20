@@ -181,6 +181,7 @@ const ci: Workflow = {
         checkout({ fetchDepth: 0, comment: "the whole history: the plan compares the head with the commit the change starts at" }),
         bun(),
         run("bun install --frozen-lockfile", { name: "The packages the plan reads, from the root's bun.lock" }),
+        run("bun commons/libraries/src/link.ts", { name: "The libraries, linked by name before any of them is imported (the root's packages are old copies from npm)" }),
         run(
           lines(
             "# a pull request starts at its base; a push to main at the commit main was at; any other branch at main, so a push that replaced a run that was stopped still carries what that run was to prove",
@@ -629,6 +630,7 @@ const release: Workflow = {
         checkout({ fetchDepth: 0, comment: "the whole history and its tags: the plan leaves out what is tagged" }),
         bun(),
         run("bun install --frozen-lockfile", { name: "The packages the plan reads, from the root's bun.lock" }),
+        run("bun commons/libraries/src/link.ts", { name: "The libraries, linked by name before any of them is imported (the root's packages are old copies from npm)" }),
         run(
           lines(
             'test "$GITHUB_REF" = refs/heads/main || { echo "a release is made from main, not $GITHUB_REF"; exit 1; }',
@@ -668,6 +670,7 @@ const release: Workflow = {
         checkout({ fetchDepth: 0, comment: "the tags: what is tagged is left out" }),
         bun(),
         run("bun install --frozen-lockfile", { name: "The packages the command reads, from the root's bun.lock" }),
+        run("bun commons/libraries/src/link.ts", { name: "The libraries, linked by name before any of them is imported" }),
         use(PIN.setupNode, { with: { "node-version": expr("env.NODE_VERSION"), "registry-url": "https://registry.npmjs.org" } }),
         use(PIN.downloadArtifact, { name: "The tarballs", with: { pattern: "package-*", path: "package" } }),
         run(PUBLISH_COMMAND, {

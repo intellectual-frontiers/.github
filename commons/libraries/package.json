@@ -16,6 +16,7 @@
     "./generate-ontology": "./src/generate-ontology.ts",
     "./generate-workflows": "./src/generate-workflows.ts",
     "./libraries": "./src/libraries.ts",
+    "./link": "./src/link.ts",
     "./newer": "./src/newer.ts",
     "./oscal-register": "./src/oscal-register.ts",
     "./pack": "./src/pack-library.ts",

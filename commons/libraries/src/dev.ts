@@ -32,13 +32,14 @@
 import process from "node:process";
 import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import { stdio } from "@intellectual-frontiers/system";
-import { existsSync, mkdirSync, readDirSync, readTextFileSync, symlinkSync } from "@intellectual-frontiers/system/fs";
+import { existsSync, readDirSync, readTextFileSync } from "@intellectual-frontiers/system/fs";
 import { dirname, join, resolve } from "@intellectual-frontiers/system/path";
 import { build, run } from "@intellectual-frontiers/system/proc";
 import { currentLook, type Look } from "@intellectual-frontiers/system/tty";
 import { flag, formatUsageError, helpText, many, parseArgs, value } from "@intellectual-frontiers/terminal/args";
 import { label, paint } from "@intellectual-frontiers/terminal/palette";
 import { affectedBy, changedSince, everyLibrary } from "./affected.ts";
+import { linkAll } from "./link.ts";
 import type { Library } from "./libraries.ts";
 
 /** What the loop is asked about: what changed since a revision, a list of files, named libraries or everything. */
@@ -107,36 +108,10 @@ const readJson = (file: string): Readonly<Record<string, unknown>> => {
   }
 };
 
-/** The folders of commons that are packages of the scope, by the folder: `ts` is `@intellectual-frontiers/commons`, the others their own names. */
-export function linksOf(repo: string): ReadonlyMap<string, string> {
-  const links = new Map<string, string>();
-  const dirs = readDirSync(join(repo, "commons"))
-    .filter((e) => e.isDirectory && e.name !== "node_modules")
-    .map((e) => e.name)
-    .sort((a, b) => (a === "ts" ? -1 : b === "ts" ? 1 : a < b ? -1 : 1));
-  for (const d of dirs) {
-    const name = readJson(join(repo, "commons", d, "package.json"))["name"];
-    if (typeof name === "string" && name.startsWith("@intellectual-frontiers/") && !links.has(name)) links.set(name, join(repo, "commons", d));
-  }
-  return links;
-}
-
-/** Links every package of commons under `commons/node_modules/@intellectual-frontiers`, where it is not linked yet: the one place every file of commons finds the others by name. */
+/** Links the libraries under `commons/node_modules` where they are not linked yet (`link.ts`, which `bun run dev:check` runs before this command can import any of them). */
 export function linkLibraries(repo: string): Result<number, string> {
-  let made = 0;
-  try {
-    const scope = join(repo, "commons", "node_modules", "@intellectual-frontiers");
-    for (const [name, dir] of linksOf(repo)) {
-      const at = join(scope, name.slice("@intellectual-frontiers/".length));
-      if (existsSync(at)) continue;
-      if (made === 0) mkdirSync(scope, { recursive: true });
-      symlinkSync(dir, at, { type: "junction" });
-      made += 1;
-    }
-    return ok(made);
-  } catch (e) {
-    return err(`the libraries could not be linked under commons/node_modules: ${e instanceof Error ? e.message : String(e)}`);
-  }
+  const r = linkAll(repo);
+  return "problem" in r ? err(r.problem) : ok(r.made);
 }
 
 /** The revision a loop compares with where none is given: `origin/main`, else `main`, else `HEAD` (the working tree alone). */

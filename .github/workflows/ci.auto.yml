@@ -48,6 +48,8 @@ jobs:
       - uses: ./.github/actions/bun
       - name: "The packages the plan reads, from the root's bun.lock"
         run: bun install --frozen-lockfile
+      - name: "The libraries, linked by name before any of them is imported (the root's packages are old copies from npm)"
+        run: bun commons/libraries/src/link.ts
       - name: "The libraries this change affects, and the systems each runs on"
         id: plan
         shell: bash

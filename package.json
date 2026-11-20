@@ -11,8 +11,8 @@
     "./ontology/mizan": "./commons/ontology/src/mizan/mod.ts"
   },
   "scripts": {
-    "dev:check": "bun commons/libraries/src/dev.ts",
-    "release": "bun commons/libraries/src/releasing.ts"
+    "dev:check": "bun commons/libraries/src/link.ts && bun commons/libraries/src/dev.ts",
+    "release": "bun commons/libraries/src/link.ts && bun commons/libraries/src/releasing.ts"
   },
   "bin": {
     "ifc": "./commons/ts/node/ifc.mjs",
