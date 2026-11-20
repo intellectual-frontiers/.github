@@ -133,7 +133,7 @@ export function compileWith(d: Dialect, alias: string, write: (c: Ctx) => string
   return `${withOf(c)}${text}`;
 }
 
-export { literal as literalOf, expr as exprOf };
+export { literal as literalOf, expr as exprOf, select as selectOf };
 export type { Ctx };
 
 /**

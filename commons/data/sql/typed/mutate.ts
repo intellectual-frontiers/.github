@@ -8,9 +8,9 @@
  */
 import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
 import type { Dialect } from "@intellectual-frontiers/data/sql/physical";
-import { compileWith, exprOf, literalOf, TypedError } from "./compile.ts";
+import { compileWith, exprOf, literalOf, selectOf, TypedError } from "./compile.ts";
 import { type Expr, type Node, nodeOf, subNode } from "./expr.ts";
-import type { Projection, RowOfProjection, Runner } from "./select.ts";
+import type { Projection, RowOfProjection, Runner, Scope, Select, SelectAst } from "./select.ts";
 import type { Column, Columns, Table } from "./table.ts";
 
 type Any = Table<unknown, unknown, string>;
@@ -74,24 +74,27 @@ function wrap<Row>(write: (d: Dialect) => string): Statement<Row> {
 
 /** An insert. */
 export class Insert<R, I, N extends string, Row = never> extends Returning<R, I, N, Row> {
+  /** Where the rows come from, where they are those of a select. */
+  private readonly query: { readonly keys: readonly string[]; readonly ast: SelectAst } | undefined;
   private readonly rows: readonly I[];
   private readonly conflict: { readonly target: readonly string[]; readonly set?: Readonly<Record<string, unknown>> } | undefined;
-  constructor(table: Table<R, I, N>, rows: readonly I[], conflict: { readonly target: readonly string[]; readonly set?: Readonly<Record<string, unknown>> } | undefined, projection?: readonly (readonly [string, Node])[]) {
+  constructor(table: Table<R, I, N>, rows: readonly I[], conflict: { readonly target: readonly string[]; readonly set?: Readonly<Record<string, unknown>> } | undefined, projection?: readonly (readonly [string, Node])[], query?: { readonly keys: readonly string[]; readonly ast: SelectAst }) {
     super(table, projection);
     this.rows = rows;
     this.conflict = conflict;
+    this.query = query;
   }
   /** Where a row's key is already there, leave it. With the keys of a unique constraint or key; none is any. */
   onConflictDoNothing(...keys: readonly (keyof R & string)[]): Insert<R, I, N, Row> {
-    return new Insert(this.table, this.rows, { target: keys }, this.projection);
+    return new Insert(this.table, this.rows, { target: keys }, this.projection, this.query);
   }
   /** Where a row's key is already there, change the row: each key of `set` to a value or an expression of the table's columns. */
   onConflictDoUpdate(keys: readonly [keyof R & string, ...(keyof R & string)[]], set: { readonly [K in keyof R & string]?: R[K] | Expr<R[K]> }): Insert<R, I, N, Row> {
-    return new Insert(this.table, this.rows, { target: keys, set }, this.projection);
+    return new Insert(this.table, this.rows, { target: keys, set }, this.projection, this.query);
   }
   /** What to give back of each row inserted. */
   returning<P extends Projection>(f: (c: Columns<R>) => P): Insert<R, I, N, RowOfProjection<P>> & Statement<RowOfProjection<P>> {
-    return withStatement(new Insert<R, I, N, RowOfProjection<P>>(this.table, this.rows, this.conflict, this.project(f)));
+    return withStatement(new Insert<R, I, N, RowOfProjection<P>>(this.table, this.rows, this.conflict, this.project(f), this.query));
   }
   toSql(d: Dialect): Result<string, TypedError> {
     return wrap<Row>((dd) => this.write(dd)).toSql(d);
@@ -102,17 +105,18 @@ export class Insert<R, I, N extends string, Row = never> extends Returning<R, I,
   private write(d: Dialect): string {
     const t = this.table as unknown as Any;
     const first = this.rows[0] as Record<string, unknown> | undefined;
-    if (first === undefined) throw new TypedError("an insert has at least one row");
-    const keys = Object.keys(first).filter((k) => first[k] !== undefined);
+    if (first === undefined && this.query === undefined) throw new TypedError("an insert has at least one row");
+    const keys = this.query !== undefined ? [...this.query.keys] : Object.keys(first ?? {}).filter((k) => (first ?? {})[k] !== undefined);
     if (keys.length === 0) throw new TypedError("a row has at least one value (a table whose columns all have defaults is filled with DEFAULT VALUES, which dialects do not share)");
-    const values = this.rows.map((row, i) => {
+    const values = (this.query !== undefined ? [] : this.rows).map((row, i) => {
       const r = row as Record<string, unknown>;
       const own = Object.keys(r).filter((k) => r[k] !== undefined);
       if (own.length !== keys.length || own.some((k) => !keys.includes(k))) throw new TypedError(`row ${i + 1} has other columns than the first: rows of one insert have the same columns (insert the others apart)`);
       return `(${keys.map((k) => literalOf(r[k], d)).join(", ")})`;
     });
     return compileWith(d, t.alias, (c) => {
-      let sql = `INSERT INTO ${target(t, d)} (${keys.map((k) => d.quote(sqlName(t, k))).join(", ")}) VALUES ${values.join(", ")}`;
+      const head = `INSERT INTO ${target(t, d)} (${keys.map((k) => d.quote(sqlName(t, k))).join(", ")})`;
+      let sql = this.query !== undefined ? `${head} ${selectOf(this.query.ast, { d, ctes: c.ctes })}` : `${head} VALUES ${values.join(", ")}`;
       if (this.conflict !== undefined) {
         sql += ` ON CONFLICT${this.conflict.target.length === 0 ? "" : ` (${this.conflict.target.map((k) => d.quote(sqlName(t, k))).join(", ")})`}`;
         if (this.conflict.set === undefined) sql += " DO NOTHING";
@@ -216,6 +220,8 @@ const withStatement = <T>(s: T): T => s;
 
 /** `INSERT INTO`: at least one row, of the table's insert type. */
 export const insertInto = <R, I, N extends string>(table: Table<R, I, N>) => ({
+  /** The rows of a select, whose keys are keys of the table: `INSERT INTO t (keys) SELECT ...`. A select that is followed by an upsert is given a condition (SQLite reads `ON CONFLICT` after a bare select as part of it). */
+  select: <K extends keyof R & string>(keys: readonly [K, ...K[]], query: Select<Scope, { readonly [P in K]: R[P] }>): Insert<R, I, N> => new Insert(table, [], undefined, undefined, { keys, ast: query.ast }),
   values: (rows: I | readonly [I, ...I[]]): Insert<R, I, N> => new Insert(table, Array.isArray(rows) ? (rows as readonly I[]) : [rows as I], undefined),
 });
 /** `UPDATE`: the values of the columns to change, which are values or expressions of the table's columns. */

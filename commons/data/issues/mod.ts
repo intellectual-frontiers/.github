@@ -16,5 +16,6 @@ import i8 from "./00008-migration-flag-is-forgeable.ts";
 import i9 from "./00009-ci-lacks-shells.ts";
 import i10 from "./00010-etl-elt-integration.ts";
 import i11 from "./00011-dbt-parity.ts";
+import i12 from "./00012-sql-aide-leftovers.ts";
 
-export const issues = issueSet("data", [i1, i2, i3, i4, i5, i6, i7, i8, i9, i10, i11]);
+export const issues = issueSet("data", [i1, i2, i3, i4, i5, i6, i7, i8, i9, i10, i11, i12]);
