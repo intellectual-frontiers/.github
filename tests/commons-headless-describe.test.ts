@@ -28,7 +28,10 @@ proves(
   "Ergonex is described for each tier: the ids are the agreed ones, every verb the tier sees traces to its command, no annotation is dropped, and each model is a LayeredModel of the documentation generator",
   () => {
     const models = describe(program);
-    assertEquals(models.map((m) => m.name), program.tiers.ladder.map((t) => `ergonex-${t}`));
+    assertEquals(
+      models.map((m) => m.name),
+      program.tiers.ladder.map((t) => `ergonex-${t}`),
+    );
     const placed = placedCommands(program.children);
     assert(placed.length >= 20, `${placed.length} verbs`);
     for (const m of models) {
