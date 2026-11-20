@@ -771,6 +771,13 @@ export const ACTIONS: readonly CompositeAction[] = [
           key: `${expr("runner.os")}-${expr("runner.arch")}-bun-${expr("hashFiles('commons/generated/pins.auto.env')")}`,
         },
       }),
+      run(
+        "node -e \"const fs=require('fs'),p=require('path');fs.mkdirSync('commons/ts/node_modules/@intellectual-frontiers',{recursive:true});fs.symlinkSync(p.resolve('commons/core'),'commons/ts/node_modules/@intellectual-frontiers/core','junction')\"",
+        {
+          name: "The foundation, linked where the installer's kernel looks for it (the installer runs before any package is installed; Bun links it again later)",
+          shell: "bash",
+        },
+      ),
       run('node commons/ts/tools/install-bun.ts "$RUNNER_TEMP/bun"', { name: "Bun, pinned and checked", shell: "bash" }),
     ],
   },
