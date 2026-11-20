@@ -221,7 +221,6 @@ const hostOf = (): Host => ({
   stdin: () => Promise.resolve(""),
   argv: [],
   now: () => 0,
-  run: { failure: undefined },
 });
 
 proves(
@@ -261,7 +260,7 @@ proves(
 
 proves(
   ["0001-ergonex FR-010", "0001-ergonex FR-022"],
-  "a finding of severity error or warning fails the run (status 1), an informational finding alone does not, and a failure of the body is recorded as usage or environment for the program's statuses 2 and 3",
+  "a finding of severity error or warning fails the run (status 1), an informational finding alone does not, and a failure of the body ends the run as usage or environment (2 or 3), in the document too",
   async () => {
     const finding = (severity: Finding["severity"]): Finding => ({ ruleId: "ergonex/generated-drift", severity, message: "x is not written", subject: "x", firstSeen: "2026-11-17" });
     const host = hostOf();
@@ -281,9 +280,8 @@ proves(
     assertEquals(warned.code, 1);
     assertStringIncludes(warned.err, "[E-GENERATED-DRIFT]");
     assertEquals((await run(program, ["noted"], IO)).code, 0);
-    assertEquals(host.run.failure, undefined);
     const broken = await run(program, ["broken"], IO);
-    assertEquals(broken.code, 1);
-    assertEquals(host.run.failure, "environment");
+    assertEquals(broken.code, 3);
+    assertEquals(JSON.parse((await run(program, ["broken", "--json"], IO)).out).exit, { code: 3, name: "environment" });
   },
 );

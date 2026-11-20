@@ -69,7 +69,6 @@ export async function main(argv: readonly string[], deps: MainDeps = {}): Promis
   const windows = build.os === "windows";
   const os = build.os === "darwin" ? "darwin" : build.os === "windows" ? "windows" : "linux";
   const placed = placesOf((name) => environment[name], os);
-  const run: ProgramHost["run"] = { failure: undefined };
   const homeFor = (override: string | undefined): string | undefined => {
     const h = homeOf({
       override: override === undefined ? undefined : resolve(cwd, override),
@@ -89,7 +88,6 @@ export async function main(argv: readonly string[], deps: MainDeps = {}): Promis
     stdin: deps.stdin ?? (() => stdin.text()),
     argv,
     now,
-    run,
   };
   const program = ergonexProgram(host);
 
@@ -123,7 +121,7 @@ export async function main(argv: readonly string[], deps: MainDeps = {}): Promis
     }
   }
 
-  const code = await launch(program, {
+  return await launch(program, {
     argv,
     io: {
       env: (n) => {
@@ -141,9 +139,6 @@ export async function main(argv: readonly string[], deps: MainDeps = {}): Promis
       ...deps.io,
     },
   });
-  // Headless' statuses are 0, 1 and 4; a command that could not do what it was asked ends the run with the program's own 2 (the words do not fit) or 3 (the host cannot do it)
-  if (code === 1 && run.failure !== undefined) return exitCodeOf(run.failure === "usage" ? "Usage" : "Environment");
-  return code;
 }
 
 if (import.meta.main) process.exitCode = await main(process.argv.slice(2));

@@ -206,5 +206,5 @@ export {
   version,
 } from "./types.ts";
 export { ergonexProgram, modulesOf, TREE, type Entry, type ProgramHost } from "./commands/program.ts";
-export { type CommandDefinition, defineCommand, type Host, type Make, type Run } from "./commands/define.ts";
+export { type CommandDefinition, defineCommand, type Host, type Make } from "./commands/define.ts";
 export { CATALOGUE, codeOfRule } from "./commands/catalogue.ts";

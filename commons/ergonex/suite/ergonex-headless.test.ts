@@ -26,7 +26,6 @@ const program = ergonexProgram({
   stdin: () => Promise.resolve(""),
   argv: [],
   now: () => 0,
-  run: { failure: undefined },
 });
 
 /** Every `.ts` file under a folder of the package. */

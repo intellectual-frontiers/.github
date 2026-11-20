@@ -118,6 +118,7 @@ export function ergonexProgram(host: ProgramHost): Program {
       const token = host.env["ERGONEX_GITHUB_TOKEN"];
       return token === undefined || token === "" ? [] : [token];
     },
+    secretKeys: ["ERGONEX_GITHUB_TOKEN"],
     defaultCommand: ["start"],
   });
 }
