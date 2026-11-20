@@ -7,7 +7,7 @@
  * @module
  */
 import { branch, type Node, type Program, programOf } from "@intellectual-frontiers/headless/logical";
-import { ok } from "@intellectual-frontiers/core";
+import { absurd, ok } from "@intellectual-frontiers/core";
 import { existsSync } from "../platform/r-fs.ts";
 import { join } from "../platform/r-path.ts";
 import { ERGONEX_VERSION } from "../state-record.ts";
@@ -50,43 +50,46 @@ const start = defineCommand({
   },
 });
 
-/** The commands and branches of the program, each as a function of the host it runs on. */
-type Tree = readonly (Make | { readonly branch: string; readonly summary: string; readonly children: readonly Make[] })[];
+/** An entry of the program's tree: a command, or a branch of commands, each made for a host. Tagged, so that a `switch` over it is exhaustive. */
+export type Entry =
+  | { readonly kind: "command"; readonly make: Make }
+  | { readonly kind: "branch"; readonly name: string; readonly summary: string; readonly children: readonly Make[] };
 
-const TREE: Tree = [
-  start,
-  initCommand,
-  {
-    branch: "repos",
-    summary: "Keep the list of repositories of the workspace.",
-    children: [addCommand, removeRepoCommand, deleteRepoCommand, adoptCommand],
-  },
-  planCommand,
-  applyCommand,
-  statusCommand,
-  doctorCommand,
-  verifyCommand,
-  renderCommand,
-  {
-    branch: "worktree",
-    summary: "Make, list and prune the worktrees of the managed repositories.",
-    children: [worktreeCommands.create, worktreeCommands.list, worktreeCommands.prune],
-  },
-  {
-    branch: "shell",
-    summary: "Print the shell snippet, or put it in (or take it out of) your start-up file.",
-    children: [shellCommands.print, shellCommands.install, shellCommands.uninstall],
-  },
-  pathsCommand,
-  setupCommand,
-  toolsCommand,
-  modulesCommand,
-  hookCommand,
+const command = (make: Make): Entry => ({ kind: "command", make });
+const branchOf = (name: string, summary: string, children: readonly Make[]): Entry => ({ kind: "branch", name, summary, children });
+
+/** The tree of the program, in the order the help lists it. */
+export const TREE: readonly Entry[] = [
+  command(start),
+  command(initCommand),
+  branchOf("repos", "Keep the list of repositories of the workspace.", [addCommand, removeRepoCommand, deleteRepoCommand, adoptCommand]),
+  command(planCommand),
+  command(applyCommand),
+  command(statusCommand),
+  command(doctorCommand),
+  command(verifyCommand),
+  command(renderCommand),
+  branchOf("worktree", "Make, list and prune the worktrees of the managed repositories.", [worktreeCommands.create, worktreeCommands.list, worktreeCommands.prune]),
+  branchOf("shell", "Print the shell snippet, or put it in (or take it out of) your start-up file.", [shellCommands.print, shellCommands.install, shellCommands.uninstall]),
+  command(pathsCommand),
+  command(setupCommand),
+  command(toolsCommand),
+  command(modulesCommand),
+  command(hookCommand),
 ];
 
 /** The nodes of the tree, made for a host. */
-function nodesOf(tree: Tree, host: Host): readonly Node[] {
-  return tree.map((t): Node => (typeof t === "function" ? t(host) : branch({ name: t.branch, summary: t.summary, children: t.children.map((c) => c(host)) })));
+function nodesOf(tree: readonly Entry[], host: Host): readonly Node[] {
+  return tree.map((t): Node => {
+    switch (t.kind) {
+      case "command":
+        return t.make(host);
+      case "branch":
+        return branch({ name: t.name, summary: t.summary, children: t.children.map((c) => c(host)) });
+      default:
+        return absurd(t);
+    }
+  });
 }
 
 /** The words of the program's own tree, for the modules a command lists and the snippet of a shell: each top-level word with its summary and the words below it. */

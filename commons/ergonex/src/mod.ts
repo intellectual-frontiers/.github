@@ -8,7 +8,7 @@
  * with `git` and the files is in `host/`; the tools and the policy scans are another milestone's work.
  *
  * @remarks
- * Everything here but `host/`, `commands/` and `ergonex.ts` is pure: no file, no process, no clock, no environment; each takes what it needs as an argument. `host/` runs `git` and reads and writes files, `commands/` are the typed modules of the command, and `ergonex.ts` is the controller; `host/observe.ts` only reads.
+ * Everything here but `host/`, `commands/`, `ergonex.ts` and the exports of the program at the end of this entry is pure: no file, no process, no clock, no environment; each takes what it needs as an argument. `host/` runs `git` and reads and writes files, `commands/` are the typed modules of the command, and `ergonex.ts` is the controller; `host/observe.ts` only reads.
  *
  * @module
  */
@@ -205,3 +205,6 @@ export {
   type Version,
   version,
 } from "./types.ts";
+export { ergonexProgram, modulesOf, TREE, type Entry, type ProgramHost } from "./commands/program.ts";
+export { type CommandDefinition, defineCommand, type Host, type Make, type Run } from "./commands/define.ts";
+export { CATALOGUE, codeOfRule } from "./commands/catalogue.ts";
