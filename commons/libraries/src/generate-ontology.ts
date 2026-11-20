@@ -37,6 +37,7 @@ import {
 import * as ifccmOntology from "@intellectual-frontiers/ontology/ifccm";
 import * as ifrOntology from "@intellectual-frontiers/ontology/ifr";
 import * as ifqsOntology from "@intellectual-frontiers/ontology/ifqs";
+import * as otoOntology from "@intellectual-frontiers/ontology/oto";
 import * as kanonOntology from "@intellectual-frontiers/ontology/kanon";
 import { formatRdfFinding, type OntologyFile, validate } from "@intellectual-frontiers/rdf";
 import { stdio } from "@intellectual-frontiers/system";
@@ -208,6 +209,46 @@ export const IFQS: OntologyPublication = {
   license: CC0,
 };
 
+/** The Operational Truth Ontology (commons ontology 0002-oto), as it is published. */
+export const OTO: OntologyPublication = {
+  name: "oto",
+  ns: { prefix: "oto", iri: otoOntology.OTO.iri },
+  idNs: { prefix: "mzid", iri: MZID.iri },
+  curies: [
+    ["oto", otoOntology.OTO.iri],
+    ["ifqs", ifqsOntology.IFQS.iri],
+    ["mz", MZ.iri],
+    ["xsd", "http://www.w3.org/2001/XMLSchema#"],
+    ["rdfs", "http://www.w3.org/2000/01/rdf-schema#"],
+    ["skos", "http://www.w3.org/2004/02/skos/core#"],
+    ["dcterms", "http://purl.org/dc/terms/"],
+    ["prov", "http://www.w3.org/ns/prov#"],
+  ],
+  files: otoOntology.files,
+  ontology: otoOntology.otoOntology,
+  classes: otoOntology.classes,
+  properties: otoOntology.properties,
+  terms: otoOntology.terms,
+  schemas: [otoOntology.DomainSchema, otoOntology.MaturityLevelSchema, otoOntology.Alignment],
+  lists: listsOf("oto", [
+    ["Domain", otoOntology.domains],
+    ["Invariant", otoOntology.invariants],
+    ["Pillar", otoOntology.pillars],
+    ["Principle", otoOntology.principles],
+    ["MaturityLevel", otoOntology.maturityLevels],
+    ["Dimension", otoOntology.dimensions],
+    ["AlignmentState", otoOntology.alignmentStates],
+  ]),
+  source: "commons/ontology/src/oto/*.ts",
+  run: RUN,
+  shapes: { prefix: "otosh", iri: "https://www.intellectualfrontiers.com/ontology/oto-shapes#" },
+  schemasIri: "https://www.intellectualfrontiers.com/ontology/oto-schemas",
+  sssomSetId: "https://www.intellectualfrontiers.com/ontology/oto-mappings",
+  sssomCuries: { dcterms: "http://purl.org/dc/terms/", prov: "http://www.w3.org/ns/prov#", ifqs: ifqsOntology.IFQS.iri },
+  viewTitle: "Operational Truth Ontology",
+  license: CC0,
+};
+
 /** The ontology of Intellectual Frontiers Releases (commons 0026-works-versioning), as it is published. */
 export const IFR: OntologyPublication = {
   name: "ifr",
@@ -279,7 +320,7 @@ export const KANON: OntologyPublication = {
 };
 
 /** The ontologies of commons that are published, each from its own typed modules: Mizan's, then the ones its specifications define. */
-export const publications: readonly OntologyPublication[] = [MIZAN, IFCCM, IFQS, IFR, KANON];
+export const publications: readonly OntologyPublication[] = [MIZAN, IFCCM, IFQS, OTO, IFR, KANON];
 
 /** Where the generated files are downloaded from: this repository's `commons/` folder on its default branch. */
 const DOWNLOAD_BASE = "https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/";

@@ -20,43 +20,43 @@ proves(["0002-estate-governance FR-001"], "the identities are made only by their
 
 proves(["0002-estate-governance FR-002", "0002-estate-governance FR-003"], "each state offers what it should, a capability not offered has a reason, and an asset moves only as allowed", () => {
   assertEquals([...STATES], ["discovered", "adopted", "managed"]);
-  assertEquals(CAPABILITIES.filter((c) => offers("discovered", c)), ["observe"]);
-  assertEquals(CAPABILITIES.filter((c) => offers("adopted", c)), ["verify", "observe", "access"]);
+  assertEquals(CAPABILITIES.filter((c) => offers("discovered", c)), [], "a discovered asset is listed and nothing more");
+  assertEquals(CAPABILITIES.filter((c) => offers("adopted", c)), ["verify", "observe"], "an adopted asset is observed and checked");
   assertEquals(CAPABILITIES.filter((c) => offers("managed", c)).length, 10);
   assertEquals(reasonNotOffered("managed", "converge"), undefined);
   assert(reasonNotOffered("adopted", "converge")?.includes("never changed") === true);
-  assert(reasonNotOffered("discovered", "verify")?.includes("nobody has adopted") === true);
+  assert(reasonNotOffered("discovered", "observe")?.includes("only listed") === true);
   assertEquals(mayMove("discovered", "adopted"), true);
-  assertEquals(mayMove("adopted", "managed"), true);
-  assertEquals(mayMove("managed", "adopted"), true);
   assertEquals(mayMove("adopted", "discovered"), true);
-  assertEquals(mayMove("discovered", "managed"), false, "an asset is adopted first");
+  assertEquals(mayMove("adopted", "managed"), false, "a managed asset is installed as managed, never moved to it");
+  assertEquals(mayMove("managed", "adopted"), false);
+  assertEquals(mayMove("discovered", "managed"), false);
   assertEquals(mayMove("managed", "discovered"), false);
 });
 
 proves(["0002-estate-governance FR-004"], "an asset says for every capability, in order, that it is offered and by whom, or that it is not and why", () => {
-  const a = defineAsset({ id: "olympia", kind: "server", state: "adopted", owners: { observe: "archon", verify: "archon", access: "archon" } });
+  const a = defineAsset({ id: "olympia", kind: "server", state: "adopted", owners: { observe: "archon", verify: "archon" } });
   assert(a.kind === "ok");
   assertEquals(a.value.capabilities.map((c) => c.capability), [...CAPABILITIES]);
   const converge = a.value.capabilities.find((c) => c.capability === "converge");
   assert(converge !== undefined && !converge.offered && converge.reason.includes("never changed"));
   assertEquals(ownerOf(a.value, "observe"), "archon");
   assertEquals(ownerOf(a.value, "converge"), undefined);
-  const d = defineAsset({ id: "printer", kind: "device", state: "discovered", owners: { observe: "archon" } });
-  assert(d.kind === "ok" && d.value.capabilities.filter((c) => !c.offered).length === 9, "nine capabilities carry a reason");
+  const d = defineAsset({ id: "printer", kind: "device", state: "discovered", owners: {} });
+  assert(d.kind === "ok" && d.value.capabilities.filter((c) => !c.offered).length === 10, "every capability of a discovered asset carries a reason");
 });
 
 proves(["0002-estate-governance FR-005"], "an asset is refused, with every reason, for an owner of what its state does not offer, a missing owner, and a name that is not well formed", () => {
-  const owned = defineAsset({ id: "olympia", kind: "server", state: "adopted", owners: { observe: "archon", verify: "archon", access: "archon", converge: "archon" } });
+  const owned = defineAsset({ id: "olympia", kind: "server", state: "adopted", owners: { observe: "archon", verify: "archon", converge: "archon" } });
   assert(owned.kind === "err" && owned.error.some((m) => m.includes("converge is owned by archon") && m.includes("does not offer it")));
   const missing = defineAsset({ id: "olympia", kind: "server", state: "adopted", owners: { observe: "archon" } });
-  assert(missing.kind === "err" && missing.error.length === 2 && missing.error.every((m) => m.includes("has no owner")));
+  assert(missing.kind === "err" && missing.error.length === 1 && missing.error.every((m) => m.includes("has no owner")));
   const bad = defineAsset({ id: "Olympia", kind: "Server", state: "discovered", owners: { observe: "Archon" } });
   assert(bad.kind === "err" && bad.error.length === 3, JSON.stringify(bad));
 });
 
 proves(["0002-estate-governance FR-006"], "a typed estate makes each asset by its key, refuses a link that is wrong as data, and does not compile a link to an asset that is not there", () => {
-  const owners = { observe: "archon", verify: "archon", access: "archon" } as const;
+  const owners = { observe: "archon", verify: "archon" } as const;
   const estate = defineEstate({ olympia: { kind: "server", state: "adopted", owners }, defiant: { kind: "workstation", state: "adopted", owners } }, [{ from: "defiant", to: "olympia", kind: "boots" }]);
   assert(estate.kind === "ok");
   assertEquals(estate.value.ids, ["defiant", "olympia"]);
@@ -71,4 +71,18 @@ proves(["0002-estate-governance FR-006"], "a typed estate makes each asset by it
   assert(loop.kind === "err" && loop.error.some((m) => m.includes("linked to itself")));
   const asset = defineEstate({ x: { kind: "server", state: "adopted", owners: { observe: "archon" } } }, []);
   assert(asset.kind === "err", "an asset that is refused refuses the estate");
+});
+
+proves(["0002-estate-governance FR-007"], "an asset says how it joined, a managed asset joined as managed and no other did, and any other word is refused", () => {
+  const paired = defineAsset({ id: "defiant", kind: "workstation", state: "adopted", joined: "paired", owners: { observe: "archon", verify: "archon" } });
+  assert(paired.kind === "ok" && paired.value.joined === "paired");
+  const managed = defineAsset({ id: "olympia", kind: "server", state: "managed", owners: Object.fromEntries(CAPABILITIES.map((c) => [c, "archon"])) });
+  assert(managed.kind === "ok" && managed.value.joined === "managed", "managed is the default way a managed asset joined");
+  const wrongManaged = defineAsset({ id: "defiant", kind: "workstation", state: "adopted", joined: "managed", owners: { observe: "archon", verify: "archon" } });
+  assert(wrongManaged.kind === "err" && wrongManaged.error.some((m) => m.includes("only an asset the system installed")));
+  const wrongOther = defineAsset({ id: "olympia", kind: "server", state: "managed", joined: "paired", owners: Object.fromEntries(CAPABILITIES.map((c) => [c, "archon"])) });
+  assert(wrongOther.kind === "err" && wrongOther.error.some((m) => m.includes("joined as managed")));
+  // @ts-expect-error a way of joining outside the closed list does not compile
+  const unknown = defineAsset({ id: "x", kind: "server", state: "adopted", joined: "wandered-in", owners: { observe: "archon", verify: "archon" } });
+  assert(unknown.kind === "err" && unknown.error.some((m) => m.includes("is not a way of joining")));
 });

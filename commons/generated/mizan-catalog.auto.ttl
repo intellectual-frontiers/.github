@@ -92,6 +92,23 @@
         <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-mizan-mizan.auto.ttl> ;
     dcat:version "1.0.0" .
 
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-oto> a dcat:Dataset ;
+    dcterms:description "The Operational Truth Ontology (OTO): the nine domains, six invariants, pillars, principles and maturity levels of Operational Truth(TM), a trademark of Netspective Communications LLC, as published at operationaltruth.org, and what an Operational Acceptance Testing run expects and observes. Built from the published site alone."@en ;
+    dcterms:identifier "https://www.intellectualfrontiers.com/ontology/oto" ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:publisher <https://www.intellectualfrontiers.com/> ;
+    dcterms:title "OTO"@en ;
+    dcat:distribution <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-oto-oto-code-lists.auto.skos.ttl>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-oto-oto-code-lists.auto.sql>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-oto-oto-mappings.auto.sssom.tsv>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-oto-oto-ontology.auto.html>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-oto-oto-schemas.auto.json>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-oto-oto-shapes.auto.ttl>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-oto-oto.auto.ofn>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-oto-oto.auto.rdf>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-oto-oto.auto.ttl> ;
+    dcat:version "1.0.0" .
+
 <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-ifccm-ifccm-code-lists.auto.skos.ttl> a dcat:Distribution ;
     dcterms:conformsTo <https://www.w3.org/TR/skos-reference/> ;
     dcterms:format <https://www.iana.org/assignments/media-types/text/turtle> ;
@@ -472,6 +489,82 @@
     dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/mizan.auto.ttl> ;
     dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> .
 
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-oto-oto-code-lists.auto.skos.ttl> a dcat:Distribution ;
+    dcterms:conformsTo <https://www.w3.org/TR/skos-reference/> ;
+    dcterms:format <https://www.iana.org/assignments/media-types/text/turtle> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "OTO code lists, SKOS"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/oto-code-lists.auto.skos.ttl> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/oto-code-lists.auto.skos.ttl> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-oto-oto-code-lists.auto.sql> a dcat:Distribution ;
+    dcterms:format <https://www.iana.org/assignments/media-types/application/sql> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "OTO code lists, SQL"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/oto-code-lists.auto.sql> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/oto-code-lists.auto.sql> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sql> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-oto-oto-mappings.auto.sssom.tsv> a dcat:Distribution ;
+    dcterms:conformsTo <https://mapping-commons.github.io/sssom/spec/> ;
+    dcterms:format <https://www.iana.org/assignments/media-types/text/tab-separated-values> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "OTO mappings to standards, SSSOM"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/oto-mappings.auto.sssom.tsv> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/oto-mappings.auto.sssom.tsv> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/tab-separated-values> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-oto-oto-ontology.auto.html> a dcat:Distribution ;
+    dcterms:format <https://www.iana.org/assignments/media-types/text/html> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "OTO ontology, HTML view"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/oto-ontology.auto.html> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/oto-ontology.auto.html> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/html> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-oto-oto-schemas.auto.json> a dcat:Distribution ;
+    dcterms:conformsTo <https://json-schema.org/draft/2020-12/schema> ;
+    dcterms:format <https://www.iana.org/assignments/media-types/application/schema+json> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "OTO JSON Schema"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/oto-schemas.auto.json> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/oto-schemas.auto.json> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/schema+json> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-oto-oto-shapes.auto.ttl> a dcat:Distribution ;
+    dcterms:conformsTo <https://www.w3.org/TR/shacl/> ;
+    dcterms:format <https://www.iana.org/assignments/media-types/text/turtle> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "OTO SHACL shapes"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/oto-shapes.auto.ttl> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/oto-shapes.auto.ttl> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-oto-oto.auto.ofn> a dcat:Distribution ;
+    dcterms:format <https://www.iana.org/assignments/media-types/text/owl-functional> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "OTO ontology, OWL 2 functional syntax"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/oto.auto.ofn> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/oto.auto.ofn> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/owl-functional> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-oto-oto.auto.rdf> a dcat:Distribution ;
+    dcterms:format <https://www.iana.org/assignments/media-types/application/rdf+xml> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "OTO ontology, RDF/XML"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/oto.auto.rdf> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/oto.auto.rdf> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-oto-oto.auto.ttl> a dcat:Distribution ;
+    dcterms:format <https://www.iana.org/assignments/media-types/text/turtle> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "OTO ontology, Turtle"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/oto.auto.ttl> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/oto.auto.ttl> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> .
+
 <https://www.intellectualfrontiers.com/ontology/mizan-catalog> a dcat:Catalog ;
     dcterms:description "The ontologies Intellectual Frontiers publishes with Mizan, each with the files generated from it."@en ;
     dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
@@ -481,4 +574,5 @@
         <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-ifqs>,
         <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-ifr>,
         <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-kanon>,
-        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-mizan> .
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-mizan>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-oto> .
