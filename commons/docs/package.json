@@ -1,22 +1,29 @@
 {
-  "name": "@intellectual-frontiers/commons",
+  "name": "@intellectual-frontiers/docs",
   "private": true,
   "version": "0.2.0",
-  "description": "IFC Docs, for the development of commons/docs: the generator of a repository's documentation site, made from its TypeScript and its spec kit alone (commons 0011-documentation). A repository depends on the repository's root package by Git and imports it as @intellectual-frontiers/commons/docs.",
+  "description": "IFC Docs: the generator of a repository's documentation site, made from its TypeScript and its spec kit alone: typed configuration, an API reference for every export, the specifications with the tests that prove them, and lenses for layered models, programs, guides and releases; one command, ifc-docs, builds or checks the static site.",
   "type": "module",
-  "exports": {
-    "./docs": "./mod.ts"
-  },
   "engines": {
     "node": ">=26"
+  },
+  "bin": {
+    "ifc-docs": "./ifc-docs.mjs"
+  },
+  "exports": {
+    ".": "./src/mod.ts",
+    "./lens/layered": "./src/lens/layered.ts",
+    "./lens/program": "./src/lens/program.ts",
+    "./lens/guides": "./src/lens/guides.ts",
+    "./lens/releases": "./src/lens/releases.ts"
   },
   "scripts": {
     "check": "tsc -p tsconfig.json",
     "test": "bun test suite/",
-    "site": "bun main.ts build --out ../../_site",
-    "site:check": "bun main.ts check",
-    "verify": "tsc -p tsconfig.json && bun test suite/ && bun main.ts check",
-    "smoke": "bun tools/smoke.ts"
+    "site": "bun src/main.ts build --out ../../_site",
+    "site:check": "bun src/main.ts check",
+    "verify": "tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../libraries/src/check.ts --root spec-kit --level L1 && bun tools/check.ts && bun test suite/ && bun src/main.ts check && bun tools/pack.ts --check",
+    "pack": "bun tools/pack.ts"
   },
   "dependencies": {
     "beautiful-mermaid": "1.1.3",
@@ -24,7 +31,10 @@
     "typescript": "7.1.0-beta"
   },
   "devDependencies": {
+    "@intellectual-frontiers/commons": "link:../ts",
     "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/libraries": "link:../libraries",
+    "@intellectual-frontiers/mizan": "link:../mizan",
     "@intellectual-frontiers/system": "link:../system",
     "@intellectual-frontiers/test": "link:../test",
     "@types/node": "26.6.6"

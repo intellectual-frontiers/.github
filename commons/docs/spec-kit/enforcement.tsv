@@ -1,0 +1,9 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-docs FR-001	check	.github: cd commons/docs && bun run verify	library.test.ts: the folder, the manifest, the package and the spec kit agree
+0001-docs FR-002	check	.github: cd commons/docs && bun run verify	package.test.ts: the entries a configuration imports are exported by name
+0001-docs FR-003	check	.github: cd commons/docs && bun run verify	package.test.ts: the launcher runs build and check on a fixture and finds the configuration upward
+0001-docs FR-004	check	.github: cd commons/docs && bun run verify	pack.test.ts: the package is packed with compiled modules, theme files, a launcher, a LICENSE and no link dependency
+0001-docs FR-005	check	.github: cd commons/docs && bun run verify	consumer.test.ts: the packed package installed into an empty project builds and checks a small repository
+0001-docs FR-006	check	.github: cd commons/docs && bun run verify	consumer.test.ts: a repository at another address has links to that address and names no other host

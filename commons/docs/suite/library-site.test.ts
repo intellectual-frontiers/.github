@@ -5,10 +5,10 @@
  * @module
  */
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
-import { kitNameOf } from "../pages/specs.ts";
-import { areasOf } from "../sources.ts";
-import { moduleComment } from "../tsdoc.ts";
-import { buildSite } from "../site.ts";
+import { kitNameOf } from "../src/pages/specs.ts";
+import { areasOf } from "../src/sources.ts";
+import { moduleComment } from "../src/tsdoc.ts";
+import { buildSite } from "../src/site.ts";
 import { CONFIG } from "./helpers.ts";
 
 proves(["0011-documentation FR-031"], "a module comment is found after `// Spec:` lines, a kit belongs to the library whose folder holds it, and an area's folder is the one it names", () => {

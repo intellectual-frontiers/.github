@@ -6,10 +6,10 @@
  */
 import { fs, path } from "@intellectual-frontiers/system";
 import { assert, assertEquals, assertMatch, assertStringIncludes, proves } from "@intellectual-frontiers/test";
-import { block, document, relative } from "../emit/html.ts";
-import { readApi } from "../extract/api.ts";
-import type { Block, Page } from "../model.ts";
-import { apiPages, registerApi } from "../pages/api.ts";
+import { block, document, relative } from "../src/emit/html.ts";
+import { readApi } from "../src/extract/api.ts";
+import type { Block, Page } from "../src/model.ts";
+import { apiPages, registerApi } from "../src/pages/api.ts";
 import { fixtureArea, freshBuild, golden, ROOT } from "./helpers.ts";
 
 const every: readonly Block[] = [
@@ -51,7 +51,7 @@ proves(["0011-documentation FR-017"], "a page asks nothing of another host, draw
     }
   }
   assert(!plain.includes("mermaid") && !withDiagram.includes("mermaid.min.js") && withDiagram.includes("<svg"), "a diagram is an SVG in the page, with no script to draw it");
-  const css = await fs.readTextFile(path.join(ROOT, "commons/docs/theme/site.css"));
+  const css = await fs.readTextFile(path.join(ROOT, "commons/docs/src/theme/site.css"));
   assertMatch(css, /--page: #ffffff;/);
   assertMatch(css, /\.content \{ background: var\(--page\)/);
   assertMatch(css, /prefers-color-scheme: dark/);

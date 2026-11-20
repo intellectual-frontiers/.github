@@ -8,5 +8,5 @@
  */
 import "../ts/node/register.mjs";
 
-const { main } = await import("./cli.ts");
+const { main } = await import("./src/cli.ts");
 process.exit(await main(process.argv.slice(2)));

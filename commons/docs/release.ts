@@ -4,9 +4,9 @@
  * @module
  */
 export const release = {
-  slug: "ifc-docs",
+  slug: "docs",
   kind: "Library",
-  title: "IFC Docs: the generator of a repository's documentation site",
+  title: "Docs: the generator of a repository's documentation site",
   authors: [
     {
       name: "Intellectual Frontiers",

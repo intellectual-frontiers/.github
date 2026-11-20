@@ -5,8 +5,8 @@
  * @module
  */
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
-import { declarationText, functionSignature, readApi } from "../extract/api.ts";
-import { apiPages, registerApi } from "../pages/api.ts";
+import { declarationText, functionSignature, readApi } from "../src/extract/api.ts";
+import { apiPages, registerApi } from "../src/pages/api.ts";
 import { fixtureArea, freshBuild, ROOT } from "./helpers.ts";
 
 const api = await readApi(ROOT, [{ slug: "fixture", entryPoints: ["commons/docs/suite/fixture/mod.ts"] }]);

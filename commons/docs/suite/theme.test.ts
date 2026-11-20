@@ -5,10 +5,10 @@
  */
 import { assert, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { fs, path } from "@intellectual-frontiers/system";
-import { document } from "../emit/html.ts";
-import type { Page } from "../model.ts";
+import { document } from "../src/emit/html.ts";
+import type { Page } from "../src/model.ts";
 
-const dir = path.join(path.dirname(path.fromFileUrl(import.meta.url)), "..", "theme");
+const dir = path.join(path.dirname(path.fromFileUrl(import.meta.url)), "..", "src", "theme");
 
 proves(["0011-documentation FR-034"], "every page sets the theme before it is drawn and has the theme button; the stylesheet has the dark tokens for the system and for a choice, and a print style; the script switches the theme and has the shortcuts", async () => {
   const page: Page = { path: "index.html", title: "T", description: "D", section: "overview", group: "G", order: 0, blocks: [{ kind: "paragraph", inlines: [{ kind: "text", text: "x" }] }] };

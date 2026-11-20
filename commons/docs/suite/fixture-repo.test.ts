@@ -7,10 +7,10 @@
  */
 import { path } from "@intellectual-frontiers/system";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { report } from "../check.ts";
-import { loadConfig } from "../cli.ts";
-import { document } from "../emit/html.ts";
-import { buildSite } from "../site.ts";
+import { report } from "../src/check.ts";
+import { loadConfig } from "../src/cli.ts";
+import { document } from "../src/emit/html.ts";
+import { buildSite } from "../src/site.ts";
 import { ROOT } from "./helpers.ts";
 
 proves(["0011-documentation FR-019", "0011-documentation FR-027", "0011-documentation FR-026"], "the fixture repository builds with no finding, from its configuration alone", async () => {

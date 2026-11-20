@@ -4,7 +4,7 @@
  * @module
  */
 import { assertEquals, proves } from "@intellectual-frontiers/test";
-import { inlines, markdown, plainContext } from "../markdown.ts";
+import { inlines, markdown, plainContext } from "../src/markdown.ts";
 
 proves(["0011-documentation FR-016"], "paragraphs, headings, lists, fences and tables become blocks", () => {
   const bs = markdown(

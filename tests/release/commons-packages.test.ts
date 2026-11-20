@@ -46,6 +46,7 @@ proves(
       await fs.mkdir(path.join(project, "node_modules"), { recursive: true });
       await fs.writeTextFile(path.join(project, "package.json"), '{ "name": "consumer", "private": true, "type": "module" }\n');
       const published: { name: string; manifest: Json }[] = [];
+      const external: Record<string, string> = {};
       for (const lib of npmLibraries()) {
         let installLog = "";
         // a library packs from its own installed tools (the compiler, the links to the libraries it depends on): a job that has not installed it does so, as a person's first `bun run verify` does
@@ -97,20 +98,29 @@ proves(
         // the inspection of the tarball as it is installed
         assertEquals(inspectPackage(into), [], `${name}: the inspection of the tarball`);
         // a package of commons depends only on packages of commons that are in this project, and on none that is not on npm
-        for (const dep of Object.keys(obj(manifest["dependencies"]))) {
-          assert(dep.startsWith("@intellectual-frontiers/"), `${name} depends on ${dep}, which this test does not install`);
+        // a package of commons depends on packages of commons that are packed here and, where it is not a bundle, on packages of npm, which the project installs below
+        for (const [dep, version] of Object.entries(obj(manifest["dependencies"]))) {
+          if (dep.startsWith("@intellectual-frontiers/")) continue;
+          assert(typeof version === "string" && /^\d+\.\d+\.\d+(-[\w.]+)?$/.test(version), `${name} depends on ${dep} at ${String(version)}, which is not an exact version of npm`);
+          external[dep] = version;
         }
         published.push({ name, manifest });
       }
       assert(published.length > 0, "no library is published to npm");
       // each library depends on libraries of this repository that were packed too
       for (const p of published) {
-        for (const dep of Object.keys(obj(p.manifest["dependencies"]))) {
+        for (const dep of Object.keys(obj(p.manifest["dependencies"])).filter((d) => d.startsWith("@intellectual-frontiers/"))) {
           assert(
             published.some((q) => q.name === dep),
             `${p.name} depends on ${dep}, which is not packed here`,
           );
         }
+      }
+      // the packages of npm that a package depends on, installed into the project beside the packages of commons that were unpacked there
+      if (Object.keys(external).length > 0) {
+        await fs.writeTextFile(path.join(project, "package.json"), `${JSON.stringify({ name: "consumer", private: true, type: "module", dependencies: external }, null, 2)}\n`);
+        const installed = await sh([bun, "install"], project);
+        assertEquals(installed.code, 0, `the packages of npm: ${installed.out}`);
       }
       // the entries of every package, imported
       const entries = published.flatMap((p) =>

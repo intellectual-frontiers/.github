@@ -38,16 +38,17 @@ function entries(pkg: unknown, field: string): [string, string][] {
   return Object.entries(v).map(([k, x]) => [k, String(x)]);
 }
 
-proves(["0011-documentation FR-001"], "the root package's name and ./docs, TypeScript 7.1.0-beta, Shiki and the diagram renderer pinned exactly and the root's, no IFC TypeScript", () => {
+proves(["0011-documentation FR-001"], "the package's name, exports and command, TypeScript 7.1.0-beta, Shiki and the diagram renderer pinned exactly and the root's", () => {
   const pkg: unknown = JSON.parse(read("commons/docs/package.json"));
   const root: unknown = JSON.parse(read("package.json"));
-  assertEquals(fieldOf(pkg, "name"), "@intellectual-frontiers/commons");
-  assertEquals(fieldOf(pkg, "exports"), { "./docs": "./mod.ts" });
+  assertEquals(fieldOf(pkg, "name"), "@intellectual-frontiers/docs");
+  assertEquals(fieldOf(pkg, "exports"), { ".": "./src/mod.ts", "./lens/layered": "./src/lens/layered.ts", "./lens/program": "./src/lens/program.ts", "./lens/guides": "./src/lens/guides.ts", "./lens/releases": "./src/lens/releases.ts" });
+  assertEquals(fieldOf(pkg, "bin"), { "ifc-docs": "./ifc-docs.mjs" });
   const deps = entries(pkg, "dependencies");
   const dev = entries(pkg, "devDependencies");
   assertEquals(deps.map(([n]) => n).sort(), ["beautiful-mermaid", "shiki", "typescript"]);
-  assertEquals(dev.map(([n]) => n).sort(), ["@intellectual-frontiers/core", "@intellectual-frontiers/system", "@intellectual-frontiers/test", "@types/node"]);
-  for (const [n, v] of dev) if (n.startsWith("@intellectual-frontiers/")) assertEquals(v, `link:../${n.split("/")[1]}`, `${n} is a link to its library`);
+  assertEquals(dev.map(([n]) => n).sort(), ["@intellectual-frontiers/commons", "@intellectual-frontiers/core", "@intellectual-frontiers/libraries", "@intellectual-frontiers/mizan", "@intellectual-frontiers/system", "@intellectual-frontiers/test", "@types/node"]);
+  for (const [n, v] of dev) if (n.startsWith("@intellectual-frontiers/")) assertEquals(v, n.endsWith("/commons") ? "link:../ts" : `link:../${n.split("/")[1]}`, `${n} is a link to its library`);
   for (const [n, v] of [...deps, ...dev]) if (!v.startsWith("link:")) assert(/^\d+\.\d+\.\d+(-[\w.]+)?$/.test(v), `${n} is pinned exactly`);
   assert(deps.some(([n, v]) => n === "typescript" && v === "7.1.0-beta"));
   const rootDeps = new Map(entries(root, "dependencies"));
@@ -73,21 +74,21 @@ const PACKAGES = new Set(["typescript/async", "beautiful-mermaid", "shiki/core",
 /** The grammars and themes of Shiki the highlighter imports one by one. */
 const SHIKI_FILES = /^shiki\/(langs|themes)\/[a-z-]+\.mjs$/;
 /** The libraries lifted out of IFC TypeScript, which the generator imports by package name (0032-lifting-libraries FR-003). */
-const LIFTED = /^@intellectual-frontiers\/(core|system|test)$/;
+const LIFTED = /^@intellectual-frontiers\/(core|system|test)$|^@intellectual-frontiers\/(libraries\/pack|mizan\/(trace|host\/trace))$/;
 const IFC_TS = new Set(["ts/kernel/mod.ts", "ts/runtime/mod.ts", "ts/runtime/test.ts"]);
 
 proves(["0011-documentation FR-002"], "a file imports the generator, IFC TypeScript by relative path and typescript/async; a lens also the libraries' entry points", () => {
-  const lensMay = new Set(["docs/mod.ts"]);
+  const lensMay = new Set(["docs/src/mod.ts"]);
   for (const f of mine) {
     const fixture = f.startsWith("commons/docs/suite/fixture-repo/");
     for (const s of specifiers(read(f))) {
-      if (PACKAGES.has(s) || SHIKI_FILES.test(s) || LIFTED.test(s) || (fixture && s === "@intellectual-frontiers/commons/docs")) continue;
+      if (PACKAGES.has(s) || (f.startsWith("commons/docs/tools/") && s === "node:process") || SHIKI_FILES.test(s) || LIFTED.test(s) || (fixture && s === "@intellectual-frontiers/docs")) continue;
       assert(s.startsWith("."), `${f} imports ${s}`);
       const target = path.relative(path.join(ROOT, "commons"), path.resolve(path.dirname(path.join(ROOT, f)), s)).split(path.sep).join("/");
       if (IFC_TS.has(target) && (target !== "ts/runtime/test.ts" || f.startsWith("commons/docs/suite/"))) continue;
-      if (f.startsWith("commons/docs/lens/")) assert(lensMay.has(target), `the lens ${f} imports ${s}, which it may not: a lens imports the generator through mod.ts`);
+      if (f.startsWith("commons/docs/src/lens/")) assert(lensMay.has(target), `the lens ${f} imports ${s}, which it may not: a lens imports the generator through mod.ts`);
       else if (f.startsWith("commons/docs/suite/")) assert(target.startsWith("docs/") || lensMay.has(target) || target === "docs.config.ts", `${f} imports ${s}, which it may not`);
-      else assert(target.startsWith("docs/") && !target.startsWith("docs/lens/"), `${f} imports ${s}, which it may not`);
+      else assert(target.startsWith("docs/") && !target.startsWith("docs/src/lens/"), `${f} imports ${s}, which it may not`);
     }
   }
 });
@@ -107,11 +108,11 @@ function reached(from: string): string[] {
 
 proves(["0011-documentation FR-026"], "the package depends on no library it shows: what ./docs and ifc-docs reach imports no data library and no lens", () => {
   const bin = read("commons/docs/ifc-docs.mjs");
-  assert(bin.includes('import("./cli.ts")'), "ifc-docs runs cli.ts");
-  const files = new Set([...reached("commons/docs/mod.ts"), ...reached("commons/docs/cli.ts")]);
-  assert(files.has("commons/docs/config.ts") && files.has("commons/docs/site.ts"));
+  assert(bin.includes('import("./src/cli.ts")'), "ifc-docs runs cli.ts");
+  const files = new Set([...reached("commons/docs/src/mod.ts"), ...reached("commons/docs/src/cli.ts")]);
+  assert(files.has("commons/docs/src/config.ts") && files.has("commons/docs/src/site.ts"));
   for (const f of files) {
-    assert(!f.startsWith("commons/docs/lens/") && !f.startsWith("commons/docs/suite/") && !f.startsWith("commons/docs/tools/"), `${f} is reached from an entry point`);
+    assert(!f.startsWith("commons/docs/src/lens/") && !f.startsWith("commons/docs/suite/") && !f.startsWith("commons/docs/tools/"), `${f} is reached from an entry point`);
     for (const s of specifiers(read(f))) assert(!/(^|\/)data\/|lens\//.test(s), `${f}, which an entry point reaches, imports ${s}`);
   }
 });
@@ -119,7 +120,7 @@ proves(["0011-documentation FR-026"], "the package depends on no library it show
 proves(["0011-documentation FR-002"], "@module on every file, TSDoc on every export, no any and no non-null assertion", () => {
   for (const f of mine) {
     const text = read(f);
-    assert(/^(?:#![^\n]*\n)?\/\*\*[\s\S]*?@module[\s\S]*?\*\//.test(text), `${f}: no @module block at its top`);
+    assert(/^(?:#![^\n]*\n)?(?:\/\/[^\n]*\n)*\/\*\*[\s\S]*?@module[\s\S]*?\*\//.test(text), `${f}: no @module block at its top`);
     const lines = text.split("\n");
     lines.forEach((line, i) => {
       if (!/^export\s+(?:async\s+)?(?:const|function|type\s+\w|interface|class)\b/.test(line)) return;

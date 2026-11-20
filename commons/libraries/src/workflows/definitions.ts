@@ -405,22 +405,17 @@ const ifcTypescript: Workflow = {
             shell: "bash",
           },
         ),
-        run(lines("bun install --frozen-lockfile", 'bun tools/smoke.ts --repo "$GITHUB_WORKSPACE" --commit "$GITHUB_SHA"'), {
-          name: "IFC Docs as a Git dependency, ifc-docs check and build on a fixture repository on Bun and Node 26",
-          workingDirectory: "commons/docs",
-          shell: "bash",
-        }),
       ],
     }),
   },
 };
 
-const docsPaths = ["commons/**", "package.json", own("docs"), BUN_ACTION];
+const docsPaths = ["commons/**", "package.json", own("site"), BUN_ACTION];
 const onMainPush = "github.event_name != 'pull_request' && github.ref == 'refs/heads/main'";
 
-const docs: Workflow = {
-  file: "docs",
-  name: "docs",
+const site: Workflow = {
+  file: "site",
+  name: "site",
   comment: lines(
     "The documentation site of commons (commons 0011-documentation FR-020): made by commons/docs, from commons' TypeScript and spec kit alone,",
     "as commons' configuration (commons/docs.config.ts) says. Every pull request and push that touches commons tests the generator and checks",
@@ -429,7 +424,7 @@ const docs: Workflow = {
   ).trimEnd(),
   on: { push: { paths: docsPaths }, pullRequest: { paths: docsPaths }, workflowDispatch: true },
   permissions: { contents: "read" },
-  concurrency: { group: "docs-${{ github.ref }}", cancelInProgress: true },
+  concurrency: { group: "site-${{ github.ref }}", cancelInProgress: true },
   jobs: {
     check: job({
       runsOn: "ubuntu-24.04",
@@ -439,10 +434,10 @@ const docs: Workflow = {
         bun(),
         tools(
           "commons/docs",
-          "TypeScript 7.1 (beta), Mermaid and @types/node, exactly as bun.lock pins them (IFC TypeScript is ../ts, by relative path)",
+          "TypeScript 7.1 (beta), Shiki, beautiful-mermaid and @types/node, exactly as bun.lock pins them",
         ),
         run("bun run verify", { name: "The compiler, the generator's tests, then check on commons", workingDirectory: "commons/docs" }),
-        run('bun main.ts build --out "$GITHUB_WORKSPACE/_site"', {
+        run('bun src/main.ts build --out "$GITHUB_WORKSPACE/_site"', {
           name: "The site, built",
           when: onMainPush,
           workingDirectory: "commons/docs",
@@ -692,7 +687,7 @@ export function workflows(): readonly Workflow[] {
   return [
     ci,
     release,
-    docs,
+    site,
     ifcTypescript,
     tests,
   ].sort((a, b) => (a.file < b.file ? -1 : a.file > b.file ? 1 : 0));

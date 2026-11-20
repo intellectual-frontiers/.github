@@ -5,11 +5,11 @@
  * @module
  */
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
-import type { Page } from "../model.ts";
-import type { LayeredModel } from "../layered.ts";
-import { layeredLens } from "../lens/layered.ts";
-import { markdownOf } from "../emit/markdown.ts";
-import { brokenLinks, buildSite } from "../site.ts";
+import type { Page } from "../src/model.ts";
+import type { LayeredModel } from "../src/layered.ts";
+import { layeredLens } from "../src/lens/layered.ts";
+import { markdownOf } from "../src/emit/markdown.ts";
+import { brokenLinks, buildSite } from "../src/site.ts";
 import { CONFIG, freshBuild, ROOT } from "./helpers.ts";
 
 const model: LayeredModel = {
@@ -50,7 +50,7 @@ function twin(pages: readonly Page[], path: string): string {
   return markdownOf(p);
 }
 
-const lens = layeredLens({ name: "demo", exports: ["commons/docs/mod.ts"], source: () => [model], regenerate: ["bun tools/generate.ts"] });
+const lens = layeredLens({ name: "demo", exports: ["commons/docs/src/mod.ts"], source: () => [model], regenerate: ["bun tools/generate.ts"] });
 
 proves(["0011-documentation FR-029"], "the lens makes the page of the layers, a page for each model, concept and code list, and the registers; every link resolves and the pages say where an element is written", async () => {
   const b = freshBuild();
@@ -94,7 +94,7 @@ proves(["0011-documentation FR-029"], "the JSON of each model and of the list is
 
 proves(["0011-documentation FR-029"], "a file that is told to export models and cannot be read is a finding that names it, and the values of the files that can be read are located by identity", async () => {
   const seen: unknown[] = [];
-  const located = layeredLens({ name: "locate", exports: ["commons/docs/nope.ts", "commons/docs/lens.ts"], source: (locate) => { seen.push(locate(lens, undefined), locate({}, undefined)); return []; } });
+  const located = layeredLens({ name: "locate", exports: ["commons/docs/nope.ts", "commons/docs/src/lens.ts"], source: (locate) => { seen.push(locate(lens, undefined), locate({}, undefined)); return []; } });
   const b = freshBuild();
   await located.read(b, [], []);
   assertEquals(b.found.map((f) => f.where), ["commons/docs/nope.ts"]);

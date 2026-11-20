@@ -82,6 +82,7 @@ export const ROLE_OF: ReadonlyMap<string, Role> = new Map<string, Role>([
   ["archon-dialect-mise", "program"],
   ["archon-dialect-winget", "program"],
   ["data", "program"],
+  ["docs", "program"],
   ["ergonex", "program"],
   ["grc", "program"],
   ["integrations", "program"],

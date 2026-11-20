@@ -5,5 +5,5 @@
     "module": "esnext",
     "moduleResolution": "bundler"
   },
-  "include": ["*.ts", "extract/**/*.ts", "emit/**/*.ts", "lens/**/*.ts", "pages/**/*.ts", "suite/**/*.ts", "tools/**/*.ts", "../about.ts", "../docs.config.ts"]
+  "include": ["about.ts", "src/**/*.ts", "suite/**/*.ts", "tools/**/*.ts"]
 }

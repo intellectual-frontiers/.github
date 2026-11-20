@@ -6,9 +6,9 @@
  */
 import { fs, path } from "@intellectual-frontiers/system";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
-import { llmsIndex, markdownOf, twinOf } from "./../emit/markdown.ts";
-import type { Page } from "../model.ts";
-import { buildSite, writeSite } from "../site.ts";
+import { llmsIndex, markdownOf, twinOf } from "../src/emit/markdown.ts";
+import type { Page } from "../src/model.ts";
+import { buildSite, writeSite } from "../src/site.ts";
 import { CONFIG } from "./helpers.ts";
 
 const page: Page = {

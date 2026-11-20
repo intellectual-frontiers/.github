@@ -7,8 +7,8 @@
  */
 import { fs, path } from "@intellectual-frontiers/system";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
-import { findConfig, loadConfig, main, parseArgs } from "../cli.ts";
-import { normalDir, resolveConfig, under } from "../config.ts";
+import { findConfig, loadConfig, main, parseArgs } from "../src/cli.ts";
+import { normalDir, resolveConfig, under } from "../src/config.ts";
 import { CONFIG, ROOT } from "./helpers.ts";
 
 proves(["0011-documentation FR-023"], "commons' configuration resolves: its root, its packages, its spec kits, its citations, its lenses and its output", () => {

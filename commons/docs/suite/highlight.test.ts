@@ -5,8 +5,8 @@
  * @module
  */
 import { assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
-import { highlightedHtml, runs } from "../highlight.ts";
-import type { Lang } from "../model.ts";
+import { highlightedHtml, runs } from "../src/highlight.ts";
+import type { Lang } from "../src/model.ts";
 
 /** The coloured runs of a text, as `text|light|dark`, those in the theme's own text left out. */
 const coloured = (code: string, lang: Lang): string[] => runs(code, lang).flatMap((line) => line.filter((r) => r.light !== undefined).map((r) => `${r.text}|${r.light}|${r.dark}`));
