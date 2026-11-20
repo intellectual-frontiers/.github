@@ -244,7 +244,7 @@ proves(["0007-repoctl-prove FR-006", "0007-repoctl-prove FR-007", "0007-repoctl-
     const body = await plan();
     assertEquals(body.classes, ["source"]);
     assertEquals(body.proofs.map((p) => proofKey(p.proof)).filter((k) => !k.startsWith("trace")), ["types:prov", "suite:prov"]);
-    assert(body.skipped.some((s) => s.reason === "surface-unchanged" && s.subject === "seam prov to user"));
+    assert(body.skipped.some((s) => s.reason === "surface-unchanged" && s.subject === "seam prov to idle, user"));
     await put(dir, "commons/prov/src/mod.ts", 'export function used(x: number, y = 1): string {\n  return String(x + y);\n}\nexport function spare(): number {\n  return 1;\n}\n');
     const signature = await plan();
     const ks = signature.proofs.map((p) => proofKey(p.proof));

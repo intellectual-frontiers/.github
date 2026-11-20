@@ -325,18 +325,25 @@ export function planProof(input: ProofInput): PlanStep {
   // the reach of a change inside a library: who imports what changed
   const need: LibraryName[] = [];
   const reached = new Map<string, Reach>();
+  const unseen = new Map<string, { readonly provider: LibraryName; readonly reason: "surface-unchanged" | "symbols-unused"; readonly changed: readonly string[]; readonly importers: LibraryName[] }>();
+  const leave = (provider: LibraryName, reason: "surface-unchanged" | "symbols-unused", changed: readonly string[], importer: LibraryName): void => {
+    const key = `${provider}:${reason}`;
+    const group = unseen.get(key) ?? { provider, reason, changed, importers: [] };
+    if (!group.importers.includes(importer)) group.importers.push(importer);
+    unseen.set(key, group);
+  };
   const visit = (provider: LibraryName, changed: ReadonlySet<string> | "all", via: Why): void => {
     const importers = input.libraries.filter((l) => l.uses.some((u) => u.provider === provider));
     for (const x of importers) {
       const usage = x.uses.find((u) => u.provider === provider)?.usage;
       if (usage === undefined) continue;
       if (changed !== "all" && changed.size === 0) {
-        skipped.push({ tier: "T2", subject: `seam ${provider} to ${x.name}`, reason: "surface-unchanged", because: `the public surface of ${provider} is the same as at ${input.base}, so ${x.name} cannot see the change` });
+        leave(provider, "surface-unchanged", [], x.name);
         continue;
       }
       const hit = changed === "all" || usage.all || usage.names.some((n) => changed.has(n));
       if (!hit) {
-        skipped.push({ tier: "T2", subject: `seam ${provider} to ${x.name}`, reason: "symbols-unused", because: `${x.name} imports ${listOf(usage.names, 4) || "nothing by name"} of ${provider}, none of the changed symbols` });
+        leave(provider, "symbols-unused", [...changed].sort(), x.name);
         continue;
       }
       const key = `${provider}>${x.name}`;
@@ -349,7 +356,7 @@ export function planProof(input: ProofInput): PlanStep {
         if (!need.includes(x.name)) need.push(x.name);
         continue;
       }
-      const onward = changed === "all" ? "all" : new Set(surface.mentions.filter((m) => m.mentions.some((x) => changed.has(x))).map((m) => m.name));
+      const onward = changed === "all" ? "all" : new Set(surface.mentions.filter((m) => m.mentions.some((n) => changed.has(n))).map((m) => m.name));
       if (onward === "all" || onward.size > 0) visit(x.name, onward, { kind: "surface", provider: x.name, symbols: onward === "all" ? [] : [...onward].sort() });
     }
   };
@@ -377,6 +384,17 @@ export function planProof(input: ProofInput): PlanStep {
     }
   }
   if (need.length > 0) return { kind: "needs", libraries: [...new Set(need)].sort() };
+  for (const g of [...unseen.values()].sort((a, b) => (a.provider + a.reason < b.provider + b.reason ? -1 : 1))) {
+    const stillReached = (name: LibraryName): boolean => reached.has(`${g.provider}>${name}`);
+    const importers = g.importers.filter((n) => !stillReached(n)).sort();
+    if (importers.length === 0) continue;
+    const subject = `seam ${g.provider} to ${listOf(importers, 4)}`;
+    skipped.push(
+      g.reason === "surface-unchanged"
+        ? { tier: "T2", subject, reason: g.reason, because: `the public surface of ${g.provider} is the same as at ${input.base}, so its ${importers.length} importers cannot see the change` }
+        : { tier: "T2", subject, reason: g.reason, because: `${importers.length === 1 ? "it imports" : `these ${importers.length} importers import`} other symbols of ${g.provider} than ${listOf(g.changed, 4)}` },
+    );
+  }
   for (const name of sourceLibs) {
     const node = libs.get(name);
     for (const system of node?.systems ?? []) skipped.push({ tier: "T5", subject: `${name} on ${system}`, reason: "tier-scheduled", because: "platform proofs run on main and nightly" });
