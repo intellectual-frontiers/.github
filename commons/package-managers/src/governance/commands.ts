@@ -15,6 +15,16 @@
 
 /** The operations of a manager that a dialect uses. */
 export const OPERATIONS = ["Install", "QueryInstalled", "QueryVersion", "Refresh"] as const;
+
+/**
+ * One operation of a package manager that a dialect uses: install a package, ask whether one is installed, ask its version, or refresh the index.
+ *
+ * @example
+ * ```ts
+ * import type { Operation } from "./commands.ts";
+ * const op: Operation = "QueryVersion";
+ * ```
+ */
 export type Operation = (typeof OPERATIONS)[number];
 
 /** One command of a manager, as the packaging ontology states it. */
