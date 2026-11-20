@@ -11,7 +11,14 @@ import {
   GENERATORS,
   type Host,
   main,
+  driftOf,
   matrixOutputs,
+  offlineRegistry,
+  raiseOf,
+  tarballOf,
+  outcomeLines,
+  publishAll,
+  type Tools,
   planLines,
   planRelease,
   readRecord,
@@ -19,7 +26,7 @@ import {
   recordText,
 } from "../src/releasing.ts";
 import { err, ok } from "@intellectual-frontiers/core";
-import { mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { mkdirSync, readFile, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { join } from "@intellectual-frontiers/system/path";
 import { proc } from "@intellectual-frontiers/system";
 import { slugOf } from "@intellectual-frontiers/mizan/versions/record";
@@ -42,6 +49,8 @@ const facts = (name: string, over: Partial<Facts> = {}): Facts => ({
   changed: false,
   impact: "patch",
   publish: true,
+  registry: "absent",
+  sinceVersion: { changed: false, impact: "patch" },
   ...over,
 });
 const steps = (fs: readonly Facts[]): readonly string[] => {
@@ -171,14 +180,14 @@ proves(
       await g("add", ".");
       await g("commit", "-q", "-m", "Start");
       for (const t of ["a-v0.1.0", "b-v0.1.0", "c-v0.1.0"]) await g("tag", t);
-      // a changes with a stated impact; c's files change too, and its version is ahead of its tag already; d has no tag and no record
+      // a changes with a stated impact; c's files change too after its version was raised (npm is not asked: its files since its version say); d has no tag and no record
       writeTextFileSync(join(dir, "commons/a/src/extra.ts"), "export const x = 1;\n");
       await g("add", ".");
       await g("commit", "-q", "-m", "Add x\n\nImpact: minor");
       writeTextFileSync(join(dir, "commons/c/src/extra.ts"), "export const y = 1;\n");
       await g("add", ".");
       await g("commit", "-q", "-m", "Add y");
-      const found = await factsOf(dir);
+      const found = await factsOf(dir, offlineRegistry);
       assert(found.kind === "ok", found.kind === "err" ? found.error : "");
       const by = new Map(found.value.map((f) => [f.slug as string, f]));
       assertEquals(by.get("a")?.changed, true);
@@ -191,7 +200,7 @@ proves(
       assert(plan.kind === "ok");
       assertEquals(
         plan.value.steps.map((s) => `${s.slug} ${s.from}>${s.to} ${s.decision.kind}`),
-        ["a 0.1.0>0.2.0 raised", "b 0.1.0>0.1.1 dependent", "c 0.2.0>0.2.0 as-is", "d 0.5.0>0.5.0 as-is"],
+        ["a 0.1.0>0.2.0 raised", "b 0.1.0>0.1.1 dependent", "c 0.2.0>0.2.1 raised", "d 0.5.0>0.5.0 as-is"],
       );
       // apply, with the generators and the proof of the test's own
       const ran: string[] = [];
@@ -205,32 +214,32 @@ proves(
           return Promise.resolve(ok(undefined));
         },
       };
-      const done = await applyRelease(dir, host, { tests: true });
+      const done = await applyRelease(dir, host, { tests: true, registry: offlineRegistry });
       assert(done.kind === "ok", done.kind === "err" ? done.error : "");
       assertEquals(ran, [...GENERATORS.map((c) => c.join(" ")), "prove"], "the generated files are made once and the proof is run once");
       assertStringIncludes(readTextFileSync(join(dir, "commons/a/release.ts")), "0.2.0");
       assertStringIncludes(readTextFileSync(join(dir, "commons/a/library.ts")), '"version":"0.2.0"');
       assertStringIncludes(readTextFileSync(join(dir, "commons/a/package.json")), '"version": "0.2.0"');
       assertStringIncludes(readTextFileSync(join(dir, "commons/b/package.json")), '"version": "0.1.1"');
-      assertStringIncludes(readTextFileSync(join(dir, "commons/c/package.json")), '"version": "0.2.0"', "released as it is: not written");
+      assertStringIncludes(readTextFileSync(join(dir, "commons/c/package.json")), '"version": "0.2.1"');
       assertStringIncludes(readTextFileSync(join(dir, "commons/d/library.ts")), '"version":"0.5.0"');
       const record = readRecord(readTextFileSync(join(dir, RECORD_PATH)));
       assert(record.kind === "ok");
       assertEquals(
         record.value.map((e) => e.tag),
-        ["a-v0.2.0", "b-v0.1.1", "c-v0.2.0", "d-v0.5.0"],
+        ["a-v0.2.0", "b-v0.1.1", "c-v0.2.1", "d-v0.5.0"],
       );
       assertEquals((await g("tag", "-l")).trim().split("\n").sort(), ["a-v0.1.0", "b-v0.1.0", "c-v0.1.0"], "apply tags nothing");
       // the proof is left out where it is asked, and a failing generator stops the release before the record
       ran.length = 0;
-      assertEquals((await applyRelease(dir, host, { tests: false })).kind, "ok");
+      assertEquals((await applyRelease(dir, host, { tests: false, registry: offlineRegistry })).kind, "ok");
       assert(!ran.includes("prove"));
       const bad: Host = { ...host, generate: () => Promise.resolve(err("the generator failed")) };
       writeTextFileSync(join(dir, RECORD_PATH), "{}\n");
-      assertEquals((await applyRelease(dir, bad, { tests: true })).kind, "err");
+      assertEquals((await applyRelease(dir, bad, { tests: true, registry: offlineRegistry })).kind, "err");
       assertEquals(readTextFileSync(join(dir, RECORD_PATH)), "{}\n", "no record from a release that stopped");
       // the command reads the same: plan says it, matrix leaves out what is tagged
-      assertEquals(await main(["plan", "--repo", dir]), 0);
+      assertEquals(await main(["plan", "--repo", dir, "--offline"]), 0);
       await g("add", ".");
       await g("commit", "-q", "-m", "Release");
       await g("tag", "a-v0.2.0");
@@ -260,7 +269,147 @@ proves(
       await g("add", ".");
       await g("commit", "-q", "-m", "Start");
       await g("tag", "a-v0.3.0");
-      assertEquals(await main(["plan", "--repo", dir]), 1);
+      assertEquals(await main(["plan", "--repo", dir, "--offline"]), 1);
     });
+  },
+);
+
+proves(
+  [`${SPEC} FR-015`],
+  "a release is published and tagged by itself: a version already on npm is not sent again and is tagged, one that is not is sent, one that cannot be sent is reported and not tagged while the others go on, a library that names no npm is only tagged, a tag that is there is kept, and any failure fails the run after every release was tried",
+  async () => {
+    const entries = ["a", "b", "c", "d", "e"].map((slug) => ({ slug, version: "1.0.0", folder: `commons/${slug}`, tag: `${slug}-v1.0.0`, publish: slug !== "e" }));
+    const calls: string[] = [];
+    const tools = (over: Partial<Tools> = {}): Tools => ({
+      onNpm: (name) => {
+        calls.push(`view ${name}`);
+        return Promise.resolve(name.endsWith("/a"));
+      },
+      npm: (e) => {
+        calls.push(`npm ${e.slug}`);
+        return Promise.resolve(e.slug === "b" ? err("b is not on npm and no credential could publish it") : ok(undefined));
+      },
+      github: (e) => {
+        calls.push(`github ${e.slug}`);
+        return Promise.resolve(ok(undefined));
+      },
+      tag: (t) => {
+        calls.push(`tag ${t}`);
+        return Promise.resolve(ok(t.startsWith("d") ? "there" : "made"));
+      },
+      ...over,
+    });
+    const out = await publishAll(entries, tools());
+    assertEquals(
+      out.map((o) => `${o.slug} ${o.npm} ${o.tagged}`),
+      ["a present made", "b failed withheld", "c published made", "d published there", "e not-published made"],
+    );
+    // a is on npm: not sent to npm, tagged; b cannot be sent: no tag, and c, d and e are still tried, in order
+    assertEquals(calls.filter((c) => c.startsWith("npm ")), ["npm b", "npm c", "npm d"]);
+    assert(!calls.includes("tag b-v1.0.0") && calls.includes("tag a-v1.0.0") && calls.includes("tag e-v1.0.0"));
+    assert(!calls.includes("github b") && !calls.includes("github e"), "the registry is asked only for what npm has");
+    const report = outcomeLines(out);
+    assertEquals(report.failed, true);
+    assertStringIncludes(report.lines[0] ?? "", "a: on npm already; tagged a-v1.0.0");
+    assertStringIncludes(report.lines[1] ?? "", "b: NOT on npm; b-v1.0.0 withheld (b is not on npm and no credential");
+    assertStringIncludes(report.lines[3] ?? "", "d-v1.0.0 was there");
+    // everything on npm or sent: no failure; a tag that cannot be made, and a registry that refuses, are failures
+    const fine = await publishAll(entries, tools({ onNpm: () => Promise.resolve(true) }));
+    assertEquals(outcomeLines(fine).failed, false);
+    assertEquals(
+      fine.map((o) => o.npm),
+      ["present", "present", "present", "present", "not-published"],
+    );
+    const noTag = await publishAll(entries.slice(0, 1), tools({ tag: () => Promise.resolve(err("no permission")) }));
+    assertEquals([noTag[0]?.tagged, outcomeLines(noTag).failed], ["failed", true]);
+    const noRegistry = await publishAll(entries.slice(0, 1), tools({ github: () => Promise.resolve(err("refused")) }));
+    assertEquals([noRegistry[0]?.registry, noRegistry[0]?.tagged, outcomeLines(noRegistry).failed], ["failed", "withheld", true]);
+    assertEquals(await publishAll([], tools()), []);
+  },
+);
+
+const ahead = (name: string, over: Partial<Facts> = {}): Facts => facts(name, { version: "0.4.0", last: undefined, ...over });
+const decisions = (fs: readonly Facts[], raise: ReadonlyMap<string, "major" | "minor" | "patch" | undefined> = new Map()): readonly string[] => {
+  const p = planRelease(fs, raise);
+  return p.kind === "ok" ? p.value.steps.map((s) => `${s.slug} ${s.from}>${s.to} ${s.decision.kind}${s.decision.kind === "raised" ? ` ${s.decision.why}` : s.decision.kind === "as-is" ? ` ${s.decision.npm}` : ""}`) : [`error: ${p.error}`];
+};
+
+proves(
+  [`${SPEC} FR-013`],
+  "a version that npm already holds with other files is raised, and not released as it is: by what npm holds where it can be compared, by the files since the version was raised where it cannot, and a version npm does not hold, or holds with the same files, is released as it is",
+  () => {
+    // not tagged, and npm holds 0.4.0 with other files: raised by the impact of the commits since the version, whatever the tags say
+    assertEquals(decisions([ahead("h", { registry: "differs", sinceVersion: { changed: true, impact: "minor" } })]), ["h 0.4.0>0.5.0 raised differs-from-npm"]);
+    // the same files: only tagged; not on npm: published
+    assertEquals(decisions([ahead("h", { registry: "same" })]), ["h 0.4.0>0.4.0 as-is same"]);
+    assertEquals(decisions([ahead("h", { registry: "absent", sinceVersion: { changed: true, impact: "patch" } })]), ["h 0.4.0>0.4.0 as-is absent"]);
+    // npm not compared: the files since the version was raised say
+    assertEquals(decisions([ahead("h", { registry: "unknown", sinceVersion: { changed: true, impact: "patch" } })]), ["h 0.4.0>0.4.1 raised changed-since-version"]);
+    assertEquals(decisions([ahead("h", { registry: "unknown" })]), ["h 0.4.0>0.4.0 as-is unknown"]);
+    // ahead of a tag too, and its importers follow
+    assertEquals(
+      decisions([
+        ahead("h", { last: { version: "0.3.0", tag: "h-v0.3.0" }, registry: "differs" }),
+        facts("i", { imports: [slug("h")] }),
+      ]),
+      ["h 0.4.0>0.4.1 raised differs-from-npm", "i 0.1.0>0.1.1 dependent"],
+    );
+    // the lines say why
+    const p = planRelease([ahead("h", { registry: "differs" }), ahead("same", { registry: "same" }), ahead("new")]);
+    assert(p.kind === "ok");
+    const lines = planLines(PLAIN, p.value);
+    assertStringIncludes(lines[0] ?? "", "differ from the version npm holds");
+    assertStringIncludes(lines[2] ?? "", "same files, so it is only tagged");
+    assertStringIncludes(lines[1] ?? "", "is not on npm, so it is published");
+    return Promise.resolve();
+  },
+);
+
+proves(
+  [`${SPEC} FR-013`],
+  "--raise raises a library whatever its state says, by an impact or by its commits', refuses a name that is no library and an impact that is none, and its importers follow",
+  () => {
+    assertEquals(decisions([facts("a"), facts("b", { imports: [slug("a")] })], new Map([["a", undefined]])), ["a 0.1.0>0.1.1 raised manual", "b 0.1.0>0.1.1 dependent"]);
+    assertEquals(decisions([facts("a")], new Map([["a", "major" as const]])), ["a 0.1.0>1.0.0 raised manual"]);
+    assertEquals(decisions([ahead("a", { registry: "same" })], new Map([["a", "minor" as const]])), ["a 0.4.0>0.5.0 raised manual"]);
+    assertEquals(decisions([facts("a", { sinceVersion: { changed: true, impact: "minor" } })], new Map([["a", undefined]])), ["a 0.1.0>0.2.0 raised manual"]);
+    assertStringIncludes(decisions([facts("a")], new Map([["nope", undefined]]))[0] ?? "", "no library");
+    const raise = raiseOf(["a", "b=minor,c=major"]);
+    assert(raise.kind === "ok");
+    assertEquals([...raise.value], [["a", undefined], ["b", "minor"], ["c", "major"]]);
+    assertEquals(raiseOf(["a=huge"]).kind, "err");
+    assertEquals(raiseOf(["=minor"]).kind, "err");
+    return Promise.resolve();
+  },
+);
+
+proves(
+  [`${SPEC} FR-013`],
+  "a tarball is read for the hash of each file and its package.json, and its sources are compared with the library's: the same files are the same, another source, a missing one and a changed entry of exports are a difference, and what the packer rewrites is not",
+  async () => {
+    const tar = proc.which("tar");
+    if (tar !== undefined) {
+      await withTempDir(async (dir) => {
+        const put = (f: string, t: string): void => {
+          mkdirSync(join(dir, f, ".."), { recursive: true });
+          writeTextFileSync(join(dir, f), t);
+        };
+        put("package/package.json", '{"name":"x","exports":{".":"./dist/a.js"},"gitHead":"abc"}');
+        put("package/src/a.ts", "export const a = 1;\n");
+        put("package/dist/a.js", "x\n");
+        const made = await proc.run([tar, "-czf", "x.tgz", "package"], { cwd: dir });
+        assertEquals(made.code, 0, made.stderr);
+        const t = tarballOf(await readFile(join(dir, "x.tgz")));
+        assertEquals([...t.hashes.keys()].sort(), ["dist/a.js", "package.json", "src/a.ts"]);
+        assertStringIncludes(t.packageJson, '"name":"x"');
+        assertEquals(t.hashes.get("src/a.ts")?.length, 64);
+      });
+    }
+    const published = { hashes: new Map([["src/a.ts", "h1"], ["dist/a.js", "zz"], ["package.json", "pp"]]), packageJson: '{"exports":{".":"./a.ts"},"gitHead":"1"}' };
+    const local = (hash: Record<string, string>, packageJson = '{"version":"9","exports":{".":"./a.ts"}}') => ({ hash: (p: string) => hash[p], packageJson });
+    assertEquals(driftOf(published, local({ "src/a.ts": "h1" })), "same");
+    assertEquals(driftOf(published, local({ "src/a.ts": "h2" })), "differs");
+    assertEquals(driftOf(published, local({})), "differs");
+    assertEquals(driftOf(published, local({ "src/a.ts": "h1" }, '{"exports":{".":"./a.ts","./more":"./more.ts"}}')), "differs");
   },
 );

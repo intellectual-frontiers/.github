@@ -242,16 +242,12 @@ proves(
     assertStringIncludes(w, "bun commons/libraries/src/releasing.ts matrix");
     assertStringIncludes(w, "run: bun run verify");
     assertStringIncludes(w, "run: bun tools/pack.ts");
-    assertStringIncludes(w, "npm publish \"$tarball\" --access public --provenance");
+    assertStringIncludes(w, "bun commons/libraries/src/releasing.ts publish --dir package");
     assertStringIncludes(w, "id-token: write");
     assertStringIncludes(w, "environment:\n      name: npm");
     assertStringIncludes(w, "NPM_TOKEN: ${{ secrets.INFRO_NPMJS_TOKEN }}");
-    assertStringIncludes(w, 'if [ -n "${NPM_TOKEN:-}" ]; then export NODE_AUTH_TOKEN="$NPM_TOKEN"; fi');
-    // a version on a registry is skipped, a tag that is there is kept, the tag is the runner's
-    assertStringIncludes(w, 'npm view "$name@$version" version >/dev/null 2>&1');
-    assertStringIncludes(w, "is already on the GitHub package registry");
-    assertStringIncludes(w, "repos/$GITHUB_REPOSITORY/git/refs");
-    assertStringIncludes(w, "is already there");
+    // each release by itself (the command: a version on npm is only tagged, one that cannot be sent is reported and not tagged, the others go on), with the runner's token for the tags
+    assertStringIncludes(w, "GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}");
     assertStringIncludes(w, "contents: write");
     // no secret but the one token the owner may add, and the runner's own
     assertEquals(

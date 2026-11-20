@@ -28,14 +28,16 @@
  *
  * @module
  */
+import { createHash } from "node:crypto";
 import process from "node:process";
+import { gunzipSync } from "node:zlib";
 import { absurd, err, ok, order, type Result } from "@intellectual-frontiers/core";
 import { stdio } from "@intellectual-frontiers/system";
-import { existsSync, mkdirSync, readTextFileSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { existsSync, mkdirSync, readDirSync, readFileSync, readTextFileSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { join, resolve } from "@intellectual-frontiers/system/path";
-import { run } from "@intellectual-frontiers/system/proc";
+import { env, run } from "@intellectual-frontiers/system/proc";
 import { currentLook, type Look } from "@intellectual-frontiers/system/tty";
-import { flag, formatUsageError, helpText, type Operand, parseArgs, value } from "@intellectual-frontiers/terminal/args";
+import { flag, formatUsageError, helpText, many, type Operand, parseArgs, value } from "@intellectual-frontiers/terminal/args";
 import { label, paint } from "@intellectual-frontiers/terminal/palette";
 import { formatGitError } from "@intellectual-frontiers/system/git";
 import { changedBetween, commitsSince, readTags, readWorkingTree, resolveCommit } from "@intellectual-frontiers/mizan/versions/git";
@@ -44,6 +46,7 @@ import { decodeReleaseSource, releaseSource, type Slug, slugOf, withVersion } fr
 import { compareVersions, greaterImpact, type Impact, nextSemVer, parseVersion } from "@intellectual-frontiers/mizan/versions/scheme";
 import { scopeOf, workFolders } from "@intellectual-frontiers/mizan/versions/works";
 import { inputsOf } from "./affected.ts";
+import { exportsLine } from "./plan.ts";
 import { everyLibrary } from "./affected.ts";
 
 /** The record of the release, from the repository's root. */
@@ -64,13 +67,23 @@ export type Facts = {
   readonly impact: Impact;
   /** Whether the release sends it to a registry: a library that names npm. */
   readonly publish: boolean;
+  /** For a version that is not tagged or is ahead of its tag: what npm holds of this version, compared with the files of the library. */
+  readonly registry: Drift;
+  /** Whether a file of the library changed since the last commit that raised its version, and the impact the commits since state (a patch where none does): the fallback where npm cannot be compared. */
+  readonly sinceVersion: { readonly changed: boolean; readonly impact: Impact };
 };
+
+/** What npm holds of a version, against the files of the library: not there, there and the same, there and different, or not known (offline, or the registry did not say). */
+export type Drift = "absent" | "same" | "differs" | "unknown";
+
+/** Why a library is raised. */
+export type Why = "changed" | "differs-from-npm" | "changed-since-version" | "manual";
 
 /** What the release does to one library. */
 export type Decision =
   | { readonly kind: "unchanged" }
-  | { readonly kind: "as-is"; readonly why: "no-tag" | "ahead-of-tag" }
-  | { readonly kind: "raised"; readonly to: string; readonly impact: Impact }
+  | { readonly kind: "as-is"; readonly why: "no-tag" | "ahead-of-tag"; readonly npm: Drift }
+  | { readonly kind: "raised"; readonly to: string; readonly impact: Impact; readonly why: Why }
   | { readonly kind: "dependent"; readonly to: string; readonly because: readonly Slug[] };
 
 /** One step of a release: a library, its version before and after, and what is done to it. */
@@ -94,10 +107,28 @@ export function describe(d: Decision, from: string): string {
   switch (d.kind) {
     case "unchanged":
       return "left alone: tagged, and no file changed since";
-    case "as-is":
-      return d.why === "no-tag" ? `released as it is (${from}): it has no tag yet` : `released as it is (${from}): its version is ahead of its last tag`;
+    case "as-is": {
+      const because = d.why === "no-tag" ? "it has no tag yet" : "its version is ahead of its last tag";
+      const npm =
+        d.npm === "absent"
+          ? "it is not on npm, so it is published"
+          : d.npm === "same"
+            ? "npm has this version with the same files, so it is only tagged"
+            : d.npm === "differs"
+              ? "npm has this version with other files"
+              : "npm was not compared, and no file changed since its version was raised";
+      return `released as it is (${from}): ${because}; ${npm}`;
+    }
     case "raised":
-      return `raised to ${d.to} (${d.impact}): files changed since its last tag`;
+      return `raised to ${d.to} (${d.impact}): ${
+        d.why === "changed"
+          ? "files changed since its last tag"
+          : d.why === "differs-from-npm"
+            ? "its files differ from the version npm holds, which stays as published"
+            : d.why === "changed-since-version"
+              ? "npm was not compared, and files changed since its version was raised"
+              : "asked for (--raise)"
+      }`;
     case "dependent":
       return `raised to ${d.to} (patch): it imports ${d.because.join(", ")}, which ${d.because.length === 1 ? "is" : "are"} raised`;
     default:
@@ -109,23 +140,34 @@ export function describe(d: Decision, from: string): string {
  * The plan of a release from the facts of the libraries (FR-013): a library with no tag, or ahead of its last tag, is released as it is; one that is tagged at its version and changed is raised by its impact; one that is tagged,
  * unchanged and imports a library that is raised, directly or through another, is raised by a patch; the rest are left alone. A library whose version is below its last tag is an error, and so is a cycle of imports.
  */
-export function planRelease(facts: readonly Facts[]): Result<Plan, string> {
-  const by = new Map(facts.map((f) => [f.slug, f] as const));
+export function planRelease(facts: readonly Facts[], raise: ReadonlyMap<string, Impact | undefined> = new Map()): Result<Plan, string> {
+  const by = new Map(facts.map((f) => [f.slug as string, f] as const));
+  const unknown = [...raise.keys()].filter((k) => !by.has(k));
+  if (unknown.length > 0) return err(`--raise names ${unknown.join(", ")}, which ${unknown.length === 1 ? "is" : "are"} no library (they are: ${facts.map((f) => f.slug).join(", ")})`);
   const decided = new Map<Slug, Decision>();
+  const raised = (f: Facts, impact: Impact, why: Why): Result<Decision, string> => {
+    const to = nextSemVer(f.version, impact);
+    return to.kind === "err" ? err(`${f.slug}: ${to.error}`) : ok({ kind: "raised", to: to.value, impact, why });
+  };
   for (const f of facts) {
-    if (f.last === undefined) {
-      decided.set(f.slug, { kind: "as-is", why: "no-tag" });
-      continue;
+    let candidate = f.last === undefined;
+    if (f.last !== undefined) {
+      const c = compare(f.version, f.last.version);
+      if (c === undefined) return err(`${f.slug}: the version ${f.version} or the tag ${f.last.tag} is not a Semantic Version`);
+      if (c < 0) return err(`${f.slug}: the version ${f.version} is below its last tag ${f.last.tag}: a version never goes back`);
+      candidate = c > 0;
     }
-    const c = compare(f.version, f.last.version);
-    if (c === undefined) return err(`${f.slug}: the version ${f.version} or the tag ${f.last.tag} is not a Semantic Version`);
-    if (c < 0) return err(`${f.slug}: the version ${f.version} is below its last tag ${f.last.tag}: a version never goes back`);
-    if (c > 0) decided.set(f.slug, { kind: "as-is", why: "ahead-of-tag" });
-    else if (f.changed) {
-      const to = nextSemVer(f.version, f.impact);
-      if (to.kind === "err") return err(`${f.slug}: ${to.error}`);
-      decided.set(f.slug, { kind: "raised", to: to.value, impact: f.impact });
-    } else decided.set(f.slug, { kind: "unchanged" });
+    const asked = raise.has(f.slug);
+    let d: Result<Decision, string>;
+    if (asked) d = raised(f, raise.get(f.slug) ?? f.sinceVersion.impact, "manual");
+    else if (candidate) {
+      // a version that has no tag, or is ahead of its tag, may be on npm already with other files: it is then raised, and not released as it is
+      if (f.registry === "differs") d = raised(f, f.sinceVersion.impact, "differs-from-npm");
+      else if (f.registry === "unknown" && f.sinceVersion.changed) d = raised(f, f.sinceVersion.impact, "changed-since-version");
+      else d = ok({ kind: "as-is", why: f.last === undefined ? "no-tag" : "ahead-of-tag", npm: f.registry });
+    } else d = f.changed ? raised(f, f.impact, "changed") : ok({ kind: "unchanged" });
+    if (d.kind === "err") return d;
+    decided.set(f.slug, d.value);
   }
   // a library that imports a raised library is raised by a patch, and so on up the imports
   for (let grew = true; grew; ) {
@@ -230,8 +272,75 @@ export function writeVersion(repo: string, step: Step): Result<readonly string[]
   return ok(files);
 }
 
+/** What a tarball holds that the comparison reads: the SHA-256 of each file by its path (without the folder `package/`), and the text of its `package.json`. */
+export type Tarball = { readonly hashes: ReadonlyMap<string, string>; readonly packageJson: string };
+
+/** The files of a gzipped tar, as a registry serves it: each regular file's path and SHA-256. A header it cannot read ends the list there. */
+export function tarballOf(gz: Uint8Array): Tarball {
+  const bytes = gunzipSync(gz);
+  const text = (from: number, to: number): string => new TextDecoder().decode(bytes.subarray(from, to)).replace(/\0.*$/s, "");
+  const hashes = new Map<string, string>();
+  let packageJson = "";
+  for (let at = 0; at + 512 <= bytes.length; ) {
+    const name = text(at, at + 100);
+    if (name === "") break;
+    const size = Number.parseInt(text(at + 124, at + 136).trim() || "0", 8);
+    const type = text(at + 156, at + 157);
+    const prefix = text(at + 345, at + 500);
+    const body = bytes.subarray(at + 512, at + 512 + size);
+    if (type === "0" || type === "") {
+      const path = (prefix === "" ? name : `${prefix}/${name}`).replace(/^package\//, "");
+      hashes.set(path, createHash("sha256").update(body).digest("hex"));
+      if (path === "package.json") packageJson = new TextDecoder().decode(body);
+    }
+    at += 512 + Math.ceil(size / 512) * 512;
+  }
+  return { hashes, packageJson };
+}
+
+/**
+ * Whether the files of a library are those of the version npm holds (FR-013): the sources the package carries (`src/`, each by its SHA-256 against the library's own file) and the keys of its `exports` (the packer rewrites the rest of
+ * `package.json`, and the compiled files are the compiler's). A source that is missing here, or other, or an entry of `exports` that was added or removed, is a difference.
+ */
+export function driftOf(published: Tarball, local: { readonly hash: (path: string) => string | undefined; readonly packageJson: string }): "same" | "differs" {
+  if (exportsLine(published.packageJson) !== exportsLine(local.packageJson)) return "differs";
+  for (const [path, sha] of published.hashes) if (path.startsWith("src/") && local.hash(path) !== sha) return "differs";
+  return "same";
+}
+
+/** Compares a library's version with what npm holds of it. */
+export type Registry = (slug: string, version: string, folder: string) => Promise<Drift>;
+
+/** The registry of npm itself, read over HTTPS: the metadata of the version, its tarball, and the library's files under `repo`; anything that goes wrong is `unknown`, never a guess. */
+export function realRegistry(repo: string): Registry {
+  return async (slug, version, folder) => {
+    try {
+      const meta = await fetch(`https://registry.npmjs.org/@intellectual-frontiers%2F${slug}/${version}`, { signal: AbortSignal.timeout(30_000) });
+      if (meta.status === 404) return "absent";
+      if (!meta.ok) return "unknown";
+      const json: unknown = await meta.json();
+      const dist = typeof json === "object" && json !== null && "dist" in json ? json.dist : undefined;
+      const url = typeof dist === "object" && dist !== null && "tarball" in dist ? dist.tarball : undefined;
+      if (typeof url !== "string") return "unknown";
+      const tgz = await fetch(url, { signal: AbortSignal.timeout(60_000) });
+      if (!tgz.ok) return "unknown";
+      const published = tarballOf(new Uint8Array(await tgz.arrayBuffer()));
+      const pkg = join(repo, folder, "package.json");
+      return driftOf(published, {
+        hash: (path) => {
+          const f = join(repo, folder, path);
+          return existsSync(f) ? createHash("sha256").update(readFileSync(f)).digest("hex") : undefined;
+        },
+        packageJson: existsSync(pkg) ? readTextFileSync(pkg) : "",
+      });
+    } catch {
+      return "unknown";
+    }
+  };
+}
+
 /** What the host gives the plan: the facts of the libraries from the tags and the tree. */
-export async function factsOf(repo: string): Promise<Result<readonly Facts[], string>> {
+export async function factsOf(repo: string, registry: Registry = realRegistry(repo)): Promise<Result<readonly Facts[], string>> {
   const tree = await readWorkingTree(repo);
   if (tree.kind === "err") return err(formatGitError(tree.error));
   const tags = await readTags(repo);
@@ -272,6 +381,25 @@ export async function factsOf(repo: string): Promise<Result<readonly Facts[], st
       if (commits.kind === "err") return err(formatGitError(commits.error));
       impact = impactOfCommits(commits.value.filter((c) => c.files.some(inScope))) ?? "patch";
     }
+    // a version with no tag, or ahead of its tag, may be on npm already: what npm holds of it is compared, and where it cannot be, the files since the version was raised say
+    const ahead = last === undefined || (compare(l.version, last.version) ?? 0) > 0;
+    let drift: Drift = "unknown";
+    let sinceVersion = { changed: false, impact: "patch" as Impact };
+    if (ahead) {
+      if (l.distribution.includes("npm")) drift = await registry(slug, l.version, l.folder);
+      const raisedAt = await run(["git", "-C", repo, "log", "-1", "--format=%H", '-G"version"', "--", `${l.folder}/package.json`]);
+      const commit = raisedAt.code === 0 ? raisedAt.stdout.trim() : "";
+      if (commit !== "") {
+        const files = await changedBetween(repo, commit, head.value);
+        const commits = await commitsSince(repo, commit);
+        if (files.kind === "err") return err(formatGitError(files.error));
+        if (commits.kind === "err") return err(formatGitError(commits.error));
+        sinceVersion = {
+          changed: files.value.some(inScope),
+          impact: greaterImpact("patch", impactOfCommits(commits.value.filter((c) => c.files.some(inScope))) ?? "patch"),
+        };
+      }
+    }
     const imports = inputsOf(repo, l.name).imports.flatMap((n) => {
       const s = slugs.get(n);
       return s === undefined ? [] : [s];
@@ -285,6 +413,8 @@ export async function factsOf(repo: string): Promise<Result<readonly Facts[], st
       changed,
       impact: greaterImpact("patch", impact),
       publish: l.distribution.includes("npm"),
+      registry: drift,
+      sinceVersion,
     });
   }
   return ok(out);
@@ -324,10 +454,14 @@ export const REAL: Host = {
 export type Applied = { readonly plan: Plan; readonly written: readonly string[] };
 
 /** Makes the release (FR-014): raises the versions of the plan, makes the generated files once, runs the tests that pack unless asked not to, and writes the record. */
-export async function applyRelease(repo: string, host: Host, options: { readonly tests: boolean }): Promise<Result<Applied, string>> {
-  const facts = await factsOf(repo);
+export async function applyRelease(
+  repo: string,
+  host: Host,
+  options: { readonly tests: boolean; readonly raise?: ReadonlyMap<string, Impact | undefined>; readonly registry?: Registry },
+): Promise<Result<Applied, string>> {
+  const facts = await factsOf(repo, options.registry);
   if (facts.kind === "err") return facts;
-  const planned = planRelease(facts.value);
+  const planned = planRelease(facts.value, options.raise);
   if (planned.kind === "err") return planned;
   const written: string[] = [];
   for (const step of planned.value.steps) {
@@ -360,7 +494,137 @@ export function planLines(look: Look, plan: Plan): readonly string[] {
   return out;
 }
 
-const COMMANDS = ["plan", "apply", "matrix"] as const;
+/** What the publication needs from the world, so that its order and its rules are a pure function of what these say. */
+export type Tools = {
+  /** Whether the version is on npm (asked again after a pause where it is not, because a version put there by hand may take a while to show). */
+  readonly onNpm: (name: string, version: string) => Promise<boolean>;
+  /** Sends the package to npm; the reason where it cannot (no trusted publisher and no token, or npm refused). */
+  readonly npm: (e: Entry) => Promise<Result<void, string>>;
+  /** Sends the package to the GitHub package registry, unless it is there. */
+  readonly github: (e: Entry) => Promise<Result<void, string>>;
+  /** Makes the tag at the commit that runs, or finds it there. */
+  readonly tag: (tag: string) => Promise<Result<"made" | "there", string>>;
+};
+
+/** What happened to one release: the state of its publication, and of its tag. */
+export type Outcome = {
+  readonly slug: string;
+  readonly tag: string;
+  readonly npm: "present" | "published" | "failed" | "not-published";
+  readonly registry: "done" | "failed" | "not-published";
+  readonly tagged: "made" | "there" | "withheld" | "failed";
+  readonly reasons: readonly string[];
+};
+
+/**
+ * Publishes and tags the releases in order (FR-015), each by itself: a version that is on npm is not sent again and is tagged; one that is not is sent, and where nothing can send it (no trusted publisher, no token) it is
+ * reported and its tag withheld, and the others go on; a release that is only tagged (a library that names no npm) is tagged. A tag that is there is kept. The failures are in the outcomes, never thrown.
+ */
+export async function publishAll(entries: readonly Entry[], tools: Tools): Promise<readonly Outcome[]> {
+  const out: Outcome[] = [];
+  for (const e of entries) {
+    const reasons: string[] = [];
+    let npm: Outcome["npm"] = "not-published";
+    let registry: Outcome["registry"] = "not-published";
+    if (e.publish) {
+      if (await tools.onNpm(`@intellectual-frontiers/${e.slug}`, e.version)) npm = "present";
+      else {
+        const sent = await tools.npm(e);
+        npm = sent.kind === "ok" ? "published" : "failed";
+        if (sent.kind === "err") reasons.push(sent.error);
+      }
+      if (npm !== "failed") {
+        const sent = await tools.github(e);
+        registry = sent.kind === "ok" ? "done" : "failed";
+        if (sent.kind === "err") reasons.push(sent.error);
+      }
+    }
+    let tagged: Outcome["tagged"] = "withheld";
+    if (npm !== "failed" && registry !== "failed") {
+      const made = await tools.tag(e.tag);
+      tagged = made.kind === "ok" ? made.value : "failed";
+      if (made.kind === "err") reasons.push(made.error);
+    }
+    out.push({ slug: e.slug, tag: e.tag, npm, registry, tagged, reasons });
+  }
+  return out;
+}
+
+/** The lines that say how each release went, and whether the run is a failure: one failure anywhere fails it, after every release was tried. */
+export function outcomeLines(outcomes: readonly Outcome[]): { readonly lines: readonly string[]; readonly failed: boolean } {
+  const lines = outcomes.map((o) => {
+    const npm = o.npm === "present" ? "on npm already" : o.npm === "published" ? "published to npm" : o.npm === "failed" ? "NOT on npm" : "no npm";
+    const tag = o.tagged === "made" ? `tagged ${o.tag}` : o.tagged === "there" ? `${o.tag} was there` : o.tagged === "withheld" ? `${o.tag} withheld` : `${o.tag} not made`;
+    return `${o.slug}: ${npm}; ${tag}${o.reasons.length > 0 ? ` (${o.reasons.join("; ")})` : ""}`;
+  });
+  return { lines, failed: outcomes.some((o) => o.npm === "failed" || o.registry === "failed" || o.tagged === "failed" || o.tagged === "withheld") };
+}
+
+const sleep = (ms: number): Promise<void> => new Promise((done) => setTimeout(done, ms));
+const tail = (t: string): string => t.trim().split("\n").slice(-3).join(" ");
+
+/** The tools of a run of the release workflow: npm and the GitHub CLI, the tarballs under `dir` (one folder for each library, `package-<slug>`), and the environment's credentials. */
+export function realTools(dir: string): Tools {
+  const token = env.get("NPM_TOKEN") ?? "";
+  const github = env.get("GITHUB_TOKEN") ?? "";
+  const tarball = (slug: string): string | undefined => {
+    const d = join(dir, `package-${slug}`);
+    return existsSync(d) ? readDirSync(d).find((f) => f.name.endsWith(".tgz"))?.name : undefined;
+  };
+  const view = async (name: string, version: string, extra: readonly string[] = []): Promise<boolean> =>
+    (await run(["npm", "view", `${name}@${version}`, "version", ...extra])).code === 0;
+  return {
+    onNpm: async (name, version) => {
+      for (let i = 0; i < 3; i++) {
+        if (await view(name, version)) return true;
+        if (i < 2) await sleep(10_000);
+      }
+      return false;
+    },
+    npm: async (e) => {
+      const f = tarball(e.slug);
+      if (f === undefined) return err(`${e.slug}: no tarball was built for it`);
+      const r = await run(["npm", "publish", join(dir, `package-${e.slug}`, f), "--access", "public", "--provenance"], {
+        env: token === "" ? {} : { NODE_AUTH_TOKEN: token },
+      });
+      return r.code === 0
+        ? ok(undefined)
+        : err(`${e.slug} ${e.version} is not on npm and could not be published (${token === "" ? "no INFRO_NPMJS_TOKEN, so trusted publishing was tried" : "with INFRO_NPMJS_TOKEN"}; configure a trusted publisher for @intellectual-frontiers/${e.slug} or publish it by hand): ${tail(`${r.stderr}${r.stdout}`)}`);
+    },
+    github: async (e) => {
+      const auth = [`--registry=https://npm.pkg.github.com`, `--//npm.pkg.github.com/:_authToken=${github}`];
+      if (await view(`@intellectual-frontiers/${e.slug}`, e.version, auth)) return ok(undefined);
+      const f = tarball(e.slug);
+      if (f === undefined) return err(`${e.slug}: no tarball was built for it`);
+      const r = await run(["npm", "publish", join(dir, `package-${e.slug}`, f), ...auth]);
+      return r.code === 0 ? ok(undefined) : err(`${e.slug} ${e.version} could not be published to the GitHub package registry: ${tail(`${r.stderr}${r.stdout}`)}`);
+    },
+    tag: async (tag) => {
+      const repo = env.get("GITHUB_REPOSITORY") ?? "";
+      if ((await run(["gh", "api", `repos/${repo}/git/ref/tags/${tag}`])).code === 0) return ok("there");
+      const made = await run(["gh", "api", `repos/${repo}/git/refs`, "-f", `ref=refs/tags/${tag}`, "-f", `sha=${env.get("GITHUB_SHA") ?? ""}`]);
+      return made.code === 0 ? ok("made") : err(`the tag ${tag} could not be made: ${tail(`${made.stderr}${made.stdout}`)}`);
+    },
+  };
+}
+
+/** What `--raise` says: each library by its name, with the impact after an `=` where one is given. */
+export function raiseOf(words: readonly string[]): Result<ReadonlyMap<string, Impact | undefined>, string> {
+  const out = new Map<string, Impact | undefined>();
+  for (const w of words.flatMap((x) => x.split(",")).filter((x) => x !== "")) {
+    const [name = "", impact] = w.split("=");
+    if (name === "") return err(`--raise ${w}: no library`);
+    if (impact === undefined) out.set(name, undefined);
+    else if (impact === "major" || impact === "minor" || impact === "patch") out.set(name, impact);
+    else return err(`--raise ${w}: the impact is major, minor or patch`);
+  }
+  return ok(out);
+}
+
+/** The registry that is not asked (`--offline`). */
+export const offlineRegistry: Registry = () => Promise.resolve("unknown");
+
+const COMMANDS = ["plan", "apply", "matrix", "publish"] as const;
 type Command = (typeof COMMANDS)[number];
 const isCommand = (t: string): t is Command => (COMMANDS as readonly string[]).includes(t);
 
@@ -368,6 +632,9 @@ const OPTIONS = {
   repo: value({ help: "The repository (the working folder by default).", valueName: "DIR", default: "." }),
   tests: flag({ help: "Run the tests that pack, install and type-check every library (on by default; apply only).", negatable: true, default: true }),
   githubOutput: value({ help: "Append the outputs to this file, as a step's `$GITHUB_OUTPUT` is read (matrix only).", valueName: "FILE" }),
+  raise: many({ help: "Raise a library whatever its state says: NAME, or NAME=major|minor|patch (the impact of its commits, or a patch, where none is given). Repeat, or separate with commas.", valueName: "NAME[=IMPACT]" }),
+  offline: flag({ help: "Do not ask npm what it holds: a version with no tag is then raised only where its files changed since it was raised." }),
+  dir: value({ help: "Where the tarballs are, a folder `package-<slug>` for each library (publish only).", valueName: "DIR", default: "package" }),
 };
 const WORDS: readonly Operand[] = [{ name: "COMMAND", help: "plan, apply or matrix (plan by default).", arity: "optional" }];
 
@@ -392,8 +659,13 @@ export async function main(argv: readonly string[], host: Host = REAL): Promise<
   const say = (t: string): void => void stdio.stdout.writeSync(`${t}\n`);
   switch (word) {
     case "plan": {
-      const facts = await factsOf(repo);
-      const planned = facts.kind === "err" ? facts : planRelease(facts.value);
+      const raise = raiseOf(parsed.value.options.raise ?? []);
+      if (raise.kind === "err") {
+        stdio.stderr.writeSync(`release: ${raise.error}\n`);
+        return 2;
+      }
+      const facts = await factsOf(repo, parsed.value.options.offline ? offlineRegistry : realRegistry(repo));
+      const planned = facts.kind === "err" ? facts : planRelease(facts.value, raise.value);
       if (planned.kind === "err") {
         stdio.stderr.writeSync(`release: ${planned.error}\n`);
         return 1;
@@ -402,7 +674,16 @@ export async function main(argv: readonly string[], host: Host = REAL): Promise<
       return 0;
     }
     case "apply": {
-      const done = await applyRelease(repo, host, { tests: parsed.value.options.tests });
+      const raise = raiseOf(parsed.value.options.raise ?? []);
+      if (raise.kind === "err") {
+        stdio.stderr.writeSync(`release: ${raise.error}\n`);
+        return 2;
+      }
+      const done = await applyRelease(repo, host, {
+        tests: parsed.value.options.tests,
+        raise: raise.value,
+        registry: parsed.value.options.offline ? offlineRegistry : realRegistry(repo),
+      });
       if (done.kind === "err") {
         stdio.stderr.writeSync(`release: ${done.error}\n`);
         return 1;
@@ -428,6 +709,23 @@ export async function main(argv: readonly string[], host: Host = REAL): Promise<
       if (out === undefined) say(text);
       else writeTextFileSync(out, `${text}\n`, { append: true });
       return 0;
+    }
+    case "publish": {
+      const file = join(repo, RECORD_PATH);
+      const entries = existsSync(file) ? readRecord(readTextFileSync(file)) : err(`${RECORD_PATH} is missing: run release apply`);
+      const tags = await readTags(repo);
+      if (entries.kind === "err") {
+        stdio.stderr.writeSync(`release: ${entries.error}\n`);
+        return 1;
+      }
+      if (tags.kind === "err") {
+        stdio.stderr.writeSync(`release: ${formatGitError(tags.error)}\n`);
+        return 1;
+      }
+      const tagged = new Set(tags.value.map((t) => t.name));
+      const report = outcomeLines(await publishAll(entries.value.filter((e) => !tagged.has(e.tag)), realTools(resolve(repo, parsed.value.options.dir))));
+      for (const l of report.lines) say(l);
+      return report.failed ? 1 : 0;
     }
     default:
       return absurd(word);

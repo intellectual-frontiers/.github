@@ -592,32 +592,7 @@ const tests: Workflow = {
 };
 
 /** The folder of a library's package that the release workflow packs: the cell of the matrix, `matrix.folder`. */
-const PUBLISH_SCRIPT = lines(
-  "set -euo pipefail",
-  "# each release, in dependency order (the plan's order: a library after the libraries it imports); a version that is on a registry is skipped, a tag that is there is kept, and a failure stops the run where it is,",
-  "# so that the run again continues from there",
-  "while read -r e; do",
-  '  slug=$(jq -r .slug <<<"$e"); version=$(jq -r .version <<<"$e"); tag=$(jq -r .tag <<<"$e"); publish=$(jq -r .publish <<<"$e")',
-  '  name="@intellectual-frontiers/$slug"',
-  '  if [ "$publish" = true ]; then',
-  '    tarball=$(ls "package/package-$slug/"*.tgz)',
-  '    if npm view "$name@$version" version >/dev/null 2>&1; then echo "$name@$version is already on npm"; else',
-  "      # trusted publishing (the id-token of this run) where the package has a trusted publisher; the token INFRO_NPMJS_TOKEN where the repository has one and the package has none yet",
-  '      if [ -n "${NPM_TOKEN:-}" ]; then export NODE_AUTH_TOKEN="$NPM_TOKEN"; fi',
-  '      npm publish "$tarball" --access public --provenance',
-  "      unset NODE_AUTH_TOKEN",
-  "    fi",
-  '    if npm view "$name@$version" version --registry https://npm.pkg.github.com "--//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >/dev/null 2>&1; then echo "$name@$version is already on the GitHub package registry"; else',
-  '      npm publish "$tarball" --registry https://npm.pkg.github.com "--//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN"',
-  "    fi",
-  "  fi",
-  "  # the tag is made once the publish was accepted: npm stages a first publish of a version and promotes it later, so the version is not asked for here",
-  '  if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" >/dev/null 2>&1; then echo "$tag is already there"; else',
-  '    gh api "repos/$GITHUB_REPOSITORY/git/refs" -f "ref=refs/tags/$tag" -f "sha=$GITHUB_SHA" >/dev/null',
-  '    echo "tagged $tag"',
-  "  fi",
-  'done < <(printf \'%s\' "$SEQUENCE" | jq -c \'.[]\')',
-);
+const PUBLISH_COMMAND = "bun commons/libraries/src/releasing.ts publish --dir package";
 
 /**
  * The one workflow that releases (0001-libraries FR-014, FR-015): run by hand from main, never by a push. It reads the release record that `release apply` wrote (`commons/generated/release.auto.json`: the libraries
@@ -689,13 +664,14 @@ const release: Workflow = {
       timeoutMinutes: 60,
       permissions: { contents: "write", "id-token": "write", packages: "write" },
       environment: { name: "npm" },
-      env: { SEQUENCE: expr("needs.plan.outputs.sequence") },
       steps: [
-        checkout(),
+        checkout({ fetchDepth: 0, comment: "the tags: what is tagged is left out" }),
+        bun(),
+        run("bun install --frozen-lockfile", { name: "The packages the command reads, from the root's bun.lock" }),
         use(PIN.setupNode, { with: { "node-version": expr("env.NODE_VERSION"), "registry-url": "https://registry.npmjs.org" } }),
         use(PIN.downloadArtifact, { name: "The tarballs", with: { pattern: "package-*", path: "package" } }),
-        run(PUBLISH_SCRIPT, {
-          name: "Published in dependency order to npm and to the GitHub package registry, and tagged",
+        run(PUBLISH_COMMAND, {
+          name: "Published in dependency order to npm and to the GitHub package registry, and tagged: each release by itself, a version already on npm is only tagged",
           shell: "bash",
           env: {
             NPM_TOKEN: expr("secrets.INFRO_NPMJS_TOKEN"),
