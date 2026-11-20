@@ -29,5 +29,5 @@ proves(["0011-documentation FR-021"], "the root package exports ./docs and has i
 });
 
 proves(["0011-documentation FR-021"], "the smoke test asks for every kind of page", () => {
-  for (const p of ["index.html", "specs/constitution.html", "api/greeting/mod.html", "assets/mermaid.min.js", "search.json"]) assert(PAGES.includes(p), p);
+  for (const p of ["index.html", "specs/constitution.html", "api/greeting/mod.html", "search.json"]) assert(PAGES.includes(p), p);
 });

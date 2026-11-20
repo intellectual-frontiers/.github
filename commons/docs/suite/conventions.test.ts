@@ -1,6 +1,6 @@
 /**
  * The conventions of the generator (commons 0011-documentation FR-001, FR-002, FR-004, FR-026): a package of the root package's name
- * whose dependencies are TypeScript and Mermaid, pinned exactly and the root's, that imports IFC TypeScript by relative path, imported by
+ * whose dependencies are TypeScript, Shiki and beautiful-mermaid, pinned exactly and the root's, that imports IFC TypeScript by relative path, imported by
  * nothing outside it but commons' configuration, importing only what it may, whose entry points reach no library it shows, held to IFC
  * TypeScript's rules, and a commons with no README.
  *
@@ -38,14 +38,14 @@ function entries(pkg: unknown, field: string): [string, string][] {
   return Object.entries(v).map(([k, x]) => [k, String(x)]);
 }
 
-proves(["0011-documentation FR-001"], "the root package's name and ./docs, TypeScript 7.1.0-beta and Mermaid pinned exactly and the root's, no IFC TypeScript", () => {
+proves(["0011-documentation FR-001"], "the root package's name and ./docs, TypeScript 7.1.0-beta, Shiki and the diagram renderer pinned exactly and the root's, no IFC TypeScript", () => {
   const pkg: unknown = JSON.parse(read("commons/docs/package.json"));
   const root: unknown = JSON.parse(read("package.json"));
   assertEquals(fieldOf(pkg, "name"), "@intellectual-frontiers/commons");
   assertEquals(fieldOf(pkg, "exports"), { "./docs": "./mod.ts" });
   const deps = entries(pkg, "dependencies");
   const dev = entries(pkg, "devDependencies");
-  assertEquals(deps.map(([n]) => n).sort(), ["mermaid", "typescript"]);
+  assertEquals(deps.map(([n]) => n).sort(), ["beautiful-mermaid", "shiki", "typescript"]);
   assertEquals(dev.map(([n]) => n).sort(), ["@intellectual-frontiers/core", "@intellectual-frontiers/system", "@intellectual-frontiers/test", "@types/node"]);
   for (const [n, v] of dev) if (n.startsWith("@intellectual-frontiers/")) assertEquals(v, `link:../${n.split("/")[1]}`, `${n} is a link to its library`);
   for (const [n, v] of [...deps, ...dev]) if (!v.startsWith("link:")) assert(/^\d+\.\d+\.\d+(-[\w.]+)?$/.test(v), `${n} is pinned exactly`);
@@ -69,7 +69,9 @@ proves(["0011-documentation FR-001"], "nothing outside commons/docs imports a fi
   }
 });
 
-const PACKAGES = new Set(["typescript/async"]);
+const PACKAGES = new Set(["typescript/async", "beautiful-mermaid", "shiki/core", "shiki/wasm", "shiki/engine/oniguruma"]);
+/** The grammars and themes of Shiki the highlighter imports one by one. */
+const SHIKI_FILES = /^shiki\/(langs|themes)\/[a-z-]+\.mjs$/;
 /** The libraries lifted out of IFC TypeScript, which the generator imports by package name (0032-lifting-libraries FR-003). */
 const LIFTED = /^@intellectual-frontiers\/(core|system|test)$/;
 const IFC_TS = new Set(["ts/kernel/mod.ts", "ts/runtime/mod.ts", "ts/runtime/test.ts"]);
@@ -79,7 +81,7 @@ proves(["0011-documentation FR-002"], "a file imports the generator, IFC TypeScr
   for (const f of mine) {
     const fixture = f.startsWith("commons/docs/suite/fixture-repo/");
     for (const s of specifiers(read(f))) {
-      if (PACKAGES.has(s) || LIFTED.test(s) || (fixture && s === "@intellectual-frontiers/commons/docs")) continue;
+      if (PACKAGES.has(s) || SHIKI_FILES.test(s) || LIFTED.test(s) || (fixture && s === "@intellectual-frontiers/commons/docs")) continue;
       assert(s.startsWith("."), `${f} imports ${s}`);
       const target = path.relative(path.join(ROOT, "commons"), path.resolve(path.dirname(path.join(ROOT, f)), s)).split(path.sep).join("/");
       if (IFC_TS.has(target) && (target !== "ts/runtime/test.ts" || f.startsWith("commons/docs/suite/"))) continue;

@@ -54,6 +54,25 @@ export function dependenciesOf(b: Build, packages: readonly Package[]): { readon
   return { uses, usedBy };
 }
 
+/** The imports of the libraries without the ones another import implies: A importing C is left out where A imports B and B imports C, at any distance. */
+function reduced(libraries: readonly Package[], uses: ReadonlyMap<string, readonly string[]>): [string, string][] {
+  const reaches = (from: string, to: string, skip: string): boolean => {
+    const seen = new Set<string>([from]);
+    const stack = (uses.get(from) ?? []).filter((x) => x !== skip);
+    while (stack.length > 0) {
+      const at = stack.pop() ?? "";
+      if (at === to) return true;
+      if (seen.has(at)) continue;
+      seen.add(at);
+      stack.push(...(uses.get(at) ?? []));
+    }
+    return false;
+  };
+  const out: [string, string][] = [];
+  for (const p of libraries) for (const c of uses.get(p.slug) ?? []) if (!(uses.get(p.slug) ?? []).some((mid) => mid !== c && reaches(mid, c, ""))) out.push([p.slug, c]);
+  return out;
+}
+
 /** The page of a package. */
 export const packagePage = (pkg: Package): string => `overview/${pkg.slug}.html`;
 
@@ -191,8 +210,8 @@ export function overviewPages(b: Build, top: Package, packages: readonly Package
       group: "Libraries",
       order: 9,
       blocks: [
-        { kind: "paragraph", inlines: [{ kind: "text", text: "A library imports another by its package name, and only the ones it lists here. Libraries at the top of a column import nothing of the others." }] },
-        { kind: "diagram", source: `flowchart LR\n${libraries.flatMap((p) => (uses.get(p.slug) ?? []).map((u) => `  ${p.slug.replaceAll("-", "_")}[${p.about.title}] --> ${u.replaceAll("-", "_")}[${bySlug.get(u)?.about.title ?? u}]`)).join("\n")}`, caption: "Which library imports which" },
+        { kind: "paragraph", inlines: [{ kind: "text", text: "A library imports another by its package name, and only the ones it lists here. Core imports nothing, and every other library imports it." }] },
+        { kind: "diagram", source: `flowchart LR\n${reduced(libraries, uses).map(([a, c]) => `  ${a.replaceAll("-", "_")}[${bySlug.get(a)?.about.title ?? a}] --> ${c.replaceAll("-", "_")}[${bySlug.get(c)?.about.title ?? c}]`).join("\n")}`, caption: "Which library imports which: an import that another import already implies is left out" },
         {
           kind: "table",
           head: ["Library", "Imports", "Imported by"].map((h) => [{ kind: "text", text: h } as Inline]),

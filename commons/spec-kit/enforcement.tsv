@@ -662,3 +662,4 @@ requirement	mechanism	by	note
 0035-licensing FR-011	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: the README License section names the license, and AGENTS.md names the generator's command
 0035-licensing FR-012	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: the packer writes the SPDX id, packs the LICENSE and refuses a library that has none
 0011-documentation FR-036	check	.github: cd commons/docs && bun run verify	newcomer.test.ts: five newcomer questions answered from the site, retired names and history words found, none on commons' site
+0011-documentation FR-037	check	.github: cd commons/docs && bun run verify	highlight.test.ts: each language cut into tokens with its colour for both schemes, the same runs every time, and the diagram drawn into the page

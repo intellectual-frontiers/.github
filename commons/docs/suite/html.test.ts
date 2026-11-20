@@ -22,7 +22,7 @@ const every: readonly Block[] = [
   { kind: "callout", tone: "limit", title: "T", blocks: [] },
   { kind: "entry", id: "e", name: "e", badges: [{ text: "const", tone: "neutral" }], signature: "const e: 1", blocks: [] },
   { kind: "tabs", id: "t", tabs: [{ label: "One", blocks: [] }, { label: "Two", blocks: [] }] },
-  { kind: "diagram", source: "erDiagram", caption: "C" },
+  { kind: "diagram", source: "flowchart LR\n  a --> b", caption: "C" },
   { kind: "cards", cards: [{ title: "Card", href: { kind: "external", url: "https://example.com" }, text: [] }] },
   { kind: "badges", badges: [{ text: "b", tone: "good" }] },
   { kind: "tree", nodes: [{ label: "a", children: [{ label: "b", children: [] }] }] },
@@ -30,7 +30,7 @@ const every: readonly Block[] = [
 
 proves(["0011-documentation FR-017"], "every case of the page model is written, text escaped and links relative to the page", () => {
   const html = every.map((b) => block(b, "a/x.html")).join("\n");
-  for (const tag of ["<h2", "<p>", 'class="meta"', "<ol>", "tk-keyword", "<table>", "callout-limit", 'class="entry"', 'role="tablist"', 'class="mermaid"', 'class="cards"', "badge-good", 'class="tree"']) {
+  for (const tag of ["<h2", "<p>", 'class="meta"', "<ol>", 'class="t"', "<table>", "callout-limit", 'class="entry"', 'role="tablist"', 'class="diagram-wrap"', 'class="cards"', "badge-good", 'class="tree"']) {
     assertStringIncludes(html, tag);
   }
   assertStringIncludes(html, "&lt;b&gt;");
@@ -40,17 +40,17 @@ proves(["0011-documentation FR-017"], "every case of the page model is written, 
 
 const page = (blocks: readonly Block[]): Page => ({ path: "api/k/x.html", title: "X", description: "D", section: "api", group: "G", order: 1, blocks });
 
-proves(["0011-documentation FR-017"], "a page asks nothing of another host, loads Mermaid only where it has a diagram, and reads on white", async () => {
+proves(["0011-documentation FR-017"], "a page asks nothing of another host, draws a diagram into the page with no script of its own, and reads on white", async () => {
   const site = { name: "N", repository: "https://github.com/x/y", pages: [page([])] };
   const plain = document(page([]), site);
-  const withDiagram = document(page([{ kind: "diagram", source: "erDiagram", caption: "C" }]), site);
+  const withDiagram = document(page([{ kind: "diagram", source: "flowchart LR\n  a --> b", caption: "C" }]), site);
   for (const html of [plain, withDiagram]) {
     for (const m of html.matchAll(/(?:src|href)="([^"]+)"/g)) {
       const url = m[1] ?? "";
       assert(!/^(https?:)?\/\//.test(url) || url === site.repository, `a page asks ${url} of another host`);
     }
   }
-  assert(!plain.includes("mermaid.min.js") && withDiagram.includes('src="../../assets/mermaid.min.js"'));
+  assert(!plain.includes("mermaid") && !withDiagram.includes("mermaid.min.js") && withDiagram.includes("<svg"), "a diagram is an SVG in the page, with no script to draw it");
   const css = await fs.readTextFile(path.join(ROOT, "commons/docs/theme/site.css"));
   assertMatch(css, /--page: #ffffff;/);
   assertMatch(css, /\.content \{ background: var\(--page\)/);
