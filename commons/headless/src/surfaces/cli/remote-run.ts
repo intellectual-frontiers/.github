@@ -85,7 +85,7 @@ export async function runOn(x: OnRun): Promise<RunResult> {
   );
   const rows = fanned.map(remoteOfFanned);
   const code = exitOfRemote(rows);
-  const outcome = redactOutcome(reportOfRemote(rows), redactor(program.secrets()));
+  const outcome = redactOutcome(reportOfRemote(rows), redactor(program.secrets(), { keys: program.secretKeys }));
   if (x.verbosity === "json") {
     const text = x.sarif
       ? sarifText({ program: program.name, version: program.version, outcome })

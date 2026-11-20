@@ -10,6 +10,7 @@ export * as identityAccess from "./identity-access.auto.ts";
 export * as identityAbac from "./identity-abac.auto.ts";
 export * as identityMachine from "./identity-machine.auto.ts";
 export * as identityDevice from "./identity-device.auto.ts";
+export * as flow from "./flow.auto.ts";
 export * as arcaTenancy from "./arca-tenancy.auto.ts";
 export * as identityRebac from "./identity-rebac.auto.ts";
 export * as identityPki from "./identity-pki.auto.ts";

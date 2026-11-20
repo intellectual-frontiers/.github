@@ -205,7 +205,7 @@ export function verbOf(c: Command): Verb {
 export const BUILT_IN_WORDS = ["help", "explain", "completions", "man", "run"] as const;
 
 /** The options of the model, by their keys. */
-export const STANDARD_KEYS = ["json", "sarif", "quiet", "verbose", "color", "nonInteractive", "dryRun", "check", "yes", "on"] as const;
+export const STANDARD_KEYS = ["json", "sarif", "quiet", "verbose", "color", "nonInteractive", "dryRun", "check", "yes", "on", "consent"] as const;
 
 /** One of the model's standard option keys. */
 export type StandardKey = (typeof STANDARD_KEYS)[number];
@@ -220,6 +220,7 @@ export function standardOptions(facts: ActionFacts, reach?: ReachPolicy): Spec {
     color: flag({ negatable: true, default: true, help: "Use colour where the terminal shows it (--no-color turns it off)." }),
     nonInteractive: flag({ help: "Never ask a question: where one is needed, fail and say so." }),
     ...(reach?.channels.includes("ssh") === true ? { on: value({ help: "Run it on these targets instead of here: ids joined by commas, `class:<class>` or `all`." }) } : {}),
+    ...(reach?.confirmation === "consent" && facts.effect !== "read" ? { consent: value({ help: "The identifier of the consent a person gave earlier: it lets this run go on with no terminal, and is recorded in the run log." }) } : {}),
     ...(facts.dryRun ? { dryRun: flag({ help: "Show what would change and change nothing." }) } : {}),
     ...(facts.check ? { check: flag({ help: "Change nothing; end with findings where something would change." }) } : {}),
     ...(facts.effect === "destructive" ? { yes: flag({ short: "y", help: "Confirm the destruction without asking." }) } : {}),

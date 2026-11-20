@@ -39,6 +39,8 @@ export type ProgramConfig = {
   readonly generic?: GenericCodes;
   /** The secret values the program holds: redacted wherever they would be written. */
   readonly secrets?: () => readonly string[];
+  /** The names of the keys that are secret in this program (`APP_TOKEN`): the value of `KEY=value` is redacted. A sentence that only names a variable is not. */
+  readonly secretKeys?: readonly string[];
   /** The targets `--on` can name. */
   readonly targets?: readonly Target[];
   /** How a run over targets is bounded: how many at once (4) and how long each may take (30 s). */
@@ -62,6 +64,7 @@ export type Program = {
   readonly guide: GuideLinks | undefined;
   readonly generic: GenericCodes;
   readonly secrets: () => readonly string[];
+  readonly secretKeys: readonly string[];
   readonly defaultCommand: readonly string[];
   readonly targets: readonly Target[];
   readonly remote: { readonly concurrency: number; readonly perHostTimeoutMs: number };
@@ -84,6 +87,7 @@ export function programOf(c: ProgramConfig): Program {
     guide: c.guide,
     generic: c.generic ?? DEFAULT_GENERIC_CODES,
     secrets: c.secrets ?? (() => []),
+    secretKeys: c.secretKeys ?? [],
     defaultCommand: c.defaultCommand ?? [],
     targets: c.targets ?? [],
     remote: { concurrency: c.remote?.concurrency ?? 4, perHostTimeoutMs: c.remote?.perHostTimeoutMs ?? 30_000 },

@@ -39,6 +39,7 @@ export type UnitClass =
   | "loads"
   | "describe"
   | "federate"
+  | "flow"
   | "issues"
   | "model"
   | "extension"
@@ -74,6 +75,7 @@ const FOLDERS: readonly Folder[] = [
   { prefix: "sql/loads/", class: "loads", instances: false },
   { prefix: "sql/describe/", class: "describe", instances: false },
   { prefix: "sql/federate/", class: "federate", instances: false },
+  { prefix: "sql/flow/", class: "flow", instances: false },
   { prefix: "sql/presets/", class: "preset", instances: false },
   { prefix: "sql/cli/", class: "cli", instances: false },
   { prefix: "issues/", class: "issues", instances: false },
@@ -93,6 +95,7 @@ export const MAY_IMPORT: Readonly<Record<UnitClass, readonly UnitClass[]>> = {
   lifecycle: ["physical", "logical", "governance", "engine"],
   dialect: ["physical", "logical", "governance", "engine"],
   sqlextension: ["lifecycle", "physical", "logical", "governance", "engine"],
+  flow: ["loads", "quality", "typed", "lifecycle", "physical", "logical", "governance", "engine"],
   federate: ["loads", "typed", "lifecycle", "physical", "logical", "governance", "engine"],
   describe: ["typed", "lifecycle", "physical", "logical", "governance", "engine"],
   loads: ["quality", "typed", "lifecycle", "physical", "logical", "governance", "engine"],
@@ -103,9 +106,9 @@ export const MAY_IMPORT: Readonly<Record<UnitClass, readonly UnitClass[]>> = {
   issues: ["governance", "engine"],
   model: ["governance", "engine", "model"],
   extension: ["governance", "engine"],
-  cli: ["preset", "federate", "describe", "drivers", "loads", "quality", "typed", "sqlextension", "dialect", "lifecycle", "physical", "logical", "governance", "engine", "extension", "model"],
-  suite: ["engine", "governance", "logical", "physical", "lifecycle", "dialect", "sqlextension", "federate", "describe", "drivers", "loads", "quality", "typed", "preset", "model", "extension", "cli", "examples"],
-  examples: ["engine", "governance", "logical", "physical", "lifecycle", "dialect", "sqlextension", "federate", "describe", "drivers", "loads", "quality", "typed", "preset", "model", "extension", "cli"],
+  cli: ["preset", "flow", "federate", "describe", "drivers", "loads", "quality", "typed", "sqlextension", "dialect", "lifecycle", "physical", "logical", "governance", "engine", "extension", "model"],
+  suite: ["engine", "governance", "logical", "physical", "lifecycle", "dialect", "sqlextension", "flow", "federate", "describe", "drivers", "loads", "quality", "typed", "preset", "model", "extension", "cli", "examples"],
+  examples: ["engine", "governance", "logical", "physical", "lifecycle", "dialect", "sqlextension", "flow", "federate", "describe", "drivers", "loads", "quality", "typed", "preset", "model", "extension", "cli"],
   tools: [],
   root: [],
 };
@@ -125,6 +128,7 @@ const LEVEL: Readonly<Record<UnitClass, number>> = {
   loads: 4.6,
   describe: 4.7,
   federate: 4.8,
+  flow: 4.9,
   preset: 4.5,
   issues: 4,
   model: 4,

@@ -1,3 +1,4 @@
+// Spec: 0052-sql-quality FR-010, FR-011
 // Spec: 0052-sql-quality FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007, FR-008, FR-009
 /**
  * SQL-DQ (commons data 0052-sql-quality), on real engines: the data tests of dbt as typed values. The algebra (levels, naming, selection), the severity and the thresholds, the built-in and the package
@@ -10,8 +11,8 @@ import { tally, tapText } from "@intellectual-frontiers/data/sql/extensions/asse
 import { snapshotOf } from "@intellectual-frontiers/data/sql/lifecycle";
 import { bind, type Dialect } from "@intellectual-frontiers/data/sql/physical";
 import {
-  acceptedRange, acceptedValues, atLeastOne, equalRowcount, equality, expressionIsTrue, judge, notConstant, notEmptyString, notNull, on, relationships, runTests, select, singular, summary, testName, testsFromState, toTap, unique,
-  uniqueCombinationOfColumns, use, type DqTest,
+  acceptedRange, acceptedValues, atLeastOne, equalRowcount, equality, exactly, expressionIsTrue, judge, notConstant, notEmptyString, notNull, on, relationships, runTests, select, singular, summary, testName, testsFromState, toTap, unique,
+  uniqueCombinationOfColumns, preview, use, type DqTest,
 } from "@intellectual-frontiers/data/sql/quality";
 import { DIALECTS, load, openEngine, type Engine } from "./engines-fixture.ts";
 import { same } from "./governance-fixture.ts";
@@ -178,6 +179,34 @@ proves(["0052-sql-quality FR-009"], "the tests a schema's state asks for (not nu
       same(summary(ran).ok, true, name);
     } finally {
       await e.close?.();
+    }
+  }
+});
+
+proves(["0052-sql-quality FR-010", "0052-sql-quality FR-011"], "a test can expect an exact number of failing rows (it fails on one fewer and on one more and is never a warning), and a set of proposed tests is previewed on the data that is already there, with a sample of the rows each would reject, changing nothing", async () => {
+  for (const { name, dialect } of DIALECTS) {
+    const e = await seeded(name);
+    try {
+      const d = driverOf(e);
+      const bad = on("orders").column("status", use(acceptedValues, { values: ["open", "shipped"] }, exactly(1)))[0]!; // one row is wrong: 'lost'
+      const missed = on("orders").column("status", use(acceptedValues, { values: ["open", "shipped"] }, { ...exactly(2), name: "expects_two" }))[0]!;
+      const extra = on("orders").column("status", use(acceptedValues, { values: ["open", "shipped", "lost"] }, { ...exactly(1), name: "expects_one_but_none" }))[0]!;
+      const zero = on("orders").column("status", use(acceptedValues, { values: ["open", "shipped", "lost"] }, { ...exactly(0), name: "expects_none" }))[0]!;
+      const ran = await runTests([bad, missed, extra, zero], d, dialect);
+      same(ran.map((o) => o.status), ["pass", "fail", "fail", "pass"], name);
+      same(judge(2, exactly(3)), "fail");
+      same([judge(3, exactly(3)), judge(4, exactly(3)), judge(0, exactly(0))], ["pass", "fail", "pass"]);
+      const impact = await preview(
+        [on("orders").column("id", use(notNull))[0]!, on("orders").column("qty", use(acceptedRange, { min: 0, max: 10 }))[0]!, on("orders").column("nothing_here", use(notNull))[0]!],
+        d,
+        dialect,
+        1,
+      );
+      same(impact.map((i) => [i.status, i.failures]), [["fail", 1], ["fail", 2], ["error", undefined]], name);
+      same(impact.map((i) => i.sample.length), [1, 1, 0], `${name}: a sample of the rows, at most what was asked`);
+      same(await e.rows("SELECT count(*) AS n FROM orders").then((r) => Number(r[0]?.["n"])), 4, `${name}: nothing was changed`);
+    } finally {
+      await e.close();
     }
   }
 });

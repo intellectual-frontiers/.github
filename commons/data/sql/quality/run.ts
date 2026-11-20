@@ -86,3 +86,40 @@ export function toTap(outcomes: readonly Outcome[]): readonly TapNode[] {
     }
   });
 }
+
+/** What one test would find on the data in a database: how many rows are wrong, and some of them. */
+export interface Impact {
+  readonly test: DqTest;
+  readonly status: Status;
+  readonly failures?: number;
+  /** Up to `sample` of the failing rows, as the test's SQL gives them. */
+  readonly sample: readonly Readonly<Record<string, unknown>>[];
+  readonly message?: string;
+}
+
+/**
+ * What a set of tests would find on data that is already in a database (the last week's, or a staging table): the rule-impact preview. A proposed rule is run before it is deployed and its failures are reported with a sample
+ * of the rows, so that the cost of a stricter rule is known before it rejects anything. Nothing is written.
+ *
+ * @param tests - the proposed tests
+ * @param driver - the database
+ * @param d - its dialect
+ * @param sample - how many failing rows to show for each test; 5 where not given
+ */
+export async function preview(tests: readonly DqTest[], driver: Driver, d: Dialect, sample = 5): Promise<readonly Impact[]> {
+  const ran = await runTests(tests.map((t) => ({ ...t, config: { ...t.config, storeFailures: false } })), driver, d);
+  const out: Impact[] = [];
+  for (const o of ran) {
+    const t = tests.find((x) => x.name === o.test.name) ?? o.test;
+    let rows: readonly Readonly<Record<string, unknown>>[] = [];
+    if (o.status !== "error" && o.status !== "skipped" && (o.failures ?? 0) > 0) {
+      try {
+        rows = await driver.query(`SELECT * FROM (${t.failing(d)}) AS dq_sample LIMIT ${Math.max(0, Math.trunc(sample))}`);
+      } catch {
+        rows = [];
+      }
+    }
+    out.push({ test: t, status: o.status, ...(o.failures === undefined ? {} : { failures: o.failures }), sample: rows, ...(o.message === undefined ? {} : { message: o.message }) });
+  }
+  return out;
+}

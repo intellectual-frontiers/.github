@@ -1,5 +1,6 @@
 // Spec: 0005-reach-and-targets FR-001, FR-002, FR-003
 // Spec: 0007-ssh-coverage FR-001
+// Spec: 0008-exit-style-consent FR-004
 /**
  * Where an action may be reached from and run, as governance (commons headless 0005-reach-and-targets): a reach policy for each action (the channels it
  * may come through, whether it is read-only and idempotent, whether it needs a terminal, whom it runs as, how it is confirmed), the classes of target there
@@ -29,8 +30,11 @@ export const CHANNELS: readonly Channel[] = ["local", "ssh", "mcp", "rest"];
 /** Whom an action runs as on the machine it runs on: the person or program that called it, or a service account of the program. */
 export type RunsAs = "caller" | "service";
 
-/** How an action is confirmed where it is confirmed at all: not at all, by a flag of the invocation, or by a person. */
-export type ConfirmationClass = "none" | "flag" | "person";
+/**
+ * How an action is confirmed where it is confirmed at all: not at all, by a flag of the invocation, by a person, or by a prior consent (0008-exit-style-consent FR-004): an
+ * identifier of an approval a person gave earlier, passed as `--consent <id>`, which lets a run that changes something go on with no terminal, and is recorded in the run's log.
+ */
+export type ConfirmationClass = "none" | "flag" | "person" | "consent";
 
 /** The reach policy of one action. */
 export type ReachPolicy = {
@@ -105,7 +109,8 @@ export type ReachRule =
   | "reach/idempotent-mismatch"
   | "reach/tty-without-terminal"
   | "reach/destructive-unconfirmed"
-  | "reach/human-only-remote";
+  | "reach/human-only-remote"
+  | "reach/consent-on-read";
 
 /** A contradiction between an action and its reach policy. */
 export type ReachProblem = { readonly rule: ReachRule; readonly message: string };
@@ -132,6 +137,9 @@ export function reachProblems(a: ActionFacts, r: ReachPolicy): readonly ReachPro
   if (a.effect === "destructive" && r.confirmation === "none") out.push({ rule: "reach/destructive-unconfirmed", message: `${a.id} destroys something and its reach policy has no confirmation` });
   if (a.audience === "human" && r.channels.some((c) => c !== "local")) {
     out.push({ rule: "reach/human-only-remote", message: `${a.id} is for a person, so it may come through the local channel only` });
+  }
+  if (r.confirmation === "consent" && a.effect === "read") {
+    out.push({ rule: "reach/consent-on-read", message: `${a.id} only reads, so there is nothing for a consent to allow` });
   }
   return out;
 }
