@@ -47,16 +47,10 @@ proves(
       const published: { name: string; manifest: Json }[] = [];
       for (const lib of npmLibraries()) {
         // a library packs from its own installed tools (the compiler, the links to the libraries it depends on): a job that has not installed it does so, as a person's first `bun run verify` does
-        // (Bun's first install of a folder can leave a `link:` dependency unlinked, and the next links it: a link that is not there is asked for again, once)
-        if (!fs.existsSync(path.join(lib.dir, "node_modules"))) {
-          const links = Object.entries(obj(obj(JSON.parse(await fs.readTextFile(path.join(lib.dir, "package.json"))))["devDependencies"]))
-            .concat(Object.entries(obj(obj(JSON.parse(await fs.readTextFile(path.join(lib.dir, "package.json"))))["dependencies"])))
-            .filter(([, v]) => typeof v === "string" && v.startsWith("link:"))
-            .map(([k]) => path.join(lib.dir, "node_modules", ...k.split("/")));
-          for (let attempt = 0; attempt < 2 && (attempt === 0 || !links.every((l) => fs.existsSync(l))); attempt++) {
-            const installed = await sh([bun, "install", "--frozen-lockfile"], lib.dir);
-            assertEquals(installed.code, 0, `${lib.name}: bun install: ${installed.out}`);
-          }
+        // (an install of a folder that links to it leaves a `node_modules` of its own behind, so the compiler is what says the tools are there)
+        if (!fs.existsSync(path.join(lib.dir, "node_modules", "typescript"))) {
+          const installed = await sh([bun, "install", "--frozen-lockfile"], lib.dir);
+          assertEquals(installed.code, 0, `${lib.name}: bun install: ${installed.out}`);
         }
         const packed = await sh([bun, "tools/pack.ts"], lib.dir);
         assertEquals(packed.code, 0, `${lib.name}: ${packed.out}`);
