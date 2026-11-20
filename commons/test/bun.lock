@@ -10,6 +10,7 @@
         "@intellectual-frontiers/crypto": "link:../crypto",
         "@intellectual-frontiers/libraries": "link:../libraries",
         "@intellectual-frontiers/mizan": "link:../mizan",
+        "@intellectual-frontiers/quality": "link:../quality",
         "@intellectual-frontiers/system": "link:../system",
         "@intellectual-frontiers/telemetry": "link:../telemetry",
         "@types/node": "26.6.6",
@@ -28,6 +29,8 @@
     "@intellectual-frontiers/libraries": ["@intellectual-frontiers/libraries@link:../libraries", {}],
 
     "@intellectual-frontiers/mizan": ["@intellectual-frontiers/mizan@link:../mizan", {}],
+
+    "@intellectual-frontiers/quality": ["@intellectual-frontiers/quality@link:../quality", {}],
 
     "@intellectual-frontiers/system": ["@intellectual-frontiers/system@link:../system", {}],
 
