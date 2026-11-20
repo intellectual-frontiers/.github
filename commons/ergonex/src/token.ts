@@ -45,14 +45,14 @@ export function tokenChecks(f: TokenFacts): readonly Check[] {
             level: "suggest",
             subject,
             message:
-              "the token for reading this organization's packages is not set in this terminal: run `ergonex shell <your shell> --install` and open a new terminal, and `gh auth login` if you have not signed in to GitHub",
+              "the token for reading this organization's packages is not set in this terminal: run `ergonex shell install <your shell>` and open a new terminal, and `gh auth login` if you have not signed in to GitHub",
           }
         : {
             id,
             level: "suggest",
             subject,
             message:
-              "the token for reading this organization's packages comes from GitHub CLI, which is not installed: install it (https://cli.github.com), run `gh auth login`, then `ergonex shell <your shell> --install` and open a new terminal",
+              "the token for reading this organization's packages comes from GitHub CLI, which is not installed: install it (https://cli.github.com), run `gh auth login`, then `ergonex shell install <your shell>` and open a new terminal",
           },
     ];
   }

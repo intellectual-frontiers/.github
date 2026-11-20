@@ -90,15 +90,15 @@ proves(
       });
       const r = await w.ergonex("doctor", "--json");
       const body = JSON.parse(r.stdout) as {
-        findings?: { ruleId: string; severity: string; subject: string }[];
+        problems?: { code: string; level: string; message: string }[];
       };
-      const found = (body.findings ?? []).filter((f) => f.ruleId.startsWith("ergonex/repo-path"));
-      assertEquals(found.map((f) => [f.ruleId, f.severity]).sort(), [
-        ["ergonex/repo-path-room", "Informational"],
-        ["ergonex/repo-path-too-long", "Error"],
+      const found = (body.problems ?? []).filter((p) => p.code.startsWith("E-REPO-PATH"));
+      assertEquals(found.map((p) => [p.code, p.level]).sort(), [
+        ["E-REPO-PATH-ROOM", "warn"],
+        ["E-REPO-PATH-TOO-LONG", "fail"],
       ]);
       assert(
-        found.every((f) => !f.subject.endsWith("/short")),
+        found.every((p) => !/\/short\b/.test(p.message)),
         "a short path has no finding",
       );
       assertEquals(r.code, 1, "an error finding makes the status 1");

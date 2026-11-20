@@ -1,6 +1,6 @@
 // Spec: 0001-ergonex FR-018
 /**
- * The starter manifest `ergonex setup --apply` writes where the workspace has none (commons 0001-ergonex FR-018): a TypeScript module that names no repository yet, with the places a person adds
+ * The starter manifest `ergonex setup` writes where the workspace has none (commons 0001-ergonex FR-018): a TypeScript module that names no repository yet, with the places a person adds
  * them, the tool catalog and the policy, as comments. It is never written over an existing manifest.
  *
  * @module

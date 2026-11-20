@@ -1,12 +1,17 @@
 /**
  * Tests of the module convention of `ergonex` as pure functions (commons 0001-ergonex FR-004 to FR-008, FR-010, FR-011, FR-022): the name of a module and the nearest names to a typo, the order of the
  * three sources and the module a later source hides, a registered module's `modules.auto.json` and its pinned hash, the answer of an external module to `--ergonex-manifest` and its JSON Schema made from
- * the same fields, the four exit statuses, and a typed command that parses its words once and is given its options as a typed value. The sources are lists a test writes; the programs themselves
+ * the same fields, the four exit statuses, and a command declared on Headless that parses its words once and is given its options as a typed value. The sources are lists a test writes; the programs themselves
  * are run by `ergonex-command.test.ts`.
  *
  * @module
  */
+import { run, type Io } from "@intellectual-frontiers/headless/cli";
+import { programOf } from "@intellectual-frontiers/headless/logical";
 import { flag } from "../src/platform/k-args.ts";
+import { defineCommand, type Host } from "../src/commands/define.ts";
+import { HOME, reads } from "../src/commands/options.ts";
+import type { Finding } from "../src/findings.ts";
 import { err, ok } from "@intellectual-frontiers/core";
 import { sha256 } from "@intellectual-frontiers/crypto";
 import { exitStatuses, moduleSources } from "./vocabulary.ts";
@@ -22,17 +27,7 @@ import {
   type Candidates,
   type Found,
 } from "../src/modules/registry.ts";
-import {
-  type BaseContext,
-  defineCommand,
-  dispatch,
-  EXIT_STATUSES,
-  exitCodeOf,
-  GLOBAL_OPTIONS,
-  type ErgonexModule,
-  MODULE_SOURCES,
-  precedenceOf,
-} from "../src/modules/types.ts";
+import { EXIT_STATUSES, exitCodeOf, MODULE_SOURCES, type Outcome, precedenceOf } from "../src/modules/types.ts";
 
 const found = (name: string, source: Found["source"], where: string): Found => ({ name, source, summary: `the ${name} module`, where });
 
@@ -205,92 +200,90 @@ proves(
   },
 );
 
-const BASE: BaseContext = {
+const IO: Io = {
+  env: () => undefined,
+  os: "linux",
+  terminal: { stdin: false, stdout: false, stderr: false },
+  columns: undefined,
+  now: () => 0,
+  pid: 1,
+  readLine: () => Promise.resolve(undefined),
+};
+
+const hostOf = (): Host => ({
   env: {},
   cwd: "/",
   today: "2026-11-17",
   platform: { os: "linux", arch: "x86_64", windows: false },
   places: undefined,
   builtins: [],
-  interact: { terminal: false, ask: () => Promise.resolve(undefined) },
   homeFor: (o) => o ?? "/home",
   stdin: () => Promise.resolve(""),
-  note: () => undefined,
-};
+  argv: [],
+  now: () => 0,
+  run: { failure: undefined },
+});
 
 proves(
   ["0001-ergonex FR-007", "0001-ergonex FR-022"],
-  "a typed command parses its words once into a typed value, accepts the five global options, answers help without running, and refuses an option it does not know",
+  "a command declared on Headless parses its words once into a typed value, answers help without running, and refuses an option it does not know with status 2 and without running",
   async () => {
     let ran = 0;
     const seen: unknown[] = [];
-    const command = defineCommand({
+    const greet = defineCommand({
       name: "greet",
       summary: "Greets.",
-      options: { ...GLOBAL_OPTIONS, loud: flag({ help: "Shout." }) },
+      options: { ...HOME, loud: flag({ help: "Shout." }) },
+      action: reads(),
       run: (ctx, args) => {
         ran++;
-        seen.push([args.options.loud, ctx.globals.json, ctx.globals.sarif, ctx.globals.noColor, ctx.home]);
-        return Promise.resolve(
-          ok({
-            text: "hello",
-            data: { loud: args.options.loud },
-            findings: [],
-          }),
-        );
+        seen.push([args.options.loud, ctx.home, ctx.mode]);
+        return Promise.resolve(ok({ text: "hello", data: { loud: args.options.loud }, findings: [] }));
       },
     });
-    const a = await command.execute(["--loud", "--json", "--sarif", "--no-color", "--home", "/w"], BASE);
-    assert(a.outcome.kind === "ok");
-    assertEquals(seen, [[true, true, true, true, "/w"]]);
-    assertEquals(a.globals?.home, "/w");
-    const help = await command.execute(["--help"], BASE);
-    assert(help.outcome.kind === "ok" && help.outcome.value.text.includes("--loud") && help.outcome.value.text.includes("--home"));
+    const program = programOf({ name: "ergonex", summary: "x", version: "0.0.0", children: [greet(hostOf())] });
+    const a = await run(program, ["greet", "--loud", "--home", "/w", "--no-color"], IO);
+    assertEquals([a.code, a.out], [0, "hello\n"]);
+    assertEquals(seen, [[true, "/w", "apply"]]);
+    const help = await run(program, ["greet", "--help"], IO);
+    assertEquals(help.code, 0);
+    assertStringIncludes(help.out, "--loud");
+    assertStringIncludes(help.out, "--home");
     assertEquals(ran, 1, "help ran the command");
-    const unknown = await command.execute(["--louder"], BASE);
-    assert(unknown.outcome.kind === "err");
-    if (unknown.outcome.kind === "err") {
-      assertEquals(unknown.outcome.error.kind, "usage");
-      assertStringIncludes(unknown.outcome.error.message, "--louder");
-      assertStringIncludes(unknown.outcome.error.message, "did you mean --loud");
-    }
+    const unknown = await run(program, ["greet", "--louder"], IO);
+    assertEquals(unknown.code, 2);
+    assertStringIncludes(unknown.err, "did you mean --loud");
     assertEquals(ran, 1, "a usage error ran the command");
-    const positional = await command.execute(["extra"], BASE);
-    assert(positional.outcome.kind === "err");
+    const positional = await run(program, ["greet", "extra"], IO);
+    assertEquals(positional.code, 2);
   },
 );
 
 proves(
-  ["0001-ergonex FR-007", "0001-ergonex FR-003"],
-  "a module of one command takes every word; a module of several takes its first word as the command and says what is unknown",
-  () => {
-    const cmd = (name: string) =>
-      defineCommand({
-        name,
-        summary: name,
-        options: { ...GLOBAL_OPTIONS },
-        run: () => Promise.resolve(err({ kind: "usage" as const, message: name })),
-      });
-    const single: ErgonexModule = {
-      name: "plan",
-      summary: "p",
-      commands: [cmd("plan")],
-    };
-    const several: ErgonexModule = {
-      name: "worktree",
-      summary: "w",
-      commands: [cmd("create"), cmd("list"), cmd("prune")],
-    };
-    const one = dispatch(single, ["--json"]);
-    assert(one.kind === "command");
-    if (one.kind === "command") assertEquals(one.words, ["--json"]);
-    const two = dispatch(several, ["list", "--json"]);
-    assert(two.kind === "command");
-    if (two.kind === "command") assertEquals([two.command.name, two.words], ["list", ["--json"]]);
-    assertEquals(dispatch(several, []).kind, "help");
-    assertEquals(dispatch(several, ["--help"]).kind, "help");
-    const unknown = dispatch(several, ["make"]);
-    assert(unknown.kind === "unknown");
-    if (unknown.kind === "unknown") assertEquals(unknown.known, ["create", "list", "prune"]);
+  ["0001-ergonex FR-010", "0001-ergonex FR-022"],
+  "a finding of severity error or warning fails the run (status 1), an informational finding alone does not, and a failure of the body is recorded as usage or environment for the program's statuses 2 and 3",
+  async () => {
+    const finding = (severity: Finding["severity"]): Finding => ({ ruleId: "ergonex/generated-drift", severity, message: "x is not written", subject: "x", firstSeen: "2026-11-17" });
+    const host = hostOf();
+    const make = (name: string, body: () => Promise<Outcome>) =>
+      defineCommand({ name, summary: name, options: { ...HOME }, action: reads(), run: body })(host);
+    const program = programOf({
+      name: "ergonex",
+      summary: "x",
+      version: "0.0.0",
+      children: [
+        make("warned", () => Promise.resolve(ok({ text: "", data: null, findings: [finding("Warning")] }))),
+        make("noted", () => Promise.resolve(ok({ text: "", data: null, findings: [finding("Informational")] }))),
+        make("broken", () => Promise.resolve(err({ kind: "environment" as const, message: "no git" }))),
+      ],
+    });
+    const warned = await run(program, ["warned"], IO);
+    assertEquals(warned.code, 1);
+    assertStringIncludes(warned.err, "[E-GENERATED-DRIFT]");
+    assertEquals((await run(program, ["noted"], IO)).code, 0);
+    assertEquals(host.run.failure, undefined);
+    const broken = await run(program, ["broken"], IO);
+    assertEquals(broken.code, 1);
+    assertEquals(host.run.failure, "environment");
   },
 );

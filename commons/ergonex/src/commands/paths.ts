@@ -9,12 +9,15 @@
 import { err, ok } from "@intellectual-frontiers/core";
 import { join } from "../platform/r-path.ts";
 import { AREA } from "../host/workspace.ts";
-import { GLOBAL_OPTIONS, defineCommand, type ErgonexModule } from "../modules/types.ts";
+import { defineCommand } from "./define.ts";
+import { HOME, reads } from "./options.ts";
 
 const paths = defineCommand({
   name: "paths",
   summary: "Say where ergonex keeps its files: the workspace, its state, its data, the tools it installs and their shims.",
-  options: { ...GLOBAL_OPTIONS },
+  options: { ...HOME },
+  action: reads(),
+  examples: [{ args: [], says: "Say where the workspace, its state, its data and its tools are." }],
   run: (ctx) => {
     const places = ctx.places;
     if (places === undefined)
@@ -46,9 +49,5 @@ const paths = defineCommand({
   },
 });
 
-/** The module `ergonex paths`. */
-export const pathsModule: ErgonexModule = {
-  name: "paths",
-  summary: paths.summary,
-  commands: [paths],
-};
+/** The command `ergonex paths`. */
+export const pathsCommand = paths;

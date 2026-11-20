@@ -6,7 +6,7 @@
  * is named with its version.
  *
  * @remarks
- * A record of the quality system is a set of cases (`checkRun`): each fact of the run is a case whose name states it (`ergonex/run: ergonex setup --apply`, `ergonex/plan: sha256 ...`, `ergonex/tool: git 2.43.0`,
+ * A record of the quality system is a set of cases (`checkRun`): each fact of the run is a case whose name states it (`ergonex/run: ergonex setup`, `ergonex/plan: sha256 ...`, `ergonex/tool: git 2.43.0`,
  * `ergonex/exit: Findings`), each finding is a failed case with its rule, file and message, and a check that did not run is `not_run`. `runRules` makes the cases and `checkRun` (the quality
  * module) makes the record; the host layer (`host/evidence.ts`) writes it once. The options are only the NAMES of the flags: a value that follows a flag is never kept.
  *

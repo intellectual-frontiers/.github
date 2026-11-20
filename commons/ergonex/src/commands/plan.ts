@@ -12,8 +12,9 @@ import { applyPlan } from "../host/apply.ts";
 import { type Loaded, situate } from "../host/workspace.ts";
 import type { Context, Outcome } from "../modules/types.ts";
 import { describeAction, isSettled } from "../plan.ts";
-import { defineCommand, GLOBAL_OPTIONS, type ErgonexModule } from "../modules/types.ts";
-import { jsonOf, planFindings, textOf, withWorkspace } from "./common.ts";
+import { jsonOf, planFindings, withWorkspace } from "./common.ts";
+import { defineCommand } from "./define.ts";
+import { changes, HOME, reads } from "./options.ts";
 
 const FETCH = flag({
   help: "Fetch each repository's remote first, so that ahead and behind are against the remote as it is now (the only use of the network).",
@@ -22,7 +23,9 @@ const FETCH = flag({
 const plan = defineCommand({
   name: "plan",
   summary: "Show the plan the manifest and what is on disk make, and change nothing.",
-  options: { ...GLOBAL_OPTIONS, fetch: FETCH },
+  options: { ...HOME, fetch: FETCH },
+  action: reads(),
+  examples: [{ args: [], says: "Show what apply would do, and change nothing." }],
   run: (ctx, args) =>
     withWorkspace(ctx, async (loaded) => {
       const s = await situate(ctx, loaded, { fetch: args.options.fetch });
@@ -37,7 +40,7 @@ const plan = defineCommand({
         ? "nothing to do: every action is a skip"
         : `${s.value.plan.actions.filter((a) => a.kind !== "Skip").length} to do`;
       return ok({
-        text: textOf([`plan ${s.value.planSha.slice(0, 12)}: ${head}`, ...lines], findings),
+        text: [`plan ${s.value.planSha.slice(0, 12)}: ${head}`, ...lines].join("\n"),
         data: {
           planSha256: s.value.planSha,
           settled: isSettled(s.value.plan),
@@ -50,7 +53,7 @@ const plan = defineCommand({
 });
 
 const APPLY_OPTIONS = {
-  ...GLOBAL_OPTIONS,
+  ...HOME,
   fetch: FETCH,
   allowDestructive: flag({
     help: "Carry out a destructive action (removing a generated file that is no longer generated); without it the action is reported as skipped.",
@@ -61,7 +64,7 @@ const APPLY_OPTIONS = {
   }),
 };
 
-/** What `apply` does on a loaded workspace: the plan, observed again before each action, carried out. `add --apply` and `adopt --apply` end with it. */
+/** What `apply` does on a loaded workspace: the plan, observed again before each action, carried out. */
 export async function applyLoaded(
   ctx: Context,
   loaded: Loaded,
@@ -90,10 +93,7 @@ export async function applyLoaded(
   const changed = steps.filter((x) => x.status === "done").length;
   const findings = done.value.findings;
   return ok({
-    text: textOf(
-      [`apply ${s.value.planSha.slice(0, 12)}: ${changed} done, ${steps.filter((x) => x.status === "failed").length} failed`, ...lines],
-      findings,
-    ),
+    text: [`apply ${s.value.planSha.slice(0, 12)}: ${changed} done, ${steps.filter((x) => x.status === "failed").length} failed`, ...lines].join("\n"),
     data: {
       planSha256: s.value.planSha,
       steps: jsonOf(
@@ -116,19 +116,16 @@ const apply = defineCommand({
   name: "apply",
   summary: "Carry out the plan: clone, fast-forward, configure and write generated files; never delete work, never change the host.",
   options: APPLY_OPTIONS,
+  action: changes({ idempotent: true }),
+  examples: [
+    { args: [], says: "Clone what is missing, fast-forward what is behind, and write the generated files." },
+    { args: ["--allow-destructive"], says: "Also remove a generated file that is no longer generated." },
+  ],
   run: (ctx, args) => withWorkspace(ctx, (loaded) => applyLoaded(ctx, loaded, args.options)),
 });
 
-/** The module `ergonex plan`. */
-export const planModule: ErgonexModule = {
-  name: "plan",
-  summary: plan.summary,
-  commands: [plan],
-};
+/** The command `ergonex plan`. */
+export const planCommand = plan;
 
-/** The module `ergonex apply`. */
-export const applyModule: ErgonexModule = {
-  name: "apply",
-  summary: apply.summary,
-  commands: [apply],
-};
+/** The command `ergonex apply`. */
+export const applyCommand = apply;

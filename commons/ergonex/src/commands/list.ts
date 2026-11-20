@@ -1,8 +1,7 @@
 // Spec: 0001-ergonex FR-002
 /**
- * `ergonex list` and `ergonex help` (commons 0001-ergonex FR-002, FR-003, FR-009): `list` names every module with its source (`ergonex:BuiltIn`, `ergonex:Registered` or `ergonex:Path`) and its summary, and a module that a
- * module of an earlier source hides is told as an informational finding; `help` describes the command and, given a module, the commands of that module. Neither runs a module found on the `PATH` unless
- * `list` is given `--probe`, which asks each such module for its `--ergonex-manifest` and runs nothing else.
+ * `ergonex modules` (commons 0001-ergonex FR-002, FR-003, FR-009): names every module with its source (`ergonex:BuiltIn`, `ergonex:Registered` or `ergonex:Path`) and its summary, and a module that a module of an earlier source hides is told as an
+ * informational finding. It runs no module found on the `PATH` unless `--probe` is given, which asks each such module for its `--ergonex-manifest` and runs nothing else. The help of the command and of each command is Headless': `ergonex help`.
  *
  * @module
  */
@@ -12,44 +11,19 @@ import type { Finding } from "../findings.ts";
 import { MANIFEST_TIMEOUT_MS } from "../modules/external.ts";
 import { discoverModules, probeModule } from "../host/discovery.ts";
 import { hiddenFindings, resolveAll } from "../modules/registry.ts";
-import { defineCommand, dispatch, GLOBAL_OPTIONS, type ErgonexModule } from "../modules/types.ts";
-import { nearestNames } from "../modules/name.ts";
-import { jsonOf, textOf } from "./common.ts";
-
-/** What `ergonex` says it is, in these words (0001-ergonex FR-002). */
-export const SCOPE_STATEMENT =
-  "ergonex manages only Intellectual Frontiers Workspaces. It is not a general IFC or Mizan controller and does not front ifc.";
-
-/** The help of the command: its scope, its usage and the modules it holds. */
-export function topHelp(builtins: readonly ErgonexModule[]): string {
-  const width = Math.max(0, ...builtins.map((m) => m.name.length));
-  return [
-    "ergonex: the command of Intellectual Frontiers Workspaces.",
-    "",
-    SCOPE_STATEMENT,
-    "",
-    "Usage: ergonex <module> [options] [arguments]",
-    "       ergonex help [module]",
-    "       ergonex list [--probe]",
-    "",
-    "`ergonex <name>` runs the module ergonex-<name>: a built-in one, one the workspace registers, or an executable named ergonex-<name> on the PATH.",
-    "",
-    "Modules:",
-    ...builtins.map((m) => `  ${m.name.padEnd(width)}  ${m.summary}`),
-    "",
-    "Every module takes --home DIR, --json, --sarif, --no-color and --help. Exit status: 0 ok, 1 findings, 2 usage, 3 environment.",
-  ].join("\n");
-}
+import { jsonOf } from "./common.ts";
+import { defineCommand } from "./define.ts";
+import { HOME, readsHere } from "./options.ts";
 
 /** A number of seconds to wait: a whole number, at least one. */
 const seconds: Parser<number> = (t) => (/^\d+$/.test(t) && Number(t) >= 1 ? ok(Number(t)) : err("a whole number of seconds, at least 1"));
 
 const LIST_OPTIONS = {
-  ...GLOBAL_OPTIONS,
+  ...HOME,
   probe: flag({
-    help: "Run each module registered or found on the PATH, to ask it for --ergonex-manifest (it runs nothing else). A module on the PATH is run only after you say yes to it, or with --yes; it is not sandboxed.",
+    help: "Run each module registered or found on the PATH, to ask it for --ergonex-manifest (it runs nothing else). A module on the PATH is run only after you say yes to it, or with --trust; it is not sandboxed.",
   }),
-  yes: flag({
+  trust: flag({
     help: "With --probe, do not ask before running a module found on the PATH.",
   }),
   probeTimeout: value({
@@ -59,20 +33,26 @@ const LIST_OPTIONS = {
   }),
 };
 
-const list = defineCommand({
-  name: "list",
+/** The command `ergonex modules`. */
+export const modulesCommand = defineCommand({
+  name: "modules",
   summary: "List every module with its source and summary; --probe asks the modules on the PATH for their manifest.",
   options: LIST_OPTIONS,
+  action: readsHere(),
+  examples: [
+    { args: [], says: "Name every module and where it was found; run none." },
+    { args: ["--probe", "--trust"], says: "Ask each module on the PATH for its manifest without asking first." },
+  ],
   run: async (ctx, args) => {
     const found = await discoverModules(ctx);
     const resolved = resolveAll(found.candidates);
     const findings: Finding[] = [...found.findings, ...hiddenFindings(resolved, ctx.today)];
     // a module on the PATH is run only with the person's yes for it, or with --yes (0001-ergonex FR-028); a registered one is the workspace's own
     const onPath = args.options.probe ? resolved.modules.filter((m) => m.source === "Path") : [];
-    if (onPath.length > 0 && !args.options.yes && !ctx.interact.terminal)
+    if (onPath.length > 0 && !args.options.trust && !ctx.interact.terminal)
       return err({
         kind: "usage",
-        message: `there is no terminal to ask on, and --probe would run ${onPath.map((m) => m.name).join(", ")} from the PATH: run it in a terminal, or give --yes to run them`,
+        message: `there is no terminal to ask on, and --probe would run ${onPath.map((m) => m.name).join(", ")} from the PATH: run it in a terminal, or give --trust to run them`,
       });
     const waitMs = (args.options.probeTimeout ?? MANIFEST_TIMEOUT_MS / 1000) * 1000;
     const rows: {
@@ -94,8 +74,8 @@ const list = defineCommand({
       if (args.options.probe && m.source !== "BuiltIn") {
         const approved =
           m.source !== "Path" ||
-          args.options.yes ||
-          /^\s*y(es)?\s*$/i.test((await ctx.interact.ask(`Run ${m.where} to ask it for its manifest? It is not sandboxed. [y/N] `)) ?? "");
+          args.options.trust ||
+          (await ctx.interact.confirm(`Run ${m.where} to ask it for its manifest? It is not sandboxed.`)) === true;
         if (!approved) {
           row.summary = "(not probed: it was not run)";
           row.probed = false;
@@ -138,87 +118,10 @@ const list = defineCommand({
     const sourceWidth = Math.max(0, ...rows.map((r) => r.source.length));
     const lines = rows.map((r) => `${r.name.padEnd(width)}  ${r.source.padEnd(sourceWidth)}  ${r.summary}`);
     return ok({
-      text: textOf(lines, findings),
+      text: lines.join("\n"),
       data: { modules: jsonOf(rows) },
       findings,
     });
   },
 });
 
-const help = defineCommand({
-  name: "help",
-  summary: "Describe the command, or the commands of a module.",
-  options: { ...GLOBAL_OPTIONS },
-  operands: [{ name: "MODULE", help: "A module to describe.", arity: "optional" }],
-  run: async (ctx, args) => {
-    const [name] = args.positionals;
-    if (name === undefined)
-      return ok({
-        text: topHelp(ctx.builtins),
-        data: null,
-        findings: [],
-        noEvidence: true,
-      });
-    const module = ctx.builtins.find((m) => m.name === name);
-    if (module === undefined) {
-      const found = await discoverModules(ctx);
-      const known = resolveAll(found.candidates).modules.find((m) => m.name === name);
-      if (known !== undefined)
-        return ok({
-          text: `${name} is a module on this computer (${known.source}: ${known.where}); help does not run it: run \`ergonex list --probe\` to ask it, or \`ergonex ${name} --help\``,
-          data: null,
-          findings: [],
-          noEvidence: true,
-        });
-      const near = nearestNames(
-        name,
-        resolveAll(found.candidates).modules.map((m) => m.name),
-      );
-      return ok({
-        text: `no module is named ${name}${near.length === 0 ? "" : `; did you mean ${near.join(", ")}?`}`,
-        data: null,
-        findings: [
-          {
-            ruleId: "ergonex/unknown-module",
-            severity: "Warning",
-            message: `no module is named ${name}`,
-            subject: name,
-            firstSeen: ctx.today,
-          },
-        ],
-        noEvidence: true,
-      });
-    }
-    const d = dispatch(module, ["--help"]);
-    const lines =
-      d.kind === "help"
-        ? [
-            `ergonex ${module.name}: ${module.summary}`,
-            "",
-            ...module.commands.map((c) => `  ergonex ${module.name} ${c.name}  ${c.summary}`),
-          ]
-        : d.kind === "command"
-          ? [d.command.help(`ergonex ${module.name}`)]
-          : [];
-    return ok({
-      text: lines.join("\n"),
-      data: null,
-      findings: [],
-      noEvidence: true,
-    });
-  },
-});
-
-/** The module `ergonex list`. */
-export const listModule: ErgonexModule = {
-  name: "list",
-  summary: list.summary,
-  commands: [list],
-};
-
-/** The module `ergonex help`. */
-export const helpModule: ErgonexModule = {
-  name: "help",
-  summary: help.summary,
-  commands: [help],
-};

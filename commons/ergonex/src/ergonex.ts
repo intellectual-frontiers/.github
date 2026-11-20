@@ -1,18 +1,20 @@
 // Spec: 0002-workspace-model FR-046
 /**
- * `ergonex`, the command of Intellectual Frontiers Workspaces (commons 0001-ergonex): a controller in the style of `git`, which runs the module `ergonex-<name>` for `ergonex <name>`, found among the typed built-in
- * modules, the modules the workspace registers in `<home>/.ergonex/modules.auto.json` and the executables named `ergonex-*` on the `PATH`, in that order. It manages only Intellectual Frontiers
- * Workspaces: it is not a general IFC or Mizan controller and does not front `ifc`.
+ * `ergonex`, the command of Intellectual Frontiers Workspaces (commons 0001-ergonex): a program on Headless (`@intellectual-frontiers/headless`), the first real one. Its commands are declared in `commands/` with the facts of their actions
+ * (what they may change, whether repeating them is safe, whether they preview) and Headless runs them: it parses the words, decides whether a run proceeds, previews, asks or is refused, draws the output (the report on standard output; the
+ * problems, the verdict and the one `next:` command on standard error), writes the run log and keeps the hints in `<XDG_STATE_HOME>/ergonex`, explains its problem codes (`ergonex explain <code>`) and generates its help, completions and
+ * man page. It manages only Intellectual Frontiers Workspaces: it is not a general IFC or Mizan controller and does not front `ifc`.
  *
  * ```sh
- * bun commons/ergonex/src/ergonex.ts <module> [options]     # or: ergonex <module> (the package's bin, on Bun or Node 26)
+ * bun commons/ergonex/src/ergonex.ts <command> [options]     # or: ergonex <command> (the package's bin, on Bun or Node 26)
  * ```
  *
  * @remarks
- * A run ends in one of four statuses: 0 ok, 1 findings (a warning or an error; an informational finding alone is 0), 2 a command line that does not fit (an unknown module, command, option or
- * argument, or a name that is not a module name, which is never passed to a shell), 3 a host that cannot do it (no `git`, a root that does not exist or cannot be written, an evidence record that
- * cannot be written). Every run writes one evidence record under `<home>/.ergonex/evidence/`, in the shape of an IFQS test record, including a run that ends in 2 (a case that is `not_run`, with the
- * reason); the exceptions are the ones the specifications make (the printing form of `ergonex shell`, a Git hook, help) and a run where the workspace's own area is not there to hold it.
+ * A run ends in Headless' statuses: 0 ok, 1 findings (a warning or an error; an informational finding alone is 0), 2 a command line that does not fit, 3 a host that cannot do it (no `git`, a root that does not exist or cannot be written, an
+ * evidence record that cannot be written), 4 where a check finds something pending. Every run of a command writes one evidence record under `<state>/evidence/`, in the shape of an IFQS test record (commands/define.ts); the exceptions are the
+ * ones the specifications make (the printing form of `ergonex shell print`, a Git hook, a preview) and a run where the workspace's own area is not there to hold it.
+ *
+ * Git's convention is the model of the modules (`git foo` runs `git-foo`): where the first word is not a command of the program and a module `ergonex-<word>` is found (registered by the workspace or on the `PATH`), that program runs.
  *
  * Credits (commons 0002-workspace-model FR-046): the layout, and the ideas of `ensure`, `status` and `doctor`, are carried on from the earlier workspace tools, and their author is credited here; the ideas of a source
  * state and a target state, templates over data, `apply`, `diff`, `status`, `verify` and a state record are chezmoi's (Tom Payne and contributors, MIT license), taken as inspiration only: no chezmoi code
@@ -21,57 +23,36 @@
  * @module
  */
 import process from "node:process";
-import { absurd, err, ok } from "@intellectual-frontiers/core";
-import { editDistance } from "./platform/k-args.ts";
+import { launch, type Io } from "@intellectual-frontiers/headless/cli";
+import { BUILT_IN_WORDS } from "@intellectual-frontiers/headless/logical";
 import { existsSync } from "./platform/r-fs.ts";
-import { join, resolve } from "./platform/r-path.ts";
-import { build, cwd as workingFolder, env as processEnv, runtimeName, runtimeVersion, run as runProgram } from "./platform/r-proc.ts";
-import { stderr, stdin, stdout } from "./platform/r-stdio.ts";
-import { BUILTIN_MODULES } from "./commands/mod.ts";
-import { topHelp } from "./commands/list.ts";
-import { guidanceFor } from "./commands/guidance.ts";
-import { writeEvidence } from "./host/evidence.ts";
+import { resolve } from "./platform/r-path.ts";
+import { build, cwd as workingFolder, env as processEnv } from "./platform/r-proc.ts";
+import { stdin, stdout, stderr } from "./platform/r-stdio.ts";
+import { exitCodeOf } from "./modules/types.ts";
+import { ergonexProgram, modulesOf, type ProgramHost } from "./commands/program.ts";
+import { recordEvidence } from "./commands/define.ts";
 import { discoverModules, runExternal } from "./host/discovery.ts";
-import { terminalInteract } from "./host/interact.ts";
-import { readManifest, LOOPBACK_NOTICE, loopbackAllowed, loopbackFinding } from "./host/workspace.ts";
 import { placesOf } from "./host/locations.ts";
-import { AREA } from "./host/workspace.ts";
-import { writeRunEvidence } from "./setup/host/evidence.ts";
-import type { RunFacts } from "./setup/evidence.ts";
-import { exitStatusOf, toSarif } from "./findings.ts";
 import { homeOf } from "./layout.ts";
 import { findModule } from "./modules/registry.ts";
-import { moduleName, describeNameError, nearestNames } from "./modules/name.ts";
-import {
-  type BaseContext,
-  type Context,
-  dispatch,
-  type Executed,
-  type ExitStatus,
-  exitCodeOf,
-  type EvidenceFacts,
-  type Globals,
-  type ErgonexModule,
-  type Interact,
-  type Outcome,
-  type Report,
-} from "./modules/types.ts";
+import { moduleName } from "./modules/name.ts";
+import type { Context } from "./modules/types.ts";
 
 /** What `main` is given besides the command line; each is read from this process where it is not. */
 export type MainDeps = {
   readonly env?: Readonly<Record<string, string | undefined>>;
   readonly cwd?: string;
+  /** Where the report goes (standard output by default). */
   readonly out?: (text: string) => void;
+  /** Where the problems and the verdict go (standard error by default). */
   readonly err?: (text: string) => void;
-  /** The modules held, built in: `BUILTIN_MODULES` by default. */
-  readonly builtins?: readonly ErgonexModule[];
-  readonly interact?: Interact;
+  /** What of the world of the run to replace (a terminal that answers, a line of input, a store of state): the rest is the process's. */
+  readonly io?: Partial<Io>;
   readonly stdin?: () => Promise<string>;
   /** The time in milliseconds since the Unix epoch. */
   readonly now?: () => number;
 };
-
-const line = (text: string): string => (text.endsWith("\n") ? text : `${text}\n`);
 
 /** The `--home` an argument vector names, found without parsing the rest: only to look for a registered module, whose command then parses its words itself. */
 function homeWord(words: readonly string[]): string | undefined {
@@ -80,23 +61,15 @@ function homeWord(words: readonly string[]): string | undefined {
   return words.find((w) => w.startsWith("--home="))?.slice("--home=".length);
 }
 
-/** The status a report ends in. */
-function statusOfReport(r: Report): ExitStatus {
-  return r.status ?? exitStatusOf(r.findings);
-}
-
 /** Runs `ergonex` with the words after its name; returns the exit status. */
 export async function main(argv: readonly string[], deps: MainDeps = {}): Promise<number> {
   const environment = deps.env ?? processEnv.toObject();
   const cwd = deps.cwd ?? workingFolder();
-  const out = deps.out ?? ((t: string): void => void stdout.writeSync(t));
-  const note = deps.err ?? ((t: string): void => void stderr.writeSync(t));
-  const builtins = deps.builtins ?? BUILTIN_MODULES;
   const now = deps.now ?? Date.now;
-  const start = BigInt(now()) * 1_000_000n;
-  const today = new Date(now()).toISOString().slice(0, 10);
   const windows = build.os === "windows";
-
+  const os = build.os === "darwin" ? "darwin" : build.os === "windows" ? "windows" : "linux";
+  const placed = placesOf((name) => environment[name], os);
+  const run: ProgramHost["run"] = { failure: undefined };
   const homeFor = (override: string | undefined): string | undefined => {
     const h = homeOf({
       override: override === undefined ? undefined : resolve(cwd, override),
@@ -106,209 +79,70 @@ export async function main(argv: readonly string[], deps: MainDeps = {}): Promis
     });
     return h.kind === "ok" ? h.value : undefined;
   };
-  const placed = placesOf((name) => environment[name], build.os === "darwin" ? "darwin" : build.os === "windows" ? "windows" : "linux");
-  const base: BaseContext = {
+  const host: ProgramHost = {
     env: environment,
     cwd,
-    today,
+    today: new Date(now()).toISOString().slice(0, 10),
     platform: { os: build.os, arch: build.arch, windows },
     places: placed.kind === "ok" ? placed.value : undefined,
-    builtins,
-    interact: deps.interact ?? terminalInteract(),
     homeFor,
     stdin: deps.stdin ?? (() => stdin.text()),
-    note: (t) => note(line(t)),
+    argv,
+    now,
+    run,
   };
+  const program = ergonexProgram(host);
 
-  // what the run is, as the evidence will say
-  let command = "usage";
-  let words: readonly string[] = argv;
-  let executed: Executed | undefined;
-  let external: { readonly code: number } | undefined;
-  let outcome: Outcome;
-
+  // a word that is not a command of the program may name a module, as `git foo` runs `git-foo`
   const [first, ...rest] = argv;
-  if (first === undefined) {
-    // a person who types the name and nothing else is told what to do next, in plain words (0004-onboarding FR-003)
-    const root = homeFor(undefined);
-    out(
-      line(
-        guidanceFor({
-          home: root,
-          hasWorkspace: root !== undefined && existsSync(join(root, AREA)),
-        }),
-      ),
-    );
-    return 0;
-  } else if (first === "--help" || first === "-h") {
-    out(line(topHelp(builtins)));
-    return 0;
-  } else if (first.startsWith("-")) {
-    outcome = err({
-      kind: "usage",
-      message: `${first} is not an option of ergonex: options come after the module's name (\`ergonex <module> ${first}\`); \`ergonex --help\` lists the modules`,
-    });
-  } else {
-    const named = moduleName(first);
-    if (named.kind === "err") {
-      outcome = err({
-        kind: "usage",
-        message: `${JSON.stringify(first)} is not a module name: ${describeNameError(named.error)}; nothing was run`,
-      });
-    } else {
-      command = named.value;
-      words = rest;
-      const mine = builtins.find((m) => m.name === named.value);
-      if (mine !== undefined) {
-        const d = dispatch(mine, rest);
-        switch (d.kind) {
-          case "command":
-            executed = await d.command.execute(d.words, base);
-            outcome = executed.outcome;
-            if (mine.commands.length > 1) command = `${mine.name} ${d.command.name}`;
-            break;
-          case "help":
-            out(
-              line(
-                [
-                  `ergonex ${mine.name}: ${mine.summary}`,
-                  "",
-                  ...mine.commands.map((c) => `  ergonex ${mine.name} ${c.name}  ${c.summary}`),
-                ].join("\n"),
-              ),
-            );
-            return 0;
-          case "unknown": {
-            const near = nearestNames(d.word, d.known);
-            outcome = err({
-              kind: "usage",
-              message: `${d.word} is not a command of ergonex ${mine.name} (${d.known.join(", ")})${near.length === 0 ? "" : `; did you mean ${near.join(", ")}?`}`,
-            });
-            break;
-          }
-          default:
-            return absurd(d);
-        }
-      } else {
-        const ctx: Context = {
-          ...base,
-          globals: { json: false, sarif: false, noColor: false },
-          home: homeFor(homeWord(rest)),
-        };
-        const found = await discoverModules(ctx);
-        const module = findModule(found.candidates, named.value);
-        if (module === undefined) {
-          const all = [
-            ...builtins.map((m) => m.name),
-            ...found.candidates.registered.map((m) => m.name),
-            ...found.candidates.path.map((m) => m.name),
-          ];
-          const near = nearestNames(named.value, [...new Set(all)]).filter((n) => editDistance(named.value, n) <= 2);
-          outcome = err({
-            kind: "usage",
-            message: `${named.value} is not an ergonex module${near.length === 0 ? "; none is near it" : `; did you mean ${near.join(", ")}?`} (\`ergonex list\` names them)`,
-          });
-        } else {
-          const ran = await runExternal(module, found.registered, rest);
-          if (ran.kind === "err") {
-            outcome =
-              ran.error.kind === "changed"
-                ? err({
-                    kind: "environment",
-                    message: `${module.name}: the program ${ran.error.program} is not the one the workspace registered (its SHA-256 differs); it was not run`,
-                  })
-                : err({
-                    kind: "environment",
-                    message: `${module.name}: the program ${ran.error.program} is not there`,
-                  });
-          } else {
-            external = { code: ran.value };
-            outcome = ok({
-              text: "",
-              data: null,
-              findings: [],
-              status: ran.value === 0 ? "Ok" : ran.value === 2 ? "Usage" : ran.value === 3 ? "Environment" : "Findings",
-            });
-          }
-        }
-      }
+  const named = first === undefined || first.startsWith("-") ? undefined : moduleName(first);
+  if (first !== undefined && named?.kind === "ok" && !program.children.some((n) => n.name === first) && !(BUILT_IN_WORDS as readonly string[]).includes(first)) {
+    const ctx: Context = {
+      ...host,
+      builtins: modulesOf(program.children),
+      interact: { terminal: false, confirm: () => Promise.resolve(undefined) },
+      note: () => undefined,
+      globals: {},
+      home: homeFor(homeWord(rest)),
+      mode: "apply",
+    };
+    const start = BigInt(now()) * 1_000_000n;
+    const found = await discoverModules(ctx);
+    const module = findModule(found.candidates, named.value);
+    if (module !== undefined) {
+      const ran = await runExternal(module, found.registered, rest);
+      const code = ran.kind === "ok" ? ran.value : exitCodeOf("Environment");
+      if (ran.kind === "err")
+        stderr.writeSync(
+          `ergonex: ${module.name}: the program ${ran.error.program} is ${ran.error.kind === "changed" ? "not the one the workspace registered (its SHA-256 differs); it was not run" : "not there"}\n`,
+        );
+      const status = code === 0 ? "Ok" : code === 2 ? "Usage" : code === 3 ? "Environment" : "Findings";
+      const home = ctx.home;
+      if (home !== undefined && existsSync(home)) await recordEvidence(ctx, host, named.value, start, { status, findings: [] });
+      return code;
     }
   }
 
-  // the loopback switch is never silent: one line on standard error and an informational finding in the report (0002-workspace-model FR-037)
-  const loopback = executed !== undefined && loopbackAllowed(environment);
-  if (loopback) note(line(LOOPBACK_NOTICE));
-
-  // the output of the run
-  const globals: Globals = executed?.globals ?? {
-    json: false,
-    sarif: false,
-    noColor: false,
-  };
-  let status: ExitStatus;
-  let code: number;
-  let facts: EvidenceFacts | undefined;
-  let runFacts: RunFacts | undefined;
-  let findings: Report["findings"] = [];
-  let noEvidence: boolean;
-  let notRun: string | undefined;
-  if (outcome.kind === "ok") {
-    const r = outcome.value;
-    status = statusOfReport(r);
-    code = external?.code ?? exitCodeOf(status);
-    findings = loopback ? [...r.findings, loopbackFinding(today)] : r.findings;
-    facts = r.facts;
-    runFacts = r.runFacts;
-    noEvidence = r.noEvidence === true;
-    if (globals.sarif) out(line(JSON.stringify(toSarif(findings), null, 2)));
-    else if (globals.json) out(line(JSON.stringify({ command, status, exitCode: code, data: r.data, findings }, null, 2)));
-    else if (r.text !== "") out(line(r.text));
-  } else {
-    status = outcome.error.kind === "usage" ? "Usage" : "Environment";
-    noEvidence = outcome.error.noEvidence === true;
-    code = exitCodeOf(status);
-    notRun = outcome.error.message.split("\n")[0] ?? "";
-    note(line(`ergonex: ${executed === undefined ? "" : `${command}: `}${outcome.error.message}`));
-  }
-
-  // the evidence record, where the workspace has a place for it
-  const home = homeFor(globals.home);
-  const places = placed.kind === "ok" ? placed.value : undefined;
-  if (!noEvidence && home !== undefined && places !== undefined && existsSync(join(home, AREA))) {
-    const policy = await readManifest(home, today, loopbackAllowed(environment));
-    const regulated = policy.kind === "ok" && policy.value.policy.regulatedDomain.length > 0;
-    const tools = [...(facts?.tools ?? []), { name: runtimeName(), version: runtimeVersion() }];
-    if (regulated && !tools.some((t) => t.name === "git")) {
-      const g = await runProgram(["git", "--version"]).catch(() => undefined);
-      const v = g?.success === true ? /(\d+\.\d+(?:\.\d+)?)/.exec(g.stdout)?.[1] : undefined;
-      if (v !== undefined) tools.push({ name: "git", version: v });
-    }
-    const end = BigInt(now()) * 1_000_000n;
-    // the evidence of `setup` and `tools` is made by the setup module's writer from the facts of the run; every other run's by this one's
-    const failure: string | undefined =
-      runFacts !== undefined
-        ? await writeRunEvidence({ home, places: places, start, end, env: environment }, { ...runFacts, exit: status }).then((w) =>
-            w.kind === "err" ? w.error : undefined,
-          )
-        : await writeEvidence(
-            { home, places },
-            {
-              command,
-              words,
-              status,
-              findings,
-              ...(notRun === undefined ? {} : { notRun }),
-              facts: { ...facts, tools },
-              start,
-              end,
+  const code = await launch(program, {
+    argv,
+    io: {
+      env: (n) => {
+        const v = environment[n];
+        return v === "" ? undefined : v;
+      },
+      ...(deps.out === undefined && deps.err === undefined
+        ? {}
+        : {
+            sink: {
+              out: deps.out ?? ((t: string): void => void stdout.writeSync(t)),
+              err: deps.err ?? ((t: string): void => void stderr.writeSync(t)),
             },
-            regulated,
-          ).then((w) => (w.kind === "err" ? w.error.reason : undefined));
-    if (failure !== undefined) {
-      note(line(`ergonex: the evidence record could not be written (${failure}); the run is reported as a failure of the host`));
-      return exitCodeOf("Environment");
-    }
-  }
+          }),
+      ...deps.io,
+    },
+  });
+  // Headless' statuses are 0, 1 and 4; a command that could not do what it was asked ends the run with the program's own 2 (the words do not fit) or 3 (the host cannot do it)
+  if (code === 1 && run.failure !== undefined) return exitCodeOf(run.failure === "usage" ? "Usage" : "Environment");
   return code;
 }
 

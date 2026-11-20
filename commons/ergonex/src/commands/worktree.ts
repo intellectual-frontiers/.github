@@ -23,8 +23,9 @@ import { observe } from "../host/observe.ts";
 import { acquireLock, describeHolder, readHolder } from "../platform/r-lock.ts";
 import { createWorktree, listWorktrees, localWork, removeWorktree } from "../host/worktrees.ts";
 import { AREA, native } from "../host/workspace.ts";
-import { defineCommand, GLOBAL_OPTIONS, type ErgonexModule } from "../modules/types.ts";
-import { jsonOf, textOf, withWorkspace } from "./common.ts";
+import { jsonOf, withWorkspace } from "./common.ts";
+import { defineCommand } from "./define.ts";
+import { changes, destroys, HOME, reads } from "./options.ts";
 
 /** Whether a branch is named for its issue: it begins with the issue's number, alone or after `issue-`, and goes on only after `-` or `/`. */
 export function branchNamesIssue(branch: string): boolean {
@@ -47,7 +48,7 @@ function resolveRepo(repos: readonly ManifestRepo[], word: string): { readonly r
 }
 
 const CREATE_OPTIONS = {
-  ...GLOBAL_OPTIONS,
+  ...HOME,
   always: flag({
     help: "Make the worktree even where the repository's own checkout is free.",
   }),
@@ -57,6 +58,8 @@ const create = defineCommand({
   name: "create",
   summary: "Make a worktree for an issue's branch, only where someone else or uncommitted work is on the repository.",
   options: CREATE_OPTIONS,
+  action: changes({ idempotent: false }),
+  examples: [{ args: ["tool", "10-ergonex-host"], says: "Make a worktree for issue 10 where someone else or uncommitted work is on the repository." }],
   operands: [
     {
       name: "REPOSITORY",
@@ -103,7 +106,7 @@ const create = defineCommand({
           firstSeen: ctx.today,
         };
         return ok({
-          text: textOf([`no worktree made: ${repo.path} is ${s.kind}`], [finding]),
+          text: `no worktree made: ${repo.path} is ${s.kind}`,
           data: { made: false },
           findings: [finding],
         });
@@ -158,7 +161,9 @@ const create = defineCommand({
 const list = defineCommand({
   name: "list",
   summary: "List the worktrees of the managed repositories.",
-  options: { ...GLOBAL_OPTIONS },
+  options: { ...HOME },
+  action: reads(),
+  examples: [{ args: [], says: "List the worktrees of the managed repositories." }],
   run: (ctx) =>
     withWorkspace(ctx, async (loaded) => {
       const rows: {
@@ -189,18 +194,18 @@ const list = defineCommand({
     }),
 });
 
-const PRUNE_OPTIONS = {
-  ...GLOBAL_OPTIONS,
-  allowDestructive: flag({
-    help: "Remove the worktrees that hold no work; without it they are only named.",
-  }),
-};
+const PRUNE_OPTIONS = { ...HOME };
 
 const prune = defineCommand({
   name: "prune",
-  summary: "Remove the worktrees that have no uncommitted change and no unpushed commit; only with --allow-destructive.",
+  summary: "Remove the worktrees that have no uncommitted change and no unpushed commit; --dry-run names them.",
   options: PRUNE_OPTIONS,
-  run: (ctx, args) =>
+  action: destroys(),
+  examples: [
+    { args: ["--dry-run"], says: "Name the worktrees that hold no work, and remove none." },
+    { args: ["--yes"], says: "Remove them without asking." },
+  ],
+  run: (ctx) =>
     withWorkspace(ctx, async (loaded) => {
       // Git prints a worktree's real path (on macOS /private/var for /var), so the base is the root's real path too
       const realHome = await realPath(loaded.home).catch(() => loaded.home);
@@ -224,8 +229,8 @@ const prune = defineCommand({
             );
             continue;
           }
-          if (!args.options.allowDestructive) {
-            lines.push(`would remove ${w.path}: it holds no work; give --allow-destructive to remove it`);
+          if (ctx.mode === "dry-run") {
+            lines.push(`would remove ${w.path}: it holds no work`);
             continue;
           }
           const gone = await removeWorktree(folder, w.path);
@@ -241,9 +246,5 @@ const prune = defineCommand({
     }),
 });
 
-/** The module `ergonex worktree`. */
-export const worktreeModule: ErgonexModule = {
-  name: "worktree",
-  summary: "Make, list and prune the worktrees of the managed repositories.",
-  commands: [create, list, prune],
-};
+/** The commands of `ergonex worktree`: make, list and prune the worktrees of the managed repositories. */
+export const worktreeCommands = { create, list, prune } as const;

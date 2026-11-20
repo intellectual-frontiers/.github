@@ -51,7 +51,7 @@ export function hookScript(name: HookName, strict: boolean): string {
     '  unable "neither bun nor node is on the PATH"',
     "fi",
     "if ! command -v ergonex >/dev/null 2>&1; then",
-    '  unable "ergonex is not on the PATH (install it with: bun add -g @intellectual-frontiers/ergonex, or run: ergonex shell --install)"',
+    '  unable "ergonex is not on the PATH (install it with: bun add -g @intellectual-frontiers/ergonex, or run: ergonex shell install)"',
     "fi",
     `ergonex hook ${name} --home "$ERGONEX_HOME" -- "$@" >&2`,
     "status=$?",

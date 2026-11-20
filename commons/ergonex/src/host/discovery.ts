@@ -77,7 +77,7 @@ export async function discoverModules(ctx: Context): Promise<Discovered> {
     onPath.push({
       name: name.value,
       source: "Path",
-      summary: "(on the PATH; run `ergonex list --probe` to ask it)",
+      summary: "(on the PATH; run `ergonex modules --probe` to ask it)",
       where: p.file,
     });
   }

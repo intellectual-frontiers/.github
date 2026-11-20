@@ -1,6 +1,6 @@
 // Spec: 0001-ergonex FR-012
 /**
- * What the commands of `ergonex` share (commons 0001-ergonex FR-012 to FR-016, FR-022): the lines a report is made of, and the findings a plan's refusals and skips become. A command is a typed module (`modules/types.ts`) whose `run` returns a `Report` or a `Failure`; these are the parts of that report that more than one command writes.
+ * What the commands of `ergonex` share (commons 0001-ergonex FR-012 to FR-016, FR-022): loading the workspace for a command, and the findings a plan's refusals and skips become. A command is declared with `define.ts` and its body returns a `Report` or a `Failure`; these are the parts of that report that more than one command writes.
  *
  * @module
  */
@@ -10,17 +10,6 @@ import type { Finding } from "../findings.ts";
 import { describeAction, type Plan } from "../plan.ts";
 import type { Context, Outcome } from "../modules/types.ts";
 import { loadFailureOutcome, loadWorkspace, type Loaded } from "../host/workspace.ts";
-
-/** A finding as a line a person reads: its severity word, what it is about and what to do. */
-export function findingLine(f: Finding): string {
-  const word = f.severity === "Informational" ? "note" : f.severity === "Warning" ? "warn" : "error";
-  return `${word} ${f.subject}: ${f.message}`;
-}
-
-/** A report's text: the lines, then the findings as lines. */
-export function textOf(lines: readonly string[], findings: readonly Finding[]): string {
-  return [...lines, ...findings.map(findingLine)].join("\n");
-}
 
 /** Runs `f` on the loaded workspace, or gives the outcome that says why it could not be loaded. */
 export async function withWorkspace(ctx: Context, f: (loaded: Loaded) => Promise<Outcome>): Promise<Outcome> {

@@ -1,7 +1,7 @@
 // Spec: 0001-ergonex FR-017
 /**
  * The plan of `ergonex setup` (commons 0001-ergonex FR-017 to FR-020, 0002-workspace-model FR-030, FR-038, FR-039): setup is the only command that installs a tool or changes the host, it shows its plan first,
- * `--dry-run` is the default and changes nothing, `--apply` is required to change anything and with `--dry-run` is a usage error, and the plan is a list of typed steps made by a pure function from
+ * it carries its plan out unless `--dry-run` is given, which shows the plan and changes nothing, and the plan is a list of typed steps made by a pure function from
  * what was observed: it creates the root and a starter manifest where there is none, installs only the pinned artifacts of the catalog for this operating system and architecture, verifies
  * `git`, `bun` and `node` by probes and never installs them, and on Windows sets `core.longpaths` in each repository and the system setting where elevated, else prints the exact steps.
  *
@@ -11,63 +11,22 @@
  *
  * @module
  */
-import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
+import { absurd } from "@intellectual-frontiers/core";
 import { type Finding, exitStatusOf } from "../findings.ts";
 import type { RepoPath } from "../types.ts";
 import { type ToolArch, type ToolCatalog, type ToolOs, artifactFor } from "../tools/catalog.ts";
 import { type Probe, describeProbe, probeFinding } from "../tools/probe.ts";
 import { LONG_PATH_STEPS, longPathFindings } from "./windows.ts";
 
+/** How a run of `ergonex setup` treats its steps: it carries them out (`apply`), or shows the plan and changes nothing (`dry-run`, `--dry-run`). */
+export type SetupMode = "apply" | "dry-run";
+
 /** What `ergonex setup` was asked. */
 export type SetupArgs = {
-  /** Whether to carry the plan out (`--apply`); false is the dry run, the default. */
-  readonly apply: boolean;
-  /** Whether to add the global Git include (`--git-include`). */
+  readonly mode: SetupMode;
+  /** Whether to add the global Git include (`--git-include`): where a person can be asked, after the exact change is shown and a yes. */
   readonly gitInclude: boolean;
-  /** Whether a question is answered yes beforehand (`--yes`), for a run with no terminal. */
-  readonly yes: boolean;
 };
-
-/** A usage error: what is wrong and how to say it right (exit status `Usage`). */
-export type SetupUsageError = {
-  readonly kind: "usage";
-  readonly message: string;
-};
-
-/** The arguments after `ergonex setup`. `--dry-run` is the default and the same as saying nothing; both `--apply` and `--dry-run` is a usage error. */
-export function parseSetupArgs(argv: readonly string[]): Result<SetupArgs, SetupUsageError> {
-  let apply = false;
-  let dry = false;
-  let gitInclude = false;
-  let yes = false;
-  for (const a of argv) {
-    switch (a) {
-      case "--apply":
-        apply = true;
-        break;
-      case "--dry-run":
-        dry = true;
-        break;
-      case "--git-include":
-        gitInclude = true;
-        break;
-      case "--yes":
-        yes = true;
-        break;
-      default:
-        return err({
-          kind: "usage",
-          message: `${JSON.stringify(a)} is not an option of ergonex setup; usage: ergonex setup [--dry-run | --apply] [--git-include] [--yes]`,
-        });
-    }
-  }
-  if (apply && dry)
-    return err({
-      kind: "usage",
-      message: "ergonex setup takes --apply or --dry-run, not both (--dry-run is the default and changes nothing)",
-    });
-  return ok({ apply, gitInclude, yes });
-}
 
 /** One step of the plan. */
 export type SetupStep =
@@ -233,14 +192,14 @@ export function setupPlan(args: SetupArgs, facts: SetupFacts, today: string): Se
   }
   if (args.gitInclude) steps.push({ kind: "AddGitInclude", file: facts.gitIncludeFile });
   const exit = left || exitStatusOf(findings) === "Findings" ? "Findings" : "Ok";
-  return { steps, findings, apply: args.apply, exit };
+  return { steps, findings, apply: args.mode === "apply", exit };
 }
 
 /** The plan as text: a header that says whether it will be carried out, one line for each step, and what is left to do. */
 export function showPlan(plan: SetupPlan): string {
   const head = plan.apply
-    ? "ergonex setup --apply: carrying out this plan"
-    : "ergonex setup (dry run: nothing is changed; run `ergonex setup --apply` to carry this plan out)";
+    ? "ergonex setup: carrying out this plan"
+    : "ergonex setup --dry-run (nothing is changed; run `ergonex setup` to carry this plan out)";
   const body = plan.steps.length === 0 ? ["  nothing to do"] : plan.steps.map((s) => `  - ${describeStep(s)}`);
   return `${[head, ...body].join("\n")}\n`;
 }

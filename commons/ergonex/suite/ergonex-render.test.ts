@@ -157,7 +157,7 @@ proves(
 
 proves(
   ["0003-host FR-009", "0003-host FR-010", "0003-host FR-011", "0003-host FR-012"],
-  "verify finds a hand edit (error), a missing file, an unrecorded .auto. file and a drift (warnings); render refuses to overwrite a hand edit and --force replaces it; --check and --diff write nothing",
+  "verify finds a hand edit (error), a missing file, an unrecorded .auto. file and a drift (warnings); render refuses to overwrite a hand edit and --force replaces it; --check and --dry-run write nothing",
   async () => {
     await withWorld(async (w) => {
       await w.ergonex("init");
@@ -175,11 +175,12 @@ proves(
       await writeTextFile(agents, "my own guide\n");
       const edited = await w.ergonex("verify");
       assertEquals(edited.code, 1);
-      assertStringIncludes(edited.stdout, "error AGENTS.auto.md");
-      assertStringIncludes(edited.stdout, "edited by hand");
+      assertStringIncludes(edited.stderr, "AGENTS.auto.md");
+      assertStringIncludes(edited.stderr, "edited by hand");
+      assertStringIncludes(edited.stderr, "[E-GENERATED-EDITED]");
       const refused = await w.ergonex("render");
       assertEquals(refused.code, 1, refused.stdout);
-      assertStringIncludes(refused.stdout, "AGENTS.auto.md");
+      assertStringIncludes(refused.stdout + refused.stderr, "AGENTS.auto.md");
       assertEquals(await readTextFile(agents), "my own guide\n");
       const apply = await w.ergonex("apply");
       assertEquals(apply.code, 1);
@@ -195,15 +196,15 @@ proves(
       await mkdirless(missingFile);
       const warned = await w.ergonex("verify");
       assertEquals(warned.code, 1);
-      assertStringIncludes(warned.stdout, "warn libs.auto.code-workspace");
-      assertStringIncludes(warned.stdout, "is recorded as written and is not there");
-      assertStringIncludes(warned.stdout, "warn stray.auto.md");
-      assertStringIncludes(warned.stdout, "the state record does not hold");
+      assertStringIncludes(warned.stderr, "libs.auto.code-workspace");
+      assertStringIncludes(warned.stderr, "is recorded as written and is not there");
+      assertStringIncludes(warned.stderr, "stray.auto.md");
+      assertStringIncludes(warned.stderr, "the state record does not hold");
       assertEquals((await w.ergonex("render")).code, 0);
       assert(existsSync(missingFile));
       await mkdirless(join(w.home, "stray.auto.md"));
 
-      // --check and --diff write nothing, and the manifest changing is what they name
+      // --check and --dry-run write nothing, and the manifest changing is what they name
       const before = tree(w.home);
       const times = before
         .filter((p) => p !== ".ergonex/workspace.ts" && existsSync(join(w.home, p)) && statSync(join(w.home, p)).isFile)
@@ -218,7 +219,7 @@ proves(
       assertStringIncludes(check.stdout, "would change AGENTS.auto.md");
       assertStringIncludes(check.stdout, "would change libs.auto.code-workspace");
       assert(!check.stdout.includes("would change core.auto.code-workspace"), "a file that would not change was named");
-      const diff = await w.ergonex("render", "--diff");
+      const diff = await w.ergonex("render", "--dry-run");
       assertEquals(diff.code, 0);
       assertStringIncludes(diff.stdout, "--- a/libs.auto.code-workspace");
       assertStringIncludes(diff.stdout, "+++ b/libs.auto.code-workspace");
@@ -430,14 +431,14 @@ proves(
       await w.git(w.repo, "config", "--local", "--unset", "core.hooksPath");
       const warn = await w.ergonex("doctor");
       assertEquals(warn.code, 1);
-      assertStringIncludes(warn.stdout, "warn    git.example.org/team/tool:");
-      assertStringIncludes(warn.stdout, "ergonex apply");
+      assertStringIncludes(warn.stderr, "git.example.org/team/tool");
+      assertStringIncludes(warn.stderr, "ergonex apply");
       await w.ergonex("apply");
       // a hand edit of a generated file is an error
       await writeTextFile(join(w.home, "AGENTS.auto.md"), "mine\n");
       const edited = await w.ergonex("doctor");
       assertEquals(edited.code, 1);
-      assertStringIncludes(edited.stdout, "error   AGENTS.auto.md:");
+      assertStringIncludes(edited.stderr, "AGENTS.auto.md");
       const sarif = JSON.parse((await w.ergonex("doctor", "--sarif")).stdout) as {
         runs: { results: { ruleId: string; level: string }[] }[];
       };

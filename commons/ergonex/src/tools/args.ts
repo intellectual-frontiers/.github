@@ -2,7 +2,7 @@
 /**
  * The arguments of `ergonex tools` (commons 0001-ergonex FR-018, 0002-workspace-model FR-038 to FR-040), read once into a sum type: `list` shows the catalog and what is installed, `verify` checks each
  * installed tool against its install record and the probes of `git`, `bun` and `node`, and `export <oscal|spdx|cyclonedx>` writes the catalog or the inventory in the form an assessor reads.
- * `ergonex tools` never installs (only `ergonex setup --apply` does), so no argument names an install.
+ * `ergonex tools` never installs (only `ergonex setup` does), so no argument names an install.
  *
  * @module
  */
@@ -48,7 +48,7 @@ export function parseToolsArgs(argv: readonly string[]): Result<ToolsArgs, Usage
   if (command === "install" || command === "update" || command === "add")
     return err({
       kind: "usage",
-      message: `ergonex tools does not install anything; only \`ergonex setup --apply\` installs the pinned tools of the catalog`,
+      message: `ergonex tools does not install anything; only \`ergonex setup\` installs the pinned tools of the catalog`,
     });
   return err({
     kind: "usage",

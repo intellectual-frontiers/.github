@@ -14,12 +14,14 @@ import { sha256 } from "@intellectual-frontiers/crypto";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { readQuality } from "@intellectual-frontiers/quality";
 import { BEGIN, END } from "../src/shell/block.ts";
-import { BUILTIN_MODULES } from "../src/commands/mod.ts";
 import { evidenceFiles, Ergonex, LAUNCHER, needsWorld, ONE_REPOSITORY, REMOTE, withWorld, type World } from "./ergonex-fixtures.ts";
 
-/** The modules a JSON `list` names, by name. */
+/** The words of the program's own tree, at the top level. */
+const TOP = ["apply", "doctor", "hook", "init", "modules", "paths", "plan", "render", "repos", "setup", "shell", "start", "status", "tools", "verify", "worktree"];
+
+/** The modules a JSON `modules` names, by name. */
 async function modules(w: World, ...extra: string[]): Promise<{ name: string; source: string; summary: string }[]> {
-  const r = await w.ergonex("list", "--json", ...extra);
+  const r = await w.ergonex("modules", "--json", ...extra);
   assertEquals(r.code, 0, r.stderr);
   return (
     JSON.parse(r.stdout) as {
@@ -46,30 +48,31 @@ const MANIFEST_OK = JSON.stringify({
 
 proves(
   ["0001-ergonex FR-002", "0001-ergonex FR-003", "0001-ergonex FR-001", "0002-workspace-model FR-004"],
-  "ergonex --help says it manages only Intellectual Frontiers Workspaces and is not an IFC or Mizan controller, and list names every module with its source",
+  "ergonex --help says it manages only Intellectual Frontiers Workspaces and is not an IFC or Mizan controller, and modules names every module with its source",
   async () => {
     await withWorld(async (w) => {
       const help = await w.ergonex("--help");
       assertEquals(help.code, 0);
       assertStringIncludes(
         help.stdout,
-        "ergonex manages only Intellectual Frontiers Workspaces. It is not a general IFC or Mizan controller and does not front ifc.",
+        "It manages only Intellectual Frontiers Workspaces; it is not a general IFC or Mizan controller and does not front ifc.",
       );
-      for (const m of BUILTIN_MODULES) assertStringIncludes(help.stdout, m.name);
+      for (const name of TOP) assertStringIncludes(help.stdout, name);
       const fromHelp = await w.ergonex("help");
       assertStringIncludes(fromHelp.stdout, "does not front ifc");
       const one = await w.ergonex("help", "worktree");
-      assertStringIncludes(one.stdout, "ergonex worktree create");
+      assertStringIncludes(one.stdout, "create");
+      assertStringIncludes(one.stdout, "prune");
       const listed = await modules(w);
       assertEquals(
         listed.map((m) => m.name),
-        BUILTIN_MODULES.map((m) => m.name).sort(),
+        TOP,
       );
       assert(listed.every((m) => m.source === "ergonex:BuiltIn" && m.summary !== ""));
       // every command accepts --help and runs nothing
-      for (const m of BUILTIN_MODULES) {
-        const r = await w.ergonex(m.name, "--help");
-        assertEquals(r.code, 0, `${m.name}: ${r.stderr}`);
+      for (const name of TOP) {
+        const r = await w.ergonex(name, "--help");
+        assertEquals(r.code, 0, `${name}: ${r.stderr}`);
         assertStringIncludes(r.stdout, "ergonex");
       }
       assert(!existsSync(w.home), "help made the root");
@@ -88,28 +91,27 @@ proves(
       assertStringIncludes(typo.stderr, "did you mean plan");
       const far = await w.ergonex("zzzzzzzz");
       assertEquals(far.code, 2);
-      assertStringIncludes(far.stderr, "none is near it");
+      assertStringIncludes(far.stderr, "is not a command of ergonex");
       for (const bad of ["../x", "a b", "a/b", "A", "x;y", "$(id)", "a".repeat(33)]) {
         const r = await w.ergonex(bad);
         assertEquals(r.code, 2, bad);
-        assertStringIncludes(r.stderr, "not a module name");
-        assertStringIncludes(r.stderr, "nothing was run");
+        assertStringIncludes(r.stderr, "is not a command of ergonex");
       }
       // no command at all is not an error: it says what to do next, in plain words (0004-onboarding FR-003)
       const bare = await w.ergonex();
       assertEquals(bare.code, 0);
       assertStringIncludes(bare.stdout, "ergonex");
       assertEquals((await w.ergonex("--nope")).code, 2);
-      const option = await w.ergonex("list", "--nope");
+      const option = await w.ergonex("modules", "--nope");
       assertEquals(option.code, 2);
       assertStringIncludes(option.stderr, "--nope");
-      for (const command of ["plan", "apply", "status", "doctor", "verify", "render", "init", "list", "shell"]) {
+      for (const command of ["plan", "apply", "status", "doctor", "verify", "render", "init", "modules", "start"]) {
         const r = await w.ergonex(command, "--not-an-option");
         assertEquals(r.code, 2, command);
       }
       const several = await w.ergonex("worktree", "make");
       assertEquals(several.code, 2);
-      assertStringIncludes(several.stderr, "create, list, prune");
+      assertStringIncludes(several.stderr, "is not a command of ergonex worktree");
     });
   },
   needsWorld,
@@ -140,15 +142,16 @@ proves(
       const stopped = await w.ergonex("plan", "--json");
       assertEquals(stopped.code, 1);
       const data = JSON.parse(stopped.stdout) as {
-        status: string;
-        exitCode: number;
-        findings: { ruleId: string; severity: string; subject: string }[];
+        ok: boolean;
+        exit: { code: number; name: string };
+        problems: { level: string; code: string; message: string }[];
       };
-      assertEquals([data.status, data.exitCode], ["Findings", 1]);
+      assertEquals([data.ok, data.exit.code, data.exit.name], [false, 1, "findings"]);
       assertEquals(
-        data.findings.map((f) => [f.ruleId, f.severity, f.subject]),
-        [["ergonex/manifest-remote", "Error", "$.repositories[1].remote"]],
+        data.problems.map((p) => [p.level, p.code]),
+        [["fail", "E-MANIFEST-REMOTE"]],
       );
+      assertStringIncludes(data.problems[0]?.message ?? "", "$.repositories[1].remote");
       const sarif = JSON.parse((await w.ergonex("plan", "--sarif")).stdout) as {
         version: string;
         runs: { results: { ruleId: string; level: string }[] }[];
@@ -195,23 +198,22 @@ proves(
       const path = `${bin}:${w.env["PATH"] ?? process.env["PATH"] ?? ""}`;
       const on = (...words: string[]) => w.ergonexOn(execPath(), Ergonex, words, { PATH: path });
 
-      const listed = await on("list", "--json");
+      const listed = await on("modules", "--json");
       assertEquals(listed.code, 0, listed.stderr);
       const parsed = JSON.parse(listed.stdout) as {
         data: { modules: { name: string; source: string; summary: string }[] };
-        findings: { ruleId: string; severity: string; subject: string }[];
+        problems: { level: string; code: string; message: string }[];
       };
       const hello = parsed.data.modules.find((m) => m.name === "hello");
       assertEquals(hello?.source, "ergonex:Path");
       assertEquals(parsed.data.modules.find((m) => m.name === "doctor")?.source, "ergonex:BuiltIn");
       assert(!existsSync(marker), "list ran a module found on the PATH");
       assert(
-        parsed.findings.some((f) => f.ruleId === "ergonex/module-hidden" && f.subject === "doctor" && f.severity === "Informational"),
-        JSON.stringify(parsed.findings),
+        parsed.problems.some((p) => p.code === "E-MODULE-HIDDEN" && p.level === "warn" && p.message.includes("the module doctor")),
+        JSON.stringify(parsed.problems),
       );
       assertEquals(listed.code, 0, "an informational finding alone made the status 1");
       assertEquals((await on("help")).code, 0);
-      assertEquals((await on("help", "hello")).code, 0);
       assert(!existsSync(marker), "help ran a module found on the PATH");
 
       // run: its words, its output and its own status are passed on
@@ -225,7 +227,7 @@ proves(
       assertStringIncludes(doctor.stdout, "ok");
 
       // probe: typed where it answers, opaque where it does not
-      const probed = await on("list", "--probe", "--yes", "--json");
+      const probed = await on("modules", "--probe", "--trust", "--json");
       const rows = (
         JSON.parse(probed.stdout) as {
           data: {
@@ -289,7 +291,7 @@ proves(
       assertStringIncludes(ran.stdout, "registered module ran: x");
       assert(onPath !== "");
       const listed = (
-        JSON.parse((await on("list", "--json")).stdout) as {
+        JSON.parse((await on("modules", "--json")).stdout) as {
           data: { modules: { name: string; source: string }[] };
         }
       ).data.modules;
@@ -321,7 +323,7 @@ proves(
 
 proves(
   ["0002-workspace-model FR-041", "0002-workspace-model FR-042", "0002-workspace-model FR-043", "0001-ergonex FR-023"],
-  "every run writes one evidence record in the shape of an IFQS record, a run that ends in usage is not_run with its reason, and none holds a credential",
+  "every run of a command writes one evidence record in the shape of an IFQS record, a command line Headless refuses runs nothing and records nothing, and none holds a credential",
   async () => {
     await withWorld(async (w) => {
       const token = `ghp_${"a1B2c3D4e5".repeat(4)}`;
@@ -335,10 +337,10 @@ proves(
       const before = evidenceFiles(w.state).length;
       assertEquals((await on("plan")).code, 0);
       assertEquals((await on("plan", "--nope")).code, 2);
-      assertEquals((await on("list")).code, 0);
+      assertEquals((await on("modules")).code, 0);
       assertEquals((await on("verify")).code, 1);
       const files = evidenceFiles(w.state);
-      assertEquals(files.length, before + 4, "a run did not write exactly one record");
+      assertEquals(files.length, before + 3, "a run did not write exactly one record, or a command line Headless refused wrote one");
       const names = new Set(files);
       assertEquals(names.size, files.length, "a record was overwritten or named twice");
       for (const f of files) {
@@ -349,10 +351,8 @@ proves(
         assert(q.kind === "ok", q.kind === "err" ? JSON.stringify(q.error) : "");
       }
       const reads = await Promise.all(files.slice(before).map(async (f) => readQuality(await readTextFile(f))));
-      const [plan, usage, list, verify] = reads.map((r) => (r.kind === "ok" ? r.value : undefined));
+      const [plan, list, verify] = reads.map((r) => (r.kind === "ok" ? r.value : undefined));
       assertEquals(plan?.counts.passed, 1);
-      assertEquals(usage?.counts.notRun, 1);
-      assertStringIncludes(JSON.stringify(await readTextFile(files[before + 1] ?? "")), "--nope");
       assertEquals(list?.counts.passed, 1);
       assert((verify?.counts.failed ?? 0) > 0, "verify found what it should (nothing rendered yet) and recorded it");
       // the plan's hash and the exit status are in the record
@@ -375,7 +375,7 @@ proves(
 
 proves(
   ["0003-host FR-017", "0003-host FR-018", "0001-ergonex FR-021", "0001-ergonex FR-026"],
-  "ergonex shell <shell> prints the snippet on standard output and writes nothing, no file and no evidence record, and a shell it does not know is exit status 2",
+  "ergonex shell print <shell> prints the snippet on standard output and writes nothing, no file and no evidence record, and a shell it does not know is exit status 2",
   async () => {
     await withWorld(async (w) => {
       await w.ergonex("init");
@@ -385,7 +385,7 @@ proves(
         .map((e) => e.name)
         .sort();
       for (const shell of ["bash", "zsh", "fish", "pwsh", "nu"]) {
-        const r = await w.ergonex("shell", shell);
+        const r = await w.ergonex("shell", "print", shell);
         assertEquals(r.code, 0, shell);
         assertStringIncludes(r.stdout, "ERGONEX_HOME");
         assertStringIncludes(r.stdout, "wcd");
@@ -399,14 +399,14 @@ proves(
         files,
       );
       assertEquals(evidenceFiles(w.state).length, evidence, "printing a snippet wrote an evidence record");
-      const bad = await w.ergonex("shell", "tcsh");
+      const bad = await w.ergonex("shell", "print", "tcsh");
       assertEquals(bad.code, 2);
       assertStringIncludes(bad.stderr, "bash, zsh, fish, pwsh, nu");
-      assertEquals((await w.ergonex("shell")).code, 2);
+      assertEquals((await w.ergonex("shell", "print")).code, 2);
       // the snippet is the same as the one a person's rc file would hold
-      const bash = await w.ergonex("shell", "bash");
+      const bash = await w.ergonex("shell", "print", "bash");
       assertStringIncludes(bash.stdout, `"\${ERGONEX_HOME:-$HOME/workspaces}"`);
-      const named = await w.ergonex("shell", "bash", "--home", "/srv/ws");
+      const named = await w.ergonex("shell", "print", "bash", "--home", "/srv/ws");
       assertStringIncludes(named.stdout, "'/srv/ws'");
     });
   },
@@ -415,27 +415,26 @@ proves(
 
 proves(
   ["0003-host FR-019", "0001-ergonex FR-020", "0003-host FR-020"],
-  "ergonex shell --install shows a diff and writes one block only after a yes (or --yes), twice leaves one, --uninstall removes exactly it, and with no terminal and no --yes it is a usage failure that writes nothing",
+  "ergonex shell install writes one block (--dry-run shows its diff and writes nothing), twice leaves one, uninstall removes exactly it, and a start-up file that is not there is not made",
   async () => {
     await withWorld(async (w) => {
       await w.ergonex("init");
       const rc = join(w.dir, "my.bashrc");
       const original = "# mine\nexport EDITOR=vi\nalias ll='ls -l'\n";
       await writeTextFile(rc, original);
-      const noTerminal = await w.ergonex("shell", "bash", "--install", "--rc", rc);
-      assertEquals(noTerminal.code, 2);
-      assertStringIncludes(noTerminal.stderr, "no terminal");
-      assertStringIncludes(noTerminal.stderr, "+# >>> ergonex >>>");
+      const preview = await w.ergonex("shell", "install", "bash", "--rc", rc, "--dry-run");
+      assertEquals(preview.code, 0, preview.stderr);
+      assertStringIncludes(preview.stdout, "+# >>> ergonex >>>");
       assertEquals(await readTextFile(rc), original);
 
-      const installed = await w.ergonex("shell", "bash", "--install", "--rc", rc, "--yes");
+      const installed = await w.ergonex("shell", "install", "bash", "--rc", rc);
       assertEquals(installed.code, 0, installed.stderr);
-      assertStringIncludes(installed.stderr, "--- a/");
+      assertStringIncludes(installed.stdout, "--- a/");
       const text = await readTextFile(rc);
       assert(text.startsWith(original));
       assertEquals(text.split("\n").filter((l) => l === BEGIN).length, 1);
       assertEquals(text.split("\n").filter((l) => l === END).length, 1);
-      const again = await w.ergonex("shell", "bash", "--install", "--rc", rc, "--yes");
+      const again = await w.ergonex("shell", "install", "bash", "--rc", rc);
       assertEquals(again.code, 0);
       assertStringIncludes(again.stdout, "already has");
       assertEquals(await readTextFile(rc), text);
@@ -444,13 +443,13 @@ proves(
       assertStringIncludes(sourced.stdout, "wcd is a function");
       // text the person adds after the block is kept by --uninstall
       await writeTextFile(rc, `${text}export AFTER=1\n`);
-      const gone = await w.ergonex("shell", "bash", "--uninstall", "--rc", rc, "--yes");
+      const gone = await w.ergonex("shell", "uninstall", "bash", "--rc", rc);
       assertEquals(gone.code, 0, gone.stderr);
       assertEquals(await readTextFile(rc), `${original}export AFTER=1\n`);
-      assertStringIncludes((await w.ergonex("shell", "bash", "--uninstall", "--rc", rc, "--yes")).stdout, "has no ergonex block");
+      assertStringIncludes((await w.ergonex("shell", "uninstall", "bash", "--rc", rc)).stdout, "has no ergonex block");
       // a start-up file that is not there is not made (0003-host FR-026): nothing is written and the way to make it is said
       const fish = join(w.dir, "config", "fish", "conf.d", "ergonex.fish");
-      const absent = await w.ergonex("shell", "fish", "--install", "--rc", fish, "--yes");
+      const absent = await w.ergonex("shell", "install", "fish", "--rc", fish);
       assertEquals(absent.code, 3, absent.stderr);
       assertStringIncludes(absent.stderr, "never creates a start-up file");
       assertStringIncludes(absent.stderr, `touch '${fish}'`);
@@ -458,9 +457,8 @@ proves(
       // made by the person, it is written like any other
       await mkdir(join(w.dir, "config", "fish", "conf.d"), { recursive: true });
       await writeTextFile(fish, "");
-      assertEquals((await w.ergonex("shell", "fish", "--install", "--rc", fish, "--yes")).code, 0);
+      assertEquals((await w.ergonex("shell", "install", "fish", "--rc", fish)).code, 0);
       assertStringIncludes(await readTextFile(fish), BEGIN);
-      assertEquals((await w.ergonex("shell", "bash", "--install", "--uninstall", "--rc", rc, "--yes")).code, 2);
       // nothing else of the user's home was written
       assertEquals(await w.userDigest().then((d) => d.length), 64);
     });
@@ -470,7 +468,7 @@ proves(
 
 proves(
   ["0003-host FR-026"],
-  "ergonex shell --install, run as a program, never creates the shell's own start-up file or its folder: it writes nothing, says the command and the path, and --uninstall does not create one either",
+  "ergonex shell install, run as a program, never creates the shell's own start-up file or its folder: it writes nothing, says the command and the path, and uninstall does not create one either",
   async () => {
     await withWorld(async (w) => {
       await w.ergonex("init");
@@ -478,21 +476,21 @@ proves(
       // the default start-up file of zsh is not in the user's home of the world
       const zshrc = join(w.user, ".zshrc");
       assert(!existsSync(zshrc));
-      const refused = await w.ergonex("shell", "zsh", "--install", "--yes");
+      const refused = await w.ergonex("shell", "install", "zsh");
       assertEquals(refused.code, 3, refused.stderr);
       assertStringIncludes(refused.stderr, "never creates a start-up file");
       assertStringIncludes(refused.stderr, `touch '${zshrc}'`);
       assert(!existsSync(zshrc), "the start-up file was made");
       assertEquals(await w.userDigest(), before, "the user's home changed");
-      // no terminal and no --yes: the refusal is the same and nothing is asked
-      assertEquals((await w.ergonex("shell", "zsh", "--install")).code, 3);
+      // asked again, the refusal is the same
+      assertEquals((await w.ergonex("shell", "install", "zsh")).code, 3);
       // uninstall of a file that is not there: nothing to remove, nothing made
-      const gone = await w.ergonex("shell", "zsh", "--uninstall", "--yes");
+      const gone = await w.ergonex("shell", "uninstall", "zsh");
       assertEquals(gone.code, 0, gone.stderr);
       assert(!existsSync(zshrc), "uninstall made the start-up file");
       // what the command says works: made by the person, it takes the block
       await writeTextFile(zshrc, "");
-      assertEquals((await w.ergonex("shell", "zsh", "--install", "--yes")).code, 0);
+      assertEquals((await w.ergonex("shell", "install", "zsh")).code, 0);
       assertStringIncludes(await readTextFile(zshrc), BEGIN);
     });
   },

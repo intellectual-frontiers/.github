@@ -19,7 +19,9 @@ import { fileFacts } from "../host/files.ts";
 import { probeFileSystem, probeLongPaths, probeTool } from "../host/probe.ts";
 import { rememberSeen } from "../host/seen.ts";
 import { type Loaded, native, situate } from "../host/workspace.ts";
-import { defineCommand, GLOBAL_OPTIONS, type Context, type ErgonexModule } from "../modules/types.ts";
+import type { Context } from "../modules/types.ts";
+import { defineCommand } from "./define.ts";
+import { HOME, reads } from "./options.ts";
 import { hiddenFindings, resolveAll } from "../modules/registry.ts";
 import { nativePath } from "../portable.ts";
 import { type FoundModule, moduleSourceFindings, type CommitSignature, signedCommitFindings } from "../scan/policy-scans.ts";
@@ -170,7 +172,7 @@ const longPathsCheck: DoctorCheck = async (ctx, loaded) => {
 export const DOCTOR_CHECKS: readonly DoctorCheck[] = [secretsCheck, signaturesCheck, modulesCheck, longPathsCheck];
 
 const OPTIONS = {
-  ...GLOBAL_OPTIONS,
+  ...HOME,
   fetch: flag({
     help: "Ask GitHub whether the token for reading packages may read them (the one check that uses the network).",
   }),
@@ -200,6 +202,11 @@ const doctor = defineCommand({
   name: "doctor",
   summary: "Check the runtime and tools, the layout, the file system, the hooks and the generated files, and say what to do about each.",
   options: OPTIONS,
+  action: reads(),
+  examples: [
+    { args: [], says: "Check the workspace and say what to fix." },
+    { args: ["--fetch"], says: "Also ask GitHub whether the token may read packages." },
+  ],
   run: (ctx, args) =>
     withWorkspace(ctx, async (loaded) => {
       const checks: Check[] = [];
@@ -286,7 +293,8 @@ const doctor = defineCommand({
       checks.push(...tokenChecks(await tokenFacts(ctx, args.options.fetch)));
 
       const findings = findingsOf(checks, ctx.today);
-      const lines = checks.map((c) => `${c.level.padEnd(7)} ${c.subject}: ${c.message}`);
+      // what is wrong is told by the closing block; the text is what is right
+      const lines = checks.filter((c) => c.level === "ok").map((c) => `${c.level.padEnd(7)} ${c.subject}: ${c.message}`);
       return ok({
         text: lines.join("\n"),
         data: { os: build.os, checks: jsonOf(checks) },
@@ -305,9 +313,5 @@ async function toolVersions(ctx: Context): Promise<readonly { readonly name: str
   return out;
 }
 
-/** The module `ergonex doctor`. */
-export const doctorModule: ErgonexModule = {
-  name: "doctor",
-  summary: doctor.summary,
-  commands: [doctor],
-};
+/** The command `ergonex doctor`. */
+export const doctorCommand = doctor;

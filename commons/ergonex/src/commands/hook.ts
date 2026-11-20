@@ -18,10 +18,11 @@ import { parseMessage } from "@intellectual-frontiers/mizan/changes/commit-messa
 import type { Finding } from "../findings.ts";
 import { unsignedCommitSeverity } from "../policy.ts";
 import { HOOK_NAMES, isHookName } from "../templates/hooks.ts";
-import { defineCommand, GLOBAL_OPTIONS, type Context, type ErgonexModule, type Outcome } from "../modules/types.ts";
+import type { Context, Outcome } from "../modules/types.ts";
+import { defineCommand } from "./define.ts";
+import { HOME, readsHere } from "./options.ts";
 import { type StagedHit, stagedSecretsScan } from "../host/staged.ts";
 import { loadFailureOutcome, loadWorkspace } from "../host/workspace.ts";
-import { textOf } from "./common.ts";
 
 /** What a hook calls on, which other modules of the workspace may replace. */
 export type Checkers = {
@@ -40,7 +41,7 @@ const ZEROS = /^0+$/;
 function outcome(text: string[], findings: readonly Finding[]): Outcome {
   const blocks = findings.some((f) => f.severity === "Error");
   return ok({
-    text: textOf(text, findings),
+    text: text.join("\n"),
     data: null,
     findings,
     status: blocks ? "Findings" : "Ok",
@@ -165,10 +166,12 @@ function check(ctx: Context, name: string, rest: readonly string[]): Promise<Out
   }
 }
 
-const hook = defineCommand({
+/** The command `ergonex hook`. */
+export const hookCommand = defineCommand({
   name: "hook",
   summary: `The checker the generated Git hooks run (${HOOK_NAMES.join(", ")}); it only reads.`,
-  options: { ...GLOBAL_OPTIONS },
+  options: { ...HOME },
+  action: readsHere(),
   operands: [{ name: "HOOK", help: `One of ${HOOK_NAMES.join(", ")}.`, arity: "one" }],
   run: async (ctx, args) => {
     // a hook only reads: whatever it finds, it writes no evidence record (0001-ergonex FR-026)
@@ -176,10 +179,3 @@ const hook = defineCommand({
     return done.kind === "ok" ? ok({ ...done.value, noEvidence: true }) : err({ ...done.error, noEvidence: true });
   },
 });
-
-/** The module `ergonex hook`. */
-export const hookModule: ErgonexModule = {
-  name: "hook",
-  summary: hook.summary,
-  commands: [hook],
-};

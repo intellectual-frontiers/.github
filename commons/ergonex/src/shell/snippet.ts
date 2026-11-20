@@ -1,12 +1,12 @@
 // Spec: 0003-host FR-017
 /**
- * The shell snippet (commons 0003-host FR-017, FR-018): what `ergonex shell <bash|zsh|fish|pwsh|nu>` prints on standard output. It does four things and no more: exports `ERGONEX_HOME`
+ * The shell snippet (commons 0003-host FR-017, FR-018): what `ergonex shell print <bash|zsh|fish|pwsh|nu>` prints on standard output. It does four things and no more: exports `ERGONEX_HOME`
  * where it is not set, adds `<home>/.ergonex/tools/bin` to the `PATH` (once) so that `ergonex-*` modules and the pinned tools resolve, defines the completions of `ergonex`, and defines one function,
  * `wcd`, that changes to a repository of the workspace by its name.
  *
  * @remarks
  * Pure: the snippet is text made from the shell's name, the root (the default, `$HOME/workspaces`, or a path a run named) and the modules to complete. It holds no secret and no command that runs
- * anything but `find`, `cd` and the shell's own builtins. It never edits a file; `block.ts` is what `ergonex shell --install` writes and removes. A path is quoted for its shell, so that a root with
+ * anything but `find`, `cd` and the shell's own builtins. It never edits a file; `block.ts` is what `ergonex shell install` writes and removes. A path is quoted for its shell, so that a root with
  * a space or a quote in it is one word.
  *
  * @module
@@ -223,7 +223,7 @@ export type RcFacts = {
 };
 
 /**
- * The start-up file a shell reads, which `ergonex shell --install` writes one block into: `~/.bashrc`, `~/.zshrc` (under `$ZDOTDIR` where it is set), `~/.config/fish/conf.d/ergonex.fish`, PowerShell's
+ * The start-up file a shell reads, which `ergonex shell install` writes one block into: `~/.bashrc`, `~/.zshrc` (under `$ZDOTDIR` where it is set), `~/.config/fish/conf.d/ergonex.fish`, PowerShell's
  * profile and Nushell's `config.nu`. A run that names `--rc` uses that file instead; this is the default, as a path with `/` between parts (the host gives it its native separators).
  */
 export function rcFileFor(shell: Shell, f: RcFacts): string {
@@ -250,7 +250,7 @@ export function rcFileFor(shell: Shell, f: RcFacts): string {
 }
 
 /**
- * What a person runs to create a start-up file that does not exist (0003-host FR-026): `ergonex shell --install` never creates one, so it says the command and the path. A path with a quote in it is quoted
+ * What a person runs to create a start-up file that does not exist (0003-host FR-026): `ergonex shell install` never creates one, so it says the command and the path. A path with a quote in it is quoted
  * for the shell it names.
  */
 export function createCommand(shell: Shell, rc: string): string {

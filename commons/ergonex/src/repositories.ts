@@ -1,6 +1,6 @@
 // Spec: 0005-repositories FR-001
 /**
- * The list of repositories that `ergonex add`, `remove` and `adopt` keep (commons ergonex 0005-repositories FR-001, FR-002): the typed file `.ergonex/repositories.ts`, which exports an array of entries and is
+ * The list of repositories that `ergonex repos add`, `remove`, `delete` and `adopt` keep (commons ergonex 0005-repositories FR-001, FR-002): the typed file `.ergonex/repositories.ts`, which exports an array of entries and is
  * rewritten whole by those commands, so that no command edits the source text of the manifest `workspace.ts`. The manifest sees the entries of both files as one list. Pure: it reads and writes no file.
  *
  * @remarks
@@ -71,7 +71,7 @@ function line(e: RepoEntry): string {
 export function renderRepositories(entries: readonly RepoEntry[]): string {
   return [
     "/**",
-    " * The repositories of this workspace that `ergonex add`, `ergonex remove` and `ergonex adopt` keep. They rewrite this file whole; you may edit it too, and the manifest `workspace.ts` can name more.",
+    " * The repositories of this workspace that `ergonex add`, `ergonex remove` and `ergonex repos adopt` keep. They rewrite this file whole; you may edit it too, and the manifest `workspace.ts` can name more.",
     " * Run `ergonex plan` to see what would change and `ergonex apply` to bring the workspace to it.",
     " */",
     entries.length === 0 ? "export default [];" : ["export default [", ...entries.map(line), "];"].join("\n"),

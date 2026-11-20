@@ -84,7 +84,7 @@ proves(
     "0002-workspace-model FR-037",
     "0002-workspace-model FR-039",
   ],
-  "ergonex tools lists, verifies and exports the catalog and installs nothing; ergonex setup shows its plan and changes nothing by default, installs the pinned artifact only with --apply, refuses a hash that differs and writes nothing, and --apply with --dry-run is a usage error",
+  "ergonex tools lists, verifies and exports the catalog and installs nothing; ergonex setup --dry-run shows its plan and changes nothing, setup installs the pinned artifact, and refuses a hash that differs and writes nothing",
   async () => {
     await withWorld(async (w) => {
       await w.ergonex("init");
@@ -92,49 +92,46 @@ proves(
       try {
         const listed = await on(w, "tools");
         assertEquals(listed.code, 0, listed.stderr + listed.stdout);
-        assertStringIncludes(listed.stdout, "hello-tool 1.0.0  not-installed");
+        assertStringIncludes(listed.all, "hello-tool 1.0.0  not-installed");
         assertEquals((await on(w, "tools", "install", "hello-tool")).code, 2);
         assertEquals((await on(w, "tools", "export", "nope")).code, 2);
 
-        const dry = await on(w, "setup");
+        const dry = await on(w, "setup", "--dry-run");
         assertEquals(dry.code, 0, dry.stderr + dry.stdout);
-        assertStringIncludes(dry.stdout, "dry run: nothing is changed");
-        assertStringIncludes(dry.stdout, "install hello-tool 1.0.0");
+        assertStringIncludes(dry.all, "nothing is changed");
+        assertStringIncludes(dry.all, "install hello-tool 1.0.0");
         assertEquals(tool.requests, [], "a dry run fetched something");
         assert(!existsSync(tool.dir));
-        // the plan of apply holds no install: only setup --apply carries one out
+        // the plan of apply holds no install: only setup carries one out
         assert(!(await on(w, "plan")).stdout.includes("install hello-tool"));
-        const both = await on(w, "setup", "--apply", "--dry-run");
-        assertEquals(both.code, 2);
-        assertEquals(tool.requests, []);
         // the first of the two files of this run's evidence is the dry run's: not_run for the apply
         assertEquals(evidenceFiles(w.state).filter((f) => f.includes("otlp")).length >= 3, true);
 
-        const applied = await on(w, "setup", "--apply");
+        const applied = await on(w, "setup");
         assertEquals(applied.code, 0, applied.stderr + applied.stdout);
         assert(existsSync(join(tool.dir, "hello-tool-1.0.0", "bin", "hello-tool")), "the pinned tool was not installed");
         assertEquals(tool.requests, ["GET /hello-tool-1.0.0.tar.gz"]);
-        const again = await on(w, "setup", "--apply");
+        const again = await on(w, "setup");
         assertEquals(again.code, 0, again.stderr + again.stdout);
         assertEquals(tool.requests.length, 1, "an installed tool was fetched again");
 
         const row = await on(w, "tools");
-        assertStringIncludes(row.stdout, "hello-tool 1.0.0  installed");
+        assertStringIncludes(row.all, "hello-tool 1.0.0  installed");
         assertEquals((await on(w, "tools", "verify")).code, 0);
         const spdx = await on(w, "tools", "export", "spdx");
         assertEquals(spdx.code, 0, spdx.stderr);
-        assertStringIncludes(spdx.stdout, "hello-tool");
+        assertStringIncludes(spdx.all, "hello-tool");
         assertEquals(JSON.parse((await on(w, "tools", "export", "oscal")).stdout) !== null, true);
         // what setup and tools did is in their own records, which name no credential
         const records = await Promise.all(evidenceFiles(w.state).map((f) => readTextFile(f)));
-        assert(records.some((t) => t.includes("ergonex/run: ergonex setup --apply")));
+        assert(records.some((t) => t.includes("ergonex/run: ergonex setup")));
         assert(records.some((t) => t.includes("ergonex/run: ergonex tools")));
         assert(records.some((t) => t.includes("ergonex/tool: hello-tool 1.0.0")));
         // a tool changed since its record is an error
         await writeTextFile(join(tool.dir, "hello-tool-1.0.0", "bin", "hello-tool"), "#!/bin/sh\necho changed\n");
         const drift = await on(w, "tools", "verify");
         assertEquals(drift.code, 1);
-        assertStringIncludes(drift.stdout, "hello-tool");
+        assertStringIncludes(drift.all, "hello-tool");
         // the catalog is in tools.auto.json
         assertEquals((await on(w, "render")).code, 0);
         assertStringIncludes(await readTextFile(join(w.home, ".ergonex", "tools.auto.json")), '"name": "hello-tool"');
@@ -154,13 +151,13 @@ proves(
       await w.ergonex("init");
       const tool = await withTool(w, { pin: "a".repeat(64) });
       try {
-        const r = await on(w, "setup", "--apply");
+        const r = await on(w, "setup");
         assertEquals(r.code, 1, r.stdout + r.stderr);
-        assertStringIncludes(r.stdout, "failed");
+        assertStringIncludes(r.all, "failed");
         assert(!existsSync(tool.dir), "a wrong hash wrote something");
         assert(!existsSync(w.tools) || readDirSync(w.tools).length === 0);
-        assertStringIncludes(r.stdout, "verify git");
-        assertStringIncludes(r.stdout, "never installed");
+        assertStringIncludes(r.all, "verify git");
+        assertStringIncludes(r.all, "never installed");
         assertEquals((await on(w, "tools", "export", "cyclonedx")).code, 0);
       } finally {
         await tool.stop();
@@ -185,21 +182,18 @@ proves(
       assertStringIncludes(await readTextFile(included), 'name = "Workspace Person"');
       const global = w.env["GIT_CONFIG_GLOBAL"] ?? "";
       const before = await readTextFile(global);
-      assertEquals((await w.ergonex("setup", "--git-include")).code, 0);
+      assertEquals((await w.ergonex("setup", "--git-include", "--dry-run")).code, 0);
       assertEquals(await readTextFile(global), before, "a dry run wrote the global configuration");
-      const asked = await w.ergonex("setup", "--apply", "--git-include");
-      assertEquals(asked.code, 2, asked.stdout + asked.stderr);
-      assertStringIncludes(asked.stderr, "--yes");
-      assertEquals(await readTextFile(global), before, "the global configuration changed without a yes");
-      const yes = await w.ergonex("setup", "--apply", "--git-include", "--yes");
+      // no one can be asked here, so the flag is the consent, and the change is shown
+      const yes = await w.ergonex("setup", "--git-include");
       assertEquals(yes.code, 0, yes.stderr + yes.stdout);
-      assertStringIncludes(yes.stderr, "+# >>> ergonex git-include >>>");
+      assertStringIncludes(yes.all, "+# >>> ergonex git-include >>>");
       const after = await readTextFile(global);
       assertStringIncludes(after, before.trimEnd());
       assertEquals(after.split("\n").filter((l) => l === "# >>> ergonex git-include >>>").length, 1);
       assertEquals(await w.git(w.dir, "config", "--global", "--get", "include.path"), included);
       assertEquals(await w.git(w.dir, "config", "--get", "user.email"), "workspace@example.org");
-      assertEquals((await w.ergonex("setup", "--apply", "--git-include", "--yes")).code, 0);
+      assertEquals((await w.ergonex("setup", "--git-include")).code, 0);
       assertEquals((await readTextFile(global)).split("\n").filter((l) => l === "# >>> ergonex git-include >>>").length, 1);
       // nothing else of the user's home changed
       assertEquals(await readTextFile(join(w.user, ".bashrc")), "# a person's own start-up file\nexport EDITOR=vi\n");
@@ -210,7 +204,7 @@ proves(
 
 proves(
   ["0002-workspace-model FR-028", "0001-ergonex FR-017"],
-  "setup and apply take the same lock file of the workspace: while another run holds it, setup --apply and apply both refuse with exit status 3 and a dry run still runs",
+  "setup and apply take the same lock file of the workspace: while another run holds it, setup and apply both refuse with exit status 3 and a dry run still runs",
   async () => {
     await withWorld(async (w) => {
       await w.ergonex("init");
@@ -221,11 +215,11 @@ proves(
       });
       assert(held !== undefined);
       try {
-        const setup = await on(w, "setup", "--apply");
+        const setup = await on(w, "setup");
         assertEquals(setup.code, 3, setup.stdout + setup.stderr);
         assertStringIncludes(setup.stderr, "holds the workspace");
         assertEquals((await w.ergonex("apply")).code, 3);
-        assertEquals((await on(w, "setup")).code, 0);
+        assertEquals((await on(w, "setup", "--dry-run")).code, 0);
         assert(!existsSync(w.repo));
       } finally {
         held?.release();
@@ -246,13 +240,13 @@ proves(
       assertEquals((await w.ergonex("apply")).code, 0);
       const clean = await w.ergonex("doctor");
       assertEquals(clean.code, 0, clean.stdout + clean.stderr);
-      assertStringIncludes(clean.stdout, "no plaintext token");
+      assertStringIncludes(clean.all, "no plaintext token");
       const token = fakeToken();
       await w.git(w.repo, "config", "--local", "remote.origin.url", `https://x-access-token:${token}@git.example.org/team/tool.git`);
       const found = await w.ergonex("doctor");
       assertEquals(found.code, 1, found.stdout + found.stderr);
-      assertStringIncludes(found.stdout, "error");
-      assertStringIncludes(found.stdout, ".git/config");
+      assertStringIncludes(found.all, "[E-PLAINTEXT-TOKEN]");
+      assertStringIncludes(found.all, ".git/config");
       assert(!found.stdout.includes(token) && !found.stderr.includes(token), "doctor printed the token");
       for (const f of evidenceFiles(w.state)) assert(!(await readTextFile(f)).includes(token), "a record holds the token");
       const sarif = JSON.parse((await w.ergonex("doctor", "--sarif")).stdout) as {
@@ -264,7 +258,7 @@ proves(
       await writeTextFile(join(w.home, ".ergonex", "workspace.ts"), `// ${token}\nexport default ${JSON.stringify(ONE_REPOSITORY)};\n`);
       const manifest = await w.ergonex("doctor");
       assertEquals(manifest.code, 1);
-      assertStringIncludes(manifest.stdout, "workspace.ts");
+      assertStringIncludes(manifest.all, "workspace.ts");
     });
   },
   needs,
@@ -283,8 +277,8 @@ proves(
       await w.git(w.repo, "-c", "commit.gpgsign=false", "commit", "-q", "--no-verify", "-m", "an unsigned commit");
       const warned = await w.ergonex("doctor");
       assertEquals(warned.code, 1, warned.stdout);
-      assertStringIncludes(warned.stdout, "warn    git.example.org/team/tool@");
-      assertStringIncludes(warned.stdout, "is not signed and verified");
+      assertStringIncludes(warned.all, "git.example.org/team/tool@");
+      assertStringIncludes(warned.all, "is not signed and verified");
       await w.manifest({
         ...ONE_REPOSITORY,
         policy: { regulatedDomain: ["FDA"] },
@@ -341,14 +335,14 @@ proves(
 
       const first = await doctor();
       assertEquals(first.code, 0, first.stdout + first.stderr);
-      assertStringIncludes(first.stdout, "suggest ergonex-foo:");
+      assertStringIncludes(first.all, "[!] ergonex-foo");
       assertEquals(await seenOf(), day(0));
       await setSeen(day(89));
       assertEquals((await doctor()).code, 0);
       await setSeen(day(91));
       const late = await doctor();
       assertEquals(late.code, 1, late.stdout);
-      assertStringIncludes(late.stdout, "warn    ergonex-foo:");
+      assertStringIncludes(late.all, "[x] ergonex-foo");
       assertEquals(await seenOf(), day(91), "the day was restarted");
       // a tool of the catalog that provides it
       const tool = await withTool(w, {
@@ -367,7 +361,7 @@ proves(
         recursive: true,
       });
       const t = await on(w, "tools");
-      assertStringIncludes(t.stdout, "stranger");
+      assertStringIncludes(t.all, "stranger");
       const kept = JSON.parse(await readTextFile(record)) as {
         firstSeen: Record<string, string>;
       };

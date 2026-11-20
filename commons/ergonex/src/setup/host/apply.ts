@@ -7,11 +7,11 @@
  *
  * @remarks
  * `setup(args, deps)` returns a `Result` of a report; the lead wires it as the module `ergonex setup` (M5's `ErgonexModule` contract is not in this tree). It is the ONLY function that carries out a
- * step with `ergonex:hostChange` (`InstallTool`, `SetSystemLongPaths`, `AddGitInclude`), and only where `args.apply` is true: `applyStep` is not exported. The report holds the run's facts for the
+ * step with `ergonex:hostChange` (`InstallTool`, `SetSystemLongPaths`, `AddGitInclude`), and only where `args.mode` is `apply`: `applyStep` is not exported. The report holds the run's facts for the
  * evidence record (`facts`), which the controller writes with `writeRunEvidence`.
  *
  * @limits The system long-path setting runs `reg add` and is not tested here (it needs Windows and an elevated process; a test gives the function that stands for it). The shell snippet block
- * (`ergonex shell --install`) is the shell module's.
+ * (`ergonex shell install`) is the shell module's.
  *
  * @module
  */
@@ -147,7 +147,7 @@ async function observe(deps: SetupDeps): Promise<SetupFacts> {
   };
 }
 
-async function applyStep(deps: SetupDeps, args: SetupArgs, step: SetupStep, findings: Finding[]): Promise<StepOutcome> {
+async function applyStep(deps: SetupDeps, step: SetupStep, findings: Finding[]): Promise<StepOutcome> {
   const ok_ = (message: string): StepOutcome => ({
     step,
     result: "done",
@@ -247,17 +247,8 @@ async function applyStep(deps: SetupDeps, args: SetupArgs, step: SetupStep, find
         };
       const diff = changeShown(deps.globalGitConfig, before, after.value);
       (deps.say ?? ((): void => undefined))(diff);
-      const yes = args.yes
-        ? true
-        : deps.confirm === undefined
-          ? undefined
-          : await deps.confirm("Write this change to your global Git configuration?");
-      if (yes === undefined)
-        return failed(
-          "there is no terminal to ask on, and --yes was not given; the global Git configuration was not changed",
-          "ergonex/setup-git-include",
-          deps.globalGitConfig,
-        );
+      // where no one can be asked, the explicit `--git-include` is the consent, and the change was shown above
+      const yes = deps.confirm === undefined ? true : await deps.confirm("Write this change to your global Git configuration?");
       if (!yes)
         return {
           step,
@@ -279,17 +270,10 @@ export function planHash(plan: SetupPlan): Promise<string> {
 }
 
 /**
- * Runs `ergonex setup`: shows the plan; with `args.apply` carries out each step in order (one at a time, under the lock of the workspace, a failed step does not stop the rest and is an error
- * finding), without it changes nothing. `--git-include` with no terminal and no `--yes` is a usage error, said before anything changes.
+ * Runs `ergonex setup`: shows the plan; with `args.mode` `apply` carries out each step in order (one at a time, under the lock of the workspace, a failed step does not stop the rest and is an error
+ * finding), without it changes nothing. `--git-include` asks where a person can be asked and otherwise takes the flag as the consent.
  */
 export async function setup(args: SetupArgs, deps: SetupDeps): Promise<Result<SetupReport, SetupError>> {
-  if (args.apply && args.gitInclude && !args.yes && deps.confirm === undefined) {
-    return err({
-      kind: "usage",
-      message:
-        "ergonex setup --apply --git-include asks before it writes the global Git configuration, and there is no terminal; say --yes to answer yes",
-    });
-  }
   const facts = await observe(deps);
   const plan = setupPlan(args, facts, deps.today);
   const shown = showPlan(plan);
@@ -297,7 +281,7 @@ export async function setup(args: SetupArgs, deps: SetupDeps): Promise<Result<Se
   const outcomes: StepOutcome[] = [];
   const findings: Finding[] = [...plan.findings];
   let applied = false;
-  if (args.apply) {
+  if (args.mode === "apply") {
     await mkdir(deps.root, { recursive: true });
     await mkdir(join(deps.root, ".ergonex"), { recursive: true });
     const lockPath = movedPath(deps.places, ".ergonex/ergonex.lock") ?? join(deps.root, ".ergonex", "ergonex.lock");
@@ -310,8 +294,8 @@ export async function setup(args: SetupArgs, deps: SetupDeps): Promise<Result<Se
       });
     try {
       for (const step of plan.steps) {
-        if (stepChangesHost(step) && !args.apply) continue;
-        outcomes.push(await applyStep(deps, args, step, findings));
+        if (stepChangesHost(step) && args.mode !== "apply") continue;
+        outcomes.push(await applyStep(deps, step, findings));
       }
     } finally {
       held.release();
@@ -322,7 +306,7 @@ export async function setup(args: SetupArgs, deps: SetupDeps): Promise<Result<Se
   const policy = deps.policy ?? policyOf();
   const runFacts: RunFacts = {
     command: "setup",
-    argv: [...(args.apply ? ["--apply"] : []), ...(args.gitInclude ? ["--git-include"] : []), ...(args.yes ? ["--yes"] : [])],
+    argv: [...(args.mode === "dry-run" ? ["--dry-run"] : []), ...(args.gitInclude ? ["--git-include"] : [])],
     planSha256: await planHash(plan),
     tools: {
       ...probedVersions(facts.probes),
@@ -330,12 +314,12 @@ export async function setup(args: SetupArgs, deps: SetupDeps): Promise<Result<Se
     },
     findings,
     exit,
-    notRun: args.apply
+    notRun: args.mode === "apply"
       ? []
       : [
           {
             name: "ergonex/setup-apply",
-            reason: "a dry run: --apply was not given, so no step was carried out",
+            reason: "a dry run: --dry-run was given, so no step was carried out",
           },
         ],
     policy,
