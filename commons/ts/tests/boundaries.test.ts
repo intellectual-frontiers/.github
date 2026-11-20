@@ -217,8 +217,10 @@ proves(
   () => {
     const m = manifest();
     const pins = Object.entries(m.devDependencies);
-    assertEquals(pins.map(([k]) => k).sort(), ["@types/node", "fast-check", "typescript"]);
-    for (const [name, v] of pins) assert(/^\d+\.\d+\.\d+$/.test(v), `${name} is not pinned exactly: ${v}`);
+    // typescript-7-1 is TypeScript 7.1 under another name, which the docs sources that the root tests reach import (typescript/async)
+    assertEquals(pins.map(([k]) => k).sort(), ["@types/node", "fast-check", "typescript", "typescript-7-1"]);
+    for (const [name, v] of pins)
+      assert(/^(npm:typescript@)?\d+\.\d+\.\d+(-[\w.]+)?$|^\d+\.\d+\.\d+$/.test(v), `${name} is not pinned exactly: ${v}`);
     assert(/^7\./.test(m.devDependencies["typescript"] ?? ""), "TypeScript is 7");
     // the one run-time dependency is core, the foundation (commons 0032-lifting-libraries FR-003), linked in this repository
     assertEquals(m.dependencies, {
@@ -243,7 +245,8 @@ proves(
     const lock = text("bun.lock");
     for (const [name, v] of pins) {
       assertStringIncludes(lock, `"${name}": "${v}"`);
-      assertStringIncludes(lock, `["${name}@${v}"`);
+      // an alias names the package it is a copy of in its entry: "typescript-7-1": ["typescript@7.1.0-beta", ...]
+      assertStringIncludes(lock, name === "typescript-7-1" ? `"${name}": ["typescript@7.1.0-beta"` : `["${name}@${v}"`);
     }
     assert(
       !existsSync(join(ROOT, "package-lock.json")) && !existsSync(join(ROOT, "yarn.lock")) && !existsSync(join(ROOT, "pnpm-lock.yaml")),
@@ -330,7 +333,8 @@ proves(
       "@intellectual-frontiers/terminal": "0.1.0",
       "@intellectual-frontiers/test": "0.1.0",
     });
-    assertEquals(root.devDependencies, {});
+    // the packages every library shares, which the root installs for the development loop (`bun run dev:check`); nothing a consumer installs
+    assertEquals(root.devDependencies, { "@types/node": "26.6.6", "fast-check": "4.10.2" });
     const lock = readTextFileSync(join(ROOT, "..", "..", "bun.lock"));
     for (const [name, v] of deps) assertStringIncludes(lock, `["${name}@${v}"`);
     for (const gone of ["tools/pack.ts", "tsconfig.build.json", "../../.github/workflows/ifc-typescript-release.yml"])
