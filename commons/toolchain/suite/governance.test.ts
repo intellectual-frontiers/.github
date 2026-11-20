@@ -8,7 +8,7 @@ import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { compareVersions, defineCatalog, defineDownload, defineTool, parseManagerId, parsePinId, parseToolName, parseVersion, type DownloadInput, type Tool, type ToolInput } from "../src/mod.ts";
 
 const SHA = "a".repeat(64);
-const DOWNLOAD: DownloadInput = { version: "1.7.1", url: "https://example.test/jq-1.7.1-linux-amd64", sha256: SHA, format: "file", bin: "" };
+const DOWNLOAD: DownloadInput = { version: "1.7.1", downloadUrl: "https://example.test/jq-1.7.1-linux-amd64", sha256: SHA, archiveFormat: "file", binPath: "" };
 
 const JQ: ToolInput = {
   name: "jq",
@@ -81,16 +81,16 @@ proves(["0002-toolchain-governance FR-004"], "a download has a version, an https
     assert(r.kind === "err", "the download is refused");
     return r.error;
   };
-  assert(bad({ url: "http://example.test/jq" }).some((m) => m.includes("https")));
-  assert(bad({ url: "https://user:secret@example.test/jq" }).some((m) => m.includes("user name or a password")));
-  assert(bad({ url: "not an address" }).some((m) => m.includes("not an address")));
+  assert(bad({ downloadUrl: "http://example.test/jq" }).some((m) => m.includes("https")));
+  assert(bad({ downloadUrl: "https://user:secret@example.test/jq" }).some((m) => m.includes("user name or a password")));
+  assert(bad({ downloadUrl: "not an address" }).some((m) => m.includes("not an address")));
   assert(bad({ sha256: "a".repeat(63) }).some((m) => m.includes("SHA-256")));
-  assert(bad({ format: "rar" }).some((m) => m.includes("format")));
-  assert(bad({ bin: "../out" }).some((m) => m.includes("inside")));
-  assert(bad({ bin: "/abs" }).some((m) => m.includes("inside")));
+  assert(bad({ archiveFormat: "rar" }).some((m) => m.includes("format")));
+  assert(bad({ binPath: "../out" }).some((m) => m.includes("inside")));
+  assert(bad({ binPath: "/abs" }).some((m) => m.includes("inside")));
   assert(bad({ version: "latest" }).some((m) => m.includes("latest")));
-  const ok = defineDownload({ ...DOWNLOAD, format: "zip", bin: "bin" });
-  assert(ok.kind === "ok" && ok.value.bin === "bin" && ok.value.sha256 === SHA && ok.value.version === "1.7.1");
+  const ok = defineDownload({ ...DOWNLOAD, archiveFormat: "zip", binPath: "bin" });
+  assert(ok.kind === "ok" && ok.value.binPath === "bin" && ok.value.sha256 === SHA && ok.value.version === "1.7.1");
 });
 
 proves(["0002-toolchain-governance FR-005"], "a tool has bindings, and no more than one pin binding or one package binding for a manager", () => {

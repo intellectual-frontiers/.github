@@ -46,7 +46,7 @@ const ALL = ["linux-x64", "linux-arm64", "macos-x64", "macos-arm64", "windows-x6
 const SHA = "b".repeat(64);
 
 function download(name: string, version = "1.0.0"): Download {
-  const r = defineDownload({ version, url: `https://example.test/${name}`, sha256: SHA, format: "file", bin: "" });
+  const r = defineDownload({ version, downloadUrl: `https://example.test/${name}`, sha256: SHA, archiveFormat: "file", binPath: "" });
   if (r.kind === "err") throw new Error(r.error.join("; "));
   return r.value;
 }
