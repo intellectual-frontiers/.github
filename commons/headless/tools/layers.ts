@@ -35,7 +35,7 @@ export type LayerRule = "layers/unclassified" | "layers/relative" | "layers/priv
 /** A finding of this check, in the shape the kernel's baseline holds (`trace.Keyed`). */
 export type LayerFinding = trace.Keyed & { readonly rule: LayerRule };
 
-/** A package a unit may import, with the subpaths it may reach (`any`, or the listed ones). */
+/** A package a unit may import, with the subpaths it may reach: `any` (the package and every entry of it), none (`[]`: the package's own entry only), or the listed subpaths (and not the package's own entry). */
 export type Allowed = { readonly name: string; readonly subpaths: "any" | readonly string[] };
 
 const TERMINAL = "@intellectual-frontiers/terminal";
@@ -130,7 +130,7 @@ function make(rule: LayerRule, file: string, line: number, message: string, abou
 /** Whether a specifier is one of the packages a unit may import. */
 export function allowedExternal(allowed: readonly Allowed[], specifier: string): boolean {
   return allowed.some((a) => {
-    if (specifier === a.name) return true;
+    if (specifier === a.name) return a.subpaths === "any" || a.subpaths.length === 0;
     if (!specifier.startsWith(`${a.name}/`)) return false;
     return a.subpaths === "any" || a.subpaths.includes(specifier.slice(a.name.length + 1));
   });

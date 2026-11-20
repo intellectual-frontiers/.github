@@ -17,4 +17,4 @@ import { path } from "@intellectual-frontiers/system";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
 
-if (import.meta.main) process.exitCode = await main(ROOT, process.argv.slice(2));
+if (import.meta.main) process.exitCode = await main(ROOT, process.argv.slice(2), { types: ["node"] });

@@ -80,9 +80,10 @@ export const processSignals: SignalPort = {
 /** The timer of the process. */
 export const processTimer: TimerPort = {
   every(ms, fn) {
-    const h = setInterval(fn, ms);
-    if (typeof h === "object" && "unref" in h) h.unref();
-    return () => clearInterval(h);
+    const h: unknown = setInterval(fn, ms);
+    // a timer of Node and Bun can be let go of, so that it never keeps the process alive
+    if (typeof h === "object" && h !== null && "unref" in h && typeof h.unref === "function") h.unref();
+    return () => clearInterval(h as never);
   },
 };
 
@@ -129,11 +130,13 @@ export type LaunchOptions = {
   /** Checks that the program can start (its configuration, a file it needs): a failure ends it with the status of its kind and writes one line. */
   readonly ready?: () => Promise<StartupFailure | undefined> | StartupFailure | undefined;
   readonly observer?: RunObserver;
+  /** What of the process's world to replace (a sink for the output, a store of state): the rest is the process's. */
+  readonly io?: Partial<Io>;
 };
 
 /** Runs the program in this process and gives its status; the caller sets `process.exitCode` to it. */
 export async function launch(program: Program, options: LaunchOptions = {}): Promise<number> {
-  const io = hostIo(options.observer === undefined ? {} : { observer: options.observer });
+  const io: Io = { ...hostIo(options.observer === undefined ? {} : { observer: options.observer }), ...options.io };
   if (options.ready !== undefined) {
     let failure: StartupFailure | undefined;
     try {
