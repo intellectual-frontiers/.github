@@ -20,4 +20,4 @@ requirement	mechanism	by	note
 0001-system FR-017	check	.github: cd commons/system && bun test suite/	job-plan.test.ts and schedule.test.ts: exact units, plist and .cmd per OS, quoting round trips
 0001-system FR-018	check	.github: cd commons/ts && bun test tests/	the console's tests of commons' suite: whether a stream is a terminal, raw mode, colour, emoji and width
 0001-system FR-019	check	.github: cd commons/ts && bun test tests/	the standard streams' tests of commons' suite: stdin, stdout and stderr as streams, bytes or text
-0001-system FR-020	check	.github: cd commons/system && bun run verify	the package is built, inspected and packed by tools/pack.ts; tests/release/commons-packages.test.ts installs the tarball and runs every entry on Node 26 and Bun and type-checks a consumer
+0001-system FR-020	check	.github: cd commons/system && bun run verify	the package is built, inspected and packed by tools/pack.ts; tests/commons-packages.test.ts installs the tarball and runs every entry on Node 26 and Bun and type-checks a consumer

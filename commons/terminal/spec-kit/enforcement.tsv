@@ -6,4 +6,4 @@ requirement	mechanism	by	note
 0001-terminal FR-003	check	.github: cd commons/terminal && bun test suite/	palette.test.ts: the palette's roles, marks and their ASCII fallbacks, colour only where allowed
 0001-terminal FR-004	check	.github: cd commons/terminal && bun test suite/	width.test.ts: wide characters and escape sequences, a line cut by display width, never inside a grapheme or an escape sequence
 0001-terminal FR-005	check	.github: cd commons/terminal && bun test suite/	vt.test.ts: the terminal emulator's sequences, scrolling, wide characters and a cut line that never wraps
-0001-terminal FR-006	check	.github: cd commons/terminal && bun run verify	the package is built, inspected and packed by tools/pack.ts; tests/release/commons-packages.test.ts installs the tarball and runs every entry on Node 26 and Bun and type-checks a consumer
+0001-terminal FR-006	check	.github: cd commons/terminal && bun run verify	the package is built, inspected and packed by tools/pack.ts; tests/commons-packages.test.ts installs the tarball and runs every entry on Node 26 and Bun and type-checks a consumer

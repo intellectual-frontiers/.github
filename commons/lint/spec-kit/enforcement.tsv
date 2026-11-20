@@ -10,4 +10,4 @@ requirement	mechanism	by	note
 0001-lint FR-007	check	.github: cd commons/lint && bun test suite/	plugin.test.ts: switch-absurd refuses a switch that does not end in a default calling absurd
 0001-lint FR-008	check	.github: cd commons/lint && bun test suite/	plugin.test.ts: terminal-writers refuses a write to the terminal outside the allowed files
 0001-lint FR-009	check	.github: cd commons/lint && bun test suite/	plugin.test.ts: every rule is proved against the real bun lint, run by lintFiles; skipped with its reason where the pinned canary is not installed
-0001-lint FR-010	check	.github: cd commons/lint && bun run verify	the package is built, inspected and packed by tools/pack.ts; tests/release/commons-packages.test.ts installs the tarball, runs every entry on Node 26 and Bun, type-checks a consumer and runs bun lint --plugin with the installed plugin
+0001-lint FR-010	check	.github: cd commons/lint && bun run verify	the package is built, inspected and packed by tools/pack.ts; tests/commons-packages.test.ts installs the tarball, runs every entry on Node 26 and Bun, type-checks a consumer and runs bun lint --plugin with the installed plugin
