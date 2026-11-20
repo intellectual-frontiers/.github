@@ -46,6 +46,11 @@ proves(
       await fs.writeTextFile(path.join(project, "package.json"), '{ "name": "consumer", "private": true, "type": "module" }\n');
       const published: { name: string; manifest: Json }[] = [];
       for (const lib of npmLibraries()) {
+        // a library packs from its own installed tools (the compiler, the links to the libraries it depends on): a job that has not installed it does so, as a person's first `bun run verify` does
+        if (!fs.existsSync(path.join(lib.dir, "node_modules"))) {
+          const installed = await sh([bun, "install", "--frozen-lockfile"], lib.dir);
+          assertEquals(installed.code, 0, `${lib.name}: bun install: ${installed.out}`);
+        }
         const packed = await sh([bun, "tools/pack.ts"], lib.dir);
         assertEquals(packed.code, 0, `${lib.name}: ${packed.out}`);
         // the packer prints the path of the tarball (the bundlers of the commands print what `bun pm pack` says besides)

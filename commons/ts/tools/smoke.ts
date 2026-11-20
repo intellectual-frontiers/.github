@@ -37,12 +37,16 @@ console.log("ok on " + proc.runtimeName() + " " + proc.runtimeVersion());
 
 const SUITE = `
 import { assertEquals, proves } from "${NAME}/ts/runtime/test";
-import { ok } from "${NAME}/ts/kernel";
+import { ok } from "@intellectual-frontiers/core";
 proves(["0005-typescript-runtime FR-030"], "a consumer's test, run by ifc test", () => assertEquals(ok(2), { kind: "ok", value: 2 }));
 `;
 
+/** The version of the foundation that the root package depends on, which a consumer names too (commons 0032-lifting-libraries FR-011). */
+const CORE_VERSION = "0.1.0";
+
 const CONSUMER = `
-import { andThen, ok, type Result, type Sha256, sha256 } from "${NAME}/ts/kernel";
+import { andThen, ok, type Result } from "@intellectual-frontiers/core";
+import { type Sha256, sha256 } from "${NAME}/ts/kernel";
 import { errors, fs } from "${NAME}/ts/runtime";
 const r: Result<number, string> = andThen(ok(1), (n: number) => ok(n + 1));
 const s: Sha256 = await sha256("abc");
@@ -84,7 +88,12 @@ const fail = (message: string): void => {
 try {
   await writeTextFile(
     join(dir, "package.json"),
-    JSON.stringify({ name: "smoke", private: true, type: "module", dependencies: { [NAME]: url } }),
+    JSON.stringify({
+      name: "smoke",
+      private: true,
+      type: "module",
+      dependencies: { [NAME]: url, "@intellectual-frontiers/core": CORE_VERSION },
+    }),
   );
   await writeTextFile(join(dir, "check.ts"), PROGRAM);
   await mkdir(join(dir, "tests"));

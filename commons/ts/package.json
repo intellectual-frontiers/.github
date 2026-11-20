@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/commons",
   "private": true,
-  "version": "0.15.0",
+  "version": "0.15.1",
   "description": "IFC TypeScript, for the development of commons/ts: the pure kernel and the host runtime of Intellectual Frontiers Commons, on web standards and node: builtins (commons 0005-typescript-runtime). A consumer depends on the repository's root package by Git, under the same name and entry points.",
   "type": "module",
   "exports": {
