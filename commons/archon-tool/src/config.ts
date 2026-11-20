@@ -32,6 +32,8 @@ export type ToolRuntime = {
 export type ToolPluginConfig = {
   /** The version of the plugin as published. */
   readonly version: string;
+  /** The program the plugin extends: `archon` by default; another command (a fleet's own) may use the same plugin. */
+  readonly program?: string;
   readonly catalog: Catalog;
   readonly runtimes: readonly ToolRuntime[];
   /** The dialects, most preferred first. */

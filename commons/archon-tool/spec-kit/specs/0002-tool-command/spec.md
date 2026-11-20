@@ -9,7 +9,7 @@
 
 ## Requirements
 
-- **FR-001**: `toolPlugin(config)` MUST give the plugin `archon-tool` that contributes the branch `tool` with the commands `list`, `show`, `ensure`, `doctor` and `clean`, or every problem of its definition as a value, and it MUST hold no catalog, dialect or pin of its own: all are in `config`.
+- **FR-001**: `toolPlugin(config)` MUST give the plugin `<program>-tool` (`archon-tool` unless the configuration names another program) that contributes the branch `tool` with the commands `list`, `show`, `ensure`, `doctor` and `clean`, or every problem of its definition as a value, and it MUST hold no catalog, dialect or pin of its own: all are in `config`, and the commands it suggests as fixes MUST name the program it extends.
 - **FR-002**: `tool list` MUST list each declared tool with its phases, its pin policy and the dialect and version it resolves to under the policy (or that it is unresolved), `--phase` MUST select the tools of a phase, a word that is not a phase MUST end the run as a usage error, and it MUST only read.
 - **FR-003**: `tool show NAME` MUST say what is declared of the tool, the dialect that carries it out and at which version, what is installed, and, where no dialect can carry it out, each dialect and the reason it was not chosen; a name not in the catalog MUST be refused naming the catalog.
 - **FR-004**: `tool doctor` MUST say for each selected tool whether it is as asked, missing or differs, with the command that fixes each, MUST end as pending where any is not as asked and as ok where all are, and MUST change nothing.

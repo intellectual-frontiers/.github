@@ -88,6 +88,18 @@ async function withWorld<T>(f: (w: World) => Promise<T>, more: { readonly integr
   });
 }
 
+/** Runs a plugin of another program through the generic composition of Headless. */
+async function mainFor(plugin: import("@intellectual-frontiers/headless/logical").Plugin | undefined, argv: readonly string[], sink: string[]): Promise<number> {
+  if (plugin === undefined) return 99;
+  const { compose, outcomeOf, command } = await import("@intellectual-frontiers/headless/logical");
+  const { launch } = await import("@intellectual-frontiers/headless/cli");
+  const { defineReach } = await import("@intellectual-frontiers/headless/governance");
+  const host = { name: plugin.program, summary: "A fleet's own command.", version: "1.0.0", children: [command({ name: "ping", summary: "Ping.", options: {}, action: { kind: "report", reach: defineReach({ channels: ["local"], readOnly: true, idempotent: true }) }, run: () => Promise.resolve(outcomeOf(null)) })] };
+  const composed = compose(host, [plugin]);
+  if (composed.kind === "err") return 98;
+  return launch(composed.value.program, { argv, io: { env: () => undefined, sink: { out: (t: string) => void sink.push(t), err: (t: string) => void sink.push(t) } } });
+}
+
 async function run(config: ToolPluginConfig, argv: readonly string[]) {
   const plugin = toolPlugin(config);
   if (plugin.kind === "err") throw new Error(JSON.stringify(plugin.error));
@@ -109,6 +121,14 @@ proves(["0002-tool-command FR-001", "0002-tool-command FR-007"], "the plugin is 
     assert((await run(config, ["tool", "list"])).out.includes("jq"));
   });
   await withWorld(async ({ config }) => assert(!(await run(config, ["tool", "list"])).out.includes("jq")), { noJq: true });
+  await withWorld(async ({ config }) => {
+    const other = toolPlugin({ ...config, program: "fleetcmd" });
+    assert(other.kind === "ok" && String(other.value.id) === "fleetcmd-tool" && other.value.program === "fleetcmd");
+    const out: string[] = [];
+    const code = await mainFor(other.kind === "ok" ? other.value : undefined, ["tool", "doctor", "--phase", "dev"], out);
+    assertEquals(code, 4);
+    assert(out.join("").includes("fleetcmd tool ensure"), out.join(""));
+  });
   const broken = toolPlugin({ ...(await withWorld((w) => Promise.resolve(w.config))), version: "one" });
   assert(broken.kind === "err" && broken.error[0]?.rule === "plugin/version", "a definition that is wrong is a value");
 });
