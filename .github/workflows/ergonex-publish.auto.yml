@@ -100,3 +100,26 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: package
+
+  tag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [build, publish-github]
+    if: "github.ref_type == 'branch'"
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: "The tag of the version that was published, made once"
+        shell: bash
+        run: |
+          version=$(node -p "require('./package.json').version")
+          tag="ergonex-v$version"
+          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" >/dev/null 2>&1; then
+            echo "$tag is already there"
+          else
+            gh api "repos/$GITHUB_REPOSITORY/git/refs" -f "ref=refs/tags/$tag" -f "sha=$GITHUB_SHA"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        working-directory: commons/ergonex

@@ -660,12 +660,35 @@ export function publishWorkflow(l: LibraryFacts): Workflow {
           }),
         ],
       }),
+      // a run by hand from main makes the tag that a push of one would have: the runner's token may, where a person's sandbox may not
+      tag: job({
+        needs: ["build", "publish-github"],
+        when: "github.ref_type == 'branch'",
+        runsOn: "ubuntu-latest",
+        timeoutMinutes: 5,
+        permissions: { contents: "write" },
+        steps: [
+          checkout(),
+          run(
+            lines(
+              `version=$(node -p "require('./package.json').version")`,
+              `tag="${l.name}-v$version"`,
+              'if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" >/dev/null 2>&1; then',
+              '  echo "$tag is already there"',
+              "else",
+              '  gh api "repos/$GITHUB_REPOSITORY/git/refs" -f "ref=refs/tags/$tag" -f "sha=$GITHUB_SHA"',
+              "fi",
+            ),
+            { name: "The tag of the version that was published, made once", shell: "bash", workingDirectory: folder, env: { GH_TOKEN: expr("secrets.GITHUB_TOKEN") } },
+          ),
+        ],
+      }),
     },
     env: { NODE_VERSION },
   };
 }
 
-/** Every workflow, the libraries' made from their manifests, in the order of their files' names. */
+/** Every workflow, the libraries'' made from their manifests, in the order of their files' names. */
 export function workflows(libraries: readonly LibraryFacts[]): readonly Workflow[] {
   return [
     ...libraries.map(libraryWorkflow),
