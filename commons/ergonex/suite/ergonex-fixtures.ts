@@ -45,6 +45,8 @@ export type Ran = {
   readonly code: number;
   readonly stdout: string;
   readonly stderr: string;
+  /** What the run wrote to both streams: the report, then the problems and the verdict. */
+  readonly all: string;
 };
 
 /** The URL the manifest names, which Git fetches from the bare repository on disk. */
@@ -160,7 +162,7 @@ export async function withWorld(f: (w: World) => Promise<void>): Promise<void> {
           env: { ...env, ...extra },
           cwd: dir,
         });
-        return { code: r.code, stdout: r.stdout, stderr: r.stderr };
+        return { code: r.code, stdout: r.stdout, stderr: r.stderr, all: r.stdout + r.stderr };
       },
       git,
       manifest: async (value) => {

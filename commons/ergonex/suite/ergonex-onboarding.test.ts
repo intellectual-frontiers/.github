@@ -190,7 +190,7 @@ proves(
     assertEquals(level({ scopes: undefined }), ["suggest"]);
     assertEquals(level({ fetched: false }), ["ok"]);
     assertStringIncludes(tokenChecks({ ...f, fetched: false })[0]?.message ?? "", "ergonex doctor --fetch");
-    assertStringIncludes(tokenChecks({ ...f, tokenSet: false })[0]?.message ?? "", "ergonex shell <your shell> --install");
+    assertStringIncludes(tokenChecks({ ...f, tokenSet: false })[0]?.message ?? "", "ergonex shell install <your shell>");
     assertStringIncludes(tokenChecks({ ...f, tokenSet: false, ghInstalled: false })[0]?.message ?? "", "https://cli.github.com");
     assert(tokenChecks({ ...f, tokenSet: true }).every((c) => c.subject === "ERGONEX_GITHUB_TOKEN"));
     assertEquals(scopesOf("HTTP/2.0 200 OK\nX-Oauth-Scopes: repo, read:packages\nX-Accepted-Oauth-Scopes: \n"), ["repo", "read:packages"]);

@@ -604,7 +604,7 @@ proves(
     for (const word of ["install", "update", "add"]) {
       const r = parseToolsArgs([word, "hello"]);
       assert(r.kind === "err");
-      assertStringIncludes(r.error.message, "ergonex setup --apply");
+      assertStringIncludes(r.error.message, "ergonex setup");
     }
     assertEquals(parseToolsArgs([]), {
       kind: "ok",

@@ -1,6 +1,6 @@
 /**
  * The loopback switch is never silent (commons 0002-workspace-model FR-037): while `ERGONEX_ALLOW_LOOPBACK_HTTP=1` is set, every command that honors it
- * writes the one line on standard error and the run's report holds an informational finding, and the exit status is what it was without the switch.
+ * says so on standard error (the closing block) and the run's problems hold an informational finding, and the exit status is what it was without the switch.
  * `ergonex` is run as a real program on the runtime that runs this file (Bun or Node 26), in a real temporary workspace with real Git; the pure parts
  * (the line, the finding) are checked as values.
  *
@@ -8,7 +8,7 @@
  */
 import { execPath, which } from "../src/platform/r-proc.ts";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { LOOPBACK_NOTICE, loopbackAllowed, loopbackFinding } from "../src/host/workspace.ts";
+import { loopbackAllowed, loopbackFinding } from "../src/host/workspace.ts";
 import { Ergonex, needsWorld, withWorld } from "./ergonex-fixtures.ts";
 
 const needs =
@@ -20,18 +20,14 @@ const needs =
 
 const SWITCH = { ERGONEX_ALLOW_LOOPBACK_HTTP: "1" };
 
-/** The findings of the loopback rule in a `--json` report: the rule and the severity of each. */
-function loopbackFindings(json: string): readonly { readonly ruleId: string; readonly severity: unknown }[] {
+/** The problems of the loopback rule in a `--json` report: the code and the level of each. */
+function loopbackFindings(json: string): readonly { readonly code: unknown; readonly level: unknown }[] {
   const report: unknown = JSON.parse(json);
-  assert(typeof report === "object" && report !== null && "findings" in report && Array.isArray(report.findings), "a report with findings");
-  const found: { ruleId: string; severity: unknown }[] = [];
-  const list: readonly unknown[] = report.findings;
+  assert(typeof report === "object" && report !== null && "problems" in report && Array.isArray(report.problems), "a report with problems");
+  const found: { code: unknown; level: unknown }[] = [];
+  const list: readonly unknown[] = report.problems;
   for (const f of list) {
-    if (typeof f === "object" && f !== null && "ruleId" in f && f.ruleId === "ergonex/loopback-http")
-      found.push({
-        ruleId: f.ruleId,
-        severity: "severity" in f ? f.severity : undefined,
-      });
+    if (typeof f === "object" && f !== null && "code" in f && f.code === "E-LOOPBACK-HTTP") found.push({ code: f.code, level: "level" in f ? f.level : undefined });
   }
   return found;
 }
@@ -43,10 +39,6 @@ proves(
     assertEquals(loopbackAllowed({ ERGONEX_ALLOW_LOOPBACK_HTTP: "1" }), true);
     assertEquals(loopbackAllowed({ ERGONEX_ALLOW_LOOPBACK_HTTP: "true" }), false);
     assertEquals(loopbackAllowed({}), false);
-    assertEquals(
-      LOOPBACK_NOTICE,
-      "ergonex: ERGONEX_ALLOW_LOOPBACK_HTTP is set: http to the loopback interface is accepted (the SHA-256 is still checked)",
-    );
     const f = loopbackFinding("2026-11-17");
     assertEquals([f.ruleId, f.severity, f.firstSeen], ["ergonex/loopback-http", "Informational", "2026-11-17"]);
   },
@@ -54,7 +46,7 @@ proves(
 
 proves(
   ["0002-workspace-model FR-037"],
-  "ergonex writes the one line on standard error and puts an informational finding in the report while the switch is set, and not otherwise; the exit status does not change",
+  "ergonex says so once on standard error and puts an informational finding in the report while the switch is set, and not otherwise; the exit status does not change",
   async () => {
     await withWorld(async (w) => {
       assertEquals((await w.ergonex("init")).code, 0);
@@ -63,12 +55,12 @@ proves(
         const loud = await w.ergonexOn(execPath(), Ergonex, [...words, "--json"], SWITCH);
         const name = words.join(" ");
         assertEquals(quiet.stderr.includes("ERGONEX_ALLOW_LOOPBACK_HTTP"), false, `${name}: the line without the switch`);
-        assertEquals(loud.stderr.split("\n").filter((l) => l === LOOPBACK_NOTICE).length, 1, `${name}: the line, once, on standard error`);
+        assertEquals(loud.stderr.split("\n").filter((l) => l.includes("ERGONEX_ALLOW_LOOPBACK_HTTP is set: http to the loopback interface")).length, 0, `${name}: --json writes only the document`);
         assertEquals(loud.code, quiet.code, `${name}: the exit status is the same`);
         const mine = loopbackFindings(loud.stdout);
         assertEquals(
           mine,
-          [{ ruleId: "ergonex/loopback-http", severity: "Informational" }],
+          [{ code: "E-LOOPBACK-HTTP", level: "warn" }],
           `${name}: one informational finding in the report`,
         );
         assertEquals(loopbackFindings(quiet.stdout), [], `${name}: none without the switch`);

@@ -14,13 +14,13 @@ export const about: About = {
   summary:
     "The one command, `ergonex`, that manages a team's workspace: the repositories laid out like their remotes on GitHub, GitLab or plain Git behind one interface, with a plan shown before anything changes, " +
     "the pinned tools, the generated files and hooks, the shell, and the checks of a workspace (`doctor`, `status`, `verify`). It runs on Windows, macOS and Linux, on Bun by default and on Node 26 as the backup, " +
-    "and is written to be installed from npm by a person who has never set up a repository. A library of commons with its own specifications.",
+    "and is written to be installed from npm by a person who has never set up a repository. The first real program on Headless: its commands are governance actions with reach policies, run through the command-line surface. A library of commons with its own specifications.",
   folders: [
     { path: "spec-kit/", what: "The library's own specifications, numbered from 0001.", mayImport: ["nothing: Markdown and TSV"] },
     {
       path: "src/",
-      what: "The controller `ergonex.ts`, its commands, the modules, the plan and the host: the pure core (the plan, the findings, the manifest, the layout) and the host layer that reads files, runs programs and writes evidence.",
-      mayImport: ["the kernel, the runtime and the Git host of commons, by package name"],
+      what: "The program `ergonex.ts`, its commands (declared on Headless in `commands/`, with the tree in `commands/program.ts`), the plan and the host: the pure core (the plan, the findings, the manifest, the layout) and the host layer that reads files, runs programs and writes evidence.",
+      mayImport: ["the kernel, the runtime and the Git host of commons, by package name; Headless only from commands/ and ergonex.ts, by its exports"],
     },
     {
       path: "src/platform/",

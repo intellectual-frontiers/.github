@@ -7,6 +7,6 @@
 import { errors } from "@intellectual-frontiers/system";
 
 /** `errors.NotFound`. */
-export const NotFound = errors.NotFound;
+export const NotFound: typeof errors.NotFound = errors.NotFound;
 /** An instance of `errors.NotFound`. */
 export type NotFound = InstanceType<typeof errors.NotFound>;

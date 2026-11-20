@@ -31,7 +31,7 @@ proves(
       const before = existsSync(w.repo);
       const plan = await w.ergonex("plan");
       assertEquals(plan.code, 0, plan.stderr);
-      assertStringIncludes(plan.stdout, `clone ${REMOTE} into git.example.org/team/tool`);
+      assertStringIncludes(plan.all, `clone ${REMOTE} into git.example.org/team/tool`);
       assert(!before && !existsSync(w.repo), "a plan changed something");
       assert(!existsSync(join(w.home, "AGENTS.auto.md")), "a plan wrote a generated file");
 
@@ -44,7 +44,7 @@ proves(
 
       const again = await w.ergonex("plan");
       assertEquals(again.code, 0);
-      assertStringIncludes(again.stdout, "nothing to do: every action is a skip");
+      assertStringIncludes(again.all, "nothing to do: every action is a skip");
       const lines = again.stdout
         .split("\n")
         .slice(1)
@@ -56,7 +56,7 @@ proves(
       assert(!SKIPS_ONLY.test(`\n${again.stdout.split("\n").slice(1).join("\n")}`) || lines.every((l) => l.trim().startsWith("skip ")));
       const twice = await w.ergonex("apply");
       assertEquals(twice.code, 0, twice.stderr);
-      assertStringIncludes(twice.stdout, "0 done");
+      assertStringIncludes(twice.all, "0 done");
     });
   },
   needsWorld,
@@ -127,7 +127,7 @@ proves(
       // a setting that was elsewhere is replaced and shown in the plan
       await w.git(w.repo, "config", "--local", "core.hooksPath", "/elsewhere");
       const plan = await w.ergonex("plan");
-      assertStringIncludes(plan.stdout, "set core.hooksPath");
+      assertStringIncludes(plan.all, "set core.hooksPath");
       assertEquals((await w.ergonex("apply")).code, 0);
       assertEquals(await local("core.hooksPath"), join(w.home, ".ergonex", "hooks"));
     });
@@ -146,22 +146,22 @@ proves(
       await w.advance("second");
       const quiet = await w.ergonex("status");
       assertEquals(quiet.code, 0);
-      assertStringIncludes(quiet.stdout, "Clean");
-      assertStringIncludes(quiet.stdout, "ahead 0 behind 0");
+      assertStringIncludes(quiet.all, "Clean");
+      assertStringIncludes(quiet.all, "ahead 0 behind 0");
       const fetched = await w.ergonex("status", "--fetch");
       assertEquals(fetched.code, 0, fetched.stderr);
-      assertStringIncludes(fetched.stdout, "Behind 1");
-      assertStringIncludes(fetched.stdout, "behind 1");
+      assertStringIncludes(fetched.all, "Behind 1");
+      assertStringIncludes(fetched.all, "behind 1");
       const head = await w.git(w.repo, "rev-parse", "HEAD");
       const applied = await w.ergonex("apply");
       assertEquals(applied.code, 0, applied.stderr);
-      assertStringIncludes(applied.stdout, "fast-forward");
+      assertStringIncludes(applied.all, "fast-forward");
       const after = await w.git(w.repo, "rev-parse", "HEAD");
       assert(after !== head, "the branch did not move");
       assertEquals(after, await w.git(w.repo, "rev-parse", "origin/main"));
       const status = await w.ergonex("status");
-      assertStringIncludes(status.stdout, "ahead 0 behind 0");
-      assertStringIncludes((await w.ergonex("plan")).stdout, "nothing to do");
+      assertStringIncludes(status.all, "ahead 0 behind 0");
+      assertStringIncludes((await w.ergonex("plan")).all, "nothing to do");
     });
   },
   needsWorld,
@@ -182,7 +182,7 @@ proves(
       const dirty = await w.ergonex("apply");
       assertEquals(dirty.code, 0);
       assertEquals(await readTextFile(join(w.repo, "README.md")), "# my own edit\n");
-      assertStringIncludes((await w.ergonex("plan")).stdout, "uncommitted changes");
+      assertStringIncludes((await w.ergonex("plan")).all, "uncommitted changes");
       await w.git(w.repo, "checkout", "--", "README.md");
       // a commit of its own: ahead, and then diverged
       await writeTextFile(join(w.repo, "mine.txt"), "mine\n");
@@ -191,8 +191,8 @@ proves(
       const mine = await w.git(w.repo, "rev-parse", "HEAD");
       const diverged = await w.ergonex("status");
       assertEquals(diverged.code, 1, diverged.stdout);
-      assertStringIncludes(diverged.stdout, "Diverged +1/-1");
-      assertStringIncludes(diverged.stdout, "only a person merges");
+      assertStringIncludes(diverged.all, "Diverged +1/-1");
+      assertStringIncludes(diverged.all, "only a person merges");
       const applied = await w.ergonex("apply");
       assertEquals(applied.code, 1, applied.stdout);
       assertEquals(await w.git(w.repo, "rev-parse", "HEAD"), mine, "apply moved a diverged branch");
@@ -203,7 +203,7 @@ proves(
       await w.git(w.repo, "add", ".");
       await w.git(w.repo, "commit", "-q", "-m", "mine again");
       const ahead = await w.ergonex("plan");
-      assertStringIncludes(ahead.stdout, "its remote does not");
+      assertStringIncludes(ahead.all, "its remote does not");
       assertEquals(ahead.code, 0);
     });
   },
@@ -224,8 +224,8 @@ proves(
       await writeTextFile(lock, "");
       const status = await w.ergonex("status");
       assertEquals(status.code, 1, status.stdout);
-      assertStringIncludes(status.stdout, "Locked");
-      assertStringIncludes(status.stdout, "locked");
+      assertStringIncludes(status.all, "Locked");
+      assertStringIncludes(status.all, "locked");
       const head = await w.git(w.repo, "rev-parse", "HEAD").catch(() => "");
       const applied = await w.ergonex("apply");
       assertEquals(applied.code, 1, applied.stdout);
@@ -249,7 +249,7 @@ proves(
       await writeTextFile(join(w.repo, "notes.txt"), "not a repository\n");
       const notRepo = await w.ergonex("apply");
       assertEquals(notRepo.code, 1, notRepo.stdout);
-      assertStringIncludes(notRepo.stdout, "not a Git repository");
+      assertStringIncludes(notRepo.all, "not a Git repository");
       assertEquals(await readTextFile(join(w.repo, "notes.txt")), "not a repository\n");
       assertEquals((await w.ergonex("status")).code, 1);
       await remove(w.repo, { recursive: true });
@@ -259,12 +259,12 @@ proves(
       await w.git(w.repo, "remote", "add", "origin", "https://git.example.org/other/thing.git");
       const wrong = await w.ergonex("apply");
       assertEquals(wrong.code, 1, wrong.stdout);
-      assertStringIncludes(wrong.stdout, "git.example.org/other/thing");
+      assertStringIncludes(wrong.all, "git.example.org/other/thing");
       assertEquals(await w.git(w.repo, "config", "--get", "remote.origin.url"), "https://git.example.org/other/thing.git");
       const status = await w.ergonex("status");
       assertEquals(status.code, 1);
-      assertStringIncludes(status.stdout, "WrongRemote");
-      assertStringIncludes(status.stdout, "never overwritten");
+      assertStringIncludes(status.all, "WrongRemote");
+      assertStringIncludes(status.all, "never overwritten");
     });
   },
   needsWorld,
@@ -320,11 +320,11 @@ proves(
       // the group goes away: its file is no longer generated
       await w.manifest({ repositories: [{ remote: REMOTE, branch: "main" }] });
       const plan = await w.ergonex("plan");
-      assertStringIncludes(plan.stdout, "remove the generated file core.auto.code-workspace");
+      assertStringIncludes(plan.all, "remove the generated file core.auto.code-workspace");
       const kept = await w.ergonex("apply");
       assertEquals(kept.code, 0, kept.stderr);
       assert(existsSync(join(w.home, "core.auto.code-workspace")), "a destructive action ran without --allow-destructive");
-      assertStringIncludes(kept.stdout, "--allow-destructive");
+      assertStringIncludes(kept.all, "--allow-destructive");
       // edited by hand: never removed, even with the flag
       await writeTextFile(join(w.home, "core.auto.code-workspace"), '{ "mine": true }\n');
       const edited = await w.ergonex("apply", "--allow-destructive");
@@ -338,14 +338,14 @@ proves(
       assertEquals(removed.code, 0, removed.stdout + removed.stderr);
       assert(!existsSync(join(w.home, "core.auto.code-workspace")));
       // setup and tools are modules; neither plan nor apply holds a step that installs or changes the host, and a dry run of setup changes nothing
-      const list = await w.ergonex("list", "--json");
+      const list = await w.ergonex("modules", "--json");
       const names = (JSON.parse(list.stdout) as { data: { modules: { name: string }[] } }).data.modules.map((m) => m.name);
       assert(names.includes("setup") && names.includes("tools"), names.join(","));
       const before = readDirSync(w.home)
         .map((e) => e.name)
         .sort();
-      const dry = await w.ergonex("setup");
-      assertStringIncludes(dry.stdout, "dry run: nothing is changed");
+      const dry = await w.ergonex("setup", "--dry-run");
+      assertStringIncludes(dry.all, "nothing is changed");
       assertEquals(
         readDirSync(w.home)
           .map((e) => e.name)
@@ -360,7 +360,7 @@ proves(
 
 proves(
   ["0001-ergonex FR-016", "0002-workspace-model FR-007", "0002-workspace-model FR-027", "0002-workspace-model FR-034"],
-  "worktree create makes a worktree only where someone else or uncommitted work is on the repository, on a branch named for its issue; list shows it; prune removes only one with no work, and only with --allow-destructive",
+  "worktree create makes a worktree only where someone else or uncommitted work is on the repository, on a branch named for its issue; list shows it; prune removes only one with no work, and only with --yes",
   async () => {
     await withWorld(async (w) => {
       await w.ergonex("init");
@@ -368,7 +368,7 @@ proves(
       await w.ergonex("apply");
       const own = await w.ergonex("worktree", "create", "tool", "10-ergonex-host");
       assertEquals(own.code, 0, own.stderr);
-      assertStringIncludes(own.stdout, "its own checkout");
+      assertStringIncludes(own.all, "its own checkout");
       assert(!existsSync(join(w.home, ".worktrees")), "a worktree was made where the checkout is free");
       // a branch that names no issue is a usage error, however it is asked
       const bad = await w.ergonex("worktree", "create", "tool", "feature-x", "--always");
@@ -383,23 +383,23 @@ proves(
       assertEquals(await w.git(place, "rev-parse", "--abbrev-ref", "HEAD"), "10-ergonex-host");
       assert(existsSync(join(w.repo, "wip.txt")), "the work in progress was disturbed");
       const listed = await w.ergonex("worktree", "list");
-      assertStringIncludes(listed.stdout, "10-ergonex-host");
+      assertStringIncludes(listed.all, "10-ergonex-host");
       // a worktree with an uncommitted change is kept, and so is one with a commit that is on no remote
       await writeTextFile(join(place, "change.txt"), "x\n");
-      const kept = await w.ergonex("worktree", "prune", "--allow-destructive");
-      assertStringIncludes(kept.stdout, "kept");
+      const kept = await w.ergonex("worktree", "prune", "--yes");
+      assertStringIncludes(kept.all, "kept");
       assert(existsSync(place));
       await w.git(place, "add", ".");
       await w.git(place, "commit", "-q", "-m", "unpushed");
-      assertStringIncludes((await w.ergonex("worktree", "prune", "--allow-destructive")).stdout, "unpushed commit");
+      assertStringIncludes((await w.ergonex("worktree", "prune", "--yes")).all, "unpushed commit");
       assert(existsSync(place));
-      // as the work is pushed away, it holds nothing: named without the flag, removed with it
+      // as the work is pushed away, it holds nothing: named with --dry-run, removed with --yes
       await w.git(place, "push", "-q", "origin", "10-ergonex-host");
-      const named = await w.ergonex("worktree", "prune");
-      assertStringIncludes(named.stdout, "would remove");
-      assert(existsSync(place), "prune removed without --allow-destructive");
-      const gone = await w.ergonex("worktree", "prune", "--allow-destructive");
-      assertStringIncludes(gone.stdout, "removed");
+      const named = await w.ergonex("worktree", "prune", "--dry-run");
+      assertStringIncludes(named.all, "would remove");
+      assert(existsSync(place), "prune --dry-run removed");
+      const gone = await w.ergonex("worktree", "prune", "--yes");
+      assertStringIncludes(gone.all, "removed");
       assert(!existsSync(place));
     });
   },

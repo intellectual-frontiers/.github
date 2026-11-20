@@ -72,15 +72,11 @@ export function native(site: Site, path: string): string {
  * Whether a run may pin an artifact on `http` to the loopback interface: only where the environment says so (`ERGONEX_ALLOW_LOOPBACK_HTTP=1`), for a person's own local mirror or a test's own server.
  *
  * @remarks
- * A stopgap until a test certificate authority replaces it (0002-workspace-model Assumptions): while it is on, every command that honors it says so (`LOOPBACK_NOTICE`) and the run's report holds `loopbackFinding`.
+ * A stopgap until a test certificate authority replaces it (0002-workspace-model Assumptions): while it is on, every command that honors it says so: the run's problems hold `loopbackFinding` (a warning that never changes the status), which the closing block shows on standard error.
  */
 export function loopbackAllowed(env: Readonly<Record<string, string | undefined>>): boolean {
   return env["ERGONEX_ALLOW_LOOPBACK_HTTP"] === "1";
 }
-
-/** The one line a command that honors `ERGONEX_ALLOW_LOOPBACK_HTTP` writes on standard error while it is set (0002-workspace-model FR-037). */
-export const LOOPBACK_NOTICE =
-  "ergonex: ERGONEX_ALLOW_LOOPBACK_HTTP is set: http to the loopback interface is accepted (the SHA-256 is still checked)";
 
 /** The informational finding that records, in the report of the run, that the loopback switch was on. */
 export function loopbackFinding(today: string): Finding {

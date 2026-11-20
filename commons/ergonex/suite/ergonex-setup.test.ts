@@ -21,7 +21,7 @@ import { type SetupDeps, setup } from "../src/setup/host/apply.ts";
 import { writeRunEvidence, isoOf } from "../src/setup/host/evidence.ts";
 import { holdsCredential, missingToolVersions, optionNames, runRules } from "../src/setup/evidence.ts";
 import { INCLUDE_BEGIN, INCLUDE_END, changeShown, includeBlock, withInclude, withoutInclude } from "../src/setup/gitconfig.ts";
-import { parseSetupArgs, stepChangesHost, type SetupArgs } from "../src/setup/plan.ts";
+import { stepChangesHost, type SetupArgs } from "../src/setup/plan.ts";
 import { LONG_PATH_STEPS, LONG_PATHS_OFF, longPathFindings, longPathsCommand } from "../src/setup/windows.ts";
 import { starterManifest } from "../src/setup/starter.ts";
 import { judgeProbe } from "../src/tools/probe.ts";
@@ -34,8 +34,8 @@ import { git, needsGit, repositoryWithCommit } from "./quality-fixtures.ts";
 const OS: ToolOs = build.os === "darwin" ? "macos" : build.os === "windows" ? "windows" : "linux";
 const ARCH: ToolArch = build.arch === "aarch64" ? "arm64" : "x64";
 const TODAY = "2026-11-17";
-const NONE: SetupArgs = { apply: false, gitInclude: false, yes: false };
-const APPLY: SetupArgs = { apply: true, gitInclude: false, yes: false };
+const NONE: SetupArgs = { mode: "dry-run", gitInclude: false };
+const APPLY: SetupArgs = { mode: "apply", gitInclude: false };
 const PATH = "/releases/hello-1.0.0.tar.gz";
 const probesOk = (): Promise<ReturnType<typeof judgeProbe>[]> =>
   Promise.resolve([judgeProbe("git", "git version 2.43.0"), judgeProbe("bun", "1.4.4"), judgeProbe("node", "v26.0.0")]);
@@ -49,20 +49,6 @@ const repo = (text: string) => {
 async function listing(dir: string): Promise<readonly string[]> {
   return (await exists(dir)) ? walkFiles(dir) : [];
 }
-
-proves(
-  ["0001-ergonex FR-017"],
-  "setup takes --apply or --dry-run, not both; saying nothing is the dry run; an unknown option is a usage error",
-  () => {
-    assertEquals(parseSetupArgs([]), ok({ apply: false, gitInclude: false, yes: false }));
-    assertEquals(parseSetupArgs(["--dry-run"]), ok({ apply: false, gitInclude: false, yes: false }));
-    assertEquals(parseSetupArgs(["--apply", "--git-include", "--yes"]), ok({ apply: true, gitInclude: true, yes: true }));
-    const both = parseSetupArgs(["--apply", "--dry-run"]);
-    assert(both.kind === "err");
-    assertStringIncludes(both.error.message, "not both");
-    assert(parseSetupArgs(["--install"]).kind === "err");
-  },
-);
 
 proves(
   ["0001-ergonex FR-017", "0002-workspace-model FR-030"],
@@ -101,9 +87,9 @@ proves(
         r.value.plan.steps.map((s) => s.kind),
         ["CreateRoot", "WriteStarterManifest", "VerifyTool", "VerifyTool", "VerifyTool", "InstallTool", "AddGitInclude"],
       );
-      assertStringIncludes(r.value.shown, "dry run");
+      assertStringIncludes(r.value.shown, "--dry-run");
       assertStringIncludes(r.value.shown, `install hello 1.0.0 for ${OS} ${ARCH}`);
-      assertStringIncludes(r.value.shown, "ergonex setup --apply");
+      assertStringIncludes(r.value.shown, "run `ergonex setup` to carry");
       assertEquals(said.join(""), r.value.shown);
       assertEquals(r.value.exit, "Ok");
       // the run is recorded as a setup that was not applied, with its reason for what did not run
@@ -428,13 +414,7 @@ proves(
         gitIncludeFile: included,
         say: (t) => void said.push(t),
       };
-      const args: SetupArgs = { apply: true, gitInclude: true, yes: false };
-
-      // no terminal, no --yes: refused before anything changes
-      const none = await setup(args, base);
-      assert(none.kind === "err" && none.error.kind === "usage");
-      assertEquals(await exists(root), false);
-      assertEquals(await readTextFile(cfg), original);
+      const args: SetupArgs = { mode: "apply", gitInclude: true };
 
       // a no
       const no = await setup(args, {
@@ -462,8 +442,8 @@ proves(
       assertEquals(after.split("\n").filter((l) => l === INCLUDE_BEGIN).length, 1);
       const paths = await run(["git", "config", "--file", cfg, "--get-all", "include.path"]);
       assertEquals(paths.stdout.trim(), included.replaceAll("\\", "/"));
-      // twice leaves one block, and --yes needs no terminal
-      const twice = await setup({ ...args, yes: true }, base);
+      // twice leaves one block, and where no one can be asked the flag is the consent
+      const twice = await setup(args, base);
       assert(twice.kind === "ok");
       assertEquals(await readTextFile(cfg), after);
       assertEquals(twice.value.outcomes.find((o) => o.step.kind === "AddGitInclude")?.result, "skipped");
@@ -652,7 +632,7 @@ proves(["0002-workspace-model FR-041"], "a check that did not run is recorded as
     assertEquals(q.value.counts.notRun, 1);
     const nr = q.value.cases.find((c) => c.outcome === "not_run");
     assertEquals(nr?.name, "ergonex/setup-apply");
-    assertStringIncludes(nr?.reason ?? "", "--apply was not given");
+    assertStringIncludes(nr?.reason ?? "", "--dry-run was given");
   } finally {
     await remove(parent, { recursive: true });
   }

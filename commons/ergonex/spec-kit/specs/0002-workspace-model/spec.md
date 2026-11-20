@@ -50,7 +50,7 @@
 - **FR-027**: Ergonex MUST NOT delete a folder whose state `ergonex:holdsLocalWork` (every state but `ergonex:Missing`, `ergonex:Clean` and `ergonex:Behind`), nor a worktree with unpushed commits or uncommitted changes, nor a generated file whose bytes are not the ones the state record holds.
 - **FR-028**: WHILE a Git lock file is present in a repository, the repository MUST be `ergonex:Locked` and Ergonex MUST NOT act on it or remove the lock; two runs of `ergonex` on one workspace MUST NOT write at once, the second waiting or refusing with the first named.
 - **FR-029**: An action of a kind that is `ergonex:destructive` MUST appear in the plan and MUST NOT be carried out unless the run says `--allow-destructive`; without it the action is reported as skipped.
-- **FR-030**: Ergonex MUST NOT carry out an action of a kind with `ergonex:hostChange` (`ergonex:InstallTool`, `ergonex:ConfigureHost`) in any run but `ergonex setup --apply` (0001-ergonex FR-017), and a plan made by any other command MUST NOT hold one.
+- **FR-030**: Ergonex MUST NOT carry out an action of a kind with `ergonex:hostChange` (`ergonex:InstallTool`, `ergonex:ConfigureHost`) in any run but `ergonex setup` (0001-ergonex FR-017), and a plan made by any other command MUST NOT hold one.
 
 ## Policy
 
