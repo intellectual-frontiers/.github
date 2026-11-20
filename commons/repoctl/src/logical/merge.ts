@@ -58,7 +58,7 @@ const lines = (text: string): readonly string[] =>
     .map((l) => l.trim())
     .filter((l) => l !== "");
 
-/** Makes a conflicted file hold the lines of both sides where they conflict (`git merge-file --union` of the three versions Git kept of it), and writes it; whether it could. */
+/** Makes a conflicted file hold the lines of both sides where they conflict (`git merge-file --union` of the three versions Git kept of it, the merged reference's lines first, since what it holds is what the other branches have already seen), and writes it; whether it could. */
 async function union(w: Pick<World, "files" | "process" | "repo">, path: string): Promise<boolean> {
   const here = { cwd: w.repo };
   const dir = await w.files.makeTemp("repoctl-merge-");
@@ -68,7 +68,7 @@ async function union(w: Pick<World, "files" | "process" | "repo">, path: string)
       const shown = await w.process.run(["git", "show", `:${i + 1}:${path}`], here);
       await w.files.write(`${dir}/${name}`, shown.code === 0 ? shown.stdout : "");
     }
-    const merged = await w.process.run(["git", "merge-file", "-p", "--union", `${dir}/ours`, `${dir}/base`, `${dir}/theirs`], here);
+    const merged = await w.process.run(["git", "merge-file", "-p", "--union", `${dir}/theirs`, `${dir}/base`, `${dir}/ours`], here);
     if (merged.code !== 0) return false;
     await w.files.write(`${w.repo}/${path}`, merged.stdout);
     return true;

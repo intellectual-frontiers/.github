@@ -340,13 +340,18 @@ export function idsIn(spec: string): ReadonlyMap<string, string> {
   return out;
 }
 
-/** The id each library has: the one it had, or the next number after the greatest. */
+/**
+ * The id each library has: the one it had, or the next number after the greatest. A number belongs to the first library that holds it in the specification: where a second one holds it (two branches each gave the next number to a
+ * library, and a merge kept both), the second is given the next number after the greatest, so that the generator makes the section again with one number for each library.
+ */
 export function idsFor(libraries: readonly Library[], had: ReadonlyMap<string, string>): ReadonlyMap<string, string> {
   const out = new Map<string, string>();
+  const first = new Map<string, string>();
+  for (const [name, id] of had) if (!first.has(id)) first.set(id, name);
   let next = Math.max(FIRST_GENERATED - 1, ...[...had.values()].map((id) => Number(id.slice(3)))) + 1;
   for (const l of libraries) {
     const id = had.get(l.name);
-    if (id !== undefined) out.set(l.name, id);
+    if (id !== undefined && first.get(id) === l.name) out.set(l.name, id);
     else out.set(l.name, `FR-${String(next++).padStart(3, "0")}`);
   }
   return out;

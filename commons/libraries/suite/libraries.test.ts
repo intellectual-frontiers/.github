@@ -218,6 +218,11 @@ proves(
     const libs = [lib];
     assertEquals([...idsFor(libs, new Map()).values()], [`FR-${FIRST_GENERATED}`]);
     assertEquals([...idsFor(libs, new Map([["a", "FR-150"]])).values()], ["FR-150"]);
+    // two branches that each gave the next number to a library, and a merge that kept both: the first in the section keeps it, the second is given the next number after the greatest
+    const other = { ...lib, name: "b" };
+    const both = idsFor([lib, other], new Map([["b", "FR-130"], ["a", "FR-130"]]));
+    assertEquals([...both.entries()], [["a", "FR-131"], ["b", "FR-130"]]);
+    assertEquals([...idsFor([lib, other], new Map([["a", "FR-130"], ["b", "FR-130"]])).entries()], [["a", "FR-130"], ["b", "FR-131"]]);
     assertStringIncludes(rowOf("FR-101", lib), "commons/a: the verify of the library");
     assertEquals(generated("no markers", "", libs).kind, "err");
   },
