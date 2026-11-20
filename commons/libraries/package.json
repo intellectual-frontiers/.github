@@ -40,7 +40,6 @@
     "@intellectual-frontiers/formats": "link:../formats",
     "@intellectual-frontiers/kanon": "link:../kanon",
     "@intellectual-frontiers/githost": "link:../githost",
-    "@intellectual-frontiers/grc": "link:../grc",
     "@intellectual-frontiers/mizan": "link:../mizan",
     "@intellectual-frontiers/net": "link:../net",
     "@intellectual-frontiers/ontology": "link:../ontology",

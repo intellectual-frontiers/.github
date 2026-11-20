@@ -32,8 +32,10 @@ import { canonicalize } from "./canonical.ts";
 import { joinAll } from "./evaluate.ts";
 import type { Result, Risk, Status } from "./kinds.ts";
 
+/** The three states of freshness. */
+export type FreshnessState = "fresh" | "due" | "stale";
 /** How fresh something is. */
-export type Freshness = { readonly state: "fresh" | "due" | "stale"; readonly dueAt: string | undefined };
+export type Freshness = { readonly state: FreshnessState; readonly dueAt: string | undefined };
 
 /** The freshness of the newest observation at `now`: `due` within a tenth of the duration of its end, `stale` past it, and `stale` for none. */
 export function freshness(newest: string | undefined, duration: string, now: string): Outcome<Freshness, string> {

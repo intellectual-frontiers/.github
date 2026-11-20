@@ -38,18 +38,9 @@ import {
   type LedgerEntry,
   type LedgerRecord,
   verifyLedger,
-} from "@intellectual-frontiers/grc/evidence";
-import {
-  type ControlRef,
-  type ControlSummary,
-  type Finding,
-  type Instant,
-  instantFromEpochMs,
-  type Severity,
-  type Status,
-} from "@intellectual-frontiers/grc/grc";
+} from "./pure/primitives.ts";
+import { type Instant, instantFromEpochMs } from "./pure/primitives.ts";
 import type { Json, JsonObject } from "@intellectual-frontiers/formats/json5";
-import { assessmentResults, renderOscal } from "@intellectual-frontiers/grc/oscal";
 import {
   type LogRecord,
   parseSpanId,
@@ -60,7 +51,7 @@ import {
 } from "@intellectual-frontiers/telemetry/otel";
 import { encodeLogs, encodeTraces } from "@intellectual-frontiers/telemetry/otlp";
 import type { Sha256 } from "@intellectual-frontiers/crypto/sha256";
-import { NAMESPACE_URL, uuidV5 } from "@intellectual-frontiers/crypto/uuid";
+import { NAMESPACE_URL, uuidV5, uuidV5Of } from "@intellectual-frontiers/crypto/uuid";
 import { el, type XmlChild, type XmlElement, writeXml } from "@intellectual-frontiers/formats/xml";
 import {
   attributeInteger,
@@ -911,6 +902,9 @@ export function sarif(run: TestRun): string {
 export const OSCAL_NAMESPACE_URI = "https://github.com/intellectual-frontiers/.github/tree/main/commons/spec-kit/specs/0008-test-evidence";
 
 /** A requirement as a catalog control: its specification and its number (`0008-test-evidence FR-001`). */
+export type ControlRef = { readonly catalog: string; readonly id: string };
+
+/** A requirement as a catalog control: its specification and its number (`0008-test-evidence FR-001`). */
 export function requirementRef(id: string): ControlRef {
   const sp = id.lastIndexOf(" ");
   return sp < 0 ? { catalog: "requirements", id } : { catalog: id.slice(0, sp), id: id.slice(sp + 1) };
@@ -921,7 +915,10 @@ export function oscalControlId(r: ControlRef): string {
   return `req-${`${r.catalog}-${r.id}`.toLowerCase().replace(/[^a-z0-9._-]+/g, "-")}`;
 }
 
-function oscalStatus(o: Outcome): Status {
+/** What a test outcome says as a status of a finding. */
+type OscalStatus = "pass" | "fail" | "error" | "not-applicable";
+
+function oscalStatus(o: Outcome): OscalStatus {
   switch (o) {
     case "pass":
       return "pass";
@@ -938,69 +935,86 @@ function oscalStatus(o: Outcome): Status {
 }
 
 /**
- * The run as OSCAL 1.2.3 assessment results (FR-005, 0007-grc FR-017): one observation per test (its control the test, its subject the
- * runtime it ran on) and one finding per requirement, satisfied or not by the outcomes of the tests that prove it.
+ * The run as OSCAL 1.2.3 assessment results (FR-005): one observation per test (its subject the runtime it ran on) and one finding per requirement, satisfied or not by the outcomes of
+ * the tests that prove it, and one for each test that proves none. Every `uuid` is a version 5 UUID of a name in the run, so the same run gives the same bytes.
  */
 export async function oscalAssessmentResults(
   run: TestRun,
   options: { readonly version?: string; readonly organization?: string } = {},
 ): Promise<string> {
-  const at: Instant = instantFromEpochMs(Number(run.start / 1_000_000n)) ?? (isoTime(0n) as Instant); // isoTime gives a canonical Instant's text
-  const severity = (r: Risk): Severity => (r === "high" ? "high" : "low");
-  const testControl = (t: RunTest): ControlSummary => ({
-    id: `test-${t.id}`,
-    title: t.name,
-    description: `${t.file}: ${t.name}`,
-    implements: t.requirements.map(requirementRef),
-    severity: severity(t.risk),
-    cadence: "each run",
-  });
-  const requirementControls: ControlSummary[] = run.requirements.map((r) => ({
-    id: `requirement ${r.id}`,
-    title: r.id,
-    description: r.reviews.length > 0 ? `reviewed: ${r.reviews.join("; ")}` : `${r.id}: ${r.state}`,
-    implements: [requirementRef(r.id)],
-    severity: severity(r.risk),
-    cadence: "each run",
-  }));
+  const iso = (ns: bigint): string => instantFromEpochMs(Number(ns / 1_000_000n)) ?? isoTime(0n);
+  const at = iso(run.start);
+  const namespace = await uuidV5(NAMESPACE_URL, OSCAL_NAMESPACE_URI);
+  const id = (...parts: readonly string[]): Promise<string> => uuidV5Of(namespace, [run.traceId, ...parts]);
+  const prop = (name: string, value: string): { readonly name: string; readonly ns: string; readonly value: string } => ({ name, ns: OSCAL_NAMESPACE_URI, value });
+  const severity = (r: Risk): string => (r === "high" ? "high" : "low");
   const runtimeLabel = (runtime: string): string => {
     const version = run.installations.find((i) => i.runtime === runtime)?.runtimeVersion;
     return version === undefined ? runtime : `${runtime} ${version}`;
   };
-  const findings: Finding[] = run.tests.map((t) => {
-    const status = oscalStatus(t.outcome);
-    return {
-      control: testControl(t),
-      subject: { kind: "runtime", id: runtimeLabel(t.runtime) },
-      status,
-      outcome: status,
-      severity: severity(t.risk),
+  const observations = await Promise.all(
+    run.tests.map(async (t) => ({
+      uuid: await id("observation", t.id),
       title: `${t.outcome}: ${t.name}`,
-      detail: t.message ?? t.reason ?? `${t.name}: ${t.outcome}`,
-      evidence: [],
-      at: instantFromEpochMs(Number(t.end / 1_000_000n)) ?? at,
-    };
-  });
-  const namespace = await uuidV5(NAMESPACE_URL, OSCAL_NAMESPACE_URI);
-  const doc = await assessmentResults(
-    {
-      pack: { id: `ifc-test-${run.traceId}`, title: `Test run ${run.traceId}` },
-      at,
-      controls: [...requirementControls, ...findings.map((f) => f.control)],
-      subjects: [],
-      findings,
-    },
-    {
-      namespace,
-      lastModified: instantFromEpochMs(Number(run.end / 1_000_000n)) ?? at,
-      version: options.version ?? "1",
-      propNamespace: OSCAL_NAMESPACE_URI,
-      title: `Test run ${run.traceId}: assessment results`,
-      controlId: oscalControlId,
-      ...(options.organization === undefined ? {} : { organization: options.organization }),
-    },
+      description: t.message ?? t.reason ?? `${t.name}: ${t.outcome}`,
+      methods: ["TEST"],
+      types: ["finding"],
+      collected: iso(t.end),
+      props: [
+        prop("status", oscalStatus(t.outcome)),
+        prop("severity", severity(t.risk)),
+        prop("subject", runtimeLabel(t.runtime)),
+        ...t.requirements.map((r) => prop("control", r)),
+      ],
+    })),
   );
-  return renderOscal(doc);
+  const observationOf = new Map(run.tests.map((t, i) => [t.id, observations[i]?.uuid ?? ""]));
+  type Target = { readonly key: string; readonly title: string; readonly tests: readonly RunTest[] };
+  const targets: Target[] = [
+    ...run.requirements.map((r): Target => ({ key: oscalControlId(requirementRef(r.id)), title: r.id, tests: run.tests.filter((t) => t.requirements.includes(r.id)) })),
+    ...run.tests.filter((t) => t.requirements.length === 0).map((t): Target => ({ key: `test-${t.id}`.toLowerCase().replace(/[^a-z0-9._-]+/g, "-"), title: t.name, tests: [t] })),
+  ];
+  const findings = await Promise.all(
+    targets.map(async (t) => {
+      const statuses = t.tests.map((x) => oscalStatus(x.outcome));
+      const satisfied = statuses.length > 0 && !statuses.includes("fail") && !statuses.includes("error") && statuses.includes("pass");
+      return {
+        uuid: await id("finding", t.key),
+        title: t.title,
+        description: `${t.title}: ${satisfied ? "satisfied" : "not satisfied"} by ${t.tests.length} tests.`,
+        props: [prop("control", t.title)],
+        target: { type: "objective-id", "target-id": t.key, status: { state: satisfied ? "satisfied" : "not-satisfied" } },
+        ...(t.tests.length === 0 ? {} : { "related-observations": t.tests.map((x) => ({ "observation-uuid": observationOf.get(x.id) ?? "" })) }),
+      };
+    }),
+  );
+  const plan = await id("assessment-plan");
+  const doc = {
+    "assessment-results": {
+      uuid: await id("assessment-results"),
+      metadata: {
+        title: `Test run ${run.traceId}: assessment results`,
+        "last-modified": iso(run.end),
+        version: options.version ?? "1",
+        "oscal-version": "1.2.3",
+        ...(options.organization === undefined ? {} : { parties: [{ uuid: await id("party"), type: "organization", name: options.organization }] }),
+      },
+      "import-ap": { href: `#${plan}` },
+      results: [
+        {
+          uuid: await id("result"),
+          title: `Test run ${run.traceId}`,
+          description: `The tests of the run ${run.traceId} and the requirements they prove.`,
+          start: at,
+          "reviewed-controls": { "control-selections": [{ "include-controls": targets.map((t) => ({ "control-id": t.key })) }] },
+          ...(observations.length === 0 ? {} : { observations }),
+          ...(findings.length === 0 ? {} : { findings }),
+        },
+      ],
+      "back-matter": { resources: [{ uuid: plan, title: `The assessment plan of the test run ${run.traceId}` }] },
+    },
+  };
+  return `${JSON.stringify(doc, null, 2)}\n`;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------------- evidence (FR-008 to FR-010)

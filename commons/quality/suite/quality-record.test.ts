@@ -7,7 +7,7 @@
  * @module
  */
 import { decodeLogs } from "@intellectual-frontiers/telemetry/otlp";
-import { GENESIS } from "@intellectual-frontiers/grc/evidence";
+import { GENESIS } from "../src/pure/primitives.ts";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { OUTCOMES } from "@intellectual-frontiers/test/record";
 import { readTextFileSync } from "@intellectual-frontiers/system/fs";
@@ -296,9 +296,6 @@ const PURE_PACKAGES = [
   "@intellectual-frontiers/crypto/sha256",
   "@intellectual-frontiers/formats/json5",
   "@intellectual-frontiers/formats/xml",
-  "@intellectual-frontiers/grc/assess",
-  "@intellectual-frontiers/grc/evidence",
-  "@intellectual-frontiers/grc/grc",
   "@intellectual-frontiers/mizan/changes/declaration",
   "@intellectual-frontiers/mizan/trace",
   "@intellectual-frontiers/telemetry/otel",

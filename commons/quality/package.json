@@ -64,7 +64,6 @@
     "@intellectual-frontiers/core": "link:../core",
     "@intellectual-frontiers/crypto": "link:../crypto",
     "@intellectual-frontiers/formats": "link:../formats",
-    "@intellectual-frontiers/grc": "link:../grc",
     "@intellectual-frontiers/libraries": "link:../libraries",
     "@intellectual-frontiers/mizan": "link:../mizan",
     "@intellectual-frontiers/ontology": "link:../ontology",

@@ -18,8 +18,8 @@
  *
  * @module
  */
-import { type Duration, duration, type Instant } from "@intellectual-frontiers/grc/grc";
-import { freshness } from "@intellectual-frontiers/grc/assess";
+import { type Duration, duration, type Instant } from "./primitives.ts";
+import { freshness } from "./primitives.ts";
 
 /** The state of a proof's freshness, in the words of the ontology (`ifqs:Fresh`, `ifqs:Due`, `ifqs:Stale`). */
 export type FreshnessState = "Fresh" | "Due" | "Stale";

@@ -29,8 +29,8 @@ import {
   type LedgerRecord,
   ledgerLines,
   parseLedger,
-} from "@intellectual-frontiers/grc/evidence";
-import { type Instant, instantFromEpochMs, roleOf } from "@intellectual-frontiers/grc/grc";
+} from "../pure/primitives.ts";
+import { type Instant, instantFromEpochMs, roleOf } from "../pure/primitives.ts";
 import { type SpanId, spanIdFrom, type TraceId, traceIdFrom } from "@intellectual-frontiers/telemetry/otel";
 import type { LogBatch, TraceBatch } from "@intellectual-frontiers/telemetry/otlp";
 import { err, ok, type Result } from "@intellectual-frontiers/core";

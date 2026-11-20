@@ -11,7 +11,7 @@
  *     --label TEXT    the name the documents give the folder (default `Intellectual Frontiers commons`)
  *
  * @remarks
- * The two documents are written by the kernel's OSCAL writers (`kernel/oscal.ts`, OSCAL 1.2.3), so that the same bytes come for the same folder: every `uuid` is a version 5 UUID of a
+ * The two documents are written here, as OSCAL 1.2.3, so that the same bytes come for the same folder: every `uuid` is a version 5 UUID of a
  * stable name, every list is in an order of its own, and no clock is read (`last-modified` is `1970-01-01T00:00:00Z`; the `version` is the first 12 characters of the SHA-256 of the
  * register's rows). A requirement's control id is `spec-<slug>.<fr>` in lower case. A requirement a test proves has one passing observation for each test file, with the SHA-256 of
  * the file as evidence; one that is only reviewed is `accepted` (it has no test); one that has no proof, whatever its row says, is a `gap`. What OSCAL does not say, the command that
@@ -39,26 +39,9 @@
  */
 import process from "node:process";
 import { fileURLToPath } from "node:url";
-import {
-  assessmentResults,
-  componentDefinition,
-  type OscalAssessmentResults,
-  type OscalComponentDefinition,
-  type OscalOptions,
-  renderOscal,
-} from "@intellectual-frontiers/grc/oscal";
-import {
-  type Assessment,
-  type ControlSummary,
-  type Finding,
-  type Instant,
-  instantOf,
-  type Status,
-  type SubjectRef,
-} from "@intellectual-frontiers/grc/grc";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { type Cited, parseSpec, proofsOf, type SourceFile } from "@intellectual-frontiers/mizan/trace";
-import { NAMESPACE_URL, uuidV5 } from "@intellectual-frontiers/crypto/uuid";
+import { NAMESPACE_URL, type Uuid, uuidV5, uuidV5Of } from "@intellectual-frontiers/crypto/uuid";
 import { existsSync, mkdirSync, readDirSync, readTextFileSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { stdio } from "@intellectual-frontiers/system";
 import { readSources } from "@intellectual-frontiers/mizan/host/trace";
@@ -108,12 +91,10 @@ export const RESULTS_FILE = "mizan-register-results.auto.oscal.json";
 export const RUN = "bun commons/libraries/src/oscal-register.ts";
 
 /** The instant the documents give as their `last-modified`: the register reads no clock (0003-mizan FR-022). */
-const NO_CLOCK: Instant = instantOf("1970-01-01T00:00:00Z") ?? absurdInstant();
+const NO_CLOCK = "1970-01-01T00:00:00.000Z";
 
-/** Never returns: the epoch is an instant, so `instantOf` has no reason to refuse it. */
-function absurdInstant(): never {
-  throw new Error("1970-01-01T00:00:00Z is an instant");
-}
+/** The version of OSCAL the documents are written as. */
+const OSCAL_VERSION = "1.2.3";
 
 const REGISTER_IRI = "https://www.intellectualfrontiers.com/ontology/mizan-register";
 const isMechanism = (x: string): x is Mechanism => x === "check" || x === "gate" || x === "review" || x === "none";
@@ -214,52 +195,43 @@ export function registerRows(input: RegisterInput): readonly RegisterRow[] {
   });
 }
 
-function summaryOf(row: RegisterRow, catalog: string): ControlSummary {
-  return {
-    id: row.requirement,
-    title: row.title,
-    implements: [{ catalog, id: row.controlId }],
-    severity: "info",
-    cadence: "on every commit",
-  };
-}
+/** What one observation of the results says. */
+type Observation = {
+  readonly row: RegisterRow;
+  readonly status: "pass" | "warn" | "gap";
+  readonly outcome: "pass" | "accepted" | "gap";
+  readonly title: string;
+  readonly detail: string;
+  readonly evidence?: string;
+  readonly waiver?: string;
+};
 
-/** What a requirement's finding says: a passing observation for each test file that proves it, else `accepted` where a person reviewed it, else a `gap`. */
-async function findingsOf(row: RegisterRow, control: ControlSummary, tests: ReadonlyMap<string, string>): Promise<readonly Finding[]> {
-  const subject: SubjectRef = { kind: "specification", id: row.spec };
-  const base = { control, subject, severity: "info" as const, at: NO_CLOCK };
+/** What a requirement's observations say: a passing observation for each test file that proves it, else `accepted` where a person reviewed it, else a `gap`. */
+async function observationsOf(row: RegisterRow, tests: ReadonlyMap<string, string>): Promise<readonly Observation[]> {
   if (row.files.length > 0)
     return Promise.all(
-      row.files.map(async (file): Promise<Finding> => ({
-        ...base,
-        status: "pass",
-        outcome: "pass",
-        title: `proved by ${file}`,
-        detail: `${row.requirement} is named by a proof in ${file}.`,
-        evidence: [await sha256(tests.get(file) ?? "")],
-      })),
+      row.files.map(
+        async (file): Promise<Observation> => ({
+          row,
+          status: "pass",
+          outcome: "pass",
+          title: `proved by ${file}`,
+          detail: `${row.requirement} is named by a proof in ${file}.`,
+          evidence: await sha256(tests.get(file) ?? ""),
+        }),
+      ),
     );
   if (row.mechanism === "review")
     return [
-      {
-        ...base,
-        status: "warn",
-        outcome: "accepted",
-        waiver: row.by,
-        title: "reviewed by a person",
-        detail: `${row.requirement} has no test; a person reviews it (${row.by}): ${row.note}`,
-        evidence: [],
-      },
+      { row, status: "warn", outcome: "accepted", waiver: row.by, title: "reviewed by a person", detail: `${row.requirement} has no test; a person reviews it (${row.by}): ${row.note}` },
     ];
-  const status: Status = "gap";
   return [
     {
-      ...base,
-      status,
-      outcome: status,
+      row,
+      status: "gap",
+      outcome: "gap",
       title: "no test proves it",
       detail: `${row.requirement} is ${row.mechanism === "none" ? "not enforced" : `enforced by ${row.mechanism} (${row.by})`}, and no proof in the tests names it: ${row.note}`,
-      evidence: [],
     },
   ];
 }
@@ -269,76 +241,126 @@ export type RegisterDocuments = { readonly componentDefinition: string; readonly
 
 /**
  * The register as OSCAL 1.2.3: the component definition and the assessment results, rendered (0003-mizan FR-021, FR-022). Where `register.enforcement` names a file, its text is the register
- * and `input.enforcement` is not read (FR-043); the same bytes come for the same register wherever its file is.
+ * and `input.enforcement` is not read (FR-043); the same bytes come for the same register wherever its file is. Both are written here, from the rows, and not by a library of exchange formats:
+ * the register's own vocabulary (a mechanism, a proof, a waiver) is Mizan's.
  */
 export async function registerDocuments(input: RegisterInput, register: RegisterOptions = {}): Promise<RegisterDocuments> {
   const rows = registerRows(register.enforcement === undefined ? input : { ...input, enforcement: enforcementAt(register.enforcement) });
   const catalog = "the specifications of its Mizan folder";
-  const pairs = rows.map((row) => ({ row, control: summaryOf(row, catalog) }));
-  const controls = pairs.map((p) => p.control);
   const tests = new Map(input.tests.map((t) => [t.path, t.text]));
-  const version = (await sha256(JSON.stringify(rows.map((r) => [r.requirement, r.mechanism, r.by, r.note, r.title, r.files])))).slice(
-    0,
-    12,
-  );
-  const namespace = await uuidV5(NAMESPACE_URL, REGISTER_IRI);
-  const options = (what: string): OscalOptions => ({
-    namespace,
-    lastModified: NO_CLOCK,
-    version,
-    propNamespace: `${REGISTER_IRI}#`,
+  const version = (await sha256(JSON.stringify(rows.map((r) => [r.requirement, r.mechanism, r.by, r.note, r.title, r.files])))).slice(0, 12);
+  const namespace: Uuid = await uuidV5(NAMESPACE_URL, REGISTER_IRI);
+  const id = (...parts: readonly string[]): Promise<string> => uuidV5Of(namespace, parts);
+  const ns = `${REGISTER_IRI}#`;
+  const prop = (name: string, value: string): { readonly name: string; readonly ns: string; readonly value: string } => ({ name, ns, value });
+  const metadata = (what: string): Record<string, string> => ({
     title: `Mizan register of ${input.label}: ${what} (generated by ${RUN}; do not edit)`,
-    controlId: (ref) => ref.id,
+    "last-modified": NO_CLOCK,
+    version,
+    "oscal-version": OSCAL_VERSION,
   });
-  const definition = await componentDefinition(
-    controls,
-    {
-      id: input.label,
-      title: input.label,
-      description: `${input.label}, whose requirements are written in the specifications of its Mizan folder.`,
-      type: "software",
-    },
-    options("component definition"),
+  const catalogId = await id("catalog", input.label);
+  const implemented = await Promise.all(
+    rows.map(async (row) => ({
+      uuid: await id("implemented-requirement", input.label, row.controlId),
+      "control-id": row.controlId,
+      description: `${row.requirement} (${row.title})`,
+      props: [prop("control", row.requirement), prop("mechanism", row.mechanism), prop("proofs", String(row.files.length))],
+    })),
   );
-  const byControl = new Map(rows.map((r) => [r.controlId, r]));
-  const inner = definition["component-definition"];
-  const withMechanism: OscalComponentDefinition = {
+  const componentDefinition = {
     "component-definition": {
-      ...inner,
-      components: inner.components.map((c) => ({
-        ...c,
-        ...(c["control-implementations"] === undefined
-          ? {}
-          : {
-              "control-implementations": c["control-implementations"].map((ci) => ({
-                ...ci,
-                "implemented-requirements": ci["implemented-requirements"].map((ir) => {
-                  const row = byControl.get(ir["control-id"]);
-                  return row === undefined
-                    ? ir
-                    : {
-                        ...ir,
-                        props: [
-                          ...ir.props,
-                          { name: "mechanism", ns: `${REGISTER_IRI}#`, value: row.mechanism },
-                          { name: "proofs", ns: `${REGISTER_IRI}#`, value: String(row.files.length) },
-                        ],
-                      };
-                }),
-              })),
-            }),
-      })),
+      uuid: await id("component-definition", input.label),
+      metadata: metadata("component definition"),
+      components: [
+        {
+          uuid: await id("component", input.label),
+          type: "software",
+          title: input.label,
+          description: `${input.label}, whose requirements are written in ${catalog}.`,
+          "control-implementations": [
+            {
+              uuid: await id("control-implementation", input.label),
+              source: `#${catalogId}`,
+              description: `The controls of ${catalog} that ${input.label} implements.`,
+              "implemented-requirements": implemented,
+            },
+          ],
+        },
+      ],
+      "back-matter": { resources: [{ uuid: catalogId, title: `The controls of ${catalog}` }] },
     },
   };
-  const assessment: Assessment = {
-    pack: { id: input.label, title: `Mizan register of ${input.label}` },
-    at: NO_CLOCK,
-    controls,
-    subjects: [...new Set(rows.map((r) => r.spec))].sort(byText).map((id) => ({ kind: "specification", id })),
-    findings: (await Promise.all(pairs.map((p) => findingsOf(p.row, p.control, tests)))).flat(),
+  const specs = [...new Set(rows.map((r) => r.spec))].sort(byText);
+  const inventory = await Promise.all(
+    specs.map(async (spec) => ({
+      uuid: await id("inventory-item", input.label, spec),
+      description: `specification ${spec}`,
+      props: [{ name: "asset-id", value: spec }, prop("subject-kind", "specification")],
+    })),
+  );
+  const inventoryOf = new Map(specs.map((spec, i) => [spec, inventory[i]?.uuid ?? ""]));
+  const observed = (await Promise.all(rows.map((row) => observationsOf(row, tests)))).flat();
+  const observations = await Promise.all(
+    observed.map(async (o, i) => {
+      const title = `${o.row.requirement} on specification ${o.row.spec}: ${o.title}`;
+      return {
+        uuid: await id("observation", input.label, String(i), title),
+        title,
+        description: o.detail,
+        props: [
+          prop("control", o.row.requirement),
+          prop("outcome", o.outcome),
+          prop("status", o.status),
+          prop("severity", "info"),
+          ...(o.waiver === undefined ? [] : [prop("waiver", o.waiver)]),
+        ],
+        methods: ["TEST"],
+        types: ["finding"],
+        subjects: [{ "subject-uuid": inventoryOf.get(o.row.spec) ?? "", type: "inventory-item", title: `specification ${o.row.spec}` }],
+        ...(o.evidence === undefined
+          ? {}
+          : { "relevant-evidence": [{ description: `evidence of SHA-256 ${o.evidence}`, props: [prop("sha256", o.evidence)] }] }),
+        collected: NO_CLOCK,
+      };
+    }),
+  );
+  const findings = await Promise.all(
+    rows.map(async (row) => {
+      const own = observed.flatMap((o, i) => (o.row === row ? [{ o, uuid: observations[i]?.uuid ?? "" }] : []));
+      const outcome = own.some((x) => x.o.outcome === "gap") ? "gap" : own.some((x) => x.o.outcome === "accepted") ? "accepted" : "pass";
+      return {
+        uuid: await id("finding", input.label, row.controlId),
+        title: row.controlId,
+        description: `${row.controlId}: ${outcome}, by ${row.requirement}.`,
+        props: [prop("outcome", outcome), prop("control", row.requirement)],
+        target: { type: "objective-id", "target-id": row.controlId, status: { state: outcome === "gap" ? "not-satisfied" : "satisfied" } },
+        "related-observations": own.map((x) => ({ "observation-uuid": x.uuid })),
+      };
+    }),
+  );
+  const plan = await id("assessment-plan", input.label);
+  const assessmentResults = {
+    "assessment-results": {
+      uuid: await id("assessment-results", input.label),
+      metadata: metadata("assessment results"),
+      "import-ap": { href: `#${plan}` },
+      results: [
+        {
+          uuid: await id("result", input.label),
+          title: `Mizan register of ${input.label} as of ${NO_CLOCK}`,
+          description: `The findings of Mizan register of ${input.label}, assessed at ${NO_CLOCK}.`,
+          start: NO_CLOCK,
+          "local-definitions": { "inventory-items": inventory },
+          "reviewed-controls": { "control-selections": [{ "include-controls": rows.map((r) => ({ "control-id": r.controlId })) }] },
+          observations,
+          findings,
+        },
+      ],
+      "back-matter": { resources: [{ uuid: plan, title: `The assessment plan of Mizan register of ${input.label}` }] },
+    },
   };
-  const results: OscalAssessmentResults = await assessmentResults(assessment, options("assessment results"));
-  return { componentDefinition: renderOscal(withMechanism), assessmentResults: renderOscal(results) };
+  return { componentDefinition: `${JSON.stringify(componentDefinition, null, 2)}\n`, assessmentResults: `${JSON.stringify(assessmentResults, null, 2)}\n` };
 }
 
 /** What the register may be told besides its folder (0003-mizan FR-043): where its `enforcement.tsv` is, where it is not `enforcement.tsv` of the folder. */
