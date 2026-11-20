@@ -1,8 +1,10 @@
 // Spec: 0009-grc-groups FR-006, FR-007, FR-008, FR-009, FR-010
+// Spec: 0012-grc-subtenants FR-007, FR-008, FR-009, FR-010, FR-011
 /**
  * The group view (0009-grc-groups): an entity gives the group a snapshot of statuses and digests through a reader function it owns, and the group joins the snapshots into coverage and a roll-up with the
  * functions the single-entity view already has (`join`, `coverage`, `rollup`). An entity that cannot be read is `pending`, never an assumed pass. Nothing here takes the data of two entities from
- * one place: the group learns of an entity through its reader alone.
+ * one place: the group learns of an entity through its reader alone. The entities form a tree (0012-grc-subtenants): the view gives each entity its own status and its rolled-up status, the join of its own and
+ * its subtenants', made from the snapshots alone.
  *
  * @remarks
  * `pending` (a question not yet answered) and `gap` (a control that nothing shows) are `unaligned`: no outside standard defines them.
@@ -13,7 +15,7 @@
  * @example
  * ```ts
  * import { groupView } from "./group.ts";
- * // groupView({ group, scope, controls, readings, exceptions: [], at: "2026-06-01T00:00:00Z" }).overall.worst; // "pending" while an entity is unread
+ * // groupView({ tree, scope, controls, readings, exceptions: [], at: "2026-06-01T00:00:00Z" }).overall.worst; // "pending" while an entity is unread
  * ```
  *
  * @module
@@ -28,8 +30,9 @@ import {
   type EntityGroup,
   type EntityId,
   entityIdDecoder,
+  type EntityTree,
   type Exception,
-  exceptionApplies,
+  exceptionCovers,
   type Framework,
   instant,
   instantMs,
@@ -243,12 +246,24 @@ export type ControlRollup = {
   readonly applicable: number;
 };
 
-/** One entity across the controls that apply to it. */
-export type EntityRollup = { readonly entity: EntityId; readonly status: Status; readonly reading: "read" | "unread"; readonly share: number | undefined };
+/** One entity of the tree in the view: its place, its own status and coverage (the join of its cells), and its rolled-up status and coverage (the join of its own and its subtenants' rolled-up). */
+export type EntityRollup = {
+  readonly entity: EntityId;
+  readonly parent?: EntityId;
+  readonly children: readonly EntityId[];
+  readonly depth: number;
+  readonly own: Status;
+  readonly rolledUp: Status;
+  readonly ownCoverage: GroupCoverage | "not-applicable";
+  readonly rolledUpCoverage: GroupCoverage | "not-applicable";
+  readonly reading: "read" | "unread";
+  readonly share: number | undefined;
+};
 
 /** The view of a group at an instant. */
 export type GroupView = {
   readonly at: string;
+  readonly roots: readonly EntityId[];
   readonly cells: readonly GroupCell[];
   readonly controls: readonly ControlRollup[];
   readonly entities: readonly EntityRollup[];
@@ -257,7 +272,7 @@ export type GroupView = {
 
 /** What `groupView` reads. */
 export type GroupViewInput = {
-  readonly group: EntityGroup;
+  readonly tree: EntityTree;
   readonly scope: ControlScope;
   readonly controls: readonly string[];
   readonly readings: readonly EntityReading[];
@@ -266,7 +281,7 @@ export type GroupViewInput = {
 };
 
 function cellOf(input: GroupViewInput, control: string, entity: EntityId, reading: EntityReading | undefined): GroupCell {
-  if (appliesTo(input.scope, control, entity) === "not-applicable") {
+  if (appliesTo(input.scope, input.tree, control, entity) === "not-applicable") {
     return { control, entity, status: "not-applicable", coverage: "not-applicable", severity: "info", reading: reading?.kind === "read" ? "read" : "unread" };
   }
   if (reading === undefined || reading.kind === "unread") return { control, entity, status: "pending", coverage: "unknown", severity: "medium", reading: "unread" };
@@ -274,7 +289,7 @@ function cellOf(input: GroupViewInput, control: string, entity: EntityId, readin
   if (state === undefined) return { control, entity, status: "gap", coverage: "gap", severity: "medium", reading: "read" };
   const excused =
     (state.status === "fail" || state.status === "warn") &&
-    input.exceptions.some((e) => e.excuses.type === "control" && e.excuses.ref === control && exceptionApplies(e, entity, input.at));
+    input.exceptions.some((e) => e.excuses.type === "control" && e.excuses.ref === control && exceptionCovers(e, input.tree, entity, input.at));
   return excused
     ? { control, entity, status: "accepted", coverage: "accepted", severity: state.severity, reading: "read" }
     : { control, entity, status: state.status, coverage: state.coverage, severity: state.severity, reading: "read" };
@@ -297,17 +312,23 @@ function asResult(c: GroupCell, at: string): Outcome {
   };
 }
 
+/** The worse of two coverages of a cell, `not-applicable` being what nothing applies to. */
+function joinCells(a: GroupCoverage | "not-applicable", b: GroupCoverage | "not-applicable"): GroupCoverage | "not-applicable" {
+  return a === "not-applicable" ? b : b === "not-applicable" ? a : joinCoverage(a, b);
+}
+
 /**
- * The group view at `at`: a cell for every control and entity (the controls and the entities in order), rolled up by control, by entity and overall; the same for any order of the readings.
+ * The group view at `at`: a cell for every control and entity (the controls and the entities in order), rolled up by control, by entity with its subtenants and overall; the same for any order of the readings,
+ * of the controls and of the entities. Nothing is read but the readings: a snapshot holds no evidence.
  *
  * @example
  * ```ts
- * // groupView({ group, scope, controls, readings, exceptions: [], at }).cells[0]?.status;
+ * // groupView({ tree, scope, controls, readings, exceptions: [], at }).entities[0]?.rolledUp;
  * ```
  */
 export function groupView(input: GroupViewInput): GroupView {
   const controls = [...new Set(input.controls)].sort();
-  const entities = input.group.entities.map((e) => e.id).sort();
+  const entities = input.tree.entities;
   const byEntity = new Map(input.readings.map((r) => [entityOf(r), r]));
   const cells = controls.flatMap((c) => entities.map((e) => cellOf(input, c, e, byEntity.get(e))));
   const results = cells.map((c) => asResult(c, input.at));
@@ -321,14 +342,38 @@ export function groupView(input: GroupViewInput): GroupView {
       applicable: mine.length,
     };
   });
+  const own = new Map(
+    entities.map((entity) => {
+      const mine = cells.filter((c) => c.entity === entity);
+      return [entity, { status: mine.map((c) => c.status).reduce<Status>(join, "not-applicable"), coverage: mine.map((c) => c.coverage).reduce(joinCells, "not-applicable" as GroupCoverage | "not-applicable") }] as const;
+    }),
+  );
+  const rolled = new Map<EntityId, { readonly status: Status; readonly coverage: GroupCoverage | "not-applicable" }>();
+  const rolledUp = (entity: EntityId): { readonly status: Status; readonly coverage: GroupCoverage | "not-applicable" } => {
+    const known = rolled.get(entity);
+    if (known !== undefined) return known;
+    const mine = own.get(entity) ?? { status: "not-applicable" as Status, coverage: "not-applicable" as const };
+    const children = input.tree.childrenOf(entity).map(rolledUp);
+    const value = { status: children.reduce<Status>((a, c) => join(a, c.status), mine.status), coverage: children.reduce((a, c) => joinCells(a, c.coverage), mine.coverage) };
+    rolled.set(entity, value);
+    return value;
+  };
   const entityRollups = entities.map((entity): EntityRollup => {
-    const mine = cells.filter((c) => c.entity === entity);
+    const parent = input.tree.parentOf(entity);
+    const mine = own.get(entity);
+    const all = rolledUp(entity);
     return {
       entity,
-      status: mine.map((c) => c.status).reduce<Status>(join, "not-applicable"),
+      ...(parent === undefined ? {} : { parent }),
+      children: input.tree.childrenOf(entity),
+      depth: input.tree.depthOf(entity),
+      own: mine?.status ?? "not-applicable",
+      rolledUp: all.status,
+      ownCoverage: mine?.coverage ?? "not-applicable",
+      rolledUpCoverage: all.coverage,
       reading: byEntity.get(entity)?.kind === "read" ? "read" : "unread",
       share: rollup(results.filter((r) => r.subject === entity)).share,
     };
   });
-  return { at: input.at, cells, controls: controlRollups, entities: entityRollups, overall: rollup(results) };
+  return { at: input.at, roots: input.tree.roots, cells, controls: controlRollups, entities: entityRollups, overall: rollup(results) };
 }
