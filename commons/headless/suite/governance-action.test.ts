@@ -7,6 +7,7 @@
 import fc from "fast-check";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { isErr, isOk } from "@intellectual-frontiers/core";
+import { PUBLIC } from "../src/governance/tier.ts";
 import {
   actionProblems,
   decide,
@@ -36,6 +37,7 @@ proves(["0002-headless-governance FR-001"], "an action has the facts of its kind
     effect: "read",
     idempotent: true,
     audience: "both",
+    tier: PUBLIC,
     dryRun: false,
     check: false,
     humanOnly: [],

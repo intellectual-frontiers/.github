@@ -85,18 +85,24 @@ export type Permissions = Readonly<
 /** The branches, paths and tags a push or a pull request is run for; none is every one. */
 export type Filter = { readonly branches?: readonly string[]; readonly paths?: readonly string[]; readonly tags?: readonly string[] };
 
+/** A question a run by hand asks: a yes or no with its default. */
+export type DispatchInput = { readonly description: string; readonly type: "boolean"; readonly default: boolean };
+
 export type Triggers = {
   readonly push?: Filter;
   readonly pullRequest?: Filter;
-  /** Run by hand from the Actions page. */
-  readonly workflowDispatch?: true;
+  /** Run by hand from the Actions page, with the inputs it asks for (true asks for none). */
+  readonly workflowDispatch?: true | { readonly inputs: Readonly<Record<string, DispatchInput>> };
   /** Called by another workflow. */
   readonly workflowCall?: true;
 };
 
+/** The cells of a matrix: the values of each axis, or an expression that gives the whole matrix (`expr("fromJSON(needs.plan.outputs.linux)")`), which a job reads from the output of another. */
+export type Matrix = Readonly<Record<string, readonly (string | number)[]>> | Expr;
+
 export type Strategy = {
   readonly failFast?: boolean;
-  readonly matrix: Readonly<Record<string, readonly (string | number)[]>>;
+  readonly matrix: Matrix;
 };
 
 export type Job = {
@@ -109,6 +115,8 @@ export type Job = {
   readonly permissions?: Permissions;
   readonly environment?: { readonly name: string; readonly url?: string };
   readonly env?: Readonly<Record<string, Scalar>>;
+  /** What the job gives the jobs that need it, by name: an expression of its steps' outputs. */
+  readonly outputs?: Readonly<Record<string, Expr>>;
   readonly strategy?: Strategy;
   readonly steps: readonly [Step, ...Step[]];
   /** A comment written above the job. */

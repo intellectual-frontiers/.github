@@ -15,10 +15,10 @@
 - **FR-003**: The files that the generator writes MUST be valid by the JSON Schema of GitHub workflows that SchemaStore publishes (`https://json.schemastore.org/github-workflow.json`, the copy kept in `commons/libraries/src/workflows/schema/`), and a test MUST check each file against it with a validator that is not this repository's.
 - **FR-004**: `generate-workflows.ts --check` MUST write nothing and exit with status 1, naming each file that is not what the model makes and each generated file that no workflow makes, and the `check` job of the `tests` workflow MUST run it.
 - **FR-005**: The version of every action a workflow uses MUST be written once, in one table of the model, and each `uses` of a workflow MUST be `./path` or `owner/name@version` with the version a tag or a commit, and the model's validation MUST find one that is not.
-- **FR-006**: The workflow of each library of commons MUST be made from the library's manifest (its name, its folder and its `verify` command) and its record of the facts of CI that a manifest does not hold, so that a library is given a workflow by being registered, with no file written by hand.
-- **FR-007**: The workflow that plans which libraries a change affects, and the one job that gates the rest, MUST be made by the same model when they are added.
+- **FR-006**: The libraries MUST be proved by one workflow, `ci.auto.yml`, made from the libraries' manifests (the name, the folder and the `verify` command of each) and the record of the facts of CI that a manifest does not hold (the tests on Node 26, a command after `verify`, and the systems other than Linux where the library has code of its own), so that a library is given its place in CI by being registered, with no file written by hand and no workflow of its own: a job `plan` says which libraries the push or the pull request affects (commons 0001-libraries FR-012), a matrix of those runs `verify` and the tests on Linux, a second matrix runs the libraries whose record names Windows or macOS on those systems, and a job `ci` is the one result that fails where a job failed.
+- **FR-007**: The workflow that plans which libraries a change affects, and the one job that gates the rest, MUST be made by the same model, as the jobs `plan` and `ci` of the workflow of FR-006.
 - **FR-008**: The composite actions of `.github/actions/` MUST be made by the same generator from the same model, and a file whose name GitHub fixes (`action.yml`), which cannot carry `.auto.`, MUST begin with the line that says it is generated and by what, and be compared by `--check` like the others.
-- **FR-009**: A library whose manifest names npm among its registries MUST be given a workflow, `<name>-publish.auto.yml`, made by the same model, that runs on a tag `<name>-v*`, checks the tag against the version of the package, proves the library, packs it with the library's own `tools/pack.ts` and sends the tarball to npm with provenance and no token, and to the GitHub package registry with the workflow's own token, and the generator MUST find a library published to npm that has no `tools/pack.ts`.
+- **FR-009**: The libraries whose manifests name npm among their registries MUST be published by one workflow, `release.auto.yml`, made by the same model and run by hand from main (never by a push or a tag), that reads the release record (`commons/generated/release.auto.json`, commons libraries 0001-libraries FR-014), leaves out what is tagged, proves each library and packs it with the library's own `tools/pack.ts`, and, where the run is asked to publish, sends the tarballs in the order of the record (a library after the libraries it imports) to npm with provenance by npm's trusted publishing (the run's id-token), or with the repository's secret `INFRO_NPMJS_TOKEN` where the repository has it, and to the GitHub package registry with the workflow's own token, skips a version a registry has already, and makes the tag `<name>-v<version>` with the runner's token; the generator MUST find a library published to npm that has no `tools/pack.ts`, and MUST write no workflow of a library's own.
 
 ## Acceptance scenarios
 
@@ -27,15 +27,15 @@
 3. **Given** a file `.github/workflows/extra.yml` written by hand, **When** `--check` runs, **Then** it exits 1 and names it as written by hand, per FR-001.
 4. **Given** a job that needs a job that is not in the workflow, **When** the model is validated, **Then** the finding names the workflow, the job and the job it needs, and the generator writes nothing, per FR-002.
 5. **Given** a step that uses `actions/checkout` with no version, **When** the model is validated, **Then** the finding names the step, per FR-005.
-6. **Given** a folder `commons/alpha/` with a manifest, **When** the generator runs, **Then** `alpha.auto.yml` is written with a job that runs the manifest's `verify` in `commons/alpha`, and it runs when that folder or what the library imports changes, per FR-006.
+6. **Given** folders `commons/alpha/` and `commons/beta/` with manifests, **When** the generator runs, **Then** one `ci.auto.yml` is written, whose plan names the libraries a change affects, whose matrix runs the manifest's `verify` in the folder of each, and no `alpha.auto.yml` or `beta.auto.yml` is written, per FR-006.
 7. **Given** the files the generator wrote, **When** a JSON Schema validator that is not this repository's reads each against the schema of GitHub workflows, **Then** none has an error, per FR-003.
 8. **Given** the composite action `bun`, **When** the generator runs, **Then** `.github/actions/bun/action.yml` begins with the line that says it is generated, and `--check` compares it, per FR-008.
-9. **Given** a library whose manifest names npm and that has a `tools/pack.ts`, **When** the generator runs, **Then** `<name>-publish.auto.yml` runs on its tag, checks the version, packs it and sends it to npm and to the GitHub package registry, and a library with no `tools/pack.ts` is a finding, per FR-009.
+9. **Given** a library whose manifest names npm and that has a `tools/pack.ts`, **When** the generator runs, **Then** the one `release.auto.yml` proves and packs it, and publishes and tags it in the order of the record when it is run by hand from main and asked to publish, and a library with no `tools/pack.ts` is a finding, per FR-009.
 
 ## Out of scope
 
 - Running a workflow, or asking GitHub whether it accepts one: the schema's validation is the check, and a run is CI's.
-- Which libraries a change affects and the planner and the gate that use it (FR-007 says only that they are made by this model).
+- Which libraries a change affects: `commons/libraries/src/affected.ts` (0027-commons-libraries FR-019 to FR-022), which the plan of FR-007 reads.
 - Another repository's workflows: `erga` has none today, and when it has, the model is the one it imports.
 
 ## Edge cases
@@ -47,9 +47,9 @@
 - A job with no step, an unknown trigger, a permission that is not `read`, `write` or `none`: refused by the compiler, per FR-002.
 - A step that runs a script in a composite action and names no shell: found, per FR-002.
 - An action pinned by a branch (`@main`): found, per FR-005.
-- A library with no record of CI facts: given the job `verify` alone, per FR-006.
+- A library with no record of CI facts: `verify` on Linux alone, per FR-006.
 - A library that names npm and has no `tools/pack.ts`: found, and nothing is written, per FR-009.
-- A tag that is not `<name>-v<version>` of the package: the publish workflow stops before anything is sent, per FR-009.
+- A run of the release workflow from a branch other than main: it stops before anything is sent, per FR-009.
 
 ## Assumptions
 

@@ -7,7 +7,6 @@
 import { ACTIONS, LIBRARY_CI, PIN, workflows } from "../src/workflows/definitions.ts";
 import { expr, job, type Permissions, run, use, validateAction, validateWorkflow, type Workflow } from "../src/workflows/model.ts";
 import { renderAction, renderWorkflow, scalar } from "../src/workflows/render.ts";
-import { readLibraries } from "../src/libraries.ts";
 import { existsSync, mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
@@ -107,11 +106,7 @@ proves(
     // every action of the model's workflows is of its table, and each version is written once
     const table: readonly string[] = Object.values(PIN);
     const used = [
-      ...workflows(
-        readLibraries(ROOT).flatMap((f) =>
-          "library" in f ? [{ name: f.library.name, verify: f.library.verify, paths: [], distribution: f.library.distribution }] : [],
-        ),
-      ).flatMap((w) => Object.values(w.jobs).flatMap((j) => j.steps)),
+      ...workflows().flatMap((w) => Object.values(w.jobs).flatMap((j) => j.steps)),
       ...ACTIONS.flatMap((a) => a.steps),
     ].flatMap((s) => (s.kind === "uses" ? [s.uses] : []));
     assert(
@@ -144,15 +139,15 @@ proves(
     await withTempDir((dir) => {
       repo(dir);
       assertEquals(main(["--check", "--repo", dir]), 1);
-      assert(!existsSync(join(dir, ".github", "workflows", "alpha.auto.yml")), "--check wrote");
+      assert(!existsSync(join(dir, ".github", "workflows", "ci.auto.yml")), "--check wrote");
       assertEquals(main(["--repo", dir]), 0);
-      const file = join(dir, ".github", "workflows", "alpha.auto.yml");
+      const file = join(dir, ".github", "workflows", "ci.auto.yml");
       assertEquals(main(["--check", "--repo", dir]), 0);
       const text = readTextFileSync(file);
       writeTextFileSync(file, text.replace(/\n/g, "\r\n"));
       assertEquals(synchronize(dir, false).stale, [], "a CRLF checkout is the file");
-      writeTextFileSync(file, text.replace("timeout-minutes: 15", "timeout-minutes: 99"));
-      assertEquals(synchronize(dir, false).stale, [".github/workflows/alpha.auto.yml"]);
+      writeTextFileSync(file, text.replace("timeout-minutes: 20", "timeout-minutes: 99"));
+      assertEquals(synchronize(dir, false).stale, [".github/workflows/ci.auto.yml"]);
       assertEquals(main(["--check", "--repo", dir]), 1);
       assertEquals(readTextFileSync(file).includes("timeout-minutes: 99"), true, "--check wrote");
       writeTextFileSync(join(dir, ".github", "workflows", "old.auto.yml"), "name: old\n");
@@ -166,32 +161,36 @@ proves(
 );
 
 proves(
-  [`${SPEC} FR-006`],
-  "a folder with a manifest is given a workflow that runs its verify in its folder when it or what it imports changes, a manifest that cannot be read stops the generator, and a library with no record of CI has the job verify alone",
+  [`${SPEC} FR-006`, `${SPEC} FR-007`],
+  "the libraries are proved by one workflow, ci, made from the manifests: a plan, a matrix of the libraries a change affects and one for the systems besides Linux, and one result; a library has no workflow of its own, a manifest that cannot be read stops the generator, and a library with no record of CI has verify on Linux alone",
   async () => {
     await withTempDir((dir) => {
       repo(dir, ["alpha", "beta"]);
       assertEquals(main(["--repo", dir]), 0);
-      const alpha = readTextFileSync(join(dir, ".github", "workflows", "alpha.auto.yml"));
-      assertStringIncludes(alpha, '- "commons/alpha/**"');
-      assertStringIncludes(alpha, '- "commons/tools/**"');
-      assertStringIncludes(alpha, "- .github/workflows/alpha.auto.yml");
-      assertStringIncludes(alpha, "working-directory: commons/alpha");
-      assertStringIncludes(alpha, "run: bun run verify");
-      assert(!alpha.includes("\n  node:"), "a library with no record of CI has the job verify alone");
-      assert(existsSync(join(dir, ".github", "workflows", "beta.auto.yml")));
+      const ci = readTextFileSync(join(dir, ".github", "workflows", "ci.auto.yml"));
+      assertStringIncludes(ci, "bun commons/libraries/src/plan.ts");
+      assertStringIncludes(ci, "matrix: ${{ fromJSON(needs.plan.outputs.linux) }}");
+      assertStringIncludes(ci, "matrix: ${{ fromJSON(needs.plan.outputs.systems) }}");
+      assertStringIncludes(ci, "run: ${{ matrix.verify }}");
+      assertStringIncludes(ci, "working-directory: ${{ matrix.folder }}");
+      assertStringIncludes(ci, "needs: [plan, verify, systems]");
+      assert(!ci.includes("commons/alpha"), "no library is named in the workflow: the plan says which are affected");
+      assert(!existsSync(join(dir, ".github", "workflows", "alpha.auto.yml")) && !existsSync(join(dir, ".github", "workflows", "beta.auto.yml")));
       assertEquals(LIBRARY_CI["alpha"], undefined);
       // a manifest that cannot be read stops the generator before it writes
       writeTextFileSync(join(dir, "commons", "beta", "library.ts"), "export const library = { nope: 1 };\n");
       writeTextFileSync(join(dir, "commons", "alpha", "library.ts"), manifest({ verify: "bun run verify --all" }));
       assertEquals(main(["--repo", dir]), 1);
-      assertEquals(readTextFileSync(join(dir, ".github", "workflows", "alpha.auto.yml")).includes("--all"), false);
+      assertEquals(readTextFileSync(join(dir, ".github", "workflows", "ci.auto.yml")).includes("--all\n"), false);
       return Promise.resolve();
     });
-    // the real library's workflow keeps its extra steps and its job on Node
-    const data = readTextFileSync(join(ROOT, ".github", "workflows", "data.auto.yml"));
-    assertStringIncludes(data, "run: bun run verify");
-    assertStringIncludes(data, "node --test");
+    // the real repository: no library has a workflow of its own, and the systems besides Linux are asked for by the libraries with code of their own for them only
+    const real = outputs(ROOT).files;
+    assertEquals([...real.keys()].filter((p) => /\/(?:core|data|system)\.auto\.yml$/.test(p)), []);
+    assert(real.has(".github/workflows/ci.auto.yml"));
+    const withSystems = Object.entries(LIBRARY_CI).filter(([, c]) => (c.systems ?? []).length > 0).map(([n]) => n);
+    assert(withSystems.includes("system") && !withSystems.includes("core"));
+    assertEquals(LIBRARY_CI["data"]?.after, "bun tools/generate-dpv.ts --check");
   },
 );
 
@@ -219,7 +218,7 @@ proves([`${SPEC} FR-008`], "the composite action is written with the line that s
 
 proves(
   [`${SPEC} FR-009`],
-  "a library that is published to npm is given a workflow that publishes it on its tag: the tag is checked against the version, the package is built by its tools/pack.ts, npm gets it with provenance and no token and the GitHub package registry with the workflow's own token; a library with no npm has none, and one with npm and no pack.ts is a finding",
+  "the one release workflow is run by hand from main and publishes in the order of the plan: npm by trusted publishing with provenance, or by INFRO_NPMJS_TOKEN where the repository has it, the GitHub package registry with the runner's token, and the tag made by the runner; no library has a workflow of its own, and a library with npm and no pack.ts is a finding",
   async () => {
     await withTempDir((dir) => {
       repo(dir, ["alpha", "beta"]);
@@ -229,48 +228,37 @@ proves(
       assertStringIncludes(outputs(dir).problems.join("\n"), "commons/beta is published to npm and has no tools/pack.ts");
       put(dir, "commons/beta/tools/pack.ts", "export {};\n");
       assertEquals(main(["--repo", dir]), 0);
-      const w = readTextFileSync(join(dir, ".github", "workflows", "beta-publish.auto.yml"));
-      assertStringIncludes(w, '- "beta-v*"');
-      assertStringIncludes(w, 'test "$GITHUB_REF_NAME" = "beta-v$version"');
-      assertStringIncludes(w, "run: bun tools/pack.ts");
-      assertStringIncludes(w, "provenance");
-      assertStringIncludes(w, "id-token: write");
-      assertStringIncludes(w, "packages: write");
-      assertStringIncludes(w, "NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}");
-      assert(!/secrets\.(?!GITHUB_TOKEN)/.test(w), "a secret that is not the workflow's own token");
-      assert(
-        !existsSync(join(dir, ".github", "workflows", "alpha-publish.auto.yml")),
-        "a library with no npm is not published by a workflow of its own",
-      );
+      assert(!existsSync(join(dir, ".github", "workflows", "beta-publish.auto.yml")), "a library has no workflow of its own");
       return Promise.resolve();
     });
-    // the real repository: ergonex is, and data is (it publishes the package `@intellectual-frontiers/arcactl`, a build target of its sources)
-    assert(existsSync(join(ROOT, ".github", "workflows", "ergonex-publish.auto.yml")));
-    assert(existsSync(join(ROOT, ".github", "workflows", "data-publish.auto.yml")));
-  },
-);
-
-proves(
-  ["0032-lifting-libraries FR-009"],
-  "the publish workflow of a library skips a registry that has the version already, and tags the version from the main branch once it is on its registry, with the runner's token, whoever put it there",
-  () => {
-    for (const lib of ["core", "rdf", "terminal", "ergonex"]) {
-      const w = readTextFileSync(join(ROOT, ".github", "workflows", `${lib}-publish.auto.yml`));
-      // each registry's job asks the registry first and publishes only where the version is not there
-      assertStringIncludes(w, "id: have");
-      assertStringIncludes(w, "if: \"steps.have.outputs.have != 'true'\"");
-      assertStringIncludes(w, 'npm view "$name@$version" version >/dev/null 2>&1');
-      assertStringIncludes(w, 'npm view "$name@$version" version --registry https://npm.pkg.github.com');
-      // the tag job runs after the others whether they published or skipped, from the main branch only, and makes the tag once
-      assertStringIncludes(w, "tag:");
-      assertStringIncludes(w, "needs: [build, publish-npm, publish-github]");
-      assertStringIncludes(w, "if: \"always() && needs.build.result == 'success' && github.ref_type == 'branch'\"");
-      assertStringIncludes(w, "contents: write");
-      assertStringIncludes(w, `tag="${lib}-v$version"`);
-      assertStringIncludes(w, `npm view "@intellectual-frontiers/${lib}@$version" version >/dev/null 2>&1`);
-      assertStringIncludes(w, "repos/$GITHUB_REPOSITORY/git/refs");
-      assertStringIncludes(w, "is already there");
-      assert(!/secrets\.(?!GITHUB_TOKEN)/.test(w), "a secret that is not the workflow's own token");
-    }
+    const w = readTextFileSync(join(ROOT, ".github", "workflows", "release.auto.yml"));
+    // by hand only, from main, asked to publish
+    assertStringIncludes(w, "workflow_dispatch:");
+    assert(!w.includes("\n  push:") && !w.includes("pull_request"), "a release is never made by a push");
+    assertStringIncludes(w, "publish:\n        description:");
+    assertStringIncludes(w, "refs/heads/main");
+    assertStringIncludes(w, "if: \"inputs.publish && needs.plan.outputs.has-build == 'true'\"");
+    // the order of the plan, the proof and the pack of each library, provenance and the token only where there is one
+    assertStringIncludes(w, "bun commons/libraries/src/releasing.ts matrix");
+    assertStringIncludes(w, "run: bun run verify");
+    assertStringIncludes(w, "run: bun tools/pack.ts");
+    assertStringIncludes(w, "npm publish \"$tarball\" --access public --provenance");
+    assertStringIncludes(w, "id-token: write");
+    assertStringIncludes(w, "environment:\n      name: npm");
+    assertStringIncludes(w, "NPM_TOKEN: ${{ secrets.INFRO_NPMJS_TOKEN }}");
+    assertStringIncludes(w, 'if [ -n "${NPM_TOKEN:-}" ]; then export NODE_AUTH_TOKEN="$NPM_TOKEN"; fi');
+    // a version on a registry is skipped, a tag that is there is kept, the tag is the runner's
+    assertStringIncludes(w, 'npm view "$name@$version" version >/dev/null 2>&1');
+    assertStringIncludes(w, "is already on the GitHub package registry");
+    assertStringIncludes(w, "repos/$GITHUB_REPOSITORY/git/refs");
+    assertStringIncludes(w, "is already there");
+    assertStringIncludes(w, "contents: write");
+    // no secret but the one token the owner may add, and the runner's own
+    assertEquals(
+      [...new Set([...w.matchAll(/secrets\.([A-Z_]+)/g)].map((m) => m[1]))].sort(),
+      ["GITHUB_TOKEN", "INFRO_NPMJS_TOKEN"],
+    );
+    for (const f of outputs(ROOT).files.keys())
+      assert(!/-publish\.auto\.yml$/.test(f), `${f}: a workflow of a library's own publication`);
   },
 );

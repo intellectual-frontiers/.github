@@ -3,9 +3,8 @@
  * are written once, the workflow of each library of commons is made from its manifest, and the rest are written here as values. Nothing is read from a file but the manifests, and nothing is written.
  *
  * @remarks
- * `workflows(libraries)` gives every workflow, in the order of their files' names; the library workflows come from `libraryWorkflow`, which reads the folder, the name and the `verify` command of a manifest
- * (0027-commons-libraries FR-012) and what else the library's job needs from `LIBRARY_CI`, the facts of CI that a manifest does not hold (a library without a record has the job `verify` and nothing else).
- * The workflows run on the same triggers, with the same jobs and steps and the same names as the hand-written ones they replaced, so that the names of their checks do not change.
+ * `workflows()` gives every workflow, in the order of their files' names; the libraries are proved by one workflow, `ci`, whose plan reads which libraries a change affects and runs a matrix of those (the folder, the
+ * name and the `verify` command of a manifest, 0027-commons-libraries FR-012, and what else the library needs from `LIBRARY_CI`, the facts of CI that a manifest does not hold: a library without a record has `verify` on Linux and nothing else).
  *
  * @limits
  * It does not run a workflow or read one; a library that registers needs no entry of `LIBRARY_CI` unless its CI is more than `verify`.
@@ -60,278 +59,179 @@ const lines = (...l: readonly string[]): string => `${l.join("\n")}\n`;
 const BUN_ACTION = ".github/actions/bun/**";
 const own = (file: string): string => `.github/workflows/${file}.auto.yml`;
 
-/** What a library's manifest gives its workflow (0027-commons-libraries FR-012): the folder's name, the command that proves it and the paths it reads. Another module's `Library` has more, and is accepted as it is. */
-export type LibraryFacts = {
-  readonly name: string;
-  readonly verify: string;
-  /** The paths whose change affects it, which the library's workflow runs on (0027-commons-libraries FR-022). */
-  readonly paths: readonly string[];
-  /** Where it is published (0027-commons-libraries FR-015 to FR-017): the registries, `github` and, where a decision says so, `npm`. */
-  readonly distribution: readonly string[];
-};
+/** The systems other than Linux that a library's CI may ask for: only a library with code of its own for one of them (paths, processes, sockets, scheduled jobs) names it. */
+export type OtherSystem = "windows-latest" | "macos-latest";
 
-/** What a library's CI needs that its manifest does not say. */
+/** What a library's CI needs that its manifest does not say: Linux and `verify` are for every library, and these are the rest. */
 export type LibraryCi = {
-  /** The paragraph written under the workflow's name. */
-  readonly comment: string;
-  /** The steps after `verify`, in the job `verify`. */
-  readonly afterVerify?: readonly Step[];
-  /** The command that runs the tests on Node 26, the backup runtime, in a job of its own. */
+  /** The command that runs the tests on Node 26, the backup runtime, in the same job as `verify`. */
   readonly nodeTests?: string;
-  /** The systems the library's jobs run on, in order of their importance to it; the first only (Linux) where it names none. */
-  readonly systems?: readonly ("windows-latest" | "macos-latest" | "ubuntu-latest")[];
+  /** A command that runs after `verify`, in the same job. */
+  readonly after?: string;
+  /** The systems besides Linux where `verify` and the tests on Node run too, because the library has code of its own for them. */
+  readonly systems?: readonly OtherSystem[];
 };
 
-/** The facts of CI of the libraries that have more than `verify`, by the library's name. */
+const NODE_TESTS = 'node --test "suite/**/*.test.ts"';
+const ALL_OTHER: readonly OtherSystem[] = ["windows-latest", "macos-latest"];
+const node: LibraryCi = { nodeTests: NODE_TESTS };
+
+/** The facts of CI of the libraries that have more than `verify` on Linux, by the library's name; a library with no record has `verify` on Linux only. */
 export const LIBRARY_CI: Readonly<Record<string, LibraryCi>> = {
-  data: {
-    comment: lines(
-      "IFC data, an independent library of commons (commons 0027-commons-libraries FR-010): its own `verify` (the compiler, the specification checker and the rules on its own",
-      "spec kit, and its tests) on Bun, and its tests on Node 26, the backup runtime (commons 0005-typescript-runtime). It runs when its folder changes or what it imports does:",
-      "the kernel and the runtime, the specification tools, and the Bun action.",
-    ).trimEnd(),
-    afterVerify: [
-      run("bun tools/generate-dpv.ts --check", {
-        name: "The terms of DPV, as the vocabulary's CSV makes them (a fetch, so not in verify)",
-        workingDirectory: "commons/data",
-      }),
-    ],
-    nodeTests: 'node --test "suite/**/*.test.ts"',
-  },
-  core: {
-    comment: lines(
-      "Core, the foundation of commons, the first library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the specification checker, the trace, its tests and the packing of its",
-      "package with the inspection of its declarations) on Bun and its tests on Node 26, on Windows, macOS and Linux, because the package runs on all three.",
-    ).trimEnd(),
-    nodeTests: 'node --test "suite/**/*.test.ts"',
-    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
-  },
-  rdf: {
-    comment: lines(
-      "RDF, typed RDF and its writers, a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the specification checker, the trace, its tests and the",
-      "package with the inspection of its declarations) on Bun and its tests on Node 26, on Windows, macOS and Linux, because the package runs on all three.",
-    ).trimEnd(),
-    nodeTests: 'node --test "suite/**/*.test.ts"',
-    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
-  },
-  terminal: {
-    comment: lines(
-      "Terminal, the command line and the console as pure code, a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the specification checker, the trace, its tests and the",
-      "package with the inspection of its declarations) on Bun and its tests on Node 26, on Windows, macOS and Linux, because the package runs on all three.",
-    ).trimEnd(),
-    nodeTests: 'node --test "suite/**/*.test.ts"',
-    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
-  },
-  net: {
-    comment: lines(
-      "Net, the network as one typed library (downloads, an HTTP server and clients, TCP and TLS, DNS and ACME), a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the specification checker, the trace, its tests and the",
-      "packing of its package with the inspection of its declarations) on Bun and its tests on Node 26, on Windows, macOS and Linux, because the package runs on all three.",
-    ).trimEnd(),
-    nodeTests: 'node --test "suite/**/*.test.ts"',
-    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
-  },
-  grc: {
-    comment: lines(
-      "GRC, governance, risk and compliance as code as one typed library, a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the specification checker, the trace, its tests and the",
-      "packing of its package with the inspection of its declarations) on Bun and its tests on Node 26, on Windows, macOS and Linux, because the package runs on all three.",
-    ).trimEnd(),
-    nodeTests: 'node --test "suite/**/*.test.ts"',
-    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
-  },
-  test: {
-    comment: lines(
-      "Test, tests that run unchanged under `bun test` and `node --test` and are recorded as evidence by their own code, a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the specification checker, the trace, its tests and the",
-      "packing of its package with the inspection of its declarations) on Bun and its tests on Node 26, on Windows, macOS and Linux, because the package runs on all three.",
-    ).trimEnd(),
-    nodeTests: 'node --test "suite/**/*.test.ts"',
-    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
-  },
-  lint: {
-    comment: lines(
-      "Lint, the lint plugin of Intellectual Frontiers, a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the pinned linter's canary, the compiler, the specification checker, the trace, its tests, which run",
-      "the real `bun lint`, and the packing of its package with the inspection of its declarations) on Bun and its tests on Node 26, on Windows, macOS and Linux, because the package runs on all three.",
-    ).trimEnd(),
-    nodeTests: `bun x bun@${BUN_LINT_VERSION} --version && node --test "suite/**/*.test.ts"`,
-    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
-  },
-  githost: {
-    comment: lines(
-      "Githost, the Git hosts behind one typed interface (GitHub, GitLab and plain Git) and the reading of a remote, a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the specification checker, the trace, its tests and the",
-      "packing of its package with the inspection of its declarations) on Bun and its tests on Node 26, on Windows, macOS and Linux, because the package runs on all three.",
-    ).trimEnd(),
-    nodeTests: 'node --test "suite/**/*.test.ts"',
-    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
-  },
-  ontology: {
-    comment: lines(
-      "Ontology, the ontologies of commons as typed values (Mizan, IFCCM, IFQS, IFR, the audit of packaging and the software supply chain), a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the spec checker, the trace, its tests and the packing of its package with the inspection of its declarations) on Bun and its tests on",
-      "Node 26, on Windows, macOS and Linux, because the package runs on all three.",
-    ).trimEnd(),
-    nodeTests: 'node --test "suite/**/*.test.ts"',
-    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
-  },
-  mizan: {
-    comment: lines(
-      "Mizan, the harness and the rules of the IF Spec Profile as plugins, with the change-control and release rules, the levels, the integrations and the trace, a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the spec checker, the trace, its tests and the packing of its package with the inspection of its declarations) on Bun and its tests on",
-      "Node 26, on Windows, macOS and Linux, because the package runs on all three.",
-    ).trimEnd(),
-    nodeTests: 'node --test "suite/**/*.test.ts"',
-    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
-  },
-  libraries: {
-    comment: lines(
-      "Libraries, the tools that manage the libraries of a repository of commons and hold it to Mizan (the manifest, the affected libraries, the typed workflows and their generator, the pinned Bun, the packer and the",
-      "commands of the repository), a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the specification checker, the trace, its tests and the packing of its package with",
-      "the inspection of its declarations) on Bun and its tests on Node 26, on Windows, macOS and Linux, because the package runs on all three.",
-    ).trimEnd(),
-    nodeTests: 'node --test "suite/**/*.test.ts"',
-    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
-  },
-  headless: {
-    comment: lines(
-      "Headless, the contract of a program with no window in layers (governance, logical, the command-line surface), a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the specification checker, the layers and trace checks, its tests and the",
-      "packing of its package with the inspection of its declarations) on Bun and its tests on Node 26, on Windows, macOS and Linux, because the package runs on all three.",
-    ).trimEnd(),
-    nodeTests: 'node --test "suite/**/*.test.ts"',
-    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
-  },
-  kanon: {
-    comment: lines(
-      "Kanon, the pattern of a library built in three layers (commons 0033-kanon): its own `verify` (the compiler, the specification checker, the trace check, its tests and the",
-      "packing of its package with the inspection of its declarations) on Bun and its tests on Node 26, on Windows, macOS and Linux, because the package runs on all three.",
-    ).trimEnd(),
-    nodeTests: 'node --test "suite/**/*.test.ts"',
-    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
-  },
-  telemetry: {
-    comment: lines(
-      "Telemetry, OpenTelemetry-native signals as one typed library, a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the specification checker, the trace, its tests and the",
-      "packing of its package with the inspection of its declarations) on Bun and its tests on Node 26, on Windows, macOS and Linux, because the package runs on all three.",
-    ).trimEnd(),
-    nodeTests: 'node --test "suite/**/*.test.ts"',
-    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
-  },
-  system: {
-    comment: lines(
-      "System, the host as one typed library (files, paths, processes, Git, scheduled jobs and the terminal's streams), a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the specification checker, the trace, its tests and the",
-      "package with the inspection of its declarations) on Bun and its tests on Node 26, on Windows, macOS and Linux, because the package runs on all three.",
-    ).trimEnd(),
-    nodeTests: 'node --test "suite/**/*.test.ts"',
-    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
-  },
-  formats: {
-    comment: lines(
-      "Formats, a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the specification checker, the trace, its tests and the packing of its",
-      "package with the inspection of its declarations) on Bun and its tests on Node 26, on Windows, macOS and Linux, because the package runs on all three.",
-    ).trimEnd(),
-    nodeTests: 'node --test "suite/**/*.test.ts"',
-    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
-  },
-  crypto: {
-    comment: lines(
-      "Crypto, a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the specification checker, the trace, its tests and the packing of its",
-      "package with the inspection of its declarations) on Bun and its tests on Node 26, on Windows, macOS and Linux, because the package runs on all three.",
-    ).trimEnd(),
-    nodeTests: 'node --test "suite/**/*.test.ts"',
-    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
-  },
-  quality: {
-    comment: lines(
-      "Quality, the quality system of commons (the record of a run as evidence, the quality branch, the ladder, the ledger, the Trust page and the assessor pack), a library lifted out of `commons/ts`",
-      "(commons 0032-lifting-libraries): its own `verify` on Bun and its tests, which run a real Git, on Node 26, on Linux.",
-    ).trimEnd(),
-    nodeTests: 'node --test "suite/**/*.test.ts"',
-  },
-  ergonex: {
-    comment: lines(
-      "Ergonex, the workspaces management of Intellectual Frontiers, a library of commons (commons 0027-commons-libraries FR-010): its own `verify` on Bun and its tests on Node 26, the backup runtime,",
-      "on Windows first, then macOS and Linux (ergonex 0004-onboarding): a person on any of them installs the command from npm and runs it.",
-    ).trimEnd(),
-    nodeTests: 'node --test "suite/**/*.test.ts"',
-    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
-  },
-  "integrations-github": {
-    comment: lines(
-      "Integrations GitHub, the reference connector of Integrations, a plugin library of commons (commons 0027-commons-libraries): its own `verify` (the compiler, the specification checker, the trace, its tests and the",
-      "packing of its package with the inspection of its declarations) on Bun and its tests on Node 26, on Windows, macOS and Linux, because the package runs on all three.",
-    ).trimEnd(),
-    nodeTests: 'node --test "suite/**/*.test.ts"',
-    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
-  },
-  "integrations-fhir": {
-    comment: lines(
-      "Integrations FHIR, the first standards plugin of Integrations, a plugin library of commons (commons 0027-commons-libraries): its own `verify` (the compiler, the specification checker, the trace, its tests and the",
-      "packing of its package with the inspection of its declarations) on Bun and its tests on Node 26, on Windows, macOS and Linux, because the package runs on all three.",
-    ).trimEnd(),
-    nodeTests: 'node --test "suite/**/*.test.ts"',
-    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
-  },
-  "integrations-x12": {
-    comment: lines(
-      "Integrations X12, the X12 envelope and acknowledgement skeleton of Integrations, a plugin library of commons (commons 0027-commons-libraries): its own `verify` (the compiler, the specification checker, the trace, its tests and the",
-      "packing of its package with the inspection of its declarations) on Bun and its tests on Node 26, on Windows, macOS and Linux, because the package runs on all three.",
-    ).trimEnd(),
-    nodeTests: 'node --test "suite/**/*.test.ts"',
-    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
-  },
-  integrations: {
-    comment: lines(
-      "Integrations, observation and exchange on one skeleton of Kanon layers (governance, logical, physical), a library of commons (commons 0027-commons-libraries): its own `verify` (the compiler, the specification checker, the layers and trace checks, its tests and the",
-      "packing of its package with the inspection of its declarations) on Bun and its tests on Node 26, on Windows, macOS and Linux, because the package runs on all three.",
-    ).trimEnd(),
-    nodeTests: 'node --test "suite/**/*.test.ts"',
-    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
-  },
+  data: { nodeTests: NODE_TESTS, after: "bun tools/generate-dpv.ts --check" },
+  core: node,
+  rdf: node,
+  terminal: node,
+  net: { nodeTests: NODE_TESTS, systems: ALL_OTHER },
+  grc: node,
+  test: node,
+  lint: { nodeTests: `bun x bun@${BUN_LINT_VERSION} --version && ${NODE_TESTS}` },
+  githost: node,
+  ontology: node,
+  mizan: node,
+  libraries: { nodeTests: NODE_TESTS, systems: ALL_OTHER },
+  headless: { nodeTests: NODE_TESTS, systems: ALL_OTHER },
+  kanon: node,
+  telemetry: node,
+  system: { nodeTests: NODE_TESTS, systems: ALL_OTHER },
+  formats: node,
+  crypto: node,
+  quality: node,
+  ergonex: { nodeTests: NODE_TESTS, systems: ALL_OTHER },
+  "integrations-github": node,
+  "integrations-fhir": node,
+  "integrations-x12": node,
+  integrations: node,
 };
 
-/** The workflow of a library of commons, made from its manifest (FR-006): its `verify` on Bun when its folder or what it imports changes, and its tests on Node where its record says so. */
-export function libraryWorkflow(l: LibraryFacts): Workflow {
-  const folder = `commons/${l.name}`;
+/** A cell of the matrix of a job of `ci`: a library, and where it runs where it is not on Linux. */
+export type Cell = {
+  readonly name: string;
+  readonly folder: string;
+  readonly verify: string;
+  /** The command that runs the tests on Node 26, or the empty string. */
+  readonly node: string;
+  /** The command that runs after `verify`, or the empty string. */
+  readonly after: string;
+  /** Whether the packing is checked in this cell: the library changed its `exports` (or the packer changed), or the run is of everything. A push does not pack otherwise; the release does. */
+  readonly pack: boolean;
+  /** The runner, for a cell that is not on Linux. */
+  readonly os?: OtherSystem;
+};
+
+/** The cell of a library on a system (`ubuntu-latest`, where it names none), from its manifest and its record of CI; `pack` says whether the packing is checked in it. */
+export function cellOf(l: { readonly name: string; readonly folder: string; readonly verify: string }, os?: OtherSystem, pack = false): Cell {
   const ci = LIBRARY_CI[l.name];
-  const paths = l.paths;
-  const systems = ci?.systems;
-  const onSystems =
-    systems === undefined
-      ? { runsOn: "ubuntu-latest" as const }
-      : { runsOn: expr("matrix.os"), strategy: { failFast: false, matrix: { os: systems } } };
-  const verify = job({
-    ...onSystems,
-    timeoutMinutes: 15,
-    steps: [
-      checkout(),
-      bun(),
-      tools(folder, "The development tools, from bun.lock (the kernel is linked from commons/ts)"),
-      run(l.verify, { name: "verify", workingDirectory: folder }),
-      ...(ci?.afterVerify ?? []),
-    ],
-  });
-  const node =
-    ci?.nodeTests === undefined
-      ? {}
-      : {
-          node: job({
-            ...onSystems,
-            timeoutMinutes: 15,
-            steps: [
-              checkout(),
-              bun(),
-              setupNode(),
-              tools(folder),
-              run(ci.nodeTests, { name: "The tests on Node 26", workingDirectory: folder }),
-            ],
-          }),
-        };
   return {
-    file: l.name,
     name: l.name,
-    ...(ci === undefined ? {} : { comment: ci.comment }),
-    on: { push: { paths }, pullRequest: { paths } },
-    permissions: { contents: "read" },
-    env: { NODE_VERSION },
-    concurrency: supersedable,
-    jobs: { verify, ...node },
+    folder: l.folder,
+    verify: l.verify,
+    pack,
+    node: ci?.nodeTests ?? "",
+    after: ci?.after ?? "",
+    ...(os === undefined ? {} : { os }),
   };
 }
+
+/** The paths a push or a pull request is run for by `ci`: the libraries and what they share. What a change affects within them is the plan's to say (0001-libraries FR-012), not a filter's. */
+const CI_PATHS = ["commons/**", "package.json", "bun.lock", BUN_ACTION, own("ci")];
+
+/** The steps that prove one library of a cell: install its tools, `verify`, what comes after, and its tests on Node 26. */
+const cellSteps = (): readonly [Step, ...Step[]] => [
+  checkout(),
+  bun(),
+  tools(expr("matrix.folder"), "The development tools, from bun.lock (the kernel is linked from commons/ts)"),
+  run(expr("matrix.verify"), { name: "verify (its packing is checked where the exports changed, and by the release)", workingDirectory: expr("matrix.folder"), env: { IFC_SKIP_PACK: expr("matrix.pack == false && '1' || ''") } }),
+  run(expr("matrix.after"), { name: "After verify", when: "matrix.after != ''", workingDirectory: expr("matrix.folder"), shell: "bash" }),
+  run(expr("matrix.node"), { name: "The tests on Node 26", when: "matrix.node != ''", workingDirectory: expr("matrix.folder"), shell: "bash" }),
+];
+
+/**
+ * The one workflow that proves the libraries (0001-libraries FR-012): a job `plan` asks `plan.ts` which libraries the push or the pull request affects (the code of the `affected` command, from the commit the
+ * change starts at), and a matrix of those libraries and nothing else runs `verify` and the tests on Node 26 on Linux. A library whose record says it has code of its own for Windows or macOS runs there too;
+ * the others are not run there. The job `ci` is the one result to require: it fails where a job it needs failed, and passes where nothing was affected. A push to main has a group of its own for each commit, so that no commit's
+ * run is replaced by a later one: each plan starts at the commit main was at, and a replaced run would leave what it was to prove unproved.
+ */
+const ci: Workflow = {
+  file: "ci",
+  name: "ci",
+  comment: lines(
+    "The libraries of commons (commons 0001-libraries FR-012, 0027-commons-libraries FR-019 to FR-022): one workflow for every library. The job `plan` reads what the push or pull request changed, from the commit it starts at,",
+    "and the libraries that change affects (their folders, what they import and what depends on them); `verify` and the tests on Node 26 run for those libraries on Linux, and on Windows and macOS only for the libraries whose",
+    "record of CI (`LIBRARY_CI`) names them, because they have code of their own for those systems. Nothing else is run. The job `ci` is the one result to require.",
+  ).trimEnd(),
+  on: { push: { paths: CI_PATHS }, pullRequest: { paths: CI_PATHS }, workflowDispatch: true },
+  permissions: { contents: "read" },
+  env: { NODE_VERSION },
+  concurrency: {
+    group: `${expr("github.workflow")}-${expr("github.ref == 'refs/heads/main' && github.sha || github.ref")}`,
+    cancelInProgress: expr("github.ref != 'refs/heads/main'"),
+  },
+  jobs: {
+    plan: job({
+      runsOn: "ubuntu-latest",
+      timeoutMinutes: 10,
+      outputs: {
+        "has-linux": expr("steps.plan.outputs.has-linux"),
+        linux: expr("steps.plan.outputs.linux"),
+        "has-systems": expr("steps.plan.outputs.has-systems"),
+        systems: expr("steps.plan.outputs.systems"),
+      },
+      steps: [
+        checkout({ fetchDepth: 0, comment: "the whole history: the plan compares the head with the commit the change starts at" }),
+        bun(),
+        run("bun install --frozen-lockfile", { name: "The packages the plan reads, from the root's bun.lock" }),
+        run(
+          lines(
+            "# a pull request starts at its base; a push to main at the commit main was at; any other branch at main, so a push that replaced a run that was stopped still carries what that run was to prove",
+            'if [ "$GITHUB_EVENT_NAME" = pull_request ]; then base="${{ github.event.pull_request.base.sha }}"',
+            'elif [ "$GITHUB_REF" = refs/heads/main ]; then base="${{ github.event.before }}"',
+            "else base=origin/main; fi",
+            'case "$base" in ""|0000000000000000000000000000000000000000) base=origin/main ;; esac',
+            'if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then scope=--all; else scope="--base $base"; fi',
+            'bun commons/libraries/src/plan.ts $scope --github-output "$GITHUB_OUTPUT"',
+          ),
+          { name: "The libraries this change affects, and the systems each runs on", id: "plan", shell: "bash" },
+        ),
+      ],
+    }),
+    verify: job({
+      name: "verify (${{ matrix.name }})",
+      needs: ["plan"],
+      when: "needs.plan.outputs.has-linux == 'true'",
+      runsOn: "ubuntu-latest",
+      timeoutMinutes: 20,
+      strategy: { failFast: false, matrix: expr("fromJSON(needs.plan.outputs.linux)") },
+      steps: cellSteps(),
+    }),
+    systems: job({
+      name: "verify (${{ matrix.name }}, ${{ matrix.os }})",
+      needs: ["plan"],
+      when: "needs.plan.outputs.has-systems == 'true'",
+      runsOn: expr("matrix.os"),
+      timeoutMinutes: 20,
+      strategy: { failFast: false, matrix: expr("fromJSON(needs.plan.outputs.systems)") },
+      steps: cellSteps(),
+    }),
+    ci: job({
+      comment: "The one result to require: every job it needs passed or had nothing to run.",
+      needs: ["plan", "verify", "systems"],
+      when: "always()",
+      runsOn: "ubuntu-latest",
+      timeoutMinutes: 5,
+      steps: [
+        run(
+          lines(
+            'for r in "${{ needs.plan.result }}" "${{ needs.verify.result }}" "${{ needs.systems.result }}"; do',
+            '  case "$r" in success|skipped) ;; *) echo "a job of ci ended $r"; exit 1 ;; esac',
+            "done",
+          ),
+          { name: "No job failed", shell: "bash" },
+        ),
+      ],
+    }),
+  },
+};
 
 const ifcTypescriptPaths = [
   "commons/ts/**",
@@ -638,7 +538,10 @@ const tests: Workflow = {
             name: "Independent validators of the exports (rdflib, pySHACL, jsonschema), which the Mizan test uses where they are installed",
           },
         ),
-        run("bun test ./tests/", { name: "The tests on Bun", when: "matrix.runtime == 'bun'" }),
+        run("bun test ./tests/*.test.ts", {
+          name: "The tests on Bun (tests/release/ is the release's: it packs, installs and type-checks every library)",
+          when: "matrix.runtime == 'bun'",
+        }),
         run('node --test "tests/*.test.ts"', { name: "The tests on Node 26", when: "matrix.runtime == 'node'" }),
       ],
     }),
@@ -688,177 +591,128 @@ const tests: Workflow = {
   },
 };
 
-/** Reads the name and version of the tarball in the working folder and says on the step's output whether that version is already on the registry (a re-run, or a first publish made by hand, never fails on a duplicate). */
-const HAVE = (registry: string): string =>
-  lines(
-    `pkg=$(tar -xzOf ./*.tgz package/package.json)`,
-    `name=$(printf '%s' "$pkg" | node -p "JSON.parse(require('fs').readFileSync(0,'utf8')).name")`,
-    `version=$(printf '%s' "$pkg" | node -p "JSON.parse(require('fs').readFileSync(0,'utf8')).version")`,
-    `if npm view "$name@$version" version${registry} >/dev/null 2>&1; then`,
-    '  echo "$name@$version is already there"',
-    '  echo "have=true" >> "$GITHUB_OUTPUT"',
-    "else",
-    '  echo "have=false" >> "$GITHUB_OUTPUT"',
-    "fi",
-  );
-const HAVE_NPM = HAVE("");
-const HAVE_GITHUB = HAVE(" --registry https://npm.pkg.github.com");
+/** The folder of a library's package that the release workflow packs: the cell of the matrix, `matrix.folder`. */
+const PUBLISH_SCRIPT = lines(
+  "set -euo pipefail",
+  "# each release, in dependency order (the plan's order: a library after the libraries it imports); a version that is on a registry is skipped, a tag that is there is kept, and a failure stops the run where it is,",
+  "# so that the run again continues from there",
+  "while read -r e; do",
+  '  slug=$(jq -r .slug <<<"$e"); version=$(jq -r .version <<<"$e"); tag=$(jq -r .tag <<<"$e"); publish=$(jq -r .publish <<<"$e")',
+  '  name="@intellectual-frontiers/$slug"',
+  '  if [ "$publish" = true ]; then',
+  '    tarball=$(ls "package/package-$slug/"*.tgz)',
+  '    if npm view "$name@$version" version >/dev/null 2>&1; then echo "$name@$version is already on npm"; else',
+  "      # trusted publishing (the id-token of this run) where the package has a trusted publisher; the token INFRO_NPMJS_TOKEN where the repository has one and the package has none yet",
+  '      if [ -n "${NPM_TOKEN:-}" ]; then export NODE_AUTH_TOKEN="$NPM_TOKEN"; fi',
+  '      npm publish "$tarball" --access public --provenance',
+  "      unset NODE_AUTH_TOKEN",
+  "    fi",
+  '    if npm view "$name@$version" version --registry https://npm.pkg.github.com "--//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >/dev/null 2>&1; then echo "$name@$version is already on the GitHub package registry"; else',
+  '      npm publish "$tarball" --registry https://npm.pkg.github.com "--//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN"',
+  "    fi",
+  "  fi",
+  "  # the tag is made once the publish was accepted: npm stages a first publish of a version and promotes it later, so the version is not asked for here",
+  '  if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" >/dev/null 2>&1; then echo "$tag is already there"; else',
+  '    gh api "repos/$GITHUB_REPOSITORY/git/refs" -f "ref=refs/tags/$tag" -f "sha=$GITHUB_SHA" >/dev/null',
+  '    echo "tagged $tag"',
+  "  fi",
+  'done < <(printf \'%s\' "$SEQUENCE" | jq -c \'.[]\')',
+);
 
 /**
- * The workflow that publishes a library to the registries its manifest names (0030-generated-workflows FR-009): on a tag `<name>-v<version>` it checks the tag is the version, proves the library, packs it
- * with its `tools/pack.ts` and sends the tarball to npm, with provenance and no token (npm's trusted publishing), and to the GitHub package registry with the workflow's own token.
+ * The one workflow that releases (0001-libraries FR-014, FR-015): run by hand from main, never by a push. It reads the release record that `release apply` wrote (`commons/generated/release.auto.json`: the libraries
+ * whose version is to be published and tagged, in dependency order), proves and packs each of them in a matrix, and, where the run is asked to publish, sends them in that order to npm (trusted publishing with provenance, or
+ * the token `INFRO_NPMJS_TOKEN` where the repository has one) and to the GitHub package registry, and makes the tag of each with the runner's token. A run that is not asked to publish stops after the packing.
  */
-export function publishWorkflow(l: LibraryFacts): Workflow {
-  const folder = `commons/${l.name}`;
-  const tarball = 'npm publish "$(ls ./*.tgz)"';
-  const sendNpm = l.distribution.includes("npm");
-  return {
-    file: `${l.name}-publish`,
-    name: `${l.name}-publish`,
-    comment: lines(
-      `Publishes ${l.name} (commons 0027-commons-libraries FR-015, FR-016): a tag \`${l.name}-v<version>\` (made by \`versions tag\`, commons 0026-works-versioning), or a run by hand from main, is checked against the package's version, the library is proved and packed by its own`,
-      "tools/pack.ts, and the tarball goes to the registries its manifest names: npm with provenance and no token (trusted publishing, which the owner of the npm scope sets up once for this workflow's file), and",
-      "the GitHub package registry with this workflow's own token.",
-    ).trimEnd(),
-    on: { push: { tags: [`${l.name}-v*`] }, workflowDispatch: true },
-    permissions: { contents: "read" },
-    jobs: {
-      build: job({
-        runsOn: "ubuntu-latest",
-        timeoutMinutes: 15,
-        steps: [
-          checkout(),
-          bun(),
-          setupNode(),
-          tools(folder),
-          run(
-            lines(
-              `version=$(node -p "require('./package.json').version")`,
-              `if [ "$GITHUB_REF_TYPE" = tag ]; then`,
-              `  test "$GITHUB_REF_NAME" = "${l.name}-v$version" || { echo "the tag $GITHUB_REF_NAME is not ${l.name}-v$version"; exit 1; }`,
-              `else`,
-              `  test "$GITHUB_REF" = refs/heads/main || { echo "a run by hand publishes only from main, not $GITHUB_REF"; exit 1; }`,
-              `fi`,
-            ),
-            {
-              name: "The tag, or main for a run by hand, is the version of the package",
-              workingDirectory: folder,
-              shell: "bash",
-            },
-          ),
-          run("bun run verify", { name: "verify", workingDirectory: folder }),
-          run("bun tools/pack.ts", { name: "The package that is published", workingDirectory: folder }),
-          use(PIN.uploadArtifact, {
-            name: "The tarball, kept for the jobs that publish it",
-            with: { name: `${l.name}-package`, path: `${folder}/dist/*.tgz`, "if-no-files-found": "error" },
-          }),
-        ],
-      }),
-      ...(sendNpm
-        ? {
-            "publish-npm": job({
-              needs: ["build"],
-              runsOn: "ubuntu-latest",
-              timeoutMinutes: 10,
-              permissions: { contents: "read", "id-token": "write" },
-              environment: { name: "npm" },
-              steps: [
-                use(PIN.downloadArtifact, { name: "The tarball", with: { name: `${l.name}-package`, path: "package" } }),
-                use(PIN.setupNode, { with: { "node-version": expr("env.NODE_VERSION"), "registry-url": "https://registry.npmjs.org" } }),
-                run(HAVE_NPM, {
-                  name: "Is the version already on npm (published by hand, or by an earlier run)?",
-                  id: "have",
-                  shell: "bash",
-                  workingDirectory: "package",
-                }),
-                run(tarball + " --access public --provenance", {
-                  name: "Published to npm, with provenance and no token",
-                  when: "steps.have.outputs.have != 'true'",
-                  workingDirectory: "package",
-                  shell: "bash",
-                }),
-              ],
-            }),
-          }
-        : {}),
-      "publish-github": job({
-        needs: ["build"],
-        runsOn: "ubuntu-latest",
-        timeoutMinutes: 10,
-        permissions: { contents: "read", packages: "write" },
-        steps: [
-          use(PIN.downloadArtifact, { name: "The tarball", with: { name: `${l.name}-package`, path: "package" } }),
-          use(PIN.setupNode, {
-            with: {
-              "node-version": expr("env.NODE_VERSION"),
-              "registry-url": "https://npm.pkg.github.com",
-              scope: "@intellectual-frontiers",
-            },
-          }),
-          run(HAVE_GITHUB, {
-            name: "Is the version already on the GitHub package registry?",
-            id: "have",
-            shell: "bash",
-            workingDirectory: "package",
-            env: { NODE_AUTH_TOKEN: expr("secrets.GITHUB_TOKEN") },
-          }),
-          run(tarball, {
-            name: "Published to the GitHub package registry",
-            when: "steps.have.outputs.have != 'true'",
-            workingDirectory: "package",
-            shell: "bash",
-            env: { NODE_AUTH_TOKEN: expr("secrets.GITHUB_TOKEN") },
-          }),
-        ],
-      }),
-      // a run by hand from main makes the tag that a push of one would have, where the runner's token may and a person's sandbox may not; it tags a version that is on its registry,
-      // however it got there (this workflow's jobs, or a person's first publish of a package that has no trusted publisher yet), and never fails on a tag that is there
-      tag: job({
-        needs: ["build", ...(sendNpm ? ["publish-npm"] : []), "publish-github"],
-        when: "always() && needs.build.result == 'success' && github.ref_type == 'branch'",
-        runsOn: "ubuntu-latest",
-        timeoutMinutes: 5,
-        permissions: { contents: "write" },
-        steps: [
-          checkout(),
-          use(PIN.setupNode, {
-            with: {
-              "node-version": expr("env.NODE_VERSION"),
-              ...(sendNpm ? {} : { "registry-url": "https://npm.pkg.github.com", scope: "@intellectual-frontiers" }),
-            },
-          }),
-          run(
-            lines(
-              `version=$(node -p "require('./package.json').version")`,
-              `tag="${l.name}-v$version"`,
-              sendNpm
-                ? `npm view "@intellectual-frontiers/${l.name}@$version" version >/dev/null 2>&1 || { echo "$version is not on npm: no tag"; exit 1; }`
-                : `npm view "@intellectual-frontiers/${l.name}@$version" version >/dev/null 2>&1 || { echo "$version is not on the GitHub package registry: no tag"; exit 1; }`,
-              'if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" >/dev/null 2>&1; then',
-              '  echo "$tag is already there"',
-              "else",
-              '  gh api "repos/$GITHUB_REPOSITORY/git/refs" -f "ref=refs/tags/$tag" -f "sha=$GITHUB_SHA"',
-              "fi",
-            ),
-            {
-              name: "The tag of the version that is published, made once",
-              shell: "bash",
-              workingDirectory: folder,
-              env: { GH_TOKEN: expr("secrets.GITHUB_TOKEN"), ...(sendNpm ? {} : { NODE_AUTH_TOKEN: expr("secrets.GITHUB_TOKEN") }) },
-            },
-          ),
-        ],
-      }),
+const release: Workflow = {
+  file: "release",
+  name: "release",
+  comment: lines(
+    "The release of the libraries (commons 0001-libraries FR-014, FR-015): by hand, from main, after `bun run release apply` (commons/libraries/src/releasing.ts) has written the versions and the record `commons/generated/release.auto.json` and they are pushed.",
+    "`plan` reads the record and leaves out what is tagged; `build` proves and packs each library (`verify`, `tools/pack.ts`); `publish`, where asked, sends the tarballs in dependency order to npm with provenance, by npm's trusted",
+    "publishing (the owner sets a trusted publisher once for each package on npmjs.com: this repository, this workflow's file, the environment `npm`) or, where the repository has the secret INFRO_NPMJS_TOKEN, by that token,",
+    "and to the GitHub package registry, and makes the tag of each. A version that is on a registry is skipped and a tag that is there is kept, so a run again continues where one stopped.",
+  ).trimEnd(),
+  on: {
+    workflowDispatch: {
+      inputs: { publish: { description: "Publish and tag; without it the run only plans, proves and packs", type: "boolean", default: false } },
     },
-    env: { NODE_VERSION },
-  };
-}
+  },
+  permissions: { contents: "read" },
+  env: { NODE_VERSION },
+  concurrency: { group: "release", cancelInProgress: false },
+  jobs: {
+    plan: job({
+      runsOn: "ubuntu-latest",
+      timeoutMinutes: 10,
+      outputs: {
+        "has-build": expr("steps.plan.outputs.has-build"),
+        build: expr("steps.plan.outputs.build"),
+        sequence: expr("steps.plan.outputs.sequence"),
+      },
+      steps: [
+        checkout({ fetchDepth: 0, comment: "the whole history and its tags: the plan leaves out what is tagged" }),
+        bun(),
+        run("bun install --frozen-lockfile", { name: "The packages the plan reads, from the root's bun.lock" }),
+        run(
+          lines(
+            'test "$GITHUB_REF" = refs/heads/main || { echo "a release is made from main, not $GITHUB_REF"; exit 1; }',
+            'bun commons/libraries/src/releasing.ts matrix --github-output "$GITHUB_OUTPUT"',
+          ),
+          { name: "The libraries to release, in dependency order, from the record", id: "plan", shell: "bash" },
+        ),
+      ],
+    }),
+    build: job({
+      name: "build (${{ matrix.slug }} ${{ matrix.version }})",
+      needs: ["plan"],
+      when: "needs.plan.outputs.has-build == 'true'",
+      runsOn: "ubuntu-latest",
+      timeoutMinutes: 20,
+      strategy: { failFast: true, matrix: expr("fromJSON(needs.plan.outputs.build)") },
+      steps: [
+        checkout(),
+        bun(),
+        tools(expr("matrix.folder")),
+        run("bun run verify", { name: "verify, which includes the packing", workingDirectory: expr("matrix.folder") }),
+        run("bun tools/pack.ts", { name: "The package that is published", workingDirectory: expr("matrix.folder") }),
+        use(PIN.uploadArtifact, {
+          name: "The tarball, kept for the job that publishes it",
+          with: { name: "package-${{ matrix.slug }}", path: "${{ matrix.folder }}/dist/*.tgz", "if-no-files-found": "error" },
+        }),
+      ],
+    }),
+    publish: job({
+      needs: ["plan", "build"],
+      when: "inputs.publish && needs.plan.outputs.has-build == 'true'",
+      runsOn: "ubuntu-latest",
+      timeoutMinutes: 60,
+      permissions: { contents: "write", "id-token": "write", packages: "write" },
+      environment: { name: "npm" },
+      env: { SEQUENCE: expr("needs.plan.outputs.sequence") },
+      steps: [
+        checkout(),
+        use(PIN.setupNode, { with: { "node-version": expr("env.NODE_VERSION"), "registry-url": "https://registry.npmjs.org" } }),
+        use(PIN.downloadArtifact, { name: "The tarballs", with: { pattern: "package-*", path: "package" } }),
+        run(PUBLISH_SCRIPT, {
+          name: "Published in dependency order to npm and to the GitHub package registry, and tagged",
+          shell: "bash",
+          env: {
+            NPM_TOKEN: expr("secrets.INFRO_NPMJS_TOKEN"),
+            GITHUB_TOKEN: expr("secrets.GITHUB_TOKEN"),
+            GH_TOKEN: expr("secrets.GITHUB_TOKEN"),
+          },
+        }),
+      ],
+    }),
+  },
+};
 
 /** Every workflow, the libraries'' made from their manifests, in the order of their files' names. */
-export function workflows(libraries: readonly LibraryFacts[]): readonly Workflow[] {
+export function workflows(): readonly Workflow[] {
   return [
-    ...libraries.map(libraryWorkflow),
-    ...libraries.filter((l) => l.distribution.includes("npm")).map(publishWorkflow),
+    ci,
+    release,
     docs,
     ifcTypescript,
     tests,

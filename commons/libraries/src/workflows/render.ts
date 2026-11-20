@@ -126,10 +126,12 @@ function jobLines(id: string, j: Job): string[] {
     if (j.environment.url !== undefined) out.push(...entry("url", j.environment.url, 6));
   }
   out.push(...mapping("env", j.env, 4));
+  out.push(...mapping("outputs", j.outputs, 4));
   if (j.strategy !== undefined) {
     out.push("    strategy:");
     if (j.strategy.failFast !== undefined) out.push(...entry("fail-fast", j.strategy.failFast, 6));
-    out.push("      matrix:", ...Object.entries(j.strategy.matrix).flatMap(([k, v]) => flowList(k, v, 8)));
+    const m = j.strategy.matrix;
+    out.push(...(typeof m === "string" ? entry("matrix", m, 6) : ["      matrix:", ...Object.entries(m).flatMap(([k, v]) => flowList(k, v, 8))]));
   }
   out.push("    steps:", ...j.steps.flatMap((s) => step(s, 6)));
   return out;
@@ -141,7 +143,13 @@ export function renderWorkflow(w: Workflow): string {
   if (w.comment !== undefined) out.push(...comment(w.comment, 0));
   out.push("on:");
   out.push(...filter("push", w.on.push, 2), ...filter("pull_request", w.on.pullRequest, 2));
-  if (w.on.workflowDispatch === true) out.push("  workflow_dispatch:");
+  const dispatch = w.on.workflowDispatch;
+  if (dispatch === true) out.push("  workflow_dispatch:");
+  else if (dispatch !== undefined) {
+    out.push("  workflow_dispatch:", "    inputs:");
+    for (const [k, v] of Object.entries(dispatch.inputs))
+      out.push(`      ${key(k)}:`, ...entry("description", v.description, 8), ...entry("type", v.type, 8), ...entry("default", v.default, 8));
+  }
   if (w.on.workflowCall === true) out.push("  workflow_call:");
   out.push("");
   if (w.permissions !== undefined) out.push(...permissions(w.permissions, 0), "");

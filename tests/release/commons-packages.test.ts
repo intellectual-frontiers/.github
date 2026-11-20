@@ -5,13 +5,13 @@
  *
  * @module
  */
-import { fs, path, proc } from "../commons/system/src/mod.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "../commons/test/src/test.ts";
-import { inspectPackage } from "../commons/libraries/src/pack-library.ts";
-import { readLibraries } from "../commons/libraries/src/libraries.ts";
-import { linter } from "../commons/lint/src/test-rule.ts";
+import { fs, path, proc } from "../../commons/system/src/mod.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "../../commons/test/src/test.ts";
+import { inspectPackage } from "../../commons/libraries/src/pack-library.ts";
+import { readLibraries } from "../../commons/libraries/src/libraries.ts";
+import { linter } from "../../commons/lint/src/test-rule.ts";
 
-const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
+const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..", "..");
 const TSC = path.join(ROOT, "commons", "ts", "node_modules", "typescript", "bin", "tsc");
 
 type Json = Readonly<Record<string, unknown>>;

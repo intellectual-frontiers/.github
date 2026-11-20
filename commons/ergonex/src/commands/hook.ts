@@ -11,7 +11,7 @@
  *
  * @module
  */
-import { absurd, err, ok } from "@intellectual-frontiers/core";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import { run } from "../platform/r-proc.ts";
 import { readTextFile } from "../platform/r-fs.ts";
 import { parseMessage } from "@intellectual-frontiers/mizan/changes/commit-message";
@@ -27,7 +27,7 @@ import { loadFailureOutcome, loadWorkspace } from "../host/workspace.ts";
 /** What a hook calls on, which other modules of the workspace may replace. */
 export type Checkers = {
   /** Reads the staged changes of the repository in the working folder and returns what it found. */
-  stagedScan: ((cwd: string) => Promise<readonly StagedHit[]>) | undefined;
+  stagedScan: ((cwd: string) => Promise<Result<readonly StagedHit[], string>>) | undefined;
 };
 
 /** The checkers a hook calls: the plaintext-token scan of the staged changes (`host/staged.ts`, which uses `scan/secrets.ts`). */
@@ -125,16 +125,10 @@ async function preCommit(ctx: Context): Promise<Outcome> {
       noEvidence: true,
       message: "no plaintext-token scanner is wired into this build of ergonex (the policy scans are src/scan/)",
     });
-  let hits: readonly StagedHit[];
-  try {
-    hits = await scan(ctx.cwd);
-  } catch (e) {
-    return err({
-      kind: "environment",
-      noEvidence: true,
-      message: `the staged changes could not be read: ${e instanceof Error ? e.message : String(e)}`,
-    });
-  }
+  const scanned = await scan(ctx.cwd);
+  if (scanned.kind === "err")
+    return err({ kind: "environment", noEvidence: true, message: `the staged changes could not be read: ${scanned.error}` });
+  const hits = scanned.value;
   const findings: Finding[] = hits.map((h) => ({
     ruleId: h.rule,
     severity: "Error",

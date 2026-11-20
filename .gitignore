@@ -4,3 +4,5 @@ commons/build/
 _site/
 # what `bun install` at the root writes; the root package.json is what a repository depends on (commons 0005-typescript-runtime FR-029)
 /node_modules/
+# the libraries of commons linked by name for development (bun run dev:check makes them; commons 0001-libraries FR-011)
+/commons/node_modules/
