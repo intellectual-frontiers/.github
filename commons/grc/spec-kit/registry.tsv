@@ -1,2 +1,9 @@
 number	slug	state
-0001	grc-engineering	in force
+0001	grc-layers	in force
+0002	grc-governance	in force
+0003	grc-logical	in force
+0004	grc-documents	in force
+0005	grc-runners	in force
+0006	grc-evidence	in force
+0007	grc-surface	in force
+0008	grc-catalogs	in force
