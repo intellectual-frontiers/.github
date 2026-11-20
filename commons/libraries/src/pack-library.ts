@@ -24,6 +24,8 @@
  */
 import { chmod, readTextFile, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { existsSync, mkdirSync, readDirSync, readTextFileSync, removeSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { decodeLibrarySource, type Library, LIBRARY_FILE } from "./libraries.ts";
+import { COMMAND as LICENSE_COMMAND, licenseOf } from "./license.ts";
 import { basename, dirname, join, relative, resolve, toPosix } from "@intellectual-frontiers/system/path";
 import { env, run, which } from "@intellectual-frontiers/system/proc";
 
@@ -309,6 +311,14 @@ export type PackOptions = {
   };
 };
 
+/** The manifest of the library at `root`, where it has one that can be read. */
+function manifestOf(root: string): Library | undefined {
+  const file = join(root, LIBRARY_FILE);
+  if (!existsSync(file)) return undefined;
+  const r = decodeLibrarySource(readTextFileSync(file));
+  return r.kind === "ok" ? r.value : undefined;
+}
+
 /** Builds and stages the package of the library at `root` (a folder `commons/<name>/` with a `package.json` and sources in `src/`), inspects it and, where nothing is wrong, packs it. */
 export async function packLibrary(root: string, options: PackOptions = {}): Promise<Packed> {
   const own = JSON.parse(readTextFileSync(join(root, "package.json"))) as Json;
@@ -463,7 +473,7 @@ export async function packLibrary(root: string, options: PackOptions = {}): Prom
     name,
     version: text(own["version"]),
     description: text(own["description"]),
-    license: "MIT",
+    license: licenseOf(manifestOf(root)),
     type: "module",
     engines: { node: ">=26" },
     sideEffects: false,
@@ -505,7 +515,8 @@ export async function packLibrary(root: string, options: PackOptions = {}): Prom
         "",
       ].join("\n"),
   );
-  copyFileSync(existsSync(join(root, "LICENSE")) ? join(root, "LICENSE") : join(commons, "ergonex", "LICENSE"), join(stage, "LICENSE"));
+  if (existsSync(join(root, "LICENSE"))) copyFileSync(join(root, "LICENSE"), join(stage, "LICENSE"));
+  else findings.push(`commons/${short} has no LICENSE; run: ${LICENSE_COMMAND}`);
   findings.push(...inspectPackage(stage));
   if (findings.length > 0) return { stage, tarball: undefined, findings, manifest };
   const packed = await run([bun, "pm", "pack", "--destination", dist], { cwd: stage });

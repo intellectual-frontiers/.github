@@ -326,11 +326,11 @@ const ifcTypescript: Workflow = {
         tools("commons/telemetry"),
         run(
           lines(
-            "v=$(sed -n 's/^OTELCOL_CONTRIB_VERSION=//p' commons/generated/pins.auto.env)",
+            "url=$(sed -n 's/^OTELCOL_CONTRIB_URL_X86_64=//p' commons/generated/pins.auto.env)",
             "sum=$(sed -n 's/^OTELCOL_CONTRIB_SHA256_X86_64=//p' commons/generated/pins.auto.env)",
             'dir="$RUNNER_TEMP/otelcol"',
             'mkdir -p "$dir"',
-            'curl -fsSL -o "$dir/otelcol.tar.gz" "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v$v/otelcol-contrib_${v}_linux_amd64.tar.gz"',
+            'curl -fsSL -o "$dir/otelcol.tar.gz" "$url"',
             'echo "$sum  $dir/otelcol.tar.gz" | sha256sum -c -',
             'tar -xzf "$dir/otelcol.tar.gz" -C "$dir" otelcol-contrib',
             'echo "IFC_OTELCOL=$dir/otelcol-contrib" >>"$GITHUB_ENV"',

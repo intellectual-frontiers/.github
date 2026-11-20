@@ -3,7 +3,7 @@
  * acts on it and how far it has been tried.
  *
  * Seeded from the tables of sigoden/upt (https://github.com/sigoden/upt), dual-licensed MIT or Apache-2.0, copyright its authors; see tests/fixtures/upt/README.md.
- * What archon (a harness) runs, and what it knows about privileges and package names, is added to it. A command with pm:origin "memory", and every needsAdministrator value,
+ * What the engine that `commons/archon` (0034-archon) replaced ran, and what it knew about privileges and package names, is added to it. A command with pm:origin "memory", and every needsAdministrator value,
  * is written from knowledge and unverified: nothing acts on it until its family is supported and the command carries pm:verifiedOn.
  * `oubes`, which upt lists with the Red Hat family, is not an os-release ID this repository recognises and is left out.
  *
@@ -107,7 +107,7 @@ export const familyRedhat = Family.make(term(PMID, "family-redhat"), {
   preferredManager: managerDnf,
   supportStatus: supportStatuses.Catalogued,
   assurance: assurances.NoAssurance,
-  note: "archon's runtime can use dnf to install the libraries a program links against, untested; no script acts on this family.",
+  note: "the engine that archon replaced could use dnf to install the libraries a program links against, untested; no script acts on this family.",
 });
 
 /** The family `family-arch`. */
@@ -136,7 +136,7 @@ export const familyAlpine = Family.make(term(PMID, "family-alpine"), {
   preferredManager: managerApk,
   supportStatus: supportStatuses.Catalogued,
   assurance: assurances.NoAssurance,
-  note: "archon's runtime can use apk to install the libraries a program links against, untested; no script acts on this family.",
+  note: "the engine that archon replaced could use apk to install the libraries a program links against, untested; no script acts on this family.",
 });
 
 /** The family `family-suse`. */

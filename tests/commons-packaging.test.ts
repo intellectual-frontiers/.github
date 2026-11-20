@@ -28,6 +28,7 @@ import { words } from "../commons/tools/shlex.ts";
 import { pyJson } from "../commons/tools/emit.ts";
 import { digestOf } from "../commons/tools/generate-packaging.ts";
 import { OPS } from "../commons/tools/ontology.ts";
+import { describeDownloadError, downloadOf, parsePinId, parsePlatformName } from "../commons/ontology/src/supply-chain/downloads.ts";
 import { files, operations } from "../commons/ontology/src/supply-chain/packaging/mod.ts";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
@@ -267,6 +268,17 @@ const env = (): Map<string, string> =>
       }),
   );
 
+type ModPlatform =
+  | {
+      readonly state: "pinned";
+      readonly sha256: string;
+      readonly downloadUrl: string;
+      readonly archiveFormat: string;
+      readonly binPath: string;
+    }
+  | { readonly state: "unpinned"; readonly sha256: string; readonly reason: string };
+const modPins: Readonly<Record<string, { readonly version: string; readonly platforms: Readonly<Record<string, ModPlatform>> }>> = mod.pins;
+
 proves(["0002-packaging FR-014", "0002-packaging FR-015"], "Pins: the env file, the TOML and the module agree", () => {
   const t = table();
   const e = env();
@@ -274,23 +286,132 @@ proves(["0002-packaging FR-014", "0002-packaging FR-015"], "Pins: the env file, 
   const platforms = doc(t.platforms);
   assert(pins.length > 0 && Object.keys(platforms).length > 0);
   assert(pins.some(([k]) => k === "bun"));
-  const modPins: Readonly<Record<string, { readonly version: string; readonly sha256: Readonly<Record<string, string>> }>> = mod.pins;
   for (const [name, pin] of pins) {
     assertEquals(e.get(`${text(pin.key)}_VERSION`), pin.version, name);
     assertEquals(modPins[name]?.version, pin.version, name);
-    assertEquals(modPins[name]?.sha256, pin.sha256 ?? {}, name);
-    for (const [plat, digest] of Object.entries(doc(pin.sha256 ?? {}))) {
-      const v = `${text(pin.key)}_SHA256_${text(doc(platforms[plat]).pin_suffix)}`;
-      assertEquals(e.get(v), digest, v);
-      assertMatch(text(digest), /^[0-9a-f]{64}$/);
+    assertEquals(Object.keys(modPins[name]?.platforms ?? {}).sort(), Object.keys(doc(pin.platforms ?? {})).sort(), name);
+    for (const [plat, entry] of entries(pin.platforms ?? {}, `${name}.platforms`)) {
+      const suffix = text(doc(platforms[plat]).pin_suffix);
+      const v = `${text(pin.key)}_SHA256_${suffix}`;
+      assertEquals(e.get(v), entry.sha256, v);
+      assertMatch(text(entry.sha256), /^[0-9a-f]{64}$/);
+      assertEquals(modPins[name]?.platforms[plat]?.sha256, entry.sha256, `${name} ${plat}`);
+      assertEquals(modPins[name]?.platforms[plat]?.state, entry.state, `${name} ${plat}`);
     }
   }
   assertEquals(
-    Object.keys(doc(doc(doc(t.pins).bun).sha256)).sort(),
+    Object.keys(doc(doc(doc(t.pins).bun).platforms)).sort(),
     Object.keys(platforms).sort(),
     "Bun is pinned on every platform, Windows too",
   );
 });
+
+proves(
+  ["0002-packaging FR-017", "0002-packaging FR-019"],
+  "Pins: a pinned platform has an https address, a format and a folder, an unpinned one says why, and the env file, the TOML and the module state each",
+  () => {
+    const t = table();
+    const e = env();
+    const platforms = doc(t.platforms);
+    let pinned = 0;
+    let unpinned = 0;
+    for (const [name, pin] of entries(t.pins)) {
+      for (const [plat, entry] of entries(pin.platforms ?? {}, `${name}.platforms`)) {
+        const suffix = text(doc(platforms[plat]).pin_suffix);
+        const key = text(pin.key);
+        const at = `${name} ${plat}`;
+        const m = modPins[name]?.platforms[plat];
+        if (entry.state === "pinned") {
+          pinned++;
+          const url = text(entry.download_url);
+          assertMatch(url, /^https:\/\/[^@/]+\//, at);
+          assert(!url.includes("{version}"), `${at}: the version is already in the address`);
+          assertMatch(text(entry.archive_format), /^(zip|tar|file)$/, at);
+          assertNotMatch(text(entry.bin_path), /^\/|\\|(^|\/)\.\.(\/|$)/, at);
+          assertEquals(e.get(`${key}_URL_${suffix}`), url, at);
+          assertEquals(e.get(`${key}_FORMAT_${suffix}`), entry.archive_format, at);
+          assertEquals(e.get(`${key}_BINPATH_${suffix}`), entry.bin_path, at);
+          assertEquals(
+            m,
+            {
+              state: "pinned",
+              sha256: text(entry.sha256),
+              downloadUrl: url,
+              archiveFormat: text(entry.archive_format),
+              binPath: text(entry.bin_path),
+            },
+            at,
+          );
+        } else {
+          unpinned++;
+          assertEquals(entry.state, "unpinned", at);
+          assert(text(entry.unpinned_reason).length > 20, `${at} says why`);
+          assertEquals(e.has(`${key}_URL_${suffix}`), false, at);
+          assertEquals(m, { state: "unpinned", sha256: text(entry.sha256), reason: text(entry.unpinned_reason) }, at);
+        }
+      }
+    }
+    assert(pinned >= 9 && unpinned >= 12, `${pinned} pinned, ${unpinned} unpinned`);
+    const bun = doc(doc(doc(t.pins).bun).platforms);
+    for (const [plat, entry] of entries(bun)) {
+      assertEquals(entry.state, "pinned", `Bun on ${plat}`);
+      assertMatch(
+        text(entry.download_url),
+        /^https:\/\/github\.com\/oven-sh\/bun\/releases\/download\/bun-v\d+\.\d+\.\d+\/bun-[a-z0-9-]+\.zip$/,
+      );
+      assertEquals(entry.bin_path, text(entry.download_url).replace(/^.*\/(bun-[a-z0-9-]+)\.zip$/, "$1"));
+    }
+  },
+);
+
+proves(
+  ["0002-packaging FR-020"],
+  "Pins: downloadOf gives the version, address, SHA-256, format and folder of a pin on a platform, or why it is unpinned",
+  () => {
+    const pin = (name: string) => {
+      const r = parsePinId(name);
+      assert(r.kind === "ok", name);
+      return r.value;
+    };
+    const platform = (name: string) => {
+      const r = parsePlatformName(name);
+      assert(r.kind === "ok", name);
+      return r.value;
+    };
+    const bun = downloadOf(pin("bun"), platform("linux-x64"));
+    assert(bun.kind === "ok");
+    const t = table();
+    assertEquals(bun.value, {
+      version: text(doc(doc(t.pins).bun).version),
+      downloadUrl: `https://github.com/oven-sh/bun/releases/download/bun-v${text(doc(doc(t.pins).bun).version)}/bun-linux-x64.zip`,
+      sha256: text(doc(doc(doc(doc(t.pins).bun).platforms)["linux-x64"]).sha256),
+      archiveFormat: "zip",
+      binPath: "bun-linux-x64",
+    });
+    const rustup = downloadOf(pin("rustup-init"), platform("macos-arm64"));
+    assert(rustup.kind === "ok");
+    assertEquals([rustup.value.archiveFormat, rustup.value.binPath], ["file", ""]);
+    const otel = downloadOf(pin("otelcol-contrib"), platform("linux-x64"));
+    assert(otel.kind === "ok");
+    assertEquals([otel.value.archiveFormat, otel.value.binPath], ["tar", ""]);
+    // every pinned platform of the TOML is a download, and every unpinned one is the reason
+    for (const [name, p] of entries(t.pins))
+      for (const [plat, entry] of entries(p.platforms ?? {})) {
+        const d = downloadOf(pin(name), platform(plat));
+        if (entry.state === "pinned") assert(d.kind === "ok" && d.value.downloadUrl === entry.download_url, `${name} ${plat}`);
+        else assert(d.kind === "err" && d.error.kind === "unpinned" && d.error.reason === entry.unpinned_reason, `${name} ${plat}`);
+      }
+    const mise = downloadOf(pin("mise"), platform("linux-x64"));
+    assert(mise.kind === "err");
+    assertStringIncludes(describeDownloadError(mise.error), "mise is unpinned on linux-x64: ");
+    const python = downloadOf(pin("python"), platform("linux-x64"));
+    assert(python.kind === "err" && python.error.kind === "not-pinned");
+    const bunWindows = downloadOf(pin("bun"), platform("windows-x64"));
+    assert(bunWindows.kind === "ok");
+    assertEquals(parsePinId("nothing").kind, "err");
+    assertEquals(parsePlatformName("plan9-x64").kind, "err");
+  },
+);
 
 proves(["0002-packaging FR-014"], "Pins: every platform names an operating system and a processor", () => {
   for (const [name, pl] of entries(table().platforms)) {
@@ -375,6 +496,57 @@ proves(["0002-packaging FR-016"], "Record: the fields are in order, with a type,
     fields.map((f) => ({ name: f.name, type: f.type, values: f.values ?? [] })),
   );
 });
+
+// ---- Managers: mise, and the commands that say a version (0002-packaging FR-021, FR-022) ----------------------------------------------------------------------
+
+proves(["0002-packaging FR-021"], "Managers: mise is a tool manager with three unverified commands of origin memory", () => {
+  const mise = doc(doc(table().managers).mise);
+  assertEquals(mise.kind, "tool");
+  assertEquals(mise.executable, "mise");
+  const commands = doc(mise.commands);
+  assertEquals(Object.keys(commands).sort(), ["install", "list-installed", "query-version"]);
+  assertEquals(texts(doc(commands.install).argv), ["mise", "install", "{packages}"]);
+  assertEquals(texts(doc(commands["query-version"]).argv), ["mise", "current", "{package}"]);
+  assertEquals(texts(doc(commands["list-installed"]).argv), ["mise", "ls"]);
+  for (const [op, c] of entries(commands)) {
+    assertEquals(c.origin, "memory", op);
+    assert(!("verified" in c), `${op} is unverified`);
+  }
+  for (const [fid, f] of entries(table().families)) assert(!texts(f.managers).includes("mise"), `${fid} does not use mise`);
+});
+
+proves(
+  ["0002-packaging FR-022"],
+  "Managers: apt, pacman, dnf, brew and winget each have a query-version command, those written from memory unverified",
+  () => {
+    const managers = doc(table().managers);
+    for (const m of ["apt", "pacman", "dnf", "brew", "winget"])
+      assert("query-version" in doc(doc(managers[m]).commands), `${m} says a version`);
+    const brew = doc(doc(doc(managers.brew).commands)["query-version"]);
+    const winget = doc(doc(doc(managers.winget).commands)["query-version"]);
+    assertEquals(texts(brew.argv), ["brew", "list", "--versions", "{package}"]);
+    assertEquals(texts(winget.argv), ["winget", "list", "--exact", "--id", "{package}"]);
+    for (const c of [brew, winget]) assertEquals([c.origin, "verified" in c], ["memory", false]);
+  },
+);
+
+// ---- Names: archon is the library of commons (0002-packaging FR-023) ---------------------------------------------------------------------------------------------
+
+proves(
+  ["0002-packaging FR-023"],
+  "Names: the ontology and its generated files say archon only of commons/archon and of the origin archon",
+  () => {
+    const sources = [...files.map((f) => `${ONTOLOGY}/${f.name}.ts`), "ontology/src/supply-chain/downloads.ts"].map((rel) =>
+      fs.readTextFileSync(`${COMMONS}/${rel}`),
+    );
+    for (const f of ["packaging.auto.ttl", "packaging.auto.toml", "packaging.auto.sh", "packaging.auto.ts", "pins.auto.env"])
+      sources.push(fs.readTextFileSync(`${COMMONS}/generated/${f}`));
+    for (const text of sources) {
+      assertNotMatch(text, /archon \(a harness\)|archon's runtime|archon runs|archon starts|archon installs|program archon|Python archon/);
+    }
+    assertStringIncludes(fs.readTextFileSync(`${COMMONS}/${ONTOLOGY}/managers.ts`), "`commons/archon` (0034-archon)");
+  },
+);
 
 // ---- the generator, run on copies of commons ---------------------------------------------------------------------------------------------------------------------
 
@@ -512,6 +684,50 @@ proves(
       "needs a pinned download, a platform and a SHA-256",
     );
     await refused((c) => c.edit("pins.ts", 'pinSuffix: "MACOS_X64"', 'pinSuffix: "X86_64"'), "two platforms share the pin suffix X86_64");
+  },
+);
+
+proves(
+  ["0002-packaging FR-018"],
+  "Generator: an address that is not https, holds a user name or is no address, a format that is none of three, a folder that leaves its root, a half-stated checksum and a checksum twice are refused",
+  async () => {
+    const bunUrl = 'downloadUrl: "https://github.com/oven-sh/bun/releases/download/bun-v{version}/bun-linux-x64.zip"';
+    const at = "of bun on linux-x64";
+    await refused(
+      (c) => c.edit("pins.ts", bunUrl, 'downloadUrl: "http://github.com/oven-sh/bun/releases/download/bun-v{version}/bun-linux-x64.zip"'),
+      `the address ${at} is not https`,
+    );
+    await refused(
+      (c) =>
+        c.edit(
+          "pins.ts",
+          bunUrl,
+          'downloadUrl: "https://who:secret@github.com/oven-sh/bun/releases/download/bun-v{version}/bun-linux-x64.zip"',
+        ),
+      `the address ${at} holds a user name or a password`,
+    );
+    await refused((c) => c.edit("pins.ts", bunUrl, 'downloadUrl: "not an address"'), `the address ${at} is not an address`);
+    await refused(
+      (c) =>
+        c.edit("pins.ts", 'archiveFormat: "zip",\n    binPath: "bun-linux-x64"', 'archiveFormat: "rar",\n    binPath: "bun-linux-x64"'),
+      `the format ${at} is "rar"`,
+    );
+    for (const path of ["../bun", "/usr/bin", "a\\\\b", "x/../y"])
+      await refused((c) => c.edit("pins.ts", 'binPath: "bun-linux-x64"', `binPath: "${path}"`), `the folder of the programs ${at}`);
+    await refused(
+      (c) => c.edit("pins.ts", 'archiveFormat: "zip",\n    binPath: "bun-linux-x64",', 'binPath: "bun-linux-x64",'),
+      "the checksum of bun on linux-x64 has some of an address, a format and a folder but not all three",
+    );
+    await refused(
+      (c) => c.edit("pins.ts", 'binPath: "bun-linux-x64",', 'binPath: "bun-linux-x64",\n    unpinnedReason: en("it is not known"),'),
+      "has an address and an unpinned reason",
+    );
+    await refused((c) => c.edit("pins.ts", /unpinnedReason: en\(\n\s+"[^"]*",\n\s+\),\n/, ""), "has no address and no unpinned reason");
+    await refused(
+      (c) =>
+        c.edit("pins.ts", "forPin: pinBun,\n    forPlatform: platformLinuxArm64", "forPin: pinBun,\n    forPlatform: platformLinuxX64"),
+      "bun has two checksums for linux-x64",
+    );
   },
 );
 
@@ -799,7 +1015,8 @@ proves(["0012-ontology FR-009"], "Ontology: no IRI is written as free text, and 
   for (const m of walk(`${COMMONS}/${ONTOLOGY}`)) {
     for (const [n, line] of fs.readTextFileSync(`${COMMONS}/${ONTOLOGY}/${m}`).split("\n").entries()) {
       if (line.trimStart().startsWith("*") || line.trimStart().startsWith("//")) continue;
-      if (/"[a-z][a-z0-9+.-]*:\/\//.test(line))
+      // the address of a download (0002-packaging FR-017) is a value that a term holds, not an IRI of the ontology
+      if (/"[a-z][a-z0-9+.-]*:\/\//.test(line) && !/^\s*downloadUrl: "https:\/\/[^"\s]+",$/.test(line))
         assert(/= namespace\("[a-z]+", "[^"]+"\);$/.test(line), `${m}:${n + 1}: an IRI outside a namespace: ${line.trim()}`);
     }
   }

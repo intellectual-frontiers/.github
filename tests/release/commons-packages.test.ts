@@ -85,6 +85,11 @@ proves(
         assertEquals(manifestText.code, 0, manifestText.out);
         const manifest = obj(JSON.parse(manifestText.out));
         const name = String(manifest["name"]);
+        // the license of a package is the one identifier of the repository, and its tarball holds the LICENSE (0035-licensing FR-012)
+        assertEquals(manifest["license"], "PolyForm-Noncommercial-1.0.0", `${name}: license`);
+        const licenseFile = await sh(["tar", "-xzOf", tarball, "package/LICENSE"], lib.dir);
+        assertEquals(licenseFile.code, 0, licenseFile.out);
+        assertStringIncludes(licenseFile.out, "PolyForm Noncommercial License 1.0.0");
         const into = path.join(project, "node_modules", ...name.split("/"));
         await fs.mkdir(into, { recursive: true });
         const unpacked = await sh(["tar", "-xzf", tarball, "-C", into, "--strip-components=1"], lib.dir);

@@ -40,7 +40,7 @@ The practices below are what this capability supports; none is a claim of compli
 
 ## Out of scope
 
-- Declaring a harness's own pinned programs: each harness keeps its own (archon's `toolchain/`).
+- Declaring a harness's own pinned programs: each harness declares its own tools (`commons/toolchain`), which read the pins of 0002-packaging for the addresses and hashes.
 - Scanning for vulnerabilities, signing and attestation.
 - Judging whether a harness complies with any regulation.
 

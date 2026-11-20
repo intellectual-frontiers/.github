@@ -87,8 +87,14 @@ export function toml(t: Table, digest: string): string {
   }
   for (const [name, pn] of byKey(t.pins)) {
     out.push(`[pins.${s(name)}]`, `key = ${s(pn.key)}`, `version = ${s(pn.version)}`, `label = ${s(pn.label)}`);
-    for (const [pf, h] of byKey(pn.sha256)) out.push(`sha256.${s(pf)} = ${s(h)}`);
     out.push("");
+    for (const [pf, e] of byKey(pn.platforms)) {
+      out.push(`[pins.${s(name)}.platforms.${s(pf)}]`, `state = ${s(e.state)}`, `sha256 = ${s(e.sha256)}`);
+      if (e.state === "pinned")
+        out.push(`download_url = ${s(e.downloadUrl)}`, `archive_format = ${s(e.archiveFormat)}`, `bin_path = ${s(e.binPath)}`);
+      else out.push(`unpinned_reason = ${s(e.reason)}`);
+      out.push("");
+    }
   }
   for (const p of t.prohibitions)
     out.push("[[prohibitions]]", `manager = ${s(p.manager)}`, `argv = ${arr(p.argv)}`, `reason = ${s(p.reason)}`, "");
@@ -301,7 +307,10 @@ export function shell(t: Table, digest: string): string {
 
 // ---- the pins --------------------------------------------------------------------------------------------------------------------------------------
 
-/** `KEY_VERSION=…` and `KEY_SHA256_<SUFFIX>=…` for each pin named, the checksums in the order of their platforms' suffixes. */
+/**
+ * `KEY_VERSION=…` and, for each platform of each pin named in the order of the platforms' suffixes, `KEY_SHA256_<SUFFIX>=…` and, where the platform is pinned,
+ * `KEY_URL_<SUFFIX>=…`, `KEY_FORMAT_<SUFFIX>=…` and `KEY_BINPATH_<SUFFIX>=…` (commons 0002-packaging FR-019).
+ */
 function pinLines(t: Table, names: readonly PinName[]): string[] {
   const out: string[] = [];
   for (const name of names) {
@@ -309,8 +318,15 @@ function pinLines(t: Table, names: readonly PinName[]): string[] {
     if (pn === undefined) continue;
     out.push(`${pn.key}_VERSION=${pn.version}`);
     const suffix = (pf: PlatformName): string => t.platforms.get(pf)?.suffix ?? "";
-    for (const [pf, h] of sortedBy(pn.sha256, ([a], [b]) => compareText(suffix(a), suffix(b))))
-      out.push(`${pn.key}_SHA256_${suffix(pf)}=${h}`);
+    for (const [pf, e] of sortedBy(pn.platforms, ([a], [b]) => compareText(suffix(a), suffix(b)))) {
+      out.push(`${pn.key}_SHA256_${suffix(pf)}=${e.sha256}`);
+      if (e.state === "pinned")
+        out.push(
+          `${pn.key}_URL_${suffix(pf)}=${e.downloadUrl}`,
+          `${pn.key}_FORMAT_${suffix(pf)}=${e.archiveFormat}`,
+          `${pn.key}_BINPATH_${suffix(pf)}=${e.binPath}`,
+        );
+    }
   }
   return out;
 }
@@ -436,7 +452,30 @@ export function typescript(t: Table, digest: string): string {
           ["key", str(pn.key)],
           ["version", str(pn.version)],
           ["label", str(pn.label)],
-          ["sha256", obj(byKey(pn.sha256).map(([pf, h]) => [pf, str(h)] as const))],
+          [
+            "platforms",
+            obj(
+              byKey(pn.platforms).map(
+                ([pf, e]) =>
+                  [
+                    pf,
+                    e.state === "pinned"
+                      ? obj([
+                          ["state", str(e.state)],
+                          ["sha256", str(e.sha256)],
+                          ["downloadUrl", str(e.downloadUrl)],
+                          ["archiveFormat", str(e.archiveFormat)],
+                          ["binPath", str(e.binPath)],
+                        ])
+                      : obj([
+                          ["state", str(e.state)],
+                          ["sha256", str(e.sha256)],
+                          ["reason", str(e.reason)],
+                        ]),
+                  ] as const,
+              ),
+            ),
+          ],
         ]),
       ] as const,
   );
@@ -464,7 +503,7 @@ export function typescript(t: Table, digest: string): string {
     "/** The platforms a harness runs on (commons 0002-packaging FR-014). */",
     `export const platforms = ${pyJson(obj(platforms))} as const;`,
     "",
-    "/** The pinned downloads, with one SHA-256 for each platform (commons 0002-packaging FR-014). */",
+    "/** The pinned downloads: for each platform, pinned (SHA-256, https address, archive format and folder of the programs) or unpinned (SHA-256 and the reason it has no address) (commons 0002-packaging FR-014, FR-017). */",
     `export const pins = ${pyJson(obj(pins))} as const;`,
     "",
     "/** The fields of the installation record, in order (commons 0002-packaging FR-016). */",

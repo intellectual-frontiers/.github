@@ -43,6 +43,10 @@
 - **FR-017**: The library MUST make, from the manifests and the `summary` of each library's `about.ts` (read as data, no library run), the table of the libraries in the root `README.md` between the markers `<!-- libraries-map:begin -->` and `<!-- libraries-map:end -->` (`readme.ts`, exported as `./readme`): one row for each library, sorted by role (foundation, pattern, program, standard) and then by name, with the package (linked to npm where it is published there), the first clause of the first sentence of its summary, its Kanon shape where its manifest declares a table, its level and its registries; it MUST name a library that has no role as a problem, MUST fail with `--check` (and write nothing) where the README is not what the manifests make, and `verify` and the tests of the repository MUST run that check.
 - **FR-018**: The root `README.md` MUST describe what is and nothing that was: it MUST NOT contain the words formerly, previously, legacy, deprecated, backward, migration, UAT, acceptance test or agora, and every link of it whose target is a path in the repository MUST name a file or folder that exists.
 
+## The license
+
+- **FR-019**: The library MUST make and check the license files of the repository (`license.ts`, exported as `./license`; commons 0035-licensing FR-004 to FR-007 and FR-010, FR-012): the `LICENSE` of the root and of every library folder from the one official text in `src/license/` and the required notice, and `THIRD_PARTY_NOTICES.md` from the record of what is vendored; `--check` MUST write nothing and exit 1 naming each file that is not what they make, a library with no `LICENSE` among them and the command that writes it; its `verify` and the development loop MUST run it; and the packer MUST write the identifier of the library's license as the `license` of the package it publishes and MUST pack its `LICENSE`.
+
 ## Acceptance scenarios
 
 1. **Given** a folder `commons/x/` with a manifest, **When** the section of the libraries is made, **Then** it holds one requirement for `x` and its row, and `--check` fails where either differs, per FR-001 and FR-002.
@@ -57,6 +61,7 @@
 
 10. **Given** a library named `archon-dialect-x` that declares no family, **When** the manifests are checked, **Then** a sentence names the library and the host it may be held for, per FR-016.
 11. **Given** a host whose table declares a dialect and a library of that dialect's name that declares its family, **When** the manifests are checked, **Then** there is no finding, and for a dialect nobody registered or a registered one nobody declared there is one, per FR-016.
+12. **Given** a folder `commons/x/` with a manifest and no `LICENSE`, **When** `license.ts --check` runs, **Then** it exits 1, names `commons/x/LICENSE` and the command `bun commons/libraries/src/license.ts`, and running that command writes the file, per FR-019.
 
 ## Out of scope
 

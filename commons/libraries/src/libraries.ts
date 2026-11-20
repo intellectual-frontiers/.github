@@ -41,6 +41,7 @@ import {
   ok,
   type Result,
 } from "@intellectual-frontiers/core";
+import { parseSpdxId, type SpdxId } from "./license/standard.ts";
 import { exportedLiteral } from "@intellectual-frontiers/formats/ts-literal";
 import { decodeTable, type Table } from "@intellectual-frontiers/kanon";
 import { existsSync, readDirSync, readTextFileSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
@@ -90,6 +91,8 @@ export type Library = {
   readonly kanon?: Table;
   /** Its host and its role where it is of a family (a host, a dialect of it or a plugin of it; 0033-kanon FR-021, 0027-commons-libraries FR-023). */
   readonly family?: LibraryFamily;
+  /** The license its `LICENSE` and its packed `package.json` carry, where it is not the default of the repository (`license/standard.ts`; commons 0035-licensing FR-003). */
+  readonly license?: SpdxId;
 };
 
 /** The lowest conformance level that requires a library to declare `kanon`; none yet (0033-kanon FR-014, OQ-1): a level asks for it by naming itself here. */
@@ -116,9 +119,9 @@ const nameDecoder: Decoder<string> = (input, path = "$") => {
 };
 const body = object(
   { name: nameDecoder, verify: nonEmpty, version: nonEmpty, exports: array(nonEmpty) },
-  { level: literal(...LEVELS), specKit: nonEmpty, summary: nonEmpty, distribution: array(literal(...REGISTRIES)), kanon: unknownValue, family: object({ host: nonEmpty, role: literal(...ROLES) }) },
+  { level: literal(...LEVELS), specKit: nonEmpty, summary: nonEmpty, distribution: array(literal(...REGISTRIES)), kanon: unknownValue, family: object({ host: nonEmpty, role: literal(...ROLES) }), license: nonEmpty },
 );
-const FIELDS = ["name", "level", "specKit", "verify", "version", "exports", "summary", "distribution", "kanon", "family"] as const;
+const FIELDS = ["name", "level", "specKit", "verify", "version", "exports", "summary", "distribution", "kanon", "family", "license"] as const;
 
 /** The manifest read from the text of its file: `export const library = { ... }` and no other export, read as data and never run (0027-commons-libraries FR-012). */
 export function decodeLibrarySource(source: string): Result<Library, string> {
@@ -154,6 +157,12 @@ export function decodeLibrarySource(source: string): Result<Library, string> {
     if (f.kind === "err") return f;
     family = f.value;
   }
+  let license: SpdxId | undefined;
+  if (v.license !== undefined) {
+    const l = parseSpdxId(v.license);
+    if (l.kind === "err") return err(`library.license: ${l.error}`);
+    license = l.value;
+  }
   return ok({
     name: v.name,
     level: v.level ?? DEFAULT_LIBRARY_LEVEL,
@@ -165,6 +174,7 @@ export function decodeLibrarySource(source: string): Result<Library, string> {
     distribution,
     ...(kanon === undefined ? {} : { kanon }),
     ...(family === undefined ? {} : { family }),
+    ...(license === undefined ? {} : { license }),
   });
 }
 

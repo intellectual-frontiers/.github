@@ -1,8 +1,10 @@
 #curie_map:
+#  dcat: http://www.w3.org/ns/dcat#
 #  dcterms: http://purl.org/dc/terms/
 #  mz: https://www.intellectualfrontiers.com/ontology/mizan#
 #  mzid: https://www.intellectualfrontiers.com/id/mizan/
 #  pm: https://www.intellectualfrontiers.com/ontology/packaging#
+#  purl: https://github.com/package-url/purl-spec#
 #  rdfs: http://www.w3.org/2000/01/rdf-schema#
 #  schema: https://schema.org/
 #  semapv: https://w3id.org/semapv/vocab/
@@ -26,3 +28,7 @@ pm:name	skos:closeMatch	schema:name	semapv:ManualMappingCuration
 pm:operatingSystem	skos:closeMatch	schema:operatingSystem	semapv:ManualMappingCuration
 pm:processor	skos:closeMatch	schema:processorRequirements	semapv:ManualMappingCuration
 pm:version	skos:closeMatch	schema:softwareVersion	semapv:ManualMappingCuration
+pm:downloadUrl	skos:closeMatch	dcat:downloadURL	semapv:ManualMappingCuration
+pm:archiveFormat	skos:closeMatch	dcat:packageFormat	semapv:ManualMappingCuration
+pm:binPath	skos:closeMatch	purl:subpath	semapv:ManualMappingCuration
+pm:unpinnedReason	skos:narrowMatch	skos:note	semapv:ManualMappingCuration

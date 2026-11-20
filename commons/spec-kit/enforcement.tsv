@@ -52,6 +52,13 @@ requirement	mechanism	by	note
 0003-mizan FR-043	check	.github: cd commons/ts && bun test tests/	mizan-harness-requests.test.ts: the proof register is read from a path given as an option, with Windows line ends, and the two OSCAL documents are the same bytes as from enforcement.tsv beside the specifications; a path that is not there is an error
 0003-mizan FR-044	check	.github: cd commons/ts && bun test tests/	mizan-harness-requests.test.ts: a requirement that names a term which does not cite it back is a finding (once for each requirement and term, ranges read, the whole specification not), the stage runs only where definitions are given, and its findings are held by the baseline and go stale when fixed
 0002-packaging FR-016	check	.github: bun test ./tests/	Record: the fields, their order and their values, as the TypeScript module carries them; Generator: a bad field is refused
+0002-packaging FR-017	check	.github: bun test ./tests/	Pins: a pinned platform has an address, a format and a folder, an unpinned one says why, and the pins state each
+0002-packaging FR-018	check	.github: bun test ./tests/	Generator: an address that is not https, holds a user name, a format that is none of three, a folder that leaves its root, a half-stated checksum and a checksum twice are each refused
+0002-packaging FR-019	check	.github: bun test ./tests/	Pins: the env file, the TOML and the module carry the addresses of the pins, and the Bun installer and the conformance job read them
+0002-packaging FR-020	check	.github: bun test ./tests/	Pins: downloadOf gives the version, address, SHA-256, format and folder of a pin on a platform, or why it is unpinned
+0002-packaging FR-021	check	.github: bun test ./tests/	Managers: mise is a tool manager with three unverified commands of origin memory
+0002-packaging FR-022	check	.github: bun test ./tests/	Managers: apt, pacman, dnf, brew and winget each have a query-version command
+0002-packaging FR-023	check	.github: bun test ./tests/	Names: the ontology and its generated files say archon only of commons/archon and of the origin archon
 0004-rules FR-001	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
 0004-rules FR-002	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
 0004-rules FR-003	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
@@ -642,3 +649,15 @@ requirement	mechanism	by	note
 0011-documentation FR-033	check	.github: cd commons/docs && bun run verify	guides.test.ts: the library map and the imports of each library are read from the sources
 0011-documentation FR-034	check	.github: cd commons/docs && bun run verify	theme.test.ts: dark tokens for the system and for a choice, the button and the script that sets the theme first, the keyboard shortcuts and the print style
 0011-documentation FR-035	check	.github: cd commons/docs && bun run verify	explorers.test.ts: the trace under a requirement, the layers of a library, the releases page, and the search filter
+0035-licensing FR-001	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: the default is PolyForm-Noncommercial-1.0.0, no LICENSE of the repository is the MIT license, and the manifest, the packer and the generator read the one identifier
+0035-licensing FR-002	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: the official text is the one recorded by its standard (SHA-256), and a changed text is refused naming both hashes
+0035-licensing FR-003	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: a manifest license of the closed list is read and one that is not is refused naming it
+0035-licensing FR-004	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: every LICENSE begins with the required notice and ends with the official text unchanged
+0035-licensing FR-005	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: every library folder and the root hold the LICENSE the generator makes, and a hand edit is found
+0035-licensing FR-006	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: --check writes nothing and exits 1 naming a library with no LICENSE and the command, and the generator writes it
+0035-licensing FR-007	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: the verify of libraries and the dev loop run the check, and tests/commons-licensing.test.ts runs it on the real repository
+0035-licensing FR-008	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: a missing or empty LICENSING.md, COMMERCIAL.md, NOTICE, CONTRIBUTING.md or CITATION.cff, and one that lacks its facts, is found
+0035-licensing FR-009	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: CONTRIBUTING.md asks for git commit -s and Refs #N, and the trademark paragraph names the five names
+0035-licensing FR-010	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: THIRD_PARTY_NOTICES.md is what the record makes, and a vendored path that is gone is found
+0035-licensing FR-011	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: the README License section names the license, and AGENTS.md names the generator's command
+0035-licensing FR-012	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: the packer writes the SPDX id, packs the LICENSE and refuses a library that has none

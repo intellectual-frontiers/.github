@@ -28,6 +28,7 @@ export const library = {
     "./mizan",
     "./mizan/mizan",
     "./standards/nist-sp-800-53/controls.auto",
+    "./supply-chain/downloads",
     "./supply-chain/packaging",
     "./supply-chain/packaging/families",
     "./supply-chain/packaging/managers",

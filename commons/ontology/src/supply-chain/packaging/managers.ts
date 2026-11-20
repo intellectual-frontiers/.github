@@ -3,7 +3,7 @@
  * and the commands no harness may run, each with its reason.
  *
  * Seeded from the tables of sigoden/upt (https://github.com/sigoden/upt), dual-licensed MIT or Apache-2.0, copyright its authors; see tests/fixtures/upt/README.md.
- * What archon (a harness) runs, and what it knows about privileges and package names, is added to it. A command with pm:origin "memory", and every needsAdministrator value,
+ * What the engine that `commons/archon` (0034-archon) replaced ran, and what it knew about privileges and package names, is added to it. A command with pm:origin "memory", and every needsAdministrator value,
  * is written from knowledge and unverified: nothing acts on it until its family is supported and the command carries pm:verifiedOn.
  *
  * @module
@@ -267,6 +267,16 @@ export const managerZypper = Manager.make(term(PMID, "manager-zypper"), {
   purlType: "rpm",
 });
 
+/** The manager `manager-mise`. */
+export const managerMise = Manager.make(term(PMID, "manager-mise"), {
+  label: en("mise"),
+  identifier: "mise",
+  executable: "mise",
+  kind: managerKinds.ToolKind,
+  needsAdministrator: false,
+  note: "A tool manager: it installs the tools of an account or a project in the account's own folder, at the versions it is told, and is no family's manager. Every command of it is from memory and unverified.",
+});
+
 /** The manager `manager-port`. */
 export const managerPort = Manager.make(term(PMID, "manager-port"), {
   label: en("port"),
@@ -307,6 +317,7 @@ export const managers = [
   managerYum,
   managerZypper,
   managerPort,
+  managerMise,
 ] as const;
 
 /** The commands of the managers, as templates of words. */
@@ -1652,6 +1663,36 @@ export const commands = [
     operation: operations.QueryVersion,
     template: "rpm -q --qf %{VERSION}-%{RELEASE} {package}",
     origin: "archon",
+  }),
+  Command.make(term(PMID, "cmd-brew-query-version"), {
+    commandOf: managerBrew,
+    operation: operations.QueryVersion,
+    template: "brew list --versions {package}",
+    origin: "memory",
+  }),
+  Command.make(term(PMID, "cmd-winget-query-version"), {
+    commandOf: managerWinget,
+    operation: operations.QueryVersion,
+    template: "winget list --exact --id {package}",
+    origin: "memory",
+  }),
+  Command.make(term(PMID, "cmd-mise-install"), {
+    commandOf: managerMise,
+    operation: operations.Install,
+    template: "mise install {packages}",
+    origin: "memory",
+  }),
+  Command.make(term(PMID, "cmd-mise-query-version"), {
+    commandOf: managerMise,
+    operation: operations.QueryVersion,
+    template: "mise current {package}",
+    origin: "memory",
+  }),
+  Command.make(term(PMID, "cmd-mise-list-installed"), {
+    commandOf: managerMise,
+    operation: operations.ListInstalled,
+    template: "mise ls",
+    origin: "memory",
   }),
 ] as const;
 
