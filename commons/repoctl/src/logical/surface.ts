@@ -202,9 +202,18 @@ export function surfaceDelta(base: Fingerprint, now: Fingerprint): SurfaceDelta 
   return changed.length === 0 ? { kind: "same" } : { kind: "changed", symbols: changed };
 }
 
-/** The identifiers that the declarations mention: what a changed name could reach through a library's own surface. */
-export function mentionsOf(declarations: readonly Declaration[]): readonly string[] {
-  return [...new Set(declarations.flatMap((d) => d.text.match(/[A-Za-z_$][\w$]*/g) ?? []))].sort();
+/** An exported name and the identifiers its declaration mentions (with the declarations local to its file). */
+export type Mention = { readonly name: string; readonly mentions: readonly string[] };
+
+/** For each exported name, the identifiers its declarations mention: what a changed name could reach through a library's own surface. */
+export function mentionsOf(declarations: readonly Declaration[]): readonly Mention[] {
+  const byName = new Map<string, Set<string>>();
+  for (const d of declarations) {
+    const set = byName.get(d.name) ?? new Set<string>();
+    for (const w of d.text.match(/[A-Za-z_$][\w$]*/g) ?? []) set.add(w);
+    byName.set(d.name, set);
+  }
+  return [...byName].sort(([a], [b]) => (a < b ? -1 : 1)).map(([name, set]) => ({ name, mentions: [...set].sort() }));
 }
 
 const IMPORT_FROM = /\b(?:import|export)\s+(?:type\s+)?([^'";]*?)\s*from\s*["']([^"']+)["']/g;

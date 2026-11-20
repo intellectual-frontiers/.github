@@ -34,7 +34,7 @@ import {
   tierOfProof,
 } from "@intellectual-frontiers/repoctl/governance";
 import { matches } from "./glob.ts";
-import { codeOf, type SurfaceDelta, type Usage } from "./surface.ts";
+import { codeOf, type Mention, type SurfaceDelta, type Usage } from "./surface.ts";
 
 /** A file that changed: its path and its text at the base and now (none where it was not there). */
 export type ChangedFile = { readonly path: string; readonly before: string | undefined; readonly after: string | undefined };
@@ -54,8 +54,8 @@ export type LibraryNode = {
   readonly systems: readonly ("windows" | "macos")[];
 };
 
-/** The surface of one library as the planner needs it: how it differs from the base, and the identifiers its declarations mention. */
-export type LibrarySurface = { readonly delta: SurfaceDelta; readonly mentions: readonly string[] };
+/** The surface of one library as the planner needs it: how it differs from the base, and for each exported name the identifiers its declaration mentions. */
+export type LibrarySurface = { readonly delta: SurfaceDelta; readonly mentions: readonly Mention[] };
 
 /** Everything the planner reads. */
 export type ProofInput = {
@@ -250,8 +250,8 @@ export function planProof(input: ProofInput): PlanStep {
     const tierSkips = PROOF_TIER_IDS.filter((t) => !ordered.some((p) => p.tier === t)).map(
       (t): SkippedProof =>
         t === "T4" || t === "T5" || t === "T6"
-          ? { tier: t, subject: `${t} ${PROOF_TIERS[t].name}`, reason: "tier-scheduled", because: `it runs on ${PROOF_TIERS[t].runsOn.filter((o) => o !== "edit" && o !== "push").join(", ")}, and this change reaches none of what it proves` }
-          : { tier: t, subject: `${t} ${PROOF_TIERS[t].name}`, reason: "class-needs-none", because: `no class of this change needs it (${classes.map((c) => c).join(", ") || "no change"})` },
+          ? { tier: t, subject: PROOF_TIERS[t].name, reason: "tier-scheduled", because: `it runs on ${PROOF_TIERS[t].runsOn.filter((o) => o !== "edit" && o !== "push").join(", ")}, and this change reaches none of what it proves` }
+          : { tier: t, subject: PROOF_TIERS[t].name, reason: "class-needs-none", because: `no class of this change needs it (${classes.map((c) => c).join(", ") || "no change"})` },
     );
     const plan: ProofPlan = { base: input.base, files, classes, proofs: ordered, skipped: [...skipped, ...tierSkips], libraries: { total, proven } };
     return { kind: "plan", plan };
@@ -349,7 +349,7 @@ export function planProof(input: ProofInput): PlanStep {
         if (!need.includes(x.name)) need.push(x.name);
         continue;
       }
-      const onward = changed === "all" ? "all" : new Set(surface.mentions.filter((m) => changed.has(m)));
+      const onward = changed === "all" ? "all" : new Set(surface.mentions.filter((m) => m.mentions.some((x) => changed.has(x))).map((m) => m.name));
       if (onward === "all" || onward.size > 0) visit(x.name, onward, { kind: "surface", provider: x.name, symbols: onward === "all" ? [] : [...onward].sort() });
     }
   };

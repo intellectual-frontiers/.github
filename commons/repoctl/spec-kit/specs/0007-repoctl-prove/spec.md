@@ -16,33 +16,30 @@
 - **FR-005**: The plan MUST never skip what it cannot show safe: a change to the planner, to the table of generators, to the workflow definitions or to the tier rules MUST plan every proof; a file the classifier does not know MUST be `outside`, never ignored; and where Git cannot say what changed the plan MUST be `--all` and say so.
 - **FR-006**: A `source` change inside a library MUST plan T0 and T1 of that library alone, and MUST skip its dependents with the reason `surface-unchanged`, where the fingerprint of the public type surface of the library (FR-007) is the same at the base and now. A library of the foundation (`core`, `formats`, `crypto`, `system`, `terminal`, `kanon`, `libraries`) MUST in addition run its smoke gate (FR-011) before anything wider.
 - **FR-007**: The public type surface of a library MUST be fingerprinted as the hash, for each exported declaration, of its emitted declaration with comments removed and whitespace normalised, together with the declarations local to the file that it can mention; the fingerprint of the library is the map from each declaration to its hash. The set of changed symbols MUST be the names whose hash differs, appeared or went away between the base and now. The same sources MUST give the same fingerprint, and a change of a comment or of a function body whose declared types are the same MUST leave it unchanged.
-- **FR-008**: Where the fingerprint changed, the plan MUST plan T0 for each library whose sources import a changed symbol (a namespace import or a re-export of everything counts as importing all of them), and T1 and T2 for those importers only; a library that imports the changed library but none of the changed symbols MUST be skipped with the reason `symbols-unused`; and the reach MUST be followed through the importers whose own surface mentions a changed symbol.
+- **FR-008**: Where the fingerprint changed, the plan MUST plan T0 and T2 (the importer's seam tests) for each library whose sources import a changed symbol (a namespace import or a re-export of everything counts as importing all of them), and for those importers only; a library that imports the changed library but none of the changed symbols MUST be skipped with the reason `symbols-unused`; and the reach MUST be followed through the importers whose own surface mentions a changed symbol.
 - **FR-009**: Every proof the plan leaves out MUST be listed with a reason of a closed union (`class-needs-none`, `surface-unchanged`, `symbols-unused`, `no-importer`, `cache-hit`, `tier-scheduled`, `quarantined`) that the `--why` text renders as one sentence. A plan MUST have no proof that is neither planned nor skipped with a reason among those the tiers and the libraries make possible.
-- **FR-010**: Tests MUST run through a content-addressed result cache (Planned): the key is the hash of the test file, of every source it transitively imports and of the runtime version, and, for a test that reads the tree, of the folder of its library; an identical key MUST not run again; the cache lives outside the repository (the cache folder of XDG); a file-level selector MUST run a test only where something it transitively imports changed, with the trace register as the second selector.
-- **FR-011**: A smoke gate (Planned) of the foundation libraries MUST be a data set of golden and property tests that runs in under 30 seconds and runs on every change that reaches a foundation library; a plan widens only where the smoke gate fails.
-- **FR-012**: A flake record (Planned) MUST be data: a test that is quarantined is named with its owner and its expiry, is reported by every plan that would have run it, and runs again when the expiry passes; a failing property test MUST print its seed in the failure message.
-- **FR-013**: The development loop and the plan job of CI MUST read the same plan where the class rules say it is safe (Planned for the plan job): `dev:check` MUST skip with a reason, and the plan job of CI MUST keep the affected set for the main branch, so that what main proves is never less than the affected set.
-- **FR-014**: The guard rails MUST stay: a nightly run of every tier, the release gate (T6) and a plan that never skips for a change to the planner (FR-005).
+- **FR-010**: The guard rails MUST stay: `--all` plans every proof of every tier (the nightly run and the release gate are that plan), and a change to the planner plans exactly what `--all` plans, so that a plan never skips for a change to itself.
 
 ## Acceptance scenarios
 
 1. **Given** a change of a comment in `commons/core/src/`, **When** `prove --plan` runs, **Then** its classes are `prose`, only the documentation check is planned and every other proof is skipped with `class-needs-none`, per FR-003 and FR-004.
 2. **Given** a change of a function body in a leaf library with the same declarations, **When** it runs, **Then** T0 and T1 of that library are planned and its importers are skipped with `surface-unchanged`, per FR-006.
-3. **Given** a change of an exported signature in `core`, **When** it runs, **Then** the importers of the changed symbol have T0, T1 and T2, and an importer of other symbols of `core` is skipped with `symbols-unused`, per FR-008.
+3. **Given** a change of an exported signature in `core`, **When** it runs, **Then** the importers of the changed symbol have T0 and T2, and an importer of other symbols of `core` is skipped with `symbols-unused`, per FR-008.
 4. **Given** a change to `commons/repoctl/src/logical/prove.ts`, **When** it runs, **Then** every proof of every tier is planned, per FR-005.
 5. **Given** the same working tree twice, **When** the plan is made, **Then** the two JSON documents are equal, per FR-001 and FR-007.
 6. **Given** `--why`, **When** it runs, **Then** each proof and each skipped proof has one sentence, per FR-009.
 
 ## Out of scope
 
+- Planned, not built: the content-addressed result cache of tests and the file-level selection with the trace register as the second selector; the smoke gate of the foundation libraries and the flake record with quarantine (data); the plan job of CI and `dev:check` reading this plan.
 - Running T4 to T6 locally: they are planned and left to the nightly run, the release and CI.
 - Deciding a version, a tag or a release.
 
 ## Edge cases
 
-- A file removed or added: it is classified by its path, and its content on the missing side is empty.
-- Declarations that cannot be emitted (a type error): the library is treated as having a changed surface.
-- A comment that holds a `// Spec:` line: a change to that line is a change of trace, so the class is `spec`.
+- A file removed or added: it is classified by its path, and its content on the missing side is empty, per FR-003.
+- Declarations that cannot be emitted (a type error): the library is treated as having a changed surface, per FR-006 and FR-008.
+- A comment that holds a `// Spec:` line: a change to that line is a change of trace, so the class is `spec`, per FR-003.
 
 ## Assumptions
 

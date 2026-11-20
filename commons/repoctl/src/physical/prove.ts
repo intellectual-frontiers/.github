@@ -239,7 +239,7 @@ export function commandOf(repo: string, proof: Proof, base: string, folderOf: (n
   const at = (name: LibraryName): string => join(root, folderOf(name));
   switch (proof.kind) {
     case "docs-check":
-      return { argv: ["bun", "main.ts", "check"], cwd: join(root, "commons", "docs") };
+      return { argv: ["bun", "main.ts", "check"], cwd: join(root, "commons", "docs"), needs: "main.ts" };
     case "spec-check":
       return proof.scope === "repository" ? { argv: ["bun", "commons/tools/mizan-check.ts"], cwd: root } : { argv: ["bun", "../tools/mizan-check.ts", "--root", "spec-kit"], cwd: at(proof.scope), needs: "spec-kit" };
     case "trace-check":
