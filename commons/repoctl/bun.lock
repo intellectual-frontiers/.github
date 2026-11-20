@@ -12,6 +12,7 @@
         "@intellectual-frontiers/kanon": "link:../kanon",
         "@intellectual-frontiers/libraries": "link:../libraries",
         "@intellectual-frontiers/mizan": "link:../mizan",
+        "@intellectual-frontiers/net": "link:../net",
         "@intellectual-frontiers/system": "link:../system",
         "@intellectual-frontiers/terminal": "link:../terminal",
         "@intellectual-frontiers/test": "link:../test",
@@ -35,6 +36,8 @@
     "@intellectual-frontiers/libraries": ["@intellectual-frontiers/libraries@link:../libraries", {}],
 
     "@intellectual-frontiers/mizan": ["@intellectual-frontiers/mizan@link:../mizan", {}],
+
+    "@intellectual-frontiers/net": ["@intellectual-frontiers/net@link:../net", {}],
 
     "@intellectual-frontiers/system": ["@intellectual-frontiers/system@link:../system", {}],
 

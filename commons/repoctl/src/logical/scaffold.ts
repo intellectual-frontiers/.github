@@ -25,18 +25,18 @@ export const ROLES: readonly Role[] = ["foundation", "pattern", "program", "stan
 export type Held = { readonly match: { readonly kind: "exact"; readonly name: string } | { readonly kind: "prefix"; readonly prefix: string }; readonly host: string };
 
 /** What a new library is given. */
-export type NewLibrary = { readonly name: string; readonly summary: string };
+export type NewLibrary = { readonly name: string; readonly summary: string; /** The folder (from the repository's root) the libraries are in. */ readonly folder: string };
 
 /** A file to write: its path from the repository's root and its text. */
 export type NewFile = { readonly path: string; readonly text: string };
 
 /** The name, once it is one that is valid, not held for a family and not in use; or why not. */
-export function acceptName(text: string, held: readonly Held[], existing: readonly string[]): Result<LibraryName, { readonly code: "E-LIBRARY-NAME" | "E-LIBRARY-RESERVED" | "E-LIBRARY-EXISTS"; readonly message: string }> {
+export function acceptName(text: string, held: readonly Held[], existing: readonly string[], folder: string): Result<LibraryName, { readonly code: "E-LIBRARY-NAME" | "E-LIBRARY-RESERVED" | "E-LIBRARY-EXISTS"; readonly message: string }> {
   const name = parseLibraryName(text);
   if (name.kind === "err") return err({ code: "E-LIBRARY-NAME", message: name.error });
   const taken = held.find((h) => (h.match.kind === "exact" ? h.match.name === name.value : name.value.startsWith(h.match.prefix)));
   if (taken !== undefined) return err({ code: "E-LIBRARY-RESERVED", message: `${name.value} is held for the family of the library ${taken.host}` });
-  if (existing.includes(name.value)) return err({ code: "E-LIBRARY-EXISTS", message: `commons/${name.value} exists` });
+  if (existing.includes(name.value)) return err({ code: "E-LIBRARY-EXISTS", message: `${folder}/${name.value} exists` });
   return ok(name.value);
 }
 
@@ -58,7 +58,7 @@ export function filesOf(l: NewLibrary): readonly NewFile[] {
   const n = l.name;
   const t = titleOf(n);
   const spec = `0001-${n}-layers`;
-  const root = `commons/${n}`;
+  const root = `${l.folder}/${n}`;
   const file = (path: string, text: string): NewFile => ({ path: `${root}/${path}`, text });
   const pkg = `@intellectual-frontiers/${n}`;
   return [

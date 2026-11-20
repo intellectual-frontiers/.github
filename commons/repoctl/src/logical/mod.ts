@@ -7,8 +7,7 @@
  * @example
  * ```ts
  * import { orderGenerators } from "@intellectual-frontiers/repoctl/logical";
- * import { GENERATORS } from "@intellectual-frontiers/repoctl/governance";
- * orderGenerators(GENERATORS).kind; // "ok"
+ * orderGenerators([]).kind; // "ok"
  * ```
  *
  * @module
@@ -25,11 +24,13 @@ export * from "./pool.ts";
 export * from "./ports.ts";
 export * from "./prove.ts";
 export * from "./publish.ts";
+export * from "./docs.ts";
 export * from "./scaffold.ts";
 export * from "./select.ts";
 export * from "./semver.ts";
 export * from "./status.ts";
 export * from "./surface.ts";
+export * from "./step.ts";
 export * from "./sync.ts";
 export * from "./hygiene.ts";
 export * from "./hygiene-facts.ts";

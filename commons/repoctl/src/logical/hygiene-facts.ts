@@ -15,7 +15,7 @@
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import type { Copy, Dependency, HygieneFacts, ImportFact, LockFacts, PackageFacts } from "./hygiene.ts";
-import { SCOPE } from "./hygiene.ts";
+import type { HygienePolicy } from "@intellectual-frontiers/repoctl/governance";
 import type { Files, World } from "./ports.ts";
 
 /** The text of a JSON with comments and trailing commas as JSON: comments and the commas before `}` and `]` are removed, and strings are left as they are. */
@@ -46,7 +46,7 @@ const text = (v: unknown): string | undefined => (typeof v === "string" ? v : un
 const add = (into: Map<string, Copy[]>, name: string, c: Copy): void => void into.set(name, [...(into.get(name) ?? []), c]);
 
 /** The copies of the packages of commons a `bun.lock` holds: each entry of `packages` is `[ "name@version", ... ]` under a key that says where it is nested. */
-export function parseBunLock(source: string, file: string): LockFacts {
+export function parseBunLock(source: string, file: string, scope: string): LockFacts {
   let json: unknown;
   try {
     json = JSON.parse(stripJsonc(source));
@@ -61,13 +61,13 @@ export function parseBunLock(source: string, file: string): LockFacts {
     if (head === undefined || at <= 0) continue;
     const name = head.slice(0, at);
     const version = head.slice(at + 1);
-    if (name.startsWith(SCOPE) && /^\d/.test(version)) add(copies, name, { version, where: `${file}: ${key}` });
+    if (name.startsWith(scope) && /^\d/.test(version)) add(copies, name, { version, where: `${file}: ${key}` });
   }
   return { kind: "read", file, copies };
 }
 
 /** The copies of the packages of commons a `package-lock.json` (versions 2 and 3: `packages` keyed by path) holds. */
-export function parseNpmLock(source: string, file: string): LockFacts {
+export function parseNpmLock(source: string, file: string, scope: string): LockFacts {
   let json: unknown;
   try {
     json = JSON.parse(source);
@@ -81,7 +81,7 @@ export function parseNpmLock(source: string, file: string): LockFacts {
     if (at < 0) continue;
     const name = key.slice(at + "node_modules/".length);
     const version = text(record(value)["version"]);
-    if (name.startsWith(SCOPE) && version !== undefined) add(copies, name, { version, where: `${file}: ${key}` });
+    if (name.startsWith(scope) && version !== undefined) add(copies, name, { version, where: `${file}: ${key}` });
   }
   return { kind: "read", file, copies };
 }
@@ -114,11 +114,11 @@ export function relativeImports(source: string): readonly string[] {
 const SOURCE = /\.(?:ts|tsx|mts|cts|js|jsx|mjs|cjs)$/;
 
 /** The copies of the packages of commons installed under a folder `node_modules`, and under the `node_modules` of each package in it (and of Bun's `.bun` store). */
-async function installedUnder(files: Files, root: string, nm: string, into: Map<string, Copy[]>, depth: number): Promise<void> {
+async function installedUnder(files: Files, root: string, nm: string, into: Map<string, Copy[]>, depth: number, scope: string): Promise<void> {
   if (depth > 4) return;
   for (const entry of await files.list(`${root}/${nm}`)) {
     if (entry === ".bun") {
-      for (const store of await files.list(`${root}/${nm}/.bun`)) await installedUnder(files, root, `${nm}/.bun/${store}/node_modules`, into, depth + 1);
+      for (const store of await files.list(`${root}/${nm}/.bun`)) await installedUnder(files, root, `${nm}/.bun/${store}/node_modules`, into, depth + 1, scope);
       continue;
     }
     if (entry.startsWith(".")) continue;
@@ -126,7 +126,7 @@ async function installedUnder(files: Files, root: string, nm: string, into: Map<
     for (const name of names) {
       const dir = `${nm}/${name}`;
       const manifest = await files.read(`${root}/${dir}/package.json`);
-      if (manifest !== undefined && name.startsWith(SCOPE)) {
+      if (manifest !== undefined && name.startsWith(scope)) {
         const r = parsePackage(manifest, `${dir}/package.json`);
         const version = (() => {
           try {
@@ -137,13 +137,13 @@ async function installedUnder(files: Files, root: string, nm: string, into: Map<
         })();
         if (r.kind === "ok" && version !== undefined) add(into, name, { version, where: dir });
       }
-      await installedUnder(files, root, `${dir}/node_modules`, into, depth + 1);
+      await installedUnder(files, root, `${dir}/node_modules`, into, depth + 1, scope);
     }
   }
 }
 
 /** Gathers the facts of the repository of a world: the only reads of the check. */
-export async function gatherHygieneFacts(w: World): Promise<HygieneFacts> {
+export async function gatherHygieneFacts(w: Pick<World, "files" | "repo">, policy: HygienePolicy): Promise<HygieneFacts> {
   const all = (await w.files.walk(w.repo)).filter((p) => !p.startsWith(".git/"));
   const packages: PackageFacts[] = [];
   let workspaces: readonly string[] = [];
@@ -164,10 +164,10 @@ export async function gatherHygieneFacts(w: World): Promise<HygieneFacts> {
   const locks: LockFacts[] = [];
   for (const [file, parse] of [["bun.lock", parseBunLock], ["package-lock.json", parseNpmLock]] as const) {
     const read = await w.files.read(`${w.repo}/${file}`);
-    if (read !== undefined) locks.push(parse(read, file));
+    if (read !== undefined) locks.push(parse(read, file, policy.scope));
   }
   const installed = new Map<string, Copy[]>();
-  await installedUnder(w.files, w.repo, "node_modules", installed, 0);
-  const repository = (await w.files.exists(`${w.repo}/commons/libraries/library.ts`)) ? "commons" : "consumer";
+  await installedUnder(w.files, w.repo, "node_modules", installed, 0, policy.scope);
+  const repository = policy.sourceMarker !== "" && (await w.files.exists(`${w.repo}/${policy.sourceMarker}`)) ? "source" : "consumer";
   return { repository, packages, locks, installed, imports, workspaces };
 }

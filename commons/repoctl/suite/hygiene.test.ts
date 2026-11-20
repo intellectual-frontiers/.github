@@ -4,19 +4,19 @@
  *
  * @module
  */
-import { ok } from "@intellectual-frontiers/core";
+import { err, ok } from "@intellectual-frontiers/core";
 import { fs } from "@intellectual-frontiers/system";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
-import { CATALOGUE, isProblemCode, verbIds, VERBS } from "@intellectual-frontiers/repoctl/governance";
+import { CATALOGUE, type HygienePolicy, isProblemCode, verbIds, VERBS } from "@intellectual-frontiers/repoctl/governance";
 import {
   countsOf,
   gatherHygieneFacts,
   hygiene,
   type HygieneFacts,
   hygieneFails,
-  intoCommons,
+  intoFamily,
   isExactVersion,
-  isGitOfCommons,
+  isGitOfFamily,
   parseBunLock,
   parseNpmLock,
   relativeImports,
@@ -29,6 +29,10 @@ import { systemFiles, systemWorld } from "@intellectual-frontiers/repoctl/physic
 import { execute, hostOf, put } from "./world.ts";
 
 const CORE = "@intellectual-frontiers/core";
+
+/** The policy these fixtures are written for: a family whose scope is `@intellectual-frontiers/`, whose own repository has a folder `commons`. */
+const POLICY: HygienePolicy = { scope: "@intellectual-frontiers/", gitSources: ["intellectual-frontiers/.github"], pathSegment: "commons", sourceMarker: "commons/libraries/library.ts", allow: { paths: [], packages: [] } };
+const WITH_POLICY = { config: { hygiene: { scope: POLICY.scope, gitSources: POLICY.gitSources, pathSegment: POLICY.pathSegment, sourceMarker: POLICY.sourceMarker } } } as const;
 
 const none: HygieneFacts = { repository: "consumer", packages: [], locks: [], installed: new Map(), imports: [], workspaces: [] };
 const pkg = (p: string, name: string | undefined, dependencies: Record<string, string>): HygieneFacts["packages"][number] => ({ path: p, name, dependencies: Object.entries(dependencies).map(([n, spec]) => ({ name: n, spec })) });
@@ -44,7 +48,7 @@ proves(["0007-repoctl-hygiene FR-001"], "the verb is declared once, public and r
 });
 
 proves(["0007-repoctl-hygiene FR-002", "0036-distribution FR-010"], "each of the six findings is made from facts, in the order of the codes", () => {
-  assertEquals(hygiene(none), []);
+  assertEquals(hygiene(none, POLICY), []);
   const facts: HygieneFacts = {
     repository: "consumer",
     packages: [
@@ -57,7 +61,7 @@ proves(["0007-repoctl-hygiene FR-002", "0036-distribution FR-010"], "each of the
     imports: [{ file: "src/a.ts", specifier: "../commons/core/src/mod.ts" }, { file: "src/b.ts", specifier: "./local.ts" }],
     workspaces: ["packages/*"],
   };
-  const found = hygiene(facts);
+  const found = hygiene(facts, POLICY);
   assertEquals(found.map((f) => `${f.code} ${f.level} ${f.path}`), [
     "E-HYGIENE-GIT fail package.json",
     "E-HYGIENE-PATH fail package.json",
@@ -71,27 +75,27 @@ proves(["0007-repoctl-hygiene FR-002", "0036-distribution FR-010"], "each of the
   assert(hygieneFails(found));
   assertStringIncludes(found.find((f) => f.code === "E-HYGIENE-DUPLICATE")?.message ?? "", "0.1.4");
   // a range alone is a warning and does not fail; one version under two paths is one copy
-  const range = hygiene({ ...none, packages: [pkg("package.json", "app", { "@intellectual-frontiers/kanon": "latest" })], locks: [{ kind: "read", file: "bun.lock", copies: new Map() }] });
+  const range = hygiene({ ...none, packages: [pkg("package.json", "app", { "@intellectual-frontiers/kanon": "latest" })], locks: [{ kind: "read", file: "bun.lock", copies: new Map() }] }, POLICY);
   assertEquals(range.map((f) => f.code), ["E-HYGIENE-RANGE"]);
   assertEquals(hygieneFails(range), false);
-  const hoisted = hygiene({ ...none, installed: new Map([[CORE, [{ version: "0.1.5", where: "a" }, { version: "0.1.5", where: "b" }]]]) });
+  const hoisted = hygiene({ ...none, installed: new Map([[CORE, [{ version: "0.1.5", where: "a" }, { version: "0.1.5", where: "b" }]]]) }, POLICY);
   assertEquals(hoisted, []);
   // the predicates
   assert(isExactVersion("0.1.5") && isExactVersion("1.0.0-rc.1") && !isExactVersion("^0.1.5") && !isExactVersion("latest"));
-  assert(isGitOfCommons("git+https://github.com/intellectual-frontiers/.github.git#x") && isGitOfCommons("intellectual-frontiers/.github") && !isGitOfCommons("^0.1.0"));
-  assert(intoCommons("../commons/core") && intoCommons("..\\commons\\core") && !intoCommons("../commons") && !intoCommons("../common/core"));
+  assert(isGitOfFamily(POLICY, "git+https://github.com/intellectual-frontiers/.github.git#x") && isGitOfFamily(POLICY, "intellectual-frontiers/.github") && !isGitOfFamily(POLICY, "^0.1.0"));
+  assert(intoFamily(POLICY, "../commons/core") && intoFamily(POLICY, "..\\commons\\core") && !intoFamily(POLICY, "../commons") && !intoFamily(POLICY, "../common/core"));
 });
 
 proves(["0007-repoctl-hygiene FR-002", "0036-distribution FR-013"], "in the repository of commons the path, import and vendored findings are not made and the others are", () => {
   const facts: HygieneFacts = {
-    repository: "commons",
+    repository: "source",
     packages: [pkg("commons/core/package.json", CORE, { "@intellectual-frontiers/commons": "link:../ts", dep: "github:intellectual-frontiers/.github#x" })],
     locks: [{ kind: "read", file: "bun.lock", copies: new Map() }],
     installed: new Map(),
     imports: [{ file: "commons/a/src/x.ts", specifier: "../../commons/core/src/mod.ts" }],
     workspaces: [],
   };
-  assertEquals(hygiene(facts).map((f) => f.code), ["E-HYGIENE-GIT"]);
+  assertEquals(hygiene(facts, POLICY).map((f) => f.code), ["E-HYGIENE-GIT"]);
 });
 
 const BUN_LOCK = `{
@@ -117,16 +121,16 @@ const NPM_LOCK = JSON.stringify({
 
 proves(["0007-repoctl-hygiene FR-003", "0036-distribution FR-011"], "bun.lock and package-lock.json give the same duplicate, comments and trailing commas are read, and a lockfile that cannot be read is a failing finding", () => {
   assertEquals(JSON.parse(stripJsonc('{ "a": "x // not a comment", /* c */ "b": [1,], }')), { a: "x // not a comment", b: [1] });
-  const bun = parseBunLock(BUN_LOCK, "bun.lock");
-  const npm = parseNpmLock(NPM_LOCK, "package-lock.json");
+  const bun = parseBunLock(BUN_LOCK, "bun.lock", POLICY.scope);
+  const npm = parseNpmLock(NPM_LOCK, "package-lock.json", POLICY.scope);
   assert(bun.kind === "read" && npm.kind === "read");
-  const dup = (l: typeof bun): readonly string[] => hygiene({ ...none, locks: [l] }).map((f) => `${f.code} ${f.message.split(" is installed ")[0] ?? ""}`);
+  const dup = (l: typeof bun): readonly string[] => hygiene({ ...none, locks: [l] }, POLICY).map((f) => `${f.code} ${f.message.split(" is installed ")[0] ?? ""}`);
   assertEquals(dup(bun), [`E-HYGIENE-DUPLICATE ${CORE}`]);
   assertEquals(dup(npm), dup(bun));
   assertEquals([...bun.copies.get(CORE)?.map((c) => c.version) ?? []].sort(), ["0.1.4", "0.1.5"]);
-  const broken = parseBunLock("{ nope", "bun.lock");
+  const broken = parseBunLock("{ nope", "bun.lock", POLICY.scope);
   assertEquals(broken.kind, "unreadable");
-  const found = hygiene({ ...none, locks: [broken] });
+  const found = hygiene({ ...none, locks: [broken] }, POLICY);
   assertEquals(found.map((f) => `${f.code} ${f.level}`), ["E-ENVIRONMENT fail"]);
   const far = ["..", "..", "commons", "x"].join("/");
   assertEquals(relativeImports(`import a from "./a.ts"; export * from "../b"; const c = await import("${far}"); import d from "pkg"; require("./e.cjs");`), ["./a.ts", "../b", far, "./e.cjs"]);
@@ -146,16 +150,16 @@ async function broken(dir: string): Promise<void> {
 proves(["0007-repoctl-hygiene FR-003", "0007-repoctl-hygiene FR-004", "0036-distribution FR-012"], "on a folder: the facts are gathered through the ports, the real command ends in 1 with the findings and one JSON document, and a repository in order ends in 0", async () => {
   await fs.withTempDir(async (dir) => {
     await broken(dir);
-    const world = systemWorld(dir, () => undefined);
-    const facts = await gatherHygieneFacts(world);
+    const world = systemWorld(dir, () => undefined, { libraries: undefined });
+    const facts = await gatherHygieneFacts(world, POLICY);
     assertEquals(facts.repository, "consumer");
     assertEquals([...(facts.installed.get(CORE) ?? [])].map((c) => c.version).sort(), ["0.1.3", "0.1.5"]);
-    const codes = hygiene(facts).map((f) => f.code);
+    const codes = hygiene(facts, POLICY).map((f) => f.code);
     for (const c of ["E-HYGIENE-GIT", "E-HYGIENE-PATH", "E-HYGIENE-IMPORT", "E-HYGIENE-VENDORED", "E-HYGIENE-DUPLICATE", "E-HYGIENE-RANGE"]) assert(codes.includes(c as never), c);
-    const out = await execute(hostOf(world), ["hygiene"]);
+    const out = await execute(hostOf(world, WITH_POLICY), ["hygiene"]);
     assertEquals(out.code, 1, out.err);
     assertStringIncludes(out.out + out.err, "E-HYGIENE-GIT");
-    const json = await execute(hostOf(world), ["hygiene", "--json"]);
+    const json = await execute(hostOf(world, WITH_POLICY), ["hygiene", "--json"]);
     assertEquals(json.code, 1);
     const doc: unknown = JSON.parse(json.out);
     assert(typeof doc === "object" && doc !== null && "data" in doc && typeof doc.data === "object" && doc.data !== null);
@@ -164,20 +168,20 @@ proves(["0007-repoctl-hygiene FR-003", "0007-repoctl-hygiene FR-004", "0036-dist
   await fs.withTempDir(async (dir) => {
     await put(dir, "package.json", JSON.stringify({ name: "app", dependencies: { [CORE]: "0.1.5" } }));
     await put(dir, "bun.lock", '{ "lockfileVersion": 1, "packages": { "@intellectual-frontiers/core": ["@intellectual-frontiers/core@0.1.5", "", {}, "x"] } }');
-    const world = systemWorld(dir, () => undefined);
-    const ok0 = await execute(hostOf(world), ["hygiene", "--json"]);
+    const world = systemWorld(dir, () => undefined, { libraries: undefined });
+    const ok0 = await execute(hostOf(world, WITH_POLICY), ["hygiene", "--json"]);
     assertEquals(ok0.code, 0, ok0.err);
     // a warning alone does not fail
     await put(dir, "package.json", JSON.stringify({ name: "app", dependencies: { [CORE]: "^0.1.5" } }));
-    assertEquals((await execute(hostOf(world), ["hygiene"])).code, 0);
+    assertEquals((await execute(hostOf(world, WITH_POLICY), ["hygiene"])).code, 0);
     // the repository of commons is told apart
     await put(dir, "commons/libraries/library.ts", "export const library = {};\n");
-    assertEquals((await gatherHygieneFacts(world)).repository, "commons");
+    assertEquals((await gatherHygieneFacts(world, POLICY)).repository, "source");
   });
 });
 
 proves(["0007-repoctl-hygiene FR-005", "0036-distribution FR-009"], "status asks npm for the package a library publishes", async () => {
-  const lib: LibraryInfo = { name: "data", package: "@intellectual-frontiers/arcactl", folder: "commons/data", version: "0.9.0", level: "L1", specKit: undefined, npm: true, versionConstants: [] };
+  const lib: LibraryInfo = { name: "data", package: "@intellectual-frontiers/arcactl", folder: "commons/data", version: "0.9.0", level: "L1", specKit: undefined, npm: true, held: undefined, versionConstants: [] };
   const asked: string[] = [];
   const world: World = {
     repo: "/nowhere",
@@ -186,6 +190,7 @@ proves(["0007-repoctl-hygiene FR-005", "0036-distribution FR-009"], "status asks
     registry: { view: (name) => { asked.push(name); return Promise.resolve(ok("absent")); } },
     credentials: { npmToken: () => undefined },
     libraries: { list: () => Promise.resolve(ok([lib])) },
+    docs: { load: () => Promise.resolve(err("no generator")) },
   };
   const r = await runStatus(world, { offline: false });
   assert(r.kind === "ok");

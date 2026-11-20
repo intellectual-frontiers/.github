@@ -7,7 +7,7 @@
  * @example
  * ```ts
  * import { systemWorld } from "@intellectual-frontiers/repoctl/physical";
- * const world = systemWorld("/path/to/checkout", (name) => process.env[name]);
+ * const world = systemWorld("/path/to/checkout", (name) => process.env[name], { libraries: undefined });
  * world.repo; // "/path/to/checkout"
  * ```
  *
@@ -16,10 +16,12 @@
 import { err, ok } from "@intellectual-frontiers/core";
 import { secretOf } from "@intellectual-frontiers/headless/logical";
 import { publishedPackage, readLibraries } from "@intellectual-frontiers/libraries/libraries";
-import { makeTempDir, mkdirSync, readDirSync, readTextFileSync, removeSync, writeTextFileSync, existsSync, statSync } from "@intellectual-frontiers/system/fs";
-import { dirname, join } from "@intellectual-frontiers/system/path";
+import { makeTempDir, mkdirSync, readDirSync, readFileSync, readTextFileSync, removeSync, writeTextFileSync, existsSync, statSync } from "@intellectual-frontiers/system/fs";
+import { dirname, join, toFileUrl } from "@intellectual-frontiers/system/path";
 import { run } from "@intellectual-frontiers/system/proc";
-import type { Credentials, Files, LibraryInfo, Libraries, Process, Registry, World } from "@intellectual-frontiers/repoctl/logical";
+import type { Config } from "@intellectual-frontiers/repoctl/governance";
+import type { Credentials, DocsGenerator, DocsPort, Files, LibraryInfo, Libraries, Process, Registry, World } from "@intellectual-frontiers/repoctl/logical";
+import { serve } from "@intellectual-frontiers/net/serve";
 
 /** The variable that holds the token for npm. */
 export const NPM_TOKEN_VARIABLE = "INFRO_NPMJS_TOKEN";
@@ -109,10 +111,11 @@ export function envCredentials(env: (name: string) => string | undefined): Crede
   };
 }
 
-/** The libraries of the repository, read from their manifests. */
-export function manifestLibraries(repo: string): Libraries {
+/** The libraries of the repository, read from their manifests; none where its configuration has no libraries. */
+export function manifestLibraries(repo: string, configured: boolean): Libraries {
   return {
     list: () => {
+      if (!configured) return Promise.resolve(ok([]));
       const found = readLibraries(repo);
       const bad = found.flatMap((f) => ("problem" in f ? [`commons/${f.dir}/library.ts: ${f.problem}`] : []));
       if (bad.length > 0) return Promise.resolve(err(bad.join("; ")));
@@ -128,7 +131,8 @@ export function manifestLibraries(repo: string): Libraries {
                     version: f.library.version,
                     level: f.library.level,
                     specKit: f.library.specKit === undefined ? undefined : f.library.specKit,
-                    npm: f.library.distribution.includes("npm"),
+                    npm: f.library.held === undefined && f.library.distribution.includes("npm"),
+                    held: f.library.held,
                     versionConstants: f.library.versionConstants ?? [],
                   },
                 ]
@@ -140,7 +144,87 @@ export function manifestLibraries(repo: string): Libraries {
   };
 }
 
+/** The package of the documentation generator, which `repoctl docs` loads where it is installed. */
+export const DOCS_PACKAGE = "@intellectual-frontiers/docs";
+
+const isRecord = (v: unknown): v is Readonly<Record<string, unknown>> => typeof v === "object" && v !== null;
+
+/** The entry file of an installed package: its `exports` entry `.` (as `import` or `default`), else `module`, else `main`. */
+function entryOf(folder: string): string | undefined {
+  const manifest = join(folder, "package.json");
+  if (!existsSync(manifest)) return undefined;
+  const json: unknown = JSON.parse(readTextFileSync(manifest));
+  if (!isRecord(json)) return undefined;
+  const exported = isRecord(json["exports"]) ? json["exports"]["."] : json["exports"];
+  const pick = (v: unknown): string | undefined => (typeof v === "string" ? v : isRecord(v) ? pick(v["import"]) ?? pick(v["default"]) : undefined);
+  const entry = pick(exported) ?? pick(json["module"]) ?? pick(json["main"]) ?? "index.js";
+  return join(folder, entry);
+}
+
+function generatorOf(mod: unknown): DocsGenerator | undefined {
+  if (!isRecord(mod)) return undefined;
+  const main = mod["main"];
+  return typeof main === "function" ? { main: async (argv) => Number(await main(argv)) } : undefined;
+}
+
+/** The documentation generator: the package found in the `node_modules` of the repository or above it, else the one this program can import by its name. */
+export const systemDocs: DocsPort = {
+  load: async (repo) => {
+    const tried: string[] = [];
+    for (let dir = repo; ; dir = dirname(dir)) {
+      const entry = entryOf(join(dir, "node_modules", DOCS_PACKAGE));
+      if (entry !== undefined && existsSync(entry)) {
+        try {
+          const found = generatorOf(await import(toFileUrl(entry).href));
+          if (found !== undefined) return ok(found);
+          tried.push(`${entry} exports no main`);
+        } catch (e) {
+          tried.push(`${entry}: ${e instanceof Error ? e.message : String(e)}`);
+        }
+        break;
+      }
+      if (dirname(dir) === dir) break;
+    }
+    try {
+      const specifier: string = DOCS_PACKAGE;
+      const found = generatorOf(await import(specifier));
+      if (found !== undefined) return ok(found);
+      tried.push(`${DOCS_PACKAGE} exports no main`);
+    } catch (e) {
+      tried.push(`${DOCS_PACKAGE} cannot be imported (${e instanceof Error ? e.message : String(e)})`);
+    }
+    return err(tried.join("; "));
+  },
+};
+
+const TYPES: Readonly<Record<string, string>> = {
+  ".html": "text/html; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8",
+  ".mjs": "text/javascript; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
+  ".md": "text/markdown; charset=utf-8",
+  ".txt": "text/plain; charset=utf-8",
+  ".svg": "image/svg+xml",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".ico": "image/x-icon",
+  ".woff2": "font/woff2",
+};
+
+/** A folder served on a loopback port (0 asks the system for one): the address and the function that stops it. Nothing leaves the computer: the socket is bound to 127.0.0.1. */
+export async function serveFolder(folder: string, port: number): Promise<{ readonly url: string; readonly close: () => Promise<void> }> {
+  const server = await serve({ port, hostname: "127.0.0.1" }, (request) => {
+    const asked = decodeURIComponent(new URL(request.url).pathname);
+    const wanted = asked.endsWith("/") ? `${asked}index.html` : asked;
+    const file = join(folder, ...wanted.split("/").filter((s) => s !== "" && s !== "." && s !== ".."));
+    if (!existsSync(file) || isFolder(file)) return new Response("not found\n", { status: 404, headers: { "content-type": "text/plain; charset=utf-8" } });
+    return new Response(readFileSync(file).slice(), { status: 200, headers: { "content-type": TYPES[file.slice(file.lastIndexOf("."))] ?? "application/octet-stream" } });
+  });
+  return { url: `http://127.0.0.1:${server.addr.port}/`, close: () => server.shutdown() };
+}
+
 /** The world of a repository on this system: every port filled. */
-export function systemWorld(repo: string, env: (name: string) => string | undefined): World {
-  return { repo, process: systemProcess, files: systemFiles, registry: npmRegistry, credentials: envCredentials(env), libraries: manifestLibraries(repo) };
+export function systemWorld(repo: string, env: (name: string) => string | undefined, config: Pick<Config, "libraries">): World {
+  return { repo, process: systemProcess, files: systemFiles, registry: npmRegistry, credentials: envCredentials(env), libraries: manifestLibraries(repo, config.libraries !== undefined), docs: systemDocs };
 }

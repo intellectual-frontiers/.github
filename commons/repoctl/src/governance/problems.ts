@@ -58,7 +58,13 @@ export type ProblemCode =
   | "E-HYGIENE-DUPLICATE"
   | "E-HYGIENE-RANGE"
   | "E-PROVE-FAILED"
-  | "E-PROVE-QUARANTINE";
+  | "E-PROVE-QUARANTINE"
+  | "E-CHECK-FAILED"
+  | "E-CONFIG-MISSING"
+  | "E-CONFIG-LOAD"
+  | "E-CONFIG-INVALID"
+  | "E-DOCS-GENERATOR-MISSING"
+  | "E-DOCS-FAILED";
 
 /** Every code, in the order the explanations are listed. */
 export const PROBLEM_CODES: readonly ProblemCode[] = [
@@ -103,6 +109,12 @@ export const PROBLEM_CODES: readonly ProblemCode[] = [
   "E-HYGIENE-RANGE",
   "E-PROVE-FAILED",
   "E-PROVE-QUARANTINE",
+  "E-CHECK-FAILED",
+  "E-CONFIG-MISSING",
+  "E-CONFIG-LOAD",
+  "E-CONFIG-INVALID",
+  "E-DOCS-GENERATOR-MISSING",
+  "E-DOCS-FAILED",
 ];
 
 /** Whether a text is one of the codes. */
@@ -357,5 +369,41 @@ export const CATALOGUE: Readonly<Record<ProblemCode, Explained>> = {
     what: "`commons/repoctl/quarantine.json` names a test whose expiry day has passed (it runs again), or the record is not a list of entries with a test, an owner, an expiry and a reason.",
     why: "A quarantine holds a flaky test back for a time and names who fixes it; it never holds one for good.",
     fix: "fix the test, or renew its entry with a new expiry and a reason",
+  },
+  "E-CHECK-FAILED": {
+    title: "A check of the repository found something",
+    what: "A named check of the repository's configuration ended with 1 and said what is wrong, line by line.",
+    why: "What the check judges is wrong in this checkout.",
+    fix: "run the check's own command, named in the finding, and read its output",
+  },
+  "E-CONFIG-MISSING": {
+    title: "This repository has no repoctl.config.ts",
+    what: "No `repoctl.config.ts` is in this folder or above it, and `--config` did not name one.",
+    why: "repoctl is driven by a typed configuration at the root of the repository it operates; without one it knows no generator, check or rule.",
+    fix: "write repoctl.config.ts at the root of the repository (see the guide: repoctl in your repository)",
+  },
+  "E-CONFIG-LOAD": {
+    title: "The configuration could not be loaded",
+    what: "`repoctl.config.ts` could not be imported, or it exports no configuration (its default export or `config`).",
+    why: "A syntax error, an import that is not installed, or a file that exports nothing.",
+    fix: "run the file with bun or node to read the error, and export `defineConfig({ ... })` as the default",
+  },
+  "E-CONFIG-INVALID": {
+    title: "The configuration is not valid",
+    what: "`repoctl.config.ts` was loaded and says something that cannot be: an id used twice, a generator that waits for one that is not there, a capability that needs `libraries`, a variable that is not a name.",
+    why: "A typing mistake in the configuration; every reason is listed.",
+    fix: "correct each reason listed, then run repoctl doctor",
+  },
+  "E-DOCS-GENERATOR-MISSING": {
+    title: "The documentation generator is not installed",
+    what: "`@intellectual-frontiers/docs`, the package of the generator `ifc-docs`, cannot be imported from this repository.",
+    why: "`repoctl docs` wraps the generator and does not carry it: it is an optional peer of repoctl.",
+    fix: "bun add --dev @intellectual-frontiers/docs (or npm install --save-dev @intellectual-frontiers/docs)",
+  },
+  "E-DOCS-FAILED": {
+    title: "The documentation generator reported a failure",
+    what: "The generator ended with a status that is not 0, or could not be served.",
+    why: "The site has a finding (its lines are above), or the configuration file named by `docs.config` is wrong.",
+    fix: "repoctl docs check",
   },
 };

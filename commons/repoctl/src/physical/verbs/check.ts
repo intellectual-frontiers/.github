@@ -12,7 +12,7 @@
  *
  * @module
  */
-import { countsOf, diagnose, findingsOfStatus, gatherFacts, gatherHygieneFacts, hygiene, type HygieneFinding, reportOk, runCheck, runStatus, type CheckReport, tableOf } from "@intellectual-frontiers/repoctl/logical";
+import { countsOf, diagnose, finding, findingsOfStatus, gatherFacts, gatherHygieneFacts, hygiene, type HygieneFinding, reportOk, runCheck, runStatus, type CheckReport, tableOf } from "@intellectual-frontiers/repoctl/logical";
 import { flag } from "@intellectual-frontiers/terminal/args";
 import { defineVerb, generatorsOf, outcomeOfDone, outcomeOfEnvironment } from "../define.ts";
 
@@ -37,7 +37,7 @@ export const checkVerb = defineVerb({
     { args: ["--json"], says: "The same, as one JSON document: each section with its findings, their codes and their fixes." },
   ],
   run: async (_args, _ctx, w, host) => {
-    const report = await runCheck(w, generatorsOf(host));
+    const report = await runCheck(w, host.config);
     const findings = report.sections.flatMap((s) => s.findings);
     const first = findings.find((f) => f.level === "fail");
     return outcomeOfDone({
@@ -72,10 +72,12 @@ export const doctorVerb = defineVerb({
   name: "doctor",
   id: "doctor",
   options: {},
+  needsConfig: false,
   examples: [{ args: [], says: "What is wrong with this checkout, in the order to fix it, and the command for each." }],
   run: async (_args, _ctx, w, host) => {
-    const facts = await gatherFacts(w, generatorsOf(host));
-    const findings = diagnose(facts);
+    const facts = await gatherFacts(w, generatorsOf(host), host.config.doctor);
+    const missing = host.configProblem === undefined ? [] : [finding("fail", host.configProblem.code, host.configProblem.message, host.configProblem.code === "E-CONFIG-MISSING" ? "write repoctl.config.ts at the root of the repository" : "repoctl explain " + host.configProblem.code)];
+    const findings = [...missing, ...diagnose(facts, host.config.doctor)];
     const first = findings.find((f) => f.level === "fail");
     const lines = [
       `git      ${facts.git.works ? (facts.git.inside ? "a working tree" : "not a working tree") : "not available"}`,
@@ -84,6 +86,7 @@ export const doctorVerb = defineVerb({
       `node     ${facts.node ?? "not available"}`,
       `bun      ${facts.bun ?? "not available"} (pinned ${facts.pinnedBun ?? "unknown"})`,
       `files    ${facts.stale.length === 0 ? "generated files current" : `${facts.stale.length} stale`}`,
+      `config   ${host.configProblem === undefined ? host.config.repo : host.configProblem.code}`,
     ];
     return outcomeOfDone({
       data: { git: facts.git, installed: facts.installed, unlinked: facts.unlinked, node: facts.node ?? null, bun: facts.bun ?? null, pinnedBun: facts.pinnedBun ?? null, stale: facts.stale.map((f) => f.message) },
@@ -96,9 +99,9 @@ export const doctorVerb = defineVerb({
 });
 
 /** The lines of a hygiene report for a person: each finding with its path, and one line for the counts. */
-export function hygieneText(findings: readonly HygieneFinding[], repository: "commons" | "consumer"): string {
+export function hygieneText(findings: readonly HygieneFinding[], repository: "source" | "consumer"): string {
   const { failures, warnings } = countsOf(findings);
-  const head = repository === "commons" ? "this is the repository of commons: its own packages are not reported\n" : "";
+  const head = repository === "source" ? "this is the repository the packages are made in: its own packages are not reported\n" : "";
   const lines = findings.map((f) => `${f.level === "fail" ? "FAIL" : "warn"}  ${f.code}  ${f.message}`);
   return `${head}${[...lines, `${failures} failure${failures === 1 ? "" : "s"}, ${warnings} warning${warnings === 1 ? "" : "s"}`].join("\n")}`;
 }
@@ -109,19 +112,21 @@ export const hygieneVerb = defineVerb({
   id: "hygiene",
   options: {},
   examples: [
-    { args: [], says: "Say whether this repository consumes commons only as published packages: findings with their code and path, and the exit status 1 where one fails." },
+    { args: [], says: "Say whether this repository consumes the family's packages only as published packages: findings with their code and path, and the exit status 1 where one fails." },
     { args: ["--json"], says: "The same as one JSON document: the repository, the findings with their code, level, path, message and fix, and the counts." },
   ],
-  run: async (_args, _ctx, w) => {
-    const facts = await gatherHygieneFacts(w);
-    const findings = hygiene(facts);
+  run: async (_args, _ctx, w, host) => {
+    const policy = host.config.hygiene;
+    if (policy === undefined) return outcomeOfEnvironment("this repository's configuration has no hygiene policy");
+    const facts = await gatherHygieneFacts(w, policy);
+    const findings = hygiene(facts, policy);
     const first = findings.find((f) => f.level === "fail") ?? findings[0];
     return outcomeOfDone({
       data: { repository: facts.repository, ...countsOf(findings), findings },
       text: hygieneText(findings, facts.repository),
       findings,
       next: first === undefined ? [] : [first.fix, `repoctl explain ${first.code}`],
-      title: "This repository consumes commons as published packages",
+      title: "This repository consumes the packages as published",
     });
   },
 });

@@ -30,6 +30,7 @@
     "@intellectual-frontiers/headless": "link:../headless",
     "@intellectual-frontiers/kanon": "link:../kanon",
     "@intellectual-frontiers/libraries": "link:../libraries",
+    "@intellectual-frontiers/net": "link:../net",
     "@intellectual-frontiers/mizan": "link:../mizan",
     "@intellectual-frontiers/system": "link:../system",
     "@intellectual-frontiers/terminal": "link:../terminal",

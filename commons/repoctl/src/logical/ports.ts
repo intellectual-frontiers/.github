@@ -15,6 +15,7 @@
 import type { Result } from "@intellectual-frontiers/core";
 import type { Secret } from "@intellectual-frontiers/headless/logical";
 import type { VersionConstant } from "./constants.ts";
+import type { DocsPort } from "./docs.ts";
 
 /** How a program ended, with its output as text. */
 export type Run = { readonly code: number; readonly stdout: string; readonly stderr: string };
@@ -57,7 +58,7 @@ export type Credentials = { readonly npmToken: () => Secret | undefined };
 /** What a library says of itself, read from its manifest. */
 export type LibraryInfo = {
   readonly name: string;
-  /** The package it publishes: `@intellectual-frontiers/<name>`, or the one its manifest names in `publishes` (commons 0036-distribution FR-009). */
+  /** The package it publishes: its scope and name, or the one its manifest names in `publishes`. */
   readonly package: string;
   /** Its folder from the repository's root. */
   readonly folder: string;
@@ -66,6 +67,8 @@ export type LibraryInfo = {
   /** Its spec kit from its folder, where it has one. */
   readonly specKit: string | undefined;
   readonly npm: boolean;
+  /** Why the library is held out of the release, where it is: it has no tag, no registry and no set. */
+  readonly held: string | undefined;
   readonly versionConstants: readonly VersionConstant[];
 };
 
@@ -81,4 +84,6 @@ export type World = {
   readonly registry: Registry;
   readonly credentials: Credentials;
   readonly libraries: Libraries;
+  /** The documentation generator, loaded from the repository's own dependencies. */
+  readonly docs: DocsPort;
 };

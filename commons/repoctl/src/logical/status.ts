@@ -34,7 +34,7 @@ export type TagCell =
   | { readonly kind: "found"; readonly latest: string; readonly hasRepoVersion: boolean; readonly source: "remote" | "local" };
 
 /** Where a library stands, from the three versions. */
-export type State = "released" | "unpublished" | "untagged" | "unknown";
+export type State = "released" | "unpublished" | "untagged" | "unknown" | "held";
 
 /** One row of the status. */
 export type Row = { readonly library: string; readonly repo: string; readonly npm: NpmCell; readonly tag: TagCell; readonly state: State };
@@ -62,7 +62,8 @@ export function tagsOf(text: string): ReadonlyMap<string, readonly string[]> {
 }
 
 /** Where a library stands: it is released when npm holds its repository version (or it is not on npm) and its tag is made; what is not known is unknown. */
-export function stateOf(lib: Pick<LibraryInfo, "npm">, npm: NpmCell, tag: TagCell): State {
+export function stateOf(lib: Pick<LibraryInfo, "npm" | "held">, npm: NpmCell, tag: TagCell): State {
+  if (lib.held !== undefined) return "held";
   if (npm.kind === "skipped" || npm.kind === "unreachable" || tag.kind === "unreachable") return "unknown";
   if (lib.npm && (npm.kind === "absent" || (npm.kind === "found" && !npm.hasRepoVersion))) return "unpublished";
   if (tag.kind === "none" || !tag.hasRepoVersion) return "untagged";
@@ -85,8 +86,8 @@ export async function runStatus(w: World, options: { readonly offline: boolean }
   const tags = listed.code === 0 ? tagsOf(listed.stdout) : undefined;
   const why = `git could not list the tags (${listed.stderr.trim().split("\n").slice(-1)[0] ?? "no message"})`;
   const rows = await pool([...libs.value].sort((a, b) => (a.name < b.name ? -1 : 1)), 8, async (lib): Promise<Row> => {
-    const npm: NpmCell = !lib.npm ? { kind: "not-published" } : options.offline ? { kind: "skipped" } : npmCell(lib, await w.registry.view(lib.package));
-    const versions = tags?.get(lib.name) ?? [];
+    const npm: NpmCell = lib.held !== undefined || !lib.npm ? { kind: "not-published" } : options.offline ? { kind: "skipped" } : npmCell(lib, await w.registry.view(lib.package));
+    const versions = lib.held !== undefined ? [] : (tags?.get(lib.name) ?? []);
     const latest = greatest(versions);
     const tag: TagCell = tags === undefined ? { kind: "unreachable", why } : latest === undefined ? { kind: "none", source } : { kind: "found", latest, hasRepoVersion: versions.includes(lib.version), source };
     return { library: lib.name, repo: lib.version, npm, tag, state: stateOf(lib, npm, tag) };
