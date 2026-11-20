@@ -52,7 +52,7 @@ jobs:
         run: bun fmt --check
         working-directory: commons/ts
       - name: "The linter, type-aware, no warning allowed"
-        run: "bun x \"bun@$BUN_LINT_VERSION\" lint --type-aware --max-warnings 0 kernel runtime tests tools ../lint"
+        run: "bun x \"bun@$BUN_LINT_VERSION\" lint --type-aware --max-warnings 0 kernel runtime tests tools"
         working-directory: commons/ts
 
   test:

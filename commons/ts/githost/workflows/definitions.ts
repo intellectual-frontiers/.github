@@ -278,7 +278,7 @@ const ifcTypescript: Workflow = {
           workingDirectory: "commons/ts",
         }),
         run("bun fmt --check", { name: "The formatter", workingDirectory: "commons/ts" }),
-        run('bun x "bun@$BUN_LINT_VERSION" lint --type-aware --max-warnings 0 kernel runtime tests tools ../lint', {
+        run('bun x "bun@$BUN_LINT_VERSION" lint --type-aware --max-warnings 0 kernel runtime tests tools', {
           name: "The linter, type-aware, no warning allowed",
           workingDirectory: "commons/ts",
         }),
