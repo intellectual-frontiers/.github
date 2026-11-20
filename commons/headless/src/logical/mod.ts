@@ -16,6 +16,7 @@
  */
 export * from "./closing.ts";
 export * from "./compose.ts";
+export * from "./credentials.ts";
 export * from "./envelope.ts";
 export * from "./executor.ts";
 export * from "./explain.ts";

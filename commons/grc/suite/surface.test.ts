@@ -6,7 +6,7 @@
  */
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { fs, path } from "@intellectual-frontiers/system";
-import { modelProblems, NO_PROGRESS, NO_PROMPT, placedCommands, programOf, type Context, type Outcome } from "@intellectual-frontiers/headless/logical";
+import { modelProblems, NO_CREDENTIALS, NO_PROGRESS, NO_PROMPT, placedCommands, programOf, type Context, type Outcome } from "@intellectual-frontiers/headless/logical";
 import { createRunners } from "@intellectual-frontiers/grc/physical";
 import { sqlRunner } from "@intellectual-frontiers/grc/runners/sql";
 import { memoryStore } from "@intellectual-frontiers/grc/stores/memory";
@@ -37,7 +37,7 @@ async function run(h: GrcHost, words: readonly string[], options: Record<string,
   const program = programOf({ name: "t", summary: "T.", version: "1", children: [grcBranch(h)] });
   const placed = placedCommands(program.children).find((p) => p.id === `grc ${words[0]}`);
   if (placed === undefined) throw new Error(`no command ${words[0]}`);
-  const ctx: Context = { program: "t", command: placed.id, facts: placed.facts, mode, verbosity: "calm", interactive: false, progress: NO_PROGRESS, prompt: NO_PROMPT, env: () => undefined, signal: new AbortController().signal };
+  const ctx: Context = { program: "t", command: placed.id, facts: placed.facts, mode, verbosity: "calm", interactive: false, progress: NO_PROGRESS, prompt: NO_PROMPT, credentials: NO_CREDENTIALS, env: () => undefined, signal: new AbortController().signal };
   return placed.command.run({ kind: "args", options, positionals: words.slice(1), rest: [] } as never, ctx);
 }
 

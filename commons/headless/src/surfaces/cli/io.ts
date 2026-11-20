@@ -17,7 +17,7 @@
  */
 import type { dirs } from "@intellectual-frontiers/system";
 import type { Counts, Problem, TierName } from "@intellectual-frontiers/headless/governance";
-import type { ExecutorFor } from "@intellectual-frontiers/headless/logical";
+import type { Clock, CredentialPort, ExecutorFor } from "@intellectual-frontiers/headless/logical";
 import type { StateStore } from "./state.ts";
 
 /** A signal a run is stopped by. */
@@ -54,6 +54,12 @@ export type RunObserver = {
 
 /** What a run is given about its world. */
 export type Io = {
+  /** What asks the person for a credential (0011-credential-prompt): none where there is no way to. */
+  readonly credentials?: CredentialPort;
+  /** The timer the time limit of a credential prompt runs on; the process's where it is not given. */
+  readonly clock?: Clock;
+  /** How long a credential prompt may wait, held to the longest the library allows. */
+  readonly credentialTimeoutMs?: number;
   /** The tier the caller holds (0010-audience-tiers): the program's default tier where the surface does not say. */
   readonly tier?: TierName;
   /** A variable of the environment. */

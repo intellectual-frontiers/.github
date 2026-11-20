@@ -1,4 +1,5 @@
 // Spec: 0003-headless-output FR-001, FR-012
+// Spec: 0011-credential-prompt FR-005
 /**
  * The command model (commons headless 0003-headless-output FR-001): a program is a tree of branches and commands; a command is a verb of the
  * terminal's declaration (its name, summary, options and operands, declared once) with the facts of its action (commons headless
@@ -23,6 +24,7 @@ import { flag, value, type Args, type Operand, type Spec, type SpecCheck } from 
 import { group, treeProblems, type CommandNode, type Example, type Group, type TreeProblem, type Verb } from "@intellectual-frontiers/terminal/commands";
 import { actionProblems, defineAction, reachConformance, type ActionDefinition, type ActionFacts, type ActionProblem, type Mode, type Problem, type ProblemFields, type ReachPolicy, type ReachProblem } from "@intellectual-frontiers/headless/governance";
 import { problem } from "@intellectual-frontiers/headless/governance";
+import type { Credentials } from "./credentials.ts";
 import type { Hint, Outcome } from "./outcome.ts";
 import type { Verbosity } from "./verbosity.ts";
 
@@ -46,6 +48,8 @@ export type Context = {
   readonly progress: Progress;
   /** A question to the person; each answers `undefined` where there is no one to ask. */
   readonly prompt: Prompt;
+  /** The credentials of this one command (0011-credential-prompt): asked once each, held in memory until the command ends, refused where there is no person, never logged. */
+  readonly credentials: Credentials;
   /** The environment, as a function. */
   readonly env: (name: string) => string | undefined;
   /** Aborted when the person stops the run (SIGINT, SIGTERM): a command that can stop early listens. */

@@ -34,6 +34,7 @@ const EXPORTS: Record<string, string> = {
   "./targets/ssh": "./src/targets/ssh/mod.ts",
   "./ssh-inbound": "./src/surfaces/ssh-inbound/mod.ts",
   "./otel": "./src/otel/mod.ts",
+  "./askpass": "./src/surfaces/askpass/mod.ts",
 };
 const at = (path: string, text: string) => ({ path, text });
 const rules = (files: readonly { path: string; text: string }[]): string[] => importFindings(TABLE, files, EXPORTS).map((f) => f.rule);
@@ -117,7 +118,7 @@ proves(["0001-headless-layers FR-005"], "the command-line surface may not import
 proves(["0001-headless-layers FR-006"], "a surface is one folder with one row of the table; a folder with no row is layers/unclassified, and its row says what it may import", () => {
   assertEquals(
     TABLE.units.filter((u) => u.folder.startsWith("src/surfaces/")).map((u) => u.folder),
-    ["src/surfaces/cli/", "src/surfaces/ssh-inbound/"],
+    ["src/surfaces/cli/", "src/surfaces/ssh-inbound/", "src/surfaces/askpass/"],
   );
   // the folder `src/` is the library's own for its entry, `mod.ts`; so that a surface cannot appear without a row, every folder under `src/surfaces/` and `src/targets/` is held to be a unit of the table
   const rows = new Set(TABLE.units.map((u) => u.folder as string));

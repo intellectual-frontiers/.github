@@ -9,3 +9,4 @@ number	slug	state
 0008	exit-style-consent	in force
 0009	composition	in force
 0010	audience-tiers	in force
+0011	credential-prompt	in force

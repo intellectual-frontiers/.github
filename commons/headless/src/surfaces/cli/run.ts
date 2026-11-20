@@ -1,6 +1,7 @@
 // Spec: 0004-headless-cli FR-003, FR-004, FR-011, FR-012
 // Spec: 0008-exit-style-consent FR-001, FR-002, FR-003, FR-004
 // Spec: 0010-audience-tiers FR-003, FR-004, FR-006
+// Spec: 0011-credential-prompt FR-005, FR-006
 /**
  * The run boundary of the command line (commons headless 0004-headless-cli FR-011): `run(program, argv, io)` gives `{ code, out, err }` and touches no
  * process global, so a test, a REPL and a tool that embeds the program all call it the same way. It resolves the words to a command, parses the
@@ -42,6 +43,7 @@ import {
 } from "@intellectual-frontiers/headless/governance";
 import {
   closingOf,
+  credentialSession,
   distinctHints,
   envelopeOf,
   explainText,
@@ -249,12 +251,43 @@ type Execution = {
   readonly events?: RunEvents;
 };
 
-/** Runs the command and everything around it: the log, the reporter, the signals, the redaction, the closing block. */
+/** The clock of the process, for a surface that is not given one. */
+const processClock = {
+  after: (ms: number, fn: () => void): (() => void) => {
+    const h = setTimeout(fn, ms);
+    return () => clearTimeout(h);
+  },
+};
+
+/** Runs the command and everything around it: the log, the reporter, the signals, the redaction, the closing block, and the end of its credentials. */
 async function execute(x: Execution): Promise<Ended> {
+  const controller = new AbortController();
+  const held: { log: RunLog | undefined } = { log: undefined };
+  const credentials = credentialSession({
+    interactive: x.interactive,
+    clock: x.io.clock ?? processClock,
+    signal: controller.signal,
+    onEvent: (e) => {
+      if (e.kind === "asked") held.log?.write("credential", `${e.id} (${e.credential}) asked`);
+      else if (e.kind === "given") held.log?.write("credential", `${e.id} given`);
+      else held.log?.write("credential", `${e.id} refused: ${e.refusal}`);
+    },
+    ...(x.io.credentials === undefined ? {} : { port: x.io.credentials }),
+    ...(x.io.credentialTimeoutMs === undefined ? {} : { timeoutMs: x.io.credentialTimeoutMs }),
+  });
+  try {
+    return await executeWith(x, credentials, controller, held);
+  } finally {
+    credentials.close();
+  }
+}
+
+async function executeWith(x: Execution, credentials: Context["credentials"], controller: AbortController, held: { log: RunLog | undefined }): Promise<Ended> {
   const { program, io, placed } = x;
   const screen: string[] = [];
   const nested = isNested(program.nested, io.env);
-  const redact = redactor(program.secrets(), { keys: program.secretKeys });
+  // the redaction is made at each use: it holds the values the program holds and every credential this command was given
+  const redact = (text: string): string => redactor([...program.secrets(), ...credentials.values()], { keys: program.secretKeys })(text);
   const stateDir = stateDirOf(program.stateApp, io.env, io.os);
   const inherited = io.env(`${program.envPrefix}_LOG`);
   let log: RunLog | undefined;
@@ -265,6 +298,7 @@ async function execute(x: Execution): Promise<Ended> {
     log = new RunLog(io.state, `${dir}${io.os === "windows" ? "\\" : "/"}${logName(io.now(), io.pid)}`, io.now);
   }
   const from = program.origins[placed.id];
+  held.log = log;
   log?.write("run", `${program.name} ${placed.id} (${program.version}) mode ${x.mode}, ${x.verbosity}${from === undefined ? "" : `, from ${from}`}`);
   if (x.consent !== undefined) log?.write("consent", `${placed.id} went on by the consent ${redact(x.consent)}`);
   const reporter = new Reporter({
@@ -278,7 +312,6 @@ async function execute(x: Execution): Promise<Ended> {
     ...(io.timer === undefined ? {} : { timer: io.timer }),
     ...(x.events === undefined ? {} : { events: x.events }),
   });
-  const controller = new AbortController();
   const progress = (event: ProgressEvent): void => reporter.handle(redactEvent(event, redact));
   const ctx: Context = {
     program: program.name,
@@ -289,6 +322,7 @@ async function execute(x: Execution): Promise<Ended> {
     interactive: x.interactive,
     progress,
     prompt: x.prompt,
+    credentials,
     env: io.env,
     signal: controller.signal,
   };
