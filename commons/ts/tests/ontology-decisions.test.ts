@@ -9,10 +9,10 @@ import { readFileSync } from "node:fs";
 import { dirname, fromFileUrl, resolve } from "@intellectual-frontiers/system/path";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { termRecordsOf } from "../mizan/check.ts";
-import { termFindings } from "../mizan/standards.ts";
-import * as ifccm from "../../ontology/ifccm/mod.ts";
-import * as ifqs from "../../ontology/ifqs/mod.ts";
-import * as mizan from "../../ontology/mizan/mod.ts";
+import { termFindings } from "@intellectual-frontiers/mizan/standards";
+import * as ifccm from "@intellectual-frontiers/ontology/ifccm";
+import * as ifqs from "@intellectual-frontiers/ontology/ifqs";
+import * as mizan from "@intellectual-frontiers/ontology/mizan";
 
 const GENERATED = resolve(dirname(fromFileUrl(import.meta.url)), "../../generated");
 

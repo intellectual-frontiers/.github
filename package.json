@@ -8,10 +8,7 @@
     "./ts/runtime": "./commons/ts/runtime/mod.ts",
     "./ts/runtime/test-run": "./commons/ts/runtime/test-run.ts",
     "./ts/mizan": "./commons/ts/mizan/mod.ts",
-    "./ts/mizan/integrations": "./commons/ts/mizan/integrations/mod.ts",
     "./ts/mizan/changes": "./commons/ts/mizan/changes.ts",
-    "./ts/mizan/changes/commit-message": "./commons/ts/mizan/changes/commit-message.ts",
-    "./ts/mizan/changes/declaration": "./commons/ts/mizan/changes/declaration.ts",
     "./ts/mizan/check": "./commons/ts/mizan/check.ts",
     "./ts/mizan/oscal-register": "./commons/ts/mizan/oscal-register.ts",
     "./ts/mizan/versions": "./commons/ts/mizan/versions.ts",
@@ -20,7 +17,7 @@
     "./ts/tools/pack-library": "./commons/ts/tools/pack-library.ts",
     "./ts/node": "./commons/ts/node/register.mjs",
     "./docs": "./commons/docs/mod.ts",
-    "./ontology/mizan": "./commons/ontology/mizan/mod.ts"
+    "./ontology/mizan": "./commons/ontology/src/mizan/mod.ts"
   },
   "bin": {
     "ifc": "./commons/ts/node/ifc.mjs",

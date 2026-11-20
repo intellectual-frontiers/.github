@@ -13,7 +13,7 @@ import { OUTCOMES } from "@intellectual-frontiers/test/record";
 import { readTextFileSync } from "@intellectual-frontiers/system/fs";
 import { dirname, fromFileUrl, join, relative, resolve, toPosix } from "@intellectual-frontiers/system/path";
 import { assert, assertEquals, assertStringIncludes, proves, recorded, test } from "@intellectual-frontiers/test";
-import { evidenceGrades, testOutcomes } from "../../ontology/ifqs/mod.ts";
+import { evidenceGrades, testOutcomes } from "@intellectual-frontiers/ontology/ifqs";
 import { GRADES, QUALITY_OUTCOMES, CHARACTERISTICS, DOCUMENTS, ATTR, gradeRank, higherGrade, showGrade } from "../quality/pure/names.ts";
 import { canonicalize, checkRun, qualityCounts, readQuality } from "../quality/pure/record.ts";
 import {

@@ -5,7 +5,6 @@
  * encryption (as `cms`), signed in-toto statements (as `dsse`) and AWS Signature Version 4 (as `sigv4`); CBOR (as `cbor`), COSE keys (as `cose`)
  * and WebAuthn verification for a relying party (as `webauthn`); PNG and ICO pictures (as `png`);
  * archives, JSON5, TOML, YAML, CSV, XML and TypeScript literals; HTTP headers and media types; graphs; command-line arguments (as `args`) and command trees (as `commands`);
- * the trace of requirements and the layers of a ladder (as `trace` and `layers`, commons 0015-trace);
  * and type-level tests.
  *
  * @example
@@ -32,14 +31,10 @@
  *   (`nodenext`). The hook (`node/register.mjs`) is for a consumer that installs a copy.
  * - A library imports its own modules by its own package name through its `exports` (one entry for each public surface); a file `exports` does not name
  *   cannot be imported, by the runtimes or by the compiler, so `exports` is the library's boundary.
- * - `layers.ts` reads relative imports only, so an import by package name is never one of its findings: a library checks its own layers, by resolving
- *   each specifier through its `exports`.
  *
  * @module
  */
-export * as layers from "./layers.ts";
 export * as testReport from "./test-report.ts";
-export * as trace from "./trace.ts";
 export type {
   About,
   AboutArea,

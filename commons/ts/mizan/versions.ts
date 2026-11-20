@@ -33,9 +33,9 @@ import { existsSync, readTextFileSync, sha256File, writeTextFileSync } from "@in
 import { formatGitError } from "@intellectual-frontiers/system/git";
 import { join, resolve } from "@intellectual-frontiers/system/path";
 import { stdio } from "@intellectual-frontiers/system";
-import { dayOf, decodeHarnessRecord, type Declaration, formatRecordError } from "./changes/declaration.ts";
-import { citationOf } from "./versions/cite.ts";
-import { releaseGate } from "./versions/gate.ts";
+import { dayOf, decodeHarnessRecord, type Declaration, formatRecordError } from "@intellectual-frontiers/mizan/changes/declaration";
+import { citationOf } from "@intellectual-frontiers/mizan/versions/cite";
+import { releaseGate } from "@intellectual-frontiers/mizan/versions/gate";
 import {
   commitsSince,
   commitSeconds,
@@ -54,15 +54,39 @@ import {
   tagAncestry,
   tagsMerged,
   text as gitText,
-} from "./versions/git.ts";
-import { editionsNeeded, judgeWorks, recordFindings, type ReadRecord, type TreeFacts, versionProblems } from "./versions/judge.ts";
-import { type EarlierEntry, lastRelease, ledgerJson, ledgerText, readEarlier, readLedger, tagNameOf } from "./versions/ledger.ts";
-import { impactOfCommits, notesOf } from "./versions/notes.ts";
-import { type Release, releaseSource, CITATION_FILE } from "./versions/record.ts";
-import { formatFinding, sortFindings, type VersionsFinding } from "./versions/rules.ts";
-import { type Impact, IMPACTS, compareVersions, editionAt, nextSemVer, parseVersion, schemeOf, utcDay } from "./versions/scheme.ts";
-import { isReleaseTier } from "./versions/gate.ts";
-import { recordPathOf, scopeOf, workFolders } from "./versions/works.ts";
+} from "@intellectual-frontiers/mizan/versions/git";
+import {
+  editionsNeeded,
+  judgeWorks,
+  recordFindings,
+  type ReadRecord,
+  type TreeFacts,
+  versionProblems,
+} from "@intellectual-frontiers/mizan/versions/judge";
+import {
+  type EarlierEntry,
+  lastRelease,
+  ledgerJson,
+  ledgerText,
+  readEarlier,
+  readLedger,
+  tagNameOf,
+} from "@intellectual-frontiers/mizan/versions/ledger";
+import { impactOfCommits, notesOf } from "@intellectual-frontiers/mizan/versions/notes";
+import { type Release, releaseSource, CITATION_FILE } from "@intellectual-frontiers/mizan/versions/record";
+import { formatFinding, sortFindings, type VersionsFinding } from "@intellectual-frontiers/mizan/versions/rules";
+import {
+  type Impact,
+  IMPACTS,
+  compareVersions,
+  editionAt,
+  nextSemVer,
+  parseVersion,
+  schemeOf,
+  utcDay,
+} from "@intellectual-frontiers/mizan/versions/scheme";
+import { isReleaseTier } from "@intellectual-frontiers/mizan/versions/gate";
+import { recordPathOf, scopeOf, workFolders } from "@intellectual-frontiers/mizan/versions/works";
 
 /** What the command is given besides its arguments: where it writes and the clock (the one place the tool reads it, for the day a snapshot or an approval is made). */
 export type Deps = {

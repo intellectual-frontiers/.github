@@ -7,7 +7,7 @@
  *
  * @module
  */
-import { layerFindings, type Ladder } from "../../kernel/layers.ts";
+import { layerFindings, type Ladder } from "@intellectual-frontiers/mizan/layers";
 import { lstat, makeTempDir, mkdir, realPath, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { dirname, fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
 import { run, runtimeName, which } from "@intellectual-frontiers/system/proc";

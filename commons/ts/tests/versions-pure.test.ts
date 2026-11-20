@@ -6,10 +6,10 @@
  * @module
  */
 import { type Literal, tsLiteral } from "@intellectual-frontiers/formats/ts-literal";
-import { RELEASE_TIERS, decodeDeclaration } from "../mizan/changes/declaration.ts";
-import { citationOf } from "../mizan/versions/cite.ts";
-import { isReleaseTier, releaseGate } from "../mizan/versions/gate.ts";
-import { type EditionFacts, editionsNeeded, judgeWorks, type TreeFacts } from "../mizan/versions/judge.ts";
+import { RELEASE_TIERS, decodeDeclaration } from "@intellectual-frontiers/mizan/changes/declaration";
+import { citationOf } from "@intellectual-frontiers/mizan/versions/cite";
+import { isReleaseTier, releaseGate } from "@intellectual-frontiers/mizan/versions/gate";
+import { type EditionFacts, editionsNeeded, judgeWorks, type TreeFacts } from "@intellectual-frontiers/mizan/versions/judge";
 import {
   addDuration,
   lastRelease,
@@ -19,10 +19,10 @@ import {
   readLedger,
   splitTag,
   type TagFact,
-} from "../mizan/versions/ledger.ts";
-import { impactOf, impactOfCommits, notesOf } from "../mizan/versions/notes.ts";
-import { versionsPlugin } from "../mizan/versions/plugin.ts";
-import { decodeRelease, decodeReleaseSource, type Release, releaseSource } from "../mizan/versions/record.ts";
+} from "@intellectual-frontiers/mizan/versions/ledger";
+import { impactOf, impactOfCommits, notesOf } from "@intellectual-frontiers/mizan/versions/notes";
+import { versionsPlugin } from "@intellectual-frontiers/mizan/versions/plugin";
+import { decodeRelease, decodeReleaseSource, type Release, releaseSource } from "@intellectual-frontiers/mizan/versions/record";
 import {
   compareVersions,
   editionAt,
@@ -33,15 +33,15 @@ import {
   schemeOf,
   WORK_KINDS,
   companionOf,
-} from "../mizan/versions/scheme.ts";
-import { filesOf, scopeOf, workFolders } from "../mizan/versions/works.ts";
-import { impacts, versionSchemes, workKinds } from "../../ontology/ifr/mod.ts";
-import { qualityTiers } from "../../ontology/ifqs/mod.ts";
+} from "@intellectual-frontiers/mizan/versions/scheme";
+import { filesOf, scopeOf, workFolders } from "@intellectual-frontiers/mizan/versions/works";
+import { impacts, versionSchemes, workKinds } from "@intellectual-frontiers/ontology/ifr";
+import { qualityTiers } from "@intellectual-frontiers/ontology/ifqs";
 import { mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { join } from "@intellectual-frontiers/system/path";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
-import { holdHarness } from "../mizan/harness.ts";
-import { readWorks } from "../mizan/versions/scan.ts";
+import { holdHarness } from "@intellectual-frontiers/mizan/harness";
+import { readWorks } from "@intellectual-frontiers/mizan/versions/scan";
 
 // ------------------------------------------------------------------------------------------------------------------------------- fixtures
 

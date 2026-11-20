@@ -7,7 +7,7 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import { type Declaration, decodeHarnessRecord, formatRecordError } from "../../mizan/changes/declaration.ts";
+import { type Declaration, decodeHarnessRecord, formatRecordError } from "@intellectual-frontiers/mizan/changes/declaration";
 import { exists, readTextFile } from "@intellectual-frontiers/system/fs";
 import { join, resolve } from "@intellectual-frontiers/system/path";
 

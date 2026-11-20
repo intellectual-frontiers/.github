@@ -7,7 +7,7 @@
  * @module
  */
 import { path } from "@intellectual-frontiers/system";
-import { trace } from "@intellectual-frontiers/commons/ts/runtime";
+import * as trace from "@intellectual-frontiers/mizan/host/trace";
 import { assert, proves } from "@intellectual-frontiers/test";
 import {
   annotationsOf,

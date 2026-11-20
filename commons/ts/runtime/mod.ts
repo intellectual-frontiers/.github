@@ -4,7 +4,7 @@
  * and its tests import by package name; the network (the typed HTTP client, `serve`, `net`, `tcp`, `dns` and `acme`, which gets certificates by ACME's DNS-01 challenge, commons 0013-acme) is the library `net`
  * (`@intellectual-frontiers/net`). The signals (the pipeline that exports them and the console that renders them) are the library `telemetry` (`@intellectual-frontiers/telemetry`, commons 0032-lifting-libraries),
  * the governance, risk and compliance primitives, their loaders and the signers are the library `grc` (`@intellectual-frontiers/grc`, commons 0032-lifting-libraries),
- * and `trace` reads the files the kernel's trace and layers checks judge and holds their findings against a baseline (commons 0015-trace). Tests import the library `test` (`@intellectual-frontiers/test`, commons 0032-lifting-libraries), which loads no test runner for a program that does not test.
+ * Tests import the library `test` (`@intellectual-frontiers/test`, commons 0032-lifting-libraries), which loads no test runner for a program that does not test.
  *
  * @example
  * ```ts
@@ -15,4 +15,3 @@
  *
  * @module
  */
-export * as trace from "./trace.ts";

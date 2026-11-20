@@ -11,7 +11,7 @@
  *
  * @module
  */
-import type { Declaration } from "../../mizan/changes/declaration.ts";
+import type { Declaration } from "@intellectual-frontiers/mizan/changes/declaration";
 import { gradeNeeded, type Judgement, type RegisterRow, regulatedInProduction } from "./ladder.ts";
 import { type Grade, gradeRank, NO_GRADE } from "./names.ts";
 

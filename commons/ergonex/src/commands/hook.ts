@@ -14,7 +14,7 @@
 import { absurd, err, ok } from "@intellectual-frontiers/core";
 import { run } from "../platform/r-proc.ts";
 import { readTextFile } from "../platform/r-fs.ts";
-import { parseMessage } from "@intellectual-frontiers/commons/ts/mizan/changes/commit-message";
+import { parseMessage } from "@intellectual-frontiers/mizan/changes/commit-message";
 import type { Finding } from "../findings.ts";
 import { unsignedCommitSeverity } from "../policy.ts";
 import { HOOK_NAMES, isHookName } from "../templates/hooks.ts";

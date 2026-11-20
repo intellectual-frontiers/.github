@@ -7,7 +7,7 @@
 import { CAPABILITIES, supports } from "@intellectual-frontiers/githost/capabilities";
 import type { Capability } from "@intellectual-frontiers/githost/types";
 import { assertEquals, proves } from "@intellectual-frontiers/test";
-import { gitCapabilities, gitManagerKinds } from "../../ontology/ifccm/mod.ts";
+import { gitCapabilities, gitManagerKinds } from "@intellectual-frontiers/ontology/ifccm";
 
 proves(
   ["0020-ifccm FR-027", "0020-ifccm FR-041"],

@@ -19,7 +19,7 @@ import { mkdir, readFile, readTextFile, walkFiles, writeFile, exists } from "@in
 import { dirname, fromFileUrl, join } from "@intellectual-frontiers/system/path";
 import { type AgentStanding, agentStanding } from "../attestation/agents.ts";
 import { gradeAfterMutation, mutationFloor, strengths, type Strength } from "../attestation/mutation.ts";
-import type { Declaration } from "../../mizan/changes/declaration.ts";
+import type { Declaration } from "@intellectual-frontiers/mizan/changes/declaration";
 import { readTier2, type Tier2State } from "../attestation/host.ts";
 import { blobAt, verifyBranch } from "../host/branch.ts";
 import { formatGatherError, gather, type Gathered } from "../host/gather.ts";

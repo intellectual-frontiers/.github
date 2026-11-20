@@ -12,7 +12,7 @@ import { OUTCOMES } from "@intellectual-frontiers/test/record";
 import { readTextFileSync } from "@intellectual-frontiers/system/fs";
 import { dirname, fromFileUrl, resolve } from "@intellectual-frontiers/system/path";
 import { assert, assertEquals, proves, test } from "@intellectual-frontiers/test";
-import { bases } from "../../ontology/mizan/mod.ts";
+import { bases } from "@intellectual-frontiers/ontology/mizan";
 import {
   audiences,
   capaStates,
@@ -30,7 +30,7 @@ import {
   ReviewDebt,
   terms,
   testOutcomes,
-} from "../../ontology/ifqs/mod.ts";
+} from "@intellectual-frontiers/ontology/ifqs";
 
 const HERE = dirname(fromFileUrl(import.meta.url));
 const specOf = (slug: string): string => readTextFileSync(resolve(HERE, "..", "..", "spec-kit", "specs", slug, "spec.md"));

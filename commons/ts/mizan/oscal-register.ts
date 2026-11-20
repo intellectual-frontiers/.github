@@ -55,12 +55,12 @@ import {
   type SubjectRef,
 } from "@intellectual-frontiers/grc/grc";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
-import { type Cited, parseSpec, proofsOf, type SourceFile } from "../kernel/trace.ts";
+import { type Cited, parseSpec, proofsOf, type SourceFile } from "@intellectual-frontiers/mizan/trace";
 import { NAMESPACE_URL, uuidV5 } from "@intellectual-frontiers/crypto/uuid";
 import { existsSync, mkdirSync, readDirSync, readTextFileSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { stdio } from "@intellectual-frontiers/system";
-import { readSources } from "../runtime/trace.ts";
-import { sentenceOf, type SpecText } from "./rules.ts";
+import { readSources } from "@intellectual-frontiers/mizan/host/trace";
+import { sentenceOf, type SpecText } from "@intellectual-frontiers/mizan/rules";
 
 /** What the register says enforces a requirement (0003-mizan FR-005): a check, a gate, a person's review, or nothing. */
 export type Mechanism = "check" | "gate" | "review" | "none";

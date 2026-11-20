@@ -1,7 +1,7 @@
 /**
  * The import of the slice of schema.org that the packaging ontology specializes (commons 0019-mizan-integrations FR-005, FR-006, FR-009, FR-014): its source is fetched from the
  * versioned URL and held to the SHA-256 pinned here, so that what `schema.auto.ts` says rests on bytes that cannot change unseen, and its provenance is `schema-org.auto.prov.ttl`
- * beside this file. Run `bun commons/ts/mizan/integrations/host/import.ts commons/ts/mizan/imports/schema-org.import.ts` to write the module again, with `--check` to see whether
+ * beside this file. Run `bun commons/mizan/src/integrations/host/import.ts commons/ts/mizan/imports/schema-org.import.ts` to write the module again, with `--check` to see whether
  * it is current (offline; with `--fetch` it fetches the source and compares fully).
  *
  * @module
@@ -23,7 +23,7 @@ export const manifest = {
   format: "turtle",
   namespace: { prefix: "schema", iri: "https://schema.org/" },
   slice: ["Action", "SoftwareApplication", "Thing", "name", "operatingSystem", "processorRequirements", "softwareVersion"],
-  out: "../../../ontology/supply-chain/packaging/schema.auto.ts",
+  out: "../../../ontology/src/supply-chain/packaging/schema.auto.ts",
   provOut: "schema-org.auto.prov.ttl",
   rdfImport: "../../../rdf/src/mod.ts",
 } as const;

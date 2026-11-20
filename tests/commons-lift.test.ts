@@ -128,8 +128,8 @@ proves(
   "the libraries that exist are those of the map: named for their concern, depending only downward, importing no file outside their folder, testing themselves, and no importer names a lifted module's old path",
   () => {
     const map = mapOf(fs.readTextFileSync(path.join(ROOT, SPEC)));
-    assertEquals(map.length, 17, "the map names seventeen libraries");
-    assertEquals(new Set(map.map((r) => r.name)).size, 17);
+    assertEquals(map.length, 16, "the map names sixteen libraries");
+    assertEquals(new Set(map.map((r) => r.name)).size, 16);
     assertEquals(
       map
         .map((r) => r.layer)

@@ -6,7 +6,7 @@
  * @module
  */
 import { fs, path } from "@intellectual-frontiers/system";
-import { trace as runtime } from "@intellectual-frontiers/commons/ts/runtime";
+import * as runtime from "@intellectual-frontiers/mizan/host/trace";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { CORE, KERNEL, layerFindings, PACKAGE, specifiersOf, unitOf } from "../tools/layers.ts";
 import { main } from "../tools/check.ts";

@@ -10,6 +10,7 @@
         "@intellectual-frontiers/crypto": "link:../crypto",
         "@intellectual-frontiers/formats": "link:../formats",
         "@intellectual-frontiers/githost": "link:../githost",
+        "@intellectual-frontiers/mizan": "link:../mizan",
         "@intellectual-frontiers/net": "link:../net",
         "@intellectual-frontiers/system": "link:../system",
         "@intellectual-frontiers/telemetry": "link:../telemetry",
@@ -31,6 +32,8 @@
     "@intellectual-frontiers/formats": ["@intellectual-frontiers/formats@link:../formats", {}],
 
     "@intellectual-frontiers/githost": ["@intellectual-frontiers/githost@link:../githost", {}],
+
+    "@intellectual-frontiers/mizan": ["@intellectual-frontiers/mizan@link:../mizan", {}],
 
     "@intellectual-frontiers/net": ["@intellectual-frontiers/net@link:../net", {}],
 

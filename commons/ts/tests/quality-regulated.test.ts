@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { decodeDeclaration, type Declaration } from "../mizan/changes/declaration.ts";
+import { decodeDeclaration, type Declaration } from "@intellectual-frontiers/mizan/changes/declaration";
 import { gradeAfterMutation, mutationFloor, strengthPermille } from "../quality/attestation/mutation.ts";
 import { readDeclaration } from "../quality/host/declaration.ts";
 import { keepRun } from "../quality/host/branch.ts";

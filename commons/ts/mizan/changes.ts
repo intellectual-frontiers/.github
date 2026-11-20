@@ -24,7 +24,7 @@
  */
 import process from "node:process";
 import type { GitHostClient, RepoRef } from "@intellectual-frontiers/githost/types";
-import { formatBaseline, judge, parseBaseline, passes, report } from "../kernel/trace.ts";
+import { formatBaseline, judge, parseBaseline, passes, report } from "@intellectual-frontiers/mizan/trace";
 import { readRecord } from "../kernel/test-report.ts";
 import { existsSync, readDirSync, readTextFileSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { formatGitError } from "@intellectual-frontiers/system/git";
@@ -39,7 +39,7 @@ import {
   parseIssues,
   traceOutput,
   type TraceFormat,
-} from "./changes/capability-trace.ts";
+} from "@intellectual-frontiers/mizan/changes/capability-trace";
 import {
   type CapabilityRecord,
   decodeViewRecord,
@@ -49,11 +49,18 @@ import {
   viewIsCurrent,
   viewOf,
   type ViewRecord,
-} from "./changes/capability-view.ts";
-import { dayOf, decodeHarnessRecord, formatRecordError, type HarnessRecord, phaseOf, relaxations } from "./changes/declaration.ts";
-import { declarationHistory, readRange, readRangeFacts } from "./changes/git-log.ts";
-import { readTermsFile } from "./changes/terms-file.ts";
-import { doneWhenRequirements, parseIssueBody } from "./changes/issue-body.ts";
+} from "@intellectual-frontiers/mizan/changes/capability-view";
+import {
+  dayOf,
+  decodeHarnessRecord,
+  formatRecordError,
+  type HarnessRecord,
+  phaseOf,
+  relaxations,
+} from "@intellectual-frontiers/mizan/changes/declaration";
+import { declarationHistory, readRange, readRangeFacts } from "@intellectual-frontiers/mizan/changes/git-log";
+import { readTermsFile } from "@intellectual-frontiers/mizan/changes/terms-file";
+import { doneWhenRequirements, parseIssueBody } from "@intellectual-frontiers/mizan/changes/issue-body";
 import {
   CHANGES_RULES,
   type ChangesFinding,
@@ -63,15 +70,15 @@ import {
   ruleCases,
   STRICT_RULES,
   strictFindings,
-} from "./changes/rules.ts";
-import { askHost, NO_CLIENT } from "./changes/strict.ts";
-import { type RunCase, traceLines, traceOf, firstBreak } from "./changes/trace.ts";
-import type { OntologyCitation } from "../kernel/trace.ts";
-import { readSpecTexts } from "./spec-files.ts";
-import { packagingTerms } from "../../ontology/audit/mod.ts";
-import * as ifccmOntology from "../../ontology/ifccm/mod.ts";
-import * as ifqsOntology from "../../ontology/ifqs/mod.ts";
-import { terms } from "../../ontology/mizan/mod.ts";
+} from "@intellectual-frontiers/mizan/changes/rules";
+import { askHost, NO_CLIENT } from "@intellectual-frontiers/mizan/changes/strict";
+import { type RunCase, traceLines, traceOf, firstBreak } from "@intellectual-frontiers/mizan/changes/trace";
+import type { OntologyCitation } from "@intellectual-frontiers/mizan/trace";
+import { readSpecTexts } from "@intellectual-frontiers/mizan/spec-files";
+import { packagingTerms } from "@intellectual-frontiers/ontology/audit";
+import * as ifccmOntology from "@intellectual-frontiers/ontology/ifccm";
+import * as ifqsOntology from "@intellectual-frontiers/ontology/ifqs";
+import { terms } from "@intellectual-frontiers/ontology/mizan";
 
 /** One rule's result in a run of the check (0020-ifccm FR-031): its findings, or the reason it did not run. Its shape is the quality system's `CheckRule`, so a caller keeps it as a record without this file knowing the quality system. */
 export type RuleResult = {

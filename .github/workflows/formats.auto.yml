@@ -10,19 +10,12 @@ on:
       - .github/workflows/formats.auto.yml
       - "commons/core/src/**"
       - "commons/formats/**"
-      - "commons/ontology/audit/**"
-      - "commons/ontology/ifccm/**"
-      - "commons/ontology/ifqs/**"
-      - "commons/ontology/ifr/**"
-      - "commons/ontology/mizan/**"
-      - "commons/ontology/supply-chain/**"
-      - "commons/rdf/src/**"
+      - "commons/mizan/src/**"
       - "commons/system/src/**"
       - "commons/test/src/**"
       - "commons/tools/**"
       - "commons/ts/kernel/**"
       - "commons/ts/mizan/**"
-      - "commons/ts/runtime/**"
       - "commons/ts/tools/**"
   pull_request:
     paths:
@@ -30,19 +23,12 @@ on:
       - .github/workflows/formats.auto.yml
       - "commons/core/src/**"
       - "commons/formats/**"
-      - "commons/ontology/audit/**"
-      - "commons/ontology/ifccm/**"
-      - "commons/ontology/ifqs/**"
-      - "commons/ontology/ifr/**"
-      - "commons/ontology/mizan/**"
-      - "commons/ontology/supply-chain/**"
-      - "commons/rdf/src/**"
+      - "commons/mizan/src/**"
       - "commons/system/src/**"
       - "commons/test/src/**"
       - "commons/tools/**"
       - "commons/ts/kernel/**"
       - "commons/ts/mizan/**"
-      - "commons/ts/runtime/**"
       - "commons/ts/tools/**"
 
 permissions:

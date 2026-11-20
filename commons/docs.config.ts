@@ -30,6 +30,8 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/telemetry/spec-kit" },
     { layout: "commons", dir: "commons/lint/spec-kit" },
     { layout: "commons", dir: "commons/githost/spec-kit" },
+    { layout: "commons", dir: "commons/ontology/spec-kit" },
+    { layout: "commons", dir: "commons/mizan/spec-kit" },
     { layout: "commons", dir: "commons/net/spec-kit" },
     { layout: "commons", dir: "commons/test/spec-kit" },
     { layout: "commons", dir: "commons/grc/spec-kit" },

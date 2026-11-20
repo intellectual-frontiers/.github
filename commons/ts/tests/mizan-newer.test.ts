@@ -15,7 +15,7 @@ import { staleFindings } from "../mizan/newer.ts";
 
 const HERE = dirname(fromFileUrl(import.meta.url));
 const NEWER = resolve(HERE, "..", "mizan", "newer.ts");
-const IMPORT = resolve(HERE, "..", "mizan", "integrations", "host", "import.ts");
+const IMPORT = resolve(HERE, "..", "..", "mizan", "src", "integrations", "host", "import.ts");
 const CHECK = resolve(HERE, "..", "mizan", "check.ts");
 const SCHEMA_ORG = resolve(HERE, "..", "mizan", "imports", "schema-org.import.ts");
 

@@ -12,7 +12,7 @@
  * @module
  */
 import { instantOf } from "@intellectual-frontiers/grc/grc";
-import type { Declaration } from "../../mizan/changes/declaration.ts";
+import type { Declaration } from "@intellectual-frontiers/mizan/changes/declaration";
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { existsSync, readTextFile } from "@intellectual-frontiers/system/fs";
 import { join } from "@intellectual-frontiers/system/path";

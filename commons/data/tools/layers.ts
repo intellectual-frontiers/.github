@@ -13,7 +13,8 @@
  *
  * @module
  */
-import { layers, type trace } from "@intellectual-frontiers/commons/ts/kernel";
+import * as layers from "@intellectual-frontiers/mizan/layers";
+import * as trace from "@intellectual-frontiers/mizan/trace";
 
 /** The package's own name, which a file uses to import another unit. */
 export const PACKAGE = "@intellectual-frontiers/data";

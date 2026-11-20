@@ -7,7 +7,7 @@
  *
  * @module
  */
-import { decodeHarnessRecord, signingWaivers, type SigningWaiver } from "@intellectual-frontiers/commons/ts/mizan/changes/declaration";
+import { decodeHarnessRecord, signingWaivers, type SigningWaiver } from "@intellectual-frontiers/mizan/changes/declaration";
 import { makeTempDir, remove, writeTextFile } from "../src/platform/r-fs.ts";
 import { join } from "../src/platform/r-path.ts";
 import { run } from "../src/platform/r-proc.ts";

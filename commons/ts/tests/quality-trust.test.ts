@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { audiences } from "../../ontology/ifqs/ifqs.ts";
+import { audiences } from "@intellectual-frontiers/ontology/ifqs/ifqs";
 import { collect } from "../quality/assessor/host.ts";
 import { AUDIENCES, redactFor } from "../quality/trust/audience.ts";
 import { conformityClaim, DEFAULT_SCOPE } from "../quality/trust/view.ts";

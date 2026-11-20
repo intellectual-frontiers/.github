@@ -71,7 +71,9 @@ const LIFTED = new Set([
   "@intellectual-frontiers/formats",
   "@intellectual-frontiers/githost",
   "@intellectual-frontiers/grc",
+  "@intellectual-frontiers/mizan",
   "@intellectual-frontiers/net",
+  "@intellectual-frontiers/ontology",
   "@intellectual-frontiers/rdf",
   "@intellectual-frontiers/system",
   "@intellectual-frontiers/telemetry",
@@ -109,31 +111,8 @@ proves(
   },
 );
 
-proves(
-  ["0019-mizan-integrations FR-001"],
-  "the integrations module has a pure layer that imports only the kernel and itself, and a host layer",
-  () => {
-    const pure = sources("mizan/integrations/pure");
-    assert(pure.length >= 3);
-    assert(sources("mizan/integrations/host").length >= 1);
-    const bad: string[] = [];
-    for (const f of pure) {
-      for (const s of specifiers(readTextFileSync(join(ROOT, f)))) {
-        if (isPureLifted(s)) continue;
-        if (s.startsWith("node:")) {
-          bad.push(`${f}: ${s}`);
-          continue;
-        }
-        const target = toPosix(relative(ROOT, resolve(ROOT, dirname(f), s)));
-        if (!target.startsWith("kernel/") && !target.startsWith("mizan/integrations/pure/")) bad.push(`${f}: ${s}`);
-      }
-    }
-    assertEquals(bad, []);
-  },
-);
-
 proves(["0005-typescript-runtime FR-002"], "the kernel imports nothing outside kernel/ but core, the foundation", () => {
-  assert(KERNEL.length > 3);
+  assert(KERNEL.length > 1);
   const bad: string[] = [];
   for (const f of KERNEL) {
     for (const s of specifiers(readTextFileSync(join(ROOT, f)))) {
@@ -248,7 +227,9 @@ proves(
       "@intellectual-frontiers/formats": "link:../formats",
       "@intellectual-frontiers/githost": "link:../githost",
       "@intellectual-frontiers/grc": "link:../grc",
+      "@intellectual-frontiers/mizan": "link:../mizan",
       "@intellectual-frontiers/net": "link:../net",
+      "@intellectual-frontiers/ontology": "link:../ontology",
       "@intellectual-frontiers/rdf": "link:../rdf",
       "@intellectual-frontiers/system": "link:../system",
       "@intellectual-frontiers/telemetry": "link:../telemetry",
@@ -313,10 +294,7 @@ proves(
       "./ts/runtime": "./runtime/mod.ts",
       "./ts/runtime/test-run": "./runtime/test-run.ts",
       "./ts/mizan": "./mizan/mod.ts",
-      "./ts/mizan/integrations": "./mizan/integrations/mod.ts",
       "./ts/mizan/changes": "./mizan/changes.ts",
-      "./ts/mizan/changes/commit-message": "./mizan/changes/commit-message.ts",
-      "./ts/mizan/changes/declaration": "./mizan/changes/declaration.ts",
       "./ts/mizan/check": "./mizan/check.ts",
       "./ts/mizan/oscal-register": "./mizan/oscal-register.ts",
       "./ts/mizan/versions": "./mizan/versions.ts",
@@ -333,8 +311,8 @@ proves(
     assert(!("version" in json), "the commit is the version: the root package has none");
     const ts = Object.fromEntries(Object.entries(root.exports).filter(([k]) => k.startsWith("./ts/")));
     assertEquals(ts, rootEntries(m));
-    assertEquals(root.exports["./ontology/mizan"], "./commons/ontology/mizan/mod.ts");
-    assert(existsSync(join(ROOT, "..", "ontology", "mizan", "mod.ts")), "the shared ontology the root exports is there");
+    assertEquals(root.exports["./ontology/mizan"], "./commons/ontology/src/mizan/mod.ts");
+    assert(existsSync(join(ROOT, "..", "ontology", "src", "mizan", "mod.ts")), "the shared ontology the root exports is there");
     assertEquals(root.bin?.["ifc"], "./commons/ts/node/ifc.mjs");
     const deps = Object.entries(root.dependencies ?? {});
     for (const [name, v] of deps) assert(/^\d+\.\d+\.\d+(-[\w.]+)?$/.test(v), `${name} is not pinned exactly: ${v}`);

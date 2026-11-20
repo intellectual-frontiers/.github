@@ -1,0 +1,11 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-harness FR-001	check	.github: cd commons/mizan && bun test suite/	the package is built, inspected and packed, the suite runs, and the library's own trace and spec kit are held
+0001-harness FR-002	check	.github: cd commons/mizan && bun test suite/	mizan-profiles.test.ts, trace.test.ts: the rules are plugins whose findings are held by one baseline
+0001-harness FR-003	check	.github: cd commons/mizan && bun test suite/	mizan-changes-pure.test.ts: the change-control rules run as plugins of the harness
+0001-harness FR-004	check	.github: cd commons/mizan && bun test suite/	trace.test.ts, host-trace.test.ts: the trace and the layers of a ladder over files read by the host module
+0001-harness FR-005	check	.github: cd commons/mizan && bun test suite/	mizan-integrations.test.ts, mizan-integrations-formats.test.ts, mizan-exporters.test.ts: importers and exporters give the same bytes for the same input
+0001-harness FR-006	check	.github: cd commons/ts && bun test tests/mizan-newer.test.ts	mizan-newer.test.ts: a standard newer than its pin is a finding, and nothing is fetched but through the command's own function
+0001-harness FR-007	check	.github: cd commons/mizan && bun test suite/	mizan-boundaries.test.ts: the modules import only core, crypto, formats, githost, ontology, rdf, system and node:process and node:url
+0001-harness FR-008	check	.github: cd commons/mizan && bun run verify	the package is built, inspected and packed by tools/pack.ts; tests/commons-packages.test.ts installs the tarball, runs every entry on Node 26 and Bun and type-checks a consumer

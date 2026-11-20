@@ -1,0 +1,23 @@
+# # The findings of the trace check of Ontology (tools/check.ts) that existed when it was first held.
+# # A new finding fails the check, and so does a line below that no longer occurs: when you fix one, delete its line.
+# # Never add a line to make a check pass.
+trace/no-spec-line src/audit/mod.ts
+trace/no-spec-line src/audit/packaging.ts
+trace/no-spec-line src/ifccm/ifccm.ts
+trace/no-spec-line src/ifccm/mod.ts
+trace/no-spec-line src/ifqs/ifqs.ts
+trace/no-spec-line src/ifqs/mod.ts
+trace/no-spec-line src/ifr/audit.ts
+trace/no-spec-line src/ifr/ifr.ts
+trace/no-spec-line src/ifr/mod.ts
+trace/no-spec-line src/mizan/mizan.ts
+trace/no-spec-line src/mizan/mod.ts
+trace/no-spec-line src/mod.ts
+trace/no-spec-line src/supply-chain/packaging/families.ts
+trace/no-spec-line src/supply-chain/packaging/managers.ts
+trace/no-spec-line src/supply-chain/packaging/mod.ts
+trace/no-spec-line src/supply-chain/packaging/packaging.ts
+trace/no-spec-line src/supply-chain/packaging/pins.ts
+trace/no-spec-line src/supply-chain/packaging/programs.ts
+trace/no-spec-line src/supply-chain/packaging/record.ts
+trace/no-spec-line src/supply-chain/packaging/rules.ts

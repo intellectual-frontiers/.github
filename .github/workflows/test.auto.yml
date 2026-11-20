@@ -10,20 +10,13 @@ on:
       - .github/workflows/test.auto.yml
       - "commons/core/src/**"
       - "commons/crypto/src/**"
-      - "commons/ontology/audit/**"
-      - "commons/ontology/ifccm/**"
-      - "commons/ontology/ifqs/**"
-      - "commons/ontology/ifr/**"
-      - "commons/ontology/mizan/**"
-      - "commons/ontology/supply-chain/**"
-      - "commons/rdf/src/**"
+      - "commons/mizan/src/**"
       - "commons/system/src/**"
       - "commons/telemetry/src/**"
       - "commons/test/**"
       - "commons/tools/**"
       - "commons/ts/kernel/**"
       - "commons/ts/mizan/**"
-      - "commons/ts/runtime/**"
       - "commons/ts/tools/**"
   pull_request:
     paths:
@@ -31,20 +24,13 @@ on:
       - .github/workflows/test.auto.yml
       - "commons/core/src/**"
       - "commons/crypto/src/**"
-      - "commons/ontology/audit/**"
-      - "commons/ontology/ifccm/**"
-      - "commons/ontology/ifqs/**"
-      - "commons/ontology/ifr/**"
-      - "commons/ontology/mizan/**"
-      - "commons/ontology/supply-chain/**"
-      - "commons/rdf/src/**"
+      - "commons/mizan/src/**"
       - "commons/system/src/**"
       - "commons/telemetry/src/**"
       - "commons/test/**"
       - "commons/tools/**"
       - "commons/ts/kernel/**"
       - "commons/ts/mizan/**"
-      - "commons/ts/runtime/**"
       - "commons/ts/tools/**"
 
 permissions:

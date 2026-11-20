@@ -19,7 +19,7 @@ import {
   type RulePlugin,
   rulePlugins,
   type SpecText,
-} from "../mizan/rules.ts";
+} from "@intellectual-frontiers/mizan/rules";
 
 const HERE = dirname(fromFileUrl(import.meta.url));
 const CHECK = resolve(HERE, "..", "mizan", "check.ts");

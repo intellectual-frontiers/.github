@@ -42,7 +42,7 @@ import { exportedLiteral } from "@intellectual-frontiers/formats/ts-literal";
 import { existsSync, readDirSync, readTextFileSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { stdio } from "@intellectual-frontiers/system";
 import { spawn } from "@intellectual-frontiers/system/proc";
-import { DEFAULT_LIBRARY_LEVEL, LEVELS, type LevelKey, rankOf } from "./levels.ts";
+import { DEFAULT_LIBRARY_LEVEL, LEVELS, type LevelKey, rankOf } from "@intellectual-frontiers/mizan/levels";
 
 /** The name of a library's manifest in its folder. */
 export const LIBRARY_FILE = "library.ts";

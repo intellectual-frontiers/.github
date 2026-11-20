@@ -10,7 +10,7 @@
  *
  * @module
  */
-import { type Cited, parseSpec, proofsOf, specLines } from "../../kernel/trace.ts";
+import { type Cited, parseSpec, proofsOf, specLines } from "@intellectual-frontiers/mizan/trace";
 import type { KnownTest } from "./ledger.ts";
 
 /** A file of the repository and its text. */

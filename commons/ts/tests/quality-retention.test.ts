@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { decodeDeclaration } from "../mizan/changes/declaration.ts";
+import { decodeDeclaration } from "@intellectual-frontiers/mizan/changes/declaration";
 import { archiveCommand } from "../quality/commands.ts";
 import { archiveBranch, oldestEvidenceDay, tagTarget } from "../quality/host/archive.ts";
 import { branchTip, keepRun, verifyBranch } from "../quality/host/branch.ts";

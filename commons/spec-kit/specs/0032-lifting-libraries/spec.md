@@ -26,12 +26,13 @@
   | 2 | grc | kernel/grc, kernel/assess, kernel/evidence, kernel/oscal, kernel/ocsf, kernel/ocsf-types.auto, kernel/attest, runtime/grc, runtime/sign, tools/ocsf-gen (the generator of the OCSF types) |
   | 3 | test | runtime/test, kernel/test-record |
   | 4 | quality | quality/, kernel/test-report, runtime/test-run |
-  | 3 | mizan | mizan/integrations, mizan/rules, mizan/levels, mizan/check, mizan/harness, mizan/standards, mizan/spec-files, mizan/spec-terms, mizan/newer, mizan/imports, mizan/mod, mizan/generate-ontology, mizan/publish-ontology, mizan/oscal-register, kernel/trace, kernel/layers |
-  | 3 | ifccm | mizan/changes, mizan/changes.ts |
-  | 3 | ifr | mizan/versions, mizan/versions.ts |
+  | 2 | ontology | the folders of `commons/ontology`: mizan, audit, ifccm, ifr, ifqs, supply-chain, standards |
+  | 3 | mizan | mizan/integrations, mizan/rules, mizan/levels, mizan/harness, mizan/standards, mizan/spec-files, mizan/spec-terms, mizan/newer, mizan/changes (the change-control rules of IFCCM, as plugins), mizan/versions (the release rules of IFR, as plugins), kernel/trace, kernel/layers, runtime/trace |
   | 3 | githost | githost/capabilities, githost/git, githost/github, githost/gitlab, githost/http, githost/mod, githost/remote, githost/types |
-  | 3 | libraries | mizan/libraries, mizan/affected, workflows (the folder `githost/workflows` before the lift of githost), tools/generate-workflows, tools/pins, tools/install-bun, tools/pack-library |
+  | 4 | libraries | mizan/libraries, mizan/affected, mizan/check, mizan/changes.ts, mizan/versions.ts, mizan/generate-ontology, mizan/publish-ontology, mizan/oscal-register, mizan/imports (the importers of standards), workflows (the folder `githost/workflows` before the lift of githost), tools/generate-workflows, tools/pins, tools/install-bun, tools/pack-library |
   | 3 | lint | lint/plugin, lint/rule, lint/test-rule, lint/rules |
+
+  The map is corrected by the lift of `mizan`, which read the real dependencies: the rules of change control (IFCCM) and of releases (IFR) are plugins that the harness composes by default (`harness.ts` imports `changes/plugin` and `versions/plugin`, and `rules.ts` types its findings with theirs), so a library above the harness cannot hold them, and they are the subpaths `changes` and `versions` of `mizan`, not libraries of their own; the commands that need the whole repository (`check`, `changes.ts`, `versions.ts`, `libraries`, the generators of the ontologies and of the register) read every ontology and every manifest and are one library above, `libraries`, which also takes the importers of standards; and the ontologies (`commons/ontology`) are one library, `ontology`, below `mizan`, because the ontology of IFR extends the one of IFQS, which extends Mizan's, and no one of them can be a file of the library that uses it without a cycle.
 
   The libraries `docs`, `data` and `ergonex` already exist and are not moved; `kernel/documentation` goes to `docs`. The folder `commons/ts/data` is another work's and is not part of this lift.
 
@@ -43,7 +44,7 @@
 - **FR-005**: A library MUST be published as compiled ECMAScript modules with their type declarations, built by the TypeScript 7 compiler from its sources (`tools/pack.ts`), and the `exports` of the published package MUST name, for each entry, the `types` file, the source for the `bun` condition and the compiled file for `default`, so that the package runs on Node 26 with no hook and on Bun with no build step; the package MUST carry its license (MIT) and its `engines` of Node 26 or later.
 - **FR-006**: Node 26 MUST be the least Node a library supports, and its sources MUST be erasable TypeScript only (`erasableSyntaxOnly`), so that a library linked into another package of this repository runs from its `.ts` sources on Node 26 with no hook (Node strips the types of a file that is not under `node_modules`) and a library installed from npm runs from its compiled files. The Node hook of `commons/ts` (0005-typescript-runtime FR-029) MUST be removed when the last consumer that installs a copy of the sources has moved to the packages.
 - **FR-007**: A library's tests MUST be in its own folder (`suite/`) and run by its `verify`; a test that spans libraries (the boundaries of the whole, the versions, the ontologies, the generated files) MUST stay in the tests of this repository.
-- **FR-008**: The ontology that a library defines or generates from MUST be a file of that library.
+- **FR-008**: The ontology that a library defines or generates from MUST be a file of that library, except the ontologies that several libraries read (Mizan, IFCCM, IFQS, IFR, the audit of packaging and the software supply chain), which are the library `ontology`.
 - **FR-009**: A new library MUST start at level L1 (0028-conformance-levels), MUST be versioned as a work (0026-works-versioning FR-008: `release.ts`), MUST be published to the GitHub package registry and to npm by the workflow generated for it (0030-generated-workflows FR-009), and the workflow MUST tag the version `<name>-v<version>` once it is on its registry, whether it got there by that workflow or by a person's first publish of a package that has no trusted publisher yet, and MUST NOT fail on a version that is already there.
 
 ## Moving a module

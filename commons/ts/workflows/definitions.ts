@@ -160,6 +160,22 @@ export const LIBRARY_CI: Readonly<Record<string, LibraryCi>> = {
     nodeTests: 'node --test "suite/**/*.test.ts"',
     systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
   },
+  ontology: {
+    comment: lines(
+      "Ontology, the ontologies of commons as typed values (Mizan, IFCCM, IFQS, IFR, the audit of packaging and the software supply chain), a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the spec checker, the trace, its tests and the packing of its package with the inspection of its declarations) on Bun and its tests on",
+      "Node 26, on Windows, macOS and Linux, because the package runs on all three.",
+    ).trimEnd(),
+    nodeTests: 'node --test "suite/**/*.test.ts"',
+    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
+  },
+  mizan: {
+    comment: lines(
+      "Mizan, the harness and the rules of the IF Spec Profile as plugins, with the change-control and release rules, the levels, the integrations and the trace, a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the spec checker, the trace, its tests and the packing of its package with the inspection of its declarations) on Bun and its tests on",
+      "Node 26, on Windows, macOS and Linux, because the package runs on all three.",
+    ).trimEnd(),
+    nodeTests: 'node --test "suite/**/*.test.ts"',
+    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
+  },
   telemetry: {
     comment: lines(
       "Telemetry, OpenTelemetry-native signals as one typed library, a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the specification checker, the trace, its tests and the",

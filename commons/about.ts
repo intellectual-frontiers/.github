@@ -16,7 +16,7 @@ export const about: About = {
     "is public. A harness reads `generated/`, and keeps no fact of its own that the ontology holds.",
   folders: [
     {
-      path: "ontology/supply-chain/packaging/",
+      path: "ontology/src/supply-chain/packaging/",
       what:
         "The packaging vocabulary (`packaging.ts`) and its data (`managers.ts`, `families.ts`, `programs.ts`, `pins.ts`, `rules.ts`, " +
         "`record.ts`), seeded from the tables of [`upt`](https://github.com/sigoden/upt) (MIT or Apache-2.0) and from what `archon` runs. It is " +
