@@ -35,12 +35,14 @@ import {
   formatDecodeError,
   literal,
   object,
+  unknownValue,
   string,
   err,
   ok,
   type Result,
 } from "@intellectual-frontiers/core";
 import { exportedLiteral } from "@intellectual-frontiers/formats/ts-literal";
+import { decodeTable, type Table } from "@intellectual-frontiers/kanon";
 import { existsSync, readDirSync, readTextFileSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { stdio } from "@intellectual-frontiers/system";
 import { spawn } from "@intellectual-frontiers/system/proc";
@@ -82,7 +84,12 @@ export type Library = {
   readonly summary?: string;
   /** Where it is published: always `github` (the GitHub package registry of the organization), and `npm` as well where a decision about that package has made it so (FR-015 and FR-016). */
   readonly distribution: readonly Registry[];
+  /** The table of its layers where it is built to Kanon (commons 0033-kanon FR-010); none where it is not. */
+  readonly kanon?: Table;
 };
+
+/** The lowest conformance level that requires a library to declare `kanon`; none yet (0033-kanon FR-014, OQ-1): a level asks for it by naming itself here. */
+export const KANON_REQUIRED_FROM: LevelKey | undefined = undefined;
 
 /** The registries a library may be published to: the kinds only, never a host or a credential (0027-commons-libraries FR-018). */
 export const REGISTRIES = ["github", "npm"] as const;
@@ -104,9 +111,9 @@ const nameDecoder: Decoder<string> = (input, path = "$") => {
 };
 const body = object(
   { name: nameDecoder, verify: nonEmpty, version: nonEmpty, exports: array(nonEmpty) },
-  { level: literal(...LEVELS), specKit: nonEmpty, summary: nonEmpty, distribution: array(literal(...REGISTRIES)) },
+  { level: literal(...LEVELS), specKit: nonEmpty, summary: nonEmpty, distribution: array(literal(...REGISTRIES)), kanon: unknownValue },
 );
-const FIELDS = ["name", "level", "specKit", "verify", "version", "exports", "summary", "distribution"] as const;
+const FIELDS = ["name", "level", "specKit", "verify", "version", "exports", "summary", "distribution", "kanon"] as const;
 
 /** The manifest read from the text of its file: `export const library = { ... }` and no other export, read as data and never run (0027-commons-libraries FR-012). */
 export function decodeLibrarySource(source: string): Result<Library, string> {
@@ -130,6 +137,12 @@ export function decodeLibrarySource(source: string): Result<Library, string> {
     return err(
       "library.distribution includes github: a library is published to the GitHub package registry whatever else it is published to (FR-015, FR-016)",
     );
+  let kanon: Table | undefined;
+  if (v.kanon !== undefined) {
+    const t = decodeTable(v.kanon);
+    if (t.kind === "err") return err(`library.${t.error} (0033-kanon FR-010)`);
+    kanon = t.value;
+  }
   return ok({
     name: v.name,
     level: v.level ?? DEFAULT_LIBRARY_LEVEL,
@@ -139,6 +152,7 @@ export function decodeLibrarySource(source: string): Result<Library, string> {
     exports: v.exports,
     ...(v.summary === undefined ? {} : { summary: v.summary }),
     distribution,
+    ...(kanon === undefined ? {} : { kanon }),
   });
 }
 
@@ -231,6 +245,12 @@ export function manifestFindings(repo: string): readonly string[] {
       found.push(
         `commons/${f.dir}: the manifest declares ${l.level} and the verify script does not run the Mizan check with --level ${l.level} (0028-conformance-levels FR-013)`,
       );
+    if (l.kanon !== undefined && !verifyText.includes("kanon/src/check.ts"))
+      found.push(
+        `commons/${f.dir}: the manifest declares kanon and the verify script does not run the check of the table (bun ../kanon/src/check.ts) (0033-kanon FR-014)`,
+      );
+    if (KANON_REQUIRED_FROM !== undefined && rankOf(l.level) >= rankOf(KANON_REQUIRED_FROM) && l.kanon === undefined)
+      found.push(`commons/${f.dir}: the manifest declares ${l.level}, which requires kanon, and declares none (0033-kanon FR-014)`);
   }
   return found;
 }
