@@ -126,6 +126,18 @@ export interface About {
   readonly examples?: readonly AboutExample[];
   /** Facts its page shows in a small table beside the summary: a label and its value, as a version or a conformance level. */
   readonly facts?: readonly AboutFact[];
+  /** The folders of a library built in layers, each with the layer it is in and what it may import of the others: its page shows them as bands. */
+  readonly layers?: readonly AboutLayer[];
+}
+
+/** A folder of a library built in layers. */
+export interface AboutLayer {
+  /** The folder, relative to the library. */
+  readonly folder: string;
+  /** The layer it is in: `governance`, `logical` or `physical`. */
+  readonly layer: string;
+  /** The folders of the library that its files may import, where it names them. */
+  readonly mayImport?: readonly string[];
 }
 
 /** One fact of a package: a label and its value. */

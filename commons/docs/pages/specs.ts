@@ -6,6 +6,7 @@
  *
  * @module
  */
+import { fs } from "@intellectual-frontiers/system";
 import type { Build } from "../build.ts";
 import { under } from "../config.ts";
 import type { Enforcement, KitSource, Spec } from "../extract/specs.ts";
@@ -33,6 +34,49 @@ export function kitNameOf(dir: string): string {
   return owner ?? "";
 }
 
+/** The files that prove a requirement (the tests that name it) and the files written to it (a `// Spec:` header names it), by requirement as `0009-sql-aide FR-001`. */
+export interface Trace {
+  readonly tests: ReadonlyMap<string, readonly string[]>;
+  readonly code: ReadonlyMap<string, readonly string[]>;
+}
+
+/** Reads the trace from the files of the repository: a requirement named in a quoted string of a test file is proved by it, and one named in the `// Spec:` header of any other file is written there. */
+export function traceOf(b: Build): Trace {
+  const tests = new Map<string, Set<string>>();
+  const code = new Map<string, Set<string>>();
+  const roots = [...new Set(b.kit.sources.map((k) => k.dir.split("/").slice(0, -1).join("/")))].filter((d) => d !== "" || b.kit.sources.length > 0);
+  const walk = (rel: string, out: string[]): void => {
+    if (!b.exists(rel)) return;
+    for (const e of [...fs.readDirSync(b.abs(rel))].sort((x, y) => (x.name < y.name ? -1 : 1))) {
+      const child = under(rel, e.name);
+      if (e.isDirectory) {
+        if (e.name !== "node_modules" && e.name !== "dist" && !e.name.startsWith(".")) walk(child, out);
+      } else if (e.isFile && e.name.endsWith(".ts") && !e.name.includes(".auto.")) out.push(child);
+    }
+  };
+  const files: string[] = [];
+  for (const r of roots) walk(r, files);
+  const top = roots.length === 0 ? "" : (roots.map((r) => r.split("/")[0] ?? "").find((x) => x !== "") ?? "");
+  if (top === "commons" || roots.includes("commons")) walk("tests", files);
+  for (const f of [...new Set(files)]) {
+    const text = b.read(f);
+    if (f.includes(".test.") || /(^|\/)(suite|tests)\//.test(f)) {
+      for (const m of text.matchAll(/"(\d{3,4}-[a-z0-9-]+ FR-\d{3}[a-z]?)"/g)) {
+        const key = m[1] ?? "";
+        tests.set(key, (tests.get(key) ?? new Set()).add(f));
+      }
+    } else {
+      const head = /^\/\/ Spec: (\d{3,4}-[a-z0-9-]+) ([^\n]*)/m.exec(text.slice(0, 400));
+      if (head !== null) for (const r of (head[2] ?? "").matchAll(/FR-\d{3}[a-z]?/g)) {
+        const key = `${head[1]} ${r[0]}`;
+        code.set(key, (code.get(key) ?? new Set()).add(f));
+      }
+    }
+  }
+  const frozen = (m: Map<string, Set<string>>): ReadonlyMap<string, readonly string[]> => new Map([...m].map(([k, v]) => [k, [...v].sort()] as const));
+  return { tests: frozen(tests), code: frozen(code) };
+}
+
 /** The number of a specification's id: `0009` of `0009-sql-aide`. */
 export const numberOf = (id: string): string => id.split("-")[0] ?? id;
 
@@ -55,8 +99,25 @@ function requirementBadges(spec: Spec, e: Enforcement | undefined): Badge[] {
   return [{ text: e?.mechanism ?? "no row", tone: toneOf(e?.mechanism) }];
 }
 
+/** The lines under a requirement that say which files prove it and which are written to it. */
+function traceLines(b: Build, trace: Trace, key: string): Block[] {
+  const line = (label: string, files: readonly string[] | undefined): Block[] => {
+    if (files === undefined || files.length === 0) return [];
+    const shown = files.slice(0, 6);
+    return [{
+      kind: "meta",
+      inlines: [
+        { kind: "strong", children: [{ kind: "text", text: `${label}: ` }] },
+        ...shown.flatMap((f, i): Inline[] => [...(i === 0 ? [] : [{ kind: "text", text: ", " } as Inline]), { kind: "link", href: { kind: "external", url: b.index.blob(f) }, children: [{ kind: "code", text: f.replace(/^commons\//, "") }] }]),
+        ...(files.length > shown.length ? [{ kind: "text", text: ` and ${files.length - shown.length} more` } as Inline] : []),
+      ],
+    }];
+  };
+  return [...line("Proved by", trace.tests.get(key)), ...line("Written in", trace.code.get(key))];
+}
+
 /** A list whose items are numbered items of the specification, made into entries with anchors. */
-function itemEntries(b: Build, spec: Spec, list: Extract<Block, { kind: "list" }>): Block[] | undefined {
+function itemEntries(b: Build, spec: Spec, list: Extract<Block, { kind: "list" }>, trace: Trace): Block[] | undefined {
   const entries: Block[] = [];
   for (const item of list.items) {
     const first = item[0];
@@ -77,7 +138,7 @@ function itemEntries(b: Build, spec: Spec, list: Extract<Block, { kind: "list" }
       id: id.toLowerCase(),
       name: id,
       badges,
-      blocks: [{ kind: "paragraph", inlines: trimmed }, ...item.slice(1), ...(id.startsWith("FR-") ? enforcedLine(spec, e) : [])],
+      blocks: [{ kind: "paragraph", inlines: trimmed }, ...item.slice(1), ...(id.startsWith("FR-") ? enforcedLine(spec, e) : []), ...(id.startsWith("FR-") ? traceLines(b, trace, `${spec.id} ${id}`) : [])],
     });
   }
   return entries;
@@ -91,7 +152,7 @@ function libraryTitle(b: Build, spec: Spec): string {
 }
 
 /** A specification's page, without the pages that cite it, which `citedBy` adds once every page is made. */
-function specPageOf(b: Build, spec: Spec, order: number): Page {
+function specPageOf(b: Build, spec: Spec, order: number, trace: Trace): Page {
   const page = specPage(spec.id);
   const file = spec.file;
   const scope = { page, file, spec: spec.id };
@@ -108,7 +169,7 @@ function specPageOf(b: Build, spec: Spec, order: number): Page {
   if (spec.input !== "") blocks.push({ kind: "callout", tone: "note", title: "Input", blocks: b.md(spec.input, scope) });
   for (const block of b.md(spec.body, scope)) {
     if (block.kind === "list") {
-      const entries = itemEntries(b, spec, block);
+      const entries = itemEntries(b, spec, block, trace);
       if (entries !== undefined) {
         blocks.push(...entries);
         continue;
@@ -223,7 +284,8 @@ export function specPages(b: Build): void {
       blocks: b.md(c.body, scope),
     });
   }
-  b.kit.specs.forEach((s, i) => b.add(specPageOf(b, s, 10 + i)));
+  const trace = traceOf(b);
+  b.kit.specs.forEach((s, i) => b.add(specPageOf(b, s, 10 + i, trace)));
 }
 
 /**

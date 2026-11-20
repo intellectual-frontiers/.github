@@ -641,3 +641,4 @@ requirement	mechanism	by	note
 0011-documentation FR-032	check	.github: cd commons/docs && bun run verify	guides.test.ts: a guide that cannot be read is a finding, the sections are in order, every section has its guides with links resolved
 0011-documentation FR-033	check	.github: cd commons/docs && bun run verify	guides.test.ts: the library map and the imports of each library are read from the sources
 0011-documentation FR-034	check	.github: cd commons/docs && bun run verify	theme.test.ts: dark tokens for the system and for a choice, the button and the script that sets the theme first, the keyboard shortcuts and the print style
+0011-documentation FR-035	check	.github: cd commons/docs && bun run verify	explorers.test.ts: the trace under a requirement, the layers of a library, the releases page, and the search filter

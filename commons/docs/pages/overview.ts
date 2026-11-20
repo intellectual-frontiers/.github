@@ -230,6 +230,15 @@ export function overviewPages(b: Build, top: Package, packages: readonly Package
         })),
       });
     }
+    if (p.about.layers !== undefined && p.about.layers.length > 0) {
+      const order = ["governance", "logical", "physical"];
+      const layers = [...p.about.layers].sort((x, y) => order.indexOf(x.layer) - order.indexOf(y.layer));
+      blocks.push(heading("layers", "Layers"), {
+        kind: "table",
+        head: [[{ kind: "text", text: "Layer" }], [{ kind: "text", text: "Folder" }], [{ kind: "text", text: "May import of this library" }]],
+        rows: layers.map((l) => [[{ kind: "strong", children: [{ kind: "text", text: l.layer }] }], [{ kind: "code", text: l.folder }], (l.mayImport ?? []).length === 0 ? [{ kind: "text", text: l.layer === "governance" ? "nothing" : l.layer === "logical" ? "governance" : "governance, logical" }] : (l.mayImport ?? []).flatMap((m, i): Inline[] => [...(i === 0 ? [] : [{ kind: "text", text: ", " } as Inline]), { kind: "code", text: m }])]),
+      });
+    }
     if ((uses.get(p.slug) ?? []).length > 0) blocks.push(heading("imports", "Imports"), linkList(uses.get(p.slug) ?? []));
     if ((usedBy.get(p.slug) ?? []).length > 0) blocks.push(heading("imported-by", "Imported by"), linkList(usedBy.get(p.slug) ?? []));
     if (specs.length > 0) {
