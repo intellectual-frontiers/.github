@@ -65,6 +65,7 @@ export const finding = (level: FindingLevel, severity: Severity, code: FindingCo
 /** What a path of a schema must be. */
 export type Constraint =
   | { readonly kind: "cardinality"; readonly path: string; readonly min: number; readonly max: number | "*" }
+  | { readonly kind: "choice"; readonly path: string; readonly alternatives: readonly string[]; readonly min: number; readonly max: number | "*" }
   | { readonly kind: "pattern"; readonly path: string; readonly regex: string }
   | { readonly kind: "fixed"; readonly path: string; readonly value: string }
   | { readonly kind: "binding"; readonly path: string; readonly terminology: Ref<"terminology">; readonly strength: BindingStrength };
@@ -108,6 +109,23 @@ function checkConstraint(c: Constraint, level: "schema" | "profile", t: Transact
         if (c.max !== "*" && n > c.max) out.push(finding(level, "error", "cardinality-max", parent === t.id ? c.path : `${parent}.${c.path.slice(c.path.lastIndexOf(".") + 1)}`, `${n} of at most ${c.max}`));
       }
       return out;
+    case "choice": {
+      // a choice is one of its alternatives: the occurrences of all of them under one parent are counted together, and each is a path the schema knows
+      const total = new Map<string, number>();
+      const parents = new Set<string>();
+      for (const alt of c.alternatives) {
+        for (const [parent, n] of occurrences(t, alt)) {
+          parents.add(parent);
+          total.set(parent, (total.get(parent) ?? 0) + n);
+        }
+      }
+      for (const parent of parents) {
+        const n = total.get(parent) ?? 0;
+        if (n < c.min) out.push(finding(level, "error", "cardinality-min", `${parent}.${c.path.slice(c.path.lastIndexOf(".") + 1)}[x]`, `${n} of at least ${c.min}`));
+        if (c.max !== "*" && n > c.max) out.push(finding(level, "error", "cardinality-max", `${parent}.${c.path.slice(c.path.lastIndexOf(".") + 1)}[x]`, `${n} of at most ${c.max}`));
+      }
+      return out;
+    }
     case "pattern": {
       const re = new RegExp(c.regex);
       for (const e of entries(t)) if (e.path === c.path && !re.test(e.value)) out.push(finding(level, "error", "value-pattern", e.at, "does not match the pattern"));
