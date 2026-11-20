@@ -118,5 +118,5 @@ export default defineConfig({
     links: { folder: "commons/node_modules/@intellectual-frontiers", fix: ["bun", "commons/libraries/src/link.ts"] },
     install: "bun install --frozen-lockfile",
   },
-  docs: { config: "commons/docs.config.ts", out: "_site" },
+  docs: { config: "commons/docs.config.ts", out: "_site", generator: "commons/docs/src/cli.ts" },
 });

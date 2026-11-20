@@ -2,7 +2,7 @@
   "name": "@intellectual-frontiers/repoctl",
   "private": true,
   "version": "0.1.0",
-  "description": "Repoctl, the operations program of the repository of Intellectual Frontiers Commons: one command that makes the generated files in dependency order, merges without hand-resolving them, runs every check in one report, tells each library's version in the repository, on npm and in its tag, plans and publishes a release, scaffolds a library, makes the commit and says what is wrong with a checkout.",
+  "description": "Repoctl, the operations program of a repository, driven by its typed repoctl.config.ts: it makes the generated files in dependency order, merges without hand-resolving them, runs every named check in one report, makes the commit with the repository's identity and trailers and says what is wrong with a checkout; where the configuration turns them on it also tells the versions, releases, scaffolds a library, proves a change and builds the documentation.",
   "type": "module",
   "engines": {
     "node": ">=26"

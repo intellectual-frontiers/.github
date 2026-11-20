@@ -7,3 +7,6 @@ number	slug	state
 0006	repoctl-surfaces	in force
 0007	repoctl-hygiene	in force
 0008	repoctl-prove	in force
+0009	repoctl-config	in force
+0010	repoctl-host	in force
+0011	repoctl-docs	in force

@@ -65,3 +65,17 @@ requirement	mechanism	by	note
 0008-repoctl-prove FR-012	check	.github: cd commons/repoctl && bun run verify	suite/prove-select.test.ts: a foundation change plans the suites of every foundation library
 0008-repoctl-prove FR-013	check	.github: cd commons/repoctl && bun run verify	suite/prove-select.test.ts: the quarantine record, its expiry, and the seeds of a failing property test
 0008-repoctl-prove FR-014	check	.github: cd commons/repoctl && bun run verify	suite/prove-select.test.ts: the plan job writes the proof plan to the summary, the matrices are the planner of libraries and the full run is scheduled
+0009-repoctl-config FR-001	check	.github: cd commons/repoctl && bun run verify	suite/config.test.ts: parseConfig makes the identities and lists every reason
+0009-repoctl-config FR-002	check	.github: cd commons/repoctl && bun run verify	suite/host.test.ts: the file is found above the working folder, and each failure is its typed problem
+0009-repoctl-config FR-003	check	.github: cd commons/repoctl && bun run verify	suite/host.test.ts: a fixture repository with a minimal configuration runs sync --check, check and merge; a function generator
+0009-repoctl-config FR-004	check	.github: cd commons/repoctl && bun run verify	suite/host.test.ts: commit with the configuration's identity, prefix and trailers
+0009-repoctl-config FR-005	check	.github: cd commons/repoctl && bun run verify	suite/host.test.ts: hygiene on the fixture with its own policy
+0009-repoctl-config FR-006	check	.github: cd commons/repoctl && bun run verify	suite/config.test.ts: the doctor policy and the variable names
+0010-repoctl-host FR-001	check	.github: cd commons/repoctl && bun run verify	suite/host.test.ts: no quoted path of the repository of commons in the source of the host
+0010-repoctl-host FR-002	check	.github: cd commons/repoctl && bun run verify	suite/host.test.ts: the capabilities turn verbs on and off
+0010-repoctl-host FR-003	check	.github: cd commons/repoctl && bun run verify	suite/package.test.ts: the packed tarball installed in a scratch project runs --help and doctor offline
+0010-repoctl-host FR-004	check	.github: cd commons/repoctl && bun run verify	suite/status-release.test.ts: a held library is held in the status
+0011-repoctl-docs FR-001	check	.github: cd commons/repoctl && bun run verify	suite/docs.test.ts: the verbs are there only with docs settings
+0011-repoctl-docs FR-002	check	.github: cd commons/repoctl && bun run verify	suite/docs.test.ts: the generator is loaded from the repository and missing is its typed problem
+0011-repoctl-docs FR-003	check	.github: cd commons/repoctl && bun run verify	suite/docs.test.ts: a failing generator is E-DOCS-FAILED
+0011-repoctl-docs FR-004	check	.github: cd commons/repoctl && bun run verify	suite/docs.test.ts: serve answers on loopback only

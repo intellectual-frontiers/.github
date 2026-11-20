@@ -347,3 +347,9 @@ proves(["0004-repoctl-status-release FR-001"], "the manifests of the real reposi
   assertEquals([me?.folder, me?.npm, me?.specKit, me?.versionConstants], ["commons/repoctl", true, "spec-kit", [{ file: "src/governance/version.ts", name: "REPOCTL_VERSION" }]]);
   assertEquals(systemFiles === undefined, false);
 });
+
+proves(["0010-repoctl-host FR-004"], "a library held out of the release is held in the status, with no npm cell and no tag, whatever its distribution says", () => {
+  assertEquals(stateOf({ npm: true, held: "not published yet" }, { kind: "found", latest: "0.1.0", hasRepoVersion: true }, { kind: "none", source: "local" }), "held");
+  assertEquals(stateOf({ npm: false, held: "not published yet" }, { kind: "not-published" }, { kind: "none", source: "local" }), "held");
+  assertEquals(stateOf({ npm: false, held: undefined }, { kind: "not-published" }, { kind: "none", source: "local" }), "untagged");
+});

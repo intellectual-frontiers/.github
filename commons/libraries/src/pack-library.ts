@@ -304,6 +304,8 @@ export type PackOptions = {
    * from the compiled module. The files under `src/` that are not TypeScript (a stylesheet a module reads beside itself) are published beside the sources and beside the compiled modules.
    */
   readonly launchers?: Readonly<Record<string, string>>;
+  /** Packages the published package may use where they are installed beside it and does not need (loaded by name at run time): written as optional peer dependencies, name and range. */
+  readonly optionalPeers?: Readonly<Record<string, string>>;
   /** A bundled package: the code of each entry and of each command is one file (`bun build`), and only the declarations the entries reach are published. */
   readonly bundle?: {
     /** The commands: their name, and the source that is the command's entry from the library's folder. */
@@ -500,7 +502,10 @@ export async function packLibrary(root: string, options: PackOptions = {}): Prom
     ...(Object.keys(dependencies).length === 0
       ? {}
       : { dependencies: Object.fromEntries(Object.entries(dependencies).sort(([a], [b]) => (a < b ? -1 : 1))) }),
-    ...(namesNodeTypes(join(stage, "dist")) ? { peerDependencies: { "@types/node": ">=26" } } : {}),
+    ...(namesNodeTypes(join(stage, "dist")) || options.optionalPeers !== undefined
+      ? { peerDependencies: { ...(namesNodeTypes(join(stage, "dist")) ? { "@types/node": ">=26" } : {}), ...(options.optionalPeers ?? {}) } }
+      : {}),
+    ...(options.optionalPeers === undefined ? {} : { peerDependenciesMeta: Object.fromEntries(Object.keys(options.optionalPeers).map((n) => [n, { optional: true }])) }),
     files: [
       ...(Object.keys(exportsOut).length === 0 ? [] : ["dist"]),
       ...(bundle === undefined ? ["src"] : []),

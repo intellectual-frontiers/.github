@@ -106,8 +106,8 @@ export type Capabilities = {
   readonly prove: boolean;
 };
 
-/** The documentation generator's settings: its configuration file and the folder the site is built into, from the root. */
-export type DocsSettings = { readonly config: string; readonly out: string };
+/** The documentation generator's settings: its configuration file and the folder the site is built into, from the root, and the module (from the root) that is the generator where it is a source of the repository and not an installed package. */
+export type DocsSettings = { readonly config: string; readonly out: string; readonly generator: string | undefined };
 
 /** A configuration, as the host reads it: every identity made, every default filled. */
 export type Config = {
@@ -161,7 +161,7 @@ export type ConfigInput = {
   readonly libraries?: { readonly folder: string; readonly specKit?: LibrariesSettings["specKit"]; readonly versionConstants?: boolean; readonly linker?: readonly string[]; readonly roleFile?: string };
   readonly hygiene?: { readonly scope: string; readonly gitSources?: readonly string[]; readonly pathSegment?: string; readonly sourceMarker?: string; readonly allow?: { readonly paths?: readonly string[]; readonly packages?: readonly string[] } };
   readonly doctor?: { readonly minNode?: number; readonly bunPin?: DoctorPolicy["bunPin"]; readonly links?: DoctorPolicy["links"]; readonly install?: string };
-  readonly docs?: { readonly config?: string; readonly out?: string };
+  readonly docs?: { readonly config?: string; readonly out?: string; readonly generator?: string };
 };
 
 /** The names of the optional verbs a configuration turns on with a flag. */
@@ -326,8 +326,8 @@ export function parseConfig(input: ConfigInput): Result<Config, readonly string[
   const d = input.doctor ?? {};
   const doctor: DoctorPolicy = { minNode: d.minNode, bunPin: d.bunPin, links: d.links, install: d.install ?? "bun install --frozen-lockfile" };
 
-  const docs: DocsSettings | undefined = input.docs === undefined ? undefined : { config: input.docs.config ?? "docs.config.ts", out: input.docs.out ?? "_site" };
-  if (docs !== undefined && (!relative(docs.config) || !relative(docs.out))) bad("docs.config and docs.out are paths inside the repository, written with /");
+  const docs: DocsSettings | undefined = input.docs === undefined ? undefined : { config: input.docs.config ?? "docs.config.ts", out: input.docs.out ?? "_site", generator: input.docs.generator };
+  if (docs !== undefined && (!relative(docs.config) || !relative(docs.out) || (docs.generator !== undefined && !relative(docs.generator)))) bad("docs.config, docs.out and docs.generator are paths inside the repository, written with /");
 
   if (problems.length > 0 || tierVariable === undefined || readOnlyVariable === undefined) return err(problems);
   return ok({ repo: input.repo, tierVariable, readOnlyVariable, commit, generators: withAfter, checks, capabilities, libraries, hygiene, doctor, docs });

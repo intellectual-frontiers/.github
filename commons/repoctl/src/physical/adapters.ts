@@ -164,13 +164,22 @@ function entryOf(folder: string): string | undefined {
 function generatorOf(mod: unknown): DocsGenerator | undefined {
   if (!isRecord(mod)) return undefined;
   const main = mod["main"];
-  return typeof main === "function" ? { main: async (argv) => Number(await main(argv)) } : undefined;
+  return typeof main === "function" ? { main: async (argv, cwd) => Number(await main(argv, cwd)) } : undefined;
 }
 
-/** The documentation generator: the package found in the `node_modules` of the repository or above it, else the one this program can import by its name. */
+/** The documentation generator: the package found in the `node_modules` of the repository or above it (an optional peer of this program, never carried by it). */
 export const systemDocs: DocsPort = {
-  load: async (repo) => {
+  load: async (repo, generator) => {
     const tried: string[] = [];
+    if (generator !== undefined) {
+      const file = join(repo, generator);
+      try {
+        const found = existsSync(file) ? generatorOf(await import(toFileUrl(file).href)) : undefined;
+        return found === undefined ? err(`${generator} is not a module that exports main`) : ok(found);
+      } catch (e) {
+        return err(`${generator}: ${e instanceof Error ? e.message : String(e)}`);
+      }
+    }
     for (let dir = repo; ; dir = dirname(dir)) {
       const entry = entryOf(join(dir, "node_modules", DOCS_PACKAGE));
       if (entry !== undefined && existsSync(entry)) {
@@ -185,14 +194,7 @@ export const systemDocs: DocsPort = {
       }
       if (dirname(dir) === dir) break;
     }
-    try {
-      const specifier: string = DOCS_PACKAGE;
-      const found = generatorOf(await import(specifier));
-      if (found !== undefined) return ok(found);
-      tried.push(`${DOCS_PACKAGE} exports no main`);
-    } catch (e) {
-      tried.push(`${DOCS_PACKAGE} cannot be imported (${e instanceof Error ? e.message : String(e)})`);
-    }
+    if (tried.length === 0) tried.push(`${DOCS_PACKAGE} is not in the node_modules of ${repo} or above it`);
     return err(tried.join("; "));
   },
 };

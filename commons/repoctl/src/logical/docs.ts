@@ -1,12 +1,12 @@
-// Spec: 0010-repoctl-docs FR-001
+// Spec: 0011-repoctl-docs FR-001
 /**
- * The documentation verbs' reasoning (commons repoctl 0010-repoctl-docs FR-001 to FR-004): what `repoctl docs build`, `serve` and `check` ask of the documentation generator `ifc-docs` of `@intellectual-frontiers/docs`, as arguments of its command
+ * The documentation verbs' reasoning (commons repoctl 0011-repoctl-docs FR-001 to FR-004): what `repoctl docs build`, `serve` and `check` ask of the documentation generator `ifc-docs` of `@intellectual-frontiers/docs`, as arguments of its command
  * line, and what a missing generator or a failed run is as a finding. The generator is not carried by repoctl: the Physical layer loads it by its package name where it is installed, through the port below, and a test fills the port with its own.
  *
  * @example
  * ```ts
  * import { docsArguments } from "./docs.ts";
- * docsArguments("build", { config: "docs.config.ts", out: "_site" }, "/r"); // ["build", "--out", "/r/_site", "--config", "/r/docs.config.ts"]
+ * docsArguments("build", { config: "docs.config.ts", out: "_site", generator: undefined }, "/r"); // ["build", "--out", "/r/_site", "--config", "/r/docs.config.ts"]
  * ```
  *
  * @module
@@ -15,11 +15,11 @@ import type { Result } from "@intellectual-frontiers/core";
 import type { DocsSettings } from "@intellectual-frontiers/repoctl/governance";
 import { finding, type Finding } from "./findings.ts";
 
-/** The command line of the generator `ifc-docs` is the program's `main`: its arguments to the status it ends with. */
-export type DocsGenerator = { readonly main: (argv: readonly string[]) => Promise<number> };
+/** The command line of the generator `ifc-docs` is the program's `main`: its arguments and the folder it runs from to the status it ends with. */
+export type DocsGenerator = { readonly main: (argv: readonly string[], cwd: string) => Promise<number> };
 
-/** The port that loads the generator from the repository's own dependencies, or says why it cannot. */
-export type DocsPort = { readonly load: (repo: string) => Promise<Result<DocsGenerator, string>> };
+/** The port that loads the generator from the repository's own dependencies (or from the module the settings name), or says why it cannot. */
+export type DocsPort = { readonly load: (repo: string, generator: string | undefined) => Promise<Result<DocsGenerator, string>> };
 
 /** What the generator is asked: build into a folder, or check. */
 export type DocsAsk = "build" | "check";

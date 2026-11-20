@@ -13,8 +13,8 @@
 - **FR-002**: Every verb MUST be declared once in the table `VERBS` with its words, summary, kind, effect, whether it is safe to repeat, whether it previews and checks, the tier that sees it and its reach (channels and confirmation); the table MUST hold every verb of the union `VerbId`, and the facts of no verb MUST contradict each other or its reach under the rules of Headless' governance.
 - **FR-003**: The program MUST declare three audience tiers, lowest first, `public`, `contributor` and `releaser`, with `contributor` as the tier of a caller who says nothing; the verbs that only read MUST be `public`, the verbs that change the checkout `contributor`, and `release publish` `releaser`.
 - **FR-004**: Every problem a verb raises MUST be one of the closed union of codes `ProblemCode`, each of which MUST have an explanation (a title, what happened, the likely cause and the fix, none blank) in a registry that holds every code, and the codes MUST be of the shape Headless accepts.
-- **FR-005**: The generators of the repository MUST be declared once, in one table, each with its id, its command, the globs of what it reads and the globs of what it writes; the table MUST hold each generator of the repository that has a `--check`, and nothing else MUST name a generator's command or output.
-- **FR-006**: The checks that are not generators (the format of the specification kit, the rules of Mizan, the versions) MUST be declared once, in one table, each with its command and the code of its findings.
+- **FR-005**: The generators of a repository MUST be declared once, in its configuration (0009-repoctl-config FR-003), each with its id, its command or typed function, its check, the globs of what it reads and the globs of what it writes and the generators it comes after; the configuration MUST hold each generator of the repository that has a check, and nothing else MUST name a generator's command or output; the host holds no generator.
+- **FR-006**: The checks that are not generators MUST be declared once, in the repository's configuration, each with its id, its command or typed function and the code of its findings.
 
 ## Acceptance scenarios
 

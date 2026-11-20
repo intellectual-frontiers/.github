@@ -20,9 +20,9 @@ import { serveFolder } from "../adapters.ts";
 
 /** Runs the generator for a request: the findings (none where it ended with 0). */
 async function ask(w: World, what: DocsAsk, settings: DocsSettings, out?: string): Promise<readonly Finding[]> {
-  const generator = await w.docs.load(w.repo);
+  const generator = await w.docs.load(w.repo, settings.generator);
   if (generator.kind === "err") return [missingGenerator(generator.error)];
-  const status = await generator.value.main(docsArguments(what, settings, w.repo, out));
+  const status = await generator.value.main(docsArguments(what, settings, w.repo, out), w.repo);
   return status === 0 ? [] : [failedGenerator(what, status)];
 }
 
