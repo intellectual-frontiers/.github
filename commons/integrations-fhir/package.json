@@ -1,0 +1,32 @@
+{
+  "name": "@intellectual-frontiers/integrations-fhir",
+  "private": true,
+  "version": "0.1.1",
+  "description": "The FHIR plugin of Integrations: R4 and US Core as registry entries with their licence as data, a codec for FHIR JSON and NDJSON to the abstract typed tree, a loader of StructureDefinitions, CodeSystems and ValueSets the user supplies, and the acknowledgement port of OperationOutcome.",
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "exports": {
+    ".": "./src/mod.ts"
+  },
+  "scripts": {
+    "check": "tsc -p tsconfig.json",
+    "test": "bun test suite/",
+    "test:node": "node --test \"suite/**/*.test.ts\"",
+    "verify": "tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../libraries/src/check.ts --root spec-kit --level L1 && bun tools/check.ts && bun test suite/ && bun tools/pack.ts --check",
+    "pack": "bun tools/pack.ts"
+  },
+  "devDependencies": {
+    "@intellectual-frontiers/commons": "link:../ts",
+    "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/integrations": "link:../integrations",
+    "@intellectual-frontiers/libraries": "link:../libraries",
+    "@intellectual-frontiers/mizan": "link:../mizan",
+    "@intellectual-frontiers/system": "link:../system",
+    "@intellectual-frontiers/test": "link:../test",
+    "@types/node": "26.6.6",
+    "fast-check": "4.10.2",
+    "typescript": "7.0.2"
+  }
+}

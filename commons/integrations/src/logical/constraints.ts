@@ -35,6 +35,27 @@ export type FindingCode =
   | "lossy-mapping"
   | "mapping-target-conflict";
 
+const FINDING_CODE_TABLE: Readonly<Record<FindingCode, true>> = {
+  "syntax-error": true,
+  "unknown-path": true,
+  "cardinality-min": true,
+  "cardinality-max": true,
+  "value-pattern": true,
+  "value-fixed": true,
+  "code-not-in-terminology": true,
+  "terminology-unavailable": true,
+  "business-rule": true,
+  "unmapped-source-field": true,
+  "lossy-mapping": true,
+  "mapping-target-conflict": true,
+};
+
+/** Every finding code, as a closed list of strings a consumer may carry as data; the compiler holds it complete against `FindingCode`. */
+export const FINDING_CODES: readonly FindingCode[] = Object.keys(FINDING_CODE_TABLE).filter((k): k is FindingCode => Object.hasOwn(FINDING_CODE_TABLE, k));
+
+/** Every level of a finding. */
+export const FINDING_LEVELS: readonly FindingLevel[] = ["syntax", "schema", "profile", "terminology", "business-rule"];
+
 /** A finding: never a value of the payload. */
 export type Finding = { readonly level: FindingLevel; readonly severity: Severity; readonly code: FindingCode; readonly path: string; readonly message: string };
 
@@ -44,6 +65,7 @@ export const finding = (level: FindingLevel, severity: Severity, code: FindingCo
 /** What a path of a schema must be. */
 export type Constraint =
   | { readonly kind: "cardinality"; readonly path: string; readonly min: number; readonly max: number | "*" }
+  | { readonly kind: "choice"; readonly path: string; readonly alternatives: readonly string[]; readonly min: number; readonly max: number | "*" }
   | { readonly kind: "pattern"; readonly path: string; readonly regex: string }
   | { readonly kind: "fixed"; readonly path: string; readonly value: string }
   | { readonly kind: "binding"; readonly path: string; readonly terminology: Ref<"terminology">; readonly strength: BindingStrength };
@@ -87,6 +109,23 @@ function checkConstraint(c: Constraint, level: "schema" | "profile", t: Transact
         if (c.max !== "*" && n > c.max) out.push(finding(level, "error", "cardinality-max", parent === t.id ? c.path : `${parent}.${c.path.slice(c.path.lastIndexOf(".") + 1)}`, `${n} of at most ${c.max}`));
       }
       return out;
+    case "choice": {
+      // a choice is one of its alternatives: the occurrences of all of them under one parent are counted together, and each is a path the schema knows
+      const total = new Map<string, number>();
+      const parents = new Set<string>();
+      for (const alt of c.alternatives) {
+        for (const [parent, n] of occurrences(t, alt)) {
+          parents.add(parent);
+          total.set(parent, (total.get(parent) ?? 0) + n);
+        }
+      }
+      for (const parent of parents) {
+        const n = total.get(parent) ?? 0;
+        if (n < c.min) out.push(finding(level, "error", "cardinality-min", `${parent}.${c.path.slice(c.path.lastIndexOf(".") + 1)}[x]`, `${n} of at least ${c.min}`));
+        if (c.max !== "*" && n > c.max) out.push(finding(level, "error", "cardinality-max", `${parent}.${c.path.slice(c.path.lastIndexOf(".") + 1)}[x]`, `${n} of at most ${c.max}`));
+      }
+      return out;
+    }
     case "pattern": {
       const re = new RegExp(c.regex);
       for (const e of entries(t)) if (e.path === c.path && !re.test(e.value)) out.push(finding(level, "error", "value-pattern", e.at, "does not match the pattern"));
@@ -118,7 +157,7 @@ export function validate(t: Transaction, schema: Schema, options: { readonly pro
   if (t.id !== schema.transaction) out.push(finding("schema", "error", "unknown-path", t.id, "the transaction is not the schema's"));
   const known = new Set(schema.paths);
   for (const p of pathsOf(t)) {
-    if (!known.has(p) && ![...known].some((k) => p.startsWith(`${k}.`))) out.push(finding("schema", "error", "unknown-path", p));
+    if (!known.has(p) && ![...known].some((k) => k !== t.id && p.startsWith(`${k}.`))) out.push(finding("schema", "error", "unknown-path", p));
   }
   for (const c of schema.constraints) out.push(...checkConstraint(c, "schema", t, terms));
   if (options.profile !== undefined) for (const c of options.profile.constraints) out.push(...checkConstraint(c, "profile", t, terms));

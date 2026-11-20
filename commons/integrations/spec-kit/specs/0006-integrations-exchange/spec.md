@@ -28,6 +28,12 @@
 - **FR-011**: `transition` MUST be a total function of a state (`pending`, `sent`, `received`, `retrying`, `acknowledged`, `rejected`, `abandoned`), an event and the agreement's attempts, and an illegal pair MUST be an error value, never a throw.
 - **FR-012**: A send that times out MUST retry until `maxAttempts` and then be abandoned; a state that is final (acknowledged, rejected, abandoned) MUST accept no event.
 
+## The ledger and the codes
+
+- **FR-013**: The library MUST give a structural `LedgerPort`, a typed record of functions that return a `Result` and never throw: `append` a stage event `{loadId, stage, reasonCode?, at, contentHash?}`, `intake` a content by its hash giving the closed union `first-seen`, `duplicate` (of a load) or `conflict` (with a load: another content of the same item), `outcome` to record a validation or acknowledgement outcome by code, and `events` and `outcomes` to read them back; a stage MUST be an opaque branded text whose code list belongs to the consumer, and an event MUST carry no payload value: each of its fields is made by a smart constructor that admits no free text.
+- **FR-014**: The library MUST ship an in-memory ledger and a conformance suite, `conformLedger`, that any implementation (memory, a database) runs: it finds a ledger that does not keep events in order, does not tell first-seen from duplicate from conflict, accepts an outcome for a load it has no event of, does not read an outcome back, or remembers the contents of another ledger.
+- **FR-015**: The codes the library produces MUST be exported as closed lists of strings that a consumer may carry as data, each held complete against its union by the compiler: the finding codes and levels, the acknowledgement kinds and statuses, and the rejection kinds.
+
 ## Acceptance scenarios
 
 1. **Given** a mapping that drops `Claim.note`, **When** its coverage is computed, **Then** `lossy-mapping` is found for `Claim.note`, per FR-008.

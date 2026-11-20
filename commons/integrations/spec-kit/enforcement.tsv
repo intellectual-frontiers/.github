@@ -56,6 +56,9 @@ requirement	mechanism	by	note
 0006-integrations-exchange FR-010	check	.github: cd commons/integrations && bun run verify	suite/exchange.test.ts: statusOf over every acknowledgement
 0006-integrations-exchange FR-011	check	.github: cd commons/integrations && bun run verify	suite/exchange.test.ts: transition over every state and event (property)
 0006-integrations-exchange FR-012	check	.github: cd commons/integrations && bun run verify	suite/exchange.test.ts: retries are bounded
+0006-integrations-exchange FR-013	check	.github: cd commons/integrations && bun run verify	suite/exchange.test.ts: the identifiers admit no free text
+0006-integrations-exchange FR-014	check	.github: cd commons/integrations && bun run verify	suite/exchange.test.ts: the in-memory ledger conforms and a faulty one is found
+0006-integrations-exchange FR-015	check	.github: cd commons/integrations && bun run verify	suite/exchange.test.ts: the code lists are complete
 0007-integrations-standards FR-001	none	-	Planned: verified when integrations-fhir ships definitions
 0007-integrations-standards FR-002	none	-	Planned: the licensed-schema loader of integrations-x12
 0007-integrations-standards FR-003	none	-	Planned

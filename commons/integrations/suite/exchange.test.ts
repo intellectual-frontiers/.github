@@ -6,8 +6,21 @@
  */
 import fc from "fast-check";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { parseStandardUrn, ref, type Instant } from "../src/governance/mod.ts";
+import { ok } from "@intellectual-frontiers/core";
+import { parseSha256, parseStandardUrn, ref, type Instant } from "../src/governance/mod.ts";
 import {
+  ACK_KINDS,
+  ACK_STATUSES,
+  FINDING_CODES,
+  FINDING_LEVELS,
+  REJECTION_KINDS,
+  conformLedger,
+  memoryLedger,
+  parseItemKey,
+  parseLoadId,
+  parseOutcomeCode,
+  parseStage,
+  type LedgerPort,
   HIDDEN,
   coverage,
   element,
@@ -234,4 +247,42 @@ proves(["0006-integrations-exchange FR-012"], "retries are bounded, and a final 
   assertEquals(s, { kind: "abandoned", attempts: 3 });
   for (const e of events) assertEquals(transition(s, ev(e), policy).kind, "err");
   assertEquals(states.filter(isFinal).map((x) => x.kind), ["acknowledged", "rejected", "abandoned"]);
+});
+
+const ledgerIds = {
+  load: (n: number) => must(parseLoadId(`load-${n}`)),
+  stage: (s: string) => must(parseStage(s)),
+  code: (s: string) => must(parseOutcomeCode(s)),
+  key: (n: number) => must(parseItemKey(`item-${n}`)),
+  hash: (n: number) => must(parseSha256(String(n).repeat(64).slice(0, 64))),
+  at: NOW,
+};
+
+proves(["0006-integrations-exchange FR-013"], "the identifiers of a ledger event admit no free text", () => {
+  assertEquals(parseStage("RECEIVED").kind, "ok");
+  assertEquals(parseStage("received").kind, "err");
+  assertEquals(parseOutcomeCode("cardinality-min").kind, "ok");
+  const leak = parseOutcomeCode("Patient Zyxwvut was rejected");
+  assert(leak.kind === "err" && !JSON.stringify(leak).includes("Zyxwvut"));
+  assertEquals(parseLoadId("a b").kind, "err");
+  assertEquals(parseItemKey("ok.key:1").kind, "ok");
+});
+
+proves(["0006-integrations-exchange FR-014"], "the in-memory ledger conforms and a faulty one is found", async () => {
+  assertEquals(await conformLedger(memoryLedger, ledgerIds), []);
+  const forgetful = (): LedgerPort => ({ ...memoryLedger(), intake: () => Promise.resolve(ok({ kind: "first-seen" as const })) });
+  assertEquals((await conformLedger(forgetful, ledgerIds)).map((f) => f.rule).sort(), ["ledger/conflict", "ledger/duplicate"]);
+  const lax = (): LedgerPort => ({ ...memoryLedger(), outcome: () => Promise.resolve(ok(undefined)) });
+  assert((await conformLedger(lax, ledgerIds)).some((f) => f.rule === "ledger/unknown-load"));
+  const shared = memoryLedger();
+  assert((await conformLedger(() => shared, ledgerIds)).some((f) => f.rule === "ledger/fresh"));
+});
+
+proves(["0006-integrations-exchange FR-015"], "the code lists are complete", () => {
+  assertEquals(FINDING_CODES.length, 12);
+  assertEquals(new Set(FINDING_CODES).size, 12);
+  assertEquals(FINDING_LEVELS.length, 5);
+  assertEquals([...ACK_KINDS].sort(), ["fhir-operation-outcome", "hl7-ack", "x12-999", "x12-ta1"]);
+  assertEquals(ACK_STATUSES, ["accepted", "accepted-with-errors", "rejected"]);
+  assertEquals(REJECTION_KINDS, ["nack", "invalid"]);
 });
