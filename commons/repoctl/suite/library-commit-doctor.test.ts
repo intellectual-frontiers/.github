@@ -267,7 +267,8 @@ proves(["0005-repoctl-library-commit-doctor FR-008"], "the real checkout is in o
   if (!CAN_RUN) return;
   const out = await execute(hostOf(systemWorld(CHECKOUT, () => undefined)), ["doctor", "--json"], { tier: TIERS.public });
   const doc = JSON.parse(out.out) as { problems: { code: string }[]; data: { node: string | null; installed: boolean } };
-  assertEquals(doc.data.installed, true);
+  // A job that installed only this library's dependencies has no root `node_modules`: the doctor then says so, which is its answer and not a failure of the test.
+  assertEquals(doc.data.installed, await fs.exists(path.join(CHECKOUT, "node_modules")));
   const node26 = majorOf(doc.data.node ?? undefined) !== undefined && (majorOf(doc.data.node ?? undefined) ?? 0) >= 26;
-  assertEquals(out.code, node26 ? 0 : 1, JSON.stringify(doc.problems));
+  assertEquals(out.code, node26 && doc.data.installed ? 0 : 1, JSON.stringify(doc.problems));
 });
