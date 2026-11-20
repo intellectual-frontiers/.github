@@ -40,7 +40,7 @@ import { sha256 } from "../../kernel/sha256.ts";
 import { STEP_SPAN, decodeLines, installationOf } from "../../kernel/test-record.ts";
 import { assembleRecord, junitXml, readRecord, tap14, testsOf } from "../../kernel/test-report.ts";
 import { parseSpanId, parseTraceId } from "../../kernel/otel.ts";
-import { type Equal, expectType } from "../../kernel/types.ts";
+import { type Equal, expectType } from "@intellectual-frontiers/core";
 import { makeTempDir, readTextFile, remove, writeTextFile } from "../../runtime/fs.ts";
 import { join } from "../../runtime/path.ts";
 import { env, execPath, run, runtimeName } from "../../runtime/proc.ts";

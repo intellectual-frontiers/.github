@@ -23,7 +23,7 @@ import { appendEntry, formatLedgerParseError, type LedgerEntry, type LedgerRecor
 import { type Instant, instantFromEpochMs, roleOf } from "../kernel/grc.ts";
 import { type SpanId, spanIdFrom, type TraceId, traceIdFrom } from "../kernel/otel.ts";
 import type { LogBatch, TraceBatch } from "../kernel/otlp.ts";
-import { err, ok, type Result } from "../kernel/result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { type Sha256, sha256 } from "../kernel/sha256.ts";
 import {
   assembleRecord,

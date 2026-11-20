@@ -9,7 +9,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "../../kernel/result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { blobAt, branchTip, listCommits } from "../host/branch.ts";
 import { appendEvents, type LedgerHostError, type LedgerRead, readLedger } from "../host/ledger-branch.ts";
 import { parseEvidencePath } from "../pure/chain.ts";

@@ -13,7 +13,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "./result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 
 /** A key that needs no quotes: an identifier (letters, digits, `_`, `$`; not starting with a digit). */
 export const BARE_KEY: RegExp = /^[A-Za-z_$][A-Za-z0-9_$]*$/;

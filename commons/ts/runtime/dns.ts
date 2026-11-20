@@ -29,8 +29,7 @@ import { getServers } from "node:dns";
 import * as dgram from "node:dgram";
 import * as net from "node:net";
 import * as os from "node:os";
-import { absurd } from "../kernel/absurd.ts";
-import { err, ok, type Result } from "../kernel/result.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 
 /** The record types that can be asked for. */
 export type RecordType = "A" | "AAAA" | "CNAME" | "MX" | "NS" | "TXT" | "SRV";

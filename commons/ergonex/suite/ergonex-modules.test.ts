@@ -7,7 +7,7 @@
  * @module
  */
 import { flag } from "../src/platform/k-args.ts";
-import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok } from "@intellectual-frontiers/core";
 import { sha256 } from "@intellectual-frontiers/commons/ts/kernel";
 import { exitStatuses, moduleSources } from "./vocabulary.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/commons/ts/runtime/test";

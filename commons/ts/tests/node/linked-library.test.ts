@@ -30,10 +30,14 @@ async function project(kind: "link" | "file"): Promise<string> {
       private: true,
       type: "module",
       exports: { "./a": "./a.ts" },
-      devDependencies: { "@intellectual-frontiers/commons": `${kind}:${ROOT}` },
+      // the kernel imports core by package name, so the project that reaches the kernel has core installed beside it
+      devDependencies: {
+        "@intellectual-frontiers/commons": `${kind}:${ROOT}`,
+        "@intellectual-frontiers/core": `link:${resolve(ROOT, "..", "core")}`,
+      },
     }),
   );
-  await put("a.ts", 'import { ok } from "@intellectual-frontiers/commons/ts/kernel";\nexport const r = ok(42);\n');
+  await put("a.ts", 'import { ok } from "@intellectual-frontiers/core";\nexport const r = ok(42);\n');
   await put("internal.ts", 'export const secret = "internal";\n');
   await put("main.ts", 'import { r } from "@intellectual-frontiers/probe/a";\nconsole.log(`${r.kind}:${r.value}`);\n');
   await put("deep.ts", 'import("@intellectual-frontiers/probe/internal").then(() => process.exit(0), () => process.exit(7));\n');

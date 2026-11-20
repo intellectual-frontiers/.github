@@ -11,7 +11,7 @@
  *
  * @example
  * ```ts
- * import { boolean } from "../kernel/decode.ts";
+ * import { boolean } from "@intellectual-frontiers/core";
  * import { defineRule } from "./rule.ts";
  * export const noDebugger = defineRule({ description: "no debugger statement", options: { strict: boolean } }, (context, options) => ({
  *   DebuggerStatement: (node) => context.report({ node, message: options.strict === true ? "remove it" : "remove it, please" }),
@@ -21,9 +21,19 @@
  * @module
  */
 import { relative } from "node:path";
-import { array, type Decoded, type Decoder, type DecodeError, type Fields, formatDecodeError, object, string } from "../kernel/decode.ts";
+import {
+  array,
+  type Decoded,
+  type Decoder,
+  type DecodeError,
+  type Fields,
+  formatDecodeError,
+  object,
+  string,
+  err,
+  ok,
+} from "@intellectual-frontiers/core";
 import { formatGlobError, globToRegExp } from "../kernel/glob.ts";
-import { err, ok } from "../kernel/result.ts";
 
 // ---------------------------------------------------------------------------------------------------------------------------- ESTree
 

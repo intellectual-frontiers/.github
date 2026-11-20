@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { type ExportFormat, EXPORT_FORMATS, exportFormatOf } from "./inventory.ts";
 
 /** What `ergonex tools` was asked. */

@@ -4,8 +4,8 @@
  *
  * @module
  */
-import { absurd } from "../../../kernel/absurd.ts";
-import type { Result } from "../../../kernel/result.ts";
+import { absurd } from "@intellectual-frontiers/core";
+import type { Result } from "@intellectual-frontiers/core";
 
 /** The formats an integration reads or writes: those built are the first two and the last; the rest are specified (0019-mizan-integrations FR-010). */
 export type Format =

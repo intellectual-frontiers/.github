@@ -9,7 +9,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 
 /** The comment mark of the file the block is in: `#` for most, `--` for `psql`'s. */
 export type Style = "#" | "--";

@@ -1,0 +1,14 @@
+{
+  "extends": "../ts/tsconfig.json",
+  "compilerOptions": {
+    "lib": ["es2024", "dom", "dom.iterable"],
+    "noEmit": false,
+    "declaration": true,
+    "rewriteRelativeImportExtensions": true,
+    "rootDir": "src",
+    "outDir": "/tmp/claude-0/-home-user/af6dd78b-be18-5f10-9df2-741abc89d5bc/scratchpad/coreout",
+    "skipLibCheck": true,
+    "types": []
+  },
+  "include": ["src/**/*.ts"]
+}

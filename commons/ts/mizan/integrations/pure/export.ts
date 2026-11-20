@@ -20,8 +20,7 @@
  *
  * @module
  */
-import { absurd } from "../../../kernel/absurd.ts";
-import { err, ok, type Result } from "../../../kernel/result.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import type { Fields } from "../../../kernel/rdf-schema.ts";
 import type { Named } from "../../../kernel/rdf-term.ts";
 import type { IntegrationFinding } from "./types.ts";

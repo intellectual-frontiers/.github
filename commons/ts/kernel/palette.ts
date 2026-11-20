@@ -18,7 +18,7 @@
  *
  * @module
  */
-import { absurd } from "./absurd.ts";
+import { absurd } from "@intellectual-frontiers/core";
 
 /** What the terminal written to can show: colour, emoji, and its width in columns (the fields of the runtime's `Look`). */
 export type Capabilities = { readonly colour: boolean; readonly emoji: boolean; readonly columns: number };

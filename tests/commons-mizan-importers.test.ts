@@ -11,7 +11,7 @@ import { fs, path, proc } from "../commons/ts/runtime/mod.ts";
 import { assert, assertEquals, proves } from "../commons/ts/runtime/test.ts";
 import { sha256 } from "../commons/ts/kernel/sha256.ts";
 import { importJsonSchema, readJsonLd, readRdfXml, type Read } from "../commons/ts/mizan/integrations/mod.ts";
-import type { Result } from "../commons/ts/kernel/result.ts";
+import type { Result } from "@intellectual-frontiers/core";
 import type { IntegrationFinding } from "../commons/ts/mizan/integrations/mod.ts";
 
 const RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";

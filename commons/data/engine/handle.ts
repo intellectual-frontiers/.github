@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import type { PointName } from "./point.ts";
 
 /** A handle: a named place for a value of type `T`, which the project provides. */

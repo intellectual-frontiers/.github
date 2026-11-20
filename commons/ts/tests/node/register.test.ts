@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { lf } from "../../kernel/text.ts";
+import { lf } from "@intellectual-frontiers/core";
 import { makeTempDir, mkdir, readTextFileSync, remove, writeTextFile } from "../../runtime/fs.ts";
 import { dirname, fromFileUrl, join, resolve, toFileUrl } from "../../runtime/path.ts";
 import { run, which } from "../../runtime/proc.ts";

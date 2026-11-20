@@ -5,7 +5,7 @@
  * @module
  */
 import fc from "fast-check";
-import type { Brand } from "../../kernel/brand.ts";
+import type { Brand } from "../src/brand.ts";
 import {
   array,
   boolean,
@@ -26,17 +26,17 @@ import {
   tagged,
   tuple,
   unknownValue,
-} from "../../kernel/decode.ts";
-import { err, ok } from "../../kernel/result.ts";
-import { type Equal, expectType, type Extends } from "../../kernel/types.ts";
-import { assertEquals, proves } from "../../runtime/test.ts";
+} from "../src/decode.ts";
+import { err, ok } from "../src/result.ts";
+import { type Equal, expectType, type Extends } from "../src/types.ts";
+import { assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 
-const FR = "0005-typescript-runtime FR-006";
+const FR = "0001-core FR-002";
 
 const person = object({ name: string, age: integer, tags: array(string) }, { email: string, nick: nullable(string) });
 type Person = Decoded<typeof person>;
 
-proves([FR, "0005-typescript-runtime FR-014"], "a value written as JSON decodes back to itself (round trip)", () => {
+proves([FR, "0001-core FR-004"], "a value written as JSON decodes back to itself (round trip)", () => {
   const arb = fc.record(
     { name: fc.string(), age: fc.integer(), tags: fc.array(fc.string()), email: fc.string(), nick: fc.option(fc.string(), { nil: null }) },
     { requiredKeys: ["name", "age", "tags"], noNullPrototype: true },
@@ -98,7 +98,7 @@ proves([FR], "tagged picks the alternative by kind, and names kind where none fi
 type Port = Brand<number, "port">;
 const port = refine(integer, "port", (n) => n > 0 && n < 65536);
 
-proves([FR, "0005-typescript-runtime FR-014"], "refine makes a branded value only where it is valid, and the types follow", () => {
+proves([FR, "0001-core FR-004"], "refine makes a branded value only where it is valid, and the types follow", () => {
   assertEquals(port(80), ok(80 as Port));
   assertEquals(port(0), err({ kind: "decode", path: "$", expected: "a port", found: "number 0" }));
   expectType<Equal<Decoded<typeof port>, Port>>();

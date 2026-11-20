@@ -17,7 +17,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "../../kernel/result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { gitText } from "../host/git.ts";
 
 /** A lookup of the text of a requirement by its name (`NNNN-slug FR-nnn`), or none where the specifications do not state it. */

@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok } from "@intellectual-frontiers/core";
 import type { BindContext, Literal, Statement, StatementSource } from "@intellectual-frontiers/data/sql/physical";
 import { createTables, reload, TEXT } from "./fragment.ts";
 import type { DocumentationSettings } from "./settings.ts";

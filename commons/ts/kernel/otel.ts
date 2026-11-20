@@ -16,10 +16,9 @@
  *
  * @module
  */
-import { absurd } from "./absurd.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
+import type { Brand } from "@intellectual-frontiers/core";
 import { fromBase64 } from "./base64.ts";
-import type { Brand } from "./brand.ts";
-import { err, ok, type Result } from "./result.ts";
 import { toHex } from "./sha256.ts";
 
 // ---------------------------------------------------------------------------------------------------------------------------------

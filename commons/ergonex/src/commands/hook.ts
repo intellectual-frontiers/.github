@@ -11,8 +11,7 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/commons/ts/kernel";
-import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
+import { absurd, err, ok } from "@intellectual-frontiers/core";
 import { run } from "../platform/r-proc.ts";
 import { readTextFile } from "../platform/r-fs.ts";
 import { parseMessage } from "@intellectual-frontiers/commons/ts/mizan/changes/commit-message";

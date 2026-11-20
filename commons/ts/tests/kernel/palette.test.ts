@@ -6,8 +6,7 @@
  */
 import fc from "fast-check";
 import { type Capabilities, label, MARK_KINDS, MARKS, type MarkKind, mark, paint, type Role, ROLES, sgrOf } from "../../kernel/palette.ts";
-import { plain } from "../../kernel/text.ts";
-import { type Equal, expectType } from "../../kernel/types.ts";
+import { plain, type Equal, expectType } from "@intellectual-frontiers/core";
 import { createScreen, describeStyle } from "../../kernel/vt.ts";
 import { displayWidth } from "../../kernel/width.ts";
 import { assert, assertEquals, proves } from "../../runtime/test.ts";

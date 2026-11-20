@@ -22,10 +22,9 @@
  *
  * @module
  */
-import { absurd } from "../../kernel/absurd.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import { GENESIS } from "../../kernel/evidence.ts";
 import type { Attributes } from "../../kernel/otel.ts";
-import { err, ok, type Result } from "../../kernel/result.ts";
 import type { Sha256 } from "../../kernel/sha256.ts";
 import { AlreadyExists } from "../../runtime/errors.ts";
 import { makeTempDir, remove, writeTextFile } from "../../runtime/fs.ts";

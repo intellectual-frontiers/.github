@@ -23,12 +23,11 @@
  *
  * @module
  */
-import { absurd } from "../kernel/absurd.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import { fromBase64, toBase64 } from "../kernel/base64.ts";
 import { children, integer, readTlv, sequence, TAG } from "../kernel/der.ts";
 import { type DsseAlgorithm, type DsseEnvelope, pae, signatureAlgorithm } from "../kernel/dsse.ts";
 import type { Sign, VerifySignature } from "../kernel/evidence.ts";
-import { err, ok, type Result } from "../kernel/result.ts";
 import { fromHex, sha256 } from "../kernel/sha256.ts";
 import { NotFound } from "./errors.ts";
 import { exists, withTempDir, writeFile } from "./fs.ts";

@@ -19,9 +19,19 @@
  *
  * @module
  */
-import { absurd } from "../../kernel/absurd.ts";
-import { array, boolean, type DecodeError, formatDecodeError, integer, object, string } from "../../kernel/decode.ts";
-import { err, ok, type Result } from "../../kernel/result.ts";
+import {
+  absurd,
+  array,
+  boolean,
+  type DecodeError,
+  formatDecodeError,
+  integer,
+  object,
+  string,
+  err,
+  ok,
+  type Result,
+} from "@intellectual-frontiers/core";
 import { exportedLiteral } from "../../kernel/ts-literal.ts";
 
 /** The marker that opens the generated view. */

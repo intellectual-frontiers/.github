@@ -33,8 +33,19 @@
  */
 import { fromBase64, toBase64, toBase64Url } from "../kernel/base64.ts";
 import * as der from "../kernel/der.ts";
-import { array, boolean, type Decoder, formatDecodeError, json, literal, object, string } from "../kernel/decode.ts";
-import { err, ok, type Result } from "../kernel/result.ts";
+import {
+  array,
+  boolean,
+  type Decoder,
+  formatDecodeError,
+  json,
+  literal,
+  object,
+  string,
+  err,
+  ok,
+  type Result,
+} from "@intellectual-frontiers/core";
 
 /** Let's Encrypt's production directory. */
 export const LETS_ENCRYPT = "https://acme-v02.api.letsencrypt.org/directory";

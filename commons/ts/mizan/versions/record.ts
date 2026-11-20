@@ -20,7 +20,6 @@
  *
  * @module
  */
-import type { Brand } from "../../kernel/brand.ts";
 import {
   array,
   type DecodeError,
@@ -32,8 +31,11 @@ import {
   object,
   refine,
   string,
-} from "../../kernel/decode.ts";
-import { err, ok, type Result } from "../../kernel/result.ts";
+  err,
+  ok,
+  type Result,
+} from "@intellectual-frontiers/core";
+import type { Brand } from "@intellectual-frontiers/core";
 import { exportedLiteral, type Literal, tsLiteral } from "../../kernel/ts-literal.ts";
 import { dayOf, type Day, type RecordError } from "../changes/declaration.ts";
 import { companionOf, SCHEMES, type Scheme, schemeOf, type WorkKind, WORK_KINDS } from "./scheme.ts";

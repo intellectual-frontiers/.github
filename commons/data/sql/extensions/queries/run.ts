@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import type { Driver } from "@intellectual-frontiers/data/sql/lifecycle";
 import type { Catalog, ParamError, ParamType, Query } from "./catalog.ts";
 

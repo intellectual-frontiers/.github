@@ -7,7 +7,7 @@
  */
 import { fs, path, trace as runtime } from "@intellectual-frontiers/commons/ts/runtime";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
-import { KERNEL, layerFindings, PACKAGE, specifiersOf, unitOf } from "../tools/layers.ts";
+import { CORE, KERNEL, layerFindings, PACKAGE, specifiersOf, unitOf } from "../tools/layers.ts";
 import { main } from "../tools/check.ts";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
@@ -97,7 +97,7 @@ proves(
     assert(engine.length > 0);
     for (const f of engine) {
       for (const { specifier } of specifiersOf(f.text)) {
-        assert(specifier.startsWith("./") || specifier === KERNEL, `${f.path} imports ${specifier}`);
+        assert(specifier.startsWith("./") || specifier === KERNEL || specifier === CORE, `${f.path} imports ${specifier}`);
       }
     }
   },

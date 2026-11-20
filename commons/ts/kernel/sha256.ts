@@ -12,7 +12,7 @@
  *
  * @module
  */
-import type { Brand } from "./brand.ts";
+import type { Brand } from "@intellectual-frontiers/core";
 
 /** 64 lower-case hexadecimal digits: a SHA-256 checksum. */
 export type Sha256 = Brand<string, "Sha256">;

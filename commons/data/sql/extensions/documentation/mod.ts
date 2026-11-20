@@ -13,7 +13,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { contribute, defineExtension, type Extension, extensionId, type IdError } from "@intellectual-frontiers/data/engine";
 import { statementsPoint, type StatementSource } from "@intellectual-frontiers/data/sql/physical";
 import { commentsSource } from "./comments.ts";

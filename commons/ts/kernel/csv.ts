@@ -13,7 +13,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "./result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 
 /** Where a text stops being CSV, and why. Lines and columns count from 1. */
 export type CsvError = { readonly kind: "csv"; readonly line: number; readonly column: number; readonly message: string };

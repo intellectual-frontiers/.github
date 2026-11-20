@@ -13,7 +13,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "./result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 
 /** Bytes as standard base64, padded. */
 export function toBase64(bytes: Uint8Array): string {

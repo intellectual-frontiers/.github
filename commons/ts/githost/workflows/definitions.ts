@@ -96,6 +96,14 @@ export const LIBRARY_CI: Readonly<Record<string, LibraryCi>> = {
     ],
     nodeTests: 'node --test "suite/**/*.test.ts"',
   },
+  core: {
+    comment: lines(
+      "Core, the foundation of commons, the first library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the specification checker, the trace, its tests and the packing of its",
+      "package with the inspection of its declarations) on Bun and its tests on Node 26, on Windows, macOS and Linux, because the package runs on all three.",
+    ).trimEnd(),
+    nodeTests: 'node --test "suite/**/*.test.ts"',
+    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
+  },
   ergonex: {
     comment: lines(
       "Ergonex, the workspaces management of Intellectual Frontiers, a library of commons (commons 0027-commons-libraries FR-010): its own `verify` on Bun and its tests on Node 26, the backup runtime,",
@@ -568,6 +576,22 @@ const tests: Workflow = {
   },
 };
 
+/** Reads the name and version of the tarball in the working folder and says on the step's output whether that version is already on the registry (a re-run, or a first publish made by hand, never fails on a duplicate). */
+const HAVE = (registry: string): string =>
+  lines(
+    `pkg=$(tar -xzOf ./*.tgz package/package.json)`,
+    `name=$(printf '%s' "$pkg" | node -p "JSON.parse(require('fs').readFileSync(0,'utf8')).name")`,
+    `version=$(printf '%s' "$pkg" | node -p "JSON.parse(require('fs').readFileSync(0,'utf8')).version")`,
+    `if npm view "$name@$version" version${registry} >/dev/null 2>&1; then`,
+    '  echo "$name@$version is already there"',
+    '  echo "have=true" >> "$GITHUB_OUTPUT"',
+    "else",
+    '  echo "have=false" >> "$GITHUB_OUTPUT"',
+    "fi",
+  );
+const HAVE_NPM = HAVE("");
+const HAVE_GITHUB = HAVE(" --registry https://npm.pkg.github.com");
+
 /**
  * The workflow that publishes a library to the registries its manifest names (0030-generated-workflows FR-009): on a tag `<name>-v<version>` it checks the tag is the version, proves the library, packs it
  * with its `tools/pack.ts` and sends the tarball to npm, with provenance and no token (npm's trusted publishing), and to the GitHub package registry with the workflow's own token.
@@ -629,8 +653,15 @@ export function publishWorkflow(l: LibraryFacts): Workflow {
               steps: [
                 use(PIN.downloadArtifact, { name: "The tarball", with: { name: `${l.name}-package`, path: "package" } }),
                 use(PIN.setupNode, { with: { "node-version": expr("env.NODE_VERSION"), "registry-url": "https://registry.npmjs.org" } }),
+                run(HAVE_NPM, {
+                  name: "Is the version already on npm (published by hand, or by an earlier run)?",
+                  id: "have",
+                  shell: "bash",
+                  workingDirectory: "package",
+                }),
                 run(tarball + " --access public --provenance", {
                   name: "Published to npm, with provenance and no token",
+                  when: "steps.have.outputs.have != 'true'",
                   workingDirectory: "package",
                   shell: "bash",
                 }),
@@ -652,34 +683,57 @@ export function publishWorkflow(l: LibraryFacts): Workflow {
               scope: "@intellectual-frontiers",
             },
           }),
+          run(HAVE_GITHUB, {
+            name: "Is the version already on the GitHub package registry?",
+            id: "have",
+            shell: "bash",
+            workingDirectory: "package",
+            env: { NODE_AUTH_TOKEN: expr("secrets.GITHUB_TOKEN") },
+          }),
           run(tarball, {
             name: "Published to the GitHub package registry",
+            when: "steps.have.outputs.have != 'true'",
             workingDirectory: "package",
             shell: "bash",
             env: { NODE_AUTH_TOKEN: expr("secrets.GITHUB_TOKEN") },
           }),
         ],
       }),
-      // a run by hand from main makes the tag that a push of one would have: the runner's token may, where a person's sandbox may not
+      // a run by hand from main makes the tag that a push of one would have, where the runner's token may and a person's sandbox may not; it tags a version that is on its registry,
+      // however it got there (this workflow's jobs, or a person's first publish of a package that has no trusted publisher yet), and never fails on a tag that is there
       tag: job({
-        needs: ["build", "publish-github"],
-        when: "github.ref_type == 'branch'",
+        needs: ["build", ...(sendNpm ? ["publish-npm"] : []), "publish-github"],
+        when: "always() && needs.build.result == 'success' && github.ref_type == 'branch'",
         runsOn: "ubuntu-latest",
         timeoutMinutes: 5,
         permissions: { contents: "write" },
         steps: [
           checkout(),
+          use(PIN.setupNode, {
+            with: {
+              "node-version": expr("env.NODE_VERSION"),
+              ...(sendNpm ? {} : { "registry-url": "https://npm.pkg.github.com", scope: "@intellectual-frontiers" }),
+            },
+          }),
           run(
             lines(
               `version=$(node -p "require('./package.json').version")`,
               `tag="${l.name}-v$version"`,
+              sendNpm
+                ? `npm view "@intellectual-frontiers/${l.name}@$version" version >/dev/null 2>&1 || { echo "$version is not on npm: no tag"; exit 1; }`
+                : `npm view "@intellectual-frontiers/${l.name}@$version" version >/dev/null 2>&1 || { echo "$version is not on the GitHub package registry: no tag"; exit 1; }`,
               'if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" >/dev/null 2>&1; then',
               '  echo "$tag is already there"',
               "else",
               '  gh api "repos/$GITHUB_REPOSITORY/git/refs" -f "ref=refs/tags/$tag" -f "sha=$GITHUB_SHA"',
               "fi",
             ),
-            { name: "The tag of the version that was published, made once", shell: "bash", workingDirectory: folder, env: { GH_TOKEN: expr("secrets.GITHUB_TOKEN") } },
+            {
+              name: "The tag of the version that is published, made once",
+              shell: "bash",
+              workingDirectory: folder,
+              env: { GH_TOKEN: expr("secrets.GITHUB_TOKEN"), ...(sendNpm ? {} : { NODE_AUTH_TOKEN: expr("secrets.GITHUB_TOKEN") }) },
+            },
           ),
         ],
       }),

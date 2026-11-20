@@ -44,7 +44,7 @@ import {
   waiverState,
 } from "../../kernel/grc.ts";
 import { sha256 } from "../../kernel/sha256.ts";
-import { type Equal, expectType } from "../../kernel/types.ts";
+import { type Equal, expectType } from "@intellectual-frontiers/core";
 import { assert, assertEquals, assertThrows, proves } from "../../runtime/test.ts";
 
 const FR = (n: string): `0007-grc FR-${string}` => `0007-grc FR-${n}`;

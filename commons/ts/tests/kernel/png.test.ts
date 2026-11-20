@@ -31,7 +31,7 @@ import {
   writeIco,
   writePng,
 } from "../../kernel/png.ts";
-import type { Result } from "../../kernel/result.ts";
+import type { Result } from "@intellectual-frontiers/core";
 import { assert, assertEquals, assertRejects, assertThrows, proves } from "../../runtime/test.ts";
 
 const FR = "0005-typescript-runtime FR-043";

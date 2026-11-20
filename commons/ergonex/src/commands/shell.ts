@@ -7,7 +7,7 @@
  * @module
  */
 import { flag, value } from "../platform/k-args.ts";
-import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok } from "@intellectual-frontiers/core";
 import { existsSync, readTextFile, writeTextFile } from "../platform/r-fs.ts";
 import { unifiedDiff } from "../diff.ts";
 import { describeBlockError, installBlock, removeBlock } from "../shell/block.ts";

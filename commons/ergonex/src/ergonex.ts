@@ -21,8 +21,7 @@
  * @module
  */
 import process from "node:process";
-import { absurd } from "@intellectual-frontiers/commons/ts/kernel";
-import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
+import { absurd, err, ok } from "@intellectual-frontiers/core";
 import { editDistance } from "./platform/k-args.ts";
 import { existsSync } from "./platform/r-fs.ts";
 import { join, resolve } from "./platform/r-path.ts";

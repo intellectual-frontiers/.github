@@ -17,7 +17,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "./result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 
 /** A JSON value: what a JSON5 file holds once read. An object keeps its members in the order they were written; a number may be `NaN` or infinite. */
 export type Json = null | boolean | number | string | readonly Json[] | JsonObject;

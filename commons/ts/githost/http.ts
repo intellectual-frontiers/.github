@@ -4,8 +4,7 @@
  *
  * @module
  */
-import { type Decoder, formatDecodeError, json } from "../kernel/decode.ts";
-import { err, ok, type Result } from "../kernel/result.ts";
+import { type Decoder, formatDecodeError, json, err, ok, type Result } from "@intellectual-frontiers/core";
 import type { Exchange, Transport } from "../runtime/http-client.ts";
 import type { HostFailure } from "./types.ts";
 

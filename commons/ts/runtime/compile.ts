@@ -16,8 +16,7 @@
  *
  * @module
  */
-import { absurd } from "../kernel/absurd.ts";
-import { err, ok, type Result } from "../kernel/result.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import type { Sha256 } from "../kernel/sha256.ts";
 import { exists, sha256File } from "./fs.ts";
 import { resolve } from "./path.ts";

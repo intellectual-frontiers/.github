@@ -9,6 +9,7 @@ on:
     paths:
       - ".github/actions/**"
       - .github/workflows/data.auto.yml
+      - "commons/core/src/**"
       - "commons/data/**"
       - "commons/ontology/audit/**"
       - "commons/ontology/ifccm/**"
@@ -25,6 +26,7 @@ on:
     paths:
       - ".github/actions/**"
       - .github/workflows/data.auto.yml
+      - "commons/core/src/**"
       - "commons/data/**"
       - "commons/ontology/audit/**"
       - "commons/ontology/ifccm/**"

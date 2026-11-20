@@ -9,7 +9,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 
 /** The name of the file, inside the workspace's own folder. */
 export const REPOSITORIES_FILE = "repositories.ts";

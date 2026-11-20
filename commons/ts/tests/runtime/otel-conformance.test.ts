@@ -10,9 +10,8 @@
  */
 import { createServer } from "node:net";
 import { type ExporterConfig, type OtelConfig, SEVERITY, type SignalName, signalEndpoint } from "../../kernel/otel.ts";
-import { formatDecodeError } from "../../kernel/decode.ts";
+import { formatDecodeError, err, ok } from "@intellectual-frontiers/core";
 import { decodeLogs, decodeMetrics, decodeTraces, type LogBatch, type MetricBatch, type TraceBatch } from "../../kernel/otlp.ts";
-import { err, ok } from "../../kernel/result.ts";
 import { createTelemetry, defineSignals, memoryProcessor } from "../../kernel/signals.ts";
 import { readTextFile, withTempDir, writeTextFile } from "../../runtime/fs.ts";
 import { otlpExporter, systemClock, systemRandom } from "../../runtime/otel.ts";

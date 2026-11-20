@@ -15,7 +15,7 @@
  * @module
  */
 import { concat } from "./archive.ts";
-import { err, ok, type Result } from "./result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 
 /** The universal tags used (class universal, with the constructed bit where it applies). */
 export const TAG = {

@@ -14,7 +14,7 @@
  * @module
  */
 import { flag, formatUsageError, helpText, type Operand, parseArgs, type Parser, value } from "../kernel/args.ts";
-import { err, ok, type Result } from "../kernel/result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { isMeaning, type Meaning } from "../kernel/test-report.ts";
 import { args, exit } from "../runtime/proc.ts";
 import {

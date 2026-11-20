@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { words } from "@intellectual-frontiers/data/governance";
 import type { Driver, State, StateColumn, StateConstraint, StateRow, StateTable } from "@intellectual-frontiers/data/sql/lifecycle";
 import type { LogicalType } from "@intellectual-frontiers/data/sql/logical";

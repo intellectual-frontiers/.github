@@ -7,7 +7,7 @@
  * @module
  */
 import { resolve } from "node:path";
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { composeModules, defaultVocabularies, type Domain, lint, lintOperations, type Module } from "@intellectual-frontiers/data/governance";
 import { agentOperations } from "@intellectual-frontiers/data/models/identity-agent";
 import { dialect as duckdb } from "@intellectual-frontiers/data/sql/dialects/duckdb";

@@ -39,7 +39,7 @@ import {
   TAG,
   type Tlv,
 } from "./der.ts";
-import { err, ok, type Result } from "./result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { toHex } from "./sha256.ts";
 
 /** The object identifiers used. */

@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok } from "@intellectual-frontiers/core";
 import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 import {
   bool, csvRecords, date, decimal, ensureLedger, extractCsv, extractJsonLines, fromCsv, fromJsonLines, fromQuery, fromRows, integer, oneOf, optional, runLoad, text, watermarkOf,

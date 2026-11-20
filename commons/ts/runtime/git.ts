@@ -15,9 +15,8 @@
  *
  * @module
  */
-import { absurd } from "../kernel/absurd.ts";
-import type { Brand } from "../kernel/brand.ts";
-import { err, ok, type Result } from "../kernel/result.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
+import type { Brand } from "@intellectual-frontiers/core";
 import { NotFound } from "./errors.ts";
 import { output } from "./proc.ts";
 

@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { type Module, words } from "@intellectual-frontiers/data/governance";
 import { type Column, type LogicalSchema, type LogicalType, sameWords, type Table } from "@intellectual-frontiers/data/sql/logical";
 import { type Artifact, type Naming, naming as defaultNaming } from "@intellectual-frontiers/data/sql/physical";

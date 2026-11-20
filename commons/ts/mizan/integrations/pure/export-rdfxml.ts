@@ -22,8 +22,7 @@
  *
  * @module
  */
-import { absurd } from "../../../kernel/absurd.ts";
-import { err, ok, type Result } from "../../../kernel/result.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import { namespace, nTriplesTerm, RDF_TYPE, XSD_STRING } from "../../../kernel/rdf-term.ts";
 import type { Namespace, Subject, Term, Triple } from "../../../kernel/rdf-term.ts";
 import { compareCodePoints } from "../../../kernel/rdf-write.ts";

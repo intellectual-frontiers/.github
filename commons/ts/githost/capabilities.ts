@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { err, type Result } from "../kernel/result.ts";
+import { err, type Result } from "@intellectual-frontiers/core";
 import type { Capability, HostFailure, HostKind } from "./types.ts";
 
 /** The four capabilities every kind offers (`ifccm:CloneUrl`, `ifccm:Credentials`, `ifccm:DefaultBranch`, `ifccm:SignedCommits`). */

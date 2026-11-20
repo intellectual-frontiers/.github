@@ -21,9 +21,8 @@
  *
  * @module
  */
-import { absurd } from "./absurd.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import { helpOf, type Operand, type Spec, type SpecCheck, suggest } from "./args.ts";
-import { err, ok, type Result } from "./result.ts";
 
 /** An example of a verb: the words after the verb, and what it does. */
 export type Example = { readonly args: readonly string[]; readonly says: string };

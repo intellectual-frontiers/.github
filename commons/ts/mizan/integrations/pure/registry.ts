@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "../../../kernel/result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import type { AnyIntegration, Direction, Format } from "./types.ts";
 
 /** Why an integration is not added. */

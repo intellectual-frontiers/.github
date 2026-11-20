@@ -22,8 +22,7 @@
  *
  * @module
  */
-import { absurd } from "./absurd.ts";
-import { formatDecodeError, unknownValue } from "./decode.ts";
+import { absurd, formatDecodeError, unknownValue, err, ok, type Result } from "@intellectual-frontiers/core";
 import { type DsseEnvelope, type DsseKey, type ResourceDescriptor, type Statement, statement, verifyStatement } from "./dsse.ts";
 import { formatLedgerBreak, type LedgerBreak, type LedgerEntry, type LedgerRecord, verifyLedger } from "./evidence.ts";
 import { type ControlRef, type ControlSummary, type Finding, type Instant, instantFromEpochMs, type Severity, type Status } from "./grc.ts";
@@ -31,7 +30,6 @@ import type { Json, JsonObject } from "./json5.ts";
 import { assessmentResults, renderOscal } from "./oscal.ts";
 import { type LogRecord, parseSpanId, parseTraceId, type SpanData, type SpanId, type TraceId } from "./otel.ts";
 import { encodeLogs, encodeTraces } from "./otlp.ts";
-import { err, ok, type Result } from "./result.ts";
 import type { Sha256 } from "./sha256.ts";
 import { NAMESPACE_URL, uuidV5 } from "./uuid.ts";
 import { el, type XmlChild, type XmlElement, writeXml } from "./xml.ts";

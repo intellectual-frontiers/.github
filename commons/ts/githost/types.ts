@@ -7,8 +7,8 @@
  *
  * @module
  */
-import { absurd } from "../kernel/absurd.ts";
-import type { Result } from "../kernel/result.ts";
+import { absurd } from "@intellectual-frontiers/core";
+import type { Result } from "@intellectual-frontiers/core";
 
 /** The kinds of host: the keys of the code list `ifccm:GitManagerKind`, the one list of Git host kinds (`ifccm:hostedOn` ranges over it). */
 export type HostKind = "Github" | "Gitlab" | "Git";

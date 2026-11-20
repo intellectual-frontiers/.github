@@ -9,7 +9,7 @@
  *
  * @module
  */
-import { absurd } from "../kernel/absurd.ts";
+import { absurd } from "@intellectual-frontiers/core";
 import { liveTransport, type Transport, withBackoff } from "../runtime/http-client.ts";
 import { githubClient } from "./github.ts";
 import { plainGitClient, type PlainGitOptions } from "./git.ts";

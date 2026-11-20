@@ -10,7 +10,7 @@
 import { decodeLogs } from "../../kernel/otlp.ts";
 import { chooseMode } from "../../kernel/render.ts";
 import { createTelemetry, defineSignals, type Telemetry } from "../../kernel/signals.ts";
-import { type Equal, expectType } from "../../kernel/types.ts";
+import { type Equal, expectType } from "@intellectual-frontiers/core";
 import { consoleProcessor, exceptionOf, type UncaughtTarget, uncaughtSignals } from "../../runtime/console.ts";
 import { readDir, readTextFile, withTempDir, writeTextFile } from "../../runtime/fs.ts";
 import { fromFileUrl, join } from "../../runtime/path.ts";
@@ -25,7 +25,7 @@ const url = (relative: string): string => new URL(relative, import.meta.url).hre
 const SCRIPT = `
 import process from "node:process";
 import { createTelemetry, defineSignals } from "${url("../../kernel/signals.ts")}";
-import { ok } from "${url("../../kernel/result.ts")}";
+import { ok } from "${url("../../../core/src/mod.ts")}";
 import { consoleProcessor, installUncaught, uncaughtSignals } from "${url("../../runtime/console.ts")}";
 
 const registry = defineSignals({

@@ -22,7 +22,7 @@
  */
 import { concat } from "./archive.ts";
 import { compareBytes } from "./der.ts";
-import { err, ok, type Result } from "./result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 
 /** A map key this module reads and writes: an integer or a text string. */
 export type CborKey = number | bigint | string;

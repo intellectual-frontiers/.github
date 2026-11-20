@@ -28,7 +28,7 @@ import {
   type When,
 } from "../../kernel/schedule.ts";
 import { child, children, readXml, textOf, type XmlElement } from "../../kernel/xml.ts";
-import type { Result } from "../../kernel/result.ts";
+import type { Result } from "@intellectual-frontiers/core";
 import { assert, assertEquals, fail, proves } from "../../runtime/test.ts";
 
 const FR = "0005-typescript-runtime FR-046";

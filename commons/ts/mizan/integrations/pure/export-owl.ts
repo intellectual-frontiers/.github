@@ -22,7 +22,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "../../../kernel/result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 
 /** A text with its language, as an annotation's value. */
 export type OwlText = { readonly value: string; readonly language?: string };

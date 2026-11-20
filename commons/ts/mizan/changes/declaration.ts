@@ -19,9 +19,8 @@
  *
  * @module
  */
-import { absurd } from "../../kernel/absurd.ts";
-import type { Brand } from "../../kernel/brand.ts";
 import {
+  absurd,
   array,
   type DecodeError,
   type Decoder,
@@ -32,8 +31,11 @@ import {
   record,
   refine,
   string,
-} from "../../kernel/decode.ts";
-import { err, ok, type Result } from "../../kernel/result.ts";
+  err,
+  ok,
+  type Result,
+} from "@intellectual-frontiers/core";
+import type { Brand } from "@intellectual-frontiers/core";
 import { type Literal, exportedLiteral } from "../../kernel/ts-literal.ts";
 
 /** The names of the regulated domains a harness may claim: the keys of `ifccm:RegulatedDomain` (a test holds the two lists equal). */

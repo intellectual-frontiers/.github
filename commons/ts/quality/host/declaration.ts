@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "../../kernel/result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { type Declaration, decodeHarnessRecord, formatRecordError } from "../../mizan/changes/declaration.ts";
 import { exists, readTextFile } from "../../runtime/fs.ts";
 import { join, resolve } from "../../runtime/path.ts";

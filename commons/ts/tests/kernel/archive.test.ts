@@ -27,7 +27,7 @@ import {
   zipEntries,
 } from "../../kernel/archive.ts";
 import { Md5, md5 } from "../../kernel/md5.ts";
-import { ok } from "../../kernel/result.ts";
+import { ok } from "@intellectual-frontiers/core";
 import { assert, assertEquals, assertInstanceOf, assertRejects, proves } from "../../runtime/test.ts";
 
 const FR = "0005-typescript-runtime FR-010";

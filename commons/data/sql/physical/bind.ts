@@ -9,7 +9,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import type { Column, ForeignKey, LogicalId, LogicalType, LogicalSchema, Table } from "@intellectual-frontiers/data/sql/logical";
 import { type Naming, naming as defaultNaming, writeCode } from "./case.ts";
 import { expressor, writeNames } from "./express.ts";

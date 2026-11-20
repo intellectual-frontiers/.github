@@ -8,12 +8,11 @@
  *
  * @module
  */
-import { absurd } from "../../kernel/absurd.ts";
+import { absurd, err, ok } from "@intellectual-frontiers/core";
 import fc from "fast-check";
 import { SEVERITY } from "../../kernel/otel.ts";
 import { decodeLogs } from "../../kernel/otlp.ts";
 import { chooseMode, duration, initial, type Input, type Mode, parseMode, progressText, render, type State } from "../../kernel/render.ts";
-import { err, ok } from "../../kernel/result.ts";
 import { createTelemetry, defineSignals, type FlushResult, type Processor } from "../../kernel/signals.ts";
 import { createScreen, describeStyle, type Screen } from "../../kernel/vt.ts";
 import { cutToWidth } from "../../kernel/width.ts";

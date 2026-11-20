@@ -1,5 +1,6 @@
+// Spec: 0001-core FR-006
 /**
- * Objects made for `exactOptionalPropertyTypes` (commons 0005-typescript-runtime FR-064): `compact` builds an object from fields some of
+ * Objects made for `exactOptionalPropertyTypes` (0001-core FR-006): `compact` builds an object from fields some of
  * which may be `undefined`, leaving those out, and its type says so exactly, so that a caller writes `compact({ a, b: maybe })` instead of
  * `{ a, ...(maybe === undefined ? {} : { b: maybe }) }` once for each optional field.
  *

@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok } from "@intellectual-frontiers/core";
 import { sha256Hex } from "@intellectual-frontiers/data/sql/lifecycle";
 import { vocabularies, words } from "@intellectual-frontiers/data/governance";
 import { carriedOf, type Column, type LogicalId, type Table } from "@intellectual-frontiers/data/sql/logical";

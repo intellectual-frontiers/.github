@@ -13,7 +13,7 @@
  */
 import { instantOf } from "../../kernel/grc.ts";
 import type { Declaration } from "../../mizan/changes/declaration.ts";
-import { err, ok, type Result } from "../../kernel/result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { existsSync, readTextFile } from "../../runtime/fs.ts";
 import { join } from "../../runtime/path.ts";
 import { chainFiles, requirementLine, type SourceText, testsOf } from "../pure/chain-files.ts";

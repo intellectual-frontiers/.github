@@ -50,8 +50,12 @@ const WORKSPACES = sources("src");
 /** The host layer of the library: a folder named `host` anywhere below workspaces/ (`host/`, `tools/host/`, `setup/host/`, `scan/host/`), and what runs `git`, reads and writes files and the environment, and the command that does so. */
 const isHostLayer = (f: string): boolean =>
   f.split("/").includes("host") || f.startsWith("src/commands/") || f === "src/ergonex.ts" || f.startsWith("src/platform/r-");
-/** The packages of commons the pure core may import: the kernel, and the Git host (its types and the reading of a remote). */
-const PURE_PACKAGES = ["@intellectual-frontiers/commons/ts/kernel", "@intellectual-frontiers/commons/ts/githost"];
+/** The packages of commons the pure core may import: the foundation (core), the kernel, and the Git host (its types and the reading of a remote). */
+const PURE_PACKAGES = [
+  "@intellectual-frontiers/core",
+  "@intellectual-frontiers/commons/ts/kernel",
+  "@intellectual-frontiers/commons/ts/githost",
+];
 const PURE_WORKSPACES = WORKSPACES.filter((f) => !isHostLayer(f));
 
 proves(

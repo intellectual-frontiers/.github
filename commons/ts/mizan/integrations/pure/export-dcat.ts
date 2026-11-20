@@ -21,7 +21,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "../../../kernel/result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { en, formatIriError, named, namespace, parseIri, plain, RDF_TYPE } from "../../../kernel/rdf-term.ts";
 import type { Named, Term, Triple } from "../../../kernel/rdf-term.ts";
 import { turtle } from "../../../kernel/rdf-write.ts";

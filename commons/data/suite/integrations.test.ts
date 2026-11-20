@@ -10,7 +10,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { DuckDBInstance } from "@duckdb/node-api";
-import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok } from "@intellectual-frontiers/core";
 import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 import {
   type IntegrationSpec,

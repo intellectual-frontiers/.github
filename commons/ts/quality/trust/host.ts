@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "../../kernel/result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { exists, readTextFile } from "../../runtime/fs.ts";
 import { type Collected, trustInputOf } from "../assessor/host.ts";
 import type { Audience, RedactionRules } from "./audience.ts";

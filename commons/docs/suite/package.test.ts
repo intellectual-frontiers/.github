@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { lf } from "../../ts/kernel/mod.ts";
+import { lf } from "@intellectual-frontiers/core";
 import { fs, path } from "../../ts/runtime/mod.ts";
 import { assert, assertEquals, proves } from "../../ts/runtime/test.ts";
 import { PAGES } from "../tools/smoke.ts";

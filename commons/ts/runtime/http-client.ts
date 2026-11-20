@@ -10,7 +10,7 @@
  *
  * @example
  * ```ts
- * import { array, object, string } from "../kernel/decode.ts";
+ * import { array, object, string } from "@intellectual-frontiers/core";
  * import { getJson, liveTransport, withBackoff } from "./http-client.ts";
  * const http = withBackoff(liveTransport());
  * const repo = await getJson(http, "https://api.github.com/repos/oven-sh/bun", object({ full_name: string }));
@@ -18,11 +18,23 @@
  *
  * @module
  */
-import { absurd } from "../kernel/absurd.ts";
-import { array, type Decoder, formatDecodeError, json, literal, number, object, record, string } from "../kernel/decode.ts";
+import {
+  absurd,
+  array,
+  type Decoder,
+  formatDecodeError,
+  json,
+  literal,
+  number,
+  object,
+  record,
+  string,
+  err,
+  ok,
+  type Result,
+} from "@intellectual-frontiers/core";
 import { isSafeMethod, nextLink, retryAfterMs } from "../kernel/http.ts";
 import { formatJson5Error, parseJson5, toJson5 } from "../kernel/json5.ts";
-import { err, ok, type Result } from "../kernel/result.ts";
 import { type AwsCredentials, sign } from "../kernel/sigv4.ts";
 import { traceHttpClient } from "./otel.ts";
 import { sleep } from "./proc.ts";

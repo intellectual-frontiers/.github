@@ -5,7 +5,7 @@
  *
  * @module
  */
-import type { Brand } from "@intellectual-frontiers/commons/ts/kernel";
+import type { Brand } from "@intellectual-frontiers/core";
 
 export { NAME } from "./names.ts";
 

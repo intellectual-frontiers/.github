@@ -19,7 +19,7 @@
  *
  * @module
  */
-import { absurd } from "../../kernel/absurd.ts";
+import { absurd } from "@intellectual-frontiers/core";
 import type { CompositeAction, Filter, Job, Permissions, Scalar, Step, Workflow } from "./model.ts";
 
 /** The command that writes the files, named in the first line of each. */

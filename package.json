@@ -22,6 +22,7 @@
     "./ts/quality": "./commons/ts/quality/mod.ts",
     "./ts/githost": "./commons/ts/githost/mod.ts",
     "./ts/githost/workflows": "./commons/ts/githost/workflows/mod.ts",
+    "./ts/tools/pack-library": "./commons/ts/tools/pack-library.ts",
     "./ts/node": "./commons/ts/node/register.mjs",
     "./docs": "./commons/docs/mod.ts",
     "./ontology/mizan": "./commons/ontology/mizan/mod.ts"
@@ -34,6 +35,7 @@
     "node": ">=26"
   },
   "dependencies": {
+    "@intellectual-frontiers/core": "0.1.0",
     "mermaid": "11.17.2",
     "typescript": "7.1.0-beta"
   },

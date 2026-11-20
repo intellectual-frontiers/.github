@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import type { Dialect } from "@intellectual-frontiers/data/sql/physical";
 import { compileWith, exprOf, literalOf, selectOf, TypedError } from "./compile.ts";
 import { type Expr, type Node, nodeOf, subNode } from "./expr.ts";

@@ -14,8 +14,7 @@
  *
  * @module
  */
-import { absurd } from "./absurd.ts";
-import { err, ok, type Result } from "./result.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 
 /** A semantic version: major, minor and patch, and an optional pre-release and build, each as its dot-separated text. */
 export type SemVer = {

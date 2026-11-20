@@ -20,7 +20,7 @@
  *
  * @module
  */
-import { absurd } from "../../kernel/absurd.ts";
+import { absurd } from "@intellectual-frontiers/core";
 import { formatRecordError } from "../changes/declaration.ts";
 import { decodeReleaseSource, type Release } from "./record.ts";
 import type { VersionsFinding } from "./rules.ts";

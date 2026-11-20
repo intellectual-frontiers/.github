@@ -14,7 +14,18 @@
  *
  * @module
  */
-import { array, boolean, type Decoder, formatDecodeError, integer, json, nullable, object, record, string } from "../kernel/decode.ts";
+import {
+  array,
+  boolean,
+  type Decoder,
+  formatDecodeError,
+  integer,
+  json,
+  nullable,
+  object,
+  record,
+  string,
+} from "@intellectual-frontiers/core";
 import { sha256 } from "../kernel/sha256.ts";
 import { readTextFile, remove, writeTextFile } from "../runtime/fs.ts";
 import { dirname, fromFileUrl, join, resolve } from "../runtime/path.ts";

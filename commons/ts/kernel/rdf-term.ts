@@ -14,9 +14,8 @@
  *
  * @module
  */
-import { absurd } from "./absurd.ts";
-import type { Brand } from "./brand.ts";
-import { err, ok, type Result } from "./result.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
+import type { Brand } from "@intellectual-frontiers/core";
 
 /** An absolute IRI, checked by `parseIri` or made from a namespace. */
 export type Iri = Brand<string, "rdf/Iri">;

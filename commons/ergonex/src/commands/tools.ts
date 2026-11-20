@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok } from "@intellectual-frontiers/core";
 import { basename } from "../platform/r-path.ts";
 import { type Finding } from "../findings.ts";
 import { rememberSeen } from "../host/seen.ts";

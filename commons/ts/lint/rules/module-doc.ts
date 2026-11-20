@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { string } from "../../kernel/decode.ts";
+import { string } from "@intellectual-frontiers/core";
 import { allowedFor, allowList, defineRule, fileOf, type Rule } from "../rule.ts";
 
 /** The rule. */

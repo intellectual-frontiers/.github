@@ -10,7 +10,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import type { RepoRef } from "@intellectual-frontiers/commons/ts/githost";
 import { NotFound } from "../platform/r-errors.ts";
 import { existsSync, lstatSync, readDirSync } from "../platform/r-fs.ts";

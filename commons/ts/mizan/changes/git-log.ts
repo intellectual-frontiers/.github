@@ -19,7 +19,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "../../kernel/result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { NotFound } from "../../runtime/errors.ts";
 import { type GitError } from "../../runtime/git.ts";
 import { output } from "../../runtime/proc.ts";

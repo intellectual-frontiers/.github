@@ -9,7 +9,7 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/commons/ts/kernel";
+import { absurd } from "@intellectual-frontiers/core";
 import { uuidV5Of, NAMESPACE_URL, uuidUrn, type Uuid } from "../platform/k-uuid.ts";
 import { unapprovedSeverity, type Finding } from "../findings.ts";
 import { PROBES, type Probe } from "./probe.ts";

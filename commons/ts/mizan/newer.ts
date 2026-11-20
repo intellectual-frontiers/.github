@@ -25,7 +25,7 @@
  */
 import process from "node:process";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { err, ok, type Result } from "../kernel/result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { sha256 } from "../kernel/sha256.ts";
 import { formatBaseline, judge, parseBaseline, passes, report } from "../kernel/trace.ts";
 import { existsSync, readDirSync, readTextFileSync, writeTextFileSync } from "../runtime/fs.ts";

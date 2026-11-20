@@ -10,8 +10,7 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/commons/ts/kernel";
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 
 /** The severities of a finding, the keys of the code list `ergonex:Severity`. */
 export type Severity = "Informational" | "Warning" | "Error";

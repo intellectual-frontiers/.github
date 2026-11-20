@@ -32,7 +32,7 @@
  *
  * @module
  */
-import { absurd } from "./absurd.ts";
+import { absurd } from "@intellectual-frontiers/core";
 import { graphemes, graphemeWidth } from "./width.ts";
 
 /** A colour of text or background: the terminal's default, one of 256 indexed colours (0 to 15 the basic and bright ones), or 24-bit. */

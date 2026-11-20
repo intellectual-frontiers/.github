@@ -28,7 +28,7 @@ import { tmpdir } from "node:os";
 import { basename, dirname, isAbsolute, join, parse, relative, resolve, sep } from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
-import { absurd } from "../kernel/absurd.ts";
+import { absurd } from "@intellectual-frontiers/core";
 import { formatGlobError, globRoot, globToRegExp, type GlobOptions } from "../kernel/glob.ts";
 import type { Sha256 } from "../kernel/sha256.ts";
 import { AlreadyExists, hostCall, hostCallSync, InvalidData, NotADirectory, NotFound } from "./errors.ts";

@@ -39,7 +39,7 @@
  *
  * @module
  */
-import { absurd } from "./absurd.ts";
+import { absurd } from "@intellectual-frontiers/core";
 import { type Assessment, type Finding, type Instant, type Outcome, type Severity, type SubjectRef, epochMs, findingKey } from "./grc.ts";
 import {
   OCSF_VERSION,

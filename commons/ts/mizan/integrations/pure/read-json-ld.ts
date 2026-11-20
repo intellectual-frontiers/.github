@@ -23,7 +23,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "../../../kernel/result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import type { RdfTerm, RdfTriple, Read } from "./read-rdf.ts";
 import { resolveIri } from "./read-rdf-xml.ts";
 import type { IntegrationFinding } from "./types.ts";

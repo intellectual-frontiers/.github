@@ -21,8 +21,7 @@
  *
  * @module
  */
-import { absurd } from "../../kernel/absurd.ts";
-import { err, ok, type Result } from "../../kernel/result.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import { bump, compareSemVer, formatSemVer, parseSemVer, type SemVer } from "../../kernel/semver.ts";
 import { dayOf } from "../changes/declaration.ts";
 

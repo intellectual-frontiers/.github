@@ -10,7 +10,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 
 /** The line that opens the block. */
 export const INCLUDE_BEGIN = "# >>> ergonex git-include >>>";

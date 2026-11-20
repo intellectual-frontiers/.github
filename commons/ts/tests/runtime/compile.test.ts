@@ -8,7 +8,7 @@
  *
  * @module
  */
-import * as d from "../../kernel/decode.ts";
+import * as d from "@intellectual-frontiers/core";
 import { readFile, realPath, sha256File, withTempDir, writeTextFile } from "../../runtime/fs.ts";
 import {
   binaryPath,

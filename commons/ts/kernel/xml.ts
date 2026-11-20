@@ -17,8 +17,7 @@
  *
  * @module
  */
-import { absurd } from "./absurd.ts";
-import { err, ok, type Result } from "./result.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 
 /** An element: its name as written, its attributes in order, and its children. */
 export type XmlElement = {

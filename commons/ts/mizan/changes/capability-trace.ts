@@ -27,10 +27,8 @@
  *
  * @module
  */
-import { absurd } from "../../kernel/absurd.ts";
-import { array, formatDecodeError, integer, object, string } from "../../kernel/decode.ts";
+import { absurd, array, formatDecodeError, integer, object, string, err, ok, type Result } from "@intellectual-frontiers/core";
 import { type Ladder, placeOf } from "../../kernel/layers.ts";
-import { err, ok, type Result } from "../../kernel/result.ts";
 import { type Cited, type OntologyCitation, parseSpec, proofsOf, type SourceFile, specLines } from "../../kernel/trace.ts";
 import { parseMessage } from "./commit-message.ts";
 import { doneWhenRequirements, parseIssueBody, requirementsIn } from "./issue-body.ts";

@@ -25,7 +25,7 @@
  *
  * @module
  */
-import { absurd } from "../../kernel/absurd.ts";
+import { absurd } from "@intellectual-frontiers/core";
 import { redactText } from "../../kernel/otel.ts";
 
 /** Who a rendering is for (`ifqs:Public`, `ifqs:Assessor`, `ifqs:Internal`). */

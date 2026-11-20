@@ -12,7 +12,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "../kernel/result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { NotFound } from "../runtime/errors.ts";
 import { output } from "../runtime/proc.ts";
 import { CAPABILITIES, unsupported } from "./capabilities.ts";

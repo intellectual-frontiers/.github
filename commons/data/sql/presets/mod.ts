@@ -10,7 +10,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { type Convergence, type ConvergenceSettings, settingsOf as convergenceOf } from "@intellectual-frontiers/data/sql/extensions/convergence";
 import { type History, type HistorySettings, settingsOf as historyOf } from "@intellectual-frontiers/data/sql/extensions/history";
 import { LEDGER as LOAD_LEDGER } from "@intellectual-frontiers/data/sql/extensions/integrations";

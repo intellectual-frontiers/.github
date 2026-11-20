@@ -11,7 +11,7 @@ import process from "node:process";
 import { gzipSync } from "node:zlib";
 import { formatTraceparent } from "../../kernel/otel.ts";
 import { defineSignals, memoryProcessor } from "../../kernel/signals.ts";
-import { type Equal, expectType } from "../../kernel/types.ts";
+import { type Equal, expectType } from "@intellectual-frontiers/core";
 import { errors } from "../../runtime/errors.ts";
 import { withTempDir, writeTextFile } from "../../runtime/fs.ts";
 import { startTelemetry } from "../../runtime/otel.ts";

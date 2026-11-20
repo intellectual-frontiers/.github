@@ -17,7 +17,7 @@ import {
   DEFAULT_HISTOGRAM_BOUNDS,
 } from "../../kernel/otel.ts";
 import { countSignals } from "../../kernel/otlp.ts";
-import { err, ok, type Result } from "../../kernel/result.ts";
+import { err, ok, type Result, type Equal, expectType } from "@intellectual-frontiers/core";
 import {
   type AttributesOf,
   batchProcessor,
@@ -36,7 +36,6 @@ import {
   type TelemetryOptions,
   type Timer,
 } from "../../kernel/signals.ts";
-import { type Equal, expectType } from "../../kernel/types.ts";
 import { assert, assertEquals, assertRejects, assertThrows, proves } from "../../runtime/test.ts";
 
 const REGISTRY = "0006-signals FR-009";

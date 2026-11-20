@@ -1,6 +1,7 @@
+// Spec: 0001-core FR-002
 /**
  * Decoders: everything that enters a program is decoded from `unknown` into a typed value once, where it enters, and past a decoder no code
- * holds `unknown` (commons 0005-typescript-runtime FR-006). The type assertions a decoder needs are confined to this file. Taken from erga's
+ * holds `unknown` (0001-core FR-002). The type assertions a decoder needs are confined to this file. Taken from erga's
  * kernel (`decode.decode.ts`), with `nullable`, `record`, `tuple` and `json` added.
  *
  * @example

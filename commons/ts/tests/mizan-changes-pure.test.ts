@@ -531,7 +531,10 @@ proves(
       for (const spec of imports) {
         const target = toPosix(relative(CHANGES, resolve(CHANGES, spec)));
         const allowed =
-          target.startsWith("../../kernel/") || target === "../../githost/types.ts" || (!target.startsWith("..") && !target.includes("/"));
+          spec === "@intellectual-frontiers/core" ||
+          target.startsWith("../../kernel/") ||
+          target === "../../githost/types.ts" ||
+          (!target.startsWith("..") && !target.includes("/"));
         const ontology = target === "../../../ontology/ifccm/mod.ts";
         const plugin = name === "plugin.ts" && target === "../rules.ts";
         const hosted = host.has(name) && (target.startsWith("../../runtime/") || target.startsWith("../../githost/"));

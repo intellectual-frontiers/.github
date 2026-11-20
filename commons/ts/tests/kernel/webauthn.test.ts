@@ -11,7 +11,7 @@ import { fromBase64Url, toBase64Url } from "../../kernel/base64.ts";
 import { type CborKey, type CborValue, encodeCbor } from "../../kernel/cbor.ts";
 import { coseKeyFromJwk, ecdsaDerToRaw, EDDSA, encodeCoseKey, ES256, jwkOfCoseKey, parseCoseKey, verifyCose } from "../../kernel/cose.ts";
 import * as der from "../../kernel/der.ts";
-import type { Result } from "../../kernel/result.ts";
+import type { Result } from "@intellectual-frontiers/core";
 import {
   authenticationOptions,
   type AuthenticationResponseJSON,

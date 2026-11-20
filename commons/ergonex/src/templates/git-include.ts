@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok } from "@intellectual-frontiers/core";
 import { generated } from "../render.ts";
 import type { Template } from "./data.ts";
 

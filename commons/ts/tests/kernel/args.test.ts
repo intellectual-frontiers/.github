@@ -23,9 +23,7 @@ import {
   type UsageError,
   value,
 } from "../../kernel/args.ts";
-import { literal } from "../../kernel/decode.ts";
-import { err, ok, type Result } from "../../kernel/result.ts";
-import { type Equal, expectType } from "../../kernel/types.ts";
+import { literal, err, ok, type Result, type Equal, expectType } from "@intellectual-frontiers/core";
 import { assertEquals, fail, proves } from "../../runtime/test.ts";
 
 const FR = "0005-typescript-runtime FR-047";

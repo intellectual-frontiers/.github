@@ -19,9 +19,8 @@
  *
  * @module
  */
-import { absurd } from "../../../kernel/absurd.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import { sha256 } from "../../../kernel/sha256.ts";
-import { err, ok, type Result } from "../../../kernel/result.ts";
 import { readJsonLd } from "./read-json-ld.ts";
 import { readNTriples, readTurtle, type Read, TYPE } from "./read-rdf.ts";
 import { readRdfXml } from "./read-rdf-xml.ts";

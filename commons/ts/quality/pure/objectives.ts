@@ -18,10 +18,9 @@
  *
  * @module
  */
-import { absurd } from "../../kernel/absurd.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import { type Attributes, type Metric, type Resource } from "../../kernel/otel.ts";
 import { encodeMetrics, type MetricBatch } from "../../kernel/otlp.ts";
-import { err, ok, type Result } from "../../kernel/result.ts";
 import { TEST_SCOPE } from "../../kernel/test-record.ts";
 import { type Grade } from "./names.ts";
 import { type Summary, shareAtOrAbove } from "./ladder.ts";

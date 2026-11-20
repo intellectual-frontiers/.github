@@ -1,5 +1,6 @@
+// Spec: 0001-core FR-004
 /**
- * Tests of types with no framework (commons 0005-typescript-runtime FR-014): `expectType<Equal<A, B>>()` compiles only where `A` and `B`
+ * Tests of types with no framework (0001-core FR-004): `expectType<Equal<A, B>>()` compiles only where `A` and `B`
  * are the same type, and `// @ts-expect-error` above a line that must not compile fails the check where that line becomes legal. They cost
  * nothing at run time; `tsc` is what runs them.
  *

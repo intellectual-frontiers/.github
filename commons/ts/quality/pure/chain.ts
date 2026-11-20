@@ -18,10 +18,9 @@
  *
  * @module
  */
-import { absurd } from "../../kernel/absurd.ts";
-import type { Brand } from "../../kernel/brand.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
+import type { Brand } from "@intellectual-frontiers/core";
 import { GENESIS } from "../../kernel/evidence.ts";
-import { err, ok, type Result } from "../../kernel/result.ts";
 import { type Sha256, sha256, sha256Of } from "../../kernel/sha256.ts";
 import { EVIDENCE_ROOT, type Grade, isGrade, NO_GRADE, RUN_GRADE } from "./names.ts";
 import { dayOf, formatQualityError, readQuality, type QualityError, type QualityRecord } from "./record.ts";

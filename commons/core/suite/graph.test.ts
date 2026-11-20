@@ -6,12 +6,10 @@
  * @module
  */
 import fc from "fast-check";
-import { CRYPT_ROUNDS, cryptSalt, sha512Crypt, verifySha512Crypt } from "../../kernel/crypt.ts";
-import { type Graph, order, schedule } from "../../kernel/graph.ts";
-import { assert, assertEquals, assertRejects, proves } from "../../runtime/test.ts";
+import { type Graph, order, schedule } from "../src/graph.ts";
+import { assert, assertEquals, assertRejects, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 
-const GRAPH = "0005-typescript-runtime FR-033";
-const CRYPT = "0005-typescript-runtime FR-034";
+const GRAPH = "0001-core FR-005";
 
 /** A random acyclic graph: node i may need only nodes below i. */
 const dag = fc
@@ -27,22 +25,18 @@ const dag = fc
       ),
   );
 
-proves(
-  [GRAPH, "0005-typescript-runtime FR-014"],
-  "every node comes after the nodes it needs, every node once, the same order every time",
-  () => {
-    fc.assert(
-      fc.property(dag, (g) => {
-        const r = order(g);
-        assert(r.kind === "ok");
-        assertEquals([...r.value].sort(), [...g.keys()].sort());
-        const at = new Map(r.value.map((n, i) => [n, i]));
-        for (const [n, needs] of g) for (const m of needs) assert((at.get(m) ?? -1) < (at.get(n) ?? -1), `${m} before ${n}`);
-        assertEquals(order(new Map([...g].reverse())), r);
-      }),
-    );
-  },
-);
+proves([GRAPH, "0001-core FR-004"], "every node comes after the nodes it needs, every node once, the same order every time", () => {
+  fc.assert(
+    fc.property(dag, (g) => {
+      const r = order(g);
+      assert(r.kind === "ok");
+      assertEquals([...r.value].sort(), [...g.keys()].sort());
+      const at = new Map(r.value.map((n, i) => [n, i]));
+      for (const [n, needs] of g) for (const m of needs) assert((at.get(m) ?? -1) < (at.get(n) ?? -1), `${m} before ${n}`);
+      assertEquals(order(new Map([...g].reverse())), r);
+    }),
+  );
+});
 
 proves([GRAPH], "a cycle is named; a needed node outside the graph is ignored", () => {
   assertEquals(
@@ -60,7 +54,7 @@ proves([GRAPH], "a cycle is named; a needed node outside the graph is ignored", 
 });
 
 proves(
-  [GRAPH, "0005-typescript-runtime FR-014"],
+  [GRAPH, "0001-core FR-004"],
   "the schedule runs each node after what it needs, at most jobs at once, and skips what depends on a failure",
   async () => {
     await fc.assert(
@@ -113,54 +107,3 @@ proves([GRAPH], "a cycle, or a node that rejects, rejects the schedule", async (
   );
   await assertRejects(() => schedule(new Map([["a", []]]), 1, () => Promise.reject(new Error("boom"))), Error, "boom");
 });
-
-proves([CRYPT], "SHA-512 crypt gives what glibc's crypt(3) gives, rounds clamped as glibc clamps them", async () => {
-  const glibc: readonly (readonly [string, string, number | undefined, string])[] = [
-    [
-      "Hello world!",
-      "saltstring",
-      undefined,
-      "$6$saltstring$svn8UoSVapNtMuq1ukKS4tPQd8iKwSMHWjl/O817G3uBnIFNjnQJuesI68u4OTLiBFdcbYEdFCoEOfaS35inz1",
-    ],
-    [
-      "Hello world!",
-      "saltstringsaltstring",
-      10000,
-      "$6$rounds=10000$saltstringsaltst$OW1/O6BYHV6BcXZu8QVeXbDWra3Oeqh0sbHbbMCVNSnCM/UrjmM0Dp8vOuZeHBy/YTBmSK6H9qs/y3RnOaw5v.",
-    ],
-    [
-      "This is just a test",
-      "toolongsaltstring",
-      5000,
-      "$6$rounds=5000$toolongsaltstrin$lQ8jolhgVRVhY4b5pZKaysCLi0QBxGoNeKQzQ3glMhwllF7oGDZxUhx1yxdYcz/e1JSbq3y6JMxxl8audkUEm0",
-    ],
-    [
-      "the minimum number is still observed",
-      "roundstoolow",
-      10,
-      "$6$rounds=1000$roundstoolow$kUMsbe306n21p9R.FRkW3IGn.S9NPN0x50YhH1xhLsPuWGsUSklZt58jaTfF4ZEQpyUNGc0dqbpBYYBaHHrsX.",
-    ],
-  ];
-  for (const [password, salt, rounds, hash] of glibc) {
-    assertEquals(await sha512Crypt(password, salt, rounds), hash);
-    assert(await verifySha512Crypt(password, hash));
-    assert(!(await verifySha512Crypt(`${password}x`, hash)));
-  }
-  assert(!(await verifySha512Crypt("x", "$1$md5$notours")));
-  assertEquals(CRYPT_ROUNDS.default, 5000);
-});
-
-proves(
-  [CRYPT, "0005-typescript-runtime FR-014"],
-  "a salt from bytes is of crypt's alphabet, and a password hashed with it verifies",
-  async () => {
-    await fc.assert(
-      fc.asyncProperty(fc.uint8Array({ minLength: 1, maxLength: 20 }), fc.string({ maxLength: 12 }), async (bytes, password) => {
-        const salt = cryptSalt(bytes);
-        assert(/^[./0-9A-Za-z]{1,16}$/.test(salt), salt);
-        assert(await verifySha512Crypt(password, await sha512Crypt(password, salt, 1000)));
-      }),
-      { numRuns: 15 },
-    );
-  },
-);

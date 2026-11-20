@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { lf } from "../kernel/text.ts";
+import { lf } from "@intellectual-frontiers/core";
 import { VENDOR_GLOBALS } from "../lint/rules/no-vendor-api.ts";
 import { decodeManifest, type Manifest, PACKAGE_NAME, rootEntries } from "../tools/manifest.ts";
 import { existsSync, readDirSync, readTextFile, readTextFileSync, statSync } from "../runtime/fs.ts";
@@ -62,6 +62,9 @@ export function codeLines(text: string): { readonly line: number; readonly text:
   return out;
 }
 
+/** The one package that code of commons may import by name: the foundation (commons 0032-lifting-libraries FR-003). */
+const CORE = "@intellectual-frontiers/core";
+
 const KERNEL = sources("kernel");
 const RUNTIME = sources("runtime");
 const TESTS = sources("tests");
@@ -77,7 +80,7 @@ proves(
     const bad: string[] = [];
     for (const f of MIZAN) {
       for (const s of specifiers(readTextFileSync(join(ROOT, f)))) {
-        if (s.startsWith("node:")) continue;
+        if (s.startsWith("node:") || s === CORE) continue;
         const target = toPosix(relative(ROOT, resolve(ROOT, dirname(f), s)));
         const ok =
           target.startsWith("mizan/") ||
@@ -102,6 +105,7 @@ proves(
     const bad: string[] = [];
     for (const f of pure) {
       for (const s of specifiers(readTextFileSync(join(ROOT, f)))) {
+        if (s === CORE) continue;
         if (s.startsWith("node:")) {
           bad.push(`${f}: ${s}`);
           continue;
@@ -114,11 +118,12 @@ proves(
   },
 );
 
-proves(["0005-typescript-runtime FR-002"], "the kernel imports nothing outside kernel/", () => {
+proves(["0005-typescript-runtime FR-002"], "the kernel imports nothing outside kernel/ but core, the foundation", () => {
   assert(KERNEL.length > 5);
   const bad: string[] = [];
   for (const f of KERNEL) {
     for (const s of specifiers(readTextFileSync(join(ROOT, f)))) {
+      if (s === CORE) continue;
       const target = toPosix(relative(ROOT, resolve(ROOT, dirname(f), s)));
       if (!s.startsWith("./") || !target.startsWith("kernel/")) bad.push(`${f}: ${s}`);
     }
@@ -131,7 +136,7 @@ proves(["0005-typescript-runtime FR-003"], "the runtime imports only node: built
   const bad: string[] = [];
   for (const f of RUNTIME) {
     for (const s of specifiers(readTextFileSync(join(ROOT, f)))) {
-      if (s.startsWith("node:")) continue;
+      if (s.startsWith("node:") || s === CORE) continue;
       const target = toPosix(relative(ROOT, resolve(ROOT, dirname(f), s)));
       if (!s.startsWith(".") || !(target.startsWith("kernel/") || target.startsWith("runtime/"))) bad.push(`${f}: ${s}`);
     }
@@ -151,7 +156,7 @@ proves(
           .map((l) => l.text)
           .join("\n"),
       )) {
-        if (s.startsWith("node:")) continue;
+        if (s.startsWith("node:") || s === CORE) continue;
         const target = toPosix(relative(ROOT, resolve(ROOT, dirname(f), s)));
         if (!s.startsWith(".") || !["kernel/", "lint/", "runtime/"].some((p) => target.startsWith(p))) bad.push(`${f}: ${s}`);
       }
@@ -243,7 +248,8 @@ proves(
     assertEquals(pins.map(([k]) => k).sort(), ["@types/node", "fast-check", "typescript"]);
     for (const [name, v] of pins) assert(/^\d+\.\d+\.\d+$/.test(v), `${name} is not pinned exactly: ${v}`);
     assert(/^7\./.test(m.devDependencies["typescript"] ?? ""), "TypeScript is 7");
-    assertEquals(m.dependencies, undefined);
+    // the one run-time dependency is core, the foundation (commons 0032-lifting-libraries FR-003), linked in this repository
+    assertEquals(m.dependencies, { "@intellectual-frontiers/core": "link:../core" });
     const lock = text("bun.lock");
     for (const [name, v] of pins) {
       assertStringIncludes(lock, `"${name}": "${v}"`);
@@ -316,6 +322,7 @@ proves(
       "./ts/quality": "./quality/mod.ts",
       "./ts/githost": "./githost/mod.ts",
       "./ts/githost/workflows": "./githost/workflows/mod.ts",
+      "./ts/tools/pack-library": "./tools/pack-library.ts",
       "./ts/node": "./node/register.mjs",
     });
     for (const target of Object.values(m.exports)) assert(existsSync(join(ROOT, target)), target);
@@ -331,7 +338,8 @@ proves(
     assertEquals(root.bin?.["ifc"], "./commons/ts/node/ifc.mjs");
     const deps = Object.entries(root.dependencies ?? {});
     for (const [name, v] of deps) assert(/^\d+\.\d+\.\d+(-[\w.]+)?$/.test(v), `${name} is not pinned exactly: ${v}`);
-    assertEquals(root.dependencies, manifestAt("commons/docs/package.json").dependencies);
+    // the root package's run-time dependencies are docs' and core, which the kernel imports (exact, from npm)
+    assertEquals(root.dependencies, { ...manifestAt("commons/docs/package.json").dependencies, "@intellectual-frontiers/core": "0.1.0" });
     assertEquals(root.devDependencies, {});
     const lock = readTextFileSync(join(ROOT, "..", "..", "bun.lock"));
     for (const [name, v] of deps) assertStringIncludes(lock, `["${name}@${v}"`);

@@ -35,8 +35,22 @@
 import { fromBase64Url, toBase64Url } from "./base64.ts";
 import { type CborKey, type CborValue, decodeCbor, decodeCborItem, formatCborError, isMap } from "./cbor.ts";
 import { ALGORITHMS, type CoseKey, EDDSA, ES256, parseCoseKey, verifyCose } from "./cose.ts";
-import { array, boolean, formatDecodeError, integer, json, literal, nullable, object, record, string, unknownValue } from "./decode.ts";
-import { err, ok, type Result } from "./result.ts";
+import {
+  array,
+  boolean,
+  formatDecodeError,
+  integer,
+  json,
+  literal,
+  nullable,
+  object,
+  record,
+  string,
+  unknownValue,
+  err,
+  ok,
+  type Result,
+} from "@intellectual-frontiers/core";
 
 /** A relying party as the options name it. */
 export type PublicKeyCredentialRpEntity = { readonly id?: string; readonly name: string };

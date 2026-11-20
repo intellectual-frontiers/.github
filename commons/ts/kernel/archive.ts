@@ -19,8 +19,7 @@
  *
  * @module
  */
-import { absurd } from "./absurd.ts";
-import { err, ok, type Result } from "./result.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 
 /** The files of an archive, by their path inside it. */
 export type Files = ReadonlyMap<string, Uint8Array>;

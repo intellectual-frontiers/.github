@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { absurd } from "../ts/kernel/mod.ts";
+import { absurd } from "@intellectual-frontiers/core";
 
 /** What is wrong. */
 export type Problem =

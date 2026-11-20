@@ -8,7 +8,7 @@
  *
  * @module
  */
-import { array, object, string } from "../../kernel/decode.ts";
+import { array, object, string } from "@intellectual-frontiers/core";
 import { allowedFor, allowList, defineRule, fileOf, isIdentifier, isNode, nameOf, type Rule, stringOf } from "../rule.ts";
 
 /** A writer: a global's member (`process.stdout`), or any of its members (`console.*`). */

@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { type ComposeError, composeModules, type Domain, type Module, moduleOf, withRequired } from "@intellectual-frontiers/data/governance";
 import { partyDomain } from "@intellectual-frontiers/data/models/arca";
 import { tenancyModule } from "@intellectual-frontiers/data/models/arca-tenancy";

@@ -11,7 +11,7 @@
  *
  * @module
  */
-import { andThen, err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { andThen, err, ok, type Result } from "@intellectual-frontiers/core";
 import { errors, fs } from "@intellectual-frontiers/commons/ts/runtime";
 
 /** Half of an even number, or why not. */

@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/commons/ts/kernel";
+import { absurd } from "@intellectual-frontiers/core";
 import type { Driver, State } from "@intellectual-frontiers/data/sql/lifecycle";
 import type { Dialect, Literal } from "@intellectual-frontiers/data/sql/physical";
 import { failed, fromLines, pass, type TapNode } from "./tap.ts";

@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import type { LogicalSchema } from "@intellectual-frontiers/data/sql/logical";
 import { type Dialect, type Naming, naming as defaultNaming, type RefError, type Refs, refsOf } from "@intellectual-frontiers/data/sql/physical";
 

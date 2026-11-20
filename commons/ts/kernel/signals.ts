@@ -11,7 +11,7 @@
  * @example
  * ```ts
  * import { createTelemetry, defineSignals, memoryProcessor } from "./signals.ts";
- * import { ok } from "./result.ts";
+ * import { ok } from "@intellectual-frontiers/core";
  * const registry = defineSignals({
  *   "build.step": { signal: "span", role: "step", attributes: { target: "string", "jobs?": "int" } },
  *   "build.files": { signal: "counter", role: "none", unit: "{file}", attributes: { target: "string" } },
@@ -31,7 +31,7 @@
  *
  * @module
  */
-import { absurd } from "./absurd.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import { toBase64 } from "./base64.ts";
 import {
   type AnyValue,
@@ -72,7 +72,6 @@ import {
   type TraceState,
 } from "./otel.ts";
 import { countSignals, type LogBatch, type MetricBatch, type TraceBatch } from "./otlp.ts";
-import { err, ok, type Result } from "./result.ts";
 
 // ---------------------------------------------------------------------------------------------------------------------------------
 // The registry (FR-009)

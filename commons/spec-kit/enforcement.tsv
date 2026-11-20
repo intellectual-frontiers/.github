@@ -60,16 +60,16 @@ requirement	mechanism	by	note
 0005-typescript-runtime FR-002	check	.github: cd commons/ts && npx tsc -p tsconfig.kernel.json	the kernel type-checks with no host types; boundaries.test.ts: the kernel imports nothing outside kernel/ and names no host global
 0005-typescript-runtime FR-003	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: the runtime imports only node: builtins, kernel/ and runtime/
 0005-typescript-runtime FR-004	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: no vendor global, jsr:, npm:, @std, @erga or URL import in code, with negative controls; tsc fails on a vendor global (types: node)
-0005-typescript-runtime FR-005	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/result.test.ts and text.test.ts: Result's helpers, absurd with a switch that leaves an alternative out, brands kept apart
-0005-typescript-runtime FR-006	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/decode.test.ts: each decoder, its error path and the JSON round trip
+0005-typescript-runtime FR-005	review	0032-lifting-libraries FR-010	kept by the library core: core 0001-core FR-001
+0005-typescript-runtime FR-006	review	0032-lifting-libraries FR-010	kept by the library core: core 0001-core FR-002
 0005-typescript-runtime FR-007	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/semver.test.ts: semver.org's example order, round trip, order laws, bumps, dotted versions
 0005-typescript-runtime FR-008	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/sha256.test.ts: FIPS 180-2 vectors, hexadecimal round trip, the brand, SHASUMS files
-0005-typescript-runtime FR-009	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/text.test.ts: lf, plain, splitArgs and quoteArgs, and their round trip
+0005-typescript-runtime FR-009	review	0032-lifting-libraries FR-010	kept by the library core: core 0001-core FR-003
 0005-typescript-runtime FR-010	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/archive.test.ts: round trips of tar, zip and gzip, fixed bytes, unsafe and damaged archives, deflated zip read and written, pax and GNU names
 0005-typescript-runtime FR-011	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/text.test.ts: literals written and read back, keys, comments, refusals
 0005-typescript-runtime FR-012	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/http.test.ts: Link headers, Retry-After in both forms, safe methods
 0005-typescript-runtime FR-013	check	.github: .github/workflows/ifc-typescript.auto.yml	runtime/test.test.ts: the assertions and proves; the same tests pass under bun test and node --test in CI
-0005-typescript-runtime FR-014	check	.github: cd commons/ts && npx tsc -p tsconfig.json	the type-level tests (expectType, @ts-expect-error) with their negative controls compile; the laws are property-tested with fast-check in the kernel tests
+0005-typescript-runtime FR-014	review	0032-lifting-libraries FR-010	kept by the library core: core 0001-core FR-004
 0005-typescript-runtime FR-015	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: every file has an @module block and every export has JSDoc
 0005-typescript-runtime FR-016	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: the development dependencies are exact, the lockfile agrees, no run-time dependency
 0005-typescript-runtime FR-017	check	.github: cd commons/ts && npx tsc -p tsconfig.json	tsc 7 with the strict configuration on every file; boundaries.test.ts checks that TypeScript is 7
@@ -88,7 +88,7 @@ requirement	mechanism	by	note
 0005-typescript-runtime FR-030	gate	.github: .github/workflows/ifc-typescript.auto.yml	the git-dependency job installs the commit it checks by a git+file: URL into an empty project and runs tools/smoke.ts (the kernel, the runtime and the test registration by the package's name and ifc test run on a small suite, on Bun and Node 26; tsc 7 on a consumer), on Linux, macOS and Windows
 0005-typescript-runtime FR-031	check	.github: cd commons/ts && bun test tests/	kernel/formats.test.ts: round trips with JSON and with the writer, the specification's examples, __proto__, refusals with line and column
 0005-typescript-runtime FR-032	check	.github: cd commons/ts && bun test tests/	kernel/formats.test.ts: random trees written and read back, entities, CDATA, prefixes, the finders, refusals with line and column, no entity expansion
-0005-typescript-runtime FR-033	check	.github: cd commons/ts && bun test tests/	kernel/graph.test.ts: random acyclic graphs ordered and scheduled with random outcomes and job limits, cycles, a node that rejects
+0005-typescript-runtime FR-033	review	0032-lifting-libraries FR-010	kept by the library core: core 0001-core FR-005
 0005-typescript-runtime FR-034	check	.github: cd commons/ts && bun test tests/	kernel/graph.test.ts: glibc's own hashes, clamped rounds, verification, random salts from bytes
 0005-typescript-runtime FR-035	check	.github: cd commons/ts && bun test tests/	kernel/data.test.ts: random tables written and read back, TOML 1.0's examples, every rule broken and named with its place
 0005-typescript-runtime FR-036	check	.github: cd commons/ts && bun test tests/	kernel/data.test.ts: random records written and read back with each separator and line ending, RFC 4180's cases, refusals
@@ -118,7 +118,7 @@ requirement	mechanism	by	note
 0005-typescript-runtime FR-061	check	.github: cd commons/ts && node --test tests/**/*.test.ts	lint/*.test.ts: each rule against code it refuses and accepts, through bun lint
 0005-typescript-runtime FR-062	check	.github: .github/workflows/ifc-typescript.auto.yml compile job	CI builds a small program on each system and runs it; runtime/compile.test.ts checks the arguments
 0005-typescript-runtime FR-063	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/text.test.ts: tsLiteral takes an interface with no index signature, refuses a Date, a function, undefined in an array (type-level, with negative controls)
-0005-typescript-runtime FR-064	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/objects.test.ts: compact leaves out undefined fields, its type exact under exactOptionalPropertyTypes
+0005-typescript-runtime FR-064	review	0032-lifting-libraries FR-010	kept by the library core: core 0001-core FR-006
 0005-typescript-runtime FR-065	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test.test.ts: the gives back the value narrowed, and fails on null and undefined
 0005-typescript-runtime FR-066	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/client.test.ts: readOnly lets through the POSTs its predicate says only read, and refuses every other write
 0005-typescript-runtime FR-067	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/semver.test.ts: ranges against npm's documented desugaring and laws (caret, tilde, x-range, hyphen, union), pre-releases
@@ -601,6 +601,7 @@ requirement	mechanism	by	note
 0027-commons-libraries FR-022	check	.github: cd commons/ts && bun test tests/	mizan-affected.test.ts: the generated workflow of a library runs on its inputs as folders, and this repository's data workflow runs on all of them
 0027-commons-libraries FR-101	check	.github: cd commons/data && bun run verify	commons/data: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-102	check	.github: cd commons/ergonex && bun run verify	commons/ergonex: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-103	check	.github: cd commons/core && bun run verify	commons/core: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0028-conformance-levels FR-001	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: Mizan's ontology holds the four levels with ranks 0 to 3, each entailing what it and the levels below it add
 0028-conformance-levels FR-002	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: every requirement is added by exactly one level and names a rule or says what else proves it
 0028-conformance-levels FR-003	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: L0 adds a manifest, a verify command and a version
@@ -644,3 +645,16 @@ requirement	mechanism	by	note
 0031-install-locations FR-005	check	.github: cd commons/ergonex && bun test suite/	ergonex-locations.test.ts: Ergonex's state record, evidence and lock are in the state folder and its tools in the data folder, nothing is written below the user's home, no folder or command file of its own is made; ergonex-onboarding.test.ts: init writes no command file
 0031-install-locations FR-006	check	.github: cd commons/ergonex && bun test suite/	ergonex-install.test.ts: the Windows installer installs its prerequisites with winget by package identifier and downloads nothing; the Linux and macOS one asks Bun's own installer
 0031-install-locations FR-007	none	-	Planned: a WinGet manifest, as typed code made into YAML, comes with the first release that has a binary
+0032-lifting-libraries FR-001	check	.github: bun test ./tests/	commons-lift.test.ts: every folder of commons that is a library is named for its concern and its package is @intellectual-frontiers/<folder>; no folder is named for a language once the lift is complete
+0032-lifting-libraries FR-002	check	.github: bun test ./tests/	commons-lift.test.ts: the table of the map is read, and each library that exists is in it with the modules it takes
+0032-lifting-libraries FR-003	check	.github: bun test ./tests/	commons-lift.test.ts: the dependencies of each library are declared, acyclic and run to a lower layer, and no library imports a file outside its folder by a relative path
+0032-lifting-libraries FR-004	review	0032-lifting-libraries FR-004	a reviewer checks that no library is named for a technical layer
+0032-lifting-libraries FR-005	check	.github: bun test ./tests/	commons-packages.test.ts: the tarball of each library is installed under node_modules and run on Node 26 with no hook and on Bun
+0032-lifting-libraries FR-006	check	.github: bun test ./tests/	commons-packages.test.ts: Node 26 runs the compiled files of an installed package; the sources are erasable TypeScript only (tsconfig erasableSyntaxOnly)
+0032-lifting-libraries FR-007	check	.github: bun test ./tests/	commons-lift.test.ts: each lifted library has a suite/ that its verify runs
+0032-lifting-libraries FR-008	review	0032-lifting-libraries FR-008	a reviewer checks that the ontology of a library is in its folder
+0032-lifting-libraries FR-009	check	.github: bun test ./tests/	githost-workflows.test.ts: the publish workflow skips a version already on its registry and tags the version, from main
+0032-lifting-libraries FR-010	review	0032-lifting-libraries FR-010	a reviewer checks that the requirements of a lifted library are in its spec kit and that 0005 points at it
+0032-lifting-libraries FR-011	review	0032-lifting-libraries FR-011	a reviewer checks the importers of erga and stolos
+0032-lifting-libraries FR-012	check	.github: cd commons/ts && bunx tsc -p tsconfig.json	the compiler fails on any importer of a moved path; commons-lift.test.ts finds no import of a moved module's old path
+0032-lifting-libraries FR-013	check	.github: bun test ./tests/	commons-packages.test.ts: every npm library is packed, its tarball inspected, installed and a consumer of every entry type-checked with tsc 7 under nodenext

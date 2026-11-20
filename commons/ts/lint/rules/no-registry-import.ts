@@ -7,7 +7,7 @@
  *
  * @module
  */
-import { array, string } from "../../kernel/decode.ts";
+import { array, string } from "@intellectual-frontiers/core";
 import { allowedFor, allowList, defineRule, fileOf, isIdentifier, type Node, type Rule, stringOf } from "../rule.ts";
 
 /** The beginnings of a specifier the rule refuses where none are given. */

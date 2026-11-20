@@ -11,7 +11,7 @@
  * @example
  * ```ts
  * import { defineSignals } from "../kernel/signals.ts";
- * import { ok } from "../kernel/result.ts";
+ * import { ok } from "@intellectual-frontiers/core";
  * import { startTelemetry } from "./otel.ts";
  * const registry = defineSignals({ "build.step": { signal: "span", role: "step", attributes: { target: "string" } } });
  * const run = startTelemetry({ registry, service: "build" }); // OTEL_* from the environment; installed for proc, the client and serve
@@ -26,8 +26,7 @@ import { AsyncLocalStorage } from "node:async_hooks";
 import * as nfs from "node:fs";
 import { dirname } from "node:path";
 import process from "node:process";
-import { absurd } from "../kernel/absurd.ts";
-import { formatDecodeError } from "../kernel/decode.ts";
+import { absurd, formatDecodeError, err, ok, type Result } from "@intellectual-frontiers/core";
 import { retryAfterMs } from "../kernel/http.ts";
 import {
   type AttributeValue,
@@ -63,7 +62,6 @@ import {
   type MetricBatch,
   type TraceBatch,
 } from "../kernel/otlp.ts";
-import { err, ok, type Result } from "../kernel/result.ts";
 import {
   batchProcessor,
   type BatchOptions,

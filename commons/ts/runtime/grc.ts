@@ -31,9 +31,18 @@
  *
  * @module
  */
-import { absurd } from "../kernel/absurd.ts";
+import {
+  absurd,
+  array,
+  type DecodeError,
+  type Decoder,
+  describe,
+  formatDecodeError,
+  err,
+  ok,
+  type Result,
+} from "@intellectual-frontiers/core";
 import { type ImpactDeclaration, impactDeclarationDecoder, type RiskInput, riskDecoder } from "../kernel/assess.ts";
-import { array, type DecodeError, type Decoder, describe, formatDecodeError } from "../kernel/decode.ts";
 import {
   type Assessment,
   applyWaivers,
@@ -54,7 +63,6 @@ import {
 import { parseJson5 } from "../kernel/json5.ts";
 import { complianceFinding, type OcsfComplianceFinding, type OcsfProduct } from "../kernel/ocsf.ts";
 import { type AnyMap, type AnyValue, SEVERITY, type Scope, type SeverityNumber } from "../kernel/otel.ts";
-import { err, ok, type Result } from "../kernel/result.ts";
 import { defineSignals, type Telemetry } from "../kernel/signals.ts";
 import { isTomlDateTime, parseToml, type TomlValue } from "../kernel/toml.ts";
 import { parseYaml } from "../kernel/yaml.ts";

@@ -20,7 +20,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "../ts/kernel/mod.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { path } from "../ts/runtime/mod.ts";
 import type { Lens } from "./lens.ts";
 

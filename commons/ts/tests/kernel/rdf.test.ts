@@ -56,7 +56,7 @@ import {
   vocabulary,
   xsd,
 } from "../../kernel/rdf.ts";
-import { type Equal, expectType, type Extends, type Not } from "../../kernel/types.ts";
+import { type Equal, expectType, type Extends, type Not } from "@intellectual-frontiers/core";
 import { assert, assertEquals, assertThrows, proves } from "../../runtime/test.ts";
 
 const EX = namespace("ex", "https://example.org/terms#");

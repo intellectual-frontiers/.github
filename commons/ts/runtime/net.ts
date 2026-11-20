@@ -20,9 +20,8 @@
  */
 import * as fsp from "node:fs/promises";
 import { join } from "node:path";
-import { absurd } from "../kernel/absurd.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import { retryAfterMs } from "../kernel/http.ts";
-import { err, ok, type Result } from "../kernel/result.ts";
 import type { Sha256 } from "../kernel/sha256.ts";
 import { exists, mkdir, remove, rename, sha256File, stat } from "./fs.ts";
 

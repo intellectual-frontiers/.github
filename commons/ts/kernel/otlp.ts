@@ -14,10 +14,9 @@
  *
  * @module
  */
-import { absurd } from "./absurd.ts";
+import { absurd, describe, err, ok, type Result } from "@intellectual-frontiers/core";
+import type { DecodeError, Decoder } from "@intellectual-frontiers/core";
 import { fromBase64, toBase64 } from "./base64.ts";
-import type { DecodeError, Decoder } from "./decode.ts";
-import { describe } from "./decode.ts";
 import type { Json, JsonObject } from "./json5.ts";
 import {
   type AnyValue,
@@ -46,7 +45,6 @@ import {
   type Temporality,
   type TraceId,
 } from "./otel.ts";
-import { err, ok, type Result } from "./result.ts";
 
 /** The spans of one resource and scope, as OTLP groups them. */
 export type TraceBatch = { readonly resource: Resource; readonly scope: Scope; readonly spans: readonly SpanData[] };

@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { words } from "@intellectual-frontiers/data/governance";
 import { hashOf } from "@intellectual-frontiers/data/sql/lifecycle";
 import type { LogicalSchema } from "@intellectual-frontiers/data/sql/logical";

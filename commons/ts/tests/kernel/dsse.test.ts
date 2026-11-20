@@ -8,7 +8,7 @@
  */
 import fc from "fast-check";
 import { fromBase64, toBase64 } from "../../kernel/base64.ts";
-import { object, string, unknownValue } from "../../kernel/decode.ts";
+import { object, string, unknownValue } from "@intellectual-frontiers/core";
 import {
   type DsseEnvelope,
   type DsseKey,

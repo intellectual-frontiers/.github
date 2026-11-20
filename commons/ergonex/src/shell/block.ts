@@ -11,8 +11,7 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/commons/ts/kernel";
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 
 /** The line that begins the block. */
 export const BEGIN = "# >>> ergonex >>>";

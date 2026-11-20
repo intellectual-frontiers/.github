@@ -11,7 +11,7 @@
  * @module
  */
 import type { Places } from "../../places.ts";
-import { ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { ok, type Result } from "@intellectual-frontiers/core";
 import { listDirs } from "../../platform/r-fs.ts";
 
 import { type Finding, exitStatusOf, firstSeenOf } from "../../findings.ts";

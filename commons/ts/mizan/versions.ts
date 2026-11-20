@@ -18,9 +18,8 @@
  * @module
  */
 import process from "node:process";
-import { absurd } from "../kernel/absurd.ts";
+import { absurd, err, ok } from "@intellectual-frontiers/core";
 import { flag, formatUsageError, helpText, type Operand, parseArgs, type Parser, suggest, value } from "../kernel/args.ts";
-import { err, ok } from "../kernel/result.ts";
 import { existsSync, readTextFileSync, sha256File, writeTextFileSync } from "../runtime/fs.ts";
 import { formatGitError } from "../runtime/git.ts";
 import { join, resolve } from "../runtime/path.ts";

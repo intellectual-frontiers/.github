@@ -23,7 +23,7 @@ import { basename, delimiter, join, resolve as resolvePath } from "node:path";
 import process from "node:process";
 import { Readable, Writable } from "node:stream";
 import { setTimeout as nodeSetTimeout } from "node:timers";
-import { absurd } from "../kernel/absurd.ts";
+import { absurd } from "@intellectual-frontiers/core";
 import { InvalidData, mapError, NotFound, toError } from "./errors.ts";
 import { traceProcess } from "./otel.ts";
 

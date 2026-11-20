@@ -392,6 +392,11 @@ class Copy {
     fs.writeTextFileSync(`${tmp}/package.json`, '{ "type": "module" }\n');
     for (const rel of COPIED)
       cpSync(`${COMMONS}/${rel}`, `${this.root}/${rel}`, { recursive: true, filter: (src) => basename(src) !== "node_modules" });
+    // the kernel imports the foundation by package name (commons 0032-lifting-libraries FR-003): a copy of it is where Node and the compiler look for it
+    cpSync(`${COMMONS}/core`, `${tmp}/node_modules/@intellectual-frontiers/core`, {
+      recursive: true,
+      filter: (src) => basename(src) !== "node_modules" && basename(src) !== "dist",
+    });
   }
   static make(): Copy {
     return new Copy(fs.makeTempDirSync({ prefix: "commons-generator-" }));

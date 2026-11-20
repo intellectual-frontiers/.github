@@ -249,3 +249,28 @@ proves(
     assert(existsSync(join(ROOT, ".github", "workflows", "data-publish.auto.yml")));
   },
 );
+
+proves(
+  ["0032-lifting-libraries FR-009"],
+  "the publish workflow of a library skips a registry that has the version already, and tags the version from the main branch once it is on its registry, with the runner's token, whoever put it there",
+  () => {
+    for (const lib of ["core", "ergonex"]) {
+      const w = readTextFileSync(join(ROOT, ".github", "workflows", `${lib}-publish.auto.yml`));
+      // each registry's job asks the registry first and publishes only where the version is not there
+      assertStringIncludes(w, "id: have");
+      assertStringIncludes(w, "if: \"steps.have.outputs.have != 'true'\"");
+      assertStringIncludes(w, 'npm view "$name@$version" version >/dev/null 2>&1');
+      assertStringIncludes(w, 'npm view "$name@$version" version --registry https://npm.pkg.github.com');
+      // the tag job runs after the others whether they published or skipped, from the main branch only, and makes the tag once
+      assertStringIncludes(w, "tag:");
+      assertStringIncludes(w, "needs: [build, publish-npm, publish-github]");
+      assertStringIncludes(w, "if: \"always() && needs.build.result == 'success' && github.ref_type == 'branch'\"");
+      assertStringIncludes(w, "contents: write");
+      assertStringIncludes(w, `tag="${lib}-v$version"`);
+      assertStringIncludes(w, `npm view "@intellectual-frontiers/${lib}@$version" version >/dev/null 2>&1`);
+      assertStringIncludes(w, "repos/$GITHUB_REPOSITORY/git/refs");
+      assertStringIncludes(w, "is already there");
+      assert(!/secrets\.(?!GITHUB_TOKEN)/.test(w), "a secret that is not the workflow's own token");
+    }
+  },
+);

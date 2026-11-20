@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { ok } from "@intellectual-frontiers/commons/ts/kernel";
+import { ok } from "@intellectual-frontiers/core";
 import type { Generator } from "@intellectual-frontiers/data/sql/physical";
 import { docOf, lines, typeName } from "./model.ts";
 

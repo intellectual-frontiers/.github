@@ -19,8 +19,7 @@
  *
  * @module
  */
-import { array, formatDecodeError, mapDecoder, object, oneOf, string } from "../../kernel/decode.ts";
-import { err, ok, type Result } from "../../kernel/result.ts";
+import { array, formatDecodeError, mapDecoder, object, oneOf, string, err, ok, type Result } from "@intellectual-frontiers/core";
 import type { OntologyCitation } from "../../kernel/trace.ts";
 import { existsSync, readTextFileSync } from "../../runtime/fs.ts";
 import { toFileUrl } from "../../runtime/path.ts";

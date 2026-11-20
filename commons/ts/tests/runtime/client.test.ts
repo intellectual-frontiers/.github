@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { array, integer, nullable, object, string } from "../../kernel/decode.ts";
+import { array, integer, nullable, object, string } from "@intellectual-frontiers/core";
 import { sign } from "../../kernel/sigv4.ts";
 import { exists, readTextFile, withTempDir, writeTextFile } from "../../runtime/fs.ts";
 import {

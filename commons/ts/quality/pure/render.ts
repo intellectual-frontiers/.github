@@ -19,7 +19,7 @@
  *
  * @module
  */
-import { absurd } from "../../kernel/absurd.ts";
+import { absurd } from "@intellectual-frontiers/core";
 import { isoTime, seconds, tap14 } from "../../kernel/test-report.ts";
 import { el, type XmlChild, type XmlElement, writeXml } from "../../kernel/xml.ts";
 import { DOCUMENTS, type Grade, showGrade } from "./names.ts";

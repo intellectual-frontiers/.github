@@ -22,7 +22,7 @@
 import { readdir, stat } from "node:fs/promises";
 import { join, posix, win32 } from "node:path";
 import process from "node:process";
-import { absurd } from "../kernel/absurd.ts";
+import { absurd } from "@intellectual-frontiers/core";
 
 /** The rules a search follows: Windows' (`;`, `\`, PATHEXT) or POSIX's (`:`, `/`, the mode's execute bits). */
 export type SearchPlatform = "windows" | "posix";

@@ -11,7 +11,7 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/commons/ts/kernel";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import {
   type Args,
   flag,
@@ -24,7 +24,6 @@ import {
   value,
 } from "../platform/k-args.ts";
 import type { Json } from "@intellectual-frontiers/commons/ts/kernel";
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
 import type { Sha256 } from "@intellectual-frontiers/commons/ts/kernel";
 import type { Finding } from "../findings.ts";
 import type { Places } from "../places.ts";

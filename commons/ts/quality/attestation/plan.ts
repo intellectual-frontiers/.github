@@ -17,12 +17,10 @@
  *
  * @module
  */
-import { absurd } from "../../kernel/absurd.ts";
-import { formatDecodeError, json } from "../../kernel/decode.ts";
+import { absurd, formatDecodeError, json, err, ok, type Result } from "@intellectual-frontiers/core";
 import { canonicalize as jcs } from "../../kernel/evidence.ts";
 import { decodeTraces } from "../../kernel/otlp.ts";
 import { attributeText } from "../../kernel/test-record.ts";
-import { err, ok, type Result } from "../../kernel/result.ts";
 import { type Sha256, sha256 } from "../../kernel/sha256.ts";
 import type { LedgerEvent } from "../pure/ledger.ts";
 import type { NotRun } from "../pure/record.ts";

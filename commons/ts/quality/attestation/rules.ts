@@ -15,8 +15,7 @@
  *
  * @module
  */
-import { absurd } from "../../kernel/absurd.ts";
-import { err, ok, type Result } from "../../kernel/result.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import type { LedgerEvent } from "../pure/ledger.ts";
 import { dayOfText } from "../pure/time.ts";
 import type { MutationRow, PersonRef, SampleSubject, TestPlan } from "../pure/tier2-events.ts";

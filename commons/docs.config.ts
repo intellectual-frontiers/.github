@@ -23,6 +23,7 @@ export const config: DocsConfig = {
   ],
   specKits: [
     { layout: "commons", dir: "commons/spec-kit" },
+    { layout: "commons", dir: "commons/core/spec-kit" },
     { layout: "commons", dir: "commons/data/spec-kit" },
     { layout: "commons", dir: "commons/ergonex/spec-kit" },
   ],

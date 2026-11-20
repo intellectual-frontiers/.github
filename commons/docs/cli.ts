@@ -9,7 +9,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "../ts/kernel/mod.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { fs, path, proc } from "../ts/runtime/mod.ts";
 import { report } from "./check.ts";
 import { type Config, resolveConfig } from "./config.ts";

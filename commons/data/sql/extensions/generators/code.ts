@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { ok } from "@intellectual-frontiers/commons/ts/kernel";
+import { ok } from "@intellectual-frontiers/core";
 import type { LogicalType } from "@intellectual-frontiers/data/sql/logical";
 import type { Generator } from "@intellectual-frontiers/data/sql/physical";
 import { docOf, lines, oneLine, pascalOf, quoted } from "./model.ts";

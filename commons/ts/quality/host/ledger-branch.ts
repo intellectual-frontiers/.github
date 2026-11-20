@@ -11,7 +11,7 @@
  */
 import { GENESIS } from "../../kernel/evidence.ts";
 import { formatAssuranceError, foldAssurance } from "../attestation/rules.ts";
-import { err, ok, type Result } from "../../kernel/result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { type Sha256, sha256 } from "../../kernel/sha256.ts";
 import {
   emptyLedger,

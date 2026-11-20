@@ -17,8 +17,7 @@
  * @module
  */
 import { fileURLToPath } from "node:url";
-import { array, integer, json, nullable, object, string } from "../kernel/decode.ts";
-import { err, ok, type Result } from "../kernel/result.ts";
+import { array, integer, json, nullable, object, string, err, ok, type Result } from "@intellectual-frontiers/core";
 import { makeTempDir, mkdir, readTextFile, realPath, remove, writeTextFile } from "../runtime/fs.ts";
 import { dirname, join, relative } from "../runtime/path.ts";
 import { env, run } from "../runtime/proc.ts";

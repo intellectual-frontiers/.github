@@ -17,7 +17,7 @@ import {
   niUri,
   type TypedStatement,
 } from "../../kernel/attest.ts";
-import { object, string, unknownValue } from "../../kernel/decode.ts";
+import { object, string, unknownValue, type Equal, expectType } from "@intellectual-frontiers/core";
 import { signStatement, verifyStatement } from "../../kernel/dsse.ts";
 import { canonicalize } from "../../kernel/evidence.ts";
 import {
@@ -63,7 +63,6 @@ import {
 } from "../../kernel/ocsf.ts";
 import { assessmentResults, componentDefinition, type OscalOptions, poam, renderOscal, systemSecurityPlan } from "../../kernel/oscal.ts";
 import { type Sha256, sha256 } from "../../kernel/sha256.ts";
-import { type Equal, expectType } from "../../kernel/types.ts";
 import { NAMESPACE_URL, uuidOf, uuidV5, uuidVersion } from "../../kernel/uuid.ts";
 import { assert, assertEquals, assertNotEquals, proves } from "../../runtime/test.ts";
 

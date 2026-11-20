@@ -11,7 +11,7 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/commons/ts/kernel";
+import { absurd } from "@intellectual-frontiers/core";
 import { describeRef, parseRemote, sameRepository } from "@intellectual-frontiers/commons/ts/githost";
 import type { RepoRef } from "@intellectual-frontiers/commons/ts/githost";
 

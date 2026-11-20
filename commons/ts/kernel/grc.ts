@@ -32,10 +32,20 @@
  *
  * @module
  */
-import { absurd } from "./absurd.ts";
-import type { Brand } from "./brand.ts";
-import { type Decoder, type DecodeError, array, literal, mapDecoder, object, string } from "./decode.ts";
-import { err, ok, type Result } from "./result.ts";
+import {
+  absurd,
+  type Decoder,
+  type DecodeError,
+  array,
+  literal,
+  mapDecoder,
+  object,
+  string,
+  err,
+  ok,
+  type Result,
+} from "@intellectual-frontiers/core";
+import type { Brand } from "@intellectual-frontiers/core";
 import type { Sha256 } from "./sha256.ts";
 
 // ---------------------------------------------------------------------------------------------------------------------------- time

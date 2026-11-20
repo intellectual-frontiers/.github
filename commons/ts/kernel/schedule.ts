@@ -61,9 +61,8 @@
  *
  * @module
  */
-import { absurd } from "./absurd.ts";
-import type { Brand } from "./brand.ts";
-import { err, ok, type Result } from "./result.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
+import type { Brand } from "@intellectual-frontiers/core";
 import { el, writeXml, type XmlElement, type XmlNode } from "./xml.ts";
 
 /** The schedulers a job can be planned for: systemd on Linux, launchd on macOS, Task Scheduler on Windows. */

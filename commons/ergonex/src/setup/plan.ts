@@ -11,8 +11,7 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/commons/ts/kernel";
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import { type Finding, exitStatusOf } from "../findings.ts";
 import type { RepoPath } from "../types.ts";
 import { type ToolArch, type ToolCatalog, type ToolOs, artifactFor } from "../tools/catalog.ts";

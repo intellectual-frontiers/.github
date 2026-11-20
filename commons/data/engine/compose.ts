@@ -10,7 +10,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { contextFor, type HandleError, type Provided } from "./handle.ts";
 import type { ExtensionId } from "./id.ts";
 import { CONTRACT, type Entry, type EventName, type Extension, isLazy } from "./manifest.ts";

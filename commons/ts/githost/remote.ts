@@ -11,8 +11,7 @@
  *
  * @module
  */
-import { absurd } from "../kernel/absurd.ts";
-import { err, ok, type Result } from "../kernel/result.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import type { HostKind, RepoRef } from "./types.ts";
 
 /** Why a text is not a remote URL of a repository on a host. Never holds the URL, which may hold a credential. */

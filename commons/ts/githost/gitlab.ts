@@ -14,8 +14,7 @@
  *
  * @module
  */
-import { array, boolean, integer, literal, nullable, object, string } from "../kernel/decode.ts";
-import { err, ok, type Result } from "../kernel/result.ts";
+import { array, boolean, integer, literal, nullable, object, string, err, ok, type Result } from "@intellectual-frontiers/core";
 import type { Transport } from "../runtime/http-client.ts";
 import { CAPABILITIES } from "./capabilities.ts";
 import { describeRef } from "./remote.ts";

@@ -19,9 +19,8 @@
  *
  * @module
  */
-import { absurd } from "../../kernel/absurd.ts";
-import type { DecodeError } from "../../kernel/decode.ts";
-import { formatDecodeError } from "../../kernel/decode.ts";
+import { absurd, formatDecodeError, err, ok, type Result } from "@intellectual-frontiers/core";
+import type { DecodeError } from "@intellectual-frontiers/core";
 import { GENESIS } from "../../kernel/evidence.ts";
 import type { JsonObject } from "../../kernel/json5.ts";
 import {
@@ -41,7 +40,6 @@ import {
   type TraceId,
 } from "../../kernel/otel.ts";
 import { decodeLogs, decodeTraces, encodeLogs, encodeTraces, type LogBatch, type TraceBatch } from "../../kernel/otlp.ts";
-import { err, ok, type Result } from "../../kernel/result.ts";
 import { type Sha256, sha256Of } from "../../kernel/sha256.ts";
 import {
   assembleRecord,

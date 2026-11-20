@@ -23,7 +23,7 @@ import {
   text,
   vocabularies,
 } from "@intellectual-frontiers/data/governance";
-import type { Result } from "@intellectual-frontiers/commons/ts/kernel";
+import type { Result } from "@intellectual-frontiers/core";
 
 const { ownership, privacy, quality, requirements, security, usage } = vocabularies;
 

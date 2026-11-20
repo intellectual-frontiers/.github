@@ -7,7 +7,7 @@
  * @module
  */
 import fc from "fast-check";
-import { formatDecodeError } from "../../kernel/decode.ts";
+import { formatDecodeError } from "@intellectual-frontiers/core";
 import {
   type AnyValue,
   type Attributes,

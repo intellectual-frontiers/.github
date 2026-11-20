@@ -22,7 +22,7 @@ import {
   type SpanData,
 } from "../../kernel/otel.ts";
 import { decodeTraces, encodeTraces, type LogBatch, type MetricBatch, type TraceBatch } from "../../kernel/otlp.ts";
-import { ok } from "../../kernel/result.ts";
+import { ok } from "@intellectual-frontiers/core";
 import { batchProcessor, defineSignals, memoryProcessor } from "../../kernel/signals.ts";
 import { withTempDir, writeTextFile } from "../../runtime/fs.ts";
 import { liveTransport } from "../../runtime/http-client.ts";

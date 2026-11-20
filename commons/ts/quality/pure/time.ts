@@ -4,10 +4,9 @@
  *
  * @module
  */
-import type { Brand } from "../../kernel/brand.ts";
-import { type Decoder, refine, string } from "../../kernel/decode.ts";
+import { type Decoder, refine, string, err, ok, type Result } from "@intellectual-frontiers/core";
+import type { Brand } from "@intellectual-frontiers/core";
 import { type Instant, instantOf } from "../../kernel/grc.ts";
-import { err, ok, type Result } from "../../kernel/result.ts";
 
 /** A UTC day, `YYYY-MM-DD`, that exists on the calendar. */
 export type Day = Brand<string, "Day">;

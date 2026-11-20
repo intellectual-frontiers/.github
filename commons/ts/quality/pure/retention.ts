@@ -16,8 +16,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "../../kernel/result.ts";
-import { absurd } from "../../kernel/absurd.ts";
+import { err, ok, type Result, absurd } from "@intellectual-frontiers/core";
 import { isDay } from "./time.ts";
 
 /** The day `days` after `day` (`YYYY-MM-DD`), or none where `day` is not a day. */

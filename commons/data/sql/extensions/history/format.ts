@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import type { Verification, Step, StepStatement } from "@intellectual-frontiers/data/sql/lifecycle";
 import { canonical } from "@intellectual-frontiers/data/sql/lifecycle";
 

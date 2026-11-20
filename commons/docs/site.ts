@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { absurd } from "../ts/kernel/mod.ts";
+import { absurd } from "@intellectual-frontiers/core";
 import { fs, path } from "../ts/runtime/mod.ts";
 import { Build } from "./build.ts";
 import type { Finding } from "./check.ts";

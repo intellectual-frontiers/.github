@@ -7,7 +7,7 @@
  * @module
  */
 import fc from "fast-check";
-import { object, string } from "../../kernel/decode.ts";
+import { object, string } from "@intellectual-frontiers/core";
 import { toJson5 } from "../../kernel/json5.ts";
 import { toToml } from "../../kernel/toml.ts";
 import { toYaml } from "../../kernel/yaml.ts";

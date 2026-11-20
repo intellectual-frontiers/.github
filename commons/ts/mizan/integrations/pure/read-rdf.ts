@@ -19,8 +19,7 @@
  *
  * @module
  */
-import { absurd } from "../../../kernel/absurd.ts";
-import { err, ok, type Result } from "../../../kernel/result.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import type { IntegrationFinding } from "./types.ts";
 
 /** A term of a triple as the reader gives it: an IRI, a blank node label, or a literal with its datatype and language. */

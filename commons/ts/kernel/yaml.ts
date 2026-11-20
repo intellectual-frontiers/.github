@@ -20,7 +20,7 @@
  * @module
  */
 import type { Json } from "./json5.ts";
-import { err, ok, type Result } from "./result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 
 /** Where a text stops being YAML this reader takes, and why. Lines and columns count from 1. */
 export type YamlError = { readonly kind: "yaml"; readonly line: number; readonly column: number; readonly message: string };

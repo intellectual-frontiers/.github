@@ -41,7 +41,7 @@ import {
   traceStateSet,
 } from "../../kernel/otel.ts";
 import { toHex } from "../../kernel/sha256.ts";
-import { type Equal, expectType } from "../../kernel/types.ts";
+import { type Equal, expectType } from "@intellectual-frontiers/core";
 import { assert, assertEquals, proves } from "../../runtime/test.ts";
 
 const MODEL = "0006-signals FR-001";

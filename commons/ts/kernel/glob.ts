@@ -31,7 +31,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "./result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 
 /** How a glob is read: `extended` (extglob groups, default true), `globstar` (`**` across segments, default true), `caseInsensitive`. */
 export type GlobOptions = {

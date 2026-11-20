@@ -15,7 +15,7 @@
  * @example
  * ```ts
  * import { pae, signStatement, statement, subject, verifyStatement } from "./dsse.ts";
- * import { unknownValue } from "./decode.ts";
+ * import { unknownValue } from "@intellectual-frontiers/core";
  * new TextDecoder().decode(pae("http://example.com/HelloWorld", new TextEncoder().encode("hello world")));
  * // "DSSEv1 29 http://example.com/HelloWorld 11 hello world"
  * const keys = await crypto.subtle.generateKey({ name: "Ed25519" }, false, ["sign", "verify"]);
@@ -26,9 +26,8 @@
  *
  * @module
  */
-import { absurd } from "./absurd.ts";
-import { fromBase64, toBase64 } from "./base64.ts";
 import {
+  absurd,
   array,
   type DecodeError,
   type Decoder,
@@ -39,9 +38,12 @@ import {
   record,
   string,
   unknownValue,
-} from "./decode.ts";
+  err,
+  ok,
+  type Result,
+} from "@intellectual-frontiers/core";
+import { fromBase64, toBase64 } from "./base64.ts";
 import { children, integer, readTlv, sequence, TAG } from "./der.ts";
-import { err, ok, type Result } from "./result.ts";
 import { sha256 } from "./sha256.ts";
 
 /** The `_type` of an in-toto Statement v1. */

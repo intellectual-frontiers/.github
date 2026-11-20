@@ -1,6 +1,7 @@
+// Spec: 0001-core FR-001
 /**
  * Errors as values: a step that can fail returns a `Result` whose error is a type of its own, usually a union told apart by `kind`
- * (commons 0005-typescript-runtime FR-005). Taken from erga's kernel and the machine setup's `result.ts`, which wrote the same thing twice.
+ * (0001-core FR-001). Taken from erga's kernel and the machine setup's `result.ts`, which wrote the same thing twice.
  *
  * @example
  * ```ts

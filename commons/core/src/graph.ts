@@ -1,7 +1,8 @@
+// Spec: 0001-core FR-005
 /**
  * Graphs of work: an order in which each node comes after the nodes it needs (or the cycle that makes one impossible), and a schedule
  * that runs each node the moment the nodes it needs are done, as many at once as asked, skipping what depends on a failure and holding
- * back nothing else (commons 0005-typescript-runtime FR-033). Taken from erga's `lib/ts/graph` (the build graph), with nodes of any string
+ * back nothing else (0001-core FR-005). Taken from erga's `lib/ts/graph` (the build graph), with nodes of any string
  * type.
  *
  * @example

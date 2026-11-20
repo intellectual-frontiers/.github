@@ -8,7 +8,7 @@
  * @module
  */
 import { posix } from "node:path";
-import { array, string } from "../../kernel/decode.ts";
+import { array, string } from "@intellectual-frontiers/core";
 import { globToRegExp } from "../../kernel/glob.ts";
 import { allowedFor, allowList, defineRule, fileOf, isIdentifier, type Node, type Rule, stringOf } from "../rule.ts";
 

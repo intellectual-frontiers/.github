@@ -112,7 +112,7 @@ if (mode === "read") {
 /** A child that shows progress through the console on standard error and writes its result as JSON through stdio. */
 const PROGRESS = `
 import { createTelemetry, defineSignals } from "${url("../../kernel/signals.ts")}";
-import { ok } from "${url("../../kernel/result.ts")}";
+import { ok } from "${url("../../../core/src/mod.ts")}";
 import { consoleProcessor } from "${url("../../runtime/console.ts")}";
 import { stdout } from "${url("../../runtime/stdio.ts")}";
 const registry = defineSignals({ step: { signal: "span", role: "step", attributes: { target: "string" } } });

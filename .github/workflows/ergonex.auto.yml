@@ -8,6 +8,7 @@ on:
     paths:
       - ".github/actions/**"
       - .github/workflows/ergonex.auto.yml
+      - "commons/core/src/**"
       - "commons/ergonex/**"
       - "commons/ontology/audit/**"
       - "commons/ontology/ifccm/**"
@@ -22,10 +23,12 @@ on:
       - "commons/ts/node/**"
       - "commons/ts/quality/**"
       - "commons/ts/runtime/**"
+      - "commons/ts/tools/**"
   pull_request:
     paths:
       - ".github/actions/**"
       - .github/workflows/ergonex.auto.yml
+      - "commons/core/src/**"
       - "commons/ergonex/**"
       - "commons/ontology/audit/**"
       - "commons/ontology/ifccm/**"
@@ -40,6 +43,7 @@ on:
       - "commons/ts/node/**"
       - "commons/ts/quality/**"
       - "commons/ts/runtime/**"
+      - "commons/ts/tools/**"
 
 permissions:
   contents: read

@@ -4,7 +4,7 @@
  *
  * @module
  */
-import type { Result } from "@intellectual-frontiers/commons/ts/kernel";
+import type { Result } from "@intellectual-frontiers/core";
 import {
   type Applied,
   type Desired,

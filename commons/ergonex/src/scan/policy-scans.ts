@@ -10,7 +10,7 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/commons/ts/kernel";
+import { absurd } from "@intellectual-frontiers/core";
 import { type Finding, type Severity, unapprovedSeverity } from "../findings.ts";
 import { isRegulated, type Policy, unsignedCommitSeverity } from "../policy.ts";
 import { type ToolCatalog, providedBy } from "../tools/catalog.ts";

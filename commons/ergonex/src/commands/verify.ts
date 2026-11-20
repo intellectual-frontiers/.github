@@ -7,7 +7,7 @@
  * @module
  */
 import { flag } from "../platform/k-args.ts";
-import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok } from "@intellectual-frontiers/core";
 import { existsSync, readTextFile } from "../platform/r-fs.ts";
 import { unifiedDiff } from "../diff.ts";
 import type { Finding } from "../findings.ts";

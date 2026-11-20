@@ -13,7 +13,7 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/commons/ts/kernel";
+import { absurd } from "@intellectual-frontiers/core";
 import { type Sha256, sha256 } from "@intellectual-frontiers/commons/ts/kernel";
 import type { RepoRef } from "@intellectual-frontiers/commons/ts/githost";
 import { foldKey } from "./portable.ts";

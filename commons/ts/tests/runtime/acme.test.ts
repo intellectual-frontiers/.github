@@ -11,7 +11,7 @@
 import { fromBase64, fromBase64Url, toBase64Url } from "../../kernel/base64.ts";
 import { ecdsaDerToRaw } from "../../kernel/cose.ts";
 import * as der from "../../kernel/der.ts";
-import type { Result } from "../../kernel/result.ts";
+import type { Result } from "@intellectual-frontiers/core";
 import {
   challengeName,
   cloudflareDns,

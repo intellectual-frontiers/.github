@@ -22,11 +22,22 @@
  *
  * @module
  */
-import { absurd } from "./absurd.ts";
+import {
+  absurd,
+  type Decoder,
+  type DecodeError,
+  array,
+  formatDecodeError,
+  integer,
+  object,
+  refine,
+  string,
+  err,
+  ok,
+  type Result,
+} from "@intellectual-frontiers/core";
 import { type ArchiveError, type Files, concat, filesOf, gunzip, gzip, isSafePath, sortedPaths, tar, tarHeader, untar } from "./archive.ts";
-import { type Decoder, type DecodeError, array, formatDecodeError, integer, object, refine, string } from "./decode.ts";
 import { type Instant, type SubjectRef, instantDecoder } from "./grc.ts";
-import { err, ok, type Result } from "./result.ts";
 import { type Sha256, sha256, sha256Of } from "./sha256.ts";
 
 // ---------------------------------------------------------------------------------------------------------------------------- JCS (FR-006)

@@ -17,8 +17,7 @@
  *
  * @module
  */
-import { absurd } from "./absurd.ts";
-import { type DecodeError, formatDecodeError } from "./decode.ts";
+import { absurd, type DecodeError, formatDecodeError, err, ok, type Result } from "@intellectual-frontiers/core";
 import { roleOf } from "./grc.ts";
 import {
   type AttributeValue,
@@ -33,7 +32,6 @@ import {
   type TraceId,
 } from "./otel.ts";
 import { decodeLogs, decodeTraces, encodeLogs, encodeTraces, type LogBatch, type TraceBatch } from "./otlp.ts";
-import { err, ok, type Result } from "./result.ts";
 import { type Sha256, sha256 } from "./sha256.ts";
 
 // ---------------------------------------------------------------------------------------------------------------------------- the model

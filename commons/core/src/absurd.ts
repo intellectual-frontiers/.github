@@ -1,6 +1,7 @@
+// Spec: 0001-core FR-001
 /**
  * Exhaustive matching: a `switch` on a union's `kind` ends with `default: return absurd(value)`, so that an alternative left out does not
- * compile (commons 0005-typescript-runtime FR-005). One name, `absurd`, for what erga called `absurd` and the machine setup `assertNever`.
+ * compile (0001-core FR-001). One name, `absurd`, for what erga called `absurd` and the machine setup `assertNever`.
  *
  * @example
  * ```ts

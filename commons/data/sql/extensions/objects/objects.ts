@@ -11,7 +11,7 @@
  *
  * @module
  */
-import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok } from "@intellectual-frontiers/core";
 import { type AnyCodeList, words } from "@intellectual-frontiers/data/governance";
 import { featureId, type LogicalType } from "@intellectual-frontiers/data/sql/logical";
 import { type BindContext, type Dialect, type PhysicalError, qualified, type Statement, type StatementSource, writeCode } from "@intellectual-frontiers/data/sql/physical";

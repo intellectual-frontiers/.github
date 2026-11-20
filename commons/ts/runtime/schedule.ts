@@ -23,9 +23,8 @@
  *
  * @module
  */
-import { absurd } from "../kernel/absurd.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import { type JobPlan, type JobSpec, planJob, type ScheduleError, type SchedulerOs, type Step } from "../kernel/schedule.ts";
-import { err, ok, type Result } from "../kernel/result.ts";
 import { NotFound } from "./errors.ts";
 import { mkdir, remove, writeTextFile } from "./fs.ts";
 import { dirname, join } from "./path.ts";

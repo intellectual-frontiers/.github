@@ -27,7 +27,7 @@
 import { fromBase64Url, toBase64Url } from "./base64.ts";
 import { type CborKey, type CborValue, decodeCbor, encodeCbor, formatCborError, isMap } from "./cbor.ts";
 import { children, readTlv, TAG } from "./der.ts";
-import { err, ok, type Result } from "./result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 
 /** COSE's identifier of ES256: ECDSA on P-256 with SHA-256. */
 export const ES256 = -7;

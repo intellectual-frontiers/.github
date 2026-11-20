@@ -16,7 +16,7 @@
  * @module
  */
 import { flag, formatUsageError, helpText, many, parseArgs, type Parser, value } from "../kernel/args.ts";
-import { err, ok } from "../kernel/result.ts";
+import { err, ok } from "@intellectual-frontiers/core";
 import { mkdir, readTextFile, writeTextFile } from "../runtime/fs.ts";
 import { dirname } from "../runtime/path.ts";
 import { stderr, stdout } from "../runtime/stdio.ts";

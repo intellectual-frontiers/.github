@@ -10,7 +10,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "../../kernel/result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { type Judgement, showProofCount, summarize } from "./ladder.ts";
 import { type Ledger } from "./ledger.ts";
 import { type Evaluation, objectiveProblem } from "./objectives.ts";

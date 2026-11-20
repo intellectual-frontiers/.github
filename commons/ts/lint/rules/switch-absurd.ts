@@ -9,7 +9,7 @@
  *
  * @module
  */
-import { array, boolean, string } from "../../kernel/decode.ts";
+import { array, boolean, string } from "@intellectual-frontiers/core";
 import { allowedFor, allowList, defineRule, fileOf, isIdentifier, isMember, isNode, type Node, propertyOf, type Rule } from "../rule.ts";
 
 /** Whether a statement of a `default` calls one of the functions: `f(x);`, `return f(x);`, `throw f(x);`, or in a block. */

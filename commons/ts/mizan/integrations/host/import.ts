@@ -16,7 +16,7 @@ import { pathToFileURL } from "node:url";
 import { dirname, resolve } from "../../../runtime/path.ts";
 import { existsSync, readTextFileSync, writeTextFileSync } from "../../../runtime/fs.ts";
 import { stdio } from "../../../runtime/mod.ts";
-import { err, ok, type Result } from "../../../kernel/result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { importJsonSchema } from "../pure/import-json-schema.ts";
 import { importOscalCatalog } from "../pure/import-oscal-catalog.ts";
 import { importVocabulary } from "../pure/import-vocabulary.ts";

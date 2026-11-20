@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok } from "@intellectual-frontiers/core";
 import type { LogicalSchema, Table } from "@intellectual-frontiers/data/sql/logical";
 import type { BindContext, PhysicalError, Statement, StatementSource } from "@intellectual-frontiers/data/sql/physical";
 import { featureId } from "./deps.ts";

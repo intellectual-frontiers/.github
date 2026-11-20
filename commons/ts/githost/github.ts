@@ -13,8 +13,20 @@
  *
  * @module
  */
-import { array, boolean, integer, literal, nullable, object, oneOf, string, unknownValue } from "../kernel/decode.ts";
-import { err, ok, type Result } from "../kernel/result.ts";
+import {
+  array,
+  boolean,
+  integer,
+  literal,
+  nullable,
+  object,
+  oneOf,
+  string,
+  unknownValue,
+  err,
+  ok,
+  type Result,
+} from "@intellectual-frontiers/core";
 import type { Exchange, Transport } from "../runtime/http-client.ts";
 import { CAPABILITIES, unsupported } from "./capabilities.ts";
 import { describeRef } from "./remote.ts";

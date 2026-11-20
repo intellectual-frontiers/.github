@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/data",
   "private": true,
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Intellectual Frontiers data: governance, a logical and a physical schema, and extensions, built on IFC TypeScript's kernel. Phase 0 spike.",
   "type": "module",
   "engines": {
@@ -75,6 +75,7 @@
     "@electric-sql/pglite-pgtap": "0.0.18",
     "@electric-sql/pglite-socket": "0.2.20",
     "@intellectual-frontiers/commons": "link:../ts",
+    "@intellectual-frontiers/core": "link:../core",
     "@types/node": "26.6.6",
     "@types/pg": "8.23.1",
     "fast-check": "4.10.2",

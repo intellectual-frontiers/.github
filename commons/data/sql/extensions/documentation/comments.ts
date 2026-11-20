@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok } from "@intellectual-frontiers/core";
 import type { BindContext, Statement, StatementSource } from "@intellectual-frontiers/data/sql/physical";
 import type { DocumentationSettings } from "./settings.ts";
 

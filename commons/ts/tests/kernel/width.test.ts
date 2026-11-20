@@ -5,7 +5,7 @@
  * @module
  */
 import fc from "fast-check";
-import { plain } from "../../kernel/text.ts";
+import { plain } from "@intellectual-frontiers/core";
 import { cutToWidth, displayWidth, graphemes, graphemeWidth, RESET, sgrParams, splitAtWidth, tokens } from "../../kernel/width.ts";
 import { assert, assertEquals, proves } from "../../runtime/test.ts";
 

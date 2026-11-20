@@ -17,7 +17,7 @@
  *
  * @module
  */
-import { absurd } from "./absurd.ts";
+import { absurd } from "@intellectual-frontiers/core";
 import {
   type Iri,
   type Namespace,

@@ -20,7 +20,7 @@
  */
 import * as nfs from "node:fs";
 import process from "node:process";
-import { type Decoder, integer, json, object, string } from "../kernel/decode.ts";
+import { type Decoder, integer, json, object, string } from "@intellectual-frontiers/core";
 import { AlreadyExists, mapError, NotFound } from "./errors.ts";
 import { readTextFile, remove, writeTextFile } from "./fs.ts";
 import { sleep } from "./proc.ts";

@@ -13,9 +13,8 @@
  *
  * @module
  */
-import type { Brand } from "./brand.ts";
-import { type Decoder, describe } from "./decode.ts";
-import { err, ok } from "./result.ts";
+import { type Decoder, describe, err, ok } from "@intellectual-frontiers/core";
+import type { Brand } from "@intellectual-frontiers/core";
 import { fromHex, toHex } from "./sha256.ts";
 
 /** A UUID in RFC 9562's text form, lower-case: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`; made only by `uuidOf`, `uuidFromBytes` and `uuidV5`. */

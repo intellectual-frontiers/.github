@@ -26,7 +26,7 @@
  */
 import { type DsseKey, signStatement, statement } from "../../kernel/dsse.ts";
 import { redactText } from "../../kernel/otel.ts";
-import { err, ok, type Result } from "../../kernel/result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { sha256 } from "../../kernel/sha256.ts";
 import { tar } from "../../kernel/archive.ts";
 import { redactFor } from "../trust/audience.ts";

@@ -10,7 +10,7 @@
 import plugin from "../../lint/plugin.ts";
 import { type Rule } from "../../lint/rule.ts";
 import { linter, lintFiles, type LintRun, type Problem } from "../../lint/test-rule.ts";
-import { type Equal, expectType } from "../../kernel/types.ts";
+import { type Equal, expectType } from "@intellectual-frontiers/core";
 import { makeTempDir, remove, writeTextFile } from "../../runtime/fs.ts";
 import { join } from "../../runtime/path.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../../runtime/test.ts";
@@ -220,7 +220,7 @@ proves(
     const dir = await makeTempDir({ prefix: "ifc-lint-plugin-" });
     try {
       const rule = new URL("../../lint/rule.ts", import.meta.url).href;
-      const decode = new URL("../../kernel/decode.ts", import.meta.url).href;
+      const decode = new URL("../../../core/src/mod.ts", import.meta.url).href;
       const path = join(dir, "harness.ts");
       await writeTextFile(
         path,

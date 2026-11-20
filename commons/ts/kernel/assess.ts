@@ -20,7 +20,7 @@
  *
  * @module
  */
-import { absurd } from "./absurd.ts";
+import { absurd, type Decoder, array, literal, object, string } from "@intellectual-frontiers/core";
 import {
   type Catalog,
   type CatalogControl,
@@ -40,7 +40,6 @@ import {
   latestInstant,
   roleDecoder,
 } from "./grc.ts";
-import { type Decoder, array, literal, object, string } from "./decode.ts";
 import type { Json } from "./json5.ts";
 import type { Sha256 } from "./sha256.ts";
 

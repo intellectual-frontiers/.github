@@ -5,9 +5,7 @@
  *
  * @module
  */
-import { json, object, record, string } from "../kernel/decode.ts";
-import { formatDecodeError } from "../kernel/decode.ts";
-import { err, ok, type Result } from "../kernel/result.ts";
+import { json, object, record, string, formatDecodeError, err, ok, type Result } from "@intellectual-frontiers/core";
 
 /** The one name of the package, the root's and this folder's. */
 export const PACKAGE_NAME = "@intellectual-frontiers/commons";

@@ -1,6 +1,7 @@
+// Spec: 0001-core FR-001
 /**
  * Identifiers are types: a branded type is a plain value that the compiler keeps apart from others of the same shape, made only by the
- * function that validates it (commons 0005-typescript-runtime FR-005).
+ * function that validates it (0001-core FR-001).
  *
  * @example
  * ```ts

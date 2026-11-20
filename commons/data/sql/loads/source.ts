@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import type { Scope, Select } from "@intellectual-frontiers/data/sql/typed";
 import type { Runner } from "@intellectual-frontiers/data/sql/typed";
 

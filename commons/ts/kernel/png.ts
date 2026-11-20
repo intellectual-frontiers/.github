@@ -29,9 +29,8 @@
  *
  * @module
  */
-import { absurd } from "./absurd.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import { concat, crc32 } from "./archive.ts";
-import { err, ok, type Result } from "./result.ts";
 
 /** A raster: its size, its channels (3 for RGB, 4 for RGBA) and its bytes, row by row, eight bits a channel. */
 export type Picture = { readonly width: number; readonly height: number; readonly channels: 3 | 4; readonly data: Uint8Array };

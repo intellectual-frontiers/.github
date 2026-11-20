@@ -12,7 +12,7 @@
  * @module
  */
 import { flag } from "../platform/k-args.ts";
-import { err, ok } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok } from "@intellectual-frontiers/core";
 import { liveTransport } from "../platform/r-http-client.ts";
 import { join } from "../platform/r-path.ts";
 import { type Finding } from "../findings.ts";

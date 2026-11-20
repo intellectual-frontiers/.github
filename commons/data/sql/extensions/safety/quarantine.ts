@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { vocabularies, words } from "@intellectual-frontiers/data/governance";
 import { carriedOf, sameWords } from "@intellectual-frontiers/data/sql/logical";
 import type { Check, Plan, StepContext, StepDraft, StepStatement, StepTransform } from "@intellectual-frontiers/data/sql/lifecycle";

@@ -17,7 +17,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "../../kernel/result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { type Sha256, sha256 } from "../../kernel/sha256.ts";
 import type { LedgerEvent } from "../pure/ledger.ts";
 import { dayOfText } from "../pure/time.ts";

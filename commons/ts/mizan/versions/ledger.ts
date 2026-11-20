@@ -20,8 +20,7 @@
  *
  * @module
  */
-import { type DecodeError, array, boolean, formatDecodeError, object, string } from "../../kernel/decode.ts";
-import { err, ok, type Result } from "../../kernel/result.ts";
+import { type DecodeError, array, boolean, formatDecodeError, object, string, err, ok, type Result } from "@intellectual-frontiers/core";
 import { dayOf } from "../changes/declaration.ts";
 import type { Release } from "./record.ts";
 import type { VersionsFinding } from "./rules.ts";

@@ -9,7 +9,7 @@
  * @module
  */
 import { movedPath, type Places } from "../../places.ts";
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { parseSpanId, parseTraceId, type SpanId, type TraceId } from "../../platform/k-otel.ts";
 import { installationFromEnv } from "../../platform/k-test-record.ts";
 import { checkRun, formatQualityError } from "@intellectual-frontiers/commons/ts/quality";

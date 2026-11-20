@@ -29,9 +29,8 @@
  *
  * @module
  */
-import { absurd } from "./absurd.ts";
-import type { DecodeError } from "./decode.ts";
-import { err, ok, type Result } from "./result.ts";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
+import type { DecodeError } from "@intellectual-frontiers/core";
 
 /** A short option's letter: any ASCII letter but `h`, which is help's. */
 export type ShortName =

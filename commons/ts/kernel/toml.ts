@@ -16,7 +16,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "./result.ts";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 
 /** A date, a time, or both, as TOML wrote it (a space between date and time made `T`), with which of the four it is. */
 export type TomlDateTime = {

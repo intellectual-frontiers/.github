@@ -18,7 +18,7 @@ import type {
   RepoInfo,
   RepoRef,
 } from "../githost/types.ts";
-import { err, ok } from "../kernel/result.ts";
+import { err, ok } from "@intellectual-frontiers/core";
 import { run as changes, RECORD_FILE } from "../mizan/changes.ts";
 import { dayOf, decodeHarnessRecord, relaxations } from "../mizan/changes/declaration.ts";
 import { declarationHistory, readRange } from "../mizan/changes/git-log.ts";

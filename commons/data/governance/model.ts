@@ -16,7 +16,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import type { Annotation } from "./annotation.ts";
 import type { AnyCodeList } from "./codelist.ts";
 import type { Datatype } from "./datatype.ts";

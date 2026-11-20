@@ -10,8 +10,7 @@
  *
  * @module
  */
-import { array, formatDecodeError, literal, object, string } from "@intellectual-frontiers/commons/ts/kernel";
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { array, formatDecodeError, literal, object, string, err, ok, type Result } from "@intellectual-frontiers/core";
 import { sha256Of, type Sha256 } from "@intellectual-frontiers/commons/ts/kernel";
 import { describeBrandError, version, type Version } from "../types.ts";
 

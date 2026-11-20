@@ -9,7 +9,7 @@
  */
 import { chmodSync, existsSync, lstatSync, mkdirSync, readFileSync, realpathSync, renameSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { type BlockError, type Style, withBlock, withoutBlock } from "./blocks.ts";
 
 /** What a planned change does to a file. */
