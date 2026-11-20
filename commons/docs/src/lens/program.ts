@@ -45,6 +45,10 @@ function propertiesTable(e: LayerElement, skip: readonly string[] = []): readonl
 export function programLens(options: ProgramLensOptions): Lens {
   let models: readonly LayeredModel[] = [];
   const group = options.group ?? "Programs";
+  /** The program a model is of: the name of the model without the tier at its end (`ergonex-operator` is of `ergonex`). */
+  const programOf = (m: LayeredModel): string => m.name.replace(/-[^-]+$/, "");
+  /** The tier of a model: what follows the program in its name. */
+  const tierOf = (m: LayeredModel): string => `${m.name.slice(programOf(m).length + 1)} tier`;
   const dir = (m: LayeredModel): string => `programs/${slug(m.name)}`;
   const verbPage = (m: LayeredModel, v: LayerElement): string => `${dir(m)}/verb-${slug(v.name)}.html`;
   return {
@@ -52,7 +56,7 @@ export function programLens(options: ProgramLensOptions): Lens {
     read: async (): Promise<LensPages> => {
       models = await options.source();
       return (build, after) => {
-        const add = (p: Omit<Page, "section">): void => build.add({ ...p, section: "models" });
+        const add = (p: Omit<Page, "section">): void => build.add({ ...p, section: "programs" });
         add({
           path: "programs/index.html",
           title: "Programs",
@@ -78,8 +82,9 @@ export function programLens(options: ProgramLensOptions): Lens {
             path: `${dir(m)}/index.html`,
             title: m.title,
             description: m.summary,
-            group,
+            group: programOf(m),
             order: order++,
+            navTitle: tierOf(m),
             blocks: [
               para(t(m.summary)),
               heading(2, "Verbs"),
@@ -99,8 +104,10 @@ export function programLens(options: ProgramLensOptions): Lens {
               path: verbPage(m, v),
               title: v.name,
               description: v.definition,
-              group,
+              group: programOf(m),
               order: order++,
+              parent: `${dir(m)}/index.html`,
+              navKind: "Verbs",
               navTitle: v.name,
               badges: [badge("verb", "info"), ...(prop(v, "effect") === "" ? [] : [badge(prop(v, "effect"))])],
               blocks: [

@@ -93,9 +93,6 @@ function typedExample(name: string, from: string, columns: readonly string[]): s
   return [importOf("from", "@intellectual-frontiers/data/sql/typed"), importOf(name, from), "", `const rows = await from(${name}).select((s) => ({ ${picked} })).run(runner);`].join("\n");
 }
 
-/** The sentence that names what a model requires, or nothing. */
-const requiresOf = (names: readonly string[]): Inline[] => (names.length === 0 ? [] : [t(". Requires "), ...names.flatMap((r, i) => (i === 0 ? [c(r)] : [t(", "), c(r)]))]);
-
 const prop = (e: LayerElement, k: string): string => {
   const v = e.properties[k];
   return Array.isArray(v) ? v.join(", ") : v === null || v === undefined ? "" : String(v);
@@ -141,6 +138,7 @@ export function layeredLens(options: LayeredLensOptions): Lens {
           return h === undefined ? c(label) : { kind: "link", href: h, children: [c(label)] };
         };
         // the page of the layers: what each is for, and how to change a model
+        const subjectOfIndex = (m: LayeredModel): { readonly id: string; readonly title: string; readonly about: string; readonly order: number } => m.subject ?? { id: "other", title: "Other models", about: "Models that name no subject.", order: 99 };
         const findings = models.flatMap((m) => m.findings);
         page(build, {
           path: "models/index.html",
@@ -150,16 +148,21 @@ export function layeredLens(options: LayeredLensOptions): Lens {
           order: after,
           blocks: [
             para(t("Each model is documented in the layers it is written in. Governance says what the business means and is the only layer a person or an agent edits; the logical schema and the physical forms are made from it. "), { kind: "link", href: { kind: "page", path: "models/layers.html" }, children: [t("How the layers fit and how to change a model")] }, t(".")),
-            heading(2, "Models"),
-            {
-              kind: "cards",
-              cards: models.map((m) => ({
-                title: m.title,
-                href: { kind: "page", path: `models/${kebab(m.name)}/index.html` } as Href,
-                text: [t(m.summary)],
-                badges: [badge(`${m.elements.filter((e) => e.kind === "concept").length} concepts`, "info"), ...(m.findings.length > 0 ? [badge(`${m.findings.length} findings`, "warn")] : [])],
-              })),
-            },
+            ...[...new Map(models.map((m) => [subjectOfIndex(m).id, subjectOfIndex(m)] as const)).values()].sort((x, y) => x.order - y.order).flatMap((sub): Block[] => [
+              heading(2, sub.title, `subject-${sub.id}`),
+              para(t(sub.about)),
+              {
+                kind: "cards",
+                cards: models.filter((m) => subjectOfIndex(m).id === sub.id).map((m) => ({
+                  title: m.title,
+                  href: { kind: "page", path: `models/${kebab(m.name)}/index.html` } as Href,
+                  text: [t(m.summary)],
+                  badges: [badge(`${m.elements.filter((e) => e.kind === "concept").length} ${m.elements.filter((e) => e.kind === "concept").length === 1 ? "concept" : "concepts"}`, "info"), ...(m.findings.length > 0 ? [badge(`${m.findings.length} findings`, "warn")] : [])],
+                })),
+              },
+            ]),
+            heading(2, "How the models depend on each other"),
+            { kind: "diagram", source: `flowchart LR\n${models.flatMap((m) => list(m.elements.find((e) => e.kind === "module") ?? ({ properties: {} } as LayerElement), "requires").map((r) => `  ${m.name}[${m.title}] --> ${r}[${models.find((x) => x.name === r)?.title ?? r}]`)).join("\n")}`, caption: "A model points to the models it requires" },
             heading(2, "Registers"),
             para({ kind: "link", href: { kind: "page", path: "models/registers.html" }, children: [t("What the models annotate: personal data, security, ownership, lifecycle")] }),
             ...(findings.length === 0 ? [] : [heading(2, "Findings"), { kind: "list", ordered: false, items: findings.map((f) => [para(c(f.element), t(` ${f.message}`))]) } as Block]),
@@ -189,20 +192,40 @@ export function layeredLens(options: LayeredLensOptions): Lens {
           ],
         });
         let order = after + 2;
-        for (const m of models) {
+        // the models are grouped by what they apply to: a group of the navigation for each subject, its models beneath it, and each model's concepts and code lists beneath the model while it is read (FR-040)
+        const OTHER = { id: "other", title: "Other models", about: "Models that name no subject.", order: 99 };
+        const subjectOf = (m: LayeredModel): { readonly id: string; readonly title: string; readonly about: string; readonly order: number } => m.subject ?? OTHER;
+        const known = (name: string): boolean => models.some((x) => x.name === name);
+        const usedBy = new Map<string, string[]>();
+        for (const m of models) for (const r of list(m.elements.find((e) => e.kind === "module") ?? ({ properties: {} } as LayerElement), "requires")) usedBy.set(r, [...(usedBy.get(r) ?? []), m.name]);
+        models.forEach((m, mi) => {
+          const subject = subjectOf(m);
+          const base = 100_000 * (subject.order + 1) + mi * 1000;
+          let k = 0;
           const concepts = m.elements.filter((e) => e.kind === "concept");
           const lists = m.elements.filter((e) => e.kind === "codelist");
           const modEl = m.elements.find((e) => e.kind === "module");
           const edges = concepts.flatMap((cn) => m.elements.filter((e) => e.kind === "relationship" && e.parent === cn.id).map((r) => `  ${kebab(cn.name).replaceAll("-", "_")} -->|${r.name}| ${prop(r, "to").replace(/[^A-Za-z0-9]/g, "_")}`));
+          const metaOf = (modEl: LayerElement): Inline[] => {
+            const by = usedBy.get(m.name) ?? [];
+            return [
+              ...(modEl.source === undefined ? [] : [t("Written in "), ...sourceLink(build, modEl.source), t(". ")]),
+              ...(list(modEl, "requires").length === 0 ? [t("Requires nothing. ")] : [t("Requires "), ...list(modEl, "requires").flatMap((r, i): Inline[] => [...(i === 0 ? [] : [t(", ")]), known(r) ? { kind: "link", href: { kind: "page", path: `models/${kebab(r)}/index.html` }, children: [c(r)] } : c(r)]), t(". ")]),
+              ...(by.length === 0 ? [] : [t("Required by "), ...by.flatMap((u, i): Inline[] => [...(i === 0 ? [] : [t(", ")]), { kind: "link", href: { kind: "page", path: `models/${kebab(u)}/index.html` }, children: [c(u)] }]), t(". ")]),
+              t(`${concepts.length} ${concepts.length === 1 ? "concept" : "concepts"}, ${lists.length} code ${lists.length === 1 ? "list" : "lists"}.`),
+            ];
+          };
           page(build, {
             path: `models/${kebab(m.name)}/index.html`,
             title: m.title,
             description: m.summary,
-            group,
-            order: order++,
+            group: subject.title,
+            order: base + k++,
+            navTitle: m.title,
             blocks: [
               para(t(m.summary)),
-              ...(modEl === undefined ? [] : [para(t("Written in "), ...sourceLink(build, modEl.source), ...requiresOf(list(modEl, "requires")))]),
+              para(t("Applies to: "), t(subject.title), t(". "), t(subject.about)),
+              ...(modEl === undefined ? [] : [para(...metaOf(modEl))]),
               ...(edges.length === 0 ? [] : [{ kind: "diagram", source: `flowchart LR\n${edges.slice(0, 80).join("\n")}`, caption: `How the concepts of ${m.title} relate` } as Block]),
               heading(2, "Concepts"),
               { kind: "table", head: [[t("Concept")], [t("Definition")], [t("Attributes")], [t("Written in")]], rows: concepts.map((cn) => [[{ kind: "link", href: { kind: "page", path: conceptPage(m, cn.name) }, children: [c(cn.name)] }], [t(cn.definition)], [t(String(list(cn, "attributes").length))], sourceLink(build, cn.source)]) },
@@ -226,8 +249,10 @@ export function layeredLens(options: LayeredLensOptions): Lens {
               path: conceptPage(m, cn.name),
               title: cn.name,
               description: cn.definition,
-              group,
-              order: order++,
+              group: subject.title,
+              order: base + k++,
+              parent: `models/${kebab(m.name)}/index.html`,
+              navKind: "Concepts",
               navTitle: cn.name,
               badges: [badge("concept", "info"), ...(personal.length > 0 ? [badge("personal data", "warn")] : [])],
               blocks: [
@@ -272,8 +297,10 @@ export function layeredLens(options: LayeredLensOptions): Lens {
               path: `models/${kebab(m.name)}/list-${kebab(l.name)}.html`,
               title: l.name,
               description: l.definition,
-              group,
-              order: order++,
+              group: subject.title,
+              order: base + 500 + k++,
+              parent: `models/${kebab(m.name)}/index.html`,
+              navKind: "Code lists",
               badges: [badge("code list", "info")],
               blocks: [
                 para(t(l.definition === "" ? "No definition: say what this list means." : l.definition)),
@@ -282,7 +309,7 @@ export function layeredLens(options: LayeredLensOptions): Lens {
               ],
             });
           }
-        }
+        });
         // registers: what the models annotate
         const byKind = new Map<string, { model: string; element: LayerElement; value: string }[]>();
         for (const m of models) for (const e of m.elements) for (const a of list(e, "annotations")) {

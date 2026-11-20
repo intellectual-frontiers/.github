@@ -37,8 +37,10 @@ export const parseSystemId: (text: string) => Result<SystemId, string> = made<"e
 
 /** The states of an asset: seen and not adopted, known and observed but not changed, and changed to match what is declared. */
 export const STATES = ["discovered", "adopted", "managed"] as const;
+/** A state of an asset: one of {@link STATES}. */
 export type AssetState = (typeof STATES)[number];
 
 /** The capabilities an asset may offer. */
 export const CAPABILITIES = ["provision", "identity", "plan", "converge", "verify", "observe", "update", "access", "backup", "retire"] as const;
+/** A capability an asset may offer: one of {@link CAPABILITIES}. */
 export type Capability = (typeof CAPABILITIES)[number];

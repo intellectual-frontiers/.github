@@ -42,6 +42,7 @@ export {
   type StatusKind,
 } from "./issue.ts";
 export { type ComposeError, composeModules, defineModule, type Module, moduleOf, type ModuleSpec, withRequired } from "./module.ts";
+export { SUBJECTS, type Subject, subject, subjectOf } from "./subjects.ts";
 export {
   binary,
   type BinaryType,

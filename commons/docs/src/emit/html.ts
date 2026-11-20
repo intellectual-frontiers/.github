@@ -34,6 +34,7 @@ export const SECTIONS: readonly { readonly section: Section; readonly label: str
   { section: "specs", label: "Specifications", home: "specs/index.html" },
   { section: "api", label: "API", home: "api/index.html" },
   { section: "models", label: "Models", home: "models/index.html" },
+  { section: "programs", label: "Programs", home: "programs/index.html" },
 ];
 
 /** Text made safe for HTML. */
@@ -203,7 +204,7 @@ export function block(b: Block, from: string): string {
         highlighted(b.text, b.lang)
       }</code></pre></figure>`;
     case "table":
-      return `<div class="table-wrap"><table><thead><tr>${b.head.map((h) => `<th>${inlines(h, from)}</th>`).join("")}</tr></thead><tbody>${
+      return `${b.filter === undefined ? "" : `<input type="search" class="table-filter" placeholder="${escape(b.filter)}" aria-label="${escape(b.filter)}">`}<div class="table-wrap${b.compact === true ? " compact" : ""}"><table><thead><tr>${b.head.map((h) => `<th>${inlines(h, from)}</th>`).join("")}</tr></thead><tbody>${
         b.rows.map((r) => `<tr>${r.map((c) => `<td>${inlines(c, from)}</td>`).join("")}</tr>`).join("")
       }</tbody></table></div>`;
     case "callout":
@@ -308,6 +309,37 @@ export function navigation(pages: readonly Page[], section: Section): { readonly
     .sort((a, b) => firstOrder(a.pages) - firstOrder(b.pages) || (a.group < b.group ? -1 : 1));
 }
 
+/** The navigation of a section as HTML (FR-040): each group is a `details` element that is open where it holds the page being read, a page lists beneath it the pages whose `parent` it is only while it or one of them is being read, and no script is needed. */
+function navHtml(pages: readonly Page[], current: Page, from: string): string {
+  const inSection = pages.filter((q) => q.section === current.section);
+  const byPath = new Map(inSection.map((p) => [p.path, p] as const));
+  const childrenOf = new Map<string, Page[]>();
+  for (const p of inSection) if (p.parent !== undefined && byPath.has(p.parent)) childrenOf.set(p.parent, [...(childrenOf.get(p.parent) ?? []), p]);
+  const trail = new Set<string>();
+  for (let at: Page | undefined = current; at !== undefined; at = at.parent === undefined ? undefined : byPath.get(at.parent)) trail.add(at.path);
+  const order = (a: Page, b: Page): number => a.order - b.order || (a.title < b.title ? -1 : a.title > b.title ? 1 : 0);
+  const item = (p: Page): string => {
+    const kids = (childrenOf.get(p.path) ?? []).sort(order);
+    const link = `<a href="${escape(relative(from, p.path))}"${p.path === from ? ' class="current" aria-current="page"' : ""}>${escape(p.navTitle ?? p.title)}</a>`;
+    if (kids.length === 0 || !trail.has(p.path)) return `<li>${link}</li>`;
+    let kind: string | undefined;
+    const inner = kids.map((k) => {
+      const head = k.navKind !== undefined && k.navKind !== kind ? `<li class="nav-kind">${escape(k.navKind)}</li>` : "";
+      kind = k.navKind;
+      return `${head}${item(k)}`;
+    }).join("");
+    return `<li>${link}<ul class="nav-sub">${inner}</ul></li>`;
+  };
+  const roots = navigation(inSection, current.section).map((g) => ({ group: g.group, pages: g.pages.filter((p) => p.parent === undefined || !byPath.has(p.parent)) }));
+  const small = roots.length <= 4;
+  return roots
+    .map((g) => {
+      const open = small || g.pages.some((p) => trail.has(p.path) || [...trail].some((t) => (childrenOf.get(p.path) ?? []).some((k) => k.path === t)));
+      return `<details class="nav-group"${open ? " open" : ""}><summary><span class="nav-title">${escape(g.group)}</span><span class="nav-count">${g.pages.length}</span></summary><ul>${g.pages.map(item).join("")}</ul></details>`;
+    })
+    .join("");
+}
+
 /**
  * A page as a whole HTML document.
  *
@@ -321,21 +353,7 @@ export function document(page: Page, site: Site): string {
   const top = SECTIONS.filter((s) => site.sections === undefined || site.sections.includes(s.section)).map((s) =>
     `<a class="section-link${s.section === page.section ? " current" : ""}" href="${escape(relative(from, s.home))}">${escape(s.label)}</a>`
   ).join("");
-  const collapse = page.section === "api" || page.section === "models";
-  const nav = navigation(site.pages, page.section)
-    .map((g) =>
-      collapse && g.group !== page.group && (g.pages[0]?.order ?? 0) >= 100
-        ? `<div class="nav-group"><a class="nav-area" href="${escape(relative(from, g.pages[0]?.path ?? "index.html"))}">${escape(g.group)}</a></div>`
-        :
-        `<div class="nav-group"><p class="nav-title">${escape(g.group)}</p><ul>${
-          g.pages
-            .map((p) =>
-              `<li><a href="${escape(relative(from, p.path))}"${p.path === from ? ' class="current" aria-current="page"' : ""}>${escape(p.navTitle ?? p.title)}</a></li>`
-            )
-            .join("")
-        }</ul></div>`,
-    )
-    .join("");
+  const nav = navHtml(site.pages, page, from);
   const toc = outline(page.blocks);
   const tocHtml = toc.length < 2
     ? ""

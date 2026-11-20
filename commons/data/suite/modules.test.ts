@@ -1,4 +1,4 @@
-// Spec: 0028-modules FR-001, FR-002, FR-003, FR-004, FR-005, FR-006
+// Spec: 0028-modules FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-008
 /**
  * Modules (commons data 0028-modules): subject areas as values, composed by a project into one domain that is validated whole, so that a module that is not listed has no table; references run
  * only down the requirements; and models may import the models they require, acyclically.
@@ -126,3 +126,17 @@ proves(
     assert(cyc[0]!.message.includes("models/a/ -> models/b/ -> models/a/") || cyc[0]!.message.includes("models/b/ -> models/a/ -> models/b/"), cyc[0]!.message);
   },
 );
+
+proves(["0028-modules FR-008"], "every module of the library applies to a subject, one of the six, and a described model carries it; a module that names its own subject keeps it", async () => {
+  const { SUBJECTS, subjectOf, defineModule } = await import("@intellectual-frontiers/data/governance");
+  const { describeModels } = await import("@intellectual-frontiers/data/sql/describe");
+  const { allModules } = await import("@intellectual-frontiers/data/sql/cli");
+  const { dialect } = await import("../sql/dialects/postgres/mod.ts");
+  assert(SUBJECTS.map((s) => s.id).join() === "parties,identity,pipelines,meaning,operations,project", "six subjects, in order");
+  for (const m of allModules()) assert(subjectOf(m.name, m.subject) !== undefined, `${m.name} has a subject`);
+  const r = describeModels({ modules: allModules(), dialects: [dialect], domain: "arca", library: "data" });
+  assert(r.kind === "ok");
+  if (r.kind === "ok") for (const m of r.value) assert(m.subject !== undefined, `${m.name} carries its subject`);
+  assert(subjectOf("x", "operations")?.id === "operations" && subjectOf("x") === undefined, "a named subject is kept and an unknown module has none");
+  assert(defineModule({ name: "x", concepts: [], subject: "project" }).subject === "project");
+});

@@ -11,7 +11,7 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import { type AnyCodeList, type AnyConcept, type Annotation, composeModules, type Datatype, type Module, vocabularies, words } from "@intellectual-frontiers/data/governance";
+import { type AnyCodeList, type AnyConcept, type Annotation, composeModules, type Datatype, type Module, subjectOf, vocabularies, words } from "@intellectual-frontiers/data/governance";
 import { type Column, type LogicalSchema, projectDomain } from "@intellectual-frontiers/data/sql/logical";
 import { bind, type Dialect, type Naming, naming as defaultNaming, type Physical } from "@intellectual-frontiers/data/sql/physical";
 import { camel, ownerOf, stemOf } from "@intellectual-frontiers/data/sql/typed/generate";
@@ -58,12 +58,20 @@ export interface Finding {
   readonly message: string;
 }
 
+/** The subject of a module as a described model carries it, or nothing. */
+function subjectPart(m: Module): { readonly subject?: NonNullable<Described["subject"]> } {
+  const s = subjectOf(m.name, m.subject);
+  return s === undefined ? {} : { subject: s };
+}
+
 /** A model described in layers: structurally the generator's `LayeredModel`. */
 export interface Described {
   readonly name: string;
   readonly library: string;
   readonly title: string;
   readonly summary: string;
+  /** What the model applies to (`subjectOf` of governance), where it has a subject. */
+  readonly subject?: { readonly id: string; readonly title: string; readonly about: string; readonly order: number };
   readonly layers: readonly Layer[];
   readonly elements: readonly Element[];
   readonly trace: readonly Trace[];
@@ -288,6 +296,7 @@ export function describeModels(options: DescribeOptions): Result<readonly Descri
       library: options.library ?? "data",
       title: words(m.name).join(" "),
       summary: m.definition,
+      ...subjectPart(m),
       layers: LAYERS,
       elements: elements.toSorted((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)),
       trace: trace.toSorted((a, b) => (a.from + a.to < b.from + b.to ? -1 : 1)),

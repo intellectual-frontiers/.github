@@ -29,6 +29,7 @@ proves(["0011-documentation FR-019", "0011-documentation FR-027", "0011-document
     "specs/constitution.html",
     "specs/index.html",
     "specs/matrix.html",
+    "specs/matrix/specifications.html",
   ]);
   assert(!built.pages.some((p) => p.section === "models"), "no lens, no Models section");
   const mod = built.pages.find((p) => p.path === "api/greeting/mod.html");
