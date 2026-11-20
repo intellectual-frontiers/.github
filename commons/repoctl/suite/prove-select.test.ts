@@ -142,10 +142,12 @@ proves(["0007-repoctl-prove FR-011", "0007-repoctl-prove FR-013"], "over a real 
   });
 });
 
-proves(["0007-repoctl-prove FR-014"], "the plan job writes the proof plan to the summary of its run and the matrices stay the planner's", async () => {
+proves(["0007-repoctl-prove FR-014"], "the plan job writes the proof plan to the summary of its run, the matrices stay the planner's and the full run is scheduled", async () => {
   const yml = await systemFiles.read(path.join(CHECKOUT, ".github/workflows/ci.auto.yml"));
   assert(yml !== undefined);
   assertStringIncludes(yml, "prove --tier 6 --why $scope");
   assertStringIncludes(yml, 'bun commons/libraries/src/plan.ts $scope --github-output "$GITHUB_OUTPUT"');
   assertStringIncludes(yml, "fromJSON(needs.plan.outputs.linux)");
+  assertStringIncludes(yml, "schedule:");
+  assertStringIncludes(yml, '[ "$GITHUB_EVENT_NAME" = schedule ]');
 });

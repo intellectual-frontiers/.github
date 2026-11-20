@@ -1,7 +1,7 @@
 // Spec: 0007-repoctl-prove FR-011
 /**
  * Which tests a change must run, and which it may leave out (commons repoctl 0007-repoctl-prove FR-011, FR-012, FR-014): a test runs when anything it transitively imports changed (the selector by imports), when a requirement named by
- * a changed file's `// Spec:` line is proved by it (the selector by the trace register), or, for a seam, when its library imports a changed symbol of the provider; a test that reads the tree is never left out; a quarantined test is
+ * a changed file's `// Spec:` line is proved by it (the selector by the trace register), or, for a seam, when its library imports a changed symbol of the provider; a test of a suite that reads the tree is never left out (a seam is about symbols, so it runs the tests that import them); a quarantined test is
  * reported and not run until its expiry; and the key of a result in the cache is a hash of everything that decides it.
  *
  * @remarks
@@ -106,7 +106,6 @@ export function selectSeam(tests: readonly TestReach[], provider: LibraryName, d
     const usage = test.uses.find((u) => u.provider === provider)?.usage;
     const hit = usage !== undefined && (delta.kind === "unknown" || usage.all || (delta.kind === "changed" && usage.names.some((n) => delta.symbols.includes(n))));
     if (hit) run.push({ test, by: "symbol" });
-    else if (test.environmental) run.push({ test, by: "environmental" });
     else left.push(test);
   }
   return { run, left };

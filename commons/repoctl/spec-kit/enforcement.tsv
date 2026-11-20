@@ -59,4 +59,4 @@ requirement	mechanism	by	note
 0007-repoctl-prove FR-011	check	.github: cd commons/repoctl && bun run verify	suite/prove-select.test.ts: selection by imports, trace and symbols, environmental tests never left out, the cache keeps passes under an exact key and a second run takes them
 0007-repoctl-prove FR-012	check	.github: cd commons/repoctl && bun run verify	suite/prove-select.test.ts: a foundation change plans the suites of every foundation library
 0007-repoctl-prove FR-013	check	.github: cd commons/repoctl && bun run verify	suite/prove-select.test.ts: the quarantine record, its expiry, and the seeds of a failing property test
-0007-repoctl-prove FR-014	check	.github: cd commons/repoctl && bun run verify	suite/prove-select.test.ts: the plan job writes the proof plan to the summary and the matrices are the planner of libraries
+0007-repoctl-prove FR-014	check	.github: cd commons/repoctl && bun run verify	suite/prove-select.test.ts: the plan job writes the proof plan to the summary, the matrices are the planner of libraries and the full run is scheduled

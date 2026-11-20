@@ -94,6 +94,8 @@ export type Triggers = {
   readonly pullRequest?: Filter;
   /** Run by hand from the Actions page, with the inputs it asks for (true asks for none). */
   readonly workflowDispatch?: true | { readonly inputs: Readonly<Record<string, DispatchInput>> };
+  /** Run on a schedule: each entry is a cron expression of five fields, in UTC. */
+  readonly schedule?: readonly string[];
   /** Called by another workflow. */
   readonly workflowCall?: true;
 };
