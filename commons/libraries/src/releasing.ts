@@ -47,6 +47,7 @@ import { compareVersions, greaterImpact, type Impact, nextSemVer, parseVersion }
 import { scopeOf, workFolders } from "@intellectual-frontiers/mizan/versions/works";
 import { inputsOf } from "./affected.ts";
 import { exportsLine } from "./plan.ts";
+import { decodeLibrarySource, LIBRARY_FILE, type VersionConstant } from "./libraries.ts";
 import { everyLibrary } from "./affected.ts";
 
 /** The record of the release, from the repository's root. */
@@ -269,7 +270,28 @@ export function writeVersion(repo: string, step: Step): Result<readonly string[]
     writeTextFileSync(at, changed);
     files.push(file);
   }
+  const manifest = decodeLibrarySource(readTextFileSync(join(repo, step.folder, LIBRARY_FILE)));
+  if (manifest.kind === "err") return err(`${step.folder}/${LIBRARY_FILE}: ${manifest.error}`);
+  for (const c of manifest.value.versionConstants ?? []) {
+    const done = writeConstant(repo, step, c);
+    if (done.kind === "err") return done;
+    files.push(done.value);
+  }
   return ok(files);
+}
+
+/** Escapes the characters of a name that a regular expression reads as syntax. */
+const quoted = (name: string): string => name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/** Writes the new version into a constant of the library's sources that holds it (`export const NAME = "1.2.3"`); the file's path from the root, or the problem where the file or the constant is not there. */
+export function writeConstant(repo: string, step: Step, c: VersionConstant): Result<string, string> {
+  const path = `${step.folder}/${c.file}`;
+  const at = join(repo, path);
+  if (!existsSync(at)) return err(`${path} is missing: the manifest names it as holding the version in ${c.name}`);
+  const changed = set(readTextFileSync(at), new RegExp(`(\\b${quoted(c.name)}\\b[^=\\n]*=\\s*)"[^"]*"`), `$1"${step.to}"`);
+  if (changed === undefined) return err(`${path} does not say ${c.name} = "<version>"`);
+  writeTextFileSync(at, changed);
+  return ok(path);
 }
 
 /** What a tarball holds that the comparison reads: the SHA-256 of each file by its path (without the folder `package/`), and the text of its `package.json`. */

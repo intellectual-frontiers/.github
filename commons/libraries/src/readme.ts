@@ -81,6 +81,7 @@ export const ROLE_OF: ReadonlyMap<string, Role> = new Map<string, Role>([
   ["integrations", "program"],
   ["integrations-github", "program"],
   ["libraries", "program"],
+  ["repoctl", "program"],
   ["integrations-fhir", "standard"],
   ["integrations-x12", "standard"],
   ["mizan", "standard"],

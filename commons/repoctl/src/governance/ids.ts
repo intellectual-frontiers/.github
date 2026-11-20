@@ -1,0 +1,71 @@
+// Spec: 0002-repoctl-governance FR-001
+/**
+ * The identities of Repoctl as types that cannot be made wrong (commons repoctl 0002-repoctl-governance FR-001): a library name, a version, an issue number, a session address, a commit subject and a Git reference are values
+ * of a branded type, each made only by its smart constructor, which says why a text is not one. A function that takes one never checks again.
+ *
+ * @example
+ * ```ts
+ * import { parseLibraryName, parseSemver } from "./ids.ts";
+ * parseLibraryName("repoctl").kind; // "ok"
+ * parseSemver("1.2").kind; // "err"
+ * ```
+ *
+ * @module
+ */
+import { err, ok, refine, string, type Brand, type Result } from "@intellectual-frontiers/core";
+
+/** The name of a library of commons: its folder and the end of its package name. */
+export type LibraryName = Brand<string, "library name">;
+/** A version of Semantic Versioning, with an optional pre-release and build part. */
+export type Semver = Brand<string, "semver">;
+/** The number of an issue of the repository, in digits. */
+export type IssueNumber = Brand<string, "issue number">;
+/** The address of a Claude Code session: https, with a host and no credential. */
+export type SessionUrl = Brand<string, "session url">;
+/** The subject line of a commit: one line of at most 100 characters that does not end with a full stop. */
+export type CommitSubject = Brand<string, "commit subject">;
+/** A name Git accepts for a branch, a tag or a remote reference, which does not begin with a dash. */
+export type GitRef = Brand<string, "git ref">;
+
+const LIBRARY = refine(string, "library name", (t) => /^[a-z][a-z0-9-]*$/.test(t) && t.length <= 60);
+const SEMVER = refine(string, "semver", (t) => /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/.test(t));
+const ISSUE = refine(string, "issue number", (t) => /^[1-9]\d{0,8}$/.test(t));
+const SESSION = refine(string, "session url", (t) => /^https:\/\/[A-Za-z0-9.-]+(?:\/[A-Za-z0-9._~%/-]*)?$/.test(t));
+const SUBJECT = refine(string, "commit subject", (t) => t.trim() === t && t !== "" && !t.includes("\n") && t.length <= 100 && !t.endsWith("."));
+const REF = refine(string, "git ref", (t) => t !== "" && !t.startsWith("-") && !/[\s~^:?*[\\]|\.\.|@\{|\/\/|\.lock$|\/$/.test(t));
+
+/** A library name from text, or why the text is not one. */
+export function parseLibraryName(text: string): Result<LibraryName, string> {
+  const r = LIBRARY(text, "name");
+  return r.kind === "ok" ? ok(r.value) : err(`${JSON.stringify(text)} is not a library name: lower-case letters, digits and hyphens, starting with a letter, at most 60 characters`);
+}
+
+/** A version from text, or why the text is not one. */
+export function parseSemver(text: string): Result<Semver, string> {
+  const r = SEMVER(text, "version");
+  return r.kind === "ok" ? ok(r.value) : err(`${JSON.stringify(text)} is not a version of the form 1.2.3, with an optional -pre-release`);
+}
+
+/** An issue number from text (`10` or `#10`), or why the text is not one. */
+export function parseIssueNumber(text: string): Result<IssueNumber, string> {
+  const r = ISSUE(text.startsWith("#") ? text.slice(1) : text, "issue");
+  return r.kind === "ok" ? ok(r.value) : err(`${JSON.stringify(text)} is not an issue number: digits, from 1`);
+}
+
+/** A session address from text, or why the text is not one. */
+export function parseSessionUrl(text: string): Result<SessionUrl, string> {
+  const r = SESSION(text, "session");
+  return r.kind === "ok" ? ok(r.value) : err(`${JSON.stringify(text)} is not a session address: an https address with no user name or password`);
+}
+
+/** A commit subject from text, or why the text is not one. */
+export function parseSubject(text: string): Result<CommitSubject, string> {
+  const r = SUBJECT(text, "subject");
+  return r.kind === "ok" ? ok(r.value) : err("the subject is one line of at most 100 characters, with nothing around it and no full stop at its end");
+}
+
+/** A Git reference from text, or why the text is not one. */
+export function parseGitRef(text: string): Result<GitRef, string> {
+  const r = REF(text, "ref");
+  return r.kind === "ok" ? ok(r.value) : err(`${JSON.stringify(text)} is not a name Git accepts for a reference`);
+}

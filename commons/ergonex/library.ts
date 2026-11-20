@@ -13,6 +13,7 @@ export const library = {
   version: "0.4.7",
   distribution: ["github", "npm"],
   exports: ["."],
+  versionConstants: [{ file: "src/state-record.ts", name: "ERGONEX_VERSION" }],
   summary:
     "The workspaces management of Intellectual Frontiers: one command, `ergonex`, that sets up and operates a team's repositories, tools and shell on Windows, macOS and Linux, with its own specifications.",
 };

@@ -13,6 +13,7 @@
     "./changes": "./src/changes.ts",
     "./check": "./src/check.ts",
     "./dev": "./src/dev.ts",
+    "./family": "./src/family.ts",
     "./generate-ontology": "./src/generate-ontology.ts",
     "./generate-workflows": "./src/generate-workflows.ts",
     "./libraries": "./src/libraries.ts",
