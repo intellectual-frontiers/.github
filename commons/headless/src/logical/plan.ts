@@ -159,7 +159,7 @@ export type RunPlanOptions = {
 };
 
 /** The argument vector of a step in a mode; none where the tool has no check mode. */
-export function argvOf(step: ExecStep, mode: ExecMode): readonly string[] | undefined {
+export function vectorOf(step: ExecStep, mode: ExecMode): readonly string[] | undefined {
   switch (mode) {
     case "check":
       return step.check;
@@ -201,7 +201,7 @@ export async function runPlan(executor: Executor, plan: ExecutionPlan, request: 
   let stop = false;
   for (const [index, step] of plan.steps.entries()) {
     tell({ kind: "started", step: step.id, summary: step.summary, mode, index, total });
-    const argv = argvOf(step, mode);
+    const argv = vectorOf(step, mode);
     let result: StepResult;
     if (stop || o.signal?.aborted === true) result = { id: step.id, mode, outcome: "skipped", code: undefined };
     else if (argv === undefined) result = { id: step.id, mode, outcome: "unsupported", code: undefined };

@@ -16,7 +16,9 @@
     "./targets/ssh": "./src/targets/ssh/mod.ts",
     "./ssh-inbound": "./src/surfaces/ssh-inbound/mod.ts",
     "./otel": "./src/otel/mod.ts",
-    "./askpass": "./src/surfaces/askpass/mod.ts"
+    "./askpass": "./src/surfaces/askpass/mod.ts",
+    "./mcp": "./src/surfaces/mcp/mod.ts",
+    "./rest": "./src/surfaces/rest/mod.ts"
   },
   "scripts": {
     "check": "tsc -p tsconfig.json",

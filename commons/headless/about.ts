@@ -14,7 +14,8 @@ export const about: About = {
   summary:
     "The contract of a program that has no window, in layers: governance (what an action is and may do: its kind, effect, audience, confirmation, the problems it finds, the one table of exit statuses, redaction), " +
     "the logical layer (the command model, the typed outcome, the closing block, JSON and SARIF, explain, hints, nested runs) and surfaces that draw it, of which the command line is the first " +
-    "(calm output, prompts, the run log, signals, generated help, completions and man pages; a tool server and a REST surface slot in beside it). An optional OpenTelemetry adapter has an entry of its own. " +
+    "(calm output, prompts, the run log, signals, generated help, completions and man pages; the tool server, the REST skeleton and the credential prompt are beside it). An optional OpenTelemetry adapter has an entry of its own. " +
+    "Composition builds one program from a host and plugin packages (`compose`), audience tiers decide which verbs a caller sees (`tierGate`), the credential port asks for a passphrase once per command and keeps it in memory only, and the executor runs a plan in check or apply mode with a hash a signature can cover. " +
     "Published to npm as compiled modules with their declarations; it depends on Core, the terminal and the system, and on the telemetry only for the adapter.",
   folders: [
     { path: "spec-kit/", what: "The library's own specifications, numbered from 0001.", mayImport: ["nothing: Markdown and TSV"] },
@@ -28,6 +29,21 @@ export const about: About = {
       path: "src/surfaces/cli/",
       what: "Layer 3: the command-line surface (the renderer, prompts, the run log and hints store, signals, help, completions, man, the run boundary, the launcher).",
       mayImport: ["governance and logical, by package name", "core, the terminal and the system, by package name"],
+    },
+    {
+      path: "src/surfaces/askpass/",
+      what: "The credential port's terminal adapter (with the pure reader of its bytes and a row of devices for each system) and the contract of an `SSH_ASKPASS` helper with its launcher.",
+      mayImport: ["governance and logical, by package name", "core and the system, by package name"],
+    },
+    {
+      path: "src/surfaces/mcp/",
+      what: "The tool server: tools generated from governance by the caller's tier, the JSON-RPC 2.0 server of the Model Context Protocol as a function from a line to a line, and the standard streams as its transport.",
+      mayImport: ["governance and logical, by package name", "core and the system, by package name"],
+    },
+    {
+      path: "src/surfaces/rest/",
+      what: "The REST surface, as a skeleton: the OpenAPI 3.1 document of a program for the caller's tier.",
+      mayImport: ["governance and logical, by package name"],
     },
     {
       path: "src/otel/",

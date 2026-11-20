@@ -35,6 +35,8 @@ const EXPORTS: Record<string, string> = {
   "./ssh-inbound": "./src/surfaces/ssh-inbound/mod.ts",
   "./otel": "./src/otel/mod.ts",
   "./askpass": "./src/surfaces/askpass/mod.ts",
+  "./mcp": "./src/surfaces/mcp/mod.ts",
+  "./rest": "./src/surfaces/rest/mod.ts",
 };
 const at = (path: string, text: string) => ({ path, text });
 const rules = (files: readonly { path: string; text: string }[]): string[] => importFindings(TABLE, files, EXPORTS).map((f) => f.rule);
@@ -72,6 +74,8 @@ proves(["0001-headless-layers FR-002"], "imports point one way: below may not im
   assertEquals(rules([at("src/surfaces/cli/a.ts", `import { x } from "${PKG}/logical";\nimport { y } from "${PKG}/governance";\n`)]), []);
   assertEquals(importing("src/surfaces/cli/a.ts", `${PKG}/otel`), ["layers/around"]);
   assertEquals(importing("src/surfaces/ssh-inbound/a.ts", `${PKG}/cli`), ["layers/around"], "a surface beside another");
+  assertEquals(importing("src/surfaces/mcp/a.ts", `${PKG}/cli`), ["layers/around"], "a tool server does not import the command line: the host wires its runner");
+  assertEquals(importing("src/surfaces/rest/a.ts", `${PKG}/mcp`), ["layers/around"]);
   assertEquals(importing("src/otel/a.ts", `${PKG}/cli`), []);
   assertEquals(importing("src/surfaces/cli/a.ts", `${PKG}/cli`), [], "a unit may always import itself");
 });
@@ -118,7 +122,7 @@ proves(["0001-headless-layers FR-005"], "the command-line surface may not import
 proves(["0001-headless-layers FR-006"], "a surface is one folder with one row of the table; a folder with no row is layers/unclassified, and its row says what it may import", () => {
   assertEquals(
     TABLE.units.filter((u) => u.folder.startsWith("src/surfaces/")).map((u) => u.folder),
-    ["src/surfaces/cli/", "src/surfaces/ssh-inbound/", "src/surfaces/askpass/"],
+    ["src/surfaces/cli/", "src/surfaces/ssh-inbound/", "src/surfaces/askpass/", "src/surfaces/mcp/", "src/surfaces/rest/"],
   );
   // the folder `src/` is the library's own for its entry, `mod.ts`; so that a surface cannot appear without a row, every folder under `src/surfaces/` and `src/targets/` is held to be a unit of the table
   const rows = new Set(TABLE.units.map((u) => u.folder as string));

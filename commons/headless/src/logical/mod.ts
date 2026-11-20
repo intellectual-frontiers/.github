@@ -22,6 +22,7 @@ export * from "./executor.ts";
 export * from "./explain.ts";
 export * from "./fix.ts";
 export * from "./hints.ts";
+export * from "./machine-args.ts";
 export * from "./machine.ts";
 export * from "./model.ts";
 export * from "./nested.ts";
