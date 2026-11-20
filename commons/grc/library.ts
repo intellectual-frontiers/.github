@@ -10,7 +10,7 @@ export const library = {
   level: "L1",
   specKit: "spec-kit",
   verify: "bun run verify",
-  version: "0.2.1",
+  version: "0.2.2",
   distribution: ["github", "npm"],
   exports: [".", "./governance", "./logical", "./physical", "./conformance", "./standard", "./serializers/oscal", "./serializers/ocsf", "./serializers/sarif", "./serializers/cyclonedx", "./serializers/intoto", "./runners/sql", "./runners/file", "./runners/api", "./runners/remote", "./runners/manual", "./runners/external", "./stores/memory", "./stores/files", "./stores/git", "./stores/object", "./signers/dsse", "./surfaces/headless"],
   summary:
