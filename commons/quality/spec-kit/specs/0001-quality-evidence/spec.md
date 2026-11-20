@@ -108,7 +108,7 @@
 
 ## Trust: The Trust page
 
-- **FR-052**: A Trust page MUST be generated, never written by hand, from the evidence of a harness (the files of the `quality` branch and the index derived from them, FR-021 and commons 0022-trust FR-019) and its specifications, and the generator's `--check` MUST fail where the page differs from what the evidence makes.
+- **FR-052**: A Trust page MUST be generated, never written by hand, from the evidence of a harness (the files of the `quality` branch and the index derived from them, FR-021) and its specifications, and the generator's `--check` MUST fail where the page differs from what the evidence makes.
 - **FR-053**: The page MUST show, for the revision it was made at, each requirement with its grade (`ifqs:EvidenceGrade`), its freshness (`ifqs:FreshnessState`) and the day and run of its last proof, the review debt (`ifqs:ReviewDebt`), each objective with its target and the error budget that remains (`ifqs:QualityObjective`), and the count of `not_run` cases beside the counts of passed and failed.
 - **FR-054**: The page MUST show failures: each failed case, each open nonconformance with its age and each open CAPA MUST be listed before any success, and the page MUST NOT drop, hide or reorder a failure to improve a figure.
 - **FR-055**: The page MUST state its scope (the harness, the revision, the day it was generated and the span of evidence it covers) and what it does not cover, and MUST NOT state that a harness conforms to, is certified to or complies with a standard, a regulation or a control.
