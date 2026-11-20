@@ -46,14 +46,37 @@ proves(
       await fs.writeTextFile(path.join(project, "package.json"), '{ "name": "consumer", "private": true, "type": "module" }\n');
       const published: { name: string; manifest: Json }[] = [];
       for (const lib of npmLibraries()) {
+        let installLog = "";
         // a library packs from its own installed tools (the compiler, the links to the libraries it depends on): a job that has not installed it does so, as a person's first `bun run verify` does
         // (an install of a folder that links to it leaves a `node_modules` of its own behind, so the compiler is what says the tools are there)
         if (!fs.existsSync(path.join(lib.dir, "node_modules", "typescript"))) {
           const installed = await sh([bun, "install", "--frozen-lockfile"], lib.dir);
           assertEquals(installed.code, 0, `${lib.name}: bun install: ${installed.out}`);
+          installLog = installed.out;
         }
+        // a `link:` dependency that the install left unlinked is linked as the install does (a folder of this repository, next to the library)
+        const own = obj(JSON.parse(await fs.readTextFile(path.join(lib.dir, "package.json"))));
+        for (const [dep, spec] of [...Object.entries(obj(own["dependencies"])), ...Object.entries(obj(own["devDependencies"]))]) {
+          if (typeof spec !== "string" || !spec.startsWith("link:")) continue;
+          const at = path.join(lib.dir, "node_modules", ...dep.split("/"));
+          if (fs.existsSync(at)) continue;
+          await fs.mkdir(path.dirname(at), { recursive: true });
+          await fs.symlink(path.resolve(lib.dir, spec.slice("link:".length)), at);
+        }
+        const scope = path.join(lib.dir, "node_modules", "@intellectual-frontiers");
         const packed = await sh([bun, "tools/pack.ts"], lib.dir);
-        assertEquals(packed.code, 0, `${lib.name}: ${packed.out}`);
+        assertEquals(
+          packed.code,
+          0,
+          `${lib.name}: ${packed.out.slice(0, 1500)}\n(install: ${installLog.slice(0, 600)}; ${path.join(lib.dir, "node_modules")} holds ${
+            fs.existsSync(scope)
+              ? fs
+                  .readDirSync(scope)
+                  .map((e) => e.name)
+                  .join(", ")
+              : "no scope"
+          })`,
+        );
         // the packer prints the path of the tarball (the bundlers of the commands print what `bun pm pack` says besides)
         const tarball = (packed.out.match(/\S+\.tgz/g) ?? []).at(-1) ?? "";
         assert(tarball.endsWith(".tgz") && fs.existsSync(tarball), `${lib.name}: no tarball in ${packed.out}`);
