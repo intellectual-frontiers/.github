@@ -20,3 +20,5 @@ requirement	mechanism	by	note
 0003-toolchain-logical FR-004	check	.github: cd commons/toolchain && bun run verify	suite/logical.test.ts: a tool no dialect can carry out is refused with every reason, and a source-building dialect is never chosen
 0003-toolchain-logical FR-005	check	.github: cd commons/toolchain && bun run verify	suite/logical.test.ts: planTools says none, install or replace, and counts a path copy only where policy allows
 0003-toolchain-logical FR-006	check	.github: cd commons/toolchain && bun run verify	suite/logical.test.ts: requirementsFor gives requirements of kind tool that an order of archon is built from
+0002-toolchain-governance FR-008	check	.github: cd commons/toolchain && bun run verify	suite/governance.test.ts: a tool holds no version or hash of a pin, only the id of the pin
+0003-toolchain-logical FR-007	check	.github: cd commons/toolchain && bun run verify	suite/logical.test.ts: the downloads come from a PinSource, a pin with no download or a version below the minimum is a reason, and the library does not read the ontology
