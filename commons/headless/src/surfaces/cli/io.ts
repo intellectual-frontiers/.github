@@ -1,4 +1,5 @@
 // Spec: 0004-headless-cli FR-011, FR-015
+// Spec: 0008-exit-style-consent FR-002
 /**
  * What a run of the command line is given about its world (commons headless 0004-headless-cli FR-011): the environment, what each stream is, the clock,
  * a line of input, the files of its state, the signals, a timer for the spinner, and an observer. Everything is a value or a function, so that
@@ -70,6 +71,8 @@ export type Io = {
   readonly signals?: SignalPort;
   readonly timer?: TimerPort;
   readonly observer?: RunObserver;
+  /** How the marks are written: `plain` (ASCII), `emoji`, or `auto` (the default): plain unless the stream is a terminal that shows emoji and nothing asks for plain (`NO_COLOR`, `--no-color`, the program's `_PLAIN`). */
+  readonly marks?: "auto" | "emoji" | "plain";
   /** Where `--on <target>` runs a command: the executor of each target by its id (the ssh executor of `targets/ssh`, given by the program that wires them). */
   readonly executors?: ExecutorFor;
   /** Output as it is written (the host streams it; a test leaves it out and reads the result). */

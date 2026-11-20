@@ -1,4 +1,5 @@
 // Spec: 0003-headless-output FR-002
+// Spec: 0008-exit-style-consent FR-001
 /**
  * The typed outcome of a command (commons headless 0003-headless-output FR-002): what a verb returns instead of printing. A report's data and its
  * text, the problems the run found, the lines it wants seen, the optional features it noticed are off (hints), the steps it spells out for the
@@ -14,7 +15,7 @@
  *
  * @module
  */
-import { type Problem } from "@intellectual-frontiers/headless/governance";
+import { moreSevere, type Problem, type RunExit } from "@intellectual-frontiers/headless/governance";
 
 /** An optional feature that is merely off: a hint, not a problem. */
 export type Hint = {
@@ -58,6 +59,8 @@ export type Outcome<D = unknown> = {
   readonly title: string | undefined;
   /** Whether the run was stopped by the person before it ended. */
   readonly cancelled: boolean;
+  /** The exit the command names for its run (0008-exit-style-consent FR-001): `usage` or `environment` where its problem is of that kind; none where the problems say it. */
+  readonly exit: RunExit | undefined;
 };
 
 /** What `outcomeOf` takes besides the data. */
@@ -70,6 +73,7 @@ export type OutcomeFields = {
   readonly findings?: readonly Finding[];
   readonly title?: string;
   readonly cancelled?: boolean;
+  readonly exit?: RunExit;
 };
 
 /** An outcome with the data and the fields given; the rest is empty. */
@@ -84,11 +88,17 @@ export function outcomeOf<D>(data: D, fields: OutcomeFields = {}): Outcome<D> {
     findings: fields.findings ?? [],
     title: fields.title,
     cancelled: fields.cancelled ?? false,
+    exit: fields.exit,
   };
 }
 
 /** The outcome of a run that found nothing and has nothing to say. */
 export const NOTHING: Outcome<null> = outcomeOf(null);
+
+/** The outcome with the exit its command names. */
+export function withExit<D>(o: Outcome<D>, exit: RunExit): Outcome<D> {
+  return { ...o, exit };
+}
 
 /** The outcome with one more problem at the end. */
 export function withProblem<D>(o: Outcome<D>, p: Problem): Outcome<D> {
@@ -110,6 +120,7 @@ export function mergeOutcomes<D>(first: Outcome<D>, second: Outcome<unknown>): O
     findings: [...first.findings, ...second.findings],
     title: first.title ?? second.title,
     cancelled: first.cancelled || second.cancelled,
+    exit: moreSevere(first.exit, second.exit),
   };
 }
 

@@ -117,8 +117,12 @@ proves(["0002-headless-governance FR-010"], "a run ends with findings where anyt
 proves(["0002-headless-governance FR-011"], "redaction masks URL passwords, secret settings and given secrets, longest first, and leaves other text alone", () => {
   assertEquals(redact("connect postgres://app:hunter22@db:5432/x failed"), "connect postgres://app:***@db:5432/x failed");
   assertEquals(redact("password=hunter22 host=db"), "password=*** host=db");
-  assertEquals(redact('token: "abc def" next'), 'token: *** next');
-  assertEquals(redact("API_KEY=sk-123456 and PASSPHRASE='a b'"), "API_KEY=*** and PASSPHRASE=***");
+  // a key is secret only where the program declares it; a line that merely looks like KEY: text is prose
+  assertEquals(redact('token: "abc def" next'), 'token: "abc def" next');
+  assertEquals(redact("API_KEY=sk-123456 and PASSPHRASE='a b'"), "API_KEY=sk-123456 and PASSPHRASE='a b'");
+  assertEquals(redact("API_KEY=sk-123456 and PASSPHRASE='a b'", [], { keys: ["API_KEY", "PASSPHRASE"] }), "API_KEY=*** and PASSPHRASE=***");
+  assertEquals(redact('{"APP_TOKEN": "abc", "other": "x"}', [], { keys: ["APP_TOKEN"] }), '{"APP_TOKEN": "***", "other": "x"}');
+  assertEquals(redact("my.APP_TOKEN=abc"), "my.APP_TOKEN=abc", "undeclared");
   assertEquals(redact("the key is s3cr3t-value-1 and s3cr3t-value", ["s3cr3t-value", "s3cr3t-value-1"]), `the key is ${MASK} and ${MASK}`);
   assertEquals(redact("abc and ab", ["abc", "ab"]), "abc and ab");
   assertEquals(redact("nothing secret here, at all"), "nothing secret here, at all");

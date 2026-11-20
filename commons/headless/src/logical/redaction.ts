@@ -58,6 +58,7 @@ export function redactOutcome<D>(o: Outcome<D>, redact: Redactor): Outcome<D> {
     findings: o.findings.map((f) => redactFinding(f, redact)),
     title: o.title === undefined ? undefined : redact(o.title),
     cancelled: o.cancelled,
+    exit: o.exit,
   };
 }
 
