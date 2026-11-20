@@ -251,5 +251,5 @@ proves([`${DIST} FR-001`, `${DIST} FR-003`, `${DIST} FR-018`], "the root is priv
   for (const part of ["How other repositories use commons", "@intellectual-frontiers/commons", "repoctl hygiene", "npm.pkg.github.com", "Metapackage"]) assertStringIncludes(readme, part);
   assert(existsSync(join(ROOT, "commons", "docs", "guides", "consuming-commons.md")));
   const config = readTextFileSync(join(ROOT, "commons", "docs.config.ts"));
-  assertEquals(config.split("consuming-commons").length - 1, 1, "one entry");
+  assertEquals(config.split("guides/consuming-commons.md").length - 1, 1, "one entry");
 });
