@@ -29,7 +29,7 @@ export const about: About = {
     },
     {
       path: "runtime/",
-      what: "What is left of the host: the reader of the files the trace check judges (`trace`) and the run of a suite of tests as evidence (`test-run`). The files, paths and processes are the library `system`, the network is `net`, the signals are `telemetry`, tests are `test` and GRC engineering, with its loaders and signers, is `grc`, each imported by package name.",
+      what: "What is left of the host: the reader of the files the trace check judges (`trace`) and the quality system moved to the library `quality`. The files, paths and processes are the library `system`, the network is `net`, the signals are `telemetry`, tests are `test` and GRC engineering, with its loaders and signers, is `grc`, each imported by package name.",
       mayImport: ["node: builtins", "kernel/", "runtime/", "the lifted libraries, by package name"],
     },
     {
@@ -45,11 +45,6 @@ export const about: About = {
       ],
     },
     {
-      path: "quality/",
-      what: "IFC Quality (commons 0021-ifqs): the canonical record of a run (`not_run`, the grade E0 to E5, CTRF case bodies), its JUnit, CTRF, SARIF and TAP renderings, the evidence chain, and the append-only `quality` branch with its notes, written and verified with real `git`; Tier 1 (the ladder, freshness, the ledger of nonconformances and CAPA, objectives, the index) and Tier 2 (`attestation/`: pre-registered plans, attested samples, mutation runs, the agents' reviews; `trust/`: the Trust page and its audiences; `assessor/`: the assessor pack and its offline verifier, commons 0022-trust). `pure/` imports the kernel alone.",
-      mayImport: ["node: builtins", "kernel/", "runtime/", "quality/"],
-    },
-    {
       path: "workflows/",
       what: "The typed model of GitHub Actions workflows and composite actions (commons 0030-generated-workflows): the model, its rendering to YAML, the workflows of this repository as values, and the copy of the schema of GitHub's workflows. It moves with the library `libraries` (commons 0032-lifting-libraries).",
       mayImport: ["kernel/", "runtime/", "workflows/"],
@@ -57,7 +52,7 @@ export const about: About = {
     {
       path: "node/",
       what: "The Node hook that strips the types of this package's sources under `node_modules`, and the command `ifc`, in JavaScript.",
-      mayImport: ["node: builtins", "tools/test.ts, once the hook is registered"],
+      mayImport: ["node: builtins", "the quality library's test command, once the hook is registered"],
     },
     {
       path: "tools/",
@@ -92,14 +87,6 @@ export const about: About = {
       does: "Offline, with no Git host: for each capability the commits of the range serve, its requirements and, for each, the terms, code and tests on each rung and the stage where the chain ends, as a table or as JSON (`--format json`).",
     },
     { run: "bun run test:node", does: "Runs the suite under Node 26." },
-    {
-      run: "bun quality/quality.ts record|verify|render",
-      does: "Keeps the record of a run on the append-only quality branch (a file, a signed commit, a note on the tested commit), verifies the branch and its chain, and renders a record as JUnit, CTRF, SARIF, TAP or the 29119-3 documents.",
-    },
-    {
-      run: "bun quality/quality.ts trust|pack|verify-pack|plan|sample|mutation|agents",
-      does: "Tier 2 of the quality system: writes the Trust page for an audience (public, assessor, internal) and checks it, writes the signed assessor pack and verifies one offline (the verifier is inside the pack), registers a test plan before its run, draws a sample by a seed and records a person's attestation of it, records a mutation report and shows the strength of each proof beside its grade, and judges the sampling of the agents' reviews.",
-    },
     {
       run: "bun run test:evidence",
       does: "Runs the suite on Bun and Node into one OTLP record, its TAP, JUnit, CTRF, SARIF, OSCAL and completion reports, and the ledger.",
@@ -148,7 +135,7 @@ export const about: About = {
   ],
   areas: [
     { title: "Kernel", slug: "kernel", entryPoints: ["kernel/mod.ts"] },
-    { title: "Runtime", slug: "runtime", entryPoints: ["runtime/mod.ts", "runtime/test-run.ts"] },
+    { title: "Runtime", slug: "runtime", entryPoints: ["runtime/mod.ts"] },
   ],
   examples: [{ file: "examples/use.ts", what: "What a harness imports once it depends on commons by Git." }],
 };

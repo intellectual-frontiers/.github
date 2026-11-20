@@ -17,9 +17,8 @@ import process from "node:process";
 import { clientFor, parseRemote } from "@intellectual-frontiers/githost";
 import { type Deps, type RuleResult, run as changes } from "@intellectual-frontiers/libraries/changes";
 import { parseSpanId, parseTraceId, type SpanId, type TraceId } from "@intellectual-frontiers/telemetry/otel";
-import { readRecord } from "../kernel/test-report.ts";
-import { keepRun, writeOnce } from "../quality/host/branch.ts";
-import { checkRun } from "../quality/pure/record.ts";
+import { keepRun, writeOnce } from "@intellectual-frontiers/quality/host/branch";
+import { checkRun } from "@intellectual-frontiers/quality/pure/record";
 import { mkdir } from "@intellectual-frontiers/system/fs";
 import { join, resolve } from "@intellectual-frontiers/system/path";
 import { build, env, run, runtimeName, runtimeVersion } from "@intellectual-frontiers/system/proc";
@@ -136,7 +135,7 @@ export async function main(argv: readonly string[]): Promise<number> {
   const i = s.rest.indexOf("--repo");
   const repo = resolve((i >= 0 ? s.rest[i + 1] : undefined) ?? process.cwd());
   let captured: readonly RuleResult[] | undefined;
-  let deps: Deps = { onRules: (r) => void (captured = r), readTestRecord: readRecord };
+  let deps: Deps = { onRules: (r) => void (captured = r) };
   if (s.rest.includes("--strict")) {
     const origin = await run(["git", "-C", repo, "remote", "get-url", "origin"]);
     const parsed = origin.code === 0 ? parseRemote(origin.stdout.trim()) : undefined;

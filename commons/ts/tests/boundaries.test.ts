@@ -125,7 +125,7 @@ proves(["0005-typescript-runtime FR-002"], "the kernel imports nothing outside k
 });
 
 proves(["0005-typescript-runtime FR-003"], "the runtime imports only node: builtins, kernel/ and runtime/", () => {
-  assert(RUNTIME.length > 1);
+  assert(RUNTIME.length >= 1);
   const bad: string[] = [];
   for (const f of RUNTIME) {
     for (const s of specifiers(readTextFileSync(join(ROOT, f)))) {
@@ -231,6 +231,7 @@ proves(
       "@intellectual-frontiers/mizan": "link:../mizan",
       "@intellectual-frontiers/net": "link:../net",
       "@intellectual-frontiers/ontology": "link:../ontology",
+      "@intellectual-frontiers/quality": "link:../quality",
       "@intellectual-frontiers/rdf": "link:../rdf",
       "@intellectual-frontiers/system": "link:../system",
       "@intellectual-frontiers/telemetry": "link:../telemetry",
@@ -293,8 +294,6 @@ proves(
     assertEquals(m.exports, {
       "./ts/kernel": "./kernel/mod.ts",
       "./ts/runtime": "./runtime/mod.ts",
-      "./ts/runtime/test-run": "./runtime/test-run.ts",
-      "./ts/quality": "./quality/mod.ts",
       "./ts/node": "./node/register.mjs",
     });
     for (const target of Object.values(m.exports)) assert(existsSync(join(ROOT, target)), target);
@@ -321,6 +320,7 @@ proves(
       "@intellectual-frontiers/mizan": "0.1.0",
       "@intellectual-frontiers/net": "0.1.0",
       "@intellectual-frontiers/ontology": "0.1.2",
+      "@intellectual-frontiers/quality": "0.1.1",
       "@intellectual-frontiers/rdf": "0.1.0",
       "@intellectual-frontiers/system": "0.1.0",
       "@intellectual-frontiers/telemetry": "0.1.0",
@@ -335,7 +335,7 @@ proves(
     const ifc = lf(readTextFileSync(join(ROOT, "node", "ifc.mjs")));
     assert(ifc.startsWith("#!/usr/bin/env node\n"), "ifc runs from a shebang");
     assert(
-      ifc.indexOf('import "./register.mjs"') < ifc.indexOf('import("../tools/test.ts")'),
+      ifc.indexOf('import "./register.mjs"') < ifc.indexOf('import("@intellectual-frontiers/quality/test-cli")'),
       "ifc registers the hook before it imports TypeScript",
     );
   },

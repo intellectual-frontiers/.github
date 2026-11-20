@@ -311,7 +311,7 @@ export const conformanceRequirements = codes(
       label: en("IFQS"),
       definition: en("The quality records of the subject are kept and judged (0021-ifqs)."),
       rule: [],
-      enforcedBy: ["bun commons/ts/quality/quality.ts"],
+      enforcedBy: ["bun commons/quality/src/quality.ts"],
     },
   },
 );

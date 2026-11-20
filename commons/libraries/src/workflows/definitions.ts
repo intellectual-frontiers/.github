@@ -219,6 +219,13 @@ export const LIBRARY_CI: Readonly<Record<string, LibraryCi>> = {
     nodeTests: 'node --test "suite/**/*.test.ts"',
     systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
   },
+  quality: {
+    comment: lines(
+      "Quality, the quality system of commons (the record of a run as evidence, the quality branch, the ladder, the ledger, the Trust page and the assessor pack), a library lifted out of `commons/ts`",
+      "(commons 0032-lifting-libraries): its own `verify` on Bun and its tests, which run a real Git, on Node 26, on Linux.",
+    ).trimEnd(),
+    nodeTests: 'node --test "suite/**/*.test.ts"',
+  },
   ergonex: {
     comment: lines(
       "Ergonex, the workspaces management of Intellectual Frontiers, a library of commons (commons 0027-commons-libraries FR-010): its own `verify` on Bun and its tests on Node 26, the backup runtime,",
@@ -335,7 +342,7 @@ const ifcTypescript: Workflow = {
         run(
           lines(
             `grep -E '^000[5-8]-' ../spec-kit/enforcement.tsv >"$RUNNER_TEMP/requirements.tsv"`,
-            "bun tools/test.ts run --runtime ${{ matrix.runtime }} --out test-results \\",
+            "bun ../quality/src/test-cli.ts run --runtime ${{ matrix.runtime }} --out test-results \\",
             "  --report tap,junit,ctrf,sarif,md,html,oscal \\",
             '  --requirements "$RUNNER_TEMP/requirements.tsv" --reviewed ci-reviewed.tsv \\',
             "  --ledger test-results/ledger.jsonl tests",

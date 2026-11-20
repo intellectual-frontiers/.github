@@ -27,6 +27,7 @@
 import process from "node:process";
 import type { GitHostClient, RepoRef } from "@intellectual-frontiers/githost/types";
 import { formatBaseline, judge, parseBaseline, passes, report } from "@intellectual-frontiers/mizan/trace";
+import { readRecord } from "@intellectual-frontiers/quality/test-report";
 import { existsSync, readDirSync, readTextFileSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { formatGitError } from "@intellectual-frontiers/system/git";
 import { cwd } from "@intellectual-frontiers/system/proc";
@@ -92,14 +93,7 @@ export type RuleResult = {
 const WITHOUT_RANGE: readonly string[] = ["changes/declaration", "changes/gate-relaxed"];
 
 /** What the command is given besides its arguments: the host's client and the repository it serves, which the command never makes, and where it writes. */
-/** What the command needs of a test record: for each test, the requirements it names and its outcome. The record is the OTLP document of a test run (commons 0008-test-evidence). */
-export type TestRecordReader = (
-  text: string,
-) => { readonly kind: "ok"; readonly value: { readonly tests: readonly { readonly requirements: readonly string[]; readonly outcome: RunCase["outcome"] }[] } } | { readonly kind: "err" };
-
 export type Deps = {
-  /** Reads a test record, which `--runs` names; the library holds no reader of it (the test evidence is the quality library's), so whoever wires the command passes it. */
-  readonly readTestRecord?: TestRecordReader;
   /** Called once with each rule's result where the check judged commits or a declaration (0020-ifccm FR-031), so that the caller can keep it as a record. */
   readonly onRules?: (rules: readonly RuleResult[]) => void;
   readonly client?: GitHostClient;
@@ -220,7 +214,6 @@ async function offlineTrace(
   repo: string,
   value: (name: string) => string | undefined,
   log: (t: string) => void,
-  readTestRecord: TestRecordReader,
 ): Promise<{ readonly result: CapabilityTraceResult; readonly record: ViewRecord } | number> {
   const read = await readRangeFacts(repo, value("--range") ?? "");
   if (read.kind === "err") {
@@ -261,7 +254,7 @@ async function offlineTrace(
   const runsFile = exists("--runs");
   if (runsFile === "") return 3;
   if (runsFile !== undefined) {
-    const rec = readTestRecord(readTextFileSync(runsFile));
+    const rec = readRecord(readTextFileSync(runsFile));
     if (rec.kind === "err") {
       log(`changes: ${runsFile} is not a test record\n`);
       return 3;
@@ -291,8 +284,6 @@ async function offlineTrace(
   });
   return { result, record };
 }
-
-const NO_RECORD_READER: TestRecordReader = () => ({ kind: "err" });
 
 /** Run the command; the exit status (0 clean, 1 findings, 2 usage, 3 environment). */
 export async function run(
@@ -441,7 +432,7 @@ export async function run(
   // the capabilities and their chains, from the commits and the files alone (0020-ifccm FR-035 to FR-038)
   let traced: { readonly result: CapabilityTraceResult; readonly record: ViewRecord } | undefined;
   if (offline) {
-    const made = await offlineTrace(repo, value, log, deps.readTestRecord ?? NO_RECORD_READER);
+    const made = await offlineTrace(repo, value, log);
     if (typeof made === "number") return made;
     traced = made;
     const text = traceOutput(made.result, format);
@@ -528,7 +519,7 @@ export async function run(
         log(`changes: ${rf} does not exist\n`);
         return 3;
       }
-      const rec = (deps.readTestRecord ?? NO_RECORD_READER)(readTextFileSync(rf));
+      const rec = readRecord(readTextFileSync(rf));
       if (rec.kind === "err") {
         log(`changes: ${rf} is not a test record\n`);
         return 3;

@@ -6,8 +6,6 @@
   "exports": {
     "./ts/kernel": "./commons/ts/kernel/mod.ts",
     "./ts/runtime": "./commons/ts/runtime/mod.ts",
-    "./ts/runtime/test-run": "./commons/ts/runtime/test-run.ts",
-    "./ts/quality": "./commons/ts/quality/mod.ts",
     "./ts/node": "./commons/ts/node/register.mjs",
     "./docs": "./commons/docs/mod.ts",
     "./ontology/mizan": "./commons/ontology/src/mizan/mod.ts"
@@ -28,6 +26,7 @@
     "@intellectual-frontiers/mizan": "0.1.0",
     "@intellectual-frontiers/net": "0.1.0",
     "@intellectual-frontiers/ontology": "0.1.2",
+    "@intellectual-frontiers/quality": "0.1.1",
     "@intellectual-frontiers/rdf": "0.1.0",
     "@intellectual-frontiers/system": "0.1.0",
     "@intellectual-frontiers/telemetry": "0.1.0",

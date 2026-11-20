@@ -29,6 +29,7 @@
     "@intellectual-frontiers/libraries": "link:../libraries",
     "@intellectual-frontiers/mizan": "link:../mizan",
     "@intellectual-frontiers/net": "link:../net",
+    "@intellectual-frontiers/quality": "link:../quality",
     "@intellectual-frontiers/system": "link:../system",
     "@intellectual-frontiers/telemetry": "link:../telemetry",
     "@intellectual-frontiers/terminal": "link:../terminal",

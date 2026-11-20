@@ -20,7 +20,7 @@ import { existsSync, mkdirSync, readTextFileSync, withTempDir, writeTextFileSync
 import { dirname, join } from "@intellectual-frontiers/system/path";
 import { run as spawn } from "@intellectual-frontiers/system/proc";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
-import { needsGit } from "./quality-fixtures.ts";
+import { needsGit } from "./git-fixtures.ts";
 
 // ------------------------------------------------------------------------------------------------------------------------------- fixtures
 

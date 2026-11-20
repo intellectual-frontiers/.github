@@ -13,6 +13,7 @@
         "@intellectual-frontiers/mizan": "0.1.0",
         "@intellectual-frontiers/net": "0.1.0",
         "@intellectual-frontiers/ontology": "0.1.2",
+        "@intellectual-frontiers/quality": "0.1.1",
         "@intellectual-frontiers/rdf": "0.1.0",
         "@intellectual-frontiers/system": "0.1.0",
         "@intellectual-frontiers/telemetry": "0.1.0",
@@ -49,6 +50,8 @@
     "@intellectual-frontiers/net": ["@intellectual-frontiers/net@0.1.0", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.1", "@intellectual-frontiers/crypto": "0.1.1", "@intellectual-frontiers/formats": "0.1.1", "@intellectual-frontiers/system": "0.1.1", "@intellectual-frontiers/telemetry": "0.1.1" } }, "sha512-ZUKbf/XnmnVHSWrP4KExWKWRm3l+u7PAjeDKL4LcWvez+axZRZpVs/JiBljciwwZagGj5002GkEwTgnq1L6+iQ=="],
 
     "@intellectual-frontiers/ontology": ["@intellectual-frontiers/ontology@0.1.2", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.3", "@intellectual-frontiers/rdf": "0.1.3" } }, "sha512-e6vtnwHJfO6KNsr4JSNZbZRNCzMn28lSz5OrnGFudBdOPfsQ5oqysgK65EnH62YCH7f2mz4CKiGoVQEhHm2WSQ=="],
+
+    "@intellectual-frontiers/quality": ["@intellectual-frontiers/quality@0.1.1", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.3", "@intellectual-frontiers/crypto": "0.1.3", "@intellectual-frontiers/formats": "0.1.3", "@intellectual-frontiers/grc": "0.1.1", "@intellectual-frontiers/mizan": "0.1.0", "@intellectual-frontiers/system": "0.1.3", "@intellectual-frontiers/telemetry": "0.1.3", "@intellectual-frontiers/terminal": "0.1.3", "@intellectual-frontiers/test": "0.1.1" } }, "sha512-WELeAOEZc3PFFQ+hfm/Orv9EJDNFxSXCycElTb0/EmtyCWwxJgO943itiQkTe2dUcbnwAt574CwjsnQlvuT4/g=="],
 
     "@intellectual-frontiers/rdf": ["@intellectual-frontiers/rdf@0.1.0", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.0" } }, "sha512-D/dpkvn5N+vdvEXg7dB6Pqe2MCTxgo5ejtQuRDPzZziXhFSFn/HJxUig1ELRFS/byx67kpbS6K2E39TE5iDKRg=="],
 
@@ -353,6 +356,22 @@
     "@intellectual-frontiers/ontology/@intellectual-frontiers/core": ["@intellectual-frontiers/core@0.1.3", "", {}, "sha512-EQQqFtGdIdNSt3yqxyFW0nuEEuV+bIBI3tj7nCDhf1RsBWMDY9emrOdQ8Tp8QgG4JUcS/ytqisszFIeFEdiaDA=="],
 
     "@intellectual-frontiers/ontology/@intellectual-frontiers/rdf": ["@intellectual-frontiers/rdf@0.1.3", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.3" } }, "sha512-h70Bx+tBnbfUZKiy04na44LHOaiqaJBNZSOBMB4/2DV7sAcwqKup87mnelahzp+F7s9aeMPerMy2ldSCezcAcQ=="],
+
+    "@intellectual-frontiers/quality/@intellectual-frontiers/core": ["@intellectual-frontiers/core@0.1.3", "", {}, "sha512-EQQqFtGdIdNSt3yqxyFW0nuEEuV+bIBI3tj7nCDhf1RsBWMDY9emrOdQ8Tp8QgG4JUcS/ytqisszFIeFEdiaDA=="],
+
+    "@intellectual-frontiers/quality/@intellectual-frontiers/crypto": ["@intellectual-frontiers/crypto@0.1.3", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.3", "@intellectual-frontiers/formats": "0.1.3" } }, "sha512-8paq7/i+7dJK7+sNXKwffuMpBTvktl8fObsYVrZTgOM+3PjjeOImfJhFpSGjdhUwl0MJ2iiQRrbU78//4Jt4tg=="],
+
+    "@intellectual-frontiers/quality/@intellectual-frontiers/formats": ["@intellectual-frontiers/formats@0.1.3", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.3" } }, "sha512-Z100HNGqc2k8PoAJDjz2JEQzyhfMjvQVGmKdALjhbkBXlhsEtP14SC4jI7gc3Paw/aUQ6u+sj8ZxNLSC2mCz9w=="],
+
+    "@intellectual-frontiers/quality/@intellectual-frontiers/grc": ["@intellectual-frontiers/grc@0.1.1", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.3", "@intellectual-frontiers/crypto": "0.1.3", "@intellectual-frontiers/formats": "0.1.3", "@intellectual-frontiers/system": "0.1.3", "@intellectual-frontiers/telemetry": "0.1.3" } }, "sha512-bYIjdF2znEJcI0YRaSE634hMLUnly+OsYDr5NipbbM/Wxr/LmOo69jCjYjhaykCIWHqIqwgE0OMeuufYKcH96A=="],
+
+    "@intellectual-frontiers/quality/@intellectual-frontiers/system": ["@intellectual-frontiers/system@0.1.3", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.3", "@intellectual-frontiers/crypto": "0.1.3", "@intellectual-frontiers/formats": "0.1.3" }, "peerDependencies": { "@types/node": ">=26" } }, "sha512-pVj0+e4Xp0eWaN3ktIhIZ1rk6Tambn8KbGTZiNnLjU6bzop6Ek6ZjCUrB1fK10Rs7/a7Mi8tC4OIKXu5eBdn6A=="],
+
+    "@intellectual-frontiers/quality/@intellectual-frontiers/telemetry": ["@intellectual-frontiers/telemetry@0.1.3", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.3", "@intellectual-frontiers/formats": "0.1.3", "@intellectual-frontiers/system": "0.1.3", "@intellectual-frontiers/terminal": "0.1.3" } }, "sha512-HoEtqLl+gqSNKsKvpmFm6HXjDP+LzIAzBgY4AbuqvE2zSRseDVjisl+NYr1GcHuD9UHDkikhzy8PLrvtCQTqzQ=="],
+
+    "@intellectual-frontiers/quality/@intellectual-frontiers/terminal": ["@intellectual-frontiers/terminal@0.1.3", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.3" } }, "sha512-+LI62CAr8tgkl8eNvxPtqC15/TYFdSsz71Rjgh27OziSYBqAN799Y5rHrqvMYF9D+gw5DioUeHFKbDAKizFAXQ=="],
+
+    "@intellectual-frontiers/quality/@intellectual-frontiers/test": ["@intellectual-frontiers/test@0.1.1", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.3", "@intellectual-frontiers/crypto": "0.1.3", "@intellectual-frontiers/system": "0.1.3", "@intellectual-frontiers/telemetry": "0.1.3" } }, "sha512-pDpcFF7XeTLmmPdGS1YsFC6wyCG2/3n89Jc+qUR9AU/Z7S7JlDbDGEwnXU8NsB08mzie++6dbGd1SwR6pxyy8A=="],
 
     "@intellectual-frontiers/system/@intellectual-frontiers/core": ["@intellectual-frontiers/core@0.1.1", "", {}, "sha512-2CRWnO8kSVnsNemWJJUfbILnFuUzMKNAVdra8J4ZXS1O7pDubZw/OM4egq2iWo9+VP45cblxNVjIvV43c7fwSQ=="],
 

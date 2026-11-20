@@ -43,6 +43,7 @@
     "@intellectual-frontiers/mizan": "link:../mizan",
     "@intellectual-frontiers/net": "link:../net",
     "@intellectual-frontiers/ontology": "link:../ontology",
+    "@intellectual-frontiers/quality": "link:../quality",
     "@intellectual-frontiers/rdf": "link:../rdf",
     "@intellectual-frontiers/system": "link:../system",
     "@intellectual-frontiers/terminal": "link:../terminal",

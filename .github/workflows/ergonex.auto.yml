@@ -16,6 +16,7 @@ on:
       - "commons/libraries/src/**"
       - "commons/mizan/src/**"
       - "commons/net/src/**"
+      - "commons/quality/src/**"
       - "commons/system/src/**"
       - "commons/telemetry/src/**"
       - "commons/terminal/src/**"
@@ -23,7 +24,6 @@ on:
       - "commons/tools/**"
       - "commons/ts/kernel/**"
       - "commons/ts/node/**"
-      - "commons/ts/quality/**"
   pull_request:
     paths:
       - ".github/actions/**"
@@ -36,6 +36,7 @@ on:
       - "commons/libraries/src/**"
       - "commons/mizan/src/**"
       - "commons/net/src/**"
+      - "commons/quality/src/**"
       - "commons/system/src/**"
       - "commons/telemetry/src/**"
       - "commons/terminal/src/**"
@@ -43,7 +44,6 @@ on:
       - "commons/tools/**"
       - "commons/ts/kernel/**"
       - "commons/ts/node/**"
-      - "commons/ts/quality/**"
 
 permissions:
   contents: read

@@ -10,7 +10,7 @@ import { lf } from "@intellectual-frontiers/core";
 import { makeTempDir, mkdir, readTextFileSync, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { dirname, fromFileUrl, join, resolve, toFileUrl } from "@intellectual-frontiers/system/path";
 import { run, which } from "@intellectual-frontiers/system/proc";
-import { NODE_HOOK } from "../../runtime/test-run.ts";
+import { NODE_HOOK } from "@intellectual-frontiers/quality/host/test-run";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
 const FR = "0005-typescript-runtime FR-070";
@@ -88,7 +88,7 @@ proves(
 
 proves([FR], "ifc and ifc-docs register the hook before they import TypeScript, and ifc test run gives node --test the hook", () => {
   for (const [file, entry] of [
-    ["node/ifc.mjs", 'import("../tools/test.ts")'],
+    ["node/ifc.mjs", 'import("@intellectual-frontiers/quality/test-cli")'],
     ["../docs/ifc-docs.mjs", 'import("./cli.ts")'],
   ] as const) {
     const text = lf(readTextFileSync(join(ROOT, file)));
@@ -97,5 +97,8 @@ proves([FR], "ifc and ifc-docs register the hook before they import TypeScript, 
     assert(hook > 0 && hook < text.indexOf(entry), `${file} registers the hook before ${entry}`);
   }
   assertEquals(NODE_HOOK, toFileUrl(HOOK).href);
-  assertStringIncludes(readTextFileSync(join(ROOT, "runtime", "test-run.ts")), 'return [exe, "--import", NODE_HOOK, "--test", ...files];');
+  assertStringIncludes(
+    readTextFileSync(join(ROOT, "..", "quality", "src", "host", "test-run.ts")),
+    '[exe, "--import", NODE_HOOK, "--test", ...files]',
+  );
 });
