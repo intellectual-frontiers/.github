@@ -7,7 +7,7 @@
  */
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { embeddingFindings, register, sourceAllowed, type StandardsRegistry } from "@intellectual-frontiers/integrations/governance";
-import { conformPlugin, detect, findingsHoldNoValue, loadFrom, registerPlugin, statusOf, transactionsOf, validate, valuesOf, type Terminologies } from "@intellectual-frontiers/integrations/logical";
+import { conformPlugin, detect, entries, findingsHoldNoValue, loadFrom, registerPlugin, statusOf, transactionsOf, validate, valuesOf, type Terminologies } from "@intellectual-frontiers/integrations/logical";
 import { EMBEDDED, FHIR_JSON, FHIR_NDJSON, FHIR_R4, STANDARDS, US_CORE, fhirNdjsonPlugin, fhirPlugin, jsonCodec, ndjsonCodec, repeatingPaths } from "../src/mod.ts";
 
 const PATIENT = '{"resourceType":"Patient","id":"pt-1","active":true,"name":[{"family":"Zyxwvut","given":["Qwertyuiop","Asdfghjkl"]}],"gender":"female","birthDate":"1970-01-02","multipleBirthInteger":2}';
@@ -29,7 +29,7 @@ const SD = JSON.stringify({
       { path: "Patient.gender", min: 0, max: "1", binding: { strength: "required", valueSet: "http://example.test/ValueSet/test-gender|1" } },
       { path: "Patient.birthDate", min: 0, max: "1" },
       { path: "Patient.active", min: 0, max: "1" },
-      { path: "Patient.multipleBirth[x]", min: 0, max: "1" },
+      { path: "Patient.multipleBirth[x]", min: 0, max: "1", type: [{ code: "boolean" }, { code: "integer" }] },
     ],
   },
 });
@@ -95,7 +95,7 @@ proves(["0001-integrations-fhir-plugin FR-005"], "definitions are loaded from su
   const terminologies: Terminologies = new Map(vs.value.terminologies.map((t) => [t.id.urn, t] as const));
   assertEquals([...(vs.value.terminologies[0]?.codes ?? [])].sort(), ["female", "male"]);
   const codec = jsonCodec(repeatingPaths(defs.value.schemas));
-  const ok1 = codec.parse(PATIENT.replace(",\"multipleBirthInteger\":2", ""));
+  const ok1 = codec.parse(PATIENT);
   assert(ok1.kind === "ok");
   const t = transactionsOf(ok1.value)[0];
   assert(t !== undefined);
@@ -108,6 +108,19 @@ proves(["0001-integrations-fhir-plugin FR-005"], "definitions are loaded from su
   assertEquals(fs.map((f) => f.code).sort(), ["cardinality-min", "cardinality-min", "code-not-in-terminology", "unknown-path"]);
   assert(findingsHoldNoValue(fs, wrong.value));
   for (const v of valuesOf(wrong.value)) assert(v.length < 4 || fs.every((f) => !f.message.includes(v)), v);
+  // a choice type is a sum of its allowed types, counted together, and a primitive's JSON type is no part of its path
+  assert(schema.paths.includes("Patient.multipleBirthBoolean") && schema.paths.includes("Patient.multipleBirthInteger"));
+  const paths = entries(t).map((e) => e.path);
+  assert(paths.includes("Patient.active") && paths.includes("Patient.multipleBirthInteger"));
+  assert(!paths.some((p) => p.endsWith(".number") || p.endsWith(".boolean")));
+  const both = codec.parse('{"resourceType":"Patient","id":"p","name":[{"family":"Aaaa"}],"multipleBirthBoolean":true,"multipleBirthInteger":2}');
+  assert(both.kind === "ok");
+  assertEquals(validate(transactionsOf(both.value)[0] ?? t, schema, { terminologies }).map((f) => f.code), ["cardinality-max"]);
+  const other = codec.parse('{"resourceType":"Patient","id":"p","name":[{"family":"Aaaa"}],"multipleBirthString":"x"}');
+  assert(other.kind === "ok");
+  assertEquals(validate(transactionsOf(other.value)[0] ?? t, schema, { terminologies }).map((f) => f.code), ["unknown-path"]);
+  const typed = codec.serialize(ok1.value);
+  assert(typed.kind === "ok" && typed.value.includes('"active":true') && typed.value.includes('"multipleBirthInteger":2'));
   assertEquals(loadFrom(plugin, { origin: "user-supplied", standard: FHIR_R4, text: "not json" }).kind, "err");
   assertEquals(loadFrom(plugin, { origin: "user-supplied", standard: FHIR_R4, text: '{"resourceType":"Patient"}' }).kind, "err");
 });

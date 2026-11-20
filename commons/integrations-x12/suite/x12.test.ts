@@ -8,7 +8,7 @@
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { embeddingFindings, register, sourceAllowed, type StandardsRegistry } from "@intellectual-frontiers/integrations/governance";
 import { conformPlugin, loadFrom, registerPlugin, statusOf, validate, transactionsOf, type Interchange } from "@intellectual-frontiers/integrations/logical";
-import { EMBEDDED, STANDARDS, TRANSACTION_SETS, X12_SYNTAX, acks, ack999, codec, envelopeFindings, setUrn, ta1, x12Plugin } from "../src/mod.ts";
+import { EMBEDDED, STANDARDS, TRANSACTION_SETS, X12_SYNTAX, acks, ack999, codec, delimitersOf, envelopeFindings, setUrn, ta1, x12Plugin } from "../src/mod.ts";
 
 const W = [2, 10, 2, 10, 2, 15, 2, 15, 6, 4, 1, 5, 9, 1, 1, 1];
 const isa = (values: readonly string[]): string => `ISA*${values.map((v, i) => v.padEnd(W[i] ?? 0)).join("*")}~`;
@@ -49,9 +49,9 @@ proves(["0001-integrations-x12-skeleton FR-002", "0001-integrations-x12-skeleton
 });
 
 proves(["0001-integrations-x12-skeleton FR-004"], "a syntax failure holds a code and an offset and none of the text", () => {
-  const delim = codec.parse(ISA.replace("ISA*", "ISA|") + "GS*PO~");
+  const delim = codec.parse(ISA.replace("ISA*", "ISAA") + "GS*PO~");
   assert(delim.kind === "err" && delim.error.code === "bad-delimiter" && delim.error.offset === 3);
-  const term = codec.parse(ISA.slice(0, 105) + "!" + "IEA*0*000000001~");
+  const term = codec.parse(ISA.slice(0, 105) + "A" + "IEA*0*000000001~");
   assert(term.kind === "err" && term.error.code === "bad-delimiter");
   const width = codec.parse(ORDER.replace("SENDERID       ", "SENDERID      "));
   assert(width.kind === "err" && (width.error.code === "bad-envelope" || width.error.code === "bad-delimiter"), "a shifted fixed width is refused");  const open = codec.parse(ORDER.replace("SE*5*0001~\n", ""));
@@ -117,4 +117,31 @@ proves(["0001-integrations-x12-skeleton FR-006"], "TA1 and 999 are made, written
   assertEquals(loadFrom(x12Plugin, { origin: "user-supplied", standard: setUrn("850"), text: "nope" }).kind, "err");
   assertEquals(loadFrom(x12Plugin, { origin: "user-supplied", standard: setUrn("850"), text: JSON.stringify({ transaction: "810", segments: [] }) }).kind, "err");
   assertEquals(x12Plugin.codec.syntax.urn, X12_SYNTAX);
+});
+
+proves(["0001-integrations-x12-skeleton FR-002", "0001-integrations-x12-skeleton FR-006"], "the delimiters are read from the ISA by position, the codec writes with them, and the acknowledgements keep them", () => {
+  // element separator `|`, component separator `>`, segment terminator `!`, repetition separator `^`, version 00501
+  const text = ORDER.replaceAll("*", "|").replaceAll("~", "!").replace("|:!", "|>!");
+  const d = delimitersOf(text);
+  assert(d.kind === "ok");
+  assertEquals(d.value, { element: "|", component: ">", segment: "!", repetition: "^" });
+  const parsed = codec.parse(text);
+  assert(parsed.kind === "ok");
+  assertEquals(parsed.value.envelope?.delimiters, { element: "|", component: ">", segment: "!", repetition: "^" });
+  assertEquals(transactionsOf(parsed.value)[0]?.children.map((c) => c.id), ["BEG", "N1", "PO1"]);
+  const written = codec.serialize(parsed.value);
+  assert(written.kind === "ok");
+  assertEquals(written.value, text);
+  assertEquals(envelopeFindings(parsed.value), []);
+  const nine = ack999(parsed.value, "accepted");
+  const out = codec.serialize(nine);
+  assert(out.kind === "ok" && out.value.startsWith("ISA|") && out.value.includes("!\nGS|FA|"), "an acknowledgement is written with the delimiters received");
+  assertEquals(acks.read(nine).kind, "ok");
+  // before version 00501 ISA11 is a standards identifier, not a repetition separator
+  const old = delimitersOf(text.replace("|00501|", "|00401|"));
+  assert(old.kind === "ok" && old.value["repetition"] === undefined);
+  // the delimiters are four different characters that are not letters, digits or white space
+  assertEquals(delimitersOf(text.replace("|>!", "||!")).kind, "err");
+  assertEquals(delimitersOf(text.replace("|>!", "|>>")).kind, "err");
+  assertEquals(codec.serialize({ ...parsed.value, envelope: { header: parsed.value.envelope?.header ?? [], trailer: [] } }).kind, "err");
 });

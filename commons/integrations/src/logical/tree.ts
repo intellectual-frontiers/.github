@@ -12,7 +12,9 @@
 import type { Ref } from "@intellectual-frontiers/integrations/governance";
 
 /** An element: one value, which may have components (an HL7 v2 composite, an X12 composite). */
-export type Element = { readonly kind: "element"; readonly id: string; readonly value: string; readonly components: readonly Element[] };
+export type Element = { readonly kind: "element"; readonly id: string; readonly value: string; readonly components: readonly Element[]; readonly scalar?: PrimitiveType };
+/** The type a value had in a syntax that types its primitives (JSON): a text where absent. It is not part of a path. */
+export type PrimitiveType = "number" | "boolean" | "null";
 /** A segment: a named run of elements. */
 export type Segment = { readonly kind: "segment"; readonly id: string; readonly elements: readonly Element[] };
 /** A loop: a named run of segments and loops. */
@@ -20,7 +22,7 @@ export type Loop = { readonly kind: "loop"; readonly id: string; readonly childr
 /** What a loop or a transaction holds. */
 export type Part = Segment | Loop;
 /** The segments that open and close a node, where its syntax has them (X12's ISA and IEA, GS and GE, ST and SE): kept so that what was read is written back and its control counts can be checked. */
-export type Envelope = { readonly header: readonly Segment[]; readonly trailer: readonly Segment[] };
+export type Envelope = { readonly header: readonly Segment[]; readonly trailer: readonly Segment[]; readonly delimiters?: Readonly<Record<string, string>> };
 /** A transaction: one message or document (an 837, an ADT^A01, a FHIR resource). */
 export type Transaction = { readonly kind: "transaction"; readonly id: string; readonly control: string; readonly children: readonly Part[]; readonly envelope?: Envelope };
 /** A group of transactions of one kind. */
@@ -31,7 +33,7 @@ export type Interchange = { readonly kind: "interchange"; readonly syntax: Ref<"
 export type TreeNode = Interchange | Group | Transaction | Part | Element;
 
 /** An element. */
-export const element = (id: string, value: string, components: readonly Element[] = []): Element => ({ kind: "element", id, value, components });
+export const element = (id: string, value: string, components: readonly Element[] = [], scalar?: PrimitiveType): Element => (scalar === undefined ? { kind: "element", id, value, components } : { kind: "element", id, value, components, scalar });
 /** A segment. */
 export const segment = (id: string, ...elements: readonly Element[]): Segment => ({ kind: "segment", id, elements });
 /** A loop. */
@@ -125,7 +127,9 @@ export const HIDDEN = "[redacted]";
 function redactElement(e: Element, path: string, hide: (path: string) => boolean): Element {
   const here = join(path, e.id);
   const hidden = hide(here);
-  return { kind: "element", id: e.id, value: hidden && e.value !== "" ? HIDDEN : e.value, components: e.components.map((c) => redactElement(c, here, hide)) };
+  const components = e.components.map((c) => redactElement(c, here, hide));
+  const value = hidden && e.value !== "" ? HIDDEN : e.value;
+  return e.scalar === undefined || (hidden && e.value !== "") ? { kind: "element", id: e.id, value, components } : { kind: "element", id: e.id, value, components, scalar: e.scalar };
 }
 
 function redactParts(parts: readonly Part[], path: string, hide: (path: string) => boolean): readonly Part[] {

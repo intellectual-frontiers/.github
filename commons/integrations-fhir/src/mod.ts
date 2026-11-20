@@ -5,12 +5,12 @@
  * and terminologies (it embeds none of them), and the acknowledgement port of OperationOutcome.
  *
  * @remarks
- * A JSON object is one transaction whose id is its `resourceType`; a property is a segment (a primitive: one element with an empty id for a string, `number`, `boolean` or `null` for
- * the other JSON types) or a loop (an object); an array is a run of siblings of one id. Whether one sibling is an array is not in the JSON, so a codec is made with the set of repeating
+ * A JSON object is one transaction whose id is its `resourceType`; a property is a segment (a primitive: one element with an empty id, typed `number`, `boolean` or `null` where the JSON
+ * is, a text otherwise, and the type is no part of a path) or a loop (an object); an array is a run of siblings of one id. Whether one sibling is an array is not in the JSON, so a codec is made with the set of repeating
  * paths that the StructureDefinitions give (`repeatingPaths`), and writes an array for those and for any id that occurs twice.
  *
  * @limits
- * Choice types (`value[x]`) are not expanded by the loader: their elements are skipped. XML is Planned. Empty objects and empty arrays are not kept.
+ * Choice types (`value[x]`) are a sum: each allowed type is an alternative path and a `choice` constraint counts them together. XML is Planned. Empty objects and empty arrays are not kept.
  *
  * @module
  */
@@ -84,9 +84,9 @@ const failure = (code: SyntaxProblem["code"], offset = 0): SyntaxProblem => ({ k
 
 function primitive(k: string, v: string | number | boolean | null): Part {
   if (typeof v === "string") return segment(k, element("", v));
-  if (typeof v === "number") return segment(k, element("number", String(v)));
-  if (typeof v === "boolean") return segment(k, element("boolean", String(v)));
-  return segment(k, element("null", ""));
+  if (typeof v === "number") return segment(k, element("", String(v), [], "number"));
+  if (typeof v === "boolean") return segment(k, element("", String(v), [], "boolean"));
+  return segment(k, element("", "", [], "null"));
 }
 
 function nodes(k: string, v: Json): readonly Part[] {
@@ -109,7 +109,7 @@ function interchange(syntax: StandardUrn, transactions: readonly Transaction[]):
 
 function valueOf(e: Element | undefined): Json {
   if (e === undefined) return null;
-  switch (e.id) {
+  switch (e.scalar) {
     case "number":
       return Number(e.value);
     case "boolean":
@@ -207,10 +207,20 @@ function constraintsOf(elements: readonly Json[], root: string): { readonly path
   const constraints: Constraint[] = [];
   for (const e of elements) {
     const path = textOf(e, "path");
-    if (path === undefined || path === root || path.includes("[x]")) continue;
-    paths.push(path);
+    if (path === undefined || path === root) continue;
     const min = member(e, "min");
     const max = textOf(e, "max");
+    if (path.endsWith("[x]")) {
+      // a choice type is a sum: one of the alternatives its `type` list allows, each a path of its own (`valueQuantity`, `valueString`)
+      const base = path.slice(0, -3);
+      const types = member(e, "type");
+      const alternatives = Array.isArray(types) ? types.flatMap((t) => textOf(t, "code") ?? []).map((code) => `${base}${code.charAt(0).toUpperCase()}${code.slice(1)}`) : [];
+      if (alternatives.length === 0 || typeof min !== "number" || max === undefined) continue;
+      paths.push(...alternatives);
+      constraints.push({ kind: "choice", path: base, alternatives, min, max: max === "*" ? "*" : Number(max) });
+      continue;
+    }
+    paths.push(path);
     if (typeof min === "number" && max !== undefined) constraints.push({ kind: "cardinality", path, min, max: max === "*" ? "*" : Number(max) });
     const binding = member(e, "binding");
     const vs = textOf(binding, "valueSet");
@@ -261,7 +271,12 @@ function loadDefinition(standard: StandardUrn, text: string): Result<Definitions
 /** The paths that are arrays in the schemas: those whose cardinality allows more than one. For `jsonCodec`. */
 export function repeatingPaths(schemas: readonly Schema[]): ReadonlySet<string> {
   const out = new Set<string>();
-  for (const s of schemas) for (const c of s.constraints) if (c.kind === "cardinality" && (c.max === "*" || c.max > 1)) out.add(c.path);
+  for (const s of schemas) {
+    for (const c of s.constraints) {
+      if (c.kind === "cardinality" && (c.max === "*" || c.max > 1)) out.add(c.path);
+      if (c.kind === "choice" && (c.max === "*" || c.max > 1)) for (const a of c.alternatives) out.add(a);
+    }
+  }
   return out;
 }
 

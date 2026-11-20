@@ -5,8 +5,7 @@
  * and 999 made and read, and a loader of a schema from the user's own transcription of a licensed guide. It embeds no transaction set, guide or companion guide of X12.
  *
  * @remarks
- * The skeleton supports the delimiters `*` between elements and `~` ending a segment, which the fixed width of the ISA fixes by position; any other is a syntax failure with the offset of the
- * delimiter. Elements are not split into components. A transaction's children are its segments between ST and SE, flat: loops (the HL loops of the 837) are the schema's, Planned.
+ * The delimiters are read from the ISA by position (`delimitersOf`) and kept on the envelope, and the codec writes with them; nothing assumes `*` or `~`. Elements are not split into components. A transaction's children are its segments between ST and SE, flat: loops (the HL loops of the 837) are the schema's, Planned.
  *
  * @module
  */
@@ -75,11 +74,32 @@ const pad = (n: number): string => String(n).padStart(2, "0");
 const seg = (id: string, ...values: readonly string[]): Segment => segment(id, ...values.map((v, i) => element(pad(i + 1), v)));
 const valueAt = (s: Segment | undefined, n: number): string => s?.elements[n - 1]?.value ?? "";
 
-function parseSegments(text: string): readonly Segment[] {
-  return text.split("~").map((s) => s.trim()).filter((s) => s !== "").map((s) => {
-    const [id = "", ...values] = s.split("*");
+function parseSegments(text: string, element: string, terminator: string): readonly Segment[] {
+  return text.split(terminator).map((s) => s.trim()).filter((s) => s !== "").map((s) => {
+    const [id = "", ...values] = s.split(element);
     return seg(id, ...values);
   });
+}
+
+const isDelimiter = (c: string | undefined): c is string => c !== undefined && c.length === 1 && !/[A-Za-z0-9\s]/.test(c);
+
+/**
+ * The delimiters of an interchange, read from its ISA by position as the standard fixes them: the element separator is the character after `ISA` (position 3), the component separator is
+ * ISA16 (position 104), the segment terminator is the character after ISA16 (position 105), and the repetition separator is ISA11 where the version in ISA12 is 00501 or later (before it,
+ * ISA11 is a standards identifier). They are four different characters that are not letters, digits or white space; nothing is assumed.
+ */
+export function delimitersOf(text: string): Result<Readonly<Record<string, string>>, SyntaxProblem> {
+  const element = text[3];
+  const component = text[104];
+  const segment = text[105];
+  if (!isDelimiter(element)) return err(failure("bad-delimiter", 3));
+  if (!isDelimiter(component) || component === element) return err(failure("bad-delimiter", 104));
+  if (!isDelimiter(segment) || segment === element || segment === component) return err(failure("bad-delimiter", 105));
+  const parts = text.slice(0, 105).split(element);
+  const repetition = parts[11];
+  const version = parts[12] ?? "";
+  const hasRepetition = /^\d{5}$/.test(version) && version >= "00501" && isDelimiter(repetition) && repetition !== element && repetition !== component && repetition !== segment;
+  return ok(hasRepetition && repetition !== undefined ? { element, component, segment, repetition } : { element, component, segment });
 }
 
 /** The X12 codec. */
@@ -88,9 +108,9 @@ export const codec: Codec = {
   parse: (text) => {
     if (text.trim() === "") return err(failure("empty"));
     if (text.length < 106 || !text.startsWith("ISA")) return err(failure("bad-envelope"));
-    if (text[3] !== "*") return err(failure("bad-delimiter", 3));
-    if (text[105] !== "~") return err(failure("bad-delimiter", 105));
-    const segs = parseSegments(text);
+    const delimiters = delimitersOf(text);
+    if (delimiters.kind === "err") return delimiters;
+    const segs = parseSegments(text, delimiters.value["element"] ?? "", delimiters.value["segment"] ?? "");
     const isa = segs[0];
     if (isa === undefined || isa.id !== "ISA" || isa.elements.length !== 16) return err(failure("bad-envelope"));
     for (const [i, w] of ISA_WIDTHS.entries()) if ((isa.elements[i]?.value.length ?? -1) !== w) return err(failure("bad-envelope", i + 1));
@@ -131,11 +151,14 @@ export const codec: Codec = {
       }
     }
     if (group !== undefined || tx !== undefined || trailer.at(-1)?.id !== "IEA") return err(failure("unexpected-end"));
-    return ok({ kind: "interchange", syntax: ref("syntax", X12_SYNTAX), control: valueAt(isa, 13), groups, envelope: { header, trailer } });
+    return ok({ kind: "interchange", syntax: ref("syntax", X12_SYNTAX), control: valueAt(isa, 13), groups, envelope: { header, trailer, delimiters: delimiters.value } });
   },
   serialize: (i) => {
     const out: string[] = [];
-    const line = (s: Segment): string => `${[s.id, ...s.elements.map((e) => e.value)].join("*")}~`;
+    const element = i.envelope?.delimiters?.["element"];
+    const terminator = i.envelope?.delimiters?.["segment"];
+    if (element === undefined || terminator === undefined) return err(failure("bad-delimiter"));
+    const line = (s: Segment): string => `${[s.id, ...s.elements.map((e) => e.value)].join(element)}${terminator}`;
     const put = (env: Envelope | undefined, side: "header" | "trailer"): void => void out.push(...(env?.[side] ?? []).map(line));
     if (i.envelope === undefined || i.envelope.header[0]?.id !== "ISA") return err(failure("bad-envelope"));
     put(i.envelope, "header");
@@ -185,15 +208,16 @@ function isaFor(received: Interchange): Segment {
   return seg("ISA", v(1), v(2), v(3), v(4), v(7), v(8), v(5), v(6), v(9), v(10), v(11), v(12), v(13), "0", v(15), v(16));
 }
 
-function interchangeOf(isa: Segment, header: readonly Segment[], groups: readonly Group[], control: string): Interchange {
-  return { kind: "interchange", syntax: ref("syntax", X12_SYNTAX), control, groups, envelope: { header: [isa, ...header], trailer: [seg("IEA", String(groups.length), valueAt(isa, 13))] } };
+function interchangeOf(received: Interchange, isa: Segment, header: readonly Segment[], groups: readonly Group[], control: string): Interchange {
+  const delimiters = received.envelope?.delimiters;
+  return { kind: "interchange", syntax: ref("syntax", X12_SYNTAX), control, groups, envelope: { header: [isa, ...header], trailer: [seg("IEA", String(groups.length), valueAt(isa, 13))], ...(delimiters === undefined ? {} : { delimiters }) } };
 }
 
 /** A TA1: the acknowledgement of an interchange envelope: its control number, date and time, the status and a note code (`000` where there is no error, `001` otherwise; the detailed codes are Planned). */
 export function ta1(received: Interchange, status: AckStatus): Interchange {
   const isa = received.envelope?.header[0];
   const note = status === "accepted" ? "000" : "001";
-  return interchangeOf(isaFor(received), [seg("TA1", valueAt(isa, 13), valueAt(isa, 9), valueAt(isa, 10), STATUS_CODE[status], note)], [], valueAt(isa, 13));
+  return interchangeOf(received, isaFor(received), [seg("TA1", valueAt(isa, 13), valueAt(isa, 9), valueAt(isa, 10), STATUS_CODE[status], note)], [], valueAt(isa, 13));
 }
 
 /** A 999: the acknowledgement of each group of an interchange, AK1 for the group, AK9 for its status and counts. */
@@ -205,7 +229,7 @@ export function ack999(received: Interchange, status: AckStatus): Interchange {
     const tx: Transaction = { kind: "transaction", id: "999", control: pad(n + 1).padStart(4, "0"), children, envelope: { header: [seg("ST", "999", pad(n + 1).padStart(4, "0"))], trailer: [seg("SE", String(children.length + 2), pad(n + 1).padStart(4, "0"))] } };
     return { kind: "group", id: "FA", control: String(n + 1), transactions: [tx], envelope: { header: [seg("GS", "FA", "SENDER", "RECEIVER", "20260101", "1200", String(n + 1), "X", "005010X231A1")], trailer: [seg("GE", "1", String(n + 1))] } };
   });
-  return interchangeOf(isaFor(received), [], groups, valueAt(received.envelope?.header[0], 13));
+  return interchangeOf(received, isaFor(received), [], groups, valueAt(received.envelope?.header[0], 13));
 }
 
 const statusOfCode = (c: string): AckStatus => (c === "A" ? "accepted" : c === "E" ? "accepted-with-errors" : "rejected");
