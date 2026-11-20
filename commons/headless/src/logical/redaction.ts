@@ -32,6 +32,7 @@ function redactProblem(p: Problem, redact: Redactor): Problem {
   return {
     ...p,
     message: redact(p.message),
+    ...(p.phase === undefined ? {} : { phase: redact(p.phase) }),
     ...(p.fix === undefined ? {} : { fix: redact(p.fix) }),
     ...(p.raw === undefined ? {} : { raw: redact(p.raw) }),
   };

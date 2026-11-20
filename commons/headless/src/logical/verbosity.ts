@@ -7,7 +7,7 @@
  * @example
  * ```ts
  * import { shows, verbosityOf } from "./verbosity.ts";
- * shows("calm", "item"); // false
+ * shows("calm", "step"); // false: a phase that went well is not a line in calm
  * shows("verbose", "item"); // true
  * verbosityOf({ json: false, quiet: false, verbose: true }); // ok("verbose")
  * ```
@@ -36,11 +36,11 @@ export function verbosityOf(flags: VerbosityFlags): Result<Verbosity, string> {
   return ok(flags.verbose ? "verbose" : "calm");
 }
 
-/** The kinds of line a run can show. */
-export type LineKind = "header" | "phase" | "item" | "change" | "problem" | "outcome" | "hint" | "verdict" | "next" | "live" | "log";
+/** The kinds of line a run can show: a `step` is the line of a phase that went well, a `phase` the line of one that has something to see (a failure, a warning, a step for the person, something pending). */
+export type LineKind = "header" | "step" | "phase" | "item" | "change" | "problem" | "outcome" | "hint" | "verdict" | "next" | "live" | "log";
 
 /** Every kind of line. */
-export const LINE_KINDS: readonly LineKind[] = ["header", "phase", "item", "change", "problem", "outcome", "hint", "verdict", "next", "live", "log"];
+export const LINE_KINDS: readonly LineKind[] = ["header", "step", "phase", "item", "change", "problem", "outcome", "hint", "verdict", "next", "live", "log"];
 
 /** Whether a mode shows a kind of line on the screen (the run's log records every kind whatever the mode). */
 export function shows(mode: Verbosity, kind: LineKind): boolean {
@@ -52,7 +52,7 @@ export function shows(mode: Verbosity, kind: LineKind): boolean {
     case "verbose":
       return true;
     case "calm":
-      return kind !== "item" && kind !== "log";
+      return kind !== "item" && kind !== "step" && kind !== "log";
     default:
       return absurd(mode);
   }

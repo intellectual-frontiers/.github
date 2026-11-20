@@ -1,7 +1,7 @@
 // Spec: 0004-headless-cli FR-003, FR-004, FR-005, FR-007
 /**
  * The calm reporter (commons headless 0004-headless-cli FR-003, FR-005, FR-007): what a command tells while it runs, drawn as a person wants to read
- * it. Quiet on success and loud on a problem: one line per phase when it ends, every item only with `--verbose`, the problems kept for the closing
+ * it. Quiet on success and loud on a problem: a line for a phase only when it has something to see (a green step line is for `--verbose`), every item only with `--verbose`, the problems kept for the closing
  * block, and the whole run, every item and every problem, in the run's log whatever the mode. On a terminal a phase in progress is one line redrawn
  * in place (a spinner, a progress bar, what it is doing now); anywhere else there are only the final lines, with no control character in them.
  *
@@ -13,7 +13,7 @@
  * r.progress({ kind: "phase", name: "Packages" });
  * r.progress({ kind: "done", result: "86 installed" });
  * r.close();
- * written.join(""); // "[ok] Packages          86 installed\n"
+ * written.join(""); // "": a phase that went well is no line in calm
  * ```
  *
  * @module
@@ -125,7 +125,7 @@ export class Reporter {
     const took = this.#o.now() - p.started;
     const text = `${p.name.padEnd(NAME_WIDTH)} ${detail}${took >= 1000 ? ` ${dim(`(${fmtDuration(took)})`, this.#o.look)}` : ""}`.trimEnd();
     this.#log("phase", `end ${p.name}: ${detail} (${took}ms)`);
-    if (this.#shows("phase")) this.#o.write(`${line(tone, text, this.#o.look)}\n`);
+    if (this.#shows(p.worst === undefined ? "step" : "phase")) this.#o.write(`${line(tone, text, this.#o.look)}\n`);
   }
 
   /** Tells the reporter what the command is doing. */

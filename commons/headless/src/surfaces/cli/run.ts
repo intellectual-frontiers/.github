@@ -108,10 +108,12 @@ export async function run(program: Program, argv: readonly string[], io: Io): Pr
   const out: string[] = [];
   const err: string[] = [];
   const writeOut = (t: string): void => {
+    if (t === "") return;
     out.push(t);
     io.sink?.out(t);
   };
   const writeErr = (t: string): void => {
+    if (t === "") return;
     err.push(t);
     io.sink?.err(t);
   };
@@ -218,6 +220,7 @@ type Execution = {
 async function execute(x: Execution): Promise<Ended> {
   const { program, io, placed } = x;
   const screen: string[] = [];
+  const nested = isNested(program.nested, io.env);
   const redact = redactor(program.secrets());
   const stateDir = stateDirOf(program.stateApp, io.env, io.os);
   const inherited = io.env(`${program.envPrefix}_LOG`);
@@ -232,7 +235,9 @@ async function execute(x: Execution): Promise<Ended> {
   const reporter = new Reporter({
     look: x.look,
     verbosity: x.verbosity,
-    write: (t) => screen.push(t),
+    write: (t) => {
+      if (!nested) screen.push(t);
+    },
     now: io.now,
     ...(log === undefined ? {} : { log }),
     ...(io.timer === undefined ? {} : { timer: io.timer }),
@@ -260,9 +265,12 @@ async function execute(x: Execution): Promise<Ended> {
     }
   })();
   const g = await guarded(io.signals, controller, work);
+  // the lines a command returned as its outcome are told as the ones it told while it ran, so that each is shown once and in order
+  const finished = g.kind === "done" ? g.value : outcomeOf(null, { cancelled: true });
+  for (const text of finished.outcomes) progress({ kind: "outcome", text });
   reporter.close();
 
-  const returned = g.kind === "done" ? g.value : outcomeOf(null, { cancelled: true });
+  const returned = { ...finished, outcomes: [] };
   const translate = translator(program.catalogue, program.patterns);
   const coded = (p: Problem): Problem => {
     if (p.code !== undefined) return p;
@@ -275,7 +283,6 @@ async function execute(x: Execution): Promise<Ended> {
   const code = g.kind === "stopped" ? g.code : exitOfRun(counts, { pending: x.mode === "check" ? "pending" : "ok" });
   log?.write("run", `finished with ${code}: ${counts.fail} failure(s), ${counts.warn} warning(s), ${counts.pending} pending, ${counts.action} for you`);
 
-  const nested = isNested(program.nested, io.env);
   let out = "";
   if (x.verbosity === "json") {
     out = x.sarif ? sarifText({ program: program.name, version: program.version, outcome }) : jsonText(envelopeOf({ program: program.name, version: program.version, command: placed.id, outcome, code }));
