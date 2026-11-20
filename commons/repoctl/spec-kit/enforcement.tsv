@@ -17,7 +17,7 @@ requirement	mechanism	by	note
 0003-repoctl-sync FR-002	check	.github: cd commons/repoctl && bun run verify	suite/sync.test.ts: only a stale generator is run, it is checked again, and a failure of one does not stop the others
 0003-repoctl-sync FR-003	check	.github: cd commons/repoctl && bun run verify	suite/sync.test.ts: --check writes nothing and names the stale generator with its command; the real repository passes
 0003-repoctl-sync FR-004	check	.github: cd commons/repoctl && bun run verify	suite/sync.test.ts: a second run changes no file, and --only runs only what it names
-0003-repoctl-sync FR-005	check	.github: cd commons/repoctl && bun run verify	suite/merge.test.ts: in a real repository a conflict in a generated file is made again and a conflict in a written file is left as Git left it
+0003-repoctl-sync FR-005	check	.github: cd commons/repoctl && bun run verify	suite/merge.test.ts: in a real repository a conflict in a generated file is made again, one in a file that holds written text keeps the lines of both sides, and a conflict in a written file is left as Git left it
 0003-repoctl-sync FR-006	check	.github: cd commons/repoctl && bun run verify	suite/merge.test.ts: the merge commit is made only where no conflict is left, and a refusal of Git is E-MERGE-FAILED
 0003-repoctl-sync FR-007	check	.github: cd commons/repoctl && bun run verify	suite/check.test.ts: one report with a code and a fix for each finding, the real repository passes, nothing is written
 0003-repoctl-sync FR-008	check	.github: cd commons/repoctl && bun run verify	suite/check.test.ts: a constant that disagrees with its library's version is found, and so is one the manifest names that is missing

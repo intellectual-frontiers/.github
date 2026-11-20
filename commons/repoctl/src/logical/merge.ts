@@ -14,6 +14,7 @@
  */
 import type { Generator, GitRef } from "@intellectual-frontiers/repoctl/governance";
 import { IDENTITY_ARGS } from "@intellectual-frontiers/repoctl/governance";
+import { matches } from "./glob.ts";
 import { generatorOf } from "./order.ts";
 import type { World } from "./ports.ts";
 import { runSync, type SyncReport } from "./sync.ts";
@@ -27,6 +28,8 @@ export type MergeReport =
       readonly kind: "conflicts";
       /** The generated files that conflicted and were made again and staged. */
       readonly regenerated: readonly string[];
+      /** Of those, the ones that also hold what a person wrote: the lines of both sides were kept and the generated part was made again, so that nothing a side wrote is lost. */
+      readonly unioned: readonly string[];
       /** The generated files that conflicted and could not be made again: they stay conflicted. */
       readonly unresolved: readonly string[];
       /** The files a person wrote that conflict, untouched. */
@@ -44,14 +47,38 @@ export function partitionConflicts(table: readonly Generator[], paths: readonly 
   };
 }
 
+/** Whether a conflicted generated file also holds text a person wrote. */
+export function isMixed(table: readonly Generator[], path: string): boolean {
+  return (generatorOf(table, path)?.mixed ?? []).some((glob) => matches(glob, path));
+}
+
 const lines = (text: string): readonly string[] =>
   text
     .split("\n")
     .map((l) => l.trim())
     .filter((l) => l !== "");
 
+/** Makes a conflicted file hold the lines of both sides where they conflict (`git merge-file --union` of the three versions Git kept of it), and writes it; whether it could. */
+async function union(w: Pick<World, "files" | "process" | "repo">, path: string): Promise<boolean> {
+  const here = { cwd: w.repo };
+  const dir = await w.files.makeTemp("repoctl-merge-");
+  try {
+    const names = ["base", "ours", "theirs"] as const;
+    for (const [i, name] of names.entries()) {
+      const shown = await w.process.run(["git", "show", `:${i + 1}:${path}`], here);
+      await w.files.write(`${dir}/${name}`, shown.code === 0 ? shown.stdout : "");
+    }
+    const merged = await w.process.run(["git", "merge-file", "-p", "--union", `${dir}/ours`, `${dir}/base`, `${dir}/theirs`], here);
+    if (merged.code !== 0) return false;
+    await w.files.write(`${w.repo}/${path}`, merged.stdout);
+    return true;
+  } finally {
+    await w.files.removeTree(dir);
+  }
+}
+
 /** Merges `ref` into the checkout, in the order the generators are given. */
-export async function runMerge(w: Pick<World, "process" | "repo">, ref: GitRef, order: readonly Generator[]): Promise<MergeReport> {
+export async function runMerge(w: Pick<World, "files" | "process" | "repo">, ref: GitRef, order: readonly Generator[]): Promise<MergeReport> {
   const here = { cwd: w.repo };
   const git = (...args: readonly string[]) => w.process.run(["git", ...IDENTITY_ARGS, ...args], here);
   const merged = await git("merge", "--no-edit", ref);
@@ -61,9 +88,13 @@ export async function runMerge(w: Pick<World, "process" | "repo">, ref: GitRef, 
   const { generated, written } = partitionConflicts(order, unmerged);
   const cleared: string[] = [];
   const stuck: string[] = [];
+  const unioned: string[] = [];
   for (const path of generated) {
-    const taken = await git("checkout", "--ours", "--", path);
-    (taken.code === 0 ? cleared : stuck).push(path);
+    // a file that is only generated takes one side to clear the markers (its generator writes all of it); a file that holds written text too keeps the lines of both sides (the generator leaves them as they are)
+    const mixed = isMixed(order, path);
+    const taken = mixed ? await union(w, path) : (await git("checkout", "--ours", "--", path)).code === 0;
+    if (taken && mixed) unioned.push(path);
+    (taken ? cleared : stuck).push(path);
   }
   const sync = await runSync(w, "write", order);
   const fresh = new Set(sync.outcomes.filter((o) => o.kind === "fresh" || o.kind === "regenerated").map((o) => o.id));
@@ -80,5 +111,5 @@ export async function runMerge(w: Pick<World, "process" | "repo">, ref: GitRef, 
   const changed = [...lines((await git("diff", "--name-only")).stdout), ...lines((await git("ls-files", "--others", "--exclude-standard")).stdout)];
   for (const path of changed) if (!written.includes(path) && !unresolved.includes(path) && generatorOf(order, path) !== undefined) await git("add", "--", path);
   const committed = written.length === 0 && unresolved.length === 0 ? (await git("commit", "--no-edit")).code === 0 : false;
-  return { kind: "conflicts", regenerated, unresolved, written, committed, sync };
+  return { kind: "conflicts", regenerated, unioned: unioned.filter((p) => regenerated.includes(p)), unresolved, written, committed, sync };
 }

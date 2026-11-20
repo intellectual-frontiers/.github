@@ -27,6 +27,8 @@ export type Generator = {
   readonly inputs: readonly string[];
   /** What it writes, as globs from the repository's root. */
   readonly outputs: readonly string[];
+  /** The outputs (globs, a subset of `outputs`) that also hold text a person wrote and that the generator leaves as it finds it, so that a merge keeps the lines of both sides of them before it makes the generated part again. */
+  readonly mixed?: readonly string[];
 };
 
 /** Every generator of the repository, in the order that is kept where the facts do not order two of them. */
@@ -37,6 +39,7 @@ export const GENERATORS: readonly Generator[] = [
     command: ["commons/libraries/src/libraries.ts"],
     inputs: ["commons/*/library.ts", "commons/*/package.json"],
     outputs: ["commons/spec-kit/specs/0027-commons-libraries/spec.md", "commons/spec-kit/enforcement.tsv"],
+    mixed: ["commons/spec-kit/specs/0027-commons-libraries/spec.md", "commons/spec-kit/enforcement.tsv"],
   },
   {
     id: "packaging",
@@ -86,6 +89,7 @@ export const GENERATORS: readonly Generator[] = [
     command: ["commons/libraries/src/readme.ts"],
     inputs: ["commons/*/library.ts", "commons/*/about.ts"],
     outputs: ["README.md"],
+    mixed: ["README.md"],
   },
   {
     id: "license",

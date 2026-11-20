@@ -55,7 +55,7 @@ proves(["0003-repoctl-sync FR-005", "0003-repoctl-sync FR-006"], "a generated fi
     await diverged(dir, world, ordered.value, false);
     const r = await runMerge(world, ref("feature"), ordered.value);
     assert(r.kind === "conflicts", `a conflict: ${JSON.stringify(r)}`);
-    assertEquals([r.regenerated, r.unresolved, r.written, r.committed], [["README.md"], [], [], true]);
+    assertEquals([r.regenerated, r.unioned, r.unresolved, r.written, r.committed], [["README.md"], [], [], [], true]);
     assertEquals(await fs.readTextFile(path.join(dir, "README.md")), "a=2 b=3\n");
     assert(!(await fs.readTextFile(path.join(dir, "README.md"))).includes("<<<<<<<"));
     assertEquals((await git(dir, "status", "--porcelain")).trim(), "");
@@ -74,13 +74,61 @@ proves(["0003-repoctl-sync FR-005", "0003-repoctl-sync FR-006"], "a conflict in 
     await diverged(dir, world, ordered.value, true);
     const r = await runMerge(world, ref("feature"), ordered.value);
     assert(r.kind === "conflicts");
-    assertEquals([r.regenerated, r.unresolved, r.written, r.committed], [["README.md"], [], ["notes.txt"], false]);
+    assertEquals([r.regenerated, r.unioned, r.unresolved, r.written, r.committed], [["README.md"], [], [], ["notes.txt"], false]);
     assertStringIncludes(await fs.readTextFile(path.join(dir, "notes.txt")), "<<<<<<<");
     assertStringIncludes(await fs.readTextFile(path.join(dir, "notes.txt")), "feature");
     assertEquals((await git(dir, "diff", "--name-only", "--diff-filter=U")).trim(), "notes.txt");
     const done = mergeDone(r, "feature");
     assertEquals(done.findings.map((f) => `${f.code} ${f.message.split(" ")[0]}`), ["E-MERGE-CONFLICT notes.txt"]);
     assertStringIncludes(done.text, "written by a person, untouched");
+  });
+});
+
+/** A generator that makes only the lines of README.md that begin with `a=`, from the sources, and leaves every other line of it as it finds it: a file a person also writes. */
+const MIXED = `import { existsSync, readFileSync, writeFileSync } from "node:fs";
+const read = (f) => readFileSync(f, "utf8").trim();
+const made = "a=" + read("a.txt") + " b=" + read("b.txt");
+const have = existsSync("README.md") ? readFileSync("README.md", "utf8").split("\\n").filter((l) => l !== "") : [];
+const text = [...have.filter((l) => !l.startsWith("a=")), made].join("\\n") + "\\n";
+if (process.argv.includes("--check")) process.exit(existsSync("README.md") && readFileSync("README.md", "utf8") === text ? 0 : 1);
+writeFileSync("README.md", text);
+`;
+
+proves(["0003-repoctl-sync FR-005"], "a generated file that a person also writes keeps the lines of both sides and has its generated part made again", async () => {
+  if (!CAN_RUN) return;
+  await withRepo(TABLE, async (dir, world, generators) => {
+    const mixed = generators.map((g) => ({ ...g, mixed: ["README.md"] }));
+    const ordered = orderGenerators(mixed);
+    assert(ordered.kind === "ok");
+    await fs.writeTextFile(path.join(dir, "gen-readme.mjs"), MIXED);
+    const write = (f: string, t: string) => fs.writeTextFile(path.join(dir, f), t);
+    await write("a.txt", "1\n");
+    await write("b.txt", "1\n");
+    await write("README.md", "# Title\n");
+    await runSync(world, "write", ordered.value);
+    await git(dir, "add", ".");
+    await git(dir, "commit", "-q", "-m", "Start");
+    await git(dir, "checkout", "-q", "-b", "feature");
+    await write("a.txt", "2\n");
+    await write("README.md", "# Title\nfeature wrote this\n");
+    await runSync(world, "write", ordered.value);
+    await git(dir, "add", ".");
+    await git(dir, "commit", "-q", "-m", "Feature");
+    await git(dir, "checkout", "-q", "main");
+    await write("b.txt", "3\n");
+    await write("README.md", "# Title\nmain wrote that\n");
+    await runSync(world, "write", ordered.value);
+    await git(dir, "add", ".");
+    await git(dir, "commit", "-q", "-m", "Main");
+    const r = await runMerge(world, ref("feature"), ordered.value);
+    assert(r.kind === "conflicts", JSON.stringify(r));
+    assertEquals([r.regenerated, r.unioned, r.written, r.committed], [["README.md"], ["README.md"], [], true]);
+    const text = await fs.readTextFile(path.join(dir, "README.md"));
+    assertStringIncludes(text, "feature wrote this");
+    assertStringIncludes(text, "main wrote that");
+    assertStringIncludes(text, "a=2 b=3");
+    assert(!text.includes("<<<<<<<") && !text.includes("a=1 b=1") && !text.includes("a=2 b=1") && !text.includes("a=1 b=3"), text);
+    assertStringIncludes(mergeDone(r, "feature").text, "the lines of both sides were kept");
   });
 });
 

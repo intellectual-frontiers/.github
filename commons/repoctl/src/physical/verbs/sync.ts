@@ -100,13 +100,13 @@ export function mergeDone(r: MergeReport, ref: string): Done {
       ];
       const lines = [
         `merge of ${ref} conflicted`,
-        ...r.regenerated.map((p) => `made again  ${p}`),
+        ...r.regenerated.map((p) => (r.unioned.includes(p) ? `made again  ${p}  (the lines of both sides were kept and its generated part made again: read its diff)` : `made again  ${p}`)),
         ...r.unresolved.map((p) => `unresolved  ${p}`),
         ...r.written.map((p) => `conflict    ${p}  (written by a person, untouched)`),
         r.committed ? "the merge is committed" : "the merge is not committed yet",
       ];
       return {
-        data: { kind: r.kind, regenerated: r.regenerated, unresolved: r.unresolved, written: r.written, committed: r.committed },
+        data: { kind: r.kind, regenerated: r.regenerated, unioned: r.unioned, unresolved: r.unresolved, written: r.written, committed: r.committed },
         text: lines.join("\n"),
         findings: found,
         next: r.written.length > 0 ? ["resolve the conflicts above, git add them, then git commit"] : r.unresolved.length > 0 ? ["repoctl sync"] : [],
