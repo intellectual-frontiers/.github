@@ -1195,8 +1195,10 @@ proves(
         assertEquals(r.value.executable, m.executable);
         assertEquals(r.value.needsAdministrator, m.administrator);
         assertEquals(r.value.verified, row.verified !== undefined, `${id} ${op}`);
-        assertEquals(r.value.environment.map((e) => `${e.name}=${e.value}`).join(" "), m.environment ?? "");
-        assertEquals([r.value.manager, r.value.operation], [manager, op]);
+        assertEquals(r.value.environment ?? "", m.environment ?? "");
+        assertEquals(r.value.manager, manager);
+        assertEquals(Object.keys(r.value).includes("operation"), false);
+        assertEquals(r.value.missingExitStatus, op === "QueryInstalled" && (id === "apt" || id === "brew") ? 1 : undefined, `${id} ${op}`);
       }
     }
     assert(defined > 20 && missing > 0, `${defined} defined, ${missing} not defined`);
@@ -1204,7 +1206,7 @@ proves(
     // the four managers a dialect is written for
     const apt = commandOf(managerOf("apt"), "Install");
     assert(apt.kind === "ok");
-    assertEquals(apt.value.environment, [{ name: "DEBIAN_FRONTEND", value: "noninteractive" }]);
+    assertEquals(apt.value.environment, "DEBIAN_FRONTEND=noninteractive");
     assertEquals(apt.value.nonInteractive, ["apt-get", "install", "-y", "{packages}"]);
     assertEquals([apt.value.needsAdministrator, apt.value.verified], [true, true]);
     const brew = commandOf(managerOf("brew"), "QueryVersion");
@@ -1241,6 +1243,22 @@ proves(
         assert(c.kind === "ok");
         if (row.origin === "memory") assertEquals(c.value.verified, false, `${id} ${op}`);
       }
+  },
+);
+
+proves(
+  ["0002-packaging FR-029"],
+  "Commands: missingExitStatus is 1 for the query-installed of apt and brew and absent for every other command",
+  () => {
+    for (const m of managerIds())
+      for (const op of operationNames()) {
+        const r = commandOf(m, op);
+        if (r.kind === "err") continue;
+        const stated = op === "QueryInstalled" && (m === "apt" || m === "brew");
+        assertEquals("missingExitStatus" in r.value, stated, `${m} ${op}`);
+      }
+    const ex = exactVersionOf(managerOf("apt"));
+    assert(ex.kind === "ok" && !("missingExitStatus" in ex.value));
   },
 );
 

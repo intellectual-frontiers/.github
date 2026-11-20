@@ -64,6 +64,7 @@ requirement	mechanism	by	note
 0002-packaging FR-026	check	.github: bun test ./tests/	Commands: exactVersionOf, managerIds, operationNames, prohibitionsOf and describeCommandError
 0002-packaging FR-027	check	.github: bun test ./tests/	Commands: every error of the reader is a value of a closed union and is told in one sentence
 0002-packaging FR-028	check	.github: bun test ./tests/	Tables: the generated files carry install-exact
+0002-packaging FR-029	check	.github: bun test ./tests/	Commands: missingExitStatus is stated for the query-installed of apt and brew and absent elsewhere
 0004-rules FR-001	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
 0004-rules FR-002	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
 0004-rules FR-003	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
