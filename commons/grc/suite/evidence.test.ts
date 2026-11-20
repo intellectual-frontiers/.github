@@ -1,5 +1,5 @@
 /**
- * Tests of `kernel/evidence.ts`: RFC 8785's own examples (its sample object, its member ordering by UTF-16 code units and its number
+ * Tests of `evidence.ts`: RFC 8785's own examples (its sample object, its member ordering by UTF-16 code units and its number
  * serializations from Appendix B), one digest for equal evidence, a ledger whose tampering is named by place and kind, manifests that name
  * each missing, extra or different file and whose signature a caller's verifier checks, and bundles that are the same bytes every time,
  * begin with their manifest and are refused when a file was added.
@@ -29,12 +29,12 @@ import {
   verifyManifest,
   verifyManifestSignature,
   writeBundle,
-} from "../../kernel/evidence.ts";
-import { type Instant, instantOf } from "../../kernel/grc.ts";
+} from "../src/evidence.ts";
+import { type Instant, instantOf } from "../src/grc.ts";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
-const FR = (n: string): `0007-grc FR-${string}` => `0007-grc FR-${n}`;
+const FR = (n: string): `0001-grc-engineering FR-${string}` => `0001-grc-engineering FR-${n}`;
 const enc = new TextEncoder();
 const BS = "\\";
 const ch = (...codes: number[]): string => String.fromCharCode(...codes);

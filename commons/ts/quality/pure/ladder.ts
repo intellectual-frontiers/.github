@@ -22,8 +22,8 @@
  * @module
  */
 import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
-import type { Instant } from "../../kernel/grc.ts";
-import { instantFromEpochMs } from "../../kernel/grc.ts";
+import type { Instant } from "@intellectual-frontiers/grc/grc";
+import { instantFromEpochMs } from "@intellectual-frontiers/grc/grc";
 import type { Risk } from "@intellectual-frontiers/test/record";
 import { type Declaration, isRegulated, phaseOf } from "../../mizan/changes/declaration.ts";
 import { type FreshnessState, type FreshnessVerdict, counts as stateCounts } from "./freshness.ts";

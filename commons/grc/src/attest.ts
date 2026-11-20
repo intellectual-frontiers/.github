@@ -1,7 +1,8 @@
+// Spec: 0001-grc-engineering FR-018
 /**
- * Attestations (commons 0007-grc FR-018): an assessment as CycloneDX 1.6 `declarations` (assessors, attestations, claims, evidence and
+ * Attestations (commons 0001-grc-engineering FR-018): an assessment as CycloneDX 1.6 `declarations` (assessors, attestations, claims, evidence and
  * targets) in a minimal CycloneDX 1.6 BOM, and in-toto Statements v1 with a predicate type the caller names, ready for a DSSE envelope
- * (`kernel/dsse.ts`, 0005-typescript-runtime FR-045).
+ * (`crypto/dsse`, 0005-typescript-runtime FR-045).
  *
  * - `definitions.standards`: one standard per catalog the assessment's controls implement (a control that implements none stands as a
  *   requirement of a standard named after the pack), each catalog control a requirement.
@@ -12,7 +13,7 @@
  *   share of applicable newest findings that pass (0 where none).
  *
  * Every list is in an order of its own and the serial number is a version 5 UUID of a namespace the caller gives and the pack and time,
- * so the same assessment gives the same BOM. The in-toto statement is built by `kernel/dsse.ts`'s `statement` and keeps the predicate's
+ * so the same assessment gives the same BOM. The in-toto statement is built by `crypto/dsse`'s `statement` and keeps the predicate's
  * type in its own type, so `signStatement` and `verifyStatement` take it as it is.
  *
  * @example

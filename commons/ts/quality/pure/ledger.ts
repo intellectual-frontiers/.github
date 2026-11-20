@@ -43,7 +43,7 @@ import {
   ok,
   type Result,
 } from "@intellectual-frontiers/core";
-import { canonicalize as jcs, GENESIS } from "../../kernel/evidence.ts";
+import { canonicalize as jcs, GENESIS } from "@intellectual-frontiers/grc/evidence";
 import { type Sha256, sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { redactEvidence } from "./record.ts";
 import { TIER2_EVENTS } from "./tier2-events.ts";

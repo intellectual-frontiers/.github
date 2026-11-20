@@ -1,5 +1,6 @@
+// Spec: 0001-grc-engineering FR-001
 /**
- * Governance, risk and compliance as code: catalogs, controls, verdicts, findings and waivers (commons 0007-grc FR-001 to FR-005), with
+ * Governance, risk and compliance as code: catalogs, controls, verdicts, findings and waivers (commons 0001-grc-engineering FR-001 to FR-005), with
  * the time values they all share (an `Instant`, an ISO 8601 `Duration`; FR-011 uses them) and the globs that waivers and change-impact
  * declarations match with (FR-005, FR-013). Pure: the kernel reads no clock, so every "now" is a value the caller gives.
  *

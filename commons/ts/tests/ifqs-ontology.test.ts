@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { type FreshnessStatus } from "../kernel/assess.ts";
+import { type FreshnessStatus } from "@intellectual-frontiers/grc/assess";
 import { validate } from "@intellectual-frontiers/rdf";
 import { OUTCOMES } from "@intellectual-frontiers/test/record";
 import { readTextFileSync } from "@intellectual-frontiers/system/fs";

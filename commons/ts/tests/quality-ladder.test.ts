@@ -7,7 +7,7 @@
  *
  * @module
  */
-import { GENESIS } from "../kernel/evidence.ts";
+import { GENESIS } from "@intellectual-frontiers/grc/evidence";
 import { decodeMetrics } from "@intellectual-frontiers/telemetry/otlp";
 import { readTextFileSync } from "@intellectual-frontiers/system/fs";
 import { dirname, fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";

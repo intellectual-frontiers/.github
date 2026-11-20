@@ -1,5 +1,5 @@
 /**
- * Tests of the signals of a pack run in `runtime/grc.ts` (commons 0007-grc FR-019): with a telemetry made from a fixed clock and fixed
+ * Tests of the signals of a pack run in `host/grc.ts` (commons 0001-grc-engineering FR-019): with a telemetry made from a fixed clock and fixed
  * random bytes, the exact span tree (a `grc.pack` span and one `grc.control` span under it for each control and subject, `error` where a
  * check fails or errs), their attributes, and one log record per finding in its check's span, with the severity its severity maps to and a
  * body that decodes, through OTLP JSON and back, as the finding's OCSF Compliance Finding (class 2003). The assessment is `runPack`'s for
@@ -25,16 +25,16 @@ import {
   type Status,
   verdict,
   type Waiver,
-} from "../../kernel/grc.ts";
-import { complianceFinding } from "../../kernel/ocsf.ts";
+} from "../src/grc.ts";
+import { complianceFinding } from "../src/ocsf.ts";
 import { SEVERITY, type SpanData } from "@intellectual-frontiers/telemetry/otel";
 import { decodeLogs, encodeLogs } from "@intellectual-frontiers/telemetry/otlp";
 import { createTelemetry, memoryProcessor } from "@intellectual-frontiers/telemetry/signals";
-import { FINDING_SEVERITY, fromAnyValue, GRC_SCOPE, GRC_SIGNALS, installedGrcTelemetry, runPackObserved } from "../../runtime/grc.ts";
+import { FINDING_SEVERITY, fromAnyValue, GRC_SCOPE, GRC_SIGNALS, installedGrcTelemetry, runPackObserved } from "../src/host/grc.ts";
 import { createPipeline, install, installed, uninstall } from "@intellectual-frontiers/telemetry/host/otel";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
-const FR = "0007-grc FR-019";
+const FR = "0001-grc-engineering FR-019";
 
 const instant = (text: string): Instant => {
   const i = instantOf(text);

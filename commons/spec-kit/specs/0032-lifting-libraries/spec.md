@@ -23,7 +23,7 @@
   | 1 | system | runtime/fs, runtime/path, runtime/dirs, runtime/lock, runtime/watch, runtime/discover, runtime/errors, runtime/proc, runtime/git, runtime/compile, runtime/schedule, runtime/tty, runtime/stdio, kernel/schedule |
   | 1 | net | runtime/net, runtime/tcp, runtime/dns, runtime/http-client, runtime/serve, runtime/acme |
   | 2 | telemetry | kernel/otel, kernel/otlp, kernel/signals, kernel/render, runtime/otel, runtime/console, runtime/trace |
-  | 2 | grc | kernel/grc, kernel/assess, kernel/evidence, kernel/oscal, kernel/ocsf, kernel/ocsf-types.auto, kernel/attest, runtime/grc, runtime/sign |
+  | 2 | grc | kernel/grc, kernel/assess, kernel/evidence, kernel/oscal, kernel/ocsf, kernel/ocsf-types.auto, kernel/attest, runtime/grc, runtime/sign, tools/ocsf-gen (the generator of the OCSF types) |
   | 3 | test | runtime/test, kernel/test-record |
   | 4 | quality | quality/, kernel/test-report, runtime/test-run |
   | 3 | mizan | mizan/integrations, mizan/rules, mizan/levels, mizan/check, mizan/harness, mizan/standards, mizan/spec-files, mizan/spec-terms, mizan/newer, mizan/imports, mizan/mod, mizan/generate-ontology, mizan/publish-ontology, mizan/oscal-register, kernel/trace, kernel/layers |
@@ -81,6 +81,7 @@
   | FR-057 (MD5) | crypto |
   | FR-068 (AWS Signature Version 4) | crypto |
   | FR-013 (test registration), FR-060 (only, steps), FR-065 (the); 0008-test-evidence FR-001 to FR-003 (the record of a test) | test |
+  | 0007-grc FR-001 to FR-020 and FR-022 (every requirement of GRC engineering but the one on running a program, which is the system's) | grc |
 
 Inversions that make the layers true: `runtime/proc` used the telemetry (`traceProcess`) and `runtime/dns` held `networkInterfaces`, which `proc` re-exported: the first would have made `system` depend on `telemetry` and the second on `net`, both above it. The map is made true by inversion: `proc.setProcessTracer` is the port the telemetry installs when its module is loaded (a program is run with nothing added where none is installed), and `networkInterfaces` and its type live in `proc`, where `dns` no longer has them. The telemetry's own `traceProcess` stays in `runtime/otel`. `test` is above `telemetry` (its registration installs a record on the telemetry's pipeline) and below `quality`: the record of a test (`kernel/test-record`) is the test's, and the run of a suite and the renderings of a record (`runtime/test-run`, `kernel/test-report`) depend on the evidence, OSCAL and signing, so they go with `quality`, which depends on `test`, not the reverse; the one thing the record took of `grc` (`roleOf`, a pattern) is held in the record, and a test of the whole keeps the two the same.
 

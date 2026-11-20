@@ -24,7 +24,7 @@ import {
   riskRegister,
   requirementCoverage,
   trace,
-} from "../../kernel/assess.ts";
+} from "../src/assess.ts";
 import {
   addDuration,
   type ControlSummary,
@@ -36,12 +36,12 @@ import {
   instantOf,
   type Outcome,
   roleOf,
-} from "../../kernel/grc.ts";
+} from "../src/grc.ts";
 import { type Json, parseJson5 } from "@intellectual-frontiers/formats/json5";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
-const FR = (n: string): `0007-grc FR-${string}` => `0007-grc FR-${n}`;
+const FR = (n: string): `0001-grc-engineering FR-${string}` => `0001-grc-engineering FR-${n}`;
 
 function at(text: string): Instant {
   const i = instantOf(text);

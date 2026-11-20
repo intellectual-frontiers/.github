@@ -23,7 +23,7 @@
  * @module
  */
 import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
-import { GENESIS } from "../../kernel/evidence.ts";
+import { GENESIS } from "@intellectual-frontiers/grc/evidence";
 import type { Attributes } from "@intellectual-frontiers/telemetry/otel";
 import type { Sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { AlreadyExists } from "@intellectual-frontiers/system/errors";

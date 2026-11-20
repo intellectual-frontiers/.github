@@ -44,7 +44,7 @@ import {
   type OscalComponentDefinition,
   type OscalOptions,
   renderOscal,
-} from "../kernel/oscal.ts";
+} from "@intellectual-frontiers/grc/oscal";
 import {
   type Assessment,
   type ControlSummary,
@@ -53,7 +53,7 @@ import {
   instantOf,
   type Status,
   type SubjectRef,
-} from "../kernel/grc.ts";
+} from "@intellectual-frontiers/grc/grc";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { type Cited, parseSpec, proofsOf, type SourceFile } from "../kernel/trace.ts";
 import { NAMESPACE_URL, uuidV5 } from "@intellectual-frontiers/crypto/uuid";

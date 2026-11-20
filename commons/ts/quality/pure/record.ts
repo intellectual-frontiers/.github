@@ -21,7 +21,7 @@
  */
 import { absurd, formatDecodeError, err, ok, type Result } from "@intellectual-frontiers/core";
 import type { DecodeError } from "@intellectual-frontiers/core";
-import { GENESIS } from "../../kernel/evidence.ts";
+import { GENESIS } from "@intellectual-frontiers/grc/evidence";
 import type { JsonObject } from "@intellectual-frontiers/formats/json5";
 import {
   type AnyMap,

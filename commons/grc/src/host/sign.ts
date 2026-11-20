@@ -1,12 +1,13 @@
+// Spec: 0001-grc-engineering FR-020
 /**
- * Signing and verifying behind one interface (commons 0007-grc FR-020): a `Signer` turns bytes into a signature and the id of the key that
+ * Signing and verifying behind one interface (commons 0001-grc-engineering FR-020): a `Signer` turns bytes into a signature and the id of the key that
  * made it, a `Verifier` says whether a signature over bytes holds. Two kinds stand behind it. `sshSigner` and `sshVerifier` run OpenSSH's
  * `ssh-keygen -Y sign` and `ssh-keygen -Y verify` by their argument vector (the message on standard input, the signature an armored
  * SSHSIG), with the namespace given, the private key a file the caller names and the allowed signers a file the caller names; nothing else
  * is read, and the signature's temporary file is removed after use. `webCryptoSigner` and `webCryptoVerifier` sign with Web Crypto keys
- * (Ed25519, ECDSA with DER signatures, RSA-PSS, RSASSA-PKCS1-v1_5) in the same form as `kernel/dsse.ts`, so an envelope signed here
+ * (Ed25519, ECDSA with DER signatures, RSA-PSS, RSASSA-PKCS1-v1_5) in the same form as `crypto/dsse`, so an envelope signed here
  * verifies there and the other way round. `signEnvelopeWith` and `verifyEnvelopeWith` make and check DSSE envelopes with any of them, and
- * `toSign` and `toVerifySignature` give the shapes `kernel/evidence.ts` takes for manifests and bundles.
+ * `toSign` and `toVerifySignature` give the shapes `evidence.ts` takes for manifests and bundles.
  *
  * Failures expected in use (no `ssh-keygen`, a key that cannot sign) are `Result`s; a signature that does not hold is `ok(false)`.
  *
@@ -27,7 +28,7 @@ import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import { fromBase64, toBase64 } from "@intellectual-frontiers/formats/base64";
 import { children, integer, readTlv, sequence, TAG } from "@intellectual-frontiers/formats/der";
 import { type DsseAlgorithm, type DsseEnvelope, pae, signatureAlgorithm } from "@intellectual-frontiers/crypto/dsse";
-import type { Sign, VerifySignature } from "../kernel/evidence.ts";
+import type { Sign, VerifySignature } from "../evidence.ts";
 import { fromHex } from "@intellectual-frontiers/formats/hex";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { NotFound } from "@intellectual-frontiers/system/errors";
@@ -78,7 +79,7 @@ export function formatSignError(e: SignError): string {
   }
 }
 
-/** A signer as the `Sign` that `kernel/evidence.ts` takes; that shape has no error, so a failure rejects with an `Error` naming it. */
+/** A signer as the `Sign` that `evidence.ts` takes; that shape has no error, so a failure rejects with an `Error` naming it. */
 export function toSign(signer: Signer): Sign {
   return async (message) => {
     const r = await signer.sign(message);
@@ -87,7 +88,7 @@ export function toSign(signer: Signer): Sign {
   };
 }
 
-/** A verifier as the `VerifySignature` that `kernel/evidence.ts` takes; a check that cannot be done rejects, which it reports as a bad signature with the reason. */
+/** A verifier as the `VerifySignature` that `evidence.ts` takes; a check that cannot be done rejects, which it reports as a bad signature with the reason. */
 export function toVerifySignature(verifier: Verifier): VerifySignature {
   return async (message, signature) => {
     const r = await verifier.verify(message, signature);
@@ -292,7 +293,7 @@ const CURVE_BYTES = { "P-256": 32, "P-384": 48, "P-521": 66 } as const;
 const CURVE_HASH = { "P-256": "SHA-256", "P-384": "SHA-384", "P-521": "SHA-512" } as const;
 const HASH_BYTES = { "SHA-256": 32, "SHA-384": 48, "SHA-512": 64 } as const;
 
-/** Web Crypto's parameters for an algorithm, as `kernel/dsse.ts` signs with them. */
+/** Web Crypto's parameters for an algorithm, as `crypto/dsse` signs with them. */
 function params(a: DsseAlgorithm): AlgorithmIdentifier | EcdsaParams | RsaPssParams {
   switch (a.kind) {
     case "ed25519":
@@ -326,7 +327,7 @@ function ecdsaFromDer(der: Uint8Array, n: number): Uint8Array<ArrayBuffer> | und
 
 const reason = (e: unknown): string => (e instanceof Error ? e.message : String(e));
 
-/** A signer with a Web Crypto private key, its signatures in the form `kernel/dsse.ts` writes (ECDSA as DER), each named by `keyid`. */
+/** A signer with a Web Crypto private key, its signatures in the form `crypto/dsse` writes (ECDSA as DER), each named by `keyid`. */
 export function webCryptoSigner(privateKey: CryptoKey, keyid: string): Signer {
   return {
     kind: "web-crypto",
@@ -346,7 +347,7 @@ export function webCryptoSigner(privateKey: CryptoKey, keyid: string): Signer {
   };
 }
 
-/** A verifier with a Web Crypto public key, of signatures in the form `kernel/dsse.ts` writes; with `keyid`, matched by it in envelopes. */
+/** A verifier with a Web Crypto public key, of signatures in the form `crypto/dsse` writes; with `keyid`, matched by it in envelopes. */
 export function webCryptoVerifier(publicKey: CryptoKey, keyid?: string): Verifier {
   const verify = async (message: Uint8Array, sig: Uint8Array): Promise<Result<boolean, SignError>> => {
     const a = signatureAlgorithm(publicKey);

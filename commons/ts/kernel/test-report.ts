@@ -31,10 +31,24 @@ import {
   statement,
   verifyStatement,
 } from "@intellectual-frontiers/crypto/dsse";
-import { formatLedgerBreak, type LedgerBreak, type LedgerEntry, type LedgerRecord, verifyLedger } from "./evidence.ts";
-import { type ControlRef, type ControlSummary, type Finding, type Instant, instantFromEpochMs, type Severity, type Status } from "./grc.ts";
+import {
+  formatLedgerBreak,
+  type LedgerBreak,
+  type LedgerEntry,
+  type LedgerRecord,
+  verifyLedger,
+} from "@intellectual-frontiers/grc/evidence";
+import {
+  type ControlRef,
+  type ControlSummary,
+  type Finding,
+  type Instant,
+  instantFromEpochMs,
+  type Severity,
+  type Status,
+} from "@intellectual-frontiers/grc/grc";
 import type { Json, JsonObject } from "@intellectual-frontiers/formats/json5";
-import { assessmentResults, renderOscal } from "./oscal.ts";
+import { assessmentResults, renderOscal } from "@intellectual-frontiers/grc/oscal";
 import {
   type LogRecord,
   parseSpanId,

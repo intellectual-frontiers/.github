@@ -42,12 +42,12 @@ import {
   type Waiver,
   waiverDecoder,
   waiverState,
-} from "../../kernel/grc.ts";
+} from "../src/grc.ts";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { type Equal, expectType } from "@intellectual-frontiers/core";
 import { assert, assertEquals, assertThrows, proves } from "@intellectual-frontiers/test";
 
-const FR = (n: string): `0007-grc FR-${string}` => `0007-grc FR-${n}`;
+const FR = (n: string): `0001-grc-engineering FR-${string}` => `0001-grc-engineering FR-${n}`;
 
 function at(text: string): Instant {
   const i = instantOf(text);

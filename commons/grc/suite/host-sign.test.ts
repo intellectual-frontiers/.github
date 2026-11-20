@@ -1,6 +1,6 @@
 /**
- * Tests of `runtime/sign.ts`: Web Crypto signers and verifiers round-trip over random messages and refuse a changed one; their DSSE
- * envelopes verify with `kernel/dsse.ts` and the other way round; they sign and check evidence bundles through `kernel/evidence.ts`'s
+ * Tests of `host/sign.ts`: Web Crypto signers and verifiers round-trip over random messages and refuse a changed one; their DSSE
+ * envelopes verify with `crypto/dsse` and the other way round; they sign and check evidence bundles through `evidence.ts`'s
  * shapes; a key that cannot sign, a missing program and a missing allowed signers file are errors, not throws. Where `ssh-keygen` is
  * installed, a throwaway Ed25519 key signs with `ssh-keygen -Y sign` and verifies with `-Y verify`, bound to its namespace and identity.
  *
@@ -8,7 +8,7 @@
  */
 import fc from "fast-check";
 import { type DsseKey, signEnvelope, verifyEnvelope } from "@intellectual-frontiers/crypto/dsse";
-import { readBundle, writeBundle } from "../../kernel/evidence.ts";
+import { readBundle, writeBundle } from "../src/evidence.ts";
 import { readTextFile, withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { join } from "@intellectual-frontiers/system/path";
 import { run, which } from "@intellectual-frontiers/system/proc";
@@ -22,10 +22,10 @@ import {
   verifyEnvelopeWith,
   webCryptoSigner,
   webCryptoVerifier,
-} from "../../runtime/sign.ts";
+} from "../src/host/sign.ts";
 import { assert, assertEquals, assertRejects, proves } from "@intellectual-frontiers/test";
 
-const FR = "0007-grc FR-020";
+const FR = "0001-grc-engineering FR-020";
 const enc = new TextEncoder();
 
 async function pair(params: AlgorithmIdentifier | EcKeyGenParams): Promise<CryptoKeyPair> {

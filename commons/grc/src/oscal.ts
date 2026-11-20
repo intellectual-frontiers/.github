@@ -1,5 +1,6 @@
+// Spec: 0001-grc-engineering FR-017
 /**
- * Assessments as OSCAL 1.2.3 JSON (commons 0007-grc FR-017): `assessment-results` (one result of every finding as an observation and of
+ * Assessments as OSCAL 1.2.3 JSON (commons 0001-grc-engineering FR-017): `assessment-results` (one result of every finding as an observation and of
  * every reviewed control as an OSCAL finding), a `plan-of-action-and-milestones` (a POA&M item and a risk for each finding not passing, and
  * for each risk of a register), a `component-definition` (a component whose control implementations are the catalog controls its controls
  * implement), and a minimal `system-security-plan` of what is implemented and how far, from an assessment.

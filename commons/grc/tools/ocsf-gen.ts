@@ -1,5 +1,6 @@
+// Spec: 0001-grc-engineering FR-016
 /**
- * The generator of `kernel/ocsf-types.auto.ts` (commons 0007-grc FR-016): TypeScript types for the OCSF classes the harnesses emit, and
+ * The generator of `src/ocsf-types.auto.ts` (commons 0001-grc-engineering FR-016): TypeScript types for the OCSF classes the harnesses emit, and
  * every object those classes use, from the OCSF schema server's resolved schema at one pinned version. A required attribute is required in
  * the types; an attribute a profile adds is optional; an enumeration is the union of its values, with their captions in the JSDoc.
  *
@@ -8,7 +9,7 @@
  * the network (schema.ocsf.io), so it is run by hand and its output is committed; CI does not run it. Moving to another OCSF version is
  * three steps: set `VERSION`, run with `--pins` and paste the table it prints into `PINS`, then run it again to write the types.
  *
- *   bun tools/ocsf-gen.ts            fetch, check every response against its pin, write kernel/ocsf-types.auto.ts and format it
+ *   bun tools/ocsf-gen.ts            fetch, check every response against its pin, write src/ocsf-types.auto.ts and format it
  *   bun tools/ocsf-gen.ts --check    the same, but fail if the file written would differ from the one in the tree
  *   bun tools/ocsf-gen.ts --pins     fetch, and print the SHA-256 of every response as the `PINS` table
  *
@@ -196,7 +197,7 @@ const PINS: Readonly<Record<string, string>> = {
 };
 
 const ROOT = resolve(dirname(fromFileUrl(import.meta.url)), "..");
-const OUT = join(ROOT, "kernel", "ocsf-types.auto.ts");
+const OUT = join(ROOT, "src", "ocsf-types.auto.ts");
 
 /** Stop with a message and status 1. */
 function stop(message: string): never {
@@ -402,7 +403,7 @@ function declare(name: string, d: Def, fixed: Readonly<Record<string, string>> =
 
 const out: string[] = [
   "/**",
-  ` * TypeScript types for the OCSF ${VERSION} classes the harnesses emit (commons 0007-grc FR-016), and every object they use. A required`,
+  ` * TypeScript types for the OCSF ${VERSION} classes the harnesses emit (commons 0001-grc-engineering FR-016), and every object they use. A required`,
   " * attribute is required here; an attribute a profile adds is optional; a deprecated one says so. The classes:",
   ...classes.map((c) => ` * - ${doc(c.caption)} (${String(c.uid)}, \`${c.name}\`)`),
   " *",
@@ -447,7 +448,7 @@ async function format(path: string): Promise<void> {
 }
 
 if (args.includes("--check")) {
-  const probe = join(ROOT, "kernel", `ocsf-types.check-${String(Date.now())}.ts`);
+  const probe = join(ROOT, "src", `ocsf-types.check-${String(Date.now())}.ts`);
   try {
     await writeTextFile(probe, text);
     await format(probe);

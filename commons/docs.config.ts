@@ -31,6 +31,7 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/lint/spec-kit" },
     { layout: "commons", dir: "commons/net/spec-kit" },
     { layout: "commons", dir: "commons/test/spec-kit" },
+    { layout: "commons", dir: "commons/grc/spec-kit" },
     { layout: "commons", dir: "commons/crypto/spec-kit" },
     { layout: "commons", dir: "commons/formats/spec-kit" },
     { layout: "commons", dir: "commons/data/spec-kit" },

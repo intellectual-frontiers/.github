@@ -69,6 +69,7 @@ const LIFTED = new Set([
   CORE,
   "@intellectual-frontiers/crypto",
   "@intellectual-frontiers/formats",
+  "@intellectual-frontiers/grc",
   "@intellectual-frontiers/net",
   "@intellectual-frontiers/rdf",
   "@intellectual-frontiers/system",
@@ -135,7 +136,7 @@ proves(
 );
 
 proves(["0005-typescript-runtime FR-002"], "the kernel imports nothing outside kernel/ but core, the foundation", () => {
-  assert(KERNEL.length > 5);
+  assert(KERNEL.length > 3);
   const bad: string[] = [];
   for (const f of KERNEL) {
     for (const s of specifiers(readTextFileSync(join(ROOT, f)))) {
@@ -148,7 +149,7 @@ proves(["0005-typescript-runtime FR-002"], "the kernel imports nothing outside k
 });
 
 proves(["0005-typescript-runtime FR-003"], "the runtime imports only node: builtins, kernel/ and runtime/", () => {
-  assert(RUNTIME.length > 3);
+  assert(RUNTIME.length > 1);
   const bad: string[] = [];
   for (const f of RUNTIME) {
     for (const s of specifiers(readTextFileSync(join(ROOT, f)))) {
@@ -248,6 +249,7 @@ proves(
       "@intellectual-frontiers/core": "link:../core",
       "@intellectual-frontiers/crypto": "link:../crypto",
       "@intellectual-frontiers/formats": "link:../formats",
+      "@intellectual-frontiers/grc": "link:../grc",
       "@intellectual-frontiers/net": "link:../net",
       "@intellectual-frontiers/rdf": "link:../rdf",
       "@intellectual-frontiers/system": "link:../system",
@@ -345,6 +347,7 @@ proves(
       "@intellectual-frontiers/core": "0.1.0",
       "@intellectual-frontiers/crypto": "0.1.0",
       "@intellectual-frontiers/formats": "0.1.0",
+      "@intellectual-frontiers/grc": "0.1.0",
       "@intellectual-frontiers/net": "0.1.0",
       "@intellectual-frontiers/rdf": "0.1.0",
       "@intellectual-frontiers/system": "0.1.0",

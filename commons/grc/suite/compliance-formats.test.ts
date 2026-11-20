@@ -6,7 +6,7 @@
  * @module
  */
 import fc from "fast-check";
-import { defineRisk, type Risk } from "../../kernel/assess.ts";
+import { defineRisk, type Risk } from "../src/assess.ts";
 import {
   bomStatement,
   type CdxBom,
@@ -16,10 +16,10 @@ import {
   intotoStatement,
   niUri,
   type TypedStatement,
-} from "../../kernel/attest.ts";
+} from "../src/attest.ts";
 import { object, string, unknownValue, type Equal, expectType } from "@intellectual-frontiers/core";
 import { signStatement, verifyStatement } from "@intellectual-frontiers/crypto/dsse";
-import { canonicalize } from "../../kernel/evidence.ts";
+import { canonicalize } from "../src/evidence.ts";
 import {
   type Assessment,
   type ControlSummary,
@@ -40,7 +40,7 @@ import {
   SEVERITIES,
   STATUSES,
   verdict,
-} from "../../kernel/grc.ts";
+} from "../src/grc.ts";
 import {
   cloudResourcesInventoryInfo,
   type CloudResourcesInventoryEvent,
@@ -60,15 +60,15 @@ import {
   userInventoryInfo,
   vulnerabilityFinding,
   type VulnerabilityFindingEvent,
-} from "../../kernel/ocsf.ts";
-import { assessmentResults, componentDefinition, type OscalOptions, poam, renderOscal, systemSecurityPlan } from "../../kernel/oscal.ts";
+} from "../src/ocsf.ts";
+import { assessmentResults, componentDefinition, type OscalOptions, poam, renderOscal, systemSecurityPlan } from "../src/oscal.ts";
 import { type Sha256, sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { NAMESPACE_URL, uuidOf, uuidV5, uuidVersion } from "@intellectual-frontiers/crypto/uuid";
 import { assert, assertEquals, assertNotEquals, proves } from "@intellectual-frontiers/test";
 
-const OCSF = "0007-grc FR-016";
-const OSCAL = "0007-grc FR-017";
-const CDX = "0007-grc FR-018";
+const OCSF = "0001-grc-engineering FR-016";
+const OSCAL = "0001-grc-engineering FR-017";
+const CDX = "0001-grc-engineering FR-018";
 
 function at(text: string): Instant {
   const i = instantOf(text);

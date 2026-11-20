@@ -11,7 +11,7 @@
  *
  * @module
  */
-import { instantOf } from "../../kernel/grc.ts";
+import { instantOf } from "@intellectual-frontiers/grc/grc";
 import type { Declaration } from "../../mizan/changes/declaration.ts";
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { existsSync, readTextFile } from "@intellectual-frontiers/system/fs";

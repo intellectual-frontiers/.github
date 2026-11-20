@@ -1,5 +1,6 @@
+// Spec: 0001-grc-engineering FR-010
 /**
- * Assessment: what findings, evidence and declarations add up to (commons 0007-grc FR-010 to FR-015). Every function is pure and takes the
+ * Assessment: what findings, evidence and declarations add up to (commons 0001-grc-engineering FR-010 to FR-015). Every function is pure and takes the
  * instant it judges at as a value.
  *
  * - **Coverage** rolls each catalog control (a requirement) or control up as `gap`, `untested`, `partial`, `addressed` or `covered` (FR-010).

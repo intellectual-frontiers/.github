@@ -1,5 +1,5 @@
 /**
- * Tests of `runtime/grc.ts`: waivers, risks and impact declarations loaded from TOML, YAML, JSON and JSON5 files written to a temporary
+ * Tests of `host/grc.ts`: waivers, risks and impact declarations loaded from TOML, YAML, JSON and JSON5 files written to a temporary
  * folder (the same random waivers read back alike from each format), a generic decoder through `loadData`, and the errors, each naming the
  * file: an extension that is no format, a file that is not there, text that does not parse (with its line), and a value that does not
  * decode (with its path, a waiver with no expiry included).
@@ -12,11 +12,11 @@ import { toJson5 } from "@intellectual-frontiers/formats/json5";
 import { toToml } from "@intellectual-frontiers/formats/toml";
 import { toYaml } from "@intellectual-frontiers/formats/yaml";
 import { withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
-import { formatLoadError, formatOf, loadData, loadImpactDeclarations, loadRisks, loadWaivers, type LoadError } from "../../runtime/grc.ts";
+import { formatLoadError, formatOf, loadData, loadImpactDeclarations, loadRisks, loadWaivers, type LoadError } from "../src/host/grc.ts";
 import { join } from "@intellectual-frontiers/system/path";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
-const FR = "0007-grc FR-022";
+const FR = "0001-grc-engineering FR-021";
 
 const WAIVERS_TOML = `
 [[waivers]]

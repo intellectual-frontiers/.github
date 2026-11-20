@@ -1,6 +1,7 @@
+// Spec: 0001-grc-engineering FR-006
 /**
  * Evidence: JSON's canonical form and the digest it gives, a hash-chained ledger, a manifest of files and a deterministic bundle (commons
- * 0007-grc FR-006 to FR-009). The kernel holds no key: a manifest's signature is made and checked by functions the caller gives.
+ * 0001-grc-engineering FR-006 to FR-009). The kernel holds no key: a manifest's signature is made and checked by functions the caller gives.
  *
  * - `canonicalize` writes RFC 8785's JSON Canonicalization Scheme: object members sorted by the UTF-16 code units of their names, numbers
  *   as ECMAScript writes them, strings with JSON's minimal escapes, no white space; `evidenceDigest` is the SHA-256 of its UTF-8 (FR-006).

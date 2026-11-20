@@ -7,7 +7,7 @@
  * @module
  */
 import { decodeLogs } from "@intellectual-frontiers/telemetry/otlp";
-import { GENESIS } from "../kernel/evidence.ts";
+import { GENESIS } from "@intellectual-frontiers/grc/evidence";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { OUTCOMES } from "@intellectual-frontiers/test/record";
 import { readTextFileSync } from "@intellectual-frontiers/system/fs";

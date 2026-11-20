@@ -1,5 +1,5 @@
 /**
- * TypeScript types for the OCSF 1.9.0 classes the harnesses emit (commons 0007-grc FR-016), and every object they use. A required
+ * TypeScript types for the OCSF 1.9.0 classes the harnesses emit (commons 0001-grc-engineering FR-016), and every object they use. A required
  * attribute is required here; an attribute a profile adds is optional; a deprecated one says so. The classes:
  * - Compliance Finding (2003, `compliance_finding`)
  * - Vulnerability Finding (2002, `vulnerability_finding`)

@@ -1,5 +1,6 @@
+// Spec: 0001-grc-engineering FR-021
 /**
- * The GRC host (commons 0007-grc FR-022): waivers, risk registers, impact declarations and any other data the caller has a decoder for,
+ * The GRC host (commons 0001-grc-engineering FR-021): waivers, risk registers, impact declarations and any other data the caller has a decoder for,
  * loaded from TOML, YAML, JSON or JSON5 files (chosen by the file's extension) with the kernel's parsers and decoders. An error names the
  * file and either where its text stops parsing (line and column) or the path of the value that does not decode (`$.waivers[1].expiresAt`).
  * A list file holds its items either as its top-level array or under one key (`waivers`, `risks`, `declarations`), so TOML, whose top
@@ -42,7 +43,7 @@ import {
   ok,
   type Result,
 } from "@intellectual-frontiers/core";
-import { type ImpactDeclaration, impactDeclarationDecoder, type RiskInput, riskDecoder } from "../kernel/assess.ts";
+import { type ImpactDeclaration, impactDeclarationDecoder, type RiskInput, riskDecoder } from "../assess.ts";
 import {
   type Assessment,
   applyWaivers,
@@ -59,9 +60,9 @@ import {
   subjectRef,
   type Waiver,
   waiverDecoder,
-} from "../kernel/grc.ts";
+} from "../grc.ts";
 import { parseJson5 } from "@intellectual-frontiers/formats/json5";
-import { complianceFinding, type OcsfComplianceFinding, type OcsfProduct } from "../kernel/ocsf.ts";
+import { complianceFinding, type OcsfComplianceFinding, type OcsfProduct } from "../ocsf.ts";
 import { type AnyMap, type AnyValue, SEVERITY, type Scope, type SeverityNumber } from "@intellectual-frontiers/telemetry/otel";
 import { defineSignals, type Telemetry } from "@intellectual-frontiers/telemetry/signals";
 import { isTomlDateTime, parseToml, type TomlValue } from "@intellectual-frontiers/formats/toml";

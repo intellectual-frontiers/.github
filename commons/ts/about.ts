@@ -13,7 +13,7 @@ export const about: About = {
   summary:
     "The TypeScript part of Intellectual Frontiers Commons. It rests only on what belongs to no vendor (TypeScript 7, ECMAScript, the web " +
     "standards and the `node:` modules that Bun and Node both implement), so the same code runs on Bun, the default runtime, and on Node 26, the backup, on Linux, macOS and " +
-    "Windows. It is OpenTelemetry-native (commons 0006-signals), carries the primitives of GRC engineering (commons 0007-grc) and records each " +
+    "Windows. It is OpenTelemetry-native (commons 0006-signals), carries the primitives of GRC engineering (the library `grc`, commons 0007-grc) and records each " +
     "test run as compliance evidence (commons 0008-test-evidence). A harness depends on this repository's root package, " +
     "`@intellectual-frontiers/commons`, by Git at a commit its lockfile holds, and imports the `.ts` sources (`@intellectual-frontiers/commons/ts/kernel`): " +
     "Bun runs them as they are, and Node 26 with the hook `--import @intellectual-frontiers/commons/ts/node`. There is no release and no build. A library of this repository (`commons/data`) links it by `link:../ts` and imports it by package name, with no hook (FR-074 to FR-077). " +
@@ -29,7 +29,7 @@ export const about: About = {
     },
     {
       path: "runtime/",
-      what: "What is left of the host: the network, serving, signing and GRC (files, paths, processes, Git, locks and the terminal's streams are the library `system`, and OpenTelemetry signals, their export and the console are the library `telemetry`, imported by package name).",
+      what: "What is left of the host: the reader of the files the trace check judges (`trace`) and the run of a suite of tests as evidence (`test-run`). The files, paths and processes are the library `system`, the network is `net`, the signals are `telemetry`, tests are `test` and GRC engineering, with its loaders and signers, is `grc`, each imported by package name.",
       mayImport: ["node: builtins", "kernel/", "runtime/", "the lifted libraries, by package name"],
     },
     {
@@ -111,10 +111,6 @@ export const about: About = {
     {
       run: "bun run smoke",
       does: "Installs the checkout's HEAD as a Git dependency into an empty project, uses it and runs ifc test on Bun and Node 26, and checks a consumer with tsc 7.",
-    },
-    {
-      run: "bun tools/ocsf-gen.ts --check",
-      does: "Checks that kernel/ocsf-types.auto.ts is what the pinned OCSF 1.9.0 schema gives (needs the network; run by hand).",
     },
   ],
   rules: [

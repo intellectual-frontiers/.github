@@ -18,7 +18,7 @@
  * @module
  */
 import { absurd, formatDecodeError, json, err, ok, type Result } from "@intellectual-frontiers/core";
-import { canonicalize as jcs } from "../../kernel/evidence.ts";
+import { canonicalize as jcs } from "@intellectual-frontiers/grc/evidence";
 import { decodeTraces } from "@intellectual-frontiers/telemetry/otlp";
 import { attributeText } from "@intellectual-frontiers/test/record";
 import { type Sha256, sha256 } from "@intellectual-frontiers/crypto/sha256";

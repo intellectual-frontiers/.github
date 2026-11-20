@@ -1,5 +1,6 @@
+// Spec: 0001-grc-engineering FR-016
 /**
- * Findings and inventories as OCSF 1.9.0 events (commons 0007-grc FR-016), typed by the types `tools/ocsf-gen.ts` generates from the
+ * Findings and inventories as OCSF 1.9.0 events (commons 0001-grc-engineering FR-016), typed by the types `tools/ocsf-gen.ts` generates from the
  * pinned OCSF 1.9.0 schema (`ocsf-types.auto.ts`, re-exported here), so a missing required attribute does not compile. The classes are the
  * ones the harnesses emit:
  *

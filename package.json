@@ -34,6 +34,7 @@
     "@intellectual-frontiers/core": "0.1.0",
     "@intellectual-frontiers/crypto": "0.1.0",
     "@intellectual-frontiers/formats": "0.1.0",
+    "@intellectual-frontiers/grc": "0.1.0",
     "@intellectual-frontiers/net": "0.1.0",
     "@intellectual-frontiers/rdf": "0.1.0",
     "@intellectual-frontiers/system": "0.1.0",

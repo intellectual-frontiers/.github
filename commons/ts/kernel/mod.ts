@@ -37,12 +37,6 @@
  *
  * @module
  */
-export * as assess from "./assess.ts";
-export * as attest from "./attest.ts";
-export * as evidence from "./evidence.ts";
-export * as grc from "./grc.ts";
-export * as ocsf from "./ocsf.ts";
-export * as oscal from "./oscal.ts";
 export * as layers from "./layers.ts";
 export * as testReport from "./test-report.ts";
 export * as trace from "./trace.ts";
