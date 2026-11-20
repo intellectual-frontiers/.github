@@ -13,5 +13,10 @@
   "scripts": {
     "verify": "bun ../libraries/src/pack-metapackage.ts --check && bun tools/pack.ts --check",
     "pack": "bun tools/pack.ts"
+  },
+  "devDependencies": {
+    "@intellectual-frontiers/libraries": "link:../libraries",
+    "@intellectual-frontiers/system": "link:../system",
+    "@types/node": "26.6.6"
   }
 }

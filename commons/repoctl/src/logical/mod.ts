@@ -15,6 +15,7 @@
 export * from "./check.ts";
 export * from "./commit.ts";
 export * from "./constants.ts";
+export * from "./declared.ts";
 export * from "./doctor.ts";
 export * from "./findings.ts";
 export * from "./glob.ts";

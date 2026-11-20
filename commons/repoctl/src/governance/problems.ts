@@ -27,6 +27,7 @@ export type ProblemCode =
   | "E-VERSIONS"
   | "E-TYPES"
   | "E-VERSION-CONSTANT"
+  | "E-UNDECLARED-DEPENDENCY"
   | "E-LIBRARY-CHECK"
   | "E-MERGE-FAILED"
   | "E-MERGE-CONFLICT"
@@ -78,6 +79,7 @@ export const PROBLEM_CODES: readonly ProblemCode[] = [
   "E-VERSIONS",
   "E-TYPES",
   "E-VERSION-CONSTANT",
+  "E-UNDECLARED-DEPENDENCY",
   "E-LIBRARY-CHECK",
   "E-MERGE-FAILED",
   "E-MERGE-CONFLICT",
@@ -179,6 +181,12 @@ export const CATALOGUE: Readonly<Record<ProblemCode, Explained>> = {
     what: "A constant named for a library (`ERGONEX_VERSION`) or named by its manifest in `versionConstants` does not say the version of its package.",
     why: "The release raised the version in the manifest and the package and a constant in a source was left at the old one.",
     fix: "Set the constant to the version of its library; list it in the manifest's versionConstants so that the release writes it",
+  },
+  "E-UNDECLARED-DEPENDENCY": {
+    title: "A library imports a package its manifest does not declare",
+    what: "A source, a test or a tool of a library imports a package by name (or a `node:` built-in, which needs `@types/node`) that its package.json declares neither in dependencies nor in devDependencies.",
+    why: "A library job of CI installs only its own folder, so the import, or the types of Node, are found in a checkout with the whole repository installed and are missing there.",
+    fix: "Add the package, at an exact version, to the devDependencies of the library's package.json (a library of commons as link:../<name>) and run bun install in its folder",
   },
   "E-LIBRARY-CHECK": {
     title: "The check of a library's own rules finds something",

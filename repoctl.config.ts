@@ -110,6 +110,7 @@ export default defineConfig({
     folder: "commons",
     specKit: { format: ["bun", "commons/tools/mizan-check.ts", "--root", "{kit}"], rules: ["bun", "commons/libraries/src/check.ts", "--root", "{kit}", "--level", "{level}"] },
     versionConstants: true,
+    declaredDependencies: true,
     linker: ["bun", "commons/libraries/src/link.ts"],
     roleFile: "commons/libraries/src/readme.ts",
   },

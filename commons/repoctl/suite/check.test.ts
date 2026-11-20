@@ -48,7 +48,7 @@ proves(["0003-repoctl-sync FR-008"], "a constant named for its library or by its
   assertStringIncludes(notVersion[0]?.message ?? "", "is not a version");
 });
 
-proves(["0003-repoctl-sync FR-007", "0003-repoctl-sync FR-008"], "one report over the real repository writes nothing, ends with 0 and has a section for every check", async () => {
+proves(["0003-repoctl-sync FR-007", "0003-repoctl-sync FR-008", "0003-repoctl-sync FR-010"], "one report over the real repository writes nothing, ends with 0 and has a section for every check", async () => {
   if (!CAN_RUN) return;
   const out: string[] = [];
   const err: string[] = [];
@@ -58,7 +58,7 @@ proves(["0003-repoctl-sync FR-007", "0003-repoctl-sync FR-008"], "one report ove
   assertEquals(await git(CHECKOUT, "status", "--porcelain"), before, "check writes nothing");
   const doc: unknown = JSON.parse(out.join(""));
   const ids = (typeof doc === "object" && doc !== null && "data" in doc && typeof doc.data === "object" && doc.data !== null && "sections" in doc.data && Array.isArray(doc.data.sections) ? doc.data.sections : []).map((s: unknown) => (typeof s === "object" && s !== null && "id" in s ? String(s.id) : ""));
-  for (const id of ["generator:readme", "generator:libraries", "specs", "rules", "versions", "spec-kit:repoctl", "spec-kit:core", "version-constants"]) assert(ids.includes(id), `${id} is a section`);
+  for (const id of ["generator:readme", "generator:libraries", "specs", "rules", "versions", "spec-kit:repoctl", "spec-kit:core", "version-constants", "declared-dependencies"]) assert(ids.includes(id), `${id} is a section`);
 });
 
 proves(["0003-repoctl-sync FR-009"], "every code is explained, and a text that is no code names the nearest", async () => {
