@@ -14,7 +14,6 @@
     "./check": "./src/check.ts",
     "./generate-ontology": "./src/generate-ontology.ts",
     "./generate-workflows": "./src/generate-workflows.ts",
-    "./install-bun": "./src/install-bun.ts",
     "./libraries": "./src/libraries.ts",
     "./newer": "./src/newer.ts",
     "./oscal-register": "./src/oscal-register.ts",

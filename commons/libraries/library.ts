@@ -20,7 +20,6 @@ export const library = {
     "./check",
     "./generate-ontology",
     "./generate-workflows",
-    "./install-bun",
     "./libraries",
     "./newer",
     "./oscal-register",
