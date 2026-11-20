@@ -71,6 +71,7 @@ const LIFTED = new Set([
   "@intellectual-frontiers/formats",
   "@intellectual-frontiers/githost",
   "@intellectual-frontiers/grc",
+  "@intellectual-frontiers/libraries",
   "@intellectual-frontiers/mizan",
   "@intellectual-frontiers/net",
   "@intellectual-frontiers/ontology",
@@ -90,11 +91,11 @@ const KERNEL = sources("kernel");
 const RUNTIME = sources("runtime");
 const TESTS = sources("tests");
 const TOOLS = sources("tools");
-const MIZAN = sources("mizan");
+const MIZAN = sources("../libraries/src");
 
 proves(
   ["0003-mizan FR-017"],
-  "Mizan's files import only node: built-ins, the kernel, the runtime, the ontology, the Git host contract's types and themselves",
+  "the files of the commands that hold a repository to Mizan import only node: built-ins, the libraries of commons by name and themselves",
   () => {
     assert(MIZAN.length > 1);
     const bad: string[] = [];
@@ -102,8 +103,7 @@ proves(
       for (const s of specifiers(readTextFileSync(join(ROOT, f)))) {
         if (s.startsWith("node:") || isLifted(s)) continue;
         const target = toPosix(relative(ROOT, resolve(ROOT, dirname(f), s)));
-        const ok =
-          target.startsWith("mizan/") || target.startsWith("kernel/") || target.startsWith("runtime/") || target.startsWith("../ontology/");
+        const ok = target.startsWith("../libraries/src/");
         if (!ok) bad.push(`${f}: ${s}`);
       }
     }
@@ -227,6 +227,7 @@ proves(
       "@intellectual-frontiers/formats": "link:../formats",
       "@intellectual-frontiers/githost": "link:../githost",
       "@intellectual-frontiers/grc": "link:../grc",
+      "@intellectual-frontiers/libraries": "link:../libraries",
       "@intellectual-frontiers/mizan": "link:../mizan",
       "@intellectual-frontiers/net": "link:../net",
       "@intellectual-frontiers/ontology": "link:../ontology",
@@ -293,7 +294,6 @@ proves(
       "./ts/kernel": "./kernel/mod.ts",
       "./ts/runtime": "./runtime/mod.ts",
       "./ts/runtime/test-run": "./runtime/test-run.ts",
-      "./ts/mizan": "./mizan/mod.ts",
       "./ts/quality": "./quality/mod.ts",
       "./ts/node": "./node/register.mjs",
     });
