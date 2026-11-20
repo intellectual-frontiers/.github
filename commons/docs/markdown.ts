@@ -58,6 +58,9 @@ export function langOf(info: string): Lang {
     case "ttl":
     case "turtle":
       return "turtle";
+    case "yaml":
+    case "yml":
+      return "yaml";
     case "mermaid":
       return "mermaid";
     default:

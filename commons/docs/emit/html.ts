@@ -7,7 +7,8 @@
  * @module
  */
 import { absurd } from "@intellectual-frontiers/core";
-import { tokens } from "../highlight.ts";
+import { highlightedHtml } from "../highlight.ts";
+import { renderMermaidSVG } from "beautiful-mermaid";
 import type { Badge, Block, Card, Href, Inline, Lang, Page, Section, TreeNode } from "../model.ts";
 import { plain } from "../model.ts";
 
@@ -111,11 +112,20 @@ export function unlinked(xs: readonly Inline[]): Inline[] {
 /** Inlines as HTML. */
 export const inlines = (xs: readonly Inline[], from: string): string => xs.map((i) => inline(i, from)).join("");
 
-/** Code as highlighted HTML. */
+/** Code as highlighted HTML, coloured when the site is built (FR-037). */
 export function highlighted(code: string, lang: Lang): string {
-  return tokens(code, lang)
-    .map((t) => (t.cls === "plain" ? escape(t.text) : `<span class="tk-${t.cls}">${escape(t.text)}</span>`))
-    .join("");
+  return highlightedHtml(code, lang);
+}
+
+/**
+ * A diagram as SVG, drawn when the site is built (FR-037): in the colours of the page, as custom properties, so that the light and the dark scheme need no second drawing; where the diagram cannot be drawn, its source in a code block.
+ */
+export function diagramSvg(source: string): string {
+  try {
+    return renderMermaidSVG(source, { bg: "var(--page)", fg: "var(--text)", line: "var(--muted)", accent: "var(--link)", muted: "var(--faint)", surface: "var(--chrome)", border: "var(--border-strong)", transparent: true, font: "inherit" });
+  } catch {
+    return `<pre class="lang-mermaid"><code>${escape(source)}</code></pre>`;
+  }
 }
 
 const badge = (b: Badge): string => `<span class="badge badge-${b.tone}">${escape(b.text)}</span>`;
@@ -199,9 +209,9 @@ export function block(b: Block, from: string): string {
           .join("")
       }</div>`;
     case "diagram":
-      return `<figure class="diagram"><div class="mermaid-wrap"><pre class="mermaid">${escape(b.source)}</pre></div><figcaption>${
+      return `<figure class="diagram"><div class="diagram-wrap">${diagramSvg(b.source)}</div><figcaption>${
         escape(b.caption)
-      }</figcaption><details class="diagram-source"><summary>Diagram source</summary><pre class="lang-mermaid"><code>${escape(b.source)}</code></pre></details></figure>`;
+      }</figcaption><details class="diagram-source"><summary>Diagram source</summary><pre class="lang-text"><code>${escape(b.source)}</code></pre></details></figure>`;
     case "cards":
       return `<div class="cards">${b.cards.map((c) => card(c, from)).join("")}</div>`;
     case "badges":
@@ -302,7 +312,6 @@ export function document(page: Page, site: Site): string {
     : `<nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p><ul>${
       toc.map((t) => `<li class="toc-${t.level}"><a href="#${escape(t.id)}">${escape(t.text)}</a></li>`).join("")
     }</ul></nav>`;
-  const mermaid = hasDiagram(page.blocks) ? `<script src="${asset("mermaid.min.js")}" defer></script>` : "";
   return `<!doctype html>
 <html lang="en" data-root="${escape(root)}">
 <head>
@@ -312,7 +321,7 @@ export function document(page: Page, site: Site): string {
 <meta name="description" content="${escape(page.description)}">
 <script>try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}</script>
 <link rel="stylesheet" href="${asset("site.css")}">
-${mermaid}<script src="${asset("site.js")}" defer></script>
+<script src="${asset("site.js")}" defer></script>
 </head>
 <body>
 <a class="skip" href="#content">Skip to the content</a>

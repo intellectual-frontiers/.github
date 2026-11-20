@@ -1,6 +1,5 @@
 // The one script of commons' documentation (commons 0011-documentation FR-017, FR-034): the theme, the menu on narrow screens, tabs, copy buttons, the
-// table of contents following the reader, the search ("/" opens it, "t" switches the theme, "[" and "]" go to the previous and next page; search.json is a file of the site), and Mermaid where a page has a
-// diagram. A page reads whole without it; nothing here asks another host for anything.
+// table of contents following the reader, the search ("/" opens it, "t" switches the theme, "[" and "]" go to the previous and next page; search.json is a file of the site), and a click on a diagram to see it at full size. A page reads whole without it; nothing here asks another host for anything.
 (() => {
   "use strict";
   const root = document.documentElement.dataset.root || "";
@@ -158,21 +157,9 @@
     if (e.target === dialog) dialog.close();
   });
 
-  // diagrams
-  if (window.mermaid) {
-    window.mermaid.initialize({
-      startOnLoad: false,
-      theme: "base",
-      securityLevel: "strict",
-      fontFamily: getComputedStyle(document.body).fontFamily,
-      themeVariables: scheme() === "dark"
-        ? { background: "#0a0a0a", primaryColor: "#171717", primaryBorderColor: "#525252", primaryTextColor: "#ededed", lineColor: "#8a8a8a", secondaryColor: "#1c1c1c", tertiaryColor: "#0a0a0a", fontSize: "14px" }
-        : { background: "#ffffff", primaryColor: "#fafafa", primaryBorderColor: "#a3a3a3", primaryTextColor: "#171717", lineColor: "#737373", secondaryColor: "#f5f5f5", tertiaryColor: "#ffffff", fontSize: "14px" },
-    });
-    void window.mermaid.run({ querySelector: "pre.mermaid" });
-    for (const wrap of document.querySelectorAll(".mermaid-wrap")) {
-      wrap.title = "Click to see the diagram at full size, or to fit it again";
-      wrap.addEventListener("click", () => wrap.classList.toggle("expanded"));
-    }
+  // diagrams: drawn when the site is built; a click shows one at full size, or fits it again
+  for (const wrap of document.querySelectorAll(".diagram-wrap")) {
+    wrap.title = "Click to see the diagram at full size, or to fit it again";
+    wrap.addEventListener("click", () => wrap.classList.toggle("expanded"));
   }
 })();

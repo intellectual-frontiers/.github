@@ -20,7 +20,13 @@ export const library = {
   kanon: {
     package: "@intellectual-frontiers/archon",
     family: { dialect: "{host}-dialect-{name}", plugin: "{host}-{name}" },
-    instances: [{ name: "native-pinned", instanceOf: "src/physical/dialect/", placement: "package" }],
+    instances: [
+      { name: "native-pinned", instanceOf: "src/physical/dialect/", placement: "package" },
+      { name: "apt", instanceOf: "src/physical/dialect/", placement: "package" },
+      { name: "homebrew", instanceOf: "src/physical/dialect/", placement: "package" },
+      { name: "mise", instanceOf: "src/physical/dialect/", placement: "package" },
+      { name: "winget", instanceOf: "src/physical/dialect/", placement: "package" },
+    ],
     units: [
       { folder: "src/governance/", layer: "governance", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }] },
       {

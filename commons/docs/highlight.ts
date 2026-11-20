@@ -1,196 +1,97 @@
 /**
- * Code highlighted when the site is built (commons 0011-documentation FR-017), so that a page needs no script to colour it: a small
- * scanner for each language the site shows (TypeScript, SQL, shell, TOML, JSON and JSON5, Turtle), which gives the text cut into tokens,
- * each with its class. It colours; it does not parse, so a token it does not know is plain text.
+ * Code highlighted when the site is built (commons 0011-documentation FR-017, FR-037), so that a page needs no script to colour it: Shiki, with the grammars of the languages the site shows (TypeScript, SQL, shell, TOML, JSON,
+ * Turtle and YAML) and one theme for the light scheme and one for the dark, on the Oniguruma engine (WebAssembly, so the same on Bun and Node, with no native part). Each coloured run is a span whose two colours
+ * are custom properties (`--l`, `--d`), which the stylesheet picks between by the same rule as the rest of the site's colours; a run in the theme's own foreground is plain text. Text and diagrams are not coloured.
  *
  * @example
  * ```ts
- * import { tokens } from "./highlight.ts";
- * tokens("const a = 1; // one", "ts");
- * // [{ cls: "keyword", text: "const" }, { cls: "plain", text: " a = " }, { cls: "number", text: "1" }, ...]
+ * import { highlightedHtml } from "./highlight.ts";
+ * highlightedHtml("const a = 1;", "ts");
+ * // '<span class="t" style="--l:#D73A49;--d:#F97583">const</span> a <span ...'
  * ```
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/core";
+import { createHighlighterCore } from "shiki/core";
+import { createOnigurumaEngine } from "shiki/engine/oniguruma";
+import json from "shiki/langs/json.mjs";
+import shellscript from "shiki/langs/shellscript.mjs";
+import sql from "shiki/langs/sql.mjs";
+import toml from "shiki/langs/toml.mjs";
+import turtle from "shiki/langs/turtle.mjs";
+import typescript from "shiki/langs/typescript.mjs";
+import yaml from "shiki/langs/yaml.mjs";
+import githubDark from "shiki/themes/github-dark.mjs";
+import githubLight from "shiki/themes/github-light.mjs";
 import type { Lang } from "./model.ts";
 
-/** What a token is, as the stylesheet colours it. */
-export type TokenClass = "plain" | "keyword" | "string" | "comment" | "number" | "type" | "function" | "punct" | "variable";
+/** The themes of the two schemes. */
+export const THEMES = { light: "github-light", dark: "github-dark" } as const;
 
-/** A run of code and its class. */
-export interface Token {
-  /** Its class. */
-  readonly cls: TokenClass;
-  /** Its text. */
+/** The grammar each language of the site is read with; those not here are left plain. */
+const GRAMMAR: Readonly<Partial<Record<Lang, string>>> = { ts: "typescript", sql: "sql", sh: "shellscript", toml: "toml", json: "json", turtle: "turtle", yaml: "yaml" };
+
+/** Shiki, with the Oniguruma engine (WebAssembly, the same on Bun and Node) made once when the module is read; reading code with it is then synchronous. */
+const highlighter = await createHighlighterCore({ themes: [githubLight, githubDark], langs: [typescript, sql, shellscript, toml, json, turtle, yaml], engine: createOnigurumaEngine(import("shiki/wasm")) });
+
+/** Code longer than this many characters is shown plain: a computed type of thousands of characters costs more to colour than it helps a reader, and the page folds it. */
+export const LONGEST_COLOURED = 6000;
+
+// The first reading of a grammar by the engine can give runs that are not cut at its tokens (a comment left in the text before it). A reading of each grammar here, whose result is not used, makes the readings that are
+// used the same whatever came first; the test of the highlighter holds this.
+for (const [lang, sample] of [["typescript", 'const a = f("x"); // c'], ["sql", "SELECT 1 -- c"], ["shellscript", 'echo "$A" # c'], ["toml", '[a]\nb = "x" # c'], ["json", '{"a": [1, true, null]}'], ["turtle", 'a:b a c:D ; d:e "f"@en .'], ["yaml", "a: 1\nb: [x] # c"]] as const) {
+  for (const theme of [THEMES.light, THEMES.dark]) highlighter.codeToTokensBase(sample, { lang, theme });
+}
+
+const escapeHtml = (s: string): string => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+/** The colours that are the themes' own text, which are left as plain text. */
+const FOREGROUND = { light: githubLight.colors?.["editor.foreground"]?.toLowerCase() ?? "#24292e", dark: githubDark.colors?.["editor.foreground"]?.toLowerCase() ?? "#e1e4e8" };
+
+/** One coloured run of code. */
+export interface Run {
   readonly text: string;
+  /** Its colour in the light scheme and in the dark, or none where it is the theme's own text. */
+  readonly light?: string;
+  readonly dark?: string;
+  /** Italic, bold. */
+  readonly italic: boolean;
+  readonly bold: boolean;
 }
 
-interface Grammar {
-  readonly line: readonly string[];
-  readonly block?: readonly [string, string];
-  readonly quotes: readonly string[];
-  readonly keywords: ReadonlySet<string>;
-  readonly caseless: boolean;
-  readonly types: boolean;
-  readonly variables: boolean;
+/** The runs of the lines of code, by line, in the language given; one plain run for a language that is not coloured. */
+export function runs(code: string, lang: Lang): readonly (readonly Run[])[] {
+  const grammar = GRAMMAR[lang];
+  if (grammar === undefined || code.length > LONGEST_COLOURED) return code.split("\n").map((line) => [{ text: line, italic: false, bold: false }]);
+  const lines = highlighter.codeToTokensWithThemes(code, { lang: grammar, themes: THEMES });
+  return lines.map((line) => {
+    const out: Run[] = [];
+    for (const t of line) {
+      const l = t.variants["light"];
+      const d = t.variants["dark"];
+      const plain = (l?.color ?? "").toLowerCase() === FOREGROUND.light && (d?.color ?? "").toLowerCase() === FOREGROUND.dark && ((l?.fontStyle ?? 0) | (d?.fontStyle ?? 0)) === 0;
+      const run: Run = plain
+        ? { text: t.content, italic: false, bold: false }
+        : { text: t.content, ...(l?.color === undefined ? {} : { light: l.color }), ...(d?.color === undefined ? {} : { dark: d.color }), italic: (((l?.fontStyle ?? 0) | (d?.fontStyle ?? 0)) & 1) !== 0, bold: (((l?.fontStyle ?? 0) | (d?.fontStyle ?? 0)) & 2) !== 0 };
+      const last = out[out.length - 1];
+      if (last !== undefined && last.light === run.light && last.dark === run.dark && last.italic === run.italic && last.bold === run.bold) out[out.length - 1] = { ...last, text: last.text + run.text };
+      else out.push(run);
+    }
+    return out;
+  });
 }
 
-const words = (s: string): ReadonlySet<string> => new Set(s.split(/\s+/).filter((w) => w !== ""));
-
-const TS: Grammar = {
-  line: ["//"],
-  block: ["/*", "*/"],
-  quotes: ['"', "'", "`"],
-  keywords: words(`abstract as async await break case catch class const continue debugger declare default delete do else enum export
-    extends false finally for from function get if implements import in infer instanceof interface is keyof let namespace never new null
-    of private protected public readonly return satisfies set static super switch this throw true try type typeof undefined unique unknown
-    var void while with yield any boolean number string symbol bigint object`),
-  caseless: false,
-  types: true,
-  variables: false,
-};
-
-const SQL: Grammar = {
-  line: ["--"],
-  block: ["/*", "*/"],
-  quotes: ["'", '"'],
-  keywords: words(`add all alter and as asc begin between by cascade case check collate column commit constraint create cross current_date
-    current_timestamp database default delete desc distinct do drop else end exists extension false for foreign from full function grant
-    group having if in index inner insert into is join key language left like limit materialized not null nulls offset on or order outer
-    partition policy primary procedure references replace returning returns revoke right rollback row schema select sequence set table
-    temporary then to transaction trigger true type union unique update using values view when where with without integer int bigint
-    smallint text varchar char boolean date time timestamp timestamptz numeric decimal real double precision json jsonb uuid blob serial
-    bytea interval macro plpgsql sql immutable stable volatile security definer`),
-  caseless: true,
-  types: false,
-  variables: false,
-};
-
-const SH: Grammar = {
-  line: ["#"],
-  quotes: ['"', "'"],
-  keywords: words("if then else elif fi for in do done case esac while until function return export local set unset cd echo exit"),
-  caseless: false,
-  types: false,
-  variables: true,
-};
-
-const TOML: Grammar = { line: ["#"], quotes: ['"', "'"], keywords: words("true false"), caseless: false, types: false, variables: false };
-const JSON_: Grammar = {
-  line: ["//"],
-  block: ["/*", "*/"],
-  quotes: ['"', "'"],
-  keywords: words("true false null"),
-  caseless: false,
-  types: false,
-  variables: false,
-};
-const TURTLE: Grammar = {
-  line: ["#"],
-  quotes: ['"', "'"],
-  keywords: words("a @prefix @base true false PREFIX BASE"),
-  caseless: false,
-  types: false,
-  variables: false,
-};
-
-function grammarOf(lang: Lang): Grammar | undefined {
-  switch (lang) {
-    case "ts":
-      return TS;
-    case "sql":
-      return SQL;
-    case "sh":
-      return SH;
-    case "toml":
-      return TOML;
-    case "json":
-      return JSON_;
-    case "turtle":
-      return TURTLE;
-    case "mermaid":
-    case "text":
-      return undefined;
-    default:
-      return absurd(lang);
-  }
-}
-
-/**
- * The tokens of a text of code.
- *
- * @param code - the text
- * @param lang - its language
- */
-export function tokens(code: string, lang: Lang): Token[] {
-  const g = grammarOf(lang);
-  if (g === undefined) return [{ cls: "plain", text: code }];
-  const out: Token[] = [];
-  const push = (cls: TokenClass, text: string): void => {
-    const last = out[out.length - 1];
-    if (last !== undefined && last.cls === cls) out[out.length - 1] = { cls, text: last.text + text };
-    else out.push({ cls, text });
-  };
-  let i = 0;
-  while (i < code.length) {
-    const rest = code.slice(i);
-    const lc = g.line.find((m) => rest.startsWith(m));
-    if (lc !== undefined && (lang !== "sh" || i === 0 || /\s/.test(code[i - 1] ?? ""))) {
-      const end = code.indexOf("\n", i);
-      const stop = end < 0 ? code.length : end;
-      push("comment", code.slice(i, stop));
-      i = stop;
-      continue;
-    }
-    if (g.block !== undefined && rest.startsWith(g.block[0])) {
-      const end = code.indexOf(g.block[1], i + g.block[0].length);
-      const stop = end < 0 ? code.length : end + g.block[1].length;
-      push("comment", code.slice(i, stop));
-      i = stop;
-      continue;
-    }
-    const q = g.quotes.find((m) => rest.startsWith(m));
-    if (q !== undefined) {
-      let j = i + 1;
-      while (j < code.length && code[j] !== q) {
-        if (code[j] === "\\") j++;
-        if (code[j] === "\n" && q !== "`") break;
-        j++;
-      }
-      push("string", code.slice(i, Math.min(j + 1, code.length)));
-      i = Math.min(j + 1, code.length);
-      continue;
-    }
-    if (g.variables && rest.startsWith("$")) {
-      const m = /^\$(\{[^}]*\}|[A-Za-z_][A-Za-z0-9_]*|\d)/.exec(rest);
-      if (m !== null) {
-        push("variable", m[0]);
-        i += m[0].length;
-        continue;
-      }
-    }
-    const num = /^(?:0x[0-9a-fA-F_]+|\d[\d_]*(?:\.\d+)?(?:[eE][+-]?\d+)?n?)/.exec(rest);
-    if (num !== null && !/[\w$]/.test(code[i - 1] ?? "")) {
-      push("number", num[0]);
-      i += num[0].length;
-      continue;
-    }
-    const word = /^[@A-Za-z_$][\w$-]*/.exec(rest);
-    if (word !== null) {
-      let w = word[0];
-      if (lang !== "sh" && lang !== "turtle" && lang !== "toml") w = /^[@A-Za-z_$][\w$]*/.exec(rest)?.[0] ?? w;
-      const key = g.caseless ? w.toLowerCase() : w;
-      const after = code.slice(i + w.length).trimStart();
-      if (g.keywords.has(key)) push("keyword", w);
-      else if (g.types && /^[A-Z]/.test(w)) push("type", w);
-      else if (lang === "ts" && after.startsWith("(")) push("function", w);
-      else push("plain", w);
-      i += w.length;
-      continue;
-    }
-    push(/[{}()[\];,.:=<>+\-*/|&!?]/.test(code[i] ?? "") ? "punct" : "plain", code[i] ?? "");
-    i++;
-  }
-  return out;
+/** Code as HTML: coloured runs as spans with their two colours, the rest as escaped text. */
+export function highlightedHtml(code: string, lang: Lang): string {
+  return runs(code, lang)
+    .map((line) =>
+      line
+        .map((r) =>
+          r.light === undefined && r.dark === undefined
+            ? escapeHtml(r.text)
+            : `<span class="t${r.italic ? " i" : ""}${r.bold ? " b" : ""}" style="--l:${r.light ?? "inherit"};--d:${r.dark ?? "inherit"}">${escapeHtml(r.text)}</span>`
+        )
+        .join("")
+    )
+    .join("\n");
 }

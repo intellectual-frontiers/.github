@@ -21,7 +21,7 @@ export type Inline =
   | { readonly kind: "link"; readonly href: Href; readonly children: readonly Inline[] };
 
 /** The languages the highlighter knows; anything else is shown as plain text. */
-export type Lang = "ts" | "sql" | "sh" | "toml" | "json" | "turtle" | "mermaid" | "text";
+export type Lang = "ts" | "sql" | "sh" | "toml" | "json" | "turtle" | "yaml" | "mermaid" | "text";
 
 /** A colour of a badge: neutral, or one that says how something stands. */
 export type Tone = "neutral" | "good" | "warn" | "info";

@@ -239,13 +239,12 @@ export async function buildSite(config: Config): Promise<Built> {
   return { pages: b.pages, found: b.found, files };
 }
 
-/** The files of the theme (beside this module, in the source and in the package alike) and of Mermaid, and where the site serves them. */
+/** The files of the theme (beside this module, in the source and in the package alike), and where the site serves them. */
 function assets(): readonly (readonly [string, string])[] {
   const theme = (f: string): string => path.fromFileUrl(new URL(`./theme/${f}`, import.meta.url));
   return [
     [theme("site.css"), "assets/site.css"],
     [theme("site.js"), "assets/site.js"],
-    [path.fromFileUrl(import.meta.resolve("mermaid/dist/mermaid.min.js")), "assets/mermaid.min.js"],
   ];
 }
 
