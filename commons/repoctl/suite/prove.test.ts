@@ -209,14 +209,14 @@ const TSCONFIG = JSON.stringify({ compilerOptions: { strict: true, target: "es20
 async function withLibraries<T>(use: (dir: string, world: World) => Promise<T>): Promise<T> {
   return await fs.withTempDir(async (dir) => {
     await git(dir, "init", "-q");
-    await put(dir, "commons/ts/tsconfig.json", TSCONFIG);
+    await put(dir, "commons/tsconfig.base.json", TSCONFIG);
     for (const [name, files] of [
       ["prov", { "src/mod.ts": 'export function used(x: number): string {\n  return String(x);\n}\nexport function spare(): number {\n  return 1;\n}\n' }],
       ["user", { "src/mod.ts": 'import { used } from "@intellectual-frontiers/prov";\nexport const u: string = used(1);\n' }],
       ["idle", { "src/mod.ts": 'import { spare } from "@intellectual-frontiers/prov";\nexport const s: number = spare();\n' }],
     ] as const) {
       await put(dir, `commons/${name}/package.json`, JSON.stringify({ name: `@intellectual-frontiers/${name}`, exports: { ".": "./src/mod.ts" } }));
-      await put(dir, `commons/${name}/tsconfig.json`, JSON.stringify({ extends: "../ts/tsconfig.json", include: ["src/**/*.ts"] }));
+      await put(dir, `commons/${name}/tsconfig.json`, JSON.stringify({ extends: "../tsconfig.base.json", include: ["src/**/*.ts"] }));
       for (const [f, text] of Object.entries(files)) await put(dir, `commons/${name}/${f}`, text);
     }
     await fs.symlink(TOOLS_MODULES, path.join(dir, "node_modules"), { type: "junction" });

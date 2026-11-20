@@ -25,7 +25,7 @@
 ## The host and the package
 
 - **FR-007**: The library MUST read from the file system, in its `host` entry only, a library's manifest for its table, the `exports` of its package and its `.ts` files (leaving out `node_modules`, `dist` and the spec kit), and MUST judge the findings against a baseline of keys that only shrinks: a finding the baseline does not hold, and a line of it that no longer occurs, MUST each fail the command `check` (exit 1), and a table that cannot be read MUST exit 2.
-- **FR-008**: The library MUST be published as compiled modules with their declarations (commons 0032-lifting-libraries FR-005, FR-013): the entries `.`, `./check` and `./host`, each with a `types` file, and it MUST be proved by `bun run verify` in its folder.
+- **FR-008**: The library MUST be published as compiled modules with their declarations (commons 0032-libraries-by-concern FR-005, FR-013): the entries `.`, `./check` and `./host`, each with a `types` file, and it MUST be proved by `bun run verify` in its folder.
 
 ## The typing
 

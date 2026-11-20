@@ -5,13 +5,15 @@
     "": {
       "name": "@intellectual-frontiers/mizan",
       "devDependencies": {
-        "@intellectual-frontiers/commons": "link:../ts",
         "@intellectual-frontiers/core": "link:../core",
         "@intellectual-frontiers/crypto": "link:../crypto",
         "@intellectual-frontiers/formats": "link:../formats",
         "@intellectual-frontiers/githost": "link:../githost",
+        "@intellectual-frontiers/grc": "link:../grc",
         "@intellectual-frontiers/libraries": "link:../libraries",
+        "@intellectual-frontiers/net": "link:../net",
         "@intellectual-frontiers/ontology": "link:../ontology",
+        "@intellectual-frontiers/quality": "link:../quality",
         "@intellectual-frontiers/rdf": "link:../rdf",
         "@intellectual-frontiers/system": "link:../system",
         "@intellectual-frontiers/telemetry": "link:../telemetry",
@@ -24,8 +26,6 @@
     },
   },
   "packages": {
-    "@intellectual-frontiers/commons": ["@intellectual-frontiers/commons@link:../ts", {}],
-
     "@intellectual-frontiers/core": ["@intellectual-frontiers/core@link:../core", {}],
 
     "@intellectual-frontiers/crypto": ["@intellectual-frontiers/crypto@link:../crypto", {}],
@@ -34,9 +34,15 @@
 
     "@intellectual-frontiers/githost": ["@intellectual-frontiers/githost@link:../githost", {}],
 
+    "@intellectual-frontiers/grc": ["@intellectual-frontiers/grc@link:../grc", {}],
+
     "@intellectual-frontiers/libraries": ["@intellectual-frontiers/libraries@link:../libraries", {}],
 
+    "@intellectual-frontiers/net": ["@intellectual-frontiers/net@link:../net", {}],
+
     "@intellectual-frontiers/ontology": ["@intellectual-frontiers/ontology@link:../ontology", {}],
+
+    "@intellectual-frontiers/quality": ["@intellectual-frontiers/quality@link:../quality", {}],
 
     "@intellectual-frontiers/rdf": ["@intellectual-frontiers/rdf@link:../rdf", {}],
 

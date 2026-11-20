@@ -3,7 +3,7 @@ number	slug	state
 0002	packaging	in force
 0003	mizan	in force
 0004	rules	in force
-0005	typescript-runtime	in force
+0005	typescript-practice	in force
 0006	signals	in force
 0007	grc	in force
 0008	test-evidence	in force
@@ -30,7 +30,7 @@ number	slug	state
 0029	subject-profiles	in force
 0030	generated-workflows	in force
 0031	install-locations	in force
-0032	lifting-libraries	in force
+0032	libraries-by-concern	in force
 0033	kanon	in force
 0034	archon	in force
 0035	licensing	in force

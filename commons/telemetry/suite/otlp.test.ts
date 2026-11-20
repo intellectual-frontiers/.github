@@ -49,7 +49,7 @@ import { assertEquals, proves } from "@intellectual-frontiers/test";
 
 const FR = "0001-telemetry FR-004";
 const MODEL = "0001-telemetry FR-001";
-const LAWS = "0005-typescript-runtime FR-014";
+const LAWS = "0001-core FR-004";
 
 function value<T, E>(r: { readonly kind: "ok"; readonly value: T } | { readonly kind: "err"; readonly error: E }): T {
   if (r.kind === "err") throw new Error(`expected a success, found ${JSON.stringify(r.error)}`);

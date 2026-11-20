@@ -9,7 +9,6 @@
         "@electric-sql/pglite": "0.5.16",
         "@electric-sql/pglite-pgtap": "0.0.18",
         "@electric-sql/pglite-socket": "0.2.20",
-        "@intellectual-frontiers/commons": "link:../ts",
         "@intellectual-frontiers/core": "link:../core",
         "@intellectual-frontiers/crypto": "link:../crypto",
         "@intellectual-frontiers/formats": "link:../formats",
@@ -70,8 +69,6 @@
     "@electric-sql/pglite-pgvector": ["@electric-sql/pglite-pgvector@0.0.18", "", { "peerDependencies": { "@electric-sql/pglite": "0.5.17" } }, "sha512-G2d2rFS/rsRTXl7fvTuVIhD/fA6MIdDQB3l/xzIyRcDIVUl4KAcAEcqXPPTAXwJlqLViNGHFX+d1yn63V91xpQ=="],
 
     "@electric-sql/pglite-socket": ["@electric-sql/pglite-socket@0.2.20", "", { "peerDependencies": { "@electric-sql/pglite": "0.5.17", "@electric-sql/pglite-age": "0.0.18", "@electric-sql/pglite-pg_hashids": "0.0.18", "@electric-sql/pglite-pg_ivm": "0.0.18", "@electric-sql/pglite-pg_textsearch": "0.0.19", "@electric-sql/pglite-pg_uuidv7": "0.0.18", "@electric-sql/pglite-pgtap": "0.0.18", "@electric-sql/pglite-pgvector": "0.0.18" }, "bin": { "pglite-server": "dist/scripts/server.js" } }, "sha512-ES5Zf3oZLUHJkeKabfNWlhG6BLYZOu0iHXt7eGgwMp+aTsymSY4aoU3v4SGDaKV1j0YlgORrPSHHvOzv1iH5yw=="],
-
-    "@intellectual-frontiers/commons": ["@intellectual-frontiers/commons@link:../ts", {}],
 
     "@intellectual-frontiers/core": ["@intellectual-frontiers/core@link:../core", {}],
 

@@ -1,6 +1,6 @@
 /**
  * The conventions of the generator (commons 0011-documentation FR-001, FR-002, FR-004, FR-026): a package of the root package's name
- * whose dependencies are TypeScript, Shiki and beautiful-mermaid, pinned exactly and the root's, that imports IFC TypeScript by relative path, imported by
+ * whose dependencies are TypeScript, Shiki and beautiful-mermaid, pinned exactly and the root's, imported by
  * nothing outside it but commons' configuration, importing only what it may, whose entry points reach no library it shows, held to IFC
  * TypeScript's rules, and a commons with no README.
  *
@@ -47,8 +47,8 @@ proves(["0011-documentation FR-001"], "the package's name, exports and command, 
   const deps = entries(pkg, "dependencies");
   const dev = entries(pkg, "devDependencies");
   assertEquals(deps.map(([n]) => n).sort(), ["beautiful-mermaid", "shiki", "typescript"]);
-  assertEquals(dev.map(([n]) => n).sort(), ["@intellectual-frontiers/commons", "@intellectual-frontiers/core", "@intellectual-frontiers/libraries", "@intellectual-frontiers/mizan", "@intellectual-frontiers/system", "@intellectual-frontiers/test", "@types/node"]);
-  for (const [n, v] of dev) if (n.startsWith("@intellectual-frontiers/")) assertEquals(v, n.endsWith("/commons") ? "link:../ts" : `link:../${n.split("/")[1]}`, `${n} is a link to its library`);
+  assertEquals(dev.map(([n]) => n).sort(), ["@intellectual-frontiers/core", "@intellectual-frontiers/libraries", "@intellectual-frontiers/mizan", "@intellectual-frontiers/system", "@intellectual-frontiers/test", "@types/node"]);
+  for (const [n, v] of dev) if (n.startsWith("@intellectual-frontiers/")) assertEquals(v, `link:../${n.split("/")[1]}`, `${n} is a link to its library`);
   for (const [n, v] of [...deps, ...dev]) if (!v.startsWith("link:")) assert(/^\d+\.\d+\.\d+(-[\w.]+)?$/.test(v), `${n} is pinned exactly`);
   assert(deps.some(([n, v]) => n === "typescript" && v === "7.1.0-beta"));
   const rootDeps = new Map(entries(root, "dependencies"));
@@ -59,7 +59,7 @@ proves(["0011-documentation FR-001"], "the package's name, exports and command, 
 
 proves(["0011-documentation FR-001"], "nothing outside commons/docs imports a file of it but commons' configuration", () => {
   const commonsFiles = [...fs.readDirSync(path.join(ROOT, "commons"))].filter((e) => e.isFile && e.name.endsWith(".ts") && e.name !== "docs.config.ts").map((e) => `commons/${e.name}`);
-  for (const dir of ["commons/ts", "commons/tools", "bin", "tests", ...commonsFiles]) {
+  for (const dir of ["commons/tools", "bin", "tests", ...commonsFiles]) {
     if (!fs.existsSync(path.join(ROOT, dir))) continue;
     for (const f of dir.endsWith(".ts") ? [dir] : sources(dir)) {
       for (const s of specifiers(read(f))) {
@@ -73,11 +73,10 @@ proves(["0011-documentation FR-001"], "nothing outside commons/docs imports a fi
 const PACKAGES = new Set(["typescript/async", "beautiful-mermaid", "shiki/core", "shiki/wasm", "shiki/engine/oniguruma"]);
 /** The grammars and themes of Shiki the highlighter imports one by one. */
 const SHIKI_FILES = /^shiki\/(langs|themes)\/[a-z-]+\.mjs$/;
-/** The libraries lifted out of IFC TypeScript, which the generator imports by package name (0032-lifting-libraries FR-003). */
-const LIFTED = /^@intellectual-frontiers\/(core|system|test)$|^@intellectual-frontiers\/(libraries\/pack|mizan\/(trace|host\/trace))$/;
-const IFC_TS = new Set(["ts/kernel/mod.ts", "ts/runtime/mod.ts", "ts/runtime/test.ts"]);
+/** The libraries lifted out of IFC TypeScript, which the generator imports by package name (0032-libraries-by-concern FR-003). */
+const LIFTED = /^@intellectual-frontiers\/(core(\/about)?|system|test)$|^@intellectual-frontiers\/(libraries\/pack|mizan\/(trace|host\/trace))$/;
 
-proves(["0011-documentation FR-002"], "a file imports the generator, IFC TypeScript by relative path and typescript/async; a lens also the libraries' entry points", () => {
+proves(["0011-documentation FR-002"], "a file imports the generator and typescript/async; a lens also the libraries' entry points", () => {
   const lensMay = new Set(["docs/src/mod.ts"]);
   for (const f of mine) {
     const fixture = f.startsWith("commons/docs/suite/fixture-repo/");
@@ -85,7 +84,6 @@ proves(["0011-documentation FR-002"], "a file imports the generator, IFC TypeScr
       if (PACKAGES.has(s) || (f.startsWith("commons/docs/tools/") && s === "node:process") || SHIKI_FILES.test(s) || LIFTED.test(s) || (fixture && s === "@intellectual-frontiers/docs")) continue;
       assert(s.startsWith("."), `${f} imports ${s}`);
       const target = path.relative(path.join(ROOT, "commons"), path.resolve(path.dirname(path.join(ROOT, f)), s)).split(path.sep).join("/");
-      if (IFC_TS.has(target) && (target !== "ts/runtime/test.ts" || f.startsWith("commons/docs/suite/"))) continue;
       if (f.startsWith("commons/docs/src/lens/")) assert(lensMay.has(target), `the lens ${f} imports ${s}, which it may not: a lens imports the generator through mod.ts`);
       else if (f.startsWith("commons/docs/suite/")) assert(target.startsWith("docs/") || lensMay.has(target) || target === "docs.config.ts", `${f} imports ${s}, which it may not`);
       else assert(target.startsWith("docs/") && !target.startsWith("docs/src/lens/"), `${f} imports ${s}, which it may not`);
@@ -108,7 +106,7 @@ function reached(from: string): string[] {
 
 proves(["0011-documentation FR-026"], "the package depends on no library it shows: what ./docs and ifc-docs reach imports no data library and no lens", () => {
   const bin = read("commons/docs/ifc-docs.mjs");
-  assert(bin.includes('import("./src/cli.ts")'), "ifc-docs runs cli.ts");
+  assert(bin.includes('from "./src/cli.ts"'), "ifc-docs runs cli.ts");
   const files = new Set([...reached("commons/docs/src/mod.ts"), ...reached("commons/docs/src/cli.ts")]);
   assert(files.has("commons/docs/src/config.ts") && files.has("commons/docs/src/site.ts"));
   for (const f of files) {

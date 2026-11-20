@@ -107,7 +107,7 @@ const context = (trace: number, id: number, flags = 1) => ({
 });
 
 proves(
-  [REGISTRY, "0005-typescript-runtime FR-014"],
+  [REGISTRY, "0001-core FR-004"],
   "a kind not declared, a wrong attribute type or a missing attribute does not compile",
   () => {
     const { telemetry } = fixture();

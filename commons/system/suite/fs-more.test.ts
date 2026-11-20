@@ -1,5 +1,5 @@
 /**
- * Tests of the rest of `runtime/fs.ts` (commons 0005-typescript-runtime FR-048 to FR-050, FR-058): `readDir` as an async iterable, `chown`
+ * Tests of the rest of `runtime/fs.ts` (commons 0001-system FR-004 to FR-050, FR-058): `readDir` as an async iterable, `chown`
  * and `symlinkSync`; `open` and its `FsFile`; `copy` and `walk` as `@std/fs` gives them; `expandGlob`. Everything runs on a real temporary
  * folder; file modes, owners and symbolic links are POSIX-only and skipped on Windows (FR-018), the rest runs everywhere.
  *
@@ -16,7 +16,7 @@ import { assert, assertEquals, assertRejects, assertThrows, proves } from "@inte
 const R48 = "0001-system FR-004";
 const R49 = "0001-system FR-005";
 const R50 = "0001-system FR-006";
-const R58 = "0005-typescript-runtime FR-058";
+const R58 = "0001-formats FR-015";
 /** File modes, owners and symbolic links (which need a privilege on Windows) are tested on POSIX only (FR-018). */
 const posix = build.os !== "windows";
 const enc = new TextEncoder();

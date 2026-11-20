@@ -11,7 +11,7 @@
  *
  * @remarks
  * Nothing is installed per library. The repository's root installs the packages every library shares (`bun install`, once), the libraries are linked under `commons/node_modules` (a link for each folder whose package
- * name is `@intellectual-frontiers/<folder>`, and `@intellectual-frontiers/commons` for `commons/ts`), so that a library that imports another by its package name reads the checkout's source, never a copy from a
+ * name is `@intellectual-frontiers/<folder>`), so that a library that imports another by its package name reads the checkout's source, never a copy from a
  * registry: the `exports` of each package are the sources. A library with a package of its own outside the shared set (a database driver) is installed in its folder, once. The affected libraries are those of
  * `affected.ts` (the same code the workflow of CI runs); TypeScript 7 checks each library's own `tsconfig.json`, several at a time, and the tests of each run in a `bun test` process of its own, from its folder as `verify` runs them, several at a time.
  *

@@ -19,7 +19,7 @@ proves([FR], "the digests of FIPS 180-2's test vectors", async () => {
   );
 });
 
-proves([FR, "0005-typescript-runtime FR-014"], "bytes to hexadecimal and back are the same bytes", () => {
+proves([FR, "0001-core FR-004"], "bytes to hexadecimal and back are the same bytes", () => {
   fc.assert(fc.property(fc.uint8Array(), (b) => assertEquals(fromHex(toHex(b)), b)));
   assertEquals(fromHex("abc"), undefined);
   assertEquals(fromHex("zz"), undefined);

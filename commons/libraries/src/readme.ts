@@ -31,8 +31,9 @@ import { stdio } from "@intellectual-frontiers/system";
 import { existsSync, readTextFileSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { type Library, type Registry, readLibraries } from "./libraries.ts";
 
-/** The marker that opens the generated table, and the one that closes it. */
+/** The marker that opens the generated table. */
 export const BEGIN = "<!-- libraries-map:begin -->";
+/** The marker that closes the generated table. */
 export const END = "<!-- libraries-map:end -->";
 
 /** What a library is for in the whole: a closed union. */

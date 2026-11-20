@@ -1,6 +1,6 @@
 // Spec: 0001-system FR-016
 /**
- * Files and folders watched (commons 0005-typescript-runtime FR-051), on `node:fs`'s `watch` alone, so the same code runs on Bun and
+ * Files and folders watched (commons 0001-system FR-016), on `node:fs`'s `watch` alone, so the same code runs on Bun and
  * Node, on Linux, macOS and Windows. `watchFs` gives an async iterable of events (`create`, `modify`, `remove`,
  * `rename` with both paths), stopped by `close`, an `AbortSignal`, `using` or leaving the loop.
  *

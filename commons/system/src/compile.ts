@@ -1,6 +1,6 @@
 // Spec: 0001-system FR-013
 /**
- * A program built into one binary with the pinned Bun (commons 0005-typescript-runtime FR-062): `bun build --compile`, for this computer or
+ * A program built into one binary with the pinned Bun (commons 0001-system FR-013): `bun build --compile`, for this computer or
  * for a target given (`linux-x64`, `linux-arm64`, `darwin-x64`, `darwin-arm64`, `windows-x64`), with the files it embeds, giving the
  * binary's path and SHA-256. Bun is found as `bun` on `PATH`, or given by its path; where an expected version is given, a Bun of another
  * version is refused, so a build is made only by the pinned one. Everything that can go wrong is a `CompileError` in a `Result`.

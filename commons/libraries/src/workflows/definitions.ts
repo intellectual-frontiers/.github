@@ -27,9 +27,9 @@ export const PIN = {
   bun: "./.github/actions/bun",
 } as const;
 
-/** The Node that is the backup runtime (commons 0005-typescript-runtime). */
+/** The Node that is the backup runtime (commons 0005-typescript-practice FR-018). */
 export const NODE_VERSION = "26.13.1";
-/** The canary of Bun that runs the linter until a release does (FR-028 of 0005-typescript-runtime). */
+/** The canary of Bun that runs the linter until a release does (commons 0005-typescript-practice FR-028). */
 export const BUN_LINT_VERSION = "1.4.4-canary.20261115.1";
 
 const checkout = (o: { readonly fetchDepth?: number; readonly comment?: string } = {}): Step =>
@@ -39,8 +39,6 @@ const checkout = (o: { readonly fetchDepth?: number; readonly comment?: string }
   });
 const bun = (o: { readonly nodeVersion?: string } = {}): Step =>
   use(PIN.bun, o.nodeVersion === undefined ? {} : { with: { "node-version": o.nodeVersion } });
-const setupNode = (when?: string): Step =>
-  use(PIN.setupNode, { ...(when === undefined ? {} : { when }), with: { "node-version": expr("env.NODE_VERSION") } });
 const tools = (workingDirectory: string, name = "The development tools, from bun.lock"): Step =>
   run("bun install --frozen-lockfile", { name, workingDirectory });
 
@@ -140,7 +138,7 @@ const CI_PATHS = ["commons/**", "package.json", "bun.lock", BUN_ACTION, own("ci"
 const cellSteps = (): readonly [Step, ...Step[]] => [
   checkout(),
   bun(),
-  tools(expr("matrix.folder"), "The development tools, from bun.lock (the kernel is linked from commons/ts)"),
+  tools(expr("matrix.folder"), "The development tools, from bun.lock (the libraries it imports are linked)"),
   run(expr("matrix.verify"), { name: "verify (its packing is checked where the exports changed, and by the release)", workingDirectory: expr("matrix.folder"), env: { IFC_SKIP_PACK: expr("matrix.pack == false && '1' || ''") } }),
   run(expr("matrix.after"), { name: "After verify", when: "matrix.after != ''", workingDirectory: expr("matrix.folder"), shell: "bash" }),
   run(expr("matrix.node"), { name: "The tests on Node 26", when: "matrix.node != ''", workingDirectory: expr("matrix.folder"), shell: "bash" }),
@@ -236,88 +234,20 @@ const ci: Workflow = {
   },
 };
 
-const ifcTypescriptPaths = [
-  "commons/ts/**",
-  "commons/docs/**",
-  "commons/generated/pins.auto.env",
-  "package.json",
-  "bun.lock",
-  BUN_ACTION,
-  own("ifc-typescript"),
-];
+const conformancePaths = ["commons/telemetry/**", "commons/system/**", "commons/generated/pins.auto.env", BUN_ACTION, own("conformance")];
 
-const ifcTypescript: Workflow = {
-  file: "ifc-typescript",
-  name: "ifc-typescript",
+const conformance: Workflow = {
+  file: "conformance",
+  name: "conformance",
   comment: lines(
-    "IFC TypeScript (commons 0005-typescript-runtime FR-017, FR-018, FR-026 to FR-030, FR-070). TypeScript 7 checks; Bun, pinned in commons' pins, installs, formats",
-    "and lints; the same tests run unchanged on Bun, the default runtime, and Node 26, the backup, on Linux, macOS and Windows; and the commit is installed as a Git dependency of an empty project,",
-    "as a consumer installs it, and used there on Bun and Node 26 (through the hook), IFC Docs too (0011-documentation FR-021, FR-022). Nothing is released.",
+    "What a library's own tests cannot run alone: the OTLP of the telemetry library sent to the pinned OpenTelemetry Collector and read back from its file exporter (telemetry 0001-telemetry FR-020),",
+    "and a program built into one binary by the pinned Bun on each system, then run, and Windows built from Linux (system 0001-system FR-013). Nothing is released.",
   ).trimEnd(),
-  on: { push: { paths: ifcTypescriptPaths }, pullRequest: { paths: ifcTypescriptPaths } },
+  on: { push: { paths: conformancePaths }, pullRequest: { paths: conformancePaths } },
   permissions: { contents: "read" },
-  env: { NODE_VERSION, BUN_LINT_VERSION },
+  env: { NODE_VERSION },
   concurrency: supersedable,
   jobs: {
-    check: job({
-      runsOn: "ubuntu-latest",
-      timeoutMinutes: 10,
-      steps: [
-        checkout(),
-        bun(),
-        tools("commons/ts"),
-        tools("commons/docs", "The documentation generator's dependencies, which the sources of commons/ts's check reach"),
-        run("bun x tsc --version && bun run check", {
-          name: "TypeScript 7 on everything, then the kernel with no host types",
-          workingDirectory: "commons/ts",
-        }),
-        run("bun fmt --check", { name: "The formatter", workingDirectory: "commons/ts" }),
-        run('bun x "bun@$BUN_LINT_VERSION" lint --type-aware --max-warnings 0 kernel runtime tests tools', {
-          name: "The linter, type-aware, no warning allowed",
-          workingDirectory: "commons/ts",
-        }),
-      ],
-    }),
-    test: job({
-      runsOn: expr("matrix.os"),
-      timeoutMinutes: 15,
-      strategy: { failFast: false, matrix: { os: ["ubuntu-latest", "macos-latest", "windows-latest"], runtime: ["bun", "node"] } },
-      steps: [
-        checkout(),
-        bun(),
-        tools("commons/ts"),
-        setupNode("matrix.runtime == 'node'"),
-        run('bun x "bun@$BUN_LINT_VERSION" --version', {
-          name: "The linter's canary, so the lint plugin's tests run rather than skip",
-          shell: "bash",
-        }),
-        run(
-          lines(
-            `grep -E '^000[5-8]-' ../spec-kit/enforcement.tsv >"$RUNNER_TEMP/requirements.tsv"`,
-            "bun ../quality/src/test-cli.ts run --runtime ${{ matrix.runtime }} --out test-results \\",
-            "  --report tap,junit,ctrf,sarif,md,html,oscal \\",
-            '  --requirements "$RUNNER_TEMP/requirements.tsv" --reviewed ci-reviewed.tsv \\',
-            "  --ledger test-results/ledger.jsonl tests",
-          ),
-          {
-            name: "The suite on ${{ matrix.runtime }}, recorded as evidence (commons 0008-test-evidence FR-014)",
-            comment: "A hang ends here, so the record of what ran is still kept below.",
-            timeoutMinutes: 10,
-            workingDirectory: "commons/ts",
-            shell: "bash",
-          },
-        ),
-        use(PIN.uploadArtifact, {
-          name: "The record, its reports and the ledger, kept with the run",
-          when: "always()",
-          with: {
-            name: "test-evidence-${{ matrix.os }}-${{ matrix.runtime }}",
-            path: "commons/ts/test-results/",
-            "if-no-files-found": "error",
-          },
-        }),
-      ],
-    }),
     "otel-conformance": job({
       comment:
         "commons 0006-signals FR-020: the suite's OTLP sent to the pinned OpenTelemetry Collector, read back from its file exporter.",
@@ -348,7 +278,7 @@ const ifcTypescript: Workflow = {
     }),
     compile: job({
       comment:
-        "commons 0005-typescript-runtime FR-062: a program built into one binary by the pinned Bun on each system, then run; and Windows built from Linux.",
+        "commons system 0001-system FR-013: a program built into one binary by the pinned Bun on each system, then run; and Windows built from Linux.",
       runsOn: expr("matrix.os"),
       timeoutMinutes: 10,
       strategy: { failFast: false, matrix: { os: ["ubuntu-latest", "macos-latest", "windows-latest"] } },
@@ -378,33 +308,6 @@ const ifcTypescript: Workflow = {
             name: "Built for Windows from Linux, by the pinned Bun alone",
             when: "runner.os == 'Linux'",
             workingDirectory: "commons/system",
-            shell: "bash",
-          },
-        ),
-      ],
-    }),
-    "git-dependency": job({
-      comment: lines(
-        "commons 0005-typescript-runtime FR-030 and 0011-documentation FR-022: the commit checked, installed into an empty project by a",
-        "git+file: URL of this checkout, as a consumer installs it by github:intellectual-frontiers/.github#<commit>, and used there.",
-      ).trimEnd(),
-      runsOn: expr("matrix.os"),
-      timeoutMinutes: 15,
-      strategy: { failFast: false, matrix: { os: ["ubuntu-latest", "macos-latest", "windows-latest"] } },
-      steps: [
-        checkout({
-          fetchDepth: 0,
-          comment: "Bun clones the checkout as a Git repository; a whole one, so that nothing depends on how a shallow clone is cloned.",
-        }),
-        bun({ nodeVersion: expr("env.NODE_VERSION") }),
-        run("bun install --frozen-lockfile", {
-          name: "The root package's lockfile, which the consumer does not read but this repository keeps",
-        }),
-        run(
-          lines("bun install --frozen-lockfile", "node --version", 'bun tools/smoke.ts --repo "$GITHUB_WORKSPACE" --commit "$GITHUB_SHA"'),
-          {
-            name: "IFC TypeScript as a Git dependency, on Bun and Node 26, with ifc test and tsc 7",
-            workingDirectory: "commons/ts",
             shell: "bash",
           },
         ),
@@ -503,13 +406,14 @@ const tests: Workflow = {
             "the whole history and its tags: `versions check` compares each work with the merge base, and its ledger reads the tags (commons 0026-works-versioning FR-022, FR-035)",
         }),
         bun(),
-        tools("commons/ts"),
+        tools(".", "The root's development tools, from bun.lock"),
         tools("commons/docs", "The documentation generator's dependencies, which the tests of the root import"),
-        run("bun run check", { name: "TypeScript 7 on commons' tools and on these tests", workingDirectory: "commons/ts" }),
-        run("bun fmt --check . ../tools ../../tests", { name: "The formatter", workingDirectory: "commons/ts" }),
-        run('bun x "bun@$BUN_LINT_VERSION" lint --type-aware --max-warnings 0 ../tools ../../tests', {
+        run("bun commons/libraries/src/link.ts && bun x tsc -p tests/tsconfig.json && bun x tsc -p commons/tools/tsconfig.json", {
+          name: "TypeScript 7 on the tests of the root and on commons' tools",
+        }),
+        run("bun fmt --check commons/tools tests", { name: "The formatter" }),
+        run('bun x "bun@$BUN_LINT_VERSION" lint --type-aware --max-warnings 0 commons/tools tests', {
           name: "The linter, type-aware, no warning allowed",
-          workingDirectory: "commons/ts",
         }),
         run(lines(...checkScripts(false)), {
           name: "Commons' generated files and specifications, as a person checks them, on Bun and on Node 26",
@@ -523,7 +427,7 @@ const tests: Workflow = {
       steps: [
         checkout(),
         bun(),
-        tools("commons/ts"),
+        tools(".", "The root's development tools, from bun.lock"),
         run("sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck", {
           name: "ShellCheck, which the packaging test uses where it is installed",
           when: "runner.os == 'Linux'",
@@ -692,7 +596,7 @@ export function workflows(): readonly Workflow[] {
     ci,
     release,
     site,
-    ifcTypescript,
+    conformance,
     tests,
   ].sort((a, b) => (a.file < b.file ? -1 : a.file > b.file ? 1 : 0));
 }
@@ -703,7 +607,7 @@ export const ACTIONS: readonly CompositeAction[] = [
     folder: "bun",
     name: "Pinned Bun",
     description:
-      "Bun at the version commons pins (commons/generated/pins.auto.env, commons 0005-typescript-runtime FR-026), fetched with retries, kept only where its SHA-256 is the pinned one, unpacked by IFC TypeScript's own zip reader (commons/libraries/src/install-bun.ts, run by Node) and put on the PATH. Linux, macOS and Windows; no shell script, no Python, no unzip.",
+      "Bun at the version commons pins (commons/generated/pins.auto.env, commons 0005-typescript-practice FR-026), fetched with retries, kept only where its SHA-256 is the pinned one, unpacked by IFC TypeScript's own zip reader (commons/libraries/src/install-bun.ts, run by Node) and put on the PATH. Linux, macOS and Windows; no shell script, no Python, no unzip.",
     inputs: { "node-version": { description: "The Node that runs the installer.", default: NODE_VERSION } },
     steps: [
       use(PIN.setupNode, { with: { "node-version": expr("inputs.node-version") } }),

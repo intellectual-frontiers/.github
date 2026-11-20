@@ -133,7 +133,7 @@ export const config: DocsConfig = {
   root: "..",
   repository: "https://github.com/intellectual-frontiers/.github",
   home: { dir: "commons" },
-  packages: [{ dir: "commons/ts", slug: "ifc-typescript" }, ...(await Promise.all(libraryNames.map(libraryPackage)))],
+  packages: await Promise.all(libraryNames.map(libraryPackage)),
   specKits: [
     { layout: "commons", dir: "commons/spec-kit" },
     { layout: "commons", dir: "commons/core/spec-kit" },

@@ -5,21 +5,21 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** A harness that serves HTTPS on a host of its own (`stolos` first) needs a certificate from Let's Encrypt, or any CA that speaks ACME (RFC 8555), without a web server answering HTTP-01 and without a program such as certbot or lego to install, pin and keep: a host behind a firewall, or a wildcard name, proves control of its names by DNS-01. IFC TypeScript's runtime (0005-typescript-runtime) gets the certificate itself, with `fetch` and Web Crypto alone: the account, the order, the TXT records at the DNS host (Cloudflare first, any other behind one small interface), the challenges, a certificate signing request built with the kernel's ASN.1 DER, and the certificate. It renews by reading the certificate's own validity. Nothing is added to the package's dependencies.
+**Input:** A harness that serves HTTPS on a host of its own (`stolos` first) needs a certificate from Let's Encrypt, or any CA that speaks ACME (RFC 8555), without a web server answering HTTP-01 and without a program such as certbot or lego to install, pin and keep: a host behind a firewall, or a wildcard name, proves control of its names by DNS-01. IFC TypeScript's runtime (0005-typescript-practice) gets the certificate itself, with `fetch` and Web Crypto alone: the account, the order, the TXT records at the DNS host (Cloudflare first, any other behind one small interface), the challenges, a certificate signing request built with the kernel's ASN.1 DER, and the certificate. It renews by reading the certificate's own validity. Nothing is added to the package's dependencies.
 
 ## The client (runtime)
 
-- **FR-001**: The ACME client MUST take the issue of a certificate from the library `net` (`@intellectual-frontiers/net`, net 0001-net FR-008), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-002**: The ACME client MUST take the signed requests from the library `net` (`@intellectual-frontiers/net`, net 0001-net FR-009), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-003**: The ACME client MUST take the account from the library `net` (`@intellectual-frontiers/net`, net 0001-net FR-010), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-004**: The ACME client MUST take the removal of the TXT records from the library `net` (`@intellectual-frontiers/net`, net 0001-net FR-011), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-005**: The ACME client MUST take the failures as Results from the library `net` (`@intellectual-frontiers/net`, net 0001-net FR-012), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-006**: The ACME client MUST take the certificate signing request from the library `net` (`@intellectual-frontiers/net`, net 0001-net FR-013), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-007**: The ACME client MUST take the validity of a certificate from the library `net` (`@intellectual-frontiers/net`, net 0001-net FR-014), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
+- **FR-001**: The ACME client MUST take the issue of a certificate from the library `net` (`@intellectual-frontiers/net`, net 0001-net FR-008), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-002**: The ACME client MUST take the signed requests from the library `net` (`@intellectual-frontiers/net`, net 0001-net FR-009), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-003**: The ACME client MUST take the account from the library `net` (`@intellectual-frontiers/net`, net 0001-net FR-010), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-004**: The ACME client MUST take the removal of the TXT records from the library `net` (`@intellectual-frontiers/net`, net 0001-net FR-011), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-005**: The ACME client MUST take the failures as Results from the library `net` (`@intellectual-frontiers/net`, net 0001-net FR-012), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-006**: The ACME client MUST take the certificate signing request from the library `net` (`@intellectual-frontiers/net`, net 0001-net FR-013), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-007**: The ACME client MUST take the validity of a certificate from the library `net` (`@intellectual-frontiers/net`, net 0001-net FR-014), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
 
 ## The DNS host
 
-- **FR-008**: The ACME client MUST take the DNS host from the library `net` (`@intellectual-frontiers/net`, net 0001-net FR-015), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
+- **FR-008**: The ACME client MUST take the DNS host from the library `net` (`@intellectual-frontiers/net`, net 0001-net FR-015), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
 
 ## Out of scope
 

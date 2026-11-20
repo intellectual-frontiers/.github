@@ -1,8 +1,7 @@
 // Spec: 0001-crypto FR-001
 /**
  * SHA-256 through Web Crypto (`crypto.subtle`, in every runtime and browser), and a typed `Sha256`: 64 lower-case hexadecimal digits that
- * the compiler keeps apart from any other string, so a checksum is never confused with a version or a path (commons 0005-typescript-runtime
- * FR-008). Taken from the machine setup's `result.ts` and `net.ts`, and the many call sites that write the hex loop by hand.
+ * the compiler keeps apart from any other string, so a checksum is never confused with a version or a path (commons 0001-crypto FR-001). Taken from the machine setup's `result.ts` and `net.ts`, and the many call sites that write the hex loop by hand.
  *
  * @example
  * ```ts

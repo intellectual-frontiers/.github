@@ -42,10 +42,10 @@ export type PackageIndex = ReadonlyMap<string, { readonly folder: string; readon
 const SPECIFIER = /(?:\bimport|\bexport)\s+(?:type\s+)?(?:[^'";]*?\s+from\s+)?["']([^"']+)["']|\bimport\(\s*["']([^"']+)["']\s*\)/g;
 const SOURCE = /\.(?:ts|mts|mjs|js)$/;
 
-/** The packages of the libraries (and of `commons/ts`) with what their `exports` map each subpath to. */
+/** The packages of the libraries  with what their `exports` map each subpath to. */
 export async function packageIndexOf(w: World, libraries: readonly { readonly package: string; readonly folder: string }[]): Promise<PackageIndex> {
   const index = new Map<string, { folder: string; exports: Map<string, string> }>();
-  for (const l of [...libraries, { package: "@intellectual-frontiers/commons", folder: "commons/ts" }]) {
+  for (const l of libraries) {
     const text = await w.files.read(join(w.repo, l.folder, "package.json"));
     const exports = new Map<string, string>();
     if (text !== undefined) {

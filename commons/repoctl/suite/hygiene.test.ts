@@ -89,7 +89,7 @@ proves(["0007-repoctl-hygiene FR-002", "0036-distribution FR-010"], "each of the
 proves(["0007-repoctl-hygiene FR-002", "0036-distribution FR-013"], "in the repository of commons the path, import and vendored findings are not made and the others are", () => {
   const facts: HygieneFacts = {
     repository: "source",
-    packages: [pkg("commons/core/package.json", CORE, { "@intellectual-frontiers/commons": "link:../ts", dep: "github:intellectual-frontiers/.github#x" })],
+    packages: [pkg("commons/core/package.json", CORE, { "@intellectual-frontiers/commons": "link:../commons", dep: "github:intellectual-frontiers/.github#x" })],
     locks: [{ kind: "read", file: "bun.lock", copies: new Map() }],
     installed: new Map(),
     imports: [{ file: "commons/a/src/x.ts", specifier: "../../commons/core/src/mod.ts" }],

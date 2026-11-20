@@ -1,5 +1,5 @@
 /**
- * Tests of the tools' own helpers (commons 0005-typescript-runtime FR-026): commons' pins read as the Bun installer reads them, with a
+ * Tests of the tools' own helpers (commons 0005-typescript-practice FR-026): commons' pins read as the Bun installer reads them, with a
  * pinned checksum of Bun for every platform Bun builds for.
  *
  * @module
@@ -13,7 +13,7 @@ import { describePinProblem, pinDownload, pinSuffix, readEnvFile } from "../src/
 const ROOT = resolve(dirname(fromFileUrl(import.meta.url)), "..", "..", "..");
 
 proves(
-  ["0005-typescript-runtime FR-026", "0002-packaging FR-019"],
+  ["0005-typescript-practice FR-026", "0002-packaging FR-019"],
   "commons pins Bun with a checksum for each platform Bun builds for, and the installer finds it",
   async () => {
     const pins = readEnvFile(await readTextFile(join(ROOT, "commons", "generated", "pins.auto.env")));

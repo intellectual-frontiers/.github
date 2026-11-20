@@ -1,5 +1,5 @@
 /**
- * Tests of `runtime/watch.ts` (commons 0005-typescript-runtime FR-051) on a real temporary folder: files made, changed, removed and moved,
+ * Tests of `runtime/watch.ts` (commons 0001-system FR-016) on a real temporary folder: files made, changed, removed and moved,
  * an editor's save as one event, a recursive watch, a watched file, and the ends of a watch (abort signal, `using`, leaving the loop).
  *
  * The platforms report changes late and in their own way (macOS's FSEvents may start a moment after the watch, CI machines are slow), so

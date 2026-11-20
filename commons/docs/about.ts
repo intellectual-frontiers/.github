@@ -21,7 +21,7 @@ export const about: About = {
     { path: "src/emit/", what: "The page model written as HTML and Markdown, and the search index.", mayImport: ["src/", "shiki", "beautiful-mermaid"] },
     { path: "src/lens/", what: "The factories of the lenses a configuration passes: layered models, programs, guides and releases.", mayImport: ["src/mod.ts only"] },
     { path: "src/theme/", what: "The stylesheet and the one script of the site, published beside the modules that read them.", mayImport: ["nothing: CSS and a browser script"] },
-    { path: "ifc-docs.mjs", what: "The command `ifc-docs` in this repository: it registers IFC TypeScript's Node hook, then runs the command line, on Bun and on Node 26 alike; the published package has its own launcher of the compiled module.", mayImport: ["the Node hook", "src/cli.ts"] },
+    { path: "ifc-docs.mjs", what: "The command `ifc-docs` in this repository: it runs the command line from the sources, on Bun and on Node 26 alike; the published package has its own launcher of the compiled module.", mayImport: ["the Node hook", "src/cli.ts"] },
     { path: "tools/", what: "The trace check and the packer that `bun run verify` runs.", mayImport: ["mizan and the packer of commons, by package name"] },
     { path: "suite/", what: "The tests, with the HTML of the fixtures committed under `golden/`, a fixture repository under `fixture-repo/` and the packed package installed into an empty project.", mayImport: ["anything here"] },
   ],

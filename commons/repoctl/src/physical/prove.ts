@@ -124,7 +124,7 @@ async function emit(w: World, repo: string, dir: string, libDir: string, package
   if (entries.length === 0) return err("the package names no TypeScript entry");
   const out = join(dir, "decl");
   const config = {
-    extends: join(scopeOf(repo), "commons", "ts", "tsconfig.json"),
+    extends: join(scopeOf(repo), "commons", "tsconfig.base.json"),
     compilerOptions: {
       lib: ["es2024", "dom", "dom.iterable"],
       skipLibCheck: true,

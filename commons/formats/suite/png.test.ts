@@ -35,7 +35,7 @@ import type { Result } from "@intellectual-frontiers/core";
 import { assert, assertEquals, assertRejects, assertThrows, proves } from "@intellectual-frontiers/test";
 
 const FR = "0001-formats FR-012";
-const LAW = "0005-typescript-runtime FR-014";
+const LAW = "0001-core FR-004";
 
 /* ---- PNGs by hand ---- */
 

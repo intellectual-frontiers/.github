@@ -44,7 +44,7 @@
 
 - **FR-022**: Options MUST be parsed once at the boundary into a typed value, and every command MUST accept `--home <dir>` and Headless' options by its effect: `--json` (the one JSON document, `headless.envelope/1`), `--quiet`, `--verbose`, `--no-color`, `--non-interactive` and `--help`, `--sarif` (the findings as a SARIF 2.1.0 log, 0002-workspace-model FR-035) on a report, `--dry-run` on an action that previews, `--check` on one that checks, `--yes` on one that destroys; an option a command does not know MUST end in `ergonex:Usage`. The report MUST be on standard output and the problems, the verdict and the one `next:` command on standard error, and the run log and the hints MUST be under `<XDG_STATE_HOME>/ergonex` (`log/`, `hints.json`).
 - **FR-023**: Every action that says it is idempotent MUST be: run again with nothing changed it MUST change nothing, and every run of a command MUST write its evidence record (0002-workspace-model FR-041); a command line that Headless refuses before it runs (`ergonex:Usage`) runs nothing and records nothing.
-- **FR-024**: `ergonex` MUST be TypeScript 7 and run on Bun by default and on Node 26 as the backup, through the same loader hook that `ifc` uses on Node; it MUST NOT run on, test on or document Deno; and it MUST have no `any`, no non-null `!`, errors as values (`Result`) and exhaustive switches.
+- **FR-024**: `ergonex` MUST be TypeScript 7 and run on Bun by default and on Node 26 as the backup, from its `.ts` sources as they are; it MUST NOT run on, test on or document Deno; and it MUST have no `any`, no non-null `!`, errors as values (`Result`) and exhaustive switches.
 - **FR-025**: `ergonex init` MUST make the root and the workspace's own area and write the starter manifest (0003-host FR-002) where there is none, MUST install no tool and change nothing outside the root but what 0004-onboarding FR-002 says (ergonex itself put on the path, which `--no-install` leaves out), and run again MUST change nothing; `ergonex setup` MAY call it, and `init` and `setup` are the only commands that make the root.
 - **FR-026**: Every run MUST write its evidence record (FR-023) but the printing form of `ergonex shell print <shell>` (it writes no file, 0003-host FR-017, and a start-up file may run it at every start), a preview (`--dry-run`), `ergonex help` and the help of a command (they run nothing), a Git hook that `ergonex hook` runs (a hook only reads, 0003-host FR-015), and a run for which `<home>/.ergonex/` does not exist, which has no place to keep it (`ergonex init`, which makes the area, writes its record).
 - **FR-027**: The controller MUST hold the module `ergonex hook <pre-commit|commit-msg|pre-push>`, which the generated hooks run (0003-host FR-014, FR-025): it is internal, it only reads, and its status is 0 or 1 where it ran its checker and 2 or 3 where it could not.
@@ -86,7 +86,7 @@
 ## Assumptions
 
 - The model of the controller is Git's: `git foo` runs `git-foo`, found on the `PATH` (FR-004); Ergonex credits it (0002-workspace-model FR-046).
-- The loader hook `ifc` uses on Node 26 is reusable by `ergonex` without a change (FR-024).
+- Node 26 runs the `.ts` sources of `ergonex` as they are, which strips their types (FR-024).
 - A person who wants a module on the `PATH` approves it by adding it to the catalog within 90 days, or by registering it with its hash (FR-011).
 - This specification is Active from 2026-11-17: the requirements it does not yet prove say so in the enforcement register.
 

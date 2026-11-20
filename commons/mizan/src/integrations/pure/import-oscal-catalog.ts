@@ -25,7 +25,7 @@ import type { ImportOutput, ImportRecordData } from "./import-vocabulary.ts";
 import type { IntegrationFinding, StandardRecord } from "./types.ts";
 
 /** The generator's name, as the provenance and the header of a generated module give it. */
-export const OSCAL_GENERATOR = "commons/ts/mizan/integrations/pure/import-oscal-catalog.ts";
+export const OSCAL_GENERATOR = "commons/mizan/src/integrations/pure/import-oscal-catalog.ts";
 
 /** A control of a catalog as the importer reads it. */
 export type Control = { readonly id: string; readonly title: string; readonly group: string; readonly enhancementOf?: string };

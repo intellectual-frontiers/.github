@@ -2,7 +2,7 @@
 /**
  * Data as TypeScript object literals, for files a program writes for people to read and edit (keys bare where they are identifiers, strings
  * in double quotes, two-space indentation and trailing commas), and the reader of exactly that subset, which never runs the file, so a past
- * version from `git show` can be read safely (commons 0001-formats FR-006); the writer takes any type shaped as JSON (commons 0005-typescript-runtime FR-063).
+ * version from `git show` can be read safely (commons 0001-formats FR-006); the writer takes any type shaped as JSON (commons 0001-formats FR-007).
  * Taken from Stolos's `src/archon/core/ts-literal.ts`; the reader returns a `Result` instead of throwing.
  *
  * @example
@@ -29,7 +29,7 @@ export type Literal = null | boolean | number | string | readonly Literal[] | { 
 
 /**
  * `T` itself where `T` is shaped as JSON at every depth, else a type `T` is not assignable to, so that a parameter `T & LiteralShape<T>`
- * takes any JSON-shaped type (commons 0005-typescript-runtime FR-063), an interface with no index signature included: strings, numbers, booleans and `null`; arrays and
+ * takes any JSON-shaped type (commons 0001-formats FR-007), an interface with no index signature included: strings, numbers, booleans and `null`; arrays and
  * tuples of such values; objects whose string keys hold such values, `undefined` allowed only as an optional property's. A function, a
  * `Date`, a `Map`, a `bigint`, a symbol or `unknown` anywhere makes it `never` there.
  */
@@ -47,7 +47,7 @@ export type LiteralShape<T> = T extends Literal
 type PropertyShape<V> = undefined extends V ? LiteralShape<Exclude<V, undefined>> | undefined : LiteralShape<V>;
 
 /**
- * A value as a TypeScript literal, indented for `depth` (two spaces each). It takes any value whose type is shaped as JSON (commons 0005-typescript-runtime FR-063), an
+ * A value as a TypeScript literal, indented for `depth` (two spaces each). It takes any value whose type is shaped as JSON (commons 0001-formats FR-007), an
  * interface with no index signature included, and refuses at compile time a value holding a function, a `Date`, a `bigint` or another
  * type JSON has not. Objects and arrays span lines (empty ones stay `{}` and `[]`); properties that are `undefined` are left out, as
  * `JSON.stringify` leaves them out. A number that is not finite is written `null`, as JSON writes it. (The check is on the parameter,

@@ -1,12 +1,12 @@
 /**
  * The typed facts of Lint, an independent library of commons (commons 0027-commons-libraries): the lint plugin of Intellectual Frontiers. Its specification is in its own spec kit (`spec-kit/`, `0001-lint`); this
- * repository knows it as one requirement of 0027-commons-libraries, proved by `bun run verify` in this folder, and as a library of the lift of `commons/ts` (0032-lifting-libraries).
+ * repository knows it as one requirement of 0027-commons-libraries, proved by `bun run verify` in this folder, and as a library by concern (0032-libraries-by-concern).
  *
  * Spec: 0001-lint FR-010
  *
  * @module
  */
-import type { About } from "@intellectual-frontiers/commons/ts/kernel";
+import type { About } from "@intellectual-frontiers/core/about";
 
 /** Lint. */
 export const about: About = {

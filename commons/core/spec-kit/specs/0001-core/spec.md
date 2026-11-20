@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** The foundation that the rest of commons stands on, in a package of its own with no dependency: errors as values, exhaustive matching, branded types, decoders at the boundary, a few pure text helpers, type-level tests, graphs of work and exact optional objects. It is the first library lifted out of `commons/ts` (commons 0032-lifting-libraries), and its requirements are those that 0005-typescript-runtime made of the kernel's foundation, kept here.
+**Input:** The foundation that the rest of commons stands on, in a package of its own with no dependency: errors as values, exhaustive matching, branded types, decoders at the boundary, a few pure text helpers, type-level tests, graphs of work and exact optional objects. It is the first library lifted out of `commons/ts` (commons 0032-libraries-by-concern), and its requirements are those that 0005-typescript-practice made of the kernel's foundation, kept here.
 
 ## The foundation
 
@@ -18,7 +18,8 @@
 
 ## The package
 
-- **FR-007**: Core MUST depend on nothing, MUST import nothing outside its own files, MUST name no host global, and MUST be published as compiled modules with their declarations as `@intellectual-frontiers/core` (commons 0032-lifting-libraries FR-005), so that it runs on Bun, on Node 26 and in a browser with no build step.
+- **FR-007**: Core MUST depend on nothing, MUST import nothing outside its own files, MUST name no host global, and MUST be published as compiled modules with their declarations as `@intellectual-frontiers/core` (commons 0032-libraries-by-concern FR-005), so that it runs on Bun, on Node 26 and in a browser with no build step.
+- **FR-008**: Core MUST give the types of the facts a library states of itself for its documentation (`About` and the types it is made of: its title, its summary, the specification it implements, its folders with what each may import, its commands, its rules with what enforces each, its areas, layers and facts) as a type-only entry `@intellectual-frontiers/core/about`, which exports no value, so that a library types its `about.ts` by Core and depends on nothing else for it.
 
 ## Acceptance scenarios
 
@@ -30,7 +31,7 @@
 
 ## Out of scope
 
-- Everything that parses a format, hashes, talks to the host or the network: other libraries (commons 0032-lifting-libraries FR-002).
+- Everything that parses a format, hashes, talks to the host or the network: other libraries (commons 0032-libraries-by-concern FR-002).
 
 ## Edge cases
 

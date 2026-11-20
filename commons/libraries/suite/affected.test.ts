@@ -19,18 +19,18 @@ const put = (root: string, file: string, text: string): void => {
 const lib = (name: string, extra: Readonly<Record<string, unknown>> = {}): string =>
   `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", version: "0.1.0", exports: [], ...extra })};\n`;
 
-/** commons/ts (the kernel, the runtime, a tool), commons/alpha (imports the kernel, runs a tool) and commons/beta (imports alpha and the runtime's whole package). */
+/** commons/base (the kernel, the runtime, a tool), commons/alpha (imports the kernel, runs a tool) and commons/beta (imports alpha and the runtime's whole package). */
 function repo(root: string): void {
   put(
     root,
-    "commons/ts/package.json",
-    JSON.stringify({ name: "@x/commons", exports: { "./ts/kernel": "./kernel/mod.ts", "./ts/runtime": "./runtime/mod.ts" } }),
+    "commons/base/package.json",
+    JSON.stringify({ name: "@x/base", exports: { "./kernel": "./kernel/mod.ts", "./runtime": "./runtime/mod.ts" } }),
   );
-  put(root, "commons/ts/kernel/mod.ts", 'export { util } from "./util.ts";\n');
-  put(root, "commons/ts/kernel/util.ts", "export const util = 1;\n");
-  put(root, "commons/ts/runtime/mod.ts", "export const rt = 1;\n");
-  put(root, "commons/ts/other/thing.ts", "export const thing = 1;\n");
-  put(root, "commons/tools/check.ts", 'import { util } from "../ts/kernel/util.ts";\nexport const c = util;\n');
+  put(root, "commons/base/kernel/mod.ts", 'export { util } from "./util.ts";\n');
+  put(root, "commons/base/kernel/util.ts", "export const util = 1;\n");
+  put(root, "commons/base/runtime/mod.ts", "export const rt = 1;\n");
+  put(root, "commons/base/other/thing.ts", "export const thing = 1;\n");
+  put(root, "commons/tools/check.ts", 'import { util } from "../base/kernel/util.ts";\nexport const c = util;\n');
   put(root, "commons/alpha/library.ts", lib("alpha"));
   put(
     root,
@@ -38,23 +38,23 @@ function repo(root: string): void {
     JSON.stringify({
       name: "@x/alpha",
       exports: { "./api": "./api.ts" },
-      devDependencies: { "@x/commons": "link:../ts", left: "^1.0.0" },
+      devDependencies: { "@x/base": "link:../base", left: "^1.0.0" },
       scripts: { verify: "bun ../tools/check.ts" },
     }),
   );
-  put(root, "commons/alpha/api.ts", 'import { util } from "@x/commons/ts/kernel";\nexport const a = util;\n');
-  put(root, "commons/alpha/src/mod.ts", 'import { util } from "@x/commons/ts/kernel";\nexport const m = util;\n');
+  put(root, "commons/alpha/api.ts", 'import { util } from "@x/base/kernel";\nexport const a = util;\n');
+  put(root, "commons/alpha/src/mod.ts", 'import { util } from "@x/base/kernel";\nexport const m = util;\n');
   put(root, "commons/beta/src/mod.ts", 'import { a } from "@x/alpha/api";\nexport const b2 = a;\n');
   put(root, "commons/beta/library.ts", lib("beta"));
   put(
     root,
     "commons/beta/package.json",
-    JSON.stringify({ name: "@x/beta", devDependencies: { "@x/alpha": "link:../alpha", "@x/commons": "link:../ts" } }),
+    JSON.stringify({ name: "@x/beta", devDependencies: { "@x/alpha": "link:../alpha", "@x/base": "link:../base" } }),
   );
   put(
     root,
     "commons/beta/main.ts",
-    'import { a } from "@x/alpha/api";\nimport { x } from "@x/commons/ts/unlisted";\nexport const b = [a, x];\n',
+    'import { a } from "@x/alpha/api";\nimport { x } from "@x/base/unlisted";\nexport const b = [a, x];\n',
   );
 }
 
@@ -65,20 +65,20 @@ proves(
     await withTempDir((dir) => {
       repo(dir);
       const a = inputsOf(dir, "alpha");
-      assertEquals(a.dependsOn, ["ts"], "link:../ts is a dependency and ^1.0.0 is not");
-      assertEquals(a.files, ["commons/tools/check.ts", "commons/ts/kernel/mod.ts", "commons/ts/kernel/util.ts"]);
-      assert(a.paths.includes("commons/alpha/**") && a.paths.includes("commons/ts/kernel/**") && a.paths.includes("commons/tools/**"));
+      assertEquals(a.dependsOn, ["base"], "link:../base is a dependency and ^1.0.0 is not");
+      assertEquals(a.files, ["commons/base/kernel/mod.ts", "commons/base/kernel/util.ts", "commons/tools/check.ts"]);
+      assert(a.paths.includes("commons/alpha/**") && a.paths.includes("commons/base/kernel/**") && a.paths.includes("commons/tools/**"));
       assert(a.paths.includes(".github/actions/**") && a.paths.includes(".github/workflows/ci.auto.yml"));
       assertEquals(a.imports, [], "the kernel is not a library");
-      assert(a.codePaths.includes("commons/ts/kernel/**") && !a.codePaths.includes("commons/tools/**"), "the code reads what it imports and no tool");
-      assert(!a.paths.includes("commons/ts/runtime/**") && !a.paths.includes("commons/ts/**"), "the runtime is not imported");
+      assert(a.codePaths.includes("commons/base/kernel/**") && !a.codePaths.includes("commons/tools/**"), "the code reads what it imports and no tool");
+      assert(!a.paths.includes("commons/base/runtime/**") && !a.paths.includes("commons/base/**"), "the runtime is not imported");
       const b = inputsOf(dir, "beta");
-      assertEquals(b.dependsOn, ["alpha", "ts"]);
+      assertEquals(b.dependsOn, ["alpha", "base"]);
       assertEquals(b.imports, ["alpha"], "the libraries its own code imports by name");
-      assert(b.paths.includes("commons/ts/**"), "an import the exports do not give takes the whole dependency");
+      assert(b.paths.includes("commons/base/**"), "an import the exports do not give takes the whole dependency");
       assert(b.paths.includes("commons/alpha/**"), "a dependency library's entry is an input");
-      assertEquals(matches(a.paths, "commons/ts/kernel/util.ts"), true);
-      assertEquals(matches(a.paths, "commons/ts/runtime/mod.ts"), false);
+      assertEquals(matches(a.paths, "commons/base/kernel/util.ts"), true);
+      assertEquals(matches(a.paths, "commons/base/runtime/mod.ts"), false);
       return Promise.resolve();
     });
   },
@@ -92,13 +92,13 @@ proves(
       repo(dir);
       const names = (files: readonly string[]): readonly string[] => affectedBy(dir, files).map((l) => l.name);
       assertEquals(
-        names(["commons/ts/kernel/util.ts"]),
+        names(["commons/base/kernel/util.ts"]),
         ["alpha", "beta"],
-        "a file of what alpha imports; beta depends on alpha and on the whole of commons/ts",
+        "a file of what alpha imports; beta depends on alpha and on the whole of commons/base",
       );
       assertEquals(names(["commons/alpha/api.ts"]), ["alpha", "beta"], "the library's own file, and the library that depends on it");
       assertEquals(names(["commons/beta/main.ts"]), ["beta"]);
-      assertEquals(names(["commons/ts/other/thing.ts"]), ["beta"], "only the library that takes the whole dependency");
+      assertEquals(names(["commons/base/other/thing.ts"]), ["beta"], "only the library that takes the whole dependency");
       assertEquals(names([".github/actions/bun/action.yml"]), ["alpha", "beta"]);
       assertEquals(names(["commons/tools/check.ts"]), ["alpha", "beta"]);
       assertEquals(names(["README.md", "commons/spec-kit/x.md"]), [], "no library reads these");
@@ -144,14 +144,14 @@ proves(
       repo(dir);
       const code = (files: readonly string[]): readonly string[] => affectedBy(dir, files, "code").map((l) => l.name);
       const verify = (files: readonly string[]): readonly string[] => affectedBy(dir, files, "verify").map((l) => l.name);
-      assertEquals(code(["commons/ts/kernel/util.ts"]), ["alpha", "beta"], "what alpha's own code imports, and beta, which imports alpha");
+      assertEquals(code(["commons/base/kernel/util.ts"]), ["alpha", "beta"], "what alpha's own code imports, and beta, which imports alpha");
       assertEquals(code(["commons/alpha/api.ts"]), ["alpha", "beta"]);
       assertEquals(code(["commons/beta/main.ts"]), ["beta"]);
       assertEquals(code(["commons/tools/check.ts"]), [], "a tool that a script runs is read by verify, not by the types and the tests");
       assertEquals(verify(["commons/tools/check.ts"]), ["alpha", "beta"]);
       assertEquals(code([".github/actions/bun/action.yml", ".github/workflows/ci.auto.yml"]), []);
       assertEquals(verify([".github/workflows/ci.auto.yml"]), ["alpha", "beta"], "the workflow of CI is an input of every library's verify");
-      assertEquals(code(["commons/ts/other/thing.ts"]), [], "beta takes the whole runtime only in a file that is not its own code");
+      assertEquals(code(["commons/base/other/thing.ts"]), [], "beta takes the whole runtime only in a file that is not its own code");
       return Promise.resolve();
     });
   },

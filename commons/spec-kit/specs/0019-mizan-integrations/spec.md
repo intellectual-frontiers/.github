@@ -6,11 +6,11 @@
 **Domain:** commons
 **Part of:** 0003-mizan
 
-**Input:** IFC Mizan Integrations (`commons/ts/mizan/integrations/`) is the module of Mizan's extensions and plugins that brings outside ontologies and schemas into Intellectual Frontiers' typed TypeScript form, and turns ours into reusable, well-known ontologies, so that a harness takes standards instead of coining terms (`0018-standards-first`), and a consumer that is not TypeScript reads standard forms of what we state.
+**Input:** IFC Mizan Integrations (`commons/mizan/src/integrations/`) is the module of Mizan's extensions and plugins that brings outside ontologies and schemas into Intellectual Frontiers' typed TypeScript form, and turns ours into reusable, well-known ontologies, so that a harness takes standards instead of coining terms (`0018-standards-first`), and a consumer that is not TypeScript reads standard forms of what we state.
 
 ## The module
 
-- **FR-001**: The module MUST live in `commons/ts/mizan/integrations/` and be exported as `@intellectual-frontiers/commons/ts/mizan/integrations`, in two layers: `pure/`, functions over text with no effect on the host, and `host/`, which fetches, reads and writes files and checks pins.
+- **FR-001**: The module MUST live in `commons/mizan/src/integrations/` and be exported as `@intellectual-frontiers/mizan/integrations`, in two layers: `pure/`, functions over text with no effect on the host, and `host/`, which fetches, reads and writes files and checks pins.
 - **FR-002**: An integration MUST be a typed record: its id, its direction (`import` or `export`), the formats it reads and writes, the `Standard` it handles, and a `run` that returns a `Result` of its output or its findings; a registry MUST look integrations up by their formats. There MUST be no `any` and no non-null `!`, and a `switch` over a union MUST be exhaustive.
 - **FR-003**: Mizan's own checks (the requirement syntax, the standards-first rules) MUST be plugins through the same extension point, so that a harness can add its rules without a fork.
 - **FR-004**: The kernel MUST stay free of readers (0012-ontology FR-007); every reader of an RDF syntax or of a schema language MUST be in this module.

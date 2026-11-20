@@ -1,0 +1,7 @@
+{
+  "extends": "../commons/tsconfig.base.json",
+  "compilerOptions": {
+    "noPropertyAccessFromIndexSignature": false
+  },
+  "include": ["./**/*.ts"]
+}

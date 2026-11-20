@@ -1,6 +1,6 @@
 // Spec: 0002-workspace-model FR-005
 /**
- * The command-line parser of the library `terminal`, by its package name (commons 0027-commons-libraries FR-004, 0032-lifting-libraries FR-003): what this library uses of it, each name once, re-exported so that
+ * The command-line parser of the library `terminal`, by its package name (commons 0027-commons-libraries FR-004, 0032-libraries-by-concern FR-003): what this library uses of it, each name once, re-exported so that
  * the declarations of this package name the library and not the path of its sources.
  *
  * @module

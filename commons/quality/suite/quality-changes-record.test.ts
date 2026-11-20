@@ -1,5 +1,5 @@
 /**
- * The `changes` check leaves its result as a quality record (commons 0020-ifccm FR-031, 0001-quality-evidence FR-013, FR-020): `tools/changes.ts` run as a real
+ * The `changes` check leaves its result as a quality record (commons 0020-ifccm FR-031, 0001-quality-evidence FR-013, FR-020): `libraries/tools/changes.ts` run as a real
  * program on real temporary Git repositories with real commits. Each rule is a case, each finding a failed case with its rule, file and line, each
  * rule that could not run (the strict rules where the repository is plain Git, where no host was asked, the commit rules where no range was
  * given) a case that is `not_run` with its reason and never a pass; the record is written to the repository's `test-results` and, with
@@ -19,7 +19,7 @@ import { at, list, parsed } from "./quality-fixtures.ts";
 import { git, needsGit, repositoryWithCommit } from "./quality-fixtures.ts";
 
 const ROOT = resolve(dirname(fromFileUrl(import.meta.url)), "..");
-const CHANGES = join(ROOT, "..", "ts", "tools", "changes.ts");
+const CHANGES = join(ROOT, "..", "libraries", "tools", "changes.ts");
 
 const changes = (...words: string[]): Promise<{ readonly code: number; readonly stdout: string; readonly stderr: string }> =>
   run([execPath(), CHANGES, ...words], { env: { GIT_TERMINAL_PROMPT: "0" } });

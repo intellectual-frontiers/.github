@@ -1,6 +1,6 @@
 // Spec: 0001-test FR-001
 /**
- * Tests that run unchanged under `bun test` and `node --test` (commons 0005-typescript-runtime FR-013): registration on
+ * Tests that run unchanged under `bun test` and `node --test` (commons 0001-test FR-001): registration on
  * `node:test`, assertions on `node:assert/strict`, with short plain names (`assert`, `assertEquals`, `assertStringIncludes`, ...). `proves` names the
  * requirements a test proves, as erga's kernel `test.ts` does, and keeps them for a report. Kept out of `./mod.ts`, so that importing the
  * runtime never loads a test runner.
@@ -16,7 +16,7 @@
  * outcome is never changed by its recording: a failure is still thrown to the runner.
  *
  * A test's body is given a context `t` whose `t.step(name, fn)` runs a step as a subtest of `node:test` (`TestContext.test`), awaited, and
- * records it in the test's evidence (commons 0005-typescript-runtime FR-060): a `test step` span, a child of the test's span (or of the
+ * records it in the test's evidence (commons 0001-test FR-002): a `test step` span, a child of the test's span (or of the
  * step it is in), as it ends, and the test's `steps`, which its `test` span names in `ifc.test.steps`. A step that fails fails its test
  * with the step's error, on every runner, so that the test's record says why.
  *
@@ -34,7 +34,7 @@
  * @example
  * ```ts
  * import { assertEquals, proves } from "./test.ts";
- * proves(["0005-typescript-runtime FR-013"], "one and one", () => assertEquals(1 + 1, 2));
+ * proves(["0001-test FR-001"], "one and one", () => assertEquals(1 + 1, 2));
  * proves(["0008-test-evidence FR-001"], "a high-risk test", () => assertEquals(2 * 2, 4), { risk: "high" });
  * ```
  *
@@ -122,7 +122,7 @@ export type TestOptions = {
 /** The reason a test is recorded as skipped where another test of its file is marked `only` (FR-060). */
 export const ONLY_REASON = "another test of this file is marked only";
 
-/** A requirement cited by its specification and number: `0005-typescript-runtime FR-013`, or another repository's `erga 241-typescript-first FR-015`. */
+/** A requirement cited by its specification and number: `0001-test FR-001`, or another repository's `erga 241-typescript-first FR-015`. */
 export type Requirement = string;
 
 /** The requirements each test proves, in the order the tests were registered, for a report. */
@@ -548,7 +548,7 @@ export function test(name: string, fn: TestFn, options: TestOptions = {}): void 
   register(name, [], fn, options, options.file === undefined ? callerFile() : recordPath(options.file));
 }
 
-/** A test that proves one or more requirements, named for them: `0005-typescript-runtime FR-013: <name>`. */
+/** A test that proves one or more requirements, named for them: `0001-test FR-001: <name>`. */
 export function proves(requirements: readonly [Requirement, ...Requirement[]], name: string, fn: TestFn, options: TestOptions = {}): void {
   const full = `${requirements.join(", ")}: ${name}`;
   proofs.push({ test: full, requirements });

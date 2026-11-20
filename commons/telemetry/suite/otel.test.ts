@@ -51,7 +51,7 @@ const CONFIG = "0001-telemetry FR-005";
 const REDACT = "0001-telemetry FR-006";
 const LIMITS = "0001-telemetry FR-007";
 const SAMPLING = "0001-telemetry FR-008";
-const LAWS = "0005-typescript-runtime FR-014";
+const LAWS = "0001-core FR-004";
 
 function value<T, E>(r: { readonly kind: "ok"; readonly value: T } | { readonly kind: "err"; readonly error: E }): T {
   if (r.kind === "err") throw new Error(`expected a success, found ${JSON.stringify(r.error)}`);
@@ -61,7 +61,7 @@ function value<T, E>(r: { readonly kind: "ok"; readonly value: T } | { readonly 
 const TRACE = "4bf92f3577b34da6a3ce929d0e0e4736";
 const SPAN = "00f067aa0ba902b7";
 
-proves([MODEL, "0005-typescript-runtime FR-014"], "attribute values and bodies admit only the types OpenTelemetry allows", () => {
+proves([MODEL, "0001-core FR-004"], "attribute values and bodies admit only the types OpenTelemetry allows", () => {
   const values: readonly AttributeValue[] = ["s", true, 1n, 1.5, Uint8Array.of(1), ["a"], [true], [1n], [1.5]];
   // @ts-expect-error a heterogeneous array is not an attribute value
   const mixed: AttributeValue = ["a", 1];

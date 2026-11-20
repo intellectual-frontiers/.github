@@ -1,4 +1,4 @@
-# AUTO-GENERATED with ../../../ontology/src/standards/nist-sp-800-53/controls.auto.ts by commons/ts/mizan/integrations/pure/import-oscal-catalog.ts (commons 0019-mizan-integrations FR-009). Do not edit.
+# AUTO-GENERATED with ../../../ontology/src/standards/nist-sp-800-53/controls.auto.ts by commons/mizan/src/integrations/pure/import-oscal-catalog.ts (commons 0019-mizan-integrations FR-009). Do not edit.
 
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix prov: <http://www.w3.org/ns/prov#> .

@@ -1,13 +1,12 @@
 /**
  * The typed facts of Libraries, an independent library of commons (commons 0027-commons-libraries): the tools that manage the libraries of a repository of commons and hold it to Mizan. Its specification is in
- * its own spec kit (`spec-kit/`, `0001-libraries`); this repository knows it as one requirement of 0027-commons-libraries, proved by `bun run verify` in this folder, and as a library of the lift of
- * `commons/ts` (0032-lifting-libraries).
+ * its own spec kit (`spec-kit/`, `0001-libraries`); this repository knows it as one requirement of 0027-commons-libraries, proved by `bun run verify` in this folder, and as a library by concern (0032-libraries-by-concern).
  *
  * Spec: 0001-libraries FR-010
  *
  * @module
  */
-import type { About } from "@intellectual-frontiers/commons/ts/kernel";
+import type { About } from "@intellectual-frontiers/core/about";
 
 /** Libraries. */
 export const about: About = {

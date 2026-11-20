@@ -19,7 +19,7 @@
 - **FR-005**: `tools/check.ts` MUST run the trace of the sources and tests to these specifications (commons 0015-trace), beside the shared layers checker in `verify`, hold the findings against `trace.baseline.txt`, which only shrinks, and be part of `bun run verify`.
 - **FR-006**: The public surface MUST be the entries of `exports`: `.`, `./governance`, `./logical`, `./http`, `./transport` and `./headless`, and a vendor adapter or a standard MUST be a separate package of commons that imports them by name.
 - **FR-007**: The library MUST declare its table of layers as the field `kanon` of its manifest `library.ts` (commons 0033-kanon FR-010) and its `verify` MUST run the shared checker of `@intellectual-frontiers/kanon` (`bun ../kanon/src/check.ts`); the library keeps no checker of its own.
-- **FR-008**: The library MUST declare itself with a manifest (`library.ts`, `release.ts`, `about.ts`) and be published as compiled ESM with declarations, with exports conditions `types`, `bun` and `default` (commons 0032-lifting-libraries).
+- **FR-008**: The library MUST declare itself with a manifest (`library.ts`, `release.ts`, `about.ts`) and be published as compiled ESM with declarations, with exports conditions `types`, `bun` and `default` (commons 0032-libraries-by-concern).
 
 ## Acceptance scenarios
 

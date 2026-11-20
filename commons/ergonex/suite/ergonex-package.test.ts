@@ -1,5 +1,5 @@
 /**
- * The package that is published (commons ergonex 0004-onboarding FR-001, commons 0032-lifting-libraries FR-013): the one file that `tools/pack.ts` bundles for the command runs as it is, from an empty folder with nothing
+ * The package that is published (commons ergonex 0004-onboarding FR-001, commons 0032-libraries-by-concern FR-013): the one file that `tools/pack.ts` bundles for the command runs as it is, from an empty folder with nothing
  * installed beside it, on Bun and on Node 26; its `package.json` has the version of the library, the one file as its `bin`, an `exports` whose entry names its declarations, the packages of commons it depends on and the right
  * to be public; and the `package.json` of this folder stays private.
  *

@@ -5,7 +5,6 @@
     "": {
       "name": "@intellectual-frontiers/integrations",
       "devDependencies": {
-        "@intellectual-frontiers/commons": "link:../ts",
         "@intellectual-frontiers/core": "link:../core",
         "@intellectual-frontiers/grc": "link:../grc",
         "@intellectual-frontiers/headless": "link:../headless",
@@ -24,8 +23,6 @@
     },
   },
   "packages": {
-    "@intellectual-frontiers/commons": ["@intellectual-frontiers/commons@link:../ts", {}],
-
     "@intellectual-frontiers/core": ["@intellectual-frontiers/core@link:../core", {}],
 
     "@intellectual-frontiers/grc": ["@intellectual-frontiers/grc@link:../grc", {}],

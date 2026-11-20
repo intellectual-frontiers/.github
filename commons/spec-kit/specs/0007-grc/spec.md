@@ -5,44 +5,44 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** The primitives of governance, risk and compliance as code, pulled up into IFC TypeScript (0005-typescript-runtime) from what `erga` and `stolos` each built in their own shape: `erga` around OSCAL, with control maps, a hash-chained evidence ledger and dispositions; `stolos` around the Secure Controls Framework as its hub, with typed controls, waivers, freshness, drift, change-impact gates and OCSF, OSCAL, CycloneDX and in-toto output. One kernel of types and pure functions (catalogs, controls, verdicts, findings, waivers, evidence, assessment and the standard formats) and a thin runtime of signers, Git readers and loaders, so that each harness keeps only its connectors, its data and its catalogs' content. Every check run is a span and every finding a log record (0006-signals), so compliance is observed the way everything else is.
+**Input:** The primitives of governance, risk and compliance as code, pulled up into IFC TypeScript (0005-typescript-practice) from what `erga` and `stolos` each built in their own shape: `erga` around OSCAL, with control maps, a hash-chained evidence ledger and dispositions; `stolos` around the Secure Controls Framework as its hub, with typed controls, waivers, freshness, drift, change-impact gates and OCSF, OSCAL, CycloneDX and in-toto output. One kernel of types and pure functions (catalogs, controls, verdicts, findings, waivers, evidence, assessment and the standard formats) and a thin runtime of signers, Git readers and loaders, so that each harness keeps only its connectors, its data and its catalogs' content. Every check run is a span and every finding a log record (0006-signals), so compliance is observed the way everything else is.
 
 ## Catalogs, controls and verdicts (kernel)
 
-- **FR-001**: GRC engineering MUST take catalogs and mappings from the library `grc` (`@intellectual-frontiers/grc`, grc FR-001), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-002**: GRC engineering MUST take controls from the library `grc` (`@intellectual-frontiers/grc`, grc FR-002), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-003**: GRC engineering MUST take verdicts and severities from the library `grc` (`@intellectual-frontiers/grc`, grc FR-003), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-004**: GRC engineering MUST take findings from the library `grc` (`@intellectual-frontiers/grc`, grc FR-004), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-005**: GRC engineering MUST take waivers from the library `grc` (`@intellectual-frontiers/grc`, grc FR-005), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
+- **FR-001**: GRC engineering MUST take catalogs and mappings from the library `grc` (`@intellectual-frontiers/grc`, grc FR-001), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-002**: GRC engineering MUST take controls from the library `grc` (`@intellectual-frontiers/grc`, grc FR-002), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-003**: GRC engineering MUST take verdicts and severities from the library `grc` (`@intellectual-frontiers/grc`, grc FR-003), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-004**: GRC engineering MUST take findings from the library `grc` (`@intellectual-frontiers/grc`, grc FR-004), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-005**: GRC engineering MUST take waivers from the library `grc` (`@intellectual-frontiers/grc`, grc FR-005), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
 
 ## Evidence (kernel)
 
-- **FR-006**: GRC engineering MUST take the canonical form and the digests of evidence from the library `grc` (`@intellectual-frontiers/grc`, grc FR-006), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-007**: GRC engineering MUST take the evidence ledger from the library `grc` (`@intellectual-frontiers/grc`, grc FR-007), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-008**: GRC engineering MUST take manifests from the library `grc` (`@intellectual-frontiers/grc`, grc FR-008), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-009**: GRC engineering MUST take evidence bundles from the library `grc` (`@intellectual-frontiers/grc`, grc FR-009), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
+- **FR-006**: GRC engineering MUST take the canonical form and the digests of evidence from the library `grc` (`@intellectual-frontiers/grc`, grc FR-006), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-007**: GRC engineering MUST take the evidence ledger from the library `grc` (`@intellectual-frontiers/grc`, grc FR-007), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-008**: GRC engineering MUST take manifests from the library `grc` (`@intellectual-frontiers/grc`, grc FR-008), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-009**: GRC engineering MUST take evidence bundles from the library `grc` (`@intellectual-frontiers/grc`, grc FR-009), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
 
 ## Assessment (kernel)
 
-- **FR-010**: GRC engineering MUST take coverage from the library `grc` (`@intellectual-frontiers/grc`, grc FR-010), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-011**: GRC engineering MUST take freshness from the library `grc` (`@intellectual-frontiers/grc`, grc FR-011), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-012**: GRC engineering MUST take drift from the library `grc` (`@intellectual-frontiers/grc`, grc FR-012), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-013**: GRC engineering MUST take the change-impact gate from the library `grc` (`@intellectual-frontiers/grc`, grc FR-013), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-014**: GRC engineering MUST take the risk register from the library `grc` (`@intellectual-frontiers/grc`, grc FR-014), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-015**: GRC engineering MUST take the requirement trace from the library `grc` (`@intellectual-frontiers/grc`, grc FR-015), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
+- **FR-010**: GRC engineering MUST take coverage from the library `grc` (`@intellectual-frontiers/grc`, grc FR-010), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-011**: GRC engineering MUST take freshness from the library `grc` (`@intellectual-frontiers/grc`, grc FR-011), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-012**: GRC engineering MUST take drift from the library `grc` (`@intellectual-frontiers/grc`, grc FR-012), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-013**: GRC engineering MUST take the change-impact gate from the library `grc` (`@intellectual-frontiers/grc`, grc FR-013), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-014**: GRC engineering MUST take the risk register from the library `grc` (`@intellectual-frontiers/grc`, grc FR-014), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-015**: GRC engineering MUST take the requirement trace from the library `grc` (`@intellectual-frontiers/grc`, grc FR-015), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
 
 ## Formats (kernel)
 
-- **FR-016**: GRC engineering MUST take findings as OCSF from the library `grc` (`@intellectual-frontiers/grc`, grc FR-016), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-017**: GRC engineering MUST take assessments as OSCAL from the library `grc` (`@intellectual-frontiers/grc`, grc FR-017), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-018**: GRC engineering MUST take attestations from the library `grc` (`@intellectual-frontiers/grc`, grc FR-018), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
+- **FR-016**: GRC engineering MUST take findings as OCSF from the library `grc` (`@intellectual-frontiers/grc`, grc FR-016), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-017**: GRC engineering MUST take assessments as OSCAL from the library `grc` (`@intellectual-frontiers/grc`, grc FR-017), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-018**: GRC engineering MUST take attestations from the library `grc` (`@intellectual-frontiers/grc`, grc FR-018), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
 
 ## The host (runtime)
 
-- **FR-019**: GRC engineering MUST take the run of a pack as signals from the library `grc` (`@intellectual-frontiers/grc`, grc FR-019), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-020**: GRC engineering MUST take signing and verifying from the library `grc` (`@intellectual-frontiers/grc`, grc FR-020), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-021**: The runtime MUST take Git, read by running it from the library `system` (`@intellectual-frontiers/system`, system FR-014), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-022**: GRC engineering MUST take the loaders of settings from the library `grc` (`@intellectual-frontiers/grc`, grc FR-021), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
+- **FR-019**: GRC engineering MUST take the run of a pack as signals from the library `grc` (`@intellectual-frontiers/grc`, grc FR-019), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-020**: GRC engineering MUST take signing and verifying from the library `grc` (`@intellectual-frontiers/grc`, grc FR-020), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-021**: The runtime MUST take Git, read by running it from the library `system` (`@intellectual-frontiers/system`, system FR-014), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-022**: GRC engineering MUST take the loaders of settings from the library `grc` (`@intellectual-frontiers/grc`, grc FR-021), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
 
 ## Out of scope
 

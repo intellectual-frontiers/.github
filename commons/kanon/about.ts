@@ -5,7 +5,7 @@
  *
  * @module
  */
-import type { About } from "@intellectual-frontiers/commons/ts/kernel";
+import type { About } from "@intellectual-frontiers/core/about";
 
 /** Kanon. */
 export const about: About = {

@@ -1,24 +1,22 @@
 /**
- * The typed facts of a package of commons that its documentation shows (commons 0011-documentation FR-005, FR-008): what the package is,
- * the specification it implements, its folders and what each may import, the commands that work on it, the rules it keeps and what
- * enforces each, and its areas, each with its entry points, its specification, its phases and its examples. Each package keeps one
- * `About` value in an `about.ts` at its root, which no entry point exports; prose is TSDoc, and only what has a shape is here, so that a
- * test can hold it to the code.
+ * The typed facts of a package of commons that its documentation shows (commons 0011-documentation FR-005, FR-008): what the package is, the specification it implements, its folders and what each may import,
+ * the commands that work on it, the rules it keeps and what enforces each, its areas (each with its entry points, its specification, its phases and its examples), its layers and its facts. Each package
+ * keeps one `About` value in an `about.ts` at its root, which no entry point exports; prose is TSDoc, and only what has a shape is here, so that a test can hold it to the code. Types only: nothing here runs.
  *
  * @example
  * ```ts
- * import type { About } from "./documentation.ts";
+ * import type { About } from "@intellectual-frontiers/core/about";
  * export const about: About = {
  *   title: "Example",
  *   summary: "What the example is, in a sentence.",
- *   spec: { repo: "commons", id: "0005-typescript-runtime" },
+ *   spec: { repo: "commons", id: "0009-example" },
  * };
  * ```
  *
  * @module
  */
 
-/** A specification, by its repository and its folder's name (`commons`, `0009-example`). Only commons' own become links. */
+/** A specification, by its repository and its folder's name (`commons`, `0009-example`). Only the repository's own become links. */
 export interface AboutSpec {
   /** The repository whose spec kit holds it. */
   readonly repo: string;
@@ -82,9 +80,7 @@ export interface AboutExample {
   readonly outputs?: readonly string[];
 }
 
-/**
- * An area of a package: a part with an entry point, whose exports are its API and whose entry point's module comment is its overview.
- */
+/** An area of a package: a part with an entry point, whose exports are its API and whose entry point's module comment is its overview. */
 export interface AboutArea {
   /** Its name, as a title. */
   readonly title: string;
@@ -92,6 +88,8 @@ export interface AboutArea {
   readonly slug: string;
   /** Its entry points, relative to `about.ts`; the first one's module comment is the area's overview. */
   readonly entryPoints: readonly string[];
+  /** The folder, relative to `about.ts`, that holds the files of the area; where it is not given, the folder of the first entry point. */
+  readonly folder?: string;
   /** The specification it implements, where it has its own. */
   readonly spec?: AboutSpec;
   /** Its phases, where it is built a phase at a time. */
@@ -100,7 +98,7 @@ export interface AboutArea {
   readonly examples?: readonly AboutExample[];
 }
 
-/** The typed facts of a package of commons, or of commons as a whole. */
+/** The typed facts of a package, or of a repository as a whole. */
 export interface About {
   /** Its name, as a title. */
   readonly title: string;
@@ -118,4 +116,26 @@ export interface About {
   readonly areas?: readonly AboutArea[];
   /** Its examples that belong to no one area. */
   readonly examples?: readonly AboutExample[];
+  /** Facts its page shows in a small table beside the summary: a label and its value, as a version or a conformance level. */
+  readonly facts?: readonly AboutFact[];
+  /** The folders of a library built in layers, each with the layer it is in and what it may import of the others: its page shows them as bands. */
+  readonly layers?: readonly AboutLayer[];
+}
+
+/** A folder of a library built in layers. */
+export interface AboutLayer {
+  /** The folder, relative to the library. */
+  readonly folder: string;
+  /** The layer it is in: `governance`, `logical` or `physical`. */
+  readonly layer: string;
+  /** The folders of the library that its files may import, where it names them. */
+  readonly mayImport?: readonly string[];
+}
+
+/** One fact of a package: a label and its value. */
+export interface AboutFact {
+  /** What it is: `Version`. */
+  readonly label: string;
+  /** Its value, in Markdown: `0.9.0`. */
+  readonly value: string;
 }

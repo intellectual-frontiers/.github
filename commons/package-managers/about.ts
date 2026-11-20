@@ -5,7 +5,7 @@
  *
  * @module
  */
-import type { About } from "@intellectual-frontiers/commons/ts/kernel";
+import type { About } from "@intellectual-frontiers/core/about";
 
 /** The shared kit of the manager dialects. */
 export const about: About = {

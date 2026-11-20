@@ -1,6 +1,6 @@
 // Spec: 0001-terminal FR-001
 /**
- * A typed command-line parser (commons 0005-typescript-runtime FR-047): a command's options are declared once as data (`flag`, `value`,
+ * A typed command-line parser (commons 0001-terminal FR-001): a command's options are declared once as data (`flag`, `value`,
  * `many`), the type of what `parseArgs` gives is inferred from that declaration, and a command line that does not fit is a `UsageError`,
  * a union told apart by `kind` that `formatUsageError` says in one sentence; `helpText` writes the help from the same declaration. It
  * unifies the parsers of two harnesses: erga's `@erga/agent` `args.ts` (declared options, an undeclared option refused with a "did you mean", help that

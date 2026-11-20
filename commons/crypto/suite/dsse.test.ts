@@ -30,7 +30,7 @@ import { sha256 } from "../src/sha256.ts";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const DSSE = "0001-crypto FR-006";
-const LAWS = "0005-typescript-runtime FR-014";
+const LAWS = "0001-core FR-004";
 
 const enc = new TextEncoder();
 const dec = new TextDecoder();

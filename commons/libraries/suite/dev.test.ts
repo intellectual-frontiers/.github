@@ -98,19 +98,18 @@ proves(
 
 proves(
   [`${SPEC} FR-011`],
-  "every package of commons is linked under commons/node_modules by its name, commons/ts as @intellectual-frontiers/commons, and a second run links nothing",
+  "every package of commons is linked under commons/node_modules by its name, commons/commons as @intellectual-frontiers/commons, and a second run links nothing",
   async () => {
     await withTempDir(async (dir) => {
       repo(dir);
-      put(dir, "commons/ts/package.json", JSON.stringify({ name: "@intellectual-frontiers/commons" }));
-      put(dir, "commons/docs/package.json", JSON.stringify({ name: "@intellectual-frontiers/commons" }));
+      put(dir, "commons/commons/package.json", JSON.stringify({ name: "@intellectual-frontiers/commons" }));
       put(dir, "commons/elsewhere/package.json", JSON.stringify({ name: "@other/thing" }));
       assertEquals([...linksOf(dir).keys()].sort(), ["@intellectual-frontiers/base", "@intellectual-frontiers/commons", "@intellectual-frontiers/top"]);
-      assertEquals(linksOf(dir).get("@intellectual-frontiers/commons"), join(dir, "commons", "ts"), "commons/ts wins the name it shares with commons/docs");
+      assertEquals(linksOf(dir).get("@intellectual-frontiers/commons"), join(dir, "commons", "commons"));
       assertEquals(linkLibraries(dir), { kind: "ok", value: 3 });
       const scope = join(dir, "commons", "node_modules", "@intellectual-frontiers");
       assert(existsSync(join(scope, "base", "package.json")) && existsSync(join(scope, "top", "package.json")));
-      assertEquals(await readLink(join(scope, "commons")), join(dir, "commons", "ts"));
+      assertEquals(await readLink(join(scope, "commons")), join(dir, "commons", "commons"));
       assertEquals(linkLibraries(dir), { kind: "ok", value: 0 });
     });
   },
@@ -218,7 +217,7 @@ proves(
       const linked = await proc.run([bun, "commons/libraries/src/link.ts"], { cwd: dir });
       assertEquals(linked.code, 0, linked.stderr);
       assert(existsSync(join(dir, "commons", "node_modules", "@intellectual-frontiers", "kanon", "package.json")));
-      assert(existsSync(join(dir, "commons", "node_modules", "@intellectual-frontiers", "commons", "package.json")), "commons/ts is linked as commons");
+      assert(existsSync(join(dir, "commons", "node_modules", "@intellectual-frontiers", "commons", "package.json")), "commons/commons is linked as commons");
       const list = await proc.run([bun, "commons/libraries/src/dev.ts", "--list", "--all"], { cwd: dir });
       assertEquals(list.code, 0, list.stderr);
       assertStringIncludes(list.stdout, "affected");

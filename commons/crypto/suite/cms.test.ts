@@ -124,7 +124,7 @@ proves([FR], "a certificate that cannot encrypt to an address now is named with 
 });
 
 proves(
-  [FR, "0005-typescript-runtime FR-014"],
+  [FR, "0001-core FR-004"],
   "content encrypted to recipients is opened by each of them, and is what was encrypted",
   async () => {
     const [a, b] = [await alice, await bob];

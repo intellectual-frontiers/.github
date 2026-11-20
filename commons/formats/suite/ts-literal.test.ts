@@ -10,7 +10,7 @@ import { assertEquals, proves } from "@intellectual-frontiers/test";
 
 const literal: fc.Arbitrary<Literal> = fc.jsonValue().map((v) => JSON.parse(JSON.stringify(v)) as Literal);
 
-proves(["0001-formats FR-006", "0005-typescript-runtime FR-014"], "a literal written and read back is the same value (round trip)", () => {
+proves(["0001-formats FR-006", "0001-core FR-004"], "a literal written and read back is the same value (round trip)", () => {
   fc.assert(
     fc.property(literal, (v) => {
       const text = tsLiteral(v);
@@ -45,7 +45,7 @@ interface Fleet {
 }
 
 proves(
-  ["0001-formats FR-007", "0005-typescript-runtime FR-014"],
+  ["0001-formats FR-007", "0001-core FR-004"],
   "tsLiteral takes any type shaped as JSON and refuses one that is not",
   () => {
     const fleet: Fleet = { name: "east", owner: { role: "operator", since: null }, pair: ["a", true] };

@@ -1,11 +1,11 @@
 // Spec: 0001-system FR-020
 /**
  * The typed facts of System, an independent library of commons (commons 0027-commons-libraries): the host as one typed library. Its specification is in its own spec kit (`spec-kit/`, `0001-system`);
- * this repository knows it as one requirement of 0027-commons-libraries, proved by `bun run verify` in this folder, and as a library of the lift of `commons/ts` (0032-lifting-libraries).
+ * this repository knows it as one requirement of 0027-commons-libraries, proved by `bun run verify` in this folder, and as a library by concern (0032-libraries-by-concern).
  *
  * @module
  */
-import type { About } from "@intellectual-frontiers/commons/ts/kernel";
+import type { About } from "@intellectual-frontiers/core/about";
 
 /** System. */
 export const about: About = {

@@ -5,7 +5,6 @@
     "": {
       "name": "@intellectual-frontiers/grc",
       "devDependencies": {
-        "@intellectual-frontiers/commons": "link:../ts",
         "@intellectual-frontiers/core": "link:../core",
         "@intellectual-frontiers/crypto": "link:../crypto",
         "@intellectual-frontiers/formats": "link:../formats",
@@ -22,8 +21,6 @@
     },
   },
   "packages": {
-    "@intellectual-frontiers/commons": ["@intellectual-frontiers/commons@link:../ts", {}],
-
     "@intellectual-frontiers/core": ["@intellectual-frontiers/core@link:../core", {}],
 
     "@intellectual-frontiers/crypto": ["@intellectual-frontiers/crypto@link:../crypto", {}],

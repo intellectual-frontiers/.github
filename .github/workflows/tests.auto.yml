@@ -31,21 +31,18 @@ jobs:
         with:
           fetch-depth: 0
       - uses: ./.github/actions/bun
-      - name: "The development tools, from bun.lock"
+      - name: "The root's development tools, from bun.lock"
         run: bun install --frozen-lockfile
-        working-directory: commons/ts
+        working-directory: .
       - name: "The documentation generator's dependencies, which the tests of the root import"
         run: bun install --frozen-lockfile
         working-directory: commons/docs
-      - name: "TypeScript 7 on commons' tools and on these tests"
-        run: bun run check
-        working-directory: commons/ts
+      - name: "TypeScript 7 on the tests of the root and on commons' tools"
+        run: "bun commons/libraries/src/link.ts && bun x tsc -p tests/tsconfig.json && bun x tsc -p commons/tools/tsconfig.json"
       - name: The formatter
-        run: bun fmt --check . ../tools ../../tests
-        working-directory: commons/ts
+        run: bun fmt --check commons/tools tests
       - name: "The linter, type-aware, no warning allowed"
-        run: "bun x \"bun@$BUN_LINT_VERSION\" lint --type-aware --max-warnings 0 ../tools ../../tests"
-        working-directory: commons/ts
+        run: "bun x \"bun@$BUN_LINT_VERSION\" lint --type-aware --max-warnings 0 commons/tools tests"
       - name: "Commons' generated files and specifications, as a person checks them, on Bun and on Node 26"
         run: |
           bun commons/tools/generate-packaging.ts --check
@@ -80,9 +77,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/bun
-      - name: "The development tools, from bun.lock"
+      - name: "The root's development tools, from bun.lock"
         run: bun install --frozen-lockfile
-        working-directory: commons/ts
+        working-directory: .
       - name: "ShellCheck, which the packaging test uses where it is installed"
         if: "runner.os == 'Linux'"
         run: "sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck"

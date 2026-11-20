@@ -24,7 +24,7 @@
 ## The library
 
 - **FR-009**: The types, the table of capabilities and the reader of a remote MUST import `core` alone, and the adapters MUST import only `node:` built-ins, `core`, `net` and `system`, so that the types are pure and no other library is needed to read a remote.
-- **FR-010**: The library MUST be published to npm as compiled modules with their declarations, one entry for the package (`.`) and one for each module (`./types`, `./capabilities`, `./remote`, `./github`, `./gitlab`, `./git`), and its declarations MUST name no package it does not declare (commons 0032-lifting-libraries FR-005, FR-013).
+- **FR-010**: The library MUST be published to npm as compiled modules with their declarations, one entry for the package (`.`) and one for each module (`./types`, `./capabilities`, `./remote`, `./github`, `./gitlab`, `./git`), and its declarations MUST name no package it does not declare (commons 0032-libraries-by-concern FR-005, FR-013).
 
 ## Acceptance scenarios
 

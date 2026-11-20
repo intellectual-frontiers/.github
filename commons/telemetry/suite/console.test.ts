@@ -2,7 +2,7 @@
  * Tests of `src/host/console.ts` (commons 0001-telemetry FR-024): a child process run by this same runtime, with its output piped (so
  * `plain`), shows its spans and log records as lines with no escape byte, says once at the end where signals were not sent, writes OTLP
  * JSON lines where `IFC_CONSOLE=json` asks for them, and on an uncaught exception or an unhandled rejection renders the error and exits
- * with status 1. The rule that the console is the one writer for a person, and `system/stdio` the one for a program (0005-typescript-runtime
+ * with status 1. The rule that the console is the one writer for a person, and `system/stdio` the one for a program (0005-typescript-practice
  * FR-054): no other file of `runtime/` writes to standard output or standard error, or calls `console.log` and the like, in its code.
  *
  * @module
@@ -177,7 +177,6 @@ const WRITER =
 const FOLDERS: readonly { readonly dir: string; readonly label: string; readonly writers: ReadonlySet<string> }[] = [
   { dir: "../src/host/", label: "telemetry/src/host", writers: new Set(["console.ts"]) },
   { dir: "../../system/src/", label: "system/src", writers: new Set(["stdio.ts"]) },
-  { dir: "../../ts/runtime/", label: "ts/runtime", writers: new Set() },
 ];
 
 proves(

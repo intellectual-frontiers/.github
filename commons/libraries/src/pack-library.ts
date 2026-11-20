@@ -1,5 +1,5 @@
 /**
- * The package of a library of commons (commons 0032-lifting-libraries FR-005, FR-013): the library's sources compiled by the TypeScript 7 compiler into ECMAScript modules and their declarations, the
+ * The package of a library of commons (commons 0032-libraries-by-concern FR-005, FR-013): the library's sources compiled by the TypeScript 7 compiler into ECMAScript modules and their declarations, the
  * `package.json` that is published (each `exports` entry naming its `types`, the source for Bun and the compiled file for everything else), and the tarball. The same inspection that the packer makes before it
  * packs is `inspectPackage`, which a test runs again on the tarball it unpacks.
  *
@@ -37,7 +37,6 @@ export type Findings = readonly string[];
 
 type Json = Readonly<Record<string, unknown>>;
 
-const obj = (v: unknown): Json => (isObject(v) ? v : {});
 const isObject = (v: unknown): v is Json => typeof v === "object" && v !== null && !Array.isArray(v);
 const text = (v: unknown): string => (typeof v === "string" ? v : "");
 /** A text file copied: every file of a package is text. */
@@ -152,7 +151,7 @@ export function inspectPackage(stage: string): Findings {
     for (const s of specifiersOf(readTextFileSync(join(stage, d)))) {
       const pkg = packageOf(s);
       if (pkg === undefined) continue;
-      if (pkg === `${SCOPE}/commons`) found.push(`${d} imports ${s}: the package ${pkg} is not on npm`);
+      if (pkg === `${SCOPE}/commons`) found.push(`${d} imports ${s}: the package ${pkg} is a metapackage with no code: import the library that holds what is used`);
       else if (pkg !== name && !declared.has(pkg)) found.push(`${d} imports ${pkg}, which is not a dependency of ${name}`);
     }
   }
@@ -169,7 +168,7 @@ export function inspectPackage(stage: string): Findings {
     for (const s of specifiersOf(source)) {
       const pkg = packageOf(s);
       if (pkg === undefined) continue;
-      if (pkg === `${SCOPE}/commons`) found.push(`${f} imports ${s}: the package ${pkg} is not on npm`);
+      if (pkg === `${SCOPE}/commons`) found.push(`${f} imports ${s}: the package ${pkg} is a metapackage with no code: import the library that holds what is used`);
       else if (pkg !== name && !declared.has(pkg)) found.push(`${f} imports ${pkg}, which is not a dependency of ${name}`);
     }
   }
@@ -198,15 +197,13 @@ function libraryOf(commons: string, name: string): { readonly version: string; r
 }
 
 /**
- * The declarations of a bundle: from the entries' declarations in the compiler's output, every declaration reached by a relative import is published, and so is every declaration that a package of commons that is not
- * on npm (`@intellectual-frontiers/commons/ts/...`) gives to them, vendored under `dist/vendor/` with the specifiers that name it rewritten to relative ones. It is the way for a package to publish its API while what
- * its types are made of is still lifted out of `commons/ts` a library at a time (commons 0032-lifting-libraries); a library that has been lifted is a dependency and is not vendored.
+ * The declarations of a bundle: from the entries' declarations in the compiler's output, every declaration reached by a relative import is published, those of a file outside the library's own `src/` under `dist/vendor/`
+ * with the specifiers that name it rewritten to relative ones. A library of commons that a bundle uses is a dependency and is not vendored.
  */
 function vendorDeclarations(
   outRoot: string,
   lib: string,
   entries: readonly string[],
-  commonsPkg: { readonly folder: string; readonly exports: ReadonlyMap<string, string> },
   stageDist: string,
 ): Findings {
   const found: string[] = [];
@@ -228,26 +225,10 @@ function vendorDeclarations(
     placed.set(file, dest);
     for (const s of specifiersOf(readTextFileSync(file))) {
       if (s.startsWith(".")) todo.push(join(dirname(file), s.replace(/\.(?:js|ts|mjs)$/, "") + ".d.ts"));
-      else if (s.startsWith(`${SCOPE}/commons/`)) {
-        const target = commonsPkg.exports.get(`./${s.slice(`${SCOPE}/commons/`.length)}`);
-        if (target === undefined) found.push(`${dest} imports ${s}, which the exports of commons do not name`);
-        else todo.push(join(outRoot, commonsPkg.folder, target.replace(/^\.\//, "").replace(/\.ts$/, "") + ".d.ts"));
-      }
     }
   }
   for (const [file, dest] of placed) {
     let source = rewriteDeclarationSpecifiers(readTextFileSync(file));
-    source = source.replace(
-      new RegExp(`((?:from\\s+|import\\(\\s*|import\\s+)["'])${SCOPE}/commons/([^"']+)(["'])`, "g"),
-      (whole, pre: string, sub: string, post: string) => {
-        const target = commonsPkg.exports.get(`./${sub}`);
-        if (target === undefined) return whole;
-        const there = place(join(outRoot, commonsPkg.folder, target.replace(/^\.\//, "").replace(/\.ts$/, "") + ".d.ts"));
-        let rel = toPosix(relative(dirname(dest), there)).replace(/\.d\.ts$/, ".js");
-        if (!rel.startsWith(".")) rel = `./${rel}`;
-        return `${pre}${rel}${post}`;
-      },
-    );
     // a relative import that leaves the library's own tree (a type the compiler named by its path in commons) goes to where that declaration was placed
     source = source.replace(
       /((?:from\s+|import\(\s*|import\s+)["'])(\.[^"']+)(["'])/g,
@@ -267,23 +248,11 @@ function vendorDeclarations(
   return found;
 }
 
-/** The compiler's `paths` for the packages of commons that are not on npm: each entry of `commons/ts/package.json` (`./ts/kernel`) names the source that the specifier `@intellectual-frontiers/commons/ts/kernel` is. */
-function commonsPaths(commons: string, dist: string): Record<string, readonly string[]> {
-  const file = join(commons, "ts", "package.json");
-  const out: Record<string, readonly string[]> = {};
-  if (!existsSync(file)) return out;
-  for (const [k, v] of Object.entries(obj(obj(JSON.parse(readTextFileSync(file)) as unknown)["exports"]))) {
-    if (typeof v === "string" && v.endsWith(".ts"))
-      out[`${SCOPE}/commons/${k.replace(/^\.\//, "")}`] = [toPosix(relative(dist, join(commons, "ts", v)))];
-  }
-  return out;
-}
-
 /** What packing a library made: the staging folder, the tarball, the findings and the manifest. */
 export type Packed = { readonly stage: string; readonly tarball: string | undefined; readonly findings: Findings; readonly manifest: Json };
 
 /** What a package adds to the common form. */
-/** Whether a declaration of the package names a `node:` module: a package whose types name Node's needs `@types/node` where it is type-checked (a peer dependency, FR-013 of 0032-lifting-libraries). */
+/** Whether a declaration of the package names a `node:` module: a package whose types name Node's needs `@types/node` where it is type-checked (a peer dependency, FR-013 of 0032-libraries-by-concern). */
 function namesNodeTypes(folder: string): boolean {
   if (!existsSync(folder)) return false;
   for (const e of readDirSync(folder)) {
@@ -338,7 +307,7 @@ export async function packLibrary(root: string, options: PackOptions = {}): Prom
   if (existsSync(dist)) removeSync(dist, { recursive: true });
   mkdirSync(stage, { recursive: true });
   // the compiler's configuration for this build: the base of commons, emitting modules and declarations of src/ and nothing else
-  const base = relative(dist, join(commons, "ts", "tsconfig.json"));
+  const base = relative(dist, join(commons, "tsconfig.base.json"));
   writeTextFileSync(
     join(dist, "tsconfig.build.json"),
     JSON.stringify(
@@ -354,8 +323,6 @@ export async function packLibrary(root: string, options: PackOptions = {}): Prom
           skipLibCheck: true,
           // another library of commons is read where the package manager linked it (under node_modules), so that a declaration names it by its package and its entry and never by the path of its sources
           preserveSymlinks: true,
-          // a bundle's declarations are made from the sources of the packages of commons that are not on npm, which the compiler emits only when it reads them as sources and not through node_modules
-          ...(bundle === undefined ? {} : { paths: commonsPaths(commons, dist) }),
         },
         include: [toPosix(relative(dist, join(root, "src"))) + "/**/*.ts"],
       },
@@ -379,12 +346,6 @@ export async function packLibrary(root: string, options: PackOptions = {}): Prom
       else if (f.endsWith(".js")) copyFileSync(join(out, f), target);
     }
   } else {
-    const commonsPkgFile = join(commons, "ts", "package.json");
-    const commonsExports = new Map<string, string>();
-    if (existsSync(commonsPkgFile)) {
-      const declared = obj(obj(JSON.parse(readTextFileSync(commonsPkgFile)) as unknown)["exports"]);
-      for (const [k, v] of Object.entries(declared)) if (typeof v === "string") commonsExports.set(k, v);
-    }
     const entryFiles = Object.values(ownExports).map((e) =>
       join(out, (targetsOf(e)["default"] ?? text(e)).replace(/^\.\/src\//, "").replace(/\.ts$/, "") + ".d.ts"),
     );
@@ -393,7 +354,6 @@ export async function packLibrary(root: string, options: PackOptions = {}): Prom
         join(dist, "out"),
         basename(resolve(root)),
         entryFiles,
-        { folder: "ts", exports: commonsExports },
         join(stage, "dist"),
       ),
     );

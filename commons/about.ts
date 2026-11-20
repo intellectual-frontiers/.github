@@ -1,11 +1,11 @@
 /**
  * The typed facts of Intellectual Frontiers Commons as a whole (commons 0011-documentation FR-005), the home page of its documentation:
- * what commons is and its folders. Its capabilities are its specifications (`spec-kit/registry.tsv`), and its packages keep their own
- * `about.ts` (`ts/about.ts`).
+ * what commons is and its folders. Its capabilities are its specifications (`spec-kit/registry.tsv`), and its libraries keep their own
+ * `about.ts`.
  *
  * @module
  */
-import type { About } from "./ts/kernel/mod.ts";
+import type { About } from "@intellectual-frontiers/core/about";
 
 /** Intellectual Frontiers Commons: what any company or harness of Intellectual Frontiers may use. */
 export const about: About = {

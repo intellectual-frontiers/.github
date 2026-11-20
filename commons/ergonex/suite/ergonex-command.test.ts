@@ -534,10 +534,7 @@ proves(
       assertStringIncludes(reports[0]?.stdout ?? "", "git.example.org/team/tool");
       const text = await readTextFile(LAUNCHER);
       assert(text.startsWith("#!/usr/bin/env node\n"), "the launcher runs from a shebang");
-      assert(
-        text.indexOf('commons/ts/node";') > 0 && text.indexOf('commons/ts/node";') < text.indexOf('import("../src/ergonex.ts")'),
-        "the hook is registered first",
-      );
+      assert(text.includes('from "../src/ergonex.ts"'), "the launcher runs the sources of the command");
     });
   },
   needsWorld,

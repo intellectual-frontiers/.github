@@ -32,12 +32,12 @@
     "pack": "bun tools/pack.ts"
   },
   "devDependencies": {
-    "@intellectual-frontiers/commons": "link:../ts",
     "@intellectual-frontiers/core": "link:../core",
     "@intellectual-frontiers/crypto": "link:../crypto",
     "@intellectual-frontiers/formats": "link:../formats",
     "@intellectual-frontiers/libraries": "link:../libraries",
     "@intellectual-frontiers/mizan": "link:../mizan",
+    "@intellectual-frontiers/telemetry": "link:../telemetry",
     "@intellectual-frontiers/test": "link:../test",
     "@types/node": "26.6.6",
     "fast-check": "4.10.2",

@@ -76,7 +76,7 @@ export type ImportOutput = {
 };
 
 /** The generator's name, as the provenance and the header of a generated module give it. */
-export const GENERATOR = "commons/ts/mizan/integrations/pure/import-vocabulary.ts";
+export const GENERATOR = "commons/mizan/src/integrations/pure/import-vocabulary.ts";
 
 function kindOf(types: ReadonlySet<string>): TermKind | undefined {
   for (const [iri, kind] of KINDS) if (types.has(iri)) return kind;

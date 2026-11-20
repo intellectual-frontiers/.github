@@ -18,7 +18,7 @@ import { areaPage, firstSentence } from "./overview.ts";
 import { numberOf } from "./specs.ts";
 
 /**
- * How a file is named on a page: its path from the outermost package that holds it (`data/arca/party.ts` in commons' `commons/ts`), or
+ * How a file is named on a page: its path from the outermost package that holds it (`arca/party.ts` in commons' `commons/data`), or
  * from the root where no package does.
  *
  * @param b - the build

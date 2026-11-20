@@ -8,7 +8,8 @@
     "node": ">=26"
   },
   "exports": {
-    ".": "./src/mod.ts"
+    ".": "./src/mod.ts",
+    "./about": "./src/about.ts"
   },
   "scripts": {
     "check": "tsc -p tsconfig.json",
@@ -18,7 +19,6 @@
     "pack": "bun tools/pack.ts"
   },
   "devDependencies": {
-    "@intellectual-frontiers/commons": "link:../ts",
     "@intellectual-frontiers/libraries": "link:../libraries",
     "@intellectual-frontiers/mizan": "link:../mizan",
     "@intellectual-frontiers/system": "link:../system",

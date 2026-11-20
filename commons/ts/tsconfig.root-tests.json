@@ -1,8 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "noPropertyAccessFromIndexSignature": false,
-    "paths": { "typescript/async": ["./node_modules/typescript-7-1/dist/api/async/api.d.ts"] }
-  },
-  "include": ["../../tests/**/*.ts"]
-}

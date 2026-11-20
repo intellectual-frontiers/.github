@@ -1,6 +1,6 @@
 // Spec: 0001-system FR-009
 /**
- * The process and the programs it runs (commons 0005-typescript-runtime FR-022, FR-052, FR-053), on `node:process`, `node:child_process`
+ * The process and the programs it runs (commons 0001-system FR-009 to FR-011), on `node:process`, `node:child_process`
  * and `node:os`, the same on Bun and on Node 26. The names are short and plain (`env.get`, `args`, `exit`, `cwd`, `build.os`, `build.target`,
  * `ppid`, `output`, `spawn`, `unrefTimer`); `selfCommand` gives the argument vector for a program that runs itself again, from a script or
  * from a compiled binary. A program is always run by its argument
@@ -30,7 +30,7 @@ import { InvalidData, mapError, NotFound, toError } from "./errors.ts";
 
 /**
  * What runs a program inside a trace: it is given the program's argument vector and a function that runs it with the environment to add (`TRACEPARENT` and `TRACESTATE`), and gives that
- * function's outcome. The telemetry of commons installs one when its module is loaded (commons 0032-lifting-libraries: this library does not import the telemetry); with none installed a
+ * function's outcome. The telemetry of commons installs one when its module is loaded (commons 0032-libraries-by-concern: this library does not import the telemetry); with none installed a
  * program is run with nothing added.
  */
 export type ProcessTracer = <T extends { readonly code: number }>(
@@ -765,7 +765,7 @@ export type NetworkInterfaceInfo = {
   readonly internal: boolean;
 };
 
-/** Every address of every network interface of this computer (0005-typescript-runtime FR-056). */
+/** Every address of every network interface of this computer (0001-net FR-007). */
 export function networkInterfaces(): readonly NetworkInterfaceInfo[] {
   const out: NetworkInterfaceInfo[] = [];
   for (const [name, infos] of Object.entries(os.networkInterfaces())) {

@@ -56,7 +56,7 @@
 - A file of rung 4 that imports a file of rung 2, when rung 4 may rely on 0, 1 and 3: `layers/around`, per FR-010.
 - `import type { X } from "../model/types.ts"`: an import like any other, per FR-010.
 - On Windows, a file under `src\\archon\\core`: read as `src/archon/core/...`, per FR-011.
-- An import of `@intellectual-frontiers/commons/ts/kernel`: not a finding, per FR-010.
+- An import of `@intellectual-frontiers/core`: not a finding, per FR-010.
 
 ## Assumptions
 

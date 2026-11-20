@@ -1,11 +1,11 @@
 // Spec: 0001-test FR-007
 /**
  * The typed facts of Test, an independent library of commons (commons 0027-commons-libraries): tests as evidence. Its specification is in its own spec kit (`spec-kit/`, `0001-test`); this
- * repository knows it as one requirement of 0027-commons-libraries, proved by `bun run verify` in this folder, and as a library of the lift of `commons/ts` (0032-lifting-libraries).
+ * repository knows it as one requirement of 0027-commons-libraries, proved by `bun run verify` in this folder, and as a library by concern (0032-libraries-by-concern).
  *
  * @module
  */
-import type { About } from "@intellectual-frontiers/commons/ts/kernel";
+import type { About } from "@intellectual-frontiers/core/about";
 
 /** Test. */
 export const about: About = {

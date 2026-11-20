@@ -7,6 +7,7 @@
  */
 import { type Literal, tsLiteral } from "@intellectual-frontiers/formats/ts-literal";
 import {
+  existsSync,
   sha256File,
   makeTempDir,
   mkdirSync,
@@ -594,37 +595,24 @@ proves(
 
 proves(
   ["0026-works-versioning FR-034", "0026-works-versioning FR-035"],
-  "commons' two works have records equal to their tags and to their package.json versions, and the ledger of this repository, read from its real tags, finds nothing",
+  "commons' work Docs has a record equal to its tag and to its package.json version, the retired work ifc-ts has none, and the ledger of this repository, read from its real tags, finds nothing",
   async () => {
     const decode = (file: string) => {
       const r = decodeReleaseSource(readTextFileSync(join(ROOT, file)));
       assert(r.kind === "ok", `${file}: ${JSON.stringify(r)}`);
       return r.value;
     };
-    const ts = decode("commons/ts/release.ts");
     const docs = decode("commons/docs/release.ts");
-    assertEquals([ts.slug, docs.slug], ["ifc-ts", "ifc-docs"]);
+    assertEquals([docs.slug, docs.replaces], ["docs", "ifc-docs"]);
     // a version grows at the release, so the tests do not pin it: it is a Semantic Version no lower than the first tag of its work
-    for (const [r, first] of [
-      [ts, "0.4.0"],
-      [docs, "0.1.0"],
-    ] as const) {
-      const now = parseVersion("SemVer", r.version ?? "");
-      const was = parseVersion("SemVer", first);
-      assert(
-        now.kind === "ok" && was.kind === "ok" && (compareVersions(now.value, was.value) ?? -1) >= 0,
-        `${r.slug} is ${r.version ?? "none"}`,
-      );
-    }
-    for (const [dirName, r] of [
-      ["ts", ts],
-      ["docs", docs],
-    ] as const) {
-      const pkg: unknown = JSON.parse(readTextFileSync(join(ROOT, "commons", dirName, "package.json")));
-      assert(typeof pkg === "object" && pkg !== null && "version" in pkg);
-      assertEquals(pkg.version, r.version, `commons/${dirName}/package.json carries the version of its record`);
-    }
-    const tags = await spawn(["git", "-C", ROOT, "tag", "-l", "ifc-ts-v0.4.0", "ifc-docs-v0.1.0"]);
+    const now = parseVersion("SemVer", docs.version ?? "");
+    const was = parseVersion("SemVer", "0.1.0");
+    assert(now.kind === "ok" && was.kind === "ok" && (compareVersions(now.value, was.value) ?? -1) >= 0, `${docs.slug} is ${docs.version ?? "none"}`);
+    const pkg: unknown = JSON.parse(readTextFileSync(join(ROOT, "commons", "docs", "package.json")));
+    assert(typeof pkg === "object" && pkg !== null && "version" in pkg);
+    assertEquals(pkg.version, docs.version, "commons/docs/package.json carries the version of its record");
+    assert(!existsSync(join(ROOT, "commons", "ts")), "commons/ts is gone, and its work, ifc-ts, has no record");
+    const tags = await spawn(["git", "-C", ROOT, "tag", "-l", "core-v0.1.0"]);
     if (tags.stdout.trim() === "") return; // a clone with no tags (a shallow checkout) cannot say; the check job fetches them
     const workflow = readTextFileSync(join(ROOT, ".github", "workflows", "tests.auto.yml"));
     assertStringIncludes(workflow, "fetch-depth: 0");
@@ -632,8 +620,6 @@ proves(
     assertStringIncludes(workflow, "node commons/libraries/src/versions.ts check\n");
     const ledger = await v(ROOT, "ledger", "--json");
     assertEquals(ledger.code, 0, ledger.err);
-    assertStringIncludes(ledger.out, '"tag": "ifc-ts-v0.4.0"');
-    assertStringIncludes(ledger.out, '"tag": "ifc-docs-v0.1.0"');
   },
   needsGit,
 );

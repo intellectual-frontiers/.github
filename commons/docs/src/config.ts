@@ -3,8 +3,8 @@
  * The configuration a repository gives the generator (commons 0011-documentation FR-023 to FR-027, and 0001-docs FR-006), and the one place it is checked: a
  * `docs.config.ts` exports a value of `DocsConfig` (its default export, or `config`), and `resolveConfig` checks it once into a `Config`,
  * whose paths are absolute (the root, the output) or relative to the root (everything else), with every default filled. Nothing else reads
- * the raw value. The `About` types are the ones the kernel of IFC TypeScript has (`kernel/documentation.ts`), kept here so that a
- * repository's `about.ts` and its configuration are typed by `@intellectual-frontiers/commons/docs` alone.
+ * the raw value. The `About` types are Core's (`@intellectual-frontiers/core/about`), re-exported here so that a
+ * repository's `about.ts` and its configuration are typed by this package alone.
  *
  * @example
  * ```ts
@@ -25,129 +25,23 @@ import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { path } from "@intellectual-frontiers/system";
 import type { Lens } from "./lens.ts";
 
-/** A specification, by its repository and its folder's name (`commons`, `0009-example`). Only the repository's own become links. */
-export interface AboutSpec {
-  /** The repository whose spec kit holds it. */
-  readonly repo: string;
-  /** The specification's folder: its number and its slug. */
-  readonly id: string;
-}
+import type { About } from "@intellectual-frontiers/core/about";
 
-/** A folder of the part, with what it is and what its files may import. */
-export interface AboutFolder {
-  /** The folder (or file), relative to the `about.ts` that names it, as `kernel/` or `runtime/test.ts`. */
-  readonly path: string;
-  /** What it holds, in a sentence of Markdown. */
-  readonly what: string;
-  /** What its files may import, each in a few words (`kernel/ only`, `node: builtins`). */
-  readonly mayImport: readonly string[];
-}
+export type {
+  AboutSpec,
+  AboutFolder,
+  AboutCommand,
+  AboutEnforcer,
+  AboutRule,
+  AboutPhaseState,
+  AboutPhase,
+  AboutExample,
+  AboutArea,
+  About,
+  AboutLayer,
+  AboutFact,
+} from "@intellectual-frontiers/core/about";
 
-/** A command that works on the part, run from the folder of its `about.ts`. */
-export interface AboutCommand {
-  /** The command line, as a person types it. */
-  readonly run: string;
-  /** What it does, in a sentence. */
-  readonly does: string;
-}
-
-/** What enforces a rule: a test file, a rule of the lint plugin, an option of the compiler, or a person's review. */
-export type AboutEnforcer =
-  | { readonly kind: "test"; readonly file: string }
-  | { readonly kind: "lint"; readonly rule: string }
-  | { readonly kind: "compiler"; readonly option: string }
-  | { readonly kind: "review" };
-
-/** A rule the part keeps, and what enforces it. */
-export interface AboutRule {
-  /** The rule, in a sentence of Markdown. */
-  readonly rule: string;
-  /** What enforces it. */
-  readonly enforcedBy: readonly AboutEnforcer[];
-}
-
-/** Whether a phase of the work is done. */
-export type AboutPhaseState = "here" | "not yet";
-
-/** A phase of a library that is built a phase at a time. */
-export interface AboutPhase {
-  /** Its number. */
-  readonly n: number;
-  /** What it brings, in a line. */
-  readonly what: string;
-  /** Whether it is done. */
-  readonly state: AboutPhaseState;
-}
-
-/** An example: a file the compiler checks and a suite runs, and the committed outputs it makes. */
-export interface AboutExample {
-  /** The file, relative to the `about.ts` that names it. */
-  readonly file: string;
-  /** What it shows, in a sentence. */
-  readonly what: string;
-  /** The committed files it makes, relative to the same folder, shown beside it. */
-  readonly outputs?: readonly string[];
-}
-
-/** An area of a package: a part with an entry point, whose exports are its API and whose entry point's module comment is its overview. */
-export interface AboutArea {
-  /** Its name, as a title. */
-  readonly title: string;
-  /** Its name in the site's addresses: lower-case words joined by hyphens. */
-  readonly slug: string;
-  /** Its entry points, relative to `about.ts`; the first one's module comment is the area's overview. */
-  readonly entryPoints: readonly string[];
-  /** The folder, relative to `about.ts`, that holds the files of the area; where it is not given, the folder of the first entry point. */
-  readonly folder?: string;
-  /** The specification it implements, where it has its own. */
-  readonly spec?: AboutSpec;
-  /** Its phases, where it is built a phase at a time. */
-  readonly phases?: readonly AboutPhase[];
-  /** Its examples. */
-  readonly examples?: readonly AboutExample[];
-}
-
-/** The typed facts of a package, or of a repository as a whole. */
-export interface About {
-  /** Its name, as a title. */
-  readonly title: string;
-  /** What it is, in a paragraph of Markdown: the first thing a reader sees. */
-  readonly summary: string;
-  /** The specification it implements, where one does. */
-  readonly spec?: AboutSpec;
-  /** Its folders and what each may import. */
-  readonly folders?: readonly AboutFolder[];
-  /** The commands that work on it, run from the folder of its `about.ts`. */
-  readonly commands?: readonly AboutCommand[];
-  /** The rules it keeps. */
-  readonly rules?: readonly AboutRule[];
-  /** Its areas. */
-  readonly areas?: readonly AboutArea[];
-  /** Its examples that belong to no one area. */
-  readonly examples?: readonly AboutExample[];
-  /** Facts its page shows in a small table beside the summary: a label and its value, as a version or a conformance level. */
-  readonly facts?: readonly AboutFact[];
-  /** The folders of a library built in layers, each with the layer it is in and what it may import of the others: its page shows them as bands. */
-  readonly layers?: readonly AboutLayer[];
-}
-
-/** A folder of a library built in layers. */
-export interface AboutLayer {
-  /** The folder, relative to the library. */
-  readonly folder: string;
-  /** The layer it is in: `governance`, `logical` or `physical`. */
-  readonly layer: string;
-  /** The folders of the library that its files may import, where it names them. */
-  readonly mayImport?: readonly string[];
-}
-
-/** One fact of a package: a label and its value. */
-export interface AboutFact {
-  /** What it is: `Version`. */
-  readonly label: string;
-  /** Its value, in Markdown: `0.9.0`. */
-  readonly value: string;
-}
 
 /** A package the site shows: its folder, its name in the site's addresses, and its `About`. */
 export interface PackageConfig {

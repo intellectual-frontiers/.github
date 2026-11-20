@@ -12,11 +12,11 @@ import { plain } from "../src/model.ts";
 const index: LinkIndex = {
   specs: new Map([["0009-sql-aide", new Set(["FR-001", "FR-026"])], ["0011-documentation", new Set(["FR-010"])]]),
   citations: { prefix: "commons", digits: 4, linked: [], text: ["erga"] },
-  files: new Map([["commons/ts/data/sql-aide/mod.ts", "api/sql-aide/index.html"], ["commons/spec-kit/specs/0009-sql-aide/spec.md", "specs/0009-sql-aide.html"]]),
+  files: new Map([["commons/data/sql-aide/mod.ts", "api/sql-aide/index.html"], ["commons/spec-kit/specs/0009-sql-aide/spec.md", "specs/0009-sql-aide.html"]]),
   exports: new Map([["sql-aide", new Map([["table", { path: "api/sql-aide/algebra-table.html", anchor: "table" }]])]]),
   blob: (p) => `https://github.example/${p}`,
 };
-const scope = { page: "x.html", file: "commons/ts/data/sql-aide/x.ts", area: "sql-aide", spec: "0009-sql-aide" };
+const scope = { page: "x.html", file: "commons/data/sql-aide/x.ts", area: "sql-aide", spec: "0009-sql-aide" };
 const links = (xs: ReturnType<typeof cite>): string[] =>
   xs.flatMap((i) => (i.kind === "link" && i.href.kind === "page" ? [`${plain(i.children)}>${i.href.path}#${i.href.anchor ?? ""}`] : []));
 
@@ -52,8 +52,8 @@ proves(["0011-documentation FR-012"], "{@link} goes to an export of the area or 
 
 proves(["0011-documentation FR-011"], "a link to a file goes to its page, a specification's file to its page, anything else to GitHub", () => {
   assertEquals(hrefFor("./mod.ts", index, scope), { kind: "page", path: "api/sql-aide/index.html" });
-  assertEquals(hrefFor("../../spec-kit/specs/0009-sql-aide/spec.md", index, { ...scope, file: "commons/ts/data/x.ts" }), { kind: "page", path: "specs/0009-sql-aide.html" });
-  assertEquals(hrefFor("./other.ts", index, scope), { kind: "external", url: "https://github.example/commons/ts/data/sql-aide/other.ts" });
+  assertEquals(hrefFor("../../spec-kit/specs/0009-sql-aide/spec.md", index, { ...scope, file: "commons/data/sql-aide/x.ts" }), { kind: "page", path: "specs/0009-sql-aide.html" });
+  assertEquals(hrefFor("./other.ts", index, scope), { kind: "external", url: "https://github.example/commons/data/sql-aide/other.ts" });
 });
 
 const plainIndex: LinkIndex = {
@@ -69,13 +69,13 @@ const hrefs = (xs: ReturnType<typeof cite>): string[] =>
 
 proves(["0011-documentation FR-025", "0011-documentation FR-011"], "a repository's own form, a linked repository's site, a text-only one, and a possessive qualifier", () => {
   const found: Finding[] = [];
-  const xs = cite("096-bun-runtime FR-005a; commons 0011-documentation FR-003; commons' 0005-typescript-runtime; erga 009-machine-bootstrap FR-088; Erga's 0003-x FR-001", plainIndex, plainScope, found);
+  const xs = cite("096-bun-runtime FR-005a; commons 0011-documentation FR-003; commons' 0005-typescript-practice; erga 009-machine-bootstrap FR-088; Erga's 0003-x FR-001", plainIndex, plainScope, found);
   assertEquals(hrefs(xs), [
     "096-bun-runtime>specs/096-bun-runtime.html#",
     "FR-005a>specs/096-bun-runtime.html#fr-005a",
     "commons 0011-documentation>https://example.org/commons/specs/0011-documentation.html",
     "FR-003>https://example.org/commons/specs/0011-documentation.html#fr-003",
-    "commons' 0005-typescript-runtime>https://example.org/commons/specs/0005-typescript-runtime.html",
+    "commons' 0005-typescript-practice>https://example.org/commons/specs/0005-typescript-practice.html",
   ]);
   assert(plain(xs).endsWith("erga 009-machine-bootstrap FR-088; Erga's 0003-x FR-001"), "erga's citations are text");
   assertEquals(found, []);

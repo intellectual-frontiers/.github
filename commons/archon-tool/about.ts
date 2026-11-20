@@ -5,7 +5,7 @@
  *
  * @module
  */
-import type { About } from "@intellectual-frontiers/commons/ts/kernel";
+import type { About } from "@intellectual-frontiers/core/about";
 
 /** The plugin for tools. */
 export const about: About = {

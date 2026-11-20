@@ -1,6 +1,6 @@
 // Spec: 0001-formats FR-013
 /**
- * Hexadecimal text: bytes as lower-case hexadecimal, two digits each, and hexadecimal text as bytes (commons 0005-typescript-runtime FR-008). Taken from `sha256.ts`, which every digest
+ * Hexadecimal text: bytes as lower-case hexadecimal, two digits each, and hexadecimal text as bytes (commons 0001-crypto FR-001). Taken from `sha256.ts`, which every digest
  * is written through, so that a format of bytes is in the library of formats and the digests depend on it.
  *
  * @example

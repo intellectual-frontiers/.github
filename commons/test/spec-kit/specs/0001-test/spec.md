@@ -21,7 +21,7 @@
 
 ## The package
 
-- **FR-007**: The library MUST be published to npm as compiled modules with their declarations, one entry for the package (`.`, the registration and the assertions) and one for the record (`./record`, the pure model of a test's record and its OpenTelemetry form), built, inspected and packed by `tools/pack.ts` (commons 0032-lifting-libraries FR-005, FR-013), and it MUST depend only on `core`, `crypto`, `system` and `telemetry`, so that it imports nothing of the evidence's reports, ledger or runner.
+- **FR-007**: The library MUST be published to npm as compiled modules with their declarations, one entry for the package (`.`, the registration and the assertions) and one for the record (`./record`, the pure model of a test's record and its OpenTelemetry form), built, inspected and packed by `tools/pack.ts` (commons 0032-libraries-by-concern FR-005, FR-013), and it MUST depend only on `core`, `crypto`, `system` and `telemetry`, so that it imports nothing of the evidence's reports, ledger or runner.
 
 ## Acceptance scenarios
 

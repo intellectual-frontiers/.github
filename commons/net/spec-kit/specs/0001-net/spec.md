@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** The network as one typed library, in a package of its own: a download that fails now and works in a minute, an HTTP server over the web's `Request` and `Response`, typed HTTP clients with a live or a recorded transport, TCP and TLS, DNS records and the certificate of a name by ACME's DNS-01 challenge, on `fetch`, `node:` builtins and Web Crypto alone, with no package of the network added. It depends on Core, Formats, Crypto, System and Telemetry (which traces its requests and its server), runs the same on Bun and on Node 26, and is the library of what 0005-typescript-runtime and 0013-acme specified inside IFC TypeScript.
+**Input:** The network as one typed library, in a package of its own: a download that fails now and works in a minute, an HTTP server over the web's `Request` and `Response`, typed HTTP clients with a live or a recorded transport, TCP and TLS, DNS records and the certificate of a name by ACME's DNS-01 challenge, on `fetch`, `node:` builtins and Web Crypto alone, with no package of the network added. It depends on Core, Formats, Crypto, System and Telemetry (which traces its requests and its server), runs the same on Bun and on Node 26, and is the library of what 0005-typescript-practice and 0013-acme specified inside IFC TypeScript.
 
 ## Downloads
 
@@ -40,7 +40,7 @@
 ## Signals and the package
 
 - **FR-016**: WHEN a pipeline of Telemetry is installed, the HTTP client MUST make a `client` span for each request (`http.request.method`, `url.full` redacted, `server.address`, `http.response.status_code`) that sends `traceparent`, and `serve` a `server` span whose parent is the request's `traceparent`, as Telemetry requires of the runtime's own modules (commons 0001-telemetry FR-018); where none is installed they MUST make no span and send no `traceparent`; an OTLP receiver over `serve` MUST make no span of its own, so that a pipeline exporting to it does not feed itself (commons 0001-telemetry FR-019).
-- **FR-017**: Net MUST depend on Core, Formats, Crypto, System and Telemetry alone, MUST name `node:` builtins and no vendor's global, and MUST be published as compiled modules with their declarations as `@intellectual-frontiers/net` (commons 0032-lifting-libraries FR-005, FR-013), one entry for the package and one for each module, importable by Node 26 and by Bun from `node_modules`, with `@types/node` as a peer.
+- **FR-017**: Net MUST depend on Core, Formats, Crypto, System and Telemetry alone, MUST name `node:` builtins and no vendor's global, and MUST be published as compiled modules with their declarations as `@intellectual-frontiers/net` (commons 0032-libraries-by-concern FR-005, FR-013), one entry for the package and one for each module, importable by Node 26 and by Bun from `node_modules`, with `@types/node` as a peer.
 
 ## Acceptance scenarios
 

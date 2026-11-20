@@ -5,33 +5,33 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** Running tests so that each run is objective evidence a quality system can keep: what was tested, against which requirement, at what risk, on what installation, with what outcome, run by which role, kept so that a change to the record afterwards is detected. It follows what the regulations and standards ask of software verification records: the FDA's Quality Management System Regulation (21 CFR 820, which incorporates ISO 13485:2016) and its Computer Software Assurance guidance (a risk-based record of the intended use, the risk, the assurance done, when and by whom, the issues found and the conclusion); 21 CFR Part 11's audit trail and signatures linked to their records with their meaning, applied as design guidance; ISO/IEC/IEEE 29119-3's test log, incident report and completion report; and installation, operational and performance qualification. The record of a run is one file of OpenTelemetry (0006-signals), using its `test.*` conventions; TAP 14, JUnit XML, CTRF, SARIF 2.1.0, OSCAL assessment results and a completion report are each a pure rendering of that one record, so every report of a run agrees with every other. It gives a record that is the same on Bun and Node (0005-typescript-runtime FR-013), whatever the runner's own reporter says.
+**Input:** Running tests so that each run is objective evidence a quality system can keep: what was tested, against which requirement, at what risk, on what installation, with what outcome, run by which role, kept so that a change to the record afterwards is detected. It follows what the regulations and standards ask of software verification records: the FDA's Quality Management System Regulation (21 CFR 820, which incorporates ISO 13485:2016) and its Computer Software Assurance guidance (a risk-based record of the intended use, the risk, the assurance done, when and by whom, the issues found and the conclusion); 21 CFR Part 11's audit trail and signatures linked to their records with their meaning, applied as design guidance; ISO/IEC/IEEE 29119-3's test log, incident report and completion report; and installation, operational and performance qualification. The record of a run is one file of OpenTelemetry (0006-signals), using its `test.*` conventions; TAP 14, JUnit XML, CTRF, SARIF 2.1.0, OSCAL assessment results and a completion report are each a pure rendering of that one record, so every report of a run agrees with every other. It gives a record that is the same on Bun and Node (test 0001-test FR-001), whatever the runner's own reporter says.
 
 ## Capture (runtime)
 
-- **FR-001**: The runtime MUST take the record of every test it registers from the library `test` (`@intellectual-frontiers/test`, test 0001-test FR-004), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-002**: The runtime MUST take the span and log record of a test with the test conventions from the library `test` (`@intellectual-frontiers/test`, test 0001-test FR-005), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-003**: The runtime MUST take the installation record as the resource of a test's record from the library `test` (`@intellectual-frontiers/test`, test 0001-test FR-006), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-004**: The test run requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-001), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
+- **FR-001**: The runtime MUST take the record of every test it registers from the library `test` (`@intellectual-frontiers/test`, test 0001-test FR-004), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-002**: The runtime MUST take the span and log record of a test with the test conventions from the library `test` (`@intellectual-frontiers/test`, test 0001-test FR-005), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-003**: The runtime MUST take the installation record as the resource of a test's record from the library `test` (`@intellectual-frontiers/test`, test 0001-test FR-006), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-004**: The test run requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-001), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
 
 ## The run (runtime and tools)
 
-- **FR-005**: The test run requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-002), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-006**: The test run requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-003), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-007**: The test run requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-004), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
+- **FR-005**: The test run requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-002), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-006**: The test run requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-003), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-007**: The test run requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-004), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
 
 ## Reports (kernel)
 
-- **FR-008**: The test run requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-005), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-009**: The test run requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-006), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-010**: The test run requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-007), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
+- **FR-008**: The test run requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-005), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-009**: The test run requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-006), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-010**: The test run requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-007), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
 
 ## Evidence (kernel and runtime)
 
-- **FR-011**: The test run requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-008), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-012**: The test run requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-009), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-013**: The test run requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-010), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-014**: CI MUST run the suite of `commons/ts/` through `ifc test` on each runtime and system of 0005-typescript-runtime FR-018 and keep the record and its reports as the job's artifacts.
+- **FR-011**: The test run requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-008), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-012**: The test run requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-009), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-013**: The test run requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-010), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-014**: CI MUST run the suite of a library through the test command of the library `quality` (`src/test-cli.ts run`) on each runtime of 0005-typescript-practice FR-018 and keep the record and its reports as the job's artifacts.
 
 ## Out of scope
 
@@ -48,7 +48,7 @@
 - `ifc.test.role=alice@example.com`: refused, as a person's address, per FR-003.
 - A requirement in the list that no test proves and no review declares: the run fails naming it, per FR-006.
 - The same record rendered twice to JUnit: the same bytes, per FR-010.
-- A record changed by one byte after the run: `ifc test verify` fails, as its digest is not in the ledger, per FR-012.
+- A record changed by one byte after the run: `test-cli verify` of the library `quality` fails, as its digest is not in the ledger, per FR-012.
 - A high-risk requirement with no signature of meaning `reviewed`: `verify --require-review` fails, per FR-013.
 
 ## Assumptions
@@ -73,7 +73,7 @@
 
 - **SC-001**: One record per run, on any of the three runtimes, from which every report is rendered.
 - **SC-002**: A reviewer can trace every requirement of a specification to the tests that prove it, their outcomes and the installation they ran on, from the completion report alone.
-- **SC-003**: A change to a kept record is detected by `ifc test verify`.
+- **SC-003**: A change to a kept record is detected by `test-cli verify` of the library `quality`.
 
 ## Review & acceptance checklist
 

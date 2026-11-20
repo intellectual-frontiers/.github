@@ -1,6 +1,6 @@
 // Spec: 0001-system FR-012
 /**
- * Programs found by the prefix of their name on a search path, as Git finds `git-<word>` (commons 0005-typescript-runtime FR-071): each
+ * Programs found by the prefix of their name on a search path, as Git finds `git-<word>` (commons 0001-system FR-012): each
  * folder of the path in order, the first program of a name winning; a directory, a file that may not be run and a program shadowed by an
  * earlier one of the same name each kept with why it was not taken. On Windows a program is a file whose extension `PATHEXT` lists,
  * compared without regard to case, and its name is given without that extension.

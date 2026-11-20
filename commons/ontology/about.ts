@@ -1,11 +1,11 @@
 // Spec: 0001-ontologies FR-001
 /**
  * The typed facts of Ontology, an independent library of commons (commons 0027-commons-libraries): The ontologies of Intellectual Frontiers Commons, stated once as strongly typed TypeScript (commons 0012-ontology): Mizan (mz), IFCCM, IFQS, IFR, the audit of p Its specification is in its own spec kit (`spec-kit/`, `0001-ontologies`); this
- * repository knows it as one requirement of 0027-commons-libraries, proved by `bun run verify` in this folder, and as a library of the lift of `commons/ts` (0032-lifting-libraries).
+ * repository knows it as one requirement of 0027-commons-libraries, proved by `bun run verify` in this folder, and as a library by concern (0032-libraries-by-concern).
  *
  * @module
  */
-import type { About } from "@intellectual-frontiers/commons/ts/kernel";
+import type { About } from "@intellectual-frontiers/core/about";
 
 /** Ontology. */
 export const about: About = {

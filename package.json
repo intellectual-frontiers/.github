@@ -2,44 +2,20 @@
   "name": "@intellectual-frontiers/commons",
   "private": true,
   "license": "PolyForm-Noncommercial-1.0.0",
-  "description": "Intellectual Frontiers Commons, consumed as a Git dependency pinned by commit: IFC TypeScript's kernel, runtime and lint plugin, the Node hook that runs them from node_modules, and IFC Docs (commons 0005-typescript-runtime FR-029, 0011-documentation FR-021).",
+  "description": "Intellectual Frontiers Commons: the workspace of the development loop, a private package that is never installed elsewhere (commons 0036-distribution). Its libraries are published one by one.",
   "type": "module",
-  "exports": {
-    "./ts/kernel": "./commons/ts/kernel/mod.ts",
-    "./ts/runtime": "./commons/ts/runtime/mod.ts",
-    "./ts/node": "./commons/ts/node/register.mjs",
-    "./docs": "./commons/docs/src/mod.ts",
-    "./ontology/mizan": "./commons/ontology/src/mizan/mod.ts"
-  },
   "scripts": {
     "dev:check": "bun commons/libraries/src/link.ts && bun commons/libraries/src/dev.ts",
     "release": "bun commons/libraries/src/link.ts && bun commons/libraries/src/releasing.ts",
     "repoctl": "bun commons/libraries/src/link.ts && bun commons/repoctl/src/repoctl.ts"
   },
   "bin": {
-    "ifc": "./commons/ts/node/ifc.mjs",
-    "ifc-docs": "./commons/docs/ifc-docs.mjs",
     "repoctl": "./commons/repoctl/bin/repoctl.mjs"
   },
   "engines": {
     "node": ">=26"
   },
   "dependencies": {
-    "@intellectual-frontiers/core": "0.1.0",
-    "@intellectual-frontiers/crypto": "0.1.0",
-    "@intellectual-frontiers/formats": "0.1.0",
-    "@intellectual-frontiers/githost": "0.1.0",
-    "@intellectual-frontiers/grc": "0.1.0",
-    "@intellectual-frontiers/headless": "0.3.0",
-    "@intellectual-frontiers/mizan": "0.1.0",
-    "@intellectual-frontiers/net": "0.1.0",
-    "@intellectual-frontiers/ontology": "0.1.2",
-    "@intellectual-frontiers/quality": "0.1.1",
-    "@intellectual-frontiers/rdf": "0.1.0",
-    "@intellectual-frontiers/system": "0.1.0",
-    "@intellectual-frontiers/telemetry": "0.1.0",
-    "@intellectual-frontiers/terminal": "0.1.0",
-    "@intellectual-frontiers/test": "0.1.0",
     "beautiful-mermaid": "1.1.3",
     "shiki": "4.5.0",
     "typescript": "7.1.0-beta"
@@ -49,6 +25,7 @@
     "url": "git+https://github.com/intellectual-frontiers/.github.git"
   },
   "devDependencies": {
+    "@intellectual-frontiers/docs": "link:./commons/docs",
     "@types/node": "26.6.6",
     "fast-check": "4.10.2"
   }

@@ -38,7 +38,7 @@
 
 ## Out of scope
 
-- The settings of `bunfig.toml`'s `[lint]` section and the version of the canary: the harness's, with the pins of commons (commons 0005-typescript-runtime FR-026 to FR-028).
+- The settings of `bunfig.toml`'s `[lint]` section and the version of the canary: the harness's, with the pins of commons (commons 0005-typescript-practice FR-026 to FR-028).
 
 ## Edge cases
 

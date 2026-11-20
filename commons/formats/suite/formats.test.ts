@@ -27,7 +27,7 @@ import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const J5 = "0001-formats FR-001";
 const XML = "0001-formats FR-004";
-const LAWS = "0005-typescript-runtime FR-014";
+const LAWS = "0001-core FR-004";
 
 const value = (text: string): Json => {
   const r = parseJson5(text);

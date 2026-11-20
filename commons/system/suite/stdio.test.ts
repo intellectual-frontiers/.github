@@ -1,5 +1,5 @@
 /**
- * Tests of `runtime/stdio.ts` (commons 0005-typescript-runtime FR-054): standard input read as a web stream, by `read` into a buffer
+ * Tests of `runtime/stdio.ts` (commons 0001-system FR-019): standard input read as a web stream, by `read` into a buffer
  * (what does not fit kept for the next read, and given first to the stream), and whole as bytes or text, for any chunking (a property);
  * a child run by this same runtime that reads its input whole or by `read`, and writes by `write`, `writeSync` and `writable` to standard
  * output and standard error; and JSON written to standard output while the console shows progress on standard error comes out whole,
@@ -14,7 +14,7 @@ import * as proc from "@intellectual-frontiers/system/proc";
 import { stdinOf } from "@intellectual-frontiers/system/stdio";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
-const FR = "0005-typescript-runtime FR-054";
+const FR = "0001-system FR-019";
 const E = "\u001b";
 
 const url = (relative: string): string => new URL(relative, import.meta.url).href;
@@ -85,7 +85,7 @@ proves([FR], "for any chunking of the input and any buffer size, read and then t
 
 const CHILD = `
 import process from "node:process";
-import { stdin, stdout, stderr } from "${url("../../../system/src/stdio.ts")}";
+import { stdin, stdout, stderr } from "${url("../../system/src/stdio.ts")}";
 const mode = process.argv[2];
 if (mode === "whole") {
   const request = JSON.parse(await stdin.text());
@@ -111,10 +111,10 @@ if (mode === "read") {
 
 /** A child that shows progress through the console on standard error and writes its result as JSON through stdio. */
 const PROGRESS = `
-import { createTelemetry, defineSignals } from "${url("../../../telemetry/src/signals.ts")}";
-import { ok } from "${url("../../../core/src/mod.ts")}";
-import { consoleProcessor } from "${url("../../../telemetry/src/host/console.ts")}";
-import { stdout } from "${url("../../../system/src/stdio.ts")}";
+import { createTelemetry, defineSignals } from "${url("../../telemetry/src/signals.ts")}";
+import { ok } from "${url("../../core/src/mod.ts")}";
+import { consoleProcessor } from "${url("../../telemetry/src/host/console.ts")}";
+import { stdout } from "${url("../../system/src/stdio.ts")}";
 const registry = defineSignals({ step: { signal: "span", role: "step", attributes: { target: "string" } } });
 let t = 1700000000000000000n;
 const telemetry = createTelemetry({

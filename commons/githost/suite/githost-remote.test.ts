@@ -1,7 +1,7 @@
 /**
  * Tests of `src/remote.ts` and `src/capabilities.ts` (commons githost 0001-githost FR-003 to FR-008): every spelling of a remote gives the same repository, a credential in a URL is
  * dropped and never appears in a result or an error, the kind of host is GitHub, GitLab or plain Git by the rule, and a capability a kind lacks is a typed answer. That the table is the
- * ontology's is held by `commons/ts/tests/githost-ontology.test.ts`, which may read the ontology of change control. Pure: no program, no network.
+ * ontology's is held by `tests/commons-githost-ontology.test.ts`, which may read the ontology of change control. Pure: no program, no network.
  *
  * @module
  */

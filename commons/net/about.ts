@@ -1,11 +1,11 @@
 // Spec: 0001-net FR-017
 /**
  * The typed facts of Net, an independent library of commons (commons 0027-commons-libraries): the network as one typed library. Its specification is in its own spec kit (`spec-kit/`, `0001-net`); this
- * repository knows it as one requirement of 0027-commons-libraries, proved by `bun run verify` in this folder, and as a library of the lift of `commons/ts` (0032-lifting-libraries).
+ * repository knows it as one requirement of 0027-commons-libraries, proved by `bun run verify` in this folder, and as a library by concern (0032-libraries-by-concern).
  *
  * @module
  */
-import type { About } from "@intellectual-frontiers/commons/ts/kernel";
+import type { About } from "@intellectual-frontiers/core/about";
 
 /** Net. */
 export const about: About = {

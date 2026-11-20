@@ -8,7 +8,7 @@
 import { fs, path } from "@intellectual-frontiers/system";
 import * as runtime from "@intellectual-frontiers/mizan/host/trace";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { CORE, KERNEL, layerFindings, PACKAGE, specifiersOf, unitOf } from "../tools/layers.ts";
+import { CORE, layerFindings, PACKAGE, specifiersOf, unitOf } from "../tools/layers.ts";
 import { main } from "../tools/check.ts";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
@@ -82,10 +82,10 @@ proves(
     assertEquals(rules("sql/physical/x.ts", "pg"), ["layers/external"]);
     assertEquals(rules("sql/physical/x.ts", "node:fs"), ["layers/external"]);
     assertEquals(rules("governance/x.ts", "zod"), ["layers/external"]);
-    assertEquals(rules("engine/x.ts", "@intellectual-frontiers/commons/ts/runtime"), ["layers/external"]);
-    assertEquals(rules("engine/x.ts", KERNEL), []);
-    assertEquals(rules("sql/logical/x.ts", KERNEL, GOVERNANCE), []);
-    assertEquals(rules("tools/x.ts", "node:fs", "@intellectual-frontiers/commons/ts/runtime"), []);
+    assertEquals(rules("engine/x.ts", "@intellectual-frontiers/system"), ["layers/external"]);
+    assertEquals(rules("engine/x.ts", CORE), []);
+    assertEquals(rules("sql/logical/x.ts", CORE, GOVERNANCE), []);
+    assertEquals(rules("tools/x.ts", "node:fs", "@intellectual-frontiers/system"), []);
     assertEquals(rules("sql/dialects/duckdb/x.ts", "@duckdb/node-api"), []);
   },
 );
@@ -98,7 +98,7 @@ proves(
     assert(engine.length > 0);
     for (const f of engine) {
       for (const { specifier } of specifiersOf(f.text)) {
-        assert(specifier.startsWith("./") || specifier === KERNEL || specifier === CORE, `${f.path} imports ${specifier}`);
+        assert(specifier.startsWith("./") || specifier === CORE, `${f.path} imports ${specifier}`);
       }
     }
   },

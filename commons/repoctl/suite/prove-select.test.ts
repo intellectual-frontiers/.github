@@ -98,7 +98,7 @@ proves(["0008-repoctl-prove FR-011", "0008-repoctl-prove FR-013"], "over a real 
   if (!CAN_RUN) return;
   await fs.withTempDir(async (dir) => {
     await git(dir, "init", "-q");
-    await put(dir, "commons/ts/tsconfig.json", TSCONFIG);
+    await put(dir, "commons/tsconfig.base.json", TSCONFIG);
     await put(dir, "commons/prov/package.json", JSON.stringify({ name: "@intellectual-frontiers/prov", exports: { ".": "./src/mod.ts" } }));
     await put(dir, "commons/prov/src/mod.ts", "export const a = 1;\n");
     await put(dir, "commons/prov/src/other.ts", "export const b = 1;\n");

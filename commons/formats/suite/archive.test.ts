@@ -44,7 +44,7 @@ const files = fc
 const sorted = (m: ReadonlyMap<string, Uint8Array>): [string, Uint8Array][] =>
   sortedPaths(m.keys()).map((k) => [k, m.get(k) ?? new Uint8Array()]);
 
-proves([FR, "0005-typescript-runtime FR-014"], "tar then untar gives the files back, the same bytes every time", () => {
+proves([FR, "0001-core FR-004"], "tar then untar gives the files back, the same bytes every time", () => {
   fc.assert(
     fc.property(files, (fs) => {
       const t = tar(fs);
@@ -59,7 +59,7 @@ proves([FR, "0005-typescript-runtime FR-014"], "tar then untar gives the files b
   );
 });
 
-proves([FR, "0005-typescript-runtime FR-014"], "zip then unzip, and gzip then gunzip, give the bytes back", async () => {
+proves([FR, "0001-core FR-004"], "zip then unzip, and gzip then gunzip, give the bytes back", async () => {
   await fc.assert(
     fc.asyncProperty(files, async (fs) => {
       const z = zip(fs);
@@ -170,7 +170,7 @@ proves([FR], "a zip whose entry is deflated, and a gzip the platform compressed,
 });
 
 proves(
-  [FR, "0005-typescript-runtime FR-014"],
+  [FR, "0001-core FR-004"],
   "a zip of deflated entries: the files back, the same bytes twice, stored where deflate would not shrink",
   async () => {
     await fc.assert(

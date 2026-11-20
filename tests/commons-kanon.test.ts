@@ -19,7 +19,7 @@ import {
   type LayeredModel,
   parseElementId,
 } from "../commons/kanon/src/mod.ts";
-import type { LayeredModel as DocsLayeredModel } from "@intellectual-frontiers/commons/docs";
+import type { LayeredModel as DocsLayeredModel } from "@intellectual-frontiers/docs";
 import { decodeLibrarySource, manifestFindings } from "../commons/libraries/src/libraries.ts";
 import { reservationFindings } from "../commons/libraries/src/family.ts";
 import { classes, layers, terms } from "../commons/ontology/src/kanon/mod.ts";

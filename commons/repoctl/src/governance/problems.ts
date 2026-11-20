@@ -25,6 +25,7 @@ export type ProblemCode =
   | "E-SPEC-KIT"
   | "E-MIZAN-RULE"
   | "E-VERSIONS"
+  | "E-TYPES"
   | "E-VERSION-CONSTANT"
   | "E-LIBRARY-CHECK"
   | "E-MERGE-FAILED"
@@ -75,6 +76,7 @@ export const PROBLEM_CODES: readonly ProblemCode[] = [
   "E-SPEC-KIT",
   "E-MIZAN-RULE",
   "E-VERSIONS",
+  "E-TYPES",
   "E-VERSION-CONSTANT",
   "E-LIBRARY-CHECK",
   "E-MERGE-FAILED",
@@ -164,6 +166,12 @@ export const CATALOGUE: Readonly<Record<ProblemCode, Explained>> = {
     title: "A version record is wrong",
     what: "The check of versions found a record that is wrong, an identity that changed, or a version that went back since the base.",
     why: "A version was raised by hand or lowered; versions grow only at the release.",
+    fix: "run the command named in the finding and read its output",
+  },
+  "E-TYPES": {
+    title: "TypeScript 7 finds a type error",
+    what: "The type check of the tests of the root, or of commons' tools, which no library's own check covers, found an error.",
+    why: "A change to a test or a tool that does not type-check under the strict settings of the repository's base configuration.",
     fix: "run the command named in the finding and read its output",
   },
   "E-VERSION-CONSTANT": {

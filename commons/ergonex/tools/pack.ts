@@ -1,6 +1,6 @@
 // Spec: 0004-onboarding FR-001
 /**
- * The package that is published (commons ergonex 0004-onboarding FR-001, commons 0027-commons-libraries FR-015, FR-016, commons 0032-lifting-libraries FR-005, FR-013): `bun tools/pack.ts` packs the command and the
+ * The package that is published (commons ergonex 0004-onboarding FR-001, commons 0027-commons-libraries FR-015, FR-016, commons 0032-libraries-by-concern FR-005, FR-013): `bun tools/pack.ts` packs the command and the
  * library API of Ergonex through the packer of commons. The command is one bundled file with commons' kernel and runtime inside it (`bin: ergonex`); the library API is the entry `.` of the package, one bundled file
  * of code with the declarations of what the entry reaches (`types`), so that a program that imports `@intellectual-frontiers/ergonex` is type-checked against it. The `package.json` of this folder stays private,
  * so that nothing is published from it by hand.

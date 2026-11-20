@@ -18,8 +18,6 @@
  * @module
  */
 import { appendFile } from "node:fs/promises";
-import { existsSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 import { fromBase64 } from "@intellectual-frontiers/formats/base64";
 import { type DsseEnvelope, type DsseKey, parseEnvelope, signStatement } from "@intellectual-frontiers/crypto/dsse";
 import {
@@ -117,7 +115,7 @@ export type RunOptions = {
   readonly cwd?: string;
   /** A file of requirement ids, or a spec-kit enforcement register (FR-003). */
   readonly requirements?: string;
-  /** Keep only the requirements of this specification (`0005-typescript-runtime`). */
+  /** Keep only the requirements of this specification (`0005-typescript-practice`). */
   readonly spec?: string;
   /** A file of reviewed requirements: the requirement, a tab and the reason, one per line. */
   readonly reviewed?: string;
@@ -201,26 +199,10 @@ export async function testFiles(paths: readonly string[], cwd: string): Promise<
   return ok([...out].sort());
 }
 
-/**
- * The Node hook of commons (`commons/ts/node/register.mjs`, 0005-typescript-runtime FR-070), which `node --test` is given so that a suite whose
- * files import the sources of a package from `node_modules` runs on Node as it does on Bun. It is the hook of the package `@intellectual-frontiers/commons`
- * where the program that runs the suite can find it (a project that depends on commons by Git), else the one beside this library in a checkout of this repository, else none.
- */
-export const NODE_HOOK: string | undefined = hookOf();
-
-function hookOf(): string | undefined {
-  try {
-    return import.meta.resolve("@intellectual-frontiers/commons/ts/node");
-  } catch {
-    const url = new URL("../../../ts/node/register.mjs", import.meta.url);
-    return existsSync(fileURLToPath(url)) ? url.href : undefined;
-  }
-}
-
 function runnerArgv(runtime: Runtime, exe: string, files: readonly string[]): readonly string[] {
   switch (runtime) {
     case "node":
-      return NODE_HOOK === undefined ? [exe, "--test", ...files] : [exe, "--import", NODE_HOOK, "--test", ...files];
+      return [exe, "--test", ...files];
     case "bun":
       return [exe, "test", ...files];
     default: {

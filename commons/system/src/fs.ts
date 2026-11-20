@@ -1,6 +1,6 @@
 // Spec: 0001-system FR-002
 /**
- * Files and folders (commons 0005-typescript-runtime FR-020), on `node:fs` alone, so the same code runs on Bun and Node. The functions
+ * Files and folders (commons 0001-system FR-002), on `node:fs` alone, so the same code runs on Bun and Node. The functions
  * have short, plain names and shapes (`readTextFile`, `writeTextFile`, `remove`, `mkdir`, `stat`, `readDir`,
  * `makeTempDir`, ...); every failure is thrown as an error of `./errors.ts` (`NotFound`, `AlreadyExists`, ...).
  * The helpers Stolos wrote over them (`exists`, `readTextOr`, `ensureDir`, `writeIfChanged`, `listDirs`, `listFiles`, `walkFiles`) and the

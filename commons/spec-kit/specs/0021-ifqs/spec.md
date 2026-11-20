@@ -11,20 +11,20 @@
 ## Principles
 
 - **FR-001**: A fact about a system MUST be established by the system running (a test, a check, a probe or a production signal) and MUST NOT rest on a person's statement alone; a statement by a person or an agent MAY be recorded and MUST be graded below what a run gives (FR-021).
-- **FR-002**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-011), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-003**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-012), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
+- **FR-002**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-011), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-003**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-012), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
 - **FR-004**: WHERE a harness's source is public, its quality evidence, failures and open nonconformances included, MUST be published (0022-trust); where it is private, it MUST be publishable in the same form to an assessor on request.
-- **FR-005**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-013), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-006**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-014), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-007**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-015), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
+- **FR-005**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-013), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-006**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-014), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-007**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-015), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
 
 ## What it is held to
 
 - **FR-008**: The quality system MUST be held to the standards of the crosswalk below as mapping statements, each a standard, a clause cited by its identifier and never copied (0018-standards-first FR-007), one of the relations `closeMatch`, `broadMatch` or `narrowMatch` (SSSOM's words), and the requirements that serve it, and MUST NOT define a term for a clause; every requirement it names MUST exist.
 - **FR-009**: WHERE a harness claims `ifccm:DeviceQuality`, its design controls, verification and validation records, design history and corrective and preventive action records MUST be kept as the Quality Management System Regulation, 21 CFR Part 820, which incorporates ISO 13485:2016 by reference, asks of the manufacturer, and the test record of FR-013 MUST be what is kept as the objective evidence of verification. Authority: mzid:authority-21-cfr-820.
 - **FR-010**: The quality system MUST satisfy these NIST SP 800-53 Rev. 5 controls, cited by their OSCAL identifiers: ca-2 (control assessments: the runs), ca-5 (plan of action and milestones: the CAPA), ca-7 (continuous monitoring: probes and objectives), sa-11 (developer testing and evaluation: the test record) and si-2 (flaw remediation: the nonconformance). Controls: ca-2, ca-5, ca-7, sa-11, si-2.
-- **FR-011**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-016), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-012**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-017), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
+- **FR-011**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-016), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-012**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-017), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
 
 ### The crosswalk
 
@@ -48,43 +48,43 @@
 
 ## The canonical record (it extends 0008-test-evidence)
 
-- **FR-013**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-018), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-014**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-019), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-015**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-020), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
+- **FR-013**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-018), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-014**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-019), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-015**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-020), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
 
 ## Git is the evidence
 
-- **FR-016**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-021), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-017**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-022), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-018**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-023), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-019**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-024), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-020**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-025), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
+- **FR-016**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-021), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-017**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-022), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-018**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-023), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-019**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-024), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-020**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-025), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
 
 ## The evidence ladder
 
-- **FR-021**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-026), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-022**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-027), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-023**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-028), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-024**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-029), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
+- **FR-021**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-026), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-022**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-027), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-023**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-028), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-024**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-029), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
 
 ## Freshness
 
-- **FR-025**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-030), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
+- **FR-025**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-030), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
 
 ## Nonconformance and CAPA
 
-- **FR-026**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-031), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-027**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-032), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-028**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-033), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-029**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-034), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-030**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-035), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-031**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-036), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
+- **FR-026**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-031), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-027**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-032), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-028**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-033), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-029**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-034), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-030**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-035), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-031**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-036), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
 
 ## Objectives
 
-- **FR-032**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-037), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-033**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-038), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-034**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-039), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
+- **FR-032**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-037), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-033**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-038), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-034**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-039), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
 
 ## Rung 9
 
@@ -92,28 +92,28 @@
 
 ## Tiers
 
-- **FR-036**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-040), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
+- **FR-036**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-040), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
 - **FR-037**: WHERE a harness claims `ifqs:Tier2`, a quality console MUST show, from the index, each requirement with its grade, freshness, last run, open nonconformances, CAPA and objectives, failures first, and each figure MUST link to the evidence file it comes from.
-- **FR-038**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-041), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-039**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-042), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-040**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-043), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-041**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-044), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
+- **FR-038**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-041), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-039**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-042), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-040**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-043), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-041**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-044), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
 
 ## The grade of kept evidence
 
-- **FR-042**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-045), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
+- **FR-042**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-045), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
 
 ## Where Tier 1 keeps what it records
 
-- **FR-043**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-046), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-044**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-047), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
+- **FR-043**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-046), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-044**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-047), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
 
 ## Where Tier 2 keeps what it records
 
-- **FR-045**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-048), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-046**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-049), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-047**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-050), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-048**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-051), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
+- **FR-045**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-048), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-046**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-049), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-047**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-050), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-048**: The quality system requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-051), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
 
 ## Acceptance scenarios
 

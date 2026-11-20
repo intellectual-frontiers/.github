@@ -102,6 +102,8 @@ export default defineConfig({
     { id: "specs", summary: "The format of the specification kit of commons.", command: ["bun", "commons/tools/mizan-check.ts"], code: "E-SPEC-KIT" },
     { id: "rules", summary: "The rules Mizan adds to the format, held by the baseline that only shrinks.", command: ["bun", "commons/libraries/src/check.ts"], code: "E-MIZAN-RULE" },
     { id: "versions", summary: "The version records: a record that is wrong, an identity that changed and a version that went back.", command: ["bun", "commons/libraries/src/versions.ts", "check"], code: "E-VERSIONS" },
+    { id: "types", summary: "TypeScript 7 on the tests of the root.", command: ["bun", "node_modules/typescript/bin/tsc", "-p", "tests/tsconfig.json"], code: "E-TYPES" },
+    { id: "tools-types", summary: "TypeScript 7 on the tools of commons.", command: ["bun", "node_modules/typescript/bin/tsc", "-p", "commons/tools/tsconfig.json"], code: "E-TYPES" },
   ],
   capabilities: { release: true, newLibrary: true, status: true, prove: true },
   libraries: {

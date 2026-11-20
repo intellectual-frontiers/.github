@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** The run of a suite of tests as evidence, and the quality system that keeps it (the canonical record of a run, its renderings, the append-only `quality` branch, the evidence ladder, freshness, nonconformance and CAPA, objectives, the tiers, and the Trust page and the assessor pack made from it), lifted out of `commons/ts` into the library `quality`. The requirements are those of commons 0008-test-evidence FR-004 to FR-013, commons 0021-ifqs and commons 0022-trust that these modules prove; those specifications now point at this one (commons 0032-lifting-libraries FR-010).
+**Input:** The run of a suite of tests as evidence, and the quality system that keeps it (the canonical record of a run, its renderings, the append-only `quality` branch, the evidence ladder, freshness, nonconformance and CAPA, objectives, the tiers, and the Trust page and the assessor pack made from it), lifted out of `commons/ts` into the library `quality`. The requirements are those of commons 0008-test-evidence FR-004 to FR-013, commons 0021-ifqs and commons 0022-trust that these modules prove; those specifications now point at this one (commons 0032-libraries-by-concern FR-010).
 
 ## Test runs: Capture (runtime)
 

@@ -1,5 +1,5 @@
 /**
- * The packages of commons (commons 0032-lifting-libraries FR-005, FR-006, FR-013): every library whose distribution includes npm is packed by its own `tools/pack.ts`, its tarball is inspected (the files, the
+ * The packages of commons (commons 0032-libraries-by-concern FR-005, FR-006, FR-013): every library whose distribution includes npm is packed by its own `tools/pack.ts`, its tarball is inspected (the files, the
  * published `package.json`, each entry's `types` and the declarations it reaches), installed under the `node_modules` of an empty project, imported by Node (no hook) and by Bun, and a consumer of every entry is
  * type-checked against it by the TypeScript 7 compiler under `moduleResolution: nodenext`. The inspection's refusals are each shown on a package made to fail.
  *
@@ -12,7 +12,7 @@ import { readLibraries } from "../../commons/libraries/src/libraries.ts";
 import { linter } from "../../commons/lint/src/test-rule.ts";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..", "..");
-const TSC = path.join(ROOT, "commons", "ts", "node_modules", "typescript", "bin", "tsc");
+const TSC = path.join(ROOT, "node_modules", "typescript", "bin", "tsc");
 
 type Json = Readonly<Record<string, unknown>>;
 const obj = (v: unknown): Json => (typeof v === "object" && v !== null && !Array.isArray(v) ? (v as Json) : {});
@@ -35,7 +35,7 @@ async function sh(argv: readonly string[], cwd: string): Promise<{ readonly code
 }
 
 proves(
-  ["0032-lifting-libraries FR-005", "0032-lifting-libraries FR-006", "0032-lifting-libraries FR-013"],
+  ["0032-libraries-by-concern FR-005", "0032-libraries-by-concern FR-006", "0032-libraries-by-concern FR-013"],
   "the tarball of every library published to npm is inspected, installed, imported by Node with no hook and by Bun, and a consumer of every entry is type-checked against it",
   async () => {
     const bun = proc.which("bun") ?? "bun";
@@ -168,7 +168,7 @@ proves(
                 skipLibCheck: false,
                 // a package whose declarations name Node's asks for `@types/node` as a peer: the consumer has it (the one this repository's tools use)
                 ...(published.some((q) => obj(q.manifest["peerDependencies"])["@types/node"] !== undefined)
-                  ? { types: ["node"], typeRoots: [path.join(ROOT, "commons", "ts", "node_modules", "@types")] }
+                  ? { types: ["node"], typeRoots: [path.join(ROOT, "node_modules", "@types")] }
                   : { types: [] }),
               },
               include: ["consumer.ts"],
@@ -206,7 +206,7 @@ proves(
 );
 
 proves(
-  ["0032-lifting-libraries FR-013"],
+  ["0032-libraries-by-concern FR-013"],
   "a package with an entry that names no types, a declaration that is not there or one that imports a package it does not depend on is refused, and one that is whole is not",
   async () => {
     const dir = await fs.makeTempDir({ prefix: "commons-inspect-" });
@@ -259,12 +259,12 @@ proves(
         { "dist/a.d.ts": 'import type { Z } from "zod";\nexport type A = Z;\n', "dist/a.js": "export {};\n" },
       );
       assertEquals(inspectPackage(declared), []);
-      const notOnNpm = await make(
-        "not-on-npm",
+      const metapackage = await make(
+        "metapackage",
         { ...base, exports: { ".": { types: "./dist/a.d.ts", default: "./dist/a.js" } } },
-        { "dist/a.d.ts": "export type A = number;\n", "dist/a.js": 'import "@intellectual-frontiers/commons/ts/kernel";\n' },
+        { "dist/a.d.ts": "export type A = number;\n", "dist/a.js": 'import "@intellectual-frontiers/commons";\n' },
       );
-      assertStringIncludes(inspectPackage(notOnNpm).join("\n"), "is not on npm");
+      assertStringIncludes(inspectPackage(metapackage).join("\n"), "is a metapackage with no code");
       const tsPath = await make(
         "ts-path",
         { ...base, exports: { ".": { types: "./dist/a.d.ts", default: "./dist/a.js" } } },

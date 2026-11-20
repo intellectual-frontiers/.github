@@ -239,7 +239,7 @@ proves(["0015-trace FR-010"], "relative imports of every form, resolved; above a
     'export * from "./c.ts";',
     'import "./side.ts";',
     'const m = await import("../model/mod.ts");',
-    'import { kernel } from "@intellectual-frontiers/commons/ts/kernel";',
+    'import { core } from "@intellectual-frontiers/core";',
     '// import { no } from "./comment.ts";',
   ].join("\n");
   assertEquals(

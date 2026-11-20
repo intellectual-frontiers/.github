@@ -7,7 +7,7 @@
  *
  * ```sh
  * bun commons/quality/src/test-cli.ts run --runtime bun,node --out test-results --report tap,junit,ctrf,sarif,md,html,oscal \
- *   --requirements ../spec-kit/enforcement.tsv --spec 0005-typescript-runtime --ledger test-results/ledger.jsonl tests
+ *   --requirements ../spec-kit/enforcement.tsv --spec 0005-typescript-practice --ledger test-results/ledger.jsonl tests
  * bun commons/quality/src/test-cli.ts sign --record test-results/<trace>.otlp.json --ledger test-results/ledger.jsonl --key reviewer.pem --meaning reviewed --role qa-lead
  * bun commons/quality/src/test-cli.ts verify --record test-results/<trace>.otlp.json --ledger test-results/ledger.jsonl --envelope e.dsse.json --public-key pub.pem --require-review
  * ```

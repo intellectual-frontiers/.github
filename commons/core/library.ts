@@ -12,7 +12,7 @@ export const library = {
   verify: "bun run verify",
   version: "0.1.5",
   distribution: ["github", "npm"],
-  exports: ["."],
+  exports: [".", "./about"],
   summary:
     "The foundation of commons: errors as values, exhaustive matching, branded types, decoders from unknown, pure text helpers, type-level tests, graphs of work and exact optional objects, with no dependency and no host.",
 };

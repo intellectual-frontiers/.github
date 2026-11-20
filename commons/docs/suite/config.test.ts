@@ -21,7 +21,7 @@ proves(["0011-documentation FR-023"], "commons' configuration resolves: its root
     .filter((e) => e.isDirectory && ["library.ts", "package.json", "about.ts"].every((f) => fs.existsSync(path.join(ROOT, "commons", e.name, f))))
     .map((e) => e.name)
     .sort();
-  assertEquals(CONFIG.packages.map((p) => [p.dir, p.slug]), [["commons/ts", "ifc-typescript"], ...everyLibrary.map((n) => [`commons/${n}`, n])]);
+  assertEquals(CONFIG.packages.map((p) => [p.dir, p.slug]), everyLibrary.map((n) => [`commons/${n}`, n]));
   // a library's spec kit is named beside commons' own, so that it is published with it and never twice (0027-commons-libraries FR-009)
   const kits = CONFIG.specKits.map((k) => k.dir);
   assertEquals(kits[0], "commons/spec-kit");

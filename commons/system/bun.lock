@@ -5,12 +5,12 @@
     "": {
       "name": "@intellectual-frontiers/system",
       "devDependencies": {
-        "@intellectual-frontiers/commons": "link:../ts",
         "@intellectual-frontiers/core": "link:../core",
         "@intellectual-frontiers/crypto": "link:../crypto",
         "@intellectual-frontiers/formats": "link:../formats",
         "@intellectual-frontiers/libraries": "link:../libraries",
         "@intellectual-frontiers/mizan": "link:../mizan",
+        "@intellectual-frontiers/telemetry": "link:../telemetry",
         "@intellectual-frontiers/test": "link:../test",
         "@types/node": "26.6.6",
         "fast-check": "4.10.2",
@@ -19,8 +19,6 @@
     },
   },
   "packages": {
-    "@intellectual-frontiers/commons": ["@intellectual-frontiers/commons@link:../ts", {}],
-
     "@intellectual-frontiers/core": ["@intellectual-frontiers/core@link:../core", {}],
 
     "@intellectual-frontiers/crypto": ["@intellectual-frontiers/crypto@link:../crypto", {}],
@@ -30,6 +28,8 @@
     "@intellectual-frontiers/libraries": ["@intellectual-frontiers/libraries@link:../libraries", {}],
 
     "@intellectual-frontiers/mizan": ["@intellectual-frontiers/mizan@link:../mizan", {}],
+
+    "@intellectual-frontiers/telemetry": ["@intellectual-frontiers/telemetry@link:../telemetry", {}],
 
     "@intellectual-frontiers/test": ["@intellectual-frontiers/test@link:../test", {}],
 

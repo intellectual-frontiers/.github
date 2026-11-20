@@ -12,7 +12,7 @@
  * @example
  * ```ts
  * import { readWorks } from "./scan.ts";
- * readWorks(".").map((w) => w.path); // ["commons/ts/release.ts", ...]
+ * readWorks(".").map((w) => w.path); // ["commons/core/release.ts", ...]
  * ```
  *
  * @module

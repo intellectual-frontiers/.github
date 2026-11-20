@@ -1,6 +1,5 @@
 /**
- * The workflows of the generator (commons 0011-documentation FR-020, FR-022): the one that tests, checks and publishes commons' site, and
- * the job that installs the commit as a Git dependency and runs the smoke tests; and no workflow that makes a GitHub release.
+ * The workflows of the generator (commons 0011-documentation FR-020, FR-022): the one that tests, checks and publishes commons' site, and no workflow that makes a GitHub release.
  *
  * @module
  */
@@ -16,20 +15,7 @@ proves(["0011-documentation FR-020"], "site.yml tests and checks on pull request
   assert(!/git (add|commit|push)/.test(yml), "the site is never committed");
 });
 
-proves(["0011-documentation FR-022"], "ifc-typescript.yml's git-dependency job runs the smoke test of IFC TypeScript from git+file: on three systems, and nothing releases", async () => {
-  const yml = await fs.readTextFile(path.join(ROOT, ".github/workflows/ifc-typescript.auto.yml"));
-  const job = yml.slice(yml.indexOf("\n  git-dependency:"));
-  assert(job.length > 0 && yml.includes("\n  git-dependency:"), "ifc-typescript.yml has the job git-dependency");
-  for (const needed of [
-    "os: [ubuntu-latest, macos-latest, windows-latest]",
-    "./.github/actions/bun",
-    "node-version: ${{ env.NODE_VERSION }}",
-    'bun tools/smoke.ts --repo "$GITHUB_WORKSPACE" --commit "$GITHUB_SHA"',
-    "working-directory: commons/ts",
-  ]) {
-    assertStringIncludes(job, needed);
-  }
-  assertStringIncludes(yml, 'NODE_VERSION: "26.');
+proves(["0011-documentation FR-022"], "no workflow makes a GitHub release, and the write permission is the release job's alone", async () => {
   for (const f of fs.readDirSync(path.join(ROOT, ".github/workflows"))) {
     const text = await fs.readTextFile(path.join(ROOT, ".github/workflows", f.name));
     assert(!/gh release (create|upload)|softprops\/action-gh-release/.test(text), `${f.name} makes a release`);
@@ -38,5 +24,4 @@ proves(["0011-documentation FR-022"], "ifc-typescript.yml's git-dependency job r
     const rest = at < 0 || f.name !== "release.auto.yml" ? text : text.slice(0, at) + text.slice(at).replace(/^\n {2}publish:\n[\s\S]*?(?=\n {2}[a-z][\w-]*:\n|$)/, "");
     assert(!/contents: write/.test(rest), `${f.name} has a write permission that is not the release job's`);
   }
-  assert(!/git (add|commit|push)/.test(job), "the job commits nothing");
 });

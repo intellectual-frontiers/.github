@@ -1,6 +1,6 @@
 // Spec: 0001-system FR-001
 /**
- * The errors the runtime throws (commons 0005-typescript-runtime FR-019): one class for each kind a caller acts on, by plain names (`errors.NotFound`), each made from the `code` Node gives
+ * The errors the runtime throws (commons 0001-system FR-001): one class for each kind a caller acts on, by plain names (`errors.NotFound`), each made from the `code` Node gives
  * (`ENOENT`, `EEXIST`, `EACCES`, ...), keeping that code, the path or address where there is one, and the original error as its `cause`.
  * The runtime throws; `Result` belongs to the layers above, which turn these into their own errors.
  *

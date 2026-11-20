@@ -270,8 +270,8 @@ proves(
     assertEquals(run.status, "failure");
     assertEquals(run.unproven, [FR("009")]);
     // The lists.
-    const tsv = `# comment\nrequirement\tmechanism\tby\tnote\n${FR("001")}\tcheck\tx\ty\n${FR("002")}\treview\tx\ty\n0005-typescript-runtime FR-001\tcheck\tx\ty\n`;
-    assertEquals(parseRequirementList(tsv), [FR("001"), "0005-typescript-runtime FR-001"]);
+    const tsv = `# comment\nrequirement\tmechanism\tby\tnote\n${FR("001")}\tcheck\tx\ty\n${FR("002")}\treview\tx\ty\n0005-typescript-practice FR-001\tcheck\tx\ty\n`;
+    assertEquals(parseRequirementList(tsv), [FR("001"), "0005-typescript-practice FR-001"]);
     assertEquals(parseRequirementList(tsv, "0008-test-evidence"), [FR("001")]);
     assertEquals(parseRequirementList(`${FR("001")}\n\n${FR("002")}\r\n${FR("001")}\n`), [FR("001"), FR("002")]);
     assertEquals(parseReviewList(`${FR("014")}\tCI runs it\n# no\nlonely line\n`), [{ requirement: FR("014"), reason: "CI runs it" }]);

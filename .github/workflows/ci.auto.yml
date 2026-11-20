@@ -78,7 +78,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/bun
-      - name: "The development tools, from bun.lock (the kernel is linked from commons/ts)"
+      - name: "The development tools, from bun.lock (the libraries it imports are linked)"
         run: bun install --frozen-lockfile
         working-directory: ${{ matrix.folder }}
       - name: "verify (its packing is checked where the exports changed, and by the release)"
@@ -109,7 +109,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/bun
-      - name: "The development tools, from bun.lock (the kernel is linked from commons/ts)"
+      - name: "The development tools, from bun.lock (the libraries it imports are linked)"
         run: bun install --frozen-lockfile
         working-directory: ${{ matrix.folder }}
       - name: "verify (its packing is checked where the exports changed, and by the release)"

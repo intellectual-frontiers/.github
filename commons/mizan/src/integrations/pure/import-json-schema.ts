@@ -30,7 +30,7 @@ import type { ImportOutput, ImportRecordData } from "./import-vocabulary.ts";
 import type { IntegrationFinding, StandardRecord } from "./types.ts";
 
 /** The generator's name, as the provenance and the header of a generated module give it. */
-export const JSON_SCHEMA_GENERATOR = "commons/ts/mizan/integrations/pure/import-json-schema.ts";
+export const JSON_SCHEMA_GENERATOR = "commons/mizan/src/integrations/pure/import-json-schema.ts";
 
 /** What a JSON Schema import needs. */
 export type JsonSchemaImportInput = {

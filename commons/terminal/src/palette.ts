@@ -2,7 +2,7 @@
 /**
  * The console's one palette (commons 0006-signals FR-022): the colour roles as a union type, and the marks a person reads at a glance,
  * each with an ASCII fallback for a terminal with no emoji. Whether colour and emoji may be used is the terminal's (commons
- * 0005-typescript-runtime FR-023, `runtime/tty.ts`'s `lookOf`); this module only obeys it: `paint` writes SGR sequences only where colour is
+ * 0001-system FR-018, `runtime/tty.ts`'s `lookOf`); this module only obeys it: `paint` writes SGR sequences only where colour is
  * allowed, and `mark` an emoji only where emoji are.
  *
  * `Capabilities` has the fields of the runtime's `Look` that output depends on (`colour`, `emoji`, `columns`, the same names), so a `Look`

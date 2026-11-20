@@ -1,6 +1,6 @@
 // Spec: 0001-system FR-017
 /**
- * The operating system's own scheduled job, installed and removed (commons 0005-typescript-runtime FR-046): `installJob` plans the job
+ * The operating system's own scheduled job, installed and removed (commons 0001-system FR-017): `installJob` plans the job
  * with the kernel's `planJob`, writes its files under the home folder (making their folders, with their modes) and runs the commands that
  * load it; `removeJob` runs the commands that unload it, removes its files and runs what follows (systemd's `daemon-reload`). Each file and
  * each command is reported as an outcome, and the first failure that matters is a typed error carrying the outcomes until then; a

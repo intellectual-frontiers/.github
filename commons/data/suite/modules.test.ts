@@ -21,7 +21,7 @@ import {
 } from "@intellectual-frontiers/data/governance";
 import { person, partyDomain } from "@intellectual-frontiers/data/models/arca";
 import { projectDomain } from "@intellectual-frontiers/data/sql/logical";
-import { KERNEL, layerFindings } from "../tools/layers.ts";
+import { layerFindings } from "../tools/layers.ts";
 import { same } from "./governance-fixture.ts";
 
 const id = { id: attribute(identifier(), { definition: "What identifies it" }) };
@@ -124,6 +124,5 @@ proves(
     const cyc = layerFindings([file("models/a/mod.ts", "models/b"), file("models/b/mod.ts", "models/a")], exportsMap);
     same(cyc.map((f) => f.rule), ["layers/cycle"]);
     assert(cyc[0]!.message.includes("models/a/ -> models/b/ -> models/a/") || cyc[0]!.message.includes("models/b/ -> models/a/ -> models/b/"), cyc[0]!.message);
-    void KERNEL;
   },
 );

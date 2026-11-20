@@ -19,7 +19,6 @@
   },
   "devDependencies": {
     "@intellectual-frontiers/archon": "link:../archon",
-    "@intellectual-frontiers/commons": "link:../ts",
     "@intellectual-frontiers/core": "link:../core",
     "@intellectual-frontiers/kanon": "link:../kanon",
     "@intellectual-frontiers/libraries": "link:../libraries",

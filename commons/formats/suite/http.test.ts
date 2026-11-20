@@ -24,7 +24,7 @@ proves([FR], "Link headers are read into their links, and rel=next is found amon
   assertEquals(parseLinkHeader("not a link"), []);
 });
 
-proves([FR, "0005-typescript-runtime FR-014"], "a Link header written from links reads back to the same targets and rels", () => {
+proves([FR, "0001-core FR-004"], "a Link header written from links reads back to the same targets and rels", () => {
   const url = fc.webUrl({ withQueryParameters: true }).filter((u) => !u.includes(">") && !u.includes(","));
   const rel = fc.constantFrom("next", "prev", "last", "first");
   fc.assert(

@@ -87,12 +87,12 @@
 
 ## The Git host interface
 
-- **FR-039**: The change-control check MUST reach Git hosts only through the one `GitHostClient` interface of the library `githost` (`@intellectual-frontiers/githost`, githost 0001-githost FR-001), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-040**: The change-control check MUST take the common capabilities of every kind of Git host, and those of GitHub and GitLab, from of the library `githost` (`@intellectual-frontiers/githost`, githost 0001-githost FR-002), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-041**: The change-control check MUST answer a capability a Git host kind does not list with a typed unsupported result, as of the library `githost` (`@intellectual-frontiers/githost`, githost 0001-githost FR-003), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-042**: The change-control check MUST authenticate a Git host adapter without writing a credential anywhere, as of the library `githost` (`@intellectual-frontiers/githost`, githost 0001-githost FR-004), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-043**: The change-control check MUST choose the kind of host for a remote (a self-hosted GitLab named, never guessed), as of the library `githost` (`@intellectual-frontiers/githost`, githost 0001-githost FR-005), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
-- **FR-044**: The change-control check MUST tell the depth a kind of host allows (`maxDepth`), as of the library `githost` (`@intellectual-frontiers/githost`, githost 0001-githost FR-006), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT specify it here.
+- **FR-039**: The change-control check MUST reach Git hosts only through the one `GitHostClient` interface of the library `githost` (`@intellectual-frontiers/githost`, githost 0001-githost FR-001), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-040**: The change-control check MUST take the common capabilities of every kind of Git host, and those of GitHub and GitLab, from of the library `githost` (`@intellectual-frontiers/githost`, githost 0001-githost FR-002), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-041**: The change-control check MUST answer a capability a Git host kind does not list with a typed unsupported result, as of the library `githost` (`@intellectual-frontiers/githost`, githost 0001-githost FR-003), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-042**: The change-control check MUST authenticate a Git host adapter without writing a credential anywhere, as of the library `githost` (`@intellectual-frontiers/githost`, githost 0001-githost FR-004), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-043**: The change-control check MUST choose the kind of host for a remote (a self-hosted GitLab named, never guessed), as of the library `githost` (`@intellectual-frontiers/githost`, githost 0001-githost FR-005), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-044**: The change-control check MUST tell the depth a kind of host allows (`maxDepth`), as of the library `githost` (`@intellectual-frontiers/githost`, githost 0001-githost FR-006), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
 
 ## Acceptance scenarios
 

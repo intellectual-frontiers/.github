@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** The command line and the console as pure code, in a package of its own that depends on nothing but Core: a command line parsed against options declared once as data, command trees resolved and helped from their declaration, the console's one palette, display width and the cutting of a text by columns, and a small terminal emulator that lets a test take a snapshot of what a person would see. The requirements are those that `commons 0005-typescript-runtime` (commons 0005-typescript-runtime FR-047 and FR-072) and `commons 0006-signals` (commons 0006-signals FR-022, FR-023 and FR-025) made of the kernel's pure terminal code, moved here with the modules (commons 0032-lifting-libraries FR-010). What touches the host (the terminal's size, the standard streams, the console that renders OpenTelemetry signals) stays with the libraries that own it.
+**Input:** The command line and the console as pure code, in a package of its own that depends on nothing but Core: a command line parsed against options declared once as data, command trees resolved and helped from their declaration, the console's one palette, display width and the cutting of a text by columns, and a small terminal emulator that lets a test take a snapshot of what a person would see. The requirements are those that earlier specifications of commons stated (commons 0001-terminal FR-001 and FR-002) and `commons 0006-signals` (commons 0006-signals FR-022, FR-023 and FR-025) made of the kernel's pure terminal code, moved here with the modules (commons 0032-libraries-by-concern FR-010). What touches the host (the terminal's size, the standard streams, the console that renders OpenTelemetry signals) stays with the libraries that own it.
 
 ## The command line
 
@@ -20,7 +20,7 @@
 
 ## The package
 
-- **FR-006**: Terminal MUST depend on Core alone, MUST name no host global, and MUST be published as compiled modules with their declarations as `@intellectual-frontiers/terminal` (commons 0032-lifting-libraries FR-005), with an entry for the package and an entry for each of `args`, `commands`, `palette`, `vt` and `width`, so that it runs on Bun, on Node 26 and in a browser.
+- **FR-006**: Terminal MUST depend on Core alone, MUST name no host global, and MUST be published as compiled modules with their declarations as `@intellectual-frontiers/terminal` (commons 0032-libraries-by-concern FR-005), with an entry for the package and an entry for each of `args`, `commands`, `palette`, `vt` and `width`, so that it runs on Bun, on Node 26 and in a browser.
 
 ## Acceptance scenarios
 

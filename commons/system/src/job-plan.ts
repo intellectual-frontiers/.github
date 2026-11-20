@@ -1,6 +1,6 @@
 // Spec: 0001-system FR-017
 /**
- * The operating system's own scheduled job, planned without touching it (commons 0005-typescript-runtime FR-046): from a job's name, the
+ * The operating system's own scheduled job, planned without touching it (commons 0001-system FR-017): from a job's name, the
  * argument vector it runs, its working folder, its environment and when it runs, `planJob` gives the files to write and the commands that
  * load and unload the job, for one of three schedulers, and writes or runs nothing itself (`runtime/schedule.ts` does).
  *

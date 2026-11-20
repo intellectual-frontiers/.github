@@ -88,7 +88,6 @@
     "@electric-sql/pglite": "0.5.16",
     "@electric-sql/pglite-pgtap": "0.0.18",
     "@electric-sql/pglite-socket": "0.2.20",
-    "@intellectual-frontiers/commons": "link:../ts",
     "@intellectual-frontiers/core": "link:../core",
     "@intellectual-frontiers/crypto": "link:../crypto",
     "@intellectual-frontiers/formats": "link:../formats",

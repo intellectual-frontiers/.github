@@ -1,6 +1,6 @@
 /**
  * Bun at the version commons pins (its version, address, SHA-256, format and folder per platform in `commons/generated/pins.auto.env`, commons
- * 0005-typescript-runtime FR-026, 0002-packaging FR-019), fetched from that address with retries, kept only where its SHA-256 is the pinned one, unpacked by the
+ * 0005-typescript-practice FR-026, 0002-packaging FR-019), fetched from that address with retries, kept only where its SHA-256 is the pinned one, unpacked by the
  * kernel's own zip reader and put in a folder; nothing but IFC TypeScript itself, so it runs on Node 26 (or Bun) on Linux, macOS
  * and Windows with no shell, no Python and no unzip. CI's `.github/actions/bun` runs it.
  *

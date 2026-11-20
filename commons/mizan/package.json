@@ -68,13 +68,15 @@
     "pack": "bun tools/pack.ts"
   },
   "devDependencies": {
-    "@intellectual-frontiers/commons": "link:../ts",
     "@intellectual-frontiers/core": "link:../core",
     "@intellectual-frontiers/crypto": "link:../crypto",
     "@intellectual-frontiers/formats": "link:../formats",
     "@intellectual-frontiers/githost": "link:../githost",
+    "@intellectual-frontiers/grc": "link:../grc",
     "@intellectual-frontiers/libraries": "link:../libraries",
+    "@intellectual-frontiers/net": "link:../net",
     "@intellectual-frontiers/ontology": "link:../ontology",
+    "@intellectual-frontiers/quality": "link:../quality",
     "@intellectual-frontiers/rdf": "link:../rdf",
     "@intellectual-frontiers/system": "link:../system",
     "@intellectual-frontiers/telemetry": "link:../telemetry",

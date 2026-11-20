@@ -46,7 +46,7 @@ proves(["0011-documentation FR-003", "0011-documentation FR-009"], "the site of 
   const html = (b: typeof one): string[] => b.pages.map((p) => document(p, { name: "N", repository: "r", pages: b.pages }));
   assertEquals(html(one), html(two));
   assertEquals([...new Set(one.pages.map((p) => p.section))].sort(), ["api", "concepts", "howto", "models", "overview", "specs", "start"]);
-  for (const needed of ["index.html", "specs/matrix.html", "api/kernel/index.html", "models/index.html", "models/layers.html", "models/arca-party/person.html"]) {
+  for (const needed of ["index.html", "specs/matrix.html", "api/core/index.html", "models/index.html", "models/layers.html", "models/arca-party/person.html"]) {
     assert(one.pages.some((p) => p.path === needed), `the site has ${needed}`);
   }
 }, { timeout: 60_000 });

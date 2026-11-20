@@ -1,6 +1,6 @@
 // Spec: 0001-system FR-019
 /**
- * Standard input, output and error for what a program reads (commons 0005-typescript-runtime FR-054): JSON, a protocol on standard input
+ * Standard input, output and error for what a program reads (commons 0001-system FR-019): JSON, a protocol on standard input
  * and output, bytes passed along a pipe. The names are plain (`read`, `readable`, `write`,
  * `writeSync`, `writable`). This file and `runtime/console.ts` are the only files of the runtime that write to
  * standard output or standard error: what a person reads goes through the console (0006-signals FR-026), what a program reads through here.

@@ -113,7 +113,6 @@ export const library = {
             verify: "tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../libraries/src/check.ts --root spec-kit --level L1 && bun ../kanon/src/check.ts && bun tools/check.ts && bun test suite/",
           },
           devDependencies: {
-            "@intellectual-frontiers/commons": "link:../ts",
             "@intellectual-frontiers/core": "link:../core",
             "@intellectual-frontiers/kanon": "link:../kanon",
             "@intellectual-frontiers/libraries": "link:../libraries",
@@ -153,7 +152,7 @@ export const release = {
     file(
       "tsconfig.json",
       `{
-  "extends": "../ts/tsconfig.json",
+  "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "lib": ["es2024", "dom", "dom.iterable"],
     "skipLibCheck": true
@@ -171,7 +170,7 @@ export const release = {
  *
  * @module
  */
-${imp("type { About }", "@intellectual-frontiers/commons/ts/kernel")}
+${imp("type { About }", "@intellectual-frontiers/core/about")}
 
 /** ${t}. */
 export const about: About = {

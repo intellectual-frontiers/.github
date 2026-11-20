@@ -1,5 +1,5 @@
 /**
- * Tests of `runtime/compile.ts` (commons 0005-typescript-runtime FR-062) and, from a compiled binary, of `proc.selfCommand` (FR-053): the
+ * Tests of `runtime/compile.ts` (commons 0001-system FR-013) and, from a compiled binary, of `proc.selfCommand` (FR-053): the
  * argument vector asked of Bun for every target, built purely (a Windows target named `.exe`, the embedded files after the entry point);
  * the targets of the systems; and, where Bun is on `PATH`, a small program built for this computer with a file embedded, run, its SHA-256
  * checked, and running itself again as the binary alone; a missing Bun, a Bun that is not the pinned version, and a build that fails are

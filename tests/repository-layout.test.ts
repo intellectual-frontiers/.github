@@ -41,6 +41,7 @@ proves(R, "the repository has only the top-level entries it is meant to have", a
     "README.md",
     "THIRD_PARTY_NOTICES.md",
     "bin",
+    "bunfig.toml",
     "bun.lock",
     "commons",
     "package.json",

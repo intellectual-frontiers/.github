@@ -37,7 +37,7 @@ import { type Library, readLibraries } from "./libraries.ts";
 
 /** What a library reads: its folder, the folders and files it takes from others, what it depends on, and the files it imports one by one. */
 export type Inputs = {
-  /** The paths of the library's inputs: `commons/<name>/` and each folder (`commons/ts/kernel/**`) or file the library takes from another. */
+  /** The paths of the library's inputs: `commons/<name>/` and each folder (`commons/core/src/**`) or file the library takes from another. */
   readonly paths: readonly string[];
   /** The folders of commons that the library depends on through its package. */
   readonly dependsOn: readonly string[];

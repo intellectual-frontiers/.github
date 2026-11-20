@@ -33,24 +33,24 @@ requirement	mechanism	by	note
 0003-mizan FR-008	check	.github: bun test ./tests/	Mizan: a Part of line naming no specification of the folder, or the specification itself, is named
 0003-mizan FR-009	check	.github: bun test ./tests/	Mizan: the old tool name runs the new one and gives the same findings
 0003-mizan FR-010	check	.github: bun test ./tests/	Mizan: Active and Deferred are accepted, a word outside the list is named
-0003-mizan FR-011	check	.github: cd commons/ts && bun test tests/	mizan-oscal-register.test.ts: the requirements of a folder are implemented-requirements of a component definition and the proofs observations of assessment results, both valid against the official OSCAL 1.2.3 schemas
+0003-mizan FR-011	check	.github: cd commons/libraries && bun test suite/	mizan-oscal-register.test.ts: the requirements of a folder are implemented-requirements of a component definition and the proofs observations of assessment results, both valid against the official OSCAL 1.2.3 schemas
 0003-mizan FR-012	check	.github: bun test ./tests/	Mizan: a Spec Kit form specification is accepted and its missing section and status are named
-0003-mizan FR-013	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: the six EARS patterns told apart; a requirement with no keyword and a trigger not in its pattern named
-0003-mizan FR-014	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: a scenario out of order or citing no requirement named
-0003-mizan FR-015	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: a new finding fails, the baseline holds, a fixed finding makes its line stale, commons' own folder passes
-0003-mizan FR-016	check	.github: cd commons/ts && bun test tests/	mizan-oscal-register.test.ts: a row of reviewed.tsv is read as a review row of the register, and enforcement.tsv decides where both name a requirement
-0003-mizan FR-017	check	.github: cd commons/ts && bun test tests/	boundaries.test.ts: Mizan's files import only node: built-ins, the kernel, the runtime, the ontology, the types of the Git host contract (githost/types.ts) and themselves
+0003-mizan FR-013	check	.github: cd commons/mizan && bun test suite/	mizan.test.ts: the six EARS patterns told apart; a requirement with no keyword and a trigger not in its pattern named
+0003-mizan FR-014	check	.github: cd commons/mizan && bun test suite/	mizan.test.ts: a scenario out of order or citing no requirement named
+0003-mizan FR-015	check	.github: cd commons/mizan && bun test suite/	mizan.test.ts: a new finding fails, the baseline holds, a fixed finding makes its line stale, commons' own folder passes
+0003-mizan FR-016	check	.github: cd commons/libraries && bun test suite/	mizan-oscal-register.test.ts: a row of reviewed.tsv is read as a review row of the register, and enforcement.tsv decides where both name a requirement
+0003-mizan FR-017	check	.github: cd commons/mizan && bun test suite/	mizan-boundaries.test.ts: Mizan's files import only node: built-ins, the kernel, the runtime, the ontology, the types of the Git host contract (githost/types.ts) and themselves
 0003-mizan FR-018	check	.github: bun test ./tests/	Mizan ontology: the Turtle is current, a stale file is named with exit 1, a broken ontology stops with exit 2
-0003-mizan FR-019	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: the command run as a program: new, held and stale findings, a plugin added beside the rules
-0003-mizan FR-020	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: an undefined prefixed name is found once with its line, a prefix that is not given is not read, and commons' own specifications are read for real
-0003-mizan FR-021	check	.github: cd commons/ts && bun test tests/	mizan-oscal-register.test.ts: the control ids, the properties, the passing, accepted and gap observations, and the evidence of a proof
-0003-mizan FR-022	check	.github: cd commons/ts && bun test tests/	mizan-oscal-register.test.ts: the same bytes on two runs and whatever order the tests come in, a changed requirement or proof changes the version and nothing else does
-0003-mizan FR-023	check	.github: cd commons/ts && bun test tests/	mizan-oscal-register.test.ts: the files are current, --check names a stale one with exit 1, and each validates against the pinned official schema (jsonschema)
-0003-mizan FR-040	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: a harness folder with its own audit is held: a term with no record fails, a missing decision is held by the baseline, an overdue one fails, a specification naming an undefined term is found; stolos runs it on itself
+0003-mizan FR-019	check	.github: cd commons/mizan && bun test suite/	mizan.test.ts: the command run as a program: new, held and stale findings, a plugin added beside the rules
+0003-mizan FR-020	check	.github: cd commons/mizan && bun test suite/	mizan.test.ts: an undefined prefixed name is found once with its line, a prefix that is not given is not read, and commons' own specifications are read for real
+0003-mizan FR-021	check	.github: cd commons/libraries && bun test suite/	mizan-oscal-register.test.ts: the control ids, the properties, the passing, accepted and gap observations, and the evidence of a proof
+0003-mizan FR-022	check	.github: cd commons/libraries && bun test suite/	mizan-oscal-register.test.ts: the same bytes on two runs and whatever order the tests come in, a changed requirement or proof changes the version and nothing else does
+0003-mizan FR-023	check	.github: cd commons/libraries && bun test suite/	mizan-oscal-register.test.ts: the files are current, --check names a stale one with exit 1, and each validates against the pinned official schema (jsonschema)
+0003-mizan FR-040	check	.github: cd commons/mizan && bun test suite/	mizan.test.ts: a harness folder with its own audit is held: a term with no record fails, a missing decision is held by the baseline, an overdue one fails, a specification naming an undefined term is found; stolos runs it on itself
 0003-mizan FR-041	check	.github: bun test ./tests/	commons-mizan-harness.test.ts: a folder of three-digit specifications is clean, a gap is told with three digits, a bare citation is read at the folder's width, a number of two or five digits and a folder named so are named, and a folder of four digits reads as before
 0003-mizan FR-042	check	.github: bun test ./tests/	commons-mizan-harness.test.ts: the registers and the baseline are read from the folder --register names, by check(root, { register }) and as programs, and a stale baseline line is named there; a missing --register value is refused
-0003-mizan FR-043	check	.github: cd commons/ts && bun test tests/	mizan-harness-requests.test.ts: the proof register is read from a path given as an option, with Windows line ends, and the two OSCAL documents are the same bytes as from enforcement.tsv beside the specifications; a path that is not there is an error
-0003-mizan FR-044	check	.github: cd commons/ts && bun test tests/	mizan-harness-requests.test.ts: a requirement that names a term which does not cite it back is a finding (once for each requirement and term, ranges read, the whole specification not), the stage runs only where definitions are given, and its findings are held by the baseline and go stale when fixed
+0003-mizan FR-043	check	.github: cd commons/mizan && bun test suite/	mizan-harness-requests.test.ts: the proof register is read from a path given as an option, with Windows line ends, and the two OSCAL documents are the same bytes as from enforcement.tsv beside the specifications; a path that is not there is an error
+0003-mizan FR-044	check	.github: cd commons/mizan && bun test suite/	mizan-harness-requests.test.ts: a requirement that names a term which does not cite it back is a finding (once for each requirement and term, ranges read, the whole specification not), the stage runs only where definitions are given, and its findings are held by the baseline and go stale when fixed
 0002-packaging FR-016	check	.github: bun test ./tests/	Record: the fields, their order and their values, as the TypeScript module carries them; Generator: a bad field is refused
 0002-packaging FR-017	check	.github: bun test ./tests/	Pins: a pinned platform has an address, a format and a folder, an unpinned one says why, and the pins state each
 0002-packaging FR-018	check	.github: bun test ./tests/	Generator: an address that is not https, holds a user name, a format that is none of three, a folder that leaves its root, a half-stated checksum and a checksum twice are each refused
@@ -69,145 +69,79 @@ requirement	mechanism	by	note
 0004-rules FR-002	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
 0004-rules FR-003	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
 0004-rules FR-004	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
-0005-typescript-runtime FR-001	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries: package.json, its lockfile and the folders are there; runtime/mod.ts does not re-export test.ts (FR-001 is also held by the layout the other tests import from)
-0005-typescript-runtime FR-002	check	.github: cd commons/ts && npx tsc -p tsconfig.kernel.json	the kernel type-checks with no host types; boundaries.test.ts: the kernel imports nothing outside kernel/ and names no host global
-0005-typescript-runtime FR-003	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: the runtime imports only node: builtins, kernel/ and runtime/
-0005-typescript-runtime FR-004	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: no vendor global, jsr:, npm:, @std, @erga or URL import in code, with negative controls; tsc fails on a vendor global (types: node)
-0005-typescript-runtime FR-005	review	0032-lifting-libraries FR-010	kept by the library core: core 0001-core FR-001
-0005-typescript-runtime FR-006	review	0032-lifting-libraries FR-010	kept by the library core: core 0001-core FR-002
-0005-typescript-runtime FR-007	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-013
-0005-typescript-runtime FR-008	review	0032-lifting-libraries FR-010	kept by the library crypto: crypto 0001-crypto FR-001
-0005-typescript-runtime FR-009	review	0032-lifting-libraries FR-010	kept by the library core: core 0001-core FR-003
-0005-typescript-runtime FR-010	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-010
-0005-typescript-runtime FR-011	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-006
-0005-typescript-runtime FR-012	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-017
-0005-typescript-runtime FR-013	review	0032-lifting-libraries FR-010	kept by the library test: 0001-test FR-001
-0005-typescript-runtime FR-014	review	0032-lifting-libraries FR-010	kept by the library core: core 0001-core FR-004
-0005-typescript-runtime FR-015	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: every file has an @module block and every export has JSDoc
-0005-typescript-runtime FR-016	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: the development dependencies are exact, the lockfile agrees, no run-time dependency
-0005-typescript-runtime FR-017	check	.github: cd commons/ts && npx tsc -p tsconfig.json	tsc 7 with the strict configuration on every file; boundaries.test.ts checks that TypeScript is 7
-0005-typescript-runtime FR-018	gate	.github: .github/workflows/ifc-typescript.auto.yml	the CI matrix: tsc 7 on both configurations, the suite on Bun (the default) and Node 26 (the backup), on Linux, macOS and Windows
-0005-typescript-runtime FR-019	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-001
-0005-typescript-runtime FR-020	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-002
-0005-typescript-runtime FR-021	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-003
-0005-typescript-runtime FR-022	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-009
-0005-typescript-runtime FR-023	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-018
-0005-typescript-runtime FR-024	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-001
-0005-typescript-runtime FR-025	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-002
-0005-typescript-runtime FR-026	gate	.github: .github/workflows/ifc-typescript.auto.yml	the jobs take Bun's version from commons/generated/pins.auto.env; boundaries.test.ts: no npm, Prettier, ESLint, dprint or Vitest dependency
-0005-typescript-runtime FR-027	gate	.github: .github/workflows/ifc-typescript.auto.yml	the lint job runs bun fmt --check
-0005-typescript-runtime FR-028	gate	.github: .github/workflows/ifc-typescript.auto.yml	the lint job runs bun lint --type-aware --max-warnings 0 with bunfig.toml's rules; boundaries.test.ts: the rules FR-028 names are errors in bunfig.toml
-0005-typescript-runtime FR-029	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: the root package.json (its name, private, the ./ts entry points into commons/ts, ./ts/node, the bin ifc, the dependencies exact and those of commons/docs) and commons/ts/package.json's same name and entry points; no release workflow, no tarball tool
-0005-typescript-runtime FR-030	gate	.github: .github/workflows/ifc-typescript.auto.yml	the git-dependency job installs the commit it checks by a git+file: URL into an empty project and runs tools/smoke.ts (the kernel, the runtime and the test registration by the package's name and ifc test run on a small suite, on Bun and Node 26; tsc 7 on a consumer), on Linux, macOS and Windows
-0005-typescript-runtime FR-031	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-001
-0005-typescript-runtime FR-032	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-004
-0005-typescript-runtime FR-033	review	0032-lifting-libraries FR-010	kept by the library core: core 0001-core FR-005
-0005-typescript-runtime FR-034	review	0032-lifting-libraries FR-010	kept by the library crypto: crypto 0001-crypto FR-003
-0005-typescript-runtime FR-035	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-003
-0005-typescript-runtime FR-036	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-005
-0005-typescript-runtime FR-037	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-016
-0005-typescript-runtime FR-038	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-002
-0005-typescript-runtime FR-039	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-015
-0005-typescript-runtime FR-040	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-003
-0005-typescript-runtime FR-047	review	0032-lifting-libraries FR-010	kept by the library terminal: terminal 0001-terminal FR-001
-0005-typescript-runtime FR-041	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-009
-0005-typescript-runtime FR-042	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-008
-0005-typescript-runtime FR-044	review	0032-lifting-libraries FR-010	kept by the library crypto: crypto 0001-crypto FR-005
-0005-typescript-runtime FR-045	review	0032-lifting-libraries FR-010	kept by the library crypto: crypto 0001-crypto FR-006
-0005-typescript-runtime FR-043	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-012
-0005-typescript-runtime FR-048	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-004
-0005-typescript-runtime FR-049	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-005
-0005-typescript-runtime FR-050	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-006
-0005-typescript-runtime FR-051	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-016
-0005-typescript-runtime FR-052	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-010
-0005-typescript-runtime FR-053	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-011
-0005-typescript-runtime FR-054	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-019
-0005-typescript-runtime FR-055	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-006
-0005-typescript-runtime FR-056	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-007
-0005-typescript-runtime FR-057	review	0032-lifting-libraries FR-010	kept by the library crypto: crypto 0001-crypto FR-002
-0005-typescript-runtime FR-058	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-015
-0005-typescript-runtime FR-059	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-011
-0005-typescript-runtime FR-060	review	0032-lifting-libraries FR-010	kept by the library test: 0001-test FR-002
-0005-typescript-runtime FR-061	review	0032-lifting-libraries FR-010	kept by the library lint: 0001-lint FR-001 to FR-010
-0005-typescript-runtime FR-062	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-013
-0005-typescript-runtime FR-063	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-007
-0005-typescript-runtime FR-064	review	0032-lifting-libraries FR-010	kept by the library core: core 0001-core FR-006
-0005-typescript-runtime FR-065	review	0032-lifting-libraries FR-010	kept by the library test: 0001-test FR-003
-0005-typescript-runtime FR-066	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-004
-0005-typescript-runtime FR-067	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-014
-0005-typescript-runtime FR-068	review	0032-lifting-libraries FR-010	kept by the library crypto: crypto 0001-crypto FR-004
-0005-typescript-runtime FR-069	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-005
-0005-typescript-runtime FR-070	check	.github: cd commons/ts && node --test tests/**/*.test.ts	node/register.test.ts: a .ts under node_modules runs on Node 26 with the hook and is refused without it, a file outside is left to Node, the URL's segments decide (Windows' too), and the commands ifc and ifc-docs register it first; runtime/test-run.test.ts: node --test is given it
-0005-typescript-runtime FR-071	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-012
-0005-typescript-runtime FR-072	review	0032-lifting-libraries FR-010	kept by the library terminal: terminal 0001-terminal FR-002
-0005-typescript-runtime FR-073	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-007
-0005-typescript-runtime FR-046	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-017
-0005-typescript-runtime FR-074	check	.github: cd commons/ts && node --test tests/**/*.test.ts	node/linked-library.test.ts: Bun installs a link: dependency on commons/ts as a symbolic link to it and a file: dependency as a copy, and a lockfile with the link installs the same link again
-0005-typescript-runtime FR-075	check	.github: cd commons/ts && node --test tests/**/*.test.ts	node/linked-library.test.ts: a program of a project that links commons/ts imports the kernel by package name and runs on the runtime running the test with no hook; a copy is refused on Node and runs on Bun; the compiler checks it
-0005-typescript-runtime FR-076	check	.github: cd commons/ts && node --test tests/**/*.test.ts	node/linked-library.test.ts: a library imports its own modules by its package name through exports, and a file that exports does not name is refused by the runtime and by the compiler
-0005-typescript-runtime FR-077	check	.github: cd commons/ts && node --test tests/**/*.test.ts	node/linked-library.test.ts: layerFindings finds a climbing import by relative path and none by package name; a library's own check by its exports is proved in that library's suite (commons/data)
-0006-signals FR-001	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-001
-0006-signals FR-002	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-002
-0006-signals FR-003	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-003
-0006-signals FR-004	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-004
-0006-signals FR-005	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-005
-0006-signals FR-006	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-006
-0006-signals FR-007	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-007
-0006-signals FR-008	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-008
-0006-signals FR-009	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-009
-0006-signals FR-010	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-010
-0006-signals FR-011	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-011
-0006-signals FR-012	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-012
-0006-signals FR-013	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-013
-0006-signals FR-014	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-014
-0006-signals FR-015	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-015
-0006-signals FR-016	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-016
-0006-signals FR-017	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-017
-0006-signals FR-018	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-018
-0006-signals FR-019	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-019
-0006-signals FR-020	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-020
-0006-signals FR-021	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-021
-0006-signals FR-022	review	0032-lifting-libraries FR-010	kept by the library terminal: terminal 0001-terminal FR-003
-0006-signals FR-023	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-022
-0006-signals FR-024	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-023
-0006-signals FR-025	review	0032-lifting-libraries FR-010	kept by the library terminal: terminal 0001-terminal FR-005
-0006-signals FR-026	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-024
-0006-signals FR-027	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-025
-0007-grc FR-001	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-001
-0007-grc FR-002	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-002
-0007-grc FR-003	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-003
-0007-grc FR-004	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-004
-0007-grc FR-005	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-005
-0007-grc FR-006	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-006
-0007-grc FR-007	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-007
-0007-grc FR-008	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-008
-0007-grc FR-009	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-009
-0007-grc FR-010	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-010
-0007-grc FR-011	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-011
-0007-grc FR-012	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-012
-0007-grc FR-013	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-013
-0007-grc FR-014	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-014
-0007-grc FR-015	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-015
-0007-grc FR-016	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-016
-0007-grc FR-017	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-017
-0007-grc FR-018	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-018
-0007-grc FR-019	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-019
-0007-grc FR-020	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-020
-0007-grc FR-021	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-014
-0007-grc FR-022	review	0032-lifting-libraries FR-010	kept by the library grc: 0001-grc-engineering FR-021
-0008-test-evidence FR-001	review	0032-lifting-libraries FR-010	kept by the library test: 0001-test FR-004
-0008-test-evidence FR-002	review	0032-lifting-libraries FR-010	kept by the library test: 0001-test FR-005
-0008-test-evidence FR-003	review	0032-lifting-libraries FR-010	kept by the library test: 0001-test FR-006
-0008-test-evidence FR-004	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-001
-0008-test-evidence FR-005	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-002
-0008-test-evidence FR-006	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-003
-0008-test-evidence FR-007	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-004
-0008-test-evidence FR-008	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-005
-0008-test-evidence FR-009	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-006
-0008-test-evidence FR-010	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-007
-0008-test-evidence FR-011	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-008
-0008-test-evidence FR-012	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-009
-0008-test-evidence FR-013	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-010
+0005-typescript-practice FR-001	check	.github: bun test ./tests/	commons-typescript-practice.test.ts: every package says "type": "module" and node >=26, and the sources use no enum, namespace or parameter property
+0005-typescript-practice FR-004	check	.github: bun test ./tests/	commons-typescript-practice.test.ts: no source of a library names a vendor global, a jsr:, npm:, @std/ or URL import; the lint rules are errors in bunfig.toml
+0005-typescript-practice FR-015	check	.github: bun test ./tests/	commons-typescript-practice.test.ts: every file of a library's src/ and suite/ begins with a TSDoc block that says @module, and every export of src/ has TSDoc
+0005-typescript-practice FR-016	check	.github: bun test ./tests/	commons-typescript-practice.test.ts: the dependencies of the root and of every library are exact or links, and a lockfile is beside each package that installs packages
+0005-typescript-practice FR-017	check	.github: bun test ./tests/	commons-typescript-practice.test.ts: commons/tsconfig.base.json sets the strict options and every tsconfig extends it; `repoctl check` runs tsc 7 on the tests and the tools
+0005-typescript-practice FR-018	gate	.github: .github/workflows/ci.auto.yml	the job of each affected library runs verify and the tests on Bun and on Node 26, and on macOS and Windows where the library's record says so
+0005-typescript-practice FR-026	check	.github: bun test ./tests/	commons-typescript-practice.test.ts: no formatter, linter, test framework or package manager but Bun is a dependency, and the pins name Bun's version
+0005-typescript-practice FR-027	gate	.github: .github/workflows/tests.auto.yml	the check job runs bun fmt --check on the tools and the tests, with the [fmt] section of bunfig.toml
+0005-typescript-practice FR-028	check	.github: bun test ./tests/	commons-typescript-practice.test.ts: bunfig.toml makes an error of every rule FR-028 names; the check job of tests.auto.yml runs the linter with no warning allowed
+0005-typescript-practice FR-076	check	.github: bun test ./tests/	commons-typescript-practice.test.ts: every import of a library's own package name in its sources names an entry of its exports
+0005-typescript-practice FR-077	check	.github: cd commons/data && bun test suite/	layers.test.ts: a library that imports its own layers by package name has them checked by resolving each specifier through its exports
+0006-signals FR-001	review	0032-libraries-by-concern FR-010	kept by the library telemetry: 0001-telemetry FR-001
+0006-signals FR-002	review	0032-libraries-by-concern FR-010	kept by the library telemetry: 0001-telemetry FR-002
+0006-signals FR-003	review	0032-libraries-by-concern FR-010	kept by the library telemetry: 0001-telemetry FR-003
+0006-signals FR-004	review	0032-libraries-by-concern FR-010	kept by the library telemetry: 0001-telemetry FR-004
+0006-signals FR-005	review	0032-libraries-by-concern FR-010	kept by the library telemetry: 0001-telemetry FR-005
+0006-signals FR-006	review	0032-libraries-by-concern FR-010	kept by the library telemetry: 0001-telemetry FR-006
+0006-signals FR-007	review	0032-libraries-by-concern FR-010	kept by the library telemetry: 0001-telemetry FR-007
+0006-signals FR-008	review	0032-libraries-by-concern FR-010	kept by the library telemetry: 0001-telemetry FR-008
+0006-signals FR-009	review	0032-libraries-by-concern FR-010	kept by the library telemetry: 0001-telemetry FR-009
+0006-signals FR-010	review	0032-libraries-by-concern FR-010	kept by the library telemetry: 0001-telemetry FR-010
+0006-signals FR-011	review	0032-libraries-by-concern FR-010	kept by the library telemetry: 0001-telemetry FR-011
+0006-signals FR-012	review	0032-libraries-by-concern FR-010	kept by the library telemetry: 0001-telemetry FR-012
+0006-signals FR-013	review	0032-libraries-by-concern FR-010	kept by the library telemetry: 0001-telemetry FR-013
+0006-signals FR-014	review	0032-libraries-by-concern FR-010	kept by the library telemetry: 0001-telemetry FR-014
+0006-signals FR-015	review	0032-libraries-by-concern FR-010	kept by the library telemetry: 0001-telemetry FR-015
+0006-signals FR-016	review	0032-libraries-by-concern FR-010	kept by the library telemetry: 0001-telemetry FR-016
+0006-signals FR-017	review	0032-libraries-by-concern FR-010	kept by the library telemetry: 0001-telemetry FR-017
+0006-signals FR-018	review	0032-libraries-by-concern FR-010	kept by the library telemetry: 0001-telemetry FR-018
+0006-signals FR-019	review	0032-libraries-by-concern FR-010	kept by the library telemetry: 0001-telemetry FR-019
+0006-signals FR-020	review	0032-libraries-by-concern FR-010	kept by the library telemetry: 0001-telemetry FR-020
+0006-signals FR-021	review	0032-libraries-by-concern FR-010	kept by the library telemetry: 0001-telemetry FR-021
+0006-signals FR-022	review	0032-libraries-by-concern FR-010	kept by the library terminal: terminal 0001-terminal FR-003
+0006-signals FR-023	review	0032-libraries-by-concern FR-010	kept by the library telemetry: 0001-telemetry FR-022
+0006-signals FR-024	review	0032-libraries-by-concern FR-010	kept by the library telemetry: 0001-telemetry FR-023
+0006-signals FR-025	review	0032-libraries-by-concern FR-010	kept by the library terminal: terminal 0001-terminal FR-005
+0006-signals FR-026	review	0032-libraries-by-concern FR-010	kept by the library telemetry: 0001-telemetry FR-024
+0006-signals FR-027	review	0032-libraries-by-concern FR-010	kept by the library telemetry: 0001-telemetry FR-025
+0007-grc FR-001	review	0032-libraries-by-concern FR-010	kept by the library grc: 0001-grc-engineering FR-001
+0007-grc FR-002	review	0032-libraries-by-concern FR-010	kept by the library grc: 0001-grc-engineering FR-002
+0007-grc FR-003	review	0032-libraries-by-concern FR-010	kept by the library grc: 0001-grc-engineering FR-003
+0007-grc FR-004	review	0032-libraries-by-concern FR-010	kept by the library grc: 0001-grc-engineering FR-004
+0007-grc FR-005	review	0032-libraries-by-concern FR-010	kept by the library grc: 0001-grc-engineering FR-005
+0007-grc FR-006	review	0032-libraries-by-concern FR-010	kept by the library grc: 0001-grc-engineering FR-006
+0007-grc FR-007	review	0032-libraries-by-concern FR-010	kept by the library grc: 0001-grc-engineering FR-007
+0007-grc FR-008	review	0032-libraries-by-concern FR-010	kept by the library grc: 0001-grc-engineering FR-008
+0007-grc FR-009	review	0032-libraries-by-concern FR-010	kept by the library grc: 0001-grc-engineering FR-009
+0007-grc FR-010	review	0032-libraries-by-concern FR-010	kept by the library grc: 0001-grc-engineering FR-010
+0007-grc FR-011	review	0032-libraries-by-concern FR-010	kept by the library grc: 0001-grc-engineering FR-011
+0007-grc FR-012	review	0032-libraries-by-concern FR-010	kept by the library grc: 0001-grc-engineering FR-012
+0007-grc FR-013	review	0032-libraries-by-concern FR-010	kept by the library grc: 0001-grc-engineering FR-013
+0007-grc FR-014	review	0032-libraries-by-concern FR-010	kept by the library grc: 0001-grc-engineering FR-014
+0007-grc FR-015	review	0032-libraries-by-concern FR-010	kept by the library grc: 0001-grc-engineering FR-015
+0007-grc FR-016	review	0032-libraries-by-concern FR-010	kept by the library grc: 0001-grc-engineering FR-016
+0007-grc FR-017	review	0032-libraries-by-concern FR-010	kept by the library grc: 0001-grc-engineering FR-017
+0007-grc FR-018	review	0032-libraries-by-concern FR-010	kept by the library grc: 0001-grc-engineering FR-018
+0007-grc FR-019	review	0032-libraries-by-concern FR-010	kept by the library grc: 0001-grc-engineering FR-019
+0007-grc FR-020	review	0032-libraries-by-concern FR-010	kept by the library grc: 0001-grc-engineering FR-020
+0007-grc FR-021	review	0032-libraries-by-concern FR-010	kept by the library system: 0001-system FR-014
+0007-grc FR-022	review	0032-libraries-by-concern FR-010	kept by the library grc: 0001-grc-engineering FR-021
+0008-test-evidence FR-001	review	0032-libraries-by-concern FR-010	kept by the library test: 0001-test FR-004
+0008-test-evidence FR-002	review	0032-libraries-by-concern FR-010	kept by the library test: 0001-test FR-005
+0008-test-evidence FR-003	review	0032-libraries-by-concern FR-010	kept by the library test: 0001-test FR-006
+0008-test-evidence FR-004	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-001
+0008-test-evidence FR-005	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-002
+0008-test-evidence FR-006	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-003
+0008-test-evidence FR-007	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-004
+0008-test-evidence FR-008	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-005
+0008-test-evidence FR-009	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-006
+0008-test-evidence FR-010	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-007
+0008-test-evidence FR-011	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-008
+0008-test-evidence FR-012	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-009
+0008-test-evidence FR-013	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-010
 0008-test-evidence FR-014	check	.github: .github/workflows/ifc-typescript.auto.yml test job	CI runs the suite through ifc test on each runtime and system and uploads the record and reports
 0011-documentation FR-001	check	.github: cd commons/docs && bun run verify	conventions.test.ts: the name and ./docs, the dependencies exact and the root package's, no IFC TypeScript dependency, and nothing outside commons/docs but commons/docs.config.ts imports it
 0011-documentation FR-002	check	.github: cd commons/docs && bun run verify	the compiler of the package; conventions.test.ts: what each file imports, no any, no non-null assertion, @module and TSDoc
@@ -236,50 +170,50 @@ requirement	mechanism	by	note
 0011-documentation FR-025	check	.github: cd commons/docs && bun run verify	links.test.ts: the own prefix and digits, a linked repository's citation to its site, a text-only one, and a possessive qualifier
 0011-documentation FR-026	check	.github: cd commons/docs && bun run verify	conventions.test.ts: what ./docs and ifc-docs reach imports no data library and no lens; lenses.test.ts: the lenses as values of Lens
 0011-documentation FR-027	check	.github: cd commons/docs && bun run verify	fixture-repo.test.ts: a fixture repository with no about.ts and a plain spec kit builds with no finding
-0012-ontology FR-001	review	0032-lifting-libraries FR-010	kept by the library rdf: rdf 0001-rdf FR-001
-0012-ontology FR-002	review	0032-lifting-libraries FR-010	kept by the library rdf: rdf 0001-rdf FR-002
-0012-ontology FR-003	review	0032-lifting-libraries FR-010	kept by the library rdf: rdf 0001-rdf FR-003
-0012-ontology FR-004	review	0032-lifting-libraries FR-010	kept by the library rdf: rdf 0001-rdf FR-004
-0012-ontology FR-005	review	0032-lifting-libraries FR-010	kept by the library rdf: rdf 0001-rdf FR-005
-0012-ontology FR-006	review	0032-lifting-libraries FR-010	kept by the library rdf: rdf 0001-rdf FR-006
-0012-ontology FR-007	review	0032-lifting-libraries FR-010	kept by the library rdf: rdf 0001-rdf FR-007
+0012-ontology FR-001	review	0032-libraries-by-concern FR-010	kept by the library rdf: rdf 0001-rdf FR-001
+0012-ontology FR-002	review	0032-libraries-by-concern FR-010	kept by the library rdf: rdf 0001-rdf FR-002
+0012-ontology FR-003	review	0032-libraries-by-concern FR-010	kept by the library rdf: rdf 0001-rdf FR-003
+0012-ontology FR-004	review	0032-libraries-by-concern FR-010	kept by the library rdf: rdf 0001-rdf FR-004
+0012-ontology FR-005	review	0032-libraries-by-concern FR-010	kept by the library rdf: rdf 0001-rdf FR-005
+0012-ontology FR-006	review	0032-libraries-by-concern FR-010	kept by the library rdf: rdf 0001-rdf FR-006
+0012-ontology FR-007	review	0032-libraries-by-concern FR-010	kept by the library rdf: rdf 0001-rdf FR-007
 0012-ontology FR-008	check	.github: bun test ./tests/	Ontology: the modules import only the kernel's RDF and one another, list their files, and no .ttl is under commons/ontology
 0012-ontology FR-009	check	.github: bun test ./tests/	Ontology: no IRI is written as free text in a module; the code lists are the tools' unions
 0012-ontology FR-010	check	.github: bun test ./tests/	Ontology: tsc 7 refuses copies with a missing field, a wrong range and a wrong class; Generator: the rules a type cannot state are named and nothing is written
 0012-ontology FR-011	check	.github: bun test ./tests/	Generator: packaging.auto.ttl is what the modules make, says its generator and is the same bytes twice
 0012-ontology FR-012	check	.github: bun test ./tests/	Ontology: source_sha256 is the SHA-256 of the canonical N-Triples, and a comment changes no generated file
 0012-ontology FR-013	none	-	a one-time comparison when the Turtle was converted (7 files, 2874 triples, reported in the commit that converted it); the Turtle it was compared with is deleted in that commit
-0012-ontology FR-014	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: a term with no record is found and fails whatever the baseline holds; every term of the packaging ontology and of Mizan's vocabulary has a record; the mappings name terms of the pinned schema.org import (the compiler)
-0012-ontology FR-015	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: a code list of 5,000 entries is written to a folder and tsc 7 checks it, with its key type, within 30 seconds
-0012-ontology FR-016	check	.github: cd commons/ts && bun test tests/	tests/commons-mizan-ontology.test.ts: the generated Turtle names owl:versionInfo and owl:versionIRI; rdflib reads the version IRI back; mizan.test.ts: the kernel's OwlOntology takes a version IRI
-0013-acme FR-001	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-008
-0013-acme FR-002	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-009
-0013-acme FR-003	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-010
-0013-acme FR-004	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-011
-0013-acme FR-005	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-012
-0013-acme FR-006	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-013
-0013-acme FR-007	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-014
-0013-acme FR-008	review	0032-lifting-libraries FR-010	kept by the library net: 0001-net FR-015
-0014-webauthn FR-001	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/cbor.test.ts: RFC 8949 Appendix A vectors read and written back, sorted map keys, an item with its end, each refusal with its byte, a round-trip property
-0014-webauthn FR-002	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/webauthn.test.ts: ES256 and Ed25519 COSE keys read, written, from and to JWK, signatures verified; RS256, a wrong curve, a short coordinate and malformed DER signatures refused
-0014-webauthn FR-003	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/webauthn.test.ts: the creation and request options as JSON, and the RangeErrors of a short challenge, a long user id and a bad credential id
-0014-webauthn FR-004	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/webauthn.test.ts: registrations by ES256 and Ed25519 authenticators played with Web Crypto, several origins, packed self-attestation checked and a chain taken at none
-0014-webauthn FR-005	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/webauthn.test.ts: wrong challenge, origin, RP ID and type, cross-origin, no UP or UV, BS without BE, malformed CBOR, tpm, a none with a statement, another id, RS256
-0014-webauthn FR-006	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/webauthn.test.ts: authentications by ES256 and Ed25519 credentials, and a counter that stays 0
-0014-webauthn FR-007	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/webauthn.test.ts: a flipped or short signature, a counter not going up, wrong challenge, origin, RP ID, type, no UV, another credential or key, a non-DER ES256 signature; authenticator data with extensions
-0014-webauthn FR-008	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/webauthn.test.ts: browser JSON read into the response types and verified, refusals naming the path
-0015-trace FR-001	check	.github: cd commons/ts && bun test tests/	kernel/trace.test.ts: a finding's key without its line, named by its rule, file and what it is about
-0015-trace FR-002	check	.github: cd commons/ts && bun test tests/	kernel/trace.test.ts: a baseline written sorted with its comments, read as a set; a new finding and a stale entry each fail
-0015-trace FR-003	check	.github: cd commons/ts && bun test tests/	kernel/trace.test.ts: a judgement told as plain lines, new findings, stale entries and the summary, no colour
-0015-trace FR-004	check	.github: cd commons/ts && bun test tests/	kernel/trace.test.ts: a spec's status in both forms, its requirements with their lines, and reviewed.tsv's rows of its own
-0015-trace FR-005	check	.github: cd commons/ts && bun test tests/	kernel/trace.test.ts: Spec: lines with groups, lists, ranges, whole specs and several lines; not inside a string
-0015-trace FR-006	check	.github: cd commons/ts && bun test tests/	kernel/trace.test.ts: proofs from literals, constants and arrays of constants in proves([...]), and Proves: lines; FR(3) not read
-0015-trace FR-007	check	.github: cd commons/ts && bun test tests/	kernel/trace.test.ts: a clean tree, then each rule found on a fixture tree, a Draft spec and a reviewed requirement not unproved, .auto. exempt
-0015-trace FR-008	check	.github: cd commons/ts && bun test tests/	kernel/trace.test.ts: citations of individuals made by a schema with a spec field, none of another schema's, an uncited term found
-0015-trace FR-009	check	.github: cd commons/ts && bun test tests/	kernel/trace.test.ts: placements by one path, a home naming files and literal characters; unclassified and a tie found
-0015-trace FR-010	check	.github: cd commons/ts && bun test tests/	kernel/trace.test.ts: imports of every form resolved; above and around found with both files and rungs; same rung and packages not
-0015-trace FR-011	check	.github: cd commons/ts && bun test tests/	runtime/trace.test.ts: a fixture tree on disk read; its findings held against a baseline written, passing, then failing when stale
-0015-trace FR-012	check	.github: cd commons/ts && bun test tests/	mizan-harness-requests.test.ts: Spec: and Proves: lines are read in block comments (a line with an asterisk, a one-line block), and a string or a comment after code is not read; the trace check traces a file whose only citation is in a block comment
+0012-ontology FR-014	check	.github: cd commons/mizan && bun test suite/	mizan.test.ts: a term with no record is found and fails whatever the baseline holds; every term of the packaging ontology and of Mizan's vocabulary has a record; the mappings name terms of the pinned schema.org import (the compiler)
+0012-ontology FR-015	check	.github: cd commons/mizan && bun test suite/	mizan.test.ts: a code list of 5,000 entries is written to a folder and tsc 7 checks it, with its key type, within 30 seconds
+0012-ontology FR-016	check	.github: bun test ./tests/	tests/commons-mizan-ontology.test.ts: the generated Turtle names owl:versionInfo and owl:versionIRI; rdflib reads the version IRI back; mizan.test.ts: the kernel's OwlOntology takes a version IRI
+0013-acme FR-001	review	0032-libraries-by-concern FR-010	kept by the library net: 0001-net FR-008
+0013-acme FR-002	review	0032-libraries-by-concern FR-010	kept by the library net: 0001-net FR-009
+0013-acme FR-003	review	0032-libraries-by-concern FR-010	kept by the library net: 0001-net FR-010
+0013-acme FR-004	review	0032-libraries-by-concern FR-010	kept by the library net: 0001-net FR-011
+0013-acme FR-005	review	0032-libraries-by-concern FR-010	kept by the library net: 0001-net FR-012
+0013-acme FR-006	review	0032-libraries-by-concern FR-010	kept by the library net: 0001-net FR-013
+0013-acme FR-007	review	0032-libraries-by-concern FR-010	kept by the library net: 0001-net FR-014
+0013-acme FR-008	review	0032-libraries-by-concern FR-010	kept by the library net: 0001-net FR-015
+0014-webauthn FR-001	check	.github: cd commons/formats && bun test suite/	kernel/cbor.test.ts: RFC 8949 Appendix A vectors read and written back, sorted map keys, an item with its end, each refusal with its byte, a round-trip property
+0014-webauthn FR-002	check	.github: cd commons/crypto && bun test suite/	kernel/webauthn.test.ts: ES256 and Ed25519 COSE keys read, written, from and to JWK, signatures verified; RS256, a wrong curve, a short coordinate and malformed DER signatures refused
+0014-webauthn FR-003	check	.github: cd commons/crypto && bun test suite/	kernel/webauthn.test.ts: the creation and request options as JSON, and the RangeErrors of a short challenge, a long user id and a bad credential id
+0014-webauthn FR-004	check	.github: cd commons/crypto && bun test suite/	kernel/webauthn.test.ts: registrations by ES256 and Ed25519 authenticators played with Web Crypto, several origins, packed self-attestation checked and a chain taken at none
+0014-webauthn FR-005	check	.github: cd commons/crypto && bun test suite/	kernel/webauthn.test.ts: wrong challenge, origin, RP ID and type, cross-origin, no UP or UV, BS without BE, malformed CBOR, tpm, a none with a statement, another id, RS256
+0014-webauthn FR-006	check	.github: cd commons/crypto && bun test suite/	kernel/webauthn.test.ts: authentications by ES256 and Ed25519 credentials, and a counter that stays 0
+0014-webauthn FR-007	check	.github: cd commons/crypto && bun test suite/	kernel/webauthn.test.ts: a flipped or short signature, a counter not going up, wrong challenge, origin, RP ID, type, no UV, another credential or key, a non-DER ES256 signature; authenticator data with extensions
+0014-webauthn FR-008	check	.github: cd commons/crypto && bun test suite/	kernel/webauthn.test.ts: browser JSON read into the response types and verified, refusals naming the path
+0015-trace FR-001	check	.github: cd commons/data && bun test suite/	kernel/trace.test.ts: a finding's key without its line, named by its rule, file and what it is about
+0015-trace FR-002	check	.github: cd commons/data && bun test suite/	kernel/trace.test.ts: a baseline written sorted with its comments, read as a set; a new finding and a stale entry each fail
+0015-trace FR-003	check	.github: cd commons/data && bun test suite/	kernel/trace.test.ts: a judgement told as plain lines, new findings, stale entries and the summary, no colour
+0015-trace FR-004	check	.github: cd commons/data && bun test suite/	kernel/trace.test.ts: a spec's status in both forms, its requirements with their lines, and reviewed.tsv's rows of its own
+0015-trace FR-005	check	.github: cd commons/data && bun test suite/	kernel/trace.test.ts: Spec: lines with groups, lists, ranges, whole specs and several lines; not inside a string
+0015-trace FR-006	check	.github: cd commons/data && bun test suite/	kernel/trace.test.ts: proofs from literals, constants and arrays of constants in proves([...]), and Proves: lines; FR(3) not read
+0015-trace FR-007	check	.github: cd commons/data && bun test suite/	kernel/trace.test.ts: a clean tree, then each rule found on a fixture tree, a Draft spec and a reviewed requirement not unproved, .auto. exempt
+0015-trace FR-008	check	.github: cd commons/data && bun test suite/	kernel/trace.test.ts: citations of individuals made by a schema with a spec field, none of another schema's, an uncited term found
+0015-trace FR-009	check	.github: cd commons/data && bun test suite/	kernel/trace.test.ts: placements by one path, a home naming files and literal characters; unclassified and a tie found
+0015-trace FR-010	check	.github: cd commons/data && bun test suite/	kernel/trace.test.ts: imports of every form resolved; above and around found with both files and rungs; same rung and packages not
+0015-trace FR-011	check	.github: cd commons/data && bun test suite/	runtime/trace.test.ts: a fixture tree on disk read; its findings held against a baseline written, passing, then failing when stale
+0015-trace FR-012	check	.github: cd commons/mizan && bun test suite/	mizan-harness-requests.test.ts: Spec: and Proves: lines are read in block comments (a line with an asterisk, a one-line block), and a string or a comment after code is not read; the trace check traces a file whose only citation is in a block comment
 0016-ladder FR-001	check	.github: bun test ./tests/	Mizan ontology: the nine rungs are individuals of mz:Rung with number, purpose, required and rely-on edges
 0016-ladder FR-002	check	.github: bun test ./tests/	Mizan ontology: rungs 0 to 7 are required, rung 8 is optional and relies on nothing
 0016-ladder FR-003	check	.github: bun test ./tests/	Mizan ontology: a rung relies only on rungs below it, and no rung relies on rung 8
@@ -296,205 +230,205 @@ requirement	mechanism	by	note
 0017-two-languages FR-007	none	-	Planned, Phase 1 and 3 of issue #10: a statement and controls whose checks are the harness's own, not built yet
 0018-standards-first FR-001	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
 0018-standards-first FR-002	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
-0018-standards-first FR-003	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: a term on a standard that names none is found; every class of Mizan's vocabulary has a basis (tests/commons-mizan-ontology.test.ts). Required by the compiler for Mizan's OntologyTerm only: the kernel's schemas do not yet require it (0012 FR-014)
-0018-standards-first FR-004	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: an unaligned term with no justification is found, and the findings are held by the baseline that only shrinks
-0018-standards-first FR-005	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: a decision is missing within 90 days (held by the baseline) and overdue after, which fails whatever the baseline holds; run on commons' own folder; ontology-decisions.test.ts: the twelve terms kept unaligned by the owner's decision of 2026-11-17 each have a Decision that names them, and reach the Turtle
-0018-standards-first FR-006	check	.github: cd commons/ts && bun test tests/	mizan-newer.test.ts: a newer version than the pin is a finding (FR-014); a Standard's fields are decoded by the importer (mizan-integrations.test.ts)
+0018-standards-first FR-003	check	.github: cd commons/mizan && bun test suite/	mizan.test.ts: a term on a standard that names none is found; every class of Mizan's vocabulary has a basis (tests/commons-mizan-ontology.test.ts). Required by the compiler for Mizan's OntologyTerm only: the kernel's schemas do not yet require it (0012 FR-014)
+0018-standards-first FR-004	check	.github: cd commons/mizan && bun test suite/	mizan.test.ts: an unaligned term with no justification is found, and the findings are held by the baseline that only shrinks
+0018-standards-first FR-005	check	.github: cd commons/mizan && bun test suite/	mizan.test.ts: a decision is missing within 90 days (held by the baseline) and overdue after, which fails whatever the baseline holds; run on commons' own folder; ontology-decisions.test.ts: the twelve terms kept unaligned by the owner's decision of 2026-11-17 each have a Decision that names them, and reach the Turtle
+0018-standards-first FR-006	check	.github: cd commons/libraries && bun test suite/	mizan-newer.test.ts: a newer version than the pin is a finding (FR-014); a Standard's fields are decoded by the importer (mizan-integrations.test.ts)
 0018-standards-first FR-007	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
-0018-standards-first FR-008	check	.github: cd commons/ts && bun test tests/	mizan-authority.test.ts: a requirement that names a law and no Authority is found, and commons' own specifications pass (FR-015, FR-016)
-0018-standards-first FR-009	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: a plan with no Standards considered section named
+0018-standards-first FR-008	check	.github: cd commons/mizan && bun test suite/	mizan-authority.test.ts: a requirement that names a law and no Authority is found, and commons' own specifications pass (FR-015, FR-016)
+0018-standards-first FR-009	check	.github: cd commons/mizan && bun test suite/	mizan.test.ts: a plan with no Standards considered section named
 0018-standards-first FR-010	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
 0018-standards-first FR-011	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
 0018-standards-first FR-012	none	-	Planned, Phase 2 and 3 of issue #10: the basis fields and the standards rules are not built yet
-0018-standards-first FR-013	check	.github: cd commons/ts && bun test tests/	mizan.test.ts: a deprecated term with no replacement is found, and a specification naming a deprecated term is found saying what replaces it
-0018-standards-first FR-014	check	.github: cd commons/ts && bun test tests/	mizan-newer.test.ts: a real local HTTP server serves the pinned bytes (no finding) and then other bytes (one finding with both hashes); a manifest with no latest is not read
-0018-standards-first FR-015	check	.github: cd commons/ts && bun test tests/	mizan-authority.test.ts: the convention, what a citation of law is, and the covering of a citation by an authority, each in both directions
-0018-standards-first FR-016	check	.github: cd commons/ts && bun test tests/	mizan-authority.test.ts: the three findings of mizan/authority-citation, and commons' own specifications read for real
-0018-standards-first FR-017	check	.github: cd commons/ts && bun test tests/	mizan-newer.test.ts: the baseline holds a finding and goes stale when it is fixed, a URL that cannot be fetched exits 2 naming it, and check.ts and import.ts --check run with the network unreachable
-0019-mizan-integrations FR-001	check	.github: cd commons/ts && bun test tests/	boundaries.test.ts: pure/ imports only the kernel and itself, host/ exists, the module is exported
-0019-mizan-integrations FR-002	check	.github: cd commons/ts && bun test tests/	mizan-integrations.test.ts: the registry looks integrations up by formats and refuses an identifier or a pair twice; the record is typed
+0018-standards-first FR-013	check	.github: cd commons/mizan && bun test suite/	mizan.test.ts: a deprecated term with no replacement is found, and a specification naming a deprecated term is found saying what replaces it
+0018-standards-first FR-014	check	.github: cd commons/libraries && bun test suite/	mizan-newer.test.ts: a real local HTTP server serves the pinned bytes (no finding) and then other bytes (one finding with both hashes); a manifest with no latest is not read
+0018-standards-first FR-015	check	.github: cd commons/mizan && bun test suite/	mizan-authority.test.ts: the convention, what a citation of law is, and the covering of a citation by an authority, each in both directions
+0018-standards-first FR-016	check	.github: cd commons/mizan && bun test suite/	mizan-authority.test.ts: the three findings of mizan/authority-citation, and commons' own specifications read for real
+0018-standards-first FR-017	check	.github: cd commons/libraries && bun test suite/	mizan-newer.test.ts: the baseline holds a finding and goes stale when it is fixed, a URL that cannot be fetched exits 2 naming it, and check.ts and import.ts --check run with the network unreachable
+0019-mizan-integrations FR-001	check	.github: cd commons/mizan && bun test suite/	mizan-boundaries.test.ts: pure/ imports only the kernel and itself, host/ exists, the module is exported
+0019-mizan-integrations FR-002	check	.github: cd commons/mizan && bun test suite/	mizan-integrations.test.ts: the registry looks integrations up by formats and refuses an identifier or a pair twice; the record is typed
 0019-mizan-integrations FR-003	none	-	Planned, Phase 4 of issue #10: the module is not built yet
-0019-mizan-integrations FR-004	check	.github: cd commons/ts && bun test tests/	mizan-integrations.test.ts: the reader reads the Turtle the kernel writes back to the same graph; kernel/rdf.test.ts: the kernel exports no reader
-0019-mizan-integrations FR-005	check	.github: cd commons/ts && bun test tests/	mizan-integrations.test.ts: only the slice is taken, an empty slice and a term the source lacks are refused
-0019-mizan-integrations FR-006	check	.github: cd commons/ts && bun test tests/	mizan-integrations.test.ts: a pin mismatch, no license and no right to copy are refused; the module's header names its source; the command writes and checks it
-0019-mizan-integrations FR-007	check	.github: cd commons/ts && bun test tests/	mizan-integrations.test.ts: a blank node and a collection are named as losses, in the slice only, and the rest is read
+0019-mizan-integrations FR-004	check	.github: cd commons/mizan && bun test suite/	mizan-integrations.test.ts: the reader reads the Turtle the kernel writes back to the same graph; kernel/rdf.test.ts: the kernel exports no reader
+0019-mizan-integrations FR-005	check	.github: cd commons/mizan && bun test suite/	mizan-integrations.test.ts: only the slice is taken, an empty slice and a term the source lacks are refused
+0019-mizan-integrations FR-006	check	.github: cd commons/mizan && bun test suite/	mizan-integrations.test.ts: a pin mismatch, no license and no right to copy are refused; the module's header names its source; the command writes and checks it
+0019-mizan-integrations FR-007	check	.github: cd commons/mizan && bun test suite/	mizan-integrations.test.ts: a blank node and a collection are named as losses, in the slice only, and the rest is read
 0019-mizan-integrations FR-008	none	-	Planned, Phase 4 of issue #10: the module is not built yet
-0019-mizan-integrations FR-009	check	.github: cd commons/ts && bun test tests/	mizan-integrations.test.ts: the provenance is PROV-O Turtle the reader reads back, deterministic; the command writes it beside the manifest
-0019-mizan-integrations FR-010	check	.github: cd commons/ts && bun test tests/	mizan-integrations.test.ts: SQL, SKOS, SHACL, JSON Schema and SSSOM written from a class schema, a code list and the mappings of terms; tests/commons-mizan-ontology.test.ts: Mizan's own exports are current. RDF/XML, OWL and DCAT: FR-016 to FR-019
+0019-mizan-integrations FR-009	check	.github: cd commons/mizan && bun test suite/	mizan-integrations.test.ts: the provenance is PROV-O Turtle the reader reads back, deterministic; the command writes it beside the manifest
+0019-mizan-integrations FR-010	check	.github: cd commons/mizan && bun test suite/	mizan-integrations.test.ts: SQL, SKOS, SHACL, JSON Schema and SSSOM written from a class schema, a code list and the mappings of terms; tests/commons-mizan-ontology.test.ts: Mizan's own exports are current. RDF/XML, OWL and DCAT: FR-016 to FR-019
 0019-mizan-integrations FR-011	check	.github: bun test ./tests/	tests/commons-mizan-ontology.test.ts: rdflib parses the Turtle, pySHACL finds Mizan's ontology conforms to the shapes made from its schemas and rejects a broken one, jsonschema checks the JSON Schema; skipped where Python and these three are not installed (CI installs them, pinned)
 0019-mizan-integrations FR-012	none	-	Planned, Phase 4 of issue #10: the module is not built yet
 0019-mizan-integrations FR-013	none	-	Planned, Phase 4 of issue #10: the module is not built yet
-0019-mizan-integrations FR-014	check	.github: cd commons/ts && bun test tests/	mizan-integrations.test.ts: a source served over HTTP is written, checked offline, checked with a fetch, refused when its bytes change and named when it cannot be fetched
-0019-mizan-integrations FR-015	check	.github: cd commons/ts && bun test tests/	mizan-integrations.test.ts: a catalog read into typed controls, a slice imported deterministically, a missing control, a pin mismatch and no right to copy refused, the command run from a manifest with no namespace
-0019-mizan-integrations FR-016	check	.github: cd commons/ts && bun test tests/	mizan-exporters.test.ts: the triples are written as canonical RDF/XML (the order of the statements does not matter, a plain string, a language, a datatype and a blank node are each written, text is escaped, a predicate with no XML name and a control character are named); tests/commons-mizan-ontology.test.ts: rdflib parses the RDF/XML into a graph isomorphic to the Turtle's, skipped where Python and rdflib are not installed
-0019-mizan-integrations FR-017	check	.github: cd commons/ts && bun test tests/	mizan-exporters.test.ts: classes and properties are written as OWL functional syntax (declarations, SubClassOf, domain, range, annotations, the ontology's version IRI, the classes it names and does not define, the datatypes), deterministic, and a datatype range of an object property or a class range of a datatype property is named; tests/commons-mizan-ontology.test.ts: a reader written in the test checks the axioms against the Turtle graph (no OWL functional-syntax reader is a pinned dependency; the RDF/XML was also loaded once by hand into owlready2)
-0019-mizan-integrations FR-018	check	.github: cd commons/ts && bun test tests/	mizan-exporters.test.ts: the catalog is written as DCAT 3 Turtle (catalog, dataset, one distribution for each file with its media type, download URL and license), the same bytes for the same catalog, a bad IRI and a bad media type are named; tests/commons-mizan-ontology.test.ts: rdflib parses the catalog and finds the datasets and distributions, each distribution's file in the repository
+0019-mizan-integrations FR-014	check	.github: cd commons/mizan && bun test suite/	mizan-integrations.test.ts: a source served over HTTP is written, checked offline, checked with a fetch, refused when its bytes change and named when it cannot be fetched
+0019-mizan-integrations FR-015	check	.github: cd commons/mizan && bun test suite/	mizan-integrations.test.ts: a catalog read into typed controls, a slice imported deterministically, a missing control, a pin mismatch and no right to copy refused, the command run from a manifest with no namespace
+0019-mizan-integrations FR-016	check	.github: cd commons/mizan && bun test suite/	mizan-exporters.test.ts: the triples are written as canonical RDF/XML (the order of the statements does not matter, a plain string, a language, a datatype and a blank node are each written, text is escaped, a predicate with no XML name and a control character are named); tests/commons-mizan-ontology.test.ts: rdflib parses the RDF/XML into a graph isomorphic to the Turtle's, skipped where Python and rdflib are not installed
+0019-mizan-integrations FR-017	check	.github: cd commons/mizan && bun test suite/	mizan-exporters.test.ts: classes and properties are written as OWL functional syntax (declarations, SubClassOf, domain, range, annotations, the ontology's version IRI, the classes it names and does not define, the datatypes), deterministic, and a datatype range of an object property or a class range of a datatype property is named; tests/commons-mizan-ontology.test.ts: a reader written in the test checks the axioms against the Turtle graph (no OWL functional-syntax reader is a pinned dependency; the RDF/XML was also loaded once by hand into owlready2)
+0019-mizan-integrations FR-018	check	.github: cd commons/mizan && bun test suite/	mizan-exporters.test.ts: the catalog is written as DCAT 3 Turtle (catalog, dataset, one distribution for each file with its media type, download URL and license), the same bytes for the same catalog, a bad IRI and a bad media type are named; tests/commons-mizan-ontology.test.ts: rdflib parses the catalog and finds the datasets and distributions, each distribution's file in the repository
 0019-mizan-integrations FR-019	check	.github: bun test ./tests/	tests/commons-mizan-ontology.test.ts: mizan.auto.rdf, mizan.auto.ofn and mizan-catalog.auto.ttl are what the generator makes, each says it is generated, the catalog lists a distribution for every file the generator writes for the ontology; textOf throws ExportRefused where an exporter refuses, which main turns into exit 2 (tested at textOf: the Mizan ontology itself is never refused, so the whole command has no failing case to run)
-0019-mizan-integrations FR-020	check	.github: cd commons/ts && bun test tests/	mizan-integrations-formats.test.ts: compacted and expanded JSON-LD read with vocab, base, aliases, coerced and typed values, a list, a reverse, a nested node and the text of a number; tests/commons-mizan-importers.test.ts: the graph equals rdflib's (skipped where Python is not installed)
-0019-mizan-integrations FR-021	check	.github: cd commons/ts && bun test tests/	mizan-integrations-formats.test.ts: a remote context, a scoped context, a named graph, a nest and a JSON literal are named with their line and the rest is read; bad JSON stops with its line
-0019-mizan-integrations FR-022	check	.github: cd commons/ts && bun test tests/	mizan-integrations-formats.test.ts: a slice of $defs becomes code lists and field-name unions (allOf and $ref followed, enums lifted), deterministically, a missing definition and one with nothing to hold end the import; tests/commons-mizan-importers.test.ts: the lists and names agree with jsonschema and an independent resolution
-0019-mizan-integrations FR-023	check	.github: cd commons/ts && bun test tests/	mizan-integrations-formats.test.ts: additionalProperties as a schema, anyOf, value constraints, a $ref outside $defs, an earlier draft and a clash of identifiers are named
-0019-mizan-integrations FR-024	check	.github: cd commons/ts && bun test tests/	mizan-integrations-formats.test.ts: RDF/XML read with entities, base, rdf:ID, language, datatype, parseType, property attributes, rdf:li, CDATA and reification, and RFC 3986 resolution; tests/commons-mizan-importers.test.ts: the graph equals rdflib's. Twelve W3C RDF/XML files (8,848 triples) were also read to rdflib's graph while this was written, and are not copied here
-0019-mizan-integrations FR-025	check	.github: cd commons/ts && bun test tests/	mizan-integrations-formats.test.ts: an XML literal and an external entity are named and the rest is read; a document that is not well formed stops with its line
-0019-mizan-integrations FR-026	check	.github: cd commons/ts && bun test tests/	mizan-integrations-formats.test.ts: the same slice imported from JSON-LD and RDF/XML gives the same vocabulary, a blank-node value is named and a pin mismatch is refused; the command runs a json-ld and an rdf-xml manifest
-0019-mizan-integrations FR-027	check	.github: cd commons/ts && bun test tests/	mizan-integrations-formats.test.ts: the command runs a json-schema manifest with no namespace, and --check names a slice that drifted from the module's header
+0019-mizan-integrations FR-020	check	.github: cd commons/mizan && bun test suite/	mizan-integrations-formats.test.ts: compacted and expanded JSON-LD read with vocab, base, aliases, coerced and typed values, a list, a reverse, a nested node and the text of a number; tests/commons-mizan-importers.test.ts: the graph equals rdflib's (skipped where Python is not installed)
+0019-mizan-integrations FR-021	check	.github: cd commons/mizan && bun test suite/	mizan-integrations-formats.test.ts: a remote context, a scoped context, a named graph, a nest and a JSON literal are named with their line and the rest is read; bad JSON stops with its line
+0019-mizan-integrations FR-022	check	.github: cd commons/mizan && bun test suite/	mizan-integrations-formats.test.ts: a slice of $defs becomes code lists and field-name unions (allOf and $ref followed, enums lifted), deterministically, a missing definition and one with nothing to hold end the import; tests/commons-mizan-importers.test.ts: the lists and names agree with jsonschema and an independent resolution
+0019-mizan-integrations FR-023	check	.github: cd commons/mizan && bun test suite/	mizan-integrations-formats.test.ts: additionalProperties as a schema, anyOf, value constraints, a $ref outside $defs, an earlier draft and a clash of identifiers are named
+0019-mizan-integrations FR-024	check	.github: cd commons/mizan && bun test suite/	mizan-integrations-formats.test.ts: RDF/XML read with entities, base, rdf:ID, language, datatype, parseType, property attributes, rdf:li, CDATA and reification, and RFC 3986 resolution; tests/commons-mizan-importers.test.ts: the graph equals rdflib's. Twelve W3C RDF/XML files (8,848 triples) were also read to rdflib's graph while this was written, and are not copied here
+0019-mizan-integrations FR-025	check	.github: cd commons/mizan && bun test suite/	mizan-integrations-formats.test.ts: an XML literal and an external entity are named and the rest is read; a document that is not well formed stops with its line
+0019-mizan-integrations FR-026	check	.github: cd commons/mizan && bun test suite/	mizan-integrations-formats.test.ts: the same slice imported from JSON-LD and RDF/XML gives the same vocabulary, a blank-node value is named and a pin mismatch is refused; the command runs a json-ld and an rdf-xml manifest
+0019-mizan-integrations FR-027	check	.github: cd commons/mizan && bun test suite/	mizan-integrations-formats.test.ts: the command runs a json-schema manifest with no namespace, and --check names a slice that drifted from the module's header
 0019-mizan-integrations FR-028	check	.github: bun test ./tests/	tests/commons-mizan-importers.test.ts: rdflib reads the JSON-LD and RDF/XML to the reader's graph and jsonschema accepts the lists the import writes; skipped where Python and these tools are not installed (CI installs them, pinned)
 0019-mizan-integrations FR-029	review	0017-two-languages FR-007	Whether an XML reader needs a pinned tool is judged on evidence recorded in the requirement: twelve W3C RDF/XML files read to rdflib's graph by the hand-written reader; the test of FR-024 keeps its features checked
 0016-ladder FR-008	check	.github: bun test ./tests/	Mizan ontology: every rung has one kind of mz:RungKind, rungs 0 to 7 required, 8 optional, 9 observer and 10 environment
 0016-ladder FR-009	check	.github: bun test ./tests/	Mizan ontology: rung 9 is an observer that may rely on rungs 0 to 7 and no rung relies on it
 0016-ladder FR-010	check	.github: bun test ./tests/	Mizan ontology: rung 10 is an environment that relies on no rung and no rung relies on it
 0016-ladder FR-011	review	0017-two-languages FR-007	Whether a harness that claims a regulated domain has rungs 9 and 10 from the day it declares production is judged by a person until the harness declares its domains as typed data (0020-ifccm)
-0019-mizan-integrations FR-030	check	.github: cd commons/ts && bun test tests/	mizan-nist-import.test.ts: the committed module names the controls the specifications cite, with the titles of the pinned catalog, and the import's offline check passes
+0019-mizan-integrations FR-030	check	.github: cd commons/libraries && bun test suite/	mizan-nist-import.test.ts: the committed module names the controls the specifications cite, with the titles of the pinned catalog, and the import's offline check passes
 0020-ifccm FR-001	none	-	Not built in M2 of issue #10: no rule reads the words a tracker or a commit message uses for a unit of change; the class ifccm:Capability exists and is audited (ifccm-ontology.test.ts)
 0020-ifccm FR-002	none	-	Not read by any rule: whether a body of work has one change request, with its tasks as checkbox items, is judged by a person, because the host cannot say which change requests belong to one body of work
-0020-ifccm FR-003	check	.github: cd commons/ts && bun test tests/	mizan-changes-pure.test.ts: the four sections in order, the Done when requirements and the checkbox items are read from a body; a missing or misordered section is a problem, and changes/issue-shape finds it on a Closes of a capability
-0020-ifccm FR-004	check	.github: cd commons/ts && bun test tests/	mizan-changes-pure.test.ts: checkbox items are read with whether each is ticked, outside code blocks; mizan-changes-git.test.ts: --strict finds a Closes on an issue with an item not ticked (changes/early-close)
-0020-ifccm FR-005	check	.github: cd commons/ts && bun test tests/	mizan-changes-pure.test.ts: Refs and Closes on a line of their own, in this or another repository, two issues on two lines, prose and quoted lines not read; mizan-changes-git.test.ts: the commits of a real range
-0020-ifccm FR-006	check	.github: cd commons/ts && bun test tests/	mizan-changes-pure.test.ts: changes/early-close on a Closes whose items are not all ticked, none where all are; mizan-changes-git.test.ts: the command with --strict
-0020-ifccm FR-007	check	.github: cd commons/ts && bun test tests/	mizan-changes-pure.test.ts: changes/no-issue with the revision, a merge that joins named commits exempt, a revert reported; mizan-changes-git.test.ts: a real range with a merge and a revert
-0020-ifccm FR-008	check	.github: cd commons/ts && bun test tests/	mizan-changes-pure.test.ts: the closing words other than Closes are read wherever they stand and changes/closing-keyword reports them; mizan-changes-git.test.ts: a real commit that says Fixes
-0020-ifccm FR-009	check	.github: cd commons/ts && bun test tests/	mizan-changes-git.test.ts: --strict asks the host for each issue a commit names (this repository and another's) and finds unknown, closed and not-ticked ones; without --strict the host is never asked; mizan-changes-pure.test.ts: the rules over the answers
-0020-ifccm FR-010	check	.github: cd commons/ts && bun test tests/	mizan-changes-pure.test.ts: the declaration is typed data read and never run, its regulated domains are the code list's, a domain with no production day is refused (changes/declaration), a harness that states nothing is not regulated
-0020-ifccm FR-011	check	.github: cd commons/ts && bun test tests/	mizan-changes-pure.test.ts: warn before the declared day and gate from it, today included, and holdHarness never holds a gate finding by a baseline; mizan-changes-git.test.ts: the command holds warnings by changes.baseline.txt and fails a gate whatever it holds
-0020-ifccm FR-012	check	.github: cd commons/ts && bun test tests/	mizan-changes-git.test.ts: the history of a real declaration file gives changes/gate-relaxed for a day moved later after it passed, a day removed and a domain dropped, cleared only by a Decision that covers the revision; mizan-changes-pure.test.ts: the judgement over versions
-0020-ifccm FR-013	check	.github: cd commons/ts && bun test tests/	mizan-changes-pure.test.ts: rungsRequired gives rungs 9 and 10 from the declared day for a harness that claims a regulated domain, none otherwise; 0016-ladder FR-011 reads it
-0020-ifccm FR-014	check	.github: cd commons/ts && bun test tests/	ifccm-ontology.test.ts: the chain is six TraceStage individuals in order, each with the annotation that already links it
-0020-ifccm FR-015	check	.github: cd commons/ts && bun test tests/	mizan-changes-pure.test.ts: the chain of a requirement ends at the first stage with no link (term, code, test, run); mizan-changes-git.test.ts: the command --trace over the Done when of an issue body
-0020-ifccm FR-016	check	.github: cd commons/ts && bun test tests/	mizan-changes-pure.test.ts: the view of capabilities by rung is generated between the markers and its check fails where the document differs; mizan-changes-git.test.ts: the command writes it and --check fails where the document differs
-0020-ifccm FR-017	check	.github: cd commons/ts && bun test tests/	mizan-changes-pure.test.ts: a capability is open on a rung while a command of the rung has no passing run at its last revision, proved otherwise; mizan-changes-git.test.ts: the command
-0020-ifccm FR-018	check	.github: cd commons/ts && bun test tests/	ifccm-ontology.test.ts: the four AuthorityFunction individuals and the instrument that carries each
-0020-ifccm FR-019	check	.github: cd commons/ts && bun test tests/	mizan-changes-pure.test.ts: a departure (Departs:) with no Decision that names it, or naming one the harness does not record, is changes/no-decision; nothing of an issue's comment, label or state is read as authority
-0020-ifccm FR-020	check	.github: cd commons/ts && bun test tests/	mizan-changes-pure.test.ts: where a regulated domain is declared, a Decision approved by the role of the commit's author, or with the author's role not recorded, is changes/self-approved
-0020-ifccm FR-021	check	.github: cd commons/ts && bun test tests/	ifccm-ontology.test.ts: the kinds (capability request, problem) and states (open, closed) are the words the specification names, and a change request has exactly one kind, state and host
-0020-ifccm FR-022	check	.github: cd commons/ts && bun test tests/	ifccm-ontology.test.ts: a change names its change requests and revisions, a baseline its items and the Decision that establishes it
-0020-ifccm FR-023	check	.github: cd commons/ts && bun test tests/	ifccm-ontology.test.ts: ChangeRequest specializes oslc_cm:ChangeRequest, Change prov:Activity, ConfigurationItem prov:Entity and Baseline prov:Collection, each with its audit record
-0020-ifccm FR-024	check	.github: cd commons/ts && bun test tests/	ifccm-ontology.test.ts: the requirement names cm-2, cm-3, cm-4, cm-5 and cm-9 and the crosswalk row repeats them; the typed code list of the OSCAL controls is imported by the lead (0019-mizan-integrations FR-015)
-0020-ifccm FR-025	check	.github: cd commons/ts && bun test tests/	ifccm-ontology.test.ts: each crosswalk row has a relation SSSOM has and requirements that exist, the standards are there, and no clause is a term
+0020-ifccm FR-003	check	.github: cd commons/mizan && bun test suite/	mizan-changes-pure.test.ts: the four sections in order, the Done when requirements and the checkbox items are read from a body; a missing or misordered section is a problem, and changes/issue-shape finds it on a Closes of a capability
+0020-ifccm FR-004	check	.github: cd commons/mizan && bun test suite/	mizan-changes-pure.test.ts: checkbox items are read with whether each is ticked, outside code blocks; mizan-changes-git.test.ts: --strict finds a Closes on an issue with an item not ticked (changes/early-close)
+0020-ifccm FR-005	check	.github: cd commons/mizan && bun test suite/	mizan-changes-pure.test.ts: Refs and Closes on a line of their own, in this or another repository, two issues on two lines, prose and quoted lines not read; mizan-changes-git.test.ts: the commits of a real range
+0020-ifccm FR-006	check	.github: cd commons/mizan && bun test suite/	mizan-changes-pure.test.ts: changes/early-close on a Closes whose items are not all ticked, none where all are; mizan-changes-git.test.ts: the command with --strict
+0020-ifccm FR-007	check	.github: cd commons/mizan && bun test suite/	mizan-changes-pure.test.ts: changes/no-issue with the revision, a merge that joins named commits exempt, a revert reported; mizan-changes-git.test.ts: a real range with a merge and a revert
+0020-ifccm FR-008	check	.github: cd commons/mizan && bun test suite/	mizan-changes-pure.test.ts: the closing words other than Closes are read wherever they stand and changes/closing-keyword reports them; mizan-changes-git.test.ts: a real commit that says Fixes
+0020-ifccm FR-009	check	.github: cd commons/mizan && bun test suite/	mizan-changes-git.test.ts: --strict asks the host for each issue a commit names (this repository and another's) and finds unknown, closed and not-ticked ones; without --strict the host is never asked; mizan-changes-pure.test.ts: the rules over the answers
+0020-ifccm FR-010	check	.github: cd commons/mizan && bun test suite/	mizan-changes-pure.test.ts: the declaration is typed data read and never run, its regulated domains are the code list's, a domain with no production day is refused (changes/declaration), a harness that states nothing is not regulated
+0020-ifccm FR-011	check	.github: cd commons/mizan && bun test suite/	mizan-changes-pure.test.ts: warn before the declared day and gate from it, today included, and holdHarness never holds a gate finding by a baseline; mizan-changes-git.test.ts: the command holds warnings by changes.baseline.txt and fails a gate whatever it holds
+0020-ifccm FR-012	check	.github: cd commons/mizan && bun test suite/	mizan-changes-git.test.ts: the history of a real declaration file gives changes/gate-relaxed for a day moved later after it passed, a day removed and a domain dropped, cleared only by a Decision that covers the revision; mizan-changes-pure.test.ts: the judgement over versions
+0020-ifccm FR-013	check	.github: cd commons/mizan && bun test suite/	mizan-changes-pure.test.ts: rungsRequired gives rungs 9 and 10 from the declared day for a harness that claims a regulated domain, none otherwise; 0016-ladder FR-011 reads it
+0020-ifccm FR-014	check	.github: cd commons/ontology && bun test suite/	ifccm-ontology.test.ts: the chain is six TraceStage individuals in order, each with the annotation that already links it
+0020-ifccm FR-015	check	.github: cd commons/mizan && bun test suite/	mizan-changes-pure.test.ts: the chain of a requirement ends at the first stage with no link (term, code, test, run); mizan-changes-git.test.ts: the command --trace over the Done when of an issue body
+0020-ifccm FR-016	check	.github: cd commons/mizan && bun test suite/	mizan-changes-pure.test.ts: the view of capabilities by rung is generated between the markers and its check fails where the document differs; mizan-changes-git.test.ts: the command writes it and --check fails where the document differs
+0020-ifccm FR-017	check	.github: cd commons/mizan && bun test suite/	mizan-changes-pure.test.ts: a capability is open on a rung while a command of the rung has no passing run at its last revision, proved otherwise; mizan-changes-git.test.ts: the command
+0020-ifccm FR-018	check	.github: cd commons/ontology && bun test suite/	ifccm-ontology.test.ts: the four AuthorityFunction individuals and the instrument that carries each
+0020-ifccm FR-019	check	.github: cd commons/mizan && bun test suite/	mizan-changes-pure.test.ts: a departure (Departs:) with no Decision that names it, or naming one the harness does not record, is changes/no-decision; nothing of an issue's comment, label or state is read as authority
+0020-ifccm FR-020	check	.github: cd commons/mizan && bun test suite/	mizan-changes-pure.test.ts: where a regulated domain is declared, a Decision approved by the role of the commit's author, or with the author's role not recorded, is changes/self-approved
+0020-ifccm FR-021	check	.github: cd commons/ontology && bun test suite/	ifccm-ontology.test.ts: the kinds (capability request, problem) and states (open, closed) are the words the specification names, and a change request has exactly one kind, state and host
+0020-ifccm FR-022	check	.github: cd commons/ontology && bun test suite/	ifccm-ontology.test.ts: a change names its change requests and revisions, a baseline its items and the Decision that establishes it
+0020-ifccm FR-023	check	.github: cd commons/ontology && bun test suite/	ifccm-ontology.test.ts: ChangeRequest specializes oslc_cm:ChangeRequest, Change prov:Activity, ConfigurationItem prov:Entity and Baseline prov:Collection, each with its audit record
+0020-ifccm FR-024	check	.github: cd commons/ontology && bun test suite/	ifccm-ontology.test.ts: the requirement names cm-2, cm-3, cm-4, cm-5 and cm-9 and the crosswalk row repeats them; the typed code list of the OSCAL controls is imported by the lead (0019-mizan-integrations FR-015)
+0020-ifccm FR-025	check	.github: cd commons/ontology && bun test suite/	ifccm-ontology.test.ts: each crosswalk row has a relation SSSOM has and requirements that exist, the standards are there, and no clause is a term
 0020-ifccm FR-026	none	-	Not built in M2 of issue #10: that a DeviceQuality harness keeps its change records so that they can be handed over is a practice no check reads yet; the records of FR-021 to FR-023 are terms (ifccm-ontology.test.ts) and the Authority citation is held by mizan/authority-citation
-0020-ifccm FR-027	check	.github: cd commons/ts && bun test tests/	ifccm-ontology.test.ts: the host kinds are the three of ifccm:GitManagerKind (Github, Gitlab, Git), and ifccm:hostedOn ranges over them
-0020-ifccm FR-028	check	.github: cd commons/ts && bun test tests/	mizan-changes-pure.test.ts: the files of the changes check reach a host only through GitHostClient and name no host API or URL; the adapters are M4's (the githost folder)
+0020-ifccm FR-027	check	.github: cd commons/ontology && bun test suite/	ifccm-ontology.test.ts: the host kinds are the three of ifccm:GitManagerKind (Github, Gitlab, Git), and ifccm:hostedOn ranges over them
+0020-ifccm FR-028	check	.github: cd commons/mizan && bun test suite/	mizan-changes-pure.test.ts: the files of the changes check reach a host only through GitHostClient and name no host API or URL; the adapters are M4's (the githost folder)
 0020-ifccm FR-029	none	-	Planned, M4 of issue #10 (the adapters): the adapters read a pull request and a merge request as part of a change and #N as the issue
-0020-ifccm FR-030	check	.github: cd commons/ts && bun test tests/	mizan-changes-git.test.ts: --strict on plain Git is not_run with the reason that there is no host API, and so are no client given and an unreachable host; never passed
-0020-ifccm FR-031	check	.github: cd commons/quality && bun test suite/	quality-changes-record.test.ts (commons/quality/suite): each run of tools/changes.ts leaves a quality record with each rule as a case, each finding a failed case with rule, file and line, and each rule that could not run (strict on plain Git, no client, no --strict, no --range) not_run with its reason
-0020-ifccm FR-032	check	.github: cd commons/ts && bun test tests/	mizan-changes-pure.test.ts: the findings are Mizan findings (MizanRule, held by a baseline) and holdHarness runs the declaration rule as a plugin; mizan-changes-git.test.ts: the command runs as a program with its exit statuses; the commit rules need a range and are the command's
-0020-ifccm FR-033	check	.github: cd commons/ts && bun test tests/	mizan-changes-pure.test.ts: Departs and Decision lines are read from a commit and judged (changes/no-decision, changes/self-approved), and the record file's declaration, decisions and roles are read as data
+0020-ifccm FR-030	check	.github: cd commons/mizan && bun test suite/	mizan-changes-git.test.ts: --strict on plain Git is not_run with the reason that there is no host API, and so are no client given and an unreachable host; never passed
+0020-ifccm FR-031	check	.github: cd commons/quality && bun test suite/	quality-changes-record.test.ts (commons/quality/suite): each run of libraries/tools/changes.ts leaves a quality record with each rule as a case, each finding a failed case with rule, file and line, and each rule that could not run (strict on plain Git, no client, no --strict, no --range) not_run with its reason
+0020-ifccm FR-032	check	.github: cd commons/mizan && bun test suite/	mizan-changes-pure.test.ts: the findings are Mizan findings (MizanRule, held by a baseline) and holdHarness runs the declaration rule as a plugin; mizan-changes-git.test.ts: the command runs as a program with its exit statuses; the commit rules need a range and are the command's
+0020-ifccm FR-033	check	.github: cd commons/mizan && bun test suite/	mizan-changes-pure.test.ts: Departs and Decision lines are read from a commit and judged (changes/no-decision, changes/self-approved), and the record file's declaration, decisions and roles are read as data
 0020-ifccm FR-034	none	-	Planned, owner decision 2026-11-17 (issue #10): a repository with no Git host account may keep its change requests as a typed file in Git; not built
-0020-ifccm FR-035	check	.github: cd commons/ts && bun test tests/	mizan-harness-requests.test.ts: on a real repository with no host, the capabilities of a range are the change requests the commits name, their requirements come from messages, spec diffs, a Done when and the Spec:/Proves: lines of changed files, and a commit naming only another repository is listed apart
-0020-ifccm FR-036	check	.github: cd commons/ts && bun test tests/	mizan-harness-requests.test.ts: the change requests as JSON, the terms as JSON or as a module loaded by the file URL of a path with a space (audit records too), the rungs with homes and the specs are read; a missing file, a module with no terms and a bad format are named; --trace reads --terms
-0020-ifccm FR-037	check	.github: cd commons/ts && bun test tests/	mizan-harness-requests.test.ts: each requirement's stages, the stage where its chain ends and its spec, terms, code and tests on each rung are given as a table and as JSON, the same bytes twice, with LF, and written to --output
-0020-ifccm FR-038	check	.github: cd commons/ts && bun test tests/	mizan-harness-requests.test.ts: the view of capabilities by rung is made from the commits between the markers of a document and --check finds no difference after it; the exit status is 1 for a closed capability whose chain stops before its run, 0 for an open one, 2 and 3 for usage and inputs
-0020-ifccm FR-039	review	0032-lifting-libraries FR-010	kept by the library githost: githost 0001-githost FR-001
-0020-ifccm FR-040	review	0032-lifting-libraries FR-010	kept by the library githost: githost 0001-githost FR-002
-0020-ifccm FR-041	review	0032-lifting-libraries FR-010	kept by the library githost: githost 0001-githost FR-003
-0020-ifccm FR-042	review	0032-lifting-libraries FR-010	kept by the library githost: githost 0001-githost FR-004
-0020-ifccm FR-043	review	0032-lifting-libraries FR-010	kept by the library githost: githost 0001-githost FR-005
-0020-ifccm FR-044	review	0032-lifting-libraries FR-010	kept by the library githost: githost 0001-githost FR-006
+0020-ifccm FR-035	check	.github: cd commons/mizan && bun test suite/	mizan-harness-requests.test.ts: on a real repository with no host, the capabilities of a range are the change requests the commits name, their requirements come from messages, spec diffs, a Done when and the Spec:/Proves: lines of changed files, and a commit naming only another repository is listed apart
+0020-ifccm FR-036	check	.github: cd commons/mizan && bun test suite/	mizan-harness-requests.test.ts: the change requests as JSON, the terms as JSON or as a module loaded by the file URL of a path with a space (audit records too), the rungs with homes and the specs are read; a missing file, a module with no terms and a bad format are named; --trace reads --terms
+0020-ifccm FR-037	check	.github: cd commons/mizan && bun test suite/	mizan-harness-requests.test.ts: each requirement's stages, the stage where its chain ends and its spec, terms, code and tests on each rung are given as a table and as JSON, the same bytes twice, with LF, and written to --output
+0020-ifccm FR-038	check	.github: cd commons/mizan && bun test suite/	mizan-harness-requests.test.ts: the view of capabilities by rung is made from the commits between the markers of a document and --check finds no difference after it; the exit status is 1 for a closed capability whose chain stops before its run, 0 for an open one, 2 and 3 for usage and inputs
+0020-ifccm FR-039	review	0032-libraries-by-concern FR-010	kept by the library githost: githost 0001-githost FR-001
+0020-ifccm FR-040	review	0032-libraries-by-concern FR-010	kept by the library githost: githost 0001-githost FR-002
+0020-ifccm FR-041	review	0032-libraries-by-concern FR-010	kept by the library githost: githost 0001-githost FR-003
+0020-ifccm FR-042	review	0032-libraries-by-concern FR-010	kept by the library githost: githost 0001-githost FR-004
+0020-ifccm FR-043	review	0032-libraries-by-concern FR-010	kept by the library githost: githost 0001-githost FR-005
+0020-ifccm FR-044	review	0032-libraries-by-concern FR-010	kept by the library githost: githost 0001-githost FR-006
 0021-ifqs FR-001	none	-	Planned, M3 of issue #10: a principle held by the requirements under it: what runs is graded above what is stated (FR-021); the grade list exists (ifqs-ontology.test.ts)
-0021-ifqs FR-002	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-011
-0021-ifqs FR-003	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-012
+0021-ifqs FR-002	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-011
+0021-ifqs FR-003	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-012
 0021-ifqs FR-004	none	-	Planned, M9 of issue #10: the generator of the public page is built (quality-trust.test.ts, `quality trust`) and the pack is the form an assessor gets on request (quality-pack.test.ts); commons' own page is published with the documentation site by 0022-trust FR-006, which is not yet
-0021-ifqs FR-005	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-013
-0021-ifqs FR-006	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-014
-0021-ifqs FR-007	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-015
-0021-ifqs FR-008	check	.github: cd commons/ts && bun test tests/	ifqs-ontology.test.ts: each crosswalk row has a relation SSSOM has and requirements that exist, and the standards the specification is held to are there
+0021-ifqs FR-005	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-013
+0021-ifqs FR-006	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-014
+0021-ifqs FR-007	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-015
+0021-ifqs FR-008	check	.github: cd commons/ontology && bun test suite/	ifqs-ontology.test.ts: each crosswalk row has a relation SSSOM has and requirements that exist, and the standards the specification is held to are there
 0021-ifqs FR-009	none	-	Planned, M3 of issue #10: the test record is kept as the objective evidence of verification for a harness that claims ifccm:DeviceQuality; the Authority citation is held by mizan/authority-citation
-0021-ifqs FR-010	check	.github: cd commons/ts && bun test tests/	ifqs-ontology.test.ts: the requirement names ca-2, ca-5, ca-7, sa-11 and si-2 by their OSCAL identifiers
-0021-ifqs FR-011	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-016
-0021-ifqs FR-012	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-017
-0021-ifqs FR-013	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-018
-0021-ifqs FR-014	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-019
-0021-ifqs FR-015	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-020
-0021-ifqs FR-016	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-021
-0021-ifqs FR-017	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-022
-0021-ifqs FR-018	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-023
-0021-ifqs FR-019	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-024
-0021-ifqs FR-020	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-025
-0021-ifqs FR-021	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-026
-0021-ifqs FR-022	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-027
-0021-ifqs FR-023	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-028
-0021-ifqs FR-024	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-029
-0021-ifqs FR-025	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-030
-0021-ifqs FR-026	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-031
-0021-ifqs FR-027	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-032
-0021-ifqs FR-028	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-033
-0021-ifqs FR-029	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-034
-0021-ifqs FR-030	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-035
-0021-ifqs FR-031	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-036
-0021-ifqs FR-032	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-037
-0021-ifqs FR-033	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-038
-0021-ifqs FR-034	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-039
+0021-ifqs FR-010	check	.github: cd commons/ontology && bun test suite/	ifqs-ontology.test.ts: the requirement names ca-2, ca-5, ca-7, sa-11 and si-2 by their OSCAL identifiers
+0021-ifqs FR-011	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-016
+0021-ifqs FR-012	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-017
+0021-ifqs FR-013	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-018
+0021-ifqs FR-014	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-019
+0021-ifqs FR-015	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-020
+0021-ifqs FR-016	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-021
+0021-ifqs FR-017	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-022
+0021-ifqs FR-018	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-023
+0021-ifqs FR-019	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-024
+0021-ifqs FR-020	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-025
+0021-ifqs FR-021	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-026
+0021-ifqs FR-022	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-027
+0021-ifqs FR-023	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-028
+0021-ifqs FR-024	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-029
+0021-ifqs FR-025	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-030
+0021-ifqs FR-026	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-031
+0021-ifqs FR-027	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-032
+0021-ifqs FR-028	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-033
+0021-ifqs FR-029	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-034
+0021-ifqs FR-030	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-035
+0021-ifqs FR-031	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-036
+0021-ifqs FR-032	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-037
+0021-ifqs FR-033	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-038
+0021-ifqs FR-034	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-039
 0021-ifqs FR-035	none	-	Planned, M3 of issue #10: the layers check holds rung 9 as an observer once 0016-ladder amends the ladder
-0021-ifqs FR-036	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-040
+0021-ifqs FR-036	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-040
 0021-ifqs FR-037	none	-	The quality console is a harness's own user interface and is not built in commons: its data is the index (`quality index`) and the JSON of the page (`quality trust --audience internal`), each figure with its evidence file (FR-019); Planned, a harness's console
-0021-ifqs FR-038	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-041
-0021-ifqs FR-039	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-042
-0021-ifqs FR-040	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-043
-0021-ifqs FR-041	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-044
-0021-ifqs FR-042	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-045
-0021-ifqs FR-043	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-046
-0021-ifqs FR-044	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-047
-0021-ifqs FR-045	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-048
-0021-ifqs FR-046	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-049
-0021-ifqs FR-047	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-050
-0021-ifqs FR-048	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-051
-0022-trust FR-001	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-052
-0022-trust FR-002	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-053
-0022-trust FR-003	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-054
-0022-trust FR-004	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-055
-0022-trust FR-005	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-056
+0021-ifqs FR-038	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-041
+0021-ifqs FR-039	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-042
+0021-ifqs FR-040	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-043
+0021-ifqs FR-041	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-044
+0021-ifqs FR-042	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-045
+0021-ifqs FR-043	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-046
+0021-ifqs FR-044	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-047
+0021-ifqs FR-045	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-048
+0021-ifqs FR-046	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-049
+0021-ifqs FR-047	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-050
+0021-ifqs FR-048	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-051
+0022-trust FR-001	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-052
+0022-trust FR-002	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-053
+0022-trust FR-003	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-054
+0022-trust FR-004	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-055
+0022-trust FR-005	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-056
 0022-trust FR-006	none	-	Planned, M9 of issue #10: the page is generated; its publication with the documentation site of commons (0011-documentation) waits for a quality branch of commons' own to publish and the lead's docs build
-0022-trust FR-007	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-057
-0022-trust FR-008	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-058
-0022-trust FR-009	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-059
-0022-trust FR-010	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-060
-0022-trust FR-011	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-061
-0022-trust FR-012	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-062
-0022-trust FR-013	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-063
-0022-trust FR-014	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-064
-0022-trust FR-015	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-065
-0022-trust FR-016	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-066
-0022-trust FR-017	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-067
-0022-trust FR-018	review	0032-lifting-libraries FR-010	kept by the library quality: 0001-quality-evidence FR-068
-0026-works-versioning FR-001	check	.github: cd commons/ts && bun test tests/	ifr-ontology.test.ts: the ontology is typed values in commons/ontology/ifr with the namespace ifr#, every file it generates exists and is current (Turtle, OWL, RDF/XML, SHACL, JSON Schema, SKOS, SQL, SSSOM, HTML, the DCAT catalog entry), the generated OWL is read by ROBOT in CI, and a specification naming an ifr: term the ontology lacks is found
-0026-works-versioning FR-002	check	.github: cd commons/ts && bun test tests/	ifr-ontology.test.ts: every class and code-list class has exactly one audit record, the audit's rules find nothing within the 90 days, and the classes of no standard are unaligned with what was examined and the day they were added
-0026-works-versioning FR-003	check	.github: cd commons/ts && bun test tests/	ifr-ontology.test.ts: Work, Expression, Manifestation, Release and Edition are distinct classes joined by hasExpression, hasRelease, hasRendition and realizes, with the domains and ranges the requirement names, and a manifestation has no version property
-0026-works-versioning FR-004	check	.github: cd commons/ts && bun test tests/	ifr-ontology.test.ts: the three code lists have exactly the keys the requirement names, in that order, and each individual is of its class
-0026-works-versioning FR-005	check	.github: cd commons/ts && bun test tests/	ifr-ontology.test.ts: each work kind uses the scheme the requirement names, only Data has a companion scheme (SemVer), and the specification and the ontology agree on the nine kinds
-0026-works-versioning FR-006	check	.github: cd commons/ts && bun test tests/	ifr-ontology.test.ts: the pattern of each scheme accepts the versions it should and rejects the ones it should not, the patterns hold no backslash, NoVersion has none, and every ontology of commons has a version that matches the SemVer pattern
-0026-works-versioning FR-007	check	.github: cd commons/ts && bun test tests/	versions-pure.test.ts: a changed slug, IRI or position is versions/identity-changed, a renamed work is a new work that names the one it replaces (replaces), and a work moved to another folder is the same work
-0026-works-versioning FR-008	check	.github: cd commons/ts && bun test tests/	versions-pure.test.ts: the record decodes as data and never runs (an expression and a second export are refused), an unknown field and a wrong type name the field, a kind's own rules hold (no version on a specification, a snapshot only on data), and the one template writes a layout that reads back
-0026-works-versioning FR-009	check	.github: cd commons/ts && bun test tests/	versions-pure.test.ts: the files of a work are the tracked files under its folder less nested works, its record, CITATION.cff and exclude, and a deleted file is still the work's; versions-git.test.ts: a change only under exclude is no finding in a real repository
-0026-works-versioning FR-010	check	.github: cd commons/ts && bun test tests/	versions-pure.test.ts: Semantic Version precedence with build metadata refused in a record and ignored in a comparison, a pre-release before its release, a version that went back or did not grow is versions/not-grown; versions-git.test.ts: the check on a real branch
-0026-works-versioning FR-011	check	.github: cd commons/ts && bun test tests/	versions-pure.test.ts: the edition's day is its commit's UTC day, its commit is in the head's history, it grows by a later day or a descendant commit on the same day; versions-git.test.ts: bump writes the UTC day of a commit made at 23:30 in New York and its first eight characters
-0026-works-versioning FR-012	check	.github: cd commons/ts && bun test tests/	versions-pure.test.ts: a later snapshot date, another digest and a schema version that grew where the schema's files changed; versions-git.test.ts: bump reads the SHA-256 of the snapshot file
-0026-works-versioning FR-013	check	.github: cd commons/ts && bun test tests/	versions-pure.test.ts: an integer revision that grew, the approval record, versions/approval-missing as a gate-phase finding of the plugin; versions-git.test.ts: bump removes the approval of a new revision until it is recorded, and the check finds it
-0026-works-versioning FR-014	check	.github: cd commons/ts && bun test tests/	versions-pure.test.ts: a specification's record that carries a version is refused and a specification has no version to grow; versions-git.test.ts: bump, tag, cite and notes refuse a specification with exit 2 and write nothing
-0026-works-versioning FR-015	check	.github: cd commons/ts && bun test tests/	ontology-versions.test.ts: owl:versionInfo of Mizan's, ifccm, ifqs, ifr and the packaging ontology is a Semantic Version, owl:versionIRI is the ontology IRI, a slash and that version, the generated Turtle and the DCAT catalog carry them, and rdflib reads the version IRI back where Python is present
+0022-trust FR-007	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-057
+0022-trust FR-008	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-058
+0022-trust FR-009	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-059
+0022-trust FR-010	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-060
+0022-trust FR-011	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-061
+0022-trust FR-012	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-062
+0022-trust FR-013	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-063
+0022-trust FR-014	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-064
+0022-trust FR-015	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-065
+0022-trust FR-016	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-066
+0022-trust FR-017	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-067
+0022-trust FR-018	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-068
+0026-works-versioning FR-001	check	.github: cd commons/ontology && bun test suite/	ifr-ontology.test.ts: the ontology is typed values in commons/ontology/ifr with the namespace ifr#, every file it generates exists and is current (Turtle, OWL, RDF/XML, SHACL, JSON Schema, SKOS, SQL, SSSOM, HTML, the DCAT catalog entry), the generated OWL is read by ROBOT in CI, and a specification naming an ifr: term the ontology lacks is found
+0026-works-versioning FR-002	check	.github: cd commons/ontology && bun test suite/	ifr-ontology.test.ts: every class and code-list class has exactly one audit record, the audit's rules find nothing within the 90 days, and the classes of no standard are unaligned with what was examined and the day they were added
+0026-works-versioning FR-003	check	.github: cd commons/ontology && bun test suite/	ifr-ontology.test.ts: Work, Expression, Manifestation, Release and Edition are distinct classes joined by hasExpression, hasRelease, hasRendition and realizes, with the domains and ranges the requirement names, and a manifestation has no version property
+0026-works-versioning FR-004	check	.github: cd commons/ontology && bun test suite/	ifr-ontology.test.ts: the three code lists have exactly the keys the requirement names, in that order, and each individual is of its class
+0026-works-versioning FR-005	check	.github: cd commons/ontology && bun test suite/	ifr-ontology.test.ts: each work kind uses the scheme the requirement names, only Data has a companion scheme (SemVer), and the specification and the ontology agree on the nine kinds
+0026-works-versioning FR-006	check	.github: cd commons/ontology && bun test suite/	ifr-ontology.test.ts: the pattern of each scheme accepts the versions it should and rejects the ones it should not, the patterns hold no backslash, NoVersion has none, and every ontology of commons has a version that matches the SemVer pattern
+0026-works-versioning FR-007	check	.github: cd commons/mizan && bun test suite/	versions-pure.test.ts: a changed slug, IRI or position is versions/identity-changed, a renamed work is a new work that names the one it replaces (replaces), and a work moved to another folder is the same work
+0026-works-versioning FR-008	check	.github: cd commons/mizan && bun test suite/	versions-pure.test.ts: the record decodes as data and never runs (an expression and a second export are refused), an unknown field and a wrong type name the field, a kind's own rules hold (no version on a specification, a snapshot only on data), and the one template writes a layout that reads back
+0026-works-versioning FR-009	check	.github: cd commons/mizan && bun test suite/	versions-pure.test.ts: the files of a work are the tracked files under its folder less nested works, its record, CITATION.cff and exclude, and a deleted file is still the work's; versions-git.test.ts: a change only under exclude is no finding in a real repository
+0026-works-versioning FR-010	check	.github: cd commons/mizan && bun test suite/	versions-pure.test.ts: Semantic Version precedence with build metadata refused in a record and ignored in a comparison, a pre-release before its release, a version that went back or did not grow is versions/not-grown; versions-git.test.ts: the check on a real branch
+0026-works-versioning FR-011	check	.github: cd commons/mizan && bun test suite/	versions-pure.test.ts: the edition's day is its commit's UTC day, its commit is in the head's history, it grows by a later day or a descendant commit on the same day; versions-git.test.ts: bump writes the UTC day of a commit made at 23:30 in New York and its first eight characters
+0026-works-versioning FR-012	check	.github: cd commons/mizan && bun test suite/	versions-pure.test.ts: a later snapshot date, another digest and a schema version that grew where the schema's files changed; versions-git.test.ts: bump reads the SHA-256 of the snapshot file
+0026-works-versioning FR-013	check	.github: cd commons/mizan && bun test suite/	versions-pure.test.ts: an integer revision that grew, the approval record, versions/approval-missing as a gate-phase finding of the plugin; versions-git.test.ts: bump removes the approval of a new revision until it is recorded, and the check finds it
+0026-works-versioning FR-014	check	.github: cd commons/mizan && bun test suite/	versions-pure.test.ts: a specification's record that carries a version is refused and a specification has no version to grow; versions-git.test.ts: bump, tag, cite and notes refuse a specification with exit 2 and write nothing
+0026-works-versioning FR-015	check	.github: cd commons/ontology && bun test suite/	ontology-versions.test.ts: owl:versionInfo of Mizan's, ifccm, ifqs, ifr and the packaging ontology is a Semantic Version, owl:versionIRI is the ontology IRI, a slash and that version, the generated Turtle and the DCAT catalog carry them, and rdflib reads the version IRI back where Python is present
 0026-works-versioning FR-016	none	-	Planned, owner decision 2026-11-17: the comparison of the terms of two versions of an ontology or a schema with the declared impact is later, like the API-surface diff; the rule of impact is stated here and not yet checked
-0026-works-versioning FR-017	check	.github: cd commons/ts && bun test tests/	versions-pure.test.ts: a ledger entry names the commit and tree of its tag; versions-git.test.ts: tag writes the commit and tree hash in the message, and a tag moved to another commit is versions/tag-moved
-0026-works-versioning FR-018	check	.github: cd commons/ts && bun test tests/	versions-git.test.ts: tag makes the annotated tag <slug>-v<version> at the head with commit, tree, scheme and tier in its message, says where it is not signed, signs with an ssh-keygen key where Git is set to (git tag -v verifies), refuses a tag that exists, an uncommitted record and a version not greater than the last tag
-0026-works-versioning FR-019	check	.github: cd commons/ts && bun test tests/	versions-pure.test.ts: the ledger from tags in the order of the scheme, deterministic as text and JSON whatever the order read; versions-git.test.ts: ledger and ledger --json from real tags, twice the same document, signed or not
-0026-works-versioning FR-020	check	.github: cd commons/ts && bun test tests/	versions-pure.test.ts: versions/ledger-order, versions/tag-moved and versions/tag-removed against an earlier ledger, retired excuses, comparison only within one scheme; versions-git.test.ts: the same with real tags moved, deleted and out of order, and --against FILE
-0026-works-versioning FR-021	check	.github: cd commons/ts && bun test tests/	versions-pure.test.ts: the Impact line is read from a message (the greatest wins, a quoted line is not read); versions-git.test.ts: bump major, minor and patch, and auto from the commits since the last tag that touch the work, exit 2 and no write where none states one
-0026-works-versioning FR-022	check	.github: cd commons/ts && bun test tests/	versions-pure.test.ts: versions/not-grown for a version that went back, versions/record-invalid and versions/scheme-mismatch over two trees; versions-git.test.ts: check against the merge base and against the head's first parent on a real repository, a change with no growth is no finding
-0026-works-versioning FR-023	check	.github: cd commons/ts && bun test tests/	versions-pure.test.ts: the notes' exact Markdown, grouped by impact and ordered by issue number, and the count of commits that closed none; versions-git.test.ts: notes from real commits since the last tag, deterministic
-0026-works-versioning FR-024	check	.github: cd commons/ts && bun test tests/	versions-pure.test.ts: CITATION.cff from the record, deterministic; versions-git.test.ts: cite writes it with the day of the release's commit, --check exits 1 where it differs, and the file is not the work's own
+0026-works-versioning FR-017	check	.github: cd commons/mizan && bun test suite/	versions-pure.test.ts: a ledger entry names the commit and tree of its tag; versions-git.test.ts: tag writes the commit and tree hash in the message, and a tag moved to another commit is versions/tag-moved
+0026-works-versioning FR-018	check	.github: cd commons/mizan && bun test suite/	versions-git.test.ts: tag makes the annotated tag <slug>-v<version> at the head with commit, tree, scheme and tier in its message, says where it is not signed, signs with an ssh-keygen key where Git is set to (git tag -v verifies), refuses a tag that exists, an uncommitted record and a version not greater than the last tag
+0026-works-versioning FR-019	check	.github: cd commons/mizan && bun test suite/	versions-pure.test.ts: the ledger from tags in the order of the scheme, deterministic as text and JSON whatever the order read; versions-git.test.ts: ledger and ledger --json from real tags, twice the same document, signed or not
+0026-works-versioning FR-020	check	.github: cd commons/mizan && bun test suite/	versions-pure.test.ts: versions/ledger-order, versions/tag-moved and versions/tag-removed against an earlier ledger, retired excuses, comparison only within one scheme; versions-git.test.ts: the same with real tags moved, deleted and out of order, and --against FILE
+0026-works-versioning FR-021	check	.github: cd commons/mizan && bun test suite/	versions-pure.test.ts: the Impact line is read from a message (the greatest wins, a quoted line is not read); versions-git.test.ts: bump major, minor and patch, and auto from the commits since the last tag that touch the work, exit 2 and no write where none states one
+0026-works-versioning FR-022	check	.github: cd commons/mizan && bun test suite/	versions-pure.test.ts: versions/not-grown for a version that went back, versions/record-invalid and versions/scheme-mismatch over two trees; versions-git.test.ts: check against the merge base and against the head's first parent on a real repository, a change with no growth is no finding
+0026-works-versioning FR-023	check	.github: cd commons/mizan && bun test suite/	versions-pure.test.ts: the notes' exact Markdown, grouped by impact and ordered by issue number, and the count of commits that closed none; versions-git.test.ts: notes from real commits since the last tag, deterministic
+0026-works-versioning FR-024	check	.github: cd commons/mizan && bun test suite/	versions-pure.test.ts: CITATION.cff from the record, deterministic; versions-git.test.ts: cite writes it with the day of the release's commit, --check exits 1 where it differs, and the file is not the work's own
 0026-works-versioning FR-025	none	-	Planned, owner decision 2026-11-17: the release workflow that generates the SLSA provenance, the SPDX 3 software bill of materials and the checksums of a release is not built; only the recorded fields exist in the ontology
-0026-works-versioning FR-026	check	.github: cd commons/ts && bun test tests/	versions-pure.test.ts: the gate refuses a regulated harness with no releaseTier, no tier judged or a lower tier, and the declaration reads the field compatibly; versions-git.test.ts: tag refuses and makes no tag, and records the tier on the release that passes
-0026-works-versioning FR-027	check	.github: cd commons/ts && bun test tests/	versions-pure.test.ts: the retention period and the tombstone of a retired version are read from the record, and bytes removed before the period ends are versions/retention-early
-0026-works-versioning FR-028	check	.github: cd commons/ts && bun test tests/	versions-pure.test.ts: a retired version, its replacement and archive day are in the ledger; versions-git.test.ts: a tag gone is found against an earlier ledger unless the record's retired names it
-0026-works-versioning FR-029	check	.github: cd commons/ts && bun test tests/	versions-pure.test.ts: the identifier is written into CITATION.cff only where the record carries one; versions-git.test.ts: cite with and without one
+0026-works-versioning FR-026	check	.github: cd commons/mizan && bun test suite/	versions-pure.test.ts: the gate refuses a regulated harness with no releaseTier, no tier judged or a lower tier, and the declaration reads the field compatibly; versions-git.test.ts: tag refuses and makes no tag, and records the tier on the release that passes
+0026-works-versioning FR-027	check	.github: cd commons/mizan && bun test suite/	versions-pure.test.ts: the retention period and the tombstone of a retired version are read from the record, and bytes removed before the period ends are versions/retention-early
+0026-works-versioning FR-028	check	.github: cd commons/mizan && bun test suite/	versions-pure.test.ts: a retired version, its replacement and archive day are in the ledger; versions-git.test.ts: a tag gone is found against an earlier ledger unless the record's retired names it
+0026-works-versioning FR-029	check	.github: cd commons/mizan && bun test suite/	versions-pure.test.ts: the identifier is written into CITATION.cff only where the record carries one; versions-git.test.ts: cite with and without one
 0026-works-versioning FR-030	none	-	Planned, owner decision 2026-11-17: the comparison of a library's exported API surface with the declared impact is later; not built
-0026-works-versioning FR-031	check	.github: cd commons/ts && bun test tests/	versions-git.test.ts: the six commands, exit 0, 1, 2 and 3, not_run with its reason for a directory that is no repository, a base that is not there and a shallow clone, nothing written by a run that did not run, on plain Git, as a program on this runtime (Bun, and Node 26 under node --test)
-0026-works-versioning FR-032	check	.github: cd commons/ts && bun test tests/	versions-pure.test.ts: the rule plugin finds a record that does not decode, a version that does not match its scheme, a specification with a version, a controlled document with no approval and a repeated slug, once, for the anchored specification; mizan/check.ts passes the records under the root to holdHarness
-0026-works-versioning FR-033	check	.github: cd commons/ts && bun test tests/	versions-pure.test.ts, versions-git.test.ts: the tool is strict TypeScript with no any or non-null assertion (tsc, and the lint of the mizan folder in CI), and its tests use real repositories, real annotated tags and an ssh-keygen key where present
-0026-works-versioning FR-034	check	.github: cd commons/ts && bun test tests/	versions-git.test.ts: commons/ts/release.ts and commons/docs/release.ts decode, name ifc-ts 0.4.0 and ifc-docs 0.1.0, equal the package.json versions, and the real tags are in the ledger
-0026-works-versioning FR-035	check	.github: cd commons/ts && bun test tests/	versions-git.test.ts: the check job of .github/workflows/tests.auto.yml runs versions check with the history fetched, and the ledger of this repository finds nothing
+0026-works-versioning FR-031	check	.github: cd commons/mizan && bun test suite/	versions-git.test.ts: the six commands, exit 0, 1, 2 and 3, not_run with its reason for a directory that is no repository, a base that is not there and a shallow clone, nothing written by a run that did not run, on plain Git, as a program on this runtime (Bun, and Node 26 under node --test)
+0026-works-versioning FR-032	check	.github: cd commons/mizan && bun test suite/	versions-pure.test.ts: the rule plugin finds a record that does not decode, a version that does not match its scheme, a specification with a version, a controlled document with no approval and a repeated slug, once, for the anchored specification; mizan/check.ts passes the records under the root to holdHarness
+0026-works-versioning FR-033	check	.github: cd commons/mizan && bun test suite/	versions-pure.test.ts, versions-git.test.ts: the tool is strict TypeScript with no any or non-null assertion (tsc, and the lint of the mizan folder in CI), and its tests use real repositories, real annotated tags and an ssh-keygen key where present
+0026-works-versioning FR-034	check	.github: cd commons/mizan && bun test suite/	versions-git.test.ts: commons/docs/release.ts decodes, names docs and replaces ifc-docs, carries the version of its package, and the retired work ifc-ts has no record, equal the package.json versions, and the real tags are in the ledger
+0026-works-versioning FR-035	check	.github: cd commons/mizan && bun test suite/	versions-git.test.ts: the check job of .github/workflows/tests.auto.yml runs versions check with the history fetched, and the ledger of this repository finds nothing
 0026-works-versioning FR-036	review	0026-works-versioning FR-036	A reviewer checks that a harness that adopts this specification keeps one scheme for each kind of its works and maps its present schemes as the table of the Assumptions says
-0026-works-versioning FR-037	check	.github: cd commons/ts && bun test tests/	versions-pure.test.ts: migratedFrom names the scheme it came from and the first version of the new one, the old tags stay in the ledger and are compared only with each other
-0026-works-versioning FR-038	check	.github: cd commons/ts && bun test tests/	versions-git.test.ts: bump of an edition, of data and of a controlled document needs no impact, tag takes --tier and --declaration, and the ledger reads the commons tags that are not annotated
-0026-works-versioning FR-039	check	.github: cd commons/ts && bun test tests/	mizan-harness-requests.test.ts: paths decode, are written in their place by the template and refused where absolute, with .. or with a backslash; a path inside the work's folder is record-invalid; on a real repository a change only in a named path is versions/not-grown and a bump clears it
-0026-works-versioning FR-040	check	.github: cd commons/ts && bun test tests/	mizan-harness-requests.test.ts: the package exports versions, check, changes and oscal-register, checkVersions gives the findings as data against any revision of a real repository and not_run with its reason for a directory that is no repository or a missing revision, and readWorks finds the records of a folder
+0026-works-versioning FR-037	check	.github: cd commons/mizan && bun test suite/	versions-pure.test.ts: migratedFrom names the scheme it came from and the first version of the new one, the old tags stay in the ledger and are compared only with each other
+0026-works-versioning FR-038	check	.github: cd commons/mizan && bun test suite/	versions-git.test.ts: bump of an edition, of data and of a controlled document needs no impact, tag takes --tier and --declaration, and the ledger reads the commons tags that are not annotated
+0026-works-versioning FR-039	check	.github: cd commons/mizan && bun test suite/	mizan-harness-requests.test.ts: paths decode, are written in their place by the template and refused where absolute, with .. or with a backslash; a path inside the work's folder is record-invalid; on a real repository a change only in a named path is versions/not-grown and a bump clears it
+0026-works-versioning FR-040	check	.github: cd commons/mizan && bun test suite/	mizan-harness-requests.test.ts: the package exports versions, check, changes and oscal-register, checkVersions gives the findings as data against any revision of a real repository and not_run with its reason for a directory that is no repository or a missing revision, and readWorks finds the records of a folder
 0026-works-versioning FR-041	check	.github: cd commons/libraries && bun test suite/	releasing.test.ts: a library changed since its tag is raised by its impact, its importers by a patch, a version not tagged yet is released as it is, one tagged and unchanged is left alone, in the order of the imports
 0027-commons-libraries FR-001	check	.github: bun test ./tests/	commons-libraries.test.ts: every commons/*/spec-kit is in a folder with registry.tsv, enforcement.tsv, mizan.baseline.txt, specs/, a package.json named @intellectual-frontiers/<folder>, an about.ts and a verify script
 0027-commons-libraries FR-002	check	.github: bun test ./tests/	commons-libraries.test.ts: the registry here lists no specification of a library, and a library numbers its own from 0001 with a gapless registry
@@ -506,17 +440,17 @@ requirement	mechanism	by	note
 0027-commons-libraries FR-008	check	.github: bun test ./tests/	commons-libraries.test.ts: a folder no requirement names, a requirement naming no folder, a missing part, a verify without a part, an escaping import and a finding of the specification checker are each found, on a copy, by the real tool
 0027-commons-libraries FR-009	check	.github: bun test ./tests/	commons-libraries.test.ts: docs.config.ts names the spec kit of each library once
 0027-commons-libraries FR-010	check	.github: bun test ./tests/	commons-libraries.test.ts: the libraries are proved by the one workflow ci, which plans and runs verify; a missing one, one that does not plan or run verify, and a library with a workflow of its own are found
-0027-commons-libraries FR-011	check	.github: cd commons/ts && bun test tests/	mizan-libraries.test.ts: the section and its rows are made from the manifests, keep a library's number, number a new one from FR-101 after the greatest, are written again byte for byte, and a hand edit or a specification with no markers is found; this repository's section is what its manifests make
-0027-commons-libraries FR-012	check	.github: cd commons/ts && bun test tests/	mizan-libraries.test.ts: a manifest is read as data (L1 where it declares no level), and an unknown field, a level that is not one of the four, a name that is not lower-case, exports that are not a list, a second export and a value that is not a literal are each an error that names what is wrong
-0027-commons-libraries FR-013	check	.github: cd commons/ts && bun test tests/	mizan-libraries.test.ts: a name, a package name, a version, an export, a verify script, a spec kit and a level in the verify script that disagree with the manifest are each named
-0027-commons-libraries FR-014	check	.github: cd commons/ts && bun test tests/	mizan-libraries.test.ts: a folder with a manifest and its package is registered by the generator alone, as a new requirement and a new row, with no line written by hand
-0027-commons-libraries FR-015	check	.github: cd commons/ts && bun test tests/	mizan-libraries.test.ts: a library is published to GitHub and, where a decision says so, to npm as well; the default, the refusals and the registries in the requirement
-0027-commons-libraries FR-016	check	.github: cd commons/ts && bun test tests/	mizan-libraries.test.ts: a library is published to GitHub and, where a decision says so, to npm as well; the default, the refusals and the registries in the requirement
-0027-commons-libraries FR-017	check	.github: cd commons/ts && bun test tests/	mizan-libraries.test.ts: a library is published to GitHub and, where a decision says so, to npm as well; the default, the refusals and the registries in the requirement
-0027-commons-libraries FR-018	check	.github: cd commons/ts && bun test tests/	mizan-libraries.test.ts: a library is published to GitHub and, where a decision says so, to npm as well; the default, the refusals and the registries in the requirement
-0027-commons-libraries FR-019	check	.github: cd commons/ts && bun test tests/	mizan-affected.test.ts: a dependency by link:, file: or workspace: path is read from the package, with a dependency library, and a registry version is none
-0027-commons-libraries FR-020	check	.github: cd commons/ts && bun test tests/	mizan-affected.test.ts: a library's inputs are its folder, the shared tools, the entries it imports and what they import by relative paths, the files its scripts run, and a whole dependency where an import has no export
-0027-commons-libraries FR-021	check	.github: cd commons/ts && bun test tests/	mizan-affected.test.ts: a changed file affects the libraries that read it and those that depend on them, a shared file every library, and a file no library reads none; the matrix, --files, --all and a base Git does not know
+0027-commons-libraries FR-011	check	.github: cd commons/libraries && bun test suite/	libraries.test.ts: the section and its rows are made from the manifests, keep a library's number, number a new one from FR-101 after the greatest, are written again byte for byte, and a hand edit or a specification with no markers is found; this repository's section is what its manifests make
+0027-commons-libraries FR-012	check	.github: cd commons/libraries && bun test suite/	libraries.test.ts: a manifest is read as data (L1 where it declares no level), and an unknown field, a level that is not one of the four, a name that is not lower-case, exports that are not a list, a second export and a value that is not a literal are each an error that names what is wrong
+0027-commons-libraries FR-013	check	.github: cd commons/libraries && bun test suite/	libraries.test.ts: a name, a package name, a version, an export, a verify script, a spec kit and a level in the verify script that disagree with the manifest are each named
+0027-commons-libraries FR-014	check	.github: cd commons/libraries && bun test suite/	libraries.test.ts: a folder with a manifest and its package is registered by the generator alone, as a new requirement and a new row, with no line written by hand
+0027-commons-libraries FR-015	check	.github: cd commons/libraries && bun test suite/	libraries.test.ts: a library is published to GitHub and, where a decision says so, to npm as well; the default, the refusals and the registries in the requirement
+0027-commons-libraries FR-016	check	.github: cd commons/libraries && bun test suite/	libraries.test.ts: a library is published to GitHub and, where a decision says so, to npm as well; the default, the refusals and the registries in the requirement
+0027-commons-libraries FR-017	check	.github: cd commons/libraries && bun test suite/	libraries.test.ts: a library is published to GitHub and, where a decision says so, to npm as well; the default, the refusals and the registries in the requirement
+0027-commons-libraries FR-018	check	.github: cd commons/libraries && bun test suite/	libraries.test.ts: a library is published to GitHub and, where a decision says so, to npm as well; the default, the refusals and the registries in the requirement
+0027-commons-libraries FR-019	check	.github: cd commons/libraries && bun test suite/	affected.test.ts: a dependency by link:, file: or workspace: path is read from the package, with a dependency library, and a registry version is none
+0027-commons-libraries FR-020	check	.github: cd commons/libraries && bun test suite/	affected.test.ts: a library's inputs are its folder, the shared tools, the entries it imports and what they import by relative paths, the files its scripts run, and a whole dependency where an import has no export
+0027-commons-libraries FR-021	check	.github: cd commons/libraries && bun test suite/	affected.test.ts: a changed file affects the libraries that read it and those that depend on them, a shared file every library, and a file no library reads none; the matrix, --files, --all and a base Git does not know
 0027-commons-libraries FR-022	check	.github: cd commons/libraries && bun test suite/	affected.test.ts: the development loop reads the same planner with the reach of a library's own code (what its sources import and who imports it), and neither a tool its scripts run nor a workflow; plan.test.ts: CI runs the libraries the planner affects
 0027-commons-libraries FR-023	check	.github: cd commons/libraries && bun test suite/	family.test.ts in commons/libraries: the family field and the two sides of a family held together by the check of the manifests
 0027-commons-libraries FR-024	check	.github: cd commons/libraries && bun test suite/	family.test.ts in commons/libraries: the reserved names are found from data with no folder, and a library of the family may hold them
@@ -560,62 +494,62 @@ requirement	mechanism	by	note
 0027-commons-libraries FR-146	check	.github: cd commons/package-managers && bun run verify	commons/package-managers: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-147	check	.github: cd commons/toolchain && bun run verify	commons/toolchain: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-148	check	.github: cd commons/docs && bun run verify	commons/docs: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
-0028-conformance-levels FR-001	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: Mizan's ontology holds the four levels with ranks 0 to 3, each entailing what it and the levels below it add
-0028-conformance-levels FR-002	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: every requirement is added by exactly one level and names a rule or says what else proves it
-0028-conformance-levels FR-003	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: L0 adds a manifest, a verify command and a version
-0028-conformance-levels FR-004	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: L1 adds the eight requirements of the core
-0028-conformance-levels FR-005	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: L2 adds the audit of terms, whose rules are the rules about terms
-0028-conformance-levels FR-006	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: L3 adds change control, release control and the quality records
-0028-conformance-levels FR-007	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: every rule a requirement names exists, and a family names at least one
-0028-conformance-levels FR-008	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: with no level the check has the findings, the baseline and the status of L3
-0028-conformance-levels FR-009	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: below L3 only the rules the level entails run, a rule no requirement names from L1, and none at L0
-0028-conformance-levels FR-010	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: a baseline line of a rule the level does not run is neither stale nor lost where the baseline is written
-0028-conformance-levels FR-011	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: check.ts takes --level and refuses a level that is not one of the four with status 2
-0028-conformance-levels FR-012	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: --all runs the verify of every library a manifest declares from its folder, names each status and exits 1 where one fails, and the check without it runs none
-0028-conformance-levels FR-013	check	.github: cd commons/ts && bun test tests/	mizan-libraries.test.ts: a manifest at L1 or L2 whose verify script does not run the Mizan check with its level is found
-0029-subject-profiles FR-001	check	.github: cd commons/ts && bun test tests/	mizan-profiles.test.ts: the ontology holds the five kinds of subject, a library released as ifr:Library and the rest as ifr:Software, each with a proof and templates
-0029-subject-profiles FR-002	check	.github: cd commons/ts && bun test tests/	mizan-profiles.test.ts: the head names the kind and the audience in any case, the first line counting; a kind or an audience that is none of the ontology's is mizan/profile-unknown
-0029-subject-profiles FR-003	check	.github: cd commons/ts && bun test tests/	mizan-profiles.test.ts: each profile that asks for sections has templates, each in an EARS pattern with a keyword
-0029-subject-profiles FR-004	check	.github: cd commons/ts && bun test tests/	mizan-profiles.test.ts: the profile of a library asks for no section
-0029-subject-profiles FR-005	check	.github: cd commons/ts && bun test tests/	mizan-profiles.test.ts: the profile of a service asks for its contract, contract tests, objectives and quality attributes, and names OpenAPI 3.1, AsyncAPI, JSON Schema, OpenTelemetry and ISO/IEC 25010
-0029-subject-profiles FR-006	check	.github: cd commons/ts && bun test tests/	mizan-profiles.test.ts: the profile of an application asks for its journeys, accessibility and design system, and names WCAG 2.2 and Gherkin with a review row for what a check cannot prove
-0029-subject-profiles FR-007	check	.github: cd commons/ts && bun test tests/	mizan-profiles.test.ts: the profiles of an integration and of a platform ask for the sections their requirement names
-0029-subject-profiles FR-008	check	.github: cd commons/ts && bun test tests/	mizan-profiles.test.ts: the ontology holds the audience models b2b and b2b2c with their sections, proofs, standards and laws
-0029-subject-profiles FR-009	check	.github: cd commons/ts && bun test tests/	mizan-profiles.test.ts: b2b asks for tenant isolation, service level agreements, audit trail, data processing and security controls, naming SOC 2, ISO/IEC 27001 and NIST SP 800-53
-0029-subject-profiles FR-010	check	.github: cd commons/ts && bun test tests/	mizan-profiles.test.ts: b2b2c asks for the five sections of b2b and for actor roles, consumer privacy and consent and data boundaries, citing the GDPR and the CCPA
-0029-subject-profiles FR-011	check	.github: cd commons/ts && bun test tests/	mizan-profiles.test.ts: a missing section is found once, a heading of level two or three that begins with its name is present in any case, and the finding is held by a baseline that only shrinks
-0029-subject-profiles FR-012	check	.github: cd commons/ts && bun test tests/	mizan-profiles.test.ts: a specification that declares nothing, or a library, has no finding; the check runs from L1 and not at L0
-0029-subject-profiles FR-013	check	.github: cd commons/ts && bun test tests/	mizan-profiles.test.ts: every standard of a profile carries its edition or is marked to verify, and no profile names a company
-0029-subject-profiles FR-014	check	.github: cd commons/ts && bun test tests/	mizan-profiles.test.ts: the GDPR and the CCPA are mz:Authority individuals a requirement may cite
-0030-generated-workflows FR-001	check	.github: cd commons/ts && bun test tests/	githost-workflows.test.ts: a file in .github/workflows that is not <name>.auto.yml is found and named, and this repository's folder holds only generated files
-0030-generated-workflows FR-002	check	.github: cd commons/ts && bun test tests/	githost-workflows.test.ts: a job that needs a job that is not there, a step that runs nothing, a workflow with no trigger and a composite step with no shell are findings; the generator writes nothing while there is one
+0028-conformance-levels FR-001	check	.github: cd commons/mizan && bun test suite/	mizan-levels.test.ts: Mizan's ontology holds the four levels with ranks 0 to 3, each entailing what it and the levels below it add
+0028-conformance-levels FR-002	check	.github: cd commons/mizan && bun test suite/	mizan-levels.test.ts: every requirement is added by exactly one level and names a rule or says what else proves it
+0028-conformance-levels FR-003	check	.github: cd commons/mizan && bun test suite/	mizan-levels.test.ts: L0 adds a manifest, a verify command and a version
+0028-conformance-levels FR-004	check	.github: cd commons/mizan && bun test suite/	mizan-levels.test.ts: L1 adds the eight requirements of the core
+0028-conformance-levels FR-005	check	.github: cd commons/mizan && bun test suite/	mizan-levels.test.ts: L2 adds the audit of terms, whose rules are the rules about terms
+0028-conformance-levels FR-006	check	.github: cd commons/mizan && bun test suite/	mizan-levels.test.ts: L3 adds change control, release control and the quality records
+0028-conformance-levels FR-007	check	.github: cd commons/mizan && bun test suite/	mizan-levels.test.ts: every rule a requirement names exists, and a family names at least one
+0028-conformance-levels FR-008	check	.github: cd commons/mizan && bun test suite/	mizan-levels.test.ts: with no level the check has the findings, the baseline and the status of L3
+0028-conformance-levels FR-009	check	.github: cd commons/mizan && bun test suite/	mizan-levels.test.ts: below L3 only the rules the level entails run, a rule no requirement names from L1, and none at L0
+0028-conformance-levels FR-010	check	.github: cd commons/mizan && bun test suite/	mizan-levels.test.ts: a baseline line of a rule the level does not run is neither stale nor lost where the baseline is written
+0028-conformance-levels FR-011	check	.github: cd commons/mizan && bun test suite/	mizan-levels.test.ts: check.ts takes --level and refuses a level that is not one of the four with status 2
+0028-conformance-levels FR-012	check	.github: cd commons/mizan && bun test suite/	mizan-levels.test.ts: --all runs the verify of every library a manifest declares from its folder, names each status and exits 1 where one fails, and the check without it runs none
+0028-conformance-levels FR-013	check	.github: cd commons/libraries && bun test suite/	libraries.test.ts: a manifest at L1 or L2 whose verify script does not run the Mizan check with its level is found
+0029-subject-profiles FR-001	check	.github: cd commons/mizan && bun test suite/	mizan-profiles.test.ts: the ontology holds the five kinds of subject, a library released as ifr:Library and the rest as ifr:Software, each with a proof and templates
+0029-subject-profiles FR-002	check	.github: cd commons/mizan && bun test suite/	mizan-profiles.test.ts: the head names the kind and the audience in any case, the first line counting; a kind or an audience that is none of the ontology's is mizan/profile-unknown
+0029-subject-profiles FR-003	check	.github: cd commons/mizan && bun test suite/	mizan-profiles.test.ts: each profile that asks for sections has templates, each in an EARS pattern with a keyword
+0029-subject-profiles FR-004	check	.github: cd commons/mizan && bun test suite/	mizan-profiles.test.ts: the profile of a library asks for no section
+0029-subject-profiles FR-005	check	.github: cd commons/mizan && bun test suite/	mizan-profiles.test.ts: the profile of a service asks for its contract, contract tests, objectives and quality attributes, and names OpenAPI 3.1, AsyncAPI, JSON Schema, OpenTelemetry and ISO/IEC 25010
+0029-subject-profiles FR-006	check	.github: cd commons/mizan && bun test suite/	mizan-profiles.test.ts: the profile of an application asks for its journeys, accessibility and design system, and names WCAG 2.2 and Gherkin with a review row for what a check cannot prove
+0029-subject-profiles FR-007	check	.github: cd commons/mizan && bun test suite/	mizan-profiles.test.ts: the profiles of an integration and of a platform ask for the sections their requirement names
+0029-subject-profiles FR-008	check	.github: cd commons/mizan && bun test suite/	mizan-profiles.test.ts: the ontology holds the audience models b2b and b2b2c with their sections, proofs, standards and laws
+0029-subject-profiles FR-009	check	.github: cd commons/mizan && bun test suite/	mizan-profiles.test.ts: b2b asks for tenant isolation, service level agreements, audit trail, data processing and security controls, naming SOC 2, ISO/IEC 27001 and NIST SP 800-53
+0029-subject-profiles FR-010	check	.github: cd commons/mizan && bun test suite/	mizan-profiles.test.ts: b2b2c asks for the five sections of b2b and for actor roles, consumer privacy and consent and data boundaries, citing the GDPR and the CCPA
+0029-subject-profiles FR-011	check	.github: cd commons/mizan && bun test suite/	mizan-profiles.test.ts: a missing section is found once, a heading of level two or three that begins with its name is present in any case, and the finding is held by a baseline that only shrinks
+0029-subject-profiles FR-012	check	.github: cd commons/mizan && bun test suite/	mizan-profiles.test.ts: a specification that declares nothing, or a library, has no finding; the check runs from L1 and not at L0
+0029-subject-profiles FR-013	check	.github: cd commons/mizan && bun test suite/	mizan-profiles.test.ts: every standard of a profile carries its edition or is marked to verify, and no profile names a company
+0029-subject-profiles FR-014	check	.github: cd commons/mizan && bun test suite/	mizan-profiles.test.ts: the GDPR and the CCPA are mz:Authority individuals a requirement may cite
+0030-generated-workflows FR-001	check	.github: cd commons/libraries && bun test suite/	workflows.test.ts: a file in .github/workflows that is not <name>.auto.yml is found and named, and this repository's folder holds only generated files
+0030-generated-workflows FR-002	check	.github: cd commons/libraries && bun test suite/	workflows.test.ts: a job that needs a job that is not there, a step that runs nothing, a workflow with no trigger and a composite step with no shell are findings; the generator writes nothing while there is one
 0030-generated-workflows FR-003	check	.github: bun test ./tests/	commons-workflows-schema.test.ts: every generated file is valid by the schema of SchemaStore, read by Python's jsonschema, and a broken workflow is refused by it
-0030-generated-workflows FR-004	check	.github: cd commons/ts && bun test tests/	githost-workflows.test.ts: --check writes nothing and exits 1 naming a file that was edited and a generated file that no workflow makes; the tests workflow runs --check
-0030-generated-workflows FR-005	check	.github: cd commons/ts && bun test tests/	githost-workflows.test.ts: an action with no version or pinned by a branch is a finding, and every action of the model's workflows is one of its table
+0030-generated-workflows FR-004	check	.github: cd commons/libraries && bun test suite/	workflows.test.ts: --check writes nothing and exits 1 naming a file that was edited and a generated file that no workflow makes; the tests workflow runs --check
+0030-generated-workflows FR-005	check	.github: cd commons/libraries && bun test suite/	workflows.test.ts: an action with no version or pinned by a branch is a finding, and every action of the model's workflows is one of its table
 0030-generated-workflows FR-006	check	.github: cd commons/libraries && bun test suite/	workflows.test.ts: the libraries are proved by one generated workflow, ci, made from the manifests; no library has a workflow of its own, and a library with no record of CI has verify on Linux alone
 0030-generated-workflows FR-007	check	.github: cd commons/libraries && bun test suite/	workflows.test.ts and plan.test.ts: the plan and the one result are jobs of the workflow ci
-0030-generated-workflows FR-008	check	.github: cd commons/ts && bun test tests/	githost-workflows.test.ts: the composite action is written with the line that says it is generated, and --check compares it
+0030-generated-workflows FR-008	check	.github: cd commons/libraries && bun test suite/	workflows.test.ts: the composite action is written with the line that says it is generated, and --check compares it
 0030-generated-workflows FR-009	check	.github: cd commons/libraries && bun test suite/	workflows.test.ts: the one release workflow is run by hand from main, plans, proves and packs each library, publishes in the order of the record to npm with provenance (the token only where the repository has it) and to GitHub with its own token, skips a version that is there and tags with the runner; no library has a workflow of its own; a library with npm and no tools/pack.ts is a finding
-0031-install-locations FR-001	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-008
-0031-install-locations FR-002	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-008
-0031-install-locations FR-003	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-008
-0031-install-locations FR-004	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-008
+0031-install-locations FR-001	review	0032-libraries-by-concern FR-010	kept by the library system: 0001-system FR-008
+0031-install-locations FR-002	review	0032-libraries-by-concern FR-010	kept by the library system: 0001-system FR-008
+0031-install-locations FR-003	review	0032-libraries-by-concern FR-010	kept by the library system: 0001-system FR-008
+0031-install-locations FR-004	review	0032-libraries-by-concern FR-010	kept by the library system: 0001-system FR-008
 0031-install-locations FR-005	check	.github: cd commons/ergonex && bun test suite/	ergonex-locations.test.ts: Ergonex's state record, evidence and lock are in the state folder and its tools in the data folder, nothing is written below the user's home, no folder or command file of its own is made; ergonex-onboarding.test.ts: init writes no command file
 0031-install-locations FR-006	check	.github: cd commons/ergonex && bun test suite/	ergonex-install.test.ts: the Windows installer installs its prerequisites with winget by package identifier and downloads nothing; the Linux and macOS one asks Bun's own installer
 0031-install-locations FR-007	none	-	Planned: a WinGet manifest, as typed code made into YAML, comes with the first release that has a binary
-0032-lifting-libraries FR-001	check	.github: bun test ./tests/	commons-lift.test.ts: every folder of commons that is a library is named for its concern and its package is @intellectual-frontiers/<folder>; no folder is named for a language once the lift is complete
-0032-lifting-libraries FR-002	check	.github: bun test ./tests/	commons-lift.test.ts: the table of the map is read, and each library that exists is in it with the modules it takes
-0032-lifting-libraries FR-003	check	.github: bun test ./tests/	commons-lift.test.ts: the dependencies of each library are declared, acyclic and run to a lower layer, and no library imports a file outside its folder by a relative path
-0032-lifting-libraries FR-004	review	0032-lifting-libraries FR-004	a reviewer checks that no library is named for a technical layer
-0032-lifting-libraries FR-005	check	.github: bun test ./tests/release/	tests/release/commons-packages.test.ts: the tarball of each library is installed under node_modules and run on Node 26 with no hook and on Bun
-0032-lifting-libraries FR-006	check	.github: bun test ./tests/release/	tests/release/commons-packages.test.ts: Node 26 runs the compiled files of an installed package; the sources are erasable TypeScript only (tsconfig erasableSyntaxOnly)
-0032-lifting-libraries FR-007	check	.github: bun test ./tests/	commons-lift.test.ts: each lifted library has a suite/ that its verify runs
-0032-lifting-libraries FR-008	review	0032-lifting-libraries FR-008	a reviewer checks that the ontology of a library is in its folder
-0032-lifting-libraries FR-009	check	.github: cd commons/libraries && bun test suite/	workflows.test.ts: the release workflow skips a version already on a registry and tags the version, from main
-0032-lifting-libraries FR-010	review	0032-lifting-libraries FR-010	a reviewer checks that the requirements of a lifted library are in its spec kit and that 0005 points at it
-0032-lifting-libraries FR-011	review	0032-lifting-libraries FR-011	a reviewer checks the importers of erga and stolos
-0032-lifting-libraries FR-012	check	.github: cd commons/ts && bunx tsc -p tsconfig.json	the compiler fails on any importer of a moved path; commons-lift.test.ts finds no import of a moved module's old path
-0032-lifting-libraries FR-013	check	.github: bun test ./tests/release/	tests/release/commons-packages.test.ts: every npm library is packed, its tarball inspected, installed and a consumer of every entry type-checked with tsc 7 under nodenext
+0032-libraries-by-concern FR-001	check	.github: bun test ./tests/	commons-lift.test.ts: every folder of commons that is a library is named for its concern and its package is @intellectual-frontiers/<folder>; no folder is named for a language once the lift is complete
+0032-libraries-by-concern FR-002	check	.github: bun test ./tests/	commons-lift.test.ts: the table of the map is read, and each library that exists is in it with the modules it takes
+0032-libraries-by-concern FR-003	check	.github: bun test ./tests/	commons-lift.test.ts: the dependencies of each library are declared, acyclic and run to a lower layer, and no library imports a file outside its folder by a relative path
+0032-libraries-by-concern FR-004	review	0032-libraries-by-concern FR-004	a reviewer checks that no library is named for a technical layer
+0032-libraries-by-concern FR-005	check	.github: bun test ./tests/release/	tests/release/commons-packages.test.ts: the tarball of each library is installed under node_modules and run on Node 26 with no hook and on Bun
+0032-libraries-by-concern FR-006	check	.github: bun test ./tests/release/	tests/release/commons-packages.test.ts: Node 26 runs the compiled files of an installed package; the sources are erasable TypeScript only (tsconfig erasableSyntaxOnly)
+0032-libraries-by-concern FR-007	check	.github: bun test ./tests/	commons-lift.test.ts: each lifted library has a suite/ that its verify runs
+0032-libraries-by-concern FR-008	review	0032-libraries-by-concern FR-008	a reviewer checks that the ontology of a library is in its folder
+0032-libraries-by-concern FR-009	check	.github: cd commons/libraries && bun test suite/	workflows.test.ts: the release workflow skips a version already on a registry and tags the version, from main
+0032-libraries-by-concern FR-010	review	0032-libraries-by-concern FR-010	a reviewer checks that the requirements of a lifted library are in its spec kit and that 0005 points at it
+0032-libraries-by-concern FR-011	review	0032-libraries-by-concern FR-011	a reviewer checks the importers of erga and stolos
+0032-libraries-by-concern FR-012	check	.github: bun test ./tests/	the compiler fails on any importer of a moved path; commons-lift.test.ts finds no import of a moved module's old path
+0032-libraries-by-concern FR-013	check	.github: bun test ./tests/release/	tests/release/commons-packages.test.ts: every npm library is packed, its tarball inspected, installed and a consumer of every entry type-checked with tsc 7 under nodenext
 0011-documentation FR-028	check	.github: cd commons/docs && bun run verify	twins.test.ts: every block and inline has a Markdown form, links go to twins, the same page gives the same text; the index for a program; a site is written with a .md beside each .html and llms.txt
 0011-documentation FR-029	check	.github: cd commons/docs && bun run verify	layered-lens.test.ts: the layers page, a page for each model, concept and code list, registers and JSON; links resolve and sources are links to lines; the data models are on commons' own site with no finding
 0033-kanon FR-001	review	0033-kanon FR-001	a reviewer checks that the folders of a library that declares kanon are in the three layers by its table (the check of FR-011 holds the imports)
@@ -697,7 +631,7 @@ requirement	mechanism	by	note
 0036-distribution FR-014	review	0036-distribution FR-010	kept by the check of the exact pins (E-HYGIENE-RANGE and E-HYGIENE-DUPLICATE)
 0036-distribution FR-015	check	.github: cd commons/libraries && bun test suite/	metapackages.test.ts: a metapackage is after its members in the release plan
 0036-distribution FR-016	none	-	Planned: the manifest of a workspace does not say which packages are private yet
-0036-distribution FR-017	none	-	Planned: commons/ts and commons/docs are not libraries yet
+0036-distribution FR-017	check	.github: cd commons/docs && bun test suite/	package.test.ts: the package @intellectual-frontiers/docs is a library with the command ifc-docs
 0036-distribution FR-018	check	.github: cd commons/libraries && bun test suite/	metapackages.test.ts: the README has the section and the metapackage table, the guide exists with one entry in docs.config.ts
 0011-documentation FR-036	check	.github: cd commons/docs && bun run verify	newcomer.test.ts: five newcomer questions answered from the site, retired names and history words found, none on commons' site
 0011-documentation FR-037	check	.github: cd commons/docs && bun run verify	highlight.test.ts: each language cut into tokens with its colour for both schemes, the same runs every time, and the diagram drawn into the page

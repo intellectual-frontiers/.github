@@ -5,7 +5,6 @@
     "": {
       "name": "@intellectual-frontiers/headless",
       "devDependencies": {
-        "@intellectual-frontiers/commons": "link:../ts",
         "@intellectual-frontiers/core": "link:../core",
         "@intellectual-frontiers/kanon": "link:../kanon",
         "@intellectual-frontiers/libraries": "link:../libraries",
@@ -21,8 +20,6 @@
     },
   },
   "packages": {
-    "@intellectual-frontiers/commons": ["@intellectual-frontiers/commons@link:../ts", {}],
-
     "@intellectual-frontiers/core": ["@intellectual-frontiers/core@link:../core", {}],
 
     "@intellectual-frontiers/kanon": ["@intellectual-frontiers/kanon@link:../kanon", {}],

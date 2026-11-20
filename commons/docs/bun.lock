@@ -10,7 +10,6 @@
         "typescript": "7.1.0-beta",
       },
       "devDependencies": {
-        "@intellectual-frontiers/commons": "link:../ts",
         "@intellectual-frontiers/core": "link:../core",
         "@intellectual-frontiers/libraries": "link:../libraries",
         "@intellectual-frontiers/mizan": "link:../mizan",
@@ -21,8 +20,6 @@
     },
   },
   "packages": {
-    "@intellectual-frontiers/commons": ["@intellectual-frontiers/commons@link:../ts", {}],
-
     "@intellectual-frontiers/core": ["@intellectual-frontiers/core@link:../core", {}],
 
     "@intellectual-frontiers/libraries": ["@intellectual-frontiers/libraries@link:../libraries", {}],

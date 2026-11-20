@@ -117,7 +117,7 @@ export const pinBun = PinnedDownload.make(term(PMID, "pin-bun"), {
   pinKey: "BUN",
   version: "1.4.4",
   note: en(
-    "Checksums from the release's SHASUMS256.txt. IFC TypeScript's CI takes its version and its address from here (commons 0005-typescript-runtime FR-026).",
+    "Checksums from the release's SHASUMS256.txt. IFC TypeScript's CI takes its version and its address from here (commons 0005-typescript-practice FR-026).",
   ),
 });
 

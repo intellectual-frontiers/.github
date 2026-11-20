@@ -4,7 +4,7 @@
  *
  * @module
  */
-import type { LayeredModel as DocsLayeredModel } from "@intellectual-frontiers/commons/docs";
+import type { LayeredModel as DocsLayeredModel } from "@intellectual-frontiers/docs";
 import { assert, assertEquals, proves } from "../commons/test/src/test.ts";
 import { droppedFindings } from "../commons/kanon/src/mod.ts";
 import { ergonexProgram } from "../commons/ergonex/src/commands/program.ts";

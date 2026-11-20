@@ -8,3 +8,4 @@ requirement	mechanism	by	note
 0001-core FR-005	check	.github: cd commons/core && bun test suite/	graph.test.ts: random acyclic graphs ordered and scheduled with random outcomes and job limits, cycles, a node that rejects
 0001-core FR-006	check	.github: cd commons/core && bun test suite/	objects.test.ts: compact leaves out undefined fields, its type exact under exactOptionalPropertyTypes
 0001-core FR-007	check	.github: cd commons/core && bun run verify	the package is built, inspected and packed by tools/pack.ts; tests/commons-packages.test.ts installs the tarball and runs it on Node 26 and Bun and type-checks a consumer
+0001-core FR-008	check	.github: cd commons/core && bun test suite/	about.test.ts: an About value of every shape is accepted by the compiler and one with an unknown field or a missing title is refused (type-level), and the entry exports no value

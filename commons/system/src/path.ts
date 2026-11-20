@@ -1,6 +1,6 @@
 // Spec: 0001-system FR-003
 /**
- * Paths, on `node:path` (commons 0005-typescript-runtime FR-021): the platform's own rules, and `posix` and `win32` for the other's, with
+ * Paths, on `node:path` (commons 0001-system FR-003): the platform's own rules, and `posix` and `win32` for the other's, with
  * `file:` URLs both ways. Taken from Stolos's `src/archon/core/path.ts`, which already used `node:path`; it replaces `@std/path`.
  *
  * @example

@@ -32,7 +32,7 @@ import type { Result } from "@intellectual-frontiers/core";
 import { assert, assertEquals, fail, proves } from "@intellectual-frontiers/test";
 
 const FR = "0001-system FR-017";
-const PROPERTY = "0005-typescript-runtime FR-014";
+const PROPERTY = "0001-core FR-004";
 
 const ch = (...codes: number[]): string => String.fromCharCode(...codes);
 const NUL = ch(0);

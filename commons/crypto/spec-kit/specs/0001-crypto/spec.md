@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** The digests, signatures and envelopes that the compliance, the telemetry and the harnesses of commons sign and check with, in a package of its own that depends on `core` and `formats`: SHA-256, MD5, SHA-512 crypt, UUIDs, AWS Signature Version 4, CMS encrypted content, in-toto statements in DSSE envelopes, COSE keys and WebAuthn for a relying party, all in pure code on Web Crypto with no outside package. It is the third library lifted out of `commons/ts` (commons 0032-lifting-libraries).
+**Input:** The digests, signatures and envelopes that the compliance, the telemetry and the harnesses of commons sign and check with, in a package of its own that depends on `core` and `formats`: SHA-256, MD5, SHA-512 crypt, UUIDs, AWS Signature Version 4, CMS encrypted content, in-toto statements in DSSE envelopes, COSE keys and WebAuthn for a relying party, all in pure code on Web Crypto with no outside package. It is the third library lifted out of `commons/ts` (commons 0032-libraries-by-concern).
 
 ## Digests
 
@@ -29,7 +29,7 @@
 
 ## The package
 
-- **FR-009**: Crypto MUST depend on `core` and `formats` alone, MUST import nothing outside its own files, MUST name no host global, and MUST be published as compiled modules with their declarations as `@intellectual-frontiers/crypto`, with an entry for the package (`.`) and one for each of its modules (`./sha256`, `./dsse`, ...), each with its `types` (commons 0032-lifting-libraries FR-005, FR-013), so that it runs on Bun, on Node 26 and in a browser with no build step.
+- **FR-009**: Crypto MUST depend on `core` and `formats` alone, MUST import nothing outside its own files, MUST name no host global, and MUST be published as compiled modules with their declarations as `@intellectual-frontiers/crypto`, with an entry for the package (`.`) and one for each of its modules (`./sha256`, `./dsse`, ...), each with its `types` (commons 0032-libraries-by-concern FR-005, FR-013), so that it runs on Bun, on Node 26 and in a browser with no build step.
 
 ## Acceptance scenarios
 

@@ -1,5 +1,5 @@
 /**
- * Tests of `proc.spawn` (commons 0005-typescript-runtime FR-052) and of `ppid`, `build.target`, `unrefTimer` and `selfCommand` (FR-053):
+ * Tests of `proc.spawn` (commons 0001-system FR-010) and of `ppid`, `build.target`, `unrefTimer` and `selfCommand` (FR-053):
  * a program fed a web stream and read as one, its status and signal, `kill`, the abort signal and `await using` with SIGTERM then
  * SIGKILL, `NotFound` at once, `unref` that lets this process end, the hook that traces a program; the target triples, a
  * timer that never keeps a process alive, and the argument vector that runs a program again, on each runtime and from a compiled binary.

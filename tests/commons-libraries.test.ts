@@ -225,10 +225,10 @@ proves([`${SPEC} FR-004`], "a library file that imports by a relative path outsi
   using c = copyOf();
   writeFileSync(`${c.repo}/commons/data/engine/inside.ts`, 'import "./api.ts";\nimport "../governance/api.ts";\n');
   assertEquals(libraryFindings(c.repo), []);
-  writeFileSync(`${c.repo}/commons/data/engine/outside.ts`, 'import "../../ts/kernel/mod.ts";\n');
+  writeFileSync(`${c.repo}/commons/data/engine/outside.ts`, 'import "../../core/src/mod.ts";\n');
   assertStringIncludes(
     libraryFindings(c.repo).join("\n"),
-    "commons/data/engine/outside.ts imports ../../ts/kernel/mod.ts, outside commons/data",
+    "commons/data/engine/outside.ts imports ../../core/src/mod.ts, outside commons/data",
   );
 });
 

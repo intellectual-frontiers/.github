@@ -10,36 +10,36 @@
 
 ## The Trust page
 
-- **FR-001**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-052), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-002**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-053), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-003**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-054), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-004**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-055), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-005**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-056), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
+- **FR-001**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-052), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-002**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-053), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-003**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-054), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-004**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-055), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-005**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-056), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
 - **FR-006**: The page MUST be published with the documentation site (0011-documentation) of the harness it describes, for a harness whose source is public.
 
 ## Audiences and redaction
 
-- **FR-007**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-057), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-008**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-058), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-009**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-059), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
+- **FR-007**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-057), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-008**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-058), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-009**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-059), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
 
 ## The assessor pack
 
-- **FR-010**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-060), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-011**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-061), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-012**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-062), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-013**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-063), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
+- **FR-010**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-060), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-011**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-061), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-012**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-062), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-013**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-063), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
 
 ## Offline verification
 
-- **FR-014**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-064), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-015**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-065), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-016**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-066), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
+- **FR-014**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-064), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-015**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-065), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-016**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-066), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
 
 ## What a pack cannot redact
 
-- **FR-017**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-067), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
-- **FR-018**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-068), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT be specified here.
+- **FR-017**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-067), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
+- **FR-018**: The Trust page and the assessor pack requirement MUST be taken from the library `quality` (`@intellectual-frontiers/quality`, quality 0001-quality-evidence FR-068), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT be specified here.
 
 ## Acceptance scenarios
 

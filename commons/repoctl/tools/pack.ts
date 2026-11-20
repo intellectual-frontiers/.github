@@ -1,6 +1,6 @@
 // Spec: 0006-repoctl-surfaces FR-006
 /**
- * The package that is published (commons repoctl 0006-repoctl-surfaces FR-006, 0010-repoctl-host FR-003, commons 0027-commons-libraries FR-015, FR-016, commons 0032-lifting-libraries FR-005, FR-013): `bun tools/pack.ts` packs the command and the library API of
+ * The package that is published (commons repoctl 0006-repoctl-surfaces FR-006, 0010-repoctl-host FR-003, commons 0027-commons-libraries FR-015, FR-016, commons 0032-libraries-by-concern FR-005, FR-013): `bun tools/pack.ts` packs the command and the library API of
  * Repoctl through the packer of commons. The command is one bundled file with commons' kernel, runtime and the libraries it calls inside it (`bin: repoctl`); the library API is the entry `.` of the package, one bundled file of code with
  * the declarations of what the entry reaches (`types`). The `package.json` of this folder stays private, so that nothing is published from it by hand.
  *

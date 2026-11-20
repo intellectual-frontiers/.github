@@ -240,9 +240,12 @@ proves(
     );
     assertEquals(Object.keys(pm).length, packagingTerms.length);
     const by = (basis: string) => packagingTerms.filter((t) => t.values.basis.iri === basis).length;
-    assertEquals([by(bases.Specializes.iri), by(bases.Maps.iri), by(bases.Unaligned.iri)], [5, 5, 51]);
+    assertEquals([by(bases.Specializes.iri), by(bases.Maps.iri), by(bases.Unaligned.iri)], [5, 9, 52]);
   },
 );
+
+/** The namespaces of the standards the packaging ontology's mappings name: schema.org, DCAT 3, the Package URL specification and SKOS. */
+const STANDARD_NAMESPACES = ["https://schema.org/", "http://www.w3.org/ns/dcat#", "https://github.com/package-url/purl-spec#", "http://www.w3.org/2004/02/skos/core#"];
 
 proves(
   ["0012-ontology FR-014"],
@@ -253,7 +256,10 @@ proves(
         assert((t.values.justification ?? "").includes("Candidates to examine"), `${t.iri} names its candidates`);
         assertEquals(t.values.addedOn, AUDITED_ON);
       } else {
-        assert((t.values.standardTerm ?? "").startsWith("https://schema.org/"), `${t.iri} names a schema.org term`);
+        assert(
+          STANDARD_NAMESPACES.some((ns) => (t.values.standardTerm ?? "").startsWith(ns)),
+          `${t.iri} names a term of schema.org, DCAT, the Package URL specification or SKOS`,
+        );
         assert(t.values.mappingRelation !== undefined, `${t.iri} says its relation`);
       }
     }
@@ -302,7 +308,7 @@ proves(
 );
 
 proves(["0012-ontology FR-015"], "a code list of 5,000 entries type-checks with a key type of its entries, within 30 seconds", async () => {
-  const root = resolve(dirname(fromFileUrl(import.meta.url)), "..").replaceAll("\\", "/"); // forward slashes: the path is written into a TypeScript string
+  const root = resolve(dirname(fromFileUrl(import.meta.url)), "..", "..", "..").replaceAll("\\", "/"); // forward slashes: the path is written into a TypeScript string
   const tsc = `${root}/node_modules/typescript/bin/tsc`;
   const dir = makeTempDirSync({ prefix: "mizan-codes-" });
   try {
@@ -313,7 +319,7 @@ proves(["0012-ontology FR-015"], "a code list of 5,000 entries type-checks with 
     writeTextFileSync(
       `${dir}/list.ts`,
       [
-        `import { classSchema, codes, en, namespace, one, optional, range, rdfs, skos, vocabulary } from "${root}/../rdf/src/mod.ts";`,
+        `import { classSchema, codes, en, namespace, one, optional, range, rdfs, skos, vocabulary } from "${root}/commons/rdf/src/mod.ts";`,
         `const NS = namespace("t", "https://example.org/t#");`,
         `const t = vocabulary(NS, { Code: "owl:Class" });`,
         `const CODE = { label: one(rdfs.label, range.langString), definition: optional(skos.definition, range.langString) } as const;`,

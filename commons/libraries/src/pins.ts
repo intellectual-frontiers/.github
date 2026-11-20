@@ -1,5 +1,5 @@
 /**
- * Commons' pins as the tools read them (commons 0005-typescript-runtime FR-026, 0002-packaging FR-019): the `KEY=value` lines of `pins.auto.env`, the suffix of a platform's
+ * Commons' pins as the tools read them (commons 0005-typescript-practice FR-026, 0002-packaging FR-019): the `KEY=value` lines of `pins.auto.env`, the suffix of a platform's
  * variables, and the download of a pin on a platform (its version, address, SHA-256, format and folder), all taken from the file and written nowhere else.
  *
  * Spec: 0001-libraries FR-006

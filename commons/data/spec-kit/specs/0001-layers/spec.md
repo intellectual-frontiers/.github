@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** data
 
-**Input:** IFC data is three layers and an engine that extends them. Governance describes a business domain and what must be true of its data, and knows no database. A logical schema is made from governance and knows the kind of database (relational), not an engine. A physical schema is made from a logical schema for one engine (PostgreSQL, SQLite or DuckDB) and is the only layer that knows one. Each layer imports only the layers below it and the engine, an extension imports only the public surfaces of the layers it extends, and a check of the library holds every import to that table, because the compiler cannot: an import by package name is invisible to the layers check of commons' kernel (commons 0005-typescript-runtime FR-077).
+**Input:** IFC data is three layers and an engine that extends them. Governance describes a business domain and what must be true of its data, and knows no database. A logical schema is made from governance and knows the kind of database (relational), not an engine. A physical schema is made from a logical schema for one engine (PostgreSQL, SQLite or DuckDB) and is the only layer that knows one. Each layer imports only the layers below it and the engine, an extension imports only the public surfaces of the layers it extends, and a check of the library holds every import to that table, because the compiler cannot: an import by package name is invisible to the layers check of commons' kernel (commons 0005-typescript-practice FR-077).
 
 ## The layers
 
@@ -13,7 +13,7 @@
 - **FR-002**: A logical schema (layer 2) MUST be made from governance by a projection and MUST know the kind of database (relational) but no engine; it MUST import only governance, the engine and the kernel.
 - **FR-003**: A physical schema (layer 3) MUST be made from a logical schema, a dialect and a target, and MUST be the only layer that knows an engine; it MUST import only the logical schema, governance, the engine and the kernel, and never an extension.
 - **FR-004**: Imports MUST point one way: the engine imports nothing of the library; governance imports the engine; the logical schema imports governance and the engine; the physical schema imports the logical schema, governance and the engine; the lifecycle (what changes a database from one physical schema to the next) imports the physical and logical schemas, governance and the engine; a dialect imports the physical and logical schemas, governance and the engine; an extension of SQL imports the lifecycle as well imports the physical and logical schemas, governance and the engine; a model and an extension that needs no database import governance and the engine, and a model may also import the models it requires (0028-modules FR-006), the imports among models making no cycle; and the command line imports any of them. An import that climbs, or reaches around, MUST be a finding.
-- **FR-005**: Layers 1 to 3 and the engine MUST import no package but the kernel (`@intellectual-frontiers/commons/ts/kernel`) and this library's own, so that nothing of a host, a driver or an engine reaches them.
+- **FR-005**: Layers 1 to 3 and the engine MUST import no package but Core (`@intellectual-frontiers/core`) and this library's own, so that nothing of a host, a driver or an engine reaches them.
 
 ## Identity and flow
 

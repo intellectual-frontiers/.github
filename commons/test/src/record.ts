@@ -6,7 +6,7 @@
  * that one that never ends is closed as `cancelled` (`closeOrphans`), the installation record as a resource (`installationFromEnv`,
  * which refuses a role that names a person, and `isPersonAttribute`), and the OTLP JSON lines a test process appends to
  * `IFC_TEST_RECORD` (`recordLine`, `decodeLines`). `./test-report.ts` reads a run's record and renders it. A test's steps (commons
- * 0005-typescript-runtime FR-060) are its `steps`, named by its span's `ifc.test.steps`, each a `test step` span whose parent is the
+ * 0001-test FR-002) are its `steps`, named by its span's `ifc.test.steps`, each a `test step` span whose parent is the
  * test's span or the step it is in (`testStepSpan`).
  *
  * @example
@@ -59,7 +59,7 @@ export function isRisk(text: string): text is Risk {
   return text === "high" || text === "not-high";
 }
 
-/** What became of a step (0005-typescript-runtime FR-060): it passed, it failed, or its runner did not run it. */
+/** What became of a step (0001-test FR-002): it passed, it failed, or its runner did not run it. */
 export type StepOutcome = "pass" | "fail" | "skip";
 
 /** Whether a text is a step's outcome. */
@@ -67,7 +67,7 @@ export function isStepOutcome(text: string): text is StepOutcome {
   return text === "pass" || text === "fail" || text === "skip";
 }
 
-/** One step of a test as it ran (0005-typescript-runtime FR-060): its name, times, outcome, a failure's message, and its own steps. */
+/** One step of a test as it ran (0001-test FR-002): its name, times, outcome, a failure's message, and its own steps. */
 export type TestStep = {
   readonly name: string;
   readonly start: bigint;
@@ -98,7 +98,7 @@ export type TestCase = {
   readonly actual?: string;
   /** From 1. */
   readonly attempt: number;
-  /** Its steps, in the order they ended; absent where it has none (0005-typescript-runtime FR-060). */
+  /** Its steps, in the order they ended; absent where it has none (0001-test FR-002). */
   readonly steps?: readonly TestStep[];
 };
 
@@ -129,7 +129,7 @@ export const TEST_SCOPE: Scope = { name: "ifc-test", version: "1" };
 /** The name of a test's span. */
 export const TEST_SPAN = "test";
 
-/** The name of a step's span, a child of its test's span or of the step it is in (0005-typescript-runtime FR-060). */
+/** The name of a step's span, a child of its test's span or of the step it is in (0001-test FR-002). */
 export const STEP_SPAN = "test step";
 
 /** The name of a run's span. */
@@ -313,7 +313,7 @@ export function stepPaths(steps: readonly TestStep[], within: readonly string[] 
 }
 
 /**
- * A step as its `test step` span (0005-typescript-runtime FR-060): a child of `ctx.parentSpanId` (its test's span or the step it is in),
+ * A step as its `test step` span (0001-test FR-002): a child of `ctx.parentSpanId` (its test's span or the step it is in),
  * with its test's id and file, its name, outcome and a failure's message, and an error status where it failed.
  */
 export function testStepSpan(step: TestStep, test: Pick<TestCase, "id" | "file" | "name">, ctx: TestContext): SpanData {

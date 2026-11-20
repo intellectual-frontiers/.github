@@ -31,7 +31,7 @@ import { assert, assertEquals, assertThrows, proves } from "@intellectual-fronti
 
 const DER = "0001-formats FR-009";
 const B64 = "0001-formats FR-008";
-const LAWS = "0005-typescript-runtime FR-014";
+const LAWS = "0001-core FR-004";
 
 const content = (bytes: Uint8Array): Uint8Array => {
   const t = readTlv(bytes);

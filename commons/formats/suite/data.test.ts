@@ -18,7 +18,7 @@ const TOML = "0001-formats FR-003";
 const CSV = "0001-formats FR-005";
 const MEDIA = "0001-formats FR-018";
 const YAML = "0001-formats FR-002";
-const LAWS = "0005-typescript-runtime FR-014";
+const LAWS = "0001-core FR-004";
 
 const toml = (text: string): TomlTable => {
   const r = parseToml(text);

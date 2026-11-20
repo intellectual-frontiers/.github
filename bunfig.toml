@@ -1,12 +1,12 @@
-# IFC TypeScript's tools, all from Bun (commons 0005-typescript-runtime FR-026 to FR-028).
+# The tools of the whole repository, all from Bun (commons 0005-typescript-practice FR-026 to FR-028).
 
 [fmt]
 printWidth = 140
 
 [lint]
 typeAware = true
-# IFC TypeScript's own lint plugin (FR-061), with commons' own lists.
-plugins = ["../lint/src/plugin.ts"]
+# The lint plugin of the library `lint`, with commons' own lists.
+plugins = ["./commons/lint/src/plugin.ts"]
 
 [lint.rules]
 # Algebraic type safety: no escape from the type system, every alternative handled, every promise awaited (FR-028).
@@ -21,18 +21,18 @@ plugins = ["../lint/src/plugin.ts"]
 "typescript/no-unnecessary-type-assertion" = "error"
 "typescript/ban-ts-comment" = ["error", { "ts-expect-error" = "allow-with-description", "minimumDescriptionLength" = 10 }]
 "eslint/eqeqeq" = "error"
-# The rules of the plugin (FR-061), as commons applies them to itself.
+# The rules of the plugin, as commons applies them to itself.
 "ifc/no-vendor-api" = "error"
 "ifc/no-registry-import" = "error"
-"ifc/import-boundary" = ["error", { roots = ["kernel"] }]
 "ifc/module-doc" = "error"
 "ifc/switch-absurd" = "error"
 "ifc/terminal-writers" = [
   "error",
   { allow = [
-    { files = "../telemetry/src/host/console.ts", reason = "the renderer, the one writer for a person (0001-telemetry FR-024)" },
-    { files = "../system/src/tty.ts", reason = "the terminal's own streams, for its size and raw mode" },
-    { files = "../system/src/stdio.ts", reason = "the process's standard streams, for what programs read (FR-054)" },
-    { files = "tools/**", reason = "command-line tools print their results" },
+    { files = "commons/telemetry/src/host/console.ts", reason = "the renderer, the one writer for a person (0001-telemetry FR-024)" },
+    { files = "commons/system/src/tty.ts", reason = "the terminal's own streams, for its size and raw mode" },
+    { files = "commons/system/src/stdio.ts", reason = "the process's standard streams, for what programs read (0001-system FR-019)" },
+    { files = "commons/tools/**", reason = "command-line tools print their results" },
+    { files = "tests/**", reason = "a test prints what it runs" },
   ] },
 ]

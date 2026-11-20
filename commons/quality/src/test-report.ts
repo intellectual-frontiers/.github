@@ -199,7 +199,7 @@ function compareTests(a: RunTest, b: RunTest): number {
   );
 }
 
-/** The steps whose span's parent is `parent`, each with its own, in the order they ended (0005-typescript-runtime FR-060). */
+/** The steps whose span's parent is `parent`, each with its own, in the order they ended (0001-test FR-002). */
 function stepsUnder(parent: string, children: ReadonlyMap<string, readonly SpanData[]>): readonly TestStep[] {
   return (children.get(parent) ?? [])
     .flatMap((s): TestStep[] => {
@@ -484,7 +484,7 @@ export function readRecord(input: unknown): Result<TestRun, RecordError> {
 /**
  * The requirements a run is held to (FR-003): one id per line (`0008-test-evidence FR-001`; `#` begins a comment), or a spec-kit
  * enforcement register, whose rows (`requirement`, a tab, `mechanism`, ...) of mechanism `check` are taken. `spec` keeps only the ids
- * that begin with it (`0005-typescript-runtime`). Each id once, in the order given.
+ * that begin with it (`0005-typescript-practice`). Each id once, in the order given.
  */
 export function parseRequirementList(input: string, spec?: string): readonly string[] {
   const out = new Set<string>();
@@ -576,7 +576,7 @@ function diagnostic(t: RunTest, indent: string): string {
   return `${indent}---\n${yaml}\n${indent}...\n`;
 }
 
-/** A test's steps as a TAP subtest at `indent`, before the test's own line (0005-typescript-runtime FR-060). */
+/** A test's steps as a TAP subtest at `indent`, before the test's own line (0001-test FR-002). */
 function tapSteps(steps: readonly TestStep[], indent: string, title: string): string {
   let out = `${indent}# Subtest: ${tapDescription(title)}\n${indent}1..${steps.length}\n`;
   for (const [i, s] of steps.entries()) {
@@ -602,7 +602,7 @@ function tapSteps(steps: readonly TestStep[], indent: string, title: string): st
 /**
  * The run as TAP version 14 (FR-005): a plan, one subtest per runtime and file, each test `ok` or `not ok` numbered, `# SKIP` and
  * `# TODO` with their reasons, and a YAML diagnostic block for a failure or a cancellation; the counts as closing comments. A test's
- * steps are a subtest of their own before its line (0005-typescript-runtime FR-060).
+ * steps are a subtest of their own before its line (0001-test FR-002).
  */
 export function tap14(run: TestRun): string {
   const gs = groups(run);
@@ -677,7 +677,7 @@ function failureText(t: RunTest): string {
     .join("\n");
 }
 
-/** Each step of a test as `<outcome> <path>`, for JUnit's properties, which nest no test case (0005-typescript-runtime FR-060). */
+/** Each step of a test as `<outcome> <path>`, for JUnit's properties, which nest no test case (0001-test FR-002). */
 function stepLines(steps: readonly TestStep[], within: readonly string[] = []): string[] {
   return steps.flatMap((s) => [...stepLines(s.steps ?? [], [...within, s.name]), `${s.outcome} ${[...within, s.name].join(" > ")}`]);
 }

@@ -7,9 +7,9 @@
  * not run (the strict rules on plain Git, with no host client or without `--strict`; the commit rules without a `--range`) a case that is `not_run` with its reason, never a pass. The record is
  * written to `test-results/changes-<trace id>.otlp.json` of the repository, and kept on the `quality` branch with `--keep-record`.
  *
- *     bun commons/ts/tools/changes.ts [--repo DIR] [--strict] [--range A..B] ...    every flag of `commons/libraries/src/changes.ts`
- *     bun commons/ts/tools/changes.ts --record-dir DIR                              where the record is written (the repository's `test-results` by default)
- *     bun commons/ts/tools/changes.ts --keep-record                                 also keep it as evidence on the `quality` branch (signed where Git is set to sign)
+ *     bun commons/libraries/tools/changes.ts [--repo DIR] [--strict] [--range A..B] ...    every flag of `commons/libraries/src/changes.ts`
+ *     bun commons/libraries/tools/changes.ts --record-dir DIR                              where the record is written (the repository's `test-results` by default)
+ *     bun commons/libraries/tools/changes.ts --keep-record                                 also keep it as evidence on the `quality` branch (signed where Git is set to sign)
  *
  * @module
  */

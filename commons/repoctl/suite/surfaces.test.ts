@@ -156,5 +156,5 @@ proves(["0006-repoctl-surfaces FR-006"], "the root package has the script and th
   assertEquals(pkg.bin["repoctl"], "./commons/repoctl/bin/repoctl.mjs");
   for (const f of ["commons/repoctl/bin/repoctl.mjs", "commons/repoctl/bin/main.ts", "commons/repoctl/tools/pack.ts"]) assert(await fs.exists(path.join(CHECKOUT, f)), f);
   assertStringIncludes(await fs.readTextFile(path.join(CHECKOUT, "commons/repoctl/tools/pack.ts")), 'bin: { repoctl: "bin/main.ts" }');
-  assertStringIncludes(await fs.readTextFile(path.join(CHECKOUT, "commons/repoctl/bin/repoctl.mjs")), "ts/node");
+  assertStringIncludes(await fs.readTextFile(path.join(CHECKOUT, "commons/repoctl/bin/repoctl.mjs")), 'from "../src/repoctl.ts"');
 });

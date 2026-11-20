@@ -23,7 +23,6 @@
     "pack": "bun tools/pack.ts"
   },
   "devDependencies": {
-    "@intellectual-frontiers/commons": "link:../ts",
     "@intellectual-frontiers/core": "link:../core",
     "@intellectual-frontiers/libraries": "link:../libraries",
     "@intellectual-frontiers/mizan": "link:../mizan",

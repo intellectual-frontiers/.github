@@ -2,7 +2,7 @@
 commons/build/
 # the documentation site commons/docs builds (commons 0011-documentation FR-020); it is published, never committed
 _site/
-# what `bun install` at the root writes; the root package.json is what a repository depends on (commons 0005-typescript-runtime FR-029)
+# what `bun install` at the root writes; the root package.json is the workspace of the development loop
 /node_modules/
 # the libraries of commons linked by name for development (bun run dev:check makes them; commons 0001-libraries FR-011)
 /commons/node_modules/

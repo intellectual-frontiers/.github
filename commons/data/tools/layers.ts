@@ -2,7 +2,7 @@
 /**
  * The layers check of the library (commons data 0001-layers): which unit each file is in, which units it may import, and a finding for every import that
  * does not follow the table. It reads every import, relative or by package name, because an import by package name is invisible to the kernel's layers
- * check, which reads relative imports only (commons 0005-typescript-runtime FR-077); it resolves the library's own package name through `exports`, as Node
+ * check, which reads relative imports only (commons 0005-typescript-practice FR-077); it resolves the library's own package name through `exports`, as Node
  * and the compiler do.
  *
  * @remarks
@@ -18,9 +18,7 @@ import * as trace from "@intellectual-frontiers/mizan/trace";
 
 /** The package's own name, which a file uses to import another unit. */
 export const PACKAGE = "@intellectual-frontiers/data";
-/** The kernel's entry point, the one package the lower layers may import. */
-export const KERNEL = "@intellectual-frontiers/commons/ts/kernel";
-/** The foundation, a package of commons of its own (commons 0032-lifting-libraries): the layers hold what the kernel was held to for it. */
+/** The foundation, the one package of commons the lower layers may import. */
 export const CORE = "@intellectual-frontiers/core";
 
 /** The kinds of unit of the table (0001-layers FR-004, FR-008, 0011-sql-lifecycle FR-001). */
@@ -257,9 +255,9 @@ export function layerFindings(files: readonly trace.SourceFile[], exportsMap: Re
         );
         continue;
       }
-      if (STRICT.has(here.class) && specifier !== KERNEL && specifier !== CORE) {
+      if (STRICT.has(here.class) && specifier !== CORE) {
         out.push(
-          make("layers/external", file.path, line, `${here.name} imports ${specifier}: only the kernel, core and this package`, specifier),
+          make("layers/external", file.path, line, `${here.name} imports ${specifier}: only core and this package`, specifier),
         );
       }
     }

@@ -10,8 +10,8 @@ import { citedBy, specPages } from "../src/pages/specs.ts";
 import { freshBuild } from "./helpers.ts";
 
 proves(["0011-documentation FR-015"], "a specification is read into its header, input and requirements", () => {
-  const s = parseSpec("0099-x", "# Feature Specification: X\n\n**Spec ID:** 0099-x\n**Status:** Draft\n**Owner:** if\n**Domain:** commons\n**Part of:** 0005-typescript-runtime\n\n**Input:** Why.\n\n## A\n\n- **FR-001**: One.\n- **FR-002**: Two,\n  on two lines.\n");
-  assertEquals([s.title, s.status, s.partOf, s.input], ["X", "Draft", "0005-typescript-runtime", "Why."]);
+  const s = parseSpec("0099-x", "# Feature Specification: X\n\n**Spec ID:** 0099-x\n**Status:** Draft\n**Owner:** if\n**Domain:** commons\n**Part of:** 0005-typescript-practice\n\n**Input:** Why.\n\n## A\n\n- **FR-001**: One.\n- **FR-002**: Two,\n  on two lines.\n");
+  assertEquals([s.title, s.status, s.partOf, s.input], ["X", "Draft", "0005-typescript-practice", "Why."]);
   assertEquals(s.requirements, [{ id: "FR-001", text: "One." }, { id: "FR-002", text: "Two, on two lines." }]);
 });
 

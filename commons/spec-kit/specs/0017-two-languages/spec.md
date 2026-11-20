@@ -10,7 +10,7 @@
 
 ## The two languages
 
-- **FR-001**: A harness's specifications MUST be natural language in Markdown, and its ontology, code, tools and tests MUST be TypeScript 7 or later, run on Bun by default and on Node 26 as the backup (0005-typescript-runtime).
+- **FR-001**: A harness's specifications MUST be natural language in Markdown, and its ontology, code, tools and tests MUST be TypeScript 7 or later, run on Bun by default and on Node 26 as the backup (0005-typescript-practice).
 - **FR-002**: A fact, a setting or a schema MUST NOT be kept as source in another language or format (YAML, JSON, XML, Turtle, SQL), except as a named exception (FR-004); what other forms a tool writes from the TypeScript is generated, marked `.auto.`, and never edited by hand.
 
 ## Integrations
@@ -39,7 +39,7 @@
 
 ## Assumptions
 
-- The kernel and the host runtime already hold commons' TypeScript to Bun and Node 26 (0005-typescript-runtime), so this specification adds no runtime of its own.
+- The kernel and the host runtime already hold commons' TypeScript to Bun and Node 26 (0005-typescript-practice), so this specification adds no runtime of its own.
 - Where TypeScript 7 does not yet support a need, the choice of another stack is the integration author's, recorded in the `Exception`.
 
 ## Open questions

@@ -6,7 +6,7 @@
  *     bun commons/libraries/src/link.ts            link what is not linked, from the repository above this folder (or --repo DIR)
  *
  * @remarks
- * A folder of `commons/` whose `package.json` is named `@intellectual-frontiers/<name>` is linked as that name, and `commons/ts` as `@intellectual-frontiers/commons` (`commons/docs` bears the same name and is not linked). A link
+ * A folder of `commons/` whose `package.json` is named `@intellectual-frontiers/<name>` is linked as that name (the metapackage `commons/commons` bears `@intellectual-frontiers/commons`). A link
  * that is there is left as it is. Only the built-ins of Node are used, so it runs on Bun and on Node 26 before anything is installed.
  *
  * @limits
@@ -15,7 +15,7 @@
  * @example
  * ```ts
  * import { linksOf } from "./link.ts";
- * linksOf(".").get("@intellectual-frontiers/commons"); // the path of commons/ts
+ * linksOf(".").get("@intellectual-frontiers/commons"); // the path of commons/commons
  * ```
  *
  * Spec: 0001-libraries FR-011
@@ -38,13 +38,13 @@ const nameOf = (file: string): string | undefined => {
   }
 };
 
-/** The packages of commons by name and the folder of each; `commons/ts` comes first, so that it is the one that bears `@intellectual-frontiers/commons`. */
+/** The packages of commons by name and the folder of each. */
 export function linksOf(repo: string): ReadonlyMap<string, string> {
   const links = new Map<string, string>();
   const dirs = readdirSync(join(repo, "commons"), { withFileTypes: true })
     .filter((e) => e.isDirectory() && e.name !== "node_modules")
     .map((e) => e.name)
-    .sort((a, b) => (a === "ts" ? -1 : b === "ts" ? 1 : a < b ? -1 : 1));
+    .sort((a, b) => (a < b ? -1 : 1));
   for (const d of dirs) {
     const name = nameOf(join(repo, "commons", d, "package.json"));
     if (name !== undefined && name.startsWith(SCOPE) && !links.has(name)) links.set(name, join(repo, "commons", d));

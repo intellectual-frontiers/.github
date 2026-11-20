@@ -46,7 +46,7 @@
 
 ## The package
 
-- **FR-026**: Telemetry MUST depend on Core, Formats, Terminal and System alone, MUST have a pure entry that names no host global and reads no environment (`otel`, `otlp`, `signals`, `render`) and a host entry that holds the exporter, the pipeline and the console, and MUST be published as compiled modules with their declarations as `@intellectual-frontiers/telemetry` (commons 0032-lifting-libraries FR-005, FR-013), importable by Node 26 and by Bun from `node_modules`, with `@types/node` as a peer.
+- **FR-026**: Telemetry MUST depend on Core, Formats, Terminal and System alone, MUST have a pure entry that names no host global and reads no environment (`otel`, `otlp`, `signals`, `render`) and a host entry that holds the exporter, the pipeline and the console, and MUST be published as compiled modules with their declarations as `@intellectual-frontiers/telemetry` (commons 0032-libraries-by-concern FR-005, FR-013), importable by Node 26 and by Bun from `node_modules`, with `@types/node` as a peer.
 
 ## Acceptance scenarios
 

@@ -16,7 +16,7 @@
  *
  * @limits
  * The plan reads the tags of this repository, so a clone without its tags plans a first release of everything. It cannot know what a registry holds: the workflow asks it, and skips a version that is there. A work that is not a library
- * (`commons/ts`, `commons/docs`) is a Git dependency and is not released here.
+ * (`commons/docs`) is not released here.
  *
  * @example
  * ```ts

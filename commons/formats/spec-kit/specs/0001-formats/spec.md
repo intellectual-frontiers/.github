@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** The file and wire formats that every library of commons and every harness needs, in a package of its own that depends on `core` alone: JSON5, YAML, TOML, XML, CSV, base64 and hexadecimal, ASN.1 DER, CBOR, archives, PNG and ICO, TypeScript literals, glob patterns, semantic versions, media types and HTTP headers, read and written in pure code with no outside package. It is the second library lifted out of `commons/ts` (commons 0032-lifting-libraries), the one the cryptography, the telemetry and the compliance libraries read their data with.
+**Input:** The file and wire formats that every library of commons and every harness needs, in a package of its own that depends on `core` alone: JSON5, YAML, TOML, XML, CSV, base64 and hexadecimal, ASN.1 DER, CBOR, archives, PNG and ICO, TypeScript literals, glob patterns, semantic versions, media types and HTTP headers, read and written in pure code with no outside package. It is the second library lifted out of `commons/ts` (commons 0032-libraries-by-concern), the one the cryptography, the telemetry and the compliance libraries read their data with.
 
 ## Text formats
 
@@ -38,7 +38,7 @@
 
 ## The package
 
-- **FR-020**: Formats MUST depend on `core` alone, MUST import nothing outside its own files, MUST name no host global, and MUST be published as compiled modules with their declarations as `@intellectual-frontiers/formats`, with an entry for the package (`.`) and one for each of its modules (`./yaml`, `./der`, ...), each with its `types` (commons 0032-lifting-libraries FR-005, FR-013), so that it runs on Bun, on Node 26 and in a browser with no build step.
+- **FR-020**: Formats MUST depend on `core` alone, MUST import nothing outside its own files, MUST name no host global, and MUST be published as compiled modules with their declarations as `@intellectual-frontiers/formats`, with an entry for the package (`.`) and one for each of its modules (`./yaml`, `./der`, ...), each with its `types` (commons 0032-libraries-by-concern FR-005, FR-013), so that it runs on Bun, on Node 26 and in a browser with no build step.
 
 ## Acceptance scenarios
 
@@ -49,7 +49,7 @@
 
 ## Out of scope
 
-- Digests, signatures and encryption, which use these formats: `crypto` (commons 0032-lifting-libraries FR-002).
+- Digests, signatures and encryption, which use these formats: `crypto` (commons 0032-libraries-by-concern FR-002).
 - The reading of files from a disk: `system`.
 
 ## Edge cases

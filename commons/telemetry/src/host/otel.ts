@@ -888,7 +888,7 @@ export function traceProcess<T extends { readonly code: number }>(
     .then(carried);
 }
 
-// The system's process runner traces its programs through this module's pipeline once the module is loaded (commons 0032-lifting-libraries: the system does not import the telemetry).
+// The system's process runner traces its programs through this module's pipeline once the module is loaded (commons 0032-libraries-by-concern: the system does not import the telemetry).
 setProcessTracer(traceProcess);
 
 function portOf(url: URL): number | undefined {

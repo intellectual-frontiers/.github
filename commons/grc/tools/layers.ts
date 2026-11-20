@@ -2,7 +2,7 @@
 /**
  * The layers check of the library (0001-grc-layers): which unit each file is in, which units it may import, which packages it may name, and a finding for every import that does not follow the
  * table, for a name of a framework, runner, store, vendor or exchange format in the core, and for a shim. It reads every import, relative or by package name, because an import by package name is
- * invisible to the kernel's layers check, which reads relative imports only (commons 0005-typescript-runtime FR-077); it resolves the library's own package name through `exports`, as Node and the
+ * invisible to the kernel's layers check, which reads relative imports only (commons 0005-typescript-practice FR-077); it resolves the library's own package name through `exports`, as Node and the
  * compiler do. The shape is that of `data` 0001-layers, which Kanon will hold for every library.
  *
  * @remarks

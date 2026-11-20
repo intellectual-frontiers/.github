@@ -46,7 +46,7 @@ proves([CRYPT], "SHA-512 crypt gives what glibc's crypt(3) gives, rounds clamped
 });
 
 proves(
-  [CRYPT, "0005-typescript-runtime FR-014"],
+  [CRYPT, "0001-core FR-004"],
   "a salt from bytes is of crypt's alphabet, and a password hashed with it verifies",
   async () => {
     await fc.assert(

@@ -9,13 +9,13 @@
 
 ## The RDF library
 
-- **FR-001**: The kernel MUST take RDF as typed values (branded IRIs, namespaces, named nodes, literals, triples and quads) from the library `rdf` (`@intellectual-frontiers/rdf`, rdf 0001-rdf FR-001), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT hold it itself.
-- **FR-002**: The kernel MUST take typed vocabularies and the way to make one from the library `rdf` (`@intellectual-frontiers/rdf`, rdf 0001-rdf FR-002), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT hold it itself.
-- **FR-003**: The kernel MUST take class schemas and the individuals they make from the library `rdf` (`@intellectual-frontiers/rdf`, rdf 0001-rdf FR-003), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT hold it itself.
-- **FR-004**: The kernel MUST take the schemas an ontology states about itself, code lists and SKOS schemes from the library `rdf` (`@intellectual-frontiers/rdf`, rdf 0001-rdf FR-004), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT hold it itself.
-- **FR-005**: The kernel MUST take the checks a type cannot state from the library `rdf` (`@intellectual-frontiers/rdf`, rdf 0001-rdf FR-005), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT hold it itself.
-- **FR-006**: The kernel MUST take the writers of N-Triples, N-Quads, canonical Turtle and JSON-LD from the library `rdf` (`@intellectual-frontiers/rdf`, rdf 0001-rdf FR-006), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT hold it itself.
-- **FR-007**: The kernel MUST take that it reads no syntax from the library `rdf` (`@intellectual-frontiers/rdf`, rdf 0001-rdf FR-007), where it is specified and proved (0032-lifting-libraries FR-010), and MUST NOT hold it itself.
+- **FR-001**: The kernel MUST take RDF as typed values (branded IRIs, namespaces, named nodes, literals, triples and quads) from the library `rdf` (`@intellectual-frontiers/rdf`, rdf 0001-rdf FR-001), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT hold it itself.
+- **FR-002**: The kernel MUST take typed vocabularies and the way to make one from the library `rdf` (`@intellectual-frontiers/rdf`, rdf 0001-rdf FR-002), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT hold it itself.
+- **FR-003**: The kernel MUST take class schemas and the individuals they make from the library `rdf` (`@intellectual-frontiers/rdf`, rdf 0001-rdf FR-003), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT hold it itself.
+- **FR-004**: The kernel MUST take the schemas an ontology states about itself, code lists and SKOS schemes from the library `rdf` (`@intellectual-frontiers/rdf`, rdf 0001-rdf FR-004), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT hold it itself.
+- **FR-005**: The kernel MUST take the checks a type cannot state from the library `rdf` (`@intellectual-frontiers/rdf`, rdf 0001-rdf FR-005), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT hold it itself.
+- **FR-006**: The kernel MUST take the writers of N-Triples, N-Quads, canonical Turtle and JSON-LD from the library `rdf` (`@intellectual-frontiers/rdf`, rdf 0001-rdf FR-006), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT hold it itself.
+- **FR-007**: The kernel MUST take that it reads no syntax from the library `rdf` (`@intellectual-frontiers/rdf`, rdf 0001-rdf FR-007), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT hold it itself.
 
 ## Commons' ontology
 

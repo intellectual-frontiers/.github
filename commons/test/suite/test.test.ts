@@ -111,7 +111,7 @@ proves([FR], "each assertion passes on what it describes and throws on what it d
 
 reviewed("example-spec FR-001", "an example of a review declared in code");
 
-proves(["0001-test FR-003", "0005-typescript-runtime FR-014"], "the gives the value back narrowed, and fails on null and undefined", () => {
+proves(["0001-test FR-003", "0001-core FR-004"], "the gives the value back narrowed, and fails on null and undefined", () => {
   const roles = new Map([["lead", { name: "operator" }]]);
   const lead = the(roles.get("lead"));
   expectType<Equal<typeof lead, { name: string }>>();

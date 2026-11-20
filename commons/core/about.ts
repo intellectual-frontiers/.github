@@ -1,12 +1,11 @@
 // Spec: 0001-core FR-007
 /**
  * The typed facts of Core, an independent library of commons (commons 0027-commons-libraries): the foundation of the rest, with no dependency and no host. Its specification is in its own spec kit
- * (`spec-kit/`, `0001-core`); this repository knows it as one requirement of 0027-commons-libraries, proved by `bun run verify` in this folder, and as the first library of the lift of `commons/ts`
- * (0032-lifting-libraries).
+ * (`spec-kit/`, `0001-core`); this repository knows it as one requirement of 0027-commons-libraries, proved by `bun run verify` in this folder, and as a library by concern (0032-libraries-by-concern).
  *
  * @module
  */
-import type { About } from "@intellectual-frontiers/commons/ts/kernel";
+import type { About } from "@intellectual-frontiers/core/about";
 
 /** Core. */
 export const about: About = {

@@ -4,7 +4,7 @@
  *
  * @module
  */
-import type { About } from "@intellectual-frontiers/commons/ts/kernel";
+import type { About } from "@intellectual-frontiers/core/about";
 
 /** Integrations X12. */
 export const about: About = {

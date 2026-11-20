@@ -29,7 +29,7 @@
 
 ## Assumptions
 
-- The decision to publish the ontologies as one library is 0032-lifting-libraries FR-008: the ontology of IFR extends the one of IFQS, which extends Mizan's, so no one of them could be a file of the library that uses it without a cycle.
+- The decision to publish the ontologies as one library is 0032-libraries-by-concern FR-008: the ontology of IFR extends the one of IFQS, which extends Mizan's, so no one of them could be a file of the library that uses it without a cycle.
 
 ## Open questions
 

@@ -37,11 +37,11 @@ const semver: fc.Arbitrary<SemVer> = fc.record(
   { requiredKeys: ["major", "minor", "patch"], noNullPrototype: true },
 );
 
-proves([FR, "0005-typescript-runtime FR-014"], "a version printed and parsed is the same version (round trip)", () => {
+proves([FR, "0001-core FR-004"], "a version printed and parsed is the same version (round trip)", () => {
   fc.assert(fc.property(semver, (v) => assertEquals(parseSemVer(formatSemVer(v)), { kind: "ok", value: v })));
 });
 
-proves([FR, "0005-typescript-runtime FR-014"], "the order is reflexive, antisymmetric, transitive and total", () => {
+proves([FR, "0001-core FR-004"], "the order is reflexive, antisymmetric, transitive and total", () => {
   fc.assert(fc.property(semver, (a) => assertEquals(compareSemVer(a, a), 0)));
   fc.assert(fc.property(semver, semver, (a, b) => assertEquals(compareSemVer(a, b), -compareSemVer(b, a) || 0)));
   fc.assert(
@@ -85,7 +85,7 @@ proves([FR], "what is not a semantic version is refused; a leading v is accepted
   assertEquals(parseSemVer("v2.9.8"), { kind: "ok", value: { major: 2, minor: 9, patch: 8 } });
 });
 
-proves([FR, "0005-typescript-runtime FR-014"], "a bump is above what it bumps and suffices for its change", () => {
+proves([FR, "0001-core FR-004"], "a bump is above what it bumps and suffices for its change", () => {
   fc.assert(
     fc.property(semver, fc.constantFrom("major", "minor", "patch"), (v, level) => {
       const next = bump(v, level);
@@ -279,7 +279,7 @@ proves([RANGE], "what is not a range is an error naming it, never a range that h
 });
 
 proves(
-  [RANGE, "0005-typescript-runtime FR-014"],
+  [RANGE, "0001-core FR-004"],
   "laws: caret, tilde and x-ranges are their comparators; a hyphen is >= and <=; || is or; a space is and",
   () => {
     fc.assert(
@@ -308,7 +308,7 @@ proves(
   },
 );
 
-proves([RANGE, "0005-typescript-runtime FR-014"], "a range printed and read back is the same range (round trip)", () => {
+proves([RANGE, "0001-core FR-004"], "a range printed and read back is the same range (round trip)", () => {
   const word = fc.oneof(
     small.map(formatSemVer),
     fc.tuple(fc.constantFrom("^", "~", ">", ">=", "<", "<=", "="), small).map(([op, x]) => `${op}${formatSemVer(x)}`),
