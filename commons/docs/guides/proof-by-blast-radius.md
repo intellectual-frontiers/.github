@@ -207,6 +207,15 @@ export const CLASS_RULES: Readonly<Record<ChangeClass, ClassRule>> = {
 
 ## Measured
 
-@@MEASURED@@
+Wall-clock seconds on one four-core sandbox, for the same change proved by `bun run dev:check` (the affected libraries, types and tests, every dependent) and by `bun run repoctl prove` with a cold and a warm result cache. A foundation change is proved by the smoke gate and the importers of the changed symbols, not by every dependent.
+
+| Change | `dev:check` | `prove`, cold cache | `prove`, warm cache | Libraries proved |
+| --- | --- | --- | --- | --- |
+| a comment in `core` | 136 s | 33 s | 36 s | 0 of 33 |
+| a function body in `quality`, types unchanged | 111 s | 16 s | 13 s | 1 of 33 |
+| a changed signature in `core` | 114 s | 37 s | 32 s | 12 of 33 |
+| a function body in `core`, types unchanged | 124 s | 13 s | 5 s | 7 of 33 (the foundation) |
+
+The comment case is the documentation check of the whole site, about half a minute; making that check incremental is the next cut. The cache helps most where the tests are pure: a test that reads the checkout runs every time its library is proved, and is never cached. In this sandbox the suites of `libraries` and `data` fail for reasons of the environment (a nested run and a database driver that is not installed), so every run above ends with those two failures, in both commands alike.
 
 Related: [the release loop](concept-release-loop.md), [add a library](add-a-library.md), [the contributor path](contributor.md).
