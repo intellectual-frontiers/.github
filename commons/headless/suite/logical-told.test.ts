@@ -45,6 +45,8 @@ proves(["0003-headless-output FR-006"], "toJson never throws and gives what JSON
       assertEquals(JSON.parse(JSON.stringify(j)), j);
     }),
   );
+  const hostile = JSON.parse('{"__proto__": {"x": 1}, "a": 1}') as unknown;
+  assertEquals(JSON.stringify(toJson(hostile)), '{"__proto__":{"x":1},"a":1}', "a key named __proto__ is data");
   assertEquals(toJson(() => 1), null);
   assertEquals(toJson(Symbol("s")), null);
   assertEquals(toJson({ f: () => 1, s: Symbol("x"), u: undefined, k: 1 }), { k: 1 });

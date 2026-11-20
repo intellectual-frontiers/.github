@@ -10,7 +10,7 @@ export const library = {
   level: "L1",
   specKit: "spec-kit",
   verify: "bun run verify",
-  version: "0.5.0",
+  version: "0.6.0",
   distribution: ["github", "npm"],
   exports: [
     "./engine",
@@ -58,6 +58,7 @@ export const library = {
     "./sql/extensions/invariants",
     "./sql/extensions/objects",
     "./sql/extensions/assertions",
+    "./sql/extensions/osquery",
     "./sql/quality",
     "./sql/drivers",
     "./sql/typed",
