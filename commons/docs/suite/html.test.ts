@@ -54,7 +54,7 @@ proves(["0011-documentation FR-017"], "a page asks nothing of another host, load
   const css = await fs.readTextFile(path.join(ROOT, "commons/docs/theme/site.css"));
   assertMatch(css, /--page: #ffffff;/);
   assertMatch(css, /\.content \{ background: var\(--page\)/);
-  assert(!/prefers-color-scheme: dark/.test(css), "the site is light only");
+  assertMatch(css, /prefers-color-scheme: dark/);
 });
 
 proves(["0011-documentation FR-019"], "the fixture's pages are what is committed", async () => {

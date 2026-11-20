@@ -12,7 +12,7 @@
  * @module
  */
 import type { Controls, DialectId } from "@intellectual-frontiers/archon/governance";
-import { PIN_POLICIES, type Platform, type PinPolicy, type Scope } from "@intellectual-frontiers/toolchain/governance";
+import { PIN_POLICIES, type ManagerId, type Platform, type PinPolicy, type Scope } from "@intellectual-frontiers/toolchain/governance";
 
 /** How a dialect checks what it installs. */
 export type Integrity = "hash" | "signature" | "none";
@@ -26,14 +26,14 @@ export type ToolGuarantees = {
   readonly scopes: readonly Scope[];
   /** The platforms it can reach. */
   readonly platforms: readonly Platform[];
-  /** Whether it takes the artifacts of a binding or the packages of its manager. */
-  readonly binds: "artifact" | "package";
+  /** Whether it takes the download of a pin or the packages of its manager. */
+  readonly binds: "pin" | "package";
   /** Whether it can build from source. */
   readonly sourceBuild: boolean;
 };
 
-/** A dialect of tools: its id and what it guarantees. */
-export type ToolDialect = { readonly id: DialectId; readonly guarantees: ToolGuarantees };
+/** A dialect of tools: its id, the package manager of the ontology it drives where it drives one, and what it guarantees. */
+export type ToolDialect = { readonly id: DialectId; readonly manager?: ManagerId; readonly guarantees: ToolGuarantees };
 
 /** How strictly a control asks tools to be pinned. */
 export function pinOfControl(control: Controls["toolIntegrity"]): PinPolicy {

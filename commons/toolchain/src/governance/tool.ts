@@ -1,8 +1,9 @@
-// Spec: 0002-toolchain-governance FR-002, FR-003, FR-004, FR-005, FR-006
+// Spec: 0002-toolchain-governance FR-002, FR-003, FR-004, FR-005, FR-006, FR-008
 /**
- * A tool: a program a computer needs, declared once. It has one exact version, a pin policy, what it provides and needs, the phase of work that first needs it, the scope it lives in and the
- * bindings that say how a dialect obtains it: the artifacts of each platform (an `https` address, the SHA-256 of what is there, its format and the folder of its programs) or the names a
- * package manager knows. `defineTool` is the one way to make one, and it refuses with every reason what is not one.
+ * A tool: a program a computer needs, declared once. It has a pin policy, what it provides and needs, the phase of work that first needs it, the scope it lives in and the bindings that say how a
+ * dialect obtains it: a reference to a pin of the packaging ontology (which holds the version and the checksums, so that a declaration never copies a version or a hash), or the names a package
+ * manager of the ontology knows. `defineTool` is the one way to make one, and it refuses with every reason what is not one. A download, as a pin gives it for a platform, is checked by
+ * `defineDownload`.
  *
  * @example
  * ```ts
@@ -10,13 +11,12 @@
  * const r = defineTool({
  *   name: "jq",
  *   summary: "A command line JSON processor.",
- *   version: "1.7.1",
  *   pin: "exact",
  *   program: "jq",
  *   versionArgs: ["--version"],
  *   phases: ["core"],
  *   scope: "user",
- *   bindings: [{ kind: "package", dialect: "homebrew", packages: ["jq"] }],
+ *   bindings: [{ kind: "pin", pin: "pin-jq" }, { kind: "package", manager: "manager-brew", packages: ["jq"] }],
  * });
  * r.kind; // "ok"
  * ```
@@ -25,10 +25,10 @@
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { sha256Of, type Sha256 } from "@intellectual-frontiers/crypto/sha256";
-import { findSecretLike, parseDialectId, type DialectId } from "@intellectual-frontiers/archon/governance";
-import { compareVersions, parseToolName, parseVersion, type ToolName, type Version } from "./ids.ts";
+import { findSecretLike } from "@intellectual-frontiers/archon/governance";
+import { compareVersions, parseManagerId, parsePinId, parseToolName, parseVersion, type ManagerId, type PinId, type ToolName, type Version } from "./ids.ts";
 
-/** A platform a tool can have an artifact for. */
+/** A platform a pin can have a download for. */
 export type Platform = "linux-x64" | "linux-arm64" | "macos-x64" | "macos-arm64" | "windows-x64";
 /** Every platform. */
 export const PLATFORMS: readonly Platform[] = ["linux-x64", "linux-arm64", "macos-x64", "macos-arm64", "windows-x64"];
@@ -42,28 +42,27 @@ export type Scope = "user" | "system";
 export type PinPolicy = "exact" | "release-line" | "rolling";
 /** Every pin policy, from the least strict to the most. */
 export const PIN_POLICIES: readonly PinPolicy[] = ["rolling", "release-line", "exact"];
-/** The format of what an artifact address gives. */
+/** The format of what a download address gives. */
 export type ArtifactFormat = "zip" | "tar" | "file";
 
-/** What one platform downloads: its address, the SHA-256 of what is there, its format and the folder of its programs inside it. */
-export type Artifact = {
-  readonly url: string;
+/** What a pin gives for one platform: the version, the address, the SHA-256 of what is there, its format and the folder of its programs inside it. */
+export type Download = {
+  readonly version: Version;
+  readonly downloadUrl: string;
   readonly sha256: Sha256;
-  readonly format: ArtifactFormat;
-  readonly bin: string;
+  readonly archiveFormat: ArtifactFormat;
+  readonly binPath: string;
 };
 
-/** How a dialect obtains a tool: an artifact for each platform it has, or the names of the packages a dialect's manager knows. */
+/** How a dialect obtains a tool: the download a pin of the ontology gives, or the names of the packages a package manager of the ontology knows (at a version, where one is named). */
 export type Binding =
-  | { readonly kind: "artifact"; readonly artifacts: { readonly [P in Platform]?: Artifact } }
-  | { readonly kind: "package"; readonly dialect: DialectId; readonly packages: readonly string[] };
+  | { readonly kind: "pin"; readonly pin: PinId }
+  | { readonly kind: "package"; readonly manager: ManagerId; readonly packages: readonly string[]; readonly version?: Version };
 
-/** A tool. */
+/** A tool. It holds no version and no hash of a pin: it references the pin. */
 export type Tool = {
   readonly name: ToolName;
   readonly summary: string;
-  /** The one exact version it is pinned to, or the one it was proven with where the pin is not exact. */
-  readonly version: Version;
   readonly pin: PinPolicy;
   /** The least version of a copy found on the computer that may be taken. */
   readonly minimum?: Version;
@@ -81,19 +80,18 @@ export type Tool = {
   readonly bindings: readonly Binding[];
 };
 
-/** An artifact as written. */
-export type ArtifactInput = { readonly url: string; readonly sha256: string; readonly format: string; readonly bin: string };
+/** A download as a source of pins gives it. */
+export type DownloadInput = { readonly version: string; readonly downloadUrl: string; readonly sha256: string; readonly archiveFormat: string; readonly binPath: string };
 
 /** A binding as written. */
 export type BindingInput =
-  | { readonly kind: "artifact"; readonly artifacts: Readonly<Record<string, ArtifactInput>> }
-  | { readonly kind: "package"; readonly dialect: string; readonly packages: readonly string[] };
+  | { readonly kind: "pin"; readonly pin: string }
+  | { readonly kind: "package"; readonly manager: string; readonly packages: readonly string[]; readonly version?: string };
 
 /** What `defineTool` takes. */
 export type ToolInput = {
   readonly name: string;
   readonly summary: string;
-  readonly version: string;
   readonly pin: string;
   readonly minimum?: string;
   readonly program: string;
@@ -110,26 +108,28 @@ function oneOf<T extends string>(values: readonly T[], text: string): T | undefi
   return values.find((v) => v === text);
 }
 
-/** An artifact from what was written, or every reason it is not one. */
-function artifactOf(platform: string, input: ArtifactInput): Result<Artifact, readonly string[]> {
+/** A download from what a source of pins gave, or every reason it is not one: an `https` address with no user name or password, a SHA-256, a format and a folder inside the unpacked folder. */
+export function defineDownload(input: DownloadInput): Result<Download, readonly string[]> {
   const problems: string[] = [];
+  const version = parseVersion(input.version);
+  if (version.kind === "err") problems.push(version.error);
   let url: URL | undefined;
   try {
-    url = new URL(input.url);
+    url = new URL(input.downloadUrl);
   } catch {
-    problems.push(`${platform}: ${JSON.stringify(input.url)} is not an address`);
+    problems.push(`${JSON.stringify(input.downloadUrl)} is not an address`);
   }
   if (url !== undefined) {
-    if (url.protocol !== "https:") problems.push(`${platform}: the address is https, and ${JSON.stringify(input.url)} is not`);
-    if (url.username !== "" || url.password !== "") problems.push(`${platform}: the address holds a user name or a password`);
+    if (url.protocol !== "https:") problems.push(`the address is https, and ${JSON.stringify(input.downloadUrl)} is not`);
+    if (url.username !== "" || url.password !== "") problems.push("the address holds a user name or a password");
   }
   const hash = sha256Of(input.sha256);
-  if (hash === undefined) problems.push(`${platform}: ${JSON.stringify(input.sha256)} is not a SHA-256 (64 hexadecimal digits)`);
-  const format = oneOf<ArtifactFormat>(["zip", "tar", "file"], input.format);
-  if (format === undefined) problems.push(`${platform}: ${JSON.stringify(input.format)} is not a format (zip, tar, file)`);
-  if (input.bin.startsWith("/") || input.bin.includes("\\") || input.bin.split("/").includes("..")) problems.push(`${platform}: the folder of programs ${JSON.stringify(input.bin)} is not a path inside the unpacked folder`);
-  if (problems.length > 0 || hash === undefined || format === undefined) return err(problems);
-  return ok({ url: input.url, sha256: hash, format, bin: input.bin });
+  if (hash === undefined) problems.push(`${JSON.stringify(input.sha256)} is not a SHA-256 (64 hexadecimal digits)`);
+  const format = oneOf<ArtifactFormat>(["zip", "tar", "file"], input.archiveFormat);
+  if (format === undefined) problems.push(`${JSON.stringify(input.archiveFormat)} is not a format (zip, tar, file)`);
+  if (input.binPath.startsWith("/") || input.binPath.includes("\\") || input.binPath.split("/").includes("..")) problems.push(`the folder of programs ${JSON.stringify(input.binPath)} is not a path inside the unpacked folder`);
+  if (problems.length > 0 || version.kind === "err" || hash === undefined || format === undefined) return err(problems);
+  return ok({ version: version.value, downloadUrl: input.downloadUrl, sha256: hash, archiveFormat: format, binPath: input.binPath });
 }
 
 /** A tool, or every reason the input is not one. */
@@ -138,18 +138,13 @@ export function defineTool(input: ToolInput): Result<Tool, readonly string[]> {
   const name = parseToolName(input.name);
   if (name.kind === "err") problems.push(name.error);
   if (input.summary.trim() === "") problems.push("a tool has a summary");
-  const version = parseVersion(input.version);
-  if (version.kind === "err") problems.push(version.error);
   const pin = oneOf(PIN_POLICIES, input.pin);
   if (pin === undefined) problems.push(`${JSON.stringify(input.pin)} is not a pin policy (${PIN_POLICIES.join(", ")})`);
   let minimum: Version | undefined;
   if (input.minimum !== undefined) {
     const m = parseVersion(input.minimum);
     if (m.kind === "err") problems.push(`the minimum: ${m.error}`);
-    else {
-      minimum = m.value;
-      if (version.kind === "ok" && compareVersions(m.value, version.value) > 0) problems.push(`the minimum ${m.value} is above the version ${version.value}`);
-    }
+    else minimum = m.value;
   }
   if (input.program.trim() === "") problems.push("a tool names its program");
   const scope = oneOf<Scope>(["user", "system"], input.scope);
@@ -176,37 +171,38 @@ export function defineTool(input: ToolInput): Result<Tool, readonly string[]> {
 
   if (input.bindings.length === 0) problems.push("a tool has at least one binding");
   const bindings: Binding[] = [];
-  let artifactBindings = 0;
-  const dialects = new Set<string>();
+  let pinBindings = 0;
+  const managers = new Set<string>();
   for (const b of input.bindings) {
-    if (b.kind === "artifact") {
-      artifactBindings++;
-      if (artifactBindings > 1) problems.push("a tool has one artifact binding at most");
-      const artifacts: { [P in Platform]?: Artifact } = {};
-      const entries = Object.entries(b.artifacts);
-      if (entries.length === 0) problems.push("an artifact binding has an artifact for at least one platform");
-      for (const [platform, a] of entries) {
-        const p = oneOf(PLATFORMS, platform);
-        if (p === undefined) {
-          problems.push(`${JSON.stringify(platform)} is not a platform (${PLATFORMS.join(", ")})`);
-          continue;
-        }
-        const r = artifactOf(platform, a);
-        if (r.kind === "err") problems.push(...r.error);
-        else artifacts[p] = r.value;
-      }
-      bindings.push({ kind: "artifact", artifacts });
+    if (b.kind === "pin") {
+      pinBindings++;
+      if (pinBindings > 1) problems.push("a tool has one pin binding at most");
+      const p = parsePinId(b.pin);
+      if (p.kind === "err") problems.push(p.error);
+      else bindings.push({ kind: "pin", pin: p.value });
     } else {
-      const d = parseDialectId(b.dialect);
-      if (d.kind === "err") problems.push(d.error);
-      if (b.packages.length === 0 || b.packages.some((p) => p.trim() === "")) problems.push(`the package binding of ${b.dialect} names at least one package, none empty`);
-      if (dialects.has(b.dialect)) problems.push(`a tool has one package binding for ${b.dialect} at most`);
-      dialects.add(b.dialect);
-      if (d.kind === "ok") bindings.push({ kind: "package", dialect: d.value, packages: b.packages });
+      const m = parseManagerId(b.manager);
+      if (m.kind === "err") problems.push(m.error);
+      if (b.packages.length === 0 || b.packages.some((p) => p.trim() === "")) problems.push(`the package binding of ${b.manager} names at least one package, none empty`);
+      if (managers.has(b.manager)) problems.push(`a tool has one package binding for ${b.manager} at most`);
+      managers.add(b.manager);
+      let version: Version | undefined;
+      if (b.version !== undefined) {
+        const v = parseVersion(b.version);
+        if (v.kind === "err") problems.push(`the version of the package binding of ${b.manager}: ${v.error}`);
+        else version = v.value;
+      }
+      if (m.kind === "ok") {
+        const base = { kind: "package" as const, manager: m.value, packages: b.packages };
+        bindings.push(version === undefined ? base : { ...base, version });
+      }
     }
   }
+  if (minimum !== undefined) {
+    for (const b of bindings) if (b.kind === "package" && b.version !== undefined && compareVersions(minimum, b.version) > 0) problems.push(`the minimum ${minimum} is above the version ${b.version} of the package binding of ${b.manager}`);
+  }
 
-  if (problems.length > 0 || name.kind === "err" || version.kind === "err" || pin === undefined || scope === undefined) return err(problems.length > 0 ? problems : ["the tool is incomplete"]);
-  const base = { name: name.value, summary: input.summary, version: version.value, pin, program: input.program, versionArgs: input.versionArgs, needs, env, provides: input.provides ?? [], phases, scope, bindings };
+  if (problems.length > 0 || name.kind === "err" || pin === undefined || scope === undefined) return err(problems.length > 0 ? problems : ["the tool is incomplete"]);
+  const base = { name: name.value, summary: input.summary, pin, program: input.program, versionArgs: input.versionArgs, needs, env, provides: input.provides ?? [], phases, scope, bindings };
   return ok(minimum === undefined ? base : { ...base, minimum });
 }

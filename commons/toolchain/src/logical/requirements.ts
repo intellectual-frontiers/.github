@@ -1,7 +1,8 @@
 // Spec: 0003-toolchain-logical FR-006
 /**
- * The requirements of Archon for a resolution: one of kind `tool` for each resolved tool, with the id `tool.<name>`, a dependency on the requirement of each tool it needs, and as its desired
- * state data that names the tool, its version, its program, its scope, its phases, the dialect and the source. Archon orders and plans them, and the dialect that was chosen carries them out.
+ * The requirements of Archon for a resolution: one of kind `tool` for each resolved tool, with the id `tool.<name>`, a dependency on the requirement of each tool it needs, and as its desired state
+ * data that names the tool, the version it is carried out at, its program, its scope, its phases, the dialect and the source (the download a pin gave, or the packages). They are made, never
+ * written: the version and the hash in them come from the pin, and Archon orders and plans them for the dialect that was chosen.
  *
  * @example
  * ```ts
@@ -16,16 +17,16 @@ import { defineRequirement, type JsonValue, type Requirement, type SubjectSelect
 import type { Resolution, ResolvedTool, Source } from "./resolve.ts";
 
 function sourceOf(source: Source): JsonValue {
-  return source.kind === "artifact"
-    ? { kind: "artifact", url: source.artifact.url, sha256: source.artifact.sha256, format: source.artifact.format, bin: source.artifact.bin }
-    : { kind: "package", packages: [...source.packages] };
+  return source.kind === "download"
+    ? { kind: "download", pin: source.pin, version: source.download.version, downloadUrl: source.download.downloadUrl, sha256: source.download.sha256, archiveFormat: source.download.archiveFormat, binPath: source.download.binPath }
+    : { kind: "package", manager: source.manager, packages: [...source.packages] };
 }
 
 function desiredOf(r: ResolvedTool): JsonValue {
   return {
     tool: r.tool.name,
-    version: r.tool.version,
-    pin: r.tool.pin,
+    version: r.version ?? null,
+    pinPolicy: r.tool.pin,
     program: r.tool.program,
     versionArgs: [...r.tool.versionArgs],
     scope: r.tool.scope,
@@ -42,7 +43,7 @@ export function requirementsFor(resolution: Resolution, subject: SubjectSelector
   for (const r of resolution.entries) {
     const made = defineRequirement({
       id: `tool.${r.tool.name}`,
-      summary: `${r.tool.name} ${r.tool.version} is installed (${r.tool.summary})`,
+      summary: `${r.tool.name} ${r.version ?? "(any current version)"} is installed (${r.tool.summary})`,
       why: ["a tool the computer needs to do its work (toolchain)"],
       subject,
       kind: "tool",
