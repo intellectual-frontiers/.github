@@ -71,7 +71,7 @@ const PACKAGES = new Set(["typescript/async"]);
 const IFC_TS = new Set(["ts/kernel/mod.ts", "ts/runtime/mod.ts", "ts/runtime/test.ts"]);
 
 proves(["0011-documentation FR-002"], "a file imports the generator, IFC TypeScript by relative path and typescript/async; a lens also the libraries' entry points", () => {
-  const lensMay = new Set(["docs/mod.ts", "ts/data/sql-aide/mod.ts", "ts/data/file-aide/mod.ts"]);
+  const lensMay = new Set(["docs/mod.ts"]);
   for (const f of mine) {
     const fixture = f.startsWith("commons/docs/suite/fixture-repo/");
     for (const s of specifiers(read(f))) {

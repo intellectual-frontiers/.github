@@ -448,61 +448,6 @@ const ifcTypescript: Workflow = {
   },
 };
 
-const sqlAidePaths = ["commons/ts/**", "commons/spec-kit/**", own("sql-aide"), BUN_ACTION];
-
-const sqlAide: Workflow = {
-  file: "sql-aide",
-  name: "sql-aide",
-  comment: lines(
-    "IFC SQL Aide and the libraries that accept it, Arca and Data Vault (commons 0009-sql-aide): checked by the TypeScript 7 compiler and tested under Bun and under",
-    "Node, on SQLite, DuckDB, PGlite and a PostgreSQL server that exists only for this run (the runner's own, with pgTAP; its password is the runner's and guards",
-    "nothing). The formatter is run on all of commons/ts by ifc-typescript.",
-  ).trimEnd(),
-  on: { push: { paths: sqlAidePaths }, pullRequest: { paths: sqlAidePaths } },
-  permissions: { contents: "read" },
-  concurrency: supersedable,
-  jobs: {
-    data: job({
-      runsOn: "ubuntu-24.04",
-      timeoutMinutes: 20,
-      steps: [
-        checkout(),
-        bun(),
-        run(
-          lines(
-            "sudo apt-get update -qq && sudo apt-get install -y -qq postgresql postgresql-16-pgtap",
-            "sudo systemctl start postgresql",
-            `sudo -u postgres psql -qc "alter user postgres password 'postgres'"`,
-            'echo "IFCSQL_PG_URL=postgres://postgres:postgres@127.0.0.1:5432/postgres" >>"$GITHUB_ENV"',
-          ),
-          { name: "A PostgreSQL for the run, with pgTAP" },
-        ),
-        run(
-          lines(
-            "sqlite3 --version",
-            'curl --fail --silent --show-error --location --retry 3 -o "$RUNNER_TEMP/duckdb.tar.gz" https://install.duckdb.org/v2.0.0/duckdb-cli-linux-amd64.tar.gz',
-            'echo "c6507206baf7793c6013dbd82368469a45f20dc0e17a6f92f204602f652ed2bc  $RUNNER_TEMP/duckdb.tar.gz" | sha256sum --check',
-            'mkdir -p "$RUNNER_TEMP/duckdb" && tar -xzf "$RUNNER_TEMP/duckdb.tar.gz" -C "$RUNNER_TEMP/duckdb"',
-            'echo "$RUNNER_TEMP/duckdb" >>"$GITHUB_PATH"',
-          ),
-          {
-            name: "The engines' own clients, for the databases made from .auto.sql (sqlite3 is the runner's; the duckdb client is pinned and checked)",
-          },
-        ),
-        run(lines("bun install --frozen-lockfile", "cd data && bun install --frozen-lockfile"), {
-          name: "What IFC TypeScript and the data libraries install for checking and testing",
-          workingDirectory: "commons/ts",
-        }),
-        run("bun run verify", {
-          name: "The TypeScript 7 compiler, the documentation maps, then every test under Bun",
-          workingDirectory: "commons/ts/data",
-        }),
-        run("bun run test:node", { name: "The same tests under Node", workingDirectory: "commons/ts/data" }),
-      ],
-    }),
-  },
-};
-
 const docsPaths = ["commons/**", "package.json", own("docs"), BUN_ACTION];
 const onMainPush = "github.event_name != 'pull_request' && github.ref == 'refs/heads/main'";
 
@@ -850,7 +795,6 @@ export function workflows(libraries: readonly LibraryFacts[]): readonly Workflow
     ...libraries.filter((l) => l.distribution.includes("npm")).map(publishWorkflow),
     docs,
     ifcTypescript,
-    sqlAide,
     tests,
   ].sort((a, b) => (a.file < b.file ? -1 : a.file > b.file ? 1 : 0));
 }

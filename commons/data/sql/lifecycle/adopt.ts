@@ -6,10 +6,11 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { conceptId, words } from "@intellectual-frontiers/data/governance";
 import { type Column, columnId, constraintId, type ForeignKey, type Index, type LogicalDefault, type LogicalSchema, schemaId, type Table, tableId, type Unique } from "@intellectual-frontiers/data/sql/logical";
-import { logicalOf, type Observed, type ObservedColumn } from "./introspect.ts";
+import type { Observed, ObservedColumn } from "@intellectual-frontiers/data/sql/physical";
+import { logicalOf } from "./introspect.ts";
 
 /** A column or table that cannot be adopted. */
 export interface AdoptError {

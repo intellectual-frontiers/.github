@@ -5,9 +5,9 @@
  *
  * @module
  */
-import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
-import { adopt, drift, expectedOf, introspect, logicalOf, type Observed } from "@intellectual-frontiers/data/sql/lifecycle";
-import { bind, type Dialect } from "@intellectual-frontiers/data/sql/physical";
+import { assert, proves } from "@intellectual-frontiers/test";
+import { adopt, drift, expectedOf, introspect, logicalOf } from "@intellectual-frontiers/data/sql/lifecycle";
+import { bind, type Dialect, type Observed } from "@intellectual-frontiers/data/sql/physical";
 import { DIALECTS, load, openEngine, type Engine } from "./engines-fixture.ts";
 import { same } from "./governance-fixture.ts";
 import { driverOf, libraryAt } from "./lifecycle-fixture.ts";

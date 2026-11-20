@@ -8,34 +8,8 @@
  * @module
  */
 import type { LogicalSchema, LogicalType, Table } from "@intellectual-frontiers/data/sql/logical";
-import { type Dialect, naming as defaultNaming, type Naming, writeNames } from "@intellectual-frontiers/data/sql/physical";
+import { type Dialect, naming as defaultNaming, type Naming, type Observed, writeNames } from "@intellectual-frontiers/data/sql/physical";
 import type { Driver } from "./run.ts";
-
-/** A column as a database holds it. */
-export interface ObservedColumn {
-  readonly name: string;
-  /** The type as the engine says it, in lower case (`integer`, `numeric(10,2)`, `timestamp with time zone`, `vector(3)`). */
-  readonly type: string;
-  readonly nullable: boolean;
-  readonly default?: string;
-}
-
-/** A table as a database holds it. */
-export interface ObservedTable {
-  readonly name: string;
-  readonly columns: readonly ObservedColumn[];
-  readonly primaryKey: readonly string[];
-  readonly uniques: readonly { readonly columns: readonly string[] }[];
-  readonly foreignKeys: readonly { readonly columns: readonly string[]; readonly references: { readonly table: string; readonly columns: readonly string[] } }[];
-  readonly indexes: readonly { readonly name: string; readonly columns: readonly string[]; readonly unique: boolean }[];
-}
-
-/** What a database holds. */
-export interface Observed {
-  readonly dialect: string;
-  readonly schema?: string;
-  readonly tables: readonly ObservedTable[];
-}
 
 /** What reading is told. */
 export interface IntrospectOptions {
@@ -45,108 +19,17 @@ export interface IntrospectOptions {
   readonly exclude?: (table: string) => boolean;
 }
 
-const q = (s: string): string => `'${s.replaceAll("'", "''")}'`;
-const SEP = "\u001f";
-const split = (v: unknown): string[] => (v === null || v === undefined || String(v) === "" ? [] : String(v).split(SEP));
-const str = (v: unknown): string => (v === null || v === undefined ? "" : String(v));
-const yes = (v: unknown): boolean => v === true || v === 1 || v === "1" || v === "t" || v === "true" || v === "YES" || v === "yes";
-
-
-async function sqlite(driver: Driver): Promise<readonly ObservedTable[]> {
-  const names = (await driver.query("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name")).map((r) => str(r["name"]));
-  const out: ObservedTable[] = [];
-  for (const t of names) {
-    const cols = await driver.query(`SELECT name, type, "notnull" AS nn, dflt_value AS d, pk FROM pragma_table_info(${q(t)}) ORDER BY cid`);
-    const pk = [...cols].filter((c) => Number(c["pk"]) > 0).sort((a, b) => Number(a["pk"]) - Number(b["pk"])).map((c) => str(c["name"]));
-    const fks = new Map<number, { table: string; from: string[]; to: string[] }>();
-    for (const f of await driver.query(`SELECT id, "table" AS ref, "from" AS f, "to" AS t FROM pragma_foreign_key_list(${q(t)}) ORDER BY id, seq`)) {
-      const id = Number(f["id"]);
-      const e = fks.get(id) ?? { table: str(f["ref"]), from: [], to: [] };
-      e.from.push(str(f["f"]));
-      e.to.push(str(f["t"]));
-      fks.set(id, e);
-    }
-    const uniques: { columns: string[] }[] = [];
-    const indexes: { name: string; columns: string[]; unique: boolean }[] = [];
-    for (const ix of await driver.query(`SELECT name, "unique" AS u, origin FROM pragma_index_list(${q(t)})`)) {
-      const columns = (await driver.query(`SELECT name FROM pragma_index_info(${q(str(ix["name"]))}) ORDER BY seqno`)).map((c) => str(c["name"]));
-      if (str(ix["origin"]) === "u") uniques.push({ columns });
-      else if (str(ix["origin"]) === "c") indexes.push({ name: str(ix["name"]), columns, unique: yes(ix["u"]) });
-    }
-    out.push({
-      name: t,
-      columns: cols.map((c) => ({ name: str(c["name"]), type: str(c["type"]).toLowerCase(), nullable: !(yes(c["nn"]) || Number(c["pk"]) > 0), ...(c["d"] === null || c["d"] === undefined ? {} : { default: str(c["d"]) }) })),
-      primaryKey: pk,
-      uniques,
-      foreignKeys: [...fks.values()].map((f) => ({ columns: f.from, references: { table: f.table, columns: f.to } })),
-      indexes,
-    });
-  }
-  return out;
-}
-
-async function duckdb(driver: Driver, schema: string | undefined): Promise<readonly ObservedTable[]> {
-  const s = schema === undefined ? "current_schema()" : q(schema);
-  const names = (await driver.query(`SELECT table_name AS t FROM information_schema.tables WHERE table_schema = ${s} AND table_type = 'BASE TABLE' ORDER BY table_name`)).map((r) => str(r["t"]));
-  const cons = await driver.query(
-    `SELECT table_name AS t, constraint_type AS k, array_to_string(constraint_column_names, chr(31)) AS cols, referenced_table AS rt, array_to_string(referenced_column_names, chr(31)) AS rcols FROM duckdb_constraints() WHERE schema_name = ${s}`,
-  );
-  const idx = await driver.query(`SELECT table_name AS t, index_name AS n, is_unique AS u, expressions AS e FROM duckdb_indexes() WHERE schema_name = ${s}`);
-  const out: ObservedTable[] = [];
-  for (const t of names) {
-    const cols = await driver.query(`SELECT column_name AS n, data_type AS type, is_nullable AS nl, column_default AS d FROM information_schema.columns WHERE table_schema = ${s} AND table_name = ${q(t)} ORDER BY ordinal_position`);
-    const mine = cons.filter((c) => str(c["t"]) === t);
-    const pk = mine.find((c) => str(c["k"]) === "PRIMARY KEY");
-    out.push({
-      name: t,
-      columns: cols.map((c) => ({ name: str(c["n"]), type: str(c["type"]).toLowerCase(), nullable: yes(c["nl"]), ...(c["d"] === null || c["d"] === undefined ? {} : { default: str(c["d"]) }) })),
-      primaryKey: pk === undefined ? [] : split(pk["cols"]),
-      uniques: mine.filter((c) => str(c["k"]) === "UNIQUE").map((c) => ({ columns: split(c["cols"]) })),
-      foreignKeys: mine.filter((c) => str(c["k"]) === "FOREIGN KEY").map((c) => ({ columns: split(c["cols"]), references: { table: str(c["rt"]), columns: split(c["rcols"]) } })),
-      indexes: idx
-        .filter((i) => str(i["t"]) === t)
-        .map((i) => ({ name: str(i["n"]), columns: str(i["e"]).replace(/^\[|\]$/g, "").split(",").map((x) => x.trim().replace(/^['"]|['"]$/g, "")).filter((x) => x !== ""), unique: yes(i["u"]) })),
-    });
-  }
-  return out;
-}
-
-async function postgres(driver: Driver, schema: string | undefined): Promise<readonly ObservedTable[]> {
-  const s = schema === undefined ? "current_schema()" : q(schema);
-  const cols = await driver.query(
-    `SELECT c.relname AS t, a.attname AS n, format_type(a.atttypid, a.atttypmod) AS type, NOT a.attnotnull AS nl, pg_get_expr(d.adbin, d.adrelid) AS d FROM pg_attribute a JOIN pg_class c ON c.oid = a.attrelid JOIN pg_namespace ns ON ns.oid = c.relnamespace LEFT JOIN pg_attrdef d ON d.adrelid = a.attrelid AND d.adnum = a.attnum WHERE a.attnum > 0 AND NOT a.attisdropped AND c.relkind IN ('r', 'p') AND ns.nspname = ${s} ORDER BY c.relname, a.attnum`,
-  );
-  const cons = await driver.query(
-    `SELECT t.relname AS t, c.contype AS k, array_to_string(ARRAY(SELECT a.attname FROM unnest(c.conkey) WITH ORDINALITY u(n, o) JOIN pg_attribute a ON a.attrelid = c.conrelid AND a.attnum = u.n ORDER BY u.o), chr(31)) AS cols, rt.relname AS rt, array_to_string(ARRAY(SELECT a.attname FROM unnest(c.confkey) WITH ORDINALITY u(n, o) JOIN pg_attribute a ON a.attrelid = c.confrelid AND a.attnum = u.n ORDER BY u.o), chr(31)) AS rcols FROM pg_constraint c JOIN pg_class t ON t.oid = c.conrelid JOIN pg_namespace ns ON ns.oid = t.relnamespace LEFT JOIN pg_class rt ON rt.oid = c.confrelid WHERE ns.nspname = ${s} AND c.contype IN ('p', 'u', 'f')`,
-  );
-  const idx = await driver.query(
-    `SELECT t.relname AS t, i.relname AS n, ix.indisunique AS u, array_to_string(ARRAY(SELECT a.attname FROM unnest(ix.indkey) WITH ORDINALITY k(n, o) JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = k.n ORDER BY k.o), chr(31)) AS cols FROM pg_index ix JOIN pg_class t ON t.oid = ix.indrelid JOIN pg_class i ON i.oid = ix.indexrelid JOIN pg_namespace ns ON ns.oid = t.relnamespace WHERE ns.nspname = ${s} AND NOT ix.indisprimary AND NOT EXISTS (SELECT 1 FROM pg_constraint k WHERE k.conindid = ix.indexrelid AND k.contype IN ('u', 'p'))`,
-  );
-  const tables = [...new Set(cols.map((c) => str(c["t"])))];
-  return tables.map((t) => {
-    const mine = cons.filter((c) => str(c["t"]) === t);
-    const pk = mine.find((c) => str(c["k"]) === "p");
-    return {
-      name: t,
-      columns: cols.filter((c) => str(c["t"]) === t).map((c) => ({ name: str(c["n"]), type: str(c["type"]).toLowerCase(), nullable: yes(c["nl"]), ...(c["d"] === null || c["d"] === undefined ? {} : { default: str(c["d"]) }) })),
-      primaryKey: pk === undefined ? [] : split(pk["cols"]),
-      uniques: mine.filter((c) => str(c["k"]) === "u").map((c) => ({ columns: split(c["cols"]) })),
-      foreignKeys: mine.filter((c) => str(c["k"]) === "f").map((c) => ({ columns: split(c["cols"]), references: { table: str(c["rt"]), columns: split(c["rcols"]) } })),
-      indexes: idx.filter((i) => str(i["t"]) === t).map((i) => ({ name: str(i["n"]), columns: split(i["cols"]), unique: yes(i["u"]) })),
-    };
-  });
-}
-
 /**
  * Reads what a database holds.
  *
  * @param driver - the database
- * @param dialect - its dialect (`postgres`, `sqlite` or `duckdb`)
+ * @param dialect - its dialect 
  * @param options - the schema to read and the tables to leave out
  * @returns the tables, in the order of their names
  */
 export async function introspect(driver: Driver, dialect: Dialect, options: IntrospectOptions = {}): Promise<Observed> {
-  const read = dialect.name === "sqlite" ? await sqlite(driver) : dialect.name === "duckdb" ? await duckdb(driver, options.schema) : await postgres(driver, options.schema);
+  if (dialect.observe === undefined) throw new TypeError(`the ${dialect.name} dialect cannot observe a database: it has no \`observe\``);
+  const read = await dialect.observe((sql) => driver.query(sql), options.schema);
   const tables = read.filter((t) => options.exclude?.(t.name) !== true).toSorted((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
   return { dialect: dialect.name, ...(options.schema === undefined ? {} : { schema: options.schema }), tables };
 }

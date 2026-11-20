@@ -6,8 +6,6 @@
  * @module
  */
 import type { DocsConfig } from "./docs/config.ts";
-import { fileAide } from "./docs/lens/file-aide.ts";
-import { sqlAide } from "./docs/lens/sql-aide.ts";
 
 /** Commons' site: its packages, its spec kit, how its specifications are cited, and its lenses. */
 export const config: DocsConfig = {
@@ -18,7 +16,6 @@ export const config: DocsConfig = {
   home: { dir: "commons" },
   packages: [
     { dir: "commons/ts", slug: "ifc-typescript" },
-    { dir: "commons/ts/data", slug: "data" },
     { dir: "commons/docs", slug: "docs" },
   ],
   specKits: [
@@ -41,7 +38,7 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/ergonex/spec-kit" },
   ],
   citations: { prefix: "commons", digits: 4, text: ["erga", "archon", "stolos", "thyra"] },
-  lenses: [sqlAide, fileAide],
+  lenses: [],
   lintRules: "commons/lint/src/rules",
   out: "_site",
 };

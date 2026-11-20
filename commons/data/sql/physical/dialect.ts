@@ -86,6 +86,32 @@ export interface LiveTable {
 /** A way to run a query and read its rows. */
 export type Query = (sql: string) => Promise<readonly Record<string, unknown>[]>;
 
+/** A column as a database holds it. */
+export interface ObservedColumn {
+  readonly name: string;
+  /** The type as the engine says it, in lower case (`integer`, `numeric(10,2)`, `timestamp with time zone`, `vector(3)`). */
+  readonly type: string;
+  readonly nullable: boolean;
+  readonly default?: string;
+}
+
+/** A table as a database holds it. */
+export interface ObservedTable {
+  readonly name: string;
+  readonly columns: readonly ObservedColumn[];
+  readonly primaryKey: readonly string[];
+  readonly uniques: readonly { readonly columns: readonly string[] }[];
+  readonly foreignKeys: readonly { readonly columns: readonly string[]; readonly references: { readonly table: string; readonly columns: readonly string[] } }[];
+  readonly indexes: readonly { readonly name: string; readonly columns: readonly string[]; readonly unique: boolean }[];
+}
+
+/** What a database holds, as a dialect observes it (0055-sql-introspect FR-001). */
+export interface Observed {
+  readonly dialect: string;
+  readonly schema?: string;
+  readonly tables: readonly ObservedTable[];
+}
+
 /** How a dialect reads its own catalog (0019-sql-convergence FR-001). */
 export interface Catalog {
   /** What the dialect compares, in words, so that what it does not is said. */
@@ -137,6 +163,8 @@ export interface Dialect {
   readonly ifExists?: readonly IfExistsForm[];
   /** How the dialect reads its catalog; none where it cannot. */
   readonly catalog?: Catalog;
+  /** How the dialect observes a whole database: tables, columns, keys, unique constraints, foreign keys and indexes (0055-sql-introspect FR-001); none where it cannot. */
+  readonly observe?: (query: Query, schema?: string) => Promise<readonly ObservedTable[]>;
   /** How the dialect keeps one instance applying at a time; none where there is only one. */
   readonly advisory?: Advisory;
   /** Whether `DROP TABLE` and `DROP VIEW` take `CASCADE`, so that a table can be made again under views that read it (0023-sql-transforms). */

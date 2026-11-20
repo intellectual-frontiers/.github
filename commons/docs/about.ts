@@ -19,11 +19,6 @@ export const about: About = {
   folders: [
     { path: "config.ts", what: "The configuration's types (`DocsConfig`, `About`) and the one check of a configuration.", mayImport: ["the kernel", "the runtime"] },
     { path: "extract/", what: "The readers of the spec kits (both layouts) and of the API, through `typescript/async`.", mayImport: ["the kernel", "the runtime", "typescript/async"] },
-    {
-      path: "lens/",
-      what: "Commons' lenses, which commons' configuration passes: which exports are each library's, and the pages their values make. Reached from none of the package's entry points.",
-      mayImport: ["the generator's `mod.ts`", "the kernel", "the libraries' entry points"],
-    },
     { path: "emit/", what: "The page model written as HTML, and the search index.", mayImport: ["the kernel"] },
     { path: "theme/", what: "The stylesheet and the one script of the site.", mayImport: ["nothing: CSS and a browser script"] },
     { path: "ifc-docs.mjs", what: "The command `ifc-docs`: it registers IFC TypeScript's Node hook, then runs `cli.ts`, on Bun and on Node 26 alike.", mayImport: ["the Node hook", "cli.ts"] },

@@ -1,7 +1,7 @@
 /**
  * The typed facts of Intellectual Frontiers Commons as a whole (commons 0011-documentation FR-005), the home page of its documentation:
  * what commons is and its folders. Its capabilities are its specifications (`spec-kit/registry.tsv`), and its packages keep their own
- * `about.ts` (`ts/about.ts`, `ts/data/about.ts`).
+ * `about.ts` (`ts/about.ts`).
  *
  * @module
  */
@@ -38,7 +38,7 @@ export const about: About = {
       what: "IFC data, an independent library with a spec kit and a manifest (`library.ts`) of its own (commons 0027-commons-libraries): governance, a logical and a physical schema, and extensions. Proved by `bun run verify` in its folder.",
       mayImport: ["its own about.ts"],
     },
-    { path: "ts/", what: "IFC TypeScript, and the data libraries built on it (`ts/data/`).", mayImport: ["see its own about.ts"] },
+    { path: "ts/", what: "IFC TypeScript.", mayImport: ["see its own about.ts"] },
     {
       path: "docs/",
       what: "The generator of this documentation, IFC Docs, which any repository uses by depending on commons by Git; it reads only commons' TypeScript and the spec kit, as `docs.config.ts` names them.",

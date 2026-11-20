@@ -5,6 +5,7 @@
  *
  * @module
  */
+import { observe } from "./observe.ts";
 import type { LogicalType } from "@intellectual-frontiers/data/sql/logical";
 import { type Dialect, dialectExtension, quoteName, standardLiteral } from "@intellectual-frontiers/data/sql/physical";
 
@@ -60,6 +61,7 @@ export const dialect: Dialect = {
   type,
   cascade: true,
   advisory: { acquire: (k) => `SELECT pg_advisory_lock(${k});`, release: (k) => `SELECT pg_advisory_unlock(${k});` },
+  observe,
   catalog: {
     compares: ["tables", "columns (type, nullability, default)", "primary keys", "indexes", "foreign keys, uniques and checks (by name)"],
     read: async (query, schema) => {

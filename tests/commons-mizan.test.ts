@@ -130,11 +130,11 @@ proves(["0003-mizan FR-004"], "a bare citation of another repository's spec", ()
 proves(["0003-mizan FR-008"], "a Part of line names another specification of the folder", () => {
   using k = Kit.make();
   assertEquals(k.findings(), "", "commons' own Part of lines name specifications it has");
-  k.edit("specs/0009-sql-aide/spec.md", "**Part of:** 0005-typescript-runtime", "**Part of:** 0099-nothing");
-  k.edit("specs/0010-file-aide/spec.md", "**Part of:** 0005-typescript-runtime", "**Part of:** 0010-file-aide");
+  k.edit("specs/0016-ladder/spec.md", "**Part of:** 0003-mizan", "**Part of:** 0099-nothing");
+  k.edit("specs/0017-two-languages/spec.md", "**Part of:** 0003-mizan", "**Part of:** 0017-two-languages");
   const out = k.findings();
-  assertStringIncludes(out, "specs/0009-sql-aide: **Part of:** names 0099-nothing, which is not another specification of this folder");
-  assertStringIncludes(out, "specs/0010-file-aide: **Part of:** names 0010-file-aide");
+  assertStringIncludes(out, "specs/0016-ladder: **Part of:** names 0099-nothing, which is not another specification of this folder");
+  assertStringIncludes(out, "specs/0017-two-languages: **Part of:** names 0017-two-languages");
 });
 
 proves(["0003-mizan FR-005"], "the enforcement register", () => {

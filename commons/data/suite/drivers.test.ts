@@ -7,7 +7,7 @@
  */
 import { DuckDBInstance } from "@duckdb/node-api";
 import { PGlite } from "@electric-sql/pglite";
-import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
+import { assert, proves } from "@intellectual-frontiers/test";
 import { bunSqlDriver, driverFor, duckdbDriver, type DuckdbClient, pgDriver, pgliteDriver, plain, sqliteDriver, type PgClient, type SqliteClient } from "@intellectual-frontiers/data/sql/drivers";
 import type { Driver } from "@intellectual-frontiers/data/sql/lifecycle";
 import { DatabaseSync } from "node:sqlite";

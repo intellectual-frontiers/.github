@@ -6,6 +6,7 @@
  *
  * @module
  */
+import { observe } from "./observe.ts";
 import type { LogicalType } from "@intellectual-frontiers/data/sql/logical";
 import { type Dialect, dialectExtension, quoteName, standardLiteral } from "@intellectual-frontiers/data/sql/physical";
 
@@ -41,6 +42,7 @@ export const dialect: Dialect = {
   quote: quoteName,
   literal: standardLiteral,
   type,
+  observe,
   catalog: {
     compares: ["tables", "columns (type, nullability, default)", "primary keys", "indexes"],
     read: async (query) => {

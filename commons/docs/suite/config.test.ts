@@ -16,11 +16,11 @@ proves(["0011-documentation FR-023"], "commons' configuration resolves: its root
   assertEquals(CONFIG.fileFromRoot, "commons/docs.config.ts");
   assertEquals([CONFIG.name, CONFIG.subject, CONFIG.branch], ["IF Commons", "commons", "main"]);
   assertEquals(CONFIG.home, { dir: "commons", slug: "home", about: { kind: "file", file: "commons/about.ts" } });
-  assertEquals(CONFIG.packages.map((p) => [p.dir, p.slug]), [["commons/ts", "ifc-typescript"], ["commons/ts/data", "data"], ["commons/docs", "docs"]]);
+  assertEquals(CONFIG.packages.map((p) => [p.dir, p.slug]), [["commons/ts", "ifc-typescript"], ["commons/docs", "docs"]]);
   // a library's spec kit is named beside commons' own, so that it is published with it and never twice (0027-commons-libraries FR-009)
   assertEquals(CONFIG.specKits, [{ layout: "commons", dir: "commons/spec-kit" }, { layout: "commons", dir: "commons/data/spec-kit" }, { layout: "commons", dir: "commons/ergonex/spec-kit" }]);
   assertEquals([CONFIG.citations.prefix, CONFIG.citations.digits], ["commons", 4]);
-  assertEquals(CONFIG.lenses.map((l) => l.name), ["sql-aide", "file-aide"]);
+  assertEquals(CONFIG.lenses.map((l) => l.name), []);
   assertEquals(CONFIG.out, path.join(ROOT, "_site"));
 });
 
