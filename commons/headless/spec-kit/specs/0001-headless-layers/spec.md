@@ -19,7 +19,7 @@
 ## The check and the package
 
 - **FR-007**: `tools/check.ts` MUST run the layers check (`tools/layers.ts`, pure: given the files and the `exports` map it returns findings as data) together with the trace of the sources and tests to these specifications, and hold the findings against `trace.baseline.txt`, which only shrinks; `bun run verify` MUST run it. Taken from: commons data `tools/check.ts` and its layers specification (the check held against a baseline).
-- **FR-008**: Headless MUST be published as compiled modules with their declarations as `@intellectual-frontiers/headless` (commons 0032-lifting-libraries FR-005), with an entry for the package (`.`) and one for each layer (`./governance`, `./logical`, `./cli`, `./otel`), for Node 26 and Bun, and its manifest (`library.ts`) MUST agree with its folder; its `package.json` MUST stay private so that nothing is published from the folder by hand. Taken from: the packaging of terminal, system and quality (commons 0032-lifting-libraries FR-005, FR-013).
+- **FR-008**: Headless MUST be published as compiled modules with their declarations as `@intellectual-frontiers/headless` (commons 0032-lifting-libraries FR-005), with an entry for the package (`.`) and one for each layer (`./governance`, `./logical`, `./cli`, `./otel`), for Node 26 and Bun, and its manifest (`library.ts`) MUST agree with its folder; its `package.json` MUST stay private so that nothing is published from the folder by hand. Taken from: the packaging of terminal, system and quality (commons 0032-lifting-libraries FR-005, commons 0032-lifting-libraries FR-013).
 
 ## Acceptance scenarios
 
