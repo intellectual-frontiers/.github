@@ -11,7 +11,7 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github", "npm"],
+  distribution: ["github"],
   exports: [".", "./governance", "./logical", "./ontology"],
   family: { host: "toolchain", role: "host" },
   summary:

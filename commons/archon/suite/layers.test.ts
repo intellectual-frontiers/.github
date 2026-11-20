@@ -17,6 +17,7 @@ const EXPORTS: Record<string, string> = {
   "./governance": "./src/governance/mod.ts",
   "./logical": "./src/logical/mod.ts",
   "./dialect": "./src/physical/dialect/mod.ts",
+  "./cli": "./src/physical/cli/mod.ts",
 };
 const PKG = "@intellectual-frontiers/archon";
 const at = (path: string, text: string) => ({ path, text });
@@ -76,5 +77,5 @@ proves(["0001-archon-layers FR-005"], "the release record agrees with the manife
   assertEquals(release.slug, library.name);
   assertEquals(release.version, library.version);
   assertEquals(release.kind, "Software");
-  assertEquals(library.distribution, ["github", "npm"]);
+  assertEquals(library.distribution, ["github"], "held back from npm until the owner says it is ready");
 });

@@ -74,7 +74,7 @@ proves(["0001-package-managers-layers FR-005"], "the release record agrees with 
   assertEquals(release.slug, library.name);
   assertEquals(release.version, library.version);
   assertEquals(release.kind, "Software");
-  assertEquals(library.distribution, ["github", "npm"]);
+  assertEquals(library.distribution, ["github"], "held back from npm until the owner says it is ready");
 });
 
 proves(["0001-package-managers-layers FR-006"], "governance and logical read no file, reach no network and run no program", async () => {

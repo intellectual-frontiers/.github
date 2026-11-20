@@ -11,7 +11,8 @@
     ".": "./src/mod.ts",
     "./governance": "./src/governance/mod.ts",
     "./logical": "./src/logical/mod.ts",
-    "./dialect": "./src/physical/dialect/mod.ts"
+    "./dialect": "./src/physical/dialect/mod.ts",
+    "./cli": "./src/physical/cli/mod.ts"
   },
   "scripts": {
     "check": "tsc -p tsconfig.json",

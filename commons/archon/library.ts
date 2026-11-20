@@ -12,8 +12,8 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github", "npm"],
-  exports: [".", "./governance", "./logical", "./dialect"],
+  distribution: ["github"],
+  exports: [".", "./governance", "./logical", "./dialect", "./cli"],
   family: { host: "archon", role: "host" },
   summary:
     "Archon in the layers of Kanon: what a server, a device, a workstation or a cloud account must be, said once as requirements, the order and the plan made from them, and the port that a package for each tool (Ansible, OpenTofu, Microsoft DSC, cloud-init) implements; assurance profiles match the approval of a change to the fleet.",
@@ -27,6 +27,7 @@ export const library = {
       { name: "mise", instanceOf: "src/physical/dialect/", placement: "package" },
       { name: "winget", instanceOf: "src/physical/dialect/", placement: "package" },
     ],
+    plugins: [{ noun: "tool" }],
     units: [
       { folder: "src/governance/", layer: "governance", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }] },
       {
@@ -44,6 +45,14 @@ export const library = {
           { name: "@intellectual-frontiers/core", subpaths: [] },
           { name: "@intellectual-frontiers/crypto", subpaths: ["sha256"] },
           { name: "@intellectual-frontiers/headless", subpaths: ["logical"] },
+        ],
+      },
+      {
+        folder: "src/physical/cli/",
+        layer: "physical",
+        packages: [
+          { name: "@intellectual-frontiers/core", subpaths: [] },
+          { name: "@intellectual-frontiers/headless", subpaths: ["governance", "logical", "cli"] },
         ],
       },
       { folder: "src/", own: true },
