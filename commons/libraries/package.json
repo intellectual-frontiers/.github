@@ -20,6 +20,7 @@
     "./oscal-register": "./src/oscal-register.ts",
     "./pack": "./src/pack-library.ts",
     "./pins": "./src/pins.ts",
+    "./releasing": "./src/releasing.ts",
     "./plan": "./src/plan.ts",
     "./publish-ontology": "./src/publish-ontology.ts",
     "./versions": "./src/versions.ts",

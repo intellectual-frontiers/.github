@@ -9,4 +9,4 @@ requirement	mechanism	by	note
 0001-crypto FR-006	check	.github: cd commons/crypto && bun test suite/	dsse.test.ts: the DSSE specification's PAE example, sign and verify with six algorithms, a threshold of two over random payloads, every refusal by its kind, statements and their subjects' sha256
 0001-crypto FR-007	check	.github: cd commons/crypto && bun test suite/	uuid.test.ts: RFC 9562's examples, version 5 and its namespaces, the text form
 0001-crypto FR-008	check	.github: cd commons/crypto && bun test suite/	webauthn.test.ts: a registration and an authentication of ES256 verified and every refusal named
-0001-crypto FR-009	check	.github: cd commons/crypto && bun run verify	the package is built, inspected and packed by tools/pack.ts; tests/commons-packages.test.ts installs the tarball and runs it on Node 26 and Bun and type-checks a consumer of every entry
+0001-crypto FR-009	check	.github: cd commons/crypto && bun run verify	the package is built, inspected and packed by tools/pack.ts; tests/release/commons-packages.test.ts installs the tarball and runs it on Node 26 and Bun and type-checks a consumer of every entry

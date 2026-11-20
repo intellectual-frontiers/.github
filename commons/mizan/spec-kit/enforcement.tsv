@@ -8,4 +8,4 @@ requirement	mechanism	by	note
 0001-harness FR-005	check	.github: cd commons/mizan && bun test suite/	mizan-integrations.test.ts, mizan-integrations-formats.test.ts, mizan-exporters.test.ts: importers and exporters give the same bytes for the same input
 0001-harness FR-006	check	.github: cd commons/ts && bun test tests/mizan-newer.test.ts	mizan-newer.test.ts: a standard newer than its pin is a finding, and nothing is fetched but through the command's own function
 0001-harness FR-007	check	.github: cd commons/mizan && bun test suite/	mizan-boundaries.test.ts: the modules import only core, crypto, formats, githost, ontology, rdf, system and node:process and node:url
-0001-harness FR-008	check	.github: cd commons/mizan && bun run verify	the package is built, inspected and packed by tools/pack.ts; tests/commons-packages.test.ts installs the tarball, runs every entry on Node 26 and Bun and type-checks a consumer
+0001-harness FR-008	check	.github: cd commons/mizan && bun run verify	the package is built, inspected and packed by tools/pack.ts; tests/release/commons-packages.test.ts installs the tarball, runs every entry on Node 26 and Bun and type-checks a consumer

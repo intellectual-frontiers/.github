@@ -20,4 +20,4 @@ requirement	mechanism	by	note
 0001-formats FR-017	check	.github: cd commons/formats && bun test suite/	glob.test.ts: globs against @std/path's cases; expandGlob
 0001-formats FR-018	check	.github: cd commons/formats && bun test suite/	data.test.ts: the types and charsets of paths and extensions, unknown extensions
 0001-formats FR-019	check	.github: cd commons/formats && bun test suite/	http.test.ts: Link headers, Retry-After in both forms, safe methods
-0001-formats FR-020	check	.github: cd commons/formats && bun run verify	the package is built, inspected and packed by tools/pack.ts; tests/commons-packages.test.ts installs the tarball and runs it on Node 26 and Bun and type-checks a consumer of every entry
+0001-formats FR-020	check	.github: cd commons/formats && bun run verify	the package is built, inspected and packed by tools/pack.ts; tests/release/commons-packages.test.ts installs the tarball and runs it on Node 26 and Bun and type-checks a consumer of every entry

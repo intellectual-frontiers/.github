@@ -1,5 +1,5 @@
 /**
- * `versions`, how works are versioned (commons 0026-works-versioning): `check` finds a work whose files changed since the base and whose version did not grow by its scheme, `bump` writes the next
+ * `versions`, how works are versioned (commons 0026-works-versioning): `check` finds a record that is wrong, an identity that changed and a version that went back since the base (a version grows at the release, `release.ts`, and not at every push), `bump` writes the next
  * version into a work's record, `tag` creates the annotated (and, where Git is set to sign, signed) tag `<slug>-v<version>`, `notes` prints the release notes from the capabilities closed since the
  * last tag, `cite` writes `CITATION.cff` from the record, and `ledger` derives the ledger of releases from the tags.
  *
@@ -44,7 +44,6 @@ import {
   createTag,
   editionFacts,
   findBase,
-  changedBetween,
   isAncestor,
   isDirty,
   isRepository,
@@ -149,7 +148,7 @@ const LEDGER = {
 };
 
 const HELP_SUMMARY: Readonly<Record<(typeof COMMANDS)[number], string>> = {
-  check: "Find a work whose files changed and whose version did not grow.",
+  check: "Find a record that is wrong, an identity that changed and a version that went back (versions grow at the release).",
   bump: "Write the next version into a work's record.",
   tag: "Create the annotated tag of a work's version.",
   notes: "Print the release notes from the capabilities closed since the last tag.",
@@ -230,14 +229,11 @@ export async function checkVersions(repo: string, rev = "origin/main"): Promise<
   const baseTree =
     base.value.kind === "commit" ? await readTree(repo, base.value.commit) : ok<TreeFacts>({ paths: [], records: new Map() });
   if (baseTree.kind === "err") return notRunBecause(formatGitError(baseTree.error));
-  const changed =
-    base.value.kind === "commit" ? await changedBetween(repo, base.value.commit, headCommit.value) : ok<readonly string[]>([]);
-  if (changed.kind === "err") return notRunBecause(formatGitError(changed.error));
   const editions = await editionFacts(repo, editionsNeeded(head.value, baseTree.value), headCommit.value);
   if (editions.kind === "err") return notRunBecause(formatGitError(editions.error));
   return {
     kind: "judged",
-    findings: sortFindings(judgeWorks({ head: head.value, base: baseTree.value, changed: changed.value, editions: editions.value })),
+    findings: sortFindings(judgeWorks({ head: head.value, base: baseTree.value, changed: [], editions: editions.value })),
     works: workFolders(head.value.paths).length,
     from: base.value.kind === "commit" ? `the base ${base.value.commit.slice(0, 12)}` : "no base (the first commit)",
   };

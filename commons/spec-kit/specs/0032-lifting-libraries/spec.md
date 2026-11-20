@@ -46,7 +46,7 @@
 - **FR-006**: Node 26 MUST be the least Node a library supports, and its sources MUST be erasable TypeScript only (`erasableSyntaxOnly`), so that a library linked into another package of this repository runs from its `.ts` sources on Node 26 with no hook (Node strips the types of a file that is not under `node_modules`) and a library installed from npm runs from its compiled files. The Node hook of `commons/ts` (0005-typescript-runtime FR-029) MUST be removed when the last consumer that installs a copy of the sources has moved to the packages.
 - **FR-007**: A library's tests MUST be in its own folder (`suite/`) and run by its `verify`; a test that spans libraries (the boundaries of the whole, the versions, the ontologies, the generated files) MUST stay in the tests of this repository.
 - **FR-008**: The ontology that a library defines or generates from MUST be a file of that library, except the ontologies that several libraries read (Mizan, IFCCM, IFQS, IFR, the audit of packaging and the software supply chain), which are the library `ontology`.
-- **FR-009**: A new library MUST start at level L1 (0028-conformance-levels), MUST be versioned as a work (0026-works-versioning FR-008: `release.ts`), MUST be published to the GitHub package registry and to npm by the workflow generated for it (0030-generated-workflows FR-009), and the workflow MUST tag the version `<name>-v<version>` once it is on its registry, whether it got there by that workflow or by a person's first publish of a package that has no trusted publisher yet, and MUST NOT fail on a version that is already there.
+- **FR-009**: A new library MUST start at level L1 (0028-conformance-levels), MUST be versioned as a work (0026-works-versioning FR-008: `release.ts`), and MUST be published to the GitHub package registry and to npm by the release workflow (0030-generated-workflows FR-009), which tags the version `<name>-v<version>` once the publish was accepted, whether the package got there by that workflow or by a person's first publish of a package that has no trusted publisher yet, and MUST NOT fail on a version that is already there.
 
 ## Moving a module
 
@@ -104,7 +104,7 @@ The libraries are lifted from the layer 0 up, because a library cannot be publis
 2. **Given** a library whose `package.json` depends on a library of a higher layer or of its own layer, **When** the lift's test runs, **Then** it fails naming both, per FR-003.
 3. **Given** a library with a relative import of a file outside its folder, **When** the test runs, **Then** it fails naming the file, per FR-003.
 4. **Given** a module moved from `commons/ts` to a library, **When** any file of this repository still imports its old path, **Then** the compiler and the test fail, per FR-012.
-5. **Given** a version published by hand to npm, **When** the publish workflow is run from the main branch, **Then** it publishes nothing twice, makes the tag `<name>-v<version>` and does not fail, per FR-009.
+5. **Given** a version published by hand to npm, **When** the release workflow is run from the main branch and asked to publish, **Then** it publishes nothing twice, makes the tag `<name>-v<version>` and does not fail, per FR-009.
 
 6. **Given** a library whose published package has an entry with no `types`, or a declaration that imports a package it does not depend on, **When** it is packed, **Then** the packer refuses and names the entry or the import, per FR-013.
 7. **Given** the packed tarball of a library, **When** it is installed in an empty project, **Then** a consumer file that imports every entry type-checks against it, per FR-013.
@@ -119,7 +119,7 @@ The libraries are lifted from the layer 0 up, because a library cannot be publis
 
 - A module that two libraries need: it is in the lower one, per FR-003; a cycle between two libraries is a sign that a module is in the wrong one, and the table is changed (FR-002).
 - A library's tests that need the harness of `test`, a library of a higher layer: they are `devDependencies`, per FR-003.
-- A version already on npm when the workflow runs: the job that publishes skips, and the tag is still made, per FR-009.
+- A version already on npm when the workflow runs: it is skipped, and the tag is still made, per FR-009.
 - A consumer that pins a commit of this repository from before a move: it keeps working until it moves its pin; no re-export is kept for it, per FR-012.
 
 ## Assumptions

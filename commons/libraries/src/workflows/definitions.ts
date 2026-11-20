@@ -3,7 +3,7 @@
  * are written once, the workflow of each library of commons is made from its manifest, and the rest are written here as values. Nothing is read from a file but the manifests, and nothing is written.
  *
  * @remarks
- * `workflows(libraries)` gives every workflow, in the order of their files' names; the libraries are proved by one workflow, `ci`, whose plan reads which libraries a change affects and runs a matrix of those (the folder, the
+ * `workflows()` gives every workflow, in the order of their files' names; the libraries are proved by one workflow, `ci`, whose plan reads which libraries a change affects and runs a matrix of those (the folder, the
  * name and the `verify` command of a manifest, 0027-commons-libraries FR-012, and what else the library needs from `LIBRARY_CI`, the facts of CI that a manifest does not hold: a library without a record has `verify` on Linux and nothing else).
  *
  * @limits
@@ -59,16 +59,6 @@ const lines = (...l: readonly string[]): string => `${l.join("\n")}\n`;
 const BUN_ACTION = ".github/actions/bun/**";
 const own = (file: string): string => `.github/workflows/${file}.auto.yml`;
 
-/** What a library's manifest gives the plan of CI (0027-commons-libraries FR-012): the folder's name, the command that proves it and where it is published. */
-export type LibraryFacts = {
-  readonly name: string;
-  readonly verify: string;
-  /** The paths whose change affects it (0027-commons-libraries FR-022): the inputs of the library, as folders. */
-  readonly paths: readonly string[];
-  /** Where it is published (0027-commons-libraries FR-015 to FR-017): the registries, `github` and, where a decision says so, `npm`. */
-  readonly distribution: readonly string[];
-};
-
 /** The systems other than Linux that a library's CI may ask for: only a library with code of its own for one of them (paths, processes, sockets, scheduled jobs) names it. */
 export type OtherSystem = "windows-latest" | "macos-latest";
 
@@ -123,17 +113,20 @@ export type Cell = {
   readonly node: string;
   /** The command that runs after `verify`, or the empty string. */
   readonly after: string;
+  /** Whether the packing is checked in this cell: the library changed its `exports` (or the packer changed), or the run is of everything. A push does not pack otherwise; the release does. */
+  readonly pack: boolean;
   /** The runner, for a cell that is not on Linux. */
   readonly os?: OtherSystem;
 };
 
-/** The cell of a library on a system (`ubuntu-latest`, where it names none), from its manifest and its record of CI. */
-export function cellOf(l: { readonly name: string; readonly folder: string; readonly verify: string }, os?: OtherSystem): Cell {
+/** The cell of a library on a system (`ubuntu-latest`, where it names none), from its manifest and its record of CI; `pack` says whether the packing is checked in it. */
+export function cellOf(l: { readonly name: string; readonly folder: string; readonly verify: string }, os?: OtherSystem, pack = false): Cell {
   const ci = LIBRARY_CI[l.name];
   return {
     name: l.name,
     folder: l.folder,
     verify: l.verify,
+    pack,
     node: ci?.nodeTests ?? "",
     after: ci?.after ?? "",
     ...(os === undefined ? {} : { os }),
@@ -148,7 +141,7 @@ const cellSteps = (): readonly [Step, ...Step[]] => [
   checkout(),
   bun(),
   tools(expr("matrix.folder"), "The development tools, from bun.lock (the kernel is linked from commons/ts)"),
-  run(expr("matrix.verify"), { name: "verify", workingDirectory: expr("matrix.folder") }),
+  run(expr("matrix.verify"), { name: "verify (its packing is checked where the exports changed, and by the release)", workingDirectory: expr("matrix.folder"), env: { IFC_SKIP_PACK: expr("matrix.pack == false && '1' || ''") } }),
   run(expr("matrix.after"), { name: "After verify", when: "matrix.after != ''", workingDirectory: expr("matrix.folder"), shell: "bash" }),
   run(expr("matrix.node"), { name: "The tests on Node 26", when: "matrix.node != ''", workingDirectory: expr("matrix.folder"), shell: "bash" }),
 ];
@@ -545,7 +538,10 @@ const tests: Workflow = {
             name: "Independent validators of the exports (rdflib, pySHACL, jsonschema), which the Mizan test uses where they are installed",
           },
         ),
-        run("bun test ./tests/", { name: "The tests on Bun", when: "matrix.runtime == 'bun'" }),
+        run("bun test ./tests/*.test.ts", {
+          name: "The tests on Bun (tests/release/ is the release's: it packs, installs and type-checks every library)",
+          when: "matrix.runtime == 'bun'",
+        }),
         run('node --test "tests/*.test.ts"', { name: "The tests on Node 26", when: "matrix.runtime == 'node'" }),
       ],
     }),
@@ -595,177 +591,128 @@ const tests: Workflow = {
   },
 };
 
-/** Reads the name and version of the tarball in the working folder and says on the step's output whether that version is already on the registry (a re-run, or a first publish made by hand, never fails on a duplicate). */
-const HAVE = (registry: string): string =>
-  lines(
-    `pkg=$(tar -xzOf ./*.tgz package/package.json)`,
-    `name=$(printf '%s' "$pkg" | node -p "JSON.parse(require('fs').readFileSync(0,'utf8')).name")`,
-    `version=$(printf '%s' "$pkg" | node -p "JSON.parse(require('fs').readFileSync(0,'utf8')).version")`,
-    `if npm view "$name@$version" version${registry} >/dev/null 2>&1; then`,
-    '  echo "$name@$version is already there"',
-    '  echo "have=true" >> "$GITHUB_OUTPUT"',
-    "else",
-    '  echo "have=false" >> "$GITHUB_OUTPUT"',
-    "fi",
-  );
-const HAVE_NPM = HAVE("");
-const HAVE_GITHUB = HAVE(" --registry https://npm.pkg.github.com");
+/** The folder of a library's package that the release workflow packs: the cell of the matrix, `matrix.folder`. */
+const PUBLISH_SCRIPT = lines(
+  "set -euo pipefail",
+  "# each release, in dependency order (the plan's order: a library after the libraries it imports); a version that is on a registry is skipped, a tag that is there is kept, and a failure stops the run where it is,",
+  "# so that the run again continues from there",
+  "while read -r e; do",
+  '  slug=$(jq -r .slug <<<"$e"); version=$(jq -r .version <<<"$e"); tag=$(jq -r .tag <<<"$e"); publish=$(jq -r .publish <<<"$e")',
+  '  name="@intellectual-frontiers/$slug"',
+  '  if [ "$publish" = true ]; then',
+  '    tarball=$(ls "package/package-$slug/"*.tgz)',
+  '    if npm view "$name@$version" version >/dev/null 2>&1; then echo "$name@$version is already on npm"; else',
+  "      # trusted publishing (the id-token of this run) where the package has a trusted publisher; the token INFRO_NPMJS_TOKEN where the repository has one and the package has none yet",
+  '      if [ -n "${NPM_TOKEN:-}" ]; then export NODE_AUTH_TOKEN="$NPM_TOKEN"; fi',
+  '      npm publish "$tarball" --access public --provenance',
+  "      unset NODE_AUTH_TOKEN",
+  "    fi",
+  '    if npm view "$name@$version" version --registry https://npm.pkg.github.com "--//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >/dev/null 2>&1; then echo "$name@$version is already on the GitHub package registry"; else',
+  '      npm publish "$tarball" --registry https://npm.pkg.github.com "--//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN"',
+  "    fi",
+  "  fi",
+  "  # the tag is made once the publish was accepted: npm stages a first publish of a version and promotes it later, so the version is not asked for here",
+  '  if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" >/dev/null 2>&1; then echo "$tag is already there"; else',
+  '    gh api "repos/$GITHUB_REPOSITORY/git/refs" -f "ref=refs/tags/$tag" -f "sha=$GITHUB_SHA" >/dev/null',
+  '    echo "tagged $tag"',
+  "  fi",
+  'done < <(printf \'%s\' "$SEQUENCE" | jq -c \'.[]\')',
+);
 
 /**
- * The workflow that publishes a library to the registries its manifest names (0030-generated-workflows FR-009): on a tag `<name>-v<version>` it checks the tag is the version, proves the library, packs it
- * with its `tools/pack.ts` and sends the tarball to npm, with provenance and no token (npm's trusted publishing), and to the GitHub package registry with the workflow's own token.
+ * The one workflow that releases (0001-libraries FR-014, FR-015): run by hand from main, never by a push. It reads the release record that `release apply` wrote (`commons/generated/release.auto.json`: the libraries
+ * whose version is to be published and tagged, in dependency order), proves and packs each of them in a matrix, and, where the run is asked to publish, sends them in that order to npm (trusted publishing with provenance, or
+ * the token `INFRO_NPMJS_TOKEN` where the repository has one) and to the GitHub package registry, and makes the tag of each with the runner's token. A run that is not asked to publish stops after the packing.
  */
-export function publishWorkflow(l: LibraryFacts): Workflow {
-  const folder = `commons/${l.name}`;
-  const tarball = 'npm publish "$(ls ./*.tgz)"';
-  const sendNpm = l.distribution.includes("npm");
-  return {
-    file: `${l.name}-publish`,
-    name: `${l.name}-publish`,
-    comment: lines(
-      `Publishes ${l.name} (commons 0027-commons-libraries FR-015, FR-016): a tag \`${l.name}-v<version>\` (made by \`versions tag\`, commons 0026-works-versioning), or a run by hand from main, is checked against the package's version, the library is proved and packed by its own`,
-      "tools/pack.ts, and the tarball goes to the registries its manifest names: npm with provenance and no token (trusted publishing, which the owner of the npm scope sets up once for this workflow's file), and",
-      "the GitHub package registry with this workflow's own token.",
-    ).trimEnd(),
-    on: { push: { tags: [`${l.name}-v*`] }, workflowDispatch: true },
-    permissions: { contents: "read" },
-    jobs: {
-      build: job({
-        runsOn: "ubuntu-latest",
-        timeoutMinutes: 15,
-        steps: [
-          checkout(),
-          bun(),
-          setupNode(),
-          tools(folder),
-          run(
-            lines(
-              `version=$(node -p "require('./package.json').version")`,
-              `if [ "$GITHUB_REF_TYPE" = tag ]; then`,
-              `  test "$GITHUB_REF_NAME" = "${l.name}-v$version" || { echo "the tag $GITHUB_REF_NAME is not ${l.name}-v$version"; exit 1; }`,
-              `else`,
-              `  test "$GITHUB_REF" = refs/heads/main || { echo "a run by hand publishes only from main, not $GITHUB_REF"; exit 1; }`,
-              `fi`,
-            ),
-            {
-              name: "The tag, or main for a run by hand, is the version of the package",
-              workingDirectory: folder,
-              shell: "bash",
-            },
-          ),
-          run("bun run verify", { name: "verify", workingDirectory: folder }),
-          run("bun tools/pack.ts", { name: "The package that is published", workingDirectory: folder }),
-          use(PIN.uploadArtifact, {
-            name: "The tarball, kept for the jobs that publish it",
-            with: { name: `${l.name}-package`, path: `${folder}/dist/*.tgz`, "if-no-files-found": "error" },
-          }),
-        ],
-      }),
-      ...(sendNpm
-        ? {
-            "publish-npm": job({
-              needs: ["build"],
-              runsOn: "ubuntu-latest",
-              timeoutMinutes: 10,
-              permissions: { contents: "read", "id-token": "write" },
-              environment: { name: "npm" },
-              steps: [
-                use(PIN.downloadArtifact, { name: "The tarball", with: { name: `${l.name}-package`, path: "package" } }),
-                use(PIN.setupNode, { with: { "node-version": expr("env.NODE_VERSION"), "registry-url": "https://registry.npmjs.org" } }),
-                run(HAVE_NPM, {
-                  name: "Is the version already on npm (published by hand, or by an earlier run)?",
-                  id: "have",
-                  shell: "bash",
-                  workingDirectory: "package",
-                }),
-                run(tarball + " --access public --provenance", {
-                  name: "Published to npm, with provenance and no token",
-                  when: "steps.have.outputs.have != 'true'",
-                  workingDirectory: "package",
-                  shell: "bash",
-                }),
-              ],
-            }),
-          }
-        : {}),
-      "publish-github": job({
-        needs: ["build"],
-        runsOn: "ubuntu-latest",
-        timeoutMinutes: 10,
-        permissions: { contents: "read", packages: "write" },
-        steps: [
-          use(PIN.downloadArtifact, { name: "The tarball", with: { name: `${l.name}-package`, path: "package" } }),
-          use(PIN.setupNode, {
-            with: {
-              "node-version": expr("env.NODE_VERSION"),
-              "registry-url": "https://npm.pkg.github.com",
-              scope: "@intellectual-frontiers",
-            },
-          }),
-          run(HAVE_GITHUB, {
-            name: "Is the version already on the GitHub package registry?",
-            id: "have",
-            shell: "bash",
-            workingDirectory: "package",
-            env: { NODE_AUTH_TOKEN: expr("secrets.GITHUB_TOKEN") },
-          }),
-          run(tarball, {
-            name: "Published to the GitHub package registry",
-            when: "steps.have.outputs.have != 'true'",
-            workingDirectory: "package",
-            shell: "bash",
-            env: { NODE_AUTH_TOKEN: expr("secrets.GITHUB_TOKEN") },
-          }),
-        ],
-      }),
-      // a run by hand from main makes the tag that a push of one would have, where the runner's token may and a person's sandbox may not; it tags a version that is on its registry,
-      // however it got there (this workflow's jobs, or a person's first publish of a package that has no trusted publisher yet), and never fails on a tag that is there
-      tag: job({
-        needs: ["build", ...(sendNpm ? ["publish-npm"] : []), "publish-github"],
-        when: "always() && needs.build.result == 'success' && github.ref_type == 'branch'",
-        runsOn: "ubuntu-latest",
-        timeoutMinutes: 5,
-        permissions: { contents: "write" },
-        steps: [
-          checkout(),
-          use(PIN.setupNode, {
-            with: {
-              "node-version": expr("env.NODE_VERSION"),
-              ...(sendNpm ? {} : { "registry-url": "https://npm.pkg.github.com", scope: "@intellectual-frontiers" }),
-            },
-          }),
-          run(
-            lines(
-              `version=$(node -p "require('./package.json').version")`,
-              `tag="${l.name}-v$version"`,
-              sendNpm
-                ? `npm view "@intellectual-frontiers/${l.name}@$version" version >/dev/null 2>&1 || { echo "$version is not on npm: no tag"; exit 1; }`
-                : `npm view "@intellectual-frontiers/${l.name}@$version" version >/dev/null 2>&1 || { echo "$version is not on the GitHub package registry: no tag"; exit 1; }`,
-              'if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" >/dev/null 2>&1; then',
-              '  echo "$tag is already there"',
-              "else",
-              '  gh api "repos/$GITHUB_REPOSITORY/git/refs" -f "ref=refs/tags/$tag" -f "sha=$GITHUB_SHA"',
-              "fi",
-            ),
-            {
-              name: "The tag of the version that is published, made once",
-              shell: "bash",
-              workingDirectory: folder,
-              env: { GH_TOKEN: expr("secrets.GITHUB_TOKEN"), ...(sendNpm ? {} : { NODE_AUTH_TOKEN: expr("secrets.GITHUB_TOKEN") }) },
-            },
-          ),
-        ],
-      }),
+const release: Workflow = {
+  file: "release",
+  name: "release",
+  comment: lines(
+    "The release of the libraries (commons 0001-libraries FR-014, FR-015): by hand, from main, after `bun run release apply` (commons/libraries/src/releasing.ts) has written the versions and the record `commons/generated/release.auto.json` and they are pushed.",
+    "`plan` reads the record and leaves out what is tagged; `build` proves and packs each library (`verify`, `tools/pack.ts`); `publish`, where asked, sends the tarballs in dependency order to npm with provenance, by npm's trusted",
+    "publishing (the owner sets a trusted publisher once for each package on npmjs.com: this repository, this workflow's file, the environment `npm`) or, where the repository has the secret INFRO_NPMJS_TOKEN, by that token,",
+    "and to the GitHub package registry, and makes the tag of each. A version that is on a registry is skipped and a tag that is there is kept, so a run again continues where one stopped.",
+  ).trimEnd(),
+  on: {
+    workflowDispatch: {
+      inputs: { publish: { description: "Publish and tag; without it the run only plans, proves and packs", type: "boolean", default: false } },
     },
-    env: { NODE_VERSION },
-  };
-}
+  },
+  permissions: { contents: "read" },
+  env: { NODE_VERSION },
+  concurrency: { group: "release", cancelInProgress: false },
+  jobs: {
+    plan: job({
+      runsOn: "ubuntu-latest",
+      timeoutMinutes: 10,
+      outputs: {
+        "has-build": expr("steps.plan.outputs.has-build"),
+        build: expr("steps.plan.outputs.build"),
+        sequence: expr("steps.plan.outputs.sequence"),
+      },
+      steps: [
+        checkout({ fetchDepth: 0, comment: "the whole history and its tags: the plan leaves out what is tagged" }),
+        bun(),
+        run("bun install --frozen-lockfile", { name: "The packages the plan reads, from the root's bun.lock" }),
+        run(
+          lines(
+            'test "$GITHUB_REF" = refs/heads/main || { echo "a release is made from main, not $GITHUB_REF"; exit 1; }',
+            'bun commons/libraries/src/releasing.ts matrix --github-output "$GITHUB_OUTPUT"',
+          ),
+          { name: "The libraries to release, in dependency order, from the record", id: "plan", shell: "bash" },
+        ),
+      ],
+    }),
+    build: job({
+      name: "build (${{ matrix.slug }} ${{ matrix.version }})",
+      needs: ["plan"],
+      when: "needs.plan.outputs.has-build == 'true'",
+      runsOn: "ubuntu-latest",
+      timeoutMinutes: 20,
+      strategy: { failFast: true, matrix: expr("fromJSON(needs.plan.outputs.build)") },
+      steps: [
+        checkout(),
+        bun(),
+        tools(expr("matrix.folder")),
+        run("bun run verify", { name: "verify, which includes the packing", workingDirectory: expr("matrix.folder") }),
+        run("bun tools/pack.ts", { name: "The package that is published", workingDirectory: expr("matrix.folder") }),
+        use(PIN.uploadArtifact, {
+          name: "The tarball, kept for the job that publishes it",
+          with: { name: "package-${{ matrix.slug }}", path: "${{ matrix.folder }}/dist/*.tgz", "if-no-files-found": "error" },
+        }),
+      ],
+    }),
+    publish: job({
+      needs: ["plan", "build"],
+      when: "inputs.publish && needs.plan.outputs.has-build == 'true'",
+      runsOn: "ubuntu-latest",
+      timeoutMinutes: 60,
+      permissions: { contents: "write", "id-token": "write", packages: "write" },
+      environment: { name: "npm" },
+      env: { SEQUENCE: expr("needs.plan.outputs.sequence") },
+      steps: [
+        checkout(),
+        use(PIN.setupNode, { with: { "node-version": expr("env.NODE_VERSION"), "registry-url": "https://registry.npmjs.org" } }),
+        use(PIN.downloadArtifact, { name: "The tarballs", with: { pattern: "package-*", path: "package" } }),
+        run(PUBLISH_SCRIPT, {
+          name: "Published in dependency order to npm and to the GitHub package registry, and tagged",
+          shell: "bash",
+          env: {
+            NPM_TOKEN: expr("secrets.INFRO_NPMJS_TOKEN"),
+            GITHUB_TOKEN: expr("secrets.GITHUB_TOKEN"),
+            GH_TOKEN: expr("secrets.GITHUB_TOKEN"),
+          },
+        }),
+      ],
+    }),
+  },
+};
 
 /** Every workflow, the libraries'' made from their manifests, in the order of their files' names. */
-export function workflows(libraries: readonly LibraryFacts[]): readonly Workflow[] {
+export function workflows(): readonly Workflow[] {
   return [
-    ...libraries.filter((l) => l.distribution.includes("npm")).map(publishWorkflow),
     ci,
+    release,
     docs,
     ifcTypescript,
     tests,
