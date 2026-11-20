@@ -157,6 +157,12 @@ export const operations = codes(classSchema(pm.Operation, CODE), PM, {
   QueryInstalled: { label: en("query installed"), definition: en("Whether one package is installed: the exit status answers.") },
   QueryVersion: { label: en("query version"), definition: en("The version of one installed package, for an SBOM: the command prints it.") },
   QueryCandidate: { label: en("query candidate"), definition: en("Whether the repositories offer one package, and which version.") },
+  InstallExact: {
+    label: en("install exact"),
+    definition: en(
+      "Install one package at one version, written with {package} and {version}, as the manager's own documentation writes an exact version.",
+    ),
+  },
 });
 
 /** Whether a harness acts on a family: a code list, whose keys are the union the tools branch on. */
@@ -458,7 +464,9 @@ export const properties = [
   DatatypeProperty.make(pm.origin, {
     domain: pm.Command,
     range: xsd.string,
-    definition: en("Where the command comes from: upt, archon (what the retired Stolos engine ran, before commons/archon replaced it), memory (written from knowledge, unverified) or upt+memory."),
+    definition: en(
+      "Where the command comes from: upt, archon (what the retired Stolos engine ran, before commons/archon replaced it), memory (written from knowledge, unverified) or upt+memory.",
+    ),
   }),
   DatatypeProperty.make(pm.verifiedOn, {
     definition: en("Where and when it was run for real, in words. Without it, a command, a family or a flag is not verified."),
