@@ -24,3 +24,4 @@ requirement	mechanism	by	note
 0001-libraries FR-021	check	.github: cd commons/libraries && bun test suite/	libraries.test.ts: two libraries that hold one number are given one each, the first in the section keeping it
 0001-libraries FR-022	check	.github: cd commons/libraries && bun test suite/	metapackages.test.ts: publishes and bundle are read, and the three refusals; releasing.test.ts: the release uses the package a manifest publishes
 0001-libraries FR-023	check	.github: cd commons/libraries && bun test suite/	metapackages.test.ts: the members, the exact dependencies, the generator and its --check, the packer and the order in the plan
+0001-libraries FR-024	check	.github: cd commons/libraries && bun test suite/	held.test.ts: the decoder's acceptances and refusals and the sets; metapackages.test.ts: a held library is not in the facts of a release
