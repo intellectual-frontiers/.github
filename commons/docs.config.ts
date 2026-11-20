@@ -28,6 +28,7 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/terminal/spec-kit" },
     { layout: "commons", dir: "commons/system/spec-kit" },
     { layout: "commons", dir: "commons/telemetry/spec-kit" },
+    { layout: "commons", dir: "commons/lint/spec-kit" },
     { layout: "commons", dir: "commons/net/spec-kit" },
     { layout: "commons", dir: "commons/test/spec-kit" },
     { layout: "commons", dir: "commons/crypto/spec-kit" },
@@ -37,7 +38,7 @@ export const config: DocsConfig = {
   ],
   citations: { prefix: "commons", digits: 4, text: ["erga", "archon", "stolos", "thyra"] },
   lenses: [sqlAide, fileAide],
-  lintRules: "commons/ts/lint/rules",
+  lintRules: "commons/lint/src/rules",
   out: "_site",
 };
 

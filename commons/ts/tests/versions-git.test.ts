@@ -588,7 +588,7 @@ proves(
     };
     const ts = decode("commons/ts/release.ts");
     const docs = decode("commons/docs/release.ts");
-    assertEquals([ts.slug, ts.version], ["ifc-ts", "0.22.0"]);
+    assertEquals([ts.slug, ts.version], ["ifc-ts", "0.23.0"]);
     assertEquals([docs.slug, docs.version], ["ifc-docs", "0.1.7"]);
     for (const [dirName, r] of [
       ["ts", ts],

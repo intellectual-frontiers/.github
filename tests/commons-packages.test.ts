@@ -9,6 +9,7 @@ import { fs, path, proc } from "../commons/system/src/mod.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../commons/test/src/test.ts";
 import { inspectPackage } from "../commons/ts/tools/pack-library.ts";
 import { readLibraries } from "../commons/ts/mizan/libraries.ts";
+import { linter } from "../commons/lint/src/test-rule.ts";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
 const TSC = path.join(ROOT, "commons", "ts", "node_modules", "typescript", "bin", "tsc");
@@ -157,6 +158,24 @@ proves(
         );
         const typed = await sh([node ?? bun, TSC, "-p", "tsconfig.json"], project);
         assertEquals(typed.code, 0, `tsc: ${typed.out}`);
+      }
+      // the plugin of the lint library, as installed (compiled), is loaded by `bun lint --plugin` by its file and by its package name, and its rules run (0001-lint FR-010)
+      if (published.some((p) => p.name === "@intellectual-frontiers/lint")) {
+        const ready = await linter();
+        if (ready.kind === "ok") {
+          await fs.mkdir(path.join(project, "src"), { recursive: true });
+          await fs.writeTextFile(path.join(project, "src", "a.ts"), "export const n = 1;\nconsole.log(n);\n");
+          for (const plugin of ["./node_modules/@intellectual-frontiers/lint/dist/plugin.js", "@intellectual-frontiers/lint"]) {
+            await fs.writeTextFile(
+              path.join(project, "bunfig.toml"),
+              `[lint]\nplugins = [${JSON.stringify(plugin)}]\n[lint.rules]\n"ifc/module-doc" = "error"\n"ifc/terminal-writers" = ["error", { allow = [] }]\n`,
+            );
+            const linted = await sh([...ready.value, "lint", "src"], project);
+            assertEquals(linted.code === 0, false, `bun lint with the plugin ${plugin} found nothing: ${linted.out}`);
+            assertStringIncludes(linted.out, "ifc/module-doc");
+            assertStringIncludes(linted.out, "ifc/terminal-writers");
+          }
+        }
       }
     } finally {
       await fs.remove(tmp, { recursive: true });

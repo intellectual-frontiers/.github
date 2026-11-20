@@ -29,7 +29,6 @@
     "quality/**/*.ts",
     "githost/**/*.ts",
     "workspaces/**/*.ts",
-    "lint/**/*.ts",
     "tests/**/*.ts",
     "tools/**/*.ts",
     "examples/**/*.ts",

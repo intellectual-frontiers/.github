@@ -1,5 +1,5 @@
 /**
- * Tests of the lint plugin of `lint/` (commons 0005-typescript-runtime FR-061): each rule against code it must refuse and code it must
+ * Tests of the lint plugin of this library (commons lint 0001-lint FR-001 to FR-009): each rule against code it must refuse and code it must
  * accept, run by the real `bun lint` with the plugin loaded by `--plugin` (`lint/test-rule.ts`), its options from the rule's setting;
  * options that do not decode are reported; and a harness's own rule, made with `defineRule`, loaded from a plugin of its own.
  *
@@ -7,15 +7,14 @@
  *
  * @module
  */
-import plugin from "../../lint/plugin.ts";
-import { type Rule } from "../../lint/rule.ts";
-import { linter, lintFiles, type LintRun, type Problem } from "../../lint/test-rule.ts";
+import plugin from "../src/plugin.ts";
+import { type Rule } from "../src/rule.ts";
+import { linter, lintFiles, type LintRun, type Problem } from "../src/test-rule.ts";
 import { type Equal, expectType } from "@intellectual-frontiers/core";
 import { makeTempDir, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { join } from "@intellectual-frontiers/system/path";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
-const FR = "0005-typescript-runtime FR-061";
 const ready = await linter();
 const when = { skip: ready.kind === "err" ? ready.error : false };
 
@@ -25,6 +24,8 @@ const NPM = ["np", "m:"].join("");
 const JSR = ["js", "r:"].join("");
 const HTTPS = ["htt", "ps:"].join("");
 const DOC = "/** A module. @module */\n";
+/** A relative path that leaves its package, built from parts so that no scanner of this file takes it for an import of the file itself. */
+const OUTSIDE = ["..", "..", "b", "src", "y.ts"].join("/");
 
 /** The problems of a run, as `file:line rule`, or the linter's failure as an error. */
 async function found(r: LintRun): Promise<readonly string[]> {
@@ -33,7 +34,7 @@ async function found(r: LintRun): Promise<readonly string[]> {
   return problems.value.map((p: Problem) => `${p.file}:${p.line} ${p.rule}`);
 }
 
-proves([FR], "the plugin is in ESLint's format, named ifc, with the rules every harness wants", () => {
+proves(["0001-lint FR-001"], "the plugin is in ESLint's format, named ifc, with the rules every harness wants", () => {
   assertEquals(plugin.meta.name, "ifc");
   assertEquals(Object.keys(plugin.rules).sort(), [
     "import-boundary",
@@ -52,7 +53,7 @@ proves([FR], "the plugin is in ESLint's format, named ifc, with the rules every 
 });
 
 proves(
-  [FR],
+  ["0001-lint FR-003"],
   "no-vendor-api refuses a vendor's global in code and in types outside the files allowed with their reasons",
   async () => {
     const files = {
@@ -75,7 +76,7 @@ proves(
 );
 
 proves(
-  [FR],
+  ["0001-lint FR-004"],
   "no-registry-import refuses npm:, jsr: and URL specifiers in every form of import; a bare name, node: and a relative path pass",
   async () => {
     const files = {
@@ -102,11 +103,11 @@ proves(
 );
 
 proves(
-  [FR],
+  ["0001-lint FR-005"],
   "import-boundary refuses a relative import that leaves its package; one inside it, or from a file in no package, passes",
   async () => {
     const files = {
-      "packages/a/src/x.ts": `${DOC}import { y } from "../../b/src/y.ts";\nexport { y };\n`,
+      "packages/a/src/x.ts": `${DOC}import { y } from "${OUTSIDE}";\nexport { y };\n`,
       "packages/a/src/z.ts": `${DOC}import { w } from "./w.ts";\nimport { v } from "../v.ts";\nexport { v, w };\n`,
       "kernel/k.ts": `${DOC}export { x } from "../packages/a/src/x.ts";\n`,
       "kernel/ok.ts": `${DOC}export { k } from "./k.ts";\n`,
@@ -122,7 +123,7 @@ proves(
 );
 
 proves(
-  [FR],
+  ["0001-lint FR-006"],
   "module-doc refuses a file that does not begin with a JSDoc block saying @module; a shebang may come first",
   async () => {
     const files = {
@@ -146,7 +147,7 @@ proves(
 );
 
 proves(
-  [FR],
+  ["0001-lint FR-007"],
   "switch-absurd refuses a switch on kind that does not end in a default calling absurd; every: true holds every switch to it",
   async () => {
     const sw = (end: string, on = "s.kind"): string =>
@@ -170,7 +171,7 @@ proves(
 );
 
 proves(
-  [FR],
+  ["0001-lint FR-008"],
   "terminal-writers refuses process.stdout, process.stderr, console and the vendors' streams outside the files allowed",
   async () => {
     const files = {
@@ -196,7 +197,7 @@ proves(
 );
 
 proves(
-  [FR],
+  ["0001-lint FR-002", "0001-lint FR-009"],
   "options that do not decode are reported, never ignored: an allowed file without its reason, a list that is not one",
   async () => {
     const files = { "a.ts": `${DOC}export const n = 1;\n` };
@@ -214,13 +215,13 @@ proves(
 );
 
 proves(
-  [FR],
+  ["0001-lint FR-002", "0001-lint FR-009"],
   "a harness defines its own rule with defineRule, in a plugin of its own, and bun lint loads it by --plugin",
   async () => {
     const dir = await makeTempDir({ prefix: "ifc-lint-plugin-" });
     try {
-      const rule = new URL("../../lint/rule.ts", import.meta.url).href;
-      const decode = new URL("../../../core/src/mod.ts", import.meta.url).href;
+      const rule = new URL("../src/rule.ts", import.meta.url).href;
+      const decode = new URL("../../core/src/mod.ts", import.meta.url).href;
       const path = join(dir, "harness.ts");
       await writeTextFile(
         path,

@@ -1,6 +1,6 @@
 /**
- * The typed way to define a lint rule in the ESLint plugin format that `bun lint --plugin` loads (commons 0005-typescript-runtime
- * FR-061): the few ESTree nodes the rules of `./rules/` read (as typescript-estree gives them to a plugin, written here, without
+ * The typed way to define a lint rule in the ESLint plugin format that `bun lint --plugin` loads (commons lint 0001-lint
+ * FR-002): the few ESTree nodes the rules of `./rules/` read (as typescript-estree gives them to a plugin, written here, without
  * `@types/eslint`), a rule's context, its visitor, `defineRule`, which decodes a rule's options once with the kernel's decoders and
  * reports options that do not decode instead of running, and what the rules share: a list of files, each with its reason, by glob
  * (`allowList`), the file being linted relative to the working folder (`fileOf`), and the names a node gives (`nameOf`, `stringOf`).
@@ -17,6 +17,8 @@
  *   DebuggerStatement: (node) => context.report({ node, message: options.strict === true ? "remove it" : "remove it, please" }),
  * }));
  * ```
+ *
+ * Spec: 0001-lint FR-002
  *
  * @module
  */
@@ -165,7 +167,7 @@ export type OptionsOf<O extends Fields> = { readonly [K in keyof O]?: Decoded<O[
 
 /**
  * A rule in ESLint's format from its description and the decoders of its optional options, and what it does with the options decoded
- * (FR-061). The options are the first after the severity, an object (absent is `{}`); options that do not decode are reported once, at
+ * (0001-lint FR-002). The options are the first after the severity, an object (absent is `{}`); options that do not decode are reported once, at
  * the top of each file, and the rule does nothing else.
  */
 export function defineRule<const O extends Fields>(
@@ -206,7 +208,7 @@ export const allowed: Decoder<Allowed> = (input, path = "$") => {
   return ok({ files: e.value.files, reason: e.value.reason, pattern: pattern.value });
 };
 
-/** A list of files, each with its reason, as a rule's option `allow` (FR-061). */
+/** A list of files, each with its reason, as a rule's option `allow` (0001-lint FR-002). */
 export const allowList: Decoder<readonly Allowed[]> = array(allowed);
 
 /** The file being linted, relative to the linter's working folder, with `/`. */

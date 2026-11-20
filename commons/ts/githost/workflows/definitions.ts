@@ -136,6 +136,14 @@ export const LIBRARY_CI: Readonly<Record<string, LibraryCi>> = {
     nodeTests: 'node --test "suite/**/*.test.ts"',
     systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
   },
+  lint: {
+    comment: lines(
+      "Lint, the lint plugin of Intellectual Frontiers, a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the pinned linter's canary, the compiler, the specification checker, the trace, its tests, which run",
+      "the real `bun lint`, and the packing of its package with the inspection of its declarations) on Bun and its tests on Node 26, on Windows, macOS and Linux, because the package runs on all three.",
+    ).trimEnd(),
+    nodeTests: `bun x bun@${BUN_LINT_VERSION} --version && node --test "suite/**/*.test.ts"`,
+    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
+  },
   telemetry: {
     comment: lines(
       "Telemetry, OpenTelemetry-native signals as one typed library, a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the specification checker, the trace, its tests and the",
@@ -262,7 +270,7 @@ const ifcTypescript: Workflow = {
           workingDirectory: "commons/ts",
         }),
         run("bun fmt --check", { name: "The formatter", workingDirectory: "commons/ts" }),
-        run('bun x "bun@$BUN_LINT_VERSION" lint --type-aware --max-warnings 0 kernel runtime lint tests tools', {
+        run('bun x "bun@$BUN_LINT_VERSION" lint --type-aware --max-warnings 0 kernel runtime tests tools ../lint', {
           name: "The linter, type-aware, no warning allowed",
           workingDirectory: "commons/ts",
         }),

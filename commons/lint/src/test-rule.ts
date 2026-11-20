@@ -1,5 +1,5 @@
 /**
- * A rule of a lint plugin run against code, in a test (commons 0005-typescript-runtime FR-061): the files are written to a new folder
+ * A rule of a lint plugin run against code, in a test (commons lint 0001-lint FR-009): the files are written to a new folder
  * and the real linter, `bun lint` of the pinned Bun, is run over them with the plugin loaded by `--plugin` and only the rule turned on
  * by `--rule`, so that a test proves the rule and the way `bun lint` loads it. Its problems come back from its JSON report, decoded.
  *
@@ -14,8 +14,11 @@
  * // { kind: "ok", value: [{ file: "a.ts", rule: "no-registry-import", line: 1, column: 1, message: "..." }] }
  * ```
  *
+ * Spec: 0001-lint FR-009
+ *
  * @module
  */
+import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { array, integer, json, nullable, object, string, err, ok, type Result } from "@intellectual-frontiers/core";
 import { makeTempDir, mkdir, readTextFile, realPath, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
@@ -26,7 +29,9 @@ import { env, run } from "@intellectual-frontiers/system/proc";
 export const LINT_BUN_VERSION = "1.4.4-canary.20261115.1";
 
 /** The plugin of this folder. */
-export const PLUGIN_PATH: string = fileURLToPath(new URL("./plugin.ts", import.meta.url));
+export const PLUGIN_PATH: string = fileURLToPath(
+  new URL(existsSync(new URL("./plugin.ts", import.meta.url)) ? "./plugin.ts" : "./plugin.js", import.meta.url),
+);
 
 /** A problem the linter reported: the file (as given), the rule without its prefix, the line and column from 1, and the message. */
 export type Problem = {
@@ -73,7 +78,7 @@ const report = array(
 );
 
 /**
- * The problems one rule of a plugin finds in the files given (FR-061), by running `bun lint` over them in a new folder (its working
+ * The problems one rule of a plugin finds in the files given (0001-lint FR-009), by running `bun lint` over them in a new folder (its working
  * folder, with a `bunfig.toml` of an empty `[lint]`), the rule set to `error` with its options. Problems of other rules (Bun's own
  * defaults) are left out. An error where the linter fails (exit 2: a rule threw, or the plugin did not load).
  */

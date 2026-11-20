@@ -31,7 +31,7 @@
   | 3 | ifr | mizan/versions, mizan/versions.ts |
   | 3 | githost | githost/capabilities, githost/git, githost/github, githost/gitlab, githost/http, githost/mod, githost/remote, githost/types |
   | 3 | libraries | mizan/libraries, mizan/affected, githost/workflows, tools/generate-workflows, tools/pins, tools/install-bun, tools/pack-library |
-  | 3 | lint | lint/ |
+  | 3 | lint | lint/plugin, lint/rule, lint/test-rule, lint/rules |
 
   The libraries `docs`, `data` and `ergonex` already exist and are not moved; `kernel/documentation` goes to `docs`. The folder `commons/ts/data` is another work's and is not part of this lift.
 

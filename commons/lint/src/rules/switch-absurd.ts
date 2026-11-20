@@ -1,11 +1,13 @@
 /**
- * `switch-absurd` (commons 0005-typescript-runtime FR-061): a `switch` over a union, on its discriminant (`x.kind` by default), ends in
+ * `switch-absurd` (commons lint 0001-lint FR-007): a `switch` over a union, on its discriminant (`x.kind` by default), ends in
  * a `default` that calls `absurd` (`default: return absurd(x)`), so that an alternative added to the union and left out does not
  * compile. A JavaScript rule has no types, so a switch over a union is a switch on a member named as one of the option `discriminants`;
  * with `every`, every switch is held to it.
  *
  * Options: `discriminants` (`["kind"]` by default), `functions` (the names of the exhaustive end, `["absurd"]` by default), `every` and
  * `allow` (`[{ files, reason }]`).
+ *
+ * Spec: 0001-lint FR-007
  *
  * @module
  */

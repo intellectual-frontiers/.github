@@ -1,9 +1,11 @@
 /**
- * `import-boundary` (commons 0005-typescript-runtime FR-061): a relative import that leaves its package is refused; another package is
+ * `import-boundary` (commons lint 0001-lint FR-005): a relative import that leaves its package is refused; another package is
  * imported by its name. The packages are the option `roots`, folders relative to the linter's working folder, each a glob of whole
  * segments (`kernel`, `packages/*`, `lib/ts/*`); a file's package is the longest root it is in, and a file in none is not checked.
  *
  * Options: `roots` (the package and member folders) and `allow` (`[{ files, reason }]`).
+ *
+ * Spec: 0001-lint FR-005
  *
  * @module
  */

@@ -59,11 +59,6 @@ export const about: About = {
       ],
     },
     {
-      path: "lint/",
-      what: "The lint plugin `bun lint --plugin` loads, and its rules.",
-      mayImport: ["node: builtins", "kernel/", "lint/", "runtime/"],
-    },
-    {
       path: "node/",
       what: "The Node hook that strips the types of this package's sources under `node_modules`, and the command `ifc`, in JavaScript.",
       mayImport: ["node: builtins", "tools/test.ts, once the hook is registered"],
@@ -162,7 +157,6 @@ export const about: About = {
   areas: [
     { title: "Kernel", slug: "kernel", entryPoints: ["kernel/mod.ts"] },
     { title: "Runtime", slug: "runtime", entryPoints: ["runtime/mod.ts", "runtime/test-run.ts"] },
-    { title: "Lint plugin", slug: "lint", entryPoints: ["lint/plugin.ts", "lint/rule.ts", "lint/test-rule.ts"] },
   ],
   examples: [{ file: "examples/use.ts", what: "What a harness imports once it depends on commons by Git." }],
 };

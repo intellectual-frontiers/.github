@@ -6,7 +6,7 @@ printWidth = 140
 [lint]
 typeAware = true
 # IFC TypeScript's own lint plugin (FR-061), with commons' own lists.
-plugins = ["./lint/plugin.ts"]
+plugins = ["../lint/src/plugin.ts"]
 
 [lint.rules]
 # Algebraic type safety: no escape from the type system, every alternative handled, every promise awaited (FR-028).
@@ -34,6 +34,7 @@ plugins = ["./lint/plugin.ts"]
     { files = "../system/src/tty.ts", reason = "the terminal's own streams, for its size and raw mode" },
     { files = "../system/src/stdio.ts", reason = "the process's standard streams, for what programs read (FR-054)" },
     { files = "tools/**", reason = "command-line tools print their results" },
+    { files = "../lint/tools/**", reason = "command-line tools print their results" },
     { files = "quality/assessor/verify.ts", reason = "the verifier a pack carries imports nothing of commons (0022-trust FR-016) and prints its report itself" },
   ] },
 ]

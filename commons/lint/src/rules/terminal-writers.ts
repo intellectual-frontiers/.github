@@ -1,10 +1,12 @@
 /**
- * `terminal-writers` (commons 0005-typescript-runtime FR-061): nothing writes to the terminal (`process.stdout`, `process.stderr`,
+ * `terminal-writers` (commons lint 0001-lint FR-008): nothing writes to the terminal (`process.stdout`, `process.stderr`,
  * `console.*`, and the vendors' own streams) outside the files of the option `allow`, each with its reason; everything else emits a
  * signal, or writes through the one module a harness lists. A named import of `stdout` or `stderr` from `node:process` is refused too.
  *
  * Options: `writers` (`[{ object, property }]`, `property` `*` for any member; the list above by default) and `allow` (`[{ files,
  * reason }]`).
+ *
+ * Spec: 0001-lint FR-008
  *
  * @module
  */

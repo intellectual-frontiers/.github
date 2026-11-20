@@ -1,5 +1,5 @@
 /**
- * IFC TypeScript's lint plugin in the ESLint plugin format (commons 0005-typescript-runtime FR-061), named `ifc`, which `bun lint`
+ * IFC TypeScript's lint plugin in the ESLint plugin format (commons lint 0001-lint FR-001), named `ifc`, which `bun lint`
  * loads from this file as it is (TypeScript, no build): `bun lint --plugin=<path to lint/plugin.ts> --rule '{"ifc/no-vendor-api":
  * ["error", {...}]}'` for one run, or in `bunfig.toml`:
  *
@@ -20,6 +20,8 @@
  * - `module-doc`: every file begins with a JSDoc block that says `@module`;
  * - `switch-absurd`: a `switch` on a union's `kind` ends in `default` calling `absurd`;
  * - `terminal-writers`: no write to the terminal outside the files listed with their reasons.
+ *
+ * Spec: 0001-lint FR-001
  *
  * @module
  */

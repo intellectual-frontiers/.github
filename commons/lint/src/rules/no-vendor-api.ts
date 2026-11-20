@@ -1,9 +1,11 @@
 /**
- * `no-vendor-api` (commons 0005-typescript-runtime FR-061): no member of a vendor's global (`Deno.*`, `Bun.*` by default), in code or in
+ * `no-vendor-api` (commons lint 0001-lint FR-003): no member of a vendor's global (`Deno.*`, `Bun.*` by default), in code or in
  * a type, outside the files of the option `allow`, each with its reason; a harness keeps its own list.
  *
  * Options: `globals` (the vendor globals, `["Deno", "Bun"]` by default) and `allow` (`[{ files, reason }]`, globs relative to the
  * linter's working folder).
+ *
+ * Spec: 0001-lint FR-003
  *
  * @module
  */

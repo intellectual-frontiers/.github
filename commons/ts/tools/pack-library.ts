@@ -54,9 +54,12 @@ export function filesUnder(root: string, dir = ""): readonly string[] {
 
 const SPECIFIER = /(?:\bfrom\s+|\bimport\s+|\bimport\(\s*)["']([^"']+)["']/g;
 
-/** The specifiers a source names. */
+/** The documentation blocks of a source (a block comment that begins a line): an example in one names what a reader may write, not what the module imports. */
+const DOC_BLOCK = /^[ \t]*\/\*[\s\S]*?\*\//gm;
+
+/** The specifiers a source names, outside its documentation blocks. */
 export const specifiersOf = (source: string): readonly string[] =>
-  [...source.matchAll(SPECIFIER)].map((m) => m[1] ?? "").filter((s) => s !== "");
+  [...source.replace(DOC_BLOCK, "").matchAll(SPECIFIER)].map((m) => m[1] ?? "").filter((s) => s !== "");
 
 /** The package a bare specifier names (`@scope/name/sub` is `@scope/name`), or undefined for a relative path, a `node:` builtin or a `data:` URL. */
 export function packageOf(specifier: string): string | undefined {

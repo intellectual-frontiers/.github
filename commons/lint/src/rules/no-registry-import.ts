@@ -1,9 +1,11 @@
 /**
- * `no-registry-import` (commons 0005-typescript-runtime FR-061): no module specifier that names a registry or a URL (`npm:`, `jsr:`,
+ * `no-registry-import` (commons lint 0001-lint FR-004): no module specifier that names a registry or a URL (`npm:`, `jsr:`,
  * `http:`, `https:` by default), in an import, an export, a dynamic `import()`, a type's `import()`, `import x = require()` or
  * `require()`; a package is installed and imported by its bare name.
  *
  * Options: `prefixes` (the refused beginnings of a specifier) and `allow` (`[{ files, reason }]`).
+ *
+ * Spec: 0001-lint FR-004
  *
  * @module
  */

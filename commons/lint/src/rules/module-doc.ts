@@ -1,8 +1,10 @@
 /**
- * `module-doc` (commons 0005-typescript-runtime FR-061): a file begins with its module's documentation, a JSDoc block (`/** ... *\/`)
+ * `module-doc` (commons lint 0001-lint FR-006): a file begins with its module's documentation, a JSDoc block (`/** ... *\/`)
  * that says `@module`, before any code and before any other comment (a shebang may come first).
  *
  * Options: `tag` (`@module` by default) and `allow` (`[{ files, reason }]`).
+ *
+ * Spec: 0001-lint FR-006
  *
  * @module
  */

@@ -7,7 +7,7 @@
  * @module
  */
 import { lf } from "@intellectual-frontiers/core";
-import { VENDOR_GLOBALS } from "../lint/rules/no-vendor-api.ts";
+import { VENDOR_GLOBALS } from "../../lint/src/rules/no-vendor-api.ts";
 import { decodeManifest, type Manifest, PACKAGE_NAME, rootEntries } from "../tools/manifest.ts";
 import { existsSync, readDirSync, readTextFile, readTextFileSync, statSync } from "@intellectual-frontiers/system/fs";
 import { dirname, fromFileUrl, join, relative, resolve, toPosix } from "@intellectual-frontiers/system/path";
@@ -86,7 +86,6 @@ const KERNEL = sources("kernel");
 const RUNTIME = sources("runtime");
 const TESTS = sources("tests");
 const TOOLS = sources("tools");
-const LINT = sources("lint");
 const MIZAN = sources("mizan");
 
 proves(
@@ -161,27 +160,6 @@ proves(["0005-typescript-runtime FR-003"], "the runtime imports only node: built
   assertEquals(bad, []);
 });
 
-proves(
-  ["0005-typescript-runtime FR-061", "0005-typescript-runtime FR-003"],
-  "the lint plugin imports only node: builtins, kernel/, lint/ and runtime/",
-  () => {
-    assert(LINT.length > 3);
-    const bad: string[] = [];
-    for (const f of LINT) {
-      for (const s of specifiers(
-        codeLines(readTextFileSync(join(ROOT, f)))
-          .map((l) => l.text)
-          .join("\n"),
-      )) {
-        if (s.startsWith("node:") || isLifted(s)) continue;
-        const target = toPosix(relative(ROOT, resolve(ROOT, dirname(f), s)));
-        if (!s.startsWith(".") || !["kernel/", "lint/", "runtime/"].some((p) => target.startsWith(p))) bad.push(`${f}: ${s}`);
-      }
-    }
-    assertEquals(bad, []);
-  },
-);
-
 /** The vendor globals the lint rule `no-vendor-api` refuses, as expressions that find a member of one. */
 const VENDOR_MEMBER = VENDOR_GLOBALS.map((g) => new RegExp(`\\b${g}\\s*\\.`));
 const VENDOR = [...VENDOR_MEMBER, /["']jsr:/, /["']npm:/, /["']@std\//, /["']@erga\//, /["']https?:\/\/[^"']*\.(?:ts|js|mjs)["']/];
@@ -203,7 +181,7 @@ proves(
   "no code uses a vendor global, a registry or a URL import; the kernel names no host global",
   () => {
     const bad: string[] = [];
-    for (const f of [...KERNEL, ...RUNTIME, ...LINT, ...TESTS, ...TOOLS]) {
+    for (const f of [...KERNEL, ...RUNTIME, ...TESTS, ...TOOLS]) {
       for (const { line, text } of codeLines(readTextFileSync(join(ROOT, f)))) {
         for (const re of VENDOR) if (re.test(text) && !f.startsWith("tests/boundaries")) bad.push(`${f}:${line}: ${text.trim()}`);
         if (f.startsWith("kernel/"))
@@ -230,7 +208,7 @@ proves(["0005-typescript-runtime FR-004"], "the checks see what they look for (n
 
 proves(["0005-typescript-runtime FR-015"], "every file begins with a JSDoc block that says @module, and every export has JSDoc", () => {
   const bad: string[] = [];
-  for (const f of [...KERNEL, ...RUNTIME, ...LINT, ...TESTS, ...TOOLS]) {
+  for (const f of [...KERNEL, ...RUNTIME, ...TESTS, ...TOOLS]) {
     const text = readTextFileSync(join(ROOT, f));
     const head = /^\/\*\*[\s\S]*?\*\//.exec(text);
     if (head === null || !head[0].includes("@module")) bad.push(`${f}: no @module block at the top`);
@@ -334,9 +312,6 @@ proves(
       "./ts/kernel": "./kernel/mod.ts",
       "./ts/runtime": "./runtime/mod.ts",
       "./ts/runtime/test-run": "./runtime/test-run.ts",
-      "./ts/lint": "./lint/plugin.ts",
-      "./ts/lint/rule": "./lint/rule.ts",
-      "./ts/lint/test-rule": "./lint/test-rule.ts",
       "./ts/mizan": "./mizan/mod.ts",
       "./ts/mizan/integrations": "./mizan/integrations/mod.ts",
       "./ts/mizan/changes": "./mizan/changes.ts",
