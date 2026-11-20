@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
+import { assertEquals, proves } from "@intellectual-frontiers/test";
 import { createTelemetry, memoryProcessor } from "@intellectual-frontiers/telemetry/signals";
 import { headlessSignals, observerOf } from "../src/otel/mod.ts";
 import { run } from "../src/surfaces/cli/run.ts";
@@ -78,5 +78,4 @@ proves(["0004-headless-cli FR-005", "0004-headless-cli FR-015"], "the surface do
     if (/from\s+["']@intellectual-frontiers\/telemetry/.test(text)) named.push(rel);
   }
   assertEquals(named, ["otel/mod.ts"]);
-  assert(true);
 });

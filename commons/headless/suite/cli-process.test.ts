@@ -68,11 +68,14 @@ proves(["0004-headless-cli FR-013"], "a check of the start that throws is a fail
   const code = await launch(p, { argv: ["status"], ready: () => Promise.reject(new Error("no config")), io: { sink: { out: () => undefined, err: (t) => void out.push(t) } } });
   assertEquals(code, 70);
   assertEquals(out.join(""), "tool: no config\n");
-  const r = await launch(p, { argv: ["--version"] });
-  assertEquals(r, 0);
+  const said: string[] = [];
+  const r = await launch(p, { argv: ["--version"], io: { sink: { out: (t) => void said.push(t), err: () => undefined } } });
+  assertEquals([r, said], [0, ["tool 1.2.3\n"]]);
 });
 
 proves(["0004-headless-cli FR-009"], "a real SIGINT ends a running program with 130 and a real SIGTERM with 143, and the program says Stopped", async () => {
+  // Windows has no signals to send to a process: it ends it (erga 274-agora FR-025: SIGTERM where the platform has it); the fake signals of cli-run.test.ts prove the same there
+  if (process.platform === "win32") return;
   for (const [signal, code] of [["SIGINT", 130], ["SIGTERM", 143]] as const) {
     const r = await child(["wait"], {}, (c) => void c.kill(signal));
     assertEquals([r.code, r.signal], [code, null], signal);
