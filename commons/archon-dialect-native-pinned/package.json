@@ -9,7 +9,8 @@
   },
   "exports": {
     ".": "./src/mod.ts",
-    "./install": "./src/install.ts"
+    "./install": "./src/install.ts",
+    "./pin": "./src/pin.ts"
   },
   "scripts": {
     "check": "tsc -p tsconfig.json",

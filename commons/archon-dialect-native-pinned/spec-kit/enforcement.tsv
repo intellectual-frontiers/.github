@@ -27,3 +27,9 @@ requirement	mechanism	by	note
 0004-native-pinned-dialect FR-005	check	.github: cd commons/archon-dialect-native-pinned && bun run verify	suite/dialect.test.ts: failures name the tool, the step and the next action
 0004-native-pinned-dialect FR-006	check	.github: cd commons/archon-dialect-native-pinned && bun run verify	suite/dialect.test.ts: a tool that is as pinned costs no request
 0004-native-pinned-dialect FR-007	check	.github: cd commons/archon-dialect-native-pinned && bun run verify	suite/dialect.test.ts: a pin with no download is told with its reason
+0005-native-pinned-pin FR-001	check	.github: cd commons/archon-dialect-native-pinned && bun run verify	suite/pin.test.ts
+0005-native-pinned-pin FR-002	check	.github: cd commons/archon-dialect-native-pinned && bun run verify	suite/pin.test.ts
+0005-native-pinned-pin FR-003	check	.github: cd commons/archon-dialect-native-pinned && bun run verify	suite/pin.test.ts
+0005-native-pinned-pin FR-004	check	.github: cd commons/archon-dialect-native-pinned && bun run verify	suite/pin.test.ts
+0005-native-pinned-pin FR-005	check	.github: cd commons/archon-dialect-native-pinned && bun run verify	suite/pin.test.ts
+0005-native-pinned-pin FR-006	check	.github: cd commons/archon-dialect-native-pinned && bun run verify	suite/pin.test.ts

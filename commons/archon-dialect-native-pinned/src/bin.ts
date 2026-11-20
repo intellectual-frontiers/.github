@@ -8,7 +8,10 @@
  * bun bin.ts check .archon/<digest>/native-pinned/plan.json
  * bun bin.ts apply .archon/<digest>/native-pinned/plan.json
  * bun bin.ts clean --programs
+ * bun bin.ts pin REQUEST.json [--out PROPOSAL.json]
  * ```
+ *
+ * `pin` fetches what a request names, takes the SHA-256 itself, checks it against the publisher's checksum and writes a proposal for a person to review; it changes no pin.
  *
  * @module
  */
@@ -20,6 +23,7 @@ import * as proc from "@intellectual-frontiers/system/proc";
 import { actionFor } from "@intellectual-frontiers/toolchain/logical";
 import { askWithin, observeJob, type Ask } from "./observe.ts";
 import { readPlanFile, type PlanFile, type ToolJob } from "./plan-file.ts";
+import { fetchBytes, proposalText, proposePin, readPinRequest, type FetchBytes } from "./pin.ts";
 import { cleanStore, describeFailure, installTool, osHere, storeOf, type Store } from "./store.ts";
 
 /** What the program reads from and says to the world; a test passes its own. */
@@ -30,10 +34,12 @@ export type Io = {
   readonly path: string | undefined;
   readonly ask: Ask;
   readonly retries?: Retries;
+  /** Fetches the bytes at an address for `pin`; the real one by default. */
+  readonly fetch?: FetchBytes;
 };
 
 function usage(io: Io): number {
-  io.out("usage: bin check PLAN | bin apply PLAN | bin clean [--programs]");
+  io.out("usage: bin check PLAN | bin apply PLAN | bin clean [--programs] | bin pin REQUEST [--out PROPOSAL]");
   return 64;
 }
 
@@ -49,9 +55,36 @@ function where(job: ToolJob, o: { readonly seen: { readonly version: string; rea
   return `not found (${job.program})`;
 }
 
+async function pin(args: readonly string[], io: Io): Promise<number> {
+  const [file, flag, out] = args;
+  if (file === undefined || (flag !== undefined && (flag !== "--out" || out === undefined))) return usage(io);
+  const text = await fs.readTextOr(file);
+  if (text === undefined) {
+    io.out(`❌ the request ${file} could not be read. Next: give the path of a request file`);
+    return 1;
+  }
+  const request = readPinRequest(text);
+  if (request.kind === "err") {
+    io.out(`❌ ${file} is not a request for a pin: ${request.error}. Next: correct it and run again`);
+    return 1;
+  }
+  const retries = io.retries ?? new Retries({ tries: 4, base: 2, cap: 30 }, (line) => io.out(line));
+  const proposal = await proposePin(request.value, io.fetch ?? fetchBytes(retries));
+  const body = proposalText(proposal);
+  if (out === undefined) io.out(body);
+  else {
+    await fs.writeTextFile(out, body);
+    io.out(`📝 the proposal for ${proposal.name} ${proposal.version} is in ${out}`);
+  }
+  for (const p of proposal.platforms) io.out(`${p.publisher === "verified" && p.program === "found" ? "✅" : "⚠️"} ${p.platform}: ${p.sha256 ?? "not fetched"}, publisher ${p.publisher}, program ${p.program}`);
+  io.out(proposal.ready ? "✅ ready for review: every platform is verified by its publisher and has its program" : "⚠️ not ready: read the concerns, then fix the request or take the risk knowingly");
+  return proposal.ready ? 0 : 2;
+}
+
 /** Runs the program with its arguments and returns its exit status. */
 export async function main(argv: readonly string[], io: Io): Promise<number> {
   const [command, arg] = argv;
+  if (command === "pin") return pin(argv.slice(1), io);
   const store = storeOf(io.env, osHere());
   if (store === undefined) {
     io.out("❌ no home folder was found, so there is no store to put tools in. Next: set HOME (or USERPROFILE on Windows) and run again");
