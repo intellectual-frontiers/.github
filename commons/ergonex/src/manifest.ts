@@ -26,8 +26,8 @@ import {
   type Result,
 } from "@intellectual-frontiers/core";
 import { sha256Of } from "@intellectual-frontiers/crypto";
-import { describeRemoteError, hostKindOf, type HostKinds, readRemote, cloneUrlOf } from "@intellectual-frontiers/commons/ts/githost";
-import type { RepoRef } from "@intellectual-frontiers/commons/ts/githost";
+import { describeRemoteError, hostKindOf, type HostKinds, readRemote, cloneUrlOf } from "@intellectual-frontiers/githost";
+import type { RepoRef } from "@intellectual-frontiers/githost";
 import type { Finding } from "./findings.ts";
 import { describeLayoutError, repoPathOf, worktreePathOf } from "./layout.ts";
 import { describeNameError, moduleName } from "./modules/name.ts";

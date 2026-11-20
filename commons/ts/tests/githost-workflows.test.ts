@@ -4,9 +4,9 @@
  *
  * @module
  */
-import { ACTIONS, LIBRARY_CI, PIN, workflows } from "../githost/workflows/definitions.ts";
-import { expr, job, type Permissions, run, use, validateAction, validateWorkflow, type Workflow } from "../githost/workflows/model.ts";
-import { renderAction, renderWorkflow, scalar } from "../githost/workflows/render.ts";
+import { ACTIONS, LIBRARY_CI, PIN, workflows } from "../workflows/definitions.ts";
+import { expr, job, type Permissions, run, use, validateAction, validateWorkflow, type Workflow } from "../workflows/model.ts";
+import { renderAction, renderWorkflow, scalar } from "../workflows/render.ts";
 import { readLibraries } from "../mizan/libraries.ts";
 import { existsSync, mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";

@@ -1,5 +1,6 @@
+// Spec: 0001-githost FR-004
 /**
- * The Git hosts behind one interface (commons 0020-ifccm FR-039 to FR-044, 0020-ifccm FR-027 to FR-030): GitHub, GitLab (groups to any depth, `gitlab.com` or self-managed) and plain
+ * The Git hosts behind one interface (commons 0001-githost FR-001 to FR-006): GitHub, GitLab (groups to any depth, `gitlab.com` or self-managed) and plain
  * Git, shaped together as `GitHostClient`, with the reading of a remote URL, the table of what each kind offers and `clientFor`, the one place that reads a credential.
  *
  * @remarks

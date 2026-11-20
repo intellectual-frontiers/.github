@@ -1,5 +1,5 @@
 /**
- * The strict mode of the `changes` check (commons 0020-ifccm FR-009, FR-028, FR-030): ask a Git host, through the one interface of `githost/types.ts`, for each change request the commits
+ * The strict mode of the `changes` check (commons 0020-ifccm FR-009, FR-028, FR-030): ask a Git host, through the one interface of `@intellectual-frontiers/githost`, for each change request the commits
  * name, and say what the host answered so that `rules.ts` can judge it. Nothing in this file names a host's API, URL or word.
  *
  * @remarks
@@ -18,7 +18,7 @@
  *
  * @module
  */
-import { describeFailure, type GitHostClient, type RepoRef } from "../../githost/types.ts";
+import { describeFailure, type GitHostClient, type RepoRef } from "@intellectual-frontiers/githost/types";
 import { namedIssues, parseMessage } from "./commit-message.ts";
 import type { CommitFacts, IssueAnswer } from "./rules.ts";
 

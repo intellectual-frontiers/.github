@@ -1,15 +1,15 @@
 /**
- * Tests of the live transport path of the Git host adapters and of `clientFor` (commons 0020-ifccm FR-039, FR-018, FR-019): the adapters are run over the runtime's real `liveTransport`
+ * Tests of the live transport path of the Git host adapters and of `clientFor` (commons 0001-githost FR-001, FR-018, FR-019): the adapters are run over the runtime's real `liveTransport`
  * (`fetch`) against a real HTTP server on the loopback interface. The server is a stand-in for the HOST, which is outside the code under test: it answers as GitHub's and GitLab's documented
  * APIs do (a private repository is `404` without its credential and `200` with it, `401` for a credential it does not know, `403` with `x-ratelimit-remaining: 0` for the rate) and records the
  * headers it was sent, so that a test can say which request carried a credential and which did not. What needs an account on the real hosts (a real private repository) is not tested.
  *
  * @module
  */
-import { clientFor } from "../githost/mod.ts";
-import { githubClient } from "../githost/github.ts";
-import { gitlabClient } from "../githost/gitlab.ts";
-import type { RepoRef } from "../githost/types.ts";
+import { clientFor } from "../src/mod.ts";
+import { githubClient } from "../src/github.ts";
+import { gitlabClient } from "../src/gitlab.ts";
+import type { RepoRef } from "../src/types.ts";
 import { liveTransport } from "@intellectual-frontiers/net/http-client";
 import { serve, type Server } from "@intellectual-frontiers/net/serve";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
@@ -88,7 +88,7 @@ async function host(): Promise<{ readonly server: Server; readonly base: string;
 const ghRef = (host: string, ...path: string[]): RepoRef => ({ kind: "Github", host, path });
 
 proves(
-  ["0020-ifccm FR-039", "0020-ifccm FR-042"],
+  ["0001-githost FR-001", "0001-githost FR-004"],
   "GitHub over the live transport: public and private repositories, the credential only in a header, and every refusal typed",
   async () => {
     const { server, base, seen } = await host();
@@ -151,7 +151,7 @@ proves(
 );
 
 proves(
-  ["0020-ifccm FR-039", "0020-ifccm FR-042"],
+  ["0001-githost FR-001", "0001-githost FR-004"],
   "GitLab over the live transport: the credential in `PRIVATE-TOKEN` or `JOB-TOKEN`, never in a result",
   async () => {
     const { server, base, seen } = await host();
@@ -184,7 +184,7 @@ proves(
 );
 
 proves(
-  ["0020-ifccm FR-042", "0020-ifccm FR-043"],
+  ["0001-githost FR-004", "0001-githost FR-005"],
   "clientFor reads a token only from the environment it is given, only for a host that may hold one, and chooses the adapter by the kind",
   async () => {
     const { server, base, seen } = await host();

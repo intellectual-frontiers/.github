@@ -1,11 +1,11 @@
 /**
- * The conformance tests the three Git host adapters share (commons 0020-ifccm FR-039): one function that asks a `GitHostClient` the same questions whatever host is behind it, and
+ * The conformance tests the three Git host adapters share (commons 0001-githost FR-001): one function that asks a `GitHostClient` the same questions whatever host is behind it, and
  * holds the answers to the contract of `githost/types.ts`. The interface is not fixed until GitHub, GitLab and plain Git pass all of them.
  *
  * @module
  */
-import { CAPABILITIES } from "../githost/capabilities.ts";
-import type { Capability, GitHostClient, HostResult, RepoRef } from "../githost/types.ts";
+import { CAPABILITIES } from "../src/capabilities.ts";
+import type { Capability, GitHostClient, HostResult, RepoRef } from "../src/types.ts";
 import { assert, assertEquals } from "@intellectual-frontiers/test";
 
 /** What a conformance run needs to know of the host behind a client. */

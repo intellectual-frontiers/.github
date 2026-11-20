@@ -1,0 +1,13 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-githost FR-001	check	.github: cd commons/githost && bun test suite/	githost-adapters.test.ts, githost-live.test.ts: GitHub, GitLab and plain Git pass the same conformance function (githost-conformance.ts)
+0001-githost FR-002	check	.github: cd commons/githost && bun test suite/	githost-adapters.test.ts: GitHub issues with their parent and sub-issues, pull requests, protected branches and signatures, and the GitLab counterparts through the same calls
+0001-githost FR-003	check	.github: cd commons/githost && bun test suite/	githost-adapters.test.ts, githost-remote.test.ts: a capability a kind lacks is a typed unsupported result naming the host and the capability
+0001-githost FR-004	check	.github: cd commons/githost && bun test suite/	githost-adapters.test.ts, githost-live.test.ts, githost-remote.test.ts: a private repository asked with no credential is not found and typed; the token is read from the environment given to clientFor, sent in a header to the one host it serves, and held in no result, URL or error
+0001-githost FR-005	check	.github: cd commons/githost && bun test suite/	githost-remote.test.ts, githost-live.test.ts: GitHub for github.com, GitLab for gitlab.com and the hosts a map names, plain Git for every other, and a self-managed GitLab never guessed
+0001-githost FR-006	check	.github: cd commons/githost && bun test suite/	githost-remote.test.ts, githost-adapters.test.ts: maxDepth is two for a kind without nested groups and unbounded for GitLab, whose groups go to any depth
+0001-githost FR-007	check	.github: cd commons/githost && bun test suite/	githost-remote.test.ts: https, ssh, scp-like and git forms of one remote are one repository, a credential in a remote is dropped, and a text that is not a remote is told by what is wrong with it
+0001-githost FR-008	check	.github: cd commons/githost && bun test suite/	githost-remote.test.ts: a remote with no scheme, owner/repo, the host prefixes and the address of a branch's page are read, and a path on this computer is still refused
+0001-githost FR-009	check	.github: cd commons/githost && bun test suite/	githost-boundaries.test.ts: the types, the table and the reader import core alone, and the adapters only node: built-ins, core, net and system
+0001-githost FR-010	check	.github: cd commons/githost && bun run verify	the package is built, inspected and packed by tools/pack.ts; tests/commons-packages.test.ts installs the tarball, runs every entry on Node 26 and Bun and type-checks a consumer

@@ -8,6 +8,7 @@
         "@intellectual-frontiers/core": "link:../core",
         "@intellectual-frontiers/crypto": "link:../crypto",
         "@intellectual-frontiers/formats": "link:../formats",
+        "@intellectual-frontiers/githost": "link:../githost",
         "@intellectual-frontiers/grc": "link:../grc",
         "@intellectual-frontiers/net": "link:../net",
         "@intellectual-frontiers/rdf": "link:../rdf",
@@ -29,6 +30,8 @@
     "@intellectual-frontiers/crypto": ["@intellectual-frontiers/crypto@link:../crypto", {}],
 
     "@intellectual-frontiers/formats": ["@intellectual-frontiers/formats@link:../formats", {}],
+
+    "@intellectual-frontiers/githost": ["@intellectual-frontiers/githost@link:../githost", {}],
 
     "@intellectual-frontiers/grc": ["@intellectual-frontiers/grc@link:../grc", {}],
 

@@ -1,5 +1,6 @@
+// Spec: 0001-githost FR-001
 /**
- * GitLab behind the one interface (commons 0020-ifccm FR-039 to FR-044, 0020-ifccm FR-027 to FR-030): REST API v4 over the runtime's `Transport`, `gitlab.com` or a self-managed host,
+ * GitLab behind the one interface (commons 0001-githost FR-001 to FR-006): REST API v4 over the runtime's `Transport`, `gitlab.com` or a self-managed host,
  * public and private projects, groups to any depth (a project is addressed by its whole path, URL-encoded), issues, merge requests, protected branches and whether a commit's signature is
  * verified.
  *

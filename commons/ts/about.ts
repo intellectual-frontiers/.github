@@ -34,12 +34,12 @@ export const about: About = {
     },
     {
       path: "mizan/",
-      what: "Mizan, the IF Spec Profile, as code (commons 0003-mizan): the rules it adds to the format of a specification (as plugins), the command that holds them against a baseline, the generator of its ontology's Turtle, and `integrations/` (0019-mizan-integrations): the registry, the readers of Turtle, N-Triples, JSON-LD and RDF/XML, the importers of a slice of a vocabulary, of an OSCAL control catalog and of a JSON Schema, and the exporters of SHACL, JSON Schema, SKOS and SQL are built, the other importers and exporters are specified. `changes/` and `changes.ts` (0020-ifccm) are the change-control check: the commit rules, the declaration and its phase, the chain from an issue to a run and the view of capabilities by rung, with a host layer that takes a `githost/` client as an argument; `changes.ts --capability-trace` makes the same chain offline, from commit trailers, specifications, the ontology's `mz:definedBy`, `Spec:` and `Proves:` lines and quality records, with no Git host. `versions.ts` (0026-works-versioning) judges the versions of works, and `checkVersions`, `readWorks` and `./ts/mizan/versions` give a consumer its check as data and as a command. `levels.ts` (0028-conformance-levels) says which rules a conformance level, L0 to L3, runs (`holdHarness` takes a `level`, L3 where none is given), `rules.ts` reads the head of a specification (`**Subject:**`, `**Audience:**`) and reports the sections its profile asks for that it lacks (0029-subject-profiles), and `libraries.ts` (0027-commons-libraries) reads the manifest of a library of commons and makes the requirements that name it.",
+      what: "Mizan, the IF Spec Profile, as code (commons 0003-mizan): the rules it adds to the format of a specification (as plugins), the command that holds them against a baseline, the generator of its ontology's Turtle, and `integrations/` (0019-mizan-integrations): the registry, the readers of Turtle, N-Triples, JSON-LD and RDF/XML, the importers of a slice of a vocabulary, of an OSCAL control catalog and of a JSON Schema, and the exporters of SHACL, JSON Schema, SKOS and SQL are built, the other importers and exporters are specified. `changes/` and `changes.ts` (0020-ifccm) are the change-control check: the commit rules, the declaration and its phase, the chain from an issue to a run and the view of capabilities by rung, with a host layer that takes a client of the library `githost` as an argument; `changes.ts --capability-trace` makes the same chain offline, from commit trailers, specifications, the ontology's `mz:definedBy`, `Spec:` and `Proves:` lines and quality records, with no Git host. `versions.ts` (0026-works-versioning) judges the versions of works, and `checkVersions`, `readWorks` and `./ts/mizan/versions` give a consumer its check as data and as a command. `levels.ts` (0028-conformance-levels) says which rules a conformance level, L0 to L3, runs (`holdHarness` takes a `level`, L3 where none is given), `rules.ts` reads the head of a specification (`**Subject:**`, `**Audience:**`) and reports the sections its profile asks for that it lacks (0029-subject-profiles), and `libraries.ts` (0027-commons-libraries) reads the manifest of a library of commons and makes the requirements that name it.",
       mayImport: [
         "node: builtins",
         "kernel/",
         "runtime/",
-        "githost/ (its types)",
+        "githost, by package name (its types)",
         "mizan/",
         "../ontology/ (the ontology it generates from)",
       ],
@@ -50,13 +50,9 @@ export const about: About = {
       mayImport: ["node: builtins", "kernel/", "runtime/", "quality/"],
     },
     {
-      path: "githost/",
-      what: "The one interface to a Git host (commons 0020-ifccm): the types and the reading of a remote URL (pure), and the adapters for GitHub (REST v3), GitLab (REST v4, groups to any depth) and plain Git, with `clientFor`, the one place that reads a token, and only from the environment it is given.",
-      mayImport: [
-        "kernel/",
-        "runtime/ (the adapters; the types, the table of capabilities and the remote reader import the kernel alone)",
-        "githost/",
-      ],
+      path: "workflows/",
+      what: "The typed model of GitHub Actions workflows and composite actions (commons 0030-generated-workflows): the model, its rendering to YAML, the workflows of this repository as values, and the copy of the schema of GitHub's workflows. It moves with the library `libraries` (commons 0032-lifting-libraries).",
+      mayImport: ["kernel/", "runtime/", "workflows/"],
     },
     {
       path: "node/",

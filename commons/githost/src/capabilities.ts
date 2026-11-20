@@ -1,5 +1,6 @@
+// Spec: 0001-githost FR-002
 /**
- * What each kind of Git host offers (commons 0020-ifccm FR-040, FR-017): the table of `ifccm:GitManagerKind` and its `ifccm:supports`, as the pure types the adapters and the
+ * What each kind of Git host offers (commons 0001-githost FR-002): the table of `ifccm:GitManagerKind` and its `ifccm:supports`, as the pure types the adapters and the
  * workspace read, and the typed answer for a capability a kind lacks. A test holds this table equal to the ontology's.
  *
  * @module
@@ -24,7 +25,7 @@ export function supports(kind: HostKind, capability: Capability): boolean {
   return CAPABILITIES[kind].has(capability);
 }
 
-/** The answer for a capability that a kind of host does not offer: typed, naming the host and the capability, never a guess (0020-ifccm FR-041). */
+/** The answer for a capability that a kind of host does not offer: typed, naming the host and the capability, never a guess (0001-githost FR-003). */
 export function unsupported(host: HostKind, capability: Capability): Result<never, HostFailure> {
   return err({ kind: "unsupported", capability, host });
 }

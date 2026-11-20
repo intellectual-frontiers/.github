@@ -7,7 +7,7 @@
  *
  * @module
  */
-import { cloneUrlOf, describeRef, readRemote, sameRepository, type RepoRef } from "@intellectual-frontiers/commons/ts/githost";
+import { cloneUrlOf, describeRef, readRemote, sameRepository, type RepoRef } from "@intellectual-frontiers/githost";
 import { absurd, err, ok } from "@intellectual-frontiers/core";
 import { flag, value } from "../platform/k-args.ts";
 import { exists, remove } from "../platform/r-fs.ts";

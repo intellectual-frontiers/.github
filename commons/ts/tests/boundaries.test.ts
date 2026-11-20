@@ -69,6 +69,7 @@ const LIFTED = new Set([
   CORE,
   "@intellectual-frontiers/crypto",
   "@intellectual-frontiers/formats",
+  "@intellectual-frontiers/githost",
   "@intellectual-frontiers/grc",
   "@intellectual-frontiers/net",
   "@intellectual-frontiers/rdf",
@@ -100,11 +101,7 @@ proves(
         if (s.startsWith("node:") || isLifted(s)) continue;
         const target = toPosix(relative(ROOT, resolve(ROOT, dirname(f), s)));
         const ok =
-          target.startsWith("mizan/") ||
-          target.startsWith("kernel/") ||
-          target.startsWith("runtime/") ||
-          target.startsWith("../ontology/") ||
-          target === "githost/types.ts";
+          target.startsWith("mizan/") || target.startsWith("kernel/") || target.startsWith("runtime/") || target.startsWith("../ontology/");
         if (!ok) bad.push(`${f}: ${s}`);
       }
     }
@@ -249,6 +246,7 @@ proves(
       "@intellectual-frontiers/core": "link:../core",
       "@intellectual-frontiers/crypto": "link:../crypto",
       "@intellectual-frontiers/formats": "link:../formats",
+      "@intellectual-frontiers/githost": "link:../githost",
       "@intellectual-frontiers/grc": "link:../grc",
       "@intellectual-frontiers/net": "link:../net",
       "@intellectual-frontiers/rdf": "link:../rdf",
@@ -323,8 +321,7 @@ proves(
       "./ts/mizan/oscal-register": "./mizan/oscal-register.ts",
       "./ts/mizan/versions": "./mizan/versions.ts",
       "./ts/quality": "./quality/mod.ts",
-      "./ts/githost": "./githost/mod.ts",
-      "./ts/githost/workflows": "./githost/workflows/mod.ts",
+      "./ts/workflows": "./workflows/mod.ts",
       "./ts/tools/pack-library": "./tools/pack-library.ts",
       "./ts/node": "./node/register.mjs",
     });
@@ -347,6 +344,7 @@ proves(
       "@intellectual-frontiers/core": "0.1.0",
       "@intellectual-frontiers/crypto": "0.1.0",
       "@intellectual-frontiers/formats": "0.1.0",
+      "@intellectual-frontiers/githost": "0.1.0",
       "@intellectual-frontiers/grc": "0.1.0",
       "@intellectual-frontiers/net": "0.1.0",
       "@intellectual-frontiers/rdf": "0.1.0",

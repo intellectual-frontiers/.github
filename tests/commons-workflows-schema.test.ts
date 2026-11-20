@@ -1,6 +1,6 @@
 /**
  * The generated workflows against the schema of GitHub workflows (commons 0030-generated-workflows FR-003): an independent reader, Python's jsonschema, validates every file that the generator wrote under
- * `.github/workflows/` against the copy of SchemaStore's JSON Schema kept in `commons/ts/githost/workflows/schema/` (fetched from https://json.schemastore.org/github-workflow.json on 2026-11-19), and refuses a workflow
+ * `.github/workflows/` against the copy of SchemaStore's JSON Schema kept in `commons/ts/workflows/schema/` (fetched from https://json.schemastore.org/github-workflow.json on 2026-11-19), and refuses a workflow
  * with a step that has a key GitHub does not know. Python with jsonschema and PyYAML is not on every computer (the CI installs them): where it is not, the check is skipped.
  *
  * @module
@@ -14,7 +14,7 @@ const CHECK = `
 import glob, json, sys, yaml
 from jsonschema import Draft7Validator
 root = sys.argv[1]
-schema = json.load(open(root + "/commons/ts/githost/workflows/schema/github-workflow.schema.json"))
+schema = json.load(open(root + "/commons/ts/workflows/schema/github-workflow.schema.json"))
 Draft7Validator.check_schema(schema)
 v = Draft7Validator(schema)
 def doc(text):

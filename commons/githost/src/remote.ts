@@ -1,5 +1,6 @@
+// Spec: 0001-githost FR-007
 /**
- * A Git remote URL read as a repository on a host (commons 0020-ifccm FR-039, FR-019): the https, `git://`, `ssh://` and scp-like (`git@host:owner/repo`) forms give the same
+ * A Git remote URL read as a repository on a host (commons 0001-githost FR-005, FR-007, FR-008): the https, `git://`, `ssh://` and scp-like (`git@host:owner/repo`) forms give the same
  * `RepoRef`, whichever way the remote is written, so that a clone made over SSH is the repository the manifest names over HTTPS.
  *
  * @remarks
@@ -46,7 +47,7 @@ export function describeRemoteError(e: RemoteError): string {
 /** The hosts that are not plain Git, by name: a map from a lower-case host name to its kind, as the manifest names them (a self-managed GitLab, or GitHub Enterprise Server). */
 export type HostKinds = Readonly<Record<string, HostKind>>;
 
-/** The kind of a host: GitHub for `github.com`, GitLab for `gitlab.com`, what the map says for a host it names, and plain Git for every other (0020-ifccm FR-043). */
+/** The kind of a host: GitHub for `github.com`, GitLab for `gitlab.com`, what the map says for a host it names, and plain Git for every other (0001-githost FR-005). */
 export function hostKindOf(host: string, hostKinds: HostKinds = {}): HostKind {
   const h = host.toLowerCase();
   if (h === "github.com") return "Github";

@@ -1,11 +1,11 @@
 /**
- * What GitLab answers a caller with no credential for a public project (commons 0020-ifccm FR-039, FR-019): the answer gitlab.com gave when this was written, with the keys
+ * What GitLab answers a caller with no credential for a public project (commons 0001-githost FR-001, FR-019): the answer gitlab.com gave when this was written, with the keys
  * it carries, and no `archived` among them. The adapter reads it as a public, unarchived project instead of refusing it (found by asking the real host; the recorded answers of
  * `githost-adapters.test.ts` had carried the key).
  *
  * @module
  */
-import { gitlabClient } from "../githost/gitlab.ts";
+import { gitlabClient } from "../src/gitlab.ts";
 import { type Exchange, recordedTransport } from "@intellectual-frontiers/net/http-client";
 import { assertEquals, proves } from "@intellectual-frontiers/test";
 
@@ -29,7 +29,7 @@ const answer: Exchange = {
 };
 
 proves(
-  ["0020-ifccm FR-039", "0020-ifccm FR-043"],
+  ["0001-githost FR-001", "0001-githost FR-005"],
   "a public GitLab project answered with no credential, and with no archived key, is read as public and unarchived",
   async () => {
     const c = gitlabClient({ transport: recordedTransport([answer]) });

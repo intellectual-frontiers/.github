@@ -27,7 +27,7 @@
     "runtime/**/*.ts",
     "mizan/**/*.ts",
     "quality/**/*.ts",
-    "githost/**/*.ts",
+    "workflows/**/*.ts",
     "workspaces/**/*.ts",
     "tests/**/*.ts",
     "tools/**/*.ts",

@@ -8,7 +8,7 @@
  *
  * @remarks
  * The workflow of each library of commons is made from its manifest (`commons/<name>/library.ts`, 0027-commons-libraries FR-012) and the facts of its CI that the manifest does not hold
- * (`LIBRARY_CI` of `githost/workflows/definitions.ts`); the others are written as values there. A file that is not `.auto.yml` in the workflows' folder, and a generated file that no workflow makes, are findings
+ * (`LIBRARY_CI` of `workflows/definitions.ts`); the others are written as values there. A file that is not `.auto.yml` in the workflows' folder, and a generated file that no workflow makes, are findings
  * (nothing is deleted). Line ends are not compared: a Windows checkout of a file is the file.
  *
  * @limits
@@ -17,9 +17,9 @@
  * @module
  */
 import process from "node:process";
-import { ACTIONS, type LibraryFacts, workflows } from "../githost/workflows/definitions.ts";
-import { validateAction, validateWorkflow } from "../githost/workflows/model.ts";
-import { renderAction, renderWorkflow } from "../githost/workflows/render.ts";
+import { ACTIONS, type LibraryFacts, workflows } from "../workflows/definitions.ts";
+import { validateAction, validateWorkflow } from "../workflows/model.ts";
+import { renderAction, renderWorkflow } from "../workflows/render.ts";
 import { inputsOf } from "../mizan/affected.ts";
 import { readLibraries } from "../mizan/libraries.ts";
 import { existsSync, readDirSync, readTextFileSync, writeTextFileSync, mkdirSync } from "@intellectual-frontiers/system/fs";

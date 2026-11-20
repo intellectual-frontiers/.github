@@ -59,7 +59,7 @@ const PURE_PACKAGES = [
   "@intellectual-frontiers/formats",
   "@intellectual-frontiers/test/record",
   "@intellectual-frontiers/commons/ts/kernel",
-  "@intellectual-frontiers/commons/ts/githost",
+  "@intellectual-frontiers/githost",
 ];
 const PURE_WORKSPACES = WORKSPACES.filter((f) => !isHostLayer(f));
 

@@ -11,9 +11,9 @@
  * @module
  */
 import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
-import { maxDepth } from "@intellectual-frontiers/commons/ts/githost";
-import { hostKindOf, type HostKinds } from "@intellectual-frontiers/commons/ts/githost";
-import type { HostKind, RepoRef } from "@intellectual-frontiers/commons/ts/githost";
+import { maxDepth } from "@intellectual-frontiers/githost";
+import { hostKindOf, type HostKinds } from "@intellectual-frontiers/githost";
+import type { HostKind, RepoRef } from "@intellectual-frontiers/githost";
 import { describePortableError, foldKey, isDeviceName, type PortableError, repoPath, segment } from "./portable.ts";
 import {
   describeBrandError,

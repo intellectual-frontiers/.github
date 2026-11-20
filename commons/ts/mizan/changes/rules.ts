@@ -19,7 +19,7 @@
  *
  * @module
  */
-import type { IssueInfo } from "../../githost/types.ts";
+import type { IssueInfo } from "@intellectual-frontiers/githost/types";
 import type { Keyed } from "../../kernel/trace.ts";
 import { namedIssues, parseMessage, type ParsedMessage } from "./commit-message.ts";
 import {

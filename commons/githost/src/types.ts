@@ -1,8 +1,9 @@
+// Spec: 0001-githost FR-001
 /**
- * The one interface to a Git host (commons 0020-ifccm FR-027 to FR-030, 0020-ifccm FR-040 to FR-044): GitHub, GitLab and plain Git are read through it, so that a check of change
+ * The one interface to a Git host (commons 0001-githost FR-002 to FR-006): GitHub, GitLab and plain Git are read through it, so that a check of change
  * control and a workspace never name a host's own word. The types here are pure; the adapters (`github.ts`, `gitlab.ts`, `git.ts`) are the only code that does.
  *
- * A host answers only what it has: a capability it lacks is `unsupported`, never a guess (0020-ifccm FR-041). A private repository is asked with a credential from the
+ * A host answers only what it has: a capability it lacks is `unsupported`, never a guess (0001-githost FR-003). A private repository is asked with a credential from the
  * environment or a credential helper, never from a file; a refusal for want of one is `unauthorized`, which is a finding for a person to act on, not a retry.
  *
  * @module

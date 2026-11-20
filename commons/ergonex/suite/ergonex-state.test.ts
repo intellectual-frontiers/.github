@@ -6,8 +6,8 @@
  *
  * @module
  */
-import { parseRemote } from "@intellectual-frontiers/commons/ts/githost";
-import type { RepoRef } from "@intellectual-frontiers/commons/ts/githost";
+import { parseRemote } from "@intellectual-frontiers/githost";
+import type { RepoRef } from "@intellectual-frontiers/githost";
 import { mkdir, withTempDir, writeTextFile } from "../src/platform/r-fs.ts";
 import { join } from "../src/platform/r-path.ts";
 import { run, which } from "../src/platform/r-proc.ts";

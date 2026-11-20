@@ -1,14 +1,13 @@
 /**
- * Tests of `githost/remote.ts` and `githost/capabilities.ts` (commons 0020-ifccm FR-041, FR-019, FR-020): every spelling of a remote gives the same repository, a credential in a URL is
- * dropped and never appears in a result or an error, the kind of host is GitHub, GitLab or plain Git by the rule of FR-019, and the table of what each kind offers is the ontology's.
- * Pure: no program, no network.
+ * Tests of `src/remote.ts` and `src/capabilities.ts` (commons githost 0001-githost FR-003 to FR-008): every spelling of a remote gives the same repository, a credential in a URL is
+ * dropped and never appears in a result or an error, the kind of host is GitHub, GitLab or plain Git by the rule, and a capability a kind lacks is a typed answer. That the table is the
+ * ontology's is held by `commons/ts/tests/githost-ontology.test.ts`, which may read the ontology of change control. Pure: no program, no network.
  *
  * @module
  */
-import { CAPABILITIES, maxDepth, supports, unsupported } from "../githost/capabilities.ts";
-import { cloneUrlOf, describeRemoteError, hostKindOf, parseRemote, readRemote, sameRepository } from "../githost/remote.ts";
-import type { Capability, HostKind, RepoRef } from "../githost/types.ts";
-import { gitCapabilities, gitManagerKinds } from "../../ontology/ifccm/mod.ts";
+import { CAPABILITIES, COMMON_CAPABILITIES, maxDepth, supports, unsupported } from "../src/capabilities.ts";
+import { cloneUrlOf, describeRemoteError, hostKindOf, parseRemote, readRemote, sameRepository } from "../src/remote.ts";
+import type { HostKind, RepoRef } from "../src/types.ts";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const ref = (text: string, kinds: Readonly<Record<string, HostKind>> = {}): RepoRef => {
@@ -17,7 +16,7 @@ const ref = (text: string, kinds: Readonly<Record<string, HostKind>> = {}): Repo
   return r.value;
 };
 
-proves(["0020-ifccm FR-043"], "https, ssh, scp-like and git forms of one remote are one repository", () => {
+proves(["0001-githost FR-007"], "https, ssh, scp-like and git forms of one remote are one repository", () => {
   const forms = [
     "https://github.com/octo/hello.git",
     "https://github.com/octo/hello",
@@ -37,7 +36,7 @@ proves(["0020-ifccm FR-043"], "https, ssh, scp-like and git forms of one remote 
 });
 
 proves(
-  ["0020-ifccm FR-043"],
+  ["0001-githost FR-005"],
   "the kind of host is GitHub, GitLab or plain Git by the rule, and a self-managed GitLab is named, never guessed",
   () => {
     assertEquals(hostKindOf("github.com"), "Github");
@@ -54,7 +53,7 @@ proves(
   },
 );
 
-proves(["0020-ifccm FR-042"], "a credential in a remote is dropped, and no result and no error holds it", () => {
+proves(["0001-githost FR-004", "0001-githost FR-007"], "a credential in a remote is dropped, and no result and no error holds it", () => {
   const secret = "ghp_SECRETSECRETSECRET0123456789";
   for (const url of [
     `https://user:${secret}@github.com/octo/hello.git`,
@@ -80,7 +79,7 @@ proves(["0020-ifccm FR-042"], "a credential in a remote is dropped, and no resul
   }
 });
 
-proves(["0020-ifccm FR-043"], "a text that is not a remote of a host is told by what is wrong with it", () => {
+proves(["0001-githost FR-007"], "a text that is not a remote of a host is told by what is wrong with it", () => {
   const kind = (t: string): string => {
     const r = parseRemote(t);
     return r.kind === "ok" ? "ok" : r.error.kind;
@@ -103,14 +102,16 @@ proves(["0020-ifccm FR-043"], "a text that is not a remote of a host is told by 
 });
 
 proves(
-  ["0020-ifccm FR-041", "0020-ifccm FR-044"],
-  "the table of what each kind offers is the ontology's, and a capability a kind lacks is a typed answer naming both",
+  ["0001-githost FR-003", "0001-githost FR-006"],
+  "a capability a kind lacks is a typed answer naming both, and the depth a kind allows is told",
   () => {
-    const all = Object.keys(gitCapabilities) as Capability[];
     for (const kind of ["Github", "Gitlab", "Git"] as const) {
-      const listed = (gitManagerKinds[kind].values.supports ?? []).map((c) => c.iri.replace(/^.*[#/]/, ""));
-      assertEquals([...CAPABILITIES[kind]].sort(), [...listed].sort(), kind);
-      for (const c of all) assertEquals(supports(kind, c), listed.includes(c), `${kind} ${c}`);
+      for (const c of COMMON_CAPABILITIES) assert(supports(kind, c), `${kind} offers ${c}`);
+      assertEquals(
+        [...CAPABILITIES[kind]].every((c) => supports(kind, c)),
+        true,
+        kind,
+      );
     }
     assertEquals(unsupported("Github", "NestedGroups"), {
       kind: "err",
@@ -124,7 +125,7 @@ proves(
 );
 
 proves(
-  ["0020-ifccm FR-043"],
+  ["0001-githost FR-008"],
   "a remote as a person writes it needs no scheme where the domain says the rest, `owner/repo` is GitHub, the address of a branch's page is the repository and the branch, and a path on this computer is still no remote",
   () => {
     const read = (text: string, kinds: Readonly<Record<string, HostKind>> = {}) => {

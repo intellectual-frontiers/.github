@@ -11,7 +11,7 @@
 ## The libraries
 
 - **FR-001**: The code of commons MUST be organized by concern: each part of it is a library, a top-level folder `commons/<name>/` that is an npm package named `@intellectual-frontiers/<name>` and is registered by a manifest (0027-commons-libraries FR-012), and no folder of commons MUST be named for a language or a runtime (`ts`, `js`, `node`, `bun`) once the lift is complete.
-- **FR-002**: The libraries and what each takes from the folders of `commons/ts` MUST be those of the table below, in layers: a library of a layer MUST depend only on libraries of the layers below it (FR-003). A module is named `kernel/<m>` or `runtime/<m>` for the file `<m>.ts` of that folder of `commons/ts`; `mizan/`, `quality/`, `githost/`, `lint/` and `tools/` are those folders. Where an assignment proves wrong while a library is lifted, the table is changed in the same commit as the move.
+- **FR-002**: The libraries and what each takes from the folders of `commons/ts` MUST be those of the table below, in layers: a library of a layer MUST depend only on libraries of the layers below it (FR-003). A module is named `kernel/<m>` or `runtime/<m>` for the file `<m>.ts` of that folder of `commons/ts`; `mizan/`, `quality/`, `githost/` (before its lift), `workflows/` (it was `githost/workflows/`), `lint/` and `tools/` are those folders. Where an assignment proves wrong while a library is lifted, the table is changed in the same commit as the move.
 
   | Layer | Library | Takes |
   |---|---|---|
@@ -30,7 +30,7 @@
   | 3 | ifccm | mizan/changes, mizan/changes.ts |
   | 3 | ifr | mizan/versions, mizan/versions.ts |
   | 3 | githost | githost/capabilities, githost/git, githost/github, githost/gitlab, githost/http, githost/mod, githost/remote, githost/types |
-  | 3 | libraries | mizan/libraries, mizan/affected, githost/workflows, tools/generate-workflows, tools/pins, tools/install-bun, tools/pack-library |
+  | 3 | libraries | mizan/libraries, mizan/affected, workflows (the folder `githost/workflows` before the lift of githost), tools/generate-workflows, tools/pins, tools/install-bun, tools/pack-library |
   | 3 | lint | lint/plugin, lint/rule, lint/test-rule, lint/rules |
 
   The libraries `docs`, `data` and `ergonex` already exist and are not moved; `kernel/documentation` goes to `docs`. The folder `commons/ts/data` is another work's and is not part of this lift.

@@ -1,12 +1,12 @@
 /**
  * The pure core of the `changes` check (commons 0020-ifccm), tested on the text and the data it takes: the lines of a commit message, the sections and checkbox items of an issue body, the
  * declaration and its phase, the findings, the chain from an issue to a run, the view of capabilities by rung, and the wiring into `holdHarness`. Nothing here runs `git` or asks a host: that
- * is `mizan-changes-git.test.ts`. The answers of a host in the strict rules are plain values of the interface's own types (`githost/types.ts`), which is a description of a host, a thing outside
+ * is `mizan-changes-git.test.ts`. The answers of a host in the strict rules are plain values of the interface's own types (`@intellectual-frontiers/githost`), which is a description of a host, a thing outside
  * the code under test.
  *
  * @module
  */
-import type { IssueInfo } from "../githost/types.ts";
+import type { IssueInfo } from "@intellectual-frontiers/githost/types";
 import * as ifccm from "../../ontology/ifccm/mod.ts";
 import { holdHarness } from "../mizan/harness.ts";
 import { commitFindings, strictFindings, type CommitFacts, type Context, type IssueAnswer } from "../mizan/changes/rules.ts";
@@ -532,15 +532,15 @@ proves(
         const target = toPosix(relative(CHANGES, resolve(CHANGES, spec)));
         const allowed =
           /^@intellectual-frontiers\/(core|formats)(\/|$)/.test(spec) ||
+          spec === "@intellectual-frontiers/githost/types" ||
           target.startsWith("../../kernel/") ||
-          target === "../../githost/types.ts" ||
           (!target.startsWith("..") && !target.includes("/"));
         const ontology = target === "../../../ontology/ifccm/mod.ts";
         const plugin = name === "plugin.ts" && target === "../rules.ts";
         const hosted =
           host.has(name) &&
           (target.startsWith("../../runtime/") ||
-            target.startsWith("../../githost/") ||
+            /^@intellectual-frontiers\/githost(\/|$)/.test(spec) ||
             /^@intellectual-frontiers\/system(\/|$)/.test(spec));
         assert(allowed || ontology || plugin || hosted, `${name} imports ${spec}`);
       }

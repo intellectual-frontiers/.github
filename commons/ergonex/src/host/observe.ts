@@ -11,7 +11,7 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import type { RepoRef } from "@intellectual-frontiers/commons/ts/githost";
+import type { RepoRef } from "@intellectual-frontiers/githost";
 import { NotFound } from "../platform/r-errors.ts";
 import { existsSync, lstatSync, readDirSync } from "../platform/r-fs.ts";
 import { join } from "../platform/r-path.ts";

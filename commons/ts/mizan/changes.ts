@@ -23,7 +23,7 @@
  * @module
  */
 import process from "node:process";
-import type { GitHostClient, RepoRef } from "../githost/types.ts";
+import type { GitHostClient, RepoRef } from "@intellectual-frontiers/githost/types";
 import { formatBaseline, judge, parseBaseline, passes, report } from "../kernel/trace.ts";
 import { readRecord } from "../kernel/test-report.ts";
 import { existsSync, readDirSync, readTextFileSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";

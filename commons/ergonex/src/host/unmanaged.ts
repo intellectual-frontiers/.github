@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { readRemote, type HostKinds, cloneUrlOf } from "@intellectual-frontiers/commons/ts/githost";
+import { readRemote, type HostKinds, cloneUrlOf } from "@intellectual-frontiers/githost";
 import { lstatSync, readDirSync } from "../platform/r-fs.ts";
 import { join } from "../platform/r-path.ts";
 import { run } from "../platform/r-proc.ts";

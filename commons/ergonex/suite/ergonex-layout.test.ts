@@ -6,8 +6,8 @@
  * @module
  */
 import fc from "fast-check";
-import { parseRemote } from "@intellectual-frontiers/commons/ts/githost";
-import type { RepoRef } from "@intellectual-frontiers/commons/ts/githost";
+import { parseRemote } from "@intellectual-frontiers/githost";
+import type { RepoRef } from "@intellectual-frontiers/githost";
 import {
   describeLayoutError,
   gitHostOf,

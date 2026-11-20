@@ -7,8 +7,8 @@
  * @module
  */
 import fc from "fast-check";
-import { parseRemote } from "@intellectual-frontiers/commons/ts/githost";
-import type { RepoRef } from "@intellectual-frontiers/commons/ts/githost";
+import { parseRemote } from "@intellectual-frontiers/githost";
+import type { RepoRef } from "@intellectual-frontiers/githost";
 import { sha256, type Sha256 } from "@intellectual-frontiers/crypto";
 import { actionKinds, repoStates } from "./vocabulary.ts";
 import {
