@@ -1,3 +1,4 @@
+// Spec: 0008-exit-style-consent FR-004
 // Spec: 0002-headless-governance FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007
 /**
  * What a headless action is, before any surface draws it (commons headless 0002-headless-governance): its identity, who it is for, what it may
@@ -18,6 +19,7 @@
  * @module
  */
 import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
+import type { ReachPolicy } from "./reach.ts";
 
 /** A report only reads and says what it found; an action changes something. */
 export type Kind = "report" | "action";
@@ -144,13 +146,21 @@ export type SurfaceFacts = {
   readonly interactive: boolean;
   /** Whether `--yes` (or its like) may stand for the person's answer: a command line yes, a tool server no. */
   readonly flagConfirms: boolean;
+  /** Whether a prior consent (`--consent <id>`) may stand for the answer; the value of `flagConfirms` where it is not said. */
+  readonly acceptsConsent?: boolean;
 };
 
 /** What the invocation gave: its mode, whether it carried the confirmation flag, and the keys of the options it set. */
-export type Invocation = { readonly mode: Mode; readonly confirmed: boolean; readonly given: readonly string[] };
+export type Invocation = {
+  readonly mode: Mode;
+  readonly confirmed: boolean;
+  readonly given: readonly string[];
+  /** The identifier of a consent a person gave earlier, where the invocation carries one. */
+  readonly consent?: string;
+};
 
 /** Why a run is refused. */
-export type Refusal = "human-only-action" | "human-only-option" | "confirmation-needed" | "confirmation-not-accepted";
+export type Refusal = "human-only-action" | "human-only-option" | "confirmation-needed" | "confirmation-not-accepted" | "consent-needed";
 
 /** What to do with a run. */
 export type Decision =
@@ -171,15 +181,24 @@ export function humanOnlyGiven(a: ActionFacts, given: readonly string[]): readon
 /**
  * What to do with a run, from the action's facts, the surface and the invocation (FR-004, FR-005): refuse what a machine may not do, preview
  * what is asked to be a preview, proceed with what only reads or can be undone, and for what cannot be undone ask the person, accept the
- * flag where the surface lets a flag stand for the answer, and refuse where there is neither.
+ * flag where the surface lets a flag stand for the answer, and refuse where there is neither. Where the reach policy's confirmation class is `consent`, an action that
+ * changes something proceeds on a prior consent (`--consent <id>`), asks a person where there is one, and is refused otherwise (`consent-needed`).
  */
-export function decide(a: ActionFacts, surface: SurfaceFacts, inv: Invocation): Decision {
+export function decide(a: ActionFacts, surface: SurfaceFacts, inv: Invocation, reach?: ReachPolicy): Decision {
   if (surface.audience === "machine") {
     if (a.audience === "human") return refuse("human-only-action", `${a.id} is for a person: it cannot be run through this interface`);
     const first = humanOnlyGiven(a, inv.given)[0];
     if (first !== undefined) return refuse("human-only-option", `${first} is for a person to give: it cannot be given through this interface`);
   }
   if (inv.mode !== "apply") return { kind: "preview" };
+  if (reach?.confirmation === "consent" && a.effect !== "read") {
+    if (inv.consent !== undefined && inv.consent !== "") {
+      return (surface.acceptsConsent ?? surface.flagConfirms)
+        ? { kind: "proceed" }
+        : refuse("consent-needed", `${a.id} needs a consent, and this interface does not take one: a person must give it`);
+    }
+    return surface.interactive ? { kind: "ask" } : refuse("consent-needed", `${a.id} changes something and needs a consent: give the identifier of the one a person gave with --consent <id>`);
+  }
   switch (a.effect) {
     case "read":
     case "mutate":

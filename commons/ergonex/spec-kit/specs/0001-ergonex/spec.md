@@ -56,6 +56,7 @@
 ## Out of scope
 
 - The workspace's layout, portability, plan, policy, tools and evidence: `0002-workspace-model`. The generated files, hooks, Git configuration and shell snippet: `0003-host`.
+- A `consent` class of reach for `--git-include` (commons headless 0008-exit-style-consent FR-004): a non-goal by decision. The class belongs to a whole action and would demand `--consent <id>` of every run of `setup` that has no terminal, and `--git-include` is itself a flag a person typed after the exact change is shown, so the flag is the consent (FR-020); splitting it into a command of its own is not worth a second path.
 - `ifc` (`commons 0008-test-evidence`) and any general Mizan command: `ergonex` does not front them.
 - The contents of a module's own commands beyond the contract: the module's.
 

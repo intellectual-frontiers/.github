@@ -92,6 +92,7 @@ export type WorldOptions = {
   readonly now?: () => number;
   readonly pid?: number;
   readonly observer?: Io["observer"];
+  readonly marks?: Io["marks"];
 };
 
 /** An `Io` for a test. */
@@ -115,6 +116,7 @@ export function world(o: WorldOptions = {}): Io & { readonly asked: string[] } {
     ...(o.signals === undefined ? {} : { signals: o.signals }),
     ...(o.timer === undefined ? {} : { timer: o.timer }),
     ...(o.observer === undefined ? {} : { observer: o.observer }),
+    ...(o.marks === undefined ? {} : { marks: o.marks }),
   };
 }
 

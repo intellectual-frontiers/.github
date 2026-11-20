@@ -6,7 +6,7 @@
 #
 #   irm <this file's address> | iex
 #
-# $env:ERGONEX_RUNTIME = 'node' uses Node 26 (OpenJS.NodeJS) instead of Bun. $env:ERGONEX_VERSION = '<version>' installs another version of ergonex than 0.4.1.
+# $env:ERGONEX_RUNTIME = 'node' uses Node 26 (OpenJS.NodeJS) instead of Bun. $env:ERGONEX_VERSION = '<version>' installs another version of ergonex than 0.4.4.
 # This file is ASCII with a byte order mark, so that Windows PowerShell 5.1 reads it as it is written. It never calls exit, which would close your window.
 
 function Stop-ErgonexInstall([string] $What, [string] $Next) {
@@ -28,7 +28,7 @@ function Install-WithWinget([string] $Id, [string] $Name) {
 
 function Install-Ergonex {
     $ErrorActionPreference = 'Stop'
-    $version = if ($env:ERGONEX_VERSION) { $env:ERGONEX_VERSION } else { '0.4.1' }
+    $version = if ($env:ERGONEX_VERSION) { $env:ERGONEX_VERSION } else { '0.4.4' }
     $runtime = if ($env:ERGONEX_RUNTIME) { $env:ERGONEX_RUNTIME } else { 'bun' }
     if ($runtime -ne 'bun' -and $runtime -ne 'node') { Stop-ErgonexInstall "ERGONEX_RUNTIME is $runtime, which is not bun or node" '' }
 

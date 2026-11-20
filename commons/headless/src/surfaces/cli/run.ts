@@ -1,4 +1,5 @@
 // Spec: 0004-headless-cli FR-003, FR-004, FR-011, FR-012
+// Spec: 0008-exit-style-consent FR-001, FR-002, FR-003, FR-004
 /**
  * The run boundary of the command line (commons headless 0004-headless-cli FR-011): `run(program, argv, io)` gives `{ code, out, err }` and touches no
  * process global, so a test, a REPL and a tool that embeds the program all call it the same way. It resolves the words to a command, parses the
@@ -28,7 +29,7 @@ import {
   decide,
   exitCodeOf,
   countsOf,
-  exitOfRun,
+  exitOfNamed,
   modeOf,
   problem,
   redactor,
@@ -77,12 +78,18 @@ import type { Look } from "./style.ts";
 /** The variables the look of the terminal depends on. */
 const LOOK_VARS = ["NO_COLOR", "FORCE_COLOR", "TERM", "LC_ALL", "LC_CTYPE", "LANG", "WT_SESSION", "TERM_PROGRAM", "ConEmuANSI"] as const;
 
-/** The look of the error stream, where the narration goes: the terminal's facts, the program's own `_PLAIN` and `_EMOJI` variables, and `--no-color`. */
+/**
+ * The look of the error stream, where the narration goes (0008-exit-style-consent FR-002). The style of the marks is an explicit decision, `Io.marks`: `plain` (the ASCII marks), `emoji`,
+ * or `auto`, the default, which is plain unless the stream is a terminal that shows emoji and nothing asks for plain: not `NO_COLOR`, not `--no-color`, not the program's `<PREFIX>_PLAIN`.
+ * The program's `<PREFIX>_EMOJI` turns emoji on where nothing asks for plain. So a run in CI, in a pipe or with colour off is the same plain text everywhere.
+ */
 export function lookOfRun(program: Program, io: Io, colour: boolean): Look {
   const vars: Record<string, string | undefined> = Object.fromEntries(LOOK_VARS.map((n) => [n, io.env(n)]));
   const base = tty.lookOf({ env: vars, terminal: io.terminal.stderr, os: io.os, ...(io.columns === undefined ? {} : { columns: io.columns }) });
   const set = (n: string): boolean => (io.env(`${program.envPrefix}_${n}`) ?? "") !== "";
-  const emoji = set("PLAIN") ? false : set("EMOJI") ? true : base.emoji;
+  const asksPlain = set("PLAIN") || !colour || (io.env("NO_COLOR") ?? "") !== "";
+  const style = io.marks ?? "auto";
+  const emoji = style === "plain" ? false : style === "emoji" ? true : asksPlain ? false : set("EMOJI") ? true : base.tty && base.emoji;
   return { tty: base.tty, colour: base.colour && colour, emoji, columns: base.columns };
 }
 
@@ -187,11 +194,11 @@ export async function run(program: Program, argv: readonly string[], io: Io): Pr
 
   const interactive = io.terminal.stdin && io.terminal.stderr && !flag("nonInteractive");
   const look = lookOfRun(program, io, standard["color"] !== false && verbosity.value !== "json");
-  const decision: Decision = decide(placed.facts, { audience: "human", interactive, flagConfirms: true }, { mode: mode.value, confirmed: flag("yes"), given: given(own) });
+  const decision: Decision = decide(placed.facts, { audience: "human", interactive, flagConfirms: true }, { mode: mode.value, confirmed: flag("yes"), given: given(own), ...(typeof standard["consent"] === "string" ? { consent: standard["consent"] } : {}) }, placed.reach);
   if (decision.kind === "refuse") return usage(decision.message);
   const prompt = promptOf({ interactive, readLine: io.readLine, write: writeErr });
   if (decision.kind === "ask") {
-    const yes = await prompt.confirm(`${placed.id} destroys something and it cannot be undone. Go on?`);
+    const yes = await prompt.confirm(placed.reach?.confirmation === "consent" ? `${placed.id} changes something. Go on?` : `${placed.id} destroys something and it cannot be undone. Go on?`);
     if (yes !== true) return usage("Not confirmed: nothing was changed.");
   }
 
@@ -207,7 +214,7 @@ export async function run(program: Program, argv: readonly string[], io: Io): Pr
 
   const info = { program: program.name, version: program.version, command: placed.id };
   const body = async (events: RunEvents | undefined): Promise<Ended> =>
-    await execute({ program, io, placed, ownArgs, mode: mode.value, verbosity: verbosity.value, interactive, look, sarif: flag("sarif"), prompt, ...(events === undefined ? {} : { events }) });
+    await execute({ program, io, placed, ownArgs, mode: mode.value, verbosity: verbosity.value, interactive, look, sarif: flag("sarif"), prompt, ...(typeof standard["consent"] === "string" && decision.kind === "proceed" && placed.reach?.confirmation === "consent" ? { consent: standard["consent"] } : {}), ...(events === undefined ? {} : { events }) });
   const ended = io.observer === undefined ? await body(undefined) : await io.observer.observe(info, (events) => body(events));
   writeOut(ended.out);
   writeErr(ended.err);
@@ -225,6 +232,8 @@ type Execution = {
   readonly look: Look;
   readonly sarif: boolean;
   readonly prompt: Context["prompt"];
+  /** The identifier of the consent the run went on by, which the run log records. */
+  readonly consent?: string;
   readonly events?: RunEvents;
 };
 
@@ -233,7 +242,7 @@ async function execute(x: Execution): Promise<Ended> {
   const { program, io, placed } = x;
   const screen: string[] = [];
   const nested = isNested(program.nested, io.env);
-  const redact = redactor(program.secrets());
+  const redact = redactor(program.secrets(), { keys: program.secretKeys });
   const stateDir = stateDirOf(program.stateApp, io.env, io.os);
   const inherited = io.env(`${program.envPrefix}_LOG`);
   let log: RunLog | undefined;
@@ -244,6 +253,7 @@ async function execute(x: Execution): Promise<Ended> {
     log = new RunLog(io.state, `${dir}${io.os === "windows" ? "\\" : "/"}${logName(io.now(), io.pid)}`, io.now);
   }
   log?.write("run", `${program.name} ${placed.id} (${program.version}) mode ${x.mode}, ${x.verbosity}`);
+  if (x.consent !== undefined) log?.write("consent", `${placed.id} went on by the consent ${redact(x.consent)}`);
   const reporter = new Reporter({
     look: x.look,
     verbosity: x.verbosity,
@@ -292,7 +302,7 @@ async function execute(x: Execution): Promise<Ended> {
   const merged = mergeOutcomes(returned, outcomeOf(null, { problems: reporter.problems, outcomes: reporter.outcomes, hints: reporter.hints }));
   const outcome = redactOutcome({ ...merged, problems: merged.problems.map(coded), cancelled: merged.cancelled || g.kind === "stopped" }, redact);
   const counts: Counts = countsOf(outcome.problems);
-  const code = g.kind === "stopped" ? g.code : exitOfRun(counts, { pending: x.mode === "check" ? "pending" : "ok" });
+  const code = g.kind === "stopped" ? g.code : exitOfNamed(counts, outcome.exit, { pending: x.mode === "check" ? "pending" : "ok" });
   log?.write("run", `finished with ${code}: ${counts.fail} failure(s), ${counts.warn} warning(s), ${counts.pending} pending, ${counts.action} for you`);
 
   let out = "";

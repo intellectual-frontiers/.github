@@ -25,7 +25,7 @@
 
 ## Secrets
 
-- **FR-011**: A redactor MUST replace, with `***`, the password of every URL, the value of every setting whose name says it is secret (`password`, `passphrase`, `secret`, `token`, `api-key`, and the like), and every secret value it was given of four characters or more, longest first, wherever it stands in the text; text with none of these MUST be unchanged, and redacting twice MUST be redacting once. Taken from: arcactl 0046-arcactl FR-009 (`redact`) and commons 0006-signals FR-006 (a secret attribute is never written).
+- **FR-011**: A redactor MUST replace, with `***`, the password of every URL, a `password=` assignment, the tokens of a known shape, the value of a key the program declares secret (`KEY=value`; a sentence that only names a variable is prose and MUST NOT be replaced: 0008-exit-style-consent FR-003), and every secret value it was given of four characters or more, longest first, wherever it stands in the text; text with none of these MUST be unchanged, and redacting twice MUST be redacting once. Taken from: arcactl 0046-arcactl FR-009 (`redact`) and commons 0006-signals FR-006 (a secret attribute is never written).
 
 ## Acceptance scenarios
 

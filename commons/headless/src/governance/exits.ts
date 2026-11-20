@@ -1,4 +1,5 @@
 // Spec: 0002-headless-governance FR-009, FR-010
+// Spec: 0008-exit-style-consent FR-001
 /**
  * The exit statuses of a headless program, one table for every program (commons headless 0002-headless-governance FR-009). A run's own verdicts
  * are 0 to 4 (the statuses of a tool that reports: `Ok`, `Findings`, `Usage`, `Environment`, and `Pending`, which is kept apart from a
@@ -140,4 +141,39 @@ export function exitOfRun(counts: Counts, policy: PendingPolicy = {}): number {
   if (counts.fail > 0) return exitCodeOf("findings");
   if (counts.pending > 0 && policy.pending === "pending") return exitCodeOf("pending");
   return exitCodeOf("ok");
+}
+
+/** The verdicts of a run that a command can name for itself: the closed union of the exit names that are a run's own (not a launcher's, not a signal's). */
+export type RunExit = "ok" | "findings" | "usage" | "environment" | "pending";
+
+/** Every run exit, from the least severe to the most. */
+export const RUN_EXITS: readonly RunExit[] = ["ok", "pending", "findings", "environment", "usage"];
+
+/** The more severe of two named exits (`undefined` is no name): usage, then environment, findings, pending, ok. */
+export function moreSevere(a: RunExit | undefined, b: RunExit | undefined): RunExit | undefined {
+  if (a === undefined) return b;
+  if (b === undefined) return a;
+  return RUN_EXITS.indexOf(a) >= RUN_EXITS.indexOf(b) ? a : b;
+}
+
+/**
+ * The status of a run from what it found and the exit its command named (0008-exit-style-consent FR-001): no name, or `ok`, is the status of `exitOfRun`; `pending` is 4 unless
+ * something failed; `findings`, `usage` and `environment` are their own statuses, however little was found. The same status is what the JSON envelope carries, so that the
+ * code and the document agree.
+ */
+export function exitOfNamed(counts: Counts, named: RunExit | undefined, policy: PendingPolicy = {}): number {
+  const derived = exitOfRun(counts, policy);
+  switch (named) {
+    case undefined:
+    case "ok":
+      return derived;
+    case "pending":
+      return derived === exitCodeOf("findings") ? derived : exitCodeOf("pending");
+    case "findings":
+    case "usage":
+    case "environment":
+      return exitCodeOf(named);
+    default:
+      return absurd(named);
+  }
 }

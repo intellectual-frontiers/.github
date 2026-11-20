@@ -8,7 +8,7 @@
  * @remarks
  * A finding of severity `Error` or `Warning` is a failure of the run (a status of 1, as the specifications say), and one that is `Informational` is a warning, which never changes the status; where a report says its own status is `Ok` (a Git
  * hook lets Git go on with a warning) a warning stays a warning. A body that cannot do what it is asked returns a `Failure`: a command line that does not fit (`usage`) or a host that cannot do it (`environment`), which the program
- * ends with the statuses 2 and 3 (`Run.failure`, read by `main`).
+ * ends with the statuses 2 and 3 (the outcome names its exit, `withExit`).
  *
  * @module
  */
@@ -23,6 +23,7 @@ import {
   type Finding as HeadlessFinding,
   type Outcome as HeadlessOutcome,
   outcomeOf,
+  withExit,
 } from "@intellectual-frontiers/headless/logical";
 import { type Args, type Operand, type Spec, type SpecCheck } from "../platform/k-args.ts";
 import { existsSync } from "../platform/r-fs.ts";
@@ -37,20 +38,12 @@ import { writeRunEvidence } from "../setup/host/evidence.ts";
 import type { RunFacts } from "../setup/evidence.ts";
 import { codeOfRule } from "./catalogue.ts";
 
-/** What one run of the program is about, shared by its commands: how it ended, where the words went. */
-export type Run = {
-  /** What the run ended as where a command could not do what it was asked: Headless' statuses are 0, 1 and 4, and these two are the program's own (2 and 3). */
-  failure: "usage" | "environment" | undefined;
-};
-
 /** What the program holds for every run of its commands: the facts of the host, which a test of the program gives its own. */
 export type Host = Omit<BaseContext, "interact" | "note"> & {
   /** The whole command line, for the words the evidence record names. */
   readonly argv: readonly string[];
   /** The time in milliseconds since the Unix epoch. */
   readonly now: () => number;
-  /** How this run ended, written by the command that ran. */
-  readonly run: Run;
 };
 
 /** A command, once it is given the host it runs on. */
@@ -114,7 +107,7 @@ export function outcomeOfReport(r: Report, extra: readonly Finding[] = []): Head
 
 /** What a failure is as the typed outcome of a run: one failure, with the code of its kind. */
 export function outcomeOfFailure(message: string, kind: "usage" | "environment"): HeadlessOutcome {
-  return outcomeOf(null, { problems: [problem("fail", message, { code: kind === "usage" ? "E-USAGE" : "E-ENVIRONMENT" })] });
+  return withExit(outcomeOf(null, { problems: [problem("fail", message, { code: kind === "usage" ? "E-USAGE" : "E-ENVIRONMENT" })] }), kind);
 }
 
 /** The words of the command line after the words of the command. */
@@ -194,7 +187,6 @@ export function defineCommand<S extends Spec>(d: CommandDefinition<S>): Make {
         const id = h.command;
         if (outcome.kind === "err") {
           const f = outcome.error;
-          host.run.failure = f.kind;
           const status: ExitStatus = f.kind === "usage" ? "Usage" : "Environment";
           const reason = f.noEvidence === true ? undefined : await recordEvidence(ctx, host, id, start, { status, findings: [], notRun: f.message.split("\n")[0] ?? "" });
           const o = outcomeOfFailure(f.message, f.kind);
@@ -208,8 +200,7 @@ export function defineCommand<S extends Spec>(d: CommandDefinition<S>): Make {
         const reason = await recordEvidence(ctx, host, id, start, { status, findings, report: r });
         const o = outcomeOfReport(r, extra);
         if (reason === undefined) return o;
-        host.run.failure = "environment";
-        return { ...o, problems: [...o.problems, problem("fail", `the evidence record could not be written (${reason}); the run is reported as a failure of the host`, { code: "E-EVIDENCE" })] };
+        return withExit({ ...o, problems: [...o.problems, problem("fail", `the evidence record could not be written (${reason}); the run is reported as a failure of the host`, { code: "E-EVIDENCE" })] }, "environment");
       },
     });
 }
