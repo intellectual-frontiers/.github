@@ -38,7 +38,7 @@ import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { STEP_SPAN, decodeLines, installationOf } from "../src/record.ts";
-import { testReport } from "@intellectual-frontiers/commons/ts/kernel";
+import * as testReport from "@intellectual-frontiers/quality/test-report";
 const { assembleRecord, junitXml, readRecord, tap14, testsOf } = testReport;
 import { parseSpanId, parseTraceId } from "@intellectual-frontiers/telemetry/otel";
 import { type Equal, expectType } from "@intellectual-frontiers/core";
