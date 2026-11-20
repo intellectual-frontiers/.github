@@ -6,7 +6,7 @@
  */
 import { err, ok } from "@intellectual-frontiers/core";
 import { existsSync, mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
-import { fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
+import { basename, dirname, fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
 import { proc } from "@intellectual-frontiers/system";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { decodeLibrarySource, type Library, readLibraries } from "../src/libraries.ts";
@@ -152,9 +152,12 @@ proves([`${DIST} FR-008`], "the packer stages a package with no code, the exact 
     const packed = await packMetapackage(root);
     assertEquals(packed.findings, []);
     assert(packed.tarball?.endsWith("intellectual-frontiers-foundation-0.3.0.tgz") === true);
-    const listed = await proc.run(["tar", "-tzf", packed.tarball ?? ""]);
+    // tar runs in the tarball's folder with a bare name: GNU tar reads a Windows path ("D:\\...") as a host
+    const tarball = packed.tarball ?? "";
+    const here = { cwd: dirname(tarball) };
+    const listed = await proc.run(["tar", "-tzf", basename(tarball)], here);
     assertEquals(listed.stdout.trim().split(/\r?\n/).sort(), ["package/LICENSE", "package/README.md", "package/index.d.ts", "package/index.js", "package/package.json"]);
-    const pkg = await proc.run(["tar", "-xzOf", packed.tarball ?? "", "package/package.json"]);
+    const pkg = await proc.run(["tar", "-xzOf", basename(tarball), "package/package.json"], here);
     const json: unknown = JSON.parse(pkg.stdout);
     assert(typeof json === "object" && json !== null && "dependencies" in json && "license" in json);
     assertEquals(json.dependencies, { "@intellectual-frontiers/core": "0.1.5" });

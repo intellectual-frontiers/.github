@@ -119,7 +119,9 @@ proves(
       if (m.engines["node"] !== ">=26") bad.push(`${rel}: engines.node is ${m.engines["node"] ?? "absent"}`);
     }
     assertEquals(bad, []);
-    assertEquals(JSON.parse(read("commons/tsconfig.base.json")).compilerOptions.erasableSyntaxOnly, true);
+    const base: unknown = JSON.parse(read("commons/tsconfig.base.json"));
+    const options = isRecord(base) && isRecord(base["compilerOptions"]) ? base["compilerOptions"] : {};
+    assertEquals(options["erasableSyntaxOnly"], true);
   },
 );
 
