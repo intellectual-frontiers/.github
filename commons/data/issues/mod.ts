@@ -18,5 +18,6 @@ import i10 from "./00010-etl-elt-integration.ts";
 import i11 from "./00011-dbt-parity.ts";
 import i12 from "./00012-sql-aide-leftovers.ts";
 import i13 from "./00013-observe-and-converge-overlap.ts";
+import i14 from "./00014-book-becomes-documentation.ts";
 
-export const issues = issueSet("data", [i1, i2, i3, i4, i5, i6, i7, i8, i9, i10, i11, i12, i13]);
+export const issues = issueSet("data", [i1, i2, i3, i4, i5, i6, i7, i8, i9, i10, i11, i12, i13, i14]);

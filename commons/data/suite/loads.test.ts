@@ -1,3 +1,4 @@
+// Spec: 0054-sql-loads FR-009
 // Spec: 0054-sql-loads FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007, FR-008
 /**
  * Loads and extracts (commons data 0054-sql-loads), on real engines: sources (CSV with typed cells and rejected lines, lines of JSON, rows, a select), extracts that read back to the same rows, loads in each mode,
@@ -207,5 +208,31 @@ proves(
         }
       }
     }
+  },
+);
+
+proves(
+  ["0054-sql-loads FR-009"],
+  "a load can give the run's id to every row it writes, so that what a load wrote is found by it, and with divertConflicts a key that is there is not a failure: the same content is absorbed and counted, other content goes to the conflict table and the original is left as it was",
+  async () => {
+    interface Stamped extends ItemInsert { readonly loadId?: string | null }
+    const stamped = defineTable<Item & { readonly loadId: string | null }, Stamped, "item">({ alias: "item", name: "item", columns: { id: "id", name: "name", qty: "qty", note: "note", updated: "updated", loadId: "load_id" }, primaryKey: ["id"] });
+    await each(async ({ e, on }, name) => {
+      await e.run("ALTER TABLE item ADD COLUMN load_id TEXT");
+      const rows = (extra: readonly Stamped[] = []): Stamped[] => [{ id: 1, name: "one", qty: 1, updated: "d1" }, { id: 2, name: "two", qty: 2, updated: "d1" }, ...extra];
+      const first = await runLoad({ name: "stamped", source: fromRows(rows()), target: stamped, loadIdColumn: "loadId", divertConflicts: true }, on);
+      same([first.status, first.written, first.absorbed, first.diverted], ["loaded", 2, 0, 0], name);
+      const ids = await e.rows("SELECT DISTINCT load_id AS l FROM item");
+      same(ids.map((r) => r["l"]), [first.runId], `${name}: every row carries the run's id`);
+      // 1000 messages the book's way: redeliveries of the same content are absorbed, the same key with other content is diverted, the original is kept
+      const again = await runLoad({ name: "stamped", source: fromRows(rows([{ id: 3, name: "three", qty: 3, updated: "d1" }, { id: 2, name: "TWO", qty: 99, updated: "d2" }, { id: 3, name: "three", qty: 3, updated: "d1" }])), target: stamped, loadIdColumn: "loadId", divertConflicts: true }, on);
+      same([again.status, again.read, again.written, again.absorbed, again.diverted], ["loaded", 5, 1, 3, 1], name);
+      same((await e.rows("SELECT id, name, load_id FROM item ORDER BY id")).map((r) => [Number(r["id"]), r["name"], r["load_id"] === first.runId ? "first" : "second"]), [[1, "one", "first"], [2, "two", "first"], [3, "three", "second"]], name);
+      const kept = await e.rows('SELECT "run_id" AS r, "key" AS k, "existing" AS e, "incoming" AS i FROM "item__conflict"');
+      same(kept.length, 1, name);
+      same([kept[0]?.["r"], kept[0]?.["k"], JSON.parse(String(kept[0]?.["e"])).name, JSON.parse(String(kept[0]?.["i"])).name], [again.runId, "[2]", "two", "TWO"], name);
+      const bad = await runLoad({ name: "x", source: fromRows(rows()), target: stamped, mode: "upsert", divertConflicts: true }, on);
+      same(bad.status, "failed", `${name}: it is for append`);
+    });
   },
 );

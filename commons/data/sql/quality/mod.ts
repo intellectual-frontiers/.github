@@ -19,9 +19,10 @@
  */
 export { testsFromState } from "./derive.ts";
 export { acceptedRange, acceptedValues, atLeastOne, equalRowcount, equality, expressionIsTrue, notConstant, notEmptyString, notNull, relationships, unique, uniqueCombinationOfColumns } from "./generic.ts";
-export { countQuery, type Outcome, runTests, storedAs, summary, toTap } from "./run.ts";
+export { countQuery, type Impact, type Outcome, preview, runTests, storedAs, summary, toTap } from "./run.ts";
 export {
   columnTest,
+  exactly,
   type Context,
   type DqTest,
   type GenericTest,

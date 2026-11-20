@@ -8,7 +8,7 @@
  * @module
  */
 import { type DqTest, runTests, type Outcome, summary } from "@intellectual-frontiers/data/sql/quality";
-import { and, defineTable, deleteFrom, desc, eq, excluded, type Expr, from, insertInto, type Runner, type Table } from "@intellectual-frontiers/data/sql/typed";
+import { and, defineTable, deleteFrom, desc, eq, excluded, type Expr, from, insertInto, or, type Runner, type Table } from "@intellectual-frontiers/data/sql/typed";
 import type { Dialect } from "@intellectual-frontiers/data/sql/physical";
 import type { Rejected, Source } from "./source.ts";
 
@@ -75,6 +75,13 @@ export interface LoadSpec<R, I, N extends string> {
   readonly maxRejected?: number;
   /** Keep the staging table, to look at what was gated. */
   readonly keepStaging?: boolean;
+  /** A column of the table that is given the run's id on every row this load writes, so that what a load wrote can be found and undone by it. */
+  readonly loadIdColumn?: keyof R & string;
+  /**
+   * In `append` mode, a row whose key is already there is not a failure: where its content is the same it is absorbed (counted, not written again), and where it differs it is diverted to the table `<table>__conflict`
+   * (the existing row and the incoming one, as JSON), and the original is left as it is. Without a gate.
+   */
+  readonly divertConflicts?: boolean;
 }
 
 /** What a load did. */
@@ -89,6 +96,10 @@ export interface LoadReport {
   readonly quality: readonly Outcome[];
   readonly watermark?: string;
   readonly message?: string;
+  /** Rows whose key was there with the same content (`divertConflicts`). */
+  readonly absorbed?: number;
+  /** Rows whose key was there with other content, sent to the conflict table. */
+  readonly diverted?: number;
 }
 
 let counter = 0;
@@ -116,6 +127,9 @@ export async function runLoad<R, I, N extends string>(spec: LoadSpec<R, I, N>, o
   let read = 0;
   let written = 0;
   let mark: string | undefined;
+  let absorbed = 0;
+  let diverted = 0;
+  const seen = new Map<string, Record<string, unknown>>();
   let quality: readonly Outcome[] = [];
   const q = on.dialect.quote;
   const stagingName = staging === undefined ? "" : `${staging.source.kind === "table" && staging.source.schema !== undefined ? `${q(staging.source.schema)}.` : ""}${q(staging.source.kind === "table" ? staging.source.name : "")}`;
@@ -134,11 +148,24 @@ export async function runLoad<R, I, N extends string>(spec: LoadSpec<R, I, N>, o
           const v = (row as Record<string, unknown>)[spec.watermark];
           if (v !== null && v !== undefined && (mark === undefined || String(v) > mark)) mark = String(v);
         }
-      const rows = batch.rows as readonly I[] as readonly [I, ...I[]];
+      let incoming = batch.rows as readonly I[];
+      if (spec.loadIdColumn !== undefined) incoming = incoming.map((r) => ({ ...r, [spec.loadIdColumn as string]: runId }));
+      if (spec.divertConflicts === true && staging === undefined) {
+        if (mode !== "append") throw new TypeError("divertConflicts is for the mode append");
+        const split = await divide(spec.target, keys, incoming, seen, spec.loadIdColumn, on);
+        absorbed += split.same;
+        if (split.clashes.length > 0) {
+          diverted += split.clashes.length;
+          await keepConflicts(spec.target, split.clashes, runId, on);
+        }
+        incoming = split.fresh;
+        if (incoming.length === 0) continue;
+      }
+      const rows = incoming as readonly [I, ...I[]];
       let ins = insertInto(into).values(rows);
       if (staging === undefined) ins = conflictOf(ins, mode, keys, spec.target, rows[0] as Record<string, unknown>);
       await ins.run(on);
-      written += batch.rows.length;
+      written += incoming.length;
     }
     const total = read + rejected.length;
     if (spec.maxRejected !== undefined && total > 0 && rejected.length / total > spec.maxRejected) {
@@ -162,12 +189,66 @@ export async function runLoad<R, I, N extends string>(spec: LoadSpec<R, I, N>, o
       if (spec.keepStaging !== true) await on.driver.exec(`DROP TABLE IF EXISTS ${stagingName}`);
     }
     await on.driver.exec("COMMIT");
-    return await record(on, { runId, load: spec.name, status: "loaded", read, written, rejected, quality, ...(mark === undefined ? {} : { watermark: mark }) }, started);
+    return await record(on, { runId, load: spec.name, status: "loaded", read, written, rejected, quality, ...(mark === undefined ? {} : { watermark: mark }), ...(spec.divertConflicts === true ? { absorbed, diverted } : {}) }, started);
   } catch (thrown) {
     await on.driver.exec("ROLLBACK").catch(() => undefined);
     if (staging !== undefined && spec.keepStaging !== true) await on.driver.exec(`DROP TABLE IF EXISTS ${stagingName}`).catch(() => undefined);
     return await record(on, { runId, load: spec.name, status: "failed", read, written: 0, rejected, quality, message: thrown instanceof Error ? thrown.message : String(thrown) }, started);
   }
+}
+
+const same = (a: unknown, b: unknown): boolean => String(a ?? null) === String(b ?? null);
+
+/** The rows of a batch by what is known of their keys: new ones, ones that are there with the same content, and ones that are there with other content. */
+async function divide<R, I, N extends string>(
+  target: Table<R, I, N>,
+  keys: readonly (keyof R & string)[],
+  rows: readonly I[],
+  seen: Map<string, Record<string, unknown>>,
+  idColumn: string | undefined,
+  on: Runner,
+): Promise<{ readonly fresh: I[]; readonly same: number; readonly clashes: { readonly key: string; readonly existing: Record<string, unknown> | undefined; readonly incoming: Record<string, unknown> }[] }> {
+  const cols = Object.keys(target.sqlNames) as (keyof R & string)[];
+  const keyOf = (r: Record<string, unknown>): string => JSON.stringify(keys.map((k) => r[k] ?? null));
+  const known = new Map<string, Record<string, unknown>>();
+  const hasKey = (r: Record<string, unknown>): boolean => keys.every((k) => r[k] !== null && r[k] !== undefined);
+  const lookups = rows.map((r) => r as Record<string, unknown>).filter(hasKey);
+  if (lookups.length > 0) {
+    const cond = or(...lookups.map((r) => and(...keys.map((k) => eq((target.c as unknown as Record<string, Expr<unknown>>)[k] as Expr<never>, r[k] as never)))));
+    const found = await from(target)
+      .where(() => cond)
+      .select((s) => Object.fromEntries(cols.map((c) => [c, (s[target.alias] as unknown as Record<string, Expr<unknown>>)[c] as Expr<unknown>])) as never)
+      .run(on);
+    for (const e of found as readonly Record<string, unknown>[]) known.set(keyOf(e), e);
+  }
+  const fresh: I[] = [];
+  const clashes: { key: string; existing: Record<string, unknown> | undefined; incoming: Record<string, unknown> }[] = [];
+  let sameCount = 0;
+  for (const row of rows) {
+    const r = row as Record<string, unknown>;
+    if (!hasKey(r)) {
+      fresh.push(row);
+      continue;
+    }
+    const k = keyOf(r);
+    const there = known.get(k) ?? seen.get(k);
+    if (there === undefined) {
+      fresh.push(row);
+      seen.set(k, r);
+    } else if (cols.filter((c) => c !== idColumn).every((c) => same(there[c], r[c]))) sameCount++;
+    else clashes.push({ key: k, existing: known.get(k), incoming: r });
+  }
+  return { fresh, same: sameCount, clashes };
+}
+
+/** Writes the rows that were diverted into the conflict table of the target, which is made if it is not there. */
+async function keepConflicts<R, I, N extends string>(target: Table<R, I, N>, clashes: readonly { readonly key: string; readonly existing: Record<string, unknown> | undefined; readonly incoming: Record<string, unknown> }[], runId: string, on: Runner): Promise<void> {
+  const q = on.dialect.quote;
+  const name = `${target.source.kind === "table" ? target.source.name : "target"}__conflict`;
+  await on.driver.exec(`CREATE TABLE IF NOT EXISTS ${q(name)} (${q("run_id")} TEXT NOT NULL, ${q("at")} TEXT NOT NULL, ${q("key")} TEXT NOT NULL, ${q("existing")} TEXT, ${q("incoming")} TEXT NOT NULL)`);
+  const at = new Date().toISOString();
+  for (const c of clashes)
+    await on.driver.exec(`INSERT INTO ${q(name)} VALUES (${[runId, at, c.key, c.existing === undefined ? null : JSON.stringify(c.existing), JSON.stringify(c.incoming)].map((v) => on.dialect.literal(v)).join(", ")})`);
 }
 
 function qualifiedTarget<R, I, N extends string>(t: Table<R, I, N>, d: Dialect): string {

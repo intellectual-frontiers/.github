@@ -184,6 +184,15 @@ export const meets = (n: number, t: Threshold): boolean => {
   }
 };
 
+/**
+ * The configuration of a test that expects a number of failing rows, exactly: it fails where the count is any other, and is never a warning. `exactly(0)` is the ordinary test; `exactly(3)` is the book's seeded
+ * test (three rows are wrong and the test says so), which fails both where one of them is missed and where a new one appears.
+ *
+ * @param n - the number of failing rows (or the value of `failCalc`) that is expected
+ * @param config - the rest of the configuration
+ */
+export const exactly = (n: number, config: TestConfig = {}): TestConfig => ({ ...config, severity: "error", errorIf: { op: "!=", n }, warnIf: { op: "<", n: 0 } });
+
 /** What a run finds of one test. */
 export type Status = "pass" | "warn" | "fail" | "error" | "skipped";
 
