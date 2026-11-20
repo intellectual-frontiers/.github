@@ -88,6 +88,7 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/integrations-github`](https://www.npmjs.com/package/@intellectual-frontiers/integrations-github) | Program | The reference connector of Integrations for the posture of one organization of a code host | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/libraries`](https://www.npmjs.com/package/@intellectual-frontiers/libraries) | Program | The tools of a repository of commons | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/package-managers`](https://www.npmjs.com/package/@intellectual-frontiers/package-managers) | Program | The shared kit of the dialects that drive a package manager | layers | L1 | GitHub, npm |
+| [`@intellectual-frontiers/repoctl`](https://www.npmjs.com/package/@intellectual-frontiers/repoctl) | Program | The one command, `repoctl` | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/toolchain`](https://www.npmjs.com/package/@intellectual-frontiers/toolchain) | Program | A Kanon library of the tools a computer needs | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/integrations-fhir`](https://www.npmjs.com/package/@intellectual-frontiers/integrations-fhir) | Standard | The FHIR plugin of Integrations | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/integrations-x12`](https://www.npmjs.com/package/@intellectual-frontiers/integrations-x12) | Standard | The X12 envelope and acknowledgement skeleton of Integrations | - | L1 | GitHub, npm |

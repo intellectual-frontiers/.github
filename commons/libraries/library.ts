@@ -19,6 +19,7 @@ export const library = {
     "./changes",
     "./check",
     "./dev",
+    "./family",
     "./generate-ontology",
     "./generate-workflows",
     "./libraries",

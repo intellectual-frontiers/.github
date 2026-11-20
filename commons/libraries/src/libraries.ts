@@ -93,7 +93,12 @@ export type Library = {
   readonly family?: LibraryFamily;
   /** The license its `LICENSE` and its packed `package.json` carry, where it is not the default of the repository (`license/standard.ts`; commons 0035-licensing FR-003). */
   readonly license?: SpdxId;
+  /** The constants of its sources that say its own version (`ERGONEX_VERSION`), each a file from the library's folder and the name of the constant: the release rewrites them with the version, and a check finds one that disagrees. */
+  readonly versionConstants?: readonly VersionConstant[];
 };
+
+/** A constant of a library's sources that holds the library's version: the file (from the library's folder) and the constant's name. */
+export type VersionConstant = { readonly file: string; readonly name: string };
 
 /** The lowest conformance level that requires a library to declare `kanon`; none yet (0033-kanon FR-014, OQ-1): a level asks for it by naming itself here. */
 export const KANON_REQUIRED_FROM: LevelKey | undefined = undefined;
@@ -117,11 +122,18 @@ const nameDecoder: Decoder<string> = (input, path = "$") => {
     ? r
     : err({ kind: "decode", path, expected: "a name of lower-case letters, digits and hyphens", found: describe(input) });
 };
+const constantName: Decoder<string> = (input, path = "$") => {
+  const r = string(input, path);
+  if (r.kind === "err") return r;
+  return /^[A-Za-z_][A-Za-z0-9_]*$/.test(r.value)
+    ? r
+    : err({ kind: "decode", path, expected: "the name of a constant: letters, digits and underscores", found: describe(input) });
+};
 const body = object(
   { name: nameDecoder, verify: nonEmpty, version: nonEmpty, exports: array(nonEmpty) },
-  { level: literal(...LEVELS), specKit: nonEmpty, summary: nonEmpty, distribution: array(literal(...REGISTRIES)), kanon: unknownValue, family: object({ host: nonEmpty, role: literal(...ROLES) }), license: nonEmpty },
+  { level: literal(...LEVELS), specKit: nonEmpty, summary: nonEmpty, distribution: array(literal(...REGISTRIES)), kanon: unknownValue, family: object({ host: nonEmpty, role: literal(...ROLES) }), license: nonEmpty, versionConstants: array(object({ file: nonEmpty, name: constantName })) },
 );
-const FIELDS = ["name", "level", "specKit", "verify", "version", "exports", "summary", "distribution", "kanon", "family", "license"] as const;
+const FIELDS = ["name", "level", "specKit", "verify", "version", "exports", "summary", "distribution", "kanon", "family", "license", "versionConstants"] as const;
 
 /** The manifest read from the text of its file: `export const library = { ... }` and no other export, read as data and never run (0027-commons-libraries FR-012). */
 export function decodeLibrarySource(source: string): Result<Library, string> {
@@ -175,6 +187,7 @@ export function decodeLibrarySource(source: string): Result<Library, string> {
     ...(kanon === undefined ? {} : { kanon }),
     ...(family === undefined ? {} : { family }),
     ...(license === undefined ? {} : { license }),
+    ...(v.versionConstants === undefined ? {} : { versionConstants: v.versionConstants }),
   });
 }
 
@@ -327,13 +340,18 @@ export function idsIn(spec: string): ReadonlyMap<string, string> {
   return out;
 }
 
-/** The id each library has: the one it had, or the next number after the greatest. */
+/**
+ * The id each library has: the one it had, or the next number after the greatest. A number belongs to the first library that holds it in the specification: where a second one holds it (two branches each gave the next number to a
+ * library, and a merge kept both), the second is given the next number after the greatest, so that the generator makes the section again with one number for each library.
+ */
 export function idsFor(libraries: readonly Library[], had: ReadonlyMap<string, string>): ReadonlyMap<string, string> {
   const out = new Map<string, string>();
+  const first = new Map<string, string>();
+  for (const [name, id] of had) if (!first.has(id)) first.set(id, name);
   let next = Math.max(FIRST_GENERATED - 1, ...[...had.values()].map((id) => Number(id.slice(3)))) + 1;
   for (const l of libraries) {
     const id = had.get(l.name);
-    if (id !== undefined) out.set(l.name, id);
+    if (id !== undefined && first.get(id) === l.name) out.set(l.name, id);
     else out.set(l.name, `FR-${String(next++).padStart(3, "0")}`);
   }
   return out;

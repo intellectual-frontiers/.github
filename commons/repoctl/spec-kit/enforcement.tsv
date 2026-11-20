@@ -1,0 +1,48 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-repoctl-layers FR-001	check	.github: cd commons/repoctl && bun run verify	suite/layers.test.ts: every file of the real tree is in a unit and a file in none is layers/unclassified
+0001-repoctl-layers FR-002	check	.github: cd commons/repoctl && bun run verify	suite/layers.test.ts: below may not import above and each unit imports only what its row allows
+0001-repoctl-layers FR-003	check	.github: cd commons/repoctl && bun run verify	suite/layers.test.ts: the package exports the library and its layers
+0001-repoctl-layers FR-004	check	.github: cd commons/repoctl && bun run verify	suite/layers.test.ts: verify runs every check of the library
+0001-repoctl-layers FR-005	check	.github: cd commons/repoctl && bun run verify	suite/layers.test.ts: the version of the program, the manifest, the package and the record agree
+0001-repoctl-layers FR-006	check	.github: cd commons/repoctl && bun run verify	suite/layers.test.ts: no source of Governance or Logical imports a module that does input or output
+0002-repoctl-governance FR-001	check	.github: cd commons/repoctl && bun run verify	suite/governance.test.ts: each identity is made only by its constructor, which says why a text is not one
+0002-repoctl-governance FR-002	check	.github: cd commons/repoctl && bun run verify	suite/governance.test.ts: every verb is in the table and no verb contradicts its facts or its reach
+0002-repoctl-governance FR-003	check	.github: cd commons/repoctl && bun run verify	suite/governance.test.ts: the ladder has three tiers and each verb is at its tier
+0002-repoctl-governance FR-004	check	.github: cd commons/repoctl && bun run verify	suite/governance.test.ts: every code has an explanation and the catalogue is valid
+0002-repoctl-governance FR-005	check	.github: cd commons/repoctl && bun run verify	suite/governance.test.ts: the table of generators names a command, inputs and outputs for each, and every generator with a --check of the repository is in it
+0002-repoctl-governance FR-006	check	.github: cd commons/repoctl && bun run verify	suite/governance.test.ts: the table of checks has a command and a code for each
+0003-repoctl-sync FR-001	check	.github: cd commons/repoctl && bun run verify	suite/sync.test.ts: the order puts a reader after its writer and refuses generators that wait for each other
+0003-repoctl-sync FR-002	check	.github: cd commons/repoctl && bun run verify	suite/sync.test.ts: only a stale generator is run, it is checked again, and a failure of one does not stop the others
+0003-repoctl-sync FR-003	check	.github: cd commons/repoctl && bun run verify	suite/sync.test.ts: --check writes nothing and names the stale generator with its command; the real repository passes
+0003-repoctl-sync FR-004	check	.github: cd commons/repoctl && bun run verify	suite/sync.test.ts: a second run changes no file, and --only runs only what it names
+0003-repoctl-sync FR-005	check	.github: cd commons/repoctl && bun run verify	suite/merge.test.ts: in a real repository a conflict in a generated file is made again, one in a file that holds written text keeps the lines of both sides, and a conflict in a written file is left as Git left it
+0003-repoctl-sync FR-006	check	.github: cd commons/repoctl && bun run verify	suite/merge.test.ts: the merge commit is made only where no conflict is left, and a refusal of Git is E-MERGE-FAILED
+0003-repoctl-sync FR-007	check	.github: cd commons/repoctl && bun run verify	suite/check.test.ts: one report with a code and a fix for each finding, the real repository passes, nothing is written
+0003-repoctl-sync FR-008	check	.github: cd commons/repoctl && bun run verify	suite/check.test.ts: a constant that disagrees with its library's version is found, and so is one the manifest names that is missing
+0003-repoctl-sync FR-009	check	.github: cd commons/repoctl && bun run verify	suite/check.test.ts: every code is explained and a text that is no code names the nearest
+0004-repoctl-status-release FR-001	check	.github: cd commons/repoctl && bun run verify	suite/status-release.test.ts: a row has the three versions and a state, as a table and as JSON, from a real repository with real tags
+0004-repoctl-status-release FR-002	check	.github: cd commons/repoctl && bun run verify	suite/status-release.test.ts: --offline asks no registry and reads the local tags
+0004-repoctl-status-release FR-003	check	.github: cd commons/repoctl && bun run verify	suite/status-release.test.ts: a version npm does not list is shown as not listed, and an unreachable registry is a warning
+0004-repoctl-status-release FR-004	check	.github: cd commons/repoctl && bun run verify	suite/status-release.test.ts: the plan of a real repository is given and nothing is written
+0004-repoctl-status-release FR-005	check	.github: cd commons/repoctl && bun run verify	suite/status-release.test.ts: apply writes the version into the constant the manifest names and the generators are made again
+0004-repoctl-status-release FR-006	check	.github: cd commons/repoctl && bun run verify	suite/status-release.test.ts: the preview prints the phrase, and a wrong phrase or no token sends nothing
+0004-repoctl-status-release FR-007	check	.github: cd commons/repoctl && bun run verify	suite/status-release.test.ts: the token is in no stream, outcome or argument
+0004-repoctl-status-release FR-008	check	.github: cd commons/repoctl && bun run verify	suite/status-release.test.ts: the npmrc is 0600, outside the repository and removed after a success and after a failure
+0004-repoctl-status-release FR-009	check	.github: cd commons/repoctl && bun run verify	suite/status-release.test.ts: npm is given an absolute path of the tarball
+0004-repoctl-status-release FR-010	check	.github: cd commons/repoctl && bun run verify	suite/status-release.test.ts: each release is tried in order, a failure is reported and the staging is said
+0005-repoctl-library-commit-doctor FR-001	check	.github: cd commons/repoctl && bun run verify	suite/library-commit-doctor.test.ts: the scaffold has every file, and a library made in a copy of the repository passes its verify
+0005-repoctl-library-commit-doctor FR-002	check	.github: cd commons/repoctl && bun run verify	suite/library-commit-doctor.test.ts: an invalid, a reserved and an existing name are refused with their codes
+0005-repoctl-library-commit-doctor FR-003	check	.github: cd commons/repoctl && bun run verify	suite/library-commit-doctor.test.ts: the role is written into the map of roles of the README and sync --check ends with 0
+0005-repoctl-library-commit-doctor FR-004	check	.github: cd commons/repoctl && bun run verify	suite/library-commit-doctor.test.ts: in a real repository the commit has the identity as author and committer
+0005-repoctl-library-commit-doctor FR-005	check	.github: cd commons/repoctl && bun run verify	suite/library-commit-doctor.test.ts: the trailers are in order, and a subject, an issue and an address that do not fit are refused
+0005-repoctl-library-commit-doctor FR-006	check	.github: cd commons/repoctl && bun run verify	suite/library-commit-doctor.test.ts: a path of the agent, of installed packages and a secret are refused
+0005-repoctl-library-commit-doctor FR-007	check	.github: cd commons/repoctl && bun run verify	suite/library-commit-doctor.test.ts: a stale generator refuses the commit, nothing staged is said, and the preview commits nothing
+0005-repoctl-library-commit-doctor FR-008	check	.github: cd commons/repoctl && bun run verify	suite/library-commit-doctor.test.ts: each thing wrong with a checkout is a finding with its code, in order
+0006-repoctl-surfaces FR-001	check	.github: cd commons/repoctl && bun run verify	suite/surfaces.test.ts: every verb has examples and the model has no problem
+0006-repoctl-surfaces FR-002	check	.github: cd commons/repoctl && bun run verify	suite/surfaces.test.ts: describe gives the elements of every verb, code and tool
+0006-repoctl-surfaces FR-003	check	.github: cd commons/repoctl && bun run verify	suite/surfaces.test.ts: the tools of each tier are the verbs of that tier, a hidden tool is refused with its reason and a destruction is only a preview
+0006-repoctl-surfaces FR-004	check	.github: cd commons/repoctl && bun run verify	suite/surfaces.test.ts: the reach of each action, and the confirmation is for a person alone
+0006-repoctl-surfaces FR-005	check	.github: cd commons/repoctl && bun run verify	suite/surfaces.test.ts: the tier is the host's, an unknown word ends with 2 and a verb of a higher tier is not there
+0006-repoctl-surfaces FR-006	check	.github: cd commons/repoctl && bun run verify	suite/surfaces.test.ts: the root package has the script and the bin, and the launcher is there

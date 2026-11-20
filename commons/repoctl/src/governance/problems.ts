@@ -1,0 +1,297 @@
+// Spec: 0002-repoctl-governance FR-004
+/**
+ * The problem codes of Repoctl and what each means (commons repoctl 0002-repoctl-governance FR-004; commons headless 0003-headless-output FR-008): every problem a run can raise is one of a closed union of codes, and each code has an
+ * explanation (a title, what happened, the likely cause and the fix) that `repoctl explain <code>` prints and the documentation renders. The registry holds one entry for every code, which the compiler checks.
+ *
+ * @example
+ * ```ts
+ * import { CATALOGUE, isProblemCode } from "./problems.ts";
+ * isProblemCode("E-STALE-GENERATED"); // true
+ * CATALOGUE["E-STALE-GENERATED"].fix; // "repoctl sync"
+ * ```
+ *
+ * @module
+ */
+
+/** What `repoctl explain` says of a code: the shape of Headless' explanation, held here so that the governance imports no more than it needs. */
+export type Explained = { readonly title: string; readonly what: string; readonly why: string; readonly fix: string };
+
+/** The code of every problem: a closed union. */
+export type ProblemCode =
+  | "E-USAGE"
+  | "E-ENVIRONMENT"
+  | "E-STALE-GENERATED"
+  | "E-GENERATOR-FAILED"
+  | "E-SPEC-KIT"
+  | "E-MIZAN-RULE"
+  | "E-VERSIONS"
+  | "E-VERSION-CONSTANT"
+  | "E-LIBRARY-CHECK"
+  | "E-MERGE-FAILED"
+  | "E-MERGE-CONFLICT"
+  | "E-REGENERATE-FAILED"
+  | "E-NPM-UNREACHABLE"
+  | "E-RELEASE-RECORD"
+  | "E-RELEASE-FAILED"
+  | "E-PUBLISH-REFUSED"
+  | "E-NO-TOKEN"
+  | "E-NO-TARBALL"
+  | "E-PUBLISH-FAILED"
+  | "E-COMMIT-SUBJECT"
+  | "E-COMMIT-REFS"
+  | "E-COMMIT-SESSION"
+  | "E-COMMIT-FORBIDDEN"
+  | "E-COMMIT-NOTHING"
+  | "E-COMMIT-FAILED"
+  | "E-LIBRARY-NAME"
+  | "E-LIBRARY-RESERVED"
+  | "E-LIBRARY-EXISTS"
+  | "E-DOCTOR-INSTALL"
+  | "E-DOCTOR-LINKS"
+  | "E-DOCTOR-NODE"
+  | "E-DOCTOR-BUN"
+  | "E-DOCTOR-GIT";
+
+/** Every code, in the order the explanations are listed. */
+export const PROBLEM_CODES: readonly ProblemCode[] = [
+  "E-USAGE",
+  "E-ENVIRONMENT",
+  "E-STALE-GENERATED",
+  "E-GENERATOR-FAILED",
+  "E-SPEC-KIT",
+  "E-MIZAN-RULE",
+  "E-VERSIONS",
+  "E-VERSION-CONSTANT",
+  "E-LIBRARY-CHECK",
+  "E-MERGE-FAILED",
+  "E-MERGE-CONFLICT",
+  "E-REGENERATE-FAILED",
+  "E-NPM-UNREACHABLE",
+  "E-RELEASE-RECORD",
+  "E-RELEASE-FAILED",
+  "E-PUBLISH-REFUSED",
+  "E-NO-TOKEN",
+  "E-NO-TARBALL",
+  "E-PUBLISH-FAILED",
+  "E-COMMIT-SUBJECT",
+  "E-COMMIT-REFS",
+  "E-COMMIT-SESSION",
+  "E-COMMIT-FORBIDDEN",
+  "E-COMMIT-NOTHING",
+  "E-COMMIT-FAILED",
+  "E-LIBRARY-NAME",
+  "E-LIBRARY-RESERVED",
+  "E-LIBRARY-EXISTS",
+  "E-DOCTOR-INSTALL",
+  "E-DOCTOR-LINKS",
+  "E-DOCTOR-NODE",
+  "E-DOCTOR-BUN",
+  "E-DOCTOR-GIT",
+];
+
+/** Whether a text is one of the codes. */
+export function isProblemCode(text: string): text is ProblemCode {
+  return PROBLEM_CODES.some((c) => c === text);
+}
+
+/** The explanation of every code: a registry the compiler holds complete. */
+export const CATALOGUE: Readonly<Record<ProblemCode, Explained>> = {
+  "E-USAGE": {
+    title: "The command line does not fit",
+    what: "The words after `repoctl` do not name a verb, an option or an operand it takes.",
+    why: "A typing mistake, or an option of another verb.",
+    fix: "repoctl help",
+  },
+  "E-ENVIRONMENT": {
+    title: "This checkout cannot do it",
+    what: "Something the run needs is not there: a program, a folder, a file or the network.",
+    why: "Git, Bun or npm is not installed or not on the PATH, or the working folder is not this repository.",
+    fix: "repoctl doctor",
+  },
+  "E-STALE-GENERATED": {
+    title: "A generated file is stale",
+    what: "A generator's own check says its files are not what it makes now from their sources.",
+    why: "A source (a manifest, an about.ts, an ontology, a specification) changed and the generated files were not made again.",
+    fix: "repoctl sync",
+  },
+  "E-GENERATOR-FAILED": {
+    title: "A generator could not run",
+    what: "A generator ended with a status that is neither success nor staleness, so what it makes is not known.",
+    why: "A source it reads is broken (a manifest that does not decode, an ontology that breaks a rule), or its program is missing.",
+    fix: "repoctl check",
+  },
+  "E-SPEC-KIT": {
+    title: "A specification kit breaks the format",
+    what: "The check of the specification format found a finding in a specification kit of commons or of a library.",
+    why: "A requirement without a row in enforcement.tsv, a number that is not in registry.tsv, or a form a specification must have.",
+    fix: "bun commons/tools/mizan-check.ts --root commons/spec-kit",
+  },
+  "E-MIZAN-RULE": {
+    title: "A rule of Mizan finds something",
+    what: "The rules Mizan adds to the format found a finding that its baseline does not hold, or a line of the baseline that no longer occurs.",
+    why: "A change that breaks a rule, or a fix that left its line in the baseline.",
+    fix: "bun commons/libraries/src/check.ts",
+  },
+  "E-VERSIONS": {
+    title: "A version record is wrong",
+    what: "The check of versions found a record that is wrong, an identity that changed, or a version that went back since the base.",
+    why: "A version was raised by hand or lowered; versions grow only at the release.",
+    fix: "bun commons/libraries/src/versions.ts check",
+  },
+  "E-VERSION-CONSTANT": {
+    title: "A constant of the sources disagrees with its library's version",
+    what: "A constant named for a library (`ERGONEX_VERSION`) or named by its manifest in `versionConstants` does not say the version of its package.",
+    why: "The release raised the version in the manifest and the package and a constant in a source was left at the old one.",
+    fix: "Set the constant to the version of its library; list it in the manifest's versionConstants so that the release writes it",
+  },
+  "E-LIBRARY-CHECK": {
+    title: "The check of a library's own rules finds something",
+    what: "A library's manifest or its folder breaks a rule that the register of libraries holds.",
+    why: "A manifest that does not decode, a folder without its files, or a name that is held for a family.",
+    fix: "repoctl check",
+  },
+  "E-MERGE-FAILED": {
+    title: "The merge could not be made",
+    what: "Git refused the merge for a reason that is not a conflict.",
+    why: "Uncommitted changes in the working tree, or a reference that is not there.",
+    fix: "git status",
+  },
+  "E-MERGE-CONFLICT": {
+    title: "A file a person wrote conflicts",
+    what: "The merge conflicts in a file that is not generated; it is left as Git left it, for a person.",
+    why: "Both sides changed the same lines of a source or a document.",
+    fix: "repoctl merge --help",
+  },
+  "E-REGENERATE-FAILED": {
+    title: "A conflicted generated file could not be made again",
+    what: "A generated file conflicted and its generator could not make it, so it stays unresolved.",
+    why: "A source the generator reads is in conflict or broken.",
+    fix: "repoctl sync",
+  },
+  "E-NPM-UNREACHABLE": {
+    title: "npm could not be asked",
+    what: "The registry of npm did not answer for a library, so its version there is not known.",
+    why: "No network, a proxy, or a registry that is down.",
+    fix: "repoctl status --offline",
+  },
+  "E-RELEASE-FAILED": {
+    title: "The release could not be made",
+    what: "The release stopped before it was made: a version that went back, a registry that could not be compared, a generator or a test that failed.",
+    why: "A manifest is wrong, a tag is missing from the clone, or a test that packs a library failed.",
+    fix: "repoctl release plan",
+  },
+  "E-RELEASE-RECORD": {
+    title: "The release record is missing",
+    what: "`release publish` reads commons/generated/release.auto.json and it is not there or does not decode.",
+    why: "`release apply` was not run, or its record was not committed.",
+    fix: "repoctl release apply",
+  },
+  "E-PUBLISH-REFUSED": {
+    title: "The publication was refused",
+    what: "`release publish` needs the releaser tier and a typed confirmation, and one of them is missing.",
+    why: "REPOCTL_TIER is not releaser, or --confirm does not say the phrase that --dry-run printed.",
+    fix: "repoctl release publish --dry-run",
+  },
+  "E-NO-TOKEN": {
+    title: "There is no npm credential",
+    what: "The variable INFRO_NPMJS_TOKEN is not set, so nothing can be sent to npm by hand.",
+    why: "The token is held only by the person who publishes.",
+    fix: "repoctl doctor",
+  },
+  "E-NO-TARBALL": {
+    title: "A package was not packed",
+    what: "The tarball of a library of the record is not under dist/.",
+    why: "`release apply` did not pack it, or it is a library that names no npm.",
+    fix: "repoctl release apply",
+  },
+  "E-PUBLISH-FAILED": {
+    title: "npm did not take a package",
+    what: "npm refused a package or the run could not start it; nothing was tagged.",
+    why: "The version is on npm already with other files, the token may not publish the package, or the network failed.",
+    fix: "repoctl status",
+  },
+  "E-COMMIT-SUBJECT": {
+    title: "The commit subject is not valid",
+    what: "The subject is empty, has more than one line, is longer than 100 characters or ends with a full stop.",
+    why: "A subject written as a sentence or a paragraph.",
+    fix: "repoctl commit --help",
+  },
+  "E-COMMIT-REFS": {
+    title: "The issue number is not valid",
+    what: "`--refs` is not an issue number.",
+    why: "A word where digits were expected.",
+    fix: "repoctl commit --help",
+  },
+  "E-COMMIT-SESSION": {
+    title: "The session address is missing or not valid",
+    what: "The trailer Claude-Session needs an https address, from --session or CLAUDE_SESSION_URL.",
+    why: "The variable is not set in this shell, or the address has a credential in it.",
+    fix: "repoctl commit --help",
+  },
+  "E-COMMIT-FORBIDDEN": {
+    title: "A file that must not be committed is staged",
+    what: "A path under .claude/, under node_modules or one that looks like a secret is among the files to commit.",
+    why: "A tool's local folder was added with `git add .`, or a key or a .env file was.",
+    fix: "git restore --staged <path>",
+  },
+  "E-COMMIT-NOTHING": {
+    title: "There is nothing to commit",
+    what: "Nothing is staged and no path was given.",
+    why: "The change was committed already or was never added.",
+    fix: "git status",
+  },
+  "E-COMMIT-FAILED": {
+    title: "Git did not make the commit",
+    what: "Git refused the commit.",
+    why: "A hook failed, or the repository is in the middle of a merge.",
+    fix: "git status",
+  },
+  "E-LIBRARY-NAME": {
+    title: "The library name is not valid",
+    what: "The name is not lower-case letters, digits and hyphens starting with a letter.",
+    why: "A capital, a space or an underscore.",
+    fix: "repoctl new library --help",
+  },
+  "E-LIBRARY-RESERVED": {
+    title: "The library name is held for a family",
+    what: "The name is one that commons/libraries/src/family.ts holds for the library of a family.",
+    why: "The names of the fleet libraries and their dialects are reserved.",
+    fix: "repoctl new library --help",
+  },
+  "E-LIBRARY-EXISTS": {
+    title: "The library exists",
+    what: "A folder with this name is already in commons/.",
+    why: "The library was made before.",
+    fix: "repoctl status",
+  },
+  "E-DOCTOR-INSTALL": {
+    title: "The dependencies are not installed",
+    what: "The root has no node_modules, so no program can import a library.",
+    why: "`bun install` was not run in this checkout.",
+    fix: "bun install --frozen-lockfile",
+  },
+  "E-DOCTOR-LINKS": {
+    title: "The libraries are not linked",
+    what: "commons/node_modules/@intellectual-frontiers does not link every library.",
+    why: "A library was added and the links were not made again.",
+    fix: "bun commons/libraries/src/link.ts",
+  },
+  "E-DOCTOR-NODE": {
+    title: "Node 26 is missing",
+    what: "The program `node` is older than 26 or is not there; the commons' engines are >=26.",
+    why: "The machine has an older Node.",
+    fix: "Install Node 26 (see NODE_VERSION in commons/libraries/src/workflows/definitions.ts)",
+  },
+  "E-DOCTOR-BUN": {
+    title: "Bun is not the pinned version",
+    what: "The version of Bun is not the one the packaging ontology pins.",
+    why: "Bun was installed by another route or not upgraded.",
+    fix: "bun upgrade",
+  },
+  "E-DOCTOR-GIT": {
+    title: "Git is not available or this is not a checkout",
+    what: "`git` does not run here, or the folder is not a Git working tree with an origin.",
+    why: "Git is not installed, or the folder is not a clone.",
+    fix: "git --version",
+  },
+};

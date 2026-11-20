@@ -19,6 +19,7 @@ import {
   outcomeLines,
   publishAll,
   type Tools,
+  writeVersion,
   planLines,
   planRelease,
   readRecord,
@@ -411,5 +412,33 @@ proves(
     assertEquals(driftOf(published, local({ "src/a.ts": "h2" })), "differs");
     assertEquals(driftOf(published, local({})), "differs");
     assertEquals(driftOf(published, local({ "src/a.ts": "h1" }, '{"exports":{".":"./a.ts","./more":"./more.ts"}}')), "differs");
+  },
+);
+
+proves(
+  [`${SPEC} FR-020`],
+  "the version is written into each constant the manifest names, and a missing file or constant is a sentence that names it",
+  async () => {
+    await withTempDir(async (dir) => {
+      const put = (file: string, text: string): void => {
+        mkdirSync(join(dir, file, ".."), { recursive: true });
+        writeTextFileSync(join(dir, file), text);
+      };
+      const manifest = (constants: readonly { file: string; name: string }[]): string =>
+        `export const library = ${JSON.stringify({ name: "k", level: "L0", verify: "bun run verify", version: "0.1.0", exports: ["."], versionConstants: constants })};\n`;
+      put("commons/k/package.json", `${JSON.stringify({ name: "@x/k", version: "0.1.0" }, null, 2)}\n`);
+      put("commons/k/src/v.ts", `export const K_VERSION = "0.1.0";\nexport const OTHER_VERSION = "9.9.9";\n`);
+      const step = { slug: slug("k"), folder: "commons/k", from: "0.1.0", to: "0.2.0", tag: "k-v0.2.0", publish: true, decision: { kind: "raised", to: "0.2.0", impact: "minor", why: "changed" } } as const;
+      put("commons/k/library.ts", manifest([{ file: "src/v.ts", name: "K_VERSION" }]));
+      const done = writeVersion(dir, step);
+      assertEquals(done.kind === "ok" ? done.value : [], ["commons/k/library.ts", "commons/k/package.json", "commons/k/src/v.ts"]);
+      assertEquals(readTextFileSync(join(dir, "commons/k/src/v.ts")), `export const K_VERSION = "0.2.0";\nexport const OTHER_VERSION = "9.9.9";\n`);
+      put("commons/k/library.ts", manifest([{ file: "src/missing.ts", name: "K_VERSION" }]));
+      const gone = writeVersion(dir, step);
+      assert(gone.kind === "err" && gone.error.includes("commons/k/src/missing.ts is missing"), "a file that is not there is named");
+      put("commons/k/library.ts", manifest([{ file: "src/v.ts", name: "NOPE_VERSION" }]));
+      const none = writeVersion(dir, step);
+      assert(none.kind === "err" && none.error.includes("does not say NOPE_VERSION"), "a constant that is not there is named");
+    });
   },
 );
