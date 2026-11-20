@@ -34,7 +34,7 @@ export function kitNameOf(dir: string): string {
   return owner ?? "";
 }
 
-/** The files that prove a requirement (the tests that name it) and the files written to it (a `// Spec:` header names it), by requirement as `0009-sql-aide FR-001`. */
+/** The files that prove a requirement (the tests that name it) and the files written to it (a `// Spec:` header names it), by requirement as `0009-example FR-001`. */
 export interface Trace {
   readonly tests: ReadonlyMap<string, readonly string[]>;
   readonly code: ReadonlyMap<string, readonly string[]>;
@@ -77,7 +77,7 @@ export function traceOf(b: Build): Trace {
   return { tests: frozen(tests), code: frozen(code) };
 }
 
-/** The number of a specification's id: `0009` of `0009-sql-aide`. */
+/** The number of a specification's id: `0009` of `0009-example`. */
 export const numberOf = (id: string): string => id.split("-")[0] ?? id;
 
 /** The page of the constitution of a plain spec kit. */

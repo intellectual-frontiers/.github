@@ -148,6 +148,8 @@ export const config: DocsConfig = {
   citations: { prefix: "commons", digits: 4, text: ["erga", "archon", "stolos", "thyra"] },
   lenses: [guides, releases, dataModels, programs],
   lintRules: "commons/lint/src/rules",
+  retired: ["SQL Aide", "sql-aide", "File Aide", "IFRFS"],
+  forbiddenInGuides: ["formerly", "previously", "legacy", "deprecated", "replaces", "replaced", "migration", "backward", "backwards", "acceptance test", "history", "no longer"],
   out: "_site",
 };
 

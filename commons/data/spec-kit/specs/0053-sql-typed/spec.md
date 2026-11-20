@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** data
 
-**Input:** SQL Aide had a typed table, column and row algebra and a query builder. Here they are a unit of their own, `sql/typed`, and each model gets its own generated file of typed tables (`sql/typed/models/<model>.auto.ts`), made from governance and the logical schema, so that a program that reads and writes the tables of a model is checked against the model by the compiler.
+**Input:** A typed table, column and row algebra and a query builder are a unit of their own, `sql/typed`, and each model gets its own generated file of typed tables (`sql/typed/models/<model>.auto.ts`), made from governance and the logical schema, so that a program that reads and writes the tables of a model is checked against the model by the compiler.
 
 ## Requirements
 
@@ -35,7 +35,7 @@
 
 ## Assumptions
 
-- Ported from SQL Aide, which this library replaces; its typed algebra is rebuilt on the logical schema and governance, with the engines of the tests SQLite, DuckDB and PGlite (PostgreSQL).
+- The typed algebra is built on the logical schema and governance, with the engines of the tests SQLite, DuckDB and PGlite (PostgreSQL).
 - The generated files are committed and are in the package; a project that composes other models generates its own.
 
 ## Open questions

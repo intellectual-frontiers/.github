@@ -24,7 +24,7 @@ import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { path } from "@intellectual-frontiers/system";
 import type { Lens } from "./lens.ts";
 
-/** A specification, by its repository and its folder's name (`commons`, `0009-sql-aide`). Only the repository's own become links. */
+/** A specification, by its repository and its folder's name (`commons`, `0009-example`). Only the repository's own become links. */
 export interface AboutSpec {
   /** The repository whose spec kit holds it. */
   readonly repo: string;
@@ -232,6 +232,10 @@ export interface DocsConfig {
   readonly lenses?: readonly Lens[];
   /** The folder of the lint rules an `about` may name, as `<rule>.ts`, from the root; a lint rule is not checked without it. */
   readonly lintRules?: string;
+  /** Names that must not appear on any page of the site (a retired library, a product that is gone): a page that names one is a finding. */
+  readonly retired?: readonly string[];
+  /** Words that must not appear on the pages that people write (the sections Start here, Concepts and How-to): a page that has one is a finding. */
+  readonly forbiddenInGuides?: readonly string[];
   /** Where `build` writes the site, from the root; `_site` by default. */
   readonly out?: string;
 }
@@ -284,6 +288,10 @@ export interface Config {
   readonly lenses: readonly Lens[];
   /** The folder of the lint rules, from the root. */
   readonly lintRules: string | undefined;
+  /** Names that must not appear on any page. */
+  readonly retired: readonly string[];
+  /** Words that must not appear on the pages people write. */
+  readonly forbiddenInGuides: readonly string[];
   /** Where `build` writes the site, absolute. */
   readonly out: string;
 }
@@ -432,6 +440,17 @@ export function resolveConfig(value: unknown, file: string): Result<Config, stri
   const lenses: Lens[] = [];
   if (!Array.isArray(rawLenses)) bad("lenses must be an array of Lens values");
   else rawLenses.forEach((l: unknown, i) => (isLens(l) ? void lenses.push(l) : bad(`lenses[${i}] is not a Lens: { name, read }`)));
+  const names = (key: string): string[] => {
+    const v = value[key];
+    if (v === undefined) return [];
+    if (!Array.isArray(v) || !v.every((x: unknown) => typeof x === "string" && x !== "")) {
+      bad(`${key} must be an array of non-empty strings`);
+      return [];
+    }
+    return v.map(String);
+  };
+  const retired = names("retired");
+  const forbiddenInGuides = names("forbiddenInGuides");
   const lint = optStr("lintRules", "lintRules");
   const out = path.resolve(root, optStr("out", "out") ?? "_site");
   if (problems.length > 0) return err(problems);
@@ -449,6 +468,8 @@ export function resolveConfig(value: unknown, file: string): Result<Config, stri
     citations,
     lenses,
     lintRules: lint === undefined ? undefined : normalDir(lint),
+    retired,
+    forbiddenInGuides,
     out,
   });
 }

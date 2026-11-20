@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** data
 
-**Input:** The enum, domain, sequence, schema and extension DDL that SQL Aide had, as an extension of the engine.
+**Input:** The enum, domain, sequence, schema and extension DDL, as an extension of the engine.
 
 ## Requirements
 
@@ -24,7 +24,7 @@
 
 ## Assumptions
 
-- Ported from SQL Aide, which this library replaces; the engines of the tests are SQLite, DuckDB and PGlite (PostgreSQL), in process.
+- The engines of the tests are SQLite, DuckDB and PGlite (PostgreSQL), in process.
 
 ## Open questions
 

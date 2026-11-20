@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** data
 
-**Input:** pgTAP and TAP assertions of SQL Aide, as an extension.
+**Input:** pgTAP and TAP assertions, as an extension.
 
 ## Requirements
 
@@ -25,7 +25,7 @@
 
 ## Assumptions
 
-- Ported from SQL Aide, which this library replaces; the engines of the tests are SQLite, DuckDB and PGlite (PostgreSQL), in process.
+- The engines of the tests are SQLite, DuckDB and PGlite (PostgreSQL), in process.
 
 ## Open questions
 

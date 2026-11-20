@@ -1,7 +1,6 @@
 // Spec: 0049-sql-assertions FR-004
 /**
  * The Test Anything Protocol, version 14, as typed values (commons data 0049-sql-assertions FR-004): the one format the results of assertions are reported in. Results are data first; `tapText` writes them.
- * Ported from SQL Aide, which this library replaces.
  *
  * @module
  */

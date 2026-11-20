@@ -22,7 +22,9 @@ export type Problem =
   | { readonly kind: "undescribed"; readonly entity: string }
   | { readonly kind: "import-failed"; readonly error: string }
   | { readonly kind: "broken-link"; readonly href: string }
-  | { readonly kind: "duplicate-spec"; readonly id: string };
+  | { readonly kind: "duplicate-spec"; readonly id: string }
+  | { readonly kind: "retired-name"; readonly name: string }
+  | { readonly kind: "forbidden-word"; readonly word: string };
 
 /** A problem and where it is. */
 export interface Finding {
@@ -63,6 +65,10 @@ export function message(p: Problem): string {
       return `links to ${p.href}, which is not a page or an anchor of the site`;
     case "duplicate-spec":
       return `holds ${p.id}, which a spec kit before it holds too`;
+    case "retired-name":
+      return `names ${p.name}, which is retired`;
+    case "forbidden-word":
+      return `has the word "${p.word}", which a page people write does not use`;
     default:
       return absurd(p);
   }

@@ -17,7 +17,7 @@ export type Mechanism = "check" | "gate" | "review" | "none";
 
 /** A row of `enforcement.tsv`, or of a `reviewed.tsv`. */
 export interface Enforcement {
-  /** The requirement, as `0009-sql-aide FR-001`. */
+  /** The requirement, as `0009-example FR-001`. */
   readonly requirement: string;
   /** How. */
   readonly mechanism: Mechanism;
@@ -40,7 +40,7 @@ export type Layout = SpecKitSource["layout"];
 
 /** A specification in force. */
 export interface Spec {
-  /** Its folder's name: `0009-sql-aide`. */
+  /** Its folder's name: `0009-example`. */
   readonly id: string;
   /** Its `spec.md`, from the root. */
   readonly file: string;

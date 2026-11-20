@@ -28,7 +28,7 @@
 ## What the files hold
 
 - **FR-013**: The Zod file MUST be a module that a project can import and that validates the rows of its tables: a row that fits parses, and a row with a missing, wrong or unknown value is refused; and the Rust file MUST compile.
-- **FR-014**: The files of Arca's party model MUST hold every table, every column and every foreign key of its logical schema, in each diagram, dictionary, struct and schema, and nothing more; the equivalence of the files with the old SQL Aide's is recorded in the equivalence ledger, which is not part of this library.
+- **FR-014**: The files of Arca's party model MUST hold every table, every column and every foreign key of its logical schema, in each diagram, dictionary, struct and schema, and nothing more.
 
 ## Out of scope
 

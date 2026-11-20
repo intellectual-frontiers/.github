@@ -1,6 +1,6 @@
 /**
  * Where the words of documentation link to (commons 0011-documentation FR-011, FR-012, FR-025): a citation of a specification of the
- * repository (its prefix and an id, as `commons 0009-sql-aide`; a bare id of its own form, as `0009-sql-aide` in commons or
+ * repository (its prefix and an id, as `commons 0009-example`; a bare id of its own form, as `0009-example` in commons or
  * `096-bun-runtime` in Stolos; a number of its digits after `spec` or before a requirement, as `spec 004` or `038 FR-014`, where a
  * specification has that number; `FR-026` after any of these; or a bare `FR-045` in an area, which names a requirement of the area's
  * specification) becomes a link to the specification's page and the requirement's anchor; a citation of a repository the configuration
@@ -58,7 +58,7 @@ export interface LinkScope {
 /** The page of a specification. */
 export const specPage = (id: string): string => `specs/${id}.html`;
 
-// A qualifier and an id (`commons 0009-sql-aide`), a requirement (`FR-026`), or a number alone after `spec` or before a requirement
+// A qualifier and an id (`commons 0009-example`), a requirement (`FR-026`), or a number alone after `spec` or before a requirement
 // (`spec 004`, `038 FR-014`), which names the specification with that number.
 const CITE =
   /(?:(?<![\w-])([A-Za-z][\w.'-]*) )?(?<![\w-])(\d{3,}-[a-z][a-z0-9]*(?:-[a-z0-9]+)*)|(?<![\w-])((?:FR|SC)-\d{3}[a-z]?)(?![\w-])|(?<![\w-])(?:[Ss]pecs? (\d{3,})|(\d{3,})(?= (?:FR|SC)-\d{3}))(?![\w-])/g;
@@ -190,7 +190,7 @@ export function hrefFor(dest: string, index: LinkIndex, scope: LinkScope): Href 
  * The inlines `{@link name}` becomes: a link to the export, in the area named before `!`, or else in the scope's area, or else the one
  * export of that name in any area.
  *
- * @param name - what it names: `table`, or `sql-aide!table`
+ * @param name - what it names: `table`, or `data!table`
  * @param label - the text to show, where one is given
  * @param index - what links can reach
  * @param scope - where the link is

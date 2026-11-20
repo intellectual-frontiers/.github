@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** data
 
-**Input:** The sql and lint project commands of SQL Aide, in arcactl.
+**Input:** The sql and lint project commands, in arcactl.
 
 ## Requirements
 
@@ -25,7 +25,7 @@
 
 ## Assumptions
 
-- Ported from SQL Aide, which this library replaces; the engines of the tests are SQLite, DuckDB and PGlite (PostgreSQL), in process.
+- The engines of the tests are SQLite, DuckDB and PGlite (PostgreSQL), in process.
 
 ## Open questions
 
