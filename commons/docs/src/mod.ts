@@ -42,7 +42,7 @@ export type { ApiExport, ApiMember, AreaApi, ExportKind } from "./extract/api.ts
 export type { Constitution, Enforcement, Spec, SpecKit } from "./extract/specs.ts";
 export type { LinkScope } from "./links.ts";
 export { llmsIndex, markdownOf, twinOf } from "./emit/markdown.ts";
-export type { Layer, LayerElement, LayeredFinding, LayeredModel, LayeredSource, Locate, SourceLocation, TraceEdge } from "./layered.ts";
+export type { Layer, LayerElement, LayeredFinding, LayeredModel, LayeredSource, LayeredSubject, Locate, SourceLocation, TraceEdge } from "./layered.ts";
 export type { Lens, LensPages, SiteFile } from "./lens.ts";
 export type { Badge, Block, Card, Href, Inline, Page, Section, Tab, TreeNode } from "./model.ts";
 export { plain, possessive, slugOf } from "./model.ts";

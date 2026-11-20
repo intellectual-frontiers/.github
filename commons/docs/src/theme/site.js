@@ -17,6 +17,15 @@
   };
   document.querySelector(".theme-button")?.addEventListener("click", toggleTheme);
 
+  // a filter above a table: the rows whose text has every word typed stay, the others are hidden
+  for (const box of document.querySelectorAll(".table-filter")) {
+    const rows = [...(box.nextElementSibling?.querySelectorAll("tbody tr") ?? [])];
+    box.addEventListener("input", () => {
+      const words = box.value.toLowerCase().split(/\s+/).filter(Boolean);
+      for (const row of rows) row.hidden = !words.every((w) => row.textContent.toLowerCase().includes(w));
+    });
+  }
+
   // the menu
   const menu = document.querySelector(".menu-button");
   if (menu) {

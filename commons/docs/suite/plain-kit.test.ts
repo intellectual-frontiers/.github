@@ -41,7 +41,7 @@ proves(["0011-documentation FR-015", "0011-documentation FR-024"], "the fixture'
   const config = resolved({ name: "F", repository: "https://github.com/example/f", home: { dir: "." }, packages: [], specKits: [{ layout: "spec-kit", dir: "specs" }], citations: { prefix: "f", digits: 3 } }, path.join(FIXTURE, "x.ts"));
   const b = new Build(config, readSpecKits(FIXTURE, config.specKits));
   specPages(b);
-  assertEquals(b.pages.map((p) => p.path), ["specs/index.html", "specs/matrix.html", CONSTITUTION_PAGE, "specs/001-greeting.html", "specs/002-farewell.html"]);
+  assertEquals(b.pages.map((p) => p.path), ["specs/index.html", "specs/matrix/specifications.html", "specs/matrix.html", CONSTITUTION_PAGE, "specs/001-greeting.html", "specs/002-farewell.html"]);
   const greeting = b.pages.find((p) => p.path === "specs/001-greeting.html");
   assertEquals(greeting?.badges?.map((x) => x.text), ["001", "Implemented"]);
   const entries = (greeting?.blocks ?? []).flatMap((x) => (x.kind === "entry" ? [[x.name, x.badges.map((y) => y.text).join(",")]] : []));

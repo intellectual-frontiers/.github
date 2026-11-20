@@ -74,7 +74,7 @@ export type Block =
   | { readonly kind: "meta"; readonly inlines: readonly Inline[] }
   | { readonly kind: "list"; readonly ordered: boolean; readonly items: readonly (readonly Block[])[] }
   | { readonly kind: "code"; readonly lang: Lang; readonly text: string; readonly title?: string }
-  | { readonly kind: "table"; readonly head: readonly (readonly Inline[])[]; readonly rows: readonly (readonly (readonly Inline[])[])[] }
+  | { readonly kind: "table"; readonly head: readonly (readonly Inline[])[]; readonly rows: readonly (readonly (readonly Inline[])[])[]; readonly filter?: string; readonly compact?: boolean }
   | { readonly kind: "callout"; readonly tone: "note" | "limit" | "warn"; readonly title: string; readonly blocks: readonly Block[] }
   | {
     readonly kind: "entry";
@@ -91,7 +91,7 @@ export type Block =
   | { readonly kind: "tree"; readonly nodes: readonly TreeNode[] };
 
 /** The sections of the site (commons 0011-documentation FR-009 and FR-032): the guides, the concepts, the libraries, the how-to pages, and the reference (specifications, API and models). */
-export type Section = "start" | "concepts" | "overview" | "howto" | "specs" | "api" | "models";
+export type Section = "start" | "concepts" | "overview" | "howto" | "specs" | "api" | "models" | "programs";
 
 /** A page: where it is, what it is called, which section and group of the navigation it is in, and its blocks. */
 export interface Page {
@@ -109,6 +109,10 @@ export interface Page {
   readonly order: number;
   /** What the navigation calls it, where that is not its title. */
   readonly navTitle?: string;
+  /** The page it is under in the navigation (its path): it is listed beneath that page, and only while that page or a page beneath it is the one being read. */
+  readonly parent?: string;
+  /** What kind of page it is, for the small heading that groups the pages beneath one page in the navigation (`Concepts`, `Code lists`). */
+  readonly navKind?: string;
   /** Its badges, beside the title. */
   readonly badges?: readonly Badge[];
   /** What it holds. */

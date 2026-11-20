@@ -25,6 +25,8 @@ export interface Module {
   readonly requires: readonly string[];
   readonly concepts: readonly AnyConcept[];
   readonly codeLists: readonly AnyCodeList[];
+  /** The id of the subject it applies to (`subjects.ts`), where it names one. */
+  readonly subject?: string;
 }
 
 /** What a module is made from. */
@@ -34,6 +36,7 @@ export interface ModuleSpec {
   readonly requires?: readonly string[];
   readonly concepts: readonly AnyConcept[];
   readonly codeLists?: readonly AnyCodeList[];
+  readonly subject?: string;
 }
 
 /**
@@ -50,6 +53,7 @@ export const defineModule = (spec: ModuleSpec): Module =>
     requires: Object.freeze([...(spec.requires ?? [])]),
     concepts: Object.freeze([...spec.concepts]),
     codeLists: Object.freeze([...(spec.codeLists ?? [])]),
+    ...(spec.subject === undefined ? {} : { subject: spec.subject }),
   });
 
 /**

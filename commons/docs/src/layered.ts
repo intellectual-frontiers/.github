@@ -68,6 +68,18 @@ export interface LayeredFinding {
   readonly message: string;
 }
 
+/** What a model applies to. */
+export interface LayeredSubject {
+  /** Its id. */
+  readonly id: string;
+  /** Its title. */
+  readonly title: string;
+  /** What its models apply to, in a sentence. */
+  readonly about: string;
+  /** Its place among the subjects: lower first. */
+  readonly order: number;
+}
+
 /** A model that is built in layers, as the generator documents it. */
 export interface LayeredModel {
   /** Its name and the library it is of, as `arca`, `data`. */
@@ -75,6 +87,8 @@ export interface LayeredModel {
   readonly library: string;
   readonly title: string;
   readonly summary: string;
+  /** What the model applies to, where it has a subject: models are grouped by it. */
+  readonly subject?: LayeredSubject;
   readonly layers: readonly Layer[];
   readonly elements: readonly LayerElement[];
   readonly trace: readonly TraceEdge[];

@@ -18,6 +18,7 @@
 ## The layers
 
 - **FR-006**: A model MAY import another model through its entry of `exports` (a module imports the modules it requires); the imports among models MUST be acyclic, and `tools/layers.ts` MUST report a cycle among models as a finding (`layers/cycle`).
+- **FR-008**: A module MAY name the subject it applies to (`subject`, the id of one of `SUBJECTS`: parties, identity, pipelines, meaning, operations, project), and where it names none it MUST take the subject the library gives its own name; `subjectOf` MUST give the subject of a module, and `describeModels` MUST carry it on each described model so that the models can be grouped by what they apply to.
 
 ## Out of scope
 

@@ -11,14 +11,14 @@ import { guidesLens } from "../src/lens/guides.ts";
 import { freshBuild } from "./helpers.ts";
 import { CONFIG } from "./helpers.ts";
 
-proves(["0011-documentation FR-032"], "a guide that cannot be read is a finding, and the sections are in the order of a newcomer's path", async () => {
+proves(["0011-documentation FR-032", "0011-documentation FR-039"], "a guide that cannot be read is a finding, and the sections are in the order of a newcomer's path", async () => {
   const lens = guidesLens({ name: "g", guides: [{ file: "nowhere/none.md", path: "start/index.html", section: "start", group: "Start here", order: 0 }] });
   const b = freshBuild();
   const make = await lens.read(b, [], []);
   make(b, 10);
   assertEquals(b.pages.length, 0);
   assertEquals(b.found.map((f) => f.problem.kind), ["undescribed"]);
-  assertEquals(SECTIONS.map((s) => s.section), ["start", "concepts", "overview", "howto", "specs", "api", "models"]);
+  assertEquals(SECTIONS.map((s) => s.section), ["start", "concepts", "overview", "howto", "specs", "api", "models", "programs"]);
 });
 
 proves(["0011-documentation FR-032", "0011-documentation FR-033"], "commons' site has the guides of every section with their citations and links resolved to pages, and a library map that names what each library imports", async () => {

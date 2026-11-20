@@ -12,13 +12,16 @@ import type { Build } from "../build.ts";
 import { under } from "../config.ts";
 import type { Enforcement, KitSource, Spec } from "../extract/specs.ts";
 import { specPage } from "../links.ts";
-import type { Badge, Block, Inline, Page, Tone } from "../model.ts";
+import type { Badge, Block, Href, Inline, Page, Tone } from "../model.ts";
 import { plain, slugOf } from "../model.ts";
 
 const toneOf = (mechanism: Enforcement["mechanism"] | undefined): Tone =>
   mechanism === "check" || mechanism === "gate" ? "good" : mechanism === "review" ? "info" : "warn";
 
 const statusTone = (s: string): Tone => (s === "Adopted" ? "good" : s === "Superseded" ? "warn" : "neutral");
+
+/** The most rows a page of the matrix holds: a page ends at a specification once it has this many. */
+export const ROW_BUDGET = 150;
 
 const ITEM = /^((?:FR|SC)-\d{3}[a-z]?|OQ-\d+)$/;
 
@@ -191,11 +194,6 @@ function specPageOf(b: Build, spec: Spec, order: number, trace: Trace): Page {
   };
 }
 
-/** Where a kit's specifications come from, as the register says it. */
-function registerSource(k: KitSource): string {
-  return k.layout === "commons" ? `as ${under(k.dir, "registry.tsv")} lists them` : `as the folders of ${k.dir === "" ? "the root" : `${k.dir}/`} hold them`;
-}
-
 /** What a kit's matrix rows come from, as the matrix says it. */
 function matrixSource(k: KitSource): string {
   return k.layout === "commons" ? `with the row ${under(k.dir, "enforcement.tsv")} has for it` : `with the reason the reviewed.tsv beside its specification gives where it is proven by review`;
@@ -212,34 +210,37 @@ const joined = (xs: readonly string[]): string => (xs.length <= 1 ? xs.join("") 
 export function specPages(b: Build): void {
   if (b.kit.sources.length === 0) return;
   const subject = b.config.subject;
-  const commonsOnly = b.kit.sources.every((k) => k.layout === "commons");
+  const libs = b.kit.sources.map((k) => ({ k, here: b.kit.specs.filter((s) => kitDirOf(b, s) === k.dir) })).filter((x) => x.here.length > 0);
+  const libTitle = (dir: string): string => {
+    const name = kitNameOf(dir);
+    return name === "" || name === "commons" ? "Commons" : (b.packageTitles.get(name) ?? name);
+  };
+  const reqCount = (xs: readonly Spec[]): number => xs.reduce((n, s) => n + s.requirements.length, 0);
   b.add({
     path: "specs/index.html",
     title: "Register",
-    description: commonsOnly ? `Every specification of ${subject} in force, with its status, owner, domain and part.` : `Every specification of ${subject} in force, with its status.`,
+    description: `Every specification of ${subject} in force, by the library that keeps it.`,
     section: "specs",
     group: "Spec kit",
     order: 0,
     blocks: [
+      { kind: "paragraph", inlines: [{ kind: "text", text: `${b.kit.specs.length} specifications of ${libs.length} libraries are in force, ${reqCount(b.kit.specs)} requirements in all. Each library keeps its own, numbered from 0001; commons keeps the ones that belong to it as a whole. Open a library to see its specifications, or filter the register by a word.` }] },
       {
-        kind: "paragraph",
-        inlines: [{ kind: "text", text: `Every specification of ${subject} in force, ${joined(b.kit.sources.map(registerSource))}.` }],
+        kind: "cards",
+        cards: libs.map(({ k, here }) => ({ title: libTitle(k.dir), href: { kind: "page", path: "specs/index.html", anchor: slugOf(kitNameOf(k.dir) === "" ? "specifications" : kitNameOf(k.dir)) } as Href, text: [{ kind: "text", text: `${here.length} ${here.length === 1 ? "specification" : "specifications"}, ${reqCount(here)} requirements` }] })),
       },
-      ...b.kit.sources.flatMap((k): Block[] => {
-        const here = b.kit.specs.filter((s) => kitDirOf(b, s) === k.dir);
-        if (here.length === 0) return [];
+      ...libs.flatMap(({ k, here }): Block[] => {
         const name = kitNameOf(k.dir);
-        const title = name === "" || name === "commons" ? "Commons" : (b.packageTitles.get(name) ?? name);
         return [
-          { kind: "heading", level: 2, id: slugOf(name === "" ? "specifications" : name), text: [{ kind: "text", text: title }] },
+          { kind: "heading", level: 2, id: slugOf(name === "" ? "specifications" : name), text: [{ kind: "text", text: libTitle(k.dir) }] },
           {
             kind: "table",
-            head: ["Number", "Specification", "Status", "Part of", "Requirements"].map((h) => [{ kind: "text", text: h }]),
+            filter: `Filter the specifications of ${libTitle(k.dir)}`,
+            head: ["Number", "Specification", "Status", "Requirements"].map((h) => [{ kind: "text", text: h }]),
             rows: here.map((s) => [
               [{ kind: "code", text: numberOf(s.id) }],
-              [{ kind: "link", href: { kind: "page", path: specPage(s.id) }, children: [{ kind: "text", text: s.title }] }],
+              [{ kind: "link", href: { kind: "page", path: specPage(s.id) }, children: [{ kind: "text", text: s.title }] }, ...(s.partOf === undefined ? [] : [{ kind: "text" as const, text: " · part of " }, { kind: "link" as const, href: { kind: "page" as const, path: specPage(s.partOf) }, children: [{ kind: "code" as const, text: s.partOf }] }])],
               [{ kind: "text", text: s.status }],
-              s.partOf === undefined ? [] : [{ kind: "link", href: { kind: "page", path: specPage(s.partOf) }, children: [{ kind: "code", text: s.partOf }] }],
               [{ kind: "text", text: String(s.requirements.length) }],
             ]),
           },
@@ -247,27 +248,71 @@ export function specPages(b: Build): void {
       }),
     ],
   });
-  const rows = b.kit.specs.flatMap((s) =>
-    s.requirements.map((r): Inline[][] => {
-      const e = b.kit.enforcement.get(`${s.id} ${r.id}`);
-      return [
-        [{ kind: "link", href: { kind: "page", path: specPage(s.id), anchor: r.id.toLowerCase() }, children: [{ kind: "code", text: `${numberOf(s.id)} ${r.id}` }] }],
-        [{ kind: "text", text: e?.mechanism ?? (s.layout === "commons" ? "no row" : "") }],
-        e === undefined || e.by === "-" ? [] : [{ kind: "code", text: e.by }],
-        [{ kind: "text", text: e?.note ?? "" }],
-      ];
-    })
-  );
+  // the matrix is one page for each library, in chunks of at most ROW_BUDGET rows that end at a specification, with a summary page that counts how each requirement is enforced
+  const rowOf = (s: Spec, r: { readonly id: string }): Inline[][] => {
+    const e = b.kit.enforcement.get(`${s.id} ${r.id}`);
+    return [
+      [{ kind: "link", href: { kind: "page", path: specPage(s.id), anchor: r.id.toLowerCase() }, children: [{ kind: "code", text: r.id }] }],
+      [{ kind: "text", text: e?.mechanism ?? (s.layout === "commons" ? "no row" : "") }],
+      e === undefined || e.by === "-" ? [] : [{ kind: "code", text: e.by.replace(/^\.github: cd commons\/[a-z-]+ && /, "").replace(/^\.github: /, "") }],
+      [{ kind: "text", text: e?.note ?? "" }],
+    ];
+  };
+  const mechanismOf = (s: Spec, r: { readonly id: string }): string => b.kit.enforcement.get(`${s.id} ${r.id}`)?.mechanism ?? (s.layout === "commons" ? "no row" : "review");
+  const summary: Inline[][][] = [];
+  let matrixOrder = 100;
+  for (const { k, here } of libs) {
+    const name = kitNameOf(k.dir) === "" ? "specifications" : kitNameOf(k.dir);
+    const chunks: Spec[][] = [];
+    let rowsSoFar = 0;
+    for (const s of here) {
+      if (chunks.length === 0 || (rowsSoFar > 0 && rowsSoFar + s.requirements.length > ROW_BUDGET)) {
+        chunks.push([]);
+        rowsSoFar = 0;
+      }
+      chunks[chunks.length - 1]?.push(s);
+      rowsSoFar += s.requirements.length;
+    }
+    const counts = new Map<string, number>();
+    for (const s of here) for (const r of s.requirements) counts.set(mechanismOf(s, r), (counts.get(mechanismOf(s, r)) ?? 0) + 1);
+    const pageOf = (i: number): string => `specs/matrix/${slugOf(name)}${i === 0 ? "" : `-${i + 1}`}.html`;
+    summary.push([
+      [{ kind: "link", href: { kind: "page", path: pageOf(0) }, children: [{ kind: "text", text: libTitle(k.dir) }] }],
+      [{ kind: "text", text: String(here.length) }],
+      [{ kind: "text", text: String(reqCount(here)) }],
+      ...["check", "gate", "review", "none", "no row"].map((m): Inline[] => [{ kind: "text", text: String(counts.get(m) ?? 0) }]),
+    ]);
+    chunks.forEach((ss, i) => {
+      b.add({
+        path: pageOf(i),
+        title: chunks.length === 1 ? libTitle(k.dir) : `${libTitle(k.dir)} (${i + 1} of ${chunks.length})`,
+        description: `How each requirement of the specifications of ${libTitle(k.dir)} is enforced, and by what.`,
+        section: "specs",
+        group: "Spec kit",
+        order: matrixOrder++,
+        parent: "specs/matrix.html",
+        navKind: "Libraries",
+        navTitle: chunks.length === 1 ? libTitle(k.dir) : `${libTitle(k.dir)} ${i + 1}`,
+        blocks: [
+          { kind: "paragraph", inlines: [{ kind: "text", text: `${ss.length} ${ss.length === 1 ? "specification" : "specifications"}, ${reqCount(ss)} requirements. ` }, { kind: "link", href: { kind: "page", path: "specs/matrix.html" }, children: [{ kind: "text", text: "All libraries" }] }] },
+          ...ss.flatMap((s): Block[] => [
+            { kind: "heading", level: 2, id: slugOf(s.id), text: [{ kind: "link", href: { kind: "page", path: specPage(s.id) }, children: [{ kind: "text", text: `${numberOf(s.id)} ${s.title}` }] }] },
+            { kind: "table", compact: true, filter: `Filter the requirements of ${numberOf(s.id)}`, head: ["Requirement", "Mechanism", "Who", "Note"].map((h) => [{ kind: "text", text: h }]), rows: s.requirements.map((r) => rowOf(s, r)) },
+          ]),
+        ],
+      });
+    });
+  }
   b.add({
     path: "specs/matrix.html",
     title: "Traceability matrix",
-    description: `Every requirement of ${subject}, with how it is enforced and by what.`,
+    description: `How each requirement of ${subject} is enforced, by library.`,
     section: "specs",
     group: "Spec kit",
     order: 1,
     blocks: [
-      { kind: "paragraph", inlines: [{ kind: "text", text: `Every requirement of ${subject}, ${joined(b.kit.sources.map(matrixSource))}.` }] },
-      { kind: "table", head: ["Requirement", "Mechanism", "Who", "Note"].map((h) => [{ kind: "text", text: h }]), rows },
+      { kind: "paragraph", inlines: [{ kind: "text", text: `Every requirement of ${subject}, ${joined(b.kit.sources.map(matrixSource))}. A requirement is checked by a test, gated by a command, reviewed by a person, or has no row yet. Open a library for its requirements, specification by specification.` }] },
+      { kind: "table", filter: "Filter the libraries", head: ["Library", "Specifications", "Requirements", "Check", "Gate", "Review", "None", "No row"].map((h) => [{ kind: "text", text: h }]), rows: summary },
     ],
   });
   const c = b.kit.constitution;
@@ -305,7 +350,7 @@ export function citedBy(b: Build): void {
   };
   for (let i = 0; i < b.pages.length; i++) {
     const p = b.pages[i];
-    if (p === undefined || p.section !== "specs" || !p.path.startsWith("specs/") || ["specs/index.html", "specs/matrix.html", CONSTITUTION_PAGE].includes(p.path)) continue;
+    if (p === undefined || p.section !== "specs" || !p.path.startsWith("specs/") || ["specs/index.html", "specs/matrix.html", CONSTITUTION_PAGE].includes(p.path) || p.path.startsWith("specs/matrix/")) continue;
     const id = p.path.slice("specs/".length, -".html".length);
     const blocks = p.blocks.map((blk): Block => {
       if (blk.kind !== "entry" || !blk.name.startsWith("FR-")) return blk;
