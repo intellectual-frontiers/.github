@@ -292,6 +292,6 @@ test("a specification of IFCCM names only terms the ontology defines", () => {
 });
 
 test("the abbreviation CCM is never written alone, because it is also the Cloud Security Alliance's Cloud Controls Matrix", () => {
-  const ontology = readTextFileSync(resolve(HERE, "..", "..", "ontology", "ifccm", "ifccm.ts"));
+  const ontology = readTextFileSync(resolve(HERE, "..", "src", "ifccm", "ifccm.ts"));
   for (const text of [SPEC, ontology]) assertEquals(text.replaceAll('"CCM"', "").match(/\bCCM\b/g), null);
 });

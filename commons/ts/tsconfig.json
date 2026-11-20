@@ -32,7 +32,6 @@
     "tests/**/*.ts",
     "tools/**/*.ts",
     "examples/**/*.ts",
-    "../tools/**/*.ts",
-    "../ontology/**/*.ts"
+    "../tools/**/*.ts"
   ]
 }
