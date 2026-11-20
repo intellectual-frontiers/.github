@@ -242,6 +242,14 @@ export const LIBRARY_CI: Readonly<Record<string, LibraryCi>> = {
     nodeTests: 'node --test "suite/**/*.test.ts"',
     systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
   },
+  integrations: {
+    comment: lines(
+      "Integrations, observation and exchange on one skeleton of Kanon layers (governance, logical, physical), a library of commons (commons 0027-commons-libraries): its own `verify` (the compiler, the specification checker, the layers and trace checks, its tests and the",
+      "packing of its package with the inspection of its declarations) on Bun and its tests on Node 26, on Windows, macOS and Linux, because the package runs on all three.",
+    ).trimEnd(),
+    nodeTests: 'node --test "suite/**/*.test.ts"',
+    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
+  },
 };
 
 /** The workflow of a library of commons, made from its manifest (FR-006): its `verify` on Bun when its folder or what it imports changes, and its tests on Node where its record says so. */
