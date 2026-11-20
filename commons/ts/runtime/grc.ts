@@ -62,12 +62,12 @@ import {
 } from "../kernel/grc.ts";
 import { parseJson5 } from "@intellectual-frontiers/formats/json5";
 import { complianceFinding, type OcsfComplianceFinding, type OcsfProduct } from "../kernel/ocsf.ts";
-import { type AnyMap, type AnyValue, SEVERITY, type Scope, type SeverityNumber } from "../kernel/otel.ts";
-import { defineSignals, type Telemetry } from "../kernel/signals.ts";
+import { type AnyMap, type AnyValue, SEVERITY, type Scope, type SeverityNumber } from "@intellectual-frontiers/telemetry/otel";
+import { defineSignals, type Telemetry } from "@intellectual-frontiers/telemetry/signals";
 import { isTomlDateTime, parseToml, type TomlValue } from "@intellectual-frontiers/formats/toml";
 import { parseYaml } from "@intellectual-frontiers/formats/yaml";
 import { readTextFile } from "@intellectual-frontiers/system/fs";
-import { installed, type Pipeline } from "./otel.ts";
+import { installed, type Pipeline } from "@intellectual-frontiers/telemetry/host/otel";
 
 /** A data file's format. */
 export type DataFormat = "toml" | "yaml" | "json" | "json5";

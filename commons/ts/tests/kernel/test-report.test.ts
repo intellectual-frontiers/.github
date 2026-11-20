@@ -10,7 +10,7 @@ import fc from "fast-check";
 import { signStatement } from "@intellectual-frontiers/crypto/dsse";
 import { appendEntry, type LedgerEntry } from "../../kernel/evidence.ts";
 import { type Instant, instantOf } from "../../kernel/grc.ts";
-import { parseSpanId, parseTraceId, type SpanId, type TraceId } from "../../kernel/otel.ts";
+import { parseSpanId, parseTraceId, type SpanId, type TraceId } from "@intellectual-frontiers/telemetry/otel";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import {
   assembleRecord,

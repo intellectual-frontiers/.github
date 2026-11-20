@@ -16,7 +16,7 @@
 import process from "node:process";
 import { clientFor, parseRemote } from "../githost/mod.ts";
 import { type Deps, type RuleResult, run as changes } from "../mizan/changes.ts";
-import { parseSpanId, parseTraceId, type SpanId, type TraceId } from "../kernel/otel.ts";
+import { parseSpanId, parseTraceId, type SpanId, type TraceId } from "@intellectual-frontiers/telemetry/otel";
 import { keepRun, writeOnce } from "../quality/host/branch.ts";
 import { checkRun } from "../quality/pure/record.ts";
 import { mkdir } from "@intellectual-frontiers/system/fs";

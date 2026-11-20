@@ -8,7 +8,7 @@
  *
  * @module
  */
-import { decodeMetrics } from "../kernel/otlp.ts";
+import { decodeMetrics } from "@intellectual-frontiers/telemetry/otlp";
 import { keepRun } from "../quality/host/branch.ts";
 import { gather } from "../quality/host/gather.ts";
 import { makeTempDir, mkdir, readTextFile, remove, writeTextFile } from "@intellectual-frontiers/system/fs";

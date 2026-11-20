@@ -1,32 +1,32 @@
 /**
- * Tests of `runtime/console.ts` (commons 0006-signals FR-026): a child process run by this same runtime, with its output piped (so
+ * Tests of `src/host/console.ts` (commons 0001-telemetry FR-024): a child process run by this same runtime, with its output piped (so
  * `plain`), shows its spans and log records as lines with no escape byte, says once at the end where signals were not sent, writes OTLP
  * JSON lines where `IFC_CONSOLE=json` asks for them, and on an uncaught exception or an unhandled rejection renders the error and exits
- * with status 1. The rule that the console is the one writer for a person, and `runtime/stdio.ts` the one for a program (0005-typescript-runtime
+ * with status 1. The rule that the console is the one writer for a person, and `system/stdio` the one for a program (0005-typescript-runtime
  * FR-054): no other file of `runtime/` writes to standard output or standard error, or calls `console.log` and the like, in its code.
  *
  * @module
  */
-import { decodeLogs } from "../../kernel/otlp.ts";
-import { chooseMode } from "../../kernel/render.ts";
-import { createTelemetry, defineSignals, type Telemetry } from "../../kernel/signals.ts";
+import { decodeLogs } from "../src/otlp.ts";
+import { chooseMode } from "../src/render.ts";
+import { createTelemetry, defineSignals, type Telemetry } from "../src/signals.ts";
 import { type Equal, expectType } from "@intellectual-frontiers/core";
-import { consoleProcessor, exceptionOf, type UncaughtTarget, uncaughtSignals } from "../../runtime/console.ts";
+import { consoleProcessor, exceptionOf, type UncaughtTarget, uncaughtSignals } from "../src/host/console.ts";
 import { readDir, readTextFile, withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { fromFileUrl, join } from "@intellectual-frontiers/system/path";
 import * as proc from "@intellectual-frontiers/system/proc";
-import { assert, assertEquals, assertStringIncludes, proves } from "../../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 
-const FR = "0006-signals FR-026";
+const FR = "0001-telemetry FR-024";
 const E = "\u001b";
 
 const url = (relative: string): string => new URL(relative, import.meta.url).href;
 
 const SCRIPT = `
 import process from "node:process";
-import { createTelemetry, defineSignals } from "${url("../../kernel/signals.ts")}";
-import { ok } from "${url("../../../core/src/mod.ts")}";
-import { consoleProcessor, installUncaught, uncaughtSignals } from "${url("../../runtime/console.ts")}";
+import { createTelemetry, defineSignals } from "${url("../src/signals.ts")}";
+import { ok } from "${url("../../core/src/mod.ts")}";
+import { consoleProcessor, installUncaught, uncaughtSignals } from "${url("../src/host/console.ts")}";
 
 const registry = defineSignals({
   ...uncaughtSignals,
@@ -173,19 +173,25 @@ function codeLines(text: string): readonly { readonly n: number; readonly line: 
 const WRITER =
   /\bprocess\.(stdout|stderr)\.write\b|\b(stdout|stderr)\.write\s*\(|\bconsole\.(log|error|warn|info|debug|trace|dir|table)\s*\(/;
 
-/** The files of `runtime/` that write to standard output or standard error: the console, for a person; stdio, for a program (FR-054). */
-const WRITERS: ReadonlySet<string> = new Set(["console.ts", "stdio.ts"]);
+/** The folders of the host's code, and the files of each that write to standard output or standard error: the console, for a person; stdio, for a program (FR-054). */
+const FOLDERS: readonly { readonly dir: string; readonly label: string; readonly writers: ReadonlySet<string> }[] = [
+  { dir: "../src/host/", label: "telemetry/src/host", writers: new Set(["console.ts"]) },
+  { dir: "../../system/src/", label: "system/src", writers: new Set(["stdio.ts"]) },
+  { dir: "../../ts/runtime/", label: "ts/runtime", writers: new Set() },
+];
 
 proves(
   [FR],
-  "the console is the one writer for a person and stdio the one for a program: no other file of runtime/ writes to standard output or standard error",
+  "the console is the one writer for a person and stdio the one for a program: no other file of the host's code writes to standard output or standard error",
   async () => {
-    const runtimeDir = fromFileUrl(url("../../runtime/"));
     const found: string[] = [];
-    for await (const entry of readDir(runtimeDir)) {
-      if (!entry.isFile || !entry.name.endsWith(".ts") || WRITERS.has(entry.name)) continue;
-      const text = await readTextFile(join(runtimeDir, entry.name));
-      for (const { n, line } of codeLines(text)) if (WRITER.test(line)) found.push(`runtime/${entry.name}:${n}: ${line.trim()}`);
+    for (const folder of FOLDERS) {
+      const dir = fromFileUrl(url(folder.dir));
+      for await (const entry of readDir(dir)) {
+        if (!entry.isFile || !entry.name.endsWith(".ts") || folder.writers.has(entry.name)) continue;
+        const text = await readTextFile(join(dir, entry.name));
+        for (const { n, line } of codeLines(text)) if (WRITER.test(line)) found.push(`${folder.label}/${entry.name}:${n}: ${line.trim()}`);
+      }
     }
     assertEquals(found, []);
     assert(

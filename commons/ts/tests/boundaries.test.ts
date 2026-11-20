@@ -71,6 +71,7 @@ const LIFTED = new Set([
   "@intellectual-frontiers/formats",
   "@intellectual-frontiers/rdf",
   "@intellectual-frontiers/system",
+  "@intellectual-frontiers/telemetry",
   "@intellectual-frontiers/terminal",
 ]);
 /** Whether a specifier is a lifted library or one of its entries (`@intellectual-frontiers/terminal/args`). */
@@ -269,6 +270,7 @@ proves(
       "@intellectual-frontiers/formats": "link:../formats",
       "@intellectual-frontiers/rdf": "link:../rdf",
       "@intellectual-frontiers/system": "link:../system",
+      "@intellectual-frontiers/telemetry": "link:../telemetry",
       "@intellectual-frontiers/terminal": "link:../terminal",
     });
     const lock = text("bun.lock");
@@ -367,6 +369,7 @@ proves(
       "@intellectual-frontiers/formats": "0.1.0",
       "@intellectual-frontiers/rdf": "0.1.0",
       "@intellectual-frontiers/system": "0.1.0",
+      "@intellectual-frontiers/telemetry": "0.1.0",
       "@intellectual-frontiers/terminal": "0.1.0",
     });
     assertEquals(root.devDependencies, {});

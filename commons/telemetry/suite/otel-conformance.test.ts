@@ -1,5 +1,5 @@
 /**
- * The conformance of `runtime/otel.ts` with the OpenTelemetry Collector (commons 0006-signals FR-020): where `IFC_OTELCOL` names a
+ * The conformance of `src/host/otel.ts` with the OpenTelemetry Collector (commons 0001-telemetry FR-020): where `IFC_OTELCOL` names a
  * collector binary (the contrib distribution, pinned with its SHA-256 in commons' pins, which CI downloads and verifies), the test writes
  * its configuration (an OTLP/HTTP receiver on a free port of 127.0.0.1, the file exporter writing JSON, a pipeline for each signal, its
  * own telemetry quiet), starts it, waits until it answers, sends a span tree, log records and metrics with the runtime's exporter, stops
@@ -9,17 +9,17 @@
  * @module
  */
 import { createServer } from "node:net";
-import { type ExporterConfig, type OtelConfig, SEVERITY, type SignalName, signalEndpoint } from "../../kernel/otel.ts";
+import { type ExporterConfig, type OtelConfig, SEVERITY, type SignalName, signalEndpoint } from "../src/otel.ts";
 import { formatDecodeError, err, ok } from "@intellectual-frontiers/core";
-import { decodeLogs, decodeMetrics, decodeTraces, type LogBatch, type MetricBatch, type TraceBatch } from "../../kernel/otlp.ts";
-import { createTelemetry, defineSignals, memoryProcessor } from "../../kernel/signals.ts";
+import { decodeLogs, decodeMetrics, decodeTraces, type LogBatch, type MetricBatch, type TraceBatch } from "../src/otlp.ts";
+import { createTelemetry, defineSignals, memoryProcessor } from "../src/signals.ts";
 import { readTextFile, withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
-import { otlpExporter, systemClock, systemRandom } from "../../runtime/otel.ts";
+import { otlpExporter, systemClock, systemRandom } from "../src/host/otel.ts";
 import { join } from "@intellectual-frontiers/system/path";
 import * as proc from "@intellectual-frontiers/system/proc";
-import { assert, assertEquals, proves } from "../../runtime/test.ts";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 
-const FR = "0006-signals FR-020";
+const FR = "0001-telemetry FR-020";
 const COLLECTOR = proc.env.get("IFC_OTELCOL");
 
 const registry = defineSignals({

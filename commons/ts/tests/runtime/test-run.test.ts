@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { decodeTraces } from "../../kernel/otlp.ts";
+import { decodeTraces } from "@intellectual-frontiers/telemetry/otlp";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { toBase64 } from "@intellectual-frontiers/formats/base64";
 import { readTextFile, readFile, remove, symlink, writeFile, writeTextFile, makeTempDir } from "@intellectual-frontiers/system/fs";

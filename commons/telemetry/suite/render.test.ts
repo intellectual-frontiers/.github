@@ -1,5 +1,5 @@
 /**
- * Tests of `kernel/render.ts`: the console as a rendering of signals (commons 0006-signals FR-021 to FR-024), read through `vt.ts`'s
+ * Tests of `src/render.ts`: the console as a rendering of signals (commons 0001-telemetry FR-021 to FR-023), read through `vt.ts`'s
  * screen after every frame as a person would see it: the live region nested and redrawn in place with elapsed time and progress, the final
  * lines above it, each mode's lines, the marks and their ASCII fallbacks, colour only where allowed, lines cut to the width, and the export
  * warning said once at the end. Properties over random runs: `plain` never writes an escape byte; `attended` never wraps (a screen of its
@@ -10,18 +10,18 @@
  */
 import { absurd, err, ok } from "@intellectual-frontiers/core";
 import fc from "fast-check";
-import { SEVERITY } from "../../kernel/otel.ts";
-import { decodeLogs } from "../../kernel/otlp.ts";
-import { chooseMode, duration, initial, type Input, type Mode, parseMode, progressText, render, type State } from "../../kernel/render.ts";
-import { createTelemetry, defineSignals, type FlushResult, type Processor } from "../../kernel/signals.ts";
+import { SEVERITY } from "../src/otel.ts";
+import { decodeLogs } from "../src/otlp.ts";
+import { chooseMode, duration, initial, type Input, type Mode, parseMode, progressText, render, type State } from "../src/render.ts";
+import { createTelemetry, defineSignals, type FlushResult, type Processor } from "../src/signals.ts";
 import { createScreen, describeStyle, type Screen } from "@intellectual-frontiers/terminal/vt";
 import { cutToWidth } from "@intellectual-frontiers/terminal/width";
-import { assert, assertEquals, proves } from "../../runtime/test.ts";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 
-const MODES = "0006-signals FR-021";
-const PALETTE = "0006-signals FR-022";
-const WIDTH = "0006-signals FR-023";
-const WARN = "0006-signals FR-024";
+const MODES = "0001-telemetry FR-021";
+const PALETTE = "0001-telemetry FR-022";
+const WIDTH = "0001-telemetry FR-022";
+const WARN = "0001-telemetry FR-023";
 
 const E = "\u001b";
 const MS = 1_000_000n;
@@ -441,7 +441,7 @@ proves([MODES], "only a kind whose role is not none is shown, in every mode", ()
   }
 });
 
-proves(["0006-signals FR-027"], "pending is ⏳ and an action is ⚡: neither a warning nor an error; quiet keeps the action", () => {
+proves(["0001-telemetry FR-025"], "pending is ⏳ and an action is ⚡: neither a warning nor an error; quiet keeps the action", () => {
   for (const mode of ["plain", "quiet"] as const) {
     const h = harness(mode);
     h.telemetry.log("later", { text: "a certificate is not issued yet" });

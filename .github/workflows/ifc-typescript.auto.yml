@@ -104,7 +104,7 @@ jobs:
       - uses: ./.github/actions/bun
       - name: "The development tools, from bun.lock"
         run: bun install --frozen-lockfile
-        working-directory: commons/ts
+        working-directory: commons/telemetry
       - name: "The OpenTelemetry Collector, verified against commons' pins"
         shell: bash
         run: |
@@ -118,9 +118,9 @@ jobs:
           echo "IFC_OTELCOL=$dir/otelcol-contrib" >>"$GITHUB_ENV"
       - name: "The conformance test, on Bun and on Node"
         run: |
-          bun test tests/runtime/otel-conformance.test.ts
-          node --test tests/runtime/otel-conformance.test.ts
-        working-directory: commons/ts
+          bun test suite/otel-conformance.test.ts
+          node --test suite/otel-conformance.test.ts
+        working-directory: commons/telemetry
 
   # commons 0005-typescript-runtime FR-062: a program built into one binary by the pinned Bun on each system, then run; and Windows built from Linux.
   compile:

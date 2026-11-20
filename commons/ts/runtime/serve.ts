@@ -17,7 +17,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from "node:ht
 import type { AddressInfo } from "node:net";
 import { Readable } from "node:stream";
 import { mapError } from "@intellectual-frontiers/system/errors";
-import { traceServer } from "./otel.ts";
+import { traceServer } from "@intellectual-frontiers/telemetry/host/otel";
 
 /** Where the server listens, or where a request came from. */
 export type NetAddr = { readonly hostname: string; readonly port: number };

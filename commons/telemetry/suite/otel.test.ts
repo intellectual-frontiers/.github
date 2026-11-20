@@ -1,5 +1,5 @@
 /**
- * Tests of `kernel/otel.ts`: the attribute and body types admit only what OpenTelemetry allows, trace and span ids are made only from
+ * Tests of `src/otel.ts`: the attribute and body types admit only what OpenTelemetry allows, trace and span ids are made only from
  * valid bytes or text, `traceparent` and `tracestate` follow W3C Trace Context Level 2 (the specification's edge cases, and round trips
  * property-tested), the configuration of the `OTEL_*` variables with a warning and the default for each value that is not valid,
  * redaction of URLs, tokens, keys and command lines, the limits, and the samplers deciding alike in every process of a trace.
@@ -39,18 +39,18 @@ import {
   traceStateDelete,
   traceStateGet,
   traceStateSet,
-} from "../../kernel/otel.ts";
+} from "../src/otel.ts";
 import { toHex } from "@intellectual-frontiers/formats/hex";
 import { type Equal, expectType } from "@intellectual-frontiers/core";
-import { assert, assertEquals, proves } from "../../runtime/test.ts";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 
-const MODEL = "0006-signals FR-001";
-const IDS = "0006-signals FR-002";
-const W3C = "0006-signals FR-003";
-const CONFIG = "0006-signals FR-005";
-const REDACT = "0006-signals FR-006";
-const LIMITS = "0006-signals FR-007";
-const SAMPLING = "0006-signals FR-008";
+const MODEL = "0001-telemetry FR-001";
+const IDS = "0001-telemetry FR-002";
+const W3C = "0001-telemetry FR-003";
+const CONFIG = "0001-telemetry FR-005";
+const REDACT = "0001-telemetry FR-006";
+const LIMITS = "0001-telemetry FR-007";
+const SAMPLING = "0001-telemetry FR-008";
 const LAWS = "0005-typescript-runtime FR-014";
 
 function value<T, E>(r: { readonly kind: "ok"; readonly value: T } | { readonly kind: "err"; readonly error: E }): T {

@@ -1,5 +1,6 @@
+// Spec: 0001-telemetry FR-009
 /**
- * Typed signals and the pipeline they go through (commons 0006-signals FR-009 to FR-013). `defineSignals` declares each kind of signal
+ * Typed signals and the pipeline they go through (commons 0001-telemetry FR-009 to FR-013). `defineSignals` declares each kind of signal
  * once (a span, a log event, or a counter, up-down counter, gauge or histogram), with its attributes and their types, a log event's
  * severity, a metric's unit and bounds, the attributes that are secret, and its presentation role; emitting a kind that is not declared,
  * an attribute of the wrong type or a missing required attribute does not compile. `createTelemetry` makes the tracer, logger and meter of

@@ -39,7 +39,7 @@ import { fileURLToPath } from "node:url";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { STEP_SPAN, decodeLines, installationOf } from "../../kernel/test-record.ts";
 import { assembleRecord, junitXml, readRecord, tap14, testsOf } from "../../kernel/test-report.ts";
-import { parseSpanId, parseTraceId } from "../../kernel/otel.ts";
+import { parseSpanId, parseTraceId } from "@intellectual-frontiers/telemetry/otel";
 import { type Equal, expectType } from "@intellectual-frontiers/core";
 import { makeTempDir, readTextFile, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { join } from "@intellectual-frontiers/system/path";
@@ -179,7 +179,7 @@ const url = (rel: string): string => JSON.stringify(new URL(rel, import.meta.url
 const PIPED = `
 import { appendFileSync } from "node:fs";
 import process from "node:process";
-import { createPipeline, install } from ${url("../../runtime/otel.ts")};
+import { createPipeline, install } from ${url("../../../telemetry/src/host/otel.ts")};
 import { reviewed, test } from ${url("../../runtime/test.ts")};
 const out = process.env["PIPE_OUT"] ?? "";
 const done = () => Promise.resolve({ kind: "done" });

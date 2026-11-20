@@ -1,16 +1,16 @@
 /**
- * Test of the `process` span of a spawned program (commons 0005-typescript-runtime FR-052, 0006-signals FR-018): where a telemetry pipeline is installed, `proc.spawn` is a `process` span until the program ends and the
+ * Test of the `process` span of a spawned program (commons 0005-typescript-runtime FR-052, 0001-telemetry FR-018): where a telemetry pipeline is installed, `proc.spawn` is a `process` span until the program ends and the
  * program is given its `TRACEPARENT`. The telemetry installs the function that makes a program a span (`proc.setProcessTracer`) when its module is loaded, which is what this test runs through.
  *
  * @module
  */
-import { formatTraceparent } from "../../kernel/otel.ts";
-import { defineSignals, memoryProcessor } from "../../kernel/signals.ts";
+import { formatTraceparent } from "../src/otel.ts";
+import { defineSignals, memoryProcessor } from "../src/signals.ts";
 import { withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { join } from "@intellectual-frontiers/system/path";
 import * as proc from "@intellectual-frontiers/system/proc";
-import { startTelemetry } from "../../runtime/otel.ts";
-import { assert, assertEquals, proves } from "../../runtime/test.ts";
+import { startTelemetry } from "../src/host/otel.ts";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 
 const SPAWN = "0005-typescript-runtime FR-052";
 const decoder = new TextDecoder();

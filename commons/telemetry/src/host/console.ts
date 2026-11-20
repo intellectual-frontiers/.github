@@ -1,9 +1,10 @@
+// Spec: 0001-telemetry FR-024
 /**
- * The console: the one code of IFC TypeScript that writes for a person to standard output or standard error (commons 0006-signals FR-026).
- * It is a processor of the signal pipeline (`kernel/signals.ts`'s `Processor`): every span that starts, records progress or ends and every
- * log record goes through the kernel's pure renderer (`kernel/render.ts`), and the frames it returns are written. The mode is the one asked
+ * The console: the one code of IFC TypeScript that writes for a person to standard output or standard error (commons 0001-telemetry FR-024).
+ * It is a processor of the signal pipeline (`src/signals.ts`'s `Processor`): every span that starts, records progress or ends and every
+ * log record goes through the kernel's pure renderer (`src/render.ts`), and the frames it returns are written. The mode is the one asked
  * for (the option, else `IFC_CONSOLE=attended|plain|quiet|silent|json`), else `attended` at a terminal and `plain` elsewhere
- * (`runtime/tty.ts`'s look decides what a terminal is, and whether colour and emoji may be used). In `attended` mode a timer, which never
+ * (`system/tty`'s look decides what a terminal is, and whether colour and emoji may be used). In `attended` mode a timer, which never
  * keeps the process alive, redraws the live region so elapsed times move. At shutdown it asks the exporting processors it watches to
  * flush, says once, dimmed, where signals were not sent (FR-024), ends the live region and waits, a bounded time, for the writes to drain.
  *
@@ -15,7 +16,7 @@
  *
  * @example
  * ```ts
- * import { createTelemetry, defineSignals } from "../kernel/signals.ts";
+ * import { createTelemetry, defineSignals } from "../signals.ts";
  * import { consoleProcessor, installUncaught, uncaughtSignals } from "./console.ts";
  * const registry = defineSignals({ ...uncaughtSignals, "build.step": { signal: "span", role: "step", attributes: { target: "string" } } });
  * const telemetry = createTelemetry({ registry, processors: [consoleProcessor({ registry })], ...rest });
@@ -26,17 +27,10 @@
  */
 import process from "node:process";
 import { clearInterval, clearTimeout, setInterval, setTimeout } from "node:timers";
-import type { AnyValue, Attributes } from "../kernel/otel.ts";
-import { SEVERITY } from "../kernel/otel.ts";
-import { chooseMode, initial, type Input, type Mode, parseMode, render, type State } from "../kernel/render.ts";
-import {
-  type Declarations,
-  describeError,
-  type FlushResult,
-  type Processor,
-  type ProcessorStats,
-  type Registry,
-} from "../kernel/signals.ts";
+import type { AnyValue, Attributes } from "../otel.ts";
+import { SEVERITY } from "../otel.ts";
+import { chooseMode, initial, type Input, type Mode, parseMode, render, type State } from "../render.ts";
+import { type Declarations, describeError, type FlushResult, type Processor, type ProcessorStats, type Registry } from "../signals.ts";
 import { env, exit } from "@intellectual-frontiers/system/proc";
 import { currentLook, type Look } from "@intellectual-frontiers/system/tty";
 

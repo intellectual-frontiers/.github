@@ -1,5 +1,6 @@
+// Spec: 0001-telemetry FR-021
 /**
- * The console as a rendering of OpenTelemetry signals (commons 0006-signals FR-021 to FR-024): a pure reducer from a state, an input (a
+ * The console as a rendering of OpenTelemetry signals (commons 0001-telemetry FR-021 to FR-023): a pure reducer from a state, an input (a
  * span that started, recorded an event or ended, a log record, an export that failed, a tick of the clock, the end of the run) and the
  * time, to the next state and the frames to write. The runtime's `console.ts` feeds it and writes what it returns; a test feeds it and
  * reads the frames through `vt.ts`'s screen.
@@ -85,7 +86,7 @@ export type Input =
 /** What a renderer is made with. */
 export type RenderConfig = {
   readonly mode: Mode;
-  /** What the terminal shows: colour, emoji, its width (a `Look` of `runtime/tty.ts` is one). */
+  /** What the terminal shows: colour, emoji, its width (a `Look` of `system/tty` is one). */
   readonly look: Capabilities;
   /** The registry that gives each kind its presentation role. */
   readonly registry: Registry<Declarations>;

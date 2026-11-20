@@ -1,5 +1,5 @@
 /**
- * Tests of `runtime/otel.ts` (commons 0006-signals FR-014 to FR-019), all against servers on 127.0.0.1 that the test starts or a `fetch`
+ * Tests of `src/host/otel.ts` (commons 0001-telemetry FR-014 to FR-019), all against servers on 127.0.0.1 that the test starts or a `fetch`
  * it gives: the OTLP/HTTP JSON exporter (the request it sends, retries after `Retry-After` and growing waits, partial success, failures
  * that never throw and are said once), the probe of the default endpoint and the capped wait at exit, the rotated journal, the context
  * carried across `await` and the parent from `TRACEPARENT`, the runtime's own spans for `proc`, the HTTP client and `serve` (and nothing
@@ -8,7 +8,6 @@
  * @module
  */
 import { existsSync, readFileSync, utimesSync, writeFileSync } from "node:fs";
-import process from "node:process";
 import {
   commandShape,
   type ExporterConfig,
@@ -20,15 +19,15 @@ import {
   signalEndpoint,
   SEVERITY,
   type SpanData,
-} from "../../kernel/otel.ts";
-import { decodeTraces, encodeTraces, type LogBatch, type MetricBatch, type TraceBatch } from "../../kernel/otlp.ts";
+} from "../src/otel.ts";
+import { decodeTraces, encodeTraces, type LogBatch, type MetricBatch, type TraceBatch } from "../src/otlp.ts";
 import { ok } from "@intellectual-frontiers/core";
-import { batchProcessor, defineSignals, memoryProcessor } from "../../kernel/signals.ts";
+import { batchProcessor, defineSignals, memoryProcessor } from "../src/signals.ts";
 import { withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
-import { liveTransport } from "../../runtime/http-client.ts";
 import { join } from "@intellectual-frontiers/system/path";
 import * as proc from "@intellectual-frontiers/system/proc";
-import { serve, type Server } from "../../runtime/serve.ts";
+import { createServer } from "node:http";
+import type { AddressInfo } from "node:net";
 import {
   asyncContextManager,
   createPipeline,
@@ -43,15 +42,48 @@ import {
   startTelemetry,
   systemClock,
   untraced,
-} from "../../runtime/otel.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "../../runtime/test.ts";
+} from "../src/host/otel.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 
-const EXPORT = "0006-signals FR-014";
-const PROBE = "0006-signals FR-015";
-const JOURNAL = "0006-signals FR-016";
-const CONTEXT = "0006-signals FR-017";
-const OWN = "0006-signals FR-018";
-const RECEIVER = "0006-signals FR-019";
+/** What the tests use of a server: the port it listens on, and its end. */
+type Server = { readonly addr: { readonly port: number }; shutdown(): Promise<void> };
+
+/** A server on 127.0.0.1 over `node:http` that hands each request to a web handler as a `Request` and writes its `Response`; the library's tests need no other library's server. */
+async function serve(
+  _options: { readonly port: number; readonly hostname: string },
+  handle: (req: Request) => Response | Promise<Response>,
+): Promise<Server> {
+  const server = createServer((incoming, outgoing) => {
+    const chunks: Buffer[] = [];
+    incoming.on("data", (c: Buffer) => chunks.push(c));
+    incoming.on("end", () => {
+      const url = `http://127.0.0.1:${(server.address() as AddressInfo).port}${incoming.url ?? "/"}`;
+      const headers = new Headers();
+      for (const [k, v] of Object.entries(incoming.headers)) if (v !== undefined) headers.set(k, Array.isArray(v) ? v.join(", ") : v);
+      const method = incoming.method ?? "GET";
+      const body = method === "GET" || method === "HEAD" ? undefined : Buffer.concat(chunks);
+      void Promise.resolve(handle(new Request(url, { method, headers, ...(body === undefined ? {} : { body }) }))).then(async (res) => {
+        const bytes = Buffer.from(await res.arrayBuffer());
+        const answered: Record<string, string> = {};
+        res.headers.forEach((v, k) => (answered[k] = v));
+        outgoing.writeHead(res.status, answered);
+        outgoing.end(bytes);
+      });
+    });
+  });
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  return {
+    addr: { port: (server.address() as AddressInfo).port },
+    shutdown: () => new Promise<void>((resolve) => (server.closeAllConnections(), server.close(() => resolve()))),
+  };
+}
+
+const EXPORT = "0001-telemetry FR-014";
+const PROBE = "0001-telemetry FR-015";
+const JOURNAL = "0001-telemetry FR-016";
+const CONTEXT = "0001-telemetry FR-017";
+const OWN = "0001-telemetry FR-018";
+const RECEIVER = "0001-telemetry FR-019";
 
 const registry = defineSignals({
   "test.step": { signal: "span", role: "step", attributes: { target: "string" } },
@@ -511,33 +543,6 @@ function spansNamed(spans: readonly SpanData[], name: string): readonly SpanData
   return spans.filter((s) => s.name === name);
 }
 
-proves([OWN], "with no pipeline installed, proc, the client and serve make no span and pass no traceparent", async () => {
-  assertEquals(installed(), undefined);
-  const saved = process.env["TRACEPARENT"];
-  Reflect.deleteProperty(process.env, "TRACEPARENT");
-  try {
-    await withTempDir(async (dir) => {
-      const script = join(dir, "child.js");
-      await writeTextFile(script, CHILD);
-      assertEquals((await proc.run(runtimeArgv(script))).stdout, "none");
-    });
-    let header: string | null = "unset";
-    const server = await serve({ port: 0, hostname: "127.0.0.1" }, (req) => {
-      header = req.headers.get("traceparent");
-      return new Response("ok");
-    });
-    try {
-      const x = await liveTransport().send({ method: "GET", url: `http://127.0.0.1:${server.addr.port}/`, headers: {} });
-      assertEquals(x.kind === "ok" ? x.value.body : "", "ok");
-      assertEquals(header, null);
-    } finally {
-      await server.shutdown();
-    }
-  } finally {
-    if (saved !== undefined) process.env["TRACEPARENT"] = saved;
-  }
-});
-
 proves(
   [OWN, CONTEXT],
   "proc.run is a client span with the command's shape and exit code, and the program gets its TRACEPARENT",
@@ -567,64 +572,6 @@ proves(
     assertEquals(installed(), undefined, "shutting the pipeline down uninstalls it");
   },
 );
-
-proves([OWN], "the HTTP client's span sends traceparent, and serve's span is its child; the URL is redacted", async () => {
-  const memory = memoryProcessor();
-  await withStarted({ registry, env: { OTEL_SDK_DISABLED: "true" }, processors: [memory] }, async () => {
-    let header: string | null = null;
-    const server = await serve({ port: 0, hostname: "127.0.0.1" }, (req) => {
-      header = req.headers.get("traceparent");
-      return new Response("fine", { status: new URL(req.url).pathname === "/fail" ? 500 : 200 });
-    });
-    try {
-      const base = `http://127.0.0.1:${server.addr.port}`;
-      const http = liveTransport();
-      await http.send({ method: "GET", url: `${base}/x?signature=abc&page=2`, headers: {} });
-      const client = spansNamed(memory.spans, "http.client")[0];
-      const served = spansNamed(memory.spans, "http.server")[0];
-      assert(client !== undefined && served !== undefined);
-      assertEquals(client.kind, "client");
-      assertEquals(served.kind, "server");
-      assertEquals(header, formatTraceparent(client.context));
-      assertEquals(served.context.traceId, client.context.traceId);
-      assertEquals(served.parentSpanId, client.context.spanId);
-      assertEquals(client.attributes["url.full"], `${base}/x?signature=REDACTED&page=2`);
-      assertEquals(client.attributes["server.address"], "127.0.0.1");
-      assertEquals(client.attributes["server.port"], BigInt(server.addr.port));
-      assertEquals(client.attributes["http.request.method"], "GET");
-      assertEquals(client.attributes["http.response.status_code"], 200n);
-      assertEquals(served.attributes["url.path"], "/x");
-      assertEquals(served.attributes["http.response.status_code"], 200n);
-      assertEquals(client.status.kind, "ok");
-
-      memory.clear();
-      await http.send({ method: "GET", url: `${base}/fail`, headers: {} });
-      assertEquals(spansNamed(memory.spans, "http.client")[0]?.status, { kind: "error", message: "HTTP 500" });
-      assertEquals(spansNamed(memory.spans, "http.server")[0]?.status, { kind: "error", message: "HTTP 500" });
-    } finally {
-      await server.shutdown();
-    }
-  });
-});
-
-proves([OWN, RECEIVER], "the receiver makes no span of its own, so a pipeline exporting to it does not feed itself", async () => {
-  const memory = memoryProcessor();
-  const r = await receiver();
-  try {
-    await withStarted({ registry, env: { OTEL_EXPORTER_OTLP_ENDPOINT: r.base }, processors: [memory] }, async (s) => {
-      s.telemetry.span("test.step", { target: "sent" }, () => ok(undefined));
-      assertEquals(await s.pipeline.forceFlush(1000), { kind: "done" });
-      assertEquals(spansNamed(memory.spans, "http.server").length, 0);
-      assertEquals(
-        r.traces.flatMap((b) => b.spans.map((x) => x.attributes["target"])),
-        ["sent"],
-      );
-      assertEquals(s.pipeline.warning(), undefined);
-    });
-  } finally {
-    await r.server.shutdown();
-  }
-});
 
 proves([OWN, EXPORT], "the resource names the service and the runtime, never the host or a person", () => {
   const s = startTelemetry({

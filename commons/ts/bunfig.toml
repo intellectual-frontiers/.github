@@ -30,7 +30,7 @@ plugins = ["./lint/plugin.ts"]
 "ifc/terminal-writers" = [
   "error",
   { allow = [
-    { files = "runtime/console.ts", reason = "the renderer, the one writer for a person (0006-signals FR-026)" },
+    { files = "../telemetry/src/host/console.ts", reason = "the renderer, the one writer for a person (0001-telemetry FR-024)" },
     { files = "../system/src/tty.ts", reason = "the terminal's own streams, for its size and raw mode" },
     { files = "../system/src/stdio.ts", reason = "the process's standard streams, for what programs read (FR-054)" },
     { files = "tools/**", reason = "command-line tools print their results" },

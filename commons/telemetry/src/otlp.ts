@@ -1,5 +1,6 @@
+// Spec: 0001-telemetry FR-004
 /**
- * OTLP/HTTP with JSON, both ways (commons 0006-signals FR-004): export requests of traces, logs and metrics as the OTLP specification's
+ * OTLP/HTTP with JSON, both ways (commons 0001-telemetry FR-004): export requests of traces, logs and metrics as the OTLP specification's
  * JSON encoding writes them (camel-case field names, trace and span ids as hexadecimal, 64-bit integers as decimal strings, enumerations as
  * integers, bytes as base64, signals grouped by resource and scope), the export responses with their partial success, and the decoding of
  * each back to the values of `./otel.ts`: a failure is a `Result` naming the path, a 64-bit integer is read from a JSON number or a string,

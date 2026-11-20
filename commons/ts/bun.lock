@@ -10,6 +10,7 @@
         "@intellectual-frontiers/formats": "link:../formats",
         "@intellectual-frontiers/rdf": "link:../rdf",
         "@intellectual-frontiers/system": "link:../system",
+        "@intellectual-frontiers/telemetry": "link:../telemetry",
         "@intellectual-frontiers/terminal": "link:../terminal",
       },
       "devDependencies": {
@@ -29,6 +30,8 @@
     "@intellectual-frontiers/rdf": ["@intellectual-frontiers/rdf@link:../rdf", {}],
 
     "@intellectual-frontiers/system": ["@intellectual-frontiers/system@link:../system", {}],
+
+    "@intellectual-frontiers/telemetry": ["@intellectual-frontiers/telemetry@link:../telemetry", {}],
 
     "@intellectual-frontiers/terminal": ["@intellectual-frontiers/terminal@link:../terminal", {}],
 

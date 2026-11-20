@@ -25,7 +25,7 @@
  * @module
  */
 import { type DsseKey, signStatement, statement } from "@intellectual-frontiers/crypto/dsse";
-import { redactText } from "../../kernel/otel.ts";
+import { redactText } from "@intellectual-frontiers/telemetry/otel";
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { tar } from "@intellectual-frontiers/formats/archive";

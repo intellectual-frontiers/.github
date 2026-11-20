@@ -1,0 +1,29 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-telemetry FR-001	check	.github: cd commons/telemetry && bun test suite/	otel.test.ts: the model's types (type-level tests) and the values an attribute can hold
+0001-telemetry FR-002	check	.github: cd commons/telemetry && bun test suite/	otel.test.ts: ids from given bytes, zeros refused, brands kept apart
+0001-telemetry FR-003	check	.github: cd commons/telemetry && bun test suite/	otel.test.ts: traceparent and tracestate against the W3C examples, with property round trips
+0001-telemetry FR-004	check	.github: cd commons/telemetry && bun test suite/	otlp.test.ts: OTLP JSON encode and decode, round-trip properties, int64 as strings, unknown fields ignored
+0001-telemetry FR-005	check	.github: cd commons/telemetry && bun test suite/	otel.test.ts: configuration from OTEL_* records, invalid values warned and defaulted
+0001-telemetry FR-006	check	.github: cd commons/telemetry && bun test suite/	otel.test.ts: redaction of secret attributes, URLs, tokens, name=value pairs, provider token formats
+0001-telemetry FR-007	check	.github: cd commons/telemetry && bun test suite/	otel.test.ts: attribute, event and link limits with dropped counts
+0001-telemetry FR-008	check	.github: cd commons/telemetry && bun test suite/	otel.test.ts: the samplers, ratio decided by the trace id alone
+0001-telemetry FR-009	check	.github: cd commons/telemetry && bun test suite/	signals.test.ts: defineSignals, with @ts-expect-error for undeclared kinds and wrong attributes
+0001-telemetry FR-010	check	.github: cd commons/telemetry && bun test suite/	signals.test.ts: span ends by its Result, exceptions recorded and rethrown, one end only
+0001-telemetry FR-011	check	.github: cd commons/telemetry && bun test suite/	signals.test.ts: an exact span tree from a fixed clock and random source
+0001-telemetry FR-012	check	.github: cd commons/telemetry && bun test suite/	signals.test.ts: in-memory, simple and batch processors, drops counted, flush bounded
+0001-telemetry FR-013	check	.github: cd commons/telemetry && bun test suite/	signals.test.ts: counter, up-down, gauge and histogram aggregation
+0001-telemetry FR-014	check	.github: cd commons/telemetry && bun test suite/	otel-host.test.ts: export to a local receiver, retries on 503 with Retry-After, never throws
+0001-telemetry FR-015	check	.github: cd commons/telemetry && bun test suite/	otel-host.test.ts: the probe gives up within 150 ms, the exit wait within a second
+0001-telemetry FR-016	check	.github: cd commons/telemetry && bun test suite/	otel-host.test.ts: the journal writes OTLP lines, rotates and removes files past their age
+0001-telemetry FR-017	check	.github: cd commons/telemetry && bun test suite/	otel-host.test.ts: the current span across await, and the parent from TRACEPARENT
+0001-telemetry FR-018	check	.github: cd commons/telemetry && bun test suite/	process-span.test.ts: proc spans, with traceparent passed on; the http client and serve spans are proved by commons/ts tests/runtime/otel-net.test.ts until the library net is lifted
+0001-telemetry FR-019	check	.github: cd commons/telemetry && bun test suite/	otel-host.test.ts: the receiver decodes, refuses protobuf (415) and bad JSON (400)
+0001-telemetry FR-020	gate	.github: .github/workflows/ifc-typescript.auto.yml	the otel-conformance job runs suite/otel-conformance.test.ts against the pinned OpenTelemetry Collector and compares its file export
+0001-telemetry FR-021	check	.github: cd commons/telemetry && bun test suite/	render.test.ts: the reducer in each mode, snapshots through the terminal emulator
+0001-telemetry FR-022	check	.github: cd commons/telemetry && bun test suite/	render.test.ts: lines cut by display width, elapsed time and progress
+0001-telemetry FR-023	check	.github: cd commons/telemetry && bun test suite/	render.test.ts: the export warning said once, dimmed, at the end
+0001-telemetry FR-024	check	.github: cd commons/telemetry && bun test suite/	console.test.ts: the console is the only writer, its modes, uncaught errors recorded and rendered
+0001-telemetry FR-025	check	.github: cd commons/telemetry && bun test suite/	render.test.ts: the pending and action marks and roles; a pending or an action is no warning
+0001-telemetry FR-026	check	.github: cd commons/telemetry && bun run verify	the package is built, inspected and packed by tools/pack.ts; tests/commons-packages.test.ts installs the tarball and runs every entry on Node 26 and Bun and type-checks a consumer

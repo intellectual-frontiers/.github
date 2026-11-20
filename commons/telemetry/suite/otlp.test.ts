@@ -1,5 +1,5 @@
 /**
- * Tests of `kernel/otlp.ts`: an export request written as the OTLP specification's JSON (field names, hexadecimal ids, 64-bit integers as
+ * Tests of `src/otlp.ts`: an export request written as the OTLP specification's JSON (field names, hexadecimal ids, 64-bit integers as
  * decimal strings, enumerations as integers, bytes as base64, grouping by resource and scope), read back to the same traces, logs and
  * metrics through JSON text (property-tested), 64-bit integers read from numbers or strings, unknown fields ignored, a failure naming its
  * path, and the export responses.
@@ -29,7 +29,7 @@ import {
   type SpanStatus,
   type TraceId,
   type TraceState,
-} from "../../kernel/otel.ts";
+} from "../src/otel.ts";
 import {
   countSignals,
   decodeLogs,
@@ -43,12 +43,12 @@ import {
   type LogBatch,
   type MetricBatch,
   type TraceBatch,
-} from "../../kernel/otlp.ts";
+} from "../src/otlp.ts";
 import { toHex } from "@intellectual-frontiers/formats/hex";
-import { assertEquals, proves } from "../../runtime/test.ts";
+import { assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 
-const FR = "0006-signals FR-004";
-const MODEL = "0006-signals FR-001";
+const FR = "0001-telemetry FR-004";
+const MODEL = "0001-telemetry FR-001";
 const LAWS = "0005-typescript-runtime FR-014";
 
 function value<T, E>(r: { readonly kind: "ok"; readonly value: T } | { readonly kind: "err"; readonly error: E }): T {

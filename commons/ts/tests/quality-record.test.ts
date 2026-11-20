@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { decodeLogs } from "../kernel/otlp.ts";
+import { decodeLogs } from "@intellectual-frontiers/telemetry/otlp";
 import { GENESIS } from "../kernel/evidence.ts";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { OUTCOMES } from "../kernel/test-record.ts";

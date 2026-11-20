@@ -38,8 +38,8 @@ import {
   type SpanData,
   type SpanId,
   type TraceId,
-} from "../../kernel/otel.ts";
-import { decodeLogs, decodeTraces, encodeLogs, encodeTraces, type LogBatch, type TraceBatch } from "../../kernel/otlp.ts";
+} from "@intellectual-frontiers/telemetry/otel";
+import { decodeLogs, decodeTraces, encodeLogs, encodeTraces, type LogBatch, type TraceBatch } from "@intellectual-frontiers/telemetry/otlp";
 import { type Sha256, sha256Of } from "@intellectual-frontiers/crypto/sha256";
 import {
   assembleRecord,

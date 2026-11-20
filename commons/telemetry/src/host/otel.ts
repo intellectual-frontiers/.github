@@ -1,5 +1,6 @@
+// Spec: 0001-telemetry FR-014
 /**
- * OpenTelemetry on the host (commons 0006-signals FR-014 to FR-019): the OTLP/HTTP JSON exporter over `fetch` (headers, timeout, retries on
+ * OpenTelemetry on the host (commons 0001-telemetry FR-014 to FR-019): the OTLP/HTTP JSON exporter over `fetch` (headers, timeout, retries on
  * 429, 502, 503 and 504 after `Retry-After` or a growing wait, partial success counted, never throwing, a failure said once), the probe of
  * `http://localhost:4318` where no endpoint is configured, the journal (every export request also one line of OTLP JSON in a rotated
  * file), the current span carried across `await` by `AsyncLocalStorage` and the parent read from `TRACEPARENT` and `TRACESTATE`, the
@@ -10,7 +11,7 @@
  *
  * @example
  * ```ts
- * import { defineSignals } from "../kernel/signals.ts";
+ * import { defineSignals } from "../signals.ts";
  * import { ok } from "@intellectual-frontiers/core";
  * import { startTelemetry } from "./otel.ts";
  * const registry = defineSignals({ "build.step": { signal: "span", role: "step", attributes: { target: "string" } } });
@@ -47,7 +48,7 @@ import {
   type LogRecord,
   type SpanContext,
   type SpanData,
-} from "../kernel/otel.ts";
+} from "../otel.ts";
 import {
   decodeLogs,
   decodeMetrics,
@@ -61,7 +62,7 @@ import {
   type LogBatch,
   type MetricBatch,
   type TraceBatch,
-} from "../kernel/otlp.ts";
+} from "../otlp.ts";
 import {
   batchProcessor,
   type BatchOptions,
@@ -79,7 +80,7 @@ import {
   type SignalStats,
   type Source,
   type Telemetry,
-} from "../kernel/signals.ts";
+} from "../signals.ts";
 import { setProcessTracer } from "@intellectual-frontiers/system/proc";
 
 /** The longest a probe of the default endpoint waits for an answer (FR-015). */

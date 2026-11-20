@@ -133,33 +133,33 @@ requirement	mechanism	by	note
 0005-typescript-runtime FR-075	check	.github: cd commons/ts && node --test tests/**/*.test.ts	node/linked-library.test.ts: a program of a project that links commons/ts imports the kernel by package name and runs on the runtime running the test with no hook; a copy is refused on Node and runs on Bun; the compiler checks it
 0005-typescript-runtime FR-076	check	.github: cd commons/ts && node --test tests/**/*.test.ts	node/linked-library.test.ts: a library imports its own modules by its package name through exports, and a file that exports does not name is refused by the runtime and by the compiler
 0005-typescript-runtime FR-077	check	.github: cd commons/ts && node --test tests/**/*.test.ts	node/linked-library.test.ts: layerFindings finds a climbing import by relative path and none by package name; a library's own check by its exports is proved in that library's suite (commons/data)
-0006-signals FR-001	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: the model's types (type-level tests) and the values an attribute can hold
-0006-signals FR-002	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: ids from given bytes, zeros refused, brands kept apart
-0006-signals FR-003	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: traceparent and tracestate against the W3C examples, with property round trips
-0006-signals FR-004	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otlp.test.ts: OTLP JSON encode and decode, round-trip properties, int64 as strings, unknown fields ignored
-0006-signals FR-005	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: configuration from OTEL_* records, invalid values warned and defaulted
-0006-signals FR-006	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: redaction of secret attributes, URLs, tokens, name=value pairs, provider token formats, exact secrets and process arguments
-0006-signals FR-007	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: attribute, event and link limits with dropped counts
-0006-signals FR-008	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: the samplers, ratio decided by the trace id alone
-0006-signals FR-009	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/signals.test.ts: defineSignals, with @ts-expect-error for undeclared kinds and wrong attributes
-0006-signals FR-010	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/signals.test.ts: span ends by its Result, exceptions recorded and rethrown, one end only
-0006-signals FR-011	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/signals.test.ts: an exact span tree from a fixed clock and random source
-0006-signals FR-012	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/signals.test.ts: in-memory, simple and batch processors, drops counted, flush bounded
-0006-signals FR-013	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/signals.test.ts: counter, up-down, gauge and histogram aggregation
-0006-signals FR-014	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: export to a local receiver, retries on 503 with Retry-After, never throws
-0006-signals FR-015	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: the probe gives up within 150 ms, the exit wait within a second
-0006-signals FR-016	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: the journal writes OTLP lines, rotates and removes files past their age
-0006-signals FR-017	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: the current span across await, and the parent from TRACEPARENT
-0006-signals FR-018	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: proc, http client and serve spans, with traceparent passed on
-0006-signals FR-019	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: the receiver decodes, refuses protobuf (415) and bad JSON (400)
-0006-signals FR-020	check	.github: .github/workflows/ifc-typescript.auto.yml otel-conformance job	CI sends the suite's OTLP to the pinned OpenTelemetry Collector and compares its file export
-0006-signals FR-021	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/render.test.ts: the reducer in each mode, snapshots through the terminal emulator
+0006-signals FR-001	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-001
+0006-signals FR-002	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-002
+0006-signals FR-003	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-003
+0006-signals FR-004	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-004
+0006-signals FR-005	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-005
+0006-signals FR-006	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-006
+0006-signals FR-007	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-007
+0006-signals FR-008	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-008
+0006-signals FR-009	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-009
+0006-signals FR-010	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-010
+0006-signals FR-011	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-011
+0006-signals FR-012	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-012
+0006-signals FR-013	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-013
+0006-signals FR-014	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-014
+0006-signals FR-015	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-015
+0006-signals FR-016	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-016
+0006-signals FR-017	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-017
+0006-signals FR-018	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-018
+0006-signals FR-019	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-019
+0006-signals FR-020	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-020
+0006-signals FR-021	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-021
 0006-signals FR-022	review	0032-lifting-libraries FR-010	kept by the library terminal: terminal 0001-terminal FR-003
-0006-signals FR-023	check	.github: cd commons/ts && node --test tests/**/*.test.ts	terminal's width.test.ts and kernel/render.test.ts: lines cut by display width, elapsed time and progress
-0006-signals FR-024	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/render.test.ts: the export warning said once, dimmed, at the end
+0006-signals FR-023	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-022
+0006-signals FR-024	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-023
 0006-signals FR-025	review	0032-lifting-libraries FR-010	kept by the library terminal: terminal 0001-terminal FR-005
-0006-signals FR-026	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/console.test.ts and boundaries.test.ts: the console is the only writer, its modes, uncaught errors recorded
-0006-signals FR-027	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/palette.test.ts and kernel/render.test.ts: the ⏳ and ⚡ marks and roles; a pending or an action is no warning or failure
+0006-signals FR-026	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-024
+0006-signals FR-027	review	0032-lifting-libraries FR-010	kept by the library telemetry: 0001-telemetry FR-025
 0007-grc FR-001	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/grc.test.ts: catalogs with @ts-expect-error for an unknown control id, STRM mappings
 0007-grc FR-002	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/grc.test.ts: controls and packs over typed subjects, a throwing check gives error
 0007-grc FR-003	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/grc.test.ts: the status semilattice laws with fast-check
@@ -607,6 +607,7 @@ requirement	mechanism	by	note
 0027-commons-libraries FR-106	check	.github: cd commons/crypto && bun run verify	commons/crypto: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-107	check	.github: cd commons/formats && bun run verify	commons/formats: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-108	check	.github: cd commons/system && bun run verify	commons/system: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-109	check	.github: cd commons/telemetry && bun run verify	commons/telemetry: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0028-conformance-levels FR-001	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: Mizan's ontology holds the four levels with ranks 0 to 3, each entailing what it and the levels below it add
 0028-conformance-levels FR-002	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: every requirement is added by exactly one level and names a rule or says what else proves it
 0028-conformance-levels FR-003	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: L0 adds a manifest, a verify command and a version

@@ -54,6 +54,7 @@ const isHostLayer = (f: string): boolean =>
 const PURE_PACKAGES = [
   "@intellectual-frontiers/core",
   "@intellectual-frontiers/terminal/args",
+  "@intellectual-frontiers/telemetry",
   "@intellectual-frontiers/crypto",
   "@intellectual-frontiers/formats",
   "@intellectual-frontiers/commons/ts/kernel",

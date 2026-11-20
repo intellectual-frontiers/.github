@@ -35,8 +35,15 @@ import { formatLedgerBreak, type LedgerBreak, type LedgerEntry, type LedgerRecor
 import { type ControlRef, type ControlSummary, type Finding, type Instant, instantFromEpochMs, type Severity, type Status } from "./grc.ts";
 import type { Json, JsonObject } from "@intellectual-frontiers/formats/json5";
 import { assessmentResults, renderOscal } from "./oscal.ts";
-import { type LogRecord, parseSpanId, parseTraceId, type SpanData, type SpanId, type TraceId } from "./otel.ts";
-import { encodeLogs, encodeTraces } from "./otlp.ts";
+import {
+  type LogRecord,
+  parseSpanId,
+  parseTraceId,
+  type SpanData,
+  type SpanId,
+  type TraceId,
+} from "@intellectual-frontiers/telemetry/otel";
+import { encodeLogs, encodeTraces } from "@intellectual-frontiers/telemetry/otlp";
 import type { Sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { NAMESPACE_URL, uuidV5 } from "@intellectual-frontiers/crypto/uuid";
 import { el, type XmlChild, type XmlElement, writeXml } from "@intellectual-frontiers/formats/xml";

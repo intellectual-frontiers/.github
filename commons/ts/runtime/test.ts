@@ -47,7 +47,15 @@ import process from "node:process";
 import { test as nodeTest, type TestContext as NodeTestContext } from "node:test";
 import { fileURLToPath } from "node:url";
 import { inspect } from "node:util";
-import { extractContext, redactText, type Resource, type SpanId, spanIdFrom, type TraceId, traceIdFrom } from "../kernel/otel.ts";
+import {
+  extractContext,
+  redactText,
+  type Resource,
+  type SpanId,
+  spanIdFrom,
+  type TraceId,
+  traceIdFrom,
+} from "@intellectual-frontiers/telemetry/otel";
 import {
   cut,
   installationFromEnv,
@@ -68,7 +76,7 @@ import {
   reviewLog,
   warningLog,
 } from "../kernel/test-record.ts";
-import { installed } from "./otel.ts";
+import { installed } from "@intellectual-frontiers/telemetry/host/otel";
 import { build, runtimeName, runtimeVersion } from "@intellectual-frontiers/system/proc";
 
 /**

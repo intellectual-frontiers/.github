@@ -10,6 +10,7 @@
         "@intellectual-frontiers/formats": "0.1.0",
         "@intellectual-frontiers/rdf": "0.1.0",
         "@intellectual-frontiers/system": "0.1.0",
+        "@intellectual-frontiers/telemetry": "0.1.0",
         "@intellectual-frontiers/terminal": "0.1.0",
         "mermaid": "11.17.2",
         "typescript": "7.1.0-beta",
@@ -36,6 +37,8 @@
     "@intellectual-frontiers/rdf": ["@intellectual-frontiers/rdf@0.1.0", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.0" } }, "sha512-D/dpkvn5N+vdvEXg7dB6Pqe2MCTxgo5ejtQuRDPzZziXhFSFn/HJxUig1ELRFS/byx67kpbS6K2E39TE5iDKRg=="],
 
     "@intellectual-frontiers/system": ["@intellectual-frontiers/system@0.1.0", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.1", "@intellectual-frontiers/crypto": "0.1.1", "@intellectual-frontiers/formats": "0.1.1" }, "peerDependencies": { "@types/node": ">=26" } }, "sha512-YoD6seQNw07sz4haAOC82iNHlPXO6bGfqG7yEZDv4CHhAd9XZozn1BP46AovQLPHrEju9+2PwagKHx9y/FR/nA=="],
+
+    "@intellectual-frontiers/telemetry": ["@intellectual-frontiers/telemetry@0.1.0", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.1", "@intellectual-frontiers/formats": "0.1.1", "@intellectual-frontiers/system": "0.1.0", "@intellectual-frontiers/terminal": "0.1.1" } }, "sha512-JjDLdYVwxLiDYnm/XuzKGjKVmhKqHgK67t3ypaQzb7/EBySMBkoq7Pw8ufg+FPsXezQyrk71CQIcDw0IcpfxjQ=="],
 
     "@intellectual-frontiers/terminal": ["@intellectual-frontiers/terminal@0.1.0", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.0" } }, "sha512-YbAhZorkoWCqRFoy3biJorx9hbxryWClqXYOcNAN0rMNxKcTK9A7o6QM5UoKCeLRIkE+kyHvqEltbZEpMMHNDA=="],
 
@@ -294,6 +297,12 @@
     "@intellectual-frontiers/system/@intellectual-frontiers/crypto": ["@intellectual-frontiers/crypto@0.1.1", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.1", "@intellectual-frontiers/formats": "0.1.1" } }, "sha512-dIVy8N0ttrjDNq/P3MLmb50dRTGNKJ+xdlKw4rDBTerYSScqDoQar8DS3GfIBQwNx7uqCkRNNBS/xl2Nn+PVnw=="],
 
     "@intellectual-frontiers/system/@intellectual-frontiers/formats": ["@intellectual-frontiers/formats@0.1.1", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.1" } }, "sha512-1vucbLz1Lpv69wLN/RAezPpI6YwANY+twPSSjknnJ72+D2ixsUyICTABv3v6+DYZAUiYyXiNPMGdAVu80eizmQ=="],
+
+    "@intellectual-frontiers/telemetry/@intellectual-frontiers/core": ["@intellectual-frontiers/core@0.1.1", "", {}, "sha512-2CRWnO8kSVnsNemWJJUfbILnFuUzMKNAVdra8J4ZXS1O7pDubZw/OM4egq2iWo9+VP45cblxNVjIvV43c7fwSQ=="],
+
+    "@intellectual-frontiers/telemetry/@intellectual-frontiers/formats": ["@intellectual-frontiers/formats@0.1.1", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.1" } }, "sha512-1vucbLz1Lpv69wLN/RAezPpI6YwANY+twPSSjknnJ72+D2ixsUyICTABv3v6+DYZAUiYyXiNPMGdAVu80eizmQ=="],
+
+    "@intellectual-frontiers/telemetry/@intellectual-frontiers/terminal": ["@intellectual-frontiers/terminal@0.1.1", "", { "dependencies": { "@intellectual-frontiers/core": "0.1.1" } }, "sha512-AyfjvpsWzVkeAHQGwkDgJlCjpORgrocahJ1Q0iGbnkP6OP5VXpqyPv2fFJtaWCbYS1F956vj39UNV3Omp60HaA=="],
 
     "cytoscape-fcose/cose-base": ["cose-base@2.2.0", "", { "dependencies": { "layout-base": "^2.0.0" } }, "sha512-AzlgcsCbUMymkADOJtQm3wO9S3ltPfYOFD5033keQn9NJzIbtnZj+UdBJe7DYml/8TdbtHJW3j58SOnKhWY/5g=="],
 

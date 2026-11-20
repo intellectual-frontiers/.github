@@ -27,11 +27,11 @@ import {
   type Waiver,
 } from "../../kernel/grc.ts";
 import { complianceFinding } from "../../kernel/ocsf.ts";
-import { SEVERITY, type SpanData } from "../../kernel/otel.ts";
-import { decodeLogs, encodeLogs } from "../../kernel/otlp.ts";
-import { createTelemetry, memoryProcessor } from "../../kernel/signals.ts";
+import { SEVERITY, type SpanData } from "@intellectual-frontiers/telemetry/otel";
+import { decodeLogs, encodeLogs } from "@intellectual-frontiers/telemetry/otlp";
+import { createTelemetry, memoryProcessor } from "@intellectual-frontiers/telemetry/signals";
 import { FINDING_SEVERITY, fromAnyValue, GRC_SCOPE, GRC_SIGNALS, installedGrcTelemetry, runPackObserved } from "../../runtime/grc.ts";
-import { createPipeline, install, installed, uninstall } from "../../runtime/otel.ts";
+import { createPipeline, install, installed, uninstall } from "@intellectual-frontiers/telemetry/host/otel";
 import { assert, assertEquals, proves } from "../../runtime/test.ts";
 
 const FR = "0007-grc FR-019";

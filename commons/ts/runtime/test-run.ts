@@ -21,8 +21,8 @@ import { fromBase64 } from "@intellectual-frontiers/formats/base64";
 import { type DsseEnvelope, type DsseKey, parseEnvelope, signStatement } from "@intellectual-frontiers/crypto/dsse";
 import { appendEntry, formatLedgerParseError, type LedgerEntry, type LedgerRecord, ledgerLines, parseLedger } from "../kernel/evidence.ts";
 import { type Instant, instantFromEpochMs, roleOf } from "../kernel/grc.ts";
-import { type SpanId, spanIdFrom, type TraceId, traceIdFrom } from "../kernel/otel.ts";
-import type { LogBatch, TraceBatch } from "../kernel/otlp.ts";
+import { type SpanId, spanIdFrom, type TraceId, traceIdFrom } from "@intellectual-frontiers/telemetry/otel";
+import type { LogBatch, TraceBatch } from "@intellectual-frontiers/telemetry/otlp";
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { type Sha256, sha256 } from "@intellectual-frontiers/crypto/sha256";
 import {

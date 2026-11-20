@@ -8,7 +8,7 @@
  * @module
  */
 import { GENESIS } from "../kernel/evidence.ts";
-import { decodeMetrics } from "../kernel/otlp.ts";
+import { decodeMetrics } from "@intellectual-frontiers/telemetry/otlp";
 import { readTextFileSync } from "@intellectual-frontiers/system/fs";
 import { dirname, fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";

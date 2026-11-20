@@ -1,0 +1,45 @@
+// Spec: 0001-telemetry FR-026
+/**
+ * The typed facts of Telemetry, an independent library of commons (commons 0027-commons-libraries): OpenTelemetry-native signals written from the specification itself. Its specification is in its own spec kit
+ * (`spec-kit/`, `0001-telemetry`); this repository knows it as one requirement of 0027-commons-libraries, proved by `bun run verify` in this folder, and as a library of the lift of `commons/ts`
+ * (0032-lifting-libraries).
+ *
+ * @module
+ */
+import type { About } from "@intellectual-frontiers/commons/ts/kernel";
+
+/** Telemetry. */
+export const about: About = {
+  title: "Telemetry",
+  summary:
+    "The OpenTelemetry data model, W3C Trace Context, OTLP/HTTP JSON (`otel`, `otlp`), typed signals declared once with spans, log events and metrics (`signals`), and a pure reducer that renders them for a terminal " +
+    "(`render`); and, in `host`, the exporter over `fetch` with its journal and its probe, the pipeline a process installs, and the console that writes for a person. It uses no OpenTelemetry package. " +
+    "Published to npm as compiled modules with their declarations; it depends on Core, Formats, Terminal and System.",
+  folders: [
+    { path: "spec-kit/", what: "The library's own specifications, numbered from 0001.", mayImport: ["nothing: Markdown and TSV"] },
+    {
+      path: "src/",
+      what: "The pure modules (`otel`, `otlp`, `signals`, `render`) and `mod.ts`, the entry that names them as namespaces.",
+      mayImport: ["src/", "core, formats and terminal, by package name"],
+    },
+    {
+      path: "src/host/",
+      what: "The host: the exporter, the journal, the installed pipeline and the console, with `mod.ts` as its entry.",
+      mayImport: ["node: builtins", "src/", "core, formats, terminal and system, by package name"],
+    },
+    {
+      path: "suite/",
+      what: "The tests: the model, the encoding, the signals, the renderer, the exporter against servers the tests start, the console as a child process, and the conformance with the OpenTelemetry Collector.",
+      mayImport: [
+        "src/",
+        "fast-check",
+        "the test module of commons' runtime and the HTTP client and server of commons' runtime until `net` is lifted",
+      ],
+    },
+    {
+      path: "tools/",
+      what: "The trace check and the packer `bun run verify` runs.",
+      mayImport: ["the kernel, the runtime and the packer of commons, by package name"],
+    },
+  ],
+};

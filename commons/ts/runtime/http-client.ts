@@ -36,7 +36,7 @@ import {
 import { isSafeMethod, nextLink, retryAfterMs } from "@intellectual-frontiers/formats/http";
 import { formatJson5Error, parseJson5, toJson5 } from "@intellectual-frontiers/formats/json5";
 import { type AwsCredentials, sign } from "@intellectual-frontiers/crypto/sigv4";
-import { traceHttpClient } from "./otel.ts";
+import { traceHttpClient } from "@intellectual-frontiers/telemetry/host/otel";
 import { sleep } from "@intellectual-frontiers/system/proc";
 
 /** A request a client makes. */

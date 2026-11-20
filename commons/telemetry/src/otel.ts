@@ -1,5 +1,6 @@
+// Spec: 0001-telemetry FR-001
 /**
- * The OpenTelemetry data model, written from the OpenTelemetry specification itself (commons 0006-signals FR-001 to FR-008): attribute
+ * The OpenTelemetry data model, written from the OpenTelemetry specification itself (commons 0001-telemetry FR-001 to FR-008): attribute
  * values and log bodies, trace and span ids as brands made only from bytes the caller gives (the kernel has no randomness of its own), W3C
  * Trace Context Level 2 `traceparent` and `tracestate`, resources, scopes, finished spans, log records and metric points, the
  * configuration read from the `OTEL_*` environment variables (given as a record: the kernel reads no environment), redaction of what must

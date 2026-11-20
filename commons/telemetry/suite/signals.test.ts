@@ -1,5 +1,5 @@
 /**
- * Tests of `kernel/signals.ts`: what a registry lets compile (and what it does not), span trees exact to the id and the nanosecond with a
+ * Tests of `src/signals.ts`: what a registry lets compile (and what it does not), span trees exact to the id and the nanosecond with a
  * fixed clock and deterministic random bytes, the status a span ends with (a result, a thrown exception, a promise, a shutdown), the
  * parent taken from the context or a `traceparent`, sampling, redaction and limits applied to what is recorded, the processors (memory,
  * simple, batch) in order, with drops counted and flushes that end in time whatever the exporter does, and cumulative metrics.
@@ -15,8 +15,8 @@ import {
   type SpanId,
   type TraceId,
   DEFAULT_HISTOGRAM_BOUNDS,
-} from "../../kernel/otel.ts";
-import { countSignals } from "../../kernel/otlp.ts";
+} from "../src/otel.ts";
+import { countSignals } from "../src/otlp.ts";
 import { err, ok, type Result, type Equal, expectType } from "@intellectual-frontiers/core";
 import {
   type AttributesOf,
@@ -35,14 +35,14 @@ import {
   type Source,
   type TelemetryOptions,
   type Timer,
-} from "../../kernel/signals.ts";
-import { assert, assertEquals, assertRejects, assertThrows, proves } from "../../runtime/test.ts";
+} from "../src/signals.ts";
+import { assert, assertEquals, assertRejects, assertThrows, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 
-const REGISTRY = "0006-signals FR-009";
-const SPANS = "0006-signals FR-010";
-const EXACT = "0006-signals FR-011";
-const PIPELINE = "0006-signals FR-012";
-const METRICS = "0006-signals FR-013";
+const REGISTRY = "0001-telemetry FR-009";
+const SPANS = "0001-telemetry FR-010";
+const EXACT = "0001-telemetry FR-011";
+const PIPELINE = "0001-telemetry FR-012";
+const METRICS = "0001-telemetry FR-013";
 
 const registry = defineSignals({
   "build.run": { signal: "span", role: "step", attributes: { target: "string", "files?": "int" } },
@@ -372,7 +372,7 @@ proves([SPANS, EXACT], "the parent comes from the context, a traceparent or the 
   assertEquals(never.memory.entries, []);
 });
 
-proves([SPANS, "0006-signals FR-007", "0006-signals FR-006"], "limits and redaction apply to what a span records", () => {
+proves([SPANS, "0001-telemetry FR-007", "0001-telemetry FR-006"], "limits and redaction apply to what a span records", () => {
   const { telemetry, memory } = fixture({ limits: { attributeValueLength: 2, attributeCount: 1, eventCount: 1, linkCount: 1 } });
   const link = { traceId: traceId(9), spanId: spanId(9), traceFlags: 1, traceState: [], attributes: { a: "abc", b: "d" } };
   telemetry.span(
