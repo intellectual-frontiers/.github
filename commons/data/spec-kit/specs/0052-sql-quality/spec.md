@@ -18,6 +18,8 @@
 - **FR-007**: `where`, `limit` and `failCalc` MUST apply, failures MUST be stored as a table or a view that a later run replaces, and a disabled test MUST be skipped.
 - **FR-008**: Results MUST be counted (a warning is not a failure) and told as TAP.
 - **FR-009**: The tests a schema's state asks for (not null, keys, codes) MUST be made from it and pass on a database that holds the schema.
+- **FR-010**: A test MUST be able to expect an exact number of failing rows (`exactly(n)`): it MUST fail where the count is any other, fewer or more, and MUST never be a warning; `exactly(0)` is the ordinary test.
+- **FR-011**: `preview` MUST run a set of proposed tests on the data that is already in a database and report, for each, its status, how many rows would be wrong and up to a given number of them, MUST report a test that cannot run as an error, and MUST change nothing.
 
 ## Out of scope
 

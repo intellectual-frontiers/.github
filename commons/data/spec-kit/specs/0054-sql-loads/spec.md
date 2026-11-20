@@ -17,6 +17,7 @@
 - **FR-006**: A load MUST report the lines it rejected, MUST be refused with status `rejected` and take nothing where more than the share that is allowed was rejected, and otherwise MUST take the rows that were read.
 - **FR-007**: A load MUST keep the greatest value of a named column in the rows it loaded as its high-water mark in the ledger, `watermarkOf` MUST give the mark of the last run that loaded, and a run that did not load MUST NOT move it.
 - **FR-008**: A select of one database MUST be loadable into a table of another, through a gate, on every pair of SQLite, DuckDB and PostgreSQL, with the rows, the counts and the ledger of the database loaded into.
+- **FR-009**: A load MUST be able to give the run's id to every row it writes (`loadIdColumn`), so that what a load wrote is found by its id; and with `divertConflicts`, in the mode `append` and without a gate, a row whose key is already there MUST NOT fail the load: where its content is the same it MUST be absorbed and counted, where it differs it MUST be written to the table `<table>__conflict` (the run, when, the key and the existing and incoming rows as JSON) and the original MUST be left as it is; the report MUST say how many rows were absorbed and diverted.
 
 ## Out of scope
 
