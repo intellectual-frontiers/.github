@@ -187,8 +187,14 @@ export async function surfaceOfLibrary(w: World, node: LibraryNode, mergeBase: s
   }
 }
 
-/** What a plan was made from, for the numbers a run reports. */
-export type Planned = { readonly plan: ProofPlan; readonly seconds: number; readonly surfaces: number };
+/** What a plan was made from, for the numbers a run reports and the selection of tests: the changed files, the libraries and their surfaces. */
+export type Planned = {
+  readonly plan: ProofPlan;
+  readonly seconds: number;
+  readonly surfaces: number;
+  readonly changed: readonly ChangedFile[];
+  readonly graph: readonly LibraryNode[];
+};
 
 /** The plan of the working tree against a base, or why it cannot be made. */
 export async function makePlan(w: World, base: string, all: boolean): Promise<Result<Planned, string>> {
@@ -217,7 +223,7 @@ export async function makePlan(w: World, base: string, all: boolean): Promise<Re
       outsideReaders: [...names].sort(),
     };
     const step = planProof(input);
-    if (step.kind === "plan") return ok({ plan: step.plan, seconds: (performance.now() - t0) / 1000, surfaces: surfaces.size });
+    if (step.kind === "plan") return ok({ plan: step.plan, seconds: (performance.now() - t0) / 1000, surfaces: surfaces.size, changed, graph: graph.value });
     const mb = changes.known ? changes.mergeBase : base;
     const fresh = step.libraries.filter((n) => !surfaces.has(n));
     const made = await pool(fresh, 4, async (n) => {
@@ -269,8 +275,8 @@ export function commandOf(repo: string, proof: Proof, base: string, folderOf: (n
 
 /** How a proof ended on this machine. */
 export type ProofOutcome =
-  | { readonly kind: "passed"; readonly seconds: number }
-  | { readonly kind: "failed"; readonly seconds: number; readonly output: readonly string[] }
+  | { readonly kind: "passed"; readonly seconds: number; readonly detail: string }
+  | { readonly kind: "failed"; readonly seconds: number; readonly output: readonly string[]; readonly detail: string }
   | { readonly kind: "not-here"; readonly why: string };
 
 /** Runs one proof's program in its folder. */
@@ -281,7 +287,7 @@ export async function runProof(w: World, proof: Proof, base: string): Promise<Pr
   const t0 = performance.now();
   const r = await w.process.run(command.argv, { cwd: command.cwd, env: { CI: "" } });
   const seconds = (performance.now() - t0) / 1000;
-  return r.code === 0 ? { kind: "passed", seconds } : { kind: "failed", seconds, output: tailLines(`${r.stdout}\n${r.stderr}`, 30) };
+  return r.code === 0 ? { kind: "passed", seconds, detail: "" } : { kind: "failed", seconds, output: tailLines(`${r.stdout}\n${r.stderr}`, 30), detail: "" };
 }
 
 /** The tiers that run on a machine by default: the cheap ones, which are what an edit and a push need. */

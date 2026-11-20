@@ -160,10 +160,10 @@ export function proofKey(p: Proof): string {
 }
 
 /** Why a proof is left out: a closed union, each with one sentence in the plan. */
-export type SkipReason = "class-needs-none" | "surface-unchanged" | "symbols-unused" | "no-importer" | "cache-hit" | "tier-scheduled" | "quarantined";
+export type SkipReason = "class-needs-none" | "surface-unchanged" | "symbols-unused" | "tests-unaffected" | "cache-hit" | "tier-scheduled" | "quarantined";
 
 /** Every reason, in the order of the documentation. */
-export const SKIP_REASONS: readonly SkipReason[] = ["class-needs-none", "surface-unchanged", "symbols-unused", "no-importer", "cache-hit", "tier-scheduled", "quarantined"];
+export const SKIP_REASONS: readonly SkipReason[] = ["class-needs-none", "surface-unchanged", "symbols-unused", "tests-unaffected", "cache-hit", "tier-scheduled", "quarantined"];
 
 /** The foundation libraries: what the rest of commons stands on, so a change of their behaviour runs a smoke gate before anything wider. */
 export const FOUNDATION: readonly string[] = ["core", "formats", "crypto", "system", "terminal", "kanon", "libraries"];
@@ -174,6 +174,8 @@ export const PLANNER_GLOBS: readonly string[] = [
   "commons/repoctl/src/governance/generators.ts",
   "commons/repoctl/src/logical/prove*.ts",
   "commons/repoctl/src/logical/surface.ts",
+  "commons/repoctl/src/logical/select.ts",
+  "commons/repoctl/src/physical/tests.ts",
   "commons/repoctl/src/physical/prove*.ts",
   "commons/repoctl/src/physical/verbs/prove.ts",
   "commons/libraries/src/affected.ts",
@@ -186,3 +188,30 @@ export const PLANNER_GLOBS: readonly string[] = [
   "commons/libraries/src/workflows/**",
   "commons/tools/generate-*.ts",
 ];
+
+/** A quarantined test: named by its path from the repository's root, with the person who owns getting it fixed, the day it must be fixed by (it runs again after) and why. */
+export type QuarantineEntry = { readonly test: string; readonly owner: string; readonly expires: string; readonly reason: string };
+
+/** The quarantine record from its JSON text, or why it is not one: a list of entries, each with a test, an owner, an expiry day (`YYYY-MM-DD`) and a reason. */
+export function parseQuarantine(text: string): Result<readonly QuarantineEntry[], string> {
+  let raw: unknown;
+  try {
+    raw = JSON.parse(text);
+  } catch {
+    return err("the quarantine record is not JSON");
+  }
+  if (!Array.isArray(raw)) return err("the quarantine record is a list of entries");
+  const entries: QuarantineEntry[] = [];
+  for (const [i, e] of raw.entries()) {
+    if (typeof e !== "object" || e === null) return err(`entry ${i} is not an object`);
+    const field = (k: string): string => {
+      const v: unknown = Object.entries(e).find(([name]) => name === k)?.[1];
+      return typeof v === "string" ? v : "";
+    };
+    const entry = { test: field("test"), owner: field("owner"), expires: field("expires"), reason: field("reason") };
+    if (entry.test === "" || entry.owner === "" || entry.reason === "") return err(`entry ${i} needs a test, an owner and a reason`);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(entry.expires)) return err(`entry ${i} needs an expiry day as YYYY-MM-DD`);
+    entries.push(entry);
+  }
+  return ok(entries);
+}

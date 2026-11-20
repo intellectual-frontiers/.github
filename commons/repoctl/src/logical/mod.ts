@@ -26,6 +26,7 @@ export * from "./ports.ts";
 export * from "./prove.ts";
 export * from "./publish.ts";
 export * from "./scaffold.ts";
+export * from "./select.ts";
 export * from "./semver.ts";
 export * from "./status.ts";
 export * from "./surface.ts";

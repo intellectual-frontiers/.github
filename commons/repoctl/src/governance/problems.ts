@@ -51,7 +51,8 @@ export type ProblemCode =
   | "E-DOCTOR-NODE"
   | "E-DOCTOR-BUN"
   | "E-DOCTOR-GIT"
-  | "E-PROVE-FAILED";
+  | "E-PROVE-FAILED"
+  | "E-PROVE-QUARANTINE";
 
 /** Every code, in the order the explanations are listed. */
 export const PROBLEM_CODES: readonly ProblemCode[] = [
@@ -89,6 +90,7 @@ export const PROBLEM_CODES: readonly ProblemCode[] = [
   "E-DOCTOR-BUN",
   "E-DOCTOR-GIT",
   "E-PROVE-FAILED",
+  "E-PROVE-QUARANTINE",
 ];
 
 /** Whether a text is one of the codes. */
@@ -301,5 +303,11 @@ export const CATALOGUE: Readonly<Record<ProblemCode, Explained>> = {
     what: "A proof that `repoctl prove` ran (a type check, a check of the specifications, a suite, a packing) ended with a failure.",
     why: "The change broke what that proof holds, or the proof is flaky: a failing property test prints its seed.",
     fix: "repoctl prove --why",
+  },
+  "E-PROVE-QUARANTINE": {
+    title: "A quarantined test is past its expiry, or the record is wrong",
+    what: "`commons/repoctl/quarantine.json` names a test whose expiry day has passed (it runs again), or the record is not a list of entries with a test, an owner, an expiry and a reason.",
+    why: "A quarantine holds a flaky test back for a time and names who fixes it; it never holds one for good.",
+    fix: "fix the test, or renew its entry with a new expiry and a reason",
   },
 };

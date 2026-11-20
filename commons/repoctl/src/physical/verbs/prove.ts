@@ -12,11 +12,15 @@
  *
  * @module
  */
-import { parseProofTier, PROOF_TIER_IDS, PROOF_TIERS, proofKey, type ProofTier } from "@intellectual-frontiers/repoctl/governance";
-import { finding, type Finding, pool, proofLabel, skipSentence, whySentence, type PlannedProof, type ProofPlan } from "@intellectual-frontiers/repoctl/logical";
+import { parseProofTier, PROOF_TIER_IDS, PROOF_TIERS, type ProofTier } from "@intellectual-frontiers/repoctl/governance";
+import { dirsOf } from "@intellectual-frontiers/system/dirs";
+import { join } from "@intellectual-frontiers/system/path";
+import { build } from "@intellectual-frontiers/system/proc";
+import { finding, type Finding, proofLabel, skipSentence, whySentence, type ProofPlan } from "@intellectual-frontiers/repoctl/logical";
 import { flag, value } from "@intellectual-frontiers/terminal/args";
 import { defineVerb, outcomeOfDone, outcomeOfEnvironment, outcomeOfUsage } from "../define.ts";
-import { commandOf, DEFAULT_BASE, LOCAL_TIERS, makePlan, type ProofOutcome, runProof } from "../prove.ts";
+import { DEFAULT_BASE, LOCAL_TIERS, makePlan } from "../prove.ts";
+import { quarantineOf, runPlan } from "../prove-run.ts";
 
 const seconds = (n: number): string => `${n.toFixed(1)}s`;
 
@@ -47,6 +51,7 @@ export const proveVerb = defineVerb({
     why: flag<never>({ help: "Say, for every proof and every proof left out, why." }),
     tier: value<never>({ help: "Run only this tier (0 to 6 or T0 to T6).", valueName: "N" }),
     all: flag<never>({ help: "Plan every proof of every tier, whatever changed." }),
+    noCache: flag<never>({ help: "Run every selected test, whatever the cache holds." }),
   },
   examples: [
     { args: [], says: "Prove what the working tree changes since origin/main: the tiers T0 to T3 that apply, and only those." },
@@ -55,7 +60,7 @@ export const proveVerb = defineVerb({
     { args: ["--tier", "0"], says: "Only the static proofs of the plan." },
     { args: ["--all", "--plan"], says: "Every proof of every tier, as the nightly run and the release plan it." },
   ],
-  run: async (args, _ctx, w) => {
+  run: async (args, _ctx, w, host) => {
     const tierText = args.options.tier;
     let only: ProofTier | undefined;
     if (tierText !== undefined) {
@@ -79,38 +84,35 @@ export const proveVerb = defineVerb({
     if (args.options.plan) return outcomeOfDone({ data: plan, text: JSON.stringify(plan, null, 2), findings: [] });
     const header = proofPlanText(plan, args.options.why);
     const tiers = only === undefined ? LOCAL_TIERS : [only];
-    const todo: PlannedProof[] = plan.proofs.filter((p) => tiers.includes(p.tier));
-    const results: { readonly proof: PlannedProof; readonly outcome: ProofOutcome }[] = [];
-    const ran = new Set<string>();
-    for (const tier of tiers) {
-      const here = todo.filter((p) => p.tier === tier).filter((p) => {
-        const c = commandOf(w.repo, p.proof, base);
-        const key = c === undefined ? proofKey(p.proof) : `${c.cwd}\u0000${c.argv.join(" ")}`;
-        if (ran.has(key)) return false;
-        ran.add(key);
-        return true;
-      });
-      const width = Math.max(2, Math.min(8, globalThis.navigator?.hardwareConcurrency ?? 4));
-      const done = await pool(here, width, async (p) => ({ proof: p, outcome: await runProof(w, p.proof, base) }));
-      results.push(...done);
-    }
-    const lines = results.map(({ proof, outcome }) => {
+    const quarantine = await quarantineOf(w);
+    if ("problem" in quarantine) return outcomeOfDone({ data: null, text: quarantine.problem, findings: [finding("fail", "E-PROVE-QUARANTINE", quarantine.problem, "fix commons/repoctl/quarantine.json")] });
+    const dirs = dirsOf("repoctl", host.env, build.os === "windows" ? "windows" : build.os === "darwin" ? "darwin" : "linux");
+    const folder = host.env("REPOCTL_CACHE") ?? (dirs.cache === undefined ? undefined : join(dirs.cache, "prove"));
+    const runtime = (await w.process.run(["bun", "--version"])).stdout.trim();
+    const cache = args.options.noCache || folder === undefined ? undefined : { folder, runtime };
+    const width = Math.max(2, Math.min(8, globalThis.navigator?.hardwareConcurrency ?? 4));
+    const report = await runPlan(w, made.value, base, { tiers, cache, quarantine: quarantine.entries, today: new Date().toISOString().slice(0, 10), width });
+    const lines = report.reports.map(({ proof, outcome }) => {
       switch (outcome.kind) {
         case "passed":
-          return `  ${proof.tier} passed  ${proofLabel(proof.proof)} (${seconds(outcome.seconds)})`;
+          return `  ${proof.tier} passed  ${proofLabel(proof.proof)} (${seconds(outcome.seconds)}${outcome.detail === "" ? "" : `; ${outcome.detail}`})`;
         case "failed":
           return `  ${proof.tier} FAILED  ${proofLabel(proof.proof)} (${seconds(outcome.seconds)})\n${outcome.output.map((l) => `      ${l}`).join("\n")}`;
         case "not-here":
           return `  ${proof.tier} not run ${proofLabel(proof.proof)}: ${outcome.why}`;
       }
     });
-    const findings: readonly Finding[] = results.flatMap(({ proof, outcome }) =>
-      outcome.kind === "failed" ? [finding("fail", "E-PROVE-FAILED", `${proofLabel(proof.proof)} failed: ${outcome.output.at(-1) ?? "no output"}`, "repoctl prove --why")] : [],
-    );
-    const total = results.reduce((n, r) => n + (r.outcome.kind === "not-here" ? 0 : r.outcome.seconds), 0);
+    const left = args.options.why ? report.left.map((s) => `  left  ${s.tier} ${skipSentence(s)} (${s.reason})`) : [`  left  ${report.left.length} test groups, files or quarantined tests (--why lists them)`];
+    const findings: readonly Finding[] = [
+      ...report.reports.flatMap(({ proof, outcome }) =>
+        outcome.kind === "failed" ? [finding("fail", "E-PROVE-FAILED", `${proofLabel(proof.proof)} failed: ${outcome.output.at(0) ?? "no output"}`, "repoctl prove --why")] : [],
+      ),
+      ...report.expired.map((e) => finding("warn", "E-PROVE-QUARANTINE", `the quarantine of ${e.test} (owner ${e.owner}) expired on ${e.expires}: it runs again`, "fix the test, or renew its entry")),
+    ];
+    const total = report.reports.reduce((n, r) => n + (r.outcome.kind === "not-here" ? 0 : r.outcome.seconds), 0);
     return outcomeOfDone({
-      data: { plan, results: results.map((r) => ({ proof: r.proof.proof, tier: r.proof.tier, outcome: r.outcome })) },
-      text: [header, "", ...lines, `proofs took ${seconds(total)} of process time`].join("\n"),
+      data: { plan, results: report.reports.map((r) => ({ proof: r.proof.proof, tier: r.proof.tier, outcome: r.outcome })), left: report.left },
+      text: [header, "", ...lines, ...(report.left.length === 0 ? [] : left), `proofs took ${seconds(total)} of process time`].join("\n"),
       findings,
       title: "Every proof of the plan passes",
     });
