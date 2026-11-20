@@ -231,7 +231,7 @@ proves(
       assert(!existsSync(join(dir, ".github", "workflows", "beta-publish.auto.yml")), "a library has no workflow of its own");
       return Promise.resolve();
     });
-    const w = readTextFileSync(join(ROOT, ".github", "workflows", "release.auto.yml"));
+    const w = readTextFileSync(join(ROOT, ".github", "workflows", "release.auto.yml")).replace(/\r\n/g, "\n"); // a Windows checkout has CRLF
     // by hand only, from main, asked to publish
     assertStringIncludes(w, "workflow_dispatch:");
     assert(!w.includes("\n  push:") && !w.includes("pull_request"), "a release is never made by a push");
