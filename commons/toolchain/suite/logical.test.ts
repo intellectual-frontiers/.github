@@ -1,22 +1,29 @@
 /**
- * Tests of the Logical layer of Toolchain (commons toolchain 0003-toolchain-logical FR-001 to FR-006): the guarantees of a dialect as data, the control `toolIntegrity` and every reason a dialect does
- * not meet it, the resolution of tools in the order of needs to the first dialect that can, the refusal of a tool no dialect can carry out, the plan against what is installed, and the requirements of
- * Archon, from which an order is built. The dialects here are values of the port (the dialects with real tools are tested in their own packages); every address, hash and name is made up.
+ * Tests of the Logical layer of Toolchain (commons toolchain 0003-toolchain-logical FR-001 to FR-007): the guarantees of a dialect as data, the control `toolIntegrity` and every reason a dialect does
+ * not meet it, the resolution of tools in the order of needs to the first dialect that can with the downloads of a source of pins, the refusal of a tool no dialect can carry out, the plan against
+ * what is installed, the requirements of Archon from which an order is built, and that the library does not read the ontology. The dialects and the source of pins here are values of their ports
+ * (the dialects with real tools are tested in their own packages); every address, hash and name is made up.
  *
  * @module
  */
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { parseDialectId, parseSubjectName, type DialectId, type JsonValue } from "@intellectual-frontiers/archon/governance";
 import { buildOrder } from "@intellectual-frontiers/archon/logical";
+import * as runtime from "@intellectual-frontiers/mizan/host/trace";
+import { path } from "@intellectual-frontiers/system";
 import {
   defineCatalog,
+  defineDownload,
   defineTool,
   meetsIntegrity,
+  parseManagerId,
   planTools,
   requirementsFor,
   resolveTools,
   type Catalog,
   type Context,
+  type Download,
+  type PinSource,
   type ToolDialect,
   type ToolGuarantees,
   type ToolInput,
@@ -29,30 +36,49 @@ function id(text: string): DialectId {
   return r.value;
 }
 
+function manager(text: string) {
+  const r = parseManagerId(text);
+  if (r.kind === "err") throw new Error(r.error);
+  return r.value;
+}
+
 const ALL = ["linux-x64", "linux-arm64", "macos-x64", "macos-arm64", "windows-x64"] as const;
 const SHA = "b".repeat(64);
-const art = (name: string) => ({ url: `https://example.test/${name}`, sha256: SHA, format: "file", bin: "" });
 
-function dialect(name: string, g: Partial<ToolGuarantees> = {}): ToolDialect {
-  return { id: id(name), guarantees: { pin: "exact", integrity: "hash", scopes: ["user", "system"], platforms: [...ALL], binds: "artifact", sourceBuild: false, ...g } };
+function download(name: string, version = "1.0.0"): Download {
+  const r = defineDownload({ version, url: `https://example.test/${name}`, sha256: SHA, format: "file", bin: "" });
+  if (r.kind === "err") throw new Error(r.error.join("; "));
+  return r.value;
+}
+
+/** A source of pins with made-up downloads: jq, gh and old on linux-x64 and macos-arm64. */
+const PINS: PinSource = {
+  lookup: (pin, platform) => {
+    if (platform !== "linux-x64" && platform !== "macos-arm64") return undefined;
+    return pin === "pin-jq" || pin === "pin-gh" || pin === "pin-old" ? download(pin, pin === "pin-old" ? "0.5.0" : "1.0.0") : undefined;
+  },
+};
+
+function dialect(name: string, g: Partial<ToolGuarantees> = {}, managerId?: string): ToolDialect {
+  const base = { id: id(name), guarantees: { pin: "exact", integrity: "hash", scopes: ["user", "system"], platforms: [...ALL], binds: "pin", sourceBuild: false, ...g } satisfies ToolGuarantees };
+  return managerId === undefined ? base : { ...base, manager: manager(managerId) };
 }
 
 const PINNED = dialect("native-pinned");
-const BREW = dialect("homebrew", { pin: "rolling", integrity: "none", scopes: ["user"], platforms: ["macos-arm64", "macos-x64", "linux-x64", "linux-arm64"], binds: "package" });
-const APT = dialect("apt", { pin: "release-line", integrity: "signature", scopes: ["system"], platforms: ["linux-x64", "linux-arm64"], binds: "package" });
-const BUILDER = dialect("builder", { binds: "package", sourceBuild: true });
+const BREW = dialect("homebrew", { pin: "rolling", integrity: "none", scopes: ["user"], platforms: ["macos-arm64", "macos-x64", "linux-x64", "linux-arm64"], binds: "package" }, "manager-brew");
+const APT = dialect("apt", { pin: "release-line", integrity: "signature", scopes: ["system"], platforms: ["linux-x64", "linux-arm64"], binds: "package" }, "manager-apt");
+const BUILDER = dialect("builder", { binds: "package", sourceBuild: true }, "manager-builder");
 
 function tool(name: string, more: Partial<ToolInput> = {}) {
   const r = defineTool({
     name,
     summary: `${name}.`,
-    version: "1.0.0",
     pin: "exact",
     program: name,
     versionArgs: ["--version"],
     phases: ["core"],
     scope: "user",
-    bindings: [{ kind: "artifact", artifacts: { "linux-x64": art(`${name}-linux`), "macos-arm64": art(`${name}-macos`) } }, { kind: "package", dialect: "homebrew", packages: [name] }, { kind: "package", dialect: "builder", packages: [name] }],
+    bindings: [{ kind: "pin", pin: `pin-${name}` }, { kind: "package", manager: "manager-brew", packages: [name] }, { kind: "package", manager: "manager-builder", packages: [name] }],
     ...more,
   });
   if (r.kind === "err") throw new Error(r.error.join("; "));
@@ -60,7 +86,11 @@ function tool(name: string, more: Partial<ToolInput> = {}) {
 }
 
 function catalog(): Catalog {
-  const c = defineCatalog([tool("jq"), tool("git", { bindings: [{ kind: "package", dialect: "apt", packages: ["git"] }], pin: "release-line", scope: "system" }), tool("gh", { needs: ["git"], minimum: "0.9.0" })]);
+  const c = defineCatalog([
+    tool("jq"),
+    tool("git", { bindings: [{ kind: "package", manager: "manager-apt", packages: ["git"] }], pin: "release-line", scope: "system" }),
+    tool("gh", { needs: ["git"], minimum: "0.9.0" }),
+  ]);
   if (c.kind === "err") throw new Error(c.error.join("; "));
   return c.value;
 }
@@ -74,8 +104,10 @@ const CTX: Context = { platform: "linux-x64", preference: [id("native-pinned"), 
 
 proves(["0003-toolchain-logical FR-001"], "a dialect declares its guarantees as data", () => {
   assertEquals(Object.keys(PINNED.guarantees).sort(), ["binds", "integrity", "pin", "platforms", "scopes", "sourceBuild"]);
-  assertEquals([PINNED.guarantees.pin, PINNED.guarantees.integrity, PINNED.guarantees.binds, PINNED.guarantees.sourceBuild], ["exact", "hash", "artifact", false]);
+  assertEquals([PINNED.guarantees.pin, PINNED.guarantees.integrity, PINNED.guarantees.binds, PINNED.guarantees.sourceBuild], ["exact", "hash", "pin", false]);
   assertEquals([BREW.guarantees.pin, BREW.guarantees.integrity, BREW.guarantees.binds], ["rolling", "none", "package"]);
+  assertEquals(String(BREW.manager), "manager-brew");
+  assertEquals(PINNED.manager, undefined);
 });
 
 proves(["0003-toolchain-logical FR-002"], "meetsIntegrity names every reason a dialect does not meet the control", () => {
@@ -89,63 +121,66 @@ proves(["0003-toolchain-logical FR-002"], "meetsIntegrity names every reason a d
 });
 
 proves(["0003-toolchain-logical FR-003"], "tools and what they need are resolved in the order of needs, each to the first dialect that can", () => {
-  const r = resolveTools(catalog(), ["gh", "jq"], [PINNED, BREW, APT], CTX);
+  const r = resolveTools(catalog(), ["gh", "jq"], [PINNED, BREW, APT], PINS, CTX);
   assert(r.kind === "ok");
   assertEquals(r.value.entries.map((e) => `${e.tool.name}:${e.dialect}`), ["git:apt", "gh:native-pinned", "jq:native-pinned"]);
+  assertEquals(r.value.entries.map((e) => e.version), [undefined, "1.0.0", "1.0.0"]);
   const rolling = defineCatalog([tool("curl", { pin: "rolling" })]);
   assert(rolling.kind === "ok");
-  const prefer = resolveTools(rolling.value, ["curl"], [PINNED, BREW, APT], { ...CTX, preference: [id("homebrew"), id("native-pinned")] });
+  const prefer = resolveTools(rolling.value, ["curl"], [PINNED, BREW, APT], PINS, { ...CTX, preference: [id("homebrew"), id("native-pinned")] });
   assert(prefer.kind === "ok" && prefer.value.entries[0]?.dialect === "homebrew");
-  const exact = resolveTools(catalog(), ["jq"], [PINNED, BREW, APT], { ...CTX, preference: [id("homebrew"), id("native-pinned")] });
+  const exact = resolveTools(catalog(), ["jq"], [PINNED, BREW, APT], PINS, { ...CTX, preference: [id("homebrew"), id("native-pinned")] });
   assert(exact.kind === "ok" && exact.value.entries[0]?.dialect === "native-pinned", "an exactly pinned tool is not carried out by a rolling dialect, whatever the preference");
-  const mac = resolveTools(catalog(), ["jq"], [PINNED, BREW, APT], { ...CTX, platform: "macos-arm64" });
-  assert(mac.kind === "ok" && mac.value.entries[0]?.source.kind === "artifact");
-  const unknown = resolveTools(catalog(), ["nothing"], [PINNED], CTX);
+  const mac = resolveTools(catalog(), ["jq"], [PINNED, BREW, APT], PINS, { ...CTX, platform: "macos-arm64" });
+  assert(mac.kind === "ok" && mac.value.entries[0]?.source.kind === "download");
+  const unknown = resolveTools(catalog(), ["nothing"], [PINNED], PINS, CTX);
   assert(unknown.kind === "err" && unknown.error[0]?.kind === "unknown-tool");
 });
 
-
 proves(["0003-toolchain-logical FR-004"], "a tool no dialect can carry out is refused with every reason, and a dialect that builds from source is never chosen", () => {
-  const strict = resolveTools(catalog(), ["jq"], [PINNED, BREW, APT], { ...CTX, platform: "windows-x64", integrity: "exact-hashed" });
+  const strict = resolveTools(catalog(), ["jq"], [PINNED, BREW, APT], PINS, { ...CTX, platform: "windows-x64", integrity: "exact-hashed" });
   assert(strict.kind === "err");
   const p = strict.error[0];
   assert(p?.kind === "unexpressed" && p.tool === "jq");
   assertEquals(p.reasons.map((r) => r.dialect), ["native-pinned", "homebrew", "apt"]);
   assert(p.reasons[0]?.reason.includes("windows-x64"));
   assert(p.reasons[1]?.reason.includes("windows-x64"));
-  const hashed = resolveTools(catalog(), ["jq"], [BREW], { ...CTX, preference: [id("homebrew")], integrity: "exact-hashed" });
+  const hashed = resolveTools(catalog(), ["jq"], [BREW], PINS, { ...CTX, preference: [id("homebrew")], integrity: "exact-hashed" });
   assert(hashed.kind === "err");
   const reason = hashed.error[0];
   assert(reason?.kind === "unexpressed" && reason.reasons[0]?.reason.includes("exact"));
-  const builder = resolveTools(catalog(), ["jq"], [BUILDER], { ...CTX, preference: [id("builder")] });
+  const builder = resolveTools(catalog(), ["jq"], [BUILDER], PINS, { ...CTX, preference: [id("builder")] });
   assert(builder.kind === "err");
   const b = builder.error[0];
   assert(b?.kind === "unexpressed" && b.reasons[0]?.reason.includes("build from source"));
-  const zed = defineCatalog([tool("zed", { bindings: [{ kind: "package", dialect: "apt", packages: ["zed"] }], scope: "user" })]);
+  const zed = defineCatalog([tool("zed", { bindings: [{ kind: "package", manager: "manager-apt", packages: ["zed"] }], scope: "user" })]);
   assert(zed.kind === "ok");
-  const scope = resolveTools(zed.value, ["zed"], [APT], { ...CTX, preference: [id("apt")] });
+  const scope = resolveTools(zed.value, ["zed"], [APT], PINS, { ...CTX, preference: [id("apt")] });
   assert(scope.kind === "err" && scope.error[0]?.kind === "unexpressed" && scope.error[0].reasons[0]?.reason.includes("user scope"));
-  const missingDialect = resolveTools(catalog(), ["jq"], [PINNED], { ...CTX, preference: [id("homebrew")] });
+  const missingDialect = resolveTools(catalog(), ["jq"], [PINNED], PINS, { ...CTX, preference: [id("homebrew")] });
   assert(missingDialect.kind === "err");
+  const noManager = resolveTools(zed.value, ["zed"], [dialect("anon", { binds: "package" })], PINS, { ...CTX, preference: [id("anon")] });
+  assert(noManager.kind === "err" && noManager.error[0]?.kind === "unexpressed" && noManager.error[0].reasons[0]?.reason.includes("no package manager"));
 });
 
 proves(["0003-toolchain-logical FR-005"], "the plan says none, install or replace, and a copy on the path counts only where the policy allows", () => {
-  const res = resolveTools(catalog(), ["jq", "gh"], [PINNED, APT], { ...CTX, preference: [id("native-pinned"), id("apt")] });
+  const res = resolveTools(catalog(), ["jq", "gh"], [PINNED, APT], PINS, { ...CTX, preference: [id("native-pinned"), id("apt")] });
   assert(res.kind === "ok");
   const name = (n: string) => n as ToolName;
   const act = (observed: ReadonlyMap<ToolName, { version: string; from: "path" | "store" | "manager" }>, ctx: Context = CTX) => Object.fromEntries(planTools(res.value, observed, ctx).entries.map((e) => [e.tool, e.action]));
   assertEquals(act(new Map()), { git: "install", gh: "install", jq: "install" });
-  assertEquals(act(new Map([[name("jq"), { version: "1.0.0", from: "store" as const }], [name("gh"), { version: "1.0.0", from: "store" as const }], [name("git"), { version: "1.0.0", from: "manager" as const }]])), { git: "none", gh: "none", jq: "none" });
+  assertEquals(act(new Map([[name("jq"), { version: "1.0.0", from: "store" as const }], [name("gh"), { version: "1.0.0", from: "store" as const }], [name("git"), { version: "7.7.7", from: "manager" as const }]])), { git: "none", gh: "none", jq: "none" });
   assertEquals(act(new Map([[name("jq"), { version: "0.9.0", from: "store" as const }]]))["jq"], "replace");
   assertEquals(act(new Map([[name("gh"), { version: "0.9.5", from: "path" as const }]]))["gh"], "none", "a path copy at the least version counts under minimum");
   assertEquals(act(new Map([[name("gh"), { version: "0.8.0", from: "path" as const }]]))["gh"], "replace");
   assertEquals(act(new Map([[name("gh"), { version: "1.0.0", from: "path" as const }]]), { ...CTX, systemCopy: "never" })["gh"], "replace");
   assertEquals(act(new Map([[name("gh"), { version: "1.0.0", from: "path" as const }]]), { ...CTX, integrity: "exact-hashed" })["gh"], "replace", "exact and hashed never takes a path copy");
-  assertEquals(act(new Map([[name("jq"), { version: "1.0.0", from: "path" as const }]]))["jq"], "none", "a tool with no stated minimum is taken at its version");
+  assertEquals(act(new Map([[name("jq"), { version: "1.0.0", from: "path" as const }]]))["jq"], "none", "a tool with no stated minimum is taken at the version of its pin");
+  assertEquals(act(new Map([[name("git"), { version: "0.0.1", from: "path" as const }]]))["git"], "none", "where nothing pins a version any version counts");
 });
 
 proves(["0003-toolchain-logical FR-006"], "the requirements of kind tool are valid for Archon, depend on the tools needed, hold no secret, and an order is built from them", () => {
-  const res = resolveTools(catalog(), ["gh", "jq"], [PINNED, APT], { ...CTX, preference: [id("native-pinned"), id("apt")] });
+  const res = resolveTools(catalog(), ["gh", "jq"], [PINNED, APT], PINS, { ...CTX, preference: [id("native-pinned"), id("apt")] });
   assert(res.kind === "ok");
   const reqs = requirementsFor(res.value, { by: "all" });
   assert(reqs.kind === "ok");
@@ -157,12 +192,35 @@ proves(["0003-toolchain-logical FR-006"], "the requirements of kind tool are val
   assert(isRecord(desired));
   assertEquals(desired["tool"], "gh");
   assertEquals(desired["dialect"], "native-pinned");
+  assertEquals(desired["version"], "1.0.0");
   const source = desired["source"];
-  assert(isRecord(source) && source["kind"] === "artifact" && source["sha256"] === SHA);
+  assert(isRecord(source) && source["kind"] === "download" && source["pin"] === "pin-gh" && source["sha256"] === SHA);
+  const git = reqs.value.find((r) => r.id === "tool.git")?.desired;
+  assert(isRecord(git) && git["version"] === null);
   const name = parseSubjectName("build-01.example.test");
   assert(name.kind === "ok");
   const order = buildOrder({ subject: { name: name.value, class: "workstation" }, assurance: "solo", layers: [{ layer: "baseline", requirements: reqs.value }] });
   assert(order.kind === "ok");
   assertEquals(order.value.requirements.map((r) => String(r.id)), ["tool.git", "tool.gh", "tool.jq"]);
   assertEquals(requirementsFor(res.value, { by: "class", class: "dns" }).kind, "err");
+});
+
+proves(["0003-toolchain-logical FR-007"], "downloads come from a source of pins; a pin with no download, or a version below the minimum, is a reason; the library does not read the ontology", async () => {
+  const noDownload = resolveTools(catalog(), ["jq"], [PINNED], PINS, { ...CTX, platform: "linux-arm64", preference: [id("native-pinned")] });
+  assert(noDownload.kind === "err");
+  const nd = noDownload.error[0];
+  assert(nd?.kind === "unexpressed" && nd.reasons[0]?.reason.includes("pin-jq") && nd.reasons[0].reason.includes("linux-arm64"));
+  const old = defineCatalog([tool("old", { minimum: "1.0.0" })]);
+  assert(old.kind === "ok");
+  const below = resolveTools(old.value, ["old"], [PINNED], PINS, { ...CTX, preference: [id("native-pinned")] });
+  assert(below.kind === "err");
+  const b = below.error[0];
+  assert(b?.kind === "unexpressed" && b.reasons[0]?.reason.includes("below the minimum"));
+  let asked = 0;
+  const counting: PinSource = { lookup: (pin, platform) => { asked++; return PINS.lookup(pin, platform); } };
+  resolveTools(catalog(), ["jq"], [PINNED], counting, { ...CTX, preference: [id("native-pinned")] });
+  assertEquals(asked, 1);
+  const root = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
+  const files = await runtime.readSources(root, ["src"]);
+  for (const f of files) assertEquals(f.text.includes("@intellectual-frontiers/ontology"), false, `${f.path} reads the ontology`);
 });

@@ -1,25 +1,24 @@
 /**
- * Tests of the Governance layer of Toolchain (commons toolchain 0002-toolchain-governance FR-001 to FR-007): names and versions, the tool and every way it is refused, the pin policy and the
- * minimum, artifacts, bindings, the guard against a secret, and the catalog. Every address, hash and name is made up.
+ * Tests of the Governance layer of Toolchain (commons toolchain 0002-toolchain-governance FR-001 to FR-008): names and versions, the tool and every way it is refused, the pin policy and the
+ * minimum, a download as a pin gives it, bindings, the guard against a secret, the catalog, and that a tool holds no version or hash of a pin. Every address, hash and name is made up.
  *
  * @module
  */
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { compareVersions, defineCatalog, defineTool, parseToolName, parseVersion, type Tool, type ToolInput } from "../src/mod.ts";
+import { compareVersions, defineCatalog, defineDownload, defineTool, parseManagerId, parsePinId, parseToolName, parseVersion, type DownloadInput, type Tool, type ToolInput } from "../src/mod.ts";
 
 const SHA = "a".repeat(64);
-const ARTIFACT = { url: "https://example.test/jq-1.7.1-linux-amd64", sha256: SHA, format: "file", bin: "" };
+const DOWNLOAD: DownloadInput = { version: "1.7.1", url: "https://example.test/jq-1.7.1-linux-amd64", sha256: SHA, format: "file", bin: "" };
 
 const JQ: ToolInput = {
   name: "jq",
   summary: "A command line JSON processor.",
-  version: "1.7.1",
   pin: "exact",
   program: "jq",
   versionArgs: ["--version"],
   phases: ["core"],
   scope: "user",
-  bindings: [{ kind: "artifact", artifacts: { "linux-x64": ARTIFACT } }, { kind: "package", dialect: "homebrew", packages: ["jq"] }],
+  bindings: [{ kind: "pin", pin: "pin-jq" }, { kind: "package", manager: "manager-brew", packages: ["jq"] }],
 };
 
 function tool(more: Partial<ToolInput> = {}): Tool {
@@ -47,11 +46,15 @@ proves(["0002-toolchain-governance FR-001"], "names and versions are made only b
   assert(compareVersions("2.0.0-rc.1", "2.0.0") < 0);
   assert(compareVersions("2.0.0", "2.0.0-rc.1") > 0);
   assert(compareVersions("157.0.8103.50", "157.0.8103.9") > 0);
+  assertEquals(parsePinId("pin-bun").kind, "ok");
+  assertEquals(parsePinId("bun").kind, "err");
+  assertEquals(parseManagerId("manager-apt").kind, "ok");
+  assertEquals(parseManagerId("apt").kind, "err");
 });
 
 proves(["0002-toolchain-governance FR-002"], "a tool is defined, or refused with every reason", () => {
   const t = tool();
-  assertEquals([t.name, t.version, t.pin, t.scope, t.phases, t.needs, t.provides], ["jq", "1.7.1", "exact", "user", ["core"], [], []]);
+  assertEquals([t.name, t.pin, t.scope, t.phases, t.needs, t.provides], ["jq", "exact", "user", ["core"], [], []]);
   assert(refused({ summary: " " }).some((m) => m.includes("summary")));
   assert(refused({ program: "" }).some((m) => m.includes("program")));
   assert(refused({ phases: [] }).some((m) => m.includes("phase")));
@@ -60,40 +63,44 @@ proves(["0002-toolchain-governance FR-002"], "a tool is defined, or refused with
   assert(refused({ bindings: [] }).some((m) => m.includes("binding")));
   assert(refused({ needs: ["Bad Name"] }).some((m) => m.includes("need")));
   assert(refused({ env: { path: "x" } }).some((m) => m.includes("variable")));
-  assert(refused({ version: "latest" }).some((m) => m.includes("latest")));
   assert(refused({ name: "Bad", summary: "", phases: [], bindings: [] }).length >= 4, "every reason is given");
 });
 
-proves(["0002-toolchain-governance FR-003"], "a tool states how strictly it is pinned, and a minimum is not above its version", () => {
+proves(["0002-toolchain-governance FR-003"], "a tool states how strictly it is pinned, and a minimum is not above the version of a package binding", () => {
   assertEquals(tool({ pin: "release-line", minimum: "1.6.0" }).minimum, "1.6.0");
   assert(refused({ pin: "fixed" }).some((m) => m.includes("pin policy")));
-  assert(refused({ minimum: "2.0.0" }).some((m) => m.includes("above")));
   assert(refused({ minimum: "latest" }).some((m) => m.includes("minimum")));
+  assert(refused({ minimum: "2.0.0", bindings: [{ kind: "package", manager: "manager-brew", packages: ["jq"], version: "1.7.1" }] }).some((m) => m.includes("above")));
+  assertEquals(tool({ minimum: "1.0.0", bindings: [{ kind: "package", manager: "manager-brew", packages: ["jq"], version: "1.7.1" }] }).minimum, "1.0.0");
   assertEquals(tool().minimum, undefined);
 });
 
-proves(["0002-toolchain-governance FR-004"], "an artifact has an https address with no credentials, a SHA-256, a format, a folder inside and a platform", () => {
-  const withArtifact = (a: Partial<typeof ARTIFACT>, platform = "linux-x64") => refused({ bindings: [{ kind: "artifact", artifacts: { [platform]: { ...ARTIFACT, ...a } } }] });
-  assert(withArtifact({ url: "http://example.test/jq" }).some((m) => m.includes("https")));
-  assert(withArtifact({ url: "https://user:secret@example.test/jq" }).some((m) => m.includes("user name or a password")));
-  assert(withArtifact({ url: "not an address" }).some((m) => m.includes("not an address")));
-  assert(withArtifact({ sha256: "a".repeat(63) }).some((m) => m.includes("SHA-256")));
-  assert(withArtifact({ format: "rar" }).some((m) => m.includes("format")));
-  assert(withArtifact({ bin: "../out" }).some((m) => m.includes("inside")));
-  assert(withArtifact({ bin: "/abs" }).some((m) => m.includes("inside")));
-  assert(withArtifact({}, "linux-riscv").some((m) => m.includes("platform")));
-  const ok = tool({ bindings: [{ kind: "artifact", artifacts: { "windows-x64": { ...ARTIFACT, format: "zip", bin: "bin" } } }] });
-  const b = ok.bindings[0];
-  assert(b?.kind === "artifact" && b.artifacts["windows-x64"]?.bin === "bin");
+proves(["0002-toolchain-governance FR-004"], "a download has a version, an https address with no credentials, a SHA-256, a format and a folder inside", () => {
+  const bad = (a: Partial<DownloadInput>) => {
+    const r = defineDownload({ ...DOWNLOAD, ...a });
+    assert(r.kind === "err", "the download is refused");
+    return r.error;
+  };
+  assert(bad({ url: "http://example.test/jq" }).some((m) => m.includes("https")));
+  assert(bad({ url: "https://user:secret@example.test/jq" }).some((m) => m.includes("user name or a password")));
+  assert(bad({ url: "not an address" }).some((m) => m.includes("not an address")));
+  assert(bad({ sha256: "a".repeat(63) }).some((m) => m.includes("SHA-256")));
+  assert(bad({ format: "rar" }).some((m) => m.includes("format")));
+  assert(bad({ bin: "../out" }).some((m) => m.includes("inside")));
+  assert(bad({ bin: "/abs" }).some((m) => m.includes("inside")));
+  assert(bad({ version: "latest" }).some((m) => m.includes("latest")));
+  const ok = defineDownload({ ...DOWNLOAD, format: "zip", bin: "bin" });
+  assert(ok.kind === "ok" && ok.value.bin === "bin" && ok.value.sha256 === SHA && ok.value.version === "1.7.1");
 });
 
-proves(["0002-toolchain-governance FR-005"], "a tool has bindings, and no more than one artifact binding or one package binding for a dialect", () => {
-  assert(refused({ bindings: [{ kind: "artifact", artifacts: {} }] }).some((m) => m.includes("at least one platform")));
-  assert(refused({ bindings: [{ kind: "package", dialect: "homebrew", packages: [] }] }).some((m) => m.includes("at least one package")));
-  assert(refused({ bindings: [{ kind: "package", dialect: "Homebrew", packages: ["jq"] }] }).some((m) => m.includes("dialect id")));
-  assert(refused({ bindings: [{ kind: "package", dialect: "apt", packages: ["jq"] }, { kind: "package", dialect: "apt", packages: ["jq2"] }] }).some((m) => m.includes("one package binding for apt")));
-  assert(refused({ bindings: [{ kind: "artifact", artifacts: { "linux-x64": ARTIFACT } }, { kind: "artifact", artifacts: { "macos-arm64": ARTIFACT } }] }).some((m) => m.includes("one artifact binding")));
-  assertEquals(tool({ bindings: [{ kind: "package", dialect: "apt", packages: ["jq"] }, { kind: "package", dialect: "homebrew", packages: ["jq"] }] }).bindings.length, 2);
+proves(["0002-toolchain-governance FR-005"], "a tool has bindings, and no more than one pin binding or one package binding for a manager", () => {
+  assert(refused({ bindings: [{ kind: "pin", pin: "jq" }] }).some((m) => m.includes("pin id")));
+  assert(refused({ bindings: [{ kind: "package", manager: "manager-brew", packages: [] }] }).some((m) => m.includes("at least one package")));
+  assert(refused({ bindings: [{ kind: "package", manager: "brew", packages: ["jq"] }] }).some((m) => m.includes("manager id")));
+  assert(refused({ bindings: [{ kind: "package", manager: "manager-apt", packages: ["jq"], version: "latest" }] }).some((m) => m.includes("latest")));
+  assert(refused({ bindings: [{ kind: "package", manager: "manager-apt", packages: ["jq"] }, { kind: "package", manager: "manager-apt", packages: ["jq2"] }] }).some((m) => m.includes("one package binding for manager-apt")));
+  assert(refused({ bindings: [{ kind: "pin", pin: "pin-jq" }, { kind: "pin", pin: "pin-jq2" }] }).some((m) => m.includes("one pin binding")));
+  assertEquals(tool({ bindings: [{ kind: "package", manager: "manager-apt", packages: ["jq"] }, { kind: "package", manager: "manager-brew", packages: ["jq"] }] }).bindings.length, 2);
 });
 
 proves(["0002-toolchain-governance FR-006"], "no secret in the environment or the program", () => {
@@ -104,8 +111,9 @@ proves(["0002-toolchain-governance FR-006"], "no secret in the environment or th
 });
 
 proves(["0002-toolchain-governance FR-007"], "a catalog refuses a tool twice, a missing need, a cycle and a program provided twice, and is in the order of needs", () => {
-  const git = tool({ name: "git", program: "git", bindings: [{ kind: "package", dialect: "apt", packages: ["git"] }] });
-  const gh = tool({ name: "gh", program: "gh", needs: ["git"], bindings: [{ kind: "package", dialect: "apt", packages: ["gh"] }] });
+  const apt = [{ kind: "package", manager: "manager-apt", packages: ["x"] }] as const;
+  const git = tool({ name: "git", program: "git", bindings: apt });
+  const gh = tool({ name: "gh", program: "gh", needs: ["git"], bindings: apt });
   const ok = defineCatalog([gh, git]);
   assert(ok.kind === "ok");
   assertEquals(ok.value.sequence.map(String), ["git", "gh"]);
@@ -121,4 +129,14 @@ proves(["0002-toolchain-governance FR-007"], "a catalog refuses a tool twice, a 
   assert(same.kind === "err" && same.error.some((m) => m.includes("provided by")));
   const provided = defineCatalog([tool({ name: "one", program: "one", provides: ["two"] }), tool({ name: "other", program: "two" })]);
   assert(provided.kind === "err");
+});
+
+proves(["0002-toolchain-governance FR-008"], "a tool holds no version or hash of a pin, only the id of the pin", () => {
+  const t = tool();
+  assertEquals(Object.keys(t).sort(), ["bindings", "env", "name", "needs", "phases", "pin", "program", "provides", "scope", "summary", "versionArgs"]);
+  const pinBinding = t.bindings.find((b) => b.kind === "pin");
+  assertEquals(pinBinding && pinBinding.kind === "pin" ? String(pinBinding.pin) : undefined, "pin-jq");
+  assertEquals(/[0-9a-f]{64}/.test(JSON.stringify(t)), false, "no hash is in the declaration");
+  assertEquals(/https?:\/\//.test(JSON.stringify(t)), false, "no address is in the declaration");
+  assertEquals("version" in t, false);
 });
