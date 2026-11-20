@@ -1,0 +1,27 @@
+@probe
+version=1
+at=2026-11-21T04:11:58Z
+@os
+kernel=Linux
+release=6.18.44-fc-v726
+arch=x86_64
+hostname=vm
+family=ubuntu
+name=Ubuntu 24.04.5 LTS
+version=24.04
+model=
+@hardware
+cpus=4
+memory_mb=16087
+disk_total_gb=251
+disk_used_pct=71
+@security
+disk_encryption=off
+firewall=off
+auto_updates=off
+admins=ubuntu
+@software
+manager=apt
+packages=92
+pending_updates=0
+@listening
