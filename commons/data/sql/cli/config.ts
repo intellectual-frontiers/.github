@@ -20,6 +20,10 @@ import { identityMachineModule } from "@intellectual-frontiers/data/models/ident
 import { identityPkiModule } from "@intellectual-frontiers/data/models/identity-pki";
 import { identityRebacModule } from "@intellectual-frontiers/data/models/identity-rebac";
 import { flowModule } from "@intellectual-frontiers/data/models/flow";
+import { proofModule } from "@intellectual-frontiers/data/models/proof";
+import { operationsModule } from "@intellectual-frontiers/data/models/operations";
+import { contractModule } from "@intellectual-frontiers/data/models/contract";
+import { meaningModule } from "@intellectual-frontiers/data/models/meaning";
 import { issuesModule } from "@intellectual-frontiers/data/models/issues";
 import { projectDomain, type LogicalSchema } from "@intellectual-frontiers/data/sql/logical";
 
@@ -56,6 +60,10 @@ export const modelNames = [
   "identityAgent",
   "issues",
   "flow",
+  "meaning",
+  "contract",
+  "operations",
+  "proof",
 ] as const;
 export type ModelName = (typeof modelNames)[number];
 
@@ -115,6 +123,10 @@ export const allModules = (): readonly Module[] => [
   identityAgentModule,
   issuesModule,
   flowModule,
+  meaningModule,
+  contractModule,
+  operationsModule,
+  proofModule,
 ];
 
 /** The domain of the models a configuration wants, with what they require, and its logical schema. */
