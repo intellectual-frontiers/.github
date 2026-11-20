@@ -1,0 +1,75 @@
+{
+  "generated": "bun commons/libraries/src/releasing.ts apply; do not edit (commons 0001-libraries FR-014)",
+  "releases": [
+    {
+      "slug": "data",
+      "version": "0.9.0",
+      "folder": "commons/data",
+      "tag": "data-v0.9.0",
+      "publish": true
+    },
+    {
+      "slug": "kanon",
+      "version": "0.2.0",
+      "folder": "commons/kanon",
+      "tag": "kanon-v0.2.0",
+      "publish": true
+    },
+    {
+      "slug": "headless",
+      "version": "0.4.1",
+      "folder": "commons/headless",
+      "tag": "headless-v0.4.1",
+      "publish": true
+    },
+    {
+      "slug": "ergonex",
+      "version": "0.4.6",
+      "folder": "commons/ergonex",
+      "tag": "ergonex-v0.4.6",
+      "publish": true
+    },
+    {
+      "slug": "grc",
+      "version": "0.2.1",
+      "folder": "commons/grc",
+      "tag": "grc-v0.2.1",
+      "publish": true
+    },
+    {
+      "slug": "integrations",
+      "version": "0.1.2",
+      "folder": "commons/integrations",
+      "tag": "integrations-v0.1.2",
+      "publish": true
+    },
+    {
+      "slug": "integrations-fhir",
+      "version": "0.1.1",
+      "folder": "commons/integrations-fhir",
+      "tag": "integrations-fhir-v0.1.1",
+      "publish": true
+    },
+    {
+      "slug": "integrations-x12",
+      "version": "0.1.1",
+      "folder": "commons/integrations-x12",
+      "tag": "integrations-x12-v0.1.1",
+      "publish": true
+    },
+    {
+      "slug": "ontology",
+      "version": "0.3.0",
+      "folder": "commons/ontology",
+      "tag": "ontology-v0.3.0",
+      "publish": true
+    },
+    {
+      "slug": "libraries",
+      "version": "0.4.0",
+      "folder": "commons/libraries",
+      "tag": "libraries-v0.4.0",
+      "publish": true
+    }
+  ]
+}
