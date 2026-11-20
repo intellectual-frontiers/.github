@@ -578,3 +578,5 @@ requirement	mechanism	by	note
 0032-lifting-libraries FR-011	review	0032-lifting-libraries FR-011	a reviewer checks the importers of erga and stolos
 0032-lifting-libraries FR-012	check	.github: cd commons/ts && bunx tsc -p tsconfig.json	the compiler fails on any importer of a moved path; commons-lift.test.ts finds no import of a moved module's old path
 0032-lifting-libraries FR-013	check	.github: bun test ./tests/	commons-packages.test.ts: every npm library is packed, its tarball inspected, installed and a consumer of every entry type-checked with tsc 7 under nodenext
+0011-documentation FR-028	check	.github: cd commons/docs && bun run verify	twins.test.ts: every block and inline has a Markdown form, links go to twins, the same page gives the same text; the index for a program; a site is written with a .md beside each .html and llms.txt
+0011-documentation FR-029	check	.github: cd commons/docs && bun run verify	layered-lens.test.ts: the layers page, a page for each model, concept and code list, registers and JSON; links resolve and sources are links to lines; the data models are on commons' own site with no finding

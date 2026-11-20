@@ -55,3 +55,4 @@ number	slug	state
 0054	sql-loads	in force
 0055	sql-introspect	in force
 0056	sql-drivers	in force
+0057	sql-describe	in force

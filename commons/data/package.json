@@ -58,6 +58,7 @@
     "./sql/drivers": "./sql/drivers/mod.ts",
     "./sql/typed": "./sql/typed/mod.ts",
     "./sql/loads": "./sql/loads/mod.ts",
+    "./sql/describe": "./sql/describe/mod.ts",
     "./sql/typed/generate": "./sql/typed/generate.ts",
     "./sql/typed/models": "./sql/typed/models/mod.ts",
     "./sql/presets": "./sql/presets/mod.ts",

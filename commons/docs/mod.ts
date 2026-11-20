@@ -35,12 +35,14 @@ export type {
   SpecKitSource,
 } from "./config.ts";
 export { isAbout, normalDir, resolveConfig, under } from "./config.ts";
-export type { Lens, LensPages } from "./lens.ts";
 export { Build } from "./build.ts";
 export { type Finding, message, type Problem, report } from "./check.ts";
 export type { ApiExport, ApiMember, AreaApi, ExportKind } from "./extract/api.ts";
 export type { Constitution, Enforcement, Spec, SpecKit } from "./extract/specs.ts";
 export type { LinkScope } from "./links.ts";
+export { llmsIndex, markdownOf, twinOf } from "./emit/markdown.ts";
+export type { Layer, LayerElement, LayeredFinding, LayeredModel, LayeredSource, Locate, SourceLocation, TraceEdge } from "./layered.ts";
+export type { Lens, LensPages, SiteFile } from "./lens.ts";
 export type { Badge, Block, Card, Href, Inline, Page, Section, Tab, TreeNode } from "./model.ts";
 export { plain, possessive, slugOf } from "./model.ts";
 export { areaPage, firstSentence } from "./pages/overview.ts";

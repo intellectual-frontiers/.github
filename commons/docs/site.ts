@@ -12,10 +12,11 @@ import { Build } from "./build.ts";
 import type { Finding } from "./check.ts";
 import { type Config, under } from "./config.ts";
 import { document } from "./emit/html.ts";
+import { llmsIndex, markdownOf, twinOf } from "./emit/markdown.ts";
 import { searchIndex } from "./emit/search.ts";
 import { readApi } from "./extract/api.ts";
 import { readSpecKits } from "./extract/specs.ts";
-import type { LensPages } from "./lens.ts";
+import type { LensPages, SiteFile } from "./lens.ts";
 import { type Block, type Card, type Href, type Inline, type Page, possessive, type TreeNode } from "./model.ts";
 import { apiPages, registerApi } from "./pages/api.ts";
 import { areaPages } from "./pages/areas.ts";
@@ -29,6 +30,8 @@ export interface Built {
   readonly pages: readonly Page[];
   /** What was found. */
   readonly found: readonly Finding[];
+  /** The files the lenses added beside the pages (the JSON of a model). */
+  readonly files: readonly SiteFile[];
 }
 
 /** The section home pages for the API and the models, which list the areas and the models. */
@@ -215,7 +218,8 @@ export async function buildSite(config: Config): Promise<Built> {
   homes(b, packages);
   citedBy(b);
   b.found.push(...brokenLinks(b.pages));
-  return { pages: b.pages, found: b.found };
+  const files = config.lenses.flatMap((l) => l.files?.(b) ?? []);
+  return { pages: b.pages, found: b.found, files };
 }
 
 /** The files of the theme (beside this module, in the source and in the package alike) and of Mermaid, and where the site serves them. */
@@ -244,7 +248,15 @@ export async function writeSite(config: Config, built: Built, out: string): Prom
     const file = path.join(out, p.path);
     await fs.ensureDir(path.dirname(file));
     await fs.writeTextFile(file, document(p, site));
+    // the Markdown twin of the page, beside it (FR-028)
+    await fs.writeTextFile(path.join(out, twinOf(p.path)), markdownOf(p));
   }
+  for (const f of [...built.files].sort((a, b) => (a.path < b.path ? -1 : 1))) {
+    const file = path.join(out, f.path);
+    await fs.ensureDir(path.dirname(file));
+    await fs.writeTextFile(file, f.text);
+  }
+  await fs.writeTextFile(path.join(out, "llms.txt"), llmsIndex(config.name, built.pages, built.files.map((f) => [f.path, f.what] as const)));
   for (const [from, to] of assets()) {
     const file = path.join(out, to);
     await fs.ensureDir(path.dirname(file));
