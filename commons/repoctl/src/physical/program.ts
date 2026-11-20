@@ -22,6 +22,7 @@ import { NPM_TOKEN_VARIABLE } from "./adapters.ts";
 import { type Host, traitsOf } from "./define.ts";
 import { checkVerb, doctorVerb, hygieneVerb, statusVerb } from "./verbs/check.ts";
 import { commitVerb, newLibraryVerb } from "./verbs/library.ts";
+import { proveVerb } from "./verbs/prove.ts";
 import { releaseApplyVerb, releasePlanVerb, releasePublishVerb } from "./verbs/releasing.ts";
 import { mergeVerb, syncVerb } from "./verbs/sync.ts";
 
@@ -53,6 +54,7 @@ export function repoctlProgram(host: Host): Program {
     branch({ name: "new", summary: "Make something new in the repository.", children: [newLibraryVerb(host)] }),
     commitVerb(host),
     doctorVerb(host),
+    proveVerb(host),
   ];
   const mcp = command({
     name: "mcp",

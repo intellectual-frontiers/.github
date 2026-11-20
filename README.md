@@ -150,6 +150,49 @@ A comment says what a thing is. It cannot show how a model is layered or what a 
 - **A contributor:** [`AGENTS.md`](AGENTS.md) is the working agreement, and `bun run repoctl` is the command that operates the repository ([`commons/repoctl`](commons/repoctl/about.ts)); the commons specifications are in [`commons/spec-kit/specs/`](commons/spec-kit/specs/) and each library's in its own `spec-kit/`.
 - **An AI agent:** read [`AGENTS.md`](AGENTS.md), then the site's [`llms.txt`](https://intellectual-frontiers.github.io/.github/llms.txt); every page of the site has a Markdown twin (`.md` beside the `.html`), and the models and programs have a JSON twin. `repoctl mcp` serves the repository's operations as tools of a tool server, by audience tier.
 
+## Proof proportional to blast radius
+
+A change proves what it can break, and nothing more. `bun run repoctl prove` classifies each changed file, fingerprints the public type surface of the libraries it touches, and computes a **proof plan**: which tiers apply, which tests run and why every skipped proof is safe to skip. The same plan drives the local run and CI.
+
+```mermaid
+flowchart LR
+  change["working tree vs base"] --> classify["classify each file"]
+  classify --> plan["proof plan"]
+  plan --> t0["T0 static, seconds"]
+  plan --> t1["T1 library suite"]
+  plan --> t2["T2 seam: importers of changed symbols"]
+  plan --> t3["T3 packaging"]
+  plan --> t4["T4 end to end"]
+  plan --> t5["T5 platform"]
+  plan --> t6["T6 release"]
+  plan -. "class needs none / surface unchanged / symbols unused" .-> skip["skipped, with the reason"]
+  t4 -. "main, nightly, release" .-> safety["safety net"]
+  t5 -.-> safety
+  t6 -.-> safety
+```
+
+| The change is | It proves |
+| --- | --- |
+| a comment, TSDoc or prose | the documentation check |
+| specification text, requirement identifiers unchanged | the specification and trace checks |
+| a generated file | `sync --check`: the bytes equal the generators' |
+| a version or the release record | the versions check |
+| inside a library, public types unchanged | T0 and T1 of that library; dependents skip |
+| a public signature | T0 and T2 for the importers of the changed symbols only |
+| a foundation library (`core`, `system`, ...) | its own proofs and a smoke gate, wider only if the gate fails |
+| `exports`, `package.json`, the packer | T3: pack, install, import, type-check |
+| the planner, the generators, the tier rules | everything, always |
+
+This is test impact analysis (what a change can reach, from imports and a fingerprint of declarations) joined with consumer-driven contract testing (a consumer declares what it uses by importing it, and a provider's change reaches only those consumers). Results are content-addressed, so an identical key is never run twice, and the end-to-end flows are hermetic. A nightly full run and the release gate remain the safety net, and a plan never skips for a change to the planner itself.
+
+```sh
+bun run repoctl prove            # prove what your tree changes since origin/main (tiers T0 to T3 that apply)
+bun run repoctl prove --why      # the same, with the reason each proof runs and each skipped proof is safe
+bun run repoctl prove --plan     # the plan as JSON, running nothing (what CI reads)
+```
+
+[How to read a plan, add a test to the right tier and extend a class](https://intellectual-frontiers.github.io/.github/concepts/proof-by-blast-radius.html).
+
 ## Contributing in five commands
 
 ```sh

@@ -217,8 +217,8 @@ proves(
   () => {
     const m = manifest();
     const pins = Object.entries(m.devDependencies);
-    // typescript-7-1 is TypeScript 7.1 under another name, which the docs sources that the root tests reach import (typescript/async)
-    assertEquals(pins.map(([k]) => k).sort(), ["@types/node", "fast-check", "typescript", "typescript-7-1"]);
+    // typescript-7-1 is TypeScript 7.1 under another name, and shiki and beautiful-mermaid are what the docs sources that the root tests reach import (typescript/async, highlighting, diagrams)
+    assertEquals(pins.map(([k]) => k).sort(), ["@types/node", "beautiful-mermaid", "fast-check", "shiki", "typescript", "typescript-7-1"]);
     for (const [name, v] of pins)
       assert(/^(npm:typescript@)?\d+\.\d+\.\d+(-[\w.]+)?$|^\d+\.\d+\.\d+$/.test(v), `${name} is not pinned exactly: ${v}`);
     assert(/^7\./.test(m.devDependencies["typescript"] ?? ""), "TypeScript is 7");

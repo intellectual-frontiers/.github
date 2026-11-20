@@ -56,7 +56,9 @@ export type ProblemCode =
   | "E-HYGIENE-IMPORT"
   | "E-HYGIENE-VENDORED"
   | "E-HYGIENE-DUPLICATE"
-  | "E-HYGIENE-RANGE";
+  | "E-HYGIENE-RANGE"
+  | "E-PROVE-FAILED"
+  | "E-PROVE-QUARANTINE";
 
 /** Every code, in the order the explanations are listed. */
 export const PROBLEM_CODES: readonly ProblemCode[] = [
@@ -99,6 +101,8 @@ export const PROBLEM_CODES: readonly ProblemCode[] = [
   "E-HYGIENE-VENDORED",
   "E-HYGIENE-DUPLICATE",
   "E-HYGIENE-RANGE",
+  "E-PROVE-FAILED",
+  "E-PROVE-QUARANTINE",
 ];
 
 /** Whether a text is one of the codes. */
@@ -341,5 +345,17 @@ export const CATALOGUE: Readonly<Record<ProblemCode, Explained>> = {
     what: "An @intellectual-frontiers dependency is a range, a tag or latest.",
     why: "Commons is installed as one coherent set per release; a range lets two releases meet in one tree.",
     fix: "bun add <package>@<version> --exact",
+  },
+  "E-PROVE-FAILED": {
+    title: "A proof of the plan failed",
+    what: "A proof that `repoctl prove` ran (a type check, a check of the specifications, a suite, a packing) ended with a failure.",
+    why: "The change broke what that proof holds, or the proof is flaky: a failing property test prints its seed.",
+    fix: "repoctl prove --why",
+  },
+  "E-PROVE-QUARANTINE": {
+    title: "A quarantined test is past its expiry, or the record is wrong",
+    what: "`commons/repoctl/quarantine.json` names a test whose expiry day has passed (it runs again), or the record is not a list of entries with a test, an owner, an expiry and a reason.",
+    why: "A quarantine holds a flaky test back for a time and names who fixes it; it never holds one for good.",
+    fix: "fix the test, or renew its entry with a new expiry and a reason",
   },
 };

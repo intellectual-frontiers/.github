@@ -150,6 +150,7 @@ export function renderWorkflow(w: Workflow): string {
     for (const [k, v] of Object.entries(dispatch.inputs))
       out.push(`      ${key(k)}:`, ...entry("description", v.description, 8), ...entry("type", v.type, 8), ...entry("default", v.default, 8));
   }
+  if (w.on.schedule !== undefined && w.on.schedule.length > 0) out.push("  schedule:", ...w.on.schedule.map((c) => `    - cron: ${scalar(c)}`));
   if (w.on.workflowCall === true) out.push("  workflow_call:");
   out.push("");
   if (w.permissions !== undefined) out.push(...permissions(w.permissions, 0), "");
