@@ -454,21 +454,22 @@ proves(["0005-reach-and-targets FR-010"], "a hand-built ssh argument in a consum
 });
 
 proves(["0005-reach-and-targets FR-010"], "no unit of the library imports an ssh library or reads a protocol: the rows of the layers table for targets and for the inbound surface allow the terminal, the system and Core only", async () => {
-  const { externalsOf, TARGETS, SURFACES, layerFindings } = await import("../tools/layers.ts");
-  assertEquals(Object.keys(TARGETS), ["local", "ssh"]);
-  assertEquals(
-    externalsOf({ name: "src/targets/ssh/", class: "target" }).map((a) => a.name),
-    ["@intellectual-frontiers/core", "@intellectual-frontiers/system", "@intellectual-frontiers/terminal"],
-  );
-  assertEquals((SURFACES["ssh-inbound"] ?? []).map((a) => a.name), ["@intellectual-frontiers/core"]);
+  const { decodeTable, importFindings } = await import("@intellectual-frontiers/kanon");
+  const { library } = await import("../library.ts");
+  const decoded = decodeTable(library.kanon);
+  if (decoded.kind === "err") throw new Error(decoded.error);
+  const table = decoded.value;
+  const packages = (folder: string) => (table.units.find((u) => u.folder === folder)?.packages ?? []).map((a) => a.name);
+  assertEquals(table.units.filter((u) => u.folder.startsWith("src/targets/")).map((u) => u.folder), ["src/targets/local/", "src/targets/ssh/"]);
+  assertEquals(packages("src/targets/ssh/"), ["@intellectual-frontiers/core", "@intellectual-frontiers/system", "@intellectual-frontiers/terminal"]);
+  assertEquals(packages("src/surfaces/ssh-inbound/"), ["@intellectual-frontiers/core"]);
   const files = (path: string, spec: string) => [{ path, text: `import { x } from "${spec}";\n` }];
   const exportsMap = { "./logical": "./src/logical/mod.ts", "./cli": "./src/surfaces/cli/mod.ts" };
-  const rules = (path: string, spec: string) => layerFindings(files(path, spec), exportsMap).map((f) => f.rule);
+  const rules = (path: string, spec: string) => importFindings(table, files(path, spec), exportsMap).map((f) => f.rule);
   assertEquals(rules("src/targets/ssh/a.ts", "ssh2"), ["layers/external"]);
   assertEquals(rules("src/targets/ssh/a.ts", "@intellectual-frontiers/telemetry"), ["layers/external"]);
   assertEquals(rules("src/surfaces/ssh-inbound/a.ts", "@intellectual-frontiers/system"), ["layers/external"]);
   assertEquals(rules("src/targets/local/a.ts", "@intellectual-frontiers/headless/cli"), ["layers/around"]);
   assertEquals(rules("src/surfaces/cli/a.ts", "@intellectual-frontiers/headless/logical"), []);
   assertEquals(rules("src/targets/ssh/a.ts", "@intellectual-frontiers/headless/logical"), []);
-  assertEquals(rules("src/targets/other/a.ts", "x"), ["layers/unclassified"]);
 });

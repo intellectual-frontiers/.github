@@ -15,4 +15,66 @@ export const library = {
   exports: [".", "./governance", "./logical", "./cli", "./targets/local", "./targets/ssh", "./ssh-inbound", "./otel"],
   summary:
     "Headless programs as one contract in layers: the governance of an action (kind, effect, audience, confirmation, problems, exit statuses, redaction), the logical layer (the command model, the typed outcome, the closing block, JSON and SARIF, explain, hints, nested runs) and the command-line surface (calm output, prompts, the run log, signals, help, completions, man pages), with an OpenTelemetry adapter of its own.",
+  kanon: {
+    package: "@intellectual-frontiers/headless",
+    units: [
+      { folder: "src/governance/", layer: "governance", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }] },
+      {
+        folder: "src/logical/",
+        layer: "logical",
+        packages: [
+          { name: "@intellectual-frontiers/core", subpaths: [] },
+          { name: "@intellectual-frontiers/terminal", subpaths: ["args", "commands"] },
+        ],
+      },
+      {
+        folder: "src/surfaces/cli/",
+        layer: "physical",
+        mayImport: ["src/governance/", "src/logical/"],
+        packages: [
+          { name: "@intellectual-frontiers/core", subpaths: [] },
+          { name: "@intellectual-frontiers/terminal", subpaths: "any" },
+          { name: "@intellectual-frontiers/system", subpaths: "any" },
+        ],
+      },
+      {
+        folder: "src/surfaces/ssh-inbound/",
+        layer: "physical",
+        mayImport: ["src/governance/", "src/logical/"],
+        packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }],
+      },
+      {
+        folder: "src/targets/local/",
+        layer: "physical",
+        mayImport: ["src/governance/", "src/logical/"],
+        packages: [
+          { name: "@intellectual-frontiers/core", subpaths: [] },
+          { name: "@intellectual-frontiers/system", subpaths: "any" },
+        ],
+      },
+      {
+        folder: "src/targets/ssh/",
+        layer: "physical",
+        mayImport: ["src/governance/", "src/logical/"],
+        packages: [
+          { name: "@intellectual-frontiers/core", subpaths: [] },
+          { name: "@intellectual-frontiers/system", subpaths: "any" },
+          { name: "@intellectual-frontiers/terminal", subpaths: ["args"] },
+        ],
+      },
+      {
+        folder: "src/otel/",
+        layer: "physical",
+        mayImport: ["src/governance/", "src/logical/", "src/surfaces/cli/"],
+        packages: [
+          { name: "@intellectual-frontiers/core", subpaths: [] },
+          { name: "@intellectual-frontiers/telemetry", subpaths: "any" },
+        ],
+      },
+      { folder: "src/", own: true },
+      { folder: "suite/", own: true },
+      { folder: "tools/", own: true },
+      { folder: "./", own: true },
+    ],
+  },
 };

@@ -1,4 +1,5 @@
 // Spec: 0008-exit-style-consent FR-004
+// Spec: 0010-audience-tiers FR-001
 // Spec: 0002-headless-governance FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007
 /**
  * What a headless action is, before any surface draws it (commons headless 0002-headless-governance): its identity, who it is for, what it may
@@ -20,6 +21,7 @@
  */
 import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import type { ReachPolicy } from "./reach.ts";
+import { PUBLIC, type TierName } from "./tier.ts";
 
 /** A report only reads and says what it found; an action changes something. */
 export type Kind = "report" | "action";
@@ -40,6 +42,8 @@ export type ActionFacts = {
   /** Whether running it again with the same input changes nothing more. */
   readonly idempotent: boolean;
   readonly audience: Audience;
+  /** The tier a caller must hold to see and run it (0010-audience-tiers): the lowest tier of the program's ladder unless it says otherwise. */
+  readonly tier: TierName;
   /** Whether `--dry-run` previews what it would change and changes nothing. */
   readonly dryRun: boolean;
   /** Whether `--check` ends with findings where it would change something (a drift check), changing nothing. */
@@ -56,6 +60,7 @@ export type ActionDefinition = {
   readonly effect?: Effect;
   readonly idempotent?: boolean;
   readonly audience?: Audience;
+  readonly tier?: TierName;
   readonly dryRun?: boolean;
   readonly check?: boolean;
   readonly humanOnly?: readonly string[];
@@ -73,6 +78,7 @@ export function defineAction(d: ActionDefinition): ActionFacts {
     effect: d.effect ?? (d.kind === "report" ? "read" : "mutate"),
     idempotent: d.idempotent ?? d.kind === "report",
     audience: d.audience ?? "both",
+    tier: d.tier ?? PUBLIC,
     dryRun: d.dryRun ?? false,
     check: d.check ?? false,
     humanOnly: d.humanOnly ?? [],

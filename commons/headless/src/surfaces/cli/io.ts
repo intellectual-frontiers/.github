@@ -16,7 +16,7 @@
  * @module
  */
 import type { dirs } from "@intellectual-frontiers/system";
-import type { Counts, Problem } from "@intellectual-frontiers/headless/governance";
+import type { Counts, Problem, TierName } from "@intellectual-frontiers/headless/governance";
 import type { ExecutorFor } from "@intellectual-frontiers/headless/logical";
 import type { StateStore } from "./state.ts";
 
@@ -54,6 +54,8 @@ export type RunObserver = {
 
 /** What a run is given about its world. */
 export type Io = {
+  /** The tier the caller holds (0010-audience-tiers): the program's default tier where the surface does not say. */
+  readonly tier?: TierName;
   /** A variable of the environment. */
   readonly env: (name: string) => string | undefined;
   readonly os: dirs.Os;

@@ -4,7 +4,7 @@
  * @module
  */
 import { flag, value } from "@intellectual-frontiers/terminal/args";
-import { problem } from "../src/governance/mod.ts";
+import { problem, type TierName } from "../src/governance/mod.ts";
 import { branch, command, outcomeOf, programOf, startPhase, type Program } from "../src/logical/mod.ts";
 import type { Io, SignalPort, StopSignal, TimerPort } from "../src/surfaces/cli/io.ts";
 import type { StateStore, StoredFile } from "../src/surfaces/cli/state.ts";
@@ -93,6 +93,7 @@ export type WorldOptions = {
   readonly pid?: number;
   readonly observer?: Io["observer"];
   readonly marks?: Io["marks"];
+  readonly tier?: TierName;
 };
 
 /** An `Io` for a test. */
@@ -117,6 +118,7 @@ export function world(o: WorldOptions = {}): Io & { readonly asked: string[] } {
     ...(o.timer === undefined ? {} : { timer: o.timer }),
     ...(o.observer === undefined ? {} : { observer: o.observer }),
     ...(o.marks === undefined ? {} : { marks: o.marks }),
+    ...(o.tier === undefined ? {} : { tier: o.tier }),
   };
 }
 

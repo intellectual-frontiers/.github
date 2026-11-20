@@ -1,7 +1,7 @@
 // Spec: 0001-headless-layers FR-007
 /**
  * The check `bun run verify` runs on the library (commons headless 0001-headless-layers FR-007, commons 0027-commons-libraries FR-006): the trace of its sources and tests
- * to its own specifications (commons 0015-trace) and the layers check of this library (`layers.ts`), their findings held against `trace.baseline.txt`, which only
+ * to its own specifications (commons 0015-trace), its findings held against `trace.baseline.txt`, which only
  * shrinks. It prints the lines of the judgement and exits with 0, or with 1 where a finding is new or a line of the baseline is stale.
  *
  * ```sh
@@ -14,25 +14,21 @@
 import * as kernel from "@intellectual-frontiers/mizan/trace";
 import { fs, path } from "@intellectual-frontiers/system";
 import * as runtime from "@intellectual-frontiers/mizan/host/trace";
-import { type LayerFinding, layerFindings } from "./layers.ts";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
 const BASELINE = "trace.baseline.txt";
 const COMMENTS = [
-  "# The findings of the trace and layers checks of Headless (tools/check.ts) that existed when each was first held.",
+  "# The findings of the trace check of Headless (tools/check.ts) that existed when each was first held.",
   "# A new finding fails the check, and so does a line below that no longer occurs: when you fix one, delete its line.",
   "# Never add a line to make a check pass.",
 ] as const;
 
-/** Every finding of the library at `root`: the trace first, then the layers. */
+/** Every finding of the library at `root`: the trace of its sources and tests to its specifications. The layers are held by the shared checker of Kanon (`bun ../kanon/src/check.ts`, commons 0033-kanon FR-014). */
 export async function findings(root: string): Promise<readonly kernel.Keyed[]> {
-  const pkg = JSON.parse(await fs.readTextFile(path.join(root, "package.json"))) as { exports?: Record<string, string> };
   const sources = await runtime.readSources(root, ["about.ts", "src", "tools"]);
   const tests = await runtime.readSources(root, ["suite"]);
   const specs = await runtime.readSpecs(root, "spec-kit/specs");
-  const traced = kernel.traceFindings({ specs, sources, tests, ontology: [], specsFolder: "spec-kit/specs" });
-  const layered: readonly LayerFinding[] = layerFindings([...sources, ...tests], pkg.exports ?? {});
-  return [...traced, ...layered];
+  return kernel.traceFindings({ specs, sources, tests, ontology: [], specsFolder: "spec-kit/specs" });
 }
 
 /** The command line: the exit status, and what to print. */

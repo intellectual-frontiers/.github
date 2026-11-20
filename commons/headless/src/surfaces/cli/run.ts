@@ -1,5 +1,6 @@
 // Spec: 0004-headless-cli FR-003, FR-004, FR-011, FR-012
 // Spec: 0008-exit-style-consent FR-001, FR-002, FR-003, FR-004
+// Spec: 0010-audience-tiers FR-003, FR-004, FR-006
 /**
  * The run boundary of the command line (commons headless 0004-headless-cli FR-011): `run(program, argv, io)` gives `{ code, out, err }` and touches no
  * process global, so a test, a REPL and a tool that embeds the program all call it the same way. It resolves the words to a command, parses the
@@ -27,6 +28,7 @@ import { formatCommandError, resolveCommand } from "@intellectual-frontiers/term
 import { tty } from "@intellectual-frontiers/system";
 import {
   decide,
+  tierMessage,
   exitCodeOf,
   countsOf,
   exitOfNamed,
@@ -43,6 +45,7 @@ import {
   distinctHints,
   envelopeOf,
   explainText,
+  hiddenVerb,
   isNested,
   jsonText,
   mergeOutcomes,
@@ -58,6 +61,7 @@ import {
   translator,
   treeOf,
   verbosityOf,
+  visibleProgram,
   type Context,
   type Outcome,
   type Placed,
@@ -112,7 +116,10 @@ const asText = (e: unknown): string => (e instanceof Error ? e.message : String(
 type Ended = RunEnd & { readonly out: string; readonly err: string };
 
 /** Runs a program's command line. */
-export async function run(program: Program, argv: readonly string[], io: Io): Promise<RunResult> {
+export async function run(whole: Program, argv: readonly string[], io: Io): Promise<RunResult> {
+  // the caller's tier (0010-audience-tiers): what is drawn and what is resolved is the tree this caller may see, one tree for the help, the completions, the man page and the words
+  const held = io.tier ?? whole.tiers.default;
+  const program = visibleProgram(whole, held);
   const out: string[] = [];
   const err: string[] = [];
   const writeOut = (t: string): void => {
@@ -163,6 +170,11 @@ export async function run(program: Program, argv: readonly string[], io: Io): Pr
   }
 
   const words = argv.length === 0 && program.defaultCommand.length > 0 ? program.defaultCommand : argv;
+  const everything = resolveCommand(treeOf(whole), words);
+  if (!isErr(everything) && everything.value.kind !== "help") {
+    const hidden = hiddenVerb(whole, everything.value.path.slice(1), held);
+    if (hidden !== undefined) return usage(`${tierMessage(hidden.id, hidden.decision)} [${hidden.decision.reason}]`);
+  }
   const resolved = resolveCommand(treeOf(program), words);
   if (isErr(resolved)) return usage(formatCommandError(resolved.error));
   const r = resolved.value;
@@ -252,7 +264,8 @@ async function execute(x: Execution): Promise<Ended> {
     pruneLogs(io.state, dir, io.os, io.now());
     log = new RunLog(io.state, `${dir}${io.os === "windows" ? "\\" : "/"}${logName(io.now(), io.pid)}`, io.now);
   }
-  log?.write("run", `${program.name} ${placed.id} (${program.version}) mode ${x.mode}, ${x.verbosity}`);
+  const from = program.origins[placed.id];
+  log?.write("run", `${program.name} ${placed.id} (${program.version}) mode ${x.mode}, ${x.verbosity}${from === undefined ? "" : `, from ${from}`}`);
   if (x.consent !== undefined) log?.write("consent", `${placed.id} went on by the consent ${redact(x.consent)}`);
   const reporter = new Reporter({
     look: x.look,

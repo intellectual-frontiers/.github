@@ -15,6 +15,7 @@
  * @module
  */
 export * from "./closing.ts";
+export * from "./compose.ts";
 export * from "./envelope.ts";
 export * from "./executor.ts";
 export * from "./explain.ts";
@@ -28,3 +29,4 @@ export * from "./program.ts";
 export * from "./redaction.ts";
 export * from "./remote.ts";
 export * from "./verbosity.ts";
+export * from "./visibility.ts";
