@@ -1,0 +1,5 @@
+number	slug	state
+0001	package-managers-layers	in force
+0002	package-managers-governance	in force
+0003	package-managers-logical	in force
+0004	package-managers-dialect	in force

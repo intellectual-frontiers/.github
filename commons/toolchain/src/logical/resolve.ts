@@ -2,7 +2,7 @@
 /**
  * The resolution of tools: each tool wanted, and each tool those need, to the first dialect of the fleet's preference that can carry it out here: it has a binding for the tool on the platform
  * (the download a pin of the ontology gives, or the packages of the dialect's manager), reaches the platform and the scope, pins at least as exactly as the tool and the fleet's control ask for,
- * meets the control, and does not build from source. A tool that no dialect can carry out is refused with every dialect and the reason it was not chosen. The version and the checksums of a
+ * meets the control, and does not build from source unless the fleet has approved source builds. A tool that no dialect can carry out is refused with every dialect and the reason it was not chosen. The version and the checksums of a
  * pin are never in the catalog: a `PinSource` gives them, and the adapter over the packaging ontology is one.
  *
  * @example
@@ -27,6 +27,8 @@ export type Context = {
   readonly integrity: Controls["toolIntegrity"];
   /** Whether a copy found on the path may be taken at the least version a tool states. */
   readonly systemCopy: "minimum" | "never";
+  /** Whether the fleet has approved a dialect that can build from source (in Git, as a person approves anything); `refuse` where not stated, so that what is installed is only what a publisher released. */
+  readonly sourceBuild?: "refuse" | "approved";
 };
 
 /** Where the downloads of pins come from: the version, the address, the SHA-256, the format and the folder of a pin on a platform, or the reason it has none. */
@@ -56,7 +58,7 @@ type Chosen = { readonly source: Source; readonly version: string | undefined };
 /** Why a dialect cannot carry out a tool here, or what it would carry out. */
 function tryDialect(tool: Tool, d: ToolDialect, pins: PinSource, ctx: Context): Chosen | { readonly reason: string } {
   const g = d.guarantees;
-  if (g.sourceBuild) return { reason: "it can build from source, and only what a publisher released is installed" };
+  if (g.sourceBuild && ctx.sourceBuild !== "approved") return { reason: "it can build from source, and only what a publisher released is installed unless the fleet approves source builds" };
   if (!g.platforms.includes(ctx.platform)) return { reason: `it cannot reach ${ctx.platform}` };
   if (!g.scopes.includes(tool.scope)) return { reason: `it cannot install in the ${tool.scope} scope` };
   const required = pinRank(tool.pin) > pinRank(pinOfControl(ctx.integrity)) ? tool.pin : pinOfControl(ctx.integrity);

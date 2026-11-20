@@ -155,6 +155,10 @@ proves(["0003-toolchain-logical FR-004"], "a tool no dialect can carry out is re
   assert(builder.kind === "err");
   const b = builder.error[0];
   assert(b?.kind === "unexpressed" && b.reasons[0]?.reason.includes("build from source"));
+  const approved = resolveTools(catalog(), ["jq"], [BUILDER], PINS, { ...CTX, preference: [id("builder")], sourceBuild: "approved" });
+  assert(approved.kind === "ok" && approved.value.entries[0]?.dialect === id("builder"), "a fleet that approved source builds may use a dialect that can build");
+  const refused = resolveTools(catalog(), ["jq"], [BUILDER], PINS, { ...CTX, preference: [id("builder")], sourceBuild: "refuse" });
+  assert(refused.kind === "err");
   const zed = defineCatalog([tool("zed", { bindings: [{ kind: "package", manager: "manager-apt", packages: ["zed"] }], scope: "user" })]);
   assert(zed.kind === "ok");
   const scope = resolveTools(zed.value, ["zed"], [APT], PINS, { ...CTX, preference: [id("apt")] });

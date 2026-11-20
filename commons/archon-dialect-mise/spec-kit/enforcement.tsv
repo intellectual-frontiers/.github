@@ -1,0 +1,12 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-mise-layers FR-001	check	.github: cd commons/archon-dialect-mise && bun run verify	suite/layers.test.ts
+0001-mise-layers FR-002	check	.github: cd commons/archon-dialect-mise && bun run verify	suite/layers.test.ts
+0001-mise-layers FR-003	check	.github: cd commons/archon-dialect-mise && bun run verify	suite/layers.test.ts
+0001-mise-layers FR-004	check	.github: cd commons/archon-dialect-mise && bun run verify	suite/layers.test.ts
+0001-mise-layers FR-005	check	.github: cd commons/archon-dialect-mise && bun run verify	suite/layers.test.ts
+0002-mise-dialect FR-001	check	.github: cd commons/archon-dialect-mise && bun run verify	suite/dialect.test.ts
+0002-mise-dialect FR-002	check	.github: cd commons/archon-dialect-mise && bun run verify	suite/dialect.test.ts
+0002-mise-dialect FR-003	check	.github: cd commons/archon-dialect-mise && bun run verify	suite/dialect.test.ts
+0002-mise-dialect FR-004	check	.github: cd commons/archon-dialect-mise && bun run verify	suite/dialect.test.ts
