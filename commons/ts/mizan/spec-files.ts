@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { existsSync, readDirSync, readTextFileSync } from "../runtime/fs.ts";
+import { existsSync, readDirSync, readTextFileSync } from "@intellectual-frontiers/system/fs";
 import type { SpecText } from "./rules.ts";
 
 /** The specifications of a folder (`root/specs/NNNN-slug/spec.md`, and `plan.md` where there is one), in the order of their names. */

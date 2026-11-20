@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { fs, path, proc } from "../commons/ts/runtime/mod.ts";
+import { fs, path, proc } from "../commons/system/src/mod.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../commons/ts/runtime/test.ts";
 import { inspectPackage } from "../commons/ts/tools/pack-library.ts";
 import { readLibraries } from "../commons/ts/mizan/libraries.ts";
@@ -144,7 +144,10 @@ proves(
                 strict: true,
                 noEmit: true,
                 skipLibCheck: false,
-                types: [],
+                // a package whose declarations name Node's asks for `@types/node` as a peer: the consumer has it (the one this repository's tools use)
+                ...(published.some((q) => obj(q.manifest["peerDependencies"])["@types/node"] !== undefined)
+                  ? { types: ["node"], typeRoots: [path.join(ROOT, "commons", "ts", "node_modules", "@types")] }
+                  : { types: [] }),
               },
               include: ["consumer.ts"],
             },

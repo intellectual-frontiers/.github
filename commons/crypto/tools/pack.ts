@@ -13,7 +13,7 @@
  */
 import process from "node:process";
 import { main } from "@intellectual-frontiers/commons/ts/tools/pack-library";
-import { path } from "@intellectual-frontiers/commons/ts/runtime";
+import { path } from "@intellectual-frontiers/system";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
 

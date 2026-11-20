@@ -21,8 +21,8 @@
  * @module
  */
 import { formatBaseline, judge, parseBaseline, parseSpec, report, type Finding, type SourceFile, type Spec } from "../kernel/trace.ts";
-import { ensureDir, listDirs, readTextOr, walkFiles, writeTextFile } from "./fs.ts";
-import { dirname, join } from "./path.ts";
+import { ensureDir, listDirs, readTextOr, walkFiles, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { dirname, join } from "@intellectual-frontiers/system/path";
 
 /** The specifications of a folder (`<folder>/NNN-slug/spec.md`, and `reviewed.tsv` where there is one), in the order of their names. */
 export async function readSpecs(root: string, folder = "specs"): Promise<readonly Spec[]> {

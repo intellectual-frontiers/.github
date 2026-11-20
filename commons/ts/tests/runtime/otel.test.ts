@@ -24,10 +24,10 @@ import {
 import { decodeTraces, encodeTraces, type LogBatch, type MetricBatch, type TraceBatch } from "../../kernel/otlp.ts";
 import { ok } from "@intellectual-frontiers/core";
 import { batchProcessor, defineSignals, memoryProcessor } from "../../kernel/signals.ts";
-import { withTempDir, writeTextFile } from "../../runtime/fs.ts";
+import { withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { liveTransport } from "../../runtime/http-client.ts";
-import { join } from "../../runtime/path.ts";
-import * as proc from "../../runtime/proc.ts";
+import { join } from "@intellectual-frontiers/system/path";
+import * as proc from "@intellectual-frontiers/system/proc";
 import { serve, type Server } from "../../runtime/serve.ts";
 import {
   asyncContextManager,

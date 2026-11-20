@@ -15,9 +15,9 @@ import { definitionsOf, termDefinedByFindings } from "../mizan/spec-terms.ts";
 import { checkVersions } from "../mizan/versions.ts";
 import { decodeReleaseSource, releaseSource } from "../mizan/versions/record.ts";
 import { recordFindings } from "../mizan/versions/judge.ts";
-import { existsSync, mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "../runtime/fs.ts";
-import { dirname, join } from "../runtime/path.ts";
-import { run as spawn } from "../runtime/proc.ts";
+import { existsSync, mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { dirname, join } from "@intellectual-frontiers/system/path";
+import { run as spawn } from "@intellectual-frontiers/system/proc";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
 import { needsGit } from "./quality-fixtures.ts";
 

@@ -9,8 +9,8 @@ import { allowedSignersLine } from "../quality/assessor/verify-pack.ts";
 import { keepRun } from "../quality/host/branch.ts";
 import { appendEvents } from "../quality/host/ledger-branch.ts";
 import { attest, emptyLedger, openNonconformance } from "../quality/pure/ledger.ts";
-import { mkdir, writeTextFile } from "../runtime/fs.ts";
-import { join } from "../runtime/path.ts";
+import { mkdir, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { join } from "@intellectual-frontiers/system/path";
 import { assert } from "../runtime/test.ts";
 import { assembledRun, git, repositoryWithCommit } from "./quality-fixtures.ts";
 

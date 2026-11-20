@@ -34,7 +34,7 @@ import { appendEvents, readLedger } from "../quality/host/ledger-branch.ts";
 import { evidenceOfLedger, gradeOfEvidence } from "../quality/pure/ladder.ts";
 import { attest } from "../quality/pure/ledger.ts";
 import { RUN_GRADE, gradeRank } from "../quality/pure/names.ts";
-import { makeTempDir, remove } from "../runtime/fs.ts";
+import { makeTempDir, remove } from "@intellectual-frontiers/system/fs";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
 import { assembledRun, needsGit, repositoryWithCommit } from "./quality-fixtures.ts";
 

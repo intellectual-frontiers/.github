@@ -13,10 +13,10 @@ import { type ExporterConfig, type OtelConfig, SEVERITY, type SignalName, signal
 import { formatDecodeError, err, ok } from "@intellectual-frontiers/core";
 import { decodeLogs, decodeMetrics, decodeTraces, type LogBatch, type MetricBatch, type TraceBatch } from "../../kernel/otlp.ts";
 import { createTelemetry, defineSignals, memoryProcessor } from "../../kernel/signals.ts";
-import { readTextFile, withTempDir, writeTextFile } from "../../runtime/fs.ts";
+import { readTextFile, withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { otlpExporter, systemClock, systemRandom } from "../../runtime/otel.ts";
-import { join } from "../../runtime/path.ts";
-import * as proc from "../../runtime/proc.ts";
+import { join } from "@intellectual-frontiers/system/path";
+import * as proc from "@intellectual-frontiers/system/proc";
 import { assert, assertEquals, proves } from "../../runtime/test.ts";
 
 const FR = "0006-signals FR-020";

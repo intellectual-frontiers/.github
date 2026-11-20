@@ -7,7 +7,7 @@
  */
 import { array, integer, nullable, object, string } from "@intellectual-frontiers/core";
 import { sign } from "@intellectual-frontiers/crypto/sigv4";
-import { exists, readTextFile, withTempDir, writeTextFile } from "../../runtime/fs.ts";
+import { exists, readTextFile, withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
 import {
   bearer,
   carriesCredential,
@@ -25,8 +25,8 @@ import {
   withBackoff,
   withSigV4,
 } from "../../runtime/http-client.ts";
-import { acquireLock, describeHolder, processRuns, readHolder } from "../../runtime/lock.ts";
-import { join } from "../../runtime/path.ts";
+import { acquireLock, describeHolder, processRuns, readHolder } from "@intellectual-frontiers/system/lock";
+import { join } from "@intellectual-frontiers/system/path";
 import { serve, type ServeHandler } from "../../runtime/serve.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../../runtime/test.ts";
 import process from "node:process";

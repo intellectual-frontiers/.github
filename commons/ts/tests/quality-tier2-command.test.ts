@@ -6,9 +6,9 @@
  *
  * @module
  */
-import { makeTempDir, readTextFile, remove, writeTextFile } from "../runtime/fs.ts";
-import { dirname, fromFileUrl, join, resolve } from "../runtime/path.ts";
-import { execPath, run } from "../runtime/proc.ts";
+import { makeTempDir, readTextFile, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { dirname, fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
+import { execPath, run } from "@intellectual-frontiers/system/proc";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
 import { needsGit } from "./quality-fixtures.ts";
 import { demoEvidence, demoRepository, MARKER } from "./quality-trust-fixtures.ts";

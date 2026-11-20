@@ -24,9 +24,9 @@ import { dayOf, decodeHarnessRecord, relaxations } from "../mizan/changes/declar
 import { declarationHistory, readRange } from "../mizan/changes/git-log.ts";
 import { commitFindings, relaxationFindings } from "../mizan/changes/rules.ts";
 import { askHost, NO_HOST_API } from "../mizan/changes/strict.ts";
-import { mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "../runtime/fs.ts";
-import { dirname, fromFileUrl, join, resolve } from "../runtime/path.ts";
-import { execPath, run, which } from "../runtime/proc.ts";
+import { mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { dirname, fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
+import { execPath, run, which } from "@intellectual-frontiers/system/proc";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
 
 const HERE = dirname(fromFileUrl(import.meta.url));

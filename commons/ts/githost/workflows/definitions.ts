@@ -120,6 +120,14 @@ export const LIBRARY_CI: Readonly<Record<string, LibraryCi>> = {
     nodeTests: 'node --test "suite/**/*.test.ts"',
     systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
   },
+  system: {
+    comment: lines(
+      "System, the host as one typed library (files, paths, processes, Git, scheduled jobs and the terminal's streams), a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the specification checker, the trace, its tests and the",
+      "package with the inspection of its declarations) on Bun and its tests on Node 26, on Windows, macOS and Linux, because the package runs on all three.",
+    ).trimEnd(),
+    nodeTests: 'node --test "suite/**/*.test.ts"',
+    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
+  },
   formats: {
     comment: lines(
       "Formats, a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the specification checker, the trace, its tests and the packing of its",
@@ -313,10 +321,10 @@ const ifcTypescript: Workflow = {
       steps: [
         checkout(),
         bun(),
-        tools("commons/ts"),
-        run("bun test tests/runtime/compile.test.ts", {
+        tools("commons/system"),
+        run("bun test suite/compile.test.ts", {
           name: "Built for this computer, with an embedded file, and run",
-          workingDirectory: "commons/ts",
+          workingDirectory: "commons/system",
           shell: "bash",
         }),
         run(
@@ -325,7 +333,7 @@ const ifcTypescript: Workflow = {
             'mkdir -p "$RUNNER_TEMP/cross"',
             `printf 'console.log("ok");\\n' >"$RUNNER_TEMP/cross/hello.ts"`,
             "bun -e '",
-            '  import { compile, describeCompileError } from "./runtime/compile.ts";',
+            '  import { compile, describeCompileError } from "./src/compile.ts";',
             '  const r = await compile({ entry: process.argv[1], outfile: process.argv[2], target: "windows-x64", bunVersion: process.argv[3] });',
             '  if (r.kind === "err") { console.error(describeCompileError(r.error)); process.exit(1); }',
             "  console.log(r.value.path, r.value.sha256);",
@@ -335,7 +343,7 @@ const ifcTypescript: Workflow = {
           {
             name: "Built for Windows from Linux, by the pinned Bun alone",
             when: "runner.os == 'Linux'",
-            workingDirectory: "commons/ts",
+            workingDirectory: "commons/system",
             shell: "bash",
           },
         ),

@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { stdio } from "@intellectual-frontiers/commons/ts/runtime";
+import { stdio } from "@intellectual-frontiers/system";
 /** `stdio.stderr`. */
 export const stderr = stdio.stderr;
 /** `stdio.stdin`. */

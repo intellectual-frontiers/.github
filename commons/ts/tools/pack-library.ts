@@ -20,10 +20,10 @@
  *
  * @module
  */
-import { chmod, readTextFile, writeTextFile } from "../runtime/fs.ts";
-import { existsSync, mkdirSync, readDirSync, readTextFileSync, removeSync, writeTextFileSync } from "../runtime/fs.ts";
-import { basename, dirname, join, relative, resolve, toPosix } from "../runtime/path.ts";
-import { run, which } from "../runtime/proc.ts";
+import { chmod, readTextFile, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { existsSync, mkdirSync, readDirSync, readTextFileSync, removeSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { basename, dirname, join, relative, resolve, toPosix } from "@intellectual-frontiers/system/path";
+import { run, which } from "@intellectual-frontiers/system/proc";
 
 /** The scope of the packages of commons. */
 export const SCOPE = "@intellectual-frontiers";
@@ -275,6 +275,18 @@ function commonsPaths(commons: string, dist: string): Record<string, readonly st
 export type Packed = { readonly stage: string; readonly tarball: string | undefined; readonly findings: Findings; readonly manifest: Json };
 
 /** What a package adds to the common form. */
+/** Whether a declaration of the package names a `node:` module: a package whose types name Node's needs `@types/node` where it is type-checked (a peer dependency, FR-013 of 0032-lifting-libraries). */
+function namesNodeTypes(folder: string): boolean {
+  if (!existsSync(folder)) return false;
+  for (const e of readDirSync(folder)) {
+    const p = join(folder, e.name);
+    if (e.isDirectory) {
+      if (namesNodeTypes(p)) return true;
+    } else if (e.name.endsWith(".d.ts") && /(?:from\s+|import\()"node:/.test(readTextFileSync(p))) return true;
+  }
+  return false;
+}
+
 export type PackOptions = {
   /** Types the compiler is given (`["node"]` for a library that names Node's). */
   readonly types?: readonly string[];
@@ -454,6 +466,7 @@ export async function packLibrary(root: string, options: PackOptions = {}): Prom
     ...(Object.keys(dependencies).length === 0
       ? {}
       : { dependencies: Object.fromEntries(Object.entries(dependencies).sort(([a], [b]) => (a < b ? -1 : 1))) }),
+    ...(namesNodeTypes(join(stage, "dist")) ? { peerDependencies: { "@types/node": ">=26" } } : {}),
     files: [
       ...(Object.keys(exportsOut).length === 0 ? [] : ["dist"]),
       ...(bundle === undefined ? ["src"] : []),

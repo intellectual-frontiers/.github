@@ -39,9 +39,9 @@ import {
   type Result,
 } from "@intellectual-frontiers/core";
 import { exportedLiteral } from "@intellectual-frontiers/formats/ts-literal";
-import { existsSync, readDirSync, readTextFileSync, writeTextFileSync } from "../runtime/fs.ts";
-import { stdio } from "../runtime/mod.ts";
-import { spawn } from "../runtime/proc.ts";
+import { existsSync, readDirSync, readTextFileSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { stdio } from "@intellectual-frontiers/system";
+import { spawn } from "@intellectual-frontiers/system/proc";
 import { DEFAULT_LIBRARY_LEVEL, LEVELS, type LevelKey, rankOf } from "./levels.ts";
 
 /** The name of a library's manifest in its folder. */

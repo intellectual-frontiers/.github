@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { fs, path, proc } from "../../ts/runtime/mod.ts";
+import { fs, path, proc } from "@intellectual-frontiers/system";
 import { assert, assertEquals, proves } from "../../ts/runtime/test.ts";
 import { message, report } from "../check.ts";
 import { document } from "../emit/html.ts";

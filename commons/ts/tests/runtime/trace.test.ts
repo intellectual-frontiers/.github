@@ -5,8 +5,8 @@
  * @module
  */
 import { traceFindings } from "../../kernel/trace.ts";
-import { mkdir, readTextFile, withTempDir, writeTextFile } from "../../runtime/fs.ts";
-import { join } from "../../runtime/path.ts";
+import { mkdir, readTextFile, withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { join } from "@intellectual-frontiers/system/path";
 import { holdBaseline, posixPath, readSources, readSpecs } from "../../runtime/trace.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../../runtime/test.ts";
 

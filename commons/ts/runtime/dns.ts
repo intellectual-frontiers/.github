@@ -2,9 +2,7 @@
  * Names on the network (commons 0005-typescript-runtime FR-056). `resolveDns` asks for `A`, `AAAA`, `CNAME`, `MX`, `NS`, `TXT` and `SRV`
  * records, with the records in these shapes (`MX` as `{ preference, exchange }`, `TXT` as each record's
  * strings, `SRV` as `{ priority, weight, port, target }`), and answers with a `Result` whose error says whether the name does not exist,
- * has no such record, or could not be asked: a name that does not resolve is an expected outcome, not an exception. `networkInterfaces`
- * gives each interface's name, family, address, netmask and whether it is internal; the process module gives it as
- * `proc.networkInterfaces()`.
+ * has no such record, or could not be asked: a name that does not resolve is an expected outcome, not an exception.
  *
  * The question is asked here, over `node:dgram` (and `node:net` where the answer is too long for UDP), not through `node:dns`: the two
  * runtimes' `node:dns` can disagree on exactly what this must tell apart (Bun reports a name without the record as one that does not exist),
@@ -28,7 +26,6 @@
 import { getServers } from "node:dns";
 import * as dgram from "node:dgram";
 import * as net from "node:net";
-import * as os from "node:os";
 import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 
 /** The record types that can be asked for. */
@@ -422,44 +419,4 @@ export async function resolveDns<T extends RecordType>(
     }
   }
   return err(last);
-}
-
-/** One address of one network interface. */
-export type NetworkInterfaceInfo = {
-  /** The interface's name (`lo`, `eth0`, `en0`, `Ethernet`). */
-  readonly name: string;
-  /** The address's family. */
-  readonly family: "IPv4" | "IPv6";
-  /** The address. */
-  readonly address: string;
-  /** Its netmask. */
-  readonly netmask: string;
-  /** The address with its prefix length (`127.0.0.1/8`), where known. */
-  readonly cidr: string | null;
-  /** The IPv6 scope, where there is one. */
-  readonly scopeid: number | null;
-  /** The hardware address (`00:00:00:00:00:00` where there is none). */
-  readonly mac: string;
-  /** Whether it is internal (a loopback), not reachable from outside. */
-  readonly internal: boolean;
-};
-
-/** Every address of every network interface of this computer (`proc.networkInterfaces()`). */
-export function networkInterfaces(): readonly NetworkInterfaceInfo[] {
-  const out: NetworkInterfaceInfo[] = [];
-  for (const [name, infos] of Object.entries(os.networkInterfaces())) {
-    for (const i of infos ?? []) {
-      out.push({
-        name,
-        family: net.isIPv6(i.address) ? "IPv6" : "IPv4",
-        address: i.address,
-        netmask: i.netmask,
-        cidr: i.cidr,
-        scopeid: i.family === "IPv6" ? i.scopeid : null,
-        mac: i.mac,
-        internal: i.internal,
-      });
-    }
-  }
-  return out;
 }

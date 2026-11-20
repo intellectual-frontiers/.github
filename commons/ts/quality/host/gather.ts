@@ -14,8 +14,8 @@
 import { instantOf } from "../../kernel/grc.ts";
 import type { Declaration } from "../../mizan/changes/declaration.ts";
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import { existsSync, readTextFile } from "../../runtime/fs.ts";
-import { join } from "../../runtime/path.ts";
+import { existsSync, readTextFile } from "@intellectual-frontiers/system/fs";
+import { join } from "@intellectual-frontiers/system/path";
 import { chainFiles, requirementLine, type SourceText, testsOf } from "../pure/chain-files.ts";
 import { type Cadences, DEFAULT_CADENCES, freshnessOf } from "../pure/freshness.ts";
 import type { IndexRun } from "../pure/index-file.ts";

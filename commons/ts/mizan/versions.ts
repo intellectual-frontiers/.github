@@ -29,10 +29,10 @@ import {
   suggest,
   value,
 } from "@intellectual-frontiers/terminal/args";
-import { existsSync, readTextFileSync, sha256File, writeTextFileSync } from "../runtime/fs.ts";
-import { formatGitError } from "../runtime/git.ts";
-import { join, resolve } from "../runtime/path.ts";
-import { stdio } from "../runtime/mod.ts";
+import { existsSync, readTextFileSync, sha256File, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { formatGitError } from "@intellectual-frontiers/system/git";
+import { join, resolve } from "@intellectual-frontiers/system/path";
+import { stdio } from "@intellectual-frontiers/system";
 import { dayOf, decodeHarnessRecord, type Declaration, formatRecordError } from "./changes/declaration.ts";
 import { citationOf } from "./versions/cite.ts";
 import { releaseGate } from "./versions/gate.ts";

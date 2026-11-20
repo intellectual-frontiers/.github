@@ -11,9 +11,9 @@
  * @module
  */
 import { decodeManifest } from "./manifest.ts";
-import { existsSync, makeTempDir, mkdir, readDirSync, readTextFileSync, remove, writeTextFile } from "../runtime/fs.ts";
-import { dirname, fromFileUrl, join, resolve, toFileUrl } from "../runtime/path.ts";
-import { args, execPath, exit, run, runtimeName, which } from "../runtime/proc.ts";
+import { existsSync, makeTempDir, mkdir, readDirSync, readTextFileSync, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { dirname, fromFileUrl, join, resolve, toFileUrl } from "@intellectual-frontiers/system/path";
+import { args, execPath, exit, run, runtimeName, which } from "@intellectual-frontiers/system/proc";
 
 const NAME = "@intellectual-frontiers/commons";
 

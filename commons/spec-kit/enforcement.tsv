@@ -74,11 +74,11 @@ requirement	mechanism	by	note
 0005-typescript-runtime FR-016	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: the development dependencies are exact, the lockfile agrees, no run-time dependency
 0005-typescript-runtime FR-017	check	.github: cd commons/ts && npx tsc -p tsconfig.json	tsc 7 with the strict configuration on every file; boundaries.test.ts checks that TypeScript is 7
 0005-typescript-runtime FR-018	gate	.github: .github/workflows/ifc-typescript.auto.yml	the CI matrix: tsc 7 on both configurations, the suite on Bun (the default) and Node 26 (the backup), on Linux, macOS and Windows
-0005-typescript-runtime FR-019	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/fs.test.ts: each Node error code becomes its class with code, path and cause; NotFound, AlreadyExists, IsADirectory, AddrInUse are thrown where the host refuses
-0005-typescript-runtime FR-020	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/fs.test.ts: every call on a real temporary folder, the refusals, Stolos's helpers
-0005-typescript-runtime FR-021	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/proc.test.ts: both platforms' rules and file URLs
-0005-typescript-runtime FR-022	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/proc.test.ts: the environment, the platform's names, which, a program with its input and output, lines, NotFound, abort
-0005-typescript-runtime FR-023	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/net.test.ts: the look for each environment, terminal detection, raw mode refused without a terminal
+0005-typescript-runtime FR-019	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-001
+0005-typescript-runtime FR-020	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-002
+0005-typescript-runtime FR-021	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-003
+0005-typescript-runtime FR-022	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-009
+0005-typescript-runtime FR-023	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-018
 0005-typescript-runtime FR-024	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/net.test.ts: classification, waits, Retry-After, retries against a local server, resume with Range, the SHA-256 check
 0005-typescript-runtime FR-025	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/net.test.ts: a real server on a free port: bodies, cookies, HEAD, a handler that throws, AddrInUse, shutdown by signal
 0005-typescript-runtime FR-026	gate	.github: .github/workflows/ifc-typescript.auto.yml	the jobs take Bun's version from commons/generated/pins.auto.env; boundaries.test.ts: no npm, Prettier, ESLint, dprint or Vitest dependency
@@ -94,7 +94,7 @@ requirement	mechanism	by	note
 0005-typescript-runtime FR-036	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-005
 0005-typescript-runtime FR-037	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-016
 0005-typescript-runtime FR-038	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-002
-0005-typescript-runtime FR-039	check	.github: cd commons/ts && bun test tests/	runtime/client.test.ts: taken, refused, waited for, timed out, taken over from a dead holder and an unreadable file, inherited, released twice
+0005-typescript-runtime FR-039	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-015
 0005-typescript-runtime FR-040	check	.github: cd commons/ts && bun test tests/	runtime/client.test.ts: against a local server: decoded reads, denials, statuses, credentials refused and allowed, read-only, backoff with Retry-After and the cap, Link and cursor paging, recorded exchanges
 0005-typescript-runtime FR-047	review	0032-lifting-libraries FR-010	kept by the library terminal: terminal 0001-terminal FR-001
 0005-typescript-runtime FR-041	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-009
@@ -102,13 +102,13 @@ requirement	mechanism	by	note
 0005-typescript-runtime FR-044	review	0032-lifting-libraries FR-010	kept by the library crypto: crypto 0001-crypto FR-005
 0005-typescript-runtime FR-045	review	0032-lifting-libraries FR-010	kept by the library crypto: crypto 0001-crypto FR-006
 0005-typescript-runtime FR-043	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-012
-0005-typescript-runtime FR-048	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/fs-more.test.ts: readDir async, chown, symlinkSync
-0005-typescript-runtime FR-049	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/fs-more.test.ts: file handles, seek, streams, using
-0005-typescript-runtime FR-050	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/fs-more.test.ts: copy and walk
-0005-typescript-runtime FR-051	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/watch.test.ts: events joined, recursive, stopped by abort
-0005-typescript-runtime FR-052	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/spawn.test.ts: streams in and out, kill, status, NotFound
-0005-typescript-runtime FR-053	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/spawn.test.ts: ppid, build.target, unrefTimer, selfCommand
-0005-typescript-runtime FR-054	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/stdio.test.ts and console.test.ts: machine output, and the two writers
+0005-typescript-runtime FR-048	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-004
+0005-typescript-runtime FR-049	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-005
+0005-typescript-runtime FR-050	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-006
+0005-typescript-runtime FR-051	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-016
+0005-typescript-runtime FR-052	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-010
+0005-typescript-runtime FR-053	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-011
+0005-typescript-runtime FR-054	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-019
 0005-typescript-runtime FR-055	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/tcp.test.ts: listen, connect, TLS with a test certificate
 0005-typescript-runtime FR-056	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/dns.test.ts: resolution and its errors, network interfaces
 0005-typescript-runtime FR-057	review	0032-lifting-libraries FR-010	kept by the library crypto: crypto 0001-crypto FR-002
@@ -116,7 +116,7 @@ requirement	mechanism	by	note
 0005-typescript-runtime FR-059	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-011
 0005-typescript-runtime FR-060	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test.test.ts: only, steps and the three asserts
 0005-typescript-runtime FR-061	check	.github: cd commons/ts && node --test tests/**/*.test.ts	lint/*.test.ts: each rule against code it refuses and accepts, through bun lint
-0005-typescript-runtime FR-062	check	.github: .github/workflows/ifc-typescript.auto.yml compile job	CI builds a small program on each system and runs it; runtime/compile.test.ts checks the arguments
+0005-typescript-runtime FR-062	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-013
 0005-typescript-runtime FR-063	review	0032-lifting-libraries FR-010	kept by the library formats: formats 0001-formats FR-007
 0005-typescript-runtime FR-064	review	0032-lifting-libraries FR-010	kept by the library core: core 0001-core FR-006
 0005-typescript-runtime FR-065	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test.test.ts: the gives back the value narrowed, and fails on null and undefined
@@ -125,10 +125,10 @@ requirement	mechanism	by	note
 0005-typescript-runtime FR-068	review	0032-lifting-libraries FR-010	kept by the library crypto: crypto 0001-crypto FR-004
 0005-typescript-runtime FR-069	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/client.test.ts: a SigV4 transport signs each request to a recorded server, and the live transport still refuses it unless allowed
 0005-typescript-runtime FR-070	check	.github: cd commons/ts && node --test tests/**/*.test.ts	node/register.test.ts: a .ts under node_modules runs on Node 26 with the hook and is refused without it, a file outside is left to Node, the URL's segments decide (Windows' too), and the commands ifc and ifc-docs register it first; runtime/test-run.test.ts: node --test is given it
-0005-typescript-runtime FR-071	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/discover.test.ts: programs found by prefix on a given path, first wins, directories and unrunnable files skipped, Windows PATHEXT
+0005-typescript-runtime FR-071	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-012
 0005-typescript-runtime FR-072	review	0032-lifting-libraries FR-010	kept by the library terminal: terminal 0001-terminal FR-002
-0005-typescript-runtime FR-073	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/fs.test.ts: a folder linked as a junction is read through it (on Windows, without administrator rights)
-0005-typescript-runtime FR-046	check	.github: cd commons/ts && bun test tests/	kernel/schedule.test.ts and runtime/schedule.test.ts: exact units, plist and .cmd per OS, quoting round trips against reference splitters, every schedule kind read back, refusals; install and remove into a temporary home with a fake runner (CI runs them on Linux, macOS and Windows)
+0005-typescript-runtime FR-073	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-007
+0005-typescript-runtime FR-046	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-017
 0005-typescript-runtime FR-074	check	.github: cd commons/ts && node --test tests/**/*.test.ts	node/linked-library.test.ts: Bun installs a link: dependency on commons/ts as a symbolic link to it and a file: dependency as a copy, and a lockfile with the link installs the same link again
 0005-typescript-runtime FR-075	check	.github: cd commons/ts && node --test tests/**/*.test.ts	node/linked-library.test.ts: a program of a project that links commons/ts imports the kernel by package name and runs on the runtime running the test with no hook; a copy is refused on Node and runs on Bun; the compiler checks it
 0005-typescript-runtime FR-076	check	.github: cd commons/ts && node --test tests/**/*.test.ts	node/linked-library.test.ts: a library imports its own modules by its package name through exports, and a file that exports does not name is refused by the runtime and by the compiler
@@ -180,7 +180,7 @@ requirement	mechanism	by	note
 0007-grc FR-018	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/compliance-formats.test.ts: CycloneDX declarations and in-toto statements
 0007-grc FR-019	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/grc-signals.test.ts: a pack's run as spans and OCSF log records, the same result as the kernel's run
 0007-grc FR-020	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/sign.test.ts: ssh-keygen -Y sign and verify (where ssh-keygen is), Web Crypto DSSE
-0007-grc FR-021	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/git.test.ts: HEAD, cleanliness, changed paths and files at a revision in a temporary repository
+0007-grc FR-021	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-014
 0007-grc FR-022	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/grc.test.ts: loaders from TOML, YAML, JSON and JSON5, errors naming file and path
 0008-test-evidence FR-001	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test.test.ts: a test's record with its outcome, values, risk and attempt
 0008-test-evidence FR-002	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test.test.ts: a test span and log record with the test.* conventions
@@ -606,6 +606,7 @@ requirement	mechanism	by	note
 0027-commons-libraries FR-105	check	.github: cd commons/terminal && bun run verify	commons/terminal: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-106	check	.github: cd commons/crypto && bun run verify	commons/crypto: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-107	check	.github: cd commons/formats && bun run verify	commons/formats: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-108	check	.github: cd commons/system && bun run verify	commons/system: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0028-conformance-levels FR-001	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: Mizan's ontology holds the four levels with ranks 0 to 3, each entailing what it and the levels below it add
 0028-conformance-levels FR-002	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: every requirement is added by exactly one level and names a rule or says what else proves it
 0028-conformance-levels FR-003	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: L0 adds a manifest, a verify command and a version
@@ -642,10 +643,10 @@ requirement	mechanism	by	note
 0030-generated-workflows FR-007	none	-	Planned, Phase 2 of the per-library CI plan: the planner and the gate are not built yet
 0030-generated-workflows FR-008	check	.github: cd commons/ts && bun test tests/	githost-workflows.test.ts: the composite action is written with the line that says it is generated, and --check compares it
 0030-generated-workflows FR-009	check	.github: cd commons/ts && bun test tests/	githost-workflows.test.ts: a library with npm among its registries is given a workflow that runs on its tag, checks the version, packs it and sends it to npm with provenance and no token and to GitHub with its own token; none for a library with no npm; a library with npm and no tools/pack.ts is a finding
-0031-install-locations FR-001	check	.github: cd commons/ts && bun test tests/	runtime/dirs.test.ts: the folders on Linux, macOS and Windows from the environment, with the home, the app data folders and the binary folder
-0031-install-locations FR-002	check	.github: cd commons/ts && bun test tests/	runtime/dirs.test.ts: an XDG variable is honored where it is an absolute path, on Windows too, and ignored where it is not
-0031-install-locations FR-003	check	.github: cd commons/ts && bun test tests/	runtime/dirs.test.ts: macOS gives the folders Linux gives and never ~/Library
-0031-install-locations FR-004	check	.github: cd commons/ts && bun test tests/	runtime/dirs.test.ts: no home and no variable give undefined folders
+0031-install-locations FR-001	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-008
+0031-install-locations FR-002	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-008
+0031-install-locations FR-003	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-008
+0031-install-locations FR-004	review	0032-lifting-libraries FR-010	kept by the library system: 0001-system FR-008
 0031-install-locations FR-005	check	.github: cd commons/ergonex && bun test suite/	ergonex-locations.test.ts: Ergonex's state record, evidence and lock are in the state folder and its tools in the data folder, nothing is written below the user's home, no folder or command file of its own is made; ergonex-onboarding.test.ts: init writes no command file
 0031-install-locations FR-006	check	.github: cd commons/ergonex && bun test suite/	ergonex-install.test.ts: the Windows installer installs its prerequisites with winget by package identifier and downloads nothing; the Linux and macOS one asks Bun's own installer
 0031-install-locations FR-007	none	-	Planned: a WinGet manifest, as typed code made into YAML, comes with the first release that has a binary

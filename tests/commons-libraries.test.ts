@@ -9,7 +9,7 @@
  * @module
  */
 import { cpSync, existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
-import { fs, path, proc } from "../commons/ts/runtime/mod.ts";
+import { fs, path, proc } from "../commons/system/src/mod.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../commons/ts/runtime/test.ts";
 import { check, message } from "../commons/tools/mizan-check.ts";
 import { manifestFindings, synchronize } from "../commons/ts/mizan/libraries.ts";

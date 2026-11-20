@@ -6,7 +6,8 @@
  *
  * @module
  */
-import { path, trace } from "@intellectual-frontiers/commons/ts/runtime";
+import { path } from "@intellectual-frontiers/system";
+import { trace } from "@intellectual-frontiers/commons/ts/runtime";
 import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 import {
   annotationsOf,

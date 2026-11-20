@@ -1,0 +1,43 @@
+{
+  "name": "@intellectual-frontiers/system",
+  "private": true,
+  "version": "0.1.0",
+  "description": "The host system as one typed library: files, paths, the folders of a program, one run at a time, file watching, programs found by prefix, processes and their streams, Git, a program built into one binary, the operating system's scheduled jobs, and the terminal's streams; the same code on Bun and Node 26.",
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "exports": {
+    ".": "./src/mod.ts",
+    "./errors": "./src/errors.ts",
+    "./fs": "./src/fs.ts",
+    "./path": "./src/path.ts",
+    "./dirs": "./src/dirs.ts",
+    "./lock": "./src/lock.ts",
+    "./watch": "./src/watch.ts",
+    "./discover": "./src/discover.ts",
+    "./proc": "./src/proc.ts",
+    "./git": "./src/git.ts",
+    "./compile": "./src/compile.ts",
+    "./schedule": "./src/schedule.ts",
+    "./job-plan": "./src/job-plan.ts",
+    "./tty": "./src/tty.ts",
+    "./stdio": "./src/stdio.ts"
+  },
+  "scripts": {
+    "check": "tsc -p tsconfig.json",
+    "test": "bun test suite/",
+    "test:node": "node --test \"suite/**/*.test.ts\"",
+    "verify": "tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../ts/mizan/check.ts --root spec-kit --level L1 && bun tools/check.ts && bun test suite/ && bun tools/pack.ts --check",
+    "pack": "bun tools/pack.ts"
+  },
+  "devDependencies": {
+    "@intellectual-frontiers/commons": "link:../ts",
+    "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/crypto": "link:../crypto",
+    "@intellectual-frontiers/formats": "link:../formats",
+    "@types/node": "26.6.6",
+    "fast-check": "4.10.2",
+    "typescript": "7.0.2"
+  }
+}

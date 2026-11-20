@@ -27,10 +27,10 @@
  * @module
  */
 import process from "node:process";
-import { existsSync, readDirSync, readTextFileSync } from "../runtime/fs.ts";
-import { dirname, join, normalize, resolve, toPosix } from "../runtime/path.ts";
-import { stdio } from "../runtime/mod.ts";
-import { run } from "../runtime/proc.ts";
+import { existsSync, readDirSync, readTextFileSync } from "@intellectual-frontiers/system/fs";
+import { dirname, join, normalize, resolve, toPosix } from "@intellectual-frontiers/system/path";
+import { stdio } from "@intellectual-frontiers/system";
+import { run } from "@intellectual-frontiers/system/proc";
 import { type Library, readLibraries } from "./libraries.ts";
 
 /** What a library reads: its folder, the folders and files it takes from others, what it depends on, and the files it imports one by one. */

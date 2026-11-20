@@ -5,7 +5,7 @@
  * encryption (as `cms`), signed in-toto statements (as `dsse`) and AWS Signature Version 4 (as `sigv4`); CBOR (as `cbor`), COSE keys (as `cose`)
  * and WebAuthn verification for a relying party (as `webauthn`); PNG and ICO pictures (as `png`);
  * archives, JSON5, TOML, YAML, CSV, XML and TypeScript literals; HTTP headers and media types; graphs; command-line arguments (as `args`) and command trees (as `commands`);
- * OS scheduled jobs planned (as `jobs`); the trace of requirements and the layers of a ladder (as `trace` and `layers`, commons 0015-trace);
+ * the trace of requirements and the layers of a ladder (as `trace` and `layers`, commons 0015-trace);
  * and type-level tests.
  *
  * @example
@@ -46,7 +46,6 @@ export * as oscal from "./oscal.ts";
 export * as otel from "./otel.ts";
 export * as otlp from "./otlp.ts";
 export * as render from "./render.ts";
-export * as jobs from "./schedule.ts";
 export * as layers from "./layers.ts";
 export * as signals from "./signals.ts";
 export * as testRecord from "./test-record.ts";

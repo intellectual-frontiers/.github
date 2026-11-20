@@ -12,8 +12,8 @@ import { archiveBranch, oldestEvidenceDay, tagTarget } from "../quality/host/arc
 import { branchTip, keepRun, verifyBranch } from "../quality/host/branch.ts";
 import { readDeclaration } from "../quality/host/declaration.ts";
 import { addDays, judgeRetention, showRetention, tagNameProblem } from "../quality/pure/retention.ts";
-import { makeTempDir, remove, writeTextFile } from "../runtime/fs.ts";
-import { join } from "../runtime/path.ts";
+import { makeTempDir, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { join } from "@intellectual-frontiers/system/path";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
 import { assembledRun, git, needsGit, repositoryWithCommit } from "./quality-fixtures.ts";
 

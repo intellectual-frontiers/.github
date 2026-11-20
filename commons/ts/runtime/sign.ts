@@ -30,10 +30,10 @@ import { type DsseAlgorithm, type DsseEnvelope, pae, signatureAlgorithm } from "
 import type { Sign, VerifySignature } from "../kernel/evidence.ts";
 import { fromHex } from "@intellectual-frontiers/formats/hex";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
-import { NotFound } from "./errors.ts";
-import { exists, withTempDir, writeFile } from "./fs.ts";
-import { join } from "./path.ts";
-import { output } from "./proc.ts";
+import { NotFound } from "@intellectual-frontiers/system/errors";
+import { exists, withTempDir, writeFile } from "@intellectual-frontiers/system/fs";
+import { join } from "@intellectual-frontiers/system/path";
+import { output } from "@intellectual-frontiers/system/proc";
 
 // ---------------------------------------------------------------------------------------------------------------------------- the interface
 

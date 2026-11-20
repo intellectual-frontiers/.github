@@ -12,7 +12,7 @@
  * @module
  */
 import { andThen, err, ok, type Result } from "@intellectual-frontiers/core";
-import { errors, fs } from "@intellectual-frontiers/commons/ts/runtime";
+import { errors, fs } from "@intellectual-frontiers/system";
 
 /** Half of an even number, or why not. */
 export const half = (n: number): Result<number, string> => (n % 2 === 0 ? ok(n / 2) : err(`${n} is odd`));

@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { path } from "@intellectual-frontiers/commons/ts/runtime";
+import { path } from "@intellectual-frontiers/system";
 /** `path.basename`. */
 export const basename = path.basename;
 /** `path.delimiter`. */

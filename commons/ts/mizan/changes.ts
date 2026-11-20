@@ -26,11 +26,11 @@ import process from "node:process";
 import type { GitHostClient, RepoRef } from "../githost/types.ts";
 import { formatBaseline, judge, parseBaseline, passes, report } from "../kernel/trace.ts";
 import { readRecord } from "../kernel/test-report.ts";
-import { existsSync, readDirSync, readTextFileSync, writeTextFileSync } from "../runtime/fs.ts";
-import { formatGitError } from "../runtime/git.ts";
-import { cwd } from "../runtime/proc.ts";
-import { join, relative, resolve } from "../runtime/path.ts";
-import { stdio } from "../runtime/mod.ts";
+import { existsSync, readDirSync, readTextFileSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { formatGitError } from "@intellectual-frontiers/system/git";
+import { cwd } from "@intellectual-frontiers/system/proc";
+import { join, relative, resolve } from "@intellectual-frontiers/system/path";
+import { stdio } from "@intellectual-frontiers/system";
 import {
   capabilityTrace,
   type CapabilityTraceResult,

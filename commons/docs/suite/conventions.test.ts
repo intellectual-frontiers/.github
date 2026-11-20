@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { fs, path } from "../../ts/runtime/mod.ts";
+import { fs, path } from "@intellectual-frontiers/system";
 import { assert, assertEquals, proves } from "../../ts/runtime/test.ts";
 import { ROOT } from "./helpers.ts";
 

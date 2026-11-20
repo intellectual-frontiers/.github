@@ -6,7 +6,7 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import { exists, readTextFile } from "../../runtime/fs.ts";
+import { exists, readTextFile } from "@intellectual-frontiers/system/fs";
 import { type Collected, trustInputOf } from "../assessor/host.ts";
 import type { Audience, RedactionRules } from "./audience.ts";
 import { trustHtml } from "./html.ts";

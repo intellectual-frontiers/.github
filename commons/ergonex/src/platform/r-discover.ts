@@ -4,6 +4,6 @@
  *
  * @module
  */
-import { discover } from "@intellectual-frontiers/commons/ts/runtime";
+import { discover } from "@intellectual-frontiers/system";
 /** `discover.discoverPrograms`. */
 export const discoverPrograms = discover.discoverPrograms;

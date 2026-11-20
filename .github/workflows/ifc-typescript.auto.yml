@@ -135,11 +135,11 @@ jobs:
       - uses: ./.github/actions/bun
       - name: "The development tools, from bun.lock"
         run: bun install --frozen-lockfile
-        working-directory: commons/ts
+        working-directory: commons/system
       - name: "Built for this computer, with an embedded file, and run"
         shell: bash
-        run: bun test tests/runtime/compile.test.ts
-        working-directory: commons/ts
+        run: bun test suite/compile.test.ts
+        working-directory: commons/system
       - name: "Built for Windows from Linux, by the pinned Bun alone"
         if: "runner.os == 'Linux'"
         shell: bash
@@ -148,13 +148,13 @@ jobs:
           mkdir -p "$RUNNER_TEMP/cross"
           printf 'console.log("ok");\n' >"$RUNNER_TEMP/cross/hello.ts"
           bun -e '
-            import { compile, describeCompileError } from "./runtime/compile.ts";
+            import { compile, describeCompileError } from "./src/compile.ts";
             const r = await compile({ entry: process.argv[1], outfile: process.argv[2], target: "windows-x64", bunVersion: process.argv[3] });
             if (r.kind === "err") { console.error(describeCompileError(r.error)); process.exit(1); }
             console.log(r.value.path, r.value.sha256);
           ' "$RUNNER_TEMP/cross/hello.ts" "$RUNNER_TEMP/cross/hello" "$v"
           test -f "$RUNNER_TEMP/cross/hello.exe"
-        working-directory: commons/ts
+        working-directory: commons/system
 
   # commons 0005-typescript-runtime FR-030 and 0011-documentation FR-022: the commit checked, installed into an empty project by a
   # git+file: URL of this checkout, as a consumer installs it by github:intellectual-frontiers/.github#<commit>, and used there.

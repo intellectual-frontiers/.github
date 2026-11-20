@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { proc } from "@intellectual-frontiers/commons/ts/runtime";
+import { proc } from "@intellectual-frontiers/system";
 /** `proc.build`. */
 export const build = proc.build;
 /** `proc.cwd`. */

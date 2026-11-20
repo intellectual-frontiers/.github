@@ -49,9 +49,19 @@ import {
   verifyEvidence,
 } from "../kernel/test-report.ts";
 import { closeOrphans, decodeLines, formatRecordError, installationFromEnv, type RunnerOutcome } from "../kernel/test-record.ts";
-import { exists, makeTempDir, mkdir, readFile, readTextFile, remove, stat, walkFiles, writeTextFile } from "./fs.ts";
-import { basename, dirname, join, resolve } from "./path.ts";
-import { build, env, execPath, output, runtimeName, runtimeVersion, which } from "./proc.ts";
+import {
+  exists,
+  makeTempDir,
+  mkdir,
+  readFile,
+  readTextFile,
+  remove,
+  stat,
+  walkFiles,
+  writeTextFile,
+} from "@intellectual-frontiers/system/fs";
+import { basename, dirname, join, resolve } from "@intellectual-frontiers/system/path";
+import { build, env, execPath, output, runtimeName, runtimeVersion, which } from "@intellectual-frontiers/system/proc";
 
 /** A runtime whose runner a run uses. */
 export type Runtime = "bun" | "node";

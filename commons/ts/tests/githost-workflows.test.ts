@@ -8,8 +8,8 @@ import { ACTIONS, LIBRARY_CI, PIN, workflows } from "../githost/workflows/defini
 import { expr, job, type Permissions, run, use, validateAction, validateWorkflow, type Workflow } from "../githost/workflows/model.ts";
 import { renderAction, renderWorkflow, scalar } from "../githost/workflows/render.ts";
 import { readLibraries } from "../mizan/libraries.ts";
-import { existsSync, mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "../runtime/fs.ts";
-import { fromFileUrl, join, resolve } from "../runtime/path.ts";
+import { existsSync, mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
 import { main, outputs, synchronize } from "../tools/generate-workflows.ts";
 

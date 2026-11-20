@@ -5,8 +5,8 @@
  * @module
  */
 import { controls } from "../../ontology/standards/nist-sp-800-53/controls.auto.ts";
-import { dirname, fromFileUrl, resolve } from "../runtime/path.ts";
-import { execPath, run } from "../runtime/proc.ts";
+import { dirname, fromFileUrl, resolve } from "@intellectual-frontiers/system/path";
+import { execPath, run } from "@intellectual-frontiers/system/proc";
 import { assertEquals, proves } from "../runtime/test.ts";
 import { manifest } from "../mizan/imports/nist-sp-800-53.import.ts";
 

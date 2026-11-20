@@ -25,7 +25,7 @@
  */
 import * as net from "node:net";
 import * as tls from "node:tls";
-import { ConnectionAborted, InvalidData, mapError, TimedOut, toError } from "./errors.ts";
+import { ConnectionAborted, InvalidData, mapError, TimedOut, toError } from "@intellectual-frontiers/system/errors";
 import type { NetAddr } from "./serve.ts";
 
 export type { NetAddr } from "./serve.ts";

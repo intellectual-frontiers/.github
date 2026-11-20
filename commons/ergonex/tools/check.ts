@@ -11,7 +11,8 @@
  * @module
  */
 import { trace as kernel } from "@intellectual-frontiers/commons/ts/kernel";
-import { fs, path, trace as runtime } from "@intellectual-frontiers/commons/ts/runtime";
+import { fs, path } from "@intellectual-frontiers/system";
+import { trace as runtime } from "@intellectual-frontiers/commons/ts/runtime";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
 const BASELINE = "trace.baseline.txt";

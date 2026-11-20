@@ -18,7 +18,7 @@
  */
 import { fileURLToPath } from "node:url";
 import process from "node:process";
-import { stdio } from "../runtime/mod.ts";
+import { stdio } from "@intellectual-frontiers/system";
 import { packagingTerms } from "../../ontology/audit/mod.ts";
 import {
   audienceModels,

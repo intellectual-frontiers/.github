@@ -13,9 +13,9 @@
  */
 import process from "node:process";
 import { pathToFileURL } from "node:url";
-import { dirname, resolve } from "../../../runtime/path.ts";
-import { existsSync, readTextFileSync, writeTextFileSync } from "../../../runtime/fs.ts";
-import { stdio } from "../../../runtime/mod.ts";
+import { dirname, resolve } from "@intellectual-frontiers/system/path";
+import { existsSync, readTextFileSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { stdio } from "@intellectual-frontiers/system";
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { importJsonSchema } from "../pure/import-json-schema.ts";
 import { importOscalCatalog } from "../pure/import-oscal-catalog.ts";

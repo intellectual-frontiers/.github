@@ -17,8 +17,8 @@
  *
  * @module
  */
-import { readDirSync, readTextFileSync } from "../../runtime/fs.ts";
-import { join } from "../../runtime/path.ts";
+import { readDirSync, readTextFileSync } from "@intellectual-frontiers/system/fs";
+import { join } from "@intellectual-frontiers/system/path";
 import type { WorkFile } from "./plugin.ts";
 import { RECORD_FILE } from "./record.ts";
 

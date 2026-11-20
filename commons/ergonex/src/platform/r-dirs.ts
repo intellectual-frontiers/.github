@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { dirs } from "@intellectual-frontiers/commons/ts/runtime";
+import { dirs } from "@intellectual-frontiers/system";
 /** `dirs.dirsOf`. */
 export const dirsOf = dirs.dirsOf;
 /** `dirs.homeOf`. */

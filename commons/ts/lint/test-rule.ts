@@ -18,9 +18,9 @@
  */
 import { fileURLToPath } from "node:url";
 import { array, integer, json, nullable, object, string, err, ok, type Result } from "@intellectual-frontiers/core";
-import { makeTempDir, mkdir, readTextFile, realPath, remove, writeTextFile } from "../runtime/fs.ts";
-import { dirname, join, relative } from "../runtime/path.ts";
-import { env, run } from "../runtime/proc.ts";
+import { makeTempDir, mkdir, readTextFile, realPath, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { dirname, join, relative } from "@intellectual-frontiers/system/path";
+import { env, run } from "@intellectual-frontiers/system/proc";
 
 /** The Bun whose `lint` runs ESLint plugins, until a release has it (FR-028). */
 export const LINT_BUN_VERSION = "1.4.4-canary.20261115.1";

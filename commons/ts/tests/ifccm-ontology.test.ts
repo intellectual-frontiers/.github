@@ -7,8 +7,8 @@
  * @module
  */
 import { validate } from "@intellectual-frontiers/rdf";
-import { readTextFileSync } from "../runtime/fs.ts";
-import { dirname, fromFileUrl, resolve } from "../runtime/path.ts";
+import { readTextFileSync } from "@intellectual-frontiers/system/fs";
+import { dirname, fromFileUrl, resolve } from "@intellectual-frontiers/system/path";
 import { assert, assertEquals, proves, test } from "../runtime/test.ts";
 import { bases } from "../../ontology/mizan/mod.ts";
 import {

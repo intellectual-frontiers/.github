@@ -15,7 +15,7 @@
  * @module
  */
 import { API } from "typescript/async";
-import { fs, path } from "../../ts/runtime/mod.ts";
+import { fs, path } from "@intellectual-frontiers/system";
 import { type DocComment, docOf, type DocTag, moduleComment } from "../tsdoc.ts";
 
 /** What an export is. */

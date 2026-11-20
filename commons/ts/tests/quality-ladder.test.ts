@@ -9,8 +9,8 @@
  */
 import { GENESIS } from "../kernel/evidence.ts";
 import { decodeMetrics } from "../kernel/otlp.ts";
-import { readTextFileSync } from "../runtime/fs.ts";
-import { dirname, fromFileUrl, join, resolve } from "../runtime/path.ts";
+import { readTextFileSync } from "@intellectual-frontiers/system/fs";
+import { dirname, fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
 import { DEFAULT_CADENCES, freshnessOf } from "../quality/pure/freshness.ts";
 import {

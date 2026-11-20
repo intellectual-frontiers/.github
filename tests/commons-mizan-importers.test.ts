@@ -7,7 +7,7 @@
  *
  * @module
  */
-import { fs, path, proc } from "../commons/ts/runtime/mod.ts";
+import { fs, path, proc } from "../commons/system/src/mod.ts";
 import { assert, assertEquals, proves } from "../commons/ts/runtime/test.ts";
 import { sha256 } from "../commons/crypto/src/sha256.ts";
 import { importJsonSchema, readJsonLd, readRdfXml, type Read } from "../commons/ts/mizan/integrations/mod.ts";

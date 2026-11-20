@@ -29,8 +29,8 @@ export const about: About = {
     },
     {
       path: "runtime/",
-      what: "The host: files, paths, processes, the network, serving, typed errors, OpenTelemetry export, the terminal, signing, Git and GRC.",
-      mayImport: ["node: builtins", "kernel/", "runtime/"],
+      what: "What is left of the host: the network, serving, OpenTelemetry export, the console, signing and GRC (files, paths, processes, Git, locks and the terminal's streams are the library `system`, imported by package name).",
+      mayImport: ["node: builtins", "kernel/", "runtime/", "the lifted libraries, by package name"],
     },
     {
       path: "runtime/test.ts",

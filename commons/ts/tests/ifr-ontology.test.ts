@@ -9,9 +9,9 @@
 import { existsSync } from "node:fs";
 import process from "node:process";
 import { triplesOf, turtle, validate } from "@intellectual-frontiers/rdf";
-import { readTextFileSync } from "../runtime/fs.ts";
-import { dirname, fromFileUrl, resolve } from "../runtime/path.ts";
-import * as proc from "../runtime/proc.ts";
+import { readTextFileSync } from "@intellectual-frontiers/system/fs";
+import { dirname, fromFileUrl, resolve } from "@intellectual-frontiers/system/path";
+import * as proc from "@intellectual-frontiers/system/proc";
 import { assert, assertEquals, proves } from "../runtime/test.ts";
 import { termRecordsOf } from "../mizan/check.ts";
 import { wanted } from "../mizan/generate-ontology.ts";

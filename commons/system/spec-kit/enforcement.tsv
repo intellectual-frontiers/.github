@@ -1,0 +1,23 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-system FR-001	check	.github: cd commons/system && bun test suite/	fs.test.ts: each Node error code becomes its class with code, path and cause
+0001-system FR-002	check	.github: cd commons/system && bun test suite/	fs.test.ts: every call on a real temporary folder, the refusals
+0001-system FR-003	check	.github: cd commons/system && bun test suite/	proc.test.ts: both platforms' rules and file URLs
+0001-system FR-004	check	.github: cd commons/system && bun test suite/	fs-more.test.ts: readDir async, chown, symlinkSync
+0001-system FR-005	check	.github: cd commons/system && bun test suite/	fs-more.test.ts: file handles, seek, streams, using
+0001-system FR-006	check	.github: cd commons/system && bun test suite/	fs-more.test.ts: copy and walk
+0001-system FR-007	check	.github: cd commons/system && bun test suite/	fs.test.ts: a folder linked as a junction is read through it
+0001-system FR-008	check	.github: cd commons/system && bun test suite/	dirs.test.ts: the folders on Linux, macOS and Windows from the environment, the XDG variables honored, macOS as Linux, no home no folder
+0001-system FR-009	check	.github: cd commons/system && bun test suite/	proc.test.ts: the environment, the platform's names, which, a program with its input and output
+0001-system FR-010	check	.github: cd commons/system && bun test suite/	the library's tests of spawn: streams in and out, kill, status, NotFound
+0001-system FR-011	check	.github: cd commons/system && bun test suite/	the library's tests of spawn: ppid, build.target, unrefTimer, selfCommand
+0001-system FR-012	check	.github: cd commons/system && bun test suite/	discover.test.ts: programs found by prefix, first wins, shadowed ones kept with why
+0001-system FR-013	check	.github: cd commons/system && bun test suite/	compile.test.ts: the arguments and a small program built and run
+0001-system FR-014	check	.github: cd commons/system && bun test suite/	git.test.ts: HEAD, cleanliness, changed paths and files at a revision in a temporary repository
+0001-system FR-015	check	.github: cd commons/ts && bun test tests/	the lock's tests in commons' suite: one run at a time, the holder named, a stale lock
+0001-system FR-016	check	.github: cd commons/system && bun test suite/	watch.test.ts: events joined, recursive, stopped by abort
+0001-system FR-017	check	.github: cd commons/system && bun test suite/	job-plan.test.ts and schedule.test.ts: exact units, plist and .cmd per OS, quoting round trips
+0001-system FR-018	check	.github: cd commons/ts && bun test tests/	the console's tests of commons' suite: whether a stream is a terminal, raw mode, colour, emoji and width
+0001-system FR-019	check	.github: cd commons/ts && bun test tests/	the standard streams' tests of commons' suite: stdin, stdout and stderr as streams, bytes or text
+0001-system FR-020	check	.github: cd commons/system && bun run verify	the package is built, inspected and packed by tools/pack.ts; tests/commons-packages.test.ts installs the tarball and runs every entry on Node 26 and Bun and type-checks a consumer

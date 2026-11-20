@@ -80,6 +80,7 @@ import {
   type Source,
   type Telemetry,
 } from "../kernel/signals.ts";
+import { setProcessTracer } from "@intellectual-frontiers/system/proc";
 
 /** The longest a probe of the default endpoint waits for an answer (FR-015). */
 export const PROBE_TIMEOUT_MS = 150;
@@ -885,6 +886,9 @@ export function traceProcess<T extends { readonly code: number }>(
     })
     .then(carried);
 }
+
+// The system's process runner traces its programs through this module's pipeline once the module is loaded (commons 0032-lifting-libraries: the system does not import the telemetry).
+setProcessTracer(traceProcess);
 
 function portOf(url: URL): number | undefined {
   if (url.port !== "") return Number(url.port);

@@ -8,10 +8,10 @@
  * @module
  */
 import fc from "fast-check";
-import { withTempDir, writeTextFile } from "../../runtime/fs.ts";
-import { join } from "../../runtime/path.ts";
-import * as proc from "../../runtime/proc.ts";
-import { stdinOf } from "../../runtime/stdio.ts";
+import { withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { join } from "@intellectual-frontiers/system/path";
+import * as proc from "@intellectual-frontiers/system/proc";
+import { stdinOf } from "@intellectual-frontiers/system/stdio";
 import { assert, assertEquals, proves } from "../../runtime/test.ts";
 
 const FR = "0005-typescript-runtime FR-054";
@@ -85,7 +85,7 @@ proves([FR], "for any chunking of the input and any buffer size, read and then t
 
 const CHILD = `
 import process from "node:process";
-import { stdin, stdout, stderr } from "${url("../../runtime/stdio.ts")}";
+import { stdin, stdout, stderr } from "${url("../../../system/src/stdio.ts")}";
 const mode = process.argv[2];
 if (mode === "whole") {
   const request = JSON.parse(await stdin.text());
@@ -114,7 +114,7 @@ const PROGRESS = `
 import { createTelemetry, defineSignals } from "${url("../../kernel/signals.ts")}";
 import { ok } from "${url("../../../core/src/mod.ts")}";
 import { consoleProcessor } from "${url("../../runtime/console.ts")}";
-import { stdout } from "${url("../../runtime/stdio.ts")}";
+import { stdout } from "${url("../../../system/src/stdio.ts")}";
 const registry = defineSignals({ step: { signal: "span", role: "step", attributes: { target: "string" } } });
 let t = 1700000000000000000n;
 const telemetry = createTelemetry({

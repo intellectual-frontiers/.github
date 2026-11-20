@@ -6,7 +6,8 @@
  * @module
  */
 import { trace } from "@intellectual-frontiers/commons/ts/kernel";
-import { path, trace as runtime } from "@intellectual-frontiers/commons/ts/runtime";
+import { path } from "@intellectual-frontiers/system";
+import { trace as runtime } from "@intellectual-frontiers/commons/ts/runtime";
 import { assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");

@@ -36,7 +36,7 @@ import * as ifccmOntology from "../../ontology/ifccm/mod.ts";
 import * as ifrOntology from "../../ontology/ifr/mod.ts";
 import * as ifqsOntology from "../../ontology/ifqs/mod.ts";
 import { formatRdfFinding, type OntologyFile, validate } from "@intellectual-frontiers/rdf";
-import { stdio } from "../runtime/mod.ts";
+import { stdio } from "@intellectual-frontiers/system";
 import { exportDcat } from "./integrations/pure/export-dcat.ts";
 import {
   CC0,

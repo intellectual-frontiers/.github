@@ -8,7 +8,7 @@
  *
  * @module
  */
-import { makeTempDir, remove } from "../runtime/fs.ts";
+import { makeTempDir, remove } from "@intellectual-frontiers/system/fs";
 import { assert, assertEquals, proves } from "../runtime/test.ts";
 import { keepRun } from "../quality/host/branch.ts";
 import { appendEvents, readLedger } from "../quality/host/ledger-branch.ts";

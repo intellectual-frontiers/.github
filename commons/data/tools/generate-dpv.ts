@@ -14,7 +14,7 @@
  */
 import { formatCsvError, parseCsvRecords } from "@intellectual-frontiers/formats";
 import { sha256 } from "@intellectual-frontiers/crypto";
-import { fs, path } from "@intellectual-frontiers/commons/ts/runtime";
+import { fs, path } from "@intellectual-frontiers/system";
 
 /** Where the CSV is, and which version. */
 export const SOURCE = "https://w3c-cg.github.io/dpv/2.3/pd/pd.csv";

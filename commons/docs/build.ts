@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { fs, path } from "../ts/runtime/mod.ts";
+import { fs, path } from "@intellectual-frontiers/system";
 import type { Finding } from "./check.ts";
 import type { Config } from "./config.ts";
 import type { SpecKit } from "./extract/specs.ts";

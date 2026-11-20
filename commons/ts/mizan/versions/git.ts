@@ -20,11 +20,11 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import { readTextFile } from "../../runtime/fs.ts";
-import { NotFound } from "../../runtime/errors.ts";
-import { type GitError } from "../../runtime/git.ts";
-import { join } from "../../runtime/path.ts";
-import { output } from "../../runtime/proc.ts";
+import { readTextFile } from "@intellectual-frontiers/system/fs";
+import { NotFound } from "@intellectual-frontiers/system/errors";
+import { type GitError } from "@intellectual-frontiers/system/git";
+import { join } from "@intellectual-frontiers/system/path";
+import { output } from "@intellectual-frontiers/system/proc";
 import type { EditionFacts, TreeFacts } from "./judge.ts";
 import type { TagFact } from "./ledger.ts";
 import type { CommitFact } from "./notes.ts";

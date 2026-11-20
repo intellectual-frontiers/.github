@@ -21,7 +21,7 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import { path } from "../ts/runtime/mod.ts";
+import { path } from "@intellectual-frontiers/system";
 import type { Lens } from "./lens.ts";
 
 /** A specification, by its repository and its folder's name (`commons`, `0009-sql-aide`). Only the repository's own become links. */

@@ -20,9 +20,9 @@ import {
   regulatedInProduction,
 } from "../quality/pure/ladder.ts";
 import { judgeTier, tierRequirements } from "../quality/pure/tier.ts";
-import { makeTempDir, mkdir, remove, writeTextFile } from "../runtime/fs.ts";
+import { makeTempDir, mkdir, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { tierCommand } from "../quality/commands.ts";
-import { join } from "../runtime/path.ts";
+import { join } from "@intellectual-frontiers/system/path";
 import { assert, assertEquals, proves } from "../runtime/test.ts";
 import { assembledRun, needsGit, repositoryWithCommit } from "./quality-fixtures.ts";
 import { judge, recordOf, TODAY } from "./quality-tier1-fixtures.ts";

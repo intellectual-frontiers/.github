@@ -37,8 +37,8 @@ import {
   type ProcessorStats,
   type Registry,
 } from "../kernel/signals.ts";
-import { env, exit } from "./proc.ts";
-import { currentLook, type Look } from "./tty.ts";
+import { env, exit } from "@intellectual-frontiers/system/proc";
+import { currentLook, type Look } from "@intellectual-frontiers/system/tty";
 
 /** A processor whose exports the console watches, to say at the end where signals were not sent (an `ExportingProcessor`). */
 export type Watched = { stats(): ProcessorStats; forceFlush(timeoutMs: number): Promise<FlushResult> };

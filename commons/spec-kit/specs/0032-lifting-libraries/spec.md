@@ -56,6 +56,7 @@
   | FR-064 (objects for exact optional properties) | core |
   | 0012-ontology FR-001 to FR-007 (RDF as typed values, vocabularies, schemas, code lists, checks, writers, no reader) | rdf |
   | FR-047 (the typed command-line parser), FR-072 (command trees); 0006-signals FR-022 (the palette), FR-025 (the terminal emulator) | terminal |
+  | FR-019 (typed errors), FR-020 (files), FR-021 (paths), FR-022 (the process), FR-023 (the terminal's state), FR-039 (one run at a time), FR-046 (scheduled jobs), FR-048 to FR-050 (more of `fs`), FR-051 (watching), FR-052 and FR-053 (programs and `selfCommand`), FR-054 (the standard streams), FR-062 (a program built into one binary), FR-071 (programs found by prefix), FR-073 (junctions); 0007-grc FR-021 (Git); 0031-install-locations FR-001 to FR-004 (the folders of a program) | system |
   | FR-007 (semantic versions) | formats |
   | FR-010 (archives) | formats |
   | FR-011 (TypeScript literals) | formats |
@@ -79,6 +80,8 @@
   | FR-045 (in-toto and DSSE) | crypto |
   | FR-057 (MD5) | crypto |
   | FR-068 (AWS Signature Version 4) | crypto |
+
+Inversions that make the layers true: `runtime/proc` used the telemetry (`traceProcess`) and `runtime/dns` held `networkInterfaces`, which `proc` re-exported: the first would have made `system` depend on `telemetry` and the second on `net`, both above it. The map is made true by inversion: `proc.setProcessTracer` is the port the telemetry installs when its module is loaded (a program is run with nothing added where none is installed), and `networkInterfaces` and its type live in `proc`, where `dns` no longer has them. The telemetry's own `traceProcess` stays in `runtime/otel`.
 
 - **FR-011**: The consumers of the packages, `erga` and `stolos`, MUST import a library by its package name once it is published and MUST NOT import `commons/ts/*` for what a library holds.
 - **FR-012**: A move of modules MUST rewrite, in the same commit, every importer of them in this repository (relative paths and the barrel `@intellectual-frontiers/commons/ts/kernel` alike) to the package name of their library, MUST add the dependency to each package that imports it, and MUST leave no re-export of the moved modules behind.

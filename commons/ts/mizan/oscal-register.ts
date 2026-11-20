@@ -57,8 +57,8 @@ import {
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { type Cited, parseSpec, proofsOf, type SourceFile } from "../kernel/trace.ts";
 import { NAMESPACE_URL, uuidV5 } from "@intellectual-frontiers/crypto/uuid";
-import { existsSync, mkdirSync, readDirSync, readTextFileSync, writeTextFileSync } from "../runtime/fs.ts";
-import { stdio } from "../runtime/mod.ts";
+import { existsSync, mkdirSync, readDirSync, readTextFileSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { stdio } from "@intellectual-frontiers/system";
 import { readSources } from "../runtime/trace.ts";
 import { sentenceOf, type SpecText } from "./rules.ts";
 

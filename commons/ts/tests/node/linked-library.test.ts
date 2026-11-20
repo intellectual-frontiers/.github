@@ -8,9 +8,9 @@
  * @module
  */
 import { layerFindings, type Ladder } from "../../kernel/layers.ts";
-import { lstat, makeTempDir, mkdir, realPath, remove, writeTextFile } from "../../runtime/fs.ts";
-import { dirname, fromFileUrl, join, resolve } from "../../runtime/path.ts";
-import { run, runtimeName, which } from "../../runtime/proc.ts";
+import { lstat, makeTempDir, mkdir, realPath, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { dirname, fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
+import { run, runtimeName, which } from "@intellectual-frontiers/system/proc";
 import { assert, assertEquals, assertStringIncludes, proves } from "../../runtime/test.ts";
 
 const ROOT = resolve(dirname(fromFileUrl(import.meta.url)), "../..");

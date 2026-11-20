@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { fs, path } from "../../ts/runtime/mod.ts";
+import { fs, path } from "@intellectual-frontiers/system";
 import { assert, assertEquals, assertStringIncludes, proves } from "../../ts/runtime/test.ts";
 import { findConfig, loadConfig, main, parseArgs } from "../cli.ts";
 import { normalDir, resolveConfig, under } from "../config.ts";

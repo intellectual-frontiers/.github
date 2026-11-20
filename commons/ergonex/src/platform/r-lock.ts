@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { lock } from "@intellectual-frontiers/commons/ts/runtime";
+import { lock } from "@intellectual-frontiers/system";
 /** `lock.acquireLock`. */
 export const acquireLock = lock.acquireLock;
 /** `lock.describeHolder`. */

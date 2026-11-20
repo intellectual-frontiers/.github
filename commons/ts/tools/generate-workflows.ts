@@ -22,8 +22,8 @@ import { validateAction, validateWorkflow } from "../githost/workflows/model.ts"
 import { renderAction, renderWorkflow } from "../githost/workflows/render.ts";
 import { inputsOf } from "../mizan/affected.ts";
 import { readLibraries } from "../mizan/libraries.ts";
-import { existsSync, readDirSync, readTextFileSync, writeTextFileSync, mkdirSync } from "../runtime/fs.ts";
-import { stdio } from "../runtime/mod.ts";
+import { existsSync, readDirSync, readTextFileSync, writeTextFileSync, mkdirSync } from "@intellectual-frontiers/system/fs";
+import { stdio } from "@intellectual-frontiers/system";
 
 const RUN = "bun commons/ts/tools/generate-workflows.ts";
 const FOLDER = ".github/workflows";

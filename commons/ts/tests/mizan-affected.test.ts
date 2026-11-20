@@ -6,9 +6,9 @@
  */
 import { affectedBy, changedSince, inputsOf, main, matches, matrixOf } from "../mizan/affected.ts";
 import { readLibraries } from "../mizan/libraries.ts";
-import { mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "../runtime/fs.ts";
-import { fromFileUrl, join, resolve } from "../runtime/path.ts";
-import { proc } from "../runtime/mod.ts";
+import { mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
+import { proc } from "@intellectual-frontiers/system";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
 import { main as generate } from "../tools/generate-workflows.ts";
 

@@ -6,7 +6,7 @@
  * @module
  */
 import { readFileSync } from "node:fs";
-import { dirname, fromFileUrl, resolve } from "../runtime/path.ts";
+import { dirname, fromFileUrl, resolve } from "@intellectual-frontiers/system/path";
 import { assert, assertEquals, proves } from "../runtime/test.ts";
 import { termRecordsOf } from "../mizan/check.ts";
 import { termFindings } from "../mizan/standards.ts";

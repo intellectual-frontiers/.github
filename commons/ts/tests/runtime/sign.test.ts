@@ -9,9 +9,9 @@
 import fc from "fast-check";
 import { type DsseKey, signEnvelope, verifyEnvelope } from "@intellectual-frontiers/crypto/dsse";
 import { readBundle, writeBundle } from "../../kernel/evidence.ts";
-import { readTextFile, withTempDir, writeTextFile } from "../../runtime/fs.ts";
-import { join } from "../../runtime/path.ts";
-import { run, which } from "../../runtime/proc.ts";
+import { readTextFile, withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { join } from "@intellectual-frontiers/system/path";
+import { run, which } from "@intellectual-frontiers/system/proc";
 import {
   formatSignError,
   signEnvelopeWith,

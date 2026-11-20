@@ -12,9 +12,9 @@ import { chooseMode } from "../../kernel/render.ts";
 import { createTelemetry, defineSignals, type Telemetry } from "../../kernel/signals.ts";
 import { type Equal, expectType } from "@intellectual-frontiers/core";
 import { consoleProcessor, exceptionOf, type UncaughtTarget, uncaughtSignals } from "../../runtime/console.ts";
-import { readDir, readTextFile, withTempDir, writeTextFile } from "../../runtime/fs.ts";
-import { fromFileUrl, join } from "../../runtime/path.ts";
-import * as proc from "../../runtime/proc.ts";
+import { readDir, readTextFile, withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { fromFileUrl, join } from "@intellectual-frontiers/system/path";
+import * as proc from "@intellectual-frontiers/system/proc";
 import { assert, assertEquals, assertStringIncludes, proves } from "../../runtime/test.ts";
 
 const FR = "0006-signals FR-026";

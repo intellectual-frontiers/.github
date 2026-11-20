@@ -8,7 +8,7 @@
  * @module
  */
 import process from "node:process";
-import { fs, path } from "@intellectual-frontiers/commons/ts/runtime";
+import { fs, path } from "@intellectual-frontiers/system";
 import { installerPs1, installerSh, withBom } from "../src/install/scripts.ts";
 import { ERGONEX_VERSION } from "../src/state-record.ts";
 

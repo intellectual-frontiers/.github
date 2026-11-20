@@ -69,7 +69,7 @@ import {
   warningLog,
 } from "../kernel/test-record.ts";
 import { installed } from "./otel.ts";
-import { build, runtimeName, runtimeVersion } from "./proc.ts";
+import { build, runtimeName, runtimeVersion } from "@intellectual-frontiers/system/proc";
 
 /**
  * What a test's body, or a step's, is given (FR-060): its `name`; `step`, which runs a step as a subtest of `node:test`, awaited, and

@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { path, proc } from "../commons/ts/runtime/mod.ts";
+import { path, proc } from "../commons/system/src/mod.ts";
 import { assertEquals, proves } from "../commons/ts/runtime/test.ts";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");

@@ -19,8 +19,8 @@ import {
   rulePlugins,
 } from "../mizan/rules.ts";
 import { ruleRunsAt } from "../mizan/levels.ts";
-import { mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "../runtime/fs.ts";
-import { join } from "../runtime/path.ts";
+import { mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { join } from "@intellectual-frontiers/system/path";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
 
 const SPEC = "0029-subject-profiles";

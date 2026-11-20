@@ -11,7 +11,7 @@
 import { cpSync } from "node:fs";
 import { basename } from "node:path";
 import { parseToml } from "../commons/formats/src/toml.ts";
-import { fs, path, proc } from "../commons/ts/runtime/mod.ts";
+import { fs, path, proc } from "../commons/system/src/mod.ts";
 import {
   assert,
   assertEquals,

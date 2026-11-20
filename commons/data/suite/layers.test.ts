@@ -5,7 +5,8 @@
  *
  * @module
  */
-import { fs, path, trace as runtime } from "@intellectual-frontiers/commons/ts/runtime";
+import { fs, path } from "@intellectual-frontiers/system";
+import { trace as runtime } from "@intellectual-frontiers/commons/ts/runtime";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 import { CORE, KERNEL, layerFindings, PACKAGE, specifiersOf, unitOf } from "../tools/layers.ts";
 import { main } from "../tools/check.ts";

@@ -32,8 +32,8 @@ import {
 } from "../mizan/changes/declaration.ts";
 import { STAGES, firstBreak, traceLines, traceOf, type TraceInput } from "../mizan/changes/trace.ts";
 import { BEGIN, END, decodeViewRecord, isProved, spliceView, viewIsCurrent, viewOf } from "../mizan/changes/capability-view.ts";
-import { mkdirSync, readDirSync, readTextFileSync, withTempDir, writeTextFileSync } from "../runtime/fs.ts";
-import { dirname, fromFileUrl, join, relative, resolve, toPosix } from "../runtime/path.ts";
+import { mkdirSync, readDirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { dirname, fromFileUrl, join, relative, resolve, toPosix } from "@intellectual-frontiers/system/path";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
 
 const HERE = dirname(fromFileUrl(import.meta.url));
@@ -537,7 +537,11 @@ proves(
           (!target.startsWith("..") && !target.includes("/"));
         const ontology = target === "../../../ontology/ifccm/mod.ts";
         const plugin = name === "plugin.ts" && target === "../rules.ts";
-        const hosted = host.has(name) && (target.startsWith("../../runtime/") || target.startsWith("../../githost/"));
+        const hosted =
+          host.has(name) &&
+          (target.startsWith("../../runtime/") ||
+            target.startsWith("../../githost/") ||
+            /^@intellectual-frontiers\/system(\/|$)/.test(spec));
         assert(allowed || ontology || plugin || hosted, `${name} imports ${spec}`);
       }
     }

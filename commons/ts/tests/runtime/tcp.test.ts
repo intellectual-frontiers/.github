@@ -5,10 +5,10 @@
  *
  * @module
  */
-import { errors } from "../../runtime/errors.ts";
-import { readTextFile, withTempDir, writeTextFile } from "../../runtime/fs.ts";
-import { join } from "../../runtime/path.ts";
-import { must, which } from "../../runtime/proc.ts";
+import { errors } from "@intellectual-frontiers/system/errors";
+import { readTextFile, withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { join } from "@intellectual-frontiers/system/path";
+import { must, which } from "@intellectual-frontiers/system/proc";
 import { type Conn, connect, connectTls, listen, listenTls, type Listener } from "../../runtime/tcp.ts";
 import { assert, assertEquals, assertInstanceOf, assertRejects, proves } from "../../runtime/test.ts";
 

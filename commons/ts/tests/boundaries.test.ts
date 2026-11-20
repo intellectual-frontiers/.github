@@ -9,8 +9,8 @@
 import { lf } from "@intellectual-frontiers/core";
 import { VENDOR_GLOBALS } from "../lint/rules/no-vendor-api.ts";
 import { decodeManifest, type Manifest, PACKAGE_NAME, rootEntries } from "../tools/manifest.ts";
-import { existsSync, readDirSync, readTextFile, readTextFileSync, statSync } from "../runtime/fs.ts";
-import { dirname, fromFileUrl, join, relative, resolve, toPosix } from "../runtime/path.ts";
+import { existsSync, readDirSync, readTextFile, readTextFileSync, statSync } from "@intellectual-frontiers/system/fs";
+import { dirname, fromFileUrl, join, relative, resolve, toPosix } from "@intellectual-frontiers/system/path";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
 
 const ROOT = resolve(dirname(fromFileUrl(import.meta.url)), "..");
@@ -70,10 +70,14 @@ const LIFTED = new Set([
   "@intellectual-frontiers/crypto",
   "@intellectual-frontiers/formats",
   "@intellectual-frontiers/rdf",
+  "@intellectual-frontiers/system",
   "@intellectual-frontiers/terminal",
 ]);
 /** Whether a specifier is a lifted library or one of its entries (`@intellectual-frontiers/terminal/args`). */
 const isLifted = (s: string): boolean => [...LIFTED].some((p) => s === p || s.startsWith(`${p}/`));
+/** The host library: it touches the host, so the pure code of this folder does not import it (the kernel and the pure layers). */
+const SYSTEM = "@intellectual-frontiers/system";
+const isPureLifted = (s: string): boolean => isLifted(s) && s !== SYSTEM && !s.startsWith(`${SYSTEM}/`);
 
 const KERNEL = sources("kernel");
 const RUNTIME = sources("runtime");
@@ -115,7 +119,7 @@ proves(
     const bad: string[] = [];
     for (const f of pure) {
       for (const s of specifiers(readTextFileSync(join(ROOT, f)))) {
-        if (isLifted(s)) continue;
+        if (isPureLifted(s)) continue;
         if (s.startsWith("node:")) {
           bad.push(`${f}: ${s}`);
           continue;
@@ -133,7 +137,7 @@ proves(["0005-typescript-runtime FR-002"], "the kernel imports nothing outside k
   const bad: string[] = [];
   for (const f of KERNEL) {
     for (const s of specifiers(readTextFileSync(join(ROOT, f)))) {
-      if (isLifted(s)) continue;
+      if (isPureLifted(s)) continue;
       const target = toPosix(relative(ROOT, resolve(ROOT, dirname(f), s)));
       if (!s.startsWith("./") || !target.startsWith("kernel/")) bad.push(`${f}: ${s}`);
     }
@@ -264,6 +268,7 @@ proves(
       "@intellectual-frontiers/crypto": "link:../crypto",
       "@intellectual-frontiers/formats": "link:../formats",
       "@intellectual-frontiers/rdf": "link:../rdf",
+      "@intellectual-frontiers/system": "link:../system",
       "@intellectual-frontiers/terminal": "link:../terminal",
     });
     const lock = text("bun.lock");
@@ -361,6 +366,7 @@ proves(
       "@intellectual-frontiers/crypto": "0.1.0",
       "@intellectual-frontiers/formats": "0.1.0",
       "@intellectual-frontiers/rdf": "0.1.0",
+      "@intellectual-frontiers/system": "0.1.0",
       "@intellectual-frontiers/terminal": "0.1.0",
     });
     assertEquals(root.devDependencies, {});

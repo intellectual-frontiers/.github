@@ -27,9 +27,9 @@ import {
   string,
 } from "@intellectual-frontiers/core";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
-import { readTextFile, remove, writeTextFile } from "../runtime/fs.ts";
-import { dirname, fromFileUrl, join, resolve } from "../runtime/path.ts";
-import { args, execPath, exit, run, runtimeName, which } from "../runtime/proc.ts";
+import { readTextFile, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { dirname, fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
+import { args, execPath, exit, run, runtimeName, which } from "@intellectual-frontiers/system/proc";
 
 /** The OCSF version the types are for. */
 const VERSION = "1.9.0";

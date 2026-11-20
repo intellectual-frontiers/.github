@@ -28,9 +28,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { formatBaseline, judge, parseBaseline, passes, report } from "../kernel/trace.ts";
-import { existsSync, readDirSync, readTextFileSync, writeTextFileSync } from "../runtime/fs.ts";
-import { stdio } from "../runtime/mod.ts";
-import { resolve } from "../runtime/path.ts";
+import { existsSync, readDirSync, readTextFileSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { stdio } from "@intellectual-frontiers/system";
+import { resolve } from "@intellectual-frontiers/system/path";
 import { decodeManifest, isUrl } from "./integrations/host/import.ts";
 import type { MizanFinding } from "./rules.ts";
 

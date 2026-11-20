@@ -41,9 +41,9 @@ import { STEP_SPAN, decodeLines, installationOf } from "../../kernel/test-record
 import { assembleRecord, junitXml, readRecord, tap14, testsOf } from "../../kernel/test-report.ts";
 import { parseSpanId, parseTraceId } from "../../kernel/otel.ts";
 import { type Equal, expectType } from "@intellectual-frontiers/core";
-import { makeTempDir, readTextFile, remove, writeTextFile } from "../../runtime/fs.ts";
-import { join } from "../../runtime/path.ts";
-import { env, execPath, run, runtimeName } from "../../runtime/proc.ts";
+import { makeTempDir, readTextFile, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { join } from "@intellectual-frontiers/system/path";
+import { env, execPath, run, runtimeName } from "@intellectual-frontiers/system/proc";
 
 const FR = "0005-typescript-runtime FR-013";
 

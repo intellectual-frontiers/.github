@@ -13,8 +13,8 @@ import { verifyAll } from "../mizan/libraries.ts";
 import { CHANGES_RULES } from "../mizan/changes/rules.ts";
 import { MIZAN_RULES } from "../mizan/rules.ts";
 import { VERSIONS_RULES } from "../mizan/versions/rules.ts";
-import { mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "../runtime/fs.ts";
-import { join } from "../runtime/path.ts";
+import { mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { join } from "@intellectual-frontiers/system/path";
 import { assert, assertEquals, proves } from "../runtime/test.ts";
 
 const SPEC = "0028-conformance-levels";

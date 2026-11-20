@@ -11,9 +11,9 @@ import { object, string } from "@intellectual-frontiers/core";
 import { toJson5 } from "@intellectual-frontiers/formats/json5";
 import { toToml } from "@intellectual-frontiers/formats/toml";
 import { toYaml } from "@intellectual-frontiers/formats/yaml";
-import { withTempDir, writeTextFile } from "../../runtime/fs.ts";
+import { withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { formatLoadError, formatOf, loadData, loadImpactDeclarations, loadRisks, loadWaivers, type LoadError } from "../../runtime/grc.ts";
-import { join } from "../../runtime/path.ts";
+import { join } from "@intellectual-frontiers/system/path";
 import { assert, assertEquals, assertStringIncludes, proves } from "../../runtime/test.ts";
 
 const FR = "0007-grc FR-022";

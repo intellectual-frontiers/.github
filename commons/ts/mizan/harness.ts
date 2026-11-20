@@ -12,8 +12,8 @@
  * @module
  */
 import { formatBaseline, judge, parseBaseline, passes, report } from "../kernel/trace.ts";
-import { existsSync, readTextFileSync, writeTextFileSync } from "../runtime/fs.ts";
-import { stdio } from "../runtime/mod.ts";
+import { existsSync, readTextFileSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { stdio } from "@intellectual-frontiers/system";
 import { BASELINE_COMMENTS, readSpecTexts } from "./spec-files.ts";
 import { type Declaration } from "./changes/declaration.ts";
 import { declarationPlugin } from "./changes/plugin.ts";

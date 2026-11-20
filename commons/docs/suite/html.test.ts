@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { fs, path } from "../../ts/runtime/mod.ts";
+import { fs, path } from "@intellectual-frontiers/system";
 import { assert, assertEquals, assertMatch, assertStringIncludes, proves } from "../../ts/runtime/test.ts";
 import { block, document, relative } from "../emit/html.ts";
 import { readApi } from "../extract/api.ts";

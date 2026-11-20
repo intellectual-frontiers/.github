@@ -19,9 +19,9 @@ import {
   testCaseSpan,
   testId,
 } from "../kernel/test-record.ts";
-import { readTextFile, writeTextFile } from "../runtime/fs.ts";
-import { join } from "../runtime/path.ts";
-import { run, which } from "../runtime/proc.ts";
+import { readTextFile, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { join } from "@intellectual-frontiers/system/path";
+import { run, which } from "@intellectual-frontiers/system/proc";
 import { assert } from "../runtime/test.ts";
 
 /** Where git is, or the reason a test of it is skipped. */

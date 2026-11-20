@@ -9,6 +9,7 @@
         "@intellectual-frontiers/core": "link:../core",
         "@intellectual-frontiers/crypto": "link:../crypto",
         "@intellectual-frontiers/formats": "link:../formats",
+        "@intellectual-frontiers/system": "link:../system",
         "@intellectual-frontiers/terminal": "link:../terminal",
         "@types/node": "26.6.6",
         "fast-check": "4.10.2",
@@ -24,6 +25,8 @@
     "@intellectual-frontiers/crypto": ["@intellectual-frontiers/crypto@link:../crypto", {}],
 
     "@intellectual-frontiers/formats": ["@intellectual-frontiers/formats@link:../formats", {}],
+
+    "@intellectual-frontiers/system": ["@intellectual-frontiers/system@link:../system", {}],
 
     "@intellectual-frontiers/terminal": ["@intellectual-frontiers/terminal@link:../terminal", {}],
 

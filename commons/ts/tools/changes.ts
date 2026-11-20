@@ -19,10 +19,10 @@ import { type Deps, type RuleResult, run as changes } from "../mizan/changes.ts"
 import { parseSpanId, parseTraceId, type SpanId, type TraceId } from "../kernel/otel.ts";
 import { keepRun, writeOnce } from "../quality/host/branch.ts";
 import { checkRun } from "../quality/pure/record.ts";
-import { mkdir } from "../runtime/fs.ts";
-import { join, resolve } from "../runtime/path.ts";
-import { build, env, run, runtimeName, runtimeVersion } from "../runtime/proc.ts";
-import { stderr } from "../runtime/stdio.ts";
+import { mkdir } from "@intellectual-frontiers/system/fs";
+import { join, resolve } from "@intellectual-frontiers/system/path";
+import { build, env, run, runtimeName, runtimeVersion } from "@intellectual-frontiers/system/proc";
+import { stderr } from "@intellectual-frontiers/system/stdio";
 
 function randomHex(bytes: number): string {
   const b = new Uint8Array(bytes);

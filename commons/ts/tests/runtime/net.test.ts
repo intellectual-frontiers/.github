@@ -6,8 +6,8 @@
  * @module
  */
 import { type Sha256, sha256 } from "@intellectual-frontiers/crypto/sha256";
-import { errors } from "../../runtime/errors.ts";
-import { exists, readTextFile, withTempDir, writeTextFile } from "../../runtime/fs.ts";
+import { errors } from "@intellectual-frontiers/system/errors";
+import { exists, readTextFile, withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
 import {
   classify,
   describeFailure,
@@ -20,9 +20,9 @@ import {
   Retries,
   retryable,
 } from "../../runtime/net.ts";
-import { join } from "../../runtime/path.ts";
+import { join } from "@intellectual-frontiers/system/path";
 import { serve, type ServeHandler } from "../../runtime/serve.ts";
-import { consoleSize, currentLook, isTerminal, lookOf, setRaw } from "../../runtime/tty.ts";
+import { consoleSize, currentLook, isTerminal, lookOf, setRaw } from "@intellectual-frontiers/system/tty";
 import { assert, assertEquals, assertRejects, assertStringIncludes, assertThrows, proves } from "../../runtime/test.ts";
 
 const SERVE = "0005-typescript-runtime FR-025";

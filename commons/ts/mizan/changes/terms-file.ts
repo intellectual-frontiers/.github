@@ -21,8 +21,8 @@
  */
 import { array, formatDecodeError, mapDecoder, object, oneOf, string, err, ok, type Result } from "@intellectual-frontiers/core";
 import type { OntologyCitation } from "../../kernel/trace.ts";
-import { existsSync, readTextFileSync } from "../../runtime/fs.ts";
-import { toFileUrl } from "../../runtime/path.ts";
+import { existsSync, readTextFileSync } from "@intellectual-frontiers/system/fs";
+import { toFileUrl } from "@intellectual-frontiers/system/path";
 
 const plain = mapDecoder(object({ term: string, cites: array(string) }, { file: string }), (t): OntologyCitation => ({
   term: t.term,

@@ -13,8 +13,8 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import { NotFound } from "../runtime/errors.ts";
-import { output } from "../runtime/proc.ts";
+import { NotFound } from "@intellectual-frontiers/system/errors";
+import { output } from "@intellectual-frontiers/system/proc";
 import { CAPABILITIES, unsupported } from "./capabilities.ts";
 import { cloneUrlOf, describeRef } from "./remote.ts";
 import type { GitHostClient, HostFailure, HostResult, RepoInfo, RepoRef } from "./types.ts";

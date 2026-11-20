@@ -6,10 +6,10 @@
  * @module
  */
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
-import { makeTempDirSync, readTextFileSync, removeSync, writeTextFileSync } from "../runtime/fs.ts";
+import { makeTempDirSync, readTextFileSync, removeSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { pathToFileURL } from "node:url";
-import { dirname, fromFileUrl, resolve } from "../runtime/path.ts";
-import { execPath, run } from "../runtime/proc.ts";
+import { dirname, fromFileUrl, resolve } from "@intellectual-frontiers/system/path";
+import { execPath, run } from "@intellectual-frontiers/system/proc";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
 import {
   describeFinding,

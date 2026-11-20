@@ -23,7 +23,7 @@ import { join } from "node:path";
 import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import { retryAfterMs } from "@intellectual-frontiers/formats/http";
 import type { Sha256 } from "@intellectual-frontiers/crypto/sha256";
-import { exists, mkdir, remove, rename, sha256File, stat } from "./fs.ts";
+import { exists, mkdir, remove, rename, sha256File, stat } from "@intellectual-frontiers/system/fs";
 
 /** Why a request failed, as far as the network is concerned. */
 export type NetFailure =

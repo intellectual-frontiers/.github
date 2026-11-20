@@ -9,9 +9,9 @@
 import { decodeTraces } from "../../kernel/otlp.ts";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { toBase64 } from "@intellectual-frontiers/formats/base64";
-import { readTextFile, readFile, remove, symlink, writeFile, writeTextFile, makeTempDir } from "../../runtime/fs.ts";
-import { dirname, fromFileUrl, join, resolve, toFileUrl } from "../../runtime/path.ts";
-import { build, execPath, run, runtimeName } from "../../runtime/proc.ts";
+import { readTextFile, readFile, remove, symlink, writeFile, writeTextFile, makeTempDir } from "@intellectual-frontiers/system/fs";
+import { dirname, fromFileUrl, join, resolve, toFileUrl } from "@intellectual-frontiers/system/path";
+import { build, execPath, run, runtimeName } from "@intellectual-frontiers/system/proc";
 import { readLedger, REPORT_FORMATS, type Runtime, runTests, signRun, verifyRun, writeReports } from "../../runtime/test-run.ts";
 import { assert, assertEquals, assertExists, assertStringIncludes, proves } from "../../runtime/test.ts";
 

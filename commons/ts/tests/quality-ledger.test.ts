@@ -8,8 +8,8 @@
  * @module
  */
 import { GENESIS } from "../kernel/evidence.ts";
-import { makeTempDir, remove, writeTextFile } from "../runtime/fs.ts";
-import { join } from "../runtime/path.ts";
+import { makeTempDir, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { join } from "@intellectual-frontiers/system/path";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
 import { verifyBranch, writeCommit, keepRun } from "../quality/host/branch.ts";
 import { verifications } from "../quality/commands.ts";

@@ -10,7 +10,8 @@ import { Buffer } from "node:buffer";
 import * as dgram from "node:dgram";
 import * as net from "node:net";
 import fc from "fast-check";
-import { type NetworkInterfaceInfo, networkInterfaces, resolveDns } from "../../runtime/dns.ts";
+import { type NetworkInterfaceInfo, networkInterfaces } from "@intellectual-frontiers/system/proc";
+import { resolveDns } from "../../runtime/dns.ts";
 import { assert, assertEquals, proves } from "../../runtime/test.ts";
 
 const DNS = "0005-typescript-runtime FR-056";

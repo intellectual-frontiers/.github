@@ -4,6 +4,6 @@
  *
  * @module
  */
-import { tty } from "@intellectual-frontiers/commons/ts/runtime";
+import { tty } from "@intellectual-frontiers/system";
 /** `tty.isTerminal`. */
 export const isTerminal = tty.isTerminal;

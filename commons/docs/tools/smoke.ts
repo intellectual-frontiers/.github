@@ -10,7 +10,7 @@
  *
  * @module
  */
-import { fs, path, proc } from "../../ts/runtime/mod.ts";
+import { fs, path, proc } from "@intellectual-frontiers/system";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
 const FIXTURE = path.join(ROOT, "suite/fixture-repo");

@@ -11,8 +11,8 @@ import plugin from "../../lint/plugin.ts";
 import { type Rule } from "../../lint/rule.ts";
 import { linter, lintFiles, type LintRun, type Problem } from "../../lint/test-rule.ts";
 import { type Equal, expectType } from "@intellectual-frontiers/core";
-import { makeTempDir, remove, writeTextFile } from "../../runtime/fs.ts";
-import { join } from "../../runtime/path.ts";
+import { makeTempDir, remove, writeTextFile } from "@intellectual-frontiers/system/fs";
+import { join } from "@intellectual-frontiers/system/path";
 import { assert, assertEquals, assertStringIncludes, proves } from "../../runtime/test.ts";
 
 const FR = "0005-typescript-runtime FR-061";

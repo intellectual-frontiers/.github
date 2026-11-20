@@ -4,9 +4,9 @@
  *
  * @module
  */
-import { readTextFileSync } from "../runtime/fs.ts";
-import { dirname, fromFileUrl, resolve } from "../runtime/path.ts";
-import * as proc from "../runtime/proc.ts";
+import { readTextFileSync } from "@intellectual-frontiers/system/fs";
+import { dirname, fromFileUrl, resolve } from "@intellectual-frontiers/system/path";
+import * as proc from "@intellectual-frontiers/system/proc";
 import { assert, assertEquals, proves } from "../runtime/test.ts";
 import { ifccmOntology } from "../../ontology/ifccm/mod.ts";
 import { ifqsOntology } from "../../ontology/ifqs/mod.ts";

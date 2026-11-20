@@ -66,7 +66,7 @@ import { type AnyMap, type AnyValue, SEVERITY, type Scope, type SeverityNumber }
 import { defineSignals, type Telemetry } from "../kernel/signals.ts";
 import { isTomlDateTime, parseToml, type TomlValue } from "@intellectual-frontiers/formats/toml";
 import { parseYaml } from "@intellectual-frontiers/formats/yaml";
-import { readTextFile } from "./fs.ts";
+import { readTextFile } from "@intellectual-frontiers/system/fs";
 import { installed, type Pipeline } from "./otel.ts";
 
 /** A data file's format. */

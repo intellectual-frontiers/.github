@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { fs, path } from "@intellectual-frontiers/commons/ts/runtime";
+import { fs, path } from "@intellectual-frontiers/system";
 import { assert, proves } from "@intellectual-frontiers/commons/ts/runtime/test";
 import { vocabularies } from "@intellectual-frontiers/data/governance";
 import { OUT, PINNED_SHA256, render, SOURCE, VERSION } from "../tools/generate-dpv.ts";

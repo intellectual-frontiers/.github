@@ -7,7 +7,7 @@
  * @module
  */
 import { absurd } from "@intellectual-frontiers/core";
-import { fs, path } from "../ts/runtime/mod.ts";
+import { fs, path } from "@intellectual-frontiers/system";
 import { Build } from "./build.ts";
 import type { Finding } from "./check.ts";
 import { type Config, under } from "./config.ts";

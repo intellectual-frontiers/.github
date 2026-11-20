@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/rdf",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "RDF as algebraically typed values: IRIs, namespaces, typed vocabularies, class schemas, code lists, and the writers of N-Triples, N-Quads, canonical Turtle and JSON-LD; pure, no host, the same code on Bun, Node 26 and in a browser.",
   "type": "module",
   "engines": {
@@ -20,6 +20,7 @@
   "devDependencies": {
     "@intellectual-frontiers/commons": "link:../ts",
     "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/system": "link:../system",
     "@types/node": "26.6.6",
     "fast-check": "4.10.2",
     "typescript": "7.0.2"

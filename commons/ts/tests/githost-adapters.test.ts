@@ -10,10 +10,10 @@ import { githubClient } from "../githost/github.ts";
 import { plainGitClient } from "../githost/git.ts";
 import { gitlabClient } from "../githost/gitlab.ts";
 import type { RepoRef } from "../githost/types.ts";
-import { mkdir, withTempDir, writeTextFile } from "../runtime/fs.ts";
+import { mkdir, withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { type Exchange, recordedTransport } from "../runtime/http-client.ts";
-import { join } from "../runtime/path.ts";
-import { run, which } from "../runtime/proc.ts";
+import { join } from "@intellectual-frontiers/system/path";
+import { run, which } from "@intellectual-frontiers/system/proc";
 import { assert, assertEquals, proves } from "../runtime/test.ts";
 import { conformance } from "./githost-conformance.ts";
 

@@ -9,9 +9,9 @@
 import { cpSync } from "node:fs";
 import { OSCAL_VERSION } from "../kernel/oscal.ts";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
-import { makeTempDirSync, mkdirSync, readTextFileSync, removeSync, writeTextFileSync } from "../runtime/fs.ts";
-import { dirname, fromFileUrl, resolve } from "../runtime/path.ts";
-import { execPath, run, which } from "../runtime/proc.ts";
+import { makeTempDirSync, mkdirSync, readTextFileSync, removeSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { dirname, fromFileUrl, resolve } from "@intellectual-frontiers/system/path";
+import { execPath, run, which } from "@intellectual-frontiers/system/proc";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
 import {
   COMPONENT_FILE,
