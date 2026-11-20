@@ -310,6 +310,7 @@ export function document(page: Page, site: Site): string {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escape(page.title)} · ${escape(site.name)}</title>
 <meta name="description" content="${escape(page.description)}">
+<script>try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}</script>
 <link rel="stylesheet" href="${asset("site.css")}">
 ${mermaid}<script src="${asset("site.js")}" defer></script>
 </head>
@@ -320,6 +321,7 @@ ${mermaid}<script src="${asset("site.js")}" defer></script>
 <a class="brand" href="${escape(relative(from, "index.html"))}">${escape(site.name)}</a>
 <nav class="sections" aria-label="Sections">${top}</nav>
 <button type="button" class="search-button" aria-haspopup="dialog"><span>Search</span><kbd>/</kbd></button>
+<button type="button" class="theme-button" aria-label="Switch between the light and the dark theme" title="Theme (t)"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg></button>
 <a class="repo" href="${escape(site.repository)}" rel="noopener">GitHub</a>
 </header>
 <div class="layout">

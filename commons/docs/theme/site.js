@@ -1,9 +1,22 @@
-// The one script of commons' documentation (commons 0011-documentation FR-017): the menu on narrow screens, tabs, copy buttons, the
-// table of contents following the reader, the search ("/" opens it; search.json is a file of the site), and Mermaid where a page has a
+// The one script of commons' documentation (commons 0011-documentation FR-017, FR-034): the theme, the menu on narrow screens, tabs, copy buttons, the
+// table of contents following the reader, the search ("/" opens it, "t" switches the theme, "[" and "]" go to the previous and next page; search.json is a file of the site), and Mermaid where a page has a
 // diagram. A page reads whole without it; nothing here asks another host for anything.
 (() => {
   "use strict";
   const root = document.documentElement.dataset.root || "";
+
+  // the theme: the reader's system decides until they choose, and the choice is kept in this browser only
+  const scheme = () => document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const toggleTheme = () => {
+    const next = scheme() === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    try {
+      localStorage.setItem("theme", next);
+    } catch {
+      // storage may be unavailable: the choice then lasts for this page only
+    }
+  };
+  document.querySelector(".theme-button")?.addEventListener("click", toggleTheme);
 
   // the menu
   const menu = document.querySelector(".menu-button");
@@ -109,6 +122,14 @@
     if (e.key === "/" && !typing && !dialog?.open) {
       e.preventDefault();
       open();
+    } else if (e.key === "t" && !typing && !dialog?.open && !e.metaKey && !e.ctrlKey && !e.altKey) {
+      toggleTheme();
+    } else if ((e.key === "[" || e.key === "]") && !typing && !dialog?.open) {
+      // the previous and the next page of the side navigation
+      const links = [...document.querySelectorAll(".sidebar a")];
+      const at = links.findIndex((a) => a.classList.contains("current"));
+      const go = links[at + (e.key === "]" ? 1 : -1)];
+      if (at >= 0 && go) location.href = go.href;
     }
   });
   input?.addEventListener("input", render);
@@ -136,16 +157,9 @@
       theme: "base",
       securityLevel: "strict",
       fontFamily: getComputedStyle(document.body).fontFamily,
-      themeVariables: {
-        background: "#ffffff",
-        primaryColor: "#fafafa",
-        primaryBorderColor: "#a3a3a3",
-        primaryTextColor: "#171717",
-        lineColor: "#737373",
-        secondaryColor: "#f5f5f5",
-        tertiaryColor: "#ffffff",
-        fontSize: "14px",
-      },
+      themeVariables: scheme() === "dark"
+        ? { background: "#0a0a0a", primaryColor: "#171717", primaryBorderColor: "#525252", primaryTextColor: "#ededed", lineColor: "#8a8a8a", secondaryColor: "#1c1c1c", tertiaryColor: "#0a0a0a", fontSize: "14px" }
+        : { background: "#ffffff", primaryColor: "#fafafa", primaryBorderColor: "#a3a3a3", primaryTextColor: "#171717", lineColor: "#737373", secondaryColor: "#f5f5f5", tertiaryColor: "#ffffff", fontSize: "14px" },
     });
     void window.mermaid.run({ querySelector: "pre.mermaid" });
     for (const wrap of document.querySelectorAll(".mermaid-wrap")) {
