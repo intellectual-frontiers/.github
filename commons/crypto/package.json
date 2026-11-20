@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/crypto",
   "private": true,
-  "version": "0.1.5",
+  "version": "0.2.0",
   "description": "Crypto: SHA-256, MD5, SHA-512 crypt, UUIDs, AWS Signature Version 4, CMS, DSSE, COSE and WebAuthn, in pure code on Web Crypto, with core and formats as its dependencies.",
   "type": "module",
   "engines": {
