@@ -6,3 +6,6 @@ _site/
 /node_modules/
 # the libraries of commons linked by name for development (bun run dev:check makes them; commons 0001-libraries FR-011)
 /commons/node_modules/
+# dependencies and packed tarballs of any library: installed or built, never committed
+**/node_modules/
+**/dist/
