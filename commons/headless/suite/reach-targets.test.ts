@@ -107,8 +107,38 @@ proves(["0005-reach-and-targets FR-004"], "an executor has the shape of the syst
   assertEquals((await localExecutor().exec([process.execPath, "-e", "process.exit(7)"])).code, 7);
 });
 
+/** The words of a command string made by `remoteCommand`, read back by hand: single-quoted runs and bare words, the one `'\\''` escape. */
+function unquoted(remote: string): string[] {
+  const words: string[] = [];
+  let cur = "";
+  let has = false;
+  for (let i = 0; i < remote.length; i += 1) {
+    const c = remote[i];
+    if (c === "'") {
+      const end = remote.indexOf("'", i + 1);
+      cur += remote.slice(i + 1, end);
+      has = true;
+      i = end;
+    } else if (c === "\\") {
+      cur += remote[i + 1] ?? "";
+      i += 1;
+    } else if (c === " ") {
+      if (has || cur !== "") words.push(cur);
+      cur = "";
+      has = false;
+    } else {
+      cur += c;
+      has = true;
+    }
+  }
+  if (has || cur !== "") words.push(cur);
+  return words;
+}
+
 /** What a real POSIX shell reads back from a remote command string, as NUL-separated words. */
 function shellWords(remote: string): string[] {
+  // a POSIX shell on a remote host is what the quoting is for; the sh of a Windows runner (Git for Windows) changes a carriage return in its arguments, so the words are read back only where a POSIX sh is the system's
+  if (process.platform === "win32") return JSON.parse(JSON.stringify(unquoted(remote)));
   const r = spawnSync("sh", ["-c", `for w in ${remote}; do printf '%s\\0' "$w"; done`], { encoding: "utf8" });
   return r.stdout.split("\u0000").slice(0, -1);
 }
@@ -120,7 +150,10 @@ proves(["0005-reach-and-targets FR-005"], "the remote command is quoted word by 
   const argv = ["ops", "run", "--json", "say", "it's; rm -rf /", "$(id)", "a b", "`x`", "", "*", "\\n"];
   const r = remoteCommand(argv);
   assert(isOk(r));
-  if (isOk(r)) assertEquals(shellWords(r.value), argv);
+  if (isOk(r)) {
+    assertEquals(shellWords(r.value), argv);
+    assertEquals(unquoted(r.value), argv, "the hand reading agrees with a real shell");
+  }
   assert(isErr(remoteCommand([])) && isErr(remoteCommand(["a\u0000b"])));
   fc.assert(
     fc.property(fc.array(fc.string({ unit: "binary" }).filter((s) => !s.includes("\u0000")), { minLength: 1, maxLength: 5 }), (words) => {
