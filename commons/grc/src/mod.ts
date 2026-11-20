@@ -1,20 +1,18 @@
-// Spec: 0001-grc-engineering FR-001
+// Spec: 0001-grc-layers FR-001
 /**
- * GRC engineering as one typed library (commons 0007-grc, 0032-lifting-libraries): the pure modules as namespaces. `grc` gives catalogs, controls, verdicts, findings and waivers; `evidence` gives the canonical form of
- * JSON, the hash-chained ledger and the manifests and bundles; `assess` gives coverage, freshness, drift, the change-impact gate and the risk register; `ocsf`, `oscal` and `attest` write the findings, the assessments and
- * the attestations as the standards define them. The host (`@intellectual-frontiers/grc/host`) loads the settings of packs and runs them as signals, and signs.
+ * GRC as one typed library of three layers (0001-grc-layers): `governance` (frameworks, crosswalks, policies, checks, requirements, evidence policy and exceptions as data), `logical` (results,
+ * findings, evidence, attestations, assessments and the pure computations over them, as self-describing versioned documents) and `physical` (the ports of runners, evidence stores and signers).
+ * The extensions are units of their own, by their own entries (`@intellectual-frontiers/grc/runners/sql`, `.../serializers/oscal`, `.../stores/files`, `.../signers/dsse`), and `standard`
+ * registers the ones this library ships; the headless verbs are `@intellectual-frontiers/grc/surfaces/headless` and the conformance suites `@intellectual-frontiers/grc/conformance`.
  *
  * @example
  * ```ts
- * import { grc } from "@intellectual-frontiers/grc";
- * grc.join("fail", "pass"); // "fail"
+ * import { logical } from "@intellectual-frontiers/grc";
+ * logical.join("fail", "pass"); // "fail"
  * ```
  *
  * @module
  */
-export * as assess from "./assess.ts";
-export * as attest from "./attest.ts";
-export * as evidence from "./evidence.ts";
-export * as grc from "./grc.ts";
-export * as ocsf from "./ocsf.ts";
-export * as oscal from "./oscal.ts";
+export * as governance from "./governance/mod.ts";
+export * as logical from "./logical/mod.ts";
+export * as physical from "./physical/mod.ts";

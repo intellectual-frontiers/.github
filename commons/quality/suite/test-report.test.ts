@@ -8,8 +8,8 @@
  */
 import fc from "fast-check";
 import { signStatement } from "@intellectual-frontiers/crypto/dsse";
-import { appendEntry, type LedgerEntry } from "@intellectual-frontiers/grc/evidence";
-import { type Instant, instantOf } from "@intellectual-frontiers/grc/grc";
+import { appendEntry, type LedgerEntry } from "../src/pure/primitives.ts";
+import { type Instant, instantOf } from "../src/pure/primitives.ts";
 import { parseSpanId, parseTraceId, type SpanId, type TraceId } from "@intellectual-frontiers/telemetry/otel";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import {

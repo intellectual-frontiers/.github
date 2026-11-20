@@ -9,10 +9,11 @@
         "@intellectual-frontiers/core": "link:../core",
         "@intellectual-frontiers/crypto": "link:../crypto",
         "@intellectual-frontiers/formats": "link:../formats",
+        "@intellectual-frontiers/headless": "link:../headless",
         "@intellectual-frontiers/libraries": "link:../libraries",
         "@intellectual-frontiers/mizan": "link:../mizan",
         "@intellectual-frontiers/system": "link:../system",
-        "@intellectual-frontiers/telemetry": "link:../telemetry",
+        "@intellectual-frontiers/terminal": "link:../terminal",
         "@intellectual-frontiers/test": "link:../test",
         "@types/node": "26.6.6",
         "fast-check": "4.10.2",
@@ -29,13 +30,15 @@
 
     "@intellectual-frontiers/formats": ["@intellectual-frontiers/formats@link:../formats", {}],
 
+    "@intellectual-frontiers/headless": ["@intellectual-frontiers/headless@link:../headless", {}],
+
     "@intellectual-frontiers/libraries": ["@intellectual-frontiers/libraries@link:../libraries", {}],
 
     "@intellectual-frontiers/mizan": ["@intellectual-frontiers/mizan@link:../mizan", {}],
 
     "@intellectual-frontiers/system": ["@intellectual-frontiers/system@link:../system", {}],
 
-    "@intellectual-frontiers/telemetry": ["@intellectual-frontiers/telemetry@link:../telemetry", {}],
+    "@intellectual-frontiers/terminal": ["@intellectual-frontiers/terminal@link:../terminal", {}],
 
     "@intellectual-frontiers/test": ["@intellectual-frontiers/test@link:../test", {}],
 

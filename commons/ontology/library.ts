@@ -10,7 +10,7 @@ export const library = {
   level: "L1",
   specKit: "spec-kit",
   verify: "bun run verify",
-  version: "0.1.4",
+  version: "0.2.0",
   distribution: ["github", "npm"],
   exports: [
     ".",
@@ -23,6 +23,8 @@ export const library = {
     "./ifr",
     "./ifr/audit",
     "./ifr/ifr",
+    "./kanon",
+    "./kanon/kanon",
     "./mizan",
     "./mizan/mizan",
     "./standards/nist-sp-800-53/controls.auto",
@@ -37,5 +39,5 @@ export const library = {
     "./supply-chain/packaging/schema.auto",
   ],
   summary:
-    "The ontologies of Intellectual Frontiers Commons as typed TypeScript values over the RDF of the library `rdf`: Mizan, IFCCM, IFQS, IFR, the audit of packaging and the software supply chain, each with its classes, properties, code lists and decisions.",
+    "The ontologies of Intellectual Frontiers Commons as typed TypeScript values over the RDF of the library `rdf`: Mizan, IFCCM, IFQS, IFR, Kanon, the audit of packaging and the software supply chain, each with its classes, properties, code lists and decisions.",
 };

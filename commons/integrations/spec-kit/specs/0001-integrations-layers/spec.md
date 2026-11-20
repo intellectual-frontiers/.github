@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** Integrations is one library on one skeleton, the governance to logical to physical pattern of Kanon, for two families: OBSERVE (read-only connectors that write observations and entities) and EXCHANGE (messages and documents under standards and partner agreements). Governance names no vendor, no syntax, no transport and no file; the logical layer is pure; only the physical layer and the surfaces reach anything. Each file is one unit, imports point one way, units reach each other only through the package's `exports`, and each unit may import only what its row of the table allows. Until commons/kanon has a shared checker, the rules are those of commons/data 0001-layers, written in `tools/layers.ts` as commons/data and commons/headless do.
+**Input:** Integrations is one library on one skeleton, the governance to logical to physical pattern of Kanon, for two families: OBSERVE (read-only connectors that write observations and entities) and EXCHANGE (messages and documents under standards and partner agreements). Governance names no vendor, no syntax, no transport and no file; the logical layer is pure; only the physical layer and the surfaces reach anything. Each file is one unit, imports point one way, units reach each other only through the package's `exports`, and each unit may import only what its row of the table allows. The rules are those of commons/kanon (commons 0033-kanon), declared as a table in the manifest and held by its shared checker.
 
 ## The layers
 
@@ -16,9 +16,9 @@
 
 ## The check and the package
 
-- **FR-005**: `tools/check.ts` MUST run the layers check with the trace of the sources and tests to these specifications (commons 0015-trace), hold the findings against `trace.baseline.txt`, which only shrinks, and be part of `bun run verify`.
+- **FR-005**: `tools/check.ts` MUST run the trace of the sources and tests to these specifications (commons 0015-trace), beside the shared layers checker in `verify`, hold the findings against `trace.baseline.txt`, which only shrinks, and be part of `bun run verify`.
 - **FR-006**: The public surface MUST be the entries of `exports`: `.`, `./governance`, `./logical`, `./http`, `./transport` and `./headless`, and a vendor adapter or a standard MUST be a separate package of commons that imports them by name.
-- **FR-007**: When commons/kanon has a shared checker on main, this library MUST switch `tools/layers.ts` to it; until then its rules MUST be those of commons/data 0001-layers FR-001 to FR-011.
+- **FR-007**: The library MUST declare its table of layers as the field `kanon` of its manifest `library.ts` (commons 0033-kanon FR-010) and its `verify` MUST run the shared checker of `@intellectual-frontiers/kanon` (`bun ../kanon/src/check.ts`); the library keeps no checker of its own.
 - **FR-008**: The library MUST declare itself with a manifest (`library.ts`, `release.ts`, `about.ts`) and be published as compiled ESM with declarations, with exports conditions `types`, `bun` and `default` (commons 0032-lifting-libraries).
 
 ## Acceptance scenarios

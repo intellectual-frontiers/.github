@@ -13,6 +13,16 @@
  *
  * @module
  */
+import { PERSONAL } from "./classify.ts";
 export { classify, type Classification, PERSONAL } from "./classify.ts";
-export { type OsqueryError, OsqueryFailure, type OsqueryOptions, osqueryDriver, osqueryQuery, type OsqueryRow, type Ran, type Run, selectOnly, SIDE_EFFECT_TABLES, tablesRead } from "./driver.ts";
+export { type MachineTarget, type OsqueryError, OsqueryFailure, type OsqueryOptions, osqueryDriver, osqueryQuery, osqueryTarget, type OsqueryRow, type Ran, type Run, selectOnly, SIDE_EFFECT_TABLES, tablesRead } from "./driver.ts";
+/**
+ * A redaction for a fan-out (0059): the personal columns of the schema (0058 FR-003) are hidden, so that a merged result of machines does not carry what identifies a person.
+ *
+ * @param mask - what a hidden value becomes
+ */
+export const redactPersonal = (mask = "[redacted]"): ((column: string, value: unknown) => unknown) => {
+  const names = new Set(Object.values(PERSONAL).flatMap((t) => Object.keys(t.columns)));
+  return (column, value) => (names.has(column) && value !== null ? mask : value);
+};
 export { importSchema, osquery, type OsqueryColumn, type OsquerySchema, type OsqueryTable, type OsqueryType, type Platform, PLATFORMS, readSchema, toObserved } from "./schema.ts";

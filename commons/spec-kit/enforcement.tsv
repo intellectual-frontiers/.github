@@ -523,7 +523,7 @@ requirement	mechanism	by	note
 0027-commons-libraries FR-117	check	.github: cd commons/quality && bun run verify	commons/quality: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-118	check	.github: cd commons/libraries && bun run verify	commons/libraries: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-119	check	.github: cd commons/headless && bun run verify	commons/headless: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
-0027-commons-libraries FR-120	check	.github: cd commons/integrations && bun run verify	commons/integrations: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-120	check	.github: cd commons/kanon && bun run verify	commons/kanon: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0028-conformance-levels FR-001	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: Mizan's ontology holds the four levels with ranks 0 to 3, each entailing what it and the levels below it add
 0028-conformance-levels FR-002	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: every requirement is added by exactly one level and names a rule or says what else proves it
 0028-conformance-levels FR-003	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: L0 adds a manifest, a verify command and a version
@@ -582,3 +582,21 @@ requirement	mechanism	by	note
 0032-lifting-libraries FR-013	check	.github: bun test ./tests/	commons-packages.test.ts: every npm library is packed, its tarball inspected, installed and a consumer of every entry type-checked with tsc 7 under nodenext
 0011-documentation FR-028	check	.github: cd commons/docs && bun run verify	twins.test.ts: every block and inline has a Markdown form, links go to twins, the same page gives the same text; the index for a program; a site is written with a .md beside each .html and llms.txt
 0011-documentation FR-029	check	.github: cd commons/docs && bun run verify	layered-lens.test.ts: the layers page, a page for each model, concept and code list, registers and JSON; links resolve and sources are links to lines; the data models are on commons' own site with no finding
+0033-kanon FR-001	review	0033-kanon FR-001	a reviewer checks that the folders of a library that declares kanon are in the three layers by its table (the check of FR-011 holds the imports)
+0033-kanon FR-002	review	0033-kanon FR-002	a reviewer checks that a lower layer derives what the layer above says by code and keeps no copy of it
+0033-kanon FR-003	review	0033-kanon FR-003	a reviewer checks the trace graph of a library's model until the check finds an element with no edge; LayeredModel carries the edges (commons-kanon.test.ts)
+0033-kanon FR-004	check	.github: bun test ./tests/	commons-kanon.test.ts: a table and a root give layers/above, layers/around and layers/cycle as data; the library's own tests are in commons/kanon/suite
+0033-kanon FR-005	check	.github: bun test ./tests/	commons-kanon.test.ts: an annotation with no trace edge, no carried property and no unexpressed record is kanon/dropped, and is not once it is named
+0033-kanon FR-006	check	.github: bun test ./tests/	commons-kanon.test.ts: an import by a relative path or by a path exports does not name is layers/relative or layers/private
+0033-kanon FR-007	review	0033-kanon FR-007	a reviewer checks that the terms are used as the vocabulary says
+0033-kanon FR-008	review	0033-kanon FR-008	a reviewer checks the table of the alignment against the standards; the ontology kanon is made from it (commons-kanon.test.ts reads the layers' viewpoints)
+0033-kanon FR-009	review	0033-kanon FR-009	a reviewer checks which libraries are Kanon until data and headless declare their tables
+0033-kanon FR-010	check	.github: bun test ./tests/	commons-kanon.test.ts: the manifest accepts a kanon table and refuses a unit in a fourth layer or a field of another form
+0033-kanon FR-011	check	.github: bun test ./tests/	commons-kanon.test.ts: every code of the check is found as data from a table and a root
+0033-kanon FR-012	check	.github: cd commons/kanon && bun run verify	commons/kanon: the verify of the library (its compiler, specification checker, rules, tests and the packing of its package)
+0033-kanon FR-013	check	.github: bun test ./tests/	commons-kanon.test.ts: a LayeredModel is the shape of the layered model of the documentation generator, with the kinds and the id builders agreed
+0033-kanon FR-014	check	.github: bun test ./tests/	commons-kanon.test.ts: the check of the manifests finds a library that declares kanon and whose verify does not run the check
+0033-kanon FR-015	check	.github: bun test ./tests/	commons-kanon.test.ts: the ontology kanon has the six classes, the three layers with their MDA viewpoints, and a record of the basis of each class
+0033-kanon FR-016	review	0033-kanon FR-016	a reviewer checks that no requirement of another library's spec kit is edited by this specification
+0033-kanon FR-017	review	0033-kanon FR-017	a reviewer checks the cross-reference of the ladder and Kanon until the two are unified or kept apart by decision (OQ-2)
+0033-kanon FR-018	review	0033-kanon FR-018	a reviewer checks the typing of a Kanon library; commons/kanon is the example, and its tests prove its own (0001-kanon-checker FR-009)

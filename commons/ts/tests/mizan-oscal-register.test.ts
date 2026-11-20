@@ -7,7 +7,7 @@
  * @module
  */
 import { cpSync } from "node:fs";
-import { OSCAL_VERSION } from "@intellectual-frontiers/grc/oscal";
+import { OSCAL_VERSION } from "@intellectual-frontiers/grc/serializers/oscal";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { makeTempDirSync, mkdirSync, readTextFileSync, removeSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { dirname, fromFileUrl, resolve } from "@intellectual-frontiers/system/path";

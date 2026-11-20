@@ -11,7 +11,7 @@
  *
  * @module
  */
-import { instantOf } from "@intellectual-frontiers/grc/grc";
+import { instantOf } from "../pure/primitives.ts";
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { type Cadences, DEFAULT_CADENCES, freshnessOf } from "../pure/freshness.ts";
 import { buildIndex } from "../pure/index-file.ts";

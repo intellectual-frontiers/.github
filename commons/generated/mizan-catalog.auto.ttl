@@ -58,6 +58,23 @@
         <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-ifr-ifr.auto.ttl> ;
     dcat:version "1.0.0" .
 
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-kanon> a dcat:Dataset ;
+    dcterms:description "The vocabulary of Kanon, the pattern of a library built in three layers: the layers, the elements they say, the projections that derive one from the other, the trace edges that keep identity, the surfaces and the findings of the check."@en ;
+    dcterms:identifier "https://www.intellectualfrontiers.com/ontology/kanon" ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:publisher <https://www.intellectualfrontiers.com/> ;
+    dcterms:title "Kanon"@en ;
+    dcat:distribution <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-kanon-kanon-code-lists.auto.skos.ttl>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-kanon-kanon-code-lists.auto.sql>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-kanon-kanon-mappings.auto.sssom.tsv>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-kanon-kanon-ontology.auto.html>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-kanon-kanon-schemas.auto.json>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-kanon-kanon-shapes.auto.ttl>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-kanon-kanon.auto.ofn>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-kanon-kanon.auto.rdf>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-kanon-kanon.auto.ttl> ;
+    dcat:version "1.0.0" .
+
 <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-mizan> a dcat:Dataset ;
     dcterms:description "The shared vocabulary of Mizan, the IF Spec Profile: the ladder, specifications and requirements, standards, laws and the basis of every term."@en ;
     dcterms:identifier "https://www.intellectualfrontiers.com/ontology/mizan" ;
@@ -303,6 +320,82 @@
     dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/ifr.auto.ttl> ;
     dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> .
 
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-kanon-kanon-code-lists.auto.skos.ttl> a dcat:Distribution ;
+    dcterms:conformsTo <https://www.w3.org/TR/skos-reference/> ;
+    dcterms:format <https://www.iana.org/assignments/media-types/text/turtle> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "Kanon code lists, SKOS"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/kanon-code-lists.auto.skos.ttl> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/kanon-code-lists.auto.skos.ttl> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-kanon-kanon-code-lists.auto.sql> a dcat:Distribution ;
+    dcterms:format <https://www.iana.org/assignments/media-types/application/sql> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "Kanon code lists, SQL"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/kanon-code-lists.auto.sql> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/kanon-code-lists.auto.sql> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sql> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-kanon-kanon-mappings.auto.sssom.tsv> a dcat:Distribution ;
+    dcterms:conformsTo <https://mapping-commons.github.io/sssom/spec/> ;
+    dcterms:format <https://www.iana.org/assignments/media-types/text/tab-separated-values> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "Kanon mappings to standards, SSSOM"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/kanon-mappings.auto.sssom.tsv> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/kanon-mappings.auto.sssom.tsv> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/tab-separated-values> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-kanon-kanon-ontology.auto.html> a dcat:Distribution ;
+    dcterms:format <https://www.iana.org/assignments/media-types/text/html> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "Kanon ontology, HTML view"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/kanon-ontology.auto.html> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/kanon-ontology.auto.html> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/html> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-kanon-kanon-schemas.auto.json> a dcat:Distribution ;
+    dcterms:conformsTo <https://json-schema.org/draft/2020-12/schema> ;
+    dcterms:format <https://www.iana.org/assignments/media-types/application/schema+json> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "Kanon JSON Schema"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/kanon-schemas.auto.json> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/kanon-schemas.auto.json> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/schema+json> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-kanon-kanon-shapes.auto.ttl> a dcat:Distribution ;
+    dcterms:conformsTo <https://www.w3.org/TR/shacl/> ;
+    dcterms:format <https://www.iana.org/assignments/media-types/text/turtle> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "Kanon SHACL shapes"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/kanon-shapes.auto.ttl> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/kanon-shapes.auto.ttl> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-kanon-kanon.auto.ofn> a dcat:Distribution ;
+    dcterms:format <https://www.iana.org/assignments/media-types/text/owl-functional> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "Kanon ontology, OWL 2 functional syntax"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/kanon.auto.ofn> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/kanon.auto.ofn> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/owl-functional> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-kanon-kanon.auto.rdf> a dcat:Distribution ;
+    dcterms:format <https://www.iana.org/assignments/media-types/application/rdf+xml> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "Kanon ontology, RDF/XML"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/kanon.auto.rdf> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/kanon.auto.rdf> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-kanon-kanon.auto.ttl> a dcat:Distribution ;
+    dcterms:format <https://www.iana.org/assignments/media-types/text/turtle> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "Kanon ontology, Turtle"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/kanon.auto.ttl> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/kanon.auto.ttl> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> .
+
 <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-mizan-mizan-code-lists.auto.skos.ttl> a dcat:Distribution ;
     dcterms:conformsTo <https://www.w3.org/TR/skos-reference/> ;
     dcterms:format <https://www.iana.org/assignments/media-types/text/turtle> ;
@@ -387,4 +480,5 @@
     dcat:dataset <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-ifccm>,
         <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-ifqs>,
         <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-ifr>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-kanon>,
         <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-mizan> .

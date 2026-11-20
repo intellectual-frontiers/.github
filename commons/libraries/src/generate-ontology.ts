@@ -37,6 +37,7 @@ import {
 import * as ifccmOntology from "@intellectual-frontiers/ontology/ifccm";
 import * as ifrOntology from "@intellectual-frontiers/ontology/ifr";
 import * as ifqsOntology from "@intellectual-frontiers/ontology/ifqs";
+import * as kanonOntology from "@intellectual-frontiers/ontology/kanon";
 import { formatRdfFinding, type OntologyFile, validate } from "@intellectual-frontiers/rdf";
 import { stdio } from "@intellectual-frontiers/system";
 import { exportDcat } from "@intellectual-frontiers/mizan/integrations/pure/export-dcat";
@@ -241,8 +242,40 @@ export const IFR: OntologyPublication = {
   license: CC0,
 };
 
+/** The ontology of Kanon (commons 0033-kanon), as it is published. */
+export const KANON: OntologyPublication = {
+  name: "kanon",
+  ns: { prefix: "kanon", iri: kanonOntology.KANON.iri },
+  idNs: { prefix: "mzid", iri: MZID.iri },
+  curies: [
+    ["kanon", kanonOntology.KANON.iri],
+    ["mz", MZ.iri],
+    ["xsd", "http://www.w3.org/2001/XMLSchema#"],
+    ["rdfs", "http://www.w3.org/2000/01/rdf-schema#"],
+    ["skos", "http://www.w3.org/2004/02/skos/core#"],
+    ["dcterms", "http://purl.org/dc/terms/"],
+    ["prov", "http://www.w3.org/ns/prov#"],
+    ["sh", "http://www.w3.org/ns/shacl#"],
+  ],
+  files: kanonOntology.files,
+  ontology: kanonOntology.kanonOntology,
+  classes: kanonOntology.classes,
+  properties: kanonOntology.properties,
+  terms: kanonOntology.terms,
+  schemas: [kanonOntology.Layer],
+  lists: listsOf("kanon", [["Layer", kanonOntology.layers]]),
+  source: "commons/ontology/src/kanon/*.ts",
+  run: RUN,
+  shapes: { prefix: "kanonsh", iri: "https://www.intellectualfrontiers.com/ontology/kanon-shapes#" },
+  schemasIri: "https://www.intellectualfrontiers.com/ontology/kanon-schemas",
+  sssomSetId: "https://www.intellectualfrontiers.com/ontology/kanon-mappings",
+  sssomCuries: { dcterms: "http://purl.org/dc/terms/", prov: "http://www.w3.org/ns/prov#", sh: "http://www.w3.org/ns/shacl#" },
+  viewTitle: "Kanon: the ontology",
+  license: CC0,
+};
+
 /** The ontologies of commons that are published, each from its own typed modules: Mizan's, then the ones its specifications define. */
-export const publications: readonly OntologyPublication[] = [MIZAN, IFCCM, IFQS, IFR];
+export const publications: readonly OntologyPublication[] = [MIZAN, IFCCM, IFQS, IFR, KANON];
 
 /** Where the generated files are downloaded from: this repository's `commons/` folder on its default branch. */
 const DOWNLOAD_BASE = "https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/";

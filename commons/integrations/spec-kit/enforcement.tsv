@@ -7,7 +7,7 @@ requirement	mechanism	by	note
 0001-integrations-layers FR-004	check	.github: cd commons/integrations && bun run verify	suite/layers.test.ts: no source of the two pure layers names a vendor
 0001-integrations-layers FR-005	check	.github: cd commons/integrations && bun run verify	suite/layers.test.ts: the real tree has no finding of the layers check
 0001-integrations-layers FR-006	check	.github: cd commons/integrations && bun run verify	suite/layers.test.ts: the table's entries are the package's exports
-0001-integrations-layers FR-007	check	.github: cd commons/integrations && bun run verify	suite/layers.test.ts: the rules are the six rules of the data library's check
+0001-integrations-layers FR-007	check	.github: cd commons/integrations && bun run verify	suite/layers.test.ts: the table is read from the manifest and verify runs the shared checker
 0001-integrations-layers FR-008	check	.github: cd commons/integrations && bun run verify	suite/layers.test.ts: the manifest agrees with the package
 0002-integrations-governance FR-001	check	.github: cd commons/integrations && bun run verify	suite/governance-ids.test.ts: each parse accepts its form and refuses others as a value
 0002-integrations-governance FR-002	check	.github: cd commons/integrations && bun run verify	suite/governance-ids.test.ts: a refused credential reference does not appear in its error

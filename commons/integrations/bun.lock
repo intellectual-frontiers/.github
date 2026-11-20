@@ -8,6 +8,7 @@
         "@intellectual-frontiers/commons": "link:../ts",
         "@intellectual-frontiers/core": "link:../core",
         "@intellectual-frontiers/headless": "link:../headless",
+        "@intellectual-frontiers/kanon": "link:../kanon",
         "@intellectual-frontiers/libraries": "link:../libraries",
         "@intellectual-frontiers/mizan": "link:../mizan",
         "@intellectual-frontiers/net": "link:../net",
@@ -27,6 +28,8 @@
     "@intellectual-frontiers/core": ["@intellectual-frontiers/core@link:../core", {}],
 
     "@intellectual-frontiers/headless": ["@intellectual-frontiers/headless@link:../headless", {}],
+
+    "@intellectual-frontiers/kanon": ["@intellectual-frontiers/kanon@link:../kanon", {}],
 
     "@intellectual-frontiers/libraries": ["@intellectual-frontiers/libraries@link:../libraries", {}],
 
