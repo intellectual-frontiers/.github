@@ -187,7 +187,7 @@ export function whySentence(w: Why): string {
     case "surface-unknown":
       return `the public surface of ${w.provider} cannot be compared (${w.why}), so every importer is reached`;
     case "foundation":
-      return `${w.library} is a foundation library: its smoke gate runs before anything wider`;
+      return `${w.library} is a foundation library: the smoke gate of the foundation (the suites of core, formats, crypto, system, terminal, kanon and libraries) runs before anything wider`;
     case "everything":
       return w.because;
     default:
@@ -367,7 +367,7 @@ export function planProof(input: ProofInput): PlanStep {
       continue;
     }
     const node = libs.get(name);
-    if (node?.foundation === true) add({ kind: "smoke", library: name }, { kind: "foundation", library: name });
+    if (node?.foundation === true) for (const f of input.libraries.filter((l) => l.foundation)) add({ kind: "smoke", library: f.name }, { kind: "foundation", library: name });
     const d = surface.delta;
     switch (d.kind) {
       case "same":
