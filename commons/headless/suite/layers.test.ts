@@ -82,7 +82,7 @@ proves(["0001-headless-layers FR-003"], "a file of one unit reaches another thro
   assertEquals(importing("src/logical/a.ts", "./model.ts"), [], "inside the unit a relative import is fine");
   assertEquals(importing("src/logical/a.ts", `${PKG}/governance/action`), ["layers/private"]);
   assertEquals(importing("src/logical/a.ts", `${PKG}/nothing`), ["layers/private"]);
-  for (const own of ["suite/a.test.ts", "tools/a.ts", "src/mod.ts", "about.ts"]) assertEquals(importing(own, "../src/logical/model.ts"), [], `${own} is the library's own checking: it may import any file`);
+  for (const own of ["suite/a.test.ts", "tools/a.ts", "src/mod.ts", "about.ts"]) assertEquals(importing(own, own === "about.ts" ? "./src/logical/model.ts" : "../src/logical/model.ts"), [], `${own} is the library's own checking: it may import any file`);
 });
 
 proves(["0001-headless-layers FR-004"], "each unit imports only what its row allows: governance Core, logical Core and the terminal's args and commands, the command line Core, the terminal and the system, the adapter Core and the telemetry", () => {
