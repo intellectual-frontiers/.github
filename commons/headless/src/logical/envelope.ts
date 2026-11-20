@@ -33,7 +33,8 @@ export function toJson(value: unknown): Json {
     case "string":
       return value;
     case "number":
-      return Number.isFinite(value) ? value : null;
+      // JSON has no negative zero: `JSON.stringify(-0)` is `0`, so the value is made what its text says
+      return Number.isFinite(value) ? (value === 0 ? 0 : value) : null;
     case "bigint":
       return value.toString();
     case "function":
