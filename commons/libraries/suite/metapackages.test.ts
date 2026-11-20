@@ -153,7 +153,7 @@ proves([`${DIST} FR-008`], "the packer stages a package with no code, the exact 
     assertEquals(packed.findings, []);
     assert(packed.tarball?.endsWith("intellectual-frontiers-foundation-0.3.0.tgz") === true);
     const listed = await proc.run(["tar", "-tzf", packed.tarball ?? ""]);
-    assertEquals(listed.stdout.trim().split("\n").sort(), ["package/LICENSE", "package/README.md", "package/index.d.ts", "package/index.js", "package/package.json"]);
+    assertEquals(listed.stdout.trim().split(/\r?\n/).sort(), ["package/LICENSE", "package/README.md", "package/index.d.ts", "package/index.js", "package/package.json"]);
     const pkg = await proc.run(["tar", "-xzOf", packed.tarball ?? "", "package/package.json"]);
     const json: unknown = JSON.parse(pkg.stdout);
     assert(typeof json === "object" && json !== null && "dependencies" in json && "license" in json);
