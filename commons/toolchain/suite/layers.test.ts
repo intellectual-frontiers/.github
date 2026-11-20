@@ -18,6 +18,7 @@ const EXPORTS: Record<string, string> = {
   ".": "./src/mod.ts",
   "./governance": "./src/governance/mod.ts",
   "./logical": "./src/logical/mod.ts",
+  "./ontology": "./src/physical/ontology/mod.ts",
 };
 const PKG = "@intellectual-frontiers/toolchain";
 const at = (path: string, text: string) => ({ path, text });
@@ -36,6 +37,7 @@ proves(["0001-toolchain-layers FR-001", "0001-toolchain-layers FR-002"], "the sh
   assertEquals(found.value.map((f) => `${f.rule} ${f.file}`), []);
   assertEquals(unitOf(table(), "src/governance/tool.ts")?.name, "src/governance/");
   assertEquals(unitOf(table(), "src/logical/resolve.ts")?.name, "src/logical/");
+  assertEquals(unitOf(table(), "src/physical/ontology/ontology.ts")?.name, "src/physical/ontology/");
 });
 
 proves(["0001-toolchain-layers FR-001"], "a file in no unit is layers/unclassified", () => {
@@ -52,6 +54,12 @@ proves(["0001-toolchain-layers FR-002"], "below may not import above, a unit rea
   assertEquals(rules([at("src/governance/a.ts", `import { findSecretLike } from "@intellectual-frontiers/archon/governance";\n`)]), []);
   assertEquals(rules([at("src/governance/a.ts", `import { x } from "@intellectual-frontiers/archon/logical";\n`)]), ["layers/external"]);
   assertEquals(rules([at("src/logical/a.ts", `import { sha256 } from "@intellectual-frontiers/crypto/sha256";\n`)]), ["layers/external"]);
+  assertEquals(rules([at("src/governance/a.ts", `import { x } from "${PKG}/ontology";\n`)]), ["layers/above"]);
+  assertEquals(rules([at("src/logical/a.ts", `import { x } from "${PKG}/ontology";\n`)]), ["layers/above"]);
+  assertEquals(rules([at("src/physical/ontology/a.ts", `import { x } from "${PKG}/logical";\n`)]), []);
+  assertEquals(rules([at("src/physical/ontology/a.ts", `import { downloadOf } from "@intellectual-frontiers/ontology/supply-chain/downloads";\n`)]), []);
+  assertEquals(rules([at("src/logical/a.ts", `import { downloadOf } from "@intellectual-frontiers/ontology/supply-chain/downloads";\n`)]), ["layers/external"]);
+  assertEquals(rules([at("src/physical/ontology/a.ts", `import { x } from "node:fs";\n`)]), ["layers/external"]);
   assertEquals(rules([at("suite/a.test.ts", `import { x } from "../src/logical/mod.ts";\n`)]), []);
 });
 

@@ -22,3 +22,8 @@ requirement	mechanism	by	note
 0003-toolchain-logical FR-006	check	.github: cd commons/toolchain && bun run verify	suite/logical.test.ts: requirementsFor gives requirements of kind tool that an order of archon is built from
 0002-toolchain-governance FR-008	check	.github: cd commons/toolchain && bun run verify	suite/governance.test.ts: a tool holds no version or hash of a pin, only the id of the pin
 0003-toolchain-logical FR-007	check	.github: cd commons/toolchain && bun run verify	suite/logical.test.ts: the downloads come from a PinSource, a pin with no download or a version below the minimum is a reason, and the library does not read the ontology
+0002-toolchain-governance FR-009	check	.github: cd commons/toolchain && bun run verify	suite/governance.test.ts: other names of a program, refused where they clash
+0004-toolchain-ontology FR-001	check	.github: cd commons/toolchain && bun run verify	suite/ontology.test.ts: a download for a pinned program on a platform
+0004-toolchain-ontology FR-002	check	.github: cd commons/toolchain && bun run verify	suite/ontology.test.ts: the ontology's reason for an unknown, unpinned or not pinned download
+0004-toolchain-ontology FR-003	check	.github: cd commons/toolchain && bun run verify	suite/ontology.test.ts: every download given is valid under defineDownload
+0004-toolchain-ontology FR-004	check	.github: cd commons/toolchain && bun run verify	suite/ontology.test.ts: no version, address or hash in the sources

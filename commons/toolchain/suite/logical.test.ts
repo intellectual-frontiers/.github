@@ -6,6 +6,7 @@
  *
  * @module
  */
+import { err, ok } from "@intellectual-frontiers/core";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { parseDialectId, parseSubjectName, type DialectId, type JsonValue } from "@intellectual-frontiers/archon/governance";
 import { buildOrder } from "@intellectual-frontiers/archon/logical";
@@ -54,8 +55,8 @@ function download(name: string, version = "1.0.0"): Download {
 /** A source of pins with made-up downloads: jq, gh and old on linux-x64 and macos-arm64. */
 const PINS: PinSource = {
   lookup: (pin, platform) => {
-    if (platform !== "linux-x64" && platform !== "macos-arm64") return undefined;
-    return pin === "pin-jq" || pin === "pin-gh" || pin === "pin-old" ? download(pin, pin === "pin-old" ? "0.5.0" : "1.0.0") : undefined;
+    if (platform !== "linux-x64" && platform !== "macos-arm64") return err(`the source has no download on ${platform}`);
+    return pin === "jq" || pin === "gh" || pin === "old" ? ok(download(pin, pin === "old" ? "0.5.0" : "1.0.0")) : err(`the source has no pin called ${pin}`);
   },
 };
 
@@ -78,7 +79,7 @@ function tool(name: string, more: Partial<ToolInput> = {}) {
     versionArgs: ["--version"],
     phases: ["core"],
     scope: "user",
-    bindings: [{ kind: "pin", pin: `pin-${name}` }, { kind: "package", manager: "manager-brew", packages: [name] }, { kind: "package", manager: "manager-builder", packages: [name] }],
+    bindings: [{ kind: "pin", pin: name }, { kind: "package", manager: "manager-brew", packages: [name] }, { kind: "package", manager: "manager-builder", packages: [name] }],
     ...more,
   });
   if (r.kind === "err") throw new Error(r.error.join("; "));
@@ -194,7 +195,7 @@ proves(["0003-toolchain-logical FR-006"], "the requirements of kind tool are val
   assertEquals(desired["dialect"], "native-pinned");
   assertEquals(desired["version"], "1.0.0");
   const source = desired["source"];
-  assert(isRecord(source) && source["kind"] === "download" && source["pin"] === "pin-gh" && source["sha256"] === SHA);
+  assert(isRecord(source) && source["kind"] === "download" && source["pin"] === "gh" && source["sha256"] === SHA);
   const git = reqs.value.find((r) => r.id === "tool.git")?.desired;
   assert(isRecord(git) && git["version"] === null);
   const name = parseSubjectName("build-01.example.test");
@@ -209,7 +210,7 @@ proves(["0003-toolchain-logical FR-007"], "downloads come from a source of pins;
   const noDownload = resolveTools(catalog(), ["jq"], [PINNED], PINS, { ...CTX, platform: "linux-arm64", preference: [id("native-pinned")] });
   assert(noDownload.kind === "err");
   const nd = noDownload.error[0];
-  assert(nd?.kind === "unexpressed" && nd.reasons[0]?.reason.includes("pin-jq") && nd.reasons[0].reason.includes("linux-arm64"));
+  assert(nd?.kind === "unexpressed" && nd.reasons[0]?.reason.includes("jq") && nd.reasons[0].reason.includes("linux-arm64"));
   const old = defineCatalog([tool("old", { minimum: "1.0.0" })]);
   assert(old.kind === "ok");
   const below = resolveTools(old.value, ["old"], [PINNED], PINS, { ...CTX, preference: [id("native-pinned")] });
@@ -222,5 +223,5 @@ proves(["0003-toolchain-logical FR-007"], "downloads come from a source of pins;
   assertEquals(asked, 1);
   const root = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
   const files = await runtime.readSources(root, ["src"]);
-  for (const f of files) assertEquals(f.text.includes("@intellectual-frontiers/ontology"), false, `${f.path} reads the ontology`);
+  for (const f of files.filter((x) => x.path.startsWith("src/governance/") || x.path.startsWith("src/logical/"))) assertEquals(f.text.includes("@intellectual-frontiers/ontology"), false, `${f.path} reads the ontology`);
 });

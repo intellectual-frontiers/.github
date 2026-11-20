@@ -18,7 +18,7 @@ const JQ: ToolInput = {
   versionArgs: ["--version"],
   phases: ["core"],
   scope: "user",
-  bindings: [{ kind: "pin", pin: "pin-jq" }, { kind: "package", manager: "manager-brew", packages: ["jq"] }],
+  bindings: [{ kind: "pin", pin: "jq" }, { kind: "package", manager: "manager-brew", packages: ["jq"] }],
 };
 
 function tool(more: Partial<ToolInput> = {}): Tool {
@@ -46,8 +46,10 @@ proves(["0002-toolchain-governance FR-001"], "names and versions are made only b
   assert(compareVersions("2.0.0-rc.1", "2.0.0") < 0);
   assert(compareVersions("2.0.0", "2.0.0-rc.1") > 0);
   assert(compareVersions("157.0.8103.50", "157.0.8103.9") > 0);
-  assertEquals(parsePinId("pin-bun").kind, "ok");
-  assertEquals(parsePinId("bun").kind, "err");
+  assertEquals(parsePinId("bun").kind, "ok");
+  assertEquals(parsePinId("rustup-init").kind, "ok");
+  assertEquals(parsePinId("pin Bun").kind, "err");
+  assertEquals(parsePinId("1bun").kind, "err");
   assertEquals(parseManagerId("manager-apt").kind, "ok");
   assertEquals(parseManagerId("apt").kind, "err");
 });
@@ -94,12 +96,12 @@ proves(["0002-toolchain-governance FR-004"], "a download has a version, an https
 });
 
 proves(["0002-toolchain-governance FR-005"], "a tool has bindings, and no more than one pin binding or one package binding for a manager", () => {
-  assert(refused({ bindings: [{ kind: "pin", pin: "jq" }] }).some((m) => m.includes("pin id")));
+  assert(refused({ bindings: [{ kind: "pin", pin: "Jq 2" }] }).some((m) => m.includes("pin id")));
   assert(refused({ bindings: [{ kind: "package", manager: "manager-brew", packages: [] }] }).some((m) => m.includes("at least one package")));
   assert(refused({ bindings: [{ kind: "package", manager: "brew", packages: ["jq"] }] }).some((m) => m.includes("manager id")));
   assert(refused({ bindings: [{ kind: "package", manager: "manager-apt", packages: ["jq"], version: "latest" }] }).some((m) => m.includes("latest")));
   assert(refused({ bindings: [{ kind: "package", manager: "manager-apt", packages: ["jq"] }, { kind: "package", manager: "manager-apt", packages: ["jq2"] }] }).some((m) => m.includes("one package binding for manager-apt")));
-  assert(refused({ bindings: [{ kind: "pin", pin: "pin-jq" }, { kind: "pin", pin: "pin-jq2" }] }).some((m) => m.includes("one pin binding")));
+  assert(refused({ bindings: [{ kind: "pin", pin: "jq" }, { kind: "pin", pin: "jq2" }] }).some((m) => m.includes("one pin binding")));
   assertEquals(tool({ bindings: [{ kind: "package", manager: "manager-apt", packages: ["jq"] }, { kind: "package", manager: "manager-brew", packages: ["jq"] }] }).bindings.length, 2);
 });
 
@@ -133,10 +135,24 @@ proves(["0002-toolchain-governance FR-007"], "a catalog refuses a tool twice, a 
 
 proves(["0002-toolchain-governance FR-008"], "a tool holds no version or hash of a pin, only the id of the pin", () => {
   const t = tool();
-  assertEquals(Object.keys(t).sort(), ["bindings", "env", "name", "needs", "phases", "pin", "program", "provides", "scope", "summary", "versionArgs"]);
+  assertEquals(Object.keys(t).sort(), ["alsoNamed", "bindings", "env", "name", "needs", "phases", "pin", "program", "provides", "scope", "summary", "versionArgs"]);
   const pinBinding = t.bindings.find((b) => b.kind === "pin");
-  assertEquals(pinBinding && pinBinding.kind === "pin" ? String(pinBinding.pin) : undefined, "pin-jq");
+  assertEquals(pinBinding && pinBinding.kind === "pin" ? String(pinBinding.pin) : undefined, "jq");
   assertEquals(/[0-9a-f]{64}/.test(JSON.stringify(t)), false, "no hash is in the declaration");
   assertEquals(/https?:\/\//.test(JSON.stringify(t)), false, "no address is in the declaration");
   assertEquals("version" in t, false);
+});
+
+proves(["0002-toolchain-governance FR-009"], "a tool may name other names of its program, and a catalog refuses a name that clashes", () => {
+  const t = tool({ name: "chromium", program: "chromium", alsoNamed: ["chrome", "google-chrome"] });
+  assertEquals(t.alsoNamed, ["chrome", "google-chrome"]);
+  assertEquals(tool().alsoNamed, []);
+  assert(refused({ alsoNamed: ["bin/chrome"] }).some((m) => m.includes("other name")));
+  assert(refused({ alsoNamed: [" "] }).some((m) => m.includes("other name")));
+  const apt = [{ kind: "package", manager: "manager-apt", packages: ["x"] }] as const;
+  const clash = defineCatalog([tool({ name: "chromium", program: "chromium", alsoNamed: ["chrome"], bindings: apt }), tool({ name: "chrome-tool", program: "chrome", bindings: apt })]);
+  assert(clash.kind === "err" && clash.error.some((m) => m.includes("provided by")));
+  const twice = defineCatalog([tool({ name: "one", program: "one", alsoNamed: ["x"], bindings: apt }), tool({ name: "two", program: "two", alsoNamed: ["x"], bindings: apt })]);
+  assert(twice.kind === "err");
+  assertEquals(defineCatalog([t]).kind, "ok");
 });

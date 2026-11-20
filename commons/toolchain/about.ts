@@ -18,6 +18,7 @@ export const about: About = {
     { path: "spec-kit/", what: "The library's own specifications, numbered from 0001.", mayImport: ["nothing: Markdown and TSV"] },
     { path: "src/governance/", what: "Layer 1: tool names and versions, the declaration of a tool, the catalog.", mayImport: ["core, the digest of crypto and the governance of archon, by package name"] },
     { path: "src/logical/", what: "Layer 2: the guarantees of a dialect, the resolution, the plan, the requirements of archon.", mayImport: ["governance, by package name", "core and the governance of archon, by package name"] },
+    { path: "src/physical/ontology/", what: "Layer 3: the one adapter, a source of pins over the packaging ontology.", mayImport: ["governance and logical, by package name", "core and the downloads of the ontology, by package name"] },
     { path: "suite/", what: "The tests: every requirement.", mayImport: ["src/", "the test module of commons' runtime, by package name"] },
     { path: "tools/", what: "The trace check and the packer `bun run verify` runs.", mayImport: ["the kernel, the runtime and the packer of commons, by package name"] },
   ],
