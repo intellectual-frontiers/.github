@@ -3,7 +3,6 @@
   "set": "programs",
   "dependencies": {
     "@intellectual-frontiers/arcactl": "0.9.0",
-    "@intellectual-frontiers/archon-tool": "0.1.0",
     "@intellectual-frontiers/ergonex": "0.4.7",
     "@intellectual-frontiers/grc": "0.2.2",
     "@intellectual-frontiers/integrations": "0.1.3",
