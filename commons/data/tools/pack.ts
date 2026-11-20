@@ -14,6 +14,7 @@
  */
 import process from "node:process";
 import { readdirSync, rmSync } from "node:fs";
+import { licenseOf } from "@intellectual-frontiers/libraries/license";
 import { fs, path, proc } from "@intellectual-frontiers/system";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
@@ -30,7 +31,7 @@ export function publishedManifest(own: Readonly<Record<string, unknown>>): Reado
     name: PACKAGE,
     version: text("version"),
     description: "arcactl: check, set up and maintain the arca data models in PostgreSQL, from a terminal or a pipeline.",
-    license: "MIT",
+    license: licenseOf(undefined),
     type: "module",
     bin: { arcactl: "./arcactl.mjs" },
     engines: { node: ">=22" },
