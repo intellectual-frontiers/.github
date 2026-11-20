@@ -37,8 +37,28 @@ export const parseSystemId: (text: string) => Result<SystemId, string> = made<"e
 
 /** The states of an asset: seen and not adopted, known and observed but not changed, and changed to match what is declared. */
 export const STATES = ["discovered", "adopted", "managed"] as const;
+
+/**
+ * The state of an asset: `discovered` (seen, not adopted), `adopted` (known, observed and verified, never changed) or `managed` (changed to match what is declared).
+ *
+ * @example
+ * ```ts
+ * import type { AssetState } from "./ids.ts";
+ * const state: AssetState = "adopted";
+ * ```
+ */
 export type AssetState = (typeof STATES)[number];
 
 /** The capabilities an asset may offer. */
 export const CAPABILITIES = ["provision", "identity", "plan", "converge", "verify", "observe", "update", "access", "backup", "retire"] as const;
+
+/**
+ * One capability an asset may offer: what can be done with it, from observing it to retiring it.
+ *
+ * @example
+ * ```ts
+ * import type { Capability } from "./ids.ts";
+ * const capability: Capability = "converge";
+ * ```
+ */
 export type Capability = (typeof CAPABILITIES)[number];
