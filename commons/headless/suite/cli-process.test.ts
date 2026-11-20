@@ -18,7 +18,7 @@ type Ended = { readonly code: number | null; readonly signal: string | null; rea
 /** Runs the fixture as a process; `during` is given the child once it has said `ready`, to send it a signal. */
 function child(args: readonly string[], env: Record<string, string> = {}, during?: (c: ReturnType<typeof spawn>) => void): Promise<Ended> {
   return new Promise((resolve, reject) => {
-    const c = spawn(process.execPath, [ENTRY, ...args], { env: { ...process.env, NO_COLOR: "1", ...env }, stdio: ["pipe", "pipe", "pipe"] });
+    const c = spawn(process.execPath, [ENTRY, ...args], { env: { ...process.env, NO_COLOR: "1", FIXTURE_PLAIN: "1", ...env }, stdio: ["pipe", "pipe", "pipe"] });
     let out = "";
     let err = "";
     let sent = false;
