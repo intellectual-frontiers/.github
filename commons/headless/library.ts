@@ -12,7 +12,7 @@ export const library = {
   verify: "bun run verify",
   version: "0.4.0",
   distribution: ["github", "npm"],
-  exports: [".", "./governance", "./logical", "./cli", "./targets/local", "./targets/ssh", "./ssh-inbound", "./otel", "./askpass", "./mcp", "./rest"],
+  exports: [".", "./governance", "./logical", "./cli", "./targets/local", "./targets/ssh", "./ssh-inbound", "./otel", "./askpass", "./mcp", "./rest", "./describe"],
   summary:
     "Headless programs as one contract in layers: the governance of an action (kind, effect, audience, confirmation, problems, exit statuses, redaction), the logical layer (the command model, the typed outcome, the closing block, JSON and SARIF, explain, hints, nested runs) and the command-line surface (calm output, prompts, the run log, signals, help, completions, man pages), with composition of a host and plugins into one program, audience tiers, a credential prompt port, plan-versus-apply execution with a signable plan hash, a tool server and a REST skeleton generated from governance, and an OpenTelemetry adapter of its own.",
   kanon: {
@@ -93,6 +93,16 @@ export const library = {
         packages: [
           { name: "@intellectual-frontiers/core", subpaths: [] },
           { name: "@intellectual-frontiers/telemetry", subpaths: "any" },
+        ],
+      },
+      {
+        folder: "src/describe/",
+        layer: "physical",
+        mayImport: ["src/governance/", "src/logical/", "src/surfaces/mcp/", "src/surfaces/rest/"],
+        packages: [
+          { name: "@intellectual-frontiers/core", subpaths: [] },
+          { name: "@intellectual-frontiers/kanon", subpaths: [] },
+          { name: "@intellectual-frontiers/terminal", subpaths: ["args"] },
         ],
       },
       { folder: "src/", own: true },
