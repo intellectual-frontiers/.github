@@ -1,0 +1,10 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-integrations-fhir-plugin FR-001	check	.github: cd commons/integrations-fhir && bun run verify	suite/fhir.test.ts: the entries and an empty embedded list
+0001-integrations-fhir-plugin FR-002	check	.github: cd commons/integrations-fhir && bun run verify	suite/fhir.test.ts: round trips and conformance
+0001-integrations-fhir-plugin FR-003	check	.github: cd commons/integrations-fhir && bun run verify	suite/fhir.test.ts: a repeating path is written as an array
+0001-integrations-fhir-plugin FR-004	check	.github: cd commons/integrations-fhir && bun run verify	suite/fhir.test.ts: a syntax failure holds none of the text
+0001-integrations-fhir-plugin FR-005	check	.github: cd commons/integrations-fhir && bun run verify	suite/fhir.test.ts: definitions are loaded from supplied data and validate a resource
+0001-integrations-fhir-plugin FR-006	check	.github: cd commons/integrations-fhir && bun run verify	suite/fhir.test.ts: OperationOutcome made and read back
+0001-integrations-fhir-plugin FR-007	check	.github: cd commons/integrations-fhir && bun run verify	suite/fhir.test.ts: the plugin keeps to the ports

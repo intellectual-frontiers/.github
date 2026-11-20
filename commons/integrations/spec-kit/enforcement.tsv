@@ -1,0 +1,78 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-integrations-layers FR-001	check	.github: cd commons/integrations && bun run verify	suite/layers.test.ts: every file of the real tree is in a unit, and a file in none is layers/unclassified
+0001-integrations-layers FR-002	check	.github: cd commons/integrations && bun run verify	suite/layers.test.ts: below may not import above, and a unit reaches another only through exports
+0001-integrations-layers FR-003	check	.github: cd commons/integrations && bun run verify	suite/layers.test.ts: each unit imports only what its row allows, and the pure layers import Core alone
+0001-integrations-layers FR-004	check	.github: cd commons/integrations && bun run verify	suite/layers.test.ts: no source of the two pure layers names a vendor
+0001-integrations-layers FR-005	check	.github: cd commons/integrations && bun run verify	suite/layers.test.ts: the real tree has no finding of the layers check
+0001-integrations-layers FR-006	check	.github: cd commons/integrations && bun run verify	suite/layers.test.ts: the table's entries are the package's exports
+0001-integrations-layers FR-007	check	.github: cd commons/integrations && bun run verify	suite/layers.test.ts: the table is read from the manifest and verify runs the shared checker
+0001-integrations-layers FR-008	check	.github: cd commons/integrations && bun run verify	suite/layers.test.ts: the manifest agrees with the package
+0002-integrations-governance FR-001	check	.github: cd commons/integrations && bun run verify	suite/governance-ids.test.ts: each parse accepts its form and refuses others as a value
+0002-integrations-governance FR-002	check	.github: cd commons/integrations && bun run verify	suite/governance-ids.test.ts: a refused credential reference does not appear in its error
+0002-integrations-governance FR-003	check	.github: cd commons/integrations && bun run verify	suite/governance-ids.test.ts: urn parts round-trip (property)
+0002-integrations-governance FR-004	check	.github: cd commons/integrations && bun run verify	suite/governance-observe.test.ts: the classes are a closed union, the contract says never
+0002-integrations-governance FR-005	check	.github: cd commons/integrations && bun run verify	suite/governance-observe.test.ts: a grant can only read, and no scope is a problem
+0002-integrations-governance FR-006	check	.github: cd commons/integrations && bun run verify	suite/governance-observe.test.ts: cadence defaults, caps and staleness (property)
+0002-integrations-governance FR-007	check	.github: cd commons/integrations && bun run verify	suite/governance-observe.test.ts: a spec without a secret field is refused
+0002-integrations-governance FR-008	check	.github: cd commons/integrations && bun run verify	suite/governance-observe.test.ts: the generic denylist and a weaker one
+0002-integrations-governance FR-009	check	.github: cd commons/integrations && bun run verify	suite/governance-observe.test.ts: decidePin over every policy and digest (property)
+0002-integrations-governance FR-010	check	.github: cd commons/integrations && bun run verify	suite/governance-exchange.test.ts: register refuses a duplicate, a mismatched urn and a licence without terms
+0002-integrations-governance FR-011	check	.github: cd commons/integrations && bun run verify	suite/governance-exchange.test.ts: sourceAllowed over each embedding and source
+0002-integrations-governance FR-012	check	.github: cd commons/integrations && bun run verify	suite/governance-exchange.test.ts: references carry their level
+0002-integrations-governance FR-013	check	.github: cd commons/integrations && bun run verify	suite/governance-exchange.test.ts: agreementProblems finds each
+0002-integrations-governance FR-014	check	.github: cd commons/integrations && bun run verify	suite/governance-exchange.test.ts: only a public payload may appear in logs
+0002-integrations-governance FR-015	check	.github: cd commons/integrations && bun run verify	suite/governance-exchange.test.ts: embeddingFindings refuses embedded content a licence does not allow
+0003-integrations-logical FR-001	check	.github: cd commons/integrations && bun run verify	suite/observe.test.ts: a connector observes over an in-memory port and a fixed clock
+0003-integrations-logical FR-002	check	.github: cd commons/integrations && bun run verify	suite/observe.test.ts: a secret never shows in text or JSON
+0003-integrations-logical FR-003	check	.github: cd commons/integrations && bun run verify	suite/observe.test.ts: findings and failures hold no value of the payload
+0004-integrations-physical FR-001	check	.github: cd commons/integrations && bun run verify	suite/physical.test.ts: a write is refused by the guard and never reaches the transport
+0004-integrations-physical FR-002	check	.github: cd commons/integrations && bun run verify	suite/physical.test.ts: pages, and failures name the path only
+0004-integrations-physical FR-003	check	.github: cd commons/integrations && bun run verify	suite/physical.test.ts: the digest of a known text
+0004-integrations-physical FR-004	check	.github: cd commons/integrations && bun run verify	suite/physical.test.ts: a delivery, and a rejection with its status only
+0004-integrations-physical FR-005	check	.github: cd commons/integrations && bun run verify	suite/physical.test.ts: the token form and the failures
+0004-integrations-physical FR-006	check	.github: cd commons/integrations && bun run verify	suite/physical.test.ts: frame and unframe round-trip (property)
+0005-integrations-observe FR-001	check	.github: cd commons/integrations && bun run verify	suite/observe.test.ts: an observation round-trips through its document
+0005-integrations-observe FR-002	check	.github: cd commons/integrations && bun run verify	suite/observe.test.ts: records and entities decode
+0005-integrations-observe FR-003	check	.github: cd commons/integrations && bun run verify	suite/observe.test.ts: describe agrees with governance
+0005-integrations-observe FR-004	check	.github: cd commons/integrations && bun run verify	suite/observe.test.ts: defineConnector refuses a connector with problems
+0005-integrations-observe FR-005	check	.github: cd commons/integrations && bun run verify	suite/observe.test.ts: a denied field and an undeclared entity kind do not survive
+0005-integrations-observe FR-006	check	.github: cd commons/integrations && bun run verify	suite/observe.test.ts: evaluatePolicy over each expectation
+0005-integrations-observe FR-007	check	.github: cd commons/integrations && bun run verify	suite/observe.test.ts: a stale observation fails the freshness policy
+0005-integrations-observe FR-008	check	.github: cd commons/integrations && bun run verify	suite/observe.test.ts: a document of another schema is refused
+0005-integrations-observe FR-009	check	.github: cd commons/integrations && bun run verify	suite/observe.test.ts: pinSource refuses a branch
+0005-integrations-observe FR-010	check	.github: cd commons/integrations && bun run verify	suite/observe.test.ts: a lock round-trips in order
+0005-integrations-observe FR-011	check	.github: cd commons/integrations && bun run verify	suite/observe.test.ts: a copy with another digest is refused
+0006-integrations-exchange FR-001	check	.github: cd commons/integrations && bun run verify	suite/exchange.test.ts: a tree is made and walked
+0006-integrations-exchange FR-002	check	.github: cd commons/integrations && bun run verify	suite/exchange.test.ts: paths, entries and occurrences
+0006-integrations-exchange FR-003	check	.github: cd commons/integrations && bun run verify	suite/exchange.test.ts: redaction hides what it names and keeps the rest
+0006-integrations-exchange FR-004	check	.github: cd commons/integrations && bun run verify	suite/exchange.test.ts: a schema and a profile constrain a transaction
+0006-integrations-exchange FR-005	check	.github: cd commons/integrations && bun run verify	suite/exchange.test.ts: findings hold no value (property)
+0006-integrations-exchange FR-006	check	.github: cd commons/integrations && bun run verify	suite/exchange.test.ts: binding strengths
+0006-integrations-exchange FR-007	check	.github: cd commons/integrations && bun run verify	suite/exchange.test.ts: validate finds each kind
+0006-integrations-exchange FR-008	check	.github: cd commons/integrations && bun run verify	suite/exchange.test.ts: coverage finds an unmapped, a conflict and a drop
+0006-integrations-exchange FR-009	check	.github: cd commons/integrations && bun run verify	suite/exchange.test.ts: translate maps, carries and drops, and refuses an unmapped field
+0006-integrations-exchange FR-010	check	.github: cd commons/integrations && bun run verify	suite/exchange.test.ts: statusOf over every acknowledgement
+0006-integrations-exchange FR-011	check	.github: cd commons/integrations && bun run verify	suite/exchange.test.ts: transition over every state and event (property)
+0006-integrations-exchange FR-012	check	.github: cd commons/integrations && bun run verify	suite/exchange.test.ts: retries are bounded
+0006-integrations-exchange FR-013	check	.github: cd commons/integrations && bun run verify	suite/exchange.test.ts: the identifiers admit no free text
+0006-integrations-exchange FR-014	check	.github: cd commons/integrations && bun run verify	suite/exchange.test.ts: the in-memory ledger conforms and a faulty one is found
+0006-integrations-exchange FR-015	check	.github: cd commons/integrations && bun run verify	suite/exchange.test.ts: the code lists are complete
+0007-integrations-standards FR-001	none	-	Planned: verified when integrations-fhir ships definitions
+0007-integrations-standards FR-002	none	-	Planned: the licensed-schema loader of integrations-x12
+0007-integrations-standards FR-003	none	-	Planned
+0007-integrations-standards FR-004	none	-	Planned
+0008-integrations-plugins FR-001	check	.github: cd commons/integrations && bun run verify	suite/plugins.test.ts: registerPlugin refuses the three cases
+0008-integrations-plugins FR-002	check	.github: cd commons/integrations && bun run verify	suite/plugins.test.ts: a syntax failure holds none of the text
+0008-integrations-plugins FR-003	check	.github: cd commons/integrations && bun run verify	suite/plugins.test.ts: a user-supplied standard is not loaded from an embedded source
+0008-integrations-plugins FR-004	check	.github: cd commons/integrations && bun run verify	suite/plugins.test.ts: detect picks the plugin that parses
+0008-integrations-plugins FR-005	check	.github: cd commons/integrations && bun run verify	suite/plugins.test.ts: conformConnector finds each fault in a deliberately faulty connector
+0008-integrations-plugins FR-006	check	.github: cd commons/integrations && bun run verify	suite/plugins.test.ts: conformPlugin finds each fault in a deliberately faulty codec
+0008-integrations-plugins FR-007	check	.github: cd commons/integrations && bun run verify	suite/plugins.test.ts: the gate refuses embedded content
+0008-integrations-plugins FR-008	check	.github: cd commons/integrations && bun run verify	suite/plugins.test.ts: findings of a validation hold no value of the payload
+0009-integrations-verbs FR-001	check	.github: cd commons/integrations && bun run verify	suite/verbs.test.ts: each verb runs over in-memory ports
+0009-integrations-verbs FR-002	check	.github: cd commons/integrations && bun run verify	suite/verbs.test.ts: reach policies conform
+0009-integrations-verbs FR-003	check	.github: cd commons/integrations && bun run verify	suite/verbs.test.ts: no payload value in the outcome of any verb over a document
+0009-integrations-verbs FR-004	check	.github: cd commons/integrations && bun run verify	suite/verbs.test.ts: explain covers every code
+0009-integrations-verbs FR-005	check	.github: cd commons/integrations && bun run verify	suite/verbs.test.ts: credential, delivery and state

@@ -1,0 +1,10 @@
+number	slug	state
+0001	integrations-layers	in force
+0002	integrations-governance	in force
+0003	integrations-logical	in force
+0004	integrations-physical	in force
+0005	integrations-observe	in force
+0006	integrations-exchange	in force
+0007	integrations-standards	in force
+0008	integrations-plugins	in force
+0009	integrations-verbs	in force
