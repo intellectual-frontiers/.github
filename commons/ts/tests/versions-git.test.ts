@@ -118,7 +118,11 @@ proves(
       assertEquals(clean.code, 0);
       assertStringIncludes(clean.out, "1 work judged");
       await commit(repo, "Change\n\nRefs #10", DAY(13), { "lib/a.ts": "2\n" });
-      assertEquals((await v(repo, "check", "--base", "main")).code, 0, "the files changed and the version did not: it grows at the release");
+      assertEquals(
+        (await v(repo, "check", "--base", "main")).code,
+        0,
+        "the files changed and the version did not: it grows at the release",
+      );
       const bumped = await v(repo, "bump", "lib", "--impact", "minor");
       assertEquals([bumped.code, decodeReleaseSource(readTextFileSync(join(repo, "lib", "release.ts"))).kind], [0, "ok"]);
       const raised = readTextFileSync(join(repo, "lib", "release.ts"));
@@ -136,7 +140,11 @@ proves(
       await git(repo, ["merge", "-q", "--ff-only", "feature"]);
       assertEquals((await v(repo, "check", "--base", "main")).code, 0, "main as the base of itself: the head's first parent");
       await commit(repo, "Unbumped\n\nRefs #10", DAY(17), { "lib/a.ts": "3\n" });
-      assertEquals((await v(repo, "check", "--base", "main")).code, 0, "a push that changed the work and did not bump it: the release bumps");
+      assertEquals(
+        (await v(repo, "check", "--base", "main")).code,
+        0,
+        "a push that changed the work and did not bump it: the release bumps",
+      );
     });
   },
   needsGit,
@@ -603,7 +611,10 @@ proves(
     ] as const) {
       const now = parseVersion("SemVer", r.version ?? "");
       const was = parseVersion("SemVer", first);
-      assert(now.kind === "ok" && was.kind === "ok" && (compareVersions(now.value, was.value) ?? -1) >= 0, `${r.slug} is ${r.version ?? "none"}`);
+      assert(
+        now.kind === "ok" && was.kind === "ok" && (compareVersions(now.value, was.value) ?? -1) >= 0,
+        `${r.slug} is ${r.version ?? "none"}`,
+      );
     }
     for (const [dirName, r] of [
       ["ts", ts],
