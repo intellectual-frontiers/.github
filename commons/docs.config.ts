@@ -63,6 +63,7 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/ergonex/spec-kit" },
     { layout: "commons", dir: "commons/libraries/spec-kit" },
     { layout: "commons", dir: "commons/quality/spec-kit" },
+    { layout: "commons", dir: "commons/headless/spec-kit" },
   ],
   citations: { prefix: "commons", digits: 4, text: ["erga", "archon", "stolos", "thyra"] },
   lenses: [dataModels],

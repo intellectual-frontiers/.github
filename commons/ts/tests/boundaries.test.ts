@@ -227,6 +227,7 @@ proves(
       "@intellectual-frontiers/formats": "link:../formats",
       "@intellectual-frontiers/githost": "link:../githost",
       "@intellectual-frontiers/grc": "link:../grc",
+      "@intellectual-frontiers/headless": "link:../headless",
       "@intellectual-frontiers/libraries": "link:../libraries",
       "@intellectual-frontiers/mizan": "link:../mizan",
       "@intellectual-frontiers/net": "link:../net",
