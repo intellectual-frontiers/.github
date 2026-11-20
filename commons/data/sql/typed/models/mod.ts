@@ -17,3 +17,7 @@ export * as identityPki from "./identity-pki.auto.ts";
 export * as identityDelegation from "./identity-delegation.auto.ts";
 export * as identityAgent from "./identity-agent.auto.ts";
 export * as issues from "./issues.auto.ts";
+export * as meaning from "./meaning.auto.ts";
+export * as contract from "./contract.auto.ts";
+export * as operations from "./operations.auto.ts";
+export * as proof from "./proof.auto.ts";

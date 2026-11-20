@@ -34,6 +34,10 @@
 - **FR-014**: `apply` MUST write the new version into the record, the manifest and the package of each library it raises, make the generated files once (the section of the libraries, the packaging tables, the ontologies, the workflows and the register), run the tests that pack every library, install it and type-check a consumer (`tests/release/`) unless it is told not to, and write the record `commons/generated/release.auto.json` (the libraries to publish and tag, in order, with no day and no person), and it MUST NOT publish, tag or commit; `matrix` MUST read the record and give the workflow what is not tagged yet.
 - **FR-015**: The library MUST make, with the generator of its workflows, the one release workflow `release.auto.yml` (commons 0030-generated-workflows FR-009): run by hand from main, it plans from the record, proves and packs each library in a matrix, and, only where asked to publish, sends the tarballs in the order of the record to npm (trusted publishing with provenance, or the secret `INFRO_NPMJS_TOKEN` where the repository has it) and to the GitHub package registry, skipping a version a registry has, and makes the tags with the runner's token.
 
+## Families and reserved names
+
+- **FR-016**: The decoder of the manifest MUST read the optional field `family` (a `host`, a library name, and a `role` of `host`, `dialect` or `plugin`), and the check of the manifests MUST find, as one sentence each: a library whose name a reservation holds and whose family is not the host the reservation names (the reservations are data of the library, an exact name or a prefix with the host that may hold it, and hold `archon`, `archon-*`, `signing`, `gitops` and `estate`, with no folder); a host that is not named as its family; a dialect or plugin whose host is not a library that declares role `host` and a `kanon` table; a name the host's family rule does not read as its role; a member the host's table does not declare, and a member the host's table declares that no library declares; a member whose `kanon` table does not extend the host; and a library whose name the family rule of a host reads as a member and that declares no family.
+
 ## Acceptance scenarios
 
 1. **Given** a folder `commons/x/` with a manifest, **When** the section of the libraries is made, **Then** it holds one requirement for `x` and its row, and `--check` fails where either differs, per FR-001 and FR-002.
@@ -45,6 +49,9 @@
 7. **Given** libraries tagged and unchanged, a library whose files changed since its tag and one that imports it, **When** `releasing.ts plan` runs, **Then** the first two are raised and the importer by a patch, and the unchanged are left alone, per FR-013.
 8. **Given** a release made by `apply`, **When** the release workflow is run from main and asked to publish, **Then** the libraries are published in the order of the record, skipping what a registry has, and tagged, per FR-014 and FR-015.
 9. **Given** the repository, **When** `check --all` runs, **Then** the `verify` of every library runs and a failing one fails the run, per FR-008.
+
+10. **Given** a library named `archon-dialect-x` that declares no family, **When** the manifests are checked, **Then** a sentence names the library and the host it may be held for, per FR-016.
+11. **Given** a host whose table declares a dialect and a library of that dialect's name that declares its family, **When** the manifests are checked, **Then** there is no finding, and for a dialect nobody registered or a registered one nobody declared there is one, per FR-016.
 
 ## Out of scope
 

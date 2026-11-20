@@ -9,7 +9,7 @@
  *
  * @remarks
  * A manifest declares the library's `name` (its folder), its conformance `level` (`L1` where it declares none, 0028-conformance-levels), the path of its spec kit, its `verify` command, its
- * `version`, its `exports` (the keys of the package's `exports`) and its `distribution` (the registries it is published to: `github`, the default, and `npm` as well where a decision about that package has made it so; FR-015 to FR-018). The section "The libraries" of the specification is between the markers `<!-- libraries:begin -->` and `<!-- libraries:end -->`,
+ * `version`, its `exports` (the keys of the package's `exports`) its `family` (a host and a role in a family of libraries, FR-023) and its `distribution` (the registries it is published to: `github`, the default, and `npm` as well where a decision about that package has made it so; FR-015 to FR-018). The section "The libraries" of the specification is between the markers `<!-- libraries:begin -->` and `<!-- libraries:end -->`,
  * one requirement for each library numbered from FR-101, an id kept for the life of the library; the rows of those requirements are in `enforcement.tsv`. Adding a library is adding a folder with a manifest and
  * running this command.
  *
@@ -47,6 +47,7 @@ import { existsSync, readDirSync, readTextFileSync, writeTextFileSync } from "@i
 import { stdio } from "@intellectual-frontiers/system";
 import { spawn } from "@intellectual-frontiers/system/proc";
 import { DEFAULT_LIBRARY_LEVEL, LEVELS, type LevelKey, rankOf } from "@intellectual-frontiers/mizan/levels";
+import { decodeFamily, familyFindings, type LibraryFamily, reservationFindings, ROLES } from "./family.ts";
 
 /** The name of a library's manifest in its folder. */
 export const LIBRARY_FILE = "library.ts";
@@ -86,6 +87,8 @@ export type Library = {
   readonly distribution: readonly Registry[];
   /** The table of its layers where it is built to Kanon (commons 0033-kanon FR-010); none where it is not. */
   readonly kanon?: Table;
+  /** Its host and its role where it is of a family (a host, a dialect of it or a plugin of it; 0033-kanon FR-021, 0027-commons-libraries FR-023). */
+  readonly family?: LibraryFamily;
 };
 
 /** The lowest conformance level that requires a library to declare `kanon`; none yet (0033-kanon FR-014, OQ-1): a level asks for it by naming itself here. */
@@ -111,9 +114,9 @@ const nameDecoder: Decoder<string> = (input, path = "$") => {
 };
 const body = object(
   { name: nameDecoder, verify: nonEmpty, version: nonEmpty, exports: array(nonEmpty) },
-  { level: literal(...LEVELS), specKit: nonEmpty, summary: nonEmpty, distribution: array(literal(...REGISTRIES)), kanon: unknownValue },
+  { level: literal(...LEVELS), specKit: nonEmpty, summary: nonEmpty, distribution: array(literal(...REGISTRIES)), kanon: unknownValue, family: object({ host: nonEmpty, role: literal(...ROLES) }) },
 );
-const FIELDS = ["name", "level", "specKit", "verify", "version", "exports", "summary", "distribution", "kanon"] as const;
+const FIELDS = ["name", "level", "specKit", "verify", "version", "exports", "summary", "distribution", "kanon", "family"] as const;
 
 /** The manifest read from the text of its file: `export const library = { ... }` and no other export, read as data and never run (0027-commons-libraries FR-012). */
 export function decodeLibrarySource(source: string): Result<Library, string> {
@@ -143,6 +146,12 @@ export function decodeLibrarySource(source: string): Result<Library, string> {
     if (t.kind === "err") return err(`library.${t.error} (0033-kanon FR-010)`);
     kanon = t.value;
   }
+  let family: LibraryFamily | undefined;
+  if (v.family !== undefined) {
+    const f = decodeFamily(v.family);
+    if (f.kind === "err") return f;
+    family = f.value;
+  }
   return ok({
     name: v.name,
     level: v.level ?? DEFAULT_LIBRARY_LEVEL,
@@ -153,6 +162,7 @@ export function decodeLibrarySource(source: string): Result<Library, string> {
     ...(v.summary === undefined ? {} : { summary: v.summary }),
     distribution,
     ...(kanon === undefined ? {} : { kanon }),
+    ...(family === undefined ? {} : { family }),
   });
 }
 
@@ -252,6 +262,8 @@ export function manifestFindings(repo: string): readonly string[] {
     if (KANON_REQUIRED_FROM !== undefined && rankOf(l.level) >= rankOf(KANON_REQUIRED_FROM) && l.kanon === undefined)
       found.push(`commons/${f.dir}: the manifest declares ${l.level}, which requires kanon, and declares none (0033-kanon FR-014)`);
   }
+  const known = have.flatMap((f) => ("library" in f ? [f.library] : []));
+  found.push(...reservationFindings(known), ...familyFindings(known));
   return found;
 }
 

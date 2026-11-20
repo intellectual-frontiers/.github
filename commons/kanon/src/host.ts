@@ -1,4 +1,4 @@
-// Spec: 0001-kanon-checker FR-007
+// Spec: 0001-kanon-checker FR-007, FR-012
 /**
  * The host side of the check of Kanon (commons 0033-kanon FR-012, FR-014): it reads a library's manifest for its table, the `exports` of its package and its `.ts` files, and gives the findings of the
  * import check over them, judged against a baseline of findings that only shrinks. The pure check is `importFindings`; this is the only module of the package that reads files.
@@ -16,7 +16,9 @@
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { exportedLiteral } from "@intellectual-frontiers/formats/ts-literal";
 import { existsSync, readDirSync, readTextFileSync } from "@intellectual-frontiers/system/fs";
-import { type Finding, importFindings, type SourceFile } from "./imports.ts";
+import { splitPackage } from "./family.ts";
+import { extensionFindings } from "./extensions.ts";
+import { type ExportsMap, type Finding, importFindings, type SourceFile } from "./imports.ts";
 import { decodeTable, type Table } from "./table.ts";
 
 /** The name of a library's manifest in its folder. */
@@ -39,7 +41,7 @@ export const systemFiles: Files = {
 };
 
 /** An `exports` map: each subpath to its target, a string or an object of conditions of strings. */
-export type Exports = Readonly<Record<string, string | { readonly [condition: string]: string }>>;
+export type Exports = ExportsMap;
 
 /** The folders that are not read. */
 const SKIPPED: ReadonlySet<string> = new Set(["node_modules", "dist", "spec-kit", ".git"]);
@@ -126,7 +128,14 @@ export function findings(root: string, files: Files = systemFiles): Result<reado
   if (exported.kind === "err") return exported;
   const sources = readSources(root, files);
   if (sources.kind === "err") return sources;
-  return ok(importFindings(table.value, sources.value, exported.value));
+  if (table.value.extends === undefined) return ok(importFindings(table.value, sources.value, exported.value));
+  // an extension is a folder beside its host's, which its package names (0027-commons-libraries FR-013: a package's folder is its name)
+  const hostRoot = `${root}/../${splitPackage(table.value.extends).base}`;
+  const host = readTable(hostRoot, files);
+  if (host.kind === "err") return err(`the host ${table.value.extends}: ${host.error}`);
+  const hostExports = readExports(hostRoot, files);
+  if (hostExports.kind === "err") return hostExports;
+  return ok(extensionFindings(host.value, hostExports.value, table.value, sources.value, exported.value));
 }
 
 /** A baseline's keys, from its text: a line that is not a comment or blank. */

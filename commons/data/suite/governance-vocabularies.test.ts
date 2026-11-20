@@ -237,6 +237,7 @@ proves(
         "quality.appendOnly",
         "quality.transitions",
         "quality.atMost",
+        "quality.temporal",
       ],
     );
     assert(

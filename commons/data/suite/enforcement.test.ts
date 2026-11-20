@@ -70,6 +70,8 @@ proves(
     const n = (d: string) => attribute(integer(), { definition: d });
     same(make({ used: n("Used"), cap: n("Cap") }, [annotate(quality.atMost, { member: "used", other: "cap" })]), []);
     same(make({ used: n("Used") }, [annotate(quality.atMost, { member: "used", other: "nope" })]).length, 1, "a member that is not there");
+    same(make({ from: n("From"), to: n("To") }, [annotate(quality.temporal, { validFrom: "from", validTo: "to" })]), [], "an effective-dated concept names its members");
+    same(make({ from: n("From") }, [annotate(quality.temporal, { validFrom: "from", validTo: "gone" })]).length, 1, "a temporal end that is not a member");
     same(make({ n: n("N") }, [annotate(quality.appendOnly, { chain: { hash: "n", previous: "n", sequence: "n", genesis: "g" } })]), []);
     same(make({ n: n("N") }, [annotate(quality.appendOnly, { chain: { hash: "missing", previous: "n", sequence: "n", genesis: "g" } })]).length, 1);
     same(make({ s: attribute(codeOf(status), { definition: "Where it is", annotations: [annotate(quality.transitions, { allowed: { open: ["shut"], shut: [] } })] }) }, []), []);
