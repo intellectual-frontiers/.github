@@ -24,7 +24,7 @@
 ## Out of scope
 
 - The dialects of the managers: packages of their own.
-- Reading the commands from the ontology: the reader of the ontology (`supply-chain/commands`) is a source this kit takes as a function.
+- Reading the ontology: its reader of commands; the adapter of Physical only calls it.
 
 ## Edge cases
 

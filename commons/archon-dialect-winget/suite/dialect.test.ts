@@ -9,6 +9,7 @@ import { parseSubjectName } from "@intellectual-frontiers/archon/governance";
 import { readPlanFile, type CommandSource } from "@intellectual-frontiers/package-managers";
 import { defineCatalog, defineTool, requirementsFor, resolveTools } from "@intellectual-frontiers/toolchain";
 import { err, ok } from "@intellectual-frontiers/core";
+import { commandOf, exactVersionOf, parseManagerId } from "@intellectual-frontiers/ontology/supply-chain/commands";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { winget, DIALECT_ID, SPEC, TOOL_DIALECT } from "../src/dialect.ts";
 
@@ -87,4 +88,18 @@ proves(["0002-winget-dialect FR-004"], "Toolchain chooses the dialect only for t
       assert(how === "pin" ? reasons.includes("pins") : reasons.includes("hash"), reasons);
     }
   }
+});
+
+proves(["0002-winget-dialect FR-001", "0002-winget-dialect FR-003"], "against the real ontology: the way it writes a version and the status of its check agree with what the ontology states", () => {
+  const id = parseManagerId("winget");
+  assert(id.kind === "ok");
+  const exact = exactVersionOf(id.value);
+  assert(exact.kind === "ok");
+  const words = exact.value.template;
+  assert(SPEC.versioning.kind === "flags");
+  const mine = [...SPEC.versioning.packageFlags, "{package}", ...SPEC.versioning.exactFlags, SPEC.versioning.versionFlag, "{version}"].sort();
+  assertEquals(words.slice(2).sort(), mine, "the same flags and names, in the order WinGet does not mind");
+  const installed = commandOf(id.value, "QueryInstalled");
+  assertEquals(installed.kind === "ok" ? installed.value.missingExitStatus : undefined, SPEC.missingExit, "the status that means missing is the ontology's, or neither states one");
+  assertEquals(String(SPEC.manager), `manager-${id.value}`);
 });

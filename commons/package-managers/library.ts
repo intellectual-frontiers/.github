@@ -40,6 +40,7 @@ export const library = {
           { name: "@intellectual-frontiers/system", subpaths: ["proc", "fs", "path"] },
           { name: "@intellectual-frontiers/archon", subpaths: ["governance", "logical", "dialect"] },
           { name: "@intellectual-frontiers/toolchain", subpaths: ["logical"] },
+          { name: "@intellectual-frontiers/ontology", subpaths: ["supply-chain/commands"] },
         ],
       },
       { folder: "src/", own: true },
