@@ -50,6 +50,7 @@ export const OPS = [
   "query-installed",
   "query-candidate",
   "query-version",
+  "install-exact",
 ] as const;
 export type Op = (typeof OPS)[number];
 /** The word of each operation of the code list (a key left out, or one more, does not compile). */
@@ -65,6 +66,7 @@ const OP_OF: { readonly [K in keyof typeof operations]: Op } = {
   QueryInstalled: "query-installed",
   QueryCandidate: "query-candidate",
   QueryVersion: "query-version",
+  InstallExact: "install-exact",
 };
 export type Assurance = "verified" | "stand-in" | "untested" | "none";
 const ASSURANCE: { readonly [K in keyof typeof assurances]: Assurance } = {

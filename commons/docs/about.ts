@@ -13,8 +13,8 @@ export const about: About = {
     "which any repository depends on by Git at a commit, so that it builds its own site the same way. It reads only the repository's TypeScript (module documentation, TSDoc, the `about` of each package, examples, and the values of " +
     "models and layouts) and its spec kit, through the TypeScript 7.1 programmatic API and the libraries' own functions, and writes static " +
     "HTML with no framework. A repository says what to read in a typed configuration, `docs.config.ts`; commons' is `commons/docs.config.ts`. " +
-    "Its lenses know what each library is for: a schema written with SQL Aide is shown as a schema, a layout written with File Aide as a " +
-    "layout. Nothing is written for the site alone.",
+    "Its lenses know what each library is for: a data model is shown as a model in layers and a program as its verbs for each tier. " +
+    "Nothing is written for the site alone but the guides.",
   spec: { repo: "commons", id: "0011-documentation" },
   folders: [
     { path: "config.ts", what: "The configuration's types (`DocsConfig`, `About`) and the one check of a configuration.", mayImport: ["the kernel", "the runtime"] },

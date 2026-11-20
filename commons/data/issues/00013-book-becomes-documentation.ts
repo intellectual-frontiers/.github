@@ -3,7 +3,7 @@
 import { issue } from "@intellectual-frontiers/data/governance";
 
 export default issue({
-  id: 14,
+  id: 13,
   slug: "book-becomes-documentation",
   title: "Refactor the book into the documentation of commons/data, besides its own content",
   summary:

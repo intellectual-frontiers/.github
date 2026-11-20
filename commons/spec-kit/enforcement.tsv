@@ -56,9 +56,14 @@ requirement	mechanism	by	note
 0002-packaging FR-018	check	.github: bun test ./tests/	Generator: an address that is not https, holds a user name, a format that is none of three, a folder that leaves its root, a half-stated checksum and a checksum twice are each refused
 0002-packaging FR-019	check	.github: bun test ./tests/	Pins: the env file, the TOML and the module carry the addresses of the pins, and the Bun installer and the conformance job read them
 0002-packaging FR-020	check	.github: bun test ./tests/	Pins: downloadOf gives the version, address, SHA-256, format and folder of a pin on a platform, or why it is unpinned
-0002-packaging FR-021	check	.github: bun test ./tests/	Managers: mise is a tool manager with three unverified commands of origin memory
+0002-packaging FR-021	check	.github: bun test ./tests/	Managers: mise is a tool manager with four unverified commands of origin memory
 0002-packaging FR-022	check	.github: bun test ./tests/	Managers: apt, pacman, dnf, brew and winget each have a query-version command
 0002-packaging FR-023	check	.github: bun test ./tests/	Names: the ontology and its generated files say archon only of commons/archon and of the origin archon
+0002-packaging FR-024	check	.github: bun test ./tests/	Managers: apt, brew, winget and mise have an install-exact command of origin memory, unverified
+0002-packaging FR-025	check	.github: bun test ./tests/	Commands: commandOf gives the words, executable, environment, administrator need and verification of an operation of a manager, for every manager and operation
+0002-packaging FR-026	check	.github: bun test ./tests/	Commands: exactVersionOf, managerIds, operationNames, prohibitionsOf and describeCommandError
+0002-packaging FR-027	check	.github: bun test ./tests/	Commands: every error of the reader is a value of a closed union and is told in one sentence
+0002-packaging FR-028	check	.github: bun test ./tests/	Tables: the generated files carry install-exact
 0004-rules FR-001	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
 0004-rules FR-002	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
 0004-rules FR-003	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
@@ -540,7 +545,8 @@ requirement	mechanism	by	note
 0027-commons-libraries FR-124	check	.github: cd commons/integrations-x12 && bun run verify	commons/integrations-x12: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-125	check	.github: cd commons/archon && bun run verify	commons/archon: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-126	check	.github: cd commons/toolchain && bun run verify	commons/toolchain: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
-0027-commons-libraries FR-127	check	.github: cd commons/repoctl && bun run verify	commons/repoctl: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-127	check	.github: cd commons/archon-dialect-native-pinned && bun run verify	commons/archon-dialect-native-pinned: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-128	check	.github: cd commons/repoctl && bun run verify	commons/repoctl: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0028-conformance-levels FR-001	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: Mizan's ontology holds the four levels with ranks 0 to 3, each entailing what it and the levels below it add
 0028-conformance-levels FR-002	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: every requirement is added by exactly one level and names a rule or says what else proves it
 0028-conformance-levels FR-003	check	.github: cd commons/ts && bun test tests/	mizan-levels.test.ts: L0 adds a manifest, a verify command and a version
@@ -662,3 +668,4 @@ requirement	mechanism	by	note
 0035-licensing FR-010	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: THIRD_PARTY_NOTICES.md is what the record makes, and a vendored path that is gone is found
 0035-licensing FR-011	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: the README License section names the license, and AGENTS.md names the generator's command
 0035-licensing FR-012	check	.github: cd commons/libraries && bun test suite/	licensing.test.ts: the packer writes the SPDX id, packs the LICENSE and refuses a library that has none
+0011-documentation FR-036	check	.github: cd commons/docs && bun run verify	newcomer.test.ts: five newcomer questions answered from the site, retired names and history words found, none on commons' site

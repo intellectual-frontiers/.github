@@ -24,7 +24,7 @@ export interface SiteFile {
 
 /** A lens: its name, and what reads its library's values and makes their pages. */
 export interface Lens {
-  /** Its name, as `sql-aide`. */
+  /** Its name, as `data`. */
   readonly name: string;
   /** Reads the values of the areas whose exports are its library's, and returns what makes their pages. */
   readonly read: (b: Build, areas: readonly Area[], apis: readonly AreaApi[]) => Promise<LensPages>;

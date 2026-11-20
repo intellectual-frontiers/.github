@@ -49,7 +49,7 @@
 
 ## Out of scope
 
-- The old SQL Aide's generated identity keys, tables with no key and constraint names truncated with a hash: not built. Governance gives every concept an identity (0003-governance), so a key is never made up or left out; a name that is too long is an error value (0007-physical FR-003), not a hash that hides it.
+- Generated identity keys, tables with no key and constraint names truncated with a hash are not built. Governance gives every concept an identity (0003-governance), so a key is never made up or left out; a name that is too long is an error value (0007-physical FR-003), not a hash that hides it.
 - Routines written as a query algebra: a body is text and typed references; a query extension may come later.
 - An index over vectors (`hnsw`, `ivfflat`) and masks (`security.mask`): later extensions; a mask is carried as data until then.
 - Materialized views, triggers, sequences and domains.

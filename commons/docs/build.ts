@@ -35,7 +35,7 @@ export class Build {
   readonly exports: Map<string, Map<string, { readonly path: string; readonly anchor: string }>> = new Map();
   /** The page that shows a model's entity, by its area and export name (`arca!party`). */
   readonly entityPages: Map<string, string> = new Map();
-  /** The pages that cite each specification (key `0009-sql-aide`) and each requirement (key `0009-sql-aide FR-001`). */
+  /** The pages that cite each specification (key `0009-example`) and each requirement (key `0009-example FR-001`). */
   readonly citations: Map<string, Set<string>> = new Map();
   /** The title of each package, by its slug: what the pages of its specifications and the register call it. */
   readonly packageTitles: Map<string, string> = new Map();

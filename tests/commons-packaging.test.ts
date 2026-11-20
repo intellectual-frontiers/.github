@@ -29,6 +29,17 @@ import { pyJson } from "../commons/tools/emit.ts";
 import { digestOf } from "../commons/tools/generate-packaging.ts";
 import { OPS } from "../commons/tools/ontology.ts";
 import { describeDownloadError, downloadOf, parsePinId, parsePlatformName } from "../commons/ontology/src/supply-chain/downloads.ts";
+import {
+  commandOf,
+  describeCommandError,
+  exactVersionOf,
+  managerIds,
+  operationNames,
+  parseManagerId,
+  parseOperation,
+  prohibitionsOf,
+  wordsOfTemplate,
+} from "../commons/ontology/src/supply-chain/commands.ts";
 import { files, operations } from "../commons/ontology/src/supply-chain/packaging/mod.ts";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
@@ -499,12 +510,12 @@ proves(["0002-packaging FR-016"], "Record: the fields are in order, with a type,
 
 // ---- Managers: mise, and the commands that say a version (0002-packaging FR-021, FR-022) ----------------------------------------------------------------------
 
-proves(["0002-packaging FR-021"], "Managers: mise is a tool manager with three unverified commands of origin memory", () => {
+proves(["0002-packaging FR-021"], "Managers: mise is a tool manager with four unverified commands of origin memory", () => {
   const mise = doc(doc(table().managers).mise);
   assertEquals(mise.kind, "tool");
   assertEquals(mise.executable, "mise");
   const commands = doc(mise.commands);
-  assertEquals(Object.keys(commands).sort(), ["install", "list-installed", "query-version"]);
+  assertEquals(Object.keys(commands).sort(), ["install", "install-exact", "list-installed", "query-version"]);
   assertEquals(texts(doc(commands.install).argv), ["mise", "install", "{packages}"]);
   assertEquals(texts(doc(commands["query-version"]).argv), ["mise", "current", "{package}"]);
   assertEquals(texts(doc(commands["list-installed"]).argv), ["mise", "ls"]);
@@ -1148,3 +1159,166 @@ test("commons' tools are strongly typed: no any, no non-null escape, one audited
     .sort();
   assertEquals(brands, ["ontology.ts"], "only the decode boundary brands a value");
 });
+
+// ---- the typed reader of the commands (FR-024 to FR-028) ----------------------------------------------------------------
+
+function managerOf(name: string) {
+  const r = parseManagerId(name);
+  assert(r.kind === "ok", name);
+  return r.value;
+}
+
+proves(
+  ["0002-packaging FR-025", "0002-packaging FR-027"],
+  "Commands: commandOf gives, for every manager and operation, the words of the table or not-defined, and verified only where the table says where it ran",
+  () => {
+    const t = table();
+    const opKey = { Install: "install", QueryVersion: "query-version", QueryInstalled: "query-installed", Refresh: "refresh" } as const;
+    assertEquals([...operationNames()], ["Install", "QueryVersion", "QueryInstalled", "Refresh"]);
+    let defined = 0;
+    let missing = 0;
+    for (const [id, m] of entries(t.managers)) {
+      const manager = managerOf(id);
+      for (const op of operationNames()) {
+        const r = commandOf(manager, op);
+        const row = doc(doc(m.commands ?? {})[opKey[op]] ?? {});
+        if (row.argv === undefined) {
+          missing++;
+          assert(r.kind === "err" && r.error.kind === "not-defined", `${id} ${op}`);
+          assertStringIncludes(describeCommandError(r.error), `no ${op} command for ${id}`);
+          continue;
+        }
+        defined++;
+        assert(r.kind === "ok", `${id} ${op}`);
+        assertEquals([...r.value.template], row.argv, `${id} ${op}`);
+        assertEquals(r.value.nonInteractive === undefined ? null : [...r.value.nonInteractive], row.noninteractive ?? null, `${id} ${op}`);
+        assertEquals(r.value.executable, m.executable);
+        assertEquals(r.value.needsAdministrator, m.administrator);
+        assertEquals(r.value.verified, row.verified !== undefined, `${id} ${op}`);
+        assertEquals(r.value.environment.map((e) => `${e.name}=${e.value}`).join(" "), m.environment ?? "");
+        assertEquals([r.value.manager, r.value.operation], [manager, op]);
+      }
+    }
+    assert(defined > 20 && missing > 0, `${defined} defined, ${missing} not defined`);
+    assertEquals(managerIds().length, Object.keys(t.managers).length);
+    // the four managers a dialect is written for
+    const apt = commandOf(managerOf("apt"), "Install");
+    assert(apt.kind === "ok");
+    assertEquals(apt.value.environment, [{ name: "DEBIAN_FRONTEND", value: "noninteractive" }]);
+    assertEquals(apt.value.nonInteractive, ["apt-get", "install", "-y", "{packages}"]);
+    assertEquals([apt.value.needsAdministrator, apt.value.verified], [true, true]);
+    const brew = commandOf(managerOf("brew"), "QueryVersion");
+    assert(brew.kind === "ok");
+    assertEquals(
+      [[...brew.value.template], brew.value.verified, brew.value.needsAdministrator],
+      [["brew", "list", "--versions", "{package}"], false, false],
+    );
+    const winget = commandOf(managerOf("winget"), "QueryVersion");
+    assert(winget.kind === "ok");
+    assertEquals([...winget.value.template], ["winget", "list", "--exact", "--id", "{package}"]);
+    const mise = commandOf(managerOf("mise"), "Install");
+    assert(mise.kind === "ok" && !mise.value.verified);
+    assertEquals([...mise.value.template], ["mise", "install", "{packages}"]);
+    const miseRefresh = commandOf(managerOf("mise"), "Refresh");
+    assert(miseRefresh.kind === "err" && miseRefresh.error.kind === "not-defined");
+    // a command that is not verified says so: every command of origin memory
+    for (const [id, m] of entries(t.managers))
+      for (const [op, row] of entries(doc(m.commands ?? {}))) {
+        const key =
+          op === "install"
+            ? "Install"
+            : op === "query-version"
+              ? "QueryVersion"
+              : op === "query-installed"
+                ? "QueryInstalled"
+                : op === "refresh"
+                  ? "Refresh"
+                  : "";
+        if (key === "") continue;
+        const r = parseOperation(key);
+        assert(r.kind === "ok");
+        const c = commandOf(managerOf(id), r.value);
+        assert(c.kind === "ok");
+        if (row.origin === "memory") assertEquals(c.value.verified, false, `${id} ${op}`);
+      }
+  },
+);
+
+proves(["0002-packaging FR-027"], "Commands: every error of the reader is a value of a closed union and is told in one sentence", () => {
+  const unknownManager = parseManagerId("nothing");
+  assert(unknownManager.kind === "err" && unknownManager.error.kind === "unknown-manager");
+  assertEquals(describeCommandError(unknownManager.error), "the ontology states no package manager nothing");
+  assertEquals(parseManagerId("").kind, "err");
+  const unknownOperation = parseOperation("Purge");
+  assert(unknownOperation.kind === "err" && unknownOperation.error.kind === "unknown-operation");
+  assertEquals(
+    describeCommandError(unknownOperation.error),
+    "the reader knows no operation Purge (Install, QueryVersion, QueryInstalled, Refresh)",
+  );
+  assertEquals(parseOperation("install").kind, "err");
+  assertEquals(parseOperation("Install").kind, "ok");
+  const notDefined = commandOf(managerOf("winget"), "Refresh");
+  assert(notDefined.kind === "err" && notDefined.error.kind === "not-defined");
+  assertEquals(describeCommandError(notDefined.error), "the ontology states no Refresh command for winget");
+  const noExact = exactVersionOf(managerOf("pacman"));
+  assert(noExact.kind === "err" && noExact.error.kind === "not-defined");
+  assertEquals(describeCommandError(noExact.error), "the ontology states no ExactVersion command for pacman");
+  // malformed: a template that is not words is refused, and the sentence names the manager and the operation
+  for (const bad of ["", "   ", "ls | wc", "echo 'x'", 'echo "x"', "a; b", "a && b", "a > b", "a\\ b", "a `b`"])
+    assertEquals(wordsOfTemplate(bad).kind, "err", JSON.stringify(bad));
+  const good = wordsOfTemplate("dpkg-query -W -f=${Status} {package}");
+  assert(good.kind === "ok");
+  assertEquals([...good.value], ["dpkg-query", "-W", "-f=${Status}", "{package}"]);
+  const bad = wordsOfTemplate("a | b");
+  assert(bad.kind === "err");
+  assertEquals(
+    describeCommandError({ kind: "malformed", manager: managerOf("apt"), operation: "Install", reason: bad.error }),
+    "the Install command of apt is malformed: the template a | b holds a quotation, an escape or a shell character",
+  );
+  // every manager's every stated command is words (none is malformed)
+  for (const m of managerIds())
+    for (const op of operationNames()) {
+      const r = commandOf(m, op);
+      assert(r.kind === "ok" || r.error.kind === "not-defined", `${m} ${op}`);
+    }
+});
+
+proves(
+  ["0002-packaging FR-024", "0002-packaging FR-026", "0002-packaging FR-028"],
+  "Commands: apt, brew, winget and mise write an exact version unverified, any other manager says none, and prohibitions and the lists are given",
+  () => {
+    const exact = (name: string) => {
+      const r = exactVersionOf(managerOf(name));
+      assert(r.kind === "ok", name);
+      assertEquals(r.value.verified, false, name);
+      return [...r.value.template];
+    };
+    assertEquals(exact("apt"), ["apt", "install", "{package}={version}"]);
+    assertEquals(exact("brew"), ["brew", "install", "{package}@{version}"]);
+    assertEquals(exact("winget"), ["winget", "install", "--exact", "--id", "{package}", "--version", "{version}"]);
+    assertEquals(exact("mise"), ["mise", "install", "{package}@{version}"]);
+    const withExact = managerIds()
+      .filter((m) => exactVersionOf(m).kind === "ok")
+      .map(String)
+      .sort();
+    assertEquals(withExact, ["apt", "brew", "mise", "winget"]);
+    // the generated files carry it
+    const apt = doc(doc(doc(table().managers).apt).commands);
+    assertEquals(doc(apt["install-exact"]).argv, ["apt", "install", "{package}={version}"]);
+    assertEquals(doc(apt["install-exact"]).origin, "memory");
+    assert(OPS.includes("install-exact"));
+    assertStringIncludes(fs.readTextFileSync(`${COMMONS}/generated/packaging.auto.ttl`), "pm:InstallExact");
+    // prohibitions
+    const pacman = prohibitionsOf(managerOf("pacman"));
+    assertEquals(
+      pacman.map((p) => p.template.join(" ")),
+      ["pacman -Sy", "pacman -Sy {packages}"],
+    );
+    assertStringIncludes(pacman[0]?.reason ?? "", "partly upgraded");
+    assertEquals(prohibitionsOf(managerOf("yay")).length, 2);
+    assertEquals(prohibitionsOf(managerOf("apt")), []);
+    const total = managerIds().reduce((n, m) => n + prohibitionsOf(m).length, 0);
+    assertEquals(total, Object.keys(doc(table())).includes("prohibitions") ? (table().prohibitions as readonly unknown[]).length : 4);
+    assertEquals(managerIds().includes(managerOf("mise")), true);
+  },
+);

@@ -18,7 +18,7 @@
  * @module
  */
 
-/** A specification, by its repository and its folder's name (`commons`, `0009-sql-aide`). Only commons' own become links. */
+/** A specification, by its repository and its folder's name (`commons`, `0009-example`). Only commons' own become links. */
 export interface AboutSpec {
   /** The repository whose spec kit holds it. */
   readonly repo: string;

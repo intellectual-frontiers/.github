@@ -18,6 +18,7 @@ import {
   defineTool,
   meetsIntegrity,
   parseManagerId,
+  actionFor,
   planTools,
   requirementsFor,
   resolveTools,
@@ -178,6 +179,16 @@ proves(["0003-toolchain-logical FR-005"], "the plan says none, install or replac
   assertEquals(act(new Map([[name("gh"), { version: "1.0.0", from: "path" as const }]]), { ...CTX, integrity: "exact-hashed" })["gh"], "replace", "exact and hashed never takes a path copy");
   assertEquals(act(new Map([[name("jq"), { version: "1.0.0", from: "path" as const }]]))["jq"], "none", "a tool with no stated minimum is taken at the version of its pin");
   assertEquals(act(new Map([[name("git"), { version: "0.0.1", from: "path" as const }]]))["git"], "none", "where nothing pins a version any version counts");
+});
+
+proves(["0003-toolchain-logical FR-005"], "actionFor is the one rule, for a dialect that holds no tool declaration", () => {
+  const base = { version: "1.0.0", minimum: undefined, systemCopy: "minimum" as const, integrity: "rolling" as const };
+  assertEquals(actionFor({ ...base, seen: undefined }), "install");
+  assertEquals(actionFor({ ...base, seen: { version: "1.0.0", from: "store" } }), "none");
+  assertEquals(actionFor({ ...base, seen: { version: "0.9.0", from: "store" } }), "replace");
+  assertEquals(actionFor({ ...base, seen: { version: "2.0.0", from: "path" } }), "none");
+  assertEquals(actionFor({ ...base, seen: { version: "2.0.0", from: "path" }, integrity: "exact-hashed" }), "replace");
+  assertEquals(actionFor({ ...base, version: undefined, seen: { version: "0.0.1", from: "manager" } }), "none");
 });
 
 proves(["0003-toolchain-logical FR-006"], "the requirements of kind tool are valid for Archon, depend on the tools needed, hold no secret, and an order is built from them", () => {

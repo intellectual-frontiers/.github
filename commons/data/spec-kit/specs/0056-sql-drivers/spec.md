@@ -23,7 +23,7 @@
 
 ## Assumptions
 
-- Ported from SQL Aide (its ISLM catalog reader and its drivers), which this library replaces; the engines of the tests are SQLite, DuckDB and PGlite (PostgreSQL).
+- The engines of the tests are SQLite, DuckDB and PGlite (PostgreSQL).
 
 ## Open questions
 

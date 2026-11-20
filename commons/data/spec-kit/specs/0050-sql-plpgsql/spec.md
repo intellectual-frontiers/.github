@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** data
 
-**Input:** The typed PL-body DSL of SQL Aide, in the routines extension.
+**Input:** The typed PL-body DSL, in the routines extension.
 
 ## Requirements
 
@@ -23,7 +23,7 @@
 
 ## Assumptions
 
-- Ported from SQL Aide, which this library replaces; the engines of the tests are SQLite, DuckDB and PGlite (PostgreSQL), in process.
+- The engines of the tests are SQLite, DuckDB and PGlite (PostgreSQL), in process.
 
 ## Open questions
 

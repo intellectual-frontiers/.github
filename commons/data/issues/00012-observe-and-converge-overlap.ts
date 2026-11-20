@@ -3,7 +3,7 @@
 import { issue } from "@intellectual-frontiers/data/governance";
 
 export default issue({
-  id: 13,
+  id: 12,
   slug: "observe-and-converge-overlap",
   title: "Two readers of a database's catalog: convergence's `catalog` and the dialects' `observe`",
   summary:

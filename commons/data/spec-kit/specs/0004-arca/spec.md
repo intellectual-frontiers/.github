@@ -43,7 +43,7 @@
 
 ## Assumptions
 
-- The model it replaces is the party model of the Arca of the former SQL Aide (removed 2026-11-20; in the history of the repository); this one is written afresh from its documentation, in governance terms, and is not copied.
+- The party model is written from its documentation, in governance terms.
 - The purposes named for personal data and the classification are Arca's own statements for a model that has none to carry over; a business that uses it states its own.
 - Arca keeps its own name, `arca`, as the owner role of the domain.
 

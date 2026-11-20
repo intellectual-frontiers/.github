@@ -8,7 +8,7 @@
  *
  * @limits
  * A type in a signature is printed as text and is not yet a link to its page. A signature is the checker's own printing, with no
- * truncation, so the computed types of SQL Aide's models can be thousands of characters long; the page folds them. Positions in the
+ * truncation, so the computed types of a data model can be thousands of characters long; the page folds them. Positions in the
  * source are read as the compiler gives them and checked against the declaration's name; where they do not match, the checker's printing
  * is shown instead of the source.
  *
