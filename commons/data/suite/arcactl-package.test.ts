@@ -52,7 +52,7 @@ proves(
     assert(!text.includes("/home/") && !text.includes(ROOT) && !text.includes("@electric-sql/pglite") && !text.includes("@duckdb/node-api") && !/from ["']bun:test/.test(text), "none of this machine and none of the test tools");
     assert(statSync(file).size < 1_000_000, `${statSync(file).size} bytes`);
     same(JSON.parse(readFileSync(join(dir, "package.json"), "utf8")), m);
-    assert(readFileSync(join(dir, "LICENSE"), "utf8").startsWith("MIT License") && readFileSync(join(dir, "README.md"), "utf8").includes("arcactl doctor"));
+    assert(readFileSync(join(dir, "LICENSE"), "utf8").includes("PolyForm Noncommercial License 1.0.0") && readFileSync(join(dir, "README.md"), "utf8").includes("arcactl doctor"));
   },
 );
 
