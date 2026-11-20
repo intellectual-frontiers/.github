@@ -92,12 +92,25 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 
 This table is generated from the manifests (`library.ts`) and the summaries (`about.ts`) of `commons/` by `bun commons/libraries/src/readme.ts`; a test fails where it is stale.
 
+## Documentation from the code: JSDoc, and lenses
+
+The code is documented as usual, with TSDoc and JSDoc comments on every export (a description, `@example`, `@remarks`, `@limits`), and `check` in [`commons/docs`](commons/docs/) fails an export that has none. The generator reads those comments with the TypeScript checker and makes the API pages from them.
+
+A comment says what a thing is. It cannot show how a model is layered or what a command line offers, so the site also has **lenses**: a lens is a typed value that knows one library, reads its TypeScript *values* in a different way, and makes the pages that way of reading calls for (see [`commons/docs/lens.ts`](commons/docs/lens.ts)). The generator itself depends on no library it shows; a repository passes its lenses in [`docs.config.ts`](commons/docs.config.ts). The API and specification readers are built into the generator; the layered-model and program lenses are the ones a repository passes. Every page is also written as Markdown beside its HTML, and the models as JSON, for people and for programs.
+
+| Reader | What it reads | What it shows |
+| --- | --- | --- |
+| **API** (TSDoc) | The exports of each package, their types and comments | One page per package and entity, with signatures, examples and links between them |
+| **Layered model** ([`lens/layered.ts`](commons/docs/lens/layered.ts)) | The governance, logical and physical values of a Kanon library, such as the data models of `commons/data` | Each model layer by layer, every element with a stable id, where it is written, and the trace from governance down to the table |
+| **Program** ([`lens/program.ts`](commons/docs/lens/program.ts)) | A program built on `headless`, such as Ergonex, described by `describe(program)` | One page set for each audience tier: every command with its options, operands and examples, and its CLI, MCP and REST forms; a command a tier cannot see is listed with the reason |
+| **Specifications** | The spec kit of each library | Every requirement with its identifier, so that code and tests that cite it link back |
+
 ## Where to go
 
 - **The documentation site: <https://intellectual-frontiers.github.io/.github/>**, with every package, every specification and the generated API pages.
 - **A new developer:** start with the site's overview, then [`AGENTS.md`](AGENTS.md) for how the repository works, and the spec kit of the library you care about.
 - **A contributor:** [`AGENTS.md`](AGENTS.md) is the working agreement; the commons specifications are in [`commons/spec-kit/specs/`](commons/spec-kit/specs/) and each library's in its own `spec-kit/`.
-- **An AI agent:** read [`AGENTS.md`](AGENTS.md), then the site's [`llms.txt`](https://intellectual-frontiers.github.io/.github/llms.txt); every page of the site has a Markdown twin (`.md` beside the `.html`) and a JSON twin.
+- **An AI agent:** read [`AGENTS.md`](AGENTS.md), then the site's [`llms.txt`](https://intellectual-frontiers.github.io/.github/llms.txt); every page of the site has a Markdown twin (`.md` beside the `.html`), and the models and programs have a JSON twin.
 
 ## Contributing in five commands
 
