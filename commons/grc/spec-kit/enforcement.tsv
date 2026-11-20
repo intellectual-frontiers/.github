@@ -74,3 +74,32 @@ requirement	mechanism	by	note
 0008-grc-catalogs FR-004	none	-	draft: the shape of a data package, built later
 0008-grc-catalogs FR-005	none	-	draft: the shape of a data package, built later
 0008-grc-catalogs FR-006	none	-	draft: the shape of a data package, built later
+0009-grc-groups FR-001	check	.github: cd commons/grc && bun run verify	suite/groups.test.ts
+0009-grc-groups FR-002	check	.github: cd commons/grc && bun run verify	suite/groups.test.ts
+0009-grc-groups FR-003	check	.github: cd commons/grc && bun run verify	suite/groups.test.ts
+0009-grc-groups FR-004	check	.github: cd commons/grc && bun run verify	suite/groups.test.ts
+0009-grc-groups FR-005	check	.github: cd commons/grc && bun run verify	suite/groups.test.ts
+0009-grc-groups FR-006	check	.github: cd commons/grc && bun run verify	suite/groups.test.ts
+0009-grc-groups FR-007	check	.github: cd commons/grc && bun run verify	suite/groups.test.ts
+0009-grc-groups FR-008	check	.github: cd commons/grc && bun run verify	suite/groups.test.ts
+0009-grc-groups FR-009	check	.github: cd commons/grc && bun run verify	suite/groups.test.ts
+0009-grc-groups FR-010	check	.github: cd commons/grc && bun run verify	suite/groups.test.ts
+0009-grc-groups FR-011	check	.github: cd commons/grc && bun run verify	suite/groups.test.ts
+0010-grc-as-of FR-001	check	.github: cd commons/grc && bun run verify	suite/as-of.test.ts
+0010-grc-as-of FR-002	check	.github: cd commons/grc && bun run verify	suite/as-of.test.ts
+0010-grc-as-of FR-003	check	.github: cd commons/grc && bun run verify	suite/as-of.test.ts
+0010-grc-as-of FR-004	check	.github: cd commons/grc && bun run verify	suite/as-of.test.ts
+0010-grc-as-of FR-005	check	.github: cd commons/grc && bun run verify	suite/as-of.test.ts
+0010-grc-as-of FR-006	check	.github: cd commons/grc && bun run verify	suite/as-of.test.ts
+0011-grc-bundles FR-001	check	.github: cd commons/grc && bun run verify	suite/bundles.test.ts
+0011-grc-bundles FR-002	check	.github: cd commons/grc && bun run verify	suite/bundles.test.ts
+0011-grc-bundles FR-003	check	.github: cd commons/grc && bun run verify	suite/bundles.test.ts
+0011-grc-bundles FR-004	check	.github: cd commons/grc && bun run verify	suite/bundles.test.ts
+0011-grc-bundles FR-005	check	.github: cd commons/grc && bun run verify	suite/bundles.test.ts
+0011-grc-bundles FR-006	check	.github: cd commons/grc && bun run verify	suite/bundles.test.ts
+0011-grc-bundles FR-007	check	.github: cd commons/grc && bun run verify	suite/bundles.test.ts
+0011-grc-bundles FR-008	check	.github: cd commons/grc && bun run verify	suite/bundles.test.ts
+0011-grc-bundles FR-009	check	.github: cd commons/grc && bun run verify	suite/bundles.test.ts
+0011-grc-bundles FR-010	check	.github: cd commons/grc && bun run verify	suite/bundles.test.ts
+0011-grc-bundles FR-011	check	.github: cd commons/grc && bun run verify	suite/bundles.test.ts
+0011-grc-bundles FR-012	check	.github: cd commons/grc && bun run verify	suite/bundles.test.ts

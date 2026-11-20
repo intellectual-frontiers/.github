@@ -5,10 +5,13 @@
  *
  * @module
  */
+export * from "./as-of.ts";
 export * from "./assemble.ts";
 export * from "./canonical.ts";
 export * from "./compute.ts";
 export * from "./evaluate.ts";
+export * from "./group.ts";
 export * from "./kinds.ts";
 export * from "./ledger.ts";
 export * from "./serializer.ts";
+export * from "./standard-kinds.ts";

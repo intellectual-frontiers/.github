@@ -1,7 +1,7 @@
 // Spec: 0003-grc-logical FR-001, FR-002
 /**
  * The documents of the logical layer (0003-grc-logical): result, finding, evidence, attestation, assessment, risk, a ledger entry and an evidence manifest, each a kind of the envelope; the
- * statuses a result may have and the order in which they join; and the registry of every kind of this library, which is what a reader is given.
+ * statuses a result may have and the order in which they join.
  *
  * @remarks
  * The status `gap` (a control that nothing shows) and `pending` (a question a person has not yet answered) are `unaligned`: no outside standard defines them.
@@ -11,19 +11,14 @@
 import { array, type Decoded, integer, literal, object, string } from "@intellectual-frontiers/core";
 import {
   check,
-  createKinds,
-  crosswalk,
   defineKind,
-  evidencePolicy,
   exception,
   framework,
   instant,
   jsonData,
   LEVELS,
   policy,
-  requirement,
   SEVERITIES,
-  type Kinds,
 } from "@intellectual-frontiers/grc/governance";
 
 /** A status, from the one that says least to the one that says most (the order of `join`). */
@@ -149,28 +144,3 @@ export const evidenceManifest = defineKind("grc.evidence-manifest", "1", {
 });
 /** An evidence manifest. */
 export type EvidenceManifest = Decoded<typeof evidenceManifest.decode>;
-
-/** The registry of every kind of document of this library: the one a reader is given. */
-export function standardKinds(): Kinds {
-  const kinds = createKinds();
-  for (const k of [
-    framework,
-    crosswalk,
-    policy,
-    check,
-    requirement,
-    evidencePolicy,
-    exception,
-    result,
-    finding,
-    evidence,
-    attestation,
-    risk,
-    assessment,
-    ledgerEntry,
-    evidenceManifest,
-  ]) {
-    kinds.register(k);
-  }
-  return kinds;
-}

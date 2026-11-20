@@ -5,7 +5,10 @@
  *
  * @module
  */
+export * from "./bundle-files.ts";
+export * from "./bundle.ts";
 export * from "./directory.ts";
+export * from "./entity.ts";
 export * from "./runner.ts";
 export * from "./signer.ts";
 export * from "./store.ts";

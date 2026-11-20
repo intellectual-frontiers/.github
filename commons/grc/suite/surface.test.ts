@@ -41,9 +41,9 @@ async function run(h: GrcHost, words: readonly string[], options: Record<string,
   return placed.command.run({ kind: "args", options, positionals: words.slice(1), rest: [] } as never, ctx);
 }
 
-proves(["0007-grc-surface FR-001"], "the branch has exactly check, assess, explain and evidence, and the model has no defect with the reach required", () => {
+proves(["0007-grc-surface FR-001"], "the branch has exactly check, assess, explain, evidence and bundle verify, and the model has no defect with the reach required", () => {
   const program = programOf({ name: "t", summary: "T.", version: "1", children: [grcBranch(host([]))] });
-  assertEquals(placedCommands(program.children).map((p) => p.id), ["grc check", "grc assess", "grc explain", "grc evidence"]);
+  assertEquals(placedCommands(program.children).map((p) => p.id), ["grc check", "grc assess", "grc explain", "grc evidence", "grc bundle verify"]);
   assertEquals(modelProblems(program, { requireReach: true }), []);
 });
 

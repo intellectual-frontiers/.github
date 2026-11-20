@@ -7,6 +7,7 @@
  */
 export * from "./document.ts";
 export * from "./glob.ts";
+export * from "./group.ts";
 export * from "./kinds.ts";
 export * from "./registry.ts";
 export * from "./rules.ts";

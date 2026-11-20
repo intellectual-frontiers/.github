@@ -1,6 +1,7 @@
 // Spec: 0007-grc-surface FR-001, FR-002, FR-003, FR-004, FR-005, FR-006
+// Spec: 0011-grc-bundles FR-010, FR-011, FR-012
 /**
- * The headless verbs of GRC (0007-grc-surface): a branch `grc` with `check`, `assess`, `explain` and `evidence`, made with Headless (commons headless 0002-headless-governance,
+ * The headless verbs of GRC (0007-grc-surface, 0011-grc-bundles): a branch `grc` with `check`, `assess`, `explain`, `evidence` and `bundle verify`, made with Headless (commons headless 0002-headless-governance,
  * 0003-headless-output) from a host that gives the governance documents, the registries of runners, serializers and the evidence store, and the clock. The branch names no runner and no store.
  *
  * @example
@@ -11,14 +12,30 @@
  *
  * @module
  */
-import { branch, command, type Node, outcomeOf } from "@intellectual-frontiers/headless/logical";
-import { defineReach, problem } from "@intellectual-frontiers/headless/governance";
+import { branch, type Catalogue, catalogueProblems, command, explainText, type Node, outcomeOf } from "@intellectual-frontiers/headless/logical";
+import { defineReach, isProblemCode, problem } from "@intellectual-frontiers/headless/governance";
 import { value } from "@intellectual-frontiers/terminal/args";
 import { fs } from "@intellectual-frontiers/system";
 import { type Check, controlUrns, type Crosswalk, type Exception, type Framework, mappedControls, type Policy, type Requirement } from "@intellectual-frontiers/grc/governance";
 import { assess, type Evidence, newestResults, rollup, type Result, type Serializers, verifyManifest, makeManifest } from "@intellectual-frontiers/grc/logical";
 import { applyExceptions } from "@intellectual-frontiers/grc/logical";
-import { type EvidenceStore, runChecks, type Runners, type Subject } from "@intellectual-frontiers/grc/physical";
+import {
+  type BundleFinding,
+  bundleOk,
+  codeOfFinding,
+  codeOfKind,
+  describeFinding,
+  type EvidenceStore,
+  FINDING_KINDS,
+  readBundle,
+  readTrust,
+  runChecks,
+  type Runners,
+  type Signers,
+  type Subject,
+  verifyBundle,
+} from "@intellectual-frontiers/grc/physical";
+import { instantMs } from "@intellectual-frontiers/grc/governance";
 
 /** What the program gives the branch. */
 export type GrcHost = {
@@ -32,6 +49,8 @@ export type GrcHost = {
   readonly runners: Runners;
   readonly serializers: Serializers;
   readonly store?: EvidenceStore;
+  /** The signers that verify a bundle's signature, by id (`bundle verify --signer`, `dsse` by default). */
+  readonly signers?: Signers;
   readonly now: () => string;
   readonly timeoutMs?: number;
 };
@@ -50,6 +69,53 @@ async function run(host: GrcHost, ids: readonly string[]): Promise<{ readonly re
 function nearest(id: string, ids: readonly string[]): string {
   const near = ids.filter((i) => i.includes(id) || id.includes(i)).slice(0, 3);
   return near.length === 0 ? `the known ids start ${ids.slice(0, 3).join(", ")}` : `did you mean ${near.join(", ")}?`;
+}
+
+
+const WHAT: Readonly<Record<(typeof FINDING_KINDS)[number], readonly [title: string, what: string, why: string, fix: string]>> = {
+  "document-invalid": ["A file of the bundle is not a valid document", "A file is absent, is not JSON or does not decode as its kind.", "The bundle was cut, edited or made by another release.", "Make the bundle again from its source; do not edit its files."],
+  "kind-unknown": ["A document is of a kind no reader knows", "A file holds a document whose kind this release does not register.", "The bundle was made by software that has other kinds.", "Verify it with the release that made it, or make it again."],
+  "schema-unknown": ["A document is of a schema this release does not read", "A file holds a document of another schema than this release reads.", "The bundle was made by another release of the library.", "Verify it with the release that made it."],
+  "not-canonical": ["A file is not in canonical form", "A file does not equal the RFC 8785 canonical form of its content.", "It was edited, reformatted or written by a tool that does not canonicalize.", "Write the manifest, ledger and evidence list in canonical form, then sign again."],
+  "item-missing": ["An item the manifest lists is missing", "The manifest names an item that items/<digest> does not hold.", "The item was removed or never copied.", "Restore the item from the evidence store."],
+  "item-hash-mismatch": ["An item does not have its digest", "The SHA-256 of an item's bytes is not the digest it is named by.", "The item was changed after it was kept.", "Restore the item from the store; treat the bundle as tampered with until then."],
+  "item-size-mismatch": ["An item has another size than the manifest says", "The length of an item is not the size in the manifest.", "The item was truncated or the manifest was written wrongly.", "Restore the item and make the manifest again."],
+  "item-extra": ["The bundle holds an item the manifest does not list", "An object of items/ is not in the manifest.", "An item was added after signing.", "Remove it, or make and sign a new manifest that lists it."],
+  "chain-broken": ["The ledger's hash chain is broken", "An entry was changed, removed, inserted or reordered, or the ledger ends before the head the manifest names.", "The ledger was edited or cut off.", "Restore the ledger from its source; the entry named is the first at fault."],
+  "evidence-expired": ["Evidence is past its retention", "An item of evidence was observed longer ago than the evidence policy keeps it.", "The bundle is old, or the policy's retention is short.", "Collect the evidence again, or verify at an instant inside the retention with --at."],
+  "signature-absent": ["The bundle has no signature", "There is no signature.json, or it holds no signature.", "The bundle was never signed.", "Sign the canonical manifest with a trusted key."],
+  "signature-bad": ["A signature does not verify", "A signature fails with the key the verifier trusts, or signs something other than the manifest.", "The manifest changed after signing, or the key is not the signer's.", "Sign the manifest again with the right key."],
+  "signer-unallowed": ["The signer is not allowed", "The key is not trusted, its role may not attest by the evidence policy, or the signer's custody is weaker than the policy needs.", "The keys file or the policy of the verifier does not allow this signer.", "Sign with an allowed key, or correct the keys file and the policy if the verifier is wrong."],
+};
+
+/**
+ * The explanation of every problem code `grc bundle verify` gives, for `grc explain <code>`.
+ *
+ * @example
+ * ```ts
+ * BUNDLE_CATALOGUE["E-BUNDLE-ITEM-MISSING"]?.title; // "An item the manifest lists is missing"
+ * ```
+ */
+export const BUNDLE_CATALOGUE: Catalogue = {
+  ...Object.fromEntries(FINDING_KINDS.map((k) => [codeOfKind(k), { title: WHAT[k][0], what: WHAT[k][1], why: WHAT[k][2], fix: WHAT[k][3] }])),
+  "E-BUNDLE-UNREADABLE": {
+    title: "The bundle, the keys or the policy could not be read",
+    what: "A folder or a file the verification needs is missing or unreadable.",
+    why: "The path is wrong, or the file is not there.",
+    fix: "Check the paths given to bundle verify, --keys and --policy.",
+  },
+};
+
+/**
+ * The problems of `BUNDLE_CATALOGUE`, as data: none.
+ *
+ * @example
+ * ```ts
+ * bundleCatalogueProblems(); // []
+ * ```
+ */
+export function bundleCatalogueProblems(): readonly string[] {
+  return catalogueProblems(BUNDLE_CATALOGUE);
 }
 
 /** The branch `grc`. */
@@ -110,13 +176,17 @@ export function grcBranch(host: GrcHost): Node {
 
   const explain = command({
     name: "explain",
-    summary: "Say what a control, policy, check or requirement is, what it maps to and what shows it.",
+    summary: "Say what a control, policy, check or requirement is, what it maps to and what shows it, or what a problem code of `bundle verify` means.",
     options: {},
-    operands: [{ name: "ID", help: "A control URN, or the id of a policy, a check or a requirement.", arity: "one" }],
+    operands: [{ name: "ID", help: "A control URN, the id of a policy, a check or a requirement, or a problem code (E-BUNDLE-...).", arity: "one" }],
     examples: [{ args: ["urn:grc:example:1:A-1"], says: "Explain a control." }],
     action: { kind: "report", reach: READ },
     run: (args) => {
       const [id] = args.positionals;
+      if (id !== undefined && isProblemCode(id.toUpperCase()) && BUNDLE_CATALOGUE[id.toUpperCase()] !== undefined) {
+        const text = explainText(BUNDLE_CATALOGUE, { program: "grc" }, id);
+        return Promise.resolve(outcomeOf({ id, lines: text.split("\n") }, { text }));
+      }
       const urns = controlUrns(host.frameworks);
       const all = [...urns, ...host.policies.map((p) => p.id), ...host.checks.map((c) => c.id), ...host.requirements.map((r) => r.id)];
       if (id === undefined || !all.includes(id)) return Promise.resolve(outcomeOf(null, { problems: [problem("fail", `${id ?? ""} is not known; ${nearest(id ?? "", all)}`, { code: "E000-USAGE-ID" })] }));
@@ -160,5 +230,41 @@ export function grcBranch(host: GrcHost): Node {
     },
   });
 
-  return branch({ name: "grc", summary: "Governance, risk and compliance: run checks, assess, explain and keep evidence.", children: [check, assessCmd, explain, evidence] });
+
+  const verify = command({
+    name: "verify",
+    summary: "Verify a whole evidence bundle offline: items, ledger chain, canonical form, signature and retention.",
+    options: {
+      keys: value({ short: "k", help: "The file of the public keys the verifier trusts: { \"keys\": [{ keyid, role, jwk }] }.", valueName: "FILE" }),
+      policy: value({ short: "p", help: "The evidence policy file (a grc.evidence-policy document).", valueName: "FILE" }),
+      at: value({ short: "t", help: "The instant to verify at (ISO 8601 with a zone); now where none is given.", valueName: "INSTANT" }),
+      signer: value({ short: "s", help: "The id of the signer that verifies; dsse where none is given.", valueName: "ID" }),
+    },
+    operands: [{ name: "BUNDLE", help: "The folder of the bundle.", arity: "one" }],
+    examples: [{ args: ["./bundle", "--keys", "keys.json", "--policy", "policy.json"], says: "Verify the bundle in ./bundle." }],
+    action: { kind: "report", reach: READ },
+    run: async (args) => {
+      const usage = (message: string) => outcomeOf(null, { problems: [problem("fail", message, { code: "E000-USAGE-BUNDLE" })], exit: "usage" });
+      const [dir] = args.positionals;
+      const { keys, policy, at: asked, signer: signerId } = args.options;
+      if (dir === undefined) return usage("a bundle folder is needed");
+      if (keys === undefined || policy === undefined) return usage("--keys and --policy are needed: the verifier gives the trust, the bundle does not");
+      const at = asked ?? host.now();
+      if (instantMs(at) === undefined) return usage(`${at} is not an ISO 8601 instant with a zone`);
+      const signer = host.signers?.get(signerId ?? "dsse");
+      if (signer === undefined) return usage(`${signerId ?? "dsse"} is not a signer; registered: ${host.signers?.list().map((s) => s.id).join(", ") || "none"}`);
+      const unreadable = (message: string) => outcomeOf(null, { problems: [problem("fail", message, { code: "E-BUNDLE-UNREADABLE" })], exit: "environment" });
+      const contents = await readBundle(dir);
+      if (contents.kind === "err") return unreadable(contents.error);
+      const trust = await readTrust(policy, keys, signer);
+      if (trust.kind === "err") return unreadable(trust.error);
+      const report = await verifyBundle(contents.value, trust.value, at);
+      const problems = report.findings.map((f: BundleFinding) => problem("fail", describeFinding(f), { code: codeOfFinding(f), fix: `grc explain ${codeOfFinding(f)}` }));
+      const text = bundleOk(report) ? `${report.items} items, ${report.entries} ledger entries: the bundle verifies` : `${report.findings.length} findings in ${report.items} items and ${report.entries} ledger entries`;
+      return outcomeOf(report, { problems, text });
+    },
+  });
+
+  const bundle = branch({ name: "bundle", summary: "Evidence bundles: verify one offline.", children: [verify] });
+  return branch({ name: "grc", summary: "Governance, risk and compliance: run checks, assess, explain and keep evidence.", children: [check, assessCmd, explain, evidence, bundle] });
 }

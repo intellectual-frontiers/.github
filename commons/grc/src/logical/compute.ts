@@ -145,8 +145,10 @@ export function changeImpact(
   return { verdict: reasons.some((r) => r.resolvedBy === undefined) ? "blocked" : "allowed", reasons };
 }
 
+/** Every coverage state. */
+export const COVERAGE_STATES = ["gap", "untested", "failing", "stale", "partial", "accepted", "covered"] as const;
 /** How well a control is covered. */
-export type CoverageState = "gap" | "untested" | "failing" | "stale" | "partial" | "accepted" | "covered";
+export type CoverageState = (typeof COVERAGE_STATES)[number];
 /** The coverage of one control. */
 export type Coverage = { readonly urn: string; readonly state: CoverageState; readonly checks: readonly string[]; readonly via: readonly string[] };
 
