@@ -187,6 +187,14 @@ export const LIBRARY_CI: Readonly<Record<string, LibraryCi>> = {
     nodeTests: 'node --test "suite/**/*.test.ts"',
     systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
   },
+  headless: {
+    comment: lines(
+      "Headless, the contract of a program with no window in layers (governance, logical, the command-line surface), a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the specification checker, the layers and trace checks, its tests and the",
+      "packing of its package with the inspection of its declarations) on Bun and its tests on Node 26, on Windows, macOS and Linux, because the package runs on all three.",
+    ).trimEnd(),
+    nodeTests: 'node --test "suite/**/*.test.ts"',
+    systems: ["windows-latest", "macos-latest", "ubuntu-latest"],
+  },
   telemetry: {
     comment: lines(
       "Telemetry, OpenTelemetry-native signals as one typed library, a library lifted out of `commons/ts` (commons 0032-lifting-libraries): its own `verify` (the compiler, the specification checker, the trace, its tests and the",

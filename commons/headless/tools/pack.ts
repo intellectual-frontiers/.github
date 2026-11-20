@@ -12,7 +12,7 @@
  * @module
  */
 import process from "node:process";
-import { main } from "@intellectual-frontiers/commons/ts/tools/pack-library";
+import { main } from "@intellectual-frontiers/libraries/pack";
 import { path } from "@intellectual-frontiers/system";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
