@@ -37,6 +37,7 @@ const EXPORTS: Record<string, string> = {
   "./askpass": "./src/surfaces/askpass/mod.ts",
   "./mcp": "./src/surfaces/mcp/mod.ts",
   "./rest": "./src/surfaces/rest/mod.ts",
+  "./describe": "./src/describe/mod.ts",
 };
 const at = (path: string, text: string) => ({ path, text });
 const rules = (files: readonly { path: string; text: string }[]): string[] => importFindings(TABLE, files, EXPORTS).map((f) => f.rule);

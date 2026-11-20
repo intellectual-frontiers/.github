@@ -1,7 +1,7 @@
 // Spec: 0001-headless-layers FR-008
 /**
  * The typed facts of Headless, an independent library of commons (commons 0027-commons-libraries): the contract of a program that has no window. Its
- * specification is in its own spec kit (`spec-kit/`, `0001-headless-layers` to `0004-headless-cli`); this repository knows it as one requirement of
+ * specification is in its own spec kit (`spec-kit/`, `0001-headless-layers` to `0015-describe`); this repository knows it as one requirement of
  * 0027-commons-libraries, proved by `bun run verify` in this folder, and as a library of the lift of `commons/ts` (0032-lifting-libraries).
  *
  * @module
@@ -44,6 +44,11 @@ export const about: About = {
       path: "src/surfaces/rest/",
       what: "The REST surface, as a skeleton: the OpenAPI 3.1 document of a program for the caller's tier.",
       mayImport: ["governance and logical, by package name"],
+    },
+    {
+      path: "src/describe/",
+      what: "The description of a program as layered models of Kanon, one for each tier: governance (the action of each verb, the problem codes, the exit statuses), the logical layer (the program, plugins, verbs, options, operands) and the command, tool and route that each surface draws.",
+      mayImport: ["governance, logical, the tool server and the REST surface, by package name", "core, the terminal's args and Kanon, by package name"],
     },
     {
       path: "src/otel/",
