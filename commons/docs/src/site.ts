@@ -12,7 +12,7 @@ import { fs, path } from "@intellectual-frontiers/system";
 import { Build } from "./build.ts";
 import type { Finding } from "./check.ts";
 import { type Config, under } from "./config.ts";
-import { document } from "./emit/html.ts";
+import { diagramSources, document, drawable } from "./emit/html.ts";
 import { llmsIndex, markdownOf, twinOf } from "./emit/markdown.ts";
 import { searchIndex } from "./emit/search.ts";
 import { readApi } from "./extract/api.ts";
@@ -235,6 +235,7 @@ export async function buildSite(config: Config): Promise<Built> {
   homes(b, packages);
   citedBy(b);
   b.found.push(...brokenLinks(b.pages));
+  for (const p of b.pages) for (const src of diagramSources(p.blocks)) if (!drawable(src)) b.found.push({ where: p.path, problem: { kind: "diagram-undrawable", first: src.split("\n")[0] ?? "" } });
   b.found.push(...wordFindings(b.pages, config.retired, config.forbiddenInGuides));
   const files = config.lenses.flatMap((l) => l.files?.(b) ?? []);
   return { pages: b.pages, found: b.found, files };

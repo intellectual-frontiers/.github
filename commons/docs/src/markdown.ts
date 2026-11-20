@@ -132,7 +132,9 @@ export function markdown(source: string, ctx: InlineContext): Block[] {
         i++;
       }
       i++;
-      blocks.push({ kind: "code", lang: langOf(fence[3] ?? ""), text: body.join("\n") });
+      const lang = langOf(fence[3] ?? "");
+      // a Mermaid fence is a diagram, drawn when the site is built (commons 0011-documentation FR-037); its source stays on the page
+      blocks.push(lang === "mermaid" ? { kind: "diagram", source: body.join("\n"), caption: "" } : { kind: "code", lang, text: body.join("\n") });
       continue;
     }
     const heading = HEADING.exec(line);

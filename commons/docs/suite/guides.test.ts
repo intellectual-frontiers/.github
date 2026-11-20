@@ -35,3 +35,15 @@ proves(["0011-documentation FR-032", "0011-documentation FR-033"], "commons' sit
   const headless = built.pages.find((p) => p.path === "overview/headless.html");
   assertStringIncludes(JSON.stringify(headless?.blocks), "Imports");
 });
+
+proves(["0011-documentation FR-037"], "a Mermaid fence in Markdown is a diagram block with its source, a diagram of a type the renderer draws is drawable, and one it does not draw is a finding that says so", async () => {
+  const { markdown, plainContext } = await import("../src/markdown.ts");
+  const { diagramSources, drawable } = await import("../src/emit/html.ts");
+  const { message } = await import("../src/check.ts");
+  const blocks = markdown("Text.\n\n```mermaid\nflowchart LR\n  a[A] --> b[B]\n```\n\n```ts\nconst a = 1;\n```\n", plainContext);
+  assertEquals(blocks.map((b) => b.kind), ["paragraph", "diagram", "code"]);
+  assertEquals(diagramSources(blocks), ["flowchart LR\n  a[A] --> b[B]"]);
+  assert(drawable("flowchart LR\n  a --> b") && drawable("erDiagram\n  a ||--o{ b : has"), "flowchart and entity-relationship diagrams are drawn");
+  assert(!drawable('pie title Pets\n  "Dogs" : 3'), "a pie chart is not drawn");
+  assertStringIncludes(message({ kind: "diagram-undrawable", first: "pie title Pets" }), "cannot be drawn");
+});

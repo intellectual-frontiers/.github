@@ -24,6 +24,7 @@ export type Problem =
   | { readonly kind: "import-failed"; readonly error: string }
   | { readonly kind: "broken-link"; readonly href: string }
   | { readonly kind: "duplicate-spec"; readonly id: string }
+  | { readonly kind: "diagram-undrawable"; readonly first: string }
   | { readonly kind: "retired-name"; readonly name: string }
   | { readonly kind: "forbidden-word"; readonly word: string };
 
@@ -66,6 +67,8 @@ export function message(p: Problem): string {
       return `links to ${p.href}, which is not a page or an anchor of the site`;
     case "duplicate-spec":
       return `holds ${p.id}, which a spec kit before it holds too`;
+    case "diagram-undrawable":
+      return `has a diagram that cannot be drawn (it is not a flowchart, state, sequence, class or entity-relationship diagram, or it is not valid): ${p.first}`;
     case "retired-name":
       return `names ${p.name}, which is retired`;
     case "forbidden-word":

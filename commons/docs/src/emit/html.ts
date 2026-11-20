@@ -118,6 +118,35 @@ export function highlighted(code: string, lang: Lang): string {
   return highlightedHtml(code, lang);
 }
 
+/** Whether a diagram can be drawn: its source is of a type the renderer draws (flowchart, state, sequence, class, entity-relationship). */
+export function drawable(source: string): boolean {
+  try {
+    renderMermaidSVG(source);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** The sources of the diagrams in blocks, at any depth. */
+export function diagramSources(bs: readonly Block[]): string[] {
+  return bs.flatMap((b): string[] => {
+    switch (b.kind) {
+      case "diagram":
+        return [b.source];
+      case "list":
+        return b.items.flatMap(diagramSources);
+      case "callout":
+      case "entry":
+        return diagramSources(b.blocks);
+      case "tabs":
+        return b.tabs.flatMap((t) => diagramSources(t.blocks));
+      default:
+        return [];
+    }
+  });
+}
+
 /**
  * A diagram as SVG, drawn when the site is built (FR-037): in the colours of the page, as custom properties, so that the light and the dark scheme need no second drawing; where the diagram cannot be drawn, its source in a code block.
  */
