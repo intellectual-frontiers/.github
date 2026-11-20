@@ -11,6 +11,7 @@
         "@intellectual-frontiers/formats": "link:../formats",
         "@intellectual-frontiers/githost": "link:../githost",
         "@intellectual-frontiers/grc": "link:../grc",
+        "@intellectual-frontiers/kanon": "link:../kanon",
         "@intellectual-frontiers/mizan": "link:../mizan",
         "@intellectual-frontiers/net": "link:../net",
         "@intellectual-frontiers/ontology": "link:../ontology",
@@ -37,6 +38,8 @@
     "@intellectual-frontiers/githost": ["@intellectual-frontiers/githost@link:../githost", {}],
 
     "@intellectual-frontiers/grc": ["@intellectual-frontiers/grc@link:../grc", {}],
+
+    "@intellectual-frontiers/kanon": ["@intellectual-frontiers/kanon@link:../kanon", {}],
 
     "@intellectual-frontiers/mizan": ["@intellectual-frontiers/mizan@link:../mizan", {}],
 

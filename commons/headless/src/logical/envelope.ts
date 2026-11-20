@@ -42,12 +42,8 @@ export function toJson(value: unknown): Json {
     case "object": {
       if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value.toISOString();
       if (Array.isArray(value)) return value.map((v) => toJson(v));
-      const out: Record<string, Json> = {};
-      for (const [k, v] of Object.entries(value)) {
-        if (v === undefined || typeof v === "function" || typeof v === "symbol") continue;
-        out[k] = toJson(v);
-      }
-      return out;
+      // `fromEntries` defines each key as an own property: a key named `__proto__` is data here, never the prototype
+      return Object.fromEntries(Object.entries(value).filter(([, v]) => v !== undefined && typeof v !== "function" && typeof v !== "symbol").map(([k, v]) => [k, toJson(v)]));
     }
     default:
       return null;
