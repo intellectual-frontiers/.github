@@ -50,7 +50,8 @@ export type ProblemCode =
   | "E-DOCTOR-LINKS"
   | "E-DOCTOR-NODE"
   | "E-DOCTOR-BUN"
-  | "E-DOCTOR-GIT";
+  | "E-DOCTOR-GIT"
+  | "E-PROVE-FAILED";
 
 /** Every code, in the order the explanations are listed. */
 export const PROBLEM_CODES: readonly ProblemCode[] = [
@@ -87,6 +88,7 @@ export const PROBLEM_CODES: readonly ProblemCode[] = [
   "E-DOCTOR-NODE",
   "E-DOCTOR-BUN",
   "E-DOCTOR-GIT",
+  "E-PROVE-FAILED",
 ];
 
 /** Whether a text is one of the codes. */
@@ -293,5 +295,11 @@ export const CATALOGUE: Readonly<Record<ProblemCode, Explained>> = {
     what: "`git` does not run here, or the folder is not a Git working tree with an origin.",
     why: "Git is not installed, or the folder is not a clone.",
     fix: "git --version",
+  },
+  "E-PROVE-FAILED": {
+    title: "A proof of the plan failed",
+    what: "A proof that `repoctl prove` ran (a type check, a check of the specifications, a suite, a packing) ended with a failure.",
+    why: "The change broke what that proof holds, or the proof is flaky: a failing property test prints its seed.",
+    fix: "repoctl prove --why",
   },
 };

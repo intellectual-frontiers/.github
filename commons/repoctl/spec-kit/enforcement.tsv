@@ -46,3 +46,17 @@ requirement	mechanism	by	note
 0006-repoctl-surfaces FR-004	check	.github: cd commons/repoctl && bun run verify	suite/surfaces.test.ts: the reach of each action, and the confirmation is for a person alone
 0006-repoctl-surfaces FR-005	check	.github: cd commons/repoctl && bun run verify	suite/surfaces.test.ts: the tier is the host's, an unknown word ends with 2 and a verb of a higher tier is not there
 0006-repoctl-surfaces FR-006	check	.github: cd commons/repoctl && bun run verify	suite/surfaces.test.ts: the root package has the script and the bin, and the launcher is there
+0007-repoctl-prove FR-001	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: see the requirement
+0007-repoctl-prove FR-002	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: see the requirement
+0007-repoctl-prove FR-003	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: see the requirement
+0007-repoctl-prove FR-004	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: see the requirement
+0007-repoctl-prove FR-005	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: see the requirement
+0007-repoctl-prove FR-006	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: see the requirement
+0007-repoctl-prove FR-007	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: see the requirement
+0007-repoctl-prove FR-008	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: see the requirement
+0007-repoctl-prove FR-009	check	.github: cd commons/repoctl && bun run verify	suite/prove.test.ts: see the requirement
+0007-repoctl-prove FR-010	none	-	Planned: not built yet
+0007-repoctl-prove FR-011	none	-	Planned: not built yet
+0007-repoctl-prove FR-012	none	-	Planned: not built yet
+0007-repoctl-prove FR-013	none	-	Planned: not built yet
+0007-repoctl-prove FR-014	review	0007-repoctl-prove FR-005	the nightly and release workflows keep every tier

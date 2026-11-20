@@ -14,8 +14,10 @@
  */
 export * from "./adapters.ts";
 export * from "./define.ts";
+export * from "./prove.ts";
 export * from "./program.ts";
 export * from "./verbs/check.ts";
 export * from "./verbs/library.ts";
+export * from "./verbs/prove.ts";
 export * from "./verbs/releasing.ts";
 export * from "./verbs/sync.ts";

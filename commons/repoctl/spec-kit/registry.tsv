@@ -5,3 +5,4 @@ number	slug	state
 0004	repoctl-status-release	in force
 0005	repoctl-library-commit-doctor	in force
 0006	repoctl-surfaces	in force
+0007	repoctl-prove	in force
