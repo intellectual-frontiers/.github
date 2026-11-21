@@ -1,0 +1,14 @@
+# Upper-case extensions, whatever the case
+
+$ sqlfs --root $ROOT 'SELECT path FROM files WHERE ext ILIKE '\''ts'\'' AND name <> lower(name)'
+path
+----------
+src/Big.TS
+
+$ sqlfind --root $ROOT --emit shell 'SELECT path FROM files WHERE ext ILIKE '\''ts'\'' AND name <> lower(name)'
+find $ROOT -mindepth 1 -maxdepth 64 -printf '%P\0%y\0%s\0%Ts\0%m\0%u\0'
+
+$ sqlfind --root $ROOT 'SELECT path FROM files WHERE ext ILIKE '\''ts'\'' AND name <> lower(name)'
+path
+----------
+src/Big.TS

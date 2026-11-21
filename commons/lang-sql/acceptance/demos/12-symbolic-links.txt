@@ -1,0 +1,16 @@
+# Symbolic links
+
+$ sqlfs --root $ROOT 'SELECT path FROM files WHERE kind = '\''l'\'' ORDER BY path'
+path
+-----------
+lib/link.ts
+lib/loop
+
+$ sqlfind --root $ROOT --emit shell 'SELECT path FROM files WHERE kind = '\''l'\'' ORDER BY path'
+find $ROOT -mindepth 1 -maxdepth 64 -type l -printf '%P\0%y\0%s\0%Ts\0%m\0%u\0'
+
+$ sqlfind --root $ROOT 'SELECT path FROM files WHERE kind = '\''l'\'' ORDER BY path'
+path
+-----------
+lib/link.ts
+lib/loop

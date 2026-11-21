@@ -1,0 +1,1012 @@
+SELECT purchases, LAST_VALUE(item) OVER item_window AS most_popular FROM Produce WINDOW item_window AS (PARTITION BY purchases ORDER BY purchases ROWS BETWEEN 2 PRECEDING AND 2 FOLLOWING);
+
+SELECT EOMONTH(CAST('2008-11-25' AS DATE));
+
+SELECT TIMEFROMPARTS(15, 30, 00, 0, 0);
+
+SELECT CAST('2008-12-25 15:30:00' AS TIME);
+
+SELECT DATEDIFF(WEEK, d2, d1);
+
+SELECT * FROM (SELECT 1 AS x ORDER BY x OFFSET 0 ROWS FETCH FIRST 1 ROWS ONLY) AS _l_0 UNION ALL SELECT 2 AS x;
+
+SELECT 2 AS x UNION ALL SELECT * FROM (SELECT 1 AS x ORDER BY x OFFSET 0 ROWS FETCH FIRST 1 ROWS ONLY) AS _l_0;
+
+SELECT * FROM (SELECT 1 AS x ORDER BY x OFFSET 1 ROWS FETCH FIRST 1 ROWS ONLY) AS _l_0 UNION ALL SELECT 2 AS x;
+
+SELECT HASHBYTES('SHA1', x), HASHBYTES('SHA2_256', x), HASHBYTES('SHA2_512', x);
+
+CREATE TABLE foo (x AS YEAR(y));
+
+SELECT DATEDIFF(YEAR, 'start', 'end');
+
+SELECT DATEADD(YEAR, 1, '2020-01-01');
+
+SELECT DATEADD(DAY, 1, CAST(CAST('2020-01-01' AS DATETIME2) AS DATE));
+
+SELECT * FROM [table];
+
+SELECT TOP 0 * INTO a FROM b AS temp;
+
+SELECT (PATINDEX(CONVERT(VARCHAR(MAX), 0x255b5e002d7f5d25) COLLATE Latin1_General_BIN, x) = 0);
+
+SELECT CASE WHEN NOT a IS NULL THEN b ELSE c END;
+
+SELECT CASE WHEN NOT a IS NULL THEN b END;
+
+SELECT * FROM (SELECT * FROM a UNION SELECT * FROM b) AS _l_0 ORDER BY (SELECT NULL) OFFSET 1 ROWS;
+
+SELECT * FROM a UNION SELECT * FROM b ORDER BY x OFFSET 1 ROWS FETCH FIRST 1 ROWS ONLY;
+
+SELECT * FROM (SELECT a FROM x UNION SELECT a FROM y) AS _l_0 ORDER BY (SELECT NULL) OFFSET 0 ROWS FETCH FIRST 2 ROWS ONLY;
+
+SELECT TOP 1 * FROM (SELECT * FROM a UNION SELECT * FROM b) AS _l_0 ORDER BY x;
+
+SELECT TOP 10 x FROM y;
+
+SELECT 1 'foo';
+
+BEGIN TRANSACTION;
+
+SELECT COUNT(IIF(col % 2 = 0, 1, NULL)) FROM foo;
+
+SELECT COUNT_IF(col % 2 = 0) FILTER(WHERE col < 1000) FROM foo;
+
+SELECT COUNT(IIF(col < 1000 AND col % 2 = 0, 1, NULL)) FROM foo;
+
+SELECT * FROM (SELECT *, COUNT_BIG(*) OVER () AS _w FROM t) AS _t WHERE _w > 1;
+
+SELECT [user id], some_id, other_id, [2 nd id] FROM (SELECT [user id] AS [user id], some_id AS some_id, 1 AS other_id, 2 AS [2 nd id], COUNT_BIG(*) OVER () AS _w FROM t) AS _t WHERE _w > 1;
+
+WITH t AS (SELECT 1 AS c) SELECT * FROM (SELECT c AS c FROM t) AS subq;
+
+WITH t AS (SELECT 1 AS c) SELECT * FROM (SELECT * FROM (SELECT c AS c FROM t) AS subq1) AS subq2;
+
+WITH t1(x) AS (SELECT 1), t2(y) AS (SELECT 2) SELECT * FROM (SELECT y AS y FROM t2) AS subq;
+
+WITH _generated_dates(date_value) AS (SELECT CAST('2020-01-01' AS DATE) AS date_value UNION ALL SELECT CAST(DATEADD(WEEK, 1, date_value) AS DATE) FROM _generated_dates WHERE CAST(DATEADD(WEEK, 1, date_value) AS DATE) <= CAST('2020-02-01' AS DATE)) SELECT * FROM (SELECT date_value AS date_value FROM _generated_dates) AS _generated_dates;
+
+WITH _generated_dates(date_value) AS (SELECT CAST('2020-01-01' AS DATE) AS date_value UNION ALL SELECT CAST(DATEADD(WEEK, 1, date_value) AS DATE) FROM _generated_dates WHERE CAST(DATEADD(WEEK, 1, date_value) AS DATE) <= CAST('2020-02-01' AS DATE)), dates AS (SELECT * FROM (SELECT date_value AS date_value FROM _generated_dates) AS _generated_dates) SELECT * FROM dates;
+
+WITH _generated_dates(date_value) AS (SELECT CAST('2020-01-01' AS DATE) AS date_value UNION ALL SELECT CAST(DATEADD(WEEK, 1, date_value) AS DATE) FROM _generated_dates WHERE CAST(DATEADD(WEEK, 1, date_value) AS DATE) <= CAST('2020-02-01' AS DATE)), _generated_dates_1(date_value) AS (SELECT CAST('2020-01-01' AS DATE) AS date_value UNION ALL SELECT CAST(DATEADD(MONTH, 1, date_value) AS DATE) FROM _generated_dates_1 WHERE CAST(DATEADD(MONTH, 1, date_value) AS DATE) <= CAST('2020-03-01' AS DATE)), dates1 AS (SELECT * FROM (SELECT date_value AS date_value FROM _generated_dates) AS _generated_dates), dates2 AS (SELECT * FROM (SELECT date_value AS date_value FROM _generated_dates_1) AS _generated_dates_1) SELECT * FROM dates1 CROSS JOIN dates2;
+
+WITH _generated_dates(date_week) AS (SELECT CAST('2020-01-01' AS DATE) AS date_week UNION ALL SELECT CAST(DATEADD(WEEK, 1, date_week) AS DATE) FROM _generated_dates WHERE CAST(DATEADD(WEEK, 1, date_week) AS DATE) <= CAST('2020-02-01' AS DATE)) SELECT * FROM (SELECT date_week AS date_week FROM _generated_dates) AS _generated_dates;
+
+SELECT SUM(IIF(c = 'US', x, NULL)), COUNT(IIF(c > 1, 1, NULL)), COUNT_BIG(DISTINCT IIF(c > 1, x, NULL)) FROM t;
+
+SELECT x BETWEEN 2 AND 10;
+
+SELECT (x BETWEEN 10 AND 2 OR x BETWEEN 2 AND 10);
+
+SELECT x BETWEEN 10 AND 2;
+
+SELECT 1 AS [[x]]];
+
+SELECT 1 AS [x"];
+
+SELECT FORMAT(CAST('2020-01-01' AS DATETIME2), CONCAT('yyyy', 'MM'));
+
+SELECT CAST('foo' AS DATETIME2);
+
+EXEC sp_rename 'db.t1', 't2';
+
+EXEC sp_rename '[db].[t1]', 't2';
+
+CREATE TABLE t (a MONEY, b SMALLMONEY, c XML, d IMAGE, e JSON);
+
+CREATE TABLE t (col VARCHAR(MAX));
+
+CREATE TABLE t (col CHAR(MAX));
+
+ALTER TABLE Payments ADD Stock NUMERIC(38, 0), dropid VARCHAR(500);
+
+CREATE TABLE t (foo VARBINARY);
+
+SELECT a FROM tbl;
+
+SELECT IIF(a, 1, 2);
+
+SELECT * FROM t ORDER BY (SELECT NULL) OFFSET 0 ROWS FETCH FIRST 10 ROWS ONLY;
+
+SELECT DATEADD(QUARTER, -1, GETDATE());
+
+SELECT TOP 5 * FROM [test_table] ORDER BY RAND();
+
+SELECT (CAST('2016-01-10' AS DATE), CAST('2016-02-01' AS DATE)) OVERLAPS (CAST('2016-01-20' AS DATE), CAST('2016-02-10' AS DATE));
+
+SELECT * FROM GENERATE_SERIES(a, b);
+
+SELECT * FROM t CROSS JOIN GENERATE_SERIES(2, 4);
+
+SELECT * FROM t CROSS JOIN GENERATE_SERIES(2, 4) AS s;
+
+CREATE TABLE x (a UNIQUEIDENTIFIER, b VARBINARY);
+
+SELECT DATEFROMPARTS(2024, 1, 31);
+
+SELECT DAY(x), MONTH(x), YEAR(x);
+
+SELECT DATEADD(MONTH, 1, CAST('2008-03-31' AS DATETIME2));
+
+SELECT a, b FROM (SELECT a AS a, b AS b, ROW_NUMBER() OVER (PARTITION BY a ORDER BY CASE WHEN c IS NULL THEN 1 ELSE 0 END DESC, c DESC) AS _row_number FROM x) AS _t WHERE _row_number = 1;
+
+SELECT DATEADD(MONTH, 18, CAST('2008-02-28' AS DATETIME2));
+
+SELECT DATEDIFF(WEEK, '2009-01-01', '2009-12-31');
+
+CREATE TABLE t (a INTEGER);
+
+CREATE TABLE TEST (cola VARCHAR(max));
+
+CREATE TABLE testTypes (a BIT);
+
+WITH vartab(v) AS (SELECT '[{"attr": [{"name": "banana"}]}]') SELECT ISNULL(JSON_QUERY(v, '$[0].attr[0].name'), JSON_VALUE(v, '$[0].attr[0].name')) FROM vartab;
+
+WITH vartab(v) AS (SELECT '{"attr": [{"name": "banana"}]}') SELECT ISNULL(JSON_QUERY(v, '$.attr[0].name'), JSON_VALUE(v, '$.attr[0].name')) FROM vartab;
+
+SELECT ISNULL(JSON_QUERY('{"fruit":"banana"}', '$.fruit'), JSON_VALUE('{"fruit":"banana"}', '$.fruit'));
+
+SELECT STUFF(a, 0, 0, 'b');
+
+SELECT CAST(a AS SQL_VARIANT);
+
+SELECT x FROM t ORDER BY (SELECT NULL) OFFSET 5 ROWS;
+
+SELECT CHAR(72) + CHAR(105) + CHAR(x);
+
+SELECT STRING_AGG(x, ',') WITHIN GROUP (ORDER BY y);
+
+SELECT CONCAT(a, b) FROM t;
+
+CREATE TABLE t (a INT, b AS (a * 2) PERSISTED NOT NULL);
+
+CREATE TABLE a;
+
+SELECT t.x FROM (VALUES (1)) AS t(x) UNION ALL SELECT 2 ORDER BY (t.x);
+
+SELECT (t.x + 1) FROM (VALUES (1)) AS t(x) UNION ALL SELECT 2 ORDER BY t.x + 1;
+
+SELECT * FROM (SELECT a FROM x UNION ALL SELECT a FROM y) AS _l_0 ORDER BY CASE WHEN a IS NULL THEN 1 ELSE 0 END DESC, a DESC OFFSET 1 ROWS FETCH FIRST 2 ROWS ONLY;
+
+SELECT -1 AS x UNION ALL SELECT TOP 2 x FROM (VALUES (2), (1), (0)) AS t(x) ORDER BY x OFFSET 0 ROWS FETCH FIRST 1 ROWS ONLY;
+
+SELECT a FROM x UNION SELECT a FROM y ORDER BY a OFFSET 1 ROWS FETCH NEXT 2 ROWS ONLY;
+
+SELECT a FROM x UNION ALL SELECT TOP 1 a FROM y ORDER BY a OFFSET 1 ROWS;
+
+SELECT x.a FROM x UNION ALL SELECT y.a FROM y ORDER BY x.a OFFSET 1 ROWS;
+
+SELECT 1 UNION ALL SELECT 2 ORDER BY 1 OFFSET 1 ROWS;
+
+SELECT a, a FROM x UNION ALL SELECT a, a FROM y ORDER BY 1 OFFSET 1 ROWS;
+
+SELECT a FROM x UNION ALL SELECT TOP 50 PERCENT a FROM y ORDER BY a OFFSET 1 ROWS;
+
+SELECT a FROM x UNION SELECT a FROM y UNION SELECT a FROM z ORDER BY a OFFSET 1 ROWS FETCH NEXT 2 ROWS ONLY;
+
+SELECT a FROM x UNION SELECT a FROM (SELECT a AS a FROM y ORDER BY a OFFSET 1 ROWS FETCH NEXT 2 ROWS ONLY) AS t ORDER BY a OFFSET 1 ROWS FETCH NEXT 2 ROWS ONLY;
+
+WITH x(a) AS (SELECT 1), y(a) AS (SELECT 2) SELECT a FROM x UNION SELECT a FROM y ORDER BY a OFFSET 1 ROWS FETCH NEXT 2 ROWS ONLY;
+
+SELECT 1 AS x ORDER BY x FOR JSON PATH OPTION(RECOMPILE);
+
+SELECT TOP 1 a FROM x UNION ALL SELECT TOP 1 a FROM y;
+
+SELECT 1 AS x UNION ALL SELECT 2 AS x ORDER BY x;
+
+SELECT 1 AS x UNION ALL SELECT TOP 1 x FROM (VALUES (2), (3)) AS t(x) ORDER BY x;
+
+SELECT a FROM x UNION ALL SELECT TOP 1 a FROM y UNION ALL SELECT a FROM z;
+
+SELECT a FROM x UNION ALL SELECT TOP 1 a FROM y;
+
+WITH c AS (SELEC1) SELECT * FROM c;
+
+WITH c AS (SELEC - 1) SELECT * FROM c;
+
+WITH x AS (SELECT 1 AS [1]) SELECT TOP 0 * FROM (SELECT * FROM x UNION SELECT * FROM x) AS _l_0 ORDER BY 1;
+
+SELECT * FROM a..b;
+
+SELECT output FROM t;
+
+SELECT 1 output;
+
+SELECT 1 AS output;
+
+SELECT TOP (SELECT 1) * FROM t;
+
+SELECT ATN2(x, y);
+
+SELECT EXP(1);
+
+SELECT SYSDATETIMEOFFSET();
+
+SELECT COMPRESS('Hello World');
+
+CREATE view a.b.c;
+
+CREATE VIEW b.c;
+
+DROP view a.b.c;
+
+DROP VIEW b.c;
+
+DROP VIEW a.b.c, a.b.d;
+
+DROP VIEW b.c, b.d;
+
+EXEC MyProc @id = 7, @name = 'Lochristi';
+
+EXECUTE MyProc @id = 7, @name = 'Lochristi';
+
+EXECUTE @return_status = dbo.MyProc @a, @b;
+
+EXEC @RC = dbo.MyProc @id = 7;
+
+EXECUTE @RC = dbo.MyProc @id = 7;
+
+SELECT TRIM('     test    ') AS Result;
+
+SELECT TRIM('.,! ' FROM '     #     test    .') AS Result;
+
+SELECT * FROM t TABLESAMPLE (10 PERCENT);
+
+SELECT * FROM t TABLESAMPLE (20 ROWS);
+
+SELECT * FROM t TABLESAMPLE (10 PERCENT) REPEATABLE (123);
+
+SELECT CONCAT(column1, column2);
+
+SELECT TestSpecialChar.Test# FROM TestSpecialChar;
+
+SELECT TestSpecialChar.Test@ FROM TestSpecialChar;
+
+SELECT TestSpecialChar.Test$ FROM TestSpecialChar;
+
+SELECT TestSpecialChar.Test_ FROM TestSpecialChar;
+
+SELECT TOP (2 + 1) 1;
+
+SELECT * FROM t WHERE NOT c;
+
+SELECT * FROM t WHERE NOT c <> 0;
+
+TRUNCATE TABLE t1 WITH (PARTITIONS(1, 2 TO 5, 10 TO 20, 84));
+
+WITH t1 AS (SELECT 1 AS a), t2 AS (SELECT 1 AS a) SELECT TOP 10 a FROM t1 UNION ALL SELECT TOP 10 a FROM t2;
+
+SELECT TOP 10 s.RECORDID, n.c.value('(/*:FORM_ROOT/*:SOME_TAG)[1]', 'float') AS SOME_TAG_VALUE FROM source_table.dbo.source_data AS s(nolock) CROSS APPLY FormContent.nodes('/*:FORM_ROOT') AS N(C);
+
+SELECT TOP 10 s.RECORDID, n.c.value('(/*:FORM_ROOT/*:SOME_TAG)[1]', 'float') AS SOME_TAG_VALUE FROM source_table.dbo.source_data AS s WITH (nolock) CROSS APPLY FormContent.nodes('/*:FORM_ROOT') AS N(C);
+
+CREATE CLUSTERED INDEX [IX_OfficeTagDetail_TagDetailID] ON [dbo].[OfficeTagDetail]([TagDetailID] ASC);
+
+CREATE INDEX [x] ON [y]([z] ASC) WITH (allow_page_locks=on) ON X([y]);
+
+CREATE INDEX [x] ON [y]([z] ASC) WITH (allow_page_locks=on) ON PRIMARY;
+
+COPY INTO test_1 FROM 'path' WITH (FORMAT_NAME = test, FILE_TYPE = 'CSV', CREDENTIAL = (IDENTITY='Shared Access Signature', SECRET='token'), FIELDTERMINATOR = ';', ROWTERMINATOR = '0X0A', ENCODING = 'UTF8', DATEFORMAT = 'ymd', MAXERRORS = 10, ERRORFILE = 'errorsfolder', IDENTITY_INSERT = 'ON');
+
+WITH t1 AS (SELECT 1 AS a), t2 AS (SELECT 1 AS a) SELECT TOP 10 a FROM t1 UNION ALL SELECT TOP 10 a FROM t2 ORDER BY a DESC;
+
+WITH t1 AS (SELECT 1 AS a), t2 AS (SELECT 1 AS a) SELECT COUNT(*) FROM (SELECT TOP 10 a FROM t1 UNION ALL SELECT TOP 10 a FROM t2 ORDER BY a DESC) AS t;
+
+SELECT 1 AS "[x]";
+
+INSERT INTO foo.bar WITH cte AS (SELECT 1 AS one) SELECT * FROM cte;
+
+WITH cte AS (SELECT 1 AS one) INSERT INTO foo.bar SELECT * FROM cte;
+
+CREATE TABLE test_table([ID] [BIGINT] NOT NULL,[EffectiveFrom] [DATETIME2] (3) NOT NULL);
+
+CREATE TABLE test_table ([ID] BIGINT NOT NULL, [EffectiveFrom] DATETIME2(3) NOT NULL);
+
+SELECT CONVERT(DATETIME, '2006-04-25T15:50:59.997', 126);
+
+WITH A AS (SELECT 2 AS value), C AS (SELECT * FROM A) SELECT * INTO TEMP_NESTED_WITH FROM (SELECT * FROM C) AS temp;
+
+SELECT IIF(cond <> 0, 'True', 'False');
+
+SELECT TRIM(BOTH 'a' FROM a);
+
+SELECT TIMEFROMPARTS(23, 59, 59, 0, 0);
+
+SELECT DATETIMEFROMPARTS(2013, 4, 5, 12, 00, 00, 0);
+
+SELECT TOP 1 * FROM (SELECT x FROM t1 UNION ALL SELECT x FROM t2) AS _l_0;
+
+WITH t(c) AS (SELECT 1) SELECT * INTO foo FROM (SELECT c AS c FROM t) AS temp;
+
+WITH t(c) AS (SELECT 1) SELECT * INTO UNLOGGED #foo FROM (SELECT c AS c FROM t) AS temp;
+
+WITH t(c) AS (SELECT 1) SELECT c INTO #foo FROM t;
+
+WITH t(c) AS (SELECT 1) SELECT * INTO UNLOGGED foo FROM (SELECT c AS c FROM t) AS temp;
+
+WITH y AS (SELECT 2 AS c) INSERT INTO #t SELECT * FROM y;
+
+WITH y AS (SELECT 2 AS c) INSERT INTO t SELECT * FROM y;
+
+WITH t(c) AS (SELECT 1) SELECT 1 AS c UNION (SELECT c FROM t);
+
+WITH t(c) AS (SELECT 1) MERGE INTO x AS z USING (SELECT c AS c FROM t) AS y ON a = b WHEN MATCHED THEN UPDATE SET a = y.b;
+
+WITH t(n) AS (SELECT 1 AS n UNION ALL SELECT n + 1 AS n FROM t WHERE n < 4) SELECT * FROM (SELECT SUM(n) AS s4 FROM t) AS subq;
+
+CREATE TABLE #mytemptable (a INTEGER);
+
+CREATE TABLE [dbo].[mytable](
+                [email] [varchar](255) NOT NULL,
+                CONSTRAINT [UN_t_mytable] UNIQUE NONCLUSTERED
+                (
+                    [email] ASC
+                )
+                );
+
+CREATE TABLE x ( A INTEGER NOT NULL, B INTEGER NULL );
+
+CREATE TABLE x (A INTEGER NOT NULL, B INTEGER NULL);
+
+CREATE TABLE x (CONSTRAINT "pk_mytable" UNIQUE NONCLUSTERED (a DESC)) ON b (c);
+
+CREATE TABLE x (CONSTRAINT [pk_mytable] UNIQUE NONCLUSTERED (a DESC)) ON b (c);
+
+CREATE TABLE x ([zip_cd] VARCHAR(5) NULL NOT FOR REPLICATION, [zip_cd_mkey] VARCHAR(5) NOT NULL, CONSTRAINT [pk_mytable] PRIMARY KEY CLUSTERED ([zip_cd_mkey] ASC) WITH (PAD_INDEX=ON, STATISTICS_NORECOMPUTE=OFF) ON [INDEX]) ON [SECONDARY];
+
+CREATE TABLE tbl (a AS (x + 1) PERSISTED, b AS (y + 2), c AS (y / 3) PERSISTED NOT NULL);
+
+CREATE TABLE [db].[tbl]([a] [int]);
+
+CREATE TABLE [db].[tbl] ([a] INTEGER);
+
+MERGE INTO mytable WITH (HOLDLOCK) AS T USING mytable_merge AS S ON (T.user_id = S.user_id) WHEN NOT MATCHED THEN INSERT (c1, c2) VALUES (S.c1, S.c2);
+
+UPDATE STATISTICS x;
+
+UPDATE x SET y = 1 OUTPUT x.a, x.b INTO @y FROM y;
+
+UPDATE x SET y = 1 OUTPUT x.a, x.b FROM y;
+
+INSERT INTO x (y) OUTPUT x.a, x.b INTO l SELECT * FROM z;
+
+INSERT INTO x (y) OUTPUT x.a, x.b SELECT * FROM z;
+
+DELETE x OUTPUT x.a FROM z;
+
+SELECT * FROM t WITH (TABLOCK, INDEX(myindex));
+
+SELECT * FROM t WITH (NOWAIT);
+
+SELECT CASE WHEN a > 1 THEN b END;
+
+SELECT * FROM taxi ORDER BY 1 OFFSET 0 ROWS FETCH NEXT 3 ROWS ONLY;
+
+SELECT Employee_ID, Department_ID FROM @MyTableVar;
+
+INSERT INTO @TestTable VALUES (1, 'Value1', 12, 20);
+
+SELECT * FROM #foo;
+
+SELECT * FROM ##foo;
+
+DECLARE @TestVariable AS VARCHAR(100) = 'Save Our Planet';
+
+DECLARE @TestVariable VARCHAR(100) = 'Save Our Planet';
+
+SELECT a = 1 UNION ALL SELECT a = b;
+
+SELECT 1 AS a UNION ALL SELECT b AS a;
+
+SELECT x FROM @MyTableVar AS m JOIN Employee ON m.EmployeeID = Employee.EmployeeID;
+
+SELECT DISTINCT DepartmentName, PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY BaseRate) OVER (PARTITION BY DepartmentName) AS MedianCont FROM dbo.DimEmployee;
+
+SELECT "x"."y" FROM foo;
+
+SELECT [x].[y] FROM foo;
+
+SELECT * FROM t ORDER BY (SELECT NULL) OFFSET 2 ROWS;
+
+SELECT * FROM t ORDER BY (SELECT NULL) OFFSET 5 ROWS FETCH FIRST 10 ROWS ONLY;
+
+SELECT CAST([a].[b] AS SMALLINT) FROM foo;
+
+SELECT val FROM (VALUES ((TRUE), (FALSE), (NULL))) AS t(val);
+
+SELECT val FROM (VALUES ((1), (0), (NULL))) AS t(val);
+
+CREATE TABLE db.t1 (a INTEGER, b VARCHAR(50), CONSTRAINT c PRIMARY KEY (a DESC));
+
+CREATE TABLE db.t1 (a INTEGER, b INTEGER, CONSTRAINT c PRIMARY KEY (a DESC, b));
+
+CREATE PROCEDURE test(@v1 INTEGER = 1, @v2 CHAR(1) = 'c');
+
+DECLARE @v1 AS INTEGER = 1, @v2 AS CHAR(1) = 'c';
+
+DECLARE @v1 INTEGER = 1, @v2 CHAR(1) = 'c';
+
+CREATE PROCEDURE test(@v1 AS INTEGER = 1, @v2 AS CHAR(1) = 'c');
+
+SELECT e.employee_id FROM employees AS e LEFT JOIN employee_positions AS ep ON e.employee_id = ep.employee_id ORDER BY CASE WHEN e.employee_id IS NULL THEN 1 ELSE 0 END, e.employee_id;
+
+SELECT (-1) * col AS col FROM t1 LEFT JOIN t2 USING (id) ORDER BY CASE WHEN (-1) * col IS NULL THEN 1 ELSE 0 END, (-1) * col;
+
+SELECT t1.x + t2.y AS s FROM t1 JOIN t2 ON t1.id = t2.id ORDER BY CASE WHEN t1.x + t2.y IS NULL THEN 1 ELSE 0 END, t1.x + t2.y;
+
+SELECT STRING_AGG(v, ',') WITHIN GROUP (ORDER BY CASE WHEN v IS NULL THEN 1 ELSE 0 END, v) AS v FROM t;
+
+SELECT x AS v, STRING_AGG(v, ',') WITHIN GROUP (ORDER BY CASE WHEN v IS NULL THEN 1 ELSE 0 END, v) AS w FROM t GROUP BY x;
+
+SELECT col FROM t OPTION(LABEL = 'foo');
+
+SELECT * FROM t FOR XML PATH, BINARY BASE64, ELEMENTS XSINIL;
+
+SELECT (SELECT TOP 5 a, b FROM t ORDER BY b DESC FOR JSON PATH) AS j FROM x;
+
+SELECT j FROM (SELECT a AS j FROM t FOR JSON PATH) AS x;
+
+SELECT * FROM t FOR JSON PATH, ROOT('Root'), INCLUDE_NULL_VALUES;
+
+SELECT * FROM t FOR JSON AUTO;
+
+SELECT * FROM t FOR BROWSE;
+
+CREATE TABLE t (col1 DATETIME2(2));
+
+SELECT TRUE, FALSE;
+
+SELECT 1, 0;
+
+SELECT TRUE AS a, FALSE AS b;
+
+SELECT 1 AS a, 0 AS b;
+
+SELECT 1 FROM a WHERE TRUE;
+
+SELECT 1 FROM a WHERE (1 = 1);
+
+CREATE VIEW start WITH SCHEMABINDING AS SELECT a FROM x;
+
+ALTER TABLE a RENAME TO [x'; SELECT 1; --];
+
+EXEC sp_rename 'a', 'x''; SELECT 1; --';
+
+CREATE SCHEMA testSchema;
+
+CREATE VIEW t AS WITH cte AS (SELECT 1 AS c) SELECT c FROM cte;
+
+ALTER TABLE tbl SET (SYSTEM_VERSIONING=OFF);
+
+ALTER TABLE tbl SET (FILESTREAM_ON = 'test');
+
+ALTER TABLE tbl SET (DATA_DELETION=ON);
+
+ALTER TABLE tbl SET (DATA_DELETION=OFF);
+
+ALTER TABLE t1 WITH CHECK ADD CONSTRAINT ctr FOREIGN KEY (c1) REFERENCES t2 (c2);
+
+ALTER TABLE tbl SET (SYSTEM_VERSIONING=ON(HISTORY_TABLE=db.tbl, DATA_CONSISTENCY_CHECK=OFF, HISTORY_RETENTION_PERIOD=5 DAYS));
+
+ALTER TABLE tbl SET (SYSTEM_VERSIONING=ON(HISTORY_TABLE=db.tbl, HISTORY_RETENTION_PERIOD=INFINITE));
+
+ALTER TABLE tbl SET (DATA_DELETION=ON(FILTER_COLUMN=col, RETENTION_PERIOD=5 MONTHS));
+
+ALTER VIEW v AS SELECT a, b, c, d FROM foo;
+
+ALTER VIEW v AS SELECT * FROM foo WHERE c > 100;
+
+ALTER VIEW v WITH SCHEMABINDING AS SELECT * FROM foo WHERE c > 100;
+
+ALTER VIEW v WITH ENCRYPTION AS SELECT * FROM foo WHERE c > 100;
+
+ALTER VIEW v WITH VIEW_METADATA AS SELECT * FROM foo WHERE c > 100;
+
+CREATE COLUMNSTORE INDEX index_name ON foo.bar;
+
+CREATE NONCLUSTERED COLUMNSTORE INDEX index_name ON foo.bar;
+
+CREATE PROCEDURE foo AS BEGIN DELETE FROM bla WHERE foo < CURRENT_TIMESTAMP - 7; END;
+
+CREATE PROCEDURE foo AS BEGIN DELETE FROM bla WHERE foo < GETDATE() - 7; END;
+
+INSERT INTO Production.UpdatedInventory SELECT ProductID, LocationID, NewQty, PreviousQty FROM (MERGE INTO Production.ProductInventory AS pi USING (SELECT ProductID, SUM(OrderQty) FROM Sales.SalesOrderDetail AS sod INNER JOIN Sales.SalesOrderHeader AS soh ON sod.SalesOrderID = soh.SalesOrderID AND soh.OrderDate BETWEEN '20030701' AND '20030731' GROUP BY ProductID) AS src(ProductID, OrderQty) ON pi.ProductID = src.ProductID WHEN MATCHED AND pi.Quantity - src.OrderQty >= 0 THEN UPDATE SET pi.Quantity = pi.Quantity - src.OrderQty WHEN MATCHED AND pi.Quantity - src.OrderQty <= 0 THEN DELETE OUTPUT $action, Inserted.ProductID, Inserted.LocationID, Inserted.Quantity AS NewQty, Deleted.Quantity AS PreviousQty) AS Changes(Action, ProductID, LocationID, NewQty, PreviousQty) WHERE Action = 'UPDATE';
+
+INSERT INTO Production.UpdatedInventory
+SELECT
+  ProductID,
+  LocationID,
+  NewQty,
+  PreviousQty
+FROM (
+  MERGE INTO Production.ProductInventory AS pi
+  USING (
+    SELECT
+      ProductID,
+      SUM(OrderQty)
+    FROM Sales.SalesOrderDetail AS sod
+    INNER JOIN Sales.SalesOrderHeader AS soh
+      ON sod.SalesOrderID = soh.SalesOrderID
+      AND soh.OrderDate BETWEEN '20030701' AND '20030731'
+    GROUP BY
+      ProductID
+  ) AS src(ProductID, OrderQty)
+  ON pi.ProductID = src.ProductID
+  WHEN MATCHED AND pi.Quantity - src.OrderQty >= 0 THEN UPDATE SET
+    pi.Quantity = pi.Quantity - src.OrderQty
+  WHEN MATCHED AND pi.Quantity - src.OrderQty <= 0 THEN DELETE
+  OUTPUT $action, Inserted.ProductID, Inserted.LocationID, Inserted.Quantity AS NewQty, Deleted.Quantity AS PreviousQty
+) AS Changes(Action, ProductID, LocationID, NewQty, PreviousQty)
+WHERE
+  Action = 'UPDATE';
+
+CREATE TABLE [#temptest] (name INTEGER);
+
+CREATE TABLE tbl (id INTEGER IDENTITY PRIMARY KEY);
+
+CREATE TABLE tbl (id INTEGER NOT NULL IDENTITY(10, 1) PRIMARY KEY);
+
+SELECT * INTO foo.bar.baz FROM (SELECT * FROM a.b.c) AS temp;
+
+CREATE OR ALTER VIEW a.b AS SELECT 1;
+
+ALTER TABLE a ADD b INTEGER, c INTEGER;
+
+ALTER TABLE a ALTER COLUMN b INTEGER;
+
+ALTER TABLE a ALTER COLUMN b INTEGER NOT NULL;
+
+ALTER TABLE a ALTER COLUMN b INTEGER NULL;
+
+ALTER TABLE a ALTER COLUMN b VARCHAR(10) COLLATE Latin1_General_CI_AS NOT NULL;
+
+CREATE TABLE #mytemp (a INTEGER, b CHAR(2), c TIME(4), d FLOAT(24));
+
+BEGIN TRAN;
+
+BEGIN TRANSACTION transaction_name;
+
+BEGIN TRANSACTION @tran_name_variable;
+
+BEGIN TRANSACTION transaction_name WITH MARK 'description';
+
+COMMIT;
+
+COMMIT TRANSACTION;
+
+COMMIT TRAN;
+
+COMMIT TRANSACTION transaction_name;
+
+COMMIT TRANSACTION @tran_name_variable;
+
+COMMIT TRANSACTION @tran_name_variable WITH (DELAYED_DURABILITY = ON);
+
+COMMIT TRANSACTION transaction_name WITH (DELAYED_DURABILITY = OFF);
+
+ROLLBACK;
+
+ROLLBACK TRANSACTION;
+
+ROLLBACK TRAN;
+
+ROLLBACK TRANSACTION transaction_name;
+
+ROLLBACK TRANSACTION @tran_name_variable;
+
+DECLARE @DWH_DateCreated AS DATETIME2 = CONVERT(DATETIME2, GETDATE(), 104);
+
+DECLARE @DWH_DateCreated DATETIME2 = CONVERT(DATETIME2, GETDATE(), 104);
+
+CREATE PROCEDURE foo @a INTEGER, @b INTEGER AS SELECT @a = SUM(bla) FROM baz AS bar;
+
+CREATE PROC foo @ID INTEGER, @AGE INTEGER AS SELECT DB_NAME(@ID) AS ThatDB;
+
+CREATE PROC foo AS SELECT BAR() AS baz;
+
+CREATE PROCEDURE foo AS SELECT BAR() AS baz;
+
+CREATE PROCEDURE foo WITH ENCRYPTION AS SELECT 1;
+
+CREATE PROCEDURE foo WITH RECOMPILE AS SELECT 1;
+
+CREATE PROCEDURE foo WITH SCHEMABINDING AS SELECT 1;
+
+CREATE PROCEDURE foo WITH NATIVE_COMPILATION AS SELECT 1;
+
+CREATE PROCEDURE foo WITH EXECUTE AS OWNER AS SELECT 1;
+
+CREATE PROCEDURE foo WITH EXECUTE AS 'username' AS SELECT 1;
+
+CREATE PROCEDURE foo WITH EXECUTE AS OWNER, SCHEMABINDING, NATIVE_COMPILATION AS SELECT 1;
+
+CREATE FUNCTION foo(@bar INTEGER) RETURNS TABLE AS RETURN SELECT 1;
+
+CREATE FUNCTION dbo.ISOweek(@DATE DATETIME2) RETURNS INTEGER;
+
+CREATE FUNCTION dbo.f() RETURNS TABLE AS RETURN (WITH subquery AS (SELECT id AS id FROM subtable) SELECT other_id FROM main_table AS mt INNER JOIN subquery ON subquery.id = mt.other_id);
+
+CREATE FUNCTION foo(@bar INTEGER) RETURNS @foo TABLE (x INTEGER, y NUMERIC) AS RETURN SELECT 1;
+
+CREATE FUNCTION foo() RETURNS @contacts TABLE (first_name VARCHAR(50), phone VARCHAR(25)) AS SELECT @fname, @phone;
+
+CREATE FUNCTION udfProductInYear (
+                @model_year INT
+            )
+            RETURNS TABLE
+            AS
+            RETURN
+                SELECT
+                    product_name,
+                    model_year,
+                    list_price
+                FROM
+                    production.products
+                WHERE
+                    model_year = @model_year;
+
+CREATE FUNCTION udfProductInYear(
+    @model_year INTEGER
+)
+RETURNS TABLE AS
+RETURN SELECT
+  product_name,
+  model_year,
+  list_price
+FROM production.products
+WHERE
+  model_year = @model_year;
+
+BEGIN;
+
+SET XACT_ABORT ON;
+
+SELECT CAST(SUBSTRING('ABCD~1234', CHARINDEX('~', 'ABCD~1234') + 1, LEN('ABCD~1234')) AS BIGINT);
+
+SELECT DATEFROMPARTS('2020', 10, 01);
+
+SELECT DATENAME(mm, '1970-01-01');
+
+SELECT FORMAT(CAST('1970-01-01' AS DATETIME2), 'MMMM');
+
+SELECT DATENAME(dw, '1970-01-01');
+
+SELECT FORMAT(CAST('1970-01-01' AS DATETIME2), 'dddd');
+
+SELECT DATEPART(month,'1970-01-01');
+
+SELECT DATEPART(month, '1970-01-01');
+
+SELECT DATEPART(YEAR, CAST('2017-01-01' AS DATE));
+
+SELECT DATEPART(MONTH, CAST('2017-03-01' AS DATE));
+
+SELECT DATEPART(DAY, CAST('2017-01-02' AS DATE));
+
+SELECT DATEPART("dd", x);
+
+SELECT DATEPART(DAY, x);
+
+SELECT CONVERT(VARCHAR(10), testdb.dbo.test.x, 120) y FROM testdb.dbo.test;
+
+SELECT CONVERT(VARCHAR(10), testdb.dbo.test.x, 120) AS y FROM testdb.dbo.test;
+
+SELECT CONVERT(VARCHAR(10), y.x) z FROM testdb.dbo.test y;
+
+SELECT CONVERT(VARCHAR(10), y.x) AS z FROM testdb.dbo.test AS y;
+
+SELECT CAST((SELECT x FROM y) AS VARCHAR) AS test;
+
+SELECT DATEADD(YEAR, 1, '2017/08/25');
+
+SELECT DATEADD(qq, 1, '2017/08/25');
+
+SELECT DATEADD(wk, 1, '2017/08/25');
+
+SELECT DATEDIFF(HOUR, 1.5, '2021-01-01');
+
+SELECT DATEDIFF_BIG(HOUR, 1.5, '2021-01-01');
+
+SELECT x.a, x.b, t.v, t.y FROM x CROSS APPLY (SELECT v, y FROM t) t(v, y);
+
+SELECT x.a, x.b, t.v, t.y FROM x CROSS APPLY (SELECT v, y FROM t) AS t(v, y);
+
+SELECT x.a, x.b, t.v, t.y FROM x OUTER APPLY (SELECT v, y FROM t) t(v, y);
+
+SELECT x.a, x.b, t.v, t.y FROM x OUTER APPLY (SELECT v, y FROM t) AS t(v, y);
+
+SELECT x.a, x.b, t.v, t.y, s.v, s.y FROM x OUTER APPLY (SELECT v, y FROM t) t(v, y) OUTER APPLY (SELECT v, y FROM t) s(v, y) LEFT JOIN z ON z.id = s.id;
+
+SELECT x.a, x.b, t.v, t.y, s.v, s.y FROM x OUTER APPLY (SELECT v, y FROM t) AS t(v, y) OUTER APPLY (SELECT v, y FROM t) AS s(v, y) LEFT JOIN z ON z.id = s.id;
+
+SELECT t.x, y.z FROM x CROSS APPLY tvfTest(t.x) y(z);
+
+SELECT t.x, y.z FROM x CROSS APPLY TVFTEST(t.x) AS y(z);
+
+SELECT t.x, y.z FROM x OUTER APPLY tvfTest(t.x)y(z);
+
+SELECT t.x, y.z FROM x OUTER APPLY TVFTEST(t.x) AS y(z);
+
+SELECT t.x, y.z FROM x OUTER APPLY a.b.tvfTest(t.x)y(z);
+
+SELECT t.x, y.z FROM x OUTER APPLY a.b.tvfTest(t.x) AS y(z);
+
+SELECT DISTINCT TOP 3 * FROM A;
+
+SELECT TOP (3) * FROM A;
+
+CREATE TABLE schema.table AS SELECT a, id FROM (SELECT a, (SELECT id FROM tb ORDER BY t DESC LIMIT 1) as id FROM tbl) AS _subquery;
+
+SELECT * INTO schema.table FROM (SELECT a AS a, id AS id FROM (SELECT a AS a, (SELECT TOP 1 id FROM tb ORDER BY t DESC) AS id FROM tbl) AS _subquery) AS temp;
+
+SELECT TOP 10 PERCENT;
+
+SELECT TOP 10 PERCENT WITH TIES;
+
+SELECT FORMAT(foo, 'dddd', 'de-CH');
+
+SELECT FORMAT(EndOfDayRate, 'N', 'en-us');
+
+SELECT FORMAT('01-01-1991', 'd.mm.yyyy');
+
+SELECT FORMAT(12345, '###.###.###');
+
+SELECT FORMAT(1234567, 'f');
+
+SELECT FORMAT(1000000.01,'###,###.###');
+
+SELECT FORMAT(1000000.01, '###,###.###');
+
+SELECT FORMAT(a, 'ffffff');
+
+SELECT FORMAT('01-01-1991', 'dd.mm.yyyy');
+
+SELECT FORMAT(date_col, 'dd.mm.yyyy');
+
+SELECT FORMAT(date_col, 'm');
+
+SELECT FORMAT(date_col, 'MMMM d');
+
+SELECT FORMAT(num_col, 'c');
+
+SELECT N'test';
+
+SELECT '''test''';
+
+WITH t AS (SELECT 0 AS col) SELECT YEAR(col) FROM t;
+
+SELECT @x;
+
+SELECT * FROM #mytemptable;
+
+SELECT * FROM ##mytemptable;
+
+CREATE TABLE test ("data" CHAR(7), "valid_from" DATETIME2(2) GENERATED ALWAYS AS ROW START NOT NULL, "valid_to" DATETIME2(2) GENERATED ALWAYS AS ROW END NOT NULL, PERIOD FOR SYSTEM_TIME ("valid_from", "valid_to")) WITH(SYSTEM_VERSIONING=ON);
+
+CREATE TABLE test ([data] CHAR(7), [valid_from] DATETIME2(2) GENERATED ALWAYS AS ROW START NOT NULL, [valid_to] DATETIME2(2) GENERATED ALWAYS AS ROW END NOT NULL, PERIOD FOR SYSTEM_TIME ([valid_from], [valid_to])) WITH(SYSTEM_VERSIONING=ON);
+
+CREATE TABLE test ([data] CHAR(7), [valid_from] DATETIME2(2) GENERATED ALWAYS AS ROW START HIDDEN NOT NULL, [valid_to] DATETIME2(2) GENERATED ALWAYS AS ROW END HIDDEN NOT NULL, PERIOD FOR SYSTEM_TIME ([valid_from], [valid_to])) WITH(SYSTEM_VERSIONING=ON(HISTORY_TABLE=[dbo].[benchmark_history], DATA_CONSISTENCY_CHECK=ON));
+
+CREATE TABLE test ([data] CHAR(7), [valid_from] DATETIME2(2) GENERATED ALWAYS AS ROW START NOT NULL, [valid_to] DATETIME2(2) GENERATED ALWAYS AS ROW END NOT NULL, PERIOD FOR SYSTEM_TIME ([valid_from], [valid_to])) WITH(SYSTEM_VERSIONING=ON(HISTORY_TABLE=[dbo].[benchmark_history], DATA_CONSISTENCY_CHECK=ON));
+
+CREATE TABLE test ([data] CHAR(7), [valid_from] DATETIME2(2) GENERATED ALWAYS AS ROW START NOT NULL, [valid_to] DATETIME2(2) GENERATED ALWAYS AS ROW END NOT NULL, PERIOD FOR SYSTEM_TIME ([valid_from], [valid_to])) WITH(SYSTEM_VERSIONING=ON(HISTORY_TABLE=[dbo].[benchmark_history], DATA_CONSISTENCY_CHECK=OFF));
+
+CREATE TABLE test ([data] CHAR(7), [valid_from] DATETIME2(2) GENERATED ALWAYS AS ROW START NOT NULL, [valid_to] DATETIME2(2) GENERATED ALWAYS AS ROW END NOT NULL, PERIOD FOR SYSTEM_TIME ([valid_from], [valid_to])) WITH(SYSTEM_VERSIONING=ON(HISTORY_TABLE=[dbo].[benchmark_history]));
+
+SELECT [x] FROM [a].[b] FOR SYSTEM_TIME AS OF 'foo';
+
+SELECT [x] FROM [a].[b] FOR SYSTEM_TIME AS OF 'foo' AS alias;
+
+SELECT [x] FROM [a].[b] FOR SYSTEM_TIME FROM c TO d;
+
+SELECT [x] FROM [a].[b] FOR SYSTEM_TIME BETWEEN c AND d;
+
+SELECT [x] FROM [a].[b] FOR SYSTEM_TIME CONTAINED IN (c, d);
+
+SELECT [x] FROM [a].[b] FOR SYSTEM_TIME ALL AS alias;
+
+SELECT x FROM a INNER HASH JOIN b ON b.id = a.id;
+
+SELECT x FROM a INNER LOOP JOIN b ON b.id = a.id;
+
+SELECT x FROM a INNER REMOTE JOIN b ON b.id = a.id;
+
+SELECT x FROM a INNER MERGE JOIN b ON b.id = a.id;
+
+SELECT x FROM a WITH (NOLOCK);
+
+SELECT x FROM start WITH (NOLOCK);
+
+SELECT * FROM t AS start WITH (NOLOCK);
+
+UPDATE start WITH (ROWLOCK) SET a = 1;
+
+DELETE FROM start WITH (ROWLOCK);
+
+UPDATE dbo.t (ROWLOCK) SET x = 1;
+
+UPDATE dbo.t WITH (ROWLOCK) SET x = 1;
+
+DELETE FROM dbo.t (ROWLOCK);
+
+DELETE FROM dbo.t WITH (ROWLOCK);
+
+SELECT * FROM dbo.t (NOLOCK) JOIN dbo.u AS u (ROWLOCK) ON t.id = u.id;
+
+SELECT * FROM dbo.t WITH (NOLOCK) JOIN dbo.u AS u WITH (ROWLOCK) ON t.id = u.id;
+
+SELECT * FROM dbo.t (NOLOCK) AS s JOIN dbo.u AS u ON s.id = u.id;
+
+SELECT * FROM dbo.t AS s WITH (NOLOCK) JOIN dbo.u AS u ON s.id = u.id;
+
+SELECT * FROM dbo.t AS s /* alias */ (NOLOCK /* hint */);
+
+SELECT * FROM dbo.t AS s /* alias */ WITH (NOLOCK /* hint */);
+
+INSERT INTO dbo.t (nolock) SELECT 1;
+
+UPDATE s SET x = 1 FROM dbo.t AS s (ROWLOCK) JOIN dbo.u AS u ON s.id = u.id;
+
+UPDATE s SET x = 1 FROM dbo.t AS s WITH (ROWLOCK) JOIN dbo.u AS u ON s.id = u.id;
+
+SELECT * FROM dbo.t AS s (NOLOCK) PIVOT(SUM(x) FOR id IN ([1])) AS p;
+
+SELECT * FROM dbo.t AS s WITH (NOLOCK) PIVOT(SUM(x) FOR id IN ([1])) AS p;
+
+SELECT * FROM dbo.t (NOLOCK);
+
+SELECT * FROM dbo.t WITH (NOLOCK);
+
+SELECT * FROM OPENJSON(@json);
+
+SELECT [key], value FROM OPENJSON(@json,'$.path.to."sub-object"');
+
+SELECT [key], value FROM OPENJSON(@json, '$.path.to."sub-object"');
+
+SELECT * FROM OPENJSON(@array) WITH (month VARCHAR(3), temp int, month_id tinyint '$.sql:identity()') as months;
+
+SELECT * FROM OPENJSON(@array) WITH (month VARCHAR(3), temp INTEGER, month_id TINYINT '$.sql:identity()') AS months;
+
+SELECT *
+            FROM OPENJSON ( @json )
+            WITH (
+                          Number   VARCHAR(200)   '$.Order.Number',
+                          Date     DATETIME       '$.Order.Date',
+                          Customer VARCHAR(200)   '$.AccountNumber',
+                          Quantity INT            '$.Item.Quantity',
+                          [Order]  NVARCHAR(MAX)  AS JSON
+             );
+
+SELECT
+  *
+FROM OPENJSON(@json) WITH (
+    Number VARCHAR(200) '$.Order.Number',
+    Date DATETIME '$.Order.Date',
+    Customer VARCHAR(200) '$.AccountNumber',
+    Quantity INTEGER '$.Item.Quantity',
+    [Order] NVARCHAR(MAX) AS JSON
+);
+
+SET KEY VALUE;
+
+SET @count = (SELECT COUNT(1) FROM x);
+
+WITH t AS (SELECT 1) SELECT * FROM t;
+
+WITH t AS (SELECT 1 AS [1]) SELECT * FROM t;
+
+WITH t AS (SELECT "c") SELECT * FROM t;
+
+WITH t AS (SELECT [c] AS [c]) SELECT * FROM t;
+
+SELECT * FROM (SELECT 1) AS subq;
+
+SELECT * FROM (SELECT 1 AS [1]) AS subq;
+
+SELECT * FROM (SELECT "c") AS subq;
+
+SELECT * FROM (SELECT [c] AS [c]) AS subq;
+
+WITH t1(c) AS (SELECT 1), t2 AS (SELECT CAST(c AS INTEGER) AS c FROM t1) SELECT * FROM t2;
+
+DECLARE @X INT;
+
+DECLARE @X INTEGER;
+
+DECLARE @X INT = 1;
+
+DECLARE @X INTEGER = 1;
+
+DECLARE @X INT, @Y VARCHAR(10);
+
+DECLARE @X INTEGER, @Y VARCHAR(10);
+
+declare @X int = (select col from table where id = 1);
+
+DECLARE @X INTEGER = (SELECT col FROM table WHERE id = 1);
+
+declare @X TABLE (Id INT NOT NULL, Name VARCHAR(100) NOT NULL);
+
+DECLARE @X TABLE (Id INTEGER NOT NULL, Name VARCHAR(100) NOT NULL);
+
+declare @X TABLE (Id INT NOT NULL, constraint PK_Id primary key (Id));
+
+DECLARE @X TABLE (Id INTEGER NOT NULL, CONSTRAINT PK_Id PRIMARY KEY (Id));
+
+declare @X UserDefinedTableType;
+
+DECLARE @MyTableVar TABLE (EmpID INT NOT NULL, PRIMARY KEY CLUSTERED (EmpID), UNIQUE NONCLUSTERED (EmpID), INDEX CustomNonClusteredIndex NONCLUSTERED (EmpID));
+
+DECLARE vendor_cursor CURSOR FOR SELECT VendorID, Name FROM Purchasing.Vendor WHERE PreferredVendorStatus = 1 ORDER BY VendorID;
+
+SELECT COUNT_BIG(1) FROM x;
+
+SELECT COUNT(1) FROM x;
+
+GRANT EXECUTE ON TestProc TO User2;
+
+GRANT EXECUTE ON TestProc TO TesterRole WITH GRANT OPTION;
+
+GRANT EXECUTE ON TestProc TO User2 AS TesterRole;
+
+REVOKE EXECUTE ON TestProc FROM User2;
+
+REVOKE EXECUTE ON TestProc FROM TesterRole;
+
+SELECT SPLIT_PART('1,2,3', ',', 1);
+
+WITH t AS (SELECT 'a.b.c' AS value, 1 AS idx) SELECT SPLIT_PART(value, '.', idx) FROM t;
+
+SELECT NEXT VALUE FOR db.schema.sequence_name OVER (ORDER BY foo), col;
+
+SELECT NEXT VALUE FOR db.schema.sequence_name;
+
+SELECT DATETRUNC(month, 'foo');
+
+SELECT DATETRUNC(MONTH, CAST('foo' AS DATETIME2));
+
+SELECT DATETRUNC(month, foo);
+
+SELECT DATETRUNC(year, CAST('foo1' AS date));
+
+SELECT DATETRUNC(MONTH, CAST('2024-05-15' AS DATE));
+
+SELECT DATETRUNC(ISO_WEEK, CAST('2024-05-15' AS DATE));
+
+CREATE TRIGGER reminder ON customers AFTER INSERT AS BEGIN INSERT INTO audit_log (customer_id, action, created_at) SELECT id, 'INSERT', GETDATE() FROM inserted END;
+
+CREATE TRIGGER updview ON vw_employees INSTEAD OF UPDATE AS BEGIN UPDATE employees SET salary = inserted.salary FROM inserted WHERE employees.id = inserted.id END;
+
+CREATE TRIGGER ddl_trig ON DATABASE FOR CREATE_TABLE AS BEGIN INSERT INTO schema_changes (event_type, event_time, login_name) VALUES ('CREATE_TABLE', GETDATE(), SYSTEM_USER) END;
+
+DROP INDEX IF EXISTS i ON dbo.t;
+
+ALTER TABLE tbl DROP COLUMN col1, col2;
+
+ALTER TABLE tbl ADD CONSTRAINT cnstr PRIMARY KEY CLUSTERED (ID), CONSTRAINT cnstr2 UNIQUE CLUSTERED (ID);
+
+SELECT 1;
+
+SELECT 2;
+
+EXEC sp_executesql @payload;
+
+EXECUTE sp_executesql @payload;
+
+SELECT go;
+
+SELECT 1 WHERE EXISTS(SELECT 1);
+
+ALTER TABLE dbo.DocExe DROP CONSTRAINT FK_Column_B;
+
+SELECT a = 1;
+
+SELECT 1 AS a;
+
+SELECT * FROM [#temp_table];
+
+SELECT * FROM [##temp_table];
+
+SELECT * FROM @x;
+
+ALTER TABLE a ALTER COLUMN b CHAR(10) COLLATE abc;

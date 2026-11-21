@@ -65,6 +65,7 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | --- | --- | --- | --- | --- | --- |
 | [`@intellectual-frontiers/anyfs`](commons/anyfs) | Foundation | One typed interface to the places bytes live | layers, plugins | L1 | held |
 | [`@intellectual-frontiers/anyfs-bridge`](commons/anyfs-bridge) | Foundation | Copy, sync, move, check, two-way sync and mirror between any two AnyFS stores | layers, extension | L1 | held |
+| [`@intellectual-frontiers/anyfs-git`](commons/anyfs-git) | Foundation | A branch of a Git repository and a Git working tree, each kept as an AnyFS store | layers, extension | L1 | held |
 | [`@intellectual-frontiers/anyfs-posix`](commons/anyfs-posix) | Foundation | The POSIX view of any AnyFS store | layers, extension | L1 | held |
 | [`@intellectual-frontiers/anyfs-ssh`](commons/anyfs-ssh) | Foundation | The SSH backend of AnyFS: a store over a folder on a host reached by SSH | layers, extension | L1 | held |
 | [`@intellectual-frontiers/core`](https://www.npmjs.com/package/@intellectual-frontiers/core) | Foundation | Errors as values (`Result`) | - | L1 | GitHub, npm |
@@ -97,6 +98,7 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/integrations`](https://www.npmjs.com/package/@intellectual-frontiers/integrations) | Program | Two families on one skeleton of Kanon layers | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/integrations-github`](https://www.npmjs.com/package/@intellectual-frontiers/integrations-github) | Program | The reference connector of Integrations for the posture of one organization of a code host | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/lab`](commons/lab) | Program | Disposable machines for tests | layers | L1 | held |
+| [`@intellectual-frontiers/lang-sql`](https://www.npmjs.com/package/@intellectual-frontiers/lang-sql) | Program | A small, fast, portable multi-dialect SQL language library | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/libraries`](https://www.npmjs.com/package/@intellectual-frontiers/libraries) | Program | The tools of a repository of commons | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/machine-probe`](commons/machine-probe) | Program | The probe a machine runs for its fleet | layers | L1 | held |
 | [`@intellectual-frontiers/package-managers`](https://www.npmjs.com/package/@intellectual-frontiers/package-managers) | Program | The shared kit of the dialects that drive a package manager | layers | L1 | GitHub, npm |

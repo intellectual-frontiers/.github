@@ -1,0 +1,1 @@
+SELECT z.a FROM x;

@@ -1,0 +1,26 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-git-layers FR-001	check	.github: cd commons/anyfs-git && bun run verify	suite/layers.test.ts
+0001-git-layers FR-002	check	.github: cd commons/anyfs-git && bun run verify	suite/layers.test.ts
+0002-git-governance FR-001	check	.github: cd commons/anyfs-git && bun run verify	suite/governance.test.ts
+0002-git-governance FR-002	check	.github: cd commons/anyfs-git && bun run verify	suite/governance.test.ts
+0002-git-governance FR-003	check	.github: cd commons/anyfs-git && bun run verify	suite/governance.test.ts
+0003-git-ref FR-001	check	.github: cd commons/anyfs-git && bun run verify	suite/ref.test.ts
+0003-git-ref FR-002	check	.github: cd commons/anyfs-git && bun run verify	suite/ref.test.ts
+0003-git-ref FR-003	check	.github: cd commons/anyfs-git && bun run verify	suite/ref.test.ts
+0003-git-ref FR-004	check	.github: cd commons/anyfs-git && bun run verify	suite/ref.test.ts
+0003-git-ref FR-005	check	.github: cd commons/anyfs-git && bun run verify	suite/ref.test.ts
+0003-git-ref FR-006	check	.github: cd commons/anyfs-git && bun run verify	suite/ref.test.ts
+0003-git-ref FR-007	check	.github: cd commons/anyfs-git && bun run verify	suite/ref.test.ts
+0003-git-ref FR-008	check	.github: cd commons/anyfs-git && bun run verify	suite/ref.test.ts
+0004-git-worktree FR-001	check	.github: cd commons/anyfs-git && bun run verify	suite/worktree.test.ts
+0004-git-worktree FR-002	check	.github: cd commons/anyfs-git && bun run verify	suite/worktree.test.ts
+0004-git-worktree FR-003	check	.github: cd commons/anyfs-git && bun run verify	suite/worktree.test.ts
+0004-git-worktree FR-004	check	.github: cd commons/anyfs-git && bun run verify	suite/worktree.test.ts
+0004-git-worktree FR-005	check	.github: cd commons/anyfs-git && bun run verify	suite/worktree.test.ts
+0005-git-remote FR-001	check	.github: cd commons/anyfs-git && bun run verify	suite/remote.test.ts
+0005-git-remote FR-002	check	.github: cd commons/anyfs-git && bun run verify	suite/remote.test.ts
+0005-git-remote FR-003	check	.github: cd commons/anyfs-git && bun run verify	suite/remote.test.ts
+0006-git-conformance FR-001	check	.github: cd commons/anyfs-git && bun run verify	suite/conformance.test.ts
+0006-git-conformance FR-002	check	.github: cd commons/anyfs-git && bun run verify	suite/conformance.test.ts
