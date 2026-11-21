@@ -1,0 +1,34 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-bridge-layers FR-001	check	.github: cd commons/anyfs-bridge && bun run verify	suite/layers.test.ts
+0001-bridge-layers FR-002	check	.github: cd commons/anyfs-bridge && bun run verify	suite/layers.test.ts
+0002-bridge-plans FR-001	check	.github: cd commons/anyfs-bridge && bun run verify	suite/glob.test.ts
+0002-bridge-plans FR-002	check	.github: cd commons/anyfs-bridge && bun run verify	suite/glob.test.ts
+0002-bridge-plans FR-003	check	.github: cd commons/anyfs-bridge && bun run verify	suite/transfer.test.ts
+0002-bridge-plans FR-004	check	.github: cd commons/anyfs-bridge && bun run verify	suite/transfer.test.ts
+0002-bridge-plans FR-005	check	.github: cd commons/anyfs-bridge && bun run verify	suite/glob.test.ts
+0002-bridge-plans FR-006	check	.github: cd commons/anyfs-bridge && bun run verify	suite/glob.test.ts
+0002-bridge-plans FR-007	check	.github: cd commons/anyfs-bridge && bun run verify	suite/glob.test.ts
+0003-bridge-transfer FR-001	check	.github: cd commons/anyfs-bridge && bun run verify	suite/transfer.test.ts
+0003-bridge-transfer FR-002	check	.github: cd commons/anyfs-bridge && bun run verify	suite/transfer.test.ts
+0003-bridge-transfer FR-003	check	.github: cd commons/anyfs-bridge && bun run verify	suite/transfer.test.ts
+0003-bridge-transfer FR-004	check	.github: cd commons/anyfs-bridge && bun run verify	suite/transfer.test.ts
+0003-bridge-transfer FR-005	check	.github: cd commons/anyfs-bridge && bun run verify	suite/transfer.test.ts
+0003-bridge-transfer FR-006	check	.github: cd commons/anyfs-bridge && bun run verify	suite/transfer.test.ts
+0003-bridge-transfer FR-007	check	.github: cd commons/anyfs-bridge && bun run verify	suite/transfer.test.ts
+0003-bridge-transfer FR-008	check	.github: cd commons/anyfs-bridge && bun run verify	suite/transfer.test.ts
+0003-bridge-transfer FR-009	check	.github: cd commons/anyfs-bridge && bun run verify	suite/transfer.test.ts
+0003-bridge-transfer FR-010	check	.github: cd commons/anyfs-bridge && bun run verify	suite/transfer.test.ts
+0003-bridge-transfer FR-011	check	.github: cd commons/anyfs-bridge && bun run verify	suite/transfer.test.ts
+0003-bridge-transfer FR-012	check	.github: cd commons/anyfs-bridge && bun run verify	suite/transfer.test.ts
+0004-bridge-twoway FR-001	check	.github: cd commons/anyfs-bridge && bun run verify	suite/twoway.test.ts
+0004-bridge-twoway FR-002	check	.github: cd commons/anyfs-bridge && bun run verify	suite/twoway.test.ts
+0004-bridge-twoway FR-003	check	.github: cd commons/anyfs-bridge && bun run verify	suite/twoway.test.ts
+0004-bridge-twoway FR-004	check	.github: cd commons/anyfs-bridge && bun run verify	suite/twoway.test.ts
+0004-bridge-twoway FR-005	check	.github: cd commons/anyfs-bridge && bun run verify	suite/twoway.test.ts
+0004-bridge-twoway FR-006	check	.github: cd commons/anyfs-bridge && bun run verify	suite/twoway.test.ts
+0004-bridge-twoway FR-007	check	.github: cd commons/anyfs-bridge && bun run verify	suite/twoway.test.ts
+0004-bridge-twoway FR-008	check	.github: cd commons/anyfs-bridge && bun run verify	suite/twoway.test.ts
+0005-bridge-conformance FR-001	check	.github: cd commons/anyfs-bridge && bun run verify	suite/conformance.test.ts
+0005-bridge-conformance FR-002	check	.github: cd commons/anyfs-bridge && bun run verify	suite/conformance.test.ts
