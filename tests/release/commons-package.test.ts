@@ -177,7 +177,7 @@ proves(
           assertEquals(ran.code, 0, `${tool}: runtime ${rt}: ${ran.out.slice(0, 800)}`);
           const seen = JSON.parse(ran.out.trim().split("\n").at(-1) ?? "{}") as Record<string, unknown>;
           const label = `${tool} on ${rt}`;
-          assertEquals(seen["sp800"], [1014, 2781, 97, 422], `${label}: the SP 800 catalog loads from the installed package`);
+          assertEquals(seen["sp800"], [1014, 2781, 97, 422, 110, 320], `${label}: the SP 800 catalog loads from the installed package`);
           assert(
             Array.isArray(seen["csf"]) && seen["csf"].length === 1 && Number(seen["csf"][0]) > 100,
             `${label}: the CSF 2.0 catalog loads from the installed package: ${JSON.stringify(seen["csf"])}`,

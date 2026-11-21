@@ -4,9 +4,9 @@
     {
       "slug": "commons",
       "package": "@intellectual-frontiers/commons",
-      "version": "0.2.0",
+      "version": "0.2.2",
       "folder": "commons/commons",
-      "tag": "commons-v0.2.0",
+      "tag": "commons-v0.2.2",
       "publish": true,
       "registries": [
         "github"
