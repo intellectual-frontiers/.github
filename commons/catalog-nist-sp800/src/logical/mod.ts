@@ -5,3 +5,4 @@
  * @module
  */
 export * from "./convert.ts";
+export * from "./rev2.ts";

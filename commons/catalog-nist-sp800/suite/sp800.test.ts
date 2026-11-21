@@ -8,7 +8,7 @@ import { standardKinds } from "@intellectual-frontiers/grc/logical";
 import { readCatalogPackage } from "@intellectual-frontiers/grc/physical";
 import { fs, path, proc } from "@intellectual-frontiers/system";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { FRAMEWORKS, REPOSITORY, SOURCES, urlOf } from "../src/governance/mod.ts";
+import { FRAMEWORKS, PRINTED_SOURCES, REPOSITORY, REV2_FRAMEWORKS, SOURCES, urlOf } from "../src/governance/mod.ts";
 import { convertCatalog, type Catalog } from "../src/logical/mod.ts";
 import { makePackage, PACKAGE_DIR } from "../src/physical/mod.ts";
 
@@ -46,8 +46,9 @@ proves(["0002-sp800-package FR-001", "0002-sp800-package FR-004"], "the conversi
 });
 
 proves(["0002-sp800-package FR-004"], "the same catalogs give the same files, byte for byte", async () => {
-  const a = await makePackage({ "800-53": SMALL, "800-171": { catalog: { groups: [] } } });
-  const b = await makePackage({ "800-53": structuredClone(SMALL), "800-171": { catalog: { groups: [] } } });
+  const none = { "800-171r2": "", "800-171a": "" } as const;
+  const a = await makePackage({ "800-53": SMALL, "800-171": { catalog: { groups: [] } } }, none);
+  const b = await makePackage({ "800-53": structuredClone(SMALL), "800-171": { catalog: { groups: [] } } }, none);
   assertEquals([...a], [...b]);
 });
 
@@ -56,8 +57,8 @@ proves(["0002-sp800-package FR-001", "0002-sp800-package FR-002"], "the real pac
   assert(r.kind === "ok", r.kind === "err" ? JSON.stringify(r.error) : "");
   type Fw = { id: string; version: string; controls: { id: string; title: string; statement: string; family: string }[] };
   const fws = new Map((r.value.documents as unknown as Fw[]).map((d) => [d.id, d]));
-  assertEquals([...fws.keys()], FRAMEWORKS.map((f) => f.id));
-  assertEquals([...fws.values()].map((f) => f.controls.length), [1014, 2781, 97, 422]);
+  assertEquals([...fws.keys()], [...FRAMEWORKS, ...REV2_FRAMEWORKS].map((f) => f.id));
+  assertEquals([...fws.values()].map((f) => f.controls.length), [1014, 2781, 97, 422, 110, 320]);
   for (const f of fws.values()) {
     assertEquals(new Set(f.controls.map((c) => c.id)).size, f.controls.length, `${f.id} has no control twice`);
     for (const c of f.controls) assert(c.statement.trim() !== "" && c.family !== "", `${f.id} ${c.id}`);
@@ -74,9 +75,9 @@ proves(["0002-sp800-package FR-001", "0002-sp800-package FR-002"], "the real pac
 
 proves(["0002-sp800-package FR-002", "0002-sp800-package FR-003"], "the manifest records the repository, the commit, the digest of each source, the licence and that the content may be redistributed", async () => {
   const m = JSON.parse(await fs.readTextFile(path.join(PACKAGE_DIR, "manifest.json"))) as { source: { edition: string }; sources: { url: string; sha256: string }[]; licence: string; redistributable: boolean };
-  assertEquals(m.sources, SOURCES.map((s) => ({ url: urlOf(s), sha256: s.sha256 })));
+  assertEquals(m.sources, [...SOURCES.map((s) => ({ url: urlOf(s), sha256: s.sha256 })), ...PRINTED_SOURCES.map((s) => ({ url: s.url, sha256: s.sha256 }))]);
   assert(m.source.edition.includes(REPOSITORY.commit) && m.licence.includes("CC0 1.0") && m.redistributable);
-  assert(m.sources.every((s) => s.url.includes(REPOSITORY.commit)), "every source is read at the commit, not at a branch");
+  assert(m.sources.slice(0, SOURCES.length).every((s) => s.url.includes(REPOSITORY.commit)), "every source of the repository is read at the commit, not at a branch");
 });
 
 proves(["0002-sp800-package FR-003"], "the generator refuses a source that is not the pinned one, and the files on disk are those of the pinned sources (checked where they are at hand)", async () => {
@@ -86,12 +87,13 @@ proves(["0002-sp800-package FR-003"], "the generator refuses a source that is no
       await fs.mkdir(path.join(dir, path.dirname(s.path)), { recursive: true });
       await fs.writeTextFile(path.join(dir, s.path), "{}");
     }
-    const r = await proc.run(["bun", tool, "--source-dir", dir, "--check"], {});
+    const r = await proc.run(["bun", tool, "--source-dir", dir, "--pdf-dir", dir, "--check"], {});
     assert(!r.success && r.stderr.includes("refused"), r.stderr);
   });
   const real = process.env["OSCAL_CONTENT"];
-  if (real !== undefined && real !== "") {
-    const ok = await proc.run(["bun", tool, "--source-dir", real, "--check"], {});
+  if (real !== undefined && real !== "" && (process.env["NIST_PDFS"] ?? "") !== "") {
+    const pdfs = process.env["NIST_PDFS"] ?? "";
+    const ok = await proc.run(["bun", tool, "--source-dir", real, "--pdf-dir", pdfs, "--check"], {});
     assert(ok.success, `the files differ from what the sources give: ${ok.stderr}`);
   }
 });

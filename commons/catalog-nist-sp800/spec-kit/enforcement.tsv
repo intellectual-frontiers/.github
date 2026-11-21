@@ -7,3 +7,7 @@ requirement	mechanism	by	note
 0002-sp800-package FR-002	check	.github: cd commons/catalog-nist-sp800 && bun run verify	suite/sp800.test.ts
 0002-sp800-package FR-003	check	.github: cd commons/catalog-nist-sp800 && bun run verify	suite/sp800.test.ts
 0002-sp800-package FR-004	check	.github: cd commons/catalog-nist-sp800 && bun run verify	suite/sp800.test.ts
+0003-sp800-171-r2 FR-001	check	.github: cd commons/catalog-nist-sp800 && bun run verify	suite/rev2.test.ts
+0003-sp800-171-r2 FR-002	check	.github: cd commons/catalog-nist-sp800 && bun run verify	suite/rev2.test.ts
+0003-sp800-171-r2 FR-003	check	.github: cd commons/catalog-nist-sp800 && bun run verify	suite/rev2.test.ts
+0003-sp800-171-r2 FR-004	check	.github: cd commons/catalog-nist-sp800 && bun run verify	suite/rev2.test.ts
