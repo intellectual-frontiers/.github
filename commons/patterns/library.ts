@@ -9,7 +9,7 @@ export const library = {
   name: "patterns",
   level: "L0",
   verify: "bun run verify",
-  version: "0.1.4",
+  version: "0.1.5",
   distribution: ["github", "npm"],
   exports: ["."],
   bundle: "patterns",

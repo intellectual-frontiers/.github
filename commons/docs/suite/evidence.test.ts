@@ -1,4 +1,4 @@
-// Spec: 0001-docs FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016, FR-017, FR-020, FR-022, FR-023, FR-024
+// Spec: 0001-docs FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016, FR-017, FR-020, FR-022, FR-023, FR-025
 /**
  * The evidence the site shows beside the code (docs 0001-docs FR-009 to FR-012): CTRF results, GitHub tickets and typed issues read from files, the Quality section made from them, the lines on a requirement, a library and a
  * module, the findings for a file that cannot be read and a test that names a requirement that is not there, and, with no run recorded, nothing shown as passed.
@@ -347,7 +347,7 @@ proves(["0001-docs FR-023"], "the four measures of DORA are taken from the runs 
   assertEquals(deliveryOf(runs.slice(0, 1)), undefined);
 });
 
-proves(["0001-docs FR-024"], "the tests that exercise an export are those of its package whose files import it, by the name it is exported under, and the API page of an export says how many there are and whether any fails", async () => {
+proves(["0001-docs FR-025"], "the tests that exercise an export are those of its package whose files import it, by the name it is exported under, and the API page of an export says how many there are and whether any fails", async () => {
   const names = importedNames(['import { a, b as c, type D } from "./x.ts";', 'import type { E } from "../src/y.ts";', 'import { F } from "@intellectual-frontiers/core";', 'import { G } from "node:fs";', 'import { H } from "left-pad";'].join("\n"));
   assertEquals([...names].sort(), ["E", "F", "a", "b"].concat(["D"]).sort());
   const t = (name: string, file: string, status: "passed" | "failed") => ({ name, status, durationMs: 1, file, requirements: [], risk: "", runtime: "", retries: 0, message: undefined });

@@ -1,4 +1,4 @@
-// Spec: 0001-docs FR-001, FR-024
+// Spec: 0001-docs FR-001, FR-025
 /**
  * The API pages of each area (commons 0011-documentation FR-010): a page for each source file its exports come from, in the order its
  * entry points export them, with the file's module comment (what it is, its account, its examples, its limits) and an entry for each

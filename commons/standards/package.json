@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/standards",
   "private": true,
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "The standards libraries as one install, each at an exact version. Mizan, the ontologies, the quality standards and the standards of integrations.",
   "type": "module",
   "engines": {

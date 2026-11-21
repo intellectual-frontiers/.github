@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/docs",
   "private": true,
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "IFC Docs: the generator of a repository's documentation site, made from its TypeScript and its spec kit alone: typed configuration, an API reference for every export, the specifications with the tests that prove them, and lenses for layered models, programs, guides and releases; one command, ifc-docs, builds or checks the static site.",
   "type": "module",
   "engines": {
@@ -32,6 +32,7 @@
   },
   "devDependencies": {
     "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/lang-sql": "link:../lang-sql",
     "@intellectual-frontiers/libraries": "link:../libraries",
     "@intellectual-frontiers/mizan": "link:../mizan",
     "@intellectual-frontiers/system": "link:../system",

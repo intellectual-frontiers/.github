@@ -1,6 +1,6 @@
-// Spec: 0001-docs FR-024
+// Spec: 0001-docs FR-025
 /**
- * Which tests exercise an export (docs 0001-docs FR-024): a test exercises what its file imports. `importedNames` reads the names a source file imports from its relative modules and from packages of the repository; `testsImporting`
+ * Which tests exercise an export (docs 0001-docs FR-025): a test exercises what its file imports. `importedNames` reads the names a source file imports from its relative modules and from packages of the repository; `testsImporting`
  * gives the tests of the run whose files import a name, by package, each with its library. It says that a test imports an export, not that it calls it or checks what it returns, and the pages say so.
  *
  * @module
