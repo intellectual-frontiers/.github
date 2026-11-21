@@ -85,6 +85,7 @@ export const ROLE_OF: ReadonlyMap<string, Role> = new Map<string, Role>([
   ["archon-dialect-cloud-init", "program"],
   ["archon-converge", "program"],
   ["archon-boot", "program"],
+  ["archon-dns", "program"],
   ["archon-dialect-homebrew", "program"],
   ["archon-dialect-mise", "program"],
   ["archon-dialect-winget", "program"],

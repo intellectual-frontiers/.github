@@ -73,5 +73,5 @@ proves(["0005-archon-assembly FR-004"], "the manifest declares the plugin noun t
   const t = decodeTable(library.kanon);
   assert(t.kind === "ok");
   assertEquals(library.exports.includes("./cli"), true);
-  assertEquals(JSON.stringify(library.kanon.plugins), JSON.stringify([{ noun: "tool" }, { noun: "converge" }, { noun: "boot" }]));
+  assertEquals(JSON.stringify(library.kanon.plugins), JSON.stringify([{ noun: "tool" }, { noun: "converge" }, { noun: "boot" }, { noun: "dns" }]));
 });
