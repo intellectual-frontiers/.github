@@ -15,6 +15,7 @@
 import process from "node:process";
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
+import { sign } from "@intellectual-frontiers/crypto/sigv4";
 import { unzip } from "@intellectual-frontiers/formats/archive";
 import { dirsOf } from "@intellectual-frontiers/system/dirs";
 import { fs, path, proc } from "@intellectual-frontiers/system";
@@ -132,22 +133,24 @@ export async function startRustfs(binary: string, options: { readonly readyMs?: 
     await child.status.catch(() => undefined);
     await fs.remove(data, { recursive: true }).catch(() => undefined);
   };
+  // ready is when the service answers a signed request for the list of its buckets: it listens before its storage is up, and answers 503 until it is
   const deadline = Date.now() + (options.readyMs ?? 30_000);
+  const url = `http://127.0.0.1:${port}/`;
   for (;;) {
     try {
-      const answer = await fetch(`http://127.0.0.1:${port}/`, { signal: AbortSignal.timeout(1000) });
-      if (answer.status > 0) break;
+      const signed = await sign({ method: "GET", url, headers: {} }, { credentials: { accessKeyId: accessKey, secretAccessKey: secretKey }, region: "us-east-1", service: "s3", date: new Date() });
+      const answer = await fetch(url, { headers: signed.headers, signal: AbortSignal.timeout(1000) });
+      await answer.arrayBuffer();
+      if (answer.status === 200) break;
     } catch {
       // not listening yet
     }
     if (Date.now() > deadline) {
       await stop();
-      return err("RustFS did not answer in time");
+      return err("RustFS did not answer a signed request in time");
     }
     await proc.sleep(100);
   }
-  // the server does not keep the process of the tests alive: it is stopped when that ends
-  child.unref();
   return ok({ endpoint: `http://127.0.0.1:${port}`, accessKey, secretKey, stop, kill: () => controller.abort() });
 }
 
