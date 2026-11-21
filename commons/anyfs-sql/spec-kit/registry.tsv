@@ -5,3 +5,5 @@ number	slug	state
 0004	sql-schema	in force
 0005	sql-store	in force
 0006	sql-conformance	in force
+0007	sql-merge	in force
+0008	sql-dump	in force

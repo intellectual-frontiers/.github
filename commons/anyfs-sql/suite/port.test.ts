@@ -16,7 +16,7 @@ const naming = (() => {
   return n.value;
 })();
 
-const HOSTILE = `a'; DROP TABLE fleet_objects; -- 100% _x\\y "q"`;
+const HOSTILE = `a'; DROP TABLE fleet_versions; -- 100% _x\\y "q"`;
 
 proves(["0003-sql-port FR-001"], "the port has query, exec, transaction and close, and a transaction that throws leaves nothing of its changes, on every engine", async () => {
   for (const [name, make] of [["sqlite", sqliteMemory], ["postgres", pgliteMemory], ["duckdb", duckdbMemory]] as const) {
@@ -46,10 +46,10 @@ proves(["0003-sql-port FR-002"], "the builder writes names as the dialect writes
   const pg = sqlFor("postgres", naming);
   const duck = sqlFor("duckdb", naming);
   const path = HOSTILE;
-  const q = (s: typeof sqlite): { readonly text: string; readonly params: readonly unknown[] } => s.query().text("SELECT rev FROM ").table("objects").text(" WHERE path = ").param(path).text(" AND size > ").param(1).done();
-  assertEquals(q(sqlite), { text: "SELECT rev FROM fleet_objects WHERE path = ? AND size > ?", params: [path, 1] });
-  assertEquals(q(pg), { text: "SELECT rev FROM fleet_objects WHERE path = $1 AND size > $2", params: [path, 1] });
-  assertEquals(q(duck).text, "SELECT rev FROM fleet_objects WHERE path = $1 AND size > $2");
+  const q = (s: typeof sqlite): { readonly text: string; readonly params: readonly unknown[] } => s.query().text("SELECT rev FROM ").table("versions").text(" WHERE path = ").param(path).text(" AND size > ").param(1).done();
+  assertEquals(q(sqlite), { text: "SELECT rev FROM fleet_versions WHERE path = ? AND size > ?", params: [path, 1] });
+  assertEquals(q(pg), { text: "SELECT rev FROM fleet_versions WHERE path = $1 AND size > $2", params: [path, 1] });
+  assertEquals(q(duck).text, "SELECT rev FROM fleet_versions WHERE path = $1 AND size > $2");
   for (const s of [sqlite, pg, duck]) {
     const text = q(s).text;
     for (const bit of ["DROP", "'", "100%", "\\", '"q"']) assert(!text.includes(bit), `${bit} is not in the text`);
@@ -58,12 +58,12 @@ proves(["0003-sql-port FR-002"], "the builder writes names as the dialect writes
   assertEquals(sqlite.name("select"), '"select"');
   assertEquals(pg.name("order"), '"order"');
   const withSchema = sqlFor("postgres", { prefix: naming.prefix, schema: naming.prefix });
-  assertEquals(withSchema.table("objects"), "fleet.fleet_objects");
+  assertEquals(withSchema.table("versions"), "fleet.fleet_versions");
   // bytes are a value for the engines that type them and hex for DuckDB
   const bytes = new Uint8Array([1, 255]);
-  const withBytes = (s: typeof sqlite): { readonly text: string; readonly params: readonly unknown[] } => s.query().text("INSERT INTO ").table("objects").text(" (body) VALUES (").bytes(bytes).text(")").done();
+  const withBytes = (s: typeof sqlite): { readonly text: string; readonly params: readonly unknown[] } => s.query().text("INSERT INTO ").table("versions").text(" (body) VALUES (").bytes(bytes).text(")").done();
   assertEquals(withBytes(pg).params, [bytes]);
-  assertEquals(withBytes(duck), { text: "INSERT INTO fleet_objects (body) VALUES (unhex($1))", params: ["01ff"] });
+  assertEquals(withBytes(duck), { text: "INSERT INTO fleet_versions (body) VALUES (unhex($1))", params: ["01ff"] });
   assertEquals(sqlite.query().text("SELECT ").selectBytes("body").done().text, "SELECT body");
   assertEquals(duck.query().text("SELECT ").selectBytes("body").done().text, "SELECT hex(body) AS body");
   assertEquals(pg.query().text("SELECT 1").forUpdate().done().text, "SELECT 1 FOR UPDATE");
