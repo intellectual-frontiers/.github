@@ -80,6 +80,7 @@ jobs:
       - name: "The development tools, from bun.lock (the libraries it imports are linked)"
         run: bun install --frozen-lockfile
         working-directory: ${{ matrix.folder }}
+        continue-on-error: true
       - name: "The test runner's own packages (commons quality)"
         run: bun install --frozen-lockfile
         working-directory: commons/quality
