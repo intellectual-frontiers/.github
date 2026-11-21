@@ -299,7 +299,7 @@ export const MERGE_CASES: readonly MergeCase[] = [
       const w = ok(await b.store.applyDelta(wrongBytes), "wrong bytes");
       expect(w.kind === "refused" && w.refusal.kind === "bad-blob", `bytes that are not their digest ended ${JSON.stringify(w)}`);
       const sha = await blobSha(enc.encode("future"));
-      const far = await makeVersion({ id: makeVersionId({ ms: Date.now() + 10 * 365 * 86_400_000, counter: 0 }, a.replica), replica: a.replica, seq: 99, path: "f", parent: null, merged: [], kind: "put", blob: sha });
+      const far = await makeVersion({ id: makeVersionId({ ms: Date.now() + 10 * 365 * 86_400_000, counter: 0 }), replica: a.replica, seq: 99, path: "f", parent: null, merged: [], kind: "put", blob: sha });
       if (far.kind === "err") throw new ConformanceFailure(far.error);
       const future = ok(await b.store.applyDelta({ format: 1, origin: a.replica, versions: [far.value], blobs: [{ sha, bytes: toBase64(enc.encode("future")) }] }), "future id");
       expect(future.kind === "refused" && future.refusal.kind === "future-id", `an id ten years ahead ended ${JSON.stringify(future)}`);
