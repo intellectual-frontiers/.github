@@ -77,14 +77,15 @@ export function signingWorks(findings: readonly Finding[]): boolean {
 
 /** The text of the file that lists a fleet's signers, as a tenant keeps it (`signers.ts`): a header, and the signers by name, role and public key. */
 export function renderSigners(signers: readonly Signer[], header = "Who may approve this fleet's changes, by public key. Written by `opsfolio keys`; every change to it is a controlled change."): string {
-  const body = signers.map((s) => `  {\n    "name": ${JSON.stringify(s.name)},\n    "role": ${JSON.stringify(s.role)},\n    "key": ${JSON.stringify(s.key)},\n    "added": ${JSON.stringify(s.added ?? "")}\n  }`).join(",\n");
+  const body = signers.map((s) => `  {\n    "name": ${JSON.stringify(s.name)},\n    "role": ${JSON.stringify(s.role)},\n    "key": ${JSON.stringify(s.key)},\n    "added": ${JSON.stringify(s.added ?? "")}${s.retired === undefined ? "" : `,\n    "retired": ${JSON.stringify(s.retired)}`}\n  }`).join(",\n");
   return `// ${header}\nexport const signers = [\n${body}\n] as const;\n`;
 }
 
-/** The signers with the key of one replaced (the name and the role kept), or nothing where there is no such signer. */
-export function replaceKey(signers: readonly Signer[], name: string, key: string, added: string): readonly Signer[] | undefined {
-  if (!signers.some((s) => s.name === name)) return undefined;
-  return signers.map((s) => (s.name === name ? { ...s, key, added } : s));
+/** The signers with the key of one replaced: the old key stays in the list, named `<name>-retired-<day>` and retired on the day (its signatures count for changes dated up to then, so that what it signed still verifies), and the new key has the name and the role; nothing where there is no such signer. */
+export function replaceKey(signers: readonly Signer[], name: string, key: string, day: string): readonly Signer[] | undefined {
+  const old = signers.find((s) => s.name === name);
+  if (old === undefined) return undefined;
+  return [...signers.filter((s) => s.name !== name), { ...old, name: `${name}-retired-${day}`, retired: day }, { name, role: old.role, key, added: day }].sort((a, b) => signers.findIndex((s) => s.name === a.name) - signers.findIndex((s) => s.name === b.name) || a.name.localeCompare(b.name));
 }
 
 /** The signers with one added, or the same where the key is already listed; a name is used once. */

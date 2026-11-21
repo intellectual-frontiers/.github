@@ -17,8 +17,8 @@ export const SIGNER_NAME = /^[a-z0-9][a-z0-9._-]{0,62}$/;
 /** The public keys that Git can verify a signature with. */
 export const KEY_LINE = /^(ssh-ed25519|ssh-rsa|ecdsa-sha2-nistp256|ecdsa-sha2-nistp384|ecdsa-sha2-nistp521|sk-ssh-ed25519@openssh\.com|sk-ecdsa-sha2-nistp256@openssh\.com) [A-Za-z0-9+/]+={0,2}(?: [^\n\r]*)?$/;
 
-/** A signer of the fleet: its name (the principal of its signature), its role and its public key. */
-export type Signer = { readonly name: string; readonly role: string; readonly key: string; readonly added?: string };
+/** A signer of the fleet: its name (the principal of its signature), its role and its public key, the day it was added, and, for a key that was replaced, the last day its signatures count (a day, `YYYY-MM-DD`). */
+export type Signer = { readonly name: string; readonly role: string; readonly key: string; readonly added?: string; readonly retired?: string };
 
 /** A path (or a family of paths) whose changes need approval, and the roles of the signers who may approve a change to it. A `*` stands for any characters but `/` and `**` for any characters. */
 export type Controlled = { readonly path: string; readonly approvers: readonly string[] };

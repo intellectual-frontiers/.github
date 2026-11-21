@@ -34,13 +34,13 @@ export async function readCommits(repo: string, from: string, to: string, allowe
     const file = path.join(dir, "allowed_signers");
     await fs.writeTextFile(file, allowedSignersText);
     const range = from === "" ? to : `${from}..${to}`;
-    const log = await git(repo, ["-c", "gpg.format=ssh", "-c", `gpg.ssh.allowedSignersFile=${file}`, "log", "--no-merges", "--reverse", "--name-only", "--format=%x1e%H%x1f%an%x1f%s%x1f%G?%x1f%GS%x1f%b%x1d", range]);
+    const log = await git(repo, ["-c", "gpg.format=ssh", "-c", `gpg.ssh.allowedSignersFile=${file}`, "log", "--no-merges", "--reverse", "--name-only", "--format=%x1e%H%x1f%an%x1f%s%x1f%G?%x1f%GS%x1f%aI%x1f%b%x1d", range]);
     if (log.kind === "err") return log;
     const commits: Commit[] = [];
     for (const rec of log.value.split("\x1e").filter((r) => r.trim() !== "")) {
       const [head = "", filesText = ""] = rec.split("\x1d");
-      const [sha = "", author = "", subject = "", state = "N", signer = "", body = ""] = head.split("\x1f");
-      commits.push({ sha, author, subject, body, files: filesText.split("\n").map((f) => f.trim()).filter((f) => f !== ""), signature: (STATES.has(state) ? state : "E") as SignatureState, signer: signer.trim() });
+      const [sha = "", author = "", subject = "", state = "N", signer = "", at = "", body = ""] = head.split("\x1f");
+      commits.push({ sha, author, subject, body, files: filesText.split("\n").map((f) => f.trim()).filter((f) => f !== ""), signature: (STATES.has(state) ? state : "E") as SignatureState, signer: signer.trim(), at: at.trim() });
     }
     return ok(commits);
   } finally {

@@ -48,7 +48,9 @@ proves(["0004-change-control-keys FR-002"], "the signers file lists each signer,
   const text = renderSigners([a, b]);
   assert(text.startsWith("// ") && text.includes('"name": "daily"') && text.includes("] as const;"));
   const swapped = replaceKey([a, b], "daily", "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINew c@x", "2026-12-01");
-  assertEquals([swapped?.[0]?.role, swapped?.[0]?.added, swapped?.[1]], ["daily", "2026-12-01", b]);
+  assertEquals(swapped?.map((x) => [x.name, x.retired ?? "", x.added ?? ""]).sort(), [["daily", "", "2026-12-01"], ["daily-retired-2026-12-01", "2026-12-01", "2026-11-14"], ["recovery", "", "2026-11-14"]].sort());
+  assertEquals(swapped?.find((x) => x.name === "daily")?.role, "daily");
+  assert(renderSigners(swapped ?? []).includes('"retired": "2026-12-01"'));
   assertEquals(replaceKey([a], "nobody", "k", "d"), undefined);
   assertEquals(withSigner([a], { ...a, name: "other", key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOne other@x" }), [a], "a key that is listed is not listed twice");
   assertEquals(withSigner([a], { name: "daily", role: "x", key: "ssh-ed25519 AAAAB different" }), "a signer is already named daily");
