@@ -13,3 +13,9 @@ requirement	mechanism	by	note
 0002-oto FR-006	check	.github: cd commons/ontology && bun test suite/	oto-ontology.test.ts
 0002-oto FR-007	check	.github: cd commons/ontology && bun test suite/	oto-ontology.test.ts
 0002-oto FR-008	check	.github: cd commons/ontology && bun test suite/	oto-ontology.test.ts
+0003-planning-terms FR-001	check	.github: cd commons/ontology && bun test suite/	planning-ontology.test.ts
+0003-planning-terms FR-002	check	.github: cd commons/ontology && bun test suite/	planning-ontology.test.ts
+0003-planning-terms FR-003	check	.github: cd commons/ontology && bun test suite/	planning-ontology.test.ts
+0003-planning-terms FR-004	check	.github: cd commons/ontology && bun test suite/	planning-ontology.test.ts
+0003-planning-terms FR-005	check	.github: cd commons/ontology && bun test suite/	planning-ontology.test.ts
+0003-planning-terms FR-006	check	.github: cd commons/ontology && bun test suite/	planning-ontology.test.ts

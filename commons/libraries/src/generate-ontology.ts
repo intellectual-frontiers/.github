@@ -38,6 +38,7 @@ import * as ifccmOntology from "@intellectual-frontiers/ontology/ifccm";
 import * as ifrOntology from "@intellectual-frontiers/ontology/ifr";
 import * as ifqsOntology from "@intellectual-frontiers/ontology/ifqs";
 import * as otoOntology from "@intellectual-frontiers/ontology/oto";
+import * as planningOntology from "@intellectual-frontiers/ontology/planning";
 import * as kanonOntology from "@intellectual-frontiers/ontology/kanon";
 import { formatRdfFinding, type OntologyFile, validate } from "@intellectual-frontiers/rdf";
 import { stdio } from "@intellectual-frontiers/system";
@@ -249,6 +250,50 @@ export const OTO: OntologyPublication = {
   license: CC0,
 };
 
+/** The ontology of Planning (commons 0037-planning), as it is published. */
+export const PLANNING: OntologyPublication = {
+  name: "planning",
+  ns: { prefix: "plan", iri: planningOntology.PLANNING.iri },
+  idNs: { prefix: "mzid", iri: MZID.iri },
+  curies: [
+    ["plan", planningOntology.PLANNING.iri],
+    ["mz", MZ.iri],
+    ["xsd", "http://www.w3.org/2001/XMLSchema#"],
+    ["rdfs", "http://www.w3.org/2000/01/rdf-schema#"],
+    ["skos", "http://www.w3.org/2004/02/skos/core#"],
+    ["dcterms", "http://purl.org/dc/terms/"],
+    ["prov", "http://www.w3.org/ns/prov#"],
+  ],
+  files: planningOntology.files,
+  ontology: planningOntology.planningOntology,
+  classes: planningOntology.classes,
+  properties: planningOntology.properties,
+  terms: planningOntology.terms,
+  schemas: [planningOntology.ItemKindSchema, planningOntology.StateSchema, planningOntology.CloseReasonSchema, planningOntology.SeveritySchema],
+  lists: listsOf("plan", [
+    ["ItemKind", planningOntology.itemKinds],
+    ["State", planningOntology.states],
+    ["CloseReason", planningOntology.closeReasons],
+    ["Severity", planningOntology.severities],
+    ["Verdict", planningOntology.verdicts],
+    ["LinkKind", planningOntology.linkKinds],
+    ["Capability", planningOntology.capabilities],
+    ["FieldAuthority", planningOntology.fieldAuthorities],
+    ["Origin", planningOntology.origins],
+    ["ActorKind", planningOntology.actorKinds],
+    ["LocatorKind", planningOntology.locatorKinds],
+    ["EventType", planningOntology.eventTypes],
+  ]),
+  source: "commons/ontology/src/planning/*.ts",
+  run: RUN,
+  shapes: { prefix: "plansh", iri: "https://www.intellectualfrontiers.com/ontology/planning-shapes#" },
+  schemasIri: "https://www.intellectualfrontiers.com/ontology/planning-schemas",
+  sssomSetId: "https://www.intellectualfrontiers.com/ontology/planning-mappings",
+  sssomCuries: { dcterms: "http://purl.org/dc/terms/", prov: "http://www.w3.org/ns/prov#" },
+  viewTitle: "Planning Ontology",
+  license: CC0,
+};
+
 /** The ontology of Intellectual Frontiers Releases (commons 0026-works-versioning), as it is published. */
 export const IFR: OntologyPublication = {
   name: "ifr",
@@ -320,7 +365,7 @@ export const KANON: OntologyPublication = {
 };
 
 /** The ontologies of commons that are published, each from its own typed modules: Mizan's, then the ones its specifications define. */
-export const publications: readonly OntologyPublication[] = [MIZAN, IFCCM, IFQS, OTO, IFR, KANON];
+export const publications: readonly OntologyPublication[] = [MIZAN, IFCCM, IFQS, OTO, PLANNING, IFR, KANON];
 
 /** Where the generated files are downloaded from: this repository's `commons/` folder on its default branch. */
 const DOWNLOAD_BASE = "https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/";
