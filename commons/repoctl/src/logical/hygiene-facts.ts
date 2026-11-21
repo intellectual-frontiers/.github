@@ -14,7 +14,7 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import type { Copy, Dependency, HygieneFacts, ImportFact, LockFacts, PackageFacts } from "./hygiene.ts";
+import type { Copy, Dependency, HygieneFacts, ImportFact, LockFacts, PackageFacts, TreeFacts } from "./hygiene.ts";
 import type { HygienePolicy } from "@intellectual-frontiers/repoctl/governance";
 import type { Files, World } from "./ports.ts";
 
@@ -142,12 +142,29 @@ async function installedUnder(files: Files, root: string, nm: string, into: Map<
   }
 }
 
-/** Gathers the facts of the repository of a world: the only reads of the check. */
+/** The folders that hold only what is made or fetched, never read for a lockfile or a package: a path with one of these segments is left out. `node_modules` is never walked at all. */
+export const IGNORED_FOLDERS: readonly string[] = [".git", "dist", "coverage", ".cache", ".turbo", ".next"];
+
+const ignored = (path: string): boolean => path.split("/").some((s) => IGNORED_FOLDERS.includes(s));
+
+/** The lockfiles of the kinds the rule reads, in a folder (`""` the root), and the files they were read from. */
+async function locksIn(files: Files, repo: string, folder: string, scope: string): Promise<readonly LockFacts[]> {
+  const locks: LockFacts[] = [];
+  for (const [name, parse] of [["bun.lock", parseBunLock], ["package-lock.json", parseNpmLock]] as const) {
+    const file = folder === "" ? name : `${folder}/${name}`;
+    const read = await files.read(`${repo}/${file}`);
+    if (read !== undefined) locks.push(parse(read, file, scope));
+  }
+  return locks;
+}
+
+/** Gathers the facts of the repository of a world: the only reads of the check. Every folder with a `package.json` is a tree of its own, with the lockfiles next to it and its own `node_modules`. */
 export async function gatherHygieneFacts(w: Pick<World, "files" | "repo">, policy: HygienePolicy): Promise<HygieneFacts> {
-  const all = (await w.files.walk(w.repo)).filter((p) => !p.startsWith(".git/"));
+  const all = (await w.files.walk(w.repo)).filter((p) => !ignored(p));
   const packages: PackageFacts[] = [];
   let workspaces: readonly string[] = [];
   const imports: ImportFact[] = [];
+  const folderNames = new Set<string>();
   for (const p of all) {
     if (p === "package.json" || p.endsWith("/package.json")) {
       const read = await w.files.read(`${w.repo}/${p}`);
@@ -156,18 +173,21 @@ export async function gatherHygieneFacts(w: Pick<World, "files" | "repo">, polic
       if (parsed.kind === "err") continue;
       packages.push(parsed.value.facts);
       if (p === "package.json") workspaces = parsed.value.workspaces;
+      else folderNames.add(p.slice(0, p.lastIndexOf("/")));
     } else if (SOURCE.test(p)) {
       const read = await w.files.read(`${w.repo}/${p}`);
       if (read !== undefined) for (const specifier of relativeImports(read)) imports.push({ file: p, specifier });
     }
   }
-  const locks: LockFacts[] = [];
-  for (const [file, parse] of [["bun.lock", parseBunLock], ["package-lock.json", parseNpmLock]] as const) {
-    const read = await w.files.read(`${w.repo}/${file}`);
-    if (read !== undefined) locks.push(parse(read, file, policy.scope));
-  }
+  const locks = await locksIn(w.files, w.repo, "", policy.scope);
   const installed = new Map<string, Copy[]>();
   await installedUnder(w.files, w.repo, "node_modules", installed, 0, policy.scope);
+  const folders: TreeFacts[] = [];
+  for (const folder of [...folderNames].sort()) {
+    const into = new Map<string, Copy[]>();
+    await installedUnder(w.files, w.repo, `${folder}/node_modules`, into, 0, policy.scope);
+    folders.push({ folder, locks: await locksIn(w.files, w.repo, folder, policy.scope), installed: into });
+  }
   const repository = policy.sourceMarker !== "" && (await w.files.exists(`${w.repo}/${policy.sourceMarker}`)) ? "source" : "consumer";
-  return { repository, packages, locks, installed, imports, workspaces };
+  return { repository, packages, locks, installed, folders, imports, workspaces };
 }

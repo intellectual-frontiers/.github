@@ -34,7 +34,7 @@ const CORE = "@intellectual-frontiers/core";
 const POLICY: HygienePolicy = { scope: "@intellectual-frontiers/", gitSources: ["intellectual-frontiers/.github"], pathSegment: "commons", sourceMarker: "commons/libraries/library.ts", allow: { paths: [], packages: [] } };
 const WITH_POLICY = { config: { hygiene: { scope: POLICY.scope, gitSources: POLICY.gitSources, pathSegment: POLICY.pathSegment, sourceMarker: POLICY.sourceMarker } } } as const;
 
-const none: HygieneFacts = { repository: "consumer", packages: [], locks: [], installed: new Map(), imports: [], workspaces: [] };
+const none: HygieneFacts = { repository: "consumer", packages: [], locks: [], installed: new Map(), folders: [], imports: [], workspaces: [] };
 const pkg = (p: string, name: string | undefined, dependencies: Record<string, string>): HygieneFacts["packages"][number] => ({ path: p, name, dependencies: Object.entries(dependencies).map(([n, spec]) => ({ name: n, spec })) });
 
 proves(["0007-repoctl-hygiene FR-001"], "the verb is declared once, public and read-only, with its examples, and each code has an explanation", () => {
@@ -58,6 +58,7 @@ proves(["0007-repoctl-hygiene FR-002", "0036-distribution FR-010"], "each of the
     ],
     locks: [],
     installed: new Map([[CORE, [{ version: "0.1.4", where: "node_modules/a/node_modules/@intellectual-frontiers/core" }, { version: "0.1.5", where: "node_modules/@intellectual-frontiers/core" }]]]),
+    folders: [],
     imports: [{ file: "src/a.ts", specifier: "../commons/core/src/mod.ts" }, { file: "src/b.ts", specifier: "./local.ts" }],
     workspaces: ["packages/*"],
   };
@@ -92,6 +93,7 @@ proves(["0007-repoctl-hygiene FR-002", "0036-distribution FR-013"], "in the repo
     packages: [pkg("commons/core/package.json", CORE, { "@intellectual-frontiers/commons": "link:../commons", dep: "github:intellectual-frontiers/.github#x" })],
     locks: [{ kind: "read", file: "bun.lock", copies: new Map() }],
     installed: new Map(),
+    folders: [],
     imports: [{ file: "commons/a/src/x.ts", specifier: "../../commons/core/src/mod.ts" }],
     workspaces: [],
   };
@@ -177,6 +179,68 @@ proves(["0007-repoctl-hygiene FR-003", "0007-repoctl-hygiene FR-004", "0036-dist
     // the repository of commons is told apart
     await put(dir, "commons/libraries/library.ts", "export const library = {};\n");
     assertEquals((await gatherHygieneFacts(world, POLICY)).repository, "source");
+  });
+});
+
+const lockOf = (version: string): string => `{ "lockfileVersion": 1, "packages": { "${CORE}": ["${CORE}@${version}", "", {}, "x"] } }`;
+const npmLockOf = (version: string): string => JSON.stringify({ lockfileVersion: 3, packages: { "": { name: "x" }, [`node_modules/${CORE}`]: { version } } });
+const manifest = (name: string, dependencies: Record<string, string> = { [CORE]: "0.1.5" }): string => JSON.stringify({ name, dependencies });
+
+proves(["0007-repoctl-hygiene FR-006", "0007-repoctl-hygiene FR-003"], "a repository with no root package.json is judged folder by folder: the lockfile next to each package.json and its node_modules are read, and a folder with dependencies and no lockfile is named", async () => {
+  await fs.withTempDir(async (dir) => {
+    // the layout of a monorepo of independent packages: no root package.json, a lockfile of each kind next to each package.json
+    await put(dir, "lib/ts/agora-domain/package.json", manifest("agora-domain"));
+    await put(dir, "lib/ts/agora-domain/bun.lock", lockOf("0.1.5"));
+    await put(dir, "services/opsfolio/package.json", manifest("opsfolio", { [CORE]: "0.1.6" }));
+    await put(dir, "services/opsfolio/package-lock.json", npmLockOf("0.1.6"));
+    await put(dir, "services/opsfolio/node_modules/@intellectual-frontiers/core/package.json", JSON.stringify({ name: CORE, version: "0.1.6" }));
+    await put(dir, "services/www/deep/site/package.json", manifest("site"));
+    await put(dir, "services/www/deep/site/bun.lock", lockOf("0.1.5"));
+    // a package.json of what is built, fetched or installed is not judged
+    await put(dir, "services/opsfolio/dist/package.json", manifest("built"));
+    await put(dir, "services/opsfolio/node_modules/other/package.json", manifest("other"));
+    // a package.json that declares nothing needs no lockfile
+    await put(dir, "tools/empty/package.json", JSON.stringify({ name: "empty" }));
+    const world = systemWorld(dir, () => undefined, { libraries: undefined });
+    const facts = await gatherHygieneFacts(world, POLICY);
+    assertEquals(facts.folders.map((f) => [f.folder, f.locks.map((l) => l.file)]), [
+      ["lib/ts/agora-domain", ["lib/ts/agora-domain/bun.lock"]],
+      ["services/opsfolio", ["services/opsfolio/package-lock.json"]],
+      ["services/www/deep/site", ["services/www/deep/site/bun.lock"]],
+      ["tools/empty", []],
+    ]);
+    assertEquals(facts.folders.find((f) => f.folder === "services/opsfolio")?.installed.get(CORE)?.map((c) => c.version), ["0.1.6"]);
+    // two folders install two versions of one package: each its own install, so no duplicate and no warning
+    assertEquals(hygiene(facts, POLICY), []);
+    const out = await execute(hostOf(world, WITH_POLICY), ["hygiene", "--json"]);
+    assertEquals(out.code, 0, out.err);
+    assertEquals(countsOf(hygiene(facts, POLICY)), { failures: 0, warnings: 0 });
+    // a folder with dependencies and no lockfile next to it is a warning that names it, and a lockfile in another folder does not cover it
+    await put(dir, "services/orphan/package.json", manifest("orphan"));
+    const warned = hygiene(await gatherHygieneFacts(world, POLICY), POLICY);
+    assertEquals(warned.map((f) => `${f.code} ${f.level} ${f.path}`), ["E-ENVIRONMENT warn services/orphan/package.json"]);
+    assertStringIncludes(warned[0]?.message ?? "", "services/orphan");
+    assertEquals((await execute(hostOf(world, WITH_POLICY), ["hygiene"])).code, 0);
+    // a duplicate inside one folder is found at that folder
+    await put(dir, "services/orphan/bun.lock", lockOf("0.1.4"));
+    await put(dir, "services/orphan/node_modules/@intellectual-frontiers/core/package.json", JSON.stringify({ name: CORE, version: "0.1.5" }));
+    const dup = hygiene(await gatherHygieneFacts(world, POLICY), POLICY);
+    assertEquals(dup.map((f) => `${f.code} ${f.path.split(":")[0]}`), ["E-HYGIENE-DUPLICATE services/orphan/bun.lock"]);
+    assertEquals((await execute(hostOf(world, WITH_POLICY), ["hygiene"])).code, 1);
+  });
+  // a package.json under a folder that has a lockfile is installed by it (a workspace member); a root with dependencies and no lockfile still warns
+  await fs.withTempDir(async (dir) => {
+    await put(dir, "package.json", JSON.stringify({ name: "root", workspaces: ["packages/*"], dependencies: { [CORE]: "0.1.5" } }));
+    await put(dir, "packages/a/package.json", manifest("@intellectual-frontiers/erga-a"));
+    await put(dir, "other/package.json", manifest("other"));
+    const world = systemWorld(dir, () => undefined, { libraries: undefined });
+    const none0 = hygiene(await gatherHygieneFacts(world, POLICY), POLICY);
+    assertEquals(none0.map((f) => f.path).sort(), ["other/package.json", "package.json", "packages/a/package.json"]);
+    // a lockfile in a sibling folder covers nothing
+    await put(dir, "packages/a/bun.lock", lockOf("0.1.5"));
+    assertEquals(hygiene(await gatherHygieneFacts(world, POLICY), POLICY).map((f) => f.path).sort(), ["other/package.json", "package.json"]);
+    await put(dir, "bun.lock", lockOf("0.1.5"));
+    assertEquals(hygiene(await gatherHygieneFacts(world, POLICY), POLICY), []);
   });
 });
 

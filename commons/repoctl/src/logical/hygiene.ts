@@ -17,7 +17,7 @@
  * ```ts
  * import { hygiene } from "./hygiene.ts";
  * const policy = { scope: "@acme/", gitSources: ["acme/platform"], pathSegment: "platform", sourceMarker: "", allow: { paths: [], packages: [] } };
- * hygiene({ repository: "consumer", packages: [], locks: [], installed: new Map(), imports: [], workspaces: [] }, policy); // []
+ * hygiene({ repository: "consumer", packages: [], locks: [], installed: new Map(), folders: [], imports: [], workspaces: [] }, policy); // []
  * ```
  *
  * @module
@@ -47,14 +47,23 @@ export type ImportFact = { readonly file: string; readonly specifier: string };
 /** Whose repository it is: the repository the family's packages are made in (the policy's source marker is there), or a repository that consumes them. */
 export type Repository = "source" | "consumer";
 
+/** The lockfiles and the installed copies of one folder that holds a `package.json` (a folder of its own is one tree: the copies of two folders are never one install). `folder` is a path from the root, `""` for the root itself. */
+export type TreeFacts = {
+  readonly folder: string;
+  readonly locks: readonly LockFacts[];
+  readonly installed: ReadonlyMap<string, readonly Copy[]>;
+};
+
 /** Everything the check reads of a repository. */
 export type HygieneFacts = {
   readonly repository: Repository;
   readonly packages: readonly PackageFacts[];
-  /** One entry for each lockfile found (`bun.lock`, `package-lock.json`); none where there is none. */
+  /** One entry for each lockfile found at the root (`bun.lock`, `package-lock.json`); none where there is none. */
   readonly locks: readonly LockFacts[];
-  /** The copies found in `node_modules`, by package. */
+  /** The copies found in the `node_modules` of the root, by package. */
   readonly installed: ReadonlyMap<string, readonly Copy[]>;
+  /** The same for each other folder that holds a `package.json`, nested ones included (never a folder under `node_modules`, `dist` or `.git`); each is an install of its own. */
+  readonly folders: readonly TreeFacts[];
   readonly imports: readonly ImportFact[];
   /** The globs of the workspaces the root `package.json` declares: the packages of the repository itself. */
   readonly workspaces: readonly string[];
@@ -128,20 +137,33 @@ export function hygiene(facts: HygieneFacts, policy: HygienePolicy): readonly Hy
     for (const i of facts.imports)
       if (i.specifier.startsWith(".") && intoFamily(policy, i.specifier))
         out.push({ level: "fail", code: "E-HYGIENE-IMPORT", path: i.file, message: `${i.file}: imports ${i.specifier}, which reaches into a copy of the family: import the package by its name`, fix: "import from @intellectual-frontiers/<library>" });
-  const copies = new Map<string, Copy[]>();
-  const add = (pkg: string, c: Copy): void => void copies.set(pkg, [...(copies.get(pkg) ?? []), c]);
-  for (const l of facts.locks) if (l.kind === "read") for (const [pkg, cs] of l.copies) for (const c of cs) add(pkg, c);
-  for (const [pkg, cs] of facts.installed) for (const c of cs) add(pkg, c);
-  for (const [pkg, cs] of [...copies].sort(([a], [b]) => (a < b ? -1 : 1))) {
-    const versions = [...new Set(cs.map((c) => c.version))].sort();
-    if (versions.length < 2) continue;
-    const where = versions.map((v) => `${v} (${cs.find((c) => c.version === v)?.where ?? "?"})`).join(", ");
-    out.push({ level: "fail", code: "E-HYGIENE-DUPLICATE", path: cs[0]?.where ?? pkg, message: `${pkg} is installed ${versions.length} times, at ${where}: make the tree hold one copy`, fix: `add "overrides": { "${pkg}": "${versions[versions.length - 1] ?? ""}" } to package.json and install again` });
+  const trees: readonly TreeFacts[] = [{ folder: "", locks: facts.locks, installed: facts.installed }, ...facts.folders];
+  for (const tree of trees) {
+    const copies = new Map<string, Copy[]>();
+    const add = (pkg: string, c: Copy): void => void copies.set(pkg, [...(copies.get(pkg) ?? []), c]);
+    for (const l of tree.locks) if (l.kind === "read") for (const [pkg, cs] of l.copies) for (const c of cs) add(pkg, c);
+    for (const [pkg, cs] of tree.installed) for (const c of cs) add(pkg, c);
+    for (const [pkg, cs] of [...copies].sort(([a], [b]) => (a < b ? -1 : 1))) {
+      const versions = [...new Set(cs.map((c) => c.version))].sort();
+      if (versions.length < 2) continue;
+      const where = versions.map((v) => `${v} (${cs.find((c) => c.version === v)?.where ?? "?"})`).join(", ");
+      out.push({ level: "fail", code: "E-HYGIENE-DUPLICATE", path: cs[0]?.where ?? pkg, message: `${pkg} is installed ${versions.length} times, at ${where}: make the tree hold one copy`, fix: `add "overrides": { "${pkg}": "${versions[versions.length - 1] ?? ""}" } to package.json and install again` });
+    }
+    for (const l of tree.locks)
+      if (l.kind === "unreadable") out.push({ level: "fail", code: "E-ENVIRONMENT", path: l.file, message: `${l.file} could not be read (${l.why}), so the installed copies are not known`, fix: "bun install" });
   }
-  for (const l of facts.locks)
-    if (l.kind === "unreadable") out.push({ level: "fail", code: "E-ENVIRONMENT", path: l.file, message: `${l.file} could not be read (${l.why}), so the installed copies are not known`, fix: "bun install" });
-  if (facts.locks.length === 0 && facts.packages.length > 0)
-    out.push({ level: "warn", code: "E-ENVIRONMENT", path: "package.json", message: "there is no bun.lock or package-lock.json: the installed copies are read from node_modules alone", fix: "bun install" });
+  // a lockfile next to a package.json installs it, and so does one of a folder above it (the workspaces of a root install their members)
+  const locked = (folder: string): boolean => trees.some((t) => t.locks.length > 0 && (t.folder === "" || folder === t.folder || folder.startsWith(`${t.folder}/`)));
+  for (const p of facts.packages) {
+    if (p.dependencies.length === 0) continue;
+    const folder = dirOf(p.path);
+    if (locked(folder)) continue;
+    out.push(
+      folder === ""
+        ? { level: "warn", code: "E-ENVIRONMENT", path: p.path, message: "there is no bun.lock or package-lock.json: the installed copies are read from node_modules alone", fix: "bun install" }
+        : { level: "warn", code: "E-ENVIRONMENT", path: p.path, message: `there is no bun.lock or package-lock.json next to ${p.path} (folder ${folder}): the installed copies are read from its node_modules alone`, fix: `bun install in ${folder}` },
+    );
+  }
   return out.sort((a, b) => ORDER.indexOf(a.code) - ORDER.indexOf(b.code) || (a.path < b.path ? -1 : a.path > b.path ? 1 : 0) || (a.message < b.message ? -1 : 1));
 }
 
