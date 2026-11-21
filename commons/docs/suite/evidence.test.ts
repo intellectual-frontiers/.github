@@ -1,4 +1,4 @@
-// Spec: 0001-docs FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016, FR-017, FR-020
+// Spec: 0001-docs FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016, FR-017, FR-020, FR-022, FR-023
 /**
  * The evidence the site shows beside the code (docs 0001-docs FR-009 to FR-012): CTRF results, GitHub tickets and typed issues read from files, the Quality section made from them, the lines on a requirement, a library and a
  * module, the findings for a file that cannot be read and a test that names a requirement that is not there, and, with no run recorded, nothing shown as passed.
@@ -9,12 +9,13 @@ import { fs, path, proc } from "@intellectual-frontiers/system";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { report } from "../src/check.ts";
 import { loadConfig } from "../src/cli.ts";
-import { causeOf } from "../src/pages/quality.ts";
+import { causeOf, deliveryOf } from "../src/pages/quality.ts";
 import { movementsOf, parseHistoryRun, runsOf } from "../src/history.ts";
 import { sparkText } from "../src/emit/html.ts";
 import { busFactor, lastChanged, libraryOfPath, parseLog } from "../src/pages/git.ts";
 import { document } from "../src/emit/html.ts";
 import { type EvidenceSource, resolveConfig } from "../src/config.ts";
+import { parseCoverage, parseLcov, percent } from "../src/coverage.ts";
 import { parseCtrf, parseRuns, parseTickets, readEvidence, requirementsIn, standing } from "../src/evidence.ts";
 import { markdownOf } from "../src/emit/markdown.ts";
 import { buildSite } from "../src/site.ts";
@@ -243,7 +244,7 @@ proves(["0001-docs FR-016"], "the history says how a library's tests moved over 
   const page = markdownOf(b.pages.find((p) => p.path === "quality/fixture.html") as never);
   for (const said of ["## History", "*Tests: ", "*Pass rate: ", "*Time: ", "### Began to fail in the latest run (1)", "C is new", "### Fixed since the run before (1)", "D went away", "### Flapping: failed more than once, passing in the latest run (1)", "E comes and goes (failed in 2 separate stretches)", "https://github.com/example/fixture/compare/"]) assertStringIncludes(page, said);
   const dash = markdownOf(b.pages.find((p) => p.path === "quality/index.html") as never);
-  assertStringIncludes(dash, "| Pass rate | Flaky |");
+  assertStringIncludes(dash, "| Pass rate | Coverage | Flaky |");
   assert(/`[▁-█]{5}`/.test(dash), "a trend of the pass rate in the row");
   const q = JSON.parse(b.files.find((f) => f.path === "quality.json")?.text ?? "{}") as { libraries: { library: string; flaky: string[]; newlyFailing: string[] }[] };
   assertEquals(q.libraries.find((l) => l.library === "fixture")?.flaky, ["001-greeting FR-001: E comes and goes"]);
@@ -314,4 +315,33 @@ proves(["0001-docs FR-020"], "the log of git is read into commits, the bus facto
   assert(b.pages.some((p) => p.path === "quality/hotspots.html"), "the page is made, with a history or without");
   const page = markdownOf(b.pages.find((p) => p.path === "quality/hotspots.html") as never);
   assert(page.includes("Where the work is") || page.includes("The history of the repository is not available"), page.slice(0, 200));
+});
+
+proves(["0001-docs FR-022"], "line coverage is read from the lcov of bun, left to the library's source files, shown as a percent on the dashboard and as the least covered files on the library's page", async () => {
+  const lcov = ["TN:", "SF:../core/src/a.ts", "LF:4", "LH:3", "end_of_record", "SF:../core/suite/a.test.ts", "LF:9", "LH:9", "end_of_record", "SF:../core/src/empty.ts", "LF:0", "LH:0", "end_of_record", ""].join("\n");
+  const files = parseLcov(lcov, "commons/data");
+  assertEquals(files, [{ path: "commons/core/src/a.ts", found: 4, hit: 3 }], "tests and files with no lines are left out, and paths are from the root");
+  assertEquals([percent(files), percent([])], [75, undefined]);
+  assert("error" in parseCoverage("{"));
+  assert("error" in parseCoverage("{}"));
+  const b = await built({ results: EVIDENCE });
+  const found: never[] = [];
+  const ev = readEvidence(path.join(ROOT, "commons/docs/suite"), { results: "fixture-evidence" }, found);
+  assertEquals(percent(ev.coverage.get("fixture")?.files ?? []), 33.3);
+  const page = markdownOf(b.pages.find((p) => p.path === "quality/fixture.html") as never);
+  assertStringIncludes(page, "Line coverage");
+  assertStringIncludes(page, "commons/fixture/src/rare.ts");
+  assertStringIncludes(markdownOf(b.pages.find((p) => p.path === "quality/index.html") as never), "33.3%");
+});
+
+proves(["0001-docs FR-023"], "the four measures of DORA are taken from the runs of the publishing workflow: publishes a day, the median minutes of a successful run, the share of runs that failed and the minutes from a failure to the next pass, and fewer than two runs give none", () => {
+  const run = (n: number, at: string, end: string, conclusion: string) => ({ id: n, number: n, event: "push", status: "completed", conclusion, sha: "", title: "", url: "", createdAt: at, startedAt: at, updatedAt: end });
+  const runs = [
+    run(4, "2026-11-02T00:00:00Z", "2026-11-02T00:06:00Z", "success"),
+    run(3, "2026-11-01T12:00:00Z", "2026-11-01T12:04:00Z", "failure"),
+    run(2, "2026-11-01T06:00:00Z", "2026-11-01T06:08:00Z", "cancelled"),
+    run(1, "2026-11-01T00:00:00Z", "2026-11-01T00:02:00Z", "success"),
+  ];
+  assertEquals(deliveryOf(runs), { runs: 3, days: 1, perDay: 2, leadMinutes: 6, failureRate: 33, restoreMinutes: 720 });
+  assertEquals(deliveryOf(runs.slice(0, 1)), undefined);
 });

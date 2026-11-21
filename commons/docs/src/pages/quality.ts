@@ -1,4 +1,4 @@
-// Spec: 0001-docs FR-010, FR-011
+// Spec: 0001-docs FR-010, FR-011, FR-022, FR-023
 /**
  * The Quality section (docs 0001-docs FR-010, FR-011; commons 0011-documentation FR-041): what the tests and the issues say of each library, made from the evidence the configuration names (`evidence.ts`): a dashboard with a row
  * for each library, a page for each library (its failing and its skipped tests, its slowest, the requirements no passing test proves, its open issues and tickets), a register of the issues and tickets and a page for each issue kept
@@ -8,6 +8,7 @@
  */
 import type { Build } from "../build.ts";
 import { type Finding, message } from "../check.ts";
+import { percent } from "../coverage.ts";
 import { type Evidence, isOpen, type LibraryResults, standing, testsFor, type TestResult, type Ticket, type TypedIssue, type WorkflowRun } from "../evidence.ts";
 import { sparkText } from "../emit/html.ts";
 import { movementsOf, runsOf } from "../history.ts";
@@ -188,6 +189,7 @@ export function qualityPages(b: Build): void {
       [text(r === undefined ? "" : String(r.failed))],
       [text(r === undefined ? "" : String(r.skipped + r.other))],
       passRates(ev, lib).length < 2 ? [] : [code(sparkText(passRates(ev, lib)))],
+      [text(ev.coverage.get(lib) === undefined ? "" : `${percent(ev.coverage.get(lib)?.files ?? []) ?? ""}%`)],
       [text(movementsOf(ev, lib).flaky.length === 0 ? "" : String(movementsOf(ev, lib).flaky.length))],
       [text(q.total === 0 ? "" : `${q.proved} of ${q.total}`)],
       [text(String(heldFindings(b, lib)))],
@@ -217,7 +219,7 @@ export function qualityPages(b: Build): void {
       {
         kind: "table",
         filter: "Filter the libraries",
-        head: th("Library", "Gate", "Tests", "Passed", "Failed", "Skipped", "Pass rate", "Flaky", "Proved", "Held", "Issues", "Tickets"),
+        head: th("Library", "Gate", "Tests", "Passed", "Failed", "Skipped", "Pass rate", "Coverage", "Flaky", "Proved", "Held", "Issues", "Tickets"),
         rows,
       },
       { kind: "paragraph", inlines: [link("quality/issues/index.html", "Every open issue and ticket"), text(" is in the register. Proved: requirements of the library's specifications whose every test passed (one with no test recorded is not counted as proved). Held: findings of the trace and specification checks held against a baseline. Issues and tickets: open ones.")] },
@@ -235,6 +237,13 @@ export function qualityPages(b: Build): void {
     if (noRun !== undefined) blocks.push({ kind: "callout", tone: "warn", title: "No test run for this library", blocks: [{ kind: "paragraph", inlines: [text(`No test report of the library is in the run these pages show: ${noRun}.`)] }] });
     if (hasOverview(lib)) blocks.push({ kind: "paragraph", inlines: [text("The library: "), link(`overview/${lib}.html`, title(lib)), text(".")] });
     blocks.push(...gateBlocks(b, lib));
+    const cov = ev.coverage.get(lib);
+    if (cov !== undefined && cov.files.length > 0) {
+      blocks.push({ kind: "heading", level: 2, id: "coverage", text: [text("Line coverage")] });
+      blocks.push({ kind: "paragraph", inlines: [text(`${percent(cov.files)}% of ${plural(cov.files.reduce((n, f) => n + f.found, 0), "line")} of ${plural(cov.files.length, "source file")} are reached by the library's tests. The least covered files:`)] });
+      const least = [...cov.files].sort((x, y) => x.hit / x.found - y.hit / y.found || y.found - x.found).slice(0, 10);
+      blocks.push({ kind: "table", head: th("File", "Lines", "Hit", "Covered"), rows: least.map((f) => [[code(f.path)], [text(String(f.found))], [text(String(f.hit))], [text(`${percent([f])}%`)]]) });
+    }
     if (r !== undefined) {
       blocks.push({ kind: "heading", level: 2, id: "tests", text: [text("Tests")] });
       blocks.push({ kind: "paragraph", inlines: [text(`${plural(r.tests.length, "test")}: ${r.passed} passed, ${r.failed} failed, ${r.skipped} skipped, ${r.other} planned or other.`)] });
@@ -554,6 +563,38 @@ const ago = (a: string | undefined, z: string | undefined): number | undefined =
 };
 const mark = (r: WorkflowRun): string => (r.status !== "completed" ? "…" : r.conclusion === "success" ? "✓" : r.conclusion === "failure" ? "✗" : "–");
 
+/** The minutes from each failing run to the next run that passed, for the runs of a workflow (completed, cancelled ones left out). */
+function recoveriesOf(done: readonly WorkflowRun[]): number[] {
+  const asc = [...done].reverse();
+  const out: number[] = [];
+  asc.forEach((r, i) => {
+    if (r.conclusion !== "failure" || (i > 0 && asc[i - 1]?.conclusion === "failure")) return;
+    const next = asc.slice(i + 1).find((x) => x.conclusion === "success");
+    const t = next === undefined ? undefined : ago(r.createdAt, next.createdAt);
+    if (t !== undefined) out.push(t);
+  });
+  return out.sort((x, y) => x - y);
+}
+
+/** The four numbers of DORA from the runs of the workflow that publishes (how often it delivers, how long from a push to its being published, the share of runs that failed, how long a failure lasts), or undefined where there are fewer than two runs. */
+export function deliveryOf(runs: readonly WorkflowRun[]): { readonly runs: number; readonly days: number; readonly perDay: number; readonly leadMinutes: number | undefined; readonly failureRate: number; readonly restoreMinutes: number | undefined } | undefined {
+  const done = runs.filter((r) => r.status === "completed" && r.conclusion !== "cancelled" && r.conclusion !== "skipped");
+  if (done.length < 2) return undefined;
+  const times = done.map((r) => Date.parse(r.createdAt)).filter((t) => Number.isFinite(t));
+  const days = Math.max(1 / 24, (Math.max(...times) - Math.min(...times)) / 86_400_000);
+  const ok = done.filter((r) => r.conclusion === "success");
+  const lead = ok.map((r) => ago(r.startedAt, r.updatedAt)).filter((x): x is number => x !== undefined).sort((x, y) => x - y);
+  const rec = recoveriesOf(done);
+  return {
+    runs: done.length,
+    days: Math.round(days * 10) / 10,
+    perDay: Math.round((ok.length / days) * 10) / 10,
+    leadMinutes: lead.length === 0 ? undefined : lead[Math.floor(lead.length / 2)],
+    failureRate: Math.round(((done.length - ok.length) / done.length) * 100),
+    restoreMinutes: rec.length === 0 ? undefined : rec[Math.floor(rec.length / 2)],
+  };
+}
+
 /** The CI/CD page: each workflow's latest run, the last ten as marks, how long a run takes, whether it flaps, and which jobs failed in the latest failed runs. */
 function ciPage(b: Build): void {
   const ev = b.evidence;
@@ -592,19 +633,27 @@ function ciPage(b: Build): void {
         const done = w.runs.filter((r) => r.status === "completed" && r.conclusion !== "cancelled" && r.conclusion !== "skipped");
         const passed = done.filter((r) => r.conclusion === "success").length;
         const mins = done.map((r) => ago(r.startedAt, r.updatedAt)).filter((x): x is number => x !== undefined).sort((x, y) => x - y);
-        const asc = [...done].reverse();
-        const recoveries: number[] = [];
-        asc.forEach((r, i) => {
-          if (r.conclusion !== "failure" || (i > 0 && asc[i - 1]?.conclusion === "failure")) return;
-          const next = asc.slice(i + 1).find((x) => x.conclusion === "success");
-          const t = next === undefined ? undefined : ago(r.createdAt, next.createdAt);
-          if (t !== undefined) recoveries.push(t);
-        });
-        recoveries.sort((x, y) => x - y);
+        const recoveries = recoveriesOf(done);
         const median = (xs: readonly number[]): string => (xs.length === 0 ? "" : String(xs[Math.floor(xs.length / 2)]));
         return [[text(w.name)], [text(String(done.length))], [text(done.length === 0 ? "" : `${Math.round((passed / done.length) * 100)}%`)], [text(median(mins))], [text(recoveries.length === 0 ? "" : `${median(recoveries)} min`)]];
       }),
     });
+    const publisher = ev.workflows.find((w) => w.name === "site");
+    const dora = publisher === undefined ? undefined : deliveryOf(publisher.runs);
+    if (dora !== undefined) {
+      blocks.push({ kind: "heading", level: 2, id: "delivery", text: [text("Delivery")] });
+      blocks.push({ kind: "paragraph", inlines: [text(`The four measures of DORA, taken from the runs of the workflow that publishes the site (${dora.runs} runs over ${dora.days} days). They describe how this repository delivers its documentation, which is a proxy for delivery: a release has its own runs.`)] });
+      blocks.push({
+        kind: "table",
+        head: th("Measure", "Value", "Meaning"),
+        rows: [
+          [[text("Deployment frequency")], [text(`${dora.perDay} a day`)], [text("Publishes that succeeded, per day of the window.")]],
+          [[text("Lead time")], [text(dora.leadMinutes === undefined ? "" : `${dora.leadMinutes} min`)], [text("Median minutes a successful run took, from its start to its publish.")]],
+          [[text("Change failure rate")], [text(`${dora.failureRate}%`)], [text("Runs that failed, of those that finished (cancelled runs left out).")]],
+          [[text("Time to restore")], [text(dora.restoreMinutes === undefined ? "" : `${dora.restoreMinutes} min`)], [text("Median minutes from a failed run to the next one that passed.")]],
+        ],
+      });
+    }
     for (const w of ev.workflows) {
       const failing = w.failed.filter((f) => f.jobs.length > 0).slice(0, 3);
       if (failing.length === 0) continue;

@@ -46,6 +46,7 @@ export type {
 } from "./config.ts";
 export { DEFAULT_PRESENTATIONS, isAbout, normalDir, PRESENTATION_IDS, resolveConfig, under } from "./config.ts";
 export { Build } from "./build.ts";
+export { type FileCoverage, type LibraryCoverage, parseCoverage, parseLcov, percent } from "./coverage.ts";
 export { type Evidence, isOpen, type LibraryResults, NONE, parseCtrf, parseTickets, readEvidence, requirementsIn, standing, type TestResult, type TestStatus, type Ticket, type TypedIssue } from "./evidence.ts";
 export { type Finding, message, type Problem, report } from "./check.ts";
 export type { ApiExport, ApiMember, AreaApi, ExportKind } from "./extract/api.ts";
