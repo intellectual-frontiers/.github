@@ -273,6 +273,28 @@ export async function syncThrough(options: ExchangeOptions): Promise<Result<Sync
   return ok({ published, pulled, vector: vector.value });
 }
 
+/** What a synchronization would do, found without changing the replica or the medium. */
+export type SyncPlan = { readonly toPublish: number; readonly toTake: readonly string[]; readonly vector: VersionVector };
+
+/** What a synchronization would do: how many of the replica's own rows are not published yet, and which delta files of the others it has not taken. */
+export async function planSync(options: ExchangeOptions): Promise<Result<SyncPlan, ExchangeProblem>> {
+  const loaded = await options.cursor.load();
+  if (loaded.kind === "err") return err({ kind: "cursor", detail: loaded.error });
+  const vector = await options.replica.versionVector();
+  if (vector.kind === "err") return err({ kind: "replica", problem: vector.error });
+  const listed = await listAll(options.medium, deltasPrefix());
+  if (listed.kind === "err") return err({ kind: "medium", problem: listed.error });
+  const done = new Set([...loaded.value.applied, ...loaded.value.quarantined]);
+  const toTake = sorted(
+    listed.value.filter((path) => {
+      const name = parseDeltaPath(path);
+      return name.kind === "ok" && name.value.replica !== options.self && !done.has(path);
+    }),
+    (x) => x,
+  );
+  return ok({ toPublish: Math.max(0, (vector.value[options.self] ?? 0) - loaded.value.published), toTake, vector: vector.value });
+}
+
 /** The vectors the replicas published: for each replica, what it held when it last said so. */
 export async function readVectors(medium: Pick<Medium, "list" | "read">): Promise<Result<Readonly<Record<string, VersionVector>>, ExchangeProblem>> {
   const listed = await listAll(medium, vectorsPrefix());

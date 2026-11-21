@@ -62,7 +62,7 @@ proves(["0004-anyfs-cli-surfaces FR-009"], "the tools a tier sees are the verbs 
   const writer = names("writer");
   assert(reader.length > 0 && writer.length > reader.length);
   for (const id of VERB_IDS) {
-    const tool = `anyfs_${id.replaceAll(" ", "_")}`;
+    const tool = `anyfs_${id.replaceAll(" ", "_").replaceAll("-", "_")}`;
     const facts = VERBS[id];
     assertEquals(reader.includes(tool), facts.tier === "reader" && facts.channels.includes("mcp"), tool);
     assertEquals(writer.includes(tool), facts.channels.includes("mcp"), tool);
