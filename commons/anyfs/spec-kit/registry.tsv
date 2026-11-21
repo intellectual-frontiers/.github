@@ -5,3 +5,6 @@ number	slug	state
 0004	anyfs-middleware	in force
 0005	anyfs-conformance	in force
 0006	anyfs-documents	in force
+0007	anyfs-merge-governance	in force
+0008	anyfs-merge-logical	in force
+0009	anyfs-merge-physical	in force

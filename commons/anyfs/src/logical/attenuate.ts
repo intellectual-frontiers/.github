@@ -18,7 +18,7 @@ import { mapDone, mapOp, mapProblem, type PathMap } from "./remap.ts";
 import { type AnyStore, type Carried, capabilitiesWithout, carriedCapabilities, makeStore, type OpCapability, type Store } from "./store.ts";
 
 /** The capabilities that change something. */
-export const MUTATING_CAPABILITIES = ["write", "delete", "batch", "rename", "append", "lock"] as const;
+export const MUTATING_CAPABILITIES = ["write", "delete", "batch", "rename", "append", "lock", "merge"] as const;
 /** One capability that changes something. */
 export type MutatingCapability = (typeof MUTATING_CAPABILITIES)[number];
 
@@ -70,7 +70,7 @@ function lowerPath(prefix: Prefix, path: Path): Result<Path, Problem> {
 }
 
 /** A store of only what is below a prefix of its argument: every path is below the prefix and none can name the way out of it. It has the capabilities of its argument that have an operation. */
-export function sub<C extends Capability>(store: Store<C>, prefix: Prefix): Store<Carried<C>> {
+export function sub<C extends Capability>(store: Store<C>, prefix: Prefix): Store<Exclude<Carried<C>, "merge">> {
   const into: PathMap = {
     path: (path) => {
       const p = parsePath(join(prefix, path));
@@ -88,7 +88,8 @@ export function sub<C extends Capability>(store: Store<C>, prefix: Prefix): Stor
     place: store.place,
     consistency: store.consistency,
     traits: store.traits,
-    capabilities: carriedCapabilities(store),
+    // a merge exchanges the changes of a whole replica: it cannot be made through a view of one prefix of it
+    capabilities: carriedCapabilities(store).filter((c): c is Exclude<Carried<C>, "merge"> => c !== "merge"),
     handle: async (op) => {
       const lifted = mapOp(into, op);
       if (lifted.kind === "err") return lifted;

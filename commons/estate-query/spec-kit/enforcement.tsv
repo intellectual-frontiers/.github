@@ -1,0 +1,22 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-estate-query-layers FR-001	check	.github: cd commons/estate-query && bun run verify	suite/layers.test.ts: every file of the real tree is in a unit and no import is outside its row
+0001-estate-query-layers FR-002	check	.github: cd commons/estate-query && bun run verify	suite/layers.test.ts: verify runs every check of the library
+0002-estate-query-relations FR-001	check	.github: cd commons/estate-query && bun run verify	suite/estate-query.test.ts
+0002-estate-query-relations FR-002	check	.github: cd commons/estate-query && bun run verify	suite/estate-query.test.ts
+0002-estate-query-relations FR-003	check	.github: cd commons/estate-query && bun run verify	suite/estate-query.test.ts
+0002-estate-query-relations FR-004	check	.github: cd commons/estate-query && bun run verify	suite/estate-query.test.ts
+0002-estate-query-relations FR-005	check	.github: cd commons/estate-query && bun run verify	suite/estate-query.test.ts
+0003-estate-query-run FR-001	check	.github: cd commons/estate-query && bun run verify	suite/estate-query.test.ts
+0003-estate-query-run FR-002	check	.github: cd commons/estate-query && bun run verify	suite/estate-query.test.ts
+0003-estate-query-run FR-003	check	.github: cd commons/estate-query && bun run verify	suite/estate-query.test.ts
+0003-estate-query-run FR-004	check	.github: cd commons/estate-query && bun run verify	suite/estate-query.test.ts
+0004-estate-query-checks FR-001	check	.github: cd commons/estate-query && bun run verify	suite/checks.test.ts
+0004-estate-query-checks FR-002	check	.github: cd commons/estate-query && bun run verify	suite/checks.test.ts
+0004-estate-query-checks FR-003	check	.github: cd commons/estate-query && bun run verify	suite/checks.test.ts
+0005-estate-query-live FR-001	check	.github: cd commons/estate-query && bun run verify	suite/live.test.ts
+0005-estate-query-live FR-002	check	.github: cd commons/estate-query && bun run verify	suite/live.test.ts
+0005-estate-query-live FR-003	check	.github: cd commons/estate-query && bun run verify	suite/live.test.ts
+0005-estate-query-live FR-004	check	.github: cd commons/estate-query && bun run verify	suite/live.test.ts
+0002-estate-query-relations FR-006	check	.github: cd commons/estate-query && bun run verify	suite/estate-query.test.ts

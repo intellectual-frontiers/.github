@@ -15,6 +15,7 @@ import type { Result } from "@intellectual-frontiers/core";
 import type { Dialect } from "@intellectual-frontiers/archon/dialect";
 import type { Requirement } from "@intellectual-frontiers/archon/governance";
 import type { Executor } from "@intellectual-frontiers/headless/logical";
+import type { Family } from "@intellectual-frontiers/linux-observe/governance";
 import type { ValueOption } from "@intellectual-frontiers/terminal/args";
 
 /** An option of the fleet's own, made with `value` of the terminal's arguments. */
@@ -30,6 +31,10 @@ export type ConvergeSubject = {
   readonly executor: Executor;
   /** The prefix that raises rights where the account needs it (empty for none). */
   readonly elevate: readonly string[];
+  /** The family of the machine (`debian` where none is given): the program that reads a package, and the module that carries it. */
+  readonly family?: Family;
+  /** The dialect for this machine where it differs from the plugin's own (its family and the version of its tool): given by the fleet from the platform it declares or reads. */
+  readonly dialect?: Dialect;
 };
 
 /** Why an asset is not for the plugin to converge: the words, a code, and how the command ends. */

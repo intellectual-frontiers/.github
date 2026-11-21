@@ -105,7 +105,7 @@ export default defineConfig({
     { id: "types", summary: "TypeScript 7 on the tests of the root.", command: ["bun", "node_modules/typescript/bin/tsc", "-p", "tests/tsconfig.json"], code: "E-TYPES" },
     { id: "tools-types", summary: "TypeScript 7 on the tools of commons.", command: ["bun", "node_modules/typescript/bin/tsc", "-p", "commons/tools/tsconfig.json"], code: "E-TYPES" },
   ],
-  capabilities: { release: true, newLibrary: true, status: true, prove: true },
+  capabilities: { release: true, newLibrary: true, status: true, prove: true, query: true },
   libraries: {
     folder: "commons",
     specKit: { format: ["bun", "commons/tools/mizan-check.ts", "--root", "{kit}"], rules: ["bun", "commons/libraries/src/check.ts", "--root", "{kit}", "--level", "{level}"] },

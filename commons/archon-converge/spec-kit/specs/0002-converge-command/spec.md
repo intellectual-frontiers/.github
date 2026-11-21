@@ -14,6 +14,7 @@
 - **FR-003**: `apply` MUST carry out exactly the plan of the hash it is given and refuse another (`the plan changed`) with nothing changed, refuse a plan that removes something unless `--allow-removal yes` is given, check that the tool on the machine is the version the dialect pins, put the render on the machine and run the steps with the executor of Headless.
 - **FR-004**: After an apply the plan MUST be made again and, where it is not empty, the command MUST end with 1 and say so.
 - **FR-005**: Every change of a machine MUST be by the steps of the plan that the hash covers; a change made by hand MUST be found again by the next plan, with the one change.
+- **FR-006**: The subject MAY say the family of the machine and a dialect of its own (the family and the version of the tool of this machine, which the fleet gives from the platform it declares or reads, commons linux-observe 0004-linux-observe-platform): where it does, the observation MUST read each package by the program of the family and the render, the steps and the check of the version of the tool MUST be those of that dialect, so that one command converges machines of different families, each by what it is.
 
 ## Acceptance scenarios
 

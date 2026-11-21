@@ -56,6 +56,7 @@ export function asStore<C extends OpCapability>(ns: Namespace, id: string, capab
   if (ns.mounts.length === 0) return err("a namespace with no mount has no store");
   for (const c of capabilities) {
     if (c === "search") return err("a search is not made across mounts: ask the store of one");
+    if (c === "merge") return err("a merge is not made across mounts: ask the store of one");
     const lacking = ns.mounts.find((m) => !m.store.capabilities.has(c));
     if (lacking !== undefined) return err(`${lacking.prefix === "" ? "the root mount" : lacking.prefix} does not have ${c}`);
   }
@@ -151,6 +152,8 @@ export function asStore<C extends OpCapability>(ns: Namespace, id: string, capab
       }
       case "search":
         return err(refused("capability-absent", "a search is not made across mounts"));
+      case "merge":
+        return err(refused("capability-absent", "a merge is not made across mounts"));
       case "read":
       case "write":
       case "stat":

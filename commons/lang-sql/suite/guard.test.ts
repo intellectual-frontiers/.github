@@ -141,3 +141,13 @@ proves(["0012-sql-guard FR-004"], "a PRAGMA that lists a table is a read where P
   assert(allowed("PRAGMA main.index_list('users')", sqlite, { allowPragma: true }));
   assertEquals(why("PRAGMA journal_mode(wal)", sqlite, { allowPragma: true }), "a PRAGMA that sets is not a read (line 1, column 1)");
 });
+
+proves(["0012-sql-guard FR-005"], "a common table expression's own name is not a table of the allow-list, while the tables its body reads are still checked, and a name does not shadow a table inside its own definition", () => {
+  const o = { tables: ["asset"] };
+  assert(allowed("WITH t AS (SELECT id FROM asset) SELECT id FROM t", postgres, o));
+  assert(allowed("WITH a AS (SELECT id FROM asset), b AS (SELECT id FROM a) SELECT id FROM b", postgres, o));
+  assert(allowed("WITH RECURSIVE r AS (SELECT 1 AS n UNION ALL SELECT n + 1 FROM r WHERE n < 3) SELECT n FROM r", postgres, { tables: [] }));
+  assertEquals(why("WITH t AS (SELECT id FROM secrets) SELECT id FROM t", postgres, o), "the table secrets is not in the language read-only (line 1, column 27)");
+  assert(why("WITH asset AS (SELECT id FROM users) SELECT id FROM asset", postgres, o) !== undefined, "a name does not hide the table its own body reads");
+  assert(why("SELECT id FROM t", postgres, o) !== undefined, "outside the WITH it is a table");
+});

@@ -12,19 +12,19 @@
  * @module
  */
 import { err, type Result } from "@intellectual-frontiers/core";
-import type { Observed } from "@intellectual-frontiers/linux-observe/governance";
+import type { Family, Observed } from "@intellectual-frontiers/linux-observe/governance";
 import type { JsonValue, Requirement, RequirementId } from "@intellectual-frontiers/archon/governance";
 import { textOf, type Executor } from "@intellectual-frontiers/headless/logical";
-import { platformOfOsRelease, groupShape, keyFileOf, keyShape, packageShape, pathShape, parseStat, serviceShape, settingShape, userShape } from "@intellectual-frontiers/linux-observe/logical";
+import { platformOfOsRelease, groupShape, keyFileOf, keyShape, pacmanPackageShape, packageShape, pathShape, parseStat, rpmPackageShape, serviceShape, settingFileOf, settingShape, userShape } from "@intellectual-frontiers/linux-observe/logical";
 
 /** The programs that observation runs, and no others: every one of them only reads. */
-export const READERS = ["getent", "id", "stat", "cat", "systemctl", "dpkg-query", "readlink", "uname"] as const;
+export const READERS = ["getent", "id", "stat", "cat", "systemctl", "dpkg-query", "rpm", "pacman", "readlink", "uname"] as const;
 
 type Obj = { readonly [key: string]: JsonValue };
 const isObj = (v: JsonValue): v is Obj => typeof v === "object" && v !== null && !Array.isArray(v);
 
 /** What is on the machine, in the shape of each requirement's desired state, read with no change: a resource that is not there has no entry. */
-export async function observeRequirements(executor: Executor, requirements: readonly Requirement[], elevate: readonly string[] = []): Promise<ReadonlyMap<RequirementId, JsonValue>> {
+export async function observeRequirements(executor: Executor, requirements: readonly Requirement[], elevate: readonly string[] = [], family: Family = "debian"): Promise<ReadonlyMap<RequirementId, JsonValue>> {
   const out = new Map<RequirementId, JsonValue>();
   const run = async (argv: readonly string[]): Promise<string | undefined> => {
     const r = await executor.exec([...elevate, ...argv]);
@@ -59,11 +59,14 @@ export async function observeRequirements(executor: Executor, requirements: read
         seen = keyShape(d, await run(["cat", keyFileOf(d)]));
         break;
       case "package":
-        seen = packageShape(d, await run(["dpkg-query", "-W", "-f", "${db:Status-Abbrev}|${Version}", s("name")]));
+        if (family === "debian") seen = packageShape(d, await run(["dpkg-query", "-W", "-f", "${db:Status-Abbrev}|${Version}", s("name")]));
+        else if (family === "arch") seen = pacmanPackageShape(d, await run(["pacman", "-Q", s("name")]));
+        else seen = rpmPackageShape(d, await run(["rpm", "-q", "--qf", "%{VERSION}-%{RELEASE}", s("name")]));
         break;
       case "system-setting": {
         const name = s("name");
-        seen = settingShape(name, await run(name === "timezone" ? ["readlink", "/etc/localtime"] : ["cat", name === "keyboard" ? "/etc/default/keyboard" : "/etc/default/locale"]));
+        const file = settingFileOf(family, name);
+        if (file !== undefined) seen = settingShape(name, await run(name === "timezone" ? ["readlink", file] : ["cat", file]));
         break;
       }
     }

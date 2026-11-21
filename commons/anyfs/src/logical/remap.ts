@@ -51,6 +51,8 @@ export function mapOp(map: PathMap, op: Op): Result<Op, Problem> {
       }
       return ok({ op: "batch", changes });
     }
+    case "merge":
+      return ok(op);
     case "list":
     case "search": {
       const p = map.prefix(op.prefix);
@@ -108,6 +110,7 @@ export function mapDone(map: PathMap, done: Done): Result<Done, Problem> {
     case "history":
     case "rangeRead":
     case "append":
+    case "merge":
       return ok(done);
     default:
       return never(done);

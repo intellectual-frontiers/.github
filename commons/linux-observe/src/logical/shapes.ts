@@ -77,6 +77,21 @@ export function packageShape(d: Obj, dpkg: string | undefined): JsonValue | unde
   return d["version"] === undefined ? { name: str(d, "name") ?? "" } : { name: str(d, "name") ?? "", version };
 }
 
+/** A package of an rpm family from `rpm -q --qf '%{VERSION}-%{RELEASE}'`: the version it prints where it is installed (the command fails, and there is nothing to read, where it is not), with the version of the requirement where it names one. */
+export function rpmPackageShape(d: Obj, rpm: string | undefined): JsonValue | undefined {
+  if (rpm === undefined || rpm.trim() === "") return undefined;
+  const version = rpm.trim();
+  return d["version"] === undefined ? { name: str(d, "name") ?? "" } : { name: str(d, "name") ?? "", version };
+}
+
+/** A package of Arch from `pacman -Q name`, which prints `name version` where it is installed. */
+export function pacmanPackageShape(d: Obj, pacman: string | undefined): JsonValue | undefined {
+  if (pacman === undefined) return undefined;
+  const [name = "", version = ""] = pacman.trim().split(/\s+/);
+  if (name === "") return undefined;
+  return d["version"] === undefined ? { name: str(d, "name") ?? "" } : { name: str(d, "name") ?? "", version };
+}
+
 /** A setting of the system from the file that holds it: the time zone is where `/etc/localtime` points (after `zoneinfo/`), the keyboard layout is `XKBLAYOUT` of `/etc/default/keyboard` and the locale is `LANG` of `/etc/default/locale`. */
 export function settingShape(name: string, text: string | undefined): JsonValue | undefined {
   if (text === undefined) return undefined;
@@ -90,4 +105,11 @@ export function settingShape(name: string, text: string | undefined): JsonValue 
 export function keyFileOf(d: Obj): string {
   const user = str(d, "user") ?? "";
   return str(d, "path") ?? `${user === "root" ? "/root" : `/home/${user}`}/.ssh/authorized_keys`;
+}
+
+/** The file a setting is read from on a family: the time zone is the link `/etc/localtime` everywhere; the locale is `LANG` of `/etc/default/locale` on Debian and `/etc/locale.conf` elsewhere; the keyboard layout is `XKBLAYOUT` of `/etc/default/keyboard` on Debian only (the other families keep a console keymap of another name, which is not the same fact). */
+export function settingFileOf(family: string, name: string): string | undefined {
+  if (name === "timezone") return "/etc/localtime";
+  if (name === "locale") return family === "debian" ? "/etc/default/locale" : "/etc/locale.conf";
+  return name === "keyboard" && family === "debian" ? "/etc/default/keyboard" : undefined;
 }

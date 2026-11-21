@@ -24,11 +24,10 @@ export const DENIED_FUNCTIONS: readonly string[] = [
   "set_config", "nextval", "setval", "load_extension", "readfile", "writefile", "load_file", "sleep", "benchmark", "xp_cmdshell", "sys_exec",
 ];
 
-/** What a guard may be given. */
 /** The PRAGMAs that take a name and only list (`table_info(t)`): the same form with a value sets, so any other call is refused. */
 const LISTING_PRAGMA = /^\s*(?:\w+\.)?(?:table_info|table_xinfo|table_list|index_list|index_info|index_xinfo|foreign_key_list|foreign_key_check|integrity_check|quick_check)\s*\(/i;
 
-/** What the guard is told: which statements and pragmas it allows, and which dialect's words it reads them in. */
+/** What a guard may be given. */
 export interface GuardOptions {
   /** Allow a `PRAGMA` that reads. */
   readonly allowPragma?: boolean;
