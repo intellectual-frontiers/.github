@@ -8,11 +8,24 @@
  */
 import { ANSI_LEXICAL, ansi } from "../../ansi.ts";
 import { declareDialect } from "../../dialect.ts";
+import { Prec } from "../../grammar.ts";
 
 /** SQLite. */
 export const dialect = declareDialect({
   name: "sqlite",
   extends: ansi,
+  grammar: (g) => ({
+    ...g,
+    operators: [
+      ...g.operators,
+      { text: "->", prec: Prec.Other },
+      { text: "->>", prec: Prec.Other },
+      { text: "<<", prec: Prec.Other },
+      { text: ">>", prec: Prec.Other },
+      { text: "==", prec: Prec.Compare },
+    ],
+    likeWords: ["GLOB", "REGEXP", "MATCH"],
+  }),
   lexical: (base) => ({
     ...base,
     comments: [

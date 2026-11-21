@@ -1,27 +1,44 @@
 /**
- * The SQL language core (commons data 0065-sql-lang): a small, fast, portable front end for SQL in many dialects, of which this is the lexical layer: `lex` turns text into tokens and comments with exact
- * positions, a dialect says how it is written (`defineDialect`, `compileLexical`), and the comments a person wrote are kept, with their place, for the features that read them. The folder imports only
- * `@intellectual-frontiers/core`, so that it can be published alone as `@intellectual-frontiers/sql-lang`; the dialects are the other exports (`./sql/lang/dialects/<name>`), and the core names none.
+ * The SQL language core (commons data 0065-sql-lang, 0066-sql-ast-parser): a small, fast, portable front end for SQL in many dialects. `lex` turns text into tokens and comments with exact positions; `parse` reads
+ * the tokens into a syntax tree, a closed union whose child fields are typed by sort, and attaches each comment to its node; a dialect says how it is written (`defineDialect`) and how its grammar differs; and the
+ * walks (`children`, `walk`, `findAll`, `fold`) and `toSexp` read a tree. The folder imports only `@intellectual-frontiers/core`, so that it can be published alone as `@intellectual-frontiers/sql-lang`; the
+ * dialects are the other exports (`./sql/lang/dialects/<name>`), and the core names none.
  *
  * @remarks
- * Not here yet, and specified after this layer: the parser and the syntax tree, the attachment of comments to nodes, the walkers and queries over the tree, the projection to `unist`, the extraction of
- * documentation from comments, and SQL over data that is not a database.
+ * Not here yet, and specified after these layers: rewriting a tree, queries over trees, the projection to `unist`, the extraction of documentation from comments, the dialects beyond the three, and SQL over
+ * data that is not a database.
  *
  * @limits
- * It lexes; it does not parse, does not judge where a word is a keyword, and does not write SQL.
+ * The common ground of SQL and what a dialect's grammar names; it does not write SQL, and does not look names up.
  *
  * @example
  * ```ts
- * import { allComments, ansi, lex } from "@intellectual-frontiers/data/sql/lang";
- * const { text, tokens, comments } = lex("-- a note\nselect 1", ansi.compiled);
- * allComments(comments, text)[0]?.text; // " a note"
+ * import { commentsOf, parse } from "@intellectual-frontiers/data/sql/lang";
+ * const { script, comments, attachments } = parse("-- a note\nselect a from t");
+ * comments[0]?.text; // " a note"
+ * commentsOf(attachments, script.statements[0]!).leading.length; // 1
  * ```
  *
- * Spec: 0065-sql-lang FR-001, FR-004, FR-009, FR-014, FR-015, FR-016, FR-017
+ * Spec: 0065-sql-lang FR-001, FR-004, FR-009, FR-014, FR-015, FR-016, FR-017; 0066-sql-ast-parser FR-008, FR-016
  *
  * @module
  */
 export { ANSI_LEXICAL, ansi } from "./ansi.ts";
+export type * from "./ast.ts";
+export {
+  type Attachment,
+  attachComments,
+  type CommentTable,
+  commentsOf,
+  NO_COMMENTS,
+  type NodeComments,
+  type Placement,
+} from "./attach.ts";
+export { type SexpOptions, toSexp } from "./dump.ts";
+export { describeParseError, type ParseError, spanOf } from "./errors.ts";
+export { ANSI_GRAMMAR, type CustomOperator, type Grammar, Prec, RESERVED_WORDS } from "./grammar.ts";
+export { type ParseOptions, type Parsed, parse, parseStrict } from "./parser.ts";
+export { children, findAll, fold, type Visitor, walk } from "./walk.ts";
 export { type Comment, CommentFlag, type Comments, type CommentStyle, allComments, commentAt, commentCount } from "./comment.ts";
 export {
   declareDialect,

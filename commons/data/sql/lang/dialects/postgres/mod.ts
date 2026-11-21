@@ -9,11 +9,52 @@
  */
 import { ansi } from "../../ansi.ts";
 import { declareDialect } from "../../dialect.ts";
+import { Prec } from "../../grammar.ts";
 
 /** PostgreSQL. */
 export const dialect = declareDialect({
   name: "postgres",
   extends: ansi,
+  grammar: (g) => ({
+    ...g,
+    castOperator: "::",
+    likeWords: ["ILIKE"],
+    operators: [
+      ...g.operators,
+      ...[
+        "->",
+        "->>",
+        "#>",
+        "#>>",
+        "@>",
+        "<@",
+        "?|",
+        "?&",
+        "&&",
+        "~",
+        "~*",
+        "!~",
+        "!~*",
+        "~~",
+        "~~*",
+        "!~~",
+        "!~~*",
+        "@@",
+        "<->",
+        "<<",
+        ">>",
+        "#-",
+        "@?",
+        "&",
+        "|",
+        "#",
+      ].map((text) => ({
+        text,
+        prec: Prec.Other,
+      })),
+      { text: "^", prec: Prec.Exponent },
+    ],
+  }),
   lexical: (base) => ({
     ...base,
     prefixes: [{ prefix: "E", escape: "both" }, { prefix: "B" }, { prefix: "X" }, { prefix: "N" }, { prefix: "U&" }],

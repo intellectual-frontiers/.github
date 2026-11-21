@@ -64,3 +64,4 @@ number	slug	state
 0063	operating-model	in force
 0064	recovery-proof-identity	in force
 0065	sql-lang	in force
+0066	sql-ast-parser	in force

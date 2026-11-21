@@ -8,11 +8,29 @@
  */
 import { ansi } from "../../ansi.ts";
 import { declareDialect } from "../../dialect.ts";
+import { Prec } from "../../grammar.ts";
 
 /** DuckDB. */
 export const dialect = declareDialect({
   name: "duckdb",
   extends: ansi,
+  grammar: (g) => ({
+    ...g,
+    castOperator: "::",
+    likeWords: ["ILIKE", "GLOB"],
+    operators: [
+      ...g.operators,
+      ...["->", "->>", "<<", ">>", "&&", "@>", "<@", "~", "~*", "!~", "!~*", "~~", "~~*", "!~~", "!~~*", "^@", "<->", "&", "|"].map(
+        (text) => ({
+          text,
+          prec: Prec.Other,
+        }),
+      ),
+      { text: "//", prec: Prec.Multiplicative },
+      { text: "**", prec: Prec.Exponent },
+      { text: "^", prec: Prec.Exponent },
+    ],
+  }),
   lexical: (base) => ({
     ...base,
     prefixes: [{ prefix: "E", escape: "both" }, { prefix: "B" }, { prefix: "X" }],

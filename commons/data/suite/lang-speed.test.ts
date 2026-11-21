@@ -2,7 +2,7 @@
  * The lexer's speed (commons data 0065-sql-lang FR-018): it reads text in one pass with no regular expression and no object for a token, and it is fast enough that a floor far below what it does would catch a
  * change that made it slow. The number that matters is printed by `bun tools/bench-lang.ts`; a test keeps only a floor, because timings in a shared runner are noisy.
  *
- * Spec: 0065-sql-lang FR-018
+ * Spec: 0065-sql-lang FR-018; 0066-sql-ast-parser FR-018
  *
  * @module
  */
@@ -10,7 +10,7 @@ import { readFileSync } from "node:fs";
 import { performance } from "node:perf_hooks";
 import { fileURLToPath } from "node:url";
 import { assert, proves } from "@intellectual-frontiers/test";
-import { lex } from "@intellectual-frontiers/data/sql/lang";
+import { ansi, lex, parse } from "@intellectual-frontiers/data/sql/lang";
 import { dialect as postgres } from "@intellectual-frontiers/data/sql/lang/dialects/postgres";
 import { CORPUS } from "./lang-fixture.ts";
 
@@ -39,5 +39,28 @@ proves(
     }
     const mbps = text.length / 1e6 / (best / 1000);
     assert(mbps >= 10, `${mbps.toFixed(1)} MB/s is below the floor`);
+  },
+);
+
+proves(
+  ["0066-sql-ast-parser FR-018"],
+  "the parser reads tokens by index with no regular expression, and parses the corpus, comments attached, at a floor of three megabytes of text a second",
+  () => {
+    const source = readFileSync(fileURLToPath(new URL("../sql/lang/parser.ts", import.meta.url)), "utf8");
+    const code = source
+      .split("\n")
+      .filter((l) => !/^\s*(\/\/|\*|\/\*)/.test(l))
+      .join("\n");
+    assert(!/new RegExp|\.match\(|\.matchAll\(|\.replace\(|\.exec\(|\.test\(/.test(code), "a regular expression call");
+    const text = CORPUS.repeat(Math.ceil(1_000_000 / CORPUS.length));
+    assert(parse(text, ansi).errors.length === 0);
+    let best = Number.POSITIVE_INFINITY;
+    for (let i = 0; i < 3; i++) {
+      const t0 = performance.now();
+      parse(text, ansi);
+      best = Math.min(best, performance.now() - t0);
+    }
+    const mbps = text.length / 1e6 / (best / 1000);
+    assert(mbps >= 3, `${mbps.toFixed(1)} MB/s is below the floor`);
   },
 );

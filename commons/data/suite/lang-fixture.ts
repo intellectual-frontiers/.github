@@ -6,8 +6,22 @@
  * @module
  */
 import { readFileSync } from "node:fs";
+import { absurd } from "@intellectual-frontiers/core";
 import { fileURLToPath } from "node:url";
-import { ansi, type Dialect, kindAt, type Lexed, lex, Tok, tokenCount, textAt } from "@intellectual-frontiers/data/sql/lang";
+import {
+  ansi,
+  type Dialect,
+  type Expr,
+  kindAt,
+  type Lexed,
+  lex,
+  type Parsed,
+  parse,
+  Tok,
+  textAt,
+  toSexp,
+  tokenCount,
+} from "@intellectual-frontiers/data/sql/lang";
 import { dialect as duckdb } from "@intellectual-frontiers/data/sql/lang/dialects/duckdb";
 import { dialect as postgres } from "@intellectual-frontiers/data/sql/lang/dialects/postgres";
 import { dialect as sqlite } from "@intellectual-frontiers/data/sql/lang/dialects/sqlite";
@@ -56,4 +70,84 @@ export function textsOf(d: Dialect, text: string): readonly string[] {
   const out: string[] = [];
   for (let i = 0; i < tokenCount(l.tokens) - 1; i++) out.push(textAt(l.tokens, text, i));
   return out;
+}
+
+/** The folder of the golden files, and what each dialect's folder is called. */
+export const GOLDEN = fileURLToPath(new URL("./golden/lang/", import.meta.url));
+
+/** The dialect of a folder of golden files. */
+export const GOLDEN_DIALECTS: Readonly<Record<string, Dialect>> = { ansi, sqlite, postgres, duckdb };
+
+/** Every comment's place, one to a line: placement, the node's kind and range, and the text. */
+export function describeAttachments(p: Parsed): string {
+  return p.attachments.all
+    .map((a) => `${a.placement} ${a.node.kind}@${a.node.start}-${a.node.end} ${JSON.stringify(a.comment.text)}`)
+    .join("\n");
+}
+
+/** What a golden file of SQL must say: the tree of its text, and the places of its comments where it has any. */
+export function goldenOf(d: Dialect, sql: string): { readonly sexp: string; readonly comments: string | undefined } {
+  const p = parse(sql, d);
+  const errors = p.errors.map((e) => `error ${JSON.stringify(e)}`).join("\n");
+  return {
+    sexp: `${toSexp(p.script)}${errors === "" ? "" : `\n${errors}`}\n`,
+    comments: p.comments.length === 0 ? undefined : `${describeAttachments(p)}\n`,
+  };
+}
+
+/** An expression with every operator parenthesized, so that its grouping can be read. */
+export function show(e: Expr): string {
+  switch (e.kind) {
+    case "name":
+      return e.parts.map((p) => p.name).join(".");
+    case "number":
+      return e.text;
+    case "string":
+      return JSON.stringify(e.value);
+    case "boolean":
+      return e.value ? "TRUE" : "FALSE";
+    case "null":
+      return "NULL";
+    case "param":
+      return e.text;
+    case "star":
+      return "*";
+    case "unary":
+      return `(${e.op} ${show(e.arg)})`;
+    case "binary":
+    case "operator":
+      return `(${show(e.left)} ${e.op} ${show(e.right)})`;
+    case "is":
+      return `(${show(e.arg)} IS ${e.negated ? "NOT " : ""}${e.test}${e.other === undefined ? "" : ` ${show(e.other)}`})`;
+    case "between":
+      return `(${show(e.arg)} ${e.negated ? "NOT " : ""}BETWEEN ${show(e.low)} AND ${show(e.high)})`;
+    case "in":
+      return `(${show(e.arg)} ${e.negated ? "NOT " : ""}IN [${e.values.map(show).join(", ")}])`;
+    case "like":
+      return `(${show(e.arg)} ${e.negated ? "NOT " : ""}${e.op} ${show(e.pattern)})`;
+    case "cast":
+      return `(${show(e.arg)} :: ${e.type.name})`;
+    case "call":
+      return `${e.name.parts.map((p) => p.name).join(".")}(${e.args.map((a) => (a.kind === "named-arg" ? `${a.name.name} => ${show(a.value)}` : show(a))).join(", ")})`;
+    case "tuple":
+      return `<${e.items.map(show).join(", ")}>`;
+    case "case":
+    case "exists":
+    case "extract":
+    case "in-query":
+    case "interval":
+    case "scalar-query":
+      return `{${e.kind}}`;
+    default:
+      return absurd(e);
+  }
+}
+
+/** The expression of a script's first select item. */
+export function firstItem(p: Parsed): Expr {
+  const s = p.script.statements[0];
+  if (s === undefined || s.kind !== "select") throw new Error("not a select");
+  const item = s.items[0];
+  if (item === undefined) throw new Error("no item");
+  return item.expr;
 }
