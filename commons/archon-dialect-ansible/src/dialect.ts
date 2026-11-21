@@ -135,7 +135,7 @@ function taskOf(r: Requirement, index: number, problems: string[]): Obj | readon
       const enabled = o["enabled"];
       if (typeof running !== "boolean" || typeof enabled !== "boolean") problems.push(`${id}: desired.running and desired.enabled are true or false`);
       if (name === undefined || typeof running !== "boolean" || typeof enabled !== "boolean") return undefined;
-      return base("ansible.builtin.systemd_service", { name, state: running ? "started" : "stopped", enabled });
+      return base("ansible.builtin.systemd_service", { name, state: running ? "started" : "stopped", enabled, daemon_reload: true });
     }
     case "ssh-authorized-key": {
       const user = str(o, "user", problems, id, true, NAME);
