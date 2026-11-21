@@ -1,0 +1,40 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-anyfs-cli-layers FR-001	check	.github: cd commons/anyfs-cli && bun run verify	suite/layers.test.ts
+0001-anyfs-cli-layers FR-002	check	.github: cd commons/anyfs-cli && bun run verify	suite/layers.test.ts
+0001-anyfs-cli-layers FR-003	check	.github: cd commons/anyfs-cli && bun run verify	suite/layers.test.ts
+0002-anyfs-cli-governance FR-001	check	.github: cd commons/anyfs-cli && bun run verify	suite/governance.test.ts
+0002-anyfs-cli-governance FR-002	check	.github: cd commons/anyfs-cli && bun run verify	suite/governance.test.ts
+0002-anyfs-cli-governance FR-003	check	.github: cd commons/anyfs-cli && bun run verify	suite/governance.test.ts
+0002-anyfs-cli-governance FR-004	check	.github: cd commons/anyfs-cli && bun run verify	suite/governance.test.ts
+0002-anyfs-cli-governance FR-005	check	.github: cd commons/anyfs-cli && bun run verify	suite/governance.test.ts
+0002-anyfs-cli-governance FR-006	check	.github: cd commons/anyfs-cli && bun run verify	suite/governance.test.ts
+0003-anyfs-cli-logical FR-001	check	.github: cd commons/anyfs-cli && bun run verify	suite/logical.test.ts
+0003-anyfs-cli-logical FR-002	check	.github: cd commons/anyfs-cli && bun run verify	suite/logical.test.ts
+0003-anyfs-cli-logical FR-003	check	.github: cd commons/anyfs-cli && bun run verify	suite/logical.test.ts
+0003-anyfs-cli-logical FR-004	check	.github: cd commons/anyfs-cli && bun run verify	suite/logical.test.ts
+0003-anyfs-cli-logical FR-005	check	.github: cd commons/anyfs-cli && bun run verify	suite/logical.test.ts
+0003-anyfs-cli-logical FR-006	check	.github: cd commons/anyfs-cli && bun run verify	suite/logical.test.ts
+0003-anyfs-cli-logical FR-007	check	.github: cd commons/anyfs-cli && bun run verify	suite/logical.test.ts
+0003-anyfs-cli-logical FR-008	check	.github: cd commons/anyfs-cli && bun run verify	suite/logical.test.ts
+0003-anyfs-cli-logical FR-009	check	.github: cd commons/anyfs-cli && bun run verify	suite/logical.test.ts
+0003-anyfs-cli-logical FR-010	check	.github: cd commons/anyfs-cli && bun run verify	suite/logical.test.ts
+0003-anyfs-cli-logical FR-011	check	.github: cd commons/anyfs-cli && bun run verify	suite/logical.test.ts
+0003-anyfs-cli-logical FR-012	check	.github: cd commons/anyfs-cli && bun run verify	suite/logical.test.ts
+0004-anyfs-cli-surfaces FR-001	check	.github: cd commons/anyfs-cli && bun run verify	suite/program.test.ts
+0004-anyfs-cli-surfaces FR-002	check	.github: cd commons/anyfs-cli && bun run verify	suite/program.test.ts
+0004-anyfs-cli-surfaces FR-003	check	.github: cd commons/anyfs-cli && bun run verify	suite/program.test.ts
+0004-anyfs-cli-surfaces FR-004	check	.github: cd commons/anyfs-cli && bun run verify	suite/program.test.ts
+0004-anyfs-cli-surfaces FR-005	check	.github: cd commons/anyfs-cli && bun run verify	suite/read.test.ts
+0004-anyfs-cli-surfaces FR-006	check	.github: cd commons/anyfs-cli && bun run verify	suite/program.test.ts
+0004-anyfs-cli-surfaces FR-007	check	.github: cd commons/anyfs-cli && bun run verify	suite/read.test.ts
+0004-anyfs-cli-surfaces FR-008	check	.github: cd commons/anyfs-cli && bun run verify	suite/read.test.ts
+0004-anyfs-cli-surfaces FR-009	check	.github: cd commons/anyfs-cli && bun run verify	suite/program.test.ts
+0004-anyfs-cli-surfaces FR-010	check	.github: cd commons/anyfs-cli && bun run verify	suite/write.test.ts
+0004-anyfs-cli-surfaces FR-011	check	.github: cd commons/anyfs-cli && bun run verify	suite/write.test.ts
+0004-anyfs-cli-surfaces FR-012	check	.github: cd commons/anyfs-cli && bun run verify	suite/bridge.test.ts
+0004-anyfs-cli-surfaces FR-013	check	.github: cd commons/anyfs-cli && bun run verify	suite/bridge.test.ts
+0004-anyfs-cli-surfaces FR-014	check	.github: cd commons/anyfs-cli && bun run verify	suite/program.test.ts
+0004-anyfs-cli-surfaces FR-015	check	.github: cd commons/anyfs-cli && bun run verify	suite/program.test.ts
+0004-anyfs-cli-surfaces FR-016	check	.github: cd commons/anyfs-cli && bun run verify	suite/program.test.ts

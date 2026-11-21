@@ -195,3 +195,15 @@ proves(["0002-anyfs-ssh-helper FR-010"], "the helper is kept on a host under a n
     assertEquals(viaDefault.stdout, path.join(host.home, ".local/state/anyfs", `helper-${POSIX_HELPER_SHA256}.sh`));
   }),
 );
+
+proves(["0002-anyfs-ssh-helper FR-006"], "a store at the root of the host's file system reads what is below it and keeps its locks in the account's own folder", async () => {
+  await fs.withTempDir(async (home) => {
+    const run = (command: string, ...args: readonly string[]) => proc.run(["/bin/sh", "-c", POSIX_HELPER, "anyfs-helper", command, "/", ...args], { env: { PATH: "/usr/bin:/bin", HOME: home, LC_ALL: "C" }, clearEnv: true, stdin: "null" });
+    await fs.writeTextFile(path.join(home, "kept.txt"), "kept\n");
+    const stat = await run("stat", `${home.slice(1)}/kept.txt`);
+    assertEquals(stat.code, 0, stat.stderr);
+    const outside = await run("stat", `${home.slice(1)}/../kept.txt`);
+    assertEquals(outside.code, 12);
+    assertEquals(await fs.exists("/.anyfs-locks"), false);
+  });
+});

@@ -1,0 +1,4 @@
+number	slug	state
+0001	anyfs-s3-layers	in force
+0002	anyfs-s3-store	in force
+0003	anyfs-s3-tests	in force

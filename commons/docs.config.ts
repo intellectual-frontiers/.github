@@ -14,6 +14,7 @@ import { releasesLens } from "./docs/src/lens/releases.ts";
 import { programLens } from "./docs/src/lens/program.ts";
 import { ergonexProgram, type ProgramHost } from "./ergonex/src/mod.ts";
 import { describe } from "./headless/src/describe/mod.ts";
+import { anyfsProgram, INERT_HOST as ANYFS_INERT_HOST } from "./anyfs-cli/src/mod.ts";
 import { INERT_HOST as REPOCTL_INERT_HOST, repoctlProgram } from "./repoctl/src/mod.ts";
 import { SUBJECTS } from "./data/governance/api.ts";
 import { allModules } from "./data/sql/cli/config.ts";
@@ -43,8 +44,8 @@ const dataModels = layeredLens({
 /** A host that does nothing: the tree of a program is made from it without reading anything, and `describe` never runs a command. */
 const INERT_HOST: ProgramHost = { env: {}, cwd: "/", today: "2026-11-20", platform: { os: "linux", arch: "x86_64", windows: false }, places: undefined, homeFor: () => undefined, stdin: () => Promise.resolve(""), argv: [], now: () => 0 } as unknown as ProgramHost;
 
-/** The programs built on headless, documented by tier from their own descriptions: ergonex, the workspaces tool, and repoctl, the operations program of this repository. */
-const programs = programLens({ name: "programs", source: () => [...describe(ergonexProgram(INERT_HOST)), ...describe(repoctlProgram(REPOCTL_INERT_HOST))] });
+/** The programs built on headless, documented by tier from their own descriptions: ergonex, the workspaces tool, repoctl, the operations program of this repository, and anyfs, the command line of the stores. */
+const programs = programLens({ name: "programs", source: () => [...describe(ergonexProgram(INERT_HOST)), ...describe(repoctlProgram(REPOCTL_INERT_HOST)), ...describe(anyfsProgram(ANYFS_INERT_HOST))] });
 
 /** The libraries of commons: each folder with a manifest (`library.ts`), a `package.json` and an `about.ts`, in order of name. */
 const libraryNames: readonly string[] = readdirSync(new URL("./", import.meta.url), { withFileTypes: true })
@@ -217,8 +218,10 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/estate/spec-kit" },
     { layout: "commons", dir: "commons/anyfs/spec-kit" },
     { layout: "commons", dir: "commons/anyfs-posix/spec-kit" },
+    { layout: "commons", dir: "commons/anyfs-s3/spec-kit" },
     { layout: "commons", dir: "commons/anyfs-ssh/spec-kit" },
     { layout: "commons", dir: "commons/anyfs-bridge/spec-kit" },
+    { layout: "commons", dir: "commons/anyfs-cli/spec-kit" },
     { layout: "commons", dir: "commons/anyfs-git/spec-kit" },
     { layout: "commons", dir: "commons/anyfs-query/spec-kit" },
     { layout: "commons", dir: "commons/evidence-capture/spec-kit" },
