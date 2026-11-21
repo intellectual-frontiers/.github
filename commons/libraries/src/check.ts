@@ -38,6 +38,7 @@ import {
 import * as ifccmOntology from "@intellectual-frontiers/ontology/ifccm";
 import * as ifrOntology from "@intellectual-frontiers/ontology/ifr";
 import * as ifqsOntology from "@intellectual-frontiers/ontology/ifqs";
+import * as otoOntology from "@intellectual-frontiers/ontology/oto";
 import { pm } from "@intellectual-frontiers/ontology/supply-chain/packaging";
 import { type RulePlugin, rulePlugins } from "@intellectual-frontiers/mizan/rules";
 import { holdHarness } from "@intellectual-frontiers/mizan/harness";
@@ -73,7 +74,7 @@ export function termRecordsOf(audit: readonly (typeof terms)[number][]): readonl
 
 /** Mizan's own terms and the packaging ontology's as the rules read them. */
 export function mizanTermRecords(): readonly TermRecord[] {
-  return termRecordsOf([...terms, ...packagingTerms, ...ifccmOntology.terms, ...ifqsOntology.terms, ...ifrOntology.terms]);
+  return termRecordsOf([...terms, ...packagingTerms, ...ifccmOntology.terms, ...ifqsOntology.terms, ...otoOntology.terms, ...ifrOntology.terms]);
 }
 
 /** The prefixes of commons' own ontologies and their namespaces. */
@@ -82,6 +83,7 @@ const PREFIXES = {
   pm: "https://www.intellectualfrontiers.com/ontology/packaging#",
   ifccm: ifccmOntology.IFCCM.iri,
   ifqs: ifqsOntology.IFQS.iri,
+  oto: otoOntology.OTO.iri,
   ifr: ifrOntology.IFR.iri,
 } as const;
 
@@ -94,7 +96,7 @@ function curieOf(iri: string): string {
 /** The deprecated terms of commons' own ontologies, by CURIE, with what replaces each (0018-standards-first): a specification that names one is found. */
 export function deprecatedTerms(): ReadonlyMap<string, string> {
   return new Map(
-    [...terms, ...packagingTerms, ...ifccmOntology.terms, ...ifqsOntology.terms, ...ifrOntology.terms].flatMap((t) =>
+    [...terms, ...packagingTerms, ...ifccmOntology.terms, ...ifqsOntology.terms, ...otoOntology.terms, ...ifrOntology.terms].flatMap((t) =>
       t.values.deprecatedOn === undefined ? [] : [[curieOf(t.values.termIri), curieOf(t.values.replacedBy ?? "")] as const],
     ),
   );
@@ -153,6 +155,11 @@ export function main(
               recorded: ifqsOntology.terms.map((t) => t.values.termIri),
             },
             {
+              file: "commons/ontology/src/oto/oto.ts",
+              ontology: otoOntology.classes.map((c) => c.iri),
+              recorded: otoOntology.terms.map((t) => t.values.termIri),
+            },
+            {
               file: "commons/ontology/src/ifr/ifr.ts",
               ontology: ifrOntology.classes.map((c) => c.iri),
               recorded: ifrOntology.terms.map((t) => t.values.termIri),
@@ -172,6 +179,18 @@ export function main(
                 ...Object.keys(audienceModels),
               ]),
               pm: new Set(Object.keys(pm)),
+              oto: new Set([
+                ...Object.keys(otoOntology.oto),
+                ...[
+                  otoOntology.domains,
+                  otoOntology.invariants,
+                  otoOntology.pillars,
+                  otoOntology.principles,
+                  otoOntology.maturityLevels,
+                  otoOntology.dimensions,
+                  otoOntology.alignmentStates,
+                ].flatMap((l) => Object.keys(l)),
+              ]),
               ifr: ifrOntology.termNames,
               ifccm: new Set([
                 ...Object.keys(ifccmOntology.ifccm),

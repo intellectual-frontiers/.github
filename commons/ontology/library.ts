@@ -20,6 +20,8 @@ export const library = {
     "./ifccm/ifccm",
     "./ifqs",
     "./ifqs/ifqs",
+    "./oto",
+    "./oto/oto",
     "./ifr",
     "./ifr/audit",
     "./ifr/ifr",

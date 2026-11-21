@@ -15,6 +15,8 @@
     "./ifccm/ifccm": "./src/ifccm/ifccm.ts",
     "./ifqs": "./src/ifqs/mod.ts",
     "./ifqs/ifqs": "./src/ifqs/ifqs.ts",
+    "./oto": "./src/oto/mod.ts",
+    "./oto/oto": "./src/oto/oto.ts",
     "./ifr": "./src/ifr/mod.ts",
     "./ifr/audit": "./src/ifr/audit.ts",
     "./ifr/ifr": "./src/ifr/ifr.ts",
