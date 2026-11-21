@@ -27,7 +27,7 @@ export async function sha256File(file: string): Promise<string> {
 }
 
 /** The files the server holds: the boot files by name, and the installer image. */
-export type Assets = { readonly files: Readonly<Record<string, string>>; readonly iso: string };
+export type Assets = { readonly files: Readonly<Record<string, string>>; readonly iso?: string };
 
 /** Gets the bytes at an address. */
 export type Fetch = (url: string) => Promise<Response>;
@@ -58,6 +58,7 @@ export async function ensureAssets(dir: string, pins: BootPins, fetcher: Fetch =
     if (r.kind === "err") return r;
     files[name] = r.value;
   }
+  if (pins.iso === undefined) return ok({ files });
   const iso = await ensure(dir, pins.iso.name, pins.iso.url, pins.iso.sha256, fetcher, say);
   return iso.kind === "err" ? iso : ok({ files, iso: iso.value });
 }
@@ -66,7 +67,7 @@ export async function ensureAssets(dir: string, pins: BootPins, fetcher: Fetch =
 export async function assetStatus(dir: string, pins: BootPins): Promise<{ readonly ready: readonly string[]; readonly missing: readonly string[] }> {
   const ready: string[] = [];
   const missing: string[] = [];
-  const want: Array<[string, string]> = [...Object.entries(pins.files), [pins.iso.name, pins.iso.sha256]];
+  const want: Array<[string, string]> = [...Object.entries(pins.files), ...(pins.iso === undefined ? [] : ([[pins.iso.name, pins.iso.sha256]] as Array<[string, string]>))];
   for (const [name, sha] of want) {
     const file = path.join(dir, name);
     ((await fs.exists(file)) && (await sha256File(file)) === sha ? ready : missing).push(name);

@@ -133,3 +133,13 @@ proves(["0002-boot-command FR-005"], "serve does not start where a boot file is 
     assertEquals(t.code, 3);
   });
 });
+
+proves(["0002-boot-command FR-006"], "status and serve take the profile of the distribution: an unknown one is refused with the ones there are, and the Debian profile asks for its own files", async () => {
+  await fs.withTempDir(async (dir) => {
+    const bad = await run(config(dir), ["boot", "status", "--state", path.join(dir, "state.json"), "--assets", dir, "--profile", "plan9"]);
+    assertEquals(bad.code, 2, bad.err + bad.out);
+    assert(bad.err.includes("ubuntu-26.04") && bad.err.includes("debian-13"), bad.err);
+    const deb = await run(config(dir), ["boot", "status", "--state", path.join(dir, "state.json"), "--assets", dir, "--profile", "debian-13"]);
+    assert(deb.out.includes("initrd.gz") && !deb.out.includes("ubuntu-26.04.1-live-server"), deb.out);
+  });
+});
