@@ -80,6 +80,7 @@ jobs:
       - name: "The development tools, from bun.lock (the libraries it imports are linked)"
         run: bun install --frozen-lockfile
         working-directory: ${{ matrix.folder }}
+        continue-on-error: true
       - name: "The test runner's own packages (commons quality)"
         run: bun install --frozen-lockfile
         working-directory: commons/quality
@@ -170,11 +171,12 @@ jobs:
         with:
           path: _site
 
+  # always(): a library whose run failed is an ancestor that failed, and would otherwise skip the publication of a site that was built
   publish:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     needs: [site]
-    if: "github.event_name != 'pull_request' && github.ref == 'refs/heads/main'"
+    if: "always() && needs.site.result == 'success' && (github.event_name != 'pull_request' && github.ref == 'refs/heads/main')"
     permissions:
       pages: write
       id-token: write

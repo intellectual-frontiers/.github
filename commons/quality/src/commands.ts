@@ -22,6 +22,8 @@ import { appendEvents, formatLedgerHostError, readLedger } from "./host/ledger-b
 import { authorOf, formatGatherError, gather, isAfter } from "./host/gather.ts";
 import { evaluateObjectives, indexOf, openings } from "./host/report.ts";
 import { gitText } from "./host/git.ts";
+import { keptRuns } from "./host/runs.ts";
+import { queryRuns } from "./query/mod.ts";
 import { indexIsCurrent } from "./pure/index-file.ts";
 import { parseRegister, registerView, showProofCount, summarize } from "./pure/ladder.ts";
 import {
@@ -469,6 +471,44 @@ export async function registerCommand(rest: readonly string[]): Promise<number> 
   }
   await writeTextFile(o.out, text);
   say(`quality: register ${o.out}`);
+  return 0;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------------- query
+
+const QUERY = {
+  repo: REPO,
+  limit: value({ help: "The most rows of the answer.", valueName: "N", default: "1000" }),
+  json: flag({ help: "The answer as one JSON document." }),
+};
+
+/** The rows as aligned text: a header, then a row for each, the columns padded to the widest value. */
+function tableOf(columns: readonly string[], rows: readonly (readonly (string | number | boolean | null)[])[]): string {
+  const text = rows.map((r) => r.map((v) => (v === null ? "" : String(v))));
+  const width = columns.map((c, i) => Math.max(c.length, ...text.map((r) => (r[i] ?? "").length)));
+  const line = (r: readonly string[]): string => r.map((c, i) => c.padEnd(width[i] ?? 0)).join("  ").trimEnd();
+  return `${[line(columns), ...text.map(line)].join("\n")}\n`;
+}
+
+/**
+ * `quality query "SELECT ..."`: one read-only SELECT over the runs and the cases kept on the `quality` branch (relations `runs`, `cases` and `case_requirements`), as a table or with `--json` (0002-quality-query FR-004, FR-005). It writes nothing;
+ * a question that is refused or cannot be answered ends with 1.
+ */
+export async function queryCommand(rest: readonly string[]): Promise<number> {
+  const operand = [{ name: "SQL", help: "One SELECT over runs, cases and case_requirements.", arity: "one" }] as const;
+  const p = parseArgs(rest, QUERY, operand);
+  if (p.kind === "err") return fail(formatUsageError(p.error, "quality query"), 2);
+  if (p.value.kind === "help") return help(helpText("quality query", "Ask the runs kept as evidence in SQL.", QUERY, operand));
+  const o = p.value.options;
+  const limit = Number(o.limit);
+  if (!Number.isInteger(limit) || limit < 0) return fail(`${o.limit} is not a number of rows`, 2);
+  const kept = await keptRuns(o.repo);
+  if (kept.kind === "err") return fail(kept.error, 1);
+  const answer = queryRuns(kept.value, p.value.positionals[0] ?? "", { limit });
+  if (answer.kind === "err") return fail(answer.error, 1);
+  const { columns, rows, truncated } = answer.value;
+  stdout.writeSync(o.json ? `${JSON.stringify({ columns, rows, truncated })}\n` : tableOf(columns, rows));
+  if (truncated) say(`quality: cut at ${limit} rows`);
   return 0;
 }
 

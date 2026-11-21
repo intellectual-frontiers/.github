@@ -317,7 +317,6 @@ const conformance: Workflow = {
 };
 
 const docsPaths = ["commons/**", "package.json", own("site"), BUN_ACTION];
-const onMainPush = "github.event_name != 'pull_request' && github.ref == 'refs/heads/main'";
 /** A push to main, a run by hand on main, or the night's run: where the evidence is gathered and the site published. */
 const onMainOrSchedule = "github.event_name != 'pull_request' && github.ref == 'refs/heads/main'";
 
@@ -373,7 +372,7 @@ const site: Workflow = {
       steps: [
         checkout(),
         bun(),
-        tools(expr("matrix.folder"), "The development tools, from bun.lock (the libraries it imports are linked)"),
+        { ...tools(expr("matrix.folder"), "The development tools, from bun.lock (the libraries it imports are linked)"), continueOnError: true },
         tools("commons/quality", "The test runner's own packages (commons quality)"),
         run('bun commons/docs/tools/evidence.ts --library "${{ matrix.name }}" --out "$RUNNER_TEMP/evidence"', { name: "The tests, kept as a CTRF report", continueOnError: true, shell: "bash" }),
         use(PIN.uploadArtifact, { name: "The report, kept for the site", when: "always()", with: { name: "evidence-${{ matrix.name }}", path: "${{ runner.temp }}/evidence/*.ctrf.json", "if-no-files-found": "ignore", "retention-days": 3 } }),
@@ -423,8 +422,9 @@ const site: Workflow = {
       ],
     }),
     publish: job({
+      comment: "always(): a library whose run failed is an ancestor that failed, and would otherwise skip the publication of a site that was built",
       needs: ["site"],
-      when: onMainOrSchedule,
+      when: `always() && needs.site.result == 'success' && (${onMainOrSchedule})`,
       runsOn: "ubuntu-24.04",
       timeoutMinutes: 10,
       permissions: { pages: "write", "id-token": "write" },
