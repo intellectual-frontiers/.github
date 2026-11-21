@@ -7,7 +7,7 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import { castTemporal, extract, formatDate, formatTime, formatTimestamp, intervalLiteral, formatInterval, negateInterval, temporalArithmetic, temporalOrder } from "./temporal.ts";
+import { castTemporal, dateTrunc, extract, formatDate, formatTime, formatTimestamp, intervalLiteral, formatInterval, negateInterval, temporalArithmetic, temporalOrder } from "./temporal.ts";
 import { ansi, children, type Dialect, type Expr, type FrameBound, type Node, type OrderItem, parse, type Query, type Select, type SelectItem, type SetOp, type Source, type WindowDef, type WindowSpec, declareDialect } from "../../mod.ts";
 
 /** A value of a relation. */
@@ -592,6 +592,37 @@ function padded(text: string, length: number, fill: string, left: boolean): stri
   return left ? pad + text : text + pad;
 }
 
+/** `round(x, n)` half away from zero on the decimal text of the number, so that 2.675 to 2 places is 2.68 (0010-aide FR-027). */
+function rounded(x: number, places: number): number {
+  if (!Number.isFinite(x)) return x;
+  const shifted = Number(`${Math.abs(x)}e${places}`);
+  if (!Number.isFinite(shifted)) return x;
+  const r = Number(`${Math.round(shifted)}e${-places}`);
+  return x < 0 ? -r : r;
+}
+
+const NUMBER_FUNCTIONS: readonly (readonly [string, ScalarFunction])[] = [
+  [
+    "round",
+    (a) => {
+      const x = a[0] === null || a[0] === undefined ? null : numberOf(a[0]);
+      const n = a[1] === undefined ? 0 : whole(a[1], "the places of round");
+      return x === null || n === null ? null : rounded(x, n);
+    },
+  ],
+  ["floor", (a) => (a[0] === null || a[0] === undefined ? null : Math.floor(numberOf(a[0]) ?? 0))],
+  ["ceil", (a) => (a[0] === null || a[0] === undefined ? null : Math.ceil(numberOf(a[0]) ?? 0))],
+  ["ceiling", (a) => (a[0] === null || a[0] === undefined ? null : Math.ceil(numberOf(a[0]) ?? 0))],
+  [
+    "date_trunc",
+    (a) => {
+      if (a[0] === null || a[0] === undefined || a[1] === null || a[1] === undefined) return null;
+      const r = dateTrunc(String(a[0]), a[1]);
+      return r.kind === "ok" ? r.value : fail(r.error);
+    },
+  ],
+];
+
 const text1 = (f: (s: string) => Value): ScalarFunction => (a) => (a[0] === null || a[0] === undefined ? null : f(String(a[0])));
 
 const STRING_FUNCTIONS: readonly (readonly [string, ScalarFunction])[] = [
@@ -651,7 +682,7 @@ const STRING_FUNCTIONS: readonly (readonly [string, ScalarFunction])[] = [
 ];
 
 /** The functions of the engine: the basic ones and the string functions (0010-aide FR-021). */
-const BUILTIN: ReadonlyMap<string, ScalarFunction> = new Map<string, ScalarFunction>([...BASIC, ...STRING_FUNCTIONS]);
+const BUILTIN: ReadonlyMap<string, ScalarFunction> = new Map<string, ScalarFunction>([...BASIC, ...STRING_FUNCTIONS, ...NUMBER_FUNCTIONS]);
 
 const KEYWORD_FUNCTIONS: ReadonlySet<string> = new Set(["substring", "position", "trim", "overlay"]);
 

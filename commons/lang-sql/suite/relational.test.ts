@@ -420,3 +420,20 @@ proves(["0010-aide FR-026"], "a LATERAL subquery is run for each row before it a
     assert(r.kind === "err" && r.error.message !== "", bad);
   }
 });
+
+proves(["0010-aide FR-027"], "round goes half away from zero on the decimal text (and to negative places), floor and ceil go to whole numbers, date_trunc cuts a date or a timestamp to the start of a part, a null gives a null, and what is not a number, a date or a field is an error value", () => {
+  const v = (sql: string) => ask(text0, `SELECT ${sql}`).rows[0]?.[0];
+  assertEquals([v("round(2.675, 2)"), v("round(-2.675, 2)"), v("round(2.5)"), v("round(-2.5)"), v("round(1234.567, -2)"), v("round(1.005, 2)"), v("round(0.5)"), v("round(7)"), v("round(1.4999)"), v("round(3.14159, 3)"), v("round('2.5')")], [2.68, -2.68, 3, -3, 1200, 1.01, 1, 7, 1, 3.142, 3]);
+  assertEquals([v("floor(2.7)"), v("floor(-2.1)"), v("ceil(2.1)"), v("ceil(-2.9)"), v("ceiling(2)"), v("floor('3.5')"), v("ceil(0)")], [2, -3, 3, -2, 2, 3, 0]);
+  assertEquals([v("round(NULL)"), v("round(1.5, NULL)"), v("floor(NULL)"), v("ceil(NULL)"), v("date_trunc('day', NULL)"), v("date_trunc(NULL, TIMESTAMP '2024-01-01 00:00:00')")], [null, null, null, null, null, null]);
+  const ts = "TIMESTAMP '2024-03-15 10:20:30.5'";
+  const cut = (f: string, x = ts) => v(`date_trunc('${f}', ${x})`);
+  assertEquals([cut("second"), cut("minute"), cut("hour"), cut("day"), cut("month"), cut("quarter"), cut("year"), cut("milliseconds")], ["2024-03-15 10:20:30", "2024-03-15 10:20:00", "2024-03-15 10:00:00", "2024-03-15 00:00:00", "2024-03-01 00:00:00", "2024-01-01 00:00:00", "2024-01-01 00:00:00", "2024-03-15 10:20:30.5"]);
+  assertEquals([cut("quarter", "TIMESTAMP '2024-08-09 00:00:00'"), cut("week"), cut("week", "TIMESTAMP '2024-03-17 23:59:59'"), cut("week", "TIMESTAMP '2024-03-11 08:00:00'"), cut("week", "DATE '2024-03-01'")], ["2024-07-01 00:00:00", "2024-03-11 00:00:00", "2024-03-11 00:00:00", "2024-03-11 00:00:00", "2024-02-26 00:00:00"]);
+  assertEquals([cut("decade"), cut("century"), cut("millennium"), cut("century", "DATE '2000-06-01'"), cut("MONTH", "DATE '2024-03-15'"), cut("month", "'2024-03-15 10:00:00'")], ["2020-01-01 00:00:00", "2001-01-01 00:00:00", "2001-01-01 00:00:00", "1901-01-01 00:00:00", "2024-03-01 00:00:00", "2024-03-01 00:00:00"]);
+  assertEquals(ask(clock, "SELECT date_trunc('month', ts) AS m, count(*) AS c, round(avg(n), 1) AS a FROM d GROUP BY date_trunc('month', ts) ORDER BY m").rows, [["2023-12-01 00:00:00", 1, null], ["2024-03-01 00:00:00", 1, 3]]);
+  for (const bad of ["SELECT date_trunc('fortnight', TIMESTAMP '2024-01-01 00:00:00')", "SELECT date_trunc('day', 'abc')", "SELECT date_trunc('day', 5)", "SELECT date_trunc('day', INTERVAL '1' DAY)", "SELECT round('x')", "SELECT round(1, 1.5)", "SELECT floor('x')", "SELECT ceil(TRUE) + 'x'"]) {
+    const r = text0.run(bad);
+    assert(r.kind === "err" && r.error.message !== "", bad);
+  }
+});
