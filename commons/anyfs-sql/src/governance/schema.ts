@@ -47,6 +47,7 @@ export const LAYOUT: readonly Column[] = [
   { table: "epochs", column: "horizon", kind: "text", since: 3, means: "the version vector every replica of the roster held, as JSON" },
   { table: "epochs", column: "roster", kind: "text", since: 3, means: "the replicas that reported, as JSON" },
   { table: "epochs", column: "retained", kind: "text", since: 3, means: "the keys (`id|sum`) of rows the horizon covers that the epoch keeps, as JSON" },
+  { table: "epochs", column: "bound", kind: "text", since: 3, means: "the greatest id an epoch collected: a parent not above it was collected, not missing" },
   { table: "cache", column: "kind", kind: "text", since: 3, means: "what a cached row is: `pending` is a delta held back until what it waits for arrives; never in a dump" },
   { table: "cache", column: "key", kind: "text", since: 3, means: "the identity of the cached thing" },
   { table: "cache", column: "value", kind: "text", since: 3, means: "the cached text" },
