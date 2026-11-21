@@ -65,17 +65,29 @@ proves(["0003-planning-terms FR-003"], "the twelve code lists have the members t
     for (const m of Object.values(list)) assert((m.values.definition?.value ?? "").length > 5, `${m.iri} has a definition`);
 });
 
-proves(["0003-planning-terms FR-004"], "a name from another standard is a name in a property that says whose it is, with (to verify), and no IRI of such a standard is written", () => {
+proves(["0003-planning-terms FR-004"], "a name from another standard is a name in a property that says whose it is, read in the standard's text and cited by section, and no IRI is written but one that was read", () => {
   assertEquals(severities.Error.values.sarifLevel, "error");
+  assertEquals(severities.Warning.values.sarifLevel, "warning");
+  assertEquals(severities.Note.values.sarifLevel, "note");
   assertEquals(states.Open.values.icalStatus, "NEEDS-ACTION");
+  assertEquals(states.InProgress.values.icalStatus, "IN-PROCESS");
   assertEquals(itemKinds.Question.values.webAnnotationMotivation, "questioning");
+  assertEquals(itemKinds.Finding.values.webAnnotationMotivation, "assessing");
+  assertEquals(closeReasons.Completed.values.githubStateReason, "completed");
   assertEquals(closeReasons.NotPlanned.values.githubStateReason, "not_planned");
+  assertEquals(closeReasons.Duplicate.values.githubStateReason, "duplicate");
   for (const p of ["sarifLevel", "icalStatus", "webAnnotationMotivation", "githubStateReason"] as const) {
     const prop = properties.find((x) => x.iri === plan[p].iri);
-    assert(prop !== undefined && (prop.values.definition?.value ?? "").includes("(to verify"), `${p} says (to verify)`);
+    const d = prop?.values.definition?.value ?? "";
+    assert(prop !== undefined && !d.includes("to verify") && /section|REST API/.test(d), `${p} cites its section and no longer says to verify`);
   }
   const text = readDirSync(SRC).map((e) => readTextFileSync(join(SRC, e.name))).join("\n");
-  for (const host of ["oasis-open.org", "www.w3.org/ns/oa", "rfc-editor.org", "datatracker.ietf.org", "github.github.com", "open-services.net"]) assert(!text.includes(host), `no IRI at ${host}`);
+  assert(!text.includes("(to verify"), "no name is left to verify");
+  for (const host of ["oasis-open.org", "rfc-editor.org", "datatracker.ietf.org", "github.github.com", "open-services.net"]) assert(!text.includes(host), `no IRI at ${host}`);
+  for (const m of text.matchAll(/https?:\/\/[^\s"'`)>,]+/g)) {
+    const iri = m[0];
+    assert(iri.startsWith("https://www.intellectualfrontiers.com/ontology/") || iri.startsWith("http://www.w3.org/"), `${iri} is an IRI of this ontology or one that was read`);
+  }
 });
 
 proves(["0003-planning-terms FR-005"], "every class has a record of its basis, specializing a PROV-O or SKOS term, and none is unaligned", () => {

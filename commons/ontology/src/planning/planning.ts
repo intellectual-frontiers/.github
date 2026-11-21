@@ -8,8 +8,9 @@
  * It stands on PROV-O and SKOS, whose terms the library `rdf` and the Kanon ontology already hold: an item, an observation, a locator, a link, a patch and a preview are `prov:Entity`, an event is a
  * `prov:Activity`, an actor a `prov:Agent`, a source a `prov:SoftwareAgent`, a trace a `prov:Derivation`, and every code list is a SKOS concept. Where another standard names a value (the SARIF `level`
  * of a severity, the iCalendar `STATUS` of a state, the Web Annotation motivation of a kind, the GitHub reason a work item was closed) the value is data of the member as a plain name, in a property that
- * says whose it is, and never as an IRI: those documents were not read when this ontology was written (0037-planning, Standards considered), so each name is `(to verify)` and no IRI of them is invented,
- * as `kanon:mdaViewpoint` does.
+ * says whose it is, and each name was read in the standard's own text (0037-planning, Standards considered, with the version and the section); no IRI is written except where one was read: the Web Annotation
+ * motivations are `http://www.w3.org/ns/oa#<name>` (Web Annotation Vocabulary, Recommendation 23 February 2017, section 2.3), and a SARIF, iCalendar or GitHub name has no IRI in its text.
+ * An agent that authors an event names the person it acts for with `prov:actedOnBehalfOf` (PROV-O section 4.1), a term the library `rdf` already holds, so that no property of this ontology says it.
  *
  * @limits
  * The properties do not yet carry a basis of their own (the baseline holds them until the schemas require it). A time is a string of ISO 8601 in UTC to the second, as the datatype list of the kernel has no date-time.
@@ -149,7 +150,10 @@ export const states = codes(StateSchema, PLANNING, {
   Proposed: { label: en("Proposed"), definition: en("Found or inferred by a program or an agent, not yet confirmed by a person; it is counted in no plan until it is.") },
   Open: { label: en("Open"), definition: en("Confirmed and not started."), icalStatus: "NEEDS-ACTION" },
   InProgress: { label: en("In progress"), definition: en("Being worked on."), icalStatus: "IN-PROCESS" },
-  Closed: { label: en("Closed"), definition: en("Finished or set aside, with a reason; it may be reopened.") },
+  Closed: {
+    label: en("Closed"),
+    definition: en("Finished or set aside, with a reason; it may be reopened. The iCalendar status that a closed item is closest to is COMPLETED or CANCELLED, which the reason chooses and this ontology does not."),
+  },
 });
 
 /** The schema of a close reason (`plan:CloseReason`): the reason a Git host gives, as a name. */
@@ -215,10 +219,10 @@ export const origins = codes(classSchema(plan.Origin, CODE), PLANNING, {
   Inferred: { label: en("Inferred"), definition: en("Guessed by a heuristic or an agent; it is proposed until a person confirms it.") },
 });
 
-/** The three kinds of actor, as in the events of the issues the first dataset holds. */
+/** The three kinds of actor, as in the events of the issue files of the first dataset. */
 export const actorKinds = codes(classSchema(plan.ActorKind, CODE), PLANNING, {
-  ByPerson: { label: en("Person"), definition: en("A human being, named by who they are and never by a program acting for them.") },
-  ByAgent: { label: en("Agent"), definition: en("An AI agent; an item or an event it wrote says so and is never signed as a person.") },
+  ByPerson: { label: en("Person"), definition: en("A human being, named by who they are and never by a program acting for them; the person an agent acts for, and the only kind that confirms a proposed item.") },
+  ByAgent: { label: en("Agent"), definition: en("An AI agent; an item or an event it wrote says so, names the person it acted for with prov:actedOnBehalfOf, and is never signed as a person.") },
   ByTool: { label: en("Tool"), definition: en("A program with no judgement of its own: a scanner, a linter, a synchronizer.") },
 });
 
@@ -351,10 +355,10 @@ export const properties = [
   DatatypeProperty.make(plan.sourceName, { domain: plan.Source, range: xsd.string, label: en("source name"), definition: en("The name of the source, as the package that holds it is named.") }),
   ObjectProperty.make(plan.sourceCapability, { domain: plan.Source, range: plan.Capability, label: en("source capability"), definition: en("An ability the source declares.") }),
   ObjectProperty.make(plan.fieldAuthority, { domain: plan.Source, range: plan.FieldAuthority, label: en("field authority"), definition: en("How the source's value of a field is weighed against the store's.") }),
-  DatatypeProperty.make(plan.sarifLevel, { domain: plan.Severity, range: xsd.string, label: en("SARIF level"), definition: en("The name of the SARIF result level the severity is: error, warning or note (to verify against the OASIS text); a name and no IRI.") }),
-  DatatypeProperty.make(plan.icalStatus, { domain: plan.State, range: xsd.string, label: en("iCalendar status"), definition: en("The name of the iCalendar to-do STATUS the state is closest to (to verify against RFC 5545); a name and no IRI.") }),
-  DatatypeProperty.make(plan.webAnnotationMotivation, { domain: plan.ItemKind, range: xsd.string, label: en("Web Annotation motivation"), definition: en("The name of the Web Annotation motivation the kind is closest to (to verify against the W3C text); a name and no IRI.") }),
-  DatatypeProperty.make(plan.githubStateReason, { domain: plan.CloseReason, range: xsd.string, label: en("GitHub state reason"), definition: en("The name of the reason GitHub gives for closing an issue, as its interface writes it (to verify against its documentation); a name and no IRI.") }),
+  DatatypeProperty.make(plan.sarifLevel, { domain: plan.Severity, range: xsd.string, label: en("SARIF level"), definition: en("The name of the SARIF result level the severity is: error, warning or note (SARIF 2.1.0 Plus Errata 01, sections 3.27.9 and 3.27.10: the levels that apply where the result's kind is fail); a name and no IRI.") }),
+  DatatypeProperty.make(plan.icalStatus, { domain: plan.State, range: xsd.string, label: en("iCalendar status"), definition: en("The name of the iCalendar to-do STATUS the state is closest to (RFC 5545 section 3.8.1.11: NEEDS-ACTION, COMPLETED, IN-PROCESS or CANCELLED for a VTODO); a name and no IRI.") }),
+  DatatypeProperty.make(plan.webAnnotationMotivation, { domain: plan.ItemKind, range: xsd.string, label: en("Web Annotation motivation"), definition: en("The name of the Web Annotation motivation the kind is closest to (Web Annotation Data Model, section 3.3.5, one of the thirteen motivations; the IRI of each is in the namespace http://www.w3.org/ns/oa# of the Web Annotation Vocabulary, section 2.3).") }),
+  DatatypeProperty.make(plan.githubStateReason, { domain: plan.CloseReason, range: xsd.string, label: en("GitHub state reason"), definition: en("The name of the reason GitHub gives for closing an issue, as the REST interface writes it (GitHub Docs, REST API 2026-03-10, update an issue: completed, not_planned, duplicate, reopened, or null); a name and no IRI.") }),
 ] as const;
 
 /** The ontology itself: its label, description and version. */
