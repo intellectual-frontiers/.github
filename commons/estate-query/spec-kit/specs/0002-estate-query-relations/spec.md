@@ -15,6 +15,7 @@
 - **FR-004**: A value of `declared` and `observed` MUST be one row for each leaf of what is held, with a dotted path (a list has the number of the item), and a value that looks like a secret, by what it is or by the name of its key (as `findSecretLike` of Archon decides), MUST be replaced by `[redacted: looks like a secret]` and never given.
 - **FR-005**: A relation MUST be built only when a question names it, and once for a question.
 - **FR-006**: `fromSnapshot` MUST make the estate data of a snapshot of a fleet store (its assets, what is declared, the observations, the policy results and the risks accepted, by the shape alone, so that nothing of AnyFS is imported) and, where it is given, what was assessed of it (the truths and the violations), at an instant, so that the relations of a fleet store and of a tenant's files are the same.
+- **FR-007**: The relations MUST include `attribute` (the attributes an asset states, one row for each, a list one row for each item), `endpoint` (one row for each asset of the kind endpoint, with the port its service or scheme usually has where none is stated, the class of its service and whether it speaks in the clear), `link` (the links between assets with their named kinds, from the data's `links`) and `service` (the catalog of common services), all of the estate library's kinds, links and services (commons estate 0007-estate-kinds), so that a question can join an endpoint to its service and an asset to what it exposes.
 
 ## Acceptance scenarios
 
