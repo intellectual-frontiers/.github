@@ -140,7 +140,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        library: [archon-dialect-apt, archon-dialect-homebrew, archon-dialect-mise, archon-dialect-winget, integrations-github, catalog-nist-csf-2, archon-dns, catalog-nist-sp800, archon-dialect-ansible, archon-converge, integrations-x12, lab]
+        library: [archon-dialect-apt, archon-dialect-homebrew, archon-dialect-mise, archon-dialect-winget, integrations-github, catalog-nist-csf-2, archon-dns, catalog-nist-sp800, archon-converge, integrations-x12, lab]
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/bun
