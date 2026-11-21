@@ -121,3 +121,8 @@ requirement	mechanism	by	note
 0013-grc-gitref FR-004	check	.github: cd commons/grc && bun run verify	suite/gitref.test.ts
 0013-grc-gitref FR-005	check	.github: cd commons/grc && bun run verify	suite/gitref.test.ts
 0013-grc-gitref FR-006	check	.github: cd commons/grc && bun run verify	suite/gitref.test.ts
+0014-grc-sshsig FR-001	check	.github: cd commons/grc && bun run verify	suite/sshsig.test.ts
+0014-grc-sshsig FR-002	check	.github: cd commons/grc && bun run verify	suite/sshsig.test.ts
+0014-grc-sshsig FR-003	check	.github: cd commons/grc && bun run verify	suite/sshsig.test.ts
+0014-grc-sshsig FR-004	check	.github: cd commons/grc && bun run verify	suite/sshsig.test.ts
+0014-grc-sshsig FR-005	check	.github: cd commons/grc && bun run verify	suite/sshsig.test.ts
