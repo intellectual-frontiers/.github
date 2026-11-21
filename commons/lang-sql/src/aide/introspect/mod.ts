@@ -1,7 +1,7 @@
 /**
  * Introspection (commons lang-sql 0008-sql-introspect): SQL over the syntax tree. `introspect` parses a text and gives an {@link Introspection} whose `query` answers a small SQL over the relations of the parse (statements, nodes, attributes,
- * ancestors, tokens, comments, names, calls, parameters, common table expressions, diagnostics and the language of the dialect), and whose `diagnostics` are the errors of the parse and the rows of the rules, which are queries too. An extension of the core: it
- * imports the core and nothing else.
+ * ancestors, tokens, comments, names, calls, parameters, common table expressions, diagnostics and the language of the dialect), and whose `diagnostics` are the errors of the parse and the rows of the rules, which are queries too. A helper of `aide`: it
+ * runs its queries on the engine of `aide/relational`.
  *
  * @example
  * ```ts
@@ -16,11 +16,11 @@
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { type Dialect, type FunctionSpec, parse, type Parsed } from "../../mod.ts";
-import { createEngine, type Engine, type QueryError, type Rows, type ScalarFunction, type Value } from "./engine.ts";
+import { createEngine, type Engine, type QueryError, type Rows, type ScalarFunction, type Value } from "../relational/mod.ts";
 import { parseDiagnostics, relationsOf, SCHEMA } from "./relations.ts";
 import { BUILTIN_RULES, type Rule } from "./rules.ts";
 
-export { astsql, createEngine, type Engine, type QueryError, type Rows, type ScalarFunction, type Table, type Value } from "./engine.ts";
+export { astsql, createEngine, type Engine, type QueryError, type Rows, type ScalarFunction, type Table, type Value } from "../relational/mod.ts";
 export { BUILTIN_RULES, type Rule } from "./rules.ts";
 export { SCHEMA } from "./relations.ts";
 
