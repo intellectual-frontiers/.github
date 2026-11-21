@@ -1,0 +1,1 @@
+SELECT FoÄ FROM BaÜ;

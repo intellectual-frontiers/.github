@@ -38,6 +38,9 @@ export const ANSI_LEXICAL: Lexical = {
   keywords: KEYWORDS.split(" "),
   wordChars: "",
   numbers: { radix: false, underscores: false },
+  numberSuffixes: [],
+  wordStartChars: "",
+  qQuoting: false,
 };
 
 /** The base dialect. */

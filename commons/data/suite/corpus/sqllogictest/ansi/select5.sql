@@ -1,0 +1,3611 @@
+CREATE TABLE t1(
+  a1 INTEGER PRIMARY KEY,
+  b1 INTEGER,
+  x1 VARCHAR(40)
+);
+
+INSERT INTO t1 VALUES(8,7,'table t1 row 8');
+
+INSERT INTO t2 VALUES(5,2,'table t2 row 5');
+
+INSERT INTO t3 VALUES(2,8,'table t3 row 2');
+
+INSERT INTO t3 VALUES(10,7,'table t3 row 10');
+
+INSERT INTO t4 VALUES(7,7,'table t4 row 7');
+
+INSERT INTO t5 VALUES(4,7,'table t5 row 4');
+
+INSERT INTO t6 VALUES(1,2,'table t6 row 1');
+
+INSERT INTO t6 VALUES(9,4,'table t6 row 9');
+
+INSERT INTO t7 VALUES(6,4,'table t7 row 6');
+
+INSERT INTO t8 VALUES(3,8,'table t8 row 3');
+
+CREATE TABLE t9(
+  a9 INTEGER PRIMARY KEY,
+  b9 INTEGER,
+  x9 VARCHAR(40)
+);
+
+INSERT INTO t9 VALUES(8,1,'table t9 row 8');
+
+INSERT INTO t10 VALUES(5,5,'table t10 row 5');
+
+INSERT INTO t11 VALUES(2,8,'table t11 row 2');
+
+INSERT INTO t11 VALUES(10,10,'table t11 row 10');
+
+INSERT INTO t12 VALUES(7,10,'table t12 row 7');
+
+INSERT INTO t13 VALUES(4,2,'table t13 row 4');
+
+INSERT INTO t14 VALUES(1,5,'table t14 row 1');
+
+INSERT INTO t14 VALUES(9,10,'table t14 row 9');
+
+INSERT INTO t15 VALUES(6,6,'table t15 row 6');
+
+INSERT INTO t16 VALUES(3,4,'table t16 row 3');
+
+CREATE TABLE t17(
+  a17 INTEGER PRIMARY KEY,
+  b17 INTEGER,
+  x17 VARCHAR(40)
+);
+
+INSERT INTO t17 VALUES(8,9,'table t17 row 8');
+
+INSERT INTO t18 VALUES(5,10,'table t18 row 5');
+
+INSERT INTO t19 VALUES(2,7,'table t19 row 2');
+
+INSERT INTO t19 VALUES(10,3,'table t19 row 10');
+
+INSERT INTO t20 VALUES(7,1,'table t20 row 7');
+
+INSERT INTO t21 VALUES(4,3,'table t21 row 4');
+
+INSERT INTO t22 VALUES(1,7,'table t22 row 1');
+
+INSERT INTO t22 VALUES(9,5,'table t22 row 9');
+
+INSERT INTO t23 VALUES(6,6,'table t23 row 6');
+
+INSERT INTO t24 VALUES(3,8,'table t24 row 3');
+
+CREATE TABLE t25(
+  a25 INTEGER PRIMARY KEY,
+  b25 INTEGER,
+  x25 VARCHAR(40)
+);
+
+INSERT INTO t25 VALUES(8,2,'table t25 row 8');
+
+INSERT INTO t26 VALUES(5,8,'table t26 row 5');
+
+INSERT INTO t27 VALUES(2,3,'table t27 row 2');
+
+INSERT INTO t27 VALUES(10,1,'table t27 row 10');
+
+INSERT INTO t28 VALUES(7,3,'table t28 row 7');
+
+INSERT INTO t29 VALUES(4,8,'table t29 row 4');
+
+INSERT INTO t30 VALUES(1,5,'table t30 row 1');
+
+INSERT INTO t30 VALUES(9,2,'table t30 row 9');
+
+INSERT INTO t31 VALUES(6,9,'table t31 row 6');
+
+INSERT INTO t32 VALUES(3,6,'table t32 row 3');
+
+CREATE TABLE t33(
+  a33 INTEGER PRIMARY KEY,
+  b33 INTEGER,
+  x33 VARCHAR(40)
+);
+
+INSERT INTO t33 VALUES(8,6,'table t33 row 8');
+
+INSERT INTO t34 VALUES(5,9,'table t34 row 5');
+
+INSERT INTO t35 VALUES(2,7,'table t35 row 2');
+
+INSERT INTO t35 VALUES(10,9,'table t35 row 10');
+
+INSERT INTO t36 VALUES(7,2,'table t36 row 7');
+
+INSERT INTO t37 VALUES(4,3,'table t37 row 4');
+
+INSERT INTO t38 VALUES(1,2,'table t38 row 1');
+
+INSERT INTO t38 VALUES(9,9,'table t38 row 9');
+
+INSERT INTO t39 VALUES(6,7,'table t39 row 6');
+
+INSERT INTO t40 VALUES(3,10,'table t40 row 3');
+
+CREATE TABLE t41(
+  a41 INTEGER PRIMARY KEY,
+  b41 INTEGER,
+  x41 VARCHAR(40)
+);
+
+INSERT INTO t41 VALUES(8,7,'table t41 row 8');
+
+INSERT INTO t42 VALUES(5,8,'table t42 row 5');
+
+INSERT INTO t43 VALUES(2,3,'table t43 row 2');
+
+INSERT INTO t43 VALUES(10,7,'table t43 row 10');
+
+INSERT INTO t44 VALUES(7,2,'table t44 row 7');
+
+INSERT INTO t45 VALUES(4,9,'table t45 row 4');
+
+INSERT INTO t46 VALUES(1,1,'table t46 row 1');
+
+INSERT INTO t46 VALUES(9,6,'table t46 row 9');
+
+INSERT INTO t47 VALUES(6,4,'table t47 row 6');
+
+INSERT INTO t48 VALUES(3,3,'table t48 row 3');
+
+CREATE TABLE t49(
+  a49 INTEGER PRIMARY KEY,
+  b49 INTEGER,
+  x49 VARCHAR(40)
+);
+
+INSERT INTO t49 VALUES(8,1,'table t49 row 8');
+
+INSERT INTO t50 VALUES(5,2,'table t50 row 5');
+
+INSERT INTO t51 VALUES(2,3,'table t51 row 2');
+
+INSERT INTO t51 VALUES(10,1,'table t51 row 10');
+
+INSERT INTO t52 VALUES(7,7,'table t52 row 7');
+
+INSERT INTO t53 VALUES(4,2,'table t53 row 4');
+
+INSERT INTO t54 VALUES(1,6,'table t54 row 1');
+
+INSERT INTO t54 VALUES(9,10,'table t54 row 9');
+
+INSERT INTO t55 VALUES(6,4,'table t55 row 6');
+
+INSERT INTO t56 VALUES(3,6,'table t56 row 3');
+
+CREATE TABLE t57(
+  a57 INTEGER PRIMARY KEY,
+  b57 INTEGER,
+  x57 VARCHAR(40)
+);
+
+INSERT INTO t57 VALUES(8,7,'table t57 row 8');
+
+INSERT INTO t58 VALUES(5,4,'table t58 row 5');
+
+INSERT INTO t59 VALUES(2,10,'table t59 row 2');
+
+INSERT INTO t59 VALUES(10,6,'table t59 row 10');
+
+INSERT INTO t60 VALUES(7,3,'table t60 row 7');
+
+INSERT INTO t61 VALUES(4,4,'table t61 row 4');
+
+INSERT INTO t62 VALUES(1,10,'table t62 row 1');
+
+INSERT INTO t62 VALUES(9,9,'table t62 row 9');
+
+INSERT INTO t63 VALUES(6,2,'table t63 row 6');
+
+INSERT INTO t64 VALUES(3,6,'table t64 row 3');
+
+SELECT x29,x31,x51,x55
+  FROM t51,t29,t31,t55
+ WHERE a51=b31
+   AND a29=6
+   AND a29=b51
+   AND b55=a31;
+
+SELECT x61,x29,x6,x36
+  FROM t61,t6,t29,t36
+ WHERE a36=b29
+   AND b36=a61
+   AND a6=b61
+   AND a6=6;
+
+SELECT x16,x64,x45,x29,x40
+  FROM t16,t64,t29,t40,t45
+ WHERE a29=10
+   AND b45=a16
+   AND b40=a64
+   AND b16=a40
+   AND b64=a29;
+
+SELECT x60,x27,x36,x5,x32,x28
+  FROM t28,t27,t32,t36,t5,t60
+ WHERE b5=a27
+   AND b36=a32
+   AND a60=6
+   AND b32=a28
+   AND b27=a36
+   AND b28=a60;
+
+SELECT x37,x45,x6,x17,x41,x57
+  FROM t37,t17,t41,t45,t57,t6
+ WHERE a37=2
+   AND a57=b17
+   AND a37=b6
+   AND b57=a41
+   AND a45=b41
+   AND a6=b45;
+
+SELECT x54,x17,x21,x6,x34,x49,x2
+  FROM t21,t49,t54,t17,t2,t6,t34
+ WHERE b34=a54
+   AND a34=b6
+   AND a21=b2
+   AND a21=4
+   AND a17=b49
+   AND a49=b54
+   AND b17=a2;
+
+SELECT x22,x44,x30,x36,x48,x27,x2,x57
+  FROM t48,t57,t27,t2,t36,t30,t44,t22
+ WHERE b30=a48
+   AND b44=a27
+   AND a22=b27
+   AND b22=a36
+   AND b48=a57
+   AND a57=7
+   AND a30=b36
+   AND a44=b2;
+
+SELECT x38,x64,x1,x9,x26,x54,x41,x44
+  FROM t26,t1,t44,t64,t54,t41,t38,t9
+ WHERE a41=8
+   AND b1=a9
+   AND b26=a38
+   AND b64=a26
+   AND b38=a54
+   AND b54=a41
+   AND a1=b44
+   AND b9=a64;
+
+SELECT x9,x64,x24,x18,x44,x27,x14,x5,x56
+  FROM t44,t14,t64,t27,t9,t5,t56,t24,t18
+ WHERE a14=b18
+   AND a24=b5
+   AND b24=a56
+   AND b14=a44
+   AND b64=a5
+   AND a18=b9
+   AND a27=3
+   AND b44=a64
+   AND b56=a27;
+
+SELECT x17,x41,x55,x7,x64,x42,x43,x58,x21,x27
+  FROM t55,t21,t41,t17,t42,t43,t7,t27,t64,t58
+ WHERE a7=9
+   AND a43=b55
+   AND b43=a42
+   AND b27=a55
+   AND a64=b21
+   AND a21=b42
+   AND b41=a7
+   AND a58=b64
+   AND a41=b58
+   AND b17=a27;
+
+SELECT x24,x30,x38,x29,x46,x23,x50,x43,x61,x10
+  FROM t10,t38,t23,t61,t24,t46,t43,t50,t30,t29
+ WHERE a23=7
+   AND a29=b50
+   AND b46=a38
+   AND a24=b38
+   AND a46=b30
+   AND b24=a23
+   AND a43=b61
+   AND a50=b10
+   AND a30=b43
+   AND b29=a61;
+
+SELECT x32,x7,x37,x60,x29,x58,x62,x17,x4,x22,x53
+  FROM t37,t17,t53,t60,t7,t62,t58,t32,t29,t4,t22
+ WHERE b62=a17
+   AND a4=b32
+   AND a53=b60
+   AND b17=a29
+   AND b37=a32
+   AND b7=a58
+   AND a37=b22
+   AND a22=b58
+   AND a29=10
+   AND b53=a62
+   AND b4=a60;
+
+SELECT x2,x49,x18,x47,x29,x56,x60,x9,x31,x34,x53,x11
+  FROM t11,t9,t47,t56,t53,t60,t34,t2,t29,t18,t31,t49
+ WHERE a9=b11
+   AND b53=a11
+   AND a49=b9
+   AND a31=3
+   AND a60=b56
+   AND a56=b34
+   AND a29=b49
+   AND a2=b18
+   AND b2=a47
+   AND a34=b47
+   AND b29=a31
+   AND b60=a53;
+
+SELECT x63,x30,x61,x47,x53,x46,x28,x3,x5,x1,x52,x49
+  FROM t46,t3,t1,t5,t61,t47,t30,t52,t49,t63,t28,t53
+ WHERE b53=a1
+   AND b61=a46
+   AND a5=b28
+   AND b1=a28
+   AND a47=b46
+   AND a3=b63
+   AND a61=b3
+   AND b49=a30
+   AND a5=1
+   AND b30=a53
+   AND a49=b47
+   AND b52=a63;
+
+SELECT x24,x48,x58,x33,x51,x63,x41,x49,x54,x21,x40,x50,x47
+  FROM t33,t49,t58,t41,t50,t47,t54,t51,t24,t48,t21,t40,t63
+ WHERE b51=a24
+   AND a33=b58
+   AND b24=a40
+   AND a41=b50
+   AND a49=b40
+   AND a47=b21
+   AND b49=a50
+   AND b41=a48
+   AND b48=a21
+   AND a33=5
+   AND a58=b47
+   AND b63=a54
+   AND b54=a51;
+
+SELECT x39,x18,x49,x23,x7,x19,x52,x37,x15,x8,x16,x32,x56,x27
+  FROM t18,t7,t49,t15,t27,t32,t37,t52,t19,t56,t16,t23,t39,t8
+ WHERE a52=b8
+   AND b19=a37
+   AND b16=a56
+   AND b18=a32
+   AND b23=a19
+   AND a37=1
+   AND b15=a27
+   AND a8=b7
+   AND a23=b49
+   AND a7=b56
+   AND b32=a49
+   AND b27=a18
+   AND b39=a15
+   AND a39=b52;
+
+SELECT x23,x52,x34,x15,x16,x57,x39,x5,x42,x21,x9,x61,x47,x19
+  FROM t61,t52,t57,t15,t9,t47,t19,t39,t21,t34,t42,t23,t5,t16
+ WHERE a21=b16
+   AND a16=b42
+   AND a57=b21
+   AND b19=a61
+   AND b57=a23
+   AND a42=b61
+   AND b9=a19
+   AND a34=b39
+   AND a52=b34
+   AND b5=a15
+   AND a23=7
+   AND b15=a39
+   AND b47=a9
+   AND a47=b52;
+
+SELECT x13,x62,x20,x41,x11,x1,x37,x61,x54,x6,x27,x34,x45,x4,x60
+  FROM t34,t20,t60,t37,t11,t6,t54,t61,t4,t41,t45,t1,t13,t62,t27
+ WHERE b45=a60
+   AND b27=a4
+   AND b11=a37
+   AND a54=b13
+   AND b6=a41
+   AND a13=b1
+   AND b37=a45
+   AND b62=a34
+   AND b41=a62
+   AND b4=a11
+   AND b34=a1
+   AND a61=b20
+   AND a54=4
+   AND a27=b61
+   AND a6=b60;
+
+SELECT x13,x25,x38,x42,x57,x22,x37,x31,x61,x46,x43,x9,x58,x15,x53,x32
+  FROM t43,t37,t58,t25,t38,t42,t31,t15,t13,t57,t61,t53,t46,t22,t9,t32
+ WHERE a31=b38
+   AND a32=b9
+   AND b31=a15
+   AND a38=b25
+   AND a42=b13
+   AND b57=a37
+   AND a53=b32
+   AND b46=a9
+   AND a25=b53
+   AND a37=9
+   AND a58=b42
+   AND a22=b15
+   AND a57=b22
+   AND b58=a46
+   AND b61=a43
+   AND a13=b43;
+
+SELECT x14,x30,x56,x46,x35,x62,x50,x60,x39,x10,x33,x54,x64,x34,x3,x13
+  FROM t14,t62,t34,t35,t60,t54,t33,t50,t3,t13,t30,t39,t10,t56,t64,t46
+ WHERE b62=a3
+   AND b10=a46
+   AND a10=b56
+   AND b60=a30
+   AND b33=a54
+   AND a39=b46
+   AND a33=b39
+   AND b64=a34
+   AND b30=a56
+   AND b54=a62
+   AND a50=b35
+   AND b3=a64
+   AND a35=b13
+   AND a60=b14
+   AND a50=1
+   AND a13=b34;
+
+SELECT x3,x9,x54,x39,x7,x5,x21,x46,x51,x64,x4,x59,x41,x38,x14,x11,x29
+  FROM t38,t11,t46,t29,t59,t5,t21,t54,t4,t64,t41,t3,t7,t14,t51,t39,t9
+ WHERE a9=b29
+   AND a51=b38
+   AND a11=b21
+   AND a7=b41
+   AND a54=10
+   AND b59=a46
+   AND b4=a21
+   AND b14=a64
+   AND a5=b7
+   AND b3=a59
+   AND a14=b9
+   AND b64=a4
+   AND b11=a38
+   AND b51=a3
+   AND b39=a54
+   AND a39=b46
+   AND a29=b5;
+
+SELECT x24,x30,x20,x44,x51,x43,x6,x49,x26,x54,x22,x46,x55,x9,x36,x10,x12,x19
+  FROM t49,t12,t46,t22,t9,t36,t20,t24,t54,t6,t44,t55,t51,t30,t10,t26,t43,t19
+ WHERE a6=b55
+   AND b6=a49
+   AND b9=a19
+   AND b20=a54
+   AND a43=b46
+   AND a51=b10
+   AND a24=3
+   AND b44=a12
+   AND a10=b22
+   AND a22=b36
+   AND a20=b49
+   AND b43=a24
+   AND a36=b30
+   AND b19=a30
+   AND a26=b12
+   AND a55=b51
+   AND a44=b54
+   AND a46=b26;
+
+SELECT x14,x2,x30,x39,x11,x48,x61,x19,x40,x44,x25,x49,x24,x16,x38,x60,x13,x36
+  FROM t38,t44,t48,t49,t11,t24,t19,t36,t61,t14,t25,t40,t16,t60,t13,t30,t39,t2
+ WHERE b13=a44
+   AND b16=a11
+   AND a48=b40
+   AND a13=b25
+   AND a19=b39
+   AND b14=a16
+   AND b60=a2
+   AND b48=a36
+   AND b49=a30
+   AND a24=b38
+   AND a14=b61
+   AND b2=a39
+   AND a40=b30
+   AND a60=b11
+   AND b24=a25
+   AND a36=5
+   AND b44=a61
+   AND a49=b19;
+
+SELECT x47,x36,x39,x20,x37,x8,x13,x40,x62,x35,x5,x24,x46,x45,x57,x31,x38,x25,x34
+  FROM t45,t34,t47,t40,t57,t46,t25,t13,t24,t5,t31,t20,t8,t36,t35,t39,t62,t37,t38
+ WHERE a40=6
+   AND b34=a31
+   AND a38=b39
+   AND a20=b5
+   AND a8=b31
+   AND a46=b36
+   AND a25=b35
+   AND a37=b57
+   AND a57=b46
+   AND b25=a47
+   AND b45=a62
+   AND b20=a45
+   AND b47=a39
+   AND a24=b8
+   AND a34=b37
+   AND a36=b13
+   AND b38=a13
+   AND a40=b24
+   AND b62=a35;
+
+SELECT x60,x31,x57,x37,x62,x51,x45,x6,x7,x3,x33,x23,x30,x41,x40,x13,x52,x49,x58,x19
+  FROM t7,t33,t51,t3,t30,t40,t31,t58,t19,t13,t52,t62,t57,t45,t41,t60,t49,t23,t6,t37
+ WHERE a23=b13
+   AND a60=4
+   AND b33=a52
+   AND a31=b45
+   AND a37=b19
+   AND b31=a49
+   AND b52=a60
+   AND a6=b30
+   AND a30=b41
+   AND b57=a58
+   AND b62=a19
+   AND a57=b3
+   AND b40=a3
+   AND b37=a40
+   AND b23=a33
+   AND a62=b6
+   AND b58=a7
+   AND b7=a51
+   AND b49=a41
+   AND b51=a13;
+
+SELECT x50,x7,x19,x33,x54,x32,x47,x30,x53,x45,x55,x28,x58,x25,x15,x41,x37,x60,x10,x24
+  FROM t25,t50,t10,t33,t7,t37,t28,t15,t32,t53,t19,t45,t30,t60,t41,t58,t54,t47,t24,t55
+ WHERE b30=a41
+   AND a32=b55
+   AND a45=b54
+   AND b25=a50
+   AND a25=b10
+   AND a30=b53
+   AND a47=b50
+   AND b41=a33
+   AND a47=3
+   AND a60=b33
+   AND a37=b24
+   AND b7=a55
+   AND b28=a10
+   AND a7=b19
+   AND a54=b15
+   AND b58=a28
+   AND a19=b37
+   AND b45=a53
+   AND a58=b32
+   AND b60=a24;
+
+SELECT x4,x8,x38,x44,x31,x9,x57,x48,x19,x40,x14,x12,x7,x64,x37,x18,x62,x35,x42,x15,x16
+  FROM t35,t40,t14,t42,t15,t7,t64,t19,t9,t8,t57,t37,t44,t38,t18,t62,t4,t48,t31,t16,t12
+ WHERE b48=a57
+   AND a4=b19
+   AND a14=b16
+   AND b37=a48
+   AND a40=b42
+   AND a31=7
+   AND a15=b40
+   AND a38=b8
+   AND b15=a31
+   AND b64=a18
+   AND b12=a44
+   AND b7=a8
+   AND b35=a16
+   AND a12=b14
+   AND a64=b57
+   AND b62=a7
+   AND a35=b38
+   AND b9=a19
+   AND a62=b18
+   AND b4=a37
+   AND b44=a42;
+
+SELECT x63,x53,x62,x52,x11,x5,x40,x64,x27,x28,x21,x41,x22,x30,x16,x14,x56,x32,x46,x50,x1,x34
+  FROM t46,t34,t1,t32,t53,t21,t63,t11,t30,t62,t27,t50,t16,t64,t40,t56,t22,t28,t52,t5,t41,t14
+ WHERE a21=b5
+   AND b30=a52
+   AND a62=b46
+   AND a14=3
+   AND b52=a28
+   AND b53=a14
+   AND a63=b28
+   AND b40=a56
+   AND a11=b64
+   AND a53=b22
+   AND b1=a34
+   AND b32=a41
+   AND a50=b63
+   AND a64=b62
+   AND b11=a30
+   AND b27=a40
+   AND a22=b56
+   AND b21=a46
+   AND a1=b50
+   AND b34=a16
+   AND a27=b16
+   AND a5=b41;
+
+SELECT x57,x1,x43,x41,x28,x60,x54,x42,x6,x7,x2,x37,x48,x47,x36,x39,x50,x44,x9,x4,x21,x19
+  FROM t42,t48,t60,t2,t28,t44,t4,t43,t54,t6,t36,t19,t57,t21,t9,t7,t37,t47,t41,t50,t1,t39
+ WHERE a41=b44
+   AND a60=b47
+   AND a6=b28
+   AND a47=b9
+   AND b6=a48
+   AND a39=b60
+   AND a43=b50
+   AND b21=a9
+   AND b19=a37
+   AND b4=a54
+   AND a39=1
+   AND a50=b2
+   AND a7=b54
+   AND b57=a36
+   AND b48=a1
+   AND a2=b37
+   AND a42=b1
+   AND a44=b43
+   AND b42=a19
+   AND b36=a4
+   AND b41=a57
+   AND b7=a21;
+
+SELECT x20,x8,x49,x36,x27,x38,x2,x14,x31,x53,x62,x63,x32,x57,x42,x46,x40,x39,x3,x56,x55,x15,x33
+  FROM t38,t56,t39,t46,t33,t36,t63,t20,t55,t3,t32,t42,t40,t27,t57,t15,t2,t62,t53,t8,t14,t31,t49
+ WHERE b49=a56
+   AND b20=a15
+   AND b57=a63
+   AND b55=a32
+   AND b39=a42
+   AND a8=b63
+   AND a20=b36
+   AND b2=a49
+   AND a31=10
+   AND b42=a40
+   AND a27=b14
+   AND a62=b33
+   AND a55=b3
+   AND a2=b53
+   AND b8=a31
+   AND a33=b38
+   AND a38=b40
+   AND b32=a57
+   AND b62=a46
+   AND b15=a53
+   AND b56=a39
+   AND a14=b46
+   AND a3=b27;
+
+SELECT x13,x20,x6,x32,x54,x39,x28,x47,x43,x24,x30,x25,x2,x53,x40,x23,x52,x5,x18,x63,x31,x59,x11,x51
+  FROM t51,t52,t6,t63,t23,t54,t2,t11,t31,t30,t24,t40,t39,t47,t13,t28,t25,t5,t59,t20,t43,t18,t53,t32
+ WHERE b2=a51
+   AND a5=b59
+   AND a47=b54
+   AND b32=a54
+   AND b39=a59
+   AND a18=b43
+   AND b5=a28
+   AND a31=b52
+   AND a28=10
+   AND b20=a2
+   AND b40=a6
+   AND b25=a20
+   AND b24=a40
+   AND a63=b30
+   AND a30=b31
+   AND a23=b18
+   AND b47=a24
+   AND a52=b6
+   AND b53=a13
+   AND a25=b23
+   AND a39=b63
+   AND b13=a11
+   AND a53=b51
+   AND b11=a32;
+
+SELECT x61,x16,x59,x6,x29,x53,x31,x12,x56,x50,x27,x54,x24,x22,x13,x58,x42,x2,x17,x4,x19,x55,x63,x34
+  FROM t17,t59,t42,t61,t12,t34,t6,t16,t54,t19,t22,t27,t55,t24,t50,t29,t56,t53,t31,t58,t4,t2,t13,t63
+ WHERE b16=a27
+   AND b54=a2
+   AND a54=b22
+   AND b31=a42
+   AND b53=a6
+   AND a13=b55
+   AND a4=b61
+   AND a17=b12
+   AND b58=a53
+   AND a29=b6
+   AND b19=a16
+   AND a56=b13
+   AND a22=b17
+   AND a55=b50
+   AND a59=b2
+   AND b34=a50
+   AND a61=b42
+   AND b4=a63
+   AND a27=1
+   AND a58=b24
+   AND a24=b63
+   AND a19=b59
+   AND a12=b56
+   AND a34=b29;
+
+SELECT x40,x27,x30,x36,x24,x56,x42,x17,x11,x41,x32,x23,x16,x47,x25,x50,x12,x19,x33,x61,x20,x15,x54,x55,x53
+  FROM t53,t50,t41,t15,t54,t30,t19,t56,t32,t55,t17,t40,t33,t11,t61,t12,t25,t23,t47,t20,t16,t36,t42,t27,t24
+ WHERE a56=b33
+   AND a47=b42
+   AND b12=a30
+   AND b53=a19
+   AND a23=b15
+   AND a36=b47
+   AND b24=a41
+   AND b55=a54
+   AND a40=b54
+   AND b36=a20
+   AND b20=a50
+   AND b17=a15
+   AND a24=b32
+   AND a17=b41
+   AND b19=a12
+   AND a16=b11
+   AND a50=7
+   AND b16=a55
+   AND b56=a32
+   AND b30=a11
+   AND a33=b27
+   AND a61=b23
+   AND b25=a42
+   AND b61=a53
+   AND b40=a25;
+
+SELECT x57,x44,x27,x7,x37,x47,x23,x19,x60,x55,x24,x40,x17,x15,x30,x28,x33,x35,x5,x54,x45,x56,x25,x50,x26,x51
+  FROM t25,t23,t54,t44,t27,t24,t47,t17,t5,t7,t26,t50,t33,t55,t60,t56,t19,t30,t35,t51,t40,t57,t45,t28,t37,t15
+ WHERE a25=b26
+   AND b35=a33
+   AND a15=b50
+   AND b44=a19
+   AND b15=a30
+   AND b30=a57
+   AND a47=b51
+   AND a51=b5
+   AND b17=a23
+   AND a28=b57
+   AND b56=a7
+   AND b28=a35
+   AND a54=b7
+   AND b55=a45
+   AND b40=a26
+   AND a27=b19
+   AND b24=a44
+   AND a5=b27
+   AND b60=a24
+   AND a23=1
+   AND a55=b37
+   AND b45=a60
+   AND b54=a17
+   AND a50=b25
+   AND b47=a56
+   AND b33=a37;
+
+SELECT x19,x39,x61,x47,x10,x43,x9,x53,x16,x37,x22,x54,x21,x14,x27,x60,x18,x20,x52,x1,x45,x23,x50,x28,x31,x64
+  FROM t50,t39,t61,t45,t28,t52,t43,t53,t31,t14,t64,t10,t18,t27,t23,t20,t16,t60,t22,t37,t47,t19,t21,t54,t1,t9
+ WHERE b61=a27
+   AND a43=b60
+   AND a20=b28
+   AND b22=a54
+   AND b9=a22
+   AND b53=a1
+   AND b47=a21
+   AND b20=a60
+   AND a53=b50
+   AND a18=b1
+   AND b19=a52
+   AND b31=a45
+   AND b39=a23
+   AND a37=b10
+   AND b18=a31
+   AND b14=a47
+   AND a23=4
+   AND b37=a64
+   AND a61=b21
+   AND a28=b52
+   AND a16=b54
+   AND b27=a19
+   AND b43=a39
+   AND a14=b64
+   AND b45=a9
+   AND b16=a10;
+
+SELECT x6,x9,x61,x49,x33,x14,x24,x28,x10,x5,x23,x63,x31,x19,x25,x15,x13,x35,x18,x62,x47,x46,x51,x27,x60,x36,x26
+  FROM t60,t15,t18,t36,t35,t28,t61,t26,t33,t46,t10,t27,t13,t14,t23,t6,t24,t31,t63,t62,t25,t51,t19,t47,t5,t9,t49
+ WHERE b10=a5
+   AND a35=b46
+   AND b31=a24
+   AND a13=b51
+   AND a26=b19
+   AND a18=7
+   AND b6=a9
+   AND b61=a14
+   AND a19=b33
+   AND b5=a51
+   AND b28=a36
+   AND b14=a63
+   AND b47=a6
+   AND a18=b13
+   AND b24=a23
+   AND a60=b27
+   AND a10=b63
+   AND b60=a62
+   AND b25=a27
+   AND b15=a28
+   AND a25=b9
+   AND a46=b49
+   AND a15=b26
+   AND b62=a31
+   AND a61=b35
+   AND b23=a49
+   AND a47=b36;
+
+SELECT x15,x49,x32,x43,x63,x64,x25,x7,x48,x59,x9,x41,x4,x17,x30,x42,x50,x46,x57,x6,x53,x47,x52,x31,x60,x13,x45,x24
+  FROM t24,t25,t15,t30,t4,t59,t63,t53,t9,t46,t31,t60,t52,t32,t47,t13,t43,t42,t50,t49,t45,t6,t7,t48,t17,t41,t57,t64
+ WHERE a52=b32
+   AND a48=b9
+   AND a64=b13
+   AND a32=b41
+   AND a24=b60
+   AND b30=a63
+   AND a7=b17
+   AND a43=b45
+   AND a49=5
+   AND b42=a17
+   AND b63=a46
+   AND a31=b50
+   AND b59=a4
+   AND a42=b24
+   AND b46=a45
+   AND b47=a50
+   AND a59=b64
+   AND a15=b48
+   AND b15=a30
+   AND a47=b43
+   AND b6=a53
+   AND b4=a25
+   AND a41=b53
+   AND b52=a49
+   AND a6=b7
+   AND b57=a9
+   AND b31=a60
+   AND a57=b25;
+
+SELECT x5,x13,x52,x24,x17,x46,x26,x54,x33,x44,x43,x2,x16,x34,x35,x57,x1,x60,x23,x28,x56,x48,x49,x41,x40,x61,x11,x55
+  FROM t17,t28,t5,t34,t49,t24,t33,t55,t61,t41,t11,t60,t13,t43,t48,t40,t52,t54,t2,t56,t16,t44,t1,t57,t26,t46,t23,t35
+ WHERE b16=a44
+   AND a56=b46
+   AND b41=a46
+   AND a2=b35
+   AND a26=b13
+   AND a55=b1
+   AND b57=a48
+   AND b54=a35
+   AND a34=b5
+   AND b56=a11
+   AND b2=a13
+   AND b33=a40
+   AND b49=a33
+   AND b24=a49
+   AND a28=b44
+   AND a28=5
+   AND b55=a16
+   AND b17=a24
+   AND a57=b40
+   AND a52=b43
+   AND b48=a61
+   AND a17=b11
+   AND b34=a54
+   AND a23=b61
+   AND a1=b60
+   AND a60=b52
+   AND a41=b26
+   AND a43=b23;
+
+SELECT x56,x14,x61,x48,x44,x63,x57,x34,x42,x17,x3,x46,x18,x20,x62,x10,x49,x4,x25,x59,x51,x19,x35,x53,x60,x33,x45,x31,x5
+  FROM t25,t35,t61,t45,t34,t18,t63,t42,t4,t51,t49,t62,t60,t3,t33,t31,t46,t59,t10,t14,t57,t17,t44,t5,t19,t48,t20,t53,t56
+ WHERE b17=a42
+   AND a56=1
+   AND a49=b4
+   AND a17=b48
+   AND a56=b20
+   AND a63=b34
+   AND a35=b25
+   AND a61=b10
+   AND a62=b51
+   AND b53=a44
+   AND a10=b31
+   AND b5=a34
+   AND a57=b45
+   AND a53=b33
+   AND a18=b42
+   AND b60=a4
+   AND b14=a51
+   AND b18=a59
+   AND b49=a3
+   AND a45=b61
+   AND b62=a33
+   AND b3=a5
+   AND b46=a14
+   AND a48=b19
+   AND a19=b44
+   AND a20=b59
+   AND a60=b57
+   AND b63=a46
+   AND b35=a31;
+
+SELECT x45,x27,x57,x6,x48,x62,x29,x41,x51,x53,x2,x12,x56,x61,x14,x15,x40,x4,x31,x16,x33,x10,x9,x18,x34,x22,x39,x64,x17,x49
+  FROM t62,t49,t10,t6,t12,t14,t56,t53,t15,t61,t22,t27,t29,t57,t4,t41,t17,t31,t39,t2,t45,t9,t40,t48,t16,t33,t34,t64,t18,t51
+ WHERE b2=a12
+   AND a62=b9
+   AND a61=b33
+   AND a22=b49
+   AND a6=b4
+   AND a45=b17
+   AND a51=b45
+   AND a9=b51
+   AND a2=b22
+   AND b29=a31
+   AND a34=b18
+   AND a14=b6
+   AND a17=b31
+   AND a27=b62
+   AND b15=a4
+   AND a41=b57
+   AND a57=b64
+   AND b39=a29
+   AND b41=a49
+   AND b14=a40
+   AND b61=a10
+   AND a33=b16
+   AND a53=b10
+   AND a15=b27
+   AND a39=b56
+   AND b53=a64
+   AND b34=a16
+   AND a40=3
+   AND a18=b48
+   AND b12=a56;
+
+SELECT x46,x29,x34,x16,x21,x31,x17,x40,x4,x56,x26,x27,x45,x2,x20,x41,x28,x36,x37,x7,x23,x64,x18,x22,x33,x61,x24,x54,x9,x48
+  FROM t45,t27,t37,t36,t7,t24,t34,t9,t46,t61,t16,t48,t28,t23,t54,t40,t22,t2,t31,t41,t20,t18,t17,t56,t33,t4,t26,t64,t21,t29
+ WHERE a31=b33
+   AND a4=b40
+   AND a54=b9
+   AND b4=a34
+   AND b16=a20
+   AND a21=b7
+   AND a29=b34
+   AND a45=3
+   AND a2=b23
+   AND a37=b36
+   AND a16=b46
+   AND a56=b29
+   AND a9=b22
+   AND a7=b48
+   AND a24=b28
+   AND a18=b17
+   AND b61=a46
+   AND b21=a17
+   AND b56=a27
+   AND b41=a48
+   AND a61=b64
+   AND b54=a28
+   AND b20=a23
+   AND b24=a40
+   AND b2=a41
+   AND a64=b37
+   AND b27=a26
+   AND b18=a45
+   AND b31=a22
+   AND b26=a36;
+
+SELECT x19,x54,x35,x22,x45,x33,x63,x23,x6,x18,x36,x20,x4,x25,x13,x57,x55,x43,x40,x1,x5,x3,x52,x59,x37,x27,x56,x16,x32,x50,x64
+  FROM t55,t19,t25,t52,t35,t43,t22,t5,t59,t33,t4,t23,t63,t40,t13,t32,t50,t64,t6,t16,t3,t18,t1,t57,t56,t27,t54,t37,t45,t20,t36
+ WHERE b3=a63
+   AND a54=b25
+   AND b55=a5
+   AND a57=b16
+   AND a36=b54
+   AND b5=a3
+   AND a59=b22
+   AND b32=a20
+   AND a43=b33
+   AND b43=a55
+   AND b1=a64
+   AND b59=a27
+   AND b36=a45
+   AND a35=b19
+   AND a37=b64
+   AND a18=b4
+   AND b50=a33
+   AND a27=1
+   AND b56=a52
+   AND b45=a32
+   AND a1=b35
+   AND a16=b20
+   AND a19=b40
+   AND a40=b13
+   AND b18=a6
+   AND b63=a56
+   AND a22=b6
+   AND b23=a13
+   AND b52=a23
+   AND b37=a25
+   AND a4=b57;
+
+SELECT x20,x37,x55,x40,x31,x15,x28,x48,x64,x17,x1,x56,x4,x11,x5,x26,x52,x32,x35,x63,x60,x38,x36,x22,x24,x39,x13,x33,x61,x49,x58,x47
+  FROM t20,t15,t52,t56,t4,t48,t60,t28,t35,t5,t11,t33,t1,t26,t64,t31,t24,t32,t39,t22,t13,t63,t55,t40,t36,t47,t58,t49,t38,t61,t37,t17
+ WHERE b40=a5
+   AND b39=a63
+   AND a33=b60
+   AND a1=b52
+   AND b31=a64
+   AND b64=a28
+   AND b17=a24
+   AND a60=b4
+   AND b15=a35
+   AND a26=b33
+   AND b11=a40
+   AND b48=a22
+   AND b35=a47
+   AND a4=b37
+   AND a56=b5
+   AND a15=b13
+   AND b28=a48
+   AND b55=a49
+   AND b49=a11
+   AND b63=a61
+   AND a17=b20
+   AND a32=b22
+   AND a36=b24
+   AND a52=b32
+   AND b61=a37
+   AND b38=a31
+   AND b26=a55
+   AND a47=1
+   AND a13=b36
+   AND b1=a39
+   AND b56=a58
+   AND b58=a20;
+
+SELECT x23,x57,x9,x18,x6,x42,x34,x21,x43,x27,x48,x38,x35,x4,x19,x30,x54,x64,x50,x17,x37,x10,x11,x29,x8,x22,x20,x32,x46,x12,x14,x61
+  FROM t19,t12,t17,t64,t37,t57,t32,t35,t11,t43,t8,t6,t29,t30,t21,t27,t61,t42,t34,t20,t54,t14,t18,t9,t50,t10,t48,t38,t4,t46,t22,t23
+ WHERE b43=a29
+   AND a64=b12
+   AND b9=a17
+   AND a19=b20
+   AND a22=b6
+   AND a14=b27
+   AND b42=a30
+   AND a42=b14
+   AND b21=a27
+   AND a50=b38
+   AND a46=b30
+   AND a6=b10
+   AND a10=b37
+   AND a35=b17
+   AND a34=4
+   AND b57=a32
+   AND a54=b29
+   AND b23=a4
+   AND b19=a8
+   AND a38=b46
+   AND b22=a23
+   AND b48=a12
+   AND b18=a37
+   AND a9=b32
+   AND b8=a18
+   AND a34=b4
+   AND a21=b64
+   AND a48=b35
+   AND b11=a57
+   AND b50=a43
+   AND a61=b54
+   AND a20=b61;
+
+SELECT x30,x22,x3,x23,x47,x9,x16,x1,x34,x28,x8,x59,x12,x38,x54,x61,x20,x45,x4,x7,x41,x53,x46,x15,x64,x24,x17,x44,x21,x60,x35,x49,x19
+  FROM t4,t60,t12,t54,t61,t22,t35,t47,t23,t7,t41,t8,t9,t3,t17,t20,t53,t24,t21,t46,t19,t30,t15,t16,t45,t64,t59,t44,t38,t34,t49,t28,t1
+ WHERE a1=b9
+   AND b22=a30
+   AND a17=b53
+   AND a61=10
+   AND b34=a3
+   AND b15=a35
+   AND b28=a19
+   AND b23=a46
+   AND b8=a49
+   AND a23=b3
+   AND a12=b30
+   AND a8=b59
+   AND b49=a44
+   AND a34=b38
+   AND a53=b19
+   AND a20=b41
+   AND b47=a15
+   AND a24=b21
+   AND b17=a54
+   AND a9=b44
+   AND a4=b16
+   AND b12=a45
+   AND b7=a41
+   AND b20=a61
+   AND b54=a16
+   AND b24=a38
+   AND b46=a59
+   AND a60=b4
+   AND b64=a28
+   AND b1=a22
+   AND b60=a47
+   AND a7=b35
+   AND a64=b45;
+
+SELECT x51,x5,x38,x22,x27,x39,x64,x9,x41,x49,x7,x50,x24,x60,x43,x48,x13,x45,x54,x37,x57,x26,x10,x34,x61,x2,x4,x25,x23,x59,x3,x18,x47,x62
+  FROM t23,t45,t39,t38,t47,t25,t18,t3,t4,t48,t22,t24,t64,t43,t13,t37,t50,t41,t5,t60,t9,t49,t27,t54,t10,t57,t7,t26,t61,t34,t62,t51,t2,t59
+ WHERE a38=b48
+   AND b59=a49
+   AND a57=b7
+   AND a22=b54
+   AND a61=4
+   AND b38=a24
+   AND b51=a45
+   AND b27=a23
+   AND b41=a26
+   AND b3=a59
+   AND a41=b2
+   AND a5=b60
+   AND a13=b10
+   AND a34=b49
+   AND b57=a43
+   AND b22=a37
+   AND b50=a48
+   AND b23=a61
+   AND b5=a54
+   AND a7=b26
+   AND a4=b13
+   AND b18=a10
+   AND b9=a2
+   AND a51=b4
+   AND a18=b62
+   AND a9=b24
+   AND b64=a47
+   AND b45=a39
+   AND a64=b25
+   AND a3=b39
+   AND a60=b47
+   AND a50=b37
+   AND b43=a62
+   AND a27=b34;
+
+SELECT x13,x23,x6,x39,x22,x40,x16,x2,x27,x25,x9,x8,x56,x60,x11,x48,x28,x42,x7,x19,x5,x55,x20,x44,x18,x51,x36,x34,x38,x52,x64,x14,x3,x37
+  FROM t16,t19,t39,t9,t40,t3,t55,t36,t48,t18,t8,t25,t44,t2,t14,t56,t23,t42,t13,t11,t7,t22,t51,t60,t27,t37,t64,t52,t28,t38,t34,t5,t6,t20
+ WHERE b39=a56
+   AND b20=a28
+   AND b28=a34
+   AND a51=b19
+   AND a42=b36
+   AND a5=b9
+   AND a38=b25
+   AND a48=b8
+   AND a19=b18
+   AND a11=4
+   AND a64=b13
+   AND a14=b56
+   AND b42=a23
+   AND b5=a40
+   AND a60=b38
+   AND a13=b48
+   AND b44=a18
+   AND a39=b52
+   AND b51=a9
+   AND b3=a55
+   AND a52=b23
+   AND a2=b40
+   AND a3=b22
+   AND a6=b37
+   AND b55=a27
+   AND a37=b34
+   AND b14=a8
+   AND a20=b60
+   AND b16=a25
+   AND a16=b27
+   AND a7=b6
+   AND a11=b2
+   AND a22=b64
+   AND a44=b7;
+
+SELECT x5,x58,x23,x20,x3,x12,x48,x24,x47,x26,x37,x13,x14,x8,x43,x7,x63,x9,x39,x19,x50,x15,x2,x57,x4,x25,x16,x53,x34,x64,x35,x55,x60,x18,x46
+  FROM t58,t24,t4,t39,t63,t34,t53,t9,t37,t57,t48,t5,t46,t2,t20,t55,t35,t13,t47,t19,t43,t15,t25,t8,t50,t7,t16,t64,t23,t18,t12,t26,t3,t60,t14
+ WHERE a47=b20
+   AND b16=a20
+   AND a58=b43
+   AND a7=8
+   AND b58=a53
+   AND a19=b13
+   AND b47=a25
+   AND a16=b15
+   AND a2=b26
+   AND b37=a24
+   AND b5=a55
+   AND b53=a23
+   AND b34=a4
+   AND b8=a34
+   AND b9=a13
+   AND a12=b39
+   AND a50=b24
+   AND b23=a39
+   AND b2=a14
+   AND a7=b18
+   AND b57=a48
+   AND a9=b4
+   AND b12=a63
+   AND a26=b25
+   AND a57=b14
+   AND a3=b64
+   AND b50=a43
+   AND a15=b19
+   AND b55=a37
+   AND a18=b46
+   AND b48=a5
+   AND a8=b35
+   AND a35=b3
+   AND b63=a46
+   AND b60=a64;
+
+SELECT x27,x8,x58,x50,x30,x3,x38,x12,x26,x45,x44,x49,x1,x35,x4,x39,x6,x23,x47,x11,x25,x54,x52,x61,x53,x18,x60,x56,x7,x63,x31,x28,x42,x15,x22,x13
+  FROM t30,t54,t38,t56,t58,t45,t49,t12,t25,t63,t18,t42,t35,t31,t26,t39,t13,t44,t23,t3,t50,t22,t52,t60,t27,t6,t8,t7,t15,t4,t1,t47,t28,t11,t61,t53
+ WHERE a15=b11
+   AND a39=1
+   AND b63=a11
+   AND a28=b1
+   AND a7=b30
+   AND b38=a3
+   AND b26=a52
+   AND a27=b44
+   AND a26=b3
+   AND a6=b8
+   AND a60=b47
+   AND b61=a42
+   AND b35=a30
+   AND b22=a47
+   AND b58=a61
+   AND a38=b56
+   AND b52=a8
+   AND b50=a12
+   AND b27=a56
+   AND a44=b12
+   AND b60=a13
+   AND b6=a49
+   AND a39=b7
+   AND a4=b25
+   AND a58=b18
+   AND b49=a63
+   AND a22=b15
+   AND a31=b53
+   AND b54=a25
+   AND b13=a53
+   AND a1=b45
+   AND a54=b31
+   AND a35=b42
+   AND a50=b28
+   AND b4=a18
+   AND b23=a45;
+
+SELECT x43,x31,x10,x8,x24,x13,x17,x53,x38,x52,x25,x2,x16,x47,x33,x18,x45,x57,x9,x3,x49,x46,x15,x55,x44,x34,x35,x56,x7,x4,x20,x36,x27,x42,x14,x1
+  FROM t36,t35,t46,t44,t4,t3,t33,t10,t15,t20,t34,t56,t13,t8,t1,t31,t57,t14,t16,t18,t24,t42,t52,t45,t2,t25,t43,t9,t27,t53,t47,t17,t55,t49,t38,t7
+ WHERE a18=b10
+   AND a13=b34
+   AND b38=a7
+   AND a10=b44
+   AND a55=b31
+   AND a14=b35
+   AND b24=a4
+   AND b55=a33
+   AND a3=b9
+   AND a24=b56
+   AND a56=b2
+   AND b53=a31
+   AND a36=4
+   AND b18=a46
+   AND b16=a52
+   AND b8=a35
+   AND b45=a8
+   AND a43=b13
+   AND a2=b27
+   AND a16=b43
+   AND b15=a53
+   AND b52=a1
+   AND b14=a25
+   AND b49=a27
+   AND a44=b42
+   AND b3=a34
+   AND a17=b25
+   AND b20=a49
+   AND a38=b33
+   AND b4=a45
+   AND b47=a15
+   AND b57=a9
+   AND a42=b17
+   AND b1=a36
+   AND a47=b46
+   AND a57=b7;
+
+SELECT x27,x44,x20,x4,x21,x28,x32,x31,x12,x58,x22,x6,x35,x10,x53,x7,x5,x3,x29,x50,x11,x43,x45,x19,x13,x54,x57,x15,x1,x60,x9,x38,x63,x17,x2,x41,x30
+  FROM t38,t60,t57,t58,t53,t27,t2,t13,t19,t43,t22,t29,t5,t30,t50,t9,t3,t35,t31,t4,t11,t12,t54,t6,t21,t44,t17,t32,t28,t7,t15,t1,t20,t63,t45,t10,t41
+ WHERE a21=b13
+   AND b17=a41
+   AND a19=b7
+   AND b30=a50
+   AND a17=b1
+   AND b29=a3
+   AND b45=a28
+   AND b15=a35
+   AND a5=b57
+   AND a30=b63
+   AND b5=a11
+   AND a6=b32
+   AND b3=a1
+   AND b20=a38
+   AND a13=b22
+   AND b58=a63
+   AND b19=a45
+   AND a22=b27
+   AND a12=b60
+   AND a27=b43
+   AND b12=a32
+   AND a20=b10
+   AND b31=a44
+   AND a31=b54
+   AND b21=a9
+   AND a15=b50
+   AND a60=b53
+   AND b44=a29
+   AND b28=a2
+   AND b9=a10
+   AND a2=2
+   AND b41=a4
+   AND b4=a57
+   AND b6=a58
+   AND a54=b35
+   AND a53=b38
+   AND b11=a7;
+
+SELECT x23,x35,x6,x1,x13,x28,x52,x54,x15,x29,x36,x41,x43,x46,x10,x37,x57,x42,x49,x12,x26,x9,x48,x18,x64,x38,x14,x27,x50,x45,x47,x2,x20,x7,x60,x40,x32,x31
+  FROM t32,t2,t29,t15,t7,t9,t35,t43,t48,t27,t13,t49,t23,t54,t31,t52,t64,t18,t38,t40,t37,t26,t20,t28,t46,t1,t50,t60,t45,t12,t47,t10,t6,t14,t36,t57,t42,t41
+ WHERE a20=b42
+   AND b50=a60
+   AND b31=a46
+   AND a9=b57
+   AND b6=a18
+   AND a32=b45
+   AND a2=b27
+   AND a14=b40
+   AND b46=a15
+   AND b10=a49
+   AND b7=a23
+   AND b12=a29
+   AND b18=a1
+   AND b64=a50
+   AND a38=b48
+   AND b9=a48
+   AND a26=b29
+   AND a37=b20
+   AND b35=a64
+   AND b2=a35
+   AND a47=b23
+   AND a40=b43
+   AND a27=b38
+   AND b54=a13
+   AND b60=a10
+   AND b1=a54
+   AND a12=b14
+   AND b37=a52
+   AND a42=b47
+   AND b28=a36
+   AND a6=b41
+   AND b13=a7
+   AND b32=a28
+   AND a41=b49
+   AND a26=7
+   AND a43=b36
+   AND b15=a57
+   AND b52=a45;
+
+SELECT x58,x59,x15,x63,x7,x11,x22,x56,x47,x34,x51,x53,x9,x24,x10,x55,x6,x19,x44,x48,x17,x42,x38,x13,x45,x39,x26,x4,x2,x1,x60,x46,x41,x43,x18,x27,x35,x54
+  FROM t38,t45,t44,t60,t4,t10,t55,t42,t26,t56,t41,t6,t46,t58,t35,t7,t39,t22,t2,t13,t9,t17,t59,t27,t48,t47,t63,t11,t51,t15,t53,t19,t24,t18,t34,t43,t54,t1
+ WHERE a42=b6
+   AND a41=b26
+   AND a10=b51
+   AND b44=a39
+   AND b48=a22
+   AND a54=b9
+   AND a56=b13
+   AND a15=b19
+   AND a34=b41
+   AND a47=b10
+   AND b55=a7
+   AND b38=a18
+   AND b60=a19
+   AND a24=b15
+   AND b45=a55
+   AND a53=b34
+   AND a38=b7
+   AND a17=b35
+   AND a46=b1
+   AND b54=a2
+   AND b17=a6
+   AND b24=a59
+   AND a27=b63
+   AND a1=b42
+   AND a48=b43
+   AND a63=b46
+   AND a60=b18
+   AND a51=b39
+   AND b47=a9
+   AND b27=a4
+   AND b4=a11
+   AND a58=b2
+   AND a43=b56
+   AND a44=b11
+   AND b59=a13
+   AND a22=2
+   AND b53=a35
+   AND a45=b58;
+
+SELECT x10,x34,x13,x12,x6,x54,x17,x60,x55,x62,x38,x8,x28,x56,x63,x22,x33,x15,x35,x27,x20,x4,x18,x47,x45,x19,x52,x5,x30,x7,x26,x49,x36,x46,x25,x24,x37,x57,x59
+  FROM t22,t28,t54,t62,t4,t36,t12,t17,t45,t46,t6,t15,t18,t56,t52,t7,t38,t27,t55,t33,t30,t19,t26,t20,t8,t59,t49,t47,t34,t60,t13,t25,t35,t10,t63,t5,t37,t57,t24
+ WHERE b34=a49
+   AND a38=b24
+   AND b57=a35
+   AND b38=a18
+   AND b54=a15
+   AND a54=b26
+   AND a37=b33
+   AND b36=a19
+   AND b8=a56
+   AND a25=b59
+   AND b28=a8
+   AND b30=a27
+   AND b27=a20
+   AND b55=a59
+   AND a6=b13
+   AND b18=a47
+   AND b46=a30
+   AND a62=b20
+   AND b17=a45
+   AND a25=6
+   AND b56=a46
+   AND a36=b52
+   AND b63=a12
+   AND a24=b45
+   AND b7=a33
+   AND a5=b62
+   AND b47=a10
+   AND a26=b5
+   AND a17=b4
+   AND b22=a28
+   AND b19=a22
+   AND a60=b49
+   AND a7=b12
+   AND b10=a55
+   AND b60=a4
+   AND a52=b6
+   AND b35=a63
+   AND b15=a34
+   AND b37=a13;
+
+SELECT x9,x4,x58,x19,x28,x13,x53,x40,x49,x59,x10,x22,x16,x55,x54,x23,x64,x45,x31,x24,x27,x32,x38,x42,x36,x48,x6,x61,x17,x50,x20,x37,x57,x47,x56,x60,x34,x11,x7,x26
+  FROM t27,t6,t28,t32,t26,t17,t16,t40,t4,t38,t54,t53,t24,t58,t20,t55,t64,t57,t11,t59,t50,t22,t19,t36,t47,t31,t7,t45,t60,t42,t13,t9,t48,t10,t37,t34,t49,t23,t61,t56
+ WHERE a37=b19
+   AND b17=a38
+   AND a27=b45
+   AND a47=b56
+   AND b27=a23
+   AND b61=a42
+   AND a40=b38
+   AND b28=a26
+   AND a60=b34
+   AND a17=b20
+   AND a24=b23
+   AND a34=b54
+   AND b13=a49
+   AND a64=b50
+   AND b26=a7
+   AND a56=b59
+   AND b53=a54
+   AND b7=a19
+   AND b22=a45
+   AND a10=b42
+   AND a28=b16
+   AND b24=a9
+   AND b11=a48
+   AND a36=b4
+   AND b6=a13
+   AND b10=a57
+   AND a20=b57
+   AND a58=1
+   AND b60=a50
+   AND b31=a32
+   AND a11=b37
+   AND b49=a59
+   AND a4=b64
+   AND a31=b48
+   AND b55=a58
+   AND b9=a53
+   AND b36=a16
+   AND a55=b47
+   AND a61=b32
+   AND a6=b40;
+
+SELECT x47,x55,x8,x5,x6,x58,x12,x43,x64,x60,x30,x32,x4,x18,x15,x11,x61,x35,x45,x63,x19,x52,x62,x10,x16,x44,x24,x7,x40,x22,x59,x13,x17,x36,x50,x41,x26,x27,x37,x48
+  FROM t26,t59,t15,t32,t17,t52,t43,t19,t37,t47,t7,t63,t64,t18,t55,t40,t44,t5,t45,t22,t61,t58,t27,t30,t50,t4,t48,t12,t13,t8,t6,t11,t62,t36,t35,t41,t60,t10,t24,t16
+ WHERE a52=b43
+   AND b47=a7
+   AND a5=b22
+   AND b24=a15
+   AND b27=a26
+   AND a8=b10
+   AND b32=a35
+   AND a59=b30
+   AND a4=b52
+   AND b17=a10
+   AND a11=b61
+   AND a18=b41
+   AND b50=a13
+   AND a40=b16
+   AND a30=b26
+   AND b58=a43
+   AND b40=a24
+   AND a60=b63
+   AND b4=a45
+   AND a17=b35
+   AND a58=b62
+   AND b55=a64
+   AND b48=a44
+   AND a19=b13
+   AND a27=b60
+   AND a22=b12
+   AND b44=a16
+   AND a12=b11
+   AND a48=b6
+   AND b37=a63
+   AND a62=b64
+   AND a18=10
+   AND a47=b45
+   AND a36=b7
+   AND a37=b15
+   AND b19=a61
+   AND b8=a41
+   AND a55=b59
+   AND b5=a6
+   AND a32=b36;
+
+SELECT x28,x20,x13,x60,x37,x11,x27,x53,x61,x36,x6,x2,x31,x45,x43,x52,x38,x22,x41,x16,x30,x35,x19,x5,x29,x51,x14,x25,x21,x8,x49,x15,x54,x34,x47,x44,x42,x56,x57,x24,x12
+  FROM t25,t28,t20,t29,t13,t53,t31,t12,t41,t54,t45,t15,t30,t56,t52,t38,t22,t47,t36,t6,t43,t61,t14,t16,t49,t57,t34,t51,t11,t21,t19,t24,t37,t44,t5,t8,t35,t42,t27,t60,t2
+ WHERE a15=b57
+   AND a53=b6
+   AND b60=a49
+   AND b15=a24
+   AND a22=b36
+   AND a19=b45
+   AND a8=b20
+   AND a12=b49
+   AND b14=a38
+   AND b5=a42
+   AND a54=b30
+   AND a13=b41
+   AND a27=b21
+   AND b43=a28
+   AND a29=b35
+   AND b44=a60
+   AND a52=b19
+   AND b38=a35
+   AND b27=a57
+   AND b24=a6
+   AND a20=b22
+   AND a16=b51
+   AND b42=a14
+   AND b54=a43
+   AND b16=a34
+   AND a44=b2
+   AND a45=b31
+   AND a31=b29
+   AND a28=7
+   AND b25=a37
+   AND b12=a61
+   AND b47=a5
+   AND b13=a25
+   AND a2=b8
+   AND b34=a36
+   AND a21=b52
+   AND b56=a30
+   AND a51=b11
+   AND a41=b53
+   AND a47=b61
+   AND a56=b37;
+
+SELECT x61,x29,x32,x21,x64,x2,x55,x11,x35,x49,x4,x3,x1,x45,x47,x23,x12,x5,x40,x15,x56,x16,x60,x24,x52,x27,x46,x18,x48,x6,x10,x25,x44,x26,x7,x51,x53,x37,x43,x30,x63,x34
+  FROM t21,t32,t30,t2,t4,t49,t26,t34,t44,t23,t40,t25,t15,t18,t24,t56,t6,t10,t61,t55,t35,t43,t16,t48,t29,t5,t60,t7,t51,t3,t1,t63,t27,t53,t45,t12,t37,t52,t46,t64,t11,t47
+ WHERE b64=a1
+   AND a12=b46
+   AND b30=a16
+   AND a49=b1
+   AND b18=a55
+   AND b35=a32
+   AND b47=a52
+   AND a18=b60
+   AND b37=a30
+   AND b23=a44
+   AND b34=a63
+   AND a2=b3
+   AND a64=b26
+   AND a5=b61
+   AND a27=b11
+   AND b48=a23
+   AND a34=b43
+   AND b10=a29
+   AND a56=b49
+   AND b29=a26
+   AND a35=b12
+   AND b40=a25
+   AND b51=a21
+   AND b27=a15
+   AND a61=b21
+   AND a40=b24
+   AND a43=b56
+   AND b45=a53
+   AND a11=b32
+   AND b52=a24
+   AND a3=b44
+   AND a10=b16
+   AND b4=a47
+   AND a45=b2
+   AND b53=a37
+   AND a48=b5
+   AND a7=b63
+   AND b55=a51
+   AND b15=a4
+   AND b6=a46
+   AND a7=3
+   AND a60=b25;
+
+SELECT x42,x16,x43,x30,x51,x61,x24,x27,x34,x46,x14,x22,x3,x26,x58,x28,x59,x33,x17,x12,x49,x23,x56,x63,x39,x37,x62,x55,x18,x64,x47,x25,x57,x32,x44,x21,x31,x5,x52,x6,x8,x36
+  FROM t55,t14,t32,t5,t16,t52,t28,t36,t37,t18,t51,t31,t43,t42,t6,t49,t23,t62,t21,t27,t64,t57,t56,t17,t58,t63,t61,t34,t47,t39,t26,t8,t12,t22,t59,t3,t30,t25,t44,t46,t24,t33
+ WHERE b57=a14
+   AND b43=a63
+   AND b8=a23
+   AND b14=a6
+   AND b62=a24
+   AND a27=b51
+   AND b46=a49
+   AND a55=b34
+   AND b58=a31
+   AND b33=a18
+   AND b12=a21
+   AND a62=b37
+   AND a34=b23
+   AND b56=a5
+   AND a22=b61
+   AND b27=a16
+   AND a56=b17
+   AND a42=6
+   AND b55=a17
+   AND a3=b22
+   AND b36=a46
+   AND a44=b28
+   AND a25=b39
+   AND b18=a58
+   AND a42=b5
+   AND b30=a33
+   AND a28=b6
+   AND a26=b16
+   AND b3=a39
+   AND a30=b52
+   AND b44=a59
+   AND b26=a8
+   AND a36=b64
+   AND a51=b25
+   AND a32=b49
+   AND a12=b59
+   AND b24=a57
+   AND b47=a37
+   AND b32=a52
+   AND a43=b31
+   AND a61=b21
+   AND a47=b63;
+
+SELECT x50,x20,x13,x22,x18,x25,x31,x6,x19,x35,x28,x37,x27,x8,x41,x61,x3,x14,x51,x54,x44,x12,x64,x55,x9,x57,x62,x1,x15,x17,x36,x49,x11,x10,x59,x26,x60,x24,x39,x5,x58,x7,x38
+  FROM t7,t10,t50,t15,t12,t1,t35,t22,t57,t38,t13,t41,t19,t64,t39,t14,t60,t18,t5,t28,t37,t31,t25,t26,t55,t62,t54,t8,t51,t36,t59,t24,t9,t6,t49,t11,t20,t17,t58,t61,t27,t44,t3
+ WHERE b51=a50
+   AND a18=b15
+   AND b28=a19
+   AND a38=b41
+   AND b61=a17
+   AND b12=a36
+   AND a64=b59
+   AND a8=b3
+   AND a25=b24
+   AND a9=6
+   AND b17=a20
+   AND b8=a54
+   AND b18=a9
+   AND a60=b10
+   AND b54=a13
+   AND a12=b27
+   AND a59=b26
+   AND a39=b22
+   AND b38=a22
+   AND b57=a6
+   AND b20=a35
+   AND b1=a14
+   AND a26=b5
+   AND a5=b60
+   AND b49=a44
+   AND b31=a3
+   AND a27=b37
+   AND b58=a55
+   AND b62=a28
+   AND b25=a15
+   AND b7=a10
+   AND a58=b44
+   AND b64=a41
+   AND a1=b13
+   AND b36=a49
+   AND a37=b19
+   AND a11=b50
+   AND b6=a62
+   AND b39=a31
+   AND a24=b55
+   AND a51=b35
+   AND a61=b14
+   AND a57=b11;
+
+SELECT x62,x38,x47,x43,x58,x50,x26,x55,x45,x25,x44,x6,x46,x23,x39,x35,x2,x18,x28,x15,x8,x29,x20,x37,x40,x49,x31,x5,x41,x17,x32,x13,x21,x1,x12,x61,x54,x30,x33,x51,x4,x60,x16,x14
+  FROM t5,t26,t51,t4,t35,t43,t50,t60,t18,t14,t1,t12,t44,t8,t16,t6,t17,t46,t37,t40,t33,t25,t30,t49,t62,t31,t20,t38,t23,t58,t61,t28,t15,t45,t29,t13,t32,t21,t55,t47,t54,t39,t2,t41
+ WHERE b40=a5
+   AND a35=9
+   AND b2=a23
+   AND b16=a6
+   AND a26=b28
+   AND b50=a17
+   AND a49=b60
+   AND b62=a18
+   AND b44=a55
+   AND a21=b25
+   AND b30=a39
+   AND b31=a33
+   AND b58=a50
+   AND b39=a61
+   AND a45=b20
+   AND a62=b1
+   AND b13=a28
+   AND b21=a32
+   AND a13=b15
+   AND b49=a47
+   AND b26=a44
+   AND a38=b43
+   AND b41=a14
+   AND b29=a2
+   AND a54=b33
+   AND b6=a25
+   AND b14=a16
+   AND b4=a58
+   AND a51=b46
+   AND a4=b51
+   AND b17=a31
+   AND b55=a43
+   AND a40=b32
+   AND a15=b5
+   AND a30=b54
+   AND a29=b12
+   AND b45=a41
+   AND b37=a20
+   AND b47=a1
+   AND a8=b61
+   AND a46=b38
+   AND a12=b18
+   AND a37=b23
+   AND a35=b8;
+
+SELECT x48,x61,x23,x18,x21,x63,x7,x59,x47,x58,x56,x60,x27,x57,x6,x32,x14,x41,x2,x8,x13,x40,x39,x37,x1,x19,x33,x43,x9,x45,x25,x62,x51,x36,x26,x50,x46,x15,x5,x42,x11,x44,x10,x4
+  FROM t6,t27,t45,t25,t61,t62,t14,t37,t51,t33,t15,t48,t44,t11,t40,t41,t5,t13,t8,t10,t1,t4,t58,t63,t50,t18,t23,t56,t42,t19,t9,t26,t21,t46,t7,t60,t59,t36,t39,t47,t57,t43,t32,t2
+ WHERE a47=b8
+   AND a57=b13
+   AND b62=a10
+   AND b2=a40
+   AND b59=a56
+   AND b23=a59
+   AND b60=a33
+   AND b18=a48
+   AND a43=b42
+   AND a27=b51
+   AND b10=a19
+   AND b26=a37
+   AND b48=a25
+   AND b7=a6
+   AND b47=a58
+   AND a36=1
+   AND b57=a1
+   AND b14=a26
+   AND a45=b43
+   AND b1=a51
+   AND b45=a4
+   AND b61=a5
+   AND a39=b37
+   AND a42=b56
+   AND b6=a60
+   AND a2=b5
+   AND b25=a13
+   AND b44=a14
+   AND a46=b9
+   AND b33=a62
+   AND b15=a18
+   AND a36=b21
+   AND a9=b39
+   AND a11=b27
+   AND b4=a32
+   AND b41=a7
+   AND a23=b46
+   AND a44=b19
+   AND a61=b63
+   AND b50=a41
+   AND b11=a21
+   AND b32=a8
+   AND b40=a50
+   AND b58=a15;
+
+SELECT x48,x42,x26,x13,x52,x1,x15,x22,x57,x30,x8,x41,x29,x24,x7,x5,x47,x55,x40,x54,x60,x35,x58,x44,x25,x19,x39,x2,x21,x28,x23,x14,x45,x36,x12,x18,x38,x11,x34,x62,x17,x31,x46,x61,x9
+  FROM t17,t52,t48,t8,t18,t46,t25,t60,t36,t39,t61,t30,t54,t55,t35,t45,t13,t15,t40,t24,t31,t57,t12,t34,t2,t22,t38,t11,t41,t44,t28,t9,t21,t5,t19,t58,t23,t47,t29,t1,t14,t62,t42,t7,t26
+ WHERE a21=b44
+   AND a40=b46
+   AND b8=a34
+   AND a39=b13
+   AND a24=b62
+   AND b60=a9
+   AND a30=b48
+   AND a47=b26
+   AND b39=a11
+   AND b5=a25
+   AND a5=b12
+   AND a46=b15
+   AND a12=b30
+   AND b29=a15
+   AND a29=b23
+   AND b61=a48
+   AND a58=b34
+   AND b57=a7
+   AND a57=b52
+   AND b31=a60
+   AND a52=b58
+   AND a14=b24
+   AND a42=b9
+   AND b42=a22
+   AND b38=a23
+   AND b41=a62
+   AND b11=a35
+   AND b28=a54
+   AND a28=b19
+   AND a38=b35
+   AND b14=a18
+   AND a19=b36
+   AND a2=b21
+   AND b18=a55
+   AND a61=b1
+   AND b54=a44
+   AND b2=a17
+   AND b45=a41
+   AND a36=b40
+   AND a45=b47
+   AND a31=b55
+   AND a1=b17
+   AND a26=b7
+   AND a25=5
+   AND b22=a13;
+
+SELECT x39,x46,x23,x21,x2,x64,x59,x32,x22,x62,x17,x60,x5,x41,x58,x44,x27,x54,x13,x4,x12,x24,x36,x9,x14,x45,x53,x50,x33,x63,x28,x38,x7,x10,x30,x1,x61,x31,x29,x48,x15,x42,x37,x34,x3,x26
+  FROM t63,t28,t54,t37,t34,t32,t2,t12,t27,t1,t44,t42,t7,t50,t3,t60,t39,t10,t59,t41,t48,t45,t30,t58,t36,t38,t29,t23,t14,t5,t13,t15,t31,t21,t17,t53,t22,t33,t26,t24,t4,t61,t46,t9,t64,t62
+ WHERE a30=b45
+   AND a45=b38
+   AND b62=a13
+   AND a58=b7
+   AND b12=a2
+   AND a42=b31
+   AND a7=b33
+   AND b3=a59
+   AND b59=a23
+   AND a31=b64
+   AND b34=a4
+   AND b32=a37
+   AND a39=b14
+   AND b22=a64
+   AND b5=a41
+   AND a24=b53
+   AND b4=a60
+   AND b21=a27
+   AND a28=b24
+   AND a62=b42
+   AND a29=b13
+   AND b36=a32
+   AND a50=b10
+   AND a44=b37
+   AND a21=b60
+   AND a34=b1
+   AND b39=a26
+   AND b17=a12
+   AND a5=b23
+   AND b61=a54
+   AND a14=b48
+   AND b15=a36
+   AND b54=a1
+   AND b28=a15
+   AND a46=b29
+   AND a63=b27
+   AND b41=a48
+   AND b30=a33
+   AND b44=a17
+   AND a22=b26
+   AND a2=4
+   AND b58=a53
+   AND b46=a61
+   AND a9=b63
+   AND a3=b50
+   AND b9=a38;
+
+SELECT x44,x17,x7,x59,x54,x63,x33,x38,x41,x52,x16,x37,x23,x21,x29,x50,x48,x31,x4,x60,x34,x40,x11,x49,x36,x19,x28,x1,x20,x42,x3,x39,x18,x10,x25,x64,x56,x35,x61,x47,x26,x57,x45,x6,x14,x58
+  FROM t29,t26,t45,t35,t50,t4,t23,t6,t18,t36,t17,t14,t56,t52,t41,t28,t19,t1,t10,t20,t21,t3,t47,t63,t48,t34,t61,t37,t16,t58,t59,t57,t25,t42,t7,t31,t38,t39,t40,t11,t44,t49,t54,t60,t64,t33
+ WHERE b38=a49
+   AND a3=b54
+   AND b11=a57
+   AND a61=b44
+   AND a39=b56
+   AND b4=a47
+   AND a59=4
+   AND a36=b26
+   AND a54=b45
+   AND a59=b20
+   AND b16=a41
+   AND a28=b18
+   AND a48=b64
+   AND a17=b35
+   AND a56=b47
+   AND a45=b58
+   AND a11=b29
+   AND a16=b49
+   AND b36=a58
+   AND b19=a1
+   AND a10=b34
+   AND a31=b25
+   AND a37=b61
+   AND b40=a33
+   AND a60=b21
+   AND a34=b50
+   AND b41=a50
+   AND a38=b14
+   AND a4=b10
+   AND a19=b3
+   AND a25=b6
+   AND a52=b63
+   AND b31=a18
+   AND a14=b17
+   AND b42=a21
+   AND a20=b57
+   AND a26=b39
+   AND a42=b28
+   AND b48=a63
+   AND b37=a23
+   AND b1=a29
+   AND a7=b33
+   AND b7=a35
+   AND a40=b60
+   AND a6=b23
+   AND b52=a44;
+
+SELECT x33,x17,x49,x6,x40,x31,x26,x14,x15,x21,x7,x37,x61,x11,x9,x39,x22,x54,x36,x52,x42,x56,x53,x63,x8,x46,x30,x47,x18,x41,x45,x62,x16,x13,x10,x25,x51,x20,x50,x28,x57,x19,x29,x1,x5,x43,x24
+  FROM t22,t36,t1,t14,t56,t16,t8,t21,t33,t26,t11,t13,t61,t29,t5,t57,t51,t31,t7,t62,t10,t46,t28,t45,t30,t19,t15,t42,t6,t25,t17,t37,t9,t50,t18,t41,t40,t20,t47,t43,t39,t53,t63,t24,t52,t54,t49
+ WHERE b51=a22
+   AND a5=b40
+   AND a6=b15
+   AND b21=a53
+   AND a50=b10
+   AND a31=b57
+   AND b17=a18
+   AND b36=a7
+   AND b25=a42
+   AND a56=b54
+   AND a49=b63
+   AND b18=a16
+   AND a28=b46
+   AND a36=b16
+   AND a43=b26
+   AND a1=b6
+   AND b41=a46
+   AND b28=a52
+   AND a19=b62
+   AND b49=a29
+   AND b47=a9
+   AND a8=b29
+   AND a54=b24
+   AND a47=b19
+   AND a7=10
+   AND a51=b31
+   AND b43=a13
+   AND b53=a20
+   AND a40=b9
+   AND b20=a61
+   AND b37=a41
+   AND b42=a63
+   AND b14=a30
+   AND b52=a26
+   AND b1=a24
+   AND a25=b45
+   AND b5=a15
+   AND b30=a11
+   AND a62=b39
+   AND b8=a57
+   AND a14=b61
+   AND a17=b11
+   AND a10=b56
+   AND b50=a33
+   AND a21=b33
+   AND b22=a39
+   AND a45=b13;
+
+SELECT x33,x8,x47,x30,x17,x39,x37,x9,x1,x7,x12,x29,x27,x50,x22,x44,x45,x31,x16,x15,x18,x62,x60,x6,x36,x11,x42,x58,x52,x56,x46,x49,x57,x21,x55,x19,x20,x2,x64,x10,x3,x43,x13,x25,x24,x4,x51,x41
+  FROM t45,t18,t47,t58,t24,t49,t12,t29,t7,t43,t33,t10,t21,t1,t36,t60,t44,t15,t52,t20,t62,t17,t42,t57,t11,t3,t37,t30,t8,t55,t19,t16,t22,t41,t27,t51,t13,t6,t25,t46,t56,t4,t2,t50,t9,t64,t39,t31
+ WHERE a31=b39
+   AND a30=b41
+   AND a60=b31
+   AND b58=a52
+   AND a22=b57
+   AND a8=b36
+   AND a11=b62
+   AND b24=a51
+   AND b19=a7
+   AND b55=a47
+   AND a58=b3
+   AND a64=b50
+   AND a3=b56
+   AND a27=9
+   AND a46=b33
+   AND a13=b46
+   AND a29=b9
+   AND b37=a20
+   AND b18=a43
+   AND a4=b22
+   AND a56=b29
+   AND a18=b13
+   AND b6=a39
+   AND b15=a50
+   AND b44=a1
+   AND a36=b49
+   AND a45=b8
+   AND b45=a10
+   AND a2=b43
+   AND b4=a24
+   AND a25=b42
+   AND b51=a16
+   AND b21=a33
+   AND a17=b60
+   AND b17=a44
+   AND a15=b47
+   AND a62=b16
+   AND b52=a6
+   AND a37=b10
+   AND a57=b30
+   AND a27=b1
+   AND a41=b64
+   AND b20=a42
+   AND a55=b2
+   AND b25=a12
+   AND a49=b7
+   AND a9=b11
+   AND b12=a21;
+
+SELECT x30,x52,x1,x59,x8,x29,x17,x62,x23,x56,x46,x24,x32,x51,x54,x12,x50,x60,x38,x34,x57,x63,x47,x7,x19,x6,x9,x61,x33,x26,x58,x5,x41,x40,x14,x42,x64,x21,x28,x39,x43,x31,x16,x27,x25,x20,x4,x18
+  FROM t58,t12,t60,t17,t27,t59,t32,t52,t19,t18,t4,t43,t9,t16,t61,t21,t64,t14,t39,t20,t26,t63,t31,t23,t56,t41,t33,t6,t62,t24,t34,t38,t46,t29,t30,t5,t57,t47,t40,t51,t42,t50,t25,t54,t1,t28,t8,t7
+ WHERE a62=b38
+   AND b41=a30
+   AND b60=a4
+   AND b32=a38
+   AND a29=b20
+   AND b63=a25
+   AND b12=a28
+   AND a8=b4
+   AND b27=a6
+   AND b5=a32
+   AND a42=b1
+   AND a19=b26
+   AND b43=a20
+   AND a40=b57
+   AND b42=a56
+   AND a14=b24
+   AND a7=b30
+   AND a60=b7
+   AND a50=b40
+   AND a18=b56
+   AND a61=b51
+   AND a5=b14
+   AND a23=b18
+   AND b19=a12
+   AND b31=a64
+   AND a9=b62
+   AND a24=b61
+   AND a54=b46
+   AND a1=b29
+   AND a33=b54
+   AND b8=a16
+   AND b28=a63
+   AND b6=a51
+   AND b25=a52
+   AND a59=b39
+   AND b52=a34
+   AND b9=a17
+   AND b58=a27
+   AND b16=a31
+   AND b34=a47
+   AND a41=b23
+   AND a26=b50
+   AND b17=a43
+   AND b59=a57
+   AND a39=b21
+   AND b64=a21
+   AND a47=7
+   AND a58=b33;
+
+SELECT x5,x38,x61,x13,x42,x4,x58,x15,x54,x28,x51,x55,x6,x50,x37,x64,x29,x26,x35,x46,x12,x53,x14,x41,x18,x25,x23,x63,x22,x21,x59,x31,x44,x48,x8,x49,x10,x56,x20,x34,x27,x17,x32,x19,x39,x16,x57,x2,x60
+  FROM t29,t49,t31,t10,t23,t26,t64,t6,t13,t21,t44,t46,t14,t22,t19,t12,t58,t25,t34,t2,t39,t48,t32,t57,t42,t41,t4,t18,t8,t59,t63,t17,t50,t28,t38,t55,t54,t15,t61,t20,t53,t60,t27,t16,t56,t51,t35,t5,t37
+ WHERE b5=a63
+   AND b29=a28
+   AND b19=a39
+   AND b41=a4
+   AND a12=b49
+   AND a17=b13
+   AND b28=a19
+   AND b26=a48
+   AND b59=a46
+   AND b44=a54
+   AND b25=a26
+   AND b8=a15
+   AND b55=a37
+   AND b17=a41
+   AND a60=b54
+   AND b64=a51
+   AND a61=8
+   AND b58=a23
+   AND a55=b56
+   AND b27=a21
+   AND a44=b57
+   AND a32=b42
+   AND b46=a61
+   AND a35=b16
+   AND b10=a5
+   AND a25=b15
+   AND a18=b4
+   AND b6=a22
+   AND b35=a38
+   AND a59=b2
+   AND b20=a50
+   AND a49=b39
+   AND a53=b21
+   AND b14=a6
+   AND a10=b32
+   AND b31=a56
+   AND a34=b38
+   AND a8=b50
+   AND a13=b37
+   AND a20=b51
+   AND b63=a57
+   AND b23=a2
+   AND a42=b34
+   AND a64=b12
+   AND a31=b53
+   AND a14=b48
+   AND a27=b22
+   AND b60=a58
+   AND b18=a16;
+
+SELECT x36,x56,x27,x13,x47,x31,x26,x59,x22,x10,x34,x6,x7,x2,x24,x64,x16,x4,x45,x11,x38,x49,x50,x63,x20,x33,x18,x55,x15,x1,x28,x58,x41,x60,x32,x57,x23,x35,x3,x40,x30,x52,x14,x54,x8,x37,x61,x9,x46,x25
+  FROM t38,t41,t3,t56,t25,t27,t1,t15,t52,t20,t9,t6,t33,t8,t10,t16,t2,t11,t35,t63,t32,t28,t26,t46,t30,t34,t24,t61,t18,t64,t60,t13,t7,t59,t37,t14,t49,t57,t47,t50,t55,t45,t36,t31,t4,t22,t40,t23,t58,t54
+ WHERE b33=a32
+   AND a61=b45
+   AND b35=a25
+   AND a28=b34
+   AND b8=a10
+   AND a13=b9
+   AND a36=b26
+   AND a50=b27
+   AND a7=b55
+   AND b25=a47
+   AND a45=b18
+   AND b57=a54
+   AND a26=b59
+   AND b7=a16
+   AND a64=b23
+   AND a56=b58
+   AND b46=a27
+   AND a24=b52
+   AND a60=b63
+   AND a46=b1
+   AND b20=a31
+   AND a35=b3
+   AND a58=b47
+   AND b37=a1
+   AND b60=a55
+   AND a57=b4
+   AND b41=a22
+   AND a8=b36
+   AND a2=b61
+   AND a41=b2
+   AND b49=a23
+   AND a56=5
+   AND a38=b28
+   AND b6=a63
+   AND a49=b16
+   AND b13=a40
+   AND b50=a30
+   AND a11=b15
+   AND a59=b54
+   AND a3=b22
+   AND a52=b11
+   AND b64=a33
+   AND a6=b10
+   AND a37=b14
+   AND b24=a14
+   AND b30=a4
+   AND b31=a34
+   AND b32=a20
+   AND b38=a9
+   AND b40=a18;
+
+SELECT x60,x42,x6,x62,x40,x53,x37,x2,x16,x31,x17,x56,x45,x7,x4,x33,x59,x44,x32,x47,x23,x1,x10,x19,x43,x22,x54,x27,x25,x55,x18,x26,x57,x8,x58,x61,x30,x14,x41,x34,x15,x49,x9,x11,x64,x39,x35,x3,x48,x63
+  FROM t16,t43,t32,t37,t47,t45,t33,t35,t64,t61,t9,t4,t23,t39,t2,t63,t40,t30,t44,t22,t49,t7,t11,t58,t60,t17,t25,t6,t27,t55,t48,t54,t53,t57,t19,t34,t18,t26,t56,t59,t3,t62,t1,t10,t42,t14,t8,t15,t41,t31
+ WHERE a10=b49
+   AND a58=b25
+   AND a4=b33
+   AND b30=a53
+   AND b31=a19
+   AND b4=a22
+   AND b16=a25
+   AND a64=b6
+   AND a30=b39
+   AND a41=b55
+   AND b62=a17
+   AND a11=b32
+   AND b2=a57
+   AND a60=10
+   AND b8=a60
+   AND b48=a59
+   AND b27=a33
+   AND a7=b9
+   AND a39=b1
+   AND b37=a9
+   AND b42=a16
+   AND b59=a43
+   AND a26=b54
+   AND a63=b23
+   AND b7=a47
+   AND b57=a23
+   AND b53=a42
+   AND a35=b11
+   AND a62=b26
+   AND a34=b45
+   AND a48=b3
+   AND a54=b64
+   AND a8=b22
+   AND a1=b34
+   AND a18=b43
+   AND a3=b19
+   AND a49=b56
+   AND a40=b63
+   AND a6=b35
+   AND a27=b47
+   AND b44=a32
+   AND a31=b14
+   AND a45=b18
+   AND a56=b17
+   AND b41=a61
+   AND b10=a14
+   AND b15=a44
+   AND b58=a55
+   AND b61=a37
+   AND b40=a15;
+
+SELECT x59,x60,x43,x51,x5,x34,x48,x22,x42,x30,x49,x47,x53,x29,x58,x32,x55,x10,x7,x56,x28,x20,x31,x17,x24,x6,x25,x16,x63,x57,x12,x21,x1,x50,x15,x14,x26,x44,x62,x46,x18,x64,x45,x40,x27,x54,x11,x35,x38,x33,x2
+  FROM t14,t31,t50,t43,t33,t21,t17,t47,t63,t34,t56,t42,t1,t45,t27,t49,t54,t30,t48,t26,t12,t40,t2,t44,t11,t59,t60,t6,t15,t64,t35,t51,t18,t24,t32,t20,t53,t25,t5,t55,t28,t16,t62,t29,t7,t57,t38,t10,t46,t22,t58
+ WHERE b44=a54
+   AND b53=a48
+   AND a11=b2
+   AND b25=a6
+   AND b59=a42
+   AND b33=a55
+   AND a26=b42
+   AND b56=a43
+   AND a60=b48
+   AND a34=b51
+   AND a64=b32
+   AND b34=a56
+   AND a32=b63
+   AND b60=a38
+   AND b46=a22
+   AND a53=b14
+   AND a59=b50
+   AND a45=b55
+   AND b1=a51
+   AND b49=a18
+   AND b43=a5
+   AND b28=a12
+   AND b30=a44
+   AND a28=b17
+   AND b5=a15
+   AND a20=b12
+   AND a58=b29
+   AND b11=a30
+   AND b58=a62
+   AND a7=b6
+   AND a33=b57
+   AND a40=b10
+   AND a29=b27
+   AND b64=a35
+   AND a2=b62
+   AND a10=b38
+   AND b16=a31
+   AND b45=a50
+   AND a57=b18
+   AND b31=a21
+   AND a1=b21
+   AND a14=b54
+   AND a22=4
+   AND b26=a24
+   AND a25=b40
+   AND b20=a47
+   AND b24=a63
+   AND a49=b47
+   AND a16=b7
+   AND b15=a17
+   AND b35=a46;
+
+SELECT x1,x47,x23,x39,x33,x36,x35,x62,x52,x34,x48,x13,x19,x15,x51,x46,x55,x24,x20,x64,x45,x57,x12,x25,x56,x17,x5,x4,x8,x26,x16,x42,x30,x63,x41,x61,x3,x2,x29,x50,x53,x11,x28,x14,x54,x60,x9,x37,x49,x6,x18,x22
+  FROM t11,t33,t9,t35,t25,t4,t26,t42,t49,t19,t34,t46,t29,t47,t41,t18,t24,t6,t54,t48,t3,t15,t28,t20,t30,t8,t5,t22,t1,t39,t61,t63,t56,t12,t2,t13,t57,t53,t51,t50,t52,t55,t17,t37,t60,t62,t36,t16,t45,t23,t14,t64
+ WHERE a51=b34
+   AND b1=a13
+   AND b14=a19
+   AND a47=b48
+   AND a25=b50
+   AND b23=a57
+   AND a22=b15
+   AND a9=b51
+   AND a12=b29
+   AND b20=a18
+   AND b49=a34
+   AND b30=a60
+   AND a55=b16
+   AND b24=a23
+   AND a28=b39
+   AND b46=a64
+   AND a50=b37
+   AND a46=b28
+   AND b52=a14
+   AND b8=a5
+   AND a52=b53
+   AND a26=b4
+   AND b2=a45
+   AND b22=a49
+   AND b54=a15
+   AND a16=b57
+   AND a37=b60
+   AND b63=a36
+   AND b13=a8
+   AND b17=a11
+   AND b12=a2
+   AND a62=b35
+   AND b6=a33
+   AND b61=a24
+   AND a3=b56
+   AND a26=5
+   AND b11=a41
+   AND b9=a56
+   AND a1=b36
+   AND a4=b45
+   AND a48=b41
+   AND a6=b64
+   AND a54=b19
+   AND a63=b3
+   AND b42=a61
+   AND b55=a29
+   AND a20=b25
+   AND a35=b18
+   AND a53=b33
+   AND a42=b47
+   AND b62=a39
+   AND b5=a17;
+
+SELECT x52,x64,x54,x26,x40,x3,x7,x46,x41,x31,x43,x49,x47,x12,x36,x8,x1,x21,x48,x27,x61,x32,x5,x57,x38,x45,x17,x20,x33,x6,x39,x60,x25,x55,x15,x24,x35,x28,x23,x50,x19,x42,x9,x16,x59,x63,x53,x2,x10,x29,x11,x30
+  FROM t6,t26,t54,t38,t46,t8,t12,t53,t25,t63,t15,t2,t20,t42,t41,t31,t52,t28,t33,t32,t64,t40,t59,t36,t5,t23,t47,t29,t43,t10,t55,t50,t35,t48,t11,t61,t27,t9,t24,t57,t49,t7,t19,t39,t60,t3,t21,t1,t17,t45,t16,t30
+ WHERE b21=a27
+   AND a52=b49
+   AND b12=a16
+   AND b36=a50
+   AND a59=b61
+   AND a49=b46
+   AND b39=a20
+   AND a9=b6
+   AND a29=b48
+   AND a53=b32
+   AND a57=b42
+   AND b17=a10
+   AND b16=a8
+   AND a64=b1
+   AND b25=a43
+   AND a55=b3
+   AND b19=a24
+   AND a3=b11
+   AND a12=b53
+   AND a17=b35
+   AND a19=b7
+   AND a30=6
+   AND a61=b5
+   AND b50=a63
+   AND a46=b40
+   AND b10=a25
+   AND b55=a26
+   AND b47=a42
+   AND a33=b59
+   AND b27=a2
+   AND b60=a11
+   AND a21=b45
+   AND a45=b33
+   AND b24=a39
+   AND a5=b41
+   AND a47=b28
+   AND a40=b57
+   AND a28=b31
+   AND a38=b26
+   AND b43=a41
+   AND b2=a60
+   AND a54=b64
+   AND a36=b15
+   AND a31=b29
+   AND a6=b20
+   AND b23=a32
+   AND b52=a35
+   AND b63=a1
+   AND a23=b38
+   AND b54=a48
+   AND b9=a30
+   AND b8=a7;
+
+SELECT x64,x41,x55,x3,x8,x7,x32,x6,x23,x40,x49,x48,x19,x58,x61,x63,x56,x12,x15,x62,x11,x17,x5,x36,x51,x29,x1,x9,x25,x33,x4,x39,x13,x21,x37,x44,x45,x30,x10,x46,x16,x43,x35,x24,x54,x47,x60,x27,x20,x50,x53,x18,x28
+  FROM t15,t61,t30,t4,t49,t16,t48,t28,t35,t64,t27,t33,t9,t8,t24,t40,t25,t50,t51,t7,t53,t36,t39,t45,t11,t18,t60,t5,t17,t47,t3,t55,t32,t54,t10,t43,t19,t37,t56,t41,t12,t21,t62,t13,t58,t46,t63,t23,t6,t20,t29,t1,t44
+ WHERE b25=a19
+   AND a16=b51
+   AND a20=b13
+   AND a9=b18
+   AND b20=a50
+   AND a3=b55
+   AND a62=b27
+   AND a45=b19
+   AND b60=a1
+   AND a56=b5
+   AND b12=a33
+   AND a10=5
+   AND b8=a40
+   AND a37=b3
+   AND a44=b40
+   AND b45=a23
+   AND a18=b29
+   AND b28=a29
+   AND b47=a24
+   AND a13=b48
+   AND a63=b49
+   AND a46=b54
+   AND b58=a28
+   AND b64=a15
+   AND b6=a60
+   AND b63=a64
+   AND b44=a36
+   AND a10=b11
+   AND a4=b9
+   AND a5=b62
+   AND b43=a54
+   AND a11=b15
+   AND b17=a27
+   AND a7=b16
+   AND b46=a39
+   AND a53=b61
+   AND b1=a32
+   AND a58=b39
+   AND b30=a17
+   AND b7=a8
+   AND a21=b50
+   AND b56=a49
+   AND a43=b33
+   AND a51=b24
+   AND a55=b41
+   AND b35=a47
+   AND b21=a6
+   AND b32=a61
+   AND a30=b4
+   AND b36=a48
+   AND b37=a25
+   AND b23=a35
+   AND b53=a12;
+
+SELECT x45,x52,x21,x6,x57,x54,x11,x5,x34,x4,x59,x16,x44,x47,x24,x56,x40,x46,x18,x19,x41,x25,x38,x17,x20,x64,x9,x2,x37,x22,x55,x53,x60,x30,x3,x10,x43,x1,x8,x62,x63,x27,x29,x26,x49,x12,x51,x48,x13,x42,x14,x36,x61,x33
+  FROM t26,t53,t18,t13,t52,t42,t12,t56,t41,t29,t5,t11,t21,t17,t43,t30,t10,t14,t34,t6,t51,t3,t9,t46,t61,t1,t27,t38,t8,t16,t19,t2,t64,t40,t22,t33,t20,t37,t44,t48,t47,t59,t60,t45,t54,t25,t55,t36,t24,t57,t49,t63,t4,t62
+ WHERE a57=b61
+   AND b33=a40
+   AND b34=a8
+   AND b5=a25
+   AND b64=a9
+   AND a20=b52
+   AND a4=b26
+   AND b9=a17
+   AND b60=a33
+   AND a49=b30
+   AND b44=a52
+   AND a6=5
+   AND a55=b19
+   AND b14=a3
+   AND b59=a53
+   AND b12=a56
+   AND b56=a61
+   AND a42=b57
+   AND b42=a13
+   AND a41=b20
+   AND a27=b51
+   AND a37=b22
+   AND b46=a6
+   AND b36=a38
+   AND a26=b53
+   AND b38=a2
+   AND b47=a43
+   AND a44=b54
+   AND b24=a34
+   AND a62=b2
+   AND b41=a18
+   AND b11=a14
+   AND a45=b4
+   AND b8=a63
+   AND a36=b37
+   AND b3=a22
+   AND b45=a60
+   AND a19=b48
+   AND b40=a46
+   AND b62=a54
+   AND a51=b17
+   AND a11=b55
+   AND b27=a59
+   AND b1=a5
+   AND a24=b10
+   AND b13=a16
+   AND a64=b43
+   AND a1=b16
+   AND a21=b49
+   AND a48=b21
+   AND b18=a47
+   AND b29=a10
+   AND a12=b63
+   AND a30=b25;
+
+SELECT x44,x49,x16,x1,x4,x15,x53,x26,x63,x33,x59,x57,x48,x23,x55,x64,x45,x27,x13,x47,x29,x35,x14,x19,x31,x6,x32,x60,x11,x22,x12,x36,x58,x30,x5,x51,x61,x38,x42,x43,x54,x20,x3,x46,x18,x2,x34,x39,x21,x56,x50,x7,x52,x37
+  FROM t6,t35,t55,t4,t3,t45,t18,t13,t58,t38,t37,t31,t29,t30,t56,t14,t23,t46,t48,t12,t63,t52,t47,t49,t61,t7,t59,t15,t22,t1,t20,t19,t33,t16,t36,t60,t51,t43,t54,t64,t5,t2,t42,t11,t57,t34,t26,t53,t39,t44,t27,t21,t32,t50
+ WHERE b42=a7
+   AND b5=a60
+   AND a48=b4
+   AND b30=a31
+   AND b6=a55
+   AND a46=b39
+   AND a4=b23
+   AND b60=a61
+   AND a35=b18
+   AND b50=a36
+   AND a6=b38
+   AND a2=b58
+   AND b3=a19
+   AND a53=b51
+   AND a52=b16
+   AND a44=b43
+   AND b32=a15
+   AND a37=b33
+   AND a58=b7
+   AND b20=a1
+   AND b2=a30
+   AND b44=a3
+   AND b21=a50
+   AND a39=b29
+   AND b61=a21
+   AND a26=b46
+   AND b49=a42
+   AND a27=b55
+   AND b52=a34
+   AND a14=b63
+   AND a56=b35
+   AND b15=a33
+   AND a16=b12
+   AND a54=b26
+   AND b59=a51
+   AND b13=a18
+   AND a32=b34
+   AND b22=a59
+   AND a57=b19
+   AND a43=b14
+   AND a38=b54
+   AND b56=a11
+   AND a20=b11
+   AND a47=b53
+   AND b45=a49
+   AND a48=7
+   AND b31=a5
+   AND b37=a29
+   AND b64=a22
+   AND b1=a63
+   AND a13=b27
+   AND b47=a23
+   AND a45=b57
+   AND b36=a64;
+
+SELECT x25,x14,x55,x11,x27,x59,x50,x45,x5,x7,x56,x22,x48,x41,x16,x1,x64,x19,x63,x43,x35,x33,x18,x8,x36,x15,x38,x4,x26,x49,x61,x9,x40,x20,x37,x10,x54,x13,x12,x6,x29,x30,x58,x32,x23,x17,x62,x46,x53,x52,x57,x42,x2,x60,x51
+  FROM t41,t45,t61,t48,t13,t5,t22,t38,t60,t32,t36,t54,t62,t37,t23,t19,t26,t11,t59,t18,t2,t58,t25,t7,t27,t50,t14,t8,t51,t52,t29,t9,t33,t55,t20,t17,t12,t49,t35,t56,t30,t40,t57,t15,t63,t4,t43,t16,t64,t1,t42,t53,t46,t10,t6
+ WHERE a49=b27
+   AND b61=a12
+   AND b45=a27
+   AND a30=b58
+   AND b40=a59
+   AND b4=a9
+   AND a40=b55
+   AND b37=a11
+   AND a6=b59
+   AND b42=a17
+   AND a16=b20
+   AND a45=b48
+   AND b33=a58
+   AND b22=a35
+   AND a10=b18
+   AND a20=b49
+   AND a54=b6
+   AND b51=a37
+   AND b57=a46
+   AND b8=a25
+   AND a4=b46
+   AND b36=a15
+   AND a8=b56
+   AND a2=b10
+   AND a64=b63
+   AND a57=b32
+   AND a62=b14
+   AND a41=b1
+   AND a23=b26
+   AND a52=b53
+   AND a14=b64
+   AND a50=b43
+   AND a38=b9
+   AND b12=a51
+   AND a5=b17
+   AND a55=b50
+   AND a11=3
+   AND b52=a26
+   AND a53=b29
+   AND a63=b35
+   AND b60=a13
+   AND a48=b41
+   AND b19=a1
+   AND a56=b23
+   AND a18=b15
+   AND a22=b25
+   AND a32=b7
+   AND a60=b30
+   AND b2=a19
+   AND b38=a33
+   AND b5=a43
+   AND a29=b54
+   AND a7=b16
+   AND a61=b13
+   AND b62=a36;
+
+SELECT x54,x57,x61,x58,x20,x44,x18,x36,x2,x22,x32,x14,x15,x26,x19,x63,x38,x37,x48,x40,x34,x21,x27,x25,x5,x16,x24,x43,x29,x35,x49,x31,x17,x46,x64,x3,x51,x59,x13,x6,x28,x12,x23,x30,x9,x60,x56,x47,x11,x52,x8,x10,x45,x42,x55,x4
+  FROM t14,t11,t61,t28,t15,t18,t25,t57,t40,t2,t60,t9,t38,t26,t12,t47,t6,t10,t58,t56,t8,t55,t23,t59,t32,t24,t3,t34,t48,t51,t30,t49,t27,t31,t16,t45,t54,t42,t22,t63,t21,t29,t19,t4,t43,t20,t17,t13,t44,t64,t36,t46,t52,t35,t5,t37
+ WHERE b13=a38
+   AND a44=b52
+   AND a60=b5
+   AND a37=b45
+   AND a18=b51
+   AND a28=b14
+   AND b16=a36
+   AND a26=b58
+   AND a13=b56
+   AND b63=a46
+   AND a17=b57
+   AND a6=b32
+   AND b37=a16
+   AND a19=b31
+   AND a23=b21
+   AND b8=a30
+   AND b23=a35
+   AND b42=a63
+   AND b19=a27
+   AND a34=b48
+   AND a4=b25
+   AND a57=b44
+   AND a32=b22
+   AND b2=a24
+   AND b55=a2
+   AND a12=b43
+   AND a51=b10
+   AND a40=b12
+   AND a15=b60
+   AND b29=a11
+   AND b3=a45
+   AND b15=a22
+   AND b61=a20
+   AND a52=b28
+   AND a42=b26
+   AND a3=b64
+   AND b30=a21
+   AND a36=4
+   AND b4=a48
+   AND a9=b47
+   AND b34=a49
+   AND a47=b38
+   AND b24=a8
+   AND a54=b49
+   AND a5=b40
+   AND a43=b9
+   AND a29=b27
+   AND b18=a14
+   AND b59=a10
+   AND b17=a25
+   AND b20=a56
+   AND b54=a61
+   AND b11=a55
+   AND a58=b35
+   AND a64=b46
+   AND a31=b6;
+
+SELECT x19,x28,x29,x59,x42,x34,x18,x62,x11,x37,x4,x7,x26,x45,x22,x41,x47,x13,x60,x10,x61,x9,x33,x24,x38,x46,x51,x44,x12,x39,x57,x64,x21,x15,x31,x16,x1,x30,x48,x50,x32,x56,x6,x58,x25,x20,x3,x35,x23,x49,x36,x27,x63,x53,x54,x14
+  FROM t51,t11,t45,t63,t12,t7,t32,t4,t38,t19,t48,t33,t49,t14,t27,t47,t24,t60,t42,t50,t13,t22,t64,t30,t62,t6,t58,t37,t56,t39,t41,t15,t26,t1,t35,t59,t29,t23,t34,t18,t9,t25,t53,t36,t46,t3,t10,t16,t57,t54,t28,t61,t31,t20,t44,t21
+ WHERE b36=a20
+   AND b20=a15
+   AND b31=a21
+   AND b57=a29
+   AND b30=a34
+   AND b53=a64
+   AND a37=7
+   AND a48=b28
+   AND a24=b23
+   AND a42=b50
+   AND a18=b22
+   AND a59=b56
+   AND b26=a38
+   AND a62=b51
+   AND a33=b64
+   AND b15=a57
+   AND b10=a31
+   AND a41=b47
+   AND b46=a35
+   AND a16=b59
+   AND a11=b44
+   AND a10=b1
+   AND a60=b11
+   AND b6=a63
+   AND a39=b9
+   AND a9=b13
+   AND b49=a6
+   AND b48=a3
+   AND b3=a36
+   AND b19=a30
+   AND a56=b39
+   AND a28=b21
+   AND b63=a1
+   AND b32=a27
+   AND a47=b29
+   AND b62=a26
+   AND a51=b42
+   AND a37=b25
+   AND a19=b60
+   AND a22=b12
+   AND a32=b35
+   AND b16=a49
+   AND a44=b24
+   AND a4=b7
+   AND b27=a45
+   AND a50=b58
+   AND b34=a12
+   AND b14=a46
+   AND b61=a58
+   AND b45=a23
+   AND b54=a14
+   AND b33=a54
+   AND a25=b41
+   AND a13=b18
+   AND b38=a53
+   AND b4=a61;
+
+SELECT x40,x44,x32,x51,x49,x5,x59,x19,x2,x54,x15,x53,x30,x34,x17,x14,x41,x13,x36,x8,x58,x50,x37,x7,x57,x47,x27,x25,x24,x60,x43,x62,x22,x31,x11,x35,x48,x20,x39,x16,x6,x63,x45,x23,x33,x18,x3,x52,x1,x61,x4,x21,x28,x26,x10,x46,x55
+  FROM t19,t35,t49,t39,t7,t61,t44,t22,t62,t28,t52,t63,t8,t53,t34,t45,t4,t18,t37,t55,t15,t31,t11,t47,t24,t1,t17,t16,t57,t27,t25,t50,t46,t13,t40,t58,t60,t43,t41,t51,t36,t30,t10,t3,t32,t23,t48,t6,t21,t2,t20,t14,t5,t54,t26,t59,t33
+ WHERE b1=a59
+   AND b25=a55
+   AND b48=a27
+   AND a45=b57
+   AND b36=a23
+   AND a26=b46
+   AND a15=b33
+   AND b27=a17
+   AND b44=a51
+   AND b52=a30
+   AND a43=b20
+   AND b40=a44
+   AND a14=b3
+   AND a28=b45
+   AND a54=b22
+   AND b31=a60
+   AND b2=a5
+   AND b24=a61
+   AND a33=b13
+   AND a52=b37
+   AND b41=a62
+   AND b30=a2
+   AND b58=a41
+   AND b14=a21
+   AND a19=b43
+   AND b7=a34
+   AND a36=b17
+   AND b6=a50
+   AND a58=b28
+   AND b23=a16
+   AND a49=b47
+   AND b61=a46
+   AND a8=b50
+   AND a48=b11
+   AND a39=b4
+   AND a4=b5
+   AND a31=b16
+   AND b18=a63
+   AND b19=a53
+   AND a6=b59
+   AND b62=a7
+   AND b53=a11
+   AND a40=b21
+   AND b39=a18
+   AND b32=a47
+   AND a49=7
+   AND a35=b26
+   AND b8=a57
+   AND a37=b34
+   AND b51=a20
+   AND a22=b63
+   AND b55=a13
+   AND b35=a3
+   AND b15=a1
+   AND b54=a10
+   AND a32=b60
+   AND a24=b10;
+
+SELECT x37,x17,x2,x34,x30,x43,x50,x57,x1,x15,x35,x10,x40,x16,x21,x13,x29,x42,x14,x41,x26,x12,x38,x19,x36,x5,x54,x25,x9,x46,x56,x44,x58,x6,x3,x18,x24,x4,x20,x61,x27,x7,x33,x53,x55,x60,x11,x52,x39,x23,x8,x31,x48,x64,x63,x59,x22,x47
+  FROM t42,t19,t56,t7,t18,t58,t29,t22,t52,t53,t24,t31,t36,t2,t23,t30,t13,t38,t15,t60,t34,t8,t63,t25,t39,t48,t46,t5,t40,t37,t3,t55,t9,t1,t59,t16,t33,t14,t6,t4,t57,t20,t35,t47,t44,t12,t50,t64,t61,t43,t27,t41,t21,t26,t10,t17,t11,t54
+ WHERE a44=b42
+   AND b22=a38
+   AND a35=b20
+   AND b40=a64
+   AND b47=a30
+   AND b2=a56
+   AND b46=a48
+   AND b31=a12
+   AND b16=a63
+   AND b4=a47
+   AND a13=b6
+   AND b1=a42
+   AND b54=a33
+   AND b8=a15
+   AND a34=b25
+   AND a2=b3
+   AND b27=a14
+   AND a16=b53
+   AND b29=a23
+   AND a46=b52
+   AND a61=b34
+   AND a25=b48
+   AND a22=b13
+   AND a6=b19
+   AND a37=b23
+   AND a7=b41
+   AND a5=b43
+   AND a3=b5
+   AND b64=a4
+   AND b11=a39
+   AND a31=b37
+   AND a43=b17
+   AND b7=a40
+   AND a50=b38
+   AND a27=b24
+   AND a1=b50
+   AND b55=a59
+   AND b39=a20
+   AND a10=b30
+   AND a14=9
+   AND b56=a29
+   AND b12=a53
+   AND a9=b18
+   AND b9=a41
+   AND a19=b15
+   AND a55=b35
+   AND a36=b21
+   AND b61=a60
+   AND b44=a54
+   AND b10=a58
+   AND b59=a26
+   AND b33=a11
+   AND a17=b36
+   AND b26=a24
+   AND a52=b63
+   AND a21=b58
+   AND b60=a57
+   AND b57=a8;
+
+SELECT x25,x22,x30,x34,x21,x6,x47,x12,x29,x31,x14,x32,x33,x51,x17,x9,x3,x57,x1,x11,x8,x5,x63,x44,x62,x46,x24,x56,x4,x40,x16,x61,x52,x38,x20,x59,x55,x58,x60,x2,x18,x28,x49,x23,x26,x64,x10,x39,x54,x15,x35,x13,x53,x43,x19,x42,x27,x36
+  FROM t62,t55,t40,t6,t3,t30,t13,t52,t24,t29,t56,t33,t12,t35,t44,t59,t39,t51,t16,t4,t14,t20,t28,t36,t46,t58,t64,t1,t27,t23,t61,t34,t60,t25,t8,t18,t47,t15,t19,t63,t22,t57,t53,t49,t17,t5,t10,t43,t31,t11,t26,t54,t42,t9,t32,t21,t38,t2
+ WHERE b12=a24
+   AND a16=b59
+   AND a3=b32
+   AND b13=a18
+   AND a58=b11
+   AND a21=b60
+   AND a42=b14
+   AND a12=b43
+   AND b1=a53
+   AND b18=a8
+   AND b21=a59
+   AND b22=a57
+   AND a46=b51
+   AND b47=a2
+   AND a20=b53
+   AND b8=a47
+   AND a60=b15
+   AND a57=10
+   AND b49=a22
+   AND b36=a4
+   AND a14=b46
+   AND a40=b56
+   AND b28=a1
+   AND a52=b38
+   AND a35=b17
+   AND b19=a26
+   AND a9=b64
+   AND b42=a33
+   AND b44=a34
+   AND a63=b58
+   AND b27=a25
+   AND b9=a23
+   AND b31=a30
+   AND a6=b55
+   AND a10=b63
+   AND a49=b6
+   AND a43=b26
+   AND a64=b40
+   AND a5=b16
+   AND a61=b30
+   AND a36=b35
+   AND b3=a27
+   AND a39=b33
+   AND a54=b20
+   AND a62=b61
+   AND a17=b34
+   AND b54=a11
+   AND a13=b4
+   AND b23=a44
+   AND b39=a55
+   AND b5=a56
+   AND a19=b25
+   AND b10=a38
+   AND a32=b2
+   AND b24=a28
+   AND b52=a29
+   AND a15=b62
+   AND a51=b29;
+
+SELECT x19,x12,x35,x9,x58,x38,x5,x32,x60,x13,x8,x17,x1,x27,x25,x39,x59,x34,x51,x47,x54,x6,x7,x45,x30,x55,x33,x31,x48,x24,x20,x36,x43,x3,x11,x4,x44,x28,x10,x61,x52,x14,x46,x50,x37,x41,x21,x23,x49,x16,x57,x64,x22,x62,x56,x29,x26,x53,x2
+  FROM t37,t28,t20,t48,t25,t19,t57,t9,t5,t54,t44,t39,t60,t47,t21,t24,t33,t31,t46,t55,t52,t8,t12,t53,t36,t16,t32,t45,t34,t11,t10,t64,t29,t23,t56,t17,t22,t41,t27,t38,t49,t51,t3,t26,t13,t1,t2,t14,t59,t6,t50,t30,t62,t7,t43,t4,t58,t61,t35
+ WHERE a23=b20
+   AND a9=b56
+   AND b14=a47
+   AND a39=b23
+   AND b54=a1
+   AND b32=a36
+   AND b57=a58
+   AND a57=b46
+   AND b58=a51
+   AND b51=a28
+   AND a55=b39
+   AND a49=8
+   AND b52=a22
+   AND a3=b6
+   AND b8=a50
+   AND a21=b36
+   AND a53=b50
+   AND b47=a46
+   AND b28=a35
+   AND b29=a26
+   AND a41=b2
+   AND b1=a19
+   AND a38=b45
+   AND b9=a11
+   AND a6=b38
+   AND a13=b34
+   AND b16=a52
+   AND b64=a25
+   AND a34=b53
+   AND b24=a2
+   AND b10=a49
+   AND a48=b30
+   AND a43=b44
+   AND b37=a5
+   AND b27=a37
+   AND b48=a24
+   AND b11=a29
+   AND a10=b17
+   AND a33=b62
+   AND b43=a14
+   AND b26=a16
+   AND a4=b60
+   AND b3=a27
+   AND a30=b61
+   AND a60=b5
+   AND a7=b19
+   AND b55=a45
+   AND a32=b33
+   AND b7=a31
+   AND a64=b22
+   AND a44=b25
+   AND b13=a20
+   AND b41=a54
+   AND b12=a62
+   AND a8=b21
+   AND b4=a61
+   AND a12=b35
+   AND b31=a17
+   AND a56=b59;
+
+SELECT x19,x8,x9,x55,x20,x60,x15,x35,x26,x18,x4,x16,x13,x53,x22,x32,x34,x59,x43,x31,x21,x30,x29,x63,x41,x46,x57,x62,x44,x45,x42,x36,x50,x56,x64,x24,x39,x37,x7,x52,x38,x51,x33,x14,x47,x11,x49,x40,x17,x54,x28,x61,x12,x23,x5,x48,x10,x27,x58,x1
+  FROM t17,t63,t35,t32,t9,t37,t46,t61,t29,t15,t28,t52,t48,t47,t31,t22,t20,t62,t51,t36,t11,t49,t64,t39,t5,t21,t54,t53,t14,t33,t7,t8,t27,t16,t23,t24,t58,t34,t18,t1,t57,t38,t42,t41,t4,t45,t30,t55,t60,t56,t12,t13,t40,t19,t10,t26,t43,t50,t44,t59
+ WHERE a60=b24
+   AND b49=a56
+   AND a29=b64
+   AND a14=b17
+   AND a61=b18
+   AND a37=b42
+   AND b53=a17
+   AND b9=a48
+   AND a52=b12
+   AND b33=a31
+   AND a13=b40
+   AND b43=a62
+   AND b16=a35
+   AND a4=b51
+   AND b36=a20
+   AND a45=b38
+   AND b26=a18
+   AND b48=a1
+   AND a9=b8
+   AND b41=a63
+   AND b5=a26
+   AND b30=a50
+   AND a54=b34
+   AND a8=b35
+   AND b39=a53
+   AND b54=a40
+   AND b46=a44
+   AND b28=a10
+   AND a57=b63
+   AND b29=a47
+   AND b32=a5
+   AND b57=a19
+   AND b22=a36
+   AND b4=a64
+   AND b1=a55
+   AND a15=b59
+   AND b52=a59
+   AND b45=a33
+   AND a32=b37
+   AND b62=a39
+   AND a46=b23
+   AND b19=a43
+   AND a21=b13
+   AND b10=a16
+   AND a34=b58
+   AND a49=b61
+   AND a12=b47
+   AND b60=a7
+   AND a24=b55
+   AND a58=b56
+   AND a41=b27
+   AND a30=b21
+   AND a38=b7
+   AND a20=6
+   AND b14=a11
+   AND a23=b31
+   AND b15=a28
+   AND a27=b50
+   AND a22=b11
+   AND b44=a42;
+
+SELECT x36,x32,x40,x55,x38,x49,x46,x7,x53,x14,x48,x44,x12,x22,x42,x8,x10,x18,x21,x64,x43,x26,x35,x45,x24,x25,x57,x13,x11,x9,x62,x37,x30,x59,x50,x15,x63,x31,x61,x3,x34,x54,x16,x33,x60,x17,x39,x47,x6,x2,x56,x20,x5,x41,x51,x28,x23,x19,x1,x58
+  FROM t54,t49,t18,t60,t23,t50,t7,t3,t22,t56,t53,t31,t17,t20,t28,t43,t12,t24,t61,t33,t34,t13,t51,t8,t59,t25,t16,t6,t40,t46,t58,t38,t32,t26,t5,t63,t36,t42,t21,t48,t55,t1,t37,t2,t57,t41,t35,t10,t47,t11,t44,t45,t30,t39,t19,t15,t14,t64,t62,t9
+ WHERE b45=a3
+   AND b57=a21
+   AND b54=a10
+   AND b26=a46
+   AND a13=b17
+   AND b49=a33
+   AND b38=a11
+   AND b63=a44
+   AND a42=b11
+   AND a40=b9
+   AND b46=a17
+   AND a38=b56
+   AND b35=a41
+   AND a28=b51
+   AND b6=a23
+   AND a64=b42
+   AND a30=b16
+   AND b24=a43
+   AND b25=a35
+   AND b64=a12
+   AND a50=b58
+   AND b23=a5
+   AND b47=a8
+   AND a14=b2
+   AND a2=b40
+   AND a24=b55
+   AND a7=b59
+   AND b3=a15
+   AND b10=a1
+   AND a54=b21
+   AND a20=b33
+   AND a59=b41
+   AND b18=a60
+   AND a22=b53
+   AND b62=a51
+   AND a62=b34
+   AND a31=b28
+   AND b14=a58
+   AND b61=a53
+   AND a39=b13
+   AND a16=b32
+   AND a57=b5
+   AND a34=b60
+   AND a45=b1
+   AND a56=b20
+   AND b7=a48
+   AND b37=a25
+   AND b8=a55
+   AND a19=b48
+   AND a31=6
+   AND a36=b43
+   AND a26=b36
+   AND b12=a37
+   AND b50=a63
+   AND a9=b19
+   AND b39=a32
+   AND b15=a18
+   AND a47=b22
+   AND a6=b30
+   AND b44=a61;
+
+SELECT x26,x15,x30,x33,x5,x42,x4,x40,x52,x53,x58,x55,x64,x21,x35,x54,x61,x24,x19,x2,x59,x34,x1,x8,x16,x41,x57,x49,x11,x38,x12,x56,x17,x29,x37,x32,x18,x44,x27,x39,x48,x45,x47,x20,x50,x3,x62,x7,x13,x36,x46,x6,x23,x25,x60,x9,x22,x14,x10,x43,x63
+  FROM t14,t61,t52,t35,t48,t27,t16,t7,t42,t26,t34,t37,t33,t63,t43,t8,t24,t47,t3,t2,t46,t55,t59,t9,t4,t32,t11,t40,t19,t30,t44,t22,t53,t5,t12,t49,t10,t56,t58,t62,t1,t38,t15,t36,t45,t18,t6,t23,t57,t64,t41,t60,t29,t50,t13,t54,t17,t21,t20,t25,t39
+ WHERE b24=a5
+   AND a8=b43
+   AND a43=b16
+   AND b36=a19
+   AND a11=b33
+   AND a35=b44
+   AND a49=b38
+   AND b1=a39
+   AND b60=a23
+   AND b4=a14
+   AND b3=a20
+   AND b56=a45
+   AND a26=1
+   AND b7=a44
+   AND a58=b5
+   AND b8=a10
+   AND b25=a48
+   AND a40=b64
+   AND a18=b6
+   AND a1=b32
+   AND b39=a37
+   AND b19=a46
+   AND a30=b59
+   AND b20=a38
+   AND b12=a64
+   AND b11=a50
+   AND a52=b40
+   AND a29=b23
+   AND a12=b34
+   AND b14=a9
+   AND b37=a63
+   AND a2=b22
+   AND b41=a13
+   AND a42=b55
+   AND a59=b57
+   AND a62=b9
+   AND a34=b21
+   AND b52=a27
+   AND a61=b50
+   AND a54=b35
+   AND b29=a21
+   AND b49=a60
+   AND a4=b54
+   AND b45=a15
+   AND a47=b2
+   AND b61=a22
+   AND b30=a26
+   AND b42=a36
+   AND a53=b46
+   AND b47=a7
+   AND b17=a16
+   AND b48=a33
+   AND b18=a32
+   AND b13=a17
+   AND a25=b27
+   AND b58=a41
+   AND b63=a55
+   AND a3=b10
+   AND a6=b62
+   AND a24=b15
+   AND a57=b53;
+
+SELECT x6,x1,x12,x35,x28,x33,x34,x13,x56,x8,x24,x40,x47,x16,x41,x62,x31,x46,x19,x58,x48,x5,x22,x45,x10,x55,x38,x21,x15,x25,x59,x9,x60,x63,x20,x30,x51,x52,x36,x4,x64,x26,x11,x54,x2,x14,x43,x18,x23,x17,x61,x29,x37,x49,x39,x32,x44,x50,x3,x42,x53,x57
+  FROM t31,t13,t15,t60,t44,t14,t30,t2,t34,t17,t28,t50,t6,t1,t18,t5,t56,t32,t61,t11,t10,t48,t21,t25,t53,t51,t8,t19,t57,t42,t22,t24,t40,t55,t41,t12,t23,t33,t26,t59,t46,t20,t29,t37,t58,t36,t47,t63,t49,t43,t38,t39,t16,t62,t4,t45,t9,t3,t64,t52,t35,t54
+ WHERE b39=a63
+   AND b62=a29
+   AND b31=a28
+   AND a9=b57
+   AND b16=a8
+   AND b54=a12
+   AND a58=b25
+   AND a16=b38
+   AND b26=a39
+   AND a34=10
+   AND a17=b37
+   AND b11=a31
+   AND b63=a57
+   AND a19=b8
+   AND a49=b22
+   AND b23=a22
+   AND b43=a44
+   AND a48=b50
+   AND a52=b61
+   AND b64=a36
+   AND b5=a15
+   AND a32=b41
+   AND a61=b4
+   AND a38=b6
+   AND b59=a6
+   AND b44=a11
+   AND a42=b19
+   AND a24=b21
+   AND b35=a41
+   AND b40=a37
+   AND a43=b17
+   AND a64=b32
+   AND a25=b28
+   AND b46=a54
+   AND a45=b30
+   AND b49=a35
+   AND b45=a10
+   AND b47=a2
+   AND b56=a50
+   AND a20=b13
+   AND b42=a62
+   AND a23=b55
+   AND b2=a4
+   AND b51=a1
+   AND b52=a21
+   AND b14=a56
+   AND a33=b60
+   AND a55=b20
+   AND b53=a3
+   AND a60=b3
+   AND a51=b15
+   AND b18=a34
+   AND b29=a13
+   AND a5=b58
+   AND b36=a40
+   AND b12=a47
+   AND a18=b48
+   AND a26=b1
+   AND a59=b33
+   AND a46=b10
+   AND b24=a14
+   AND a30=b9;
+
+SELECT x24,x53,x32,x6,x11,x46,x51,x16,x36,x45,x33,x23,x62,x49,x42,x56,x54,x17,x64,x31,x59,x20,x2,x19,x41,x14,x61,x63,x48,x3,x60,x55,x10,x12,x52,x38,x43,x30,x5,x9,x35,x27,x50,x58,x22,x8,x13,x28,x25,x47,x1,x15,x44,x4,x29,x21,x7,x57,x39,x26,x40,x34
+  FROM t42,t51,t14,t62,t61,t9,t33,t30,t17,t50,t36,t41,t22,t2,t21,t24,t40,t38,t57,t12,t44,t13,t7,t1,t20,t8,t34,t35,t5,t39,t16,t49,t46,t4,t63,t6,t55,t53,t59,t27,t19,t64,t25,t54,t28,t32,t11,t58,t15,t45,t56,t23,t31,t60,t10,t52,t29,t47,t48,t26,t43,t3
+ WHERE b46=a14
+   AND a7=b28
+   AND a35=b29
+   AND b39=a60
+   AND a16=b20
+   AND b41=a30
+   AND b15=a57
+   AND a23=b49
+   AND a55=b6
+   AND a36=b62
+   AND a1=b30
+   AND b55=a8
+   AND b64=a49
+   AND b63=a61
+   AND b51=a28
+   AND a43=b56
+   AND b59=a51
+   AND b45=a34
+   AND a17=b47
+   AND b32=a21
+   AND a5=b42
+   AND b52=a31
+   AND b26=a24
+   AND b27=a25
+   AND a2=b35
+   AND a58=b61
+   AND b53=a48
+   AND b33=a46
+   AND a52=b43
+   AND b4=a45
+   AND a10=b50
+   AND a27=b7
+   AND b25=a47
+   AND a41=b40
+   AND a42=b38
+   AND a1=10
+   AND b22=a26
+   AND a53=b44
+   AND a54=b48
+   AND a32=b24
+   AND a3=b34
+   AND b57=a59
+   AND b13=a9
+   AND a19=b8
+   AND b19=a39
+   AND b60=a64
+   AND a22=b10
+   AND b16=a63
+   AND a6=b12
+   AND a40=b5
+   AND b31=a44
+   AND b21=a13
+   AND b58=a11
+   AND b36=a33
+   AND b54=a29
+   AND b23=a4
+   AND a50=b2
+   AND a38=b14
+   AND b11=a62
+   AND b17=a56
+   AND b9=a20
+   AND b3=a15;
+
+SELECT x41,x10,x14,x56,x42,x57,x6,x4,x13,x8,x54,x33,x16,x17,x47,x23,x52,x25,x36,x28,x1,x9,x53,x64,x11,x34,x39,x7,x51,x30,x5,x46,x38,x2,x48,x50,x27,x49,x15,x31,x26,x62,x44,x37,x55,x59,x22,x40,x12,x3,x35,x63,x21,x61,x43,x60,x24,x29,x20,x58,x19,x32,x45
+  FROM t22,t24,t39,t64,t52,t62,t35,t10,t55,t6,t40,t12,t8,t5,t2,t29,t37,t54,t56,t32,t41,t25,t51,t63,t19,t49,t53,t23,t9,t31,t7,t11,t28,t26,t48,t45,t15,t43,t36,t57,t20,t4,t44,t38,t50,t60,t16,t13,t42,t61,t34,t47,t3,t33,t59,t27,t30,t46,t1,t58,t17,t21,t14
+ WHERE a22=b54
+   AND b14=a55
+   AND a15=b49
+   AND a11=b37
+   AND b42=a5
+   AND a56=b55
+   AND a12=b30
+   AND a42=b31
+   AND b2=a48
+   AND b43=a57
+   AND a26=b3
+   AND b33=a51
+   AND b5=a59
+   AND b17=a41
+   AND a50=b36
+   AND a64=b1
+   AND b34=a30
+   AND a32=3
+   AND a37=b22
+   AND b38=a31
+   AND a47=b21
+   AND b64=a27
+   AND b63=a46
+   AND a1=b13
+   AND b20=a28
+   AND b23=a35
+   AND b24=a2
+   AND a20=b15
+   AND a54=b46
+   AND a34=b52
+   AND a3=b61
+   AND a14=b50
+   AND b26=a60
+   AND b4=a7
+   AND b27=a44
+   AND b45=a43
+   AND b12=a13
+   AND a40=b57
+   AND a45=b47
+   AND a49=b44
+   AND b28=a8
+   AND b7=a53
+   AND a29=b35
+   AND a58=b40
+   AND a10=b9
+   AND a33=b8
+   AND a38=b10
+   AND b60=a16
+   AND a25=b11
+   AND b48=a6
+   AND a36=b6
+   AND b51=a21
+   AND b16=a4
+   AND a32=b41
+   AND b39=a61
+   AND a62=b29
+   AND a63=b58
+   AND a52=b19
+   AND b59=a39
+   AND a24=b25
+   AND a17=b56
+   AND a23=b53
+   AND a19=b62;
+
+SELECT x35,x24,x17,x38,x55,x61,x36,x6,x2,x31,x23,x47,x37,x22,x33,x14,x64,x39,x20,x4,x29,x41,x21,x27,x44,x19,x12,x54,x57,x40,x8,x13,x3,x42,x62,x25,x28,x18,x58,x45,x30,x1,x46,x56,x7,x9,x26,x53,x43,x51,x63,x49,x5,x48,x34,x16,x50,x11,x15,x52,x60,x59,x32,x10
+  FROM t4,t38,t47,t23,t40,t59,t29,t46,t12,t13,t2,t49,t14,t54,t33,t16,t24,t60,t64,t10,t56,t51,t17,t42,t55,t45,t58,t30,t63,t31,t18,t15,t27,t57,t62,t20,t3,t37,t5,t35,t28,t61,t21,t9,t26,t41,t44,t8,t19,t1,t53,t34,t50,t43,t48,t39,t36,t6,t7,t11,t25,t52,t32,t22
+ WHERE a24=b11
+   AND a39=b25
+   AND a13=b46
+   AND b61=a23
+   AND b3=a60
+   AND b15=a4
+   AND b51=a58
+   AND b50=a59
+   AND b16=a26
+   AND a49=b55
+   AND a51=b54
+   AND a64=b27
+   AND a50=b44
+   AND b45=a10
+   AND b39=a8
+   AND b47=a57
+   AND b36=a1
+   AND b35=a33
+   AND a43=b26
+   AND a36=b28
+   AND b18=a32
+   AND a7=b10
+   AND b1=a29
+   AND b17=a3
+   AND b29=a6
+   AND b37=a55
+   AND a31=b52
+   AND a46=b31
+   AND a25=b42
+   AND a62=b4
+   AND b7=a47
+   AND b19=a5
+   AND a41=b40
+   AND a54=b21
+   AND b59=a18
+   AND b49=a11
+   AND a37=b13
+   AND b57=a2
+   AND a14=b34
+   AND a40=b5
+   AND b14=a30
+   AND b58=a48
+   AND b32=a27
+   AND b22=a63
+   AND b33=a20
+   AND a28=b62
+   AND a17=b20
+   AND b30=a19
+   AND b63=a16
+   AND b48=a35
+   AND b12=a52
+   AND a34=b6
+   AND b24=a9
+   AND b43=a38
+   AND b2=a44
+   AND a12=b23
+   AND a21=b53
+   AND a61=b64
+   AND b9=a15
+   AND b56=a53
+   AND a45=b60
+   AND a8=9
+   AND a42=b41
+   AND a56=b38;
+
+SELECT x11,x8,x54,x38,x12,x24,x42,x29,x3,x2,x43,x62,x22,x26,x20,x47,x16,x10,x35,x51,x9,x55,x48,x41,x13,x23,x14,x46,x15,x53,x18,x39,x31,x61,x25,x34,x59,x57,x17,x52,x37,x27,x45,x28,x58,x4,x33,x1,x50,x7,x21,x49,x6,x5,x64,x60,x56,x44,x19,x63,x36,x32,x30,x40
+  FROM t57,t16,t23,t28,t58,t18,t20,t63,t44,t36,t6,t50,t25,t10,t31,t51,t32,t5,t1,t54,t9,t42,t14,t37,t13,t52,t29,t33,t56,t34,t59,t41,t55,t60,t19,t17,t62,t15,t22,t43,t11,t39,t24,t12,t30,t4,t53,t61,t8,t27,t47,t46,t49,t48,t40,t64,t38,t3,t21,t45,t7,t35,t2,t26
+ WHERE b17=a34
+   AND a25=b52
+   AND a8=b19
+   AND a17=b46
+   AND b39=a22
+   AND a63=b35
+   AND a43=b54
+   AND a44=b9
+   AND b18=a41
+   AND b4=a60
+   AND b63=a54
+   AND a16=b31
+   AND b51=a20
+   AND a61=b37
+   AND a29=b60
+   AND b12=a48
+   AND a33=b26
+   AND b13=a51
+   AND b25=a58
+   AND a28=b11
+   AND b1=a53
+   AND b33=a24
+   AND b24=a18
+   AND b43=a10
+   AND b14=a49
+   AND a2=b49
+   AND b28=a55
+   AND b53=a32
+   AND a11=b61
+   AND b62=a50
+   AND a48=8
+   AND b10=a31
+   AND a39=b47
+   AND b30=a56
+   AND b20=a27
+   AND a14=b38
+   AND a6=b22
+   AND b59=a35
+   AND b55=a7
+   AND a47=b16
+   AND b6=a64
+   AND a3=b15
+   AND b7=a26
+   AND b42=a38
+   AND b45=a59
+   AND a4=b40
+   AND b2=a40
+   AND b36=a52
+   AND a1=b58
+   AND a30=b32
+   AND b56=a12
+   AND b21=a9
+   AND a37=b50
+   AND a45=b44
+   AND b8=a23
+   AND a15=b64
+   AND b5=a57
+   AND b27=a5
+   AND b23=a46
+   AND b34=a42
+   AND b41=a13
+   AND b3=a36
+   AND a21=b57
+   AND a62=b29;

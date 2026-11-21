@@ -208,6 +208,26 @@ export interface NamedArg extends Base {
   readonly value: Expr;
 }
 
+/** `[a, b]` and `ARRAY[a, b]`. */
+export interface ArrayLit extends Base {
+  readonly kind: "array";
+  readonly items: readonly Expr[];
+}
+
+/** `x[i]`. */
+export interface Subscript extends Base {
+  readonly kind: "subscript";
+  readonly arg: Expr;
+  readonly index: Expr;
+}
+
+/** `x COLLATE name`. */
+export interface Collate extends Base {
+  readonly kind: "collate";
+  readonly arg: Expr;
+  readonly collation: Name;
+}
+
 /** A call: `name(args)`, with `DISTINCT`, `FILTER (WHERE ...)` and `OVER`. */
 export interface Call extends Base {
   readonly kind: "call";
@@ -257,6 +277,9 @@ export type Expr =
   | Cast
   | ExtractField
   | Interval
+  | ArrayLit
+  | Subscript
+  | Collate
   | Call
   | Exists
   | ScalarQuery
@@ -452,6 +475,8 @@ export interface DataType extends Base {
   readonly kind: "data-type";
   readonly name: string;
   readonly args: readonly Expr[];
+  /** The name of its `COLLATE`, as written. */
+  readonly collation: string | undefined;
 }
 
 /** `[CONSTRAINT name] NOT NULL`. */
@@ -527,7 +552,13 @@ export interface CreateTable extends Base {
   readonly kind: "create-table";
   readonly name: Name;
   readonly ifNotExists: boolean;
+  /** Whether it is `TEMP` or `TEMPORARY`. */
+  readonly temporary: boolean;
   readonly elements: readonly (ColumnDef | TableConstraint)[];
+  /** The query of `AS query`, for a table made from one. */
+  readonly query: Query | undefined;
+  /** The text after the column list or the name that the parser does not read (an engine, partitions, options), as written. */
+  readonly options: string | undefined;
 }
 
 /** `CREATE [UNIQUE] INDEX [IF NOT EXISTS] [name] ON table (items) [WHERE ...]`. */
@@ -612,13 +643,24 @@ export interface Drop extends Base {
 
 // scripts
 
+/**
+ * A statement of a kind the grammar does not read: a command (`SET`, `SHOW`, `EXPLAIN`, `GRANT`, ...) or a `CREATE`, `ALTER` or `DROP` of an object it does not read (a function, a sequence, a type). It holds no node:
+ * its keyword and, for those three, its object, upper case, and the text after them as written.
+ */
+export interface Command extends Base {
+  readonly kind: "command";
+  readonly keyword: string;
+  readonly object: string | undefined;
+  readonly text: string;
+}
+
 /** A statement the parser could not read: its range, from its first token to the one before the `;` that ends it. */
 export interface Unparsed extends Base {
   readonly kind: "unparsed";
 }
 
 /** A statement. */
-export type Statement = Query | Insert | Update | Delete | CreateTable | CreateIndex | CreateView | AlterTable | Drop | Unparsed;
+export type Statement = Query | Insert | Update | Delete | CreateTable | CreateIndex | CreateView | AlterTable | Drop | Command | Unparsed;
 
 /** A script: its statements. */
 export interface Script extends Base {

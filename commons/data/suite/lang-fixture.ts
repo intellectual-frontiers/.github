@@ -137,6 +137,9 @@ export function show(e: Expr): string {
     case "in-query":
     case "interval":
     case "scalar-query":
+    case "array":
+    case "subscript":
+    case "collate":
       return `{${e.kind}}`;
     default:
       return absurd(e);
@@ -150,4 +153,54 @@ export function firstItem(p: Parsed): Expr {
   const item = s.items[0];
   if (item === undefined) throw new Error("no item");
   return item.expr;
+}
+
+/** The folder of this library. */
+export const ROOT = fileURLToPath(new URL("../", import.meta.url));
+
+/** The names of the thirty dialects, in order. */
+export const DIALECT_NAMES: readonly string[] = [
+  "athena",
+  "bigquery",
+  "clickhouse",
+  "databricks",
+  "doris",
+  "dremio",
+  "drill",
+  "druid",
+  "duckdb",
+  "dune",
+  "exasol",
+  "fabric",
+  "hive",
+  "materialize",
+  "mysql",
+  "oracle",
+  "postgres",
+  "presto",
+  "redshift",
+  "risingwave",
+  "singlestore",
+  "snowflake",
+  "solr",
+  "spark",
+  "spark2",
+  "sqlite",
+  "starrocks",
+  "teradata",
+  "trino",
+  "tsql",
+];
+
+/** Every dialect of the library, loaded, in the order of {@link DIALECT_NAMES}. */
+export const ALL_DIALECTS: readonly Dialect[] = await Promise.all(
+  DIALECT_NAMES.map(async (n) => {
+    const m: unknown = await import(`@intellectual-frontiers/data/sql/lang/dialects/${n}`);
+    if (typeof m !== "object" || m === null || !("dialect" in m) || !isDialect(m.dialect)) throw new Error(`${n} exports no dialect`);
+    return m.dialect;
+  }),
+);
+
+function isDialect(v: unknown): v is Dialect {
+  return typeof v === "object" && v !== null && "name" in v && "lexical" in v && "compiled" in v && "grammar" in v;
 }

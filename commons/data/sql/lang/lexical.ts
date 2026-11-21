@@ -85,6 +85,12 @@ export interface Lexical {
   /** ASCII characters, besides letters, digits and `_`, that a word may hold after its first character (`$` in PostgreSQL). */
   readonly wordChars: string;
   readonly numbers: { readonly radix: boolean; readonly underscores: boolean };
+  /** Upper-case letters after a number that belong to it (`L`, `BD` in Hive: `1L`, `1.5BD`). */
+  readonly numberSuffixes: readonly string[];
+  /** ASCII characters, besides letters and `_`, that may begin a word (`#` for T-SQL's `#temp`). */
+  readonly wordStartChars: string;
+  /** Whether `q'[...]'` is a string whose delimiter is the character after the quote (Oracle). */
+  readonly qQuoting: boolean;
 }
 
 /** What is wrong with a lexical, one sentence each (see {@link describeLexicalError}). */
@@ -171,6 +177,8 @@ export interface CompiledLexical {
   readonly kwMax: number;
   readonly radix: boolean;
   readonly underscores: boolean;
+  readonly numberSuffixes: readonly string[];
+  readonly qQuoting: boolean;
 }
 
 const STYLE_ID: Readonly<Record<ParamStyle, number>> = {
@@ -218,6 +226,12 @@ export function compileLexical(lexical: Lexical): Result<CompiledLexical, Lexica
   for (let c = 97; c <= 122; c++) cls[c] = Cls.WordStart | Cls.WordPart;
   cls[95] = Cls.WordStart | Cls.WordPart;
   for (const ch of OPERATOR_CHARS) cls[ch.charCodeAt(0)] = (cls[ch.charCodeAt(0)] ?? 0) | Cls.OpChar;
+  for (const ch of lexical.wordStartChars) {
+    const c = ch.charCodeAt(0);
+    if (c >= 128 || (cls[c] ?? 0) & (Cls.WordStart | Cls.Space | Cls.Digit))
+      return err({ kind: "invalid", field: "wordStartChars", value: ch });
+    cls[c] = (cls[c] ?? 0) | Cls.WordStart | Cls.WordPart;
+  }
   for (const ch of lexical.wordChars) {
     const c = ch.charCodeAt(0);
     if (c >= 128 || (cls[c] ?? 0) & (Cls.WordPart | Cls.Space)) return err({ kind: "invalid", field: "wordChars", value: ch });
@@ -306,6 +320,9 @@ export function compileLexical(lexical: Lexical): Result<CompiledLexical, Lexica
   }
   for (const rules of opsByFirst) rules.sort(byLengthDesc);
 
+  for (const sfx of lexical.numberSuffixes)
+    if (!/^[A-Za-z]+$/.test(sfx)) return err({ kind: "invalid", field: "numberSuffixes", value: sfx });
+
   let paramBits = 0;
   for (const p of lexical.params) paramBits |= 1 << STYLE_ID[p];
 
@@ -353,6 +370,8 @@ export function compileLexical(lexical: Lexical): Result<CompiledLexical, Lexica
     kwMax,
     radix: lexical.numbers.radix,
     underscores: lexical.numbers.underscores,
+    numberSuffixes: [...new Set(lexical.numberSuffixes.map((x) => x.toUpperCase()))].sort((a, b) => b.length - a.length),
+    qQuoting: lexical.qQuoting,
   });
 }
 

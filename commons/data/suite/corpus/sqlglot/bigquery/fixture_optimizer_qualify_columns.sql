@@ -1,0 +1,93 @@
+WITH x AS (select 'a' as a, 1 as b) SELECT x.a AS c, y.a as d, SUM(x.b) AS y, FROM x join x as y on x.a = y.a group by 1, 2;
+
+SELECT DATE_TRUNC(a, MONTH) AS a FROM x;
+
+WITH t AS (SELECT 1 AS c) SELECT TO_JSON_STRING(t) FROM t;
+
+SELECT DATE_TRUNC(col1, WEEK(MONDAY)), col2 FROM t;
+
+SELECT * FROM (SELECT 1 AS foo, 2 AS bar INNER UNION ALL BY NAME SELECT 3 AS bar, 4 AS baz);
+
+SELECT * FROM (SELECT 1 AS foo, 2 AS bar UNION ALL CORRESPONDING SELECT 3 AS bar, 4 AS baz);
+
+SELECT * FROM (SELECT 1 AS foo, 2 AS bar LEFT UNION ALL BY NAME SELECT 3 AS bar, 4 AS baz);
+
+SELECT * FROM (SELECT 1 AS foo, 2 AS bar FULL UNION ALL BY NAME SELECT 3 AS bar, 4 AS baz);
+
+SELECT * FROM (SELECT 1 AS foo, 2 AS bar LEFT UNION ALL CORRESPONDING SELECT 3 AS bar, 4 AS baz);
+
+SELECT * FROM (SELECT 1 AS foo, 2 AS bar FULL UNION ALL CORRESPONDING SELECT 3 AS bar, 4 AS baz);
+
+SELECT * FROM (SELECT 1 AS foo, 2 AS bar FULL UNION ALL CORRESPONDING BY (foo, bar) SELECT 3 AS bar, 4 AS baz);
+
+SELECT * FROM (SELECT 1 AS foo, 2 AS bar FULL UNION ALL BY NAME ON (foo, bar) SELECT 3 AS bar, 4 AS baz);
+
+SELECT * FROM ((SELECT 1 AS foo, 2 AS bar LEFT UNION ALL BY NAME SELECT 3 AS bar, 4 AS baz) LEFT UNION ALL BY NAME ON (bar) SELECT 3 AS foo, 4 AS bar);
+
+SELECT * FROM ((SELECT 1 AS foo, 2 AS bar LEFT UNION ALL BY NAME SELECT 3 AS bar, 4 AS baz) FULL UNION ALL BY NAME ON (foo, qux) SELECT 3 AS qux, 4 AS bar);
+
+SELECT * FROM ((SELECT 1 AS foo, 2 AS bar) FULL OUTER UNION ALL BY NAME (SELECT 3 AS bar, 4 AS baz));
+
+SELECT * FROM (((SELECT 1 AS foo, 2 AS bar LEFT UNION ALL BY NAME SELECT 3 AS bar, 4 AS baz) FULL UNION ALL BY NAME ON (foo, qux) SELECT 3 AS qux, 4 AS bar) INNER UNION ALL BY NAME ON (foo) SELECT 6 AS foo);
+
+WITH t1 AS (SELECT 1 AS a, 2 AS b), t2 AS (SELECT 2 AS b, 3 AS c), t3 AS (SELECT 2 AS c, 3 AS d), t4 AS (SELECT 2 AS e, 3 AS f) SELECT * FROM ((SELECT * FROM t1 FULL OUTER UNION ALL BY NAME (SELECT * FROM t2 FULL OUTER UNION ALL BY NAME (SELECT * FROM t3 FULL OUTER UNION ALL BY NAME SELECT * FROM t4))));
+
+WITH t1 AS (SELECT 1 AS a, 2 AS b), t2 AS (SELECT 2 AS b, 3 AS c), t3 AS (SELECT 2 AS c, 3 AS d), t4 AS (SELECT 2 AS e, 3 AS f) SELECT * FROM ((SELECT * FROM t1 FULL OUTER UNION ALL BY NAME (SELECT * FROM t2 INNER UNION ALL BY NAME (SELECT * FROM t3 FULL OUTER UNION ALL BY NAME SELECT * FROM t4))));
+
+WITH t1 AS (SELECT 1 AS a, 2 AS b, 3 AS c, 4 AS d), t2 AS (SELECT 2 AS b, 3 AS c), t3 AS (SELECT 2 AS c, 3 AS d), t4 AS (SELECT 2 AS d, 3 AS e) SELECT * FROM ((SELECT * FROM t1 FULL OUTER UNION ALL BY NAME (SELECT * FROM t2 FULL UNION ALL BY NAME (SELECT * FROM t3 LEFT UNION ALL BY NAME SELECT * FROM t4))));
+
+WITH tbl1 AS (SELECT STRUCT(1 AS col1, 2 AS col2, Struct("test" AS col1, Struct(3 AS col2) AS lvl2) AS lvl1) AS col), tbl2 AS (SELECT STRUCT(1 AS col1, 2 AS col2, Struct("test" AS col1, Struct(3 AS col2) AS lvl2) AS lvl1) AS col) SELECT tbl1.col.*, tbl2.col.* FROM tbl1, tbl2;
+
+WITH tbl1 AS (SELECT STRUCT(1 AS col1, 2 AS col2, Struct("test" AS col1, Struct(3 AS col2) AS lvl2) AS lvl1, 3 AS col3) AS col) SELECT tbl1.col.lvl1.* FROM tbl1;
+
+WITH tbl1 AS (SELECT STRUCT(1 AS col1, Struct(5 AS col1)) AS col) SELECT tbl1.col.* FROM tbl1;
+
+WITH tbl1 AS (SELECT STRUCT(1 AS col1, 2 AS col1) AS col) SELECT tbl1.col.* FROM tbl1;
+
+WITH tbl1 AS (SELECT STRUCT(1 AS f0, 2 as f1) AS col) SELECT tbl1.col.* from tbl1;
+
+SELECT one.* FROM structs;
+
+WITH one AS (SELECT 1 AS x) SELECT one.* FROM structs;
+
+WITH one AS (SELECT 1 AS x) SELECT one.* FROM structs, one;
+
+SELECT nested_0.nested_1.* FROM structs;
+
+SELECT aa FROM x, UNNEST(a) AS aa;
+
+SELECT h FROM t, UNNEST(rel.arr) AS h;
+
+SELECT EXISTS(SELECT 1 FROM UNNEST(rel.deep.arr) AS h) FROM t;
+
+SELECT day FROM UNNEST(GENERATE_DATE_ARRAY((SELECT MIN(d) FROM t), CURRENT_DATE)) AS day;
+
+SELECT r.* FROM t, UNNEST(doc.arr) AS r;
+
+select * from unnest ([1, 2]) as x with offset;
+
+select * from unnest ([1, 2]) as x with offset as y;
+
+select x, a, x.a from unnest([STRUCT(1 AS a)]) as x CROSS JOIN m;
+
+WITH cte AS (SELECT [STRUCT(1 AS a)] AS x) select a, x, m.a from cte, UNNEST(x) AS m CROSS JOIN n;
+
+WITH cte AS (SELECT 1 AS col) SELECT * FROM cte LEFT JOIN UNNEST((SELECT ARRAY_AGG(DISTINCT x) AS agg FROM UNNEST([1]) AS x WHERE col = 1)) AS unnested;
+
+SELECT * FROM UNNEST(ARRAY<STRUCT<percentile STRING, value INT64, score FLOAT64>>[("p10", 1, 0.0)]);
+
+WITH scores AS (SELECT * FROM UNNEST((SELECT ARRAY<STRUCT<percentile STRING, value INT64, score FLOAT64>>[("p10", 1, 0.0)]))) SELECT percentile FROM scores;
+
+SELECT ROW_NUMBER() OVER (PARTITION BY a ORDER BY b) AS row_num FROM x QUALIFY row_num = 1;
+
+SELECT x.b, x.a FROM x LEFT JOIN y ON x.b = y.b QUALIFY ROW_NUMBER() OVER(PARTITION BY x.b ORDER BY x.a DESC) = 1 ORDER BY x.b, x.a;
+
+SELECT a, MAX(b) AS x FROM x GROUP BY a QUALIFY ROW_NUMBER() OVER (PARTITION BY x ORDER BY a) = 1;
+
+SELECT x.a, MAX(x.b) AS x FROM x GROUP BY 1 QUALIFY ROW_NUMBER() OVER (PARTITION BY x ORDER BY a) = 1;
+
+SELECT k, ANY_VALUE(j.Foo) AS v FROM t GROUP BY k ORDER BY ANY_VALUE(j.Foo), ANY_VALUE(j.foo);
+
+SELECT unp FROM (SELECT 7 AS unp, 1 AS a, 2 AS b) UNPIVOT(v FOR k IN (a, b)) AS unp;
+
+SELECT ARRAY_AGG(piv) AS arr FROM unknown_table AS u PIVOT(SUM(u.v) FOR u.k IN (82 AS a)) AS piv;

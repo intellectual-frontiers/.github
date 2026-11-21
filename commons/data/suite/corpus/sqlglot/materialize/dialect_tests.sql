@@ -1,0 +1,59 @@
+SELECT x BETWEEN 2 AND 10;
+
+SELECT (x BETWEEN 10 AND 2 OR x BETWEEN 2 AND 10);
+
+SELECT x BETWEEN 10 AND 2;
+
+SELECT ARRAY_LENGTH(ARRAY[1, 2], 1);
+
+SELECT CASE WHEN arr IS NULL THEN NULL ELSE COALESCE(ARRAY_LENGTH(arr, 1), 0) END FROM t;
+
+CREATE TABLE example (id INT PRIMARY KEY, name TEXT);
+
+CREATE TABLE example (id INT, name TEXT);
+
+INSERT INTO example (id, name) VALUES (1, 'Alice') ON CONFLICT(id) DO NOTHING;
+
+INSERT INTO example (id, name) VALUES (1, 'Alice');
+
+CREATE TABLE example (id SERIAL, name TEXT);
+
+CREATE TABLE example (id INT NOT NULL, name TEXT);
+
+CREATE TABLE example (id INT AUTO_INCREMENT, name TEXT);
+
+SELECT JSON_EXTRACT_PATH_TEXT('{ "farm": {"barn": { "color": "red", "feed stocked": true }}}', 'farm', 'barn', 'color');
+
+SELECT MAP['a' => 1];
+
+SELECT CAST(1 AS mz_timestamp);
+
+CREATE TABLE example (id INT, name LIST);
+
+SELECT LIST[];
+
+SELECT LIST[1, 2, 3];
+
+SELECT LIST[LIST[1], LIST[2], NULL];
+
+SELECT CAST(LIST[1, 2, 3] AS INT LIST);
+
+SELECT CAST(NULL AS INT LIST);
+
+SELECT CAST(NULL AS INT LIST LIST LIST);
+
+SELECT LIST(SELECT 1);
+
+SELECT MAP[];
+
+SELECT MAP['a' => MAP['b' => 'c']];
+
+SELECT CAST(MAP['a' => 1] AS MAP[TEXT => INT]);
+
+SELECT CAST(NULL AS MAP[TEXT => INT]);
+
+SELECT CAST(NULL AS MAP[TEXT => MAP[TEXT => INT]]);
+
+SELECT MAP(SELECT 'a', 1);
+
+CREATE TABLE t (a INT, b TEXT);

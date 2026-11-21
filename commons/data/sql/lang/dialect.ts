@@ -82,6 +82,9 @@ export const EMPTY_LEXICAL: Lexical = {
   keywords: [],
   wordChars: "",
   numbers: { radix: false, underscores: false },
+  numberSuffixes: [],
+  wordStartChars: "",
+  qQuoting: false,
 };
 
 /**
@@ -103,6 +106,10 @@ export function defineDialect(spec: DialectSpec): Result<Dialect, DialectError> 
   }
   if (grammar.castOperator !== undefined && operatorId(compiled.value, grammar.castOperator) === undefined) {
     return err({ kind: "grammar", dialect: spec.name, what: `the cast operator ${grammar.castOperator} is not one of its lexical's` });
+  }
+  for (const o of grammar.wordOperators) {
+    if (keywordId(compiled.value, o.text) === undefined)
+      return err({ kind: "grammar", dialect: spec.name, what: `the word operator ${o.text} is not one of its lexical's keywords` });
   }
   for (const w of grammar.likeWords) {
     if (keywordId(compiled.value, w) === undefined)

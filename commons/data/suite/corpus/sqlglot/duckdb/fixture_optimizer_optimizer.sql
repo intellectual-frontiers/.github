@@ -1,0 +1,3 @@
+SELECT x.a, y.c FROM x POSITIONAL JOIN y;
+
+SELECT x.a FROM x LEFT JOIN (SELECT DISTINCT t.b FROM (VALUES ('1'), ('01')) AS t(b)) AS y ON x.a = CAST(y.b AS INT) ORDER BY x.a;

@@ -1,0 +1,1 @@
+WITH cte AS (SELECT b FROM y) INSERT INTO s SELECT * FROM cte;

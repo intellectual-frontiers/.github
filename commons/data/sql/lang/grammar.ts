@@ -48,10 +48,12 @@ export interface Grammar {
   readonly castOperator: string | undefined;
   /** The words that are `LIKE` for it (`ILIKE`, `GLOB`), upper case. */
   readonly likeWords: readonly string[];
+  /** The binary operators that are keywords (`DIV`, `MOD`, `XOR` in MySQL), upper case, each an `operator` node. */
+  readonly wordOperators: readonly CustomOperator[];
 }
 
 /** The grammar of the common ground: nothing is added. */
-export const ANSI_GRAMMAR: Grammar = { operators: [], castOperator: undefined, likeWords: [] };
+export const ANSI_GRAMMAR: Grammar = { operators: [], castOperator: undefined, likeWords: [], wordOperators: [] };
 
 /** The words the common grammar reserves: they are identifiers only after a `.` or where quoted. */
 export const RESERVED_WORDS: readonly string[] = (

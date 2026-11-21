@@ -275,7 +275,7 @@ proves(
       mixed.script.statements.map((s) => s.kind),
       ["unparsed", "select"],
     );
-    const unsupported = parse("CREATE SEQUENCE s");
+    const unsupported = parse("(SELECT 1 LIMIT 1) LIMIT 2");
     assertEquals(
       unsupported.errors.map((x) => x.kind),
       ["unsupported"],
@@ -296,17 +296,7 @@ proves(
       parse(`SELECT ${"- ".repeat(500)}1`).errors.map((x) => x.kind),
       ["too-deep"],
     );
-    for (const q of [
-      "((((",
-      "SELECT (",
-      "CREATE TABLE",
-      "ALTER TABLE t",
-      "INSERT INTO",
-      "SELECT CASE",
-      "SELECT CAST(",
-      "WITH a AS",
-      "SELECT 1 UNION",
-    ]) {
+    for (const q of ["((((", "SELECT (", "CREATE TABLE", "INSERT INTO", "SELECT CASE", "SELECT CAST(", "WITH a AS", "SELECT 1 UNION"]) {
       assert(parse(q).errors.length > 0, q);
     }
   },

@@ -1,5 +1,5 @@
 script
-  statements[0]: create-table ifNotExists=false
+  statements[0]: create-table ifNotExists=false temporary=false
     name: name
       parts[0]: ident name="person" quoted=false
     elements[0]: column-def

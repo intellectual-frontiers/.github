@@ -68,6 +68,10 @@ const isUnicodeSpace = (c: number): boolean =>
   c === 0x3000 ||
   c === 0xfeff;
 
+/** The id a string token carries for an Oracle `q'[...]'` string, which no string syntax of the dialect has. */
+export const Q_STRING = 65535;
+const CLOSERS: Readonly<Record<string, string>> = { "[": "]", "{": "}", "(": ")", "<": ">" };
+
 /** The id of the keyword in `text[start, end)`, 0 where it is none. */
 function keywordAt(lx: CompiledLexical, text: string, start: number, end: number): number {
   const len = end - start;
@@ -158,6 +162,17 @@ function scanNumber(text: string, i: number, lx: CompiledLexical): number {
     const sign = text.charCodeAt(k);
     if (sign === 43 || sign === 45) k++;
     if (digit(text.charCodeAt(k))) j = run(k);
+  }
+  if (lx.numberSuffixes.length > 0) {
+    const c = text.charCodeAt(j) | 32;
+    if (c >= 97 && c <= 122) {
+      for (const sfx of lx.numberSuffixes) {
+        const end = j + sfx.length;
+        if (text.slice(j, end).toUpperCase() !== sfx) continue;
+        const after = text.charCodeAt(end);
+        if (!(after < 128 && ((lx.cls[after] ?? 0) & Cls.WordPart) !== 0)) return end;
+      }
+    }
   }
   return j;
 }
@@ -351,7 +366,19 @@ export function lex(text: string, lx: CompiledLexical): Lexed {
       k = Tok.Word;
       const q = text.charCodeAt(j);
       let done = false;
-      if (j - i <= 2 && q < 128 && ((cls[q] ?? 0) & Cls.QuoteStart) !== 0 && lx.prefixes.size > 0) {
+      if (lx.qQuoting && j - i === 1 && (text.charCodeAt(i) | 32) === 113 && q === 39) {
+        const d = text.charAt(j + 1);
+        if (d !== "" && d.charCodeAt(0) > 32 && d !== "'") {
+          const close = `${CLOSERS[d] ?? d}'`;
+          const at = text.indexOf(close, j + 2);
+          e = at < 0 ? n : at + close.length;
+          if (at < 0) errors.push({ kind: "unterminated-string", span: { start: i, end: n } });
+          k = Tok.String;
+          tid = Q_STRING;
+          done = true;
+        }
+      }
+      if (!done && j - i <= 2 && q < 128 && ((cls[q] ?? 0) & Cls.QuoteStart) !== 0 && lx.prefixes.size > 0) {
         const up = text.slice(i, j).toUpperCase();
         if (lx.prefixes.has(up)) {
           for (const r of lx.stringsByFirst[q] ?? []) {

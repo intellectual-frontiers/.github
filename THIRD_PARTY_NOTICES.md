@@ -62,3 +62,67 @@ Packages installed from a registry (listed in `bun.lock`) are not vendored: noth
 - **Owner**: Knut Sveidqvist and contributors.
 - **License**: MIT.
 - **Checked**: The LICENSE of the installed package 11.17.2 was read on 2026-11-20: The MIT License (MIT), Copyright (c) 2014 - 2022 Knut Sveidqvist.
+
+## `commons/data/suite/corpus/calcite`
+
+- **What**: SQL statements of Apache Calcite's Quidem scripts (core/src/test/resources/sql/*.iq), sampled.
+- **Source**: https://github.com/apache/calcite, commit 647e8f288b62d3fa594e901da5428f2c545f0609.
+- **Owner**: The Apache Software Foundation (Apache Calcite).
+- **License**: Apache-2.0.
+- **Checked**: The license is that of the repository (its LICENSE, read on 2026-11-21, kept in commons/data/suite/corpus/LICENSES/calcite.txt).
+
+## `commons/data/suite/corpus/clickhouse`
+
+- **What**: SQL statements of ClickHouse's stateless tests (tests/queries/0_stateless), sampled.
+- **Source**: https://github.com/ClickHouse/ClickHouse, commit 2a2f57466616f97b3f6cbbf4dbe29b85b5811dfe.
+- **Owner**: ClickHouse, Inc. and the ClickHouse contributors.
+- **License**: Apache-2.0.
+- **Checked**: The license is that of the repository (its LICENSE, read on 2026-11-21, kept in commons/data/suite/corpus/LICENSES/clickhouse.txt).
+
+## `commons/data/suite/corpus/duckdb`
+
+- **What**: SQL statements of DuckDB's tests (test/sql, `statement ok` and `query` blocks), sampled.
+- **Source**: https://github.com/duckdb/duckdb, commit 87d96b7773a10356b11cc15c352125acdc58a9ce.
+- **Owner**: DuckDB Foundation and the DuckDB contributors.
+- **License**: MIT.
+- **Checked**: The license is that of the repository (its LICENSE, read on 2026-11-21, kept in commons/data/suite/corpus/LICENSES/duckdb.txt).
+
+## `commons/data/suite/corpus/postgres_regress`
+
+- **What**: SQL statements of PostgreSQL's regression tests (src/test/regress/sql, selected files, psql commands removed).
+- **Source**: https://github.com/postgres/postgres, commit 207b5293b8d9a217bb918b5b44774b3b4f1e2f89.
+- **Owner**: The PostgreSQL Global Development Group.
+- **License**: PostgreSQL.
+- **Checked**: The license is that of the repository (its COPYRIGHT, read on 2026-11-21, kept in commons/data/suite/corpus/LICENSES/postgres_regress.txt).
+
+## `commons/data/suite/corpus/spark`
+
+- **What**: SQL statements of Apache Spark's sql-tests inputs, sampled.
+- **Source**: https://github.com/apache/spark, commit 03a2b318c4ffd2529106a3e1503393a3280ccd64.
+- **Owner**: The Apache Software Foundation (Apache Spark).
+- **License**: Apache-2.0.
+- **Checked**: The license is that of the repository (its LICENSE, read on 2026-11-21, kept in commons/data/suite/corpus/LICENSES/spark.txt).
+
+## `commons/data/suite/corpus/sqlglot`
+
+- **What**: SQL statements taken from the tests of sqlglot (tests/dialects/test_*.py, tests/fixtures), one file for each dialect.
+- **Source**: https://github.com/tobymao/sqlglot, commit b812ff95afa2ab7ab925f95edd5d97c4b761cec9.
+- **Owner**: Toby Mao and the sqlglot contributors.
+- **License**: MIT.
+- **Checked**: The license is that of the repository (its LICENSE, read on 2026-11-21, kept in commons/data/suite/corpus/LICENSES/sqlglot.txt).
+
+## `commons/data/suite/corpus/sqllogictest`
+
+- **What**: SQL statements of SQLite's sqllogictest (select1-5 and evidence), sampled.
+- **Source**: https://github.com/gregrahn/sqllogictest, commit c93ac416f05635ff5cc490009add936d9753d01d.
+- **Owner**: D. Richard Hipp and the SQLite authors (gregrahn/sqllogictest mirror).
+- **License**: CC0-1.0 OR MIT OR BSD, at the author's offer in COPYRIGHT.md.
+- **Checked**: The license is that of the repository (its COPYRIGHT.md, read on 2026-11-21, kept in commons/data/suite/corpus/LICENSES/sqllogictest.txt). unverified: its COPYRIGHT.md offers the GPL, BSD, MIT or CC0 at the user's choice without giving the texts; the permissive option is taken; ask counsel
+
+## `commons/data/suite/corpus/starrocks`
+
+- **What**: SQL statements of StarRocks's test/sql inputs, sampled.
+- **Source**: https://github.com/StarRocks/starrocks, commit 576d9cf780b5a5d10b9b95fa8c60ddb82862411f.
+- **Owner**: The StarRocks Project Authors.
+- **License**: Apache-2.0.
+- **Checked**: The license is that of the repository (its LICENSE.txt, read on 2026-11-21, kept in commons/data/suite/corpus/LICENSES/starrocks.txt).

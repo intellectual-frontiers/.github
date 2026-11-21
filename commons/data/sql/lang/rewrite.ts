@@ -199,6 +199,20 @@ class Rewriter {
       }
       case "tuple":
         return this.tuple(e);
+      case "array": {
+        const items = mapList(e.items, (x) => this.expr(x));
+        return items === e.items ? e : { ...e, items };
+      }
+      case "subscript": {
+        const arg = this.expr(e.arg);
+        const index = this.expr(e.index);
+        return arg === e.arg && index === e.index ? e : { ...e, arg, index };
+      }
+      case "collate": {
+        const arg = this.expr(e.arg);
+        const collation = this.name(e.collation);
+        return arg === e.arg && collation === e.collation ? e : { ...e, arg, collation };
+      }
       default:
         return absurd(e);
     }
@@ -412,7 +426,8 @@ class Rewriter {
       case "create-table": {
         const name = this.name(s.name);
         const elements = mapList(s.elements, (el) => (el.kind === "column-def" ? this.columnDef(el) : this.tableConstraint(el)));
-        return name === s.name && elements === s.elements ? s : { ...s, name, elements };
+        const query = opt(s.query, (x) => this.query(x));
+        return name === s.name && elements === s.elements && query === s.query ? s : { ...s, name, elements, query };
       }
       case "create-index": {
         const name = opt(s.name, (x) => this.name(x));
@@ -437,6 +452,7 @@ class Rewriter {
         return names === s.names ? s : { ...s, names };
       }
       case "unparsed":
+      case "command":
         return s;
       default:
         return absurd(s);

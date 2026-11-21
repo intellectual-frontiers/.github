@@ -63,7 +63,7 @@ import { allComments, type Comment } from "./comment.ts";
 import type { Dialect } from "./dialect.ts";
 import type { ParseError } from "./errors.ts";
 import { Prec, RESERVED_WORDS } from "./grammar.ts";
-import { lex } from "./lexer.ts";
+import { lex, Q_STRING } from "./lexer.ts";
 import { type CompiledLexical, keywordId, operatorId, type ParamStyle } from "./lexical.ts";
 import { Tok, type TokKind } from "./token.ts";
 
@@ -196,6 +196,7 @@ const kw = (lx: CompiledLexical) => {
     CASCADE: k("CASCADE"),
     RESTRICT: k("RESTRICT"),
     ACTION: k("ACTION"),
+    COLLATE: k("COLLATE"),
     NO: k("NO"),
     TIME: k("TIME"),
     WITHOUT: k("WITHOUT"),
@@ -232,6 +233,45 @@ const CORE_INFIX: readonly (readonly [string, number, BinaryOp])[] = [
   [">=", Prec.Compare, ">="],
 ];
 
+/** The words that may follow the first word of a type's name where what follows the type is an expression. */
+const TYPE_WORDS: ReadonlySet<string> = new Set([
+  "PRECISION",
+  "VARYING",
+  "TIME",
+  "ZONE",
+  "LOCAL",
+  "UNSIGNED",
+  "SIGNED",
+  "ZEROFILL",
+  "CHARACTER",
+  "CHAR",
+  "VARCHAR",
+  "NCHAR",
+  "BYTE",
+  "YEAR",
+  "MONTH",
+  "DAY",
+  "HOUR",
+  "MINUTE",
+  "SECOND",
+  "TO",
+  "WITH",
+  "WITHOUT",
+]);
+/** The words that begin a statement the grammar keeps as a command. */
+const COMMAND_WORDS: ReadonlySet<string> = new Set(
+  "SET SHOW EXPLAIN DESCRIBE DESC ANALYZE ANALYSE GRANT REVOKE USE PRAGMA BEGIN START COMMIT ROLLBACK SAVEPOINT RELEASE TRUNCATE COPY VACUUM CALL EXEC EXECUTE DECLARE IF WHILE LOAD ATTACH DETACH INSTALL EXPORT IMPORT COMMENT LOCK UNLOCK REFRESH REINDEX CLUSTER CHECKPOINT RESET DISCARD DO LISTEN NOTIFY PREPARE DEALLOCATE FETCH OPTIMIZE MERGE UNSET UNDROP RENAME SYSTEM".split(
+    " ",
+  ),
+);
+/** The words that may stand between `CREATE` and the kind of object. */
+const OBJECT_MODIFIERS: ReadonlySet<string> = new Set(
+  "OR REPLACE TEMP TEMPORARY GLOBAL LOCAL UNLOGGED MATERIALIZED RECURSIVE UNIQUE VIRTUAL EXTERNAL TRANSIENT VOLATILE SECURE IF NOT EXISTS".split(
+    " ",
+  ),
+);
+/** The words that may stand between `CREATE` and `TABLE`. */
+const TABLE_MODIFIERS: ReadonlySet<string> = new Set("TEMP TEMPORARY GLOBAL LOCAL UNLOGGED TRANSIENT VOLATILE EXTERNAL".split(" "));
 const STYLES: readonly ParamStyle[] = ["question", "question", "dollar-number", "dollar-name", "colon-name", "at-name"];
 const ESCAPES: Readonly<Record<string, string>> = { n: "\n", t: "\t", r: "\r", "0": "\0", b: "\b", f: "\f", v: "\v" };
 
@@ -243,6 +283,7 @@ function stringValue(raw: string, lx: CompiledLexical, tag: number): { readonly 
     const inner = raw.length >= t.length * 2 && raw.endsWith(t) ? raw.slice(t.length, raw.length - t.length) : raw.slice(t.length);
     return { value: inner, prefix: "" };
   }
+  if (tag === Q_STRING) return { value: raw.slice(3, Math.max(3, raw.length - 2)), prefix: raw.charAt(0).toUpperCase() };
   const syn = lx.lexical.strings[tag - 1];
   if (syn === undefined) return { value: raw, prefix: "" };
   const p = raw.indexOf(syn.open);
@@ -285,6 +326,7 @@ class Parser {
   private readonly opPlus: number;
   private readonly opStar: number;
   private readonly named: ReadonlySet<number>;
+  private readonly wordOps: ReadonlyMap<number, Infix>;
   private i = 0;
   private depth = 0;
   readonly errors: ParseError[] = [];
@@ -340,6 +382,12 @@ class Parser {
       if (id !== undefined) named.add(id);
     }
     this.named = named;
+    const wordOps = new Map<number, Infix>();
+    for (const o of d.grammar.wordOperators) {
+      const id = keywordId(d.compiled, o.text);
+      if (id !== undefined) wordOps.set(id, { prec: o.prec, op: undefined, text: o.text });
+    }
+    this.wordOps = wordOps;
   }
 
   // ---- the tokens
@@ -349,6 +397,10 @@ class Parser {
   }
   private id(at = 0): number {
     return this.ids[this.i + at] ?? 0;
+  }
+  /** The kind of the token `back` before the cursor. */
+  private tokens(back: number): TokKind {
+    return this.kinds[this.i + back] ?? Tok.Eof;
   }
   private atEnd(): boolean {
     return this.kind() === Tok.Eof;
@@ -474,7 +526,7 @@ class Parser {
         if (oid === this.castOp) {
           if (Prec.Cast < min) break;
           this.i++;
-          const type = this.dataType();
+          const type = this.dataType(true);
           left = { kind: "cast", start: s, end: this.last(), arg: left, type };
           continue;
         }
@@ -488,10 +540,29 @@ class Parser {
             : { kind: "binary", start: s, end: this.last(), op: info.op, left, right };
         continue;
       }
+      if (k === Tok.LBracket) {
+        if (Prec.Cast < min) break;
+        this.i++;
+        const index = this.expr(0);
+        this.expectKind(Tok.RBracket, "]");
+        left = { kind: "subscript", start: s, end: this.last(), arg: left, index };
+        continue;
+      }
       if (k !== Tok.Word) break;
       const w = this.id();
       const K = this.K;
-      if (w === K.AND) {
+      const wordOp = this.wordOps.get(w);
+      if (wordOp !== undefined) {
+        if (wordOp.prec < min) break;
+        this.i++;
+        const right = this.expr(wordOp.prec + 1);
+        left = { kind: "operator", start: s, end: this.last(), op: wordOp.text, left, right };
+      } else if (w === K.COLLATE) {
+        if (Prec.Cast < min) break;
+        this.i++;
+        const collation = this.qualifiedName();
+        left = { kind: "collate", start: s, end: this.last(), arg: left, collation };
+      } else if (w === K.AND) {
         if (Prec.And < min) break;
         this.i++;
         const right = this.expr(Prec.And + 1);
@@ -589,6 +660,12 @@ class Parser {
         this.expectKind(Tok.RParen, ")");
         return first;
       }
+      case Tok.LBracket: {
+        this.i++;
+        const items = this.kind() === Tok.RBracket ? [] : this.commaList(() => this.expr(0));
+        this.expectKind(Tok.RBracket, "]");
+        return { kind: "array", start: s, end: this.last(), items };
+      }
       case Tok.Op: {
         const o = this.id();
         if (o === this.opMinus || o === this.opPlus) {
@@ -603,7 +680,6 @@ class Parser {
         return this.wordPrefix(s);
       case Tok.Eof:
       case Tok.RParen:
-      case Tok.LBracket:
       case Tok.RBracket:
       case Tok.LBrace:
       case Tok.RBrace:
@@ -636,11 +712,17 @@ class Parser {
         return { kind: "unary", start: s, end: this.last(), op: "NOT", arg };
       }
       if (w === K.CASE) return this.caseExpr(s);
+      if (this.kind(1) === Tok.LBracket && this.slice().toUpperCase() === "ARRAY") {
+        this.i += 2;
+        const items = this.kind() === Tok.RBracket ? [] : this.commaList(() => this.expr(0));
+        this.expectKind(Tok.RBracket, "]");
+        return { kind: "array", start: s, end: this.last(), items };
+      }
       if (w === K.CAST && paren) {
         this.i += 2;
         const arg = this.expr(0);
         this.expect(K.AS, "AS");
-        const type = this.dataType();
+        const type = this.dataType(true);
         this.expectKind(Tok.RParen, ")");
         return { kind: "cast", start: s, end: this.last(), arg, type };
       }
@@ -851,7 +933,12 @@ class Parser {
 
   // ---- data types
 
-  private dataType(): DataType {
+  /** Whether the word at the cursor may continue a data type's name after its first word, where what follows a type is an expression (`x::int ILIKE 'a'`, `x::int DESC`). */
+  private isTypeWord(): boolean {
+    return TYPE_WORDS.has(this.slice().toUpperCase());
+  }
+
+  private dataType(strict = false): DataType {
     const K = this.K;
     const s = this.start();
     const words: string[] = [];
@@ -868,7 +955,11 @@ class Parser {
         this.i++;
         args.push(...this.commaList(() => this.expr(0)));
         this.expectKind(Tok.RParen, ")");
-      } else if (this.kind() === Tok.Word && (!this.isReserved() || ((this.at(K.WITH) || this.at(K.WITHOUT)) && this.at(K.TIME, 1)))) {
+      } else if (
+        this.kind() === Tok.Word &&
+        (!this.isReserved() || ((this.at(K.WITH) || this.at(K.WITHOUT)) && this.at(K.TIME, 1))) &&
+        (!strict || this.isTypeWord())
+      ) {
         words.push(this.slice().toUpperCase());
         this.i++;
       } else break;
@@ -878,7 +969,12 @@ class Parser {
       this.i += 2;
       name += "[]";
     }
-    return { kind: "data-type", start: s, end: this.last(), name, args };
+    let collation: string | undefined;
+    if (this.eat(K.COLLATE)) {
+      const c = this.qualifiedName();
+      collation = c.parts.map((p) => p.name).join(".");
+    }
+    return { kind: "data-type", start: s, end: this.last(), name, args, collation };
   }
 
   // ---- queries
@@ -1085,6 +1181,11 @@ class Parser {
     const K = this.K;
     const s = this.start();
     const lateral = this.eat(K.LATERAL);
+    if (this.at(K.VALUES)) {
+      const query = this.values();
+      const alias = this.alias();
+      return { kind: "subquery", start: s, end: this.last(), query, alias, lateral };
+    }
     if (this.kind() === Tok.LParen) {
       if (this.atQuery(1)) {
         this.i++;
@@ -1294,17 +1395,35 @@ class Parser {
   private create(): Statement {
     const K = this.K;
     const s = this.start();
+    const first = this.i;
     this.i++;
     const orReplace = this.at(K.OR) && this.at(K.REPLACE, 1);
     if (orReplace) this.i += 2;
     const unique = this.eat(K.UNIQUE);
+    let temporary = false;
+    while (this.kind() === Tok.Word && TABLE_MODIFIERS.has(this.slice().toUpperCase())) {
+      if (this.slice().toUpperCase().startsWith("TEMP")) temporary = true;
+      this.i++;
+    }
     if (this.eat(K.TABLE)) {
       const ifNotExists = this.ifNotExists();
       const name = this.qualifiedName();
-      this.expectKind(Tok.LParen, "(");
-      const elements = this.commaList(() => (this.atTableConstraint() ? this.tableConstraint() : this.columnDef()));
-      this.expectKind(Tok.RParen, ")");
-      return { kind: "create-table", start: s, end: this.last(), name, ifNotExists, elements };
+      const elements =
+        this.kind() === Tok.LParen && !this.atQuery(1)
+          ? (this.i++, this.commaList(() => (this.atTableConstraint() ? this.tableConstraint() : this.columnDef())))
+          : [];
+      if (elements.length > 0 || this.tokens(-1) === Tok.LParen) this.expectKind(Tok.RParen, ")");
+      const from = this.i;
+      let depth = 0;
+      while (!this.atEnd() && this.kind() !== Tok.Semicolon && !(depth === 0 && this.at(K.AS))) {
+        if (this.kind() === Tok.LParen) depth++;
+        else if (this.kind() === Tok.RParen) depth--;
+        this.i++;
+      }
+      const options = this.i > from ? this.text.slice(this.starts[from] ?? 0, this.ends[this.i - 1] ?? 0) : undefined;
+      let query: Query | undefined;
+      if (this.eat(K.AS)) query = this.query();
+      return { kind: "create-table", start: s, end: this.last(), name, ifNotExists, temporary, elements, query, options };
     }
     if (this.eat(K.INDEX)) {
       const ifNotExists = this.ifNotExists();
@@ -1324,7 +1443,8 @@ class Parser {
       const query = this.query();
       return { kind: "create-view", start: s, end: this.last(), orReplace, name, columns, query };
     }
-    return this.unsupported("this CREATE");
+    this.i = first;
+    return this.command();
   }
 
   private ifNotExists(): boolean {
@@ -1387,27 +1507,59 @@ class Parser {
     const K = this.K;
     const s = this.start();
     this.i++;
-    if (!this.eat(K.TABLE)) this.unsupported("this ALTER");
-    const ifExists = this.ifExists();
-    const table = this.qualifiedName();
-    const actions = this.commaList(() => this.alterAction());
-    return { kind: "alter-table", start: s, end: this.last(), ifExists, table, actions };
+    const first = this.i - 1;
+    if (!this.eat(K.TABLE)) {
+      this.i = first;
+      return this.command();
+    }
+    try {
+      const ifExists = this.ifExists();
+      const table = this.qualifiedName();
+      const actions = this.commaList(() => this.alterAction());
+      return { kind: "alter-table", start: s, end: this.last(), ifExists, table, actions };
+    } catch (e) {
+      if (!(e instanceof Failure)) throw e;
+      this.i = first;
+      return this.command();
+    }
   }
 
   private drop(): Statement {
     const K = this.K;
     const s = this.start();
     this.i++;
+    const first = this.i - 1;
     const object = this.eat(K.TABLE) ? "table" : this.eat(K.VIEW) ? "view" : this.eat(K.INDEX) ? "index" : undefined;
-    if (object === undefined) return this.unsupported("this DROP");
+    if (object === undefined) {
+      this.i = first;
+      return this.command();
+    }
     const ifExists = this.ifExists();
     const names = this.commaList(() => this.qualifiedName());
     const behavior = this.eat(K.CASCADE) ? "cascade" : this.eat(K.RESTRICT) ? "restrict" : undefined;
     return { kind: "drop", start: s, end: this.last(), object, ifExists, names, behavior };
   }
 
+  /** A statement that holds no node: its keyword, its object for `CREATE`, `ALTER` and `DROP`, and its text. */
+  private command(): Statement {
+    const s = this.start();
+    const keyword = this.slice().toUpperCase();
+    this.i++;
+    let object: string | undefined;
+    if (keyword === "CREATE" || keyword === "ALTER" || keyword === "DROP") {
+      let at = 0;
+      while (this.kind(at) === Tok.Word && OBJECT_MODIFIERS.has(this.slice(at).toUpperCase())) at++;
+      if (this.kind(at) === Tok.Word) object = this.slice(at).toUpperCase();
+    }
+    const from = this.i;
+    while (!this.atEnd() && this.kind() !== Tok.Semicolon) this.i++;
+    const text = this.i > from ? this.text.slice(this.starts[from] ?? 0, this.ends[this.i - 1] ?? 0) : "";
+    return { kind: "command", start: s, end: this.last(), keyword, object, text };
+  }
+
   private statement(): Statement {
     const K = this.K;
+    if (this.kind() === Tok.Word && COMMAND_WORDS.has(this.slice().toUpperCase())) return this.command();
     if (this.kind() === Tok.LParen || this.at(K.SELECT) || this.at(K.WITH) || this.at(K.VALUES)) return this.query();
     if (this.at(K.INSERT)) return this.insert();
     if (this.at(K.UPDATE)) return this.update();

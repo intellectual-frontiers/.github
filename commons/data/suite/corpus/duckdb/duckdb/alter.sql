@@ -1,0 +1,1273 @@
+CREATE TABLE test(i INTEGER, j INTEGER);
+
+INSERT INTO test VALUES (1, 1), (2, 2);
+
+ALTER TABLE test ADD COLUMN k INTEGER;
+
+SELECT * FROM test;
+
+BEGIN TRANSACTION;
+
+INSERT INTO test VALUES (3, 3);
+
+ALTER TABLE test ADD COLUMN l INTEGER;
+
+ALTER TABLE test ADD COLUMN m INTEGER DEFAULT 3;
+
+ROLLBACK;
+
+CREATE TABLE compression_test(i INTEGER);
+
+ALTER TABLE compression_test ADD COLUMN added INTEGER USING COMPRESSION UNCOMPRESSED DEFAULT 42;
+
+INSERT INTO compression_test SELECT i, i FROM range(10000) t(i);
+
+SELECT contains(sql, 'USING COMPRESSION Uncompressed')
+FROM duckdb_tables()
+WHERE table_name = 'compression_test';
+
+CHECKPOINT;
+
+SELECT DISTINCT compression
+FROM pragma_storage_info('compression_test')
+WHERE column_name = 'added' AND segment_type = 'INTEGER';
+
+CREATE TABLE t1(i INTEGER);
+
+CREATE TABLE t2(i INTEGER PRIMARY KEY);
+
+SELECT count(*) FROM pragma_table_info('t1');
+
+ALTER TABLE test ADD COLUMN l INTEGER DEFAULT 3;
+
+SELECT i, j, l FROM test;
+
+CREATE SEQUENCE seq;
+
+ALTER TABLE test ADD COLUMN m INTEGER DEFAULT nextval('seq');
+
+ALTER TABLE test ADD COLUMN n INTEGER DEFAULT currval('seq');
+
+CREATE TABLE t AS SELECT range AS i FROM range(100000);
+
+ALTER TABLE t ADD COLUMN IF NOT EXISTS u VARCHAR DEFAULT (nextval('seq') * 7919 % 2001)::VARCHAR;
+
+SELECT s.approx_unique BETWEEN 1000 AND 10000 FROM (SELECT stats(u) s FROM t LIMIT 1);
+
+INSERT INTO t SELECT 100000 + range, (nextval('seq') * 7919 % 2001)::VARCHAR FROM range(10);
+
+CREATE TABLE t (i INTEGER);
+
+INSERT INTO t VALUES (1), (2);
+
+ALTER TABLE t ADD COLUMN IF NOT EXISTS b BOOLEAN DEFAULT false;
+
+UPDATE t SET b = true;
+
+SELECT b FROM t;
+
+CREATE VIEW x(x) AS (SELECT 1);
+
+ALTER TABLE test ADD COLUMN k INTEGER DEFAULT 2;
+
+CREATE INDEX i_index ON test(k);
+
+COMMIT;
+
+INSERT INTO test VALUES (3, 3, 3);
+
+SELECT * FROM test WHERE k=2;
+
+SELECT * FROM test WHERE k=3;
+
+CREATE TABLE t(a INTEGER);
+
+INSERT INTO t VALUES (1);
+
+DELETE FROM t;
+
+ALTER TABLE t ADD COLUMN b INTEGER NOT NULL;
+
+INSERT INTO t VALUES (2, 42);
+
+SELECT * FROM t;
+
+SELECT * FROM test WHERE m=2;
+
+SELECT s.min, s.max FROM (SELECT stats(m) s FROM test LIMIT 1);
+
+ALTER TABLE t ADD COLUMN b INTEGER UNIQUE;
+
+INSERT INTO t VALUES (2, 5);
+
+INSERT INTO t VALUES (4, NULL), (5, NULL);
+
+CREATE SCHEMA test_schema;
+
+CREATE TYPE main_int AS int32;
+
+CREATE TYPE test_schema.test_int AS int32;
+
+CREATE TABLE test_schema.test_t1 (i INT);
+
+CREATE TABLE main_t1 (i INT);
+
+ALTER TABLE test_schema.test_t1 ADD COLUMN not_found main_int;
+
+ALTER TABLE test_schema.test_t1 ADD COLUMN l test_int;
+
+CREATE TABLE test (i INTEGER, j INTEGER, d TEXT);
+
+INSERT INTO test VALUES (3, 4, 'hello'), (44, 45, '56');
+
+ALTER TABLE test ADD PRIMARY KEY (i, j);
+
+INSERT INTO test VALUES (1, 1, 'foo'), (1, 2, 'bar');
+
+CREATE TABLE test (i INTEGER, j INTEGER);
+
+INSERT INTO test VALUES (1, 1);
+
+ALTER TABLE test ADD PRIMARY KEY (j);
+
+INSERT INTO test VALUES (1, 2);
+
+CREATE TABLE reverse (i INTEGER, j INTEGER);
+
+INSERT INTO reverse VALUES (1, 2);
+
+ALTER TABLE reverse ADD PRIMARY KEY (j, i);
+
+CREATE TABLE scan (i INTEGER, j INTEGER);
+
+INSERT INTO scan SELECT range, range + 1 FROM range(30000);
+
+ALTER TABLE scan ADD PRIMARY KEY (i);
+
+SELECT * FROM scan WHERE i = 2;
+
+CREATE TEMPORARY TABLE temp_pk_test(x INTEGER);
+
+SELECT table_name, database_name, temporary FROM duckdb_tables() WHERE table_name='temp_pk_test';
+
+ALTER TABLE temp_pk_test ADD PRIMARY KEY (x);
+
+CREATE VIEW view_test AS SELECT 'hello' AS name, 42 AS value;
+
+DROP VIEW view_test;
+
+ALTER TABLE test ALTER COLUMN j SET NOT NULL;
+
+ATTACH ':memory:' as memory;
+
+USE memory;
+
+DETACH test_add_pk_attach;
+
+USE test_add_pk_attach;
+
+CREATE TABLE uniq (i INTEGER UNIQUE, j INTEGER);
+
+INSERT INTO uniq VALUES (1, 10), (2, 20), (3, 30);
+
+ALTER TABLE uniq ADD PRIMARY KEY (i);
+
+CREATE TABLE t (id BIGINT, c INTEGER);
+
+INSERT INTO t SELECT range, range % 10 FROM range(2000);
+
+INSERT INTO t VALUES (5000, 1);
+
+SELECT count(*) FROM t WHERE c = 1;
+
+CREATE OR REPLACE TABLE t (id INTEGER);
+
+INSERT INTO t SELECT i FROM range(1, 100001) tbl(i);
+
+ALTER TABLE t ADD PRIMARY KEY (id);
+
+INSERT INTO t VALUES (NULL);
+
+SELECT (SELECT count(*) FROM t WHERE id IS NULL) = 0
+    OR (SELECT count(*) FROM duckdb_constraints() WHERE table_name = 't' AND constraint_type = 'PRIMARY KEY') = 0;
+
+DROP TABLE test;
+
+CREATE TABLE integers(i integer);
+
+INSERT INTO integers SELECT * FROM range(50000);
+
+SELECT i FROM integers WHERE i = 100;
+
+DELETE FROM integers WHERE i = 42;
+
+ALTER TABLE integers ADD PRIMARY KEY (i);
+
+CREATE TABLE duplicates (i INTEGER, j INTEGER);
+
+INSERT INTO duplicates VALUES (1, 10), (2, 20), (3, 30), (1, 100);
+
+CREATE TABLE nulls (i INTEGER, j INTEGER);
+
+INSERT INTO nulls VALUES (1, 10), (2, NULL), (3, 30), (4, 40);
+
+DROP TABLE nulls;
+
+INSERT INTO nulls VALUES (5, 10), (NULL, 20), (7, 30), (8, 100);
+
+CREATE TABLE nulls_compound (i INTEGER, j INTEGER, k VARCHAR);
+
+INSERT INTO nulls_compound VALUES (1, 10, 'hello'), (2, 20, 'world'), (NULL, NULL, NULL), (3, 100, 'yay');
+
+CREATE TABLE test (a INTEGER[], b INTEGER);
+
+BEGIN;
+
+CREATE TABLE test (i INTEGER);
+
+INSERT INTO test VALUES (1);
+
+ALTER TABLE test ADD PRIMARY KEY (i);
+
+CREATE INDEX PRIMARY_test_i ON test(i);
+
+INSERT INTO test VALUES (2, 1);
+
+INSERT INTO test VALUES (1, 1), (2, 1), (2, NULL);
+
+CREATE TABLE other (i INTEGER, j INTEGER);
+
+INSERT INTO other VALUES (1, 1), (2, 1);
+
+ALTER TABLE other ADD PRIMARY KEY (j);
+
+PRAGMA disable_checkpoint_on_shutdown;
+
+SET wal_autocheckpoint='1TB';
+
+INSERT INTO test VALUES (1, 2), (3, 4);
+
+CREATE TABLE t_lead(g INTEGER GENERATED ALWAYS AS (a + 1), a INTEGER);
+
+INSERT INTO t_lead(a) VALUES (1), (2);
+
+ALTER TABLE t_lead ADD PRIMARY KEY (a);
+
+CREATE TABLE t_mid(a INTEGER, g INTEGER GENERATED ALWAYS AS (a + 1), c INTEGER);
+
+INSERT INTO t_mid(a, c) VALUES (1, 10), (2, 20);
+
+ALTER TABLE t_mid ADD PRIMARY KEY (c);
+
+CREATE TABLE t_uq(g INTEGER GENERATED ALWAYS AS (a + 1), a INTEGER);
+
+INSERT INTO t_uq(a) VALUES (1);
+
+ALTER TABLE t_uq ADD UNIQUE (a);
+
+SELECT g, a FROM t_lead ORDER BY a;
+
+SELECT a FROM t_lead WHERE a = 2;
+
+INSERT INTO t_lead(a) VALUES (3);
+
+SELECT a, g, c FROM t_mid ORDER BY c;
+
+INSERT INTO t_mid(a, c) VALUES (3, 30);
+
+INSERT INTO t_uq(a) VALUES (2);
+
+CREATE TABLE test (
+	a INT NOT NULL,
+	b INT GENERATED ALWAYS AS (a) VIRTUAL,
+	c INT,
+);
+
+INSERT INTO test VALUES (5, 4);
+
+ALTER TABLE test ADD PRIMARY KEY (c);
+
+CREATE TABLE other (i INTEGER PRIMARY KEY, j INTEGER);
+
+CREATE TABLE t(c INT);
+
+ALTER TABLE t ADD UNIQUE (c);
+
+CREATE TABLE d(i INT);
+
+INSERT INTO d VALUES (1), (1);
+
+CREATE TABLE r(i INT);
+
+ALTER TABLE r ADD UNIQUE (i);
+
+INSERT INTO r VALUES (1), (1);
+
+CREATE TABLE g(a INT, g INT GENERATED ALWAYS AS (a + 1));
+
+CREATE TABLE dup(i INT UNIQUE, j INT);
+
+ALTER TABLE dup ADD UNIQUE (j);
+
+ALTER TABLE dup ADD PRIMARY KEY (i);
+
+CREATE TABLE t(i INTEGER, j INTEGER, k INTEGER);
+
+INSERT INTO t VALUES (1, 10, 100);
+
+ALTER TABLE t ADD PRIMARY KEY (j);
+
+ALTER TABLE t ADD UNIQUE (i);
+
+ALTER TABLE t RENAME TO renamed_t;
+
+ALTER TABLE renamed_t RENAME COLUMN i TO id;
+
+ALTER TABLE renamed_t RENAME TO t;
+
+ALTER TABLE t RENAME COLUMN id TO i;
+
+ALTER TABLE t ADD UNIQUE (k);
+
+INSERT INTO renamed_t VALUES (2, 20, 100);
+
+INSERT INTO renamed_t VALUES (3, 30, 100);
+
+CREATE TABLE test(i INTEGER, j INTEGER NOT NULL);
+
+ALTER TABLE test ALTER COLUMN j DROP NOT NULL;
+
+INSERT INTO test VALUES (3, NULL);
+
+CREATE TABLE test2(i INTEGER, j INTEGER);
+
+INSERT INTO test2 VALUES (1, 1), (2, 2);
+
+ALTER TABLE test2 ALTER COLUMN j DROP NOT NULL;
+
+DROP TABLE IF EXISTS test;
+
+CREATE TABLE test(i AS (1), j INTEGER NOT NULL);
+
+INSERT INTO test VALUES (1), (2);
+
+ALTER TABLE test ALTER COLUMN i DROP NOT NULL;
+
+INSERT INTO test VALUES (NULL);
+
+CREATE TEMPORARY TABLE temp_drop_not_null_test(x INTEGER NOT NULL);
+
+SELECT table_name, database_name, temporary FROM duckdb_tables() WHERE table_name='temp_drop_not_null_test';
+
+ALTER TABLE temp_drop_not_null_test ALTER COLUMN x DROP NOT NULL;
+
+CREATE TABLE pk_col(i INTEGER PRIMARY KEY, j INTEGER);
+
+CREATE TABLE t(i INTEGER, j INTEGER);
+
+INSERT INTO t SELECT i, i FROM RANGE(2048) tbl(i);
+
+INSERT INTO t VALUES(9999, NULL);
+
+SELECT i FROM t WHERE j IS NULL;
+
+DROP TABLE IF EXISTS t;
+
+INSERT INTO t values(8888, 8888);
+
+ALTER TABLE t ALTER COLUMN j SET NOT NULL;
+
+SELECT * FROM t WHERE j = 8888;
+
+CREATE TABLE t(i int, j int);
+
+INSERT INTO T SELECT 1,1 FROM RANGE(2048);
+
+INSERT INTO t VALUES(2, 2);
+
+ALTER TABLE t ALTER COLUMN j DROP NOT NULL;
+
+INSERT INTO t values(3, NULL);
+
+INSERT INTO t VALUES(4, NULL);
+
+SELECT * FROM t WHERE j IS NULL;
+
+INSERT INTO T VALUES(7777, NULL);
+
+SELECT COUNT(*) FROM t WHERE j IS NULL;
+
+CREATE TABLE t(i INTEGER);
+
+ALTER TABLE t ALTER COLUMN i SET NOT NULL;
+
+INSERT INTO t SELECT 1 FROM RANGE(1024);
+
+CREATE TABLE t(i INTEGER NOT NULL);
+
+ALTER TABLE t ALTER COLUMN i DROP NOT NULL;
+
+INSERT INTO t VALUES(NULL);
+
+INSERT INTO t SELECT 1,1 FROM RANGE(1024);
+
+INSERT INTO t VALUES(2,NULL);
+
+DELETE FROM t WHERE i = 2;
+
+SELECT i FROM t;
+
+SELECT COUNT(*) FROM  t;
+
+CREATE TABLE t(id INT, s VARCHAR);
+
+INSERT INTO t VALUES (1, 'hello'), (2, 'HELLO'), (3, 'World');
+
+ALTER TABLE t ALTER COLUMN s TYPE VARCHAR COLLATE nocase;
+
+SELECT id FROM t WHERE s = 'hello' ORDER BY id;
+
+SELECT s FROM t ORDER BY s, id;
+
+ALTER TABLE t ALTER COLUMN id TYPE VARCHAR COLLATE nocase USING 'x' || id::VARCHAR;
+
+SELECT count(*) FROM t WHERE id = 'X1';
+
+SELECT sql LIKE '%s VARCHAR(''nocase'')%' FROM duckdb_tables() WHERE table_name = 't';
+
+ALTER TABLE t ADD COLUMN c VARCHAR COLLATE nocase;
+
+UPDATE t SET c = s;
+
+SELECT id FROM t WHERE c = 'HELLO' ORDER BY id;
+
+SELECT sql LIKE '%c VARCHAR(''nocase'')%' FROM duckdb_tables() WHERE table_name = 't';
+
+INSERT INTO t VALUES (1, 1), (2, 2);
+
+INSERT INTO t SELECT 5,5 from range(65534);
+
+INSERT INTO t VALUES (1, 1), (2, 2), (3, null);
+
+INSERT INTO t SELECT 4,4 FROM RANGE(65536);
+
+INSERT INTO t VALUES (5, null);
+
+INSERT INTO t SELECT 1,1 FROM RANGE(65536);
+
+INSERT INTO t VALUES (3, null);
+
+CREATE TABLE t0(c0 AS (1), c1 INT);
+
+ALTER TABLE t0 ALTER c1 SET NOT NULL;
+
+CREATE TABLE t(i AS (1), j INTEGER);
+
+INSERT INTO t SELECT 1 FROM RANGE(65536);
+
+CREATE TEMPORARY TABLE temp_not_null_test(x INTEGER);
+
+SELECT table_name, database_name, temporary FROM duckdb_tables() WHERE table_name='temp_not_null_test';
+
+ALTER TABLE temp_not_null_test ALTER COLUMN x SET NOT NULL;
+
+INSERT INTO t VALUES (NULL), (42);
+
+DELETE FROM t WHERE i IS NULL;
+
+CREATE SCHEMA s1;
+
+set variable location='my/location/path';
+
+ALTER SCHEMA IF EXISTS s2 SET (foo='baz');
+
+ALTER SCHEMA IF EXISTS s2 RESET (foo);
+
+ATTACH ':memory:' AS other_db;
+
+CREATE SCHEMA other_db.s3;
+
+ALTER SCHEMA IF EXISTS other_db.s1 SET (foo='baz');
+
+CREATE SCHEMA s1.child;
+
+CREATE SCHEMA s1.child.grandchild;
+
+CREATE SCHEMA other_db.s3.child;
+
+CREATE SCHEMA other_db.s3.child.grandchild;
+
+ALTER SCHEMA IF EXISTS s1.missing SET (foo='baz');
+
+ALTER SCHEMA IF EXISTS s1.missing_parent.child RESET (foo);
+
+SET debug_verify_statement='reparse_statement';
+
+ALTER TABLE IF EXISTS nope ADD CONSTRAINT c CHECK (a > 0);
+
+ALTER TABLE IF EXISTS nope ADD PRIMARY KEY (a);
+
+ALTER TABLE IF EXISTS nope SET PARTITIONED BY (a);
+
+ALTER TABLE IF EXISTS nope RESET PARTITIONED BY;
+
+ALTER TABLE IF EXISTS nope SET SORTED BY (a);
+
+ALTER TABLE IF EXISTS nope SET (opt = 1);
+
+ALTER TABLE IF EXISTS nope RESET (opt);
+
+CREATE TABLE t (a INTEGER);
+
+ALTER TABLE t ALTER a SET NOT NULL;
+
+ALTER TABLE t ALTER COLUMN a DROP NOT NULL;
+
+CREATE TABLE tbl(i INTEGER);
+
+CREATE TABLE tbl1(i INTEGER);
+
+SELECT v FROM t;
+
+SELECT typeof(v) FROM t;
+
+CREATE TABLE c AS SELECT hash(range) % 2000 AS v FROM range(100000);
+
+ALTER TABLE c ALTER COLUMN v SET DATA TYPE VARCHAR USING v::VARCHAR;
+
+SELECT s.approx_unique BETWEEN 1000 AND 10000 FROM (SELECT stats(v) s FROM c LIMIT 1);
+
+INSERT INTO c SELECT (hash(range) % 2000)::VARCHAR FROM range(100);
+
+CREATE TABLE t(v VARCHAR);
+
+INSERT INTO t VALUES ('not a number');
+
+INSERT INTO t VALUES ('still works');
+
+UPDATE t SET v = 'updated';
+
+SELECT count(*) FROM t WHERE v = 'updated';
+
+CREATE TABLE test AS SELECT {'t': 42} t;
+
+ALTER TABLE test ALTER t TYPE ROW(t VARCHAR) USING {'t': concat('hello', (test.t.t + 42)::varchar)};
+
+ALTER TABLE test ALTER t TYPE ROW(t VARCHAR) USING {'t': concat('hello', (t.t + 42)::varchar)};
+
+ALTER TABLE test ALTER i SET DATA TYPE VARCHAR;
+
+SELECT * FROM test ORDER BY ALL;
+
+SELECT * FROM test WHERE i = '1';
+
+ALTER TABLE test ALTER i SET DATA TYPE INTEGER;
+
+SELECT * FROM test WHERE i = 1;
+
+SELECT s.min, s.max FROM (SELECT stats(i) s FROM test LIMIT 1);
+
+CREATE TABLE tbl (col STRUCT(i INT));
+
+INSERT INTO tbl SELECT {'i': range} FROM range(5000);
+
+ALTER TABLE tbl ALTER col TYPE USING struct_insert(col, a := 42, b := NULL::VARCHAR);
+
+INSERT INTO tbl VALUES ({'i': 10000, 'a': NULL, 'b': 'hello'});
+
+SELECT col FROM tbl ORDER BY col DESC LIMIT 3;
+
+SELECT i FROM test;
+
+CREATE TABLE test(i INTEGER CHECK(i < 10), j INTEGER);
+
+ALTER TABLE test ALTER j SET DATA TYPE VARCHAR;
+
+PREPARE v1 AS SELECT * FROM test;
+
+EXECUTE v1;
+
+ALTER TABLE test ALTER i TYPE VARCHAR USING i::VARCHAR;
+
+ALTER TABLE test ALTER i TYPE INTEGER USING i::INTEGER;
+
+PREPARE v2 AS SELECT i+$1 FROM test;
+
+EXECUTE v2(1);
+
+ALTER TABLE test ALTER i TYPE BIGINT USING i+100;
+
+CREATE INDEX i_index ON test(i);
+
+DROP INDEX i_index;
+
+ALTER TABLE test ALTER i SET DATA TYPE BIGINT;
+
+ALTER TABLE test ALTER i TYPE INTEGER USING 2*(i+j);
+
+CREATE TABLE test(i INTEGER NOT NULL, j INTEGER);
+
+INSERT INTO test VALUES ('hello', 3);
+
+UPDATE test SET i='hello';
+
+CREATE TABLE test(i INTEGER UNIQUE, j INTEGER);
+
+CREATE TABLE t(a INTEGER NOT NULL, b INTEGER);
+
+INSERT INTO t VALUES (1, 10), (2, 20);
+
+SELECT a, b FROM t ORDER BY a;
+
+CREATE TABLE test(i AS (1), j INTEGER);
+
+ALTER TABLE test ALTER j TYPE VARCHAR;
+
+CREATE TABLE data(id INTEGER, x INTEGER);
+
+ALTER TABLE data ALTER COLUMN id DROP DEFAULT;
+
+INSERT INTO data VALUES (1, 0), (2, 1);
+
+ALTER TABLE data ALTER COLUMN x DROP DEFAULT;
+
+ALTER TABLE test ALTER j SET DEFAULT 3;
+
+INSERT INTO test (i) VALUES (3);
+
+ALTER TABLE test ALTER COLUMN j DROP DEFAULT;
+
+INSERT INTO test (i) VALUES (4);
+
+ALTER TABLE test ALTER j SET DEFAULT nextval('seq');
+
+INSERT INTO test (i) VALUES (5), (6);
+
+CREATE TABLE constrainty(i INTEGER PRIMARY KEY, j INTEGER);
+
+ALTER TABLE constrainty ALTER j SET DEFAULT 3;
+
+INSERT INTO constrainty (i) VALUES (2);
+
+SELECT * FROM constrainty;
+
+CREATE TEMPORARY TABLE temp_default_test(x INTEGER DEFAULT 1);
+
+SELECT table_name, database_name, temporary FROM duckdb_tables() WHERE table_name='temp_default_test';
+
+ALTER TABLE temp_default_test ALTER x SET DEFAULT 5;
+
+ALTER TABLE test DROP COLUMN j;
+
+CREATE TABLE test(i INTEGER, j INTEGER CHECK(j < 10));
+
+INSERT INTO test VALUES (3);
+
+CREATE TABLE test2(i INTEGER, j INTEGER CHECK(i+j < 10));
+
+SELECT * FROM test2;
+
+ALTER TABLE test DROP COLUMN i;
+
+SET immediate_transaction_mode=true;
+
+CREATE TABLE t1 (id INTEGER PRIMARY KEY, val INTEGER, extra INTEGER);
+
+INSERT INTO t1 SELECT i, i * 10, i FROM range(1000) tbl(i);
+
+EXPLAIN ANALYZE SELECT val FROM t1 WHERE id = 5;
+
+SELECT val FROM t1 WHERE id = 499;
+
+EXPLAIN ANALYZE SELECT val FROM t1 WHERE id = 500;
+
+SELECT val FROM t1 WHERE id = 500;
+
+SET debug_verify_blocks=true;
+
+CREATE TABLE t AS SELECT i::VARCHAR AS "a.b", i::VARCHAR AS a FROM range(100000) t(i);
+
+ALTER TABLE t DROP COLUMN "a.b";
+
+ALTER TABLE test DROP COLUMN IF EXISTS blabla;
+
+CREATE TABLE test2 (id INT PRIMARY KEY, name TEXT, surname TEXT, age INT, UNIQUE(surname, age));
+
+CREATE TABLE test3 (a INT, b INT, c INT, PRIMARY KEY(a, b));
+
+CREATE TABLE gen(a INT PRIMARY KEY, b INT GENERATED ALWAYS AS (a + 1), c INT, d INT GENERATED ALWAYS AS (c * 2));
+
+INSERT INTO gen(a, c) VALUES (1, 10);
+
+ALTER TABLE gen DROP COLUMN c CASCADE;
+
+SELECT * FROM gen;
+
+CREATE INDEX i_index ON test(j);
+
+CREATE TABLE test(i INTEGER, j INTEGER, k INTEGER NOT NULL);
+
+INSERT INTO test VALUES (1, 1, 11), (2, 2, 12);
+
+INSERT INTO test VALUES (3, 13);
+
+INSERT INTO test SELECT i, i FROM range(100) tbl(i);
+
+DELETE FROM test WHERE j%2=0;
+
+SELECT COUNT(j), SUM(j) FROM test;
+
+UPDATE test SET j=j+100;
+
+CREATE TABLE test(i INTEGER PRIMARY KEY, j INTEGER);
+
+create table t(i int, j as (2), k int, m as (3), n int);
+
+alter table t drop column n;
+
+alter table t drop column m;
+
+alter table t drop column k;
+
+alter table t drop column j;
+
+WITH cte AS (
+	SELECT a::STRUCT(i INTEGER, j INTEGER)[] a FROM
+	VALUES ([ROW(1, 1)]), ([ROW(2, 2)]) t(a)
+)
+SELECT remap_struct(
+	a,
+	NULL::STRUCT(i INTEGER, j INTEGER, k INTEGER)[],
+	{'list': ('list', {'i': 'i', 'j': 'j'})},
+	{'list': {'k': NULL::INTEGER}}
+) FROM cte;
+
+CREATE TABLE test(s STRUCT(i INTEGER, j INTEGER)[]);
+
+INSERT INTO test VALUES ([ROW(1, 1)]), ([ROW(2, 2)]);
+
+ALTER TABLE test ADD COLUMN s.element.k INTEGER;
+
+CREATE TABLE test(
+	s STRUCT(
+		a STRUCT(i INTEGER, j INTEGER)[]
+	)
+);
+
+INSERT INTO test VALUES (ROW([ROW(1, 1)])), (ROW([ROW(2, 2)]));
+
+ALTER TABLE test ADD COLUMN s.a.element.k INTEGER;
+
+ALTER TABLE test DROP COLUMN s.element.j;
+
+ALTER TABLE test DROP COLUMN s.a.element.i;
+
+CREATE TABLE test(
+	s STRUCT(
+		i INTEGER,
+		j INTEGER
+	)[]
+);
+
+ALTER TABLE test RENAME COLUMN s.element.j TO k;
+
+CREATE TABLE test(
+	s STRUCT(
+		a STRUCT(
+			i INTEGER,
+			j INTEGER
+		)[]
+	)
+);
+
+ALTER TABLE test RENAME COLUMN s.a.element.i TO k;
+
+WITH cte as (
+	select a::MAP(STRUCT(n INTEGER, m INTEGER), STRUCT(i INTEGER, j INTEGER)) a from
+	VALUES
+		(MAP {ROW(3,3): ROW(1, 1)}),
+		(MAP {ROW(4,4): ROW(2, 2)})
+	t(a)
+)
+SELECT remap_struct(
+	a,
+	NULL::MAP(STRUCT(n INTEGER, m INTEGER), STRUCT(i INTEGER, j INTEGER, k INTEGER)),
+	{
+		'key': 'key',
+		'value': (
+			'value', {
+				'i': 'i',
+				'j': 'j'
+			}
+		)
+	},
+	{
+		'value': {
+			'k': NULL::INTEGER
+		}
+	}
+) from cte;
+
+CREATE TABLE test(
+	s MAP(
+		STRUCT(
+			n INTEGER,
+			m INTEGER
+		),
+		STRUCT(
+			i INTEGER,
+			j INTEGER
+		)
+	)
+);
+
+INSERT INTO test VALUES
+	(MAP {ROW(3,3): ROW(1, 1)}),
+	(MAP {ROW(4,4): ROW(2, 2)});
+
+ALTER TABLE test ADD COLUMN s.key.k INTEGER;
+
+ALTER TABLE test ADD COLUMN s.value.b VARCHAR;
+
+CREATE TABLE test(
+	s STRUCT(
+		a MAP(
+			STRUCT(
+				n INTEGER,
+				m INTEGER
+			),
+			STRUCT(
+				i INTEGER,
+				j INTEGER
+			)
+		)
+	)
+);
+
+INSERT INTO test VALUES
+	(ROW(MAP {ROW(3,3): ROW(1, 1)})),
+	(ROW(MAP {ROW(4,4): ROW(2, 2)}));
+
+ALTER TABLE test ADD COLUMN s.a.key.k INTEGER;
+
+ALTER TABLE test ADD COLUMN s.a.value.b VARCHAR;
+
+ALTER TABLE test DROP COLUMN s.value.j;
+
+ALTER TABLE test DROP COLUMN s.key.n;
+
+ALTER TABLE test DROP COLUMN s.a.key.m;
+
+ALTER TABLE test DROP COLUMN s.a.value.j;
+
+ALTER TABLE test RENAME COLUMN s.value.j TO abc;
+
+ALTER TABLE test RENAME COLUMN s.key.n TO def;
+
+ALTER TABLE test RENAME COLUMN s.a.key.m TO abc;
+
+ALTER TABLE test RENAME COLUMN s.a.value.j TO def;
+
+ALTER TABLE test RENAME COLUMN i TO k;
+
+INSERT INTO test (i, j) VALUES (1, 2), (2, 3);
+
+INSERT INTO test (k, j) VALUES (1, 2), (2, 3);
+
+PREPARE v1 AS SELECT i, j FROM test;
+
+PREPARE v2 AS SELECT * FROM test;
+
+EXECUTE v2;
+
+SELECT i, j FROM test;
+
+SET default_transaction_invalidation_policy='SYNTACTIC_ERRORS_DO_NOT_INVALIDATE';
+
+START TRANSACTION;
+
+SELECT k FROM test;
+
+CREATE TABLE test(i INTEGER, j INTEGER, PRIMARY KEY(i, j));
+
+INSERT INTO test (i, j) VALUES (1, 1), (2, 2);
+
+INSERT INTO test (k, j) VALUES (3, 3), (4, 4);
+
+create schema public;
+
+set schema=public;
+
+create table a1 (c int);
+
+alter table public.a1 rename to a2;
+
+alter table a2 rename to a3;
+
+create view v1 as select 42;
+
+alter view public.v1 rename to v2;
+
+alter view v2 rename to v3;
+
+INSERT INTO tbl VALUES (999), (100);
+
+ALTER TABLE tbl RENAME TO tbl2;
+
+SELECT * FROM tbl2;
+
+SELECT * FROM tbl;
+
+ALTER TABLE tbl2 RENAME TO tbl3;
+
+ALTER TABLE tbl3 RENAME TO tbl4;
+
+ALTER TABLE tbl4 RENAME TO tbl5;
+
+SELECT * FROM tbl5;
+
+CREATE TABLE tbl2(i INTEGER);
+
+CREATE TABLE tbl3(i INTEGER);
+
+CREATE TABLE tbl4(i INTEGER);
+
+CREATE TEMPORARY TABLE temp_tbl(i INTEGER);
+
+INSERT INTO temp_tbl VALUES (42);
+
+SELECT table_name, database_name, temporary FROM duckdb_tables() WHERE table_name='temp_tbl';
+
+ALTER TABLE temp.temp_tbl RENAME TO temp_tbl_renamed;
+
+SELECT * FROM temp_tbl_renamed;
+
+SELECT table_name, database_name, temporary FROM duckdb_tables() WHERE table_name='temp_tbl_renamed';
+
+create table MY_TABLE (i integer);
+
+insert into MY_TABLE values(42);
+
+alter table MY_TABLE rename to my_table;
+
+select * from my_table;
+
+SELECT * FROM entry;
+
+SELECT * FROM entry4;
+
+SELECT * FROM entry3;
+
+SELECT i FROM t2 ORDER BY i;
+
+SELECT i FROM t1 ORDER BY i;
+
+SELECT i FROM t3 ORDER BY i;
+
+INSERT INTO ta VALUES (42);
+
+CREATE TABLE rollback_table(i INTEGER);
+
+ALTER TABLE rollback_table RENAME TO rollback_table_new;
+
+INSERT INTO rollback_table VALUES (84);
+
+SELECT * FROM ta ORDER BY i;
+
+SELECT * FROM rollback_table ORDER BY i;
+
+CREATE TABLE tbl(i INTEGER PRIMARY KEY, j INTEGER CHECK(j < 10));
+
+INSERT INTO tbl VALUES (999, 4), (1000, 5);
+
+INSERT INTO tbl VALUES (9999, 0), (10000, 1);
+
+ALTER TABLE tbl RENAME TO new_tbl;
+
+INSERT INTO new_tbl VALUES (66, 6), (55, 5);
+
+SELECT * FROM tbl1;
+
+SELECT * FROM tbl3;
+
+SELECT * FROM tbl4;
+
+CREATE VIEW v1 AS SELECT * FROM tbl;
+
+ALTER TABLE v1 RENAME TO v2;
+
+SELECT * FROM v2;
+
+CREATE TABLE t0 (c0 INT);
+
+CREATE UNIQUE INDEX i1 ON t0 (c0);
+
+CREATE TABLE t3 (c0 INT);
+
+DROP TABLE t0;
+
+SELECT * FROM t2;
+
+CREATE VIEW vw AS SELECT * FROM tbl;
+
+ALTER VIEW vw RENAME TO vw2;
+
+SELECT * FROM vw2;
+
+SELECT * FROM vw;
+
+CREATE VIEW vw AS SELECT i+1 AS i FROM tbl;
+
+CREATE VIEW vw2 AS SELECT 1729 AS i;
+
+SELECT * FROM vw1;
+
+SELECT * FROM vw3;
+
+SELECT * FROM vw4;
+
+SELECT * FROM v1;
+
+CREATE TABLE test(s STRUCT(s2 STRUCT(v1 INT, v2 INT)));
+
+INSERT INTO test VALUES (ROW(ROW(1, 1))), (ROW(ROW(2, 2)));
+
+ALTER TABLE test ADD COLUMN s.s2.k INTEGER;
+
+ALTER TABLE test ADD COLUMN IF NOT EXISTS s.s2.v1 VARCHAR;
+
+ALTER TABLE test ADD COLUMN s.i INTEGER DEFAULT 100;
+
+CREATE TABLE test(s STRUCT(i INTEGER, j INTEGER));
+
+INSERT INTO test VALUES (ROW(1, 1)), (ROW(2, 2));
+
+ALTER TABLE test ADD COLUMN s.k INTEGER;
+
+ALTER TABLE test ADD COLUMN s.l INTEGER DEFAULT 42;
+
+ALTER TABLE test ADD COLUMN s.m INTEGER DEFAULT 42;
+
+ALTER TABLE test ADD COLUMN IF NOT EXISTS s.i VARCHAR;
+
+CREATE TABLE d(i INT, s STRUCT(a INT, b INT) DEFAULT {'a': 0, 'b': 0});
+
+INSERT INTO d(i) VALUES (0);
+
+ALTER TABLE d ADD COLUMN s.c INT DEFAULT 9;
+
+INSERT INTO d(i) VALUES (1);
+
+SELECT i, s FROM d ORDER BY i;
+
+ALTER TABLE d ADD COLUMN s.e VARCHAR;
+
+INSERT INTO d(i) VALUES (2);
+
+INSERT INTO d(i) VALUES (3);
+
+SELECT i, s FROM d WHERE i = 3;
+
+CREATE TABLE n(i INT, s STRUCT(x STRUCT(a INT), b INT) DEFAULT {'x': {'a': 1}, 'b': 2});
+
+ALTER TABLE n ADD COLUMN s.x.c VARCHAR DEFAULT 'deep';
+
+INSERT INTO n(i) VALUES (1);
+
+SELECT i, s FROM n;
+
+CREATE TABLE l(i INT, v STRUCT(a INT)[] DEFAULT [{'a': 1}, {'a': 2}]);
+
+ALTER TABLE l ADD COLUMN v.element.c INT DEFAULT 9;
+
+INSERT INTO l(i) VALUES (1);
+
+SELECT i, v FROM l;
+
+CREATE TABLE t(i INT, s STRUCT(a INT, b INT));
+
+ALTER TABLE t ADD COLUMN s.c INT DEFAULT 9;
+
+INSERT INTO t VALUES (1, {'a': 1, 'b': 2});
+
+INSERT INTO t(i) VALUES (2);
+
+SELECT i, s FROM t ORDER BY i;
+
+SELECT column_default IS NULL FROM duckdb_columns() WHERE table_name = 't' AND column_name = 's';
+
+CREATE TABLE c(i INT, s STRUCT(a INT) DEFAULT NULL, p STRUCT(a INT, b VARCHAR) DEFAULT {'a': 1},
+	q STRUCT(a INT) DEFAULT '{a: 5}', l STRUCT(a INT)[] DEFAULT [], m MAP(VARCHAR, STRUCT(a INT)) DEFAULT MAP {});
+
+ALTER TABLE c ADD COLUMN s.c INT DEFAULT 9;
+
+ALTER TABLE c ADD COLUMN p.c INT DEFAULT 9;
+
+ALTER TABLE c ADD COLUMN q.c INT DEFAULT 9;
+
+ALTER TABLE c ADD COLUMN l.element.c INT DEFAULT 9;
+
+ALTER TABLE c ADD COLUMN m.value.c INT DEFAULT 9;
+
+INSERT INTO c(i) VALUES (1);
+
+SELECT * FROM c;
+
+ALTER TABLE c RENAME s.c TO d;
+
+ALTER TABLE c RENAME q.c TO d;
+
+INSERT INTO c(i) VALUES (2);
+
+SELECT i, s, q FROM c ORDER BY i;
+
+CREATE TABLE r(i INT, s STRUCT(a INT) DEFAULT NULL, q STRUCT(a INT) DEFAULT '{a: 5}');
+
+ALTER TABLE r RENAME s.a TO b;
+
+ALTER TABLE r RENAME q.a TO b;
+
+INSERT INTO r(i) VALUES (1);
+
+SELECT * FROM r;
+
+CREATE TABLE test(s STRUCT(a INTEGER, b INTEGER));
+
+INSERT INTO test VALUES ({'a': NULL, 'b': 1});
+
+CREATE TABLE simple(a INTEGER, b INTEGER);
+
+INSERT INTO simple VALUES (1, 1);
+
+ALTER TABLE simple ALTER a SET NOT NULL;
+
+ALTER TABLE simple ALTER a DROP NOT NULL;
+
+INSERT INTO simple VALUES (NULL, 2);
+
+ALTER TABLE simple ALTER a SET DEFAULT 42;
+
+ALTER TABLE simple ALTER a TYPE BIGINT;
+
+CREATE TABLE test(s STRUCT(i INT, s2 STRUCT(v1 INT, v2 INT)));
+
+INSERT INTO test VALUES (ROW(42, ROW(1, 1))), (ROW(84, ROW(2, 2)));
+
+ALTER TABLE test DROP s.s2.v1;
+
+ALTER TABLE test DROP COLUMN IF EXISTS s.s2.v1;
+
+ALTER TABLE test DROP COLUMN s.s2;
+
+ALTER TABLE test DROP COLUMN s.i;
+
+ALTER TABLE test DROP COLUMN IF EXISTS s.v;
+
+ALTER TABLE test RENAME s.s2.v1 TO i;
+
+ALTER TABLE test RENAME COLUMN s.s2 TO x;
+
+CREATE TABLE test_default(s STRUCT(s2 STRUCT(a INTEGER, b INTEGER)) DEFAULT {'s2': {'a': 1, 'b': 2}});
+
+INSERT INTO test_default DEFAULT VALUES;
+
+ALTER TABLE test_default RENAME s.s2.a TO c;
+
+SELECT s FROM test_default;
+
+CREATE TABLE test_default_parent(s STRUCT(s2 STRUCT(a INTEGER, b INTEGER)) DEFAULT {'s2': {'a': 1, 'b': 2}});
+
+INSERT INTO test_default_parent DEFAULT VALUES;
+
+ALTER TABLE test_default_parent RENAME s.s2 TO x;
+
+SELECT s FROM test_default_parent;
+
+ALTER TABLE test RENAME s.i TO v1;
+
+ALTER TABLE test RENAME s.j TO v2;
+
+CREATE TABLE test_default(s STRUCT(a INTEGER, b INTEGER) DEFAULT {'a': 1, 'b': 2});
+
+ALTER TABLE test_default RENAME s.a TO c;
+
+CREATE TABLE test_cast_default(
+    s STRUCT(a INTEGER, b INTEGER)
+    DEFAULT (struct_pack(a := 1, b := 2)::STRUCT(a INTEGER, b INTEGER))
+);
+
+ALTER TABLE test_cast_default RENAME s.a TO c;
+
+INSERT INTO test_cast_default DEFAULT VALUES;
+
+SELECT s FROM test_cast_default;
+
+ATTACH ':memory:' AS test_db;
+
+CREATE TABLE test_db.sample AS SELECT i FROM range(100) t(i);
+
+SELECT COUNT(*) FROM test_db.sample;
+
+ALTER DATABASE test_db SET ALIAS TO renamed_db;
+
+SELECT COUNT(*) FROM renamed_db.sample;
+
+ALTER DATABASE IF EXISTS non_existent SET ALIAS TO something_else;
+
+ATTACH ':memory:' AS another_db;
+
+ALTER SEQUENCE IF EXISTS seq OWNED BY x;
+
+ALTER TABLE IF EXISTS t0 ADD COLUMN c0 INT;
+
+ALTER TABLE IF EXISTS t0 ADD COLUMN IF NOT EXISTS c0 int;
+
+ALTER TABLE t0 ADD COLUMN IF NOT EXISTS c0 int;
+
+INSERT INTO t0 VALUES (42);
+
+ALTER TABLE t0 ADD COLUMN c1 int;
+
+INSERT INTO t0 VALUES (42, 43);
+
+ALTER TABLE t0 ADD COLUMN IF NOT EXISTS c2 int;
+
+INSERT INTO t0 VALUES (42, 43, 44);
+
+ALTER TABLE IF EXISTS t1 DROP COLUMN IF EXISTS c3;
+
+ALTER TABLE IF EXISTS t0 DROP COLUMN if EXISTS c3;
+
+ALTER TABLE t0 DROP COLUMN IF EXISTS c3;
+
+ALTER TABLE IF EXISTS t1 ALTER COLUMN c0 TYPE varchar;
+
+CREATE TABLE t_default (c0 INT, c1 BOOLEAN);
+
+ALTER TABLE t_default ADD COLUMN IF NOT EXISTS c1 BOOLEAN DEFAULT false;
+
+ALTER TABLE t_default ADD COLUMN IF NOT EXISTS c2 BOOLEAN DEFAULT false;
+
+INSERT INTO t_default VALUES (1, true, true);
+
+SELECT * FROM t_default;
+
+CREATE TABLE unit (price INTEGER, amount_sold INTEGER);
+
+ALTER TABLE unit DROP COLUMN IF EXISTS rowid;
+
+SELECT rowid FROM unit;
+
+INSERT INTO unit VALUES (10, 5);
+
+ALTER TABLE unit ADD COLUMN rowid INTEGER;
+
+INSERT INTO unit VALUES (20, 10, 1337);
+
+INSERT INTO unit VALUES (30, 20);
+
+ALTER TABLE unit ADD COLUMN IF NOT EXISTS rowid INTEGER;
+
+INSERT INTO unit VALUES (40, 30, 1337);
+
+ALTER TABLE unit DROP COLUMN rowid;

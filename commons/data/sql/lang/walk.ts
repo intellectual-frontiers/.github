@@ -32,6 +32,7 @@ export function children(n: Node): readonly Node[] {
   const out: Node[] = [];
   switch (n.kind) {
     case "ident":
+    case "command":
     case "number":
     case "string":
     case "boolean":
@@ -101,7 +102,14 @@ export function children(n: Node): readonly Node[] {
       out.push(n.query);
       break;
     case "tuple":
+    case "array":
       all(out, n.items);
+      break;
+    case "subscript":
+      out.push(n.arg, n.index);
+      break;
+    case "collate":
+      out.push(n.arg, n.collation);
       break;
     case "frame-bound":
       opt(out, n.offset);
@@ -230,6 +238,7 @@ export function children(n: Node): readonly Node[] {
     case "create-table":
       out.push(n.name);
       all(out, n.elements);
+      opt(out, n.query);
       break;
     case "create-index":
       opt(out, n.name);
