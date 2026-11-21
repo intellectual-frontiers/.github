@@ -15,7 +15,7 @@
 - **FR-004**: The trace MUST tie every source file to a requirement, every requirement to a proof and every ontology term to its specification, and the layers MUST judge every relative import of a ladder's files, both as pure functions over the contents of files that a host module (`host/trace`) reads and holds against a baseline.
 - **FR-005**: The integrations MUST read a standard's published manifest into the terms of an ontology and write an ontology as Turtle, RDF/XML, OWL, SHACL, JSON Schema, DCAT, HTML and SSSOM mappings, the same bytes for the same input.
 - **FR-006**: The rule `mizan/standard-newer` MUST be one of the rules of Mizan and its findings data held by the baseline; the library MUST reach no network: the opt-in report that fetches the latest source of each standard is the command `newer.ts` of this repository, which gives the rule its findings.
-- **FR-007**: The library MUST import only `node:process` and `node:url`, `core`, `crypto`, `formats`, `githost`, `ontology`, `rdf` and `system` by package name, and its own modules by relative path, so that the harness runs wherever those do.
+- **FR-007**: The library MUST import only `node:process` and `node:url`, `core`, `crypto`, `formats`, `githost`, `ontology`, `rdf` and `system` by package name (and, in the module of the questions in SQL only, `lang-sql/aide/{catalog,guard,relational,text}`, 0002-mizan-query FR-005), and its own modules by relative path, so that the harness runs wherever those do.
 - **FR-008**: The library MUST be published to npm as compiled modules with their declarations, one entry for the package (`.`) and one for each of its modules, and its declarations MUST name no type that the package or its dependencies do not hold.
 
 ## Acceptance scenarios
