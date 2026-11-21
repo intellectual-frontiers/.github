@@ -88,6 +88,7 @@ export type Block =
   | { readonly kind: "diagram"; readonly source: string; readonly caption: string }
   | { readonly kind: "cards"; readonly cards: readonly Card[] }
   | { readonly kind: "badges"; readonly badges: readonly Badge[] }
+  | { readonly kind: "trend"; readonly label: string; readonly values: readonly number[]; readonly unit?: string }
   | { readonly kind: "tree"; readonly nodes: readonly TreeNode[] };
 
 /** The sections of the site (commons 0011-documentation FR-009 and FR-032): the guides, the concepts, the libraries, the how-to pages, and the reference (specifications, API and models). */

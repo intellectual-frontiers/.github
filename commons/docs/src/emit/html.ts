@@ -248,6 +248,8 @@ export function block(b: Block, from: string): string {
       return `<div class="cards">${b.cards.map((c) => card(c, from)).join("")}</div>`;
     case "badges":
       return `<p class="badge-row">${b.badges.map(badge).join("")}</p>`;
+    case "trend":
+      return trendHtml(b.label, b.values, b.unit);
     case "tree":
       return `<div class="tree">${tree(b.nodes, from)}</div>`;
     default:
@@ -282,12 +284,34 @@ export function hasDiagram(bs: readonly Block[]): boolean {
       case "table":
       case "cards":
       case "badges":
+      case "trend":
       case "tree":
         return false;
       default:
         return absurd(b);
     }
   });
+}
+
+/** The values of a trend as a line of letters: the lowest is the lowest bar. */
+export function sparkText(values: readonly number[]): string {
+  if (values.length === 0) return "";
+  const lo = Math.min(...values);
+  const hi = Math.max(...values);
+  return values.map((v) => "▁▂▃▄▅▆▇█"[hi === lo ? 3 : Math.round(((v - lo) / (hi - lo)) * 7)] ?? "▁").join("");
+}
+
+/** A trend as a small line, drawn in the page (no script, no image): the label and the range are its text, for a reader that cannot see it. */
+function trendHtml(label: string, values: readonly number[], unit: string | undefined): string {
+  const w = 120;
+  const h = 28;
+  const lo = Math.min(...values);
+  const hi = Math.max(...values);
+  const x = (i: number): number => (values.length <= 1 ? w / 2 : 2 + (i * (w - 4)) / (values.length - 1));
+  const y = (v: number): number => (hi === lo ? h / 2 : h - 3 - ((v - lo) / (hi - lo)) * (h - 6));
+  const points = values.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  const range = values.length === 0 ? "no runs" : `${lo === hi ? String(lo) : `${lo} to ${hi}`}${unit === undefined ? "" : ` ${unit}`}, latest ${values[values.length - 1]}`;
+  return `<figure class="trend"><svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="${escape(label)}: ${escape(range)}"><polyline fill="none" stroke="currentColor" stroke-width="1.5" points="${points}"/>${values.length === 0 ? "" : `<circle cx="${x(values.length - 1).toFixed(1)}" cy="${y(values[values.length - 1] ?? 0).toFixed(1)}" r="2.2" fill="currentColor"/>`}</svg><figcaption>${escape(label)}: ${escape(range)}</figcaption></figure>`;
 }
 
 /** The headings and entries of a page, for its table of contents. */

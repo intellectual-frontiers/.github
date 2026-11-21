@@ -10,6 +10,7 @@
 import { fs, path } from "@intellectual-frontiers/system";
 import type { Finding } from "./check.ts";
 import type { EvidenceSource, IssueLike } from "./config.ts";
+import { type HistoryRun, parseHistoryRun } from "./history.ts";
 
 /** How a test ended, in CTRF's words. */
 export type TestStatus = "passed" | "failed" | "skipped" | "pending" | "other";
@@ -130,10 +131,12 @@ export interface Evidence {
   readonly workflows: readonly WorkflowRuns[];
   /** Why the runs could not be read, where `runs.json` says so. */
   readonly runsError: string | undefined;
+  /** The runs of the evidence that were kept (docs 0001-docs FR-016), oldest first. */
+  readonly history: readonly HistoryRun[];
 }
 
 /** No evidence: nothing recorded. */
-export const NONE: Evidence = { results: new Map(), run: undefined, issues: [], tickets: [], recorded: false, status: new Map(), build: undefined, workflows: [], runsError: undefined };
+export const NONE: Evidence = { results: new Map(), run: undefined, issues: [], tickets: [], recorded: false, status: new Map(), build: undefined, workflows: [], runsError: undefined, history: [] };
 
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 const str = (v: unknown): string | undefined => (typeof v === "string" && v !== "" ? v : undefined);
@@ -273,6 +276,7 @@ export function readEvidence(root: string, source: EvidenceSource | undefined, f
   let build: BuildInfo | undefined;
   let workflows: readonly WorkflowRuns[] = [];
   let runsError: string | undefined;
+  const history: HistoryRun[] = [];
   const dir = source.results === undefined ? undefined : path.resolve(root, source.results);
   if (dir !== undefined && fs.existsSync(dir)) {
     for (const entry of [...fs.readDirSync(dir)].sort((a, b) => (a.name < b.name ? -1 : 1))) {
@@ -316,6 +320,14 @@ export function readEvidence(root: string, source: EvidenceSource | undefined, f
       }
     }
   }
+  const runsDir = dir === undefined ? undefined : path.join(dir, "history", "runs");
+  if (runsDir !== undefined && fs.existsSync(runsDir)) {
+    for (const e of [...fs.readDirSync(runsDir)].filter((x) => x.name.endsWith(".json")).sort((a, b) => (a.name < b.name ? -1 : 1))) {
+      const r = parseHistoryRun(fs.readTextFileSync(path.join(runsDir, e.name)));
+      if ("error" in r) found.push({ where: path.relative(root, path.join(runsDir, e.name)).split(path.sep).join("/"), problem: { kind: "evidence-unreadable", why: r.error } });
+      else history.push(r.value);
+    }
+  }
   let tickets: readonly Ticket[] = [];
   if (source.github !== undefined) {
     const file = path.resolve(root, source.github);
@@ -325,7 +337,7 @@ export function readEvidence(root: string, source: EvidenceSource | undefined, f
       else tickets = r.value;
     }
   }
-  return { results, run, issues, tickets, recorded, status, build, workflows, runsError };
+  return { results, run, issues, tickets, recorded, status, build, workflows, runsError, history };
 }
 
 /** The tests of every library that name a requirement, as `0009-example FR-001`. */

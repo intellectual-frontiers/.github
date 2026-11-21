@@ -273,3 +273,8 @@ dialog.search form input[type="search"] { flex: 1 1 60%; }
 .table-filter + .table-wrap tbody tr[hidden] { display: none; }
 .table-wrap.compact td, .table-wrap.compact th { padding: 5px 10px; font-size: 13px; line-height: 1.45; }
 .table-wrap.compact td code { font-size: 12px; }
+
+/* a trend: a small line with its caption */
+.trend { margin: 0 0 .6rem; display: flex; align-items: center; gap: .6rem; color: var(--muted, currentColor); }
+.trend svg { flex: none; color: var(--accent, currentColor); }
+.trend figcaption { font-size: .85rem; }

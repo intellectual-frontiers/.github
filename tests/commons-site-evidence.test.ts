@@ -13,8 +13,9 @@ const read = (p: string): string => readFileSync(path.join(ROOT, p), "utf8");
 
 proves(["0011-documentation FR-042"], "the evidence workflow runs the tests of every library by the hour and keeps each report with its status, and the site workflow publishes on every push from the newest evidence whatever failed", () => {
   const e = read(".github/workflows/evidence.auto.yml");
-  for (const said of ["cron: \"17 * * * *\"", "plan.ts --all", "matrix: ${{ fromJSON(needs.plan.outputs.linux) }}", "continue-on-error: true", "status-${{ matrix.name }}.json", "name: evidence-${{ matrix.name }}", "name: evidence-repository", "name: evidence", "merge-multiple: true"]) assertStringIncludes(e, said);
+  for (const said of ["cron: \"17 * * * *\"", "plan.ts --all", "matrix: ${{ fromJSON(needs.plan.outputs.linux) }}", "continue-on-error: true", "status-${{ matrix.name }}.json", "name: evidence-${{ matrix.name }}", "name: evidence-repository", "name: evidence", "merge-multiple: true", "tools/history.ts --evidence _evidence --history _history", "gh run download --name evidence --dir _prev"]) assertStringIncludes(e, said);
   assert(!e.includes("push:"), "the evidence is not gathered on a push");
+  assert(!e.includes("contents: write"), "nothing here writes to the repository: the history travels in the artifact");
   const w = read(".github/workflows/site.auto.yml");
   for (const said of ["gh run download --name evidence", "_evidence/github-issues.json", "tools/ci-runs.ts", "tools/status-site.ts", "steps.build.outcome != 'success'", "workflow_run:", "needs: [check]", "always() && github.event_name != 'pull_request'", "needs: [site]", "always() && needs.site.result == 'success'", "cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}"]) assertStringIncludes(w, said);
   assert(!w.includes("evidence.ts --library"), "the site does not run the tests");

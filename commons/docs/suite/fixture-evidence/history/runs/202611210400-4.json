@@ -1,0 +1,25 @@
+{
+  "at": "2026-11-21 04:00 UTC",
+  "commit": "dddd000dddd000dddd000dddd000dddd000dddd0000000",
+  "url": "https://github.com/example/fixture/actions/runs/4",
+  "libraries": {
+    "fixture": {
+      "tests": 13,
+      "passed": 11,
+      "failed": 2,
+      "skipped": 0,
+      "durationMs": 4000,
+      "failing": [
+        {
+          "id": "b2",
+          "name": "001-greeting FR-002: B ends with a full stop"
+        },
+        {
+          "id": "d4",
+          "name": "001-greeting FR-001: D went away"
+        }
+      ]
+    }
+  },
+  "missing": []
+}

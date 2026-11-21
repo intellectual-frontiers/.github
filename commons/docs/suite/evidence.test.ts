@@ -1,4 +1,4 @@
-// Spec: 0001-docs FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015
+// Spec: 0001-docs FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016
 /**
  * The evidence the site shows beside the code (docs 0001-docs FR-009 to FR-012): CTRF results, GitHub tickets and typed issues read from files, the Quality section made from them, the lines on a requirement, a library and a
  * module, the findings for a file that cannot be read and a test that names a requirement that is not there, and, with no run recorded, nothing shown as passed.
@@ -9,6 +9,10 @@ import { fs, path, proc } from "@intellectual-frontiers/system";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { report } from "../src/check.ts";
 import { loadConfig } from "../src/cli.ts";
+import { causeOf } from "../src/pages/quality.ts";
+import { movementsOf, parseHistoryRun, runsOf } from "../src/history.ts";
+import { sparkText } from "../src/emit/html.ts";
+import { document } from "../src/emit/html.ts";
 import { type EvidenceSource, resolveConfig } from "../src/config.ts";
 import { parseCtrf, parseRuns, parseTickets, readEvidence, requirementsIn, standing } from "../src/evidence.ts";
 import { markdownOf } from "../src/emit/markdown.ts";
@@ -220,5 +224,60 @@ proves(["0001-docs FR-013", "0001-docs FR-014"], "the tool that reads the runs w
     assertEquals((await proc.run(["bun", "tools/status-site.ts"], { cwd })).code, 2);
   } finally {
     await fs.remove(out, { recursive: true });
+  }
+}, { timeout: 120_000 });
+
+proves(["0001-docs FR-016"], "the history says how a library's tests moved over its runs: what began to fail, what was fixed, what keeps failing and what flaps, with trends, causes and the range of commits", async () => {
+  const b = await built({ results: EVIDENCE });
+  const ev = readEvidence(ROOT, { results: EVIDENCE }, []);
+  assertEquals(ev.history.length, 5);
+  assertEquals(runsOf(ev, "fixture").length, 5);
+  const m = movementsOf(ev, "fixture");
+  assertEquals(m.newlyFailing.map((x) => x.id), ["c3"]);
+  assertEquals(m.fixed.map((x) => x.id), ["d4"]);
+  assertEquals(m.persistent.map((x) => x.id), ["b2"]);
+  assertEquals(m.flaky.map((x) => [x.id, x.episodes]), [["e5", 2]], "a test that failed once is not flaky; one that failed in two separate stretches is");
+  assertEquals([m.from, m.to], ["dddd000".repeat(6) + "0000", "eeee000".repeat(6) + "0000"]);
+  const page = markdownOf(b.pages.find((p) => p.path === "quality/fixture.html") as never);
+  for (const said of ["## History", "*Tests: ", "*Pass rate: ", "*Time: ", "### Began to fail in the latest run (1)", "C is new", "### Fixed since the run before (1)", "D went away", "### Flapping: failed more than once, passing in the latest run (1)", "E comes and goes (failed in 2 separate stretches)", "https://github.com/example/fixture/compare/"]) assertStringIncludes(page, said);
+  const dash = markdownOf(b.pages.find((p) => p.path === "quality/index.html") as never);
+  assertStringIncludes(dash, "| Pass rate | Flaky |");
+  assert(/`[▁-█]{5}`/.test(dash), "a trend of the pass rate in the row");
+  const q = JSON.parse(b.files.find((f) => f.path === "quality.json")?.text ?? "{}") as { libraries: { library: string; flaky: string[]; newlyFailing: string[] }[] };
+  assertEquals(q.libraries.find((l) => l.library === "fixture")?.flaky, ["001-greeting FR-001: E comes and goes"]);
+  // the line, in the page itself
+  const html = document(b.pages.find((p) => p.path === "quality/fixture.html") as never, { name: "N", repository: "r", pages: b.pages });
+  assertStringIncludes(html, '<figure class="trend"><svg viewBox="0 0 120 28"');
+  assertStringIncludes(html, "Pass rate: ");
+  assertEquals(sparkText([1, 2, 3, 4, 5, 6, 7, 8]), "▁▂▃▄▅▆▇█");
+  assertEquals(sparkText([5, 5]), "▄▄");
+  assertEquals(sparkText([]), "");
+  assert("error" in parseHistoryRun("{") && "error" in parseHistoryRun("{}"), "a file that is not a run is said so");
+  assertEquals(causeOf("expected 'Hello, Ada' to end with '.' at /home/x/y/z.ts:12"), "expected '…' to end with '…' at <path>:N");
+  assertEquals(causeOf(undefined), "no message");
+});
+
+proves(["0001-docs FR-016"], "the history tool adds a run once, keeps the newest, and refuses evidence with no time", async () => {
+  const dir = await fs.makeTempDir({ prefix: "ifc-docs-history-" });
+  try {
+    const ev = path.join(dir, "evidence");
+    const hist = path.join(dir, "history");
+    await fs.ensureDir(ev);
+    await fs.writeTextFile(path.join(ev, "fixture.ctrf.json"), fs.readTextFileSync(path.join(EVIDENCE, "fixture.ctrf.json")));
+    await fs.writeTextFile(path.join(ev, "status-grc.json"), '{ "library": "grc", "reported": false }');
+    const cwd = path.join(ROOT, "commons/docs");
+    const run = (...a: string[]) => proc.run(["bun", "tools/history.ts", ...a], { cwd });
+    assertEquals((await run("--evidence", ev, "--history", hist)).code, 2, "no time, no run");
+    for (const n of [1, 2, 3]) {
+      await fs.writeTextFile(path.join(ev, "meta.json"), JSON.stringify({ at: `2026-11-21 0${n}:00 UTC`, commit: `c${n}`, url: `https://x/runs/${n}` }));
+      assertEquals((await run("--evidence", ev, "--history", hist, "--keep", "2")).code, 0);
+    }
+    assertEquals((await run("--evidence", ev, "--history", hist, "--keep", "2")).code, 0, "the same run again");
+    const files = [...fs.readDirSync(path.join(hist, "runs"))].map((e) => e.name).sort();
+    assertEquals(files, ["202611210200-2.json", "202611210300-3.json"]);
+    const r = parseHistoryRun(fs.readTextFileSync(path.join(hist, "runs", files[1] as string)));
+    assert("value" in r && r.value.missing[0] === "grc" && r.value.libraries["fixture"]?.failed === 1 && r.value.libraries["fixture"].failing[0]?.id.length === 8, JSON.stringify(r));
+  } finally {
+    await fs.remove(dir, { recursive: true });
   }
 }, { timeout: 120_000 });

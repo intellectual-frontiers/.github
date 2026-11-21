@@ -8,6 +8,7 @@
  */
 import { absurd } from "@intellectual-frontiers/core";
 import type { Block, Card, Href, Inline, Page, TreeNode } from "../model.ts";
+import { sparkText } from "./html.ts";
 
 /** The path of the Markdown twin of a page: its own with `.md` for `.html`. */
 export const twinOf = (path: string): string => path.replace(/\.html$/, ".md");
@@ -82,6 +83,8 @@ function block(b: Block, from: string, level: number): string[] {
       return [...cards(b.cards, from, 0), ""];
     case "badges":
       return [b.badges.map((x) => `\`${x.text}\``).join(" "), ""];
+    case "trend":
+      return [`*${b.label}: ${sparkText(b.values)} (${b.values.length === 0 ? "no runs" : `${Math.min(...b.values)} to ${Math.max(...b.values)}${b.unit === undefined ? "" : ` ${b.unit}`}, latest ${b.values[b.values.length - 1]}`})*`, ""];
     case "tree":
       return [...tree(b.nodes, from, 0), ""];
     default:

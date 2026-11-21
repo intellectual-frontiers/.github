@@ -162,6 +162,7 @@ function hrefsOf(bs: readonly Block[]): Href[] {
         case "code":
         case "diagram":
         case "badges":
+        case "trend":
           break;
         default:
           absurd(b);

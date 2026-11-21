@@ -9,6 +9,8 @@
 import type { Build } from "../build.ts";
 import { type Finding, message } from "../check.ts";
 import { type Evidence, isOpen, type LibraryResults, standing, testsFor, type TestResult, type Ticket, type TypedIssue, type WorkflowRun } from "../evidence.ts";
+import { sparkText } from "../emit/html.ts";
+import { movementsOf, runsOf } from "../history.ts";
 import { specPage } from "../links.ts";
 import type { Area } from "../sources.ts";
 import type { Badge, Block, Inline, Page, Tone } from "../model.ts";
@@ -89,6 +91,14 @@ export function noRunReason(ev: Evidence, library: string): string | undefined {
   if (st.tests === "cancelled") return "its job was cancelled or timed out";
   return "its tests could not be run (it has no suite, or the runner failed)";
 }
+
+/** A failure's cause as its message says it, with what varies (numbers, paths, quoted values) taken out, so that failures of one cause are one. */
+export function causeOf(message: string | undefined): string {
+  return (message ?? "no message").replace(/(["'`]).*?\1/g, "$1…$1").replace(/(?:\/[\w.@-]+){2,}/g, "<path>").replace(/\d+/g, "N").replace(/\s+/g, " ").trim().slice(0, 90);
+}
+
+/** The pass rate of a library over its last runs, in percent. */
+const passRates = (ev: Evidence, library: string): number[] => runsOf(ev, library).map(({ lib }) => (lib.tests === 0 ? 0 : Math.round((lib.passed / lib.tests) * 100)));
 
 /** The line of a run: which commit and when, or that none is recorded. */
 function runLine(b: Build): Inline[] {
@@ -173,6 +183,8 @@ export function qualityPages(b: Build): void {
       [text(r === undefined ? "" : String(r.passed))],
       [text(r === undefined ? "" : String(r.failed))],
       [text(r === undefined ? "" : String(r.skipped + r.other))],
+      passRates(ev, lib).length < 2 ? [] : [code(sparkText(passRates(ev, lib)))],
+      [text(movementsOf(ev, lib).flaky.length === 0 ? "" : String(movementsOf(ev, lib).flaky.length))],
       [text(q.total === 0 ? "" : `${q.proved} of ${q.total}`)],
       [text(String(heldFindings(b, lib)))],
       [text(String(openIssuesOf(ev, lib).length))],
@@ -201,7 +213,7 @@ export function qualityPages(b: Build): void {
       {
         kind: "table",
         filter: "Filter the libraries",
-        head: th("Library", "Tests", "Passed", "Failed", "Skipped", "Proved", "Held", "Issues", "Tickets"),
+        head: th("Library", "Tests", "Passed", "Failed", "Skipped", "Pass rate", "Flaky", "Proved", "Held", "Issues", "Tickets"),
         rows,
       },
       { kind: "paragraph", inlines: [link("quality/issues/index.html", "Every open issue and ticket"), text(" is in the register. Proved: requirements of the library's specifications whose every test passed (one with no test recorded is not counted as proved). Held: findings of the trace and specification checks held against a baseline. Issues and tickets: open ones.")] },
@@ -227,6 +239,32 @@ export function qualityPages(b: Build): void {
       if (notPassed.length > 0) blocks.push({ kind: "heading", level: 3, id: "not-run", text: [text("Skipped or planned")] }, testTable(b, notPassed.slice(0, 100), "Filter the skipped tests"));
       const slow = [...r.tests].sort((a, c) => c.durationMs - a.durationMs).slice(0, 10).filter((t) => t.durationMs > 0);
       if (slow.length > 0) blocks.push({ kind: "heading", level: 3, id: "slowest", text: [text("Slowest")] }, testTable(b, slow, "Filter the slowest tests"));
+    }
+    const failing = r?.tests.filter((t) => t.status === "failed") ?? [];
+    if (failing.length >= 2) {
+      const causes = new Map<string, TestResult[]>();
+      for (const t of failing) causes.set(causeOf(t.message), [...(causes.get(causeOf(t.message)) ?? []), t]);
+      blocks.push({ kind: "heading", level: 3, id: "causes", text: [text("Failing, by cause")] });
+      blocks.push({ kind: "table", head: th("Cause", "Tests", "Example"), rows: [...causes].sort(([, a], [, c]) => c.length - a.length).map(([cause, ts]) => [[code(cause)], [text(String(ts.length))], [text((ts[0]?.name ?? "").replace(/^.*?: /, "").slice(0, 90))]]) });
+    }
+    const hist = runsOf(ev, lib);
+    if (hist.length >= 2) {
+      const mv = movementsOf(ev, lib);
+      blocks.push({ kind: "heading", level: 2, id: "history", text: [text("History")] });
+      blocks.push({ kind: "paragraph", inlines: [text(`The last ${hist.length} runs in which the library's tests ran, oldest first.`)] });
+      blocks.push({ kind: "trend", label: "Tests", values: hist.map((h) => h.lib.tests) });
+      blocks.push({ kind: "trend", label: "Pass rate", values: passRates(ev, lib), unit: "%" });
+      blocks.push({ kind: "trend", label: "Time", values: hist.map((h) => Math.round(h.lib.durationMs / 1000)), unit: "s" });
+      const compare = mv.from !== undefined && mv.to !== undefined && mv.from !== "" && mv.to !== "" && mv.from !== mv.to ? { kind: "external" as const, url: `${b.config.repository}/compare/${mv.from}...${mv.to}` } : undefined;
+      const list = (id: string, heading: string, xs: readonly { readonly name: string; readonly episodes?: number }[], note?: Inline[]): void => {
+        if (xs.length === 0) return;
+        blocks.push({ kind: "heading", level: 3, id, text: [text(`${heading} (${xs.length})`)] });
+        if (note !== undefined) blocks.push({ kind: "paragraph", inlines: note });
+        blocks.push({ kind: "list", ordered: false, items: xs.slice(0, 40).map((x) => [{ kind: "paragraph", inlines: [text(x.name.replace(/^.*?: /, "")), ...(x.episodes === undefined ? [] : [text(` (failed in ${x.episodes} separate stretches)`)])] }]) });
+      };
+      list("newly-failing", "Began to fail in the latest run", mv.newlyFailing, compare === undefined ? undefined : [text("What changed between the runs: "), { kind: "link", href: compare, children: [text("the commits")] }, text(".")]);
+      list("fixed", "Fixed since the run before", mv.fixed);
+      list("flaky", "Flapping: failed more than once, passing in the latest run", mv.flaky);
     }
     if (q.total > 0) {
       blocks.push({ kind: "heading", level: 2, id: "requirements", text: [text("Requirements")] });
@@ -471,6 +509,8 @@ export function qualityData(b: Build): readonly { readonly path: string; readonl
       heldFindings: heldFindings(b, lib),
       openIssues: openIssuesOf(ev, lib).map((i) => ({ id: i.id, title: i.title, severity: i.severity, priority: i.priority, status: i.status.kind, cites: i.cites ?? [] })),
       openTickets: openTicketsOf(ev, lib).map((t) => ({ number: t.number, title: t.title, url: t.url, requirements: t.requirements })),
+      flaky: movementsOf(ev, lib).flaky.map((f) => f.name),
+      newlyFailing: movementsOf(ev, lib).newlyFailing.map((f) => f.name),
       failing: (r?.tests ?? []).filter((t) => t.status === "failed").map((t) => ({ name: t.name, file: t.file, message: t.message ?? null, requirements: t.requirements })),
     };
   });
