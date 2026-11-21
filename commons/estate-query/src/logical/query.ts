@@ -70,7 +70,7 @@ export function openEstateQuery(data: EstateData, budget: Budget = {}, live?: Li
   });
   return {
     query: (sql, params = []) => {
-      const guarded = guard(sql, astsql, { catalog, maxNodes });
+      const guarded = guard(sql, astsql, { catalog, tables: [...RELATIONS.map((r) => r.name), ...(live === undefined ? [] : [...Object.keys(live.tables), LIVE_STATUS.name])], maxNodes });
       if (guarded.kind === "err") return err({ kind: "refused", reasons: guarded.error.map((v) => v.message) });
       const ran = engine.run(sql, params);
       if (ran.kind === "err") return err({ kind: "failed", message: ran.error.message });
