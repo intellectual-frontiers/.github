@@ -1,4 +1,4 @@
-// Spec: 0001-docs FR-001, FR-025, FR-026
+// Spec: 0001-docs FR-001, FR-025, FR-026, FR-027
 /**
  * The API pages of each area (commons 0011-documentation FR-010): a page for each source file its exports come from, in the order its
  * entry points export them, with the file's module comment (what it is, its account, its examples, its limits) and an entry for each
@@ -11,6 +11,7 @@ import type { Build } from "../build.ts";
 import type { ApiExport, AreaApi } from "../extract/api.ts";
 import type { LinkScope } from "../links.ts";
 import type { Badge, Block, Inline } from "../model.ts";
+import { scoreOf } from "../mutation.ts";
 import { importIndex, testsImporting } from "../exercise.ts";
 import { standing } from "../evidence.ts";
 import { fileIssueBlocks, issuesNamingFile } from "./quality.ts";
@@ -157,6 +158,8 @@ export function apiPages(b: Build, areas: readonly Area[], apis: readonly AreaAp
       else blocks.push({ kind: "meta", inlines: [textInl("Source: "), { kind: "link", href: { kind: "external", url: b.index.blob(m.file) }, children: [{ kind: "code", text: m.file }] }] });
       const naming = issuesNamingFile(b, m.file);
       blocks.push(...fileIssueBlocks(b, m.file));
+      const mutated = b.evidence.recorded ? [...b.evidence.mutation.values()].flatMap((l) => l.files).find((f) => f.path === m.file) : undefined;
+      if (mutated !== undefined && scoreOf([mutated]) !== undefined) blocks.push({ kind: "meta", inlines: [textInl(`Mutation score of this file: ${scoreOf([mutated])}% (${mutated.survived + mutated.noCoverage} of ${mutated.killed + mutated.timeout + mutated.survived + mutated.noCoverage} changes to its code were not noticed by a test).`)] });
       let tested = 0;
       let exercised = 0;
       const head = blocks.length;

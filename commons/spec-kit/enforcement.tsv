@@ -508,7 +508,6 @@ requirement	mechanism	by	note
 0027-commons-libraries FR-158	check	.github: cd commons/lang-sql && bun run verify	commons/lang-sql: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-159	check	.github: cd commons/anyfs-cli && bun run verify	commons/anyfs-cli: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-160	check	.github: cd commons/anyfs-s3 && bun run verify	commons/anyfs-s3: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
-0027-commons-libraries FR-161	check	.github: cd commons/anyfs && bun run verify	commons/anyfs: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-162	check	.github: cd commons/anyfs-query && bun run verify	commons/anyfs-query: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-163	check	.github: cd commons/anyfs-githost && bun run verify	commons/anyfs-githost: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-164	check	.github: cd commons/archon-converge && bun run verify	commons/archon-converge: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
@@ -527,6 +526,11 @@ requirement	mechanism	by	note
 0027-commons-libraries FR-177	check	.github: cd commons/estate-iac && bun run verify	commons/estate-iac: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-178	check	.github: cd commons/estate-endpoints && bun run verify	commons/estate-endpoints: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-179	check	.github: cd commons/pentest && bun run verify	commons/pentest: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-181	check	.github: cd commons/planning && bun run verify	commons/planning: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-182	check	.github: cd commons/anyfs && bun run verify	commons/anyfs: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-183	check	.github: cd commons/archon-dialect-opentofu && bun run verify	commons/archon-dialect-opentofu: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-184	check	.github: cd commons/findings && bun run verify	commons/findings: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-185	check	.github: cd commons/scanners && bun run verify	commons/scanners: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0028-conformance-levels FR-001	check	.github: cd commons/mizan && bun test suite/	mizan-levels.test.ts: Mizan's ontology holds the four levels with ranks 0 to 3, each entailing what it and the levels below it add
 0028-conformance-levels FR-002	check	.github: cd commons/mizan && bun test suite/	mizan-levels.test.ts: every requirement is added by exactly one level and names a rule or says what else proves it
 0028-conformance-levels FR-003	check	.github: cd commons/mizan && bun test suite/	mizan-levels.test.ts: L0 adds a manifest, a verify command and a version
@@ -673,50 +677,50 @@ requirement	mechanism	by	note
 0011-documentation FR-040	check	.github: cd commons/docs && bun run verify	book.test.ts: commons' five volumes of the Commons Manuals have chapters, anchors that resolve, and no matrix or register, and the same pages give the same files
 0011-documentation FR-041	check	.github: bun test ./tests/	commons-site-evidence.test.ts: commons' configuration gives the evidence: the results folder, the GitHub snapshot in it, and the issues of data with their scopes; check.test.ts in commons/docs: the site of commons has the Quality section and the issues of data
 0011-documentation FR-042	check	.github: bun test ./tests/	commons-site-evidence.test.ts: the workflow site runs the tests of every library and of the repository on main, keeps each report, fetches the open issues and publishes the site whether or not a test failed
-0037-planning FR-001	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-002	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-003	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-004	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-005	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-006	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-007	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-008	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-009	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-010	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-011	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-012	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-013	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-014	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-015	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-016	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-017	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-018	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-019	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-020	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-021	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-022	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-023	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-024	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-025	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-026	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-027	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-028	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-029	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-030	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-031	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-032	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-033	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-034	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-035	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-036	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-037	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-038	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-039	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-040	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-041	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-042	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-043	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-044	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-045	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-046	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
-0037-planning FR-047	none	-	Planned: no code is written until the owner confirms the custom types (0037-planning OQ-9)
+0037-planning FR-001	check	.github: cd commons/planning && bun run verify	commons/planning suite/fold.test.ts, vocabulary.test.ts (0002-planning-core FR-001, FR-002): an item is a sum of the four kinds over the shared core, with the carried fields, and the lists are the ontology's
+0037-planning FR-002	none	-	Planned, phase 1 in part: the three severities, the four verdicts and the carried value of a source are in commons/planning (0002-planning-core FR-001, FR-002); the statement of the matrix of FR-015 waits for phase 4
+0037-planning FR-003	check	.github: cd commons/planning && bun run verify	commons/planning suite/events.test.ts, records.test.ts (0002-planning-core FR-005, FR-011): the fourteen types of event as a closed union, immutable, no operation that changes or removes one, and the ten types of the monorepo's issue files read as cases of it
+0037-planning FR-004	check	.github: cd commons/planning && bun run verify	commons/planning suite/fold.test.ts (0002-planning-core FR-006): fold is the same for any order and any repeat of the events, by property tests, and the state is never stored
+0037-planning FR-005	check	.github: cd commons/planning && bun run verify	commons/planning suite/actors.test.ts, events.test.ts (0002-planning-core FR-004, FR-005): an agent names its principal, a person names none, an agent with no principal is refused when built and when read, and a context with no person makes no person's or agent's actor
+0037-planning FR-006	none	-	Planned, phase 1 in part: fold starts an inferred item proposed and confirms it only by a person, by the policy (commons/planning suite/fold.test.ts); the views and queries that do not count a proposal wait for phase 4
+0037-planning FR-007	none	-	Planned, phase 1 and 2 in part: the ids are made by the hybrid clock of anyfs's merge, the next id is after every id seen and a far-future id is refused (commons/planning suite/ids.test.ts); that an id survives a move between places waits for reconcile, phase 3
+0037-planning FR-008	none	-	Planned: phase 3
+0037-planning FR-009	none	-	Planned, phase 1 in part: the cycle check of blocks (commons/planning suite/links.test.ts); the trace to each observation waits for phase 3
+0037-planning FR-010	none	-	Planned: phase 3
+0037-planning FR-011	none	-	Planned: phase 3
+0037-planning FR-012	none	-	Planned, phase 1 in part: fold applies the four authorities to each field over the events, and a person-only field waits as a proposal (commons/planning suite/fold.test.ts); the authority for a source and a field comes with the configuration, phase 6
+0037-planning FR-013	none	-	Planned: phase 3
+0037-planning FR-014	none	-	Planned: phase 3
+0037-planning FR-015	none	-	Planned: phase 4
+0037-planning FR-016	none	-	Planned: phase 3
+0037-planning FR-017	none	-	Planned: phase 3
+0037-planning FR-018	none	-	Planned: phase 3
+0037-planning FR-019	none	-	Planned: phase 3
+0037-planning FR-020	none	-	Planned: phase 4
+0037-planning FR-021	none	-	Planned: phase 4
+0037-planning FR-022	check	.github: cd commons/planning && bun run verify	commons/planning suite/typing.test.ts (0002-planning-core FR-008): the governance and logical sources import no system module and the work runs with the clock, the random source and the network taken away
+0037-planning FR-023	none	-	Planned: phase 4
+0037-planning FR-024	none	-	Planned: phase 5
+0037-planning FR-025	none	-	Planned, phase 2 in part: the issue file, the event object and the summary of the monorepo are decoded, read as an item with all ten types of event and written as they were (commons/planning suite/records.test.ts, and read-only against the monorepo's own files); the source that writes a new event waits for phase 5
+0037-planning FR-026	none	-	Planned: phase 5
+0037-planning FR-027	none	-	Planned: phase 5
+0037-planning FR-028	none	-	Planned: phase 5
+0037-planning FR-029	none	-	Planned: phase 5
+0037-planning FR-030	none	-	Planned: phase 5
+0037-planning FR-031	none	-	Planned: phase 5
+0037-planning FR-032	none	-	Planned: phase 6
+0037-planning FR-033	none	-	Planned: phase 3
+0037-planning FR-034	none	-	Planned: phase 6
+0037-planning FR-035	none	-	Planned: phase 6
+0037-planning FR-036	none	-	Planned: phase 6
+0037-planning FR-037	none	-	Planned: phase 6
+0037-planning FR-038	check	.github: cd commons/planning && bun run verify	commons/planning suite/records.test.ts (0002-planning-core FR-011): one JSON5 file for each event and each item, keys in the order of RFC 8785 section 3.2.3, and a total decoder
+0037-planning FR-039	none	-	Planned, phase 2 in part: the summary of the monorepo's issues is rendered from items by a pure function (commons/planning suite/records.test.ts); the renderers named by the configuration wait for phase 6
+0037-planning FR-040	none	-	Planned, phase 0 in part: the library is Kanon with its three layers and its verify runs the check of kanon; the patches, reconcile, the queries and the surfaces wait for phases 3 to 6
+0037-planning FR-041	check	.github: cd commons/planning && bun run verify	commons/planning suite/typing.test.ts (0002-planning-core FR-009): no any, non-null assertion, enum or cast but brand, readonly and exact optional fields held by the compiler, every switch closed
+0037-planning FR-042	none	-	Planned: phase 5
+0037-planning FR-043	none	-	Planned: the ontology names every list of the library, held by commons/planning suite/vocabulary.test.ts; the rule over every term of the model waits for phase 4
+0037-planning FR-044	check	.github: cd commons/planning && bun run verify	commons/planning suite/legacy-ids.test.ts (0002-planning-core FR-010): the id of a ULID and of another scheme, the external ids and the actors of a file by the rule of the configuration
+0037-planning FR-045	none	-	Planned, phase 1 in part: a run's context makes an agent's actor with the basis stored and refuses a person or an agent where there is no person (commons/planning suite/actors.test.ts); the tool server, the headless run and the commit-author case over a real Git repository wait for phase 6
+0037-planning FR-046	none	-	Planned, phase 2 in part: an issue file's every key is carried or found (commons/planning suite/records.test.ts); the other sources wait for phase 5
+0037-planning FR-047	none	-	Planned: phase 5

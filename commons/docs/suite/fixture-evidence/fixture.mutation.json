@@ -1,0 +1,1 @@
+{ "library": "fixture", "files": [ { "path": "src/mod.ts", "killed": 6, "timeout": 0, "survived": 2, "noCoverage": 0, "survivors": [ { "line": 20, "mutator": "StringLiteral", "replacement": "\"\"", "status": "Survived" } ] } ] }

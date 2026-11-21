@@ -54,6 +54,8 @@ requirement	mechanism	by	note
 0007-anyfs-merge-governance FR-007	check	.github: cd commons/anyfs && bun run verify	suite/merge-algebra.test.ts
 0007-anyfs-merge-governance FR-008	check	.github: cd commons/anyfs && bun run verify	suite/merge-algebra.test.ts
 0007-anyfs-merge-governance FR-009	check	.github: cd commons/anyfs && bun run verify	suite/merge-algebra.test.ts
+0007-anyfs-merge-governance FR-010	check	.github: cd commons/anyfs && bun run verify	suite/version-id.test.ts
+0007-anyfs-merge-governance FR-011	check	.github: cd commons/anyfs && bun run verify	suite/version-id.test.ts
 0008-anyfs-merge-logical FR-001	check	.github: cd commons/anyfs && bun run verify	suite/merge-algebra.test.ts
 0008-anyfs-merge-logical FR-002	check	.github: cd commons/anyfs && bun run verify	suite/merge-algebra.test.ts
 0008-anyfs-merge-logical FR-003	check	.github: cd commons/anyfs && bun run verify	suite/merge-algebra.test.ts

@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/archon",
   "private": true,
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Archon in the layers of Kanon: what a server, a device, a workstation or a cloud account must be, said once as requirements, the order and the plan made from them, and the port that a package for each tool (Ansible, OpenTofu, Microsoft DSC, cloud-init) implements; assurance profiles match the approval of a change to the fleet.",
   "type": "module",
   "engines": {

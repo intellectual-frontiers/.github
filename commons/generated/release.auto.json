@@ -4,225 +4,241 @@
     {
       "slug": "lang-sql",
       "package": "@intellectual-frontiers/lang-sql",
-      "version": "0.1.3",
+      "version": "0.1.4",
       "folder": "commons/lang-sql",
-      "tag": "lang-sql-v0.1.3",
+      "tag": "lang-sql-v0.1.4",
       "publish": true
     },
     {
       "slug": "telemetry",
       "package": "@intellectual-frontiers/telemetry",
-      "version": "0.2.6",
+      "version": "0.2.7",
       "folder": "commons/telemetry",
-      "tag": "telemetry-v0.2.6",
+      "tag": "telemetry-v0.2.7",
+      "publish": true
+    },
+    {
+      "slug": "anyfs",
+      "package": "@intellectual-frontiers/anyfs",
+      "version": "0.1.0",
+      "folder": "commons/anyfs",
+      "tag": "anyfs-v0.1.0",
       "publish": true
     },
     {
       "slug": "headless",
       "package": "@intellectual-frontiers/headless",
-      "version": "0.5.6",
+      "version": "0.5.7",
       "folder": "commons/headless",
-      "tag": "headless-v0.5.6",
+      "tag": "headless-v0.5.7",
       "publish": true
     },
     {
       "slug": "archon",
       "package": "@intellectual-frontiers/archon",
-      "version": "0.1.5",
+      "version": "0.1.6",
       "folder": "commons/archon",
-      "tag": "archon-v0.1.5",
+      "tag": "archon-v0.1.6",
       "publish": true
     },
     {
       "slug": "ontology",
       "package": "@intellectual-frontiers/ontology",
-      "version": "0.4.2",
+      "version": "0.4.3",
       "folder": "commons/ontology",
-      "tag": "ontology-v0.4.2",
+      "tag": "ontology-v0.4.3",
       "publish": true
     },
     {
       "slug": "toolchain",
       "package": "@intellectual-frontiers/toolchain",
-      "version": "0.1.5",
+      "version": "0.1.6",
       "folder": "commons/toolchain",
-      "tag": "toolchain-v0.1.5",
+      "tag": "toolchain-v0.1.6",
       "publish": true
     },
     {
       "slug": "package-managers",
       "package": "@intellectual-frontiers/package-managers",
-      "version": "0.1.5",
+      "version": "0.1.6",
       "folder": "commons/package-managers",
-      "tag": "package-managers-v0.1.5",
+      "tag": "package-managers-v0.1.6",
       "publish": true
     },
     {
       "slug": "archon-dialect-mise",
       "package": "@intellectual-frontiers/archon-dialect-mise",
-      "version": "0.1.5",
+      "version": "0.1.6",
       "folder": "commons/archon-dialect-mise",
-      "tag": "archon-dialect-mise-v0.1.5",
+      "tag": "archon-dialect-mise-v0.1.6",
       "publish": true
     },
     {
       "slug": "net",
       "package": "@intellectual-frontiers/net",
-      "version": "0.2.6",
+      "version": "0.2.7",
       "folder": "commons/net",
-      "tag": "net-v0.2.6",
+      "tag": "net-v0.2.7",
       "publish": true
     },
     {
       "slug": "archon-dialect-native-pinned",
       "package": "@intellectual-frontiers/archon-dialect-native-pinned",
-      "version": "0.1.5",
+      "version": "0.1.6",
       "folder": "commons/archon-dialect-native-pinned",
-      "tag": "archon-dialect-native-pinned-v0.1.5",
+      "tag": "archon-dialect-native-pinned-v0.1.6",
       "publish": true
     },
     {
       "slug": "docs",
       "package": "@intellectual-frontiers/docs",
-      "version": "0.3.6",
+      "version": "0.3.7",
       "folder": "commons/docs",
-      "tag": "docs-v0.3.6",
+      "tag": "docs-v0.3.7",
       "publish": true
     },
     {
       "slug": "githost",
       "package": "@intellectual-frontiers/githost",
-      "version": "0.2.6",
+      "version": "0.2.7",
       "folder": "commons/githost",
-      "tag": "githost-v0.2.6",
+      "tag": "githost-v0.2.7",
       "publish": true
     },
     {
       "slug": "mizan",
       "package": "@intellectual-frontiers/mizan",
-      "version": "0.2.6",
+      "version": "0.2.7",
       "folder": "commons/mizan",
-      "tag": "mizan-v0.2.6",
+      "tag": "mizan-v0.2.7",
       "publish": true
     },
     {
       "slug": "test",
       "package": "@intellectual-frontiers/test",
-      "version": "0.2.6",
+      "version": "0.2.7",
       "folder": "commons/test",
-      "tag": "test-v0.2.6",
+      "tag": "test-v0.2.7",
       "publish": true
     },
     {
       "slug": "quality",
       "package": "@intellectual-frontiers/quality",
-      "version": "0.3.6",
+      "version": "0.3.7",
       "folder": "commons/quality",
-      "tag": "quality-v0.3.6",
+      "tag": "quality-v0.3.7",
       "publish": true
     },
     {
       "slug": "ergonex",
       "package": "@intellectual-frontiers/ergonex",
-      "version": "0.5.6",
+      "version": "0.5.7",
       "folder": "commons/ergonex",
-      "tag": "ergonex-v0.5.6",
+      "tag": "ergonex-v0.5.7",
       "publish": true
     },
     {
       "slug": "grc",
       "package": "@intellectual-frontiers/grc",
-      "version": "0.3.6",
+      "version": "0.3.7",
       "folder": "commons/grc",
-      "tag": "grc-v0.3.6",
+      "tag": "grc-v0.3.7",
       "publish": true
     },
     {
       "slug": "integrations",
       "package": "@intellectual-frontiers/integrations",
-      "version": "0.2.6",
+      "version": "0.2.7",
       "folder": "commons/integrations",
-      "tag": "integrations-v0.2.6",
+      "tag": "integrations-v0.2.7",
       "publish": true
     },
     {
       "slug": "integrations-fhir",
       "package": "@intellectual-frontiers/integrations-fhir",
-      "version": "0.2.6",
+      "version": "0.2.7",
       "folder": "commons/integrations-fhir",
-      "tag": "integrations-fhir-v0.2.6",
+      "tag": "integrations-fhir-v0.2.7",
       "publish": true
     },
     {
       "slug": "integrations-github",
       "package": "@intellectual-frontiers/integrations-github",
-      "version": "0.2.6",
+      "version": "0.2.7",
       "folder": "commons/integrations-github",
-      "tag": "integrations-github-v0.2.6",
+      "tag": "integrations-github-v0.2.7",
       "publish": true
     },
     {
       "slug": "integrations-x12",
       "package": "@intellectual-frontiers/integrations-x12",
-      "version": "0.2.6",
+      "version": "0.2.7",
       "folder": "commons/integrations-x12",
-      "tag": "integrations-x12-v0.2.6",
+      "tag": "integrations-x12-v0.2.7",
       "publish": true
     },
     {
       "slug": "libraries",
       "package": "@intellectual-frontiers/libraries",
-      "version": "0.5.8",
+      "version": "0.5.9",
       "folder": "commons/libraries",
-      "tag": "libraries-v0.5.8",
+      "tag": "libraries-v0.5.9",
+      "publish": true
+    },
+    {
+      "slug": "planning",
+      "package": "@intellectual-frontiers/planning",
+      "version": "0.1.0",
+      "folder": "commons/planning",
+      "tag": "planning-v0.1.0",
       "publish": true
     },
     {
       "slug": "repoctl",
       "package": "@intellectual-frontiers/repoctl",
-      "version": "0.2.7",
+      "version": "0.2.8",
       "folder": "commons/repoctl",
-      "tag": "repoctl-v0.2.7",
+      "tag": "repoctl-v0.2.8",
       "publish": true
     },
     {
       "slug": "commons",
       "package": "@intellectual-frontiers/commons",
-      "version": "0.1.8",
+      "version": "0.1.9",
       "folder": "commons/commons",
-      "tag": "commons-v0.1.8",
+      "tag": "commons-v0.1.9",
       "publish": true
     },
     {
       "slug": "foundation",
       "package": "@intellectual-frontiers/foundation",
-      "version": "0.1.6",
+      "version": "0.1.7",
       "folder": "commons/foundation",
-      "tag": "foundation-v0.1.6",
+      "tag": "foundation-v0.1.7",
       "publish": true
     },
     {
       "slug": "patterns",
       "package": "@intellectual-frontiers/patterns",
-      "version": "0.1.6",
+      "version": "0.1.7",
       "folder": "commons/patterns",
-      "tag": "patterns-v0.1.6",
+      "tag": "patterns-v0.1.7",
       "publish": true
     },
     {
       "slug": "programs",
       "package": "@intellectual-frontiers/programs",
-      "version": "0.1.8",
+      "version": "0.1.9",
       "folder": "commons/programs",
-      "tag": "programs-v0.1.8",
+      "tag": "programs-v0.1.9",
       "publish": true
     },
     {
       "slug": "standards",
       "package": "@intellectual-frontiers/standards",
-      "version": "0.1.6",
+      "version": "0.1.7",
       "folder": "commons/standards",
-      "tag": "standards-v0.1.6",
+      "tag": "standards-v0.1.7",
       "publish": true
     }
   ]

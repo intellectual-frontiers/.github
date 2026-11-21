@@ -8,6 +8,7 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "17 * * * *"
+    - cron: "43 3 * * *"
 
 permissions:
   contents: read
@@ -130,11 +131,45 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
+  # the mutation score of a small library, by the night and by hand: the suite is run once for each change made to the library's code, so it is slow; where it cannot be done the score of the night before stays
+  mutation:
+    name: mutation (${{ matrix.library }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    if: "github.event_name == 'workflow_dispatch' || github.event.schedule == '43 3 * * *'"
+    strategy:
+      fail-fast: false
+      matrix:
+        library: [archon-dialect-apt, archon-dialect-homebrew, archon-dialect-mise, archon-dialect-winget, integrations-github, catalog-nist-csf-2, archon-dns, catalog-nist-sp800, archon-dialect-ansible, archon-converge, integrations-x12, lab]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/bun
+      - name: "The development tools, from bun.lock (the libraries it imports are linked)"
+        run: bun install --frozen-lockfile
+        working-directory: ${{ format('commons/{0}', matrix.library) }}
+        continue-on-error: true
+      - name: "The packages of the tool that keeps the report (commons docs)"
+        run: bun install --frozen-lockfile
+        working-directory: commons/docs
+        continue-on-error: true
+      - name: "The mutation run, kept as a small report"
+        shell: bash
+        run: "bun commons/docs/tools/mutation.ts --library \"${{ matrix.library }}\" --out \"$RUNNER_TEMP/evidence\""
+        continue-on-error: true
+      - name: "The score, kept for the site"
+        if: "always()"
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-mutation-${{ matrix.library }}
+          path: ${{ runner.temp }}/evidence/*.mutation.json
+          if-no-files-found: ignore
+          retention-days: 7
+
   # every report in one artifact, whatever happened to the jobs that made them, with the run added to the history that the artifact of the run before carried
   collect:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
-    needs: [tests, repository]
+    needs: [tests, repository, mutation]
     if: "always()"
     permissions:
       contents: read
@@ -165,6 +200,8 @@ jobs:
           mkdir -p _history _prev
           gh run download --name evidence --dir _prev || echo 'no earlier evidence: the history begins here'
           if [ -d _prev/history ]; then cp -r _prev/history/. _history/; fi
+          # the mutation scores are made by the night; the hours between keep the ones the run before had
+          for f in _prev/*.mutation.json; do if [ -e "$f" ] && [ ! -e "_evidence/$(basename "$f")" ]; then cp "$f" _evidence/; fi; done
           bun commons/docs/tools/history.ts --evidence _evidence --history _history || echo 'the history could not be kept'
           mkdir -p _evidence/history && cp -r _history/runs _evidence/history/ 2>/dev/null || true
         env:

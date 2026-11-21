@@ -1,0 +1,16 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-planning-layers FR-001	check	.github: cd commons/planning && bun run verify	suite/layers.test.ts: every file of the real tree is in a unit and no import is outside its row
+0001-planning-layers FR-002	check	.github: cd commons/planning && bun run verify	suite/layers.test.ts: verify runs every check of the library
+0002-planning-core FR-001	check	.github: cd commons/planning && bun run verify	suite/vocabulary.test.ts: every list has one registry entry for each case and each entry is a member of the ontology plan:, and a value outside a list is an error value
+0002-planning-core FR-002	check	.github: cd commons/planning && bun run verify	suite/fold.test.ts: an item of each kind has the fields of the core and the five states
+0002-planning-core FR-003	check	.github: cd commons/planning && bun run verify	suite/ids.test.ts: the smart constructors, the clock over the real merge clock of anyfs, the sight of an id and the refusal of a far-future id
+0002-planning-core FR-004	check	.github: cd commons/planning && bun run verify	suite/actors.test.ts: the actor rules in the types and in the constructors, from the values of a file and from a run's context
+0002-planning-core FR-005	check	.github: cd commons/planning && bun run verify	suite/events.test.ts: an event of each type, deeply frozen, with the refusals of makeEvent
+0002-planning-core FR-006	check	.github: cd commons/planning && bun run verify	suite/fold.test.ts: the fold is the same for any order and any repeat, the conflicts, the proposals and the authority of each field
+0002-planning-core FR-007	check	.github: cd commons/planning && bun run verify	suite/links.test.ts: a link that closes a cycle of blocks is refused with its items
+0002-planning-core FR-008	check	.github: cd commons/planning && bun run verify	suite/typing.test.ts: the governance and logical sources import no system module, read no clock and use no random source
+0002-planning-core FR-009	check	.github: cd commons/planning && bun run verify	suite/typing.test.ts: the sources hold no any, non-null assertion, enum or cast but brand, and the files that must not compile do not (ts-expect-error, held by the compiler of verify)
+0002-planning-core FR-010	check	.github: cd commons/planning && bun run verify	suite/legacy-ids.test.ts: the id of a ULID against its layout, the id of another scheme, and the actors of a file by the rule of the configuration
+0002-planning-core FR-011	check	.github: cd commons/planning && bun run verify	suite/records.test.ts: the files of events and items round-trip with their keys in order and decode totally, and the monorepo's three records round-trip as written
