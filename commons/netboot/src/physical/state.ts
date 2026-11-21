@@ -31,8 +31,14 @@ export async function writeState(file: string, state: BootState): Promise<void> 
   await fs.rename(tmp, file);
 }
 
-/** Reads the state, changes it with `f` and writes it back, one change at a time. */
 let chain: Promise<unknown> = Promise.resolve();
+
+/**
+ * Reads the state, changes it with `f` and writes it back, one change at a time.
+ *
+ * @param file - the state's file
+ * @param f - what changes it: the new state and the value it gives back
+ */
 export function updateState<T>(file: string, f: (s: BootState) => { readonly state: BootState; readonly value: T }): Promise<T> {
   const run = chain.then(async () => {
     const r = f(await readState(file));

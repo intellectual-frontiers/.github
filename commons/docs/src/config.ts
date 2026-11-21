@@ -104,6 +104,43 @@ export interface CitationsConfig {
   readonly text?: readonly string[];
 }
 
+/** An issue kept as typed code (commons data 0044-issues), as far as the site reads it: the package depends on no library, so it names the fields and not the type. */
+export interface IssueLike {
+  readonly id: number;
+  readonly slug: string;
+  readonly title: string;
+  readonly summary: string;
+  readonly severity: string;
+  readonly priority: string;
+  readonly goals?: readonly string[];
+  readonly status: { readonly kind: string; readonly reason?: string; readonly by?: string; readonly of?: number; readonly until?: string; readonly proof?: readonly { readonly kind: string; readonly [k: string]: unknown }[] };
+  readonly size?: string;
+  /** The requirements it is about, as `0043-sql-invariants FR-002`. */
+  readonly cites?: readonly string[];
+  readonly evidence?: readonly { readonly kind: string; readonly [k: string]: unknown }[];
+  readonly links?: readonly { readonly kind: string; readonly to: number }[];
+  readonly raised: string;
+}
+
+/** The issues of one library, as typed code. */
+export interface IssuesOf {
+  /** The library, by the name of its folder. */
+  readonly library: string;
+  /** Where in the library the set is (its path), where a library keeps more than one set: the numbers of two sets may be alike. */
+  readonly scope?: string;
+  readonly issues: readonly IssueLike[];
+}
+
+/** What the site shows of quality (docs 0001-docs FR-009): the folder of test results (CTRF, one `<library>.ctrf.json` for each, and `meta.json`), the issues of the libraries as typed code, and a snapshot of the tickets of GitHub. */
+export interface EvidenceSource {
+  /** The folder of results, from the root; where it is not there, no run is recorded. */
+  readonly results?: string;
+  /** The snapshot of the GitHub issues (a JSON array as the API gives it), from the root. */
+  readonly github?: string;
+  /** The issues kept as typed code. */
+  readonly issues?: readonly IssuesOf[];
+}
+
 /** The presentations of the pages (docs 0001-docs FR-007): the static site, the Markdown twins with `llms.txt`, the JSON a lens adds, and the AsciiDoc of the volumes of a book. */
 export const PRESENTATION_IDS = ["web", "markdown", "data", "book"] as const;
 
@@ -191,6 +228,8 @@ export interface DocsConfig {
   readonly presentations?: readonly PresentationId[];
   /** The volumes of the book presentation (docs 0001-docs FR-008); none by default. */
   readonly books?: BooksConfig;
+  /** The evidence the site shows beside the code: test results, issues, tickets (docs 0001-docs FR-009); none by default. */
+  readonly evidence?: EvidenceSource;
 }
 
 /** A package as the build reads it: its folder from the root (`""` for the root), its name, and where its `About` is. */
@@ -251,6 +290,8 @@ export interface Config {
   readonly presentations: readonly PresentationId[];
   /** The volumes of the book presentation. */
   readonly books: BooksConfig;
+  /** The evidence the site shows. */
+  readonly evidence: EvidenceSource | undefined;
 }
 
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
@@ -292,6 +333,35 @@ export function isAbout(v: unknown): v is About {
 /** Whether a value is a lens: a name and a `read` function. */
 function isLens(v: unknown): v is Lens {
   return isRecord(v) && typeof v["name"] === "string" && typeof v["read"] === "function";
+}
+
+/** The evidence of a configuration checked (docs 0001-docs FR-009): paths that are strings, and issues of the shape the site reads. */
+function evidenceOf(v: unknown, bad: (what: string) => void): EvidenceSource | undefined {
+  if (v === undefined) return undefined;
+  if (!isRecord(v)) {
+    bad("evidence must be an object: { results?, github?, issues? }");
+    return undefined;
+  }
+  for (const key of ["results", "github"]) if (v[key] !== undefined && (typeof v[key] !== "string" || v[key] === "")) bad(`evidence.${key} must be a path from the root`);
+  const issues: IssuesOf[] = [];
+  const raw = v["issues"] ?? [];
+  if (!Array.isArray(raw)) bad("evidence.issues must be an array of { library, issues }");
+  else {
+    raw.forEach((s: unknown, i) => {
+      const where = `evidence.issues[${i}]`;
+      if (!isRecord(s) || typeof s["library"] !== "string" || !Array.isArray(s["issues"])) return bad(`${where} must be { library, issues }`);
+      const list = s["issues"] as unknown[];
+      list.forEach((x, j) => {
+        if (!isRecord(x) || typeof x["id"] !== "number" || typeof x["title"] !== "string" || typeof x["severity"] !== "string" || !isRecord(x["status"]) || typeof x["status"]["kind"] !== "string") bad(`${where}.issues[${j}] is not an issue (an id, a title, a severity and a status)`);
+      });
+      issues.push({ library: s["library"], ...(typeof s["scope"] === "string" ? { scope: s["scope"] } : {}), issues: list as IssueLike[] });
+    });
+  }
+  return {
+    ...(typeof v["results"] === "string" ? { results: v["results"] } : {}),
+    ...(typeof v["github"] === "string" ? { github: v["github"] } : {}),
+    issues,
+  };
 }
 
 /** The books of a configuration checked (docs 0001-docs FR-008): a volume's slug, title and parts, and a selector's section. */
@@ -485,6 +555,7 @@ export function resolveConfig(value: unknown, file: string): Result<Config, stri
     }
   }
   const books = booksOf(value["books"], bad);
+  const evidence = evidenceOf(value["evidence"], bad);
   if (presentations.includes("book") && books.volumes.length === 0) bad("presentations names book, and books names no volume");
   if (problems.length > 0) return err(problems);
   return ok({
@@ -506,5 +577,6 @@ export function resolveConfig(value: unknown, file: string): Result<Config, stri
     out,
     presentations,
     books,
+    evidence,
   });
 }

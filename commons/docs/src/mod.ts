@@ -29,6 +29,9 @@ export type {
   BookVolume,
   BooksConfig,
   CitationsConfig,
+  EvidenceSource,
+  IssueLike,
+  IssuesOf,
   PageSelector,
   PresentationId,
   Config,
@@ -42,6 +45,7 @@ export type {
 } from "./config.ts";
 export { DEFAULT_PRESENTATIONS, isAbout, normalDir, PRESENTATION_IDS, resolveConfig, under } from "./config.ts";
 export { Build } from "./build.ts";
+export { type Evidence, isOpen, type LibraryResults, NONE, parseCtrf, parseTickets, readEvidence, requirementsIn, standing, type TestResult, type TestStatus, type Ticket, type TypedIssue } from "./evidence.ts";
 export { type Finding, message, type Problem, report } from "./check.ts";
 export type { ApiExport, ApiMember, AreaApi, ExportKind } from "./extract/api.ts";
 export type { Constitution, Enforcement, Spec, SpecKit } from "./extract/specs.ts";

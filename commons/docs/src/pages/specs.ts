@@ -14,6 +14,7 @@ import type { Enforcement, KitSource, Spec } from "../extract/specs.ts";
 import { specPage } from "../links.ts";
 import type { Badge, Block, Href, Inline, Page, Tone } from "../model.ts";
 import { plain, slugOf } from "../model.ts";
+import { requirementEvidence } from "./quality.ts";
 
 const toneOf = (mechanism: Enforcement["mechanism"] | undefined): Tone =>
   mechanism === "check" || mechanism === "gate" ? "good" : mechanism === "review" ? "info" : "warn";
@@ -137,12 +138,13 @@ function itemEntries(b: Build, spec: Spec, list: Extract<Block, { kind: "list" }
     const badges: Badge[] = id.startsWith("FR-")
       ? requirementBadges(spec, e)
       : [{ text: id.startsWith("SC-") ? "success criterion" : "open question", tone: "neutral" }];
+    const evidence = id.startsWith("FR-") ? requirementEvidence(b, `${spec.id} ${id}`) : undefined;
     entries.push({
       kind: "entry",
       id: id.toLowerCase(),
       name: id,
-      badges,
-      blocks: [{ kind: "paragraph", inlines: trimmed }, ...item.slice(1), ...(id.startsWith("FR-") ? enforcedLine(spec, e) : []), ...(id.startsWith("FR-") ? traceLines(b, trace, `${spec.id} ${id}`) : [])],
+      badges: evidence?.badge === undefined ? badges : [...badges, evidence.badge],
+      blocks: [{ kind: "paragraph", inlines: trimmed }, ...item.slice(1), ...(id.startsWith("FR-") ? enforcedLine(spec, e) : []), ...(id.startsWith("FR-") ? traceLines(b, trace, `${spec.id} ${id}`) : []), ...(evidence?.blocks ?? [])],
     });
   }
   return entries;
@@ -331,6 +333,7 @@ export function specPages(b: Build): void {
     });
   }
   const trace = traceOf(b);
+  b.trace = trace;
   b.kit.specs.forEach((s, i) => b.add(specPageOf(b, s, 10 + i, trace)));
 }
 

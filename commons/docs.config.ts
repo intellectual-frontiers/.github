@@ -6,7 +6,7 @@
  * @module
  */
 import { existsSync, readdirSync, readFileSync } from "node:fs";
-import type { About, BooksConfig, DocsConfig, PackageConfig } from "./docs/src/config.ts";
+import type { About, BooksConfig, DocsConfig, EvidenceSource, PackageConfig } from "./docs/src/config.ts";
 import { layeredLens } from "./docs/src/lens/layered.ts";
 import { DEFAULT_LICENSE } from "./libraries/src/license/standard.ts";
 import { guidesLens } from "./docs/src/lens/guides.ts";
@@ -17,6 +17,11 @@ import { describe } from "./headless/src/describe/mod.ts";
 import { anyfsProgram, INERT_HOST as ANYFS_INERT_HOST } from "./anyfs-cli/src/mod.ts";
 import { INERT_HOST as REPOCTL_INERT_HOST, repoctlProgram } from "./repoctl/src/mod.ts";
 import { SUBJECTS } from "./data/governance/api.ts";
+import { issues as dataIssues } from "./data/issues/mod.ts";
+import { issues as convergenceIssues } from "./data/sql/extensions/convergence/issues/mod.ts";
+import { issues as historyIssues } from "./data/sql/extensions/history/issues/mod.ts";
+import { issues as operationsIssues } from "./data/sql/extensions/operations/issues/mod.ts";
+import { issues as presetsIssues } from "./data/sql/presets/issues/mod.ts";
 import { allModules } from "./data/sql/cli/config.ts";
 import { describeModels } from "./data/sql/describe/mod.ts";
 import { dialect as duckdb } from "./data/sql/dialects/duckdb/mod.ts";
@@ -174,6 +179,19 @@ const books: BooksConfig = {
   ],
 };
 
+/**
+ * What the site shows beside the code (commons 0011-documentation FR-041): the results of the tests that CI leaves in `_evidence/` (`<library>.ctrf.json` for each library and `meta.json`; none where a build is made by hand, and the pages
+ * say so), a snapshot of the open tickets of GitHub in the same folder, and the issues that the libraries keep as typed code, which are read from the libraries themselves.
+ */
+const evidence: EvidenceSource = {
+  results: "_evidence",
+  github: "_evidence/github-issues.json",
+  issues: [
+    { library: "data", issues: dataIssues.issues },
+    ...[convergenceIssues, historyIssues, operationsIssues, presetsIssues].map((set) => ({ library: "data", scope: set.scope, issues: set.issues })),
+  ],
+};
+
 /** Commons' site: its packages, its spec kit, how its specifications are cited, and its lenses. */
 export const config: DocsConfig = {
   name: "IF Commons",
@@ -233,6 +251,17 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/kanon/spec-kit" },
     { layout: "commons", dir: "commons/lab/spec-kit" },
     { layout: "commons", dir: "commons/machine-probe/spec-kit" },
+    { layout: "commons", dir: "commons/archon-boot/spec-kit" },
+    { layout: "commons", dir: "commons/archon-converge/spec-kit" },
+    { layout: "commons", dir: "commons/archon-dialect-ansible/spec-kit" },
+    { layout: "commons", dir: "commons/archon-dialect-cloud-init/spec-kit" },
+    { layout: "commons", dir: "commons/archon-dns/spec-kit" },
+    { layout: "commons", dir: "commons/catalog-nist-csf-2/spec-kit" },
+    { layout: "commons", dir: "commons/catalog-nist-sp800/spec-kit" },
+    { layout: "commons", dir: "commons/lang-sql/spec-kit" },
+    { layout: "commons", dir: "commons/linux-observe/spec-kit" },
+    { layout: "commons", dir: "commons/linux-services/spec-kit" },
+    { layout: "commons", dir: "commons/netboot/spec-kit" },
     { layout: "commons", dir: "commons/repoctl/spec-kit" },
   ],
   citations: { prefix: "commons", digits: 4, text: ["erga", "archon", "stolos", "thyra"] },
@@ -242,6 +271,7 @@ export const config: DocsConfig = {
   forbiddenInGuides: ["formerly", "previously", "legacy", "deprecated", "replaces", "replaced", "migration", "backward", "backwards", "acceptance test", "history", "no longer"],
   out: "_site",
   books,
+  evidence,
 };
 
 export default config;
