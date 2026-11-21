@@ -39,6 +39,7 @@ import * as ifccmOntology from "@intellectual-frontiers/ontology/ifccm";
 import * as ifrOntology from "@intellectual-frontiers/ontology/ifr";
 import * as ifqsOntology from "@intellectual-frontiers/ontology/ifqs";
 import * as otoOntology from "@intellectual-frontiers/ontology/oto";
+import * as planningOntology from "@intellectual-frontiers/ontology/planning";
 import { pm } from "@intellectual-frontiers/ontology/supply-chain/packaging";
 import { type RulePlugin, rulePlugins } from "@intellectual-frontiers/mizan/rules";
 import { holdHarness } from "@intellectual-frontiers/mizan/harness";
@@ -74,7 +75,7 @@ export function termRecordsOf(audit: readonly (typeof terms)[number][]): readonl
 
 /** Mizan's own terms and the packaging ontology's as the rules read them. */
 export function mizanTermRecords(): readonly TermRecord[] {
-  return termRecordsOf([...terms, ...packagingTerms, ...ifccmOntology.terms, ...ifqsOntology.terms, ...otoOntology.terms, ...ifrOntology.terms]);
+  return termRecordsOf([...terms, ...packagingTerms, ...ifccmOntology.terms, ...ifqsOntology.terms, ...otoOntology.terms, ...planningOntology.terms, ...ifrOntology.terms]);
 }
 
 /** The prefixes of commons' own ontologies and their namespaces. */
@@ -84,6 +85,7 @@ const PREFIXES = {
   ifccm: ifccmOntology.IFCCM.iri,
   ifqs: ifqsOntology.IFQS.iri,
   oto: otoOntology.OTO.iri,
+  plan: planningOntology.PLANNING.iri,
   ifr: ifrOntology.IFR.iri,
 } as const;
 
@@ -96,7 +98,7 @@ function curieOf(iri: string): string {
 /** The deprecated terms of commons' own ontologies, by CURIE, with what replaces each (0018-standards-first): a specification that names one is found. */
 export function deprecatedTerms(): ReadonlyMap<string, string> {
   return new Map(
-    [...terms, ...packagingTerms, ...ifccmOntology.terms, ...ifqsOntology.terms, ...otoOntology.terms, ...ifrOntology.terms].flatMap((t) =>
+    [...terms, ...packagingTerms, ...ifccmOntology.terms, ...ifqsOntology.terms, ...otoOntology.terms, ...planningOntology.terms, ...ifrOntology.terms].flatMap((t) =>
       t.values.deprecatedOn === undefined ? [] : [[curieOf(t.values.termIri), curieOf(t.values.replacedBy ?? "")] as const],
     ),
   );
@@ -160,6 +162,11 @@ export function main(
               recorded: otoOntology.terms.map((t) => t.values.termIri),
             },
             {
+              file: "commons/ontology/src/planning/planning.ts",
+              ontology: planningOntology.classes.map((c) => c.iri),
+              recorded: planningOntology.terms.map((t) => t.values.termIri),
+            },
+            {
               file: "commons/ontology/src/ifr/ifr.ts",
               ontology: ifrOntology.classes.map((c) => c.iri),
               recorded: ifrOntology.terms.map((t) => t.values.termIri),
@@ -189,6 +196,23 @@ export function main(
                   otoOntology.maturityLevels,
                   otoOntology.dimensions,
                   otoOntology.alignmentStates,
+                ].flatMap((l) => Object.keys(l)),
+              ]),
+              plan: new Set([
+                ...Object.keys(planningOntology.plan),
+                ...[
+                  planningOntology.itemKinds,
+                  planningOntology.states,
+                  planningOntology.closeReasons,
+                  planningOntology.severities,
+                  planningOntology.verdicts,
+                  planningOntology.linkKinds,
+                  planningOntology.capabilities,
+                  planningOntology.fieldAuthorities,
+                  planningOntology.origins,
+                  planningOntology.actorKinds,
+                  planningOntology.locatorKinds,
+                  planningOntology.eventTypes,
                 ].flatMap((l) => Object.keys(l)),
               ]),
               ifr: ifrOntology.termNames,

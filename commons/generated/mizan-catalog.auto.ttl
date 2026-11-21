@@ -109,6 +109,23 @@
         <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-oto-oto.auto.ttl> ;
     dcat:version "1.0.0" .
 
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-planning> a dcat:Dataset ;
+    dcterms:description "The vocabulary of Planning: the seven kinds of planning item, the events that make their history and the states folded from them, the actors, the observations of what a source saw and where, the traces and links between items, the patches that write a change back and their previews, the sources that read and write, and the closed code lists the model branches on."@en ;
+    dcterms:identifier "https://www.intellectualfrontiers.com/ontology/planning" ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:publisher <https://www.intellectualfrontiers.com/> ;
+    dcterms:title "Planning"@en ;
+    dcat:distribution <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-planning-planning-code-lists.auto.skos.ttl>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-planning-planning-code-lists.auto.sql>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-planning-planning-mappings.auto.sssom.tsv>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-planning-planning-ontology.auto.html>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-planning-planning-schemas.auto.json>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-planning-planning-shapes.auto.ttl>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-planning-planning.auto.ofn>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-planning-planning.auto.rdf>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-planning-planning.auto.ttl> ;
+    dcat:version "1.0.0" .
+
 <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-ifccm-ifccm-code-lists.auto.skos.ttl> a dcat:Distribution ;
     dcterms:conformsTo <https://www.w3.org/TR/skos-reference/> ;
     dcterms:format <https://www.iana.org/assignments/media-types/text/turtle> ;
@@ -565,6 +582,82 @@
     dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/oto.auto.ttl> ;
     dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> .
 
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-planning-planning-code-lists.auto.skos.ttl> a dcat:Distribution ;
+    dcterms:conformsTo <https://www.w3.org/TR/skos-reference/> ;
+    dcterms:format <https://www.iana.org/assignments/media-types/text/turtle> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "Planning code lists, SKOS"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/planning-code-lists.auto.skos.ttl> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/planning-code-lists.auto.skos.ttl> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-planning-planning-code-lists.auto.sql> a dcat:Distribution ;
+    dcterms:format <https://www.iana.org/assignments/media-types/application/sql> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "Planning code lists, SQL"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/planning-code-lists.auto.sql> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/planning-code-lists.auto.sql> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sql> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-planning-planning-mappings.auto.sssom.tsv> a dcat:Distribution ;
+    dcterms:conformsTo <https://mapping-commons.github.io/sssom/spec/> ;
+    dcterms:format <https://www.iana.org/assignments/media-types/text/tab-separated-values> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "Planning mappings to standards, SSSOM"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/planning-mappings.auto.sssom.tsv> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/planning-mappings.auto.sssom.tsv> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/tab-separated-values> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-planning-planning-ontology.auto.html> a dcat:Distribution ;
+    dcterms:format <https://www.iana.org/assignments/media-types/text/html> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "Planning ontology, HTML view"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/planning-ontology.auto.html> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/planning-ontology.auto.html> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/html> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-planning-planning-schemas.auto.json> a dcat:Distribution ;
+    dcterms:conformsTo <https://json-schema.org/draft/2020-12/schema> ;
+    dcterms:format <https://www.iana.org/assignments/media-types/application/schema+json> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "Planning JSON Schema"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/planning-schemas.auto.json> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/planning-schemas.auto.json> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/schema+json> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-planning-planning-shapes.auto.ttl> a dcat:Distribution ;
+    dcterms:conformsTo <https://www.w3.org/TR/shacl/> ;
+    dcterms:format <https://www.iana.org/assignments/media-types/text/turtle> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "Planning SHACL shapes"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/planning-shapes.auto.ttl> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/planning-shapes.auto.ttl> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-planning-planning.auto.ofn> a dcat:Distribution ;
+    dcterms:format <https://www.iana.org/assignments/media-types/text/owl-functional> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "Planning ontology, OWL 2 functional syntax"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/planning.auto.ofn> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/planning.auto.ofn> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/owl-functional> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-planning-planning.auto.rdf> a dcat:Distribution ;
+    dcterms:format <https://www.iana.org/assignments/media-types/application/rdf+xml> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "Planning ontology, RDF/XML"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/planning.auto.rdf> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/planning.auto.rdf> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-planning-planning.auto.ttl> a dcat:Distribution ;
+    dcterms:format <https://www.iana.org/assignments/media-types/text/turtle> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "Planning ontology, Turtle"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/planning.auto.ttl> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/planning.auto.ttl> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> .
+
 <https://www.intellectualfrontiers.com/ontology/mizan-catalog> a dcat:Catalog ;
     dcterms:description "The ontologies Intellectual Frontiers publishes with Mizan, each with the files generated from it."@en ;
     dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
@@ -575,4 +668,5 @@
         <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-ifr>,
         <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-kanon>,
         <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-mizan>,
-        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-oto> .
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-oto>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-planning> .

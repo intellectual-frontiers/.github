@@ -22,6 +22,8 @@ export const library = {
     "./ifqs/ifqs",
     "./oto",
     "./oto/oto",
+    "./planning",
+    "./planning/planning",
     "./ifr",
     "./ifr/audit",
     "./ifr/ifr",

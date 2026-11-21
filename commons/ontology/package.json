@@ -17,6 +17,8 @@
     "./ifqs/ifqs": "./src/ifqs/ifqs.ts",
     "./oto": "./src/oto/mod.ts",
     "./oto/oto": "./src/oto/oto.ts",
+    "./planning": "./src/planning/mod.ts",
+    "./planning/planning": "./src/planning/planning.ts",
     "./ifr": "./src/ifr/mod.ts",
     "./ifr/audit": "./src/ifr/audit.ts",
     "./ifr/ifr": "./src/ifr/ifr.ts",
