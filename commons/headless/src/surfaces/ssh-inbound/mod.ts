@@ -26,15 +26,16 @@ export type KeyRole = "read-only" | "full";
 /** A key to let in: its name (for a person), the public key line, its role, and the addresses it may come from. */
 export type InboundKey = { readonly name: string; readonly publicKey: string; readonly role: KeyRole; readonly from?: readonly string[] };
 
-/** The two forced commands: a tool server over ssh, or one run of a verb with a JSON report. */
-export type InboundMode = "mcp" | "run";
+/** The forced commands: a tool server over ssh, one run of a verb with a JSON report, or a program that is not ours to run and that reads only (a probe script), forced as it is. */
+export type InboundMode = "mcp" | "run" | "program";
 
 const KEY = /^(ssh-ed25519|ssh-rsa|ecdsa-sha2-nistp256|ecdsa-sha2-nistp384|ecdsa-sha2-nistp521|sk-ssh-ed25519@openssh\.com|sk-ecdsa-sha2-nistp256@openssh\.com) [A-Za-z0-9+/]+={0,2}(?: [^\n\r]*)?$/;
 const PROGRAM = /^[A-Za-z0-9_./-]+$/;
 const FROM = /^[A-Za-z0-9.:*?!/_-]+$/;
 
-/** The command a mode forces, for a role: `<program> mcp` or `<program> run --ssh`, with `--read-only` for a key that may only read. */
+/** The command a mode forces, for a role: `<program> mcp` or `<program> run --ssh`, with `--read-only` for a key that may only read; for the mode `program`, the program alone, which is what it is that reads only. */
 export function forcedCommand(program: string, mode: InboundMode, role: KeyRole): string {
+  if (mode === "program") return program;
   return `${program} ${mode === "mcp" ? "mcp" : "run --ssh"}${role === "read-only" ? " --read-only" : ""}`;
 }
 

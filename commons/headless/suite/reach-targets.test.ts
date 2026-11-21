@@ -415,6 +415,9 @@ proves(["0005-reach-and-targets FR-008"], "the inbound lines are generated from 
   const runLine = authorizedKeysLine({ program: "ops", mode: "run", key: { name: "probe", publicKey: PUB, role: "read-only", from: ["10.0.0.0/8", "*.example"] } });
   assertEquals(runLine, { kind: "ok", value: `restrict,from="10.0.0.0/8,*.example",command="ops run --ssh --read-only" ${PUB}` });
   assertEquals(forcedCommand("ops", "mcp", "read-only"), "ops mcp --read-only");
+  const programLine = authorizedKeysLine({ program: ".local/bin/machine-probe", mode: "program", key: { name: "probe", publicKey: PUB, role: "read-only" } });
+  assertEquals(programLine, { kind: "ok", value: `restrict,command=".local/bin/machine-probe" ${PUB}` }, "a program that only reads is forced as it is");
+  assert(isErr(authorizedKeysLine({ program: 'p" ; rm', mode: "program", key: { name: "k", publicKey: PUB, role: "read-only" } })), "a program that could break out of the quotes is refused in this mode too");
   assertEquals(modesFor([ssh], "read-only"), ["mcp", "run"]);
   assertEquals(modesFor([sshOnlyChange], "read-only"), []);
   assertEquals(modesFor([sshOnlyChange], "full"), ["run"]);

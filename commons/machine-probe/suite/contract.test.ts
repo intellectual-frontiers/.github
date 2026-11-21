@@ -6,11 +6,12 @@
  */
 import * as proc from "@intellectual-frontiers/system/proc";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { encodeRequest, keyLine, parseRequest, PROBE_PATH, sshArgv, type ProbeTarget } from "../src/governance/mod.ts";
-import { posixScriptPath, probeScript } from "../src/physical/mod.ts";
+import { target } from "@intellectual-frontiers/headless/logical";
+import { sshExecutor } from "@intellectual-frontiers/headless/targets/ssh";
+import { encodeRequest, parseRequest, PROBE_PATH } from "../src/governance/mod.ts";
+import { posixScriptPath, probeKeyLine, probeScript, sendVia } from "../src/physical/mod.ts";
 
 const KEY = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
-const TARGET: ProbeTarget = { user: "probe", host: "sparta.example", port: 2222, identityFile: "/keys/probe", knownHostsFile: "/repo/known_hosts" };
 
 proves(["0002-machine-probe-contract FR-001"], "only facts, version and one osquery SELECT are accepted, every other request is refused with its reason, and an encoded request is read back", () => {
   assertEquals(parseRequest("facts"), { kind: "ok", value: { kind: "facts" } });
@@ -27,28 +28,32 @@ proves(["0002-machine-probe-contract FR-001"], "only facts, version and one osqu
   assert(unknown.kind === "err" && unknown.error.includes("facts, version, osquery"));
 });
 
-proves(["0002-machine-probe-contract FR-002"], "the key line forces the probe and restricts the key, and a key or a comment that could add an option or a line is refused", () => {
-  const line = keyLine(KEY, "probe@fleet");
-  assert(line.kind === "ok");
-  assertEquals(line.value, `command="${PROBE_PATH}",restrict ${KEY} probe@fleet`);
-  assert(keyLine(`${KEY} ignored comment`, "probe@fleet").kind === "ok", "the comment of the key itself is dropped");
-  for (const bad of ["", "not a key", `${KEY}\nssh-ed25519 AAAA`, "ssh-ed25519", "command=\"x\" ssh-ed25519 AAAAC3Nza"]) assertEquals(keyLine(bad, "probe@fleet").kind, "err", JSON.stringify(bad));
-  for (const bad of ["probe fleet", "a\nb", "x\"y", ""]) assertEquals(keyLine(KEY, bad).kind, "err", JSON.stringify(bad));
+proves(["0002-machine-probe-contract FR-002"], "the key line forces the probe and restricts the key, may be limited to addresses, and a text that is not one public key line is refused", () => {
+  assertEquals(probeKeyLine(`${KEY} probe@fleet`), { kind: "ok", value: `restrict,command="${PROBE_PATH}" ${KEY} probe@fleet` });
+  assertEquals(probeKeyLine(KEY, ["10.0.0.0/8"]), { kind: "ok", value: `restrict,from="10.0.0.0/8",command="${PROBE_PATH}" ${KEY}` });
+  for (const bad of ["", "not a key", `${KEY}\nssh-ed25519 AAAA`, "-----BEGIN OPENSSH PRIVATE KEY-----", "command=\"x\" ssh-ed25519 AAAAC3Nza"]) assertEquals(probeKeyLine(bad).kind, "err", JSON.stringify(bad));
+  assertEquals(probeKeyLine(KEY, ['a",command="x']).kind, "err", "an address pattern that is not one");
 });
 
-proves(["0002-machine-probe-contract FR-003"], "the ssh command line uses the key alone, checks the host key against the file given, asks for no terminal or forwarding or password, and ends with the request", () => {
-  const argv = sshArgv(TARGET, { kind: "facts" });
-  assert(argv.kind === "ok");
-  const a = argv.value;
-  for (const o of ["-T", "-a", "-x", "BatchMode=yes", "IdentitiesOnly=yes", "StrictHostKeyChecking=yes", "UserKnownHostsFile=/repo/known_hosts", "PasswordAuthentication=no"]) assert(a.includes(o), `has ${o}`);
-  assertEquals(a.slice(a.indexOf("-i"), a.indexOf("-i") + 2), ["-i", "/keys/probe"]);
-  assertEquals(a.slice(-2), ["probe@sparta.example", "facts"]);
-  assert(!a.includes("StrictHostKeyChecking=no") && !a.includes("-A"));
-  assertEquals(a.slice(a.indexOf("-p"), a.indexOf("-p") + 2), ["-p", "2222"]);
-  const { port: _port, ...noPort } = TARGET;
-  assert(!sshArgv(noPort, { kind: "version" }).kind.includes("err") && !(sshArgv(noPort, { kind: "version" }) as { value: readonly string[] }).value.includes("-p"), "no port, no -p");
-  assertEquals(sshArgv({ ...TARGET, host: "fe80::1" }, { kind: "facts" }).kind, "ok", "an address of IPv6");
-  for (const bad of [{ user: "a b" }, { host: "x;y" }, { port: 0 }, { port: 70000 }, { user: "-oProxyCommand" }, { user: "-v" }, { host: "-oProxyCommand" }]) assertEquals(sshArgv({ ...TARGET, ...bad }, { kind: "facts" }).kind, "err", JSON.stringify(bad));
+proves(["0002-machine-probe-contract FR-003"], "a request is sent as the last argument of the ssh target's batch call that checks the host key against the repository's file, and a request that is not one of the three is not sent", async () => {
+  const t = target({ id: "sparta", class: "server", address: "sparta.example", user: "probe", port: 2222, credential: "probe" });
+  assert(t.kind === "ok");
+  const calls: string[][] = [];
+  const run = async (argv: readonly string[]) => (calls.push([...argv]), { code: 0, success: true, signal: null, stdout: new TextEncoder().encode("1\n"), stderr: new Uint8Array() });
+  const ex = sshExecutor(t.value, [t.value], { knownHostsRepository: "/repo/known_hosts", knownHostsUser: "/home/a/.ssh/known_hosts", identityFor: () => "/keys/probe" }, run);
+  const send = sendVia(ex);
+  assertEquals((await send("version")).stdout, "1\n");
+  const a = calls[0] ?? [];
+  for (const o of ["-T", "BatchMode=yes", "IdentitiesOnly=yes", "StrictHostKeyChecking=yes", "UserKnownHostsFile=/repo/known_hosts /home/a/.ssh/known_hosts", "PasswordAuthentication=no"]) assert(a.includes(o), `has ${o}`);
+  assert(!a.includes("StrictHostKeyChecking=no"));
+  assertEquals(a.slice(-2), ["probe@sparta.example", "version"]);
+  await send(encodeRequest({ kind: "osquery", sql: "SELECT 1" }));
+  assertEquals(calls[1]?.at(-1), `osquery ${btoa("SELECT 1")}`);
+  for (const bad of ["id", "facts; id", "osquery !!!"]) {
+    const r = await send(bad);
+    assertEquals(r.code, 2, JSON.stringify(bad));
+  }
+  assertEquals(calls.length, 2, "nothing else was sent");
 });
 
 const sh = async (request: string, env: Record<string, string> = {}) => {

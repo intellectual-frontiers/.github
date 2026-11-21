@@ -4,5 +4,6 @@
  *
  * @module
  */
+export * from "./key.ts";
 export * from "./run.ts";
 export * from "./scripts.ts";

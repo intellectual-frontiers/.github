@@ -5,20 +5,20 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** What a probe on a machine answers and how it is reached: three read-only requests, the line of `authorized_keys` that restricts a key to the probe, the command line of the ssh client that asks it, and the two scripts (POSIX shell and PowerShell). It is the contract of an adopted machine as Stolos defined it (067-adopt): observed over ssh with a key that may run one read-only script and nothing else, and never changed.
+**Input:** What a probe on a machine answers and how it is reached: three read-only requests, the line of `authorized_keys` that restricts a key to the probe (made by the inbound surface of Headless), asking it through an executor of Headless (the ssh target, a container or this machine), and the two scripts (POSIX shell and PowerShell). It is the contract of an adopted machine as Stolos defined it (067-adopt): observed over ssh with a key that may run one read-only script and nothing else, and never changed.
 
 ## Requirements
 
 - **FR-001**: `parseRequest` MUST accept only `facts`, `version` and `osquery <base64>` of one SELECT (or a WITH that ends in one), MUST refuse any other text, a query that is not base64, one that is not a SELECT and one with a second statement, each with its reason, and `encodeRequest` MUST give back the text `parseRequest` reads.
-- **FR-002**: `keyLine` MUST give the line of `authorized_keys` that forces the probe program for the key and sets `restrict` (no terminal, no forwarding, no other service), and MUST refuse a public key that is not one line of a key type and its base64 and a comment that could add an option or a second line.
-- **FR-003**: `sshArgv` MUST give the argument vector of the ssh client for one request that uses only the key given (no agent), verifies the host key against the file of known hosts given and never accepts it for the person, asks for no terminal, forwards nothing, never asks for a password, and has the request as its last single argument; it MUST refuse an account, a host or a port that is not well formed.
+- **FR-002**: `probeKeyLine` MUST give, through the inbound surface of Headless, the line of `authorized_keys` that forces the probe program for the key and sets `restrict` (no terminal, no forwarding, no other service), with the addresses the key may come from where they are given, and MUST refuse a text that is not one public key line (a private key in particular).
+- **FR-003**: `sendVia` MUST send a request as the command of an executor of Headless, so that the ssh target's rules apply (a batch call with no terminal, the key given alone, the host key checked against the repository's known hosts and never accepted for the person), the request MUST be the last argument, and a request that is not one of the three MUST NOT be sent.
 - **FR-004**: The POSIX script MUST answer `facts` and `version`, MUST refuse every other request with status 2 and nothing on its standard output (a second command after `facts` included), MUST answer an osquery request with status 3 where osquery is not installed, and MUST read only; the PowerShell script MUST name the same three requests and the same refusals.
 
 ## Acceptance scenarios
 
 1. **Given** a request that is `id`, **When** it is parsed, **Then** it is refused with the three requests named, per FR-001.
-2. **Given** a public key and a comment, **When** the key line is made, **Then** it forces the probe and restricts the key, and a comment with a space is refused, per FR-002.
-3. **Given** a target, **When** the command line is made, **Then** it checks the host key against the file given and has the request last, per FR-003.
+2. **Given** a public key, **When** the key line is made, **Then** it forces the probe and restricts the key, and a private key is refused, per FR-002.
+3. **Given** an ssh target, **When** a request is sent through it, **Then** the call is a batch call that checks the host key against the repository's file and has the request last, and `id` is not sent, per FR-003.
 4. **Given** the POSIX script, **When** it is run with `facts; id`, **Then** it ends with 2 and prints nothing, per FR-004.
 
 ## Out of scope
@@ -29,7 +29,7 @@
 ## Edge cases
 
 - A trailing semicolon or space on a query is accepted and dropped, per FR-001.
-- A host that is an IPv6 address is accepted, per FR-003.
+- A key line may be limited to addresses, per FR-002.
 
 ## Assumptions
 

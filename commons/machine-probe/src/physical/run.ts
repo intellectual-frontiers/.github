@@ -13,9 +13,9 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import { encodeRequest, parseRequest, sshArgv, type ProbeRequest, type ProbeTarget } from "@intellectual-frontiers/machine-probe/governance";
+import type { Executor } from "@intellectual-frontiers/headless/logical";
+import { encodeRequest, parseRequest, type ProbeRequest } from "@intellectual-frontiers/machine-probe/governance";
 import { parseProbe, toObserved, type Observed } from "@intellectual-frontiers/machine-probe/logical";
-import * as proc from "@intellectual-frontiers/system/proc";
 
 /** What running a command gave. */
 export type Ran = { readonly code: number; readonly stdout: string; readonly stderr: string };
@@ -65,14 +65,13 @@ export async function query(send: Send, sql: string): Promise<Result<readonly Ro
   }
 }
 
-/** A way of sending requests to a machine through the system's ssh client, with the key restricted to the probe and the host key checked against the file given. */
-export function sshSend(target: ProbeTarget): Send {
+/** A way of sending requests through an executor of Headless: the ssh target (its host key checked against the repository's known hosts), a container or this machine. The request is the command, as the probe's forced command reads it. */
+export function sendVia(executor: Executor): Send {
   return async (request) => {
     const parsed = parseRequest(request);
     if (parsed.kind === "err") return { code: 2, stdout: "", stderr: parsed.error };
-    const argv = sshArgv(target, parsed.value);
-    if (argv.kind === "err") return { code: 2, stdout: "", stderr: argv.error };
-    const r = await proc.run(argv.value);
-    return { code: r.code, stdout: r.stdout, stderr: r.stderr };
+    const out = await executor.exec(encodeRequest(parsed.value).split(" "));
+    const text = new TextDecoder();
+    return { code: out.code, stdout: text.decode(out.stdout), stderr: text.decode(out.stderr) };
   };
 }
