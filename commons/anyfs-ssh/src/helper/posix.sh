@@ -65,7 +65,8 @@ if [ "$cmd" = probe ]; then
   if [ "$create" = create ]; then mkdir -p -- "$root" 2>/dev/null || exit 22; fi
 fi
 RR=$(cd -- "$root" 2>/dev/null && pwd -P) || exit 22
-lockdir=$RR/.anyfs-locks
+# a store at the root of the host's file system keeps its locks in the account's state folder, since a folder made at the root is not the account's to make
+if [ "$RR" = / ]; then lockdir=${HOME:-/tmp}/.local/state/anyfs/locks-root; else lockdir=$RR/.anyfs-locks; fi
 nl='
 '
 
@@ -93,6 +94,7 @@ confine() {
     [ -n "$_parent" ] || _parent=/
     _real=$(cd -- "$_parent" 2>/dev/null && pwd -P) || return 1
   fi
+  if [ "$RR" = / ]; then return 0; fi
   case $_real in "$RR"|"$RR"/*) return 0 ;; esac
   return 1
 }
