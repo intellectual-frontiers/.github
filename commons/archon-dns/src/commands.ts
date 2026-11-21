@@ -30,7 +30,7 @@ export function dnsCommands(config: DnsPluginConfig): readonly Node[] {
     summary: "Read a zone and say what the records the fleet wants would change in it, with the hash of the plan to approve. It changes nothing.",
     options: { zone, ...fleet },
     examples: [{ args: ["--zone", "example.org"], says: "Plan the zone example.org." }],
-    action: { kind: "report", reach: defineReach({ channels: ["local"], readOnly: true, idempotent: true }) },
+    action: { kind: "report", reach: defineReach({ channels: ["local", "ssh", "mcp"], readOnly: true, idempotent: true }) },
     run: async (args) => {
       const o = args.options as Readonly<Record<string, unknown>>;
       const name = String(o["zone"]);

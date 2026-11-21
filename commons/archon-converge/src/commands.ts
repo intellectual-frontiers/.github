@@ -29,7 +29,7 @@ export function convergeCommands(config: ConvergePluginConfig): readonly Node[] 
     summary: "Observe a managed machine (reading only) and say what the requirements would change, with the hash of the plan to approve. It changes nothing.",
     options: { asset, ...fleet },
     examples: [{ args: ["--asset", "athens"], says: "Plan athens." }],
-    action: { kind: "report", reach: defineReach({ channels: ["local"], readOnly: true, idempotent: true }) },
+    action: { kind: "report", reach: defineReach({ channels: ["local", "ssh", "mcp"], readOnly: true, idempotent: true }) },
     run: async (args) => {
       const o = args.options as Readonly<Record<string, unknown>>;
       const name = String(o["asset"]);
