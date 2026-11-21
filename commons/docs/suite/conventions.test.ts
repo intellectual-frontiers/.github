@@ -139,5 +139,7 @@ proves(["0011-documentation FR-004"], "commons keeps no README", () => {
     });
   // a library's own README is the page its package shows (commons/<library>/README.md); no other folder keeps one
   const own = (r: string): boolean => /^commons\/[a-z-]+\/README\.md$/.test(r) && fs.existsSync(path.join(ROOT, r.replace(/README\.md$/, "package.json")));
-  assertEquals(readmes("commons").filter((r) => !r.includes("/tree/") && !r.includes("/fixtures/") && !own(r)), []);
+  // and the walk-through of an acceptance kit (0027-commons-libraries FR-025): commons/<library>/<acceptance|oat|uat|aat>/[<kit>/]README.md
+  const kit = (r: string): boolean => /^commons\/[a-z-]+\/(acceptance|oat|uat|aat)\/([a-z0-9-]+\/)?README\.md$/.test(r);
+  assertEquals(readmes("commons").filter((r) => !r.includes("/tree/") && !r.includes("/fixtures/") && !own(r) && !kit(r)), []);
 });

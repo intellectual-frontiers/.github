@@ -6,7 +6,6 @@
  *
  * @module
  */
-import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { assert, proves } from "@intellectual-frontiers/test";
@@ -17,7 +16,7 @@ const DATA = join(dirname(fileURLToPath(import.meta.url)), "..");
 const KEY = "uat-seal-key-0123456789abcdef";
 const env = { ARCA_SEAL_KEY: KEY, ARCA_UNLOCK_SECRET: "unlock" };
 const io = (over: Partial<Io> = {}): Io => ({ env, cwd: DATA, ...over });
-const sql = (...flags: string[]) => projectCommandOf("sql", ["--module", "uat/models/crm.ts", ...flags], io());
+const sql = (...flags: string[]) => projectCommandOf("sql", ["--module", "suite/arcactl-access-model.ts", ...flags], io());
 
 proves(["0051-project-cli FR-006"], "sql writes the grants and policies, the protected layer, the reach and the seal that its flags ask for, and refuses a seal with no key, a key given as an argument, a reach with no access, and a dialect that has no row security", async () => {
   const plain = await sql("--schema", "data");
@@ -29,9 +28,9 @@ proves(["0051-project-cli FR-006"], "sql writes the grants and policies, the pro
   assert(full.out.includes("ifc_seal.scope('tenant')") && full.out.includes("string_to_array") && full.out.includes("= '*'") && full.out.includes('OWNER TO "crm_owner"'), "seal, reach and wildcard, owned by the role");
   assert(full.out.includes(KEY), "the key is in the statements, since the database holds it; that is why they are piped and not stored");
   assert(!full.err.includes(KEY), "and never in what is said about them");
-  const noKey = await projectCommandOf("sql", ["--module", "uat/models/crm.ts", "--seal"], { cwd: DATA, env: {} });
+  const noKey = await projectCommandOf("sql", ["--module", "suite/arcactl-access-model.ts", "--seal"], { cwd: DATA, env: {} });
   assert(noKey.code === 2 && noKey.err.includes("ARCA_SEAL_KEY"), "no key: refused");
-  const short = await projectCommandOf("sql", ["--module", "uat/models/crm.ts", "--seal"], { cwd: DATA, env: { ARCA_SEAL_KEY: "short" } });
+  const short = await projectCommandOf("sql", ["--module", "suite/arcactl-access-model.ts", "--seal"], { cwd: DATA, env: { ARCA_SEAL_KEY: "short" } });
   assert(short.code === 2 && short.err.includes("16"), "a short key: refused");
   for (const bad of [["--reach", "set"], ["--wildcard"], ["--access", "--reach", "everything"], ["--access", "--wildcard"], ["--protect", "Not A Role"], ["--access", "--dialect", "sqlite"]]) {
     const r = await sql(...bad);
@@ -74,10 +73,10 @@ proves(["0046-arcactl FR-013"], "doctor holds a project's own module as it holds
   const made = await sql("--schema", "data", "--protect", "crm_owner", "--seal", "--reach", "set", "--wildcard");
   const e = await openEngine("postgres");
   try {
-    await e.run(readFileSync(join(DATA, "uat/sql/roles.sql"), "utf8").replace(":'uat_password'", "'p'"));
+    await e.run("CREATE ROLE crm_owner; CREATE ROLE crm_reader; CREATE ROLE crm_writer; CREATE ROLE crm_support;");
     await e.run(made.out);
     const connect: Io["connect"] = async () => ({ kind: "custom", driver: { exec: (q) => e.run(q), query: (q) => e.rows(q) }, close: async () => {} });
-    const check = (...extra: string[]) => main(["doctor", "--module", "uat/models/crm.ts", "--schema", "data", "--seal", ...extra], io({ connect }));
+    const check = (...extra: string[]) => main(["doctor", "--module", "suite/arcactl-access-model.ts", "--schema", "data", "--seal", ...extra], io({ connect }));
     const sound = await check();
     assert(sound.out.includes("PASS  ARCA-D002") && sound.out.includes("all 17 tables of the project's models") && sound.out.includes("PASS  ARCA-D003") && sound.out.includes("PASS  ARCA-D007") && sound.out.includes("4 scoped tables"), sound.out);
     assert(!sound.out.includes("FAIL"), "nothing fails");
@@ -86,7 +85,7 @@ proves(["0046-arcactl FR-013"], "doctor holds a project's own module as it holds
     await e.run(`ALTER TABLE "data"."contact" NO FORCE ROW LEVEL SECURITY`);
     const broken = await check();
     assert(broken.code === 1 && broken.out.includes("FAIL  ARCA-D007") && broken.out.includes("row security is not forced on contact"), broken.out);
-    const both = await main(["doctor", "--module", "uat/models/crm.ts", "--models", "identityAgent"], io({ connect }));
+    const both = await main(["doctor", "--module", "suite/arcactl-access-model.ts", "--models", "identityAgent"], io({ connect }));
     assert(both.code === 2 && both.err.includes("not both"), "a module and models: refused");
   } finally {
     await e.close();
@@ -96,12 +95,12 @@ proves(["0046-arcactl FR-013"], "doctor holds a project's own module as it holds
 proves(["0051-project-cli FR-004"], "a generator is named by its id or by the short name the usage gives, for a module of the project's own", async () => {
   const names = ["dictionary", "mermaid", "d2", "rust", "zod", "register", "html"];
   for (const n of names) {
-    const short = await projectCommandOf("generate", [n, "--module", "uat/models/crm.ts"], io());
-    const id = await projectCommandOf("generate", [`sql.generate.${n === "mermaid" ? "erd-mermaid" : n === "d2" ? "erd-d2" : n}`, "--module", "uat/models/crm.ts"], io());
+    const short = await projectCommandOf("generate", [n, "--module", "suite/arcactl-access-model.ts"], io());
+    const id = await projectCommandOf("generate", [`sql.generate.${n === "mermaid" ? "erd-mermaid" : n === "d2" ? "erd-d2" : n}`, "--module", "suite/arcactl-access-model.ts"], io());
     assert(short.code === 0 && short.out.length > 0 && short.out === id.out, `${n}: the short name and the id say the same`);
   }
-  const dictionary = await projectCommandOf("generate", ["dictionary", "--module", "uat/models/crm.ts"], io());
+  const dictionary = await projectCommandOf("generate", ["dictionary", "--module", "suite/arcactl-access-model.ts"], io());
   assert(dictionary.out.includes("customer_account") && dictionary.out.includes("tenant_id"), "the project's own tables");
-  const none = await projectCommandOf("generate", ["nothing", "--module", "uat/models/crm.ts"], io());
+  const none = await projectCommandOf("generate", ["nothing", "--module", "suite/arcactl-access-model.ts"], io());
   assert(none.code === 2 && none.err.includes("generate what"), "a name that is not one");
 });

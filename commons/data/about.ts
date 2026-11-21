@@ -43,8 +43,8 @@ export const about: About = {
       mayImport: ["governance/, engine/, by package name"],
     },
     {
-      path: "uat/",
-      what: "The UAT kit (0071-uat-kit): a walk-through, with scripts, an example business-to-business application with tenants and roles, a seed and the row-security scenarios, to test the library by hand on a PostgreSQL that the person already has. Not packed.",
+      path: "acceptance/",
+      what: "The acceptance kits (acceptance/README.md): testing by people or agents, for the experience beyond the code, with their own specifications (acceptance/spec-kit), made-up data and checks, and run apart from the library's tests by `bun run acceptance`. The first is `arcactl-pg`, a UAT of arcactl and row-level security on PostgreSQL. Not packed.",
       mayImport: ["governance/, sql/, models/, by package name"],
     },
     { path: "suite/", what: "The tests.", mayImport: ["anything here"] },
