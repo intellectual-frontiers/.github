@@ -90,6 +90,8 @@ export function judgeRange(commits: readonly Commit[], policy: Policy): Judgemen
     const hits = policy.controlled.filter((rule) => c.files.some((f) => matches(rule.path, f)));
     if (hits.length === 0) return { sha: c.sha, subject: c.subject, state: "accepted", signer: c.signer, reasons: [], controlled: [], approvedBy: undefined };
     const need = [...new Set(hits.flatMap((h) => h.approvers))];
+    const controlled0 = [...new Set(c.files.filter((f) => hits.some((h) => matches(h.path, f))))];
+    if (need.includes(roleOf.get(c.signer) ?? "")) return { sha: c.sha, subject: c.subject, state: "accepted", signer: c.signer, reasons: [], controlled: controlled0, approvedBy: c.signer };
     const approver = commits.slice(i + 1).find((later) => later.signature === "G" && roleOf.has(later.signer) && later.signer !== c.signer && need.includes(roleOf.get(later.signer) ?? "") && [...later.body.matchAll(APPROVES)].some((m) => c.sha.startsWith(m[1] ?? "~")));
     const controlled = [...new Set(c.files.filter((f) => hits.some((h) => matches(h.path, f))))];
     if (approver !== undefined) return { sha: c.sha, subject: c.subject, state: "accepted", signer: c.signer, reasons: [], controlled, approvedBy: approver.signer };

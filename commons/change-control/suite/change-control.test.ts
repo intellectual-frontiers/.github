@@ -45,13 +45,14 @@ proves(["0002-change-control-policy FR-003", "0002-change-control-policy FR-004"
   assertEquals(approved.verdicts[0]?.approvedBy, "recovery");
   assertEquals(approved.ok, true);
   for (const [name, range] of [
-    ["by the same signer", [commit(a, "G", "recovery", ["fleets/fcr/signers.ts"]), commit(b, "G", "recovery", ["x"], `Approves: ${a.slice(0, 12)}`)]],
-    ["by a signer of another role", [commit(a, "G", "recovery", ["deploy/x"]), commit(b, "G", "daily", ["x"], `Approves: ${a.slice(0, 12)}`)]],
+    ["by a signer of another role", [commit(a, "G", "daily", ["deploy/x"]), commit(b, "G", "daily", ["x"], `Approves: ${a.slice(0, 12)}`)]],
     ["before the commit", [commit(b, "G", "recovery", ["x"], `Approves: ${a.slice(0, 12)}`), commit(a, "G", "daily", ["deploy/x"])]],
     ["that is not signed", [commit(a, "G", "daily", ["deploy/x"]), commit(b, "N", "", ["x"], `Approves: ${a.slice(0, 12)}`)]],
     ["of another commit", [commit(a, "G", "daily", ["deploy/x"]), commit(b, "G", "recovery", ["x"], `Approves: ${f.slice(0, 12)}`)]],
     ["too short", [commit(a, "G", "daily", ["deploy/x"]), commit(b, "G", "recovery", ["x"], "Approves: aaaa")]],
   ] as const) assertEquals(judgeRange(range, policy.value).verdicts.find((v) => v.sha === a)?.state, "blocked", name);
+  const self = judgeRange([commit(a, "G", "recovery", ["fleets/fcr/signers.ts"])], policy.value);
+  assertEquals([self.verdicts[0]?.state, self.verdicts[0]?.approvedBy], ["accepted", "recovery"], "a change by a signer of an approving role is its own approval");
   void c; void d; void e;
 });
 
