@@ -16,7 +16,7 @@ import { diagramSources, drawable } from "./emit/html.ts";
 import { markdownOf } from "./emit/markdown.ts";
 import { readEvidence } from "./evidence.ts";
 import { presentationFiles, writeFiles } from "./presentation.ts";
-import { decorate, qualityData, qualityPages } from "./pages/quality.ts";
+import { decorate, fillFindings, qualityData, qualityPages } from "./pages/quality.ts";
 import { readApi } from "./extract/api.ts";
 import { readSpecKits } from "./extract/specs.ts";
 import type { LensPages, SiteFile } from "./lens.ts";
@@ -271,6 +271,7 @@ export async function buildSite(config: Config): Promise<Built> {
   b.found.push(...brokenLinks(b.pages));
   for (const p of b.pages) for (const src of diagramSources(p.blocks)) if (!drawable(src)) b.found.push({ where: p.path, problem: { kind: "diagram-undrawable", first: src.split("\n")[0] ?? "" } });
   b.found.push(...wordFindings(b.pages, config.retired, config.forbiddenInGuides));
+  fillFindings(b, b.found);
   const lensFiles = config.lenses.flatMap((l) => {
     try {
       return l.files?.(b) ?? [];
