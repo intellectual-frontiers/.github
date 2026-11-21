@@ -1,0 +1,385 @@
+{
+  "kind": "grc.framework",
+  "schema": "1",
+  "id": "soc2-tsc",
+  "createdAt": "2026-11-21T00:00:00Z",
+  "provenance": {
+    "producer": {
+      "name": "catalog-soc2",
+      "version": "1"
+    },
+    "inputs": [
+      "src/governance/criteria.ts"
+    ]
+  },
+  "version": "2017",
+  "title": "SOC 2 Trust Services Criteria (2017, revised points of focus 2022), in our own words",
+  "controls": [
+    {
+      "id": "CC1.1",
+      "title": "Integrity and ethics",
+      "statement": "Leadership sets and shows the values the organization works by, and has a way to see that people follow them.",
+      "family": "CC1"
+    },
+    {
+      "id": "CC1.2",
+      "title": "Independent oversight",
+      "statement": "A governing body that is independent of day-to-day management watches over how internal control is designed and whether it works.",
+      "family": "CC1"
+    },
+    {
+      "id": "CC1.3",
+      "title": "Structure and authority",
+      "statement": "Management has settled who reports to whom, who may decide what, and who answers for which objective, so that security responsibilities have owners.",
+      "family": "CC1"
+    },
+    {
+      "id": "CC1.4",
+      "title": "Competent people",
+      "statement": "The organization hires, trains and keeps people who can do what their roles need, and plans for the skills it will need next.",
+      "family": "CC1"
+    },
+    {
+      "id": "CC1.5",
+      "title": "Accountability",
+      "statement": "People are held to account for their part in internal control, with incentives and consequences that fit the objectives and do not push them to cut corners.",
+      "family": "CC1"
+    },
+    {
+      "id": "CC2.1",
+      "title": "Useful information",
+      "statement": "The organization collects or produces relevant, good-quality information and uses it to run its internal controls.",
+      "family": "CC2"
+    },
+    {
+      "id": "CC2.2",
+      "title": "Internal communication",
+      "statement": "Staff are told what internal control is for and what their own part in it is, through channels that work in both directions, including a way to raise concerns.",
+      "family": "CC2"
+    },
+    {
+      "id": "CC2.3",
+      "title": "External communication",
+      "statement": "The organization tells customers, partners and others outside it what they need to know about its commitments and about matters that bear on internal control, and hears from them.",
+      "family": "CC2"
+    },
+    {
+      "id": "CC3.1",
+      "title": "Clear objectives",
+      "statement": "Objectives are stated clearly enough that the risks to them can be identified and judged.",
+      "family": "CC3"
+    },
+    {
+      "id": "CC3.2",
+      "title": "Risk identification",
+      "statement": "The organization finds the risks to its objectives across the entity and decides how each is to be managed.",
+      "family": "CC3"
+    },
+    {
+      "id": "CC3.3",
+      "title": "Fraud risk",
+      "statement": "When assessing risk the organization considers how fraud, by anyone, could affect its objectives.",
+      "family": "CC3"
+    },
+    {
+      "id": "CC3.4",
+      "title": "Change and risk",
+      "statement": "The organization notices changes that could alter its risks or its internal control, in its environment, its business or its leadership, and assesses them.",
+      "family": "CC3"
+    },
+    {
+      "id": "CC4.1",
+      "title": "Evaluating controls",
+      "statement": "Controls are checked, continuously or at intervals, to learn whether they are present and working.",
+      "family": "CC4"
+    },
+    {
+      "id": "CC4.2",
+      "title": "Reporting deficiencies",
+      "statement": "Weaknesses in control are reported in good time to those who must fix them and to leadership, and followed until they are fixed.",
+      "family": "CC4"
+    },
+    {
+      "id": "CC5.1",
+      "title": "Control activities",
+      "statement": "The organization chooses and builds control activities that bring risks to its objectives down to an acceptable level.",
+      "family": "CC5"
+    },
+    {
+      "id": "CC5.2",
+      "title": "Technology controls",
+      "statement": "The organization chooses and builds general controls over its technology to help meet its objectives.",
+      "family": "CC5"
+    },
+    {
+      "id": "CC5.3",
+      "title": "Policies and procedures",
+      "statement": "Control activities are put into effect through written policies that set expectations and procedures that carry them out.",
+      "family": "CC5"
+    },
+    {
+      "id": "CC6.1",
+      "title": "Logical access protection",
+      "statement": "The systems and information that matter are protected by logical access controls that are designed, put in place and kept up.",
+      "family": "CC6"
+    },
+    {
+      "id": "CC6.2",
+      "title": "Access provisioning",
+      "statement": "Before credentials are issued, users are registered and authorized, and access is removed when it is no longer justified.",
+      "family": "CC6"
+    },
+    {
+      "id": "CC6.3",
+      "title": "Least privilege",
+      "statement": "Access to data and assets is granted, changed and removed according to roles, least privilege and separation of duties.",
+      "family": "CC6"
+    },
+    {
+      "id": "CC6.4",
+      "title": "Physical access",
+      "statement": "Physical access to facilities and protected assets is limited to those authorized, and the limits are enforced.",
+      "family": "CC6"
+    },
+    {
+      "id": "CC6.5",
+      "title": "Retiring assets",
+      "statement": "Assets that hold protected information are made unreadable or physically destroyed before they are discarded or reused.",
+      "family": "CC6"
+    },
+    {
+      "id": "CC6.6",
+      "title": "Outside threats",
+      "statement": "The boundary of the system is protected against threats that come from outside it.",
+      "family": "CC6"
+    },
+    {
+      "id": "CC6.7",
+      "title": "Information in motion",
+      "statement": "The movement, transmission and removal of information is limited to authorized parties, and the information is protected while it moves.",
+      "family": "CC6"
+    },
+    {
+      "id": "CC6.8",
+      "title": "Malicious software",
+      "statement": "The organization prevents or detects software that is unauthorized or harmful, and acts on it.",
+      "family": "CC6"
+    },
+    {
+      "id": "CC7.1",
+      "title": "Detecting weaknesses",
+      "statement": "The organization detects changes to configurations and newly found vulnerabilities that could let a threat succeed.",
+      "family": "CC7"
+    },
+    {
+      "id": "CC7.2",
+      "title": "Monitoring for anomalies",
+      "statement": "Systems and their components are watched for behavior that suggests malicious acts, natural events or mistakes, and what is found is analyzed.",
+      "family": "CC7"
+    },
+    {
+      "id": "CC7.3",
+      "title": "Judging events",
+      "statement": "Security events are assessed to decide whether they have harmed, or could harm, the organization's objectives, which makes them incidents.",
+      "family": "CC7"
+    },
+    {
+      "id": "CC7.4",
+      "title": "Incident response",
+      "statement": "Incidents are handled by a defined program of response: contain, remediate, communicate and learn.",
+      "family": "CC7"
+    },
+    {
+      "id": "CC7.5",
+      "title": "Recovery from incidents",
+      "statement": "The organization restores normal operation after an incident and takes the lessons into its controls.",
+      "family": "CC7"
+    },
+    {
+      "id": "CC8.1",
+      "title": "Change management",
+      "statement": "Changes to infrastructure, data, software and procedures are authorized, designed, developed, tested, approved and put into effect under control.",
+      "family": "CC8"
+    },
+    {
+      "id": "CC9.1",
+      "title": "Business disruption",
+      "statement": "The organization identifies the ways its business could be disrupted and chooses how to reduce the risk, including by insurance.",
+      "family": "CC9"
+    },
+    {
+      "id": "CC9.2",
+      "title": "Vendors and partners",
+      "statement": "The organization assesses and manages the risks that come from its vendors and business partners.",
+      "family": "CC9"
+    },
+    {
+      "id": "A1.1",
+      "title": "Capacity",
+      "statement": "Processing capacity and use of the system are watched, and capacity is adjusted so that availability commitments can be met.",
+      "family": "A1"
+    },
+    {
+      "id": "A1.2",
+      "title": "Protection of availability",
+      "statement": "The organization puts in place the environmental protections, the backups and the recovery infrastructure that availability needs, and looks after them.",
+      "family": "A1"
+    },
+    {
+      "id": "A1.3",
+      "title": "Testing recovery",
+      "statement": "The plans for recovering the system are tested, so that it is known whether recovery meets the commitments.",
+      "family": "A1"
+    },
+    {
+      "id": "C1.1",
+      "title": "Confidential information",
+      "statement": "Information meant to be confidential is identified and kept protected for as long as the commitments require.",
+      "family": "C1"
+    },
+    {
+      "id": "C1.2",
+      "title": "Disposing of confidential information",
+      "statement": "Confidential information is destroyed once it is no longer needed to meet the commitments.",
+      "family": "C1"
+    },
+    {
+      "id": "PI1.1",
+      "title": "Processing specifications",
+      "statement": "The organization states what the system's processing must produce, and the definitions that data must meet, and keeps them current and understood.",
+      "family": "PI1"
+    },
+    {
+      "id": "PI1.2",
+      "title": "Input checks",
+      "statement": "Policies and procedures check that inputs to the system are complete and accurate as the specifications require.",
+      "family": "PI1"
+    },
+    {
+      "id": "PI1.3",
+      "title": "Processing checks",
+      "statement": "Policies and procedures keep processing complete, valid, accurate and timely, and authorized, as the specifications require.",
+      "family": "PI1"
+    },
+    {
+      "id": "PI1.4",
+      "title": "Output checks",
+      "statement": "Policies and procedures deliver system output only to the intended recipients, and complete and accurate, as the specifications require.",
+      "family": "PI1"
+    },
+    {
+      "id": "PI1.5",
+      "title": "Stored data checks",
+      "statement": "Policies and procedures keep stored data complete and accurate for as long as it is held, as the specifications require.",
+      "family": "PI1"
+    },
+    {
+      "id": "P1.1",
+      "title": "Privacy notice",
+      "statement": "People whose personal information is handled are given a notice of the organization's practices, at the time it is first collected and when it changes.",
+      "family": "P1"
+    },
+    {
+      "id": "P2.1",
+      "title": "Choice and consent",
+      "statement": "The organization tells people what choices they have about their personal information and obtains their consent where it is required.",
+      "family": "P2"
+    },
+    {
+      "id": "P3.1",
+      "title": "Limited collection",
+      "statement": "Personal information is collected only as far as the objectives stated in the notice need.",
+      "family": "P3"
+    },
+    {
+      "id": "P3.2",
+      "title": "Explicit consent for sensitive data",
+      "statement": "Where the information is sensitive, explicit consent is obtained and recorded before it is collected.",
+      "family": "P3"
+    },
+    {
+      "id": "P4.1",
+      "title": "Limited use",
+      "statement": "Personal information is used only for the purposes the notice states and the person consented to.",
+      "family": "P4"
+    },
+    {
+      "id": "P4.2",
+      "title": "Retention",
+      "statement": "Personal information is kept only as long as the stated purposes and the law need.",
+      "family": "P4"
+    },
+    {
+      "id": "P4.3",
+      "title": "Disposal of personal information",
+      "statement": "Personal information that is no longer needed is securely disposed of.",
+      "family": "P4"
+    },
+    {
+      "id": "P5.1",
+      "title": "Access by the person",
+      "statement": "People can see the personal information the organization holds about them, subject to stated exceptions.",
+      "family": "P5"
+    },
+    {
+      "id": "P5.2",
+      "title": "Correction",
+      "statement": "People can ask for their personal information to be corrected, and the organization acts on valid requests and tells those concerned.",
+      "family": "P5"
+    },
+    {
+      "id": "P6.1",
+      "title": "Disclosure with consent",
+      "statement": "Personal information goes to third parties only for the purposes stated and with the person's consent.",
+      "family": "P6"
+    },
+    {
+      "id": "P6.2",
+      "title": "Record of authorized disclosures",
+      "statement": "The organization keeps a record of the disclosures of personal information it has authorized.",
+      "family": "P6"
+    },
+    {
+      "id": "P6.3",
+      "title": "Record of unauthorized disclosures",
+      "statement": "The organization keeps a record of unauthorized disclosures and of breaches of personal information.",
+      "family": "P6"
+    },
+    {
+      "id": "P6.4",
+      "title": "Third parties' obligations",
+      "statement": "Agreements require third parties that handle personal information to meet the organization's privacy commitments, and their compliance is checked.",
+      "family": "P6"
+    },
+    {
+      "id": "P6.5",
+      "title": "Third parties report incidents",
+      "statement": "Third parties are bound to tell the organization of breaches and incidents involving personal information so that it can respond.",
+      "family": "P6"
+    },
+    {
+      "id": "P6.6",
+      "title": "Notifying of breaches",
+      "statement": "The organization tells those affected, and others as required, of breaches of personal information.",
+      "family": "P6"
+    },
+    {
+      "id": "P6.7",
+      "title": "Accounting of disclosures",
+      "statement": "On request the organization can tell a person what personal information it holds about them and to whom it has disclosed it.",
+      "family": "P6"
+    },
+    {
+      "id": "P7.1",
+      "title": "Quality of personal information",
+      "statement": "Personal information is kept accurate, complete and relevant for the purposes it is used for.",
+      "family": "P7"
+    },
+    {
+      "id": "P8.1",
+      "title": "Privacy monitoring and enforcement",
+      "statement": "The organization handles privacy inquiries, complaints and disputes, and checks that it complies with its privacy commitments.",
+      "family": "P8"
+    }
+  ]
+}
