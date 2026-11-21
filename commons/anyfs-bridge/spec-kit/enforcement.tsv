@@ -62,3 +62,7 @@ requirement	mechanism	by	note
 0008-bridge-merge-mode FR-003	check	.github: cd commons/anyfs-bridge && bun run verify	suite/merge-mode.test.ts: the requirement
 0008-bridge-merge-mode FR-004	check	.github: cd commons/anyfs-bridge && bun run verify	suite/merge-mode.test.ts: the requirement
 0008-bridge-merge-mode FR-005	check	.github: cd commons/anyfs-bridge && bun run verify	suite/merge-mode.test.ts: the requirement
+0009-bridge-merge-signing FR-001	check	.github: cd commons/anyfs-bridge && bun run verify	suite/signing.test.ts
+0009-bridge-merge-signing FR-002	check	.github: cd commons/anyfs-bridge && bun run verify	suite/signing.test.ts
+0009-bridge-merge-signing FR-003	check	.github: cd commons/anyfs-bridge && bun run verify	suite/signing.test.ts
+0009-bridge-merge-signing FR-004	check	.github: cd commons/anyfs-bridge && bun run verify	suite/signing.test.ts

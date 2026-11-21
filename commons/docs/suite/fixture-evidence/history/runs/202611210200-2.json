@@ -1,0 +1,21 @@
+{
+  "at": "2026-11-21 02:00 UTC",
+  "commit": "bbbb000bbbb000bbbb000bbbb000bbbb000bbbb0000000",
+  "url": "https://github.com/example/fixture/actions/runs/2",
+  "libraries": {
+    "fixture": {
+      "tests": 11,
+      "passed": 10,
+      "failed": 1,
+      "skipped": 0,
+      "durationMs": 2000,
+      "failing": [
+        {
+          "id": "a1",
+          "name": "001-greeting FR-001: A names the person once"
+        }
+      ]
+    }
+  },
+  "missing": []
+}

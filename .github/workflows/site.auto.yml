@@ -59,7 +59,10 @@ jobs:
       issues: read
       actions: read
     steps:
+      # the whole history, for the page of hotspots and owners
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: ./.github/actions/bun
       - name: "TypeScript 7.1 (beta), Shiki, beautiful-mermaid and @types/node, exactly as bun.lock pins them"
         run: bun install --frozen-lockfile

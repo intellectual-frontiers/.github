@@ -33,7 +33,7 @@ import {
 } from "@intellectual-frontiers/anyfs/docs";
 import { parsePrefix, type Prefix } from "@intellectual-frontiers/anyfs/governance";
 import type { Json } from "@intellectual-frontiers/grc/governance";
-import { type Asset, type AssetInput, defineAsset, ORIGINS, STATES } from "@intellectual-frontiers/estate/governance";
+import { type Asset, type AssetInput, type AttributeValue, defineAsset, ORIGINS, STATES } from "@intellectual-frontiers/estate/governance";
 
 /** The schema the manifest of a store says it is kept at, and the one this code reads and writes. */
 export const FLEET_SCHEMA = 1;
@@ -124,26 +124,32 @@ const refused = (path: string, expected: string, problems: readonly string[]): D
 
 // --- the asset -------------------------------------------------------------------------------------------------------------------------------------
 
-const assetFields = object({ id: string, kind: string, state: literal(...STATES), owners: record(string) }, { origin: literal(...ORIGINS) });
+// attributes are optional, so that a document written before they existed still decodes (the schema version stays 1: a field was added, none was changed)
+const attributeValue: Decoder<AttributeValue> = (input, path = "$") => {
+  if (typeof input === "string" || typeof input === "number" || typeof input === "boolean") return ok(input);
+  if (Array.isArray(input) && input.every((x) => typeof x === "string")) return ok(input as readonly string[]);
+  return err(decodeError(path, "a string, a number, a boolean or a list of strings", typeof input));
+};
+const assetFields = object({ id: string, kind: string, state: literal(...STATES), owners: record(string) }, { origin: literal(...ORIGINS), attributes: record(attributeValue) });
 
 const assetDecoder: Decoder<Asset> = (input, path = "$") => {
   const fields = assetFields(input, path);
   if (fields.kind === "err") return fields;
-  const made = defineAsset({ id: fields.value.id, kind: fields.value.kind, state: fields.value.state, owners: fields.value.owners, ...(fields.value.origin === undefined ? {} : { origin: fields.value.origin }) });
+  const made = defineAsset({ id: fields.value.id, kind: fields.value.kind, state: fields.value.state, owners: fields.value.owners, ...(fields.value.origin === undefined ? {} : { origin: fields.value.origin }), ...(fields.value.attributes === undefined ? {} : { attributes: fields.value.attributes }) });
   return made.kind === "ok" ? ok(made.value) : err(refused(path, "an asset the estate accepts", made.error));
 };
 
 function assetEncode(asset: Asset): Result<JsonObject, string> {
   const owners: Record<string, string> = {};
   for (const line of asset.capabilities) if (line.offered) owners[line.capability] = line.owner;
-  return ok({ id: asset.id, kind: asset.kind, state: asset.state, ...(asset.origin === undefined ? {} : { origin: asset.origin }), owners });
+  return ok({ id: asset.id, kind: asset.kind, state: asset.state, ...(asset.origin === undefined ? {} : { origin: asset.origin }), ...(asset.attributes === undefined ? {} : { attributes: asset.attributes as unknown as JsonObject[string] }), owners });
 }
 
 /** The input an asset is made from: the owners of the capabilities it offers. */
 export function inputOf(asset: Asset): AssetInput {
   const owners: Partial<Record<(typeof asset.capabilities)[number]["capability"], string>> = {};
   for (const line of asset.capabilities) if (line.offered) owners[line.capability] = line.owner;
-  return { id: asset.id, kind: asset.kind, state: asset.state, ...(asset.origin === undefined ? {} : { origin: asset.origin }), owners };
+  return { id: asset.id, kind: asset.kind, state: asset.state, ...(asset.origin === undefined ? {} : { origin: asset.origin }), ...(asset.attributes === undefined ? {} : { attributes: asset.attributes }), owners };
 }
 
 /** The codec of an asset document. */

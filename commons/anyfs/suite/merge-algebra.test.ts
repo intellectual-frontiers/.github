@@ -266,9 +266,11 @@ proves(["0007-anyfs-merge-governance FR-005", "0008-anyfs-merge-logical FR-012"]
   assertEquals(refused.state.versions.size, 0);
   const listed = newState(rid(2), { ...defaultConfig(rid(2)), trust: { kind: "allowlist", replicas: new Set([rid(1), rid(2)]) } });
   assertEquals((await applyDelta(listed, w.delta, 1000)).outcome.kind, "applied");
-  const signedOk = newState(rid(2), { ...defaultConfig(rid(2)), trust: { kind: "signed", verify: (_id, sig) => sig === "good" } });
-  assertEquals((await applyDelta(signedOk, w.delta, 1000)).outcome.kind, "refused");
-  assertEquals((await applyDelta(signedOk, { ...w.delta, signature: "bad" }, 1000)).outcome.kind, "refused");
+  const signedOk = newState(rid(2), { ...defaultConfig(rid(2)), trust: { kind: "signed", verify: (_id, sig) => (sig === "good" ? "ok" : "bad-signature") } });
+  const unsigned = await applyDelta(signedOk, w.delta, 1000);
+  assert(unsigned.outcome.kind === "refused" && unsigned.outcome.refusal.kind === "unsigned");
+  const badly = await applyDelta(signedOk, { ...w.delta, signature: "bad" }, 1000);
+  assert(badly.outcome.kind === "refused" && badly.outcome.refusal.kind === "bad-signature");
   assertEquals((await applyDelta(signedOk, { ...w.delta, signature: "good" }, 1000)).outcome.kind, "applied");
   // the signature is not part of the identity
   assertEquals(await deltaId({ ...w.delta, signature: "good" }), await deltaId(w.delta));
@@ -337,7 +339,7 @@ proves(["0008-anyfs-merge-logical FR-015"], "the check of a replica's rows finds
 });
 
 proves(["0007-anyfs-merge-governance FR-005"], "the reasons, outcomes and findings of a merge are closed lists, each with a sentence", () => {
-  assertEquals([...MERGE_REFUSAL_KINDS], ["trust", "future-id", "malformed", "too-large", "bad-sum", "bad-blob", "forged"]);
+  assertEquals([...MERGE_REFUSAL_KINDS], ["trust", "unsigned", "bad-signature", "unknown-key", "future-id", "malformed", "too-large", "bad-sum", "bad-blob", "forged"]);
   assertEquals([...FINDING_KINDS], ["duplicate-id", "duplicate-seq", "bad-sum", "bad-blob", "future-id", "untrusted-replica", "dangling-parent", "missing-blob", "bad-id"]);
   assertStringIncludes(describeMergeRefusal({ kind: "trust", message: "x" }), "trust");
   assertEquals(defaultTrust(rid(1)), { kind: "allowlist", replicas: new Set([rid(1)]) });

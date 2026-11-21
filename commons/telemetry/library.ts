@@ -10,7 +10,7 @@ export const library = {
   level: "L1",
   specKit: "spec-kit",
   verify: "bun run verify",
-  version: "0.2.3",
+  version: "0.2.4",
   distribution: ["github", "npm"],
   exports: [".", "./otel", "./otlp", "./signals", "./render", "./query", "./host/query", "./host", "./host/otel", "./host/console"],
   summary:

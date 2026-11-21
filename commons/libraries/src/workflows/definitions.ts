@@ -362,6 +362,7 @@ const evidence: Workflow = {
         bun(),
         { ...tools(expr("matrix.folder"), "The development tools, from bun.lock (the libraries it imports are linked)"), id: "install", continueOnError: true },
         { ...tools("commons/quality", "The test runner's own packages (commons quality)"), id: "runner", continueOnError: true },
+        { ...tools("commons/docs", "The packages of the tool that keeps the report (commons docs)"), continueOnError: true },
         run('bun commons/docs/tools/evidence.ts --library "${{ matrix.name }}" --out "$RUNNER_TEMP/evidence"', { name: "The tests, kept as a CTRF report", id: "tests", continueOnError: true, shell: "bash" }),
         run(
           lines(
@@ -397,13 +398,16 @@ const evidence: Workflow = {
       ],
     }),
     collect: job({
-      comment: "every report in one artifact, whatever happened to the jobs that made them",
+      comment: "every report in one artifact, whatever happened to the jobs that made them, with the run added to the history that the artifact of the run before carried",
       needs: ["tests", "repository"],
       when: "always()",
       runsOn: "ubuntu-24.04",
       timeoutMinutes: 10,
+      permissions: { contents: "read", actions: "read" },
       steps: [
         checkout(),
+        bun(),
+        { ...tools("commons/docs", "The packages of the tool that keeps the history (commons docs)"), continueOnError: true },
         use(PIN.downloadArtifact, { name: "The reports of the tests", with: { pattern: "evidence-*", path: "_evidence", "merge-multiple": true } }),
         run(
           lines(
@@ -412,6 +416,17 @@ const evidence: Workflow = {
             "ls -l _evidence | head -200",
           ),
           { name: "Which run this is", shell: "bash" },
+        ),
+        run(
+          lines(
+            "# the history travels from one run's artifact to the next: this run adds itself to the one the run before kept (it is cut to the newest 120)",
+            "mkdir -p _history _prev",
+            "gh run download --name evidence --dir _prev || echo 'no earlier evidence: the history begins here'",
+            "if [ -d _prev/history ]; then cp -r _prev/history/. _history/; fi",
+            "bun commons/docs/tools/history.ts --evidence _evidence --history _history || echo 'the history could not be kept'",
+            "mkdir -p _evidence/history && cp -r _history/runs _evidence/history/ 2>/dev/null || true",
+          ),
+          { name: "The run, added to the history", shell: "bash", continueOnError: true, env: { GH_TOKEN: expr("github.token") } },
         ),
         use(PIN.uploadArtifact, { name: "The evidence, kept for the site", with: { name: "evidence", path: "_evidence", "retention-days": 7 } }),
       ],
@@ -461,7 +476,7 @@ const site: Workflow = {
       timeoutMinutes: 20,
       permissions: { contents: "read", issues: "read", actions: "read" },
       steps: [
-        checkout(),
+        checkout({ fetchDepth: 0, comment: "the whole history, for the page of hotspots and owners" }),
         bun(),
         { ...tools("commons/docs", "TypeScript 7.1 (beta), Shiki, beautiful-mermaid and @types/node, exactly as bun.lock pins them"), continueOnError: true },
         run(

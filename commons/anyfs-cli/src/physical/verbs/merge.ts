@@ -35,6 +35,7 @@ import { counted, type Host, problemOf, usage } from "@intellectual-frontiers/an
 import type { Bound } from "../bind.ts";
 import { bindAll, defineVerb } from "./common.ts";
 import { staleOutcome } from "./transfer.ts";
+import { refusalLine, resolveTrust, signersOf, trustOptions } from "./trust.ts";
 
 const dry = (ctx: { readonly mode: string }): boolean => ctx.mode !== "apply";
 
@@ -55,6 +56,7 @@ const merge = (host: Host): Command =>
       maxRows: value({ parse: integerText, valueName: "N", help: "Refuse a plan in which a store would take more than N rows at once." }),
       maxBytes: value({ parse: integerText, valueName: "N", help: "Refuse a plan in which a store would take more than N bytes of blobs at once." }),
       planHash: value({ valueName: "HASH", help: "Apply only the plan with this hash: where the stores changed since it was read, nothing is applied." }),
+      ...trustOptions,
     },
     operands: [{ name: "A", help: "The first store that merges.", arity: "one" }, { name: "B", help: "The second store that merges.", arity: "one" }],
     examples: [
@@ -72,6 +74,11 @@ const merge = (host: Host): Command =>
       if (a.kind === "err") return a.error;
       const b = mergeable(y, "merge");
       if (b.kind === "err") return b.error;
+      const flags = { trust: args.options.trust, roster: args.options.roster, signKey: args.options.signKey, replicas: args.options.replicas };
+      const sideA = await resolveTrust(host, flags, x.trust);
+      if (sideA.kind === "err") return sideA.error;
+      const sideB = await resolveTrust(host, flags, y.trust);
+      if (sideB.kind === "err") return sideB.error;
       const rails = { ...(args.options.maxRows === undefined ? {} : { maxVersions: args.options.maxRows }), ...(args.options.maxBytes === undefined ? {} : { maxBytes: args.options.maxBytes }) };
       const prepared = await planMerge(a.value, b.value, rails);
       if (prepared.kind === "err") return outcomeOf(null, { problems: [problemOf("E-PLAN-REFUSED", describeMergeProblem(prepared.error))] });
@@ -80,10 +87,15 @@ const merge = (host: Host): Command =>
       const text = nothing ? "nothing to do: the two hold the same rows" : [takingText(wa, plan.toA), takingText(wb, plan.toB), `plan ${plan.hash}`].join("\n");
       if (dry(ctx)) return outcomeOf({ plan }, { text, next: nothing ? [] : [`next: anyfs merge ${wa} ${wb} --yes --plan-hash ${plan.hash}`] });
       if (args.options.planHash !== undefined && args.options.planHash !== plan.hash) return staleOutcome(args.options.planHash, plan.hash);
-      const done = await applyMerge(a.value, b.value, prepared.value, { approved: args.options.planHash ?? plan.hash, rails });
+      const done = await applyMerge(a.value, b.value, prepared.value, {
+        approved: args.options.planHash ?? plan.hash,
+        rails,
+        signers: signersOf(sideA.value, sideB.value),
+        trust: { ...(sideA.value.trust === undefined ? {} : { a: sideA.value.trust }), ...(sideB.value.trust === undefined ? {} : { b: sideB.value.trust }) },
+      });
       if (done.kind === "err") return done.error.kind === "stale" ? staleOutcome(done.error.planned, done.error.now) : outcomeOf(null, { problems: [problemOf("E-PLAN-REFUSED", describeMergeProblem(done.error))] });
       const refused = [done.value.toA, done.value.toB].filter((o) => o?.kind === "refused").length;
-      const lines = [`${wa}: ${done.value.toA?.kind ?? "nothing to take"}`, `${wb}: ${done.value.toB?.kind ?? "nothing to take"}`, done.value.vectorsEqual ? "the two hold the same rows now" : "the two do not hold the same rows: one of them refused a delta"];
+      const lines = [refusalLine(wa, done.value.toA), refusalLine(wb, done.value.toB), done.value.vectorsEqual ? "the two hold the same rows now" : "the two do not hold the same rows: one of them refused a delta"];
       const base = outcomeOf({ report: done.value }, { text: lines.join("\n") });
       return refused > 0 ? { ...base, problems: [problemOf("E-MERGE-REFUSED", `${counted(refused, "store")} refused what the other offered: see the lines above`)] } : base;
     },
@@ -111,6 +123,7 @@ const syncMedium = (host: Host): Command =>
     options: {
       replica: value({ valueName: "ID", help: "The identity of the store as a replica (32 hexadecimal digits), which the store does not say of itself." }),
       maxRows: value({ parse: integerText, valueName: "N", help: "Put at most N rows in one delta file." }),
+      ...trustOptions,
     },
     operands: [{ name: "STORE", help: "The store that merges.", arity: "one" }, { name: "MEDIUM", help: "The shared place: any store that reads, writes and lists.", arity: "one" }],
     examples: [
@@ -130,7 +143,13 @@ const syncMedium = (host: Host): Command =>
       const replica = mergeable(s, "sync-medium");
       if (replica.kind === "err") return replica.error;
       if (!(m.store.capabilities.has("read") && m.store.capabilities.has("write") && m.store.capabilities.has("list"))) return outcomeOf(null, { problems: [problemOf("E-PLAN-REFUSED", `${m.text}: the medium ${m.store.id} must read, write and list`)] });
+      const resolved = await resolveTrust(host, { trust: args.options.trust, roster: args.options.roster, signKey: args.options.signKey, replicas: args.options.replicas }, s.trust);
+      if (resolved.kind === "err") return resolved.error;
+      const signer = resolved.value.signers.find((k) => k.replica === self.value);
+      if (resolved.value.signers.length > 0 && signer === undefined) return usage(`--sign-key: none of the keys is of replica ${self.value}, which is the replica of the store`);
       const options = {
+        ...(resolved.value.trust === undefined ? {} : { trust: resolved.value.trust }),
+        ...(signer === undefined ? {} : { signer }),
         self: self.value,
         replica: replica.value,
         medium: m.store as unknown as Medium,

@@ -15,7 +15,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/core";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import { LAYOUT_NAME, MIGRATION_PLAN, type Naming, SCHEMA_VERSION, type SqlPort, type SqlRunner, tableOf } from "@intellectual-frontiers/anyfs-sql/governance";
 import { sqlFor, textOf } from "./sql.ts";
 
@@ -34,16 +34,24 @@ export type MigrateOptions = {
 /** What a migration did: the version the database was at, the version it is at, and whether it has the index of search. */
 export type Migrated = { readonly from: number; readonly version: number; readonly search: boolean };
 
-/** Why a dialect has no layout yet, or nothing where it has one. */
+/** Why a dialect has no layout, or nothing where it has one: SQLite and its drivers, PostgreSQL and DuckDB each have theirs. */
 export function dialectProblem(port: SqlPort): string | undefined {
-  return port.dialect === "sqlite" ? undefined : `the layout of a store that merges is made for SQLite and its drivers: ${port.dialect} has none yet`;
+  return port.dialect === "sqlite" || port.dialect === "postgres" || port.dialect === "duckdb" ? undefined : `the layout of a store that merges has none for the dialect ${String(port.dialect)}`;
 }
 
 async function tableExists(tx: SqlRunner, port: SqlPort, naming: Naming, role: "meta" | "search"): Promise<boolean> {
   const sql = sqlFor(port.dialect, naming);
-  const q = sql.query().text("SELECT name FROM ");
-  if (naming.schema !== undefined) q.name(naming.schema).text(".");
-  q.text("sqlite_master WHERE name = ").param(tableOf(naming, role));
+  if (port.dialect === "sqlite") {
+    const q = sql.query().text("SELECT name FROM ");
+    if (naming.schema !== undefined) q.name(naming.schema).text(".");
+    q.text("sqlite_master WHERE name = ").param(tableOf(naming, role));
+    const st = q.done();
+    return (await tx.query(st.text, st.params)).length > 0;
+  }
+  // PostgreSQL and DuckDB both keep the catalog in `information_schema`, a table of a schema being the one named or the current one
+  const q = sql.query().text("SELECT table_name FROM information_schema.tables WHERE table_name = ").param(tableOf(naming, role)).text(" AND table_schema = ");
+  if (naming.schema !== undefined) q.param(naming.schema);
+  else q.text("current_schema()");
   const st = q.done();
   return (await tx.query(st.text, st.params)).length > 0;
 }
@@ -68,7 +76,9 @@ async function setFact(tx: SqlRunner, port: SqlPort, naming: Naming, key: string
 }
 
 /** The statements of one version of the layout. */
-function statementsOf(version: number, port: SqlPort, naming: Naming): readonly string[] {
+function statementsOf(version: number, port: SqlPort, naming: Naming, schema: string): readonly string[] {
+  if (port.dialect === "postgres") return postgresStatements(version, naming, schema);
+  if (port.dialect === "duckdb") return duckdbStatements(version, naming);
   const sql = sqlFor(port.dialect, naming);
   const n = (role: Parameters<typeof sql.table>[0]): string => sql.table(role);
   const idx = (on: string): string => sql.name(`${naming.prefix}_versions_${on}`);
@@ -119,10 +129,22 @@ function statementsOf(version: number, port: SqlPort, naming: Naming): readonly 
   }
 }
 
-/** The statements that make the index of search in a dialect, or none where the dialect has no index. */
+/** The statements that make the index of search in a dialect, or none where the dialect has no index: FTS5 for SQLite, a `tsvector` with a GIN index for PostgreSQL, nothing for DuckDB (it has no index that keeps itself current). */
 function searchStatements(port: SqlPort, naming: Naming): readonly string[] {
   const sql = sqlFor(port.dialect, naming);
-  return [`CREATE VIRTUAL TABLE IF NOT EXISTS ${sql.table("search")} USING fts5(path UNINDEXED, text)`];
+  switch (port.dialect) {
+    case "sqlite":
+      return [`CREATE VIRTUAL TABLE IF NOT EXISTS ${sql.table("search")} USING fts5(path UNINDEXED, text)`];
+    case "postgres":
+      return [
+        `CREATE TABLE IF NOT EXISTS ${sql.table("search")} (path TEXT COLLATE "C" NOT NULL PRIMARY KEY, text TEXT NOT NULL, tsv tsvector GENERATED ALWAYS AS (to_tsvector('simple', text)) STORED)`,
+        `CREATE INDEX IF NOT EXISTS ${sql.name(`${naming.prefix}_search_tsv`)} ON ${sql.table("search")} USING GIN (tsv)`,
+      ];
+    case "duckdb":
+      return [];
+    default:
+      return absurd(port.dialect);
+  }
 }
 
 /** Whether the database has the table of search. */
@@ -148,7 +170,9 @@ export async function migrate(port: SqlPort, naming: Naming, options: MigrateOpt
   for (const step of plan) {
     if (step.version <= from || step.version > target) continue;
     if (step.destructive && options.destructive !== true) return err(`migration ${step.version} (${step.name}) takes something away: it runs only where the caller says so`);
-    const statements = statementsOf(step.version, port, naming);
+    // a trigger function of PostgreSQL runs with the search path of the session that fires it (a restore sets it empty), so it is given the schema of the tables: the one named or the current one
+    const schema = naming.schema ?? (port.dialect === "postgres" ? textOf((await port.query("SELECT current_schema() AS schema", []))[0]?.["schema"] ?? null) : "main");
+    const statements = statementsOf(step.version, port, naming, schema);
     await port.transaction(async (tx) => {
       for (const s of statements) await tx.exec(s, []);
       if (step.version === first) {
@@ -162,12 +186,95 @@ export async function migrate(port: SqlPort, naming: Naming, options: MigrateOpt
   let search = false;
   if (version >= SCHEMA_VERSION && options.search !== "off") {
     try {
-      for (const s of searchStatements(port, naming)) await port.exec(s, []);
-      search = true;
+      const made = searchStatements(port, naming);
+      if (made.length === 0 && options.search === "require") return err(`the index of search could not be made: ${port.dialect} has no index that keeps itself current`);
+      for (const s of made) await port.exec(s, []);
+      search = made.length > 0;
     } catch (thrown) {
       if (options.search === "require") return err(`the index of search could not be made: ${thrown instanceof Error ? thrown.message : String(thrown)}`);
     }
   }
   if (search) await port.transaction((tx) => setFact(tx, port, naming, "search", "on"));
   return ok({ from, version, search: options.search === "off" ? false : search || (version >= SCHEMA_VERSION && (await hasSearch(port, naming))) });
+}
+
+/** The statements of a version of the layout in PostgreSQL: the same tables with the types of the engine and the byte order of the `C` collation for every key and path (so that the order of a listing is the order of the bytes), the views, and the two triggers as functions. */
+function postgresStatements(version: number, naming: Naming, schema: string): readonly string[] {
+  if (version !== 3) return [];
+  const sql = sqlFor("postgres", naming);
+  const n = (role: Parameters<typeof sql.table>[0]): string => sql.table(role);
+  const idx = (on: string): string => sql.name(`${naming.prefix}_versions_${on}`);
+  const key = 'TEXT COLLATE "C"';
+  const qualify = (name: string): string => (naming.schema === undefined ? sql.name(name) : `${sql.name(naming.schema)}.${sql.name(name)}`);
+  const dead = `${naming.prefix}_versions_dead`;
+  const trust = `${naming.prefix}_versions_trust`;
+  const wherever = "AND strpos(c.merged, '\"' || v.id || '\"') > 0";
+  return [
+    `CREATE TABLE IF NOT EXISTS ${n("meta")} (key TEXT PRIMARY KEY, value TEXT NOT NULL)`,
+    `CREATE TABLE IF NOT EXISTS ${n("versions")} (id ${key} NOT NULL, sum ${key} NOT NULL, replica ${key} NOT NULL, seq BIGINT NOT NULL, path ${key} NOT NULL, parent ${key}, merged TEXT NOT NULL, kind TEXT NOT NULL, blob ${key}, PRIMARY KEY (id, sum))`,
+    `CREATE TABLE IF NOT EXISTS ${n("blobs")} (sha ${key} NOT NULL PRIMARY KEY, bytes BYTEA NOT NULL)`,
+    `CREATE INDEX IF NOT EXISTS ${idx("path")} ON ${n("versions")} (path, id)`,
+    `CREATE INDEX IF NOT EXISTS ${idx("parent")} ON ${n("versions")} (parent) WHERE parent IS NOT NULL`,
+    `CREATE INDEX IF NOT EXISTS ${idx("replica")} ON ${n("versions")} (replica, seq)`,
+    `CREATE INDEX IF NOT EXISTS ${idx("merged")} ON ${n("versions")} (id) WHERE merged <> '[]'`,
+    `CREATE TABLE IF NOT EXISTS ${n("trust")} (replica TEXT PRIMARY KEY)`,
+    `CREATE TABLE IF NOT EXISTS ${n("epochs")} (n BIGINT PRIMARY KEY, horizon TEXT NOT NULL, roster TEXT NOT NULL, retained TEXT NOT NULL, bound TEXT NOT NULL)`,
+    `CREATE TABLE IF NOT EXISTS ${n("cache")} (kind TEXT NOT NULL, key TEXT NOT NULL, value TEXT NOT NULL, PRIMARY KEY (kind, key))`,
+    // the heads: the rows no other row replaced (a parent, or an id in the list of merged ids, which is the JSON text of a list of quoted ids)
+    `CREATE OR REPLACE VIEW ${n("heads")} AS SELECT v.id AS id, v.sum AS sum, v.replica AS replica, v.seq AS seq, v.path AS path, v.parent AS parent, v.merged AS merged, v.kind AS kind, v.blob AS blob FROM ${n("versions")} v ` +
+      `WHERE NOT EXISTS (SELECT 1 FROM ${n("versions")} c WHERE c.parent = v.id) ` +
+      `AND NOT EXISTS (SELECT 1 FROM ${n("versions")} c WHERE c.merged <> '[]' ${wherever})`,
+    `CREATE OR REPLACE VIEW ${n("names")} AS SELECT h.path AS path, h.id AS id, h.sum AS sum, h.blob AS blob, h.replica AS replica FROM ${n("heads")} h ` +
+      `WHERE h.kind = 'put' AND NOT EXISTS (SELECT 1 FROM ${n("heads")} o WHERE o.path = h.path AND (o.id > h.id OR (o.id = h.id AND o.sum > h.sum)))`,
+    `CREATE OR REPLACE VIEW ${n("siblings")} AS SELECT h.id AS id, h.sum AS sum, h.replica AS replica, h.seq AS seq, h.path AS path, h.parent AS parent, h.merged AS merged, h.kind AS kind, h.blob AS blob FROM ${n("heads")} h ` +
+      `WHERE EXISTS (SELECT 1 FROM ${n("heads")} o WHERE o.path = h.path AND (o.id > h.id OR (o.id = h.id AND o.sum > h.sum)))`,
+    `CREATE OR REPLACE VIEW ${n("vector")} AS SELECT v.replica AS replica, MIN(v.seq) AS n FROM ${n("versions")} v ` +
+      `WHERE NOT EXISTS (SELECT 1 FROM ${n("versions")} w WHERE w.replica = v.replica AND w.seq = v.seq + 1) ` +
+      `GROUP BY v.replica HAVING EXISTS (SELECT 1 FROM ${n("versions")} f WHERE f.replica = v.replica AND f.seq = 1)`,
+    // a row an epoch has collected is dead: the trigger gives the row up (returns null) so that an old dump replayed writes nothing, unless the epoch retained it
+    `CREATE OR REPLACE FUNCTION ${qualify(`${dead}_fn`)}() RETURNS trigger LANGUAGE plpgsql SET search_path = ${sql.name(schema)} AS $fn$ BEGIN ` +
+      `IF EXISTS (SELECT 1 FROM ${n("epochs")} e WHERE e.n = (SELECT MAX(n) FROM ${n("epochs")}) ` +
+      `AND NEW.seq <= COALESCE((e.horizon::jsonb ->> NEW.replica)::bigint, 0) ` +
+      `AND NOT jsonb_exists(e.retained::jsonb, NEW.id || '|' || NEW.sum)) THEN RETURN NULL; END IF; RETURN NEW; END $fn$`,
+    `DROP TRIGGER IF EXISTS ${sql.name(dead)} ON ${n("versions")}`,
+    `CREATE TRIGGER ${sql.name(dead)} BEFORE INSERT ON ${n("versions")} FOR EACH ROW EXECUTE FUNCTION ${qualify(`${dead}_fn`)}()`,
+    // a raw import writes no row of a replica this copy does not trust where its trust mode is the allowlist: the hashes are checked by `verify`
+    `CREATE OR REPLACE FUNCTION ${qualify(`${trust}_fn`)}() RETURNS trigger LANGUAGE plpgsql SET search_path = ${sql.name(schema)} AS $fn$ BEGIN ` +
+      `IF (SELECT value FROM ${n("meta")} WHERE key = 'trust_mode') = 'allowlist' AND NOT EXISTS (SELECT 1 FROM ${n("trust")} WHERE replica = NEW.replica) THEN ` +
+      `RAISE EXCEPTION 'the replica of this row is not one this database takes rows from'; END IF; RETURN NEW; END $fn$`,
+    `DROP TRIGGER IF EXISTS ${sql.name(trust)} ON ${n("versions")}`,
+    `CREATE TRIGGER ${sql.name(trust)} BEFORE INSERT ON ${n("versions")} FOR EACH ROW EXECUTE FUNCTION ${qualify(`${trust}_fn`)}()`,
+  ];
+}
+
+/**
+ * The statements of a version of the layout in DuckDB: the same tables with a primary key that the library's own inserts meet with `ON CONFLICT DO NOTHING` (DuckDB has no conflict rule in a table), the views, and no
+ * trigger, since DuckDB has none: the allowlist and the epochs are held by the library's import and by `verify`, and a raw import into a DuckDB database that does not go through the library is held by neither.
+ */
+function duckdbStatements(version: number, naming: Naming): readonly string[] {
+  if (version !== 3) return [];
+  const sql = sqlFor("duckdb", naming);
+  const n = (role: Parameters<typeof sql.table>[0]): string => sql.table(role);
+  const idx = (on: string): string => sql.name(`${naming.prefix}_versions_${on}`);
+  return [
+    `CREATE TABLE IF NOT EXISTS ${n("meta")} (key TEXT PRIMARY KEY, value TEXT NOT NULL)`,
+    `CREATE TABLE IF NOT EXISTS ${n("versions")} (id TEXT NOT NULL, sum TEXT NOT NULL, replica TEXT NOT NULL, seq BIGINT NOT NULL, path TEXT NOT NULL, parent TEXT, merged TEXT NOT NULL, kind TEXT NOT NULL, blob TEXT, PRIMARY KEY (id, sum))`,
+    `CREATE TABLE IF NOT EXISTS ${n("blobs")} (sha TEXT NOT NULL PRIMARY KEY, bytes BLOB NOT NULL)`,
+    `CREATE INDEX IF NOT EXISTS ${idx("path")} ON ${n("versions")} (path, id)`,
+    `CREATE INDEX IF NOT EXISTS ${idx("parent")} ON ${n("versions")} (parent)`,
+    `CREATE INDEX IF NOT EXISTS ${idx("replica")} ON ${n("versions")} (replica, seq)`,
+    `CREATE TABLE IF NOT EXISTS ${n("trust")} (replica TEXT PRIMARY KEY)`,
+    `CREATE TABLE IF NOT EXISTS ${n("epochs")} (n BIGINT PRIMARY KEY, horizon TEXT NOT NULL, roster TEXT NOT NULL, retained TEXT NOT NULL, bound TEXT NOT NULL)`,
+    `CREATE TABLE IF NOT EXISTS ${n("cache")} (kind TEXT NOT NULL, key TEXT NOT NULL, value TEXT NOT NULL, PRIMARY KEY (kind, key))`,
+    `CREATE OR REPLACE VIEW ${n("heads")} AS SELECT v.id AS id, v.sum AS sum, v.replica AS replica, v.seq AS seq, v.path AS path, v.parent AS parent, v.merged AS merged, v.kind AS kind, v.blob AS blob FROM ${n("versions")} v ` +
+      `WHERE NOT EXISTS (SELECT 1 FROM ${n("versions")} c WHERE c.parent = v.id) ` +
+      `AND NOT EXISTS (SELECT 1 FROM ${n("versions")} c WHERE c.merged <> '[]' AND strpos(c.merged, '"' || v.id || '"') > 0)`,
+    `CREATE OR REPLACE VIEW ${n("names")} AS SELECT h.path AS path, h.id AS id, h.sum AS sum, h.blob AS blob, h.replica AS replica FROM ${n("heads")} h ` +
+      `WHERE h.kind = 'put' AND NOT EXISTS (SELECT 1 FROM ${n("heads")} o WHERE o.path = h.path AND (o.id > h.id OR (o.id = h.id AND o.sum > h.sum)))`,
+    `CREATE OR REPLACE VIEW ${n("siblings")} AS SELECT h.id AS id, h.sum AS sum, h.replica AS replica, h.seq AS seq, h.path AS path, h.parent AS parent, h.merged AS merged, h.kind AS kind, h.blob AS blob FROM ${n("heads")} h ` +
+      `WHERE EXISTS (SELECT 1 FROM ${n("heads")} o WHERE o.path = h.path AND (o.id > h.id OR (o.id = h.id AND o.sum > h.sum)))`,
+    `CREATE OR REPLACE VIEW ${n("vector")} AS SELECT v.replica AS replica, MIN(v.seq) AS n FROM ${n("versions")} v ` +
+      `WHERE NOT EXISTS (SELECT 1 FROM ${n("versions")} w WHERE w.replica = v.replica AND w.seq = v.seq + 1) ` +
+      `GROUP BY v.replica HAVING EXISTS (SELECT 1 FROM ${n("versions")} f WHERE f.replica = v.replica AND f.seq = 1)`,
+  ];
 }

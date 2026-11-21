@@ -50,3 +50,8 @@ requirement	mechanism	by	note
 0006-estate-fleet-store FR-011	check	.github: cd commons/estate && bun run verify	suite/fleet-store.test.ts
 0006-estate-fleet-store FR-012	check	.github: cd commons/estate && bun run verify	suite/fleet-store.test.ts
 0003-estate-logical FR-009	check	.github: cd commons/estate && bun run verify	suite/discovery.test.ts
+0007-estate-kinds FR-001	check	.github: cd commons/estate && bun run verify	suite/kinds.test.ts
+0007-estate-kinds FR-002	check	.github: cd commons/estate && bun run verify	suite/kinds.test.ts
+0007-estate-kinds FR-003	check	.github: cd commons/estate && bun run verify	suite/kinds.test.ts
+0007-estate-kinds FR-004	check	.github: cd commons/estate && bun run verify	suite/kinds.test.ts
+0007-estate-kinds FR-005	check	.github: cd commons/estate && bun run verify	suite/kinds.test.ts

@@ -278,9 +278,19 @@ export async function openSqlStore(port: SqlPort, options: SqlOptions = {}): Pro
     await execQ(tx, l.upsertFact("fingerprint", identity.fingerprint));
     await execQ(tx, l.insertTrust(replica));
     if (identity.forkedFrom !== undefined) await execQ(tx, l.insertTrust(identity.forkedFrom));
-    await execQ(tx, l.upsertFact("trust_mode", trust.kind));
-    if (trust.kind === "allowlist") for (const who of trust.replicas) await execQ(tx, l.insertTrust(who));
+    // the mode the database itself enforces on a row it is given by SQL: the allowlist for an allowlist and for signed changes whose replicas are known (the signature is checked by the library, the replica by the database), and nothing for the rest
+    const known = trust.kind === "allowlist" ? trust.replicas : trust.kind === "signed" ? (trust.replicas ?? trust.signers) : undefined;
+    await execQ(tx, l.upsertFact("trust_mode", trust.kind === "open" || known === undefined ? "open" : "allowlist"));
+    if (known !== undefined) for (const who of known) await execQ(tx, l.insertTrust(who));
   });
+
+  /** A transaction that writes: where two connections write side by side the writers take turns, so that the one that wins a path is the one that read it last. */
+  const writing = <T>(work: (tx: SqlRunner) => Promise<T>): Promise<T> =>
+    port.transaction(async (tx) => {
+      const lock = l.lockWriters();
+      if (lock !== undefined) await runQ(tx, lock);
+      return work(tx);
+    });
 
   const ctx: Ctx = { l, replica, config: { maxDrift: options.maxDrift ?? DEFAULT_MAX_DRIFT, limits: options.limits ?? DEFAULT_LIMITS, trust }, searching, searchBytes };
   const place: Place = { kind: "sql", dialect, target: options.target ?? "memory" };
@@ -371,14 +381,14 @@ export async function openSqlStore(port: SqlPort, options: SqlOptions = {}): Pro
         }
         case "write": {
           if (op.bytes.length > maxObject) return err(tooLarge(op.path, op.bytes.length));
-          const done = await port.transaction((tx) => changeIn(tx, op.path, { kind: "put", bytes: op.bytes }, op.expect));
+          const done = await writing((tx) => changeIn(tx, op.path, { kind: "put", bytes: op.bytes }, op.expect));
           if (done.kind === "err") return done;
           if (done.value.sha === undefined) return err(unavailable("a write made no digest", false));
           const value: Written = { rev: revOf(done.value.sha), created: done.value.created };
           return ok({ op: "write", value });
         }
         case "delete": {
-          const done = await port.transaction((tx) => changeIn(tx, op.path, { kind: "remove" }, op.expect));
+          const done = await writing((tx) => changeIn(tx, op.path, { kind: "remove" }, op.expect));
           return done.kind === "err" ? done : ok({ op: "delete", value: { existed: done.value.existed } });
         }
         case "list": {
@@ -399,7 +409,7 @@ export async function openSqlStore(port: SqlPort, options: SqlOptions = {}): Pro
         case "batch": {
           for (const c of op.changes) if (c.kind === "put" && c.bytes.length > maxObject) return err(tooLarge(c.path, c.bytes.length));
           try {
-            const results = await port.transaction(async (tx) => {
+            const results = await writing(async (tx) => {
               const out: ChangeResult[] = [];
               for (const change of op.changes as readonly Change[]) {
                 if (change.kind === "put") {
@@ -424,7 +434,7 @@ export async function openSqlStore(port: SqlPort, options: SqlOptions = {}): Pro
         case "rename": {
           if (op.from === op.to) return err(refused("outside-scope", "a rename to the same path moves nothing", op.from));
           try {
-            const value = await port.transaction(async (tx): Promise<Written> => {
+            const value = await writing(async (tx): Promise<Written> => {
               const state = await stateOf(tx, ctx, [op.from, op.to]);
               const had = headOf(state, op.from);
               if (had === undefined) throw new Abort(missing(op.from));
@@ -466,7 +476,7 @@ export async function openSqlStore(port: SqlPort, options: SqlOptions = {}): Pro
               return ok({ op: "merge", value: { kind: "delta", delta: await deltaOfDatabase(port, ctx, op.action.since) } });
             case "apply": {
               const delta = op.action.delta;
-              const taken = await port.transaction(async (tx) => {
+              const taken = await writing(async (tx) => {
                 const t = await takeDelta(tx, ctx, delta, clock());
                 for (const p of t.paths) await index(tx, p);
                 return t;
@@ -480,7 +490,7 @@ export async function openSqlStore(port: SqlPort, options: SqlOptions = {}): Pro
         case "search": {
           if (!searching) return err(refused("capability-absent", `this ${dialect} store has no index of search`));
           const limit = Math.min(Math.max(1, Math.floor(op.limit ?? PAGE)), MAX_PAGE);
-          const words = ftsQuery(op.text);
+          const words = dialect === "postgres" ? op.text.split(/\s+/u).filter((w) => w !== "").join(" ") : ftsQuery(op.text);
           if (words === "") return ok({ op: "search", value: { hits: [] } });
           const rows = await runQ(port, l.searchWords(op.prefix, words, limit));
           const value: Hits = { hits: rows.map((row) => ({ path: pathOf(textOf(row["path"] ?? null)), rev: revOf(textOf(row["blob"] ?? null)) })) };

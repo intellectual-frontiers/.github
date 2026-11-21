@@ -58,3 +58,4 @@ export async function runConformance(make: () => Promise<Store<CoreCapability>>)
   return reports;
 }
 export { type MakeReplicas, type MergeCase, type MergeCaseReport, type MergeFace, MERGE_CASES, runMergeCase, runMergeConformance } from "./merge.ts";
+export { runSigningConformance, type MakeSigned, type SigningReport } from "./signing.ts";

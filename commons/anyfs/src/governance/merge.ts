@@ -117,17 +117,31 @@ export type Delta = {
   readonly signature?: string;
 };
 
-/** Whom a replica takes changes from: `open` takes any, `allowlist` only the replicas named (the default, and itself alone by default), `signed` only deltas whose signature a verifier accepts. */
+/** What a verifier says of a signature: it holds, it does not hold for the key it names, or no key of that replica is known for it at that time. */
+export const SIGNATURE_VERDICTS = ["ok", "bad-signature", "unknown-key"] as const;
+/** One verdict of a verifier. */
+export type SignatureVerdict = (typeof SIGNATURE_VERDICTS)[number];
+
+/**
+ * Whom a replica takes changes from: `open` takes any, `allowlist` only the replicas named (the default, and itself alone by default), `signed` only deltas whose signature a verifier accepts and, where `replicas` is
+ * given, only from those replicas as well (a replica must be on the list and its signature must hold). `at` is the time of the newest row of the delta in milliseconds, so that a key has a window in which it speaks for a replica.
+ */
 export type Trust =
   | { readonly kind: "open" }
   | { readonly kind: "allowlist"; readonly replicas: ReadonlySet<ReplicaId> }
-  | { readonly kind: "signed"; readonly verify: (id: string, signature: string, origin: ReplicaId) => boolean };
+  | {
+      readonly kind: "signed";
+      readonly replicas?: ReadonlySet<ReplicaId>;
+      /** The replicas whose keys the verifier knows: a database that cannot check a signature itself (a raw SQL import) still refuses rows of any other replica. */
+      readonly signers?: ReadonlySet<ReplicaId>;
+      readonly verify: (id: string, signature: string, origin: ReplicaId, at: number, domain: "anyfs-delta/1" | "anyfs-epoch/1" | "anyfs-dump/1") => SignatureVerdict | Promise<SignatureVerdict>;
+    };
 
 /** The trust a replica has until it is told otherwise: itself alone. */
 export const defaultTrust = (self: ReplicaId): Trust => ({ kind: "allowlist", replicas: new Set([self]) });
 
 /** The reasons a delta is refused: a closed list. */
-export const MERGE_REFUSAL_KINDS = ["trust", "future-id", "malformed", "too-large", "bad-sum", "bad-blob", "forged"] as const;
+export const MERGE_REFUSAL_KINDS = ["trust", "unsigned", "bad-signature", "unknown-key", "future-id", "malformed", "too-large", "bad-sum", "bad-blob", "forged"] as const;
 /** One reason a delta is refused. */
 export type MergeRefusalKind = (typeof MERGE_REFUSAL_KINDS)[number];
 

@@ -14,16 +14,24 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import { type Place, type PlaceKind, parsePlace } from "@intellectual-frontiers/anyfs/governance";
+import { type Place, type PlaceKind, parsePlace, parseReplicaId } from "@intellectual-frontiers/anyfs/governance";
 import type { AnyStore } from "@intellectual-frontiers/anyfs/logical";
 import type { VerifyMode } from "@intellectual-frontiers/anyfs-bridge/logical";
 import { type MountName, parseMountName } from "@intellectual-frontiers/anyfs-cli/governance";
 
+/** Whom a store that merges takes changes from, and how it signs, as a mount says it: the mode, the file or variable (`env:NAME`) that holds the roster of keys, the replicas it takes from where the mode names them, and the files or variables of the keys it signs with (never the keys themselves). */
+export type MountTrustInput = {
+  readonly mode: "open" | "allowlist" | "signed";
+  readonly roster?: string;
+  readonly replicas?: readonly string[];
+  readonly signKeys?: readonly string[];
+};
+
 /** A mount as it is written: its name, its place as text, and whether it may only be read. */
-export type MountInput = { readonly name: string; readonly place: string; readonly readOnly?: boolean; readonly note?: string };
+export type MountInput = { readonly name: string; readonly place: string; readonly readOnly?: boolean; readonly note?: string; readonly trust?: MountTrustInput };
 
 /** A mount, checked. */
-export type Mount = { readonly name: MountName; readonly place: Place; readonly readOnly: boolean; readonly note: string };
+export type Mount = { readonly name: MountName; readonly place: Place; readonly readOnly: boolean; readonly note: string; readonly trust: MountTrustInput | undefined };
 
 /** What a transfer is bounded by where the command line says nothing. */
 export type Defaults = {
@@ -81,6 +89,18 @@ export function defineConfig(input: ConfigInput): ConfigInput {
 /** The configuration of no file: no mount, the default bounds, no opener but the program's own. */
 export const EMPTY_CONFIG: Config = { mounts: [], defaults: DEFAULT_DEFAULTS, kinds: [], ssh: {} };
 
+/** The trust of a mount, checked: a mode that is one of three, replicas that are identities where the mode takes them, a roster where the mode is signed, and keys named by a file or a variable. */
+function checkTrust(mount: string, t: MountTrustInput | undefined, problems: string[]): MountTrustInput | undefined {
+  if (t === undefined) return undefined;
+  const bad = (what: string): void => void problems.push(`${mount}: trust ${what}`);
+  if (t.mode !== "open" && t.mode !== "allowlist" && t.mode !== "signed") bad(`mode is ${String(t.mode)}: open, allowlist or signed`);
+  for (const r of t.replicas ?? []) if (parseReplicaId(r).kind === "err") bad(`replica ${r} is not an identity (32 hexadecimal digits)`);
+  if (t.mode === "allowlist" && (t.replicas ?? []).length === 0) bad("allowlist names the replicas it takes changes from");
+  if (t.mode === "signed" && (t.roster === undefined || t.roster === "")) bad("signed names a roster of keys (a file, or env:NAME)");
+  for (const k of t.signKeys ?? []) if (k === "" || k === "env:") bad("signKeys name a file or env:NAME each");
+  return t;
+}
+
 /** Checks a configuration, and gives every problem found. */
 export function parseConfig(input: ConfigInput): Result<Config, readonly string[]> {
   const problems: string[] = [];
@@ -102,7 +122,8 @@ export function parseConfig(input: ConfigInput): Result<Config, readonly string[
       problems.push(`${name.value}: ${place.error}`);
       continue;
     }
-    mounts.push({ name: name.value, place: place.value, readOnly: m.readOnly === true, note: m.note ?? "" });
+    const trust = checkTrust(name.value, m.trust, problems);
+    mounts.push({ name: name.value, place: place.value, readOnly: m.readOnly === true, note: m.note ?? "", trust });
   }
   const d = input.defaults ?? {};
   const concurrency = d.concurrency ?? DEFAULT_DEFAULTS.concurrency;

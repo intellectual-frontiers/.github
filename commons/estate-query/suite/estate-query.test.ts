@@ -142,3 +142,37 @@ proves(["0002-estate-query-relations FR-006"], "the estate of a snapshot of a fl
   assertEquals(rows("select asset, currency from truth", [], data), [["athens", "fresh"]]);
   assertEquals(rows("select count(*) from truth", [], fromSnapshot(snapshot, NOW)), [[0]], "no truth where nothing was assessed");
 });
+
+function typed(id: string, kind: string, attributes: Record<string, string | number | boolean | readonly string[]>): Asset {
+  const r = defineAsset({ id, kind, state: "discovered", owners: {}, attributes });
+  if (r.kind === "err") throw new Error(r.error.join("; "));
+  return r.value;
+}
+
+proves(["0002-estate-query-relations FR-007"], "attribute, endpoint, link and service give the typed assets, the links and the services catalog, and a question joins an endpoint to its service and to what exposes it", () => {
+  const data: EstateData = {
+    assets: [
+      asset("athens", "managed"),
+      typed("portal", "application", { tier: "web", handles: ["cui", "fci"] }),
+      typed("portal-https", "endpoint", { scheme: "https", host: "portal.example.test", exposure: "internet", authentication: "oauth" }),
+      typed("db-direct", "endpoint", { scheme: "tcp", host: "10.0.0.5", service: "postgres", exposure: "internet", authentication: "unknown" }),
+      typed("legacy-web", "endpoint", { scheme: "http", host: "old.example.test", port: 8080, exposure: "internet" }),
+      typed("ftp-box", "endpoint", { scheme: "tcp", host: "10.0.0.9", service: "ftp", exposure: "partner" }),
+    ],
+    links: [{ from: "athens", to: "portal-https", kind: "exposes" }, { from: "athens", to: "db-direct", kind: "exposes" }, { from: "portal", to: "athens", kind: "runs-on" }],
+    now: NOW,
+  };
+  assertEquals(rows("select asset, name, value from attribute where asset = 'portal' order by value", [], data), [["portal", "handles", "cui"], ["portal", "handles", "fci"], ["portal", "tier", "web"]]);
+  assertEquals(rows("select asset, scheme, port, class, cleartext from endpoint order by asset", [], data), [
+    ["db-direct", "tcp", 5432, "data", false],
+    ["ftp-box", "tcp", 21, "file", true],
+    ["legacy-web", "http", 8080, "", true],
+    ["portal-https", "https", 443, "", false],
+  ]);
+  assertEquals(rows("select kind, count(*) from link group by kind order by kind", [], data), [["exposes", 2], ["runs-on", 1]]);
+  assertEquals(rows("select name from service where port = 22 order by name", [], data), [["sftp"], ["ssh"]]);
+  // what a pen test scope or a passive check asks: the endpoints open to the internet that carry data or speak in the clear, and what exposes them
+  const exposed = rows("select e.asset, l.from_asset from endpoint e left join link l on l.to_asset = e.asset and l.kind = 'exposes' where e.exposure = 'internet' and (e.class = 'data' or e.cleartext) order by e.asset", [], data);
+  assertEquals(exposed, [["db-direct", "athens"], ["legacy-web", null]]);
+  assertEquals(rows("select count(*) from endpoint", [], { assets: [], now: NOW }), [[0]]);
+});

@@ -11,7 +11,7 @@
  * @module
  */
 import { findSecretLike, type JsonValue } from "@intellectual-frontiers/archon/governance";
-import { installOf, type Asset } from "@intellectual-frontiers/estate/governance";
+import { installOf, serviceByName, SERVICES, type Asset } from "@intellectual-frontiers/estate/governance";
 import { judgePolicy, type AcceptedRisk, type Observation, type PolicyOutcome, type Truth, type Violation } from "@intellectual-frontiers/estate/logical";
 import type { Table, Value } from "@intellectual-frontiers/lang-sql/aide/relational";
 import { RELATIONS } from "@intellectual-frontiers/estate-query/governance";
@@ -35,6 +35,8 @@ export type EstateData = {
   readonly changes?: readonly { readonly commit: string; readonly at: string; readonly author: string; readonly subject: string; readonly refs: string; readonly signed: boolean }[];
   /** The approvals kept. */
   readonly approvals?: readonly { readonly asset: string; readonly kind: string; readonly by: string; readonly planHash: string; readonly at: string }[];
+  /** The links between assets, by identity, with their kinds. */
+  readonly links?: readonly { readonly from: string; readonly to: string; readonly kind: string }[];
   /** The fleet that declares each asset, by its identity, where the data says. */
   readonly fleets?: Readonly<Record<string, string>>;
   /** The instant now, for the policies' acceptances (an ISO 8601 instant). */
@@ -60,6 +62,21 @@ function leaves(value: JsonValue, prefix = ""): readonly (readonly [string, stri
 const table = (columns: readonly string[], rows: readonly (readonly Value[])[]): Table => ({ columns, rows });
 const columnsOf = (name: string): readonly string[] => RELATIONS.find((r) => r.name === name)?.columns.map((c) => c.name) ?? [];
 
+const SCHEME_PORT: Readonly<Record<string, number>> = { http: 80, https: 443, ssh: 22, wss: 443, ws: 80 };
+const CLEARTEXT_SCHEMES: ReadonlySet<string> = new Set(["http", "ws"]);
+const SECURE_SCHEMES: ReadonlySet<string> = new Set(["https", "wss", "tls", "ssh"]);
+
+/** The row of an endpoint: its attributes, with the usual port of its service or scheme where none is stated and whether it speaks in the clear. */
+function endpointRow(a: Asset): readonly Value[] {
+  const at = a.attributes ?? {};
+  const text = (n: string): string => (typeof at[n] === "string" ? String(at[n]) : "");
+  const service = text("service") === "" ? undefined : serviceByName(text("service"));
+  const scheme = text("scheme");
+  const port = typeof at["port"] === "number" ? at["port"] : (service?.port ?? SCHEME_PORT[scheme] ?? 0);
+  const cleartext = CLEARTEXT_SCHEMES.has(scheme) ? true : SECURE_SCHEMES.has(scheme) ? false : (service?.cleartext ?? false);
+  return [String(a.id), scheme, text("host"), port, text("path"), text("service"), service?.class ?? "", text("exposure"), text("authentication"), cleartext];
+}
+
 /** The relations of the data, built as a query names them. */
 export function tablesOf(data: EstateData): Tables {
   const latest = new Map((data.observations ?? []).map((o) => [o.asset, o.observation]));
@@ -79,6 +96,10 @@ export function tablesOf(data: EstateData): Tables {
         }),
       ),
     declared: () => table(columnsOf("declared"), Object.entries(data.declared ?? {}).flatMap(([asset, d]) => leaves(d as JsonValue).map(([path, value]): readonly Value[] => [asset, path, value]))),
+    attribute: () => table(columnsOf("attribute"), data.assets.flatMap((a) => Object.entries(a.attributes ?? {}).flatMap(([name, v]): readonly (readonly Value[])[] => (typeof v === "object" ? v.map((x): readonly Value[] => [String(a.id), name, x]) : [[String(a.id), name, String(v)]])))),
+    endpoint: () => table(columnsOf("endpoint"), data.assets.filter((a) => String(a.kind) === "endpoint").map((a): readonly Value[] => endpointRow(a))),
+    link: () => table(columnsOf("link"), (data.links ?? []).map((l): readonly Value[] => [l.from, l.to, l.kind])),
+    service: () => table(columnsOf("service"), SERVICES.map((x): readonly Value[] => [x.name, x.transport, x.port, x.class, x.cleartext])),
     observation: () => table(columnsOf("observation"), [...latest.entries()].map(([asset, o]): readonly Value[] => [asset, o.at, o.source])),
     observed: () => table(columnsOf("observed"), [...latest.entries()].flatMap(([asset, o]) => leaves(o.state as JsonValue).map(([path, value]): readonly Value[] => [asset, path, value]))),
     truth: () => table(columnsOf("truth"), (data.truths ?? []).map((t): readonly Value[] => [t.asset, t.currency, t.alignment, t.agrees, t.observedAt ?? "", t.source ?? ""])),
