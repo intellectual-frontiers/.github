@@ -13,10 +13,10 @@
  * @module
  */
 import { findingsOfPublish, finding, findingsOfSync, gate, orderGenerators, planPublish, runPublish, runSync, STAGED_NOTE, type Finding, type PublishPlan, type Published, type ReleaseEntry, type World } from "@intellectual-frontiers/repoctl/logical";
-import { applyRelease, describe, offlinePublishedExports, offlineRegistry, type Plan, raiseOf, readRecord, REAL, realPublishedExports, realRegistry, RECORD_PATH, releasePlan } from "@intellectual-frontiers/libraries/releasing";
+import { activeMode, applyRelease, describe, offlinePublishedExports, offlineRegistry, type DistributionMode, type Plan, raiseOf, readRecord, MODE_VARIABLE, publishedOf, REAL, registryOf, RECORD_PATH, releasePlan } from "@intellectual-frontiers/libraries/releasing";
 import { holdSentence } from "@intellectual-frontiers/libraries/libraries";
 import { flag, many, value } from "@intellectual-frontiers/terminal/args";
-import { type Done, defineVerb, generatorsOf, outcomeOfDone, outcomeOfEnvironment, outcomeOfUsage } from "../define.ts";
+import { type Done, defineVerb, generatorsOf, type Host, outcomeOfDone, outcomeOfEnvironment, outcomeOfUsage } from "../define.ts";
 
 /** The lines of a plan for a person: one for each library that is released, and the libraries that are left alone. */
 export function planText(plan: Plan): string {
@@ -37,13 +37,22 @@ export function planData(plan: Plan): unknown {
 
 const OPTIONS = {
   offline: flag({ help: "Do not ask npm what it holds: a version with no tag is then raised only where its files changed since it was raised." }),
+  distribution: value({ help: "The distribution mode for this run: per-library or single (the mode of the repository, or IFC_DISTRIBUTION, where it is not given).", valueName: "MODE" }),
   raise: many<never>({ help: "Raise a library whatever its state says: NAME, or NAME=major|minor|patch.", valueName: "NAME[=IMPACT]" }),
 };
 
-async function planOf(w: World, offline: boolean, words: readonly string[]): Promise<{ readonly plan: Plan } | { readonly problem: string; readonly usage: boolean }> {
+/** The mode of a run: the option, else the variable of the host's environment, else the mode of the repository. */
+function modeOf(option: string | undefined, host: Host): { readonly mode: DistributionMode } | { readonly problem: string } {
+  const m = activeMode(option ?? host.env(MODE_VARIABLE));
+  return m.kind === "ok" ? { mode: m.value } : { problem: m.error };
+}
+
+async function planOf(w: World, host: Host, offline: boolean, words: readonly string[], distribution: string | undefined): Promise<{ readonly plan: Plan } | { readonly problem: string; readonly usage: boolean }> {
   const raise = raiseOf(words);
   if (raise.kind === "err") return { problem: raise.error, usage: true };
-  const planned = await releasePlan(w.repo, { raise: raise.value, registry: offline ? offlineRegistry : realRegistry(w.repo), published: offline ? offlinePublishedExports : realPublishedExports() });
+  const chosen = modeOf(distribution, host);
+  if ("problem" in chosen) return { problem: chosen.problem, usage: true };
+  const planned = await releasePlan(w.repo, { raise: raise.value, registry: offline ? offlineRegistry : registryOf(chosen.mode, w.repo), published: offline ? offlinePublishedExports : publishedOf(chosen.mode), mode: chosen.mode });
   return planned.kind === "err" ? { problem: planned.error, usage: false } : { plan: planned.value };
 }
 
@@ -57,8 +66,8 @@ export const releasePlanVerb = defineVerb({
     { args: ["--offline"], says: "The same without asking npm." },
     { args: ["--raise", "headless=minor"], says: "Plan the release with headless raised by a minor." },
   ],
-  run: async (args, _ctx, w) => {
-    const got = await planOf(w, args.options.offline, args.options.raise ?? []);
+  run: async (args, _ctx, w, host) => {
+    const got = await planOf(w, host, args.options.offline, args.options.raise ?? [], args.options.distribution);
     if ("problem" in got) return got.usage ? outcomeOfUsage(got.problem, "E-USAGE", "repoctl release plan --help") : outcomeOfDone({ data: null, text: got.problem, findings: [finding("fail", "E-RELEASE-FAILED", got.problem, "repoctl status")] });
     return outcomeOfDone({ data: planData(got.plan), text: planText(got.plan), findings: [], next: got.plan.steps.length > 0 ? ["repoctl release apply"] : [], title: "Planned" });
   },
@@ -76,13 +85,15 @@ export const releaseApplyVerb = defineVerb({
   ],
   run: async (args, ctx, w, host) => {
     if (ctx.mode !== "apply") {
-      const got = await planOf(w, args.options.offline, args.options.raise ?? []);
+      const got = await planOf(w, host, args.options.offline, args.options.raise ?? [], args.options.distribution);
       if ("problem" in got) return outcomeOfDone({ data: null, text: got.problem, findings: [finding("fail", "E-RELEASE-FAILED", got.problem, "repoctl release plan")] });
       return outcomeOfDone({ data: planData(got.plan), text: planText(got.plan), findings: [], title: "Planned" });
     }
     const raise = raiseOf(args.options.raise ?? []);
     if (raise.kind === "err") return outcomeOfUsage(raise.error, "E-USAGE", "repoctl release apply --help");
-    const made = await applyRelease(w.repo, host.releasing ?? REAL, { tests: args.options.tests, raise: raise.value, registry: args.options.offline ? offlineRegistry : realRegistry(w.repo), published: args.options.offline ? offlinePublishedExports : realPublishedExports() });
+    const chosen = modeOf(args.options.distribution, host);
+    if ("problem" in chosen) return outcomeOfUsage(chosen.problem, "E-USAGE", "repoctl release apply --help");
+    const made = await applyRelease(w.repo, host.releasing ?? REAL, { tests: args.options.tests, raise: raise.value, registry: args.options.offline ? offlineRegistry : registryOf(chosen.mode, w.repo), published: args.options.offline ? offlinePublishedExports : publishedOf(chosen.mode), mode: chosen.mode });
     if (made.kind === "err") return outcomeOfDone({ data: null, text: made.error, findings: [finding("fail", "E-RELEASE-FAILED", made.error, "repoctl release plan")] });
     const order = orderGenerators(generatorsOf(host));
     if (order.kind === "err") return outcomeOfEnvironment(`the table of generators waits for itself: ${order.error.join(", ")}`);

@@ -141,11 +141,12 @@ proves(["0004-repoctl-status-release FR-003"], "a registry that cannot be asked 
   });
 });
 
-proves(["0004-repoctl-status-release FR-004", "0004-repoctl-status-release FR-005"], "the plan of a real repository is given and nothing is written, and apply with --dry-run is the plan", async () => {
-  if (!CAN_RUN) return;
-  await fs.withTempDir(async (dir) => {
-    for (const [name, version] of [["libraries", "0.4.0"], ["alpha", "0.1.0"]] as const) {
-      await put(dir, `commons/${name}/library.ts`, manifest(name, version, ["github", "npm"]));
+/** A repository of two libraries, `libraries` and `alpha`, and in `single` mode the one package `commons`, each tagged at its version, where `alpha` then changes with the impact `minor`. */
+async function withLibraries<T>(mode: "single" | "per-library", use: (dir: string) => Promise<T>): Promise<T> {
+  return await fs.withTempDir(async (dir) => {
+    const folders = mode === "single" ? ([["libraries", "0.4.0"], ["alpha", "0.1.0"], ["commons", "0.3.0"]] as const) : ([["libraries", "0.4.0"], ["alpha", "0.1.0"]] as const);
+    for (const [name, version] of folders) {
+      await put(dir, `commons/${name}/library.ts`, name === "commons" ? `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", version, exports: ["."], distribution: ["github", "npm"], bundle: "commons" })};\n` : manifest(name, version, ["github", "npm"]));
       await put(dir, `commons/${name}/package.json`, `${JSON.stringify({ name: `@intellectual-frontiers/${name}`, version, exports: { ".": "./src/mod.ts" } }, null, 2)}\n`);
       await put(dir, `commons/${name}/src/mod.ts`, `export const ${name} = 1;\n`);
       await put(dir, `commons/${name}/release.ts`, `export const release = ${JSON.stringify({ slug: name, kind: "Library", title: name, authors: [{ name: "x" }], version, repository: "https://example.org/r" })};\n`);
@@ -155,56 +156,89 @@ proves(["0004-repoctl-status-release FR-004", "0004-repoctl-status-release FR-00
     await git(dir, "commit", "-q", "-m", "Start");
     await git(dir, "tag", "alpha-v0.1.0");
     await git(dir, "tag", "libraries-v0.4.0");
+    if (mode === "single") await git(dir, "tag", "commons-v0.3.0");
     await put(dir, "commons/alpha/src/mod.ts", "export const alpha = 2;\n");
     await git(dir, "commit", "-q", "-am", "Change alpha\n\nImpact: minor");
-    const before = await git(dir, "status", "--porcelain");
-    const host = hostOf(systemWorld(dir, () => undefined, LIBRARIES));
-    const plan = await execute(host, ["release", "plan", "--offline", "--json"]);
-    assertEquals(plan.code, 0, plan.err);
-    const doc = JSON.parse(plan.out) as { data: { steps: { library: string; from: string; to: string }[] } };
-    assertEquals(doc.data.steps.map((s) => `${s.library} ${s.from}>${s.to}`), ["alpha 0.1.0>0.2.0"]);
-    const dry = await execute(host, ["release", "apply", "--offline", "--dry-run"]);
-    assertEquals(dry.code, 0, dry.err);
-    assertStringIncludes(dry.out, "alpha 0.1.0 -> 0.2.0");
-    assertEquals(await git(dir, "status", "--porcelain"), before, "nothing is written");
-    const bad = await execute(host, ["release", "plan", "--offline", "--raise", "alpha=huge"]);
-    assertEquals(bad.code, 2);
+    return await use(dir);
   });
-});
+}
 
-proves(["0004-repoctl-status-release FR-005"], "apply raises the version into the record, the manifest, the package and the constant the manifest names, makes the generated files by the table and commits nothing", async () => {
-  if (!CAN_RUN) return;
-  await fs.withTempDir(async (dir) => {
-    const name = "libraries";
-    const manifestText = (v: string): string => `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", version: v, exports: ["."], distribution: ["github", "npm"], versionConstants: [{ file: "src/version.ts", name: "LIBRARIES_VERSION" }] })};\n`;
-    await put(dir, `commons/${name}/library.ts`, manifestText("0.1.0"));
-    await put(dir, `commons/${name}/package.json`, `${JSON.stringify({ name: `@intellectual-frontiers/${name}`, version: "0.1.0", exports: { ".": "./src/mod.ts" } }, null, 2)}\n`);
-    await put(dir, `commons/${name}/src/mod.ts`, "export const x = 1;\n");
-    await put(dir, `commons/${name}/src/version.ts`, 'export const LIBRARIES_VERSION = "0.1.0";\n');
-    await put(dir, `commons/${name}/release.ts`, `export const release = ${JSON.stringify({ slug: name, kind: "Library", title: name, authors: [{ name: "x" }], version: "0.1.0", repository: "https://example.org/r" })};\n`);
-    await git(dir, "init", "-q");
-    await git(dir, "add", ".");
-    await git(dir, "commit", "-q", "-m", "Start");
-    await git(dir, "tag", "libraries-v0.1.0");
-    await put(dir, `commons/${name}/src/mod.ts`, "export const x = 2;\n");
-    await git(dir, "commit", "-q", "-am", "Change\n\nImpact: minor");
-    const made: string[] = [];
-    const releasing = { lock: () => Promise.resolve(ok(undefined)), sync: () => Promise.resolve(ok(undefined)), generate: () => Promise.resolve(ok(undefined)), prove: () => Promise.resolve(ok(undefined)) };
-    const generators = [{ ...genOf("readme", ["commons/*/library.ts"], ["README.md"]), run: { kind: "program" as const, argv: ["bun", "make-readme.mjs"] }, check: { kind: "program" as const, argv: ["bun", "make-readme.mjs", "--check"] } }];
-    await put(dir, "make-readme.mjs", `import { writeFileSync, readFileSync } from "node:fs";\nconst v = readFileSync("commons/libraries/src/version.ts", "utf8").match(/"([^"]+)"/)?.[1];\nconst text = "libraries " + v + "\\n";\nif (process.argv.includes("--check")) process.exit(readFileSync("README.md", "utf8") === text ? 0 : 1);\nwriteFileSync("README.md", text);\n`);
-    await put(dir, "README.md", "libraries 0.1.0\n");
-    await git(dir, "add", ".");
-    await git(dir, "commit", "-q", "-m", "The README");
-    const out = await execute(hostOf(systemWorld(dir, () => undefined, LIBRARIES), { generators, releasing }), ["release", "apply", "--offline", "--no-tests"]);
-    assertEquals(out.code, 0, out.err);
-    made.push(await fs.readTextFile(path.join(dir, `commons/${name}/src/version.ts`)));
-    assertEquals(made[0], 'export const LIBRARIES_VERSION = "0.2.0";\n');
-    assertStringIncludes(await fs.readTextFile(path.join(dir, `commons/${name}/library.ts`)), '"version":"0.2.0"');
-    assertStringIncludes(await fs.readTextFile(path.join(dir, `commons/${name}/package.json`)), '"version": "0.2.0"');
-    assertEquals(await fs.readTextFile(path.join(dir, "README.md")), "libraries 0.2.0\n", "the generators of the table are made after the versions");
-    assertEquals((await git(dir, "log", "--oneline")).trim().split("\n").length, 3, "nothing is committed");
+const MODES = [
+  { mode: "single", steps: ["commons 0.3.0>0.4.0"], dry: "commons 0.3.0 -> 0.4.0" },
+  { mode: "per-library", steps: ["alpha 0.1.0>0.2.0"], dry: "alpha 0.1.0 -> 0.2.0" },
+] as const;
+
+for (const m of MODES) {
+  proves(["0004-repoctl-status-release FR-004", "0004-repoctl-status-release FR-005"], `in ${m.mode} mode the plan of a real repository is given and nothing is written, and apply with --dry-run is the plan`, async () => {
+    if (!CAN_RUN) return;
+    await withLibraries(m.mode, async (dir) => {
+      const before = await git(dir, "status", "--porcelain");
+      const host = hostOf(systemWorld(dir, () => undefined, LIBRARIES), { env: (n) => (n === "IFC_DISTRIBUTION" ? m.mode : undefined) });
+      const plan = await execute(host, ["release", "plan", "--offline", "--json"]);
+      assertEquals(plan.code, 0, plan.err);
+      const doc = JSON.parse(plan.out) as { data: { steps: { library: string; from: string; to: string }[] } };
+      assertEquals(doc.data.steps.map((s) => `${s.library} ${s.from}>${s.to}`), [...m.steps]);
+      const dry = await execute(host, ["release", "apply", "--offline", "--dry-run"]);
+      assertEquals(dry.code, 0, dry.err);
+      assertStringIncludes(dry.out, m.dry);
+      assertEquals(await git(dir, "status", "--porcelain"), before, "nothing is written");
+      const bad = await execute(host, ["release", "plan", "--offline", "--raise", "alpha=huge"]);
+      assertEquals(bad.code, 2);
+      const named = await execute(host, ["release", "plan", "--offline", "--json", "--distribution", m.mode]);
+      assertEquals(named.out, plan.out, "the option names the mode the variable names");
+      assertEquals((await execute(host, ["release", "plan", "--offline", "--distribution", "both"])).code, 2, "a value that is no mode is refused");
+    });
   });
-});
+}
+
+for (const mode of ["single", "per-library"] as const) {
+  proves(["0004-repoctl-status-release FR-005"], `in ${mode} mode apply raises the versions the mode releases into the record, the manifest, the package and the constant the manifest names, makes the generated files by the table and commits nothing`, async () => {
+    if (!CAN_RUN) return;
+    await fs.withTempDir(async (dir) => {
+      const name = "libraries";
+      const record = (slug: string, v: string): string => `export const release = ${JSON.stringify({ slug, kind: "Library", title: slug, authors: [{ name: "x" }], version: v, repository: "https://example.org/r" })};\n`;
+      const manifestText = (v: string): string => `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", version: v, exports: ["."], distribution: ["github", "npm"], versionConstants: [{ file: "src/version.ts", name: "LIBRARIES_VERSION" }] })};\n`;
+      await put(dir, `commons/${name}/library.ts`, manifestText("0.1.0"));
+      await put(dir, `commons/${name}/package.json`, `${JSON.stringify({ name: `@intellectual-frontiers/${name}`, version: "0.1.0", exports: { ".": "./src/mod.ts" } }, null, 2)}\n`);
+      await put(dir, `commons/${name}/src/mod.ts`, "export const x = 1;\n");
+      await put(dir, `commons/${name}/src/version.ts`, 'export const LIBRARIES_VERSION = "0.1.0";\n');
+      await put(dir, `commons/${name}/release.ts`, record(name, "0.1.0"));
+      if (mode === "single") {
+        // the one package of `single` mode: the release raises it and no library
+        await put(dir, "commons/commons/library.ts", `export const library = ${JSON.stringify({ name: "commons", level: "L0", verify: "bun run verify", version: "0.1.0", exports: ["."], distribution: ["github", "npm"], bundle: "commons", versionConstants: [{ file: "src/version.ts", name: "COMMONS_VERSION" }] })};\n`);
+        await put(dir, "commons/commons/package.json", `${JSON.stringify({ name: "@intellectual-frontiers/commons", version: "0.1.0", exports: { ".": "./index.js" } }, null, 2)}\n`);
+        await put(dir, "commons/commons/src/version.ts", 'export const COMMONS_VERSION = "0.1.0";\n');
+        await put(dir, "commons/commons/release.ts", record("commons", "0.1.0"));
+      }
+      await git(dir, "init", "-q");
+      await git(dir, "add", ".");
+      await git(dir, "commit", "-q", "-m", "Start");
+      await git(dir, "tag", "libraries-v0.1.0");
+      if (mode === "single") await git(dir, "tag", "commons-v0.1.0");
+      await put(dir, `commons/${name}/src/mod.ts`, "export const x = 2;\n");
+      await git(dir, "commit", "-q", "-am", "Change\n\nImpact: minor");
+      const releasing = { lock: () => Promise.resolve(ok(undefined)), sync: () => Promise.resolve(ok(undefined)), generate: () => Promise.resolve(ok(undefined)), prove: () => Promise.resolve(ok(undefined)) };
+      const generators = [{ ...genOf("readme", ["commons/*/library.ts"], ["README.md"]), run: { kind: "program" as const, argv: ["bun", "make-readme.mjs"] }, check: { kind: "program" as const, argv: ["bun", "make-readme.mjs", "--check"] } }];
+      const raised = mode === "single" ? "commons" : name;
+      const constant = mode === "single" ? "COMMONS_VERSION" : "LIBRARIES_VERSION";
+      await put(dir, "make-readme.mjs", `import { writeFileSync, readFileSync } from "node:fs";\nconst v = readFileSync("commons/${raised}/src/version.ts", "utf8").match(/"([^"]+)"/)?.[1];\nconst text = "${raised} " + v + "\\n";\nif (process.argv.includes("--check")) process.exit(readFileSync("README.md", "utf8") === text ? 0 : 1);\nwriteFileSync("README.md", text);\n`);
+      await put(dir, "README.md", `${raised} 0.1.0\n`);
+      await git(dir, "add", ".");
+      await git(dir, "commit", "-q", "-m", "The README");
+      const out = await execute(hostOf(systemWorld(dir, () => undefined, LIBRARIES), { generators, releasing, env: (n) => (n === "IFC_DISTRIBUTION" ? mode : undefined) }), ["release", "apply", "--offline", "--no-tests"]);
+      assertEquals(out.code, 0, out.err);
+      assertEquals(await fs.readTextFile(path.join(dir, `commons/${raised}/src/version.ts`)), `export const ${constant} = "0.2.0";\n`);
+      assertStringIncludes(await fs.readTextFile(path.join(dir, `commons/${raised}/library.ts`)), '"version":"0.2.0"');
+      assertStringIncludes(await fs.readTextFile(path.join(dir, `commons/${raised}/package.json`)), '"version": "0.2.0"');
+      assertEquals(await fs.readTextFile(path.join(dir, "README.md")), `${raised} 0.2.0\n`, "the generators of the table are made after the versions");
+      if (mode === "single") {
+        assertStringIncludes(await fs.readTextFile(path.join(dir, `commons/${name}/package.json`)), '"version": "0.1.0"');
+        assertStringIncludes(await fs.readTextFile(path.join(dir, `commons/${name}/library.ts`)), '"version":"0.1.0"');
+      }
+      assertEquals((await git(dir, "log", "--oneline")).trim().split("\n").length, 3, "nothing is committed");
+    });
+  });
+}
 
 /** Entries of a record and the files of a publication in a real repository: a, b and c go to npm, d is not packed, e is only tagged. */
 async function withRecord<T>(use: (dir: string, entries: readonly ReleaseEntry[]) => Promise<T>, pack: readonly string[] = ["a", "b", "c"]): Promise<T> {

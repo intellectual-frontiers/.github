@@ -949,10 +949,13 @@ export function raiseOf(words: readonly string[]): Result<ReadonlyMap<string, Im
 export const offlineRegistry: Registry = () => Promise.resolve("unknown");
 
 /** The registry that is asked: npm for the files of the library, or for those of the one package. */
-const registryOf = (mode: DistributionMode, repo: string): Registry => (mode === "single" ? realRegistrySingle(repo, registryAt()) : realRegistry(repo));
+export const registryOf = (mode: DistributionMode, repo: string): Registry => (mode === "single" ? realRegistrySingle(repo, registryAt()) : realRegistry(repo));
 
 /** The registry whose `exports` keys the floor reads. */
-const publishedOf = (mode: DistributionMode): PublishedExports => (mode === "single" ? realPublishedExports(registryAt().base, registryAt().token) : realPublishedExports());
+export const publishedOf = (mode: DistributionMode): PublishedExports => (mode === "single" ? realPublishedExports(registryAt().base, registryAt().token) : realPublishedExports());
+
+/** The mode of a run and the variable that names it, for a program that wraps the release (Repoctl). */
+export { activeMode, type DistributionMode, MODE_VARIABLE };
 
 const COMMANDS = ["plan", "apply", "matrix", "publish"] as const;
 type Command = (typeof COMMANDS)[number];
