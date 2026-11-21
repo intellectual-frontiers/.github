@@ -402,7 +402,7 @@ export function handler(store: Store<Viewable>, options: HandlerOptions): (reque
     const note = (f: Fidelity): void => {
       fidelity = worse(fidelity, f);
     };
-    const one = async (from: PosixPath, to: PosixPath): Promise<void> => {
+    const one = async (from: PosixPath, to: PosixPath, root = false): Promise<void> => {
       const st = await statOf(from);
       if (st.kind === "err") {
         failed.push({ path: from, status: 404 });
@@ -423,7 +423,8 @@ export function handler(store: Store<Viewable>, options: HandlerOptions): (reque
         note(emulated("write-back-buffer", "a copy reads the object and writes it again: the store has no copy of its own"));
         return;
       }
-      const m = await view.mkdir(to);
+      // the parent of the destination was checked before the destination was replaced, and it may have been there only for the destination (a collection is kept while something lies below it): the root of a copy does not ask for it again
+      const m = await view.mkdir(to, root ? { parents: true } : {});
       if (m.kind === "err" && m.error.errno !== "EEXIST") {
         failed.push({ path: to, status: errorAnswer(m.error, "other").status });
         return;
@@ -437,7 +438,7 @@ export function handler(store: Store<Viewable>, options: HandlerOptions): (reque
       }
       for (const e of list.value.value) await one(joinPosix(from, e.name), joinPosix(to, e.name));
     };
-    await one(src, dst);
+    await one(src, dst, true);
     return { fidelity, failed };
   }
 

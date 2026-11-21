@@ -97,3 +97,28 @@ export function tablesOf(data: EstateData): Tables {
     violation: () => table(columnsOf("violation"), (data.violations ?? []).map((v): readonly Value[] => [v.invariant, v.subject, v.message])),
   };
 }
+
+/** What of a snapshot of a fleet store is read (`FleetSnapshot` of the estate library's physical layer satisfies it by shape; it is described here so that nothing of AnyFS is imported). */
+export type SnapshotLike = {
+  readonly assets: readonly Asset[];
+  readonly declared: Readonly<Record<string, Readonly<Record<string, JsonValue>>>>;
+  readonly observations: readonly { readonly asset: string; readonly observation: Observation }[];
+  readonly results: readonly (PolicyOutcome & { readonly asset: string })[];
+  readonly acceptances: Readonly<Record<string, readonly AcceptedRisk[]>>;
+};
+
+/** What `assessSnapshot` of the estate library gives, as far as the relations use it. */
+export type AssessmentLike = { readonly truths: readonly Truth[]; readonly violations: readonly Violation[] };
+
+/** The estate of a snapshot of a fleet store, at an instant, with what was assessed of it where that was done. */
+export function fromSnapshot(snapshot: SnapshotLike, now: string, assessment?: AssessmentLike): EstateData {
+  return {
+    assets: snapshot.assets,
+    declared: snapshot.declared,
+    observations: snapshot.observations,
+    results: snapshot.results,
+    acceptances: snapshot.acceptances,
+    ...(assessment === undefined ? {} : { truths: assessment.truths, violations: assessment.violations }),
+    now,
+  };
+}

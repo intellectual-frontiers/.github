@@ -169,6 +169,26 @@ proves(["0005-anyfs-serve-conformance FR-002"], "a random sequence of MKCOL, PUT
   );
 });
 
+proves(["0005-anyfs-serve-conformance FR-002"], "a COPY of a collection over a resource whose parent is there only for it replaces the resource and keeps the parent (the counterexample of the property, as examples)", async () => {
+  const sequences: readonly (readonly (readonly [string, string, string?])[])[] = [
+    // a collection over a file that is the only thing below its parent
+    [["MKCOL", "/c"], ["PUT", "/a/a/c"], ["COPY", "/c", "/a/a/c"]],
+    // a collection with a file over a file
+    [["MKCOL", "/c"], ["PUT", "/c/f"], ["PUT", "/a/a/c"], ["COPY", "/c", "/a/a/c"]],
+    // a collection over a collection that holds one file
+    [["MKCOL", "/c"], ["PUT", "/a/a/c/g"], ["COPY", "/c", "/a/a/c"]],
+  ];
+  for (const steps of sequences) {
+    const c = client(full());
+    for (const [method, from, to] of steps) {
+      const r = method === "PUT" ? await c.call(method, from, { body: "x" }) : to === undefined ? await c.call(method, from) : await c.call(method, from, { headers: { destination: to } });
+      assertEquals(r.status >= 200 && r.status < 300 && r.status !== 207, true, `${method} ${from}${to === undefined ? "" : ` -> ${to}`} gave ${r.status}`);
+    }
+    assertEquals((await c.call("MKCOL", "/a")).status, 405, "the parent of the copy is there");
+    assertEquals((await c.call("PROPFIND", "/a/a/", { headers: { depth: "0" } })).status, 207, "and so is the one below it");
+  }
+});
+
 // ---- FR-003: hostile XML
 proves(["0005-anyfs-serve-conformance FR-003"], "a PROPFIND, a PROPPATCH or a LOCK with a hostile body is refused with 400 or 413 and no resource is touched", async () => {
   const limits = { maxBody: 1000, maxXml: 2000, maxXmlDepth: 8, maxXmlNodes: 200, maxLockSeconds: 60, maxLocks: 10, maxResources: 100 };

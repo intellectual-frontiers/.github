@@ -29,6 +29,8 @@ export function safeToRepeat(op: Op): boolean {
     case "history":
     case "rangeRead":
     case "search":
+    // a delta applied twice is applied once, so a merge may be repeated
+    case "merge":
       return true;
     case "write":
     case "delete":
