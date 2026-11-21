@@ -75,6 +75,7 @@ const OPS: readonly Op[] = [
   { op: "rangeRead", path: p("a"), start: 0, length: 1 },
   { op: "append", path: p("a"), bytes: bytes("x"), expect: expectAny },
   { op: "search", prefix: ROOT, text: "x" },
+  { op: "merge", action: { kind: "vector" } },
 ];
 
 const METHOD: Readonly<Record<OpCapability, string>> = {
@@ -90,6 +91,7 @@ const METHOD: Readonly<Record<OpCapability, string>> = {
   rangeRead: "readRange",
   append: "append",
   search: "search",
+  merge: "applyDelta",
 };
 const OP_CAPABILITIES = Object.keys(METHOD) as OpCapability[];
 
@@ -104,7 +106,9 @@ proves(["0003-anyfs-logical FR-001"], "an operation is data, every operation nee
   assertEquals(capabilitiesNeeded({ op: "write", path: p("a"), bytes: bytes(""), expect: expectRev(rev("sha256:1")) }), ["write", "cas"]);
   const change: Change = { kind: "delete", path: p("a"), expect: expectRev(rev("sha256:1")) };
   assertEquals(capabilitiesNeeded({ op: "batch", changes: [change] }), ["batch", "cas"]);
-  assertEquals(OPS.map(effectOf), ["read", "mutate", "read", "read", "destructive", "mutate", "mutate", "read", "read", "mutate", "read"]);
+  assertEquals(OPS.map(effectOf), ["read", "mutate", "read", "read", "destructive", "mutate", "mutate", "read", "read", "mutate", "read", "read"]);
+  assertEquals(effectOf({ op: "merge", action: { kind: "since", since: {} } }), "read");
+  assert(["mutate", "destructive"].includes(effectOf({ op: "merge", action: { kind: "apply", delta: { format: 1, origin: "0".repeat(32) as never, versions: [], blobs: [] } } })));
   assertEquals(effectOf({ op: "batch", changes: [change] }), "destructive");
   assertEquals(pathOf(OPS[0] as Op), p("a"));
   assertEquals(pathOf(OPS[3] as Op), undefined);
@@ -281,5 +285,5 @@ proves(["0003-anyfs-logical FR-006"], "a guarded store refuses, as consent, ever
   assert(d.kind === "err" && d.error.kind === "refused" && d.error.reason === "consent");
   const destroy = guarded(base, "destructive");
   assertEquals((await destroy.delete(p("b"), expectAny)).kind, "ok");
-  assert([...CAPABILITIES].length === 14);
+  assert([...CAPABILITIES].length === 15);
 });

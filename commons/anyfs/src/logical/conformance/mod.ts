@@ -57,3 +57,4 @@ export async function runConformance(make: () => Promise<Store<CoreCapability>>)
   for (const c of casesFor(sample.capabilities)) reports.push(await runCase(c, make));
   return reports;
 }
+export { type MakeReplicas, type MergeCase, type MergeCaseReport, type MergeFace, MERGE_CASES, runMergeCase, runMergeConformance } from "./merge.ts";
