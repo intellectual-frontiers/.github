@@ -22,6 +22,11 @@ export const RESULTS = ["pass", "fail", "not-applicable"] as const;
 /** A result. */
 export type Result = (typeof RESULTS)[number];
 
+/** How the evidence was obtained, which is how much it is worth: read from the system by a tool, a signed record from a system, a person's attestation, or a screenshot. */
+export const ORIGINS = ["machine", "signed-record", "attestation", "screenshot"] as const;
+/** An origin. */
+export type Origin = (typeof ORIGINS)[number];
+
 /** Who made the record: a tool (a probe, a scanner) or a person (an assessor, an owner). */
 export type By = { readonly kind: "tool" | "person"; readonly name: string };
 
@@ -41,6 +46,8 @@ export type Evidence = {
   readonly source: string;
   /** A person's word on it; required for `not-applicable`. */
   readonly note?: string;
+  /** How it was obtained; where absent a tool's record is `machine` and a person's is `attestation`. */
+  readonly origin?: Origin;
   /** Whether a person determines the objective from it. A tool never does. */
   readonly determines: boolean;
 };

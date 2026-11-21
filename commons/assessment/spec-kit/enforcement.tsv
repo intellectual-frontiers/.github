@@ -10,3 +10,8 @@ requirement	mechanism	by	note
 0002-objective-evidence FR-005	check	.github: cd commons/assessment && bun run verify	suite/evidence.test.ts
 0002-objective-evidence FR-006	check	.github: cd commons/assessment && bun run verify	suite/evidence.test.ts
 0002-objective-evidence FR-007	check	.github: cd commons/assessment && bun run verify	suite/evidence.test.ts
+0003-evidence-grading FR-001	check	.github: cd commons/assessment && bun run verify	suite/grading.test.ts
+0003-evidence-grading FR-002	check	.github: cd commons/assessment && bun run verify	suite/grading.test.ts
+0003-evidence-grading FR-003	check	.github: cd commons/assessment && bun run verify	suite/grading.test.ts
+0003-evidence-grading FR-004	check	.github: cd commons/assessment && bun run verify	suite/grading.test.ts
+0003-evidence-grading FR-005	check	.github: cd commons/assessment && bun run verify	suite/grading.test.ts

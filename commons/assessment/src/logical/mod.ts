@@ -7,3 +7,4 @@
 export * from "./bind.ts";
 export * from "./determine.ts";
 export * from "./records.ts";
+export * from "./grade.ts";

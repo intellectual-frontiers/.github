@@ -12,7 +12,7 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import { type Evidence, METHODS, RESULTS } from "@intellectual-frontiers/assessment/governance";
+import { type Evidence, METHODS, ORIGINS, RESULTS } from "@intellectual-frontiers/assessment/governance";
 import { formatJson5Error, isJsonObject, type Json, parseJson5, toJson5 } from "@intellectual-frontiers/formats/json5";
 
 const INSTANT = /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ$/;
@@ -28,6 +28,8 @@ export function problemsOf(e: Evidence): readonly string[] {
   if (e.determines && e.by.kind !== "person") out.push("a tool does not determine an objective: only a person does");
   if (e.result === "not-applicable" && (e.by.kind !== "person" || (e.note ?? "").trim() === "")) out.push("not-applicable is a person's word and has a reason in `note`");
   if (e.by.name.trim() === "") out.push("who made the record is named");
+  if (e.origin !== undefined && !ORIGINS.includes(e.origin)) out.push(`origin is one of ${ORIGINS.join(", ")}`);
+  if (e.by.kind === "tool" && (e.origin === "attestation" || e.origin === "screenshot")) out.push("a tool's record is a machine's or a signed record, not an attestation or a screenshot");
   return out;
 }
 
@@ -40,6 +42,7 @@ export function recordPath(e: Pick<Evidence, "id" | "framework" | "objective">):
 export function encodeRecord(e: Evidence): string {
   const json: Record<string, Json> = { schema: "assessment-evidence/1", id: e.id, framework: e.framework, objective: e.objective, method: e.method, result: e.result, by: { kind: e.by.kind, name: e.by.name }, at: e.at };
   if (e.validUntil !== undefined) json["validUntil"] = e.validUntil;
+  if (e.origin !== undefined) json["origin"] = e.origin;
   json["source"] = e.source;
   if (e.note !== undefined) json["note"] = e.note;
   json["determines"] = e.determines;
@@ -68,6 +71,7 @@ export function decodeRecord(source: string): Result<Evidence, string> {
     id, framework, objective, method: method as Evidence["method"], result: result as Evidence["result"], by: { kind: by["kind"], name: by["name"] }, at, source: src, determines: o["determines"],
     ...(typeof o["validUntil"] === "string" ? { validUntil: o["validUntil"] } : {}),
     ...(typeof o["note"] === "string" ? { note: o["note"] } : {}),
+    ...(typeof o["origin"] === "string" ? { origin: o["origin"] as NonNullable<Evidence["origin"]> } : {}),
   };
   const bad = problemsOf(e);
   return bad.length > 0 ? err(bad.join("; ")) : ok(e);
