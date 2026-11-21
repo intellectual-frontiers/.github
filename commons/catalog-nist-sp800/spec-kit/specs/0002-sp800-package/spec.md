@@ -21,7 +21,7 @@
 
 ## Out of scope
 
-- SP 800-171 Rev 2, which CMMC Level 2 assesses today: NIST publishes no OSCAL content for it, so it is its own package from another source.
+- SP 800-171 Rev 2, which CMMC Level 2 assesses today: NIST publishes no OSCAL content for it; it is read from the printed publications (0003-sp800-171-r2).
 - Baselines and profiles (FedRAMP's, NIST's): later packages, with crosswalks.
 - The guidance text and the assessment methods and objects of the publications.
 

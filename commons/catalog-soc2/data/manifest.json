@@ -1,0 +1,38 @@
+{
+  "kind": "grc.catalog-package",
+  "schema": "1",
+  "id": "catalog-soc2",
+  "createdAt": "2026-11-21T00:00:00Z",
+  "provenance": {
+    "producer": {
+      "name": "catalog-soc2",
+      "version": "1"
+    },
+    "inputs": [
+      "src/governance/criteria.ts"
+    ]
+  },
+  "version": "2017",
+  "title": "SOC 2 Trust Services Criteria (2017, revised points of focus 2022), in our own words",
+  "source": {
+    "publisher": "Intellectual Frontiers LLC, reading the criteria of the AICPA",
+    "edition": "2017 Trust Services Criteria for Security, Availability, Processing Integrity, Confidentiality, and Privacy (With Revised Points of Focus, 2022); American Institute of Certified Public Accountants (AICPA), Assurance Services Executive Committee",
+    "url": "https://www.aicpa-cima.com/resources/landing/2017-trust-services-criteria-with-revised-points-of-focus-2022"
+  },
+  "licence": "Own words of Intellectual Frontiers LLC under the PolyForm Noncommercial License 1.0.0. The identifiers (CC6.1) and the series names refer to the AICPA's Trust Services Criteria; the AICPA's text, its points of focus and its illustrative controls are its copyright and are not carried. The titles and statements are a reading of each criterion, not a quotation and not a substitute for the publication.",
+  "redistributable": true,
+  "holds": [
+    {
+      "kind": "grc.framework",
+      "id": "soc2-tsc",
+      "file": "frameworks/soc2-tsc-2017.json",
+      "digest": "f651a7072dd4e4e2d817afd44dea0a6a09bd165b06ac4ef008b5d23a1f286685"
+    }
+  ],
+  "sources": [
+    {
+      "url": "src/governance/criteria.ts",
+      "sha256": "d2f5f4d90e0003b238022b54cede961c863fb13e8256ba629c1b878a7697e42c"
+    }
+  ]
+}
