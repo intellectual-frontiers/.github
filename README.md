@@ -66,9 +66,11 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/anyfs`](commons/anyfs) | Foundation | One typed interface to the places bytes live | layers, plugins | L1 | held |
 | [`@intellectual-frontiers/anyfs-bridge`](commons/anyfs-bridge) | Foundation | Copy, sync, move, check, two-way sync and mirror between any two AnyFS stores | layers, extension | L1 | held |
 | [`@intellectual-frontiers/anyfs-git`](commons/anyfs-git) | Foundation | A branch of a Git repository and a Git working tree, each kept as an AnyFS store | layers, extension | L1 | held |
+| [`@intellectual-frontiers/anyfs-githost`](commons/anyfs-githost) | Foundation | The Git host backend of AnyFS | layers, extension | L1 | held |
 | [`@intellectual-frontiers/anyfs-posix`](commons/anyfs-posix) | Foundation | The POSIX view of any AnyFS store | layers, extension | L1 | held |
 | [`@intellectual-frontiers/anyfs-query`](commons/anyfs-query) | Foundation | Read-only SQL over the files, places, revisions and content of any AnyFS store | layers, extension | L1 | held |
 | [`@intellectual-frontiers/anyfs-s3`](commons/anyfs-s3) | Foundation | The S3 backend of AnyFS: a store over a bucket and a prefix of any S3-compatible service | layers, extension | L1 | held |
+| [`@intellectual-frontiers/anyfs-serve`](commons/anyfs-serve) | Foundation | AnyFS over HTTP: any AnyFS store served as WebDAV | layers, extension | L1 | held |
 | [`@intellectual-frontiers/anyfs-sql`](commons/anyfs-sql) | Foundation | A table of any SQL-speaking database kept as an AnyFS store | layers, extension | L1 | held |
 | [`@intellectual-frontiers/anyfs-ssh`](commons/anyfs-ssh) | Foundation | The SSH backend of AnyFS: a store over a folder on a host reached by SSH | layers, extension | L1 | held |
 | [`@intellectual-frontiers/core`](https://www.npmjs.com/package/@intellectual-frontiers/core) | Foundation | Errors as values (`Result`) | - | L1 | GitHub, npm |
