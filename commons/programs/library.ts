@@ -9,7 +9,7 @@ export const library = {
   name: "programs",
   level: "L0",
   verify: "bun run verify",
-  version: "0.1.5",
+  version: "0.1.6",
   distribution: ["github", "npm"],
   exports: ["."],
   bundle: "programs",

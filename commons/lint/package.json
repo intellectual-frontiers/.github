@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/lint",
   "private": true,
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "The lint plugin of Intellectual Frontiers in the ESLint plugin format that bun lint --plugin loads, with the rules every harness wants (no vendor API, no registry import, import boundaries, a module block in every file, absurd in every switch, no write to the terminal outside a list) and the typed way to define a rule of its own and to test it against the real linter.",
   "type": "module",
   "engines": {

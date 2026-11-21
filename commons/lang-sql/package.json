@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/lang-sql",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A small, fast, portable multi-dialect SQL language library: a lexer, a closed syntax tree and a parser for thirty dialects, comments as first-class nodes, and extensions for queries, unist, documentation and PL/pgSQL.",
   "type": "module",
   "engines": {
