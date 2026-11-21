@@ -288,6 +288,7 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/linux-observe/spec-kit" },
     { layout: "commons", dir: "commons/linux-services/spec-kit" },
     { layout: "commons", dir: "commons/netboot/spec-kit" },
+    { layout: "commons", dir: "commons/change-control/spec-kit" },
     { layout: "commons", dir: "commons/repoctl/spec-kit" },
     { layout: "commons", dir: "commons/estate-query/spec-kit" },
   ],
