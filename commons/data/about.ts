@@ -32,6 +32,11 @@ export const about: About = {
       mayImport: ["governance/, engine/, by package name"],
     },
     {
+      path: "sql/lang/",
+      what: "The SQL language core (0065-sql-lang): a small, fast, portable front end for SQL in many dialects, built to be published alone as `@intellectual-frontiers/sql-lang`. The lexical layer first: `lex` turns text into tokens and comments with exact positions, a dialect (`defineDialect`) says how it is written, and every comment is kept with its kind, marker, span and place for the features that read them. The core is the files of the folder; the dialects are `dialects/<name>/` and the extensions will be `extensions/<name>/`, which may import the core and nothing else here.",
+      mayImport: ["@intellectual-frontiers/core, by package name, and nothing of this library"],
+    },
+    {
       path: "sql/lifecycle/",
       what: "What changes a database from one physical schema to the next: the hashed state of a database, the changes between two states, the plan of classified steps, the hash-chained ledger and the run on a driver. Strategies and features of migration (idempotency first) are extensions of it.",
       mayImport: ["sql/physical/, sql/logical/, governance/, engine/, by package name"],

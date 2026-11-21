@@ -23,6 +23,7 @@ export const CORE = "@intellectual-frontiers/core";
 
 /** The kinds of unit of the table (0001-layers FR-004, FR-008, 0011-sql-lifecycle FR-001). */
 export type UnitClass =
+  | "lang"
   | "engine"
   | "governance"
   | "logical"
@@ -66,6 +67,7 @@ type Folder = { readonly prefix: string; readonly class: UnitClass; readonly ins
 const FOLDERS: readonly Folder[] = [
   { prefix: "engine/", class: "engine", instances: false },
   { prefix: "governance/", class: "governance", instances: false },
+  { prefix: "sql/lang/", class: "lang", instances: false },
   { prefix: "sql/logical/", class: "logical", instances: false },
   { prefix: "sql/physical/", class: "physical", instances: false },
   { prefix: "sql/lifecycle/", class: "lifecycle", instances: false },
@@ -94,13 +96,14 @@ const FOLDERS: readonly Folder[] = [
 
 /** What each class may import (0001-layers FR-004); a unit may always import itself. */
 export const MAY_IMPORT: Readonly<Record<UnitClass, readonly UnitClass[]>> = {
+  lang: [],
   engine: [],
   governance: ["engine"],
   logical: ["governance", "engine"],
   physical: ["logical", "governance", "engine"],
   lifecycle: ["physical", "logical", "governance", "engine"],
   dialect: ["physical", "logical", "governance", "engine"],
-  sqlextension: ["lifecycle", "physical", "logical", "governance", "engine"],
+  sqlextension: ["lang", "lifecycle", "physical", "logical", "governance", "engine"],
   meaning: ["loads", "quality", "typed", "lifecycle", "physical", "logical", "governance", "engine"],
   contract: ["loads", "quality", "typed", "lifecycle", "physical", "logical", "governance", "engine"],
   operations: ["loads", "quality", "typed", "lifecycle", "physical", "logical", "governance", "engine"],
@@ -116,15 +119,16 @@ export const MAY_IMPORT: Readonly<Record<UnitClass, readonly UnitClass[]>> = {
   issues: ["governance", "engine"],
   model: ["governance", "engine", "model"],
   extension: ["governance", "engine"],
-  cli: ["preset", "flow", "proof", "operations", "contract", "meaning", "federate", "describe", "drivers", "loads", "quality", "typed", "sqlextension", "dialect", "lifecycle", "physical", "logical", "governance", "engine", "extension", "model"],
-  suite: ["engine", "governance", "logical", "physical", "lifecycle", "dialect", "sqlextension", "flow", "proof", "operations", "contract", "meaning", "federate", "describe", "drivers", "loads", "quality", "typed", "preset", "model", "extension", "cli", "examples"],
-  examples: ["engine", "governance", "logical", "physical", "lifecycle", "dialect", "sqlextension", "flow", "proof", "operations", "contract", "meaning", "federate", "describe", "drivers", "loads", "quality", "typed", "preset", "model", "extension", "cli"],
+  cli: ["lang", "preset", "flow", "proof", "operations", "contract", "meaning", "federate", "describe", "drivers", "loads", "quality", "typed", "sqlextension", "dialect", "lifecycle", "physical", "logical", "governance", "engine", "extension", "model"],
+  suite: ["lang", "engine", "governance", "logical", "physical", "lifecycle", "dialect", "sqlextension", "flow", "proof", "operations", "contract", "meaning", "federate", "describe", "drivers", "loads", "quality", "typed", "preset", "model", "extension", "cli", "examples"],
+  examples: ["lang", "engine", "governance", "logical", "physical", "lifecycle", "dialect", "sqlextension", "flow", "proof", "operations", "contract", "meaning", "federate", "describe", "drivers", "loads", "quality", "typed", "preset", "model", "extension", "cli"],
   tools: [],
   root: [],
 };
 
 /** How high a class stands: an import of a higher level climbs (`layers/above`), of the same or a lower one that is not allowed reaches around (`layers/around`). */
 const LEVEL: Readonly<Record<UnitClass, number>> = {
+  lang: -1,
   engine: 0,
   governance: 1,
   logical: 2,
@@ -158,7 +162,7 @@ const LEVEL: Readonly<Record<UnitClass, number>> = {
 const OWN: ReadonlySet<UnitClass> = new Set<UnitClass>(["suite", "examples", "tools", "root"]);
 
 /** The classes that import the kernel and the library alone (0001-layers FR-005). */
-const STRICT: ReadonlySet<UnitClass> = new Set<UnitClass>(["engine", "governance", "logical", "physical"]);
+const STRICT: ReadonlySet<UnitClass> = new Set<UnitClass>(["lang", "engine", "governance", "logical", "physical"]);
 
 /** The unit a file is in, from its path relative to the library with `/`; `undefined` where it is in none (0001-layers FR-008). */
 export function unitOf(path: string): Unit | undefined {

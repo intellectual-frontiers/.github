@@ -1,0 +1,91 @@
+/**
+ * The PostgreSQL dialect's lexical layer (commons data 0065-sql-lang FR-017): `--` comments and `/* *\/` comments that nest, identifiers in `"`, strings in `'` that write a quote twice, the prefixes
+ * `E` (backslash escapes), `B`, `X`, `N` and `U&`, dollar quotes, the parameter `$1`, `$` inside a word, and the operators of the language including the JSON, array, text-search and regular-expression ones.
+ * PostgreSQL has no `#` comment: `#` begins an operator.
+ *
+ * Spec: 0065-sql-lang FR-017
+ *
+ * @module
+ */
+import { ansi } from "../../ansi.ts";
+import { declareDialect } from "../../dialect.ts";
+
+/** PostgreSQL. */
+export const dialect = declareDialect({
+  name: "postgres",
+  extends: ansi,
+  lexical: (base) => ({
+    ...base,
+    prefixes: [{ prefix: "E", escape: "both" }, { prefix: "B" }, { prefix: "X" }, { prefix: "N" }, { prefix: "U&" }],
+    dollarQuotes: true,
+    params: ["dollar-number"],
+    operators: [
+      ...base.operators,
+      "::",
+      "->",
+      "->>",
+      "#>",
+      "#>>",
+      "@>",
+      "<@",
+      "?|",
+      "?&",
+      "<<",
+      ">>",
+      "&&",
+      "~*",
+      "!~",
+      "!~*",
+      "~~",
+      "~~*",
+      "!~~",
+      "!~~*",
+      "@@",
+      "<->",
+      "=>",
+      ":=",
+      "**",
+      "#-",
+      "@?",
+      "<<=",
+      ">>=",
+      "&<",
+      "&>",
+      "-|-",
+    ],
+    keywords: [
+      ...base.keywords,
+      "ILIKE",
+      "SIMILAR",
+      "RETURNING",
+      "CONFLICT",
+      "DO",
+      "NOTHING",
+      "LATERAL",
+      "ORDINALITY",
+      "MATERIALIZED",
+      "VERBOSE",
+      "ANALYZE",
+      "VACUUM",
+      "TABLESAMPLE",
+      "COLLATION",
+      "INHERITS",
+      "UNLOGGED",
+      "TEMP",
+      "TEMPORARY",
+      "SEQUENCE",
+      "SCHEMA",
+      "EXTENSION",
+      "FUNCTION",
+      "TRIGGER",
+      "DOMAIN",
+      "OWNER",
+      "CASCADE",
+      "RESTRICT",
+      "SERIAL",
+      "BIGSERIAL",
+    ],
+    wordChars: "$",
+    numbers: { radix: true, underscores: true },
+  }),
+});

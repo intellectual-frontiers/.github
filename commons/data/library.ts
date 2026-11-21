@@ -16,6 +16,10 @@ export const library = {
   exports: [
     "./engine",
     "./governance",
+    "./sql/lang",
+    "./sql/lang/dialects/sqlite",
+    "./sql/lang/dialects/postgres",
+    "./sql/lang/dialects/duckdb",
     "./sql/logical",
     "./sql/physical",
     "./models/arca",

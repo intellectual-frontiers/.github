@@ -10,6 +10,10 @@
   "exports": {
     "./engine": "./engine/api.ts",
     "./governance": "./governance/api.ts",
+    "./sql/lang": "./sql/lang/mod.ts",
+    "./sql/lang/dialects/sqlite": "./sql/lang/dialects/sqlite/mod.ts",
+    "./sql/lang/dialects/postgres": "./sql/lang/dialects/postgres/mod.ts",
+    "./sql/lang/dialects/duckdb": "./sql/lang/dialects/duckdb/mod.ts",
     "./sql/logical": "./sql/logical/api.ts",
     "./sql/physical": "./sql/physical/api.ts",
     "./issues": "./issues/mod.ts",
