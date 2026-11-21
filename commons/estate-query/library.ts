@@ -12,7 +12,7 @@ export const library = {
   verify: "bun run verify",
   version: "0.1.0",
   distribution: ["github"],
-  held: "built and verified but not released: the owner publishes the fleet libraries together, when the first fleet runs on them",
+  held: { kind: "owner-blocked", reason: "built and verified but not released: the owner publishes the fleet libraries together, when the first fleet runs on them" },
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "SQL over the estate: what an estate holds (its assets, the capabilities of each and who owns them, what is declared and observed, the policies judged, the risks accepted, the operational truth and the invariants broken) as relations with a catalog that is data, asked with one read-only statement through the guard and the engine of lang-sql, with no secret in a relation.",
   kanon: {

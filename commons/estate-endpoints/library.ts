@@ -12,7 +12,7 @@ export const library = {
   verify: "bun run verify",
   version: "0.1.0",
   distribution: ["github"],
-  held: "built and verified but not released: the owner publishes the fleet libraries together, when the first fleet runs on them",
+  held: { kind: "owner-blocked", reason: "built and verified but not released: the owner publishes the fleet libraries together, when the first fleet runs on them" },
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "Finds the endpoints of an estate from what describes or shows them: OpenAPI and GraphQL descriptions, Android and iOS manifests, DNS zone files, certificates and the listening ports a machine reports, as assets and links of the estate with where each came from. It reads files and text and reaches no network.",
   kanon: {

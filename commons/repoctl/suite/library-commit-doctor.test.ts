@@ -9,7 +9,7 @@ import { assert, assertEquals, assertStringIncludes, proves } from "@intellectua
 import { ok } from "@intellectual-frontiers/core";
 import { fs, path, proc } from "@intellectual-frontiers/system";
 import { type CommitPolicy, type DoctorPolicy, DEFAULT_ALLOWED_PATHS, DEFAULT_FORBIDDEN_PATHS, DEFAULT_SECRET_PATTERNS, TIERS } from "@intellectual-frontiers/repoctl/governance";
-import { acceptName, diagnose, type Facts, filesOf, forbidden, gatherFacts, type Held, majorOf, messageOf, messageText, type Process, ROLES, secretLike, titleOf, withRole, type World } from "@intellectual-frontiers/repoctl/logical";
+import { acceptName, diagnose, type Facts, filesOf, forbidden, gatherFacts, type Held, majorOf, messageOf, messageText, type Process, ROLES, secretLike, titleOf, withRole, withSpecKit, type World } from "@intellectual-frontiers/repoctl/logical";
 import { systemProcess, systemWorld } from "@intellectual-frontiers/repoctl/physical";
 import { main } from "@intellectual-frontiers/repoctl";
 import { CAN_RUN, CHECKOUT, checkVerdict, execute, git, hostOf, LIBRARIES, put, TEST_CO_AUTHOR, TEST_IDENTITY, withRepo } from "./world.ts";
@@ -110,6 +110,7 @@ proves(["0005-repoctl-library-commit-doctor FR-001", "0005-repoctl-library-commi
     for (const f of ["library.ts", "LICENSE", "spec-kit/registry.tsv", "suite/layers.test.ts"]) assert(await fs.exists(path.join(dir, "commons/probe", f)), `${f} is there`);
     assertStringIncludes(await fs.readTextFile(path.join(dir, "commons/libraries/src/readme.ts")), '["probe", "program"]');
     assertStringIncludes(await fs.readTextFile(path.join(dir, "README.md")), "probe");
+    assertStringIncludes(await fs.readTextFile(path.join(dir, "commons/docs.config.ts")), '{ layout: "commons", dir: "commons/probe/spec-kit" },');
     out.length = 0;
     assertEquals(await main(["sync", "--check"], io), 0, `${out.join("")}${err.join("")}`);
     const lib = path.join(dir, "commons/probe");
@@ -129,6 +130,7 @@ proves(["0005-repoctl-library-commit-doctor FR-005"], "the message is the subjec
   assertEquals(m.trailers, ["Refs #10", CO_AUTHOR, `Claude-Session: ${SESSION}`]);
   assertEquals(messageText(m), `Add the doctor\n\nRefs #10\n${CO_AUTHOR}\nClaude-Session: ${SESSION}\n`);
   assertEquals(messageOf(TRAILERS, { subject: "S", refs: undefined, coAuthor: CO_AUTHOR, session: SESSION }).trailers, [CO_AUTHOR, `Claude-Session: ${SESSION}`]);
+  assertEquals(messageOf({ ...TRAILERS, trailers: ["issue", "impact", "co-author", "session"] }, { subject: "S", refs: "10", impact: "major", coAuthor: CO_AUTHOR, session: SESSION }).trailers, ["Refs #10", "Impact: major", CO_AUTHOR, `Claude-Session: ${SESSION}`]);
 });
 
 proves(["0005-repoctl-library-commit-doctor FR-006"], "a path of the agent, of installed packages, of a secret and a text that looks like a secret are named and refused", () => {
@@ -280,4 +282,13 @@ proves(["0005-repoctl-library-commit-doctor FR-008"], "the real checkout is in o
   assertEquals(doc.data.installed, await fs.exists(path.join(CHECKOUT, "node_modules")));
   const node26 = majorOf(doc.data.node ?? undefined) !== undefined && (majorOf(doc.data.node ?? undefined) ?? 0) >= 26;
   assertEquals(out.code, node26 && doc.data.installed ? 0 : 1, JSON.stringify(doc.problems));
+});
+
+proves(["0005-repoctl-library-commit-doctor FR-003"], "the spec kit of a new library is listed after the last one the configuration of the site lists, once, and a configuration that lists none is refused", () => {
+  const source = 'specKits: [\n    { layout: "commons", dir: "commons/a/spec-kit" },\n    { layout: "commons", dir: "commons/b/spec-kit" },\n  ],\n';
+  const once = withSpecKit(source, "c", "spec-kit");
+  assert(once.kind === "ok");
+  assertEquals(once.value, 'specKits: [\n    { layout: "commons", dir: "commons/a/spec-kit" },\n    { layout: "commons", dir: "commons/b/spec-kit" },\n    { layout: "commons", dir: "commons/c/spec-kit" },\n  ],\n');
+  assertEquals(withSpecKit(once.value, "c", "spec-kit"), { kind: "ok", value: once.value });
+  assertEquals(withSpecKit("specKits: [],\n", "c", "spec-kit").kind, "err");
 });

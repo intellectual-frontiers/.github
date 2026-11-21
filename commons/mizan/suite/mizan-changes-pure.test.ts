@@ -9,7 +9,7 @@
 import type { IssueInfo } from "@intellectual-frontiers/githost/types";
 import * as ifccm from "@intellectual-frontiers/ontology/ifccm";
 import { holdHarness } from "../src/harness.ts";
-import { commitFindings, strictFindings, type CommitFacts, type Context, type IssueAnswer } from "../src/changes/rules.ts";
+import { CHANGES_RULES, commitFindings, strictFindings, type CommitFacts, type Context, type IssueAnswer } from "../src/changes/rules.ts";
 import { namedIssues, parseMessage } from "../src/changes/commit-message.ts";
 import {
   doneWhenItems,
@@ -105,6 +105,24 @@ proves(["0020-ifccm FR-008"], "the words a host reads as closing other than Clos
   assertStringIncludes(found[0]?.message ?? "", "Closes #N on the commit that finishes it");
   // a commit that names its change request only by a wrong word is not also reported as naming none
   assertEquals(commitFindings([commit(1, "Refs #10\nCloses #10\n")], WARN), []);
+});
+
+proves(["0020-ifccm FR-045"], "an Impact line is read as major, minor or patch in any case and a line that is none of the three is changes/impact with its value, held by the phase like the other findings", () => {
+  const ok = parseMessage("Add it\n\nRefs #10\nImpact: minor\nimpact: PATCH\n  Impact:  major  \n> Impact: nonsense\n");
+  assertEquals(ok.badImpacts, []);
+  const bad = parseMessage("Add it\n\nRefs #10\nImpact: huge\nImpact:\nImpact: major, minor\n");
+  assertEquals(bad.badImpacts, [
+    { value: "huge", line: 4 },
+    { value: "", line: 5 },
+    { value: "major, minor", line: 6 },
+  ]);
+  assertEquals(commitFindings([commit(1, "Refs #10\nImpact: minor\n")], WARN), []);
+  const found = commitFindings([commit(1, "Refs #10\nImpact: huge\n")], WARN);
+  assertEquals(found.map((f) => [f.rule, f.severity]), [["changes/impact", "warn"]]);
+  assertStringIncludes(found[0]?.message ?? "", "Impact: huge");
+  assertStringIncludes(found[0]?.message ?? "", "major, minor or patch");
+  assertEquals(commitFindings([commit(1, "Refs #10\nImpact: huge\n")], { ...WARN, phase: "gate" }).map((f) => f.severity), ["gate"]);
+  assertEquals(new Set(CHANGES_RULES).has("changes/impact"), true);
 });
 
 proves(

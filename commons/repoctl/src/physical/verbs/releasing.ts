@@ -13,15 +13,17 @@
  * @module
  */
 import { findingsOfPublish, finding, findingsOfSync, gate, orderGenerators, planPublish, runPublish, runSync, STAGED_NOTE, type Finding, type PublishPlan, type Published, type ReleaseEntry, type World } from "@intellectual-frontiers/repoctl/logical";
-import { applyRelease, describe, factsOf, offlineRegistry, planRelease, type Plan, raiseOf, readRecord, REAL, realRegistry, RECORD_PATH } from "@intellectual-frontiers/libraries/releasing";
+import { applyRelease, describe, offlinePublishedExports, offlineRegistry, type Plan, raiseOf, readRecord, REAL, realPublishedExports, realRegistry, RECORD_PATH, releasePlan } from "@intellectual-frontiers/libraries/releasing";
+import { holdSentence } from "@intellectual-frontiers/libraries/libraries";
 import { flag, many, value } from "@intellectual-frontiers/terminal/args";
 import { type Done, defineVerb, generatorsOf, outcomeOfDone, outcomeOfEnvironment, outcomeOfUsage } from "../define.ts";
 
 /** The lines of a plan for a person: one for each library that is released, and the libraries that are left alone. */
 export function planText(plan: Plan): string {
-  if (plan.steps.length === 0) return "nothing to release: every library is tagged at its version and unchanged";
+  const held = plan.held.map((h) => `${h.name} not released  ${holdSentence(h.hold)}`);
+  if (plan.steps.length === 0) return ["nothing to release: every library is tagged at its version and unchanged", ...held].join("\n");
   const lines = plan.steps.map((s) => `${s.slug} ${s.from === s.to ? s.to : `${s.from} -> ${s.to}`}${s.publish ? "" : " (tag only)"}  ${describe(s.decision, s.from)}`);
-  return [...lines, ...(plan.unchanged.length > 0 ? [`left alone (${plan.unchanged.length}): ${plan.unchanged.join(", ")}`] : [])].join("\n");
+  return [...lines, ...(plan.unchanged.length > 0 ? [`left alone (${plan.unchanged.length}): ${plan.unchanged.join(", ")}`] : []), ...held].join("\n");
 }
 
 /** The data of a plan, for `--json`. */
@@ -29,6 +31,7 @@ export function planData(plan: Plan): unknown {
   return {
     steps: plan.steps.map((s) => ({ library: s.slug, from: s.from, to: s.to, tag: s.tag, publish: s.publish, why: describe(s.decision, s.from) })),
     unchanged: plan.unchanged,
+    held: plan.held.map((h) => ({ library: h.name, kind: h.hold.kind, why: holdSentence(h.hold) })),
   };
 }
 
@@ -40,9 +43,7 @@ const OPTIONS = {
 async function planOf(w: World, offline: boolean, words: readonly string[]): Promise<{ readonly plan: Plan } | { readonly problem: string; readonly usage: boolean }> {
   const raise = raiseOf(words);
   if (raise.kind === "err") return { problem: raise.error, usage: true };
-  const facts = await factsOf(w.repo, offline ? offlineRegistry : realRegistry(w.repo));
-  if (facts.kind === "err") return { problem: facts.error, usage: false };
-  const planned = planRelease(facts.value, raise.value);
+  const planned = await releasePlan(w.repo, { raise: raise.value, registry: offline ? offlineRegistry : realRegistry(w.repo), published: offline ? offlinePublishedExports : realPublishedExports() });
   return planned.kind === "err" ? { problem: planned.error, usage: false } : { plan: planned.value };
 }
 
@@ -81,7 +82,7 @@ export const releaseApplyVerb = defineVerb({
     }
     const raise = raiseOf(args.options.raise ?? []);
     if (raise.kind === "err") return outcomeOfUsage(raise.error, "E-USAGE", "repoctl release apply --help");
-    const made = await applyRelease(w.repo, host.releasing ?? REAL, { tests: args.options.tests, raise: raise.value, registry: args.options.offline ? offlineRegistry : realRegistry(w.repo) });
+    const made = await applyRelease(w.repo, host.releasing ?? REAL, { tests: args.options.tests, raise: raise.value, registry: args.options.offline ? offlineRegistry : realRegistry(w.repo), published: args.options.offline ? offlinePublishedExports : realPublishedExports() });
     if (made.kind === "err") return outcomeOfDone({ data: null, text: made.error, findings: [finding("fail", "E-RELEASE-FAILED", made.error, "repoctl release plan")] });
     const order = orderGenerators(generatorsOf(host));
     if (order.kind === "err") return outcomeOfEnvironment(`the table of generators waits for itself: ${order.error.join(", ")}`);

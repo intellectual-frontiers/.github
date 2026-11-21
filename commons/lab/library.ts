@@ -12,7 +12,7 @@ export const library = {
   verify: "bun run verify",
   version: "0.1.0",
   distribution: ["github"],
-  held: "for tests only: a library of disposable machines that no program of ours depends on at run time",
+  held: { kind: "tests-only", reason: "a library of disposable machines that no program of ours depends on at run time" },
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "Disposable machines for tests: a systemd and sshd container rendered from a typed description, started and removed per test with a throwaway key, and what a container can and cannot stand in for.",
   kanon: {

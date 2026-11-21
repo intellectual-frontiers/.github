@@ -83,7 +83,7 @@ proves(["0001-anyfs-layers FR-005"], "the release record agrees with the manifes
   assertEquals(release.slug, library.name);
   assertEquals(release.version, library.version);
   assertEquals(release.kind, "Software");
-  assert(library.held.length > 0, "the library says why it is held");
+  assert(library.held.reason.length > 0, "the library says why it is held");
 });
 
 proves(["0001-anyfs-layers FR-006"], "governance, logical and the store in memory read no file, reach no network and run no program", async () => {

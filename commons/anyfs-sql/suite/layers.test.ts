@@ -26,7 +26,7 @@ proves(["0001-sql-layers FR-001"], "the manifest is a plugin of the family of An
   assertEquals(library.family, { host: "anyfs", role: "plugin" });
   assertEquals(library.kanon.extends, "@intellectual-frontiers/anyfs");
   assertEquals(library.distribution, ["github"]);
-  assert(typeof library.held === "string" && library.held !== "");
+  assert(library.held.kind === "unfinished" && library.held.reason !== "");
   const manifest = JSON.parse(await fs.readTextFile(path.join(ROOT, "package.json"))) as { exports: Record<string, string> };
   assertEquals([...library.exports].sort(), Object.keys(manifest.exports).sort());
   assert(Object.keys(governance).includes("parseNaming") && Object.keys(physical).includes("openSqlStore") && Object.keys(physical).includes("migrate"));

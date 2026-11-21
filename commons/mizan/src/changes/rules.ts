@@ -45,7 +45,8 @@ export type ChangesRule =
   | "changes/issue-shape"
   | "changes/no-decision"
   | "changes/self-approved"
-  | "changes/declaration";
+  | "changes/declaration"
+  | "changes/impact";
 
 /** Every rule, in the order the report lists them. */
 export const CHANGES_RULES: readonly ChangesRule[] = [
@@ -59,6 +60,7 @@ export const CHANGES_RULES: readonly ChangesRule[] = [
   "changes/no-decision",
   "changes/self-approved",
   "changes/declaration",
+  "changes/impact",
 ];
 
 /** The rules that need the host (`--strict`, 0020-ifccm FR-009). */
@@ -119,7 +121,7 @@ function isJoin(c: CommitFacts, bySha: ReadonlyMap<string, CommitFacts>): boolea
   });
 }
 
-/** The offline findings of a range of commits: no issue, a closing word other than `Closes`, a departure with no Decision, and a Decision approved by the author where a regulated domain is claimed. */
+/** The offline findings of a range of commits: no issue, a closing word other than `Closes`, a departure with no Decision, an `Impact:` line that is not major, minor or patch, and a Decision approved by the author where a regulated domain is claimed. */
 export function commitFindings(commits: readonly CommitFacts[], ctx: Context): readonly ChangesFinding[] {
   const bySha = new Map(commits.map((c) => [c.sha, c]));
   const out: ChangesFinding[] = [];
@@ -144,6 +146,8 @@ export function commitFindings(commits: readonly CommitFacts[], ctx: Context): r
           `${w.word.toLowerCase()} ${w.repo ?? ""}#${w.number}`,
         ),
       );
+    for (const b of m.badImpacts)
+      out.push(found("changes/impact", ctx.phase, c.sha, `its line "Impact: ${b.value}" is none of major, minor or patch, so the release cannot read it`, `impact ${b.value}`));
     const authorized = new Map(ctx.decisions.filter((d) => m.decisions.includes(d.id)).map((d) => [d.id, d]));
     for (const id of m.decisions)
       if (!authorized.has(id))

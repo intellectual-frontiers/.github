@@ -1,11 +1,17 @@
 /**
- * The held library (0001-libraries FR-024): a manifest field that keeps a library out of the release entirely, the decoder's refusals, its absence from every set, and its flag in the README table.
+ * The policy of the release (0001-libraries FR-024): a library is released unless its manifest carries a typed reason not to, from a closed union of kinds with a required text; the decoder's acceptances and refusals, the library's absence from every set, the reason in the plan and in the README table.
  *
  * @module
  */
+import { slugOf } from "@intellectual-frontiers/mizan/versions/record";
+import { proc } from "@intellectual-frontiers/system";
+import { mkdirSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { join } from "@intellectual-frontiers/system/path";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
-import { decodeLibrarySource, type Library } from "../src/libraries.ts";
+import { decodeHold, decodeLibrarySource, HOLD_KINDS, type Hold, holdSentence, type Library, readLibraries } from "../src/libraries.ts";
 import { isConsumerFacing } from "../src/metapackages.ts";
+import { type Facts, offlinePublishedExports, offlineRegistry, planLines, planRelease, releasePlan } from "../src/releasing.ts";
+import { rowOf, tableOf } from "../src/readme.ts";
 
 const SPEC = "0001-libraries";
 
@@ -17,21 +23,121 @@ const lib = (name: string, extra: Record<string, unknown> = {}): Library => {
   return r.value;
 };
 
-proves([`${SPEC} FR-024`], "held is a non-empty line, allows any distribution, and is refused with publishes or bundle; without it a distribution of no registry is still refused", () => {
-  assertEquals(lib("archon", { held: "not published yet" }).held, "not published yet");
-  assertEquals(lib("archon", { held: "not published yet", distribution: [] }).distribution, []);
-  assertEquals(lib("archon", { held: "not published yet", distribution: ["npm"] }).distribution, ["npm"]);
+const decodeHoldOf = (h: unknown): Hold => {
+  const r = decodeHold(h);
+  if (r.kind === "err") throw new Error(r.error);
+  return r.value;
+};
+const OWNER_INPUT = { kind: "owner-blocked", reason: "the owner publishes the fleet libraries together" } as const;
+const UNFINISHED_INPUT = { kind: "unfinished", reason: "built, but nothing runs on it yet", missing: ["its first consumer"], liftedWhen: "the first consumer runs on it" } as const;
+const TESTS_INPUT = { kind: "tests-only", reason: "disposable machines that nothing depends on at run time" } as const;
+const OWNER = decodeHoldOf(OWNER_INPUT);
+const UNFINISHED = decodeHoldOf(UNFINISHED_INPUT);
+const TESTS = decodeHoldOf(TESTS_INPUT);
+
+proves([`${SPEC} FR-024`], "a library with no hold is released; a hold is one of the closed kinds with its text, an unfinished one names what is missing and what lifts it, and any other shape is refused", () => {
   assertEquals(lib("archon").held, undefined);
-  assertEquals(decodeLibrarySource(manifest("archon", { held: "" })).kind, "err");
-  assertEquals(decodeLibrarySource(manifest("archon", { held: " padded " })).kind, "err");
-  const both = decodeLibrarySource(manifest("archon", { held: "x", publishes: "@intellectual-frontiers/other" }));
+  assertEquals([...HOLD_KINDS], ["tests-only", "unfinished", "owner-blocked"]);
+  assertEquals(lib("archon", { held: OWNER_INPUT }).held, OWNER);
+  assertEquals(lib("archon", { held: UNFINISHED_INPUT }).held, UNFINISHED);
+  assertEquals(lib("archon", { held: TESTS_INPUT }).held, TESTS);
+  // the text is one trimmed non-empty line, and the kind is one of the three
+  const refused = (held: unknown): string => {
+    const r = decodeLibrarySource(manifest("archon", { held }));
+    assert(r.kind === "err", `${JSON.stringify(held)} is refused`);
+    return r.error;
+  };
+  assertStringIncludes(refused("not published yet"), "library.held is");
+  assertStringIncludes(refused({ kind: "later", reason: "x" }), "library.held is");
+  assertStringIncludes(refused({ kind: "owner-blocked", reason: "" }), "library.held.reason");
+  assertStringIncludes(refused({ kind: "owner-blocked", reason: " padded " }), "library.held.reason");
+  assertStringIncludes(refused({ kind: "owner-blocked" }), "library.held.reason");
+  assertStringIncludes(refused({ kind: "owner-blocked", reason: "x", liftedWhen: "y" }), "library.held.liftedWhen");
+  assertStringIncludes(refused({ kind: "unfinished", reason: "x", missing: ["a"] }), "library.held.liftedWhen");
+  assertStringIncludes(refused({ kind: "unfinished", reason: "x", liftedWhen: "y" }), "library.held.missing");
+  assertStringIncludes(refused({ kind: "unfinished", reason: "x", liftedWhen: "y", missing: [] }), "library.held.missing");
+  assertStringIncludes(refused({ kind: "unfinished", reason: "x", liftedWhen: "y", missing: [""] }), "library.held.missing[0]");
+  assertEquals(decodeHold(null).kind, "err");
+  assertEquals(decodeHold([]).kind, "err");
+});
+
+proves([`${SPEC} FR-024`], "a held library may declare any distribution and is refused with publishes or bundle; without a hold a distribution of no registry is still refused", () => {
+  assertEquals(lib("archon", { held: OWNER_INPUT, distribution: [] }).distribution, []);
+  assertEquals(lib("archon", { held: OWNER_INPUT, distribution: ["npm"] }).distribution, ["npm"]);
+  const both = decodeLibrarySource(manifest("archon", { held: OWNER_INPUT, publishes: "@intellectual-frontiers/other" }));
   assert(both.kind === "err");
   assertStringIncludes(both.error, "library.held");
-  assertEquals(decodeLibrarySource(manifest("foundation", { held: "x", bundle: "foundation" })).kind, "err");
+  assertEquals(decodeLibrarySource(manifest("foundation", { held: OWNER_INPUT, bundle: "foundation" })).kind, "err");
   assertEquals(decodeLibrarySource(manifest("archon", { distribution: [] })).kind, "err");
 });
 
-proves([`${SPEC} FR-024`], "a held library is in no set even where it declares npm", () => {
-  assertEquals(isConsumerFacing(lib("archon", { held: "not published yet", distribution: ["github", "npm"] })), false);
+proves([`${SPEC} FR-024`], "a held library is in no set even where it declares npm, and every hold says itself in one sentence", () => {
+  assertEquals(isConsumerFacing(lib("archon", { held: OWNER_INPUT, distribution: ["github", "npm"] })), false);
   assertEquals(isConsumerFacing(lib("widget", { distribution: ["github", "npm"] })), true);
+  assertEquals(holdSentence(TESTS), "tests only: disposable machines that nothing depends on at run time");
+  assertEquals(holdSentence(OWNER), "owner-blocked: the owner publishes the fleet libraries together");
+  assertEquals(holdSentence(UNFINISHED), "unfinished (missing its first consumer): built, but nothing runs on it yet; lifted when the first consumer runs on it");
+});
+
+proves([`${SPEC} FR-024`, `${SPEC} FR-026`], "the plan says for each library that is not released the kind of its hold and its text, --raise of one says so, and the README row says not released with the kind", () => {
+  const slug = slugOf(lib("widget", { distribution: ["github", "npm"] }).name);
+  if (slug === undefined) throw new Error("widget is a slug");
+  const facts: Facts = {
+    slug,
+    folder: "commons/widget",
+    package: "@intellectual-frontiers/widget",
+    version: "0.1.0",
+    imports: [],
+    last: undefined,
+    changed: false,
+    impact: "patch",
+    publish: true,
+    registry: "absent",
+    sinceVersion: { changed: false, impact: "patch" },
+    exportsChange: undefined,
+  };
+  const held = [
+    { name: "archon", hold: OWNER },
+    { name: "lab", hold: TESTS },
+  ];
+  const planned = planRelease([facts], new Map(), held);
+  assert(planned.kind === "ok");
+  assertEquals(planned.value.steps.map((s) => s.slug as string), ["widget"]);
+  assertEquals(planned.value.held.map((h) => h.name), ["archon", "lab"]);
+  const lines = planLines({ tty: false, colour: false, emoji: false, columns: 80 }, planned.value);
+  assertEquals(lines.filter((l) => l.includes("not released")).length, 2);
+  assert(lines.some((l) => l.includes("archon not released") && l.includes("owner-blocked: the owner publishes the fleet libraries together")));
+  assert(lines.some((l) => l.includes("lab not released") && l.includes("tests only:")));
+  const raised = planRelease([facts], new Map([["archon", undefined]]), held);
+  assert(raised.kind === "err");
+  assertStringIncludes(raised.error, "archon (not released: owner-blocked: the owner publishes the fleet libraries together)");
+  const made = rowOf(lib("archon", { held: OWNER_INPUT }), "A program. More.");
+  assert(made.kind === "ok");
+  const row = tableOf([made.value]);
+  assertStringIncludes(row, "not released (owner-blocked)");
+});
+
+proves([`${SPEC} FR-024`, `${SPEC} FR-026`], "on a real repository a library with a hold is left out of the facts and the record and is named in the plan with its reason, and one with none is released", async () => {
+  const git = proc.which("git");
+  if (git === undefined) return;
+  await withTempDir(async (dir) => {
+    const put = (file: string, text: string): void => {
+      mkdirSync(join(dir, file, ".."), { recursive: true });
+      writeTextFileSync(join(dir, file), text);
+    };
+    for (const [name, extra] of [["ready", {}], ["parked", { held: UNFINISHED_INPUT }]] as const) {
+      put(`commons/${name}/library.ts`, manifest(name, { distribution: ["github", "npm"], ...extra }));
+      put(`commons/${name}/package.json`, `${JSON.stringify({ name: `@x/${name}`, version: "0.1.0", exports: { ".": "./src/mod.ts" } }, null, 2)}\n`);
+      put(`commons/${name}/src/mod.ts`, `export const ${name} = 1;\n`);
+    }
+    for (const a of [["init", "-q", "-b", "main"], ["add", "."], ["commit", "-q", "-m", "Start"]] as const) {
+      const r = await proc.run([git, "-C", dir, "-c", "user.name=t", "-c", "user.email=t@t", "-c", "commit.gpgsign=false", ...a]);
+      assertEquals(r.code, 0, r.stderr);
+    }
+    const planned = await releasePlan(dir, { registry: offlineRegistry, published: offlinePublishedExports });
+    assert(planned.kind === "ok", planned.kind === "err" ? planned.error : "");
+    assertEquals(planned.value.steps.map((s) => s.slug as string), ["ready"]);
+    assertEquals(planned.value.held.map((h) => `${h.name} ${h.hold.kind}`), ["parked unfinished"]);
+    assertEquals(readLibraries(dir).filter((f) => "library" in f && f.library.held !== undefined).length, 1);
+  });
 });

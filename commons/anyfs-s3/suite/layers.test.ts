@@ -47,8 +47,8 @@ proves(["0001-anyfs-s3-layers FR-003"], "no source reaches the network but the t
 });
 
 proves(["0001-anyfs-s3-layers FR-004"], "the manifest holds the library from the registries and names the reason", () => {
-  assertEquals(typeof library.held, "string");
-  assert(library.held.length > 10);
+  assertEquals(library.held.kind, "unfinished");
+  assert(library.held.reason.length > 10);
   assertEquals(library.distribution, ["github"]);
 });
 

@@ -12,7 +12,7 @@ export const library = {
   verify: "bun run verify",
   version: "0.1.0",
   distribution: ["github"],
-  held: "new: built and verified but not released until the command line runs a server on it",
+  held: { kind: "unfinished", reason: "built and verified but not released until the command line runs a server on it", missing: ["its first consumer, the command line"], liftedWhen: "the command line runs a server on it" },
   exports: [".", "./governance", "./logical", "./physical"],
   family: { host: "anyfs", role: "plugin" },
   summary:

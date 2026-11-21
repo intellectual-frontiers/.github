@@ -13,8 +13,8 @@
  * @module
  */
 import { RESERVED, type Match } from "@intellectual-frontiers/libraries/family";
-import { CO_AUTHOR_VARIABLE, parseIssueNumber, parseSessionUrl, parseSubject, SESSION_VARIABLE } from "@intellectual-frontiers/repoctl/governance";
-import { acceptName, filesOf, findingsOfSync, finding, type Held, messageText, orderGenerators, ROLES, type Role, runCommit, runSync, withRole } from "@intellectual-frontiers/repoctl/logical";
+import { CO_AUTHOR_VARIABLE, parseCommitImpact, parseIssueNumber, parseSessionUrl, parseSubject, SESSION_VARIABLE } from "@intellectual-frontiers/repoctl/governance";
+import { acceptName, filesOf, findingsOfSync, finding, type Held, messageText, orderGenerators, ROLES, type Role, runCommit, runSync, withRole, withSpecKit } from "@intellectual-frontiers/repoctl/logical";
 import { value } from "@intellectual-frontiers/terminal/args";
 import { defineVerb, generatorsOf, outcomeOfDone, outcomeOfEnvironment, outcomeOfUsage } from "../define.ts";
 
@@ -55,6 +55,14 @@ export const newLibraryVerb = defineVerb({
       if (classified.kind === "err") return outcomeOfEnvironment(classified.error);
       await w.files.write(readme, classified.value);
     }
+    if (settings.docsFile !== undefined) {
+      const docs = `${w.repo}/${settings.docsFile}`;
+      const source = await w.files.read(docs);
+      if (source === undefined) return outcomeOfEnvironment(`${settings.docsFile} is missing, so the spec kit of the library cannot be listed in it`);
+      const listed = withSpecKit(source, name.value, "spec-kit");
+      if (listed.kind === "err") return outcomeOfEnvironment(listed.error);
+      await w.files.write(docs, listed.value);
+    }
     if (settings.linker !== undefined) await w.process.run(settings.linker, { cwd: w.repo });
     const order = orderGenerators(generatorsOf(host));
     if (order.kind === "err") return outcomeOfEnvironment(`the table of generators waits for itself: ${order.error.join(", ")}`);
@@ -76,6 +84,7 @@ export const commitVerb = defineVerb({
   options: {
     message: value({ short: "m", help: "The subject of the commit: one line of at most 100 characters, with no full stop at its end.", valueName: "SUBJECT", required: true }),
     refs: value<never>({ help: "The issue the commit refers to: its number, written as the line `Refs #N`.", valueName: "N" }),
+    impact: value<never>({ help: "How much the release raises the version of a library this commit changes: major (a breaking change; a minor while the major version is 0), minor (a feature) or patch (a fix), written as the line `Impact:`.", valueName: "IMPACT" }),
     session: value<never>({ help: `The address of the session, written as the line \`Claude-Session\` (else the variable ${SESSION_VARIABLE}).`, valueName: "URL" }),
     coAuthor: value<never>({ help: `The line that credits the agent (else the variable ${CO_AUTHOR_VARIABLE}, else the configuration's).`, valueName: "LINE" }),
   },
@@ -89,7 +98,10 @@ export const commitVerb = defineVerb({
     if (subject.kind === "err") return outcomeOfUsage(subject.error, "E-COMMIT-SUBJECT", "repoctl commit --help");
     const refs = args.options.refs === undefined ? undefined : parseIssueNumber(args.options.refs);
     if (refs?.kind === "err") return outcomeOfUsage(refs.error, "E-COMMIT-REFS", "repoctl commit --help");
+    const impact = args.options.impact === undefined ? undefined : parseCommitImpact(args.options.impact);
+    if (impact?.kind === "err") return outcomeOfUsage(impact.error, "E-COMMIT-IMPACT", "repoctl commit --help");
     const policy = host.config.commit;
+    if (impact !== undefined && !policy.trailers.includes("impact")) return outcomeOfUsage("this repository's commits carry no Impact line: commit.trailers has no \"impact\"", "E-COMMIT-IMPACT", "repoctl commit --help");
     if (policy.issue.required && refs === undefined) return outcomeOfUsage("this repository's commits refer to an issue: give --refs N", "E-COMMIT-REFS", "repoctl commit --help");
     const text = args.options.session ?? host.env(SESSION_VARIABLE) ?? "";
     const session = policy.trailers.includes("session") ? parseSessionUrl(text) : undefined;
@@ -97,7 +109,7 @@ export const commitVerb = defineVerb({
     const coAuthor = policy.trailers.includes("co-author") ? (args.options.coAuthor ?? host.env(CO_AUTHOR_VARIABLE) ?? policy.coAuthor) : undefined;
     const order = orderGenerators(generatorsOf(host));
     if (order.kind === "err") return outcomeOfEnvironment(`the table of generators waits for itself: ${order.error.join(", ")}`);
-    const report = await runCommit(w, { subject: subject.value, refs: refs?.value, session: session?.value, coAuthor, paths: args.positionals, dryRun: ctx.mode !== "apply" }, order.value, policy);
+    const report = await runCommit(w, { subject: subject.value, refs: refs?.value, impact: impact?.value, session: session?.value, coAuthor, paths: args.positionals, dryRun: ctx.mode !== "apply" }, order.value, policy);
     switch (report.kind) {
       case "refused":
         return outcomeOfDone({ data: null, text: "the commit was refused", findings: report.findings });

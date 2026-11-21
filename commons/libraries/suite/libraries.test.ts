@@ -146,6 +146,23 @@ proves(
 );
 
 proves(
+  ["0001-libraries FR-025"],
+  "a library with a spec kit that commons/docs.config.ts does not list is a finding that names the library and the line to add, a listed one is none, and a repository with no such file is asked nothing",
+  async () => {
+    await repo((root) => {
+      assertEquals(manifestFindings(root), [], "no configuration of the site, nothing asked");
+      writeTextFileSync(join(root, "commons", "docs.config.ts"), 'export const config = { specKits: [{ layout: "commons", dir: "commons/other/spec-kit" }] };\n');
+      const found = manifestFindings(root);
+      assertEquals(found.length, 1);
+      assertStringIncludes(found.join("\n"), "commons/docs.config.ts does not list the spec kit of alpha");
+      assertStringIncludes(found.join("\n"), 'add { layout: "commons", dir: "commons/alpha/spec-kit" } to specKits');
+      writeTextFileSync(join(root, "commons", "docs.config.ts"), 'export const config = { specKits: [{ layout: "commons", dir: "commons/alpha/spec-kit" }] };\n');
+      assertEquals(manifestFindings(root), []);
+    });
+  },
+);
+
+proves(
   [`${SPEC} FR-008`, `${SPEC} FR-012`],
   "a folder with a spec kit and no manifest is found, a manifest that cannot be read is found, and an L0 library needs no spec kit",
   async () => {

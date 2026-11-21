@@ -13,7 +13,7 @@ export const library = {
   verify: "bun run verify",
   version: "0.1.0",
   distribution: ["github"],
-  held: "new: built and verified but not released until the first consumer, the fleet store, runs on it",
+  held: { kind: "unfinished", reason: "built and verified but not released until the first consumer, the fleet store, runs on it", missing: ["its first consumer, the fleet store"], liftedWhen: "the first consumer, the fleet store, runs on it" },
   exports: [".", "./governance", "./logical", "./physical", "./layers", "./conformance", "./memory", "./local", "./merge", "./memory-merge", "./docs", "./docs/formats"],
   family: { host: "anyfs", role: "host" },
   summary:

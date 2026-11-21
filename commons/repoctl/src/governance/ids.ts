@@ -58,6 +58,17 @@ export function parseIssueNumber(text: string): Result<IssueNumber, string> {
   return r.kind === "ok" ? ok(r.value) : err(`${JSON.stringify(text)} is not an issue number: digits, from 1`);
 }
 
+/** The impacts a commit may state on its `Impact:` line (commons 0026-works-versioning FR-021): a closed union, least first. */
+export const COMMIT_IMPACTS = ["patch", "minor", "major"] as const;
+/** The impact a commit states: how much the release raises the version of a library the commit changes. */
+export type CommitImpact = (typeof COMMIT_IMPACTS)[number];
+
+/** An impact from text (`major`, `minor` or `patch`), or why the text is not one. */
+export function parseCommitImpact(text: string): Result<CommitImpact, string> {
+  const impact = COMMIT_IMPACTS.find((i) => i === text);
+  return impact === undefined ? err(`${JSON.stringify(text)} is not an impact: major (a breaking change), minor (a feature) or patch (a fix)`) : ok(impact);
+}
+
 /** A session address from text, or why the text is not one. */
 export function parseSessionUrl(text: string): Result<SessionUrl, string> {
   const r = SESSION(text, "session");

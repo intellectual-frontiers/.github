@@ -63,16 +63,16 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 
 | Library | Role | What it is | Kanon | Level | Published to |
 | --- | --- | --- | --- | --- | --- |
-| [`@intellectual-frontiers/anyfs`](commons/anyfs) | Foundation | One typed interface to the places bytes live | layers, plugins | L1 | held |
-| [`@intellectual-frontiers/anyfs-bridge`](commons/anyfs-bridge) | Foundation | Copy, sync, move, check, two-way sync and mirror between any two AnyFS stores | layers, extension | L1 | held |
-| [`@intellectual-frontiers/anyfs-git`](commons/anyfs-git) | Foundation | A branch of a Git repository and a Git working tree, each kept as an AnyFS store | layers, extension | L1 | held |
-| [`@intellectual-frontiers/anyfs-githost`](commons/anyfs-githost) | Foundation | The Git host backend of AnyFS | layers, extension | L1 | held |
-| [`@intellectual-frontiers/anyfs-posix`](commons/anyfs-posix) | Foundation | The POSIX view of any AnyFS store | layers, extension | L1 | held |
-| [`@intellectual-frontiers/anyfs-query`](commons/anyfs-query) | Foundation | Read-only SQL over the files, places, revisions and content of any AnyFS store | layers, extension | L1 | held |
-| [`@intellectual-frontiers/anyfs-s3`](commons/anyfs-s3) | Foundation | The S3 backend of AnyFS: a store over a bucket and a prefix of any S3-compatible service | layers, extension | L1 | held |
-| [`@intellectual-frontiers/anyfs-serve`](commons/anyfs-serve) | Foundation | AnyFS over HTTP: any AnyFS store served as WebDAV | layers, extension | L1 | held |
-| [`@intellectual-frontiers/anyfs-sql`](commons/anyfs-sql) | Foundation | A SQLite database kept as an AnyFS store that merges by nature | layers, extension | L1 | held |
-| [`@intellectual-frontiers/anyfs-ssh`](commons/anyfs-ssh) | Foundation | The SSH backend of AnyFS: a store over a folder on a host reached by SSH | layers, extension | L1 | held |
+| [`@intellectual-frontiers/anyfs`](commons/anyfs) | Foundation | One typed interface to the places bytes live | layers, plugins | L1 | not released (unfinished) |
+| [`@intellectual-frontiers/anyfs-bridge`](commons/anyfs-bridge) | Foundation | Copy, sync, move, check, two-way sync and mirror between any two AnyFS stores | layers, extension | L1 | not released (unfinished) |
+| [`@intellectual-frontiers/anyfs-git`](commons/anyfs-git) | Foundation | A branch of a Git repository and a Git working tree, each kept as an AnyFS store | layers, extension | L1 | not released (unfinished) |
+| [`@intellectual-frontiers/anyfs-githost`](commons/anyfs-githost) | Foundation | The Git host backend of AnyFS | layers, extension | L1 | not released (unfinished) |
+| [`@intellectual-frontiers/anyfs-posix`](commons/anyfs-posix) | Foundation | The POSIX view of any AnyFS store | layers, extension | L1 | not released (unfinished) |
+| [`@intellectual-frontiers/anyfs-query`](commons/anyfs-query) | Foundation | Read-only SQL over the files, places, revisions and content of any AnyFS store | layers, extension | L1 | not released (unfinished) |
+| [`@intellectual-frontiers/anyfs-s3`](commons/anyfs-s3) | Foundation | The S3 backend of AnyFS: a store over a bucket and a prefix of any S3-compatible service | layers, extension | L1 | not released (unfinished) |
+| [`@intellectual-frontiers/anyfs-serve`](commons/anyfs-serve) | Foundation | AnyFS over HTTP: any AnyFS store served as WebDAV | layers, extension | L1 | not released (unfinished) |
+| [`@intellectual-frontiers/anyfs-sql`](commons/anyfs-sql) | Foundation | A SQLite database kept as an AnyFS store that merges by nature | layers, extension | L1 | not released (unfinished) |
+| [`@intellectual-frontiers/anyfs-ssh`](commons/anyfs-ssh) | Foundation | The SSH backend of AnyFS: a store over a folder on a host reached by SSH | layers, extension | L1 | not released (unfinished) |
 | [`@intellectual-frontiers/core`](https://www.npmjs.com/package/@intellectual-frontiers/core) | Foundation | Errors as values (`Result`) | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/crypto`](https://www.npmjs.com/package/@intellectual-frontiers/crypto) | Foundation | The digests, signatures and envelopes of commons in pure code on Web Crypto | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/formats`](https://www.npmjs.com/package/@intellectual-frontiers/formats) | Foundation | The file and wire formats of commons | - | L1 | GitHub, npm |
@@ -86,44 +86,44 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/test`](https://www.npmjs.com/package/@intellectual-frontiers/test) | Foundation | Tests that run unchanged under `bun test` and `node --test` | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/headless`](https://www.npmjs.com/package/@intellectual-frontiers/headless) | Pattern | The contract of a program that has no window | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/kanon`](https://www.npmjs.com/package/@intellectual-frontiers/kanon) | Pattern | The pattern of a library built in three layers | - | L1 | GitHub, npm |
-| [`@intellectual-frontiers/anyfs-cli`](commons/anyfs-cli) | Program | The `anyfs` program: POSIX-style access to any AnyFS store (ls, cat, cp, rm, find, grep, diff) and the bridge verbs (sync, bisync, mirror, check, merge, sync-medium) from the command line | layers, extension | L1 | held |
+| [`@intellectual-frontiers/anyfs-cli`](commons/anyfs-cli) | Program | The `anyfs` program: POSIX-style access to any AnyFS store (ls, cat, cp, rm, find, grep, diff) and the bridge verbs (sync, bisync, mirror, check, merge, sync-medium) from the command line | layers, extension | L1 | not released (unfinished) |
 | [`@intellectual-frontiers/archon`](https://www.npmjs.com/package/@intellectual-frontiers/archon) | Program | A Kanon library that orders subjects: a machine, a device, a workstation or a cloud account | layers, instances, plugins | L1 | GitHub, npm |
-| [`@intellectual-frontiers/archon-boot`](commons/archon-boot) | Program | The plugin that gives `archon` its verbs for the network install | layers, extension | L1 | held |
-| [`@intellectual-frontiers/archon-converge`](commons/archon-converge) | Program | The plugin that gives `archon` its verbs for convergence | layers, extension | L1 | held |
-| [`@intellectual-frontiers/archon-dialect-ansible`](commons/archon-dialect-ansible) | Program | The dialect of Archon that converges a Linux host with Ansible | layers, extension | L1 | held |
-| [`@intellectual-frontiers/archon-dialect-apt`](commons/archon-dialect-apt) | Program | The dialect of tools that installs them with apt | layers, extension | L1 | held |
-| [`@intellectual-frontiers/archon-dialect-cloud-init`](commons/archon-dialect-cloud-init) | Program | The dialect of Archon for the unattended install of a machine from nothing | layers, extension | L1 | held |
-| [`@intellectual-frontiers/archon-dialect-homebrew`](commons/archon-dialect-homebrew) | Program | The dialect of tools that installs them with Homebrew | layers, extension | L1 | held |
+| [`@intellectual-frontiers/archon-boot`](commons/archon-boot) | Program | The plugin that gives `archon` its verbs for the network install | layers, extension | L1 | not released (owner-blocked) |
+| [`@intellectual-frontiers/archon-converge`](commons/archon-converge) | Program | The plugin that gives `archon` its verbs for convergence | layers, extension | L1 | not released (owner-blocked) |
+| [`@intellectual-frontiers/archon-dialect-ansible`](commons/archon-dialect-ansible) | Program | The dialect of Archon that converges a Linux host with Ansible | layers, extension | L1 | not released (owner-blocked) |
+| [`@intellectual-frontiers/archon-dialect-apt`](commons/archon-dialect-apt) | Program | The dialect of tools that installs them with apt | layers, extension | L1 | not released (owner-blocked) |
+| [`@intellectual-frontiers/archon-dialect-cloud-init`](commons/archon-dialect-cloud-init) | Program | The dialect of Archon for the unattended install of a machine from nothing | layers, extension | L1 | not released (owner-blocked) |
+| [`@intellectual-frontiers/archon-dialect-homebrew`](commons/archon-dialect-homebrew) | Program | The dialect of tools that installs them with Homebrew | layers, extension | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/archon-dialect-mise`](https://www.npmjs.com/package/@intellectual-frontiers/archon-dialect-mise) | Program | The dialect of tools that installs them with mise | layers, extension | L1 | GitHub, npm |
 | [`@intellectual-frontiers/archon-dialect-native-pinned`](https://www.npmjs.com/package/@intellectual-frontiers/archon-dialect-native-pinned) | Program | The default dialect of tools | layers, extension | L1 | GitHub, npm |
-| [`@intellectual-frontiers/archon-dialect-winget`](commons/archon-dialect-winget) | Program | The dialect of tools that installs them with WinGet | layers, extension | L1 | held |
-| [`@intellectual-frontiers/archon-dns`](commons/archon-dns) | Program | The plugin that gives `archon` its verbs for DNS | layers, extension | L1 | held |
-| [`@intellectual-frontiers/archon-tool`](commons/archon-tool) | Program | The plugin that gives `archon` its verbs for tools | layers, extension | L1 | held |
-| [`@intellectual-frontiers/change-control`](commons/change-control) | Program | Change control for a fleet's repository | layers | L1 | held |
+| [`@intellectual-frontiers/archon-dialect-winget`](commons/archon-dialect-winget) | Program | The dialect of tools that installs them with WinGet | layers, extension | L1 | not released (owner-blocked) |
+| [`@intellectual-frontiers/archon-dns`](commons/archon-dns) | Program | The plugin that gives `archon` its verbs for DNS | layers, extension | L1 | not released (owner-blocked) |
+| [`@intellectual-frontiers/archon-tool`](commons/archon-tool) | Program | The plugin that gives `archon` its verbs for tools | layers, extension | L1 | not released (owner-blocked) |
+| [`@intellectual-frontiers/change-control`](commons/change-control) | Program | Change control for a fleet's repository | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/data`](https://www.npmjs.com/package/@intellectual-frontiers/data) | Program | Governance (what a business domain is and what must be true of its data) | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/docs`](https://www.npmjs.com/package/@intellectual-frontiers/docs) | Program | The generator of a repository's documentation site | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/ergonex`](https://www.npmjs.com/package/@intellectual-frontiers/ergonex) | Program | The one command, `ergonex` | - | L1 | GitHub, npm |
-| [`@intellectual-frontiers/estate`](commons/estate) | Program | The assets of an organization (machines, services, accounts) as discovered | layers | L1 | held |
-| [`@intellectual-frontiers/estate-endpoints`](commons/estate-endpoints) | Program | Finds the endpoints of an estate from what describes or shows them | layers | L1 | held |
-| [`@intellectual-frontiers/estate-iac`](commons/estate-iac) | Program | Reads infrastructure as code (OpenTofu and Terraform plans and state as JSON, CloudFormation templates, Kubernetes manifests, Compose files, Pulumi stack exports) into assets and links of the estate | layers | L1 | held |
-| [`@intellectual-frontiers/estate-query`](commons/estate-query) | Program | SQL over the estate: what an estate holds (its assets, the capabilities of each and who owns them, what is declared and observed, the policies judged, the risks accepted, the operational truth and the invariants broken) as relations with a catalog that is data | layers | L1 | held |
-| [`@intellectual-frontiers/evidence-capture`](commons/evidence-capture) | Program | The unattended capture of evidence | layers | L1 | held |
+| [`@intellectual-frontiers/estate`](commons/estate) | Program | The assets of an organization (machines, services, accounts) as discovered | layers | L1 | not released (owner-blocked) |
+| [`@intellectual-frontiers/estate-endpoints`](commons/estate-endpoints) | Program | Finds the endpoints of an estate from what describes or shows them | layers | L1 | not released (owner-blocked) |
+| [`@intellectual-frontiers/estate-iac`](commons/estate-iac) | Program | Reads infrastructure as code (OpenTofu and Terraform plans and state as JSON, CloudFormation templates, Kubernetes manifests, Compose files, Pulumi stack exports) into assets and links of the estate | layers | L1 | not released (owner-blocked) |
+| [`@intellectual-frontiers/estate-query`](commons/estate-query) | Program | SQL over the estate: what an estate holds (its assets, the capabilities of each and who owns them, what is declared and observed, the policies judged, the risks accepted, the operational truth and the invariants broken) as relations with a catalog that is data | layers | L1 | not released (owner-blocked) |
+| [`@intellectual-frontiers/evidence-capture`](commons/evidence-capture) | Program | The unattended capture of evidence | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/grc`](https://www.npmjs.com/package/@intellectual-frontiers/grc) | Program | Governance, risk and compliance in layers | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/integrations`](https://www.npmjs.com/package/@intellectual-frontiers/integrations) | Program | Two families on one skeleton of Kanon layers | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/integrations-github`](https://www.npmjs.com/package/@intellectual-frontiers/integrations-github) | Program | The reference connector of Integrations for the posture of one organization of a code host | - | L1 | GitHub, npm |
-| [`@intellectual-frontiers/lab`](commons/lab) | Program | Disposable machines for tests | layers | L1 | held |
+| [`@intellectual-frontiers/lab`](commons/lab) | Program | Disposable machines for tests | layers | L1 | not released (tests-only) |
 | [`@intellectual-frontiers/lang-sql`](https://www.npmjs.com/package/@intellectual-frontiers/lang-sql) | Program | A small, fast, portable multi-dialect SQL language library | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/libraries`](https://www.npmjs.com/package/@intellectual-frontiers/libraries) | Program | The tools of a repository of commons | - | L1 | GitHub, npm |
-| [`@intellectual-frontiers/linux-observe`](commons/linux-observe) | Program | What a Linux machine is, read with no change | layers | L1 | held |
-| [`@intellectual-frontiers/linux-services`](commons/linux-services) | Program | The services a Linux machine runs | layers | L1 | held |
-| [`@intellectual-frontiers/machine-probe`](commons/machine-probe) | Program | The probe a machine runs for its fleet | layers | L1 | held |
-| [`@intellectual-frontiers/netboot`](commons/netboot) | Program | The network boot of a blank machine | layers | L1 | held |
+| [`@intellectual-frontiers/linux-observe`](commons/linux-observe) | Program | What a Linux machine is, read with no change | layers | L1 | not released (owner-blocked) |
+| [`@intellectual-frontiers/linux-services`](commons/linux-services) | Program | The services a Linux machine runs | layers | L1 | not released (owner-blocked) |
+| [`@intellectual-frontiers/machine-probe`](commons/machine-probe) | Program | The probe a machine runs for its fleet | layers | L1 | not released (owner-blocked) |
+| [`@intellectual-frontiers/netboot`](commons/netboot) | Program | The network boot of a blank machine | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/package-managers`](https://www.npmjs.com/package/@intellectual-frontiers/package-managers) | Program | The shared kit of the dialects that drive a package manager | layers | L1 | GitHub, npm |
-| [`@intellectual-frontiers/pentest`](commons/pentest) | Program | The rules of an authorized security test of an estate | layers | L1 | held |
+| [`@intellectual-frontiers/pentest`](commons/pentest) | Program | The rules of an authorized security test of an estate | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/repoctl`](https://www.npmjs.com/package/@intellectual-frontiers/repoctl) | Program | The operations program of this repository | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/toolchain`](https://www.npmjs.com/package/@intellectual-frontiers/toolchain) | Program | A Kanon library of the tools a computer needs | layers | L1 | GitHub, npm |
-| [`@intellectual-frontiers/catalog-nist-csf-2`](commons/catalog-nist-csf-2) | Standard | The NIST Cybersecurity Framework 2.0 as a grc catalog package | layers | L1 | held |
-| [`@intellectual-frontiers/catalog-nist-sp800`](commons/catalog-nist-sp800) | Standard | NIST SP 800-53 Rev 5.2.0 and SP 800-171 Rev 3 as grc catalog packages | layers | L1 | held |
+| [`@intellectual-frontiers/catalog-nist-csf-2`](commons/catalog-nist-csf-2) | Standard | The NIST Cybersecurity Framework 2.0 as a grc catalog package | layers | L1 | not released (owner-blocked) |
+| [`@intellectual-frontiers/catalog-nist-sp800`](commons/catalog-nist-sp800) | Standard | NIST SP 800-53 Rev 5.2.0 and SP 800-171 Rev 3 as grc catalog packages | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/integrations-fhir`](https://www.npmjs.com/package/@intellectual-frontiers/integrations-fhir) | Standard | The FHIR plugin of Integrations | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/integrations-x12`](https://www.npmjs.com/package/@intellectual-frontiers/integrations-x12) | Standard | The X12 envelope and acknowledgement skeleton of Integrations | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/mizan`](https://www.npmjs.com/package/@intellectual-frontiers/mizan) | Standard | Mizan, the IF Spec Profile, as code | - | L1 | GitHub, npm |

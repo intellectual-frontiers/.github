@@ -93,7 +93,7 @@ export default defineConfig({
   commit: {
     identity: { name: "Shahid Shah", email: "47497+shah@users.noreply.github.com" },
     issue: { prefix: "Refs #", required: false },
-    trailers: ["issue", "co-author", "session"],
+    trailers: ["issue", "impact", "co-author", "session"],
     coAuthor: "Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>",
     forbidden: { paths: DEFAULT_FORBIDDEN_PATHS, allow: DEFAULT_ALLOWED_PATHS, secrets: DEFAULT_SECRET_PATTERNS },
   },
@@ -113,6 +113,7 @@ export default defineConfig({
     declaredDependencies: true,
     linker: ["bun", "commons/libraries/src/link.ts"],
     roleFile: "commons/libraries/src/readme.ts",
+    docsFile: "commons/docs.config.ts",
   },
   hygiene: { scope: "@intellectual-frontiers/", gitSources: ["intellectual-frontiers/.github"], pathSegment: "commons", sourceMarker: "commons/libraries/library.ts" },
   doctor: {

@@ -194,7 +194,7 @@ function libraryOf(commons: string, name: string): { readonly version: string; r
   const lib = join(commons, name, "library.ts");
   const source = existsSync(lib) ? readTextFileSync(lib) : "";
   const npm = /distribution:\s*\[[^\]]*"npm"/.test(source);
-  const held = /\bheld:\s*"/.test(source);
+  const held = /\bheld:\s*\{/.test(source);
   return { version: text((JSON.parse(readTextFileSync(pkg)) as Json)["version"]), npm, held };
 }
 

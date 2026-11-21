@@ -13,7 +13,7 @@ export const library = {
   verify: "bun run verify",
   version: "0.1.0",
   distribution: ["github"],
-  held: "new: built and verified but not released until the first consumers, the fleet store and the servers, run on it",
+  held: { kind: "unfinished", reason: "built and verified but not released until the first consumers, the fleet store and the servers, run on it", missing: ["its first consumers, the fleet store and the servers"], liftedWhen: "the first consumers, the fleet store and the servers, run on it" },
   exports: [".", "./governance", "./logical", "./physical"],
   family: { host: "anyfs", role: "plugin" },
   versionConstants: [{ file: "src/governance/version.ts", name: "ANYFS_CLI_VERSION" }],

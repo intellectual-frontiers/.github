@@ -41,6 +41,7 @@ export type ProblemCode =
   | "E-PUBLISH-FAILED"
   | "E-COMMIT-SUBJECT"
   | "E-COMMIT-REFS"
+  | "E-COMMIT-IMPACT"
   | "E-COMMIT-SESSION"
   | "E-COMMIT-FORBIDDEN"
   | "E-COMMIT-NOTHING"
@@ -93,6 +94,7 @@ export const PROBLEM_CODES: readonly ProblemCode[] = [
   "E-PUBLISH-FAILED",
   "E-COMMIT-SUBJECT",
   "E-COMMIT-REFS",
+  "E-COMMIT-IMPACT",
   "E-COMMIT-SESSION",
   "E-COMMIT-FORBIDDEN",
   "E-COMMIT-NOTHING",
@@ -264,6 +266,12 @@ export const CATALOGUE: Readonly<Record<ProblemCode, Explained>> = {
     title: "The issue number is not valid",
     what: "`--refs` is not an issue number.",
     why: "A word where digits were expected.",
+    fix: "repoctl commit --help",
+  },
+  "E-COMMIT-IMPACT": {
+    title: "The impact is not valid",
+    what: "`--impact` is not major, minor or patch, or the repository's commits carry no `Impact:` line.",
+    why: "A word other than the three impacts of a version, or a configuration whose trailers leave `impact` out.",
     fix: "repoctl commit --help",
   },
   "E-COMMIT-SESSION": {
