@@ -10,7 +10,7 @@ import dgram from "node:dgram";
 import net from "node:net";
 import { fs, path } from "@intellectual-frontiers/system";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { BASE_PLACEHOLDER, PASSWORD_PLACEHOLDER, UBUNTU_26_04, type BootPins } from "../src/governance/mod.ts";
+import { BASE_PLACEHOLDER, PASSWORD_PLACEHOLDER, UBUNTU_26_04, UBUNTU_26_04_PROFILE, DEBIAN_13_PROFILE, ROCKY_9_PROFILE, PROFILES, profileById, type BootPins, type BootProfile } from "../src/governance/mod.ts";
 import { agreedOptions, arm, armedHosts, chooserMenu, classify, decide, describeFacts, disarm, done, emptyState, hostMenu, isArmed, mainMenu, newToken, note, parseFacts, parseRequest, servedPath, tokenFits } from "../src/logical/mod.ts";
 import { assetStatus, bootHandler, ensureAssets, httpServer, parseRange, readState, sha256File, startBoot, tftpServer, updateState, type BootProvider } from "../src/physical/mod.ts";
 
@@ -18,21 +18,21 @@ const sha = (b: string | Uint8Array): string => createHash("sha256").update(b).d
 
 proves(["0002-netboot-pins FR-001", "0002-netboot-pins FR-002"], "the pins name each boot file and the image by a SHA-256 of 64 hexadecimal digits, and the placeholders are the ones a render may hold", () => {
   assertEquals(Object.keys(UBUNTU_26_04.files), ["bootx64.efi", "grubx64.efi", "linux", "initrd"]);
-  for (const v of [...Object.values(UBUNTU_26_04.files), UBUNTU_26_04.iso.sha256]) assert(/^[0-9a-f]{64}$/.test(v), v);
-  assert(UBUNTU_26_04.iso.url.startsWith("https://") && UBUNTU_26_04.netboot.startsWith("https://"));
+  for (const v of [...Object.values(UBUNTU_26_04.files), UBUNTU_26_04.iso?.sha256 ?? ""]) assert(/^[0-9a-f]{64}$/.test(v), v);
+  assert((UBUNTU_26_04.iso?.url ?? "").startsWith("https://") && UBUNTU_26_04.netboot.startsWith("https://"));
   assertEquals([BASE_PLACEHOLDER, PASSWORD_PLACEHOLDER], ["@archon:base@", "@archon:password-hash@"]);
 });
 
 proves(["0003-netboot-logical FR-001"], "the menus boot the local disk for a host that is not armed and for a machine nobody knows, and install only an armed host, by its token and the MAC GRUB reports", () => {
   const base = "http://192.0.2.10:8080/";
   assert(mainMenu().includes("configfile /boot/hosts/${net_default_mac}.cfg"));
-  const off = hostMenu({ name: "athens" }, UBUNTU_26_04, base, undefined);
+  const off = hostMenu({ name: "athens" }, UBUNTU_26_04_PROFILE, base, undefined);
   assert(off.includes("not armed") && !off.includes("autoinstall"));
-  const on = hostMenu({ name: "athens" }, UBUNTU_26_04, base, "t".repeat(32));
-  assert(on.includes("autoinstall") && on.includes(`iso-url=${base}iso/${UBUNTU_26_04.iso.name}`) && on.includes("ds=nocloud-net\;s=http://192.0.2.10:8080/install/athens/" + "t".repeat(32) + "/${net_default_mac}/"), on);
+  const on = hostMenu({ name: "athens" }, UBUNTU_26_04_PROFILE, base, "t".repeat(32));
+  assert(on.includes("autoinstall") && on.includes(`iso-url=${base}iso/${UBUNTU_26_04.iso?.name}`) && on.includes("ds=nocloud-net\\;s=http://192.0.2.10:8080/install/athens/" + "t".repeat(32) + "/${net_default_mac}/"), on);
   assert(on.includes("erases this machine's disk") && on.includes("boot the local disk instead"));
-  assert(chooserMenu([], UBUNTU_26_04, base).includes("nothing armed: boot the local disk"));
-  const pick = chooserMenu([{ host: { name: "athens" }, token: "a".repeat(32) }], UBUNTU_26_04, base);
+  assert(chooserMenu([], UBUNTU_26_04_PROFILE, base).includes("nothing armed: boot the local disk"));
+  const pick = chooserMenu([{ host: { name: "athens" }, token: "a".repeat(32) }], UBUNTU_26_04_PROFILE, base);
   assert(pick.startsWith("# Unknown machine") && pick.indexOf("boot the local disk") < pick.indexOf("Install athens") && pick.includes("set default=0"), "the disk is the first entry and the default");
 });
 
@@ -119,7 +119,7 @@ proves(["0004-netboot-physical FR-002"], "a file is fetched once and kept, and o
     assert(first.kind === "ok");
     assertEquals(asked.length, 5);
     assertEquals(await fs.readTextFile(first.value.files["linux"] ?? ""), "kernel bytes");
-    assertEquals(await sha256File(first.value.iso), pins.iso.sha256);
+    assertEquals(await sha256File(first.value.iso ?? ""), pins.iso?.sha256);
     const again = await ensureAssets(dir, pins, fetcher);
     assert(again.kind === "ok");
     assertEquals(asked.length, 5, "nothing is fetched again");
@@ -253,20 +253,22 @@ proves(["0004-netboot-physical FR-003"], "the TFTP server gives a file with the 
 const SPEC_BASE = BASE_PLACEHOLDER;
 const USER_DATA = `#cloud-config\n{"base":"${SPEC_BASE}","hash":"${PASSWORD_PLACEHOLDER}"}\n`;
 
-async function withBoot<T>(f: (c: { dir: string; stateFile: string; url: string; http: (path: string, init?: RequestInit) => Promise<Response>; events: string[]; tftp: number }) => Promise<T>, provider: Partial<BootProvider> = {}): Promise<T> {
+async function withBoot<T>(f: (c: { dir: string; stateFile: string; url: string; http: (path: string, init?: RequestInit) => Promise<Response>; events: string[]; tftp: number }) => Promise<T>, provider: Partial<BootProvider> = {}, use: BootProfile = UBUNTU_26_04_PROFILE): Promise<T> {
   return scratch(async (dir) => {
     const stateFile = path.join(dir, "state.json");
     const files: Record<string, string> = {};
-    for (const [n, body] of Object.entries({ "bootx64.efi": "shim", "grubx64.efi": "grub", linux: "kernel", initrd: "initrd" })) {
+    const bodies: Record<string, string> = { "bootx64.efi": "shim", "grubx64.efi": "grub", linux: "kernel", initrd: "initrd" };
+    for (const [n, body] of Object.keys(use.pins.files).map((k) => [k, bodies[k] ?? k] as const)) {
       files[n] = path.join(dir, n);
       await fs.writeTextFile(files[n] ?? "", body);
     }
     const iso = path.join(dir, "x.iso");
     await fs.writeTextFile(iso, "image");
-    const pins: BootPins = { ...UBUNTU_26_04, iso: { ...UBUNTU_26_04.iso, name: "x.iso" } };
+    const pins: BootPins = use.pins.iso === undefined ? use.pins : { ...use.pins, iso: { name: "x.iso", url: "https://iso.example.test/x.iso", sha256: sha("image") } };
+    const profile: BootProfile = { ...use, pins };
     const events: string[] = [];
     const server = await startBoot({
-      stateFile, assets: { files, iso }, pins, http: { port: 0, hostname: "127.0.0.1" }, tftp: { port: 0, hostname: "127.0.0.1" }, emit: (e) => events.push(`${e.kind}: ${e.detail}`),
+      stateFile, assets: pins.iso === undefined ? { files } : { files, iso }, profile, http: { port: 0, hostname: "127.0.0.1" }, tftp: { port: 0, hostname: "127.0.0.1" }, emit: (e) => events.push(`${e.kind}: ${e.detail}`),
       provider: { hosts: async () => [{ name: "athens", mac: "aa:bb:cc:dd:ee:ff" }, { name: "sparta" }], userData: async () => USER_DATA, metaData: async (h) => `instance-id: ${h}\n`, passwordHash: async () => "$6$made$up", ...provider },
     });
     try {
@@ -351,4 +353,64 @@ proves(["0004-netboot-physical FR-005"], "the handler refuses a method it does n
     assertEquals((await c.http("/etc/passwd")).status, 404);
     void bootHandler;
   });
+});
+
+proves(["0005-netboot-profiles FR-001", "0005-netboot-profiles FR-002", "0005-netboot-profiles FR-005", "0005-netboot-profiles FR-006"], "every profile pins its boot files by SHA-256, names a kernel and a ramdisk it holds and an install document, and a profile is found by its id", () => {
+  assertEquals(PROFILES.map((p) => p.id), ["ubuntu-26.04", "debian-13", "rocky-9"]);
+  for (const p of PROFILES) {
+    assert(Object.keys(p.pins.files).includes(p.kernel) && Object.keys(p.pins.files).includes(p.initrd), p.id);
+    for (const v of Object.values(p.pins.files)) assert(/^[0-9a-f]{64}$/.test(v), `${p.id} ${v}`);
+    assertEquals(profileById(p.id), p);
+  }
+  assertEquals(profileById("nope"), undefined);
+  assertEquals(DEBIAN_13_PROFILE.pins.iso, undefined, "the Debian installer fetches from a mirror: no image");
+  assertEquals([UBUNTU_26_04_PROFILE.guard, DEBIAN_13_PROFILE.guard, ROCKY_9_PROFILE.guard], [true, false, false]);
+  for (const [name] of Object.entries(ROCKY_9_PROFILE.pins.paths ?? {})) assert(name in ROCKY_9_PROFILE.pins.files, name);
+});
+
+proves(["0005-netboot-profiles FR-003"], "a Debian host's menu boots its own kernel and ramdisk with the URL of its preseed, escapes nothing that GRUB would split, and Ubuntu's keeps the escaped semicolon", () => {
+  const base = "http://192.0.2.10:8080/";
+  const token = "d".repeat(32);
+  const deb = hostMenu({ name: "delphi" }, DEBIAN_13_PROFILE, base, token);
+  assert(deb.includes("linux /boot/linux auto=true priority=critical") && deb.includes(`url=${base}install/delphi/${token}/${"$"}{net_default_mac}/preseed.cfg`) && deb.includes("initrd /boot/initrd.gz") && !deb.includes("iso-url") && deb.includes("Debian 13.8"), deb);
+  const ubu = hostMenu({ name: "athens" }, UBUNTU_26_04_PROFILE, base, token);
+  assert(ubu.includes("autoinstall ds=nocloud-net\\;s="), "GRUB would end the command at a bare semicolon");
+  assert(!ubu.includes("ip=dhcp ip=dhcp"));
+});
+
+proves(["0005-netboot-profiles FR-004"], "a server of the Debian profile serves the preseed as the install document under the token, refuses the user-data Ubuntu reads, and serves no image", async () => {
+  await withBoot(async (c) => {
+    const token = newToken();
+    await updateState(c.stateFile, (s) => ({ state: arm(s, "athens", { token, at: "2026-11-21T00:00:00Z" }), value: 0 }));
+    const ud = await c.http(`/install/athens/${token}/aa:bb:cc:dd:ee:ff/user-data`);
+    assertEquals(ud.status, 200, "the default profile of the harness is Ubuntu's");
+  });
+  await withBoot(async (c) => {
+    const token = newToken();
+    await updateState(c.stateFile, (s) => ({ state: arm(s, "athens", { token, at: "2026-11-21T00:00:00Z" }), value: 0 }));
+    const pre = await c.http(`/install/athens/${token}/aa:bb:cc:dd:ee:ff/preseed.cfg`);
+    assertEquals(pre.status, 200);
+    assert(pre.headers.get("content-type")?.startsWith("text/plain"));
+    assertEquals((await c.http(`/install/athens/${token}/aa:bb:cc:dd:ee:ff/user-data`)).status, 404, "a Debian install does not read a user-data");
+    assertEquals((await c.http(`/iso/x.iso`)).status, 404);
+  }, {}, DEBIAN_13_PROFILE);
+});
+
+proves(["0005-netboot-profiles FR-003"], "a Rocky host's menu boots its kernel with the URL of its Kickstart and the repository, and a file of a two-folder tree is fetched from its own path", async () => {
+  const base = "http://192.0.2.10:8080/";
+  const token = "r".repeat(32);
+  const menu = hostMenu({ name: "corinth" }, ROCKY_9_PROFILE, base, token);
+  assert(menu.includes("linux /boot/vmlinuz ip=dhcp inst.repo=https://download.rockylinux.org/") && menu.includes(`inst.ks=${base}install/corinth/${token}/${"$"}{net_default_mac}/ks.cfg`) && menu.includes("initrd /boot/initrd.img") && menu.includes("Rocky Linux 9.9"), menu);
+  const asked: string[] = [];
+  const bodies: Record<string, string> = Object.fromEntries(Object.keys(ROCKY_9_PROFILE.pins.files).map((n) => [n, `body of ${n}`]));
+  const pins: BootPins = { ...ROCKY_9_PROFILE.pins, files: Object.fromEntries(Object.entries(bodies).map(([n, b]) => [n, sha(b)])) };
+  await scratch(async (dir) => {
+    const r = await ensureAssets(dir, pins, async (u) => {
+      asked.push(u);
+      const name = Object.entries(pins.paths ?? {}).find(([, p]) => u.endsWith(p))?.[0] ?? "";
+      return new Response(bodies[name] ?? "", { status: bodies[name] === undefined ? 404 : 200 });
+    });
+    assert(r.kind === "ok", JSON.stringify(r));
+  });
+  assert(asked.includes("https://download.rockylinux.org/pub/rocky/9/BaseOS/x86_64/os/EFI/BOOT/BOOTX64.EFI") && asked.includes("https://download.rockylinux.org/pub/rocky/9/BaseOS/x86_64/os/images/pxeboot/vmlinuz"), asked.join(" "));
 });

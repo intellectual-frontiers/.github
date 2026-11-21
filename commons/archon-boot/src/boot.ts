@@ -17,7 +17,7 @@ import { dirname, join } from "node:path";
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { parseSubjectName, type Requirement } from "@intellectual-frontiers/archon/governance";
 import { buildOrder, planOrder } from "@intellectual-frontiers/archon/logical";
-import { UBUNTU_26_04 } from "@intellectual-frontiers/netboot/governance";
+import type { BootProfile } from "@intellectual-frontiers/netboot/governance";
 import { arm, disarm, newToken } from "@intellectual-frontiers/netboot/logical";
 import { assetStatus, readState, updateState } from "@intellectual-frontiers/netboot/physical";
 import type { BootSubject } from "./config.ts";
@@ -80,9 +80,9 @@ export async function disarmAsset(stateFile: string, asset: string): Promise<voi
 }
 
 /** What `status` shows. */
-export async function statusOf(stateFile: string, dir: string): Promise<{ readonly armed: readonly string[]; readonly installed: readonly string[]; readonly last: readonly string[]; readonly missing: readonly string[] }> {
+export async function statusOf(stateFile: string, dir: string, profile: BootProfile): Promise<{ readonly armed: readonly string[]; readonly installed: readonly string[]; readonly last: readonly string[]; readonly missing: readonly string[] }> {
   const s = await readState(stateFile);
-  const a = await assetStatus(dir, UBUNTU_26_04);
+  const a = await assetStatus(dir, profile.pins);
   return {
     armed: Object.entries(s.armed).map(([h, x]) => `${h} (armed ${x.at}${x.confirmDestroy === true ? ", may erase a disk that holds data" : ""})`),
     installed: Object.entries(s.installed).map(([h, x]) => `${h} (${x.at}${x.mac === undefined ? "" : `, ${x.mac}`})`),

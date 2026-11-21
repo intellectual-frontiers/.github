@@ -15,7 +15,7 @@ export const library = {
   held: "built and verified but not released: the owner publishes the archon libraries together, when the first fleet runs on them",
   exports: ["."],
   family: { host: "archon", role: "dialect" },
-  summary: "The dialect of Archon for the unattended install of a machine from nothing: it renders an order to Ubuntu's autoinstall user-data and meta-data (no secret in it, a blank-disk guard first, key-only sign-in) and the script that converges the machine from its signed repository.",
+  summary: "The dialects of Archon for the unattended install of a machine from nothing: they render an order to Ubuntu's autoinstall user-data and meta-data (no secret in it, a blank-disk guard first, key-only sign-in) or to a Debian preseed from the same facts, and the script that converges the machine from its signed repository.",
   kanon: {
     package: "@intellectual-frontiers/archon-dialect-cloud-init",
     extends: "@intellectual-frontiers/archon",
