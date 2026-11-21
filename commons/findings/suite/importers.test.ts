@@ -6,7 +6,7 @@
  */
 import { fs, path } from "@intellectual-frontiers/system";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { detectFormat, importBurp, importNessus, importReport, importSarif, importZap } from "../src/logical/mod.ts";
+import { detectFormat, importBurp, importNessus, importNmap, importNuclei, importReport, importSarif, importZap } from "../src/logical/mod.ts";
 import { importPaths } from "../src/physical/mod.ts";
 
 const SECRET = "hunter2-made-up-password";
@@ -141,8 +141,49 @@ proves(["0003-findings-importers FR-004"], "a Nessus export gives a finding for 
   assertEquals(importNessus("x", "<a/>").problems.length, 1);
 });
 
+const NUCLEI = [
+  JSON.stringify({ "template-id": "CVE-2024-9999", info: { name: "Example RCE", severity: "critical", description: "Remote code execution.", remediation: "Upgrade.", classification: { "cve-id": ["cve-2024-9999"], "cwe-id": ["CWE-94"] } }, type: "http", host: "https://app.example.test", "matched-at": "https://app.example.test/api/run?x=1", "extracted-results": [`token=${SECRET}`], request: `GET /api/run HTTP/1.1\r\nAuthorization: Bearer ${SECRET}`, "curl-command": `curl -H 'Authorization: Bearer ${SECRET}' https://app.example.test` }),
+  JSON.stringify({ "template-id": "tech-detect", info: { name: "Wappalyzer", severity: "info" }, host: "app.example.test:8443", "matched-at": "app.example.test:8443" }),
+  "not json",
+].join("\n");
+
+proves(["0003-findings-importers FR-007"], "a nuclei JSONL gives a finding for each line with the template as the rule and its classification, and never reads the request, the response or the command line", () => {
+  const r = importNuclei("n.jsonl", NUCLEI);
+  assertEquals(r.findings.map((f) => `${f.rule} ${f.severity} ${f.asset} ${f.location ?? "-"} ${f.cve.join()} ${f.cwe.join()}`), ["CVE-2024-9999 critical https://app.example.test https://app.example.test/api/run?x=1 CVE-2024-9999 CWE-94", "tech-detect info app.example.test:8443 app.example.test:8443  "]);
+  assertEquals(r.problems.length, 1);
+  assert(!JSON.stringify(r).includes(SECRET), "nothing of the request, the command line or the extracted token");
+  assert(r.findings[0]?.evidence?.includes("token: [redacted]"));
+  assertEquals(importNuclei("n.jsonl", '{"a":1}').problems.length, 1);
+});
+
+const NMAP = `<?xml version="1.0"?>
+<nmaprun scanner="nmap" version="7.95">
+  <host><status state="up"/><address addr="192.0.2.10" addrtype="ipv4"/><hostnames><hostname name="athens.example.test" type="user"/></hostnames>
+    <ports>
+      <port protocol="tcp" portid="22"><state state="open"/><service name="ssh" product="OpenSSH" version="9.6"/></port>
+      <port protocol="tcp" portid="23"><state state="closed"/><service name="telnet"/></port>
+      <port protocol="tcp" portid="8080"><state state="filtered"/></port>
+      <port protocol="udp" portid="53"><state state="open"/><service name="domain"/></port>
+    </ports>
+  </host>
+  <host><address addr="192.0.2.11"/><ports><port protocol="tcp" portid="443"><state state="open"/><service name="https"/></port></ports></host>
+</nmaprun>`;
+
+proves(["0003-findings-importers FR-008"], "an nmap report gives an informational finding for each open port of each host and none for a closed or filtered one", () => {
+  const r = importNmap("n.xml", NMAP);
+  assertEquals(r.problems, []);
+  assertEquals(r.findings.map((f) => `${f.rule} ${f.severity} ${f.asset} ${f.location} ${f.title}`), [
+    "open-port info athens.example.test 22/tcp Open port 22/tcp (ssh)",
+    "open-port info athens.example.test 53/udp Open port 53/udp (domain)",
+    "open-port info 192.0.2.11 443/tcp Open port 443/tcp (https)",
+  ]);
+  assertEquals(r.findings[0]?.description, "The service is OpenSSH 9.6.");
+  assertEquals(r.findings[0]?.source.version, "7.95");
+  assertEquals(importNmap("x", "<a/>").problems.length, 1);
+});
+
 proves(["0003-findings-importers FR-005"], "the importer is chosen by what is in the report, a SARIF report needs the asset, and an unknown text is a problem", () => {
-  assertEquals([SARIF, ZAP, BURP, NESSUS, "{}", "hello"].map((t) => detectFormat(t)), ["sarif", "zap", "burp", "nessus", undefined, undefined]);
+  assertEquals([SARIF, ZAP, BURP, NESSUS, NUCLEI, NMAP, "{}", "hello"].map((t) => detectFormat(t)), ["sarif", "zap", "burp", "nessus", "nuclei", "nmap", undefined, undefined]);
   assertEquals(importReport("a.sarif", SARIF, "portal").findings.length, 3);
   assert(importReport("a.sarif", SARIF).problems[0]?.includes("give the asset"));
   assertEquals(importReport("a.json", ZAP).findings.length, 3);

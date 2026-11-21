@@ -37,7 +37,8 @@ export function importZap(file: string, text: string): Imported {
     const name = str(site["@name"]) ?? str(site["@host"]) ?? "unknown";
     const asset = (() => {
       try {
-        return new URL(name).origin;
+        const u = new URL(name);
+        return u.protocol === "http:" || u.protocol === "https:" ? u.origin : name;
       } catch {
         return name;
       }

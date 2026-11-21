@@ -12,16 +12,19 @@
  */
 import { importBurp } from "./burp.ts";
 import { importNessus } from "./nessus.ts";
+import { importNmap } from "./nmap.ts";
+import { importNuclei } from "./nuclei.ts";
 import type { Imported } from "./result.ts";
 import { importSarif } from "./sarif.ts";
 import { importZap } from "./zap.ts";
 
 /** The report formats. */
-export type ReportFormat = "sarif" | "zap" | "burp" | "nessus";
+export type ReportFormat = "sarif" | "zap" | "burp" | "nessus" | "nuclei" | "nmap";
 
 /** The format of a report, or nothing where none is read. */
 export function detectFormat(text: string): ReportFormat | undefined {
   const t = text.trimStart();
+  if (t.startsWith("{") && /"template-id"\s*:/.test(t.split("\n")[0] ?? "")) return "nuclei";
   if (t.startsWith("{")) {
     try {
       const d = JSON.parse(text) as Record<string, unknown>;
@@ -33,6 +36,7 @@ export function detectFormat(text: string): ReportFormat | undefined {
     return undefined;
   }
   if (/<NessusClientData/.test(t)) return "nessus";
+  if (/<nmaprun[\s>]/.test(t)) return "nmap";
   if (/<issues[\s>/]/.test(t)) return "burp";
   return undefined;
 }
@@ -49,6 +53,10 @@ export function importReport(file: string, text: string, asset = ""): Imported &
       return { format, ...importBurp(file, text) };
     case "nessus":
       return { format, ...importNessus(file, text) };
+    case "nuclei":
+      return { format, ...importNuclei(file, text) };
+    case "nmap":
+      return { format, ...importNmap(file, text) };
     default:
       return { format, findings: [], problems: [`${file}: no importer reads it (SARIF, an OWASP ZAP JSON report, a Burp XML report, a Nessus export)`] };
   }
