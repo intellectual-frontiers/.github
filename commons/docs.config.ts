@@ -220,6 +220,7 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/anyfs-ssh/spec-kit" },
     { layout: "commons", dir: "commons/anyfs-bridge/spec-kit" },
     { layout: "commons", dir: "commons/anyfs-git/spec-kit" },
+    { layout: "commons", dir: "commons/anyfs-query/spec-kit" },
     { layout: "commons", dir: "commons/evidence-capture/spec-kit" },
     { layout: "commons", dir: "commons/integrations-fhir/spec-kit" },
     { layout: "commons", dir: "commons/integrations-x12/spec-kit" },
