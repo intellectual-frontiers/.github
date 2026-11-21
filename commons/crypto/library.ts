@@ -10,7 +10,7 @@ export const library = {
   level: "L1",
   specKit: "spec-kit",
   verify: "bun run verify",
-  version: "0.2.0",
+  version: "0.2.1",
   distribution: ["github", "npm"],
   exports: [".", "./cms", "./cose", "./crypt", "./dsse", "./md5", "./sha256", "./sigv4", "./uuid", "./webauthn"],
   summary:

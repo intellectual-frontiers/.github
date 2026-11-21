@@ -4,25 +4,73 @@
     {
       "slug": "core",
       "package": "@intellectual-frontiers/core",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "folder": "commons/core",
-      "tag": "core-v0.2.0",
+      "tag": "core-v0.2.1",
       "publish": true
     },
     {
       "slug": "formats",
       "package": "@intellectual-frontiers/formats",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "folder": "commons/formats",
-      "tag": "formats-v0.2.0",
+      "tag": "formats-v0.2.1",
       "publish": true
     },
     {
       "slug": "crypto",
       "package": "@intellectual-frontiers/crypto",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "folder": "commons/crypto",
-      "tag": "crypto-v0.2.0",
+      "tag": "crypto-v0.2.1",
+      "publish": true
+    },
+    {
+      "slug": "system",
+      "package": "@intellectual-frontiers/system",
+      "version": "0.2.1",
+      "folder": "commons/system",
+      "tag": "system-v0.2.1",
+      "publish": true
+    },
+    {
+      "slug": "kanon",
+      "package": "@intellectual-frontiers/kanon",
+      "version": "0.3.1",
+      "folder": "commons/kanon",
+      "tag": "kanon-v0.3.1",
+      "publish": true
+    },
+    {
+      "slug": "terminal",
+      "package": "@intellectual-frontiers/terminal",
+      "version": "0.2.1",
+      "folder": "commons/terminal",
+      "tag": "terminal-v0.2.1",
+      "publish": true
+    },
+    {
+      "slug": "telemetry",
+      "package": "@intellectual-frontiers/telemetry",
+      "version": "0.2.1",
+      "folder": "commons/telemetry",
+      "tag": "telemetry-v0.2.1",
+      "publish": true
+    },
+    {
+      "slug": "headless",
+      "package": "@intellectual-frontiers/headless",
+      "version": "0.5.1",
+      "folder": "commons/headless",
+      "tag": "headless-v0.5.1",
+      "publish": true
+    },
+    {
+      "slug": "archon",
+      "package": "@intellectual-frontiers/archon",
+      "version": "0.1.0",
+      "folder": "commons/archon",
+      "tag": "archon-v0.1.0",
       "publish": true
     },
     {
@@ -34,219 +82,195 @@
       "publish": true
     },
     {
-      "slug": "system",
-      "package": "@intellectual-frontiers/system",
-      "version": "0.2.0",
-      "folder": "commons/system",
-      "tag": "system-v0.2.0",
-      "publish": true
-    },
-    {
       "slug": "docs",
       "package": "@intellectual-frontiers/docs",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "folder": "commons/docs",
-      "tag": "docs-v0.2.0",
-      "publish": true
-    },
-    {
-      "slug": "terminal",
-      "package": "@intellectual-frontiers/terminal",
-      "version": "0.2.0",
-      "folder": "commons/terminal",
-      "tag": "terminal-v0.2.0",
-      "publish": true
-    },
-    {
-      "slug": "telemetry",
-      "package": "@intellectual-frontiers/telemetry",
-      "version": "0.2.0",
-      "folder": "commons/telemetry",
-      "tag": "telemetry-v0.2.0",
+      "tag": "docs-v0.3.0",
       "publish": true
     },
     {
       "slug": "net",
       "package": "@intellectual-frontiers/net",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "folder": "commons/net",
-      "tag": "net-v0.2.0",
+      "tag": "net-v0.2.1",
       "publish": true
     },
     {
       "slug": "githost",
       "package": "@intellectual-frontiers/githost",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "folder": "commons/githost",
-      "tag": "githost-v0.2.0",
-      "publish": true
-    },
-    {
-      "slug": "kanon",
-      "package": "@intellectual-frontiers/kanon",
-      "version": "0.3.0",
-      "folder": "commons/kanon",
-      "tag": "kanon-v0.3.0",
-      "publish": true
-    },
-    {
-      "slug": "headless",
-      "package": "@intellectual-frontiers/headless",
-      "version": "0.5.0",
-      "folder": "commons/headless",
-      "tag": "headless-v0.5.0",
+      "tag": "githost-v0.2.1",
       "publish": true
     },
     {
       "slug": "rdf",
       "package": "@intellectual-frontiers/rdf",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "folder": "commons/rdf",
-      "tag": "rdf-v0.2.0",
+      "tag": "rdf-v0.2.1",
       "publish": true
     },
     {
       "slug": "ontology",
       "package": "@intellectual-frontiers/ontology",
-      "version": "0.4.0",
+      "version": "0.4.1",
       "folder": "commons/ontology",
-      "tag": "ontology-v0.4.0",
+      "tag": "ontology-v0.4.1",
       "publish": true
     },
     {
       "slug": "mizan",
       "package": "@intellectual-frontiers/mizan",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "folder": "commons/mizan",
-      "tag": "mizan-v0.2.0",
+      "tag": "mizan-v0.2.1",
       "publish": true
     },
     {
       "slug": "test",
       "package": "@intellectual-frontiers/test",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "folder": "commons/test",
-      "tag": "test-v0.2.0",
+      "tag": "test-v0.2.1",
       "publish": true
     },
     {
       "slug": "quality",
       "package": "@intellectual-frontiers/quality",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "folder": "commons/quality",
-      "tag": "quality-v0.3.0",
+      "tag": "quality-v0.3.1",
       "publish": true
     },
     {
       "slug": "ergonex",
       "package": "@intellectual-frontiers/ergonex",
-      "version": "0.5.0",
+      "version": "0.5.1",
       "folder": "commons/ergonex",
-      "tag": "ergonex-v0.5.0",
+      "tag": "ergonex-v0.5.1",
       "publish": true
     },
     {
       "slug": "grc",
       "package": "@intellectual-frontiers/grc",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "folder": "commons/grc",
-      "tag": "grc-v0.3.0",
+      "tag": "grc-v0.3.1",
       "publish": true
     },
     {
       "slug": "integrations",
       "package": "@intellectual-frontiers/integrations",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "folder": "commons/integrations",
-      "tag": "integrations-v0.2.0",
+      "tag": "integrations-v0.2.1",
       "publish": true
     },
     {
       "slug": "integrations-fhir",
       "package": "@intellectual-frontiers/integrations-fhir",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "folder": "commons/integrations-fhir",
-      "tag": "integrations-fhir-v0.2.0",
+      "tag": "integrations-fhir-v0.2.1",
       "publish": true
     },
     {
       "slug": "integrations-github",
       "package": "@intellectual-frontiers/integrations-github",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "folder": "commons/integrations-github",
-      "tag": "integrations-github-v0.2.0",
+      "tag": "integrations-github-v0.2.1",
       "publish": true
     },
     {
       "slug": "integrations-x12",
       "package": "@intellectual-frontiers/integrations-x12",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "folder": "commons/integrations-x12",
-      "tag": "integrations-x12-v0.2.0",
+      "tag": "integrations-x12-v0.2.1",
       "publish": true
     },
     {
       "slug": "libraries",
       "package": "@intellectual-frontiers/libraries",
-      "version": "0.5.0",
+      "version": "0.5.1",
       "folder": "commons/libraries",
-      "tag": "libraries-v0.5.0",
+      "tag": "libraries-v0.5.1",
       "publish": true
     },
     {
       "slug": "lint",
       "package": "@intellectual-frontiers/lint",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "folder": "commons/lint",
-      "tag": "lint-v0.2.0",
+      "tag": "lint-v0.2.1",
+      "publish": true
+    },
+    {
+      "slug": "toolchain",
+      "package": "@intellectual-frontiers/toolchain",
+      "version": "0.1.0",
+      "folder": "commons/toolchain",
+      "tag": "toolchain-v0.1.0",
+      "publish": true
+    },
+    {
+      "slug": "package-managers",
+      "package": "@intellectual-frontiers/package-managers",
+      "version": "0.1.0",
+      "folder": "commons/package-managers",
+      "tag": "package-managers-v0.1.0",
       "publish": true
     },
     {
       "slug": "repoctl",
       "package": "@intellectual-frontiers/repoctl",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "folder": "commons/repoctl",
-      "tag": "repoctl-v0.1.0",
+      "tag": "repoctl-v0.2.0",
       "publish": true
     },
     {
       "slug": "commons",
       "package": "@intellectual-frontiers/commons",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "folder": "commons/commons",
-      "tag": "commons-v0.1.0",
+      "tag": "commons-v0.1.1",
       "publish": true
     },
     {
       "slug": "foundation",
       "package": "@intellectual-frontiers/foundation",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "folder": "commons/foundation",
-      "tag": "foundation-v0.1.0",
+      "tag": "foundation-v0.1.1",
       "publish": true
     },
     {
       "slug": "patterns",
       "package": "@intellectual-frontiers/patterns",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "folder": "commons/patterns",
-      "tag": "patterns-v0.1.0",
+      "tag": "patterns-v0.1.1",
       "publish": true
     },
     {
       "slug": "programs",
       "package": "@intellectual-frontiers/programs",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "folder": "commons/programs",
-      "tag": "programs-v0.1.0",
+      "tag": "programs-v0.1.1",
       "publish": true
     },
     {
       "slug": "standards",
       "package": "@intellectual-frontiers/standards",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "folder": "commons/standards",
-      "tag": "standards-v0.1.0",
+      "tag": "standards-v0.1.1",
       "publish": true
     }
   ]

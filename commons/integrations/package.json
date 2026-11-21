@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/integrations",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Integrations in the layers of Kanon: connectors that observe the outside world read-only (clouds, SaaS, identity, code hosts, HR, endpoints, network devices) and exchanges of messages and documents under standards and partner agreements (FHIR, X12, HL7 v2), with each standard a plugin package behind typed ports and a conformance suite.",
   "type": "module",
   "engines": {

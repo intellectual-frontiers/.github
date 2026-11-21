@@ -5,7 +5,6 @@
  */
 export const release = {
   slug: "docs",
-  replaces: "ifc-docs",
   kind: "Library",
   title: "Docs: the generator of a repository's documentation site",
   authors: [
@@ -13,6 +12,7 @@ export const release = {
       name: "Intellectual Frontiers",
     },
   ],
-  version: "0.2.0",
+  version: "0.3.0",
   repository: "https://github.com/intellectual-frontiers/.github",
+  replaces: "ifc-docs",
 };

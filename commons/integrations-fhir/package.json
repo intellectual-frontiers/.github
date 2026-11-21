@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/integrations-fhir",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "The FHIR plugin of Integrations: R4 and US Core as registry entries with their licence as data, a codec for FHIR JSON and NDJSON to the abstract typed tree, a loader of StructureDefinitions, CodeSystems and ValueSets the user supplies, and the acknowledgement port of OperationOutcome.",
   "type": "module",
   "engines": {

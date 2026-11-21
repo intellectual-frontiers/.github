@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/net",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "The network as one typed library: downloads that retry and resume, an HTTP server over web Request and Response, typed HTTP clients with recorded transports and AWS signing, TCP and TLS, DNS records, and ACME certificates by DNS-01; the same code on Bun and Node 26.",
   "type": "module",
   "engines": {
