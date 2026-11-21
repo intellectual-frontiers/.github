@@ -230,6 +230,8 @@ export interface DocsConfig {
   readonly books?: BooksConfig;
   /** The evidence the site shows beside the code: test results, issues, tickets (docs 0001-docs FR-009); none by default. */
   readonly evidence?: EvidenceSource;
+  /** What could not be read while the configuration was made, each a finding of the site (docs 0001-docs FR-015): the configuration goes on without it, so that one library does not stop the site. */
+  readonly problems?: readonly { readonly where: string; readonly error: string }[];
 }
 
 /** A package as the build reads it: its folder from the root (`""` for the root), its name, and where its `About` is. */
@@ -292,6 +294,8 @@ export interface Config {
   readonly books: BooksConfig;
   /** The evidence the site shows. */
   readonly evidence: EvidenceSource | undefined;
+  /** What could not be read while the configuration was made. */
+  readonly problems: readonly { readonly where: string; readonly error: string }[];
 }
 
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
@@ -578,5 +582,6 @@ export function resolveConfig(value: unknown, file: string): Result<Config, stri
     presentations,
     books,
     evidence,
+    problems: (Array.isArray(value["problems"]) ? value["problems"] : []).filter((x): x is { where: string; error: string } => isRecord(x) && typeof x["where"] === "string" && typeof x["error"] === "string"),
   });
 }

@@ -13,3 +13,6 @@ requirement	mechanism	by	note
 0001-docs FR-010	check	.github: cd commons/docs && bun run verify	evidence.test.ts: with a run recorded, the site has the Quality section, a line on each requirement, library and module, a finding for a test of a requirement that is not there, and the numbers in quality.json; evidence.test.ts: with no run recorded, no requirement is shown as passing, the pages say so, and a build with no evidence configured has no Quality section
 0001-docs FR-011	check	.github: cd commons/docs && bun run verify	evidence.test.ts: with a run recorded, the site has the Quality section, a line on each requirement, library and module, a finding for a test of a requirement that is not there, and the numbers in quality.json; evidence.test.ts: with no run recorded, no requirement is shown as passing, the pages say so, and a build with no evidence configured has no Quality section
 0001-docs FR-012	check	.github: cd commons/docs && bun run verify	evidence.test.ts: the evidence tool runs a library's suite into CTRF the site reads, leaves meta.json, and refuses a library with no suite
+0001-docs FR-013	check	.github: cd commons/docs && bun run verify	x
+0001-docs FR-014	check	.github: cd commons/docs && bun run verify	x
+0001-docs FR-015	check	.github: cd commons/docs && bun run verify	x

@@ -6,7 +6,7 @@
  * @module
  */
 import { existsSync, readdirSync, readFileSync } from "node:fs";
-import type { About, BooksConfig, DocsConfig, EvidenceSource, PackageConfig } from "./docs/src/config.ts";
+import type { About, BooksConfig, DocsConfig, EvidenceSource, IssuesOf, PackageConfig } from "./docs/src/config.ts";
 import { layeredLens } from "./docs/src/lens/layered.ts";
 import { DEFAULT_LICENSE } from "./libraries/src/license/standard.ts";
 import { guidesLens } from "./docs/src/lens/guides.ts";
@@ -17,11 +17,6 @@ import { describe } from "./headless/src/describe/mod.ts";
 import { anyfsProgram, INERT_HOST as ANYFS_INERT_HOST } from "./anyfs-cli/src/mod.ts";
 import { INERT_HOST as REPOCTL_INERT_HOST, repoctlProgram } from "./repoctl/src/mod.ts";
 import { SUBJECTS } from "./data/governance/api.ts";
-import { issues as dataIssues } from "./data/issues/mod.ts";
-import { issues as convergenceIssues } from "./data/sql/extensions/convergence/issues/mod.ts";
-import { issues as historyIssues } from "./data/sql/extensions/history/issues/mod.ts";
-import { issues as operationsIssues } from "./data/sql/extensions/operations/issues/mod.ts";
-import { issues as presetsIssues } from "./data/sql/presets/issues/mod.ts";
 import { allModules } from "./data/sql/cli/config.ts";
 import { describeModels } from "./data/sql/describe/mod.ts";
 import { dialect as duckdb } from "./data/sql/dialects/duckdb/mod.ts";
@@ -67,8 +62,22 @@ function commonFolder(files: readonly string[]): string {
   return first.slice(0, n).join("/");
 }
 
-/** A library as a package of the site: its own `about.ts`, with one area whose entry points are the files its `package.json` exports. */
+/** What could not be read while this configuration was made (a library whose `about.ts` fails to import): each is a finding of the site and the library is a page that says so, and the site is made without it. */
+const problems: { where: string; error: string }[] = [];
+
+/** A library as a package of the site, or, where its `about.ts` or its manifest cannot be read, a package that says so (the site is made whatever one library does). */
 async function libraryPackage(name: string): Promise<PackageConfig> {
+  try {
+    return await readLibraryPackage(name);
+  } catch (thrown) {
+    const error = thrown instanceof Error ? thrown.message : String(thrown);
+    problems.push({ where: `commons/${name}`, error });
+    return { dir: `commons/${name}`, slug: name, about: { title: name, summary: `This library could not be read for the site: ${error.replace(/\s+/g, " ").slice(0, 200)}.` } };
+  }
+}
+
+/** A library as a package of the site: its own `about.ts`, with one area whose entry points are the files its `package.json` exports. */
+async function readLibraryPackage(name: string): Promise<PackageConfig> {
   const pkg = JSON.parse(readFileSync(new URL(`./${name}/package.json`, import.meta.url), "utf8")) as { readonly exports?: Readonly<Record<string, string | { readonly default?: string; readonly import?: string }>>; readonly description?: string };
   const targets = Object.values(pkg.exports ?? {}).map((t) => (typeof t === "string" ? t : (t.default ?? t.import ?? ""))).filter((t) => t.endsWith(".ts")).map((t) => t.replace(/^\.\//, ""));
   const { about: written } = (await import(`./${name}/about.ts`)) as { readonly about: About };
@@ -179,6 +188,20 @@ const books: BooksConfig = {
   ],
 };
 
+/** The issues a library keeps as typed code, read one set at a time: a set that cannot be imported is a finding of the site and the other sets are shown. */
+async function issuesOf(sets: readonly (readonly [library: string, file: string, scoped: boolean])[]): Promise<IssuesOf[]> {
+  const out: IssuesOf[] = [];
+  for (const [library, file, scoped] of sets) {
+    try {
+      const { issues } = (await import(file)) as { readonly issues: { readonly scope: string; readonly issues: IssuesOf["issues"] } };
+      out.push({ library, ...(scoped ? { scope: issues.scope } : {}), issues: issues.issues });
+    } catch (thrown) {
+      problems.push({ where: `commons/${file.replace(/^\.\//, "")}`, error: thrown instanceof Error ? thrown.message : String(thrown) });
+    }
+  }
+  return out;
+}
+
 /**
  * What the site shows beside the code (commons 0011-documentation FR-041): the results of the tests that CI leaves in `_evidence/` (`<library>.ctrf.json` for each library and `meta.json`; none where a build is made by hand, and the pages
  * say so), a snapshot of the open tickets of GitHub in the same folder, and the issues that the libraries keep as typed code, which are read from the libraries themselves.
@@ -186,10 +209,13 @@ const books: BooksConfig = {
 const evidence: EvidenceSource = {
   results: "_evidence",
   github: "_evidence/github-issues.json",
-  issues: [
-    { library: "data", issues: dataIssues.issues },
-    ...[convergenceIssues, historyIssues, operationsIssues, presetsIssues].map((set) => ({ library: "data", scope: set.scope, issues: set.issues })),
-  ],
+  issues: await issuesOf([
+    ["data", "./data/issues/mod.ts", false],
+    ["data", "./data/sql/extensions/convergence/issues/mod.ts", true],
+    ["data", "./data/sql/extensions/history/issues/mod.ts", true],
+    ["data", "./data/sql/extensions/operations/issues/mod.ts", true],
+    ["data", "./data/sql/presets/issues/mod.ts", true],
+  ]),
 };
 
 /** Commons' site: its packages, its spec kit, how its specifications are cited, and its lenses. */
@@ -273,6 +299,7 @@ export const config: DocsConfig = {
   out: "_site",
   books,
   evidence,
+  problems,
 };
 
 export default config;
