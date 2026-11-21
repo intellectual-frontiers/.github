@@ -26,6 +26,8 @@ const DATA: EstateData = {
   acceptances: { athens: [{ policy: "ssh-root-login", reason: "a break-glass account, reviewed quarterly", by: "Ada", until: "2027-01-15" }] },
   truths: [{ asset: "athens", state: "managed", observedAt: "2026-11-30T00:00:00Z", currency: "fresh", difference: null, agrees: true, alignment: "aligned", source: "probe" }],
   violations: [{ invariant: "observed-asset-is-declared" as never, subject: "printer", message: "observed and never declared" }],
+  changes: [{ commit: "a1", at: "2026-11-30T10:00:00Z", author: "Ada", subject: "172: take sparta over", refs: "#217", signed: true }, { commit: "b2", at: "2026-11-29T10:00:00Z", author: "Bob", subject: "tweak", refs: "", signed: false }],
+  approvals: [{ asset: "sparta", kind: "manage", by: "Ada", planHash: `sha256:${"a".repeat(64)}`, at: "2026-11-30T10:00:00Z" }],
   fleets: { athens: "fcr", sparta: "fcr", corinth: "if" },
   now: NOW,
 };
@@ -76,6 +78,8 @@ proves(["0002-estate-query-relations FR-003"], "the policies are judged with the
   assertEquals(rows("select control from policy_control where policy = 'ssh-root-login' order by control"), [["AC-6"], ["IA-2"]]);
   assertEquals(rows("select asset, policy, accepted_by, until from risk"), [["athens", "ssh-root-login", "Ada", "2027-01-15"]]);
   assertEquals(rows("select subject from violation"), [["printer"]]);
+  assertEquals(rows("select commit, signed from change where not signed"), [["b2", false]]);
+  assertEquals(rows("select a.asset, a.approved_by, c.refs from approval a join change c on c.at = a.at"), [["sparta", "Ada", "#217"]]);
   assertEquals(rows("select asset, currency, alignment, agrees from truth"), [["athens", "fresh", "aligned", true]]);
   const expired = rows("select status from policy_result where policy = 'ssh-root-login'", [], { ...DATA, now: "2027-02-01T00:00:00Z" });
   assertEquals(expired, [["fail"]], "an acceptance that has ended is a failure again");

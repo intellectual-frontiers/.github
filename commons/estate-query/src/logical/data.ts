@@ -31,6 +31,10 @@ export type EstateData = {
   readonly truths?: readonly Truth[];
   /** The invariants broken, where they were checked. */
   readonly violations?: readonly Violation[];
+  /** The changes of the repository, newest first. */
+  readonly changes?: readonly { readonly commit: string; readonly at: string; readonly author: string; readonly subject: string; readonly refs: string; readonly signed: boolean }[];
+  /** The approvals kept. */
+  readonly approvals?: readonly { readonly asset: string; readonly kind: string; readonly by: string; readonly planHash: string; readonly at: string }[];
   /** The fleet that declares each asset, by its identity, where the data says. */
   readonly fleets?: Readonly<Record<string, string>>;
   /** The instant now, for the policies' acceptances (an ISO 8601 instant). */
@@ -88,6 +92,8 @@ export function tablesOf(data: EstateData): Tables {
       ),
     policy_control: () => table(columnsOf("policy_control"), (data.results ?? []).flatMap((r) => r.controls.map((control): readonly Value[] => [r.asset, r.id, control]))),
     risk: () => table(columnsOf("risk"), Object.entries(data.acceptances ?? {}).flatMap(([asset, risks]) => risks.map((r): readonly Value[] => [asset, r.policy, r.reason, r.by, r.until]))),
+    change: () => table(columnsOf("change"), (data.changes ?? []).map((x): readonly Value[] => [x.commit, x.at, x.author, x.subject, x.refs, x.signed])),
+    approval: () => table(columnsOf("approval"), (data.approvals ?? []).map((x): readonly Value[] => [x.asset, x.kind, x.by, x.planHash, x.at])),
     violation: () => table(columnsOf("violation"), (data.violations ?? []).map((v): readonly Value[] => [v.invariant, v.subject, v.message])),
   };
 }
