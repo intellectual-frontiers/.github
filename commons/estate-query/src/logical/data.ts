@@ -31,6 +31,8 @@ export type EstateData = {
   readonly truths?: readonly Truth[];
   /** The invariants broken, where they were checked. */
   readonly violations?: readonly Violation[];
+  /** The fleet that declares each asset, by its identity, where the data says. */
+  readonly fleets?: Readonly<Record<string, string>>;
   /** The instant now, for the policies' acceptances (an ISO 8601 instant). */
   readonly now: string;
 };
@@ -59,7 +61,7 @@ export function tablesOf(data: EstateData): Tables {
   const latest = new Map((data.observations ?? []).map((o) => [o.asset, o.observation]));
   const accepted = (asset: string): readonly AcceptedRisk[] => data.acceptances?.[asset] ?? [];
   return {
-    asset: () => table(columnsOf("asset"), data.assets.map((a) => [String(a.id), String(a.kind), a.state, a.origin ?? "", a.state === "discovered" ? "" : installOf(a)])),
+    asset: () => table(columnsOf("asset"), data.assets.map((a) => [String(a.id), data.fleets?.[String(a.id)] ?? "", String(a.kind), a.state, a.origin ?? "", a.state === "discovered" ? "" : installOf(a)])),
     capability: () => table(columnsOf("capability"), data.assets.flatMap((a) => a.capabilities.map((l): readonly Value[] => [String(a.id), l.capability, l.offered, l.offered ? String(l.owner) : "", l.offered ? "" : l.reason]))),
     platform: () =>
       table(

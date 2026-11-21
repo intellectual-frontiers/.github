@@ -26,6 +26,7 @@ const DATA: EstateData = {
   acceptances: { athens: [{ policy: "ssh-root-login", reason: "a break-glass account, reviewed quarterly", by: "Ada", until: "2027-01-15" }] },
   truths: [{ asset: "athens", state: "managed", observedAt: "2026-11-30T00:00:00Z", currency: "fresh", difference: null, agrees: true, alignment: "aligned", source: "probe" }],
   violations: [{ invariant: "observed-asset-is-declared" as never, subject: "printer", message: "observed and never declared" }],
+  fleets: { athens: "fcr", sparta: "fcr", corinth: "if" },
   now: NOW,
 };
 
@@ -51,7 +52,7 @@ proves(["0002-estate-query-relations FR-001", "0002-estate-query-relations FR-00
 });
 
 proves(["0002-estate-query-relations FR-002"], "asset and capability say what the estate library says, an inherited asset has no provision and a discovered one has no install, and the platform is read where it is declared", () => {
-  assertEquals(rows("select id, state, origin, install from asset order by id"), [["athens", "managed", "provisioned", "provisioned"], ["corinth", "adopted", "paired", "inherited"], ["printer", "discovered", "", ""], ["sparta", "managed", "paired", "inherited"]]);
+  assertEquals(rows("select id, fleet, state, origin, install from asset order by id"), [["athens", "fcr", "managed", "provisioned", "provisioned"], ["corinth", "if", "adopted", "paired", "inherited"], ["printer", "", "discovered", "", ""], ["sparta", "fcr", "managed", "paired", "inherited"]]);
   assertEquals(rows("select asset, offered, reason from capability where capability = 'provision' and asset in ('athens','sparta') order by asset").map((r) => [r[0], r[1], String(r[2]).includes("installed by someone else")]), [["athens", true, false], ["sparta", false, true]]);
   assertEquals(rows("select count(*) from capability where asset = 'athens' and offered"), [[10]]);
   assertEquals(rows("select asset, family, distro, release, arch, ansible from platform"), [["athens", "debian", "ubuntu", "26.04", "x86_64", ""]]);
