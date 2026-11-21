@@ -409,6 +409,8 @@ export interface Select extends Base {
   readonly orderBy: readonly OrderItem[];
   readonly limit: Expr | undefined;
   readonly offset: Expr | undefined;
+  /** The locking clauses (`FOR UPDATE OF t NOWAIT`), as text. */
+  readonly locking: string | undefined;
 }
 
 /** `UNION`, `INTERSECT` or `EXCEPT`. */
@@ -424,6 +426,8 @@ export interface SetOp extends Base {
   readonly orderBy: readonly OrderItem[];
   readonly limit: Expr | undefined;
   readonly offset: Expr | undefined;
+  /** The locking clauses (`FOR UPDATE OF t NOWAIT`), as text. */
+  readonly locking: string | undefined;
 }
 
 /** `VALUES (...), (...)`. */
@@ -691,8 +695,11 @@ export interface CreateTable extends Base {
 export interface CreateIndex extends Base {
   readonly kind: "create-index";
   readonly unique: boolean;
+  readonly concurrently: boolean;
   readonly ifNotExists: boolean;
   readonly name: Name | undefined;
+  /** `ON ONLY table`. */
+  readonly only: boolean;
   readonly table: Name;
   readonly items: readonly OrderItem[];
   readonly where: Expr | undefined;
@@ -776,6 +783,7 @@ export interface Drop extends Base {
   readonly object: "table" | "view" | "index";
   readonly ifExists: boolean;
   readonly names: readonly Name[];
+  readonly concurrently: boolean;
   readonly behavior: "cascade" | "restrict" | undefined;
 }
 

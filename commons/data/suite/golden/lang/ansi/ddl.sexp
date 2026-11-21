@@ -63,7 +63,7 @@ script
         left: name
           parts[0]: ident name="id" quoted=false
         right: number text="0"
-  statements[1]: create-index unique=true ifNotExists=true
+  statements[1]: create-index unique=true concurrently=false ifNotExists=true only=false
     name: name
       parts[0]: ident name="person_name" quoted=false
     table: name
@@ -80,7 +80,7 @@ script
     where: is test="null" negated=true
       arg: name
         parts[0]: ident name="name" quoted=false
-  statements[2]: create-index unique=false ifNotExists=false
+  statements[2]: create-index unique=false concurrently=false ifNotExists=false only=false
     table: name
       parts[0]: ident name="t" quoted=false
     items[0]: order-item
@@ -135,15 +135,15 @@ script
       parts[0]: ident name="t" quoted=false
     actions[0]: rename-table
       to: ident name="u" quoted=false
-  statements[7]: drop object="table" ifExists=true behavior="cascade"
+  statements[7]: drop object="table" ifExists=true concurrently=false behavior="cascade"
     names[0]: name
       parts[0]: ident name="a" quoted=false
     names[1]: name
       parts[0]: ident name="s" quoted=false
       parts[1]: ident name="b" quoted=false
-  statements[8]: drop object="view" ifExists=false
+  statements[8]: drop object="view" ifExists=false concurrently=false
     names[0]: name
       parts[0]: ident name="v" quoted=false
-  statements[9]: drop object="index" ifExists=false behavior="restrict"
+  statements[9]: drop object="index" ifExists=false concurrently=false behavior="restrict"
     names[0]: name
       parts[0]: ident name="i" quoted=false

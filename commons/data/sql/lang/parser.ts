@@ -354,7 +354,7 @@ const OP_RUN_CHARS: ReadonlySet<number> = new Set([...("+-*/<>=~!@#%^&|?")].map(
 const SPECIAL_OP_CHARS: ReadonlySet<number> = new Set([...("~!@#%^&|?")].map((c) => c.charCodeAt(0)));
 
 /** The words that begin a column option the grammar keeps as text. */
-const COLUMN_OPTION_WORDS: ReadonlySet<string> = new Set("GENERATED AUTOINCREMENT AUTO_INCREMENT DEFERRABLE INITIALLY ASC DESC NO".split(" "));
+const COLUMN_OPTION_WORDS: ReadonlySet<string> = new Set("GENERATED AUTOINCREMENT AUTO_INCREMENT DEFERRABLE INITIALLY ASC DESC NO NULLS".split(" "));
 
 /** The words that begin a column constraint, where an option ends. */
 const CONSTRAINT_STARTS: ReadonlySet<string> = new Set("CONSTRAINT NOT NULL DEFAULT PRIMARY UNIQUE CHECK REFERENCES COLLATE".split(" "));
@@ -774,6 +774,11 @@ class Parser {
           continue;
         } else this.fail("NULL, TRUE, FALSE, UNKNOWN or DISTINCT FROM");
         left = { kind: "is", start: s, end: this.last(), arg: left, test, negated, other };
+      } else if (w === 0 && this.at(K.TIME, 1) && this.at(K.ZONE, 2) && this.slice().toUpperCase() === "AT") {
+        if (Prec.Exponent < min) break;
+        this.i += 3;
+        const right = this.expr(Prec.Exponent + 1);
+        left = { kind: "operator", start: s, end: this.last(), op: "AT TIME ZONE", left, right };
       } else if (w === K.NOT && this.at(K.NULL, 1)) {
         if (Prec.Is < min) break;
         this.i += 2;
@@ -951,6 +956,10 @@ class Parser {
         if (this.kind() === Tok.Word && this.isIntervalUnit(this.id())) {
           unit = this.slice().toUpperCase();
           this.i++;
+          if (this.kind() === Tok.LParen && this.kind(1) === Tok.Number && this.kind(2) === Tok.RParen) {
+            unit += `(${this.slice(1)})`;
+            this.i += 3;
+          }
           if (this.at(K.TO) && this.kind(1) === Tok.Word && this.isIntervalUnit(this.id(1))) {
             unit += ` TO ${this.slice(1).toUpperCase()}`;
             this.i += 2;
@@ -1379,6 +1388,23 @@ class Parser {
     return this.textFrom(from);
   }
 
+  /** Whether a locking clause (`FOR UPDATE`, `FOR SHARE`, `FOR NO KEY UPDATE`, `FOR KEY SHARE`) is at the cursor. */
+  private atLocking(): boolean {
+    return this.at(this.K.FOR) && (this.wordIs("UPDATE", 1) || this.wordIs("SHARE", 1) || (this.wordIs("NO", 1) && this.wordIs("KEY", 2)) || (this.wordIs("KEY", 1) && this.wordIs("SHARE", 2)));
+  }
+
+  private lockingClause(): void {
+    this.i++;
+    while (this.wordIs("NO") || this.wordIs("KEY")) this.i++;
+    this.i++;
+    if (this.wordIs("OF")) {
+      this.i++;
+      this.commaList(() => this.qualifiedName());
+    }
+    if (this.wordIs("NOWAIT")) this.i++;
+    else if (this.wordIs("SKIP") && this.wordIs("LOCKED", 1)) this.i += 2;
+  }
+
   private queryExpr(): Query {
     const K = this.K;
     const s = this.start();
@@ -1386,6 +1412,7 @@ class Parser {
     const orderBy = this.orderByClause();
     let limit: Expr | undefined;
     let offset: Expr | undefined;
+    let locking: string | undefined;
     for (;;) {
       if (this.eat(K.LIMIT)) {
         limit = this.expr(0);
@@ -1407,15 +1434,19 @@ class Parser {
             : this.expr(Prec.Additive);
         if (!this.eat(K.ROWS)) this.expect(K.ROW, "ROW or ROWS");
         this.expect(K.ONLY, "ONLY");
+      } else if (this.atLocking()) {
+        const from = this.i;
+        while (this.atLocking()) this.lockingClause();
+        locking = this.textFrom(from);
       } else break;
     }
-    if (orderBy.length === 0 && limit === undefined && offset === undefined) return left;
+    if (orderBy.length === 0 && limit === undefined && offset === undefined && locking === undefined) return left;
     if (left.kind === "select" || left.kind === "set-op") {
       if (left.orderBy.length > 0 || left.limit !== undefined || left.offset !== undefined)
         this.unsupported("a clause after a query in parentheses that has its own");
       return left.kind === "select"
-        ? { ...left, start: s, end: this.last(), orderBy, limit, offset }
-        : { ...left, start: s, end: this.last(), orderBy, limit, offset };
+        ? { ...left, start: s, end: this.last(), orderBy, limit, offset, locking }
+        : { ...left, start: s, end: this.last(), orderBy, limit, offset, locking };
     }
     return this.unsupported("ORDER BY or LIMIT after this query");
   }
@@ -1451,6 +1482,7 @@ class Parser {
         orderBy: [],
         limit: undefined,
         offset: undefined,
+        locking: undefined,
       };
       left = node;
     }
@@ -1624,7 +1656,7 @@ class Parser {
     } else expr = this.expr(0);
     let alias: Ident | undefined;
     if (this.eat(K.AS)) alias = this.ident(true);
-    else if (this.canBeIdent() && !this.atQualify()) alias = this.ident();
+    else if (this.canBeIdent() && !this.atQualify() && !this.atLocking()) alias = this.ident();
     return { kind: "select-item", start: s, end: this.last(), expr, alias };
   }
 
@@ -1689,6 +1721,7 @@ class Parser {
       orderBy: [],
       limit: undefined,
       offset: undefined,
+      locking: undefined,
     };
   }
 
@@ -1699,7 +1732,7 @@ class Parser {
     const s = this.start();
     let name: Ident;
     if (this.eat(K.AS)) name = this.ident(true);
-    else if (this.canBeIdent() && !this.atQualify() && !(this.wordIs("INDEXED") && this.at(K.BY, 1))) name = this.ident();
+    else if (this.canBeIdent() && !this.atQualify() && !this.atLocking() && !(this.wordIs("INDEXED") && this.at(K.BY, 1))) name = this.ident();
     else return undefined;
     const columns: Ident[] = [];
     const types: (DataType | undefined)[] = [];
@@ -2080,6 +2113,11 @@ class Parser {
     }
   }
 
+  /** Whether the word before the cursor is `BY` or `NULLS`, so that the word at it continues an option and does not begin a constraint (`GENERATED BY DEFAULT`, `UNIQUE NULLS NOT DISTINCT`). */
+  private afterBy(): boolean {
+    return this.kind(-1) === Tok.Word && (this.at(this.K.BY, -1) || this.at(this.K.NULLS, -1));
+  }
+
   private atColumnOption(): boolean {
     const K = this.K;
     if (this.kind() !== Tok.Word) return false;
@@ -2105,7 +2143,7 @@ class Parser {
       this.kind() !== Tok.Comma &&
       this.kind() !== Tok.RParen &&
       this.kind() !== Tok.Semicolon &&
-      !(this.kind() === Tok.Word && CONSTRAINT_STARTS.has(this.slice().toUpperCase()))
+      !(this.kind() === Tok.Word && CONSTRAINT_STARTS.has(this.slice().toUpperCase()) && !this.afterBy())
     );
     return { kind: "column-option", start: s, end: this.last(), name, text: this.textFrom(from) ?? "", expr };
   }
@@ -2155,9 +2193,11 @@ class Parser {
       return { kind: "create-table", start: s, end: this.last(), name, ifNotExists, temporary, elements, query, options };
     }
     if (this.eat(K.INDEX)) {
+      const concurrently = this.wordIs("CONCURRENTLY") ? (this.i++, true) : false;
       const ifNotExists = this.ifNotExists();
       const name = this.at(K.ON) ? undefined : this.qualifiedName();
       this.expect(K.ON, "ON");
+      const only = this.wordIs("ONLY") && this.kind(1) !== Tok.LParen ? (this.i++, true) : false;
       const table = this.qualifiedName();
       const method = this.eat(K.USING) ? this.ident(true).name : undefined;
       this.expectKind(Tok.LParen, "(");
@@ -2170,7 +2210,7 @@ class Parser {
       }
       const options = this.textFrom(from);
       const where = this.eat(K.WHERE) ? this.expr(0) : undefined;
-      return { kind: "create-index", start: s, end: this.last(), unique, ifNotExists, name, table, items, where, method, options };
+      return { kind: "create-index", start: s, end: this.last(), unique, concurrently, ifNotExists, name, only, table, items, where, method, options };
     }
     if (this.eat(K.VIEW)) {
       const name = this.qualifiedName();
@@ -2490,10 +2530,11 @@ class Parser {
       this.i = first;
       return this.command();
     }
+    const concurrently = this.wordIs("CONCURRENTLY") ? (this.i++, true) : false;
     const ifExists = this.ifExists();
     const names = this.commaList(() => this.qualifiedName());
     const behavior = this.eat(K.CASCADE) ? "cascade" : this.eat(K.RESTRICT) ? "restrict" : undefined;
-    return { kind: "drop", start: s, end: this.last(), object, ifExists, names, behavior };
+    return { kind: "drop", start: s, end: this.last(), object, ifExists, names, concurrently, behavior };
   }
 
   private wordIs(w: string, at = 0): boolean {
