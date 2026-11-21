@@ -98,7 +98,7 @@ export const MAY_NAME: Readonly<Record<UnitClass, readonly string[] | undefined>
   store: HOSTED,
   signer: HOSTED,
   conformance: PURE,
-  surface: [...HOSTED, "@intellectual-frontiers/headless", "@intellectual-frontiers/terminal"],
+  surface: [...HOSTED, "@intellectual-frontiers/headless", "@intellectual-frontiers/terminal", "@intellectual-frontiers/lang-sql"],
   suite: undefined,
   tools: undefined,
   root: undefined,

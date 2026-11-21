@@ -102,6 +102,8 @@ export type Capabilities = {
   readonly release: boolean;
   /** `new library`. */
   readonly newLibrary: boolean;
+  /** `query`: questions of the libraries, specifications and requirements in SQL. */
+  readonly query: boolean;
   /** `status` of the packages. */
   readonly status: boolean;
   /** `prove`, the proof of a change by its blast radius. */
@@ -167,7 +169,7 @@ export type ConfigInput = {
 };
 
 /** The names of the optional verbs a configuration turns on with a flag. */
-export const CAPABILITY_NAMES: readonly (keyof Capabilities)[] = ["release", "newLibrary", "status", "prove"];
+export const CAPABILITY_NAMES: readonly (keyof Capabilities)[] = ["release", "newLibrary", "status", "prove", "query"];
 
 /** The name of the file a repository keeps its configuration in, at its root. */
 export const CONFIG_FILE = "repoctl.config.ts";
@@ -311,7 +313,7 @@ export function parseConfig(input: ConfigInput): Result<Config, readonly string[
   }
   if (!dedupe(checks.map((k) => k.id))) bad("checks: an id is used twice");
 
-  const capabilities: Capabilities = { release: false, newLibrary: false, status: false, prove: false, ...input.capabilities };
+  const capabilities: Capabilities = { release: false, newLibrary: false, status: false, prove: false, query: false, ...input.capabilities };
   const needsLibraries = CAPABILITY_NAMES.filter((name) => capabilities[name]);
   const libraries: LibrariesSettings | undefined =
     input.libraries === undefined ? undefined : { folder: input.libraries.folder, specKit: input.libraries.specKit, versionConstants: input.libraries.versionConstants ?? false, declaredDependencies: input.libraries.declaredDependencies ?? false, linker: input.libraries.linker, roleFile: input.libraries.roleFile };
@@ -351,6 +353,9 @@ export function enabledVerbs(config: Config): readonly VerbId[] {
         return;
       case "prove":
         out.push("prove");
+        return;
+      case "query":
+        out.push("query");
         return;
       default:
         absurd(name);

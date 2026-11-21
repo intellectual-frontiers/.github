@@ -32,7 +32,8 @@
     "./stores/object": "./src/stores/object/mod.ts",
     "./signers/dsse": "./src/signers/dsse/mod.ts",
     "./signers/sshsig": "./src/signers/sshsig/mod.ts",
-    "./surfaces/headless": "./src/surfaces/headless/mod.ts"
+    "./surfaces/headless": "./src/surfaces/headless/mod.ts",
+    "./surfaces/query": "./src/surfaces/query/mod.ts"
   },
   "scripts": {
     "check": "tsc -p tsconfig.json",

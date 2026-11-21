@@ -126,3 +126,8 @@ requirement	mechanism	by	note
 0014-grc-sshsig FR-003	check	.github: cd commons/grc && bun run verify	suite/sshsig.test.ts
 0014-grc-sshsig FR-004	check	.github: cd commons/grc && bun run verify	suite/sshsig.test.ts
 0014-grc-sshsig FR-005	check	.github: cd commons/grc && bun run verify	suite/sshsig.test.ts
+0015-grc-query FR-001	check	.github: cd commons/grc && bun run verify	suite/query.test.ts
+0015-grc-query FR-002	check	.github: cd commons/grc && bun run verify	suite/query.test.ts
+0015-grc-query FR-003	check	.github: cd commons/grc && bun run verify	suite/query.test.ts
+0015-grc-query FR-004	check	.github: cd commons/grc && bun run verify	suite/query.test.ts
+0015-grc-query FR-005	check	.github: cd commons/grc && bun run verify	suite/query.test.ts

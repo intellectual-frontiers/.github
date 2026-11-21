@@ -17,7 +17,7 @@ import type { Channel, ConfirmationClass, Effect, Kind } from "@intellectual-fro
 import type { TierId } from "./tiers.ts";
 
 /** The words of every verb, as a person types them: a closed union. */
-export type VerbId = "sync" | "merge" | "check" | "status" | "hygiene" | "release plan" | "release apply" | "release publish" | "new library" | "commit" | "doctor" | "prove" | "docs build" | "docs serve" | "docs check" | "mcp";
+export type VerbId = "sync" | "merge" | "check" | "status" | "hygiene" | "release plan" | "release apply" | "release publish" | "new library" | "commit" | "doctor" | "prove" | "docs build" | "docs serve" | "docs check" | "query" | "mcp";
 
 /** What a verb is. */
 export type VerbFacts = {
@@ -98,6 +98,19 @@ export const VERBS: Readonly<Record<VerbId, VerbFacts>> = {
   hygiene: {
     id: "hygiene",
     summary: "Say whether this repository consumes commons as published packages: no Git or path dependency, no vendored copy, one copy of each library, exact versions.",
+    kind: "report",
+    effect: "read",
+    idempotent: true,
+    dryRun: false,
+    check: false,
+    tier: "public",
+    channels: ["local", "mcp"],
+    confirmation: "none",
+    humanOnly: [],
+  },
+  query: {
+    id: "query",
+    summary: "Ask the libraries, their specifications and their requirements in SQL: one read-only SELECT over the relations libraries, specs and requirements.",
     kind: "report",
     effect: "read",
     idempotent: true,
@@ -255,5 +268,5 @@ export const VERBS: Readonly<Record<VerbId, VerbFacts>> = {
 
 /** The words of every verb, in the order the help lists them. */
 export function verbIds(): readonly VerbId[] {
-  return ["check", "sync", "merge", "status", "hygiene", "release plan", "release apply", "release publish", "new library", "commit", "doctor", "prove", "docs build", "docs serve", "docs check", "mcp"];
+  return ["check", "sync", "merge", "status", "hygiene", "release plan", "release apply", "release publish", "new library", "commit", "doctor", "prove", "docs build", "docs serve", "docs check", "query", "mcp"];
 }
