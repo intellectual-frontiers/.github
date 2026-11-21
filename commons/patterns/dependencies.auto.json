@@ -2,7 +2,7 @@
   "generated": "bun commons/libraries/src/pack-metapackage.ts; do not edit (commons 0036-distribution FR-007)",
   "set": "patterns",
   "dependencies": {
-    "@intellectual-frontiers/headless": "0.5.2",
-    "@intellectual-frontiers/kanon": "0.3.2"
+    "@intellectual-frontiers/headless": "0.5.3",
+    "@intellectual-frontiers/kanon": "0.3.3"
   }
 }

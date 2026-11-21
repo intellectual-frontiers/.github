@@ -3,15 +3,15 @@
   "set": "foundation",
   "dependencies": {
     "@intellectual-frontiers/core": "0.2.1",
-    "@intellectual-frontiers/crypto": "0.2.2",
-    "@intellectual-frontiers/formats": "0.2.2",
-    "@intellectual-frontiers/githost": "0.2.2",
-    "@intellectual-frontiers/lint": "0.2.2",
-    "@intellectual-frontiers/net": "0.2.2",
+    "@intellectual-frontiers/crypto": "0.2.3",
+    "@intellectual-frontiers/formats": "0.2.3",
+    "@intellectual-frontiers/githost": "0.2.3",
+    "@intellectual-frontiers/lint": "0.2.3",
+    "@intellectual-frontiers/net": "0.2.3",
     "@intellectual-frontiers/rdf": "0.2.1",
-    "@intellectual-frontiers/system": "0.2.2",
-    "@intellectual-frontiers/telemetry": "0.2.2",
+    "@intellectual-frontiers/system": "0.2.3",
+    "@intellectual-frontiers/telemetry": "0.2.3",
     "@intellectual-frontiers/terminal": "0.2.1",
-    "@intellectual-frontiers/test": "0.2.2"
+    "@intellectual-frontiers/test": "0.2.3"
   }
 }

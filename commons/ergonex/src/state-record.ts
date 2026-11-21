@@ -17,7 +17,7 @@ import { type GeneratedFile } from "./render.ts";
 import { headerText } from "./render.ts";
 
 /** The version of Ergonex the record names. */
-export const ERGONEX_VERSION = "0.5.2";
+export const ERGONEX_VERSION = "0.5.3";
 
 /** Where the state record is, below the root. */
 export const STATE_RECORD_PATH = ".ergonex/state.auto.json";
