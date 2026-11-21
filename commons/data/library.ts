@@ -20,6 +20,8 @@ export const library = {
     "./sql/lang/dialects/sqlite",
     "./sql/lang/dialects/postgres",
     "./sql/lang/dialects/duckdb",
+    "./sql/lang/extensions/query",
+    "./sql/lang/extensions/unist",
     "./sql/logical",
     "./sql/physical",
     "./models/arca",

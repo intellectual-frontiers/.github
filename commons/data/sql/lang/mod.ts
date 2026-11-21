@@ -1,12 +1,12 @@
 /**
  * The SQL language core (commons data 0065-sql-lang, 0066-sql-ast-parser): a small, fast, portable front end for SQL in many dialects. `lex` turns text into tokens and comments with exact positions; `parse` reads
  * the tokens into a syntax tree, a closed union whose child fields are typed by sort, and attaches each comment to its node; a dialect says how it is written (`defineDialect`) and how its grammar differs; and the
- * walks (`children`, `walk`, `findAll`, `fold`) and `toSexp` read a tree. The folder imports only `@intellectual-frontiers/core`, so that it can be published alone as `@intellectual-frontiers/sql-lang`; the
+ * walks (`children`, `walk`, `findAll`, `fold`), `toSexp` and the rewrites (`rewriteScript` and its kin, with the `build` of nodes) read and change a tree; the extensions `extensions/query` (selections and
+ * analyses) and `extensions/unist` (the projection to `unist`) are further exports. The folder imports only `@intellectual-frontiers/core`, so that it can be published alone as `@intellectual-frontiers/sql-lang`; the
  * dialects are the other exports (`./sql/lang/dialects/<name>`), and the core names none.
  *
  * @remarks
- * Not here yet, and specified after these layers: rewriting a tree, queries over trees, the projection to `unist`, the extraction of documentation from comments, the dialects beyond the three, and SQL over
- * data that is not a database.
+ * Not here yet, and specified after these layers: writing SQL from a tree, the extraction of documentation from comments, the dialects beyond the three, and SQL over data that is not a database.
  *
  * @limits
  * The common ground of SQL and what a dialect's grammar names; it does not write SQL, and does not look names up.
@@ -19,7 +19,7 @@
  * commentsOf(attachments, script.statements[0]!).leading.length; // 1
  * ```
  *
- * Spec: 0065-sql-lang FR-001, FR-004, FR-009, FR-014, FR-015, FR-016, FR-017; 0066-sql-ast-parser FR-008, FR-016
+ * Spec: 0065-sql-lang FR-001, FR-004, FR-009, FR-014, FR-015, FR-016, FR-017; 0066-sql-ast-parser FR-008, FR-016; 0067-sql-ast-tools FR-001, FR-003
  *
  * @module
  */
@@ -36,8 +36,10 @@ export {
 } from "./attach.ts";
 export { type SexpOptions, toSexp } from "./dump.ts";
 export { describeParseError, type ParseError, spanOf } from "./errors.ts";
+export { build } from "./build.ts";
 export { ANSI_GRAMMAR, type CustomOperator, type Grammar, Prec, RESERVED_WORDS } from "./grammar.ts";
 export { type ParseOptions, type Parsed, parse, parseStrict } from "./parser.ts";
+export { type Rules, rewriteExpr, rewriteQuery, rewriteScript, rewriteSource, rewriteStatement } from "./rewrite.ts";
 export { children, findAll, fold, type Visitor, walk } from "./walk.ts";
 export { type Comment, CommentFlag, type Comments, type CommentStyle, allComments, commentAt, commentCount } from "./comment.ts";
 export {

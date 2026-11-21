@@ -28,7 +28,10 @@ export type Placement = "leading" | "trailing" | "dangling" | "detached";
 export interface Attachment {
   readonly comment: Comment;
   readonly placement: Placement;
+  /** The node it is attached to. */
   readonly node: Node;
+  /** The smallest node that contains it, which may be the node it is attached to or the one above. */
+  readonly enclosing: Node;
 }
 
 /** The comments of one node, by placement, in the order of the text. */
@@ -117,7 +120,7 @@ export function attachComments(script: Script, comments: readonly Comment[]): Co
     } else if (preceding !== undefined) [placement, node] = ["trailing", preceding];
     else if (following !== undefined) [placement, node] = ["leading", following];
     else [placement, node] = ["dangling", enclosing];
-    const a: Attachment = { comment, placement, node };
+    const a: Attachment = { comment, placement, node, enclosing };
     all.push(a);
     const list = byNode.get(node);
     if (list === undefined) byNode.set(node, [a]);

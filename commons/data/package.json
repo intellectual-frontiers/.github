@@ -14,6 +14,8 @@
     "./sql/lang/dialects/sqlite": "./sql/lang/dialects/sqlite/mod.ts",
     "./sql/lang/dialects/postgres": "./sql/lang/dialects/postgres/mod.ts",
     "./sql/lang/dialects/duckdb": "./sql/lang/dialects/duckdb/mod.ts",
+    "./sql/lang/extensions/query": "./sql/lang/extensions/query/mod.ts",
+    "./sql/lang/extensions/unist": "./sql/lang/extensions/unist/mod.ts",
     "./sql/logical": "./sql/logical/api.ts",
     "./sql/physical": "./sql/physical/api.ts",
     "./issues": "./issues/mod.ts",
@@ -104,6 +106,8 @@
     "fast-check": "4.10.2",
     "pg": "8.23.1",
     "typescript": "7.0.2",
+    "unist-util-select": "5.1.0",
+    "unist-util-visit": "5.2.0",
     "zod": "4.1.12"
   },
   "bin": {
