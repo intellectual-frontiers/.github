@@ -1,0 +1,14 @@
+# Everything in the hidden directory
+
+$ sqlfs --root $ROOT 'SELECT path FROM files WHERE path GLOB '\''.hidden/*'\'''
+path
+-----------------
+.hidden/secret.ts
+
+$ sqlfind --root $ROOT --emit shell 'SELECT path FROM files WHERE path GLOB '\''.hidden/*'\'''
+find $ROOT -mindepth 1 -maxdepth 64 -path '$ROOT/.hidden/*' -printf '%P\0%y\0%s\0%Ts\0%m\0%u\0'
+
+$ sqlfind --root $ROOT 'SELECT path FROM files WHERE path GLOB '\''.hidden/*'\'''
+path
+-----------------
+.hidden/secret.ts

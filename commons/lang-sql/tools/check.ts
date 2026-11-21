@@ -24,7 +24,7 @@ const COMMENTS = [
 
 /** Every finding of the library at `root`: the trace of its sources and tests to its specifications. */
 export async function findings(root: string): Promise<readonly kernel.Keyed[]> {
-  const sources = await runtime.readSources(root, ["about.ts", "src", "tools"]);
+  const sources = await runtime.readSources(root, ["about.ts", "src", "acceptance", "tools"]);
   const tests = await runtime.readSources(root, ["suite"]);
   const specs = await runtime.readSpecs(root, "spec-kit/specs");
   return kernel.traceFindings({ specs, sources, tests, ontology: [], specsFolder: "spec-kit/specs" });

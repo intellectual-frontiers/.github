@@ -476,6 +476,7 @@ class Parser {
   private readonly likeWords: ReadonlySet<number>;
   private readonly castOp: number;
   private readonly runs: boolean;
+  private readonly units: ReadonlyMap<string, number>;
   private readonly selectTop: boolean;
   private readonly parametric: boolean;
   private halfGt = false;
@@ -538,6 +539,7 @@ class Parser {
     }
     this.likeWords = like;
     this.runs = d.grammar.operatorRuns;
+    this.units = new Map(d.grammar.units.map((u) => [u.unit.toUpperCase(), u.factor]));
     this.selectTop = d.grammar.selectTop;
     this.parametric = d.grammar.parametric;
     this.queryTail = new Set(d.grammar.queryTail);
@@ -858,8 +860,16 @@ class Parser {
     const s = this.start();
     switch (k) {
       case Tok.Number: {
-        const text = this.slice();
+        let text = this.slice();
         this.i++;
+        if (this.units.size > 0 && this.kind() === Tok.Word) {
+          const factor = this.units.get(this.slice().toUpperCase());
+          const n = Number(text.replaceAll("_", ""));
+          if (factor !== undefined && Number.isFinite(n * factor)) {
+            text = String(n * factor);
+            this.i++;
+          }
+        }
         return { kind: "number", start: s, end: this.last(), text };
       }
       case Tok.String: {

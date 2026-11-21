@@ -1,0 +1,14 @@
+# Where the compressed archives are
+
+$ sqlfs --root $ROOT 'SELECT path FROM files WHERE ext = '\''gz'\'''
+path
+------------------
+lib/archive.tar.gz
+
+$ sqlfind --root $ROOT --emit shell 'SELECT path FROM files WHERE ext = '\''gz'\'''
+find $ROOT -mindepth 1 -maxdepth 64 -name '*.gz' -printf '%P\0%y\0%s\0%Ts\0%m\0%u\0'
+
+$ sqlfind --root $ROOT 'SELECT path FROM files WHERE ext = '\''gz'\'''
+path
+------------------
+lib/archive.tar.gz

@@ -9,6 +9,12 @@
   },
   "exports": {
     ".": "./src/mod.ts",
+    "./aide/catalog": "./src/aide/catalog/mod.ts",
+    "./aide/exec": "./src/aide/exec/mod.ts",
+    "./aide/normalize": "./src/aide/normalize/mod.ts",
+    "./aide/plan": "./src/aide/plan/mod.ts",
+    "./aide/profile": "./src/aide/profile/mod.ts",
+    "./aide/text": "./src/aide/text/mod.ts",
     "./dialects/athena": "./src/dialects/athena/mod.ts",
     "./dialects/bigquery": "./src/dialects/bigquery/mod.ts",
     "./dialects/clickhouse": "./src/dialects/clickhouse/mod.ts",
@@ -40,6 +46,7 @@
     "./dialects/trino": "./src/dialects/trino/mod.ts",
     "./dialects/tsql": "./src/dialects/tsql/mod.ts",
     "./extensions/docs": "./src/extensions/docs/mod.ts",
+    "./extensions/introspect": "./src/extensions/introspect/mod.ts",
     "./extensions/plpgsql": "./src/extensions/plpgsql/mod.ts",
     "./extensions/query": "./src/extensions/query/mod.ts",
     "./extensions/unist": "./src/extensions/unist/mod.ts"

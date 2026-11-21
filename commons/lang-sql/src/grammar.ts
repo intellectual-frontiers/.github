@@ -34,6 +34,12 @@ export const Prec = {
   Cast: 100,
 } as const;
 
+/** A unit of number literals: its word (upper case) and the factor by which it scales the number before it. */
+export interface UnitLiteral {
+  readonly unit: string;
+  readonly factor: number;
+}
+
 /** An operator a dialect adds: its text as the lexer reads it and its binding power. */
 export interface CustomOperator {
   readonly text: string;
@@ -68,10 +74,12 @@ export interface Grammar {
   readonly parametric: boolean;
   /** Whether `SELECT TOP n [PERCENT] [WITH TIES]` is read (T-SQL). */
   readonly selectTop: boolean;
+  /** The units of number literals: a number followed by a word that is one of them (`10 KB`, `7d`) is read as one number scaled by the unit's factor. */
+  readonly units: readonly UnitLiteral[];
 }
 
 /** The grammar of the common ground: nothing is added. */
-export const ANSI_GRAMMAR: Grammar = { operators: [], castOperator: undefined, likeWords: [], wordOperators: [], operatorRuns: false, emptySelect: false, fromFirst: false, lambdas: false, colonPaths: false, tableIndexes: false, queryTail: [], parametric: false, selectTop: false };
+export const ANSI_GRAMMAR: Grammar = { operators: [], castOperator: undefined, likeWords: [], wordOperators: [], operatorRuns: false, emptySelect: false, fromFirst: false, lambdas: false, colonPaths: false, tableIndexes: false, queryTail: [], parametric: false, selectTop: false, units: [] };
 
 /** The words the common grammar reserves: they are identifiers only after a `.` or where quoted. */
 export const RESERVED_WORDS: readonly string[] = (

@@ -1,0 +1,18 @@
+# The three newest files
+
+$ sqlfs --root $ROOT 'SELECT path FROM files WHERE kind = '\''f'\'' ORDER BY mtime DESC, path LIMIT 3'
+path
+----------------------
+README.md
+docs/readme.md
+src/deep/nested/mod.ts
+
+$ sqlfind --root $ROOT --emit shell 'SELECT path FROM files WHERE kind = '\''f'\'' ORDER BY mtime DESC, path LIMIT 3'
+find $ROOT -mindepth 1 -maxdepth 64 -type f -printf '%P\0%y\0%s\0%Ts\0%m\0%u\0'
+
+$ sqlfind --root $ROOT 'SELECT path FROM files WHERE kind = '\''f'\'' ORDER BY mtime DESC, path LIMIT 3'
+path
+----------------------
+README.md
+docs/readme.md
+src/deep/nested/mod.ts

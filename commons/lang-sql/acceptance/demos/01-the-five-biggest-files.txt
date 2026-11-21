@@ -1,0 +1,22 @@
+# The five biggest files
+
+$ sqlfs --root $ROOT 'SELECT path, size FROM files WHERE kind = '\''f'\'' ORDER BY size DESC, path LIMIT 5'
+path            size
+--------------  -----
+lib/data.json   50000
+src/Big.TS      20000
+docs/guide.md   4000
+src/util.ts     3000
+docs/readme.md  200
+
+$ sqlfind --root $ROOT --emit shell 'SELECT path, size FROM files WHERE kind = '\''f'\'' ORDER BY size DESC, path LIMIT 5'
+find $ROOT -mindepth 1 -maxdepth 64 -type f -printf '%P\0%y\0%s\0%Ts\0%m\0%u\0'
+
+$ sqlfind --root $ROOT 'SELECT path, size FROM files WHERE kind = '\''f'\'' ORDER BY size DESC, path LIMIT 5'
+path            size
+--------------  -----
+lib/data.json   50000
+src/Big.TS      20000
+docs/guide.md   4000
+src/util.ts     3000
+docs/readme.md  200

@@ -6,3 +6,7 @@ number	slug	state
 0005	sql-dialects	in force
 0006	sql-routines	in force
 0007	sql-emit	in force
+0008	sql-introspect	in force
+0009	sql-print	in force
+0010	aide	in force
+0011	acceptance	in force
