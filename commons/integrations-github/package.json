@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/integrations-github",
   "private": true,
-  "version": "0.2.1",
+  "version": "0.2.3",
   "description": "The reference connector of Integrations for the posture of one organization of a code host: read-only, with its governance as data, its posture policies in the vocabulary of GRC, its records and entities, proved by the conformance suite over made-up recorded answers.",
   "type": "module",
   "engines": {

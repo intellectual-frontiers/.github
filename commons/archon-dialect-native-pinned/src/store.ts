@@ -189,11 +189,16 @@ export async function installTool(store: Store, spec: InstallSpec, o: InstallOpt
     const folder = toolFolder(store, spec.tool, spec.version);
     await fs.mkdir(path.join(store.root, spec.tool), { recursive: true });
     await ops.remove(temp).catch(() => undefined);
-    for (const [p, data] of files.value) {
+    for (const [p, data] of files.value.files) {
       const target = path.join(temp, ...p.split("/"));
       await fs.mkdir(path.dirname(target), { recursive: true });
       await fs.writeFile(target, data);
-      if (store.os !== "windows" && (p === programFile(spec) || path.dirname(p) === (spec.binPath === "" ? "." : spec.binPath))) await fs.chmod(target, 0o755);
+      if (store.os !== "windows" && (files.value.executable.has(p) || p === programFile(spec) || path.dirname(p) === (spec.binPath === "" ? "." : spec.binPath))) await fs.chmod(target, 0o755);
+    }
+    for (const l of files.value.links) {
+      const at = path.join(temp, ...l.path.split("/"));
+      await fs.mkdir(path.dirname(at), { recursive: true });
+      await fs.symlink(l.target, at);
     }
     await fs.writeTextFile(path.join(temp, INSTALL_RECORD), writeInstallRecord(await installRecordOf(spec, files.value)));
 

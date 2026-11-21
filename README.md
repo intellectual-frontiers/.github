@@ -79,8 +79,8 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/archon`](https://www.npmjs.com/package/@intellectual-frontiers/archon) | Program | A Kanon library that orders subjects: a machine, a device, a workstation or a cloud account | layers, instances, plugins | L1 | GitHub, npm |
 | [`@intellectual-frontiers/archon-dialect-apt`](commons/archon-dialect-apt) | Program | The dialect of tools that installs them with apt | layers, extension | L1 | held |
 | [`@intellectual-frontiers/archon-dialect-homebrew`](commons/archon-dialect-homebrew) | Program | The dialect of tools that installs them with Homebrew | layers, extension | L1 | held |
-| [`@intellectual-frontiers/archon-dialect-mise`](commons/archon-dialect-mise) | Program | The dialect of tools that installs them with mise | layers, extension | L1 | held |
-| [`@intellectual-frontiers/archon-dialect-native-pinned`](commons/archon-dialect-native-pinned) | Program | The default dialect of tools | layers, extension | L1 | held |
+| [`@intellectual-frontiers/archon-dialect-mise`](https://www.npmjs.com/package/@intellectual-frontiers/archon-dialect-mise) | Program | The dialect of tools that installs them with mise | layers, extension | L1 | GitHub, npm |
+| [`@intellectual-frontiers/archon-dialect-native-pinned`](https://www.npmjs.com/package/@intellectual-frontiers/archon-dialect-native-pinned) | Program | The default dialect of tools | layers, extension | L1 | GitHub, npm |
 | [`@intellectual-frontiers/archon-dialect-winget`](commons/archon-dialect-winget) | Program | The dialect of tools that installs them with WinGet | layers, extension | L1 | held |
 | [`@intellectual-frontiers/archon-tool`](commons/archon-tool) | Program | The plugin that gives `archon` its verbs for tools | layers, extension | L1 | held |
 | [`@intellectual-frontiers/data`](https://www.npmjs.com/package/@intellectual-frontiers/data) | Program | Governance (what a business domain is and what must be true of its data) | - | L1 | GitHub, npm |

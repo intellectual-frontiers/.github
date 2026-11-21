@@ -14,6 +14,7 @@ import {
   gunzip,
   gzip,
   isSafePath,
+  linksOf,
   sortedPaths,
   splitName,
   tar,
@@ -27,6 +28,7 @@ import {
   zipEntries,
 } from "../src/archive.ts";
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
 import { ok } from "@intellectual-frontiers/core";
 import { assert, assertEquals, assertInstanceOf, assertRejects, proves } from "@intellectual-frontiers/test";
 
@@ -424,4 +426,30 @@ proves([STREAM], "cancelling the entries cancels the bytes they are read from", 
   assertEquals(first.done ? undefined : first.value.path, "a.txt");
   await reader.cancel("enough");
   assert(cancelled !== undefined);
+});
+
+proves(["0001-formats FR-023"], "a tar with symbolic and hard links gives each link as an entry of its own and linksOf lists them in the order of the archive, none among the files", () => {
+  const bytes = new Uint8Array(readFileSync(new URL("./fixtures/tar/links.tar", import.meta.url)));
+  const entries = untar(bytes);
+  assert(entries.kind === "ok");
+  assertEquals(
+    entries.value.map((e) => [e.kind, e.path, e.linkName]),
+    [
+      ["directory", "pkg", ""],
+      ["symlink", "pkg/abs", "/etc/passwd"],
+      ["directory", "pkg/dir", ""],
+      ["file", "pkg/dir/hard.txt", ""],
+      ["hardlink", "pkg/dir/real.txt", "pkg/dir/hard.txt"],
+      ["symlink", "pkg/dir/up", "../rel"],
+      ["symlink", "pkg/rel", "dir/real.txt"],
+    ],
+  );
+  assertEquals(linksOf(entries.value), [
+    { kind: "symlink", path: "pkg/abs", target: "/etc/passwd" },
+    { kind: "hardlink", path: "pkg/dir/real.txt", target: "pkg/dir/hard.txt" },
+    { kind: "symlink", path: "pkg/dir/up", target: "../rel" },
+    { kind: "symlink", path: "pkg/rel", target: "dir/real.txt" },
+  ]);
+  assertEquals([...filesOf(entries.value).keys()], ["pkg/dir/hard.txt"]);
+  assertEquals(linksOf([]), []);
 });

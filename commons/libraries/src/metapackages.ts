@@ -30,8 +30,6 @@ import { ROLE_OF, type Role } from "./readme.ts";
 export const HELD_BACK: ReadonlyMap<string, string> = new Map([
   ["archon-dialect-apt", "a dialect of Archon, which is not released yet"],
   ["archon-dialect-homebrew", "a dialect of Archon, which is not released yet"],
-  ["archon-dialect-mise", "a dialect of Archon, which is not released yet"],
-  ["archon-dialect-native-pinned", "a dialect of Archon, which is not released yet"],
   ["archon-dialect-winget", "a dialect of Archon, which is not released yet"],
 ]);
 

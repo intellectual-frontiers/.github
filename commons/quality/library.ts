@@ -10,7 +10,7 @@ export const library = {
   level: "L1",
   specKit: "spec-kit",
   verify: "bun run verify",
-  version: "0.3.1",
+  version: "0.3.3",
   distribution: ["github", "npm"],
   exports: [".", "./assessor/host", "./assessor/pack", "./assessor/verify", "./assessor/verify-pack", "./attestation/agents", "./attestation/host", "./attestation/mutation", "./attestation/plan", "./attestation/rules", "./attestation/sample", "./commands", "./host/archive", "./host/branch", "./host/declaration", "./host/gather", "./host/git", "./host/ledger-branch", "./host/report", "./host/test-run", "./pure/chain", "./pure/chain-files", "./pure/freshness", "./pure/index-file", "./pure/ladder", "./pure/ledger", "./pure/names", "./pure/objectives", "./pure/record", "./pure/render", "./pure/retention", "./pure/tier", "./pure/tier2-events", "./pure/time", "./quality", "./test-cli", "./test-report", "./tier2-commands", "./trust/audience", "./trust/host", "./trust/html", "./trust/requirement-text", "./trust/view"],
   summary:
