@@ -14,7 +14,7 @@
  * @module
  */
 import { absurd, type Result } from "@intellectual-frontiers/core";
-import type { Capability, Expect, Path, Prefix, Problem, Revision, Cursor } from "@intellectual-frontiers/anyfs/governance";
+import type { Capability, Cursor, Delta, Expect, MergeOutcome, Path, Prefix, Problem, Revision, VersionVector } from "@intellectual-frontiers/anyfs/governance";
 
 /** What a store says of an object without its bytes. */
 export type Stat = { readonly path: Path; readonly size: number; readonly rev: Revision; readonly modified?: string };
@@ -37,6 +37,11 @@ export type Ranged = { readonly bytes: Uint8Array; readonly rev: Revision; reado
 /** The objects a search found. */
 export type Hits = { readonly hits: readonly { readonly path: Path; readonly rev: Revision }[] };
 
+/** What a merge is asked: what the replica has seen, the delta of what it has that a replica which has seen a vector has not, or to take a delta. */
+export type MergeAction = { readonly kind: "vector" } | { readonly kind: "since"; readonly since: VersionVector } | { readonly kind: "apply"; readonly delta: Delta };
+/** What a merge answered: a vector, a delta, or what taking a delta ended with. */
+export type MergeAnswer = { readonly kind: "vector"; readonly vector: VersionVector } | { readonly kind: "delta"; readonly delta: Delta } | { readonly kind: "outcome"; readonly outcome: MergeOutcome };
+
 /** One change of a batch. */
 export type Change<E extends Expect = Expect> =
   | { readonly kind: "put"; readonly path: Path; readonly bytes: Uint8Array; readonly expect: E }
@@ -57,12 +62,13 @@ export type Op =
   | { readonly op: "history"; readonly path: Path; readonly limit?: number }
   | { readonly op: "rangeRead"; readonly path: Path; readonly start: number; readonly length: number }
   | { readonly op: "append"; readonly path: Path; readonly bytes: Uint8Array; readonly expect: Expect }
-  | { readonly op: "search"; readonly prefix: Prefix; readonly text: string; readonly limit?: number };
+  | { readonly op: "search"; readonly prefix: Prefix; readonly text: string; readonly limit?: number }
+  | { readonly op: "merge"; readonly action: MergeAction };
 
 /** The name of an operation. */
 export type OpName = Op["op"];
 /** The names of the operations, in the order of the capabilities. */
-export const OP_NAMES: readonly OpName[] = ["read", "write", "stat", "list", "delete", "batch", "rename", "history", "rangeRead", "append", "search"];
+export const OP_NAMES: readonly OpName[] = ["read", "write", "stat", "list", "delete", "batch", "rename", "history", "rangeRead", "append", "search", "merge"];
 
 /** What an operation ended with: a closed union, tagged by the operation it answers. */
 export type Done =
@@ -76,7 +82,8 @@ export type Done =
   | { readonly op: "history"; readonly value: Versions }
   | { readonly op: "rangeRead"; readonly value: Ranged }
   | { readonly op: "append"; readonly value: Written }
-  | { readonly op: "search"; readonly value: Hits };
+  | { readonly op: "search"; readonly value: Hits }
+  | { readonly op: "merge"; readonly value: MergeAnswer };
 
 /** The one function a backend writes: an operation to what it ended with. It does not throw. */
 export type Handler = (op: Op) => Promise<Result<Done, Problem>>;
@@ -95,6 +102,7 @@ export function capabilityOf(op: Op): Capability {
     case "rangeRead":
     case "append":
     case "search":
+    case "merge":
       return op.op;
     default:
       return absurd(op);
@@ -119,6 +127,7 @@ export function expectsRevision(op: Op): boolean {
     case "history":
     case "rangeRead":
     case "search":
+    case "merge":
       return false;
     default:
       return absurd(op);
@@ -146,6 +155,7 @@ export function pathOf(op: Op): Path | undefined {
     case "list":
     case "search":
     case "batch":
+    case "merge":
       return undefined;
     default:
       return absurd(op);

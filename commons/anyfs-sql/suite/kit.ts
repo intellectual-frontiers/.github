@@ -5,7 +5,7 @@
  * @module
  */
 import { type Path, parsePath } from "@intellectual-frontiers/anyfs/governance";
-import type { CoreCapability } from "@intellectual-frontiers/anyfs/governance";
+import { type CoreCapability, type ReplicaId, replicaIdOfBytes } from "@intellectual-frontiers/anyfs/governance";
 import type { Store } from "@intellectual-frontiers/anyfs/logical";
 import { path as osPath, fs } from "@intellectual-frontiers/system";
 import { Gate } from "../src/physical/adapters/common.ts";
@@ -135,9 +135,18 @@ export async function withTemp<T>(use: (dir: string) => Promise<T>): Promise<T> 
 
 export { osPath };
 
-/** The engines a store is tried on, each a real one, with whether it has the index of search. */
-export const ENGINES: readonly { readonly name: string; readonly make: () => Promise<SqlPort>; readonly search: boolean }[] = [
-  { name: "sqlite", make: sqliteMemory, search: true },
-  { name: "postgres (PGlite)", make: pgliteMemory, search: true },
-  { name: "duckdb", make: duckdbMemory, search: false },
-];
+/** The engines a store that merges is tried on: SQLite, the real engine of the runtime. The layouts of PostgreSQL and DuckDB are refused with a sentence until they are made. */
+export const ENGINES: readonly { readonly name: string; readonly make: () => Promise<SqlPort>; readonly search: boolean }[] = [{ name: "sqlite", make: sqliteMemory, search: true }];
+
+/** A replica identity from a number: the same number is the same identity. */
+export const replicaOf = (n: number): ReplicaId => {
+  const r = replicaIdOfBytes(new Uint8Array(16).fill(n + 1));
+  if (r.kind === "err") throw new Error(r.error);
+  return r.value;
+};
+
+/** A clock that gives a later millisecond at every call, from a start: so that the ids of a test are in the order it makes them. */
+export const monotone = (start = 1_700_000_000_000): (() => number) => {
+  let t = start;
+  return () => (t += 1);
+};

@@ -16,9 +16,6 @@ requirement	mechanism	by	note
 0003-sql-port FR-007	check	.github: cd commons/anyfs-sql && bun run verify	suite/port.test.ts
 0003-sql-port FR-008	check	.github: cd commons/anyfs-sql && bun run verify	suite/port.test.ts
 0003-sql-port FR-009	check	.github: cd commons/anyfs-sql && bun run verify	suite/port.test.ts
-0004-sql-schema FR-001	check	.github: cd commons/anyfs-sql && bun run verify	suite/schema.test.ts
-0004-sql-schema FR-002	check	.github: cd commons/anyfs-sql && bun run verify	suite/schema.test.ts
-0004-sql-schema FR-003	check	.github: cd commons/anyfs-sql && bun run verify	suite/schema.test.ts
 0005-sql-store FR-001	check	.github: cd commons/anyfs-sql && bun run verify	suite/store.test.ts
 0005-sql-store FR-002	check	.github: cd commons/anyfs-sql && bun run verify	suite/store.test.ts
 0005-sql-store FR-003	check	.github: cd commons/anyfs-sql && bun run verify	suite/store.test.ts
@@ -31,3 +28,17 @@ requirement	mechanism	by	note
 0006-sql-conformance FR-003	check	.github: cd commons/anyfs-sql && bun run verify	suite/conformance.test.ts
 0006-sql-conformance FR-004	check	.github: cd commons/anyfs-sql && bun run verify	suite/conformance.test.ts
 0005-sql-store FR-008	check	.github: cd commons/anyfs-sql && bun run verify	suite/store.test.ts
+0004-sql-schema FR-001	check	.github: cd commons/anyfs-sql && bun run verify	suite/schema.test.ts
+0004-sql-schema FR-002	check	.github: cd commons/anyfs-sql && bun run verify	suite/schema.test.ts
+0004-sql-schema FR-003	check	.github: cd commons/anyfs-sql && bun run verify	suite/schema.test.ts
+0004-sql-schema FR-004	check	.github: cd commons/anyfs-sql && bun run verify	suite/schema.test.ts
+0007-sql-merge FR-001	check	.github: cd commons/anyfs-sql && bun run verify	suite/merge.test.ts
+0007-sql-merge FR-002	check	.github: cd commons/anyfs-sql && bun run verify	suite/merge.test.ts
+0007-sql-merge FR-003	check	.github: cd commons/anyfs-sql && bun run verify	suite/merge.test.ts
+0007-sql-merge FR-004	check	.github: cd commons/anyfs-sql && bun run verify	suite/merge.test.ts
+0008-sql-dump FR-001	check	.github: cd commons/anyfs-sql && bun run verify	suite/dump.test.ts
+0008-sql-dump FR-002	check	.github: cd commons/anyfs-sql && bun run verify	suite/dump.test.ts
+0008-sql-dump FR-003	check	.github: cd commons/anyfs-sql && bun run verify	suite/dump.test.ts
+0008-sql-dump FR-004	check	.github: cd commons/anyfs-sql && bun run verify	suite/dump.test.ts
+0008-sql-dump FR-005	check	.github: cd commons/anyfs-sql && bun run verify	suite/dump.test.ts
+0008-sql-dump FR-006	check	.github: cd commons/anyfs-sql && bun run verify	suite/dump.test.ts

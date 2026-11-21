@@ -5,5 +5,8 @@
  * @module
  */
 export { migrate, hasSearch, layoutVersion, type MigrateOptions, type Migrated } from "./schema.ts";
-export { openSqlStore, SQL_CAPABILITIES, type SearchableSqlStore, type SqlFacts, type SqlOptions, type SqlStore, type SqlStoreOf } from "./store.ts";
+export { openSqlStore, SQL_CAPABILITIES, type SearchableSqlStore, type SqlFacts, type SqlOptions, type SqlSibling, type SqlStore, type SqlStoreOf } from "./store.ts";
+export { type Ctx, type Judged, type Taken, deltaOfDatabase, judgeDelta, stateOf, takeDelta, vectorOfDatabase, verifyDatabase } from "./merge.ts";
+export { type Dump, type DumpedVersion, type Imported, dumpArgv, dumpTables, dumpText, importDumps, parseDump } from "./dump.ts";
+export { type Layout, layoutOf } from "./layout.ts";
 export { sqlFor, type Query, type Sql, type Statement } from "./sql.ts";

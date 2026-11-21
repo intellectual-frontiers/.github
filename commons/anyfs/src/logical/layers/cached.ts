@@ -22,7 +22,7 @@ import type { Handler } from "../ops.ts";
 import { capabilitiesWithout, makeStore, type Store } from "../store.ts";
 
 /** The capabilities a cache cannot keep in step. */
-export const UNCACHEABLE = ["batch", "rename", "append", "rangeRead", "search"] as const;
+export const UNCACHEABLE = ["batch", "rename", "append", "rangeRead", "search", "merge"] as const;
 
 const dataPath = (path: Path): Path | undefined => {
   const p = parsePath(`d/${path}`);
@@ -88,6 +88,7 @@ export function cached<C extends Capability>(origin: Store<C> & NoInfer<Store<"r
       case "append":
       case "rangeRead":
       case "search":
+      case "merge":
         return err(refused("capability-absent", `a cached store does not carry ${op.op}`));
       default:
         return err(refused("capability-absent", "an operation of no known kind"));

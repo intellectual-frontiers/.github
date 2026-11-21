@@ -1,9 +1,11 @@
 // Spec: 0005-sql-store FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007
 /**
- * The store of a table in a database: every object is one row of the table of objects, its revision the digest of its bytes (`sha256:`, made here so that the same bytes are the same revision in every
- * store), and every operation is one or more statements of the language, run through the port. A write that expects a revision, or no object, is decided by one statement that returns a row only where it
- * changed something, so that two writers cannot both win; a batch, a rename and a delete that moves history and search with them are one transaction, all or none. The order of a list is the order of the
- * bytes of the paths, by a range and never by a pattern, so that a path with a percent sign, an underscore or a backslash in it is an ordinary name.
+ * The store of a database that merges: a file is the winner among the heads of its path, a set of immutable version rows in the table of versions (each write or delete a new row that replaces the heads of its path, the
+ * bytes of a put in the table of blobs under the digest), its revision the digest of its bytes (`sha256:`, made here so that the same bytes are the same revision in every store), and every operation is one or more statements
+ * of the language, run through the port in one transaction. The winner, the siblings and the next id are the pure model's (`@intellectual-frontiers/anyfs/merge`), applied to the rows of the path; an expectation of a
+ * revision or of no file is decided against the winner in the same transaction that writes, so that two writers of one database cannot both win. The store also merges: it says what it holds (the version vector), gives the
+ * delta past a vector and takes a delta, whole or not at all. The order of a list is the order of the bytes of the paths, by a range and never by a pattern, so that a path with a percent sign, an underscore or a backslash
+ * in it is an ordinary name.
  *
  * @example
  * ```ts
@@ -20,40 +22,62 @@ import {
   type Change,
   type ChangeResult,
   type Handler,
+  type Hits,
   type Listing,
   makeStore,
   type Op,
+  type Read,
   type Stat,
   type Store,
   type Versions,
-  type Hits,
-  type Read,
   type Written,
 } from "@intellectual-frontiers/anyfs/logical";
 import {
   conflict,
   type Cursor,
+  defaultTrust,
   type Expect,
+  type MergeFinding,
   missing,
   parseCursor,
+  parseFingerprint,
   parsePath,
+  parseReplicaId,
   parseRevision,
   type Path,
   type Place,
   type Problem,
   refused,
+  type ReplicaId,
+  replicaIdOfBytes,
   type Revision,
   tampered,
+  type Trust,
   unavailable,
+  type Version,
 } from "@intellectual-frontiers/anyfs/governance";
-import { HARD_MAX_OBJECT, type Naming, type NamingOptions, parseNaming, type SqlDialect, type SqlPort, type SqlRow, type SqlRunner, DEFAULT_MAX_OBJECT, SCHEMA_VERSION } from "@intellectual-frontiers/anyfs-sql/governance";
+import {
+  blobSha,
+  DEFAULT_LIMITS,
+  DEFAULT_MAX_DRIFT,
+  fromBase64,
+  type Limits,
+  type MergeState,
+  openIdentity,
+  type PathOp,
+  transact,
+  viewOf,
+  withBlob,
+} from "@intellectual-frontiers/anyfs/merge";
+import { DEFAULT_MAX_OBJECT, HARD_MAX_OBJECT, type Naming, type NamingOptions, parseNaming, SCHEMA_VERSION, type SqlDialect, type SqlPort, type SqlRunner } from "@intellectual-frontiers/anyfs-sql/governance";
+import { type Ctx, deltaOfDatabase, execQ, runQ, siblingsOfPath, stateOf, takeDelta, vectorOfDatabase, verifyDatabase } from "./merge.ts";
 import { hasSearch, layoutVersion, migrate, type MigrateOptions } from "./schema.ts";
-import { layoutOf } from "./layout.ts";
-import { bytesOf, numberOf, type Query, type Sql, sqlFor, textOf } from "./sql.ts";
+import { type Layout, layoutOf } from "./layout.ts";
+import { bytesOf, numberOf, type Sql, sqlFor, textOf } from "./sql.ts";
 
-/** The capabilities of every SQL store. */
-export const SQL_CAPABILITIES = ["read", "write", "list", "stat", "delete", "cas", "batch", "rename", "history"] as const;
-/** The type of the store of a table, without search. */
+/** The capabilities of every SQL store: those of a store that merges. */
+export const SQL_CAPABILITIES = ["read", "write", "list", "stat", "delete", "cas", "batch", "rename", "history", "merge"] as const;
+/** The type of the store of a database, without search. */
 export type SqlStoreOf = Store<(typeof SQL_CAPABILITIES)[number]>;
 /** The type of the same store where the engine has search. */
 export type SearchableSqlStore = Store<(typeof SQL_CAPABILITIES)[number] | "search">;
@@ -66,7 +90,7 @@ export type SqlOptions = {
   readonly target?: string;
   /** The largest object, in bytes: below the limit of the engine, 64 MiB where not given. */
   readonly maxObject?: number;
-  /** The clock that dates a change, in milliseconds. */
+  /** The clock that makes ids, in milliseconds. */
   readonly clock?: () => number;
   /** Whether the store has the index of search: `auto` where the engine has one. */
   readonly search?: MigrateOptions["search"];
@@ -74,13 +98,45 @@ export type SqlOptions = {
   readonly searchMaxBytes?: number;
   /** Whether the layout is brought to the latest version (`migrate`, the default) or only checked (`check`: a database at an older version is refused). */
   readonly layout?: "migrate" | "check";
+  /** The identity of the replica a new database takes: random where not given. A database that has one keeps it. */
+  readonly replica?: ReplicaId;
+  /** What tells a copy of the database from the original (the identity of its file): a database whose stored fingerprint is another is a copy and takes a new replica identity. `none` where not given. */
+  readonly fingerprint?: string;
+  /** Whom the database takes changes and rows from: itself alone where not given. `open` takes any, `allowlist` the replicas named (and itself), `signed` the deltas a verifier accepts. */
+  readonly trust?: Trust;
+  /** How far ahead of the wall clock an id is taken: five minutes where not given. */
+  readonly maxDrift?: number;
+  /** What a delta may hold: the defaults where not given. */
+  readonly limits?: Limits;
 };
 
 /** What the store knows of its database. */
 export type SqlFacts = { readonly dialect: SqlDialect; readonly naming: Naming; readonly version: number; readonly search: boolean };
 
-/** An opened store: the store, the same store with search where the engine has it, and the facts of the layout. */
-export type SqlStore = { readonly store: SqlStoreOf; readonly searchable: SearchableSqlStore | undefined; readonly facts: SqlFacts };
+/** A sibling: a head of a path that is not the winner. */
+export type SqlSibling = { readonly id: string; readonly kind: "put" | "tombstone"; readonly rev: Revision | undefined; readonly replica: ReplicaId };
+
+/** An opened store: the store, the same store with search where the engine has it, the facts of the layout, and what a program reads of the replica that the interface of a store does not give. */
+export type SqlStore = {
+  readonly store: SqlStoreOf;
+  readonly searchable: SearchableSqlStore | undefined;
+  readonly facts: SqlFacts;
+  /** Who this copy of the database is. */
+  readonly replica: ReplicaId;
+  /** Where the file was a copy and took a new identity: the identity it had. */
+  readonly forkedFrom: ReplicaId | undefined;
+  /** The heads of a path that are not the winner. */
+  siblings(path: Path): Promise<readonly SqlSibling[]>;
+  /** What is wrong with the rows and blobs the database holds, whatever way they came. */
+  verify(): Promise<readonly MergeFinding[]>;
+  /** How many deltas the database holds back until what they wait for arrives. */
+  pending(): Promise<number>;
+  /** The index of search made again from the files, after rows were put in by a SQL import. */
+  reindex(): Promise<void>;
+  /** The context the merge and the dump work in. */
+  readonly ctx: Ctx;
+  readonly port: SqlPort;
+};
 
 const PAGE = 1000;
 const MAX_PAGE = 10000;
@@ -96,15 +152,9 @@ class Abort extends Error {
 
 const retryable = (e: unknown): boolean => /SQLITE_BUSY|SQLITE_LOCKED|database is locked|deadlock detected|could not serialize|40001|40P01|connection|timeout/i.test(e instanceof Error ? e.message : String(e));
 
-const revisionOf = async (bytes: Uint8Array): Promise<Revision> => {
-  const r = parseRevision(`sha256:${await sha256(bytes)}`);
-  if (r.kind === "err") throw new Error(r.error);
-  return r.value;
-};
-
-const revOf = (text: string): Revision => {
-  const r = parseRevision(text);
-  if (r.kind === "err") throw new Error(`the database holds ${JSON.stringify(text)}, which is not a revision`);
+const revOf = (sha: string): Revision => {
+  const r = parseRevision(`sha256:${sha}`);
+  if (r.kind === "err") throw new Error(`the database holds ${JSON.stringify(sha)}, which is not a digest`);
   return r.value;
 };
 
@@ -113,6 +163,9 @@ const pathOf = (text: string): Path => {
   if (r.kind === "err") throw new Error(`the database holds ${JSON.stringify(text)}, which is not a path`);
   return r.value;
 };
+
+/** The instant an id was made, as ISO 8601 text in UTC. */
+const instantOf = (id: string): string => new Date(Number.parseInt(id.replaceAll("-", "").slice(0, 12), 16)).toISOString();
 
 /** The conflict an expectation finds against what is there, or nothing where it holds. */
 function check(path: Path, expect: Expect, there: Revision | undefined): Problem | undefined {
@@ -148,7 +201,27 @@ const ftsQuery = (text: string): string =>
     .map((w) => `"${w.split('"').join('""')}"`)
     .join(" ");
 
-/** Opens the store of a table of a database: brings the layout to its version, and gives the store. */
+const randomReplica = (): ReplicaId => {
+  const r = replicaIdOfBytes(globalThis.crypto.getRandomValues(new Uint8Array(16)));
+  if (r.kind === "err") throw new Error(r.error);
+  return r.value;
+};
+
+/** The fact a database holds under a key, or nothing. */
+async function factOf(r: SqlRunner, l: Layout, key: string): Promise<string | undefined> {
+  const first = (await runQ(r, l.selectFact(key)))[0];
+  return first === undefined ? undefined : textOf(first["value"] ?? null);
+}
+
+/** A file as the model sees it: its winner and the digest of its bytes. */
+type Head = { readonly version: Version; readonly sha: string };
+
+const headOf = (state: MergeState, path: string): Head | undefined => {
+  const v = viewOf(state, path);
+  return v.present && v.winner !== undefined && v.winner.blob !== null ? { version: v.winner, sha: v.winner.blob } : undefined;
+};
+
+/** Opens the store of a database: brings the layout to its version, settles who this copy is and whom it trusts, and gives the store. */
 export async function openSqlStore(port: SqlPort, options: SqlOptions = {}): Promise<Result<SqlStore, string>> {
   const naming = parseNaming(options.naming ?? {});
   if (naming.kind === "err") return naming;
@@ -159,6 +232,8 @@ export async function openSqlStore(port: SqlPort, options: SqlOptions = {}): Pro
   const sql: Sql = sqlFor(port.dialect, naming.value);
   const l = layoutOf(sql);
   const dialect = port.dialect;
+  const fingerprint = parseFingerprint(options.fingerprint ?? "none");
+  if (fingerprint.kind === "err") return fingerprint;
 
   let found: { readonly version: number; readonly search: boolean };
   if (options.layout === "check") {
@@ -172,115 +247,132 @@ export async function openSqlStore(port: SqlPort, options: SqlOptions = {}): Pro
   }
   const searching = found.search;
 
+  // who this copy is: kept where the fingerprint is the one stored, new where the database was copied
+  const storedReplica = await factOf(port, l, "replica");
+  const storedFingerprint = await factOf(port, l, "fingerprint");
+  const parsedReplica = storedReplica === undefined ? undefined : parseReplicaId(storedReplica);
+  const parsedFingerprint = storedFingerprint === undefined ? undefined : parseFingerprint(storedFingerprint);
+  if (parsedReplica?.kind === "err") return err(`the database holds a replica identity that is not one: ${parsedReplica.error}`);
+  const identity = openIdentity(
+    parsedReplica?.kind === "ok" && parsedFingerprint?.kind === "ok" ? { replica: parsedReplica.value, fingerprint: parsedFingerprint.value } : undefined,
+    fingerprint.value,
+    () => options.replica ?? randomReplica(),
+  );
+  const replica = identity.replica;
+  const trust: Trust = options.trust ?? defaultTrust(replica);
+  await port.transaction(async (tx) => {
+    await execQ(tx, l.upsertFact("replica", replica));
+    await execQ(tx, l.upsertFact("fingerprint", identity.fingerprint));
+    await execQ(tx, l.insertTrust(replica));
+    if (identity.forkedFrom !== undefined) await execQ(tx, l.insertTrust(identity.forkedFrom));
+    await execQ(tx, l.upsertFact("trust_mode", trust.kind));
+    if (trust.kind === "allowlist") for (const who of trust.replicas) await execQ(tx, l.insertTrust(who));
+  });
+
+  const ctx: Ctx = { l, replica, config: { maxDrift: options.maxDrift ?? DEFAULT_MAX_DRIFT, limits: options.limits ?? DEFAULT_LIMITS, trust }, searching, searchBytes };
   const place: Place = { kind: "sql", dialect, target: options.target ?? "memory" };
-  const instant = (): string => new Date(clock()).toISOString();
-  const run = (r: SqlRunner, q: Query): Promise<readonly SqlRow[]> => {
-    const st = q.done();
-    return r.query(st.text, st.params);
-  };
-  const exec = (r: SqlRunner, q: Query): Promise<void> => {
-    const st = q.done();
-    return r.exec(st.text, st.params);
-  };
 
-  /** What the object at a path is: its revision and size, or nothing. */
-  const there = async (r: SqlRunner, path: Path, lock: boolean): Promise<{ readonly rev: Revision; readonly size: number } | undefined> => {
-    const rows = await run(r, l.selectHeld(path, lock));
-    const row = rows[0];
-    return row === undefined ? undefined : { rev: revOf(textOf(row["rev"] ?? null)), size: numberOf(row["size"] ?? null) };
-  };
-
-  /** The index of search after a change: the words of the object, or nothing where it is not text. */
-  const index = async (r: SqlRunner, path: Path, bytes: Uint8Array | undefined): Promise<void> => {
+  /** The index of search after a change: the words of the file now, or nothing where it is not text. */
+  const index = async (r: SqlRunner, path: string): Promise<void> => {
     if (!searching) return;
-    await exec(r, l.deleteWords(path));
-    const text = bytes === undefined ? undefined : textFor(bytes, searchBytes);
-    if (text === undefined) return;
-    await exec(r, l.insertWords(path, text));
+    await execQ(r, l.deleteWords(path));
+    const row = (await runQ(r, l.selectCurrent(path)))[0];
+    if (row === undefined) return;
+    const text = textFor(bytesOf(row["bytes"] ?? null), searchBytes);
+    if (text !== undefined) await execQ(r, l.insertWords(path, text));
   };
 
-  /** A revision added to the history of a path. */
-  const remember = async (r: SqlRunner, path: Path, rev: Revision, size: number, modified: string): Promise<void> => {
-    await exec(r, l.addRevision(path, rev, size, modified));
-  };
-
-  /** One write, inside a transaction: the expectation decides it, a statement that changes something only where it holds makes it. */
-  const writeIn = async (r: SqlRunner, path: Path, bytes: Uint8Array, rev: Revision, expect: Expect): Promise<Result<Written, Problem>> => {
-    for (let attempt = 0; attempt < 4; attempt++) {
-      const had = await there(r, path, true);
-      const bad = check(path, expect, had?.rev);
-      if (bad !== undefined) return err(bad);
-      if (had !== undefined && had.rev === rev) return ok({ rev, created: false });
-      const modified = instant();
-      if (had === undefined) {
-        const made = await run(r, l.insertObject(path, rev, bytes, modified));
-        if (made.length === 0) {
-          // another writer made the object between the look and the insert: look again, and the expectation decides
-          continue;
+  /** The index of search made again from every file. */
+  const reindex = async (): Promise<void> => {
+    if (!searching) return;
+    await port.transaction(async (tx) => {
+      await execQ(tx, l.deleteAllWords());
+      let after: string | undefined;
+      for (;;) {
+        const page = await runQ(tx, l.selectIndexable(searchBytes, after, 200));
+        for (const row of page) {
+          const text = textFor(bytesOf(row["bytes"] ?? null), searchBytes);
+          if (text !== undefined) await execQ(tx, l.insertWords(textOf(row["path"] ?? null), text));
         }
-        await remember(r, path, rev, bytes.length, modified);
-        await index(r, path, bytes);
-        return ok({ rev, created: true });
+        const last = page[page.length - 1];
+        if (last === undefined || page.length < 200) break;
+        after = textOf(last["path"] ?? null);
       }
-      const changed = await run(r, l.updateObject(path, rev, bytes, modified, expect.kind === "any" ? undefined : had.rev));
-      if (changed.length === 0) continue;
-      await remember(r, path, rev, bytes.length, modified);
-      await index(r, path, bytes);
-      return ok({ rev, created: false });
-    }
-    return err(unavailable("the object kept changing under the write", true, path));
+    });
   };
 
-  /** One delete, inside a transaction. */
-  const deleteIn = async (r: SqlRunner, path: Path, expect: Expect): Promise<Result<{ readonly existed: boolean }, Problem>> => {
-    const had = await there(r, path, true);
-    const bad = check(path, expect, had?.rev);
-    if (bad !== undefined) return err(bad);
-    if (had === undefined) return ok({ existed: false });
-    const gone = await run(r, l.deleteObjectAt(path, had.rev));
-    if (gone.length === 0) return err(conflict(path, expect, { kind: "absent" }));
-    await exec(r, l.deleteHistory(path));
-    await index(r, path, undefined);
-    return ok({ existed: true });
+  /** The rows a transaction made and the blobs they use, added in the transaction the runner is. */
+  const keep = async (r: SqlRunner, delta: { readonly versions: readonly Version[]; readonly blobs: readonly { readonly sha: string; readonly bytes: string }[] } | undefined): Promise<void> => {
+    if (delta === undefined) return;
+    for (const b of delta.blobs) {
+      const bytes = fromBase64(b.bytes);
+      if (bytes !== undefined) await runQ(r, l.insertBlob(b.sha, bytes));
+    }
+    for (const v of delta.versions) await runQ(r, l.insertVersion(v));
   };
 
   const tooLarge = (path: Path, size: number): Problem => refused("too-large", `${size} bytes is more than the ${maxObject} this store holds in one object`, path);
+
+  type Changed = { readonly created: boolean; readonly existed: boolean; readonly sha: string | undefined };
+
+  /** One put or remove inside a transaction: the rows of the path are read, the expectation decides, a new row replaces the heads. */
+  const changeIn = async (r: SqlRunner, path: Path, op: { readonly kind: "put"; readonly bytes: Uint8Array } | { readonly kind: "remove" }, expect: Expect): Promise<Result<Changed, Problem>> => {
+    const state = await stateOf(r, ctx, [path]);
+    const had = headOf(state, path);
+    const bad = check(path, expect, had === undefined ? undefined : revOf(had.sha));
+    if (bad !== undefined) return err(bad);
+    if (op.kind === "remove") {
+      if (had === undefined) return ok({ created: false, existed: false, sha: undefined });
+      const made = await transact(state, [{ kind: "remove", path }], new Map(), clock());
+      if (made.kind === "err") return err(refused("too-large", made.error, path));
+      await keep(r, made.value.delta);
+      await index(r, path);
+      return ok({ created: false, existed: true, sha: had.sha });
+    }
+    const sha = await blobSha(op.bytes);
+    if (had !== undefined && had.sha === sha) return ok({ created: false, existed: true, sha });
+    const made = await transact(state, [{ kind: "put", path, blob: sha }], new Map([[sha, op.bytes.slice()]]), clock());
+    if (made.kind === "err") return err(refused("too-large", made.error, path));
+    await keep(r, made.value.delta);
+    await index(r, path);
+    return ok({ created: had === undefined, existed: had !== undefined, sha });
+  };
 
   const handle: Handler = async (op: Op) => {
     try {
       switch (op.op) {
         case "read": {
-          const rows = await run(port, l.selectRead(op.path));
-          const row = rows[0];
+          const row = (await runQ(port, l.selectCurrent(op.path)))[0];
           if (row === undefined) return err(missing(op.path));
-          const bytes = bytesOf(row["body"] ?? null).slice();
-          const rev = revOf(textOf(row["rev"] ?? null));
-          if (rev.startsWith("sha256:") && rev !== (await revisionOf(bytes))) return err(tampered(op.path, "the bytes in the database are not the ones their revision names"));
-          const value: Read = { bytes, rev, modified: textOf(row["modified"] ?? null) };
+          const bytes = bytesOf(row["bytes"] ?? null).slice();
+          const sha = textOf(row["blob"] ?? null);
+          if ((await sha256(bytes)) !== sha) return err(tampered(op.path, "the bytes in the database are not the ones their revision names"));
+          const value: Read = { bytes, rev: revOf(sha), modified: instantOf(textOf(row["id"] ?? null)) };
           return ok({ op: "read", value });
         }
         case "stat": {
-          const rows = await run(port, l.selectStat(op.path));
-          const row = rows[0];
+          const row = (await runQ(port, l.selectCurrentStat(op.path)))[0];
           if (row === undefined) return err(missing(op.path));
-          const value: Stat = { path: op.path, size: numberOf(row["size"] ?? null), rev: revOf(textOf(row["rev"] ?? null)), modified: textOf(row["modified"] ?? null) };
+          const value: Stat = { path: op.path, size: numberOf(row["size"] ?? null), rev: revOf(textOf(row["blob"] ?? null)), modified: instantOf(textOf(row["id"] ?? null)) };
           return ok({ op: "stat", value });
         }
         case "write": {
           if (op.bytes.length > maxObject) return err(tooLarge(op.path, op.bytes.length));
-          const rev = await revisionOf(op.bytes);
-          const done = await port.transaction((tx) => writeIn(tx, op.path, op.bytes, rev, op.expect));
-          return done.kind === "err" ? done : ok({ op: "write", value: done.value });
+          const done = await port.transaction((tx) => changeIn(tx, op.path, { kind: "put", bytes: op.bytes }, op.expect));
+          if (done.kind === "err") return done;
+          if (done.value.sha === undefined) return err(unavailable("a write made no digest", false));
+          const value: Written = { rev: revOf(done.value.sha), created: done.value.created };
+          return ok({ op: "write", value });
         }
         case "delete": {
-          const done = await port.transaction((tx) => deleteIn(tx, op.path, op.expect));
-          return done.kind === "err" ? done : ok({ op: "delete", value: done.value });
+          const done = await port.transaction((tx) => changeIn(tx, op.path, { kind: "remove" }, op.expect));
+          return done.kind === "err" ? done : ok({ op: "delete", value: { existed: done.value.existed } });
         }
         case "list": {
           const limit = Math.min(Math.max(1, Math.floor(op.limit ?? PAGE)), MAX_PAGE);
           const after = op.after === undefined ? undefined : decodeURIComponent(op.after);
-          const rows = await run(port, l.selectPage(op.prefix, after, limit));
-          const entries: Stat[] = rows.slice(0, limit).map((row) => ({ path: pathOf(textOf(row["path"] ?? null)), size: numberOf(row["size"] ?? null), rev: revOf(textOf(row["rev"] ?? null)), modified: textOf(row["modified"] ?? null) }));
+          const rows = await runQ(port, l.selectPage(op.prefix, after, limit));
+          const entries: Stat[] = rows.slice(0, limit).map((row) => ({ path: pathOf(textOf(row["path"] ?? null)), size: numberOf(row["size"] ?? null), rev: revOf(textOf(row["blob"] ?? null)), modified: instantOf(textOf(row["id"] ?? null)) }));
           const last = entries[entries.length - 1];
           let next: Cursor | undefined;
           if (rows.length > limit && last !== undefined) {
@@ -292,22 +384,18 @@ export async function openSqlStore(port: SqlPort, options: SqlOptions = {}): Pro
           return ok({ op: "list", value });
         }
         case "batch": {
-          const prepared: { readonly change: Change; readonly rev: Revision | undefined }[] = [];
-          for (const c of op.changes) {
-            if (c.kind === "put" && c.bytes.length > maxObject) return err(tooLarge(c.path, c.bytes.length));
-            prepared.push({ change: c, rev: c.kind === "put" ? await revisionOf(c.bytes) : undefined });
-          }
+          for (const c of op.changes) if (c.kind === "put" && c.bytes.length > maxObject) return err(tooLarge(c.path, c.bytes.length));
           try {
             const results = await port.transaction(async (tx) => {
               const out: ChangeResult[] = [];
-              for (const { change, rev } of prepared) {
+              for (const change of op.changes as readonly Change[]) {
                 if (change.kind === "put") {
-                  if (rev === undefined) throw new Abort(unavailable("a put with no digest", false));
-                  const done = await writeIn(tx, change.path, change.bytes, rev, change.expect);
+                  const done = await changeIn(tx, change.path, { kind: "put", bytes: change.bytes }, change.expect);
                   if (done.kind === "err") throw new Abort(done.error);
-                  out.push({ kind: "put", path: change.path, rev, created: done.value.created });
+                  if (done.value.sha === undefined) throw new Abort(unavailable("a put made no digest", false));
+                  out.push({ kind: "put", path: change.path, rev: revOf(done.value.sha), created: done.value.created });
                 } else {
-                  const done = await deleteIn(tx, change.path, change.expect);
+                  const done = await changeIn(tx, change.path, { kind: "remove" }, change.expect);
                   if (done.kind === "err") throw new Abort(done.error);
                   out.push({ kind: "delete", path: change.path, existed: done.value.existed });
                 }
@@ -324,23 +412,24 @@ export async function openSqlStore(port: SqlPort, options: SqlOptions = {}): Pro
           if (op.from === op.to) return err(refused("outside-scope", "a rename to the same path moves nothing", op.from));
           try {
             const value = await port.transaction(async (tx): Promise<Written> => {
-              const had = await there(tx, op.from, true);
+              const state = await stateOf(tx, ctx, [op.from, op.to]);
+              const had = headOf(state, op.from);
               if (had === undefined) throw new Abort(missing(op.from));
-              const bad = check(op.from, op.expect, had.rev);
+              const bad = check(op.from, op.expect, revOf(had.sha));
               if (bad !== undefined) throw new Abort(bad);
-              const target = await there(tx, op.to, true);
-              if (target !== undefined) throw new Abort(conflict(op.to, { kind: "absent" }, { kind: "rev", rev: target.rev }));
-              const made = await run(tx, l.copyObject(op.from, op.to));
-              if (made.length === 0) throw new Abort(conflict(op.to, { kind: "absent" }, { kind: "absent" }));
-              await exec(tx, l.deleteObject(op.from));
-              await exec(tx, l.moveHistory(op.from, op.to));
-              if (searching) {
-                const rows = await run(tx, l.selectBody(op.to));
-                const row = rows[0];
-                await index(tx, op.from, undefined);
-                await index(tx, op.to, row === undefined ? undefined : bytesOf(row["body"] ?? null));
-              }
-              return { rev: had.rev, created: true };
+              const there = headOf(state, op.to);
+              if (there !== undefined) throw new Abort(conflict(op.to, { kind: "absent" }, { kind: "rev", rev: revOf(there.sha) }));
+              const body = bytesOf((await runQ(tx, l.selectBlob(had.sha)))[0]?.["bytes"] ?? null);
+              const ops: readonly PathOp[] = [
+                { kind: "put", path: op.to, blob: had.sha },
+                { kind: "remove", path: op.from },
+              ];
+              const made = await transact(withBlob(state, had.sha, body), ops, new Map(), clock());
+              if (made.kind === "err") throw new Abort(refused("too-large", made.error));
+              await keep(tx, made.value.delta);
+              await index(tx, op.from);
+              await index(tx, op.to);
+              return { rev: revOf(had.sha), created: true };
             });
             return ok({ op: "rename", value });
           } catch (thrown) {
@@ -349,20 +438,39 @@ export async function openSqlStore(port: SqlPort, options: SqlOptions = {}): Pro
           }
         }
         case "history": {
-          const exists = await there(port, op.path, false);
-          if (exists === undefined) return err(missing(op.path));
+          const state = await stateOf(port, ctx, [op.path]);
+          if (headOf(state, op.path) === undefined) return err(missing(op.path));
           const limit = Math.min(Math.max(1, Math.floor(op.limit ?? PAGE)), MAX_PAGE);
-          const rows = await run(port, l.selectHistory(op.path, limit));
-          const value: Versions = { versions: rows.map((row) => ({ rev: revOf(textOf(row["rev"] ?? null)), size: numberOf(row["size"] ?? null), modified: textOf(row["modified"] ?? null) })) };
+          const rows = await runQ(port, l.selectHistory(op.path, limit));
+          const value: Versions = { versions: rows.map((row) => ({ rev: revOf(textOf(row["blob"] ?? null)), size: numberOf(row["size"] ?? null), modified: instantOf(textOf(row["id"] ?? null)) })) };
           return ok({ op: "history", value });
+        }
+        case "merge": {
+          switch (op.action.kind) {
+            case "vector":
+              return ok({ op: "merge", value: { kind: "vector", vector: await vectorOfDatabase(port, ctx) } });
+            case "since":
+              return ok({ op: "merge", value: { kind: "delta", delta: await deltaOfDatabase(port, ctx, op.action.since) } });
+            case "apply": {
+              const delta = op.action.delta;
+              const taken = await port.transaction(async (tx) => {
+                const t = await takeDelta(tx, ctx, delta, clock());
+                for (const p of t.paths) await index(tx, p);
+                return t;
+              });
+              return ok({ op: "merge", value: { kind: "outcome", outcome: taken.outcome } });
+            }
+            default:
+              return err(unavailable("a merge of no known kind", false));
+          }
         }
         case "search": {
           if (!searching) return err(refused("capability-absent", `this ${dialect} store has no index of search`));
           const limit = Math.min(Math.max(1, Math.floor(op.limit ?? PAGE)), MAX_PAGE);
-          const words = dialect === "sqlite" ? ftsQuery(op.text) : op.text.trim();
+          const words = ftsQuery(op.text);
           if (words === "") return ok({ op: "search", value: { hits: [] } });
-          const rows = await run(port, l.searchWords(op.prefix, words, limit));
-          const value: Hits = { hits: rows.map((row) => ({ path: pathOf(textOf(row["path"] ?? null)), rev: revOf(textOf(row["rev"] ?? null)) })) };
+          const rows = await runQ(port, l.searchWords(op.prefix, words, limit));
+          const value: Hits = { hits: rows.map((row) => ({ path: pathOf(textOf(row["path"] ?? null)), rev: revOf(textOf(row["blob"] ?? null)) })) };
           return ok({ op: "search", value });
         }
         case "rangeRead":
@@ -378,7 +486,19 @@ export async function openSqlStore(port: SqlPort, options: SqlOptions = {}): Pro
 
   const id = `sql:${dialect}:${options.target ?? "memory"}`;
   const traits = { caseSensitive: true, maxObject } as const;
-  const store = makeStore({ id, place, consistency: "strong", traits, capabilities: SQL_CAPABILITIES, handle });
-  const searchable = searching ? makeStore({ id, place, consistency: "strong", traits, capabilities: [...SQL_CAPABILITIES, "search"] as const, handle }) : undefined;
-  return ok({ store, searchable, facts: { dialect, naming: naming.value, version: found.version, search: searching } });
+  const store = makeStore({ id, place, consistency: "eventual-merge", traits, capabilities: SQL_CAPABILITIES, handle });
+  const searchable = searching ? makeStore({ id, place, consistency: "eventual-merge", traits, capabilities: [...SQL_CAPABILITIES, "search"] as const, handle }) : undefined;
+  return ok({
+    store,
+    searchable,
+    facts: { dialect, naming: naming.value, version: found.version, search: searching },
+    replica,
+    forkedFrom: identity.forkedFrom,
+    siblings: async (path) => (await siblingsOfPath(port, ctx, path)).map((v): SqlSibling => ({ id: v.id, kind: v.kind, rev: v.blob === null ? undefined : revOf(v.blob), replica: v.replica })),
+    verify: () => verifyDatabase(port, ctx, clock()),
+    pending: async () => numberOf((await runQ(port, l.countPending()))[0]?.["n"] ?? null),
+    reindex,
+    ctx,
+    port,
+  });
 }

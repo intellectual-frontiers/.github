@@ -23,7 +23,7 @@ proves(["0002-sql-governance FR-002"], "a word of a name is lower case letters, 
   assertEquals(parseWord("fleet_2").kind, "ok");
   const n = parseNaming();
   assert(n.kind === "ok");
-  assertEquals(TABLE_ROLES.map((r) => tableOf(n.value, r)), ["anyfs_meta", "anyfs_objects", "anyfs_revisions", "anyfs_search"]);
+  assertEquals(TABLE_ROLES.map((r) => tableOf(n.value, r)), ["anyfs_versions", "anyfs_blobs", "anyfs_meta", "anyfs_trust", "anyfs_epochs", "anyfs_cache", "anyfs_search", "anyfs_heads", "anyfs_names", "anyfs_siblings", "anyfs_vector"]);
   const s = parseNaming({ prefix: "fleet", schema: "ops" });
   assert(s.kind === "ok" && s.value.schema === "ops");
   assertEquals(parseNaming({ prefix: "Bad" }).kind, "err");
@@ -31,19 +31,23 @@ proves(["0002-sql-governance FR-002"], "a word of a name is lower case letters, 
 });
 
 proves(["0002-sql-governance FR-003"], "the layout is documented column by column and agrees with the tables the migrations make, and the plan of the migrations lists each version in order", async () => {
-  assertEquals(SCHEMA_VERSION, 2);
-  assertEquals(MIGRATION_PLAN.map((m) => m.version), [1, 2]);
+  assertEquals(SCHEMA_VERSION, 3);
+  assertEquals(MIGRATION_PLAN.map((m) => m.version), [3]);
   assert(MIGRATION_PLAN.every((m) => !m.destructive));
   const port = await sqliteMemory();
   const n = parseNaming();
   assert(n.kind === "ok");
   const made = await migrate(port, n.value, { search: "auto" });
-  assert(made.kind === "ok" && made.value.version === 2);
+  assert(made.kind === "ok" && made.value.version === 3);
   const sql = sqlFor("sqlite", n.value);
-  for (const role of ["meta", "objects", "revisions"] as const) {
+  for (const role of ["versions", "blobs", "meta", "trust", "epochs", "cache"] as const) {
     const rows = await port.query(`PRAGMA table_info(${sql.table(role)})`, []);
     const have = rows.map((r) => String(r["name"]));
     assertEquals(have, LAYOUT.filter((c) => c.table === role).map((c) => c.column), role);
+  }
+  for (const role of ["names", "vector"] as const) {
+    const rows = await port.query(`PRAGMA table_info(${sql.table(role)})`, []);
+    assertEquals(rows.map((r) => String(r["name"])), LAYOUT.filter((c) => c.table === role).map((c) => c.column), role);
   }
   const search = await port.query(`PRAGMA table_info(${sql.table("search")})`, []);
   assertEquals(search.map((r) => String(r["name"])), LAYOUT.filter((c) => c.table === "search").map((c) => c.column));

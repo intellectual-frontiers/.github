@@ -108,6 +108,7 @@ function step(s: Step, n: number): string[] {
   if (s.env !== undefined) props.push(mapping("env", s.env, 0));
   if (s.workingDirectory !== undefined) props.push(entry("working-directory", s.workingDirectory, 0));
   if (s.timeoutMinutes !== undefined) props.push(entry("timeout-minutes", s.timeoutMinutes, 0));
+  if (s.continueOnError === true) props.push(entry("continue-on-error", true, 0));
   const lines = props.flat();
   lines.forEach((l, i) => out.push(i === 0 ? `${pad(n)}- ${l}` : l === "" ? "" : `${pad(n + 2)}${l}`));
   return out;

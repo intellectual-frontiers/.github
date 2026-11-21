@@ -35,8 +35,8 @@ export const parseAssetKind: (text: string) => Result<AssetKind, string> = made<
 /** A system id from text: lower case words joined by hyphens, at most 60 characters. */
 export const parseSystemId: (text: string) => Result<SystemId, string> = made<"estate system id">("a system id", "lower case words joined by hyphens", word, 60);
 
-/** How an asset first reached the fleet: `provisioned` (the system installed it), `paired` (a short code paired it), `integration` (an integration or a cloud account brought it) or `self` (the controller adopted itself). */
-export const ORIGINS = ["provisioned", "paired", "integration", "self"] as const;
+/** How an asset first reached the fleet: `provisioned` (the system installed it), `paired` (a short code paired it), `integration` (an integration or a cloud account brought it), `self` (the controller adopted itself) or `scan` (it was seen on the network and adopted from the list of what was found). */
+export const ORIGINS = ["provisioned", "paired", "integration", "self", "scan"] as const;
 
 /**
  * Where an asset came from. Only a managed asset can be `provisioned`; the others reached the fleet as someone else's install.

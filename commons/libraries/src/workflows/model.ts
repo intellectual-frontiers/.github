@@ -47,6 +47,8 @@ type StepCommon = {
   readonly env?: Readonly<Record<string, Scalar>>;
   readonly workingDirectory?: string;
   readonly timeoutMinutes?: number;
+  /** The step may fail without failing its job (a run of tests whose failure is what a page is to show). */
+  readonly continueOnError?: boolean;
   /** A comment written above the step. */
   readonly comment?: string;
 };

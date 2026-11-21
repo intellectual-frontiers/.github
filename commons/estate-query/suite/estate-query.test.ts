@@ -7,7 +7,7 @@
 import { defineAsset, installOf, CAPABILITIES, type Asset } from "@intellectual-frontiers/estate/governance";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { RELATIONS } from "../src/governance/mod.ts";
-import { CATALOG, formatTable, openEstateQuery, tablesOf, type EstateData } from "../src/logical/mod.ts";
+import { CATALOG, formatTable, fromSnapshot, openEstateQuery, tablesOf, type EstateData } from "../src/logical/mod.ts";
 
 function asset(id: string, state: "discovered" | "adopted" | "managed", more: { origin?: "provisioned" | "paired" | "integration" | "self" } = {}): Asset {
   const all = Object.fromEntries(CAPABILITIES.map((c) => [c, "opsfolio"]));
@@ -26,6 +26,9 @@ const DATA: EstateData = {
   acceptances: { athens: [{ policy: "ssh-root-login", reason: "a break-glass account, reviewed quarterly", by: "Ada", until: "2027-01-15" }] },
   truths: [{ asset: "athens", state: "managed", observedAt: "2026-11-30T00:00:00Z", currency: "fresh", difference: null, agrees: true, alignment: "aligned", source: "probe" }],
   violations: [{ invariant: "observed-asset-is-declared" as never, subject: "printer", message: "observed and never declared" }],
+  changes: [{ commit: "a1", at: "2026-11-30T10:00:00Z", author: "Ada", subject: "172: take sparta over", refs: "#217", signed: true }, { commit: "b2", at: "2026-11-29T10:00:00Z", author: "Bob", subject: "tweak", refs: "", signed: false }],
+  approvals: [{ asset: "sparta", kind: "manage", by: "Ada", planHash: `sha256:${"a".repeat(64)}`, at: "2026-11-30T10:00:00Z" }],
+  fleets: { athens: "fcr", sparta: "fcr", corinth: "if" },
   now: NOW,
 };
 
@@ -51,7 +54,7 @@ proves(["0002-estate-query-relations FR-001", "0002-estate-query-relations FR-00
 });
 
 proves(["0002-estate-query-relations FR-002"], "asset and capability say what the estate library says, an inherited asset has no provision and a discovered one has no install, and the platform is read where it is declared", () => {
-  assertEquals(rows("select id, state, origin, install from asset order by id"), [["athens", "managed", "provisioned", "provisioned"], ["corinth", "adopted", "paired", "inherited"], ["printer", "discovered", "", ""], ["sparta", "managed", "paired", "inherited"]]);
+  assertEquals(rows("select id, fleet, state, origin, install from asset order by id"), [["athens", "fcr", "managed", "provisioned", "provisioned"], ["corinth", "if", "adopted", "paired", "inherited"], ["printer", "", "discovered", "", ""], ["sparta", "fcr", "managed", "paired", "inherited"]]);
   assertEquals(rows("select asset, offered, reason from capability where capability = 'provision' and asset in ('athens','sparta') order by asset").map((r) => [r[0], r[1], String(r[2]).includes("installed by someone else")]), [["athens", true, false], ["sparta", false, true]]);
   assertEquals(rows("select count(*) from capability where asset = 'athens' and offered"), [[10]]);
   assertEquals(rows("select asset, family, distro, release, arch, ansible from platform"), [["athens", "debian", "ubuntu", "26.04", "x86_64", ""]]);
@@ -75,6 +78,8 @@ proves(["0002-estate-query-relations FR-003"], "the policies are judged with the
   assertEquals(rows("select control from policy_control where policy = 'ssh-root-login' order by control"), [["AC-6"], ["IA-2"]]);
   assertEquals(rows("select asset, policy, accepted_by, until from risk"), [["athens", "ssh-root-login", "Ada", "2027-01-15"]]);
   assertEquals(rows("select subject from violation"), [["printer"]]);
+  assertEquals(rows("select commit, signed from change where not signed"), [["b2", false]]);
+  assertEquals(rows("select a.asset, a.approved_by, c.refs from approval a join change c on c.at = a.at"), [["sparta", "Ada", "#217"]]);
   assertEquals(rows("select asset, currency, alignment, agrees from truth"), [["athens", "fresh", "aligned", true]]);
   const expired = rows("select status from policy_result where policy = 'ssh-root-login'", [], { ...DATA, now: "2027-02-01T00:00:00Z" });
   assertEquals(expired, [["fail"]], "an acceptance that has ended is a failure again");
@@ -128,4 +133,12 @@ proves(["0003-estate-query-run FR-004"], "a table is given as aligned text with 
   const text = formatTable(t, "table");
   assert(text.startsWith("id  note") && text.includes("3 rows") && text.split("\n")[1]?.startsWith("--"), text);
   assert(formatTable({ columns: ["n"], rows: [[1]] }, "table").includes("1 row\n"));
+});
+
+proves(["0002-estate-query-relations FR-006"], "the estate of a snapshot of a fleet store is asked as the estate of files is, with what was assessed where it is given", () => {
+  const snapshot = { assets: DATA.assets, declared: DATA.declared ?? {}, observations: DATA.observations ?? [], results: DATA.results ?? [], acceptances: DATA.acceptances ?? {}, manifest: { store: "x" }, findings: [], stable: true };
+  const data = fromSnapshot(snapshot, NOW, { truths: DATA.truths ?? [], violations: DATA.violations ?? [] });
+  assertEquals(rows("select policy, status from policy_result order by policy", [], data), rows("select policy, status from policy_result order by policy"));
+  assertEquals(rows("select asset, currency from truth", [], data), [["athens", "fresh"]]);
+  assertEquals(rows("select count(*) from truth", [], fromSnapshot(snapshot, NOW)), [[0]], "no truth where nothing was assessed");
 });

@@ -31,6 +31,12 @@ export type EstateData = {
   readonly truths?: readonly Truth[];
   /** The invariants broken, where they were checked. */
   readonly violations?: readonly Violation[];
+  /** The changes of the repository, newest first. */
+  readonly changes?: readonly { readonly commit: string; readonly at: string; readonly author: string; readonly subject: string; readonly refs: string; readonly signed: boolean }[];
+  /** The approvals kept. */
+  readonly approvals?: readonly { readonly asset: string; readonly kind: string; readonly by: string; readonly planHash: string; readonly at: string }[];
+  /** The fleet that declares each asset, by its identity, where the data says. */
+  readonly fleets?: Readonly<Record<string, string>>;
   /** The instant now, for the policies' acceptances (an ISO 8601 instant). */
   readonly now: string;
 };
@@ -59,7 +65,7 @@ export function tablesOf(data: EstateData): Tables {
   const latest = new Map((data.observations ?? []).map((o) => [o.asset, o.observation]));
   const accepted = (asset: string): readonly AcceptedRisk[] => data.acceptances?.[asset] ?? [];
   return {
-    asset: () => table(columnsOf("asset"), data.assets.map((a) => [String(a.id), String(a.kind), a.state, a.origin ?? "", a.state === "discovered" ? "" : installOf(a)])),
+    asset: () => table(columnsOf("asset"), data.assets.map((a) => [String(a.id), data.fleets?.[String(a.id)] ?? "", String(a.kind), a.state, a.origin ?? "", a.state === "discovered" ? "" : installOf(a)])),
     capability: () => table(columnsOf("capability"), data.assets.flatMap((a) => a.capabilities.map((l): readonly Value[] => [String(a.id), l.capability, l.offered, l.offered ? String(l.owner) : "", l.offered ? "" : l.reason]))),
     platform: () =>
       table(
@@ -86,6 +92,33 @@ export function tablesOf(data: EstateData): Tables {
       ),
     policy_control: () => table(columnsOf("policy_control"), (data.results ?? []).flatMap((r) => r.controls.map((control): readonly Value[] => [r.asset, r.id, control]))),
     risk: () => table(columnsOf("risk"), Object.entries(data.acceptances ?? {}).flatMap(([asset, risks]) => risks.map((r): readonly Value[] => [asset, r.policy, r.reason, r.by, r.until]))),
+    change: () => table(columnsOf("change"), (data.changes ?? []).map((x): readonly Value[] => [x.commit, x.at, x.author, x.subject, x.refs, x.signed])),
+    approval: () => table(columnsOf("approval"), (data.approvals ?? []).map((x): readonly Value[] => [x.asset, x.kind, x.by, x.planHash, x.at])),
     violation: () => table(columnsOf("violation"), (data.violations ?? []).map((v): readonly Value[] => [v.invariant, v.subject, v.message])),
+  };
+}
+
+/** What of a snapshot of a fleet store is read (`FleetSnapshot` of the estate library's physical layer satisfies it by shape; it is described here so that nothing of AnyFS is imported). */
+export type SnapshotLike = {
+  readonly assets: readonly Asset[];
+  readonly declared: Readonly<Record<string, Readonly<Record<string, JsonValue>>>>;
+  readonly observations: readonly { readonly asset: string; readonly observation: Observation }[];
+  readonly results: readonly (PolicyOutcome & { readonly asset: string })[];
+  readonly acceptances: Readonly<Record<string, readonly AcceptedRisk[]>>;
+};
+
+/** What `assessSnapshot` of the estate library gives, as far as the relations use it. */
+export type AssessmentLike = { readonly truths: readonly Truth[]; readonly violations: readonly Violation[] };
+
+/** The estate of a snapshot of a fleet store, at an instant, with what was assessed of it where that was done. */
+export function fromSnapshot(snapshot: SnapshotLike, now: string, assessment?: AssessmentLike): EstateData {
+  return {
+    assets: snapshot.assets,
+    declared: snapshot.declared,
+    observations: snapshot.observations,
+    results: snapshot.results,
+    acceptances: snapshot.acceptances,
+    ...(assessment === undefined ? {} : { truths: assessment.truths, violations: assessment.violations }),
+    now,
   };
 }

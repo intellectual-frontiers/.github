@@ -9,10 +9,12 @@
 import { fs, path } from "@intellectual-frontiers/system";
 import type { Finding } from "./check.ts";
 import type { Config } from "./config.ts";
+import { type Evidence, NONE } from "./evidence.ts";
 import type { SpecKit } from "./extract/specs.ts";
 import { contextFor, type LinkIndex, type LinkScope, specPage } from "./links.ts";
 import { markdown } from "./markdown.ts";
 import type { Block, Inline, Page } from "./model.ts";
+import type { Trace } from "./pages/specs.ts";
 
 /** One build: what it reads, what it has made, and what it has found. */
 export class Build {
@@ -40,6 +42,10 @@ export class Build {
   readonly citations: Map<string, Set<string>> = new Map();
   /** The title of each package, by its slug: what the pages of its specifications and the register call it. */
   readonly packageTitles: Map<string, string> = new Map();
+  /** What the tests, the issues and the tickets say, read from the files the configuration names (docs 0001-docs FR-009). */
+  evidence: Evidence = NONE;
+  /** The files that prove each requirement and the files written to it, once the specification pages are made. */
+  trace: Trace | undefined;
   /** What links can reach. */
   readonly index: LinkIndex;
 

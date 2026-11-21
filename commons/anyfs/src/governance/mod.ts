@@ -11,3 +11,4 @@ export * from "./expect.ts";
 export * from "./capability.ts";
 export * from "./problem.ts";
 export * from "./place.ts";
+export * from "./merge.ts";

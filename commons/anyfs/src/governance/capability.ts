@@ -16,7 +16,7 @@
 /** The capabilities every store has. */
 export const CORE_CAPABILITIES = ["read", "write", "list", "stat", "delete"] as const;
 /** The capabilities a store may have. */
-export const OPTIONAL_CAPABILITIES = ["cas", "batch", "rename", "watch", "lock", "history", "rangeRead", "append", "search"] as const;
+export const OPTIONAL_CAPABILITIES = ["cas", "batch", "rename", "watch", "lock", "history", "rangeRead", "append", "search", "merge"] as const;
 /** Every capability, the core ones first. */
 export const CAPABILITIES = [...CORE_CAPABILITIES, ...OPTIONAL_CAPABILITIES] as const;
 
@@ -41,6 +41,7 @@ export const CAPABILITY_SUMMARY: Readonly<Record<Capability, string>> = {
   rangeRead: "read a part of an object",
   append: "add bytes to the end of an object",
   search: "find objects by what they hold",
+  merge: "take the changes of another replica and give one's own, so that any two replicas converge to the same state in any order",
 };
 
 /** Whether a text is the name of a capability. */
@@ -48,8 +49,8 @@ export function isCapability(text: string): text is Capability {
   return (CAPABILITIES as readonly string[]).includes(text);
 }
 
-/** How consistent a store is: `strong` (every read sees the last write and a list sees every object), `read-your-writes` (a writer sees its own writes) or `eventual-listing` (a list may lag behind the objects). */
-export const CONSISTENCIES = ["strong", "read-your-writes", "eventual-listing"] as const;
+/** How consistent a store is: `strong` (every read sees the last write and a list sees every object), `read-your-writes` (a writer sees its own writes) `eventual-listing` (a list may lag behind the objects) or `eventual-merge` (a replica holds what it has made and taken, and every two replicas that have taken each other's changes hold the same). */
+export const CONSISTENCIES = ["strong", "read-your-writes", "eventual-listing", "eventual-merge"] as const;
 /** One way a store is consistent. */
 export type Consistency = (typeof CONSISTENCIES)[number];
 

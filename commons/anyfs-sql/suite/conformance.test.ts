@@ -1,6 +1,7 @@
 /**
- * Tests of the conformance of the SQL stores (commons anyfs-sql 0006-sql-conformance FR-001 to FR-004): the store passes the laws of AnyFS on each real engine and on the fakes of the clients that need a server (named
- * as fakes here), the laws of the bridge hold between it and the stores of memory and of a folder, a sync from a folder into a database and back gives the folder again, and two processes writing one file are safe.
+ * Tests of the conformance of the SQL stores (commons anyfs-sql 0006-sql-conformance FR-001 to FR-004): the store passes the laws of AnyFS on SQLite, the real engine, and through a FAKE of a libSQL client's shape over a real
+ * SQLite (named as a fake here), the laws of the bridge hold between it and the stores of memory and of a folder, a sync from a folder into a database and back gives the folder again, and two processes writing one file
+ * are safe.
  *
  * @module
  */
@@ -17,19 +18,17 @@ import { proc } from "@intellectual-frontiers/system";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { openSqliteFile } from "../src/physical/adapters/sqlite.ts";
 import { openSqlStore } from "../src/mod.ts";
-import { ENGINES, asCore, bytes, libsqlFake, osPath, p, pgFake, sqliteFile, storeOn, text, withTemp } from "./kit.ts";
+import { asCore, bytes, libsqlFake, osPath, p, sqliteFile, sqliteMemory, storeOn, text, withTemp } from "./kit.ts";
 
 const failures = (reports: readonly { readonly id: string; readonly failure?: string }[]): readonly string[] => reports.filter((r) => r.failure !== undefined).map((r) => `${r.id}: ${r.failure}`);
 
-proves(["0006-sql-conformance FR-001"], "the store passes every case of the suite its capabilities name, on SQLite, on PostgreSQL in PGlite and on DuckDB, each a real engine", async () => {
-  for (const e of ENGINES) {
-    const sample = asCore(await storeOn(await e.make()));
-    assertEquals([...sample.capabilities].sort(), ["batch", "cas", "delete", "history", "list", "read", "rename", "stat", "write"], e.name);
-    const reports = await runConformance(async () => asCore(await storeOn(await e.make())));
-    assertEquals(failures(reports), [], e.name);
-    assertEquals(reports.length, casesFor(sample.capabilities).length, e.name);
-    assert(reports.length >= 18, `${e.name}: the cases that need cas, batch, rename and history are run`);
-  }
+proves(["0006-sql-conformance FR-001"], "the store passes every case of the suite its capabilities name on SQLite, the real engine, and has the capabilities of a store that merges", async () => {
+  const sample = asCore(await storeOn(await sqliteMemory()));
+  assertEquals([...sample.capabilities].sort(), ["batch", "cas", "delete", "history", "list", "merge", "read", "rename", "stat", "write"]);
+  const reports = await runConformance(async () => asCore(await storeOn(await sqliteMemory())));
+  assertEquals(failures(reports), []);
+  assertEquals(reports.length, casesFor(sample.capabilities).length);
+  assert(reports.length >= 18, "the cases that need cas, batch, rename and history are run");
 });
 
 proves(["0006-sql-conformance FR-001"], "the store passes the same cases on the other SQLite module where the runtime has one (node:sqlite under Bun and Node 26 alike)", async () => {
@@ -48,18 +47,16 @@ proves(["0006-sql-conformance FR-001"], "the store passes the same cases on the 
   assertEquals(failures(await runConformance(make)), []);
 });
 
-proves(["0006-sql-conformance FR-002"], "the port of a libSQL client passes the same cases through a FAKE of the client's shape over a real SQLite, and the port of a `pg` pool through a FAKE of the pool's shape over a real PostgreSQL in PGlite", async () => {
-  for (const [name, make] of [["libSQL client (FAKE over SQLite)", libsqlFake], ["pg pool (FAKE over PGlite)", pgFake]] as const) {
-    const reports = await runConformance(async () => asCore(await storeOn(await make())));
-    assertEquals(failures(reports), [], name);
-    assert(reports.length >= 18, name);
-  }
+proves(["0006-sql-conformance FR-002"], "the port of a libSQL client passes the same cases through a FAKE of the client's shape over a real SQLite", async () => {
+  const reports = await runConformance(async () => asCore(await storeOn(await libsqlFake())));
+  assertEquals(failures(reports), [], "libSQL client (FAKE over SQLite)");
+  assert(reports.length >= 18);
 });
 
 proves(["0006-sql-conformance FR-003"], "every law of the bridge holds between a store in memory or in a folder and the store of a database, in both directions, and between two databases", async () => {
   const folders: string[] = [];
   try {
-    const sqlStore = async (): Promise<Dest> => (await storeOn(await (await import("./kit.ts")).sqliteMemory())).store as unknown as Dest;
+    const sqlStore = async (): Promise<Dest> => (await storeOn(await sqliteMemory())).store as unknown as Dest;
     const folder = async (): Promise<Dest> => {
       const dir = await (await import("@intellectual-frontiers/system")).fs.makeTempDir({ prefix: "anyfs-sql-bridge-" });
       folders.push(dir);
@@ -108,7 +105,6 @@ proves(["0006-sql-conformance FR-003"], "a sync from a folder into a database an
       const y = await b.value.read(s.path);
       assert(x.kind === "ok" && y.kind === "ok" && x.value.bytes.length === y.value.bytes.length && x.value.bytes.every((v, i) => v === y.value.bytes[i]), s.path);
     }
-    // a second sync changes nothing
     const again = await prepare({ kind: "sync", deletes: forbidDeletes }, { store: a.value as unknown as Dest, prefix: ROOT }, { store: db as unknown as Dest, prefix: ROOT });
     if (again.kind === "err") throw new Error(JSON.stringify(again.error));
     assertEquals(again.value.plan.actions.length, 0);
@@ -116,10 +112,9 @@ proves(["0006-sql-conformance FR-003"], "a sync from a folder into a database an
   });
 });
 
-proves(["0006-sql-conformance FR-004"], "two processes writing one SQLite file are safe: of two that write no object at one path exactly one wins, and every write of each ends", async () => {
+proves(["0006-sql-conformance FR-004"], "two processes writing one SQLite file are safe: of two that write no file at one path exactly one wins, and every write of each ends", async () => {
   await withTemp(async (dir) => {
     const file = osPath.join(dir, "shared.db");
-    // the file is made first, so that the two start on a database that is there
     const first = await openSqliteFile(file);
     assert(first.kind === "ok");
     assert((await openSqlStore(first.value)).kind === "ok");
@@ -139,9 +134,10 @@ proves(["0006-sql-conformance FR-004"], "two processes writing one SQLite file a
     const opened = await openSqlStore(check.value);
     assert(opened.kind === "ok");
     const all = await opened.value.store.list(ROOT, { limit: 1000 });
-    assert(all.kind === "ok" && all.value.entries.length === 2 * count + 1, "every object is there");
+    assert(all.kind === "ok" && all.value.entries.length === 2 * count + 1, "every file is there");
     const race = await opened.value.store.read(p("race"));
     assert(race.kind === "ok" && [text(race.value.bytes)].every((t) => t === "a" || t === "b"));
+    assertEquals((await opened.value.verify()).map((f) => f.kind), [], "the rows of two processes are rows of one replica, and are all in order");
     await check.value.close();
   });
 });

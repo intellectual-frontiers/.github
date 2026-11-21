@@ -17,7 +17,7 @@
 ## Acceptance scenarios
 
 1. **Given** the text `Fleet-1`, **When** a word is made, **Then** it is refused, per FR-002.
-2. **Given** no options, **When** a naming is made, **Then** its objects table is `anyfs_objects`, per FR-002.
+2. **Given** no options, **When** a naming is made, **Then** its versions table is `anyfs_versions`, per FR-002.
 3. **Given** `a/b.json`, **When** its media type is asked, **Then** it is `application/json`, per FR-004.
 
 ## Out of scope
