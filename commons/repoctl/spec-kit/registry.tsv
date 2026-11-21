@@ -10,3 +10,4 @@ number	slug	state
 0009	repoctl-config	in force
 0010	repoctl-host	in force
 0011	repoctl-docs	in force
+0012	repoctl-query	in force

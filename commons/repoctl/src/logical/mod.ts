@@ -35,3 +35,4 @@ export * from "./step.ts";
 export * from "./sync.ts";
 export * from "./hygiene.ts";
 export * from "./hygiene-facts.ts";
+export * from "./query.ts";

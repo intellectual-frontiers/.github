@@ -122,3 +122,27 @@ proves(["0002-converge-command FR-002", "0002-converge-command FR-003", "0002-co
     await m.stop();
   }
 });
+
+proves(["0002-converge-command FR-006"], "a machine of another family is converged by its own dialect and observed by the program of its family: on a real Rocky Linux machine the plan is made, the hash approved, the apply made and the plan after it empty", async (t) => {
+  if (reason !== undefined) return t.skip(reason);
+  const spec = readMachineSpec({ name: "rocky", image: "quay.io/rockylinux/rockylinux:9", users: [{ name: "admin", sudo: true }], packages: ["ansible-core"] });
+  assert(spec.kind === "ok");
+  const started = await startMachine(spec.value);
+  assert(started.kind === "ok", started.kind === "err" ? started.error : "");
+  const m = started.value;
+  try {
+    const dialect = ansible({ family: "rhel", version: "2.14", renderRoot: "/var/lib/archon-test" });
+    const reqs = [req("group.lab", "group", { name: "labgroup" }), req("pkg.ssh", "package", { name: "openssh-server" }), req("dir.lab", "directory", { path: "/srv/lab", mode: "0750" }, { dependsOn: ["group.lab"] })];
+    const config: ConvergePluginConfig = { ...base(async () => ok({ requirements: reqs, unexpressed: [], executor: m.executor, elevate: [], family: "rhel", dialect })), dialect: ansible({ renderRoot: "/var/lib/archon-test" }) };
+    const plan = await run(config, ["converge", "plan", "--asset", "rocky"]);
+    assertEquals(plan.code, 4, plan.err + plan.out);
+    assert(plan.out.includes("2 changes, 1 already as declared") && plan.out.includes("create group.lab") && !plan.out.includes("pkg.ssh: "), plan.out);
+    const hash = /(sha256:[0-9a-f]{64})/.exec(plan.out)?.[1] ?? "";
+    const applied = await run(config, ["converge", "apply", "--asset", "rocky", "--plan-hash", hash]);
+    assertEquals(applied.code, 0, applied.err + applied.out);
+    assert(applied.out.includes("the plan after the apply is empty"), applied.out);
+    assertEquals((await run(config, ["converge", "plan", "--asset", "rocky"])).code, 0);
+  } finally {
+    await m.stop();
+  }
+}, { timeout: 900_000 });

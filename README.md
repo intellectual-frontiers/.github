@@ -71,6 +71,7 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/anyfs-query`](commons/anyfs-query) | Foundation | Read-only SQL over the files, places, revisions and content of any AnyFS store | layers, extension | L1 | held |
 | [`@intellectual-frontiers/anyfs-s3`](commons/anyfs-s3) | Foundation | The S3 backend of AnyFS: a store over a bucket and a prefix of any S3-compatible service | layers, extension | L1 | held |
 | [`@intellectual-frontiers/anyfs-serve`](commons/anyfs-serve) | Foundation | AnyFS over HTTP: any AnyFS store served as WebDAV | layers, extension | L1 | held |
+| [`@intellectual-frontiers/anyfs-sql`](commons/anyfs-sql) | Foundation | A table of any SQL-speaking database kept as an AnyFS store | layers, extension | L1 | held |
 | [`@intellectual-frontiers/anyfs-ssh`](commons/anyfs-ssh) | Foundation | The SSH backend of AnyFS: a store over a folder on a host reached by SSH | layers, extension | L1 | held |
 | [`@intellectual-frontiers/core`](https://www.npmjs.com/package/@intellectual-frontiers/core) | Foundation | Errors as values (`Result`) | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/crypto`](https://www.npmjs.com/package/@intellectual-frontiers/crypto) | Foundation | The digests, signatures and envelopes of commons in pure code on Web Crypto | - | L1 | GitHub, npm |
@@ -102,6 +103,7 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/docs`](https://www.npmjs.com/package/@intellectual-frontiers/docs) | Program | The generator of a repository's documentation site | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/ergonex`](https://www.npmjs.com/package/@intellectual-frontiers/ergonex) | Program | The one command, `ergonex` | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/estate`](commons/estate) | Program | The assets of an organization (machines, services, accounts) as discovered | layers | L1 | held |
+| [`@intellectual-frontiers/estate-query`](commons/estate-query) | Program | SQL over the estate: what an estate holds (its assets, the capabilities of each and who owns them, what is declared and observed, the policies judged, the risks accepted, the operational truth and the invariants broken) as relations with a catalog that is data | layers | L1 | held |
 | [`@intellectual-frontiers/evidence-capture`](commons/evidence-capture) | Program | The unattended capture of evidence | layers | L1 | held |
 | [`@intellectual-frontiers/grc`](https://www.npmjs.com/package/@intellectual-frontiers/grc) | Program | Governance, risk and compliance in layers | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/integrations`](https://www.npmjs.com/package/@intellectual-frontiers/integrations) | Program | Two families on one skeleton of Kanon layers | layers | L1 | GitHub, npm |
