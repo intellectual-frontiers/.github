@@ -19,7 +19,7 @@
 
 - **FR-005**: Every commit's message MUST name at least one change request on a line of its own, as `Refs #N` while the capability is in progress or as `Closes #N` on the commit that finishes it (`ifccm:IssueReferenceKind`: `ifccm:Refs`, `ifccm:Closes`); a change request of another repository is named `owner/repo#N`.
 - **FR-006**: `Closes #N` MUST be on the commit that finishes N, where every checkbox item of N is ticked and each of its `Done when` checks passes, and MUST NOT be on any other commit.
-- **FR-007**: WHEN a commit names no change request, the `changes` check MUST report it as `changes/no-issue` with its revision; a merge commit that only joins commits that each name one MUST be exempt.
+- **FR-007**: WHEN a commit names no change request, the `changes` check MUST report it as `changes/no-issue` with its revision; a merge commit (two or more parents) MUST NOT be reported for want of a reference of its own, because a merge is judged by its parents: each parent in the range is judged by this rule on its own, so that a parent that names none is reported once, as itself and not again as the merge, and a parent outside the range was judged where it was made.
 - **FR-008**: IF a commit names a change request by a keyword the Git host reads as closing it other than `Closes` (such as `Fixes` or `Resolves`), THEN the check MUST report `changes/closing-keyword`, so that only the commit that finishes a capability closes it.
 - **FR-009**: WHEN the check runs with `--strict`, it MUST ask the Git host (FR-028) for each change request a commit names and report `changes/unknown-issue` where it does not exist and `changes/closed-issue` where a `Refs` names one that is already closed; without `--strict` it MUST use no network, so that the network never fails the offline check (0018-standards-first FR-017).
 
@@ -123,7 +123,8 @@
 - A `--terms` module in a folder whose name has a space, on Windows: loaded by its `file:` URL, per FR-036.
 - A capability that a commit closes and whose requirement has no passing run: the trace exits 1; an open capability with the same chain exits 0, per FR-038.
 - A commit that names `Refs intellectual-frontiers/.github#10`: read as that repository's change request, and `--strict` asks that repository's host, per FR-005 and FR-009.
-- A merge commit whose two parents each name an issue: exempt, per FR-007.
+- A merge commit whose two parents each name an issue, with the default message and no body: exempt, per FR-007.
+- A merge commit one of whose parents names no issue: the parent is reported, the merge is not, per FR-007.
 - A revert commit with no issue: reported, because a revert is a change, per FR-007.
 - A body that says `Closes #10` in prose in the middle of a line: it is not a line of its own and is not read, per FR-005.
 - A capability with three tiny steps: three checkbox items and no new issues, per FR-004.

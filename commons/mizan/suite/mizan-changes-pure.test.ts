@@ -127,7 +127,7 @@ proves(["0020-ifccm FR-045"], "an Impact line is read as major, minor or patch i
 
 proves(
   ["0020-ifccm FR-007", "0020-ifccm FR-011"],
-  "a commit that names no change request is reported with its revision, a merge that joins named commits is not",
+  "a commit that names no change request is reported with its revision, a merge is judged by its parents and never reported itself",
   () => {
     const a = commit(1, "One\n\nRefs #10\n");
     const b = commit(2, "Two\n\nRefs #12\n", { parents: [] });
@@ -139,17 +139,17 @@ proves(
       [["changes/no-issue", "warn", `changes/no-issue ${none.sha}`]],
     );
     assertStringIncludes(found[0]?.message ?? "", none.sha.slice(0, 12));
-    // a merge that joins a commit naming nothing is reported, and the gate phase is carried on the finding
+    // a merge that joins a commit naming nothing: the parent is reported once, as itself, and the gate phase is carried on the finding
     const bad = commit(5, "No issue\n", { parents: [] });
     const merge2 = commit(6, "Merge\n", { parents: [a.sha, bad.sha] });
     const gate = commitFindings([a, bad, merge2], { ...WARN, phase: "gate" });
     assertEquals(
       gate.map((f) => [f.key.split(" ")[1], f.severity]),
-      [
-        [bad.sha, "gate"],
-        [merge2.sha, "gate"],
-      ],
+      [[bad.sha, "gate"]],
     );
+    // an ordinary commit with no reference is still reported, a merge made on top of it or not
+    const lone = commit(7, "Lone\n", { parents: [a.sha] });
+    assertEquals(commitFindings([a, lone], WARN).length, 1);
   },
 );
 

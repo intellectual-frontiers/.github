@@ -112,22 +112,17 @@ function names(m: ParsedMessage): boolean {
   return namedIssues(m).length > 0;
 }
 
-/** Whether a merge commit only joins commits that each name a change request (0020-ifccm FR-007): a parent outside the range was judged where it was made. */
-function isJoin(c: CommitFacts, bySha: ReadonlyMap<string, CommitFacts>): boolean {
-  if (c.parents.length < 2) return false;
-  return c.parents.every((p) => {
-    const parent = bySha.get(p);
-    return parent === undefined || names(parseMessage(parent.message)) || isJoin(parent, bySha);
-  });
+/** Whether a commit is a merge: it joins two or more parents, and the parents are judged, never the merge (0020-ifccm FR-007). */
+function isMerge(c: CommitFacts): boolean {
+  return c.parents.length >= 2;
 }
 
 /** The offline findings of a range of commits: no issue, a closing word other than `Closes`, a departure with no Decision, an `Impact:` line that is not major, minor or patch, and a Decision approved by the author where a regulated domain is claimed. */
 export function commitFindings(commits: readonly CommitFacts[], ctx: Context): readonly ChangesFinding[] {
-  const bySha = new Map(commits.map((c) => [c.sha, c]));
-  const out: ChangesFinding[] = [];
+    const out: ChangesFinding[] = [];
   for (const c of commits) {
     const m = parseMessage(c.message);
-    if (!names(m) && !isJoin(c, bySha))
+    if (!names(m) && !isMerge(c))
       out.push(
         found(
           "changes/no-issue",

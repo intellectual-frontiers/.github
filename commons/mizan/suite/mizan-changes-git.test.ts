@@ -22,7 +22,7 @@ import { err, ok } from "@intellectual-frontiers/core";
 import { run as changes, RECORD_FILE } from "@intellectual-frontiers/libraries/changes";
 import { dayOf, decodeHarnessRecord, relaxations } from "@intellectual-frontiers/mizan/changes/declaration";
 import { declarationHistory, readRange } from "@intellectual-frontiers/mizan/changes/git-log";
-import { commitFindings, relaxationFindings } from "@intellectual-frontiers/mizan/changes/rules";
+import { type CommitFacts, commitFindings, relaxationFindings } from "@intellectual-frontiers/mizan/changes/rules";
 import { askHost, NO_HOST_API } from "@intellectual-frontiers/mizan/changes/strict";
 import { mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { dirname, fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
@@ -155,6 +155,53 @@ async function cmd(
 
 const decl = (domains: string[], on?: string): string =>
   `export const declaration = {\n  regulatedDomains: [${domains.map((d) => JSON.stringify(d)).join(", ")}],\n${on === undefined ? "" : `  productionDeclaredOn: ${JSON.stringify(on)},\n`}};\n`;
+
+proves(
+  ["0020-ifccm FR-007"],
+  "a default merge commit with no body is judged by its parents: exempt where its parents name an issue, and the parent that names none is reported once, not the merge",
+  async () => {
+    await withTempDir(async (repo) => {
+      await init(repo);
+      const root = await commit(repo, "Root\n\nRefs #1\n", "2026-11-01");
+      await git(repo, "switch", "-q", "-c", "work");
+      const a = await commit(repo, "Work\n\nRefs #10\n", "2026-11-02");
+      await git(repo, "switch", "-q", "main");
+      const b = await commit(repo, "Main\n\nRefs #12\n", "2026-11-03");
+      await git(repo, "switch", "-q", "work");
+      // the message git writes itself, with no body: "Merge branch 'main' into work"
+      await git(repo, "merge", "-q", "--no-ff", "--no-edit", "main");
+      const clean = await git(repo, "rev-parse", "HEAD");
+      assertEquals((await git(repo, "log", "-1", "--format=%B")).split("\n")[0], "Merge branch 'main' into work");
+      const rangeOf = async (): Promise<readonly CommitFacts[]> => {
+        const r = await readRange(repo, `${root}..HEAD`);
+        assert(r.kind === "ok", JSON.stringify(r));
+        return r.value;
+      };
+      const ctx = { phase: "warn", decisions: [], roles: {} } as const;
+      assertEquals([...(await rangeOf()).map((c) => c.sha)].sort(), [a, b, clean].sort());
+      assertEquals(commitFindings(await rangeOf(), ctx), []);
+      // a parent that names no issue is reported on its own, and the merge of it is not reported again
+      await git(repo, "switch", "-q", "main");
+      const bare = await commit(repo, "No reference at all\n", "2026-11-04");
+      await git(repo, "switch", "-q", "work");
+      await git(repo, "merge", "-q", "--no-ff", "--no-edit", "main");
+      const merged = await git(repo, "rev-parse", "HEAD");
+      const found = commitFindings(await rangeOf(), ctx);
+      assertEquals(
+        found.map((f) => [f.rule, f.key.split(" ")[1]]),
+        [["changes/no-issue", bare]],
+      );
+      assert(!found.some((f) => f.key.includes(merged)));
+      // an ordinary commit that names none is reported as before
+      const loose = await commit(repo, "Loose\n", "2026-11-05");
+      assertEquals(
+        commitFindings(await rangeOf(), ctx).map((f) => f.key.split(" ")[1]),
+        [bare, loose],
+      );
+    });
+  },
+  skip,
+);
 
 proves(
   ["0020-ifccm FR-005", "0020-ifccm FR-007", "0020-ifccm FR-008"],
