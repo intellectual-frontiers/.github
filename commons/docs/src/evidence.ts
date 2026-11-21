@@ -1,4 +1,4 @@
-// Spec: 0001-docs FR-009
+// Spec: 0001-docs FR-009, FR-022
 /**
  * The evidence the site shows beside the code (docs 0001-docs FR-009 to FR-011): the results of the tests, the issues kept as typed code, and the tickets of GitHub, read from files that CI (or a person) leaves in
  * a folder, so that the same files give the same pages. The results are CTRF (the Common Test Report Format: `<library>.ctrf.json`, one file for each library, written by `ifc test run --report ctrf`), with
@@ -7,6 +7,7 @@
  *
  * @module
  */
+import { type LibraryCoverage, parseCoverage } from "./coverage.ts";
 import { fs, path } from "@intellectual-frontiers/system";
 import type { Finding } from "./check.ts";
 import type { EvidenceSource, IssueLike } from "./config.ts";
@@ -133,10 +134,12 @@ export interface Evidence {
   readonly runsError: string | undefined;
   /** The runs of the evidence that were kept (docs 0001-docs FR-016), oldest first. */
   readonly history: readonly HistoryRun[];
+  /** The line coverage of each library whose tests were run with it (docs 0001-docs FR-022). */
+  readonly coverage: ReadonlyMap<string, LibraryCoverage>;
 }
 
 /** No evidence: nothing recorded. */
-export const NONE: Evidence = { results: new Map(), run: undefined, issues: [], tickets: [], recorded: false, status: new Map(), build: undefined, workflows: [], runsError: undefined, history: [] };
+export const NONE: Evidence = { results: new Map(), run: undefined, issues: [], tickets: [], recorded: false, status: new Map(), build: undefined, workflows: [], runsError: undefined, history: [], coverage: new Map() };
 
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 const str = (v: unknown): string | undefined => (typeof v === "string" && v !== "" ? v : undefined);
@@ -277,6 +280,7 @@ export function readEvidence(root: string, source: EvidenceSource | undefined, f
   let workflows: readonly WorkflowRuns[] = [];
   let runsError: string | undefined;
   const history: HistoryRun[] = [];
+  const coverage = new Map<string, LibraryCoverage>();
   const dir = source.results === undefined ? undefined : path.resolve(root, source.results);
   if (dir !== undefined && fs.existsSync(dir)) {
     for (const entry of [...fs.readDirSync(dir)].sort((a, b) => (a.name < b.name ? -1 : 1))) {
@@ -308,6 +312,10 @@ export function readEvidence(root: string, source: EvidenceSource | undefined, f
         } catch (e) {
           found.push({ where: rel, problem: { kind: "evidence-unreadable", why: `is not JSON: ${e instanceof Error ? e.message : String(e)}` } });
         }
+      } else if (entry.isFile && entry.name.endsWith(".coverage.json")) {
+        const r = parseCoverage(fs.readTextFileSync(path.join(dir, entry.name)));
+        if ("error" in r) found.push({ where: rel, problem: { kind: "evidence-unreadable", why: r.error } });
+        else coverage.set(r.value.library, r.value);
       } else if (entry.isFile && entry.name.endsWith(".ctrf.json")) {
         const library = entry.name.slice(0, -".ctrf.json".length);
         const folder = dirOf(library);
@@ -337,7 +345,7 @@ export function readEvidence(root: string, source: EvidenceSource | undefined, f
       else tickets = r.value;
     }
   }
-  return { results, run, issues, tickets, recorded, status, build, workflows, runsError, history };
+  return { results, run, issues, tickets, recorded, status, build, workflows, runsError, history, coverage };
 }
 
 /** The tests of every library that name a requirement, as `0009-example FR-001`. */

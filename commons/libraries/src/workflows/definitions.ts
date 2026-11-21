@@ -363,7 +363,7 @@ const evidence: Workflow = {
         { ...tools(expr("matrix.folder"), "The development tools, from bun.lock (the libraries it imports are linked)"), id: "install", continueOnError: true },
         { ...tools("commons/quality", "The test runner's own packages (commons quality)"), id: "runner", continueOnError: true },
         { ...tools("commons/docs", "The packages of the tool that keeps the report (commons docs)"), continueOnError: true },
-        run('bun commons/docs/tools/evidence.ts --library "${{ matrix.name }}" --out "$RUNNER_TEMP/evidence"', { name: "The tests, kept as a CTRF report", id: "tests", continueOnError: true, shell: "bash" }),
+        run('bun commons/docs/tools/evidence.ts --library "${{ matrix.name }}" --coverage --out "$RUNNER_TEMP/evidence"', { name: "The tests, kept as a CTRF report", id: "tests", continueOnError: true, shell: "bash" }),
         run(
           lines(
             "mkdir -p \"$RUNNER_TEMP/evidence\"",
@@ -386,7 +386,7 @@ const evidence: Workflow = {
         { ...tools("commons/docs", "The documentation generator's dependencies, which the tests of the root import"), continueOnError: true },
         { ...tools("commons/quality", "The test runner's own packages (commons quality)"), id: "runner", continueOnError: true },
         run("bun commons/libraries/src/link.ts", { name: "The libraries, linked by name", continueOnError: true }),
-        run('bun commons/docs/tools/evidence.ts --library repository --out "$RUNNER_TEMP/evidence"', { name: "The tests, kept as a CTRF report", id: "tests", continueOnError: true, shell: "bash" }),
+        run('bun commons/docs/tools/evidence.ts --library repository --coverage --out "$RUNNER_TEMP/evidence"', { name: "The tests, kept as a CTRF report", id: "tests", continueOnError: true, shell: "bash" }),
         run(
           lines(
             "mkdir -p \"$RUNNER_TEMP/evidence\"",

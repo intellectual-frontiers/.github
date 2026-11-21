@@ -66,7 +66,7 @@ jobs:
       - name: "The tests, kept as a CTRF report"
         id: tests
         shell: bash
-        run: "bun commons/docs/tools/evidence.ts --library \"${{ matrix.name }}\" --out \"$RUNNER_TEMP/evidence\""
+        run: "bun commons/docs/tools/evidence.ts --library \"${{ matrix.name }}\" --coverage --out \"$RUNNER_TEMP/evidence\""
         continue-on-error: true
       - name: "Why there is a report, or none"
         if: "always()"
@@ -113,7 +113,7 @@ jobs:
       - name: "The tests, kept as a CTRF report"
         id: tests
         shell: bash
-        run: "bun commons/docs/tools/evidence.ts --library repository --out \"$RUNNER_TEMP/evidence\""
+        run: "bun commons/docs/tools/evidence.ts --library repository --coverage --out \"$RUNNER_TEMP/evidence\""
         continue-on-error: true
       - name: "Why there is a report, or none"
         if: "always()"

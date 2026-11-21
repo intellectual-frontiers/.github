@@ -1,0 +1,1 @@
+{ "library": "fixture", "files": [ { "path": "commons/fixture/src/mod.ts", "found": 10, "hit": 8 }, { "path": "commons/fixture/src/rare.ts", "found": 20, "hit": 2 } ] }
