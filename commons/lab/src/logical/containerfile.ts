@@ -13,7 +13,7 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import type { MachineSpec } from "@intellectual-frontiers/lab/governance";
+import { BASE_IMAGES, imageFamily, type MachineSpec } from "@intellectual-frontiers/lab/governance";
 
 const NAME = /^[a-z][a-z0-9-]{0,29}$/;
 const USER = /^[a-z][a-z0-9_-]{0,31}$/;
@@ -27,7 +27,7 @@ export function readMachineSpec(input: unknown): Result<MachineSpec, readonly st
   const name = o["name"];
   if (typeof name !== "string" || !NAME.test(name)) problems.push("the name is a lower case letter then lower case letters, digits and hyphens, at most 30");
   const image = o["image"];
-  if (image !== "ubuntu:24.04" && image !== "ubuntu:26.04") problems.push("the image is ubuntu:24.04 or ubuntu:26.04");
+  if (!(BASE_IMAGES as readonly unknown[]).includes(image)) problems.push(`the image is one of ${BASE_IMAGES.join(", ")}`);
   const users = Array.isArray(o["users"]) ? o["users"] : undefined;
   if (users === undefined || users.length === 0) problems.push("a machine has at least one user");
   const parsedUsers = (users ?? []).map((u: unknown) => {
@@ -54,19 +54,22 @@ export function readMachineSpec(input: unknown): Result<MachineSpec, readonly st
   });
 }
 
-/** The Containerfile of a machine: the same text for the same description, so that an image is made once and found again by the hash of its text. */
+/** The line that installs the packages with dnf: where the builder gives a secret `ca`, the install trusts it too, and the file is removed in the same layer. */
+const RHEL_INSTALL = (packages: string): string =>
+  "RUN --mount=type=secret,id=ca,required=false sh -c 'O=\"\"; if [ -r /run/secrets/ca ]; then cat /etc/pki/tls/certs/ca-bundle.crt /run/secrets/ca > /tmp/ca.pem; O=\"--setopt=sslcacert=/tmp/ca.pem\"; fi; dnf -y $O install --setopt=install_weak_deps=False " + packages + " && dnf clean all; rm -f /tmp/ca.pem'";
+
+/** The Containerfile of a machine: the same text for the same description, so that an image is made once and found again by the hash of its text. The RHEL family installs through a build secret `ca` where the builder has one (a network that inspects TLS: the certificate is read for the install and is in no layer). The lines differ by the family of the image (apt and `ssh` on Debian and Ubuntu, dnf and `sshd` on the RHEL family); the rest is the same. */
 export function containerfile(spec: MachineSpec): string {
-  const packages = ["systemd", "systemd-sysv", "dbus", "openssh-server", "sudo", "tzdata", "locales", "ca-certificates", "iproute2", ...spec.packages];
-  const lines = [
-    `FROM ${spec.image}`,
-    "ENV DEBIAN_FRONTEND=noninteractive",
-    `RUN apt-get update && apt-get install -y --no-install-recommends ${[...new Set(packages)].sort().join(" ")} && rm -rf /var/lib/apt/lists/*`,
-    "RUN ssh-keygen -A && mkdir -p /run/sshd && systemctl disable ssh.socket 2>/dev/null; systemctl enable ssh.service",
-    ...(spec.timezone === undefined ? [] : [`RUN ln -sf /usr/share/zoneinfo/${spec.timezone} /etc/localtime && echo ${spec.timezone} > /etc/timezone`]),
-  ];
+  const rhel = imageFamily(spec.image) === "rhel";
+  const base = rhel ? ["systemd", "dbus-daemon", "openssh-server", "sudo", "tzdata", "glibc-langpack-en", "ca-certificates", "iproute", "python3", "shadow-utils"] : ["systemd", "systemd-sysv", "dbus", "openssh-server", "sudo", "tzdata", "locales", "ca-certificates", "iproute2"];
+  const packages = [...new Set([...base, ...spec.packages])].sort().join(" ");
+  const lines = rhel
+    ? [`FROM ${spec.image}`, RHEL_INSTALL(packages), "RUN ssh-keygen -A && systemctl disable sshd.socket 2>/dev/null; systemctl enable sshd.service"]
+    : [`FROM ${spec.image}`, "ENV DEBIAN_FRONTEND=noninteractive", `RUN apt-get update && apt-get install -y --no-install-recommends ${packages} && rm -rf /var/lib/apt/lists/*`, "RUN ssh-keygen -A && mkdir -p /run/sshd && systemctl disable ssh.socket 2>/dev/null; systemctl enable ssh.service"];
+  if (spec.timezone !== undefined) lines.push(`RUN ln -sf /usr/share/zoneinfo/${spec.timezone} /etc/localtime && echo ${spec.timezone} > /etc/timezone`);
   for (const u of spec.users) {
     lines.push(`RUN (id ${u.name} >/dev/null 2>&1 || useradd -m -s /bin/bash ${u.name})${u.sudo ? ` && echo '${u.name} ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/90-${u.name} && chmod 0440 /etc/sudoers.d/90-${u.name}` : ""}`);
   }
-  lines.push("STOPSIGNAL SIGRTMIN+3", 'CMD ["/sbin/init"]', "");
+  lines.push("STOPSIGNAL SIGRTMIN+3", rhel ? 'CMD ["/usr/sbin/init"]' : 'CMD ["/sbin/init"]', "");
   return lines.join("\n");
 }

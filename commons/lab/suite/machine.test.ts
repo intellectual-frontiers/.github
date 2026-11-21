@@ -7,7 +7,7 @@
 import * as proc from "@intellectual-frontiers/system/proc";
 import { fs } from "@intellectual-frontiers/system";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { AREAS, NOT_FAITHFUL } from "../src/governance/mod.ts";
+import { AREAS, BASE_IMAGES, NOT_FAITHFUL } from "../src/governance/mod.ts";
 import { containerfile, readMachineSpec } from "../src/logical/mod.ts";
 import { runtimeUsable, startMachine } from "../src/physical/mod.ts";
 
@@ -44,6 +44,18 @@ proves(["0002-lab-machine FR-003"], "the Containerfile is the same text for the 
   for (const word of ["PRIVATE KEY", "ssh-ed25519", "authorized_keys", "password"]) assert(!text.includes(word), `no ${word}`);
   const dup = readMachineSpec({ ...GOOD, packages: ["curl", "dbus"] });
   assert(dup.kind === "ok" && containerfile(dup.value).match(/\bdbus\b/g)?.length === 1, "a package that is already there is once");
+});
+
+proves(["0002-lab-machine FR-002", "0002-lab-machine FR-003"], "each base image is read, and the Containerfile of the RHEL family installs with dnf, starts sshd and systemd of its own path, and has no apt", () => {
+  for (const image of BASE_IMAGES) assertEquals(readMachineSpec({ ...GOOD, image }).kind, "ok", image);
+  assertEquals(readMachineSpec({ ...GOOD, image: "alpine:3" }).kind, "err");
+  const spec = readMachineSpec({ ...GOOD, image: "quay.io/rockylinux/rockylinux:9" });
+  assert(spec.kind === "ok");
+  const text = containerfile(spec.value);
+  assert(text.startsWith("FROM quay.io/rockylinux/rockylinux:9\n") && text.includes("dnf -y $O install") && text.includes("type=secret,id=ca") && text.includes("systemctl enable sshd.service") && text.includes('CMD ["/usr/sbin/init"]'));
+  assert(!text.includes("apt-get") && !text.includes("DEBIAN_FRONTEND"));
+  const deb = readMachineSpec({ ...GOOD, image: "debian:13" });
+  assert(deb.kind === "ok" && containerfile(deb.value).includes("apt-get install") && containerfile(deb.value).includes("systemctl enable ssh.service"));
 });
 
 const reason = await runtimeUsable("docker");

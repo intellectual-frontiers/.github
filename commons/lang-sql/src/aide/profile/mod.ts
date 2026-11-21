@@ -89,7 +89,15 @@ export function conform(parsed: Parsed, profile: Profile): Result<Parsed, readon
   let nodes = 0;
   let tableUses = 0;
   let deepest = 0;
-  const visit = (n: Node, depth: number): void => {
+  /** The names of common table expressions that a child of a node sees: a later one sees the earlier ones (and its own where the `WITH` is recursive), the body sees all of them. */
+  const scopeFor = (n: Node, c: Node, scope: ReadonlySet<string>): ReadonlySet<string> => {
+    if (n.kind !== "with") return scope;
+    const names = n.ctes.map((x) => lc(x.name.name));
+    const at = n.ctes.findIndex((x) => x === c);
+    if (at < 0) return c === n.body ? new Set([...scope, ...names]) : scope;
+    return new Set([...scope, ...names.slice(0, n.recursive ? at + 1 : at)]);
+  };
+  const visit = (n: Node, depth: number, scope: ReadonlySet<string>): void => {
     nodes++;
     if (depth > deepest) deepest = depth;
     if (forbid.has(n.kind)) out.push({ start: n.start, end: n.end, message: `${n.kind} is not in the language ${profile.name}` });
@@ -102,16 +110,16 @@ export function conform(parsed: Parsed, profile: Profile): Result<Parsed, readon
     if (n.kind === "table") {
       tableUses++;
       const name = n.name.parts.map((p) => p.name).join(".");
-      if (tables !== undefined && !tables.has(lc(name))) out.push({ start: n.name.start, end: n.name.end, message: `the table ${name} is not in the language ${profile.name}` });
+      if (tables !== undefined && !tables.has(lc(name)) && !(n.name.parts.length === 1 && scope.has(lc(name)))) out.push({ start: n.name.start, end: n.name.end, message: `the table ${name} is not in the language ${profile.name}` });
     }
-    for (const c of children(n)) visit(c, depth + 1);
+    for (const c of children(n)) visit(c, depth + 1, scopeFor(n, c, scope));
   };
   if (profile.maxStatements !== undefined && parsed.script.statements.length > profile.maxStatements)
     out.push({ start: 0, end: parsed.text.length, message: `the text has ${parsed.script.statements.length} statements, and the language ${profile.name} allows ${profile.maxStatements}` });
   for (const s of parsed.script.statements) {
     if (s.kind === "unparsed") continue;
     if (!allowedStatements.has(s.kind)) out.push({ start: s.start, end: s.end, message: `a ${s.kind} statement is not in the language ${profile.name}` });
-    visit(s, 0);
+    visit(s, 0, new Set());
   }
   const whole = { start: 0, end: parsed.text.length };
   if (profile.maxDepth !== undefined && deepest > profile.maxDepth) out.push({ ...whole, message: `the statement is nested ${deepest} deep, and the language ${profile.name} allows ${profile.maxDepth}` });

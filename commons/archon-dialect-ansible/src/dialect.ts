@@ -17,6 +17,7 @@ import { err, type Result } from "@intellectual-frontiers/core";
 import { renderedOf, renderHeader, type Dialect, type DialectStep, type Rendered } from "@intellectual-frontiers/archon/dialect";
 import { findSecretLike, parseDialectId, parseKindId, type JsonValue, type Requirement, type RequirementId, type ResourceKindId } from "@intellectual-frontiers/archon/governance";
 import type { Order, Plan } from "@intellectual-frontiers/archon/logical";
+import type { Family } from "@intellectual-frontiers/linux-observe/governance";
 
 /** The id of the dialect. */
 export const DIALECT_ID = "ansible";
@@ -27,6 +28,11 @@ export const PINNED_VERSION = "2.16.3";
 /** The kinds of resource the dialect carries out, with the shape of `desired` for each (see the specification). */
 export const KINDS_CARRIED = ["package", "user", "group", "file", "directory", "service", "ssh-authorized-key", "system-setting"] as const;
 
+/** The kinds the dialect carries for a family: every kind where the family has a builtin module for its packages (`apt` for debian, `dnf` for rhel), and every kind but `package` for the families whose package modules are not in ansible-core (`suse`, `arch`): what is not carried is said where a requirement of it is rendered, and never left out. */
+export function kindsCarriedFor(family: Family): readonly string[] {
+  return family === "debian" || family === "rhel" ? KINDS_CARRIED : KINDS_CARRIED.filter((k) => k !== "package");
+}
+
 /** The names of `system-setting` the dialect carries, each by files only (no module of a collection): the time zone, the locale and the keyboard layout. */
 export const SETTINGS_CARRIED = ["timezone", "locale", "keyboard"] as const;
 
@@ -36,6 +42,8 @@ export type AnsibleOptions = {
   readonly version?: string;
   /** Whether the tasks raise their rights with sudo; no by default, because the machine converges itself as the user that runs it. */
   readonly become?: boolean;
+  /** The family of the machine (0004-linux-observe-platform), which says the module that carries a package: `debian` by default. */
+  readonly family?: Family;
   /** The folder, below the working folder, the render is written in; `.archon` by default. */
   readonly renderRoot?: string;
 };
@@ -79,7 +87,7 @@ function homeOf(user: string): string {
 }
 
 /** The task of one requirement, or the reasons it cannot be rendered. */
-function taskOf(r: Requirement, index: number, problems: string[]): Obj | readonly Obj[] | undefined {
+function taskOf(r: Requirement, index: number, problems: string[], family: Family): Obj | readonly Obj[] | undefined {
   const id = r.id;
   const d = r.desired;
   const absent = r.ensure === "absent";
@@ -93,7 +101,13 @@ function taskOf(r: Requirement, index: number, problems: string[]): Obj | readon
     case "package": {
       const name = str(o, "name", problems, id, true, PKG);
       const version = str(o, "version", problems, id, false, /^[A-Za-z0-9.+:~-]+$/);
-      return name === undefined ? undefined : base("ansible.builtin.apt", { name: version === undefined ? name : `${name}=${version}`, state: absent ? "absent" : "present", update_cache: true, cache_valid_time: 3600 });
+      if (name === undefined) return undefined;
+      if (family === "rhel") return base("ansible.builtin.dnf", { name: version === undefined ? name : `${name}-${version}`, state: absent ? "absent" : "present" });
+      if (family !== "debian") {
+        problems.push(`${id}: a package is not carried for the family ${family}: ansible-core has no builtin module for it (a collection would be needed, and none is pinned)`);
+        return undefined;
+      }
+      return base("ansible.builtin.apt", { name: version === undefined ? name : `${name}=${version}`, state: absent ? "absent" : "present", update_cache: true, cache_valid_time: 3600 });
     }
     case "group": {
       const name = str(o, "name", problems, id, true, NAME);
@@ -135,7 +149,7 @@ function taskOf(r: Requirement, index: number, problems: string[]): Obj | readon
       const enabled = o["enabled"];
       if (typeof running !== "boolean" || typeof enabled !== "boolean") problems.push(`${id}: desired.running and desired.enabled are true or false`);
       if (name === undefined || typeof running !== "boolean" || typeof enabled !== "boolean") return undefined;
-      return base("ansible.builtin.systemd_service", { name, state: running ? "started" : "stopped", enabled, daemon_reload: true });
+      return base("ansible.builtin.systemd", { name, state: running ? "started" : "stopped", enabled, daemon_reload: true });
     }
     case "ssh-authorized-key": {
       const user = str(o, "user", problems, id, true, NAME);
@@ -156,7 +170,15 @@ function taskOf(r: Requirement, index: number, problems: string[]): Obj | readon
       const v = str(o, "value", problems, id, true, name === "timezone" ? /^[A-Za-z][A-Za-z0-9_+-]*(\/[A-Za-z0-9_+-]+){0,2}$/ : name === "locale" ? /^(C|[a-z]{2,3}_[A-Z]{2})\.UTF-8$/ : /^[a-z]{2,3}(\([a-z0-9_-]+\))?$/);
       if (v === undefined) return undefined;
       const task = (module: string, args: Obj, suffix: string, extra: Obj = {}): Obj => ({ name: `${id}: ${r.summary} (${suffix})`, [module]: args, register: `s${index}${suffix}`, ignore_errors: "{{ ansible_check_mode }}", ...extra });
-      if (name === "timezone") return [task("ansible.builtin.copy", { dest: "/etc/timezone", content: `${v}\n`, mode: "0644" }, "a"), task("ansible.builtin.file", { src: `/usr/share/zoneinfo/${v}`, dest: "/etc/localtime", state: "link", force: true }, "b")];
+      if (name === "timezone") {
+        const link = task("ansible.builtin.file", { src: `/usr/share/zoneinfo/${v}`, dest: "/etc/localtime", state: "link", force: true }, "b");
+        return family === "debian" ? [task("ansible.builtin.copy", { dest: "/etc/timezone", content: `${v}\n`, mode: "0644" }, "a"), link] : [link];
+      }
+      if (family !== "debian" && name === "keyboard") {
+        problems.push(`${id}: the keyboard layout is not carried for the family ${family}: it keeps a console keymap, which is not the same fact as the layout of /etc/default/keyboard`);
+        return undefined;
+      }
+      if (family !== "debian" && name === "locale") return [task("ansible.builtin.lineinfile", { path: "/etc/locale.conf", regexp: "^LANG=", line: `LANG=${v}`, create: true }, "a")];
       if (name === "keyboard") return [task("ansible.builtin.lineinfile", { path: "/etc/default/keyboard", regexp: "^XKBLAYOUT=", line: `XKBLAYOUT="${v}"`, create: true }, "a")];
       return v === "C.UTF-8"
         ? [task("ansible.builtin.lineinfile", { path: "/etc/default/locale", regexp: "^LANG=", line: `LANG=${v}`, create: true }, "a")]
@@ -181,7 +203,8 @@ function changing(plan: Plan): ReadonlySet<RequirementId> {
 export function ansible(options: AnsibleOptions = {}): Dialect {
   const root = options.renderRoot ?? ".archon";
   const version = options.version ?? PINNED_VERSION;
-  const carried = KINDS_CARRIED.map((k) => must(parseKindId(k)) as ResourceKindId);
+  const family: Family = options.family ?? "debian";
+  const carried = kindsCarriedFor(family).map((k) => must(parseKindId(k)) as ResourceKindId);
   return {
     id: must(parseDialectId(DIALECT_ID)),
     tool: { name: "ansible-core", version },
@@ -195,7 +218,7 @@ export function ansible(options: AnsibleOptions = {}): Dialect {
         if (!todo.has(r.id)) return;
         const found = findSecretLike(r.desired);
         if (found.length > 0) problems.push(`${r.id}: desired holds what looks like a secret (${found.map((f) => f.path).join(", ")}); a secret is a reference, never a value`);
-        const t = taskOf(r, i, problems);
+        const t = taskOf(r, i, problems, family);
         if (t === undefined) return;
         for (const one of Array.isArray(t) ? t : [t]) {
           tasks.push(one as Obj);
@@ -223,7 +246,7 @@ export function ansible(options: AnsibleOptions = {}): Dialect {
       const playbook = rendered.files.get("ansible/playbook.yml");
       if (playbook === undefined) return [];
       const todo = changing(plan);
-      const covers = plan.entries.filter((e) => todo.has(e.id) && (KINDS_CARRIED as readonly string[]).includes(String(e.kind))).map((e) => e.id);
+      const covers = plan.entries.filter((e) => todo.has(e.id) && kindsCarriedFor(family).includes(String(e.kind))).map((e) => e.id);
       if (covers.length === 0) return [];
       const dir = `${root}/${rendered.digest}/ansible`;
       const run = (extra: readonly string[]): readonly string[] => ["env", `ANSIBLE_CONFIG=${dir}/ansible.cfg`, "ansible-playbook", "-i", `${dir}/inventory.yml`, `${dir}/playbook.yml`, ...extra];

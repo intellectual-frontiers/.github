@@ -315,30 +315,50 @@ proves(
   },
 );
 
-proves([`${SPEC} FR-025`], "the acceptance kits of a library are not libraries: no list of the libraries, no spec kit of the documentation and no specification of the library or the repository names one", () => {
-  const folders = ["acceptance", "oat", "uat", "aat"] as const;
-  const commons = path.join(ROOT, "commons");
-  const libraries = readdirSync(commons).filter((d) => existsSync(path.join(commons, d, "library.ts")));
-  const kits = libraries.flatMap((l) => folders.filter((f) => existsSync(path.join(commons, l, f, "spec-kit", "registry.tsv"))).map((f) => `commons/${l}/${f}/spec-kit`));
-  assert(kits.length >= 1, "this repository has an acceptance kit to prove it with");
-  const docs = read(path.join(commons, "docs.config.ts"));
-  for (const k of kits) {
-    assert(!libraries.includes(k.split("/").slice(1).join("/")), `${k} is not a library`);
-    assert(!docs.includes(k), `${k} is not a spec kit of the documentation`);
-    const where = path.join(ROOT, k, "..", "..");
-    assert(existsSync(path.join(where, "library.ts")) && !existsSync(path.join(ROOT, k, "..", "library.ts")), "the folder belongs to its library, and holds no manifest of its own");
-    // no specification of the repository or of the library names one of the kit's, or the kit
-    const ids = read(path.join(ROOT, k, "registry.tsv")).split("\n").slice(1).filter((l) => l.trim() !== "").map((l) => l.split("\t").slice(0, 2).join("-"));
-    const library = path.join(where);
-    const specs = [path.join(commons, "spec-kit", "specs"), path.join(library, "spec-kit", "specs")];
-    const walk = (d: string): string[] => readdirSync(d, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(path.join(d, e.name)) : e.name.endsWith(".md") ? [path.join(d, e.name)] : []));
-    for (const f of specs.flatMap(walk)) {
-      const text = read(f);
-      for (const id of ids) assert(!text.includes(id), `${f} names ${id}`);
-      assert(!text.includes(k.replace(/\/spec-kit$/, "")), `${f} names the kit`);
+proves(
+  [`${SPEC} FR-025`],
+  "the acceptance kits of a library are not libraries: no list of the libraries, no spec kit of the documentation and no specification of the library or the repository names one",
+  () => {
+    const folders = ["acceptance", "oat", "uat", "aat"] as const;
+    const commons = path.join(ROOT, "commons");
+    const libraries = readdirSync(commons).filter((d) => existsSync(path.join(commons, d, "library.ts")));
+    const kits = libraries.flatMap((l) =>
+      folders.filter((f) => existsSync(path.join(commons, l, f, "spec-kit", "registry.tsv"))).map((f) => `commons/${l}/${f}/spec-kit`),
+    );
+    assert(kits.length >= 1, "this repository has an acceptance kit to prove it with");
+    const docs = read(path.join(commons, "docs.config.ts"));
+    for (const k of kits) {
+      assert(!libraries.includes(k.split("/").slice(1).join("/")), `${k} is not a library`);
+      assert(!docs.includes(k), `${k} is not a spec kit of the documentation`);
+      const where = path.join(ROOT, k, "..", "..");
+      assert(
+        existsSync(path.join(where, "library.ts")) && !existsSync(path.join(ROOT, k, "..", "library.ts")),
+        "the folder belongs to its library, and holds no manifest of its own",
+      );
+      // no specification of the repository or of the library names one of the kit's, or the kit
+      const ids = read(path.join(ROOT, k, "registry.tsv"))
+        .split("\n")
+        .slice(1)
+        .filter((l) => l.trim() !== "")
+        .map((l) => l.split("\t").slice(0, 2).join("-"));
+      const library = path.join(where);
+      const specs = [path.join(commons, "spec-kit", "specs"), path.join(library, "spec-kit", "specs")];
+      const walk = (d: string): string[] =>
+        readdirSync(d, { withFileTypes: true }).flatMap((e) =>
+          e.isDirectory() ? walk(path.join(d, e.name)) : e.name.endsWith(".md") ? [path.join(d, e.name)] : [],
+        );
+      for (const f of specs.flatMap(walk)) {
+        const text = read(f);
+        for (const id of ids) assert(!text.includes(id), `${f} names ${id}`);
+        assert(!text.includes(k.replace(/\/spec-kit$/, "")), `${f} names the kit`);
+      }
     }
-  }
-  using c = copyOf();
-  const synth = libraryFindings(c.repo);
-  assertEquals(synth.filter((f) => /acceptance|\/uat|\/oat|\/aat/.test(f)), [], "the check of the libraries has nothing to say of the kits");
-});
+    using c = copyOf();
+    const synth = libraryFindings(c.repo);
+    assertEquals(
+      synth.filter((f) => /acceptance|\/uat|\/oat|\/aat/.test(f)),
+      [],
+      "the check of the libraries has nothing to say of the kits",
+    );
+  },
+);

@@ -18,7 +18,7 @@ import { containerExecutor, type Runtime } from "@intellectual-frontiers/headles
 import { listen } from "@intellectual-frontiers/net/tcp";
 import { fs, path, proc } from "@intellectual-frontiers/system";
 import { containerfile } from "@intellectual-frontiers/lab/logical";
-import type { MachineSpec } from "@intellectual-frontiers/lab/governance";
+import { imageFamily, type MachineSpec } from "@intellectual-frontiers/lab/governance";
 
 export type { Runtime };
 
@@ -83,7 +83,10 @@ async function bringUp(spec: MachineSpec, runtime: Runtime, dir: string, contain
     if (!exists.success) {
       const empty = path.join(dir, "context");
       await fs.mkdir(empty, { recursive: true });
-      const built = await proc.run([runtime, "build", "--network=host", "-t", tag, "-f", "-", empty], { input: text });
+      // On a network that inspects TLS the builder may be given the certificate to trust for the install: a build secret, in no layer of the image (LAB_CA_BUNDLE names the file).
+      const caFile = process.env["LAB_CA_BUNDLE"];
+      const secret = caFile !== undefined && caFile !== "" && (await fs.stat(caFile).then(() => true, () => false)) ? ["--secret", `id=ca,src=${caFile}`] : [];
+      const built = await proc.run([runtime, "build", "--network=host", ...secret, "-t", tag, "-f", "-", empty], { input: text });
       if (!built.success) return err(`the image of ${spec.name} was not built: ${built.stderr.trim().split("\n").slice(-3).join(" | ")}`);
     }
     const key = path.join(dir, "id_ed25519");
@@ -110,7 +113,7 @@ async function bringUp(spec: MachineSpec, runtime: Runtime, dir: string, contain
     }
     const port = await freePort();
     const conf = [`Port ${port}`, "ListenAddress 127.0.0.1", "PasswordAuthentication no", "KbdInteractiveAuthentication no", "PermitRootLogin no", ""].join("\n");
-    const wrote = await executor.exec(["sh", "-c", "cat > /etc/ssh/sshd_config.d/10-lab.conf && systemctl restart ssh"], { input: conf });
+    const wrote = await executor.exec(["sh", "-c", `cat > /etc/ssh/sshd_config.d/10-lab.conf && systemctl restart ${imageFamily(spec.image) === "rhel" ? "sshd" : "ssh"}`], { input: conf });
     if (!wrote.success) return err(`sshd was not set up: ${new TextDecoder().decode(wrote.stderr).trim()}`);
     let scanned = "";
     for (let i = 0; i < 40 && scanned === ""; i++) {

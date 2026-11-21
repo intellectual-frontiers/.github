@@ -1,4 +1,4 @@
-# What each corpus file reads (commons data 0069-sql-dialects FR-008): statements, statements read with no error, errors of the lexer.
+# What each corpus file reads (lang-sql 0005-sql-dialects FR-008): statements, statements read with no error, errors of the lexer.
 # The numbers only improve: a file that reads less, or whose lexer finds more errors, fails the test. `bun tools/conformance-lang.ts --write` writes this file.
 path	statements	ok	lexErrors
 calcite/ansi/quidem_iq.sql	311	275	27
