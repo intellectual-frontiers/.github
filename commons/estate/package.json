@@ -10,7 +10,8 @@
   "exports": {
     ".": "./src/mod.ts",
     "./governance": "./src/governance/mod.ts",
-    "./logical": "./src/logical/mod.ts"
+    "./logical": "./src/logical/mod.ts",
+    "./physical": "./src/physical/mod.ts"
   },
   "scripts": {
     "check": "tsc -p tsconfig.json",
@@ -20,6 +21,8 @@
     "pack": "bun tools/pack.ts"
   },
   "devDependencies": {
+    "@intellectual-frontiers/anyfs": "link:../anyfs",
+    "@intellectual-frontiers/anyfs-bridge": "link:../anyfs-bridge",
     "@intellectual-frontiers/core": "link:../core",
     "@intellectual-frontiers/grc": "link:../grc",
     "@intellectual-frontiers/kanon": "link:../kanon",

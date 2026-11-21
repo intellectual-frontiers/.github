@@ -12,3 +12,4 @@ export * from "./entity.ts";
 export * from "./runner.ts";
 export * from "./signer.ts";
 export * from "./store.ts";
+export * from "./catalog.ts";

@@ -14,13 +14,13 @@ export const library = {
   distribution: ["github"],
   held: "built and verified but not released: the owner publishes the libraries of the fleet work together, when the first fleet runs on them",
   exports: [".", "./governance", "./logical", "./physical"],
-  summary: "The probe a machine runs for its fleet: the three read-only requests it answers (facts, version, one osquery SELECT), the key line that restricts a key to them, the facts as a typed observation, and the policy pack that judges an observation with its Secure Controls Framework controls.",
+  summary: "The probe a machine runs for its fleet: the three read-only requests it answers (facts, version, one osquery SELECT), the key line that restricts a key to them, the facts as a typed observation, and the policy pack that judges an observation with the NIST SP 800-53 controls each gives evidence for.",
   kanon: {
     package: "@intellectual-frontiers/machine-probe",
     units: [
-      { folder: "src/governance/", layer: "governance", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }] },
+      { folder: "src/governance/", layer: "governance", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/lang-sql", subpaths: ["aide/guard", "dialects/sqlite"] }] },
       { folder: "src/logical/", layer: "logical", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/estate", subpaths: ["logical"] }, { name: "@intellectual-frontiers/grc", subpaths: ["governance", "logical"] }] },
-      { folder: "src/physical/", layer: "physical", mayImport: ["src/governance/", "src/logical/"], packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/headless", subpaths: ["logical", "ssh-inbound"] }, { name: "@intellectual-frontiers/system", subpaths: "any" }] },
+      { folder: "src/physical/", layer: "physical", mayImport: ["src/governance/", "src/logical/"], packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/headless", subpaths: ["logical", "ssh-inbound", "targets/ssh"] }, { name: "@intellectual-frontiers/machine-probe", subpaths: ["governance", "logical"] }, { name: "@intellectual-frontiers/system", subpaths: "any" }, { name: "node:fs/promises", subpaths: [] }, { name: "node:os", subpaths: [] }] },
       { folder: "src/", own: true },
       { folder: "suite/", own: true },
       { folder: "tools/", own: true },

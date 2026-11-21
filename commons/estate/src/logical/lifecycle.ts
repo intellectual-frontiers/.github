@@ -1,6 +1,6 @@
 // Spec: 0003-estate-logical FR-001, FR-002
 /**
- * The life of an asset: a move between states (a discovered asset is adopted, and an adopted asset is released back; a managed asset is installed and retired, never moved), and the move of one capability from one system to another, which is made only when
+ * The life of an asset: a move between states (a discovered asset is adopted, an adopted asset is released back or taken over with an approval; a managed asset is never moved, it is retired), and the move of one capability from one system to another, which is made only when
  * the acceptance test of that capability on that asset has passed. A move down a state gives up the capabilities the lower state does not offer; a move up needs an owner for each new one.
  *
  * @example
@@ -21,17 +21,21 @@ function ownersOf(asset: Asset): Partial<Record<Capability, string>> {
   return owners;
 }
 
+/** The approval to take an adopted asset over: the person, and the hash of the plan they approved. */
+export type Approval = { readonly by: string; readonly planHash: string };
+
 /** The asset in another state: the owners it had are kept for what the new state still offers (what it does not offer is given up), and `owners` names the owners of what is new; refused where the move is not allowed or an owner is missing. */
-export function moveState(asset: Asset, to: AssetState, owners: Readonly<Partial<Record<Capability, string>>> = {}): Result<Asset, readonly string[]> {
+export function moveState(asset: Asset, to: AssetState, owners: Readonly<Partial<Record<Capability, string>>> = {}, approval?: Approval): Result<Asset, readonly string[]> {
   if (asset.state === to) return err([`${asset.id} is already ${to}`]);
-  if (!mayMove(asset.state, to)) return err([`${asset.id} cannot move from ${asset.state} to ${to}: a discovered asset is adopted and an adopted asset is released, and a managed asset is installed and retired, never moved`]);
+  if (!mayMove(asset.state, to)) return err([`${asset.id} cannot move from ${asset.state} to ${to}: a discovered asset is adopted, an adopted asset is released or managed, and a managed asset is never moved (it is retired)`]);
+  if (to === "managed" && (approval === undefined || approval.by.trim() === "" || !/^sha256:[0-9a-f]{64}$/.test(approval.planHash))) return err([`${asset.id}: an adopted asset is taken over only with an approval: the person who approved and the hash of the plan they approved`]);
   const kept = ownersOf(asset);
   const next: Partial<Record<Capability, string>> = {};
   for (const capability of OFFERED[to]) {
     const given = owners[capability] ?? kept[capability];
     if (given !== undefined) next[capability] = given;
   }
-  return defineAsset({ id: asset.id, kind: asset.kind, state: to, ...(asset.joined === undefined || asset.joined === "managed" ? {} : { joined: asset.joined }), owners: next });
+  return defineAsset({ id: asset.id, kind: asset.kind, state: to, ...(asset.origin === undefined ? {} : { origin: asset.origin }), owners: next });
 }
 
 /** A test of a capability of an asset that passed, by the system that is to own it. */
@@ -49,6 +53,6 @@ export function moveCapability(asset: Asset, capability: Capability, to: string,
     return err([`${asset.id}: the acceptance record is for ${acceptance.asset} ${acceptance.capability} by ${acceptance.system}, not for ${asset.id} ${capability} by ${system.value}`]);
   }
   const owners = { ...ownersOf(asset), [capability]: system.value };
-  return defineAsset({ id: asset.id, kind: asset.kind, state: asset.state, ...(asset.joined === undefined ? {} : { joined: asset.joined }), owners });
+  return defineAsset({ id: asset.id, kind: asset.kind, state: asset.state, ...(asset.origin === undefined ? {} : { origin: asset.origin }), owners });
 }
 

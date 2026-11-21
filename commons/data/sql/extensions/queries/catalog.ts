@@ -6,6 +6,11 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
+import type { Dialect as LangDialect } from "@intellectual-frontiers/lang-sql";
+import { refusal } from "@intellectual-frontiers/lang-sql/aide/guard";
+import { dialect as langDuckdb } from "@intellectual-frontiers/lang-sql/dialects/duckdb";
+import { dialect as langPostgres } from "@intellectual-frontiers/lang-sql/dialects/postgres";
+import { dialect as langSqlite } from "@intellectual-frontiers/lang-sql/dialects/sqlite";
 import type { LogicalSchema } from "@intellectual-frontiers/data/sql/logical";
 import { type Dialect, type Naming, naming as defaultNaming, type RefError, type Refs, refsOf } from "@intellectual-frontiers/data/sql/physical";
 
@@ -68,7 +73,6 @@ export interface CatalogOptions {
 }
 
 const MARK = "\u0001";
-const FORBIDDEN = ["INSERT", "UPDATE", "DELETE", "DROP", "CREATE", "ALTER", "TRUNCATE", "GRANT", "ATTACH", "COPY", "PRAGMA", "INTO", "MERGE", "CALL", "INSTALL", "EXPORT", "VACUUM", "REINDEX"];
 
 /**
  * The code of a query: what is left when its string literals, quoted names, dollar-quoted strings and comments are left out, found by reading it once from the start so that a comment marker inside a
@@ -124,13 +128,15 @@ export function code(sql: string): string {
   return out;
 }
 
-/** Why a query is not read-only, or nothing. */
-export function readOnly(sql: string): string | undefined {
-  const s = code(sql).replace(new RegExp(`${MARK}[^${MARK}]*${MARK}`, "g"), "?").trim();
-  if (!/^(SELECT|WITH)\b/i.test(s)) return "it is not a SELECT or WITH";
-  if (s.includes(";")) return "it holds more than one statement";
-  const word = FORBIDDEN.find((w) => new RegExp(`\\b${w}\\b`, "i").test(s));
-  return word === undefined ? undefined : `it holds ${word}`;
+const LANGUAGES: Readonly<Record<string, LangDialect>> = { postgres: langPostgres, sqlite: langSqlite, duckdb: langDuckdb };
+
+/**
+ * Why a query is not read-only, or nothing: the guard of the SQL language library reads it with the parser of the dialect (0024-sql-queries FR-003), so that a word of a write in a string, a quoted name or a comment is not a write, and the
+ * places of its parameters are read as `NULL`.
+ */
+export function readOnly(sql: string, dialect = "postgres"): string | undefined {
+  const text = sql.replace(new RegExp(`${MARK}[^${MARK}]*${MARK}`, "g"), "NULL").trim();
+  return refusal(text, LANGUAGES[dialect] ?? langPostgres);
 }
 
 const specOf = (p: ParamType | ParamSpec): ParamSpec => (typeof p === "string" ? { type: p } : p);
@@ -162,7 +168,7 @@ export function queries(schema: LogicalSchema, specs: readonly QuerySpec[], opti
       .trim()
       .replace(/;+\s*$/, "");
     errors.push(...kit.errors());
-    const why = readOnly(text);
+    const why = readOnly(text, dialect.name);
     if (why !== undefined) errors.push({ kind: "not-read-only", query: s.name, why });
     const render = (values: Readonly<Record<string, unknown>> = {}): Result<string, readonly ParamError[]> => {
       const problems: ParamError[] = [];
