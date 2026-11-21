@@ -20,7 +20,7 @@ export const library = {
     units: [
       { folder: "src/governance/", layer: "governance", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }] },
       { folder: "src/logical/", layer: "logical", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/crypto", subpaths: ["sha256"] }, { name: "@intellectual-frontiers/estate", subpaths: ["governance"] }, { name: "@intellectual-frontiers/grc", subpaths: ["governance", "logical"] }] },
-      { folder: "src/physical/", layer: "physical", mayImport: ["src/governance/", "src/logical/"], packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/estate", subpaths: ["governance"] }, { name: "@intellectual-frontiers/grc", subpaths: ["governance", "logical", "stores/gitref"] }, { name: "@intellectual-frontiers/headless", subpaths: ["logical"] }, { name: "@intellectual-frontiers/system", subpaths: "any" }] },
+      { folder: "src/physical/", layer: "physical", mayImport: ["src/governance/", "src/logical/"], packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/estate", subpaths: ["governance"] }, { name: "@intellectual-frontiers/crypto", subpaths: ["sha256"] }, { name: "@intellectual-frontiers/grc", subpaths: ["governance", "logical", "physical", "stores/gitref", "signers/sshsig"] }, { name: "@intellectual-frontiers/headless", subpaths: ["logical"] }, { name: "@intellectual-frontiers/system", subpaths: "any" }] },
       { folder: "src/", own: true },
       { folder: "suite/", own: true },
       { folder: "tools/", own: true },

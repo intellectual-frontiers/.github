@@ -15,3 +15,9 @@ requirement	mechanism	by	note
 0003-evidence-capture-collect FR-005	check	.github: cd commons/evidence-capture && bun run verify	suite/collect.test.ts
 0003-evidence-capture-collect FR-006	check	.github: cd commons/evidence-capture && bun run verify	suite/collect.test.ts
 0003-evidence-capture-collect FR-007	check	.github: cd commons/evidence-capture && bun run verify	suite/collect.test.ts
+0004-evidence-capture-seal FR-001	check	.github: cd commons/evidence-capture && bun run verify	suite/seal.test.ts
+0004-evidence-capture-seal FR-002	check	.github: cd commons/evidence-capture && bun run verify	suite/seal.test.ts
+0004-evidence-capture-seal FR-003	check	.github: cd commons/evidence-capture && bun run verify	suite/seal.test.ts
+0004-evidence-capture-seal FR-004	check	.github: cd commons/evidence-capture && bun run verify	suite/seal.test.ts
+0004-evidence-capture-seal FR-005	check	.github: cd commons/evidence-capture && bun run verify	suite/seal.test.ts
+0004-evidence-capture-seal FR-006	check	.github: cd commons/evidence-capture && bun run verify	suite/seal.test.ts

@@ -4,4 +4,5 @@
  *
  * @module
  */
+export * from "./bundle.ts";
 export * from "./collect.ts";
