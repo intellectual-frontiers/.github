@@ -29,7 +29,7 @@ export type Column = { readonly table: TableRole; readonly column: string; reado
 
 /** The columns of every table and view, in order: the documented layout. A catalog reads these and no other. */
 export const LAYOUT: readonly Column[] = [
-  { table: "versions", column: "id", kind: "text", since: 3, means: "the id of the version: a UUID of version 7 made by the hybrid clock of the replica, so that ids sort in the order they were made; with `sum` it is the primary key" },
+  { table: "versions", column: "id", kind: "text", since: 3, means: "the id of the version: a UUID of version 7 made by the hybrid clock, with 62 random bits for each id and holding no replica (the replica is its column), so that ids sort in the order they were made; with `sum` it is the primary key" },
   { table: "versions", column: "sum", kind: "text", since: 3, means: "the SHA-256 of every other field of the row, so that a row is its own checksum" },
   { table: "versions", column: "replica", kind: "text", since: 3, means: "the replica that made the row: 32 lower case hexadecimal digits" },
   { table: "versions", column: "seq", kind: "integer", since: 3, means: "the number of the row among the rows of its replica, from 1 with none missing" },

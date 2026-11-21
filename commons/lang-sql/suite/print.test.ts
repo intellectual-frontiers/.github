@@ -136,3 +136,29 @@ proves(["0009-sql-print FR-005"], "a number followed by a unit is one number sca
   const s = first("SELECT 10 KB", units);
   assert(s.kind === "select" && s.items[0]?.expr.kind === "number" && s.items[0].expr.text === "10240" && s.items[0].expr.end - s.items[0].expr.start === 5);
 });
+
+proves(["0009-sql-print FR-006", "0002-sql-ast-parser FR-019"], "FETCH FIRST with PERCENT or WITH TIES is read into the limit and its options, written with the offset first, read back as the same tree, and a FETCH FIRST n ROWS ONLY is still a LIMIT", () => {
+  for (const d of [ansi, postgres]) {
+    assertEquals(roundTrip("select a from t order by a offset 2 rows fetch first 10 percent rows with ties", d), "SELECT a FROM t ORDER BY a OFFSET 2 ROWS FETCH FIRST 10 PERCENT ROWS WITH TIES");
+    assertEquals(roundTrip("select a from t order by a fetch next 3 rows with ties", d), "SELECT a FROM t ORDER BY a FETCH FIRST 3 ROWS WITH TIES");
+    assertEquals(roundTrip("select a from t order by a fetch first 5 percent row only", d), "SELECT a FROM t ORDER BY a FETCH FIRST 5 PERCENT ROWS ONLY");
+    assertEquals(roundTrip("select a from t order by a fetch first 3 rows only", d), "SELECT a FROM t ORDER BY a LIMIT 3");
+    assertEquals(roundTrip("select a from t order by a offset 1 row fetch first row only", d), "SELECT a FROM t ORDER BY a LIMIT 1 OFFSET 1");
+    assertEquals(roundTrip("select a from t union all select a from u order by a fetch first 3 rows with ties", d), "SELECT a FROM t UNION ALL SELECT a FROM u ORDER BY a FETCH FIRST 3 ROWS WITH TIES");
+  }
+  const s = first("select a from t order by a fetch first 10 percent rows with ties", ansi);
+  assert(s.kind === "select" && s.limitOptions === "PERCENT WITH TIES" && s.limit?.kind === "number", "the options are kept");
+  const plain = first("select a from t fetch first 3 rows only", ansi);
+  assert(plain.kind === "select" && plain.limitOptions === undefined, "a plain FETCH has no options");
+  assertEquals(parse("select a from t fetch first 3 rows", ansi).errors.length > 0, true);
+});
+
+proves(["0002-sql-ast-parser FR-020", "0009-sql-print FR-001"], "TABLESAMPLE after a table with no alias is read as what stands beside the table, not as its alias, and is written back", () => {
+  const t = first("select * from t tablesample bernoulli (10) repeatable (1)", postgres);
+  assert(t.kind === "select" && t.from[0]?.kind === "table" && t.from[0].alias === undefined && t.from[0].hint === "tablesample bernoulli (10) repeatable (1)", "no alias");
+  const a = first("select * from t as x tablesample system (10)", postgres);
+  assert(a.kind === "select" && a.from[0]?.kind === "table" && a.from[0].alias?.name.name === "x" && a.from[0].hint?.toLowerCase() === "tablesample system (10)", "an alias before");
+  assertEquals(roundTrip("select * from t tablesample bernoulli (10) repeatable (1)", postgres).toLowerCase(), "select * from t tablesample bernoulli (10) repeatable (1)");
+  const alias = first("select * from t tablesample", postgres);
+  assert(alias.kind === "select", "a table named tablesample is still an alias where nothing follows it");
+});

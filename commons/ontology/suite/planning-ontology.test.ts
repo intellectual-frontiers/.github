@@ -1,5 +1,5 @@
 /**
- * The Planning ontology (commons ontology 0003-planning-terms): its namespace, its classes, the twelve closed code lists, the names that other standards give (as names, never as IRIs), the audit of
+ * The Planning ontology (commons ontology 0003-planning-terms): its namespace, its classes, the thirteen closed code lists, the names that other standards give (as names, never as IRIs), the audit of
  * every class and the ontology's boundaries. Pure functions over the typed ontology; nothing runs and no network is used.
  *
  * @module
@@ -23,6 +23,7 @@ import {
   origins,
   plan,
   planningOntology,
+  principalBases,
   properties,
   severities,
   states,
@@ -37,45 +38,75 @@ proves(["0003-planning-terms FR-001"], "the ontology has its namespace, the vers
   assertEquals(plan.Item.iri, "https://www.intellectualfrontiers.com/ontology/planning#Item");
   assertEquals(planningOntology.values.versionInfo, "1.0.0");
   const d = planningOntology.values.description?.value ?? "";
-  for (const s of ["seven kinds", "events", "observations", "patches"]) assert(d.includes(s), `the description says ${s}`);
+  for (const s of ["four kinds", "events", "observations", "patches"]) assert(d.includes(s), `the description says ${s}`);
 });
 
-proves(["0003-planning-terms FR-002"], "the ten classes of the model and the twelve of the code lists are there, each with a definition", () => {
+proves(["0003-planning-terms FR-002"], "the ten classes of the model and the thirteen of the code lists are there, each with a definition", () => {
   const names = new Set(classes.map((c) => c.iri));
   for (const n of ["Item", "Event", "Actor", "Observation", "Locator", "Trace", "Link", "Patch", "Preview", "Source"] as const) assert(names.has(plan[n].iri), `the class ${n}`);
-  for (const n of ["ItemKind", "State", "CloseReason", "Severity", "Verdict", "LinkKind", "Capability", "FieldAuthority", "Origin", "ActorKind", "LocatorKind", "EventType"] as const) assert(names.has(plan[n].iri), `the class ${n}`);
-  assertEquals(classes.length, 22);
+  for (const n of ["ItemKind", "State", "CloseReason", "Severity", "Verdict", "LinkKind", "Capability", "FieldAuthority", "Origin", "ActorKind", "LocatorKind", "EventType", "PrincipalBasis"] as const) assert(names.has(plan[n].iri), `the class ${n}`);
+  assertEquals(classes.length, 23);
+  const props = new Set(properties.map((p) => p.iri));
+  for (const n of ["principalBasis", "externalSource", "externalValue", "deferredUntil", "itemMotivation", "itemBlocker", "itemTarget", "itemSource", "itemPriority", "itemSize", "itemGoals", "itemEngines", "itemCites", "itemEvidence", "sourceSeverity"] as const)
+    assert(props.has(plan[n].iri), `the property ${n}`);
   for (const c of classes) assert((c.values.definition?.value ?? "").length > 20, `${c.iri} has a definition`);
 });
 
-proves(["0003-planning-terms FR-003"], "the twelve code lists have the members the specification counts", () => {
-  assertEquals(keys(itemKinds), ["Issue", "Task", "Todo", "RoadmapItem", "Question", "Decision", "Finding"]);
-  assertEquals(keys(states), ["Proposed", "Open", "InProgress", "Closed"]);
+proves(["0003-planning-terms FR-003"], "the thirteen code lists have the members the specification counts", () => {
+  assertEquals(keys(itemKinds), ["Issue", "Task", "Todo", "Finding"]);
+  assertEquals(keys(states), ["Proposed", "Open", "InProgress", "Deferred", "Closed"]);
   assertEquals(keys(closeReasons), ["Completed", "NotPlanned", "Duplicate"]);
   assertEquals(keys(severities), ["Error", "Warning", "Note"]);
   assertEquals(keys(verdicts), ["Accept", "MinorRevision", "MajorRevision", "Reject"]);
-  assertEquals(keys(linkKinds).length, 5);
+  assertEquals(keys(linkKinds), ["Blocks", "SameAs", "RelatesTo", "ParentOf"]);
   assertEquals(keys(capabilities).length, 7);
   assertEquals(keys(fieldAuthorities), ["SourceWins", "StoreWins", "LatestWins", "PersonOnly"]);
   assertEquals(keys(origins), ["Declared", "Derived", "Inferred"]);
   assertEquals(keys(actorKinds), ["ByPerson", "ByAgent", "ByTool"]);
-  assertEquals(keys(locatorKinds), ["FileSpan", "Url", "Row", "Commit"]);
-  assertEquals(keys(eventTypes).length, 14);
-  for (const list of [itemKinds, states, closeReasons, severities, verdicts, linkKinds, capabilities, fieldAuthorities, origins, actorKinds, locatorKinds, eventTypes])
+  assertEquals(keys(locatorKinds), ["FileSpan", "Url", "Commit"]);
+  assertEquals(keys(eventTypes), [
+    "OpenedEvent",
+    "CommentedEvent",
+    "EditedEvent",
+    "LabeledEvent",
+    "AssignedEvent",
+    "SeveritySetEvent",
+    "BlockerSetEvent",
+    "StartedEvent",
+    "DeferredEvent",
+    "ClosedEvent",
+    "ReopenedEvent",
+    "DecidedEvent",
+    "LinkedEvent",
+    "ConfirmedEvent",
+  ]);
+  assertEquals(keys(principalBases), ["Session", "Argument", "Configuration", "CommitAuthor"]);
+  for (const list of [itemKinds, states, closeReasons, severities, verdicts, linkKinds, capabilities, fieldAuthorities, origins, actorKinds, locatorKinds, eventTypes, principalBases])
     for (const m of Object.values(list)) assert((m.values.definition?.value ?? "").length > 5, `${m.iri} has a definition`);
 });
 
-proves(["0003-planning-terms FR-004"], "a name from another standard is a name in a property that says whose it is, with (to verify), and no IRI of such a standard is written", () => {
+proves(["0003-planning-terms FR-004"], "a name from another standard is a name in a property that says whose it is, read in the standard's text and cited by section, and no IRI is written but one that was read", () => {
   assertEquals(severities.Error.values.sarifLevel, "error");
+  assertEquals(severities.Warning.values.sarifLevel, "warning");
+  assertEquals(severities.Note.values.sarifLevel, "note");
   assertEquals(states.Open.values.icalStatus, "NEEDS-ACTION");
-  assertEquals(itemKinds.Question.values.webAnnotationMotivation, "questioning");
+  assertEquals(states.InProgress.values.icalStatus, "IN-PROCESS");
+  assertEquals(itemKinds.Finding.values.webAnnotationMotivation, "assessing");
+  assertEquals(closeReasons.Completed.values.githubStateReason, "completed");
   assertEquals(closeReasons.NotPlanned.values.githubStateReason, "not_planned");
+  assertEquals(closeReasons.Duplicate.values.githubStateReason, "duplicate");
   for (const p of ["sarifLevel", "icalStatus", "webAnnotationMotivation", "githubStateReason"] as const) {
     const prop = properties.find((x) => x.iri === plan[p].iri);
-    assert(prop !== undefined && (prop.values.definition?.value ?? "").includes("(to verify"), `${p} says (to verify)`);
+    const d = prop?.values.definition?.value ?? "";
+    assert(prop !== undefined && !d.includes("to verify") && /section|REST API/.test(d), `${p} cites its section and no longer says to verify`);
   }
   const text = readDirSync(SRC).map((e) => readTextFileSync(join(SRC, e.name))).join("\n");
-  for (const host of ["oasis-open.org", "www.w3.org/ns/oa", "rfc-editor.org", "datatracker.ietf.org", "github.github.com", "open-services.net"]) assert(!text.includes(host), `no IRI at ${host}`);
+  assert(!text.includes("(to verify"), "no name is left to verify");
+  for (const host of ["oasis-open.org", "rfc-editor.org", "datatracker.ietf.org", "github.github.com", "open-services.net"]) assert(!text.includes(host), `no IRI at ${host}`);
+  for (const m of text.matchAll(/https?:\/\/[^\s"'`)>,]+/g)) {
+    const iri = m[0];
+    assert(iri.startsWith("https://www.intellectualfrontiers.com/ontology/") || iri.startsWith("http://www.w3.org/"), `${iri} is an IRI of this ontology or one that was read`);
+  }
 });
 
 proves(["0003-planning-terms FR-005"], "every class has a record of its basis, specializing a PROV-O or SKOS term, and none is unaligned", () => {

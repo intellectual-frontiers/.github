@@ -1,6 +1,6 @@
 // Spec: 0003-planning-terms FR-001, FR-002, FR-003, FR-004, FR-005, FR-006
 /**
- * The vocabulary of Planning (commons 0037-planning): the planning content a person or a program keeps about work to be done (an issue, a task, a to-do, a roadmap item, a question, a decision, a finding),
+ * The vocabulary of Planning (commons 0037-planning): the planning content a person or a program keeps about work to be done (an issue, a task, a to-do, a finding),
  * the append-only events that make its history, the actors who wrote them, the observations of what a source saw and where (with a locator and a content hash), the trace that ties an item to every place
  * it was seen, the patch that writes a change back, the preview of that patch, the source that reads and writes one place, and the closed code lists the model branches on.
  *
@@ -8,8 +8,9 @@
  * It stands on PROV-O and SKOS, whose terms the library `rdf` and the Kanon ontology already hold: an item, an observation, a locator, a link, a patch and a preview are `prov:Entity`, an event is a
  * `prov:Activity`, an actor a `prov:Agent`, a source a `prov:SoftwareAgent`, a trace a `prov:Derivation`, and every code list is a SKOS concept. Where another standard names a value (the SARIF `level`
  * of a severity, the iCalendar `STATUS` of a state, the Web Annotation motivation of a kind, the GitHub reason a work item was closed) the value is data of the member as a plain name, in a property that
- * says whose it is, and never as an IRI: those documents were not read when this ontology was written (0037-planning, Standards considered), so each name is `(to verify)` and no IRI of them is invented,
- * as `kanon:mdaViewpoint` does.
+ * says whose it is, and each name was read in the standard's own text (0037-planning, Standards considered, with the version and the section); no IRI is written except where one was read: the Web Annotation
+ * motivations are `http://www.w3.org/ns/oa#<name>` (Web Annotation Vocabulary, Recommendation 23 February 2017, section 2.3), and a SARIF, iCalendar or GitHub name has no IRI in its text.
+ * An agent that authors an event names the person it acts for with `prov:actedOnBehalfOf` (PROV-O section 4.1), a term the library `rdf` already holds, so that no property of this ontology says it.
  *
  * @limits
  * The properties do not yet carry a basis of their own (the baseline holds them until the schemas require it). A time is a string of ISO 8601 in UTC to the second, as the datatype list of the kernel has no date-time.
@@ -76,6 +77,7 @@ export const plan = vocabulary(PLANNING, {
   ActorKind: "owl:Class",
   LocatorKind: "owl:Class",
   EventType: "owl:Class",
+  PrincipalBasis: "owl:Class",
   itemId: "owl:DatatypeProperty",
   itemKind: "owl:ObjectProperty",
   itemState: "owl:ObjectProperty",
@@ -113,6 +115,21 @@ export const plan = vocabulary(PLANNING, {
   icalStatus: "owl:DatatypeProperty",
   webAnnotationMotivation: "owl:DatatypeProperty",
   githubStateReason: "owl:DatatypeProperty",
+  principalBasis: "owl:ObjectProperty",
+  externalSource: "owl:DatatypeProperty",
+  externalValue: "owl:DatatypeProperty",
+  deferredUntil: "owl:DatatypeProperty",
+  itemMotivation: "owl:DatatypeProperty",
+  itemBlocker: "owl:DatatypeProperty",
+  itemTarget: "owl:DatatypeProperty",
+  itemSource: "owl:DatatypeProperty",
+  itemPriority: "owl:DatatypeProperty",
+  itemSize: "owl:DatatypeProperty",
+  itemGoals: "owl:DatatypeProperty",
+  itemEngines: "owl:DatatypeProperty",
+  itemCites: "owl:DatatypeProperty",
+  itemEvidence: "owl:DatatypeProperty",
+  sourceSeverity: "owl:DatatypeProperty",
 });
 
 // ---- the code lists
@@ -122,18 +139,11 @@ const CODE = { label: one(rdfs.label, range.langString), definition: one(skos.de
 /** The schema of a kind of item (`plan:ItemKind`): the Web Annotation motivation the kind is closest to, as a name, where one is. */
 export const ItemKindSchema = classSchema(plan.ItemKind, { ...CODE, webAnnotationMotivation: optional(plan.webAnnotationMotivation, range.string) });
 
-/** The seven kinds of item (0037-planning FR-001): the sum of the model, over one shared core. */
+/** The four kinds of item (0037-planning FR-001): the sum of the model, over one shared core. */
 export const itemKinds = codes(ItemKindSchema, PLANNING, {
   Issue: { label: en("Issue"), definition: en("A problem or a request that someone is to look at, with a title and a body.") },
   Task: { label: en("Task"), definition: en("A unit of work to be done, possibly with sub-items.") },
   Todo: { label: en("Todo"), definition: en("A note left in a place to do something there: a comment in a source file, a line of a list.") },
-  RoadmapItem: { label: en("Roadmap item"), definition: en("A planned outcome with an intended time horizon (now, next or later), not yet a task.") },
-  Question: {
-    label: en("Question"),
-    definition: en("Something that needs an answer before work can go on."),
-    webAnnotationMotivation: "questioning",
-  },
-  Decision: { label: en("Decision"), definition: en("A choice to be made or that was made, with its verdict and its reason.") },
   Finding: {
     label: en("Finding"),
     definition: en("What an audit, a scan or a review found, with a severity and where it was seen."),
@@ -144,12 +154,16 @@ export const itemKinds = codes(ItemKindSchema, PLANNING, {
 /** The schema of a state (`plan:State`): the iCalendar `STATUS` the state is closest to, as a name, where one is. */
 export const StateSchema = classSchema(plan.State, { ...CODE, icalStatus: optional(plan.icalStatus, range.string) });
 
-/** The four states of an item (0037-planning FR-004): a fold of its events, never stored. */
+/** The five states of an item (0037-planning FR-004): a fold of its events, never stored. */
 export const states = codes(StateSchema, PLANNING, {
   Proposed: { label: en("Proposed"), definition: en("Found or inferred by a program or an agent, not yet confirmed by a person; it is counted in no plan until it is.") },
   Open: { label: en("Open"), definition: en("Confirmed and not started."), icalStatus: "NEEDS-ACTION" },
   InProgress: { label: en("In progress"), definition: en("Being worked on."), icalStatus: "IN-PROCESS" },
-  Closed: { label: en("Closed"), definition: en("Finished or set aside, with a reason; it may be reopened.") },
+  Deferred: { label: en("Deferred"), definition: en("Set aside until a day, and not closed; a reopened event opens it again.") },
+  Closed: {
+    label: en("Closed"),
+    definition: en("Finished or set aside, with a reason; it may be reopened. The iCalendar status that a closed item is closest to is COMPLETED or CANCELLED, which the reason chooses and this ontology does not."),
+  },
 });
 
 /** The schema of a close reason (`plan:CloseReason`): the reason a Git host gives, as a name. */
@@ -186,7 +200,6 @@ export const linkKinds = codes(classSchema(plan.LinkKind, CODE), PLANNING, {
   SameAs: { label: en("Same as"), definition: en("The two items say one thing; a person confirms the link.") },
   RelatesTo: { label: en("Relates to"), definition: en("The two items are about the same matter, with no order between them.") },
   ParentOf: { label: en("Parent of"), definition: en("The first item contains the second as a sub-item.") },
-  DerivedFrom: { label: en("Derived from"), definition: en("The first item was made out of the second, as a finding makes a task.") },
 });
 
 /** The abilities of a source (0037-planning FR-014): what it can be asked to write. */
@@ -215,18 +228,17 @@ export const origins = codes(classSchema(plan.Origin, CODE), PLANNING, {
   Inferred: { label: en("Inferred"), definition: en("Guessed by a heuristic or an agent; it is proposed until a person confirms it.") },
 });
 
-/** The three kinds of actor, as in the events of the issues the first dataset holds. */
+/** The three kinds of actor, as in the events of the issue files of the first dataset. */
 export const actorKinds = codes(classSchema(plan.ActorKind, CODE), PLANNING, {
-  ByPerson: { label: en("Person"), definition: en("A human being, named by who they are and never by a program acting for them.") },
-  ByAgent: { label: en("Agent"), definition: en("An AI agent; an item or an event it wrote says so and is never signed as a person.") },
+  ByPerson: { label: en("Person"), definition: en("A human being, named by who they are and never by a program acting for them; the person an agent acts for, and the only kind that confirms a proposed item.") },
+  ByAgent: { label: en("Agent"), definition: en("An AI agent; an item or an event it wrote says so, names the person it acted for with prov:actedOnBehalfOf, and is never signed as a person.") },
   ByTool: { label: en("Tool"), definition: en("A program with no judgement of its own: a scanner, a linter, a synchronizer.") },
 });
 
-/** The kinds of locator, the ways a place is named (0037-planning FR-008). */
+/** The three kinds of locator, the ways a place is named (0037-planning FR-008). */
 export const locatorKinds = codes(classSchema(plan.LocatorKind, CODE), PLANNING, {
   FileSpan: { label: en("File span"), definition: en("A file of a store, with a line or a range and the symbol that encloses it where there is one.") },
   Url: { label: en("URL"), definition: en("A web address, as of an issue on a Git host.") },
-  Row: { label: en("Row"), definition: en("A row of a table, named by the table and its key.") },
   Commit: { label: en("Commit"), definition: en("A commit of a repository, named by its hash, as of a trailer.") },
 });
 
@@ -240,12 +252,23 @@ export const eventTypes = codes(classSchema(plan.EventType, CODE), PLANNING, {
   SeveritySetEvent: { label: en("Severity set"), definition: en("The severity changed.") },
   BlockerSetEvent: { label: en("Blocker set"), definition: en("The item was marked as blocking, or not.") },
   StartedEvent: { label: en("Started"), definition: en("Work began on the item.") },
+  DeferredEvent: { label: en("Deferred"), definition: en("The item was set aside until a day.") },
   ClosedEvent: { label: en("Closed"), definition: en("The item was closed, with a reason.") },
-  ReopenedEvent: { label: en("Reopened"), definition: en("A closed item was opened again.") },
+  ReopenedEvent: { label: en("Reopened"), definition: en("A closed or deferred item was opened again.") },
   DecidedEvent: { label: en("Decided"), definition: en("A verdict was given on the item, with a note.") },
   LinkedEvent: { label: en("Linked"), definition: en("A link to another item was added or taken away.") },
   ConfirmedEvent: { label: en("Confirmed"), definition: en("A person confirmed a proposed item.") },
-  SeenEvent: { label: en("Seen"), definition: en("A source saw the item again, or no longer saw it; it records the observation and no human change.") },
+});
+
+/** The schema of a basis of a principal: how the person an agent acts for was established. */
+export const PrincipalBasisSchema = classSchema(plan.PrincipalBasis, CODE);
+
+/** The ways the principal of an agent was established (0037-planning FR-045), stored with the actor. */
+export const principalBases = codes(PrincipalBasisSchema, PLANNING, {
+  Session: { label: en("Session"), definition: en("The person whose credentials or session launched the program, as the authenticated person of a tool server's session.") },
+  Argument: { label: en("Argument"), definition: en("The person named by an argument of the run.") },
+  Configuration: { label: en("Configuration"), definition: en("The person the configuration of a headless run names as its principal.") },
+  CommitAuthor: { label: en("Commit author"), definition: en("The author of a commit whose trailer names the agent, where the configuration names that rule.") },
 });
 
 // ---- the classes and the properties, each with its label and definition
@@ -255,7 +278,7 @@ export const classes = [
   OwlClass.make(plan.Item, {
     label: en("Item"),
     subClassOf: [prov.Entity],
-    definition: en("A piece of planning content of one of seven kinds, with a stable id and a history of events from which its state is folded."),
+    definition: en("A piece of planning content of one of four kinds, with a stable id and a history of events from which its state is folded."),
   }),
   OwlClass.make(plan.Event, {
     label: en("Event"),
@@ -302,8 +325,8 @@ export const classes = [
     subClassOf: [prov.SoftwareAgent],
     definition: en("A program that reads observations from one kind of place and writes patches back to it, with the capabilities it declares."),
   }),
-  OwlClass.make(plan.ItemKind, { label: en("Item kind"), subClassOf: [skos.Concept], definition: en("One of the seven kinds of item.") }),
-  OwlClass.make(plan.State, { label: en("State"), subClassOf: [skos.Concept], definition: en("One of the four states an item is in, as folded from its events.") }),
+  OwlClass.make(plan.ItemKind, { label: en("Item kind"), subClassOf: [skos.Concept], definition: en("One of the four kinds of item.") }),
+  OwlClass.make(plan.State, { label: en("State"), subClassOf: [skos.Concept], definition: en("One of the five states an item is in, as folded from its events.") }),
   OwlClass.make(plan.CloseReason, { label: en("Close reason"), subClassOf: [skos.Concept], definition: en("One of the reasons an item is closed.") }),
   OwlClass.make(plan.Severity, { label: en("Severity"), subClassOf: [skos.Concept], definition: en("One of the three severities of an item.") }),
   OwlClass.make(plan.Verdict, { label: en("Verdict"), subClassOf: [skos.Concept], definition: en("One of the four verdicts a decision gives.") }),
@@ -314,6 +337,7 @@ export const classes = [
   OwlClass.make(plan.ActorKind, { label: en("Actor kind"), subClassOf: [skos.Concept], definition: en("One of the kinds of actor: person, agent or tool.") }),
   OwlClass.make(plan.LocatorKind, { label: en("Locator kind"), subClassOf: [skos.Concept], definition: en("One of the ways a place is named.") }),
   OwlClass.make(plan.EventType, { label: en("Event type"), subClassOf: [skos.Concept], definition: en("One of the cases of the union an item's history is made of.") }),
+  OwlClass.make(plan.PrincipalBasis, { label: en("Principal basis"), subClassOf: [skos.Concept], definition: en("One of the ways the person an agent acts for was established.") }),
 ] as const;
 
 /** The properties, each with its domain, range and definition. */
@@ -351,17 +375,32 @@ export const properties = [
   DatatypeProperty.make(plan.sourceName, { domain: plan.Source, range: xsd.string, label: en("source name"), definition: en("The name of the source, as the package that holds it is named.") }),
   ObjectProperty.make(plan.sourceCapability, { domain: plan.Source, range: plan.Capability, label: en("source capability"), definition: en("An ability the source declares.") }),
   ObjectProperty.make(plan.fieldAuthority, { domain: plan.Source, range: plan.FieldAuthority, label: en("field authority"), definition: en("How the source's value of a field is weighed against the store's.") }),
-  DatatypeProperty.make(plan.sarifLevel, { domain: plan.Severity, range: xsd.string, label: en("SARIF level"), definition: en("The name of the SARIF result level the severity is: error, warning or note (to verify against the OASIS text); a name and no IRI.") }),
-  DatatypeProperty.make(plan.icalStatus, { domain: plan.State, range: xsd.string, label: en("iCalendar status"), definition: en("The name of the iCalendar to-do STATUS the state is closest to (to verify against RFC 5545); a name and no IRI.") }),
-  DatatypeProperty.make(plan.webAnnotationMotivation, { domain: plan.ItemKind, range: xsd.string, label: en("Web Annotation motivation"), definition: en("The name of the Web Annotation motivation the kind is closest to (to verify against the W3C text); a name and no IRI.") }),
-  DatatypeProperty.make(plan.githubStateReason, { domain: plan.CloseReason, range: xsd.string, label: en("GitHub state reason"), definition: en("The name of the reason GitHub gives for closing an issue, as its interface writes it (to verify against its documentation); a name and no IRI.") }),
+  DatatypeProperty.make(plan.sarifLevel, { domain: plan.Severity, range: xsd.string, label: en("SARIF level"), definition: en("The name of the SARIF result level the severity is: error, warning or note (SARIF 2.1.0 Plus Errata 01, sections 3.27.9 and 3.27.10: the levels that apply where the result's kind is fail); a name and no IRI.") }),
+  DatatypeProperty.make(plan.icalStatus, { domain: plan.State, range: xsd.string, label: en("iCalendar status"), definition: en("The name of the iCalendar to-do STATUS the state is closest to (RFC 5545 section 3.8.1.11: NEEDS-ACTION, COMPLETED, IN-PROCESS or CANCELLED for a VTODO); a name and no IRI.") }),
+  DatatypeProperty.make(plan.webAnnotationMotivation, { domain: plan.ItemKind, range: xsd.string, label: en("Web Annotation motivation"), definition: en("The name of the Web Annotation motivation the kind is closest to (Web Annotation Data Model, section 3.3.5, one of the thirteen motivations; the IRI of each is in the namespace http://www.w3.org/ns/oa# of the Web Annotation Vocabulary, section 2.3).") }),
+  DatatypeProperty.make(plan.githubStateReason, { domain: plan.CloseReason, range: xsd.string, label: en("GitHub state reason"), definition: en("The name of the reason GitHub gives for closing an issue, as the REST interface writes it (GitHub Docs, REST API 2026-03-10, update an issue: completed, not_planned, duplicate, reopened, or null); a name and no IRI.") }),
+  ObjectProperty.make(plan.principalBasis, { domain: plan.Actor, range: plan.PrincipalBasis, label: en("principal basis"), definition: en("How the principal of an agent was established; stored with the actor, which names the principal with prov:actedOnBehalfOf.") }),
+  DatatypeProperty.make(plan.externalSource, { label: en("external source"), definition: en("The name of the source that gave an item or an event an id of another scheme (a ULID, a number of a Git host, an id of a build finding); with the external value it is the external id.") }),
+  DatatypeProperty.make(plan.externalValue, { label: en("external value"), definition: en("The id of another scheme, as the source named it.") }),
+  DatatypeProperty.make(plan.deferredUntil, { label: en("deferred until"), definition: en("The day an item set aside is to come back, YYYY-MM-DD, with the state deferred.") }),
+  DatatypeProperty.make(plan.itemMotivation, { domain: plan.Item, range: xsd.string, label: en("item motivation"), definition: en("The name of the Web Annotation motivation of the record the item was read from, one of the thirteen (Web Annotation Data Model, section 3.3.5); a name and no IRI.") }),
+  DatatypeProperty.make(plan.itemBlocker, { domain: plan.Item, range: xsd.boolean, label: en("item blocker"), definition: en("Whether the item holds work up; a flag of the record, and not a severity.") }),
+  DatatypeProperty.make(plan.itemTarget, { domain: plan.Item, range: xsd.string, label: en("item target"), definition: en("What the record is about: a file, a page and a quote (the quote is the exact text of a Web Annotation TextQuoteSelector, section 4.2.4).") }),
+  DatatypeProperty.make(plan.itemSource, { domain: plan.Item, range: xsd.string, label: en("item source"), definition: en("Where a finding came from: the tool, the rule, the file and the line (the SARIF ruleId and physicalLocation, sections 3.27.5 and 3.29, are the standard's names for the last three).") }),
+  DatatypeProperty.make(plan.itemPriority, { domain: plan.Item, range: xsd.string, label: en("item priority"), definition: en("How important the work is, as the source writes it (P1 to P3 in a typed issue); not a severity.") }),
+  DatatypeProperty.make(plan.itemSize, { domain: plan.Item, range: xsd.string, label: en("item size"), definition: en("How large the work is, as the source writes it (xs to xl in a typed issue).") }),
+  DatatypeProperty.make(plan.itemGoals, { domain: plan.Item, range: xsd.string, label: en("item goals"), definition: en("The goals the work serves, as the source names them.") }),
+  DatatypeProperty.make(plan.itemEngines, { domain: plan.Item, range: xsd.string, label: en("item engines"), definition: en("The engines the work applies to, or all, as the source names them.") }),
+  DatatypeProperty.make(plan.itemCites, { domain: plan.Item, range: xsd.string, label: en("item cites"), definition: en("A requirement the item cites, as written in the source.") }),
+  DatatypeProperty.make(plan.itemEvidence, { domain: plan.Item, range: xsd.string, label: en("item evidence"), definition: en("A piece of evidence for the item: a commit, a test, a specification, a file with a line or a review, as the source writes it.") }),
+  DatatypeProperty.make(plan.sourceSeverity, { domain: plan.Item, range: xsd.string, label: en("source severity"), definition: en("The severity as the source wrote it, where the source has more levels than the three of plan:Severity; the item keeps this value and the three are not an exact expression of it.") }),
 ] as const;
 
 /** The ontology itself: its label, description and version. */
 export const planningOntology = OwlOntology.make(ontologyOf(PLANNING), {
   label: en("Planning"),
   description: en(
-    "The vocabulary of Planning: the seven kinds of planning item, the events that make their history and the states folded from them, the actors, the observations of what a source saw and where, the traces and links between items, the patches that write a change back and their previews, the sources that read and write, and the closed code lists the model branches on.",
+    "The vocabulary of Planning: the four kinds of planning item, the events that make their history and the states folded from them, the actors, the observations of what a source saw and where, the traces and links between items, the patches that write a change back and their previews, the sources that read and write, and the closed code lists the model branches on.",
   ),
   versionInfo: "1.0.0",
   versionIri: named<"owl:Ontology">(iriIn(PLANNINGV, "1.0.0")),
@@ -407,6 +446,7 @@ export const terms = [
   specializes("ActorKind", CONCEPT, "0037-planning FR-005"),
   specializes("LocatorKind", CONCEPT, "0037-planning FR-008"),
   specializes("EventType", CONCEPT, "0037-planning FR-003"),
+  specializes("PrincipalBasis", CONCEPT, "0037-planning FR-045"),
 ] as const;
 
 /** The file this module states: its name, its prefixes and its individuals. */
@@ -429,6 +469,7 @@ export const file: OntologyFile = {
     ...Object.values(actorKinds),
     ...Object.values(locatorKinds),
     ...Object.values(eventTypes),
+    ...Object.values(principalBases),
     ...terms,
   ],
 };

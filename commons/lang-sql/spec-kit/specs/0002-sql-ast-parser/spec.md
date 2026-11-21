@@ -40,6 +40,11 @@
 
 - **FR-018**: The parser MUST read the tokens by index and make a node with one object literal, with no regular expression and no copy of the text but the identifiers' and strings' own; `bun tools/bench.ts` MUST measure its throughput (the lexer and the parser together, the parser alone) on the corpus beside the throughput of sqlglot's parser on the same corpus.
 
+## Paging
+
+- **FR-019**: The parser MUST read `FETCH FIRST|NEXT n [PERCENT] ROWS ONLY` and `FETCH FIRST|NEXT n [PERCENT] ROWS WITH TIES` after a select or a set operation, as the count in `limit` and the words that a `LIMIT` cannot say, `PERCENT`, `WITH TIES` or `PERCENT WITH TIES`, in `limitOptions` (none for a count of rows only), so that a `FETCH FIRST n ROWS ONLY` is a `LIMIT n` as before.
+- **FR-020**: A table followed at once by `TABLESAMPLE method (...)` MUST be read with the sample as what stands beside the table (its `hint`) and no alias, as a table with an alias before it is: `FROM t TABLESAMPLE BERNOULLI (10)` and `FROM t AS x TABLESAMPLE BERNOULLI (10)`.
+
 ## Out of scope
 
 - Writing SQL from a tree, and changing a tree into another dialect's.

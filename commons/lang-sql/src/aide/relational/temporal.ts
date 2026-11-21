@@ -357,3 +357,33 @@ export function extract(field: string, v: Value): Result<Value, string> {
     default: return err(`${f} is not a part of a date or a timestamp`);
   }
 }
+
+/** `date_trunc(field, x)` of a date or a timestamp: the timestamp at the start of the part the field names (a week begins on Monday), or an error value (0010-aide FR-027). */
+export function dateTrunc(field: string, v: Value): Result<Value, string> {
+  const t = temporalOf(v);
+  if (t === undefined || (t.kind !== "date" && t.kind !== "timestamp")) return err(`date_trunc needs a date or a timestamp, not ${typeof v === "string" ? `"${v}"` : String(v)}`);
+  const d = new Date(t.ms);
+  const [y, mo, day, h, mi, sec, ms] = [d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), d.getUTCHours(), d.getUTCMinutes(), d.getUTCSeconds(), d.getUTCMilliseconds()];
+  const at = (year: number, month = 0, dayOfMonth = 1, hour = 0, minute = 0, second = 0, milli = 0): Result<Value, string> => ok(formatTimestamp(Date.UTC(year, month, dayOfMonth, hour, minute, second, milli)));
+  switch (field.toLowerCase()) {
+    case "microseconds":
+    case "microsecond":
+    case "milliseconds":
+    case "millisecond": return at(y, mo, day, h, mi, sec, ms);
+    case "second": return at(y, mo, day, h, mi, sec);
+    case "minute": return at(y, mo, day, h, mi);
+    case "hour": return at(y, mo, day, h);
+    case "day": return at(y, mo, day);
+    case "week": {
+      const back = (d.getUTCDay() + 6) % 7;
+      return ok(formatTimestamp(Date.UTC(y, mo, day - back)));
+    }
+    case "month": return at(y, mo);
+    case "quarter": return at(y, Math.floor(mo / 3) * 3);
+    case "year": return at(y);
+    case "decade": return at(Math.floor(y / 10) * 10);
+    case "century": return at(y > 0 ? Math.floor((y - 1) / 100) * 100 + 1 : Math.ceil(y / 100) * 100 - 99);
+    case "millennium": return at(y > 0 ? Math.floor((y - 1) / 1000) * 1000 + 1 : Math.ceil(y / 1000) * 1000 - 999);
+    default: return err(`${field} is not a field of date_trunc`);
+  }
+}

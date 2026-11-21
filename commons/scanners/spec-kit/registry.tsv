@@ -1,0 +1,5 @@
+number	slug	state
+0001	scanners-layers	in force
+0002	scanners-catalog	in force
+0003	scanners-tls	in force
+0004	scanners-run	in force

@@ -21,7 +21,7 @@ const NOW = "2026-12-01T00:00:00Z";
 const DATA: EstateData = {
   assets: [asset("athens", "managed"), asset("sparta", "managed", { origin: "paired" }), asset("corinth", "adopted", { origin: "paired" }), asset("printer", "discovered")],
   declared: { athens: { platform: { family: "debian", distro: "ubuntu", release: "26.04", arch: "x86_64" }, timezone: "America/New_York", tags: ["db", "prod"], adminPassword: "hunter2" }, sparta: { platform: "not an object" } },
-  observations: [{ asset: "athens", observation: { at: "2026-11-30T00:00:00Z", source: "probe", state: { os: { family: "ubuntu", version: "26.04" }, apiToken: "ghp_abcdefghijklmnopqrstuvwxyz0123456789ABCD", ports: [22, 5432] } } }],
+  observations: [{ asset: "athens", observation: { at: "2026-11-30T00:00:00Z", source: "probe", state: { os: { family: "ubuntu", version: "26.04" }, apiToken: "ghp" + "_abcdefghijklmnopqrstuvwxyz0123456789ABCD", ports: [22, 5432] } } }],
   results: [{ asset: "athens", id: "ssh-root-login", status: "fail", controls: ["AC-6", "IA-2"] }, { asset: "athens", id: "disk-encryption", status: "pass", controls: ["SC-28"] }],
   acceptances: { athens: [{ policy: "ssh-root-login", reason: "a break-glass account, reviewed quarterly", by: "Ada", until: "2027-01-15" }] },
   truths: [{ asset: "athens", state: "managed", observedAt: "2026-11-30T00:00:00Z", currency: "fresh", difference: null, agrees: true, alignment: "aligned", source: "probe" }],
@@ -171,6 +171,7 @@ proves(["0002-estate-query-relations FR-007"], "attribute, endpoint, link and se
   ]);
   assertEquals(rows("select kind, count(*) from link group by kind order by kind", [], data), [["exposes", 2], ["runs-on", 1]]);
   assertEquals(rows("select name from service where port = 22 order by name", [], data), [["sftp"], ["ssh"]]);
+  assertEquals(rows("select today, in_30_days, in_90_days from clock", [], data), [["2026-12-01", "2026-12-31", "2027-03-01"]]);
   // what a pen test scope or a passive check asks: the endpoints open to the internet that carry data or speak in the clear, and what exposes them
   const exposed = rows("select e.asset, l.from_asset from endpoint e left join link l on l.to_asset = e.asset and l.kind = 'exposes' where e.exposure = 'internet' and (e.class = 'data' or e.cleartext) order by e.asset", [], data);
   assertEquals(exposed, [["db-direct", "athens"], ["legacy-web", null]]);

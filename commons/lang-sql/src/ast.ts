@@ -440,6 +440,8 @@ export interface Select extends Base {
   readonly qualify: Expr | undefined;
   readonly orderBy: readonly OrderItem[];
   readonly limit: Expr | undefined;
+  /** The words of `FETCH FIRST n [PERCENT] ROWS ONLY | WITH TIES` that a `LIMIT` cannot say, as text (`PERCENT`, `WITH TIES`, `PERCENT WITH TIES`); none for a count of rows only. */
+  readonly limitOptions: string | undefined;
   readonly offset: Expr | undefined;
   /** The locking clauses (`FOR UPDATE OF t NOWAIT`), as text. */
   readonly locking: string | undefined;
@@ -461,6 +463,8 @@ export interface SetOp extends Base {
   readonly right: Query;
   readonly orderBy: readonly OrderItem[];
   readonly limit: Expr | undefined;
+  /** The words of `FETCH FIRST n [PERCENT] ROWS ONLY | WITH TIES` that a `LIMIT` cannot say, as text; none for a count of rows only. */
+  readonly limitOptions: string | undefined;
   readonly offset: Expr | undefined;
   /** The locking clauses (`FOR UPDATE OF t NOWAIT`), as text. */
   readonly locking: string | undefined;

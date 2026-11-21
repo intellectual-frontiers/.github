@@ -63,7 +63,7 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 
 | Library | Role | What it is | Kanon | Level | Published to |
 | --- | --- | --- | --- | --- | --- |
-| [`@intellectual-frontiers/anyfs`](commons/anyfs) | Foundation | One typed interface to the places bytes live | layers, plugins | L1 | held |
+| [`@intellectual-frontiers/anyfs`](https://www.npmjs.com/package/@intellectual-frontiers/anyfs) | Foundation | One typed interface to the places bytes live | layers, plugins | L1 | GitHub, npm |
 | [`@intellectual-frontiers/anyfs-bridge`](commons/anyfs-bridge) | Foundation | Copy, sync, move, check, two-way sync and mirror between any two AnyFS stores | layers, extension | L1 | held |
 | [`@intellectual-frontiers/anyfs-git`](commons/anyfs-git) | Foundation | A branch of a Git repository and a Git working tree, each kept as an AnyFS store | layers, extension | L1 | held |
 | [`@intellectual-frontiers/anyfs-githost`](commons/anyfs-githost) | Foundation | The Git host backend of AnyFS | layers, extension | L1 | held |
@@ -86,6 +86,7 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/test`](https://www.npmjs.com/package/@intellectual-frontiers/test) | Foundation | Tests that run unchanged under `bun test` and `node --test` | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/headless`](https://www.npmjs.com/package/@intellectual-frontiers/headless) | Pattern | The contract of a program that has no window | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/kanon`](https://www.npmjs.com/package/@intellectual-frontiers/kanon) | Pattern | The pattern of a library built in three layers | - | L1 | GitHub, npm |
+| [`@intellectual-frontiers/planning`](https://www.npmjs.com/package/@intellectual-frontiers/planning) | Pattern | Planning content from many places as one item each with one stable id | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/anyfs-cli`](commons/anyfs-cli) | Program | The `anyfs` program: POSIX-style access to any AnyFS store (ls, cat, cp, rm, find, grep, diff) and the bridge verbs (sync, bisync, mirror, check, merge, sync-medium) from the command line | layers, extension | L1 | held |
 | [`@intellectual-frontiers/archon`](https://www.npmjs.com/package/@intellectual-frontiers/archon) | Program | A Kanon library that orders subjects: a machine, a device, a workstation or a cloud account | layers, instances, plugins | L1 | GitHub, npm |
 | [`@intellectual-frontiers/archon-boot`](commons/archon-boot) | Program | The plugin that gives `archon` its verbs for the network install | layers, extension | L1 | held |
@@ -96,6 +97,7 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/archon-dialect-homebrew`](commons/archon-dialect-homebrew) | Program | The dialect of tools that installs them with Homebrew | layers, extension | L1 | held |
 | [`@intellectual-frontiers/archon-dialect-mise`](https://www.npmjs.com/package/@intellectual-frontiers/archon-dialect-mise) | Program | The dialect of tools that installs them with mise | layers, extension | L1 | GitHub, npm |
 | [`@intellectual-frontiers/archon-dialect-native-pinned`](https://www.npmjs.com/package/@intellectual-frontiers/archon-dialect-native-pinned) | Program | The default dialect of tools | layers, extension | L1 | GitHub, npm |
+| [`@intellectual-frontiers/archon-dialect-opentofu`](commons/archon-dialect-opentofu) | Program | The dialect of Archon for cloud resources with OpenTofu | layers, extension | L1 | held |
 | [`@intellectual-frontiers/archon-dialect-winget`](commons/archon-dialect-winget) | Program | The dialect of tools that installs them with WinGet | layers, extension | L1 | held |
 | [`@intellectual-frontiers/archon-dns`](commons/archon-dns) | Program | The plugin that gives `archon` its verbs for DNS | layers, extension | L1 | held |
 | [`@intellectual-frontiers/archon-tool`](commons/archon-tool) | Program | The plugin that gives `archon` its verbs for tools | layers, extension | L1 | held |
@@ -104,9 +106,11 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/docs`](https://www.npmjs.com/package/@intellectual-frontiers/docs) | Program | The generator of a repository's documentation site | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/ergonex`](https://www.npmjs.com/package/@intellectual-frontiers/ergonex) | Program | The one command, `ergonex` | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/estate`](commons/estate) | Program | The assets of an organization (machines, services, accounts) as discovered | layers | L1 | held |
+| [`@intellectual-frontiers/estate-endpoints`](commons/estate-endpoints) | Program | Finds the endpoints of an estate from what describes or shows them | layers | L1 | held |
 | [`@intellectual-frontiers/estate-iac`](commons/estate-iac) | Program | Reads infrastructure as code (OpenTofu and Terraform plans and state as JSON, CloudFormation templates, Kubernetes manifests, Compose files, Pulumi stack exports) into assets and links of the estate | layers | L1 | held |
 | [`@intellectual-frontiers/estate-query`](commons/estate-query) | Program | SQL over the estate: what an estate holds (its assets, the capabilities of each and who owns them, what is declared and observed, the policies judged, the risks accepted, the operational truth and the invariants broken) as relations with a catalog that is data | layers | L1 | held |
 | [`@intellectual-frontiers/evidence-capture`](commons/evidence-capture) | Program | The unattended capture of evidence | layers | L1 | held |
+| [`@intellectual-frontiers/findings`](commons/findings) | Program | Test results from other tools (SARIF, OWASP ZAP, Burp Suite and Nessus reports) read into findings that keep where they came from | layers | L1 | held |
 | [`@intellectual-frontiers/grc`](https://www.npmjs.com/package/@intellectual-frontiers/grc) | Program | Governance, risk and compliance in layers | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/integrations`](https://www.npmjs.com/package/@intellectual-frontiers/integrations) | Program | Two families on one skeleton of Kanon layers | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/integrations-github`](https://www.npmjs.com/package/@intellectual-frontiers/integrations-github) | Program | The reference connector of Integrations for the posture of one organization of a code host | - | L1 | GitHub, npm |
@@ -118,7 +122,9 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/machine-probe`](commons/machine-probe) | Program | The probe a machine runs for its fleet | layers | L1 | held |
 | [`@intellectual-frontiers/netboot`](commons/netboot) | Program | The network boot of a blank machine | layers | L1 | held |
 | [`@intellectual-frontiers/package-managers`](https://www.npmjs.com/package/@intellectual-frontiers/package-managers) | Program | The shared kit of the dialects that drive a package manager | layers | L1 | GitHub, npm |
+| [`@intellectual-frontiers/pentest`](commons/pentest) | Program | The rules of an authorized security test of an estate | layers | L1 | held |
 | [`@intellectual-frontiers/repoctl`](https://www.npmjs.com/package/@intellectual-frontiers/repoctl) | Program | The operations program of this repository | layers | L1 | GitHub, npm |
+| [`@intellectual-frontiers/scanners`](commons/scanners) | Program | Runs security scanners (a built-in TLS and header check, nuclei, nmap, trivy, grype, semgrep, checkov and ZAP's baseline scan) the safe way | layers | L1 | held |
 | [`@intellectual-frontiers/toolchain`](https://www.npmjs.com/package/@intellectual-frontiers/toolchain) | Program | A Kanon library of the tools a computer needs | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/catalog-nist-csf-2`](commons/catalog-nist-csf-2) | Standard | The NIST Cybersecurity Framework 2.0 as a grc catalog package | layers | L1 | held |
 | [`@intellectual-frontiers/catalog-nist-sp800`](commons/catalog-nist-sp800) | Standard | NIST SP 800-53 Rev 5.2.0 and SP 800-171 Rev 3 as grc catalog packages | layers | L1 | held |

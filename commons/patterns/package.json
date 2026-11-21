@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/patterns",
   "private": true,
-  "version": "0.1.5",
+  "version": "0.1.7",
   "description": "The pattern libraries as one install, each at an exact version. The headless program pattern and the layers of Kanon.",
   "type": "module",
   "engines": {

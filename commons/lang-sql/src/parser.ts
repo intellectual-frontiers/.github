@@ -1635,6 +1635,7 @@ class Parser {
     const left = this.setExpr(1);
     const orderBy = this.orderByClause();
     let limit: Expr | undefined;
+    let limitOptions: string | undefined;
     let offset: Expr | undefined;
     let locking: string | undefined;
     let settings: string | undefined;
@@ -1657,8 +1658,13 @@ class Parser {
           this.at(K.ROW) || this.at(K.ROWS)
             ? { kind: "number", start: this.start(), end: this.start(), text: "1" }
             : this.expr(Prec.Additive);
+        const percent = this.wordIs("PERCENT");
+        if (percent) this.i++;
         if (!this.eat(K.ROWS)) this.expect(K.ROW, "ROW or ROWS");
-        this.expect(K.ONLY, "ONLY");
+        const ties = this.at(K.WITH) && this.wordIs("TIES", 1);
+        if (ties) this.i += 2;
+        else this.expect(K.ONLY, "ONLY");
+        limitOptions = percent || ties ? `${percent ? "PERCENT" : ""}${percent && ties ? " " : ""}${ties ? "WITH TIES" : ""}` : undefined;
       } else if (this.atTail()) {
         const from = this.i;
         let depth = 0;
@@ -1679,8 +1685,8 @@ class Parser {
       if (left.orderBy.length > 0 || left.limit !== undefined || left.offset !== undefined)
         this.unsupported("a clause after a query in parentheses that has its own");
       return left.kind === "select"
-        ? { ...left, start: s, end: this.last(), orderBy, limit, offset, locking, settings }
-        : { ...left, start: s, end: this.last(), orderBy, limit, offset, locking, settings };
+        ? { ...left, start: s, end: this.last(), orderBy, limit, limitOptions, offset, locking, settings }
+        : { ...left, start: s, end: this.last(), orderBy, limit, limitOptions, offset, locking, settings };
     }
     return this.unsupported("ORDER BY or LIMIT after this query");
   }
@@ -1718,6 +1724,7 @@ class Parser {
         right,
         orderBy: [],
         limit: undefined,
+        limitOptions: undefined,
         offset: undefined,
         locking: undefined,
         settings: undefined,
@@ -1985,6 +1992,7 @@ class Parser {
       qualify,
       orderBy: [],
       limit: undefined,
+      limitOptions: undefined,
       offset: undefined,
       locking: undefined,
         settings: undefined,
@@ -1998,7 +2006,7 @@ class Parser {
     const s = this.start();
     let name: Ident;
     if (this.eat(K.AS)) name = this.ident(true);
-    else if (this.canBeIdent() && !this.atQualify() && !this.atLocking() && !this.atTail() && !this.atIndexHint() && this.tableOpAt() === undefined && !(this.wordIs("INDEXED") && this.at(K.BY, 1))) name = this.ident();
+    else if (this.canBeIdent() && !this.atQualify() && !this.atLocking() && !this.atTail() && !this.atIndexHint() && this.tableOpAt() === undefined && !(this.wordIs("INDEXED") && this.at(K.BY, 1)) && !(this.wordIs("TABLESAMPLE") && this.kind(1) === Tok.Word && this.kind(2) === Tok.LParen)) name = this.ident();
     else return undefined;
     const columns: Ident[] = [];
     const types: (DataType | undefined)[] = [];

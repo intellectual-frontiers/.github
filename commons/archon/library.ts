@@ -11,7 +11,7 @@ export const library = {
   level: "L1",
   specKit: "spec-kit",
   verify: "bun run verify",
-  version: "0.1.4",
+  version: "0.1.6",
   distribution: ["github", "npm"],
   exports: [".", "./governance", "./logical", "./dialect", "./cli"],
   family: { host: "archon", role: "host" },
@@ -28,6 +28,7 @@ export const library = {
       { name: "winget", instanceOf: "src/physical/dialect/", placement: "package" },
       { name: "ansible", instanceOf: "src/physical/dialect/", placement: "package" },
       { name: "cloud-init", instanceOf: "src/physical/dialect/", placement: "package" },
+      { name: "opentofu", instanceOf: "src/physical/dialect/", placement: "package" },
     ],
     plugins: [{ noun: "tool" }, { noun: "converge" }, { noun: "boot" }, { noun: "dns" }],
     units: [

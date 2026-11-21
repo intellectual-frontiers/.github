@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/archon-dialect-native-pinned",
   "private": true,
-  "version": "0.1.4",
+  "version": "0.1.6",
   "description": "The default dialect of tools for Archon: the programs a computer needs, as their publishers released them, pinned by the SHA-256 of the artifact, in a folder of the user's own, with no administrator rights and no package manager; never built from source.",
   "type": "module",
   "engines": {

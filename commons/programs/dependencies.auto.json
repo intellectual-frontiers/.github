@@ -3,18 +3,18 @@
   "set": "programs",
   "dependencies": {
     "@intellectual-frontiers/arcactl": "0.10.1",
-    "@intellectual-frontiers/archon": "0.1.4",
-    "@intellectual-frontiers/archon-dialect-mise": "0.1.4",
-    "@intellectual-frontiers/archon-dialect-native-pinned": "0.1.4",
-    "@intellectual-frontiers/docs": "0.3.5",
-    "@intellectual-frontiers/ergonex": "0.5.5",
-    "@intellectual-frontiers/grc": "0.3.5",
-    "@intellectual-frontiers/integrations": "0.2.5",
-    "@intellectual-frontiers/integrations-github": "0.2.5",
-    "@intellectual-frontiers/lang-sql": "0.1.2",
-    "@intellectual-frontiers/libraries": "0.5.7",
-    "@intellectual-frontiers/package-managers": "0.1.4",
-    "@intellectual-frontiers/repoctl": "0.2.6",
-    "@intellectual-frontiers/toolchain": "0.1.4"
+    "@intellectual-frontiers/archon": "0.1.6",
+    "@intellectual-frontiers/archon-dialect-mise": "0.1.6",
+    "@intellectual-frontiers/archon-dialect-native-pinned": "0.1.6",
+    "@intellectual-frontiers/docs": "0.3.7",
+    "@intellectual-frontiers/ergonex": "0.5.7",
+    "@intellectual-frontiers/grc": "0.3.7",
+    "@intellectual-frontiers/integrations": "0.2.7",
+    "@intellectual-frontiers/integrations-github": "0.2.7",
+    "@intellectual-frontiers/lang-sql": "0.1.4",
+    "@intellectual-frontiers/libraries": "0.5.9",
+    "@intellectual-frontiers/package-managers": "0.1.6",
+    "@intellectual-frontiers/repoctl": "0.2.8",
+    "@intellectual-frontiers/toolchain": "0.1.6"
   }
 }

@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/githost",
   "private": true,
-  "version": "0.2.5",
+  "version": "0.2.7",
   "description": "The Git hosts behind one typed interface: GitHub (public and private repositories), GitLab (groups to any depth, gitlab.com or self-managed) and plain Git, held to the same conformance tests, and the reading of a remote in any form a person writes it; the same code on Bun and Node 26.",
   "type": "module",
   "engines": {

@@ -9,7 +9,7 @@ export const library = {
   level: "L1",
   specKit: "spec-kit",
   verify: "bun run verify",
-  version: "0.2.5",
+  version: "0.2.7",
   distribution: ["github", "npm"],
   exports: ["."],
   summary: "The FHIR plugin of Integrations: R4 and US Core as registry entries with their licence as data, a codec for FHIR JSON and NDJSON to the abstract typed tree, a loader of StructureDefinitions, CodeSystems and ValueSets the user supplies, and the acknowledgement port of OperationOutcome.",

@@ -113,7 +113,6 @@ proves(["0008-sql-introspect FR-006"], "what astsql does not have is an error va
     ["SELECT DISTINCT ON (id) id FROM node", "that clause"],
     ["SELECT sum(id) OVER (ORDER BY id GROUPS 1 PRECEDING) FROM node", "GROUPS"],
     ["SELECT id FROM node WHERE row_number() OVER () = 1", "window function"],
-    ["SELECT 1 FROM node a CROSS JOIN LATERAL (SELECT 1) AS x", "LATERAL"],
     ["SELECT * FROM nowhere", "no relation nowhere"],
     ["SELECT nope()", "nope"],
     ["SELECT nocolumn FROM node", "no column nocolumn"],

@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/package-managers",
   "private": true,
-  "version": "0.1.4",
+  "version": "0.1.6",
   "description": "The shared kit of the dialects that drive a package manager for Archon and Toolchain: the commands of the packaging ontology as argument vectors (no shell), the exact version written as each manager writes it, the jobs a tool asks of a manager, the plan file, the observation of what is installed, and the dialect made from a manager's data.",
   "type": "module",
   "engines": {

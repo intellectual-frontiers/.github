@@ -111,7 +111,7 @@ proves(["0010-aide FR-013"], "a window function runs over the groups of a query 
     "SELECT sum(pay) OVER (ORDER BY name GROUPS 1 PRECEDING) FROM e",
     "SELECT sum(pay) OVER (ORDER BY name ROWS BETWEEN 1 PRECEDING AND CURRENT ROW EXCLUDE TIES) FROM e",
     "SELECT sum(pay) OVER (ORDER BY pay RANGE 1 PRECEDING) FROM e",
-    "SELECT lag(pay) IGNORE NULLS OVER (ORDER BY name) FROM e",
+    "SELECT sum(pay) IGNORE NULLS OVER (ORDER BY name) FROM e",
     "SELECT lower(name) OVER (ORDER BY name) FROM e",
     "SELECT sum(pay) OVER nowhere FROM e",
     "SELECT ntile(0) OVER (ORDER BY name) FROM e",
@@ -174,7 +174,7 @@ proves(["0010-aide FR-016"], "a recursive common table expression runs its ancho
   }
 });
 
-proves(["0010-aide FR-015"], "NULLS FIRST and NULLS LAST order the nulls where they say (and as before where they do not), OFFSET n ROWS and FETCH FIRST n ROWS ONLY page the answer, and WITH TIES is an error value", () => {
+proves(["0010-aide FR-015"], "NULLS FIRST and NULLS LAST order the nulls where they say (and as before where they do not), and OFFSET n ROWS and FETCH FIRST n ROWS ONLY page the answer", () => {
   assertEquals(ask(emps, "SELECT name FROM e ORDER BY pay NULLS FIRST, name").rows.map((x) => x[0]), ["ed", "di", "flo", "ann", "bob", "cy"]);
   assertEquals(ask(emps, "SELECT name FROM e ORDER BY pay NULLS LAST, name").rows.map((x) => x[0]), ["di", "flo", "ann", "bob", "cy", "ed"]);
   assertEquals(ask(emps, "SELECT name FROM e ORDER BY pay DESC NULLS FIRST, name").rows.map((x) => x[0]), ["ed", "bob", "cy", "ann", "flo", "di"]);
@@ -184,8 +184,7 @@ proves(["0010-aide FR-015"], "NULLS FIRST and NULLS LAST order the nulls where t
   assertEquals(ask(emps, "SELECT name FROM e ORDER BY name OFFSET 4 ROWS").rows, [["ed"], ["flo"]]);
   assertEquals(ask(emps, "SELECT name FROM e ORDER BY name OFFSET 1 ROWS FETCH NEXT 2 ROWS ONLY").rows, [["bob"], ["cy"]]);
   assertEquals(ask(emps, "SELECT name FROM e ORDER BY name FETCH FIRST ROW ONLY").rows, [["ann"]]);
-  const ties = emps.run("SELECT name FROM e ORDER BY pay FETCH FIRST 2 ROWS WITH TIES");
-  assert(ties.kind === "err" && ties.error.message !== "", "WITH TIES");
+  assertEquals(ask(emps, "SELECT name FROM e ORDER BY pay FETCH FIRST 2 ROWS WITH TIES").rows.length, 2);
 });
 
 const NOW = new Date(Date.UTC(2026, 10, 21, 13, 45, 7));
@@ -299,6 +298,142 @@ proves(["0010-aide FR-020"], "ANY, SOME and ALL compare with a subquery or an ar
   assertEquals(ask(quant, "SELECT count(*) FROM t WHERE a < ALL (SELECT b FROM u WHERE b > a)").rows, [[4]]);
   for (const bad of ["SELECT a FROM t WHERE a > ANY (SELECT b, b FROM u)", "SELECT a FROM t WHERE a LIKE ANY (SELECT b FROM u)", "SELECT a FROM t WHERE a > ANY (1)", "SELECT a FROM t WHERE a + 1 = ANY (SELECT b FROM u) + 1"]) {
     const r = quant.run(bad);
+    assert(r.kind === "err" && r.error.message !== "", bad);
+  }
+});
+
+const text = createEngine(providerOf({ one: { columns: ["x"], rows: [[1]] } }));
+const sx = (sql: string) => ask(text, `SELECT ${sql} FROM one`).rows[0]?.[0];
+
+proves(["0010-aide FR-021"], "the string functions follow the standard: SUBSTRING counts a part before the start in its length, POSITION and TRIM take their keywords, OVERLAY places, nulls give nulls (but for concat), and what is not a whole number is an error value", () => {
+  assertEquals([sx("char_length('héllo')"), sx("character_length('😀a')"), sx("octet_length('héllo')")], [5, 2, 6]);
+  assertEquals([sx("SUBSTRING('hello' FROM 2 FOR 3)"), sx("SUBSTRING('hello' FROM 0 FOR 3)"), sx("SUBSTRING('hello' FROM -1 FOR 4)"), sx("SUBSTRING('hello' FROM 4)"), sx("SUBSTRING('hello' FROM 10)"), sx("substring('hello', 2, 2)"), sx("substring('hello', 2)")], ["ell", "he", "he", "lo", "", "el", "ello"]);
+  assertEquals([sx("POSITION('l' IN 'hello')"), sx("POSITION('z' IN 'hello')"), sx("POSITION('' IN 'x')"), sx("POSITION('lo' IN 'hello')")], [3, 0, 1, 4]);
+  assertEquals([sx("TRIM(BOTH 'x' FROM 'xxaxx')"), sx("TRIM(LEADING 'x' FROM 'xxaxx')"), sx("TRIM(TRAILING 'x' FROM 'xxaxx')"), sx("TRIM(LEADING FROM '  a ')"), sx("TRIM('x' FROM 'xax')"), sx("trim('  a  ')"), sx("ltrim('xxa', 'x')"), sx("rtrim('axx', 'x')"), sx("TRIM(BOTH 'xy' FROM 'yxaxy')")], ["a", "axx", "xxa", "a ", "a", "a", "a", "a", "a"]);
+  assertEquals([sx("OVERLAY('abcdef' PLACING 'XY' FROM 3)"), sx("OVERLAY('abcdef' PLACING 'XY' FROM 3 FOR 0)"), sx("OVERLAY('abcdef' PLACING 'XY' FROM 3 FOR 4)"), sx("OVERLAY('abcdef' PLACING 'XY' FROM 1 FOR 2)")], ["abXYef", "abXYcdef", "abXY", "XYcdef"]);
+  assertEquals([sx("concat('a', NULL, 'b')"), sx("concat()"), sx("left('hello', 2)"), sx("left('hello', -2)"), sx("right('hello', 2)"), sx("right('hello', -2)"), sx("repeat('ab', 3)"), sx("reverse('abc')"), sx("lpad('7', 3, '0')"), sx("rpad('ab', 5, 'xy')"), sx("lpad('abcdef', 3)"), sx("lpad('a', 4)")], ["ab", "", "he", "hel", "lo", "llo", "ababab", "cba", "007", "abxyx", "abc", "   a"]);
+  assertEquals([sx("char_length(NULL)"), sx("SUBSTRING(NULL FROM 1)"), sx("SUBSTRING('a' FROM NULL)"), sx("POSITION(NULL IN 'a')"), sx("TRIM(BOTH NULL FROM 'a')"), sx("OVERLAY('a' PLACING NULL FROM 1)"), sx("left(NULL, 1)"), sx("repeat('a', NULL)"), sx("lpad('a', NULL)")], [null, null, null, null, null, null, null, null, null]);
+  assertEquals(ask(text, "SELECT upper(substring(name FROM 1 FOR 1)) || substring(name FROM 2) AS n FROM (VALUES ('ann'), ('bob')) AS t(name)").rows, [["Ann"], ["Bob"]]);
+  for (const bad of ["SELECT SUBSTRING('abc' FROM 1.5)", "SELECT SUBSTRING('abc' FROM 1 FOR -1)", "SELECT left('abc', 'x')", "SELECT repeat('a', 1000000)", "SELECT POSITION('a')", "SELECT OVERLAY('a' PLACING 'b')", "SELECT SUBSTRING('abc' FOR 2)"]) {
+    const r = text.run(bad);
+    assert(r.kind === "err" && r.error.message !== "", bad);
+  }
+});
+
+proves(["0010-aide FR-022"], "LISTAGG, STRING_AGG and GROUP_CONCAT join the values in the order given, with DISTINCT and a FILTER, a separator is required where the standard has none, and an ORDER BY on any other aggregate is an error value", () => {
+  assertEquals(ask(sales, "SELECT region, listagg(shop, '|') WITHIN GROUP (ORDER BY shop DESC) AS l FROM s GROUP BY region ORDER BY region").rows, [["n", "b|a|a"], ["s", "c|c"]]);
+  assertEquals(ask(sales, "SELECT region, listagg(DISTINCT shop, '|') WITHIN GROUP (ORDER BY shop DESC) AS l FROM s GROUP BY region ORDER BY region").rows, [["n", "b|a"], ["s", "c"]]);
+  assertEquals(ask(sales, "SELECT region, string_agg(shop, ',' ORDER BY amt DESC) AS l FROM s GROUP BY region ORDER BY region").rows, [["n", "b,a,a"], ["s", "c,c"]]);
+  assertEquals(ask(sales, "SELECT group_concat(shop ORDER BY shop) AS l FROM s").rows, [["a,a,b,c,c"]]);
+  assertEquals(ask(sales, "SELECT string_agg(shop, '' ORDER BY amt) FILTER (WHERE amt > 1) AS l FROM s").rows, [["abcc"]]);
+  assertEquals(ask(sales, "SELECT listagg(region, ',') AS l FROM empty").rows, [[null]]);
+  assertEquals(ask(sales, "SELECT string_agg(region, ',' ORDER BY region NULLS FIRST) AS l FROM (VALUES ('b'), (NULL), ('a')) AS t(region)").rows, [["a,b"]]);
+  assertEquals(ask(sales, "SELECT shop, group_concat(shop, '-') OVER (ORDER BY amt ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS l FROM s WHERE region = 'n' ORDER BY amt").rows, [["a", "a"], ["a", "a-a"], ["b", "a-a-b"]]);
+  for (const bad of ["SELECT listagg(shop) FROM s", "SELECT string_agg(shop) FROM s", "SELECT sum(amt ORDER BY amt) FROM s", "SELECT sum(amt) WITHIN GROUP (ORDER BY amt) FROM s", "SELECT listagg(shop, ',') WITHIN GROUP (ORDER BY shop) OVER () FROM s"]) {
+    const r = sales.run(bad);
+    assert(r.kind === "err" && r.error.message !== "", bad);
+  }
+});
+
+const ign = createEngine(providerOf({ v: { columns: ["id", "x"], rows: [[1, 1], [2, null], [3, 3], [4, null], [5, null], [6, 6]] } }));
+
+proves(["0010-aide FR-022"], "IGNORE NULLS counts only the rows whose value is not null for lag, lead, first_value, last_value and nth_value, RESPECT NULLS is as none, and any other function refuses it", () => {
+  const col = (sql: string) => ask(ign, sql).rows.map((r) => r[0]);
+  assertEquals(col("SELECT lag(x) IGNORE NULLS OVER (ORDER BY id) FROM v ORDER BY id"), [null, 1, 1, 3, 3, 3]);
+  assertEquals(col("SELECT lead(x) IGNORE NULLS OVER (ORDER BY id) FROM v ORDER BY id"), [3, 3, 6, 6, 6, null]);
+  assertEquals(col("SELECT lag(x, 2, -1) IGNORE NULLS OVER (ORDER BY id) FROM v ORDER BY id"), [-1, -1, -1, 1, 1, 1]);
+  assertEquals(col("SELECT lag(x) OVER (ORDER BY id) FROM v ORDER BY id"), [null, 1, null, 3, null, null]);
+  assertEquals(col("SELECT lag(x) RESPECT NULLS OVER (ORDER BY id) FROM v ORDER BY id"), [null, 1, null, 3, null, null]);
+  assertEquals(col("SELECT last_value(x) IGNORE NULLS OVER (ORDER BY id) FROM v ORDER BY id"), [1, 1, 3, 3, 3, 6]);
+  assertEquals(col("SELECT last_value(x) OVER (ORDER BY id) FROM v ORDER BY id"), [1, null, 3, null, null, 6]);
+  assertEquals(col("SELECT first_value(x) IGNORE NULLS OVER (ORDER BY id DESC) FROM v ORDER BY id"), [6, 6, 6, 6, 6, 6]);
+  assertEquals(col("SELECT nth_value(x, 2) IGNORE NULLS OVER (ORDER BY id) FROM v ORDER BY id"), [null, null, 3, 3, 3, 3]);
+  assertEquals(col("SELECT first_value(x) IGNORE NULLS OVER (ORDER BY id ROWS BETWEEN 1 FOLLOWING AND UNBOUNDED FOLLOWING) FROM v ORDER BY id"), [3, 3, 6, 6, 6, null]);
+  for (const bad of ["SELECT sum(x) IGNORE NULLS OVER () FROM v", "SELECT row_number() IGNORE NULLS OVER (ORDER BY id) FROM v"]) {
+    const r = ign.run(bad);
+    assert(r.kind === "err" && r.error.message !== "", bad);
+  }
+});
+
+proves(["0010-aide FR-023"], "FETCH FIRST n PERCENT takes the ceiling of the percent of the rows after the offset, WITH TIES takes the rows that equal the last on the keys of the ORDER BY, both work in a set operation, and what makes no sense is an error value", () => {
+  const names = (sql: string) => ask(emps, sql).rows.map((r) => r[0]);
+  const by = "SELECT name FROM e ORDER BY pay DESC NULLS LAST, name";
+  assertEquals(names(`${by} FETCH FIRST 2 ROWS ONLY`), ["bob", "cy"]);
+  assertEquals(names("SELECT name FROM e ORDER BY pay DESC NULLS LAST FETCH FIRST 2 ROWS WITH TIES"), ["bob", "cy"]);
+  assertEquals(names("SELECT name FROM e ORDER BY pay DESC NULLS LAST FETCH FIRST 1 ROWS WITH TIES").length, 2);
+  assertEquals(names("SELECT name FROM e ORDER BY pay DESC NULLS LAST FETCH FIRST 3 ROWS WITH TIES").length, 3);
+  assertEquals(names("SELECT name FROM e ORDER BY pay FETCH FIRST 1 ROW WITH TIES"), ["ed"]);
+  assertEquals([50, 10, 0, 100, 34, 17].map((p) => names(`${by} FETCH FIRST ${p} PERCENT ROWS ONLY`).length), [3, 1, 0, 6, 3, 2]);
+  assertEquals(names(`${by} OFFSET 1 ROWS FETCH FIRST 50 PERCENT ROWS ONLY`), ["cy", "ann", "flo"]);
+  assertEquals(names("SELECT name FROM e ORDER BY pay DESC NULLS LAST FETCH FIRST 10 PERCENT ROWS WITH TIES").length, 2);
+  assertEquals(ask(emps, "SELECT pay FROM e UNION ALL SELECT pay FROM e ORDER BY pay DESC FETCH FIRST 1 ROWS WITH TIES").rows, [[20], [20], [20], [20]]);
+  assertEquals(ask(emps, "SELECT pay FROM e UNION ALL SELECT pay FROM e ORDER BY pay DESC FETCH FIRST 25 PERCENT ROWS ONLY").rows, [[20], [20], [20]]);
+  for (const bad of ["SELECT name FROM e FETCH FIRST 3 ROWS WITH TIES", "SELECT name FROM e ORDER BY name FETCH FIRST 101 PERCENT ROWS ONLY", "SELECT name FROM e ORDER BY name FETCH FIRST -1 PERCENT ROWS ONLY", "SELECT pay FROM e UNION SELECT pay FROM e FETCH FIRST 1 ROWS WITH TIES"]) {
+    const r = emps.run(bad);
+    assert(r.kind === "err" && r.error.message !== "", bad);
+  }
+});
+
+proves(["0010-aide FR-024"], "SIMILAR TO matches the whole text by the pattern of the standard: wildcards, alternation, repetition, classes (named too), an escape that is only where it is given, a dot that is a dot, and null for null", () => {
+  const sim = (text: string, pattern: string, escape = "") => ask(text0, `SELECT '${text}' SIMILAR TO '${pattern}'${escape === "" ? "" : ` ESCAPE '${escape}'`}`).rows[0]?.[0];
+  assertEquals([sim("abc", "abc"), sim("abc", "a%"), sim("abc", "a_c"), sim("abc", "(a|x)bc"), sim("abbbc", "ab+c"), sim("ac", "ab?c"), sim("abc", "b"), sim("a.c", "a.c"), sim("abc", "a.c")], [true, true, true, true, true, true, false, true, false]);
+  assertEquals([sim("ab", "[a-c][a-c]"), sim("a1", "[[:alpha:]][[:digit:]]"), sim("A1", "[[:lower:]]1"), sim("ab12", "[a-z]{2}[0-9]{2}"), sim("ad", "a[^b-c]"), sim("ab", "a[^b-c]"), sim("a-", "a[-]")], [true, true, false, true, true, false, true]);
+  assertEquals([sim("a%", "a\\%", "\\"), sim("ab", "a\\%", "\\"), sim("a|b", "a#|b", "#"), sim("(x)", "#(x#)", "#")], [true, false, true, true]);
+  assertEquals(ask(text0, "SELECT 'abc' NOT SIMILAR TO 'a%', 'abc' NOT SIMILAR TO 'x%', NULL SIMILAR TO 'a', 'a' SIMILAR TO NULL").rows, [[false, true, null, null]]);
+  assertEquals(ask(text0, "SELECT x FROM (VALUES ('apple'), ('banana'), ('cherry')) AS t(x) WHERE x SIMILAR TO '(a|b)%' ORDER BY x").rows, [["apple"], ["banana"]]);
+  for (const bad of ["SELECT 'a' SIMILAR TO '('", "SELECT 'a' SIMILAR TO '[abc'", "SELECT 'a' SIMILAR TO '[[:foo:]]'", "SELECT 'a' SIMILAR TO 'a{'"]) {
+    const r = text0.run(bad);
+    assert(r.kind === "err" && r.error.message !== "", bad);
+  }
+});
+
+const text0 = createEngine(providerOf({ one: { columns: ["x"], rows: [[1]] } }));
+const big = createEngine(providerOf({ n: { columns: ["i"], rows: Array.from({ length: 400 }, (_, i) => [i]) } }));
+
+proves(["0010-aide FR-025"], "TABLESAMPLE keeps the rows a seeded generator lets through: all at 100 percent, none at 0, the same rows for the same seed, others for another seed, about the percent, with an alias or without, and a method or size that is none is an error value", () => {
+  const sample = (sql: string) => ask(big, sql).rows.map((r) => r[0]);
+  assertEquals(sample("SELECT i FROM n TABLESAMPLE BERNOULLI (100)").length, 400);
+  assertEquals(sample("SELECT i FROM n TABLESAMPLE BERNOULLI (0)").length, 0);
+  const a = sample("SELECT i FROM n TABLESAMPLE BERNOULLI (25) REPEATABLE (7)");
+  assertEquals(sample("SELECT i FROM n TABLESAMPLE BERNOULLI (25) REPEATABLE (7)"), a);
+  assert(a.length > 60 && a.length < 140, `about a quarter: ${a.length}`);
+  assert(JSON.stringify(sample("SELECT i FROM n TABLESAMPLE BERNOULLI (25) REPEATABLE (8)")) !== JSON.stringify(a), "another seed");
+  assertEquals(sample("SELECT i FROM n TABLESAMPLE SYSTEM (25) REPEATABLE (7)"), a);
+  assertEquals(sample("SELECT x.i FROM n AS x TABLESAMPLE BERNOULLI (25) REPEATABLE (7) WHERE x.i < 100"), a.filter((v) => Number(v) < 100));
+  assertEquals(sample("SELECT i FROM n TABLESAMPLE BERNOULLI (50)"), sample("SELECT i FROM n TABLESAMPLE BERNOULLI (50) REPEATABLE (0)"));
+  for (const bad of ["SELECT i FROM n TABLESAMPLE BLOCK (10)", "SELECT i FROM n TABLESAMPLE BERNOULLI (101)", "SELECT i FROM n TABLESAMPLE BERNOULLI (-1)", "SELECT i FROM n TABLESAMPLE BERNOULLI (x)", "SELECT i FROM n TABLESAMPLE BERNOULLI (10) REPEATABLE (1.5)"]) {
+    const r = big.run(bad);
+    assert(r.kind === "err" && r.error.message !== "", bad);
+  }
+});
+
+proves(["0010-aide FR-026"], "a LATERAL subquery is run for each row before it and may name its columns: cross and inner joins keep the rows it gives, a left join keeps the row once with nulls, a comma in the FROM works the same, and a right or full join is an error value", () => {
+  assertEquals(ask(shop, "SELECT c.name, x.total FROM c CROSS JOIN LATERAL (SELECT total FROM o WHERE o.cust = c.id ORDER BY total DESC LIMIT 1) AS x ORDER BY c.name").rows, [["ann", 7], ["bob", 9]]);
+  assertEquals(ask(shop, "SELECT c.name, x.total FROM c LEFT JOIN LATERAL (SELECT total FROM o WHERE o.cust = c.id ORDER BY total DESC LIMIT 1) AS x ON TRUE ORDER BY c.name").rows, [["ann", 7], ["bob", 9], ["cy", null]]);
+  assertEquals(ask(shop, "SELECT c.name, x.n FROM c, LATERAL (SELECT count(*) AS n FROM o WHERE o.cust = c.id) AS x ORDER BY c.name").rows, [["ann", 2], ["bob", 1], ["cy", 0]]);
+  assertEquals(ask(shop, "SELECT c.id, y.k FROM c JOIN LATERAL (SELECT c.id * 10 AS k) AS y ON y.k > 10 ORDER BY c.id").rows, [[2, 20], [3, 30]]);
+  assertEquals(ask(shop, "SELECT c.name, o.id, x.t FROM c JOIN o ON o.cust = c.id, LATERAL (SELECT o.total + 1 AS t) AS x ORDER BY o.id").rows, [["ann", 10, 6], ["ann", 11, 8], ["bob", 12, 10]]);
+  assertEquals(ask(shop, "SELECT c.name, x.n FROM c LEFT JOIN LATERAL (SELECT count(*) AS n FROM o WHERE o.cust = c.id AND o.total > 100) AS x ON TRUE WHERE x.n = 0 ORDER BY c.name").rows.length, 3);
+  assertEquals(ask(shop, "SELECT * FROM (SELECT 1 AS a) AS s, LATERAL (SELECT a + 1 AS b) AS l").rows, [[1, 2]]);
+  for (const bad of ["SELECT * FROM c RIGHT JOIN LATERAL (SELECT 1) AS x ON TRUE", "SELECT * FROM c FULL JOIN LATERAL (SELECT 1) AS x ON TRUE", "SELECT * FROM c, LATERAL (SELECT nope) AS x"]) {
+    const r = shop.run(bad);
+    assert(r.kind === "err" && r.error.message !== "", bad);
+  }
+});
+
+proves(["0010-aide FR-027"], "round goes half away from zero on the decimal text (and to negative places), floor and ceil go to whole numbers, date_trunc cuts a date or a timestamp to the start of a part, a null gives a null, and what is not a number, a date or a field is an error value", () => {
+  const v = (sql: string) => ask(text0, `SELECT ${sql}`).rows[0]?.[0];
+  assertEquals([v("round(2.675, 2)"), v("round(-2.675, 2)"), v("round(2.5)"), v("round(-2.5)"), v("round(1234.567, -2)"), v("round(1.005, 2)"), v("round(0.5)"), v("round(7)"), v("round(1.4999)"), v("round(3.14159, 3)"), v("round('2.5')")], [2.68, -2.68, 3, -3, 1200, 1.01, 1, 7, 1, 3.142, 3]);
+  assertEquals([v("floor(2.7)"), v("floor(-2.1)"), v("ceil(2.1)"), v("ceil(-2.9)"), v("ceiling(2)"), v("floor('3.5')"), v("ceil(0)")], [2, -3, 3, -2, 2, 3, 0]);
+  assertEquals([v("round(NULL)"), v("round(1.5, NULL)"), v("floor(NULL)"), v("ceil(NULL)"), v("date_trunc('day', NULL)"), v("date_trunc(NULL, TIMESTAMP '2024-01-01 00:00:00')")], [null, null, null, null, null, null]);
+  const ts = "TIMESTAMP '2024-03-15 10:20:30.5'";
+  const cut = (f: string, x = ts) => v(`date_trunc('${f}', ${x})`);
+  assertEquals([cut("second"), cut("minute"), cut("hour"), cut("day"), cut("month"), cut("quarter"), cut("year"), cut("milliseconds")], ["2024-03-15 10:20:30", "2024-03-15 10:20:00", "2024-03-15 10:00:00", "2024-03-15 00:00:00", "2024-03-01 00:00:00", "2024-01-01 00:00:00", "2024-01-01 00:00:00", "2024-03-15 10:20:30.5"]);
+  assertEquals([cut("quarter", "TIMESTAMP '2024-08-09 00:00:00'"), cut("week"), cut("week", "TIMESTAMP '2024-03-17 23:59:59'"), cut("week", "TIMESTAMP '2024-03-11 08:00:00'"), cut("week", "DATE '2024-03-01'")], ["2024-07-01 00:00:00", "2024-03-11 00:00:00", "2024-03-11 00:00:00", "2024-03-11 00:00:00", "2024-02-26 00:00:00"]);
+  assertEquals([cut("decade"), cut("century"), cut("millennium"), cut("century", "DATE '2000-06-01'"), cut("MONTH", "DATE '2024-03-15'"), cut("month", "'2024-03-15 10:00:00'")], ["2020-01-01 00:00:00", "2001-01-01 00:00:00", "2001-01-01 00:00:00", "1901-01-01 00:00:00", "2024-03-01 00:00:00", "2024-03-01 00:00:00"]);
+  assertEquals(ask(clock, "SELECT date_trunc('month', ts) AS m, count(*) AS c, round(avg(n), 1) AS a FROM d GROUP BY date_trunc('month', ts) ORDER BY m").rows, [["2023-12-01 00:00:00", 1, null], ["2024-03-01 00:00:00", 1, 3]]);
+  for (const bad of ["SELECT date_trunc('fortnight', TIMESTAMP '2024-01-01 00:00:00')", "SELECT date_trunc('day', 'abc')", "SELECT date_trunc('day', 5)", "SELECT date_trunc('day', INTERVAL '1' DAY)", "SELECT round('x')", "SELECT round(1, 1.5)", "SELECT floor('x')", "SELECT ceil(TRUE) + 'x'"]) {
+    const r = text0.run(bad);
     assert(r.kind === "err" && r.error.message !== "", bad);
   }
 });

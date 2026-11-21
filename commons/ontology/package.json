@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/ontology",
   "private": true,
-  "version": "0.4.1",
+  "version": "0.4.3",
   "description": "The ontologies of Intellectual Frontiers Commons as typed TypeScript: Mizan, IFCCM, IFQS, IFR, Kanon, the audit of packaging and the software supply chain.",
   "type": "module",
   "engines": {

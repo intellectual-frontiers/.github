@@ -1,0 +1,17 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-scanners-layers FR-001	check	.github: cd commons/scanners && bun run verify	suite/layers.test.ts: every file of the real tree is in a unit and no import is outside its row
+0001-scanners-layers FR-002	check	.github: cd commons/scanners && bun run verify	suite/layers.test.ts: verify runs every check of the library
+0002-scanners-catalog FR-001	check	.github: cd commons/scanners && bun run verify	suite/catalog.test.ts
+0002-scanners-catalog FR-002	check	.github: cd commons/scanners && bun run verify	suite/catalog.test.ts
+0002-scanners-catalog FR-003	check	.github: cd commons/scanners && bun run verify	suite/catalog.test.ts
+0002-scanners-catalog FR-004	check	.github: cd commons/scanners && bun run verify	suite/catalog.test.ts
+0003-scanners-tls FR-001	check	.github: cd commons/scanners && bun run verify	suite/tls.test.ts
+0003-scanners-tls FR-002	check	.github: cd commons/scanners && bun run verify	suite/tls.test.ts
+0003-scanners-tls FR-003	check	.github: cd commons/scanners && bun run verify	suite/tls.test.ts
+0004-scanners-run FR-001	check	.github: cd commons/scanners && bun run verify	suite/run.test.ts
+0004-scanners-run FR-002	check	.github: cd commons/scanners && bun run verify	suite/run.test.ts
+0004-scanners-run FR-003	check	.github: cd commons/scanners && bun run verify	suite/run.test.ts
+0004-scanners-run FR-004	check	.github: cd commons/scanners && bun run verify	suite/run.test.ts
+0004-scanners-run FR-005	check	.github: cd commons/scanners && bun run verify	suite/run.test.ts

@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/foundation",
   "private": true,
-  "version": "0.1.5",
+  "version": "0.1.7",
   "description": "The foundation libraries as one install, each at an exact version. Errors as values and decoders, formats, cryptography, the system, the terminal, telemetry, the network, the test runtime, RDF, the Git host and the lint rules.",
   "type": "module",
   "engines": {
