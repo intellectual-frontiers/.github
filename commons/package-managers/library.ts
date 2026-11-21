@@ -11,8 +11,7 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
-  held: "built and verified but not released: the owner publishes the archon libraries together, when the first fleet runs on them",
+  distribution: ["github", "npm"],
   exports: [".", "./governance", "./logical", "./physical"],
   summary:
     "The shared kit of the dialects that drive a package manager for Archon and Toolchain: the commands of the packaging ontology as argument vectors (no shell), the exact version written as each manager writes it, the jobs a tool asks of a manager, the plan file, the observation of what is installed, and the dialect made from a manager's data.",

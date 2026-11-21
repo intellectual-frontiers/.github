@@ -84,7 +84,7 @@ proves(["0001-toolchain-layers FR-005"], "the release record agrees with the man
   assertEquals(release.slug, library.name);
   assertEquals(release.version, library.version);
   assertEquals(release.kind, "Software");
-  assertEquals(library.distribution, ["github"], "held back from npm until the owner says it is ready");
+  assertEquals(library.distribution, ["github", "npm"]);
 });
 
 proves(["0001-toolchain-layers FR-006"], "no source reads a file, reaches the network or runs a program", async () => {

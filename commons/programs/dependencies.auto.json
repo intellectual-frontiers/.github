@@ -3,12 +3,15 @@
   "set": "programs",
   "dependencies": {
     "@intellectual-frontiers/arcactl": "0.10.0",
+    "@intellectual-frontiers/archon": "0.1.0",
     "@intellectual-frontiers/docs": "0.2.0",
     "@intellectual-frontiers/ergonex": "0.5.0",
     "@intellectual-frontiers/grc": "0.3.0",
     "@intellectual-frontiers/integrations": "0.2.0",
     "@intellectual-frontiers/integrations-github": "0.2.0",
     "@intellectual-frontiers/libraries": "0.5.0",
-    "@intellectual-frontiers/repoctl": "0.1.0"
+    "@intellectual-frontiers/package-managers": "0.1.0",
+    "@intellectual-frontiers/repoctl": "0.1.0",
+    "@intellectual-frontiers/toolchain": "0.1.0"
   }
 }

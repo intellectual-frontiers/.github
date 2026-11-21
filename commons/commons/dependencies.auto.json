@@ -3,6 +3,7 @@
   "set": "commons",
   "dependencies": {
     "@intellectual-frontiers/arcactl": "0.10.0",
+    "@intellectual-frontiers/archon": "0.1.0",
     "@intellectual-frontiers/core": "0.2.0",
     "@intellectual-frontiers/crypto": "0.2.0",
     "@intellectual-frontiers/docs": "0.2.0",
@@ -21,12 +22,14 @@
     "@intellectual-frontiers/mizan": "0.2.0",
     "@intellectual-frontiers/net": "0.2.0",
     "@intellectual-frontiers/ontology": "0.4.0",
+    "@intellectual-frontiers/package-managers": "0.1.0",
     "@intellectual-frontiers/quality": "0.3.0",
     "@intellectual-frontiers/rdf": "0.2.0",
     "@intellectual-frontiers/repoctl": "0.1.0",
     "@intellectual-frontiers/system": "0.2.0",
     "@intellectual-frontiers/telemetry": "0.2.0",
     "@intellectual-frontiers/terminal": "0.2.0",
-    "@intellectual-frontiers/test": "0.2.0"
+    "@intellectual-frontiers/test": "0.2.0",
+    "@intellectual-frontiers/toolchain": "0.1.0"
   }
 }

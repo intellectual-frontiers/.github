@@ -12,8 +12,7 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
-  held: "built and verified but not released: the owner publishes the archon libraries together, when the first fleet runs on them",
+  distribution: ["github", "npm"],
   exports: [".", "./governance", "./logical", "./dialect", "./cli"],
   family: { host: "archon", role: "host" },
   summary:
