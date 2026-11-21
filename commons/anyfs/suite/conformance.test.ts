@@ -161,6 +161,18 @@ proves(["0005-anyfs-conformance FR-004", "0005-anyfs-conformance FR-005"], "the 
     assertEquals((await localStore("relative/dir")).kind, "err");
     assertEquals((await localStore(osPath.join(dir, "nothing"))).kind, "err");
     assertEquals((await localStore(osPath.join(dir, "made"), { create: true })).kind, "ok");
+    // a store at the root of the file system opens without writing there, reads what is below it, and takes the names the computer has
+    const rootPath = osPath.parse(dir).root;
+    const locks = osPath.join(dir, "locks-of-the-wide-store");
+    const wide = await localStore(rootPath, { portable: false, caseSensitive: true, lockDir: locks });
+    assert(wide.kind === "ok", "the root of the file system opens");
+    const below = p(dir.slice(rootPath.length).split(osPath.sep).join("/") + "/a/b.txt");
+    await s.write(p("a/b.txt"), bytes("seen from the root"), expectAny);
+    const seen = await wide.value.read(below);
+    assert(seen.kind === "ok" && new TextDecoder().decode(seen.value.bytes) === "seen from the root");
+    const written = await wide.value.write(p(`${dir.slice(rootPath.length).split(osPath.sep).join("/")}/a/c.txt`), bytes("written through the root"), expectAny);
+    assert(written.kind === "ok");
+    assertEquals(await fs.exists(locks), true);
   });
   // a store whose methods do not match its capabilities is found by the check the suite is run with
   for (const s of [memoryStore(), await inFolder((dir) => localIn(dir))]) {
@@ -260,4 +272,21 @@ proves(["0005-anyfs-conformance FR-006", "0003-anyfs-logical FR-003"], "the stor
   });
   void err;
   void unavailable;
+});
+
+proves(["0005-anyfs-conformance FR-003"], "the memory store keeps a write that is made while a batch is being prepared: the batch is applied to the state as it is when the batch is committed", async () => {
+  const store = memoryStore({ name: "race" });
+  const at = (text: string): Path => {
+    const r = parsePath(text);
+    if (r.kind === "err") throw new Error(r.error);
+    return r.value;
+  };
+  const big = new Uint8Array(1 << 20).fill(7);
+  const batching = store.batch([{ kind: "put", path: at("batch/a"), bytes: big, expect: expectAny }]);
+  const writing = Promise.all(Array.from({ length: 20 }, (_, i) => store.write(at(`w/${i}`), new TextEncoder().encode(String(i)), expectAny)));
+  const [batched] = await Promise.all([batching, writing]);
+  assert(batched.kind === "ok");
+  const listed = await store.list(ROOT);
+  assert(listed.kind === "ok");
+  assertEquals(listed.value.entries.length, 21, "no write was lost by the batch");
 });

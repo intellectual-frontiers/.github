@@ -1,0 +1,25 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-anyfs-s3-layers FR-001	check	.github: cd commons/anyfs-s3 && bun run verify	suite/layers.test.ts: the table decodes and the checker finds nothing
+0001-anyfs-s3-layers FR-002	check	.github: cd commons/anyfs-s3 && bun run verify	suite/layers.test.ts: verify runs every check of the library
+0001-anyfs-s3-layers FR-003	check	.github: cd commons/anyfs-s3 && bun run verify	suite/layers.test.ts: only the transport reaches the network and no outside package signs
+0001-anyfs-s3-layers FR-004	check	.github: cd commons/anyfs-s3 && bun run verify	suite/layers.test.ts: the manifest holds the library with the reason
+0001-anyfs-s3-layers FR-005	check	.github: cd commons/anyfs-s3 && bun run verify	suite/layers.test.ts: the packer is the library's own
+0002-anyfs-s3-store FR-001	check	.github: cd commons/anyfs-s3 && bun run verify	suite/keys.test.ts: the names of buckets
+0002-anyfs-s3-store FR-002	check	.github: cd commons/anyfs-s3 && bun run verify	suite/keys.test.ts: keys, paths, encoding and findings
+0002-anyfs-s3-store FR-003	check	.github: cd commons/anyfs-s3 && bun run verify	suite/xml.test.ts: the strict reader and its refusals
+0002-anyfs-s3-store FR-004	check	.github: cd commons/anyfs-s3 && bun run verify	suite/errors.test.ts: the total table of errors
+0002-anyfs-s3-store FR-005	check	.github: cd commons/anyfs-s3 && bun run verify	suite/credentials.test.ts: the sources of keys
+0002-anyfs-s3-store FR-006	check	.github: cd commons/anyfs-s3 && bun run verify	suite/sigv4.test.ts: failures of the transport are values
+0002-anyfs-s3-store FR-007	check	.github: cd commons/anyfs-s3 && bun run verify	suite/sigv4.test.ts: the examples AWS publishes
+0002-anyfs-s3-store FR-008	check	.github: cd commons/anyfs-s3 && bun run verify	suite/store.test.ts: the probe and the capabilities it decides
+0002-anyfs-s3-store FR-009	check	.github: cd commons/anyfs-s3 && bun run verify	suite/store.test.ts: revisions, foreign objects, tampering and the two schemes
+0002-anyfs-s3-store FR-010	check	.github: cd commons/anyfs-s3 && bun run verify	suite/store.test.ts: races of writers on both servers
+0002-anyfs-s3-store FR-011	check	.github: cd commons/anyfs-s3 && bun run verify	suite/store.test.ts: delete at a revision and delete of nothing
+0002-anyfs-s3-store FR-012	check	.github: cd commons/anyfs-s3 && bun run verify	suite/store.test.ts: names, pages of more than a thousand and keys that are no paths
+0002-anyfs-s3-store FR-013	check	.github: cd commons/anyfs-s3 && bun run verify	suite/store.test.ts: connection loss, throttling and the limits
+0002-anyfs-s3-store FR-014	check	.github: cd commons/anyfs-s3 && bun run verify	suite/store.test.ts and suite/bridge.test.ts: the conformance suites on both servers
+0003-anyfs-s3-tests FR-001	check	.github: cd commons/anyfs-s3 && bun run verify	suite/rustfs.test.ts: the pins and the verified download
+0003-anyfs-s3-tests FR-002	check	.github: cd commons/anyfs-s3 && bun run verify	suite/store.test.ts: one contract on the fake and on RustFS
+0003-anyfs-s3-tests FR-003	check	.github: cd commons/anyfs-s3 && bun run verify	suite/store.test.ts: a test says why it did not run RustFS

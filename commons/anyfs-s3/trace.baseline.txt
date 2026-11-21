@@ -1,0 +1,3 @@
+# # The findings of the trace check of AnyFS S3 (tools/check.ts) that existed when each was first held.
+# # A new finding fails the check, and so does a line below that no longer occurs: when you fix one, delete its line.
+# # Never add a line to make a check pass.

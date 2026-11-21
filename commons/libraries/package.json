@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/libraries",
   "private": true,
-  "version": "0.5.4",
+  "version": "0.5.5",
   "description": "The libraries of a repository of commons as code: the manifest of a library and the check that it and its folder agree, which libraries a change affects, the typed workflows of GitHub Actions and their generator, the pinned Bun, the packer that builds, inspects and packs a library for npm with its declarations, and the commands that hold a whole repository to Mizan (check, change control, versions, the register and the ontologies).",
   "type": "module",
   "engines": {

@@ -4,3 +4,4 @@ number	slug	state
 0003	bridge-transfer	in force
 0004	bridge-twoway	in force
 0005	bridge-conformance	in force
+0006	bridge-mirrored	in force
