@@ -4,6 +4,8 @@
   "dependencies": {
     "@intellectual-frontiers/arcactl": "0.10.0",
     "@intellectual-frontiers/archon": "0.1.0",
+    "@intellectual-frontiers/archon-dialect-mise": "0.1.0",
+    "@intellectual-frontiers/archon-dialect-native-pinned": "0.1.0",
     "@intellectual-frontiers/docs": "0.3.0",
     "@intellectual-frontiers/ergonex": "0.5.1",
     "@intellectual-frontiers/grc": "0.3.1",
