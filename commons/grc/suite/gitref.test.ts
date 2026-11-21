@@ -62,7 +62,8 @@ proves(["0013-grc-gitref FR-002"], "a commit leaves the working tree, the index 
     assertEquals(await git(dir, "rev-parse", "main"), mainBefore);
     assertEquals(await git(dir, "symbolic-ref", "--short", "HEAD"), "main");
     assertEquals(await fs.readTextFile(path.join(dir, "work.txt")), "uncommitted\n");
-    assertEquals(await git(dir, "log", "-1", "--format=%cI|%an|%ae|%G?", "evidence"), "2026-12-01T10:00:00+00:00|collector|collector@localhost|N");
+    // the instant as seconds since the epoch: Git writes a UTC offset as `Z` or `+00:00` by its version
+    assertEquals(await git(dir, "log", "-1", "--format=%ct|%an|%ae|%G?", "evidence"), `${Date.parse("2026-12-01T10:00:00Z") / 1000}|collector|collector@localhost|N`);
   });
 }, skip);
 

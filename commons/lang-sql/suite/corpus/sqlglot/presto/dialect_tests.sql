@@ -1,0 +1,543 @@
+SELECT purchases, LAST_VALUE(item) OVER (PARTITION BY purchases ORDER BY purchases NULLS FIRST ROWS BETWEEN 2 PRECEDING AND 2 FOLLOWING) AS most_popular FROM Produce;
+
+SELECT results FROM Coordinates CROSS JOIN UNNEST(Coordinates.position) AS _t0(results);
+
+SELECT results FROM Coordinates CROSS JOIN "Coordinates"."position" AS results;
+
+SELECT results FROM Coordinates AS c, UNNEST(c.position) AS _t(results);
+
+SELECT results FROM Coordinates AS c CROSS JOIN UNNEST(c.position) AS _t0(results);
+
+SELECT LAST_DAY_OF_MONTH(CAST('2008-11-25' AS DATE));
+
+SELECT DATE_DIFF('MINUTE', FROM_UNIXTIME(0), FROM_UNIXTIME(60));
+
+SELECT DATE_DIFF('MONTH', DATE_TRUNC('MONTH', CAST('2021-01-31 00:00:00' AS TIMESTAMP)), DATE_TRUNC('MONTH', CAST('2021-02-01 00:00:00' AS TIMESTAMP)));
+
+SELECT DATE_DIFF('WEEK', DATE_TRUNC('WEEK', CAST('2017-10-14 00:00:00' AS TIMESTAMP) + INTERVAL '1' DAY), DATE_TRUNC('WEEK', CAST('2017-10-15 00:00:00' AS TIMESTAMP) + INTERVAL '1' DAY));
+
+SELECT LOWER(TO_HEX(MD5(some_string)));
+
+SELECT * FROM UNNEST(ARRAY['7', '14']) AS _t0(x);
+
+CREATE TABLE db.example_table (col_a ROW(struct_col_a INTEGER, struct_col_b VARCHAR));
+
+CREATE TABLE db.example_table (col_a ROW(struct_col_a BIGINT, struct_col_b ROW(nested_col_a VARCHAR, nested_col_b VARCHAR)));
+
+DELETE FROM db.example_table WHERE x = 1;
+
+DELETE FROM db.example_table WHERE example_table.x = 1;
+
+DELETE FROM db.t1 WHERE NOT c IN (SELECT c FROM db.t2);
+
+SELECT * FROM a WHERE b IN (SELECT UNNEST(ARRAY[1, 2, 3]));
+
+SELECT CAST(UUID() AS VARCHAR);
+
+SELECT JSON '{"a": 1}';
+
+SELECT JSON_PARSE('{"a": 1}');
+
+SELECT * FROM UNNEST(ARRAY[CAST(ROW('Alice', CAST(ROW(85, 90) AS ROW(math INTEGER, english INTEGER))) AS ROW(name VARCHAR, scores ROW(math INTEGER, english INTEGER))), CAST(ROW('Bob', CAST(ROW(92, 88) AS ROW(math INTEGER, english INTEGER))) AS ROW(name VARCHAR, scores ROW(math INTEGER, english INTEGER)))]);
+
+SELECT * FROM UNNEST(ARRAY[CAST(ROW('Alice', 85) AS ROW(name VARCHAR, score INTEGER)), CAST(ROW('Bob', 92) AS ROW(name VARCHAR, score INTEGER)), CAST(ROW('Diana', 95) AS ROW(name VARCHAR, score INTEGER))]);
+
+SELECT a[2], b[2], c[1], ELEMENT_AT(d, 2), ELEMENT_AT(e, 1);
+
+SELECT SHA1(x), SHA256(x), SHA512(x);
+
+SELECT col[1];
+
+TABLE "table";
+
+CREATE TABLE a (LIKE b);
+
+SELECT COALESCE(1, NULL) FROM foo;
+
+SELECT CASE WHEN NOT a IS NULL THEN b ELSE c END;
+
+SELECT CASE WHEN NOT a IS NULL THEN b END;
+
+SELECT ARRAY_EXCEPT(ARRAY[1, 2, 3], ARRAY[2]);
+
+SELECT array_position(array[1, 2, 3], 2);
+
+SELECT fname, lname, age FROM person ORDER BY age DESC NULLS FIRST, fname ASC, lname NULLS FIRST;
+
+SELECT a FROM x CROSS JOIN UNNEST(y) AS t(a);
+
+SELECT a, b FROM x CROSS JOIN UNNEST(y, z) AS t(a, b);
+
+SELECT a FROM x CROSS JOIN UNNEST(y) WITH ORDINALITY AS t(a);
+
+SELECT * FROM x CROSS JOIN UNNEST(y) AS t;
+
+SELECT a, b FROM x CROSS JOIN UNNEST(y) AS t(a, b);
+
+SELECT numbers, animals, n, a FROM (SELECT ARRAY[2, 5] AS numbers, ARRAY['dog', 'cat', 'bird'] AS animals UNION ALL SELECT ARRAY[7, 8, 9], ARRAY['cow', 'pig']) AS x CROSS JOIN UNNEST(numbers, animals) AS t(n, a);
+
+SELECT a, b, c, d, e FROM x CROSS JOIN UNNEST(y) AS t(a, b, c, d);
+
+SELECT * FROM x CROSS JOIN UNNEST(a) AS j(lista) CROSS JOIN UNNEST(b) AS k(listb) CROSS JOIN UNNEST(c) AS l(listc);
+
+SELECT * FROM a UNION SELECT * FROM b;
+
+SELECT * FROM a UNION ALL SELECT * FROM b;
+
+SELECT * FROM a INTERSECT SELECT * FROM b;
+
+SELECT * FROM a EXCEPT SELECT * FROM b;
+
+SELECT * FROM a INTERSECT ALL SELECT * FROM b;
+
+SELECT * FROM a EXCEPT ALL SELECT * FROM b;
+
+SELECT IF(COALESCE(bar, 0) = 1, TRUE, FALSE) AS foo FROM baz;
+
+SELECT * FROM t FETCH FIRST ROWS ONLY;
+
+WITH t AS (SELECT 1 AS x, 2 AS y) SELECT x AS x FROM t GROUP BY x;
+
+WITH t AS (SELECT 1 AS x, 2 AS y) SELECT SUM(x) AS y, y AS x FROM t GROUP BY y;
+
+SELECT * FROM (SELECT 1 AS col) apply;
+
+START TRANSACTION;
+
+START TRANSACTION READ WRITE, ISOLATION LEVEL SERIALIZABLE;
+
+START TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+
+SELECT COUNT_IF(col % 2 = 0) FROM foo;
+
+SELECT COUNT_IF(col % 2 = 0) FILTER(WHERE col < 1000) FROM foo;
+
+SELECT * FROM (WITH t AS (SELECT 1 AS c) SELECT c FROM t) AS subq;
+
+SELECT * FROM UNNEST(SEQUENCE(CAST('2020-01-01' AS DATE), CAST('2020-02-01' AS DATE), (1 * INTERVAL '7' DAY)));
+
+SELECT ARRAY_JOIN(ARRAY[1, 2, 3, NULL, 5], ',', '*');
+
+SELECT IF(_u.pos = _u_2.pos_2, _u_2.col) AS col, IF(_u.pos = _u_3.pos_3, _u_3.col_2) AS col_2, IF(_u.pos = _u_4.pos_4, _u_4.col_3) AS col_3 FROM UNNEST(SEQUENCE(1, GREATEST(CARDINALITY(ARRAY[1, 2, 3]), CARDINALITY(ARRAY[4, 5]), CARDINALITY(ARRAY[6])))) AS _u(pos) CROSS JOIN UNNEST(ARRAY[1, 2, 3]) WITH ORDINALITY AS _u_2(col, pos_2) CROSS JOIN UNNEST(ARRAY[4, 5]) WITH ORDINALITY AS _u_3(col_2, pos_3) CROSS JOIN UNNEST(ARRAY[6]) WITH ORDINALITY AS _u_4(col_3, pos_4) WHERE ((_u.pos = _u_2.pos_2 OR (_u.pos > CARDINALITY(ARRAY[1, 2, 3]) AND _u_2.pos_2 = CARDINALITY(ARRAY[1, 2, 3]))) AND (_u.pos = _u_3.pos_3 OR (_u.pos > CARDINALITY(ARRAY[4, 5]) AND _u_3.pos_3 = CARDINALITY(ARRAY[4, 5])))) AND (_u.pos = _u_4.pos_4 OR (_u.pos > CARDINALITY(ARRAY[6]) AND _u_4.pos_4 = CARDINALITY(ARRAY[6])));
+
+SELECT IF(_u.pos = _u_2.pos_2, _u_2.col) AS col, IF(_u.pos = _u_3.pos_3, _u_3.col_2) AS col_2, IF(_u.pos = _u_4.pos_4, _u_4.col_3) AS col_3 FROM x CROSS JOIN UNNEST(SEQUENCE(1, GREATEST(CARDINALITY(ARRAY[1, 2, 3]), CARDINALITY(ARRAY[4, 5]), CARDINALITY(ARRAY[6])))) AS _u(pos) CROSS JOIN UNNEST(ARRAY[1, 2, 3]) WITH ORDINALITY AS _u_2(col, pos_2) CROSS JOIN UNNEST(ARRAY[4, 5]) WITH ORDINALITY AS _u_3(col_2, pos_3) CROSS JOIN UNNEST(ARRAY[6]) WITH ORDINALITY AS _u_4(col_3, pos_4) WHERE ((_u.pos = _u_2.pos_2 OR (_u.pos > CARDINALITY(ARRAY[1, 2, 3]) AND _u_2.pos_2 = CARDINALITY(ARRAY[1, 2, 3]))) AND (_u.pos = _u_3.pos_3 OR (_u.pos > CARDINALITY(ARRAY[4, 5]) AND _u_3.pos_3 = CARDINALITY(ARRAY[4, 5])))) AND (_u.pos = _u_4.pos_4 OR (_u.pos > CARDINALITY(ARRAY[6]) AND _u_4.pos_4 = CARDINALITY(ARRAY[6])));
+
+SELECT SLICE(ARRAY[10, 20, 30, 40, 50], 3, 3);
+
+SELECT SLICE(ARRAY[1, 2, 3, 4], 2, 2);
+
+SELECT ((DATE_ADD('week', -5, DATE_TRUNC('DAY', DATE_ADD('day', (0 - MOD((DAY_OF_WEEK(CAST(CAST(DATE_TRUNC('DAY', NOW()) AS DATE) AS TIMESTAMP)) % 7) - 1 + 7, 7)), CAST(CAST(DATE_TRUNC('DAY', NOW()) AS DATE) AS TIMESTAMP)))))) AS t1;
+
+SELECT CAST('foo' AS TIMESTAMP);
+
+SELECT some_arr[1] AS first FROM blah;
+
+SELECT BITWISE_AND(x, 1);
+
+SELECT BITWISE_OR(x, 1);
+
+SELECT BITWISE_XOR(x, 1);
+
+SELECT BITWISE_NOT(x);
+
+SELECT BITWISE_LEFT_SHIFT(x, 1);
+
+SELECT BITWISE_RIGHT_SHIFT(x, 1);
+
+SELECT REGEXP_EXTRACT('My mail address is my_mail@yahoo.com', '(?i)[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}') AS EMAIL;
+
+SELECT IF(1 = 0, NULL, 1) AS NIZ1;
+
+SELECT IF(NULL IS NULL, 0, NULL) AS NIZ1;
+
+SELECT REGEXP_LIKE(a, 'x');
+
+SELECT REGEXP_LIKE(a, '.*x.*');
+
+SELECT VAR_POP(current_salary);
+
+SELECT DATE_FORMAT(CAST('1999-12-31' AS DATE)) AS TO_CHAR;
+
+CREATE TABLE x (w VARCHAR, y INTEGER, z INTEGER) WITH (PARTITIONED_BY=ARRAY['y', 'z']);
+
+CREATE TABLE test WITH (format='parquet', x='1', Z='2') AS SELECT 1;
+
+CREATE TABLE db.example_table (col_a ROW(struct_col_a INTEGER, struct_col_b ROW(nested_col_a VARCHAR, nested_col_b VARCHAR)));
+
+SELECT a, b FROM x CROSS JOIN UNNEST(y) AS t(a) CROSS JOIN UNNEST(z) AS u(b);
+
+SELECT a FROM x CROSS JOIN LATERAL (SELECT pos - 1 AS pos, col FROM UNNEST(y) WITH ORDINALITY AS t(col, pos));
+
+SELECT * FROM x CROSS JOIN LATERAL (SELECT pos - 1 AS pos, key, value FROM UNNEST(MAP(ARRAY[col], ARRAY['val'])) WITH ORDINALITY AS t(key, value, pos));
+
+SELECT a FROM x CROSS JOIN UNNEST(ARRAY[y]) AS t(a);
+
+SELECT * FROM x AS foo TABLESAMPLE BERNOULLI (1);
+
+SELECT DATE_TRUNC('MONTH', CAST(ds AS TIMESTAMP));
+
+SELECT DATE_TRUNC('MONTH', TRY_CAST(ds AS TIMESTAMP));
+
+SELECT ANY_MATCH(arr, x -> x > 2);
+
+SELECT (DATE_DIFF('DAY', CAST(CAST('0000-01-01' AS TIMESTAMP) AS DATE), CAST(CAST(x AS TIMESTAMP) AS DATE)) + 1);
+
+SELECT DATE_DIFF('DAY', y, x);
+
+SELECT DATE_DIFF('DAY', DATE_TRUNC('DAY', y), DATE_TRUNC('DAY', x));
+
+SELECT * FROM test OFFSET 1 LIMIT 1;
+
+SELECT IF(a, 1);
+
+SELECT APPROX_PERCENTILE(amount, 0.5);
+
+SELECT * FROM UNNEST(SEQUENCE(a, b));
+
+SELECT * FROM t CROSS JOIN UNNEST(SEQUENCE(2, 4));
+
+SELECT * FROM t CROSS JOIN UNNEST(SEQUENCE(2, 4)) AS _u(s);
+
+SELECT * FROM x FETCH FIRST 1 ROWS ONLY;
+
+SELECT fname, lname, age FROM person ORDER BY age DESC NULLS FIRST, fname ASC, lname;
+
+CREATE TABLE x (a UUID, b VARBINARY);
+
+SELECT IF(_u.pos = _u_2.pos_2, _u_2.col) AS col FROM t CROSS JOIN UNNEST(SEQUENCE(1, GREATEST(CARDINALITY(c)))) AS _u(pos) CROSS JOIN UNNEST(c) WITH ORDINALITY AS _u_2(col, pos_2) WHERE _u.pos = _u_2.pos_2 OR (_u.pos > CARDINALITY(c) AND _u_2.pos_2 = CARDINALITY(c));
+
+SELECT IF(_u.pos = _u_2.pos_2, _u_2.col) AS col FROM UNNEST(SEQUENCE(1, GREATEST(CARDINALITY(ARRAY[1])))) AS _u(pos) CROSS JOIN UNNEST(ARRAY[1]) WITH ORDINALITY AS _u_2(col, pos_2) WHERE _u.pos = _u_2.pos_2 OR (_u.pos > CARDINALITY(ARRAY[1]) AND _u_2.pos_2 = CARDINALITY(ARRAY[1]));
+
+SELECT U&'Hello winter \2603 !';
+
+SELECT U&'can''t';
+
+DEALLOCATE PREPARE my_query;
+
+DESCRIBE INPUT x;
+
+DESCRIBE OUTPUT x;
+
+SELECT * FROM x qualify;
+
+SELECT * FROM x AS qualify;
+
+SELECT FROM_ISO8601_TIMESTAMP('2020-05-11T11:15:05');
+
+SELECT FROM_ISO8601_DATE('2020-05-11');
+
+SELECT CAST('10C' AS INTEGER);
+
+SELECT CAST('1970-01-01 00:00:00' AS TIMESTAMP);
+
+SELECT FROM_UNIXTIME(col) FROM tbl;
+
+SELECT DATE_ADD('DAY', 1, CAST(CURRENT_DATE AS TIMESTAMP));
+
+SELECT CAST('2012-10-31 00:00' AS TIMESTAMP) AT TIME ZONE 'America/Sao_Paulo';
+
+SELECT AT_TIMEZONE(CAST('2012-10-31 00:00' AS TIMESTAMP), 'America/Sao_Paulo');
+
+SELECT CAST('2012-10-31 00:00:00' AS TIMESTAMP) AT TIME ZONE 'America/Sao_Paulo';
+
+SELECT AT_TIMEZONE(CAST('2012-10-31 00:00' AS TIMESTAMP WITH TIME ZONE), 'America/Sao_Paulo');
+
+SELECT DATE_ADD('MINUTE', 30, col);
+
+SELECT DATE_ADD('DAY', MOD(5, 2.5), y), DATE_ADD('DAY', CEIL(5.5), y);
+
+SELECT DATE_ADD('DAY', CAST(5 % 2.5 AS BIGINT), y), DATE_ADD('DAY', CAST(CEIL(5.5) AS BIGINT), y);
+
+SELECT WEEK_OF_YEAR(y);
+
+SELECT WEEK(y);
+
+CREATE TABLE test WITH (FORMAT = 'PARQUET') AS SELECT 1;
+
+CREATE TABLE test WITH (format='PARQUET') AS SELECT 1;
+
+CREATE TABLE test STORED AS 'PARQUET' AS SELECT 1;
+
+CREATE TABLE test WITH (FORMAT = 'PARQUET', X = '1', Z = '2') AS SELECT 1;
+
+CREATE TABLE x WITH (bucket_by = ARRAY['y'], bucket_count = 64) AS SELECT 1 AS y;
+
+CREATE TABLE x WITH (bucket_by=ARRAY['y'], bucket_count=64) AS SELECT 1 AS y;
+
+SELECT fname, lname, age FROM person ORDER BY age DESC NULLS FIRST, fname ASC NULLS LAST, lname;
+
+CREATE OR REPLACE VIEW x (cola) SELECT 1 as cola;
+
+CREATE OR REPLACE VIEW x AS SELECT 1 AS cola;
+
+CREATE TABLE IF NOT EXISTS x ("cola" INTEGER, "ds" TEXT) COMMENT 'comment' WITH (PARTITIONED BY=("ds"));
+
+CREATE TABLE IF NOT EXISTS x ("cola" INTEGER, "ds" VARCHAR) COMMENT 'comment' WITH (PARTITIONED_BY=ARRAY['ds']);
+
+CREATE OR REPLACE VIEW v SECURITY DEFINER AS SELECT id FROM t;
+
+CREATE OR REPLACE VIEW v SECURITY INVOKER AS SELECT id FROM t;
+
+SELECT a FROM x CROSS JOIN UNNEST(ARRAY(y)) AS t (a);
+
+SELECT a FROM x CROSS JOIN UNNEST(ARRAY(y)) AS t (a) CROSS JOIN b;
+
+SELECT a FROM x CROSS JOIN UNNEST(ARRAY[y]) AS t(a) CROSS JOIN b;
+
+SELECT SHA256(x);
+
+SELECT SHA512(x);
+
+SELECT LOWER(TO_HEX(SHA256(x)));
+
+SELECT LOWER(TO_HEX(SHA512(x)));
+
+SELECT a FROM t GROUP BY a, ROLLUP (b), ROLLUP (c), ROLLUP (d);
+
+SELECT a FROM test TABLESAMPLE BERNOULLI (50);
+
+SELECT a FROM test TABLESAMPLE SYSTEM (75);
+
+SELECT * FROM x OFFSET 1 LIMIT 1;
+
+SELECT * FROM x OFFSET 1 ROW;
+
+SELECT * FROM x OFFSET 1;
+
+SELECT * FROM x OFFSET 1 FETCH FIRST 1 ROWS ONLY;
+
+SELECT BOOL_OR(a > 10) FROM asd AS T(a);
+
+SELECT * FROM (VALUES (1));
+
+SELECT SPLIT_TO_MAP('a:1;b:2;a:3', ';', ':', (k, v1, v2) -> CONCAT(v1, v2));
+
+SELECT * FROM example.testdb.customer_orders FOR VERSION AS OF 8954597067493422955;
+
+SELECT * FROM example.testdb.customer_orders FOR TIMESTAMP AS OF CAST('2022-03-23 09:59:29.803 Europe/Vienna' AS TIMESTAMP);
+
+SELECT origin_state, destination_state, origin_zip, SUM(package_weight) FROM shipping GROUP BY ALL CUBE (origin_state, destination_state), ROLLUP (origin_state, origin_zip);
+
+SELECT origin_state, destination_state, origin_zip, SUM(package_weight) FROM shipping GROUP BY DISTINCT CUBE (origin_state, destination_state), ROLLUP (origin_state, origin_zip);
+
+SELECT JSON_EXTRACT_SCALAR(CAST(extra AS JSON), '$.value_b'), COUNT(*) FROM table_a GROUP BY DISTINCT (JSON_EXTRACT_SCALAR(CAST(extra AS JSON), '$.value_b'));
+
+SELECT MAX_BY(a.id, a.timestamp) FROM a;
+
+SELECT MIN_BY(a.id, a.timestamp, 3) FROM a;
+
+SELECT ROW(1, 2);
+
+VALUES 1, 2, 3;
+
+VALUES (1), (2), (3);
+
+SELECT INTERVAL 'x) ; SELECT 1; --' WEEK;
+
+SELECT SUBSTR(a, 1, 3), SUBSTR(a, LENGTH(a) - (3 - 1));
+
+WITH RECURSIVE t(n) AS (SELECT 1 AS n UNION ALL SELECT n + 1 AS n FROM t WHERE n < 4) SELECT SUM(n) FROM t;
+
+WITH RECURSIVE t(n, k) AS (SELECT 1 AS n, 2 AS k) SELECT SUM(n) FROM t;
+
+WITH RECURSIVE t1(n) AS (SELECT 1 AS n), t2(n) AS (SELECT 2 AS n) SELECT SUM(t1.n), SUM(t2.n) FROM t1, t2;
+
+WITH RECURSIVE t(n, _c_0) AS (SELECT 1 AS n, (1 + 2)) SELECT * FROM t;
+
+WITH RECURSIVE t(n, "1") AS (SELECT n, 1 FROM tbl) SELECT * FROM t;
+
+SELECT JSON_OBJECT(KEY 'key1' VALUE 1, KEY 'key2' VALUE TRUE);
+
+SELECT JSON_OBJECT('key1': 1, 'key2': TRUE);
+
+SELECT a."b" FROM "foo";
+
+SELECT ARRAY[1, 2];
+
+SELECT APPROX_DISTINCT(a) FROM foo;
+
+SELECT APPROX_DISTINCT(a, 0.1) FROM foo;
+
+SELECT JSON_EXTRACT(x, '$.name');
+
+SELECT JSON_EXTRACT_SCALAR(x, '$.name');
+
+SELECT ARRAY_SORT(x, (left, right) -> -1);
+
+SELECT ARRAY_SORT(x, ("left", "right") -> -1);
+
+SELECT * FROM UNNEST(ARRAY['7', '14']) AS x;
+
+SELECT * FROM UNNEST(ARRAY['7', '14']) AS x(y);
+
+WITH RECURSIVE t(n) AS (VALUES (1) UNION ALL SELECT n+1 FROM t WHERE n < 100 ) SELECT SUM(n) FROM t;
+
+WITH RECURSIVE t(n) AS (SELECT * FROM (VALUES (1)) AS _values UNION ALL SELECT n + 1 FROM t WHERE n < 100) SELECT SUM(n) FROM t;
+
+SELECT JSON_FORMAT(JSON '{"a": 1, "b": "c"}');
+
+SELECT JSON_FORMAT(JSON '[1, 2, 3]');
+
+SELECT id, FIRST_VALUE(is_deleted) OVER (PARTITION BY id) AS first_is_deleted, NTH_VALUE(is_deleted, 2) OVER (PARTITION BY id) AS nth_is_deleted, LAST_VALUE(is_deleted) OVER (PARTITION BY id) AS last_is_deleted FROM my_table;
+
+SELECT NULLABLE FROM system.jdbc.types;
+
+SELECT * FROM foo FOR TIMESTAMP AS OF CAST('2020-01-01 00:00:00' AS TIMESTAMP) AS bar;
+
+SELECT JSON_EXTRACT(x, '$[1,0]');
+
+SELECT JSON_EXTRACT_SCALAR(x, '$[1,0]');
+
+SELECT JSON_EXTRACT(x, '$["a",""]');
+
+SELECT JSON_EXTRACT(x, '$[""]');
+
+SELECT CAST(JSON '[1,23,456]' AS ARRAY(INTEGER));
+
+SELECT CAST(JSON_PARSE('[1,23,456]') AS ARRAY(INTEGER));
+
+SELECT CAST(JSON '{"k1":1,"k2":23,"k3":456}' AS MAP(VARCHAR, INTEGER));
+
+SELECT CAST(JSON_PARSE('{"k1":1,"k2":23,"k3":456}') AS MAP(VARCHAR, INTEGER));
+
+SELECT CAST(ARRAY [1, 23, 456] AS JSON);
+
+SELECT CAST(ARRAY[1, 23, 456] AS JSON);
+
+SELECT
+  *
+FROM orders
+MATCH_RECOGNIZE (
+  PARTITION BY custkey
+  ORDER BY
+    orderdate
+  MEASURES
+    A.totalprice AS starting_price,
+    LAST(B.totalprice) AS bottom_price,
+    LAST(C.totalprice) AS top_price
+  ONE ROW PER MATCH
+  AFTER MATCH SKIP PAST LAST ROW
+  PATTERN (A B+ C+ D+)
+  DEFINE
+    B AS totalprice < PREV(totalprice),
+    C AS totalprice > PREV(totalprice) AND totalprice <= A.totalprice,
+    D AS totalprice > PREV(totalprice),
+    E AS MAX(foo) >= NEXT(bar)
+);
+
+ANALYZE tbl;
+
+ANALYZE tbl WITH (prop1=val1, prop2=val2);
+
+SELECT COALESCE(ELEMENT_AT(MAP_FROM_ENTRIES(ARRAY[(51, '1')]), id), quantity) FROM my_table;
+
+SELECT ELEMENT_AT(ARRAY[1, 2, 3], 4);
+
+SELECT JSON_EXTRACT_SCALAR(TRY(FILTER(CAST(JSON_EXTRACT('{"k1": [{"k2": "{\"k3\": 1}", "k4": "v"}]}', '$.k1') AS ARRAY(MAP(VARCHAR, VARCHAR))), x -> x['k4'] = 'v')[1]['k2']), '$.k3');
+
+SELECT JSON_EXTRACT_SCALAR('{ "farm": {"barn": { "color": "red", "feed stocked": true }}}', '$.farm.barn.color');
+
+CREATE TABLE IF NOT EXISTS city_slash_id ("city/id" INTEGER NOT NULL, state CHAR(2) NOT NULL);
+
+SELECT a, b FROM (SELECT a AS a, b AS b, ROW_NUMBER() OVER (PARTITION BY a ORDER BY c DESC NULLS FIRST) AS _row_number FROM x) AS _t WHERE _row_number = 1;
+
+SELECT DATE_ADD('MONTH', 18, CAST('2008-02-28' AS TIMESTAMP));
+
+SELECT DATE_DIFF('WEEK', CAST('2009-01-01' AS TIMESTAMP), CAST('2009-12-31' AS TIMESTAMP));
+
+SELECT * FROM (SELECT 1, 2) AS t;
+
+CREATE TABLE t1 (LIKE t2);
+
+CREATE TABLE t1 (col VARCHAR, LIKE t2);
+
+SELECT U&'d\0061t\0061';
+
+WITH vartab(v) AS (SELECT JSON_PARSE('[{"attr": [{"name": "banana"}]}]')) SELECT JSON_EXTRACT(v, '$[0].attr[0].name') FROM vartab;
+
+WITH vartab(v) AS (SELECT JSON_PARSE('{"attr": [{"name": "banana"}]}')) SELECT JSON_EXTRACT(v, '$.attr[0].name') FROM vartab;
+
+SELECT JSON_EXTRACT(JSON_PARSE('{"fruit":"banana"}'), '$.fruit');
+
+SELECT i, p, o FROM (SELECT i, p, o, ROW_NUMBER() OVER (PARTITION BY p ORDER BY o) AS _w FROM qt) AS _t WHERE _w = 1;
+
+SELECT FROM_UNIXTIME(CAST(1659981729000000000 AS DOUBLE) / POW(10, 9));
+
+SELECT ARRAY_AGG(DISTINCT a) FILTER(WHERE a IS NOT NULL);
+
+SELECT APPROX_PERCENTILE(a, 1, 0.5, 0.001) FROM t;
+
+SELECT APPROX_PERCENTILE(a, 0.5) FROM t;
+
+SELECT CONTAINS(ARRAY['1'], '1');
+
+SELECT CONTAINS(ARRAY[DATE '2020-10-10'], DATE '2020-10-10');
+
+SELECT TO_UNIXTIME(CAST(foo AS TIMESTAMP)) AS ddate FROM table_name;
+
+SELECT TO_UNIXTIME(CAST(foo AS TIMESTAMP)) * 1000 AS ddate FROM table_name;
+
+CREATE TABLE db.example_table (col_a ARRAY(INTEGER), col_b ARRAY(ARRAY(INTEGER)));
+
+CREATE TABLE x WITH (format='ICEBERG', PARTITIONED_BY=ARRAY['MONTHS(y)']);
+
+CREATE TABLE blah (
+  col_a INTEGER,
+  date VARCHAR
+)
+COMMENT 'Test comment: blah'
+WITH (
+  PARTITIONED_BY=ARRAY['date'],
+  format='ICEBERG',
+  x='1'
+);
+
+SELECT JSON_FORMAT(CAST(CAST(ROW('blah') AS ROW(x VARCHAR)) AS JSON)) AS y;
+
+SELECT ELEMENT_AT(ARRAY[1, 2, 3], 2);
+
+SELECT id_column, name, age FROM test_table CROSS JOIN UNNEST(struc_column) AS explode_view(name, age);
+
+SELECT DATE_FORMAT(CAST(CAST('2020-01-01' AS DATE) AS TIMESTAMP), '%W') AS weekday;
+
+SELECT REGEXP_SPLIT('123|789', '\|');
+
+WITH tbl AS (SELECT 1 AS id, 'eggy' AS name UNION ALL SELECT NULL AS id, 'jake' AS name) SELECT COUNT(DISTINCT CASE WHEN id IS NULL THEN NULL WHEN name IS NULL THEN NULL ELSE (id, name) END) AS cnt FROM tbl;
+
+SELECT WITH_TIMEZONE(CAST('2016-08-31' AS TIMESTAMP), 'Asia/Seoul') AT TIME ZONE 'UTC';
+
+SELECT AT_TIMEZONE(CAST('2016-08-31' AS TIMESTAMP), 'Asia/Seoul');
+
+SELECT SPLIT_TO_MAP('a:1,b:2,c:3', ',', ':');
+
+SELECT DATE_DIFF('MONTH', CAST(CAST('2020-01-01' AS TIMESTAMP) AS DATE), CAST(CAST('2020-03-05' AS TIMESTAMP) AS DATE));
+
+SELECT SUBSTR(x, 1, 2), SUBSTR(x, LENGTH(x) - (2 - 1));
+
+SELECT DATE_ADD('MONTH', 20, col);
+
+SELECT CAST(ROW(1, 2) AS ROW(col1 INTEGER, col2 INTEGER));
+
+SELECT IF(_u.pos = _u_2.pos_2, _u_2.col) AS col FROM tbl CROSS JOIN UNNEST(SEQUENCE(1, GREATEST(CARDINALITY(x)))) AS _u(pos) CROSS JOIN UNNEST(x) WITH ORDINALITY AS _u_2(col, pos_2) WHERE _u.pos = _u_2.pos_2 OR (_u.pos > CARDINALITY(x) AND _u_2.pos_2 = CARDINALITY(x));
+
+SELECT IF(_u_2.pos = _u_3.pos_2, _u_3.col_2) AS col_2 FROM _u CROSS JOIN UNNEST(SEQUENCE(1, GREATEST(CARDINALITY(col)))) AS _u_2(pos) CROSS JOIN UNNEST(col) WITH ORDINALITY AS _u_3(col_2, pos_2) WHERE _u_2.pos = _u_3.pos_2 OR (_u_2.pos > CARDINALITY(col) AND _u_3.pos_2 = CARDINALITY(col));
+
+SELECT IF(_u.pos = _u_2.pos_2, _u_2.exploded) AS exploded FROM schema.tbl CROSS JOIN UNNEST(SEQUENCE(1, GREATEST(CARDINALITY(col)))) AS _u(pos) CROSS JOIN UNNEST(col) WITH ORDINALITY AS _u_2(exploded, pos_2) WHERE _u.pos = _u_2.pos_2 OR (_u.pos > CARDINALITY(col) AND _u_2.pos_2 = CARDINALITY(col));
+
+SELECT IF(_u.pos = _u_2.pos_2, _u_2.col) AS col FROM UNNEST(SEQUENCE(1, GREATEST(CARDINALITY(ARRAY[1, 2])))) AS _u(pos) CROSS JOIN UNNEST(ARRAY[1, 2]) WITH ORDINALITY AS _u_2(col, pos_2) WHERE _u.pos = _u_2.pos_2 OR (_u.pos > CARDINALITY(ARRAY[1, 2]) AND _u_2.pos_2 = CARDINALITY(ARRAY[1, 2]));
+
+SELECT IF(_u.pos = _u_2.pos_2, _u_2.x) AS x, IF(_u.pos = _u_2.pos_2, _u_2.pos_2) AS pos_2 FROM UNNEST(SEQUENCE(1, GREATEST(CARDINALITY(ARRAY[2, 3])))) AS _u(pos) CROSS JOIN UNNEST(ARRAY[2, 3]) WITH ORDINALITY AS _u_2(x, pos_2) WHERE _u.pos = _u_2.pos_2 OR (_u.pos > CARDINALITY(ARRAY[2, 3]) AND _u_2.pos_2 = CARDINALITY(ARRAY[2, 3]));
+
+SELECT IF(_u.pos = _u_2.a, _u_2.b) AS b, IF(_u.pos = _u_2.a, _u_2.a) AS a FROM UNNEST(SEQUENCE(1, GREATEST(CARDINALITY(x)))) AS _u(pos) CROSS JOIN UNNEST(x) WITH ORDINALITY AS _u_2(b, a) WHERE _u.pos = _u_2.a OR (_u.pos > CARDINALITY(x) AND _u_2.a = CARDINALITY(x));
+
+SELECT IF(_u.pos = _u_2.pos_2, _u_2.col) AS col, IF(_u.pos = _u_2.pos_2, _u_2.pos_2) AS pos_2, IF(_u.pos = _u_3.pos_3, _u_3.col_2) AS col_2 FROM tbl CROSS JOIN UNNEST(SEQUENCE(1, GREATEST(CARDINALITY(ARRAY[2, 3]), CARDINALITY(ARRAY[4, 5, 6])))) AS _u(pos) CROSS JOIN UNNEST(ARRAY[2, 3]) WITH ORDINALITY AS _u_2(col, pos_2) CROSS JOIN UNNEST(ARRAY[4, 5, 6]) WITH ORDINALITY AS _u_3(col_2, pos_3) WHERE (_u.pos = _u_2.pos_2 OR (_u.pos > CARDINALITY(ARRAY[2, 3]) AND _u_2.pos_2 = CARDINALITY(ARRAY[2, 3]))) AND (_u.pos = _u_3.pos_3 OR (_u.pos > CARDINALITY(ARRAY[4, 5, 6]) AND _u_3.pos_3 = CARDINALITY(ARRAY[4, 5, 6])));
+
+SELECT col, pos, IF(_u_2.pos_2 = _u_3.pos_3, _u_3.col_2) AS col_2, IF(_u_2.pos_2 = _u_3.pos_3, _u_3.pos_3) AS pos_3 FROM _u CROSS JOIN UNNEST(SEQUENCE(1, GREATEST(CARDINALITY(ARRAY[2, 3])))) AS _u_2(pos_2) CROSS JOIN UNNEST(ARRAY[2, 3]) WITH ORDINALITY AS _u_3(col_2, pos_3) WHERE _u_2.pos_2 = _u_3.pos_3 OR (_u_2.pos_2 > CARDINALITY(ARRAY[2, 3]) AND _u_3.pos_3 = CARDINALITY(ARRAY[2, 3]));
+
+SELECT IF(_u.pos = _u_2.pos_2, _u_2.a) AS a, (SELECT MAX(b) FROM (SELECT IF(_u.pos = _u_2.pos_2, _u_2.b) AS b FROM UNNEST(SEQUENCE(1, GREATEST(CARDINALITY(ARRAY[1, 2])))) AS _u(pos) CROSS JOIN UNNEST(ARRAY[1, 2]) WITH ORDINALITY AS _u_2(b, pos_2) WHERE _u.pos = _u_2.pos_2 OR (_u.pos > CARDINALITY(ARRAY[1, 2]) AND _u_2.pos_2 = CARDINALITY(ARRAY[1, 2])))) AS m FROM tbl CROSS JOIN UNNEST(SEQUENCE(1, GREATEST(CARDINALITY(x)))) AS _u(pos) CROSS JOIN UNNEST(x) WITH ORDINALITY AS _u_2(a, pos_2) WHERE _u.pos = _u_2.pos_2 OR (_u.pos > CARDINALITY(x) AND _u_2.pos_2 = CARDINALITY(x));
+
+SELECT MAX_BY(a, b), MIN_BY(a, b) FROM t;
+
+SELECT MAP(ARRAY['a', 'b'], ARRAY[1, 2]);
+
+CREATE TABLE a;

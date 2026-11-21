@@ -1,4 +1,4 @@
-// Spec: 0009-sql-features FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007, FR-008, FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016, FR-017, FR-018
+// Spec: 0009-sql-features FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007, FR-008, FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016, FR-017, FR-018, FR-019, FR-020
 /**
  * The feature extensions (commons data 0009-sql-features), on real engines: views, access (row-level security and grants), routines, partitions and vectors each do what they say on the engines
  * that can, and are an error value, or carried as data, on those that cannot.
@@ -23,7 +23,7 @@ import {
 import { dialect as duckdb } from "@intellectual-frontiers/data/sql/dialects/duckdb";
 import { dialect as postgres } from "@intellectual-frontiers/data/sql/dialects/postgres";
 import { dialect as sqlite } from "@intellectual-frontiers/data/sql/dialects/sqlite";
-import { accessSource, scopeStatement, sealedScope } from "@intellectual-frontiers/data/sql/extensions/access";
+import { accessSource, grantOf, scopeStatement, sealedScope } from "@intellectual-frontiers/data/sql/extensions/access";
 import { sha256Hex } from "@intellectual-frontiers/data/sql/lifecycle";
 import { partitions } from "@intellectual-frontiers/data/sql/extensions/partitions";
 import { column, columnName, param, routinesSource, table } from "@intellectual-frontiers/data/sql/extensions/routines";
@@ -320,6 +320,42 @@ proves(
       await e.run(`SELECT set_config('ifc.ddl_unlock', '${UNLOCK}', false)`);
       await e.run(`DROP POLICY "document_tenant_select" ON "document"`);
     });
+  },
+);
+
+proves(
+  ["0009-sql-features FR-020"],
+  "with a reach of a set, a sealed scope shows the rows of every tenant it lists, a reseller its tenants and a platform operator every row with the wildcard; without the wildcard `*` is a tenant of no row, and the mark still decides",
+  async () => {
+    const KEY = "issuer-key-kept-outside-the-database";
+    const schema = schemaOf(document, ledger);
+    const grant = (v: readonly string[] | "*") => scopeStatement(KEY, "tenant", grantOf(v), "app", false);
+    assert(!render(must(postgres, schema, { sources: [accessSource({ seal: { key: KEY } })] })).includes("string_to_array"), "exact is the default");
+    for (const wildcard of [true, false]) {
+      await withEngine("postgres", async (e) => {
+        const p = must(postgres, schema, { sources: [accessSource({ seal: { key: KEY }, reach: "set", wildcard })] });
+        await e.run("CREATE ROLE reader; CREATE ROLE writer;");
+        await load(e, p);
+        await e.run(`INSERT INTO "document" VALUES ('d1', 'a', 'Alpha'), ('d2', 'b', 'Beta'), ('d3', 'c', 'Gamma')`);
+        const ids = async () => (await e.rows(`SELECT id FROM "document" ORDER BY id`)).map((r) => r["id"]);
+        await e.run("SET ROLE writer");
+        await e.run(grant(["a"]));
+        same(await ids(), ["d1"], "one tenant");
+        await e.run(grant(["a", "c"]));
+        same(await ids(), ["d1", "d3"], "a list of tenants");
+        await e.run(`INSERT INTO "document" VALUES ('d4', 'c', 'Delta')`);
+        assert(await refuses(e, `INSERT INTO "document" VALUES ('d5', 'b', 'Not listed')`), "a row of a tenant not on the list is refused");
+        await e.run(grant("*"));
+        same(await ids(), wildcard ? ["d1", "d2", "d3", "d4"] : [], wildcard ? "the wildcard reaches every row" : "without the wildcard * reaches nothing");
+        await e.run("SET app.tenant = 'a,b'");
+        same(await ids(), [], "a list the session wrote itself is not trusted");
+        await e.run("SET app.tenant = '*'");
+        same(await ids(), [], "nor is a wildcard it wrote itself");
+        await e.run("RESET ROLE");
+      });
+    }
+    for (const bad of [[], [""], ["a,b"], ["*"]]) assert((() => { try { grantOf(bad); return false; } catch { return true; } })(), `a grant of ${JSON.stringify(bad)} is refused`);
+    assert(grantOf(["a", "b"]) === "a,b" && grantOf("*") === "*");
   },
 );
 

@@ -9,6 +9,8 @@ export { connect, type Connection, type ConnectOptions } from "./connection.ts";
 export { type CheckResult, checkIds, doctor, renderReport, type Report, type Status } from "./doctor.ts";
 export { type Io, main, type Outcome, USAGE } from "./main.ts";
 export { passwordOf, redact } from "./redact.ts";
+export { resolveTarget, type Target, urlOfTarget } from "./resolve.ts";
+export { SCOPE_USAGE, scopeCommand, subtree } from "./scope.ts";
 export { type Action, type Applied, applyChange, type Change, diffOf, type FileError, pgpassModeOk, planBlock, type Want } from "./files.ts";
 export { type BlockError, blockOf, markers, type Style, withBlock, withoutBlock } from "./blocks.ts";
 export { type Chosen, mayAsk, mayWriteHome, type Mode, modeOf, type Read, secretOf, type ServerSettings, serverSettings } from "./server.ts";

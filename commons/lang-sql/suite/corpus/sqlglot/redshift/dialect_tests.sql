@@ -1,0 +1,520 @@
+SELECT purchases, LAST_VALUE(item) OVER (PARTITION BY purchases ORDER BY purchases NULLS FIRST ROWS BETWEEN 2 PRECEDING AND 2 FOLLOWING) AS most_popular FROM Produce;
+
+SELECT results FROM Coordinates AS c, c.position AS results;
+
+SELECT results FROM Coordinates AS c CROSS JOIN c.position AS results;
+
+SELECT LAST_DAY(CAST('2008-11-25' AS DATE));
+
+SELECT CAST('2008-12-25 15:30:00' AS TIME);
+
+SELECT * FROM t1 CROSS JOIN "t1" AS "col";
+
+SELECT * FROM t CROSS JOIN "t2"."t3" AS "col";
+
+SELECT * FROM t1 CROSS JOIN "t1"."t2"."t3"."t4" AS "col";
+
+CREATE TABLE a (LIKE b);
+
+SELECT DECODE(a, 1, 'one');
+
+SELECT DECODE(a, 1, 'one', 'default');
+
+SELECT DECODE(a, NULL, 'null');
+
+SELECT DECODE(a, b, c);
+
+SELECT DECODE(tbl.col, 'some_string', 'foo');
+
+SELECT COALESCE(1, NULL) FROM foo;
+
+SELECT NVL2(a, b, c);
+
+SELECT NVL2(a, b);
+
+SELECT
+  *
+FROM (
+  SELECT
+    1 AS x
+  UNION ALL
+  SELECT
+    2
+) AS t
+PIVOT(SUM(x) FOR x IN (1));
+
+SELECT * FROM t LIMIT 1;
+
+CREATE TABLE t (b1 VARBYTE, b2 VARBYTE(1024), c1 VARCHAR(MAX), c2 VARCHAR(1024));
+
+BEGIN;
+
+SELECT SUM(CASE WHEN col % 2 = 0 THEN 1 ELSE 0 END) FROM foo;
+
+SELECT * FROM (WITH t AS (SELECT 1 AS c) SELECT c FROM t) AS subq;
+
+WITH RECURSIVE _generated_dates(date_value) AS (SELECT CAST('2020-01-01' AS DATE) AS date_value UNION ALL SELECT CAST(DATEADD(WEEK, 1, date_value) AS DATE) FROM _generated_dates WHERE CAST(DATEADD(WEEK, 1, date_value) AS DATE) <= CAST('2020-02-01' AS DATE)) SELECT * FROM (SELECT date_value FROM _generated_dates) AS _generated_dates;
+
+WITH RECURSIVE _generated_dates(date_value) AS (SELECT CAST('2020-01-01' AS DATE) AS date_value UNION ALL SELECT CAST(DATEADD(WEEK, 1, date_value) AS DATE) FROM _generated_dates WHERE CAST(DATEADD(WEEK, 1, date_value) AS DATE) <= CAST('2020-02-01' AS DATE)), dates AS (SELECT * FROM (SELECT date_value FROM _generated_dates) AS _generated_dates) SELECT * FROM dates;
+
+WITH RECURSIVE _generated_dates(date_value) AS (SELECT CAST('2020-01-01' AS DATE) AS date_value UNION ALL SELECT CAST(DATEADD(WEEK, 1, date_value) AS DATE) FROM _generated_dates WHERE CAST(DATEADD(WEEK, 1, date_value) AS DATE) <= CAST('2020-02-01' AS DATE)), _generated_dates_1(date_value) AS (SELECT CAST('2020-01-01' AS DATE) AS date_value UNION ALL SELECT CAST(DATEADD(MONTH, 1, date_value) AS DATE) FROM _generated_dates_1 WHERE CAST(DATEADD(MONTH, 1, date_value) AS DATE) <= CAST('2020-03-01' AS DATE)), dates1 AS (SELECT * FROM (SELECT date_value FROM _generated_dates) AS _generated_dates), dates2 AS (SELECT * FROM (SELECT date_value FROM _generated_dates_1) AS _generated_dates_1) SELECT * FROM dates1 CROSS JOIN dates2;
+
+WITH RECURSIVE _generated_dates(date_week) AS (SELECT CAST('2020-01-01' AS DATE) AS date_week UNION ALL SELECT CAST(DATEADD(WEEK, 1, date_week) AS DATE) FROM _generated_dates WHERE CAST(DATEADD(WEEK, 1, date_week) AS DATE) <= CAST('2020-02-01' AS DATE)) SELECT * FROM (SELECT date_week FROM _generated_dates) AS _generated_dates;
+
+SELECT x BETWEEN 2 AND 10;
+
+SELECT (x BETWEEN 10 AND 2 OR x BETWEEN 2 AND 10);
+
+SELECT x BETWEEN 10 AND 2;
+
+SELECT col IS NULL::BOOLEAN FROM (SELECT 1 AS col) AS t;
+
+SELECT col IS NOT NULL::BOOLEAN FROM (SELECT 1 AS col) AS t;
+
+SELECT * FROM (SELECT 1 AS x UNION ALL SELECT 2) AS t PIVOT(SUM(x) FOR x IN (1));
+
+SELECT DATEDIFF('x'') ; SELECT 1; --', '2020-01-01', '2025-10-12');
+
+SELECT 'ThOmAs' ~* 'thomas';
+
+SELECT CAST('foo' AS TIMESTAMP);
+
+SELECT APPROXIMATE COUNT(DISTINCT y);
+
+SELECT CONVERT_TIMEZONE('Europe/Berlin', 'America/New_York', '2012-05-10 12:00:00');
+
+SELECT CAST(CAST('1999-12-31' AS DATE) AS VARCHAR(MAX)) AS TO_CHAR;
+
+CREATE TABLE t (foo VARBYTE);
+
+SELECT DATEDIFF(DAY, y, x);
+
+SELECT (TIMESTAMP 'epoch' + col * INTERVAL '1 SECOND');
+
+SELECT a FROM tbl;
+
+SELECT a = b IS NULL FROM t;
+
+SELECT JSON_EXTRACT_PATH_TEXT(x, k1, k2, k3) FROM t;
+
+SELECT EXTRACT(MINUTE FROM CAST('2023-01-04 04:05:06.789' AS TIMESTAMP));
+
+SELECT EXTRACT(MONTH FROM CAST('20220502' AS DATE));
+
+SELECT TO_CHAR(foo, bar);
+
+SELECT CAST('10C' AS INTEGER);
+
+SELECT DATEADD(DAY, 1, CURRENT_DATE);
+
+SELECT LEFT(a, 3), RIGHT(a, 3);
+
+SELECT COSH(1.5);
+
+SELECT SPLIT_TO_ARRAY('12,345,6789');
+
+SELECT SPLIT_TO_ARRAY('12,345,6789', ',');
+
+SELECT JSON_EXTRACT_PATH_TEXT('{ "farm": {"barn": { "color": "red", "feed stocked": true }}}', 'farm', 'barn', 'color');
+
+SELECT LISTAGG(x, ',') WITHIN GROUP (ORDER BY y) FILTER (WHERE z > 0) FROM t;
+
+SELECT CAST('01:03:05.124' AS TIME(2) WITH TIME ZONE);
+
+SELECT CAST('2020-02-02 01:03:05.124' AS TIMESTAMP(2) WITH TIME ZONE);
+
+SELECT INTERVAL '5 DAYS';
+
+SELECT ADD_MONTHS('2008-03-31', 1);
+
+SELECT DATEADD(MONTH, 1, '2008-03-31');
+
+SELECT STRTOL('abc', 16);
+
+SELECT SNAPSHOT, type;
+
+SELECT "SNAPSHOT", "type";
+
+SELECT SYSDATE;
+
+SELECT DATE_PART(minute, timestamp '2023-01-04 04:05:06.789');
+
+SELECT DATE_PART(month, date '20220502');
+
+create table "group" ("col" char(10));
+
+create table if not exists city_slash_id("city/id" integer not null, state char(2) not null);
+
+CREATE TABLE IF NOT EXISTS city_slash_id ("city/id" INTEGER NOT NULL, state CHAR(2) NOT NULL);
+
+SELECT ST_AsEWKT(ST_GeomFromEWKT('SRID=4326;POINT(10 20)')::geography);
+
+SELECT ST_ASEWKT(CAST(ST_GEOMFROMEWKT('SRID=4326;POINT(10 20)') AS GEOGRAPHY));
+
+SELECT ST_AsEWKT(ST_GeogFromText('LINESTRING(110 40, 2 3, -10 80, -7 9)')::geometry);
+
+SELECT ST_ASEWKT(CAST(ST_GEOGFROMTEXT('LINESTRING(110 40, 2 3, -10 80, -7 9)') AS GEOMETRY));
+
+SELECT 'abc'::BINARY;
+
+SELECT CAST('abc' AS VARBYTE);
+
+CREATE TABLE a (b BINARY VARYING(10));
+
+CREATE TABLE a (b VARBYTE(10));
+
+SELECT 'abc'::CHARACTER;
+
+SELECT CAST('abc' AS CHAR);
+
+SELECT DISTINCT ON (a) a, b FROM x ORDER BY c DESC;
+
+SELECT a, b FROM (SELECT a AS a, b AS b, ROW_NUMBER() OVER (PARTITION BY a ORDER BY c DESC) AS _row_number FROM x) AS _t WHERE _row_number = 1;
+
+SELECT DATEADD(month, 18, '2008-02-28');
+
+SELECT DATEDIFF(week, '2009-01-01', '2009-12-31');
+
+SELECT EXTRACT(EPOCH FROM CURRENT_DATE);
+
+SELECT VERSION();
+
+SELECT TEXTLEN('hello world');
+
+SELECT LENGTH('hello world');
+
+SELECT DATE_DIFF('second'::TEXT, TIMESTAMP '2024-01-01', TIMESTAMP '2024-01-01 00:01:00');
+
+SELECT DATE_DIFF(CAST('second' AS VARCHAR(MAX)), CAST('2024-01-01' AS TIMESTAMP), CAST('2024-01-01 00:01:00' AS TIMESTAMP));
+
+SELECT DATE_DIFF('weeks'::VARCHAR::TEXT, TIMESTAMP '2024-01-01', TIMESTAMP '2024-01-15');
+
+SELECT DATE_DIFF(CAST(CAST('weeks' AS VARCHAR) AS VARCHAR(MAX)), CAST('2024-01-01' AS TIMESTAMP), CAST('2024-01-15' AS TIMESTAMP));
+
+SELECT DATE_ADD('month'::VARCHAR::TEXT, 1, DATE '2024-01-01');
+
+SELECT DATE_ADD(CAST(CAST('month' AS VARCHAR) AS VARCHAR(MAX)), 1, CAST('2024-01-01' AS DATE));
+
+SELECT DATE_ADD(CAST('month' AS VARCHAR(1)), 1, CAST('2024-01-01' AS TIMESTAMP));
+
+SELECT DATE_DIFF(COALESCE(t.unit, 'day'), t.start_date, t.end_date) FROM t;
+
+SELECT GETBIT(FROM_HEX('4d'), 2);
+
+SELECT EXP(1);
+
+ALTER TABLE table_name ALTER COLUMN bla TYPE VARCHAR;
+
+ALTER TABLE t DROP b CASCADE;
+
+ALTER TABLE t DROP COLUMN b CASCADE;
+
+SELECT CAST(value AS FLOAT(8));
+
+CREATE MATERIALIZED VIEW orders AUTO REFRESH YES AS SELECT 1;
+
+SELECT DATEADD(DAY, 1, 'today');
+
+SELECT * FROM #x;
+
+SELECT INTERVAL '5 DAY';
+
+SELECT date_col - INTERVAL '30' FROM t;
+
+SELECT date_col - INTERVAL '1' AS one_second_later;
+
+SELECT date_col - INTERVAL '30' DAY FROM t;
+
+SELECT date_col - INTERVAL '30 DAY' FROM t;
+
+SELECT date_col - INTERVAL '1' HOUR AS one_hour_later;
+
+SELECT date_col - INTERVAL '1 HOUR' AS one_hour_later;
+
+CREATE TABLE real1 (realcol REAL);
+
+CREATE TABLE datetable (start_date DATE, end_date DATE);
+
+SELECT APPROXIMATE AS y;
+
+SELECT APPROXIMATE PERCENTILE_DISC(0.5) WITHIN GROUP (ORDER BY totalprice);
+
+CREATE TABLE t (c BIGINT IDENTITY(0, 1));
+
+COPY test_staging_tbl FROM 's3://your/bucket/prefix/here' IAM_ROLE default FORMAT AS AVRO 'auto';
+
+COPY test_staging_tbl FROM 's3://your/bucket/prefix/here' IAM_ROLE default FORMAT AS JSON 's3://jsonpaths_file';
+
+SELECT * FROM venue WHERE (venuecity, venuestate) IN (('Miami', 'FL'), ('Tampa', 'FL')) ORDER BY venueid;
+
+SELECT tablename, "column" FROM pg_table_def WHERE "column" LIKE '%start\\_%' LIMIT 5;
+
+SELECT JSON_EXTRACT_PATH_TEXT('{"f2":{"f3":1},"f4":{"f5":99,"f6":"star"}', 'f4', 'f6', TRUE);
+
+SELECT CONCAT('abc', 'def');
+
+SELECT 'abc' || 'def';
+
+SELECT TOP 1 x FROM y;
+
+SELECT x FROM y LIMIT 1;
+
+SELECT DATE_DIFF('month', CAST('2020-02-29 00:00:00' AS TIMESTAMP), CAST('2020-03-02 00:00:00' AS TIMESTAMP));
+
+SELECT DATEDIFF(MONTH, CAST('2020-02-29 00:00:00' AS TIMESTAMP), CAST('2020-03-02 00:00:00' AS TIMESTAMP));
+
+SELECT * FROM x WHERE y = DATEADD('month', -1, DATE_TRUNC('month', (SELECT y FROM #temp_table)));
+
+SELECT * FROM x WHERE y = DATEADD(MONTH, -1, DATE_TRUNC('MONTH', (SELECT y FROM #temp_table)));
+
+SELECT 'a''b';
+
+SELECT 'a\'b';
+
+CREATE TABLE t (c BIGINT GENERATED BY DEFAULT AS IDENTITY (0, 1));
+
+SELECT DATEADD(HOUR, 0, CAST('2020-02-02 01:03:05.124' AS TIMESTAMP));
+
+SELECT DATEDIFF(SECOND, '2020-02-02 00:00:00.000', '2020-02-02 01:03:05.124');
+
+CREATE OR REPLACE VIEW v1 AS SELECT id, AVG(average_metric1) AS m1, AVG(average_metric2) AS m2 FROM t GROUP BY id WITH NO SCHEMA BINDING;
+
+SELECT caldate + INTERVAL '1 SECOND' AS dateplus FROM date WHERE caldate = '12-31-2008';
+
+SELECT COUNT(*) FROM event WHERE eventname LIKE '%Ring%' OR eventname LIKE '%Die%';
+
+CREATE TABLE sales (salesid INTEGER NOT NULL) DISTKEY(listid) COMPOUND SORTKEY(listid, sellerid) DISTSTYLE AUTO;
+
+CREATE TABLE t (a INTEGER) DISTSTYLE KEY DISTKEY(a) SORTKEY(a);
+
+COPY customer FROM 's3://mybucket/customer' IAM_ROLE 'arn:aws:iam::0123456789012:role/MyRedshiftRole' REGION 'us-east-1' FORMAT orc;
+
+COPY customer FROM 's3://mybucket/mydata' CREDENTIALS 'aws_iam_role=arn:aws:iam::<aws-account-id>:role/<role-name>;master_symmetric_key=<root-key>' emptyasnull blanksasnull timeformat 'YYYY-MM-DD HH:MI:SS';
+
+UNLOAD ('select * from venue') TO 's3://mybucket/unload/' IAM_ROLE 'arn:aws:iam::0123456789012:role/MyRedshiftRole';
+
+CREATE TABLE SOUP (SOUP1 VARCHAR(50) NOT NULL ENCODE ZSTD, SOUP2 VARCHAR(70) NULL ENCODE DELTA);
+
+SELECT DATEADD('day', ndays, caldate);
+
+SELECT DATEADD(DAY, ndays, caldate);
+
+SELECT DATE_ADD('day', 1, DATE('2023-01-01'));
+
+SELECT DATEADD(DAY, 1, DATE('2023-01-01'));
+
+SELECT
+  c_name,
+  orders.o_orderkey AS orderkey,
+  index AS orderkey_index
+FROM customer_orders_lineitem AS c, c.c_orders AS orders AT index
+ORDER BY
+  orderkey_index;
+
+SELECT attr AS attr, JSON_TYPEOF(val) AS value_type FROM customer_orders_lineitem AS c, UNPIVOT c.c_orders[0] WHERE c_custkey = 9451;
+
+SELECT attr AS attr, JSON_TYPEOF(val) AS value_type FROM customer_orders_lineitem AS c, UNPIVOT c.c_orders AS val AT attr WHERE c_custkey = 9451;
+
+SELECT JSON_PARSE('[]');
+
+SELECT ARRAY(1, 2, 3);
+
+SELECT ARRAY[1, 2, 3];
+
+SELECT CONVERT_TIMEZONE('America/New_York', '2024-08-06 09:10:00.000');
+
+SELECT CONVERT_TIMEZONE('UTC', 'America/New_York', '2024-08-06 09:10:00.000');
+
+SELECT *, 4 AS col4 EXCLUDE (col2, col3) FROM (SELECT 1 AS col1, 2 AS col2, 3 AS col3);
+
+SELECT *, 4 AS col4 EXCLUDE col2, col3 FROM (SELECT 1 AS col1, 2 AS col2, 3 AS col3);
+
+SELECT col1, *, col2 EXCLUDE(col3) FROM (SELECT 1 AS col1, 2 AS col2, 3 AS col3);
+
+SELECT col1, *, col2 EXCLUDE (col3) FROM (SELECT 1 AS col1, 2 AS col2, 3 AS col3);
+
+SELECT 1 EXCLUDE;
+
+SELECT 1 AS EXCLUDE;
+
+SELECT 1 EXCLUDE FROM t;
+
+SELECT 1 AS EXCLUDE FROM t;
+
+SELECT * FROM (SELECT 1 AS EXCLUDE) AS t;
+
+SELECT 1 AS EXCLUDE, 2 AS foo;
+
+WITH qualify AS (SELECT 1 AS x) SELECT * FROM qualify;
+
+SELECT qualify FROM t;
+
+INSERT INTO t (a) VALUES (1), (2), (3);
+
+INSERT INTO t (a, b) VALUES (1, 2), (3, 4);
+
+SELECT * FROM (SELECT 1, 2) AS t;
+
+SELECT * FROM (SELECT 1 AS id) AS t1 CROSS JOIN (SELECT 1 AS id) AS t2;
+
+SELECT a, b FROM (SELECT 1 AS a, 2 AS b) AS t;
+
+SELECT a, b FROM (SELECT 1 AS a, 2 AS b UNION ALL SELECT 3, 4) AS "t";
+
+SELECT a, b FROM (SELECT 1 AS a, 2 AS b UNION ALL SELECT 3, 4 UNION ALL SELECT 5, 6 UNION ALL SELECT 7, 8) AS t;
+
+INSERT INTO t (a, b) SELECT a, b FROM (SELECT 1 AS a, 2 AS b UNION ALL SELECT 3, 4) AS t;
+
+SELECT * FROM ((SELECT 1 UNION ALL SELECT 2 ORDER BY 1 LIMIT 1 OFFSET 1)) AS t(x);
+
+SELECT
+  *
+FROM (
+  (
+    SELECT
+      1
+    UNION ALL
+    SELECT
+      2
+    ORDER BY
+      1
+    LIMIT 1
+    OFFSET 1
+  )
+) AS t(x);
+
+CREATE TABLE table_backup BACKUP NO AS SELECT * FROM event;
+
+CREATE TABLE table_backup BACKUP YES AS SELECT * FROM event;
+
+CREATE TABLE table_backup (i INTEGER, b VARCHAR) BACKUP NO;
+
+CREATE TABLE table_backup (i INTEGER, b VARCHAR) BACKUP YES;
+
+select foo, bar from table_1 minus select foo, bar from table_2;
+
+SELECT foo, bar FROM table_1 EXCEPT SELECT foo, bar FROM table_2;
+
+CREATE TABLE SOUP (LIKE other_table) DISTKEY(soup1) SORTKEY(soup2) DISTSTYLE ALL;
+
+CREATE TABLE t1 (LIKE t2);
+
+CREATE TABLE t1 (col VARCHAR, LIKE t2);
+
+ALTER TABLE s.t ALTER SORTKEY (c);
+
+ALTER TABLE t ALTER SORTKEY AUTO;
+
+ALTER TABLE t ALTER SORTKEY NONE;
+
+ALTER TABLE t ALTER SORTKEY (c1, c2);
+
+ALTER TABLE t ALTER COMPOUND SORTKEY (c1, c2);
+
+ALTER TABLE t ALTER DISTSTYLE ALL;
+
+ALTER TABLE t ALTER DISTSTYLE EVEN;
+
+ALTER TABLE t ALTER DISTSTYLE AUTO;
+
+ALTER TABLE t ALTER DISTSTYLE KEY DISTKEY c;
+
+ALTER TABLE t SET TABLE PROPERTIES ('a' = '5', 'b' = 'c');
+
+ALTER TABLE t SET LOCATION 's3://bucket/folder/';
+
+ALTER TABLE t SET FILE FORMAT AVRO;
+
+ALTER TABLE t ALTER DISTKEY c;
+
+ALTER TABLE db.t1 RENAME TO db.t2;
+
+ALTER TABLE db.t1 RENAME TO t2;
+
+CREATE TABLE "TEST" ("cola" VARCHAR(MAX));
+
+CREATE TABLE TEST (cola VARCHAR(max));
+
+CREATE OR REPLACE VIEW v1 AS SELECT cola, colb FROM t1 WITH NO SCHEMA BINDING;
+
+SELECT c.*, o FROM bloo AS c, c.c_orders AS o;
+
+SELECT c.*, o, l FROM bloo AS c, c.c_orders AS o, o.o_lineitems AS l;
+
+select a.foo, b.bar, a.baz from a, b where a.baz = b.baz (+);
+
+GRANT SELECT ON TABLE sales TO fred;
+
+GRANT ALL ON SCHEMA qa_tickit TO GROUP qa_users;
+
+GRANT ALL ON TABLE qa_tickit.sales TO GROUP qa_users;
+
+GRANT ALL ON TABLE qa_tickit.sales TO GROUP qa_users, GROUP ro_users;
+
+GRANT ALL ON view_date TO view_user;
+
+GRANT SELECT(cust_name, cust_phone), UPDATE(cust_contact_preference) ON cust_profile TO GROUP sales_group;
+
+GRANT ALL(cust_name, cust_phone, cust_contact_preference) ON cust_profile TO GROUP sales_admin;
+
+GRANT USAGE ON DATABASE sales_db TO Bob;
+
+GRANT USAGE ON SCHEMA sales_schema TO ROLE Analyst_role;
+
+GRANT SELECT ON sales_db.sales_schema.tickit_sales_redshift TO Bob;
+
+REVOKE SELECT ON TABLE sales FROM fred;
+
+REVOKE ALL ON SCHEMA qa_tickit FROM GROUP qa_users;
+
+REVOKE USAGE ON DATABASE sales_db FROM Bob;
+
+REVOKE USAGE ON SCHEMA sales_schema FROM ROLE Analyst_role;
+
+ANALYZE TBL(col1, col2);
+
+ANALYZE VERBOSE TBL;
+
+ANALYZE TBL PREDICATE COLUMNS;
+
+ANALYZE TBL ALL COLUMNS;
+
+SELECT * FROM t FETCH FIRST 1 ROWS ONLY;
+
+SELECT LAG(x) IGNORE NULLS OVER (PARTITION BY y ORDER BY z);
+
+SELECT LAG(x) RESPECT NULLS OVER (PARTITION BY y ORDER BY z);
+
+SELECT LAG(x IGNORE NULLS) OVER (PARTITION BY y ORDER BY z);
+
+SELECT LAG(x RESPECT NULLS) OVER (PARTITION BY y ORDER BY z);
+
+SELECT REGEXP_SUBSTR(abc, 'pattern(group)', 2) FROM table;
+
+SELECT REGEXP_SUBSTR(abc, 'pattern(group)', 2) FROM "table";
+
+SELECT STRTOL('f',16);
+
+SELECT datediff(week,'2009-01-01','2009-12-31') AS numweeks;
+
+SELECT (TIMESTAMP 'epoch' + 1659981729 * INTERVAL '1 SECOND');
+
+SELECT (TIMESTAMP 'epoch' + (1659981729000 / POWER(10, 3)) * INTERVAL '1 SECOND');
+
+SELECT (TIMESTAMP 'epoch' + (16599817290000 / POWER(10, 4)) * INTERVAL '1 SECOND');
+
+SELECT (TIMESTAMP 'epoch' + (1659981729000000000 / POWER(10, 9)) * INTERVAL '1 SECOND');
+
+SELECT CONVERT_TIMEZONE('America/Los_Angeles', 'America/New_York', '2024-08-06 09:10:00.000');
+
+SELECT t1.c1, t2.c2 FROM t1, t2 WHERE t1.c1 = t2.c2 (+);
+
+SELECT GETBIT(11, 1);
+
+SELECT CAST('2016-08-31' AS TIMESTAMP) AT TIME ZONE 'Asia/Seoul' AT TIME ZONE 'UTC';
+
+SELECT DATEDIFF(WEEK, CAST('2020-01-01' AS DATE), CAST('2020-12-31' AS DATE));
+
+CREATE TABLE a;
+
+CREATE TABLE z (a GEOMETRY(1));

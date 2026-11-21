@@ -94,7 +94,7 @@ export const MAY_NAME: Readonly<Record<UnitClass, readonly string[] | undefined>
   logical: PURE,
   physical: HOSTED,
   serializer: PURE,
-  runner: HOSTED,
+  runner: [...HOSTED, "@intellectual-frontiers/lang-sql"],
   store: HOSTED,
   signer: HOSTED,
   conformance: PURE,

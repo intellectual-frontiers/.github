@@ -1,0 +1,1663 @@
+SELECT VAR_SAMP(x) FROM t;
+
+SELECT purchases, LAST_VALUE(item) OVER item_window AS most_popular FROM Produce WINDOW item_window AS (PARTITION BY purchases ORDER BY purchases NULLS FIRST ROWS BETWEEN 2 PRECEDING AND 2 FOLLOWING);
+
+SELECT CAST(DATE_TRUNC('MONTH', CAST('2008-11-25' AS DATE)) + INTERVAL '1 MONTH' - INTERVAL '1 DAY' AS DATE);
+
+SELECT MAKE_TIME(15, 30, 00);
+
+SELECT CAST('2008-12-25 15:30:00' AS TIME);
+
+SELECT '
+';
+
+SELECT * FROM (VALUES (1)) AS t1;
+
+SELECT * FROM (VALUES (1)) AS t1(id) CROSS JOIN (VALUES (1)) AS t2(id);
+
+SELECT x % 10;
+
+SELECT DECODE('61', 'hex');
+
+WITH cte(foo) AS (SELECT 1, 2) SELECT foo FROM cte;
+
+WITH cte(foo) AS (SELECT 1 UNION ALL SELECT 2) SELECT foo FROM cte;
+
+SELECT CAST('{"a": 1}' AS JSON);
+
+SELECT 1 AS x FETCH FIRST ROW ONLY;
+
+SELECT 1 AS x OFFSET 1 ROW FETCH FIRST 2 ROWS ONLY;
+
+(SELECT 1 AS x ORDER BY x NULLS FIRST FETCH FIRST 1 ROWS ONLY) UNION ALL SELECT 2 AS x;
+
+SELECT 2 AS x UNION ALL (SELECT 1 AS x ORDER BY x NULLS FIRST FETCH FIRST 1 ROWS ONLY);
+
+SELECT payload -> 'amount', payload ->> 'amount';
+
+SELECT TO_DATE('05 12 2000', 'DD MM YYYY');
+
+SELECT CAST(CAST(TO_DATE('05 12 2000', 'DD MM YYYY') AS TIMESTAMP) AS DATE);
+
+SELECT UNNEST(ARRAY[1, 2, 3]);
+
+SELECT TIMESTAMP '2020-01-01' + INTERVAL '500 us';
+
+SELECT CAST('2020-01-01' AS TIMESTAMP) + INTERVAL '500 MICROSECOND';
+
+SELECT CURRENT_DATE;
+
+SELECT CURRENT_TIMESTAMP;
+
+SELECT 'ThOmAs' ~* 'thomas';
+
+SELECT 'ThOmAs' ~* x FROM t;
+
+SELECT "a\b";
+
+ALTER TABLE t ALTER COLUMN c TYPE BIGINT;
+
+INSERT INTO t (col1, col2) VALUES (('abcd'), (1234));
+
+SELECT TRIM(LEADING 'xy' FROM s), TRIM(TRAILING 'xy' FROM s), TRIM('xy' FROM s);
+
+SELECT CAST(v -> 'a' AS TEXT) FROM data;
+
+WITH t(a, b) AS (VALUES (1, 'x'), (2, 'y')) SELECT * FROM t;
+
+SELECT BOOL_AND(x), BOOL_OR(x) FROM t;
+
+SELECT * FROM a CROSS JOIN LATERAL UNNEST(a.arr) WITH ORDINALITY AS t(x, n);
+
+SELECT JSON_EXTRACT_PATH(col, 'fr''uit');
+
+SELECT CAST(EXTRACT(epoch FROM CAST('end' AS TIMESTAMP) - CAST('start' AS TIMESTAMP)) * 1000000 AS BIGINT);
+
+SELECT CAST(EXTRACT(epoch FROM CAST('end' AS TIMESTAMP) - CAST('start' AS TIMESTAMP)) * 1000 AS BIGINT);
+
+SELECT CAST(EXTRACT(epoch FROM CAST('end' AS TIMESTAMP) - CAST('start' AS TIMESTAMP)) AS BIGINT);
+
+SELECT CAST(EXTRACT(epoch FROM CAST('end' AS TIMESTAMP) - CAST('start' AS TIMESTAMP)) / 60 AS BIGINT);
+
+SELECT CAST(EXTRACT(epoch FROM CAST('end' AS TIMESTAMP) - CAST('start' AS TIMESTAMP)) / 3600 AS BIGINT);
+
+SELECT CAST(EXTRACT(epoch FROM CAST('end' AS TIMESTAMP) - CAST('start' AS TIMESTAMP)) / 86400 AS BIGINT);
+
+SELECT CAST(EXTRACT(days FROM (CAST('end' AS TIMESTAMP) - CAST('start' AS TIMESTAMP))) / 7 AS BIGINT);
+
+SELECT CAST(EXTRACT(year FROM AGE(CAST('end' AS TIMESTAMP), CAST('start' AS TIMESTAMP))) * 12 + EXTRACT(month FROM AGE(CAST('end' AS TIMESTAMP), CAST('start' AS TIMESTAMP))) AS BIGINT);
+
+SELECT CAST(EXTRACT(year FROM AGE(CAST('end' AS TIMESTAMP), CAST('start' AS TIMESTAMP))) * 4 + EXTRACT(month FROM AGE(CAST('end' AS TIMESTAMP), CAST('start' AS TIMESTAMP))) / 3 AS BIGINT);
+
+SELECT CAST(EXTRACT(year FROM AGE(CAST('end' AS TIMESTAMP), CAST('start' AS TIMESTAMP))) AS BIGINT);
+
+TABLE "table";
+
+CREATE TABLE a (LIKE b);
+
+SELECT COALESCE(1, NULL) FROM foo;
+
+SELECT (x ~ '^[[:ascii:]]*$');
+
+SELECT CASE WHEN NOT a IS NULL THEN b ELSE c END;
+
+SELECT CASE WHEN NOT a IS NULL THEN b END;
+
+SELECT * FROM t FETCH FIRST ROWS ONLY;
+
+CREATE TABLE t (c CHAR, nc CHAR, v1 VARCHAR, v2 VARCHAR, nv VARCHAR, nv2 VARCHAR);
+
+CREATE INDEX my_idx ON tbl(a NULLS FIRST, b NULLS FIRST);
+
+CREATE UNIQUE INDEX my_idx ON tbl(a NULLS FIRST, b NULLS FIRST);
+
+CREATE TABLE t (b1 BYTEA, b2 BYTEA(1024), c1 TEXT, c2 TEXT(1024));
+
+SELECT y AS x FROM my_table AS t;
+
+SELECT * FROM (SELECT * FROM my_table AS t) AS tbl;
+
+WITH cte1 AS (SELECT a, b FROM table1), cte2 AS (SELECT c, e AS d FROM table2) SELECT b, d AS dd FROM cte1 AS t CROSS JOIN cte2 WHERE cte1.a = cte2.c;
+
+SELECT * FROM (SELECT 1 AS col) apply;
+
+SELECT a IS NOT DISTINCT FROM b;
+
+SELECT a IS DISTINCT FROM b;
+
+BEGIN;
+
+MERGE INTO foo AS target USING (SELECT a, b FROM tbl) AS src ON src.a = target.a WHEN MATCHED AND target.a <> src.a THEN UPDATE SET b = 'FOO' WHEN NOT MATCHED THEN INSERT (a, b) VALUES (src.a, src.b);
+
+MERGE INTO foo AS target USING (SELECT a, b FROM tbl) AS src ON src.a = target.a WHEN MATCHED THEN UPDATE SET b = COALESCE(src.b, target.b) WHEN NOT MATCHED THEN INSERT (a, b) VALUES (src.a, src.b);
+
+SELECT SUM(CASE WHEN col % 2 = 0 THEN 1 ELSE 0 END) FROM foo;
+
+SELECT * FROM (SELECT *, COUNT(*) OVER () AS _w FROM t) AS _t WHERE _w > 1;
+
+SELECT "user id", some_id, other_id, "2 nd id" FROM (SELECT "user id", some_id, 1 AS other_id, 2 AS "2 nd id", COUNT(*) OVER () AS _w FROM t) AS _t WHERE _w > 1;
+
+SELECT SUM(X) OVER (PARTITION BY x RANGE BETWEEN 1 PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS);
+
+SELECT SUM(X) OVER (PARTITION BY x RANGE BETWEEN 1 PRECEDING AND CURRENT ROW);
+
+SELECT * FROM (WITH t AS (SELECT 1 AS c) SELECT c FROM t) AS subq;
+
+SELECT * FROM (SELECT CAST(value AS DATE) FROM GENERATE_SERIES(CAST('2020-01-01' AS DATE), CAST('2020-02-01' AS DATE), INTERVAL '1 WEEK') AS _t(value)) AS _unnested_generate_series;
+
+SELECT 1 EXCEPT ALL SELECT 1;
+
+SELECT 1 UNION SELECT 2 INTERSECT SELECT 3;
+
+SELECT 1 EXCEPT SELECT 2 INTERSECT SELECT 3 INTERSECT SELECT 4 UNION SELECT 5;
+
+SELECT 1 INTERSECT SELECT 2 INTERSECT SELECT 3 UNION SELECT 4;
+
+SELECT 1 UNION SELECT 2 INTERSECT SELECT 3 ORDER BY 1 LIMIT 10 OFFSET 2;
+
+SELECT (SELECT 1 UNION SELECT 2 INTERSECT SELECT 3 ORDER BY 1);
+
+SELECT (SELECT 1 UNION (SELECT 2 INTERSECT SELECT 3) ORDER BY 1);
+
+SELECT 1 UNION (SELECT 2 INTERSECT SELECT 3);
+
+(SELECT 1 UNION SELECT 2) INTERSECT SELECT 3;
+
+SELECT x BETWEEN 2 AND 10;
+
+SELECT x BETWEEN SYMMETRIC 10 AND 2;
+
+SELECT x BETWEEN ASYMMETRIC 10 AND 2;
+
+SELECT col IS NULL::BOOLEAN FROM (SELECT 1 AS col) AS t;
+
+SELECT col IS NOT NULL::BOOLEAN FROM (SELECT 1 AS col) AS t;
+
+SELECT '{"key": 1}'::jsonb ->> 'key';
+
+SELECT JSON_EXTRACT_PATH(CAST('{"key": 1}' AS JSONB), 'key');
+
+SELECT STRING_AGG('aa', ',');
+
+SELECT LAG(1) OVER (ORDER BY 1);
+
+SELECT LAG(1, 2) OVER (ORDER BY 1);
+
+SELECT LEAD(1) OVER (ORDER BY 1);
+
+SELECT LEAD(1, 2) OVER (ORDER BY 1);
+
+DELETE FROM sales AS s WHERE s.id = 1;
+
+DELETE FROM orders AS o WHERE o.customer_id IN (SELECT c.id FROM customers AS c WHERE c.status_code = 'inactive');
+
+DELETE FROM temp_data AS t WHERE NOT EXISTS(SELECT 1 FROM main_data AS m WHERE m.id = t.id);
+
+UPDATE employees AS e SET e.salary = e.salary * 1.1 WHERE e.department = 'IT';
+
+UPDATE accounts AS a SET a.balance = a.balance + 100, a.status_code = 'active' WHERE a.account_type = 'savings';
+
+UPDATE prices AS p SET p.amount = p.amount * 0.9 WHERE p.product_id IN (SELECT pr.id FROM products AS pr JOIN categories AS c ON pr.category_id = c.id WHERE c.foo = 'Electronics');
+
+SELECT x ILIKE '%y';
+
+SELECT NOT x ILIKE '%y';
+
+SELECT x ILIKE '%y' ESCAPE '#';
+
+SELECT * FROM a LEFT JOIN b USING (id);
+
+SELECT ARRAY_TO_STRING(ARRAY[1, 2, 3, NULL, 5], ',', '*');
+
+SELECT GENERATE_SERIES(5, 1 + 1, -1);
+
+SELECT JSON_OBJECT('a': 1, 'b': NULL NULL ON NULL);
+
+SELECT JSON_OBJECT('a': 1, 'a': 2 WITHOUT UNIQUE KEYS);
+
+SELECT x ~ y, NOT x ~ y;
+
+SELECT '{"x": 1}'::JSONB;
+
+SELECT CAST(EXTRACT(year FROM AGE(DATE_TRUNC('MONTH', CAST(CAST('2026-03-01' AS DATE) AS TIMESTAMP)), DATE_TRUNC('MONTH', CAST(CAST('2026-01-31' AS DATE) AS TIMESTAMP)))) * 12 + EXTRACT(month FROM AGE(DATE_TRUNC('MONTH', CAST(CAST('2026-03-01' AS DATE) AS TIMESTAMP)), DATE_TRUNC('MONTH', CAST(CAST('2026-01-31' AS DATE) AS TIMESTAMP)))) AS BIGINT);
+
+SELECT PERCENTILE_CONT(q) WITHIN GROUP (ORDER BY x) FROM t;
+
+SELECT PERCENTILE_DISC(q) WITHIN GROUP (ORDER BY x) FROM t;
+
+SELECT x ~ 'a';
+
+SELECT NOT ('xabc' SIMILAR TO 'abc');
+
+SELECT ('abc' SIMILAR TO 'abc') || '!', '!' || ('abc' SIMILAR TO 'abc');
+
+SELECT CAST('2024-01-01' AS TIMESTAMP) + INTERVAL '-10.75 MINUTE';
+
+SELECT INTERVAL '3 MONTH';
+
+SELECT CAST('foo' AS TIMESTAMP);
+
+SELECT x # 1;
+
+SELECT TO_CHAR(CAST('2024-07-08 13:45:00' AS TIMESTAMP), 'TMDy');
+
+SELECT CAST(CAST('1999-12-31' AS DATE) AS TEXT) AS TO_CHAR;
+
+CREATE TABLE t (col VARCHAR);
+
+CREATE TABLE t (col CHAR);
+
+SELECT (FALSE IS DISTINCT FROM NULL) = NULL;
+
+SELECT (CARDINALITY(ARRAY(SELECT x FROM UNNEST(arr) AS _t0(x) WHERE x > 2)) <> 0);
+
+SELECT CARDINALITY(arr) FROM t;
+
+CREATE TABLE example (id INT PRIMARY KEY, name TEXT);
+
+INSERT INTO example (id, name) VALUES (1, 'Alice') ON CONFLICT(id) DO NOTHING;
+
+CREATE TABLE example (id INT GENERATED BY DEFAULT AS IDENTITY NOT NULL, name TEXT);
+
+SELECT JSON_EXTRACT_PATH_TEXT('{ "farm": {"barn": { "color": "red", "feed stocked": true }}}', 'farm', 'barn', 'color');
+
+CREATE TABLE t (a INT, b INT, CONSTRAINT u UNIQUE (a, b));
+
+SELECT SUBSTRING('abcdef' FROM 2 FOR 3);
+
+SELECT LEFT(x, CASE WHEN n < 0 THEN 0 ELSE n END), RIGHT(x, CASE WHEN -1 < 0 THEN 0 ELSE -1 END);
+
+CREATE TABLE t (foo BYTEA);
+
+SELECT (CAST(x AS DATE) - CAST(y AS DATE));
+
+SELECT TO_TIMESTAMP(col);
+
+WITH t AS (SELECT CAST('2020-01-10' AS DATE) AS col, 5 AS num_days) SELECT col + (INTERVAL '1 DAY' * num_days) FROM t;
+
+SELECT '2024-01-31' + INTERVAL '1 MONTH';
+
+SELECT '2024-01-01 12:00:00' + INTERVAL '30 SECOND';
+
+SELECT '11' || '22';
+
+SELECT department, array_agg(name) AS employee_names FROM data GROUP BY department;
+
+SELECT EXTRACT(epoch FROM TIMESTAMP '2024-04-29 12:00:00');
+
+SELECT * FROM x FULL JOIN y ON x.id = y.id ORDER BY 1 LIMIT 0;
+
+WITH x AS (SELECT 1 AS id), y AS (SELECT 2 AS id) SELECT COALESCE(x.id, y.id) AS id FROM x FULL JOIN y ON x.id = y.id ORDER BY 1 LIMIT 1 OFFSET 1;
+
+SELECT * FROM t1 FULL OUTER JOIN t2 ON t1.x = t2.x;
+
+SELECT * FROM t1 FULL OUTER JOIN t2 USING (x);
+
+SELECT * FROM t1 FULL OUTER JOIN t2 USING (x, y);
+
+SELECT * FROM test LIMIT 0 + 1 OFFSET 0 + 1;
+
+SELECT a FROM tbl FOR UPDATE;
+
+SELECT a FROM tbl FOR SHARE;
+
+SELECT FIRST_VALUE(col1) OVER (ORDER BY col2 NULLS FIRST ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) FROM table1;
+
+SELECT FIRST_VALUE(col1) OVER (ORDER BY col2 NULLS FIRST) FROM table1;
+
+WITH c AS (SELECT a AS v, b AS x FROM t UNION ALL SELECT a, b FROM u ORDER BY v LIMIT 1) SELECT x AS v FROM c;
+
+SELECT x AS v, ROW_NUMBER() OVER (ORDER BY v) AS rn FROM t;
+
+SELECT LENGTH('foo');
+
+SELECT fred FROM barney WHERE dino <> 'wilma';
+
+SELECT RANDOM();
+
+SELECT CASE COUNT(x) WHEN 0 THEN NULL WHEN 1 THEN 0 ELSE VAR_SAMP(x) END FROM t;
+
+SELECT CASE COUNT(DISTINCT x) WHEN 0 THEN NULL WHEN 1 THEN 0 ELSE VAR_SAMP(DISTINCT x) END FROM t;
+
+SELECT VARIANCE(x) FROM t;
+
+SELECT SUM(CASE COUNT(x) WHEN 0 THEN NULL WHEN 1 THEN 0 ELSE VAR_SAMP(x) END) OVER () FROM t GROUP BY y;
+
+SELECT ENCODE(CONVERT(DECODE('6162', 'hex'), 'UTF8', 'UTF8'), 'hex');
+
+SELECT CONVERT(bytes, src_encoding, dest_encoding) FROM (VALUES (DECODE('e9', 'hex'), 'LATIN1', 'UTF8')) AS t(bytes, src_encoding, dest_encoding);
+
+SELECT * FROM GENERATE_SERIES(TIMESTAMP '2024-01-01', TIMESTAMP '2024-01-03', '+12 hours');
+
+SELECT * FROM GENERATE_SERIES(CAST('2024-01-01' AS TIMESTAMP), CAST('2024-01-03' AS TIMESTAMP), INTERVAL '12 HOURS');
+
+SELECT TIMESTAMP '2024-01-01 00:00:00' - INTERVAL '+1.5 hours' AS r;
+
+SELECT CAST('2024-01-01 00:00:00' AS TIMESTAMP) - INTERVAL '1.5 HOURS' AS r;
+
+SELECT * FROM t;
+
+TABLE t *;
+
+TABLE t FOR UPDATE;
+
+SELECT * FROM t FOR UPDATE;
+
+TABLE t ORDER BY x OFFSET 1 FETCH FIRST 1 ROW ONLY;
+
+SELECT * FROM t ORDER BY x OFFSET 1 FETCH FIRST 1 ROWS ONLY;
+
+SELECT CAST('2024-01-01 12:00:00' AS TIMESTAMP) + INTERVAL '30 SECOND' - (CAST('2024-01-01 12:00:00' AS TIMESTAMP) + INTERVAL '30 SECOND');
+
+SELECT |/ 16 + 9, ||/ 27 + 37, |/ 16 * 4;
+
+SELECT 2 * |/ 16 + 9 < 11, (|/ 16) + 9, |/ 16 || 'x';
+
+SELECT 2 * SQRT(16 + 9) < 11, (SQRT(16)) + 9, SQRT(16) || 'x';
+
+SELECT a = b IS NULL FROM t;
+
+SELECT a = (b IS NULL) FROM t;
+
+SELECT FALSE IS DISTINCT FROM NULL = NULL;
+
+SELECT FALSE IS DISTINCT FROM (NULL = NULL);
+
+SELECT NULL IS NULL = FALSE;
+
+SELECT (NULL IS NULL) = FALSE;
+
+SELECT a = b IS NOT NULL FROM t;
+
+SELECT (a = b) IS NOT NULL FROM t;
+
+SELECT a = b NOTNULL FROM t;
+
+SELECT a IS NOT NULL IS NULL FROM t;
+
+SELECT a IS NULL IS NOT NULL FROM t;
+
+SELECT NULL IS NOT NULL IS FALSE;
+
+CREATE TABLE t (a INT, b BOOLEAN GENERATED ALWAYS AS (a IS NULL) STORED);
+
+CREATE TABLE t (a INT, b BOOLEAN GENERATED ALWAYS AS (a = 1 IS NULL) STORED);
+
+CREATE TABLE t (a INT, b BOOLEAN GENERATED ALWAYS AS ((a = 1) IS NULL) STORED);
+
+SELECT JSON_VALUE(j, '$.a' RETURNING BIGINT) FROM t;
+
+SELECT JSON_VALUE('"2020-01-01T01:02:03"', '$' RETURNING TIMESTAMP WITH TIME ZONE);
+
+SELECT JSON_VALUE('"2020-01-01T01:02:03"', '$' RETURNING TIMESTAMPTZ);
+
+SELECT JSON_VALUE('42', '$' RETURNING BIGINT);
+
+SELECT JSON_VALUE(j, p) FROM (VALUES (CAST('{"a":42}' AS JSONB), CAST('$.a' AS JSONPATH))) AS t(j, p);
+
+SELECT JSON_VALUE('{"a":42}', '$' || '.a');
+
+SELECT JSON_VALUE('{"a":42}', CASE WHEN TRUE THEN '$.a' ELSE '$.b' END);
+
+SELECT @ x;
+
+SELECT ABS(x);
+
+SELECT @ -5.0;
+
+SELECT ABS(-5.0);
+
+SELECT @ -3 + 1;
+
+SELECT ABS(-3 + 1);
+
+SELECT @ x > 1;
+
+SELECT ABS(x) > 1;
+
+SELECT @ -3 & 3;
+
+SELECT ABS(-3) & 3;
+
+SELECT 2 * @ -3;
+
+SELECT 2 * ABS(-3);
+
+SELECT @ DECIMAL '-1.25';
+
+SELECT ABS(CAST('-1.25' AS DECIMAL));
+
+UPDATE character SET x = 1;
+
+WITH t AS (SELECT 1 AS "null") SELECT t.null FROM t;
+
+WITH t AS (SELECT 1 AS "true") SELECT t.true FROM t;
+
+SELECT '%' SIMILAR TO '^%' ESCAPE '^';
+
+SELECT GET_BIT(CAST(44 AS BIT(10)), 6);
+
+SELECT * FROM t GROUP BY ROLLUP (a || '^' || b);
+
+SELECT COSH(1.5);
+
+SELECT EXP(1);
+
+SELECT MODE() WITHIN GROUP (ORDER BY status DESC) AS most_common FROM orders;
+
+SELECT ST_DISTANCE(gg1, gg2, FALSE) AS sphere_dist;
+
+SELECT SHA256(x);
+
+SELECT ENCODE(SHA256(x), 'hex');
+
+SELECT EXTRACT(QUARTER FROM CAST('2025-04-26' AS DATE));
+
+SELECT DATE_TRUNC('QUARTER', CAST('2025-04-26' AS DATE));
+
+SELECT DATE_TRUNC('DAY', x, 'America/New_York');
+
+SELECT x FROM t WHERE CAST($1 AS TEXT) = 'ok';
+
+SELECT * FROM t TABLESAMPLE SYSTEM (50) REPEATABLE (55);
+
+SELECT * FROM events WHERE doc @? '$.a[*] ? (@ > 2)';
+
+SELECT ARRAY[1, 2, 3];
+
+SELECT ARRAY(SELECT 1);
+
+SELECT CASE WHEN SUBSTRING('abcdefg') IN ('ab') THEN 1 ELSE 0 END;
+
+COMMENT ON TABLE mytable IS 'this';
+
+COMMENT ON MATERIALIZED VIEW my_view IS 'this';
+
+COMMENT ON TYPE mood IS 'x';
+
+COMMENT ON TYPE foo.mood IS 'x';
+
+COMMENT ON VIEW foo.bat IS 'x';
+
+COMMENT ON MATERIALIZED VIEW foo.my_view IS 'x';
+
+COMMENT ON SEQUENCE public.seq IS 'x';
+
+COMMENT ON INDEX public.idx IS 'x';
+
+SELECT e'\x44EADBEEF';
+
+SELECT e'DEADBEEF';
+
+SELECT CAST(e'\176' AS BYTEA);
+
+SELECT CAST(e'~' AS BYTEA);
+
+SELECT * FROM x WHERE SUBSTRING('Thomas' FROM '...$') IN ('mas');
+
+SELECT TRIM(' X' FROM ' XXX ');
+
+SELECT BTRIM(x, 'ab');
+
+SELECT TRIM('ab' FROM x);
+
+SELECT TRIM(LEADING 'bla' FROM ' XXX ' COLLATE utf8_bin);
+
+SELECT * FROM JSON_TO_RECORDSET(z) AS y("rank" INT);
+
+SELECT ~x;
+
+SELECT * FROM r CROSS JOIN LATERAL UNNEST(ARRAY[1]) AS s(location);
+
+EXEC AS myfunc @id = 123;
+
+SELECT listen, notify, discard, deallocate, unlisten FROM t;
+
+SELECT CURRENT_SCHEMA;
+
+SELECT CURRENT_USER;
+
+SELECT CURRENT_ROLE;
+
+SELECT VERSION();
+
+SELECT * FROM ONLY t1;
+
+SELECT INTERVAL '-1 MONTH';
+
+SELECT INTERVAL '4.1 DAY';
+
+SELECT INTERVAL '3.14159 HOUR';
+
+SELECT INTERVAL '2.5 MONTH';
+
+SELECT INTERVAL '-10.75 MINUTE';
+
+SELECT INTERVAL '0.123456789 SECOND';
+
+SELECT INTERVAL '1'' SECOND; SELECT 1; --';
+
+SELECT INTERVAL '1''; SELECT 1; --' DAY TO SECOND;
+
+SELECT date_col - INTERVAL '30' FROM t;
+
+SELECT date_col - INTERVAL '1' AS one_second_later;
+
+SELECT date_col - INTERVAL '30' DAY FROM t;
+
+SELECT date_col - INTERVAL '30 DAY' FROM t;
+
+SELECT date_col - INTERVAL '1' HOUR AS one_hour_later;
+
+SELECT date_col - INTERVAL '1 HOUR' AS one_hour_later;
+
+SELECT INTERVAL '1 day' + '2024-01-01'::date;
+
+SELECT INTERVAL '1 DAY' + CAST('2024-01-01' AS DATE);
+
+SELECT INTERVAL '1 day' + '2 hours'::interval;
+
+SELECT INTERVAL '1 DAY' + CAST('2 hours' AS INTERVAL);
+
+SELECT INTERVAL '1 day' + 2 * INTERVAL '1 hour';
+
+SELECT INTERVAL '1 day' + '2' dt;
+
+SELECT INTERVAL '1 DAY' + '2' AS dt;
+
+SELECT INTERVAL '1 day' + '2' days;
+
+SELECT INTERVAL '1 DAY' + '2' AS days;
+
+SELECT INTERVAL '1 day' + '2' hours;
+
+SELECT INTERVAL '1 DAY' + '2' AS hours;
+
+SELECT SUM(x) OVER (PARTITION BY y ORDER BY interval ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) - SUM(x) OVER (PARTITION BY y ORDER BY interval ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS total;
+
+SELECT * FROM test_data, LATERAL JSONB_ARRAY_ELEMENTS(data) WITH ORDINALITY AS elem(value, ordinality);
+
+SELECT id, name FROM xml_data AS t, XMLTABLE('/root/user' PASSING t.xml COLUMNS id INT PATH '@id', name TEXT PATH 'name/text()') AS x;
+
+SELECT id, value FROM xml_content AS t, XMLTABLE(XMLNAMESPACES('http://example.com/ns1' AS ns1, 'http://example.com/ns2' AS ns2), '/root/data' PASSING t.xml COLUMNS id INT PATH '@ns1:id', value TEXT PATH 'ns2:value/text()') AS x;
+
+SELECT * FROM t WHERE some_column >= CURRENT_DATE + INTERVAL '1 day 1 hour' AND some_another_column IS TRUE;
+
+UPDATE "x" SET "y" = CAST('0 days 60.000000 seconds' AS INTERVAL) WHERE "x"."id" IN (2, 3);
+
+WITH t1 AS MATERIALIZED (SELECT 1), t2 AS NOT MATERIALIZED (SELECT 2) SELECT * FROM t1, t2;
+
+ALTER TABLE ONLY "Album" ADD CONSTRAINT "FK_AlbumArtistId" FOREIGN KEY ("ArtistId") REFERENCES "Artist" ("ArtistId") ON DELETE CASCADE;
+
+ALTER TABLE ONLY "Album" ADD CONSTRAINT "FK_AlbumArtistId" FOREIGN KEY ("ArtistId") REFERENCES "Artist" ("ArtistId") ON DELETE RESTRICT;
+
+SELECT * FROM JSON_ARRAY_ELEMENTS('[1,true, [2,false]]') WITH ORDINALITY;
+
+SELECT * FROM JSON_ARRAY_ELEMENTS('[1,true, [2,false]]') WITH ORDINALITY AS kv_json;
+
+SELECT * FROM JSON_ARRAY_ELEMENTS('[1,true, [2,false]]') WITH ORDINALITY AS kv_json(a, b);
+
+SELECT SUM(x) OVER a, SUM(y) OVER b FROM c WINDOW a AS (PARTITION BY d), b AS (PARTITION BY e);
+
+SELECT CASE WHEN SUBSTRING('abcdefg' FROM 1) IN ('ab') THEN 1 ELSE 0 END;
+
+SELECT CASE WHEN SUBSTRING('abcdefg' FROM 1 FOR 2) IN ('ab') THEN 1 ELSE 0 END;
+
+SELECT * FROM "x" WHERE SUBSTRING("x"."foo" FROM 1 FOR 2) IN ('mas');
+
+SELECT * FROM x WHERE SUBSTRING('Thomas' FROM '%#"o_a#"_' FOR '#') IN ('mas');
+
+SELECT SUBSTRING('bla' + 'foo' || 'bar' FROM 3 - 1 + 5 FOR 4 + SOME_FUNC(arg1, arg2));
+
+SELECT TO_TIMESTAMP(1284352323.5), TO_TIMESTAMP('05 Dec 2000', 'DD Mon YYYY');
+
+SELECT TO_TIMESTAMP('05 Dec 2000 10:00 AM', 'DD Mon YYYY HH:MI AM');
+
+SELECT TO_TIMESTAMP('05 Dec 2000 10:00 PM', 'DD Mon YYYY HH:MI PM');
+
+SELECT * FROM foo, LATERAL (SELECT * FROM bar WHERE bar.id = foo.bar_id) AS ss;
+
+SELECT c.oid, n.nspname, c.relname FROM pg_catalog.pg_class AS c LEFT JOIN pg_catalog.pg_namespace AS n ON n.oid = c.relnamespace WHERE c.relname OPERATOR(pg_catalog.~) '^(courses)$' COLLATE pg_catalog.default AND pg_catalog.PG_TABLE_IS_VISIBLE(c.oid) ORDER BY 2, 3;
+
+SELECT date_add(current_date, interval '7' day);
+
+SELECT CURRENT_DATE + INTERVAL '7 DAY';
+
+SELECT e'foo \' bar';
+
+SELECT e'foo '' bar';
+
+SELECT e'\n';
+
+SELECT e'\t';
+
+SELECT e'update table_name set a = \'foo\' where 1 = 0' AS x FROM tab;
+
+SELECT e'update table_name set a = ''foo'' where 1 = 0' AS x FROM tab;
+
+select count() OVER(partition by a order by a range offset preceding exclude current row);
+
+SELECT COUNT() OVER (PARTITION BY a ORDER BY a range BETWEEN offset preceding AND CURRENT ROW EXCLUDE CURRENT ROW);
+
+SELECT SUBSTRING('Thomas' FOR 3 FROM 2);
+
+SELECT SUBSTRING('Thomas' FROM 2 FOR 3);
+
+SELECT DATE_PART('isodow'::varchar(6), current_date);
+
+SELECT EXTRACT(CAST('isodow' AS VARCHAR(6)) FROM CURRENT_DATE);
+
+SELECT DATE_PART('isoyear', ts);
+
+SELECT EXTRACT(ISOYEAR FROM ts);
+
+COMMIT AND NO CHAIN;
+
+COMMIT AND CHAIN;
+
+SELECT $$a$$;
+
+SELECT 'a';
+
+SELECT $$Dianne's horse$$;
+
+SELECT 'Dianne''s horse';
+
+SELECT $$The price is $9.95$$ AS msg;
+
+SELECT 'The price is $9.95' AS msg;
+
+COMMENT ON TABLE mytable IS $$doc this$$;
+
+COMMENT ON TABLE mytable IS 'doc this';
+
+UPDATE MYTABLE T1 SET T1.COL = 13;
+
+UPDATE MYTABLE AS T1 SET T1.COL = 13;
+
+SELECT 'testa 1' NOT LIKE ALL (ARRAY['testa%', 'testb%']);
+
+SELECT 'testa 1' NOT LIKE ANY(ARRAY['testa%', 'testb%']);
+
+SELECT 'testa 1' NOT ILIKE ALL (ARRAY['testa%', 'testb%']);
+
+SELECT 'testa 1' NOT ILIKE ANY(ARRAY['testa%', 'testb%']);
+
+SELECT NOT 'testa 1' LIKE ALL (ARRAY['testa%', 'testb%']);
+
+SELECT NOT ('testa 1' LIKE ALL (ARRAY['testa%', 'testb%']));
+
+SELECT to_timestamp(123)::time without time zone;
+
+SELECT CAST(TO_TIMESTAMP(123) AS TIME);
+
+SELECT SUM(x) OVER (PARTITION BY a ORDER BY d ROWS 1 PRECEDING);
+
+SELECT SUM(x) OVER (PARTITION BY a ORDER BY d ROWS BETWEEN 1 PRECEDING AND CURRENT ROW);
+
+SELECT SUBSTRING(2022::CHAR(4) || LPAD(3::CHAR(2), 2, '0') FROM 3 FOR 4);
+
+SELECT SUBSTRING(CAST(2022 AS CHAR(4)) || LPAD(CAST(3 AS CHAR(2)), 2, '0') FROM 3 FOR 4);
+
+SELECT m.name FROM manufacturers AS m LEFT JOIN LATERAL GET_PRODUCT_NAMES(m.id) pname ON TRUE WHERE pname IS NULL;
+
+SELECT m.name FROM manufacturers AS m LEFT JOIN LATERAL GET_PRODUCT_NAMES(m.id) AS pname ON TRUE WHERE pname IS NULL;
+
+SELECT p1.id, p2.id, v1, v2 FROM polygons AS p1, polygons AS p2, LATERAL VERTICES(p1.poly) v1, LATERAL VERTICES(p2.poly) v2 WHERE (v1 <-> v2) < 10 AND p1.id <> p2.id;
+
+SELECT p1.id, p2.id, v1, v2 FROM polygons AS p1, polygons AS p2, LATERAL VERTICES(p1.poly) AS v1, LATERAL VERTICES(p2.poly) AS v2 WHERE (v1 <-> v2) < 10 AND p1.id <> p2.id;
+
+SELECT id, email, CAST(deleted AS TEXT) FROM users WHERE deleted NOTNULL;
+
+SELECT id, email, CAST(deleted AS TEXT) FROM users WHERE deleted IS NOT NULL;
+
+SELECT id, email, CAST(deleted AS TEXT) FROM users WHERE NOT deleted ISNULL;
+
+SELECT id, email, CAST(deleted AS TEXT) FROM users WHERE NOT deleted IS NULL;
+
+SELECT JSON_ARRAY_ELEMENTS((foo->'sections')::JSON) AS sections;
+
+SELECT JSON_ARRAY_ELEMENTS(CAST((foo -> 'sections') AS JSON)) AS sections;
+
+MERGE INTO x USING (SELECT id) AS y ON a = b WHEN MATCHED THEN UPDATE SET x.a = y.b WHEN NOT MATCHED THEN INSERT (a, b) VALUES (y.a, y.b);
+
+MERGE INTO x USING (SELECT id) AS y ON a = b WHEN MATCHED THEN UPDATE SET a = y.b WHEN NOT MATCHED THEN INSERT (a, b) VALUES (y.a, y.b);
+
+SELECT * FROM t1*;
+
+SELECT * FROM t1;
+
+SELECT SUBSTRING('afafa' for 1);
+
+SELECT SUBSTRING('afafa' FROM 1 FOR 1);
+
+WITH
+              json_data AS (SELECT '{"field_id": [1, 2, 3]}'::JSON AS data),
+              field_ids AS (SELECT 'field_id' AS field_id)
+
+            SELECT
+                JSON_ARRAY_ELEMENTS(json_data.data -> field_ids.field_id) AS element
+            FROM json_data, field_ids;
+
+WITH json_data AS (
+  SELECT
+    CAST('{"field_id": [1, 2, 3]}' AS JSON) AS data
+), field_ids AS (
+  SELECT
+    'field_id' AS field_id
+)
+SELECT
+  JSON_ARRAY_ELEMENTS(json_data.data -> field_ids.field_id) AS element
+FROM json_data, field_ids;
+
+SELECT E'a\tb';
+
+SELECT CAST('2025-02-01 00:00:00' AS TIMESTAMP) - MAKE_INTERVAL(years => 1);
+
+SELECT NOW() + MAKE_INTERVAL(years => 1, months => 2, days => 3);
+
+SELECT CURRENT_TIMESTAMP + MAKE_INTERVAL(years => 1, months => 2, days => 3);
+
+SELECT NOW() - MAKE_INTERVAL(years => 1, months => 2, days => 3);
+
+SELECT CURRENT_TIMESTAMP - MAKE_INTERVAL(years => 1, months => 2, days => 3);
+
+SELECT MAKE_INTERVAL(days => 3);
+
+SELECT MAKE_INTERVAL(1, hours => 2, mins => 30);
+
+SELECT MAKE_INTERVAL(secs => 7.5, mins => 6, hours => 5, DAYS => 4, weeks => 3, months => 2, years => 1);
+
+SELECT MAKE_INTERVAL(years => 1, months => 2, weeks => 3, DAYS => 4, hours => 5, mins => 6, secs => 7.5);
+
+SELECT MAKE_INTERVAL(1, 2, 3, 4, 5, 6, 7.5);
+
+SELECT MAKE_INTERVAL(days => 3) /* sqlglot.anonymous */;
+
+SELECT CURRENT_TIMESTAMP + INTERVAL '-3 MONTH';
+
+SELECT ARRAY[]::INT[] AS foo;
+
+SELECT CAST(ARRAY[] AS INT[]) AS foo;
+
+SELECT ARRAY[1, 2, 3] @> ARRAY[1, 2];
+
+SELECT a @> b, a <@ b;
+
+SELECT REGEXP_REPLACE('mr .', '[^a-zA-Z]', '', 'g');
+
+CREATE TABLE t (c INT);
+
+SELECT * FROM "test_table" ORDER BY RANDOM() LIMIT 5;
+
+SELECT (data -> 'en-US') AS acat FROM my_table;
+
+SELECT (data ->> 'en-US') AS acat FROM my_table;
+
+SELECT JSON_EXTRACT_PATH_TEXT(x, k1, k2, k3) FROM t;
+
+SELECT JSON_EXTRACT_PATH(x, k1, 'k2') FROM t;
+
+SELECT JSON_EXTRACT_PATH(x, 'k1', k2) FROM t;
+
+SELECT JSON_EXTRACT_PATH_TEXT(x, k1, 'k2') FROM t;
+
+SELECT JSON_EXTRACT_PATH(a, VARIADIC '{}') FROM t;
+
+SELECT JSON_EXTRACT_PATH_TEXT(a, VARIADIC '{}') FROM t;
+
+SELECT 'prefix' || JSON_EXTRACT_PATH_TEXT(a, VARIADIC '{}') FROM t;
+
+SELECT 'prefix' || JSON_EXTRACT_SCALAR(a, '$') FROM t;
+
+SELECT * FROM t TABLESAMPLE SYSTEM (50);
+
+SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY amount);
+
+SELECT DATE_PART('minute', timestamp '2023-01-04 04:05:06.789');
+
+SELECT EXTRACT(MINUTE FROM CAST('2023-01-04 04:05:06.789' AS TIMESTAMP));
+
+SELECT DATE_PART('month', date '20220502');
+
+SELECT EXTRACT(MONTH FROM CAST('20220502' AS DATE));
+
+SELECT (DATE '2016-01-10', DATE '2016-02-01') OVERLAPS (DATE '2016-01-20', DATE '2016-02-10');
+
+SELECT (CAST('2016-01-10' AS DATE), CAST('2016-02-01' AS DATE)) OVERLAPS (CAST('2016-01-20' AS DATE), CAST('2016-02-10' AS DATE));
+
+SELECT DATE_PART('epoch', CAST('2023-01-04 04:05:06.789' AS TIMESTAMP));
+
+SELECT GENERATE_SERIES(1, 5);
+
+SELECT GENERATE_SERIES(1, 5) AS x;
+
+SELECT GENERATE_SERIES(1, 5) AS x WHERE x > 2 ORDER BY x DESC LIMIT 3;
+
+SELECT y, GENERATE_SERIES(1, 3) AS g FROM t;
+
+SELECT GENERATE_SERIES(1, 2) AS a, GENERATE_SERIES(11, 13) AS b;
+
+SELECT y, GENERATE_SERIES(1, 2) AS a, GENERATE_SERIES(11, 13) AS b FROM t;
+
+WITH dates AS (SELECT GENERATE_SERIES('2020-01-01'::DATE, '2024-01-01'::DATE, '1 day'::INTERVAL) AS date), date_table AS (SELECT DISTINCT DATE_TRUNC('MONTH', date) AS date FROM dates) SELECT * FROM date_table;
+
+WITH dates AS (SELECT GENERATE_SERIES(CAST('2020-01-01' AS DATE), CAST('2024-01-01' AS DATE), CAST('1 day' AS INTERVAL)) AS date), date_table AS (SELECT DISTINCT DATE_TRUNC('MONTH', date) AS date FROM dates) SELECT * FROM date_table;
+
+SELECT * FROM GENERATE_SERIES(a, b);
+
+SELECT * FROM t CROSS JOIN GENERATE_SERIES(2, 4);
+
+SELECT * FROM t CROSS JOIN GENERATE_SERIES(2, 4) AS s;
+
+SELECT * FROM x FETCH 1 ROW;
+
+SELECT * FROM x FETCH FIRST 1 ROWS ONLY;
+
+SELECT fname, lname, age FROM person ORDER BY age DESC NULLS FIRST, fname ASC NULLS LAST, lname;
+
+SELECT fname, lname, age FROM person ORDER BY age DESC, fname ASC, lname;
+
+SELECT * FROM x WHERE SUBSTRING(col1 FROM 3 + LENGTH(col1) - 10 FOR 10) IN (col2);
+
+SELECT TRIM(BOTH ' XXX ');
+
+SELECT TRIM(' XXX ');
+
+SELECT TRIM(LEADING ' XXX ' COLLATE "de_DE");
+
+SELECT LTRIM(' XXX ' COLLATE "de_DE");
+
+SELECT TRIM(TRAILING ' XXX ' COLLATE "de_DE");
+
+SELECT RTRIM(' XXX ' COLLATE "de_DE");
+
+merge into x as x using (select id) as y on a = b WHEN matched then update set X."A" = y.b;
+
+MERGE INTO x AS x USING (SELECT id) AS y ON a = b WHEN MATCHED THEN UPDATE SET "A" = y.b;
+
+merge into x as z using (select id) as y on a = b WHEN matched then update set X.a = y.b;
+
+MERGE INTO x AS z USING (SELECT id) AS y ON a = b WHEN MATCHED THEN UPDATE SET a = y.b;
+
+merge into x as z using (select id) as y on a = b WHEN matched then update set Z.a = y.b;
+
+merge into x using (select id) as y on a = b WHEN matched then update set x.a = y.b;
+
+MERGE INTO x USING (SELECT id) AS y ON a = b WHEN MATCHED THEN UPDATE SET a = y.b;
+
+COPY tbl (col1, col2) FROM 'file' WITH (FORMAT format, HEADER MATCH, FREEZE TRUE);
+
+COPY tbl (col1, col2) TO 'file' WITH (FORMAT format, HEADER MATCH, FREEZE TRUE);
+
+COPY (SELECT * FROM t) TO 'file' WITH (FORMAT format, HEADER MATCH, FREEZE TRUE);
+
+SELECT TO_DATE('01/01/2000', 'MM/DD/YYYY');
+
+SELECT TO_CHAR(x, 'IYYY-IW');
+
+SELECT js, js IS JSON AS "json?", js IS JSON VALUE AS "scalar?", js IS JSON SCALAR AS "scalar?", js IS JSON OBJECT AS "object?", js IS JSON ARRAY AS "array?" FROM t;
+
+SELECT js, js IS JSON ARRAY WITH UNIQUE KEYS AS "array w. UK?", js IS JSON ARRAY WITHOUT UNIQUE KEYS AS "array w/o UK?", js IS JSON ARRAY UNIQUE KEYS AS "array w UK 2?" FROM t;
+
+MERGE INTO target_table USING source_table AS source ON target.id = source.id WHEN MATCHED THEN DO NOTHING WHEN NOT MATCHED THEN DO NOTHING RETURNING MERGE_ACTION(), *;
+
+SELECT 1 FROM ((VALUES (1)) AS vals(id) LEFT OUTER JOIN tbl ON vals.id = tbl.id);
+
+SELECT OVERLAY(a PLACING b FROM 1);
+
+SELECT OVERLAY(a PLACING b FROM 1 FOR 1);
+
+SELECT JSONB_EXISTS('{"a": [1,2,3]}', 'a');
+
+WITH t AS (SELECT ARRAY[1, 2, 3] AS col) SELECT * FROM t WHERE 1 <= ANY(col) AND 2 = ANY(col);
+
+/*+ some comment*/ SELECT b.foo, b.bar FROM baz AS b;
+
+/* + some comment */ SELECT b.foo, b.bar FROM baz AS b;
+
+SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY a) FILTER(WHERE CAST(b AS BOOLEAN)) AS mean_value FROM (VALUES (0, 't')) AS fake_data(a, b);
+
+SELECT JSON_OBJECT_AGG(k, v) FROM t;
+
+SELECT JSON_OBJECTAGG(k VALUE v) FROM t;
+
+SELECT JSON_OBJECTAGG(k: v ABSENT ON NULL) FROM t;
+
+SELECT JSON_OBJECTAGG(k: v WITHOUT UNIQUE KEYS) FROM t;
+
+SELECT JSON_OBJECTAGG(k: v FORMAT JSON) FROM t;
+
+SELECT JSON_OBJECTAGG(k: v RETURNING BYTEA FORMAT JSON ENCODING UTF8) FROM t;
+
+SELECT JSONB_OBJECT_AGG(k, v) FROM t;
+
+SELECT DATE_BIN('30 days', timestamp_col, (SELECT MIN(TIMESTAMP) from table)) FROM table;
+
+SELECT ANY_VALUE(1) AS col;
+
+SELECT * FROM foo WHERE id = %s;
+
+SELECT * FROM foo WHERE id = %(id_param)s;
+
+SELECT * FROM foo WHERE id = ?;
+
+SELECT '{"a":1, "b":2, "c":3}'::jsonb ?| array['b', 'c'];
+
+SELECT CAST('{"a":1, "b":2, "c":3}' AS JSONB) ?| ARRAY['b', 'c'];
+
+SELECT '["a", "b"]'::jsonb ?& array['a', 'b'];
+
+SELECT CAST('["a", "b"]' AS JSONB) ?& ARRAY['a', 'b'];
+
+SELECT '["a", {"b":1}]'::jsonb #- '{1,b}';
+
+SELECT CAST('["a", {"b":1}]' AS JSONB) #- '{1,b}';
+
+SELECT JSON_AGG(DISTINCT name) FROM users;
+
+SELECT JSON_AGG(c1 ORDER BY c1) FROM (VALUES ('c'), ('b'), ('a')) AS t(c1);
+
+SELECT JSON_AGG(DISTINCT c1 ORDER BY c1) FROM (VALUES ('c'), ('b'), ('a')) AS t(c1);
+
+SELECT REGEXP_REPLACE('aaa', 'a', 'b');
+
+SELECT TO_CHAR(foo, bar);
+
+CREATE TABLE table1 (a INT, b INT, PRIMARY KEY (a));
+
+SELECT NUMRANGE(1.1, 2.2) -|- NUMRANGE(2.2, 3.3);
+
+SELECT SLOPE(point '(4,4)', point '(0,0)');
+
+SELECT SLOPE(CAST('(4,4)' AS POINT), CAST('(0,0)' AS POINT));
+
+UPDATE foo SET a = bar.a, b = bar.b FROM bar WHERE foo.id = bar.id;
+
+SELECT MLEAST(VARIADIC ARRAY[10, -1, 5, 4.4]);
+
+SELECT MLEAST(VARIADIC ARRAY[]::numeric[]);
+
+SELECT MLEAST(VARIADIC CAST(ARRAY[] AS DECIMAL[]));
+
+SELECT * FROM schema_name.table_name st WHERE JSON_EXTRACT_PATH_TEXT((st.data)::json, variadic array['test'::text]) = 'test'::text;
+
+SELECT * FROM schema_name.table_name AS st WHERE JSON_EXTRACT_PATH_TEXT(CAST((st.data) AS JSON), VARIADIC ARRAY[CAST('test' AS TEXT)]) = CAST('test' AS TEXT);
+
+CREATE VIEW v AS SELECT * FROM start WITH CHECK OPTION;
+
+CREATE VIEW start WITH (security_barrier=TRUE) AS SELECT 1;
+
+CREATE TYPE widget;
+
+CREATE TYPE float8range AS RANGE (subtype = float8, subtype_diff = float8mi);
+
+ALTER INDEX "IX_Ratings_Column1" RENAME TO "IX_Ratings_Column2";
+
+CREATE TABLE x (a TEXT COLLATE "de_DE");
+
+CREATE TABLE x (a TEXT COLLATE pg_catalog."default");
+
+CREATE TABLE t (col INT[3][5]);
+
+CREATE TABLE t (col INT[3]);
+
+CREATE INDEX IF NOT EXISTS ON t(c);
+
+CREATE INDEX et_vid_idx ON et(vid) INCLUDE (fid);
+
+CREATE INDEX idx_x ON x USING BTREE(x, y) WHERE (NOT y IS NULL);
+
+CREATE TABLE test (elems JSONB[]);
+
+CREATE TABLE public.y (x TSTZRANGE NOT NULL);
+
+CREATE TABLE test (foo HSTORE);
+
+CREATE TABLE test (foo JSONB);
+
+CREATE TABLE test (foo VARCHAR(64)[]);
+
+CREATE TABLE test (foo INT) PARTITION BY HASH(foo);
+
+INSERT INTO x VALUES (1, 'a', 2.0) RETURNING a;
+
+INSERT INTO x VALUES (1, 'a', 2.0) RETURNING a, b;
+
+INSERT INTO x VALUES (1, 'a', 2.0) RETURNING *;
+
+UPDATE tbl_name SET foo = 123 RETURNING a;
+
+UPDATE t SET (b, c) = (3, 4), xs[1] = 7;
+
+CREATE TABLE cities_partdef PARTITION OF cities DEFAULT;
+
+CREATE TABLE t (c CHAR(2) UNIQUE NOT NULL) INHERITS (t1);
+
+CREATE TABLE s.t (c CHAR(2) UNIQUE NOT NULL) INHERITS (s.t1, s.t2);
+
+CREATE FUNCTION x(INT) RETURNS INT SET search_path = 'public';
+
+TRUNCATE TABLE t1 CONTINUE IDENTITY;
+
+TRUNCATE TABLE t1 RESTART IDENTITY;
+
+TRUNCATE TABLE t1 CASCADE;
+
+TRUNCATE TABLE t1 RESTRICT;
+
+TRUNCATE TABLE t1 CONTINUE IDENTITY CASCADE;
+
+TRUNCATE TABLE t1 RESTART IDENTITY RESTRICT;
+
+ALTER TABLE t1 SET LOGGED;
+
+ALTER TABLE t1 SET UNLOGGED;
+
+ALTER TABLE t1 SET WITHOUT CLUSTER;
+
+ALTER TABLE t1 SET WITHOUT OIDS;
+
+ALTER TABLE t1 SET ACCESS METHOD method;
+
+ALTER TABLE t1 SET TABLESPACE tablespace;
+
+ALTER TABLE t1 SET (fillfactor = 5, autovacuum_enabled = TRUE);
+
+INSERT INTO book (isbn, title) VALUES ($1, $2) ON CONFLICT(isbn) WHERE deleted_at IS NULL DO UPDATE SET title = EXCLUDED.title RETURNING id, isbn;
+
+INSERT INTO newtable AS t(a, b, c) VALUES (1, 2, 3) ON CONFLICT(c) DO UPDATE SET a = t.a + 1 WHERE t.a < 1;
+
+INSERT INTO newtable AS t (a, b, c) VALUES (1, 2, 3) ON CONFLICT(c) DO UPDATE SET a = t.a + 1 WHERE t.a < 1;
+
+INSERT INTO t (id, a) VALUES (1, FALSE) ON CONFLICT(id) DO UPDATE SET a = t.x OR t.y, b = t.x AND t.y WHERE t.id = 1 RETURNING a;
+
+INSERT INTO tbl (a, b) VALUES (1, 'x') ON CONFLICT(a, LOWER(b)) DO UPDATE SET b = excluded.b;
+
+ALTER TABLE tested_table ADD CONSTRAINT unique_example UNIQUE (column_name) NOT VALID;
+
+CREATE FUNCTION pymax(a INT, b INT) RETURNS INT LANGUAGE plpython3u AS $$
+  if a > b:
+    return a
+  return b
+$$;
+
+CREATE TABLE t (vid INT NOT NULL, CONSTRAINT ht_vid_nid_fid_idx EXCLUDE (INT4RANGE(vid, nid) WITH &&, INT4RANGE(fid, fid, '[]') WITH &&));
+
+CREATE TABLE t (i INT, a TEXT, PRIMARY KEY (i) INCLUDE (a));
+
+CREATE TABLE t (i INT, PRIMARY KEY (i), EXCLUDE USING gist(col varchar_pattern_ops DESC NULLS LAST WITH &&) WITH (sp1=1, sp2=2));
+
+CREATE TABLE t (i INT, EXCLUDE USING btree(INT4RANGE(vid, nid, '[]') ASC NULLS FIRST WITH &&) INCLUDE (col1, col2));
+
+CREATE TABLE t (i INT, EXCLUDE USING gin(col1 WITH &&, col2 WITH ||) USING INDEX TABLESPACE tablespace WHERE (id > 5));
+
+CREATE TABLE A (LIKE B INCLUDING CONSTRAINT INCLUDING COMPRESSION EXCLUDING COMMENTS);
+
+CREATE TABLE cust_part3 PARTITION OF customers FOR VALUES WITH (MODULUS 3, REMAINDER 2);
+
+CREATE TABLE measurement_y2016m07 PARTITION OF measurement (unitsales DEFAULT 0) FOR VALUES FROM ('2016-07-01') TO ('2016-08-01');
+
+CREATE TABLE measurement_ym_older PARTITION OF measurement_year_month FOR VALUES FROM (MINVALUE, MINVALUE) TO (2016, 11);
+
+CREATE TABLE measurement_ym_y2016m11 PARTITION OF measurement_year_month FOR VALUES FROM (2016, 11) TO (2016, 12);
+
+CREATE TABLE cities_ab PARTITION OF cities (CONSTRAINT city_id_nonzero CHECK (city_id <> 0)) FOR VALUES IN ('a', 'b');
+
+CREATE TABLE cities_ab PARTITION OF cities (CONSTRAINT city_id_nonzero CHECK (city_id <> 0)) FOR VALUES IN ('a', 'b') PARTITION BY RANGE(population);
+
+CREATE INDEX foo ON bar.baz USING btree(col1 varchar_pattern_ops ASC, col2);
+
+CREATE INDEX index_issues_on_title_trigram ON public.issues USING gin(title public.gin_trgm_ops);
+
+INSERT INTO x VALUES (1, 'a', 2.0) ON CONFLICT(id) DO NOTHING RETURNING *;
+
+INSERT INTO x VALUES (1, 'a', 2.0) ON CONFLICT(id) DO UPDATE SET x.id = 1 RETURNING *;
+
+INSERT INTO x VALUES (1, 'a', 2.0) ON CONFLICT(id) DO UPDATE SET x.id = excluded.id RETURNING *;
+
+INSERT INTO x VALUES (1, 'a', 2.0) ON CONFLICT ON CONSTRAINT pkey DO NOTHING RETURNING *;
+
+INSERT INTO x VALUES (1, 'a', 2.0) ON CONFLICT ON CONSTRAINT pkey DO UPDATE SET x.id = 1 RETURNING *;
+
+DELETE FROM event USING sales AS s WHERE event.eventid = s.eventid RETURNING a;
+
+WITH t(c) AS (SELECT 1) SELECT * INTO UNLOGGED foo FROM (SELECT c AS c FROM t) AS temp;
+
+CREATE TABLE test (x TIMESTAMP WITHOUT TIME ZONE[][]);
+
+CREATE TABLE test (x TIMESTAMP[][]);
+
+CREATE FUNCTION add(integer, integer) RETURNS INT LANGUAGE SQL IMMUTABLE RETURNS NULL ON NULL INPUT AS 'select $1 + $2;';
+
+CREATE FUNCTION add(integer, integer) RETURNS INT LANGUAGE SQL IMMUTABLE STRICT AS 'select $1 + $2;';
+
+CREATE FUNCTION add(INT, INT) RETURNS INT SET search_path TO 'public' AS 'select $1 + $2;' LANGUAGE SQL IMMUTABLE;
+
+CREATE FUNCTION x(INT) RETURNS INT SET foo FROM CURRENT;
+
+CREATE CONSTRAINT TRIGGER my_trigger AFTER INSERT OR DELETE OR UPDATE OF col_a, col_b ON public.my_table DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION DO_STH();
+
+CREATE UNLOGGED TABLE foo AS WITH t(c) AS (SELECT 1) SELECT * FROM (SELECT c AS c FROM t) AS temp;
+
+ALTER TABLE foo ADD COLUMN id BIGINT NOT NULL PRIMARY KEY DEFAULT 1, ADD CONSTRAINT fk_orders_user FOREIGN KEY (id) REFERENCES foo (id);
+
+ALTER TABLE t ALTER COLUMN b RESTART;
+
+ALTER TABLE t ALTER COLUMN b SET STATISTICS 100;
+
+ALTER TABLE t ALTER COLUMN b OPTIONS (ADD x 'a');
+
+CREATE TABLE t (col integer ARRAY[3]);
+
+CREATE TABLE t (col integer ARRAY);
+
+CREATE TABLE t (col INT[]);
+
+CREATE FUNCTION x(INT) RETURNS INT SET search_path TO 'public';
+
+CREATE OR REPLACE FUNCTION function_name (input_a character varying DEFAULT NULL::character varying);
+
+CREATE OR REPLACE FUNCTION function_name(input_a VARCHAR DEFAULT CAST(NULL AS VARCHAR));
+
+CREATE FUNCTION foo(a INT);
+
+CREATE FUNCTION foo(IN a INT);
+
+CREATE FUNCTION foo(OUT a INT);
+
+CREATE FUNCTION foo(INOUT a INT);
+
+CREATE FUNCTION foo(VARIADIC a INT[]);
+
+CREATE FUNCTION foo(out INT);
+
+CREATE FUNCTION foo(inout VARCHAR);
+
+CREATE FUNCTION foo(variadic INT[]);
+
+CREATE FUNCTION foo(a INT, OUT b INT, INOUT c VARCHAR, VARIADIC d INT[]);
+
+CREATE OR REPLACE FUNCTION foo(INOUT id UUID);
+
+CREATE OR REPLACE FUNCTION foo(id UUID, OUT created_at TIMESTAMPTZ);
+
+CREATE FUNCTION foo(OUT x INT DEFAULT 5);
+
+CREATE FUNCTION foo(INOUT y VARCHAR DEFAULT 'test');
+
+CREATE FUNCTION foo(IN a INT DEFAULT 0, OUT b INT);
+
+CREATE FUNCTION foo(VARIADIC args INT[] DEFAULT ARRAY[]::INT[]);
+
+CREATE FUNCTION foo(VARIADIC args INT[] DEFAULT CAST(ARRAY[] AS INT[]));
+
+CREATE FUNCTION foo(OUT result INT, IN input INT DEFAULT 10);
+
+CREATE TABLE products (product_no INT UNIQUE, name TEXT, price DECIMAL);
+
+CREATE TABLE products (product_no INT CONSTRAINT must_be_different UNIQUE, name TEXT CONSTRAINT present NOT NULL, price DECIMAL);
+
+CREATE TABLE products (product_no INT, name TEXT, price DECIMAL, UNIQUE (product_no, name));
+
+CREATE TABLE products (product_no INT UNIQUE, name TEXT, price DECIMAL CHECK (price > 0), discounted_price DECIMAL CONSTRAINT positive_discount CHECK (discounted_price > 0), CHECK (product_no > 1), CONSTRAINT valid_discount CHECK (price > discounted_price));
+
+CREATE INDEX index_ci_builds_on_commit_id_and_artifacts_expireatandidpartial
+            ON public.ci_builds
+            USING btree (commit_id, artifacts_expire_at, id)
+            WHERE (
+                ((type)::text = 'Ci::Build'::text)
+                AND ((retried = false) OR (retried IS NULL))
+                AND ((name)::text = ANY (ARRAY[
+                    ('sast'::character varying)::text,
+                    ('dependency_scanning'::character varying)::text,
+                    ('sast:container'::character varying)::text,
+                    ('container_scanning'::character varying)::text,
+                    ('dast'::character varying)::text
+                ]))
+            );
+
+CREATE INDEX index_ci_builds_on_commit_id_and_artifacts_expireatandidpartial ON public.ci_builds USING btree(commit_id, artifacts_expire_at, id) WHERE ((CAST((type) AS TEXT) = CAST('Ci::Build' AS TEXT)) AND ((retried = FALSE) OR (retried IS NULL)) AND (CAST((name) AS TEXT) = ANY(ARRAY[CAST((CAST('sast' AS VARCHAR)) AS TEXT), CAST((CAST('dependency_scanning' AS VARCHAR)) AS TEXT), CAST((CAST('sast:container' AS VARCHAR)) AS TEXT), CAST((CAST('container_scanning' AS VARCHAR)) AS TEXT), CAST((CAST('dast' AS VARCHAR)) AS TEXT)])));
+
+CREATE INDEX index_ci_pipelines_on_project_idandrefandiddesc ON public.ci_pipelines USING btree(project_id, ref, id DESC);
+
+TRUNCATE TABLE ONLY t1, t2*, ONLY t3, t4, t5* RESTART IDENTITY CASCADE;
+
+TRUNCATE TABLE ONLY t1, t2, ONLY t3, t4, t5 RESTART IDENTITY CASCADE;
+
+CREATE TABLE x (a UUID, b BYTEA);
+
+CREATE TABLE tbl (col INT UNIQUE NULLS NOT DISTINCT DEFAULT 9.99);
+
+CREATE TABLE tbl (col UUID UNIQUE DEFAULT GEN_RANDOM_UUID());
+
+CREATE TABLE tbl (col UUID, UNIQUE NULLS NOT DISTINCT (col));
+
+CREATE TABLE tbl (col_a INT GENERATED ALWAYS AS (1 + 2) STORED);
+
+CREATE TABLE tbl (col_a INTERVAL GENERATED ALWAYS AS (a - b) STORED);
+
+CREATE INDEX CONCURRENTLY ix_table_id ON tbl USING btree(id);
+
+CREATE INDEX CONCURRENTLY IF NOT EXISTS ix_table_id ON tbl USING btree(id);
+
+DROP INDEX ix_table_id;
+
+DROP INDEX IF EXISTS ix_table_id;
+
+DROP INDEX CONCURRENTLY ix_table_id;
+
+DROP INDEX CONCURRENTLY IF EXISTS ix_table_id;
+
+CREATE TABLE IF NOT EXISTS public.rental
+        (
+            inventory_id INT NOT NULL,
+            CONSTRAINT rental_customer_id_fkey FOREIGN KEY (customer_id)
+                REFERENCES public.customer (customer_id) MATCH FULL
+                ON UPDATE CASCADE
+                ON DELETE RESTRICT,
+            CONSTRAINT rental_inventory_id_fkey FOREIGN KEY (inventory_id)
+                REFERENCES public.inventory (inventory_id) MATCH PARTIAL
+                ON UPDATE CASCADE
+                ON DELETE RESTRICT,
+            CONSTRAINT rental_staff_id_fkey FOREIGN KEY (staff_id)
+                REFERENCES public.staff (staff_id) MATCH SIMPLE
+                ON UPDATE CASCADE
+                ON DELETE RESTRICT,
+            INITIALLY IMMEDIATE
+        );
+
+CREATE TABLE IF NOT EXISTS public.rental (inventory_id INT NOT NULL, CONSTRAINT rental_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.customer (customer_id) MATCH FULL ON UPDATE CASCADE ON DELETE RESTRICT, CONSTRAINT rental_inventory_id_fkey FOREIGN KEY (inventory_id) REFERENCES public.inventory (inventory_id) MATCH PARTIAL ON UPDATE CASCADE ON DELETE RESTRICT, CONSTRAINT rental_staff_id_fkey FOREIGN KEY (staff_id) REFERENCES public.staff (staff_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT, INITIALLY IMMEDIATE);
+
+ALTER TABLE t DROP b;
+
+ALTER TABLE t DROP COLUMN b;
+
+ALTER TABLE t DROP b, DROP c;
+
+ALTER TABLE t DROP COLUMN b, DROP COLUMN c;
+
+ALTER TABLE t DROP b CASCADE;
+
+ALTER TABLE t DROP COLUMN b CASCADE;
+
+ALTER TABLE t DROP IF EXISTS b CASCADE;
+
+ALTER TABLE t DROP COLUMN IF EXISTS b CASCADE;
+
+ALTER TABLE t DROP type;
+
+ALTER TABLE t DROP COLUMN type;
+
+ALTER TABLE t DROP if;
+
+ALTER TABLE t DROP COLUMN if;
+
+ALTER TABLE t DROP IF EXISTS if CASCADE;
+
+ALTER TABLE t DROP COLUMN IF EXISTS if CASCADE;
+
+ALTER TABLE t DROP b, DROP view CASCADE;
+
+ALTER TABLE t DROP COLUMN b, DROP COLUMN view CASCADE;
+
+ALTER TABLE t DROP COLUMN partitioned_by CASCADE;
+
+SELECT * FROM UNNEST(ARRAY[1, 2], ARRAY['foo', 'bar', 'baz']) AS x(a, b);
+
+SELECT TRIM(ARRAY_TO_STRING(ARRAY(SELECT val FROM UNNEST(ARRAY['a', 'b']) WITH ORDINALITY AS u(val, rn)), ' '));
+
+SELECT r.v, r.idx FROM t CROSS JOIN LATERAL UNNEST(t.a) WITH ORDINALITY AS r(v, idx);
+
+SELECT * FROM t, LATERAL UNNEST(t.a) WITH ORDINALITY AS r;
+
+SELECT * FROM t, LATERAL UNNEST(t.a, t.b) WITH ORDINALITY AS r(x, y, idx);
+
+SELECT r.v, r.idx FROM t, LATERAL UNNEST(t.a) WITH ORDINALITY AS r(v, idx);
+
+SELECT UNNEST(c) FROM t;
+
+SELECT UNNEST(ARRAY[1]);
+
+SELECT a, LOGICAL_OR(b) FROM table GROUP BY a;
+
+SELECT a, BOOL_OR(b) FROM table GROUP BY a;
+
+SELECT CONCAT('abcde', 2, NULL, 22);
+
+SELECT u & 5 FROM t;
+
+SELECT (U&'\FE01' || 'Test literal') AS label FROM data;
+
+SELECT U&'d!0061t!+000061' UESCAPE '!' AS label;
+
+SELECT u&'\0441\043B\043E\043D';
+
+SELECT U&'can''t';
+
+SELECT U&'a''b''c';
+
+SELECT U&'can''t !0061' UESCAPE '!' AS label;
+
+SELECT U&'d\0061t\0061', U&'d!+000061ta' UESCAPE '!', U&'a\\b', U&'\D83D\DE00';
+
+SELECT U&'Hello winter \2603 !';
+
+SELECT U&'a
+b';
+
+SELECT CORR(a, b);
+
+SELECT CORR(a, b) OVER (PARTITION BY c);
+
+SELECT CORR(a, b) FILTER(WHERE c > 0);
+
+SELECT CORR(a, b) FILTER(WHERE c > 0) OVER (PARTITION BY d);
+
+SELECT * FROM ROWS FROM (FUNC1(col1, col2));
+
+SELECT * FROM ROWS FROM (FUNC1(col1) AS alias1("col1" TEXT), FUNC2(col2) AS alias2("col2" INT)) WITH ORDINALITY;
+
+SELECT * FROM table1, ROWS FROM (FUNC1(col1) AS alias1("col1" TEXT)) WITH ORDINALITY AS alias3("col3" INT, "col4" TEXT);
+
+SELECT ARRAY_LENGTH(ARRAY[1, 2, 3], 1);
+
+SELECT XMLELEMENT(NAME foo);
+
+SELECT XMLELEMENT(NAME foo, XMLATTRIBUTES('xyz' AS bar));
+
+SELECT XMLELEMENT(NAME test, XMLATTRIBUTES(a, b)) FROM test;
+
+SELECT XMLELEMENT(NAME foo, XMLATTRIBUTES(CURRENT_DATE AS bar), 'cont', 'ent');
+
+SELECT XMLELEMENT(NAME "foo$bar", XMLATTRIBUTES('xyz' AS "a&b"));
+
+SELECT XMLELEMENT(NAME foo, XMLATTRIBUTES('xyz' AS bar), XMLELEMENT(NAME abc), XMLCOMMENT('test'), XMLELEMENT(NAME xyz));
+
+ANALYZE TBL;
+
+ANALYZE t1, t2;
+
+ANALYZE VERBOSE t1, t2;
+
+ANALYZE TBL(col1, col2);
+
+ANALYZE VERBOSE SKIP_LOCKED TBL(col1, col2);
+
+ANALYZE BUFFER_USAGE_LIMIT 1337 TBL;
+
+WITH RECURSIVE search_graph(id, link, data, depth) AS (SELECT g.id, g.link, g.data, 1 FROM graph AS g UNION ALL SELECT g.id, g.link, g.data, sg.depth + 1 FROM graph AS g, search_graph AS sg WHERE g.id = sg.link) CYCLE id SET is_cycle USING path SELECT * FROM search_graph;
+
+WITH RECURSIVE search_graph(id, link, data, depth) AS (SELECT g.id, g.link, g.data, 1 FROM graph AS g UNION ALL SELECT g.id, g.link, g.data, sg.depth + 1 FROM graph AS g, search_graph AS sg WHERE g.id = sg.link) CYCLE id SET is_cycle TO 'Y' DEFAULT 'N' USING path SELECT * FROM search_graph;
+
+WITH RECURSIVE search_graph(id, link, data, depth) AS (SELECT g.id, g.link, g.data, 1 FROM graph AS g UNION ALL SELECT g.id, g.link, g.data, sg.depth + 1 FROM graph AS g, search_graph AS sg WHERE g.id = sg.link) SEARCH DEPTH FIRST BY id SET ordercol CYCLE id SET is_cycle USING path SELECT * FROM search_graph ORDER BY ordercol;
+
+SELECT a -> ('x' || 'y');
+
+SELECT JSON_EXTRACT(a, 'x' || 'y');
+
+SELECT a -> (1 + 2);
+
+SELECT JSON_EXTRACT(a, 1 + 2);
+
+SELECT a -> (NOT x);
+
+SELECT JSON_EXTRACT(a, NOT x);
+
+SELECT a #> (n IN (1, 2));
+
+SELECT JSONB_EXTRACT(a, n IN (1, 2));
+
+SELECT MAKE_DATE(2024, 1, 31);
+
+SELECT EXTRACT(DAY FROM CAST(x AS DATE)), EXTRACT(MONTH FROM CAST(x AS DATE)), EXTRACT(YEAR FROM CAST(x AS DATE));
+
+CREATE TABLE foo (data XML);
+
+LOCK TABLE foo, bar IN SHARE ROW EXCLUSIVE MODE;
+
+GRANT EXECUTE ON FUNCTION calculate_bonus(integer) TO analyst;
+
+REVOKE EXECUTE ON FUNCTION calculate_bonus(integer) FROM analyst;
+
+CREATE TRIGGER proc_trigger BEFORE INSERT ON users FOR EACH ROW EXECUTE PROCEDURE LOG_CHANGES();
+
+CREATE TRIGGER proc_trigger BEFORE INSERT ON users FOR EACH ROW EXECUTE FUNCTION LOG_CHANGES();
+
+CREATE TRIGGER "MyTrigger" BEFORE INSERT ON "MyTable" FOR EACH ROW EXECUTE FUNCTION MYFUNCTION();
+
+SELECT a <<->> b;
+
+SELECT r IS NOT NULL FROM t;
+
+SELECT NOT r IS NULL FROM t;
+
+SELECT NOT r IS NOT NULL FROM t;
+
+SELECT r NOTNULL FROM t;
+
+SELECT r ISNULL FROM t;
+
+SELECT r IS NULL FROM t;
+
+SELECT * FROM ONLY t;
+
+SELECT col[1];
+
+SELECT * FROM GENERATE_SERIES(CAST('2024-01-01' AS DATE), CAST('2024-01-05' AS DATE), INTERVAL '1 DAY');
+
+SELECT * FROM GENERATE_SERIES(CAST('2024-01-01 00:00:00' AS TIMESTAMP), CAST('2024-01-01 00:00:02' AS TIMESTAMP), INTERVAL '0.5 SECONDS');
+
+SELECT * FROM GENERATE_SERIES(CAST('2024-01-01 00:00:00' AS TIMESTAMP), CAST('2024-01-01 02:00:00' AS TIMESTAMP), INTERVAL '1 HOURS');
+
+CREATE TYPE mood AS ENUM ('sad', 'ok', 'happy');
+
+CREATE TYPE mood AS ENUM ();
+
+CREATE TYPE inventory_item AS (name TEXT, supplier_id INT, price DECIMAL);
+
+CREATE TYPE public.mood AS ENUM ('sad', 'ok');
+
+CREATE FUNCTION add(integer, integer) RETURNS integer AS 'select $1 + $2;' LANGUAGE SQL IMMUTABLE CALLED ON NULL INPUT;
+
+CREATE FUNCTION add(integer, integer) RETURNS INT LANGUAGE SQL IMMUTABLE CALLED ON NULL INPUT AS 'select $1 + $2;';
+
+ALTER TABLE t DROP COLUMN if CASCADE, DROP COLUMN b;
+
+SELECT ARRAY[1, 2, 3] <@ ARRAY[1, 2];
+
+ALTER TABLE t ADD COLUMN if INT;
+
+ALTER TABLE t DROP COLUMN cascade;
+
+ALTER TABLE t DROP COLUMN restrict;
+
+ALTER TABLE t DROP CONSTRAINT restrict;
+
+ALTER TABLE t DROP COLUMN partitioned_by;
+
+SELECT CAST('10C' AS INTEGER);
+
+SELECT 'epoch'::TIMESTAMP;
+
+WITH RECURSIVE t AS (SELECT 1 AS n UNION ALL SELECT n + 1 AS n FROM t WHERE n < 4) SELECT SUM(n) FROM t;
+
+WITH RECURSIVE t AS (SELECT 1 AS n, 2 as k) SELECT SUM(n) FROM t;
+
+WITH RECURSIVE t1 AS (SELECT 1 AS n), t2 AS (SELECT 2 AS n) SELECT SUM(t1.n), SUM(t2.n) FROM t1, t2;
+
+WITH RECURSIVE t AS (SELECT 1 AS n, (1 + 2)) SELECT * FROM t;
+
+WITH RECURSIVE t AS (SELECT n, 1 FROM tbl) SELECT * FROM t;
+
+SELECT (ARRAY[1, 2, 3])[4];
+
+SELECT STRING_TO_ARRAY('12,345,6789', ',');
+
+SELECT CAST('01:03:05.124' AS TIMETZ(2));
+
+SELECT CAST('2020-02-02 01:03:05.124' AS TIMESTAMPTZ(2));
+
+SELECT CAST('2008-02-28' AS TIMESTAMP) + INTERVAL '18 MONTH';
+
+SELECT CAST(EXTRACT(days FROM (CAST('2009-12-31' AS TIMESTAMP) - CAST('2009-01-01' AS TIMESTAMP))) / 7 AS BIGINT);
+
+CREATE TABLE t (a INT);
+
+SELECT * FROM ((VALUES (1), (2)) ORDER BY 1 LIMIT 1 OFFSET 1) AS t(x);
+
+CREATE TABLE t1 (LIKE t2);
+
+CREATE TABLE t1 (col VARCHAR, LIKE t2);
+
+SELECT * FROM t FETCH FIRST 1 ROWS ONLY;
+
+SELECT PERCENTILE_CONT(1) WITHIN GROUP (ORDER BY x) FROM t ORDER BY x;
+
+SELECT 'ABC' ~* 'a.*';
+
+CREATE TABLE testTypes (a JSONB);
+
+SELECT MODE() WITHIN GROUP (ORDER BY x) FROM t;
+
+SELECT RPAD('data', 8);
+
+SELECT VAR_SAMP(x);
+
+SELECT VAR_POP(x);
+
+CREATE TABLE c (pk BIGINT GENERATED ALWAYS AS IDENTITY (START WITH 10));
+
+CREATE TABLE c (pk BIGINT GENERATED ALWAYS AS IDENTITY (INCREMENT BY -1));
+
+SELECT BOOL_OR(c1), BOOL_OR(c2) FROM test;
+
+SELECT BOOL_AND(c1), BOOL_AND(c2) FROM test;
+
+SELECT * FROM test AS _tmp TABLESAMPLE BERNOULLI (5);
+
+CREATE OR REPLACE TRANSIENT TABLE a (id INT);
+
+CREATE OR REPLACE TABLE a (id INT);
+
+SELECT JSON_EXTRACT_PATH(col, 'customer''s department');
+
+SELECT CAST('a' AS VARCHAR COLLATE foo);
+
+WITH tbl AS (SELECT 1 AS id, 'eggy' AS name UNION ALL SELECT NULL AS id, 'jake' AS name) SELECT COUNT(DISTINCT CASE WHEN id IS NULL THEN NULL WHEN name IS NULL THEN NULL ELSE (id, name) END) AS cnt FROM tbl;
+
+SELECT CAST('2016-08-31' AS TIMESTAMP) AT TIME ZONE 'Asia/Seoul' AT TIME ZONE 'UTC';
+
+SELECT CAST(EXTRACT(days FROM (CAST(CAST('2020-12-31' AS DATE) AS TIMESTAMP) - CAST(CAST('2020-01-01' AS DATE) AS TIMESTAMP))) / 7 AS BIGINT);
+
+SELECT 'John Doe' ~ 'John.*';
+
+SELECT fname, lname, age FROM person ORDER BY age DESC, fname ASC, lname NULLS FIRST;
+
+SELECT RANDOM() < 0.1;
+
+SELECT STRING_AGG(DISTINCT x, ',') FROM t;
+
+SELECT STRING_AGG(DISTINCT x, ',' ORDER BY x) FROM t;
+
+SELECT x FROM t LIMIT ALL OFFSET 5;
+
+SELECT (FALSE IS DISTINCT FROM TRUE) IS DISTINCT FROM FALSE;
+
+SELECT CHR(72) || CHR(105) || CHR(x);
+
+SELECT d + INTERVAL '1 day' FROM t;
+
+SELECT d - INTERVAL '2 hours' FROM t;
+
+SELECT CAST(d AS TIMESTAMP) + INTERVAL '1 day' FROM t;
+
+SELECT CURRENT_TIMESTAMP - INTERVAL '7 days';
+
+SELECT JSON_EXTRACT_PATH_TEXT(a, 'k') FROM t;
+
+SELECT GREATEST(a, b) FROM t;
+
+SELECT LEAST(a, b) FROM t;
+
+SELECT LEAST(a, b, c) FROM t;
+
+SELECT GREATEST(NULL, 1);
+
+SELECT LEAST(3, NULL, 1);
+
+SELECT CONCAT(a, b) FROM t;
+
+SELECT CONCAT_WS(',', a, b) FROM t;
+
+SELECT JSON_AGG(name) FROM t;
+
+SELECT JSON_OBJECT_AGG(name, value) FROM t;
+
+CREATE TABLE t (x DOUBLE PRECISION, y DOUBLE PRECISION);
+
+CREATE TABLE z (a INT GENERATED BY DEFAULT AS IDENTITY NOT NULL UNIQUE PRIMARY KEY);
+
+SELECT CASE WHEN a THEN b WHEN c THEN d END;
+
+SELECT CAST(x AS DOUBLE PRECISION) FROM t;
+
+SELECT ARRAY[1, 2] <@ ARRAY[1, 2, 3];
+
+CREATE TABLE foo (col1 BIGINT, col2 BIGINT);
+
+SELECT * FROM UNNEST(ARRAY['John', 'Jane', 'Jim', 'Jamie'], ARRAY[24, 25, 26, 27]) AS t(name, age);
+
+SELECT id, t.type, t.scores FROM example_table, UNNEST(SPLIT(type, ';'), scores) AS t(type, scores);
+
+CREATE TABLE a;
+
+SELECT x AS result FROM t;
+
+SELECT a FROM x UNION ALL SELECT a FROM y ORDER BY a DESC LIMIT 2 OFFSET 1;
+
+SELECT MAKE_TIME(23, 59, 59);
+
+WITH t(c) AS (SELECT 1) SELECT * INTO foo FROM (SELECT c AS c FROM t) AS temp;
+
+WITH t(c) AS (SELECT 1) SELECT * INTO TEMPORARY foo FROM (SELECT c AS c FROM t) AS temp;
+
+WITH t(c) AS (SELECT 1) SELECT c INTO TEMPORARY foo FROM t;
+
+WITH y AS (SELECT 2 AS c) INSERT INTO t SELECT * FROM y;
+
+MERGE INTO x AS z USING (WITH t(c) AS (SELECT 1) SELECT c FROM t) AS y ON a = b WHEN MATCHED THEN UPDATE SET a = y.b;
+
+SELECT * FROM t OFFSET 2;
+
+SELECT * FROM t ORDER BY (SELECT NULL) NULLS FIRST OFFSET 2;
+
+SELECT x AS v, STRING_AGG(v, ',' ORDER BY v) AS w FROM t GROUP BY x;
+
+CREATE TABLE tbl (id INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 10) PRIMARY KEY);
+
+CREATE TABLE tbl (id INT NOT NULL GENERATED BY DEFAULT AS IDENTITY (START WITH 10 INCREMENT BY 1) PRIMARY KEY);
+
+SELECT DATE_PART('YEAR', '2017-01-01'::DATE);
+
+SELECT EXTRACT(YEAR FROM CAST('2017-01-01' AS DATE));
+
+SELECT DATE_PART('month', '2017-03-01'::DATE);
+
+SELECT EXTRACT(MONTH FROM CAST('2017-03-01' AS DATE));
+
+SELECT DATE_PART('day', '2017-01-02'::DATE);
+
+SELECT EXTRACT(DAY FROM CAST('2017-01-02' AS DATE));
+
+SELECT x.a, x.b, t.v, t.y FROM x INNER JOIN LATERAL (SELECT v, y FROM t) AS t(v, y) ON TRUE;
+
+SELECT x.a, x.b, t.v, t.y FROM x LEFT JOIN LATERAL (SELECT v, y FROM t) AS t(v, y) ON TRUE;
+
+SELECT x.a, x.b, t.v, t.y, s.v, s.y FROM x LEFT JOIN LATERAL (SELECT v, y FROM t) AS t(v, y) ON TRUE LEFT JOIN LATERAL (SELECT v, y FROM t) AS s(v, y) ON TRUE LEFT JOIN z ON z.id = s.id;
+
+SELECT t.x, y.z FROM x INNER JOIN LATERAL TVFTEST(t.x) AS y(z) ON TRUE;
+
+SELECT t.x, y.z FROM x LEFT JOIN LATERAL TVFTEST(t.x) AS y(z) ON TRUE;
+
+SELECT t.x, y.z FROM x LEFT JOIN LATERAL a.b.tvfTest(t.x) AS y(z) ON TRUE;

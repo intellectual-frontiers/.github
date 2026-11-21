@@ -1,0 +1,39 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-anyfs-ssh-layers FR-001	check	.github: cd commons/anyfs-ssh && bun run verify	suite/layers.test.ts: the table decodes and the checker finds nothing
+0001-anyfs-ssh-layers FR-002	check	.github: cd commons/anyfs-ssh && bun run verify	suite/layers.test.ts: verify runs every check of the library
+0001-anyfs-ssh-layers FR-003	check	.github: cd commons/anyfs-ssh && bun run verify	suite/protocol.test.ts: the ban finds nothing in the sources
+0001-anyfs-ssh-layers FR-004	check	.github: cd commons/anyfs-ssh && bun run verify	suite/layers.test.ts: the manifest says held
+0001-anyfs-ssh-layers FR-005	check	.github: cd commons/anyfs-ssh && bun run verify	bun run verify: the packer inspects the package
+0002-anyfs-ssh-helper FR-001	check	.github: cd commons/anyfs-ssh && bun run verify	suite/helper.test.ts: the module is made from the script and the hash is the hash of the script
+0002-anyfs-ssh-helper FR-002	check	.github: cd commons/anyfs-ssh && bun run verify	suite/protocol.test.ts: the posix helper; tsc: the exhaustive match of helperOf
+0002-anyfs-ssh-helper FR-003	check	.github: cd commons/anyfs-ssh && bun run verify	suite/protocol.test.ts: the vector of a call; suite/store.test.ts: no argument holds a body
+0002-anyfs-ssh-helper FR-004	check	.github: cd commons/anyfs-ssh && bun run verify	suite/protocol.test.ts: each exit status is one answer; suite/helper.test.ts: the commands answer as the protocol says
+0002-anyfs-ssh-helper FR-005	check	.github: cd commons/anyfs-ssh && bun run verify	suite/helper.test.ts: an expectation that does not hold is a conflict that says what was found
+0002-anyfs-ssh-helper FR-006	check	.github: cd commons/anyfs-ssh && bun run verify	suite/helper.test.ts: a name that is not a path of the store, a path outside the folder and a link are refused
+0002-anyfs-ssh-helper FR-007	check	.github: cd commons/anyfs-ssh && bun run verify	suite/helper.test.ts: names with spaces, quotes and dollar signs are kept as they are
+0002-anyfs-ssh-helper FR-008	check	.github: cd commons/anyfs-ssh && bun run verify	suite/helper.test.ts: exactly one of many writers wins; a lock of a process that is gone is taken over
+0002-anyfs-ssh-helper FR-009	check	.github: cd commons/anyfs-ssh && bun run verify	suite/helper.test.ts: more than the most is refused; no temporary file is left
+0002-anyfs-ssh-helper FR-010	check	.github: cd commons/anyfs-ssh && bun run verify	suite/helper.test.ts: the helper is kept under its hash, once, and a script that does not have the hash is refused
+0003-anyfs-ssh-store FR-001	check	.github: cd commons/anyfs-ssh && bun run verify	suite/store.test.ts: the store passes every case of the conformance suite
+0003-anyfs-ssh-store FR-002	check	.github: cd commons/anyfs-ssh && bun run verify	suite/store.test.ts: the capabilities, the place and the pages of a list
+0003-anyfs-ssh-store FR-003	check	.github: cd commons/anyfs-ssh && bun run verify	suite/store.test.ts: the revision is the digest of the bytes, the same as in memory
+0003-anyfs-ssh-store FR-004	check	.github: cd commons/anyfs-ssh && bun run verify	suite/store.test.ts: no argument holds a body and a name is one word
+0003-anyfs-ssh-store FR-005	check	.github: cd commons/anyfs-ssh && bun run verify	suite/store.test.ts: a path that leaves the folder by a link is refused
+0003-anyfs-ssh-store FR-006	check	.github: cd commons/anyfs-ssh && bun run verify	suite/store.test.ts: the helper is kept under its hash, carried where it cannot be kept, and a helper that is not the pinned one is refused
+0003-anyfs-ssh-store FR-007	check	.github: cd commons/anyfs-ssh && bun run verify	suite/store.test.ts: a lost connection is retryable and a failure is not
+0003-anyfs-ssh-store FR-008	check	.github: cd commons/anyfs-ssh && bun run verify	suite/store.test.ts: bytes that the host did not keep as sent are tampered
+0003-anyfs-ssh-store FR-009	check	.github: cd commons/anyfs-ssh && bun run verify	suite/store.test.ts: an object of more than the most is refused
+0003-anyfs-ssh-store FR-010	check	.github: cd commons/anyfs-ssh && bun run verify	suite/store.test.ts: a host with no tool for SHA-256, no such folder or a helper of another protocol is not taken
+0004-anyfs-ssh-sshd-test FR-001	check	.github: cd commons/anyfs-ssh && bun run verify	suite/sshd-tool.test.ts: the requirement
+0004-anyfs-ssh-sshd-test FR-002	check	.github: cd commons/anyfs-ssh && bun run verify	suite/sshd-tool.test.ts: the requirement
+0004-anyfs-ssh-sshd-test FR-003	check	.github: cd commons/anyfs-ssh && bun run verify	suite/sshd-tool.test.ts: the requirement
+0004-anyfs-ssh-sshd-test FR-004	check	.github: cd commons/anyfs-ssh && bun run verify	suite/sshd-tool.test.ts: the requirement
+0004-anyfs-ssh-sshd-test FR-005	check	.github: cd commons/anyfs-ssh && bun run verify	suite/sshd-tool.test.ts: the requirement
+0004-anyfs-ssh-sshd-test FR-006	check	.github: cd commons/anyfs-ssh && bun run verify	suite/sshd-tool.test.ts: the requirement
+0004-anyfs-ssh-sshd-test FR-007	check	.github: cd commons/anyfs-ssh && bun run verify	suite/sshd.test.ts: the requirement
+0005-anyfs-ssh-mirror FR-001	check	.github: cd commons/anyfs-ssh && bun run verify	suite/mirror.test.ts: the requirement
+0005-anyfs-ssh-mirror FR-002	check	.github: cd commons/anyfs-ssh && bun run verify	suite/mirror.test.ts: the requirement
+0005-anyfs-ssh-mirror FR-003	check	.github: cd commons/anyfs-ssh && bun run verify	suite/mirror.test.ts: the requirement
+0005-anyfs-ssh-mirror FR-004	check	.github: cd commons/anyfs-ssh && bun run verify	suite/mirror.test.ts: the requirement

@@ -1,0 +1,43 @@
+{
+  "name": "@intellectual-frontiers/anyfs-cli",
+  "private": true,
+  "version": "0.1.0",
+  "description": "The `anyfs` program: POSIX-style access to any AnyFS store (ls, cat, cp, rm, find, grep, diff) and the bridge verbs (sync, bisync, mirror, check) from the command line, a tool server and a REST description, with every operation saying how it was carried out and every destruction a plan first.",
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "bin": {
+    "anyfs": "./bin/anyfs.mjs"
+  },
+  "exports": {
+    ".": "./src/mod.ts",
+    "./governance": "./src/governance/mod.ts",
+    "./logical": "./src/logical/mod.ts",
+    "./physical": "./src/physical/mod.ts"
+  },
+  "scripts": {
+    "check": "tsc -p tsconfig.json",
+    "test": "bun test suite/",
+    "test:node": "node --test \"suite/**/*.test.ts\"",
+    "verify": "tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../libraries/src/check.ts --root spec-kit --level L1 && bun ../kanon/src/check.ts && bun tools/check.ts && bun test suite/"
+  },
+  "devDependencies": {
+    "@intellectual-frontiers/anyfs": "link:../anyfs",
+    "@intellectual-frontiers/anyfs-bridge": "link:../anyfs-bridge",
+    "@intellectual-frontiers/anyfs-posix": "link:../anyfs-posix",
+    "@intellectual-frontiers/anyfs-ssh": "link:../anyfs-ssh",
+    "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/crypto": "link:../crypto",
+    "@intellectual-frontiers/headless": "link:../headless",
+    "@intellectual-frontiers/kanon": "link:../kanon",
+    "@intellectual-frontiers/libraries": "link:../libraries",
+    "@intellectual-frontiers/mizan": "link:../mizan",
+    "@intellectual-frontiers/system": "link:../system",
+    "@intellectual-frontiers/terminal": "link:../terminal",
+    "@intellectual-frontiers/test": "link:../test",
+    "@types/node": "26.6.6",
+    "fast-check": "4.10.2",
+    "typescript": "7.0.2"
+  }
+}

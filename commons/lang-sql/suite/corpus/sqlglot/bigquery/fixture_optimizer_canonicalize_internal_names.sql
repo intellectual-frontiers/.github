@@ -1,0 +1,23 @@
+WITH t AS (SELECT a AS k FROM x UNION ALL BY NAME (SELECT b AS k FROM y UNION ALL BY NAME ON (k) (SELECT c AS k FROM z))) SELECT k FROM t;
+
+WITH t AS (SELECT a AS k, b AS v FROM x FULL UNION ALL BY NAME (SELECT b AS k, c AS w FROM y FULL UNION ALL BY NAME (SELECT c AS k, b AS u FROM z))) SELECT k, v, w, u FROM t;
+
+SELECT * REPLACE (a + 1 AS a) FROM x;
+
+SELECT a, b FROM x QUALIFY ROW_NUMBER() OVER (PARTITION BY a ORDER BY b) = 1;
+
+SELECT n, off FROM UNNEST([10, 20, 30]) AS n WITH OFFSET AS off;
+
+SELECT t.id, u FROM t CROSS JOIN UNNEST(t.arr) AS u;
+
+SELECT x.a, p.sid FROM x JOIN (SELECT sid FROM UNNEST([STRUCT('a' AS sid), STRUCT('b')])) AS p ON x.a = p.sid;
+
+WITH cte AS (SELECT [STRUCT('a' AS sid)] AS arr) SELECT v.sid FROM cte, UNNEST(cte.arr) AS v;
+
+SELECT s.sid FROM UNNEST([STRUCT('a' AS sid)]) AS s;
+
+SELECT s FROM UNNEST([STRUCT('a' AS sid)]) AS s;
+
+SELECT t FROM t;
+
+SELECT my_pivot.x FROM pvt PIVOT(SUM(v) FOR c IN ('x')) AS my_pivot;

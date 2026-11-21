@@ -1,0 +1,62 @@
+// Spec: 0001-sql-lang FR-003
+/**
+ * The manifest of Lang Sql, a library of commons (commons 0027-commons-libraries FR-012): data a program reads and never runs. Registering a library is a folder with a manifest like this one; this
+ * repository's specification of the libraries is made from it (`bun commons/libraries/src/libraries.ts`), and a test fails where the manifest and the folder disagree.
+ *
+ * @module
+ */
+export const library = {
+  name: "lang-sql",
+  level: "L1",
+  specKit: "spec-kit",
+  verify: "bun run verify",
+  version: "0.1.0",
+  distribution: ["github", "npm"],
+  exports: [
+    ".",
+    "./aide/catalog",
+    "./aide/exec",
+    "./aide/guard",
+    "./aide/normalize",
+    "./aide/plan",
+    "./aide/profile",
+    "./aide/text",
+    "./dialects/athena",
+    "./dialects/bigquery",
+    "./dialects/clickhouse",
+    "./dialects/databricks",
+    "./dialects/doris",
+    "./dialects/dremio",
+    "./dialects/drill",
+    "./dialects/druid",
+    "./dialects/duckdb",
+    "./dialects/dune",
+    "./dialects/exasol",
+    "./dialects/fabric",
+    "./dialects/hive",
+    "./dialects/materialize",
+    "./dialects/mysql",
+    "./dialects/oracle",
+    "./dialects/postgres",
+    "./dialects/presto",
+    "./dialects/redshift",
+    "./dialects/risingwave",
+    "./dialects/singlestore",
+    "./dialects/snowflake",
+    "./dialects/solr",
+    "./dialects/spark",
+    "./dialects/spark2",
+    "./dialects/sqlite",
+    "./dialects/starrocks",
+    "./dialects/teradata",
+    "./dialects/trino",
+    "./dialects/tsql",
+    "./extensions/docs",
+    "./extensions/introspect",
+    "./extensions/plpgsql",
+    "./extensions/query",
+    "./extensions/unist",
+  ],
+  summary:
+    "A small, fast, portable multi-dialect SQL language library: a lexer, a closed syntax tree and a parser for thirty dialects, comments as first-class nodes, and extensions for queries, unist, documentation and PL/pgSQL.",
+};

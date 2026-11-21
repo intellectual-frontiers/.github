@@ -1,0 +1,7 @@
+number	slug	state
+0001	git-layers	in force
+0002	git-governance	in force
+0003	git-ref	in force
+0004	git-worktree	in force
+0005	git-remote	in force
+0006	git-conformance	in force

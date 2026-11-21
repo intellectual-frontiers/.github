@@ -92,6 +92,6 @@ proves(["0001-libraries FR-016"], "the names held are data, and a library of the
   assert(matches({ kind: "prefix", prefix: "a-" }, "a-b") && !matches({ kind: "exact", name: "a" }, "a-b"));
   assertEquals(
     RESERVED.map((r) => (r.match.kind === "exact" ? r.match.name : `${r.match.prefix}*`)),
-    ["archon", "archon-*", "signing", "gitops", "estate", "toolchain"],
+    ["archon", "archon-*", "signing", "gitops", "anyfs", "anyfs-*", "estate", "toolchain"],
   );
 });

@@ -1,0 +1,7 @@
+SELECT * FROM DUAL;
+
+SELECT * FROM "DUAL";
+
+SELECT dual FROM t;
+
+SELECT * FROM t AS dual;

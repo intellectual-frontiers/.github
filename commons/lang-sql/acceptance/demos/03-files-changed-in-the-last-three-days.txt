@@ -1,0 +1,20 @@
+# Files changed in the last three days
+
+$ sqlfs --root $ROOT 'SELECT path FROM files WHERE kind = '\''f'\'' AND mtime > now() - 3 D ORDER BY path'
+path
+----------------------
+README.md
+docs/readme.md
+lib/dq"uote.ts
+src/deep/nested/mod.ts
+
+$ sqlfind --root $ROOT --emit shell 'SELECT path FROM files WHERE kind = '\''f'\'' AND mtime > now() - 3 D ORDER BY path'
+find $ROOT -mindepth 1 -maxdepth 64 -type f -printf '%P\0%y\0%s\0%Ts\0%m\0%u\0'
+
+$ sqlfind --root $ROOT 'SELECT path FROM files WHERE kind = '\''f'\'' AND mtime > now() - 3 D ORDER BY path'
+path
+----------------------
+README.md
+docs/readme.md
+lib/dq"uote.ts
+src/deep/nested/mod.ts

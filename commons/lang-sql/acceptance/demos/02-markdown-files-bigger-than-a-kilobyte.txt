@@ -1,0 +1,14 @@
+# Markdown files bigger than a kilobyte
+
+$ sqlfs --root $ROOT 'SELECT path FROM files WHERE ext = '\''md'\'' AND size > 1 KB'
+path
+-------------
+docs/guide.md
+
+$ sqlfind --root $ROOT --emit shell 'SELECT path FROM files WHERE ext = '\''md'\'' AND size > 1 KB'
+find $ROOT -mindepth 1 -maxdepth 64 -name '*.md' -size +1024c -printf '%P\0%y\0%s\0%Ts\0%m\0%u\0'
+
+$ sqlfind --root $ROOT 'SELECT path FROM files WHERE ext = '\''md'\'' AND size > 1 KB'
+path
+-------------
+docs/guide.md

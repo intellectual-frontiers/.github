@@ -18,7 +18,7 @@
 - **FR-004**: Governance (layer 1, `src/governance/`) MUST import only Core (`@intellectual-frontiers/core`) and the library's own governance.
 - **FR-005**: The logical layer (layer 2, `src/logical/`) MUST import only governance, Core, and the pure packages Crypto and Formats; it MUST be pure: no file, network, process or clock (the time is a parameter).
 - **FR-006**: The physical layer (layer 3, `src/physical/`) holds the ports (runner, evidence store, signer), their registries and the helpers that run through them; it MUST import only the logical layer, governance, Core, Crypto, Formats and System, and MUST NOT import a unit that registers into it.
-- **FR-007**: An extension MUST be a unit of its own: a serializer (`src/serializers/<id>/`) imports the logical layer; a runner (`src/runners/<kind>/`), a store (`src/stores/<id>/`) and a signer (`src/signers/<id>/`) import the physical, logical and governance layers; the conformance suites (`src/conformance/`) import all of those; an extension MUST NOT import another extension.
+- **FR-007**: An extension MUST be a unit of its own: a serializer (`src/serializers/<id>/`) imports the logical layer; a runner (`src/runners/<kind>/`), a store (`src/stores/<id>/`) and a signer (`src/signers/<id>/`) import the physical, logical and governance layers; the conformance suites (`src/conformance/`) import all of those; the `sql` runner MAY also import the SQL language library (`@intellectual-frontiers/lang-sql`) for its guard; an extension MUST NOT import another extension.
 - **FR-008**: A surface (`src/surfaces/<id>/`) MAY import every unit below it and Headless and Terminal, and nothing but the suite and the tools MAY import a surface.
 
 ## Registries and documents

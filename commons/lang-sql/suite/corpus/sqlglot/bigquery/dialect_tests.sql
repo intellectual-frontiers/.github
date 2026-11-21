@@ -1,0 +1,1559 @@
+SELECT var_samp(x) FROM t;
+
+SELECT 0 isnull;
+
+SELECT 0 AS isnull;
+
+SELECT CASE WHEN TRUE THEN 0 ELSE 1 END isnull;
+
+SELECT CASE WHEN TRUE THEN 0 ELSE 1 END AS isnull;
+
+SELECT 'foo' 'bar';
+
+SELECT CONCAT('foo', 'bar');
+
+SELECT 'foo'/* c */'bar';
+
+SELECT CONCAT('foo' /* c */, 'bar');
+
+SELECT `a\`b`;
+
+SELECT `a\\b`;
+
+SELECT * FROM `domain.com:project-id.mydataset.mytable`;
+
+SELECT * FROM `domain.com:project-id.region-us.INFORMATION_SCHEMA`.JOBS;
+
+SELECT * FROM `domain.com:project-id.region-us.INFORMATION_SCHEMA.JOBS` AS JOBS;
+
+SELECT * FROM `domain.com:project-id.region-us.INFORMATION_SCHEMA.JOBS`;
+
+SELECT * FROM `domain.com:project-id.region-us.INFORMATION_SCHEMA.JOBS` AS `domain.com:project-id.region-us.INFORMATION_SCHEMA.JOBS`;
+
+SELECT * FROM `a.b.com:project-id.mydataset.mytable`;
+
+SELECT * FROM `a.b.com:project-id.region-us.INFORMATION_SCHEMA.JOBS`;
+
+SELECT * FROM `a.b.com:project-id.region-us.INFORMATION_SCHEMA.JOBS` AS `a.b.com:project-id.region-us.INFORMATION_SCHEMA.JOBS`;
+
+SELECT * FROM x-0.y;
+
+SELECT `p.d.UdF`(data) FROM `p.d.t`;
+
+SELECT EXP(1);
+
+SELECT ARRAY_CONCAT([1]);
+
+SELECT * FROM READ_CSV('bla.csv');
+
+SELECT jsondoc['some_key'];
+
+SELECT data.144A_FLAG FROM t;
+
+SELECT data.`144A_FLAG` FROM t;
+
+SELECT t.1a FROM t;
+
+SELECT t.`1a` FROM t;
+
+SELECT STRING(data.144) FROM t;
+
+SELECT STRING(data.`144`) FROM t;
+
+SELECT STRING(data.1e10) FROM t;
+
+SELECT STRING(data.`1e10`) FROM t;
+
+SELECT t.144 A_FLAG FROM t;
+
+SELECT t.`144` AS A_FLAG FROM t;
+
+SELECT `p.d.UdF`(data).* FROM `p.d.t`;
+
+SELECT * FROM `my-project.my-dataset.my-table`;
+
+CREATE OR REPLACE TABLE `a.b.c` CLONE `a.b.d`;
+
+SELECT x, 1 AS y GROUP BY 1 ORDER BY 1;
+
+SELECT * FROM x.*;
+
+SELECT * FROM x.y*;
+
+CREATE SCHEMA x DEFAULT COLLATE 'en';
+
+CREATE TABLE x (y INT64) DEFAULT COLLATE 'en';
+
+SELECT SEARCH(data_to_search, 'search_query');
+
+SELECT SEARCH(data_to_search, 'search_query', json_scope => 'JSON_KEYS_AND_VALUES');
+
+SELECT SEARCH(data_to_search, 'search_query', analyzer => 'PATTERN_ANALYZER');
+
+SELECT SEARCH(data_to_search, 'search_query', analyzer_options => 'analyzer_options_values');
+
+SELECT SEARCH(data_to_search, 'search_query', json_scope => 'JSON_VALUES', analyzer => 'LOG_ANALYZER');
+
+SELECT SEARCH(data_to_search, 'search_query', analyzer => 'PATTERN_ANALYZER', analyzer_options => 'options');
+
+SELECT ARRAY_AGG((SELECT c FROM t LIMIT 1) IGNORE NULLS) FROM u;
+
+SELECT ARRAY_AGG((SELECT c FROM t ORDER BY c) IGNORE NULLS LIMIT 1) FROM u;
+
+SELECT * FROM dataset.my_table TABLESAMPLE SYSTEM (10 PERCENT);
+
+SELECT '\n\r\a\v\f\t';
+
+SELECT * FROM tbl FOR SYSTEM_TIME AS OF z;
+
+SELECT * FROM tbl FOR SYSTEM TIME AS OF z;
+
+SELECT PARSE_TIMESTAMP('%c', 'Thu Dec 25 07:30:00 2008', 'UTC');
+
+SELECT ANY_VALUE(fruit HAVING MAX sold) FROM fruits;
+
+SELECT ANY_VALUE(fruit HAVING MIN sold) FROM fruits;
+
+SELECT ANY_VALUE(fruit HAVING MAX sold) FROM Store;
+
+SELECT ANY_VALUE(fruit HAVING MIN sold) FROM Store;
+
+SELECT category, ANY_VALUE(product HAVING MAX price), ANY_VALUE(product HAVING MIN cost), ANY_VALUE(supplier) FROM products GROUP BY category;
+
+WITH data AS (SELECT "A" AS fruit, 20 AS sold UNION ALL SELECT NULL AS fruit, 25 AS sold) SELECT ANY_VALUE(fruit HAVING MAX sold) FROM data;
+
+SELECT `project-id`.udfs.func(call.dir);
+
+SELECT CAST(CURRENT_DATE AS STRING FORMAT 'DAY') AS current_day;
+
+CREATE TABLE t CLUSTER BY col1, col2;
+
+SELECT foo IN UNNEST(bar) AS bla;
+
+SELECT * FROM x-0.a;
+
+SELECT * FROM pivot CROSS JOIN foo;
+
+SELECT * FROM a-b-c.mydataset.mytable;
+
+SELECT * FROM abc-def-ghi;
+
+SELECT * FROM a-b-c;
+
+SELECT * FROM my-table;
+
+SELECT * FROM my-project.mydataset.mytable;
+
+SELECT * FROM pro-ject_id.c.d CROSS JOIN foo-bar;
+
+SELECT * FROM foo.bar.25;
+
+SELECT * FROM foo.bar.`25`;
+
+SELECT * FROM foo.bar.25_;
+
+SELECT * FROM foo.bar.`25_`;
+
+SELECT * FROM foo.bar.25x a;
+
+SELECT * FROM foo.bar.`25x` AS a;
+
+SELECT * FROM foo.bar.25ab c;
+
+SELECT * FROM foo.bar.`25ab` AS c;
+
+SELECT DATE_TRUNC(DATE '2015-06-15', ISOYEAR);
+
+SELECT DATE_TRUNC(CAST('2015-06-15' AS DATE), ISOYEAR);
+
+SELECT b'abc';
+
+SELECT AS STRUCT 1 AS a, 2 AS b;
+
+SELECT DISTINCT AS STRUCT 1 AS a, 2 AS b;
+
+SELECT AS VALUE STRUCT(1 AS a, 2 AS b);
+
+SELECT * FROM q UNPIVOT(values FOR quarter IN (b, c));
+
+CREATE TABLE x (a STRUCT<values ARRAY<INT64>>);
+
+CREATE TABLE x (a STRUCT<b STRING OPTIONS (description='b')>);
+
+BEGIN DECLARE y INT64;
+
+ALTER TABLE foo DROP PRIMARY KEY IF EXISTS;
+
+SELECT MAKE_INTERVAL(100, 11, 1, 12, 30, 10);
+
+SELECT MAKE_INTERVAL(1, day => '2\'; SELECT 1; --')
+;
+
+BEGIN TRANSACTION;
+
+COMMIT TRANSACTION;
+
+ROLLBACK TRANSACTION;
+
+SELECT y + 1 FROM x GROUP BY y + 1 ORDER BY 1;
+
+SELECT TIMESTAMP_SECONDS(2) AS t;
+
+SELECT TIMESTAMP_MILLIS(2) AS t;
+
+UPDATE x SET y = NULL;
+
+SELECT COUNT(x RESPECT NULLS);
+
+SELECT LAST_VALUE(x IGNORE NULLS) OVER y AS x;
+
+SELECT ARRAY((SELECT AS STRUCT 1 AS a, 2 AS b));
+
+SELECT ARRAY((SELECT AS STRUCT 1 AS a, 2 AS b) LIMIT 10);
+
+SELECT * FROM x WHERE x.y >= (SELECT MAX(a) FROM b-c) - 20;
+
+SELECT FORMAT_TIMESTAMP('%F %T', CURRENT_TIMESTAMP(), 'Europe/Berlin') AS ts;
+
+SELECT cars, apples FROM some_table PIVOT(SUM(total_counts) FOR products IN ('general.cars' AS cars, 'food.apples' AS apples));
+
+MERGE INTO dataset.NewArrivals USING (SELECT * FROM UNNEST([('microwave', 10, 'warehouse #1'), ('dryer', 30, 'warehouse #1'), ('oven', 20, 'warehouse #2')])) ON FALSE WHEN NOT MATCHED THEN INSERT ROW WHEN NOT MATCHED BY SOURCE THEN DELETE;
+
+SELECT * FROM test QUALIFY a IS DISTINCT FROM b WINDOW c AS (PARTITION BY d);
+
+CREATE TABLE x (a STRING OPTIONS (description='x')) OPTIONS (table_expiration_days=1);
+
+SELECT * FROM (SELECT * FROM `t`) AS a UNPIVOT((c) FOR c_name IN (v1, v2));
+
+CREATE TABLE IF NOT EXISTS foo AS SELECT * FROM bla EXCEPT DISTINCT (SELECT * FROM bar) LIMIT 0;
+
+SELECT ROW() OVER (y ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) FROM x WINDOW y AS (PARTITION BY CATEGORY);
+
+SELECT item, purchases, LAST_VALUE(item) OVER (item_window ROWS BETWEEN 2 PRECEDING AND 2 FOLLOWING) AS most_popular FROM Produce WINDOW item_window AS (ORDER BY purchases);
+
+SELECT LAST_VALUE(a IGNORE NULLS) OVER y FROM x WINDOW y AS (PARTITION BY CATEGORY);
+
+CREATE OR REPLACE VIEW test (tenant_id OPTIONS (description='Test description on table creation')) AS SELECT 1 AS tenant_id, 1 AS customer_id;
+
+SELECT * FROM foo AS t0 FOR SYSTEM_TIME AS OF '2026-02-12T23:22:21.743416+00:00';
+
+SELECT b"\x0a$'x'00";
+
+SELECT b'\n$\'x\'00';
+
+SELECT * FROM t1, t2;
+
+SELECT * FROM t1 CROSS JOIN t2;
+
+SELECT r"\t";
+
+SELECT '\\t';
+
+SELECT * FROM `proj.dataset.INFORMATION_SCHEMA.SOME_VIEW`;
+
+SELECT * FROM `proj.dataset.INFORMATION_SCHEMA.SOME_VIEW` AS `proj.dataset.INFORMATION_SCHEMA.SOME_VIEW`;
+
+SELECT * FROM region_or_dataset.INFORMATION_SCHEMA.TABLES;
+
+SELECT * FROM `region_or_dataset.INFORMATION_SCHEMA.TABLES` AS TABLES;
+
+SELECT * FROM region_or_dataset.INFORMATION_SCHEMA.TABLES AS some_name;
+
+SELECT * FROM `region_or_dataset.INFORMATION_SCHEMA.TABLES` AS some_name;
+
+SELECT * FROM proj.region_or_dataset.INFORMATION_SCHEMA.TABLES;
+
+SELECT * FROM `proj.region_or_dataset.INFORMATION_SCHEMA.TABLES` AS TABLES;
+
+CREATE VIEW `d.v` OPTIONS (expiration_timestamp=TIMESTAMP '2020-01-02T04:05:06.007Z') AS SELECT 1 AS c;
+
+CREATE VIEW `d.v` OPTIONS (expiration_timestamp=CAST('2020-01-02T04:05:06.007Z' AS TIMESTAMP)) AS SELECT 1 AS c;
+
+SELECT ARRAY(SELECT AS STRUCT 1 a, 2 b);
+
+SELECT ARRAY(SELECT AS STRUCT 1 AS a, 2 AS b);
+
+select array_contains([1, 2, 3], 1);
+
+SELECT EXISTS(SELECT 1 FROM UNNEST([1, 2, 3]) AS _col WHERE _col = 1);
+
+SELECT SPLIT(foo);
+
+SELECT SPLIT(foo, ',');
+
+SELECT 1 AS hash;
+
+SELECT 1 AS `hash`;
+
+SELECT 1 AS at;
+
+SELECT 1 AS `at`;
+
+SELECT """ends with \"word\"""";
+
+SELECT 'ends with "word"';
+
+SELECT '''ends with \'word\'''';
+
+SELECT 'ends with \'word\'';
+
+SELECT """a\"b""";
+
+SELECT 'a"b';
+
+SELECT r"""ends with \"""";
+
+SELECT 'ends with \\"';
+
+SELECT r"""a\"b""";
+
+SELECT 'a\\"b';
+
+SELECT a overlaps;
+
+SELECT a AS overlaps;
+
+SELECT y + 1 z FROM x GROUP BY y + 1 ORDER BY z;
+
+SELECT y + 1 AS z FROM x GROUP BY z ORDER BY z;
+
+SELECT y + 1 z FROM x GROUP BY y + 1;
+
+SELECT y + 1 AS z FROM x GROUP BY y + 1;
+
+SELECT JSON '"foo"' AS json_data;
+
+SELECT * FROM (SELECT a, b, c FROM test) PIVOT(SUM(b) d, COUNT(*) e FOR c IN ('x', 'y'));
+
+SELECT * FROM (SELECT a, b, c FROM test) PIVOT(SUM(b) AS d, COUNT(*) AS e FOR c IN ('x', 'y'));
+
+SELECT CAST(1 AS BYTEINT);
+
+SELECT CAST(1 AS INT64);
+
+CREATE TEMPORARY FUNCTION FOO()
+RETURNS STRING
+LANGUAGE js AS
+'return "Hello world!"';
+
+SELECT TRUE IS TRUE;
+
+SELECT REPEAT(' ', 2);
+
+SELECT purchases, LAST_VALUE(item) OVER item_window AS most_popular FROM Produce WINDOW item_window AS (PARTITION BY purchases ORDER BY purchases ROWS BETWEEN 2 PRECEDING AND 2 FOLLOWING);
+
+SELECT DATE(2024, 1, 15);
+
+SELECT STRUCT(1, 2, 3), STRUCT(), STRUCT('abc'), STRUCT(1, t.str_col), STRUCT(1 as a, 'abc' AS b), STRUCT(str_col AS abc);
+
+SELECT DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY);
+
+SELECT DATE_SUB(CURRENT_DATE, INTERVAL '2' DAY);
+
+SELECT DATE_SUB(DATE '2008-12-25', INTERVAL 5 DAY);
+
+SELECT DATE_SUB(CAST('2008-12-25' AS DATE), INTERVAL '5' DAY);
+
+SELECT t.c1, h.c2, s.c3 FROM t1 AS t, UNNEST(t.t2) AS h, UNNEST(h.t3) AS s;
+
+SELECT t.c1, h.c2, s.c3 FROM t1 AS t CROSS JOIN UNNEST(t.t2) AS h CROSS JOIN UNNEST(h.t3) AS s;
+
+SELECT results FROM Coordinates, Coordinates.position AS results;
+
+SELECT results FROM Coordinates CROSS JOIN UNNEST(Coordinates.position) AS results;
+
+SELECT results FROM Coordinates, `Coordinates.position` AS results;
+
+SELECT results FROM Coordinates CROSS JOIN `Coordinates.position` AS results;
+
+SELECT results FROM Coordinates AS c, UNNEST(c.position) AS results;
+
+SELECT results FROM Coordinates AS c CROSS JOIN UNNEST(c.position) AS results;
+
+SELECT TIMESTAMP('2008-12-25 15:30:00', 'America/Los_Angeles');
+
+SELECT SUM(x IGNORE NULLS) AS x;
+
+SELECT SUM(x RESPECT NULLS) AS x;
+
+SELECT PERCENTILE_CONT(x, 0.5 RESPECT NULLS) OVER ();
+
+SELECT ARRAY_AGG(DISTINCT x IGNORE NULLS ORDER BY x LIMIT 10) AS x;
+
+SELECT ARRAY_AGG(x IGNORE NULLS) AS x;
+
+SELECT ARRAY_AGG(DISTINCT x IGNORE NULLS ORDER BY x) AS x;
+
+SELECT * FROM Produce UNPIVOT((first_half_sales, second_half_sales) FOR semesters IN ((Q1, Q2) AS 'semester_1', (Q3, Q4) AS 'semester_2'));
+
+SELECT * FROM Produce UNPIVOT((first_half_sales, second_half_sales) FOR semesters IN ((Q1, Q2) AS 1, (Q3, Q4) AS 2));
+
+SELECT UNIX_DATE(DATE '2008-12-25');
+
+SELECT UNIX_DATE(CAST('2008-12-25' AS DATE));
+
+SELECT LAST_DAY(CAST('2008-11-25' AS DATE), MONTH);
+
+SELECT LAST_DAY(CAST('2008-11-25' AS DATE), QUARTER);
+
+SELECT TIME(15, 30, 00);
+
+SELECT TIME('2008-12-25 15:30:00');
+
+SELECT COUNTIF(x);
+
+SELECT TIMESTAMP_DIFF(TIMESTAMP_SECONDS(60), TIMESTAMP_SECONDS(0), minute);
+
+SELECT TIMESTAMP_MICROS(x);
+
+SELECT * FROM t WHERE EXISTS(SELECT * FROM unnest(nums) AS x WHERE x > 1);
+
+SELECT '\n';
+
+SELECT '''
+''';
+
+CREATE OR REPLACE TABLE `a.b.c` COPY `a.b.d`;
+
+SELECT DATETIME_DIFF(DATETIME '2021-02-01 00:00:00', DATETIME '2021-01-31 00:00:00', MONTH);
+
+SELECT DATETIME_DIFF(CAST('2021-02-01 00:00:00' AS DATETIME), CAST('2021-01-31 00:00:00' AS DATETIME), MONTH);
+
+SELECT DATETIME_DIFF(DATETIME '2017-10-15 00:00:00', DATETIME '2017-10-14 00:00:00', WEEK);
+
+SELECT DATETIME_DIFF(CAST('2017-10-15 00:00:00' AS DATETIME), CAST('2017-10-14 00:00:00' AS DATETIME), WEEK);
+
+SELECT TIMESTAMP_ADD(TIMESTAMP "2008-12-25 15:30:00+00", INTERVAL 10 MINUTE);
+
+SELECT TIMESTAMP_ADD(CAST('2008-12-25 15:30:00+00' AS TIMESTAMP), INTERVAL '10' MINUTE);
+
+SELECT TIMESTAMP_SUB(TIMESTAMP "2008-12-25 15:30:00+00", INTERVAL 10 MINUTE);
+
+SELECT TIMESTAMP_SUB(CAST('2008-12-25 15:30:00+00' AS TIMESTAMP), INTERVAL '10' MINUTE);
+
+SELECT TIMESTAMP_SUB(TIMESTAMP "2008-12-25 15:30:00+00", INTERVAL col MINUTE);
+
+SELECT TIMESTAMP_SUB(CAST('2008-12-25 15:30:00+00' AS TIMESTAMP), INTERVAL col MINUTE);
+
+SELECT TIME_ADD(CAST('09:05:03' AS TIME), INTERVAL 2 HOUR);
+
+SELECT TIME_ADD(CAST('09:05:03' AS TIME), INTERVAL '2' HOUR);
+
+SELECT TIME_SUB(CAST('09:05:03' AS TIME), INTERVAL 2 HOUR);
+
+SELECT TIME_SUB(CAST('09:05:03' AS TIME), INTERVAL '2' HOUR);
+
+SELECT TO_HEX(MD5(some_string));
+
+SELECT CAST('20201225' AS TIMESTAMP FORMAT 'YYYYMMDD' AT TIME ZONE 'America/New_York');
+
+SELECT PARSE_TIMESTAMP('%Y%m%d', '20201225', 'America/New_York');
+
+SELECT CAST('20201225' AS TIMESTAMP FORMAT 'YYYYMMDD');
+
+SELECT PARSE_TIMESTAMP('%Y%m%d', '20201225');
+
+SELECT CAST(TIMESTAMP '2008-12-25 00:00:00+00:00' AS STRING FORMAT 'YYYY-MM-DD HH24:MI:SS TZH:TZM') AS date_time_to_string;
+
+SELECT CAST(CAST('2008-12-25 00:00:00+00:00' AS TIMESTAMP) AS STRING FORMAT 'YYYY-MM-DD HH24:MI:SS TZH:TZM') AS date_time_to_string;
+
+SELECT CAST(TIMESTAMP '2008-12-25 00:00:00+00:00' AS STRING FORMAT 'YYYY-MM-DD HH24:MI:SS TZH:TZM' AT TIME ZONE 'Asia/Kolkata') AS date_time_to_string;
+
+SELECT CAST(CAST('2008-12-25 00:00:00+00:00' AS TIMESTAMP) AS STRING FORMAT 'YYYY-MM-DD HH24:MI:SS TZH:TZM' AT TIME ZONE 'Asia/Kolkata') AS date_time_to_string;
+
+WITH cte AS (SELECT [1, 2, 3] AS arr) SELECT IF(pos = pos_2, col, NULL) AS col FROM cte CROSS JOIN UNNEST(GENERATE_ARRAY(0, GREATEST(ARRAY_LENGTH(arr)) - 1)) AS pos CROSS JOIN UNNEST(arr) AS col WITH OFFSET AS pos_2 WHERE pos = pos_2 OR (pos > (ARRAY_LENGTH(arr) - 1) AND pos_2 = (ARRAY_LENGTH(arr) - 1));
+
+SELECT IF(pos = pos_2, col, NULL) AS col FROM UNNEST(GENERATE_ARRAY(0, GREATEST(ARRAY_LENGTH(IF(ARRAY_LENGTH(COALESCE([], [])) = 0, [[][SAFE_ORDINAL(0)]], []))) - 1)) AS pos CROSS JOIN UNNEST(IF(ARRAY_LENGTH(COALESCE([], [])) = 0, [[][SAFE_ORDINAL(0)]], [])) AS col WITH OFFSET AS pos_2 WHERE pos = pos_2 OR (pos > (ARRAY_LENGTH(IF(ARRAY_LENGTH(COALESCE([], [])) = 0, [[][SAFE_ORDINAL(0)]], [])) - 1) AND pos_2 = (ARRAY_LENGTH(IF(ARRAY_LENGTH(COALESCE([], [])) = 0, [[][SAFE_ORDINAL(0)]], [])) - 1));
+
+SELECT IF(pos = pos_2, col, NULL) AS col, IF(pos = pos_2, pos_2, NULL) AS pos_2 FROM UNNEST(GENERATE_ARRAY(0, GREATEST(ARRAY_LENGTH(IF(ARRAY_LENGTH(COALESCE([], [])) = 0, [[][SAFE_ORDINAL(0)]], []))) - 1)) AS pos CROSS JOIN UNNEST(IF(ARRAY_LENGTH(COALESCE([], [])) = 0, [[][SAFE_ORDINAL(0)]], [])) AS col WITH OFFSET AS pos_2 WHERE pos = pos_2 OR (pos > (ARRAY_LENGTH(IF(ARRAY_LENGTH(COALESCE([], [])) = 0, [[][SAFE_ORDINAL(0)]], [])) - 1) AND pos_2 = (ARRAY_LENGTH(IF(ARRAY_LENGTH(COALESCE([], [])) = 0, [[][SAFE_ORDINAL(0)]], [])) - 1));
+
+SELECT AS STRUCT ARRAY(SELECT AS STRUCT 1 AS b FROM x) AS y FROM z;
+
+SELECT CAST(STRUCT(1) AS STRUCT<INT64>);
+
+CREATE TEMP TABLE foo AS SELECT 1;
+
+CREATE TEMPORARY TABLE foo AS SELECT 1;
+
+SELECT * FROM UNNEST(['7', '14']) AS x;
+
+SELECT ARRAY(SELECT x FROM UNNEST([0, 1]) AS x);
+
+SELECT [(SELECT 1), 2];
+
+SELECT [1, (SELECT 2)];
+
+SELECT [STRUCT((SELECT 1) AS a), STRUCT(2 AS a)];
+
+SELECT [COALESCE((SELECT 1), 0), 2];
+
+SELECT ARRAY(SELECT DISTINCT x FROM UNNEST(some_numbers) AS x) AS unique_numbers;
+
+SELECT ARRAY(SELECT * FROM foo JOIN bla ON x = y);
+
+CREATE TABLE db.example_table (col_a struct<struct_col_a:int, struct_col_b:string>);
+
+CREATE TABLE db.example_table (col_a STRUCT<struct_col_a INT64, struct_col_b STRING>);
+
+CREATE TABLE db.example_table (col_a STRUCT<struct_col_a INT64, struct_col_b STRUCT<nested_col_a STRING, nested_col_b STRING>>);
+
+CREATE TABLE db.example_table (x int) PARTITION BY x cluster by x;
+
+CREATE TABLE db.example_table (x INT64) PARTITION BY x CLUSTER BY x;
+
+DELETE db.example_table WHERE x = 1;
+
+DELETE db.example_table tb WHERE tb.x = 1;
+
+DELETE db.example_table AS tb WHERE tb.x = 1;
+
+DELETE FROM db.example_table WHERE x = 1;
+
+DELETE FROM db.example_table tb WHERE tb.x = 1;
+
+DELETE FROM db.example_table AS tb WHERE tb.x = 1;
+
+DELETE FROM db.example_table AS tb WHERE example_table.x = 1;
+
+DELETE FROM db.example_table WHERE example_table.x = 1;
+
+DELETE FROM db.t1 AS t1 WHERE NOT t1.c IN (SELECT db.t2.c FROM db.t2);
+
+SELECT * FROM a WHERE b IN UNNEST([1, 2, 3]);
+
+SELECT * FROM a WHERE b NOT IN UNNEST([1, 2, 3]);
+
+SELECT * FROM a WHERE NOT b IN UNNEST([1, 2, 3]);
+
+SELECT a FROM test WHERE a = 1 GROUP BY a HAVING a = 2 QUALIFY z ORDER BY a LIMIT 10;
+
+SELECT cola, colb FROM UNNEST([STRUCT(1 AS cola, 'test' AS colb)]) AS tab;
+
+SELECT * FROM UNNEST([STRUCT(1 AS _c0)]) AS t1;
+
+SELECT * FROM UNNEST([STRUCT(1 AS id)]) AS t1 CROSS JOIN UNNEST([STRUCT(1 AS id)]) AS t2;
+
+SELECT * FROM UNNEST([1]) WITH OFFSET;
+
+SELECT * FROM UNNEST([1]) WITH OFFSET AS offset;
+
+SELECT * FROM UNNEST([1]) WITH OFFSET y;
+
+SELECT * FROM UNNEST([1]) WITH OFFSET AS y;
+
+SELECT
+  `u`.`user_email` AS `user_email`,
+  `d`.`user_id` AS `user_id`,
+  `account_id` AS `account_id`
+FROM `analytics_staging`.`stg_mongodb__users` AS `u`, UNNEST(`u`.`cluster_details`) AS `d`, UNNEST(`d`.`account_ids`) AS `account_id`
+WHERE
+  NOT `account_id` IS NULL;
+
+SELECT MOD(x, 10);
+
+SELECT CAST(x AS DATETIME);
+
+SELECT TIME(foo, 'America/Los_Angeles');
+
+SELECT DATETIME('2020-01-01');
+
+SELECT DATETIME('2020-01-01', TIME '23:59:59');
+
+SELECT DATETIME('2020-01-01', CAST('23:59:59' AS TIME));
+
+SELECT DATETIME('2020-01-01', 'America/Los_Angeles');
+
+SELECT LENGTH(foo);
+
+SELECT TIME_DIFF('12:00:00', '12:30:00', MINUTE);
+
+SELECT GENERATE_TIMESTAMP_ARRAY('2016-10-05 00:00:00', '2016-10-07 00:00:00', INTERVAL '1' DAY);
+
+SELECT PARSE_DATE('%A %b %e %Y', 'Thursday Dec 25 2008');
+
+SELECT PARSE_DATE('%Y%m%d', '20081225');
+
+SELECT PARSE_DATE('%m-%d', '12-25');
+
+SELECT PARSE_TIMESTAMP('%m-%d %H:%M:%S', '12-25 07:30:00');
+
+SELECT PARSE_TIMESTAMP('%m-%d %T', '12-25 07:30:00');
+
+SELECT ARRAY_TO_STRING(['cake', 'pie', NULL], '--') AS text;
+
+SELECT ARRAY_TO_STRING(['cake', 'pie', NULL], '--', 'MISSING') AS text;
+
+SELECT * FROM a-b c;
+
+SELECT * FROM a-b AS c;
+
+SELECT JSON_VALUE_ARRAY('{"arr": [1, "a"]}', '$.arr');
+
+SELECT INSTR('foo@example.com', '@');
+
+SELECT ts + MAKE_INTERVAL(1, 2, minute => 5, day => 3);
+
+SELECT ts + MAKE_INTERVAL(1, 2, day => 3, minute => 5);
+
+SELECT INT64(JSON_QUERY(JSON '{"key": 2000}', '$.key'));
+
+SELECT * FROM t1, UNNEST(`t1`) AS `col`;
+
+SELECT * FROM t1 CROSS JOIN UNNEST(`t1`) AS `col`;
+
+SELECT * FROM t, UNNEST(`t2`.`t3`) AS `col`;
+
+SELECT * FROM t CROSS JOIN UNNEST(`t2`.`t3`) AS `col`;
+
+SELECT * FROM t1, UNNEST(`t1`.`t2`.`t3`.`t4`) AS `col`;
+
+SELECT * FROM t1 CROSS JOIN UNNEST(`t1`.`t2`.`t3`.`t4`) AS `col`;
+
+SELECT CAST(col AS STRUCT<fld1 STRUCT<fld2 INT>>).fld1.fld2;
+
+SELECT CAST(col AS STRUCT<fld1 STRUCT<fld2 INT64>>).fld1.fld2;
+
+SELECT PARSE_DATETIME('%a %b %e %I:%M:%S %Y', 'Thu Dec 25 07:30:00 2008');
+
+SELECT PARSE_DATETIME('%F %T', '2023-01-15 14:30:00');
+
+SELECT TRANSLATE(MODEL, 'in', 't') FROM (SELECT 'input' AS MODEL);
+
+SELECT GRANT FROM (SELECT 'input' AS GRANT);
+
+SELECT 0xA;
+
+SELECT ARRAY_CONCAT_AGG(arr) FROM (SELECT [1, 2] AS arr) AS t;
+
+SELECT ARRAY_CONCAT_AGG(arr ORDER BY y) FROM (SELECT [1, 2] AS arr, 1 AS y) AS t;
+
+SELECT ARRAY_CONCAT_AGG(arr LIMIT 2) FROM (SELECT [1, 2] AS arr) AS t;
+
+SELECT ARRAY_CONCAT_AGG(arr ORDER BY y DESC LIMIT 2) FROM (SELECT [1, 2] AS arr, 1 AS y) AS t;
+
+SELECT * FROM a LEFT JOIN b ON a.key = b.key AND a.val IN UNNEST(b.arr);
+
+SELECT b'a';
+
+SELECT GENERATE_UUID();
+
+SELECT REPLACE('apple pie', 'pie', 'cobbler') AS result;
+
+WITH sample AS (SELECT * FROM UNNEST([TIMESTAMP '2024-03-15 14:35:46', TIMESTAMP '2024-03-16 01:12:03']) AS ts) SELECT ts, TIMESTAMP_TRUNC(ts, DAY, 'America/New_York') AS truncated_ts FROM sample;
+
+WITH sample AS (SELECT * FROM UNNEST([CAST('2024-03-15 14:35:46' AS TIMESTAMP), CAST('2024-03-16 01:12:03' AS TIMESTAMP)]) AS ts) SELECT ts, TIMESTAMP_TRUNC(ts, DAY, 'America/New_York') AS truncated_ts FROM sample;
+
+WITH sample AS (SELECT ts FROM UNNEST([TIMESTAMP '2024-03-15 14:35:46', TIMESTAMP '2024-03-16 01:12:03']) AS ts) SELECT ts, TIMESTAMP_TRUNC(ts, DAY) AS truncated_ts FROM sample;
+
+WITH sample AS (SELECT ts FROM UNNEST([CAST('2024-03-15 14:35:46' AS TIMESTAMP), CAST('2024-03-16 01:12:03' AS TIMESTAMP)]) AS ts) SELECT ts, TIMESTAMP_TRUNC(ts, DAY) AS truncated_ts FROM sample;
+
+WITH sample AS (SELECT * FROM UNNEST([TIMESTAMP '2024-03-15 14:35:46', TIMESTAMP '2024-03-16 01:12:03']) AS ts) SELECT ts, TIMESTAMP_TRUNC(ts, MINUTE, 'America/New_York') AS truncated_ts FROM sample;
+
+WITH sample AS (SELECT * FROM UNNEST([CAST('2024-03-15 14:35:46' AS TIMESTAMP), CAST('2024-03-16 01:12:03' AS TIMESTAMP)]) AS ts) SELECT ts, TIMESTAMP_TRUNC(ts, MINUTE, 'America/New_York') AS truncated_ts FROM sample;
+
+WITH sample AS (SELECT * FROM UNNEST([TIMESTAMP '2024-03-15 14:35:46', TIMESTAMP '2024-03-16 01:12:03']) AS ts) SELECT ts, TIMESTAMP_TRUNC(ts, MINUTE) AS truncated_ts FROM sample;
+
+WITH sample AS (SELECT * FROM UNNEST([CAST('2024-03-15 14:35:46' AS TIMESTAMP), CAST('2024-03-16 01:12:03' AS TIMESTAMP)]) AS ts) SELECT ts, TIMESTAMP_TRUNC(ts, MINUTE) AS truncated_ts FROM sample;
+
+SELECT GREATEST(1, NULL, 3);
+
+SELECT LEAST(1, NULL, 3);
+
+CREATE TEMPORARY FUNCTION a(x FLOAT64, y FLOAT64) RETURNS FLOAT64 NOT DETERMINISTIC LANGUAGE js AS 'return x*y;';
+
+CREATE TEMPORARY FUNCTION udf(x ANY TYPE) AS (x);
+
+CREATE TEMPORARY FUNCTION a(x FLOAT64, y FLOAT64) AS ((x + 4) / y);
+
+CREATE TABLE FUNCTION a(x INT64) RETURNS TABLE <q STRING, r INT64> AS SELECT s, t;
+
+CREATE TEMPORARY FUNCTION string_length_0(strings ARRAY<STRING>) RETURNS FLOAT64 LANGUAGE js AS """'use strict'; function string_length(strings) { return _.sum(_.map(strings, ((x) => x.length))); } return string_length(strings);""" OPTIONS (library=['gs://ibis-testing-libraries/lodash.min.js']);
+
+CREATE TEMPORARY FUNCTION string_length_0(strings ARRAY<STRING>) RETURNS FLOAT64 LANGUAGE js OPTIONS (library=['gs://ibis-testing-libraries/lodash.min.js']) AS '\'use strict\'; function string_length(strings) { return _.sum(_.map(strings, ((x) => x.length))); } return string_length(strings);';
+
+CREATE TABLE test (a NUMERIC(10, 2));
+
+INSERT INTO test (cola, colb) VALUES (CAST(7 AS STRING(10)), CAST(14 AS STRING(10)));
+
+INSERT INTO test (cola, colb) VALUES (CAST(7 AS STRING), CAST(14 AS STRING));
+
+SELECT CAST(1 AS NUMERIC(10, 2));
+
+SELECT CAST(1 AS NUMERIC);
+
+SELECT SAFE_CAST('foo' AS NUMERIC(10, 3));
+
+SELECT SAFE_CAST('foo' AS NUMERIC);
+
+SELECT SAFE_CAST('100000000000000000000000000000' AS NUMERIC(38, 0));
+
+SELECT SAFE_CAST('100000000000000000000000000000' AS BIGNUMERIC);
+
+SELECT CAST('1' AS STRING(10)) UNION ALL SELECT CAST('2' AS STRING(10));
+
+SELECT CAST('1' AS STRING) UNION ALL SELECT CAST('2' AS STRING);
+
+SELECT cola FROM (SELECT CAST('1' AS STRING(10)) AS cola UNION ALL SELECT CAST('2' AS STRING(10)) AS cola);
+
+SELECT cola FROM (SELECT CAST('1' AS STRING) AS cola UNION ALL SELECT CAST('2' AS STRING) AS cola);
+
+SELECT * FROM GAP_FILL(TABLE device_data, ts_column => 'time', bucket_width => INTERVAL '1' MINUTE, value_columns => [('signal', 'locf')]) ORDER BY time;
+
+SELECT a, b, c, d, e FROM GAP_FILL(TABLE foo, ts_column => 'b', partitioning_columns => ['a'], value_columns => [('c', 'bar'), ('d', 'baz'), ('e', 'bla')], bucket_width => INTERVAL '1' DAY);
+
+SELECT * FROM GAP_FILL(TABLE device_data, ts_column => 'time', bucket_width => INTERVAL '1' MINUTE, value_columns => [('signal', 'linear')], ignore_null_values => FALSE) ORDER BY time;
+
+SELECT * FROM GAP_FILL(TABLE device_data, ts_column => 'time', bucket_width => INTERVAL '1' MINUTE) ORDER BY time;
+
+SELECT * FROM GAP_FILL(TABLE device_data, ts_column => 'time', bucket_width => INTERVAL '1' MINUTE, value_columns => [('signal', 'null')], origin => CAST('2023-11-01 09:30:01' AS DATETIME)) ORDER BY time;
+
+CREATE OR REPLACE MODEL foo OPTIONS (model_type='linear_reg') AS SELECT bla FROM foo WHERE cond;
+
+CREATE OR REPLACE MODEL m
+TRANSFORM(
+  ML.FEATURE_CROSS(STRUCT(f1, f2)) AS cross_f,
+  ML.QUANTILE_BUCKETIZE(f3) OVER () AS buckets,
+  label_col
+)
+OPTIONS (
+  model_type='linear_reg',
+  input_label_cols=['label_col']
+) AS
+SELECT
+  *
+FROM t;
+
+CREATE MODEL project_id.mydataset.mymodel
+INPUT(
+  f1 INT64,
+  f2 FLOAT64,
+  f3 STRING,
+  f4 ARRAY<INT64>
+)
+OUTPUT(
+  out1 INT64,
+  out2 INT64
+)
+REMOTE WITH CONNECTION myproject.us.test_connection
+OPTIONS (
+  ENDPOINT='https://us-central1-aiplatform.googleapis.com/v1/projects/myproject/locations/us-central1/endpoints/1234'
+);
+
+SELECT * FROM ML.PREDICT(MODEL mydataset.mymodel, (SELECT label, column1, column2 FROM mydataset.mytable));
+
+SELECT label, predicted_label1, predicted_label AS predicted_label2 FROM ML.PREDICT(MODEL mydataset.mymodel2, (SELECT * EXCEPT (predicted_label), predicted_label AS predicted_label1 FROM ML.PREDICT(MODEL mydataset.mymodel1, TABLE mydataset.mytable)));
+
+SELECT * FROM ML.PREDICT(MODEL mydataset.mymodel, (SELECT custom_label, column1, column2 FROM mydataset.mytable), STRUCT(0.55 AS threshold));
+
+SELECT COSH(1.5);
+
+SELECT * FROM ML.PREDICT(MODEL `my_project`.my_dataset.my_model, (SELECT * FROM input_data));
+
+SELECT * FROM ML.PREDICT(MODEL my_dataset.vision_model, (SELECT uri, ML.RESIZE_IMAGE(ML.DECODE_IMAGE(data), 480, 480, FALSE) AS input FROM my_dataset.object_table));
+
+SELECT * FROM ML.PREDICT(MODEL my_dataset.vision_model, (SELECT uri, ML.CONVERT_COLOR_SPACE(ML.RESIZE_IMAGE(ML.DECODE_IMAGE(data), 224, 280, TRUE), 'YIQ') AS input FROM my_dataset.object_table WHERE content_type = 'image/jpeg'));
+
+SELECT * FROM ML.FEATURES_AT_TIME((SELECT 1), num_rows => 1);
+
+SELECT * FROM ML.FEATURES_AT_TIME(TABLE mydataset.feature_table, time => '2022-06-11 10:00:00+00', num_rows => 1, ignore_feature_nulls => TRUE);
+
+SELECT * FROM VECTOR_SEARCH(TABLE mydataset.base_table, 'column_to_search', TABLE mydataset.query_table, 'query_column_to_search', top_k => 2, distance_type => 'cosine', options => '{"fraction_lists_to_search":0.15}');
+
+SELECT * FROM VECTOR_SEARCH(TABLE mydataset.base_table, 'column_to_search', TABLE mydataset.query_table, query_column_to_search => 'query_column_to_search', top_k => 2, distance_type => 'cosine', options => '{"fraction_lists_to_search":0.15}');
+
+SELECT * FROM VECTOR_SEARCH((SELECT * FROM mydataset.base_table), 'column_to_search', (SELECT * FROM mydataset.query_table), 'query_column_to_search');
+
+SELECT * FROM VECTOR_SEARCH(TABLE mydataset.base_table, 'column_to_search', TABLE mydataset.query_table);
+
+SELECT * FROM ML.TRANSLATE(MODEL `mydataset.mytranslatemodel`, TABLE `mydataset.mybqtable`, STRUCT('translate_text' AS translate_mode, 'zh-CN' AS target_language_code));
+
+SELECT * FROM ML.FORECAST(MODEL `mydataset.mymodel`, STRUCT(2 AS horizon));
+
+SELECT * FROM ML.FORECAST(MODEL `mydataset.mymodel`, TABLE `mydataset.mybqtable`, STRUCT(2 AS horizon, 4 AS confidence_level));
+
+SELECT * FROM ML.FORECAST(MODEL `mydataset.mymodel`, (SELECT * FROM mydataset.query_table), STRUCT());
+
+SELECT * FROM AI.FORECAST(TABLE citibike_trips, data_col => 'num_trips', timestamp_col => 'date', horizon => 30);
+
+SELECT * FROM AI.FORECAST((SELECT * FROM citibike_trips), data_col => 'num_trips', timestamp_col => 'date', horizon => 30);
+
+SELECT * FROM ML.GENERATE_TEXT(MODEL `mydataset.gemini_model`, TABLE `mydataset.prompt_table`, STRUCT(0.15 AS temperature));
+
+SELECT * FROM AI.GENERATE_TEXT(MODEL `mydataset.gemini_model`, TABLE `mydataset.prompt_table`, STRUCT(0.15 AS temperature));
+
+SELECT * FROM AI.GENERATE_TABLE(MODEL `mydataset.gemini_model`, (SELECT 'Q' AS prompt), STRUCT('name STRING' AS output_schema));
+
+SELECT AI.GENERATE_BOOL(MODEL `mydataset.gemini_model`, 'Is sky blue?');
+
+SELECT AI.EMBED('hello');
+
+SELECT AI.SIMILARITY('a', 'b');
+
+SELECT AI.GENERATE('Write a haiku');
+
+SELECT AI.GENERATE('Write a haiku', endpoint => 'gemini-2.5-flash', model_params => JSON '{"generationConfig": {"temperature": 0}}');
+
+MERGE dataset.Inventory T
+            USING dataset.NewArrivals S ON FALSE
+            WHEN NOT MATCHED BY TARGET AND product LIKE '%a%'
+            THEN DELETE
+            WHEN NOT MATCHED BY SOURCE AND product LIKE '%b%'
+            THEN DELETE;
+
+MERGE INTO dataset.Inventory AS T USING dataset.NewArrivals AS S ON FALSE WHEN NOT MATCHED AND product LIKE '%a%' THEN DELETE WHEN NOT MATCHED BY SOURCE AND product LIKE '%b%' THEN DELETE;
+
+ALTER TABLE db.t1 RENAME TO db.t2;
+
+ALTER TABLE db.t1 RENAME TO t2;
+
+WITH cte AS (SELECT 1 AS foo) SELECT foo FROM cte;
+
+WITH cte AS (SELECT 1 AS bar) SELECT bar FROM cte;
+
+WITH cte AS (SELECT 1 AS foo, 2) SELECT foo FROM cte;
+
+WITH cte AS (SELECT 1 AS foo UNION ALL SELECT 2) SELECT foo FROM cte;
+
+SELECT PARSE_JSON(json_string) FROM t;
+
+SELECT JSON '''{}''';
+
+SELECT JSON '{}';
+
+SELECT JSON '{"a": 1}';
+
+SELECT JSON_OBJECT() AS json_data;
+
+SELECT JSON_OBJECT('foo', 10, 'bar', TRUE) AS json_data;
+
+SELECT JSON_OBJECT('foo', 10, 'bar', ['a', 'b']) AS json_data;
+
+SELECT JSON_OBJECT('a', 10, 'a', 'foo') AS json_data;
+
+SELECT JSON_OBJECT(['a', 'b'], [10, NULL]) AS json_data;
+
+SELECT JSON_OBJECT('a', 10, 'b', NULL) AS json_data;
+
+SELECT JSON_OBJECT(['a', 'b'], [JSON '10', JSON '"foo"']) AS json_data;
+
+SELECT JSON_OBJECT('a', JSON '10', 'b', JSON '"foo"') AS json_data;
+
+SELECT JSON_OBJECT(['a', 'b'], [STRUCT(10 AS id, 'Red' AS color), STRUCT(20 AS id, 'Blue' AS color)]) AS json_data;
+
+SELECT JSON_OBJECT('a', STRUCT(10 AS id, 'Red' AS color), 'b', STRUCT(20 AS id, 'Blue' AS color)) AS json_data;
+
+SELECT JSON_OBJECT(['a', 'b'], [TO_JSON(10), TO_JSON(['foo', 'bar'])]) AS json_data;
+
+SELECT JSON_OBJECT('a', TO_JSON(10), 'b', TO_JSON(['foo', 'bar'])) AS json_data;
+
+SELECT MOD((SELECT 1), 2);
+
+SELECT TIMESTAMP(DATETIME(CAST(CAST('2012-10-31 00:00:00' AS DATETIME) AS TIMESTAMP), 'America/Sao_Paulo'));
+
+SELECT x LIKE '%s3\\_data\\_lake%';
+
+SELECT x LIKE 'a\\_b\\\\c';
+
+SELECT x NOT LIKE 'a^b\\%';
+
+SELECT LOWER(x) LIKE LOWER('a\\\\b\\_');
+
+SELECT UPPER(x) LIKE UPPER('%s3\\_data\\_lake%');
+
+SELECT x LIKE '\n';
+
+SELECT STRUCT<ARRAY<STRING>>(["2023-01-17"]);
+
+SELECT CAST(STRUCT(['2023-01-17']) AS STRUCT<ARRAY<STRING>>);
+
+SELECT STRUCT<STRING>((SELECT 'foo')).*;
+
+SELECT CAST(STRUCT((SELECT 'foo')) AS STRUCT<STRING>).*;
+
+SELECT ARRAY<FLOAT64>[1, 2, 3];
+
+SELECT * FROM UNNEST(ARRAY<STRUCT<x INT64>>[]);
+
+SELECT * FROM UNNEST(ARRAY<STRUCT<device_id INT64, time DATETIME, signal INT64, state STRING>>[STRUCT(1, DATETIME '2023-11-01 09:34:01', 74, 'INACTIVE'),STRUCT(4, DATETIME '2023-11-01 09:38:01', 80, 'ACTIVE')]);
+
+SELECT * FROM UNNEST(ARRAY<STRUCT<device_id INT64, time DATETIME, signal INT64, state STRING>>[STRUCT(1, CAST('2023-11-01 09:34:01' AS DATETIME), 74, 'INACTIVE'), STRUCT(4, CAST('2023-11-01 09:38:01' AS DATETIME), 80, 'ACTIVE')]);
+
+SELECT STRUCT<a INT64, b STRUCT<c STRING>>(1, STRUCT('c_str'));
+
+SELECT CAST(STRUCT(1, STRUCT('c_str')) AS STRUCT<a INT64, b STRUCT<c STRING>>);
+
+SELECT MAX_BY(name, score) FROM table1;
+
+SELECT MIN_BY(product, price) FROM table1;
+
+SELECT name, laps FROM UNNEST([STRUCT('Rudisha' AS name, [23.4, 26.3, 26.4, 26.1] AS laps), STRUCT('Makhloufi' AS name, [24.5, 25.4, 26.6, 26.1] AS laps)]);
+
+WITH Races AS (SELECT '800M' AS race) SELECT race, name, laps FROM Races AS r CROSS JOIN UNNEST([STRUCT('Rudisha' AS name, [23.4, 26.3, 26.4, 26.1] AS laps)]);
+
+SELECT participant FROM UNNEST([STRUCT('Rudisha' AS name, [23.4, 26.3, 26.4, 26.1] AS laps)]) AS participant;
+
+WITH Races AS (SELECT '800M' AS race) SELECT race, participant FROM Races AS r CROSS JOIN UNNEST([STRUCT('Rudisha' AS name, [23.4, 26.3, 26.4, 26.1] AS laps)]) AS participant;
+
+SELECT * FROM UNNEST([STRUCT('Alice' AS name, STRUCT(85 AS math, 90 AS english) AS scores), STRUCT('Bob' AS name, STRUCT(92 AS math, 88 AS english) AS scores)]);
+
+SELECT * FROM UNNEST([STRUCT('Alice' AS name, 85 AS score), STRUCT('Bob', 92), STRUCT('Diana', 95)]);
+
+SELECT RANGE(CAST('2022-12-01' AS DATE), CAST('2022-12-31' AS DATE));
+
+SELECT RANGE(NULL, CAST('2022-12-31' AS DATE));
+
+SELECT RANGE(CAST('2022-10-01 14:53:27' AS DATETIME), CAST('2022-10-01 16:00:00' AS DATETIME));
+
+SELECT RANGE(CAST('2022-10-01 14:53:27 America/Los_Angeles' AS TIMESTAMP), CAST('2022-10-01 16:00:00 America/Los_Angeles' AS TIMESTAMP));
+
+SELECT JSON_EXTRACT_SCALAR(j, '$.a');
+
+SELECT JSON_QUERY('{"class": {"students": []}}', '$.class');
+
+SELECT JSON_QUERY(foo, '$.class');
+
+SELECT UNIX_SECONDS('2008-12-25 15:30:00+00');
+
+SELECT UNIX_MICROS('2008-12-25 15:30:00+00');
+
+SELECT UNIX_MICROS(TIMESTAMP '2008-12-25 15:30:00+00');
+
+SELECT UNIX_MICROS(CAST('2008-12-25 15:30:00+00' AS TIMESTAMP));
+
+SELECT UNIX_MILLIS('2008-12-25 15:30:00+00');
+
+SELECT UNIX_MILLIS(TIMESTAMP '2008-12-25 15:30:00+00');
+
+SELECT UNIX_MILLIS(CAST('2008-12-25 15:30:00+00' AS TIMESTAMP));
+
+SELECT REGEXP_EXTRACT(abc, 'pattern(group)') FROM table;
+
+SELECT REGEXP_EXTRACT(abc, 'pattern(group)', 1) FROM table;
+
+SELECT REGEXP_EXTRACT(abc, 'pattern(group)', 2) FROM table;
+
+SELECT REGEXP_EXTRACT(abc, 'pattern(group)', 1, 1) FROM table;
+
+SELECT REGEXP_EXTRACT(abc, 'pattern(group)', 2, 3) FROM table;
+
+SELECT FORMAT_DATE('%Y%m%d', '2023-12-25');
+
+SELECT FORMAT_DATETIME('%Y%m%d %H:%M:%S', DATETIME '2023-12-25 15:30:00');
+
+SELECT FORMAT_DATETIME('%Y%m%d %T', CAST('2023-12-25 15:30:00' AS DATETIME));
+
+SELECT FORMAT_DATETIME('%x', '2023-12-25 15:30:00');
+
+SELECT FORMAT_DATETIME('%D', '2023-12-25 15:30:00');
+
+SELECT FORMAT_DATETIME('%F %T', DATETIME '2023-10-15 14:30:45');
+
+SELECT FORMAT_DATETIME('%F %T', CAST('2023-10-15 14:30:45' AS DATETIME));
+
+SELECT FORMAT_DATETIME('%c', DATETIME '2008-12-25 15:30:00');
+
+SELECT FORMAT_DATETIME('%c', CAST('2008-12-25 15:30:00' AS DATETIME));
+
+SELECT FORMAT_DATETIME('%Y-%m-%e', DATETIME '2020-09-09 10:15:30');
+
+SELECT FORMAT_DATETIME('%Y-%m-%e', CAST('2020-09-09 10:15:30' AS DATETIME));
+
+SELECT FORMAT_TIMESTAMP("%b-%d-%Y", TIMESTAMP "2050-12-25 15:30:55+00");
+
+SELECT FORMAT_TIMESTAMP('%b-%d-%Y', CAST('2050-12-25 15:30:55+00' AS TIMESTAMP));
+
+SELECT CAST('2026-03-24' AS STRING FORMAT ('YYYY'));
+
+SELECT CAST('2026-03-24' AS STRING FORMAT 'YYYY');
+
+SELECT CAST(date AS STRING FORMAT ('YYYY')) FROM (SELECT DATE('2026-03-24') AS date);
+
+SELECT CAST(date AS STRING FORMAT 'YYYY') FROM (SELECT DATE('2026-03-24') AS date);
+
+SELECT CAST(date AS STRING FORMAT ('YYYY-MM-DD'));
+
+SELECT CAST(date AS STRING FORMAT 'YYYY-MM-DD');
+
+SELECT CAST(timestamp AS STRING FORMAT ('YYYY-MM-DD') AT TIME ZONE 'UTC');
+
+SELECT CAST(timestamp AS STRING FORMAT 'YYYY-MM-DD' AT TIME ZONE 'UTC');
+
+SELECT CAST(date AS TIMESTAMP FORMAT ('YYYY-MM-DD HH24:MI:SS'));
+
+SELECT PARSE_TIMESTAMP('%F %T', date);
+
+SELECT a, GROUP_CONCAT(b) FROM table GROUP BY a;
+
+SELECT a, STRING_AGG(b) FROM table GROUP BY a;
+
+SELECT 1 AS foo INNER UNION ALL SELECT 3 AS foo, 4 AS bar;
+
+(SELECT 1 AS foo) FULL OUTER UNION ALL BY NAME (SELECT 2 AS foo, 3 AS bar);
+
+(SELECT 1 AS foo) FULL UNION ALL BY NAME (SELECT 2 AS foo);
+
+(SELECT 1) AS x UNION ALL (SELECT 2);
+
+SELECT 1 AS x UNION ALL CORRESPONDING SELECT 2 AS x;
+
+SELECT 1 AS x INNER UNION ALL BY NAME SELECT 2 AS x;
+
+SELECT 1 AS x UNION ALL CORRESPONDING BY (foo, bar) SELECT 2 AS x;
+
+SELECT 1 AS x INNER UNION ALL BY NAME ON (foo, bar) SELECT 2 AS x;
+
+SELECT 1 AS x LEFT UNION ALL CORRESPONDING SELECT 2 AS x;
+
+SELECT 1 AS x LEFT UNION ALL BY NAME SELECT 2 AS x;
+
+SELECT 1 AS x UNION ALL STRICT CORRESPONDING SELECT 2 AS x;
+
+SELECT 1 AS x UNION ALL BY NAME SELECT 2 AS x;
+
+SELECT 1 AS x UNION ALL STRICT CORRESPONDING BY (foo, bar) SELECT 2 AS x;
+
+SELECT 1 AS x UNION ALL BY NAME ON (foo, bar) SELECT 2 AS x;
+
+SELECT * FROM UNNEST(x) WITH OFFSET EXCEPT DISTINCT SELECT * FROM UNNEST(y) WITH OFFSET;
+
+SELECT * FROM UNNEST(x) WITH OFFSET AS offset EXCEPT DISTINCT SELECT * FROM UNNEST(y) WITH OFFSET AS offset;
+
+SELECT [STRUCT((SELECT 1) AS a)];
+
+WITH x AS ( SELECT 1 AS id), test_cte AS ( SELECT ARRAY_CONCAT(( SELECT id FROM x WHERE FALSE)) AS result ) SELECT * FROM test_cte;
+
+SELECT ARRAY(SELECT AS STRUCT x1 AS x1, x2 AS x2 FROM t) AS array_col;
+
+WITH t1 AS (SELECT ARRAY(SELECT AS STRUCT x1 AS alias_x1, x2 /* test */ FROM t2) AS array_col) SELECT array_col[0].alias_x1, array_col[0].x2 FROM t1;
+
+WITH t1 AS (SELECT ARRAY(SELECT AS STRUCT 1 AS a, 2 AS b) AS array_col) SELECT array_col[0].a, array_col[0].b FROM t1;
+
+WITH t1 AS (SELECT ARRAY(SELECT AS STRUCT x1 AS alias_x1, x2 /* test */ FROM t2 WHERE x2 = 4) AS array_col) SELECT array_col[0].alias_x1, array_col[0].x2 FROM t1;
+
+SELECT GENERATE_DATE_ARRAY('2016-10-05', '2016-10-08');
+
+SELECT GENERATE_DATE_ARRAY('2016-10-05', '2016-10-08', INTERVAL '1' DAY);
+
+SELECT GENERATE_DATE_ARRAY('2016-10-05', '2016-10-08', INTERVAL '1' MONTH);
+
+SELECT id, mnth FROM t CROSS JOIN UNNEST(GENERATE_DATE_ARRAY(start_month, DATE_TRUNC(CURRENT_DATE, MONTH), INTERVAL '1' MONTH)) AS mnth;
+
+SELECT id, mnth AS a_mnth FROM t CROSS JOIN UNNEST(GENERATE_DATE_ARRAY(start_month, DATE_TRUNC(CURRENT_DATE, MONTH), INTERVAL '1' MONTH)) AS mnth;
+
+SELECT id, mnth + 1 AS a_mnth FROM t CROSS JOIN UNNEST(GENERATE_DATE_ARRAY(start_month, DATE_TRUNC(CURRENT_DATE, MONTH), INTERVAL '1' MONTH)) AS mnth;
+
+DECLARE X INT64;
+
+DECLARE X INT64 DEFAULT 1;
+
+DECLARE X FLOAT64 DEFAULT 0.9;
+
+DECLARE X INT64 DEFAULT (SELECT MAX(col) FROM foo);
+
+DECLARE X, Y, Z INT64;
+
+DECLARE X, Y, Z INT64 DEFAULT 42;
+
+DECLARE X, Y, Z INT64 DEFAULT (SELECT 42);
+
+DECLARE START_DATE DATE DEFAULT CURRENT_DATE - 1;
+
+DECLARE TS TIMESTAMP DEFAULT CURRENT_TIMESTAMP() - INTERVAL '1' HOUR;
+
+SELECT LAST_DAY(DATE '2008-11-10', WEEK(SUNDAY));
+
+SELECT LAST_DAY(CAST('2008-11-10' AS DATE), WEEK);
+
+SELECT LAST_DAY(DATE '2008-11-10', WEEK);
+
+SELECT LAST_DAY(DATE '2008-11-10', WEEK(MONDAY));
+
+SELECT LAST_DAY(CAST('2008-11-10' AS DATE), WEEK(MONDAY));
+
+SELECT LAST_DAY(DATE '2008-11-10', ISOWEEK);
+
+SELECT LAST_DAY(CAST('2008-11-10' AS DATE), ISOWEEK);
+
+SELECT DATE_TRUNC(d, WEEK(SUNDAY));
+
+SELECT DATE_TRUNC(d, WEEK);
+
+SELECT TIMESTAMP_TRUNC(ts, WEEK(SUNDAY));
+
+SELECT TIMESTAMP_TRUNC(ts, WEEK);
+
+SELECT DATETIME_TRUNC(dt, WEEK(SUNDAY));
+
+SELECT DATETIME_TRUNC(dt, WEEK);
+
+SELECT DATE_DIFF(d1, d2, WEEK(SUNDAY));
+
+SELECT DATE_DIFF(d1, d2, WEEK);
+
+SELECT LAST_DAY(d, WEEK(SUNDAY));
+
+SELECT LAST_DAY(d, WEEK);
+
+SELECT EXTRACT(WEEK(THURSDAY) FROM d);
+
+SELECT DATE_TRUNC(DATE '2008-11-10', WEEK(SUNDAY));
+
+SELECT DATE_TRUNC(CAST('2008-11-10' AS DATE), WEEK);
+
+SELECT DATE_TRUNC(DATE '2008-11-10', ISOWEEK);
+
+SELECT DATE_TRUNC(CAST('2008-11-10' AS DATE), ISOWEEK);
+
+SELECT DATE_TRUNC(DATE '2008-11-10', WEEK);
+
+SELECT TIMESTAMP_TRUNC(TIMESTAMP '2008-11-10 14:30:00', WEEK);
+
+SELECT TIMESTAMP_TRUNC(CAST('2008-11-10 14:30:00' AS TIMESTAMP), WEEK);
+
+SELECT TIMESTAMP_TRUNC(TIMESTAMP '2008-11-10 14:30:00', WEEK(SUNDAY));
+
+SELECT DATETIME_TRUNC(DATETIME '2008-11-10 14:30:00', WEEK);
+
+SELECT DATETIME_TRUNC(CAST('2008-11-10 14:30:00' AS DATETIME), WEEK);
+
+SELECT DATETIME_TRUNC(DATETIME '2008-11-10 14:30:00', WEEK(SUNDAY));
+
+SELECT TIMESTAMP_TRUNC(TIMESTAMP '2008-11-10 14:30:00+00', WEEK, 'America/New_York');
+
+SELECT TIMESTAMP_TRUNC(CAST('2008-11-10 14:30:00+00' AS TIMESTAMP), WEEK, 'America/New_York');
+
+SELECT TIMESTAMP_TRUNC(TIMESTAMP '2008-11-10 14:30:00+00', WEEK(SUNDAY), 'America/New_York');
+
+SELECT DATE_DIFF('2024-06-15', '2024-01-08', WEEK(MONDAY));
+
+SELECT DATE_DIFF('2026-01-15', '2024-01-08', WEEK(SUNDAY));
+
+SELECT DATE_DIFF('2026-01-15', '2024-01-08', WEEK);
+
+SELECT DATE_DIFF('2024-01-15', '2022-04-28', WEEK(SATURDAY));
+
+SELECT DATE_DIFF('2024-01-15', '2024-01-08', WEEK);
+
+SELECT DATE_DIFF('2024-01-07', '2024-01-06', WEEK);
+
+SELECT DATE_DIFF('2024-01-15', '2024-01-08', ISOWEEK);
+
+SELECT DATE_DIFF(DATE '2024-09-15', DATE '2024-01-08', WEEK(MONDAY));
+
+SELECT DATE_DIFF(CAST('2024-09-15' AS DATE), CAST('2024-01-08' AS DATE), WEEK(MONDAY));
+
+SELECT DATE_DIFF(DATE '2024-01-01', DATE '2024-01-15', WEEK(SUNDAY));
+
+SELECT DATE_DIFF(CAST('2024-01-01' AS DATE), CAST('2024-01-15' AS DATE), WEEK);
+
+SELECT DATE_DIFF(DATE '2023-05-01', DATE '2024-01-15', ISOWEEK);
+
+SELECT DATE_DIFF(CAST('2023-05-01' AS DATE), CAST('2024-01-15' AS DATE), ISOWEEK);
+
+SELECT DATE_DIFF(DATE '2024-01-01', DATE '2024-01-15', DAY);
+
+SELECT DATE_DIFF(CAST('2024-01-01' AS DATE), CAST('2024-01-15' AS DATE), DAY);
+
+SELECT 1 & 1;
+
+SELECT ~1;
+
+SELECT TO_HEX(SHA1('abc'));
+
+SELECT MD5('abc');
+
+SELECT TO_JSON_STRING(STRUCT('Alice' AS name)) AS json_data;
+
+SELECT CONCAT('T.P.', ' ', 'Bar') AS author;
+
+SELECT col FROM t WHERE _PARTITIONTIME BETWEEN a AND b;
+
+SELECT _DBT_MAX_PARTITION FROM t;
+
+SELECT ROUND(2.25) AS value;
+
+SELECT ROUND(2.25, 1) AS value;
+
+SELECT ROUND(NUMERIC '2.25', 1, 'ROUND_HALF_AWAY_FROM_ZERO') AS value;
+
+SELECT ROUND(CAST('2.25' AS NUMERIC), 1, 'ROUND_HALF_AWAY_FROM_ZERO') AS value;
+
+SELECT ROUND(NUMERIC '2.25', 1, 'ROUND_HALF_EVEN') AS value;
+
+SELECT ROUND(CAST('2.25' AS NUMERIC), 1, 'ROUND_HALF_EVEN') AS value;
+
+SELECT SUM(APPROX_QUANTILES(x, 2)[1]) OVER () FROM t;
+
+SELECT SUM((SELECT APPROX_QUANTILES(x, 2)[1] FROM t)) OVER () FROM u;
+
+SELECT DATETIME_DIFF('2023-01-01T00:00:00', '2023-01-01T05:00:00', MILLISECOND);
+
+SELECT DATETIME_ADD('2023-01-01T00:00:00', INTERVAL 1 MILLISECOND);
+
+SELECT DATETIME_ADD('2023-01-01T00:00:00', INTERVAL '1' MILLISECOND);
+
+SELECT DATETIME_SUB('2023-01-01T00:00:00', INTERVAL 1 MILLISECOND);
+
+SELECT DATETIME_SUB('2023-01-01T00:00:00', INTERVAL '1' MILLISECOND);
+
+SELECT DATETIME_TRUNC('2023-01-01T01:01:01', HOUR);
+
+WITH cte(c) AS (SELECT * FROM t) SELECT * FROM cte;
+
+WITH cte AS (SELECT * FROM t) SELECT * FROM cte;
+
+SELECT * FROM t AS t(c1, c2);
+
+SELECT * FROM t AS t;
+
+SELECT a[1], b[OFFSET(1)], c[ORDINAL(1)], d[SAFE_OFFSET(1)], e[SAFE_ORDINAL(1)];
+
+WITH foo AS (SELECT [1, 2, 3] AS array_col) SELECT array_col[offset] FROM foo CROSS JOIN UNNEST(array_col) WITH OFFSET AS offset;
+
+SELECT `db.t`.`c` FROM `db.t`;
+
+SELECT `p.d.t`.`c`.`f` FROM `p.d.t`;
+
+SELECT CAST('1' AS BIGNUMERIC);
+
+DECLARE x BIGNUMERIC(20, 4);
+
+DECLARE x BIGNUMERIC(76, 38);
+
+DECLARE x BIGNUMERIC(1e1000000, 4);
+
+SELECT CAST(1 AS BIGNUMERIC);
+
+SELECT NOT deterministic FROM t;
+
+SELECT * FROM ML.TRANSLATE(MODEL `mydataset.mymodel`, (SELECT comment AS text_content FROM mydataset.mytable), STRUCT('translate_text' AS translate_mode, 'en' AS target_language_code));
+
+WITH t AS (SELECT '{"x-y": "z"}' AS c) SELECT JSON_EXTRACT(c, '$.x-y') FROM t;
+
+SELECT APPROX_COUNT_DISTINCT(x) FROM (SELECT ANY_VALUE(y) x FROM (SELECT 1 y));
+
+SELECT APPROX_COUNT_DISTINCT(x) FROM (SELECT ANY_VALUE(y) AS x FROM (SELECT 1 AS y));
+
+SELECT IS_NAN(x), ARRAY_REVERSE(a);
+
+SELECT IS_INF(x);
+
+SELECT CONTAINS_SUBSTR(s, 'a');
+
+SELECT col[0];
+
+CREATE TABLE a LIKE b;
+
+SELECT COALESCE(1, NULL) FROM foo;
+
+SELECT CASE WHEN NOT a IS NULL THEN b ELSE c END;
+
+SELECT CASE WHEN NOT a IS NULL THEN b END;
+
+SELECT fname, lname, age FROM person ORDER BY age DESC NULLS FIRST, fname ASC NULLS LAST, lname;
+
+SELECT * FROM a UNION DISTINCT SELECT * FROM b;
+
+SELECT * FROM a UNION ALL SELECT * FROM b;
+
+SELECT * FROM a INTERSECT DISTINCT SELECT * FROM b;
+
+SELECT * FROM a EXCEPT DISTINCT SELECT * FROM b;
+
+SELECT * FROM a INTERSECT ALL SELECT * FROM b;
+
+SELECT * FROM a EXCEPT ALL SELECT * FROM b;
+
+SELECT IF(COALESCE(bar, 0) = 1, TRUE, FALSE) AS foo FROM baz;
+
+SELECT * FROM t LIMIT 1;
+
+SELECT * FROM (SELECT 1 AS col) apply;
+
+SELECT 1 # arbitrary content,,, until end-of-line;
+
+SELECT # comment1
+  x, # comment2
+  y # comment3;
+
+MERGE INTO target USING source ON target.id = source.id WHEN NOT MATCHED THEN INSERT (id) VALUES (source.id);
+
+MERGE INTO target USING source ON target.id = source.id WHEN MATCHED AND source.is_deleted = 1 THEN DELETE WHEN MATCHED THEN UPDATE SET val = source.val WHEN NOT MATCHED THEN INSERT (id, val) VALUES (source.id, source.val);
+
+MERGE INTO a AS b USING c AS d ON b.id = d.id WHEN MATCHED AND EXISTS(SELECT b.name EXCEPT DISTINCT SELECT d.name) THEN UPDATE SET b.name = d.name;
+
+SELECT ROW_NUMBER() OVER () FROM t;
+
+SELECT * FROM (WITH t AS (SELECT 1 AS c) SELECT c FROM t) AS subq;
+
+SELECT * FROM (SELECT * FROM (WITH t AS (SELECT 1 AS c) SELECT c FROM t) AS subq1) AS subq2;
+
+SELECT * FROM UNNEST(GENERATE_DATE_ARRAY(CAST('2020-01-01' AS DATE), CAST('2020-02-01' AS DATE), INTERVAL '1' WEEK));
+
+SELECT SUM(IF(c = 'US', x, NULL)), COUNTIF(c > 1), COUNT(DISTINCT IF(c > 1, x, NULL)) FROM t;
+
+SELECT ARRAY_AGG(IF(c > 1, x, NULL) IGNORE NULLS ORDER BY y) FROM t;
+
+SELECT SUM(X) OVER (ORDER BY x);
+
+SELECT SUM(X) OVER (ORDER BY x RANGE BETWEEN 1 PRECEDING AND CURRENT ROW);
+
+CREATE TEMP FUNCTION f1(a INT64, b INT64) AS (a + b);
+
+SELECT GENERATE_ARRAY(5, 1 + 1, -1);
+
+SELECT STRUCT(column1 AS bla, column2 AS foo, column3 AS bar) AS data FROM source_table;
+
+SELECT IF(pos = pos_2, col, NULL) AS col, IF(pos = pos_3, col_2, NULL) AS col_2, IF(pos = pos_4, col_3, NULL) AS col_3 FROM UNNEST(GENERATE_ARRAY(0, GREATEST(ARRAY_LENGTH([1, 2, 3]), ARRAY_LENGTH([4, 5]), ARRAY_LENGTH([6])) - 1)) AS pos CROSS JOIN UNNEST([1, 2, 3]) AS col WITH OFFSET AS pos_2 CROSS JOIN UNNEST([4, 5]) AS col_2 WITH OFFSET AS pos_3 CROSS JOIN UNNEST([6]) AS col_3 WITH OFFSET AS pos_4 WHERE ((pos = pos_2 OR (pos > (ARRAY_LENGTH([1, 2, 3]) - 1) AND pos_2 = (ARRAY_LENGTH([1, 2, 3]) - 1))) AND (pos = pos_3 OR (pos > (ARRAY_LENGTH([4, 5]) - 1) AND pos_3 = (ARRAY_LENGTH([4, 5]) - 1)))) AND (pos = pos_4 OR (pos > (ARRAY_LENGTH([6]) - 1) AND pos_4 = (ARRAY_LENGTH([6]) - 1)));
+
+SELECT IF(pos = pos_2, col, NULL) AS col, IF(pos = pos_3, col_2, NULL) AS col_2, IF(pos = pos_4, col_3, NULL) AS col_3 FROM x CROSS JOIN UNNEST(GENERATE_ARRAY(0, GREATEST(ARRAY_LENGTH([1, 2, 3]), ARRAY_LENGTH([4, 5]), ARRAY_LENGTH([6])) - 1)) AS pos CROSS JOIN UNNEST([1, 2, 3]) AS col WITH OFFSET AS pos_2 CROSS JOIN UNNEST([4, 5]) AS col_2 WITH OFFSET AS pos_3 CROSS JOIN UNNEST([6]) AS col_3 WITH OFFSET AS pos_4 WHERE ((pos = pos_2 OR (pos > (ARRAY_LENGTH([1, 2, 3]) - 1) AND pos_2 = (ARRAY_LENGTH([1, 2, 3]) - 1))) AND (pos = pos_3 OR (pos > (ARRAY_LENGTH([4, 5]) - 1) AND pos_3 = (ARRAY_LENGTH([4, 5]) - 1)))) AND (pos = pos_4 OR (pos > (ARRAY_LENGTH([6]) - 1) AND pos_4 = (ARRAY_LENGTH([6]) - 1)));
+
+SELECT IF(pos = pos_2, col, NULL) + 1 AS col FROM UNNEST(GENERATE_ARRAY(0, GREATEST(ARRAY_LENGTH(x)) - 1)) AS pos CROSS JOIN UNNEST(x) AS col WITH OFFSET AS pos_2 WHERE pos = pos_2 OR (pos > (ARRAY_LENGTH(x) - 1) AND pos_2 = (ARRAY_LENGTH(x) - 1));
+
+SELECT IF(pos = pos_2, y, NULL) + 1 AS y FROM UNNEST(GENERATE_ARRAY(0, GREATEST(ARRAY_LENGTH(x)) - 1)) AS pos CROSS JOIN UNNEST(x) AS y WITH OFFSET AS pos_2 WHERE pos = pos_2 OR (pos > (ARRAY_LENGTH(x) - 1) AND pos_2 = (ARRAY_LENGTH(x) - 1));
+
+SELECT DATE_SUB(CAST('2020-05-06' AS DATE), INTERVAL 5 DAY);
+
+SELECT DATE_ADD(CAST('2020-05-06' AS DATE), INTERVAL 5 DAY);
+
+SELECT REGEXP_EXTRACT(a, 'pattern') FROM t;
+
+SELECT CAST(b'Hello\nworld' AS STRING);
+
+SELECT CURRENT_DATE('UTC');
+
+SELECT DATE(2016, 12, 25);
+
+SELECT DATE(DATETIME '2016-12-25 23:59:59');
+
+SELECT DATE(TIMESTAMP '2016-12-25', 'America/Los_Angeles');
+
+SELECT DATE('2024-01-15 23:30:00', 'Europe/Berlin');
+
+SELECT DATE(PARSE_DATE('%m/%d/%Y', '05/06/2020'));
+
+SELECT PARSE_TIME('%H:%M', '14:30');
+
+SELECT PARSE_TIME('%H:%M:%E6S', '15:30:00.123456');
+
+SELECT PARSE_DATETIME('%Y-%m-%d %H:%M:%S', '2023-01-15 14:30:00');
+
+SELECT PARSE_DATETIME('%H:%M:%E6S', '15:30:00.123456');
+
+SELECT CAST('foo' AS DATETIME);
+
+SELECT @foo;
+
+SET a = 1;
+
+SELECT some_arr[0] AS first FROM blah;
+
+SELECT x ^ 1;
+
+SELECT REGEXP_EXTRACT('My mail address is my_mail@yahoo.com', '(?i)[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}') AS EMAIL;
+
+SELECT (ARRAY_LENGTH(ARRAY(SELECT x FROM UNNEST(arr) AS x WHERE x > 2)) <> 0);
+
+CREATE TABLE t (foo BYTES);
+
+SELECT * FROM test LIMIT 1 OFFSET 1;
+
+SELECT IF(a, 1, 2);
+
+SELECT * FROM sales AS s FOR SYSTEM_TIME AS OF '2026-10-10 12:00:00';
+
+SELECT * FROM sales AS s FOR SYSTEM_TIME AS OF PARSE_TIMESTAMP('%F %H:%M:%E6S', '2026-10-10 12:00:00');
+
+SELECT * FROM sales AS s FOR SYSTEM_TIME AS OF '2026-10-10 12:00:00.123456';
+
+SELECT FORMAT_DATE('%G-%V', x);
+
+SELECT * FROM `test_table` ORDER BY RAND() NULLS LAST LIMIT 5;
+
+SELECT _gen_series_value FROM UNNEST(GENERATE_ARRAY(1, 5)) AS _gen_series_value;
+
+SELECT x FROM UNNEST(GENERATE_ARRAY(1, 5)) AS x;
+
+SELECT x FROM UNNEST(GENERATE_ARRAY(1, 5)) AS x WHERE x > 2 ORDER BY x DESC NULLS FIRST LIMIT 3;
+
+SELECT y, g FROM t CROSS JOIN UNNEST(GENERATE_ARRAY(1, 3)) AS g;
+
+SELECT a, b FROM UNNEST(GENERATE_ARRAY(1, 2)) AS a CROSS JOIN UNNEST(GENERATE_ARRAY(11, 13)) AS b;
+
+SELECT y, a, b FROM t CROSS JOIN UNNEST(GENERATE_ARRAY(1, 2)) AS a CROSS JOIN UNNEST(GENERATE_ARRAY(11, 13)) AS b;
+
+SELECT 'can\'t';
+
+SELECT 'a\nb';
+
+SELECT DATE(2024, 1, 31);
+
+SELECT CAST('2020-05-11T11:15:05' AS TIMESTAMP);
+
+SELECT CAST('2020-05-11' AS DATE);
+
+SELECT SHA256(x);
+
+SELECT SHA512(x);
+
+SELECT MAX_BY(a.id, a.timestamp) FROM a;
+
+SELECT [1, 2];
+
+SELECT * FROM UNNEST(['7', '14']);
+
+SELECT * FROM UNNEST(['7', '14']) AS y;
+
+SELECT [1, 2, 3][SAFE_ORDINAL(4)];
+
+SELECT JSON_EXTRACT_SCALAR('{ "farm": {"barn": { "color": "red", "feed stocked": true }}}', '$.farm.barn.color');
+
+SELECT DATE_ADD(CAST('2008-03-31' AS DATETIME), INTERVAL 1 MONTH);
+
+SELECT ST_AsEWKT(CAST(ST_GeomFromEWKT('SRID=4326;POINT(10 20)') AS GEOGRAPHY));
+
+SELECT a, b FROM (SELECT a AS a, b AS b, ROW_NUMBER() OVER (PARTITION BY a ORDER BY c DESC NULLS FIRST) AS _row_number FROM x) AS _t WHERE _row_number = 1;
+
+SELECT DATE_ADD(CAST('2008-02-28' AS DATETIME), INTERVAL 18 MONTH);
+
+SELECT DATE_DIFF(CAST('2009-12-31' AS DATETIME), CAST('2009-01-01' AS DATETIME), WEEK);
+
+SELECT REGEXP_CONTAINS('a', 'b');
+
+SELECT TIME('2019-03-14 06:04:12', 'GMT');
+
+SELECT DATETIME_ADD(NOW(), INTERVAL 1 MONTH);
+
+SELECT DATETIME_TRUNC('2016-08-08 12:05:31', MINUTE);
+
+SELECT DATETIME_SUB('2010-04-02', INTERVAL '1' WEEK);
+
+SELECT DATE_DIFF('2013-09-01', '2009-02-13', QUARTER);
+
+SELECT CURRENT_DATETIME();
+
+CREATE TABLE testTypes (a BIGDECIMAL(10, 20));
+
+SELECT x FROM UNNEST([STRUCT('x' AS x)]);
+
+SELECT x, y, z FROM UNNEST([STRUCT(1 AS x, 2 AS y, 3 AS z)]);
+
+SELECT u1.x, u2.y FROM UNNEST([STRUCT(1 AS x)]) AS u1, UNNEST([STRUCT(2 AS y)]) AS u2;
+
+SELECT t.id, name, age FROM t, UNNEST([STRUCT('John' AS name, 30 AS age)]);
+
+SELECT value FROM UNNEST([STRUCT(1 AS x)]) AS value;
+
+SELECT t.col1, field1, other_col, field2 FROM t, UNNEST([STRUCT('a' AS field1, 'b' AS field2)]);
+
+SELECT * FROM (SELECT x FROM UNNEST([STRUCT('value' AS x)]));
+
+SELECT value FROM UNNEST([1, 2, 3]) AS value;
+
+SELECT * FROM t1 AS t1, t2 AS t2 LEFT JOIN t3 AS t3 ON t1.a = t3.i;
+
+SELECT x, yval, zval FROM UNNEST([STRUCT('x' AS x, ['y1', 'y2', 'y3'] AS y, ['z1', 'z2', 'z3'] AS z)]), UNNEST(y) AS yval, UNNEST(z) AS zval;
+
+SELECT _u.foo, bar, baz FROM UNNEST([struct('x' AS foo, ['y', 'z'] AS bars, ['w'] AS bazs)]) AS _u, UNNEST(_u.bars) AS bar, UNNEST(_u.bazs) AS baz;
+
+select _u, _u.foo, _u.bar from unnest([struct('x' as foo, 'y' AS bar)]) as _u;
+
+select _u.foo[0].bar from unnest([struct([struct(1 as bar)] as foo)]) as _u;
+
+WITH vartab AS (SELECT PARSE_JSON('[{"attr": [{"name": "banana"}]}]') AS v) SELECT JSON_EXTRACT(v, '$[0].attr[0].name') FROM vartab;
+
+WITH vartab AS (SELECT PARSE_JSON('{"attr": [{"name": "banana"}]}') AS v) SELECT JSON_EXTRACT(v, '$.attr[0].name') FROM vartab;
+
+SELECT JSON_EXTRACT(PARSE_JSON('{"fruit":"banana"}'), '$.fruit');
+
+SELECT COLLATE('B', 'und:ci');
+
+SELECT a FROM test WHERE a = 1 GROUP BY a HAVING a = 2 QUALIFY z ORDER BY a NULLS LAST LIMIT 10;
+
+SELECT a FROM test AS t QUALIFY ROW_NUMBER() OVER (PARTITION BY a ORDER BY Z NULLS LAST) = 1;
+
+SELECT PARSE_TIMESTAMP('%d-%m-%Y %I:%M:%S', col) FROM t;
+
+SELECT TIMESTAMP_SECONDS(1659981729);
+
+SELECT TIMESTAMP_MILLIS(1659981729000);
+
+SELECT TIMESTAMP_SECONDS(CAST(16599817290000 / POWER(10, 4) AS INT64));
+
+SELECT TIMESTAMP_SECONDS(CAST(1659981729000000000 / POWER(10, 9) AS INT64));
+
+SELECT CAST('2013-04-05 01:02:03' AS DATETIME);
+
+SELECT PARSE_TIMESTAMP('%m/%d/%Y %H:%M:%S', '04/05/2013 01:02:03');
+
+SELECT PARSE_TIMESTAMP('%m/%d/%Y %T', '04/05/2013 01:02:03');
+
+SELECT FROM_HEX('65');
+
+SELECT CAST(1 AS BIGDECIMAL), CAST(1 AS BIGNUMERIC);
+
+SELECT EXTRACT(ISOWEEK FROM CAST('2013-12-25' AS DATE));
+
+WITH foo AS (SELECT [1] AS arr_1) SELECT (SELECT unnested_arr FROM UNNEST(arr_1) AS unnested_arr) AS f FROM foo;
+
+SELECT * FROM foo WHERE 'str' IN UNNEST(vals);
+
+SELECT CAST('12:05:00' AS TIME);
+
+SELECT TIME(CAST('2024-01-15 14:30:00' AS DATETIME));
+
+CREATE TABLE orders_clone CLONE orders;
+
+CREATE TABLE FUNCTION a() RETURNS TABLE <b INT64> AS SELECT 1;
+
+SELECT SAFE_CAST('1.2345' AS NUMERIC);
+
+CREATE TABLE db.example_table (col_a ARRAY<INT64>, col_b ARRAY<ARRAY<INT64>>);
+
+SELECT * FROM x;
+
+SELECT cola FROM table;
+
+SELECT DATETIME(TIMESTAMP(CAST('2016-08-31' AS DATETIME), 'Asia/Seoul'), 'UTC');
+
+SELECT DATE_DIFF(CAST('2020-12-31' AS DATE), CAST('2020-01-01' AS DATE), WEEK);
+
+SELECT CAST(SAFE_CAST(x AS TIMESTAMP FORMAT 'MM/DD/YYYY') AS DATE);
+
+SELECT REGEXP_CONTAINS('John Doe', 'John.*');
+
+SELECT * FROM produce AS p PIVOT(SUM(p.sales) AS sales FOR p.quarter IN ('Q1' AS Q1, 'Q2' AS Q1));
+
+SELECT DATE_ADD(CAST(CAST(my_date_column AS DATETIME) AS DATE), INTERVAL 1 DAY);
+
+SELECT IF(pos = pos_2, col, NULL) AS col FROM tbl CROSS JOIN UNNEST(GENERATE_ARRAY(0, GREATEST(ARRAY_LENGTH(x)) - 1)) AS pos CROSS JOIN UNNEST(x) AS col WITH OFFSET AS pos_2 WHERE pos = pos_2 OR (pos > (ARRAY_LENGTH(x) - 1) AND pos_2 = (ARRAY_LENGTH(x) - 1));
+
+SELECT IF(pos = pos_2, col_2, NULL) AS col_2 FROM _u CROSS JOIN UNNEST(GENERATE_ARRAY(0, GREATEST(ARRAY_LENGTH(col)) - 1)) AS pos CROSS JOIN UNNEST(col) AS col_2 WITH OFFSET AS pos_2 WHERE pos = pos_2 OR (pos > (ARRAY_LENGTH(col) - 1) AND pos_2 = (ARRAY_LENGTH(col) - 1));
+
+SELECT IF(pos = pos_2, col, NULL) AS col FROM UNNEST(GENERATE_ARRAY(0, GREATEST(ARRAY_LENGTH([1, 2])) - 1)) AS pos CROSS JOIN UNNEST([1, 2]) AS col WITH OFFSET AS pos_2 WHERE pos = pos_2 OR (pos > (ARRAY_LENGTH([1, 2]) - 1) AND pos_2 = (ARRAY_LENGTH([1, 2]) - 1));
+
+SELECT IF(pos = pos_2, x, NULL) AS x, IF(pos = pos_2, pos_2, NULL) AS pos_2 FROM UNNEST(GENERATE_ARRAY(0, GREATEST(ARRAY_LENGTH([2, 3])) - 1)) AS pos CROSS JOIN UNNEST([2, 3]) AS x WITH OFFSET AS pos_2 WHERE pos = pos_2 OR (pos > (ARRAY_LENGTH([2, 3]) - 1) AND pos_2 = (ARRAY_LENGTH([2, 3]) - 1));
+
+SELECT IF(pos = pos_2, col, NULL) AS col, IF(pos = pos_2, pos_2, NULL) AS pos_2, IF(pos = pos_3, col_2, NULL) AS col_2 FROM tbl CROSS JOIN UNNEST(GENERATE_ARRAY(0, GREATEST(ARRAY_LENGTH([2, 3]), ARRAY_LENGTH([4, 5, 6])) - 1)) AS pos CROSS JOIN UNNEST([2, 3]) AS col WITH OFFSET AS pos_2 CROSS JOIN UNNEST([4, 5, 6]) AS col_2 WITH OFFSET AS pos_3 WHERE (pos = pos_2 OR (pos > (ARRAY_LENGTH([2, 3]) - 1) AND pos_2 = (ARRAY_LENGTH([2, 3]) - 1))) AND (pos = pos_3 OR (pos > (ARRAY_LENGTH([4, 5, 6]) - 1) AND pos_3 = (ARRAY_LENGTH([4, 5, 6]) - 1)));
+
+SELECT IF(pos = pos_2, a, NULL) AS a, (SELECT MAX(b) FROM (SELECT IF(pos = pos_2, b, NULL) AS b FROM UNNEST(GENERATE_ARRAY(0, GREATEST(ARRAY_LENGTH([1, 2])) - 1)) AS pos CROSS JOIN UNNEST([1, 2]) AS b WITH OFFSET AS pos_2 WHERE pos = pos_2 OR (pos > (ARRAY_LENGTH([1, 2]) - 1) AND pos_2 = (ARRAY_LENGTH([1, 2]) - 1)))) AS m FROM tbl CROSS JOIN UNNEST(GENERATE_ARRAY(0, GREATEST(ARRAY_LENGTH(x)) - 1)) AS pos CROSS JOIN UNNEST(x) AS a WITH OFFSET AS pos_2 WHERE pos = pos_2 OR (pos > (ARRAY_LENGTH(x) - 1) AND pos_2 = (ARRAY_LENGTH(x) - 1));
+
+SELECT RAND() < 0.1;
+
+SELECT DIV(CAST(a AS INT64), NULLIF(CAST(b AS INT64), 0)) FROM t;
+
+SELECT CHR(72) || CHR(105) || CHR(x);
+
+SELECT DATE_SUB(d, INTERVAL 1 MONTH) FROM t;
+
+SELECT LAST_VALUE(x IGNORE NULLS) OVER (ORDER BY t);
+
+SELECT LAST_VALUE(x RESPECT NULLS) OVER (ORDER BY t);
+
+CREATE TABLE a;
+
+SELECT CAST('2020-05-11T11:15:05.000000000' AS TIMESTAMP);
+
+SELECT DATE_TRUNC(CAST('2024-05-15' AS DATE), MONTH);
+
+SELECT DATE_TRUNC(CAST('2024-05-15' AS DATE), WEEK(MONDAY));

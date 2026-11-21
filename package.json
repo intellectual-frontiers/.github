@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev:check": "bun commons/libraries/src/link.ts && bun commons/libraries/src/dev.ts",
-    "release": "bun commons/libraries/src/link.ts && bun commons/libraries/src/releasing.ts",
+    "release": "bun commons/libraries/src/link.ts && bun commons/libraries/src/release-run.ts",
     "repoctl": "bun commons/libraries/src/link.ts && bun commons/repoctl/src/repoctl.ts"
   },
   "bin": {

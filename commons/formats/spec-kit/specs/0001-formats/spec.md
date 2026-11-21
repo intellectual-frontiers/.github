@@ -39,6 +39,9 @@
 ## The package
 
 - **FR-020**: Formats MUST depend on `core` alone, MUST import nothing outside its own files, MUST name no host global, and MUST be published as compiled modules with their declarations as `@intellectual-frontiers/formats`, with an entry for the package (`.`) and one for each of its modules (`./yaml`, `./der`, ...), each with its `types` (commons 0032-libraries-by-concern FR-005, FR-013), so that it runs on Bun, on Node 26 and in a browser with no build step.
+- **FR-021**: Formats MUST read an xz file in pure code (`unxz`, from `@intellectual-frontiers/formats/xz`): the container (one stream or several, with the zero padding between them), the LZMA2 filter, and the checks the file carries (the CRC-32 of each header and of the index, the CRC-32, CRC-64 or SHA-256 of each block's data, the sizes the headers and the index state, and the list of blocks the index holds), and MUST refuse the whole file, giving no bytes, for a check that fails, a truncation, a filter other than LZMA2 or a check it does not know.
+- **FR-022**: `unxz` MUST NOT make more bytes than its limit (a gigabyte unless the caller gives another) however few bytes it is given, MUST grow its output only as data is made and not by what a header declares, and MUST reach no file, network or program; a tar that was xz-compressed is read by `untar` of what `unxz` gives, as a gzipped one is read of what `gunzip` gives.
+- **FR-023**: `untar` MUST give each symbolic link and each hard link of a tar as an entry of its own, of the kind `symlink` or `hardlink`, with the path it names in `linkName`, and `linksOf` MUST give the links of a list of entries as typed values (the path, whether it is a symbolic or a hard link, and its target) in the order of the archive, so that a consumer decides what to do with a link and never finds one among its files.
 
 ## Acceptance scenarios
 
