@@ -11,7 +11,7 @@
  *
  * @module
  */
-import type { BootPins } from "@intellectual-frontiers/netboot/governance";
+import type { BootProfile } from "@intellectual-frontiers/netboot/governance";
 
 /** A host the menus name. */
 export type MenuHost = { readonly name: string };
@@ -27,18 +27,26 @@ menuentry "Not an Archon host (\${net_default_mac}): boot the local disk" {
 `;
 }
 
-/** An install entry: GRUB fills in the MAC it booted from, so that the installed network matches it. `base` is the server's URL ending in a slash. */
-function installEntry(host: MenuHost, pins: BootPins, base: string, token: string): string {
-  const ds = `ds=nocloud-net\;s=${base}install/${host.name}/${token}/\${net_default_mac}/`;
-  return `menuentry "Install ${host.name} (Ubuntu ${pins.point}, erases this machine's disk)" {
-  linux /boot/linux ip=dhcp iso-url=${base}iso/${pins.iso.name} autoinstall ${ds} ---
-  initrd /boot/initrd
+/**
+ * The kernel's command line of a profile for one host: the placeholders of the profile's template filled in. GRUB fills in the MAC it booted from, so that the installed network matches it. `base` is the server's URL ending in a slash.
+ */
+export function kernelLine(host: MenuHost, profile: BootProfile, base: string, token: string): string {
+  const install = `${base}install/${host.name}/${token}/\${net_default_mac}/`;
+  const iso = profile.pins.iso === undefined ? "" : `${base}iso/${profile.pins.iso.name}`;
+  return profile.cmdline.split("{install}").join(install).split("{iso}").join(iso).split("{base}").join(base);
+}
+
+/** An install entry of a host. */
+function installEntry(host: MenuHost, profile: BootProfile, base: string, token: string): string {
+  return `menuentry "Install ${host.name} (${profile.title}, erases this machine's disk)" {
+  linux /boot/${profile.kernel} ${kernelLine(host, profile, base, token)}
+  initrd /boot/${profile.initrd}
 }
 `;
 }
 
 /** The menu of a known host: an unattended install when it is armed (`token` set), otherwise its own disk. */
-export function hostMenu(host: MenuHost, pins: BootPins, base: string, token: string | undefined): string {
+export function hostMenu(host: MenuHost, profile: BootProfile, base: string, token: string | undefined): string {
   if (token === undefined) {
     return `# ${host.name} is not armed for an install.
 set timeout=3
@@ -47,16 +55,16 @@ menuentry "${host.name}: not armed for install, booting its own disk" {
 }
 `;
   }
-  return `# ${host.name}: unattended install of Ubuntu ${pins.point}.
+  return `# ${host.name}: unattended install of ${profile.title}.
 set timeout=3
-${installEntry(host, pins, base, token)}menuentry "${host.name}: boot the local disk instead" {
+${installEntry(host, profile, base, token)}menuentry "${host.name}: boot the local disk instead" {
   exit
 }
 `;
 }
 
 /** The menu of a machine the server does not know: the armed hosts, with the local disk the default unless someone at the console picks one. */
-export function chooserMenu(armed: ReadonlyArray<{ readonly host: MenuHost; readonly token: string }>, pins: BootPins, base: string): string {
+export function chooserMenu(armed: ReadonlyArray<{ readonly host: MenuHost; readonly token: string }>, profile: BootProfile, base: string): string {
   if (armed.length === 0) {
     return `# Unknown machine and no host is armed: boot the local disk.
 set timeout=3
@@ -71,5 +79,5 @@ set timeout=60
 menuentry "Unknown machine (\${net_default_mac}): boot the local disk" {
   exit
 }
-${armed.map((a) => installEntry(a.host, pins, base, a.token)).join("")}`;
+${armed.map((a) => installEntry(a.host, profile, base, a.token)).join("")}`;
 }

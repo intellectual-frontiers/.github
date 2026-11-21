@@ -1,0 +1,21 @@
+{
+  "at": "2026-11-21 01:00 UTC",
+  "commit": "aaaa000aaaa000aaaa000aaaa000aaaa000aaaa0000000",
+  "url": "https://github.com/example/fixture/actions/runs/1",
+  "libraries": {
+    "fixture": {
+      "tests": 10,
+      "passed": 9,
+      "failed": 1,
+      "skipped": 0,
+      "durationMs": 1000,
+      "failing": [
+        {
+          "id": "e5",
+          "name": "001-greeting FR-001: E comes and goes"
+        }
+      ]
+    }
+  },
+  "missing": []
+}

@@ -12,7 +12,7 @@
  * @module
  */
 import { fs } from "@intellectual-frontiers/system";
-import { BASE_PLACEHOLDER, PASSWORD_PLACEHOLDER, type BootPins } from "@intellectual-frontiers/netboot/governance";
+import { BASE_PLACEHOLDER, PASSWORD_PLACEHOLDER, type BootProfile } from "@intellectual-frontiers/netboot/governance";
 import { answerOf, armedHosts, chooserMenu, classify, decide, describeFacts, done, GUARD_SCRIPT, hostMenu, mainMenu, note, parseFacts, tokenFits, type Progress } from "@intellectual-frontiers/netboot/logical";
 import type { Assets } from "./assets.ts";
 import { httpServer, type BootRequest, type BootResponse, type HttpServer } from "./http-server.ts";
@@ -38,7 +38,8 @@ export type BootEvent = { readonly at: string; readonly kind: "http" | "tftp" | 
 export type BootOptions = {
   readonly stateFile: string;
   readonly assets: Assets;
-  readonly pins: BootPins;
+  /** The profile of the distribution this server serves: its files, its menu entries and its install document. */
+  readonly profile: BootProfile;
   readonly provider: BootProvider;
   readonly http: { readonly port: number; readonly hostname?: string };
   readonly tftp: { readonly port: number; readonly hostname?: string };
@@ -75,10 +76,11 @@ export function bootHandler(o: BootOptions): (r: BootRequest) => Promise<BootRes
         const hosts = await o.provider.hosts();
         const found = hosts.find((h) => h.mac?.toLowerCase() === route.mac) ?? Object.entries(state.armed).map(([name, a]) => ({ name, mac: a.mac })).find((h) => h.mac?.toLowerCase() === route.mac);
         say("http", `menu for ${route.mac}: ${found?.name ?? "unknown machine"}`);
-        return text(found === undefined ? chooserMenu(armedHosts(state), o.pins, base) : hostMenu({ name: found.name }, o.pins, base, state.armed[found.name]?.token));
+        return text(found === undefined ? chooserMenu(armedHosts(state), o.profile, base) : hostMenu({ name: found.name }, o.profile, base, state.armed[found.name]?.token));
       }
       case "iso": {
-        if (route.name !== o.pins.iso.name) return NOT_FOUND();
+        const iso = o.profile.pins.iso;
+        if (iso === undefined || route.name !== iso.name || o.assets.iso === undefined) return NOT_FOUND();
         return { status: 200, headers: {}, body: { file: o.assets.iso, size: (await fs.stat(o.assets.iso)).size } };
       }
       case "install": {
@@ -91,7 +93,12 @@ export function bootHandler(o: BootOptions): (r: BootRequest) => Promise<BootRes
         const root = `${base}install/${route.host}/${route.token}/${route.mac}/`;
         const at = now();
         switch (route.file) {
-          case "user-data": {
+          case "user-data":
+          case "preseed.cfg":
+          case "ks.cfg":
+          case "autoinst.xml": {
+            // only the profile's own install document is served: a Debian install does not read a user-data
+            if (route.file !== o.profile.document) return NOT_FOUND();
             const [data, hash] = [await o.provider.userData(route.host), await o.provider.passwordHash(route.host)];
             if (data === undefined) return NOT_FOUND();
             if (data.includes(PASSWORD_PLACEHOLDER) && hash === undefined) {
@@ -99,7 +106,7 @@ export function bootHandler(o: BootOptions): (r: BootRequest) => Promise<BootRes
               return text("no password hash on the boot machine\n", 500);
             }
             say("install", `serving the install data of ${route.host}`);
-            return text(data.split(BASE_PLACEHOLDER).join(root).split(PASSWORD_PLACEHOLDER).join(hash ?? ""), 200, "text/cloud-config; charset=utf-8");
+            return text(data.split(BASE_PLACEHOLDER).join(root).split(PASSWORD_PLACEHOLDER).join(hash ?? ""), 200, o.profile.documentType);
           }
           case "meta-data": {
             const m = await o.provider.metaData(route.host);

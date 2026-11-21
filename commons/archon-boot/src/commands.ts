@@ -13,7 +13,7 @@
  */
 import { defineReach, problem } from "@intellectual-frontiers/headless/governance";
 import { command, outcomeOf, type Node } from "@intellectual-frontiers/headless/logical";
-import { UBUNTU_26_04 } from "@intellectual-frontiers/netboot/governance";
+import { PROFILES, profileById, type BootProfile } from "@intellectual-frontiers/netboot/governance";
 import { ensureAssets, startBoot } from "@intellectual-frontiers/netboot/physical";
 import { value } from "@intellectual-frontiers/terminal/args";
 import { armAsset, assetsDir, defaultStateFile, disarmAsset, prepare, statusOf, variable } from "./boot.ts";
@@ -23,10 +23,14 @@ const asset = value<never>({ help: "The asset to install.", valueName: "ASSET", 
 const stateOpt = value<never>({ help: "The boot server's state file.", valueName: "FILE", default: "" });
 const assetsOpt = value<never>({ help: "The folder of the pinned boot files and the installer image.", valueName: "DIR", default: "" });
 
+const profileOpt = value<never>({ help: `The distribution the server serves (${PROFILES.map((p) => p.id).join(", ")}); one at a time, because the boot files of every distribution have the same names.`, valueName: "PROFILE", default: "" });
+
 /** The commands of the branch `boot`. */
 export function bootCommands(config: BootPluginConfig): readonly Node[] {
   const program = config.program ?? "archon";
   const fleet = config.options ?? {};
+  const profileOf = (o: Readonly<Record<string, unknown>>): BootProfile | undefined => profileById(String(o["profile"] ?? "") === "" ? (config.profile ?? "ubuntu-26.04") : String(o["profile"]));
+  const noProfile = (o: Readonly<Record<string, unknown>>) => outcomeOf(null, { problems: [problem("fail", `there is no boot profile ${String(o["profile"])}: ${PROFILES.map((p) => p.id).join(", ")}`, { code: "E-PROFILE" })], exit: "usage" });
   const optionsOf = (o: Readonly<Record<string, unknown>>): Record<string, string> => Object.fromEntries(Object.keys(fleet).map((k) => [k, String(o[k] ?? "")]));
   const stateOf = (o: Readonly<Record<string, unknown>>, env: (n: string) => string | undefined): string => (String(o["state"] ?? "") !== "" ? String(o["state"]) : defaultStateFile(program, env));
 
@@ -50,7 +54,7 @@ export function bootCommands(config: BootPluginConfig): readonly Node[] {
   const arm = command({
     name: "arm",
     summary: "Say that the next network boot of the asset may install it: only an armed asset is installed, once. A machine whose disks hold data is stopped unless you arm it with --confirm-destroy yes. It changes nothing on the machine.",
-    options: { asset, ...fleet, state: stateOpt, confirmDestroy: value<never>({ help: "Allow the install to erase a disk that holds data: `yes`.", valueName: "yes", default: "" }), mac: value<never>({ help: "The MAC of the machine that will boot, where the fleet does not know it.", valueName: "MAC", default: "" }) },
+    options: { asset, ...fleet, state: stateOpt, profile: profileOpt, confirmDestroy: value<never>({ help: "Allow the install to erase a disk that holds data: `yes`.", valueName: "yes", default: "" }), mac: value<never>({ help: "The MAC of the machine that will boot, where the fleet does not know it.", valueName: "MAC", default: "" }) },
     examples: [{ args: ["--asset", "athens"], says: "Arm athens for one install." }, { args: ["--asset", "athens", "--confirm-destroy", "yes"], says: "Arm athens and allow it to erase a disk that holds data." }],
     action: { kind: "action", effect: "mutate", dryRun: false, idempotent: false, reach: defineReach({ channels: ["local"] }) },
     run: async (args, ctx) => {
@@ -59,6 +63,11 @@ export function bootCommands(config: BootPluginConfig): readonly Node[] {
       const subject = await config.subject(name, optionsOf(o));
       if (subject.kind === "err") return outcomeOf(null, { problems: [problem("fail", subject.error.message, { code: subject.error.code })], exit: subject.error.exit });
       const destroy = String(o["confirmDestroy"]) === "yes";
+      const profile = profileOf(o);
+      if (profile === undefined) return noProfile(o);
+      if (!profile.guard && !destroy) {
+        return outcomeOf(null, { problems: [problem("fail", `the installer of ${profile.title} cannot check the disk before it erases one: arm ${name} with --confirm-destroy yes to say that it may`, { code: "E-NO-GUARD" })], exit: "usage" });
+      }
       const mac = String(o["mac"] ?? "");
       const token = await armAsset(stateOf(o, ctx.env), name, { confirmDestroy: destroy, ...(mac === "" ? {} : { mac }) });
       return outcomeOf({ armed: name, tokenLength: token.length }, { text: `armed ${name}${destroy ? " (it may erase a disk that holds data)" : " (it is stopped if a disk holds data)"}: network boot the machine now`, next: [`${program} boot serve`] });
@@ -81,13 +90,15 @@ export function bootCommands(config: BootPluginConfig): readonly Node[] {
   const status = command({
     name: "status",
     summary: "Show what is armed, what has installed, the installs' latest progress and which boot files are not held yet. It changes nothing.",
-    options: { state: stateOpt, assets: assetsOpt },
+    options: { state: stateOpt, assets: assetsOpt, profile: profileOpt },
     examples: [{ args: [], says: "Show the state of the boot server." }],
     action: { kind: "report", reach: defineReach({ channels: ["local"], readOnly: true, idempotent: true }) },
     run: async (args, ctx) => {
       const o = args.options as Readonly<Record<string, unknown>>;
+      const profile = profileOf(o);
+      if (profile === undefined) return noProfile(o);
       const stateFile = stateOf(o, ctx.env);
-      const s = await statusOf(stateFile, assetsDir(program, String(o["assets"] ?? ""), stateFile, ctx.env));
+      const s = await statusOf(stateFile, assetsDir(program, String(o["assets"] ?? ""), stateFile, ctx.env), profile);
       const text = [`armed: ${s.armed.join("; ") || "nothing"}`, `installed: ${s.installed.join("; ") || "nothing"}`, `boot files not held (or not matching their pins): ${s.missing.join(", ") || "none"}`, ...s.last.map((l) => `  ${l}`)].join("\n");
       return outcomeOf(s, { text, ...(s.missing.length > 0 ? { next: [`${program} boot serve --fetch yes`] } : {}) });
     },
@@ -95,11 +106,11 @@ export function bootCommands(config: BootPluginConfig): readonly Node[] {
 
   const serve = command({
     name: "serve",
-    summary: `Run the boot server: TFTP (UDP 69) and HTTP (TCP 8080) answer a machine that network boots, from the pinned Ubuntu ${UBUNTU_26_04.point} files, the menus and the install data of the armed assets, until you stop it (or for --for seconds). The password hash comes from <secrets>/<asset>/password-hash on this machine only.`,
+    summary: `Run the boot server: TFTP (UDP 69) and HTTP (TCP 8080) answer a machine that network boots, from the pinned files of the profile (Ubuntu 26.04 by default), the menus and the install data of the armed assets, until you stop it (or for --for seconds). The password hash comes from <secrets>/<asset>/password-hash on this machine only.`,
     options: {
-      ...fleet, state: stateOpt, assets: assetsOpt,
+      ...fleet, state: stateOpt, assets: assetsOpt, profile: profileOpt,
       secrets: value<never>({ help: `The folder of the secrets of the fleet's machines, outside any repository (${variable(program, "SECRETS")}).`, valueName: "DIR", default: "" }),
-      fetch: value<never>({ help: "Fetch the boot files and the installer image (about 2 GB) that are not held, checking each against its pin: `yes`.", valueName: "yes", default: "" }),
+      fetch: value<never>({ help: "Fetch the boot files and the installer image (an Ubuntu image is about 2 GB) that are not held, checking each against its pin: `yes`.", valueName: "yes", default: "" }),
       httpPort: value<never>({ help: "The TCP port of the HTTP server.", valueName: "PORT", default: "8080" }),
       tftpPort: value<never>({ help: "The UDP port of the TFTP server (69 is the standard; it needs the right to bind it).", valueName: "PORT", default: "69" }),
       baseUrl: value<never>({ help: "The server's address as the machine sees it, for example http://192.168.1.10:8080/ (the address a request arrived at by default).", valueName: "URL", default: "" }),
@@ -109,15 +120,17 @@ export function bootCommands(config: BootPluginConfig): readonly Node[] {
     action: { kind: "action", effect: "mutate", dryRun: false, idempotent: false, reach: defineReach({ channels: ["local"] }) },
     run: async (args, ctx) => {
       const o = args.options as Readonly<Record<string, unknown>>;
+      const profile = profileOf(o);
+      if (profile === undefined) return noProfile(o);
       const stateFile = stateOf(o, ctx.env);
       const dir = assetsDir(program, String(o["assets"] ?? ""), stateFile, ctx.env);
-      const fetched = await ensureAssets(dir, UBUNTU_26_04, String(o["fetch"]) === "yes" ? undefined : async (u) => new Response(`not fetched: ${u}`, { status: 404 }), () => {});
+      const fetched = await ensureAssets(dir, profile.pins, String(o["fetch"]) === "yes" ? undefined : async (u) => new Response(`not fetched: ${u}`, { status: 404 }), () => {});
       if (fetched.kind === "err") return outcomeOf(null, { problems: [problem("fail", `${fetched.error}${String(o["fetch"]) === "yes" ? "" : " (add --fetch yes to get the files)"}`, { code: "E-ASSETS" })], exit: "environment" });
       const secrets = String(o["secrets"]) !== "" ? String(o["secrets"]) : ctx.env(variable(program, "SECRETS"));
       const lines: string[] = [];
       const base = String(o["baseUrl"] ?? "");
       const server = await startBoot({
-        stateFile, assets: fetched.value, pins: UBUNTU_26_04, provider: config.provider(optionsOf(o), secrets),
+        stateFile, assets: fetched.value, profile, provider: config.provider(optionsOf(o), secrets),
         http: { port: Number(o["httpPort"]) }, tftp: { port: Number(o["tftpPort"]) },
         ...(base === "" ? {} : { baseUrl: base.endsWith("/") ? base : `${base}/` }),
         emit: (e) => void lines.push(`${e.at} ${e.kind}: ${e.detail}`),

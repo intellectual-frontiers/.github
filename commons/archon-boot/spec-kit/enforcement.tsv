@@ -11,3 +11,4 @@ requirement	mechanism	by	note
 0002-boot-command FR-003	check	.github: cd commons/archon-boot && bun run verify	suite/command.test.ts
 0002-boot-command FR-004	check	.github: cd commons/archon-boot && bun run verify	suite/command.test.ts
 0002-boot-command FR-005	check	.github: cd commons/archon-boot && bun run verify	suite/command.test.ts
+0002-boot-command FR-006	check	.github: cd commons/archon-boot && bun run verify	suite/command.test.ts

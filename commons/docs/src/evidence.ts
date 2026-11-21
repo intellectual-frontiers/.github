@@ -10,6 +10,7 @@
 import { fs, path } from "@intellectual-frontiers/system";
 import type { Finding } from "./check.ts";
 import type { EvidenceSource, IssueLike } from "./config.ts";
+import { type HistoryRun, parseHistoryRun } from "./history.ts";
 
 /** How a test ended, in CTRF's words. */
 export type TestStatus = "passed" | "failed" | "skipped" | "pending" | "other";
@@ -74,6 +75,47 @@ export interface TypedIssue extends IssueLike {
 /** Whether an issue's status is one that is still to be dealt with. */
 export const isOpen = (i: Pick<IssueLike, "status">): boolean => i.status.kind === "open" || i.status.kind === "in-progress" || i.status.kind === "deferred";
 
+/** Why a library has a report, or none: what the job that ran its tests says (`success`, `failure`, `skipped`, `cancelled`). */
+export interface LibraryStatus {
+  readonly library: string;
+  readonly install: string;
+  readonly runner: string;
+  readonly tests: string;
+  /** Whether the job left a CTRF report. */
+  readonly reported: boolean;
+}
+
+/** Which build of the site this is: the commit, when, the run, and how the generator's own check ended (`success`, `failure`, `skipped`). */
+export interface BuildInfo {
+  readonly commit: string | undefined;
+  readonly at: string | undefined;
+  readonly url: string | undefined;
+  readonly check: string | undefined;
+}
+
+/** A run of a workflow, as the API gives it. */
+export interface WorkflowRun {
+  readonly id: number;
+  readonly number: number;
+  readonly event: string;
+  readonly status: string;
+  readonly conclusion: string | undefined;
+  readonly sha: string;
+  readonly title: string;
+  readonly url: string;
+  readonly createdAt: string;
+  readonly startedAt: string | undefined;
+  readonly updatedAt: string | undefined;
+}
+
+/** A workflow, its recent runs (newest first) and the jobs that failed in the latest failed ones. */
+export interface WorkflowRuns {
+  readonly name: string;
+  readonly path: string;
+  readonly runs: readonly WorkflowRun[];
+  readonly failed: readonly { readonly run: number; readonly jobs: readonly { readonly name: string; readonly url: string; readonly step: string | undefined }[] }[];
+}
+
 /** Everything the site knows of quality. */
 export interface Evidence {
   readonly results: ReadonlyMap<string, LibraryResults>;
@@ -82,10 +124,19 @@ export interface Evidence {
   readonly tickets: readonly Ticket[];
   /** Whether a folder of results was given and read (a run is recorded), as opposed to none. */
   readonly recorded: boolean;
+  /** What each library's job says of its tests, by library. */
+  readonly status: ReadonlyMap<string, LibraryStatus>;
+  readonly build: BuildInfo | undefined;
+  /** The workflows and their recent runs; none where `runs.json` is not there. */
+  readonly workflows: readonly WorkflowRuns[];
+  /** Why the runs could not be read, where `runs.json` says so. */
+  readonly runsError: string | undefined;
+  /** The runs of the evidence that were kept (docs 0001-docs FR-016), oldest first. */
+  readonly history: readonly HistoryRun[];
 }
 
 /** No evidence: nothing recorded. */
-export const NONE: Evidence = { results: new Map(), run: undefined, issues: [], tickets: [], recorded: false };
+export const NONE: Evidence = { results: new Map(), run: undefined, issues: [], tickets: [], recorded: false, status: new Map(), build: undefined, workflows: [], runsError: undefined, history: [] };
 
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 const str = (v: unknown): string | undefined => (typeof v === "string" && v !== "" ? v : undefined);
@@ -173,6 +224,40 @@ export function parseTickets(text: string): { readonly value: readonly Ticket[] 
   return { value: out.sort((a, b) => a.number - b.number) };
 }
 
+/** The runs of the workflows, from `runs.json` as `tools/ci-runs.ts` writes it. */
+export function parseRuns(text: string): { readonly workflows: readonly WorkflowRuns[]; readonly error: string | undefined } | { readonly error: string } {
+  let json: unknown;
+  try {
+    json = JSON.parse(text);
+  } catch (e) {
+    return { error: `is not JSON: ${e instanceof Error ? e.message : String(e)}` };
+  }
+  if (!isRecord(json) || !Array.isArray(json["workflows"])) return { error: "is not a list of workflows" };
+  const num = (v: unknown): number => (typeof v === "number" ? v : 0);
+  const workflows = json["workflows"].filter(isRecord).map((w): WorkflowRuns => ({
+    name: str(w["name"]) ?? "",
+    path: str(w["path"]) ?? "",
+    runs: (Array.isArray(w["runs"]) ? w["runs"] : []).filter(isRecord).map((r): WorkflowRun => ({
+      id: num(r["id"]),
+      number: num(r["run_number"]),
+      event: str(r["event"]) ?? "",
+      status: str(r["status"]) ?? "",
+      conclusion: str(r["conclusion"]),
+      sha: str(r["head_sha"]) ?? "",
+      title: str(r["display_title"]) ?? "",
+      url: str(r["html_url"]) ?? "",
+      createdAt: str(r["created_at"]) ?? "",
+      startedAt: str(r["run_started_at"]),
+      updatedAt: str(r["updated_at"]),
+    })),
+    failed: (Array.isArray(w["failed"]) ? w["failed"] : []).filter(isRecord).map((f) => ({
+      run: num(f["run"]),
+      jobs: (Array.isArray(f["jobs"]) ? f["jobs"] : []).filter(isRecord).map((j) => ({ name: str(j["name"]) ?? "", url: str(j["url"]) ?? "", step: str(j["step"]) })),
+    })),
+  }));
+  return { workflows, error: str(json["error"]) };
+}
+
 /**
  * The evidence the configuration names, read from its files.
  *
@@ -187,6 +272,11 @@ export function readEvidence(root: string, source: EvidenceSource | undefined, f
   const results = new Map<string, LibraryResults>();
   let run: RunMeta | undefined;
   let recorded = false;
+  const status = new Map<string, LibraryStatus>();
+  let build: BuildInfo | undefined;
+  let workflows: readonly WorkflowRuns[] = [];
+  let runsError: string | undefined;
+  const history: HistoryRun[] = [];
   const dir = source.results === undefined ? undefined : path.resolve(root, source.results);
   if (dir !== undefined && fs.existsSync(dir)) {
     for (const entry of [...fs.readDirSync(dir)].sort((a, b) => (a.name < b.name ? -1 : 1))) {
@@ -195,6 +285,26 @@ export function readEvidence(root: string, source: EvidenceSource | undefined, f
         try {
           const m = JSON.parse(fs.readTextFileSync(path.join(dir, entry.name))) as unknown;
           if (isRecord(m)) run = { commit: str(m["commit"]), at: str(m["at"]), url: str(m["url"]) };
+        } catch (e) {
+          found.push({ where: rel, problem: { kind: "evidence-unreadable", why: `is not JSON: ${e instanceof Error ? e.message : String(e)}` } });
+        }
+      } else if (entry.name === "build.json") {
+        try {
+          const m = JSON.parse(fs.readTextFileSync(path.join(dir, entry.name))) as unknown;
+          if (isRecord(m)) build = { commit: str(m["commit"]), at: str(m["at"]), url: str(m["url"]), check: str(m["check"]) };
+        } catch (e) {
+          found.push({ where: rel, problem: { kind: "evidence-unreadable", why: `is not JSON: ${e instanceof Error ? e.message : String(e)}` } });
+        }
+      } else if (entry.name === "runs.json") {
+        const r = parseRuns(fs.readTextFileSync(path.join(dir, entry.name)));
+        if ("workflows" in r) {
+          workflows = r.workflows;
+          runsError = r.error;
+        } else found.push({ where: rel, problem: { kind: "evidence-unreadable", why: r.error } });
+      } else if (entry.isFile && entry.name.startsWith("status-") && entry.name.endsWith(".json")) {
+        try {
+          const m = JSON.parse(fs.readTextFileSync(path.join(dir, entry.name))) as unknown;
+          if (isRecord(m) && typeof m["library"] === "string") status.set(m["library"], { library: m["library"], install: str(m["install"]) ?? "", runner: str(m["runner"]) ?? "", tests: str(m["tests"]) ?? "", reported: m["reported"] === true });
         } catch (e) {
           found.push({ where: rel, problem: { kind: "evidence-unreadable", why: `is not JSON: ${e instanceof Error ? e.message : String(e)}` } });
         }
@@ -210,6 +320,14 @@ export function readEvidence(root: string, source: EvidenceSource | undefined, f
       }
     }
   }
+  const runsDir = dir === undefined ? undefined : path.join(dir, "history", "runs");
+  if (runsDir !== undefined && fs.existsSync(runsDir)) {
+    for (const e of [...fs.readDirSync(runsDir)].filter((x) => x.name.endsWith(".json")).sort((a, b) => (a.name < b.name ? -1 : 1))) {
+      const r = parseHistoryRun(fs.readTextFileSync(path.join(runsDir, e.name)));
+      if ("error" in r) found.push({ where: path.relative(root, path.join(runsDir, e.name)).split(path.sep).join("/"), problem: { kind: "evidence-unreadable", why: r.error } });
+      else history.push(r.value);
+    }
+  }
   let tickets: readonly Ticket[] = [];
   if (source.github !== undefined) {
     const file = path.resolve(root, source.github);
@@ -219,7 +337,7 @@ export function readEvidence(root: string, source: EvidenceSource | undefined, f
       else tickets = r.value;
     }
   }
-  return { results, run, issues, tickets, recorded };
+  return { results, run, issues, tickets, recorded, status, build, workflows, runsError, history };
 }
 
 /** The tests of every library that name a requirement, as `0009-example FR-001`. */

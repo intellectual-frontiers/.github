@@ -6,3 +6,5 @@
  */
 export * from "./dialect.ts";
 export * from "./install.ts";
+export * from "./preseed.ts";
+export * from "./kickstart.ts";

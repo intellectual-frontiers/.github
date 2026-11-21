@@ -320,21 +320,142 @@ const docsPaths = ["commons/**", "package.json", own("site"), BUN_ACTION];
 /** A push to main, a run by hand on main, or the night's run: where the evidence is gathered and the site published. */
 const onMainOrSchedule = "github.event_name != 'pull_request' && github.ref == 'refs/heads/main'";
 
+/**
+ * The evidence of quality (commons 0011-documentation FR-042): the tests of every library and of the repository's own `tests/`, one job for each, kept whether they pass, fail or cannot be run, and gathered into one artifact
+ * that the site reads. It runs by the hour and by hand, never on a push: a push to main comes every minute or two and a run of every suite takes a quarter of an hour, so a run for each push would never finish, and the site
+ * would wait for it. The site is built on every push from the newest evidence there is, and says how old it is.
+ */
+const evidence: Workflow = {
+  file: "evidence",
+  name: "evidence",
+  comment: lines(
+    "The evidence of quality for the documentation site (commons 0011-documentation FR-042): the tests of every library and of the repository's own `tests/`, one job for each, each kept as a CTRF report with a status file that says why",
+    "there is none (the packages could not be installed, there is no suite, the run timed out). By the hour and by hand, never on a push. The jobs `tests` and `repository` never fail the workflow for what they find: a failed test is what the",
+    "site is to show. The job `collect` gathers every report into the artifact `evidence`, which the workflow `site` downloads on each push.",
+  ).trimEnd(),
+  on: { workflowDispatch: true, schedule: ["17 * * * *"] },
+  permissions: { contents: "read" },
+  concurrency: { group: "evidence", cancelInProgress: false },
+  jobs: {
+    plan: job({
+      comment: "every library the plan knows, as a matrix",
+      runsOn: "ubuntu-24.04",
+      timeoutMinutes: 10,
+      outputs: { linux: expr("steps.plan.outputs.linux") },
+      steps: [
+        checkout({ fetchDepth: 0 }),
+        bun(),
+        run("bun install --frozen-lockfile", { name: "The packages the plan reads, from the root's bun.lock" }),
+        run("bun commons/libraries/src/link.ts", { name: "The libraries, linked by name before any of them is imported (the root's packages are old copies from npm)" }),
+        run('bun commons/libraries/src/plan.ts --all --github-output "$GITHUB_OUTPUT"', { name: "Every library, as a matrix", id: "plan", shell: "bash" }),
+      ],
+    }),
+    tests: job({
+      name: "tests (${{ matrix.name }})",
+      comment: "the tests of one library, whose result is kept whether they pass, fail or cannot be run",
+      needs: ["plan"],
+      runsOn: "ubuntu-24.04",
+      timeoutMinutes: 25,
+      strategy: { failFast: false, matrix: expr("fromJSON(needs.plan.outputs.linux)") },
+      steps: [
+        checkout(),
+        bun(),
+        { ...tools(expr("matrix.folder"), "The development tools, from bun.lock (the libraries it imports are linked)"), id: "install", continueOnError: true },
+        { ...tools("commons/quality", "The test runner's own packages (commons quality)"), id: "runner", continueOnError: true },
+        { ...tools("commons/docs", "The packages of the tool that keeps the report (commons docs)"), continueOnError: true },
+        run('bun commons/docs/tools/evidence.ts --library "${{ matrix.name }}" --out "$RUNNER_TEMP/evidence"', { name: "The tests, kept as a CTRF report", id: "tests", continueOnError: true, shell: "bash" }),
+        run(
+          lines(
+            "mkdir -p \"$RUNNER_TEMP/evidence\"",
+            "printf '{ \"library\": \"%s\", \"install\": \"%s\", \"runner\": \"%s\", \"tests\": \"%s\", \"reported\": %s }\\n' \"${{ matrix.name }}\" \"${{ steps.install.outcome }}\" \"${{ steps.runner.outcome }}\" \"${{ steps.tests.outcome }}\" \"$(test -f \"$RUNNER_TEMP/evidence/${{ matrix.name }}.ctrf.json\" && echo true || echo false)\" > \"$RUNNER_TEMP/evidence/status-${{ matrix.name }}.json\"",
+          ),
+          { name: "Why there is a report, or none", when: "always()", shell: "bash" },
+        ),
+        use(PIN.uploadArtifact, { name: "The report and its status, kept for the site", when: "always()", with: { name: "evidence-${{ matrix.name }}", path: "${{ runner.temp }}/evidence/*.json", "if-no-files-found": "ignore", "retention-days": 7 } }),
+      ],
+    }),
+    repository: job({
+      name: "tests (repository)",
+      comment: "the tests of the repository's own files (`tests/`)",
+      runsOn: "ubuntu-24.04",
+      timeoutMinutes: 25,
+      steps: [
+        checkout({ fetchDepth: 0 }),
+        bun(),
+        { ...tools(".", "The root's development tools, from bun.lock"), id: "install", continueOnError: true },
+        { ...tools("commons/docs", "The documentation generator's dependencies, which the tests of the root import"), continueOnError: true },
+        { ...tools("commons/quality", "The test runner's own packages (commons quality)"), id: "runner", continueOnError: true },
+        run("bun commons/libraries/src/link.ts", { name: "The libraries, linked by name", continueOnError: true }),
+        run('bun commons/docs/tools/evidence.ts --library repository --out "$RUNNER_TEMP/evidence"', { name: "The tests, kept as a CTRF report", id: "tests", continueOnError: true, shell: "bash" }),
+        run(
+          lines(
+            "mkdir -p \"$RUNNER_TEMP/evidence\"",
+            "printf '{ \"library\": \"repository\", \"install\": \"%s\", \"runner\": \"%s\", \"tests\": \"%s\", \"reported\": %s }\\n' \"${{ steps.install.outcome }}\" \"${{ steps.runner.outcome }}\" \"${{ steps.tests.outcome }}\" \"$(test -f \"$RUNNER_TEMP/evidence/repository.ctrf.json\" && echo true || echo false)\" > \"$RUNNER_TEMP/evidence/status-repository.json\"",
+          ),
+          { name: "Why there is a report, or none", when: "always()", shell: "bash" },
+        ),
+        use(PIN.uploadArtifact, { name: "The report and its status, kept for the site", when: "always()", with: { name: "evidence-repository", path: "${{ runner.temp }}/evidence/*.json", "if-no-files-found": "ignore", "retention-days": 7 } }),
+      ],
+    }),
+    collect: job({
+      comment: "every report in one artifact, whatever happened to the jobs that made them, with the run added to the history that the artifact of the run before carried",
+      needs: ["tests", "repository"],
+      when: "always()",
+      runsOn: "ubuntu-24.04",
+      timeoutMinutes: 10,
+      permissions: { contents: "read", actions: "read" },
+      steps: [
+        checkout(),
+        bun(),
+        { ...tools("commons/docs", "The packages of the tool that keeps the history (commons docs)"), continueOnError: true },
+        use(PIN.downloadArtifact, { name: "The reports of the tests", with: { pattern: "evidence-*", path: "_evidence", "merge-multiple": true } }),
+        run(
+          lines(
+            "mkdir -p _evidence",
+            "printf '{ \"commit\": \"%s\", \"at\": \"%s\", \"url\": \"%s\" }\\n' \"$GITHUB_SHA\" \"$(date -u '+%Y-%m-%d %H:%M UTC')\" \"$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\" > _evidence/meta.json",
+            "ls -l _evidence | head -200",
+          ),
+          { name: "Which run this is", shell: "bash" },
+        ),
+        run(
+          lines(
+            "# the history travels from one run's artifact to the next: this run adds itself to the one the run before kept (it is cut to the newest 120)",
+            "mkdir -p _history _prev",
+            "gh run download --name evidence --dir _prev || echo 'no earlier evidence: the history begins here'",
+            "if [ -d _prev/history ]; then cp -r _prev/history/. _history/; fi",
+            "bun commons/docs/tools/history.ts --evidence _evidence --history _history || echo 'the history could not be kept'",
+            "mkdir -p _evidence/history && cp -r _history/runs _evidence/history/ 2>/dev/null || true",
+          ),
+          { name: "The run, added to the history", shell: "bash", continueOnError: true, env: { GH_TOKEN: expr("github.token") } },
+        ),
+        use(PIN.uploadArtifact, { name: "The evidence, kept for the site", with: { name: "evidence", path: "_evidence", "retention-days": 7 } }),
+      ],
+    }),
+  },
+};
+
+/**
+ * The documentation site of commons (commons 0011-documentation FR-020, FR-041, FR-042): built on every push to main in a few minutes from the sources and the newest evidence there is, and published whatever happened to
+ * anything else. The site is how a failure is seen, so nothing that fails may keep it from being published: the generator's own check, a library's tests, the evidence run, even the generator itself, for which an emergency
+ * page is made from the evidence alone.
+ */
 const site: Workflow = {
   file: "site",
   name: "site",
   comment: lines(
-    "The documentation site of commons (commons 0011-documentation FR-020, FR-041, FR-042): made by commons/docs, from commons' TypeScript and spec kit and, beside them, the evidence of quality. Every pull request",
-    "and push that touches commons tests the generator and checks the site (no finding, every link and anchor resolves). A push to main also runs the tests of every library and of the repository's own `tests/`, one job",
-    "for each, keeps each run's CTRF report (commons/docs/tools/evidence.ts), fetches the open issues of the repository, builds the site from them and publishes it to GitHub Pages with GitHub's own actions: the site is",
-    "published whether or not a test failed, since its Quality section is how a failure is seen. A library whose run cannot be made has none recorded. The site is never committed.",
+    "The documentation site of commons (commons 0011-documentation FR-020, FR-041, FR-042): made by commons/docs, from commons' TypeScript and spec kit and, beside them, the evidence of quality. Every pull request and push that",
+    "touches commons tests the generator and checks the site (no finding, every link and anchor resolves): that gates a pull request and nothing else. A push to main builds the site in a few minutes from the newest evidence the",
+    "workflow `evidence` has kept (the tests of every library, with how old they are), the open issues and the runs of the workflows, and publishes it to GitHub Pages with GitHub's own actions WHATEVER failed: the generator's check, a",
+    "library's tests, the evidence run, even the build, for which an emergency page is made from the evidence alone. The site is how a failure is seen. It is never committed.",
   ).trimEnd(),
-  on: { push: { paths: docsPaths }, pullRequest: { paths: docsPaths }, workflowDispatch: true, schedule: ["41 4 * * *"] },
+  on: { push: { paths: docsPaths }, pullRequest: { paths: docsPaths }, workflowDispatch: true, workflowRun: { workflows: ["evidence", "ci", "release", "tests", "conformance"] }, schedule: ["41 4 * * *"] },
   permissions: { contents: "read" },
   // on main a run in progress is finished and only the newest waiting one is kept, so that a busy main still publishes
   concurrency: { group: "site-${{ github.ref }}", cancelInProgress: expr("github.ref != 'refs/heads/main'") },
   jobs: {
     check: job({
+      comment: "gates a pull request; on main its result is shown on the site and stops nothing. A refresh of the site after a workflow, or by the night, does not run it.",
+      when: "github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'",
       runsOn: "ubuntu-24.04",
       timeoutMinutes: 15,
       steps: [
@@ -347,84 +468,50 @@ const site: Workflow = {
         run("bun run verify", { name: "The compiler, the generator's tests, then check on commons", workingDirectory: "commons/docs" }),
       ],
     }),
-    plan: job({
-      comment: "the libraries whose tests are run for the evidence: every one the plan knows, as a push that touched every library would run them",
-      when: onMainOrSchedule,
-      runsOn: "ubuntu-24.04",
-      timeoutMinutes: 10,
-      outputs: { linux: expr("steps.plan.outputs.linux") },
-      steps: [
-        checkout({ fetchDepth: 0 }),
-        bun(),
-        run("bun install --frozen-lockfile", { name: "The packages the plan reads, from the root's bun.lock" }),
-        run("bun commons/libraries/src/link.ts", { name: "The libraries, linked by name before any of them is imported (the root's packages are old copies from npm)" }),
-        run('bun commons/libraries/src/plan.ts --all --github-output "$GITHUB_OUTPUT"', { name: "Every library, as a matrix", id: "plan", shell: "bash" }),
-      ],
-    }),
-    evidence: job({
-      name: "tests (${{ matrix.name }})",
-      comment: "the tests of one library, whose result is kept whether they pass or fail",
-      needs: ["plan"],
-      when: onMainOrSchedule,
-      runsOn: "ubuntu-24.04",
-      timeoutMinutes: 25,
-      strategy: { failFast: false, matrix: expr("fromJSON(needs.plan.outputs.linux)") },
-      steps: [
-        checkout(),
-        bun(),
-        { ...tools(expr("matrix.folder"), "The development tools, from bun.lock (the libraries it imports are linked)"), continueOnError: true },
-        tools("commons/quality", "The test runner's own packages (commons quality)"),
-        run('bun commons/docs/tools/evidence.ts --library "${{ matrix.name }}" --out "$RUNNER_TEMP/evidence"', { name: "The tests, kept as a CTRF report", continueOnError: true, shell: "bash" }),
-        use(PIN.uploadArtifact, { name: "The report, kept for the site", when: "always()", with: { name: "evidence-${{ matrix.name }}", path: "${{ runner.temp }}/evidence/*.ctrf.json", "if-no-files-found": "ignore", "retention-days": 3 } }),
-      ],
-    }),
-    repository: job({
-      name: "tests (repository)",
-      comment: "the tests of the repository's own files (`tests/`)",
-      when: onMainOrSchedule,
-      runsOn: "ubuntu-24.04",
-      timeoutMinutes: 25,
-      steps: [
-        checkout({ fetchDepth: 0 }),
-        bun(),
-        tools(".", "The root's development tools, from bun.lock"),
-        tools("commons/docs", "The documentation generator's dependencies, which the tests of the root import"),
-        tools("commons/quality", "The test runner's own packages (commons quality)"),
-        run("bun commons/libraries/src/link.ts", { name: "The libraries, linked by name" }),
-        run('bun commons/docs/tools/evidence.ts --library repository --out "$RUNNER_TEMP/evidence"', { name: "The tests, kept as a CTRF report", continueOnError: true, shell: "bash" }),
-        use(PIN.uploadArtifact, { name: "The report, kept for the site", when: "always()", with: { name: "evidence-repository", path: "${{ runner.temp }}/evidence/*.ctrf.json", "if-no-files-found": "ignore", "retention-days": 3 } }),
-      ],
-    }),
     site: job({
-      comment: "the site, built from the sources and the evidence: it is built whether or not a test failed, and whether or not a library's run could be made",
-      needs: ["check", "evidence", "repository"],
-      when: `always() && needs.check.result == 'success' && (${onMainOrSchedule})`,
+      comment: "the site, built from the sources and the evidence, whatever else failed; where the build itself fails, a page made from the evidence alone",
+      needs: ["check"],
+      when: `always() && ${onMainOrSchedule}`,
       runsOn: "ubuntu-24.04",
       timeoutMinutes: 20,
-      permissions: { contents: "read", issues: "read" },
+      permissions: { contents: "read", issues: "read", actions: "read" },
       steps: [
         checkout(),
         bun(),
-        tools("commons/docs", "TypeScript 7.1 (beta), Shiki, beautiful-mermaid and @types/node, exactly as bun.lock pins them"),
-        use(PIN.downloadArtifact, { name: "The reports of the tests", with: { pattern: "evidence-*", path: "_evidence", "merge-multiple": true } }),
+        { ...tools("commons/docs", "TypeScript 7.1 (beta), Shiki, beautiful-mermaid and @types/node, exactly as bun.lock pins them"), continueOnError: true },
+        run(
+          lines(
+            "mkdir -p _evidence",
+            "# the newest evidence the workflow `evidence` kept, whatever its result; none is a site that says no run is recorded",
+            "gh run download --name evidence --dir _evidence || echo 'no evidence has been kept yet'",
+          ),
+          { name: "The newest test reports", shell: "bash", continueOnError: true, env: { GH_TOKEN: expr("github.token") } },
+        ),
         run(
           lines(
             "mkdir -p _evidence",
             "# each page of the answer is an array: the pages are made one",
             "gh api --paginate -X GET \"repos/$GITHUB_REPOSITORY/issues\" -f state=all -f per_page=100 --jq '.[]' | jq -s '.' > _evidence/github-issues.json || echo '[]' > _evidence/github-issues.json",
-            "printf '{ \"commit\": \"%s\", \"at\": \"%s\", \"url\": \"%s\" }\\n' \"$GITHUB_SHA\" \"$(date -u '+%Y-%m-%d %H:%M UTC')\" \"$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\" > _evidence/meta.json",
+            "bun commons/docs/tools/ci-runs.ts --out _evidence/runs.json || echo 'the runs of the workflows could not be read'",
+            "printf '{ \"commit\": \"%s\", \"at\": \"%s\", \"url\": \"%s\", \"check\": \"%s\" }\\n' \"$GITHUB_SHA\" \"$(date -u '+%Y-%m-%d %H:%M UTC')\" \"$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\" \"${{ needs.check.result }}\" > _evidence/build.json",
             "ls -l _evidence | head -80",
           ),
-          { name: "The open issues of the repository, and which run this is", shell: "bash", env: { GH_TOKEN: expr("github.token") } },
+          { name: "The open issues, the runs of the workflows, and which build this is", shell: "bash", continueOnError: true, env: { GH_TOKEN: expr("github.token") } },
         ),
-        run('bun src/main.ts build --out "$GITHUB_WORKSPACE/_site"', { name: "The site, built", workingDirectory: "commons/docs" }),
+        run('set -o pipefail; bun src/main.ts build --out "$GITHUB_WORKSPACE/_site" 2>&1 | tee "$RUNNER_TEMP/build.log"', { name: "The site, built", id: "build", continueOnError: true, shell: "bash", workingDirectory: "commons/docs" }),
+        run('bun tools/status-site.ts --evidence "$GITHUB_WORKSPACE/_evidence" --log "$RUNNER_TEMP/build.log" --out "$GITHUB_WORKSPACE/_site"', {
+          name: "The emergency page, where the build failed",
+          when: "steps.build.outcome != 'success'",
+          shell: "bash",
+          workingDirectory: "commons/docs",
+        }),
         use(PIN.uploadPages, { name: "The site, kept for Pages", with: { path: "_site" } }),
       ],
     }),
     publish: job({
-      comment: "always(): a library whose run failed is an ancestor that failed, and would otherwise skip the publication of a site that was built",
+      comment: "always(): whatever failed before is an ancestor that failed, and would otherwise skip the publication of a site that was built",
       needs: ["site"],
-      when: `always() && needs.site.result == 'success' && (${onMainOrSchedule})`,
+      when: `always() && needs.site.result == 'success' && ${onMainOrSchedule}`,
       runsOn: "ubuntu-24.04",
       timeoutMinutes: 10,
       permissions: { pages: "write", "id-token": "write" },
@@ -665,6 +752,7 @@ const release: Workflow = {
 export function workflows(): readonly Workflow[] {
   return [
     ci,
+    evidence,
     release,
     site,
     conformance,

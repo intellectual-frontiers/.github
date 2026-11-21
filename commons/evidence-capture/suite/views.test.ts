@@ -9,7 +9,7 @@ import { gitRefStore, type GitRefStore } from "@intellectual-frontiers/grc/store
 import { fs, path, proc } from "@intellectual-frontiers/system";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { durationText, parseSpan } from "../src/logical/mod.ts";
-import { changesSince, collect, diffAsset, exportWith, knownAt, readSignersFile, sealsOf, sealWith, timerEvery, timerFor, verifyBundleAt, verifyJournalOf, type StateCodec } from "../src/physical/mod.ts";
+import { askJournal, changesSince, collect, diffAsset, exportWith, knownAt, readSignersFile, sealsOf, sealWith, timerEvery, timerFor, verifyBundleAt, verifyJournalOf, type StateCodec } from "../src/physical/mod.ts";
 
 type State = { readonly firewall: string };
 type Diff = { readonly from: string; readonly to: string } | "same";
@@ -148,5 +148,27 @@ proves(["0005-evidence-capture-views FR-007", "0005-evidence-capture-views FR-00
     await fs.writeTextFile(strangerSigners, JSON.stringify([other.signer]));
     const bad = await verifyBundleAt(out, strangerSigners, "2026-12-01T12:00:00Z");
     assert(bad.kind === "err" || !bad.value.ok, "a bundle is not verified with signers that did not sign it");
+  });
+});
+
+proves(["0006-evidence-capture-query FR-001", "0006-evidence-capture-query FR-002", "0006-evidence-capture-query FR-003", "0006-evidence-capture-query FR-004"], "the journal and the last look at each asset are relations, the questions of an operator are one line of SQL each, what is not one read is refused as a value, and the branch is asked through the store (a branch that does not exist says nothing was captured)", async () => {
+  await withJournal(async (store, dir) => {
+    const asked = async (sql: string, options = {}) => {
+      const r = await askJournal(store, "evidence", sql, options);
+      if (r.kind === "err") throw new Error(r.error);
+      return r.value;
+    };
+    assertEquals((await asked("SELECT type, count(*) AS n FROM journal GROUP BY type ORDER BY type")).rows, [["capture.changed", 3], ["capture.unchanged", 1]]);
+    assertEquals((await asked("SELECT asset, entries, changes, failures, last_type FROM assets")).rows, [["sparta", 4, 3, 0, "capture.changed"]]);
+    assertEquals((await asked("SELECT seq FROM journal WHERE at >= ? ORDER BY seq", { params: ["2026-12-01T10:30:00Z"] })).rows, [[3], [4]]);
+    const cut = await asked("SELECT seq FROM journal ORDER BY seq", { limit: 2 });
+    assert(cut.rows.length === 2 && cut.truncated, "cut");
+    for (const bad of ["DELETE FROM journal", "SELECT 1; SELECT 2", "SELECT nope FROM journal", "SELECT * FROM nowhere"]) assert((await askJournal(store, "evidence", bad)).kind === "err", bad);
+    const typo = await askJournal(store, "evidence", "SELECT subjec FROM journal");
+    assert(typo.kind === "err", "an unknown column");
+    assert((await proc.run(["git", "init", "-q", "-b", "main", path.join(dir, "empty")])).success);
+    const none = gitRefStore({ repo: path.join(dir, "empty"), branch: "evidence", identity: { name: "collector", email: "collector@localhost" } });
+    const nothing = await askJournal(none, "evidence", "SELECT 1");
+    assert(nothing.kind === "err" && nothing.error.includes("nothing was captured"), "no branch");
   });
 });

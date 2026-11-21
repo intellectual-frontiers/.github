@@ -1,0 +1,29 @@
+{
+  "at": "2026-11-21 03:00 UTC",
+  "commit": "cccc000cccc000cccc000cccc000cccc000cccc0000000",
+  "url": "https://github.com/example/fixture/actions/runs/3",
+  "libraries": {
+    "fixture": {
+      "tests": 12,
+      "passed": 9,
+      "failed": 3,
+      "skipped": 0,
+      "durationMs": 3000,
+      "failing": [
+        {
+          "id": "a1",
+          "name": "001-greeting FR-001: A names the person once"
+        },
+        {
+          "id": "b2",
+          "name": "001-greeting FR-002: B ends with a full stop"
+        },
+        {
+          "id": "e5",
+          "name": "001-greeting FR-001: E comes and goes"
+        }
+      ]
+    }
+  },
+  "missing": []
+}

@@ -1,4 +1,4 @@
-// Spec: 0001-docs FR-009, FR-010, FR-011, FR-012
+// Spec: 0001-docs FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016, FR-017
 /**
  * The evidence the site shows beside the code (docs 0001-docs FR-009 to FR-012): CTRF results, GitHub tickets and typed issues read from files, the Quality section made from them, the lines on a requirement, a library and a
  * module, the findings for a file that cannot be read and a test that names a requirement that is not there, and, with no run recorded, nothing shown as passed.
@@ -9,8 +9,12 @@ import { fs, path, proc } from "@intellectual-frontiers/system";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { report } from "../src/check.ts";
 import { loadConfig } from "../src/cli.ts";
+import { causeOf } from "../src/pages/quality.ts";
+import { movementsOf, parseHistoryRun, runsOf } from "../src/history.ts";
+import { sparkText } from "../src/emit/html.ts";
+import { document } from "../src/emit/html.ts";
 import { type EvidenceSource, resolveConfig } from "../src/config.ts";
-import { parseCtrf, parseTickets, readEvidence, requirementsIn, standing } from "../src/evidence.ts";
+import { parseCtrf, parseRuns, parseTickets, readEvidence, requirementsIn, standing } from "../src/evidence.ts";
 import { markdownOf } from "../src/emit/markdown.ts";
 import { buildSite } from "../src/site.ts";
 import { ROOT } from "./helpers.ts";
@@ -136,3 +140,162 @@ proves(["0001-docs FR-012"], "the evidence tool runs a library's suite into CTRF
     await fs.remove(out, { recursive: true });
   }
 }, { timeout: 180_000 });
+
+proves(["0001-docs FR-013", "0001-docs FR-011"], "the runs of the workflows are read from runs.json, and the Workflows page says how each ended, the last runs as marks, how long a run takes, which jobs failed, and what flaps", async () => {
+  const r = parseRuns(fs.readTextFileSync(path.join(EVIDENCE, "runs.json")));
+  assert("workflows" in r && r.workflows.length === 2 && r.workflows[0]?.runs.length === 5 && r.workflows[0].failed[0]?.jobs[0]?.step === "verify (its packing is checked)");
+  assert("error" in parseRuns("{}") && "error" in parseRuns("["), "a file that is not the runs is said so");
+  const b = await built({ results: EVIDENCE });
+  const page = markdownOf(b.pages.find((p) => p.path === "quality/ci.html") as never);
+  assertStringIncludes(page, "Workflows are failing");
+  assertStringIncludes(page, "The latest run of ci failed.");
+  assertStringIncludes(page, "✗ ✓ ✗ ✓ –");
+  assertStringIncludes(page, "| 12 |", "the latest run took 12 minutes");
+  assertStringIncludes(page, "flapping (3 flips in 4 runs)");
+  assertStringIncludes(page, "verify (grc)");
+  assertStringIncludes(page, "… |", "a run in progress is a mark");
+  assertStringIncludes(page, "| ci | 4 | 50% | 10 | 60 min |", "the share that passed, the median minutes, the median time to recover");
+  const none = markdownOf((await built({ issues: [] })).pages.find((p) => p.path === "quality/ci.html") as never);
+  assertStringIncludes(none, "The runs of the workflows are not recorded for this build of the site.");
+});
+
+proves(["0001-docs FR-011"], "the dashboard says which build this is and how the generator's own check ended, and a library with no report says why from what its job says", async () => {
+  const dir = await fs.makeTempDir({ prefix: "ifc-docs-status-" });
+  try {
+    await fs.writeTextFile(path.join(dir, "meta.json"), '{ "commit": "abc", "at": "2026-11-21 09:00 UTC" }');
+    await fs.writeTextFile(path.join(dir, "build.json"), fs.readTextFileSync(path.join(EVIDENCE, "build.json")));
+    await fs.writeTextFile(path.join(dir, "status-fixture.json"), '{ "library": "fixture", "install": "failure", "runner": "success", "tests": "skipped", "reported": false }');
+    await fs.writeTextFile(path.join(dir, "other.ctrf.json"), fs.readTextFileSync(path.join(EVIDENCE, "fixture.ctrf.json")));
+    const b = await built({ results: dir });
+    const dash = markdownOf(b.pages.find((p) => p.path === "quality/index.html") as never);
+    assertStringIncludes(dash, "from the commit [`fedcba9876`]");
+    assertStringIncludes(dash, "the generator's own tests and check failure");
+    assertStringIncludes(dash, "| no run |");
+    const lib = markdownOf(b.pages.find((p) => p.path === "quality/fixture.html") as never);
+    assertStringIncludes(lib, "No test report of the library is in the run these pages show: its packages could not be installed.");
+    for (const [status, why] of [['{ "library": "fixture", "install": "success", "runner": "failure", "tests": "skipped" }', "the test runner could not be installed"], ['{ "library": "fixture", "install": "success", "runner": "success", "tests": "cancelled" }', "its job was cancelled or timed out"], ['{ "library": "fixture", "install": "success", "runner": "success", "tests": "failure" }', "it has no suite, or the runner failed"]] as const) {
+      await fs.writeTextFile(path.join(dir, "status-fixture.json"), status);
+      assertStringIncludes(markdownOf((await built({ results: dir })).pages.find((p) => p.path === "quality/fixture.html") as never), why);
+    }
+  } finally {
+    await fs.remove(dir, { recursive: true });
+  }
+});
+
+proves(["0001-docs FR-011"], "the findings page says what the generator found while it made the site, by library, and that it found nothing where it did", async () => {
+  const b = await built({ results: EVIDENCE });
+  const page = markdownOf(b.pages.find((p) => p.path === "quality/findings.html") as never);
+  assertStringIncludes(page, "1 finding: 1 test-requirement-unknown.");
+  assertStringIncludes(page, "proves 001-greeting FR-009");
+  const clean = await built({ issues: [] });
+  assertStringIncludes(markdownOf(clean.pages.find((p) => p.path === "quality/findings.html") as never), "The generator found nothing wrong while it made this site");
+});
+
+proves(["0001-docs FR-015"], "a configuration's problems and a lens that throws are findings and the site is made without them", async () => {
+  const loaded = await loadConfig(FIXTURE);
+  assert(loaded.kind === "ok");
+  const broken = { name: "broken", read: async () => { throw new Error("the lens could not read its library"); } };
+  const throwsPages = { name: "pages", read: async () => () => { throw new Error("its pages could not be made"); } };
+  const throwsFiles = { name: "files", read: async () => (_b: unknown, n: number) => n, files: () => { throw new Error("its files could not be made"); } };
+  const b = await buildSite({ ...loaded.value, problems: [{ where: "commons/grc", error: "Cannot find package 'x'" }], lenses: [broken, throwsPages, throwsFiles] as never });
+  const said = report(b.found);
+  for (const want of ["commons/grc: the module could not be imported: Cannot find package", "lens broken: the module could not be imported: the lens could not read", "a lens's pages: the module could not be imported: its pages", "lens files: the module could not be imported: its files"]) assert(said.some((l) => l.startsWith(want) || l.includes(want)), `${want} in ${said.join(" | ")}`);
+  assert(b.pages.length > 5, "the site is made");
+  assertEquals(resolveConfig({ name: "N", repository: "https://github.com/e/n", home: { dir: ".", about: { title: "N", summary: "n." } }, packages: [], citations: { prefix: "n", digits: 3 }, problems: [{ where: "x", error: "y" }, 3] }, "/x/docs.config.ts").kind, "ok");
+});
+
+proves(["0001-docs FR-013", "0001-docs FR-014"], "the tool that reads the runs writes a file that says so where the API cannot be reached, and the emergency page is made from the evidence alone", async () => {
+  const out = await fs.makeTempDir({ prefix: "ifc-docs-tools-" });
+  try {
+    const cwd = path.join(ROOT, "commons/docs");
+    const runs = await proc.run(["bun", "tools/ci-runs.ts", "--out", path.join(out, "runs.json")], { cwd, env: { GITHUB_REPOSITORY: "", PATH: proc.env.get("PATH") ?? "" } });
+    assertEquals(runs.code, 0, runs.stderr);
+    const written = JSON.parse(fs.readTextFileSync(path.join(out, "runs.json"))) as { workflows: unknown[]; error?: string };
+    assertEquals([written.workflows.length, typeof written.error], [0, "string"]);
+    assert("workflows" in parseRuns(fs.readTextFileSync(path.join(out, "runs.json"))), "the file is a valid runs file");
+    await fs.writeTextFile(path.join(out, "build.log"), "Error: the build broke\n    at somewhere\n");
+    const site = path.join(out, "site");
+    const emergency = await proc.run(["bun", "tools/status-site.ts", "--evidence", EVIDENCE, "--log", path.join(out, "build.log"), "--out", site], { cwd });
+    assertEquals(emergency.code, 0, emergency.stderr);
+    const html = fs.readTextFileSync(path.join(site, "index.html"));
+    for (const said of ["the documentation build failed", "Error: the build broke", "fedcba9876", "<td>fixture</td><td>4</td><td>2</td><td>1</td><td>1</td>", "001-greeting FR-002", ">failure</a>"]) assertStringIncludes(html, said);
+    const bare = await proc.run(["bun", "tools/status-site.ts", "--out", path.join(out, "bare")], { cwd });
+    assertEquals(bare.code, 0, "with nothing at all it still writes a page");
+    assertStringIncludes(fs.readTextFileSync(path.join(out, "bare/index.html")), "No test report is kept.");
+    assertEquals((await proc.run(["bun", "tools/status-site.ts"], { cwd })).code, 2);
+  } finally {
+    await fs.remove(out, { recursive: true });
+  }
+}, { timeout: 120_000 });
+
+proves(["0001-docs FR-016"], "the history says how a library's tests moved over its runs: what began to fail, what was fixed, what keeps failing and what flaps, with trends, causes and the range of commits", async () => {
+  const b = await built({ results: EVIDENCE });
+  const ev = readEvidence(ROOT, { results: EVIDENCE }, []);
+  assertEquals(ev.history.length, 5);
+  assertEquals(runsOf(ev, "fixture").length, 5);
+  const m = movementsOf(ev, "fixture");
+  assertEquals(m.newlyFailing.map((x) => x.id), ["c3"]);
+  assertEquals(m.fixed.map((x) => x.id), ["d4"]);
+  assertEquals(m.persistent.map((x) => x.id), ["b2"]);
+  assertEquals(m.flaky.map((x) => [x.id, x.episodes]), [["e5", 2]], "a test that failed once is not flaky; one that failed in two separate stretches is");
+  assertEquals([m.from, m.to], ["dddd000".repeat(6) + "0000", "eeee000".repeat(6) + "0000"]);
+  const page = markdownOf(b.pages.find((p) => p.path === "quality/fixture.html") as never);
+  for (const said of ["## History", "*Tests: ", "*Pass rate: ", "*Time: ", "### Began to fail in the latest run (1)", "C is new", "### Fixed since the run before (1)", "D went away", "### Flapping: failed more than once, passing in the latest run (1)", "E comes and goes (failed in 2 separate stretches)", "https://github.com/example/fixture/compare/"]) assertStringIncludes(page, said);
+  const dash = markdownOf(b.pages.find((p) => p.path === "quality/index.html") as never);
+  assertStringIncludes(dash, "| Pass rate | Flaky |");
+  assert(/`[▁-█]{5}`/.test(dash), "a trend of the pass rate in the row");
+  const q = JSON.parse(b.files.find((f) => f.path === "quality.json")?.text ?? "{}") as { libraries: { library: string; flaky: string[]; newlyFailing: string[] }[] };
+  assertEquals(q.libraries.find((l) => l.library === "fixture")?.flaky, ["001-greeting FR-001: E comes and goes"]);
+  // the line, in the page itself
+  const html = document(b.pages.find((p) => p.path === "quality/fixture.html") as never, { name: "N", repository: "r", pages: b.pages });
+  assertStringIncludes(html, '<figure class="trend"><svg viewBox="0 0 120 28"');
+  assertStringIncludes(html, "Pass rate: ");
+  assertEquals(sparkText([1, 2, 3, 4, 5, 6, 7, 8]), "▁▂▃▄▅▆▇█");
+  assertEquals(sparkText([5, 5]), "▄▄");
+  assertEquals(sparkText([]), "");
+  assert("error" in parseHistoryRun("{") && "error" in parseHistoryRun("{}"), "a file that is not a run is said so");
+  assertEquals(causeOf("expected 'Hello, Ada' to end with '.' at /home/x/y/z.ts:12"), "expected '…' to end with '…' at <path>:N");
+  assertEquals(causeOf(undefined), "no message");
+});
+
+proves(["0001-docs FR-016"], "the history tool adds a run once, keeps the newest, and refuses evidence with no time", async () => {
+  const dir = await fs.makeTempDir({ prefix: "ifc-docs-history-" });
+  try {
+    const ev = path.join(dir, "evidence");
+    const hist = path.join(dir, "history");
+    await fs.ensureDir(ev);
+    await fs.writeTextFile(path.join(ev, "fixture.ctrf.json"), fs.readTextFileSync(path.join(EVIDENCE, "fixture.ctrf.json")));
+    await fs.writeTextFile(path.join(ev, "status-grc.json"), '{ "library": "grc", "reported": false }');
+    const cwd = path.join(ROOT, "commons/docs");
+    const run = (...a: string[]) => proc.run(["bun", "tools/history.ts", ...a], { cwd });
+    assertEquals((await run("--evidence", ev, "--history", hist)).code, 2, "no time, no run");
+    for (const n of [1, 2, 3]) {
+      await fs.writeTextFile(path.join(ev, "meta.json"), JSON.stringify({ at: `2026-11-21 0${n}:00 UTC`, commit: `c${n}`, url: `https://x/runs/${n}` }));
+      assertEquals((await run("--evidence", ev, "--history", hist, "--keep", "2")).code, 0);
+    }
+    assertEquals((await run("--evidence", ev, "--history", hist, "--keep", "2")).code, 0, "the same run again");
+    const files = [...fs.readDirSync(path.join(hist, "runs"))].map((e) => e.name).sort();
+    assertEquals(files, ["202611210200-2.json", "202611210300-3.json"]);
+    const r = parseHistoryRun(fs.readTextFileSync(path.join(hist, "runs", files[1] as string)));
+    assert("value" in r && r.value.missing[0] === "grc" && r.value.libraries["fixture"]?.failed === 1 && r.value.libraries["fixture"].failing[0]?.id.length === 8, JSON.stringify(r));
+  } finally {
+    await fs.remove(dir, { recursive: true });
+  }
+}, { timeout: 120_000 });
+
+proves(["0001-docs FR-017"], "each library is held to the gate of the configuration, shown and enforced nowhere, and the requirements page says how each specification stands", async () => {
+  const b = await built({ results: EVIDENCE, issues: [{ library: "fixture", issues: [ISSUE] }], gate: [{ id: "ran" }, { id: "tests-pass" }, { id: "no-blocking-issues" }, { id: "requirements-proved", min: 50 }] });
+  const lib = markdownOf(b.pages.find((p) => p.path === "quality/fixture.html") as never);
+  for (const said of ["## Quality gate", "The library does not hold 3 conditions of the gate. The gate is shown and enforces nothing", "| its tests were in the run | yes |", "| no test failed | no | 1 test failed |", "| no open issue of severity high or critical | no | 1 open issue of severity high or critical |", "| its requirements are proved (50%) | no | 33% of the requirements are proved, 50% are wanted |"]) assertStringIncludes(lib, said);
+  assertStringIncludes(markdownOf(b.pages.find((p) => p.path === "quality/index.html") as never), "| Library | Gate |");
+  const reqs = markdownOf(b.pages.find((p) => p.path === "quality/requirements.html") as never);
+  assertStringIncludes(reqs, "3 requirements of 2 specifications: 1 proved (33%), 0 partly, 1 failing, 1 with no test recorded.");
+  assertStringIncludes(reqs, "| [001-greeting](../specs/001-greeting.md) |");
+  const clean = await built({ results: EVIDENCE });
+  assertStringIncludes(markdownOf(clean.pages.find((p) => p.path === "quality/fixture.html") as never), "The library does not hold 1 condition of the gate");
+  const json = JSON.parse(clean.files.find((f) => f.path === "quality/fixture.json")?.text ?? "{}") as { gate: { condition: string; holds: boolean }[]; requirements: { proved: number; notProved: string[] }; history: unknown[] };
+  assertEquals(json.gate.map((g) => [g.condition, g.holds]), [["ran", true], ["tests-pass", false], ["no-blocking-issues", true]]);
+  assertEquals([json.requirements.proved, json.requirements.notProved.length, json.history.length], [1, 2, 5]);
+  const bad = resolveConfig({ name: "N", repository: "https://github.com/e/n", home: { dir: ".", about: { title: "N", summary: "n." } }, packages: [], citations: { prefix: "n", digits: 3 }, evidence: { gate: [{ id: "luck" }, { id: "requirements-proved", min: 200 }] } }, "/x/docs.config.ts");
+  assert(bad.kind === "err" && bad.error.join().includes("evidence.gate[0].id") && bad.error.join().includes("evidence.gate[1].min"));
+});

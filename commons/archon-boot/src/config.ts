@@ -43,6 +43,8 @@ export type BootPluginConfig = {
   readonly version: string;
   /** The program the plugin extends: `archon` by default. Its upper-case name prefixes the variables the plugin reads: `<PROGRAM>_BOOT_STATE`, `<PROGRAM>_BOOT_ASSETS` and `<PROGRAM>_SECRETS`. */
   readonly program?: string;
+  /** The boot profile served when `--profile` is not given: `ubuntu-26.04` by default (see the profiles of `@intellectual-frontiers/netboot/governance`). */
+  readonly profile?: string;
   /** The options of the fleet's own (where the tenant is), by name. */
   readonly options?: Readonly<Record<string, FleetOption>>;
   /** What is rendered for an asset, or why it is not to be installed. */
