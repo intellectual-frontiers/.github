@@ -300,6 +300,7 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/archon-dialect-opentofu/spec-kit" },
     { layout: "commons", dir: "commons/catalog-soc2/spec-kit" },
     { layout: "commons", dir: "commons/assessment/spec-kit" },
+    { layout: "commons", dir: "commons/tenancy/spec-kit" },
   ],
   citations: { prefix: "commons", digits: 4, text: ["erga", "archon", "stolos", "thyra"] },
   lenses: [guides, releases, dataModels, programs],
