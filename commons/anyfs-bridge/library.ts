@@ -13,7 +13,7 @@ export const library = {
   version: "0.1.0",
   distribution: ["github"],
   held: "new: built and verified but not released until the fleet store runs on it",
-  exports: [".", "./governance", "./logical", "./conformance", "./mirror"],
+  exports: [".", "./governance", "./logical", "./conformance", "./mirror", "./exchange"],
   family: { host: "anyfs", role: "plugin" },
   summary:
     "The bridge of AnyFS: copy, sync, move, check, two-way sync and mirror between any two stores. Every transfer is a plan first, in a fixed order with a hash, that says how each file was compared and what the destination would not keep; an apply refuses a plan that is not the one approved, guards every write by the revision the plan saw, and checks what it wrote. The rails (filters, limits, never-overwrite, protected paths) are code, and nothing here touches a file system or a network except through a store.",
@@ -46,6 +46,16 @@ export const library = {
           { name: "@intellectual-frontiers/core", subpaths: [] },
           { name: "@intellectual-frontiers/crypto", subpaths: ["sha256"] },
           { name: "@intellectual-frontiers/anyfs", subpaths: ["governance", "logical", "docs"] },
+        ],
+      },
+      {
+        folder: "src/exchange/",
+        layer: "logical",
+        mayImport: ["src/governance/", "src/logical/"],
+        packages: [
+          { name: "@intellectual-frontiers/core", subpaths: [] },
+          { name: "@intellectual-frontiers/crypto", subpaths: ["sha256"] },
+          { name: "@intellectual-frontiers/anyfs", subpaths: ["governance", "logical", "merge"] },
         ],
       },
       { folder: "src/", own: true },
