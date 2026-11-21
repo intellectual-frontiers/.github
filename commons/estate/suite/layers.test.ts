@@ -42,7 +42,7 @@ proves(["0001-estate-layers FR-002", "0001-estate-layers FR-006"], "below may no
   assertEquals(rules([at("src/governance/a.ts", `import { x } from "${PKG}/logical";\n`)]), ["layers/above"]);
   assertEquals(rules([at("src/logical/a.ts", `import { x } from "${PKG}/governance";\n`)]), []);
   assertEquals(rules([at("src/logical/a.ts", `import { x } from "../governance/commands.ts";\n`)]), ["layers/relative"]);
-  assertEquals(rules([at("src/governance/a.ts", `import { x } from "@intellectual-frontiers/grc/governance";\n`)]), ["layers/external"]);
+  assertEquals(rules([at("src/governance/a.ts", `import { x } from "@intellectual-frontiers/system";\n`)]), ["layers/external"]);
   assertEquals(rules([at("src/logical/a.ts", `import { x } from "@intellectual-frontiers/grc/logical";\n`)]), []);
   assertEquals(rules([at("src/logical/a.ts", `import { x } from "@intellectual-frontiers/system/proc";\n`)]), ["layers/external"]);
   assertEquals(rules([at("src/logical/a.ts", `import { x } from "node:fs";\n`)]), ["layers/external"]);

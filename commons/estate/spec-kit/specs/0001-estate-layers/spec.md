@@ -10,7 +10,7 @@
 ## Requirements
 
 - **FR-001**: The library MUST be Kanon: its manifest `library.ts` MUST declare the table of its units in the field `kanon`, with `src/governance/` and `src/logical/`, and the shared checker of `@intellectual-frontiers/kanon` MUST find no import that the table does not allow.
-- **FR-002**: Governance MUST import nothing but `@intellectual-frontiers/core`; Logical MUST import Governance, `core` and the governance and logical of `@intellectual-frontiers/grc`; no unit MUST reach another by a relative path.
+- **FR-002**: Governance MUST import nothing but `@intellectual-frontiers/core` and the governance of `@intellectual-frontiers/grc` (for durations); Logical MUST import Governance, `core` and the governance and logical of `@intellectual-frontiers/grc`; no unit MUST reach another by a relative path.
 - **FR-003**: The package MUST export `.`, `./governance` and `./logical`.
 - **FR-004**: `bun run verify` in the folder of the library MUST run the TypeScript 7 compiler, the checks of the specification kit, the check of the level L1, the layers check of Kanon, the trace check, the tests under Bun and the check of the package, and MUST fail on any finding that is not held by a baseline that only shrinks.
 - **FR-005**: The library MUST be released as `estate-v<version>` (commons 0026-works-versioning) and MUST be held until the owner says it is ready.

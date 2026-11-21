@@ -3,3 +3,4 @@ number	slug	state
 0002	machine-probe-contract	in force
 0003	machine-probe-observation	in force
 0004	machine-probe-policies	in force
+0005	machine-probe-state	in force

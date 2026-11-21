@@ -20,7 +20,7 @@ export const library = {
   kanon: {
     package: "@intellectual-frontiers/estate",
     units: [
-      { folder: "src/governance/", layer: "governance", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }] },
+      { folder: "src/governance/", layer: "governance", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/grc", subpaths: ["governance"] }] },
       {
         folder: "src/logical/",
         layer: "logical",

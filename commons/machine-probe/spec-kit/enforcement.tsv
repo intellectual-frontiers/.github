@@ -16,3 +16,7 @@ requirement	mechanism	by	note
 0003-machine-probe-observation FR-004	check	.github: cd commons/machine-probe && bun run verify	suite/observation.test.ts
 0004-machine-probe-policies FR-004	check	.github: cd commons/machine-probe && bun run verify	suite/policies.test.ts
 0002-machine-probe-contract FR-005	check	.github: cd commons/machine-probe && bun run verify	suite/over-ssh.test.ts
+0005-machine-probe-state FR-001	check	.github: cd commons/machine-probe && bun run verify	suite/state.test.ts
+0005-machine-probe-state FR-002	check	.github: cd commons/machine-probe && bun run verify	suite/state.test.ts
+0005-machine-probe-state FR-003	check	.github: cd commons/machine-probe && bun run verify	suite/state.test.ts
+0005-machine-probe-state FR-004	check	.github: cd commons/machine-probe && bun run verify	suite/state.test.ts
