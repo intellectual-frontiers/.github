@@ -1,4 +1,4 @@
-// Spec: 0001-docs FR-001, FR-025
+// Spec: 0001-docs FR-001, FR-025, FR-026
 /**
  * The API pages of each area (commons 0011-documentation FR-010): a page for each source file its exports come from, in the order its
  * entry points export them, with the file's module comment (what it is, its account, its examples, its limits) and an entry for each
@@ -13,6 +13,7 @@ import type { LinkScope } from "../links.ts";
 import type { Badge, Block, Inline } from "../model.ts";
 import { importIndex, testsImporting } from "../exercise.ts";
 import { standing } from "../evidence.ts";
+import { fileIssueBlocks, issuesNamingFile } from "./quality.ts";
 import { type Area, inside } from "../sources.ts";
 import { moduleComment } from "../tsdoc.ts";
 import { firstSentence } from "./overview.ts";
@@ -154,6 +155,8 @@ export function apiPages(b: Build, areas: readonly Area[], apis: readonly AreaAp
       }
       if (m.file === "") blocks.push({ kind: "paragraph", inlines: [textInl(m.summary)] });
       else blocks.push({ kind: "meta", inlines: [textInl("Source: "), { kind: "link", href: { kind: "external", url: b.index.blob(m.file) }, children: [{ kind: "code", text: m.file }] }] });
+      const naming = issuesNamingFile(b, m.file);
+      blocks.push(...fileIssueBlocks(b, m.file));
       let tested = 0;
       let exercised = 0;
       const head = blocks.length;
@@ -190,6 +193,7 @@ export function apiPages(b: Build, areas: readonly Area[], apis: readonly AreaAp
         path: m.page,
         title: m.title,
         description: m.summary || `${area.title}: ${m.title}`,
+        ...(naming.issues.length + naming.tickets.length === 0 ? {} : { badges: [{ text: `${naming.issues.length + naming.tickets.length} open`, tone: "warn" as const }] }),
         section: "api",
         group: area.title,
         order: 100 + ai * 100 + mi + 1,
