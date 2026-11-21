@@ -21,6 +21,7 @@ import {
   type MergeFinding,
   type MergeOutcome,
   type MergeRefusal,
+  type Trust,
   parseReplicaId,
   parseVersionId,
   type ReplicaId,
@@ -145,25 +146,40 @@ function findingsOf(state: MergeState, added: readonly Version[]): readonly Merg
   return out;
 }
 
+/**
+ * What a trust says of a delta before anything else is looked at: the replicas it names must be ones that are taken from, and under signed trust the delta must be signed by a key of its origin that was valid when its newest
+ * row was made. `undefined` where the trust takes the delta. A bridge holds a trust of its own and asks the same question, so that what a medium offers is judged by the owner of the command as well as by the replica.
+ */
+export async function trustRefusal(trust: Trust, delta: Delta): Promise<MergeRefusal | undefined> {
+  const replicas = new Set<ReplicaId>([delta.origin, ...delta.versions.map((v) => v.replica)]);
+  switch (trust.kind) {
+    case "open":
+      return undefined;
+    case "allowlist":
+      for (const r of replicas) if (!trust.replicas.has(r)) return { kind: "trust", message: `replica ${r} is not one this replica takes changes from` };
+      return undefined;
+    case "signed": {
+      const who = trust.replicas;
+      if (who !== undefined) for (const r of replicas) if (!who.has(r)) return { kind: "trust", message: `replica ${r} is not one this replica takes changes from` };
+      const id = await deltaId(delta);
+      if (delta.signature === undefined) return { kind: "unsigned", message: `the delta ${id.slice(0, 12)} is not signed, and this replica takes signed deltas only` };
+      const at = delta.versions.reduce((m, v) => Math.max(m, timeOfId(v.id).ms), 0);
+      const verdict = await trust.verify(id, delta.signature, delta.origin, at, "anyfs-delta/1");
+      if (verdict === "bad-signature") return { kind: "bad-signature", message: `the signature of the delta ${id.slice(0, 12)} does not hold` };
+      if (verdict === "unknown-key") return { kind: "unknown-key", message: `no key of replica ${delta.origin} that this replica knows made the signature of the delta ${id.slice(0, 12)}` };
+      return undefined;
+    }
+  }
+}
+
 type Step = { readonly state: MergeState; readonly outcome: MergeOutcome };
 
 async function judge(state: MergeState, delta: Delta, wall: number): Promise<Step> {
   const { config } = state;
   const keep = (outcome: MergeOutcome): Step => ({ state, outcome });
   if (delta.versions.length > config.limits.maxVersions) return keep(refuse("too-large", `a delta of ${delta.versions.length} rows: at most ${config.limits.maxVersions}`));
-  const replicas = new Set<ReplicaId>([delta.origin, ...delta.versions.map((v) => v.replica)]);
-  switch (config.trust.kind) {
-    case "open":
-      break;
-    case "allowlist":
-      for (const r of replicas) if (!config.trust.replicas.has(r)) return keep(refuse("trust", `replica ${r} is not one this replica takes changes from`));
-      break;
-    case "signed": {
-      const id = await deltaId(delta);
-      if (delta.signature === undefined || !config.trust.verify(id, delta.signature, delta.origin)) return keep(refuse("trust", `the delta ${id.slice(0, 12)} has no signature the replica accepts`));
-      break;
-    }
-  }
+  const untrusted = await trustRefusal(config.trust, delta);
+  if (untrusted !== undefined) return keep({ kind: "refused", refusal: untrusted });
   const blobs = new Map<string, Uint8Array>();
   for (const b of delta.blobs) {
     const bytes = fromBase64(b.bytes);

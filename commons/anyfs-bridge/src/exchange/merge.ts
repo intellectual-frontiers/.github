@@ -14,8 +14,8 @@
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
-import { describeProblem, type Delta, type MergeOutcome, type Problem, type VersionVector } from "@intellectual-frontiers/anyfs/governance";
-import { deltaId } from "@intellectual-frontiers/anyfs/merge";
+import { describeProblem, type Delta, type MergeOutcome, type Problem, type Trust, type VersionVector } from "@intellectual-frontiers/anyfs/governance";
+import { deltaId, type Signer, signDeltaBy, trustRefusal } from "@intellectual-frontiers/anyfs/merge";
 import type { Mergeable } from "./exchange.ts";
 
 /** What one store takes in a merge. */
@@ -88,20 +88,34 @@ export type MergeReport = { readonly toA: MergeOutcome | undefined; readonly toB
  * Applies a merge: the plan is made again, and where its hash is not the one approved nothing is applied; otherwise each store takes its delta, whole or not at all, and a second merge of the same stores changes
  * nothing.
  */
-export async function applyMerge(a: Mergeable, b: Mergeable, prepared: PreparedMerge, options: { readonly approved: string | undefined; readonly rails?: MergeRails }): Promise<Result<MergeReport, MergeProblem>> {
+export async function applyMerge(a: Mergeable, b: Mergeable, prepared: PreparedMerge, options: {
+    readonly approved: string | undefined;
+    readonly rails?: MergeRails;
+    /** The keys the deltas of this merge are signed with: each delta by the key of its origin, a delta of an origin with no key here unsigned. */
+    readonly signers?: readonly Signer[];
+    /** A trust each side judges what it is offered by before the store does: the first side by `toA`, the second by `toB`, each a trust of its own where the two differ. */
+    readonly trust?: { readonly a?: Trust; readonly b?: Trust };
+  },
+): Promise<Result<MergeReport, MergeProblem>> {
   if (options.approved !== prepared.plan.hash) return err(options.approved === undefined ? { kind: "unapproved", hash: prepared.plan.hash } : { kind: "stale", planned: options.approved, now: prepared.plan.hash });
   const again = await planMerge(a, b, options.rails ?? {});
   if (again.kind === "err") return again;
   if (again.value.plan.hash !== options.approved) return err({ kind: "stale", planned: options.approved, now: again.value.plan.hash });
   let toB: MergeOutcome | undefined;
   let toA: MergeOutcome | undefined;
+  const signers = options.signers ?? [];
+  const take = async (to: Mergeable, delta: Delta, trust: Trust | undefined): Promise<ReturnType<Mergeable["applyDelta"]>> => {
+    const signed = await signDeltaBy(delta, signers);
+    const refusal = trust === undefined ? undefined : await trustRefusal(trust, signed);
+    return refusal === undefined ? to.applyDelta(signed) : Promise.resolve({ kind: "ok" as const, value: { kind: "refused" as const, refusal } });
+  };
   if (again.value.toB !== undefined) {
-    const r = await b.applyDelta(again.value.toB);
+    const r = await take(b, again.value.toB, options.trust?.b);
     if (r.kind === "err") return err({ kind: "store", which: "b", problem: r.error });
     toB = r.value;
   }
   if (again.value.toA !== undefined) {
-    const r = await a.applyDelta(again.value.toA);
+    const r = await take(a, again.value.toA, options.trust?.a);
     if (r.kind === "err") return err({ kind: "store", which: "a", problem: r.error });
     toA = r.value;
   }

@@ -25,12 +25,13 @@ import {
   parseReplicaId,
   type Path,
   type Problem,
+  type Trust,
   type ReplicaId,
   type Version,
   type VersionVector,
 } from "@intellectual-frontiers/anyfs/governance";
 import type { Store } from "@intellectual-frontiers/anyfs/logical";
-import { DEFAULT_LIMITS, decodeDelta, deltaId, encodeDelta, horizonOf, type Limits } from "@intellectual-frontiers/anyfs/merge";
+import { DEFAULT_LIMITS, decodeDelta, deltaId, encodeDelta, horizonOf, type Limits, signDelta, type Signer, trustRefusal } from "@intellectual-frontiers/anyfs/merge";
 import { type Cursor, type CursorState } from "./cursor.ts";
 import { deltaPath, deltasPrefix, parseDeltaPath, parseVectorPath, vectorPath, vectorsPrefix } from "./names.ts";
 
@@ -62,6 +63,10 @@ export type ExchangeOptions = {
   readonly pull?: boolean;
   /** Whether to publish its own rows: yes where not given. */
   readonly publish?: boolean;
+  /** Whoever signs the files this replica publishes: where given every file it writes carries the signature of this key, and where not the files are unsigned. */
+  readonly signer?: Signer;
+  /** A trust the files of the others are judged by before the replica judges them by its own: a file the trust refuses is refused with the kind it names (`trust`, `unsigned`, `bad-signature`, `unknown-key`) and the replica is not asked. */
+  readonly trust?: Trust;
 };
 
 /** Why a synchronization could not be made at all: the medium or the replica failed. A file that fails is in the report, not here. */
@@ -92,7 +97,7 @@ export type Pulled = {
 /** What a synchronization did. */
 export type SyncReport = { readonly published: readonly Published[]; readonly pulled: Pulled; readonly vector: VersionVector };
 
-const DEFAULT_QUARANTINE: ReadonlySet<MergeRefusalKind> = new Set<MergeRefusalKind>(["malformed", "too-large", "bad-sum", "bad-blob", "forged"]);
+const DEFAULT_QUARANTINE: ReadonlySet<MergeRefusalKind> = new Set<MergeRefusalKind>(["malformed", "too-large", "bad-sum", "bad-blob", "forged", "unsigned", "bad-signature"]);
 const DEFAULT_MAX_ROWS = 5000;
 const enc = new TextEncoder();
 const dec = new TextDecoder();
@@ -136,8 +141,9 @@ export async function publishOwn(options: ExchangeOptions, state: CursorState): 
     const rows: Version[] = own.slice(i, i + maxRows);
     const shas = new Set(rows.flatMap((v) => (v.blob === null ? [] : [v.blob])));
     const blobs = delta.value.blobs.filter((b) => shas.has(b.sha));
-    const chunk = { ...delta.value, origin: self, versions: rows, blobs };
-    const id = await deltaId(chunk);
+    const bare = { ...delta.value, origin: self, versions: rows, blobs };
+    const id = await deltaId(bare);
+    const chunk = options.signer === undefined ? bare : await signDelta(bare, options.signer);
     const first = rows[0] as Version;
     const end = rows[rows.length - 1] as Version;
     const path = deltaPath({ replica: self, from: first.seq, to: end.seq, id });
@@ -213,6 +219,11 @@ export async function pullOthers(options: ExchangeOptions, state: CursorState): 
         put("quarantined", `the file of replica ${file.name.replica} holds the row ${foreign.id} of replica ${foreign.replica}`);
         continue;
       }
+    }
+    const gate = options.trust === undefined ? undefined : await trustRefusal(options.trust, decoded.value);
+    if (gate !== undefined) {
+      put(quarantine.has(gate.kind) ? "quarantined" : "refused", `refused (${gate.kind}): ${gate.message}`);
+      continue;
     }
     const taken = await replica.applyDelta(decoded.value);
     if (taken.kind === "err") return err({ kind: "replica", problem: taken.error });

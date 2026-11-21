@@ -16,7 +16,9 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import type { MergeFinding } from "@intellectual-frontiers/anyfs/governance";
+import { sha256 } from "@intellectual-frontiers/crypto/sha256";
+import { type MergeFinding, parseReplicaId, type ReplicaId, timeOfId, type VersionId } from "@intellectual-frontiers/anyfs/governance";
+import type { Signer } from "@intellectual-frontiers/anyfs/merge";
 import { type Naming, type SqlDialect, type SqlRunner, tableOf, type SqlPort } from "@intellectual-frontiers/anyfs-sql/governance";
 import { layoutOf } from "./layout.ts";
 import { type Dump, type DumpedVersion, redump } from "./redump.ts";
@@ -243,6 +245,46 @@ export function parseDump(text: string, naming: Naming): Result<Dump, string> {
   return ok({ versions, blobs });
 }
 
+/**
+ * What a replica that signs says of a dump it made: which replica made it, the SHA-256 of its text and how many rows and blobs it holds, in its key. A dump is data that anything can write, so under signed trust a dump is replayed only with a manifest
+ * whose signature holds; what is signed is the digest with the counts (`<sha256>:<rows>:<blobs>`) under the domain `anyfs-dump/1`, so that a signature of a delta or an epoch is never one of a dump. The file next to a dump is named `<replica>.sql.sig`.
+ */
+export type DumpManifest = { readonly format: 1; readonly replica: ReplicaId; readonly sha256: string; readonly versions: number; readonly blobs: number; readonly signature: string };
+
+/** A dump with the manifest that was signed for it. */
+export type SignedDump = { readonly text: string; readonly manifest: DumpManifest };
+
+const manifestDigest = (sha: string, versions: number, blobs: number): string => `${sha}:${versions}:${blobs}`;
+
+/** Signs a dump: the manifest of its text, from the rows it holds. */
+export async function signDump(text: string, naming: Naming, signer: Signer): Promise<Result<SignedDump, string>> {
+  const d = parseDump(text, naming);
+  if (d.kind === "err") return d;
+  const sum = await sha256(text);
+  const signature = await signer.sign("anyfs-dump/1", manifestDigest(sum, d.value.versions.length, d.value.blobs.length));
+  return ok({ text, manifest: { format: 1, replica: signer.replica, sha256: sum, versions: d.value.versions.length, blobs: d.value.blobs.length, signature } });
+}
+
+/** The text of a manifest, as it is kept in `<replica>.sql.sig`. */
+export const manifestText = (m: DumpManifest): string => `${JSON.stringify(m)}\n`;
+
+/** A manifest from its text, or why it is not one. */
+export function parseManifest(source: string): Result<DumpManifest, string> {
+  let x: unknown;
+  try {
+    x = JSON.parse(source);
+  } catch {
+    return err("a manifest of a dump is JSON");
+  }
+  if (typeof x !== "object" || x === null) return err("a manifest of a dump is an object");
+  const o = x as { readonly [k: string]: unknown };
+  const replica = typeof o["replica"] === "string" ? parseReplicaId(o["replica"]) : err("a manifest names its replica");
+  if (replica.kind === "err") return replica;
+  if (o["format"] !== 1 || typeof o["sha256"] !== "string" || !/^[0-9a-f]{64}$/u.test(o["sha256"]) || typeof o["signature"] !== "string") return err("a manifest is format 1 with a digest and a signature");
+  if (typeof o["versions"] !== "number" || typeof o["blobs"] !== "number" || !Number.isSafeInteger(o["versions"]) || !Number.isSafeInteger(o["blobs"]) || o["versions"] < 0 || o["blobs"] < 0) return err("a manifest counts the rows and the blobs");
+  return ok({ format: 1, replica: replica.value, sha256: o["sha256"], versions: o["versions"], blobs: o["blobs"], signature: o["signature"] });
+}
+
 /** What replaying dumps did: the rows and blobs that were new, and what is wrong with the database after. */
 export type Imported = { readonly versions: number; readonly blobs: number; readonly findings: readonly MergeFinding[] };
 
@@ -250,12 +292,25 @@ export type Imported = { readonly versions: number; readonly blobs: number; read
  * Replays dumps into the database of a store: the schema is there (the store made it), every dump is read as rows before anything is written (a text that is not a dump of plain inserts changes nothing), the rows are
  * replayed in one transaction through the trigger that refuses a replica the database does not trust (and the whole replay is undone where one is refused), the index of search is made again, and every row and blob is checked.
  */
-export async function importDumps(store: SqlStore, texts: readonly string[]): Promise<Result<Imported, string>> {
+export async function importDumps(store: SqlStore, inputs: readonly (string | SignedDump)[]): Promise<Result<Imported, string>> {
   const l = store.ctx.l;
   const parsed: Dump[] = [];
-  for (const text of texts) {
+  const trust = store.ctx.config.trust;
+  for (const input of inputs) {
+    const text = typeof input === "string" ? input : input.text;
     const d = parseDump(text, store.facts.naming);
     if (d.kind === "err") return d;
+    if (trust.kind === "signed") {
+      // under signed trust a dump is data anyone could have written: it is replayed only with the manifest of a replica that is on the list (where there is one) and whose key signed this text and these counts, and no row may be of a replica off the list
+      if (typeof input === "string") return err("the dump is not signed, and this database takes signed dumps only");
+      const m = input.manifest;
+      if (trust.replicas !== undefined && !trust.replicas.has(m.replica)) return err(`the dump is from replica ${m.replica}, which this database does not take rows from`);
+      if ((await sha256(text)) !== m.sha256 || d.value.versions.length !== m.versions || d.value.blobs.length !== m.blobs) return err("the dump is not the one its manifest was signed for");
+      if (trust.replicas !== undefined) for (const v of d.value.versions) if (!trust.replicas.has(v[2] as ReplicaId)) return err(`the dump holds a row of replica ${v[2]}, which this database does not take rows from`);
+      const at = d.value.versions.reduce((n, v) => Math.max(n, timeOfId(v[0] as VersionId).ms), 0);
+      const verdict = await trust.verify(manifestDigest(m.sha256, m.versions, m.blobs), m.signature, m.replica, at, "anyfs-dump/1");
+      if (verdict !== "ok") return err(verdict === "bad-signature" ? "the signature of the dump does not hold" : `no key of replica ${m.replica} that this database knows made the signature of the dump`);
+    }
     parsed.push(d.value);
   }
   let added: { readonly versions: number; readonly blobs: number };

@@ -81,3 +81,9 @@ requirement	mechanism	by	note
 0009-anyfs-merge-physical FR-010	check	.github: cd commons/anyfs && bun run verify	suite/merge-layout.test.ts
 0009-anyfs-merge-physical FR-011	check	.github: cd commons/anyfs && bun run verify	suite/merge-layout.test.ts
 0009-anyfs-merge-physical FR-012	check	.github: cd commons/anyfs && bun run verify	suite/merge-layout.test.ts
+0010-anyfs-merge-signing FR-001	check	.github: cd commons/anyfs && bun run verify	suite/merge-signing.test.ts
+0010-anyfs-merge-signing FR-002	check	.github: cd commons/anyfs && bun run verify	suite/merge-signing.test.ts
+0010-anyfs-merge-signing FR-003	check	.github: cd commons/anyfs && bun run verify	suite/merge-signing.test.ts
+0010-anyfs-merge-signing FR-004	check	.github: cd commons/anyfs && bun run verify	suite/merge-signing.test.ts
+0010-anyfs-merge-signing FR-005	check	.github: cd commons/anyfs && bun run verify	suite/merge-signing.test.ts
+0010-anyfs-merge-signing FR-006	check	.github: cd commons/anyfs && bun run verify	suite/merge-signing.test.ts

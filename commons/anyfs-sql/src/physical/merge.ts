@@ -253,8 +253,14 @@ export async function judgeDelta(r: SqlRunner, c: Ctx, delta: Delta, wall: numbe
       for (const who of replicas) if (!config.trust.replicas.has(who)) return none(refused("trust", `replica ${who} is not one this replica takes changes from`));
       break;
     case "signed": {
+      const listed = config.trust.replicas;
+      if (listed !== undefined) for (const who of replicas) if (!listed.has(who)) return none(refused("trust", `replica ${who} is not one this replica takes changes from`));
       const id = await deltaId(delta);
-      if (delta.signature === undefined || !config.trust.verify(id, delta.signature, delta.origin)) return none(refused("trust", `the delta ${id.slice(0, 12)} has no signature the replica accepts`));
+      if (delta.signature === undefined) return none(refused("unsigned", `the delta ${id.slice(0, 12)} is not signed, and this replica takes signed deltas only`));
+      const at = delta.versions.reduce((m, v) => Math.max(m, timeOfId(v.id).ms), 0);
+      const verdict = await config.trust.verify(id, delta.signature, delta.origin, at, "anyfs-delta/1");
+      if (verdict === "bad-signature") return none(refused("bad-signature", `the signature of the delta ${id.slice(0, 12)} does not hold`));
+      if (verdict === "unknown-key") return none(refused("unknown-key", `no key of replica ${delta.origin} that this replica knows made the signature of the delta ${id.slice(0, 12)}`));
       break;
     }
   }

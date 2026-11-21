@@ -278,8 +278,10 @@ export async function openSqlStore(port: SqlPort, options: SqlOptions = {}): Pro
     await execQ(tx, l.upsertFact("fingerprint", identity.fingerprint));
     await execQ(tx, l.insertTrust(replica));
     if (identity.forkedFrom !== undefined) await execQ(tx, l.insertTrust(identity.forkedFrom));
-    await execQ(tx, l.upsertFact("trust_mode", trust.kind));
-    if (trust.kind === "allowlist") for (const who of trust.replicas) await execQ(tx, l.insertTrust(who));
+    // the mode the database itself enforces on a row it is given by SQL: the allowlist for an allowlist and for signed changes whose replicas are known (the signature is checked by the library, the replica by the database), and nothing for the rest
+    const known = trust.kind === "allowlist" ? trust.replicas : trust.kind === "signed" ? (trust.replicas ?? trust.signers) : undefined;
+    await execQ(tx, l.upsertFact("trust_mode", trust.kind === "open" || known === undefined ? "open" : "allowlist"));
+    if (known !== undefined) for (const who of known) await execQ(tx, l.insertTrust(who));
   });
 
   /** A transaction that writes: where two connections write side by side the writers take turns, so that the one that wins a path is the one that read it last. */

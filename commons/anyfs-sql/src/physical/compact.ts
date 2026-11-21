@@ -16,9 +16,9 @@
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
-import { describeProblem, expectAbsent, parsePath, parsePrefix, parseReplicaId, type ReplicaId, type VersionVector } from "@intellectual-frontiers/anyfs/governance";
+import { describeProblem, expectAbsent, parsePath, parsePrefix, parseReplicaId, type ReplicaId, timeOfId, type VersionId, type VersionVector } from "@intellectual-frontiers/anyfs/governance";
 import type { Store } from "@intellectual-frontiers/anyfs/logical";
-import { compareText, headsOf, horizonOf } from "@intellectual-frontiers/anyfs/merge";
+import { compareText, headsOf, horizonOf, type Signer } from "@intellectual-frontiers/anyfs/merge";
 import type { SqlPort, SqlRunner } from "@intellectual-frontiers/anyfs-sql/governance";
 import { type Ctx, epochsOfDatabase, heldKeys, latestEpoch, runQ, execQ, stateOf, vectorOfDatabase } from "./merge.ts";
 import { numberOf, textOf } from "./sql.ts";
@@ -31,6 +31,8 @@ export type EpochProposal = {
   readonly roster: readonly ReplicaId[];
   readonly retained: readonly string[];
   readonly bound: string;
+  /** What the replica that made the epoch says of its identity, where it signs: not part of the identity. */
+  readonly signature?: string;
 };
 
 /** What a collection did. */
@@ -77,7 +79,18 @@ export function decodeEpoch(text: string): Result<EpochProposal, string> {
     if (id.kind === "err") return id;
     ids.push(id.value);
   }
-  return ok({ format: 1, proposer: proposer.value, horizon, roster: ids, retained, bound: o["bound"] });
+  if (o["signature"] !== undefined && typeof o["signature"] !== "string") return err("the signature of an epoch is text");
+  return ok({ format: 1, proposer: proposer.value, horizon, roster: ids, retained, bound: o["bound"], ...(typeof o["signature"] === "string" ? { signature: o["signature"] } : {}) });
+}
+
+/** The text of an epoch record as it is kept in a medium: its identity's text and the signature where it has one. */
+export function encodeEpochFile(p: EpochProposal): string {
+  return JSON.stringify({ ...(JSON.parse(encodeEpoch(p)) as object), ...(p.signature === undefined ? {} : { signature: p.signature }) });
+}
+
+/** An epoch signed by the replica that made it: the signature is over the identity of the epoch, which is made without it. */
+export async function signEpoch(p: EpochProposal, signer: Signer): Promise<EpochProposal> {
+  return { ...p, signature: await signer.sign("anyfs-epoch/1", await epochId(p)) };
 }
 
 const BATCH = 500;
@@ -149,7 +162,14 @@ export async function compactDatabase(port: SqlPort, c: Ctx, input: CompactInput
 export async function adoptEpoch(port: SqlPort, c: Ctx, proposal: EpochProposal): Promise<Result<Compacted | "nothing", string>> {
   const trust = c.config.trust;
   if (trust.kind === "allowlist" && !trust.replicas.has(proposal.proposer)) return err(`the epoch is from replica ${proposal.proposer}, which this replica does not take changes from`);
-  if (trust.kind === "signed") return err("an epoch is not signed: a replica that takes signed changes only does not adopt it");
+  if (trust.kind === "signed") {
+    // an epoch changes what a replica holds as a delta does, so it is taken on the same terms: the proposer must be on the list where there is one, and the epoch must be signed by a key of the proposer, valid when the epoch's rows were made
+    if (trust.replicas !== undefined && !trust.replicas.has(proposal.proposer)) return err(`the epoch is from replica ${proposal.proposer}, which this replica does not take changes from`);
+    if (proposal.signature === undefined) return err("the epoch is not signed, and this replica takes signed changes only");
+    const at = proposal.bound === "" ? Date.now() : timeOfId(proposal.bound as VersionId).ms;
+    const verdict = await trust.verify(await epochId(proposal), proposal.signature, proposal.proposer, at, "anyfs-epoch/1");
+    if (verdict !== "ok") return err(verdict === "bad-signature" ? "the signature of the epoch does not hold" : `no key of replica ${proposal.proposer} that this replica knows made the signature of the epoch`);
+  }
   const own = await vectorOfDatabase(port, c);
   const behind = Object.entries(proposal.horizon).find(([r, n]) => (own[r] ?? 0) < n);
   if (behind !== undefined) {
@@ -209,10 +229,11 @@ export async function epochPath(p: EpochProposal): Promise<Result<ReturnType<typ
 }
 
 /** Publishes an epoch to a medium, written once; where it is there already it is the same file. */
-export async function publishEpoch(medium: Store<"write">, p: EpochProposal): Promise<Result<string, string>> {
+export async function publishEpoch(medium: Store<"write">, p: EpochProposal, signer?: Signer): Promise<Result<string, string>> {
   const path = await epochPath(p);
   if (path.kind === "err") return path;
-  const w = await medium.write(path.value, new TextEncoder().encode(encodeEpoch(p)), expectAbsent);
+  const signed = signer === undefined ? p : await signEpoch(p, signer);
+  const w = await medium.write(path.value, new TextEncoder().encode(encodeEpochFile(signed)), expectAbsent);
   if (w.kind === "err" && w.error.kind !== "conflict") return err(describeProblem(w.error));
   return ok(path.value);
 }
