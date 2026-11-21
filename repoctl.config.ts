@@ -23,6 +23,14 @@ const generators: readonly GeneratorInput[] = [
     outputs: ["commons/*/dependencies.auto.json"],
   },
   {
+    id: "single-tools",
+    summary: "The devDependencies of commons/commons and its bun.lock: every third-party package that compiling the libraries needs, from their manifests and the sources they pack.",
+    command: ["bun", "commons/libraries/src/pack-commons.ts", "--tools"],
+    inputs: ["commons/*/library.ts", "commons/*/src/**", "commons/libraries/src/pack-tools.ts"],
+    outputs: ["commons/commons/package.json", "commons/commons/bun.lock"],
+    mixed: ["commons/commons/package.json"],
+  },
+  {
     id: "packaging",
     summary: "The packaging tables (TOML, shell, TypeScript, pins and rules) from the packaging ontology.",
     command: ["bun", "commons/tools/generate-packaging.ts"],

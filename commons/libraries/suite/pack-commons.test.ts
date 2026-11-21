@@ -4,11 +4,12 @@
  *
  * @module
  */
-import { mkdirSync, readTextFileSync, symlinkSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { existsSync as existsSyncOf, mkdirSync, readTextFileSync, symlinkSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { dirname, fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
 import { proc } from "@intellectual-frontiers/system";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { importSpecifiers } from "../src/scan.ts";
+import { filesUnder } from "../src/pack-library.ts";
 import { activeMode, DISTRIBUTION, DISTRIBUTION_MODES, parseMode } from "../src/distribution.ts";
 import {
   type Command,
@@ -21,9 +22,15 @@ import {
   oldSpecifiers,
   packCommons,
   rewriteSpecifiers,
+  NOT_RUNTIME,
   runsWhenLoaded,
+  toolsFindingsOf,
+  toolsOfLibraries,
   unionDependencies,
+  packableLibraries,
+  factsOf,
 } from "../src/pack-commons.ts";
+import { devDependenciesOf, importedPackages, linkTools, readLock, toolFindings, toolsOf, typesPackageOf, writeTools } from "../src/pack-tools.ts";
 
 const DIST = "0036-distribution";
 const LIBRARIES = resolve(dirname(fromFileUrl(import.meta.url)), "..");
@@ -35,9 +42,11 @@ const facts = (name: string, extra: Partial<Facts> = {}): Facts => ({
   summary: `${name}.`,
   exports: { ".": "./src/mod.ts" },
   roots: ["src"],
+  folders: [],
   bin: {},
   dependencies: {},
   drivers: {},
+  devDependencies: {},
   held: false,
   ...extra,
 });
@@ -142,7 +151,16 @@ function make(dir: string): void {
   w("commons/alpha/library.ts", manifest("alpha", { exports: [".", "./util"] }));
   w("commons/alpha/package.json", JSON.stringify({ name: "@intellectual-frontiers/alpha", version: "0.1.0", type: "module", exports: { ".": "./src/mod.ts", "./util": "./src/util.ts" } }));
   w("commons/alpha/src/mod.ts", 'export const alpha = (): string => "a";\n');
-  w("commons/alpha/src/util.ts", 'import { alpha } from "./mod.ts";\n\n/** The name twice. */\nexport const twice = (): string => `${alpha()}${alpha()}`;\n');
+  w(
+    "commons/alpha/src/util.ts",
+    'import { readFileSync } from "node:fs";\nimport { dirname, join } from "node:path";\nimport { fileURLToPath } from "node:url";\nimport { alpha } from "./mod.ts";\n\n/** The name twice. */\nexport const twice = (): string => `${alpha()}${alpha()}`;\n\n/** The text of the data folder, which is beside the sources and, from the compiled module, beside `dist`. */\nexport const data = (): string => readFileSync(join(dirname(fileURLToPath(import.meta.url)), "..", "data", "x.txt"), "utf8");\n',
+  );
+  w("commons/alpha/data/x.txt", "the data of alpha\n");
+  w("commons/alpha/data/sub/y.txt", "deeper\n");
+  w("commons/alpha/suite/a.test.ts", "export {};\n");
+  w("commons/alpha/spec-kit/spec.md", "# spec\n");
+  w("commons/alpha/tools/pack.ts", "export {};\n");
+  w("commons/alpha/acceptance/kit.md", "# kit\n");
   w("commons/beta/library.ts", manifest("beta", { exports: [".", "./util"] }));
   w("commons/beta/package.json", JSON.stringify({ name: "@intellectual-frontiers/beta", version: "0.1.0", type: "module", exports: { ".": "./src/mod.ts", "./util": "./src/util.ts" }, bin: { beta: "./bin/beta.mjs" } }));
   w("commons/beta/bin/beta.mjs", 'import { main } from "../src/cli.ts";\nprocess.exit(await main(process.argv.slice(2)));\n');
@@ -154,6 +172,11 @@ function make(dir: string): void {
   w("commons/commons/LICENSE", "PolyForm Noncommercial License 1.0.0\n");
   mkdirSync(join(dir, "commons", "node_modules", "@intellectual-frontiers"), { recursive: true });
   for (const l of ["alpha", "beta"]) symlinkSync(join(dir, "commons", l), join(dir, "commons", "node_modules", "@intellectual-frontiers", l));
+}
+
+/** The files of an unpacked package, by path (a helper of the tests below). */
+function readLibraryFiles(folder: string): readonly string[] {
+  return filesUnder(folder);
 }
 
 const OPTIONS = { tsc: join(LIBRARIES, "node_modules", "typescript", "bin", "tsc"), toolsFolder: LIBRARIES, parallel: 2 };
@@ -183,6 +206,12 @@ proves([`${DIST} FR-021`, `${DIST} FR-022`, `${DIST} FR-023`, `${DIST} FR-024`, 
     writeTextFileSync(join(dir, "consumer", "use.mjs"), 'import { beta } from "@intellectual-frontiers/commons/beta";\nimport { twice } from "@intellectual-frontiers/commons/alpha/util";\nconsole.log(beta(), twice());\n');
     const ran = await proc.run(["node", "use.mjs"], { cwd: join(dir, "consumer") });
     assertEquals(ran.stdout.trim().split("\n"), ["beta loaded", "ba aa"]);
+    // the data folder of a library is read from the installed package by Node (from the compiled module) and by Bun (from the source), and what only develops the library is not in the package
+    writeTextFileSync(join(dir, "consumer", "data.mjs"), 'import { data } from "@intellectual-frontiers/commons/alpha/util";\nprocess.stdout.write(data());\n');
+    for (const runtime of ["node", proc.which("bun") ?? "bun"]) assertEquals((await proc.run([runtime, "data.mjs"], { cwd: join(dir, "consumer") })).stdout, "the data of alpha\n", `${runtime} reads the data folder`);
+    const shipped = new Set(readLibraryFiles(into));
+    for (const f of ["alpha/data/x.txt", "alpha/data/sub/y.txt", "alpha/dist/data/x.txt", "alpha/dist/data/sub/y.txt"]) assert(shipped.has(f), `${f} is in the package`);
+    for (const f of shipped) for (const dev of ["suite", "spec-kit", "tools", "acceptance"]) assert(!f.startsWith(`alpha/${dev}/`) && !f.startsWith(`alpha/dist/${dev}/`), `${f} only develops the library and is not in the package`);
     // a missing library
     const without = JSON.parse(readTextFileSync(join(stage, "package.json"))) as Record<string, unknown>;
     const keep = (m2: Record<string, unknown>): void => writeTextFileSync(join(stage, "package.json"), JSON.stringify(m2));
@@ -221,5 +250,83 @@ proves([`${DIST} FR-021`, `${DIST} FR-022`, `${DIST} FR-023`, `${DIST} FR-024`, 
     const clash = await packCommons(dir, OPTIONS);
     assertEquals(clash.tarball, undefined);
     assertStringIncludes(clash.findings.join("\n"), "the command beta is declared by alpha and by beta");
+  });
+});
+
+
+proves([`${DIST} FR-030`], "every folder of a library that is not one that only develops it is shipped, and the folders that are not shipped are the closed set NOT_RUNTIME; in the real repository the data of the catalogs, the guides of Docs and the installers of Ergonex are among them", () => {
+  assertEquals([...NOT_RUNTIME].sort(), ["aat", "acceptance", "bin", "dist", "node_modules", "oat", "spec-kit", "suite", "tools", "uat"]);
+  const byName = new Map(packableLibraries(REPO).libraries.map((l) => [l.name, factsOf(REPO, l).facts.folders] as const));
+  assertEquals(byName.get("catalog-nist-sp800"), ["data"]);
+  assertEquals(byName.get("catalog-nist-csf-2"), ["data"]);
+  assertEquals(byName.get("docs"), ["guides"]);
+  assertEquals(byName.get("ergonex"), ["install"]);
+  for (const [name, folders] of byName) for (const f of folders) assert(!NOT_RUNTIME.has(f), `${name}/${f} is a development folder`);
+});
+
+proves([`${DIST} FR-029`], "the tools of the package are the union of the dependencies and the drivers, the compiler, the types of Node and of a package, and what the packed sources import, each at one version; a package no manifest versions and two versions of one are findings", () => {
+  assertEquals(typesPackageOf("pg"), "@types/pg");
+  assertEquals(typesPackageOf("@duckdb/node-api"), "@types/duckdb__node-api");
+  const lib = (name: string, dependencies: Record<string, string>, devDependencies: Record<string, string>) => ({ name, roots: ["src"], dependencies, devDependencies });
+  const made = toolsOf(
+    [lib("docs", { shiki: "4.5.0", typescript: "7.1.0-beta" }, { "@types/node": "26.6.6" }), lib("data", {}, { pg: "8.23.1", "@types/pg": "8.23.1", typescript: "7.0.2", "@types/node": "26.6.6", "left-pad": "1.3.0" })],
+    { shiki: "4.5.0", typescript: "7.1.0-beta", pg: "8.23.1" },
+    new Map([["left-pad", "data/src/a.ts"]]),
+  );
+  assertEquals(made.problems, []);
+  assertEquals(made.tools, { "@types/node": "26.6.6", "@types/pg": "8.23.1", "left-pad": "1.3.0", pg: "8.23.1", shiki: "4.5.0", typescript: "7.1.0-beta" });
+  assertStringIncludes(toolsOf([lib("a", {}, {})], {}, new Map([["zod", "a/src/x.ts"]])).problems.join("\n"), "zod is needed (a/src/x.ts imports it) and no library names a version of it");
+  assertStringIncludes(toolsOf([lib("a", {}, { zod: "4.1.12" }), lib("b", {}, { zod: "3.0.0" })], {}, new Map([["zod", "a/src/x.ts"]])).problems.join("\n"), "the libraries name 3.0.0 and 4.1.12");
+  assertEquals([...importedPackages([{ file: "a.ts", text: 'import { x } from "zod/v4";\nimport "node:fs";\nimport { y } from "./y.ts";\nimport { z } from "@intellectual-frontiers/core";\nimport s from "@scope/pkg/sub";\n' }]).keys()], ["zod", "@scope/pkg"]);
+});
+
+proves([`${DIST} FR-029`], "a package the libraries need that the manifest or the lockfile of the folder lacks, or holds at another version, is a finding that names it, and the writing form makes the manifest what the tools say", () => {
+  const tools = { pg: "8.23.1", shiki: "4.5.0" };
+  const manifest = JSON.stringify({ name: "x", devDependencies: { "@intellectual-frontiers/system": "link:../system", shiki: "4.5.0" } });
+  const lock = (workspace: Record<string, string>, packages: Record<string, string>): string =>
+    `${JSON.stringify({ workspaces: { "": { devDependencies: workspace } }, packages: Object.fromEntries(Object.entries(packages).map(([k, v]) => [k, [`${k}@${v}`, "", {}, "sha"]])) }, null, 2)}\n`;
+  const complete = lock({ pg: "8.23.1", shiki: "4.5.0" }, { pg: "8.23.1", shiki: "4.5.0" });
+  assertEquals(readLock(complete)?.versions.get("pg"), "8.23.1");
+  const written = writeTools(manifest, tools);
+  assertEquals(written.changed, true);
+  assertEquals(JSON.parse(written.text).devDependencies, { "@intellectual-frontiers/system": "link:../system", pg: "8.23.1", shiki: "4.5.0" });
+  assertEquals(writeTools(written.text, tools).changed, false);
+  assertEquals(devDependenciesOf({ a: "1.0.0", "b": "link:../b" }, tools), { b: "link:../b", pg: "8.23.1", shiki: "4.5.0" });
+  assertEquals(toolFindings("commons/commons", written.text, complete, tools), []);
+  assertStringIncludes(toolFindings("commons/commons", manifest, complete, tools).join("\n"), "commons/commons/package.json has no devDependency pg@8.23.1");
+  assertStringIncludes(toolFindings("commons/commons", written.text, lock({ shiki: "4.5.0" }, { shiki: "4.5.0" }), tools).join("\n"), "commons/commons/bun.lock does not hold pg@8.23.1");
+  assertStringIncludes(toolFindings("commons/commons", written.text, lock({ pg: "8.0.0", shiki: "4.5.0" }, { pg: "8.0.0", shiki: "4.5.0" }), tools).join("\n"), "bun.lock holds pg@8.0.0");
+  assertStringIncludes(toolFindings("commons/commons", written.text, undefined, tools).join("\n"), "bun.lock is missing");
+});
+
+proves([`${DIST} FR-029`], "in the real repository the manifest and the lockfile of commons/commons hold every package that compiling the libraries needs, so that a library that starts to need another is found here", () => {
+  const listed = packableLibraries(REPO);
+  const facts = listed.libraries.map((l) => factsOf(REPO, l).facts);
+  const union = unionDependencies(facts);
+  assertEquals(union.problems, []);
+  const needed = toolsOfLibraries(REPO, facts, union.dependencies);
+  assertEquals(needed.problems, []);
+  for (const must of ["typescript", "@types/node", "beautiful-mermaid", "shiki", "@duckdb/node-api", "@electric-sql/pglite", "pg", "@types/pg"]) assert(must in needed.tools, `${must} is a tool`);
+  assertEquals(toolsFindingsOf(REPO, needed.tools), []);
+  // a library that starts to need a package the folder lacks: shown on a tool that is not there
+  assertStringIncludes(toolsFindingsOf(REPO, { ...needed.tools, "left-pad": "1.3.0" }).join("\n"), "no devDependency left-pad@1.3.0");
+});
+
+proves([`${DIST} FR-029`], "the third-party packages of the folder of the package are linked where the sources of a library are resolved from, those that are already there are left, and the libraries are not touched", async () => {
+  await withTempDir((dir) => {
+    const tools = join(dir, "tools");
+    for (const p of ["shiki", "@types/pg", "@intellectual-frontiers/system", "already"]) {
+      mkdirSync(join(tools, "node_modules", p), { recursive: true });
+      writeTextFileSync(join(tools, "node_modules", p, "package.json"), "{}\n");
+    }
+    mkdirSync(join(dir, "commons", "node_modules", "already"), { recursive: true });
+    const first = linkTools(dir, tools);
+    assertEquals("made" in first ? first.made : -1, 2);
+    assertEquals(readTextFileSync(join(dir, "commons", "node_modules", "shiki", "package.json")), "{}\n");
+    assertEquals(readTextFileSync(join(dir, "commons", "node_modules", "@types", "pg", "package.json")), "{}\n");
+    assert(!existsSyncOf(join(dir, "commons", "node_modules", "@intellectual-frontiers")), "the libraries of commons are linked by link.ts, not here");
+    const again = linkTools(dir, tools);
+    assertEquals("made" in again ? again.made : -1, 0);
+    return Promise.resolve();
   });
 });

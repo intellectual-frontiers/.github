@@ -5,6 +5,7 @@
  *     bun commons/commons/tools/pack.ts            (in commons/commons) pack `dist/intellectual-frontiers-commons-<version>.tgz`
  *     bun commons/commons/tools/pack.ts --check    the same, and print what was found; exit 1 where anything was
  *     bun commons/libraries/src/pack-commons.ts --report    the facts of the package without compiling: the libraries, the keys of `exports`, the commands and the dependencies
+ *     bun commons/libraries/src/pack-commons.ts --tools [--check]    the packages that compiling needs, in `commons/commons/package.json` and `bun.lock` (pack-tools.ts, FR-029)
  *
  * @remarks
  * A library is a folder of commons with a manifest that is not a metapackage ({@link packableLibraries}); `single` mode leaves none out unless `SINGLE_EXCLUDED` names it (a `held` library is packed like any other). The package maps a library to
@@ -14,7 +15,9 @@
  * is written as `@intellectual-frontiers/commons/<library>[/<subpath>]` in the compiled files, the declarations and the sources the package carries (the package names itself, which Node, Bun and TypeScript resolve). The sources of this repository keep the name of
  * the library (Kanon, 0033-kanon FR-010). The dependencies are the union of the runtime dependencies of the libraries and of the drivers the libraries take as ports (`SINGLE_DRIVERS`), each at an exact version; the commands are those the libraries declare,
  * each a launcher in `bin/` that imports the compiled module; the files of the package that do something when they are loaded (a module that installs a port, a command) are named in `sideEffects`, and every other is free of effects, which the inspection proves by
- * reading the compiled files.
+ * reading the compiled files. A folder of a library other than its entries' folders and those of {@link NOT_RUNTIME} (the data of a catalog, the guides of Docs, the installers of Ergonex) is shipped beside the sources and beside `dist/`, so that a module reads it at the
+ * same relative path from its source (Bun) and from its compiled file (Node). The libraries are resolved by name and the third-party packages from `commons/commons` alone (they are linked under `commons/node_modules`, which is not committed), so that a fresh clone in which only
+ * that folder was installed packs the package; the folder's `package.json` and `bun.lock` hold what that takes (`pack-tools.ts`), which the packer checks before it compiles.
  *
  * @limits
  * It builds from the sources of a checkout and does not publish; the release runs it (`bun tools/pack.ts` in `commons/commons`) and the workflow publishes the tarball. It needs the TypeScript compiler of `commons/commons` (or of the repository's root) installed.
@@ -32,12 +35,14 @@
  */
 import process from "node:process";
 import { chmod } from "@intellectual-frontiers/system/fs";
-import { existsSync, mkdirSync, readTextFileSync, removeSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { existsSync, mkdirSync, readDirSync, readTextFileSync, removeSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { dirname, join, resolve, toPosix } from "@intellectual-frontiers/system/path";
 import { env, run, which } from "@intellectual-frontiers/system/proc";
 import { activeMode, GITHUB_REGISTRY, MODE_VARIABLE, SINGLE, SINGLE_DRIVERS, SINGLE_EXCLUDED, SINGLE_TARGETS } from "./distribution.ts";
 import { type Library, readLibraries } from "./libraries.ts";
 import { licenseOf } from "./license.ts";
+import { linkAll } from "./link.ts";
+import { devDependenciesOf, importedPackages, linkTools, sourcesOf, syncTools, toolFindings, toolsOf, type Tools } from "./pack-tools.ts";
 import { importSpecifiers, scanSource, specifierRanges } from "./scan.ts";
 import { filesUnder, isObject, namesNodeTypes, noDot, packageOf, rewriteDeclarationSpecifiers, SCOPE, tarballName, targetsOf } from "./pack-library.ts";
 
@@ -68,12 +73,16 @@ export type Facts = {
   readonly exports: Readonly<Record<string, string>>;
   /** The folders of the library's folder that its entries and commands are in (`src`; `engine`, `sql`, ... for `data`). */
   readonly roots: readonly string[];
+  /** The other folders of the library's folder that the package ships beside them: what the library reads at run time (`data`, `guides`, `install`); see {@link NOT_RUNTIME}. */
+  readonly folders: readonly string[];
   /** The commands the library declares in `bin`. */
   readonly bin: Readonly<Record<string, string>>;
   /** Its runtime dependencies on packages that are not of commons, each with the version the library names. */
   readonly dependencies: Readonly<Record<string, string>>;
   /** What it names of the drivers of {@link SINGLE_DRIVERS} in its `dependencies` or `devDependencies`. */
   readonly drivers: Readonly<Record<string, string>>;
+  /** Its `devDependencies` that are not of commons: what the compiler needs of it besides its runtime dependencies. */
+  readonly devDependencies: Readonly<Record<string, string>>;
   readonly held: boolean;
 };
 
@@ -97,6 +106,13 @@ export function packableLibraries(repo: string): { readonly libraries: readonly 
   return { libraries: out, problems };
 }
 
+/**
+ * The folders of a library's folder that are not shipped: what develops, proves and documents the library and is never read by its code at run time (its tests, its specifications, its tools and its acceptance kits, 0027-commons-libraries FR-025), what
+ * the packer makes itself (the launchers of `bin`) and what a build or an install leaves. Every other folder of a library's folder is shipped beside its sources and its compiled files, so that a folder a library reads at run time (the data of a catalog, the guides of
+ * Docs, the installers of Ergonex) is in the package without a list that someone keeps.
+ */
+export const NOT_RUNTIME: ReadonlySet<string> = new Set(["suite", "spec-kit", "tools", "acceptance", "oat", "uat", "aat", "bin", "dist", "node_modules"]);
+
 /** The first folder of a path from a library's folder: `./src/mod.ts` is `src`. */
 const rootOf = (target: string): string => noDot(target).split("/")[0] ?? "";
 
@@ -117,6 +133,8 @@ export function factsOf(repo: string, l: Library): { readonly facts: Facts; read
   if (manifestKeys !== packageKeys) problems.push(`commons/${l.name}: the exports of library.ts (${manifestKeys}) are not those of package.json (${packageKeys})`);
   const bin = Object.fromEntries(Object.entries(objectOf(pkg["bin"])).flatMap(([k, v]) => (typeof v === "string" ? [[k, v] as const] : [])));
   const roots = [...new Set([...Object.values(exportsOut), ...Object.values(bin).filter((b) => b.endsWith(".ts"))].map(rootOf))].filter((r) => r !== "").sort(byName);
+  const dir = join(repo, "commons", l.name);
+  const folders = (existsSync(dir) ? readDirSync(dir) : []).filter((e) => e.isDirectory && !e.name.startsWith(".") && !NOT_RUNTIME.has(e.name) && !roots.includes(e.name)).map((e) => e.name).sort(byName);
   const strings = (v: unknown): Record<string, string> => Object.fromEntries(Object.entries(objectOf(v)).flatMap(([k, x]) => (typeof x === "string" ? [[k, x] as const] : [])));
   const dependencies = Object.fromEntries(Object.entries(strings(pkg["dependencies"])).filter(([k]) => !k.startsWith(`${SCOPE}/`)));
   const dev = strings(pkg["devDependencies"]);
@@ -125,7 +143,19 @@ export function factsOf(repo: string, l: Library): { readonly facts: Facts; read
     return version === undefined ? [] : [[d, version] as const];
   }));
   return {
-    facts: { name: l.name, version: l.version, summary: l.summary ?? text(pkg["description"]), exports: exportsOut, roots, bin, dependencies, drivers, held: l.held !== undefined },
+    facts: {
+      name: l.name,
+      version: l.version,
+      summary: l.summary ?? text(pkg["description"]),
+      exports: exportsOut,
+      roots,
+      folders,
+      bin,
+      dependencies,
+      drivers,
+      devDependencies: Object.fromEntries(Object.entries(dev).filter(([k]) => !k.startsWith(`${SCOPE}/`))),
+      held: l.held !== undefined,
+    },
     problems,
   };
 }
@@ -392,15 +422,10 @@ function compilerOf(repo: string, folder: string, given: string | undefined): st
 }
 
 /** Builds one library: the compiler's output under `<work>/<library>/out/<library>/`, or the reason it could not. */
-async function compileLibrary(repo: string, f: Facts, work: string, bun: string, tsc: string, tools: string, thirdParty: readonly string[]): Promise<Findings> {
+async function compileLibrary(repo: string, f: Facts, work: string, bun: string, tsc: string, tools: string): Promise<Findings> {
   const dir = join(work, f.name);
   mkdirSync(dir, { recursive: true });
   const commons = join(repo, "commons");
-  const paths: Record<string, readonly string[]> = {};
-  for (const p of thirdParty) {
-    paths[p] = [join(tools, "node_modules", p)];
-    paths[`${p}/*`] = [join(tools, "node_modules", p, "*")];
-  }
   writeTextFileSync(
     join(dir, "tsconfig.json"),
     JSON.stringify(
@@ -416,7 +441,6 @@ async function compileLibrary(repo: string, f: Facts, work: string, bun: string,
           typeRoots: [toPosix(join(tools, "node_modules", "@types"))],
           skipLibCheck: true,
           preserveSymlinks: true,
-          ...(thirdParty.length === 0 ? {} : { paths }),
         },
         include: f.roots.map((r) => `${toPosix(join(commons, f.name, r))}/**/*.ts`),
       },
@@ -503,14 +527,25 @@ export async function packCommons(repo: string, options: PackCommonsOptions = {}
   found.push(...union.problems);
   if (found.length > 0) return fail(found);
   const tools = options.toolsFolder ?? folder;
+  // what compiling needs is what the folder installs by itself: the manifest and the lockfile of the folder carry it (FR-029); a given tools folder (a test's) is its own
+  if (options.toolsFolder === undefined) {
+    const needed = toolsOfLibraries(root, facts, union.dependencies);
+    found.push(...needed.problems, ...toolsFindingsOf(root, needed.tools));
+    if (found.length > 0) return fail(found);
+  }
   const tsc = compilerOf(root, folder, options.tsc);
   if (tsc === undefined) return fail([`the TypeScript compiler is not installed: run bun install in ${SINGLE.folder} (or at the root)`]);
   const bun = which("bun") ?? "bun";
+  // the libraries by their names, and the third-party packages of the folder, where the sources of a library are resolved from (a fresh clone has installed only the folder of the package)
+  const linked = linkAll(root);
+  if ("problem" in linked) return fail([linked.problem]);
+  const linkedTools = linkTools(root, tools);
+  if ("problem" in linkedTools) return fail([linkedTools.problem]);
   if (existsSync(dist)) removeSync(dist, { recursive: true });
   mkdirSync(stage, { recursive: true });
   const work = join(dist, "work");
   const names = new Set(facts.map((f) => f.name));
-  const compiled = await pool(facts, options.parallel ?? 4, (f) => compileLibrary(root, f, work, bun, tsc, tools, Object.keys(union.dependencies)));
+  const compiled = await pool(facts, options.parallel ?? 4, (f) => compileLibrary(root, f, work, bun, tsc, tools));
   found.push(...compiled.flat());
   if (found.length > 0) return fail(found);
   // the files of each library: its compiled files and declarations, its sources and the files beside them
@@ -530,6 +565,14 @@ export async function packCommons(repo: string, options: PackCommonsOptions = {}
         const inPackage = `${r}/${rel}`;
         place(source, join(stage, f.name, inPackage), names, unknown, `${f.name}/${inPackage}`);
         if (!rel.endsWith(".ts")) place(source, join(stage, f.name, "dist", inPackage), names, unknown, `${f.name}/dist/${inPackage}`);
+      }
+    }
+    // the folders the library reads at run time: where its sources are (Bun) and where its compiled files are (Node), at the same path from the module that reads them
+    for (const r of f.folders) {
+      const from = join(root, "commons", f.name, r);
+      for (const rel of filesUnder(from)) {
+        place(join(from, rel), join(stage, f.name, r, rel), names, unknown, `${f.name}/${r}/${rel}`);
+        place(join(from, rel), join(stage, f.name, "dist", r, rel), names, unknown, `${f.name}/dist/${r}/${rel}`);
       }
     }
   }
@@ -615,6 +658,51 @@ export function singleExportKeys(repo: string): readonly string[] {
   return reportOf(repo).exports;
 }
 
+/** The tools that compiling the libraries needs (FR-029): from their manifests and from what their packed sources import. */
+export function toolsOfLibraries(repo: string, facts: readonly Facts[], union: Tools): { readonly tools: Tools; readonly problems: Findings } {
+  const sources = facts.map((f) => ({ name: f.name, roots: f.roots, dependencies: f.dependencies, devDependencies: { ...f.devDependencies, ...f.drivers } }));
+  const imported = importedPackages(facts.flatMap((f) => sourcesOf(repo, f.name, f.roots)));
+  return toolsOf(sources, union, imported);
+}
+
+/** What the manifest and the lockfile of the folder of the package lack of the tools. */
+export function toolsFindingsOf(repo: string, tools: Tools): Findings {
+  const folder = join(repo, SINGLE.folder);
+  const read = (name: string): string | undefined => (existsSync(join(folder, name)) ? readTextFileSync(join(folder, name)) : undefined);
+  return toolFindings(SINGLE.folder, read("package.json"), read("bun.lock"), tools);
+}
+
+/** `--tools`: the manifest and the lockfile of the folder hold the tools; written, or only checked. */
+async function toolsMain(repo: string, check: boolean): Promise<number> {
+  const root = resolve(repo);
+  const listed = packableLibraries(root);
+  const found: string[] = [...listed.problems];
+  const facts: Facts[] = [];
+  for (const l of listed.libraries) {
+    const r = factsOf(root, l);
+    found.push(...r.problems);
+    facts.push(r.facts);
+  }
+  const union = unionDependencies(facts);
+  found.push(...union.problems);
+  const needed = toolsOfLibraries(root, facts, union.dependencies);
+  found.push(...needed.problems);
+  if (found.length > 0) {
+    for (const f of found) console.error(f);
+    return 1;
+  }
+  if (!check) found.push(...(await syncTools(root, SINGLE.folder, needed.tools)));
+  else {
+    const current = existsSync(join(root, SINGLE.folder, "package.json")) ? (JSON.parse(readTextFileSync(join(root, SINGLE.folder, "package.json"))) as { devDependencies?: Record<string, string> }).devDependencies ?? {} : {};
+    const expected = devDependenciesOf(current, needed.tools);
+    if (JSON.stringify(expected) !== JSON.stringify(current)) found.push(`${SINGLE.folder}/package.json has devDependencies that are not the tools of the libraries: run bun commons/libraries/src/pack-commons.ts --tools`);
+    found.push(...toolsFindingsOf(root, needed.tools));
+  }
+  for (const f of found) console.error(f);
+  if (found.length === 0) console.log(`${SINGLE.folder}: ${Object.keys(needed.tools).length} tools, in its package.json and its bun.lock`);
+  return found.length > 0 ? 1 : 0;
+}
+
 /** The command line of `commons/commons/tools/pack.ts`: pack, print what was found (or the tarball) and the exit status. */
 export async function main(repo: string, argv: readonly string[], options: PackCommonsOptions = {}): Promise<number> {
   const mode = activeMode(env.get(MODE_VARIABLE));
@@ -631,6 +719,7 @@ export async function main(repo: string, argv: readonly string[], options: PackC
     console.log("pack check skipped: no export and no packer changed in this push (IFC_SKIP_PACK); the release packs it");
     return 0;
   }
+  if (argv.includes("--tools")) return toolsMain(repo, argv.includes("--check"));
   if (argv.includes("--report")) {
     const r = reportOf(repo);
     console.log(JSON.stringify({ libraries: r.libraries.length, exports: r.exports.length, commands: r.commands.map((c) => c.name), dependencies: r.dependencies, problems: r.problems }, null, 2));

@@ -313,11 +313,12 @@ export function formatVerifierError(e: VerifierError): string {
 }
 
 /**
- * Where a verifier file may be, from the folder of the module that asks: beside the module (the source layout, and Bun's `bun` condition on a published package),
- * then in the `src/assessor/` of the package that the compiled module `dist/assessor/` belongs to (the published layout under Node, where only `.js` and `.d.ts` are compiled).
+ * Where a verifier file may be, from the folder of the module that asks, in the three layouts a module runs in: beside the module (the source layout, and Bun's `bun` condition on a published package),
+ * in the `src/assessor/` of the package that the compiled module `dist/assessor/` belongs to (the per-library package under Node, where only `.js` and `.d.ts` are compiled), and in the `src/assessor/` of the library
+ * folder that the compiled module `<library>/dist/src/assessor/` belongs to (the one package of commons under Node, `@intellectual-frontiers/commons/quality`, where the sources are shipped at the paths they have in the library's folder).
  */
 export function verifierCandidates(here: string, file: VerifierFile): readonly string[] {
-  return [join(here, file), join(here, "..", "..", "src", "assessor", file)];
+  return [join(here, file), join(here, "..", "..", "src", "assessor", file), join(here, "..", "..", "..", "src", "assessor", file)];
 }
 
 /** The verifier's two files read from the first place each is found, from the folder of the module that asks (FR-066, FR-069). */

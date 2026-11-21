@@ -1,6 +1,6 @@
 /**
  * Where the assessor finds the verifier's two source files (commons 0001-quality-evidence FR-069): beside its own module in the source layout, and in the `src/assessor/` of the package from
- * its compiled `dist/assessor/` in the published layout (where only `.js` and `.d.ts` are beside it); a file in neither place is a typed error naming the places. The packed and installed
+ * its compiled `dist/assessor/` in the per-library layout and in the `src/assessor/` of the library's folder from `dist/src/assessor/` in the layout of the one package of commons (where only `.js` and `.d.ts` are beside it); a file in none of the places is a typed error naming the places. The packed and installed
  * package makes a pack on Node 26 and on Bun in `tests/release/quality-assessor-package.test.ts`.
  *
  * @module
@@ -14,7 +14,7 @@ const SOURCES = join(dirname(fromFileUrl(import.meta.url)), "..", "src", "assess
 
 proves(
   ["0001-quality-evidence FR-069"],
-  "the verifier's files are found beside the module and in the src/assessor of the package from dist/assessor, and a file in neither place is a typed error naming the places",
+  "the verifier's files are found beside the module, in the src/assessor of the package from dist/assessor and in the src/assessor of the library folder from dist/src/assessor, and a file in none of the places is a typed error naming the places",
   async () => {
     const tmp = await makeTempDir({ prefix: "ifc-verifier-locator-" });
     try {
@@ -34,6 +34,15 @@ proves(
       const published = await verifierSources(dist);
       assert(published.kind === "ok");
       assertEquals(published.value, { pack: "// pack\n", main: "// main\n" });
+      // the layout of the one package of commons: <library>/dist/src/assessor holds no .ts, <library>/src/assessor does
+      const single = join(tmp, "single", "quality");
+      await mkdir(join(single, "dist", "src", "assessor"), { recursive: true });
+      await mkdir(join(single, "src", "assessor"), { recursive: true });
+      await writeTextFile(join(single, "src", "assessor", "verify-pack.ts"), "// single pack\n");
+      await writeTextFile(join(single, "src", "assessor", "verify.ts"), "// single main\n");
+      const inSingle = await verifierSources(join(single, "dist", "src", "assessor"));
+      assert(inSingle.kind === "ok");
+      assertEquals(inSingle.value, { pack: "// single pack\n", main: "// single main\n" });
       // a package without them: the error names the file and where it was looked for
       const bare = join(tmp, "bare", "dist", "assessor");
       await mkdir(bare, { recursive: true });

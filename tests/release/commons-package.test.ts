@@ -98,6 +98,46 @@ proves(
           const called = await sh([rt, "call.mjs"], project);
           assertStringIncludes(called.out, "ok ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb");
         }
+        // the folders that libraries read at run time are in the installed package, and the libraries that read them find them, under Node (from the compiled modules) and under Bun (from the sources): the NIST catalogs load
+        // through the catalog loader of grc, the guides of Docs are beside its modules, and Quality finds the two source files of its verifier
+        await fs.writeTextFile(
+          path.join(project, "runtime.mjs"),
+          [
+            'import { existsSync, readdirSync } from "node:fs";',
+            'import { dirname, join } from "node:path";',
+            'import { fileURLToPath } from "node:url";',
+            `import { PACKAGE_DIR as sp800 } from "${SELF}/catalog-nist-sp800/physical";`,
+            `import { PACKAGE_DIR as csf } from "${SELF}/catalog-nist-csf-2/physical";`,
+            `import { readCatalogPackage } from "${SELF}/grc/physical";`,
+            `import { standardKinds } from "${SELF}/grc/logical";`,
+            `import { verifierCandidates, verifierSources } from "${SELF}/quality/assessor/host";`,
+            "const out = {};",
+            "for (const [name, dir] of [['sp800', sp800], ['csf', csf]]) {",
+            "  const r = await readCatalogPackage(dir, standardKinds());",
+            "  out[name] = r.kind === 'ok' ? r.value.documents.map((d) => d.controls.length) : JSON.stringify(r.error).slice(0, 300);",
+            "}",
+            `const root = dirname(fileURLToPath(import.meta.resolve("${SELF}/docs")));`,
+            "const guides = [join(root, '..', 'guides'), join(root, '..', '..', 'guides')];",
+            "out.guides = guides.map((g) => existsSync(g) ? readdirSync(g).length : 0);",
+            "const here = dirname(fileURLToPath(import.meta.resolve('" + SELF + "/quality/assessor/host')));",
+            "const v = await verifierSources(here);",
+            "out.verifier = v.kind === 'ok' ? [v.value.pack.length > 100, v.value.main.length > 100] : v.error;",
+            "out.candidates = verifierCandidates(here, 'verify-pack.ts').length;",
+            'console.log(JSON.stringify({ runtime: typeof Bun === "undefined" ? "node" : "bun", ...out }));',
+            "process.exit(0);",
+            "",
+          ].join("\n"),
+        );
+        for (const rt of [node, bun]) {
+          const ran = await sh([rt, "runtime.mjs"], project);
+          assertEquals(ran.code, 0, `${tool}: runtime ${rt}: ${ran.out.slice(0, 800)}`);
+          const seen = JSON.parse(ran.out.trim().split("\n").at(-1) ?? "{}") as Record<string, unknown>;
+          const label = `${tool} on ${rt}`;
+          assertEquals(seen["sp800"], [1014, 2781, 97, 422], `${label}: the SP 800 catalog loads from the installed package`);
+          assert(Array.isArray(seen["csf"]) && seen["csf"].length === 1 && Number(seen["csf"][0]) > 100, `${label}: the CSF 2.0 catalog loads from the installed package: ${JSON.stringify(seen["csf"])}`);
+          assertEquals(seen["verifier"], [true, true], `${label}: Quality finds its verifier's two files`);
+          assert(Array.isArray(seen["guides"]) && seen["guides"].some((n) => typeof n === "number" && n > 20), `${label}: the guides of Docs are in the package`);
+        }
         // the commands run on Node, by their launchers
         for (const c of ["anyfs", "ergonex", "repoctl", "ifc-docs", "arcactl"]) {
           const ran = await sh([node, path.join(project, "node_modules", ".bin", c), "--help"], project);
