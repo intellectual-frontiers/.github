@@ -26,3 +26,10 @@ requirement	mechanism	by	note
 0003-anyfs-ssh-store FR-008	check	.github: cd commons/anyfs-ssh && bun run verify	suite/store.test.ts: bytes that the host did not keep as sent are tampered
 0003-anyfs-ssh-store FR-009	check	.github: cd commons/anyfs-ssh && bun run verify	suite/store.test.ts: an object of more than the most is refused
 0003-anyfs-ssh-store FR-010	check	.github: cd commons/anyfs-ssh && bun run verify	suite/store.test.ts: a host with no tool for SHA-256, no such folder or a helper of another protocol is not taken
+0004-anyfs-ssh-sshd-test FR-001	check	.github: cd commons/anyfs-ssh && bun run verify	suite/sshd-tool.test.ts: the requirement
+0004-anyfs-ssh-sshd-test FR-002	check	.github: cd commons/anyfs-ssh && bun run verify	suite/sshd-tool.test.ts: the requirement
+0004-anyfs-ssh-sshd-test FR-003	check	.github: cd commons/anyfs-ssh && bun run verify	suite/sshd-tool.test.ts: the requirement
+0004-anyfs-ssh-sshd-test FR-004	check	.github: cd commons/anyfs-ssh && bun run verify	suite/sshd-tool.test.ts: the requirement
+0004-anyfs-ssh-sshd-test FR-005	check	.github: cd commons/anyfs-ssh && bun run verify	suite/sshd-tool.test.ts: the requirement
+0004-anyfs-ssh-sshd-test FR-006	check	.github: cd commons/anyfs-ssh && bun run verify	suite/sshd-tool.test.ts: the requirement
+0004-anyfs-ssh-sshd-test FR-007	check	.github: cd commons/anyfs-ssh && bun run verify	suite/sshd.test.ts: the requirement
