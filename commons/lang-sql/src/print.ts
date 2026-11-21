@@ -415,10 +415,16 @@ class Printer {
     }
   }
 
-  tail(q: { readonly orderBy: readonly OrderItem[]; readonly limit: Expr | undefined; readonly offset: Expr | undefined; readonly locking: string | undefined; readonly settings: string | undefined }, parts: string[]): void {
+  tail(q: { readonly orderBy: readonly OrderItem[]; readonly limit: Expr | undefined; readonly limitOptions: string | undefined; readonly offset: Expr | undefined; readonly locking: string | undefined; readonly settings: string | undefined }, parts: string[]): void {
     if (q.orderBy.length > 0) parts.push(`ORDER BY ${this.order(q.orderBy)}`);
-    if (q.limit !== undefined) parts.push(`LIMIT ${this.expr(q.limit)}`);
-    if (q.offset !== undefined) parts.push(`OFFSET ${this.expr(q.offset)}`);
+    if (q.limit !== undefined && q.limitOptions !== undefined) {
+      // the words a LIMIT cannot say: the offset comes before the fetch
+      if (q.offset !== undefined) parts.push(`OFFSET ${this.expr(q.offset)} ROWS`);
+      parts.push(`FETCH FIRST ${this.expr(q.limit)} ${q.limitOptions.includes("PERCENT") ? "PERCENT " : ""}ROWS ${q.limitOptions.includes("TIES") ? "WITH TIES" : "ONLY"}`);
+    } else {
+      if (q.limit !== undefined) parts.push(`LIMIT ${this.expr(q.limit)}`);
+      if (q.offset !== undefined) parts.push(`OFFSET ${this.expr(q.offset)}`);
+    }
     if (q.locking !== undefined) parts.push(q.locking);
     if (q.settings !== undefined) parts.push(q.settings);
   }

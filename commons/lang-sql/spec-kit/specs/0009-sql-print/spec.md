@@ -18,6 +18,10 @@
 
 - **FR-005**: A grammar MUST be able to list units (`{ unit, factor }`, the unit a word of letters, upper case): a number followed by a word that is a unit (with or without white space) MUST be read as one number whose text is the product of the number and the factor, and a dialect that lists none MUST read the text as before.
 
+## Paging
+
+- **FR-006**: A select or a set operation whose `limitOptions` is set MUST be written with its offset first and then `FETCH FIRST n [PERCENT] ROWS ONLY | WITH TIES`, in every dialect, and read back as the same tree; one without is written with `LIMIT` and `OFFSET` as before.
+
 ## Out of scope
 
 - Custom top-level statements, which no consumer needs yet, and the comments of a tree (the printer writes none).

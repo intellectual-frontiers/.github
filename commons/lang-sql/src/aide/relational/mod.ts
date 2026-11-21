@@ -36,7 +36,7 @@ export interface Engine {
 }
 
 /** The dialect of the queries: the common ground. */
-export const astsql: Dialect = declareDialect({ name: "astsql", extends: ansi, lexical: (l) => ({ ...l, params: ["question", "dollar-number"] }) });
+export const astsql: Dialect = declareDialect({ name: "astsql", extends: ansi, lexical: (l) => ({ ...l, params: ["question", "dollar-number"], keywords: [...l.keywords, "SIMILAR", "TABLESAMPLE"] }) });
 
 class Failure extends Error {
   readonly detail: string;
@@ -82,7 +82,8 @@ interface Context {
   readonly groupingAll?: ReadonlySet<string>;
 }
 
-const AGGREGATES: ReadonlySet<string> = new Set(["count", "sum", "avg", "min", "max", "group_concat"]);
+const STRING_AGGREGATES: ReadonlySet<string> = new Set(["group_concat", "listagg", "string_agg"]);
+const AGGREGATES: ReadonlySet<string> = new Set(["count", "sum", "avg", "min", "max", "group_concat", "listagg", "string_agg"]);
 const lc = (s: string): string => s.toLowerCase();
 
 const truthy = (v: Value): boolean => v === true || (typeof v === "number" && v !== 0);
@@ -124,6 +125,49 @@ function likeRegex(pattern: string, escape: string | undefined): RegExp {
   return new RegExp(`${out}$`, "u");
 }
 
+const CLASSES: Readonly<Record<string, string>> = { alpha: "a-zA-Z", digit: "0-9", alnum: "a-zA-Z0-9", upper: "A-Z", lower: "a-z", space: "\\s" };
+
+/** The regular expression of a `SIMILAR TO` pattern of the standard (0010-aide FR-024): `%` and `_` as in `LIKE`, `| * + ? { } ( )` and `[...]` as in a regular expression, everything else itself, the whole text matching. */
+function similarRegex(pattern: string, escape: string | undefined): RegExp {
+  let out = "^(?:";
+  const chars = [...pattern];
+  for (let i = 0; i < chars.length; i++) {
+    const c = chars[i] ?? "";
+    if (escape !== undefined && c === escape && i + 1 < chars.length) {
+      i++;
+      out += (chars[i] ?? "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    } else if (c === "%") out += "[\\s\\S]*";
+    else if (c === "_") out += "[\\s\\S]";
+    else if (c === "[") {
+      let j = i + 1;
+      let cls = "[";
+      if (chars[j] === "^") {
+        cls += "^";
+        j++;
+      }
+      for (; j < chars.length && (chars[j] !== "]" || j === i + 1 || (j === i + 2 && chars[i + 1] === "^")); j++) {
+        const d = chars[j] ?? "";
+        const named = d === "[" && chars[j + 1] === ":" ? /^\[:([a-z]+):\]/.exec(chars.slice(j).join("")) : null;
+        if (named !== null) {
+          const body = CLASSES[named[1] ?? ""];
+          if (body === undefined) return fail(`the class ${named[1]} of a SIMILAR TO pattern is not in astsql`);
+          cls += body;
+          j += named[0].length - 1;
+        } else cls += d === "\\" || d === "[" ? `\\${d}` : d;
+      }
+      if (chars[j] !== "]") return fail("a [ of a SIMILAR TO pattern is not closed");
+      out += `${cls}]`;
+      i = j;
+    } else if ("|*+?(){}".includes(c)) out += c;
+    else out += c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+  try {
+    return new RegExp(`${out})$`, "u");
+  } catch {
+    return fail(`"${pattern}" is not a SIMILAR TO pattern`);
+  }
+}
+
 function numberOf(v: Value): number | null {
   if (v === null) return null;
   if (typeof v === "number") return v;
@@ -132,7 +176,7 @@ function numberOf(v: Value): number | null {
   return Number.isNaN(n) ? fail(`"${v}" is not a number`) : n;
 }
 
-const BUILTIN: ReadonlyMap<string, ScalarFunction> = new Map<string, ScalarFunction>([
+const BASIC: ReadonlyMap<string, ScalarFunction> = new Map<string, ScalarFunction>([
   ["lower", (a) => (typeof a[0] === "string" ? a[0].toLowerCase() : (a[0] ?? null))],
   ["upper", (a) => (typeof a[0] === "string" ? a[0].toUpperCase() : (a[0] ?? null))],
   ["length", (a) => (a[0] === null || a[0] === undefined ? null : String(a[0]).length)],
@@ -449,12 +493,12 @@ function evalExpr(e: Expr, env: Env, ctx: Context, group: readonly Env[] | undef
       return sawNull ? null : e.negated;
     }
     case "like": {
-      if (e.op !== "LIKE") return fail(`${e.op} is not in astsql`);
+      if (e.op !== "LIKE" && e.op !== "SIMILAR TO") return fail(`${e.op} is not in astsql`);
       const v = go(e.arg);
       const p = go(e.pattern);
       if (v === null || p === null) return null;
       const esc = e.escape === undefined ? undefined : go(e.escape);
-      const r = likeRegex(String(p), typeof esc === "string" ? esc : undefined).test(String(v));
+      const r = (e.op === "LIKE" ? likeRegex(String(p), typeof esc === "string" ? esc : undefined) : similarRegex(String(p), typeof esc === "string" ? esc : undefined)).test(String(v));
       return e.negated ? !r : r;
     }
     case "case": {
@@ -512,6 +556,161 @@ function evalExpr(e: Expr, env: Env, ctx: Context, group: readonly Env[] | undef
   }
 }
 
+/** A whole number from a value, or an error value; null stays null. */
+function whole(v: Value, what: string): number | null {
+  if (v === null) return null;
+  const n = numberOf(v);
+  return n !== null && Number.isInteger(n) ? n : fail(`${what} is a whole number`);
+}
+
+/** `SUBSTRING` by the standard: positions from 1, a part before the start counted in the length, characters being code points (0010-aide FR-021). */
+function substringOf(text: string, from: number, length: number | undefined): string {
+  const chars = [...text];
+  if (length !== undefined && length < 0) return fail("the length of a substring is not negative");
+  const start = Math.max(from, 1) - 1;
+  const end = length === undefined ? chars.length : Math.max(from + length - 1, 0);
+  return chars.slice(start, Math.max(end, start)).join("");
+}
+
+/** A string without the characters of `chars` at the ends the side names. */
+function trimmed(text: string, chars: string, side: "leading" | "trailing" | "both"): string {
+  const set = new Set([...chars]);
+  const c = [...text];
+  let a = 0;
+  let b = c.length;
+  if (side !== "trailing") while (a < b && set.has(c[a] ?? "")) a++;
+  if (side !== "leading") while (b > a && set.has(c[b - 1] ?? "")) b--;
+  return c.slice(a, b).join("");
+}
+
+/** The padding of a string to a length with a fill, on the left or the right; a longer string is cut to the length. */
+function padded(text: string, length: number, fill: string, left: boolean): string {
+  const c = [...text];
+  if (length <= c.length) return c.slice(0, Math.max(length, 0)).join("");
+  if (fill === "") return text;
+  const pad = [...fill.repeat(Math.ceil((length - c.length) / [...fill].length))].slice(0, length - c.length).join("");
+  return left ? pad + text : text + pad;
+}
+
+const text1 = (f: (s: string) => Value): ScalarFunction => (a) => (a[0] === null || a[0] === undefined ? null : f(String(a[0])));
+
+const STRING_FUNCTIONS: readonly (readonly [string, ScalarFunction])[] = [
+  ["char_length", text1((s) => [...s].length)],
+  ["character_length", text1((s) => [...s].length)],
+  ["octet_length", text1((s) => new TextEncoder().encode(s).length)],
+  ["reverse", text1((s) => [...s].reverse().join(""))],
+  ["trim", (a) => (a[0] === null || a[0] === undefined || a[1] === null ? null : trimmed(String(a[0]), a[1] === undefined ? " " : String(a[1]), "both"))],
+  ["ltrim", (a) => (a[0] === null || a[0] === undefined || a[1] === null ? null : trimmed(String(a[0]), a[1] === undefined ? " " : String(a[1]), "leading"))],
+  ["rtrim", (a) => (a[0] === null || a[0] === undefined || a[1] === null ? null : trimmed(String(a[0]), a[1] === undefined ? " " : String(a[1]), "trailing"))],
+  ["concat", (a) => a.filter((v) => v !== null).map(String).join("")],
+  [
+    "substring",
+    (a) => {
+      if (a[0] === null || a[0] === undefined || a[1] === null || a[1] === undefined || a[2] === null) return null;
+      return substringOf(String(a[0]), whole(a[1], "the start of a substring") ?? 1, a[2] === undefined ? undefined : (whole(a[2], "the length of a substring") ?? undefined));
+    },
+  ],
+  [
+    "left",
+    (a) => {
+      const n = a[1] === undefined ? null : whole(a[1], "the length of left");
+      return a[0] === null || a[0] === undefined || n === null ? null : [...String(a[0])].slice(0, n < 0 ? Math.max([...String(a[0])].length + n, 0) : n).join("");
+    },
+  ],
+  [
+    "right",
+    (a) => {
+      const n = a[1] === undefined ? null : whole(a[1], "the length of right");
+      const c = a[0] === null || a[0] === undefined ? [] : [...String(a[0])];
+      return a[0] === null || a[0] === undefined || n === null ? null : c.slice(n < 0 ? Math.min(-n, c.length) : Math.max(c.length - n, 0)).join("");
+    },
+  ],
+  [
+    "repeat",
+    (a) => {
+      const n = a[1] === undefined ? null : whole(a[1], "the count of repeat");
+      if (a[0] === null || a[0] === undefined || n === null) return null;
+      if (n > 100_000) return fail("repeat is limited to 100000 times");
+      return String(a[0]).repeat(Math.max(n, 0));
+    },
+  ],
+  [
+    "lpad",
+    (a) => {
+      const n = a[1] === undefined ? null : whole(a[1], "the length of lpad");
+      return a[0] === null || a[0] === undefined || n === null || a[2] === null ? null : padded(String(a[0]), n, a[2] === undefined ? " " : String(a[2]), true);
+    },
+  ],
+  [
+    "rpad",
+    (a) => {
+      const n = a[1] === undefined ? null : whole(a[1], "the length of rpad");
+      return a[0] === null || a[0] === undefined || n === null || a[2] === null ? null : padded(String(a[0]), n, a[2] === undefined ? " " : String(a[2]), false);
+    },
+  ],
+];
+
+/** The functions of the engine: the basic ones and the string functions (0010-aide FR-021). */
+const BUILTIN: ReadonlyMap<string, ScalarFunction> = new Map<string, ScalarFunction>([...BASIC, ...STRING_FUNCTIONS]);
+
+const KEYWORD_FUNCTIONS: ReadonlySet<string> = new Set(["substring", "position", "trim", "overlay"]);
+
+/** `SUBSTRING(x FROM a FOR n)`, `POSITION(a IN x)`, `TRIM(side chars FROM x)` and `OVERLAY(x PLACING y FROM a FOR n)`, whose arguments are told apart by their keywords (0010-aide FR-021). */
+function keywordFunction(name: string, e: Extract<Expr, { kind: "call" }>, env: Env, ctx: Context, group: readonly Env[] | undefined): Value {
+  const positional: Value[] = [];
+  const keyword = new Map<string, Value | undefined>();
+  for (const a of e.args) {
+    if (a.kind === "keyword-arg") keyword.set(a.keyword.toUpperCase(), a.value === undefined ? undefined : evalExpr(a.value, env, ctx, group));
+    else if (a.kind === "star" || a.kind === "named-arg") return fail(`${name} takes plain arguments`);
+    else positional.push(evalExpr(a, env, ctx, group));
+  }
+  const need = (k: string): Value => {
+    const v = keyword.get(k);
+    return v === undefined && !keyword.has(k) ? fail(`${name.toUpperCase()} needs ${k}`) : (v ?? null);
+  };
+  const given = (vs: readonly (Value | undefined)[]): boolean => vs.every((v) => v !== null);
+  switch (name) {
+    case "substring": {
+      const x = positional[0];
+      const from = need("FROM");
+      const len = keyword.get("FOR");
+      if (x === undefined || !given([x, from, len])) return null;
+      return substringOf(String(x), whole(from, "the start of a substring") ?? 1, len === undefined ? undefined : (whole(len, "the length of a substring") ?? undefined));
+    }
+    case "position": {
+      const a = positional[0];
+      const x = need("IN");
+      if (a === undefined || !given([a, x])) return null;
+      return String(x).indexOf(String(a)) + 1;
+    }
+    case "trim": {
+      let side: "leading" | "trailing" | "both" = "both";
+      let chars: Value | undefined = positional[0];
+      for (const k of ["LEADING", "TRAILING", "BOTH"] as const) {
+        if (keyword.has(k)) {
+          side = k === "LEADING" ? "leading" : k === "TRAILING" ? "trailing" : "both";
+          const given = keyword.get(k);
+          if (given !== undefined) chars = given;
+        }
+      }
+      const x = need("FROM");
+      if (!given([x, chars])) return null;
+      return trimmed(String(x), chars === undefined ? " " : String(chars), side);
+    }
+    default: {
+      const x = positional[0];
+      const y = need("PLACING");
+      const from = need("FROM");
+      const len = keyword.get("FOR");
+      if (x === undefined || !given([x, y, from, len])) return null;
+      const at = whole(from, "the start of OVERLAY") ?? 1;
+      const n = len === undefined || len === null ? [...String(y)].length : (whole(len, "the length of OVERLAY") ?? 0);
+      const chars = [...String(x)];
+      return chars.slice(0, Math.max(at - 1, 0)).join("") + String(y) + chars.slice(Math.max(at - 1, 0) + Math.max(n, 0)).join("");
+    }
+  }
+}
+
 /** An aggregate of the values it is given (nulls already left out) and the number of rows it ranges over. */
 function reduce(name: string, distinct: boolean, values: readonly Value[], rows: number, star: boolean, separator: string): Value {
   let v = values;
@@ -537,7 +736,9 @@ const isPlainArg = (a: Extract<Expr, { kind: "call" }>["args"][number] | undefin
 /** The separator of `group_concat(x, sep)`, a comma where none is given. */
 function separatorOf(e: Extract<Expr, { kind: "call" }>, env: Env, ctx: Context): string {
   const a = e.args[1];
-  return isPlainArg(a) ? String(evalExpr(a, env, ctx, undefined)) : ",";
+  if (isPlainArg(a)) return String(evalExpr(a, env, ctx, undefined));
+  const name = lc(e.name.parts[e.name.parts.length - 1]?.name ?? "");
+  return name === "listagg" || name === "string_agg" ? fail(`${name} takes a separator`) : ",";
 }
 
 function callFunction(e: Extract<Expr, { kind: "call" }>, env: Env, ctx: Context, group: readonly Env[] | undefined): Value {
@@ -560,13 +761,23 @@ function callFunction(e: Extract<Expr, { kind: "call" }>, env: Env, ctx: Context
   if (AGGREGATES.has(name)) {
     if (group === undefined) return fail(`${name} is an aggregate and stands only in a query that groups`);
     const filter = e.filter;
-    const rows = filter === undefined ? group : group.filter((g) => truthy(evalExpr(filter, g, ctx, undefined)));
+    const filtered = filter === undefined ? group : group.filter((g) => truthy(evalExpr(filter, g, ctx, undefined)));
+    const ordering = e.orderBy.length > 0 ? e.orderBy : e.withinGroup;
+    if (ordering.length > 0 && name !== "group_concat" && name !== "listagg" && name !== "string_agg") return fail(`${name} with ORDER BY is not in astsql`);
+    const rows = ordering.length === 0 ? filtered : filtered.map((g) => ({ g, keys: ordering.map((o) => evalExpr(o.expr, g, ctx, undefined)) })).sort((a, b) => {
+      for (const [i, o] of ordering.entries()) {
+        const c = nullsOrder(a.keys[i] ?? null, b.keys[i] ?? null, o.direction === "desc" ? -1 : 1, o.nulls);
+        if (c !== 0) return c;
+      }
+      return 0;
+    }).map((x) => x.g);
     const star = e.args[0]?.kind === "star";
     const arg = e.args[0];
-    if (isPlainArg(arg)) return reduce(name, e.distinct, rows.map((g) => evalExpr(arg, g, ctx, undefined)).filter((v) => v !== null), rows.length, false, name === "group_concat" ? separatorOf(e, env, ctx) : ",");
+    if (isPlainArg(arg)) return reduce(name, e.distinct, rows.map((g) => evalExpr(arg, g, ctx, undefined)).filter((v) => v !== null), rows.length, false, STRING_AGGREGATES.has(name) ? separatorOf(e, env, ctx) : ",");
     if (name === "count" && (star || e.args.length === 0)) return rows.length;
     return fail(`${name} takes an expression`);
   }
+  if (KEYWORD_FUNCTIONS.has(name) && e.args.some((a) => a.kind === "keyword-arg")) return keywordFunction(name, e, env, ctx, group);
   const current = e.args.length <= 1 ? currentOf(name, ctx.now) : undefined;
   if (current !== undefined) return current;
   const fn = ctx.functions.get(name) ?? BUILTIN.get(name);
@@ -579,6 +790,29 @@ function callFunction(e: Extract<Expr, { kind: "call" }>, env: Env, ctx: Context
   return fn(args);
 }
 
+/** The rows a `TABLESAMPLE BERNOULLI|SYSTEM (p) [REPEATABLE (seed)]` after a table keeps (0010-aide FR-025): each where a pseudo-random number of a generator that the seed starts is under `p` percent; all of them where the hint says no sample. */
+function sampled(rows: readonly (readonly Value[])[], hint: string | undefined): readonly (readonly Value[])[] {
+  const m = hint === undefined ? null : /TABLESAMPLE\s+([A-Za-z_]+)\s*\(\s*([^)]*?)\s*\)(?:\s+REPEATABLE\s*\(\s*([^)]*?)\s*\))?/i.exec(hint);
+  if (m === null) return rows;
+  const method = (m[1] ?? "").toUpperCase();
+  if (method !== "BERNOULLI" && method !== "SYSTEM") return fail(`the sampling method ${m[1]} is not in astsql`);
+  const percent = Number(m[2]);
+  if (m[2] === "" || Number.isNaN(percent) || percent < 0 || percent > 100) return fail("the size of TABLESAMPLE is a percent from 0 to 100");
+  const seedText = m[3];
+  const seed = seedText === undefined ? 0 : Number(seedText);
+  if (Number.isNaN(seed) || !Number.isInteger(seed)) return fail("the seed of REPEATABLE is a whole number");
+  let state = seed >>> 0;
+  const next = (): number => {
+    // mulberry32: a small generator that the seed fixes
+    state = (state + 0x6d2b79f5) >>> 0;
+    let t = state;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  return rows.filter(() => next() * 100 < percent);
+}
+
 function envsOf(src: Source, ctx: Context, outer: Env | undefined): { readonly envs: Env[]; readonly names: readonly Binding[] } {
   switch (src.kind) {
     case "table": {
@@ -587,10 +821,9 @@ function envsOf(src: Source, ctx: Context, outer: Env | undefined): { readonly e
       if (t === undefined) return fail(`there is no relation ${name}`);
       const alias = src.alias?.name.name ?? src.name.parts[src.name.parts.length - 1]?.name ?? name;
       const empty: Binding = { alias, columns: t.columns, row: [] };
-      return { envs: t.rows.map((row) => pushScope(outer, { alias, columns: t.columns, row })), names: [empty] };
+      return { envs: sampled(t.rows, src.hint).map((row) => pushScope(outer, { alias, columns: t.columns, row })), names: [empty] };
     }
     case "subquery": {
-      if (src.lateral) return fail("LATERAL is not in astsql");
       const t = runQuery(src.query, ctx, outer);
       const alias = src.alias?.name.name ?? "";
       const cols = src.alias !== undefined && src.alias.columns.length > 0 ? src.alias.columns.map((c) => c.name) : t.columns;
@@ -600,7 +833,11 @@ function envsOf(src: Source, ctx: Context, outer: Env | undefined): { readonly e
     case "join": {
       if (src.type !== "inner" && src.type !== "left" && src.type !== "right" && src.type !== "full" && src.type !== "cross") return fail(`a ${src.type} join is not in astsql`);
       const left = envsOf(src.left, ctx, outer);
-      const right = envsOf(src.right, ctx, outer);
+      const lateral = src.right.kind === "subquery" && src.right.lateral;
+      if (lateral && (src.type === "right" || src.type === "full")) return fail("a LATERAL subquery stands on the right of an inner, cross or left join");
+      // a lateral subquery is run for each row of the left, which it may name (0010-aide FR-026); its columns are those it gives for a row of nulls
+      const right = envsOf(src.right, ctx, lateral ? nullEnv(left.names, outer) : outer);
+      const rightEnvs = (l: Env): readonly Env[] => (lateral ? envsOf(src.right, ctx, l).envs : right.envs);
       const type = src.type;
       // the columns a USING list or a NATURAL join makes one (FR-014)
       const columnsOf = (bs: readonly Binding[]): string[] => bs.flatMap((b) => b.columns.filter((_, k) => visible(b, k)));
@@ -638,7 +875,8 @@ function envsOf(src: Source, ctx: Context, outer: Env | undefined): { readonly e
       const on = src.on;
       // an equality of two qualified columns, or the columns of USING, is a hash join
       let hash: { readonly leftKey: (e: Env) => Value; readonly rightKey: (e: Env) => Value } | undefined;
-      if (joined.length > 0) hash = { leftKey: (e) => rowKeyValue(joined.map((c) => valueIn(e, c))), rightKey: (e) => rowKeyValue(joined.map((c) => valueIn(e, c))) };
+      if (lateral) hash = undefined;
+      else if (joined.length > 0) hash = { leftKey: (e) => rowKeyValue(joined.map((c) => valueIn(e, c))), rightKey: (e) => rowKeyValue(joined.map((c) => valueIn(e, c))) };
       else if (on !== undefined && on.kind === "binary" && on.op === "=" && on.left.kind === "name" && on.right.kind === "name" && right.names.length === 1) {
         const ra = lc(right.names[0]?.alias ?? "");
         const lq = lc(on.left.parts.length > 1 ? (on.left.parts[on.left.parts.length - 2]?.name ?? "") : "");
@@ -666,7 +904,7 @@ function envsOf(src: Source, ctx: Context, outer: Env | undefined): { readonly e
         const candidates = index !== undefined && hash !== undefined ? (() => {
           const k = hash.leftKey(l);
           return k === null ? [] : (index.get(`${typeof k}:${String(k)}`) ?? []);
-        })() : right.envs;
+        })() : rightEnvs(l);
         for (const r of candidates) {
           const both = merge(l, r);
           if (on === undefined || truthy(evalExpr(on, both, ctx, undefined))) {
@@ -750,7 +988,8 @@ function computeWindows(calls: readonly CallExpr[], units: readonly Unit[], defs
     const name = lc(call.name.parts[call.name.parts.length - 1]?.name ?? "");
     if (!WINDOW_ONLY.has(name) && !AGGREGATES.has(name)) fail(`the function ${name} is not a window function in astsql`);
     if (call.distinct || call.orderBy.length > 0 || call.withinGroup.length > 0 || call.parameters.length > 0) fail(`${name} with DISTINCT, ORDER BY or WITHIN GROUP is not a window function in astsql`);
-    if (call.nullTreatment === "ignore") fail("IGNORE NULLS is not in astsql");
+    const ignoring = call.nullTreatment === "ignore";
+    if (ignoring && !["lag", "lead", "first_value", "last_value", "nth_value"].includes(name)) fail(`IGNORE NULLS does not apply to ${name}`);
     const w = resolveWindow(over, defs);
     const values = new Map<Env, Value>();
     out.set(call, values);
@@ -819,7 +1058,18 @@ function computeWindows(calls: readonly CallExpr[], units: readonly Unit[], defs
           case "lead": {
             const by = call.args[1] === undefined ? 1 : numberOf(arg(u, 1));
             if (by === null || !Number.isInteger(by) || by < 0) return fail(`${name} takes an offset that is a whole number and not negative`);
-            const at = name === "lag" ? i - by : i + by;
+            let at = name === "lag" ? i - by : i + by;
+            if (ignoring && by > 0) {
+              // only the rows whose value is not null are counted
+              const step = name === "lag" ? -1 : 1;
+              let left = by;
+              at = i;
+              while (left > 0) {
+                at += step;
+                if (at < 0 || at >= n) break;
+                if (arg(keyed[at]?.u ?? u, 0) !== null) left--;
+              }
+            }
             v = at >= 0 && at < n ? arg(keyed[at]?.u ?? u, 0) : call.args[2] === undefined ? null : arg(u, 2);
             break;
           }
@@ -829,12 +1079,15 @@ function computeWindows(calls: readonly CallExpr[], units: readonly Unit[], defs
             const f = frame();
             let at: number | undefined;
             if (f !== undefined) {
-              if (name === "first_value") at = f[0];
-              else if (name === "last_value") at = f[1];
+              // the places of the frame whose value counts: all of them, or those whose value is not null
+              const places: number[] = [];
+              for (let k = f[0]; k <= f[1]; k++) if (!ignoring || arg(keyed[k]?.u ?? u, 0) !== null) places.push(k);
+              if (name === "first_value") at = places[0];
+              else if (name === "last_value") at = places[places.length - 1];
               else {
                 const k = numberOf(arg(u, 1));
                 if (k === null || !Number.isInteger(k) || k < 1) return fail("nth_value takes a whole number that is more than 0");
-                at = f[0] + k - 1 <= f[1] ? f[0] + k - 1 : undefined;
+                at = places[k - 1];
               }
             }
             v = at === undefined ? null : arg(keyed[at]?.u ?? u, 0);
@@ -848,7 +1101,7 @@ function computeWindows(calls: readonly CallExpr[], units: readonly Unit[], defs
             const star = call.args[0]?.kind === "star";
             if (name === "count" && (star || call.args.length === 0)) v = kept.length;
             else if (!isPlainArg(call.args[0])) return fail(`${name} takes an expression`);
-            else v = reduce(name, false, kept.map((r) => arg(r, 0)).filter((x) => x !== null), kept.length, false, name === "group_concat" ? separatorOf(call, u.env, ctx) : ",");
+            else v = reduce(name, false, kept.map((r) => arg(r, 0)).filter((x) => x !== null), kept.length, false, STRING_AGGREGATES.has(name) ? separatorOf(call, u.env, u.ctx ?? ctx) : ",");
           }
         }
         values.set(u.env, v);
@@ -856,6 +1109,11 @@ function computeWindows(calls: readonly CallExpr[], units: readonly Unit[], defs
     }
   }
   return out;
+}
+
+/** An environment of the bindings with every value null, for what a lateral subquery gives where there is no row to run it for. */
+function nullEnv(names: readonly Binding[], outer: Env | undefined): Env {
+  return { bindings: names.map((b) => ({ ...b, row: b.columns.map(() => null) })), outer };
 }
 
 function runSelect(q: Select, ctx: Context, outer: Env | undefined): Table {
@@ -866,6 +1124,15 @@ function runSelect(q: Select, ctx: Context, outer: Env | undefined): Table {
   else {
     envs = [{ bindings: [], outer }];
     for (const s of q.from) {
+      if (s.kind === "subquery" && s.lateral) {
+        // run once for each row before it, which it may name (0010-aide FR-026)
+        const probe = envsOf(s, ctx, nullEnv(names, outer));
+        names = [...names, ...probe.names];
+        const next: Env[] = [];
+        for (const e of envs) for (const p of envsOf(s, ctx, e).envs) next.push({ bindings: [...e.bindings, ...p.bindings], outer });
+        envs = next;
+        continue;
+      }
       const part = envsOf(s, ctx, outer);
       names = [...names, ...part.names];
       const next: Env[] = [];
@@ -971,7 +1238,6 @@ function runSelect(q: Select, ctx: Context, outer: Env | undefined): Table {
       return 0;
     });
   }
-  let rows = result.map((o) => o.values);
   const num = (x: Expr | undefined): number | undefined => {
     if (x === undefined) return undefined;
     const v = evalExpr(x, { bindings: [], outer }, ctx, undefined);
@@ -980,8 +1246,9 @@ function runSelect(q: Select, ctx: Context, outer: Env | undefined): Table {
   };
   const off = num(q.offset);
   const lim = num(q.limit);
-  if (off !== undefined) rows = rows.slice(off);
-  if (lim !== undefined) rows = rows.slice(0, lim);
+  const afterOffset = off === undefined ? result : result.slice(off);
+  const tied = (a: Out, b: Out): boolean => q.orderBy.every((_, i) => nullsOrder(a.keys[i] ?? null, b.keys[i] ?? null, 1, undefined) === 0);
+  const rows = limited(afterOffset, lim, q.limitOptions, tied, q.orderBy.length > 0).map((o) => o.values);
   return { columns: colNames, rows };
 }
 
@@ -998,6 +1265,20 @@ function counted(rows: readonly (readonly Value[])[]): Map<string, { readonly ro
     else c.n++;
   }
   return out;
+}
+
+/** The first rows of an ordered answer by `LIMIT n`, `FETCH FIRST n PERCENT ROWS ONLY` or `... ROWS WITH TIES` (0010-aide FR-023): a percent is of the rows there are, and the ties are the rows after the last that equal it on every key of the `ORDER BY`. */
+function limited<T>(rows: readonly T[], limit: number | undefined, options: string | undefined, tie: (a: T, b: T) => boolean, ordered: boolean): readonly T[] {
+  if (limit === undefined) return rows;
+  const percent = options?.includes("PERCENT") === true;
+  const ties = options?.includes("TIES") === true;
+  if (percent && (limit < 0 || limit > 100)) return fail("a percent of FETCH FIRST is from 0 to 100");
+  if (ties && !ordered) return fail("WITH TIES needs an ORDER BY");
+  const count = percent ? Math.ceil((limit / 100) * rows.length) : Math.max(limit, 0);
+  let end = Math.min(count, rows.length);
+  const last = rows[end - 1];
+  if (ties && last !== undefined) while (end < rows.length && tie(rows[end] as T, last)) end++;
+  return rows.slice(0, end);
 }
 
 /** `UNION`, `INTERSECT` and `EXCEPT`, with or without `ALL` (0010-aide FR-012), then the `ORDER BY`, `OFFSET` and `LIMIT` of the whole. */
@@ -1034,11 +1315,11 @@ function runSetOp(q: SetOp, ctx: Context, outer: Env | undefined): Table {
     default:
       return fail(`the set operator ${q.op} is not in astsql`);
   }
-  return tail({ columns: left.columns, rows }, q.orderBy, q.limit, q.offset, ctx, outer);
+  return tail({ columns: left.columns, rows }, q.orderBy, q.limit, q.limitOptions, q.offset, ctx, outer);
 }
 
 /** The `ORDER BY` (by the name of an output column or its place), `OFFSET` and `LIMIT` of a query that is made of a set operation. */
-function tail(t: Table, orderBy: readonly OrderItem[], limit: Expr | undefined, offset: Expr | undefined, ctx: Context, outer: Env | undefined): Table {
+function tail(t: Table, orderBy: readonly OrderItem[], limit: Expr | undefined, limitOptions: string | undefined, offset: Expr | undefined, ctx: Context, outer: Env | undefined): Table {
   let rows = t.rows;
   if (orderBy.length > 0) {
     const keys = orderBy.map((o): { readonly at: number; readonly sign: number; readonly nulls: "first" | "last" | undefined } => {
@@ -1067,7 +1348,8 @@ function tail(t: Table, orderBy: readonly OrderItem[], limit: Expr | undefined, 
   const off = num(offset);
   const lim = num(limit);
   if (off !== undefined) rows = rows.slice(off);
-  if (lim !== undefined) rows = rows.slice(0, lim);
+  const sortAt = orderBy.map((o) => (o.expr.kind === "number" ? Number(o.expr.text) - 1 : t.columns.findIndex((c) => o.expr.kind === "name" && lc(c) === lc(o.expr.parts[0]?.name ?? ""))));
+  rows = limited(rows, lim, limitOptions, (a, b) => sortAt.every((k) => nullsOrder(a[k] ?? null, b[k] ?? null, 1, undefined) === 0), orderBy.length > 0);
   return { columns: t.columns, rows };
 }
 
@@ -1111,7 +1393,7 @@ function runRecursive(q: SetOp, name: string, columns: readonly string[], ctx: C
     result.push(...working);
     if (result.length > MOST_ROWS) return fail(`the recursive ${name} made more than ${MOST_ROWS} rows`);
   }
-  return tail({ columns: cols, rows: result }, q.orderBy, q.limit, q.offset, ctx, outer);
+  return tail({ columns: cols, rows: result }, q.orderBy, q.limit, q.limitOptions, q.offset, ctx, outer);
 }
 
 function runQuery(q: Query, ctx: Context, outer: Env | undefined): Table {
