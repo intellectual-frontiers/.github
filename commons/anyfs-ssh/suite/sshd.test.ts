@@ -1,9 +1,14 @@
 /**
- * The store against a real ssh server (commons anyfs-ssh 0003-anyfs-ssh-store FR-001): the executor of Headless reaches a host by the system's OpenSSH client and the store passes the conformance
- * suite there. It runs only where a host is named by the environment, and is skipped where none is.
+ * The store against a real ssh server (commons anyfs-ssh 0003-anyfs-ssh-store FR-001; 0004-anyfs-ssh-sshd-test FR-007): the executor of Headless reaches a host by the system's OpenSSH client, the calls of a run share one
+ * connection, and the store passes the conformance suite there.
+ *
+ * The server is the one named by the environment, and where none is named it is a throwaway server of OpenSSH made by `tools/sshd-test.ts` for the run. Where the computer has no OpenSSH server the test is
+ * skipped, and says so.
  *
  * ```sh
- * # a throwaway key and a server that accepts it, for instance an OpenSSH container with sshd on the port 2222:
+ * bun test suite/sshd.test.ts                      a throwaway server, made and taken away by the test
+ * bun tools/sshd-test.ts run -- bun test suite/    the same, for a whole command
+ * # or a server of your own, for instance an OpenSSH container with sshd on the port 2222:
  * ANYFS_SSH_TEST_ADDRESS=127.0.0.1 ANYFS_SSH_TEST_PORT=2222 ANYFS_SSH_TEST_USER=fleet \
  * ANYFS_SSH_TEST_KEY=/path/to/key ANYFS_SSH_TEST_KNOWN_HOSTS=/path/to/known_hosts ANYFS_SSH_TEST_ROOT=/home/fleet/anyfs-test \
  * bun test suite/sshd.test.ts
@@ -17,26 +22,50 @@ import { sshExecutor } from "@intellectual-frontiers/headless/targets/ssh";
 import { target } from "@intellectual-frontiers/headless/logical";
 import { proc } from "@intellectual-frontiers/system";
 import { openSshStore } from "../src/mod.ts";
+import { ENV_PREFIX, type SshdHost, withSshd } from "../tools/sshd-test.ts";
 
-const env = (name: string): string | undefined => proc.env.get(`ANYFS_SSH_TEST_${name}`);
+const env = (name: string): string | undefined => proc.env.get(`${ENV_PREFIX}${name}`);
 
-proves(["0003-anyfs-ssh-store FR-001"], "against a real ssh server named by the environment, the store passes every case of the conformance suite (skipped where none is named)", async () => {
+/** The server named by the environment, if one is. */
+function named(): SshdHost | undefined {
   const address = env("ADDRESS");
   const key = env("KEY");
-  const known = env("KNOWN_HOSTS");
+  const knownHosts = env("KNOWN_HOSTS");
   const root = env("ROOT");
-  if (address === undefined || key === undefined || known === undefined || root === undefined) return;
-  const user = env("USER");
+  if (address === undefined || key === undefined || knownHosts === undefined || root === undefined) return undefined;
   const port = env("PORT");
-  const t = target({ id: "fleet-test", class: "server", address, ...(user === undefined ? {} : { user }), ...(port === undefined ? {} : { port: Number(port) }), credential: "test-key" });
+  return { address, port: port === undefined ? 22 : Number(port), user: env("USER") ?? "", key, knownHosts, root, controlDir: env("CONTROL_DIR") ?? "" };
+}
+
+async function conformance(host: SshdHost): Promise<readonly string[]> {
+  const t = target({ id: "fleet-test", class: "server", address: host.address, ...(host.user === "" ? {} : { user: host.user }), port: host.port, credential: "test-key" });
   if (t.kind === "err") throw new Error(t.error);
-  const executor = sshExecutor(t.value, [t.value], { knownHostsRepository: known, knownHostsUser: known, identityFor: (name) => (name === "test-key" ? key : undefined) });
+  const executor = sshExecutor(t.value, [t.value], {
+    knownHostsRepository: host.knownHosts,
+    knownHostsUser: host.knownHosts,
+    identityFor: (name) => (name === "test-key" ? host.key : undefined),
+    ...(host.controlDir === "" ? {} : { controlDir: host.controlDir }),
+  });
   let n = 0;
   const reports = await runConformance(async () => {
     n += 1;
-    const opened = await openSshStore(executor, { place: { host: address, ...(user === undefined ? {} : { user }), ...(port === undefined ? {} : { port: Number(port) }) }, root: `${root}/run-${Date.now()}-${n}`, create: true });
+    const opened = await openSshStore(executor, { place: { host: host.address, ...(host.user === "" ? {} : { user: host.user }), port: host.port }, root: `${host.root}/run-${Date.now()}-${n}`, create: true });
     if (opened.kind === "err") throw new Error(opened.error);
     return opened.value.store;
   });
-  assertEquals(reports.filter((r) => r.failure !== undefined).map((r) => `${r.id}: ${r.failure}`), []);
+  return reports.filter((r) => r.failure !== undefined).map((r) => `${r.id}: ${r.failure}`);
+}
+
+proves(["0003-anyfs-ssh-store FR-001", "0004-anyfs-ssh-sshd-test FR-007"], "against a real ssh server, named by the environment or made for the run, the store passes every case of the conformance suite over one shared connection (skipped where no server can be had)", async (t) => {
+  const given = named();
+  if (given !== undefined) {
+    assertEquals(await conformance(given), []);
+    return;
+  }
+  const ran = await withSshd(conformance);
+  if (ran.kind === "skipped") {
+    t.skip(ran.reason);
+    return;
+  }
+  assertEquals(ran.value, []);
 });

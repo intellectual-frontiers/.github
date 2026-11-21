@@ -2,3 +2,4 @@ number	slug	state
 0001	anyfs-ssh-layers	in force
 0002	anyfs-ssh-helper	in force
 0003	anyfs-ssh-store	in force
+0004	anyfs-ssh-sshd-test	in force

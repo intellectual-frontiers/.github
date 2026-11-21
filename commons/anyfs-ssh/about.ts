@@ -16,6 +16,6 @@ export const about: About = {
     { path: "src/", what: "Layer 3: the store on a host, the protocol of the helper as pure functions, and the dialects of the host's shell.", mayImport: ["anyfs, by its exports", "headless, by its exports", "crypto and core, by package name"] },
     { path: "src/helper/", what: "The helper that runs on the host: the script of the posix dialect and the module made from it, with its pinned SHA-256.", mayImport: ["nothing: a shell script and the text it is carried as"] },
     { path: "suite/", what: "The tests: every requirement, over an executor that runs the real helper on this computer by the path an ssh executor takes.", mayImport: ["src/", "the test module of commons' runtime, by package name"] },
-    { path: "tools/", what: "The trace check, the maker of the helper module and the packer `bun run verify` runs.", mayImport: ["the kernel, the runtime and the packer of commons, by package name"] },
+    { path: "tools/", what: "The trace check, the maker of the helper module and the packer `bun run verify` runs, and the throwaway OpenSSH server of the tests of the store.", mayImport: ["the kernel, the runtime and the packer of commons, by package name"] },
   ],
 };
