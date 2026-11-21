@@ -1,0 +1,36 @@
+{
+  "name": "@intellectual-frontiers/estate-query",
+  "private": true,
+  "version": "0.1.0",
+  "description": "SQL over the estate: what an estate holds (its assets, the capabilities of each and who owns them, what is declared and observed, the policies judged, the risks accepted, the operational truth and the invariants broken) as relations with a catalog that is data, asked with one read-only statement through the guard and the engine of lang-sql, with no secret in a relation.",
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "exports": {
+    ".": "./src/mod.ts",
+    "./governance": "./src/governance/mod.ts",
+    "./logical": "./src/logical/mod.ts",
+    "./physical": "./src/physical/mod.ts"
+  },
+  "scripts": {
+    "check": "tsc -p tsconfig.json",
+    "test": "bun test suite/",
+    "test:node": "node --test \"suite/**/*.test.ts\"",
+    "verify": "tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../libraries/src/check.ts --root spec-kit --level L1 && bun ../kanon/src/check.ts && bun tools/check.ts && bun test suite/"
+  },
+  "devDependencies": {
+    "@intellectual-frontiers/archon": "link:../archon",
+    "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/estate": "link:../estate",
+    "@intellectual-frontiers/kanon": "link:../kanon",
+    "@intellectual-frontiers/lang-sql": "link:../lang-sql",
+    "@intellectual-frontiers/libraries": "link:../libraries",
+    "@intellectual-frontiers/mizan": "link:../mizan",
+    "@intellectual-frontiers/system": "link:../system",
+    "@intellectual-frontiers/test": "link:../test",
+    "@types/node": "26.6.6",
+    "fast-check": "4.10.2",
+    "typescript": "7.0.2"
+  }
+}
