@@ -1,0 +1,8 @@
+// Spec: 0001-machine-probe-layers FR-001
+/**
+ * The Logical layer of Machine Probe: the facts a probe gives as a typed observation, and the policy pack that judges one. Pure.
+ *
+ * @module
+ */
+export * from "./observed.ts";
+export * from "./policies.ts";
