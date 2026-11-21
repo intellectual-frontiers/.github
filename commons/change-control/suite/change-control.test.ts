@@ -45,13 +45,22 @@ proves(["0002-change-control-policy FR-003", "0002-change-control-policy FR-004"
   assertEquals(approved.verdicts[0]?.approvedBy, "recovery");
   assertEquals(approved.ok, true);
   for (const [name, range] of [
-    ["by the same signer", [commit(a, "G", "recovery", ["fleets/fcr/signers.ts"]), commit(b, "G", "recovery", ["x"], `Approves: ${a.slice(0, 12)}`)]],
-    ["by a signer of another role", [commit(a, "G", "recovery", ["deploy/x"]), commit(b, "G", "daily", ["x"], `Approves: ${a.slice(0, 12)}`)]],
+    ["by a signer of another role", [commit(a, "G", "daily", ["deploy/x"]), commit(b, "G", "daily", ["x"], `Approves: ${a.slice(0, 12)}`)]],
     ["before the commit", [commit(b, "G", "recovery", ["x"], `Approves: ${a.slice(0, 12)}`), commit(a, "G", "daily", ["deploy/x"])]],
     ["that is not signed", [commit(a, "G", "daily", ["deploy/x"]), commit(b, "N", "", ["x"], `Approves: ${a.slice(0, 12)}`)]],
     ["of another commit", [commit(a, "G", "daily", ["deploy/x"]), commit(b, "G", "recovery", ["x"], `Approves: ${f.slice(0, 12)}`)]],
     ["too short", [commit(a, "G", "daily", ["deploy/x"]), commit(b, "G", "recovery", ["x"], "Approves: aaaa")]],
   ] as const) assertEquals(judgeRange(range, policy.value).verdicts.find((v) => v.sha === a)?.state, "blocked", name);
+  const withRetired = parsePolicy({ signers: [...POLICY.signers, { name: "old", role: "daily", key: KEY("O"), retired: "2026-06-30" }], controlled: [] });
+  assert(withRetired.kind === "ok");
+  const dated = (at: string): Commit => ({ ...commit(a, "G", "old", ["x"]), at });
+  assertEquals(judgeRange([dated("2026-06-30T23:00:00Z")], withRetired.value).verdicts[0]?.state, "accepted", "a key retired on a day signs for that day");
+  const late = judgeRange([dated("2026-07-01T00:10:00Z")], withRetired.value);
+  assertEquals(late.verdicts[0]?.state, "refused");
+  assert(late.verdicts[0]?.reasons[0]?.includes("retired on 2026-06-30") === true);
+  assertEquals(parsePolicy({ signers: [{ name: "x", role: "r", key: KEY("X"), retired: "last week" }] }).kind, "err");
+  const self = judgeRange([commit(a, "G", "recovery", ["fleets/fcr/signers.ts"])], policy.value);
+  assertEquals([self.verdicts[0]?.state, self.verdicts[0]?.approvedBy], ["accepted", "recovery"], "a change by a signer of an approving role is its own approval");
   void c; void d; void e;
 });
 

@@ -13,5 +13,6 @@ export { traitsOf, defineVerb, POSIX_OPTIONS } from "./verbs/common.ts";
 export { readVerbs, displayOf } from "./verbs/read.ts";
 export { writeVerbs, removalHash } from "./verbs/write.ts";
 export { bridgeVerbs } from "./verbs/bridge.ts";
+export { mergeVerbs } from "./verbs/merge.ts";
 export { setupVerbs, kindStatus, mountTargets } from "./verbs/setup.ts";
 export * from "./program.ts";

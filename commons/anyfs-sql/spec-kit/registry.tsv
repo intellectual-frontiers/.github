@@ -7,3 +7,4 @@ number	slug	state
 0006	sql-conformance	in force
 0007	sql-merge	in force
 0008	sql-dump	in force
+0009	sql-compaction	in force

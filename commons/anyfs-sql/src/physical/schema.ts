@@ -87,7 +87,7 @@ function statementsOf(version: number, port: SqlPort, naming: Naming): readonly 
         `CREATE INDEX IF NOT EXISTS ${idx("merged")} ON ${n("versions")} (id) WHERE merged <> '[]'`,
         // the local tables: whom this copy trusts, its epochs, its caches
         `CREATE TABLE IF NOT EXISTS ${n("trust")} (replica TEXT PRIMARY KEY)`,
-        `CREATE TABLE IF NOT EXISTS ${n("epochs")} (n INTEGER PRIMARY KEY, horizon TEXT NOT NULL, roster TEXT NOT NULL, retained TEXT NOT NULL)`,
+        `CREATE TABLE IF NOT EXISTS ${n("epochs")} (n INTEGER PRIMARY KEY, horizon TEXT NOT NULL, roster TEXT NOT NULL, retained TEXT NOT NULL, bound TEXT NOT NULL)`,
         `CREATE TABLE IF NOT EXISTS ${n("cache")} (kind TEXT NOT NULL, key TEXT NOT NULL, value TEXT NOT NULL, PRIMARY KEY (kind, key))`,
         // the heads: the rows no other row replaced
         `CREATE VIEW IF NOT EXISTS ${n("heads")} AS SELECT v.id AS id, v.sum AS sum, v.replica AS replica, v.seq AS seq, v.path AS path, v.parent AS parent, v.merged AS merged, v.kind AS kind, v.blob AS blob FROM ${n("versions")} v ` +
@@ -103,6 +103,12 @@ function statementsOf(version: number, port: SqlPort, naming: Naming): readonly 
         `CREATE VIEW IF NOT EXISTS ${n("vector")} AS SELECT v.replica AS replica, MIN(v.seq) AS n FROM ${n("versions")} v ` +
           `WHERE NOT EXISTS (SELECT 1 FROM ${n("versions")} w WHERE w.replica = v.replica AND w.seq = v.seq + 1) ` +
           `GROUP BY v.replica HAVING EXISTS (SELECT 1 FROM ${n("versions")} f WHERE f.replica = v.replica AND f.seq = 1)`,
+        // a row an epoch has collected is dead: a raw import that brings it back (an old dump) writes nothing, unless the epoch retained it
+        `CREATE TRIGGER IF NOT EXISTS ${sql.name(`${naming.prefix}_versions_dead`)} BEFORE INSERT ON ${n("versions")} ` +
+          `WHEN EXISTS (SELECT 1 FROM ${n("epochs")} e WHERE e.n = (SELECT MAX(n) FROM ${n("epochs")}) ` +
+          `AND NEW.seq <= COALESCE(json_extract(e.horizon, '$."' || NEW.replica || '"'), 0) ` +
+          `AND NOT EXISTS (SELECT 1 FROM json_each(e.retained) j WHERE j.value = NEW.id || '|' || NEW.sum)) ` +
+          `BEGIN SELECT RAISE(IGNORE); END`,
         // a raw import writes no row of a replica this copy does not trust where its trust mode is the allowlist: SQLite cannot hash, so the sums are checked by `verify`
         `CREATE TRIGGER IF NOT EXISTS ${sql.name(`${naming.prefix}_versions_trust`)} BEFORE INSERT ON ${n("versions")} ` +
           `WHEN (SELECT value FROM ${n("meta")} WHERE key = 'trust_mode') = 'allowlist' AND NOT EXISTS (SELECT 1 FROM ${n("trust")} WHERE replica = NEW.replica) ` +

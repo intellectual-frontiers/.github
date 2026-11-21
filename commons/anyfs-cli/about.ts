@@ -11,7 +11,7 @@ import type { About } from "@intellectual-frontiers/core/about";
 export const about: About = {
   title: "AnyFS command line",
   summary:
-    "The `anyfs` program: POSIX-style access to any AnyFS store (ls, cat, cp, rm, find, grep, diff) and the bridge verbs (sync, bisync, mirror, check) from the command line, a tool server and a REST description, with every operation saying how it was carried out and every destruction a plan first.",
+    "The `anyfs` program: POSIX-style access to any AnyFS store (ls, cat, cp, rm, find, grep, diff) and the bridge verbs (sync, bisync, mirror, check, merge, sync-medium) from the command line, a tool server and a REST description, with every operation saying how it was carried out and every destruction a plan first.",
   folders: [
     { path: "spec-kit/", what: "The library's own specifications, numbered from 0001.", mayImport: ["nothing: Markdown and TSV"] },
     { path: "src/governance/", what: "Layer 1: the facts of the verbs, the tiers, the problem codes, and the grammar of a place on a command line.", mayImport: ["the kernel and the governance of AnyFS and Headless, by package name"] },

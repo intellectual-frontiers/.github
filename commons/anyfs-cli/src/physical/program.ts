@@ -23,6 +23,7 @@ import { output } from "@intellectual-frontiers/system/proc";
 import { ANYFS_CLI_VERSION, CATALOGUE, LADDER, tierOf } from "@intellectual-frontiers/anyfs-cli/governance";
 import { EMPTY_CONFIG, type Host } from "@intellectual-frontiers/anyfs-cli/logical";
 import { bridgeVerbs } from "./verbs/bridge.ts";
+import { mergeVerbs } from "./verbs/merge.ts";
 import { traitsOf } from "./verbs/common.ts";
 import { readVerbs } from "./verbs/read.ts";
 import { setupVerbs } from "./verbs/setup.ts";
@@ -57,7 +58,7 @@ const systemRun: RunLocal = (argv, opts) => output(argv, opts);
 
 /** `anyfs` as a Headless program, for the host it runs on. */
 export function anyfsProgram(host: Host, run: RunLocal = systemRun): Program {
-  const verbs: readonly Node[] = [...readVerbs(host), ...writeVerbs(host), ...bridgeVerbs(host), ...setupVerbs(host, run)];
+  const verbs: readonly Node[] = [...readVerbs(host), ...writeVerbs(host), ...bridgeVerbs(host), ...mergeVerbs(host), ...setupVerbs(host, run)];
   const mcp = command({
     name: "mcp",
     summary: "Serve the verbs the held tier sees as tools of a tool server on standard input and output.",

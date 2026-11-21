@@ -28,7 +28,8 @@ export function parsePolicy(input: unknown): Result<Policy, readonly string[]> {
     if (typeof r["role"] !== "string" || !SIGNER_NAME.test(r["role"])) problems.push(`signers[${i}].role: a role name`);
     if (typeof r["key"] !== "string" || !KEY_LINE.test(r["key"].trim()) || /PRIVATE KEY/.test(r["key"])) problems.push(`signers[${i}].key: one public key line`);
     if (problems.length === 0 || (typeof r["name"] === "string" && typeof r["role"] === "string" && typeof r["key"] === "string" && SIGNER_NAME.test(r["name"]) && SIGNER_NAME.test(r["role"]) && KEY_LINE.test(r["key"].trim()))) {
-      signers.push({ name: String(r["name"]), role: String(r["role"]), key: String(r["key"]).trim(), ...(typeof r["added"] === "string" ? { added: r["added"] } : {}) });
+      if (r["retired"] !== undefined && (typeof r["retired"] !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(r["retired"]))) problems.push(`signers[${i}].retired: a day, YYYY-MM-DD`);
+      signers.push({ name: String(r["name"]), role: String(r["role"]), key: String(r["key"]).trim(), ...(typeof r["added"] === "string" && r["added"] !== "" ? { added: r["added"] } : {}), ...(typeof r["retired"] === "string" ? { retired: r["retired"] } : {}) });
     }
   });
   const names = signers.map((s) => s.name);
@@ -58,7 +59,7 @@ export function matches(pattern: string, path: string): boolean {
 }
 
 /** A commit as read: its identity, who it says made it, what it says, the paths it changed, the state of its signature and the signer Git found (the principal of the `allowed_signers` line). */
-export type Commit = { readonly sha: string; readonly author: string; readonly subject: string; readonly body: string; readonly files: readonly string[]; readonly signature: SignatureState; readonly signer: string };
+export type Commit = { readonly sha: string; readonly author: string; readonly subject: string; readonly body: string; readonly files: readonly string[]; readonly signature: SignatureState; readonly signer: string; readonly at?: string };
 
 /** What was found of one commit. */
 export type Verdict = { readonly sha: string; readonly subject: string; readonly state: "accepted" | "refused" | "blocked"; readonly signer: string; readonly reasons: readonly string[]; readonly controlled: readonly string[]; readonly approvedBy: string | undefined };
@@ -86,10 +87,16 @@ export function judgeRange(commits: readonly Commit[], policy: Policy): Judgemen
     const reasons: string[] = [];
     if (c.signature !== "G") reasons.push(SAYS[c.signature] ?? "it is not signed");
     else if (!roleOf.has(c.signer)) reasons.push(`it is signed by ${c.signer === "" ? "a key" : c.signer}, who is not a signer of the fleet`);
+    else {
+      const retired = policy.signers.find((x) => x.name === c.signer)?.retired;
+      if (retired !== undefined && c.at !== undefined && c.at.slice(0, 10) > retired) reasons.push(`its key was retired on ${retired}, and this change is dated after`);
+    }
     if (reasons.length > 0) return { sha: c.sha, subject: c.subject, state: "refused", signer: c.signer, reasons, controlled: [], approvedBy: undefined };
     const hits = policy.controlled.filter((rule) => c.files.some((f) => matches(rule.path, f)));
     if (hits.length === 0) return { sha: c.sha, subject: c.subject, state: "accepted", signer: c.signer, reasons: [], controlled: [], approvedBy: undefined };
     const need = [...new Set(hits.flatMap((h) => h.approvers))];
+    const controlled0 = [...new Set(c.files.filter((f) => hits.some((h) => matches(h.path, f))))];
+    if (need.includes(roleOf.get(c.signer) ?? "")) return { sha: c.sha, subject: c.subject, state: "accepted", signer: c.signer, reasons: [], controlled: controlled0, approvedBy: c.signer };
     const approver = commits.slice(i + 1).find((later) => later.signature === "G" && roleOf.has(later.signer) && later.signer !== c.signer && need.includes(roleOf.get(later.signer) ?? "") && [...later.body.matchAll(APPROVES)].some((m) => c.sha.startsWith(m[1] ?? "~")));
     const controlled = [...new Set(c.files.filter((f) => hits.some((h) => matches(h.path, f))))];
     if (approver !== undefined) return { sha: c.sha, subject: c.subject, state: "accepted", signer: c.signer, reasons: [], controlled, approvedBy: approver.signer };

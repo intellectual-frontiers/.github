@@ -9,3 +9,9 @@ requirement	mechanism	by	note
 0002-change-control-policy FR-004	check	.github: cd commons/change-control && bun run verify	suite/change-control.test.ts
 0003-change-control-git FR-001	check	.github: cd commons/change-control && bun run verify	suite/change-control.test.ts
 0003-change-control-git FR-002	check	.github: cd commons/change-control && bun run verify	suite/change-control.test.ts
+0004-change-control-keys FR-001	check	.github: cd commons/change-control && bun run verify	suite/keys.test.ts
+0004-change-control-keys FR-002	check	.github: cd commons/change-control && bun run verify	suite/keys.test.ts
+0004-change-control-keys FR-003	check	.github: cd commons/change-control && bun run verify	suite/keys.test.ts
+0004-change-control-keys FR-004	check	.github: cd commons/change-control && bun run verify	suite/keys.test.ts
+0004-change-control-keys FR-005	check	.github: cd commons/change-control && bun run verify	suite/keys.test.ts
+0004-change-control-keys FR-006	check	.github: cd commons/change-control && bun run verify	suite/keys.test.ts

@@ -185,11 +185,33 @@ export function layoutOf(sql: Sql) {
     selectPending: (): Query => sql.query().text("SELECT key, value FROM ").table("cache").text(" WHERE kind = 'pending' ORDER BY key"),
     deletePending: (key: string): Query => sql.query().text("DELETE FROM ").table("cache").text(" WHERE kind = 'pending' AND key = ").param(key),
     countPending: (): Query => sql.query().text("SELECT COUNT(*) AS n FROM ").table("cache").text(" WHERE kind = 'pending'"),
-    selectEpochs: (): Query => sql.query().text("SELECT n, horizon, roster, retained FROM ").table("epochs").text(" ORDER BY n"),
-    insertEpoch: (n: number, horizon: string, roster: string, retained: string): Query =>
-      sql.query().text("INSERT INTO ").table("epochs").text(" (n, horizon, roster, retained) VALUES (").param(n).text(", ").param(horizon).text(", ").param(roster).text(", ").param(retained).text(")"),
-    /** Removes the rows of a replica whose number a horizon covers, but for those an epoch keeps (given as keys). */
+    selectEpochs: (): Query => sql.query().text("SELECT n, horizon, roster, retained, bound FROM ").table("epochs").text(" ORDER BY n"),
+    insertEpoch: (n: number, horizon: string, roster: string, retained: string, bound: string): Query =>
+      sql
+        .query()
+        .text("INSERT INTO ")
+        .table("epochs")
+        .text(" (n, horizon, roster, retained, bound) VALUES (")
+        .param(n)
+        .text(", ")
+        .param(horizon)
+        .text(", ")
+        .param(roster)
+        .text(", ")
+        .param(retained)
+        .text(", ")
+        .param(bound)
+        .text(")"),
+    /** The heads whose number a horizon covers, with their path and kind. */
+    selectCoveredHeads: (replica: string, upTo: number): Query =>
+      sql.query().text("SELECT id, sum, path, kind FROM ").table("heads").text(" WHERE replica = ").param(replica).text(" AND seq <= ").param(upTo),
+    /** The rows of a replica whose number a horizon covers. */
     selectCovered: (replica: string, upTo: number): Query => sql.query().text("SELECT id, sum FROM ").table("versions").text(" WHERE replica = ").param(replica).text(" AND seq <= ").param(upTo),
+    /** The numbers of the rows of a replica above a floor, in order. */
+    selectSeqsAbove: (replica: string, floor: number): Query => sql.query().text("SELECT seq FROM ").table("versions").text(" WHERE replica = ").param(replica).text(" AND seq > ").param(floor).text(" ORDER BY seq"),
+    insertRetired: (replica: string, value: string): Query =>
+      sql.query().text("INSERT INTO ").table("cache").text(" (kind, key, value) VALUES ('retired', ").param(replica).text(", ").param(value).text(") ON CONFLICT DO NOTHING"),
+    selectRetired: (): Query => sql.query().text("SELECT key, value FROM ").table("cache").text(" WHERE kind = 'retired' ORDER BY key"),
     deleteVersion: (id: string, sum: string): Query => sql.query().text("DELETE FROM ").table("versions").text(" WHERE id = ").param(id).text(" AND sum = ").param(sum),
     deleteBlobsUnnamed: (): Query =>
       sql.query().text("DELETE FROM ").table("blobs").text(" WHERE sha NOT IN (SELECT blob FROM ").table("versions").text(" WHERE blob IS NOT NULL)"),

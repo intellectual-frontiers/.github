@@ -37,6 +37,8 @@ export type VerbId =
   | "rm"
   | "sync"
   | "bisync"
+  | "merge"
+  | "sync-medium"
   | "check"
   | "mirror status"
   | "mirror sync"
@@ -89,6 +91,8 @@ export const VERBS: Readonly<Record<VerbId, VerbFacts>> = {
   mv: destroy("mv", "Move files or directories, within a store or from one store to another: a copy that is checked, then the removal of the source."),
   rm: destroy("rm", "Remove files, or directories and everything below them with -r."),
   sync: destroy("sync", "Make a destination equal to a source: a plan first with its hash, then the apply that the hash approves."),
+  merge: destroy("merge", "Bring two stores that merge together: a plan first with its hash (what each takes from the other), then the apply that the hash approves; there is no conflict to settle."),
+  "sync-medium": change("sync-medium", "Exchange a store that merges with a shared place: publish its new rows as delta files and take the files of the others.", true),
   bisync: destroy("bisync", "Make two directories equal both ways against a recorded base, with a rule for what both changed."),
   check: report("check", "Compare two directories by content and say what differs; changes nothing."),
   "mirror status": report("mirror status", "Say whether a replica is in sync with its primary, behind it, or has diverged."),
@@ -100,7 +104,7 @@ export const VERBS: Readonly<Record<VerbId, VerbFacts>> = {
 
 /** The ids of the verbs, in the order they are listed. */
 export const VERB_IDS: readonly VerbId[] = [
-  "ls", "cat", "stat", "head", "tail", "find", "du", "tree", "grep", "diff", "sha256sum", "put", "mkdir", "touch", "cp", "mv", "rm", "sync", "bisync", "check", "mirror status", "mirror sync", "mirror promote", "places", "doctor",
+  "ls", "cat", "stat", "head", "tail", "find", "du", "tree", "grep", "diff", "sha256sum", "put", "mkdir", "touch", "cp", "mv", "rm", "sync", "bisync", "merge", "sync-medium", "check", "mirror status", "mirror sync", "mirror promote", "places", "doctor",
 ];
 
 /** The ids of the verbs, in the order they are listed. */

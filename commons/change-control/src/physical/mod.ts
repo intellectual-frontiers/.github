@@ -5,3 +5,5 @@
  * @module
  */
 export { readCommits, resolve } from "./git.ts";
+export { HOOK_MARKER, commitSigned, configureGit, installHook, makeKey, readFacts, testSign } from "./keys.ts";
+export type { FactsInput } from "./keys.ts";
