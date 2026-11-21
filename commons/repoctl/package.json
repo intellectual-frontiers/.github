@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/repoctl",
   "private": true,
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Repoctl, the operations program of a repository, driven by its typed repoctl.config.ts: it makes the generated files in dependency order, merges without hand-resolving them, runs every named check in one report, makes the commit with the repository's identity and trailers and says what is wrong with a checkout; where the configuration turns them on it also tells the versions, releases, scaffolds a library, proves a change and builds the documentation.",
   "type": "module",
   "engines": {
@@ -28,6 +28,7 @@
     "@intellectual-frontiers/crypto": "link:../crypto",
     "@intellectual-frontiers/headless": "link:../headless",
     "@intellectual-frontiers/kanon": "link:../kanon",
+    "@intellectual-frontiers/lang-sql": "link:../lang-sql",
     "@intellectual-frontiers/libraries": "link:../libraries",
     "@intellectual-frontiers/net": "link:../net",
     "@intellectual-frontiers/mizan": "link:../mizan",

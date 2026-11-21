@@ -72,7 +72,7 @@ export function describedConfig(): Config {
   const parsed = parseConfig({
     repo: "(described)",
     commit: { identity: { name: "repoctl", email: "repoctl@localhost" } },
-    capabilities: { release: true, newLibrary: true, status: true, prove: true },
+    capabilities: { release: true, newLibrary: true, status: true, prove: true, query: true },
     libraries: { folder: "libraries" },
     hygiene: { scope: "@scope/" },
     docs: {},

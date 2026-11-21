@@ -13,6 +13,8 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
+import { refusal } from "@intellectual-frontiers/lang-sql/aide/guard";
+import { dialect as sqlite } from "@intellectual-frontiers/lang-sql/dialects/sqlite";
 
 /** The name of the probe program on a machine. */
 export const PROBE_PROGRAM = "machine-probe";
@@ -40,7 +42,7 @@ export function encodeRequest(r: ProbeRequest): string {
   return r.kind === "osquery" ? `osquery ${base64(r.sql)}` : r.kind;
 }
 
-/** A request from its text, or why it is refused: only `facts`, `version` and `osquery <base64>` of one SELECT (or a WITH that ends in one), with no second statement. */
+/** A request from its text, or why it is refused: only `facts`, `version` and `osquery <base64>` of one statement that only reads, as the guard of the SQL language library judges it by its tree in the SQLite dialect of osquery (no second statement, no write). */
 export function parseRequest(text: string): Result<ProbeRequest, string> {
   if (text === "facts") return ok({ kind: "facts" });
   if (text === "version") return ok({ kind: "version" });
@@ -48,8 +50,9 @@ export function parseRequest(text: string): Result<ProbeRequest, string> {
   const sql = fromBase64(text.slice("osquery ".length).trim());
   if (sql === undefined) return err("the query is not base64");
   const trimmed = sql.trim().replace(/[\s;]+$/, "");
-  if (!/^(select|with)\b/i.test(trimmed)) return err("only SELECT");
-  if (trimmed.includes(";")) return err("one statement");
+  if (trimmed === "") return err("only SELECT");
+  const why = refusal(trimmed, sqlite);
+  if (why !== undefined) return err(why);
   return ok({ kind: "osquery", sql: trimmed });
 }
 

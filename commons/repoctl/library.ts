@@ -11,7 +11,7 @@ export const library = {
   level: "L1",
   specKit: "spec-kit",
   verify: "bun run verify",
-  version: "0.2.3",
+  version: "0.2.4",
   distribution: ["github", "npm"],
   exports: [".", "./governance", "./logical", "./physical"],
   versionConstants: [{ file: "src/governance/version.ts", name: "REPOCTL_VERSION" }],
@@ -24,7 +24,7 @@ export const library = {
       {
         folder: "src/logical/",
         layer: "logical",
-        packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/headless", subpaths: ["governance", "logical"] }],
+        packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/headless", subpaths: ["governance", "logical"] }, { name: "@intellectual-frontiers/lang-sql", subpaths: ["aide/catalog", "aide/guard", "aide/relational", "aide/text"] }],
       },
       {
         folder: "src/physical/",

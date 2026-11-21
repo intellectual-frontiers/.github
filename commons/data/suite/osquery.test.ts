@@ -9,7 +9,7 @@
 import { assert, proves } from "@intellectual-frontiers/test";
 import { vocabularies } from "@intellectual-frontiers/data/governance";
 import { bind } from "@intellectual-frontiers/data/sql/physical";
-import { classify, importSchema, OsqueryFailure, osqueryDriver, osqueryQuery, PERSONAL, readSchema, selectOnly, SIDE_EFFECT_TABLES, tablesRead, type OsquerySchema, type Ran } from "@intellectual-frontiers/data/sql/extensions/osquery";
+import { classify, importSchema, OsqueryFailure, osqueryCatalog, osqueryDriver, osqueryQuery, PERSONAL, readSchema, selectOnly, SIDE_EFFECT_TABLES, tablesRead, type OsquerySchema, type Ran } from "@intellectual-frontiers/data/sql/extensions/osquery";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { trimmed } from "../tools/osquery-schema.ts";
@@ -90,6 +90,17 @@ const run = (answer: Ran) => (argv: readonly string[]): Promise<Ran> => {
   return Promise.resolve(answer);
 };
 const options = (answer: Ran, platform: "linux" | "darwin" | "windows" = "linux") => ({ run: run(answer), schema: schema(), platform });
+
+proves(["0058-sql-osquery FR-008"], "the schema is made into a catalog for a platform: a table of the platform is there with its columns, one that the platform lacks is not", () => {
+  const s = schema();
+  const all = osqueryCatalog(s);
+  const linux = osqueryCatalog(s, "linux");
+  const win = osqueryCatalog(s, "windows");
+  const only = s.tables.find((t) => t.platforms.length === 1 && t.platforms[0] === "linux");
+  assert(only !== undefined, "a table of one platform");
+  assert(JSON.stringify(linux).includes(`"${only?.name}"`) && !JSON.stringify(win).includes(`"${only?.name}"`), "the platform filters");
+  assert(JSON.stringify(all).includes('"processes"') && JSON.stringify(all).includes('"uid"'), "a table with its columns");
+});
 
 proves(["0058-sql-osquery FR-004", "0058-sql-osquery FR-005"], "only a SELECT of one statement is run: anything that writes, more than one statement, an empty one and what is not a SELECT are refused as error values before a process is started, words in strings and comments are not code, and a table that acts on the world is refused", async () => {
   for (const bad of ["DELETE FROM users", "INSERT INTO t VALUES (1)", "UPDATE users SET uid = 1", "DROP TABLE x", "ATTACH 'f' AS g", "PRAGMA table_info(users)", "SELECT 1; SELECT 2", "SELECT 1; DROP TABLE users", "CREATE TABLE a (b)", "", "   ", "EXPLAIN SELECT 1", "WITH x AS (SELECT 1) DELETE FROM users"]) {

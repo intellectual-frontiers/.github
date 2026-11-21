@@ -356,6 +356,7 @@ export function withRole(source: string, name: string, role: Role): Result<strin
   if (body.includes(`[${q(name)},`)) return ok(source);
   const lastOfRole = body.lastIndexOf(`, ${q(role)}],`);
   if (lastOfRole < 0) return ok(`${source.slice(0, end)}\n${entry}${source.slice(end)}`);
-  const at = start + body.indexOf("\n", lastOfRole);
+  const newline = body.indexOf("\n", lastOfRole);
+  const at = newline < 0 ? end : start + newline;
   return ok(`${source.slice(0, at)}\n${entry}${source.slice(at)}`);
 }

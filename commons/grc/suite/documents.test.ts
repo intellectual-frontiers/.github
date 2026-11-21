@@ -117,7 +117,8 @@ proves(["0004-grc-documents FR-007"], "oscal writes a system security plan of wh
   const a = await sample();
   const ssp = JSON.parse(((await oscal.serialize(a, { options: { model: "system-security-plan" } })) as { value: string }).value);
   const reqs = ssp["system-security-plan"]["control-implementation"]["implemented-requirements"];
-  assertEquals(reqs.map((r: { "control-id": string }) => r["control-id"]), ["a-1", "b-1"]);
+  assertEquals(reqs.map((r: { "control-id": string }) => r["control-id"]), ["a-1", "a-2", "b-1"]);
+  assertEquals(reqs.map((r: { "by-components": { "implementation-status": { state: string } }[] }) => r["by-components"][0]?.["implementation-status"].state), ["partial", "partial", "implemented"], "a control is implemented only where every result shows it");
   const poam = JSON.parse(((await oscal.serialize(a, { options: { model: "plan-of-action-and-milestones" } })) as { value: string }).value)["plan-of-action-and-milestones"];
   assertEquals(poam.risks.length, 2);
   assertEquals(poam["poam-items"][0]["related-risks"][0]["risk-uuid"], poam.risks[0].uuid);
@@ -174,4 +175,56 @@ proves(["0004-grc-documents FR-011"], "the conformance suite passes every serial
   assertEquals(failures.map((f) => f.name), ["deterministic"]);
   const throws = { ...sarif, id: "throws", serialize: () => Promise.reject(new Error("boom")) };
   assertEquals((await serializerConformance(throws, a, EMPTY)).length > 0, true);
+});
+
+proves(["0004-grc-documents FR-007"], "the system security plan says what the caller says of the system and invents nothing else: its sensitivity, boundary, profile, information types, components, users and who is responsible for each control", async () => {
+  const a = await sample();
+  const w = await oscal.serialize(a, {
+    options: {
+      model: "system-security-plan",
+      system: {
+        description: "The lab fleet.", sensitivity: "moderate", boundary: "Every machine of the fleet and nothing else.", profile: "https://example.test/profiles/moderate.json",
+        informationTypes: [{ title: "Technical data", description: "What the fleet holds." }], components: [{ name: "athens", type: "software", description: "A server." }], users: [{ title: "Administrator" }],
+        responsibilities: { "a-1": "inherited", "b-1": "provider", "a-2": "customer" },
+      },
+    },
+  });
+  assert(w.kind === "ok");
+  const ssp = JSON.parse(w.value)["system-security-plan"];
+  assertEquals(ssp["import-profile"].href, "https://example.test/profiles/moderate.json");
+  const sc = ssp["system-characteristics"];
+  assertEquals([sc.description, sc["security-sensitivity-level"], sc["authorization-boundary"].description, sc["system-information"]["information-types"][0].title], ["The lab fleet.", "moderate", "Every machine of the fleet and nothing else.", "Technical data"]);
+  assertEquals(ssp["system-implementation"].components.map((c: { title: string }) => c.title), ["Q2 posture", "athens"]);
+  assertEquals(ssp["system-implementation"].users[0].title, "Administrator");
+  const by = (id: string) => ssp["control-implementation"]["implemented-requirements"].find((r: { "control-id": string }) => r["control-id"] === id)["by-components"][0];
+  assert(by("a-1").inherited.length === 1 && by("b-1").satisfied.length === 1 && by("a-2").export.responsibilities.length === 1);
+  const bare = JSON.parse(((await oscal.serialize(a, { options: { model: "system-security-plan" } })) as { value: string }).value)["system-security-plan"];
+  assertEquals(bare["system-characteristics"]["authorization-boundary"].description, "Not stated by the assessment.");
+  assertEquals(bare["system-characteristics"]["security-sensitivity-level"], undefined, "no sensitivity is made up");
+});
+
+proves(["0004-grc-documents FR-007"], "the three OSCAL documents are valid against NIST's published schema, where the schema (OSCAL_SCHEMA, a file) and a Node with ajv (OSCAL_AJV, the folder that holds it) are at hand", async (t) => {
+  const schema = process.env["OSCAL_SCHEMA"];
+  const ajv = process.env["OSCAL_AJV"];
+  if (schema === undefined || schema === "" || ajv === undefined || ajv === "") return t.skip("OSCAL_SCHEMA and OSCAL_AJV are not set: fetch oscal_complete_schema.json from NIST's OSCAL release and install ajv and ajv-formats in a folder");
+  const a = await sample();
+  const docs: string[] = [];
+  for (const model of ["assessment-results", "system-security-plan", "plan-of-action-and-milestones"]) {
+    const w = await oscal.serialize(a, { options: { model, system: { sensitivity: "moderate" } } });
+    assert(w.kind === "ok");
+    docs.push(w.value);
+  }
+  const { proc, fs, path } = await import("@intellectual-frontiers/system");
+  await fs.withTempDir(async (dir) => {
+    const script = path.join(dir, "v.mjs");
+    await fs.writeTextFile(script, `import { createRequire } from "node:module";import { readFileSync } from "node:fs";const require = createRequire(${JSON.stringify(`${ajv}/`)});const Ajv = require("ajv");const add = require("ajv-formats");const a = new Ajv({ strict: false, allErrors: true });add(a);const v = a.compile(JSON.parse(readFileSync(${JSON.stringify(schema)}, "utf8")));const bad = [];for (const f of process.argv.slice(2)) { if (!v(JSON.parse(readFileSync(f, "utf8")))) bad.push(f + ": " + JSON.stringify(v.errors.slice(0, 5))); }console.log(bad.join("\\n"));process.exit(bad.length ? 1 : 0);`);
+    const files: string[] = [];
+    for (const [i, d] of docs.entries()) {
+      const f = path.join(dir, `d${i}.json`);
+      await fs.writeTextFile(f, d);
+      files.push(f);
+    }
+    const r = await proc.run(["node", script, ...files], {});
+    assert(r.success, r.stdout + r.stderr);
+  });
 });

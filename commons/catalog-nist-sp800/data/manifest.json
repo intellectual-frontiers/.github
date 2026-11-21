@@ -1,0 +1,61 @@
+{
+  "kind": "grc.catalog-package",
+  "schema": "1",
+  "id": "catalog-nist-sp800",
+  "createdAt": "2026-11-21T00:00:00Z",
+  "provenance": {
+    "producer": {
+      "name": "catalog-nist-sp800",
+      "version": "1"
+    },
+    "inputs": [
+      "https://raw.githubusercontent.com/usnistgov/oscal-content/f0de6d8d8c059d374f15e0ae07508d82e370fc1d/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json",
+      "https://raw.githubusercontent.com/usnistgov/oscal-content/f0de6d8d8c059d374f15e0ae07508d82e370fc1d/nist.gov/SP800-171/rev3/json/NIST_SP800-171_rev3_catalog.json"
+    ]
+  },
+  "version": "1",
+  "title": "NIST SP 800-53 Rev 5.2.0 and SP 800-171 Rev 3, with their assessment objectives",
+  "source": {
+    "publisher": "National Institute of Standards and Technology (NIST), OSCAL content",
+    "edition": "SP 800-53 Rev 5.2.0 with SP 800-53A Rev 5.2.0 assessment procedures; SP 800-171 Rev 3 with SP 800-171A Rev 3 assessment objectives; https://github.com/usnistgov/oscal-content at f0de6d8d8c059d374f15e0ae07508d82e370fc1d",
+    "url": "https://github.com/usnistgov/oscal-content"
+  },
+  "licence": "Public domain: as a work of the United States government the content is in the public domain within the United States, and NIST additionally waives copyright and related rights worldwide under CC0 1.0 Universal (https://creativecommons.org/publicdomain/zero/1.0/); source: https://github.com/usnistgov/oscal-content/blob/main/LICENSE.md",
+  "redistributable": true,
+  "holds": [
+    {
+      "kind": "grc.framework",
+      "id": "nist-800-53",
+      "file": "frameworks/nist-800-53-5.2.0.json",
+      "digest": "99741117d252448a7119fdaf9fc689f11fc34270561fb6255d3c8b03ded9f012"
+    },
+    {
+      "kind": "grc.framework",
+      "id": "nist-800-53a",
+      "file": "frameworks/nist-800-53a-5.2.0.json",
+      "digest": "b5b111f2010f5b1ddac21984073ecfa35c3e8af4d30b5a03b37d49bc9be617dc"
+    },
+    {
+      "kind": "grc.framework",
+      "id": "nist-800-171",
+      "file": "frameworks/nist-800-171-3.json",
+      "digest": "fe11ff25d4991cdfb318b52bf30d9b222ba33ccb4255bb8dd45c8518915481f3"
+    },
+    {
+      "kind": "grc.framework",
+      "id": "nist-800-171a",
+      "file": "frameworks/nist-800-171a-3.json",
+      "digest": "3d0954227a2feeb0087a1e87efb42c15cef33466240ce4adbeb2abe9cb4d84fb"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://raw.githubusercontent.com/usnistgov/oscal-content/f0de6d8d8c059d374f15e0ae07508d82e370fc1d/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json",
+      "sha256": "64ca6b4161de51ab6af098a7d101d326f14c95e1abf721396cd8a049e8115eeb"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/usnistgov/oscal-content/f0de6d8d8c059d374f15e0ae07508d82e370fc1d/nist.gov/SP800-171/rev3/json/NIST_SP800-171_rev3_catalog.json",
+      "sha256": "fd68bad4c1fee98dd1b2511884b585fb1f14265d4c5693d0492a25dd66e73dde"
+    }
+  ]
+}
