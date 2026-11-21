@@ -30,6 +30,7 @@ export type {
   BooksConfig,
   CitationsConfig,
   EvidenceSource,
+  GateCondition,
   IssueLike,
   IssuesOf,
   PageSelector,

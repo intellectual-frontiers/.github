@@ -1,4 +1,4 @@
-// Spec: 0001-docs FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016
+// Spec: 0001-docs FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016, FR-017
 /**
  * The evidence the site shows beside the code (docs 0001-docs FR-009 to FR-012): CTRF results, GitHub tickets and typed issues read from files, the Quality section made from them, the lines on a requirement, a library and a
  * module, the findings for a file that cannot be read and a test that names a requirement that is not there, and, with no run recorded, nothing shown as passed.
@@ -154,6 +154,7 @@ proves(["0001-docs FR-013", "0001-docs FR-011"], "the runs of the workflows are 
   assertStringIncludes(page, "flapping (3 flips in 4 runs)");
   assertStringIncludes(page, "verify (grc)");
   assertStringIncludes(page, "… |", "a run in progress is a mark");
+  assertStringIncludes(page, "| ci | 4 | 50% | 10 | 60 min |", "the share that passed, the median minutes, the median time to recover");
   const none = markdownOf((await built({ issues: [] })).pages.find((p) => p.path === "quality/ci.html") as never);
   assertStringIncludes(none, "The runs of the workflows are not recorded for this build of the site.");
 });
@@ -281,3 +282,20 @@ proves(["0001-docs FR-016"], "the history tool adds a run once, keeps the newest
     await fs.remove(dir, { recursive: true });
   }
 }, { timeout: 120_000 });
+
+proves(["0001-docs FR-017"], "each library is held to the gate of the configuration, shown and enforced nowhere, and the requirements page says how each specification stands", async () => {
+  const b = await built({ results: EVIDENCE, issues: [{ library: "fixture", issues: [ISSUE] }], gate: [{ id: "ran" }, { id: "tests-pass" }, { id: "no-blocking-issues" }, { id: "requirements-proved", min: 50 }] });
+  const lib = markdownOf(b.pages.find((p) => p.path === "quality/fixture.html") as never);
+  for (const said of ["## Quality gate", "The library does not hold 3 conditions of the gate. The gate is shown and enforces nothing", "| its tests were in the run | yes |", "| no test failed | no | 1 test failed |", "| no open issue of severity high or critical | no | 1 open issue of severity high or critical |", "| its requirements are proved (50%) | no | 33% of the requirements are proved, 50% are wanted |"]) assertStringIncludes(lib, said);
+  assertStringIncludes(markdownOf(b.pages.find((p) => p.path === "quality/index.html") as never), "| Library | Gate |");
+  const reqs = markdownOf(b.pages.find((p) => p.path === "quality/requirements.html") as never);
+  assertStringIncludes(reqs, "3 requirements of 2 specifications: 1 proved (33%), 0 partly, 1 failing, 1 with no test recorded.");
+  assertStringIncludes(reqs, "| [001-greeting](../specs/001-greeting.md) |");
+  const clean = await built({ results: EVIDENCE });
+  assertStringIncludes(markdownOf(clean.pages.find((p) => p.path === "quality/fixture.html") as never), "The library does not hold 1 condition of the gate");
+  const json = JSON.parse(clean.files.find((f) => f.path === "quality/fixture.json")?.text ?? "{}") as { gate: { condition: string; holds: boolean }[]; requirements: { proved: number; notProved: string[] }; history: unknown[] };
+  assertEquals(json.gate.map((g) => [g.condition, g.holds]), [["ran", true], ["tests-pass", false], ["no-blocking-issues", true]]);
+  assertEquals([json.requirements.proved, json.requirements.notProved.length, json.history.length], [1, 2, 5]);
+  const bad = resolveConfig({ name: "N", repository: "https://github.com/e/n", home: { dir: ".", about: { title: "N", summary: "n." } }, packages: [], citations: { prefix: "n", digits: 3 }, evidence: { gate: [{ id: "luck" }, { id: "requirements-proved", min: 200 }] } }, "/x/docs.config.ts");
+  assert(bad.kind === "err" && bad.error.join().includes("evidence.gate[0].id") && bad.error.join().includes("evidence.gate[1].min"));
+});

@@ -131,6 +131,12 @@ export interface IssuesOf {
   readonly issues: readonly IssueLike[];
 }
 
+/** A condition of a quality gate (docs 0001-docs FR-017): `ran` (the library's tests were in the run), `tests-pass` (none failed), `no-blocking-issues` (no open issue of severity critical or high), `requirements-proved` (at least `min` percent of its requirements are proved; 100 where not said). */
+export interface GateCondition {
+  readonly id: "ran" | "tests-pass" | "no-blocking-issues" | "requirements-proved";
+  readonly min?: number;
+}
+
 /** What the site shows of quality (docs 0001-docs FR-009): the folder of test results (CTRF, one `<library>.ctrf.json` for each, and `meta.json`), the issues of the libraries as typed code, and a snapshot of the tickets of GitHub. */
 export interface EvidenceSource {
   /** The folder of results, from the root; where it is not there, no run is recorded. */
@@ -139,6 +145,8 @@ export interface EvidenceSource {
   readonly github?: string;
   /** The issues kept as typed code. */
   readonly issues?: readonly IssuesOf[];
+  /** The conditions of the quality gate each library is held to, shown and never enforced; `ran`, `tests-pass` and `no-blocking-issues` where none are given. */
+  readonly gate?: readonly GateCondition[];
 }
 
 /** The presentations of the pages (docs 0001-docs FR-007): the static site, the Markdown twins with `llms.txt`, the JSON a lens adds, and the AsciiDoc of the volumes of a book. */
@@ -361,10 +369,23 @@ function evidenceOf(v: unknown, bad: (what: string) => void): EvidenceSource | u
       issues.push({ library: s["library"], ...(typeof s["scope"] === "string" ? { scope: s["scope"] } : {}), issues: list as IssueLike[] });
     });
   }
+  const gate: GateCondition[] = [];
+  const rawGate = v["gate"];
+  if (rawGate !== undefined && !Array.isArray(rawGate)) bad("evidence.gate must be an array of { id, min? }");
+  else {
+    (Array.isArray(rawGate) ? rawGate : []).forEach((g: unknown, i) => {
+      const id = isRecord(g) ? (["ran", "tests-pass", "no-blocking-issues", "requirements-proved"] as const).find((x) => x === g["id"]) : undefined;
+      if (id === undefined) return bad(`evidence.gate[${i}].id must be ran, tests-pass, no-blocking-issues or requirements-proved`);
+      const min = isRecord(g) ? g["min"] : undefined;
+      if (min !== undefined && (typeof min !== "number" || min < 0 || min > 100)) bad(`evidence.gate[${i}].min must be a number from 0 to 100`);
+      gate.push({ id, ...(typeof min === "number" ? { min } : {}) });
+    });
+  }
   return {
     ...(typeof v["results"] === "string" ? { results: v["results"] } : {}),
     ...(typeof v["github"] === "string" ? { github: v["github"] } : {}),
     issues,
+    ...(gate.length === 0 ? {} : { gate }),
   };
 }
 

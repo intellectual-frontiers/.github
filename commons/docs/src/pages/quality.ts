@@ -15,6 +15,7 @@ import { specPage } from "../links.ts";
 import type { Area } from "../sources.ts";
 import type { Badge, Block, Inline, Page, Tone } from "../model.ts";
 import { slugOf } from "../model.ts";
+import { gateBlocks, gateMark, gateResult } from "./insight.ts";
 import { areaPage } from "./overview.ts";
 import type { Spec } from "../extract/specs.ts";
 import { kitDirOf, kitNameOf } from "./specs.ts";
@@ -55,16 +56,18 @@ function requirementsOf(b: Build, library: string): string[] {
 }
 
 /** How the requirements of a library stand on the tests recorded for them. */
-export function requirementStanding(b: Build, library: string): { readonly proved: number; readonly partly: number; readonly failing: number; readonly none: number; readonly total: number; readonly missing: readonly string[] } {
+export function requirementStanding(b: Build, library: string): { readonly proved: number; readonly partly: number; readonly failing: number; readonly none: number; readonly total: number; readonly missing: readonly string[]; readonly notProved: readonly string[] } {
   const reqs = requirementsOf(b, library);
   const by = { proved: 0, partly: 0, failing: 0, none: 0 };
   const missing: string[] = [];
+  const notProved: string[] = [];
   for (const r of reqs) {
     const s = standing(testsFor(b.evidence, r));
     by[s] += 1;
     if (s === "none" || s === "partly") missing.push(r);
+    if (s !== "proved") notProved.push(r);
   }
-  return { ...by, total: reqs.length, missing };
+  return { ...by, total: reqs.length, missing, notProved };
 }
 
 /** The findings a library holds against its trace and its specification checks (`trace.baseline.txt` and `spec-kit/mizan.baseline.txt`): debt that only shrinks, as a count. */
@@ -179,6 +182,7 @@ export function qualityPages(b: Build): void {
     const q = requirementStanding(b, lib);
     return [
       [link(`quality/${lib}.html`, title(lib))],
+      [text(gateMark(b, lib))],
       [text(r === undefined ? (noRunReason(ev, lib) === undefined ? "none" : "no run") : String(r.tests.length))],
       [text(r === undefined ? "" : String(r.passed))],
       [text(r === undefined ? "" : String(r.failed))],
@@ -203,7 +207,7 @@ export function qualityPages(b: Build): void {
       ...(failedAll > 0 ? [BANNER(failedAll)] : []),
       { kind: "paragraph", inlines: runLine(b) },
       ...(ev.build === undefined ? [] : [{ kind: "paragraph" as const, inlines: buildLine(b) }]),
-      { kind: "paragraph", inlines: [link("quality/ci.html", "The workflows"), text(": how the latest runs ended. "), link("quality/findings.html", "The documentation's own findings"), text(": what the generator found while it made this site.")] },
+      { kind: "paragraph", inlines: [link("quality/ci.html", "The workflows"), text(": how the latest runs ended. "), link("quality/requirements.html", "Requirements"), text(": proved, by specification. "), link("quality/dependencies.html", "Dependencies"), text(" and the SBOM. "), link("quality/todo.html", "Notes in the code"), text(". "), link("quality/acceptance.html", "Acceptance kits"), text(". "), link("quality/findings.html", "The documentation's own findings"), text(": what the generator found while it made this site.")] },
       ...(ev.recorded
         ? [{
           kind: "paragraph" as const,
@@ -213,7 +217,7 @@ export function qualityPages(b: Build): void {
       {
         kind: "table",
         filter: "Filter the libraries",
-        head: th("Library", "Tests", "Passed", "Failed", "Skipped", "Pass rate", "Flaky", "Proved", "Held", "Issues", "Tickets"),
+        head: th("Library", "Gate", "Tests", "Passed", "Failed", "Skipped", "Pass rate", "Flaky", "Proved", "Held", "Issues", "Tickets"),
         rows,
       },
       { kind: "paragraph", inlines: [link("quality/issues/index.html", "Every open issue and ticket"), text(" is in the register. Proved: requirements of the library's specifications whose every test passed (one with no test recorded is not counted as proved). Held: findings of the trace and specification checks held against a baseline. Issues and tickets: open ones.")] },
@@ -230,6 +234,7 @@ export function qualityPages(b: Build): void {
     const noRun = noRunReason(ev, lib);
     if (noRun !== undefined) blocks.push({ kind: "callout", tone: "warn", title: "No test run for this library", blocks: [{ kind: "paragraph", inlines: [text(`No test report of the library is in the run these pages show: ${noRun}.`)] }] });
     if (hasOverview(lib)) blocks.push({ kind: "paragraph", inlines: [text("The library: "), link(`overview/${lib}.html`, title(lib)), text(".")] });
+    blocks.push(...gateBlocks(b, lib));
     if (r !== undefined) {
       blocks.push({ kind: "heading", level: 2, id: "tests", text: [text("Tests")] });
       blocks.push({ kind: "paragraph", inlines: [text(`${plural(r.tests.length, "test")}: ${r.passed} passed, ${r.failed} failed, ${r.skipped} skipped, ${r.other} planned or other.`)] });
@@ -514,7 +519,31 @@ export function qualityData(b: Build): readonly { readonly path: string; readonl
       failing: (r?.tests ?? []).filter((t) => t.status === "failed").map((t) => ({ name: t.name, file: t.file, message: t.message ?? null, requirements: t.requirements })),
     };
   });
-  return [{ path: "quality.json", text: `${JSON.stringify({ recorded: ev.recorded, run: ev.run ?? null, libraries }, null, 2)}\n`, what: "the results of the tests, the requirements proved and the open issues and tickets, by library" }];
+  const per = librariesOf(b).map((lib) => {
+    const r = ev.results.get(lib);
+    const q = requirementStanding(b, lib);
+    const mv = movementsOf(ev, lib);
+    return {
+      path: `quality/${lib}.json`,
+      what: `the quality of ${lib}: tests, requirements, gate, history and open issues`,
+      text: `${JSON.stringify({
+        library: lib,
+        run: ev.run ?? null,
+        noRun: noRunReason(ev, lib) ?? null,
+        tests: r === undefined ? null : { total: r.tests.length, passed: r.passed, failed: r.failed, skipped: r.skipped, other: r.other },
+        failing: (r?.tests ?? []).filter((t) => t.status === "failed").map((t) => ({ name: t.name, file: t.file, message: t.message ?? null, requirements: t.requirements })),
+        requirements: { total: q.total, proved: q.proved, partly: q.partly, failing: q.failing, none: q.none, notProved: q.notProved },
+        gate: gateResult(b, lib).map((g) => ({ condition: g.condition.id, min: g.condition.min ?? null, holds: g.holds, why: g.why })),
+        history: runsOf(ev, lib).map((h) => ({ at: h.run.at, commit: h.run.commit, tests: h.lib.tests, passed: h.lib.passed, failed: h.lib.failed, durationMs: h.lib.durationMs })),
+        newlyFailing: mv.newlyFailing.map((x) => x.name),
+        fixed: mv.fixed.map((x) => x.name),
+        flaky: mv.flaky.map((x) => x.name),
+        openIssues: openIssuesOf(ev, lib).map((i) => ({ id: i.id, title: i.title, severity: i.severity, priority: i.priority, status: i.status.kind, cites: i.cites ?? [] })),
+        openTickets: openTicketsOf(ev, lib).map((t) => ({ number: t.number, title: t.title, url: t.url })),
+      }, null, 2)}\n`,
+    };
+  });
+  return [...per, { path: "quality.json", text: `${JSON.stringify({ recorded: ev.recorded, run: ev.run ?? null, libraries }, null, 2)}\n`, what: "the results of the tests, the requirements proved and the open issues and tickets, by library" }];
 }
 
 
@@ -552,6 +581,28 @@ function ciPage(b: Build): void {
           [text(w.runs.slice(0, 10).map(mark).join(" "))],
           [text(flips >= 3 ? `flapping (${flips} flips in ${Math.min(10, done.length)} runs)` : "")],
         ];
+      }),
+    });
+    blocks.push({ kind: "heading", level: 2, id: "reliability", text: [text("Reliability and speed")] });
+    blocks.push({ kind: "paragraph", inlines: [text("From the runs above, cancelled ones left out: the share that passed, the median minutes a run takes, and how long a failure usually lasts (from a run that failed to the next that passed).")] });
+    blocks.push({
+      kind: "table",
+      head: th("Workflow", "Runs", "Passed", "Median minutes", "Median time to recover"),
+      rows: ev.workflows.map((w) => {
+        const done = w.runs.filter((r) => r.status === "completed" && r.conclusion !== "cancelled" && r.conclusion !== "skipped");
+        const passed = done.filter((r) => r.conclusion === "success").length;
+        const mins = done.map((r) => ago(r.startedAt, r.updatedAt)).filter((x): x is number => x !== undefined).sort((x, y) => x - y);
+        const asc = [...done].reverse();
+        const recoveries: number[] = [];
+        asc.forEach((r, i) => {
+          if (r.conclusion !== "failure" || (i > 0 && asc[i - 1]?.conclusion === "failure")) return;
+          const next = asc.slice(i + 1).find((x) => x.conclusion === "success");
+          const t = next === undefined ? undefined : ago(r.createdAt, next.createdAt);
+          if (t !== undefined) recoveries.push(t);
+        });
+        recoveries.sort((x, y) => x - y);
+        const median = (xs: readonly number[]): string => (xs.length === 0 ? "" : String(xs[Math.floor(xs.length / 2)]));
+        return [[text(w.name)], [text(String(done.length))], [text(done.length === 0 ? "" : `${Math.round((passed / done.length) * 100)}%`)], [text(median(mins))], [text(recoveries.length === 0 ? "" : `${median(recoveries)} min`)]];
       }),
     });
     for (const w of ev.workflows) {
