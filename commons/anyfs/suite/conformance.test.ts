@@ -161,6 +161,18 @@ proves(["0005-anyfs-conformance FR-004", "0005-anyfs-conformance FR-005"], "the 
     assertEquals((await localStore("relative/dir")).kind, "err");
     assertEquals((await localStore(osPath.join(dir, "nothing"))).kind, "err");
     assertEquals((await localStore(osPath.join(dir, "made"), { create: true })).kind, "ok");
+    // a store at the root of the file system opens without writing there, reads what is below it, and takes the names the computer has
+    const rootPath = osPath.parse(dir).root;
+    const locks = osPath.join(dir, "locks-of-the-wide-store");
+    const wide = await localStore(rootPath, { portable: false, caseSensitive: true, lockDir: locks });
+    assert(wide.kind === "ok", "the root of the file system opens");
+    const below = p(dir.slice(rootPath.length).split(osPath.sep).join("/") + "/a/b.txt");
+    await s.write(p("a/b.txt"), bytes("seen from the root"), expectAny);
+    const seen = await wide.value.read(below);
+    assert(seen.kind === "ok" && new TextDecoder().decode(seen.value.bytes) === "seen from the root");
+    const written = await wide.value.write(p(`${dir.slice(rootPath.length).split(osPath.sep).join("/")}/a/c.txt`), bytes("written through the root"), expectAny);
+    assert(written.kind === "ok");
+    assertEquals(await fs.exists(locks), true);
   });
   // a store whose methods do not match its capabilities is found by the check the suite is run with
   for (const s of [memoryStore(), await inFolder((dir) => localIn(dir))]) {
