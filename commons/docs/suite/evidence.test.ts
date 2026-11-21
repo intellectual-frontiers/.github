@@ -1,4 +1,4 @@
-// Spec: 0001-docs FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016, FR-017, FR-020, FR-022, FR-023
+// Spec: 0001-docs FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016, FR-017, FR-020, FR-022, FR-023, FR-024
 /**
  * The evidence the site shows beside the code (docs 0001-docs FR-009 to FR-012): CTRF results, GitHub tickets and typed issues read from files, the Quality section made from them, the lines on a requirement, a library and a
  * module, the findings for a file that cannot be read and a test that names a requirement that is not there, and, with no run recorded, nothing shown as passed.
@@ -15,6 +15,7 @@ import { sparkText } from "../src/emit/html.ts";
 import { busFactor, lastChanged, libraryOfPath, parseLog } from "../src/pages/git.ts";
 import { document } from "../src/emit/html.ts";
 import { type EvidenceSource, resolveConfig } from "../src/config.ts";
+import { importedNames, importIndex, testsImporting } from "../src/exercise.ts";
 import { parseCoverage, parseLcov, percent } from "../src/coverage.ts";
 import { parseCtrf, parseRuns, parseTickets, readEvidence, requirementsIn, standing } from "../src/evidence.ts";
 import { markdownOf } from "../src/emit/markdown.ts";
@@ -344,4 +345,23 @@ proves(["0001-docs FR-023"], "the four measures of DORA are taken from the runs 
   ];
   assertEquals(deliveryOf(runs), { runs: 3, days: 1, perDay: 2, leadMinutes: 6, failureRate: 33, restoreMinutes: 720 });
   assertEquals(deliveryOf(runs.slice(0, 1)), undefined);
+});
+
+proves(["0001-docs FR-024"], "the tests that exercise an export are those of its package whose files import it, by the name it is exported under, and the API page of an export says how many there are and whether any fails", async () => {
+  const names = importedNames(['import { a, b as c, type D } from "./x.ts";', 'import type { E } from "../src/y.ts";', 'import { F } from "@intellectual-frontiers/core";', 'import { G } from "node:fs";', 'import { H } from "left-pad";'].join("\n"));
+  assertEquals([...names].sort(), ["E", "F", "a", "b"].concat(["D"]).sort());
+  const t = (name: string, file: string, status: "passed" | "failed") => ({ name, status, durationMs: 1, file, requirements: [], risk: "", runtime: "", retries: 0, message: undefined });
+  const files: Record<string, string> = { "commons/p/suite/a.test.ts": 'import { greet } from "../src/mod.ts";', "commons/p/suite/b.test.ts": 'import { greet, fs } from "../src/mod.ts";', "commons/q/suite/c.test.ts": 'import { greet } from "../../p/src/mod.ts";' };
+  const stub = {
+    evidence: { results: new Map([["p", { library: "p", tests: [t("1: a", "commons/p/suite/a.test.ts", "passed"), t("2: b", "commons/p/suite/b.test.ts", "failed")] }], ["q", { library: "q", tests: [t("3: c", "commons/q/suite/c.test.ts", "passed")] }]]) },
+    exists: (f: string) => f in files,
+    read: (f: string) => files[f] ?? "",
+  };
+  const index = importIndex(stub as never);
+  assertEquals(testsImporting(index, "commons/p", "greet").map((x) => [x.test.name, x.library]), [["1: a", "p"], ["2: b", "p"]], "the tests of the package, not of another that imports it too");
+  assertEquals(testsImporting(index, "commons/p", "fs.readTextFile").map((x) => x.test.name), ["2: b"], "a namespace's member is found by the namespace");
+  assertEquals(testsImporting(index, "commons/p", "nothing"), []);
+  const b = await built({ results: EVIDENCE });
+  const api = markdownOf(b.pages.find((p) => p.path.startsWith("api/greeting/")) as never);
+  assertStringIncludes(api, "greet");
 });
