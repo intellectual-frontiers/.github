@@ -41,6 +41,8 @@ export {
 export { type SexpOptions, toSexp } from "./dump.ts";
 export { describeParseError, type ParseError, spanOf } from "./errors.ts";
 export { build } from "./build.ts";
+export { describeEmitError, type EmitError, identifier, paramStyles, placeholder, qualified, quoteIdent, quoteString } from "./emit.ts";
+export { ANSI_FUNCTIONS, createRegistry, describeRegistryError, type FunctionSpec, type Registry, type RegistryError } from "./registry.ts";
 export { ANSI_GRAMMAR, type CustomOperator, type Grammar, Prec, RESERVED_WORDS } from "./grammar.ts";
 export {
   type Fragment,

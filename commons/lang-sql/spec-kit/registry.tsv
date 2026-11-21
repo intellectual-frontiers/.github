@@ -5,3 +5,4 @@ number	slug	state
 0004	sql-docs	in force
 0005	sql-dialects	in force
 0006	sql-routines	in force
+0007	sql-emit	in force
