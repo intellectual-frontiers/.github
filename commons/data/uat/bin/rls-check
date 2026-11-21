@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Step 7: runs every row-security scenario against your database. Pass --explain to see the statements, --only S01,S03 to run some.
+set -euo pipefail
+. "$(dirname "$0")/env"
+cd "$UAT_DATA"
+exec bun uat/bin/rls-check.ts "$@"

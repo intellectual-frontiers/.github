@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Step 3: makes the roles of the UAT. Run it as a PostgreSQL superuser, in the UAT database. Safe to run again.
+set -euo pipefail
+. "$(dirname "$0")/env"
+psql -v ON_ERROR_STOP=1 -v uat_password="$UAT_PASSWORD" -f "$UAT_DIR/sql/roles.sql"
+echo "roles: done. Next: bin/schema"

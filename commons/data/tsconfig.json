@@ -3,5 +3,5 @@
   "compilerOptions": {
     "skipLibCheck": true
   },
-  "include": ["about.ts", "engine/**/*.ts", "governance/**/*.ts", "models/**/*.ts", "sql/**/*.ts", "extensions/**/*.ts", "suite/**/*.ts"]
+  "include": ["about.ts", "engine/**/*.ts", "governance/**/*.ts", "models/**/*.ts", "sql/**/*.ts", "extensions/**/*.ts", "suite/**/*.ts", "uat/**/*.ts"]
 }

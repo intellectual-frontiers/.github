@@ -1,4 +1,4 @@
-// Spec: 0051-project-cli FR-001, FR-002, FR-003, FR-004, FR-005
+// Spec: 0051-project-cli FR-001, FR-002, FR-003, FR-004, FR-005, FR-006
 /**
  * The project commands of `arcactl` (commons data 0051-project-cli): `sql` writes the DDL of a project's models for a dialect, `lint` holds the models to governance's rules (and the operations to theirs),
  * `generate` writes what a generator makes (a diagram, the data dictionary, Rust, Zod) and `list` says what there is. They read no database and write no file: what they make goes to standard output, so that a
@@ -13,12 +13,16 @@ import { agentOperations } from "@intellectual-frontiers/data/models/identity-ag
 import { dialect as duckdb } from "@intellectual-frontiers/data/sql/dialects/duckdb";
 import { dialect as postgres } from "@intellectual-frontiers/data/sql/dialects/postgres";
 import { dialect as sqlite } from "@intellectual-frontiers/data/sql/dialects/sqlite";
+import { accessSource, type AccessSettings } from "@intellectual-frontiers/data/sql/extensions/access";
 import { generators } from "@intellectual-frontiers/data/sql/extensions/generators";
 import { invariants, invariantsOf } from "@intellectual-frontiers/data/sql/extensions/invariants";
+import { sha256Hex } from "@intellectual-frontiers/data/sql/lifecycle";
 import { projectDomain, type LogicalSchema } from "@intellectual-frontiers/data/sql/logical";
+import { protection } from "@intellectual-frontiers/data/sql/extensions/protected-access";
 import { bind, type Dialect, naming } from "@intellectual-frontiers/data/sql/physical";
 import { loadConfig, type ModelName, modelNames, schemaOf, settingsOf } from "./config.ts";
 import type { Outcome } from "./main.ts";
+import { secretOf } from "./server.ts";
 
 /** The commands of this file. */
 export type ProjectCommand = "sql" | "lint" | "generate" | "list";
@@ -27,13 +31,23 @@ export const projectCommands: readonly ProjectCommand[] = ["sql", "lint", "gener
 const DIALECTS: Readonly<Record<string, Dialect>> = { postgres, sqlite, duckdb };
 
 /** What a project is. */
-interface Project {
+export interface Project {
   readonly label: string;
   readonly domain: Domain;
   readonly schema: LogicalSchema;
   readonly models: readonly string[];
   readonly name: string;
 }
+
+/** What a project command is given besides its arguments: where a relative path is from, and the environment a secret is read from. */
+export interface ProjectIo {
+  readonly cwd: string;
+  readonly env?: Readonly<Record<string, string | undefined>>;
+  readonly read?: (path: string) => string;
+}
+
+/** The flags that take a value, so that a positional argument is not mistaken for one. */
+const VALUE_FLAGS = ["--models", "--config", "--module", "--schema", "--dialect", "--protect", "--reach", "--prefix"];
 
 const flag = (argv: readonly string[], name: string): string | undefined => {
   const i = argv.indexOf(name);
@@ -44,7 +58,7 @@ const isDomain = (x: unknown): x is Domain => typeof x === "object" && x !== nul
 const isModule = (x: unknown): x is Module => typeof x === "object" && x !== null && "requires" in x && "concepts" in x;
 
 /** The project a module of the project's own gives: its default export, as a domain, a module or a list of modules, or a result of one. */
-async function fromModule(path: string): Promise<Result<Project, string>> {
+export async function fromModule(path: string): Promise<Result<Project, string>> {
   let mod: { default?: unknown };
   try {
     mod = (await import(path)) as { default?: unknown };
@@ -57,7 +71,7 @@ async function fromModule(path: string): Promise<Result<Project, string>> {
   let domain: Domain | undefined;
   if (isDomain(x)) domain = x;
   else if (isModule(x) || (Array.isArray(x) && x.every(isModule))) {
-    const composed = composeModules("project", {}, Array.isArray(x) ? (x as Module[]) : [x as Module]);
+    const composed = composeModules("project", { definition: `The models of ${path}` }, Array.isArray(x) ? (x as Module[]) : [x as Module]);
     if (composed.kind === "err") return err(`${path}: the modules do not compose: ${JSON.stringify(composed.error).slice(0, 300)}`);
     domain = composed.value;
   }
@@ -92,6 +106,39 @@ async function load(given: readonly string[], cwd: string): Promise<Result<Proje
 
 const names = (xs: readonly { readonly id: string; readonly describe: string }[]): string => xs.map((g) => `${g.id}  ${g.describe}`).join("\n");
 
+/** What `sql` is asked of access: the settings of the access source, and the owner of the protected layer where it is asked for. */
+interface AccessAsked {
+  readonly settings: AccessSettings;
+  readonly protect: string | undefined;
+}
+
+/** The access the flags ask for (`--access`, `--protect OWNER`, `--seal`, `--reach`, `--wildcard`, `--prefix`), with the seal's key and unlock secret read from the environment and never from an argument. */
+async function accessOf(given: readonly string[], env: Readonly<Record<string, string | undefined>>, read: ProjectIo["read"]): Promise<Result<AccessAsked | undefined, string>> {
+  const protect = flag(given, "--protect");
+  const seal = given.includes("--seal");
+  const reach = flag(given, "--reach");
+  const wildcard = given.includes("--wildcard");
+  const prefix = flag(given, "--prefix");
+  const asked = given.includes("--access") || seal || protect !== undefined;
+  if (!asked) return reach === undefined && !wildcard && prefix === undefined ? ok(undefined) : err("--reach, --wildcard and --prefix are for row security: add --access");
+  if (reach !== undefined && reach !== "exact" && reach !== "set") return err(`--reach is exact or set, not ${reach}`);
+  if (wildcard && reach !== "set") return err("--wildcard needs --reach set");
+  if (protect !== undefined && !/^[a-z_][a-z0-9_]*$/.test(protect)) return err(`--protect names the role that owns the tables: a lower-case name, not ${JSON.stringify(protect)}`);
+  let sealed: AccessSettings["seal"];
+  if (seal) {
+    const key = secretOf(env, "ARCA_SEAL_KEY", read);
+    if (key.kind === "err") return err(key.error);
+    if (key.value === undefined || key.value.length < 16) return err("--seal needs a key of at least 16 characters in ARCA_SEAL_KEY (or in the file ARCA_SEAL_KEY_FILE names): it is never an argument");
+    const unlock = secretOf(env, "ARCA_UNLOCK_SECRET", read);
+    if (unlock.kind === "err") return err(unlock.error);
+    sealed = { key: key.value, ...(unlock.value === undefined ? {} : { unlock: sha256Hex(unlock.value) }) };
+  }
+  return ok({
+    protect,
+    settings: { ...(sealed === undefined ? {} : { seal: sealed }), ...(reach === undefined ? {} : { reach }), ...(wildcard ? { wildcard } : {}), ...(prefix === undefined ? {} : { settingPrefix: prefix }) },
+  });
+}
+
 /**
  * Runs a project command.
  *
@@ -100,9 +147,10 @@ const names = (xs: readonly { readonly id: string; readonly describe: string }[]
  * @param cwd - where a relative path is from
  * @returns the exit status (0 done, 1 what it found is wrong, 2 the command is wrong) and what to print
  */
-export async function projectCommand(command: ProjectCommand, given: readonly string[], cwd: string): Promise<Outcome> {
+export async function projectCommand(command: ProjectCommand, given: readonly string[], io: ProjectIo | string): Promise<Outcome> {
+  const { cwd, env = {}, read } = typeof io === "string" ? { cwd: io } as ProjectIo : io;
   const fail = (m: string): Outcome => ({ code: 2, out: "", err: `${m}\n` });
-  const positional = given.filter((g, i) => !g.startsWith("--") && !["--models", "--config", "--module", "--schema", "--dialect"].includes(given[i - 1] ?? ""));
+  const positional = given.filter((g, i) => !g.startsWith("--") && !VALUE_FLAGS.includes(given[i - 1] ?? ""));
   const project = await load(given, cwd);
   if (project.kind === "err" && command !== "list") return fail(project.error);
   const dialectName = flag(given, "--dialect") ?? "postgres";
@@ -133,7 +181,15 @@ export async function projectCommand(command: ProjectCommand, given: readonly st
       if (project.kind === "err") return fail(project.error);
       const p = project.value;
       const sources = given.includes("--no-invariants") ? [] : [invariants({ unsupported: "carry", guard: false })];
-      const bound = bind(p.schema, { dialect, ...(flag(given, "--schema") === undefined && p.models.length === 0 ? {} : { schema: flag(given, "--schema") ?? p.name }), sources });
+      const access = await accessOf(given, env, read);
+      if (access.kind === "err") return fail(access.error);
+      const a = access.value;
+      const schemaName = flag(given, "--schema") === undefined && p.models.length === 0 ? undefined : (flag(given, "--schema") ?? p.name);
+      if (a !== undefined && dialectName !== "postgres") return fail("row security, the protected layer and the seal are PostgreSQL's: --dialect postgres");
+      const kit = a?.protect === undefined ? undefined : protection({ owner: a.protect, ...(schemaName === undefined ? {} : { tablesSchema: schemaName }) });
+      if (a !== undefined) sources.push(accessSource({ ...a.settings, ...(kit === undefined ? {} : { viewsSchema: kit.settings.viewsSchema }) }));
+      if (kit !== undefined) sources.push(...kit.bind.sources);
+      const bound = bind(p.schema, { dialect, ...(kit !== undefined ? { schema: kit.settings.tablesSchema } : schemaName === undefined ? {} : { schema: schemaName }), sources });
       if (bound.kind === "err") return { code: 1, out: "", err: `${p.label}: ${JSON.stringify(bound.error).slice(0, 600)}\n` };
       return { code: 0, out: `${bound.value.statements.map((s) => s.sql).join("\n\n")}\n`, err: "" };
     }
@@ -150,7 +206,9 @@ export async function projectCommand(command: ProjectCommand, given: readonly st
     case "generate": {
       if (project.kind === "err") return fail(project.error);
       const name = positional[0];
-      const g = generators.find((x) => x.id === name);
+      // the short names the usage gives (dictionary, mermaid, d2, rust, zod, register, html) are the ids without their prefix, as `list` shows them
+      const short = name === "mermaid" ? "erd-mermaid" : name === "d2" ? "erd-d2" : name;
+      const g = generators.find((x) => x.id === name || x.id === `sql.generate.${short}`);
       if (g === undefined) return fail(`generate what? ${generators.map((x) => x.id).join(", ")}`);
       const made = g.generate({ schema: project.value.schema, naming: naming(), dialect });
       if (made.kind === "err") return { code: 1, out: "", err: `${project.value.label}: ${JSON.stringify(made.error).slice(0, 600)}\n` };

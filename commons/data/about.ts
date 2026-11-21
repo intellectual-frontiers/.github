@@ -42,6 +42,11 @@ export const about: About = {
       what: "Arca's typical data models as governance: the party model first.",
       mayImport: ["governance/, engine/, by package name"],
     },
+    {
+      path: "uat/",
+      what: "The UAT kit (0071-uat-kit): a walk-through, with scripts, an example business-to-business application with tenants and roles, a seed and the row-security scenarios, to test the library by hand on a PostgreSQL that the person already has. Not packed.",
+      mayImport: ["governance/, sql/, models/, by package name"],
+    },
     { path: "suite/", what: "The tests.", mayImport: ["anything here"] },
   ],
   commands: [{ run: "bun run verify", does: "The compiler, the specification checker and the rules on spec-kit/, and the tests." }],

@@ -1,0 +1,31 @@
+# Source this file; do not run it:   . uat/bin/env     (from commons/data)
+#
+# It gives your shell what the UAT needs, and nothing else:
+#   - UAT_DIR       where the kit is
+#   - arcactl       a shell function that runs arcactl from this checkout (no install needed)
+#   - UAT_PASSWORD, ARCA_SEAL_KEY, ARCA_UNLOCK_SECRET
+#                   three secrets, made once into uat/.env.uat (not committed) and read from there afterwards
+# It never touches your database. Which database you use is yours to say with libpq's variables (PGHOST, PGPORT, PGUSER,
+# PGDATABASE, PGSERVICE) or a connection URL in ARCA_DATABASE_URL; see the README, step 2.
+
+UAT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-${(%):-%x}}")/.." && pwd)"
+export UAT_DIR
+UAT_DATA="$(cd "$UAT_DIR/.." && pwd)"
+export UAT_DATA
+
+arcactl() { bun "$UAT_DATA/sql/cli/arcactl.ts" "$@"; }
+
+if [ ! -f "$UAT_DIR/.env.uat" ]; then
+  secret() { od -An -N16 -tx1 /dev/urandom | tr -d ' \n'; }
+  umask 077
+  {
+    echo "UAT_PASSWORD=uat-$(secret)"
+    echo "ARCA_SEAL_KEY=seal-$(secret)"
+    echo "ARCA_UNLOCK_SECRET=unlock-$(secret)"
+  } > "$UAT_DIR/.env.uat"
+  echo "uat: made $UAT_DIR/.env.uat with three new secrets (it is not committed; delete it to make new ones)" >&2
+fi
+set -a
+# shellcheck disable=SC1091
+. "$UAT_DIR/.env.uat"
+set +a

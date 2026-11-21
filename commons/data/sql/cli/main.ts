@@ -8,19 +8,21 @@
  */
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
-import { type ArcaConfig, type ConfigError, loadConfig, type ModelName, modelNames, schemaOf, settingsOf } from "./config.ts";
+import { type Arca, type ArcaConfig, type ConfigError, loadConfig, type ModelName, modelNames, schemaOf, settingsOf } from "./config.ts";
 import { type Connection, connect as realConnect, type ConnectOptions } from "./connection.ts";
 import { checkIds, doctor, renderReport } from "./doctor.ts";
 import { passwordOf, redact } from "./redact.ts";
 import { modeOf, secretOf } from "./server.ts";
 import { envJson, shellScript } from "./shell.ts";
 import { runInit } from "./init.ts";
-import { projectCommand, type ProjectCommand, projectCommands } from "./project.ts";
+import { scopeCommand } from "./scope.ts";
+import { fromModule, projectCommand, type ProjectCommand, projectCommands } from "./project.ts";
 import type { Prompter } from "./prompt.ts";
 import { readState } from "./state.ts";
 import { workstationChecks, workstationIds } from "./workstation-checks.ts";
 import { type Platform, pathsOf, type Shell, shellOf, shells } from "./workstation.ts";
 import type { CheckResult, Report } from "./doctor.ts";
+import type { LogicalSchema } from "@intellectual-frontiers/data/sql/logical";
 
 /** What the command line is given besides its arguments. */
 export interface Io {
@@ -54,7 +56,8 @@ export const USAGE = `arcactl: manage and check an arca database in PostgreSQL
 
   arcactl doctor [options]     check the database against the models (read-only)
   arcactl shell [options]      print the script that sets up this shell (source it; writes nothing)
-  arcactl sql [options]        write the DDL of the models for a dialect (to standard output)
+  arcactl sql [options]        write the DDL of the models for a dialect (to standard output); --access, --protect OWNER, --seal, --reach set, --wildcard add row security
+  arcactl scope [options]      print the statement that sets a sealed scope for a session: --tenant a,b, --subtree T or --all (the key is ARCA_SEAL_KEY)
   arcactl lint [options]       hold the models (and their operations) to governance's rules
   arcactl generate NAME        write what a generator makes: mermaid, d2, dictionary, rust, zod, register
   arcactl list [WHAT]          generators (default), models, dialects, tables, codes, invariants, operations
@@ -64,7 +67,13 @@ options:
   --config <file>     arca.config.ts (default: ./arca.config.ts where there is one)
   --models <a,b,...>  the models wanted, where there is no config: ${modelNames.join(", ")}
   --schema <name>     the schema the tables are in (default: arca)
-  --module <file>     a module of your own whose default export is a domain, a module or a list of modules (sql, lint, generate, list)
+  --module <file>     a module of your own whose default export is a domain, a module or a list of modules (sql, lint, generate, list, doctor)
+  --access            sql: grants and row-level policies of security.access and security.scope
+  --protect <role>    sql: the protected layer (tables in --schema, views in api), owned by this role; implies --access
+  --seal              sql, doctor: the scope is sealed; the key is ARCA_SEAL_KEY and the unlock secret ARCA_UNLOCK_SECRET, never arguments; implies --access
+  --reach <r>         sql: exact (default) or set: a scope may list tenants, separated by commas
+  --wildcard          sql: with --reach set, the scope * reaches every row (a platform operator)
+  --prefix <p>        sql: the prefix of the scope setting (default app)
   --dialect <d>       postgres (default), sqlite or duckdb (sql, generate)
   --no-invariants     sql: leave out the triggers of the invariants
   --strict            lint: a warning fails too
@@ -121,7 +130,8 @@ export async function main(argv: readonly string[], io: Io): Promise<Outcome> {
   const [command] = argv;
   if (command === undefined || command === "-h" || command === "--help" || command === "help") return { code: command === undefined ? 2 : 0, out: command === undefined ? "" : USAGE, err: command === undefined ? USAGE : "" };
   if (command === "shell") return shellCommand(argv.slice(1), io);
-  if ((projectCommands as readonly string[]).includes(command)) return projectCommand(command as ProjectCommand, argv.slice(1), io.cwd);
+  if (command === "scope") return scopeCommand(argv.slice(1), io);
+  if ((projectCommands as readonly string[]).includes(command)) return projectCommand(command as ProjectCommand, argv.slice(1), { cwd: io.cwd, env: io.env, ...(io.read === undefined ? {} : { read: io.read }) });
   if (command === "init") {
     const plat = io.platform ?? ((process.platform === "win32" ? "win32" : process.platform === "darwin" ? "darwin" : "linux") as Platform);
     return runInit(argv.slice(1), { env: io.env, platform: plat, cwd: io.cwd, tty: io.tty ?? false, ...(io.prompt === undefined ? {} : { prompt: io.prompt }), ...(io.stdin === undefined ? {} : { stdin: io.stdin }), ...(io.connect === undefined ? {} : { connect: io.connect }), ...(io.psqlVersion === undefined ? {} : { psqlVersion: io.psqlVersion }) });
@@ -161,11 +171,25 @@ export async function main(argv: readonly string[], io: Io): Promise<Outcome> {
   }
   const models = flag(given, "--models")?.split(",").map((m) => m.trim()).filter((m) => m !== "") as ModelName[] | undefined;
   const schema = flag(given, "--schema");
-  if (base === undefined && models === undefined) return fail("name the models: write arca.config.ts, or give --models (for example --models identityAgent)");
-  const config = settingsOf({ ...(base ?? { models: [] }), ...(models === undefined ? {} : { models }), ...(schema === undefined ? {} : { schema }) });
-  if (config.kind === "err") return fail(config.error.map(says).join("\n"));
-  const made = schemaOf(config.value);
-  if (made.kind === "err") return fail(made.error.map(says).join("\n"));
+  const moduleFile = flag(given, "--module");
+  if (moduleFile !== undefined && (models !== undefined || file !== undefined)) return fail("give the models (--models or --config) or a module of your own (--module), not both");
+  if (base === undefined && models === undefined && moduleFile === undefined) return fail("name the models: write arca.config.ts, or give --models (for example --models identityAgent), or a module of your own with --module");
+  // a project's own module is held as it is: the tables of its schema, with no invariant guard (as `sql` writes it), sealed where the seal is expected
+  let config: { readonly value: Arca };
+  let made: { readonly value: { readonly schema: LogicalSchema } };
+  if (moduleFile !== undefined) {
+    const project = await fromModule(resolve(io.cwd, moduleFile));
+    if (project.kind === "err") return fail(project.error);
+    config = { value: { schema: schema ?? "arca", models: [], invariants: true, guard: false, seal: given.includes("--seal"), unmanaged: "hold", ledgerTable: "lifecycle_ledger" } };
+    made = { value: { schema: project.value.schema } };
+  } else {
+    const settled = settingsOf({ ...(base ?? { models: [] }), ...(models === undefined ? {} : { models }), ...(schema === undefined ? {} : { schema }) });
+    if (settled.kind === "err") return fail(settled.error.map(says).join("\n"));
+    const picked = schemaOf(settled.value);
+    if (picked.kind === "err") return fail(picked.error.map(says).join("\n"));
+    config = settled;
+    made = picked;
+  }
   const only = flag(given, "--check")?.split(",").map((s) => s.trim());
   const unknown = (only ?? []).filter((c) => !checkIds.includes(c) && !workstationIds.includes(c));
   if (unknown.length > 0) return fail(`no such check: ${unknown.join(", ")} (they are ${checkIds.join(", ")})`);
