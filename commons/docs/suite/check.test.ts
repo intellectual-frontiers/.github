@@ -40,14 +40,14 @@ proves(["0011-documentation FR-018"], "a link to a page or an anchor that is not
   assertEquals(report(found), ["a.html: links to a.html#gone, which is not a page or an anchor of the site", "a.html: links to b.html, which is not a page or an anchor of the site"]);
 });
 
-proves(["0011-documentation FR-003", "0011-documentation FR-009", "0011-documentation FR-041", "0001-docs FR-018", "0001-docs FR-019"], "the site of commons builds with no finding, the same twice, with its sections, the Quality section and the issues of data", async () => {
+proves(["0011-documentation FR-003", "0011-documentation FR-009", "0011-documentation FR-041", "0001-docs FR-018", "0001-docs FR-019", "0001-docs FR-021"], "the site of commons builds with no finding, the same twice, with its sections, the Quality section and the issues of data", async () => {
   const one = await buildSite(CONFIG);
   const two = await buildSite(CONFIG);
   assertEquals(report(one.found), []);
   const html = (b: typeof one): string[] => b.pages.map((p) => document(p, { name: "N", repository: "r", pages: b.pages }));
   assertEquals(html(one), html(two));
   assertEquals([...new Set(one.pages.map((p) => p.section))].sort(), ["api", "concepts", "howto", "models", "overview", "programs", "quality", "specs", "start"]);
-  for (const needed of ["index.html", "specs/matrix.html", "api/core/index.html", "models/index.html", "models/layers.html", "models/arca-party/person.html", "quality/index.html", "quality/data.html", "quality/issues/index.html", "quality/issues/data-00005.html", "quality/requirements.html", "quality/dependencies.html", "quality/todo.html", "quality/acceptance.html", "quality/ci.html", "quality/findings.html"]) {
+  for (const needed of ["index.html", "specs/matrix.html", "api/core/index.html", "models/index.html", "models/layers.html", "models/arca-party/person.html", "quality/index.html", "quality/data.html", "quality/issues/index.html", "quality/issues/data-00005.html", "quality/requirements.html", "quality/dependencies.html", "quality/todo.html", "quality/acceptance.html", "quality/ci.html", "quality/findings.html", "quality/hotspots.html", "quality/health.html"]) {
     assert(one.pages.some((p) => p.path === needed), `the site has ${needed}`);
   }
   // what is made of the repository beside the tests: dependencies and the SBOM, the notes in the code, the acceptance kits, the requirements (0001-docs FR-018, FR-019)
@@ -55,6 +55,7 @@ proves(["0011-documentation FR-003", "0011-documentation FR-009", "0011-document
   assertStringIncludes(md("quality/dependencies.html"), "[core](../overview/core.md)");
   assertStringIncludes(md("quality/acceptance.html"), "acceptance/arcactl-pg");
   assertStringIncludes(md("quality/requirements.html"), "[0001-core](../specs/0001-core.md)");
+  assertStringIncludes(md("quality/health.html"), "Token-Permissions");
   const bom = JSON.parse(one.files.find((f) => f.path === "sbom.cdx.json")?.text ?? "{}") as { bomFormat: string; specVersion: string; components: { name: string }[]; dependencies: { ref: string }[] };
   assertEquals([bom.bomFormat, bom.specVersion], ["CycloneDX", "1.5"]);
   assert(bom.components.some((c) => c.name === "@intellectual-frontiers/core") && bom.components.length > 60 && bom.dependencies.length > 40, "a component for each library and package");

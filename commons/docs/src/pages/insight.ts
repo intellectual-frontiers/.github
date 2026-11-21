@@ -1,4 +1,4 @@
-// Spec: 0001-docs FR-017, FR-018, FR-019
+// Spec: 0001-docs FR-017, FR-018, FR-019, FR-021
 /**
  * The pages that read the repository beside the tests (docs 0001-docs FR-017 to FR-019): the quality gate of each library as data, the requirements by specification, what each library imports and is imported by (with licences, and an
  * SBOM in CycloneDX), the notes people left in the code (TODO, FIXME), and the acceptance kits with their findings. Each is made from files of the repository or the evidence, shows what it is made from, and says none where there is none.
@@ -11,7 +11,6 @@ import type { GateCondition } from "../config.ts";
 import { isOpen } from "../evidence.ts";
 import { specPage } from "../links.ts";
 import type { Block, Inline } from "../model.ts";
-import { slugOf } from "../model.ts";
 import { requirementStanding } from "./quality.ts";
 import { kitDirOf, kitNameOf } from "./specs.ts";
 
@@ -106,6 +105,7 @@ export function insightPages(b: Build): void {
   dependenciesPage(b);
   todoPage(b);
   acceptancePage(b);
+  healthPage(b);
 }
 
 function requirementsPage(b: Build): void {
@@ -289,4 +289,41 @@ function acceptancePage(b: Build): void {
   });
 }
 
-void slugOf;
+/** The checks of the repository's health that its own files answer, in the manner of the OpenSSF Scorecard: the workflows' permissions and pins, the files a project is expected to have, a tool that keeps dependencies up to date. */
+function healthPage(b: Build): void {
+  const wfDir = ".github/workflows";
+  const workflows = b.exists(wfDir) ? fs.readDirSync(b.abs(wfDir)).filter((e) => e.isFile && /\.ya?ml$/.test(e.name)).map((e) => ({ name: e.name, text: b.read(`${wfDir}/${e.name}`) })).sort((x, y) => (x.name < y.name ? -1 : 1)) : [];
+  const uses = workflows.flatMap((w) => [...w.text.matchAll(/^\s*-?\s*uses:\s*([^\s#]+)/gm)].map((m) => m[1] ?? "")).filter((u) => !u.startsWith("./"));
+  const pinned = uses.filter((u) => /@[0-9a-f]{40}$/.test(u)).length;
+  const noPerms = workflows.filter((w) => !/^permissions:/m.test(w.text)).map((w) => w.name);
+  const targets = workflows.filter((w) => /^\s*pull_request_target:/m.test(w.text)).map((w) => w.name);
+  const inherit = workflows.filter((w) => /secrets:\s*inherit/.test(w.text)).map((w) => w.name);
+  const has = (...fs2: string[]): boolean => fs2.some((f) => b.exists(f));
+  type Row = readonly [check: string, scorecard: string, result: "pass" | "warn" | "fail", detail: string];
+  const rows: Row[] = [
+    ["Workflows declare their token's permissions", "Token-Permissions", workflows.length === 0 ? "warn" : noPerms.length === 0 ? "pass" : "fail", workflows.length === 0 ? "no workflow" : noPerms.length === 0 ? `all ${workflows.length} workflows have a top-level permissions block` : `without: ${noPerms.join(", ")}`],
+    ["Actions are pinned to a commit", "Pinned-Dependencies", uses.length === 0 ? "pass" : pinned === uses.length ? "pass" : pinned === 0 ? "fail" : "warn", `${pinned} of ${uses.length} uses of outside actions are pinned to a full commit; the rest are tags, which their owners can move`],
+    ["No workflow runs untrusted code with secrets (pull_request_target)", "Dangerous-Workflow", targets.length === 0 ? "pass" : "fail", targets.length === 0 ? "none uses it" : targets.join(", ")],
+    ["No workflow passes every secret on (secrets: inherit)", "Token-Permissions", inherit.length === 0 ? "pass" : "warn", inherit.length === 0 ? "none does" : inherit.join(", ")],
+    ["A security policy", "Security-Policy", has("SECURITY.md", ".github/SECURITY.md") ? "pass" : "fail", has("SECURITY.md", ".github/SECURITY.md") ? "SECURITY.md is there" : "no SECURITY.md"],
+    ["A licence", "License", has("LICENSE", "LICENSE.md", "LICENSE.txt") ? "pass" : "fail", has("LICENSE", "LICENSE.md", "LICENSE.txt") ? "a LICENSE file is at the root" : "none at the root"],
+    ["A tool that keeps dependencies up to date", "Dependency-Update-Tool", has(".github/dependabot.yml", ".github/dependabot.yaml", "renovate.json", ".github/renovate.json") ? "pass" : "warn", has(".github/dependabot.yml", ".github/dependabot.yaml", "renovate.json", ".github/renovate.json") ? "configured" : "none configured: dependencies are pinned by a lockfile and raised by hand"],
+    ["Dependencies are locked", "Pinned-Dependencies", has("bun.lock", "bun.lockb", "package-lock.json", "pnpm-lock.yaml", "yarn.lock") ? "pass" : "fail", has("bun.lock", "bun.lockb", "package-lock.json", "pnpm-lock.yaml", "yarn.lock") ? "a lockfile is committed" : "no lockfile"],
+    ["Owners of code are named (CODEOWNERS)", "Code-Review", has("CODEOWNERS", ".github/CODEOWNERS", "docs/CODEOWNERS") ? "pass" : "warn", has("CODEOWNERS", ".github/CODEOWNERS", "docs/CODEOWNERS") ? "a CODEOWNERS file is there" : "none"],
+    ["How to contribute is written down", "Contributors", has("CONTRIBUTING.md", ".github/CONTRIBUTING.md") ? "pass" : "warn", has("CONTRIBUTING.md", ".github/CONTRIBUTING.md") ? "CONTRIBUTING.md is there" : "none"],
+    ["The tests run in CI", "CI-Tests", workflows.some((w) => /bun (run )?(verify|test)|bun test/.test(w.text)) ? "pass" : "warn", `${workflows.filter((w) => /bun (run )?(verify|test)|bun test/.test(w.text)).length} of ${workflows.length} workflows run tests`],
+  ];
+  const tone = (r: string): string => (r === "pass" ? "pass" : r === "warn" ? "partly" : "fails");
+  b.add({
+    path: "quality/health.html",
+    title: "Repository health",
+    description: "Checks of the repository's own files, in the manner of the OpenSSF Scorecard: the workflows' permissions and pins, and the files a project is expected to have.",
+    section: "quality",
+    group: "Quality",
+    order: 8,
+    blocks: [
+      { kind: "paragraph", inlines: [text(`${rows.filter((r) => r[2] === "pass").length} of ${rows.length} checks pass. They are made from the files of the repository, so they say what is written there and not what the host's settings are (branch protection and required reviews are settings that these files cannot show). The names of the OpenSSF Scorecard checks that each answers are given.`)] },
+      { kind: "table", head: th("Check", "Scorecard", "Result", "Detail"), rows: rows.map(([c, sc, res, d]) => [[text(c)], [code(sc)], [text(tone(res))], [text(d)]]) },
+    ],
+  });
+}

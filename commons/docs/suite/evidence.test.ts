@@ -1,4 +1,4 @@
-// Spec: 0001-docs FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016, FR-017
+// Spec: 0001-docs FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016, FR-017, FR-020
 /**
  * The evidence the site shows beside the code (docs 0001-docs FR-009 to FR-012): CTRF results, GitHub tickets and typed issues read from files, the Quality section made from them, the lines on a requirement, a library and a
  * module, the findings for a file that cannot be read and a test that names a requirement that is not there, and, with no run recorded, nothing shown as passed.
@@ -12,6 +12,7 @@ import { loadConfig } from "../src/cli.ts";
 import { causeOf } from "../src/pages/quality.ts";
 import { movementsOf, parseHistoryRun, runsOf } from "../src/history.ts";
 import { sparkText } from "../src/emit/html.ts";
+import { busFactor, lastChanged, libraryOfPath, parseLog } from "../src/pages/git.ts";
 import { document } from "../src/emit/html.ts";
 import { type EvidenceSource, resolveConfig } from "../src/config.ts";
 import { parseCtrf, parseRuns, parseTickets, readEvidence, requirementsIn, standing } from "../src/evidence.ts";
@@ -298,4 +299,19 @@ proves(["0001-docs FR-017"], "each library is held to the gate of the configurat
   assertEquals([json.requirements.proved, json.requirements.notProved.length, json.history.length], [1, 2, 5]);
   const bad = resolveConfig({ name: "N", repository: "https://github.com/e/n", home: { dir: ".", about: { title: "N", summary: "n." } }, packages: [], citations: { prefix: "n", digits: 3 }, evidence: { gate: [{ id: "luck" }, { id: "requirements-proved", min: 200 }] } }, "/x/docs.config.ts");
   assert(bad.kind === "err" && bad.error.join().includes("evidence.gate[0].id") && bad.error.join().includes("evidence.gate[1].min"));
+});
+
+proves(["0001-docs FR-020"], "the log of git is read into commits, the bus factor is how few authors made half of the commits, a file's last change is its newest commit, and a repository with no history is said to have none", async () => {
+  const log = ["\u00012026-11-20\u0001a|a@x\n\ncommons/core/src/a.ts\ncommons/core/spec-kit/specs/0001-core/spec.md\n", "\u00012026-11-10\u0001a|a@x\n\ncommons/core/src/a.ts\n", "\u00012026-10-01\u0001b|b@x\n\ncommons/data/src/d.ts\n"].join("");
+  const commits = parseLog(log);
+  assertEquals(commits.map((c) => [c.day, c.who, c.files.length]), [["2026-11-20", "a|a@x", 2], ["2026-11-10", "a|a@x", 1], ["2026-10-01", "b|b@x", 1]]);
+  assertEquals(busFactor(commits), 1, "one author made two thirds");
+  assertEquals(busFactor([{ who: "a" }, { who: "b" }, { who: "c" }, { who: "d" }]), 2);
+  assertEquals(busFactor([]), 0);
+  assertEquals([...lastChanged(commits)], [["commons/core/src/a.ts", "2026-11-20"], ["commons/core/spec-kit/specs/0001-core/spec.md", "2026-11-20"], ["commons/data/src/d.ts", "2026-10-01"]]);
+  assertEquals([libraryOfPath("commons/core/src/a.ts"), libraryOfPath("tests/x.test.ts"), libraryOfPath("README.md")], ["core", "repository", ""]);
+  const b = await built({ results: EVIDENCE });
+  assert(b.pages.some((p) => p.path === "quality/hotspots.html"), "the page is made, with a history or without");
+  const page = markdownOf(b.pages.find((p) => p.path === "quality/hotspots.html") as never);
+  assert(page.includes("Where the work is") || page.includes("The history of the repository is not available"), page.slice(0, 200));
 });

@@ -20,3 +20,5 @@ requirement	mechanism	by	note
 0001-docs FR-017	check	.github: cd commons/docs && bun run verify	evidence.test.ts: each library is held to the gate of the configuration, shown and enforced nowhere, and the requirements page says how each specification stands
 0001-docs FR-018	check	.github: cd commons/docs && bun run verify	check.test.ts: the site of commons builds with no finding, the same twice, with its sections, the Quality section and the issues of data
 0001-docs FR-019	check	.github: cd commons/docs && bun run verify	check.test.ts: the site of commons builds with no finding, the same twice, with its sections, the Quality section and the issues of data
+0001-docs FR-020	check	.github: cd commons/docs && bun run verify	evidence.test.ts: the log of git is read into commits, the bus factor is how few authors made half of the commits, a file's last change is its newest commit, and a repository with no history is said to have none
+0001-docs FR-021	check	.github: cd commons/docs && bun run verify	check.test.ts: the site of commons builds with no finding, the same twice, with its sections, the Quality section and the issues of data

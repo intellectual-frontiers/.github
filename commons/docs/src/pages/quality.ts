@@ -207,7 +207,7 @@ export function qualityPages(b: Build): void {
       ...(failedAll > 0 ? [BANNER(failedAll)] : []),
       { kind: "paragraph", inlines: runLine(b) },
       ...(ev.build === undefined ? [] : [{ kind: "paragraph" as const, inlines: buildLine(b) }]),
-      { kind: "paragraph", inlines: [link("quality/ci.html", "The workflows"), text(": how the latest runs ended. "), link("quality/requirements.html", "Requirements"), text(": proved, by specification. "), link("quality/dependencies.html", "Dependencies"), text(" and the SBOM. "), link("quality/todo.html", "Notes in the code"), text(". "), link("quality/acceptance.html", "Acceptance kits"), text(". "), link("quality/findings.html", "The documentation's own findings"), text(": what the generator found while it made this site.")] },
+      { kind: "paragraph", inlines: [link("quality/ci.html", "The workflows"), text(": how the latest runs ended. "), link("quality/requirements.html", "Requirements"), text(": proved, by specification. "), link("quality/dependencies.html", "Dependencies"), text(" and the SBOM. "), link("quality/todo.html", "Notes in the code"), text(". "), link("quality/acceptance.html", "Acceptance kits"), text(". "), link("quality/hotspots.html", "Hotspots and ownership"), text(". "), link("quality/health.html", "Repository health"), text(". "), link("quality/findings.html", "The documentation's own findings"), text(": what the generator found while it made this site.")] },
       ...(ev.recorded
         ? [{
           kind: "paragraph" as const,
