@@ -325,6 +325,10 @@ const onMainOrSchedule = "github.event_name != 'pull_request' && github.ref == '
  * that the site reads. It runs by the hour and by hand, never on a push: a push to main comes every minute or two and a run of every suite takes a quarter of an hour, so a run for each push would never finish, and the site
  * would wait for it. The site is built on every push from the newest evidence there is, and says how old it is.
  */
+/** The night's run, which adds the mutation score of a few small libraries to the evidence. */
+const MUTATION_CRON = "43 3 * * *";
+/** The libraries whose mutation score is kept: small ones, since a run makes the suite run once for each change to the code (docs 0001-docs FR-027). */
+const MUTATION_LIBRARIES = ["archon-dialect-apt", "archon-dialect-homebrew", "archon-dialect-mise", "archon-dialect-winget", "integrations-github", "catalog-nist-csf-2", "archon-dns", "catalog-nist-sp800", "archon-dialect-ansible", "archon-converge", "integrations-x12", "lab"];
 const evidence: Workflow = {
   file: "evidence",
   name: "evidence",
@@ -333,7 +337,7 @@ const evidence: Workflow = {
     "there is none (the packages could not be installed, there is no suite, the run timed out). By the hour and by hand, never on a push. The jobs `tests` and `repository` never fail the workflow for what they find: a failed test is what the",
     "site is to show. The job `collect` gathers every report into the artifact `evidence`, which the workflow `site` downloads on each push.",
   ).trimEnd(),
-  on: { workflowDispatch: true, schedule: ["17 * * * *"] },
+  on: { workflowDispatch: true, schedule: ["17 * * * *", MUTATION_CRON] },
   permissions: { contents: "read" },
   concurrency: { group: "evidence", cancelInProgress: false },
   jobs: {
@@ -397,9 +401,25 @@ const evidence: Workflow = {
         use(PIN.uploadArtifact, { name: "The report and its status, kept for the site", when: "always()", with: { name: "evidence-repository", path: "${{ runner.temp }}/evidence/*.json", "if-no-files-found": "ignore", "retention-days": 7 } }),
       ],
     }),
+    mutation: job({
+      name: "mutation (${{ matrix.library }})",
+      comment: "the mutation score of a small library, by the night and by hand: the suite is run once for each change made to the library's code, so it is slow; where it cannot be done the score of the night before stays",
+      when: `github.event_name == 'workflow_dispatch' || github.event.schedule == '${MUTATION_CRON}'`,
+      runsOn: "ubuntu-24.04",
+      timeoutMinutes: 40,
+      strategy: { failFast: false, matrix: { library: MUTATION_LIBRARIES } },
+      steps: [
+        checkout(),
+        bun(),
+        { ...tools(expr("format('commons/{0}', matrix.library)"), "The development tools, from bun.lock (the libraries it imports are linked)"), continueOnError: true },
+        { ...tools("commons/docs", "The packages of the tool that keeps the report (commons docs)"), continueOnError: true },
+        run('bun commons/docs/tools/mutation.ts --library "${{ matrix.library }}" --out "$RUNNER_TEMP/evidence"', { name: "The mutation run, kept as a small report", continueOnError: true, shell: "bash" }),
+        use(PIN.uploadArtifact, { name: "The score, kept for the site", when: "always()", with: { name: "evidence-mutation-${{ matrix.library }}", path: "${{ runner.temp }}/evidence/*.mutation.json", "if-no-files-found": "ignore", "retention-days": 7 } }),
+      ],
+    }),
     collect: job({
       comment: "every report in one artifact, whatever happened to the jobs that made them, with the run added to the history that the artifact of the run before carried",
-      needs: ["tests", "repository"],
+      needs: ["tests", "repository", "mutation"],
       when: "always()",
       runsOn: "ubuntu-24.04",
       timeoutMinutes: 10,
@@ -423,6 +443,8 @@ const evidence: Workflow = {
             "mkdir -p _history _prev",
             "gh run download --name evidence --dir _prev || echo 'no earlier evidence: the history begins here'",
             "if [ -d _prev/history ]; then cp -r _prev/history/. _history/; fi",
+            "# the mutation scores are made by the night; the hours between keep the ones the run before had",
+            "for f in _prev/*.mutation.json; do if [ -e \"$f\" ] && [ ! -e \"_evidence/$(basename \"$f\")\" ]; then cp \"$f\" _evidence/; fi; done",
             "bun commons/docs/tools/history.ts --evidence _evidence --history _history || echo 'the history could not be kept'",
             "mkdir -p _evidence/history && cp -r _history/runs _evidence/history/ 2>/dev/null || true",
           ),

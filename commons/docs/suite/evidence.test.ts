@@ -1,4 +1,4 @@
-// Spec: 0001-docs FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016, FR-017, FR-020, FR-022, FR-023, FR-025, FR-026
+// Spec: 0001-docs FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016, FR-017, FR-020, FR-022, FR-023, FR-025, FR-026, FR-027
 /**
  * The evidence the site shows beside the code (docs 0001-docs FR-009 to FR-012): CTRF results, GitHub tickets and typed issues read from files, the Quality section made from them, the lines on a requirement, a library and a
  * module, the findings for a file that cannot be read and a test that names a requirement that is not there, and, with no run recorded, nothing shown as passed.
@@ -15,6 +15,7 @@ import { sparkText } from "../src/emit/html.ts";
 import { busFactor, lastChanged, libraryOfPath, parseLog } from "../src/pages/git.ts";
 import { document } from "../src/emit/html.ts";
 import { type EvidenceSource, resolveConfig } from "../src/config.ts";
+import { parseMutation, scoreOf, summariseStryker } from "../src/mutation.ts";
 import { importedNames, importIndex, testsImporting } from "../src/exercise.ts";
 import { parseCoverage, parseLcov, percent } from "../src/coverage.ts";
 import { parseCtrf, parseRuns, parseTickets, readEvidence, requirementsIn, standing } from "../src/evidence.ts";
@@ -245,7 +246,7 @@ proves(["0001-docs FR-016"], "the history says how a library's tests moved over 
   const page = markdownOf(b.pages.find((p) => p.path === "quality/fixture.html") as never);
   for (const said of ["## History", "*Tests: ", "*Pass rate: ", "*Time: ", "### Began to fail in the latest run (1)", "C is new", "### Fixed since the run before (1)", "D went away", "### Flapping: failed more than once, passing in the latest run (1)", "E comes and goes (failed in 2 separate stretches)", "https://github.com/example/fixture/compare/"]) assertStringIncludes(page, said);
   const dash = markdownOf(b.pages.find((p) => p.path === "quality/index.html") as never);
-  assertStringIncludes(dash, "| Pass rate | Coverage | Flaky |");
+  assertStringIncludes(dash, "| Pass rate | Coverage | Mutation | Flaky |");
   assert(/`[▁-█]{5}`/.test(dash), "a trend of the pass rate in the row");
   const q = JSON.parse(b.files.find((f) => f.path === "quality.json")?.text ?? "{}") as { libraries: { library: string; flaky: string[]; newlyFailing: string[] }[] };
   assertEquals(q.libraries.find((l) => l.library === "fixture")?.flaky, ["001-greeting FR-001: E comes and goes"]);
@@ -377,4 +378,24 @@ proves(["0001-docs FR-026"], "the open issues and tickets that name a file are o
   const none = await built({ results: EVIDENCE });
   assert(!markdownOf(none.pages.find((p) => p.path.startsWith("api/greeting/") && p.title.includes("mod")) as never).includes("name this file"));
   void issuesNamingFile;
+});
+
+proves(["0001-docs FR-027"], "the report of Stryker is read into the mutants killed, surviving and not run of each source file, the score is the share the tests detected, and the dashboard, the library's page and the file's API page show it", async () => {
+  const stryker = JSON.stringify({ files: { "src/a.ts": { mutants: [{ status: "Killed" }, { status: "Timeout" }, { status: "Survived", mutatorName: "StringLiteral", replacement: '""', location: { start: { line: 4 } } }, { status: "NoCoverage", mutatorName: "BlockStatement", replacement: "{}", location: { start: { line: 9 } } }, { status: "CompileError" }, { status: "Ignored" }] }, "suite/a.test.ts": { mutants: [{ status: "Killed" }] } } });
+  const r = summariseStryker(stryker, "p", "commons/p");
+  assert("value" in r);
+  assertEquals(r.value.files.length, 1, "tests are not mutated code");
+  const f = r.value.files[0];
+  assertEquals([f?.path, f?.killed, f?.timeout, f?.survived, f?.noCoverage, f?.survivors.map((x) => [x.line, x.status])], ["commons/p/src/a.ts", 1, 1, 1, 1, [[4, "Survived"], [9, "NoCoverage"]]]);
+  assertEquals([scoreOf(r.value.files), scoreOf([])], [50, undefined], "errors and ignored mutants are not counted");
+  assert("error" in summariseStryker("{", "p", ""));
+  assert("error" in summariseStryker("{}", "p", ""));
+  assert("error" in parseMutation("{}"));
+  const b = await built({ results: EVIDENCE });
+  const lib = markdownOf(b.pages.find((p) => p.path === "quality/fixture.html") as never);
+  assertStringIncludes(lib, "Mutation score");
+  assertStringIncludes(lib, "75% of the changes");
+  assertStringIncludes(lib, 'src/mod.ts:20');
+  assertStringIncludes(markdownOf(b.pages.find((p) => p.path === "quality/index.html") as never), "75%");
+  assertStringIncludes(markdownOf(b.pages.find((p) => p.path.startsWith("api/greeting/") && p.title.includes("mod")) as never), "Mutation score of this file: 75%");
 });

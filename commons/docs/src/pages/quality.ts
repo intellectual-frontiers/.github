@@ -1,4 +1,4 @@
-// Spec: 0001-docs FR-010, FR-011, FR-022, FR-023, FR-026
+// Spec: 0001-docs FR-010, FR-011, FR-022, FR-023, FR-026, FR-027
 /**
  * The Quality section (docs 0001-docs FR-010, FR-011; commons 0011-documentation FR-041): what the tests and the issues say of each library, made from the evidence the configuration names (`evidence.ts`): a dashboard with a row
  * for each library, a page for each library (its failing and its skipped tests, its slowest, the requirements no passing test proves, its open issues and tickets), a register of the issues and tickets and a page for each issue kept
@@ -9,6 +9,7 @@
 import type { Build } from "../build.ts";
 import { type Finding, message } from "../check.ts";
 import { percent } from "../coverage.ts";
+import { scoreOf } from "../mutation.ts";
 import { type Evidence, isOpen, type LibraryResults, standing, testsFor, type TestResult, type Ticket, type TypedIssue, type WorkflowRun } from "../evidence.ts";
 import { sparkText } from "../emit/html.ts";
 import { movementsOf, runsOf } from "../history.ts";
@@ -190,6 +191,7 @@ export function qualityPages(b: Build): void {
       [text(r === undefined ? "" : String(r.skipped + r.other))],
       passRates(ev, lib).length < 2 ? [] : [code(sparkText(passRates(ev, lib)))],
       [text(ev.coverage.get(lib) === undefined ? "" : `${percent(ev.coverage.get(lib)?.files ?? []) ?? ""}%`)],
+      [text(ev.mutation.get(lib) === undefined || scoreOf(ev.mutation.get(lib)?.files ?? []) === undefined ? "" : `${scoreOf(ev.mutation.get(lib)?.files ?? [])}%`)],
       [text(movementsOf(ev, lib).flaky.length === 0 ? "" : String(movementsOf(ev, lib).flaky.length))],
       [text(q.total === 0 ? "" : `${q.proved} of ${q.total}`)],
       [text(String(heldFindings(b, lib)))],
@@ -219,7 +221,7 @@ export function qualityPages(b: Build): void {
       {
         kind: "table",
         filter: "Filter the libraries",
-        head: th("Library", "Gate", "Tests", "Passed", "Failed", "Skipped", "Pass rate", "Coverage", "Flaky", "Proved", "Held", "Issues", "Tickets"),
+        head: th("Library", "Gate", "Tests", "Passed", "Failed", "Skipped", "Pass rate", "Coverage", "Mutation", "Flaky", "Proved", "Held", "Issues", "Tickets"),
         rows,
       },
       { kind: "paragraph", inlines: [link("quality/issues/index.html", "Every open issue and ticket"), text(" is in the register. Proved: requirements of the library's specifications whose every test passed (one with no test recorded is not counted as proved). Held: findings of the trace and specification checks held against a baseline. Issues and tickets: open ones.")] },
@@ -243,6 +245,16 @@ export function qualityPages(b: Build): void {
       blocks.push({ kind: "paragraph", inlines: [text(`${percent(cov.files)}% of ${plural(cov.files.reduce((n, f) => n + f.found, 0), "line")} of ${plural(cov.files.length, "source file")} are reached by the library's tests. The least covered files:`)] });
       const least = [...cov.files].sort((x, y) => x.hit / x.found - y.hit / y.found || y.found - x.found).slice(0, 10);
       blocks.push({ kind: "table", head: th("File", "Lines", "Hit", "Covered"), rows: least.map((f) => [[code(f.path)], [text(String(f.found))], [text(String(f.hit))], [text(`${percent([f])}%`)]]) });
+    }
+    const mut = ev.mutation.get(lib);
+    if (mut !== undefined && scoreOf(mut.files) !== undefined) {
+      const sc = (f: { killed: number; timeout: number; survived: number; noCoverage: number }): number => scoreOf([f]) ?? 100;
+      blocks.push({ kind: "heading", level: 2, id: "mutation", text: [text("Mutation score")] });
+      blocks.push({ kind: "paragraph", inlines: [text(`${scoreOf(mut.files)}% of the changes made to the library's code were noticed by its tests (${plural(mut.files.reduce((n, f) => n + f.killed + f.timeout + f.survived + f.noCoverage, 0), "change")} in ${plural(mut.files.length, "file")}). A change that survives is one that no test notices: the code there is the least proved. The weakest files:`)] });
+      const weakest = [...mut.files].filter((f) => f.survived + f.noCoverage > 0).sort((x, y) => sc(x) - sc(y) || y.survived + y.noCoverage - (x.survived + x.noCoverage)).slice(0, 10);
+      blocks.push({ kind: "table", head: th("File", "Score", "Killed", "Survived", "Not run"), rows: weakest.map((f) => [[code(f.path)], [text(`${sc(f)}%`)], [text(String(f.killed + f.timeout))], [text(String(f.survived))], [text(String(f.noCoverage))]]) });
+      const surviving = weakest.slice(0, 3).flatMap((f) => f.survivors.slice(0, 5).map((s) => [[code(`${f.path}:${s.line}`)], [text(s.mutator)], [code(s.replacement)]]));
+      if (surviving.length > 0) blocks.push({ kind: "heading", level: 3, id: "survivors", text: [text("Changes no test noticed")] }, { kind: "table", head: th("Where", "Change", "To"), rows: surviving });
     }
     if (r !== undefined) {
       blocks.push({ kind: "heading", level: 2, id: "tests", text: [text("Tests")] });
