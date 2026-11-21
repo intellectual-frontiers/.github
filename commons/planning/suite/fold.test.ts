@@ -268,6 +268,26 @@ proves(["0002-planning-core FR-002"], "an item of each of the four kinds has eve
   assertEquals(noTitle.kind, "issue");
 });
 
+proves(["0002-planning-core FR-006"], "an item that a tool derived from a place by an exact rule, or that a person declared, is open and counted: only an inferred one is proposed", () => {
+  for (const [opener, origin] of [[TOOL, "derived"], [ADA, "declared"], [AGENT, "declared"], [TOOL, "declared"]] as const) {
+    const item = must(fold(story(opener, origin, [])));
+    assertEquals(item.state, { kind: "open" });
+    assert(isCounted(item));
+  }
+  assertEquals(must(fold(story(TOOL, "inferred", []))).state, { kind: "proposed" });
+});
+
+proves(["0002-planning-core FR-006"], "the links of an item are the adds and removes of its linked events, in order, as a set", () => {
+  const a = itemId(7);
+  const b = itemId(8);
+  const link = (change: "add" | "remove", to: typeof a): [Actor, EventData] => [ADA, { type: "linked", change, link: "same-as", to }];
+  const links = (rest: readonly (readonly [Actor, EventData])[]) => must(fold(story(ADA, "declared", rest))).links.map((l) => `${l.kind} ${l.to === a ? "a" : "b"}`);
+  assertEquals(links([link("add", a), link("add", b), link("add", a)]), ["same-as a", "same-as b"].sort());
+  assertEquals(links([link("add", a), link("remove", a)]), []);
+  assertEquals(links([link("add", a), link("remove", a), link("add", a)]), ["same-as a"]);
+  assertEquals(links([link("remove", a), link("add", b)]), ["same-as b"]);
+});
+
 proves(["0002-planning-core FR-006"], "an item inferred by an agent or a heuristic starts proposed, is not counted, and leaves proposed only by a person's confirmation", () => {
   const proposed = must(fold(story(AGENT, "inferred", [])));
   assertEquals(proposed.state, { kind: "proposed" });
@@ -315,6 +335,9 @@ proves(["0002-planning-core FR-006"], "the authority over a field is applied in 
   assertEquals(title("store-wins"), "by bob again");
   assertEquals(title("person-only"), "by bob again");
   assertEquals(must(fold(events)).title, "by bob again");
+  // Store wins takes the latest of the people and the agents, whoever of them it was.
+  const agentLast = story(ADA, "declared", [[ADA, EDIT("by ada")], [AGENT, EDIT("by agent")], [TOOL, EDIT("by tool")]]);
+  assertEquals(must(fold(agentLast, titlePolicy("store-wins"))).title, "by agent");
   // Source wins falls back to the others where no source spoke, and store wins to the source where the store did not.
   const noTool = story(ADA, "declared", [[ADA, EDIT("a")], [AGENT, EDIT("b")]]);
   assertEquals(must(fold(noTool, titlePolicy("source-wins"))).title, "b");

@@ -198,6 +198,11 @@ proves(["0002-planning-core FR-011"], "an issue file is read as an item with all
   assert(item.state.kind === "closed" && item.state.reason === "duplicate" && item.state.by.id === "ada@example.test");
   assertEquals([item.comments.length, item.decisions.length, item.decisions[0]?.verdict], [1, 1, "minor-revision"]);
   assertEquals(item.external[0], { source: "event-files", value: full.id });
+  // An opening by a tool, from a place read by a rule, is derived; by a person, declared.
+  const byTool = issueText(ULIDS.item, [{ id: ULIDS.first, at: "2026-11-07T13:20:23Z", actor: { type: "tool", id: "agora work build" }, type: "opened", data: { title: "A finding", source: { tool: "lint" } } }]);
+  const derived = must(await records.readIssueFile(must(records.decodeIssueFile(byTool)), OPTIONS));
+  assertEquals(derived.events[0]?.data.type === "opened" ? derived.events[0].data.origin : "", "derived");
+  assertEquals(opened.origin, "declared");
   // The tool's close, by the reason `not_planned`, is the reason `not-planned`.
   const toolClose = read.events.find((e) => e.actor.kind === "tool");
   assert(toolClose?.data.type === "closed" && toolClose.data.reason === "not-planned");

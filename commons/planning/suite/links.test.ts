@@ -35,8 +35,13 @@ proves(["0002-planning-core FR-007"], "an item is not linked to itself, a link t
     const there = must(addLink([], { kind, from: at(0), to: at(1) }));
     assert(addLink(there, { kind, from: at(1), to: at(0) }).kind === "ok", kind);
   }
-  // A blocks link and a relates-to link the other way are no cycle.
-  assert(addLink(once, { kind: "relates-to", from: at(1), to: at(0) }).kind === "ok");
+  // A blocks link and a link of another kind the other way are no cycle, whatever the kind.
+  for (const kind of ["relates-to", "same-as", "parent-of"] as const) assert(addLink(once, { kind, from: at(1), to: at(0) }).kind === "ok", kind);
+  for (const kind of ["relates-to", "same-as", "parent-of"] as const) {
+    const mixed = must(addLink(must(addLink([], { kind, from: at(1), to: at(2) })), blocks(0, 1)));
+    assert(addLink(mixed, blocks(2, 0)).kind === "ok", `${kind} is no edge of blocks`);
+    assertEquals(findBlocksCycle([...mixed, blocks(2, 0)]), undefined);
+  }
 });
 
 proves(["0002-planning-core FR-007"], "whatever links are added, the accepted blocks have no cycle, and a link is refused exactly when its target already reaches its source", () => {
