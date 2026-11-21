@@ -25,7 +25,10 @@ export const DIALECT_ID = "ansible";
 export const PINNED_VERSION = "2.16.3";
 
 /** The kinds of resource the dialect carries out, with the shape of `desired` for each (see the specification). */
-export const KINDS_CARRIED = ["package", "user", "group", "file", "directory", "service", "ssh-authorized-key"] as const;
+export const KINDS_CARRIED = ["package", "user", "group", "file", "directory", "service", "ssh-authorized-key", "system-setting"] as const;
+
+/** The names of `system-setting` the dialect carries, each by files only (no module of a collection): the time zone, the locale and the keyboard layout. */
+export const SETTINGS_CARRIED = ["timezone", "locale", "keyboard"] as const;
 
 /** What a dialect is made with. */
 export type AnsibleOptions = {
@@ -140,6 +143,27 @@ function taskOf(r: Requirement, index: number, problems: string[]): Obj | readon
       const keyLine = base("ansible.builtin.lineinfile", { path, line: key, state: absent ? "absent" : "present", ...(absent ? {} : { create: true, owner: user, mode: "0600" }) });
       return absent ? keyLine : [{ name: `${id}: the folder of the key file`, "ansible.builtin.file": { path: dir, state: "directory", owner: user, mode: "0700" }, register: `d${index}`, ignore_errors: "{{ ansible_check_mode }}" }, keyLine];
     }
+    case "system-setting": {
+      const name = str(o, "name", problems, id, true, /^(timezone|locale|keyboard)$/);
+      if (name === undefined) return undefined;
+      if (absent) {
+        problems.push(`${id}: a setting of the system is changed, never removed`);
+        return undefined;
+      }
+      const v = str(o, "value", problems, id, true, name === "timezone" ? /^[A-Za-z][A-Za-z0-9_+-]*(\/[A-Za-z0-9_+-]+){0,2}$/ : name === "locale" ? /^(C|[a-z]{2,3}_[A-Z]{2})\.UTF-8$/ : /^[a-z]{2,3}(\([a-z0-9_-]+\))?$/);
+      if (v === undefined) return undefined;
+      const task = (module: string, args: Obj, suffix: string, extra: Obj = {}): Obj => ({ name: `${id}: ${r.summary} (${suffix})`, [module]: args, register: `s${index}${suffix}`, ignore_errors: "{{ ansible_check_mode }}", ...extra });
+      if (name === "timezone") return [task("ansible.builtin.copy", { dest: "/etc/timezone", content: `${v}\n`, mode: "0644" }, "a"), task("ansible.builtin.file", { src: `/usr/share/zoneinfo/${v}`, dest: "/etc/localtime", state: "link", force: true }, "b")];
+      if (name === "keyboard") return [task("ansible.builtin.lineinfile", { path: "/etc/default/keyboard", regexp: "^XKBLAYOUT=", line: `XKBLAYOUT="${v}"`, create: true }, "a")];
+      return v === "C.UTF-8"
+        ? [task("ansible.builtin.lineinfile", { path: "/etc/default/locale", regexp: "^LANG=", line: `LANG=${v}`, create: true }, "a")]
+        : [
+            { name: `${id}: the locales package`, "ansible.builtin.apt": { name: "locales", state: "present", update_cache: true, cache_valid_time: 3600 }, register: `s${index}p`, ignore_errors: "{{ ansible_check_mode }}" },
+            task("ansible.builtin.lineinfile", { path: "/etc/locale.gen", regexp: `^#? ?${v.replace(".", "\\.")} UTF-8`, line: `${v} UTF-8`, create: true }, "g"),
+            { name: `${id}: generate the locale`, "ansible.builtin.command": { argv: ["locale-gen"] }, when: `s${index}g is changed` },
+            task("ansible.builtin.lineinfile", { path: "/etc/default/locale", regexp: "^LANG=", line: `LANG=${v}`, create: true }, "a"),
+          ];
+    }
     default:
       problems.push(`${id}: the kind ${String(r.kind)} is not carried by this dialect (${KINDS_CARRIED.join(", ")})`);
       return undefined;
@@ -172,7 +196,7 @@ export function ansible(options: AnsibleOptions = {}): Dialect {
         if (t === undefined) return;
         for (const one of Array.isArray(t) ? t : [t]) {
           tasks.push(one as Obj);
-          registered.push(String(one["register"]));
+          if (typeof one["register"] === "string") registered.push(one["register"]);
         }
       });
       if (problems.length > 0) return err(problems);

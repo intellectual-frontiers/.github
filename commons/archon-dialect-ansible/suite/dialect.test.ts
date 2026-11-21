@@ -36,6 +36,9 @@ const REQS = [
   req("user.lab", "user", { name: "labuser", shell: "/bin/bash", groups: ["labgroup"] }, { dependsOn: ["group.lab"] }),
   req("dir.lab", "directory", { path: "/srv/lab", owner: "labuser", mode: "0750" }, { dependsOn: ["user.lab"] }),
   req("file.lab", "file", { path: "/srv/lab/motd", content: "hello\n", owner: "labuser", mode: "0640" }, { dependsOn: ["dir.lab"] }),
+  req("setting.timezone", "system-setting", { name: "timezone", value: "America/New_York" }),
+  req("setting.keyboard", "system-setting", { name: "keyboard", value: "us" }),
+  req("setting.locale", "system-setting", { name: "locale", value: "en_US.UTF-8" }),
   req("key.lab", "ssh-authorized-key", { user: "labuser", key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMadeUpKeyForTestsOnlyMadeUpKeyForTestsOnly1 lab@test" }, { dependsOn: ["user.lab"] }),
 ];
 
@@ -86,7 +89,7 @@ proves(["0002-ansible-dialect FR-005"], "the steps check with the difference and
   const steps = d.steps(plan, rendered.value);
   assertEquals(steps.length, 1);
   const s = steps[0]!;
-  assertEquals(s.covers.map(String), REQS.map((r) => String(r.id)));
+  assertEquals(s.covers.map(String).sort(), REQS.map((r) => String(r.id)).sort());
   assertEquals(s.changedExit, 2);
   assert(s.apply.includes("ansible-playbook") && s.check?.includes("--check") && s.check.includes("--diff") && !s.apply.includes("--check"));
   assert(s.apply.some((w) => w.includes(rendered.value.digest)), "the digest is in the vector");
@@ -150,6 +153,11 @@ proves(["0002-ansible-dialect FR-006"], "on a disposable machine with the real a
     assertEquals(applied.code, 0, applied.out);
     assert((await run(["getent", "passwd", "labuser"])).success && (await run(["test", "-f", "/srv/lab/motd"])).success, "apply made them");
     assertEquals(new TextDecoder().decode((await run(["cat", "/srv/lab/motd"])).stdout), "hello\n");
+    assertEquals(new TextDecoder().decode((await run(["cat", "/etc/timezone"])).stdout), "America/New_York\n");
+    assertEquals(new TextDecoder().decode((await run(["readlink", "/etc/localtime"])).stdout).trim(), "/usr/share/zoneinfo/America/New_York");
+    assert(new TextDecoder().decode((await run(["cat", "/etc/default/keyboard"])).stdout).includes('XKBLAYOUT="us"'));
+    assert(new TextDecoder().decode((await run(["cat", "/etc/default/locale"])).stdout).includes("LANG=en_US.UTF-8"));
+    assert(new TextDecoder().decode((await run(["locale", "-a"])).stdout).split("\n").some((l) => /^en_US\.utf-?8$/i.test(l)), "the locale was generated");
     // the second time, everything is as it must be: observed equals desired, so there is nothing to do, and ansible itself also reports no change
     const again = await converge(REQS, new Map(REQS.map((r) => [r.id, r.desired])), "apply");
     assertEquals(again.code, 0);
