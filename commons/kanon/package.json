@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/kanon",
   "private": true,
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "Kanon, the pattern of a library built in three layers (governance, logical, physical): the type of a library's table of layers, the import check that holds it, the check that no annotation of governance is dropped, and the types-only LayeredModel contract. One rule, projected down, nothing lost.",
   "type": "module",
   "engines": {

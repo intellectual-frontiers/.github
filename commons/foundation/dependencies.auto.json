@@ -5,13 +5,13 @@
     "@intellectual-frontiers/core": "0.2.1",
     "@intellectual-frontiers/crypto": "0.2.3",
     "@intellectual-frontiers/formats": "0.2.3",
-    "@intellectual-frontiers/githost": "0.2.4",
-    "@intellectual-frontiers/lint": "0.2.4",
-    "@intellectual-frontiers/net": "0.2.4",
+    "@intellectual-frontiers/githost": "0.2.5",
+    "@intellectual-frontiers/lint": "0.2.5",
+    "@intellectual-frontiers/net": "0.2.5",
     "@intellectual-frontiers/rdf": "0.2.1",
-    "@intellectual-frontiers/system": "0.2.4",
-    "@intellectual-frontiers/telemetry": "0.2.4",
+    "@intellectual-frontiers/system": "0.2.5",
+    "@intellectual-frontiers/telemetry": "0.2.5",
     "@intellectual-frontiers/terminal": "0.2.1",
-    "@intellectual-frontiers/test": "0.2.4"
+    "@intellectual-frontiers/test": "0.2.5"
   }
 }
