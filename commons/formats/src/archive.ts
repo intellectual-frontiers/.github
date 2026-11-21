@@ -1,4 +1,4 @@
-// Spec: 0001-formats FR-010
+// Spec: 0001-formats FR-010, FR-023
 /**
  * Archives in memory, with no outside package (commons 0001-formats FR-010). Writing: a POSIX ustar archive, a gzip stream of
  * stored deflate blocks and a zip of stored entries (`zip`), each entry with a fixed time and mode and in the byte order of its path, so the
@@ -742,6 +742,21 @@ export function readTarStream(stream: ReadableStream<Uint8Array>): ReadableStrea
 export function untarStream(): ReadableWritablePair<TarStreamEntry, Uint8Array> {
   const input = new TransformStream<Uint8Array, Uint8Array>();
   return { writable: input.writable, readable: readTarStream(input.readable) };
+}
+
+/** One link of a tar: a symbolic link names a path (relative to the link's own folder, or absolute), a hard link names the path of another entry of the archive. */
+export type TarLink =
+  | { readonly kind: "symlink"; readonly path: string; readonly target: string }
+  | { readonly kind: "hardlink"; readonly path: string; readonly target: string };
+
+/** The links of a list of tar entries, in the order of the archive, so that a consumer decides what to do with each and finds none among the files. */
+export function linksOf(entries: readonly TarEntry[]): readonly TarLink[] {
+  const links: TarLink[] = [];
+  for (const e of entries) {
+    if (e.kind === "symlink") links.push({ kind: "symlink", path: e.path, target: e.linkName });
+    else if (e.kind === "hardlink") links.push({ kind: "hardlink", path: e.path, target: e.linkName });
+  }
+  return links;
 }
 
 /** The files of a list of tar entries, by path: folders and links left out. */

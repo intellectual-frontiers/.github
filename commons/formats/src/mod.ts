@@ -24,6 +24,7 @@ export {
   gunzip,
   gzip,
   isSafePath,
+  linksOf,
   readTarStream,
   sortedPaths,
   splitName,
@@ -38,7 +39,9 @@ export {
   zipEntries,
   zipRead,
 } from "./archive.ts";
-export type { ArchiveError, Files, TarEntry, TarHeader, TarStreamEntry, ZipEntry } from "./archive.ts";
+export type { ArchiveError, Files, TarEntry, TarHeader, TarLink, TarStreamEntry, ZipEntry } from "./archive.ts";
+export { DEFAULT_MAX_BYTES, isXz, unxz } from "./xz.ts";
+export type { UnxzOptions } from "./xz.ts";
 export { fromBase64, fromBase64Url, toBase64, toBase64Url } from "./base64.ts";
 export * as cbor from "./cbor.ts";
 export { csvField, formatCsvError, parseCsv, parseCsvRecords, toCsv } from "./csv.ts";

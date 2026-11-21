@@ -5,6 +5,7 @@
  *
  * @module
  */
+import { readFileSync } from "node:fs";
 import { createServer, type Server } from "node:http";
 import { Retries } from "@intellectual-frontiers/net/net";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
@@ -131,6 +132,30 @@ proves(["0003-native-pinned-store FR-002", "0003-native-pinned-store FR-003", "0
       if (store.os !== "windows") assert((((await fs.stat(done.value.program)).mode ?? 0) & 0o111) !== 0, "the program is executable");
       const read = await readInstalled(store, "jq", "1.7.1");
       assert(read !== undefined && read.record.artifactSha256 === (await sha256(ARCHIVE)));
+    });
+  } finally {
+    await server.stop();
+  }
+});
+
+proves(["0003-native-pinned-store FR-008"], "a tool whose archive is xz-compressed and holds links is installed with its links made, the execute bits the archive gave and the links in the record", async () => {
+  if (process.platform === "win32") return;
+  const node = new Uint8Array(readFileSync(new URL("./fixtures/node-like.tar.xz", import.meta.url)));
+  const server = await serve(node);
+  try {
+    await withStore(async (store) => {
+      const s: InstallSpec = { tool: "node", version: "1.0.0", platform: "linux-x64", os: "linux", program: "node", downloadUrl: server.url, sha256: await sha256(node), archiveFormat: "tar", binPath: "node-v1/bin" };
+      const done = await installTool(store, s, { retries: quiet() });
+      assert(done.kind === "ok", done.kind === "err" ? JSON.stringify(done.error) : "");
+      const folder = done.value.folder;
+      assertEquals(await fs.readLink(path.join(folder, "node-v1", "bin", "npm")), "../lib/node_modules/npm/bin/npm-cli.js");
+      assertEquals(await fs.readTextFile(path.join(folder, "node-v1", "bin", "npx")), '#!/usr/bin/env node\nconsole.log("npx")\n', "the link reads as its target");
+      assert((await fs.lstat(path.join(folder, "node-v1", "bin", "npm"))).isSymlink);
+      assert((((await fs.stat(path.join(folder, "node-v1", "lib", "node_modules", "npm", "bin", "npm-cli.js"))).mode ?? 0) & 0o111) !== 0, "the target of a link is executable as the archive gave");
+      assertEquals(done.value.record.links, { "node-v1/bin/npm": "../lib/node_modules/npm/bin/npm-cli.js", "node-v1/bin/npx": "../lib/node_modules/npm/bin/npx-cli.js" });
+      assert(!("node-v1/bin/npm" in done.value.record.files), "a link is not among the files");
+      const again = await installTool(store, s, { retries: quiet() });
+      assert(again.kind === "ok" && !again.value.fresh && server.requests() === 1, "a second run fetches nothing");
     });
   } finally {
     await server.stop();

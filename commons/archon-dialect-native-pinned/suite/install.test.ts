@@ -19,10 +19,12 @@ import {
   unpackVerified,
   writeInstallRecord,
   type InstallSpec,
+  type Unpacked,
 } from "../src/install.ts";
 
 const text = (s: string) => new TextEncoder().encode(s);
 const FILES: Files = new Map([["bin/jq", text("#!/bin/sh\necho jq\n")], ["share/readme.txt", text("made up\n")]]);
+const unpacked = (files: Files): Unpacked => ({ files, executable: new Set<string>(), links: [] });
 
 async function spec(bytes: Uint8Array, more: Partial<InstallSpec> = {}): Promise<InstallSpec> {
   return { tool: "jq", version: "1.7.1", platform: "linux-x64", os: "linux", program: "jq", downloadUrl: "https://example.test/jq", sha256: await sha256(bytes), archiveFormat: "tar", binPath: "bin", ...more };
@@ -60,7 +62,7 @@ function rawTar(entries: readonly { path: string; data: Uint8Array; type?: strin
 proves(["0002-native-pinned-install FR-001"], "the bytes are checked against the pinned SHA-256 before anything is unpacked, and a mismatch returns no file", async () => {
   const bytes = unwrapTar(FILES);
   const good = await unpackVerified(await spec(bytes), bytes);
-  assert(good.kind === "ok" && good.value.has("bin/jq"));
+  assert(good.kind === "ok" && good.value.files.has("bin/jq"));
   const other = text("not the pinned bytes");
   const s = await spec(bytes);
   const bad = await unpackVerified(s, other);
@@ -78,14 +80,14 @@ proves(["0002-native-pinned-install FR-002"], "a zip, a tar and a gzipped tar gi
   for (const [name, bytes, format] of archives) {
     const r = await unpackVerified(await spec(bytes, { archiveFormat: format }), bytes);
     assert(r.kind === "ok", `${name}`);
-    assertEquals([...r.value.keys()].sort(), ["bin/jq", "share/readme.txt"], name);
-    assertEquals(new TextDecoder().decode(r.value.get("share/readme.txt")), "made up\n", name);
+    assertEquals([...r.value.files.keys()].sort(), ["bin/jq", "share/readme.txt"], name);
+    assertEquals(new TextDecoder().decode(r.value.files.get("share/readme.txt")), "made up\n", name);
   }
   const single = text("#!/bin/sh\n");
   const file = await unpackVerified(await spec(single, { archiveFormat: "file", binPath: "" }), single);
-  assert(file.kind === "ok" && file.value.has("jq"));
+  assert(file.kind === "ok" && file.value.files.has("jq"));
   const windows = await unpackVerified(await spec(single, { archiveFormat: "file", binPath: "", os: "windows" }), single);
-  assert(windows.kind === "ok" && windows.value.has("jq.exe"));
+  assert(windows.kind === "ok" && windows.value.files.has("jq.exe"));
 
   const escape = rawTar([{ path: "bin/jq", data: text("x") }, { path: "../evil", data: text("y") }]);
   const evil = await unpackVerified(await spec(escape), escape);
@@ -114,12 +116,12 @@ proves(["0002-native-pinned-install FR-003"], "the program must be in the unpack
 proves(["0002-native-pinned-install FR-004"], "the install record names the tool and the pin, holds the hash of each file, is written in a fixed form and is read back", async () => {
   const bytes = unwrapTar(FILES);
   const s = await spec(bytes);
-  const record = await installRecordOf(s, FILES);
+  const record = await installRecordOf(s, unpacked(FILES));
   assertEquals([record.tool, record.version, record.platform, record.program, record.artifactSha256], ["jq", "1.7.1", "linux-x64", "bin/jq", s.sha256]);
   assertEquals(Object.keys(record.files), ["bin/jq", "share/readme.txt"]);
   const written = writeInstallRecord(record);
   assert(written.endsWith("\n") && written.startsWith('{\n  "tool"'));
-  assertEquals(written, writeInstallRecord(await installRecordOf(s, new Map([...FILES].reverse()))), "the same files give the same text whatever the order");
+  assertEquals(written, writeInstallRecord(await installRecordOf(s, unpacked(new Map([...FILES].reverse())))), "the same files give the same text whatever the order");
   const back = readInstallRecord(written);
   assert(back.kind === "ok");
   assertEquals(back.value, record);
@@ -130,14 +132,14 @@ proves(["0002-native-pinned-install FR-004"], "the install record names the tool
 proves(["0002-native-pinned-install FR-005"], "drift finds every file changed, missing or extra, in the order of the paths, and a pin that has moved", async () => {
   const bytes = unwrapTar(FILES);
   const s = await spec(bytes);
-  const record = await installRecordOf(s, FILES);
-  assertEquals(installDrift(record, { ...record.files }), []);
+  const record = await installRecordOf(s, unpacked(FILES));
+  assertEquals(installDrift(record, { files: { ...record.files }, links: {} }), []);
   const found = { ...record.files, "bin/jq": "0".repeat(64), "extra.txt": "1".repeat(64) } as Record<string, string>;
   delete found["share/readme.txt"];
-  const drift = installDrift(record, found);
+  const drift = installDrift(record, { files: found, links: {} });
   assertEquals(drift.map((d) => `${d.kind} ${"path" in d ? d.path : ""}`), ["changed bin/jq", "missing share/readme.txt", "extra extra.txt"]);
   assert(describeDrift("jq", drift[0] ?? { kind: "unpinned", reason: "" }).includes("differs from the install record"));
-  const moved = installDrift(record, { ...record.files }, "f".repeat(64));
+  const moved = installDrift(record, { files: { ...record.files }, links: {} }, "f".repeat(64));
   assertEquals(moved.map((d) => d.kind), ["unpinned"]);
   assert(describeDrift("jq", moved[0] ?? { kind: "changed", path: "" }).includes("now names"));
 });

@@ -29,8 +29,9 @@ export const library = {
     "./toml",
     "./ts-literal",
     "./xml",
+    "./xz",
     "./yaml",
   ],
   summary:
-    "The file and wire formats of commons, read and written in pure code: JSON5, YAML, TOML, XML, CSV, base64, hexadecimal, ASN.1 DER, CBOR, tar, gzip and zip archives, PNG and ICO pictures, TypeScript literals, glob patterns, semantic versions, media types and HTTP headers; one dependency, core.",
+    "The file and wire formats of commons, read and written in pure code: JSON5, YAML, TOML, XML, CSV, base64, hexadecimal, ASN.1 DER, CBOR, tar, gzip, xz and zip archives, PNG and ICO pictures, TypeScript literals, glob patterns, semantic versions, media types and HTTP headers; one dependency, core.",
 };

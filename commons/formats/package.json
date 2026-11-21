@@ -24,6 +24,7 @@
     "./toml": "./src/toml.ts",
     "./ts-literal": "./src/ts-literal.ts",
     "./xml": "./src/xml.ts",
+    "./xz": "./src/xz.ts",
     "./yaml": "./src/yaml.ts"
   },
   "scripts": {
