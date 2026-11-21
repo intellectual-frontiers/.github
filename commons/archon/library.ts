@@ -28,6 +28,7 @@ export const library = {
       { name: "mise", instanceOf: "src/physical/dialect/", placement: "package" },
       { name: "winget", instanceOf: "src/physical/dialect/", placement: "package" },
       { name: "ansible", instanceOf: "src/physical/dialect/", placement: "package" },
+      { name: "cloud-init", instanceOf: "src/physical/dialect/", placement: "package" },
     ],
     plugins: [{ noun: "tool" }],
     units: [

@@ -79,6 +79,7 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/archon`](commons/archon) | Program | A Kanon library that orders subjects: a machine, a device, a workstation or a cloud account | layers, instances, plugins | L1 | held |
 | [`@intellectual-frontiers/archon-dialect-ansible`](commons/archon-dialect-ansible) | Program | The dialect of Archon that converges a Linux host with Ansible | layers, extension | L1 | held |
 | [`@intellectual-frontiers/archon-dialect-apt`](commons/archon-dialect-apt) | Program | The dialect of tools that installs them with apt | layers, extension | L1 | held |
+| [`@intellectual-frontiers/archon-dialect-cloud-init`](commons/archon-dialect-cloud-init) | Program | The dialect of Archon for the unattended install of a machine from nothing | layers, extension | L1 | held |
 | [`@intellectual-frontiers/archon-dialect-homebrew`](commons/archon-dialect-homebrew) | Program | The dialect of tools that installs them with Homebrew | layers, extension | L1 | held |
 | [`@intellectual-frontiers/archon-dialect-mise`](commons/archon-dialect-mise) | Program | The dialect of tools that installs them with mise | layers, extension | L1 | held |
 | [`@intellectual-frontiers/archon-dialect-native-pinned`](commons/archon-dialect-native-pinned) | Program | The default dialect of tools | layers, extension | L1 | held |
