@@ -118,6 +118,32 @@ proves(["0009-repoctl-config FR-004"], "commit makes the commit as the configura
   });
 });
 
+proves(["0005-repoctl-library-commit-doctor FR-009"], "commit --impact writes the line Impact: after the reference to the issue where the configuration lists the trailer, refuses a word that is none of major, minor and patch, and refuses the option where the configuration has no such trailer", async () => {
+  if (!CAN_RUN) return;
+  const withImpact = configText().replace('trailers: ["issue", "co-author", "session"]', 'trailers: ["issue", "impact", "co-author", "session"]');
+  await withFixture(async (dir) => {
+    await run(dir, ["sync"]);
+    await put(dir, "c.txt", "c\n");
+    const bad = await run(dir, ["commit", "-m", "Add c", "--impact", "huge", "c.txt"], { CLAUDE_SESSION_URL: SESSION });
+    assertEquals(bad.code, 2);
+    assertStringIncludes(bad.err, "E-COMMIT-IMPACT");
+    const made = await run(dir, ["commit", "-m", "Add c", "--refs", "212", "--impact", "minor", "--session", SESSION, "--co-author", "Co-Authored-By: Pair <pair@example.test>", "c.txt", "out.txt"]);
+    assertEquals(made.code, 0, made.err);
+    assertEquals((await git(dir, "log", "-1", "--format=%B")).trim(), `Add c\n\nRefs #212\nImpact: minor\nCo-Authored-By: Pair <pair@example.test>\nClaude-Session: ${SESSION}`);
+    await put(dir, "d.txt", "d\n");
+    const none = await run(dir, ["commit", "-m", "Add d", "d.txt"], { CLAUDE_SESSION_URL: SESSION });
+    assertEquals(none.code, 0, none.err);
+    assert(!(await git(dir, "log", "-1", "--format=%B")).includes("Impact:"), "no impact given, no line");
+  }, withImpact);
+  await withFixture(async (dir) => {
+    await run(dir, ["sync"]);
+    await put(dir, "c.txt", "c\n");
+    const refused = await run(dir, ["commit", "-m", "Add c", "--impact", "patch", "c.txt"], { CLAUDE_SESSION_URL: SESSION });
+    assertEquals(refused.code, 2);
+    assertStringIncludes(refused.err, "E-COMMIT-IMPACT");
+  });
+});
+
 proves(["0009-repoctl-config FR-003"], "merge makes a conflicted generated file again from the configuration's generators and commits the merge as its identity", async () => {
   if (!CAN_RUN) return;
   await withFixture(async (dir) => {

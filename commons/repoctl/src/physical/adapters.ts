@@ -15,7 +15,7 @@
  */
 import { err, ok } from "@intellectual-frontiers/core";
 import { secretOf } from "@intellectual-frontiers/headless/logical";
-import { publishedPackage, readLibraries } from "@intellectual-frontiers/libraries/libraries";
+import { holdSentence, publishedPackage, readLibraries } from "@intellectual-frontiers/libraries/libraries";
 import { makeTempDir, mkdirSync, readDirSync, readFileSync, readTextFileSync, removeSync, writeTextFileSync, existsSync, statSync } from "@intellectual-frontiers/system/fs";
 import { dirname, join, toFileUrl } from "@intellectual-frontiers/system/path";
 import { run } from "@intellectual-frontiers/system/proc";
@@ -132,7 +132,7 @@ export function manifestLibraries(repo: string, configured: boolean): Libraries 
                     level: f.library.level,
                     specKit: f.library.specKit === undefined ? undefined : f.library.specKit,
                     npm: f.library.held === undefined && f.library.distribution.includes("npm"),
-                    held: f.library.held,
+                    held: f.library.held === undefined ? undefined : holdSentence(f.library.held),
                     versionConstants: f.library.versionConstants ?? [],
                   },
                 ]

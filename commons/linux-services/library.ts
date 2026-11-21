@@ -12,7 +12,7 @@ export const library = {
   verify: "bun run verify",
   version: "0.1.0",
   distribution: ["github"],
-  held: "built and verified but not released: the owner publishes the fleet libraries together, when the first fleet runs on them",
+  held: { kind: "owner-blocked", reason: "built and verified but not released: the owner publishes the fleet libraries together, when the first fleet runs on them" },
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "The services a Linux machine runs, said as data: a PostgreSQL instance, a send-only mail relay, a certificate and a set of DNS records, each a profile that becomes the requirements of Archon (packages, files, directories and services), with the secret never in the model.",
   kanon: {

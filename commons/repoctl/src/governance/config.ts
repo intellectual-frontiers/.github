@@ -24,11 +24,11 @@ import { parseStepId, parseVariableName, type VariableName } from "./ids.ts";
 import { isProblemCode, type ProblemCode } from "./problems.ts";
 import type { VerbId } from "./verbs.ts";
 
-/** The trailers a commit may carry, in the order a configuration lists them: the reference to an issue, the line that credits the agent and the address of the session. */
-export type TrailerKind = "issue" | "co-author" | "session";
+/** The trailers a commit may carry, in the order a configuration lists them: the reference to an issue, the impact on a version, the line that credits the agent and the address of the session. */
+export type TrailerKind = "issue" | "impact" | "co-author" | "session";
 
 /** Every trailer, in the order of the documentation. */
-export const TRAILER_KINDS: readonly TrailerKind[] = ["issue", "co-author", "session"];
+export const TRAILER_KINDS: readonly TrailerKind[] = ["issue", "impact", "co-author", "session"];
 
 /** A path that must not be committed, by a glob from the repository's root, and the reason said to the person. */
 export type ForbiddenPath = { readonly glob: string; readonly why: string };
@@ -94,6 +94,8 @@ export type LibrariesSettings = {
   readonly linker: readonly string[] | undefined;
   /** The source (from the root) that classifies each library by role, which `new library` edits to add the new one; none where the repository has no such file. */
   readonly roleFile: string | undefined;
+  /** The configuration of the documentation site (from the root), which lists the spec kit of every library and which `new library` edits to add the new one's; none where the repository has no such file. */
+  readonly docsFile: string | undefined;
 };
 
 /** The optional verbs a repository turns on. */
@@ -162,7 +164,7 @@ export type ConfigInput = {
   readonly generators?: readonly GeneratorInput[];
   readonly checks?: readonly CheckInput[];
   readonly capabilities?: Partial<Capabilities>;
-  readonly libraries?: { readonly folder: string; readonly specKit?: LibrariesSettings["specKit"]; readonly versionConstants?: boolean; readonly declaredDependencies?: boolean; readonly linker?: readonly string[]; readonly roleFile?: string };
+  readonly libraries?: { readonly folder: string; readonly specKit?: LibrariesSettings["specKit"]; readonly versionConstants?: boolean; readonly declaredDependencies?: boolean; readonly linker?: readonly string[]; readonly roleFile?: string; readonly docsFile?: string };
   readonly hygiene?: { readonly scope: string; readonly gitSources?: readonly string[]; readonly pathSegment?: string; readonly sourceMarker?: string; readonly allow?: { readonly paths?: readonly string[]; readonly packages?: readonly string[] } };
   readonly doctor?: { readonly minNode?: number; readonly bunPin?: DoctorPolicy["bunPin"]; readonly links?: DoctorPolicy["links"]; readonly install?: string };
   readonly docs?: { readonly config?: string; readonly out?: string; readonly generator?: string };
@@ -316,7 +318,7 @@ export function parseConfig(input: ConfigInput): Result<Config, readonly string[
   const capabilities: Capabilities = { release: false, newLibrary: false, status: false, prove: false, query: false, ...input.capabilities };
   const needsLibraries = CAPABILITY_NAMES.filter((name) => capabilities[name]);
   const libraries: LibrariesSettings | undefined =
-    input.libraries === undefined ? undefined : { folder: input.libraries.folder, specKit: input.libraries.specKit, versionConstants: input.libraries.versionConstants ?? false, declaredDependencies: input.libraries.declaredDependencies ?? false, linker: input.libraries.linker, roleFile: input.libraries.roleFile };
+    input.libraries === undefined ? undefined : { folder: input.libraries.folder, specKit: input.libraries.specKit, versionConstants: input.libraries.versionConstants ?? false, declaredDependencies: input.libraries.declaredDependencies ?? false, linker: input.libraries.linker, roleFile: input.libraries.roleFile, docsFile: input.libraries.docsFile };
   if (libraries === undefined && needsLibraries.length > 0) bad(`capabilities ${needsLibraries.join(", ")} need libraries: { folder }, the folder of the library manifests`);
   if (libraries !== undefined && !relative(libraries.folder)) bad("libraries.folder is a folder inside the repository, written with /");
 

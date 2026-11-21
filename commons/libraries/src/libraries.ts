@@ -29,6 +29,7 @@
  */
 import process from "node:process";
 import {
+  absurd,
   array,
   type Decoder,
   describe,
@@ -99,20 +100,85 @@ export type Library = {
   readonly versionConstants?: readonly VersionConstant[];
   /** The package the library publishes where it is not `@intellectual-frontiers/<name>` (the `data` library publishes `@intellectual-frontiers/arcactl`; commons 0036-distribution FR-009). */
   readonly publishes?: PackageName;
-  /** Why the library is kept out of the release: it is verified and packed like any other, and has no release record entry, no tag, no set and no registry (FR-0xx of 0001-libraries). */
-  readonly held?: HeldReason;
+  /** The typed reason the library is not released, where there is one: a library with none is released (0001-libraries FR-024); a held library is verified and packed like any other, and has no release record entry, no tag, no set and no registry. */
+  readonly held?: Hold;
   /** The set the library is, where it is a metapackage: a folder with no code of its own whose package depends on the libraries of the set at exact versions (commons 0036-distribution FR-005). */
   readonly bundle?: BundleName;
 };
 
-/** The reason a library is held out of the release: a non-empty sentence, made only by {@link parseHeldReason}. */
-export type HeldReason = Brand<string, "held reason">;
-const heldDecoder = refine(string, "held reason", (t) => t.trim() !== "" && t.trim() === t && !t.includes("\n"));
+/** The kinds of reason not to release a library: a closed union, and the only reasons there are (0001-libraries FR-024). */
+export const HOLD_KINDS = ["tests-only", "unfinished", "owner-blocked"] as const;
+/** A kind of reason not to release a library. */
+export type HoldKind = (typeof HOLD_KINDS)[number];
 
-/** A held reason from text, or why the text is not one. */
-export function parseHeldReason(text: string): Result<HeldReason, string> {
-  const r = heldDecoder(text, "held");
-  return r.kind === "ok" ? ok(r.value) : err("library.held is one non-empty line that says why the library is kept out of the release");
+/** One line of text of a hold: non-empty, trimmed, on one line, made only by {@link parseHoldText}. */
+export type HoldText = Brand<string, "hold text">;
+const holdTextDecoder = refine(string, "hold text", (t) => t.trim() !== "" && t.trim() === t && !t.includes("\n"));
+
+/** A line of a hold from text, or why the text is not one. */
+export function parseHoldText(text: string, where: string): Result<HoldText, string> {
+  const r = holdTextDecoder(text, where);
+  return r.kind === "ok" ? ok(r.value) : err(`${where} is one non-empty line, with no space around it`);
+}
+
+/**
+ * The reason a library is not released (0001-libraries FR-024): a library is released unless its manifest carries one, and every one has its text. A library that is `tests-only` is a tool of tests that nothing depends on at run time;
+ * an `unfinished` one names what is missing and the condition that lifts the hold; an `owner-blocked` one is held by a decision of the owner that the text states.
+ */
+export type Hold =
+  | { readonly kind: "tests-only"; readonly reason: HoldText }
+  | { readonly kind: "unfinished"; readonly reason: HoldText; readonly missing: readonly [HoldText, ...HoldText[]]; readonly liftedWhen: HoldText }
+  | { readonly kind: "owner-blocked"; readonly reason: HoldText };
+
+const holdExpected = `library.held is { kind: ${HOLD_KINDS.map((k) => `"${k}"`).join(" | ")}, reason } and, for "unfinished", missing (the parts that are not done) and liftedWhen (the condition that lifts the hold)`;
+
+/** The hold of a manifest from its value, or why it is not one. */
+export function decodeHold(input: unknown): Result<Hold, string> {
+  if (typeof input !== "object" || input === null || Array.isArray(input)) return err(holdExpected);
+  const o = Object.fromEntries(Object.entries(input));
+  const kind = HOLD_KINDS.find((k) => k === o["kind"]);
+  if (kind === undefined) return err(holdExpected);
+  const allowed: readonly string[] = kind === "unfinished" ? ["kind", "reason", "missing", "liftedWhen"] : ["kind", "reason"];
+  const stray = Object.keys(o).find((k) => !allowed.includes(k));
+  if (stray !== undefined) return err(`library.held.${stray} is not a field of a hold of kind ${kind} (${allowed.join(", ")})`);
+  const text = (field: string): Result<HoldText, string> => parseHoldText(typeof o[field] === "string" ? o[field] : "", `library.held.${field}`);
+  const reason = text("reason");
+  if (reason.kind === "err") return reason;
+  switch (kind) {
+    case "tests-only":
+    case "owner-blocked":
+      return ok({ kind, reason: reason.value });
+    case "unfinished": {
+      const liftedWhen = text("liftedWhen");
+      if (liftedWhen.kind === "err") return liftedWhen;
+      const list: readonly unknown[] = Array.isArray(o["missing"]) ? o["missing"] : [];
+      const parts: HoldText[] = [];
+      for (const [i, m] of list.entries()) {
+        const p = parseHoldText(typeof m === "string" ? m : "", `library.held.missing[${i}]`);
+        if (p.kind === "err") return p;
+        parts.push(p.value);
+      }
+      const [first, ...rest] = parts;
+      if (first === undefined) return err("library.held.missing names at least one part that is not done");
+      return ok({ kind, reason: reason.value, missing: [first, ...rest], liftedWhen: liftedWhen.value });
+    }
+    default:
+      return absurd(kind);
+  }
+}
+
+/** The hold in one sentence, for a plan, a table and the register: its kind, its reason and, where it has them, what is missing and what lifts it. */
+export function holdSentence(h: Hold): string {
+  switch (h.kind) {
+    case "tests-only":
+      return `tests only: ${h.reason}`;
+    case "owner-blocked":
+      return `owner-blocked: ${h.reason}`;
+    case "unfinished":
+      return `unfinished (missing ${h.missing.join("; ")}): ${h.reason}; lifted when ${h.liftedWhen}`;
+    default:
+      return absurd(h);
+  }
 }
 
 /** The scope of the packages of commons. */
@@ -172,7 +238,7 @@ const constantName: Decoder<string> = (input, path = "$") => {
 };
 const body = object(
   { name: nameDecoder, verify: nonEmpty, version: nonEmpty, exports: array(nonEmpty) },
-  { level: literal(...LEVELS), specKit: nonEmpty, summary: nonEmpty, distribution: array(literal(...REGISTRIES)), kanon: unknownValue, family: object({ host: nonEmpty, role: literal(...ROLES) }), license: nonEmpty, versionConstants: array(object({ file: nonEmpty, name: constantName })), publishes: nonEmpty, bundle: literal(...BUNDLES), held: string },
+  { level: literal(...LEVELS), specKit: nonEmpty, summary: nonEmpty, distribution: array(literal(...REGISTRIES)), kanon: unknownValue, family: object({ host: nonEmpty, role: literal(...ROLES) }), license: nonEmpty, versionConstants: array(object({ file: nonEmpty, name: constantName })), publishes: nonEmpty, bundle: literal(...BUNDLES), held: unknownValue },
 );
 const FIELDS = ["name", "level", "specKit", "verify", "version", "exports", "summary", "distribution", "kanon", "family", "license", "versionConstants", "publishes", "bundle", "held"] as const;
 
@@ -192,10 +258,10 @@ export function decodeLibrarySource(source: string): Result<Library, string> {
   if (r.kind === "err") return err(formatDecodeError(r.error));
   const v = r.value;
   const distribution = v.distribution ?? DEFAULT_DISTRIBUTION;
-  let held: HeldReason | undefined;
+  let held: Hold | undefined;
   if (v.held !== undefined) {
-    const h = parseHeldReason(v.held);
-    if (h.kind === "err") return err(h.error);
+    const h = decodeHold(v.held);
+    if (h.kind === "err") return h;
     held = h.value;
     if (v.publishes !== undefined || v.bundle !== undefined) return err("library.held is not given with library.publishes or library.bundle: a held library is published nowhere");
   }
@@ -293,6 +359,26 @@ function scriptOf(verify: string): string | undefined {
   return /^bun run ([A-Za-z0-9:_-]+)$/.exec(verify)?.[1];
 }
 
+/** The file of the documentation site's configuration, from `commons/`, which names the spec kit of every library that has one. */
+export const DOCS_CONFIG = "docs.config.ts";
+
+/**
+ * The libraries with a spec kit that the configuration of the site does not name (0001-libraries FR-025), one sentence each with the fix: a spec kit that `commons/docs.config.ts` does not list is a section of the site and of the books that is missing,
+ * which has turned the site and the tests red after a push. Read as text, never run; where the repository has no such file nothing is asked.
+ */
+export function docsConfigFindings(root: string, libraries: readonly Library[]): readonly string[] {
+  const file = `${root}/commons/${DOCS_CONFIG}`;
+  if (!existsSync(file)) return [];
+  const text = readTextFileSync(file);
+  return libraries.flatMap((l) => {
+    if (l.specKit === undefined) return [];
+    const dir = `commons/${l.name}/${l.specKit}`;
+    return text.includes(`"${dir}"`)
+      ? []
+      : [`commons/${DOCS_CONFIG} does not list the spec kit of ${l.name}: add { layout: "commons", dir: "${dir}" } to specKits (FR-025)`];
+  });
+}
+
 /**
  * What is wrong where a manifest and its folder disagree (0027-commons-libraries FR-013), one sentence each: a folder with a spec kit and no manifest, a manifest that cannot be read, that names another
  * folder, a level above L0 with no spec kit, a spec kit that is not there, a package of another name, a version that is not the package's, exports that are not the package's, and a verify that is no script of the package.
@@ -348,7 +434,7 @@ export function manifestFindings(repo: string): readonly string[] {
       found.push(`commons/${f.dir}: the manifest declares ${l.level}, which requires kanon, and declares none (0033-kanon FR-014)`);
   }
   const known = have.flatMap((f) => ("library" in f ? [f.library] : []));
-  found.push(...reservationFindings(known), ...familyFindings(known));
+  found.push(...reservationFindings(known), ...familyFindings(known), ...docsConfigFindings(root, known));
   return found;
 }
 
@@ -378,7 +464,7 @@ const list = (items: readonly string[]): string => {
 export function requirementOf(id: string, l: Library): string {
   const kit = l.specKit === undefined ? "" : `, its spec kit at \`commons/${l.name}/${l.specKit}\``;
   const summary = l.summary === undefined ? "" : ` ${l.summary}`;
-  const where = l.held === undefined ? l.distribution.map((r) => REGISTRY_NAME[r]).join(" and ") : `no registry (held out of the release: ${l.held})`;
+  const where = l.held === undefined ? l.distribution.map((r) => REGISTRY_NAME[r]).join(" and ") : `no registry (not released, ${holdSentence(l.held)})`;
   const own = l.publishes === undefined ? `@intellectual-frontiers/${l.name}` : l.publishes;
   const sets = l.bundle === undefined ? "" : `, a metapackage with no code of its own (the set ${l.bundle}, 0036-distribution FR-005)`;
   return `- **${id}**: \`commons/${l.name}\` MUST be a library at conformance level ${l.level} (\`${LEVEL_TERM[l.level]}\`): the package \`${own}\`${sets} at version \`${l.version}\`${kit}, exporting ${list(l.exports)}, published to ${where}, proved by \`cd commons/${l.name} && ${l.verify}\`.${summary}`;

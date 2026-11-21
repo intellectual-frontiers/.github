@@ -12,7 +12,7 @@ export const library = {
   verify: "bun run verify",
   version: "0.1.0",
   distribution: ["github"],
-  held: "built and verified but not released: the owner publishes the archon libraries together, when the first fleet runs on them",
+  held: { kind: "owner-blocked", reason: "built and verified but not released: the owner publishes the archon libraries together, when the first fleet runs on them" },
   exports: ["."],
   family: { host: "archon", role: "dialect" },
   summary: "The dialect of Archon that converges a Linux host with Ansible: it renders an order and its plan to an inventory and a playbook of the modules of ansible-core, gives the steps that check (with the difference) and apply, and says what it guarantees as data.",

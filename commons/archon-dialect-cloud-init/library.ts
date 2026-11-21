@@ -12,7 +12,7 @@ export const library = {
   verify: "bun run verify",
   version: "0.1.0",
   distribution: ["github"],
-  held: "built and verified but not released: the owner publishes the archon libraries together, when the first fleet runs on them",
+  held: { kind: "owner-blocked", reason: "built and verified but not released: the owner publishes the archon libraries together, when the first fleet runs on them" },
   exports: ["."],
   family: { host: "archon", role: "dialect" },
   summary: "The dialects of Archon for the unattended install of a machine from nothing: they render an order to Ubuntu's autoinstall user-data and meta-data (no secret in it, a blank-disk guard first, key-only sign-in) or to a Debian preseed from the same facts, and the script that converges the machine from its signed repository.",

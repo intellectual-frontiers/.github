@@ -1,14 +1,14 @@
 /**
  * What a commit's message says of the change requests it serves (commons 0020-ifccm FR-005 to FR-008, FR-033): the lines `Refs #N` and `Closes #N` (or `owner/repo#N` for another
  * repository), the words a Git host reads as closing an issue other than `Closes`, and the lines `Departs:` and `Decision:` that say a commit departs from a specification and which
- * Decision authorizes it.
+ * Decision authorizes it, and the line `Impact:` that says how much the change raises a version (`major`, `minor` or `patch`; commons 0026-works-versioning FR-021), which is read here so that a line that is none of the three can be found.
  *
  * @remarks
  * Pure text in, data out. A reference is read only from a line of its own: `Closes #10` in the middle of a sentence is not read. The closing words a host reads (`Fixes`, `Resolves`,
  * `Closed`, ...) are read wherever they stand, because the host reads them wherever they stand; the rule that reports them is `rules.ts`, never this module.
  *
  * @limits
- * It does not ask whether an issue exists or is closed (`strict.ts` does, through the host interface) and does not read trailers other than `Departs:` and `Decision:`.
+ * It does not ask whether an issue exists or is closed (`strict.ts` does, through the host interface) and does not read trailers other than `Departs:`, `Decision:` and `Impact:`.
  *
  * @example
  * ```ts
@@ -38,6 +38,8 @@ export type ParsedMessage = {
   readonly departs: readonly string[];
   /** The identifiers the `Decision:` lines name. */
   readonly decisions: readonly string[];
+  /** The `Impact:` lines whose value is not `major`, `minor` or `patch`: the value as written and the line. */
+  readonly badImpacts: readonly { readonly value: string; readonly line: number }[];
 };
 
 const TARGET = String.raw`((?:[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+)?)#(\d+)`;
@@ -61,6 +63,7 @@ export function parseMessage(message: string): ParsedMessage {
   const wrongWords: WrongWord[] = [];
   const departs: string[] = [];
   const decisions: string[] = [];
+  const badImpacts: { value: string; line: number }[] = [];
   for (const [i, raw] of message.replaceAll("\r\n", "\n").split("\n").entries()) {
     const line = raw.trim();
     if (line === "" || line.startsWith(">")) continue;
@@ -85,8 +88,10 @@ export function parseMessage(message: string): ParsedMessage {
     if (departure?.[1] !== undefined) departs.push(...requirementsOf(departure[1]));
     const decision = /^decision:\s*(\S+)\s*$/i.exec(line);
     if (decision?.[1] !== undefined) decisions.push(decision[1]);
+    const impact = /^impact:\s*(.*)$/i.exec(line);
+    if (impact?.[1] !== undefined && !/^(major|minor|patch)$/i.test(impact[1].trim())) badImpacts.push({ value: impact[1].trim(), line: i + 1 });
   }
-  return { refs, wrongWords, departs: [...new Set(departs)], decisions: [...new Set(decisions)] };
+  return { refs, wrongWords, departs: [...new Set(departs)], decisions: [...new Set(decisions)], badImpacts };
 }
 
 /** Every change request a message names, by a proper line or by a closing word, as `owner/repo#N` or `#N`, each once. */

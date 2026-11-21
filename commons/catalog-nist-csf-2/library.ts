@@ -12,7 +12,7 @@ export const library = {
   verify: "bun run verify",
   version: "0.1.0",
   distribution: ["github"],
-  held: "built and verified but not released: the owner publishes the libraries of the fleet work together, when the first fleet runs on them",
+  held: { kind: "owner-blocked", reason: "built and verified but not released: the owner publishes the libraries of the fleet work together, when the first fleet runs on them" },
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "The NIST Cybersecurity Framework 2.0 as a grc catalog package: its functions, categories and 106 active subcategories as framework data, with where it came from, its licence and the digest of the source.",
   kanon: {

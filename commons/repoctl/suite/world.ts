@@ -81,7 +81,7 @@ export function configInput(extra: Partial<ConfigInput> = {}): ConfigInput {
 }
 
 /** The settings of libraries a test world reads manifests with. */
-export const LIBRARIES: Pick<Config, "libraries"> = { libraries: { folder: "commons", specKit: undefined, versionConstants: false, declaredDependencies: false, linker: undefined, roleFile: undefined } };
+export const LIBRARIES: Pick<Config, "libraries"> = { libraries: { folder: "commons", specKit: undefined, versionConstants: false, declaredDependencies: false, linker: undefined, roleFile: undefined, docsFile: undefined } };
 
 /** A generator of a test that is a plain record: it is run as the program `<id>.ts`. */
 export function genOf(id: string, inputs: readonly string[], outputs: readonly string[]): Generator {

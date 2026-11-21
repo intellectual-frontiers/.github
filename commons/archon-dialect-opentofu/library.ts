@@ -12,7 +12,7 @@ export const library = {
   verify: "bun run verify",
   version: "0.1.0",
   distribution: ["github"],
-  held: "built and verified but not released: the owner publishes the archon libraries together, when the first fleet runs on them",
+  held: { kind: "owner-blocked", reason: "built and verified but not released: the owner publishes the archon libraries together, when the first fleet runs on them" },
   exports: ["."],
   family: { host: "archon", role: "dialect" },
   summary: "The dialect of Archon for cloud resources with OpenTofu: it renders an order of cloud-resource requirements to a JSON configuration with pinned providers and no credential, the state kept outside the repository, and the steps that init, plan to a saved plan and apply exactly that plan. It renders and says what to run; it runs nothing.",

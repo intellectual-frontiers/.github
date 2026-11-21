@@ -79,11 +79,11 @@ proves(["0001-anyfs-layers FR-004"], "verify runs the compiler, the specificatio
   }
 });
 
-proves(["0001-anyfs-layers FR-005"], "the release record agrees with the manifest and the package, and the library is held", () => {
+proves(["0001-anyfs-layers FR-005"], "the release record agrees with the manifest and the package, and the library is released (it carries no hold)", () => {
   assertEquals(release.slug, library.name);
   assertEquals(release.version, library.version);
   assertEquals(release.kind, "Software");
-  assert(library.held.length > 0, "the library says why it is held");
+  assert(!("held" in library), "the library is released: it carries no hold");
 });
 
 proves(["0001-anyfs-layers FR-006"], "governance, logical and the store in memory read no file, reach no network and run no program", async () => {

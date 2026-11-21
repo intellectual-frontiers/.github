@@ -3,20 +3,20 @@
  * that the one release workflow reads.
  *
  *     bun commons/libraries/src/releasing.ts plan                    what a release would do, from the tags and the working tree; writes nothing (the default command)
- *     bun commons/libraries/src/releasing.ts apply                   raise the versions the plan says, make the generated files once, run the tests that pack, install and type-check every library, write the record
+ *     bun commons/libraries/src/releasing.ts apply                   raise the versions the plan says, refresh the lockfile of each library released, make the generated files once and synchronize them, run the tests that pack, install and type-check every library, write the record
  *     bun commons/libraries/src/releasing.ts matrix --github-output F   what the release workflow builds and publishes, from the record, leaving out what is tagged (written as the outputs of a step)
  *     other flags: --repo DIR, and for apply --no-tests (leave out the tests that pack: for trying the command, never for a release)
  *
  * @remarks
- * A library is released at the version its manifest has, and its version is raised here and nowhere else: a library whose files changed since its last tag (its folder, and the paths its record adds) is raised by the greatest `Impact:`
- * of the commits since that tag (a patch where none states one), and a library that imports a library that is raised is raised by at least a patch, and so on up the imports. A library whose version is not tagged yet is released as it is,
+ * A library is released unless its manifest carries a typed `held` reason not to (`tests-only`, `unfinished`, `owner-blocked`); `plan` names each such library and its reason. A library is released at the version its manifest has, and its version is raised here and nowhere else: a library whose files changed since its last tag (its folder, and the paths its record adds) is raised by the greater of the `Impact:`
+ * of the commits since that tag (a patch where none states one) and the floor of its `exports` (a key removed or renamed since the version npm holds is breaking, a key added a feature; a breaking change raises the minor while the major version is 0), and a library that imports a library that is raised is raised by at least a patch, and so on up the imports. A library whose version is not tagged yet is released as it is,
  * whatever the tags say of earlier versions: a library that has never been tagged (the first release of it, or a backlog that was never tagged), or whose manifest is ahead of its last tag (a version raised by hand). A library whose
  * version is tagged and whose files did not change is left alone. The order of the release is the order of the imports, a library after the libraries it imports. The record, `commons/generated/release.auto.json`, lists what the release
  * workflow publishes and tags, in that order; it says nothing of a day or a person, so the same state gives the same bytes. Nothing here publishes, tags or commits: the workflow publishes and tags, and a person commits what `apply` made.
  *
  * @limits
  * The plan reads the tags of this repository, so a clone without its tags plans a first release of everything. It cannot know what a registry holds: the workflow asks it, and skips a version that is there. A work that is not a library
- * (`commons/docs`) is not released here.
+ * (`commons/docs`) is not released here. The floor of the exports sees the keys of `exports` and nothing behind them: a changed type, signature or behaviour under an unchanged key is declared by the `Impact:` of the commit.
  *
  * @example
  * ```ts
@@ -47,7 +47,7 @@ import { compareVersions, greaterImpact, type Impact, nextSemVer, parseVersion }
 import { scopeOf, workFolders } from "@intellectual-frontiers/mizan/versions/works";
 import { inputsOf } from "./affected.ts";
 import { exportsLine } from "./plan.ts";
-import { decodeLibrarySource, LIBRARY_FILE, publishedPackage, type VersionConstant } from "./libraries.ts";
+import { decodeLibrarySource, type Hold, holdSentence, LIBRARY_FILE, publishedPackage, type VersionConstant } from "./libraries.ts";
 import { membersOf } from "./metapackages.ts";
 import { everyLibrary } from "./affected.ts";
 
@@ -75,7 +75,37 @@ export type Facts = {
   readonly registry: Drift;
   /** Whether a file of the library changed since the last commit that raised its version, and the impact the commits since state (a patch where none does): the fallback where npm cannot be compared. */
   readonly sinceVersion: { readonly changed: boolean; readonly impact: Impact };
+  /** The keys of `exports` that the version npm holds has and the library no longer has, and those it has and npm's has not; undefined where npm was not asked or did not answer (the floor of FR-027). */
+  readonly exportsChange: ExportsChange | undefined;
 };
+
+/** The keys of `exports` a library lost and gained against the version npm holds. */
+export type ExportsChange = { readonly removed: readonly string[]; readonly added: readonly string[] };
+
+/** The least impact the keys of `exports` alone ask for, and why (0001-libraries FR-027): a key removed or renamed is breaking (`major`), a key added is a feature (`minor`). */
+export type Floor = { readonly impact: Impact; readonly reason: string };
+
+/** The floor of a change of `exports`: none where no key was removed or added. Types, signatures and behaviour behind an unchanged key are not seen. */
+export function floorOf(change: ExportsChange | undefined): Floor | undefined {
+  if (change === undefined) return undefined;
+  if (change.removed.length > 0) return { impact: "major", reason: `exports removed or renamed (${change.removed.join(", ")}): breaking` };
+  if (change.added.length > 0) return { impact: "minor", reason: `exports added (${change.added.join(", ")}): a feature` };
+  return undefined;
+}
+
+/** The change of the keys of `exports` from the keys npm holds to the library's, each list sorted. */
+export function exportsChangeOf(published: readonly string[], local: readonly string[]): ExportsChange {
+  const sorted = (xs: readonly string[]): readonly string[] => [...xs].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+  return { removed: sorted(published.filter((k) => !local.includes(k))), added: sorted(local.filter((k) => !published.includes(k))) };
+}
+
+/**
+ * The impact that raises a version: while the major version is 0 the first number never changes by a release (SemVer 2.0.0 item 4: major version zero is for initial development and anything may change), so a breaking change (`major`) raises the minor, and a
+ * feature (`minor`) raises the minor too; from 1.0.0 the impact is as stated (0026-works-versioning FR-041).
+ */
+export function appliedImpact(version: string, impact: Impact): Impact {
+  return impact === "major" && /^0\./.test(version) ? "minor" : impact;
+}
 
 /** What npm holds of a version, against the files of the library: not there, there and the same, there and different, or not known (offline, or the registry did not say). */
 export type Drift = "absent" | "same" | "differs" | "unknown";
@@ -87,7 +117,7 @@ export type Why = "changed" | "differs-from-npm" | "changed-since-version" | "ma
 export type Decision =
   | { readonly kind: "unchanged" }
   | { readonly kind: "as-is"; readonly why: "no-tag" | "ahead-of-tag"; readonly npm: Drift }
-  | { readonly kind: "raised"; readonly to: string; readonly impact: Impact; readonly why: Why }
+  | { readonly kind: "raised"; readonly to: string; readonly impact: Impact; readonly why: Why; readonly floor: Floor | undefined }
   | { readonly kind: "dependent"; readonly to: string; readonly because: readonly Slug[] };
 
 /** One step of a release: a library, its version before and after, and what is done to it. */
@@ -102,8 +132,11 @@ export type Step = {
   readonly decision: Exclude<Decision, { readonly kind: "unchanged" }>;
 };
 
-/** The plan: every step in the order of the imports, and the libraries that are left alone. */
-export type Plan = { readonly steps: readonly Step[]; readonly unchanged: readonly Slug[] };
+/** A library that is not released, and the typed reason (0001-libraries FR-024). */
+export type HeldLibrary = { readonly name: string; readonly hold: Hold };
+
+/** The plan: every step in the order of the imports, the libraries that are left alone, and the libraries that are not released with their reasons. */
+export type Plan = { readonly steps: readonly Step[]; readonly unchanged: readonly Slug[]; readonly held: readonly HeldLibrary[] };
 
 const tagOf = (slug: string, version: string): string => `${slug}-v${version}`;
 
@@ -125,7 +158,7 @@ export function describe(d: Decision, from: string): string {
       return `released as it is (${from}): ${because}; ${npm}`;
     }
     case "raised":
-      return `raised to ${d.to} (${d.impact}): ${
+      return `raised to ${d.to} (${d.impact}${d.impact === "major" && appliedImpact(from, d.impact) !== d.impact ? ", a minor while the major version is 0" : ""}): ${
         d.why === "changed"
           ? "files changed since its last tag"
           : d.why === "differs-from-npm"
@@ -133,7 +166,7 @@ export function describe(d: Decision, from: string): string {
             : d.why === "changed-since-version"
               ? "npm was not compared, and files changed since its version was raised"
               : "asked for (--raise)"
-      }`;
+      }${d.floor === undefined ? "" : `; the floor of the exports: ${d.floor.reason}`}`;
     case "dependent":
       return `raised to ${d.to} (patch): it imports ${d.because.join(", ")}, which ${d.because.length === 1 ? "is" : "are"} raised`;
     default:
@@ -145,14 +178,23 @@ export function describe(d: Decision, from: string): string {
  * The plan of a release from the facts of the libraries (FR-013): a library with no tag, or ahead of its last tag, is released as it is; one that is tagged at its version and changed is raised by its impact; one that is tagged,
  * unchanged and imports a library that is raised, directly or through another, is raised by a patch; the rest are left alone. A library whose version is below its last tag is an error, and so is a cycle of imports.
  */
-export function planRelease(facts: readonly Facts[], raise: ReadonlyMap<string, Impact | undefined> = new Map()): Result<Plan, string> {
+export function planRelease(facts: readonly Facts[], raise: ReadonlyMap<string, Impact | undefined> = new Map(), held: readonly HeldLibrary[] = []): Result<Plan, string> {
   const by = new Map(facts.map((f) => [f.slug as string, f] as const));
+  const heldBy = new Map(held.map((h) => [h.name, h] as const));
   const unknown = [...raise.keys()].filter((k) => !by.has(k));
-  if (unknown.length > 0) return err(`--raise names ${unknown.join(", ")}, which ${unknown.length === 1 ? "is" : "are"} no library (they are: ${facts.map((f) => f.slug).join(", ")})`);
+  const named = (k: string): string => {
+    const h = heldBy.get(k);
+    return h === undefined ? k : `${k} (not released: ${holdSentence(h.hold)})`;
+  };
+  if (unknown.length > 0)
+    return err(`--raise names ${unknown.map(named).join(", ")}, which ${unknown.length === 1 ? "is" : "are"} no library that is released (they are: ${facts.map((f) => f.slug).join(", ")})`);
   const decided = new Map<Slug, Decision>();
+  // the impact of the commits and the floor of the exports: the greater wins (FR-027), and while the major version is 0 a breaking change raises the minor
   const raised = (f: Facts, impact: Impact, why: Why): Result<Decision, string> => {
-    const to = nextSemVer(f.version, impact);
-    return to.kind === "err" ? err(`${f.slug}: ${to.error}`) : ok({ kind: "raised", to: to.value, impact, why });
+    const floor = floorOf(f.exportsChange);
+    const stated = floor === undefined ? impact : greaterImpact(impact, floor.impact);
+    const to = nextSemVer(f.version, appliedImpact(f.version, stated));
+    return to.kind === "err" ? err(`${f.slug}: ${to.error}`) : ok({ kind: "raised", to: to.value, impact: stated, why, floor });
   };
   for (const f of facts) {
     let candidate = f.last === undefined;
@@ -202,7 +244,7 @@ export function planRelease(facts: readonly Facts[], raise: ReadonlyMap<string, 
     const to = d.kind === "as-is" ? f.version : d.to;
     steps.push({ slug, folder: f.folder, package: f.package, from: f.version, to, tag: tagOf(slug, to), publish: f.publish, decision: d });
   }
-  return ok({ steps, unchanged: facts.filter((f) => decided.get(f.slug)?.kind === "unchanged").map((f) => f.slug) });
+  return ok({ steps, unchanged: facts.filter((f) => decided.get(f.slug)?.kind === "unchanged").map((f) => f.slug), held: [...held].sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0)) });
 }
 
 function compare(a: string, b: string): number | undefined {
@@ -366,8 +408,55 @@ export function realRegistry(repo: string): Registry {
   };
 }
 
+/** The keys of `exports` of a version npm holds, or undefined where it cannot be read (not there, offline, no answer): never a guess. */
+export type PublishedExports = (pkg: string, version: string) => Promise<readonly string[] | undefined>;
+
+/** The registry of npm (or the one at `base`, for a test's own server) asked for the manifest of a version, whose `exports` keys are those the package was published with. */
+export function realPublishedExports(base = "https://registry.npmjs.org"): PublishedExports {
+  return async (name, version) => {
+    try {
+      const meta = await fetch(`${base}/${name.replace("/", "%2F")}/${version}`, { signal: AbortSignal.timeout(30_000) });
+      if (!meta.ok) return undefined;
+      const json: unknown = await meta.json();
+      const e = typeof json === "object" && json !== null && "exports" in json ? json.exports : undefined;
+      return typeof e === "object" && e !== null && !Array.isArray(e) ? Object.keys(e) : undefined;
+    } catch {
+      return undefined;
+    }
+  };
+}
+
+/** The registry that is not asked for `exports` (`--offline`). */
+export const offlinePublishedExports: PublishedExports = () => Promise.resolve(undefined);
+
+/** The keys of the `exports` of a package.json's text. */
+export function exportKeys(packageJson: string): readonly string[] {
+  try {
+    const x: unknown = JSON.parse(packageJson);
+    const e = typeof x === "object" && x !== null && "exports" in x ? x.exports : undefined;
+    return typeof e === "object" && e !== null && !Array.isArray(e) ? Object.keys(e) : [];
+  } catch {
+    return [];
+  }
+}
+
+/** The libraries that are not released, each with its typed reason, in the order of their names (0001-libraries FR-024). */
+export function heldLibraries(repo: string): readonly HeldLibrary[] {
+  return everyLibrary(repo).flatMap((l) => (l.held === undefined ? [] : [{ name: l.name, hold: l.held }]));
+}
+
+/** The plan of a repository: the facts of the libraries that are released, the libraries that are held, and the rules of the plan. */
+export async function releasePlan(
+  repo: string,
+  options: { readonly raise?: ReadonlyMap<string, Impact | undefined>; readonly registry?: Registry; readonly published?: PublishedExports } = {},
+): Promise<Result<Plan, string>> {
+  const facts = await factsOf(repo, options.registry, options.published);
+  if (facts.kind === "err") return facts;
+  return planRelease(facts.value, options.raise, heldLibraries(repo));
+}
+
 /** What the host gives the plan: the facts of the libraries from the tags and the tree. */
-export async function factsOf(repo: string, registry: Registry = realRegistry(repo)): Promise<Result<readonly Facts[], string>> {
+export async function factsOf(repo: string, registry: Registry = realRegistry(repo), published: PublishedExports = realPublishedExports()): Promise<Result<readonly Facts[], string>> {
   const tree = await readWorkingTree(repo);
   if (tree.kind === "err") return err(formatGitError(tree.error));
   const tags = await readTags(repo);
@@ -427,6 +516,14 @@ export async function factsOf(repo: string, registry: Registry = realRegistry(re
         };
       }
     }
+    // the keys of `exports` against the version npm holds: of the last tag where the library changed since it, of the version itself where it is ahead of its tag and npm holds it with other files
+    let exportsChange: ExportsChange | undefined;
+    const compared = ahead ? (drift === "differs" ? l.version : undefined) : changed && last !== undefined ? last.version : undefined;
+    if (compared !== undefined && l.distribution.includes("npm")) {
+      const keys = await published(publishedPackage(l), compared);
+      const pkg = join(repo, l.folder, "package.json");
+      if (keys !== undefined && existsSync(pkg)) exportsChange = exportsChangeOf(keys, exportKeys(readTextFileSync(pkg)));
+    }
     // a metapackage has no code to import: it depends on each member of its set, which is what raises it where a member is raised (0036-distribution FR-008)
     const members = l.bundle === undefined ? undefined : membersOf(l.bundle, libs);
     const imports = (members?.kind === "ok" ? members.value.map((m) => m.library) : inputsOf(repo, l.name).imports).flatMap((n) => {
@@ -445,6 +542,7 @@ export async function factsOf(repo: string, registry: Registry = realRegistry(re
       publish: l.distribution.includes("npm"),
       registry: drift,
       sinceVersion,
+      exportsChange,
     });
   }
   return ok(out);
@@ -463,14 +561,30 @@ export const GENERATORS: readonly (readonly string[])[] = [
 /** The tests that pack every library, install it into a consumer and type-check against it (the heavy proof a release asks for and a push does not). */
 export const PACKAGE_TESTS: readonly string[] = ["bun", "test", "./tests/release/"];
 
-/** What `apply` runs besides the planner: the generators and the tests, which a test of this module replaces. */
+/** What `apply` runs besides the planner: the refresh of a lockfile, the generators, the synchronization of every generated file and the tests, which a test of this module replaces. */
 export type Host = {
+  /** Refreshes the lockfile of the library in `folder` (from the root of the repository): an install that may change it. */
+  readonly lock: (repo: string, folder: string) => Promise<Result<void, string>>;
   readonly generate: (repo: string, command: readonly string[]) => Promise<Result<void, string>>;
+  /** Makes every generated file of the repository, in dependency order (`repoctl sync`). */
+  readonly sync: (repo: string) => Promise<Result<void, string>>;
   readonly prove: (repo: string) => Promise<Result<void, string>>;
 };
 
+const tailOf = (r: { readonly stdout: string; readonly stderr: string }, n: number): string => `${r.stdout}${r.stderr}`.trim().split("\n").slice(-n).join("\n");
+
 /** The real host: each command run with Bun from the repository's root. */
 export const REAL: Host = {
+  lock: async (repo, folder) => {
+    const r = await run(["bun", "install"], { cwd: join(repo, folder) });
+    return r.code === 0 ? ok(undefined) : err(`bun install in ${folder} ended with ${r.code}: ${tailOf(r, 8)}`);
+  },
+  sync: async (repo) => {
+    const linked = await run(["bun", "commons/libraries/src/link.ts"], { cwd: repo });
+    if (linked.code !== 0) return err(`link ended with ${linked.code}: ${tailOf(linked, 8)}`);
+    const r = await run(["bun", "commons/repoctl/src/repoctl.ts", "sync"], { cwd: repo });
+    return r.code === 0 ? ok(undefined) : err(`repoctl sync ended with ${r.code}: ${tailOf(r, 8)}`);
+  },
   generate: async (repo, command) => {
     const r = await run(["bun", ...command], { cwd: repo });
     return r.code === 0 ? ok(undefined) : err(`${command.join(" ")} ended with ${r.code}: ${`${r.stdout}${r.stderr}`.trim().split("\n").slice(-8).join("\n")}`);
@@ -484,15 +598,16 @@ export const REAL: Host = {
 /** What `apply` did: the files written, in order. */
 export type Applied = { readonly plan: Plan; readonly written: readonly string[] };
 
-/** Makes the release (FR-014): raises the versions of the plan, makes the generated files once, runs the tests that pack unless asked not to, and writes the record. */
+/**
+ * Makes the release (FR-014), in this order: the versions of the plan are written, the lockfile of every library the plan releases is refreshed (an install that may change it), the generated files are made once and then synchronized, the tests that pack
+ * run unless asked not to, and the record is written. The lockfiles are refreshed before the tests because those install each library from its lockfile and refuse a stale one.
+ */
 export async function applyRelease(
   repo: string,
   host: Host,
-  options: { readonly tests: boolean; readonly raise?: ReadonlyMap<string, Impact | undefined>; readonly registry?: Registry },
+  options: { readonly tests: boolean; readonly raise?: ReadonlyMap<string, Impact | undefined>; readonly registry?: Registry; readonly published?: PublishedExports },
 ): Promise<Result<Applied, string>> {
-  const facts = await factsOf(repo, options.registry);
-  if (facts.kind === "err") return facts;
-  const planned = planRelease(facts.value, options.raise);
+  const planned = await releasePlan(repo, { ...(options.raise === undefined ? {} : { raise: options.raise }), ...(options.registry === undefined ? {} : { registry: options.registry }), ...(options.published === undefined ? {} : { published: options.published }) });
   if (planned.kind === "err") return planned;
   const written: string[] = [];
   for (const step of planned.value.steps) {
@@ -501,10 +616,18 @@ export async function applyRelease(
     if (w.kind === "err") return w;
     written.push(...w.value);
   }
+  for (const step of planned.value.steps) {
+    if (!existsSync(join(repo, step.folder, "package.json"))) continue;
+    const r = await host.lock(repo, step.folder);
+    if (r.kind === "err") return r;
+    if (existsSync(join(repo, step.folder, "bun.lock"))) written.push(`${step.folder}/bun.lock`);
+  }
   for (const g of GENERATORS) {
     const r = await host.generate(repo, g);
     if (r.kind === "err") return r;
   }
+  const synced = await host.sync(repo);
+  if (synced.kind === "err") return synced;
   if (options.tests) {
     const proved = await host.prove(repo);
     if (proved.kind === "err") return proved;
@@ -517,12 +640,13 @@ export async function applyRelease(
 
 /** The lines the plan prints: one for each library that is released, and the libraries left alone. */
 export function planLines(look: Look, plan: Plan): readonly string[] {
-  if (plan.steps.length === 0) return [`${label("skipped", "nothing to release: every library is tagged at its version and unchanged", look)}`];
+  const heldLines = plan.held.map((h) => `${label("skipped", `${h.name} not released`, look)}  ${paint("dim", holdSentence(h.hold), look)}`);
+  if (plan.steps.length === 0) return [`${label("skipped", "nothing to release: every library is tagged at its version and unchanged", look)}`, ...heldLines];
   const out = plan.steps.map(
     (s) => `${label("action", `${s.slug} ${s.from === s.to ? s.to : `${s.from} -> ${s.to}`}${s.publish ? "" : " (tag only)"}`, look)}  ${paint("dim", describe(s.decision, s.from), look)}`,
   );
   if (plan.unchanged.length > 0) out.push(`${paint("dim", `left alone (${plan.unchanged.length}): ${plan.unchanged.join(", ")}`, look)}`);
-  return out;
+  return [...out, ...heldLines];
 }
 
 /** What the publication needs from the world, so that its order and its rules are a pure function of what these say. */
@@ -664,7 +788,7 @@ const OPTIONS = {
   tests: flag({ help: "Run the tests that pack, install and type-check every library (on by default; apply only).", negatable: true, default: true }),
   githubOutput: value({ help: "Append the outputs to this file, as a step's `$GITHUB_OUTPUT` is read (matrix only).", valueName: "FILE" }),
   raise: many({ help: "Raise a library whatever its state says: NAME, or NAME=major|minor|patch (the impact of its commits, or a patch, where none is given). Repeat, or separate with commas.", valueName: "NAME[=IMPACT]" }),
-  offline: flag({ help: "Do not ask npm what it holds: a version with no tag is then raised only where its files changed since it was raised." }),
+  offline: flag({ help: "Do not ask npm what it holds: a version with no tag is then raised only where its files changed since it was raised, and the floor of the exports is not read." }),
   dir: value({ help: "Where the tarballs are, a folder `package-<slug>` for each library (publish only).", valueName: "DIR", default: "package" }),
 };
 const WORDS: readonly Operand[] = [{ name: "COMMAND", help: "plan, apply or matrix (plan by default).", arity: "optional" }];
@@ -695,8 +819,8 @@ export async function main(argv: readonly string[], host: Host = REAL): Promise<
         stdio.stderr.writeSync(`release: ${raise.error}\n`);
         return 2;
       }
-      const facts = await factsOf(repo, parsed.value.options.offline ? offlineRegistry : realRegistry(repo));
-      const planned = facts.kind === "err" ? facts : planRelease(facts.value, raise.value);
+      const offline = parsed.value.options.offline;
+      const planned = await releasePlan(repo, { raise: raise.value, registry: offline ? offlineRegistry : realRegistry(repo), published: offline ? offlinePublishedExports : realPublishedExports() });
       if (planned.kind === "err") {
         stdio.stderr.writeSync(`release: ${planned.error}\n`);
         return 1;
@@ -714,6 +838,7 @@ export async function main(argv: readonly string[], host: Host = REAL): Promise<
         tests: parsed.value.options.tests,
         raise: raise.value,
         registry: parsed.value.options.offline ? offlineRegistry : realRegistry(repo),
+        published: parsed.value.options.offline ? offlinePublishedExports : realPublishedExports(),
       });
       if (done.kind === "err") {
         stdio.stderr.writeSync(`release: ${done.error}\n`);

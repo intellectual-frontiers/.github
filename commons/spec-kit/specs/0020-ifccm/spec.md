@@ -93,6 +93,7 @@
 - **FR-042**: The change-control check MUST authenticate a Git host adapter without writing a credential anywhere, as of the library `githost` (`@intellectual-frontiers/githost`, githost 0001-githost FR-004), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
 - **FR-043**: The change-control check MUST choose the kind of host for a remote (a self-hosted GitLab named, never guessed), as of the library `githost` (`@intellectual-frontiers/githost`, githost 0001-githost FR-005), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
 - **FR-044**: The change-control check MUST tell the depth a kind of host allows (`maxDepth`), as of the library `githost` (`@intellectual-frontiers/githost`, githost 0001-githost FR-006), where it is specified and proved (0032-libraries-by-concern FR-010), and MUST NOT specify it here.
+- **FR-045**: A commit's message MAY state how much it raises the version of the works it changes on a line of its own, `Impact: major`, `Impact: minor` or `Impact: patch` (0026-works-versioning FR-021); the `changes` check MUST report a line `Impact:` whose value is none of the three as `changes/impact`, with its revision and the value, a warning or a gate by the phase like the other findings, and MUST NOT report a commit that states none.
 
 ## Acceptance scenarios
 

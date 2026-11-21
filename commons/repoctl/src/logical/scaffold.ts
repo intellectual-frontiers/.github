@@ -345,6 +345,17 @@ if (import.meta.main) {
 `;
 }
 
+/** The configuration of the documentation site with the spec kit of the new library listed: after the last spec kit it lists, or the source unchanged where the library is listed already. */
+export function withSpecKit(source: string, name: string, specKit: string): Result<string, string> {
+  const dir = `commons/${name}/${specKit}`;
+  if (source.includes(`"${dir}"`)) return ok(source);
+  const entries = [...source.matchAll(/^( *)\{ layout: "commons", dir: "commons\/[^"]+" \},\n/gm)];
+  const last = entries[entries.length - 1];
+  if (last === undefined) return err("the configuration of the site lists no spec kit, so the new library's cannot be added after them");
+  const at = (last.index ?? 0) + last[0].length;
+  return ok(`${source.slice(0, at)}${last[1] ?? ""}{ layout: "commons", dir: "${dir}" },\n${source.slice(at)}`);
+}
+
 /** The README's map of the roles with a line added for the new library: after the last library of its role, or at the end of the map; the source unchanged where the library is there already. */
 export function withRole(source: string, name: string, role: Role): Result<string, string> {
   const start = source.indexOf("export const ROLE_OF");

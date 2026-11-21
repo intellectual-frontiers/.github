@@ -12,14 +12,14 @@ export const library = {
   verify: "bun run verify",
   version: "0.1.0",
   distribution: ["github"],
-  held: "built and verified but not released: the owner publishes the fleet libraries together, when the first fleet runs on them",
+  held: { kind: "owner-blocked", reason: "built and verified but not released: the owner publishes the fleet libraries together, when the first fleet runs on them" },
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "Test results from other tools (SARIF, OWASP ZAP, Burp Suite and Nessus reports) read into findings that keep where they came from, with a lifecycle (open, triaged, accepted for a time, fixed, verified or reopened by a retest) worked out from a log of events, and the NIST SP 800-53 controls each finding is evidence against. It reads reports and runs no tool.",
   kanon: {
     package: "@intellectual-frontiers/findings",
     units: [
       { folder: "src/governance/", layer: "governance", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }] },
-      { folder: "src/logical/", layer: "logical", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/findings", subpaths: ["governance"] }, { name: "@intellectual-frontiers/formats", subpaths: ["xml"] }] },
+      { folder: "src/logical/", layer: "logical", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/findings", subpaths: ["governance"] }, { name: "@intellectual-frontiers/formats", subpaths: ["xml"] }, { name: "@intellectual-frontiers/planning", subpaths: ["governance"] }] },
       { folder: "src/physical/", layer: "physical", mayImport: ["src/governance/", "src/logical/"], packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/findings", subpaths: ["governance", "logical"] }, { name: "@intellectual-frontiers/system", subpaths: "any" }] },
       { folder: "src/", own: true },
       { folder: "suite/", own: true },

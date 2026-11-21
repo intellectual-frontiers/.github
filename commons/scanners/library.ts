@@ -12,7 +12,7 @@ export const library = {
   verify: "bun run verify",
   version: "0.1.0",
   distribution: ["github"],
-  held: "built and verified but not released: the owner publishes the fleet libraries together, when the first fleet runs on them",
+  held: { kind: "owner-blocked", reason: "built and verified but not released: the owner publishes the fleet libraries together, when the first fleet runs on them" },
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "Runs security scanners (a built-in TLS and header check, nuclei, nmap, trivy, grype, semgrep, checkov and ZAP's baseline scan) the safe way: only after the engagement allows the action, only a binary whose SHA-256 is the one pinned for it, with a command line made from validated parts and no shell, in an empty working folder with a bare environment, and a record of every run. What they print is read into findings.",
   kanon: {

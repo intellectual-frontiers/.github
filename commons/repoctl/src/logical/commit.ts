@@ -14,7 +14,7 @@
  *
  * @module
  */
-import { type CommitPolicy, type CommitSubject, type Generator, identityArgs, type IssueNumber, type SessionUrl } from "@intellectual-frontiers/repoctl/governance";
+import { type CommitImpact, type CommitPolicy, type CommitSubject, type Generator, identityArgs, type IssueNumber, type SessionUrl } from "@intellectual-frontiers/repoctl/governance";
 import { matches } from "./glob.ts";
 import { absurd } from "@intellectual-frontiers/core";
 import { finding, type Finding } from "./findings.ts";
@@ -25,6 +25,8 @@ import { findingsOfSync, runSync } from "./sync.ts";
 export type CommitInput = {
   readonly subject: CommitSubject;
   readonly refs: IssueNumber | undefined;
+  /** The impact the commit states on its `Impact:` line, where the policy has the trailer and the commit gives one. */
+  readonly impact: CommitImpact | undefined;
   /** The address of the session, where the policy has the trailer. */
   readonly session: SessionUrl | undefined;
   /** The line that credits the agent, where the policy has the trailer. */
@@ -37,12 +39,14 @@ export type CommitInput = {
 /** The message of a commit: the subject, and the trailers, each a line. */
 export type Message = { readonly subject: string; readonly trailers: readonly string[] };
 
-/** The message: the subject, then the trailers the policy lists, in its order, each a line: the reference to an issue (the policy's prefix and the number), the line that credits the agent, and `Claude-Session`. A trailer whose value is not given is left out. */
-export function messageOf(policy: Pick<CommitPolicy, "issue" | "trailers">, input: { readonly subject: string; readonly refs: string | undefined; readonly coAuthor: string | undefined; readonly session: string | undefined }): Message {
+/** The message: the subject, then the trailers the policy lists, in its order, each a line: the reference to an issue (the policy's prefix and the number), `Impact:` and the impact, the line that credits the agent, and `Claude-Session`. A trailer whose value is not given is left out. */
+export function messageOf(policy: Pick<CommitPolicy, "issue" | "trailers">, input: { readonly subject: string; readonly refs: string | undefined; readonly impact?: string | undefined; readonly coAuthor: string | undefined; readonly session: string | undefined }): Message {
   const lines = policy.trailers.flatMap((t): readonly string[] => {
     switch (t) {
       case "issue":
         return input.refs === undefined ? [] : [`${policy.issue.prefix}${input.refs}`];
+      case "impact":
+        return input.impact === undefined ? [] : [`Impact: ${input.impact}`];
       case "co-author":
         return input.coAuthor === undefined ? [] : [input.coAuthor];
       case "session":
@@ -113,7 +117,7 @@ export async function runCommit(w: Pick<World, "process" | "repo" | "files">, in
     if (looks !== undefined) found.push(finding("fail", "E-COMMIT-FORBIDDEN", `${path} holds what looks like ${looks}`, `git restore --staged ${path}`));
   }
   if (found.length > 0) return refuse(found);
-  const message = messageOf(policy, { subject: input.subject, refs: input.refs, coAuthor: input.coAuthor, session: input.session });
+  const message = messageOf(policy, { subject: input.subject, refs: input.refs, impact: input.impact, coAuthor: input.coAuthor, session: input.session });
   const text = messageText(message);
   if (input.dryRun) return { kind: "preview", message: text, files };
   const made = await w.process.run(["git", ...identityArgs(policy.identity), "commit", "-m", message.subject, ...(message.trailers.length === 0 ? [] : ["-m", message.trailers.join("\n")])], here);

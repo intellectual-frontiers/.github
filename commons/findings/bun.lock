@@ -5,11 +5,13 @@
     "": {
       "name": "@intellectual-frontiers/findings",
       "devDependencies": {
+        "@intellectual-frontiers/anyfs": "link:../anyfs",
         "@intellectual-frontiers/core": "link:../core",
         "@intellectual-frontiers/formats": "link:../formats",
         "@intellectual-frontiers/kanon": "link:../kanon",
         "@intellectual-frontiers/libraries": "link:../libraries",
         "@intellectual-frontiers/mizan": "link:../mizan",
+        "@intellectual-frontiers/planning": "link:../planning",
         "@intellectual-frontiers/system": "link:../system",
         "@intellectual-frontiers/test": "link:../test",
         "@types/node": "26.6.6",
@@ -19,6 +21,8 @@
     },
   },
   "packages": {
+    "@intellectual-frontiers/anyfs": ["@intellectual-frontiers/anyfs@link:../anyfs", {}],
+
     "@intellectual-frontiers/core": ["@intellectual-frontiers/core@link:../core", {}],
 
     "@intellectual-frontiers/formats": ["@intellectual-frontiers/formats@link:../formats", {}],
@@ -28,6 +32,8 @@
     "@intellectual-frontiers/libraries": ["@intellectual-frontiers/libraries@link:../libraries", {}],
 
     "@intellectual-frontiers/mizan": ["@intellectual-frontiers/mizan@link:../mizan", {}],
+
+    "@intellectual-frontiers/planning": ["@intellectual-frontiers/planning@link:../planning", {}],
 
     "@intellectual-frontiers/system": ["@intellectual-frontiers/system@link:../system", {}],
 

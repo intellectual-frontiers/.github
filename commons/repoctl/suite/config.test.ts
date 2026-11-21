@@ -19,7 +19,7 @@ proves(["0009-repoctl-config FR-001"], "a minimal configuration is read with its
   const ok = parseConfig(base);
   assert(ok.kind === "ok");
   assertEquals([ok.value.generators.length, ok.value.checks.length, ok.value.capabilities.release, ok.value.docs, ok.value.hygiene], [0, 0, false, undefined, undefined]);
-  assertEquals(ok.value.commit.trailers, ["co-author", "session"]);
+  assertEquals(ok.value.commit.trailers, ["impact", "co-author", "session"]);
   const bad = reasons({
     ...base,
     generators: [

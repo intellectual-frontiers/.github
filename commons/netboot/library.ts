@@ -12,7 +12,7 @@ export const library = {
   verify: "bun run verify",
   version: "0.1.0",
   distribution: ["github"],
-  held: "built and verified but not released: the owner publishes the fleet libraries together, when the first fleet runs on them",
+  held: { kind: "owner-blocked", reason: "built and verified but not released: the owner publishes the fleet libraries together, when the first fleet runs on them" },
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "The network boot of a blank machine: the TFTP and HTTP servers that PXE firmware and Ubuntu's installer speak, the GRUB menus, the pinned boot files, the arming of a host for one install, the blank-disk guard's decision, and the install's progress.",
   kanon: {

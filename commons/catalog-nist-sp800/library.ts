@@ -12,7 +12,7 @@ export const library = {
   verify: "bun run verify",
   version: "0.1.0",
   distribution: ["github"],
-  held: "built and verified but not released: the owner publishes the libraries of the fleet work together, when the first fleet runs on them",
+  held: { kind: "owner-blocked", reason: "built and verified but not released: the owner publishes the libraries of the fleet work together, when the first fleet runs on them" },
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "NIST SP 800-53 Rev 5.2.0 and SP 800-171 Rev 3 as grc catalog packages, with the controls, the assessment objectives of SP 800-53A and SP 800-171A as controls of their own, and where they came from, their licence and the digest of each source.",
   kanon: {

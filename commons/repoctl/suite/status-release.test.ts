@@ -189,7 +189,7 @@ proves(["0004-repoctl-status-release FR-005"], "apply raises the version into th
     await put(dir, `commons/${name}/src/mod.ts`, "export const x = 2;\n");
     await git(dir, "commit", "-q", "-am", "Change\n\nImpact: minor");
     const made: string[] = [];
-    const releasing = { generate: () => Promise.resolve(ok(undefined)), prove: () => Promise.resolve(ok(undefined)) };
+    const releasing = { lock: () => Promise.resolve(ok(undefined)), sync: () => Promise.resolve(ok(undefined)), generate: () => Promise.resolve(ok(undefined)), prove: () => Promise.resolve(ok(undefined)) };
     const generators = [{ ...genOf("readme", ["commons/*/library.ts"], ["README.md"]), run: { kind: "program" as const, argv: ["bun", "make-readme.mjs"] }, check: { kind: "program" as const, argv: ["bun", "make-readme.mjs", "--check"] } }];
     await put(dir, "make-readme.mjs", `import { writeFileSync, readFileSync } from "node:fs";\nconst v = readFileSync("commons/libraries/src/version.ts", "utf8").match(/"([^"]+)"/)?.[1];\nconst text = "libraries " + v + "\\n";\nif (process.argv.includes("--check")) process.exit(readFileSync("README.md", "utf8") === text ? 0 : 1);\nwriteFileSync("README.md", text);\n`);
     await put(dir, "README.md", "libraries 0.1.0\n");

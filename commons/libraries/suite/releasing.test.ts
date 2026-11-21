@@ -53,6 +53,7 @@ const facts = (name: string, over: Partial<Facts> = {}): Facts => ({
   publish: true,
   registry: "absent",
   sinceVersion: { changed: false, impact: "patch" },
+  exportsChange: undefined,
   ...over,
 });
 const steps = (fs: readonly Facts[]): readonly string[] => {
@@ -74,7 +75,9 @@ proves(
       ]),
       ["a 0.1.0>0.2.0", "b 0.1.0>0.1.1", "c 0.1.0>0.1.1"],
     );
-    assertEquals(steps([facts("a", { changed: true, impact: "major" })]), ["a 0.1.0>1.0.0"]);
+    // while the major version is 0 a breaking change raises the minor, from 1.0.0 it raises the major
+    assertEquals(steps([facts("a", { changed: true, impact: "major" })]), ["a 0.1.0>0.2.0"]);
+    assertEquals(steps([facts("a", { version: "1.2.3", last: { version: "1.2.3", tag: "a-v1.2.3" }, changed: true, impact: "major" })]), ["a 1.2.3>2.0.0"]);
     // not tagged yet: as it is, and no importer is raised for it
     assertEquals(steps([facts("a", { last: undefined, version: "0.3.1" }), facts("b", { imports: [slug("a")] })]), ["a 0.3.1>0.3.1"]);
     // ahead of its last tag: as it is, whether or not its files changed since
@@ -107,7 +110,7 @@ proves(
     assertStringIncludes(lines[1] ?? "", "it imports a");
     assertStringIncludes(lines[2] ?? "", "d 0.1.0  released as it is");
     assertEquals(lines[3], "left alone (1): c");
-    assertStringIncludes(planLines(PLAIN, { steps: [], unchanged: [] })[0] ?? "", "nothing to release");
+    assertStringIncludes(planLines(PLAIN, { steps: [], unchanged: [], held: [] })[0] ?? "", "nothing to release");
     return Promise.resolve();
   },
 );
@@ -207,6 +210,14 @@ proves(
       // apply, with the generators and the proof of the test's own
       const ran: string[] = [];
       const host: Host = {
+        lock: (_repo, folder) => {
+          ran.push(`lock ${folder}`);
+          return Promise.resolve(ok(undefined));
+        },
+        sync: () => {
+          ran.push("sync");
+          return Promise.resolve(ok(undefined));
+        },
         generate: (_repo, command) => {
           ran.push(command.join(" "));
           return Promise.resolve(ok(undefined));
@@ -218,7 +229,7 @@ proves(
       };
       const done = await applyRelease(dir, host, { tests: true, registry: offlineRegistry });
       assert(done.kind === "ok", done.kind === "err" ? done.error : "");
-      assertEquals(ran, [...GENERATORS.map((c) => c.join(" ")), "prove"], "the generated files are made once and the proof is run once");
+      assertEquals(ran, ["lock commons/a", "lock commons/b", "lock commons/c", "lock commons/d", ...GENERATORS.map((c) => c.join(" ")), "sync", "prove"], "the lockfiles of the libraries it releases are refreshed first, the generated files are made once and synchronized, and the proof is run last, once");
       assertStringIncludes(readTextFileSync(join(dir, "commons/a/release.ts")), "0.2.0");
       assertStringIncludes(readTextFileSync(join(dir, "commons/a/library.ts")), '"version":"0.2.0"');
       assertStringIncludes(readTextFileSync(join(dir, "commons/a/package.json")), '"version": "0.2.0"');
@@ -246,7 +257,7 @@ proves(
       await g("commit", "-q", "-m", "Release");
       await g("tag", "a-v0.2.0");
       const out = join(dir, "output");
-      writeTextFileSync(join(dir, RECORD_PATH), recordText({ steps: plan.value.steps, unchanged: plan.value.unchanged }));
+      writeTextFileSync(join(dir, RECORD_PATH), recordText({ steps: plan.value.steps, unchanged: plan.value.unchanged, held: [] }));
       assertEquals(await main(["matrix", "--repo", dir, "--github-output", out]), 0);
       const text = readTextFileSync(out);
       assertStringIncludes(text, "has-build=true");
@@ -372,7 +383,7 @@ proves(
   "--raise raises a library whatever its state says, by an impact or by its commits', refuses a name that is no library and an impact that is none, and its importers follow",
   () => {
     assertEquals(decisions([facts("a"), facts("b", { imports: [slug("a")] })], new Map([["a", undefined]])), ["a 0.1.0>0.1.1 raised manual", "b 0.1.0>0.1.1 dependent"]);
-    assertEquals(decisions([facts("a")], new Map([["a", "major" as const]])), ["a 0.1.0>1.0.0 raised manual"]);
+    assertEquals(decisions([facts("a")], new Map([["a", "major" as const]])), ["a 0.1.0>0.2.0 raised manual"]);
     assertEquals(decisions([ahead("a", { registry: "same" })], new Map([["a", "minor" as const]])), ["a 0.4.0>0.5.0 raised manual"]);
     assertEquals(decisions([facts("a", { sinceVersion: { changed: true, impact: "minor" } })], new Map([["a", undefined]])), ["a 0.1.0>0.2.0 raised manual"]);
     assertStringIncludes(decisions([facts("a")], new Map([["nope", undefined]]))[0] ?? "", "no library");
@@ -429,7 +440,7 @@ proves(
         `export const library = ${JSON.stringify({ name: "k", level: "L0", verify: "bun run verify", version: "0.1.0", exports: ["."], versionConstants: constants })};\n`;
       put("commons/k/package.json", `${JSON.stringify({ name: "@x/k", version: "0.1.0" }, null, 2)}\n`);
       put("commons/k/src/v.ts", `export const K_VERSION = "0.1.0";\nexport const OTHER_VERSION = "9.9.9";\n`);
-      const step = { slug: slug("k"), folder: "commons/k", package: "@intellectual-frontiers/k", from: "0.1.0", to: "0.2.0", tag: "k-v0.2.0", publish: true, decision: { kind: "raised", to: "0.2.0", impact: "minor", why: "changed" } } as const;
+      const step = { slug: slug("k"), folder: "commons/k", package: "@intellectual-frontiers/k", from: "0.1.0", to: "0.2.0", tag: "k-v0.2.0", publish: true, decision: { kind: "raised", to: "0.2.0", impact: "minor", why: "changed", floor: undefined } } as const;
       put("commons/k/library.ts", manifest([{ file: "src/v.ts", name: "K_VERSION" }]));
       const done = writeVersion(dir, step);
       assertEquals(done.kind === "ok" ? done.value : [], ["commons/k/library.ts", "commons/k/package.json", "commons/k/src/v.ts"]);

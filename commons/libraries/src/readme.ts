@@ -29,7 +29,7 @@ import process from "node:process";
 import { absurd, type Brand, err, ok, refine, type Result, string } from "@intellectual-frontiers/core";
 import { stdio } from "@intellectual-frontiers/system";
 import { existsSync, readTextFileSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
-import { type Library, type Registry, readLibraries } from "./libraries.ts";
+import { type Hold, type Library, type Registry, readLibraries } from "./libraries.ts";
 
 /** The marker that opens the generated table. */
 export const BEGIN = "<!-- libraries-map:begin -->";
@@ -157,8 +157,8 @@ export type Row = {
   readonly level: string;
   readonly distribution: readonly Registry[];
   readonly published: boolean;
-  /** Why the library is held out of the release, where it is. */
-  readonly held: string | undefined;
+  /** The typed reason the library is not released, where it has one (0001-libraries FR-024). */
+  readonly held: Hold | undefined;
 };
 
 /**
@@ -258,7 +258,7 @@ export function tableOf(rows: readonly Row[]): string {
   const body = sorted.map((r) => {
     const pkg = `@intellectual-frontiers/${r.name}`;
     const href = r.published ? `https://www.npmjs.com/package/${pkg}` : `commons/${r.name}`;
-    return `| [\`${pkg}\`](${href}) | ${ROLE_TITLE[r.role]} | ${r.purpose} | ${r.shape} | ${r.level} | ${r.held === undefined ? r.distribution.map((d) => REGISTRY_TITLE[d]).join(", ") : "held"} |`;
+    return `| [\`${pkg}\`](${href}) | ${ROLE_TITLE[r.role]} | ${r.purpose} | ${r.shape} | ${r.level} | ${r.held === undefined ? r.distribution.map((d) => REGISTRY_TITLE[d]).join(", ") : `not released (${r.held.kind})`} |`;
   });
   return [...head, ...body].join("\n");
 }
