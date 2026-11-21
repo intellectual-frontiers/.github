@@ -1,7 +1,7 @@
 // Spec: 0001-anyfs-layers FR-001
 /**
  * The typed facts of AnyFS, an independent library of commons (commons 0027-commons-libraries): one interface to the places bytes live. Its specification is in its own spec kit (`spec-kit/`, `0001-anyfs-layers`
- * to `0005-anyfs-conformance`); this repository knows it as one requirement of 0027-commons-libraries, proved by `bun run verify` in this folder.
+ * to `0006-anyfs-documents`); this repository knows it as one requirement of 0027-commons-libraries, proved by `bun run verify` in this folder.
  *
  * @module
  */
@@ -16,6 +16,8 @@ export const about: About = {
     { path: "spec-kit/", what: "The library's own specifications, numbered from 0001.", mayImport: ["nothing: Markdown and TSV"] },
     { path: "src/governance/", what: "Layer 1: paths, prefixes, revisions, expectations, capabilities, places and the problems a store reports.", mayImport: ["core, by package name"] },
     { path: "src/logical/", what: "Layer 2: the operations as data, the store type, the laws, attenuation, mounts, the layers and the conformance suite. Pure: no input or output.", mayImport: ["governance, by package name", "core, by package name"] },
+    { path: "src/docs/", what: "Typed documents over a store: codecs with canonical bytes, schemas with versions and migrations as code, layouts as code, and collections whose documents come with their revisions. Pure: it is a function of the operations of a store.", mayImport: ["governance and logical, by package name", "core, by package name"] },
+    { path: "src/docs/formats/", what: "The codecs of documents that need the file formats of commons: JSON5 and YAML trees.", mayImport: ["docs, by package name", "core and the JSON5 and YAML formats of formats"] },
     { path: "src/physical/memory/", what: "Layer 3: the store in memory.", mayImport: ["governance and logical, by package name", "core and the SHA-256 of crypto"] },
     { path: "src/physical/local/", what: "Layer 3: the store in a folder of the local file system.", mayImport: ["governance and logical, by package name", "core, the SHA-256 of crypto, and files, paths, locks and errors of system"] },
     { path: "src/physical/", what: "Layer 3: the entry of the stores, and the tracer of the traced layer, made from the telemetry of commons.", mayImport: ["governance, logical, memory and local, by package name", "core and telemetry"] },

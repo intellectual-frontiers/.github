@@ -15,7 +15,9 @@
     "./layers": "./src/logical/layers/mod.ts",
     "./conformance": "./src/logical/conformance/mod.ts",
     "./memory": "./src/physical/memory/mod.ts",
-    "./local": "./src/physical/local/mod.ts"
+    "./local": "./src/physical/local/mod.ts",
+    "./docs": "./src/docs/mod.ts",
+    "./docs/formats": "./src/docs/formats/mod.ts"
   },
   "scripts": {
     "check": "tsc -p tsconfig.json",
@@ -27,6 +29,7 @@
   "devDependencies": {
     "@intellectual-frontiers/core": "link:../core",
     "@intellectual-frontiers/crypto": "link:../crypto",
+    "@intellectual-frontiers/formats": "link:../formats",
     "@intellectual-frontiers/kanon": "link:../kanon",
     "@intellectual-frontiers/libraries": "link:../libraries",
     "@intellectual-frontiers/mizan": "link:../mizan",

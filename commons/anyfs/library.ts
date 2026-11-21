@@ -14,7 +14,7 @@ export const library = {
   version: "0.1.0",
   distribution: ["github"],
   held: "new: built and verified but not released until the first consumer, the fleet store, runs on it",
-  exports: [".", "./governance", "./logical", "./physical", "./layers", "./conformance", "./memory", "./local"],
+  exports: [".", "./governance", "./logical", "./physical", "./layers", "./conformance", "./memory", "./local", "./docs", "./docs/formats"],
   family: { host: "anyfs", role: "host" },
   summary:
     "One typed interface to every place bytes live: paths and places as types, a revision on every read and a stated expectation on every write, the capabilities of a store in its type so that code needing one cannot be given a store without it, attenuation, mounts, composable layers and one conformance suite that every backend passes.",
@@ -28,6 +28,21 @@ export const library = {
       {
         folder: "src/logical/",
         layer: "logical",
+        packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }],
+      },
+      {
+        folder: "src/docs/formats/",
+        layer: "logical",
+        mayImport: ["src/docs/"],
+        packages: [
+          { name: "@intellectual-frontiers/core", subpaths: [] },
+          { name: "@intellectual-frontiers/formats", subpaths: ["json5", "yaml"] },
+        ],
+      },
+      {
+        folder: "src/docs/",
+        layer: "logical",
+        mayImport: ["src/governance/", "src/logical/"],
         packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }],
       },
       {

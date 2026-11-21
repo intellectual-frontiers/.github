@@ -22,6 +22,8 @@ const EXPORTS: Record<string, string> = {
   "./conformance": "./src/logical/conformance/mod.ts",
   "./memory": "./src/physical/memory/mod.ts",
   "./local": "./src/physical/local/mod.ts",
+  "./docs": "./src/docs/mod.ts",
+  "./docs/formats": "./src/docs/formats/mod.ts",
 };
 const PKG = "@intellectual-frontiers/anyfs";
 const at = (path: string, text: string) => ({ path, text });
