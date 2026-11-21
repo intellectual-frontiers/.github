@@ -9,4 +9,4 @@ import { declareDialect } from "../../dialect.ts";
 import { dialect as mysql } from "../mysql/mod.ts";
 
 /** StarRocks. */
-export const dialect = declareDialect({ name: "starrocks", extends: mysql, lexical: (b) => b });
+export const dialect = declareDialect({ name: "starrocks", extends: mysql, lexical: (b) => b, grammar: (g) => ({ ...g, lambdas: true }) });

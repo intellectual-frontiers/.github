@@ -113,12 +113,12 @@ script
       alias: alias
         name: ident name="g" quoted=false
         columns[0]: ident name="n" quoted=false
-  statements[3]: set-op op="except" quantifier="all"
-    left: set-op op="union"
+  statements[3]: set-op op="except" byName=false quantifier="all"
+    left: set-op op="union" byName=false
       left: select distinct=false groupAll=false
         items[0]: select-item
           expr: number text="1"
-      right: set-op op="intersect"
+      right: set-op op="intersect" byName=false
         left: select distinct=false groupAll=false
           items[0]: select-item
             expr: number text="2"
@@ -128,7 +128,7 @@ script
     right: select distinct=false groupAll=false
       items[0]: select-item
         expr: number text="4"
-  statements[4]: set-op op="union" quantifier="all"
+  statements[4]: set-op op="union" byName=false quantifier="all"
     left: select distinct=false groupAll=false
       items[0]: select-item
         expr: number text="1"
@@ -138,7 +138,7 @@ script
     orderBy[0]: order-item
       expr: number text="1"
     limit: number text="5"
-  statements[5]: set-op op="union"
+  statements[5]: set-op op="union" byName=false
     left: select distinct=false groupAll=false
       items[0]: select-item
         expr: number text="1"
@@ -152,7 +152,7 @@ script
     ctes[0]: cte
       name: ident name="t" quoted=false
       columns[0]: ident name="n" quoted=false
-      query: set-op op="union" quantifier="all"
+      query: set-op op="union" byName=false quantifier="all"
         left: select distinct=false groupAll=false
           items[0]: select-item
             expr: number text="1"

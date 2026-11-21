@@ -1,12 +1,12 @@
 script
-  statements[0]: insert
+  statements[0]: insert byName=false
     table: name
       parts[0]: ident name="t" quoted=false
     source: values
       rows[0]: tuple
         items[0]: number text="1"
         items[1]: string value="a" prefix=""
-  statements[1]: insert
+  statements[1]: insert byName=false
     table: name
       parts[0]: ident name="s" quoted=false
       parts[1]: ident name="t" quoted=false
@@ -28,7 +28,7 @@ script
       expr: name
         parts[0]: ident name="b" quoted=false
       alias: ident name="bb" quoted=false
-  statements[2]: insert
+  statements[2]: insert byName=false
     table: name
       parts[0]: ident name="t" quoted=false
     columns[0]: name
@@ -40,7 +40,7 @@ script
       from[0]: table
         name: name
           parts[0]: ident name="u" quoted=false
-  statements[3]: insert
+  statements[3]: insert byName=false
     table: name
       parts[0]: ident name="t" quoted=false
   statements[4]: update

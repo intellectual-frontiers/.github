@@ -21,4 +21,5 @@ export const dialect = declareDialect({
     prefixes: [{ prefix: "X" }, { prefix: "U&" }],
     operators: [...b.operators, "->", "=>"],
   }),
+  grammar: (g) => ({ ...g, lambdas: true }),
 });

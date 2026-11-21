@@ -27,4 +27,5 @@ export const dialect = declareDialect({
     wordChars: "$",
     numbers: { radix: true, underscores: false },
   }),
+  grammar: (g) => ({ ...g, selectTop: true }),
 });

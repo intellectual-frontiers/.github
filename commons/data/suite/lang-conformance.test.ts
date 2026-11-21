@@ -154,3 +154,10 @@ proves(["0069-sql-dialects FR-009"], "every dialect is read in a corpus of its o
   const script: Script = parse("SELECT 1").script;
   assertEquals(script.statements.length, 1);
 });
+
+proves(["0069-sql-dialects FR-026"], "no StarRocks corpus file holds the template variable `${...}` of its test runner, which is not SQL", () => {
+  const holding = corpusFiles()
+    .filter(([p]) => p.startsWith("starrocks/") && readFileSync(join(CORPUS, p), "utf8").includes("${"))
+    .map(([p]) => p);
+  assertEquals(holding, []);
+});

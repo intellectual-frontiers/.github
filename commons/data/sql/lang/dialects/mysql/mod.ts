@@ -52,6 +52,7 @@ export const dialect = declareDialect({
   }),
   grammar: (g) => ({
     ...g,
+    tableIndexes: true,
     likeWords: ["REGEXP", "RLIKE"],
     wordOperators: [
       { text: "DIV", prec: Prec.Multiplicative },

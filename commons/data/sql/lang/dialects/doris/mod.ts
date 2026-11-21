@@ -9,4 +9,4 @@ import { declareDialect } from "../../dialect.ts";
 import { dialect as mysql } from "../mysql/mod.ts";
 
 /** Apache Doris. */
-export const dialect = declareDialect({ name: "doris", extends: mysql, lexical: (b) => b });
+export const dialect = declareDialect({ name: "doris", extends: mysql, lexical: (b) => b, grammar: (g) => ({ ...g, lambdas: true }) });

@@ -54,10 +54,24 @@ export interface Grammar {
   readonly operatorRuns: boolean;
   /** Whether a select may have no items (`SELECT FROM t`, PostgreSQL). */
   readonly emptySelect: boolean;
+  /** Whether a query may begin with `FROM` (`FROM t SELECT a`, `FROM t`; DuckDB). */
+  readonly fromFirst: boolean;
+  /** Whether `x -> body` and `(x, y) -> body` are lambdas and not operators. */
+  readonly lambdas: boolean;
+  /** Whether `x:a.b` is a path into a value (Snowflake, Databricks). */
+  readonly colonPaths: boolean;
+  /** Whether `INDEX name ...` and `KEY name (...)` are elements of `CREATE TABLE` (MySQL, ClickHouse). */
+  readonly tableIndexes: boolean;
+  /** The words that begin a clause after a query that is kept as text to the end of the query (`SETTINGS`, `FORMAT` of ClickHouse), upper case. */
+  readonly queryTail: readonly string[];
+  /** Whether a call may be followed by a second list of arguments, the first being its parameters (`quantile(0.5)(x)`; ClickHouse). */
+  readonly parametric: boolean;
+  /** Whether `SELECT TOP n [PERCENT] [WITH TIES]` is read (T-SQL). */
+  readonly selectTop: boolean;
 }
 
 /** The grammar of the common ground: nothing is added. */
-export const ANSI_GRAMMAR: Grammar = { operators: [], castOperator: undefined, likeWords: [], wordOperators: [], operatorRuns: false, emptySelect: false };
+export const ANSI_GRAMMAR: Grammar = { operators: [], castOperator: undefined, likeWords: [], wordOperators: [], operatorRuns: false, emptySelect: false, fromFirst: false, lambdas: false, colonPaths: false, tableIndexes: false, queryTail: [], parametric: false, selectTop: false };
 
 /** The words the common grammar reserves: they are identifiers only after a `.` or where quoted. */
 export const RESERVED_WORDS: readonly string[] = (

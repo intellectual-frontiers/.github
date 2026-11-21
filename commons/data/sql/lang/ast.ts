@@ -145,6 +145,8 @@ export interface Between extends Base {
   readonly kind: "between";
   readonly arg: Expr;
   readonly negated: boolean;
+  /** `BETWEEN SYMMETRIC`. */
+  readonly symmetric: boolean;
   readonly low: Expr;
   readonly high: Expr;
 }
@@ -261,6 +263,27 @@ export interface KeywordArg extends Base {
   readonly value: Expr | undefined;
 }
 
+/** One `key: value` of a struct or map literal. */
+export interface StructEntry extends Base {
+  readonly kind: "struct-entry";
+  readonly key: Expr;
+  readonly value: Expr;
+}
+
+/** A struct or map literal: `{'a': 1}`, `map{1: 'x'}`; the prefix is the word before the brace, as written. */
+export interface StructLit extends Base {
+  readonly kind: "struct";
+  readonly prefix: string | undefined;
+  readonly entries: readonly StructEntry[];
+}
+
+/** A lambda: `x -> body`, `(x, y) -> body`, `lambda x: body`. */
+export interface Lambda extends Base {
+  readonly kind: "lambda";
+  readonly params: readonly Ident[];
+  readonly body: Expr;
+}
+
 /** `x COLLATE name`. */
 export interface Collate extends Base {
   readonly kind: "collate";
@@ -272,6 +295,8 @@ export interface Collate extends Base {
 export interface Call extends Base {
   readonly kind: "call";
   readonly name: Name;
+  /** The parameters of a parametric call `f(p)(args)`, which are the first parentheses (ClickHouse). */
+  readonly parameters: readonly Argument[];
   readonly args: readonly Argument[];
   readonly distinct: boolean;
   /** The `ORDER BY` among the arguments: `string_agg(x, ',' ORDER BY y)`. */
@@ -325,6 +350,8 @@ export type Expr =
   | Interval
   | ArrayLit
   | Subscript
+  | StructLit
+  | Lambda
   | FieldAccess
   | TypedString
   | Collate
@@ -394,6 +421,11 @@ export interface SelectItem extends Base {
 export interface Select extends Base {
   readonly kind: "select";
   readonly distinct: boolean;
+  /** `TOP n [PERCENT] [WITH TIES]` after `SELECT` (T-SQL): the count, and the words after it as text. */
+  readonly top: Expr | undefined;
+  readonly topOptions: string | undefined;
+  /** The `INTO` after the items (`SELECT * INTO TABLE t`), as text. */
+  readonly into: string | undefined;
   readonly items: readonly SelectItem[];
   readonly from: readonly Source[];
   readonly where: Expr | undefined;
@@ -411,6 +443,8 @@ export interface Select extends Base {
   readonly offset: Expr | undefined;
   /** The locking clauses (`FOR UPDATE OF t NOWAIT`), as text. */
   readonly locking: string | undefined;
+  /** The clauses after the query that the dialect names in its grammar's `queryTail` (`SETTINGS a = 1 FORMAT JSON`), as text. */
+  readonly settings: string | undefined;
 }
 
 /** `UNION`, `INTERSECT` or `EXCEPT`. */
@@ -420,6 +454,8 @@ export type SetOperator = "union" | "intersect" | "except";
 export interface SetOp extends Base {
   readonly kind: "set-op";
   readonly op: SetOperator;
+  /** `BY NAME`: columns are matched by name (DuckDB). */
+  readonly byName: boolean;
   readonly quantifier: "all" | "distinct" | undefined;
   readonly left: Query;
   readonly right: Query;
@@ -428,6 +464,8 @@ export interface SetOp extends Base {
   readonly offset: Expr | undefined;
   /** The locking clauses (`FOR UPDATE OF t NOWAIT`), as text. */
   readonly locking: string | undefined;
+  /** The clauses after the query that the dialect names in its grammar's `queryTail` (`SETTINGS a = 1 FORMAT JSON`), as text. */
+  readonly settings: string | undefined;
 }
 
 /** `VALUES (...), (...)`. */
@@ -479,7 +517,7 @@ export interface TableRef extends Base {
   readonly kind: "table";
   readonly name: Name;
   readonly alias: Alias | undefined;
-  /** `NOT INDEXED` or `INDEXED BY name` after the table (SQLite), as text. */
+  /** What stands beside the table and is not read: `ONLY` before it, `*` or `NOT INDEXED`, `INDEXED BY i` or `TABLESAMPLE ...` after it, as text. */
   readonly hint: string | undefined;
 }
 
@@ -502,7 +540,7 @@ export interface TableFn extends Base {
 }
 
 /** The types of join. */
-export type JoinType = "inner" | "left" | "right" | "full" | "cross" | "semi" | "anti";
+export type JoinType = "inner" | "left" | "right" | "full" | "cross" | "semi" | "anti" | "cross-apply" | "outer-apply";
 
 /** A join of two sources, with `ON` or `USING`. */
 export interface Join extends Base {
@@ -519,14 +557,27 @@ export interface Join extends Base {
   readonly alias: Alias | undefined;
 }
 
+/** An operator applied to a source that the grammar keeps as text: `PIVOT (...)`, `UNPIVOT (...)`, `MATCH_RECOGNIZE (...)`, `LATERAL VIEW ...`; `text` runs from the operator's word to its end, and the alias is the one after it. */
+export interface TableOp extends Base {
+  readonly kind: "table-op";
+  readonly op: string;
+  readonly source: Source;
+  readonly text: string;
+  readonly alias: Alias | undefined;
+}
+
 /** A source of rows. */
-export type Source = TableRef | SubquerySource | TableFn | Join;
+export type Source = TableRef | SubquerySource | TableFn | Join | TableOp;
 
 // data changes
 
 /** `INSERT INTO table [(columns)] query | DEFAULT VALUES [RETURNING ...]`; a source of `undefined` is `DEFAULT VALUES`. */
 export interface Insert extends Base {
   readonly kind: "insert";
+  /** `PARTITION (...)` after the table (Hive), as text. */
+  readonly partition: string | undefined;
+  /** `INSERT INTO t BY NAME` (DuckDB). */
+  readonly byName: boolean;
   readonly table: Name;
   /** The alias of the table (`INSERT INTO t AS x`). */
   readonly alias: Ident | undefined;
@@ -542,6 +593,8 @@ export interface Insert extends Base {
 /** `ON CONFLICT [(target) | ON CONSTRAINT name] [WHERE ...] DO NOTHING | DO UPDATE SET ... [WHERE ...]`. */
 export interface OnConflict extends Base {
   readonly kind: "on-conflict";
+  /** Written `ON DUPLICATE KEY UPDATE` (MySQL) and not `ON CONFLICT`. */
+  readonly duplicateKey: boolean;
   readonly targets: readonly Expr[];
   readonly constraint: Ident | undefined;
   readonly targetWhere: Expr | undefined;
@@ -586,8 +639,19 @@ export interface DataType extends Base {
   readonly kind: "data-type";
   readonly name: string;
   readonly args: readonly Expr[];
+  /** The fields or parameters of a type that names them: `STRUCT(a INT, b TEXT)`, `ARRAY<INT>`, `MAP<K, V>`. */
+  readonly fields: readonly TypeField[];
+  /** The name of its `CHARACTER SET`, as written. */
+  readonly charset: string | undefined;
   /** The name of its `COLLATE`, as written. */
   readonly collation: string | undefined;
+}
+
+/** A field of a type that has fields: its name (missing in `ARRAY<INT>`) and its type. */
+export interface TypeField extends Base {
+  readonly kind: "type-field";
+  readonly name: Ident | undefined;
+  readonly type: DataType;
 }
 
 /** `[CONSTRAINT name] NOT NULL`. */
@@ -608,6 +672,8 @@ export interface PrimaryKey extends Base {
   readonly kind: "primary-key";
   readonly name: Ident | undefined;
   readonly columns: readonly Ident[];
+  /** `DEFERRABLE`, `INITIALLY DEFERRED`, `NOT ENFORCED` and the like after it, as text. */
+  readonly options: string | undefined;
 }
 
 /** `[CONSTRAINT name] UNIQUE [(columns)]`; the columns are empty on a column. */
@@ -615,6 +681,8 @@ export interface Unique extends Base {
   readonly kind: "unique";
   readonly name: Ident | undefined;
   readonly columns: readonly Ident[];
+  /** `DEFERRABLE`, `INITIALLY DEFERRED`, `NOT ENFORCED` and the like after it, as text. */
+  readonly options: string | undefined;
 }
 
 /** `[CONSTRAINT name] CHECK (expr)`. */
@@ -646,6 +714,8 @@ export interface ForeignKey extends Base {
   readonly name: Ident | undefined;
   readonly columns: readonly Ident[];
   readonly reference: Reference;
+  /** `DEFERRABLE`, `INITIALLY DEFERRED`, `NOT ENFORCED` and the like after it, as text. */
+  readonly options: string | undefined;
 }
 
 /** A constraint of a column. */
@@ -751,6 +821,7 @@ export interface DropConstraint extends Base {
   readonly kind: "drop-constraint";
   readonly ifExists: boolean;
   readonly name: Ident;
+  readonly behavior: "cascade" | "restrict" | undefined;
 }
 
 /** `RENAME TO name`. */
@@ -872,6 +943,8 @@ export type Node =
   | WindowDef
   | StarModifier
   | OnConflict
+  | StructEntry
+  | TypeField
   | TableLike
   | OrderItem
   | When

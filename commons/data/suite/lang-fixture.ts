@@ -141,6 +141,8 @@ export function show(e: Expr): string {
     case "array":
     case "subscript":
     case "field":
+    case "struct":
+    case "lambda":
     case "typed-string":
     case "collate":
       return `{${e.kind}}`;

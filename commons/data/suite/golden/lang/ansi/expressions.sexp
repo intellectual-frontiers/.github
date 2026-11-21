@@ -151,14 +151,14 @@ script
           parts[0]: ident name="b" quoted=false
   statements[6]: select distinct=false groupAll=false
     items[0]: select-item
-      expr: between negated=false
+      expr: between negated=false symmetric=false
         arg: name
           parts[0]: ident name="a" quoted=false
         low: number text="1"
         high: number text="2"
     items[1]: select-item
       expr: binary op="AND"
-        left: between negated=true
+        left: between negated=true symmetric=false
           arg: name
             parts[0]: ident name="a" quoted=false
           low: number text="1"

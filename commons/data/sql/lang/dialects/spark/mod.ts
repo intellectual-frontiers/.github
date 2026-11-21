@@ -12,5 +12,6 @@ import { dialect as spark2 } from "../spark2/mod.ts";
 export const dialect = declareDialect({
   name: "spark",
   extends: spark2,
-  lexical: (b) => ({ ...b, prefixes: [...b.prefixes, { prefix: "R", escape: "none" }] }),
+  lexical: (b) => ({ ...b, prefixes: [...b.prefixes, { prefix: "R", escape: "none" }], operators: [...b.operators, "::"] }),
+  grammar: (g) => ({ ...g, castOperator: "::" }),
 });

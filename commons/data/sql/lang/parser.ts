@@ -62,6 +62,8 @@ import type {
   StarModifier,
   Statement,
   StringLit,
+  StructEntry,
+  TypeField,
   TableConstraint,
   TableLike,
   TableRef,
@@ -345,7 +347,7 @@ const CORE_INFIX: readonly (readonly [string, number, BinaryOp])[] = [
 const TYPED_STRING_WORDS: ReadonlySet<string> = new Set(
   (
     "DATE TIME TIMETZ TIMESTAMP TIMESTAMPTZ INT INT2 INT4 INT8 INTEGER SMALLINT BIGINT FLOAT FLOAT4 FLOAT8 REAL NUMERIC DECIMAL BOOL BOOLEAN TEXT VARCHAR CHAR BYTEA JSON JSONB UUID BIT NAME OID " +
-    "REGCLASS REGTYPE POINT BOX LSEG PATH POLYGON CIRCLE CIDR INET MACADDR MONEY XML TSVECTOR TSQUERY"
+    "TIMESTAMP_LTZ TIMESTAMP_NTZ DATETIME REGCLASS REGTYPE POINT BOX LSEG PATH POLYGON CIRCLE CIDR INET MACADDR MONEY XML TSVECTOR TSQUERY"
   ).split(" "),
 );
 
@@ -353,8 +355,11 @@ const TYPED_STRING_WORDS: ReadonlySet<string> = new Set(
 const OP_RUN_CHARS: ReadonlySet<number> = new Set([...("+-*/<>=~!@#%^&|?")].map((c) => c.charCodeAt(0)));
 const SPECIAL_OP_CHARS: ReadonlySet<number> = new Set([...("~!@#%^&|?")].map((c) => c.charCodeAt(0)));
 
+/** The units of an interval beyond the standard's. */
+const INTERVAL_UNITS: ReadonlySet<string> = new Set("WEEK QUARTER MILLISECOND MICROSECOND NANOSECOND".split(" "));
+
 /** The words that begin a column option the grammar keeps as text. */
-const COLUMN_OPTION_WORDS: ReadonlySet<string> = new Set("GENERATED AUTOINCREMENT AUTO_INCREMENT DEFERRABLE INITIALLY ASC DESC NO NULLS".split(" "));
+const COLUMN_OPTION_WORDS: ReadonlySet<string> = new Set("COMMENT GENERATED AUTOINCREMENT AUTO_INCREMENT DEFERRABLE INITIALLY ASC DESC NO NULLS".split(" "));
 
 /** The words that begin a column constraint, where an option ends. */
 const CONSTRAINT_STARTS: ReadonlySet<string> = new Set("CONSTRAINT NOT NULL DEFAULT PRIMARY UNIQUE CHECK REFERENCES COLLATE".split(" "));
@@ -471,6 +476,14 @@ class Parser {
   private readonly likeWords: ReadonlySet<number>;
   private readonly castOp: number;
   private readonly runs: boolean;
+  private readonly selectTop: boolean;
+  private readonly parametric: boolean;
+  private halfGt = false;
+  private readonly queryTail: ReadonlySet<string>;
+  private readonly fromFirst: boolean;
+  private readonly tableIndexes: boolean;
+  private readonly colonPaths: boolean;
+  private readonly lambdas: boolean;
   private readonly emptySelect: boolean;
   private readonly opMinus: number;
   private readonly opPlus: number;
@@ -525,6 +538,13 @@ class Parser {
     }
     this.likeWords = like;
     this.runs = d.grammar.operatorRuns;
+    this.selectTop = d.grammar.selectTop;
+    this.parametric = d.grammar.parametric;
+    this.queryTail = new Set(d.grammar.queryTail);
+    this.fromFirst = d.grammar.fromFirst;
+    this.tableIndexes = d.grammar.tableIndexes;
+    this.colonPaths = d.grammar.colonPaths;
+    this.lambdas = d.grammar.lambdas;
     this.emptySelect = d.grammar.emptySelect;
     this.castOp = d.grammar.castOperator === undefined ? -1 : (operatorId(d.compiled, d.grammar.castOperator) ?? -1);
     this.opMinus = operatorId(d.compiled, "-") ?? -1;
@@ -665,16 +685,23 @@ class Parser {
 
   // ---- expressions
 
-  expr(min: number = 0): Expr {
+  expr(min: number = 0, noCast = false): Expr {
     this.deeper();
     const s = this.start();
     let left = this.prefix();
     for (;;) {
       const k = this.kind();
       if (k === Tok.Op) {
+        if (this.colonPaths && this.atColon() && (this.kind(1) === Tok.Word || this.kind(1) === Tok.QuotedIdent || this.kind(1) === Tok.LBracket)) {
+          if (Prec.Cast < min) break;
+          this.i++;
+          const right = this.expr(Prec.Cast, true);
+          left = { kind: "operator", start: s, end: this.last(), op: ":", left, right };
+          continue;
+        }
         const oid = this.id();
         if (oid === this.castOp) {
-          if (Prec.Cast < min) break;
+          if (Prec.Cast < min || noCast) break;
           this.i++;
           const type = this.dataType(true);
           left = { kind: "cast", start: s, end: this.last(), arg: left, type, try: false, format: undefined };
@@ -792,10 +819,12 @@ class Parser {
         if (Prec.Like < min) break;
         this.i += at + (similar ? 2 : 1);
         if (nw === K.BETWEEN) {
+          const symmetric = this.wordIs("SYMMETRIC");
+          if (symmetric || this.wordIs("ASYMMETRIC")) this.i++;
           const low = this.expr(Prec.Like + 1);
           this.expect(K.AND, "AND");
           const high = this.expr(Prec.Like + 1);
-          left = { kind: "between", start: s, end: this.last(), arg: left, negated: neg, low, high };
+          left = { kind: "between", start: s, end: this.last(), arg: left, negated: neg, symmetric, low, high };
         } else if (nw === K.IN) {
           if (this.kind() !== Tok.LParen) {
             const table = this.qualifiedName();
@@ -834,8 +863,12 @@ class Parser {
         return { kind: "number", start: s, end: this.last(), text };
       }
       case Tok.String: {
-        const { value, prefix } = stringValue(this.slice(), this.lx, this.id());
+        let { value, prefix } = stringValue(this.slice(), this.lx, this.id());
         this.i++;
+        while (this.kind() === Tok.String && this.text.slice(this.ends[this.i - 1] ?? 0, this.starts[this.i] ?? 0).includes("\n")) {
+          value += stringValue(this.slice(), this.lx, this.id()).value;
+          this.i++;
+        }
         return { kind: "string", start: s, end: this.last(), value, prefix };
       }
       case Tok.Param: {
@@ -886,10 +919,11 @@ class Parser {
       case Tok.Word:
       case Tok.QuotedIdent:
         return this.wordPrefix(s);
+      case Tok.LBrace:
+        return this.structLit(s, undefined);
       case Tok.Eof:
       case Tok.RParen:
       case Tok.RBracket:
-      case Tok.LBrace:
       case Tok.RBrace:
       case Tok.Comma:
       case Tok.Semicolon:
@@ -920,6 +954,11 @@ class Parser {
         return { kind: "unary", start: s, end: this.last(), op: "NOT", arg };
       }
       if (w === K.CASE) return this.caseExpr(s);
+      if (this.kind(1) === Tok.LBrace && this.slice().toUpperCase() === "MAP") {
+        const prefix = this.slice();
+        this.i++;
+        return this.structLit(s, prefix);
+      }
       if (this.kind(1) === Tok.LBracket && this.slice().toUpperCase() === "ARRAY") {
         this.i += 2;
         const items = this.kind() === Tok.RBracket ? [] : this.commaList(() => this.expr(0));
@@ -929,8 +968,17 @@ class Parser {
       if (paren && (w === K.CAST || this.isTryCast(w))) {
         this.i += 2;
         const arg = this.expr(0);
-        this.expect(K.AS, "AS");
-        const type = this.dataType(true);
+        let type: DataType;
+        if (this.kind() === Tok.Comma && this.kind(1) === Tok.String) {
+          this.i++;
+          const ts = this.start();
+          const lit = stringValue(this.slice(), this.lx, this.id());
+          this.i++;
+          type = { kind: "data-type", start: ts, end: this.last(), name: lit.value, args: [], fields: [], charset: undefined, collation: undefined };
+        } else {
+          this.expect(K.AS, "AS");
+          type = this.dataType(true);
+        }
         const format = this.eat(K.FORMAT) ? this.expr(0) : undefined;
         this.expectKind(Tok.RParen, ")");
         return { kind: "cast", start: s, end: this.last(), arg, type, try: w !== K.CAST, format };
@@ -949,7 +997,7 @@ class Parser {
         this.expectKind(Tok.RParen, ")");
         return { kind: "exists", start: s, end: this.last(), query };
       }
-      if (w === K.INTERVAL && (this.kind(1) === Tok.String || this.kind(1) === Tok.Number || this.kind(1) === Tok.Param)) {
+      if (w === K.INTERVAL && (this.kind(1) === Tok.String || this.kind(1) === Tok.Number || this.kind(1) === Tok.Param || this.parenThenUnit())) {
         this.i++;
         const value = this.prefix();
         let unit: string | undefined;
@@ -1010,7 +1058,41 @@ class Parser {
     return name;
   }
 
+  /** Whether `INTERVAL (expr) UNIT` is at the cursor: a parenthesis after the word, and a unit after its closing one. */
+  private parenThenUnit(): boolean {
+    if (this.kind(1) !== Tok.LParen) return false;
+    let depth = 0;
+    let at = 1;
+    do {
+      if (this.kind(at) === Tok.LParen) depth++;
+      else if (this.kind(at) === Tok.RParen) depth--;
+      else if (this.kind(at) === Tok.Eof) return false;
+      at++;
+    } while (depth > 0);
+    if (this.kind(at) !== Tok.Word) return false;
+    const w = this.id(at);
+    return this.slice(at).length > 0 && (w === this.K.YEAR || w === this.K.MONTH || w === this.K.DAY || w === this.K.HOUR || w === this.K.MINUTE || w === this.K.SECOND || INTERVAL_UNITS.has(this.slice(at).toUpperCase()));
+  }
+
   /** Whether the word at the cursor is `TRY_CAST` or `SAFE_CAST`, which are not keywords. */
+  /** A struct or map literal from the brace at the cursor. */
+  private structLit(s: number, prefix: string | undefined): Expr {
+    this.i++;
+    const entries: StructEntry[] = [];
+    if (this.kind() !== Tok.RBrace) {
+      do {
+        const es = this.start();
+        const key = this.expr(0);
+        if (!this.atColon()) this.fail(":");
+        this.i++;
+        const value = this.expr(0);
+        entries.push({ kind: "struct-entry", start: es, end: this.last(), key, value });
+      } while (this.eatKind(Tok.Comma));
+    }
+    this.expectKind(Tok.RBrace, "}");
+    return { kind: "struct", start: s, end: this.last(), prefix, entries };
+  }
+
   private isTryCast(w: number): boolean {
     if (w !== 0) return false;
     const n = (this.ends[this.i] ?? 0) - (this.starts[this.i] ?? 0);
@@ -1021,7 +1103,7 @@ class Parser {
 
   private isIntervalUnit(w: number): boolean {
     const K = this.K;
-    return w === K.YEAR || w === K.MONTH || w === K.DAY || w === K.HOUR || w === K.MINUTE || w === K.SECOND;
+    return w === K.YEAR || w === K.MONTH || w === K.DAY || w === K.HOUR || w === K.MINUTE || w === K.SECOND || (w === 0 && INTERVAL_UNITS.has(this.slice().toUpperCase()));
   }
 
   private caseExpr(s: number): Expr {
@@ -1048,6 +1130,7 @@ class Parser {
     this.i++;
     let distinct = false;
     const args: Argument[] = [];
+    const position = name.parts.length === 1 && name.parts[0]?.name.toUpperCase() === "POSITION" && !name.parts[0].quoted;
     if (this.kind() === Tok.Op && this.id() === this.opStar && this.kind(1) === Tok.RParen) {
       const ss = this.start();
       this.i++;
@@ -1056,13 +1139,24 @@ class Parser {
       if (this.eat(K.DISTINCT)) distinct = true;
       else this.eat(K.ALL);
       for (;;) {
-        args.push(this.argument());
+        args.push(position && args.length === 0 ? this.expr(Prec.Like + 1) : this.argument());
         for (let kw = this.keywordArg(); kw !== undefined; kw = this.keywordArg()) args.push(kw);
         if (!this.eatKind(Tok.Comma)) break;
       }
     }
-    const orderBy = this.orderByClause();
+    let orderBy = this.orderByClause();
     this.expectKind(Tok.RParen, ")");
+    let parameters: Argument[] = [];
+    if (this.parametric && this.kind() === Tok.LParen) {
+      parameters = args.splice(0, args.length);
+      this.i++;
+      if (this.kind() !== Tok.RParen) {
+        if (this.eat(K.DISTINCT)) distinct = true;
+        args.push(...this.commaList(() => this.argument()));
+      }
+      orderBy = this.orderByClause();
+      this.expectKind(Tok.RParen, ")");
+    }
     let nullTreatment: "ignore" | "respect" | undefined;
     if (this.kind() === Tok.Word && this.at(K.NULLS, 1)) {
       const t = this.slice().toUpperCase();
@@ -1089,7 +1183,7 @@ class Parser {
       this.i++;
       over = this.kind() === Tok.LParen ? this.windowSpec() : this.namedWindow();
     }
-    return { kind: "call", start: name.start, end: this.last(), name, args, distinct, orderBy, withinGroup, nullTreatment, filter, over };
+    return { kind: "call", start: name.start, end: this.last(), name, parameters, args, distinct, orderBy, withinGroup, nullTreatment, filter, over };
   }
 
   /** A keyword of a call's arguments that follows an argument (`FROM`, `FOR`, `IN`, `PLACING`, `SIMILAR`), with the expression after it. */
@@ -1097,16 +1191,79 @@ class Parser {
     const K = this.K;
     if (this.kind() !== Tok.Word) return undefined;
     const w = this.id();
-    if (w !== K.FROM && w !== K.FOR && w !== K.IN && w !== K.SIMILAR && w !== K.ESCAPE && !(w === 0 && this.slice().toUpperCase() === "PLACING")) return undefined;
+    if (this.at(K.NULLS, 1) && (this.wordIs("IGNORE") || this.wordIs("RESPECT"))) {
+      const s = this.start();
+      const keyword = `${this.slice().toUpperCase()} NULLS`;
+      this.i += 2;
+      return { kind: "keyword-arg", start: s, end: this.last(), keyword, value: undefined };
+    }
+    if (w !== K.FROM && w !== K.FOR && w !== K.IN && w !== K.SIMILAR && w !== K.ESCAPE && w !== K.USING && w !== K.AS && !(w === 0 && (this.wordIs("PLACING") || this.wordIs("SEPARATOR")))) return undefined;
     const s = this.start();
     const keyword = this.slice().toUpperCase();
     this.i++;
+    if (w === K.AS) {
+      const ns = this.start();
+      const id = this.ident(true);
+      const name: Name = { kind: "name", start: ns, end: this.last(), parts: [id] };
+      return { kind: "keyword-arg", start: s, end: this.last(), keyword, value: name };
+    }
     const value = this.expr(Prec.Like + 1);
     return { kind: "keyword-arg", start: s, end: this.last(), keyword, value };
   }
 
+  /** The number of tokens of the arrow at `at` (`->`, or `-` and `>` that touch), or 0. */
+  private arrowAt(at: number): number {
+    if (this.kind(at) !== Tok.Op) return 0;
+    const from = this.starts[this.i + at] ?? 0;
+    const to = this.ends[this.i + at] ?? 0;
+    if (to - from === 2 && this.text.startsWith("->", from)) return 1;
+    if (to - from === 1 && this.text.charCodeAt(from) === 45 && this.kind(at + 1) === Tok.Op && (this.starts[this.i + at + 1] ?? -1) === to && this.text.charCodeAt(to) === 62 && (this.ends[this.i + at + 1] ?? 0) - to === 1) return 2;
+    return 0;
+  }
+
+  /** A lambda at the cursor: `x -> body`, `(x, y) -> body`, `lambda x, y: body`; or `undefined`. */
+  private lambda(): Expr | undefined {
+    const K = this.K;
+    const s = this.start();
+    const params: Ident[] = [];
+    if ((this.kind() === Tok.Word || this.kind() === Tok.QuotedIdent) && this.arrowAt(1) > 0 && this.canBeIdent()) {
+      params.push(this.ident());
+      this.i += this.arrowAt(0);
+    } else if (this.kind() === Tok.LParen) {
+      let at = 1;
+      for (;;) {
+        if (this.kind(at) !== Tok.Word && this.kind(at) !== Tok.QuotedIdent) return undefined;
+        at++;
+        if (this.kind(at) === Tok.Comma) at++;
+        else break;
+      }
+      if (this.kind(at) !== Tok.RParen || this.arrowAt(at + 1) === 0) return undefined;
+      this.i++;
+      do params.push(this.ident(true));
+      while (this.eatKind(Tok.Comma));
+      this.expectKind(Tok.RParen, ")");
+      this.i += this.arrowAt(0);
+    } else if (this.wordIs("LAMBDA") && (this.kind(1) === Tok.Word || this.kind(1) === Tok.QuotedIdent)) {
+      let at = 1;
+      while ((this.kind(at) === Tok.Word || this.kind(at) === Tok.QuotedIdent) && this.kind(at + 1) === Tok.Comma) at += 2;
+      if (!((this.kind(at) === Tok.Word || this.kind(at) === Tok.QuotedIdent) && this.kind(at + 1) === Tok.Op)) return undefined;
+      this.i++;
+      do params.push(this.ident(true));
+      while (this.eatKind(Tok.Comma));
+      if (!this.atColon()) this.fail(":");
+      this.i++;
+    } else return undefined;
+    void K;
+    const body = this.expr(0);
+    return { kind: "lambda", start: s, end: this.last(), params, body };
+  }
+
   private argument(): Argument {
     const K = this.K;
+    if (this.lambdas) {
+      const l = this.lambda();
+      if (l !== undefined) return l;
+    }
     if (this.kind() === Tok.Word) {
       const w = this.id();
       const head = w === K.BOTH || w === K.LEADING || w === K.TRAILING || (w === 0 && this.slice().toUpperCase() === "VARIADIC");
@@ -1228,7 +1385,12 @@ class Parser {
   private orderItem(indexItem = false): OrderItem {
     const K = this.K;
     const s = this.start();
-    const expr = this.expr(0);
+    let expr: Expr;
+    if (this.at(K.ALL) && !indexItem) {
+      this.i++;
+      const ident: Ident = { kind: "ident", start: s, end: this.last(), name: "ALL", quoted: false };
+      expr = { kind: "name", start: s, end: this.last(), parts: [ident] };
+    } else expr = this.expr(0);
     let opclass: string | undefined;
     if (indexItem && this.canBeIdent() && !this.at(K.ASC) && !this.at(K.DESC) && !this.at(K.NULLS)) {
       const from = this.i;
@@ -1275,6 +1437,7 @@ class Parser {
     const s = this.start();
     const words: string[] = [];
     const args: Expr[] = [];
+    const fields: TypeField[] = [];
     if (this.kind() === Tok.QuotedIdent) words.push(this.ident().name.toUpperCase());
     else if (this.kind() === Tok.Word) {
       words.push(this.slice().toUpperCase());
@@ -1285,13 +1448,17 @@ class Parser {
       if (this.kind() === Tok.LParen && !paren) {
         paren = true;
         this.i++;
-        args.push(...this.commaList(() => this.expr(0)));
+        const named = (this.kind() === Tok.Word || this.kind() === Tok.QuotedIdent) && (this.kind(1) === Tok.Word || this.kind(1) === Tok.QuotedIdent);
+        if (named) fields.push(...this.commaList(() => this.typeField()));
+        else args.push(...this.commaList(() => this.expr(0)));
         this.expectKind(Tok.RParen, ")");
       } else if (
         this.kind() === Tok.Word &&
         (!this.isReserved() || ((this.at(K.WITH) || this.at(K.WITHOUT)) && this.at(K.TIME, 1))) &&
         (!strict || this.isTypeWord()) &&
-        !COLUMN_OPTION_WORDS.has(this.slice().toUpperCase())
+        !COLUMN_OPTION_WORDS.has(this.slice().toUpperCase()) &&
+        !(this.wordIs("CHARACTER") && this.at(K.SET, 1)) &&
+        !this.wordIs("CHARSET")
       ) {
         words.push(this.slice().toUpperCase());
         this.i++;
@@ -1306,17 +1473,54 @@ class Parser {
       words[words.length - 1] = `${words[words.length - 1] ?? ""}%${this.slice(1).toUpperCase()}`;
       this.i += 2;
     }
+    const last = words[words.length - 1] ?? "";
+    if (this.atOp(operatorId(this.lx, "<") ?? -1) && (last === "ARRAY" || last === "MAP" || last === "STRUCT" || last === "ROW" || last === "LIST" || last === "TUPLE" || last === "NESTED")) {
+      this.i++;
+      fields.push(...this.commaList(() => this.typeField()));
+      this.closeAngle();
+    }
     let name = words.join(" ");
     while (this.kind() === Tok.LBracket && (this.kind(1) === Tok.RBracket || (this.kind(1) === Tok.Number && this.kind(2) === Tok.RBracket))) {
       this.i += this.kind(1) === Tok.RBracket ? 2 : 3;
       name += "[]";
+    }
+    let charset: string | undefined;
+    if ((this.wordIs("CHARACTER") && this.at(K.SET, 1)) || this.wordIs("CHARSET")) {
+      this.i += this.wordIs("CHARSET") ? 1 : 2;
+      charset = this.ident(true).name;
     }
     let collation: string | undefined;
     if (this.eat(K.COLLATE)) {
       const c = this.qualifiedName();
       collation = c.parts.map((p) => p.name).join(".");
     }
-    return { kind: "data-type", start: s, end: this.last(), name, args, collation };
+    return { kind: "data-type", start: s, end: this.last(), name, args, fields, charset, collation };
+  }
+
+  /** A field of a type: `name type`, or just a type. */
+  private typeField(): TypeField {
+    const s = this.start();
+    const named = (this.kind() === Tok.Word || this.kind() === Tok.QuotedIdent) && (this.kind(1) === Tok.Word || this.kind(1) === Tok.QuotedIdent);
+    const name = named ? this.ident(true) : undefined;
+    const type = this.dataType();
+    return { kind: "type-field", start: s, end: this.last(), name, type };
+  }
+
+  /** Closes `<` of a type; `>>` closes two, the first of them without moving. */
+  private closeAngle(): void {
+    if (this.atOp(operatorId(this.lx, ">") ?? -1)) {
+      this.i++;
+      return;
+    }
+    const w = this.kind() === Tok.Op ? this.text.slice(this.starts[this.i] ?? 0, this.ends[this.i] ?? 0) : "";
+    if (w === ">>") {
+      if (this.halfGt) {
+        this.halfGt = false;
+        this.i++;
+      } else this.halfGt = true;
+      return;
+    }
+    this.fail(">");
   }
 
   // ---- queries
@@ -1325,7 +1529,7 @@ class Parser {
     const K = this.K;
     let o = at;
     while (this.kind(o) === Tok.LParen) o++;
-    return this.at(K.SELECT, o) || this.at(K.WITH, o) || this.at(K.VALUES, o);
+    return this.at(K.SELECT, o) || this.at(K.WITH, o) || this.at(K.VALUES, o) || (this.fromFirst && this.at(K.FROM, o));
   }
 
   query(): Query {
@@ -1388,6 +1592,16 @@ class Parser {
     return this.textFrom(from);
   }
 
+  private atIndexHint(): boolean {
+    if (this.at(this.K.FOR) && (this.wordIs("SYSTEM_TIME", 1) || this.wordIs("VERSION", 1) || this.wordIs("TIMESTAMP", 1)) && this.at(this.K.AS, 2) && this.wordIs("OF", 3)) return true;
+    return (this.wordIs("USE") || this.wordIs("FORCE") || this.wordIs("IGNORE")) && (this.at(this.K.INDEX, 1) || this.wordIs("KEY", 1));
+  }
+
+  /** Whether a clause that the dialect keeps as the tail of a query is at the cursor. */
+  private atTail(): boolean {
+    return this.queryTail.size > 0 && this.kind() === Tok.Word && this.queryTail.has(this.slice().toUpperCase());
+  }
+
   /** Whether a locking clause (`FOR UPDATE`, `FOR SHARE`, `FOR NO KEY UPDATE`, `FOR KEY SHARE`) is at the cursor. */
   private atLocking(): boolean {
     return this.at(this.K.FOR) && (this.wordIs("UPDATE", 1) || this.wordIs("SHARE", 1) || (this.wordIs("NO", 1) && this.wordIs("KEY", 2)) || (this.wordIs("KEY", 1) && this.wordIs("SHARE", 2)));
@@ -1413,6 +1627,7 @@ class Parser {
     let limit: Expr | undefined;
     let offset: Expr | undefined;
     let locking: string | undefined;
+    let settings: string | undefined;
     for (;;) {
       if (this.eat(K.LIMIT)) {
         limit = this.expr(0);
@@ -1434,19 +1649,28 @@ class Parser {
             : this.expr(Prec.Additive);
         if (!this.eat(K.ROWS)) this.expect(K.ROW, "ROW or ROWS");
         this.expect(K.ONLY, "ONLY");
+      } else if (this.atTail()) {
+        const from = this.i;
+        let depth = 0;
+        while (!this.atEnd() && this.kind() !== Tok.Semicolon && !(depth === 0 && this.kind() === Tok.RParen)) {
+          if (this.kind() === Tok.LParen) depth++;
+          else if (this.kind() === Tok.RParen) depth--;
+          this.i++;
+        }
+        settings = this.textFrom(from);
       } else if (this.atLocking()) {
         const from = this.i;
         while (this.atLocking()) this.lockingClause();
         locking = this.textFrom(from);
       } else break;
     }
-    if (orderBy.length === 0 && limit === undefined && offset === undefined && locking === undefined) return left;
+    if (orderBy.length === 0 && limit === undefined && offset === undefined && locking === undefined && settings === undefined) return left;
     if (left.kind === "select" || left.kind === "set-op") {
       if (left.orderBy.length > 0 || left.limit !== undefined || left.offset !== undefined)
         this.unsupported("a clause after a query in parentheses that has its own");
       return left.kind === "select"
-        ? { ...left, start: s, end: this.last(), orderBy, limit, offset, locking }
-        : { ...left, start: s, end: this.last(), orderBy, limit, offset, locking };
+        ? { ...left, start: s, end: this.last(), orderBy, limit, offset, locking, settings }
+        : { ...left, start: s, end: this.last(), orderBy, limit, offset, locking, settings };
     }
     return this.unsupported("ORDER BY or LIMIT after this query");
   }
@@ -1470,12 +1694,15 @@ class Parser {
       if (level < min) break;
       this.i++;
       const quantifier = this.eat(K.ALL) ? "all" : this.eat(K.DISTINCT) ? "distinct" : undefined;
+      const byName = this.at(K.BY) && this.wordIs("NAME", 1);
+      if (byName) this.i += 2;
       const right = this.setExpr(level + 1);
       const node: SetOp = {
         kind: "set-op",
         start: s,
         end: this.last(),
         op,
+        byName,
         quantifier,
         left,
         right,
@@ -1483,6 +1710,7 @@ class Parser {
         limit: undefined,
         offset: undefined,
         locking: undefined,
+        settings: undefined,
       };
       left = node;
     }
@@ -1491,7 +1719,7 @@ class Parser {
 
   private queryTerm(): Query {
     const K = this.K;
-    if (this.skipSelect || this.at(K.SELECT)) return this.selectCore();
+    if (this.skipSelect || this.at(K.SELECT) || (this.fromFirst && this.at(K.FROM))) return this.selectCore();
     if (this.at(K.VALUES)) return this.values();
     if (this.kind() === Tok.LParen && this.atQuery()) {
       this.i++;
@@ -1618,6 +1846,7 @@ class Parser {
         start: s,
         end: this.last(),
         name,
+        parameters: [],
         args,
         distinct: false,
         orderBy: [],
@@ -1656,25 +1885,48 @@ class Parser {
     } else expr = this.expr(0);
     let alias: Ident | undefined;
     if (this.eat(K.AS)) alias = this.ident(true);
-    else if (this.canBeIdent() && !this.atQualify() && !this.atLocking()) alias = this.ident();
+    else if (this.canBeIdent() && !this.atQualify() && !this.atLocking() && !this.atTail()) alias = this.ident();
     return { kind: "select-item", start: s, end: this.last(), expr, alias };
   }
 
   private selectCore(): Select {
     const K = this.K;
     const s = this.start();
+    const fromFirst = this.fromFirst && this.at(K.FROM);
     if (this.skipSelect) this.skipSelect = false;
-    else this.i++;
-    const distinct = this.eat(K.DISTINCT);
+    else if (!fromFirst) this.i++;
+    const distinct = !fromFirst && this.eat(K.DISTINCT);
     let distinctOn: Expr[] = [];
     if (distinct && this.at(K.ON) && this.kind(1) === Tok.LParen) {
       this.i += 2;
       distinctOn = this.commaList(() => this.expr(0));
       this.expectKind(Tok.RParen, ")");
     }
-    if (!distinct) this.eat(K.ALL);
-    const items = this.emptySelect && (this.at(K.FROM) || this.kind() === Tok.Semicolon || this.kind() === Tok.RParen || this.atEnd() || this.at(K.UNION) || this.at(K.INTERSECT) || this.at(K.EXCEPT)) ? [] : this.commaList(() => this.selectItem());
+    if (!distinct && !fromFirst) this.eat(K.ALL);
+    let top: Expr | undefined;
+    let topOptions: string | undefined;
+    if (this.selectTop && this.wordIs("TOP") && (this.kind(1) === Tok.Number || this.kind(1) === Tok.LParen)) {
+      this.i++;
+      top = this.kind() === Tok.LParen ? this.prefix() : this.expr(Prec.Unary);
+      const f = this.i;
+      if (this.wordIs("PERCENT")) this.i++;
+      if (this.at(K.WITH) && this.wordIs("TIES", 1)) this.i += 2;
+      topOptions = this.textFrom(f);
+    }
+    let items: SelectItem[] = fromFirst ? [] : this.emptySelect && (this.at(K.FROM) || this.kind() === Tok.Semicolon || this.kind() === Tok.RParen || this.atEnd() || this.at(K.UNION) || this.at(K.INTERSECT) || this.at(K.EXCEPT)) ? [] : this.commaList(() => this.selectItem());
+    let into: string | undefined;
+    if (this.at(K.INTO)) {
+      const f = this.i;
+      this.i++;
+      while (this.wordIs("TEMP") || this.wordIs("TEMPORARY") || this.wordIs("UNLOGGED") || this.at(K.TABLE)) this.i++;
+      this.qualifiedName();
+      into = this.textFrom(f);
+    }
     const from = this.eat(K.FROM) ? this.commaList(() => this.joined()) : [];
+    if (fromFirst && this.at(K.SELECT)) {
+      this.i++;
+      items = this.commaList(() => this.selectItem());
+    }
     const where = this.eat(K.WHERE) ? this.expr(0) : undefined;
     let groupBy: Expr[] = [];
     let groupAll = false;
@@ -1709,6 +1961,9 @@ class Parser {
       start: s,
       end: this.last(),
       distinct,
+      top,
+      topOptions,
+      into,
       distinctOn,
       items,
       from,
@@ -1722,6 +1977,7 @@ class Parser {
       limit: undefined,
       offset: undefined,
       locking: undefined,
+        settings: undefined,
     };
   }
 
@@ -1732,7 +1988,7 @@ class Parser {
     const s = this.start();
     let name: Ident;
     if (this.eat(K.AS)) name = this.ident(true);
-    else if (this.canBeIdent() && !this.atQualify() && !this.atLocking() && !(this.wordIs("INDEXED") && this.at(K.BY, 1))) name = this.ident();
+    else if (this.canBeIdent() && !this.atQualify() && !this.atLocking() && !this.atTail() && !this.atIndexHint() && this.tableOpAt() === undefined && !(this.wordIs("INDEXED") && this.at(K.BY, 1))) name = this.ident();
     else return undefined;
     const columns: Ident[] = [];
     const types: (DataType | undefined)[] = [];
@@ -1748,10 +2004,19 @@ class Parser {
   }
 
   private tableRef(): TableRef {
-    const s = this.start();
+    return this.plainTable(this.start());
+  }
+
+  /** A table with its alias and what stands beside it: `ONLY t`, `t*`, `t x TABLESAMPLE ...`, `t NOT INDEXED`. */
+  private plainTable(s: number): TableRef {
+    const only = this.wordIs("ONLY") && (this.kind(1) === Tok.Word || this.kind(1) === Tok.QuotedIdent);
+    if (only) this.i++;
     const name = this.qualifiedName();
+    const star = this.atOp(this.opStar);
+    if (star) this.i++;
     const alias = this.alias();
-    const hint = this.tableHint();
+    const after = this.tableHint();
+    const hint = [only ? "ONLY" : undefined, star ? "*" : undefined, after].filter((x) => x !== undefined).join(" ") || undefined;
     return { kind: "table", start: s, end: this.last(), name, alias, hint };
   }
 
@@ -1759,7 +2024,24 @@ class Parser {
   private tableHint(): string | undefined {
     const K = this.K;
     const from = this.i;
-    if (this.at(K.NOT) && this.wordIs("INDEXED", 1)) this.i += 2;
+    if (this.at(K.WITH) && this.kind(1) === Tok.LParen) {
+      this.i++;
+      this.skipGroup();
+    } else if (this.at(K.FOR) && (this.wordIs("SYSTEM_TIME", 1) || this.wordIs("VERSION", 1) || this.wordIs("TIMESTAMP", 1)) && this.at(K.AS, 2) && this.wordIs("OF", 3)) {
+      this.i += 4;
+      this.expr(Prec.Additive);
+    } else if ((this.wordIs("USE") || this.wordIs("FORCE") || this.wordIs("IGNORE")) && (this.at(K.INDEX, 1) || this.wordIs("KEY", 1))) {
+      this.i += 2;
+      if (this.at(K.FOR)) this.i += 2;
+      if (this.kind() === Tok.LParen) this.skipGroup();
+    } else if (this.wordIs("TABLESAMPLE")) {
+      this.i += 2;
+      if (this.kind() === Tok.LParen) this.skipGroup();
+      if (this.wordIs("REPEATABLE")) {
+        this.i++;
+        if (this.kind() === Tok.LParen) this.skipGroup();
+      }
+    } else if (this.at(K.NOT) && this.wordIs("INDEXED", 1)) this.i += 2;
     else if (this.wordIs("INDEXED") && this.at(K.BY, 1)) {
       this.i += 2;
       this.qualifiedName();
@@ -1768,6 +2050,39 @@ class Parser {
   }
 
   private sourceTerm(): Source {
+    let src = this.sourceBase();
+    for (;;) {
+      const op = this.tableOpAt();
+      if (op === undefined) return src;
+      const s = src.start;
+      const from = this.i;
+      if (op === "LATERAL VIEW") {
+        this.i += 2;
+        if (this.at(this.K.OUTER)) this.i++;
+        this.expr(Prec.Cast);
+        if (this.canBeIdent()) this.ident();
+        if (this.eat(this.K.AS)) this.commaList(() => this.ident(true));
+        src = { kind: "table-op", start: s, end: this.last(), op, source: src, text: this.textFrom(from) ?? "", alias: undefined };
+        continue;
+      }
+      this.i++;
+      this.skipGroup();
+      const text = this.textFrom(from) ?? "";
+      const alias = this.alias();
+      src = { kind: "table-op", start: s, end: this.last(), op, source: src, text, alias };
+    }
+  }
+
+  /** The table operator at the cursor, if one: `PIVOT (`, `UNPIVOT (`, `MATCH_RECOGNIZE (`, `LATERAL VIEW`. */
+  private tableOpAt(): string | undefined {
+    if (this.kind() !== Tok.Word) return undefined;
+    if (this.at(this.K.LATERAL) && this.wordIs("VIEW", 1)) return "LATERAL VIEW";
+    if (this.kind(1) !== Tok.LParen) return undefined;
+    const w = this.slice().toUpperCase();
+    return w === "PIVOT" || w === "UNPIVOT" || w === "MATCH_RECOGNIZE" ? w : undefined;
+  }
+
+  private sourceBase(): Source {
     const K = this.K;
     const s = this.start();
     const lateral = this.eat(K.LATERAL);
@@ -1799,6 +2114,19 @@ class Parser {
       const alias = this.alias();
       return alias === undefined ? inner : this.withAlias(inner, alias, s);
     }
+    if (this.at(K.TABLE) && this.kind(1) === Tok.LParen) {
+      const ident: Ident = { kind: "ident", start: s, end: this.ends[this.i] ?? s, name: this.slice(), quoted: false };
+      this.i++;
+      const name: Name = { kind: "name", start: ident.start, end: ident.end, parts: [ident] };
+      const call = this.call(name);
+      if (call.kind !== "call") return this.fail("a function call");
+      const alias = this.alias();
+      return { kind: "table-fn", start: s, end: this.last(), call, alias, lateral, ordinality: false };
+    }
+    let at = this.wordIs("ONLY") && this.kind(1) !== Tok.LParen ? 1 : 0;
+    at++;
+    while (this.kind(at) === Tok.Dot) at += 2;
+    if (this.kind(at) !== Tok.LParen) return this.plainTable(s);
     const name = this.qualifiedName();
     if (this.kind() === Tok.LParen) {
       const call = this.call(name);
@@ -1824,6 +2152,8 @@ class Parser {
         return inner.alias === undefined ? { ...inner, start: s, end: this.last(), alias } : this.fail("an alias");
       case "table-fn":
         return inner.alias === undefined ? { ...inner, start: s, end: this.last(), alias } : this.fail("an alias");
+      case "table-op":
+        return inner.alias === undefined ? { ...inner, start: s, end: this.last(), alias } : this.fail("an alias");
       default:
         return absurd(inner);
     }
@@ -1846,13 +2176,19 @@ class Parser {
       else if (this.eat(K.LEFT)) type = "left";
       else if (this.eat(K.RIGHT)) type = "right";
       else if (this.eat(K.FULL)) type = "full";
-      else if (this.eat(K.CROSS)) type = "cross";
+      else if (this.at(K.CROSS) && this.wordIs("APPLY", 1)) {
+        this.i += 2;
+        type = "cross-apply";
+      } else if (this.at(K.OUTER) && this.wordIs("APPLY", 1)) {
+        this.i += 2;
+        type = "outer-apply";
+      } else if (this.eat(K.CROSS)) type = "cross";
       if (type === "left" || type === "right" || type === "full") this.eat(K.OUTER);
       if ((type === "left" || type === "right" || type === undefined) && (this.wordIs("SEMI") || this.wordIs("ANTI")) && this.at(K.JOIN, 1)) {
         type = this.wordIs("SEMI") ? "semi" : "anti";
         this.i++;
       }
-      if (!this.eat(K.JOIN)) {
+      if (type !== "cross-apply" && type !== "outer-apply" && !this.eat(K.JOIN)) {
         if (natural || type !== undefined) this.fail("JOIN");
         return left;
       }
@@ -1885,13 +2221,27 @@ class Parser {
     let conflict: string | undefined;
     if (this.at(K.REPLACE)) conflict = "REPLACE";
     this.i++;
-    if (conflict === undefined && this.eat(K.OR)) {
+    if (conflict === undefined && this.wordIs("OVERWRITE")) {
+      conflict = "OVERWRITE";
+      this.i++;
+      this.eat(K.TABLE);
+    } else if (conflict === undefined && this.eat(K.OR)) {
       if (this.kind() !== Tok.Word) this.fail("IGNORE, REPLACE, ABORT, FAIL or ROLLBACK");
       conflict = this.slice().toUpperCase();
       this.i++;
     }
-    this.expect(K.INTO, "INTO");
+    if (conflict !== "OVERWRITE") {
+      this.expect(K.INTO, "INTO");
+      this.eat(K.TABLE);
+    }
     const table = this.qualifiedName();
+    let partition: string | undefined;
+    if (this.wordIs("PARTITION") && this.kind(1) === Tok.LParen) {
+      const f = this.i;
+      this.i++;
+      this.skipGroup();
+      partition = this.textFrom(f);
+    }
     const alias = this.eat(K.AS) ? this.ident(true) : undefined;
     let columns: Expr[] = [];
     if (this.kind() === Tok.LParen && !this.atQuery(1)) {
@@ -1899,12 +2249,14 @@ class Parser {
       columns = this.commaList(() => this.expr(Prec.Cast));
       this.expectKind(Tok.RParen, ")");
     }
+    const byName = this.at(K.BY) && this.wordIs("NAME", 1);
+    if (byName) this.i += 2;
     let source: Query | undefined;
     if (this.eat(K.DEFAULT)) this.expect(K.VALUES, "VALUES");
     else source = this.query();
-    const onConflict = this.at(K.ON) && this.wordIs("CONFLICT", 1) ? this.onConflict() : undefined;
+    const onConflict = this.at(K.ON) && this.wordIs("CONFLICT", 1) ? this.onConflict() : this.at(K.ON) && this.wordIs("DUPLICATE", 1) ? this.onDuplicate() : undefined;
     const returning = this.returning();
-    return { kind: "insert", start: s, end: this.last(), table, alias, columns, source, conflict, onConflict, returning };
+    return { kind: "insert", start: s, end: this.last(), partition, byName, table, alias, columns, source, conflict, onConflict, returning };
   }
 
   private onConflict(): OnConflict {
@@ -1927,13 +2279,23 @@ class Parser {
     this.i++;
     if (this.wordIs("NOTHING")) {
       this.i++;
-      return { kind: "on-conflict", start: s, end: this.last(), targets, constraint, targetWhere, update: false, assignments: [], where: undefined };
+      return { kind: "on-conflict", start: s, end: this.last(), duplicateKey: false, targets, constraint, targetWhere, update: false, assignments: [], where: undefined };
     }
     this.expect(K.UPDATE, "NOTHING or UPDATE");
     this.expect(K.SET, "SET");
     const assignments = this.commaList(() => this.assignment());
     const where = this.eat(K.WHERE) ? this.expr(0) : undefined;
-    return { kind: "on-conflict", start: s, end: this.last(), targets, constraint, targetWhere, update: true, assignments, where };
+    return { kind: "on-conflict", start: s, end: this.last(), duplicateKey: false, targets, constraint, targetWhere, update: true, assignments, where };
+  }
+
+  private onDuplicate(): OnConflict {
+    const K = this.K;
+    const s = this.start();
+    this.i += 2;
+    this.expect(K.KEY, "KEY");
+    this.expect(K.UPDATE, "UPDATE");
+    const assignments = this.commaList(() => this.assignment());
+    return { kind: "on-conflict", start: s, end: this.last(), duplicateKey: true, targets: [], constraint: undefined, targetWhere: undefined, update: true, assignments, where: undefined };
   }
 
   private assignment(): Assignment {
@@ -2006,6 +2368,29 @@ class Parser {
     return { kind: "reference", start: s, end: this.last(), table, columns, onDelete, onUpdate, options: this.textFrom(optFrom) };
   }
 
+  private atTableIndex(): boolean {
+    if (!this.tableIndexes || this.kind() !== Tok.Word) return false;
+    const w = this.slice().toUpperCase();
+    const n = this.kind(1);
+    if (w === "INDEX") return n === Tok.Word || n === Tok.QuotedIdent || n === Tok.LParen;
+    if (w === "KEY") return n === Tok.LParen || ((n === Tok.Word || n === Tok.QuotedIdent) && this.kind(2) === Tok.LParen);
+    if (w === "FULLTEXT" || w === "SPATIAL" || w === "UNIQUE") return this.wordIs("KEY", 1) || this.wordIs("INDEX", 1);
+    return w === "PROJECTION";
+  }
+
+  /** An index among the elements of a `CREATE TABLE`, as text. */
+  private tableIndex(): TableConstraint {
+    const s = this.start();
+    const from = this.i;
+    let depth = 0;
+    while (!this.atEnd() && this.kind() !== Tok.Semicolon && !(depth === 0 && (this.kind() === Tok.Comma || this.kind() === Tok.RParen))) {
+      if (this.kind() === Tok.LParen) depth++;
+      else if (this.kind() === Tok.RParen) depth--;
+      this.i++;
+    }
+    return { kind: "column-option", start: s, end: this.last(), name: undefined, text: this.textFrom(from) ?? "", expr: undefined };
+  }
+
   private tableLike(): TableLike {
     const s = this.start();
     this.i++;
@@ -2022,7 +2407,7 @@ class Parser {
 
   private atTableConstraint(): boolean {
     const K = this.K;
-    return this.at(K.CONSTRAINT) || this.at(K.PRIMARY) || this.at(K.UNIQUE) || this.at(K.CHECK) || this.at(K.FOREIGN) || (this.at(K.NOT) && this.at(K.NULL, 1));
+    return this.at(K.CONSTRAINT) || this.at(K.PRIMARY) || this.at(K.UNIQUE) || this.at(K.CHECK) || this.at(K.FOREIGN) || (this.at(K.NOT) && this.at(K.NULL, 1)) || this.at(K.EXCLUDE);
   }
 
   /** `NO INHERIT` or `NOT VALID` after a check, as text. */
@@ -2033,6 +2418,11 @@ class Parser {
       if (this.at(K.NO) && this.wordIs("INHERIT", 1)) this.i += 2;
       else if (this.at(K.NOT) && (this.wordIs("VALID", 1) || this.wordIs("ENFORCED", 1))) this.i += 2;
       else if (this.wordIs("ENFORCED")) this.i++;
+      else if (this.at(K.NOT) && this.wordIs("DEFERRABLE", 1)) this.i += 2;
+      else if (this.wordIs("DEFERRABLE")) this.i++;
+      else if (this.wordIs("INITIALLY") && (this.wordIs("DEFERRED", 1) || this.wordIs("IMMEDIATE", 1))) this.i += 2;
+      else if (this.wordIs("NULLS") && this.at(K.NOT, 1) && this.at(K.DISTINCT, 2)) this.i += 3;
+      else if (this.at(K.USING) && this.kind(1) === Tok.Word) this.i += 2;
       else break;
     }
     return this.textFrom(from);
@@ -2042,7 +2432,7 @@ class Parser {
     const K = this.K;
     const s = this.start();
     const name = this.eat(K.CONSTRAINT) ? this.ident() : undefined;
-    if (this.at(K.NOT)) {
+    if (this.at(K.NOT) || this.at(K.EXCLUDE)) {
       const from = this.i;
       let depth = 0;
       while (!this.atEnd() && this.kind() !== Tok.Semicolon && !(depth === 0 && (this.kind() === Tok.Comma || this.kind() === Tok.RParen))) {
@@ -2055,11 +2445,13 @@ class Parser {
     if (this.eat(K.PRIMARY)) {
       this.expect(K.KEY, "KEY");
       const columns = this.identList();
-      return { kind: "primary-key", start: s, end: this.last(), name, columns };
+      const options = this.constraintOptions();
+      return { kind: "primary-key", start: s, end: this.last(), name, columns, options };
     }
     if (this.eat(K.UNIQUE)) {
       const columns = this.identList();
-      return { kind: "unique", start: s, end: this.last(), name, columns };
+      const options = this.constraintOptions();
+      return { kind: "unique", start: s, end: this.last(), name, columns, options };
     }
     if (this.eat(K.CHECK)) {
       this.expectKind(Tok.LParen, "(");
@@ -2072,7 +2464,8 @@ class Parser {
     this.expect(K.KEY, "KEY");
     const columns = this.identList();
     const reference = this.reference();
-    return { kind: "foreign-key", start: s, end: this.last(), name, columns, reference };
+    const options = this.constraintOptions();
+    return { kind: "foreign-key", start: s, end: this.last(), name, columns, reference, options };
   }
 
   private columnConstraints(): ColumnConstraint[] {
@@ -2092,9 +2485,11 @@ class Parser {
         out.push({ kind: "default", start: s, end: this.last(), name, expr });
       } else if (this.eat(K.PRIMARY)) {
         this.expect(K.KEY, "KEY");
-        out.push({ kind: "primary-key", start: s, end: this.last(), name, columns: [] });
+        const options = this.constraintOptions();
+        out.push({ kind: "primary-key", start: s, end: this.last(), name, columns: [], options });
       } else if (this.eat(K.UNIQUE)) {
-        out.push({ kind: "unique", start: s, end: this.last(), name, columns: [] });
+        const options = this.constraintOptions();
+        out.push({ kind: "unique", start: s, end: this.last(), name, columns: [], options });
       } else if (this.eat(K.CHECK)) {
         this.expectKind(Tok.LParen, "(");
         const expr = this.expr(0);
@@ -2103,7 +2498,8 @@ class Parser {
         out.push({ kind: "check", start: s, end: this.last(), name, expr, options });
       } else if (this.at(K.REFERENCES)) {
         const reference = this.reference();
-        out.push({ kind: "foreign-key", start: s, end: this.last(), name, columns: [], reference });
+        const options = this.constraintOptions();
+        out.push({ kind: "foreign-key", start: s, end: this.last(), name, columns: [], reference, options });
       } else if (this.atColumnOption()) {
         out.push(this.columnOption(s, name));
       } else {
@@ -2122,6 +2518,7 @@ class Parser {
     const K = this.K;
     if (this.kind() !== Tok.Word) return false;
     if (this.at(K.AS) && this.kind(1) === Tok.LParen) return true;
+    if ((this.wordIs("CHARACTER") && this.at(K.SET, 1)) || this.wordIs("CHARSET")) return true;
     if (this.at(K.NOT) && this.kind(1) === Tok.Word && this.wordIs("DEFERRABLE", 1)) return true;
     return COLUMN_OPTION_WORDS.has(this.slice().toUpperCase());
   }
@@ -2177,7 +2574,7 @@ class Parser {
       let elements: (ColumnDef | TableConstraint)[] = [];
       if (this.kind() === Tok.LParen && !this.atQuery(1)) {
         this.i++;
-        if (this.kind() !== Tok.RParen) elements = this.commaList(() => (this.at(K.LIKE) ? this.tableLike() : this.atTableConstraint() ? this.tableConstraint() : this.columnDef()));
+        if (this.kind() !== Tok.RParen) elements = this.commaList(() => (this.at(K.LIKE) ? this.tableLike() : this.atTableIndex() ? this.tableIndex() : this.atTableConstraint() ? this.tableConstraint() : this.columnDef()));
         this.expectKind(Tok.RParen, ")");
       }
       const from = this.i;
@@ -2477,7 +2874,8 @@ class Parser {
       if (this.eat(K.CONSTRAINT)) {
         const ifExists = this.ifExists();
         const name = this.ident();
-        return { kind: "drop-constraint", start: s, end: this.last(), ifExists, name };
+        const behavior = this.eat(K.CASCADE) ? "cascade" : this.eat(K.RESTRICT) ? "restrict" : undefined;
+        return { kind: "drop-constraint", start: s, end: this.last(), ifExists, name, behavior };
       }
       this.eat(K.COLUMN);
       const ifExists = this.ifExists();
@@ -2534,6 +2932,7 @@ class Parser {
     const ifExists = this.ifExists();
     const names = this.commaList(() => this.qualifiedName());
     const behavior = this.eat(K.CASCADE) ? "cascade" : this.eat(K.RESTRICT) ? "restrict" : undefined;
+    if (this.wordIs("FORCE") || this.wordIs("PURGE")) this.i++;
     return { kind: "drop", start: s, end: this.last(), object, ifExists, names, concurrently, behavior };
   }
 
@@ -2696,7 +3095,7 @@ class Parser {
   private statement(): Statement {
     const K = this.K;
     if (this.kind() === Tok.Word && COMMAND_WORDS.has(this.slice().toUpperCase())) return this.command();
-    if (this.kind() === Tok.LParen || this.at(K.SELECT) || this.at(K.WITH) || this.at(K.VALUES)) return this.query();
+    if (this.kind() === Tok.LParen || this.at(K.SELECT) || this.at(K.WITH) || this.at(K.VALUES) || (this.fromFirst && this.at(K.FROM))) return this.query();
     if (this.at(K.INSERT) || (this.at(K.REPLACE) && this.at(K.INTO, 1))) return this.insert();
     if (this.at(K.UPDATE)) return this.update();
     if (this.at(K.DELETE)) return this.delete();

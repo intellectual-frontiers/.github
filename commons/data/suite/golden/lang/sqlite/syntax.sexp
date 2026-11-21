@@ -52,7 +52,7 @@ script
     from[0]: table
       name: name
         parts[0]: ident name="t" quoted=false
-  statements[2]: insert
+  statements[2]: insert byName=false
     table: name
       parts[0]: ident name="t" quoted=false
     source: values

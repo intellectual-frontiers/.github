@@ -16,6 +16,8 @@ export const dialect = declareDialect({
   extends: ansi,
   grammar: (g) => ({
     ...g,
+    fromFirst: true,
+    lambdas: true,
     castOperator: "::",
     likeWords: ["ILIKE", "GLOB"],
     operators: [

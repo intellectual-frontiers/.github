@@ -46,6 +46,7 @@ export const dialect = declareDialect({
   }),
   grammar: (g) => ({
     ...g,
+    colonPaths: true,
     castOperator: "::",
     likeWords: ["ILIKE", "RLIKE", "REGEXP"],
     operators: [...g.operators, { text: "->", prec: Prec.Other }, { text: "->>", prec: Prec.Other }],

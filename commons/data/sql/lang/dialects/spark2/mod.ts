@@ -9,4 +9,4 @@ import { declareDialect } from "../../dialect.ts";
 import { dialect as hive } from "../hive/mod.ts";
 
 /** Apache Spark 2. */
-export const dialect = declareDialect({ name: "spark2", extends: hive, lexical: (b) => ({ ...b, prefixes: [{ prefix: "X" }] }) });
+export const dialect = declareDialect({ name: "spark2", extends: hive, lexical: (b) => ({ ...b, prefixes: [{ prefix: "X" }] }), grammar: (g) => ({ ...g, lambdas: true }) });

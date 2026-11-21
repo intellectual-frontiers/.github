@@ -29,6 +29,7 @@ export const dialect = declareDialect({
   }),
   grammar: (g) => ({
     ...g,
+    fromFirst: true,
     likeWords: ["RLIKE", "REGEXP"],
     wordOperators: [{ text: "DIV", prec: Prec.Multiplicative }],
     operators: [...g.operators, { text: "<=>", prec: Prec.Compare }, { text: "&&", prec: Prec.And }],

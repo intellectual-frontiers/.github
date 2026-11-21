@@ -9,4 +9,4 @@ import { declareDialect } from "../../dialect.ts";
 import { dialect as spark } from "../spark/mod.ts";
 
 /** Databricks. */
-export const dialect = declareDialect({ name: "databricks", extends: spark, lexical: (b) => b });
+export const dialect = declareDialect({ name: "databricks", extends: spark, lexical: (b) => b, grammar: (g) => ({ ...g, colonPaths: true }) });

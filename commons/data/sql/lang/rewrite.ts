@@ -57,6 +57,8 @@ import type {
   StarModifier,
   Statement,
   StringLit,
+  StructEntry,
+  TypeField,
   TableConstraint,
   TableRef,
   Tuple,
@@ -221,6 +223,15 @@ class Rewriter {
         const upper = opt(e.upper, (x) => this.expr(x));
         return arg === e.arg && index === e.index && upper === e.upper ? e : { ...e, arg, index, upper };
       }
+      case "struct": {
+        const entries = mapList(e.entries, (x) => this.structEntry(x));
+        return entries === e.entries ? e : { ...e, entries };
+      }
+      case "lambda": {
+        const params = mapList(e.params, (x) => this.ident(x));
+        const body = this.expr(e.body);
+        return params === e.params && body === e.body ? e : { ...e, params, body };
+      }
       case "field": {
         const arg = this.expr(e.arg);
         const field = opt(e.field, (x) => this.ident(x));
@@ -251,6 +262,12 @@ class Rewriter {
     return cond === w.cond && result === w.result ? w : { ...w, cond, result };
   }
 
+  private structEntry(e: StructEntry): StructEntry {
+    const key = this.expr(e.key);
+    const value = this.expr(e.value);
+    return key === e.key && value === e.value ? e : { ...e, key, value };
+  }
+
   private stringLit(s: StringLit): StringLit {
     const e = this.expr(s);
     return e.kind === "string" ? e : s;
@@ -269,19 +286,21 @@ class Rewriter {
 
   private call(c: Call): Call {
     const name = this.name(c.name);
+    const parameters = mapList(c.parameters, (a) => this.arg(a));
     const args = mapList(c.args, (a) => this.arg(a));
     const orderBy = mapList(c.orderBy, (x) => this.orderItem(x));
     const withinGroup = mapList(c.withinGroup, (x) => this.orderItem(x));
     const filter = opt(c.filter, (x) => this.expr(x));
     const over = opt(c.over, (w) => this.windowSpec(w));
     return name === c.name &&
+      parameters === c.parameters &&
       args === c.args &&
       orderBy === c.orderBy &&
       withinGroup === c.withinGroup &&
       filter === c.filter &&
       over === c.over
       ? c
-      : { ...c, name, args, orderBy, withinGroup, filter, over };
+      : { ...c, name, parameters, args, orderBy, withinGroup, filter, over };
   }
 
   private windowSpec(w: WindowSpec): WindowSpec {
@@ -316,9 +335,16 @@ class Rewriter {
     return expr === o.expr ? o : { ...o, expr };
   }
 
+  private typeField(f: TypeField): TypeField {
+    const name = opt(f.name, (x) => this.ident(x));
+    const type = this.dataType(f.type);
+    return name === f.name && type === f.type ? f : { ...f, name, type };
+  }
+
   private dataType(d: DataType): DataType {
     const args = mapList(d.args, (x) => this.expr(x));
-    return args === d.args ? d : { ...d, args };
+    const fields = mapList(d.fields, (x) => this.typeField(x));
+    return args === d.args && fields === d.fields ? d : { ...d, args, fields };
   }
 
   // ---- queries and sources
@@ -337,6 +363,7 @@ class Rewriter {
   private queryChildren(q: Query): Query {
     switch (q.kind) {
       case "select": {
+        const top = opt(q.top, (x) => this.expr(x));
         const distinctOn = mapList(q.distinctOn, (x) => this.expr(x));
         const items = mapList(q.items, (x) => this.selectItem(x));
         const from = mapList(q.from, (x) => this.source(x));
@@ -348,7 +375,8 @@ class Rewriter {
         const orderBy = mapList(q.orderBy, (x) => this.orderItem(x));
         const limit = opt(q.limit, (x) => this.expr(x));
         const offset = opt(q.offset, (x) => this.expr(x));
-        return distinctOn === q.distinctOn &&
+        return top === q.top &&
+          distinctOn === q.distinctOn &&
           items === q.items &&
           from === q.from &&
           where === q.where &&
@@ -360,7 +388,7 @@ class Rewriter {
           limit === q.limit &&
           offset === q.offset
           ? q
-          : { ...q, distinctOn, items, from, where, groupBy, having, windows, qualify, orderBy, limit, offset };
+          : { ...q, top, distinctOn, items, from, where, groupBy, having, windows, qualify, orderBy, limit, offset };
       }
       case "set-op": {
         const left = this.query(q.left);
@@ -441,6 +469,11 @@ class Rewriter {
         const call = this.call(s.call);
         const alias = opt(s.alias, (x) => this.alias(x));
         return call === s.call && alias === s.alias ? s : { ...s, call, alias };
+      }
+      case "table-op": {
+        const source = this.source(s.source);
+        const alias = opt(s.alias, (x) => this.alias(x));
+        return source === s.source && alias === s.alias ? s : { ...s, source, alias };
       }
       case "join": {
         const left = this.source(s.left);

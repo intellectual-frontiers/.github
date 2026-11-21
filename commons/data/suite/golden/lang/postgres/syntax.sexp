@@ -75,7 +75,7 @@ script
         left: name
           parts[0]: ident name="b" quoted=false
         right: string value="y" prefix=""
-  statements[5]: insert
+  statements[5]: insert byName=false
     table: name
       parts[0]: ident name="t" quoted=false
     columns[0]: name

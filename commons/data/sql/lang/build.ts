@@ -60,6 +60,7 @@ export const build = {
       start: at.start,
       end: at.end,
       name,
+      parameters: [],
       args,
       distinct: false,
       orderBy: [],

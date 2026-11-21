@@ -22,32 +22,7 @@ drop all analyze job;
 
 create analyze all properties  ("statistic_exclude_pattern"="^(?!.*test_statistic_behavior).*$");
 
-create table hive_sink_${uuid0}.hive_sink_db_${uuid0}.hive_sink_table_${uuid0} properties (
-    "file_format" = "parquet"
-)
-as select * from files (
-    "path" = "oss://${oss_bucket}/test_across_engine/test_sink/${uuid0}/tpch_lineitem.parquet",
-    "format" = "parquet"
-);
-
-create table hive_sink_${uuid0}.hive_sink_db_${uuid0}.hive_sink_table_${uuid0} properties (
-    "file_format" = "textfile"
-)
-as select * from files (
-    "path" = "oss://${oss_bucket}/test_across_engine/test_sink/${uuid0}/tpch_lineitem.parquet",
-    "format" = "parquet"
-);
-
 -- name: test_sink_parquet_partitioned @slow
-
-
-create external catalog hive_sink_${uuid0} PROPERTIES (
-    "type"="hive", 
-    "hive.metastore.uris"="${hive_metastore_uris}",
-    "aws.s3.access_key"  =  "${oss_ak}",
-    "aws.s3.secret_key"  =  "${oss_sk}",
-    "aws.s3.endpoint"  =  "${oss_endpoint}"
-);
 
 insert into t1 select * from t1;
 
@@ -74,8 +49,6 @@ drop table tab1;
 alter table tab1 modify column c1 add field [*].val1 int;
 
 use test_add_drop_field_not_allowed;
-
-drop database db_${uuid0} force;
 
 select distinct c17,c18,c19,c20,c21,c22,c23,c24 from all_t0 order by 1,2,3,4,5,6,7,8 limit 100,3;
 
@@ -204,61 +177,9 @@ create table t2 (
     c0 INT
 ) DUPLICATE key (c0) DISTRIBUTED BY HASH(c0) BUCKETS 3 PROPERTIES('replication_num' = '1');
 
-INSERT INTO t_push_down_local_agg_union_all_result_${uuid0} VALUES
-    (1, 10, 1.50, 1.25, 'alpha', '2024-01-01', [1, 2, 3]),
-    (2, NULL, NULL, NULL, 'beta', NULL, []),
-    (3, -5, -2.25, -3.50, '', '2024-01-03', [3]),
-    (4, 10, 1.50, 2.75, 'alpha', '2024-01-04', NULL),
-    (5, 0, 0.00, 0.00, NULL, '2024-01-05', [5, NULL]),
-    (6, 7, 3.33, 7.50, 'gamma', '2024-01-06', [6, 7]),
-    (7, NULL, NULL, NULL, NULL, NULL, NULL),
-    (8, 100, 9.99, 100.25, 'delta', '2024-01-08', [8]),
-    (9, -5, -2.25, -5.75, 'beta', '2024-01-09', [9, 10, 11, 12]),
-    (10, 10, 1.50, 10.50, 'alpha', '2024-01-10', []);
-
 -- ARRAY type with the feature enabled:
 --   cover statistic-style collection size expressions, NDV and HLL_RAW via CRC32_HASH(v_array),
 --   serialized HLL state, and scalar expressions wrapping aggregate results.
-
-
-SELECT COUNT(v_array), IFNULL(AVG(ARRAY_LENGTH(v_array)), -1),
-       COUNT(*) * 4 * GREATEST(0, IFNULL(AVG(ARRAY_LENGTH(v_array)), -1)),
-       NDV(CRC32_HASH(v_array)),
-       HLL_CARDINALITY(HLL_RAW(CRC32_HASH(v_array))),
-       LENGTH(HEX(HLL_SERIALIZE(IFNULL(HLL_RAW(CRC32_HASH(v_array)), HLL_EMPTY()))))
-FROM (
-    SELECT id, v_array
-    FROM t_push_down_local_agg_union_all_result_${uuid0}
-    WHERE id <= 4
-    UNION ALL
-    SELECT id, v_array
-    FROM t_push_down_local_agg_union_all_result_${uuid0}
-    WHERE id > 4 AND id <= 10
-    UNION ALL
-    SELECT id, v_array
-    FROM t_push_down_local_agg_union_all_result_${uuid0}
-    WHERE id > 100
-) u;
-
-WITH base_cte_table AS (
-    SELECT id, v_int
-    FROM t_push_down_local_agg_union_all_result_${uuid0}
-    WHERE id <= 4
-    UNION ALL
-    SELECT id, v_int
-    FROM t_push_down_local_agg_union_all_result_${uuid0}
-    WHERE id > 4 AND id <= 10
-    UNION ALL
-    SELECT id, v_int
-    FROM t_push_down_local_agg_union_all_result_${uuid0}
-    WHERE id > 100
-)
-SELECT cast(9 as INT), cast(10001 as BIGINT), 'v_int',
-       cast(0 as BIGINT), cast(4 * 10 as BIGINT),
-       HLL_CARDINALITY(IFNULL(HLL_RAW(v_int), HLL_EMPTY())),
-       cast((COUNT(*) - COUNT(v_int)) * 10 / COUNT(*) as BIGINT), '', '',
-       cast(-1.0 as BIGINT)
-FROM base_cte_table;
 
 SELECT ds_hll_count_distinct_merge(ds_hll_count_distinct_state(s)) FROM t0;
 
@@ -613,20 +534,6 @@ select
     mann_whitney_u_test(c6, c2, 'greater')
 from t1;
 
--- name: test_map_agg_decimal_key
--- map_agg over a decimal key used to type its result with the wildcard decimal (precision -1),
--- which the BE cannot build a result column for.
-CREATE TABLE t_map_agg_dec_${uuid0} (
-    k INT,
-    d32 DECIMAL(9, 3),
-    d64 DECIMAL(18, 4),
-    d128 DECIMAL(38, 10)
-) DUPLICATE KEY(k)
-DISTRIBUTED BY HASH(k) BUCKETS 3
-PROPERTIES("replication_num" = "1");
-
-DROP TABLE t_map_agg_dec_${uuid0};
-
 SELECT /*+ SET_VAR(streaming_preaggregation_mode='force_streaming')*/ MIN_N(c_float, 3) FROM t_without_null;
 
 SELECT /*+ SET_VAR(streaming_preaggregation_mode='force_streaming')*/ MIN_N(c_smallint, 1) FROM t_without_null;
@@ -875,16 +782,6 @@ SET new_planner_agg_stage = 1;
 SELECT region, COUNT(*) AS c_all, COUNT(nullable_score) AS c_non_null
 FROM t GROUP BY region ORDER BY region;
 
-EXPLAIN SELECT ai_complete(prompt => 'prompt-options-overload', provider => 'ai_complete_${uuid0}', model => 'integration-test-model',
-    options => json_object()
-);
-
-EXPLAIN SELECT DISTINCT ai_complete(prompt => 'forbidden-distinct', provider => 'ai_complete_${uuid0}', model => 'integration-test-model');
-
-ALTER AI PROVIDER ai_chat_${uuid0} SET ('model' = 'chat-v2', 'timeout_ms' = '1000');
-
-ALTER AI PROVIDER ai_chat_${uuid0} SET ('protocol' = 'openai');
-
 CREATE AI PROVIDER IF NOT EXISTS ai_provider_embedding_test TYPE embedding PROPERTIES ("endpoint" = "https://api.openai.com/v1/embeddings", "model" = "text-embedding-3-small");
 
 DROP AI PROVIDER ai_provider_embedding_test;
@@ -892,9 +789,6 @@ DROP AI PROVIDER ai_provider_embedding_test;
 SHOW AI PROVIDERS LIKE 'ai_provider_rerank_test';
 
 DROP AI PROVIDER IF EXISTS ai_provider_rerank_test;
-
--- expect the table inherits the new storage volume: sv_test02_${uuid1}
-SHOW CREATE TABLE db${uuid0}.t2;
 
 CREATE MATERIALIZED VIEW mv1 REFRESH IMMEDIATE MANUAL AS SELECT c0 AS k, count(c1) as cnt FROM t0 GROUP BY c0;
 
@@ -951,13 +845,7 @@ DUPLICATE KEY(`k1`, `k2`, `k3`, `k4`, `k5`)
 DISTRIBUTED BY HASH(`k1`, `k2`, `k3`) BUCKETS 3
 PROPERTIES ('replication_num' = '1');
 
-drop database analyze_test_${uuid0};
-
 SELECT k FROM t_ns WHERE to_date(ts_nanos) > '2020-01-01' ORDER BY k;
-
-ANALYZE TABLE analyze_hive_batch_${uuid0}.hive_oss_db.hive_oss_par_parquet_snappy
-UPDATE HISTOGRAM ON col_int, col_string, col_date
-PROPERTIES ('histogram_sample_ratio' = '1.0', 'histogram_mcv_size' = '0');
 
 -- t2 is asymmetric with t1
 INSERT INTO t2
@@ -1001,10 +889,6 @@ PROPERTIES ('replication_num' = '1');
 
 -- name: test_histogram_function
 
-create database analyze_test_${uuid0};
-
-SELECT column_name, buckets FROM _statistics_.histogram_statistics where table_name='analyze_test_${uuid0}.t2' order by column_name;
-
 drop stats test_first_load;
 
 -- predicate
@@ -1017,11 +901,6 @@ properties('replication_num'='1');
 CREATE TABLE t_collect (k1 int, v1 int)
 DUPLICATE KEY(k1) DISTRIBUTED BY HASH(k1) BUCKETS 1
 PROPERTIES ('replication_num' = '1', 'enable_statistic_collect_on_first_load' = 'false');
-
-drop analyze ${first_job.split()[0]};
-
--- an all-NULL decimal column persists empty-string min/max into the stats table
-select column_name, length(`max`), length(`min`) from default_catalog._statistics_.column_statistics where table_name='analyze_test_${uuid0}.all_null_decimal' and column_name='c1';
 
 USE test_update_trigger_statistics;
 
@@ -1731,43 +1610,6 @@ CREATE TABLE ss1(event_day DATETIME, pv BIGINT) PARTITION BY pv, date_trunc('day
 
 ALTER TABLE ss1 set ("partition_retention_condition" = "event_day >= current_date() - interval 3 day and pv = 1");
 
--- name: test_aws_glue_s3_deltalake
-CREATE EXTERNAL CATALOG test_aws_glue_s3_deltalake_${uuid0}
-PROPERTIES
-(
-"type"="deltalake",
-"hive.metastore.type"="glue",
-"aws.glue.access_key"="${aws_ak}",
-"aws.glue.secret_key"="${aws_sk}",
-"aws.glue.region"="${aws_region}",
-"aws.s3.access_key"="${aws_ak}",
-"aws.s3.secret_key"="${aws_sk}",
-"aws.s3.region"="${aws_region}"
-);
-
-drop catalog test_aws_glue_s3_hive_${uuid0};
-
-CREATE EXTERNAL CATALOG test_assume_role_hudi_${uuid0}
-PROPERTIES
-(
-"type"="hudi",
-"hive.metastore.type"="glue",
-"aws.glue.access_key"="${aws_ak}",
-"aws.glue.secret_key"="${aws_sk}",
-"aws.glue.region"="${aws_region}",
-"aws.glue.iam_role_arn"="${aws_assume_role}",
-"aws.glue.sts.region"="${aws_sts_region}",
-"aws.glue.sts.endpoint"="${aws_sts_endpoint}",
-"aws.s3.access_key"="${aws_ak}",
-"aws.s3.secret_key"="${aws_sk}",
-"aws.s3.region"="${aws_region}",
-"aws.s3.iam_role_arn"="${aws_assume_role}",
-"aws.s3.sts.region"="${aws_sts_region}",
-"aws.s3.sts.endpoint"="${aws_sts_endpoint}"
-);
-
-select * from test_assume_role_iceberg_${uuid0}.sql_test_db.iceberg_glue_s3_orc;
-
 select id, bins from t_array_binary order by id;
 
 select [to_binary('AABB', 'hex'), null];
@@ -1810,10 +1652,6 @@ select c1, bitmap_min(subdivide_bitmap) as min_value, bitmap_to_string(subdivide
 insert into t4 select 6, 10, bitmap_agg(generate_series) from table(generate_series(1, 60));
 
 SET enable_profile = true;
-
-SELECT count(1), sum(bitmap_count(subdivide_bitmap)) FROM sbb_${uuid0}, subdivide_bitmap(b, 1) WHERE id = 1;
-
-SELECT id, bitmap_count(subdivide_bitmap) FROM sbb_${uuid0}, subdivide_bitmap(b, 100) ORDER BY id;
 
 -- Exactly the buffer size: one full pass per piece and a `taken == 0` on the next one, the boundary
 -- where an off-by-one in the loop condition would either drop a piece or spin.
@@ -1881,34 +1719,7 @@ INSERT INTO t2
 
 create table t1 (id int) duplicate key(id);
 
--- name: test_broker_load_4k_parquet
-create database db_${uuid0};
-
-LOAD LABEL label2_${uuid1} (
-    DATA INFILE("s3://${oss_bucket}/test_broker_load/debezium/${uuid0}/debezium_payload.json")
-    INTO TABLE t1
-    FORMAT AS "json"
-) WITH BROKER (
-    "aws.s3.access_key" = "${oss_ak}",
-    "aws.s3.secret_key" = "${oss_sk}",
-    "aws.s3.endpoint" = "${oss_endpoint}"
-)
-PROPERTIES
-(
-    "timeout" = "3600",
-    "envelope" = "debezium",
-    "jsonpaths" = "[\"$.id\",\"$.name\"]"
-);
-
 select id, tags from t1 order by id;
-
-insert into files (
-    "path" = "oss://${oss_bucket}/test_broker_load/test_parquet/${uuid0}/",
-    "format" = "parquet",
-    "aws.s3.access_key" = "${oss_ak}",
-    "aws.s3.secret_key" = "${oss_sk}",
-    "aws.s3.endpoint" = "${oss_endpoint}"
-) select k1, k2 from t1;
 
 -- CACHE SELECT over a table with complex-type columns while a predicate on a
 -- subset of columns reorders the read schema. The reorder must not misalign the
@@ -1938,8 +1749,6 @@ insert into dim values
     (1, '1'),
     (2, '10'),
     (3, '100');
-
-drop database shorthand_cast_${uuid0};
 
 -- Create generated column using v0 and v1
 ALTER TABLE t_gen ADD COLUMN v2 bigint AS v0+v1;
@@ -2094,12 +1903,6 @@ select t3.c0, t3.c1, t.c0, t.c1, t.cnt, t.c3 from t3 left join (select count(*) 
 -- Verify both tables are in the same colocate group
 SHOW CREATE TABLE t2;
 
-create table t2 (k1 int, k2 int, w int)
-    duplicate key(k1, k2)
-    partition by range(k2) (partition p1 values less than ('100'))
-    order by(k1, k2)
-    properties('replication_num' = '1', 'colocate_with' = 'g_addp_${uuid0}:k1');
-
 insert into t_auto values (1, '2026-01-02', 30), (3, '2026-01-02', 40);
 
 insert into t2 values (1, 100), (2, 200);
@@ -2109,9 +1912,6 @@ drop table t_ref;
 select k1, count(*) from t group by k1 order by k1;
 
 drop table t_plain;
-
--- cross-DB colocate join on the colocate-prefix column
-select count(*) from db_${uuid0}_a.t_left l join db_${uuid0}_b.t_right r on l.k1 = r.k1;
 
 insert into tenants values (1, 100, 1), (2, 200, 2), (3, 300, 3);
 
@@ -2128,8 +1928,6 @@ drop table pk_seed;
 
 -- A three-way split by row count cuts where one load ends and the next begins. Those cuts are changes of
 -- k1, so each becomes a ColocateRange boundary and the group gets three ColocateRanges.
-
-alter table t1 split tablet (${tablet_id}) properties ('tablet_reshard_target_size' = '-3');
 
 select count(*), sum(v1) from r1 [_SYNC_MV_];
 
@@ -2152,13 +1950,7 @@ create table t_ref (k1 int, k2 int, v int) duplicate key(k1, k2) distributed by 
 
 insert into t values (null, 1, 1);
 
-create table b (k1 int, k2 int)
-    order by(k1, k2)
-    properties('replication_num' = '1', 'colocate_with' = 'grp_three_${uuid0}:k1');
-
 drop table b;
-
-select character_maximum_length from information_schema.columns where table_schema = 'db_${uuid0}' and table_name = 't_prefix' and column_name = 'k2';
 
 DROP TABLE if exists lineitem1;
 
@@ -2264,8 +2056,6 @@ create table t(k int, v int) primary key(k) properties('base_compaction_forbidde
 -- a collection index inside the lambda reads its own path
 select id, array_map(x -> x.items[array_length(x.other)].a, [s]) from t order by id;
 
-drop catalog ice_cat_${uuid0};
-
 -- same shape, wider projection - this is the statement the fuzzer found
 select map_size(s1.s3), s1.s2[1].a, s1.s3[1], s1.s4.f from scs3
 where str in ('aa', (s1.s2[1].a), 'ii', 'cc') order by v1 limit 2;
@@ -2302,13 +2092,6 @@ INSERT INTO user_events (user_id, event_ts, event_name, session_id, event_type, 
 ('user_004', unix_timestamp('2024-01-10 10:00:00') * 1000, 'item_view', 'session_005', 'view_event', 'view',
  '{"product_id": "prod_303"}');
 
--- name: test_keyword_column_name
--- FLOOR and CEIL are non-reserved keywords (the time_slice/date_slice boundary argument).
--- Regression: they must be usable as ordinary column names in queries, and must not be parsed
--- as a UnitBoundary literal (which previously raised
--- "class com.starrocks.sql.ast.UnitBoundary cannot be cast to ...ast.expression.Expr").
-create database db_${uuid0};
-
 USE test_reject_variant_olap_column_db;
 
 SELECT count(*) FROM vok;
@@ -2335,8 +2118,6 @@ select c2.n, a.k1, a.v1, a.v2, coalesce(z.cnt, 13) as cnt, z.m
 from c1 a cross join c2 left outer join c3 z on a.v1 = a.k1
 order by a.k1 limit 14;
 
-DROP TABLE recursive_ctas_result_${uuid0};
-
 -- Test 8: Recursive CTE with UNION + UNION ALL    
 WITH RECURSIVE numbers AS (    
     SELECT cast(1 as bigint) AS n, cast(1 as bigint) AS category                          
@@ -2359,15 +2140,7 @@ WITH RECURSIVE r AS (
 )
 SELECT /*+ SET_VAR(enable_recursive_cte=true, recursive_cte_max_depth=20, enable_insert_strict=true, insert_max_filter_ratio=0)*/ * FROM r ORDER BY n;
 
-set catalog hive_datacache_test_${uuid0};
-
--- two task run executed
-select TASK_NAME, DEFINITION from default_catalog.information_schema.task_runs where CATALOG='hive_datacache_test_${uuid0}' and `DATABASE`='cache_select_db_${uuid0}' order by TASK_NAME;
-
 set catalog default_catalog;
-
--- name: test_convert_tz_out_of_range
-CREATE DATABASE db_${uuid0};
 
 CREATE TABLE t1 (
     id INT,
@@ -2442,16 +2215,12 @@ INSERT INTO primary_table_with_null_partition values ('2020-06-01', '2020-06-01 
 -- "Getting analyzing error. Detail message: slot type shouldn't be invalid.".
 select count(a32), count(a64), count(a128) from t_arr_dec;
 
-use test_decimal_null_row_${uuid0};
-
 -- the NULL row's slot holds a value computed by an upstream `a + b`
 select k, cast(b + if(k = 1, 10000000000, 0) as decimal(18,9)) from t order by k;
 
 select k, cast(row(s) as struct<a decimal(10,2)>) from t where k < 3 order by k;
 
 select k, d1 / (d2 - d2), d1 % (d2 - d2), d1 div (d2 - d2) from t order by k;
-
-drop database test_decimal_null_row_${uuid0};
 
 -- Case 2: precision=50 medium precision test
 CREATE TABLE decimal_test_p50_s10 (d1 decimal(50, 10)) PROPERTIES("replication_num"="1");
@@ -2643,76 +2412,23 @@ INSERT INTO decimal_pk_test_p50_s10 VALUES
 -- Test point query with primary key
 SELECT decimal_value FROM decimal_pk_test_p50_s10 WHERE id1 = 2 AND id2 = 'key002' AND id3 = 200;
 
-analyze table delta_test_${uuid0}.delta_oss_db.t_partition_timestamp_ntz;
-
--- only partition column Predicate with runtime filter
-select * from delta_test_${uuid0}.delta_oss_db.string_col_dict_encode where c3='a' order by c1;
-
-select * from delta_test_${uuid0}.delta_oss_db.delta_lake_par_col_date where col_date >= '2024-04-24' and col_date < '2024-04-26' order by col_smallint;
-
-select * from delta_test_${uuid0}.delta_oss_db.delta_lake_par_col_string where col_string != 'value1' order by col_smallint;
-
-select * from delta_test_${uuid0}.delta_oss_db.t_timestamp_ntz where col_timestamp_ntz is not null order by col_int;
-
-select * from delta_test_${uuid0}.delta_oss_db.t_partition_timestamp_ntz where col_timestamp_ntz is not null order by col_int;
-
-select col_struct from delta_test_${uuid0}.delta_oss_db.delta_lake_data_type where col_struct.sex='male' order by col_tinyint;
-
--- test read parquet with legacy repeated types
--- refer to https://github.com/delta-io/delta/pull/3083
-select resourceType, id,  active, gender from delta_test_${uuid0}.delta_oss_db.delta_legacy_checkpoint where id = '5dcd87d8-7006-55e0-4c58-0078d613922d';
-
 -- name: test_deltalake_column_mapping
-
--- create catalog
-create external catalog delta_test_${uuid0} PROPERTIES (
-    "type"="deltalake",
-    "hive.metastore.uris"="${deltalake_catalog_hive_metastore_uris}",
-    "aws.s3.access_key"="${oss_ak}",
-    "aws.s3.secret_key"="${oss_sk}",
-    "aws.s3.endpoint"="${oss_endpoint}"
-);
-
---test drop column with mapping mode = id
-select * from delta_test_${uuid0}.delta_oss_db.delta_test_drop_column_column_mapping_id order by `key`;
-
---test rename struct subfield with mapping mode = id
-select * from delta_test_${uuid0}.delta_oss_db.delta_lake_struct_rename_subfield_column_mapping_id order by col_struct.age;
-
-select * from delta_test_${uuid0}.delta_oss_db.delta_test_dv order by `key`;
 
 -- test partition prune with boolean type
 
-
-
 -- test partition prune with tinyint type
-
 
 -- test partition prune with smallint type
 
-
 -- test partition prune with int type
-
 
 -- test partition prune with bigint type
 
-
 -- test partition prune with date type
-
 
 -- test partition prune with timestamp type
 
-
 -- test partition prune with string type
-
-
-drop catalog delta_test_${uuid0};
-
-select col_string, count(*) from delta_test_${uuid0}.delta_oss_db.delta_lake_par_col_string where col_string like 'val%' group by col_string order by col_string;
-
-create table delta_lake_par_col_boolean as select * from delta_test_${uuid0}.delta_oss_db.delta_lake_par_col_boolean;
-
-create table delta_lake_par_null as select * from delta_test_${uuid0}.delta_oss_db.delta_lake_par_null;
 
 select * from delta_lake_par_col_date where col_date >= '2024-04-24' and col_date < '2024-04-26' order by col_smallint;
 
@@ -2723,20 +2439,6 @@ select * from t_timestamp_ntz where col_timestamp_ntz is not null order by col_i
 select * from t_partition_timestamp_ntz where col_timestamp_ntz is null order by col_int;
 
 select col_struct from delta_lake_data_type where col_struct.sex='male' order by col_tinyint;
-
--- baseline
-select c1, c2 from delta_test_${uuid0}.delta_oss_db.delta_str_date_part order by c1;
-
-create external catalog delta_test_${uuid1} PROPERTIES (
-    "type"="deltalake",
-    "hive.metastore.uris"="${deltalake_catalog_hive_metastore_uris}",
-    "enable_deltalake_json_meta_cache" = "true",
-    "enable_deltalake_checkpoint_meta_cache" = "true",
-    "enable_deltalake_table_cache" = "false",
-    "aws.s3.access_key"="${oss_ak}",
-    "aws.s3.secret_key"="${oss_sk}",
-    "aws.s3.endpoint"="${oss_endpoint}"
-);
 
 DROP TABLE t_dict_mapping_streamload;
 
@@ -2769,22 +2471,10 @@ v3 int
 
 -- name: test_escape 
 
-create external catalog hive_catalog_${uuid0} PROPERTIES ("type"="hive", 
-    "hive.metastore.uris"="${hive_metastore_uris}",
-    "aws.s3.access_key"  =  "${oss_ak}",
-    "aws.s3.secret_key"  =  "${oss_sk}",
-    "aws.s3.endpoint"  =  "${oss_endpoint}");
-
-drop database hive_catalog_${uuid0}.hive_db_${uuid0};
-
 -- test column case-insensitive
 UPDATE primary_key_with_null SET `K4`  = 'update_k4', `K5`  = 2, `K6`  = 1, `k7`  = 7, `k8`  = 0 WHERE `k3` ="k3" and `k1`='2020-10-22' and `k2`='2020-10-22 00:00:00';
 
 drop table if exists pk_tbl1;
-
-create database hive_catalog_${uuid0}.hive_db_${uuid0};
-
-select * from hive_catalog_${uuid0}.hive_db_${uuid0}.fact as f join hive_catalog_${uuid0}.hive_db_${uuid0}.dim as d where f.dt + interval 1 day = d.dt;
 
 INSERT INTO standalone_meta VALUES (1);
 
@@ -2870,23 +2560,9 @@ drop table t_limit_test force;
 
 drop table t_range_cast force;
 
--- name: test_range_partition_prune_open_bound @native
--- Partitions with MAXVALUE upper bound should not crash or produce wrong results.
-create database test_dyn_prune_${uuid0};
-
--- name: test_range_partition_prune_null_with_other_preds @native
--- NULL combined with non-null predicates in conjuncts.
-create database test_dyn_prune_${uuid0};
-
--- name: test_range_partition_prune_multi_column
-create database test_dyn_prune_${uuid0};
-
 SELECT count(*) FROM t_range_multi;
 
 drop table t_range_multi_fixed force;
-
--- name: test_range_partition_prune_open_upper_bound
-create database test_dyn_prune_${uuid0};
 
 select * from (select l.c0,r.c1  from t0 l join [bucket](select regexp_replace(sum(c1), '1', '2') c1, c0 from t0 group by c0) r on l.c0 = r.c0) t;
 
@@ -2958,24 +2634,10 @@ insert into t_dup select g, g from table(generate_series(1, 10)) t(g);
 
 rollback;
 
-begin with label pk_delete_rollback_${uuid0};
-
 create table t1(id int) primary key(id);
-
--- After commit, the label should still be marked as used (VISIBLE status)
--- Trying to use it again should fail
-begin with label test_label_${uuid1};
 
 -- Rollback the transaction (ABORTED status)
 rollback;
-
-select count(*) from files(
-    "path" = "oss://${oss_bucket}/test_async_write_parquet_file/${uuid0}/000/*",
-    "format" = "parquet",
-    "aws.s3.access_key" = "${oss_ak}",
-    "aws.s3.secret_key" = "${oss_sk}",
-    "aws.s3.endpoint" = "${oss_endpoint}"
-);
 
 select * from test_csv_snappy_format where a = 'Alice';
 
@@ -3033,22 +2695,6 @@ DUPLICATE KEY(`department_id`)
 DISTRIBUTED BY HASH(`project_id`) BUCKETS 1
 PROPERTIES (
 "replication_num" = "1"
-);
-
-CREATE EXTERNAL TABLE mysql_ext
-(
-  `id` int,
-  `s` string  
-)
-ENGINE=mysql
-PROPERTIES
-(
-    "host" = "${mysql_host}",
-    "port" = "${mysql_port}",
-    "user" = "${mysql_user}",
-    "password" = "${mysql_password}",
-    "database" = "db_${uuid0}",
-    "table" = "t00"
 );
 
 insert into allstring values ('"key"',"1", "2");
@@ -3116,34 +2762,7 @@ PROPERTIES (
     "cloud_native_fast_schema_evolution_v2" = "true"
 );
 
-use test_varchar_widen_cloud_pk_fast_${uuid0};
-
--- name: test_varchar_widen_cloud_pk_guard_paths @cloud
-create database test_varchar_widen_cloud_pk_${uuid0};
-
-use test_varchar_widen_cloud_slow_${uuid0};
-
-CREATE TABLE t_colocate_reject (
-    k1 VARCHAR(10) NOT NULL,
-    k2 INT NOT NULL,
-    v1 INT
-)
-DUPLICATE KEY(k1, k2)
-DISTRIBUTED BY HASH(k1) BUCKETS 1
-PROPERTIES (
-    "replication_num" = "1",
-    "cloud_native_fast_schema_evolution_v2" = "true",
-    "colocate_with" = "cg_varchar_widen_${uuid0}"
-);
-
 insert into t_dist_fast values ("a", 1, 11);
-
-drop database test_varchar_widen_native_fast_${uuid0} force;
-
--- name: test_varchar_widen_native_reject_paths @native
-create database test_varchar_widen_native_reject_${uuid0};
-
-use test_varchar_widen_native_pk_${uuid0};
 
 CREATE TABLE t_varchar_slow (
     k1 VARCHAR(10) NOT NULL,
@@ -3175,15 +2794,6 @@ insert into pre_agg_case select generate_series, generate_series, generate_serie
 
 insert into __row_util_base select * from __row_util_base;
 
-CREATE TABLE iceberg_catalog_${uuid0}.iceberg_db_${uuid0}.c1_skew (
-  `c0` int(11) NULL COMMENT "",
-  `c1` char(50) NULL COMMENT "",
-  `c2` int(11) NULL COMMENT "",
-  `c3` int(11) NULL COMMENT ""
-);
-
-alter plan advisor add select count(*) from (select * from iceberg_catalog_${uuid0}.iceberg_db_${uuid0}.c1_skew t1 join (select * from iceberg_catalog_${uuid0}.iceberg_db_${uuid0}.c1_skew where c1 = 'f') t2 on t1.c2 = t2.c2 where t1.c1 = 'a') t;
-
 insert into c1_skew select generate_series, 'a', generate_series, generate_series from TABLE(generate_series(1, 10000));
 
 set enable_plan_advisor_blacklist=true;
@@ -3194,9 +2804,6 @@ analyze table skew_table;
 -- !result
 insert into repro_la select generate_series, generate_series from TABLE(generate_series(1, 8));
 
--- name: test_multi_stmt_txn_dup_table_with_bundling @cloud
-create database db_${uuid0};
-
 set enable_sql_transaction = false;
 
 -- Verify update within same transaction
@@ -3206,184 +2813,24 @@ insert into t_rollback select generate_series, concat('also_disappear_', generat
 
 select count(distinct k1) from t_nobundle;
 
-select * from files(
-    "path" = "oss://${oss_bucket}/test_files/parquet_format/${uuid0}/*",
-    "fs.oss.endpoint" = "${oss_endpoint}",
-    "fs.oss.accessKeyId" = "${oss_ak}",
-    "fs.oss.accessKeySecret" = "${oss_sk}",
-    "format" = "parquet");
-
 use test_incorrect_slot_id;
-
-select dt, int_field from files(
-    "path" = "oss://${oss_bucket}/test_files/avro_format/${uuid0}/*/*",
-    "format" = "avro",
-    "aws.s3.access_key" = "${oss_ak}",
-    "aws.s3.secret_key" = "${oss_sk}",
-    "aws.s3.endpoint" = "${oss_endpoint}",
-    "columns_from_path" = "dt");
-
-select * from files(
-    "path" = "s3://${oss_bucket}/test_files/avro_format/${uuid0}/*",
-    "format" = "avro",
-    "aws.s3.access_key" = "${oss_ak}",
-    "aws.s3.secret_key" = "${oss_sk}",
-    "aws.s3.endpoint" = "${oss_endpoint}");
-
-desc files(
-    "path" = "oss://${oss_bucket}/test_files/avro_format/${uuid0}/user1.avro",
-    "format" = "avro",
-    "aws.s3.access_key" = "${oss_ak}",
-    "aws.s3.secret_key" = "${oss_sk}",
-    "aws.s3.endpoint" = "${oss_endpoint}");
 
 -- name: test_avro_primitive_type
 
-create database db_${uuid0};
-
--- query
-desc files(
-    "path" = "oss://${oss_bucket}/test_files/csv_format/${uuid0}/*",
-    "fs.oss.endpoint" = "${oss_endpoint}",
-    "fs.oss.accessKeyId" = "${oss_ak}",
-    "fs.oss.accessKeySecret" = "${oss_sk}",
-    "format" = "csv",
-    "csv.column_separator" = ",",
-    "csv.row_delimiter" = "\n",
-    "auto_detect_sample_files" = "1");
-
--- error property
-select * from files(
-    "path" = "oss://${oss_bucket}/test_files/csv_format/${uuid0}/*",
-    "fs.oss.endpoint" = "${oss_endpoint}",
-    "fs.oss.accessKeyId" = "${oss_ak}",
-    "fs.oss.accessKeySecret" = "${oss_sk}",
-    "format" = "csv",
-    "csv.column_separator" = ",",
-    "csv.row_delimiter" = "\n",
-    "auto_detect_sample_files" = "1",
-    "fill_mismatch_column_with" = "xxx");
-
-select * from files(
-    "path" = "oss://${oss_bucket}/test_files/empty_file/${uuid0}/basic_type_empty.orc",
-    "format" = "orc",
-    "aws.s3.access_key" = "${oss_ak}",
-    "aws.s3.secret_key" = "${oss_sk}",
-    "aws.s3.endpoint" = "${oss_endpoint}");
-
-select count(*) from files(
-    "fs.oss.endpoint" = "${oss_endpoint}",
-    "fs.oss.accessKeyId" = "${oss_ak}",
-    "fs.oss.accessKeySecret" = "${oss_sk}",
-    "path" = "oss://${oss_bucket}/test_files/orc_format/${uuid0}/*",
-    "format"="orc")
-where map_keys(col_map) != [-99999.99999];
-
 -- Case A: basic1.csv has 4 fields per row; schema declares 2 → extras dropped on every row.
-
-select a, b from files(
-    "path" = "oss://${oss_bucket}/test_files/csv_format/${uuid0}/wide/*",
-    "format" = "csv",
-    "csv.column_separator" = ",",
-    "aws.s3.access_key" = "${oss_ak}",
-    "aws.s3.secret_key" = "${oss_sk}",
-    "aws.s3.endpoint" = "${oss_endpoint}",
-    "schema" = "a BIGINT, b VARCHAR(64)")
-order by a limit 3;
 
 desc ctas_target;
 
 -- name: test_files_schema_partition
 
-create database db_${uuid0};
-
 -- name: test_files_schema_validation
-
-create database db_${uuid0};
 
 create table t1 (k1 int, k2 varchar(10));
 
 set time_zone = '+08:00';
 
-insert into t2 properties ("strict_mode" = "true", "max_filter_ratio" = "0.7")
-select 10, *, 20 from files(
-    "path" = "oss://${oss_bucket}/test_files/csv_format/${uuid0}/*",
-    "format" = "csv",
-    "auto_detect_sample_rows" = "1",
-    "csv.column_separator" = "\\x01",
-    "csv.row_delimiter" = "\n",
-    "aws.s3.access_key" = "${oss_ak}",
-    "aws.s3.secret_key" = "${oss_sk}",
-    "aws.s3.endpoint" = "${oss_endpoint}"
-    );
-
 -- should not push down k1 not null
 create table t1 (k1 int not null, v int);
-
--- 4: BY NAME, SELECT with alias: k1 aliased as k3 -> mapped to target column k3 (int)
-insert into t1 by name
-properties ("enable_push_down_schema" = "true")
-select k1 as k3 from files(
-    "path" = "s3://${oss_bucket}/test_files/parquet_format/${uuid0}/*",
-    "format" = "parquet",
-    "aws.s3.access_key" = "${oss_ak}",
-    "aws.s3.secret_key" = "${oss_sk}",
-    "aws.s3.endpoint" = "${oss_endpoint}");
-
-select path, size, is_dir from files(
-    "path" = "oss://${oss_bucket}/test_files/list_files/${uuid0}/*/*",
-    "list_files_only" = "true",
-    "aws.s3.access_key" = "${oss_ak}",
-    "aws.s3.secret_key" = "${oss_sk}",
-    "aws.s3.endpoint" = "${oss_endpoint}");
-
-select path, size, is_dir from files(
-    "path" = "oss://${oss_bucket}/test_files/list_files/${uuid0}/orc*",
-    "list_files_only" = "true",
-    "list_recursively" = "false",
-    "aws.s3.access_key" = "${oss_ak}",
-    "aws.s3.secret_key" = "${oss_sk}",
-    "aws.s3.endpoint" = "${oss_endpoint}");
-
-select k2, k5, k7 from files(
-    "path" = "oss://${oss_bucket}/test_files/orc_format/${uuid0}/*",
-    "format" = "orc",
-    "fill_mismatch_column_with" = "null",
-    "auto_detect_sample_files" = "2",
-    "aws.s3.access_key" = "${oss_ak}",
-    "aws.s3.secret_key" = "${oss_sk}",
-    "aws.s3.endpoint" = "${oss_endpoint}");
-
-select * from files(
-    "path" = "oss://${oss_bucket}/test_files/parquet_format/${uuid0}/*",
-    "format" = "parquet",
-    "aws.s3.access_key" = "${oss_ak}",
-    "aws.s3.secret_key" = "${oss_sk}",
-    "aws.s3.endpoint" = "${oss_endpoint}");
-
-insert into t1
-select k1 from files(
-    "path" = "s3://${oss_bucket}/test_files/parquet_format/${uuid0}/*",
-    "format" = "parquet",
-    "aws.s3.access_key" = "${oss_ak}",
-    "aws.s3.secret_key" = "${oss_sk}",
-    "aws.s3.endpoint" = "${oss_endpoint}");
-
-select k1, k3, k8 from files(
-    "path" = "oss://${oss_bucket}/test_files/parquet_format/${uuid0}/*",
-    "format" = "parquet",
-    "fill_mismatch_column_with" = "null",
-    "auto_detect_sample_files" = "2",
-    "aws.s3.access_key" = "${oss_ak}",
-    "aws.s3.secret_key" = "${oss_sk}",
-    "aws.s3.endpoint" = "${oss_endpoint}");
-
-select count(*) from files(
-    "path" = "oss://${oss_bucket}/test_files/parquet_format/${uuid0}/list_legacy_encoding_complex.parquet",
-    "format" = "parquet",
-    "aws.s3.access_key" = "${oss_ak}",
-    "aws.s3.secret_key" = "${oss_sk}",
-    "aws.s3.endpoint" = "${oss_endpoint}");
 
 set time_zone = "Asia/Shanghai";
 
@@ -3419,19 +2866,12 @@ insert into t2 select generate_series, 7, 'STARROCKS' from TABLE(generate_series
 
 select to_file(named_struct('uri', '', 'offset', 0, 'size', 0));
 
-create database test_to_file_${uuid0};
-
 select to_file(named_struct('uri', uri, 'size', file_size - 13)) from input_files where id = 1;
 
 select fl_get_uri(try_to_file(named_struct('uri', 'a', 'offset', -1))) is null;
 
 select id, f is null, fl_get_uri(f), hex(fl_get_inline(f)), fl_get_offset(f), fl_get_size(f)
 from (select id, try_to_file(named_struct('uri', uri, 'inline', payload, 'offset', file_offset, 'size', file_size)) f from input_files) t order by id;
-
-select fl_get_uri(f) like 'http%', fl_get_uri(f) like '%X-Amz-Signature=%', fl_get_uri(f) like '%X-Amz-Expires=3600%', fl_get_offset(f), fl_get_size(f), fl_get_content_type(f), fl_get_checksum(f), fl_get_inline(f) is null
-from (select get_presigned_file('presign_${uuid0}', to_file(named_struct('uri', 's3://${oss_bucket}/dir/a.png', 'offset', 0, 'size', 12, 'content_type', 'image/png', 'checksum', 'opaque'))) f) t;
-
-select count(*) from media where fl_get_uri(get_presigned_file('presign_${uuid0}', try_to_file(named_struct('uri', uri)))) like '%X-Amz-Signature=%';
 
 -- name: test_hll_deserialize_sparse_oob @sequential
 -- Regression: hll_deserialize() deserializes user-supplied bytes directly. A SPARSE
@@ -3453,10 +2893,6 @@ select __iceberg_transform_bucket(i32, 8) from t0;
 select materialize(cast(2.5 as double));
 
 select materialize(cast(null as int));
-
--- name: test_materialize_on_table
--- Test materialize() against table columns (predicate / select / aggregate)
-create database test_db_${uuid0};
 
 select sum(materialize(c1)), count(materialize(c2)) from t1;
 
@@ -3588,27 +3024,11 @@ insert into test_uv values('2024-01-01', 1, hll_hash(10));
 
 set always_collect_low_card_dict_on_lake = true;
 
-insert into dict_version_test_${uuid0} values (3, '3');
-
-insert into dict_version_test_${uuid0} values (10, '10');
-
 select c1, cast (c2 as int) as name from t_low;
 
 -- name: test_global_dict_on_lake
 
 set low_cardinality_optimize_on_lake = true;
-
-insert into low_card_test_${uuid0} values (6, '6', ['4', '5', '6']);
-
-create external catalog ice_test_${uuid0}
-properties
-(
-    "type" = "iceberg",
-    "iceberg.catalog.type" = "hive",
-    "hive.metastore.uris" = "${iceberg_catalog_hive_metastore_uris}"
-);
-
-insert into low_card_test_${uuid0} values (5, '5', '2020-01-02');
 
 INSERT INTO lc_union_partial VALUES (1, 'b', 'y');
 
@@ -3711,10 +3131,6 @@ PROPERTIES('replication_num' = '1');
 INSERT INTO multi_column_table VALUES (1, 'b', 'y');
 
 insert into allstringx values (4096, 'S1');
-
-create database if not exists hive_dict_conjuncts_${uuid0}.hive_test_db_${uuid0};
-
-drop catalog hive_dict_conjuncts_${uuid0};
 
 insert into td values (1, 10), (2, 20), (3, 30);
 
@@ -3902,35 +3318,9 @@ with
     t2 as (select * from t0)
 select count(*) from (select count(1) from t2 join [bucket] t1 using(k1) group by k1) tb;
 
--- Q-3: the type property is immutable
-ALTER GROUP PROVIDER gp_unix_${uuid0} SET ("type" = "file");
-
--- Q-9: ALTER validates the new configuration synchronously, so a provider whose directory cannot be
--- reached fails the statement instead of silently serving no groups.
-ALTER GROUP PROVIDER gp_ldap_${uuid0} SET ("ldap_bind_root_pwd" = "sql_test_rotated_secret");
-
 set cbo_push_down_groupingset = true;
 
-create table gs_casc_deep_2_${uuid0} properties("replication_num"="1") as
-select k1, k2, k3, k4, k5, count(*) c_star, count(v_big) c_big
-from gs_cascade_src_${uuid0} group by rollup(k1, k2, k3, k4, k5);
-
-create table gs_casc_deep_4_${uuid0} properties("replication_num"="1") as
-select k1, k2, k3, k4, k5, avg(v_big) a_big, count(*) c_star
-from gs_cascade_src_${uuid0} group by rollup(k1, k2, k3, k4, k5) having avg(v_big) > 20;
-
-create table gs_casc_off_6_${uuid0} properties("replication_num"="1") as
-select k1, k2, k3, k4, k5, sum(v_big) s_big, max(v_int) mx
-from gs_cascade_src_${uuid0} group by rollup(k1, k2, k3, k4, k5)
-having sum(v_big) > 20 and (k4 is null or k5 is null);
-
 set cbo_push_down_groupingset_cascade_level = 5;
-
-drop table gs_casc_deep_7_${uuid0};
-
-drop table gs_casc_off_4_${uuid0};
-
-INSERT INTO t_gs_join_r_${uuid0} VALUES (1, 10, 1000), (2, 10, 2000), (2, 30, 3000);
 
 -- ---------------------------------------------------------------------------
 -- 1. AVG / COUNT / mixed aggregates over ROLLUP.
@@ -3946,19 +3336,6 @@ set cbo_push_down_groupingset = false;
 --    aggregate that no longer exists as a CTE output column.
 -- ---------------------------------------------------------------------------
 set cbo_push_down_groupingset = false;
-
--- ---------------------------------------------------------------------------
--- 5. AVG over the full range of DECIMAL widths. avg(decimal) is decomposed into sum/count and put back
---    together by a DIVIDE, and the BE dispatches that DIVIDE on its own decimal width, reading BOTH
---    operands at that width - so the synthesized count operand has to be cast to a matching width.
---    Getting that wrong does not fail: it reinterprets the column and silently returns 0 for every row,
---    which no plan assertion can see. DECIMAL256 (precision > 38) is the case that actually regressed.
--- ---------------------------------------------------------------------------
-drop table if exists gs_dec_src_${uuid0};
-
-drop table gs_dec_on_${uuid0};
-
-drop table gs_res_off_4_${uuid0};
 
 SELECT c0, count(c2) FROM t_struct_gs GROUP BY CUBE(c0) ORDER BY c0;
 
@@ -3991,66 +3368,7 @@ create table t(k int);
 -- name: test_h3_native_api
 SELECT IF(H3_FromGeo(ST_GeogFromText('POINT (0 0)'), 3) = 592035265791393791, 'OK', 'FAIL');
 
-create external catalog hive_analyze_test_${uuid0} PROPERTIES ("type"="hive",
-    "hive.metastore.uris"="${hive_metastore_uris}",
-    "aws.s3.access_key"="${oss_ak}",
-    "aws.s3.secret_key"="${oss_sk}",
-    "aws.s3.endpoint"="${oss_endpoint}"
-);
-
--- only partition column Predicate with runtime filter
-select * from hive_sql_test_${uuid0}.hive_oss_db.hive_oss_par_parquet_snappy where col_date = (select max(col_date) from hive_sql_test_${uuid0}.hive_oss_db.hive_oss_par_parquet_snappy);
-
 -- name: test_hive_table_with_comment
-
-create external catalog hive_catalog_${uuid0} PROPERTIES (
-    "type"="hive",
-    "hive.metastore.uris"="${hive_metastore_uris}",
-    "aws.s3.access_key"="${oss_ak}",
-    "aws.s3.secret_key"="${oss_sk}",
-    "aws.s3.endpoint"="${oss_endpoint}"
-);
-
-select * from hive_test_${uuid0}.hive_oss_db.t_decimal_part where c1=1;
-
-select * from hive_test_${uuid0}.hive_oss_db.t_decimal_part where c2 <= 2.5;
-
-select * from hive_test_${uuid0}.hive_oss_db.t_float_part;
-
-select * from hive_test_${uuid0}.hive_oss_db.t_float_part where c2 > 1.5;
-
-select * from hive_test_${uuid0}.hive_oss_db.t_float_part where c2 is NULL;
-
-select * from hive_test_${uuid0}.hive_oss_db.t_double_part where c2 >= 1.5;
-
-select * from hive_test_${uuid0}.hive_oss_db.t_double_part where c2 in (1.4, 2.4, 3.3);
-
-select * from hive_test_${uuid0}.hive_oss_db.t_decimal_part2 where c2 >=2;
-
-select * from hive_test_${uuid0}.hive_oss_db.t_decimal_part2 where c2 in (1, 2);
-
-insert into hive_preimage_${uuid0}.hive_db_${uuid0}.t1 values (1, '2023-12-31'), (2, '2024-01-01'), (3, '2024-06-15'), (4, '2024-12-31'), (5, '2025-01-01');
-
-drop catalog hive_preimage_${uuid0};
-
-create materialized view mv1
-PARTITION BY (str2date(`k3`, '%Y-%m-%d'))
-DISTRIBUTED BY HASH(k1, k2) BUCKETS 5  as select * from hive_mv_test_${uuid0}.hive_db_${uuid0}.t1 where k2 in (2, 3);
-
-insert into hive_sink_test_${uuid0}.hive_db_${uuid0}.t1 values(1);
-
-insert overwrite hive_sink_test_${uuid0}.hive_db_${uuid0}.t2 values(1, 1);
-
--- Source: low cardinality (-> dictionary encoded) BIGINT with ~95% scattered NULLs
--- (-> sparse branch of the dict decoder, the path that left null slots uninitialized).
-create table src_${uuid0} (val_col bigint) properties ("file_format" = "parquet");
-
-drop table src_${uuid0} force;
-
-create table t01 as select * from hive_sql_test_${uuid0}.hive_oss_db.string_par_with_null_orc order by id;
-
-insert into t03_${uuid0}
-select * from hive_sql_test_${uuid0}.hive_oss_db.hive_oss_par_parquet_snappy;
 
 CREATE TABLE struct_index (
 date varchar(1048576) NULL COMMENT "",
@@ -4059,28 +3377,11 @@ input struct<`index` bigint(20), value double> NULL COMMENT "",
 outputs array<struct<`index` bigint(20), value double>> NULL COMMENT ""
 );
 
-select count(*) from hive_catalog_${uuid0}.hive_oss_db.t_openx_json;
-
-insert into hive_truncate_${uuid0}.hive_db_${uuid0}.hive_tbl1_${uuid0} values (1),(2),(3);
-
-drop table hive_truncate_${uuid0}.hive_db_${uuid0}.hive_tbl2_${uuid0} force;
-
-select * from hive_truncate_${uuid0}.hive_db_${uuid0}.hive_tbl_par${uuid0} order by k1;
-
 -- name: testHiveView
-
-create external catalog hive_sql_test_${uuid0} PROPERTIES ("type"="hive",
-    "hive.metastore.uris"="${hive_metastore_uris}",
-    "aws.s3.access_key"="${oss_ak}",
-    "aws.s3.secret_key"="${oss_sk}",
-    "aws.s3.endpoint"="${oss_endpoint}"
-);
 
 select id from t1 order by id;
 
 -- name: test_write_csv_array
-
-create external catalog hive_sink_test_${uuid0} PROPERTIES ("type"="hive", "hive.metastore.uris"="${hive_metastore_uris}");
 
 drop table t2 force;
 
@@ -4140,78 +3441,10 @@ SELECT json_query(http_request(
     timeout_ms => -1000
 ), '$.status') as status;
 
--- name: test_http_output_correct @native
-use ${db[0]};
-
--- name: test_http_output_map_struct
-use ${db[0]};
-
-select distinct entity_type_id from iceberg_${uuid0}.iceberg_oss_db.entity order by entity_type_id;
-
-create table hive_add_eq_del_${uuid0}.add_eq_del_db_${uuid0}.hive_part_deletes(
-    id int,
-    p string
-) partition by(p) properties ("location" = "oss://${oss_bucket}/add_eq_del_db_${uuid0}/hive_part_deletes");
-
-insert into hive_add_eq_del_${uuid0}.add_eq_del_db_${uuid0}.hive_unpart_deletes values (2), (3);
-
--- the equality column must exist in the table
-alter table iceberg_add_eq_del_${uuid0}.add_eq_del_db_${uuid0}.ice_unpart execute add_equality_delete_files(location="oss://${oss_bucket}/add_eq_del_db_${uuid0}/hive_unpart_deletes", file_format="parquet", equality_columns="no_such");
-
-drop catalog hive_add_eq_del_${uuid0};
-
-select * from iceberg_add_files_${uuid0}.iceberg_add_files_db_${uuid0}.iceberg_par_tinyint order by c_tinyint;
-
-drop table iceberg_add_files_${uuid0}.iceberg_add_files_db_${uuid0}.iceberg_par_date force;
-
-drop table hive_add_files_${uuid0}.iceberg_add_files_db_${uuid0}.hive_par_date_string force;
-
-create table iceberg_add_files_${uuid0}.iceberg_add_files_db_${uuid0}.iceberg_par_date_month(
-    c_smallint smallint,
-    c_int int,
-    c_date date
-) partition by month(c_date);
-
-select * from iceberg_add_files_${uuid0}.iceberg_add_files_db_${uuid0}.iceberg_unpar;
-
-alter table iceberg_add_files_${uuid0}.iceberg_add_files_db_${uuid0}.iceberg_unpar execute add_files (location = "oss://${oss_bucket}/iceberg_add_files_db_${uuid0}/hive_par_date/c_date=2020-01-02/", file_format="parquet");
-
-drop database iceberg_add_files_${uuid0}.iceberg_add_files_db_${uuid0};
-
-alter table iceberg_add_files_${uuid0}.iceberg_add_files_db_${uuid0}.iceberg_par_date execute add_files(source_table="hive_add_files_${uuid0}.iceberg_add_files_db_${uuid0}.hive_par_date") where c_date>='2020-01-03';
-
--- test partitioned iceberg with partition pruning
-create table hive_add_files_${uuid0}.iceberg_add_files_db_${uuid0}.hive_par_date(
-    c_smallint smallint,
-    c_int int,
-    c_date date
-) partition by(c_date) properties ("location" = "oss://${oss_bucket}/iceberg_add_files_db_${uuid0}/hive_par_date");
-
-drop table if exists hive_add_files_${uuid0}.iceberg_add_files_db_${uuid0}.hive_par_date_string force;
-
-alter table iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.ice_tbl_${uuid0}
-add column col2 string null comment 'col2' after id;
-
-alter table iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.new_ice_tbl_${uuid0}
-set ('file_format'='orc');
-
 insert into test_part_evo values (4, 'data4', '2023-01-04', 400);
-
-drop database iceberg_sql_test_${uuid0}.iceberg_db_${uuid0};
 
 -- ############### bucket-aware OFF: ground-truth reference ###############
 set enable_bucket_aware_execution_on_lake = false;
-
--- #### bucket shuffle join
-select count(a.trip_distance), count(*), sum(a.trip_distance) from iceberg_sql_test_${uuid0}.iceberg_bucket_db.taxis_1bucket_big a join [BUCKET] iceberg_sql_test_${uuid0}.iceberg_bucket_db.taxis_no_bucket b on a.trip_id = b.trip_id;
-
-select sum(trip_distance), vendor_id from iceberg_sql_test_${uuid0}.iceberg_bucket_db.taxis_2bucket_1 group by vendor_id order by 1 desc, 2 limit 3;
-
--- #### bucket num not match
-select count(a.trip_distance), count(*), sum(a.trip_distance) from iceberg_sql_test_${uuid0}.iceberg_bucket_db.taxis_1bucket_1 a join iceberg_sql_test_${uuid0}.iceberg_bucket_db.taxis_bucket_not_match b on a.trip_id = b.trip_id;
-
--- ## string type
-select count(a.trip_distance), count(*), sum(a.trip_distance) from iceberg_sql_test_${uuid0}.iceberg_bucket_db.taxis_1bucket_string_1 a join [colocate] iceberg_sql_test_${uuid0}.iceberg_bucket_db.taxis_1bucket_string_2 b on a.trip_id = b.trip_id;
 
 create table t3 (id bigint, k bigint, d date) partition by month(d), bucket(id, 4);
 
@@ -4222,38 +3455,10 @@ select count(*) from (select id, id as a from t3 except select id, id as a from 
 
 set pipeline_dop = 0;
 
-drop catalog iceberg_cast_predicate_${uuid0};
-
-use ice_db_${uuid0};
-
-drop catalog `iceberg_cred_mask_${uuid0}`;
-
-select * from ice_cat_${uuid0}.ice_db_${uuid0}.ice_tbl_${uuid0} where col_datetime = '2024-01-29 01:00:00';
-
-insert into iceberg_collect_stats_${uuid0}.iceberg_collect_stats_db_${uuid0}.t1 values(1, 2, '2022-01-01', 10.23);
-
-insert into iceberg_collect_stats_${uuid0}.iceberg_collect_stats_db_${uuid0}.t3 values('2022-01-01', '2022-01-01' ,'2022-01-01', '2022-01-01 12:13:14'), ('2022-01-02', '2022-01-02' ,'2022-01-01', '2022-01-01 12:15:14'), ('2022-01-03', '2022-01-03' ,'2022-01-01', '2022-01-01 12:17:14');
-
-insert into iceberg_collect_stats_${uuid0}.iceberg_collect_stats_db_${uuid0}.t5 values('abc'), ('edf');
-
-drop database iceberg_collect_stats_${uuid0}.iceberg_collect_stats_db_${uuid0};
-
 -- ============================================================
 -- Case 2: SELECT c1, c3
 -- ============================================================
 select c1, c3 from t_col_proj order by c1;
-
-create database iceberg_del_edge_${uuid0}.db_${uuid0};
-
-insert into hive_del_edge_${uuid0}.hdb_${uuid0}.groups_t_by_id_k values (1, 10), (2, 20);
-
--- a later {id, k} delete hits only the later row r7 (r1 is already gone)
-create table hive_del_edge_${uuid0}.hdb_${uuid0}.groups_t_by_id_k2(
-    id int,
-    k int
-) properties ("location" = "oss://${oss_bucket}/del_edge_${uuid0}/groups_t_by_id_k2");
-
-insert into hive_del_edge_${uuid0}.hdb_${uuid0}.groups_part_t_by_id values (1, 'a');
 
 -- 3. renaming an equality key column: deletes match by field id, so a delete written before the rename still
 -- applies after it, and a new delete can name the column by its new name. The first delete file is written by the
@@ -4263,8 +3468,6 @@ create table rename_t(
     id int,
     v string
 ) properties ("format-version" = "2");
-
-alter table rename_t execute add_equality_delete_files(location="oss://${oss_bucket}/del_edge_${uuid0}/rename_t_deletes2", file_format="parquet", equality_columns="id2");
 
 -- expected: (2, b) (3, c)
 select * from promote_t order by id;
@@ -4281,233 +3484,36 @@ select content, count(*) from compact_v2_t$files where content != 0 group by con
 -- expected: a1new b3
 select * from compact_v2_t order by v;
 
-drop table hive_del_edge_${uuid0}.hdb_${uuid0}.groups_t_by_id_k force;
-
-drop table hive_del_edge_${uuid0}.hdb_${uuid0}.compact_v2_t_deletes force;
-
 -- ================================================
 -- SECTION 1: BASIC TRANSFORM PARTITION TESTS
 -- ================================================
-
--- Test 1.1: Transform partition table - bucket
-create table iceberg_del_trf_${uuid0}.iceberg_delete_db_${uuid0}.test_transform_bucket (
-    id INT,
-    name STRING,
-    amount DECIMAL(10,2),
-    category STRING
-) 
-PARTITION BY bucket(category, 4);
-
--- Delete from truncate transform table
-DELETE FROM iceberg_del_trf_${uuid0}.iceberg_delete_db_${uuid0}.test_transform_truncate WHERE sku LIKE 'SKU00%';
-
--- Insert test data into month transform table
-INSERT INTO iceberg_del_trf_${uuid0}.iceberg_delete_db_${uuid0}.test_transform_month VALUES
-    (1, 'OrderA', 100.00, '2023-01-10'),
-    (2, 'OrderB', 200.00, '2023-01-20'),
-    (3, 'OrderC', 150.00, '2023-02-15'),
-    (4, 'OrderD', 300.00, '2023-03-05'),
-    (5, 'OrderE', 250.00, '2023-02-28');
-
--- Verify deletion from day transform table
-SELECT * FROM iceberg_del_trf_${uuid0}.iceberg_delete_db_${uuid0}.test_transform_day ORDER BY created_time, id;
-
--- Verify initial data in year+month transform table
-SELECT * FROM iceberg_del_trf_${uuid0}.iceberg_delete_db_${uuid0}.test_transform_year_month ORDER BY order_date, id;
 
 -- ================================================
 -- SECTION 4: ADVANCED DELETE OPERATIONS
 -- ================================================
 
--- Test 4.1: Delete with complex conditions on transformed partitions
-INSERT INTO iceberg_del_trf_${uuid0}.iceberg_delete_db_${uuid0}.test_transform_year_month VALUES
-    (6, 'TransF', 180.00, '2024-01-15', '2024-01-20'),
-    (7, 'TransG', 220.00, '2024-02-10', '2024-02-15'),
-    (8, 'TransH', 190.00, '2024-01-20', '2024-01-25');
-
-SELECT * FROM iceberg_del_trf_${uuid0}.iceberg_delete_db_${uuid0}.test_transform_month ORDER BY order_date, id;
-
-drop table iceberg_del_trf_${uuid0}.iceberg_delete_db_${uuid0}.test_transform_day force;
-
 -- ================================================
 -- SECTION 1: SINGLE PARTITION COLUMN TESTS
 -- ================================================
 
--- Test 1.1: DATE partition column
-create table iceberg_del_part_${uuid0}.iceberg_delete_db_${uuid0}.test_partitioned_date (
-    id INT,
-    name STRING,
-    amount DECIMAL(10,2),
-    date_key DATE
-) 
-PARTITION BY (date_key);
-
--- Test 1.3: String partition column
-create table iceberg_del_part_${uuid0}.iceberg_delete_db_${uuid0}.test_partitioned_string (
-    id INT,
-    product_name STRING,
-    price DECIMAL(10,2),
-    region VARCHAR(50)
-) 
-PARTITION BY (region);
-
 -- ================================================
 -- SECTION 2: MULTI-PARTITION COLUMN TESTS
 -- ================================================
-
--- Test 2.1: Two DATE + STRING partition columns
-create table iceberg_del_part_${uuid0}.iceberg_delete_db_${uuid0}.test_partitioned_multi (
-    id INT,
-    name STRING,
-    amount DECIMAL(10,2),
-    date_key DATE,
-    category STRING
-) 
-PARTITION BY (date_key, category);
-
--- Test 2.3: Three partition columns (mixed types)
-create table iceberg_del_part_${uuid0}.iceberg_delete_db_${uuid0}.test_partitioned_complex (
-    id INT,
-    name STRING,
-    amount DECIMAL(10,2),
-    created_date DATE,
-    year_id INT,
-    quarter_id INT,
-    region STRING
-) 
-PARTITION BY (year_id, quarter_id, region);
-
-SELECT * FROM iceberg_del_part_${uuid0}.iceberg_delete_db_${uuid0}.test_partitioned_complex WHERE year_id = 2023 AND quarter_id = 1 ORDER BY region, id;
-
-INSERT INTO iceberg_del_part_${uuid0}.iceberg_delete_db_${uuid0}.test_partitioned_with_null VALUES
-    (1, 'ItemA', 100.00, 'Electronics'),
-    (2, 'ItemB', 200.00, NULL),
-    (3, 'ItemC', 150.00, 'Clothing');
-
-drop table iceberg_del_part_${uuid0}.iceberg_delete_db_${uuid0}.test_partitioned_num_multi force;
-
--- Insert test data into non-partitioned table
-INSERT INTO iceberg_del_unp_${uuid0}.iceberg_delete_db_${uuid0}.test_non_partitioned VALUES
-    (1, 'Alice', 25, 50000),
-    (2, 'Bob', 30, 60000),
-    (3, 'Charlie', 35, 70000),
-    (4, 'David', 28, 55000),
-    (5, 'Eve', 32, 65000);
-
--- Test DELETE with NULL values
-INSERT INTO iceberg_del_unp_${uuid0}.iceberg_delete_db_${uuid0}.test_non_partitioned VALUES
-    (9, NULL, 45, 90000),
-    (10, 'Iris', NULL, 75000);
-
--- Test DELETE with comparison operators
-INSERT INTO iceberg_del_unp_${uuid0}.iceberg_delete_db_${uuid0}.test_non_partitioned VALUES
-    (15, 'Nora', 33, 67000),
-    (16, 'Oscar', 26, 53000),
-    (17, 'Paul', 34, 71000);
-
--- Test DELETE with no matching records
-INSERT INTO iceberg_del_unp_${uuid0}.iceberg_delete_db_${uuid0}.test_non_partitioned VALUES
-    (27, 'Wendy', 31, 63000);
-
-DELETE FROM iceberg_del_unp_${uuid0}.iceberg_delete_db_${uuid0}.test_non_partitioned 
-WHERE EXISTS (SELECT id FROM iceberg_del_unp_${uuid0}.iceberg_delete_db_${uuid0}.temp_ids WHERE temp_ids.id = test_non_partitioned.id);
 
 set new_planner_optimize_timeout=30000;
 
 -- 1. USING deletes a row matched several times once; no USING match deletes nothing, even with a partition predicate
 delete from t using k where t.p = 1 and k.k = 999;
 
-drop catalog iceberg_dml_${uuid0};
-
-select name from iceberg_enc_hive_${uuid0}.iceberg_enc_db_${uuid0}.enc_t where id = 2;
-
--- name: test_iceberg_encryption_unsupported_catalog
--- A Hadoop catalog has no Iceberg encryption manager, so a table that declares encryption.key-id on it can
--- be neither written nor read: StarRocks refuses rather than write plaintext or read without a key. The
--- table is also format version 3, which is where row-level DELETE is refused.
-create external catalog iceberg_enc_unsupported_${uuid0}
-PROPERTIES ("type"="iceberg", "iceberg.catalog.type"="hadoop", "iceberg.catalog.warehouse"="oss://${oss_bucket}/test_iceberg_encryption_unsupported_catalog/${uuid0}/warehouse/");
-
 insert into enc_t values (4, 'a');
 
-create table hive_eq_scope_${uuid0}.eq_scope_db_${uuid0}.by_id_deletes(
-    id int,
-    p string
-) partition by(p) properties ("location" = "oss://${oss_bucket}/eq_scope_db_${uuid0}/by_id_deletes");
-
 set enable_iceberg_eq_delete_runtime_filter_pruning = true;
-
-insert into iceberg_eq_scope_${uuid0}.eq_scope_db_${uuid0}.mixed values (1, 'a1', 'a'), (2, 'a2', 'a'), (1, 'b1', 'b'), (2, 'b2', 'b');
-
--- deletes under two specs are read (and can be added) by default
-alter table iceberg_eq_scope_${uuid0}.eq_scope_db_${uuid0}.mixed execute add_equality_delete_files(location="oss://${oss_bucket}/eq_scope_db_${uuid0}/mixed_part_deletes", file_format="parquet", equality_columns="id");
-
-create table hive_eq_scope_${uuid0}.eq_scope_db_${uuid0}.global_key_deletes(
-    id int
-) properties ("location" = "oss://${oss_bucket}/eq_scope_db_${uuid0}/global_key_deletes");
-
-insert into iceberg_eq_scope_${uuid0}.eq_scope_db_${uuid0}.two_keys values (null, 20, 'x'), (1, 10, 'x'), (2, 30, 'x'), (3, 40, 'x');
-
-drop table iceberg_eq_scope_${uuid0}.eq_scope_db_${uuid0}.two_keys force;
-
-drop table hive_eq_scope_${uuid0}.eq_scope_db_${uuid0}.mixed_global_deletes force;
 
 -- name: test_iceberg_eq_delete_rf_pruning
 -- A runtime filter on an identity partition column skips the equality delete files of the partitions it rejects.
 -- The delete files are written by hive tables and registered with add_equality_delete_files.
 
-create external catalog iceberg_eq_rf_${uuid0} PROPERTIES ("type"="iceberg",
-    "iceberg.catalog.type"="hive",
-    "iceberg.catalog.hive.metastore.uris"="${iceberg_catalog_hive_metastore_uris}",
-    "aws.s3.access_key" = "${oss_ak}",
-    "aws.s3.secret_key" = "${oss_sk}",
-    "aws.s3.endpoint" = "${oss_endpoint}"
-);
-
-insert into iceberg_eq_rf_${uuid0}.eq_rf_db_${uuid0}.fact values (1, 'a1', 1), (2, 'a2', 1), (1, 'b1', 2), (2, 'b2', 2), (1, 'c1', 3), (2, 'c2', 3);
-
-select f.* from iceberg_eq_rf_${uuid0}.eq_rf_db_${uuid0}.fact f join dim_p d on f.p = d.p order by f.id;
-
-select f.* from iceberg_eq_rf_${uuid0}.eq_rf_db_${uuid0}.fact f left join dim_p d on f.p = d.p order by f.p, f.id;
-
-insert into hive_eq_rf_${uuid0}.eq_rf_db_${uuid0}.fact_null_deletes values (NULL, 1), (2, 2);
-
--- the string 'null' is a partition value of its own, apart from the NULL partition
-insert into iceberg_eq_rf_${uuid0}.eq_rf_db_${uuid0}.fact_dt values (1, 'a1', '2024-01-01'), (2, 'a2', '2024-01-01'), (1, 'b1', '2024-01-02'), (2, 'b2', '2024-01-02'), (3, 'n1', 'null'), (3, 'n2', NULL);
-
--- a global delete (unpartitioned spec) next to a partitioned one: no delete-side value for p, so nothing is pruned
-create table iceberg_eq_rf_${uuid0}.eq_rf_db_${uuid0}.mixed(
-    id int,
-    v string,
-    p int
-) partition by(p) properties ("format-version" = "2");
-
-insert into hive_eq_rf_${uuid0}.eq_rf_db_${uuid0}.mixed_part_deletes values (2, 1);
-
-create table hive_eq_rf_${uuid0}.eq_rf_db_${uuid0}.migrated_deletes(
-    id int,
-    p int
-) partition by(p) properties ("location" = "oss://${oss_bucket}/eq_rf_db_${uuid0}/migrated_deletes");
-
 -- a DML target keeps every delete
-
-delete from iceberg_eq_rf_${uuid0}.eq_rf_db_${uuid0}.fact where p in (select p from db_${uuid0}.dim_p) and v = 'a2';
-
-drop table hive_eq_rf_${uuid0}.eq_rf_db_${uuid0}.fact_null_deletes force;
-
-drop catalog hive_eq_rf_${uuid0};
-
--- name: testIcebergEqDeleteTableWithStats
-create external catalog iceberg_sql_test_${uuid0} PROPERTIES ("type"="iceberg", "iceberg.catalog.type"="hive", "iceberg.catalog.hive.metastore.uris"="${iceberg_catalog_hive_metastore_uris}","enable_iceberg_metadata_cache"="true","enable_get_stats_from_external_metadata"="true","aws.s3.access_key" = "${oss_ak}","aws.s3.secret_key" = "${oss_sk}","aws.s3.endpoint" = "${oss_endpoint}");
-
-drop table iceberg_eqnull_${uuid0}.eq_delete_db_${uuid0}.eq_del_convert;
-
-insert into iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.ice_tbl_${uuid0} select 4;
-
-select count(distinct _file) from iceberg_sql_test_${uuid0}.iceberg_oss_db.entity;
-
--- Test combination of _file and _pos
-select entity_id,_file, _pos from iceberg_sql_test_${uuid0}.iceberg_oss_db.entity where entity_id = 'e_635571';
 
 alter table t drop partition column day(ts);
 
@@ -4524,177 +3530,28 @@ select CAST(regexp_extract(get_query_profile(last_query_id()), 'StatisticsSucces
 
 -- name: test_iceberg_global_shuffle_transform
 
-
-create external catalog iceberg_shuffle_${uuid0} PROPERTIES (
-    "type" = "iceberg", 
-    "iceberg.catalog.type" = "hadoop", 
-    "iceberg.catalog.warehouse" = "oss://${oss_bucket}/test_catalog/test_iceberg_global_shuffle_transform/${uuid0}",
-    "aws.s3.access_key" = "${oss_ak}",
-    "aws.s3.secret_key" = "${oss_sk}",
-    "aws.s3.endpoint" = "${oss_endpoint}"
-);
-
-select * from iceberg_shuffle_${uuid0}.iceberg_shuffle_db_${uuid0}.year_partition order by event_date;
-
-insert into iceberg_shuffle_${uuid0}.iceberg_shuffle_db_${uuid0}.hour_partition values 
-    (datetime '2023-01-15 10:30:00', 'a'), 
-    (datetime '2023-01-15 11:45:00', 'b'), 
-    (datetime '2023-01-15 10:00:00', 'c');
-
 -- test with connector_sink_shuffle_mode = auto
 set connector_sink_shuffle_mode = 'auto';
 
-select * from iceberg_shuffle_${uuid0}.iceberg_shuffle_db_${uuid0}.bucket_partition where id >= 10 order by id;
-
-drop table iceberg_shuffle_${uuid0}.iceberg_shuffle_db_${uuid0}.multi_transform_partition force;
-
-drop table ice_hadoop${uuid0}.ice_hadoop_db${uuid0}.test;
-
-select * from ice_hadoop${uuid0}.ice_hadoop_db${uuid0}.member;
-
--- name: test_iceberg_in_list_predicate
-create external catalog ice_cat_${uuid0}
-properties
-(
-    "type" = "iceberg",
-    "iceberg.catalog.type" = "hive",
-    "hive.metastore.uris" = "${iceberg_catalog_hive_metastore_uris}"
-);
-
-select col_str from ice_tbl_${uuid0} where col_int=2000 and col_str in ('1d8cf2a2c0e14fa89d8117792be6eb6f', md5('abc'));
-
-insert into iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.ice_tbl_${uuid0} values (4, 'zzz4');
-
-select id, s from iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.ice_tbl_${uuid0} where concat(s, '') like 'star\\%' order by id;
-
-select count(1) from iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.ice_tbl_${uuid0}$logical_iceberg_metadata where column_stats is null;
-
--- ================================================
--- Test 1: WHEN MATCHED THEN UPDATE only
--- ================================================
-MERGE INTO iceberg_merge_unp_${uuid0}.iceberg_merge_db_${uuid0}.t_merge AS t
-USING (SELECT 3 AS id, 'UPDATED' AS name, 35 AS age, 75000 AS salary) AS s
-ON t.id = s.id
-WHEN MATCHED THEN UPDATE SET name = s.name, salary = s.salary;
-
-MERGE INTO iceberg_merge_unp_${uuid0}.iceberg_merge_db_${uuid0}.t_merge AS t
-USING (
-    SELECT 30 AS id, 'D' AS op
-    UNION ALL
-    SELECT 31 AS id, 'U' AS op
-) AS s
-ON t.id = s.id
-WHEN MATCHED AND s.op = 'D' THEN DELETE
-WHEN MATCHED AND s.op = 'U' THEN UPDATE SET salary = 95000;
-
 set hash_join_interpolate_passthrough = true;
 
-drop table default_catalog.olap_merge_db_${uuid0}.t_olap force;
-
 -- name: test_iceberg_merge_into_partitioned
-
-create external catalog iceberg_merge_part_${uuid0}
-PROPERTIES ( "type"  =  "iceberg",
-    "iceberg.catalog.type"  =  "hive",
-    "iceberg.catalog.hive.metastore.uris"="${hive_metastore_uris}",
-    "aws.s3.access_key"  =  "${oss_ak}",
-    "aws.s3.secret_key"  =  "${oss_sk}",
-    "aws.s3.endpoint"  =  "${oss_endpoint}",
-    "enable_iceberg_metadata_cache"="false");
-
--- ================================================
--- Test P4: MERGE — update + insert combined on partitioned table
--- ================================================
-MERGE INTO iceberg_merge_part_${uuid0}.iceberg_merge_part_db_${uuid0}.orders AS t
-USING (
-    SELECT 3 AS id, 'Widget' AS product, 165.00 AS amount, 'DELIVERED' AS status, DATE '2024-01-02' AS order_date
-    UNION ALL
-    SELECT 7 AS id, 'Sprocket' AS product, 75.00 AS amount, 'PENDING' AS status, DATE '2024-01-05' AS order_date
-) AS s
-ON t.id = s.id
-WHEN MATCHED THEN UPDATE SET status = s.status, amount = s.amount
-WHEN NOT MATCHED THEN INSERT (id, product, amount, status, order_date)
-    VALUES (s.id, s.product, s.amount, s.status, s.order_date);
-
-insert overwrite iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.ice_tbl_${uuid0}(c_tinyint,c_string,c_date,c_smallint) values(1+100, concat('overwrite old partition', ' yeah~'),cast('2000-01-01' + interval '1' day as date),10-10),(2+100,'generate new partition','2000-01-02',1),(3+100,'generate new partition','2022-02-02',100/10);
 
 select c1 from t1 where _file = 'nonexistent' order by c1;
 
 insert into t2 values (4, 2), (5, 3);
 
--- Create database
-create database iceberg_meta_del_${uuid0}.iceberg_meta_db_${uuid0}
-properties ("location" = "oss://${oss_bucket}/test_metadata_delete/${uuid0}/db");
-
 -- Delete with dt = '2023-01-03' or region = 'West' - should trigger metadata delete optimization
 -- because all data is in dt='2023-01-03' partition, which matches the first part of the OR condition
-
-
--- Execute delete
-delete from iceberg_meta_del_${uuid0}.iceberg_meta_db_${uuid0}.test_partitioned where dt = '2023-01-03' or region = 'West';
-
--- Execute delete
-delete from iceberg_meta_del_${uuid0}.iceberg_meta_db_${uuid0}.test_partitioned where dt is null;
 
 -- Delete with id > 50 - should trigger metadata delete optimization
 -- because file statistics will show that all rows in the files have id > 50
 
-
--- Execute delete
-delete from iceberg_meta_del_${uuid0}.iceberg_meta_db_${uuid0}.test_partitioned where id > 50;
-
--- Cleanup
-drop table iceberg_meta_del_${uuid0}.iceberg_meta_db_${uuid0}.test_partitioned force;
-
--- Verify data
-select * from iceberg_transform_${uuid0}.iceberg_transform_db_${uuid0}.test_year_transform order by id;
-
 -- Test 3.2: Delete with date condition on month-transformed column
-
-
--- Execute delete
-delete from iceberg_transform_${uuid0}.iceberg_transform_db_${uuid0}.test_month_transform where event_date = '2023-02-10';
-
--- Cleanup day transform table
-drop table iceberg_transform_${uuid0}.iceberg_transform_db_${uuid0}.test_day_transform force;
 
 -- ====================================================
 -- SECTION 6: Truncate Transform Partition Tests
 -- ====================================================
-
--- Create table with truncate transform partition
-create table iceberg_transform_${uuid0}.iceberg_transform_db_${uuid0}.test_truncate_transform (
-    id INT,
-    name STRING,
-    code STRING
-)
-PARTITION BY truncate(code, 3);
-
--- Insert test data
-insert into iceberg_transform_${uuid0}.iceberg_transform_db_${uuid0}.test_hour_transform values
-(1, 'Hour10', '2023-01-01 10:30:00'),
-(2, 'Hour10b', '2023-01-01 10:45:00'),
-(3, 'Hour14', '2023-01-01 14:00:00'),
-(4, 'Hour14b', '2023-01-01 14:30:00'),
-(5, 'Hour18', '2023-01-01 18:00:00');
-
--- Verify data
-select * from iceberg_transform_${uuid0}.iceberg_transform_db_${uuid0}.test_mixed_transform order by id;
-
--- Create database
-create database iceberg_unpart_${uuid0}.iceberg_unpart_db_${uuid0}
-properties ("location" = "oss://${oss_bucket}/test_unpart_delete/${uuid0}/db");
-
--- Test 2.4: Delete with string column condition
--- Re-insert data first
-insert into iceberg_unpart_${uuid0}.iceberg_unpart_db_${uuid0}.test_unpartitioned values
-(7, 'Grace', 'Electronics', 120.00),
-(8, 'Henry', 'Clothing', 180.00);
-
--- Query snapshots table to verify operation type and deleted-data-files for METADATA DELETE
-select operation, element_at(summary,'deleted-data-files') as deleted_data_files from iceberg_unpart_${uuid0}.iceberg_unpart_db_${uuid0}.test_unpartitioned$snapshots order by committed_at desc limit 1;
-
-drop catalog iceberg_unpart_${uuid0};
 
 -- the partition values are a struct
 select content, `partition`, record_count from part_t$files order by content, `partition`.p;
@@ -4715,23 +3572,6 @@ set enable_min_max_optimization = true;
 select c_int from ice_tbl_2 order by c_int;
 
 drop table ice_tbl_3 force;
-
-create external catalog hive_nm_${uuid0} PROPERTIES ("type"="hive",
-    "hive.metastore.uris"="${hive_metastore_uris}",
-    "aws.s3.access_key"="${oss_ak}",
-    "aws.s3.secret_key"="${oss_sk}",
-    "aws.s3.endpoint"="${oss_endpoint}"
-);
-
-alter table iceberg_nm_${uuid0}.nm_db_${uuid0}.t rename column c1_a to c1_b;
-
-drop table hive_nm_${uuid0}.nm_db_${uuid0}.src force;
-
-drop table ice_cat_${uuid0}.ice_db_${uuid0}.ice_tbl_${uuid0} force;
-
-select * from iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.ice_tbl_${uuid0} where k2 is null;
-
-drop table iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.ice_ctas_${uuid0} force;
 
 select count(1) from t1 where c_bool != false;
 
@@ -4800,13 +3640,6 @@ select count(1) from t1 where c_datetime in (date_sub('2023-01-01', interval 10 
 
 -- name: test_iceberg_parse_predicates_2 @slow
 
-create external catalog ice_cat_${uuid0}
-properties (
-    "type" = "iceberg",
-    "iceberg.catalog.type" = "hive",
-    "hive.metastore.uris" = "${iceberg_catalog_hive_metastore_uris}"
-);
-
 select count(1) from t1 where c_array_int <=> null;
 
 select count(1) from t1 where c_array_int in ([1000000, 1000000+1, 1000000+2, 1000000+3], [100000, 100000+1, 100000+2, 100000+3], [10, 10+1, 10+2, 10+3]) and c_array_int in ([10, 10+1, 10+2, 10+3], [1000000, 1000000+1, 1000000+2, 1000000+3], [100000, 100000+1, 100000+2, 100000+3], [7, 7+1, 7+2, 7+3], [8, 8+1, 8+2, 8+3], [9, 9+1, 9+2, 9+3]);
@@ -4844,7 +3677,6 @@ CREATE TABLE  test_orders (
 
 -- partitions=4/5
 
-
 SELECT COUNT(*), SUM(amount) FROM test_orders WHERE ts >= '2024-03-01 00:00:00'  AND ts <  '2024-04-01 00:00:00';
 
 INSERT INTO test_users_bucketed VALUES
@@ -4866,90 +3698,13 @@ select *  from (select line from table(unnest(split(get_query_profile(last_query
 
 select * from iceberg_oss_db.bloom_filter_table5 where c2 = 'Alice' and c1 = 2;
 
-alter table iceberg_ref_schema_${uuid0}.ref_schema_db_${uuid0}.t_ref drop column b;
-
-select * from iceberg_ref_schema_${uuid0}.ref_schema_db_${uuid0}.t_ref order by id;
-
-alter table iceberg_ref_schema_${uuid0}.ref_schema_db_${uuid0}.t_eq rename column id to id2;
-
-drop table iceberg_ref_schema_${uuid0}.ref_schema_db_${uuid0}.t_eq force;
-
-call iceberg_sql_test_${uuid0}.system.register_table(database_name="iceberg_db_${uuid0}",table_name="iceberg_register_table", metadata_file="oss://${oss_bucket}/iceberg_ci_db/iceberg_register_table/metadata/00002-c1b32f52-4f2b-42cc-b251-1b2909a52ea6.metadata.json");
-
-call register_table("iceberg_db_${uuid0}", "iceberg_register_table", "oss://${oss_bucket}/iceberg_ci_db/iceberg_register_table/metadata/00002-c1b32f52-4f2b-42cc-b251-1b2909a52ea6.metadata.json");
-
-insert overwrite iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.ice_tbl_${uuid0} SELECT 4;
-
-CREATE TABLE iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.`test_table` (
-    `name` VARCHAR(1048576),
-    `tenant` VARCHAR(1048576),
-    `p_year` INT
-)
-PARTITION BY (`tenant`, `p_year`);
-
-ALTER TABLE iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.`test_table` EXECUTE rewrite_data_files("min_file_size_bytes"= "134217728") where p_year=2025;
-
-set catalog iceberg_rw_del_${uuid0};
-
 -- the ratio picks p=1 only
 alter table v2_t execute rewrite_data_files(min_file_size_bytes = 1);
 
-drop catalog iceberg_rw_del_${uuid0};
-
-insert into iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.ice_tbl_${uuid0} values (2, 2);
-
-select count(1) from iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.ice_tbl_${uuid0} where p = 3;
-
 select id, _row_id from rowid_multi_rg where id in (0, 99, 100, 101, 1499, 1500, 1599, 1600, 2999) order by id;
-
--- Verify _last_updated_sequence_number can be read
-select _last_updated_sequence_number, id, name from iceberg_rl_${uuid0}.iceberg_rl_db_${uuid0}.t_v3 order by _row_id;
-
--- First insert: 3 rows
-insert into iceberg_rl_w_${uuid0}.iceberg_rl_w_db_${uuid0}.t_write values (1, 100), (2, 200), (3, 300);
 
 -- name: test_iceberg_v3_row_lineage_write_insert_select
 -- Test row lineage maintenance during INSERT ... SELECT
-
-
-create external catalog `iceberg_rl_ins_sel_${uuid0}`
-properties (
-"type"  =  "iceberg",
-"iceberg.catalog.type"  =  "hadoop",
-"iceberg.catalog.warehouse"="oss://${oss_bucket}/test_catalog/test_iceberg_row_lineage_ins_sel/${uuid0}",
-"aws.s3.access_key" = "${oss_ak}","aws.s3.secret_key" = "${oss_sk}","aws.s3.endpoint" = "${oss_endpoint}"
-);
-
-drop table iceberg_rl_ins_sel_${uuid0}.iceberg_rl_ins_sel_db_${uuid0}.t_source;
-
-select _row_id, id, value from iceberg_rl_pred_${uuid0}.iceberg_rl_pred_db_${uuid0}.t_pred where _row_id >= 2 order by _row_id;
-
--- V3 table
-create table iceberg_v2v3_${uuid0}.iceberg_v2v3_db_${uuid0}.t_v3 (
-    id int,
-    name string
-) properties (
-    "format-version" = "3"
-);
-
-drop catalog iceberg_v2v3_${uuid0};
-
--- Save pre-compaction _row_id and _last_updated_sequence_number into a snapshot table
-create table iceberg_rl_compact_${uuid0}.iceberg_rl_compact_db_${uuid0}.t_snapshot (
-    id int,
-    name string,
-    row_id_before bigint,
-    seq_num_before bigint
-) properties (
-    "format-version" = "3"
-);
-
--- Verify _last_updated_sequence_number is consistent after compaction (all same seq num)
-select count(distinct _last_updated_sequence_number) from iceberg_rl_compact_${uuid0}.iceberg_rl_compact_db_${uuid0}.t_compact;
-
-drop catalog iceberg_rl_compact_${uuid0};
-
-select * from iceberg_sql_test_${uuid0}.iceberg_oss_db.schema_evo_table order by new_trip_id;
 
 -- 2. Create No-Shredding table and load data
 CREATE TABLE test_noshredding_variant (
@@ -4995,12 +3750,6 @@ WHERE city IN ('city_1', 'city_3')
   AND get_variant_int(data, '$.profile.metrics.views') > 115
 ORDER BY id;
 
-insert into iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.t1 select 2;
-
-create database iceberg_stats_source_${uuid0}.iceberg_stats_source_db_${uuid0} properties (
-    "location" = "oss://${oss_bucket}/iceberg_stats_source_${uuid0}/test_iceberg_stats_source/${uuid0}"
-);
-
 -- name: test_iceberg_string_date_partition_cardinality
 -- description: PR2 — a STRING date partition column compared with a temporal value coerces to
 -- CAST(c2 AS DATETIME) = <ts>. On the manifest-level cardinality path (Path C, column stats off),
@@ -5016,8 +3765,6 @@ create database iceberg_stats_source_${uuid0}.iceberg_stats_source_db_${uuid0} p
 -- off so we stay on the manifest path (Path C); query-trigger-analyze is off so cached column
 -- statistics do not flip the estimate to ESTIMATE mid-run.
 
-create external catalog ice_cat_${uuid0} PROPERTIES ("type"="iceberg", "iceberg.catalog.type"="hive", "iceberg.catalog.hive.metastore.uris"="${iceberg_catalog_hive_metastore_uris}");
-
 -- cast/interval form: pre-PR2 this collapsed to cardinality=1; PR2 keeps the 2020-06-14 manifest (17 rows).
 
 -- a different partition value keeps a different manifest (23 rows), proving range pruning selects per value.
@@ -5025,7 +3772,6 @@ create external catalog ice_cat_${uuid0} PROPERTIES ("type"="iceberg", "iceberg.
 -- date_sub builtin form must agree with the operator form.
 
 -- control: bare 'yyyy-MM-dd' literal (no cast, always worked) must agree with the cast forms.
-
 
 drop table t_card force;
 
@@ -5040,31 +3786,6 @@ select c1, c2 from t_datestr where c2 >= cast('2020-06-15' as date) - interval 1
 
 drop table test_table force;
 
-select * from iceberg_sql_test_${uuid0}.iceberg_ci_db.test_partition_date_add_bucket order by k1;
-
-select * from iceberg_sql_test_${uuid0}.iceberg_ci_db.test_partition_day_bucket_drop_bucket order by k1;
-
-select * from iceberg_sql_test_${uuid0}.iceberg_ci_db.test_partition_drop_day_add_month order by k1;
-
-insert into ice_cat_${uuid0}.trino_branch_dml_${uuid0}.t values (5, 'e', 3);
-
--- a tag or an unknown name cannot be written, and the rejected statements leave no snapshot behind
-delete from ice_cat_${uuid0}.trino_branch_dml_${uuid0}.t for version as of tag1 where id = 1;
-
-update ice_cat_${uuid0}.trino_branch_schema_${uuid0}.t for version as of b1 set c = 'z' where id = 1;
-
-select * from ice_cat_${uuid0}.trino_branch_spec_${uuid0}.t for version as of 'b1' order by id;
-
-select count(*) from ice_cat_${uuid0}.trino_orc_pos_${uuid0}.t where _pos % 2 = 0;
-
-select id from ice_cat_${uuid0}.sqltest_db_${uuid0}.t where tz = '2024-01-01 08:00:01' order by id;
-
-select id, n.t.b from ice_cat_${uuid0}.sqltest_db_${uuid0}.t order by id;
-
-select * from iceberg_truncate_${uuid0}.iceberg_db_${uuid0}.ice_tbl_${uuid0} order by k1;
-
-select * from ice_tbl_${uuid0} order by k1;
-
 -- fix target 1: UNNEST an array column + GROUP BY the required column
 select id from t_required, unnest(arr) group by id order by id;
 
@@ -5072,28 +3793,6 @@ select id from t_required, unnest(arr) group by id order by id;
 select max(id), min(id) from t_required;
 
 select count(distinct id) from t_required, unnest([1, 2]);
-
--- Test 1.3: UPDATE with partition filter (should benefit from partition pruning)
-UPDATE iceberg_upd_part_${uuid0}.iceberg_update_db_${uuid0}.orders SET amount = amount * 1.1 WHERE order_date = '2024-01-02';
-
--- Test 3.2: UPDATE across all partitions
-UPDATE iceberg_upd_part_${uuid0}.iceberg_update_db_${uuid0}.events SET message = concat(message, ' [acked]') WHERE level = 'ERROR';
-
-drop catalog iceberg_upd_part_${uuid0};
-
--- ================================================
--- Test 2: UPDATE with expression in SET
--- ================================================
-UPDATE iceberg_upd_unp_${uuid0}.iceberg_update_db_${uuid0}.t_update SET salary = salary + 10000 WHERE age > 30;
-
-UPDATE iceberg_upd_unp_${uuid0}.iceberg_update_db_${uuid0}.t_update SET age = 0 WHERE age IS NULL;
-
-drop table iceberg_upd_unp_${uuid0}.iceberg_update_db_${uuid0}.t_v1 force;
-
--- ================================================
--- Test 14: UPDATE followed by DELETE on same table
--- ================================================
-UPDATE iceberg_upd_unp_${uuid0}.iceberg_update_db_${uuid0}.t_update SET name = 'TO_DELETE' WHERE id = 2;
 
 -- unpartitioned table with orc (eq-delete && pos-delete) 
 /*
@@ -5107,101 +3806,16 @@ UPDATE iceberg_upd_unp_${uuid0}.iceberg_update_db_${uuid0}.t_update SET name = '
 )
 */
 
-select * from iceberg_sql_test_${uuid0}.iceberg_ci_db.iceberg_v2_orc_unpartitioned_table order by k1;
-
-select k1,k3 from iceberg_sql_test_${uuid0}.iceberg_ci_db.iceberg_v2_orc_partitioned_table group by k1,k3 having count(1) > 1;
-
-select k2 from iceberg_sql_test_${uuid0}.iceberg_ci_db.iceberg_v2_parquet_partitioned_table order by k2;
-
--- Create table with format-version 3 and default values
-create table ice_def_hadoop${uuid0}.ice_def_db${uuid0}.default_value_test (
-    id int,
-    name string,
-    age int default "18",
-    score double default "100.0"
-) properties (
-    "format-version" = "3"
-);
-
--- Test case 2: Add column with default value using alter table
-alter table ice_def_insert${uuid0}.ice_def_db${uuid0}.insert_test add column age int default "20";
-
--- Create table with format-version 3 and default value
-create table ice_def_alter${uuid0}.ice_def_db${uuid0}.alter_test (
-    id int,
-    name string,
-    status string default 'active'
-) properties (
-    "format-version" = "3"
-);
-
-create database ice_def_types${uuid0}.ice_def_db${uuid0};
-
--- Create initial table without default value column
-create table ice_def_schema${uuid0}.ice_def_db${uuid0}.schema_test (
-    id int,
-    value int
-) properties (
-    "format-version" = "3"
-);
-
--- Check all data
-select * from ice_def_schema${uuid0}.ice_def_db${uuid0}.schema_test order by id;
-
-alter table ice_def_req${uuid0}.ice_def_db${uuid0}.required_test add column age int not null default "20";
-
-insert into ice_def_req${uuid0}.ice_def_db${uuid0}.required_test values (6, 'frank', null, 80, 'z');
-
-create table ice_def_all_types${uuid0}.ice_def_db${uuid0}.all_types_test (
-    id int,
-    bool_col boolean default "1",
-    tinyint_col tinyint default "8",
-    smallint_col smallint default "16",
-    int_col int default "42",
-    bigint_col bigint default "42000000000",
-    float_col float default "3.5",
-    double_col double default "6.25",
-    decimal_col decimal(18, 4) default "1234.5678",
-    char_col char(5) default "abcde",
-    varchar_col varchar(20) default "sr_varchar",
-    string_col string default "sr_string",
-    date_col date default "2024-01-02",
-    datetime_col datetime default "2024-01-02 03:04:05"
-) properties (
-    "format-version" = "3"
-);
-
-alter table ice_def_all_types_alter${uuid0}.ice_def_db${uuid0}.all_types_alter_test add column bool_col boolean default "0";
-
-alter table ice_def_all_types_alter${uuid0}.ice_def_db${uuid0}.all_types_alter_test add column char_col char(5) default "xyzzz";
-
 -- name: test_iceberg_v3_glm_row_id_order
 -- Global late materialization fetches rows by _row_id. A file whose _row_id does not ascend with the
 -- row position (here: a sorted rewrite that keeps each row's original _row_id) must still return each
 -- row's own values.
 
-create external catalog iceberg_glm_rid_${uuid0}
-PROPERTIES ( "type"  =  "iceberg",
-    "iceberg.catalog.type"  =  "hive",
-    "iceberg.catalog.hive.metastore.uris"="${iceberg_catalog_hive_metastore_uris}",
-    "aws.s3.access_key"  =  "${oss_ak}",
-    "aws.s3.secret_key"  =  "${oss_sk}",
-    "aws.s3.endpoint"  =  "${oss_endpoint}",
-    "enable_iceberg_metadata_cache"="false");
-
 set pipeline_sink_dop = 1;
 
 set enable_global_late_materialization = false;
 
-alter table ice_def_read${uuid0}.ice_def_db${uuid0}.t add column dt datetime default "2024-06-15 10:30:00";
-
-drop catalog ice_def_read${uuid0};
-
 select id, _row_id from rid_t order by id;
-
-select _row_id,* from iceberg_sql_test_${uuid0}.iceberg_oss_db.test_v3 where c0=20 order by _row_id limit 10;
-
-select _row_id,* from iceberg_sql_test_${uuid0}.iceberg_oss_db.test_v3 where _row_id not in (1, 11, 21) order by _row_id limit 10;
 
 -- four data files: (a, p=0), (a, p=1), (b, p=0), (b, p=1)
 insert into t select x, concat('a', x), x % 2 from table(generate_series(1, 20)) s(x);
@@ -5245,13 +3859,7 @@ from variant_json_roundtrip;
 
 create table plain (id int, v variant) properties ('format-version' = '3');
 
-alter table plain execute add_files(location='oss://${oss_bucket}/test_iceberg_variant_mixed_files/${uuid0}/data/noshred_02_conflict.parquet', file_format='parquet');
-
 drop table plain force;
-
-alter table evo execute add_files(location='oss://${oss_bucket}/test_iceberg_variant_schema_evolution/${uuid0}/data/evo_e3_double.parquet', file_format='parquet');
-
-alter table evo_plain execute add_files(location='oss://${oss_bucket}/test_iceberg_variant_schema_evolution/${uuid0}/data/evo_noshred_e4_array.parquet', file_format='parquet');
 
 select sum(get_variant_int(v, '$.a')), count(get_variant_int(v, '$.a')), cast(max(get_variant_int(v, '$.a')) as string) from evo;
 
@@ -5265,9 +3873,6 @@ select count(*), sum(id) from prune_int16 where get_variant_int(v, '$.w') not in
 -- name: test_iceberg_variant_query_0
 
 -- iceberg catalog on hive does not variant yet.
-
-create external catalog iceberg_sql_test_${uuid0}
-PROPERTIES ("type"="iceberg", "iceberg.catalog.type"="hadoop", "iceberg.catalog.warehouse"="oss://${oss_bucket}/test_iceberg_variant_query_0/${uuid0}/warehouse/");
 
 SELECT
     case_id,
@@ -5294,8 +3899,6 @@ SELECT
     CAST(variant_query(variant_mixed, '$.matrix[0][1].val') AS SMALLINT)     AS cast_smallint_nested
 FROM variant_test_cases
 ORDER BY case_id;
-
-alter table variant_test_unified execute add_files(location='oss://${oss_bucket}/test_iceberg_variant_query_1/${uuid0}/variant_query_1/data/00002-2-3f040690-719d-4a7c-aa99-f1ce04647eb9-0-00001.parquet', file_format='parquet');
 
 -- ========================================
 -- Test 1: Basic Type <-> VARIANT Bidirectional Casting
@@ -5452,8 +4055,6 @@ FROM variant_string_unicode_test
 WHERE test_id <= 7  -- Skip very long strings for VARCHAR cast
 ORDER BY test_id;
 
-alter table variant_analytics_users execute add_files(location='oss://${oss_bucket}/test_iceberg_variant_query_5/${uuid0}/variant_analytics_users/data/00000-4481-6663e105-7590-4b0d-a12e-532e70997c54-0-00001.parquet', file_format='parquet');
-
 -- ========================================
 -- Query 3: WHERE Clause - LIKE Pattern Match
 -- Test ID: UNC-5.1.3
@@ -5490,23 +4091,10 @@ SELECT 'Query 19: Event type distribution and metrics' AS test_description;
 -- be/test/formats/parquet/test_data/variant_spark/ (gen_variant_spark.sh); expected_variant_spark.tsv there
 -- holds Spark's answers for the per-path query below. Every query must return the same rows on all tables.
 
-create external catalog iceberg_variant_spark_${uuid0}
-PROPERTIES (
-    "type"="iceberg",
-    "iceberg.catalog.type"="hadoop",
-    "iceberg.catalog.warehouse"="oss://${oss_bucket}/test_iceberg_variant_spark_shredding/${uuid0}/warehouse/"
-);
-
-alter table shred execute add_files(location='oss://${oss_bucket}/test_iceberg_variant_spark_shredding/${uuid0}/data/shred_04_scalars.parquet', file_format='parquet');
-
-alter table noshred execute add_files(location='oss://${oss_bucket}/test_iceberg_variant_spark_shredding/${uuid0}/data/noshred_06_top_int.parquet', file_format='parquet');
-
 select count(*), count(v), min(id), max(id) from noshred;
 
 select id, get_variant_int(v, '$.i'), get_variant_string(v, '$.i'), get_variant_string(v, '$.s'), get_variant_int(v, '$.x')
 from shred where id in (101, 200, 201, 250) order by id;
-
-drop catalog iceberg_variant_spark_${uuid0};
 
 select id, data, get_variant_string(data, '$.kind') from t_nested order by id;
 
@@ -5533,24 +4121,7 @@ from test_variant_virtual_column
 where get_variant_date(data, '$.created_at') >= '2024-01-03'
 order by created_at;
 
-alter table variant_source execute add_files(location='oss://${oss_bucket}/test_iceberg_variant_write_0/${uuid0}/variant_input/data/00000-0-968ed6e2-3543-431b-ba6c-b41704fb5cd7-0-00001.parquet', file_format='parquet');
-
 drop table variant_source force;
-
-CREATE TABLE iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.`iceberg_v2_parquet_partitioned_table` (
-  `k1` int(11) DEFAULT NULL,
-  `k2` string DEFAULT NULL,
-  `k3` string DEFAULT NULL
-)
-PARTITION BY (`k3`);
-
-create view if not exists default_catalog.test_internal_db_${uuid0}.test_internal_view_${uuid0} properties ("key"="value") as select 1 from dual;
-
-drop view iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.test_alter_iceberg_view_${uuid0};
-
-drop view if exists iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.test_iceberg_view_${uuid0};
-
-set catalog iceberg_wdef_${uuid0};
 
 -- expected: 1 7 (initial-default), 2 7, 3 8, 4 NULL
 select id, c from t order by id;
@@ -5567,20 +4138,6 @@ create table t1 (c1 int, c2 int, c3 int, c4 string, c5 string) properties (
 create table t3 (c1 int, c2 int) properties ("write.metadata.metrics.max-inferred-column-defaults" = "1");
 
 insert into t5 values (1, 'a'), (2, 'b');
-
-create external table iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.ice_tbl_${uuid0} (k1 int);
-
--- iceberg history table
-select is_current_ancestor from iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.ice_tbl_${uuid0}$history where parent_id is not null order by is_current_ancestor;
-
-select `key`, `value` from iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.ice_tbl_${uuid0}$properties where `key` = 'location';
-
--- test unified catalog metadata table
-create external catalog iceberg_sql_test_unified_${uuid0} PROPERTIES ("type"="unified", "unified.metastore.type"="hive", "hive.metastore.uris"="${iceberg_catalog_hive_metastore_uris}","enable_iceberg_metadata_cache"="true","aws.s3.access_key" = "${oss_ak}","aws.s3.secret_key" = "${oss_sk}","aws.s3.endpoint" = "${oss_endpoint}");
-
-select latest_schema_id from iceberg_sql_test_unified_${uuid0}.iceberg_db_${uuid0}.ice_tbl_${uuid0}$metadata_log_entries where latest_schema_id is not null limit 1;
-
-drop table iceberg_sql_test_unified_${uuid0}.iceberg_db_${uuid0}.ice_tbl_${uuid0} force;
 
 -- ============================================================
 -- Setup: shredded variant table (typed shredded fields)
@@ -5614,19 +4171,6 @@ drop table test_shredding force;
 alter table payment set  ("unique_constraints" = "id");
 
 SET enable_cbo_table_prune=false;
-
-select count(*) from test_runtime_filter_in_null_${uuid0}.iceberg_oss_db.in_runtime_filter_t1 as t1 join test_runtime_filter_in_null_${uuid0}.iceberg_oss_db.in_runtime_filter_t2 as t2 on t1.c1<=>t2.c1;
-
--- int join key
-select t1.l_orderkey, t1.l_partkey from rf_pushdown_${uuid0}.iceberg_oss_db.lineitem_two_bucket as t1 join rf_pushdown_${uuid0}.iceberg_oss_db.partsupp_no_bucket as t2 on t1.l_partkey = t2.ps_partkey order by t1.l_orderkey, t1.l_partkey;
-
-select count(*) from rf_pushdown_${uuid0}.iceberg_oss_db.lineitem_two_bucket as t1 join rf_pushdown_${uuid0}.iceberg_oss_db.partsupp_no_bucket as t2 on t1.l_partkey = t2.ps_partkey;
-
-insert into iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.ice_tbl_${uuid0} version as of b1 select 5;
-
-alter table iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.ice_tbl_${uuid0} execute cherrypick_snapshot(snapshot_id=@b2_snapshot_id);
-
-select * from iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.ice_tbl_${uuid0} version as of "test_branch" order by k1;
 
 use  test_gin_index;
 
@@ -5663,10 +4207,6 @@ PROPERTIES ("replication_num"="1");
 SELECT k FROM t_gin_lc_ci WHERE msg MATCH 'Hello' ORDER BY k;
 
 INSERT INTO t_gin_lc_default VALUES (1,'Hello World');
-
-use test_gin_mv_index_${uuid0};
-
-drop database test_gin_mv_index_${uuid0};
 
 ALTER TABLE ngram_index ADD INDEX idx_name1(username) USING NGRAMBF ('gram_num' = "4", "bloom_filter_fpp" = "0.01");
 
@@ -5729,21 +4269,7 @@ select COLUMN_NAME, DATA_TYPE, DATETIME_PRECISION
 from INFORMATION_SCHEMA.COLUMNS
 where table_name = 'test_column_datetime_precision' order by ORDINAL_POSITION;
 
-select SCHEMA_NAME, DEFAULT_ENCRYPTION from ice_hadoop${uuid0}.information_schema.schemata;
-
-select TABLE_NAME, COLUMN_NAME, COLUMN_COMMENT
-from ice_hive_${uuid0}.information_schema.columns
-where TABLE_SCHEMA = 'db_${uuid0}' and TABLE_NAME = 't_ice_comment';
-
 -- name: test_external_catalog_information_schema_pattern
-
-
-create external catalog `ice_hadoop${uuid0}`
-properties (
-"type"  =  "iceberg",
-"iceberg.catalog.type"  =  "hadoop",
-"iceberg.catalog.warehouse"="oss://${oss_bucket}/test_external_catalog_information_schema_pattern/${uuid0}"
-);
 
 select TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, COLUMN_TYPE from information_schema.columns where table_name like 'a_est' order by COLUMN_NAME;
 
@@ -5757,66 +4283,21 @@ where thread_name like '%main%'
 
 select thread_name from information_schema.fe_threads order by user_time_ms desc limit 3;
 
-create user if not exists u_${uuid0};
-
-execute as u_${uuid0} with no revert;
-
-drop user u_${uuid0};
-
-select state,type from information_schema.loads where db_name='db_${uuid1}';
-
 select * from information_schema.load_tracking_logs where label="not exist";
-
-create table t_stream_${uuid0} (id int) distributed by hash(id) buckets 1 properties("replication_num" = "1");
-
--- all pushdown predicates combined (hit)
-select count(1) from information_schema.loads
-where db_name='db_${uuid0}'
-  and user='root'
-  and create_time >= date_sub(now(), interval 1 hour) and create_time <= date_add(now(), interval 1 hour)
-  and load_start_time >= date_sub(now(), interval 1 hour) and load_start_time <= date_add(now(), interval 1 hour)
-  and load_finish_time >= date_sub(now(), interval 1 hour) and load_finish_time <= date_add(now(), interval 1 hour);
-
-select count(1) from information_schema.loads where table_name='t_stream_${uuid0}'
-and load_start_time >= date_sub(now(), interval 1 hour) and load_start_time <= date_add(now(), interval 1 hour);
-
-select count(1) from information_schema.loads where db_name='db_${uuid0}' and load_finish_time >= date_sub(now(), interval 1 hour) and load_finish_time <= date_add(now(), interval 1 hour);
-
-select count(1) from information_schema.loads where label = 'sl_${uuid0}' and db_name='db_${uuid0}';
-
-select count(1) from information_schema.loads where db_name='db_${uuid0}' and table_name='t_insert_${uuid0}';
-
--- LAST_FRESHNESS_CONFIRMED_AT: NULL before any refresh, a datetime after a successful refresh.
-select if(LAST_FRESHNESS_CONFIRMED_AT is null, 'OK', concat('FAILED: ', LAST_FRESHNESS_CONFIRMED_AT))
-from information_schema.materialized_views
-where TABLE_SCHEMA = 'db_${uuid0}' and TABLE_NAME = 'mv_manual';
 
 -- A partition-scoped (partial) refresh must NOT confirm whole-MV freshness.
 create table pt (dt date, v int) duplicate key(dt)
 partition by range(dt) (partition p1 values [('2024-01-01'),('2024-01-02')), partition p2 values [('2024-01-02'),('2024-01-03')))
 distributed by hash(dt) buckets 2 properties('replication_num'='1');
 
-create materialized view mv_rg distributed by hash(event_day)
-refresh deferred manual properties('resource_group' = 'rg_${uuid0}')
-as select event_day, sum(pv) as sum_pv from ss group by event_day;
-
 -- mv on view
 create view v1 as select * from t1;
 
 alter materialized view mv1 active;
 
-select table_name from information_schema.tables where table_schema='db_${uuid0}' and table_name = 'a\\_a';
-
 -- name: test_task_run_status
 
-create database db_${uuid0};
-
-SELECT count(1) FROM information_schema.task_runs WHERE TASK_NAME = '${task_name}';
-
 use test_information_schema_task_runs;
-
--- (3) Privileged cross-table read: the subquery would run as the internal principal on vulnerable code.
-select count(1) from information_schema.task_runs where task_name = 'no_such'' OR (SELECT count(*) FROM db_${uuid0}.secret_${uuid0}) = 3 OR ''1''=''1';
 
 -- partial INSERT omitting the GIN-indexed column must succeed (regression: used to hang/fail)
 insert into t_gin (pk, v1) values (1, 111), (3, 300);
@@ -5852,23 +4333,6 @@ insert into duplicate_table_demo_datatype_not_replicated_all_varchar values ('19
 
 SELECT id1 FROM t_gin_like_underscore WHERE text_column LIKE "a_%" ORDER BY id1;
 
-CREATE TABLE `t_gin_or_prune_${uuid0}` (
-  `id` bigint NOT NULL,
-  `k`  bigint NOT NULL,
-  `v`  varchar(255) NOT NULL,
-  INDEX gin_v (`v`) USING GIN ("parser" = "none")
-) ENGINE=OLAP
-DUPLICATE KEY(`id`)
-DISTRIBUTED BY HASH(`id`) BUCKETS 1
-PROPERTIES ("replication_num" = "1", "replicated_storage" = "false");
-
--- no predicate survives the index, so v stays prunable
-select id from t_gin_or_prune_${uuid0} where v like '%red%' order by id;
-
-select max(id) from t_gin_prune_pk_${uuid0} where v like '%red%';
-
-select id from t_gin_del_prune_${uuid0} where k = 8 order by id;
-
 INSERT INTO t_lw_gin
 SELECT generate_series,
        CASE WHEN generate_series < 100 THEN 'alpha needleold gamma'
@@ -5880,14 +4344,6 @@ SELECT tokenize('standard', 'hello world');
 
 -- A constant that tokenizes to nothing has to be NULL for every row, not for one row.
 select array_length(tokenize('english', '')) as n from t_tokenized_table;
-
-desc db_binary_${uuid0}.t1;
-
--- query table function works as a regular relation for aggregation.
-select category, sum(score) as total_score
-from table(jdbc_native_query_${uuid0}.native_query('select category, score from db_native_query_${uuid0}.native_query_base where id <= 4')) q
-group by category
-order by category;
 
 CREATE TABLE IF NOT EXISTS `jit_basic` (
 	k1 BIGINT, 
@@ -6298,15 +4754,11 @@ select x.v3 + 1000 c3, b.v6 + 2000 c6, x.v1 + 3000 c1, b.v4 + 4000 c4 from (sele
 
 select x.v3 + 1000 c3, b.v6 + 2000 c6, x.v1 + 3000 c1, b.v4 + 4000 c4 from (select v1, v2, v3, v1 + 0 as p0, v1 + 1 as p1, v1 + 2 as p2, v1 + 3 as p3, v1 + 4 as p4, v1 + 5 as p5, v1 + 6 as p6, v1 + 7 as p7, v1 + 8 as p8, v1 + 9 as p9, v1 + 10 as p10, v1 + 11 as p11, v1 + 12 as p12, v1 + 13 as p13 from t_or_a) x join t_or_b b on x.v1 = b.v4 or x.v2 = b.v5 order by 1, 2, 3, 4;
 
-SELECT count(CAST(CAST(map{'a':1} AS VARIANT) AS MAP<VARCHAR, INT>)) FROM t_cast_map_const_${uuid0} WHERE k > 0;
-
 select cast(json_query(j,'$.o') as string) from t order by id limit 2;
 
 SET cbo_prune_json_subfield=false;
 
 ALTER TABLE t SET ("base_compaction_forbidden_time_ranges"="");
-
-select id, j->'a', j->'b', j->'c', j->'x.y', j->'x.z' from t_uniq_${uuid0} order by id;
 
 USE test_invalid_json;
 
@@ -6317,8 +4769,6 @@ SELECT json_pretty('{"a": 1, "b": 2}');
 
 -- 8. Numbers Formatting
 SELECT json_pretty('{"int": 123, "float": 12.34}');
-
-SELECT k, get_json_string(j->'$', '$.a') FROM t_json_root_${uuid0} ORDER BY k;
 
 CREATE DATABASE test_json_subfield_case_collision;
 
@@ -6482,9 +4932,6 @@ select COUNT(*) from (select * from (select * from t0 limit 30, 10) x limit 2) x
 
 select count(*) from (select * from TABLE(generate_series(1, 100000)) limit 1, 1000) x;
 
--- name: test_add_list_partition
-create database test_db_${uuid0};
-
 SELECT * FROM t_p_error WHERE calendar_year = '2024';
 
 SELECT * FROM t_p_error WHERE calendar_year = '2012';
@@ -6497,16 +4944,7 @@ SELECT k, city FROM fact WHERE city != 'shanghai' ORDER BY k;
 
 SELECT k, city FROM fact_null_only WHERE city != 'shanghai' ORDER BY k;
 
-select state, error_msg from information_schema.loads where label='${uuid2}';
-
 create table t_dict(k string, v string) primary key(k) distributed by hash(k) buckets 1 properties('replication_num'='1');
-
-select lookup_string('db_${uuid0}.t_dict', 'k1', 'v');
-
--- no privilege on the table: the internal lookup query is authorized as the caller, not ROOT
-execute as u1_${uuid0} with no revert;
-
-drop role r_${uuid0};
 
 select g, count(*), count(s), min(s), max(s), length(group_concat(s, ' '))
 from agg_mixed_dict_t where s is null or s != 'V0' group by g order by g;
@@ -6562,21 +5000,9 @@ drop table t_force_encode force;
 
 -- name: test_low_cardinality_parquet_cancel @sequential
 
--- Prepare Data.
-create external catalog ice_cat_${uuid0}
-properties (
-    "type" = "iceberg",
-    "iceberg.catalog.type" = "hive",
-    "hive.metastore.uris" = "${iceberg_catalog_hive_metastore_uris}"
-);
-
 -- The columns are low-cardinality, so the frontend collects a global dictionary for them and
 -- the plan rewrites them to dictionary codes. Touch them first: collection is asynchronous.
 select v1, count(*) from lm_dict group by v1 order by v1;
-
-INSERT INTO lm_force_dict_${uuid0} VALUES
-(1, 'a1', 'c1'), (2, 'a2', 'c2'), (3, 'a3', 'c3'), (4, 'a4', 'c4'), (5, 'a5', 'c5'),
-(6, 'a6', 'c6'), (7, 'a7', 'c7'), (8, 'a8', 'c8'), (9, 'a9', 'c9'), (10, 'a10', 'c10');
 
 analyze full table topn_decoded_fact;
 
@@ -6651,8 +5077,6 @@ SELECT * FROM verify_result WHERE table_name = 'mv1';
 
 SELECT * FROM verify_result WHERE table_name = 'mv_part1';
 
-create database sql_test_db_${uuid0};
-
 CREATE TABLE lineitem_hours (
                           l_orderkey    BIGINT,
                           l_partkey     INT,
@@ -6672,41 +5096,9 @@ CREATE TABLE lineitem_hours (
                           l_linestatus  VARCHAR(1)
 ) PARTITION BY  hour(l_shipdate), l_returnflag, l_linestatus;
 
--------------------------------- DATE --------------------------------
-CREATE MATERIALIZED VIEW test_date
-PARTITION BY (l_returnflag, l_linestatus, dt_date)
-REFRESH DEFERRED MANUAL
-PROPERTIES ("replication_num" = "1")
-AS
-  SELECT l_returnflag, l_linestatus, l_shipdate as dt_date, count(*) FROM mv_iceberg_${uuid0}.sql_test_db_${uuid0}.lineitem_date group by l_returnflag, l_linestatus, l_shipdate;
-
-DROP DATABASE mv_iceberg_${uuid0}.sql_test_db_${uuid0} force;
-
-use mv_ice_db_${uuid0};
-
--- case3: test sync mode with params
-CREATE MATERIALIZED VIEW test_iceberg_mv2_${uuid0} PARTITION BY dt 
-REFRESH DEFERRED MANUAL 
-properties (
-    "replication_num" = "1",
-    "partition_refresh_number" = "1"
-)
-AS SELECT dt,sum(col_int) 
-FROM mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.mv_ice_tbl_${uuid0}  GROUP BY dt;
-
-drop table mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.mv_ice_tbl_${uuid0} force;
-
-GRANT CREATE TABLE, CREATE MATERIALIZED VIEW ON DATABASE test_create_mv_with_user
-    TO USER mv_creator@'${ip[1]}';
-
 alter materialized view mv1 refresh manual;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN DATABASE test_create_mv_with_user TO ROLE role_with_refresh;
-
-GRANT IMPERSONATE ON USER root TO mv_multi_role_user@'${ip[1]}';
-
--- Test Case 2: Creator-based authorization with default role
-SET DEFAULT ROLE role_with_refresh TO mv_multi_role_user@'${ip[1]}';
 
 -- Test Case 4: Root-based authorization (mv_use_creator_based_authorization=false)
 -- This tests when MV refresh always uses ROOT user regardless of creator
@@ -6752,16 +5144,6 @@ INSERT INTO dim_location_area values('1234567890', 'Zone-1'),
 ('1234567897', 'Zone-8');
 
 drop table dim_location_area;
-
-CREATE MATERIALIZED VIEW test_mv1 
-PARTITION BY dt 
-REFRESH DEFERRED MANUAL AS 
-  SELECT * FROM mv_hive_${uuid0}.mv_hive_db_${uuid0}.tbl_for_refresh;
-
--- drop external catalog & db
-drop table mv_hive_${uuid0}.mv_hive_db_${uuid0}.tbl_for_refresh;
-
-insert into hive_catalog_${uuid0}.hive_db_${uuid0}.hive_tbl_${uuid0} VALUES (3,"2020-06-15");
 
 insert into mock_tbl values ('2021-07-29',3,10), ('2021-08-02',3,10);
 
@@ -6854,28 +5236,7 @@ select k2, k3, sum(k1) from t1 group by k2, k3 order by 1,2;
 -- 'a-b' and 'ab': the second partition replaced the first, its rows never reached the view, and every
 -- query rewritten onto the view silently lost them.
 
-create external catalog mv_iceberg_${uuid0}
-properties
-(
-    "type" = "iceberg",
-    "iceberg.catalog.type" = "hive",
-    "hive.metastore.uris" = "${iceberg_catalog_hive_metastore_uris}"
-);
-
-create materialized view mv_str partition by s distributed by hash(v) buckets 1
-refresh deferred manual properties ("replication_num" = "1")
-as select v, s from mv_iceberg_${uuid0}.sql_test_db_${uuid0}.t_str;
-
 set enable_materialized_view_rewrite = true;
-
-create table iceberg_mv_${uuid0}.ice_db_${uuid0}.f_driver_online_detail_h (
-    granularity string,
-    business    string,
-    city_id     int,
-    date_id     int,
-    online_seconds bigint,
-    driver_id   bigint
-) partition by (date_id) properties ("format-version" = "2");
 
 -- The target rewrite path: AGGREGATE_JOIN_PUSH_DOWN_RULE rewrites the joined
 -- aggregation against an MV whose only base table is the Iceberg fact table.
@@ -6892,38 +5253,13 @@ set enable_materialized_view_rewrite = true;
 -- view partitioned on the column, directly or by date_trunc, failed with "is intersected with range"
 -- or "Partition ranges overlap". The view stayed empty.
 
-create external catalog mv_iceberg_${uuid0}
-properties
-(
-    "type" = "iceberg",
-    "iceberg.catalog.type" = "hive",
-    "hive.metastore.uris" = "${iceberg_catalog_hive_metastore_uris}"
-);
-
 refresh materialized view mv_day with sync mode;
 
-CREATE MATERIALIZED VIEW test_mv1 PARTITION BY dt 
-REFRESH DEFERRED MANUAL AS SELECT dt,sum(col_int) 
-FROM mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.mv_ice_tbl_${uuid0}  GROUP BY dt;
-
-DROP TABLE mv_ice_tbl_${uuid0} FORCE;
-
-ALTER MATERIALIZED VIEW default_catalog.db_${uuid0}.test_mv1 ACTIVE;
-
-insert into mv_ice_tbl_${uuid0} values 
-  ('abc', 2000, '2023-12-02'),
-  (NULL, 2000, '2023-12-02');
-
 set enable_materialized_view_rewrite=false;
-
--- 2nd time expire snapshot
-insert into mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.mv_ice_tbl_${uuid0} values ('test', 2002, '2023-12-05');
 
 REFRESH MATERIALIZED VIEW test_mv2 FORCE WITH SYNC MODE;
 
 REFRESH MATERIALIZED VIEW test_mv3 WITH SYNC MODE;
-
-drop materialized view default_catalog.db_${uuid0}.test_mv3;
 
 ALTER MATERIALIZED VIEW mv1 inactive;
 
@@ -6985,76 +5321,16 @@ where lo_linenumber < 2 order by lo_orderkey;
 
 drop materialized view mv_lineorder_3;
 
--- name: test_mv_partition_compensate_hive @slow
-create external catalog mv_hive_${uuid0}
-properties
-(
-    "type" = "hive",
-    "hive.catalog.type" = "hive",
-    "hive.metastore.uris" = "${hive_metastore_uris}"
-);
-
-SELECT dt,sum(num) FROM mv_hive_${uuid0}.mv_hive_db_${uuid0}.t1 where dt='2020-06-15' GROUP BY dt order by dt;
-
-SELECT dt,sum(num) FROM mv_hive_${uuid0}.mv_hive_db_${uuid0}.t1 where date_trunc('day', dt) ='2020-06-15' GROUP BY dt order by dt;
-
--- Test partition compensate with partition expression
-CREATE MATERIALIZED VIEW test_mv1 
-PARTITION BY date_trunc('day', dt)
-REFRESH DEFERRED MANUAL AS 
-  SELECT dt,sum(num) FROM mv_hive_${uuid0}.mv_hive_db_${uuid0}.t1 GROUP BY dt;
-
-SELECT dt,sum(num) FROM mv_hive_${uuid0}.mv_hive_db_${uuid0}.t2 where (dt>'2020-06-15' and dt <= '2020-06-22') or dt>'2020-07-01' GROUP BY dt order by dt;
-
-SELECT dt,sum(num) FROM mv_hive_${uuid0}.mv_hive_db_${uuid0}.t2 where dt in ('2020-06-22', '2020-07-01') GROUP BY dt order by dt;
-
--- Test partition compensate without partition expression
-CREATE MATERIALIZED VIEW test_mv1 
-PARTITION BY dt 
-REFRESH DEFERRED MANUAL AS 
-  SELECT dt,sum(num) FROM mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t1 GROUP BY dt;
-
-SELECT dt,sum(num) FROM mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t1 where dt in ('2020-06-15', '2020-06-22', '2020-07-01') GROUP BY dt order by dt;
-
-SELECT dt,sum(num) FROM mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t1 where dt between '2020-06-15' and '2020-07-01' GROUP BY dt order by dt;
-
-SELECT dt,sum(num) FROM mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t2 where dt>='2020-06-15' GROUP BY dt order by dt;
-
-SELECT dt,sum(num) FROM mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t2 where date_trunc('month', dt) ='2020-07-01' GROUP BY dt order by dt;
-
 -- name: test_mv_partition_compensate_mysql @slow
 -- create mysql table
 
-
-
-
 set enable_materialized_view_transparent_union_rewrite = true;
-
-SELECT dt,sum(num) FROM mv_mysql_${uuid0}.mv_mysql_db_${uuid0}.t1 where dt>'2020-06-15' and dt < '2020-07-22' GROUP BY dt order by dt;
 
 -- union rewrite
 
-
-
-
-
-
-
-
-
-
-
 -- cannot partition prune
 
-
-
-
-
 -- cannot partition prune
-
-
-
-SELECT dt,sum(num) FROM mv_mysql_${uuid0}.mv_mysql_db_${uuid0}.t1 where dt='2020-06-15' GROUP BY dt order by dt;
 
 INSERT INTO t1 VALUES ('1988-07-01', 1, 1, 'a');
 
@@ -7064,8 +5340,6 @@ PARTITION BY (c1)
 AS 
     SELECT c1, c2, c3
     FROM t1;
-
-create table supplier as select * from db_${uuid0}.`supplier`;
 
 insert into user_tags values('2023-04-14', 3, 'e', 6);
 
@@ -7279,33 +5553,13 @@ INSERT INTO `t2` (`c4`, `c5`, `c6`) VALUES (5, NULL, 10010);
 
 refresh materialized view mv_2 with sync mode;
 
-CREATE MATERIALIZED VIEW c1_mv
-REFRESH DEFERRED MANUAL PROPERTIES ('refresh_mode' = 'incremental')
-AS SELECT k, v FROM mv_iceberg_${uuid0}.c1_db_${uuid0}.c1_base;
-
--- ==============================================================
--- Case 2: MODIFY COLUMN widening + aggregation IVM MV (state column)
--- ==============================================================
-set catalog mv_iceberg_${uuid0};
-
 INSERT INTO c2agg_base VALUES (1, 5000000000);
 
 insert into c3_base values (1, 10), (2, 20);
 
--- ==============================================================
--- Case 4: RENAME COLUMN referenced by IVM MV
--- ==============================================================
-set catalog mv_iceberg_${uuid0};
-
-SELECT STATE FROM information_schema.task_runs WHERE TASK_NAME = '${C4_TASK}' ORDER BY CREATE_TIME DESC LIMIT 1;
-
-drop database c1_db_${uuid0} force;
-
 create table c5_base (k int, v decimal(10,2)) properties('format-version'='2');
 
 insert into c5_base values (3, 1234567890.12);
-
-drop database c5_db_${uuid0} force;
 
 SELECT col_str, col_int, dt FROM test_pct_scan ORDER BY col_int;
 
@@ -7313,48 +5567,9 @@ REFRESH MATERIALIZED VIEW test_pct_agg WITH SYNC MODE;
 
 REFRESH MATERIALIZED VIEW test_ivm_scan WITH SYNC MODE;
 
--- ==============================================================
--- Case 4: IVM aggregate. __ROW_ID__ and __AGG_STATE_* are produced by the
--- rewritten query; count(*) names a state column that is not a legal
--- user-authored column name.
--- ==============================================================
-CREATE MATERIALIZED VIEW test_ivm_agg
-REFRESH DEFERRED MANUAL
-properties
-(
-    "refresh_mode" = "incremental"
-)
-AS SELECT dt, SUM(col_int) AS s, COUNT(*) AS c, MAX(col_str) AS mx
-   FROM mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t1 GROUP BY dt;
-
 drop materialized view test_ivm_agg;
 
-insert into mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t2 values (6, 'v');
-
-CREATE MATERIALIZED VIEW mv_arpl_create PARTITION BY dt
-REFRESH DEFERRED ASYNC EVERY(INTERVAL 1 DAY)
-PROPERTIES ("refresh_mode" = "INCREMENTAL", "auto_refresh_partitions_limit" = "2")
-AS SELECT k, v, dt FROM arpl_ice_${uuid0}.arpl_ice_db_${uuid0}.base;
-
-drop catalog arpl_ice_${uuid0};
-
 SELECT count(*), sum(v) FROM mv_arpl_alter;
-
-create database mv_iceberg_${uuid0}.mv_ice_db_${uuid0};
-
-create repository repo_${uuid0} with broker on location "oss://${oss_bucket}/test_ivm_backup_restore/repo_${uuid0}"
-properties ("aws.s3.access_key" = "${oss_ak}", "aws.s3.secret_key" = "${oss_sk}", "aws.s3.endpoint" = "${oss_endpoint}");
-
-drop repository repo_${uuid0};
-
-CREATE MATERIALIZED VIEW mv_having
-DISTRIBUTED BY HASH(region) BUCKETS 1
-REFRESH DEFERRED MANUAL
-PROPERTIES ("refresh_mode" = "INCREMENTAL")
-AS SELECT region, SUM(amount) AS s, COUNT(*) AS c
-FROM ivm_ice_${uuid0}.ivm_ice_db_${uuid0}.base
-GROUP BY region
-HAVING SUM(amount) > 10;
 
 create table base (region string, amount int);
 
@@ -7364,29 +5579,7 @@ SELECT region, count(*) FROM mv_range_pre_split GROUP BY region ORDER BY region;
 -- recorded for this job (IMV_SOURCE_VERSION_RANGE / IMV_SOURCE_TIMESTAMP_RANGE stay NULL).
 REFRESH MATERIALIZED VIEW test_mv1 WITH SYNC MODE;
 
--- An incremental mv is keyed by its internal row id, so ORDER BY is a sort key of its own rather than
--- part of the primary key: the two must differ, and the tablet must be created with that sort key.
-SELECT PRIMARY_KEY = SORT_KEY AS pk_eq_sort,
-       instr(PRIMARY_KEY, '__ROW_ID__') > 0 AS pk_is_row_id,
-       instr(SORT_KEY, 'region') > 0 AS sort_has_region
-FROM information_schema.tables_config
-WHERE TABLE_SCHEMA = 'db_${uuid0}' AND TABLE_NAME = 'mv_sort_key';
-
 insert into t_src values (1, 10), (2, 20);
-
--- Recorded commit times are epoch millis; their second-level prefix must match
--- the committed_at of the corresponding snapshots.
-SELECT count(*) FROM information_schema.task_runs WHERE TASK_NAME = '${TASK_NAME}' AND get_json_string(EXTRA_MESSAGE, '$.refreshMode') = 'INCREMENTAL' AND EXTRA_MESSAGE LIKE concat('%"imvSourceTimestampRange":{"mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t_src":{"start":"', (SELECT cast(unix_timestamp(committed_at) as varchar) FROM mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t_src$snapshots WHERE parent_id IS NULL), '%","end":"', (SELECT cast(unix_timestamp(committed_at) as varchar) FROM mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t_src$snapshots WHERE parent_id IS NOT NULL), '%');
-
--- ============================================================
--- S4: wrapped union — must NOT collapse (visible output is finalized count)
--- ============================================================
-CREATE MATERIALIZED VIEW mv_wrapped PARTITION BY dt
-REFRESH DEFERRED MANUAL
-PROPERTIES ("refresh_mode" = "incremental")
-AS SELECT k, dt, bitmap_count(bitmap_union(bitmap_hash(s2))) AS cnt
-   FROM mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t1
-   GROUP BY k, dt;
 
 SELECT k, dt, cnt FROM mv_wrapped ORDER BY k, dt;
 
@@ -7399,63 +5592,18 @@ SELECT k, dt, cnt FROM mv_wrapped ORDER BY k, dt;
 --   * BITMAP_UNION(to_bitmap(...)) — accepted: normalizes to bitmap_agg
 --   * HLL_UNION / BITMAP_UNION over a metric sketch (hll_hash / bitmap_hash) — accepted directly
 
-create external catalog mv_iceberg_${uuid0}
-properties
-(
-    "type" = "iceberg",
-    "iceberg.catalog.type" = "hive",
-    "hive.metastore.uris" = "${iceberg_catalog_hive_metastore_uris}"
-);
-
 SELECT k, dt, avg_d FROM mv_avg_dec ORDER BY k, dt;
-
--- ============================================================
--- POSITIVE: HLL_UNION(HLL_HASH(...)) IVM MV — now whitelisted (HLL state unions associatively)
--- ============================================================
-CREATE MATERIALIZED VIEW mv_hll PARTITION BY dt
-REFRESH DEFERRED MANUAL
-PROPERTIES ("refresh_mode" = "incremental")
-AS SELECT k, dt, HLL_UNION(HLL_HASH(s_short)) AS h
-   FROM mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t1
-   GROUP BY k, dt;
 
 SELECT k, dt, bitmap_count(b2) AS dc FROM mv_bmp_hash ORDER BY k, dt;
 
 -- bootstraps through PCT, which records no IVM window
 REFRESH MATERIALIZED VIEW mv_skip WITH SYNC MODE;
 
--- name: test_ivm_with_iceberg_abnormal @slow
-create external catalog mv_iceberg_${uuid0}
-properties
-(
-    "type" = "iceberg",
-    "iceberg.catalog.type" = "hive",
-    "hive.metastore.uris" = "${iceberg_catalog_hive_metastore_uris}"
-);
-
 SELECT col_str, col_int, dt FROM test_mv1 WHERE dt <= '2023-12-02' ORDER BY col_str, col_int, dt limit 3;
-
-insert into mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t1 values ('a', 10, '2023-12-01');
 
 SELECT dt, col_int1, col_int2, sum_col_int1, sum_col_int2, avg_col_int1, avg_col_int2, min_col_int1, min_col_int2, max_col_int1, max_col_int2, count_col_int1, count_col_int2, approx_count_distinct_col_str1, approx_count_distinct_col_str2, approx_count_distinct_col_str3 FROM test_mv1 ORDER BY dt, col_int1, col_int2 limit 5;
 
-CREATE MATERIALIZED VIEW test_mv1 PARTITION BY dt 
-REFRESH DEFERRED MANUAL 
-properties
-(
-    "refresh_mode" = "auto"
-)
-AS 
-SELECT dt, sum(col_int) as sum_col_int, approx_count_distinct(col_str) as approx_count_distinct_col_str 
-FROM mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t1 
-WHERE col_int > 5
-group by dt;
-
 create table t1 (k int, v int);
-
-ALTER TABLE mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t1 EXECUTE rewrite_data_files(rewrite_all = true);
-
-insert into mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t1 values (5, 50);
 
 create table t5 (
   col1 string,
@@ -7463,59 +5611,9 @@ create table t5 (
   dt date
 ) partition by(dt);
 
-insert into mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t2 values 
-  ('a', 2000, '2023-12-01');
-
-insert into mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t1 values 
-  ('a', 2000, '2023-12-11');
-
-insert into mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t5 values 
-  ('a', 2000, NULL);
-
 -- ==============================================================
 -- Part A: refresh_mode = "auto" — IVM -> PCT fallback -> IVM recovery
 -- ==============================================================
-
--- --- MV shape (1): SELECT * — row-level DELETE ---
--- Expected refreshMode sequence: PCT, INCREMENTAL, PCT, INCREMENTAL
--- Note: First refresh after MV creation is PCT (no prior anchor snapshot,
--- full-build establishes the baseline). Subsequent append-only refreshes
--- are INCREMENTAL; DELETE triggers PCT fallback; next append recovers.
-CREATE MATERIALIZED VIEW test_mv1 PARTITION BY dt
-REFRESH DEFERRED MANUAL
-properties ("refresh_mode" = "auto")
-AS SELECT * FROM mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t1;
-
--- DELETE OUTSIDE MV WHERE: col_int = 1 rows are not in MV (filter: col_int > 3).
--- Expected: PCT fallback (non-append-only delta), MV aggregated rows unchanged.
-DELETE FROM mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t1 WHERE col_int = 1;
-
--- ==============================================================
--- Part A extra: partition-level DELETE (metadata delete optimization)
--- Expected refreshMode sequence: PCT, PCT, PCT, INCREMENTAL
---
--- Partition-level DELETE triggers Iceberg metadata-delete; the PCT
--- refresh that follows produces only partition drops (no INSERT),
--- so MVPCTBasedRefreshProcessor returns SKIPPED before
--- updateVersionMeta runs and TVR is NOT committed. Step 3's INSERT
--- therefore still sees the stale anchor and must fall back to PCT
--- again (but this PCT has INSERT work, so TVR finally commits).
--- Step 4 verifies that after TVR catches up, a subsequent append
--- recovers to INCREMENTAL, i.e., the delayed-by-one-refresh effect
--- self-heals.
--- ==============================================================
-CREATE MATERIALIZED VIEW test_mv1 PARTITION BY dt
-REFRESH DEFERRED MANUAL
-properties ("refresh_mode" = "auto")
-AS SELECT * FROM mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t1;
-
--- ==============================================================
--- Part B: refresh_mode = "incremental" — expect refresh FAILED on DELETE
--- ==============================================================
-CREATE MATERIALIZED VIEW test_mv1 PARTITION BY dt
-REFRESH DEFERRED MANUAL
-properties ("refresh_mode" = "incremental")
-AS SELECT * FROM mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t1;
 
 insert into dist_base values (1, 10), (1, 10), (2, 20);
 
@@ -7523,62 +5621,18 @@ DROP MATERIALIZED VIEW test_mv_dup;
 
 SELECT k, cnt FROM test_mv_ord ORDER BY k;
 
--- Second batch + refresh (append-only, still IVM)
-insert into mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t1 values ('e', 9, '2023-12-05');
-
--- --- A3: DELETE + expire + refresh — position delete lifecycle ---
--- Expected refreshMode: PCT
--- MV and base-table-direct aggregation must match after delete+expire.
-DELETE FROM mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t1 WHERE col_int = 6;
-
-ALTER TABLE mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t1 EXECUTE expire_snapshots(older_than = '${NOW_TS}', retain_last = 1);
-
-SELECT STATE FROM information_schema.task_runs WHERE TASK_NAME = '${TASK_NAME2}' ORDER BY FINISH_TIME DESC LIMIT 1;
-
 -- Regression coverage: every GROUP BY shape that used to fail analyzer-time
 -- with "Table null.null.test_mv1 is not found" because of the auto-generated
 -- self-referencing UniqueConstraint on the IVM MV's PRIMARY_KEYS.
 SELECT k, count(*) FROM test_mv1 GROUP BY k ORDER BY k;
 
-CREATE MATERIALIZED VIEW test_mv1 PARTITION BY dt 
-REFRESH DEFERRED MANUAL 
-properties
-(
-    "refresh_mode" = "incremental"
-)
-AS SELECT t1.dt, t1.col1 as col11, t2.col1 as col21, t1.col2 as col12, t2.col2 as col22
-FROM mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t1 JOIN mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t2
-ON t1.dt = t2.dt;
-
-SELECT t1.dt, t1.col1 as col11, t2.col1 as col21, t3.col1 as col31, t1.col2 as col12, t2.col2 as col22, t3.col2 as col32 FROM mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t1 JOIN mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t2 JOIN mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t3 JOIN mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t4 JOIN mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t5 ON t1.dt = t2.dt AND t1.dt = t3.dt AND t1.dt = t4.dt AND t1.dt = t5.dt WHERE t1.col2 > 1 AND t2.col2 > 1 AND t3.col2 > 1 AND t4.col2 > 1 AND t5.col2 > 2 ORDER BY t1.dt,  t1.col1 , t2.col1, t3.col1, t1.col2, t2.col2, t3.col2 limit 5;
-
 SELECT count(*) FROM test_mv_multi;
-
-SELECT k, v FROM mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t_multi ORDER BY k, v;
 
 -- Establish the TVR baseline (one run over the initial 2 rows).
 REFRESH MATERIALIZED VIEW test_mv_batch WITH SYNC MODE;
 
 -- Async refresh: the 6-row delta is split into multiple bounded INCREMENTAL runs.
 REFRESH MATERIALIZED VIEW test_mv_batch;
-
--- name: test_ivm_with_iceberg_partition_shape_error
-create external catalog mv_iceberg_${uuid0}
-properties
-(
-    "type" = "iceberg",
-    "iceberg.catalog.type" = "hive",
-    "hive.metastore.uris" = "${iceberg_catalog_hive_metastore_uris}"
-);
-
--- name: test_ivm_with_iceberg_scan
-create external catalog mv_iceberg_${uuid0}
-properties
-(
-    "type" = "iceberg",
-    "iceberg.catalog.type" = "hive",
-    "hive.metastore.uris" = "${iceberg_catalog_hive_metastore_uris}"
-);
 
 CREATE TABLE IF NOT EXISTS `part` (
   `p_partkey` int(11) NOT NULL COMMENT "",
@@ -7593,50 +5647,6 @@ CREATE TABLE IF NOT EXISTS `part` (
 );
 
 REFRESH MATERIALIZED VIEW lineorder_flat_mv WITH SYNC MODE;
-
-drop table mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.supplier force;
-
--- name: test_ivm_with_iceberg_union_all
-create external catalog mv_iceberg_${uuid0}
-properties
-(
-    "type" = "iceberg",
-    "iceberg.catalog.type" = "hive",
-    "hive.metastore.uris" = "${iceberg_catalog_hive_metastore_uris}"
-);
-
-create table mv_ice_db_b_${uuid0}.tj (
-  k int,
-  w bigint,
-  dt date
-) partition by(dt);
-
-drop table mv_iceberg_${uuid0}.mv_ice_db_a_${uuid0}.tj force;
-
--- name: test_mv_with_iceberg_self_join
--- Guards self-join after the same-name-join fix re-keyed relations by table identifier: the two
--- aliases of a self-join share one identifier, so they must still be treated as one base table
--- (one refresh-scope entry / a self-join), not mistaken for two distinct tables.
-create external catalog mv_iceberg_${uuid0}
-properties
-(
-    "type" = "iceberg",
-    "iceberg.catalog.type" = "hive",
-    "hive.metastore.uris" = "${iceberg_catalog_hive_metastore_uris}"
-);
-
-create database mv_olap_db_b_${uuid0};
-
-drop table mv_olap_db_a_${uuid0}.tj force;
-
-create table mv_hive_db_b_${uuid0}.tj (
-  k int,
-  w bigint,
-  dt date not null
-)
-partition by (dt);
-
-drop database mv_hive_${uuid0}.mv_hive_db_a_${uuid0};
 
 create materialized view mv_rollup
 partition by (date_trunc('month', event_day))
@@ -7687,17 +5697,10 @@ PROPERTIES ("replication_num" = "1");
 
 drop materialized view mv_list;
 
--- name: test_mv_refresh_dropped_base_partition_across_partial_refresh
--- A refresh of another range updates the version map too, and must not erase the evidence that the
--- mv partition outside it is stale.
-create database db_${uuid0};
-
 -- name: test_mv_refresh_emptied_partition_version_map_reset
 -- A base partition emptied by TRUNCATE sits at its initial version under a new id. Once the mv's version map is reset,
 -- it reads as a new, empty partition; the mv partition still holding its old rows must be refreshed all the same, and
 -- must not answer a rewritten query before that.
-
-create database db_${uuid0};
 
 REFRESH MATERIALIZED VIEW mv_u WITH SYNC MODE;
 
@@ -7719,18 +5722,7 @@ REFRESH MATERIALIZED VIEW test_mv5 WITH SYNC MODE;
 
 DROP MATERIALIZED VIEW test_mv6;
 
-CREATE MATERIALIZED VIEW test_mv1
-PARTITION BY (year, month, day)
-REFRESH DEFERRED MANUAL
-PROPERTIES (
-    "replication_num" = "1"
-)
-AS
-  SELECT year, month, day, province,sum(num) FROM mv_iceberg_${uuid0}.db_${uuid0}.t1 GROUP BY year, month, day, province;
-
 select * from test_mv4 order by year, month;
-
-SELECT year, month, date_trunc('day', dt), province,sum(num) FROM mv_iceberg_${uuid0}.db_${uuid0}.t1 GROUP BY year, month, date_trunc('day', dt), province order by year, month, date_trunc('day', dt), province;
 
 INSERT INTO bt1 VALUES (1, "sample-domain.com");
 
@@ -7815,8 +5807,6 @@ from partition_table t1
 join non_partition_table t2 on t1.dt1 = t2.dt2 
 group by dt1, dt2;
 
-DROP table mv_hive_${uuid0}.mv_hive_db_${uuid0}.partition_table force;
-
 CREATE MATERIALIZED VIEW IF NOT EXISTS `test_mv3`
 PARTITION BY date_trunc('week', `dt`)
 DISTRIBUTED BY HASH(`dt`)
@@ -7828,25 +5818,7 @@ AS select dt, sum(id) as s1 from u3 group by dt;
 
 select dt, s1 from test_mv2 order by 1, 2;
 
-create external catalog mv_iceberg_${uuid0}
-properties
-(
-    "type" = "iceberg",
-    "iceberg.catalog.type" = "hive",
-    "hive.metastore.uris" = "${hive_metastore_uris}"
-);
-
-select `id`, `location_id`, `person_id` from mv_iceberg_${uuid0}.mv_iceberg_db_${uuid0}.t1 order by 1, 2, 3;
-
 -- name: test_mv_with_list_partitions_hive
-
-create external catalog mv_hive_${uuid0}
-properties
-(
-    "type" = "hive",
-    "hive.catalog.type" = "hive",
-    "hive.metastore.uris" = "${hive_metastore_uris}"
-);
 
 USE test_mv_avg_distinct_rewrite_db;
 
@@ -7996,12 +5968,6 @@ SELECT * FROM test_mv1 order by c0, c1 limit 3;
 
 SELECT count(1) FROM test_mv1 where c0 = 10;
 
-CREATE MATERIALIZED VIEW test_mv1
-PARTITION BY (date_trunc('month', dt))
-REFRESH DEFERRED MANUAL
-PROPERTIES ("replication_num" = "1")
-AS SELECT id, dt, val FROM mv_iceberg_${uuid0}.mv_ice_db_${uuid0}.t1;
-
 CREATE TABLE t1 (id int, dt date, val int)
 PARTITION BY (dt);
 
@@ -8013,12 +5979,6 @@ SELECT id, ST_Area(ST_Buffer(ST_GeomFromText('POLYGON ((0 0,10 0,10 10,0 10,0 0)
 
 SELECT ST_AsText(ST_CoverageSimplify(ST_GeomFromText('MULTIPOLYGON EMPTY','EPSG:4326'),1) OVER());
 
-DROP TABLE exact_fixture_${uuid0};
-
-INSERT INTO ring_intervals_${uuid0} VALUES (1,'POLYGON ((0 0,16 0,16 16,12 16,12 4,10 4,10 14,6 14,6 4,4 4,4 16,0 16,0 0),(7 1,7 3,9 3,9 1,7 1))'),(2,'POLYGON ((7 15,9 15,9 17,7 17,7 15))'),(3,'POLYGON ((7.5 1.5,8.5 1.5,8 2.5,7.5 1.5))'),(4,NULL),(5,'MULTIPOLYGON EMPTY');
-
-DROP TABLE unchecked_${uuid0};
-
 SELECT ST_Intersects(ST_GeomFromText('POLYGON ((0 0,4 0,4 4,0 4,0 0))','EPSG:4326'),ST_GeomFromText('POLYGON ((2 -1,5 -1,5 2,2 2,2 -1))','EPSG:4326'));
 
 CREATE TABLE shapes (id INT,wkt STRING) DUPLICATE KEY(id) DISTRIBUTED BY HASH(id) BUCKETS 1 PROPERTIES("replication_num"="1");
@@ -8026,20 +5986,6 @@ CREATE TABLE shapes (id INT,wkt STRING) DUPLICATE KEY(id) DISTRIBUTED BY HASH(id
 SELECT ST_IsValid(ST_GeogFromWKB(unhex('010300000001000000040000000000000000000000000000000000000000000000000000400000000000000000000000000000f03f000000000000004000000000000000000000000000000000'))), ST_IsValid(ST_GeogFromWKB(unhex('0000000003000000010000000400000000000000000000000000000000400000000000000000000000000000003ff0000000000000400000000000000000000000000000000000000000000000')));
 
 SELECT ST_Area(ST_GeomFromText('POLYGON ((0 0,1 0,1 1,0 1,0 0))')), ST_Perimeter(ST_GeomFromText('POLYGON ((0 0,1 0,1 1,0 1,0 0))'));
-
-WITH src AS (SELECT id, ST_GeogFromText(wkt) AS g FROM nested_fixture_${uuid0})
-SELECT id, ST_AsText(m[id]) FROM (
-    SELECT id, map{id:g} AS m FROM src
-    UNION ALL
-    SELECT id, map{CAST(id AS BIGINT):g} AS m FROM src
-) q ORDER BY id;
-
-WITH src AS (SELECT id, ST_GeomFromText(wkt, 'EPSG:3857') AS g FROM nested_fixture_${uuid0})
-SELECT id, ST_AsText(m[id]) FROM (
-    SELECT id, map{id:g} AS m FROM src
-    UNION ALL
-    SELECT id, map{CAST(id AS BIGINT):g} AS m FROM src
-) q ORDER BY id;
 
 WITH t AS (SELECT ST_Intersection(ST_GeomFromText('POLYGON ((0 0,4 0,4 4,0 4,0 0))', 'EPSG:3857'), ST_GeomFromText('POLYGON ((4 0,8 0,8 4,4 4,4 0))', 'EPSG:3857')) AS g) SELECT ST_GeometryType(g), ST_Length(g) FROM t;
 
@@ -8051,31 +5997,12 @@ SELECT ST_Distance(ST_GeomFromText('POINT (0 0)','EPSG:4326'),ST_GeomFromText('P
 
 SELECT ST_GeomFromWKB(UNHEX('0101000000000000000000F87F0000000000000000'), 'EPSG:4326') IS NULL, ST_GeomFromWKB(UNHEX('0101000000000000000000F07F0000000000000000'), 'EPSG:4326') IS NULL, ST_GeomFromWKB(UNHEX('0101000000000000000000F0FF0000000000000000'), 'EPSG:4326') IS NULL;
 
-DROP TABLE geo_distinct_${uuid0};
-
-CREATE TABLE geo_write_${uuid0}.db_${uuid0}.sink (wkt VARCHAR(64), wkb VARBINARY);
-
 -- name: test_geo_insert_assignment
 CREATE TABLE geo_insert_src (id INT, wkt VARCHAR(160)) PROPERTIES('replication_num'='1');
 
 INSERT INTO geo_insert_binary SELECT id,ST_AsBinary(ST_GeomFromText(wkt,'EPSG:3857')) FROM geo_insert_src;
 
-INSERT INTO multi_in_geometry_${uuid0} VALUES (1, 'POINT (1 2)'), (2, 'POINT EMPTY'), (3, NULL);
-
 -- name: test_scalar_geo_geometry
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 SELECT CASE WHEN true THEN ST_AsText(g) END, hex(ST_AsBinary(g)), g IS NULL from (select ST_GeomFromText('POINT (1 2)', 'EPSG:3857') g) t;
 
@@ -8128,12 +6055,6 @@ insert into t values ('2026-01-01', 1, 101), ('2026-01-01', 2, 102), ('2026-01-0
 
 insert overwrite t values ('2026-01-15', 1, 9151), ('2026-02-03', 1, 9231), ('2026-03-05', 1, 9351);
 
-drop database test_merge_dyn_ow_pk_${uuid0};
-
-drop database test_merge_insert_${uuid0};
-
-use test_merge_multi_${uuid0};
-
 alter table t2 partition by time_slice(b, interval 1 minute);
 
 alter table t partition by time_slice(b, interval 1 day);
@@ -8170,195 +6091,11 @@ CREATE TABLE t2 (
 DISTRIBUTED BY HASH(k1) BUCKETS 2
 PROPERTIES ("replication_num" = "1");
 
-create table if not exists paimon_ddl_${uuid0}.ddl_db.append_demo (ignored int);
-
-drop database paimon_ddl_${uuid0}.ddl_db;
-
-create table paimon_ddl_${uuid0}.ddl_db.pk_explicit (Id bigint not null) primary key (Id);
-
-select get_json_string(fields, '$[0].type'), get_json_string(fields, '$[1].type'), get_json_string(fields, '$[2].type'), primary_keys from paimon_ddl_reader_${uuid0}.ddl_db.`pk_both$schemas`;
-
-drop table if exists paimon_ddl_${paimon_ddl_warehouse_id}.ddl_db.pk_property;
-
-select get_json_string(fields, '$[4].type.type'), get_json_string(fields, '$[4].type.fields[0].name'), get_json_string(fields, '$[4].type.fields[0].type'), get_json_string(fields, '$[4].type.fields[1].name'), get_json_string(fields, '$[4].type.fields[1].type.type'), get_json_string(fields, '$[4].type.fields[1].type.element') from paimon_ddl_reader_${uuid0}.ddl_db.`type_demo$schemas`;
-
-select count(*) from paimon_dv_${uuid0}.paimon_test.pk_dv_parquet_v1 where id = 2 or amount in (10, 20);
-
-select id from paimon_dv_${uuid0}.paimon_test.pk_dv_orc_v1 where amount is null;
-
-select id, value from paimon_coverage_${uuid0}.paimon_test.empty_deleted_v1;
-
-select value, count(*) from paimon_coverage_${uuid0}.paimon_test.empty_v1 group by value;
-
-select id,v,p from paimon_boundaries_${uuid0}.paimon_test.reader_fallback_json_v1 order by id;
-
-select id, amount, flag from paimon_static_${uuid0}.paimon_test.append_orc_v1 order by id;
-
-select count(*), count(amount), sum(amount) from paimon_static_${uuid0}.paimon_test.append_avro_v1;
-
 select id, variant_typeof(v) from variant_basic order by 1;
 
 select count(*) from image_blob;
 
-select id from paimon_matrix_${uuid0}.paimon_test.global_index_v1 where id >= 2 order by id;
-
-select count(*) > 0, coalesce(sum(record_count), 0) > 0 from ${paimon_hms_prefix}${uuid0}.${paimon_hms_prefix}${uuid0}.`${paimon_hms_prefix}files$files`;
-
-insert into paimon_write_${uuid0}.writer_db.append_rows by name select 'five' as value, 'static' as p, 5 as id;
-
-drop table if exists paimon_write_${paimon_ddl_warehouse_id}.writer_db.append_rows;
-
-insert into paimon_write_${uuid0}.writer_db.pk_rows select 1, 'a', 'new';
-
-insert into paimon_write_${uuid0}.writer_db.fixed_append select id, p, value from paimon_write_${uuid0}.writer_db.pk_rows;
-
-drop table if exists paimon_write_${paimon_ddl_warehouse_id}.writer_db.fixed_append;
-
-insert into paimon_write_${uuid0}.writer_db.boolean_rows partition(p=true) values (1);
-
-select id, value, char_length(value), length(value) from paimon_write_${uuid0}.writer_db.utf8_rows order by id;
-
-select id, a[1], a[2], m['中文'], r.field_value, r.nested[1] from paimon_write_${uuid0}.writer_db.utf8_nested order by id;
-
-insert into paimon_write_${uuid0}.writer_db.scalar_rows (id) values (3);
-
-select id,array_length(a),a[1][1],a[1][2],array_length(a[2]),a[3] is null,m['a'][1],m['a'][2],r.x,r.y.z from paimon_write_${uuid0}.writer_db.nested_rows order by id;
-
-insert into paimon_write_${uuid0}.writer_db.variant_rows select 7,cast(parse_json('null') as variant);
-
-create database paimon_insert_source_${uuid0};
-
-insert into paimon_write_${uuid0}.writer_db.target_rows (value,id) select 8,201;
-
-create table paimon_write_${uuid0}.writer_db.target_rows (id bigint not null,value varchar(8)) primary key(id) properties ('bucket'='3','file.format'='parquet');
-
-DROP DATABASE IF EXISTS paimon_hms_write_${paimon_ddl_warehouse_id}.paimon_hms_write_${paimon_ddl_warehouse_id};
-
-insert overwrite paimon_overwrite_${uuid0}.writer_db.overwrite_rows select 4, 'd', 'empty' where false;
-
-drop table if exists paimon_overwrite_${paimon_ddl_warehouse_id}.writer_db.unpartitioned;
-
-insert overwrite paimon_overwrite_${uuid0}.writer_db.overwrite_rows partition(p='a/b') select 6, 'empty' where false;
-
--- name: test_paimon_int96_signed_nanoseconds
-create external catalog paimon_int96_${uuid0} properties (
-"type" = "paimon",
-"paimon.catalog.type" = "filesystem",
-"paimon.catalog.warehouse" = "oss://${oss_bucket}/ci_catalog_test_data/paimon/",
-"aws.s3.access_key" = "${oss_ak}",
-"aws.s3.secret_key" = "${oss_sk}",
-"aws.s3.endpoint" = "${oss_endpoint}",
-"aws.s3.region" = "${oss_region}",
-"aws.s3.enable_ssl" = "true"
-);
-
-select id, detail.score from paimon_coverage_${uuid0}.paimon_test.nested_types_v1 order by id;
-
-select id, amount, score from paimon_matrix_${uuid0}.paimon_test.pk_aggregation_orc_v1 order by id;
-
-select id, amount, score from paimon_matrix_${uuid0}.paimon_test.pk_aggregation_avro_v1 where amount >= 10 order by id;
-
-select count(*), count(amount), sum(amount) from paimon_matrix_${uuid0}.paimon_test.pk_first_row_parquet_v1;
-
-select id, amount, score from paimon_matrix_${uuid0}.paimon_test.pk_first_row_avro_v1 order by id;
-
-select id, amount, score from paimon_matrix_${uuid0}.paimon_test.pk_partial_update_parquet_v1 where amount >= 10 order by id;
-
-select count(*), count(amount), sum(amount) from paimon_matrix_${uuid0}.paimon_test.pk_partial_update_orc_v1;
-
-select id,v,p from paimon_boundaries_${uuid0}.paimon_test.reader_mixed_partitions_v1 order by id;
-
-select id from paimon_coverage_${uuid0}.paimon_test.nested_types_v1 where nums is null;
-
-select count(*), sum(amount), count(amount) from paimon_static_${uuid0}.paimon_test.pk_orc_unmerged_v1;
-
-select id, amount, flag from paimon_static_${uuid0}.paimon_test.pk_parquet_unmerged_v1 order by id;
-
--- name: test_paimon_partial_update_groups
-create external catalog paimon_boundaries_${uuid0}
-properties (
-"type" = "paimon",
-"paimon.catalog.type" = "filesystem",
-"paimon.catalog.warehouse" = "oss://${oss_bucket}/ci_catalog_test_data/paimon/",
-"aws.s3.access_key" = "${oss_ak}",
-"aws.s3.secret_key" = "${oss_sk}",
-"aws.s3.endpoint" = "${oss_endpoint}"
-);
-
-select v from paimon_boundaries_${uuid0}.paimon_test.reader_partial_delete_v1 order by id;
-
-select id from paimon_coverage_${uuid0}.paimon_test.partitioned_v1 where region is null;
-
-select id from paimon_static_${uuid0}.paimon_test.file_pruning_v1 where abs(id) = 1 order by id;
-
-select count(*) from paimon_static_${uuid0}.paimon_test.pk_parquet_unmerged_v1 where amount = 10;
-
-select count(*) from paimon_pk_${uuid0}.paimon_test.pk_merge_v1 where note in ("old", "deleted");
-
-select score, id from paimon_matrix_${uuid0}.paimon_test.pk_deduplicate_parquet_v1 order by id;
-
-select id from paimon_matrix_${uuid0}.paimon_test.pk_deduplicate_orc_v1 where amount is null order by id;
-
--- name: test_paimon_primary_key_sequence
-create external catalog paimon_coverage_${uuid0}
-properties (
-"type" = "paimon",
-"paimon.catalog.type" = "filesystem",
-"paimon.catalog.warehouse" = "oss://${oss_bucket}/ci_catalog_test_data/paimon/",
-"aws.s3.access_key" = "${oss_ak}",
-"aws.s3.secret_key" = "${oss_sk}",
-"aws.s3.endpoint" = "${oss_endpoint}"
-);
-
-select note, id from paimon_coverage_${uuid0}.paimon_test.pk_sequence_v1 order by amount desc limit 1;
-
-select id,cast(v as varchar) from paimon_boundaries_${uuid0}.paimon_test.reader_timestamp9_v1 order by id;
-
-select id,array_sort(map_keys(v)),array_sort(map_values(v)) from paimon_boundaries_${uuid0}.paimon_test.reader_nullable_map_avro_v1 order by id;
-
--- name: test_paimon_reader_modes
-create external catalog paimon_readers_${uuid0}
-properties (
-"type" = "paimon",
-"paimon.catalog.type" = "filesystem",
-"paimon.catalog.warehouse" = "oss://${oss_bucket}/ci_catalog_test_data/paimon/",
-"aws.s3.access_key" = "${oss_ak}",
-"aws.s3.secret_key" = "${oss_sk}",
-"aws.s3.endpoint" = "${oss_endpoint}"
-);
-
-select count(*) from paimon_predicates_${uuid0}.paimon_test.scalar_types where c_int not in (3, NULL);
-
-select id from paimon_predicates_${uuid0}.paimon_test.scalar_types where c_string = "string 值 🚀";
-
-select id from paimon_predicates_${uuid0}.paimon_test.scalar_types where c_date < cast("2024-01-01" as date);
-
-select id from paimon_coverage_${uuid0}.paimon_test.schema_evolution_v1 where amount = 10;
-
--- name: test_paimon_statistics_primary_key
-create external catalog paimon_static_${uuid0}
-properties (
-"type" = "paimon",
-"paimon.catalog.type" = "filesystem",
-"paimon.catalog.warehouse" = "oss://${oss_bucket}/ci_catalog_test_data/paimon/",
-"enable_get_stats_from_external_metadata" = "true",
-"aws.s3.access_key" = "${oss_ak}",
-"aws.s3.secret_key" = "${oss_sk}",
-"aws.s3.endpoint" = "${oss_endpoint}"
-);
-
 set chunk_size = 1024;
-
--- name: test_paimon_writer_snapshot
-create external catalog paimon_writer_${uuid0}
-properties (
-"type" = "paimon",
-"paimon.catalog.type" = "filesystem",
-"paimon.catalog.warehouse" = "oss://${oss_bucket}/ci_catalog_test_data/paimon/",
-"aws.s3.access_key" = "${oss_ak}",
-"aws.s3.secret_key" = "${oss_sk}",
-"aws.s3.endpoint" = "${oss_endpoint}"
-);
 
 -- Insert multiple batches to generate multiple rowsets
 INSERT INTO pk_parallel_2 VALUES (1, 1, 'a', 100), (2, 2, 'b', 200);
@@ -8380,13 +6117,6 @@ PROPERTIES (
 );
 
 INSERT INTO pk_parallel_5 VALUES (15, 15, 'o', 1500), (16, 16, 'p', 1600);
-
--- name: test_parallel_compaction_dup_table @cloud @sequential @slow
--- Test parallel compaction for duplicate key table
-create database test_parallel_compaction_dup_${uuid0};
-
--- Check rowset count before compaction
-SELECT NUM_ROWSET FROM information_schema.be_tablets t, information_schema.tables_config c WHERE t.TABLE_ID = c.TABLE_ID AND c.TABLE_NAME = 'dup_parallel' AND c.TABLE_SCHEMA = 'test_parallel_compaction_dup_${uuid0}';
 
 -- Create AGG table with parallel compaction enabled
 CREATE TABLE `agg_parallel` (
@@ -8420,8 +6150,6 @@ SELECT COUNT(*) FROM uniq_parallel;
 
 INSERT INTO pk_no_parallel VALUES (7, 7, 'g', 700), (8, 8, 'h', 800);
 
-DROP DATABASE test_parallel_compaction_disabled_${uuid0} FORCE;
-
 -- Alter property back to enable
 ALTER TABLE pk_alter_parallel SET ("lake_compaction_max_parallel" = "3");
 
@@ -8442,19 +6170,10 @@ SELECT COUNT(*) FROM pk_with_updates;
 
 INSERT INTO pk_large_data SELECT generate_series, REPEAT('w', 100), generate_series * 10 FROM TABLE(generate_series(3001, 4000));
 
--- name: test_parallel_compaction_multiple_buckets @cloud @sequential @slow
--- Test parallel compaction with multiple buckets
-create database test_parallel_compaction_buckets_${uuid0};
-
--- Check rowset count before compaction (should have multiple rowsets per bucket)
-SELECT SUM(NUM_ROWSET) FROM information_schema.be_tablets t, information_schema.tables_config c WHERE t.TABLE_ID = c.TABLE_ID AND c.TABLE_NAME = 'pk_multi_buckets' AND c.TABLE_SCHEMA = 'test_parallel_compaction_buckets_${uuid0}';
-
 -- Set write config for multiple segments
 UPDATE information_schema.be_configs SET VALUE = 'false' WHERE name = 'enable_load_spill';
 
 UPDATE information_schema.be_configs SET VALUE = '3145728' WHERE name = 'lake_compaction_max_bytes_per_subtask';
-
-UPDATE information_schema.be_configs SET VALUE = '${orig_write_buffer_size}' WHERE name = 'write_buffer_size';
 
 insert into tab1 (k1, v1, v2) values (301, 3, 3);
 
@@ -8612,8 +6331,6 @@ with agged_table as ( select distinct c0, c1 from t0) select /*+SET_VAR(cbo_cte_
 
 set enable_async_profile=true;
 
-select pipe_name, state from information_schema.pipes where database_name = 'db_${uuid0}' and pipe_name = 'p1';
-
 set query_debug_options = '{"execDebugOptions":[{"plan_node_id":3, "debug_action":"BLOCK_SOURCE_OPERATOR", "value":500}]}';
 
 select c1, count(*) from t0 group by c1 order by c1;
@@ -8645,20 +6362,6 @@ CREATE MATERIALIZED VIEW `mv1` AS
 SELECT `v1`, SUM(`v2`) FROM `t0`
 GROUP BY `v1`;
 
-LOAD LABEL label_${uuid2} (
-    DATA INFILE("oss://${oss_bucket}/test_profile/test_load_brpc_reached_timeout/${uuid0}/brpc_reached_timeout.csv")
-    INTO TABLE t0
-    COLUMNS TERMINATED BY ","
-) WITH BROKER (
-    "aws.s3.access_key" = "${oss_ak}",
-    "aws.s3.secret_key" = "${oss_sk}",
-    "aws.s3.endpoint" = "${oss_endpoint}"
-)
-PROPERTIES
-(
-    "timeout" = "3600"
-);
-
 INSERT INTO `t0` (v1, v2, v3) values
     (1, 1, 1),
     (1, 1, 2),
@@ -8672,21 +6375,6 @@ INSERT INTO `t0` (v1, v2, v3) values
     (2, 4, 10),
     (2, 4, 11),
     (2, 4, 12);
-
-DROP TABLE if exists pdc_t1_${uuid0};
-
-select t0.v1, count(*) from pdc_t0_${uuid0} t0 join pdc_t1_${uuid0} t1 on t0.v1 = t1.v4 group by t0.v1;
-
--- A UNION branch projecting a constant erases the group-by key, so a count pushed into each branch would
--- land ungrouped and emit a phantom row. With both inputs empty the query must return no rows at all,
--- under forced push down exactly as without it.
-CREATE TABLE pdc_e0_${uuid0}
-(
-v1 BIGINT NOT NULL
-) ENGINE=OLAP
-DUPLICATE KEY(`v1`)
-DISTRIBUTED BY HASH(`v1`) BUCKETS 1
-PROPERTIES("replication_num" = "1");
 
 -- name: test_push_down_distinct_below_window_join
 DROP TABLE if exists pdw_t0;
@@ -8702,10 +6390,6 @@ insert into t_heavy select g, case when g % 97 = 0 then 'n' else 'y' end, case w
 insert into t_heavy select g, case when g % 97 = 0 then 'n' else 'y' end, case when g % 200 = 1 then concat('a/b/c/no-date-', cast(g as string)) else concat('a/b/c/2026-07-15/part-', cast(g as string)) end from (select generate_series as g from table(generate_series(2601, 2800))) t;
 
 select /*+SET_VAR(push_down_heavy_exprs=false)*/ substr(s, 1, 6) as p, min(nullif(regexp_extract(s, '(\\d\\d\\d\\d-\\d\\d-\\d\\d)', 1), '')) as k from t_heavy where flag = 'y' group by p;
-
-INSERT INTO t_negate_nse_${uuid0} VALUES (1, 1, 2), (2, 1, 3), (3, NULL, 2), (4, NULL, NULL), (5, 2, 2);
-
-SELECT count(*) FROM ( SELECT MOD ( CAST ( c_int AS BOOLEAN ) = c_bigint , 3 ) FROM pullup_const_in_${uuid0} ) t(c1) WHERE c1 NOT IN (0, 1);
 
 INSERT INTO t0_pk (ts,k0,k1,v0,v1)
 VALUES
@@ -8781,21 +6465,6 @@ VALUES
 ('2022-01-23 19:22:00', 'Pc', 'hhbawx', '-740731249600493', '88439.40'),
 ('2022-01-05 09:04:20', '7Bh', 'cawanm', '23602', '302.44');
 
--- The entries populated above outlive the query: the partition-range predicate is
--- stripped from the cache digest and encoded per tablet, so a query over a narrower
--- range reuses them. On a cold cache the narrow query below is exact (5 partitions x
--- 4 keys = 20 insertions, well under LIMIT 40), so anything but 4/20/5/5 is the
--- poisoned entries left behind by the wide query talking.
-CREATE TABLE t2 (
-  dt date NOT NULL,
-  c1 int NOT NULL,
-  v1 bigint NOT NULL
-) ENGINE=OLAP
-DUPLICATE KEY(dt, c1)
-PARTITION BY RANGE(dt) (START ("2022-01-01") END ("2022-02-01") EVERY (INTERVAL 1 day))
-DISTRIBUTED BY HASH(c1) BUCKETS 4
-PROPERTIES("replication_num" = "1", "colocate_with" = "cg2_${uuid0}");
-
 INSERT INTO av1 VALUES (1,100),(2,100),(3,100),(4,100),(5,100),(6,100),(7,100),(8,100);
 
 -- The other direction, on a table whose entries are cold, so the failure cannot hide behind
@@ -8817,44 +6486,6 @@ set enable_query_cache = true;
 -- The cost-based gate wants a TopN-with-limit or a limit-after-join at the plan root; this shape
 -- has an aggregation there, so GLM is forced on to reach the same plan a top-level LIMIT would.
 set enable_global_late_materialization = true;
-
--- name: test_query_cache_join_predicate_cse
--- A join predicate's common sub-expressions are factored out into JoinNode.commonSlotMap,
--- and the join conjuncts then reference them by slot id alone. When those definitions are
--- missing from the digest, two joins whose predicates differ only inside a factored-out
--- subexpression share a cache key -- and a join below the cache interpolation point is
--- inside the digested subtree, so it decides which rows the cached per-tablet aggregate is
--- computed from. Whichever query runs first populates the entries and the second silently
--- inherits its answer.
---
--- Three things must line up, and getting any one wrong hides the bug rather than removing it:
---   1. the join sits BELOW the aggregation (above it, it is outside the digested subtree);
---   2. both bounds reference the other side of the join -- with literal bounds the whole
---      predicate is pushed into the right scan and never becomes a join predicate at all;
---   3. the subexpression appears twice, or it is never factored out into commonSlotMap.
-CREATE TABLE n1 (
-  dt date NOT NULL,
-  c1 int NOT NULL,
-  ts bigint NOT NULL,
-  v1 bigint NOT NULL
-) ENGINE=OLAP
-DUPLICATE KEY(dt, c1)
-PARTITION BY RANGE(dt) (START ("2022-01-01") END ("2022-02-01") EVERY (INTERVAL 1 day))
-DISTRIBUTED BY HASH(c1) BUCKETS 4
-PROPERTIES("replication_num" = "1", "colocate_with" = "cg_nlj_${uuid0}");
-
--- The same in the other direction, on tables whose entries are still cold, so the failure
--- cannot hide behind whichever order happened to run first.
-CREATE TABLE n3 (
-  dt date NOT NULL,
-  c1 int NOT NULL,
-  ts bigint NOT NULL,
-  v1 bigint NOT NULL
-) ENGINE=OLAP
-DUPLICATE KEY(dt, c1)
-PARTITION BY RANGE(dt) (START ("2022-01-01") END ("2022-02-01") EVERY (INTERVAL 1 day))
-DISTRIBUTED BY HASH(c1) BUCKETS 4
-PROPERTIES("replication_num" = "1", "colocate_with" = "cg_nlj3_${uuid0}");
 
 select sum(s) from (select n1.c1, sum(n1.v1) s from n1 join n2
   on n1.c1 = n2.c1 and (n2.ts % 9) > n1.ts and (n2.ts % 9) < n1.v1 group by n1.c1) x;
@@ -8934,8 +6565,6 @@ primary key(k1)
 order by(k1)
 properties('replication_num' = '1');
 
-select buckets from information_schema.partitions_meta where db_name = 'db_${uuid0}' and table_name = 't1';
-
 -- The join on the colocate column is still planned colocated, and a colocated scan fails unless every
 -- tablet of both tables lies inside one ColocateRange. It returns the same rows as a join that is not
 -- colocated.
@@ -8943,20 +6572,6 @@ select buckets from information_schema.partitions_meta where db_name = 'db_${uui
 select count(*), sum(t1.v), sum(t2.w) from t1 join t2 on t1.k1 = t2.k1;
 
 -- No rejected ALTER registered a job.
-
-
--- Rejected: in a group colocated on (k1, k2) the new sort key must start with k1, k2 in that order.
-create table t4 (
-    k1 int not null,
-    k2 int not null,
-    k3 int not null,
-    v int not null
-)
-duplicate key(k1, k2, k3)
-order by(k1, k2, k3)
-properties('replication_num' = '1', 'colocate_with' = 'grp_two_${uuid0}:k1,k2');
-
-select sort_key from information_schema.tables_config where table_schema = 'db_${uuid0}' and table_name = 't3';
 
 -- Accepted: the new sort key (k1, k3) keeps the colocate column k1 first.
 alter materialized view mv1 order by (k1, k3);
@@ -9048,15 +6663,9 @@ alter table t add rollup r_dup(k2, k1, v1) duplicate key(k2) order by (k2, k1);
 -- v1 leads the sort key of r_v but is not in the base sort key: it can be neither dropped nor retyped.
 alter table t add rollup r_v(v1, k1) order by (v1, k1);
 
-GRANT USAGE ON AI FUNCTION ai_complete TO ai_user_${uuid0};
-
-REVOKE USAGE ON ALL AI FUNCTIONS FROM ai_user_${uuid0};
-
 -- name: test_set_partition_version @native
 
 CREATE TABLE t (a int);
-
-REFRESH EXTERNAL TABLE default_catalog.db_${uuid0}.not_exist_tbl;
 
 analyze sample table activities with sync mode;
 
@@ -9065,12 +6674,7 @@ select * from t order by id;
 
 -- Row 2: "toolongname" (11 chars) > varchar(5)
 
-
 select * from t order by id;
-
-select count(*) as rejected_count
-from _statistics_.rejected_records
-where target_database='db_${uuid0}' and target_table='t';
 
 -- =============================================================
 -- ORC rejection via INSERT FROM FILES (stream load does not accept orc).
@@ -9080,27 +6684,12 @@ where target_database='db_${uuid0}' and target_table='t';
 -- INSERT INTO ... SELECT * FROM FILES('format'='orc'): bad row rejected in tablet_sink.
 -- Uses the same OSS-based fixture distribution as the parquet case.
 
-create database db_${uuid0};
-
 -- =============================================================
 -- Row access policy
 -- =============================================================
 
 -- name: test_rejected_records_row_access_policy @sequential
 -- Non-root user sees only records for tables they hold SELECT on.
-
-create database db_a_${uuid0};
-
-drop database db_a_${uuid0};
-
--- Exactly one rejected row, load_type=INSERT, raw_record present, load_label is the insert txn label (non-null)
-select load_type,
-       load_label is not null as has_label,
-       raw_record is not null as has_raw_record,
-       error_message is not null as has_err_msg
-from _statistics_.rejected_records
-where target_database='db_${uuid0}' and target_table='dst'
-order by created_at limit 5;
 
 -- =============================================================
 -- INSERT FROM FILES with CSV: load_type tagged INSERT, raw_record
@@ -9117,36 +6706,9 @@ order by created_at limit 5;
 -- CSV files have no header, so columns are referenced positionally
 -- ($1, $2) rather than by name.
 
-create database db_${uuid0};
-
-select count(1) 
-from (
-    select * from iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.ice_tbl_${uuid0} union all 
-    select * from iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.ice_tbl_${uuid0} union all 
-    select * from iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.ice_tbl_${uuid0} union all 
-    select * from iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.ice_tbl_${uuid0} union all 
-    select * from iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.ice_tbl_${uuid0} union all 
-    select * from iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.ice_tbl_${uuid0} union all 
-    select * from iceberg_sql_test_${uuid0}.iceberg_db_${uuid0}.ice_tbl_${uuid0}
-)t;
-
-select count(1) as num_threads from information_schema.be_threads where name = 'pip_exec_${rgd1_id}' and be_id = (select be_id from information_schema.be_threads where name = 'pip_exec_${rgd1_id}' limit 1);
-
 SELECT sleep(5);
 
 insert into t1 select row_number() over() as idx from __row_util_base;
-
-select min(bound_cpus) = ${num_cores}-3-2, max(bound_cpus) = ${num_cores}-3-2 from information_schema.be_threads where name = 'pip_exec_com';
-
-create resource group rg_${uuid0} 
-    to ( user='user_${uuid0}' ) 
-    with ('cpu_core_limit' = '1', 'mem_limit' = '0.99', 'big_query_cpu_second_limit'='1');
-
-CREATE RESOURCE GROUP rgn2_${uuid0} 
-    TO ( user='user_${uuid0}' ) 
-    WITH ( 'cpu_weight' = '3', 'mem_limit' = '0.99' );
-
-select count(1)=cast(${num_cores}*0.3 as int) as num_threads from information_schema.be_threads where name = 'pip_exec_${rgd1_id}' and be_id = (select be_id from information_schema.be_threads where name = 'pip_exec_${rgd1_id}' limit 1);
 
 -- name: test_create_resource_group_with_mem_pool
 
@@ -9176,31 +6738,14 @@ SELECT k3, k2, mv_sum_v1 FROM mv_1 [_SYNC_MV_] ORDER BY 1, 2;
 --   statement too, and they have to come back on it too.
 -- Method: mirrors the rollup case above, through the materialized view spelling of the statement.
 
-create database db_${uuid0};
-
 SHOW ROUTINE LOAD FOR rl_commit_offset;
 
 select timestamp_progress from information_schema.routine_load_jobs where name = "rl_offset_lag" order by id desc limit 1;
-
-select * from db_${uuid0}.test_lambda order by id;
 
 -- name: test_multicolumn_global_runtime_filter_prune_column @slow
 set enable_multicolumn_global_runtime_filter=true;
 
 INSERT INTO TABLE_OBJECT SELECT generate_series, generate_series, [1, 2, 3, 4, 5] FROM TABLE(generate_series(1, 1000000));
-
--- The two non-NULL Build rows produce narrow runtime-filter bounds.
--- The NULL key is ignored by every ordinary-equality runtime filter below.
-insert into rf_expr_build_${uuid0} values
-    (1, 10, 9, 20, 5, 22, -10, 2010),
-    (2, 14, 13, 28, 7, 30, -14, 2014),
-    (3, null, null, null, null, null, null, null);
-
--- year() is the function currently recognized as monotonic by the RF expression path.
-select p.id, b.id
-from rf_expr_probe_${uuid0} p join rf_expr_build_${uuid0} b
-on year(p.c_date) = b.k_year
-order by p.id, b.id;
 
 -- Without a join, as the reference: NULL -> 38 rows, 5 -> 19 rows, none of them rejected by s <> 'b'.
 SELECT dk, COUNT(*) AS c, SUM(IF(s IS NULL OR s = 'b', 1, 0)) AS rejected FROM probe_t
@@ -9368,13 +6913,9 @@ PROPERTIES ("replication_num" = "1");
 
 insert into t_bitmap select x, x from table(generate_series(1, 1000)) t(x);
 
-drop database lake_bf_added_col_${uuid0};
-
 select count(*) from t1 where v2 = 's_300';
 
 delete from t1 where k1 = 600;
-
-drop database lake_idx_fb_${uuid0};
 
 select count(*) from t1 where v2 = 'apple';
 
@@ -9396,23 +6937,11 @@ insert into t_reused select x, x, x + 10000 from table(generate_series(1, 2000))
 
 select count(*) from t_reused where v = 10200;
 
--- name: test_lake_add_index_pk_column_partial_update @cloud
-create database lake_idx_pu_${uuid0};
-
 update t_noidx set v1 = 777 where k1 <= 2;
 
 select * from t_fast order by k1;
 
 select * from t_bf order by k1;
-
--- name: test_lake_add_ngram_bloom_filter @cloud
--- Verifies the lake ADD INDEX ... USING NGRAMBF fast path:
--- (1) the alter commits via the IDG fast path,
--- (2) queries return correct results, and
--- (3) the profile counter BloomFilterFilterRows > 0 — proving the
---     ngram bloom filter actually skipped rows on segments where the
---     LIKE substring is absent.
-create database lake_ngram_${uuid0};
 
 -- Drive profile-based assertion that the IDG-backed NGRAMBF was actually
 -- consulted. We verify the BloomFilterFilter counter has non-zero time
@@ -9428,8 +6957,6 @@ CREATE TABLE t1 (
 ) DUPLICATE KEY(k1)
 DISTRIBUTED BY HASH(k1) BUCKETS 1
 PROPERTIES ("replication_num" = "1");
-
-drop database lake_plain_bf_${uuid0};
 
 INSERT INTO t1 values(1, '2022-04-17 00:00:00', 'k3', 1, 1, 1.0, 'k7'), (2, '2022-04-20 00:00:00', 'k4', 1, 1, 1.0, 'k7');
 
@@ -9643,11 +7170,7 @@ insert into t_short_circuit_part values("2026-04-01", 1, 1), ("2026-04-02", 2, 1
 -- Method: a table with three partitions, and the alter lists of a database that has no alter
 --         jobs at all, which is where an offset is past the end without setting anything up.
 
-create database db_${uuid0};
-
 insert into t_dst select cast(v as int) from t_src;
-
-SELECT count(*) FROM t_dup TABLET(${tablet_id});
 
 -- Order matters: the TEMPORARY partition is loaded first, so it ends up with the OLDER
 -- visible-version time, and swapping it in later drags the table-level maximum down.
@@ -9679,136 +7202,13 @@ insert into t2 values (1, 'hello', 'plain'), (2, 'say "hi"', 'val'), (3, 'path\\
 
 -- name: testCsvFilesSink1
 
-insert into files (
-	"path" = "s3://${oss_bucket}/test_sink/testCsvFilesSink1/${uuid0}/",
-    "aws.s3.endpoint" = "${oss_endpoint}",
-    "aws.s3.access_key" = "${oss_ak}",
-    "aws.s3.secret_key" = "${oss_sk}",
-	"format" = "csv",
-	"compression" = "uncompressed",
-	"csv.column_separator" = ",",
-	"csv.row_delimiter" = "\n"
-)
-select 1 as k1, "A" as k2 union select 2 as k1, "B" as k2;
-
-create table hive_sink_${uuid0}.hive_sink_db_${uuid0}.hive_sink_table_${uuid0} properties (
-    "file_format" = "parquet"
-)
-as select * from files (
-    "path" = "oss://${oss_bucket}/test_across_engine/test_sink/${uuid0}/tpch_lineitem.parquet",
-    "format" = "parquet",
-    "aws.s3.access_key"  =  "${oss_ak}",
-    "aws.s3.secret_key"  =  "${oss_sk}",
-    "aws.s3.endpoint"  =  "${oss_endpoint}"
-);
-
 -- name: test_sink_orc_fault_injection_oss @sequential
-
-
-create external catalog hive_sink_${uuid0} PROPERTIES (
-    "type"="hive", 
-    "hive.metastore.uris"="${hive_metastore_uris}",
-    "aws.s3.access_key"  =  "${oss_ak}",
-    "aws.s3.secret_key"  =  "${oss_sk}",
-    "aws.s3.endpoint"  =  "${oss_endpoint}"
-);
-
-select * from files (
-	"path" = "oss://${oss_bucket}/test_sink/test_files_sink/${uuid0}/*",
-    "fs.oss.endpoint" = "${oss_endpoint}",
-    "fs.oss.accessKeyId" = "${oss_ak}",
-    "fs.oss.accessKeySecret" = "${oss_sk}",
-	"format" = "parquet"
-);
-
-insert into t3 select * from files (
-    "path" = "oss://${oss_bucket}/test_sink/test_files_sink/${uuid0}/*",
-    "fs.oss.endpoint" = "${oss_endpoint}",
-    "fs.oss.accessKeyId" = "${oss_ak}",
-    "fs.oss.accessKeySecret" = "${oss_sk}",
-    "format" = "parquet"
-);
-
-insert into files(
-    "path" = "oss://${oss_bucket}/test_files/parquet_format/${uuid0}/",
-    "format" = "parquet",
-    "compression" = "zstd",
-    "single" = "true",
-    "aws.s3.access_key" = "${oss_ak}",
-    "aws.s3.secret_key" = "${oss_sk}",
-    "aws.s3.endpoint" = "${oss_endpoint}") select * from t1;
 
 -- version 1.0
 
-
-insert into files(
-    "path" = "oss://${oss_bucket}/test_sink/test_files_sink_parquet_version/${uuid0}/",
-    "format" = "parquet",
-    "parquet.version" = "1.0",
-    "aws.s3.access_key" = "${oss_ak}",
-    "aws.s3.secret_key" = "${oss_sk}",
-    "aws.s3.endpoint" = "${oss_endpoint}")
-select 1 as int_col, "abc" as string_col, cast("123.456" as decimal(16,3)) as decimal_col, cast("2025-07-11" as date) as date_col;
-
-create table iceberg_sink_${uuid0}.iceberg_sink_db_${uuid0}.t1 (
-    c1 int,
-    c2 bigint,
-    c3 date,
-    c4 decimal(10,3)
-) partition by c1,c2,c3,c4;
-
-select * from iceberg_sink_${uuid0}.iceberg_sink_db_${uuid0}.t1 where c1=2 and c2=2 and c3='2022-01-01';
-
-select * from iceberg_sink_${uuid0}.iceberg_sink_db_${uuid0}.t2 where c1=1 and c2=2 and c3='2022-01-01' and c4 = 10.65;
-
-insert into iceberg_sink_${uuid0}.iceberg_sink_db_${uuid0}.t3 values('2022-01-01', '2022-01-01' ,'2022-01-01', '2022-01-01 12:13:14'), ('2022-01-02', '2022-01-02' ,'2022-01-01', '2022-01-01 12:15:14'), ('2022-01-03', '2022-01-03' ,'2022-01-01', '2022-01-01 12:17:14');
-
-select * from iceberg_sink_${uuid0}.iceberg_sink_db_${uuid0}.t3 where c4='2022-01-01 12:13:15';
-
-insert into iceberg_sink_${uuid0}.iceberg_sink_db_${uuid0}.t5 values('abc');
-
 --todo: read datetime result should transform
 
-
-CREATE TABLE IF NOT EXISTS iceberg_sink_${uuid0}.iceberg_sink_db_${uuid0}.t7 (
-    id int,
-    v1 int,
-    v2 int,
-    dt datetime
-)
-PARTITION BY day(dt);
-
-drop table iceberg_sink_${uuid0}.iceberg_sink_db_${uuid0}.t2 force;
-
 -- name: testIcebergSinkNullPartition
-
-
-create external catalog `ice_hadoop${uuid0}`
-properties (
-"type"  =  "iceberg",
-"iceberg.catalog.type"  =  "hadoop",
-"iceberg.catalog.warehouse"="oss://${oss_bucket}/test_sink/test_iceberg_sink_null_partition/${uuid0}"
-);
-
-insert into ice_hadoop${uuid0}.ice_hadoop_db${uuid0}.test (C0, c1) values (2, NULL);
-
-create table iceberg_sink_${uuid0}.iceberg_sink_db_${uuid0}.t2 (
-    c1 decimal(23,3)
-);
-
-select c1, c1, c2 from t3 into outfile "oss://${oss_bucket}/test_sink/test_issue_38020/${uuid0}/" properties(
-    "fs.oss.endpoint" = "${oss_endpoint}",
-    "fs.oss.accessKeyId" = "${oss_ak}",
-    "fs.oss.accessKeySecret" = "${oss_sk}"
-);
-
--- output
-select * from t1 into outfile "oss://${oss_bucket}/test_sink/test_files_sink/${uuid0}/"
-    format as parquet properties (
-        "fs.oss.endpoint" = "${oss_endpoint}",
-        "fs.oss.accessKeyId" = "${oss_ak}",
-        "fs.oss.accessKeySecret" = "${oss_sk}"
-    );
 
 set enable_optimize_skew_join_v2 = true;
 
@@ -9929,12 +7329,8 @@ select * from agg_t order by k1;
 -- Add key column without specifying position
 alter table agg_t add column k5 int key default '0';
 
-drop database test_agg_add_key_sort_${uuid0} force;
-
 -- Add key column at middle position (AFTER k1)
 alter table uniq_t add column k4 int key default '0' after k1;
-
-drop database test_uniq_add_key_sort_${uuid0} force;
 
 insert into agg_test values (1,3,2,10,9),(2,2,2,9,7),(3,1,2,8,8);
 
@@ -10196,13 +7592,6 @@ set sql_mode = 'ONLY_FULL_GROUP_BY';
 
 DROP STORAGE VOLUME IF EXISTS storage_volume_alter;
 
--- db_builtin has no explicit SV binding and therefore implicitly uses builtin_storage_volume.
--- Its presence ensures the DROP below fails at the "is referenced" check, which is reached
--- only after getBindingsOfBuiltinStorageVolume() has already run (and leaked in the old code).
-CREATE DATABASE db_builtin_${uuid0};
-
-DROP STORAGE VOLUME IF EXISTS sv_${uuid0};
-
 CREATE STORAGE VOLUME IF NOT EXISTS storage_volume_partioned_prefix_fail1 TYPE = S3 LOCATIONS = ('s3://bucketname/subpath') PROPERTIES ("aws.s3.use_aws_sdk_default_behavior" = "true", "aws.s3.enable_partitioned_prefix" = "true", "aws.s3.num_partitioned_prefix" = "1024");
 
 DROP STORAGE VOLUME storage_volume_drop;
@@ -10224,21 +7613,12 @@ PROPERTIES (
  "replication_num" = "1"
 );
 
--- Verify information_schema.loads for successful merge commit stream load
-select STATE, TYPE, (DB_NAME = 'db_${uuid0}'), TABLE_NAME, starts_with(LABEL, 'merge_commit'), WAREHOUSE, SCAN_ROWS, SCAN_BYTES, SINK_ROWS, FILTERED_ROWS, UNSELECTED_ROWS, PROGRESS, ERROR_MSG, TRACKING_SQL, (PROFILE_ID IS NOT NULL) from information_schema.loads where DB_NAME='db_${uuid0}' and TABLE_NAME='t1';
-
-SELECT j.`key` FROM information_schema.loads, LATERAL json_each(RUNTIME_DETAILS) AS j WHERE DB_NAME='db_${uuid1}' and TABLE_NAME='t2' ORDER BY j.`key`;
-
-select TABLE_NAME, STATE in ('FINISHED', 'COMMITED') from information_schema.loads where DB_NAME = 'db_${uuid0}' and LABEL = 'llal_${uuid0}' order by TABLE_NAME;
-
 CREATE TABLE `table1` (
   `id` int,
   `name` varchar(100)
 ) ENGINE=OLAP
 DUPLICATE KEY(`id`)
 DISTRIBUTED BY HASH(`id`) BUCKETS 1;
-
-select c0 from db_${uuid0}.t0;
 
 -- test_debezium_error_null_before
 CREATE TABLE t1 (
@@ -10251,41 +7631,22 @@ PROPERTIES ("replication_num" = "1");
 
 -- Test 1: Basic transaction - LOAD fails, commit should fail
 
-
 -- LOAD with missing column (should return ANALYSIS_ERROR)
-
 
 -- Commit should fail (transaction was auto-aborted)
 
-
 -- Test 2: Multi-statement - LOAD fails, commit should fail
-
 
 -- LOAD with missing column (should return FAILED)
 
-
 -- Commit should fail
-
 
 -- Verify table is empty
 select count(*) from table_strict;
 
--- name: test_stream_load_label_already_exist
-create database db_${uuid0};
-
-select PARTITION_NAME from information_schema.partitions_meta where DB_NAME = 'db_${uuid0}' and TABLE_NAME = 'transaction_simple' and PARTITION_NAME like 'p%' order by PARTITION_NAME;
-
--- name: test_stream_load_non_utf8_json
-create database db_${uuid0};
-
 -- name: test_multi_txn_load_failure_then_load_different_table @sequential
 -- Test LOAD failure to one table, then LOAD to different table
 -- Now consistent with basic transaction: LOAD failure auto-aborts entire transaction
-
-create database db_${uuid0};
-
--- name: test_stream_load_txn_debezium_json @sequential
-create database db_${uuid0};
 
 CREATE TABLE t_json (id INT, name VARCHAR(32), v DOUBLE) DUPLICATE KEY(id) DISTRIBUTED BY HASH(id) BUCKETS 3 PROPERTIES("replication_num" = "1");
 
@@ -10406,10 +7767,6 @@ set lake_tablet_internal_parallel_skew_split_ratio = 1000;
 
 -- setup be config to minimize the split size.
 
-
-
-
-
 -- config.
 set enable_async_profile=false;
 
@@ -10436,19 +7793,6 @@ with
     )
 select * from result order by `key`, value;
 
--- CSV fields (v, k): the decoy first, the sort key second.
-insert into files (
-    "path" = "oss://${oss_bucket}/test_tablet_pre_split/${uuid0}/csv_vk/",
-    "format" = "csv",
-    "compression" = "uncompressed",
-    "csv.column_separator" = ",",
-    "aws.s3.access_key" = "${oss_ak}",
-    "aws.s3.secret_key" = "${oss_sk}",
-    "aws.s3.endpoint" = "${oss_endpoint}")
-select x + 1000000000 as v, x as k from table(generate_series(1, 100000)) as g(x);
-
-select state, error_msg from information_schema.loads where label = "label_csv_schema_${uuid0}";
-
 create table src (k int, v bigint) properties('replication_num' = '1');
 
 select count(*), count(distinct k), sum(k), sum(v), min(k), max(k), count(extra) from dst_partial;
@@ -10457,18 +7801,6 @@ create table src (account_id bigint, activity_date datetime, tenant_id bigint) p
 
 select tenant_id, activity_date_month, count(*) from dst group by tenant_id, activity_date_month
 order by tenant_id, activity_date_month;
-
-SELECT PARTITION_NAME, BUCKETS > 1 AS pre_split_widened_the_partition
-FROM information_schema.partitions_meta
-WHERE DB_NAME = 'db_${uuid0}' AND TABLE_NAME = 'dst_overwrite' AND IS_TEMP = false AND PARTITION_NAME LIKE 'p%'
-ORDER BY PARTITION_NAME;
-
--- Asserted right after the overwrite returns: the background split/merge daemon runs on a minutes
--- cadence, so more than one tablet this soon is the load's own pre-split. The exact count follows
--- the cluster's compute-node count, so only the widening is asserted.
-SELECT BUCKETS > 1 AS pre_split_widened_the_partition
-FROM information_schema.partitions_meta
-WHERE DB_NAME = 'db_${uuid0}' AND TABLE_NAME = 'dst' AND IS_TEMP = false;
 
 SHOW CREATE TABLE t_ddl;
 
@@ -10481,8 +7813,6 @@ PROPERTIES ('replication_num' = '1', 'tablet_reshard_target_size' = '1048576');
 -- Baseline row count, before the split.
 SELECT count(*) FROM t_varchar_sort_key;
 
-use test_alter_task_${uuid0};
-
 drop task alter_task;
 
 drop task not_exist_task;
@@ -10493,12 +7823,6 @@ create temporary table if not exists `t0` (
 ) engine=OLAP primary key(`c1`) distributed by hash(`c1`) buckets 3 properties("replication_num" = "1");
 
 select * from `t0` order by `c1`, `c2`;
-
--- name: test_create_table_as_select
-create table `t0` (
-    `c1` int,
-    `c2` int
-) engine=OLAP primary key(`c1`) distributed by hash(`c1`) buckets 3 properties("replication_num" = "1", "colocate_with"="${uuid0}");
 
 -- name: test_select_out_file
 create temporary table `t` (
@@ -10589,26 +7913,6 @@ set sql_dialect = 'trino';
 
 insert into t0 select t0.* from t0, Table(generate_series(1,10));
 
-CREATE MATERIALIZED VIEW test_mv1 
-PARTITION BY date_trunc('month', dt)
-REFRESH DEFERRED MANUAL 
-PROPERTIES ("replication_num" = "1")
-AS  SELECT v1.num, v1.dt from mv_iceberg_${uuid0}.mv_iceberg_db_${uuid0}.t1 as v1;
-
-SELECT dt,sum(num) FROM mv_iceberg_${uuid0}.mv_iceberg_db_${uuid0}.t1 GROUP BY dt ORDER BY dt;
-
-CREATE TABLE mv_hive_${uuid0}.mv_hive_db_${uuid0}.t3 (
-  num int,
-  dt date
-)
-PARTITION BY (dt);
-
-SELECT t1.num as t1_num, t1.dt as t1_dt, t2.num as t2_num, t2.dt as t2_dt FROM mv_hive_${uuid0}.mv_hive_db_${uuid0}.t1 as t1 left join mv_hive_${uuid0}.mv_hive_db_${uuid0}.t2 as t2 on t1.num=t2.num and t2.dt = '2020-06-24' and t2.num > 1 order by 1, 2, 3, 4;
-
-SELECT t1.num as t1_num, t1.dt as t1_dt, t2.num as t2_num, t3.dt as t2_dt FROM mv_hive_${uuid0}.mv_hive_db_${uuid0}.t1 as t1 left join mv_hive_${uuid0}.mv_hive_db_${uuid0}.t2 as t2 on t1.num=t2.num left join  mv_hive_${uuid0}.mv_hive_db_${uuid0}.t3 as t3 on t1.num=t3.num where t1.dt = '2020-06-24' order by 1, 2, 3, 4;
-
-drop table mv_hive_${uuid0}.mv_hive_db_${uuid0}.t4 force;
-
 -- test mv with t1
 CREATE MATERIALIZED VIEW test_mv1 
 REFRESH DEFERRED MANUAL 
@@ -10619,25 +7923,9 @@ AS
 -- partial refresh
 REFRESH MATERIALIZED VIEW test_mv1 PARTITION (('2025-01-01'), ('2025-01-02'), ('2025-01-03')) WITH SYNC MODE;
 
--------------------------------- DAYS WITH PARTITION TTL --------------------------------
-CREATE MATERIALIZED VIEW test_days
-PARTITION BY (l_returnflag, l_linestatus, date_trunc('day', l_shipdate))
-REFRESH DEFERRED MANUAL
-PROPERTIES (
-  "replication_num" = "1",
-  "partition_retention_condition" = "date_trunc('day', l_shipdate) >= '2024-11-13' or date_trunc('day', l_shipdate) is null",
-  "query_rewrite_consistency" = "force_mv"
-)
-AS
-  SELECT * FROM mv_iceberg_${uuid0}.sql_test_db.lineitem_days;
-
 DROP MATERIALIZED VIEW test_days;
 
-SELECT * FROM mv_iceberg_${uuid0}.sql_test_db.lineitem_years where l_shipdate >= '2024-11-13 00:00:00' order by l_orderkey;
-
 SELECT * FROM test_date where l_shipdate >= '2024-11-13 00:00:00' order by l_orderkey;
-
-SELECT * FROM mv_iceberg_${uuid0}.sql_test_db_${uuid0}.lineitem_hours where l_returnflag = 'R' and l_linestatus = 'F' and l_shipdate = '2024-11-13 00:00:00' order by l_orderkey;
 
 SELECT * FROM t1 order by id, province, dt limit 3;
 
@@ -10647,40 +7935,10 @@ INSERT INTO lineitem_years SELECT l_orderkey, l_partkey, l_suppkey, l_linenumber
 
 REFRESH MATERIALIZED VIEW test_months PARTITION (('R', 'F', '2024-11-12 08:00:00')) WITH SYNC MODE;
 
--------------------------------- YEARS --------------------------------
-CREATE MATERIALIZED VIEW test_years
-PARTITION BY (l_returnflag, l_linestatus, date_trunc('year', l_shipdate))
-REFRESH DEFERRED MANUAL
-PROPERTIES ("replication_num" = "1")
-AS
-  SELECT * FROM mv_iceberg_${uuid0}.sql_test_db_${uuid0}.lineitem_years;
-
-drop table mv_iceberg_${uuid0}.sql_test_db_${uuid0}.lineitem_months force;
-
--- Insert data into multiple partitions
-INSERT INTO mv_iceberg_${uuid0}.mv_iceberg_db_${uuid0}.t1 VALUES
-    (1,"2020-06-15"),(2,"2020-06-15"),
-    (2,"2020-06-18"),(3,"2020-06-18"),
-    (3,"2020-06-21"),(4,"2020-06-21");
-
 -- Query should not hit MV since it's stale (partition was dropped)
-
 
 -- Refresh MV to sync with base table
 REFRESH MATERIALIZED VIEW non_partitioned_mv WITH SYNC MODE;
-
--- Create a partitioned MV with LOOSE consistency mode
-CREATE MATERIALIZED VIEW partitioned_mv_loose 
-PARTITION BY (dt)
-REFRESH DEFERRED MANUAL 
-PROPERTIES (
-    "replication_num" = "1",
-    "query_rewrite_consistency" = "LOOSE"
-)
-AS 
-SELECT dt, sum(num) as total_num 
-FROM mv_iceberg_${uuid0}.mv_iceberg_db_${uuid0}.t1 
-GROUP BY dt;
 
 -- Verify MV contains data
 SELECT * FROM partitioned_mv_force ORDER BY dt;
@@ -10691,32 +7949,8 @@ SELECT dt,sum(num) FROM test_mv1 where dt>'2020-06-15' GROUP BY dt order by 1, 2
 
 SELECT dt,sum(num) FROM test_mv1 GROUP BY dt order by 1, 2 limit 3;
 
--- name: test_transparent_mv_hive @slow
-create external catalog mv_hive_${uuid0}
-properties
-(
-    "type" = "hive",
-    "hive.catalog.type" = "hive",
-    "hive.metastore.uris" = "${hive_metastore_uris}"
-);
-
--- Test partition compensate with partition expression
-CREATE MATERIALIZED VIEW test_mv1 
-PARTITION BY date_trunc('day', dt)
-REFRESH DEFERRED MANUAL 
-PROPERTIES ("transparent_mv_rewrite_mode" = "true")
-AS  select * from (
-SELECT dt, sum(num) as num FROM mv_hive_${uuid0}.mv_hive_db_${uuid0}.t1 GROUP BY dt 
-UNION ALL
-SELECT  str2date(dt, '%Y-%m-%d'), sum(num) as num FROM mv_hive_${uuid0}.mv_hive_db_${uuid0}.t2 GROUP BY dt) t order by 1, 2;
-
 -- name: test_transparent_mv_mysql @slow
 -- create mysql table
-
-
-
-
-
 
 set enable_materialized_view_transparent_union_rewrite = true;
 
@@ -10726,21 +7960,7 @@ REFRESH DEFERRED MANUAL
 PROPERTIES ("transparent_mv_rewrite_mode" = "true")
 AS  select * from (SELECT dt, num FROM test_mv20 UNION ALL SELECT dt, num FROM test_mv21)as t order by 1, 2;
 
-SELECT * FROM mv_hive_${uuid0}.mv_hive_db_${uuid0}.t1 where dt > '2020-07-01'  order by 1, 2 limit 3;
-
-SELECT * FROM (SELECT * FROM mv_hive_${uuid0}.mv_hive_db_${uuid0}.t1 where num > 3 UNION ALL SELECT * FROM mv_hive_${uuid0}.mv_hive_db_${uuid0}.t1 where num > 3)t order by 1, 2 limit 3;
-
-SELECT * FROM (SELECT dt, sum(num) as num FROM mv_hive_${uuid0}.mv_hive_db_${uuid0}.t1 GROUP BY dt having sum(num) > 10 UNION ALL SELECT dt, sum(num) as num FROM mv_hive_${uuid0}.mv_hive_db_${uuid0}.t1 GROUP BY dt) t order by 1, 2 limit 3;
-
-SELECT * FROM (SELECT t2.dt, sum(t2.num) as num FROM mv_hive_${uuid0}.mv_hive_db_${uuid0}.t1 join mv_hive_${uuid0}.mv_hive_db_${uuid0}.t2 on t1.dt = t2.dt where t2.dt > '2020-06-20' GROUP BY t2.dt having sum(t2.num) > 10 UNION ALL SELECT t2.dt, sum(t2.num) as num FROM mv_hive_${uuid0}.mv_hive_db_${uuid0}.t1 join mv_hive_${uuid0}.mv_hive_db_${uuid0}.t2 on t1.dt = t2.dt where t2.dt > '2020-06-20' GROUP BY t2.dt having sum(t2.num) > 10) t order by 1, 2 limit 3
-
 DROP MATERIALIZED VIEW test_mv1;
-
-SELECT * FROM mv_hive_${uuid0}.mv_hive_db_${uuid0}.t1 where dt > '2024-11-20'  order by 1, 2 limit 3;
-
-SELECT dt, sum(num) as num FROM mv_hive_${uuid0}.mv_hive_db_${uuid0}.t1 where dt >'2024-12-01' GROUP BY dt having sum(num) > 10 order by 1, 2 limit 3;
-
-SELECT * FROM (SELECT t2.dt, sum(t2.num) as num FROM mv_hive_${uuid0}.mv_hive_db_${uuid0}.t1 join mv_hive_${uuid0}.mv_hive_db_${uuid0}.t2 on t1.dt = t2.dt where t2.dt > '2024-11-20' GROUP BY t2.dt having sum(t2.num) > 10 UNION ALL SELECT t2.dt, sum(t2.num) as num FROM mv_hive_${uuid0}.mv_hive_db_${uuid0}.t1 join mv_hive_${uuid0}.mv_hive_db_${uuid0}.t2 on t1.dt = t2.dt where t2.dt > '2024-11-20' GROUP BY t2.dt having sum(t2.num) > 10) t order by 1, 2 limit 3;
 
 SELECT * FROM t1 order by 1, 2 limit 3;
 
@@ -10763,23 +7983,7 @@ SELECT id, arrow_add(a, b) AS r FROM t_arrow ORDER BY id;
 
 -- name: test_jvm_date_udf @no_arrow_flight_sql
 
-CREATE FUNCTION echo_date(date)
-RETURNS date
-PROPERTIES (
-    "symbol" = "EchoDate",
-    "type" = "StarrocksJar",
-    "file" = "${udf_url}/starrocks-jdbc/date.jar"
-);
-
 select echo_datetime(dt2) from t_dt;
-
-CREATE FUNCTION dec_array_add(array<DECIMAL(18, 4)>, array<DECIMAL(18, 4)>)
-RETURNS array<DECIMAL(20, 4)>
-PROPERTIES (
-    "symbol" = "UDFDecimalArrayAdd",
-    "type" = "StarrocksJar",
-    "file" = "${udf_url}/starrocks-jdbc/decimal.jar"
-);
 
 -- UDAF correctness
 SELECT dec_sum(d18_4) FROM t_dec;
@@ -10796,26 +8000,10 @@ select echo_struct_a(stru1) from t_struct order by id;
 
 select echo_nested_struct(row(row(0, "value0"), [row(1, "value1"), row(2, "value2")]));
 
-CREATE TABLE FUNCTION udtfdouble(double)
-RETURNS double
-symbol = "UDTFdouble"
-type = "StarrocksJar"
-file = "${udf_url}/starrocks-jdbc%2FUDTFdouble.jar";
-
 select count(udtffloat) from t0, udtffloat(c1);
 
 -- test group by limit case:
 set streaming_preaggregation_mode="force_streaming";
-
-CREATE FUNCTION echo_array_int(array<int>)
-RETURNS array<int>
-PROPERTIES
-(
-  "symbol" = "EchoArray", 
-  "isolation"="shared",
-  "type" = "StarrocksJar", 
-  "file" = "${udf_url}/starrocks-jdbc/ArrayMap.jar"
-);
 
 select c0,echo_map(c3) from tlistarray order by 1;
 
@@ -10829,14 +8017,6 @@ from (
 select concat_str_va(5, "10");
 
 select concat_str_va(1, null);
-
--- Test 9: Attempt to register a two-arg varargs UDF using a one-param class
--- Echoint.evaluate(Integer) has 1 param; sumint_va2(int, int, ...) declares 2.
-CREATE FUNCTION sumint_va2(int, int, ...)
-RETURNS int
-symbol = "Sumint2"
-type = "StarrocksJar"
-file = "${udf_url}/starrocks-jdbc/udf_vararg.jar";
 
 -- Minimum required args (exactly one array<int>)
 select echo_array_va([1,2,3]);
@@ -10878,24 +8058,6 @@ def echo(x):
     return type(x)  
 $$;
 
-drop user if exists u_udf_usage_${uuid0};
-
-grant impersonate on user root to u_udf_usage_${uuid0};
-
-execute as u_udf_usage_${uuid0} with no revert;
-
-drop global function global_udf_priv_echo_${uuid0}(int);
-
--- Create a shared isolation UDAF for cache testing
-CREATE AGGREGATE FUNCTION sumbigint_cache_shared(bigint)
-RETURNS bigint
-PROPERTIES (
-  "symbol" = "Sumbigint",
-  "type" = "StarrocksJar",
-  "file" = "${udf_url}/starrocks-jdbc%2FSumbigint.jar",
-  "isolation" = "shared"
-);
-
 -- non-group-by: global sumbigint must equal global builtin sum
 select assert_true(sumbigint_cache_shared(c1) = sum(c1)) from t_udaf_cache;
 
@@ -10923,40 +8085,17 @@ select * from ( select * from (select * from duplicate_table_with_null order by 
 
 select * from ( select * from (select * from duplicate_table order by k2 limit 3) t1 union all select * from (select * from duplicate_table_with_null order by k2 limit 1)t2 ) t order by k1 limit 1;
 
--- name: test_multi_unnest_bounded_batching
--- Multi-array UNNEST(a, b) has to build its zip, so the only thing that bounds its memory is how
--- much of that zip one process() call builds. That is invisible in the result set - the answers below
--- were already correct when a single call materialized the whole input chunk's expansion - so this
--- case asserts it on TableFunctionExecCount instead, which is the counter that changes: it goes from
--- one call per input chunk to roughly one call per output chunk.
---
--- enable_async_profile = false makes the profile readable by get_query_profile() as soon as the query
--- returns, which is what the framework's own profile helpers do.
-CREATE TABLE mub_${uuid0} (
-    `id` int(11) NOT NULL COMMENT "",
-    `a` ARRAY<int> NULL COMMENT "",
-    `b` ARRAY<int> NULL COMMENT ""
-)
-DUPLICATE KEY (id)
-DISTRIBUTED BY HASH(`id`) BUCKETS 1
-PROPERTIES ("replication_num" = "1");
-
 -- LEFT JOIN takes the same path (the extra NULL row is part of the expansion here), so it must batch
 -- too rather than falling back to a single call.
 SET chunk_size = 2;
 
 SET chunk_size = 13;
 
-SELECT count(1) FROM mu_${uuid0}, UNNEST(a, b) AS u(v1, v2)
-WHERE (v1 IS NOT NULL AND NOT array_contains(a, v1)) OR (v2 IS NOT NULL AND NOT array_contains(b, v2));
-
 -- name: test_array_of_struct_no_prune_all_subfields
 select c_struct.c1, c_struct.c2 from TABLE(unnest(array<struct<c1 int, c2 int>>[named_struct('c1', 10, 'c2', 1), named_struct('c1', 20, 'c2', 2)])) t(c_struct);
 
 -- left join on true
 select id, scores, unnest from student_score left join unnest([1, 2]) as unnest on true order by 1, 3;
-
-SELECT count(1), count(v), sum(v) FROM bnd_${uuid0}, UNNEST(arr) AS u(v);
 
 use test_unnest_stacked_same_array_join_crash;
 
@@ -11023,15 +8162,7 @@ select      /*+ set_user_variable(@a = (select c0 * 0.1 from always1)) */ percen
 
 SELECT CAST(CAST(PARSE_JSON('{"First Name": "Kyle"}') AS VARIANT) AS STRUCT<`First Name` STRING>);
 
-create database test_variant_cast_to_struct_${uuid0};
-
-drop database test_variant_cast_to_struct_${uuid0};
-
 select id from t_sync order by approx_l2_distance([0.9,0.1,0,0], v) limit 1;
-
-drop database db_sd_vidx_async_${uuid0} force;
-
-drop database db_sd_vidx_rb_${uuid0} force;
 
 select id, val from t order by id;
 
@@ -11088,7 +8219,6 @@ order by d, id limit 3;
 
 -- name: test_vector_index_hnsw_quantizer @sequential @native
 
-
 -- =====================================================================
 -- HNSW + quantizer DDL: SQ4 / SQ8 / PQ acceptance and rejection.
 -- Covers the FE analyzer path (quantizer / m_pq / nbits_pq properties).
@@ -11140,7 +8270,6 @@ PROPERTIES ("replication_num" = "1");
 
 -- name: test_vector_index_insert @sequential @native
 
-
 CREATE TABLE t1 (
     id bigint(20) NOT NULL,
     v1 ARRAY<FLOAT> NOT NULL,
@@ -11177,7 +8306,6 @@ INSERT INTO t1 values
 
 -- name: test_vector_index_ivfpq @sequential @native
 
-
 -- IVFPQ is a quantized index; turn refine on so distances are recomputed exactly and the
 -- distance-range filter is rechecked on the exact distance (results are exact and stable).
 SET enable_vector_index_refine = true;
@@ -11197,7 +8325,6 @@ where dis >= 100 and dis <= 1000
 order by dis limit 10;
 
 -- name: test_vector_index_refine @sequential @native
-
 
 -- =====================================================================
 -- Quantized vector index + enable_vector_index_refine on/off.
@@ -11245,11 +8372,7 @@ select id from t_ivfpq_overflow order by approx_l2_distance(ARRAY<FLOAT>[1e308, 
 
 create view v1 as select * from t1;
 
-create user if not exists u2_${uuid};
-
 select * from v3;
-
-select TABLE_NAME, TABLE_COMMENT from information_schema.tables WHERE TABLE_NAME = 'test_view' and TABLE_SCHEMA = 'db_${uuid0}';
 
 -- Test 3: GROUP BY virtual column for data distribution analysis
 select _tablet_id_, count(*) as row_count, sum(k2) as sum_k2

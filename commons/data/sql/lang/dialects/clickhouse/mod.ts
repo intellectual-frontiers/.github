@@ -33,8 +33,13 @@ export const dialect = declareDialect({
   }),
   grammar: (g) => ({
     ...g,
+    lambdas: true,
+    parametric: true,
+    tableIndexes: true,
+    queryTail: ["SETTINGS",
+    "FORMAT"],
     castOperator: "::",
     likeWords: ["ILIKE"],
-    operators: [...g.operators, { text: "->", prec: Prec.Other }, { text: "<=>", prec: Prec.Compare }],
+    operators: [...g.operators, { text: "->", prec: Prec.Other }, { text: "<=>", prec: Prec.Compare }, { text: "==", prec: Prec.Compare }],
   }),
 });

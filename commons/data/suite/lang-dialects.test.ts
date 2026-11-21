@@ -228,13 +228,16 @@ proves(
       ["doris", "mysql"],
       ["singlestore", "mysql"],
       ["redshift", "postgres"],
-      ["spark", "hive"],
-      ["databricks", "hive"],
       ["athena", "ansi"],
       ["fabric", "tsql"],
     ]) {
-      assertEquals(g(child ?? ""), g(parent ?? ""), `${child} keeps the grammar of ${parent}`);
+      const ops = (n: string) => {
+        const { castOperator, likeWords, operators, wordOperators } = g(n);
+        return { castOperator, likeWords, operators, wordOperators };
+      };
+      assertEquals(ops(child ?? ""), ops(parent ?? ""), `${child} keeps the operators of ${parent}`);
     }
+    assertEquals([g("spark").castOperator, g("databricks").castOperator], ["::", "::"]);
     const shown = (n: string, expr: string): string => {
       const p = parse(`SELECT ${expr}`, ALL_DIALECTS.find((x) => x.name === n) ?? ansi);
       assertEquals(p.errors, [], `${n}: ${expr}`);

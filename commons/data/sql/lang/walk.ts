@@ -96,6 +96,20 @@ export function children(n: Node): readonly Node[] {
     case "interval":
       out.push(n.value);
       break;
+    case "struct":
+      all(out, n.entries);
+      break;
+    case "struct-entry":
+      out.push(n.key, n.value);
+      break;
+    case "lambda":
+      all(out, n.params);
+      out.push(n.body);
+      break;
+    case "type-field":
+      opt(out, n.name);
+      out.push(n.type);
+      break;
     case "field":
       out.push(n.arg);
       opt(out, n.field);
@@ -125,6 +139,7 @@ export function children(n: Node): readonly Node[] {
       break;
     case "call":
       out.push(n.name);
+      all(out, n.parameters);
       all(out, n.args);
       all(out, n.orderBy);
       all(out, n.withinGroup);
@@ -171,6 +186,7 @@ export function children(n: Node): readonly Node[] {
       opt(out, n.alias);
       break;
     case "select":
+      opt(out, n.top);
       all(out, n.distinctOn);
       all(out, n.items);
       all(out, n.from);
@@ -223,6 +239,10 @@ export function children(n: Node): readonly Node[] {
       out.push(n.call);
       opt(out, n.alias);
       break;
+    case "table-op":
+      out.push(n.source);
+      opt(out, n.alias);
+      break;
     case "join":
       out.push(n.left, n.right);
       opt(out, n.on);
@@ -256,6 +276,7 @@ export function children(n: Node): readonly Node[] {
       break;
     case "data-type":
       all(out, n.args);
+      all(out, n.fields);
       break;
     case "not-null":
       opt(out, n.name);
