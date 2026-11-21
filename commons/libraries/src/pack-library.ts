@@ -24,6 +24,8 @@
  */
 import { chmod, readTextFile, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { existsSync, mkdirSync, readDirSync, readTextFileSync, removeSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { importSpecifiers } from "./scan.ts";
+import { activeMode, MODE_VARIABLE } from "./distribution.ts";
 import { decodeLibrarySource, type Library, LIBRARY_FILE } from "./libraries.ts";
 import { COMMAND as LICENSE_COMMAND, licenseOf } from "./license.ts";
 import { basename, dirname, join, relative, resolve, toPosix } from "@intellectual-frontiers/system/path";
@@ -37,11 +39,13 @@ export type Findings = readonly string[];
 
 type Json = Readonly<Record<string, unknown>>;
 
-const isObject = (v: unknown): v is Json => typeof v === "object" && v !== null && !Array.isArray(v);
+/** Whether a value is a plain object (not an array, not null). */
+export const isObject = (v: unknown): v is Json => typeof v === "object" && v !== null && !Array.isArray(v);
 const text = (v: unknown): string => (typeof v === "string" ? v : "");
 /** A text file copied: every file of a package is text. */
 const copyFileSync = (from: string, to: string): void => writeTextFileSync(to, readTextFileSync(from));
-const noDot = (p: string): string => toPosix(p).replace(/^\.\//, "");
+/** A path of a manifest without its leading `./`, with `/` separators. */
+export const noDot = (p: string): string => toPosix(p).replace(/^\.\//, "");
 
 /** The files under a folder, from the folder, in order (`node_modules` is not looked into). */
 export function filesUnder(root: string, dir = ""): readonly string[] {
@@ -55,14 +59,11 @@ export function filesUnder(root: string, dir = ""): readonly string[] {
   return out;
 }
 
-const SPECIFIER = /(?:\bfrom\s+|\bimport\s+|\bimport\(\s*)["']([^"']+)["']/g;
-
 /** The documentation blocks of a source (a block comment that begins a line): an example in one names what a reader may write, not what the module imports. */
-const DOC_BLOCK = /^[ \t]*\/\*[\s\S]*?\*\//gm;
+export const DOC_BLOCK = /^[ \t]*\/\*[\s\S]*?\*\//gm;
 
-/** The specifiers a source names, outside its documentation blocks. */
-export const specifiersOf = (source: string): readonly string[] =>
-  [...source.replace(DOC_BLOCK, "").matchAll(SPECIFIER)].map((m) => m[1] ?? "").filter((s) => s !== "");
+/** The specifiers a source imports: not those of a comment, and not the text of a string that only looks like an import. */
+export const specifiersOf = (source: string): readonly string[] => importSpecifiers(source);
 
 /** The package a bare specifier names (`@scope/name/sub` is `@scope/name`), or undefined for a relative path, a `node:` builtin or a `data:` URL. */
 export function packageOf(specifier: string): string | undefined {
@@ -73,7 +74,7 @@ export function packageOf(specifier: string): string | undefined {
 }
 
 /** The target of an export entry for each condition: the string, or the `types`, `bun` or `default` of an object. */
-function targetsOf(entry: unknown): Readonly<Record<string, string>> {
+export function targetsOf(entry: unknown): Readonly<Record<string, string>> {
   if (typeof entry === "string") return { default: entry };
   if (!isObject(entry)) return {};
   return Object.fromEntries(Object.entries(entry).flatMap(([k, v]) => (typeof v === "string" ? [[k, v] as const] : [])));
@@ -255,7 +256,7 @@ export type Packed = { readonly stage: string; readonly tarball: string | undefi
 
 /** What a package adds to the common form. */
 /** Whether a declaration of the package names a `node:` module: a package whose types name Node's needs `@types/node` where it is type-checked (a peer dependency, FR-013 of 0032-libraries-by-concern). */
-function namesNodeTypes(folder: string): boolean {
+export function namesNodeTypes(folder: string): boolean {
   if (!existsSync(folder)) return false;
   for (const e of readDirSync(folder)) {
     const p = join(folder, e.name);
@@ -511,6 +512,20 @@ export async function packLibrary(root: string, options: PackOptions = {}): Prom
 
 /** The command line of a library's `tools/pack.ts`: pack, print what was found (or the tarball) and the exit status. */
 export async function main(root: string, argv: readonly string[], options: PackOptions = {}): Promise<number> {
+  // the packing of a library by itself is the machinery of `per-library` mode (0036-distribution FR-020): in `single` mode the one package is packed by `commons/commons`, and a library's own check has nothing to pack
+  const mode = activeMode(env.get(MODE_VARIABLE));
+  if (mode.kind === "err") {
+    console.error(mode.error);
+    return 2;
+  }
+  if (mode.value === "single") {
+    if (argv.includes("--check")) {
+      console.log("pack check skipped: the distribution is single (0036-distribution FR-020); commons/commons packs every library as one package");
+      return 0;
+    }
+    console.error(`the distribution is single: a library is not packed by itself; the package is @intellectual-frontiers/commons (bun tools/pack.ts in commons/commons). To pack this library, run with ${MODE_VARIABLE}=per-library`);
+    return 1;
+  }
   // the check inside `verify` is left out where CI says the exports did not change (`IFC_SKIP_PACK`); the packing for a publication is never skipped
   if (argv.includes("--check") && (env.get("IFC_SKIP_PACK") ?? "") !== "") {
     console.log("pack check skipped: the exports of this library did not change in this push (IFC_SKIP_PACK); the release packs it");

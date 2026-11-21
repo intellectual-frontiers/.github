@@ -1,64 +1,73 @@
 # Consuming commons
 
-A repository other than `.github` uses commons by installing published packages, and by no other route (commons 0036-distribution FR-001). This guide is for the engineer who adds commons to such a repository: the rule and why it exists, how to install the whole set, how to upgrade it, how to read a finding of `repoctl hygiene`, and where private packages come from.
+A repository other than `.github` uses commons by installing a published package, and by no other route (commons 0036-distribution FR-001). This guide is for the engineer who adds commons to such a repository: the rule and why it exists, how to install the one package, how to set up the registry, how to upgrade it and how to read a finding of `repoctl hygiene`.
 
 ## The rule and why
 
-Public libraries come from npm. Private packages, those of private repositories, come from the GitHub package registry. A consumer has none of these: a Git dependency on `intellectual-frontiers/.github`, a `file:` or `link:` dependency into a checkout of commons, a vendored copy of a library, a fetch of raw source (commons 0036-distribution FR-002).
+The whole of commons is one package, `@intellectual-frontiers/commons`, published to the GitHub package registry of the organization (distribution `single`, commons 0036-distribution FR-019, FR-028); a public library may also come from npm where the owner turns that target on. A consumer has none of these: a Git dependency on `intellectual-frontiers/.github`, a `file:` or `link:` dependency into a checkout of commons, a vendored copy of a library, a fetch of raw source (commons 0036-distribution FR-002).
 
 The reason is one coherent release. A published version is immutable and carries its declarations and its license; a commit or a checkout carries whatever a branch held that day, and two repositories pinned to two commits hold two commons. A published set also gives the consumer one lockfile entry per library, which is what lets a check find two copies of the same library.
 
 ```mermaid
 flowchart LR
   commons[".github: commons/"] --> release["release: versions, record, tarballs"]
-  release --> npm["npm: public libraries"]
-  release --> ghr["GitHub package registry: the same tarballs, private packages"]
-  npm --> consumer["a consuming repository"]
-  ghr --> consumer
+  release --> ghr["GitHub package registry: the one package"]
+  release -.-> npm["npm: off"]
+  ghr --> consumer["a consuming repository"]
   consumer --> hygiene["repoctl hygiene"]
 ```
 
-## Install the set
+## Install the package
 
-Five metapackages have no code of their own. Each depends on its libraries at exact versions, so that one version of a metapackage is one release of commons (commons 0036-distribution FR-005, FR-007).
+`@intellectual-frontiers/commons` holds every library of commons at one version, compiled, with their declarations and their sources, and the commands `anyfs`, `arcactl`, `ifc-docs`, `ergonex` and `repoctl` (commons 0036-distribution FR-021, FR-024). A library is imported under the package by its name, and each of its subpaths under that (commons 0036-distribution FR-022):
 
-| Metapackage | Holds |
+| In the sources of commons | In a consumer |
 | --- | --- |
-| `@intellectual-frontiers/commons` | every consumer-facing library: the four below together |
-| `@intellectual-frontiers/foundation` | [core](../../core/), [crypto](../../crypto/), [formats](../../formats/), [githost](../../githost/), [lint](../../lint/), [net](../../net/), [rdf](../../rdf/), [system](../../system/), [telemetry](../../telemetry/), [terminal](../../terminal/), [test](../../test/) |
-| `@intellectual-frontiers/patterns` | [headless](../../headless/), [kanon](../../kanon/) |
-| `@intellectual-frontiers/programs` | [data](../../data/) (published as `@intellectual-frontiers/arcactl`), [ergonex](../../ergonex/), [grc](../../grc/), [integrations](../../integrations/), [integrations-github](../../integrations-github/), [libraries](../../libraries/), [repoctl](../../repoctl/) |
-| `@intellectual-frontiers/standards` | [integrations-fhir](../../integrations-fhir/), [integrations-x12](../../integrations-x12/), [mizan](../../mizan/), [ontology](../../ontology/), [quality](../../quality/) |
+| `@intellectual-frontiers/core` | `@intellectual-frontiers/commons/core` |
+| `@intellectual-frontiers/anyfs/governance` | `@intellectual-frontiers/commons/anyfs/governance` |
+| `@intellectual-frontiers/data/sql/logical` | `@intellectual-frontiers/commons/data/sql/logical` |
 
-The role of a library decides its set, and `ROLE_OF` in [libraries](../../libraries/) is the one place that gives it (commons 0036-distribution FR-006). Install one set at an exact version, and import each library by its own name:
+```ts
+import { err, ok } from "@intellectual-frontiers/commons/core";
+```
+
+Its dependencies are the third-party packages the libraries use and the database drivers they take as ports (DuckDB, PGlite, `pg`) at exact versions, so that a consumer installs no driver itself; the package asks for `@types/node` as a peer where it is type-checked. It runs on Node 26 and on Bun from its compiled files, and Bun reads the sources by the `bun` condition. Pin it as an exact version:
 
 ```sh
 bun add --exact @intellectual-frontiers/commons@<version>
 npm install --save-exact @intellectual-frontiers/commons@<version>
 ```
 
-```ts
-import { err, ok } from "@intellectual-frontiers/core";
+The check warns about any `@intellectual-frontiers` dependency that is a range or a tag, because a range lets two releases meet in one tree (commons 0036-distribution FR-014).
+
+## The registry
+
+The package is on the GitHub package registry, which serves the scope `@intellectual-frontiers` to a token that may read packages (commons 0036-distribution FR-028). The consumer maps the scope in `.npmrc` for npm and Node, and in `bunfig.toml` for Bun, and takes the token from the environment; the token is never written in the repository:
+
+```sh
+# .npmrc
+@intellectual-frontiers:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
 ```
 
-Pin the set in your `package.json` as an exact version. The check warns about any `@intellectual-frontiers` dependency that is a range or a tag, because a range lets two releases meet in one tree (commons 0036-distribution FR-014).
+```toml
+# bunfig.toml
+[install.scopes]
+"@intellectual-frontiers" = { url = "https://npm.pkg.github.com/", token = "$NODE_AUTH_TOKEN" }
+```
+
+Locally the token is a personal access token (classic) with the scope `read:packages`, exported as `NODE_AUTH_TOKEN` (`ERGONEX_GITHUB_TOKEN` where Ergonex supplies it). In a GitHub Actions workflow of a repository that is not `.github` the job's `GITHUB_TOKEN` is used, with `permissions: packages: read`, provided the package grants that repository read access: in the package's settings on GitHub, under "Manage Actions access", the button Add Repository gives the consumer repository the role Read.
 
 ## Upgrade
 
-An upgrade is a new version of the metapackage, installed, and then the check.
+An upgrade is a new version of the package, installed, and then the check.
 
 ```sh
 bun add --exact @intellectual-frontiers/commons@<new version>
-bunx @intellectual-frontiers/repoctl hygiene
+bunx --package @intellectual-frontiers/commons repoctl hygiene
 ```
 
-The metapackage is raised by every release that raises one of its libraries, so a new version of a library reaches you only through a new version of the set. Read the release record, `commons/generated/release.auto.json`, to see what a release holds.
-
-Where one library of your tree is wanted at one version while another package still asks for a range, add an override so that the tree holds one copy:
-
-```json
-{ "overrides": { "@intellectual-frontiers/core": "<the version the metapackage names>" } }
-```
+A version of any library reaches you only through a new version of the package. Read the release record, `commons/generated/release.auto.json`, to see what a release holds.
 
 ## Read a finding of the check
 
@@ -75,13 +84,6 @@ Where one library of your tree is wanted at one version while another package st
 
 A finding names the path it was found at and the command that fixes it. Run the check in CI of every consuming repository so that the rule is held by a job and not by memory.
 
-## Private packages
+## Other packages
 
-A package of a private repository is published to the GitHub package registry alone, with `distribution: ["github"]` in its manifest. None of the libraries of commons is private. The consumer reads such a package through a scoped registry line in `.npmrc` and a token that may read packages, taken from the environment and never written in the repository (commons 0036-distribution FR-004):
-
-```sh
-@intellectual-frontiers:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${ERGONEX_GITHUB_TOKEN}
-```
-
-The token variable of Intellectual Frontiers is `ERGONEX_GITHUB_TOKEN`, and the token of a workflow run, `GITHUB_TOKEN`, is not used for it. Writing this line during `ergonex init` is planned (commons 0036-distribution FR-016).
+A package of a private repository is published to the GitHub package registry alone, with `distribution: ["github"]` in its manifest, and is read through the same scoped `.npmrc` line and token (commons 0036-distribution FR-004). In `per-library` mode, which the owner can switch back to (commons 0036-distribution FR-019), each library is a package of its own and five metapackages (`commons`, `foundation`, `patterns`, `programs`, `standards`) install them as sets at exact versions. Writing the registry line during `ergonex init` is planned (commons 0036-distribution FR-016).

@@ -30,6 +30,7 @@ import { existsSync, readTextFileSync, writeTextFileSync } from "@intellectual-f
 import { join } from "@intellectual-frontiers/system/path";
 import { run } from "@intellectual-frontiers/system/proc";
 import { flag, formatUsageError, helpText, many, parseArgs, value } from "@intellectual-frontiers/terminal/args";
+import { isSingle } from "./distribution.ts";
 import { affectedBy, changedSince, everyLibrary } from "./affected.ts";
 import { type Cell, cellOf, LIBRARY_CI } from "./workflows/definitions.ts";
 
@@ -72,11 +73,11 @@ export function exportsLine(packageJson: string): string {
 /**
  * The libraries whose packing a push checks (FR-013): those that changed their `exports` since the base (a new library included), and every library where the packer itself changed. Git that cannot say gives every library.
  */
-export async function packsFor(repo: string, base: string, libs: readonly Planned[]): Promise<ReadonlySet<string>> {
+export async function packsFor(repo: string, base: string, libs: readonly Planned[], single = isSingle(process.env["IFC_DISTRIBUTION"])): Promise<ReadonlySet<string>> {
   const all = new Set(libs.map((l) => l.name));
   const mb = await run(["git", "-C", repo, "merge-base", base, "HEAD"]);
   if (mb.code !== 0) return all;
-  const packer = await run(["git", "-C", repo, "diff", "--name-only", mb.stdout.trim(), "--", "commons/libraries/src/pack-library.ts"]);
+  const packer = await run(["git", "-C", repo, "diff", "--name-only", mb.stdout.trim(), "--", "commons/libraries/src/pack-library.ts", "commons/libraries/src/pack-commons.ts", "commons/libraries/src/distribution.ts"]);
   if (packer.code !== 0 || packer.stdout.trim() !== "") return all;
   const out = new Set<string>();
   for (const l of libs) {
@@ -84,6 +85,8 @@ export async function packsFor(repo: string, base: string, libs: readonly Planne
     const now = join(repo, l.folder, "package.json");
     if (before.code !== 0 || !existsSync(now) || exportsLine(before.stdout) !== exportsLine(readTextFileSync(now))) out.add(l.name);
   }
+  // the one package is made of every library: it packs where any library's exports changed (0036-distribution FR-021)
+  if (single && out.size > 0) out.add("commons");
   return out;
 }
 

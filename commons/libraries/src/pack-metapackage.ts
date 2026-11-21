@@ -30,6 +30,7 @@ import { stdio } from "@intellectual-frontiers/system";
 import { existsSync, mkdirSync, readTextFileSync, removeSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { join, resolve } from "@intellectual-frontiers/system/path";
 import { env, run, which } from "@intellectual-frontiers/system/proc";
+import { activeMode, type DistributionMode, MODE_VARIABLE } from "./distribution.ts";
 import { decodeLibrarySource, type Library, LIBRARY_FILE, readLibraries } from "./libraries.ts";
 import { licenseOf } from "./license.ts";
 import { ENTRY_DTS, ENTRY_JS, membersOf, publishedManifest, readmeOf, readSetFile, SET_FILE, setFileText } from "./metapackages.ts";
@@ -45,8 +46,16 @@ export function metapackagesOf(repo: string): readonly (Library & { readonly bun
 }
 
 /** The files that are not what the manifests make (from the repository's root), and what is wrong with reading them; with `write`, the files are written. */
-export function synchronize(repo: string, write: boolean): { readonly stale: readonly string[]; readonly problems: readonly string[] } {
+export function synchronize(repo: string, write: boolean, mode?: DistributionMode): { readonly stale: readonly string[]; readonly problems: readonly string[] } {
   const root = repo.replace(/[\\/]$/, "");
+  const active = mode ?? (() => { const m = activeMode(env.get(MODE_VARIABLE)); return m.kind === "ok" ? m.value : undefined; })();
+  if (active === undefined) return { stale: [], problems: [`${MODE_VARIABLE} is not a distribution mode`] };
+  if (active === "single") {
+    // the metapackages are not built in single mode (0036-distribution FR-020): a file of a set that is there is what no manifest makes
+    const left = metapackagesOf(root).map((m) => `commons/${m.name}/${SET_FILE}`).filter((p) => existsSync(join(root, p)));
+    if (write) for (const p of left) removeSync(join(root, p));
+    return { stale: left, problems: [] };
+  }
   const libraries = readLibraries(root).flatMap((f) => ("library" in f ? [f.library] : []));
   const stale: string[] = [];
   const problems: string[] = [];
@@ -112,6 +121,15 @@ export async function packMetapackage(root: string): Promise<PackedSet> {
 
 /** The command line of a metapackage's `tools/pack.ts`: pack, print what was found (or the tarball) and the exit status. */
 export async function main(root: string, argv: readonly string[]): Promise<number> {
+  const mode = activeMode(env.get(MODE_VARIABLE));
+  if (mode.kind === "err") {
+    stdio.stderr.writeSync(`${mode.error}\n`);
+    return 2;
+  }
+  if (mode.value === "single") {
+    stdio.stderr.writeSync(`the distribution is single: a metapackage is not packed (${MODE_VARIABLE}=per-library packs it)\n`);
+    return argv.includes("--check") ? 0 : 1;
+  }
   if (argv.includes("--check") && (env.get("IFC_SKIP_PACK") ?? "") !== "") {
     stdio.stdout.writeSync("pack check skipped: the set did not change in this push (IFC_SKIP_PACK); the release packs it\n");
     return 0;

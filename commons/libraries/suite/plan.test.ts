@@ -124,12 +124,15 @@ proves(
       await g("add", ".");
       await g("commit", "-q", "-m", "work");
       const libs = ["a", "b", "c"].map(lib);
-      assertEquals([...(await packsFor(dir, "main", libs))].sort(), ["a", "c"], "a changed its exports and c is new; b did not");
+      assertEquals([...(await packsFor(dir, "main", libs, false))].sort(), ["a", "c"], "a changed its exports and c is new; b did not");
       put("commons/libraries/src/pack-library.ts", "export {};\n");
       await g("add", ".");
       await g("commit", "-q", "-m", "packer");
-      assertEquals([...(await packsFor(dir, "main", libs))].sort(), ["a", "b", "c"], "the packer changed: every library");
-      assertEquals((await packsFor(dir, "no-such-base", libs)).size, 3, "Git cannot say: every library");
+      assertEquals([...(await packsFor(dir, "main", libs, false))].sort(), ["a", "b", "c"], "the packer changed: every library");
+      assertEquals((await packsFor(dir, "no-such-base", libs, false)).size, 3, "Git cannot say: every library");
+      // the one package is packed where a library changed its exports (0036-distribution FR-021)
+      const all = ["a", "b", "c", "commons"].map(lib);
+      assertEquals([...(await packsFor(dir, "no-such-base", all, true))].sort(), ["a", "b", "c", "commons"]);
     });
   },
 );

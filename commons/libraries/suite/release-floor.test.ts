@@ -151,7 +151,7 @@ proves(
         assertEquals(by.get("gained")?.exportsChange, { removed: [], added: ["./more"] });
         assertEquals(by.get("same")?.exportsChange, { removed: [], added: [] });
         assertEquals(by.get("unpublished")?.exportsChange, undefined, "npm holds no such version: nothing to compare");
-        const plan = await releasePlan(dir, { registry: offlineRegistry, published: realPublishedExports(base) });
+        const plan = await releasePlan(dir, { registry: offlineRegistry, published: realPublishedExports(base), mode: "per-library" });
         assert(plan.kind === "ok", plan.kind === "err" ? plan.error : "");
         const to = new Map(plan.value.steps.map((s) => [s.slug as string, `${s.from}>${s.to}`]));
         // while the major version is 0 the breaking level raises the minor, and a feature raises the minor too; a source changed alone is a patch

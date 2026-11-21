@@ -5,7 +5,7 @@
  * @module
  */
 import { err, ok } from "@intellectual-frontiers/core";
-import { existsSync, mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { existsSync, mkdirSync, readTextFileSync, removeSync as rmSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { basename, dirname, fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
 import { proc } from "@intellectual-frontiers/system";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
@@ -95,27 +95,26 @@ proves([`${DIST} FR-005`, `${DIST} FR-006`, `${DIST} FR-007`, `${SPEC} FR-023`],
     assertEquals(m.level, "L0");
     assertEquals(m.specKit, undefined);
   }
+  // in single mode no set file is made (FR-020), and the sets the manifests make are the roles' (FR-006, FR-007)
   assertEquals(synchronize(ROOT, false), { stale: [], problems: [] });
-  // every set holds what the roles say, and every dependency is an exact version of a library at the version of its manifest
-  for (const m of metapackagesOf(ROOT)) {
-    const deps = readSetFile(readTextFileSync(join(ROOT, "commons", m.name, SET_FILE)));
-    assert(deps.kind === "ok");
-    for (const [pkg, version] of Object.entries(deps.value)) {
-      assert(/^\d+\.\d+\.\d+$/.test(version), `${m.name}: ${pkg} is at ${version}, which is not an exact version`);
-      const owner = libraries.find((l) => (l.publishes ?? `@intellectual-frontiers/${l.name}`) === pkg);
-      assertEquals(owner?.version, version, `${m.name}: ${pkg}`);
+  for (const m of metapackagesOf(ROOT)) assertEquals(existsSync(join(ROOT, "commons", m.name, SET_FILE)), false, `${m.name}: no set file in single mode`);
+  const sets = new Map(BUNDLES.map((b) => {
+    const r = membersOf(b, libraries);
+    assert(r.kind === "ok");
+    return [b, r.value] as const;
+  }));
+  for (const [b, members] of sets) {
+    for (const x of members) {
+      assert(/^\d+\.\d+\.\d+$/.test(x.version), `${b}: ${x.package} is at ${x.version}, which is not an exact version`);
+      const owner = libraries.find((l) => (l.publishes ?? `@intellectual-frontiers/${l.name}`) === x.package);
+      assertEquals(owner?.version, x.version, `${b}: ${x.package}`);
     }
   }
-  const all = readSetFile(readTextFileSync(join(ROOT, "commons", "commons", SET_FILE)));
-  assert(all.kind === "ok");
-  const four = ["foundation", "patterns", "programs", "standards"].flatMap((n) => {
-    const d = readSetFile(readTextFileSync(join(ROOT, "commons", n, SET_FILE)));
-    assert(d.kind === "ok");
-    return Object.keys(d.value);
-  });
-  assertEquals(Object.keys(all.value).sort(), four.sort(), "commons is the four sets together");
-  assert("@intellectual-frontiers/arcactl" in all.value && !("@intellectual-frontiers/data" in all.value), "data is installed as the package it publishes");
-  for (const held of HELD_BACK.keys()) assert(!(`@intellectual-frontiers/${held}` in all.value), `${held} is held back`);
+  const four = ["foundation", "patterns", "programs", "standards"].flatMap((n) => (sets.get(n as (typeof BUNDLES)[number]) ?? []).map((x) => x.package));
+  const all = (sets.get("commons") ?? []).map((x) => x.package);
+  assertEquals([...all].sort(), [...four].sort(), "commons is the four sets together");
+  assert(all.includes("@intellectual-frontiers/arcactl") && !all.includes("@intellectual-frontiers/data"), "data is installed as the package it publishes");
+  for (const held of HELD_BACK.keys()) assert(!all.includes(`@intellectual-frontiers/${held}`), `${held} is held back`);
 });
 
 proves([`${DIST} FR-007`], "the generator writes the files, --check writes nothing, and a stale or hand-edited file is found", async () => {
@@ -124,20 +123,26 @@ proves([`${DIST} FR-007`], "the generator writes the files, --check writes nothi
       mkdirSync(join(dir, "commons", name), { recursive: true });
       writeTextFileSync(join(dir, "commons", name, "library.ts"), manifest(name, extra, version));
     }
-    const first = synchronize(dir, false);
+    const first = synchronize(dir, false, "per-library");
     assertEquals(first.stale, ["commons/commons/dependencies.auto.json", "commons/foundation/dependencies.auto.json"]);
     assertEquals(existsSync(join(dir, "commons", "foundation", SET_FILE)), false, "--check writes nothing");
-    assertEquals(synchronize(dir, true).stale.length, 2);
-    assertEquals(synchronize(dir, false), { stale: [], problems: [] });
+    assertEquals(synchronize(dir, true, "per-library").stale.length, 2);
+    assertEquals(synchronize(dir, false, "per-library"), { stale: [], problems: [] });
     const written = readSetFile(readTextFileSync(join(dir, "commons", "foundation", SET_FILE)));
     assert(written.kind === "ok");
     assertEquals(written.value, { "@intellectual-frontiers/core": "0.1.5" });
     writeTextFileSync(join(dir, "commons", "foundation", SET_FILE), "{}\n");
-    assertEquals(synchronize(dir, false).stale, ["commons/foundation/dependencies.auto.json"]);
+    assertEquals(synchronize(dir, false, "per-library").stale, ["commons/foundation/dependencies.auto.json"]);
     // a library with no role stops the generator
     mkdirSync(join(dir, "commons", "brand-new"), { recursive: true });
     writeTextFileSync(join(dir, "commons", "brand-new", "library.ts"), manifest("brand-new"));
-    assertEquals(synchronize(dir, false).problems.length, 2);
+    assertEquals(synchronize(dir, false, "per-library").problems.length, 2);
+    // in single mode the generator makes no file and finds the files that are there, and removes them where it writes
+    rmSync(join(dir, "commons", "brand-new"), { recursive: true });
+    assertEquals(synchronize(dir, false, "single").stale, ["commons/commons/dependencies.auto.json", "commons/foundation/dependencies.auto.json"]);
+    assertEquals(synchronize(dir, true, "single").stale.length, 2);
+    assertEquals(existsSync(join(dir, "commons", "foundation", SET_FILE)), false);
+    assertEquals(synchronize(dir, false, "single"), { stale: [], problems: [] });
     return Promise.resolve();
   });
 });
@@ -253,7 +258,7 @@ proves([`${DIST} FR-001`, `${DIST} FR-003`, `${DIST} FR-018`], "the root is priv
   assertStringIncludes(agents, "published package");
   assert(!/bun add github:intellectual-frontiers/.test(agents), "AGENTS.md names no Git dependency on this repository");
   const readme = readTextFileSync(join(ROOT, "README.md"));
-  for (const part of ["How other repositories use commons", "@intellectual-frontiers/commons", "repoctl hygiene", "npm.pkg.github.com", "Metapackage"]) assertStringIncludes(readme, part);
+  for (const part of ["How other repositories use commons", "@intellectual-frontiers/commons", "repoctl hygiene", "npm.pkg.github.com", "Distribution `single`"]) assertStringIncludes(readme, part);
   assert(existsSync(join(ROOT, "commons", "docs", "guides", "consuming-commons.md")));
   const config = readTextFileSync(join(ROOT, "commons", "docs.config.ts"));
   assertEquals(config.split("guides/consuming-commons.md").length - 1, 1, "one entry");

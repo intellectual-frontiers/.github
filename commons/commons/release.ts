@@ -6,12 +6,12 @@
 export const release = {
   slug: "commons",
   kind: "Software",
-  title: "Commons: every consumer-facing library at one exact version, as one package with no code of its own",
+  title: "Commons: every library of commons as one package at one version",
   authors: [
     {
       name: "Intellectual Frontiers",
     },
   ],
-  version: "0.1.9",
+  version: "0.2.0",
   repository: "https://github.com/intellectual-frontiers/.github",
 };

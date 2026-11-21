@@ -29,6 +29,8 @@ import process from "node:process";
 import { absurd, type Brand, err, ok, refine, type Result, string } from "@intellectual-frontiers/core";
 import { stdio } from "@intellectual-frontiers/system";
 import { existsSync, readTextFileSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { env } from "@intellectual-frontiers/system/proc";
+import { activeMode, type DistributionMode, MODE_VARIABLE, SINGLE } from "./distribution.ts";
 import { type Hold, type Library, type Registry, readLibraries } from "./libraries.ts";
 
 /** The marker that opens the generated table. */
@@ -304,9 +306,20 @@ export function bundlesOf(repo: string): readonly BundleRow[] {
   return rows;
 }
 
-/** The table of the metapackages, as Markdown, with the sentence that introduces it; nothing where a repository has none. */
-export function bundlesTableOf(rows: readonly BundleRow[]): string {
+/** The table of the package or packages that install commons, as Markdown, with the sentence that introduces it: in `single` mode the one package that holds every library, in `per-library` mode the metapackages; nothing where a repository has none. */
+export function bundlesTableOf(rows: readonly BundleRow[], mode: DistributionMode = "per-library"): string {
   if (rows.length === 0) return "";
+  if (mode === "single") {
+    const one = rows.filter((r) => r.name === SINGLE.slug);
+    if (one.length === 0) return "";
+    return [
+      `Distribution \`single\` (commons 0036-distribution FR-019): the whole of commons is one package at one version, and a library is imported as \`${SINGLE.package}/<library>\` (and \`${SINGLE.package}/<library>/<subpath>\`).`,
+      "",
+      "| Package | What it holds |",
+      "| --- | --- |",
+      ...one.map((r) => `| \`${SINGLE.package}\` | ${r.purpose} |`),
+    ].join("\n");
+  }
   const body = rows.map((r) => `| [\`@intellectual-frontiers/${r.name}\`](https://www.npmjs.com/package/@intellectual-frontiers/${r.name}) | ${r.purpose} |`);
   return [
     "Metapackages: no code of their own, each depends on a set of the libraries above at exact versions (commons 0036-distribution). Install one of them, or a library.",
@@ -332,7 +345,8 @@ export function synchronize(repo: string, write: boolean): { readonly stale: boo
   const { rows, problems } = rowsOf(root);
   if (!existsSync(file)) return { stale: false, problems: [...problems, "README.md is missing"] };
   const text = readTextFileSync(file).replace(/\r\n/g, "\n");
-  const bundles = bundlesTableOf(bundlesOf(root));
+  const modeOf = activeMode(env.get(MODE_VARIABLE));
+  const bundles = bundlesTableOf(bundlesOf(root), modeOf.kind === "ok" ? modeOf.value : "per-library");
   const made = withTable(text, bundles === "" ? tableOf(rows) : `${tableOf(rows)}\n\n${bundles}`);
   if (made.kind === "err") return { stale: false, problems: [...problems, made.error] };
   const stale = made.value !== text;

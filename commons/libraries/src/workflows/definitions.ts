@@ -690,7 +690,8 @@ const release: Workflow = {
     "The release of the libraries (commons 0001-libraries FR-014, FR-015): by hand, from main, after `bun run release apply` (commons/libraries/src/releasing.ts) has written the versions and the record `commons/generated/release.auto.json` and they are pushed.",
     "`plan` reads the record and leaves out what is tagged; `build` proves and packs each library (`verify`, `tools/pack.ts`); `publish`, where asked, sends the tarballs in dependency order to npm with provenance, by npm's trusted",
     "publishing (the owner sets a trusted publisher once for each package on npmjs.com: this repository, this workflow's file, the environment `npm`) or, where the repository has the secret INFRO_NPMJS_TOKEN, by that token,",
-    "and to the GitHub package registry, and makes the tag of each. A version that is on a registry is skipped and a tag that is there is kept, so a run again continues where one stopped.",
+    "and to the GitHub package registry, and makes the tag of each; the registries of an entry are those its record names (in `single` distribution the one package goes to the GitHub package registry alone, 0036-distribution FR-028).",
+    "A version that is on a registry is skipped and a tag that is there is kept, so a run again continues where one stopped.",
   ).trimEnd(),
   on: {
     workflowDispatch: {

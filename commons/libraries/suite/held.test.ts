@@ -134,7 +134,7 @@ proves([`${SPEC} FR-024`, `${SPEC} FR-026`], "on a real repository a library wit
       const r = await proc.run([git, "-C", dir, "-c", "user.name=t", "-c", "user.email=t@t", "-c", "commit.gpgsign=false", ...a]);
       assertEquals(r.code, 0, r.stderr);
     }
-    const planned = await releasePlan(dir, { registry: offlineRegistry, published: offlinePublishedExports });
+    const planned = await releasePlan(dir, { registry: offlineRegistry, published: offlinePublishedExports, mode: "per-library" });
     assert(planned.kind === "ok", planned.kind === "err" ? planned.error : "");
     assertEquals(planned.value.steps.map((s) => s.slug as string), ["ready"]);
     assertEquals(planned.value.held.map((h) => `${h.name} ${h.hold.kind}`), ["parked unfinished"]);

@@ -3,6 +3,8 @@
  * published `package.json`, each entry's `types` and the declarations it reaches), installed under the `node_modules` of an empty project, imported by Node (no hook) and by Bun, and a consumer of every entry is
  * type-checked against it by the TypeScript 7 compiler under `moduleResolution: nodenext`. The inspection's refusals are each shown on a package made to fail.
  *
+ * This is the proof of the machinery of `per-library` distribution (0036-distribution FR-020): the repository is in `single` mode, so it runs with `IFC_DISTRIBUTION=per-library`, `bun test tests/release/commons-packages.test.ts`.
+ *
  * @module
  */
 import { fs, path, proc } from "../../commons/system/src/mod.ts";
@@ -30,7 +32,7 @@ function npmLibraries(): readonly { readonly name: string; readonly dir: string 
 }
 
 async function sh(argv: readonly string[], cwd: string): Promise<{ readonly code: number; readonly out: string }> {
-  const r = await proc.run(argv, { cwd });
+  const r = await proc.run(argv, { cwd, env: { IFC_DISTRIBUTION: "per-library" } });
   return { code: r.code, out: `${r.stdout}${r.stderr}` };
 }
 
@@ -42,6 +44,8 @@ proves(
     const node = proc.which("node");
     const tmp = await fs.makeTempDir({ prefix: "commons-packages-" });
     try {
+      // the sets of the metapackages are made in this mode and removed again in the end (in single mode no set file is made, 0036-distribution FR-020)
+      assertEquals((await sh([bun, "commons/libraries/src/pack-metapackage.ts"], ROOT)).code, 0);
       const project = path.join(tmp, "project");
       await fs.mkdir(path.join(project, "node_modules"), { recursive: true });
       await fs.writeTextFile(path.join(project, "package.json"), '{ "name": "consumer", "private": true, "type": "module" }\n');
@@ -199,6 +203,7 @@ proves(
         }
       }
     } finally {
+      await proc.run([bun, "commons/libraries/src/pack-metapackage.ts"], { cwd: ROOT, env: { IFC_DISTRIBUTION: "single" } });
       await fs.remove(tmp, { recursive: true });
     }
   },

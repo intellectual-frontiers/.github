@@ -77,7 +77,7 @@ proves(
       assert(stale.code !== 0, "the lockfile is stale before the release");
       assertStringIncludes(stale.out, "lockfile");
       const folders = ["commons/base", "commons/top"];
-      const options = { tests: true, registry: offlineRegistry, published: offlinePublishedExports } as const;
+      const options = { tests: true, registry: offlineRegistry, published: offlinePublishedExports, mode: "per-library" } as const;
       // control: an apply whose refresh does nothing leaves the gate to fail on the stale lockfile
       const lazy: Host = { lock: noop, sync: noop, generate: noop, prove: gate(folders) };
       const failed = await applyRelease(dir, lazy, options);

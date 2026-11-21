@@ -33,6 +33,7 @@ import { existsSync, readDirSync, readTextFileSync } from "@intellectual-frontie
 import { dirname, join, normalize, resolve, toPosix } from "@intellectual-frontiers/system/path";
 import { stdio } from "@intellectual-frontiers/system";
 import { run } from "@intellectual-frontiers/system/proc";
+import { isSingle, SINGLE } from "./distribution.ts";
 import { type Library, readLibraries } from "./libraries.ts";
 
 /** What a library reads: its folder, the folders and files it takes from others, what it depends on, and the files it imports one by one. */
@@ -148,6 +149,11 @@ function folderOf(file: string): string {
 /** What the library `name` reads (FR-020). */
 export function inputsOf(repo: string, name: string): Inputs {
   const root = repo.replace(/[\\/]$/, "");
+  // in single mode the one package is made of every library, so it reads all of commons (0036-distribution FR-021)
+  if (name === SINGLE.slug && isSingle(process.env["IFC_DISTRIBUTION"])) {
+    const others = readLibraries(root).flatMap((f) => ("library" in f && f.dir !== name ? [f.dir] : []));
+    return { paths: ["commons/**", ...SHARED, ".github/workflows/ci.auto.yml"].sort(), dependsOn: others, files: [], imports: others, codePaths: ["commons/**"] };
+  }
   const folder = `commons/${name}`;
   const pkg = readPackage(join(root, folder));
   const sources = sourcesUnder(root, folder);

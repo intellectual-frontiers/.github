@@ -227,7 +227,7 @@ proves(
           return Promise.resolve(ok(undefined));
         },
       };
-      const done = await applyRelease(dir, host, { tests: true, registry: offlineRegistry });
+      const done = await applyRelease(dir, host, { tests: true, registry: offlineRegistry, mode: "per-library" });
       assert(done.kind === "ok", done.kind === "err" ? done.error : "");
       assertEquals(ran, ["lock commons/a", "lock commons/b", "lock commons/c", "lock commons/d", ...GENERATORS.map((c) => c.join(" ")), "sync", "prove"], "the lockfiles of the libraries it releases are refreshed first, the generated files are made once and synchronized, and the proof is run last, once");
       assertStringIncludes(readTextFileSync(join(dir, "commons/a/release.ts")), "0.2.0");
@@ -245,20 +245,20 @@ proves(
       assertEquals((await g("tag", "-l")).trim().split("\n").sort(), ["a-v0.1.0", "b-v0.1.0", "c-v0.1.0"], "apply tags nothing");
       // the proof is left out where it is asked, and a failing generator stops the release before the record
       ran.length = 0;
-      assertEquals((await applyRelease(dir, host, { tests: false, registry: offlineRegistry })).kind, "ok");
+      assertEquals((await applyRelease(dir, host, { tests: false, registry: offlineRegistry, mode: "per-library" })).kind, "ok");
       assert(!ran.includes("prove"));
       const bad: Host = { ...host, generate: () => Promise.resolve(err("the generator failed")) };
       writeTextFileSync(join(dir, RECORD_PATH), "{}\n");
-      assertEquals((await applyRelease(dir, bad, { tests: true, registry: offlineRegistry })).kind, "err");
+      assertEquals((await applyRelease(dir, bad, { tests: true, registry: offlineRegistry, mode: "per-library" })).kind, "err");
       assertEquals(readTextFileSync(join(dir, RECORD_PATH)), "{}\n", "no record from a release that stopped");
       // the command reads the same: plan says it, matrix leaves out what is tagged
-      assertEquals(await main(["plan", "--repo", dir, "--offline"]), 0);
+      assertEquals(await main(["plan", "--repo", dir, "--offline", "--distribution", "per-library"]), 0);
       await g("add", ".");
       await g("commit", "-q", "-m", "Release");
       await g("tag", "a-v0.2.0");
       const out = join(dir, "output");
       writeTextFileSync(join(dir, RECORD_PATH), recordText({ steps: plan.value.steps, unchanged: plan.value.unchanged, held: [] }));
-      assertEquals(await main(["matrix", "--repo", dir, "--github-output", out]), 0);
+      assertEquals(await main(["matrix", "--repo", dir, "--github-output", out, "--distribution", "per-library"]), 0);
       const text = readTextFileSync(out);
       assertStringIncludes(text, "has-build=true");
       assert(!text.includes('"tag":"a-v0.2.0"'), "a tagged library is left out");
@@ -282,7 +282,7 @@ proves(
       await g("add", ".");
       await g("commit", "-q", "-m", "Start");
       await g("tag", "a-v0.3.0");
-      assertEquals(await main(["plan", "--repo", dir, "--offline"]), 1);
+      assertEquals(await main(["plan", "--repo", dir, "--offline", "--distribution", "per-library"]), 1);
     });
   },
 );

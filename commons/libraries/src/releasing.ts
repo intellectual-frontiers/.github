@@ -47,6 +47,8 @@ import { compareVersions, greaterImpact, type Impact, nextSemVer, parseVersion }
 import { scopeOf, workFolders } from "@intellectual-frontiers/mizan/versions/works";
 import { inputsOf } from "./affected.ts";
 import { exportsLine } from "./plan.ts";
+import { activeMode, type DistributionMode, GITHUB_REGISTRY, MODE_VARIABLE, type PublishTarget, PUBLISH_TARGETS, SINGLE, SINGLE_TARGETS } from "./distribution.ts";
+import { packableLibraries, rewriteSpecifiers, singleExportKeys } from "./pack-commons.ts";
 import { decodeLibrarySource, type Hold, holdSentence, LIBRARY_FILE, publishedPackage, type VersionConstant } from "./libraries.ts";
 import { membersOf } from "./metapackages.ts";
 import { everyLibrary } from "./affected.ts";
@@ -71,6 +73,8 @@ export type Facts = {
   readonly impact: Impact;
   /** Whether the release sends it to a registry: a library that names npm. */
   readonly publish: boolean;
+  /** The registries it is sent to where the mode says so (`single`); the two where it names none. */
+  readonly registries?: readonly PublishTarget[];
   /** For a version that is not tagged or is ahead of its tag: what npm holds of this version, compared with the files of the library. */
   readonly registry: Drift;
   /** Whether a file of the library changed since the last commit that raised its version, and the impact the commits since state (a patch where none does): the fallback where npm cannot be compared. */
@@ -129,6 +133,7 @@ export type Step = {
   readonly to: string;
   readonly tag: string;
   readonly publish: boolean;
+  readonly registries?: readonly PublishTarget[];
   readonly decision: Exclude<Decision, { readonly kind: "unchanged" }>;
 };
 
@@ -242,7 +247,7 @@ export function planRelease(facts: readonly Facts[], raise: ReadonlyMap<string, 
     const d = decided.get(slug);
     if (f === undefined || d === undefined || d.kind === "unchanged") continue;
     const to = d.kind === "as-is" ? f.version : d.to;
-    steps.push({ slug, folder: f.folder, package: f.package, from: f.version, to, tag: tagOf(slug, to), publish: f.publish, decision: d });
+    steps.push({ slug, folder: f.folder, package: f.package, from: f.version, to, tag: tagOf(slug, to), publish: f.publish, ...(f.registries === undefined ? {} : { registries: f.registries }), decision: d });
   }
   return ok({ steps, unchanged: facts.filter((f) => decided.get(f.slug)?.kind === "unchanged").map((f) => f.slug), held: [...held].sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0)) });
 }
@@ -255,12 +260,15 @@ function compare(a: string, b: string): number | undefined {
 
 /** The record the workflow reads, as the bytes of its file: the steps that publish or tag, in order. */
 export function recordText(plan: Plan): string {
-  const releases = plan.steps.map((s) => ({ slug: s.slug, package: s.package, version: s.to, folder: s.folder, tag: s.tag, publish: s.publish }));
+  const releases = plan.steps.map((s) => ({ slug: s.slug, package: s.package, version: s.to, folder: s.folder, tag: s.tag, publish: s.publish, ...(s.registries === undefined ? {} : { registries: s.registries }) }));
   return `${JSON.stringify({ generated: "bun commons/libraries/src/releasing.ts apply; do not edit (commons 0001-libraries FR-014)", releases }, null, 2)}\n`;
 }
 
 /** One entry of the record, as the workflow reads it. */
-export type Entry = { readonly slug: string; readonly package: string; readonly version: string; readonly folder: string; readonly tag: string; readonly publish: boolean };
+export type Entry = { readonly slug: string; readonly package: string; readonly version: string; readonly folder: string; readonly tag: string; readonly publish: boolean; readonly registries?: readonly PublishTarget[] };
+
+/** Whether a release sends an entry to a registry: an entry names its registries, and one that names none goes to both. */
+export const sendsTo = (e: Entry, target: PublishTarget): boolean => (e.registries ?? PUBLISH_TARGETS).includes(target);
 
 /** The entries of a record's text, or why it is not one. */
 export function readRecord(text: string): Result<readonly Entry[], string> {
@@ -280,7 +288,10 @@ export function readRecord(text: string): Result<readonly Entry[], string> {
     const pkg = o["package"];
     if (typeof slug !== "string" || typeof pkg !== "string" || typeof version !== "string" || typeof folder !== "string" || typeof tag !== "string" || typeof publish !== "boolean")
       return err(`${RECORD_PATH}: an entry lacks its slug, package, version, folder, tag or publish`);
-    out.push({ slug, package: pkg, version, folder, tag, publish });
+    const regs = o["registries"];
+    if (regs !== undefined && !(Array.isArray(regs) && regs.every((r): r is PublishTarget => (PUBLISH_TARGETS as readonly unknown[]).includes(r))))
+      return err(`${RECORD_PATH}: the registries of an entry are ${PUBLISH_TARGETS.join(" and ")}`);
+    out.push({ slug, package: pkg, version, folder, tag, publish, ...(regs === undefined ? {} : { registries: regs as readonly PublishTarget[] }) });
   }
   return ok(out);
 }
@@ -408,14 +419,67 @@ export function realRegistry(repo: string): Registry {
   };
 }
 
+/**
+ * Whether the files of the one package are those of the version npm holds (0036-distribution FR-027): the sources it carries (each `.ts` file by its SHA-256 against the library's own file with its specifiers written as the package's) and the keys of its
+ * `exports`. A source that is missing here, or other, or a key that was added or removed, is a difference.
+ */
+export function driftOfSingle(published: Tarball, local: { readonly source: (path: string) => string | undefined; readonly keys: readonly string[] }): "same" | "differs" {
+  const sorted = (xs: readonly string[]): string => [...xs].sort().join("\n");
+  if (sorted(exportKeys(published.packageJson)) !== sorted(local.keys)) return "differs";
+  for (const [path, sha] of published.hashes) {
+    if (!path.endsWith(".ts") || path.endsWith(".d.ts") || path.includes("/dist/")) continue;
+    const text = local.source(path);
+    if (text === undefined || createHash("sha256").update(text).digest("hex") !== sha) return "differs";
+  }
+  return "same";
+}
+
+/** The registry that holds the one package: its address and the token that may read it (none for npm, the token of the environment for the GitHub package registry). */
+export type RegistryAt = { readonly base: string; readonly token: string };
+
+/** The registry the one package is sent to first: npm where `SINGLE_TARGETS` has it, the GitHub package registry otherwise, read with `GITHUB_TOKEN`, `GH_TOKEN` or `NODE_AUTH_TOKEN` where the environment has one (without one the registry cannot be asked, which is `unknown`). */
+export function registryAt(targets: readonly PublishTarget[] = SINGLE_TARGETS): RegistryAt {
+  if (targets.includes("npm")) return { base: "https://registry.npmjs.org", token: "" };
+  return { base: GITHUB_REGISTRY, token: env.get("GITHUB_TOKEN") ?? env.get("GH_TOKEN") ?? env.get("NODE_AUTH_TOKEN") ?? "" };
+}
+
+/** The registry of npm for the one package: the metadata of the version, its tarball, and the sources of every library under `repo`; anything that goes wrong is `unknown`, never a guess. */
+export function realRegistrySingle(repo: string, registry: RegistryAt = registryAt()): Registry {
+  return async (name, version) => {
+    try {
+      const headers = registry.token === "" ? {} : { authorization: `Bearer ${registry.token}` };
+      const meta = await fetch(`${registry.base}/${name.replace("/", "%2F")}/${version}`, { headers, signal: AbortSignal.timeout(30_000) });
+      if (meta.status === 404) return "absent";
+      if (!meta.ok) return "unknown";
+      const json: unknown = await meta.json();
+      const dist = typeof json === "object" && json !== null && "dist" in json ? json.dist : undefined;
+      const url = typeof dist === "object" && dist !== null && "tarball" in dist ? dist.tarball : undefined;
+      if (typeof url !== "string") return "unknown";
+      const tgz = await fetch(url, { headers, signal: AbortSignal.timeout(120_000) });
+      if (!tgz.ok) return "unknown";
+      const published = tarballOf(new Uint8Array(await tgz.arrayBuffer()));
+      const names = new Set(packableLibraries(repo).libraries.map((l) => l.name));
+      return driftOfSingle(published, {
+        keys: singleExportKeys(repo),
+        source: (path) => {
+          const f = join(repo, "commons", path);
+          return existsSync(f) ? rewriteSpecifiers(readTextFileSync(f), names).text : undefined;
+        },
+      });
+    } catch {
+      return "unknown";
+    }
+  };
+}
+
 /** The keys of `exports` of a version npm holds, or undefined where it cannot be read (not there, offline, no answer): never a guess. */
 export type PublishedExports = (pkg: string, version: string) => Promise<readonly string[] | undefined>;
 
 /** The registry of npm (or the one at `base`, for a test's own server) asked for the manifest of a version, whose `exports` keys are those the package was published with. */
-export function realPublishedExports(base = "https://registry.npmjs.org"): PublishedExports {
+export function realPublishedExports(base = "https://registry.npmjs.org", token = ""): PublishedExports {
   return async (name, version) => {
     try {
-      const meta = await fetch(`${base}/${name.replace("/", "%2F")}/${version}`, { signal: AbortSignal.timeout(30_000) });
+      const meta = await fetch(`${base}/${name.replace("/", "%2F")}/${version}`, { headers: token === "" ? {} : { authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(30_000) });
       if (!meta.ok) return undefined;
       const json: unknown = await meta.json();
       const e = typeof json === "object" && json !== null && "exports" in json ? json.exports : undefined;
@@ -448,11 +512,101 @@ export function heldLibraries(repo: string): readonly HeldLibrary[] {
 /** The plan of a repository: the facts of the libraries that are released, the libraries that are held, and the rules of the plan. */
 export async function releasePlan(
   repo: string,
-  options: { readonly raise?: ReadonlyMap<string, Impact | undefined>; readonly registry?: Registry; readonly published?: PublishedExports } = {},
+  options: { readonly raise?: ReadonlyMap<string, Impact | undefined>; readonly registry?: Registry; readonly published?: PublishedExports; readonly mode?: DistributionMode } = {},
 ): Promise<Result<Plan, string>> {
+  const mode = options.mode === undefined ? activeMode(env.get(MODE_VARIABLE)) : ok(options.mode);
+  if (mode.kind === "err") return mode;
+  if (mode.value === "single") {
+    // the one package is the one release: no library is raised by itself, and none is held out of it by its own hold (0036-distribution FR-027)
+    const single = await singleFactsOf(repo, options.registry ?? realRegistrySingle(repo), options.published);
+    if (single.kind === "err") return single;
+    return planRelease([single.value], options.raise, []);
+  }
   const facts = await factsOf(repo, options.registry, options.published);
   if (facts.kind === "err") return facts;
   return planRelease(facts.value, options.raise, heldLibraries(repo));
+}
+
+/**
+ * What the host gives the plan of `single` mode: the facts of the one package, from the tags `commons-v<version>` and the tree. The package changed where a file of any library it holds changed since its last tag, and the impact is the greatest of
+ * the `Impact:` of the commits that touched any of them (a patch where none states one); the floor of its keys of `exports` is read against the version npm holds.
+ */
+export async function singleFactsOf(repo: string, registry: Registry = realRegistrySingle(repo), published: PublishedExports = realPublishedExports(registryAt().base, registryAt().token)): Promise<Result<Facts, string>> {
+  const tree = await readWorkingTree(repo);
+  if (tree.kind === "err") return err(formatGitError(tree.error));
+  const tags = await readTags(repo);
+  if (tags.kind === "err") return err(formatGitError(tags.error));
+  const head = await resolveCommit(repo, "HEAD");
+  if (head.kind === "err") return err(formatGitError(head.error));
+  const slug = slugOf(SINGLE.slug);
+  if (slug === undefined) return err(`${SINGLE.slug} is not a slug`);
+  const own = everyLibrary(repo).find((l) => l.name === SINGLE.slug);
+  if (own === undefined) return err(`${SINGLE.folder}/${LIBRARY_FILE} is missing: the one package has no manifest`);
+  const folders = workFolders(tree.value.paths);
+  const held = packableLibraries(repo);
+  if (held.problems.length > 0) return err(held.problems.join("; "));
+  const scopes = [...held.libraries.map((l) => `commons/${l.name}`), SINGLE.folder].map((folder) => {
+    const text = tree.value.records.get(folder);
+    const record = text === undefined ? undefined : decodeReleaseSource(text);
+    return record?.kind === "ok" ? scopeOf(folder, folders, record.value.exclude ?? [], record.value.paths ?? []) : scopeOf(folder, folders, [], []);
+  });
+  const inScope = (file: string): boolean => scopes.some((f) => f(file));
+  let last: { readonly version: string; readonly tag: string; readonly commit: string } | undefined;
+  for (const t of tags.value) {
+    if (!t.name.startsWith(`${slug}-v`)) continue;
+    const version = t.name.slice(slug.length + 2);
+    const v = parseVersion("SemVer", version);
+    if (v.kind === "err") continue;
+    const best = last === undefined ? undefined : parseVersion("SemVer", last.version);
+    if (last === undefined || (best?.kind === "ok" && compareVersions(v.value, best.value) === 1)) last = { version, tag: t.name, commit: t.commit };
+  }
+  let changed = false;
+  let impact: Impact = "patch";
+  if (last !== undefined) {
+    const files = await changedBetween(repo, last.commit, head.value);
+    if (files.kind === "err") return err(formatGitError(files.error));
+    changed = files.value.some(inScope);
+    const commits = await commitsSince(repo, last.commit);
+    if (commits.kind === "err") return err(formatGitError(commits.error));
+    impact = impactOfCommits(commits.value.filter((c) => c.files.some(inScope))) ?? "patch";
+  }
+  const ahead = last === undefined || (compare(own.version, last.version) ?? 0) > 0;
+  let drift: Drift = "unknown";
+  let sinceVersion = { changed: false, impact: "patch" as Impact };
+  if (ahead) {
+    drift = await registry(SINGLE.package, own.version, SINGLE.folder);
+    const raisedAt = await run(["git", "-C", repo, "log", "-1", "--format=%H", '-G"version"', "--", `${SINGLE.folder}/package.json`]);
+    const commit = raisedAt.code === 0 ? raisedAt.stdout.trim() : "";
+    if (commit !== "") {
+      const files = await changedBetween(repo, commit, head.value);
+      const commits = await commitsSince(repo, commit);
+      if (files.kind === "err") return err(formatGitError(files.error));
+      if (commits.kind === "err") return err(formatGitError(commits.error));
+      sinceVersion = { changed: files.value.some(inScope), impact: greaterImpact("patch", impactOfCommits(commits.value.filter((c) => c.files.some(inScope))) ?? "patch") };
+    }
+  }
+  // the keys of the one package's `exports` (every library's keys under its name) against the version npm holds
+  let exportsChange: ExportsChange | undefined;
+  const compared = ahead ? (drift === "differs" ? own.version : undefined) : changed && last !== undefined ? last.version : undefined;
+  if (compared !== undefined) {
+    const keys = await published(SINGLE.package, compared);
+    if (keys !== undefined) exportsChange = exportsChangeOf(keys, singleExportKeys(repo));
+  }
+  return ok({
+    slug,
+    folder: SINGLE.folder,
+    package: SINGLE.package,
+    version: own.version,
+    imports: [],
+    last: last === undefined ? undefined : { version: last.version, tag: last.tag },
+    changed,
+    impact: greaterImpact("patch", impact),
+    publish: true,
+    registries: SINGLE_TARGETS,
+    registry: drift,
+    sinceVersion,
+    exportsChange,
+  });
 }
 
 /** What the host gives the plan: the facts of the libraries from the tags and the tree. */
@@ -558,8 +712,14 @@ export const GENERATORS: readonly (readonly string[])[] = [
   ["commons/libraries/src/oscal-register.ts"],
 ];
 
-/** The tests that pack every library, install it into a consumer and type-check against it (the heavy proof a release asks for and a push does not). */
-export const PACKAGE_TESTS: readonly string[] = ["bun", "test", "./tests/release/"];
+/** The tests that pack every library, install it into a consumer and type-check against it (the heavy proof a release of `per-library` mode asks for and a push does not). */
+export const PACKAGE_TESTS: readonly string[] = ["bun", "test", "./tests/release/commons-packages.test.ts"];
+
+/** The test that packs the one package, installs it with npm and with Bun, imports every entry of every library on Node and on Bun and type-checks a consumer (the proof a release of `single` mode asks for). */
+export const SINGLE_PACKAGE_TESTS: readonly string[] = ["bun", "test", "./tests/release/commons-package.test.ts"];
+
+/** The tests a release of a mode runs: the mode that is not active is proved on demand with `IFC_DISTRIBUTION`. */
+export const testsOf = (mode: DistributionMode): readonly string[] => (mode === "single" ? SINGLE_PACKAGE_TESTS : PACKAGE_TESTS);
 
 /** What `apply` runs besides the planner: the refresh of a lockfile, the generators, the synchronization of every generated file and the tests, which a test of this module replaces. */
 export type Host = {
@@ -590,8 +750,11 @@ export const REAL: Host = {
     return r.code === 0 ? ok(undefined) : err(`${command.join(" ")} ended with ${r.code}: ${`${r.stdout}${r.stderr}`.trim().split("\n").slice(-8).join("\n")}`);
   },
   prove: async (repo) => {
-    const r = await run(PACKAGE_TESTS, { cwd: repo });
-    return r.code === 0 ? ok(undefined) : err(`${PACKAGE_TESTS.join(" ")} ended with ${r.code}:\n${`${r.stdout}${r.stderr}`.trim().split("\n").slice(-30).join("\n")}`);
+    const mode = activeMode(env.get(MODE_VARIABLE));
+    if (mode.kind === "err") return err(mode.error);
+    const tests = testsOf(mode.value);
+    const r = await run(tests, { cwd: repo });
+    return r.code === 0 ? ok(undefined) : err(`${tests.join(" ")} ended with ${r.code}:\n${`${r.stdout}${r.stderr}`.trim().split("\n").slice(-30).join("\n")}`);
   },
 };
 
@@ -605,9 +768,14 @@ export type Applied = { readonly plan: Plan; readonly written: readonly string[]
 export async function applyRelease(
   repo: string,
   host: Host,
-  options: { readonly tests: boolean; readonly raise?: ReadonlyMap<string, Impact | undefined>; readonly registry?: Registry; readonly published?: PublishedExports },
+  options: { readonly tests: boolean; readonly raise?: ReadonlyMap<string, Impact | undefined>; readonly registry?: Registry; readonly published?: PublishedExports; readonly mode?: DistributionMode },
 ): Promise<Result<Applied, string>> {
-  const planned = await releasePlan(repo, { ...(options.raise === undefined ? {} : { raise: options.raise }), ...(options.registry === undefined ? {} : { registry: options.registry }), ...(options.published === undefined ? {} : { published: options.published }) });
+  const planned = await releasePlan(repo, {
+    ...(options.raise === undefined ? {} : { raise: options.raise }),
+    ...(options.registry === undefined ? {} : { registry: options.registry }),
+    ...(options.published === undefined ? {} : { published: options.published }),
+    ...(options.mode === undefined ? {} : { mode: options.mode }),
+  });
   if (planned.kind === "err") return planned;
   const written: string[] = [];
   for (const step of planned.value.steps) {
@@ -643,7 +811,7 @@ export function planLines(look: Look, plan: Plan): readonly string[] {
   const heldLines = plan.held.map((h) => `${label("skipped", `${h.name} not released`, look)}  ${paint("dim", holdSentence(h.hold), look)}`);
   if (plan.steps.length === 0) return [`${label("skipped", "nothing to release: every library is tagged at its version and unchanged", look)}`, ...heldLines];
   const out = plan.steps.map(
-    (s) => `${label("action", `${s.slug} ${s.from === s.to ? s.to : `${s.from} -> ${s.to}`}${s.publish ? "" : " (tag only)"}`, look)}  ${paint("dim", describe(s.decision, s.from), look)}`,
+    (s) => `${label("action", `${s.slug} ${s.from === s.to ? s.to : `${s.from} -> ${s.to}`}${s.publish ? (s.registries === undefined ? "" : ` (to ${s.registries.join(" and ")})`) : " (tag only)"}`, look)}  ${paint("dim", describe(s.decision, s.from), look)}`,
   );
   if (plan.unchanged.length > 0) out.push(`${paint("dim", `left alone (${plan.unchanged.length}): ${plan.unchanged.join(", ")}`, look)}`);
   return [...out, ...heldLines];
@@ -682,13 +850,14 @@ export async function publishAll(entries: readonly Entry[], tools: Tools): Promi
     let npm: Outcome["npm"] = "not-published";
     let registry: Outcome["registry"] = "not-published";
     if (e.publish) {
-      if (await tools.onNpm(e.package, e.version)) npm = "present";
+      if (!sendsTo(e, "npm")) npm = "not-published";
+      else if (await tools.onNpm(e.package, e.version)) npm = "present";
       else {
         const sent = await tools.npm(e);
         npm = sent.kind === "ok" ? "published" : "failed";
         if (sent.kind === "err") reasons.push(sent.error);
       }
-      if (npm !== "failed") {
+      if (npm !== "failed" && sendsTo(e, "github")) {
         const sent = await tools.github(e);
         registry = sent.kind === "ok" ? "done" : "failed";
         if (sent.kind === "err") reasons.push(sent.error);
@@ -779,6 +948,12 @@ export function raiseOf(words: readonly string[]): Result<ReadonlyMap<string, Im
 /** The registry that is not asked (`--offline`). */
 export const offlineRegistry: Registry = () => Promise.resolve("unknown");
 
+/** The registry that is asked: npm for the files of the library, or for those of the one package. */
+const registryOf = (mode: DistributionMode, repo: string): Registry => (mode === "single" ? realRegistrySingle(repo, registryAt()) : realRegistry(repo));
+
+/** The registry whose `exports` keys the floor reads. */
+const publishedOf = (mode: DistributionMode): PublishedExports => (mode === "single" ? realPublishedExports(registryAt().base, registryAt().token) : realPublishedExports());
+
 const COMMANDS = ["plan", "apply", "matrix", "publish"] as const;
 type Command = (typeof COMMANDS)[number];
 const isCommand = (t: string): t is Command => (COMMANDS as readonly string[]).includes(t);
@@ -789,6 +964,7 @@ const OPTIONS = {
   githubOutput: value({ help: "Append the outputs to this file, as a step's `$GITHUB_OUTPUT` is read (matrix only).", valueName: "FILE" }),
   raise: many({ help: "Raise a library whatever its state says: NAME, or NAME=major|minor|patch (the impact of its commits, or a patch, where none is given). Repeat, or separate with commas.", valueName: "NAME[=IMPACT]" }),
   offline: flag({ help: "Do not ask npm what it holds: a version with no tag is then raised only where its files changed since it was raised, and the floor of the exports is not read." }),
+  distribution: value({ help: "The distribution mode for this run: per-library or single (the mode of the repository, or IFC_DISTRIBUTION, where it is not given).", valueName: "MODE" }),
   dir: value({ help: "Where the tarballs are, a folder `package-<slug>` for each library (publish only).", valueName: "DIR", default: "package" }),
 };
 const WORDS: readonly Operand[] = [{ name: "COMMAND", help: "plan, apply or matrix (plan by default).", arity: "optional" }];
@@ -810,6 +986,12 @@ export async function main(argv: readonly string[], host: Host = REAL): Promise<
     return 2;
   }
   const repo = resolve(parsed.value.options.repo);
+  const modeOf = activeMode(parsed.value.options.distribution ?? env.get(MODE_VARIABLE));
+  if (modeOf.kind === "err") {
+    stdio.stderr.writeSync(`release: ${modeOf.error}\n`);
+    return 2;
+  }
+  const mode = modeOf.value;
   const look = currentLook("stdout");
   const say = (t: string): void => void stdio.stdout.writeSync(`${t}\n`);
   switch (word) {
@@ -820,7 +1002,7 @@ export async function main(argv: readonly string[], host: Host = REAL): Promise<
         return 2;
       }
       const offline = parsed.value.options.offline;
-      const planned = await releasePlan(repo, { raise: raise.value, registry: offline ? offlineRegistry : realRegistry(repo), published: offline ? offlinePublishedExports : realPublishedExports() });
+      const planned = await releasePlan(repo, { raise: raise.value, registry: offline ? offlineRegistry : registryOf(mode, repo), published: offline ? offlinePublishedExports : publishedOf(mode), mode });
       if (planned.kind === "err") {
         stdio.stderr.writeSync(`release: ${planned.error}\n`);
         return 1;
@@ -837,8 +1019,9 @@ export async function main(argv: readonly string[], host: Host = REAL): Promise<
       const done = await applyRelease(repo, host, {
         tests: parsed.value.options.tests,
         raise: raise.value,
-        registry: parsed.value.options.offline ? offlineRegistry : realRegistry(repo),
-        published: parsed.value.options.offline ? offlinePublishedExports : realPublishedExports(),
+        registry: parsed.value.options.offline ? offlineRegistry : registryOf(mode, repo),
+        published: parsed.value.options.offline ? offlinePublishedExports : publishedOf(mode),
+        mode,
       });
       if (done.kind === "err") {
         stdio.stderr.writeSync(`release: ${done.error}\n`);
