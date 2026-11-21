@@ -159,7 +159,7 @@ export const states = codes(StateSchema, PLANNING, {
   Proposed: { label: en("Proposed"), definition: en("Found or inferred by a program or an agent, not yet confirmed by a person; it is counted in no plan until it is.") },
   Open: { label: en("Open"), definition: en("Confirmed and not started."), icalStatus: "NEEDS-ACTION" },
   InProgress: { label: en("In progress"), definition: en("Being worked on."), icalStatus: "IN-PROCESS" },
-  Deferred: { label: en("Deferred"), definition: en("Set aside until a day; it comes back to open when the day is reached or a person reopens it, and it is not closed.") },
+  Deferred: { label: en("Deferred"), definition: en("Set aside until a day, and not closed; a reopened event opens it again.") },
   Closed: {
     label: en("Closed"),
     definition: en("Finished or set aside, with a reason; it may be reopened. The iCalendar status that a closed item is closest to is COMPLETED or CANCELLED, which the reason chooses and this ontology does not."),
