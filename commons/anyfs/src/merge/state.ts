@@ -18,6 +18,7 @@ import {
   type Delta,
   type IdTime,
   makeVersionId,
+  randomCounterSeed,
   type ReplicaId,
   timeOfId,
   type Trust,
@@ -168,9 +169,9 @@ export async function transact(state: MergeState, ops: readonly PathOp[], blobs:
       }
       used.add(op.blob);
     }
-    const time = nextTime(next.last, wall);
+    const time = nextTime(next.last, wall, randomCounterSeed());
     const v = await makeVersion({
-      id: makeVersionId(time, state.replica),
+      id: makeVersionId(time),
       replica: state.replica,
       seq: next.ownSeq + 1,
       path: op.path,

@@ -74,20 +74,20 @@ proves(["0007-anyfs-merge-governance FR-001", "0007-anyfs-merge-governance FR-00
   assertEquals(parseVersionId("018f3a6e-7c00-7000-8123-456789abcdef").kind, "ok");
   for (const bad of ["", "018f3a6e-7c00-4000-8123-456789abcdef", "018f3a6e-7c00-7000-c123-456789abcdef", "018F3A6E-7C00-7000-8123-456789ABCDEF"]) assertEquals(parseVersionId(bad).kind, "err", bad);
   fc.assert(
-    fc.property(fc.integer({ min: 0, max: 2 ** 40 }), fc.integer({ min: 0, max: 0xfff }), fc.integer({ min: 1, max: 200 }), (ms, counter, n) => {
-      const id = makeVersionId({ ms, counter }, rid(n));
+    fc.property(fc.integer({ min: 0, max: 2 ** 40 }), fc.integer({ min: 0, max: 0xfff }), fc.uint8Array({ minLength: 8, maxLength: 8 }), (ms, counter, tail) => {
+      const id = makeVersionId({ ms, counter }, tail);
       const t = timeOfId(id);
       return parseVersionId(id).kind === "ok" && t.ms === ms && t.counter === counter;
     }),
   );
   fc.assert(
     fc.property(fc.tuple(fc.integer({ min: 0, max: 2 ** 40 }), fc.integer({ min: 0, max: 0xfff })), fc.tuple(fc.integer({ min: 0, max: 2 ** 40 }), fc.integer({ min: 0, max: 0xfff })), (a, b) => {
-      const ia = makeVersionId({ ms: a[0], counter: a[1] }, rid(1));
-      const ib = makeVersionId({ ms: b[0], counter: b[1] }, rid(1));
+      const ia = makeVersionId({ ms: a[0], counter: a[1] });
+      const ib = makeVersionId({ ms: b[0], counter: b[1] });
       return Math.sign(compareTime({ ms: a[0], counter: a[1] }, { ms: b[0], counter: b[1] })) === Math.sign(ia < ib ? -1 : ia > ib ? 1 : 0);
     }),
   );
-  assert(makeVersionId({ ms: 5, counter: 5 }, rid(1)) !== makeVersionId({ ms: 5, counter: 5 }, rid(2)), "two replicas never make one id");
+  assert(makeVersionId({ ms: 5, counter: 5 }) !== makeVersionId({ ms: 5, counter: 5 }), "two ids of one time differ in their random tail");
 });
 
 proves(["0008-anyfs-merge-logical FR-003"], "the clock never makes an id that is not after the last, whatever the wall clock does, and an id taken from another replica puts the next one after it", () => {
@@ -109,14 +109,14 @@ proves(["0008-anyfs-merge-logical FR-003"], "the clock never makes an id that is
 });
 
 proves(["0007-anyfs-merge-governance FR-004", "0007-anyfs-merge-governance FR-007", "0007-anyfs-merge-governance FR-008"], "a row is its own checksum: its fields make it, a put names a blob and a tombstone none, and a changed field is found", async () => {
-  const id = makeVersionId({ ms: 1, counter: 0 }, rid(1));
+  const id = makeVersionId({ ms: 1, counter: 0 });
   const sha = await sha256(enc.encode("x"));
   const put_ = await makeVersion({ id, replica: rid(1), seq: 1, path: "a", parent: null, merged: [], kind: "put", blob: sha });
   assertEquals(put_.kind, "ok");
   assertEquals((await makeVersion({ id, replica: rid(1), seq: 1, path: "a", parent: null, merged: [], kind: "put", blob: null })).kind, "err");
   assertEquals((await makeVersion({ id, replica: rid(1), seq: 1, path: "a", parent: null, merged: [], kind: "tombstone", blob: sha })).kind, "err");
   assertEquals((await makeVersion({ id, replica: rid(1), seq: 0, path: "a", parent: null, merged: [], kind: "tombstone", blob: null })).kind, "err");
-  const other = makeVersionId({ ms: 2, counter: 0 }, rid(1));
+  const other = makeVersionId({ ms: 2, counter: 0 });
   assertEquals((await makeVersion({ id, replica: rid(1), seq: 1, path: "a", parent: other, merged: [other], kind: "tombstone", blob: null })).kind, "err");
   const s = open(rid(1));
   const { state } = await put(s, "p", "text", 1000);

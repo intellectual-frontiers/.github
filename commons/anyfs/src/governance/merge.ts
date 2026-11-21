@@ -53,12 +53,34 @@ export const MAX_ID_COUNTER = 0xfff;
 /** The time of an id: the milliseconds and the counter that orders ids of one millisecond. */
 export type IdTime = { readonly ms: number; readonly counter: number };
 
-/** An id from its time and the replica that makes it: 48 bits of milliseconds, the version 7, 12 bits of counter, the variant and 62 bits taken from the replica id, so that two replicas never make one id. */
-export function makeVersionId(time: IdTime, replica: ReplicaId): VersionId {
+/** The bytes an id takes for its random part: 62 bits are used, from 8 bytes. */
+export const ID_RANDOM_BYTES = 8;
+
+/** The largest counter seed: the counter of a new millisecond starts at a random number below this, so that its top bit is a guard against the counter rolling over (RFC 9562 section 6.2). */
+export const MAX_COUNTER_SEED = 0x7ff;
+
+/** Random bytes from the CSPRNG of the runtime (RFC 9562 section 6.9 and 8). */
+export function randomIdBytes(length: number = ID_RANDOM_BYTES): Uint8Array {
+  return globalThis.crypto.getRandomValues(new Uint8Array(length));
+}
+
+/** A counter seed from the CSPRNG: a number from 0 to `MAX_COUNTER_SEED`. */
+export function randomCounterSeed(): number {
+  const b = randomIdBytes(2);
+  return (((b[0] ?? 0) << 8) | (b[1] ?? 0)) & MAX_COUNTER_SEED;
+}
+
+/**
+ * An id from its time: a UUID version 7 as RFC 9562 section 5.7 lays it out, 48 bits of milliseconds, the version `0111`, `rand_a` of 12 bits that hold the counter (section 6.2, method 1), the variant `10` and `rand_b` of
+ * 62 bits that are random for each id, from `random` where given (the first 8 bytes; a missing byte is zero) and from the CSPRNG where not. The id holds nothing of the replica that made it: the replica is the field of the
+ * row. Two ids of one replica differ by their time and counter, and ids of two replicas at one time differ by their 62 random bits.
+ */
+export function makeVersionId(time: IdTime, random: Uint8Array = randomIdBytes()): VersionId {
   const ms = time.ms.toString(16).padStart(12, "0");
   const counter = time.counter.toString(16).padStart(3, "0");
-  const low = BigInt(`0x${replica.slice(0, 16)}`) & ((1n << 62n) - 1n);
-  const lowHex = (low | (2n << 62n)).toString(16).padStart(16, "0");
+  let low = 0n;
+  for (let i = 0; i < ID_RANDOM_BYTES; i++) low = (low << 8n) | BigInt(random[i] ?? 0);
+  const lowHex = ((low & ((1n << 62n) - 1n)) | (2n << 62n)).toString(16).padStart(16, "0");
   return `${ms.slice(0, 8)}-${ms.slice(8, 12)}-7${counter}-${lowHex.slice(0, 4)}-${lowHex.slice(4, 16)}` as VersionId;
 }
 
