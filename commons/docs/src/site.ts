@@ -17,6 +17,7 @@ import { markdownOf } from "./emit/markdown.ts";
 import { readEvidence } from "./evidence.ts";
 import { presentationFiles, writeFiles } from "./presentation.ts";
 import { gitPage } from "./pages/git.ts";
+import { impactPage } from "./pages/impact.ts";
 import { insightPages, sbom } from "./pages/insight.ts";
 import { decorate, fillFindings, qualityData, qualityPages } from "./pages/quality.ts";
 import { readApi } from "./extract/api.ts";
@@ -244,6 +245,8 @@ export async function buildSite(config: Config): Promise<Built> {
   // a test that names a requirement that no specification of the kits has is stale: a requirement renumbered or removed
   if (b.evidence.recorded) {
     const known = new Set(b.kit.specs.flatMap((sp) => sp.requirements.map((r) => `${sp.id} ${r.id}`)));
+    // a success criterion (`SC-001`) of a specification is a requirement a test may prove too
+    for (const sp of b.kit.specs) if (b.exists(sp.file)) for (const m of b.read(sp.file).matchAll(/^- \*\*(SC-\d+)\*\*/gm)) known.add(`${sp.id} ${m[1] ?? ""}`);
     const seen = new Set<string>();
     for (const lib of [...b.evidence.results.values()]) {
       for (const t of lib.tests) {
@@ -271,6 +274,7 @@ export async function buildSite(config: Config): Promise<Built> {
   qualityPages(b);
   insightPages(b);
   await gitPage(b);
+  await impactPage(b);
   decorate(b, areas);
   citedBy(b);
   b.found.push(...brokenLinks(b.pages));

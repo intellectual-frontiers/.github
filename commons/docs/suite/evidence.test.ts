@@ -1,4 +1,4 @@
-// Spec: 0001-docs FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016, FR-017, FR-020, FR-022, FR-023, FR-025, FR-026, FR-027
+// Spec: 0001-docs FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016, FR-017, FR-020, FR-022, FR-023, FR-025, FR-026, FR-027, FR-028
 /**
  * The evidence the site shows beside the code (docs 0001-docs FR-009 to FR-012): CTRF results, GitHub tickets and typed issues read from files, the Quality section made from them, the lines on a requirement, a library and a
  * module, the findings for a file that cannot be read and a test that names a requirement that is not there, and, with no run recorded, nothing shown as passed.
@@ -15,6 +15,7 @@ import { sparkText } from "../src/emit/html.ts";
 import { busFactor, lastChanged, libraryOfPath, parseLog } from "../src/pages/git.ts";
 import { document } from "../src/emit/html.ts";
 import { type EvidenceSource, resolveConfig } from "../src/config.ts";
+import { kindOfPath, parseNameStatus } from "../src/pages/impact.ts";
 import { parseMutation, scoreOf, summariseStryker } from "../src/mutation.ts";
 import { importedNames, importIndex, testsImporting } from "../src/exercise.ts";
 import { parseCoverage, parseLcov, percent } from "../src/coverage.ts";
@@ -398,4 +399,12 @@ proves(["0001-docs FR-027"], "the report of Stryker is read into the mutants kil
   assertStringIncludes(lib, 'src/mod.ts:20');
   assertStringIncludes(markdownOf(b.pages.find((p) => p.path === "quality/index.html") as never), "75%");
   assertStringIncludes(markdownOf(b.pages.find((p) => p.path.startsWith("api/greeting/") && p.title.includes("mod")) as never), "Mutation score of this file: 75%");
+});
+
+proves(["0001-docs FR-028"], "the changes since the tests ran are read from git's name-status, each path is source, test, specification or other, and with no history the page says so", async () => {
+  assertEquals(parseNameStatus("A\tcommons/a/src/x.ts\nM\tcommons/a/suite/x.test.ts\nD\told.ts\nR100\tz\n\n"), [{ status: "A", path: "commons/a/src/x.ts" }, { status: "M", path: "commons/a/suite/x.test.ts" }, { status: "D", path: "old.ts" }]);
+  assertEquals(["commons/a/src/x.ts", "commons/a/suite/x.test.ts", "commons/a/spec-kit/specs/0001-a/spec.md", "spec-kit/specs/0001-b/spec.md", ".github/workflows/x.auto.yml", "commons/a/README.md", "commons/a/src/x.test.ts"].map(kindOfPath), ["source", "test", "spec", "spec", "other", "other", "test"]);
+  const b = await built({ results: EVIDENCE });
+  const page = markdownOf(b.pages.find((p) => p.path === "quality/changes.html") as never);
+  assertStringIncludes(page, "No history");
 });
