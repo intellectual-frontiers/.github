@@ -7,7 +7,7 @@
 import { defineAsset, installOf, CAPABILITIES, type Asset } from "@intellectual-frontiers/estate/governance";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { RELATIONS } from "../src/governance/mod.ts";
-import { CATALOG, formatTable, openEstateQuery, tablesOf, type EstateData } from "../src/logical/mod.ts";
+import { CATALOG, formatTable, fromSnapshot, openEstateQuery, tablesOf, type EstateData } from "../src/logical/mod.ts";
 
 function asset(id: string, state: "discovered" | "adopted" | "managed", more: { origin?: "provisioned" | "paired" | "integration" | "self" } = {}): Asset {
   const all = Object.fromEntries(CAPABILITIES.map((c) => [c, "opsfolio"]));
@@ -133,4 +133,12 @@ proves(["0003-estate-query-run FR-004"], "a table is given as aligned text with 
   const text = formatTable(t, "table");
   assert(text.startsWith("id  note") && text.includes("3 rows") && text.split("\n")[1]?.startsWith("--"), text);
   assert(formatTable({ columns: ["n"], rows: [[1]] }, "table").includes("1 row\n"));
+});
+
+proves(["0002-estate-query-relations FR-006"], "the estate of a snapshot of a fleet store is asked as the estate of files is, with what was assessed where it is given", () => {
+  const snapshot = { assets: DATA.assets, declared: DATA.declared ?? {}, observations: DATA.observations ?? [], results: DATA.results ?? [], acceptances: DATA.acceptances ?? {}, manifest: { store: "x" }, findings: [], stable: true };
+  const data = fromSnapshot(snapshot, NOW, { truths: DATA.truths ?? [], violations: DATA.violations ?? [] });
+  assertEquals(rows("select policy, status from policy_result order by policy", [], data), rows("select policy, status from policy_result order by policy"));
+  assertEquals(rows("select asset, currency from truth", [], data), [["athens", "fresh"]]);
+  assertEquals(rows("select count(*) from truth", [], fromSnapshot(snapshot, NOW)), [[0]], "no truth where nothing was assessed");
 });

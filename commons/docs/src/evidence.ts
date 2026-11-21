@@ -1,0 +1,235 @@
+// Spec: 0001-docs FR-009
+/**
+ * The evidence the site shows beside the code (docs 0001-docs FR-009 to FR-011): the results of the tests, the issues kept as typed code, and the tickets of GitHub, read from files that CI (or a person) leaves in
+ * a folder, so that the same files give the same pages. The results are CTRF (the Common Test Report Format: `<library>.ctrf.json`, one file for each library, written by `ifc test run --report ctrf`), with
+ * the requirements each test proves in `extra.requirements`; `meta.json` says which commit they are of. The package reads the format and imports no library that makes it (0011-documentation FR-026). Nothing here
+ * runs a test or reaches a network: a missing folder is "no run recorded", and a file that cannot be read is a finding.
+ *
+ * @module
+ */
+import { fs, path } from "@intellectual-frontiers/system";
+import type { Finding } from "./check.ts";
+import type { EvidenceSource, IssueLike } from "./config.ts";
+
+/** How a test ended, in CTRF's words. */
+export type TestStatus = "passed" | "failed" | "skipped" | "pending" | "other";
+
+/** One test of a run. */
+export interface TestResult {
+  /** Its name, as `proves` makes it: the requirements, a colon and what it says. */
+  readonly name: string;
+  readonly status: TestStatus;
+  readonly durationMs: number;
+  /** Its file, from the repository's root. */
+  readonly file: string;
+  /** The requirements it proves, as `0009-example FR-001`. */
+  readonly requirements: readonly string[];
+  readonly risk: string;
+  readonly runtime: string;
+  readonly retries: number;
+  /** Why it failed, cut short; for a failed test only. */
+  readonly message: string | undefined;
+}
+
+/** The results of one library's suite. */
+export interface LibraryResults {
+  /** The library, by the name of its folder (`repository` for the tests of the repository itself). */
+  readonly library: string;
+  readonly tests: readonly TestResult[];
+  readonly passed: number;
+  readonly failed: number;
+  readonly skipped: number;
+  /** Tests that were planned and not run (`pending`, `todo`, `other`). */
+  readonly other: number;
+}
+
+/** Which run the results are of. */
+export interface RunMeta {
+  readonly commit: string | undefined;
+  readonly at: string | undefined;
+  readonly url: string | undefined;
+}
+
+/** A ticket of GitHub, as its API gives it, read from a snapshot. */
+export interface Ticket {
+  readonly number: number;
+  readonly title: string;
+  readonly state: "open" | "closed";
+  readonly url: string;
+  readonly labels: readonly string[];
+  readonly body: string;
+  /** The libraries it is about (a label `lib:<name>`, or a path of `commons/<name>/` in its words). */
+  readonly libraries: readonly string[];
+  /** The requirements it names, as `0009-example FR-001`. */
+  readonly requirements: readonly string[];
+}
+
+/** An issue kept as typed code, with the library it is of. */
+export interface TypedIssue extends IssueLike {
+  readonly library: string;
+  /** The path of its set in the library, where the library has more than one. */
+  readonly scope: string | undefined;
+}
+
+/** Whether an issue's status is one that is still to be dealt with. */
+export const isOpen = (i: Pick<IssueLike, "status">): boolean => i.status.kind === "open" || i.status.kind === "in-progress" || i.status.kind === "deferred";
+
+/** Everything the site knows of quality. */
+export interface Evidence {
+  readonly results: ReadonlyMap<string, LibraryResults>;
+  readonly run: RunMeta | undefined;
+  readonly issues: readonly TypedIssue[];
+  readonly tickets: readonly Ticket[];
+  /** Whether a folder of results was given and read (a run is recorded), as opposed to none. */
+  readonly recorded: boolean;
+}
+
+/** No evidence: nothing recorded. */
+export const NONE: Evidence = { results: new Map(), run: undefined, issues: [], tickets: [], recorded: false };
+
+const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
+const str = (v: unknown): string | undefined => (typeof v === "string" && v !== "" ? v : undefined);
+
+const STATUS: Readonly<Record<string, TestStatus>> = { passed: "passed", failed: "failed", skipped: "skipped", pending: "pending" };
+
+/** The requirement keys a text names, as `0009-example FR-001`. */
+export function requirementsIn(text: string): string[] {
+  return [...new Set([...text.matchAll(/\b(\d{3,4}-[a-z0-9]+(?:-[a-z0-9]+)*) (FR-\d{3}[a-z]?)\b/g)].map((m) => `${m[1]} ${m[2]}`))].sort();
+}
+
+/**
+ * The results of a CTRF file: its tests, or why it cannot be read.
+ *
+ * @param library - the library the file is of
+ * @param text - the file's text
+ * @param prefix - what is put before a test's path to make it a path from the repository's root
+ */
+export function parseCtrf(library: string, text: string, prefix: string): { readonly value: LibraryResults } | { readonly error: string } {
+  let json: unknown;
+  try {
+    json = JSON.parse(text);
+  } catch (e) {
+    return { error: `is not JSON: ${e instanceof Error ? e.message : String(e)}` };
+  }
+  const results = isRecord(json) ? json["results"] : undefined;
+  const tests = isRecord(results) ? results["tests"] : undefined;
+  if (!Array.isArray(tests)) return { error: "is not CTRF: it has no results.tests" };
+  const out: TestResult[] = [];
+  for (const t of tests) {
+    if (!isRecord(t) || typeof t["name"] !== "string") return { error: "is not CTRF: a test has no name" };
+    const extra = isRecord(t["extra"]) ? t["extra"] : {};
+    const reqs = Array.isArray(extra["requirements"]) ? extra["requirements"].filter((r): r is string => typeof r === "string") : requirementsIn(t["name"]);
+    const file = str(t["filePath"]) ?? "";
+    const message = str(t["message"]);
+    out.push({
+      name: t["name"],
+      status: STATUS[String(t["status"])] ?? "other",
+      durationMs: typeof t["duration"] === "number" ? Math.round(t["duration"]) : 0,
+      file: file === "" ? "" : `${prefix}${file.replace(/^\.\//, "")}`,
+      requirements: [...reqs].sort(),
+      risk: str(extra["risk"]) ?? "not-high",
+      runtime: str(extra["runtime"]) ?? "",
+      retries: typeof t["retries"] === "number" ? t["retries"] : 0,
+      message: message === undefined ? undefined : message.replace(/\s+/g, " ").slice(0, 300),
+    });
+  }
+  out.sort((a, b) => (a.file < b.file ? -1 : a.file > b.file ? 1 : a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+  const count = (s: TestStatus): number => out.filter((x) => x.status === s).length;
+  return { value: { library, tests: out, passed: count("passed"), failed: count("failed"), skipped: count("skipped"), other: count("pending") + count("other") } };
+}
+
+/**
+ * The tickets of a snapshot of the GitHub issues of a repository (a JSON array as the API gives it; pull requests are left out).
+ *
+ * @param text - the snapshot
+ */
+export function parseTickets(text: string): { readonly value: readonly Ticket[] } | { readonly error: string } {
+  let json: unknown;
+  try {
+    json = JSON.parse(text);
+  } catch (e) {
+    return { error: `is not JSON: ${e instanceof Error ? e.message : String(e)}` };
+  }
+  if (!Array.isArray(json)) return { error: "is not a list of issues" };
+  const out: Ticket[] = [];
+  for (const t of json) {
+    if (!isRecord(t) || typeof t["number"] !== "number" || typeof t["title"] !== "string" || isRecord(t["pull_request"])) continue;
+    const labels = (Array.isArray(t["labels"]) ? t["labels"] : []).map((l) => (typeof l === "string" ? l : isRecord(l) ? str(l["name"]) : undefined)).filter((l): l is string => l !== undefined).sort();
+    const body = typeof t["body"] === "string" ? t["body"] : "";
+    const words = `${t["title"]}\n${body}`;
+    const libraries = new Set<string>(labels.filter((l) => l.startsWith("lib:")).map((l) => l.slice(4)));
+    for (const m of words.matchAll(/\bcommons\/([a-z][a-z0-9-]*)\//g)) libraries.add(m[1] ?? "");
+    out.push({
+      number: t["number"],
+      title: t["title"],
+      state: t["state"] === "closed" ? "closed" : "open",
+      url: str(t["html_url"]) ?? str(t["url"]) ?? "",
+      labels,
+      body: body.length > 600 ? `${body.slice(0, 600)}…` : body,
+      libraries: [...libraries].sort(),
+      requirements: requirementsIn(words),
+    });
+  }
+  return { value: out.sort((a, b) => a.number - b.number) };
+}
+
+/**
+ * The evidence the configuration names, read from its files.
+ *
+ * @param root - the repository's root, absolute
+ * @param source - what the configuration gives
+ * @param found - where findings are added
+ * @param dirOf - the folder of a library, from the repository's root (`commons/core`; `""` for the repository itself)
+ */
+export function readEvidence(root: string, source: EvidenceSource | undefined, found: Finding[], dirOf: (library: string) => string = (l) => (l === "repository" ? "" : `commons/${l}`)): Evidence {
+  if (source === undefined) return NONE;
+  const issues: TypedIssue[] = (source.issues ?? []).flatMap((set) => set.issues.map((i): TypedIssue => ({ ...i, library: set.library, scope: set.scope })));
+  const results = new Map<string, LibraryResults>();
+  let run: RunMeta | undefined;
+  let recorded = false;
+  const dir = source.results === undefined ? undefined : path.resolve(root, source.results);
+  if (dir !== undefined && fs.existsSync(dir)) {
+    for (const entry of [...fs.readDirSync(dir)].sort((a, b) => (a.name < b.name ? -1 : 1))) {
+      const rel = path.relative(root, path.join(dir, entry.name)).split(path.sep).join("/");
+      if (entry.name === "meta.json") {
+        try {
+          const m = JSON.parse(fs.readTextFileSync(path.join(dir, entry.name))) as unknown;
+          if (isRecord(m)) run = { commit: str(m["commit"]), at: str(m["at"]), url: str(m["url"]) };
+        } catch (e) {
+          found.push({ where: rel, problem: { kind: "evidence-unreadable", why: `is not JSON: ${e instanceof Error ? e.message : String(e)}` } });
+        }
+      } else if (entry.isFile && entry.name.endsWith(".ctrf.json")) {
+        const library = entry.name.slice(0, -".ctrf.json".length);
+        const folder = dirOf(library);
+        const r = parseCtrf(library, fs.readTextFileSync(path.join(dir, entry.name)), folder === "" ? "" : `${folder}/`);
+        if ("error" in r) found.push({ where: rel, problem: { kind: "evidence-unreadable", why: r.error } });
+        else {
+          results.set(library, r.value);
+          recorded = true;
+        }
+      }
+    }
+  }
+  let tickets: readonly Ticket[] = [];
+  if (source.github !== undefined) {
+    const file = path.resolve(root, source.github);
+    if (fs.existsSync(file)) {
+      const r = parseTickets(fs.readTextFileSync(file));
+      if ("error" in r) found.push({ where: path.relative(root, file).split(path.sep).join("/"), problem: { kind: "evidence-unreadable", why: r.error } });
+      else tickets = r.value;
+    }
+  }
+  return { results, run, issues, tickets, recorded };
+}
+
+/** The tests of every library that name a requirement, as `0009-example FR-001`. */
+export function testsFor(ev: Evidence, requirement: string): readonly TestResult[] {
+  return [...ev.results.values()].flatMap((l) => l.tests.filter((t) => t.requirements.includes(requirement)));
+}
+
+/** What the tests of a requirement come to: not run (none recorded), failing, proved (every one passed) or partly (some skipped or planned). */
+export function standing(tests: readonly TestResult[]): "none" | "failing" | "proved" | "partly" {
+  if (tests.length === 0) return "none";
+  if (tests.some((t) => t.status === "failed")) return "failing";
+  return tests.every((t) => t.status === "passed") ? "proved" : "partly";
+}

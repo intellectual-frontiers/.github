@@ -1,0 +1,5 @@
+[
+  { "number": 7, "title": "Greeting forgets the comma", "state": "open", "html_url": "https://github.com/example/fixture/issues/7", "labels": [{ "name": "lib:fixture" }, { "name": "bug" }], "body": "See 001-greeting FR-001 and src/mod.ts.", "pull_request": null },
+  { "number": 8, "title": "A pull request", "state": "open", "html_url": "https://github.com/example/fixture/pull/8", "labels": [], "body": "", "pull_request": { "url": "x" } },
+  { "number": 9, "title": "Old", "state": "closed", "html_url": "https://github.com/example/fixture/issues/9", "labels": [], "body": "commons/fixture/src/mod.ts" }
+]

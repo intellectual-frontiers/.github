@@ -14,7 +14,9 @@ import type { Finding } from "./check.ts";
 import { type Config, type PresentationId, under } from "./config.ts";
 import { diagramSources, drawable } from "./emit/html.ts";
 import { markdownOf } from "./emit/markdown.ts";
+import { readEvidence } from "./evidence.ts";
 import { presentationFiles, writeFiles } from "./presentation.ts";
+import { decorate, qualityData, qualityPages } from "./pages/quality.ts";
 import { readApi } from "./extract/api.ts";
 import { readSpecKits } from "./extract/specs.ts";
 import type { LensPages, SiteFile } from "./lens.ts";
@@ -208,6 +210,7 @@ export async function buildSite(config: Config): Promise<Built> {
   const found: Finding[] = [];
   const b = new Build(config, readSpecKits(root, config.specKits, found));
   b.found.push(...found);
+  b.evidence = readEvidence(root, config.evidence, b.found, (lib) => (lib === "repository" ? "" : (config.packages.find((p) => p.slug === lib)?.dir ?? `commons/${lib}`)));
   const top = await readPackage(root, config.home, config.fileFromRoot, b.found);
   const packages: Package[] = [];
   for (const src of config.packages) {
@@ -227,17 +230,34 @@ export async function buildSite(config: Config): Promise<Built> {
   const lenses: LensPages[] = [];
   for (const lens of config.lenses) lenses.push(await lens.read(b, areas, apis));
   specPages(b);
+  // a test that names a requirement that no specification of the kits has is stale: a requirement renumbered or removed
+  if (b.evidence.recorded) {
+    const known = new Set(b.kit.specs.flatMap((sp) => sp.requirements.map((r) => `${sp.id} ${r.id}`)));
+    const seen = new Set<string>();
+    for (const lib of [...b.evidence.results.values()]) {
+      for (const t of lib.tests) {
+        for (const r of t.requirements) {
+          const key = `${r}\u0000${t.file}`;
+          if (known.has(r) || seen.has(key) || !b.kit.specs.some((sp) => r.startsWith(`${sp.id} `))) continue;
+          seen.add(key);
+          b.found.push({ where: t.file === "" ? lib.library : t.file, problem: { kind: "test-requirement-unknown", requirement: r, test: t.name.replace(/^.*?: /, "").slice(0, 80) } });
+        }
+      }
+    }
+  }
   if (top !== undefined) overviewPages(b, top, packages, areas);
   apiPages(b, areas, apis, modules);
   areaPages(b, areas, modules);
   let after = 100;
   for (const make of lenses) after = make(b, after);
   homes(b, packages);
+  qualityPages(b);
+  decorate(b, areas);
   citedBy(b);
   b.found.push(...brokenLinks(b.pages));
   for (const p of b.pages) for (const src of diagramSources(p.blocks)) if (!drawable(src)) b.found.push({ where: p.path, problem: { kind: "diagram-undrawable", first: src.split("\n")[0] ?? "" } });
   b.found.push(...wordFindings(b.pages, config.retired, config.forbiddenInGuides));
-  const files = config.lenses.flatMap((l) => l.files?.(b) ?? []);
+  const files = [...config.lenses.flatMap((l) => l.files?.(b) ?? []), ...qualityData(b)];
   return { pages: b.pages, found: b.found, files };
 }
 

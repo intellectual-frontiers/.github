@@ -1,0 +1,14 @@
+{
+  "reportFormat": "CTRF",
+  "specVersion": "0.0.0",
+  "results": {
+    "tool": { "name": "ifc test" },
+    "summary": { "tests": 4, "passed": 2, "failed": 1, "skipped": 1, "pending": 0, "other": 0, "start": 0, "stop": 0 },
+    "tests": [
+      { "name": "001-greeting FR-001: a greeting names the person", "status": "passed", "duration": 3, "filePath": "src/greeting.test.ts", "extra": { "requirements": ["001-greeting FR-001"], "risk": "not-high", "runtime": "bun" } },
+      { "name": "001-greeting FR-001: a greeting names a person with a long name", "status": "passed", "duration": 12, "filePath": "src/greeting.test.ts", "extra": { "requirements": ["001-greeting FR-001"], "risk": "not-high", "runtime": "bun" } },
+      { "name": "001-greeting FR-002, 001-greeting FR-009: a greeting ends with a full stop", "status": "failed", "duration": 7, "filePath": "src/greeting.test.ts", "message": "expected 'Hello, Ada' to end with '.'\nreceived no full stop", "extra": { "requirements": ["001-greeting FR-002", "001-greeting FR-009"], "risk": "high", "runtime": "bun" } },
+      { "name": "a helper that no requirement names", "status": "skipped", "duration": 0, "filePath": "src/greeting.test.ts", "extra": { "requirements": [], "risk": "not-high", "runtime": "bun" } }
+    ]
+  }
+}

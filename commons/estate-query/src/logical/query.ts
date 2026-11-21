@@ -16,7 +16,7 @@ import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { catalogFromTables } from "@intellectual-frontiers/lang-sql/aide/catalog";
 import { guard } from "@intellectual-frontiers/lang-sql/aide/guard";
 import { astsql, createEngine, type Table, type Value } from "@intellectual-frontiers/lang-sql/aide/relational";
-import { RELATIONS } from "@intellectual-frontiers/estate-query/governance";
+import { LIVE_STATUS, osqueryRelation, RELATIONS, type Relation } from "@intellectual-frontiers/estate-query/governance";
 import { tablesOf, type EstateData } from "./data.ts";
 
 /** Why a question was not answered. */
@@ -38,14 +38,26 @@ export type EstateQuery = {
 };
 
 /** The catalog of the relations, made from the one list of them. */
-export const CATALOG = catalogFromTables(RELATIONS.map((r) => ({ name: r.name, columns: r.columns.map((c) => ({ name: c.name, type: c.type })) })), { int: "int", text: "text", bool: "bool", timestamp: "timestamp" });
+export const CATALOG = catalogOf([]);
+
+function catalogOf(extra: readonly Relation[]) {
+  return catalogFromTables([...RELATIONS, ...extra].map((r) => ({ name: r.name, columns: r.columns.map((c) => ({ name: c.name, type: c.type })) })), { int: "int", text: "text", bool: "bool", timestamp: "timestamp" });
+}
+
+/** What the machines said, gathered before the question is asked: the live relations by name and the status of each machine and table. */
+export type Live = { readonly tables: Readonly<Record<string, Table>>; readonly status: Table };
 
 /** The estate, openable for questions. */
-export function openEstateQuery(data: EstateData, budget: Budget = {}): EstateQuery {
+export function openEstateQuery(data: EstateData, budget: Budget = {}, live?: Live): EstateQuery {
   const maxRows = budget.maxRows ?? DEFAULT_BUDGET.maxRows;
   const maxNodes = budget.maxNodes ?? DEFAULT_BUDGET.maxNodes;
   const built = tablesOf(data);
   const known = new Map<string, () => Table>(Object.entries(built));
+  const catalog = live === undefined ? CATALOG : catalogOf([...Object.keys(live.tables).flatMap((n) => osqueryRelation(n.replace(/^osquery_/, "")) ?? []), LIVE_STATUS]);
+  if (live !== undefined) {
+    for (const [name, t] of Object.entries(live.tables)) known.set(name, () => t);
+    known.set(LIVE_STATUS.name, () => live.status);
+  }
   const cache = new Map<string, Table>();
   const engine = createEngine((name) => {
     const hit = cache.get(name);
@@ -58,7 +70,7 @@ export function openEstateQuery(data: EstateData, budget: Budget = {}): EstateQu
   });
   return {
     query: (sql, params = []) => {
-      const guarded = guard(sql, astsql, { catalog: CATALOG, maxNodes });
+      const guarded = guard(sql, astsql, { catalog, tables: [...RELATIONS.map((r) => r.name), ...(live === undefined ? [] : [...Object.keys(live.tables), LIVE_STATUS.name])], maxNodes });
       if (guarded.kind === "err") return err({ kind: "refused", reasons: guarded.error.map((v) => v.message) });
       const ran = engine.run(sql, params);
       if (ran.kind === "err") return err({ kind: "failed", message: ran.error.message });

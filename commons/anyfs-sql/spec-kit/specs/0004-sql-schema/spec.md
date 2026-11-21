@@ -33,7 +33,7 @@
 ## Assumptions
 
 - The stores are held to the laws of AnyFS (anyfs 0003-anyfs-logical FR-003); a value is only ever a parameter.
-- The layout of the rows is the one the merge of replicas works on (0007-sql-merge); a different layout is a replacement of the layout module (0005 FR-008) and the migrations.
+- The layout of the rows is the one the merge of replicas works on (0007-sql-merge); a different layout is a replacement of the layout module (0005-sql-store FR-008) and the migrations.
 
 ## Open questions
 

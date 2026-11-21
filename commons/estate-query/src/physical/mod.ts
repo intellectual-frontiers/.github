@@ -6,3 +6,5 @@
  */
 export { checkOf, estateConnection, estateRunners, runEstateChecks } from "./checks.ts";
 export type { SavedCheck } from "./checks.ts";
+export { gatherLive } from "./live.ts";
+export type { Fetch, GatherOptions, Gathered } from "./live.ts";

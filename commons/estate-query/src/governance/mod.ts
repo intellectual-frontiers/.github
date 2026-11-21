@@ -6,3 +6,5 @@
  */
 export { RELATIONS, relationNamed } from "./relations.ts";
 export type { Column, ColumnType, Relation } from "./relations.ts";
+export { LIVE_STATUS, OSQUERY_PREFIX, OSQUERY_TABLES, osqueryRelation, osquerySelect, osqueryTablesNamed } from "./osquery.ts";
+export type { OsqueryTable } from "./osquery.ts";

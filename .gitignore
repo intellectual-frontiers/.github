@@ -9,3 +9,4 @@ _site/
 # dependencies and packed tarballs of any library: installed or built, never committed
 **/node_modules/
 **/dist/
+_evidence
