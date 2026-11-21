@@ -19,7 +19,7 @@ import { detectFormat, importReport, type ReportFormat } from "@intellectual-fro
 export type ImportedPaths = { readonly findings: readonly Finding[]; readonly problems: readonly string[]; readonly files: readonly { readonly source: string; readonly format: ReportFormat; readonly findings: number }[]; readonly repeats: number };
 
 const SKIPPED = new Set(["node_modules", ".git"]);
-const READABLE = /\.(json|sarif|xml|nessus)$/i;
+const READABLE = /\.(json|jsonl|sarif|xml|nessus)$/i;
 
 /** The findings of the reports at the paths; `asset` is what a SARIF report is of. */
 export async function importPaths(paths: readonly string[], options: { readonly asset?: string } = {}): Promise<ImportedPaths> {

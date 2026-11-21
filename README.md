@@ -123,6 +123,7 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/package-managers`](https://www.npmjs.com/package/@intellectual-frontiers/package-managers) | Program | The shared kit of the dialects that drive a package manager | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/pentest`](commons/pentest) | Program | The rules of an authorized security test of an estate | layers | L1 | held |
 | [`@intellectual-frontiers/repoctl`](https://www.npmjs.com/package/@intellectual-frontiers/repoctl) | Program | The operations program of this repository | layers | L1 | GitHub, npm |
+| [`@intellectual-frontiers/scanners`](commons/scanners) | Program | Runs security scanners (a built-in TLS and header check, nuclei, nmap, trivy, grype, semgrep, checkov and ZAP's baseline scan) the safe way | layers | L1 | held |
 | [`@intellectual-frontiers/toolchain`](https://www.npmjs.com/package/@intellectual-frontiers/toolchain) | Program | A Kanon library of the tools a computer needs | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/catalog-nist-csf-2`](commons/catalog-nist-csf-2) | Standard | The NIST Cybersecurity Framework 2.0 as a grc catalog package | layers | L1 | held |
 | [`@intellectual-frontiers/catalog-nist-sp800`](commons/catalog-nist-sp800) | Standard | NIST SP 800-53 Rev 5.2.0 and SP 800-171 Rev 3 as grc catalog packages | layers | L1 | held |
