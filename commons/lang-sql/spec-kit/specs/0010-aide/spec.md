@@ -41,6 +41,10 @@
 
 - **FR-010**: `createEngine(provider, functions?)` of `aide/relational` MUST answer one `SELECT`, `WITH`, set operation or `VALUES` over the relations a `Provider` gives by name (inner, left and cross joins, `WHERE`, `GROUP BY` with `count`, `sum`, `avg`, `min`, `max` and `group_concat`, `HAVING`, `ORDER BY`, `LIMIT`, subqueries and common table expressions), with the logic of SQL, and MUST give an error value, never a throw, for text that is not one query, a statement that writes, and a clause it does not have; `providerOf(record)` MUST find the relations of a record without regard to case; `aide/introspect` (the relations of a parse and the rules written as queries, 0008-sql-introspect) MUST run on it.
 
+## Colouring
+
+- **FR-011**: `highlight(text, dialect)` of `aide/text` MUST give the stretches of the text and what each is, by the lexer of the dialect: `keyword` (a word the dialect lists as one), `function` (a word followed at once by `(`), `name`, `quoted-name`, `number`, `string` (a dollar quote and a doubled quote read as the dialect reads them), `param`, `operator`, `punctuation`, `comment` and `error` (a character the lexer cannot read); in the order of the text, never overlapping, with the white space left out, a word in a string or a comment not being a keyword; and it MUST NOT throw for any text.
+
 ## Out of scope
 
 - Joins, aggregates and optimizing across tables in the planner; a cost model; any change of a store.
