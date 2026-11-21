@@ -75,3 +75,13 @@ export type DnsProfile = {
   readonly zone: string;
   readonly records: readonly DnsRecord[];
 };
+
+/** The program a machine serves as a tool server over ssh (MCP), and the keys that may call it: each key runs only `<program> mcp`, with `--read-only` where it may only read. */
+export type McpAccessProfile = {
+  readonly machine: string;
+  /** The account the keys log in as. */
+  readonly user: string;
+  /** The program the forced command runs. */
+  readonly program: string;
+  readonly keys: readonly { readonly name: string; readonly publicKey: string; readonly role: "read-only" | "full"; readonly from?: readonly string[] }[];
+};

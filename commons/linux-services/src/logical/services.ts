@@ -13,7 +13,8 @@
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { defineRequirement, type Requirement, type RequirementInput } from "@intellectual-frontiers/archon/governance";
-import type { CertificateProfile, MailRelayProfile, PostgresProfile } from "@intellectual-frontiers/linux-services/governance";
+import { authorizedKeysLine } from "@intellectual-frontiers/headless/ssh-inbound";
+import type { CertificateProfile, MailRelayProfile, McpAccessProfile, PostgresProfile } from "@intellectual-frontiers/linux-services/governance";
 
 const HEADER = "# Rendered by archon from the model of the fleet. Do not edit: change the model.\n";
 
@@ -152,5 +153,30 @@ export function certificateRequirements(p: CertificateProfile): Result<readonly 
     { id: `${base}.issue-unit`, summary: `The unit that obtains ${name} where it is not yet there.`, why, subject: subjectOf(p.machine), kind: "file", desired: { path: `/etc/systemd/system/${unit}`, content: issueUnit(p), mode: "0644", ...OWNED }, change: "additive", dependsOn: [`${base}.plugin`, `${base}.cli`] },
     { id: `${base}.issue`, summary: `The unit that obtains ${name} is enabled, so that a machine without it obtains it at boot.`, why, subject: subjectOf(p.machine), kind: "service", desired: { name: unit, running: false, enabled: true }, change: "mutating", dependsOn: [`${base}.issue-unit`] },
     { id: `${base}.renewal`, summary: "The timer of Ubuntu's package renews the certificate.", why, subject: subjectOf(p.machine), kind: "service", desired: { name: "certbot.timer", running: true, enabled: true }, change: "mutating", dependsOn: [`${base}.cli`] },
+  ]);
+}
+
+/** The `authorized_keys` of the account: a line for each key that forces `<program> mcp` (with `--read-only` for a key that may only read), and so no shell, no terminal and no forwarding (`restrict`). */
+export function mcpAuthorizedKeys(p: McpAccessProfile): Result<string, readonly string[]> {
+  const lines: string[] = [];
+  const problems: string[] = [];
+  for (const key of p.keys) {
+    const line = authorizedKeysLine({ program: p.program, mode: "mcp", key });
+    if (line.kind === "ok") lines.push(line.value);
+    else problems.push(`${key.name}: ${line.error}`);
+  }
+  return problems.length > 0 ? err(problems) : ok(`# Rendered by archon from the model of the fleet. Do not edit: change the model.\n${lines.join("\n")}\n`);
+}
+
+/** The requirements of a machine that serves a program as a tool server over ssh: the account's `.ssh` folder and its `authorized_keys`, which let in only the keys of the profile and only to that program. */
+export function mcpAccessRequirements(p: McpAccessProfile): Result<readonly Requirement[], readonly string[]> {
+  const content = mcpAuthorizedKeys(p);
+  if (content.kind === "err") return content;
+  const base = `services.mcp-${p.user}`;
+  const home = p.user === "root" ? "/root" : `/home/${p.user}`;
+  const why = ["0002-linux-services-profiles FR-009", "AC-3 access enforcement", "AC-6 least privilege", "IA-2 identification and authentication"];
+  return build([
+    { id: `${base}.ssh-dir`, summary: `The .ssh folder of ${p.user} is private to it.`, why, subject: subjectOf(p.machine), kind: "directory", desired: { path: `${home}/.ssh`, mode: "0700", owner: p.user, group: p.user }, change: "additive" },
+    { id: `${base}.keys`, summary: `Only the keys of the profile let in as ${p.user}, each to ${p.program} mcp and nothing else.`, why, subject: subjectOf(p.machine), kind: "file", desired: { path: `${home}/.ssh/authorized_keys`, content: content.value, mode: "0600", owner: p.user, group: p.user }, change: "mutating", dependsOn: [`${base}.ssh-dir`] },
   ]);
 }

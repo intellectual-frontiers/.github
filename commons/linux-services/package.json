@@ -22,6 +22,7 @@
   "devDependencies": {
     "@intellectual-frontiers/archon": "link:../archon",
     "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/headless": "link:../headless",
     "@intellectual-frontiers/kanon": "link:../kanon",
     "@intellectual-frontiers/libraries": "link:../libraries",
     "@intellectual-frontiers/mizan": "link:../mizan",

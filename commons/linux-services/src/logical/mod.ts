@@ -4,7 +4,7 @@
  *
  * @module
  */
-export { parseCertificate, parseMailRelay, parsePostgres } from "./parse.ts";
-export { certbotCli, certificateRequirements, issueUnit, mailName, mailRelayRequirements, mainCf, postgresDropIn, postgresRequirements, recipientMap, SECRET_PATHS, senderMap } from "./services.ts";
+export { parseCertificate, parseMailRelay, parseMcpAccess, parsePostgres } from "./parse.ts";
+export { certbotCli, certificateRequirements, issueUnit, mailName, mailRelayRequirements, mainCf, mcpAccessRequirements, mcpAuthorizedKeys, postgresDropIn, postgresRequirements, recipientMap, SECRET_PATHS, senderMap } from "./services.ts";
 export { isEmpty, planDns } from "./dns.ts";
 export type { DnsPlan, FoundRecord } from "./dns.ts";

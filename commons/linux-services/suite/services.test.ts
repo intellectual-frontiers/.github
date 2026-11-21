@@ -11,7 +11,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { findSecretLike, type JsonValue } from "@intellectual-frontiers/archon/governance";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { certificateRequirements, issueUnit, mailRelayRequirements, mainCf, parseCertificate, parseMailRelay, parsePostgres, planDns, postgresDropIn, postgresRequirements, recipientMap, senderMap, isEmpty } from "../src/logical/mod.ts";
+import { certificateRequirements, issueUnit, mailRelayRequirements, mainCf, mcpAccessRequirements, mcpAuthorizedKeys, parseCertificate, parseMailRelay, parseMcpAccess, parsePostgres, planDns, postgresDropIn, postgresRequirements, recipientMap, senderMap, isEmpty } from "../src/logical/mod.ts";
 import type { FoundRecord } from "../src/logical/mod.ts";
 import { cloudflare } from "../src/physical/mod.ts";
 
@@ -151,4 +151,36 @@ proves(["0002-linux-services-profiles FR-008"], "the Cloudflare provider pages t
   } finally {
     server.close();
   }
+});
+
+const KEY = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
+const ACCESS = { machine: "athens", user: "ops", program: "opsfolio", keys: [{ name: "reader", publicKey: `${KEY} reader@example`, role: "read-only" }, { name: "admin", publicKey: KEY, role: "full", from: ["192.0.2.0/24"] }] };
+
+proves(["0002-linux-services-profiles FR-009"], "each key of a tool-server access forces the program's mcp under restrict, a read-only key says so, and a key that is not one public key line is refused", () => {
+  const p = parseMcpAccess(ACCESS);
+  assert(p.kind === "ok", p.kind === "err" ? p.error.join("; ") : "");
+  const keys = mcpAuthorizedKeys(p.value);
+  assert(keys.kind === "ok");
+  const lines = keys.value.split("\n").filter((l) => !l.startsWith("#") && l !== "");
+  assertEquals(lines[0], `restrict,command="opsfolio mcp --read-only" ${KEY} reader@example`);
+  assertEquals(lines[1], `restrict,from="192.0.2.0/24",command="opsfolio mcp" ${KEY}`);
+  const r = mcpAccessRequirements(p.value);
+  assertEquals(ids(r).ids, ["services.mcp-ops.ssh-dir", "services.mcp-ops.keys"]);
+  for (const bad of [{ ...ACCESS, keys: [{ name: "k", publicKey: "-----BEGIN OPENSSH PRIVATE KEY-----", role: "full" }] }, { ...ACCESS, keys: [{ name: "k", publicKey: `command="x" ${KEY}`, role: "full" }] }, { ...ACCESS, program: 'x" --evil' }, { ...ACCESS, keys: [] }]) assertEquals(parseMcpAccess(bad).kind, "err");
+});
+
+proves(["0002-linux-services-profiles FR-009"], "the real ssh-keygen reads every line of the rendered authorized_keys", () => {
+  try {
+    execFileSync("ssh-keygen", ["-?"], { stdio: "ignore" });
+  } catch (e) {
+    if ((e as { code?: string }).code === "ENOENT") return;
+  }
+  const p = parseMcpAccess(ACCESS);
+  assert(p.kind === "ok");
+  const keys = mcpAuthorizedKeys(p.value);
+  assert(keys.kind === "ok");
+  const dir = mkdtempSync(join(tmpdir(), "svc-ak-"));
+  writeFileSync(join(dir, "authorized_keys"), keys.value);
+  const out = execFileSync("ssh-keygen", ["-l", "-f", join(dir, "authorized_keys")], { encoding: "utf8" });
+  assertEquals(out.trim().split("\n").length, 2);
 });

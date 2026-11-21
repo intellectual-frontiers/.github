@@ -5,4 +5,4 @@
  * @module
  */
 export { DOMAIN, MAILBOX, MARKER, NAME, PORTS } from "./profiles.ts";
-export type { CertificateProfile, DnsProfile, DnsRecord, MailRelayProfile, PostgresProfile } from "./profiles.ts";
+export type { CertificateProfile, DnsProfile, DnsRecord, MailRelayProfile, McpAccessProfile, PostgresProfile } from "./profiles.ts";

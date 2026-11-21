@@ -13,7 +13,8 @@
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { findSecretLike, type JsonValue } from "@intellectual-frontiers/archon/governance";
 import { DOMAIN, MAILBOX, NAME, PORTS } from "@intellectual-frontiers/linux-services/governance";
-import type { CertificateProfile, MailRelayProfile, PostgresProfile } from "@intellectual-frontiers/linux-services/governance";
+import { authorizedKeysLine } from "@intellectual-frontiers/headless/ssh-inbound";
+import type { CertificateProfile, MailRelayProfile, McpAccessProfile, PostgresProfile } from "@intellectual-frontiers/linux-services/governance";
 
 type Obj = { readonly [key: string]: unknown };
 const asObj = (v: unknown): Obj | undefined => (typeof v === "object" && v !== null && !Array.isArray(v) ? (v as Obj) : undefined);
@@ -82,4 +83,28 @@ export function parseCertificate(input: unknown): Result<CertificateProfile, rea
   const directory = o["directory"] === undefined ? "https://acme-v02.api.letsencrypt.org/directory" : text(o, "directory", /^https:\/\/[a-z0-9.-]+(:[0-9]+)?(\/[A-Za-z0-9._~-]*)*$/, "an https address", problems);
   if (o["dns"] !== "cloudflare") problems.push("dns: the plugin that answers the challenge, `cloudflare`");
   return problems.length > 0 ? err(problems) : ok({ machine, names, contact, directory, dns: "cloudflare" });
+}
+
+/** A tool-server access profile from what was written: the account, the program and each key as one public key line (a private key or anything else is refused). */
+export function parseMcpAccess(input: unknown): Result<McpAccessProfile, readonly string[]> {
+  const o = asObj(input);
+  if (o === undefined) return err(["a profile is an object"]);
+  const problems = secretProblems(input, "profile");
+  const machine = text(o, "machine", NAME, "a machine name", problems);
+  const user = text(o, "user", /^[a-z_][a-z0-9_-]{0,31}$/, "an account name", problems);
+  const program = text(o, "program", /^[A-Za-z0-9_./-]+$/, "a program name that can stand in a forced command", problems);
+  const keys: McpAccessProfile["keys"][number][] = [];
+  if (!Array.isArray(o["keys"]) || o["keys"].length === 0) problems.push("keys: a list of keys");
+  else {
+    (o["keys"] as unknown[]).forEach((k, i) => {
+      const line = authorizedKeysLine({ program: String(program), mode: "mcp", key: { name: String(asObj(k)?.["name"] ?? ""), publicKey: String(asObj(k)?.["publicKey"] ?? ""), role: asObj(k)?.["role"] === "full" ? "full" : "read-only", ...(Array.isArray(asObj(k)?.["from"]) ? { from: asObj(k)?.["from"] as string[] } : {}) } });
+      const name = asObj(k)?.["name"];
+      const role = asObj(k)?.["role"];
+      if (typeof name !== "string" || !NAME.test(name)) problems.push(`keys[${i}].name: a name`);
+      if (role !== "read-only" && role !== "full") problems.push(`keys[${i}].role: read-only or full`);
+      if (line.kind === "err") problems.push(`keys[${i}]: ${line.error}`);
+      else keys.push({ name: String(name), publicKey: String(asObj(k)?.["publicKey"]).trim(), role: role as "read-only" | "full", ...(Array.isArray(asObj(k)?.["from"]) ? { from: asObj(k)?.["from"] as string[] } : {}) });
+    });
+  }
+  return problems.length > 0 ? err(problems) : ok({ machine, user, program, keys });
 }

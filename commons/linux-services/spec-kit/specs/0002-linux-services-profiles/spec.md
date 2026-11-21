@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** The services that a Linux machine of a small fleet runs (a PostgreSQL cluster, a send-only mail relay, a certificate from an ACME authority, the DNS records of a name) said as typed profiles that are checked, and from which the requirements of Archon are made over the kinds it already has (package, directory, file, service).
+**Input:** The services that a Linux machine of a small fleet runs (a PostgreSQL cluster, a send-only mail relay, a certificate from an ACME authority, the DNS records of a name, the keys that may call a tool server over ssh) said as typed profiles that are checked, and from which the requirements of Archon are made over the kinds it already has (package, directory, file, service).
 
 ## Requirements
 
@@ -17,6 +17,7 @@
 - **FR-006**: Every requirement of a profile MUST be accepted by `defineRequirement` of Archon, MUST say why it holds (the profile and the controls it answers), MUST depend on the requirements it needs (the package before its files, the files before the service) and MUST name the same subject; the ids MUST be stable, `services.<service>.<part>`.
 - **FR-007**: The records of a DNS zone MUST be said as data (`DnsRecord`: type, name, content, ttl, proxied); `planDns` MUST give, from the records wanted and the records found, the records to create, to update and to remove, and MUST remove only the records the profile claims (a name it lists, or a record that carries its marker), never the rest of the zone.
 - **FR-008**: A DNS provider MUST be a port (`DnsProvider`: list and apply); the Cloudflare provider MUST read and write the zone over HTTPS with the token it is given, MUST page through the list, MUST send no token to any address but the one it was made for and MUST put the token in no error and no log.
+- **FR-009**: `mcpAccessRequirements` MUST give the requirements of a machine that serves a program as a tool server over ssh (MCP): the private `.ssh` folder of the account and its `authorized_keys`, made by the generator of the ssh-inbound surface of Headless so that each key forces `<program> mcp` (with `--read-only` for a key that may only read) under `restrict`, and a key that is not one public key line (a private key, a line with options or a name that could break out of the quotes) MUST be refused with the reason; no key is a secret and none is generated here.
 
 ## Acceptance scenarios
 
@@ -24,7 +25,8 @@
 2. **Given** a mail profile that has a token in its relay field, **When** it is parsed, **Then** it is refused, per FR-002.
 3. **Given** the profile of PostgreSQL 18, **When** its requirements are made, **Then** each is valid, ordered and for the one subject, per FR-003 and FR-006.
 4. **Given** a records set and a zone that holds the records of others, **When** it is planned, **Then** only the records of the profile change, per FR-007.
-5. **Given** a Cloudflare API on a local socket, **When** the provider applies a plan, **Then** the records are as wanted and the token went in the header only, per FR-008.
+5. **Given** two keys, one that may only read, **When** the access is made, **Then** each line forces the program and `restrict`, and a private key is refused, per FR-009.
+6. **Given** a Cloudflare API on a local socket, **When** the provider applies a plan, **Then** the records are as wanted and the token went in the header only, per FR-008.
 
 ## Out of scope
 
