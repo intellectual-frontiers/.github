@@ -292,6 +292,7 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/repoctl/spec-kit" },
     { layout: "commons", dir: "commons/estate-query/spec-kit" },
     { layout: "commons", dir: "commons/estate-iac/spec-kit" },
+    { layout: "commons", dir: "commons/estate-endpoints/spec-kit" },
   ],
   citations: { prefix: "commons", digits: 4, text: ["erga", "archon", "stolos", "thyra"] },
   lenses: [guides, releases, dataModels, programs],

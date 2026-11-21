@@ -88,6 +88,8 @@ export const KINDS: readonly KindSpec[] = [
       str("bundle-id", "The bundle or package identifier.", { required: true }),
       str("distribution", "How it reaches devices.", { values: ["app-store", "play-store", "enterprise", "sideload"] }),
       str("min-os", "The oldest system release it runs on."),
+      bool("allows-cleartext", "Whether the app is set to allow traffic in the clear."),
+      str("provenance", "Where the asset was read from, as tool:file#address (written by the importers)."),
       strs("handles", "The data classes it handles."),
     ],
   },
@@ -104,7 +106,7 @@ export const KINDS: readonly KindSpec[] = [
   {
     kind: "certificate",
     summary: "A certificate of the web or of a service.",
-    attributes: [str("subject", "The name it is issued to.", { required: true }), str("issuer", "Who issued it."), str("not-after", "The day it expires, as YYYY-MM-DD."), str("key", "The key type and size, for example rsa-2048."), str("provenance", "Where the asset was read from, as tool:file#address (written by the importers of infrastructure as code).")],
+    attributes: [str("subject", "The name it is issued to.", { required: true }), str("issuer", "Who issued it."), str("not-after", "The day it expires, as YYYY-MM-DD."), str("key", "The key type and size, for example rsa-2048."), strs("names", "The names it is valid for (its subject alternative names)."), str("provenance", "Where the asset was read from, as tool:file#address (written by the importers of infrastructure as code).")],
   },
 ];
 

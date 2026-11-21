@@ -120,6 +120,7 @@ export const ROLE_OF: ReadonlyMap<string, Role> = new Map<string, Role>([
   ["estate-query", "program"],
   ["change-control", "program"],
   ["estate-iac", "program"],
+  ["estate-endpoints", "program"],
   ["integrations-fhir", "standard"],
   ["integrations-x12", "standard"],
   ["mizan", "standard"],
