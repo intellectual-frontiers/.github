@@ -5,3 +5,4 @@
  * @module
  */
 export * from "./journal.ts";
+export * from "./spans.ts";

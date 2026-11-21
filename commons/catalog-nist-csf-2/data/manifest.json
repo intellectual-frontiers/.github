@@ -1,0 +1,38 @@
+{
+  "kind": "grc.catalog-package",
+  "schema": "1",
+  "id": "catalog-nist-csf-2",
+  "createdAt": "2026-11-21T00:00:00Z",
+  "provenance": {
+    "producer": {
+      "name": "catalog-nist-csf-2",
+      "version": "1"
+    },
+    "inputs": [
+      "https://csrc.nist.gov/extensions/nudp/services/json/nudp/framework/version/csf_2_0_0/export/json?element=all"
+    ]
+  },
+  "version": "2.0",
+  "title": "NIST Cybersecurity Framework 2.0",
+  "source": {
+    "publisher": "National Institute of Standards and Technology (NIST)",
+    "edition": "Cybersecurity Framework 2.0 (CSWP 29)",
+    "url": "https://csrc.nist.gov/extensions/nudp/services/json/nudp/framework/version/csf_2_0_0/export/json?element=all"
+  },
+  "licence": "Public information of the United States government (NIST): with the exception of material marked as copyrighted, information presented on NIST sites is considered public information and may be distributed or copied; use of an appropriate byline is requested (https://www.nist.gov/oism/copyrights). Source: NIST Cybersecurity Framework 2.0.",
+  "redistributable": true,
+  "holds": [
+    {
+      "kind": "grc.framework",
+      "id": "nist-csf",
+      "file": "frameworks/nist-csf-2.0.json",
+      "digest": "8941e515a8cca1f4e758396f4475557e7994d775da7c236f39ebe83312a78a4f"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://csrc.nist.gov/extensions/nudp/services/json/nudp/framework/version/csf_2_0_0/export/json?element=all",
+      "sha256": "de36759d2f3f70a0f28ab9a95505259e568467923295a13d510a068939773e5a"
+    }
+  ]
+}

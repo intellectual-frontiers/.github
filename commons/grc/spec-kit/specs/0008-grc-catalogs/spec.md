@@ -1,15 +1,15 @@
 # Feature Specification: GRC catalog data packages
 
 **Spec ID:** 0008-grc-catalogs
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** grc
 
-**Input:** The content of a catalog (NIST SP 800-53, FedRAMP baselines, the Secure Controls Framework, an organization's own policy set) is data, not code, and is not in this library. It will be published as separate data packages that hold only documents of the kinds of 0002-grc-governance. This specification gives the shape of such a package and builds none.
+**Input:** The content of a catalog (NIST SP 800-53, FedRAMP baselines, the Secure Controls Framework, an organization's own policy set) is data, not code, and is not in this library. It will be published as separate data packages that hold only documents of the kinds of 0002-grc-governance. This specification gives the shape of such a package; the loader (`readCatalogPackage`) is built, and no package is built here.
 
 ## The package
 
-- **FR-001**: A catalog package MUST hold a manifest, a document of kind `grc.catalog-package` (`id`, `schema`, `version`, `title`, `source` with the publisher's name, edition and URL, `licence` as an SPDX identifier or a statement, `holds`: the list of its documents with each one's kind, id and digest), and the documents themselves (`grc.framework`, `grc.crosswalk`, and optionally `grc.policy`, `grc.check` and `grc.evidence-policy`) as JSON files.
+- **FR-001**: A catalog package MUST hold a manifest, a document of kind `grc.catalog-package` (`id`, `schema`, `version`, `title`, `source` with the publisher's name, edition and URL, `licence` as an SPDX identifier or a statement, `redistributable`, `sources`, `holds`: the list of its documents with each one's kind, id and digest), and the documents themselves (`grc.framework`, `grc.crosswalk`, and optionally `grc.policy`, `grc.check` and `grc.evidence-policy`) as JSON files.
 - **FR-002**: A package MUST hold no code and no executable input; the loader MUST read each file through the registry of kinds (0004), check its digest against the manifest, and refuse a package with a document of a kind or a schema this release does not know.
 - **FR-003**: The controls of a package MUST be addressed by the URN of 0002 under the package's framework slug and the edition's version, and a package of a newer edition MUST be a new package version, never a change of one already published.
 - **FR-004**: Every package MUST record its licence and source, and a package whose content may not be redistributed MUST say so in the manifest and MUST hold only identifiers and mappings.

@@ -87,6 +87,27 @@ export const crosswalk = defineKind("grc.crosswalk", "1", {
 /** A crosswalk. */
 export type Crosswalk = Decoded<typeof crosswalk.decode>;
 
+/**
+ * A catalog package (0008-grc-catalogs): the manifest of a folder of data that holds frameworks and crosswalks and nothing else. It says where the content came from (the publisher, the edition and the address, with the SHA-256 of each source file read),
+ * the licence, whether the content may be redistributed (a package whose content may not holds only identifiers and mappings), and the documents it holds, each by its kind, its id, its file and the SHA-256 of that file.
+ */
+export const catalogPackage = defineKind(
+  "grc.catalog-package",
+  "1",
+  {
+    version: string,
+    title: string,
+    source: object({ publisher: string, edition: string, url: string }),
+    licence: string,
+    redistributable: boolean,
+    holds: array(object({ kind: string, id: string, file: string, digest: string })),
+    sources: array(object({ url: string, sha256: string })),
+  },
+  { notice: string },
+);
+/** A catalog package. */
+export type CatalogPackage = Decoded<typeof catalogPackage.decode>;
+
 /** A policy: what must be true, who owns it, and when it is reviewed. */
 export const policy = defineKind(
   "grc.policy",

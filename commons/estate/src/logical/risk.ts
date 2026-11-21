@@ -8,7 +8,7 @@
  * import { acceptRisk, judgePolicy } from "./risk.ts";
  * const risk = acceptRisk({ policy: "disk-encryption", reason: "holds only open-source code", by: "an owner", until: "2027-03-01" }, "2026-12-01");
  * risk.kind; // "ok"
- * judgePolicy({ result: { id: "disk-encryption", status: "fail", controls: ["CRY-05"] }, observed: true, accepted: risk.kind === "ok" ? [risk.value] : [], now: "2026-12-02" }).status; // "accepted"
+ * judgePolicy({ result: { id: "disk-encryption", status: "fail", controls: ["SC-28"] }, observed: true, accepted: risk.kind === "ok" ? [risk.value] : [], now: "2026-12-02" }).status; // "accepted"
  * ```
  *
  * @module
@@ -18,7 +18,7 @@ import { err, ok, type Result } from "@intellectual-frontiers/core";
 /** What a policy found on a machine: pass, fail, warn (not required, but worth doing) or unknown (cannot tell). */
 export type PolicyFinding = "pass" | "fail" | "warn" | "unknown";
 
-/** What a policy found, by its id, with the controls it gives evidence for (the Secure Controls Framework's ids, for example). */
+/** What a policy found, by its id, with the controls it gives evidence for (identifiers of a framework's controls, such as NIST SP 800-53 Rev 5's). */
 export type PolicyOutcome = { readonly id: string; readonly status: PolicyFinding; readonly controls: readonly string[] };
 
 /** The status shown for a policy: `accepted` is a failing policy a person accepted until a date; `waiting` is a policy nothing was observed for or that could not tell. */
