@@ -50,6 +50,8 @@ export const library = {
     "./spec-files",
     "./spec-terms",
     "./standards",
+    "./query",
+    "./host/query",
     "./trace",
     "./versions",
     "./versions/cite",

@@ -28,6 +28,7 @@ proves(["0011-documentation FR-042"], "the workflow site runs the tests of every
     "needs: [check, evidence, repository]",
     "always() && needs.check.result == 'success'",
     "needs: [site]",
+    "always() && needs.site.result == 'success'",
   ]) assertStringIncludes(w, said);
   // the site is built in the one job and published by the other, and the check does not build it
   const check = w.slice(w.indexOf("\n  check:"), w.indexOf("\n  plan:"));

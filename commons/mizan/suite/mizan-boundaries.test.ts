@@ -26,8 +26,12 @@ function specifiers(file: string): string[] {
   return [...text.matchAll(/(?:from|import)\s*\(?\s*"([^"]+)"/g)].map((m) => m[1] ?? "").filter((x) => /^(\.|@|node:)/.test(x));
 }
 
-const ALLOWED = (s: string): boolean =>
+/** The module of the questions in SQL, which may also name the SQL language library (0002-mizan-query FR-005). */
+const QUERY_MODULES: readonly string[] = ["query.ts"];
+
+const ALLOWED = (s: string, file = ""): boolean =>
   s.startsWith(".") ||
+  (QUERY_MODULES.includes(file) && /^@intellectual-frontiers\/lang-sql\/aide\/(catalog|guard|relational|text)$/.test(s)) ||
   s === "node:process" ||
   s === "node:url" ||
   /^@intellectual-frontiers\/(core|crypto|formats|githost|ontology|rdf|system)(\/|$)/.test(s);
@@ -39,7 +43,7 @@ proves(
     const all = files(SRC);
     assert(all.length >= 30, `the modules of the library are there: ${all.length}`);
     for (const f of all) {
-      const bad = specifiers(f).filter((s) => !ALLOWED(s));
+      const bad = specifiers(f).filter((s) => !ALLOWED(s, f));
       assertEquals(bad, [], `${f} imports only node: process and url, core, crypto, formats, githost, ontology, rdf and system`);
     }
   },

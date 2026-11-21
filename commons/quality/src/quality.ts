@@ -33,6 +33,7 @@ import {
   freshnessCommand,
   indexCommand,
   nonconformancesCommand,
+  queryCommand,
   registerCommand,
   runFactsOf,
   tierCommand,
@@ -111,7 +112,7 @@ const RENDER = {
 };
 
 const USAGE =
-  "usage: quality record|verify|render|index|freshness|nonconformances|capa|register|archive|tier|attest|trust|pack|verify-pack|plan|sample|mutation|agents [OPTIONS] (--help for each)";
+  "usage: quality record|verify|render|index|freshness|nonconformances|capa|register|archive|tier|attest|trust|pack|verify-pack|plan|sample|mutation|agents|query [OPTIONS] (--help for each)";
 
 /** `quality` with its arguments: the exit status. */
 export async function main(argv: readonly string[]): Promise<number> {
@@ -241,6 +242,8 @@ export async function main(argv: readonly string[]): Promise<number> {
       return mutationCommand(rest);
     case "agents":
       return agentsCommand(rest);
+    case "query":
+      return queryCommand(rest);
     case undefined:
     case "--help":
     case "-h":
