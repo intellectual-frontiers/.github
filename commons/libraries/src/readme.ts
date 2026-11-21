@@ -80,6 +80,7 @@ export const ROLE_OF: ReadonlyMap<string, Role> = new Map<string, Role>([
   ["archon-dialect-native-pinned", "program"],
   ["package-managers", "program"],
   ["archon-dialect-apt", "program"],
+  ["archon-dialect-ansible", "program"],
   ["archon-dialect-homebrew", "program"],
   ["archon-dialect-mise", "program"],
   ["archon-dialect-winget", "program"],

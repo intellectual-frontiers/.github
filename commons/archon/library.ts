@@ -27,6 +27,7 @@ export const library = {
       { name: "homebrew", instanceOf: "src/physical/dialect/", placement: "package" },
       { name: "mise", instanceOf: "src/physical/dialect/", placement: "package" },
       { name: "winget", instanceOf: "src/physical/dialect/", placement: "package" },
+      { name: "ansible", instanceOf: "src/physical/dialect/", placement: "package" },
     ],
     plugins: [{ noun: "tool" }],
     units: [
