@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** lang-sql
 
-**Input:** Once SQL is parsed, what a person asks of it (which tables does it write, where is a `DELETE` with no `WHERE`, how deep is it nested, what is its shape) is best asked in SQL. This feature, an extension of the core, turns a parse into relations and answers a small SQL over them, so that the tree, its comments, its errors and the language itself are observable with the tool every reader of the tree already knows. It is self-hosting: the query is read by this library's own parser.
+**Input:** Once SQL is parsed, what a person asks of it (which tables does it write, where is a `DELETE` with no `WHERE`, how deep is it nested, what is its shape) is best asked in SQL. This feature, a helper in `aide` (`aide/introspect`, on the engine of `aide/relational`), turns a parse into relations and answers a small SQL over them, so that the tree, its comments, its errors and the language itself are observable with the tool every reader of the tree already knows. It is self-hosting: the query is read by this library's own parser.
 
 ## The relations
 

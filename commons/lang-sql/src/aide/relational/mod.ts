@@ -1,6 +1,6 @@
 /**
- * The engine of introspection (commons lang-sql 0008-sql-introspect FR-005, FR-006): a small evaluator of the common ground of SQL over relations held in memory, so that a question about a tree is a query. It reads the query with this
- * library's own parser, with the logic of SQL (null where a value is not known), and says in one sentence what it does not have. It sits behind {@link Engine}, which does not name the tree, so that it can move out of the core.
+ * The engine of introspection (commons lang-sql 0008-sql-introspect FR-005, FR-006; 0010-aide FR-010): a small evaluator of the common ground of SQL over relations held in memory, so that a question about a tree is a query. It reads the query with this
+ * library's own parser, with the logic of SQL (null where a value is not known), and says in one sentence what it does not have. It sits behind {@link Engine}, which does not name the tree, and takes its relations from a {@link Provider}, so that any rows (a file tree, a list of checks, the tables of a machine) can be asked in SQL; it is read-only, and a statement that is not a query is an error value.
  *
  * Spec: 0008-sql-introspect FR-005, FR-006
  *
@@ -597,8 +597,17 @@ function runQuery(q: Query, ctx: Context, outer: Env | undefined): Table {
   }
 }
 
+/** Where relations come from: a function that gives the relation of a name, or `undefined` for a name it has not; it is asked when a query names the relation, so a provider may build it then. */
+export type Provider = (name: string) => Table | undefined;
+
+/** A provider of the relations of a record, found without regard to case. */
+export function providerOf(tables: Readonly<Record<string, Table>>): Provider {
+  const byName = new Map(Object.entries(tables).map(([k, v]) => [k.toLowerCase(), v]));
+  return (name) => byName.get(name.toLowerCase());
+}
+
 /** An engine over relations that a function gives by name (the relations are built when a query names them). */
-export function createEngine(tables: (name: string) => Table | undefined, functions: ReadonlyMap<string, ScalarFunction> = new Map()): Engine {
+export function createEngine(tables: Provider, functions: ReadonlyMap<string, ScalarFunction> = new Map()): Engine {
   return {
     run(sql, params = []) {
       const parsed = parse(sql, astsql);

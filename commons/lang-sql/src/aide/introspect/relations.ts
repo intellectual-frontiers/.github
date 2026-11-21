@@ -7,7 +7,7 @@
  * @module
  */
 import { describeParseError, type Dialect, type Node, type Parsed, spanOf, Tok, kindAt, lex, startAt, endAt, textAt, tokenCount } from "../../mod.ts";
-import type { Table, Value } from "./engine.ts";
+import type { Table, Value } from "../relational/mod.ts";
 
 /** A node in the order of the text with where it stands. */
 export interface Flat {

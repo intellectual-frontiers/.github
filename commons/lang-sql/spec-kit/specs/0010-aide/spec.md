@@ -37,6 +37,10 @@
 
 - **FR-009**: `transpile(text, from, to)` MUST read the text in one dialect and write it in another, and give with the text the list of constructs that the other dialect does not read (found by reading what was written in it); `sql` MUST be a tagged template that gives the text and the values of a statement with a parameter for each value in the dialect's style, and MUST NOT put a value into the text; `renderDiagnostic(text, diagnostic)` MUST write a diagnostic with its line, the text of the line and a caret under its span.
 
+## Relations
+
+- **FR-010**: `createEngine(provider, functions?)` of `aide/relational` MUST answer one `SELECT`, `WITH`, set operation or `VALUES` over the relations a `Provider` gives by name (inner, left and cross joins, `WHERE`, `GROUP BY` with `count`, `sum`, `avg`, `min`, `max` and `group_concat`, `HAVING`, `ORDER BY`, `LIMIT`, subqueries and common table expressions), with the logic of SQL, and MUST give an error value, never a throw, for text that is not one query, a statement that writes, and a clause it does not have; `providerOf(record)` MUST find the relations of a record without regard to case; `aide/introspect` (the relations of a parse and the rules written as queries, 0008-sql-introspect) MUST run on it.
+
 ## Out of scope
 
 - Joins, aggregates and optimizing across tables in the planner; a cost model; any change of a store.
