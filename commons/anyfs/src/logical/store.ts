@@ -21,7 +21,10 @@ import {
   type Capability,
   type Consistency,
   type Cursor,
+  type Delta,
   type ExpectFor,
+  type MergeOutcome,
+  type VersionVector,
   type Path,
   type Place,
   type Prefix,
@@ -37,6 +40,7 @@ import {
   type Done,
   type Handler,
   type Hits,
+  type MergeAnswer,
   type ListOptions,
   type Listing,
   type Op,
@@ -83,6 +87,12 @@ type Group<K extends Capability, C extends Capability> = K extends "read"
                       ? { append(path: Path, bytes: Uint8Array, expect: ExpectFor<C>): Promise<Result<Written, Problem>> }
                       : K extends "search"
                         ? { search(prefix: Prefix, text: string, limit?: number): Promise<Result<Hits, Problem>> }
+                        : K extends "merge"
+                          ? {
+                              versionVector(): Promise<Result<VersionVector, Problem>>;
+                              deltaSince(since: VersionVector): Promise<Result<Delta, Problem>>;
+                              applyDelta(delta: Delta): Promise<Result<MergeOutcome, Problem>>;
+                            }
                         : K extends "watch"
                           ? { watch(prefix: Prefix, listener: (change: Changed) => void): Promise<Result<Subscription, Problem>> }
                           : K extends "lock"
@@ -134,6 +144,12 @@ const pick = <T>(r: Result<Done, Problem>, wanted: Op["op"], get: (d: Done) => T
 
 type Call = (op: Op) => Promise<Result<Done, Problem>>;
 
+const pickMerge = <T>(r: Result<Done, Problem>, wanted: string, get: (a: MergeAnswer) => T | undefined): Result<T, Problem> => {
+  if (r.kind === "err") return r;
+  const v = r.value.op === "merge" ? get(r.value.value) : undefined;
+  return v === undefined ? err(mismatch(`merge ${wanted}`, r.value.op)) : ok(v);
+};
+
 const METHODS: { readonly [K in OpCapability]: (call: Call) => Readonly<Record<string, unknown>> } = {
   read: (call) => ({ read: async (path: Path) => pick(await call({ op: "read", path }), "read", (d) => (d.op === "read" ? d.value : undefined)) }),
   write: (call) => ({ write: async (path: Path, bytes: Uint8Array, expect: Parameters<Group<"write", "cas">["write"]>[2]) => pick(await call({ op: "write", path, bytes, expect }), "write", (d) => (d.op === "write" ? d.value : undefined)) }),
@@ -153,6 +169,11 @@ const METHODS: { readonly [K in OpCapability]: (call: Call) => Readonly<Record<s
   history: (call) => ({ history: async (path: Path, limit?: number) => pick(await call({ op: "history", path, ...(limit === undefined ? {} : { limit }) }), "history", (d) => (d.op === "history" ? d.value : undefined)) }),
   rangeRead: (call) => ({ readRange: async (path: Path, start: number, length: number) => pick(await call({ op: "rangeRead", path, start, length }), "rangeRead", (d) => (d.op === "rangeRead" ? d.value : undefined)) }),
   append: (call) => ({ append: async (path: Path, bytes: Uint8Array, expect: Parameters<Group<"append", "cas">["append"]>[2]) => pick(await call({ op: "append", path, bytes, expect }), "append", (d) => (d.op === "append" ? d.value : undefined)) }),
+  merge: (call) => ({
+    versionVector: async () => pickMerge(await call({ op: "merge", action: { kind: "vector" } }), "vector", (a) => (a.kind === "vector" ? a.vector : undefined)),
+    deltaSince: async (since: VersionVector) => pickMerge(await call({ op: "merge", action: { kind: "since", since } }), "delta", (a) => (a.kind === "delta" ? a.delta : undefined)),
+    applyDelta: async (delta: Delta) => pickMerge(await call({ op: "merge", action: { kind: "apply", delta } }), "outcome", (a) => (a.kind === "outcome" ? a.outcome : undefined)),
+  }),
   search: (call) => ({ search: async (prefix: Prefix, text: string, limit?: number) => pick(await call({ op: "search", prefix, text, ...(limit === undefined ? {} : { limit }) }), "search", (d) => (d.op === "search" ? d.value : undefined)) }),
 };
 

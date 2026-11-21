@@ -41,6 +41,8 @@ export function effectOf(op: Op): Effect {
       return "mutate";
     case "delete":
       return "destructive";
+    case "merge":
+      return op.action.kind === "apply" ? "destructive" : "read";
     case "batch":
       return op.changes.some((c) => c.kind === "delete") ? "destructive" : "mutate";
     default:

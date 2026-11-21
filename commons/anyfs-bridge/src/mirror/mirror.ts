@@ -269,6 +269,7 @@ export async function openMirror<C extends Capability>(primary: Member<Store<C>>
       case "history":
       case "rangeRead":
       case "search":
+      case "merge":
         return;
     }
   };
@@ -293,6 +294,9 @@ export async function openMirror<C extends Capability>(primary: Member<Store<C>>
       case "list":
       case "search":
         return hidden(op.prefix) ? refuse(op.prefix) : undefined;
+      case "merge":
+        // the changes of a whole replica are not a path of the mirror: a mirror is of a store that has one authority (0007-anyfs-merge-governance FR-009)
+        return undefined;
     }
   };
 

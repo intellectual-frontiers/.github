@@ -41,7 +41,7 @@ const p = (text: string): Path => {
 };
 const bytes = (text: string): Uint8Array => new TextEncoder().encode(text);
 const text = (b: Uint8Array): string => new TextDecoder().decode(b);
-const METHOD: Readonly<Record<OpCapability, string>> = { read: "read", write: "write", list: "list", stat: "stat", delete: "delete", cas: "cas", batch: "batch", rename: "rename", history: "history", rangeRead: "readRange", append: "append", search: "search" };
+const METHOD: Readonly<Record<OpCapability, string>> = { read: "read", write: "write", list: "list", stat: "stat", delete: "delete", cas: "cas", batch: "batch", rename: "rename", history: "history", rangeRead: "readRange", append: "append", search: "search", merge: "applyDelta" };
 
 /** A fresh folder for a test, removed after it. */
 async function inFolder<T>(run: (dir: string) => Promise<T>): Promise<T> {

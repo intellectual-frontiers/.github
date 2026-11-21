@@ -114,10 +114,10 @@ proves(["0002-anyfs-governance FR-004"], "an expectation is any, absent or a rev
   assert(noCas.kind === "any" && withCas.kind === "rev" && bad !== undefined);
 });
 
-proves(["0002-anyfs-governance FR-005"], "the capabilities are a closed union of five core and nine optional ones, each with a sentence", () => {
+proves(["0002-anyfs-governance FR-005"], "the capabilities are a closed union of five core and ten optional ones, each with a sentence", () => {
   assertEquals([...CORE_CAPABILITIES], ["read", "write", "list", "stat", "delete"]);
-  assertEquals(OPTIONAL_CAPABILITIES.length, 9);
-  assertEquals(CAPABILITIES.length, 14);
+  assertEquals(OPTIONAL_CAPABILITIES.length, 10);
+  assertEquals(CAPABILITIES.length, 15);
   for (const c of CAPABILITIES) {
     assert(isCapability(c));
     assert(CAPABILITY_SUMMARY[c].length > 10, c);
@@ -126,7 +126,7 @@ proves(["0002-anyfs-governance FR-005"], "the capabilities are a closed union of
 });
 
 proves(["0002-anyfs-governance FR-006"], "a store declares how consistent it is, from a closed list", () => {
-  assertEquals([...CONSISTENCIES], ["strong", "read-your-writes", "eventual-listing"]);
+  assertEquals([...CONSISTENCIES], ["strong", "read-your-writes", "eventual-listing", "eventual-merge"]);
 });
 
 proves(["0002-anyfs-governance FR-007"], "a place is a typed address that formats back to itself, and only memory and file are implemented", () => {
