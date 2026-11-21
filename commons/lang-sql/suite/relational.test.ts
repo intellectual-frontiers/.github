@@ -187,3 +187,118 @@ proves(["0010-aide FR-015"], "NULLS FIRST and NULLS LAST order the nulls where t
   const ties = emps.run("SELECT name FROM e ORDER BY pay FETCH FIRST 2 ROWS WITH TIES");
   assert(ties.kind === "err" && ties.error.message !== "", "WITH TIES");
 });
+
+const NOW = new Date(Date.UTC(2026, 10, 21, 13, 45, 7));
+const clock = createEngine(providerOf({ d: { columns: ["day", "ts", "n"], rows: [["2024-01-31", "2024-03-10 08:30:00", 3], ["2024-02-29", "2023-12-31 23:59:59.5", null]] } }), new Map(), { now: () => NOW });
+
+proves(["0010-aide FR-017"], "the current date and time are the moment of the clock given, once for a statement, and dates, timestamps and intervals compare as the moments do", () => {
+  assertEquals(ask(clock, "SELECT current_date, current_time, localtime, current_timestamp, localtimestamp, current_timestamp(3)").rows, [["2026-11-21", "13:45:07", "13:45:07", "2026-11-21 13:45:07", "2026-11-21 13:45:07", "2026-11-21 13:45:07"]]);
+  assertEquals(ask(clock, "SELECT current_date = DATE '2026-11-21' AS a, current_timestamp > TIMESTAMP '2026-11-21 13:45:06' AS b, DATE '2026-11-21' = TIMESTAMP '2026-11-21 00:00:00' AS c, DATE '2026-11-21' < TIMESTAMP '2026-11-21 00:00:01' AS d").rows, [[true, true, true, true]]);
+  assertEquals(ask(clock, "SELECT INTERVAL '10' DAY > INTERVAL '2' DAY AS a, INTERVAL '1' MONTH < INTERVAL '31' DAY AS b, INTERVAL '2' HOUR = INTERVAL '120' MINUTE AS c").rows, [[true, true, true]]);
+  assertEquals(ask(clock, "SELECT day FROM d WHERE day > current_date - INTERVAL '3' YEAR ORDER BY day").rows, [["2024-01-31"], ["2024-02-29"]]);
+  assertEquals(ask(clock, "SELECT day FROM d ORDER BY ts").rows, [["2024-02-29"], ["2024-01-31"]]);
+  assertEquals(ask(clock, "SELECT 'P1D' < 'P2D' AS a, '2024-1-1' < '2024-1-2' AS b, 'abc' < 'abd' AS c").rows, [[true, true, true]]);
+});
+
+proves(["0010-aide FR-018"], "date and time literals, casts and arithmetic follow the calendar: months clamp to the end of a month, a date plus an interval with a time is a timestamp, differences are days or intervals, and what is not a date is an error value", () => {
+  const one = (sql: string) => ask(clock, sql).rows[0]?.[0];
+  assertEquals(one("SELECT DATE '2024-01-31' + INTERVAL '1' MONTH"), "2024-02-29");
+  assertEquals(one("SELECT DATE '2023-01-31' + INTERVAL '1' MONTH"), "2023-02-28");
+  assertEquals(one("SELECT DATE '2024-03-31' - INTERVAL '1' MONTH"), "2024-02-29");
+  assertEquals(one("SELECT DATE '2024-02-29' + INTERVAL '1' YEAR"), "2025-02-28");
+  assertEquals(one("SELECT DATE '2024-12-31' + 1"), "2025-01-01");
+  assertEquals(one("SELECT DATE '2024-03-01' - 1"), "2024-02-29");
+  assertEquals(one("SELECT DATE '2024-03-01' + INTERVAL '1 02:03:04' DAY TO SECOND"), "2024-03-02 02:03:04");
+  assertEquals(one("SELECT TIMESTAMP '2024-03-01 10:00:00' + INTERVAL '90' MINUTE"), "2024-03-01 11:30:00");
+  assertEquals(one("SELECT INTERVAL '1' DAY + TIMESTAMP '2024-03-01 10:00:00'"), "2024-03-02 10:00:00");
+  assertEquals(one("SELECT TIME '23:30:00' + INTERVAL '1' HOUR"), "00:30:00");
+  assertEquals(one("SELECT DATE '2024-03-01' - DATE '2024-02-01'"), 29);
+  assertEquals(one("SELECT TIMESTAMP '2024-03-02 12:00:00' - TIMESTAMP '2024-03-01 06:00:00'"), "P1DT6H");
+  assertEquals(one("SELECT TIME '10:30:00' - TIME '08:00:00'"), "PT2H30M");
+  assertEquals(one("SELECT INTERVAL '1' YEAR + INTERVAL '2' MONTH + INTERVAL '3' DAY"), "P1Y2M3D");
+  assertEquals(one("SELECT INTERVAL '1' DAY * 3"), "P3D");
+  assertEquals(one("SELECT 2 * INTERVAL '90' MINUTE"), "PT3H");
+  assertEquals(one("SELECT INTERVAL '1' DAY / 2"), "PT12H");
+  assertEquals(one("SELECT INTERVAL '1' MONTH * 1.5"), "P1M15D");
+  assertEquals(one("SELECT -INTERVAL '1-2' YEAR TO MONTH"), "P-1Y-2M");
+  assertEquals(one("SELECT INTERVAL '1 year 2 months -3 days 04:05:06'"), "P1Y2M-3DT4H5M6S");
+  assertEquals(one("SELECT INTERVAL 'P1Y2M3DT4H5M6.5S'"), "P1Y2M3DT4H5M6.5S");
+  assertEquals(one("SELECT INTERVAL '-1 02:03' DAY TO MINUTE"), "P-1DT-2H-3M");
+  assertEquals(one("SELECT CAST('2024-03-10 08:30:00' AS DATE)"), "2024-03-10");
+  assertEquals(one("SELECT CAST(DATE '2024-03-10' AS TIMESTAMP)"), "2024-03-10 00:00:00");
+  assertEquals(one("SELECT CAST(ts AS TIME) FROM d WHERE n = 3"), "08:30:00");
+  assertEquals(one("SELECT CAST('2 days' AS INTERVAL)"), "P2D");
+  assertEquals(one("SELECT CAST(DATE '2024-03-10' AS VARCHAR)"), "2024-03-10");
+  assertEquals(one("SELECT day + n FROM d WHERE n = 3"), "2024-02-03");
+  assertEquals(one("SELECT n + 1 FROM d WHERE n = 3"), 4);
+  assertEquals(ask(clock, "SELECT day + n FROM d ORDER BY day").rows, [["2024-02-03"], [null]]);
+});
+
+proves(["0010-aide FR-018"], "EXTRACT reads the parts of a date, a timestamp, a time and an interval, and a null gives a null", () => {
+  const x = (field: string, v: string) => ask(clock, `SELECT EXTRACT(${field} FROM ${v})`).rows[0]?.[0];
+  const t = "TIMESTAMP '2024-02-29 13:45:07.25'";
+  assertEquals([x("YEAR", t), x("QUARTER", t), x("MONTH", t), x("DAY", t), x("HOUR", t), x("MINUTE", t), x("SECOND", t)], [2024, 1, 2, 29, 13, 45, 7.25]);
+  assertEquals([x("DOW", t), x("ISODOW", t), x("DOY", t), x("WEEK", t), x("EPOCH", "TIMESTAMP '1970-01-02 00:00:00'")], [4, 4, 60, 9, 86400]);
+  assertEquals([x("DOW", "DATE '2024-03-03'"), x("ISODOW", "DATE '2024-03-03'"), x("WEEK", "DATE '2021-01-03'"), x("WEEK", "DATE '2020-12-31'")], [0, 7, 53, 53]);
+  assertEquals([x("MILLISECOND", t), x("MICROSECOND", t)], [7250, 7250000]);
+  assertEquals([x("HOUR", "TIME '10:20:30'"), x("MINUTE", "TIME '10:20:30'"), x("SECOND", "TIME '10:20:30'")], [10, 20, 30]);
+  assertEquals([x("YEAR", "INTERVAL '1-2' YEAR TO MONTH"), x("MONTH", "INTERVAL '1-2' YEAR TO MONTH"), x("DAY", "INTERVAL '3' DAY"), x("EPOCH", "INTERVAL '1' DAY")], [1, 2, 3, 86400]);
+  assertEquals(ask(clock, "SELECT EXTRACT(MONTH FROM n) FROM d WHERE n IS NULL").rows, [[null]]);
+  assertEquals(ask(clock, "SELECT EXTRACT(YEAR FROM day) AS y, count(*) AS c FROM d GROUP BY EXTRACT(YEAR FROM day)").rows, [[2024, 2]]);
+  for (const bad of ["SELECT DATE '2024-02-30'", "SELECT DATE 'nope'", "SELECT TIMESTAMP '2024-01-01 25:00:00'", "SELECT TIMESTAMP WITH TIME ZONE '2024-01-01 00:00:00+01'", "SELECT INTERVAL '1' FORTNIGHT", "SELECT INTERVAL 'x' DAY", "SELECT EXTRACT(YEAR FROM 'abc')", "SELECT EXTRACT(DOW FROM INTERVAL '1' DAY)", "SELECT EXTRACT(HOUR FROM DATE '2024-01-01') + EXTRACT(FOO FROM DATE '2024-01-01')", "SELECT DATE '2024-01-01' * 2", "SELECT DATE '2024-01-01' + DATE '2024-01-02'", "SELECT CAST('x' AS DATE)", "SELECT CAST(1 AS DATE)", "SELECT INTERVAL '1' DAY / 0"]) {
+    const r = clock.run(bad);
+    assert(r.kind === "err" && r.error.message !== "", bad);
+  }
+});
+
+const sales = createEngine(providerOf({
+  s: { columns: ["region", "shop", "amt"], rows: [["n", "a", 1], ["n", "a", 2], ["n", "b", 4], ["s", "c", 8], ["s", "c", 16]] },
+  empty: { columns: ["region", "amt"], rows: [] },
+}));
+
+proves(["0010-aide FR-019"], "ROLLUP, CUBE and GROUPING SETS group each set on its own, with nulls for the columns a set leaves out, the empty set giving a row over no rows, GROUPING telling the rows apart, and plain expressions put with them", () => {
+  assertEquals(ask(sales, "SELECT region, shop, sum(amt) AS t FROM s GROUP BY ROLLUP (region, shop) ORDER BY region NULLS LAST, shop NULLS LAST").rows, [["n", "a", 3], ["n", "b", 4], ["n", null, 7], ["s", "c", 24], ["s", null, 24], [null, null, 31]]);
+  assertEquals(ask(sales, "SELECT region, shop, sum(amt) AS t FROM s GROUP BY CUBE (region, shop) ORDER BY region NULLS LAST, shop NULLS LAST").rows, [["n", "a", 3], ["n", "b", 4], ["n", null, 7], ["s", "c", 24], ["s", null, 24], [null, "a", 3], [null, "b", 4], [null, "c", 24], [null, null, 31]]);
+  assertEquals(ask(sales, "SELECT region, shop, sum(amt) FROM s GROUP BY GROUPING SETS ((region), (shop), ())").rows, [["n", null, 7], ["s", null, 24], [null, "a", 3], [null, "b", 4], [null, "c", 24], [null, null, 31]]);
+  assertEquals(ask(sales, "SELECT region, shop, sum(amt) FROM s GROUP BY region, ROLLUP (shop) ORDER BY region, shop NULLS LAST").rows, [["n", "a", 3], ["n", "b", 4], ["n", null, 7], ["s", "c", 24], ["s", null, 24]]);
+  assertEquals(ask(sales, "SELECT region, shop, GROUPING(region) AS gr, GROUPING(shop) AS gs, GROUPING(region, shop) AS g FROM s GROUP BY ROLLUP (region, shop) ORDER BY g, region, shop").rows, [["n", "a", 0, 0, 0], ["n", "b", 0, 0, 0], ["s", "c", 0, 0, 0], ["n", null, 0, 1, 1], ["s", null, 0, 1, 1], [null, null, 1, 1, 3]]);
+  assertEquals(ask(sales, "SELECT region, sum(amt) AS t FROM s GROUP BY ROLLUP (region) HAVING sum(amt) > 10 ORDER BY t").rows, [["s", 24], [null, 31]]);
+  assertEquals(ask(sales, "SELECT region, sum(amt) AS t FROM s GROUP BY ROLLUP (region) HAVING GROUPING(region) = 1").rows, [[null, 31]]);
+  assertEquals(ask(sales, "SELECT upper(region) AS r, count(*) AS c FROM s GROUP BY ROLLUP (upper(region)) ORDER BY c").rows, [["S", 2], ["N", 3], [null, 5]]);
+  assertEquals(ask(sales, "SELECT region, shop, count(*) FROM s GROUP BY ROLLUP ((region, shop)) ORDER BY region NULLS LAST, shop").rows, [["n", "a", 2], ["n", "b", 1], ["s", "c", 2], [null, null, 5]]);
+  assertEquals(ask(sales, "SELECT region, count(*) FROM s GROUP BY GROUPING SETS (ROLLUP (region), CUBE (region)) ORDER BY region NULLS LAST").rows, [["n", 3], ["n", 3], ["s", 2], ["s", 2], [null, 5], [null, 5]]);
+  assertEquals(ask(sales, "SELECT region, sum(amt) FROM empty GROUP BY ROLLUP (region)").rows, [[null, null]]);
+  assertEquals(ask(sales, "SELECT region, sum(amt) FROM empty GROUP BY region").rows, []);
+  assertEquals(ask(sales, "SELECT sum(amt) FROM s GROUP BY ()").rows, [[31]]);
+  assertEquals(ask(sales, "SELECT region, GROUPING(region) AS g, rank() OVER (ORDER BY sum(amt) DESC) AS r FROM s GROUP BY ROLLUP (region) ORDER BY r").rows, [[null, 1, 1], ["s", 0, 2], ["n", 0, 3]]);
+  assertEquals(ask(sales, "SELECT GROUPING(region) FROM s GROUP BY region ORDER BY 1").rows, [[0], [0]]);
+  for (const bad of ["SELECT GROUPING(shop) FROM s GROUP BY region", "SELECT GROUPING(region) FROM s", "SELECT region FROM s GROUP BY CUBE (region, shop, amt, region, shop, amt, region, shop, amt, region, shop, amt, region)", "SELECT region FROM s GROUP BY ROLLUP (*)"]) {
+    const r = sales.run(bad);
+    assert(r.kind === "err" && r.error.message !== "", bad);
+  }
+});
+
+const quant = createEngine(providerOf({
+  t: { columns: ["a"], rows: [[1], [5], [10], [null]] },
+  u: { columns: ["b"], rows: [[3], [7]] },
+  n: { columns: ["b"], rows: [[3], [null]] },
+  z: { columns: ["b"], rows: [] },
+}));
+
+proves(["0010-aide FR-020"], "ANY, SOME and ALL compare with a subquery or an array by the logic of SQL, a null among the values giving null where nothing decides, and none giving false for ANY and true for ALL", () => {
+  assertEquals(ask(quant, "SELECT a FROM t WHERE a > ANY (SELECT b FROM u) ORDER BY a").rows, [[5], [10]]);
+  assertEquals(ask(quant, "SELECT a FROM t WHERE a > SOME (SELECT b FROM u) ORDER BY a").rows, [[5], [10]]);
+  assertEquals(ask(quant, "SELECT a FROM t WHERE a > ALL (SELECT b FROM u) ORDER BY a").rows, [[10]]);
+  assertEquals(ask(quant, "SELECT a FROM t WHERE a = ANY (SELECT b FROM u) ORDER BY a").rows, []);
+  assertEquals(ask(quant, "SELECT a FROM t WHERE a <> ALL (SELECT b FROM u) ORDER BY a").rows, [[1], [5], [10]]);
+  assertEquals(ask(quant, "SELECT a FROM t WHERE a = ANY (ARRAY[1, 10]) ORDER BY a").rows, [[1], [10]]);
+  assertEquals(ask(quant, "SELECT a FROM t WHERE a >= ALL (ARRAY[1, 5]) ORDER BY a").rows, [[5], [10]]);
+  assertEquals(ask(quant, "SELECT a, a < ANY (SELECT b FROM n) AS x, a < ALL (SELECT b FROM n) AS y FROM t ORDER BY a").rows, [[null, null, null], [1, true, null], [5, null, false], [10, null, false]]);
+  assertEquals(ask(quant, "SELECT a, a = ANY (SELECT b FROM z) AS x, a = ALL (SELECT b FROM z) AS y FROM t ORDER BY a").rows.map((r) => [r[1], r[2]]), [[false, true], [false, true], [false, true], [false, true]]);
+  assertEquals(ask(quant, "SELECT a FROM t WHERE NOT a = ANY (SELECT b FROM n) ORDER BY a").rows, []);
+  assertEquals(ask(quant, "SELECT count(*) FROM t WHERE a < ALL (SELECT b FROM u WHERE b > a)").rows, [[4]]);
+  for (const bad of ["SELECT a FROM t WHERE a > ANY (SELECT b, b FROM u)", "SELECT a FROM t WHERE a LIKE ANY (SELECT b FROM u)", "SELECT a FROM t WHERE a > ANY (1)", "SELECT a FROM t WHERE a + 1 = ANY (SELECT b FROM u) + 1"]) {
+    const r = quant.run(bad);
+    assert(r.kind === "err" && r.error.message !== "", bad);
+  }
+});

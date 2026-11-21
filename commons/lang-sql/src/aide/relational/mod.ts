@@ -7,6 +7,7 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
+import { castTemporal, extract, formatDate, formatTime, formatTimestamp, intervalLiteral, formatInterval, negateInterval, temporalArithmetic, temporalOrder } from "./temporal.ts";
 import { ansi, children, type Dialect, type Expr, type FrameBound, type Node, type OrderItem, parse, type Query, type Select, type SelectItem, type SetOp, type Source, type WindowDef, type WindowSpec, declareDialect } from "../../mod.ts";
 
 /** A value of a relation. */
@@ -71,8 +72,14 @@ interface Context {
   readonly params: readonly Value[];
   readonly paramIndex: ReadonlyMap<Node, number>;
   readonly ctes: ReadonlyMap<string, Table>;
+  /** The moment `CURRENT_DATE`, `CURRENT_TIMESTAMP` and the others are read at: one for the whole statement (0010-aide FR-017). */
+  readonly now: Date;
   /** The values of the window functions of the select being run, by call and by the row they are for (0010-aide FR-013). */
   readonly windowValues?: Map<Node, ReadonlyMap<Env, Value>>;
+  /** In a row of a grouping set (0010-aide FR-019): the keys of the grouping expressions the set holds, and of those it does not, which are null in the row. */
+  readonly groupingSet?: ReadonlySet<string>;
+  readonly nulled?: ReadonlySet<string>;
+  readonly groupingAll?: ReadonlySet<string>;
 }
 
 const AGGREGATES: ReadonlySet<string> = new Set(["count", "sum", "avg", "min", "max", "group_concat"]);
@@ -80,8 +87,15 @@ const lc = (s: string): string => s.toLowerCase();
 
 const truthy = (v: Value): boolean => v === true || (typeof v === "number" && v !== 0);
 
+/** Whether a text may be a date, a time, a timestamp or an interval, from its first characters, so that the text of other values is not read as one. */
+const maybeTemporal = (s: string): boolean => (s.length >= 3 && s.length <= 40 && ((s.charCodeAt(0) >= 48 && s.charCodeAt(0) <= 57 && (s.charAt(4) === "-" || s.charAt(2) === ":")) || s.charAt(0) === "P" || s.startsWith("-P")));
+
 function compare(a: Value, b: Value): number {
   if (typeof a === "number" && typeof b === "number") return a - b;
+  if (typeof a === "string" && typeof b === "string" && maybeTemporal(a) && maybeTemporal(b)) {
+    const t = temporalOrder(a, b);
+    if (t !== undefined) return t;
+  }
   if (typeof a === "boolean" || typeof b === "boolean") return Number(a) - Number(b);
   if (typeof a === "string" && typeof b === "string") return a < b ? -1 : a > b ? 1 : 0;
   const x = String(a);
@@ -180,6 +194,91 @@ function lookup(env: Env, qualifier: string | undefined, name: string): Value {
 /** The key of the values a join compares: null where any is null (a null equals nothing), else the values as text with their types. */
 const rowKeyValue = (values: readonly Value[]): Value => (values.some((v) => v === null) ? null : values.map((v) => `${typeof v}:${String(v)}`).join("\u0001"));
 
+/** `CURRENT_DATE`, `CURRENT_TIME`, `CURRENT_TIMESTAMP`, `LOCALTIME` and `LOCALTIMESTAMP` at a moment (in UTC), or `undefined` for any other name (0010-aide FR-017). */
+function currentOf(name: string, now: Date): Value | undefined {
+  switch (name) {
+    case "current_date":
+      return formatDate(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    case "current_time":
+    case "localtime":
+      return formatTime(now.getUTCHours() * 3600 + now.getUTCMinutes() * 60 + now.getUTCSeconds());
+    case "current_timestamp":
+    case "localtimestamp":
+      return formatTimestamp(Math.floor(now.getTime() / 1000) * 1000);
+    default:
+      return undefined;
+  }
+}
+
+/** A key that two expressions share where they are the same expression written alike, without regard to case or place. */
+function exprKey(e: Node): string {
+  return JSON.stringify(e, (k, v: unknown) => (k === "start" || k === "end" || k === "leading" || k === "trailing" || k === "comments" ? undefined : v)).toLowerCase();
+}
+
+/** The sets of a `GROUP BY` that one of its elements stands for (0010-aide FR-019): a plain expression is one set of one, a parenthesized list one set, `ROLLUP` its prefixes, `CUBE` its subsets and `GROUPING SETS` the sets of its arguments. */
+function setsOf(x: Expr): Expr[][] {
+  const units = (args: readonly Expr[]): Expr[][] => args.map((a) => (a.kind === "tuple" ? [...a.items] : [a]));
+  if (x.kind === "tuple") return [[...x.items]];
+  if (x.kind !== "call") return [[x]];
+  const name = lc(x.name.parts.map((p) => p.name).join(" "));
+  const args = x.args.map((a) => (a.kind === "star" || a.kind === "named-arg" || a.kind === "keyword-arg" ? fail(`${name} takes expressions`) : a));
+  if (name === "rollup") {
+    const u = units(args);
+    return Array.from({ length: u.length + 1 }, (_, i) => u.slice(0, u.length - i).flat());
+  }
+  if (name === "cube") {
+    const u = units(args);
+    if (u.length > 12) return fail("a CUBE of more than 12 expressions is not in astsql");
+    const out: Expr[][] = [];
+    for (let mask = (1 << u.length) - 1; mask >= 0; mask--) out.push(u.flatMap((x2, i) => ((mask >> (u.length - 1 - i)) & 1) === 1 ? x2 : []));
+    return out;
+  }
+  if (name === "grouping sets") return args.flatMap((a) => (a.kind === "tuple" || a.kind === "call" ? setsOf(a) : [[a]]));
+  return [[x]];
+}
+
+/** All the sets of a `GROUP BY`: the sets of each element put together with those of the elements before it. */
+function groupingSets(elements: readonly Expr[]): Expr[][] {
+  let sets: Expr[][] = [[]];
+  for (const el of elements) {
+    const next: Expr[][] = [];
+    for (const s of sets) for (const t of setsOf(el)) next.push([...s, ...t]);
+    sets = next;
+  }
+  return sets;
+}
+
+const QUANTIFIERS: ReadonlySet<string> = new Set(["any", "some", "all"]);
+
+/** `a op b` for a comparison operator, with the logic of SQL (null where either is null), or `undefined` for any other operator. */
+function comparison(op: string, a: Value, b: Value): boolean | null | undefined {
+  if (op !== "=" && op !== "<>" && op !== "!=" && op !== "<" && op !== "<=" && op !== ">" && op !== ">=") return undefined;
+  if (a === null || b === null) return null;
+  const c = compare(a, b);
+  return op === "=" ? c === 0 : op === "<>" || op === "!=" ? c !== 0 : op === "<" ? c < 0 : op === "<=" ? c <= 0 : op === ">" ? c > 0 : c >= 0;
+}
+
+/** `x op ANY|SOME|ALL (query or array)` (0010-aide FR-020). */
+function quantified(op: string, quantifier: string, left: Value, arg: Expr | Extract<Expr, { kind: "call" }>["args"][number] | undefined, env: Env, ctx: Context): Value {
+  if (!isPlainArg(arg)) return fail(`${quantifier.toUpperCase()} takes a subquery or an array`);
+  let values: Value[];
+  if (arg.kind === "scalar-query") {
+    const t = runQuery(arg.query, ctx, env);
+    if (t.columns.length !== 1) return fail(`the subquery of ${quantifier.toUpperCase()} has ${t.columns.length} columns, and must have one`);
+    values = t.rows.map((r) => r[0] ?? null);
+  } else if (arg.kind === "array") values = arg.items.map((x) => evalExpr(x, env, ctx, undefined));
+  else return fail(`${quantifier.toUpperCase()} takes a subquery or an array`);
+  let sawNull = false;
+  for (const v of values) {
+    const c = comparison(op, left, v);
+    if (c === undefined) return fail(`the operator ${op} is not in astsql with ${quantifier.toUpperCase()}`);
+    if (c === null) sawNull = true;
+    else if (quantifier === "all" ? !c : c) return quantifier !== "all";
+  }
+  if (values.length === 0) return quantifier === "all";
+  return sawNull ? null : quantifier === "all";
+}
+
 const isQuery = (n: Node): boolean => n.kind === "select" || n.kind === "set-op" || n.kind === "values" || n.kind === "with";
 
 function hasAggregate(n: Node): boolean {
@@ -204,6 +303,7 @@ function paramsOf(n: Node, out: Node[]): void {
 
 /** The value of an expression in a row; in a group, an aggregate reads the rows of the group. */
 function evalExpr(e: Expr, env: Env, ctx: Context, group: readonly Env[] | undefined): Value {
+  if (ctx.nulled !== undefined && group !== undefined && e.kind !== "number" && e.kind !== "string" && ctx.nulled.has(exprKey(e))) return null;
   const go = (x: Expr): Value => evalExpr(x, env, ctx, group);
   switch (e.kind) {
     case "number":
@@ -222,6 +322,10 @@ function evalExpr(e: Expr, env: Env, ctx: Context, group: readonly Env[] | undef
       return v === undefined ? fail(`the parameter ${style} has no value`) : v;
     }
     case "name": {
+      if (e.parts.length === 1) {
+        const now = currentOf(lc(e.parts[0]?.name ?? ""), ctx.now);
+        if (now !== undefined) return now;
+      }
       const last = e.parts[e.parts.length - 1]?.name ?? "";
       const q = e.parts.length > 1 ? e.parts[e.parts.length - 2]?.name : undefined;
       return lookup(env, q, last);
@@ -229,6 +333,10 @@ function evalExpr(e: Expr, env: Env, ctx: Context, group: readonly Env[] | undef
     case "unary": {
       const v = go(e.arg);
       if (e.op === "NOT") return v === null ? null : !truthy(v);
+      if (e.op === "-" && typeof v === "string" && maybeTemporal(v)) {
+        const negated = negateInterval(v);
+        if (negated !== undefined) return negated;
+      }
       const n = numberOf(v);
       return n === null ? null : e.op === "-" ? -n : n;
     }
@@ -247,6 +355,7 @@ function evalExpr(e: Expr, env: Env, ctx: Context, group: readonly Env[] | undef
         if (r !== null && truthy(r)) return true;
         return l === null || r === null ? null : false;
       }
+      if (e.right.kind === "call" && e.right.over === undefined && e.right.name.parts.length === 1 && QUANTIFIERS.has(lc(e.right.name.parts[0]?.name ?? "")) && e.right.args.length === 1) return quantified(e.op, lc(e.right.name.parts[0]?.name ?? ""), go(e.left), e.right.args[0], env, ctx);
       const l = go(e.left);
       const r = go(e.right);
       if (l === null || r === null) return null;
@@ -271,6 +380,10 @@ function evalExpr(e: Expr, env: Env, ctx: Context, group: readonly Env[] | undef
         case "*":
         case "/":
         case "%": {
+          if ((typeof l === "string" && maybeTemporal(l)) || (typeof r === "string" && maybeTemporal(r))) {
+            const t = temporalArithmetic(e.op, l, r);
+            if (t !== undefined) return t.kind === "ok" ? t.value : fail(t.error);
+          }
           const a = numberOf(l) ?? 0;
           const b = numberOf(r) ?? 0;
           if ((e.op === "/" || e.op === "%") && b === 0) return null;
@@ -360,8 +473,30 @@ function evalExpr(e: Expr, env: Env, ctx: Context, group: readonly Env[] | undef
       if (t === "INT" || t === "INTEGER" || t === "BIGINT" || t === "SMALLINT") return Math.trunc(numberOf(v) ?? 0);
       if (t === "REAL" || t === "FLOAT" || t === "DOUBLE" || t === "DOUBLE PRECISION" || t === "NUMERIC" || t === "DECIMAL") return numberOf(v);
       if (t === "BOOLEAN" || t === "BOOL") return truthy(v);
+      if (t === "DATE" || t === "TIME" || t === "TIMESTAMP" || t === "INTERVAL") {
+        const c = castTemporal(t, v);
+        return c.kind === "ok" ? c.value : fail(c.error);
+      }
       if (t.startsWith("VARCHAR") || t === "TEXT" || t === "CHAR") return String(v);
       return fail(`the type ${e.type.name} is not in astsql`);
+    }
+    case "typed-string": {
+      const text = e.value.kind === "string" ? e.value.value : fail(`a ${e.type} literal is a string`);
+      const type = e.type.toUpperCase();
+      if (type !== "DATE" && type !== "TIME" && type !== "TIMESTAMP") return fail(`a ${e.type} literal is not in astsql`);
+      const c = castTemporal(type, text);
+      return c.kind === "ok" ? c.value : fail(c.error);
+    }
+    case "interval": {
+      const text = e.value.kind === "string" ? e.value.value : e.value.kind === "number" ? e.value.text : fail("an INTERVAL literal is a string or a number");
+      const i = intervalLiteral(text, e.unit);
+      return i === undefined ? fail(`"${text}"${e.unit === undefined ? "" : ` ${e.unit}`} is not an interval`) : formatInterval(i);
+    }
+    case "extract": {
+      const v = go(e.arg);
+      if (v === null) return null;
+      const x = extract(e.field, v);
+      return x.kind === "ok" ? x.value : fail(x.error);
     }
     case "exists":
       return runQuery(e.query, ctx, env).rows.length > 0;
@@ -412,6 +547,16 @@ function callFunction(e: Extract<Expr, { kind: "call" }>, env: Env, ctx: Context
     if (values === undefined) return fail("a window function stands only in the select list and the ORDER BY");
     return values.get(env) ?? null;
   }
+  if (name === "grouping" && ctx.groupingSet !== undefined) {
+    let bits = 0;
+    for (const a of e.args) {
+      if (!isPlainArg(a)) return fail("GROUPING takes expressions");
+      const key = exprKey(a);
+      if (ctx.groupingAll?.has(key) !== true) return fail("GROUPING takes an expression that the query groups on");
+      bits = bits * 2 + (ctx.groupingSet.has(key) ? 0 : 1);
+    }
+    return bits;
+  }
   if (AGGREGATES.has(name)) {
     if (group === undefined) return fail(`${name} is an aggregate and stands only in a query that groups`);
     const filter = e.filter;
@@ -422,6 +567,8 @@ function callFunction(e: Extract<Expr, { kind: "call" }>, env: Env, ctx: Context
     if (name === "count" && (star || e.args.length === 0)) return rows.length;
     return fail(`${name} takes an expression`);
   }
+  const current = e.args.length <= 1 ? currentOf(name, ctx.now) : undefined;
+  if (current !== undefined) return current;
   const fn = ctx.functions.get(name) ?? BUILTIN.get(name);
   if (fn === undefined) return fail(`the function ${name} is not in astsql`);
   const args: Value[] = [];
@@ -542,6 +689,8 @@ function envsOf(src: Source, ctx: Context, outer: Env | undefined): { readonly e
 interface Unit {
   readonly env: Env;
   readonly group: readonly Env[] | undefined;
+  /** The context of its grouping set, where the select has grouping sets. */
+  readonly ctx?: Context;
 }
 
 type CallExpr = Extract<Expr, { kind: "call" }>;
@@ -607,17 +756,17 @@ function computeWindows(calls: readonly CallExpr[], units: readonly Unit[], defs
     out.set(call, values);
     const partitions = new Map<string, Unit[]>();
     for (const u of units) {
-      const key = rowKey(w.partitionBy.map((x) => evalExpr(x, u.env, ctx, u.group)));
+      const key = rowKey(w.partitionBy.map((x) => evalExpr(x, u.env, u.ctx ?? ctx, u.group)));
       const list = partitions.get(key);
       if (list === undefined) partitions.set(key, [u]);
       else list.push(u);
     }
     const arg = (u: Unit, k: number): Value => {
       const a = call.args[k];
-      return isPlainArg(a) ? evalExpr(a, u.env, ctx, u.group) : fail(`${name} takes plain arguments`);
+      return isPlainArg(a) ? evalExpr(a, u.env, u.ctx ?? ctx, u.group) : fail(`${name} takes plain arguments`);
     };
     for (const part of partitions.values()) {
-      const keyed = part.map((u) => ({ u, keys: w.orderBy.map((o) => evalExpr(o.expr, u.env, ctx, u.group)) }));
+      const keyed = part.map((u) => ({ u, keys: w.orderBy.map((o) => evalExpr(o.expr, u.env, u.ctx ?? ctx, u.group)) }));
       if (w.orderBy.length > 0) {
         keyed.sort((a, b) => {
           for (const [i, o] of w.orderBy.entries()) {
@@ -638,7 +787,7 @@ function computeWindows(calls: readonly CallExpr[], units: readonly Unit[], defs
         const first = peerStart[i] ?? i;
         const last = peerEnd[i] ?? i;
         if (first === i) dense++;
-        const frameValue = (e: Expr): Value => evalExpr(e, u.env, ctx, u.group);
+        const frameValue = (e: Expr): Value => evalExpr(e, u.env, u.ctx ?? ctx, u.group);
         const frame = (): readonly [number, number] | undefined => frameOf(w, i, n, first, last, frameValue);
         let v: Value;
         switch (name) {
@@ -695,7 +844,7 @@ function computeWindows(calls: readonly CallExpr[], units: readonly Unit[], defs
             const f = frame();
             const rows = f === undefined ? [] : keyed.slice(f[0], f[1] + 1).map((k) => k.u);
             const filter = call.filter;
-            const kept = filter === undefined ? rows : rows.filter((r) => truthy(evalExpr(filter, r.env, ctx, r.group)));
+            const kept = filter === undefined ? rows : rows.filter((r) => truthy(evalExpr(filter, r.env, r.ctx ?? ctx, r.group)));
             const star = call.args[0]?.kind === "star";
             if (name === "count" && (star || call.args.length === 0)) v = kept.length;
             else if (!isPlainArg(call.args[0])) return fail(`${name} takes an expression`);
@@ -757,7 +906,7 @@ function runSelect(q: Select, ctx: Context, outer: Env | undefined): Table {
     readonly keys: Value[];
   }
   const outs: Out[] = [];
-  const project = (env: Env, group: readonly Env[] | undefined): Out => {
+  const project = (env: Env, group: readonly Env[] | undefined, c: Context): Out => {
     const values: Value[] = [];
     for (const { item, star } of itemsOut) {
       if (star !== undefined) {
@@ -766,7 +915,7 @@ function runSelect(q: Select, ctx: Context, outer: Env | undefined): Table {
           if (qual !== undefined && lc(b.alias) !== lc(qual)) continue;
           for (const [k, v] of b.row.entries()) if (qual !== undefined || visible(b, k)) values.push(v);
         }
-      } else values.push(evalExpr(item.expr, env, wctx, group));
+      } else values.push(evalExpr(item.expr, env, c, group));
     }
     const keys = q.orderBy.map((o): Value => {
       const ex = o.expr;
@@ -775,33 +924,41 @@ function runSelect(q: Select, ctx: Context, outer: Env | undefined): Table {
         const i = colNames.findIndex((c) => lc(c) === lc(ex.parts[0]?.name ?? ""));
         if (i >= 0 && itemsOut[i]?.item.alias !== undefined) return values[i] ?? null;
       }
-      return evalExpr(ex, env, wctx, group);
+      return evalExpr(ex, env, c, group);
     });
     return { values, keys };
   };
   const units: Unit[] = [];
   if (grouped) {
-    const groups = new Map<string, Env[]>();
-    if (q.groupBy.length === 0) groups.set("", envs);
-    else {
-      for (const e of envs) {
-        const key = JSON.stringify(q.groupBy.map((g) => evalExpr(g, e, ctx, undefined)));
-        const list = groups.get(key);
-        if (list === undefined) groups.set(key, [e]);
-        else list.push(e);
+    const sets = q.groupBy.length === 0 ? [[]] : groupingSets(q.groupBy);
+    const all = new Set(sets.flat().map(exprKey));
+    for (const set of sets) {
+      const inSet = new Set(set.map(exprKey));
+      const absent = [...all].filter((k) => !inSet.has(k));
+      const setCtx: Context = { ...wctx, groupingSet: inSet, groupingAll: all, ...(absent.length > 0 ? { nulled: new Set(absent) } : {}) };
+      const groups = new Map<string, Env[]>();
+      if (set.length === 0) groups.set("", envs);
+      else {
+        for (const e of envs) {
+          const key = JSON.stringify(set.map((g) => evalExpr(g, e, ctx, undefined)));
+          const list = groups.get(key);
+          if (list === undefined) groups.set(key, [e]);
+          else list.push(e);
+        }
       }
-    }
-    for (const g of groups.values()) {
-      const rep = g[0] ?? { bindings: names.map((b) => ({ alias: b.alias, columns: b.columns, row: b.columns.map(() => null) })), outer };
-      if (q.having !== undefined && !truthy(evalExpr(q.having, rep, ctx, g))) continue;
-      units.push({ env: rep, group: g });
+      for (const g of groups.values()) {
+        const rep = g[0] ?? { bindings: names.map((b) => ({ alias: b.alias, columns: b.columns, row: b.columns.map(() => null) })), outer };
+        if (q.having !== undefined && !truthy(evalExpr(q.having, rep, setCtx, g))) continue;
+        // a row of its own, though the first row of the group is also the first of the groups of the other sets: the values of the window functions are kept by it
+        units.push({ env: { bindings: rep.bindings, outer: rep.outer }, group: g, ctx: setCtx });
+      }
     }
   } else for (const e of envs) units.push({ env: e, group: undefined });
   if (windowCalls.length > 0) {
     const computed = computeWindows(windowCalls, units, q.windows, wctx);
     for (const [k, v] of computed) wctx.windowValues?.set(k, v);
   }
-  for (const u of units) outs.push(project(u.env, u.group));
+  for (const u of units) outs.push(project(u.env, u.group, u.ctx ?? wctx));
   let result = outs;
   if (q.distinct) result = result.filter((o, i) => result.findIndex((p) => p.values.length === o.values.length && p.values.every((v, j) => order(v, o.values[j] ?? null) === 0)) === i);
   if (q.orderBy.length > 0) {
@@ -994,8 +1151,14 @@ export function providerOf(tables: Readonly<Record<string, Table>>): Provider {
   return (name) => byName.get(name.toLowerCase());
 }
 
+/** What an engine may be given besides its relations and functions. */
+export interface EngineOptions {
+  /** The clock `CURRENT_DATE` and the other current values are read from, once for each statement (the system clock where none is given). */
+  readonly now?: () => Date;
+}
+
 /** An engine over relations that a function gives by name (the relations are built when a query names them). */
-export function createEngine(tables: Provider, functions: ReadonlyMap<string, ScalarFunction> = new Map()): Engine {
+export function createEngine(tables: Provider, functions: ReadonlyMap<string, ScalarFunction> = new Map(), options: EngineOptions = {}): Engine {
   return {
     run(sql, params = []) {
       const parsed = parse(sql, astsql);
@@ -1009,7 +1172,7 @@ export function createEngine(tables: Provider, functions: ReadonlyMap<string, Sc
       ps.sort((a, b) => a.start - b.start);
       const paramIndex = new Map<Node, number>(ps.map((n, i) => [n, i]));
       try {
-        return ok(runQuery(stmt, { tables, functions, params, paramIndex, ctes: new Map() }, undefined));
+        return ok(runQuery(stmt, { tables, functions, params, paramIndex, ctes: new Map(), now: (options.now ?? (() => new Date()))() }, undefined));
       } catch (e) {
         if (e instanceof Failure) return err({ message: e.detail });
         return err({ message: "the query could not be run" });

@@ -58,10 +58,12 @@ export type Ctx = {
   readonly searchBytes: number;
 };
 
+/** Runs a query on the runner and returns its rows. */
 export const runQ = async (r: SqlRunner, q: Query): Promise<readonly SqlRow[]> => {
   const st = q.done();
   return r.query(st.text, st.params);
 };
+/** Runs a statement on the runner for its effect only. */
 export const execQ = async (r: SqlRunner, q: Query): Promise<void> => {
   const st = q.done();
   await r.exec(st.text, st.params);
@@ -212,6 +214,7 @@ async function heldIds(r: SqlRunner, c: Ctx, ids: readonly string[]): Promise<Re
   return held;
 }
 
+/** Of the given version ids, the ones the database already holds. */
 export async function heldKeys(r: SqlRunner, c: Ctx, ids: readonly string[]): Promise<ReadonlySet<string>> {
   const held = new Set<string>();
   for (const part of chunks([...new Set(ids)], CHUNK)) for (const row of await runQ(r, c.l.selectRowsOfIds(part))) held.add(`${textOf(row["id"] ?? null)}|${textOf(row["sum"] ?? null)}`);

@@ -81,6 +81,7 @@ import { packagingTerms } from "@intellectual-frontiers/ontology/audit";
 import * as ifccmOntology from "@intellectual-frontiers/ontology/ifccm";
 import * as ifqsOntology from "@intellectual-frontiers/ontology/ifqs";
 import * as otoOntology from "@intellectual-frontiers/ontology/oto";
+import * as planningOntology from "@intellectual-frontiers/ontology/planning";
 import { terms } from "@intellectual-frontiers/ontology/mizan";
 
 /** One rule's result in a run of the check (0020-ifccm FR-031): its findings, or the reason it did not run. Its shape is the quality system's `CheckRule`, so a caller keeps it as a record without this file knowing the quality system. */
@@ -175,7 +176,7 @@ function sourcesUnder(root: string): readonly { readonly path: string; readonly 
 
 /** The citations of requirements by the terms of commons' own ontologies (`mz:definedBy`), for the chain's third stage (`--terms commons`, and the default of `--trace`). */
 function termCitations(): readonly { readonly term: string; readonly cites: readonly string[]; readonly file: string }[] {
-  return [...terms, ...packagingTerms, ...ifccmOntology.terms, ...ifqsOntology.terms, ...otoOntology.terms].map((t) => ({
+  return [...terms, ...packagingTerms, ...ifccmOntology.terms, ...ifqsOntology.terms, ...otoOntology.terms, ...planningOntology.terms].map((t) => ({
     term: t.values.termIri,
     cites: t.values.definedBy ?? [],
     file: "commons/ontology",
