@@ -63,7 +63,8 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 
 | Library | Role | What it is | Kanon | Level | Published to |
 | --- | --- | --- | --- | --- | --- |
-| [`@intellectual-frontiers/anyfs`](commons/anyfs) | Foundation | One typed interface to the places bytes live | layers | L1 | held |
+| [`@intellectual-frontiers/anyfs`](commons/anyfs) | Foundation | One typed interface to the places bytes live | layers, plugins | L1 | held |
+| [`@intellectual-frontiers/anyfs-bridge`](commons/anyfs-bridge) | Foundation | Copy, sync, move, check, two-way sync and mirror between any two AnyFS stores | layers, extension | L1 | held |
 | [`@intellectual-frontiers/core`](https://www.npmjs.com/package/@intellectual-frontiers/core) | Foundation | Errors as values (`Result`) | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/crypto`](https://www.npmjs.com/package/@intellectual-frontiers/crypto) | Foundation | The digests, signatures and envelopes of commons in pure code on Web Crypto | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/formats`](https://www.npmjs.com/package/@intellectual-frontiers/formats) | Foundation | The file and wire formats of commons | - | L1 | GitHub, npm |
