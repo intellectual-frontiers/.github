@@ -143,3 +143,15 @@ proves(["0002-boot-command FR-006"], "status and serve take the profile of the d
     assert(deb.out.includes("initrd.gz") && !deb.out.includes("ubuntu-26.04.1-live-server"), deb.out);
   });
 });
+
+proves(["0002-boot-command FR-006"], "arm refuses a profile whose installer cannot run the guard unless it is told that a disk may be erased", async () => {
+  await fs.withTempDir(async (dir) => {
+    const state = path.join(dir, "state.json");
+    const no = await run(config(dir), ["boot", "arm", "--asset", "athens", "--state", state, "--profile", "debian-13"]);
+    assertEquals(no.code, 2, no.err + no.out);
+    assert(no.err.includes("--confirm-destroy yes") && no.err.includes("E-NO-GUARD"), no.err);
+    const yes = await run(config(dir), ["boot", "arm", "--asset", "athens", "--state", state, "--profile", "debian-13", "--confirm-destroy", "yes"]);
+    assertEquals(yes.code, 0, yes.err + yes.out);
+    assert(yes.out.includes("armed athens"), yes.out);
+  });
+});

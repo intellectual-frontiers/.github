@@ -14,6 +14,7 @@
 - **FR-003**: The menu of an armed host MUST boot its profile's kernel and ramdisk with the profile's command line, in which `{install}` is the install's URL (with the host, the token and the MAC GRUB reports), `{iso}` the image's URL and `{base}` the server's URL; a character GRUB would take for the end of a command MUST be escaped in the command line.
 - **FR-004**: The server MUST serve, under the install's URL and only for an armed host and its token, the install document of its profile (the autoinstall's `user-data`, a Debian `preseed.cfg`, a Kickstart `ks.cfg` or an AutoYaST `autoinst.xml`) with the profile's content type and the secrets put in as it is served, and MUST NOT serve the install document of another profile.
 - **FR-005**: The profiles MUST include Ubuntu 26.04 (autoinstall) and Debian 13 (preseed); a server MUST serve one profile at a time, because the boot files of every distribution have the same names.
+- **FR-006**: A profile MUST say whether its installer can run the blank-disk guard before a disk is touched (Ubuntu's can, Debian's cannot, because its installer has neither `curl` nor `lsblk`); where it cannot, an asset MUST be armed for it only with the owner's say-so that the install may erase a disk (`archon boot arm --confirm-destroy yes`).
 
 ## Acceptance scenarios
 

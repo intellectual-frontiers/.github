@@ -14,7 +14,7 @@
 - **FR-003**: `prepare` MUST render the install with the install dialect and the playbook with the playbook dialect, each from the requirements it carries, as generated files in the folder the fleet names that hold no secret and are the same text every time, and say each file written.
 - **FR-004**: `arm` MUST record that the asset's next network boot may install it, with a token, and that it may erase a disk that holds data only if `--confirm-destroy yes` was given, in a state file readable by its owner alone; `disarm` MUST take it out; `status` MUST show what is armed, what installed, the latest progress and the boot files that are missing or do not match their pins.
 - **FR-005**: `serve` MUST run the TFTP and HTTP boot server over the pinned files with the fleet's provider and the secrets folder, and MUST NOT start where a boot file is missing or does not match its pin (ending with 3 and saying how to get the files).
-- **FR-006**: `status` and `serve` MUST take the boot profile of the distribution to serve (`--profile`, the fleet's default or Ubuntu 26.04 where none is given), MUST serve its pinned files, and MUST refuse a profile that does not exist with the profiles there are and the usage exit.
+- **FR-006**: `arm`, `status` and `serve` MUST take the boot profile of the distribution to serve (`--profile`, the fleet's default or Ubuntu 26.04 where none is given), MUST serve its pinned files, and MUST refuse a profile that does not exist with the profiles there are and the usage exit; `arm` MUST refuse, with the usage exit, a profile whose installer cannot run the blank-disk guard unless `--confirm-destroy yes` says that the install may erase a disk.
 
 ## Acceptance scenarios
 

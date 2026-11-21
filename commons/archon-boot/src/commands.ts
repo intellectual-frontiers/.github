@@ -54,7 +54,7 @@ export function bootCommands(config: BootPluginConfig): readonly Node[] {
   const arm = command({
     name: "arm",
     summary: "Say that the next network boot of the asset may install it: only an armed asset is installed, once. A machine whose disks hold data is stopped unless you arm it with --confirm-destroy yes. It changes nothing on the machine.",
-    options: { asset, ...fleet, state: stateOpt, confirmDestroy: value<never>({ help: "Allow the install to erase a disk that holds data: `yes`.", valueName: "yes", default: "" }), mac: value<never>({ help: "The MAC of the machine that will boot, where the fleet does not know it.", valueName: "MAC", default: "" }) },
+    options: { asset, ...fleet, state: stateOpt, profile: profileOpt, confirmDestroy: value<never>({ help: "Allow the install to erase a disk that holds data: `yes`.", valueName: "yes", default: "" }), mac: value<never>({ help: "The MAC of the machine that will boot, where the fleet does not know it.", valueName: "MAC", default: "" }) },
     examples: [{ args: ["--asset", "athens"], says: "Arm athens for one install." }, { args: ["--asset", "athens", "--confirm-destroy", "yes"], says: "Arm athens and allow it to erase a disk that holds data." }],
     action: { kind: "action", effect: "mutate", dryRun: false, idempotent: false, reach: defineReach({ channels: ["local"] }) },
     run: async (args, ctx) => {
@@ -63,6 +63,11 @@ export function bootCommands(config: BootPluginConfig): readonly Node[] {
       const subject = await config.subject(name, optionsOf(o));
       if (subject.kind === "err") return outcomeOf(null, { problems: [problem("fail", subject.error.message, { code: subject.error.code })], exit: subject.error.exit });
       const destroy = String(o["confirmDestroy"]) === "yes";
+      const profile = profileOf(o);
+      if (profile === undefined) return noProfile(o);
+      if (!profile.guard && !destroy) {
+        return outcomeOf(null, { problems: [problem("fail", `the installer of ${profile.title} cannot check the disk before it erases one: arm ${name} with --confirm-destroy yes to say that it may`, { code: "E-NO-GUARD" })], exit: "usage" });
+      }
       const mac = String(o["mac"] ?? "");
       const token = await armAsset(stateOf(o, ctx.env), name, { confirmDestroy: destroy, ...(mac === "" ? {} : { mac }) });
       return outcomeOf({ armed: name, tokenLength: token.length }, { text: `armed ${name}${destroy ? " (it may erase a disk that holds data)" : " (it is stopped if a disk holds data)"}: network boot the machine now`, next: [`${program} boot serve`] });

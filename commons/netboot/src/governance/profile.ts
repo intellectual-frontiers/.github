@@ -40,6 +40,8 @@ export type BootProfile = {
   readonly document: InstallDocument;
   /** The content type the install document is served with. */
   readonly documentType: string;
+  /** Whether the installer can run the blank-disk guard before it touches a disk. Where it cannot, the install erases the disk it picks and an asset may be armed for it only with the owner's say-so that it may erase one (`confirmDestroy`). */
+  readonly guard: boolean;
 };
 
 /** Ubuntu 26.04.1: the live server's autoinstall, fed by cloud-init's NoCloud from the install's URL. */
@@ -53,6 +55,7 @@ export const UBUNTU_26_04_PROFILE: BootProfile = {
   cmdline: "ip=dhcp iso-url={iso} autoinstall ds=nocloud-net\\;s={install} ---",
   document: "user-data",
   documentType: "text/cloud-config; charset=utf-8",
+  guard: true,
 };
 
 /**
@@ -82,6 +85,8 @@ export const DEBIAN_13_PROFILE: BootProfile = {
   cmdline: "auto=true priority=critical netcfg/choose_interface=auto url={install}preseed.cfg ---",
   document: "preseed.cfg",
   documentType: "text/plain; charset=utf-8",
+  // the installer's own environment has no curl and no lsblk, which the guard reads the machine with
+  guard: false,
 };
 
 /** Every profile there is. */

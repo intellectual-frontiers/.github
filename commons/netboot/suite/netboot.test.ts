@@ -355,7 +355,7 @@ proves(["0004-netboot-physical FR-005"], "the handler refuses a method it does n
   });
 });
 
-proves(["0005-netboot-profiles FR-001", "0005-netboot-profiles FR-002", "0005-netboot-profiles FR-005"], "every profile pins its boot files by SHA-256, names a kernel and a ramdisk it holds and an install document, and a profile is found by its id", () => {
+proves(["0005-netboot-profiles FR-001", "0005-netboot-profiles FR-002", "0005-netboot-profiles FR-005", "0005-netboot-profiles FR-006"], "every profile pins its boot files by SHA-256, names a kernel and a ramdisk it holds and an install document, and a profile is found by its id", () => {
   assertEquals(PROFILES.map((p) => p.id), ["ubuntu-26.04", "debian-13"]);
   for (const p of PROFILES) {
     assert(Object.keys(p.pins.files).includes(p.kernel) && Object.keys(p.pins.files).includes(p.initrd), p.id);
@@ -364,6 +364,7 @@ proves(["0005-netboot-profiles FR-001", "0005-netboot-profiles FR-002", "0005-ne
   }
   assertEquals(profileById("nope"), undefined);
   assertEquals(DEBIAN_13_PROFILE.pins.iso, undefined, "the Debian installer fetches from a mirror: no image");
+  assertEquals([UBUNTU_26_04_PROFILE.guard, DEBIAN_13_PROFILE.guard], [true, false]);
 });
 
 proves(["0005-netboot-profiles FR-003"], "a Debian host's menu boots its own kernel and ramdisk with the URL of its preseed, escapes nothing that GRUB would split, and Ubuntu's keeps the escaped semicolon", () => {
