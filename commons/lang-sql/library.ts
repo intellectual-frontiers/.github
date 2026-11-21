@@ -16,6 +16,7 @@ export const library = {
     ".",
     "./aide/catalog",
     "./aide/exec",
+    "./aide/guard",
     "./aide/normalize",
     "./aide/plan",
     "./aide/profile",

@@ -132,3 +132,10 @@ requirement	mechanism	by	note
 0011-acceptance FR-007	check	.github: cd commons/lang-sql && bun run verify	suite/acceptance-aat.test.ts: for every query of the table, sqlfs over the disk, sqlfs over the entries the fixture is meant to have and sqlfind through the real find give the same rows
 0011-acceptance FR-008	check	.github: cd commons/lang-sql && bun run verify	suite/acceptance-aat.test.ts: each utility exits 0 for a query that runs, 1 for one that is wrong and 2 for a usage error; reports what it cannot read, lists a link that loops and does not follow it, limits depth and rows, leaves a hostile value in its own condition, and searches ten thousand entries in under ten seconds
 0011-acceptance FR-009	check	.github: cd commons/lang-sql && bun run verify	suite/acceptance-aat.test.ts: the scenarios are answered as written by hand by both utilities, and the demo files are what the utilities print
+0012-sql-guard FR-001	check	.github: cd commons/lang-sql && bun run verify	x
+0012-sql-guard FR-002	check	.github: cd commons/lang-sql && bun run verify	x
+0012-sql-guard FR-003	check	.github: cd commons/lang-sql && bun run verify	x
+0012-sql-guard FR-004	check	.github: cd commons/lang-sql && bun run verify	x
+0012-sql-guard FR-005	check	.github: cd commons/lang-sql && bun run verify	x
+0012-sql-guard FR-006	check	.github: cd commons/lang-sql && bun run verify	x
+0012-sql-guard FR-007	check	.github: cd commons/lang-sql && bun run verify	x

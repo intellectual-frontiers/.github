@@ -11,6 +11,7 @@
     ".": "./src/mod.ts",
     "./aide/catalog": "./src/aide/catalog/mod.ts",
     "./aide/exec": "./src/aide/exec/mod.ts",
+    "./aide/guard": "./src/aide/guard/mod.ts",
     "./aide/normalize": "./src/aide/normalize/mod.ts",
     "./aide/plan": "./src/aide/plan/mod.ts",
     "./aide/profile": "./src/aide/profile/mod.ts",

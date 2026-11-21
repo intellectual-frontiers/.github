@@ -13,7 +13,7 @@
 
 ## Profiles
 
-- **FR-002**: `defineProfile(spec)` and `conform(parsed, profile)` MUST restrict a parse to a subset of the language: the kinds of statement, the kinds of node, the names of functions, the names of tables, and the limits of depth, of nodes and of tables used; `conform` MUST give an `ok` value where the parse is inside the profile and an `err` value of every violation with the span of its node and one sentence each.
+- **FR-002**: `defineProfile(spec)` and `conform(parsed, profile)` MUST restrict a parse to a subset of the language: the kinds of statement, the kinds of node, the names of functions, the names of tables, the functions that are denied, the most statements a text may hold, and the limits of depth, of nodes and of tables used; `conform` MUST give an `ok` value where the parse is inside the profile and an `err` value of every violation with the span of its node and one sentence each.
 
 ## Catalog, names and types
 

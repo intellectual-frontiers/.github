@@ -29,6 +29,10 @@ export interface Profile {
   readonly maxDepth: number | undefined;
   readonly maxNodes: number | undefined;
   readonly maxTables: number | undefined;
+  /** The functions that may not be called, without regard to case or to a schema before the name. */
+  readonly deniedFunctions: readonly string[];
+  /** The most statements a text may hold; any where not given. */
+  readonly maxStatements: number | undefined;
 }
 
 /** What a profile is made from. */
@@ -41,6 +45,8 @@ export interface ProfileSpec {
   readonly maxDepth?: number;
   readonly maxNodes?: number;
   readonly maxTables?: number;
+  readonly deniedFunctions?: readonly string[];
+  readonly maxStatements?: number;
 }
 
 /** What a parse does that its profile does not allow. */
@@ -61,6 +67,8 @@ export function defineProfile(spec: ProfileSpec): Profile {
     maxDepth: spec.maxDepth,
     maxNodes: spec.maxNodes,
     maxTables: spec.maxTables,
+    deniedFunctions: spec.deniedFunctions ?? [],
+    maxStatements: spec.maxStatements,
   };
 }
 
@@ -76,6 +84,7 @@ export function conform(parsed: Parsed, profile: Profile): Result<Parsed, readon
   const forbid = new Set<string>(profile.forbidNodes);
   const allowedStatements = new Set<string>(profile.statements);
   const functions = profile.functions === undefined ? undefined : new Set(profile.functions.map(lc));
+  const denied = new Set(profile.deniedFunctions.map(lc));
   const tables = profile.tables === undefined ? undefined : new Set(profile.tables.map(lc));
   let nodes = 0;
   let tableUses = 0;
@@ -84,9 +93,11 @@ export function conform(parsed: Parsed, profile: Profile): Result<Parsed, readon
     nodes++;
     if (depth > deepest) deepest = depth;
     if (forbid.has(n.kind)) out.push({ start: n.start, end: n.end, message: `${n.kind} is not in the language ${profile.name}` });
-    if (n.kind === "call" && functions !== undefined) {
+    if (n.kind === "call") {
       const name = n.name.parts.map((p) => p.name).join(".");
-      if (!functions.has(lc(name))) out.push({ start: n.start, end: n.end, message: `the function ${name} is not in the language ${profile.name}` });
+      const bare = lc(n.name.parts[n.name.parts.length - 1]?.name ?? "");
+      if (denied.has(bare)) out.push({ start: n.start, end: n.end, message: `the function ${name} is denied in the language ${profile.name}` });
+      else if (functions !== undefined && !functions.has(lc(name))) out.push({ start: n.start, end: n.end, message: `the function ${name} is not in the language ${profile.name}` });
     }
     if (n.kind === "table") {
       tableUses++;
@@ -95,6 +106,8 @@ export function conform(parsed: Parsed, profile: Profile): Result<Parsed, readon
     }
     for (const c of children(n)) visit(c, depth + 1);
   };
+  if (profile.maxStatements !== undefined && parsed.script.statements.length > profile.maxStatements)
+    out.push({ start: 0, end: parsed.text.length, message: `the text has ${parsed.script.statements.length} statements, and the language ${profile.name} allows ${profile.maxStatements}` });
   for (const s of parsed.script.statements) {
     if (s.kind === "unparsed") continue;
     if (!allowedStatements.has(s.kind)) out.push({ start: s.start, end: s.end, message: `a ${s.kind} statement is not in the language ${profile.name}` });
