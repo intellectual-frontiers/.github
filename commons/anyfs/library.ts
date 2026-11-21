@@ -22,7 +22,7 @@ export const library = {
     package: "@intellectual-frontiers/anyfs",
     family: { dialect: "{host}-dialect-{name}", plugin: "{host}-{name}" },
     instances: [],
-    plugins: [{ noun: "posix" }],
+    plugins: [{ noun: "bridge" }, { noun: "posix" }, { noun: "ssh" }],
     units: [
       { folder: "src/governance/", layer: "governance", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }] },
       {
