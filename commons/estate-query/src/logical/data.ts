@@ -62,6 +62,11 @@ function leaves(value: JsonValue, prefix = ""): readonly (readonly [string, stri
 const table = (columns: readonly string[], rows: readonly (readonly Value[])[]): Table => ({ columns, rows });
 const columnsOf = (name: string): readonly string[] => RELATIONS.find((r) => r.name === name)?.columns.map((c) => c.name) ?? [];
 
+/** The day, `days` after the instant, as YYYY-MM-DD in UTC. */
+function dayOf(instant: string, days: number): string {
+  return new Date(Date.parse(instant) + days * 86_400_000).toISOString().slice(0, 10);
+}
+
 const SCHEME_PORT: Readonly<Record<string, number>> = { http: 80, https: 443, ssh: 22, wss: 443, ws: 80 };
 const CLEARTEXT_SCHEMES: ReadonlySet<string> = new Set(["http", "ws"]);
 const SECURE_SCHEMES: ReadonlySet<string> = new Set(["https", "wss", "tls", "ssh"]);
@@ -100,6 +105,7 @@ export function tablesOf(data: EstateData): Tables {
     endpoint: () => table(columnsOf("endpoint"), data.assets.filter((a) => String(a.kind) === "endpoint").map((a): readonly Value[] => endpointRow(a))),
     link: () => table(columnsOf("link"), (data.links ?? []).map((l): readonly Value[] => [l.from, l.to, l.kind])),
     service: () => table(columnsOf("service"), SERVICES.map((x): readonly Value[] => [x.name, x.transport, x.port, x.class, x.cleartext])),
+    clock: () => table(columnsOf("clock"), [[dayOf(data.now, 0), dayOf(data.now, 30), dayOf(data.now, 90)]]),
     observation: () => table(columnsOf("observation"), [...latest.entries()].map(([asset, o]): readonly Value[] => [asset, o.at, o.source])),
     observed: () => table(columnsOf("observed"), [...latest.entries()].flatMap(([asset, o]) => leaves(o.state as JsonValue).map(([path, value]): readonly Value[] => [asset, path, value]))),
     truth: () => table(columnsOf("truth"), (data.truths ?? []).map((t): readonly Value[] => [t.asset, t.currency, t.alignment, t.agrees, t.observedAt ?? "", t.source ?? ""])),
