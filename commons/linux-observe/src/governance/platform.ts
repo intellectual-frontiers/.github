@@ -1,6 +1,6 @@
 // Spec: 0004-linux-observe-platform FR-001, FR-002
 /**
- * What kind of machine a Linux machine is: its family (the way its packages are managed), its distribution, its release and its architecture, and the role the model gives it. The family is the fact the rest depends on: a dialect carries a package by the program of the family, and an observation reads it by the program of the family.
+ * What kind of machine a Linux machine is: its family (the way its packages are managed), its distribution, its release and its architecture. The family is the fact the rest depends on: a dialect carries a package by the program of the family, and an observation reads it by the program of the family.
  *
  * @example
  * ```ts
@@ -16,11 +16,6 @@ export const FAMILIES = ["debian", "rhel", "suse", "arch"] as const;
 /** A family. */
 export type Family = (typeof FAMILIES)[number];
 
-/** What a machine is for, as the model says: a server or a workstation. */
-export const ROLES = ["server", "workstation"] as const;
-/** A role. */
-export type Role = (typeof ROLES)[number];
-
 /** The architectures of a machine, as `uname -m` names them for the ones in use. */
 export const ARCHITECTURES = ["x86_64", "aarch64"] as const;
 /** An architecture. */
@@ -29,8 +24,8 @@ export type Architecture = (typeof ARCHITECTURES)[number];
 /** What is read of a machine: its family, the `ID` and `VERSION_ID` of `/etc/os-release`, and the architecture where it was asked. */
 export type Observed = { readonly family: Family; readonly distro: string; readonly release: string; readonly arch?: Architecture };
 
-/** What the model declares of a machine: the same, and its role. */
-export type Declared = { readonly family: Family; readonly distro: string; readonly release: string; readonly arch: Architecture; readonly role: Role };
+/** What the model declares of a machine: the same, with the architecture always said. Whether it is a server or a workstation is the kind of its asset, said once there. */
+export type Declared = { readonly family: Family; readonly distro: string; readonly release: string; readonly arch: Architecture };
 
 /** The families by the `ID` of a distribution. The ones a distribution derives from are found by `ID_LIKE` where the `ID` is not here. */
 export const FAMILY_OF_ID: Readonly<Record<string, Family>> = {

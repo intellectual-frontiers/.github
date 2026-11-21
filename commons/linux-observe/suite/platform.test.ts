@@ -35,12 +35,12 @@ proves(["0004-linux-observe-platform FR-001", "0004-linux-observe-platform FR-00
   assertEquals([architectureOf("amd64\n"), architectureOf("arm64"), architectureOf("aarch64"), architectureOf("riscv64")], ["x86_64", "aarch64", "aarch64", undefined]);
 });
 
-const DECLARED = { family: "rhel", distro: "rocky", release: "9.4", arch: "x86_64", role: "server" };
+const DECLARED = { family: "rhel", distro: "rocky", release: "9.4", arch: "x86_64" };
 
 proves(["0004-linux-observe-platform FR-003"], "a declaration is refused with every reason, one in a family its distribution is not of is refused, and the drift is said in a sentence each", () => {
-  const bad = parseDeclared({ family: "bsd", distro: "Rocky", release: "9", arch: "sparc", role: "pet" });
+  const bad = parseDeclared({ family: "bsd", distro: "Rocky", release: "9", arch: "sparc" });
   assert(bad.kind === "err");
-  assertEquals(bad.error.length, 4);
+  assertEquals(bad.error.length, 3);
   const wrong = parseDeclared({ ...DECLARED, family: "debian" });
   assert(wrong.kind === "err" && wrong.error[0]?.includes("is of the family rhel"));
   const ok = parseDeclared(DECLARED);

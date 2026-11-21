@@ -4,5 +4,5 @@
  *
  * @module
  */
-export { ARCHITECTURES, FAMILIES, FAMILY_OF_ID, ROLES, familyOf } from "./platform.ts";
-export type { Architecture, Declared, Family, Observed, Role } from "./platform.ts";
+export { ARCHITECTURES, FAMILIES, FAMILY_OF_ID, familyOf } from "./platform.ts";
+export type { Architecture, Declared, Family, Observed } from "./platform.ts";

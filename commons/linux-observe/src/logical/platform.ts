@@ -11,7 +11,7 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import { ARCHITECTURES, FAMILIES, ROLES, familyOf, type Architecture, type Declared, type Observed } from "@intellectual-frontiers/linux-observe/governance";
+import { ARCHITECTURES, FAMILIES, familyOf, type Architecture, type Declared, type Observed } from "@intellectual-frontiers/linux-observe/governance";
 
 /** The `KEY=value` lines of an `os-release` as a table: a value may be in single or double quotes. */
 export function osReleaseTable(text: string): ReadonlyMap<string, string> {
@@ -52,11 +52,10 @@ export function parseDeclared(input: unknown): Result<Declared, readonly string[
   if (typeof o["distro"] !== "string" || !/^[a-z][a-z0-9-]{1,40}$/.test(o["distro"])) problems.push("distro is the ID of its os-release (lowercase)");
   if (typeof o["release"] !== "string" || !/^[A-Za-z0-9.]{0,20}$/.test(o["release"])) problems.push("release is the VERSION_ID of its os-release (it may be empty on a rolling release)");
   if (!(ARCHITECTURES as readonly unknown[]).includes(o["arch"])) problems.push(`arch is one of ${ARCHITECTURES.join(", ")}`);
-  if (!(ROLES as readonly unknown[]).includes(o["role"])) problems.push(`role is one of ${ROLES.join(", ")}`);
   if (problems.length > 0) return err(problems);
   const family = familyOf(String(o["distro"]), String(o["family"]));
   if (family !== undefined && family !== o["family"]) return err([`${String(o["distro"])} is of the family ${family}, not ${String(o["family"])}`]);
-  return ok({ family: o["family"] as Declared["family"], distro: String(o["distro"]), release: String(o["release"]), arch: o["arch"] as Declared["arch"], role: o["role"] as Declared["role"] });
+  return ok({ family: o["family"] as Declared["family"], distro: String(o["distro"]), release: String(o["release"]), arch: o["arch"] as Declared["arch"] });
 }
 
 /** What differs between the platform declared and the one observed, one sentence each: a machine that is not what its model says is said, not converged as though it were. */
