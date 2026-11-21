@@ -1,0 +1,3 @@
+# The PL/pgSQL routines of postgres_regress/postgres/plpgsql_routines.sql (commons data 0070-sql-routines FR-009): bodies, bodies read with no error. The second number only rises.
+path	bodies	ok
+postgres_regress/postgres/plpgsql_routines.sql	228	218

@@ -1,5 +1,5 @@
 script
-  statements[0]: select distinct=false
+  statements[0]: select distinct=false groupAll=false
     items[0]: select-item
       expr: number text="1"
     items[1]: select-item
@@ -14,7 +14,7 @@ script
       expr: null
     items[6]: select-item
       expr: param style="question" text="?"
-  statements[1]: select distinct=false
+  statements[1]: select distinct=false groupAll=false
     items[0]: select-item
       expr: name
         parts[0]: ident name="a" quoted=false
@@ -29,7 +29,7 @@ script
           parts[0]: ident name="t" quoted=false
     items[3]: select-item
       expr: star
-  statements[2]: select distinct=false
+  statements[2]: select distinct=false groupAll=false
     items[0]: select-item
       expr: unary op="-"
         arg: name
@@ -69,7 +69,7 @@ script
             parts[0]: ident name="b" quoted=false
         right: name
           parts[0]: ident name="c" quoted=false
-  statements[3]: select distinct=false
+  statements[3]: select distinct=false groupAll=false
     items[0]: select-item
       expr: binary op="="
         left: name
@@ -105,7 +105,7 @@ script
         left: name
           parts[0]: ident name="a" quoted=false
         right: number text="7"
-  statements[4]: select distinct=false
+  statements[4]: select distinct=false groupAll=false
     items[0]: select-item
       expr: binary op="OR"
         left: binary op="AND"
@@ -116,7 +116,7 @@ script
         right: unary op="NOT"
           arg: name
             parts[0]: ident name="c" quoted=false
-  statements[5]: select distinct=false
+  statements[5]: select distinct=false groupAll=false
     items[0]: select-item
       expr: is test="null" negated=false
         arg: name
@@ -149,7 +149,7 @@ script
           parts[0]: ident name="a" quoted=false
         other: name
           parts[0]: ident name="b" quoted=false
-  statements[6]: select distinct=false
+  statements[6]: select distinct=false groupAll=false
     items[0]: select-item
       expr: between negated=false
         arg: name
@@ -165,7 +165,7 @@ script
           high: number text="2"
         right: name
           parts[0]: ident name="c" quoted=false
-  statements[7]: select distinct=false
+  statements[7]: select distinct=false groupAll=false
     items[0]: select-item
       expr: in negated=false
         arg: name
@@ -177,7 +177,7 @@ script
       expr: in-query negated=true
         arg: name
           parts[0]: ident name="a" quoted=false
-        query: select distinct=false
+        query: select distinct=false groupAll=false
           items[0]: select-item
             expr: name
               parts[0]: ident name="x" quoted=false
@@ -194,7 +194,7 @@ script
         values[1]: tuple
           items[0]: number text="3"
           items[1]: number text="4"
-  statements[8]: select distinct=false
+  statements[8]: select distinct=false groupAll=false
     items[0]: select-item
       expr: like op="LIKE" negated=false
         arg: name
@@ -206,7 +206,7 @@ script
           parts[0]: ident name="a" quoted=false
         pattern: string value="x%" prefix=""
         escape: string value="!" prefix=""
-  statements[9]: select distinct=false
+  statements[9]: select distinct=false groupAll=false
     items[0]: select-item
       expr: case
         whens[0]: when
@@ -229,30 +229,30 @@ script
         whens[0]: when
           cond: number text="1"
           result: string value="one" prefix=""
-  statements[10]: select distinct=false
+  statements[10]: select distinct=false groupAll=false
     items[0]: select-item
-      expr: cast
+      expr: cast try=false
         arg: name
           parts[0]: ident name="a" quoted=false
         type: data-type name="INTEGER"
     items[1]: select-item
-      expr: cast
+      expr: cast try=false
         arg: name
           parts[0]: ident name="b" quoted=false
         type: data-type name="DECIMAL"
           args[0]: number text="10"
           args[1]: number text="2"
     items[2]: select-item
-      expr: cast
+      expr: cast try=false
         arg: name
           parts[0]: ident name="c" quoted=false
         type: data-type name="DOUBLE PRECISION"
     items[3]: select-item
-      expr: cast
+      expr: cast try=false
         arg: name
           parts[0]: ident name="d" quoted=false
         type: data-type name="TIMESTAMP WITH TIME ZONE"
-  statements[11]: select distinct=false
+  statements[11]: select distinct=false groupAll=false
     items[0]: select-item
       expr: extract field="YEAR"
         arg: name
@@ -263,7 +263,7 @@ script
     items[2]: select-item
       expr: interval
         value: string value="2" prefix=""
-  statements[12]: select distinct=false
+  statements[12]: select distinct=false groupAll=false
     items[0]: select-item
       expr: call distinct=false
         name: name
@@ -291,7 +291,7 @@ script
         args[0]: name
           parts[0]: ident name="t" quoted=false
           parts[1]: ident name="name" quoted=false
-  statements[13]: select distinct=false
+  statements[13]: select distinct=false groupAll=false
     items[0]: select-item
       expr: call distinct=false
         name: name
@@ -320,7 +320,7 @@ script
           parts[0]: ident name="x" quoted=false
         over: window-spec
           base: ident name="w" quoted=false
-  statements[14]: select distinct=false
+  statements[14]: select distinct=false groupAll=false
     items[0]: select-item
       expr: call distinct=false
         name: name
@@ -346,21 +346,21 @@ script
           frame: frame unit="range"
             from: frame-bound type="unbounded-preceding"
             to: frame-bound type="unbounded-following"
-  statements[15]: select distinct=false
+  statements[15]: select distinct=false groupAll=false
     items[0]: select-item
       expr: exists
-        query: select distinct=false
+        query: select distinct=false groupAll=false
           items[0]: select-item
             expr: number text="1"
     items[1]: select-item
       expr: unary op="NOT"
         arg: exists
-          query: select distinct=false
+          query: select distinct=false groupAll=false
             items[0]: select-item
               expr: number text="1"
     items[2]: select-item
       expr: scalar-query
-        query: select distinct=false
+        query: select distinct=false groupAll=false
           items[0]: select-item
             expr: call distinct=false
               name: name

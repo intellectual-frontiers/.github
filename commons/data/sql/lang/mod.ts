@@ -27,7 +27,11 @@ export { ANSI_LEXICAL, ansi } from "./ansi.ts";
 export type * from "./ast.ts";
 export {
   type Attachment,
+  type AttachedTo,
   attachComments,
+  attachTree,
+  type Ranged,
+  type TableOf,
   type CommentTable,
   commentsOf,
   NO_COMMENTS,
@@ -38,7 +42,17 @@ export { type SexpOptions, toSexp } from "./dump.ts";
 export { describeParseError, type ParseError, spanOf } from "./errors.ts";
 export { build } from "./build.ts";
 export { ANSI_GRAMMAR, type CustomOperator, type Grammar, Prec, RESERVED_WORDS } from "./grammar.ts";
-export { type ParseOptions, type Parsed, parse, parseStrict } from "./parser.ts";
+export {
+  type Fragment,
+  type ParseOptions,
+  type Parsed,
+  parse,
+  parseExpressionRange,
+  parseStatementRange,
+  parseStrict,
+  parseTypeRange,
+  type StatementRangeOptions,
+} from "./parser.ts";
 export { type Rules, rewriteExpr, rewriteQuery, rewriteScript, rewriteSource, rewriteStatement } from "./rewrite.ts";
 export { children, findAll, fold, type Visitor, walk } from "./walk.ts";
 export { type Comment, CommentFlag, type Comments, type CommentStyle, allComments, commentAt, commentCount } from "./comment.ts";

@@ -81,6 +81,7 @@ export function children(n: Node): readonly Node[] {
       break;
     case "cast":
       out.push(n.arg, n.type);
+      opt(out, n.format);
       break;
     case "extract":
       out.push(n.arg);
@@ -94,6 +95,8 @@ export function children(n: Node): readonly Node[] {
     case "call":
       out.push(n.name);
       all(out, n.args);
+      all(out, n.orderBy);
+      all(out, n.withinGroup);
       opt(out, n.filter);
       opt(out, n.over);
       break;
@@ -124,6 +127,9 @@ export function children(n: Node): readonly Node[] {
       all(out, n.orderBy);
       opt(out, n.frame);
       break;
+    case "window-def":
+      out.push(n.name, n.spec);
+      break;
     case "order-item":
       out.push(n.expr);
       break;
@@ -132,11 +138,14 @@ export function children(n: Node): readonly Node[] {
       opt(out, n.alias);
       break;
     case "select":
+      all(out, n.distinctOn);
       all(out, n.items);
       all(out, n.from);
       opt(out, n.where);
       all(out, n.groupBy);
       opt(out, n.having);
+      all(out, n.windows);
+      opt(out, n.qualify);
       all(out, n.orderBy);
       opt(out, n.limit);
       opt(out, n.offset);
@@ -181,6 +190,7 @@ export function children(n: Node): readonly Node[] {
       out.push(n.left, n.right);
       opt(out, n.on);
       all(out, n.using);
+      opt(out, n.alias);
       break;
     case "insert":
       out.push(n.table);
@@ -245,6 +255,21 @@ export function children(n: Node): readonly Node[] {
       out.push(n.table);
       all(out, n.items);
       opt(out, n.where);
+      break;
+    case "routine-param":
+      opt(out, n.name);
+      out.push(n.type);
+      opt(out, n.default);
+      break;
+    case "routine-body":
+      opt(out, n.expr);
+      break;
+    case "create-routine":
+      out.push(n.name);
+      all(out, n.params);
+      opt(out, n.returns);
+      all(out, n.table);
+      opt(out, n.body);
       break;
     case "create-view":
       out.push(n.name);

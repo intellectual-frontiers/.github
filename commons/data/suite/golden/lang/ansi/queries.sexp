@@ -1,5 +1,5 @@
 script
-  statements[0]: select distinct=true
+  statements[0]: select distinct=true groupAll=false
     items[0]: select-item
       expr: name
         parts[0]: ident name="a" quoted=false
@@ -45,7 +45,7 @@ script
         parts[0]: ident name="b" quoted=false
     limit: number text="10"
     offset: number text="5"
-  statements[1]: select distinct=false
+  statements[1]: select distinct=false groupAll=false
     items[0]: select-item
       expr: name
         parts[0]: ident name="a" quoted=false
@@ -86,18 +86,18 @@ script
       right: table
         name: name
           parts[0]: ident name="t7" quoted=false
-  statements[2]: select distinct=false
+  statements[2]: select distinct=false groupAll=false
     items[0]: select-item
       expr: star
     from[0]: subquery lateral=false
-      query: select distinct=false
+      query: select distinct=false groupAll=false
         items[0]: select-item
           expr: number text="1"
           alias: ident name="a" quoted=false
       alias: alias
         name: ident name="s" quoted=false
     from[1]: subquery lateral=true
-      query: select distinct=false
+      query: select distinct=false groupAll=false
         items[0]: select-item
           expr: name
             parts[0]: ident name="s" quoted=false
@@ -115,37 +115,37 @@ script
         columns[0]: ident name="n" quoted=false
   statements[3]: set-op op="except" quantifier="all"
     left: set-op op="union"
-      left: select distinct=false
+      left: select distinct=false groupAll=false
         items[0]: select-item
           expr: number text="1"
       right: set-op op="intersect"
-        left: select distinct=false
+        left: select distinct=false groupAll=false
           items[0]: select-item
             expr: number text="2"
-        right: select distinct=false
+        right: select distinct=false groupAll=false
           items[0]: select-item
             expr: number text="3"
-    right: select distinct=false
+    right: select distinct=false groupAll=false
       items[0]: select-item
         expr: number text="4"
   statements[4]: set-op op="union" quantifier="all"
-    left: select distinct=false
+    left: select distinct=false groupAll=false
       items[0]: select-item
         expr: number text="1"
-    right: select distinct=false
+    right: select distinct=false groupAll=false
       items[0]: select-item
         expr: number text="2"
     orderBy[0]: order-item
       expr: number text="1"
     limit: number text="5"
   statements[5]: set-op op="union"
-    left: select distinct=false
+    left: select distinct=false groupAll=false
       items[0]: select-item
         expr: number text="1"
       orderBy[0]: order-item
         expr: number text="1"
       limit: number text="1"
-    right: select distinct=false
+    right: select distinct=false groupAll=false
       items[0]: select-item
         expr: number text="2"
   statements[6]: with recursive=true
@@ -153,10 +153,10 @@ script
       name: ident name="t" quoted=false
       columns[0]: ident name="n" quoted=false
       query: set-op op="union" quantifier="all"
-        left: select distinct=false
+        left: select distinct=false groupAll=false
           items[0]: select-item
             expr: number text="1"
-        right: select distinct=false
+        right: select distinct=false groupAll=false
           items[0]: select-item
             expr: binary op="+"
               left: name
@@ -169,7 +169,7 @@ script
             left: name
               parts[0]: ident name="n" quoted=false
             right: number text="5"
-    body: select distinct=false
+    body: select distinct=false groupAll=false
       items[0]: select-item
         expr: name
           parts[0]: ident name="n" quoted=false
@@ -179,7 +179,7 @@ script
   statements[7]: with recursive=false
     ctes[0]: cte
       name: ident name="a" quoted=false
-      query: select distinct=false
+      query: select distinct=false groupAll=false
         items[0]: select-item
           expr: number text="1"
     ctes[1]: cte
@@ -190,7 +190,7 @@ script
         rows[0]: tuple
           items[0]: number text="1"
           items[1]: number text="2"
-    body: select distinct=false
+    body: select distinct=false groupAll=false
       items[0]: select-item
         expr: star
       from[0]: table
@@ -206,7 +206,7 @@ script
     rows[1]: tuple
       items[0]: number text="2"
       items[1]: string value="b" prefix=""
-  statements[9]: select distinct=false
+  statements[9]: select distinct=false groupAll=false
     items[0]: select-item
       expr: name
         parts[0]: ident name="a" quoted=false
@@ -214,7 +214,7 @@ script
       name: name
         parts[0]: ident name="t" quoted=false
     limit: number text="3"
-  statements[10]: select distinct=false
+  statements[10]: select distinct=false groupAll=false
     items[0]: select-item
       expr: name
         parts[0]: ident name="a" quoted=false
@@ -223,7 +223,7 @@ script
         parts[0]: ident name="t" quoted=false
     limit: number text="5"
     offset: number text="2"
-  statements[11]: select distinct=false
+  statements[11]: select distinct=false groupAll=false
     items[0]: select-item
       expr: name
         parts[0]: ident name="t" quoted=false

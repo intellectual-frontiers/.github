@@ -91,7 +91,7 @@ script
       parts[0]: ident name="v" quoted=false
     columns[0]: ident name="a" quoted=false
     columns[1]: ident name="b" quoted=false
-    query: select distinct=false
+    query: select distinct=false groupAll=false
       items[0]: select-item
         expr: number text="1"
       items[1]: select-item
@@ -102,10 +102,10 @@ script
     query: with recursive=false
       ctes[0]: cte
         name: ident name="c" quoted=false
-        query: select distinct=false
+        query: select distinct=false groupAll=false
           items[0]: select-item
             expr: number text="1"
-      body: select distinct=false
+      body: select distinct=false groupAll=false
         items[0]: select-item
           expr: star
         from[0]: table

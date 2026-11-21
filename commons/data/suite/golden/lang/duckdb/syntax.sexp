@@ -1,5 +1,5 @@
 script
-  statements[0]: select distinct=false
+  statements[0]: select distinct=false groupAll=false
     items[0]: select-item
       expr: operator op="//"
         left: name
@@ -11,7 +11,7 @@ script
         left: number text="2"
         right: number text="3"
     items[2]: select-item
-      expr: cast
+      expr: cast try=false
         arg: name
           parts[0]: ident name="a" quoted=false
         type: data-type name="INT"
@@ -37,7 +37,7 @@ script
     from[0]: table
       name: name
         parts[0]: ident name="t" quoted=false
-  statements[1]: select distinct=false
+  statements[1]: select distinct=false groupAll=false
     items[0]: select-item
       expr: call distinct=false
         name: name

@@ -315,9 +315,38 @@ function scanComment(
  *
  * @param text - SQL, in any dialect
  * @param lx - how that dialect is written, compiled
+ * @param from - where to begin, 0 by default; the tokens, comments and errors have offsets of the whole text
+ * @param to - where to end, the end of the text by default
  * @returns its tokens (the last is the end of the text), its comments and what it holds that the dialect cannot read
  */
-export function lex(text: string, lx: CompiledLexical): Lexed {
+export function lex(text: string, lx: CompiledLexical, from = 0, to = text.length): Lexed {
+  if (from === 0 && to >= text.length) return lexWhole(text, lx);
+  // a range of a text: lexed alone and moved to its place, so that every offset is an offset of the whole text
+  const l = lexWhole(text.slice(from, to), lx);
+  const shift = (xs: readonly number[]): number[] => xs.map((x) => x + from);
+  const span = (s: Span): Span => ({ start: s.start + from, end: s.end + from });
+  const errors = l.errors.map((e): LexError =>
+    e.kind === "unexpected-character" ? { ...e, span: span(e.span) } : { ...e, span: span(e.span) },
+  );
+  const c = l.comments;
+  return {
+    text,
+    tokens: { kind: l.tokens.kind, start: shift(l.tokens.start), end: shift(l.tokens.end), id: l.tokens.id },
+    comments: {
+      style: c.style,
+      marker: c.marker,
+      start: shift(c.start),
+      end: shift(c.end),
+      innerStart: shift(c.innerStart),
+      innerEnd: shift(c.innerEnd),
+      before: c.before,
+      flags: c.flags,
+    },
+    errors,
+  };
+}
+
+function lexWhole(text: string, lx: CompiledLexical): Lexed {
   const n = text.length;
   const kind: TokKind[] = [];
   const start: number[] = [];

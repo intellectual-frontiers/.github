@@ -45,6 +45,8 @@ import type {
   PrimaryKey,
   Query,
   Reference,
+  RoutineBody,
+  RoutineParam,
   Script,
   SelectItem,
   Source,
@@ -54,6 +56,7 @@ import type {
   Tuple,
   Unique,
   When,
+  WindowDef,
   WindowSpec,
 } from "./ast.ts";
 
@@ -177,7 +180,8 @@ class Rewriter {
       case "cast": {
         const arg = this.expr(e.arg);
         const type = this.dataType(e.type);
-        return arg === e.arg && type === e.type ? e : { ...e, arg, type };
+        const format = opt(e.format, (x) => this.expr(x));
+        return arg === e.arg && type === e.type && format === e.format ? e : { ...e, arg, type, format };
       }
       case "extract": {
         const arg = this.expr(e.arg);
@@ -239,9 +243,18 @@ class Rewriter {
   private call(c: Call): Call {
     const name = this.name(c.name);
     const args = mapList(c.args, (a) => this.arg(a));
+    const orderBy = mapList(c.orderBy, (x) => this.orderItem(x));
+    const withinGroup = mapList(c.withinGroup, (x) => this.orderItem(x));
     const filter = opt(c.filter, (x) => this.expr(x));
     const over = opt(c.over, (w) => this.windowSpec(w));
-    return name === c.name && args === c.args && filter === c.filter && over === c.over ? c : { ...c, name, args, filter, over };
+    return name === c.name &&
+      args === c.args &&
+      orderBy === c.orderBy &&
+      withinGroup === c.withinGroup &&
+      filter === c.filter &&
+      over === c.over
+      ? c
+      : { ...c, name, args, orderBy, withinGroup, filter, over };
   }
 
   private windowSpec(w: WindowSpec): WindowSpec {
@@ -252,6 +265,12 @@ class Rewriter {
     return base === w.base && partitionBy === w.partitionBy && orderBy === w.orderBy && frame === w.frame
       ? w
       : { ...w, base, partitionBy, orderBy, frame };
+  }
+
+  private windowDef(d: WindowDef): WindowDef {
+    const name = this.ident(d.name);
+    const spec = this.windowSpec(d.spec);
+    return name === d.name && spec === d.spec ? d : { ...d, name, spec };
   }
 
   private frame(f: Frame): Frame {
@@ -291,24 +310,30 @@ class Rewriter {
   private queryChildren(q: Query): Query {
     switch (q.kind) {
       case "select": {
+        const distinctOn = mapList(q.distinctOn, (x) => this.expr(x));
         const items = mapList(q.items, (x) => this.selectItem(x));
         const from = mapList(q.from, (x) => this.source(x));
         const where = opt(q.where, (x) => this.expr(x));
         const groupBy = mapList(q.groupBy, (x) => this.expr(x));
         const having = opt(q.having, (x) => this.expr(x));
+        const windows = mapList(q.windows, (x) => this.windowDef(x));
+        const qualify = opt(q.qualify, (x) => this.expr(x));
         const orderBy = mapList(q.orderBy, (x) => this.orderItem(x));
         const limit = opt(q.limit, (x) => this.expr(x));
         const offset = opt(q.offset, (x) => this.expr(x));
-        return items === q.items &&
+        return distinctOn === q.distinctOn &&
+          items === q.items &&
           from === q.from &&
           where === q.where &&
           groupBy === q.groupBy &&
           having === q.having &&
+          windows === q.windows &&
+          qualify === q.qualify &&
           orderBy === q.orderBy &&
           limit === q.limit &&
           offset === q.offset
           ? q
-          : { ...q, items, from, where, groupBy, having, orderBy, limit, offset };
+          : { ...q, distinctOn, items, from, where, groupBy, having, windows, qualify, orderBy, limit, offset };
       }
       case "set-op": {
         const left = this.query(q.left);
@@ -371,7 +396,10 @@ class Rewriter {
         const right = this.source(s.right);
         const on = opt(s.on, (x) => this.expr(x));
         const using = mapList(s.using, (x) => this.ident(x));
-        return left === s.left && right === s.right && on === s.on && using === s.using ? s : { ...s, left, right, on, using };
+        const alias = opt(s.alias, (x) => this.alias(x));
+        return left === s.left && right === s.right && on === s.on && using === s.using && alias === s.alias
+          ? s
+          : { ...s, left, right, on, using, alias };
       }
       default:
         return absurd(s);
@@ -451,12 +479,34 @@ class Rewriter {
         const names = mapList(s.names, (x) => this.name(x));
         return names === s.names ? s : { ...s, names };
       }
+      case "create-routine": {
+        const name = this.name(s.name);
+        const params = mapList(s.params, (x) => this.routineParam(x));
+        const returns = opt(s.returns, (x) => this.dataType(x));
+        const table = mapList(s.table, (x) => this.columnDef(x));
+        const body = opt(s.body, (x) => this.routineBody(x));
+        return name === s.name && params === s.params && returns === s.returns && table === s.table && body === s.body
+          ? s
+          : { ...s, name, params, returns, table, body };
+      }
       case "unparsed":
       case "command":
         return s;
       default:
         return absurd(s);
     }
+  }
+
+  private routineParam(p: RoutineParam): RoutineParam {
+    const name = opt(p.name, (x) => this.ident(x));
+    const type = this.dataType(p.type);
+    const def = opt(p.default, (x) => this.expr(x));
+    return name === p.name && type === p.type && def === p.default ? p : { ...p, name, type, default: def };
+  }
+
+  private routineBody(b: RoutineBody): RoutineBody {
+    const expr = opt(b.expr, (x) => this.expr(x));
+    return expr === b.expr ? b : { ...b, expr };
   }
 
   private assignment(a: Assignment): Assignment {

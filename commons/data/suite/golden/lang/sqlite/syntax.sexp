@@ -1,5 +1,5 @@
 script
-  statements[0]: select distinct=false
+  statements[0]: select distinct=false groupAll=false
     items[0]: select-item
       expr: operator op="=="
         left: name
@@ -38,7 +38,7 @@ script
     from[0]: table
       name: name
         parts[0]: ident name="t" quoted=false
-  statements[1]: select distinct=false
+  statements[1]: select distinct=false groupAll=false
     items[0]: select-item
       expr: param style="question" text="?"
     items[1]: select-item

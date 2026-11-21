@@ -80,12 +80,12 @@ proves(
     const child = defineDialect({
       name: "child",
       extends: ansi,
-      lexical: (b) => ({ ...b, keywords: [...b.keywords, "QUALIFY"], comments: [...b.comments, { kind: "line", marker: "#" }] }),
+      lexical: (b) => ({ ...b, keywords: [...b.keywords, "FOOBAR"], comments: [...b.comments, { kind: "line", marker: "#" }] }),
     });
     assert(child.kind === "ok");
     assert(child.value.parent === ansi);
-    assertEquals(child.value.lexical.keywords.includes("QUALIFY"), true);
-    assertEquals(ansi.lexical.keywords.includes("QUALIFY"), false, "the parent is untouched");
+    assertEquals(child.value.lexical.keywords.includes("FOOBAR"), true);
+    assertEquals(ansi.lexical.keywords.includes("FOOBAR"), false, "the parent is untouched");
     const grand = defineDialect({
       name: "grand",
       extends: child.value,
@@ -93,7 +93,7 @@ proves(
     });
     assert(grand.kind === "ok");
     assert(grand.value.parent === child.value);
-    assertEquals(grand.value.lexical.keywords.includes("QUALIFY"), true, "what it does not touch it inherits");
+    assertEquals(grand.value.lexical.keywords.includes("FOOBAR"), true, "what it does not touch it inherits");
     assertEquals(lex("a -- b\n# c", grand.value.compiled).comments.marker, ["#"], "-- was removed");
     assertEquals(textsOf(grand.value, "a<=>b a<=b"), ["a", "<=>", "b", "a", "<", "=", "b"], "operators were replaced");
     const none = defineDialect({ name: "", lexical: (l) => l });

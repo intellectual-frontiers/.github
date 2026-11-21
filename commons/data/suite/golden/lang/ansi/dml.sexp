@@ -30,7 +30,7 @@ script
     table: name
       parts[0]: ident name="t" quoted=false
     columns[0]: ident name="a" quoted=false
-    source: select distinct=false
+    source: select distinct=false groupAll=false
       items[0]: select-item
         expr: name
           parts[0]: ident name="a" quoted=false
@@ -86,7 +86,7 @@ script
     where: in-query negated=false
       arg: name
         parts[0]: ident name="a" quoted=false
-      query: select distinct=false
+      query: select distinct=false groupAll=false
         items[0]: select-item
           expr: name
             parts[0]: ident name="a" quoted=false

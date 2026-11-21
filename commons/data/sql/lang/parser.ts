@@ -45,6 +45,8 @@ import type {
   OrderItem,
   Query,
   RefAction,
+  RoutineBody,
+  RoutineParam,
   Reference,
   Script,
   Select,
@@ -56,6 +58,7 @@ import type {
   TableConstraint,
   TableRef,
   Tuple,
+  WindowDef,
   WindowSpec,
 } from "./ast.ts";
 import { attachComments, type CommentTable, NO_COMMENTS } from "./attach.ts";
@@ -68,6 +71,85 @@ import { type CompiledLexical, keywordId, operatorId, type ParamStyle } from "./
 import { Tok, type TokKind } from "./token.ts";
 
 const MAX_DEPTH = 200;
+
+/** What a read of a range of a text gives: the node, the errors, and the comments of the range, all with offsets of the whole text. */
+export interface Fragment<T> {
+  readonly node: T | undefined;
+  readonly errors: readonly ParseError[];
+  readonly comments: readonly Comment[];
+}
+
+function readRange<T>(
+  text: string,
+  dialect: Dialect,
+  from: number,
+  to: number,
+  skip: readonly (readonly [number, number])[],
+  read: (p: Parser) => T,
+): Fragment<T> {
+  const lexed = lex(text, dialect.compiled, from, to);
+  let tokens = lexed.tokens;
+  if (skip.length > 0) {
+    const keep = tokens.start.map((st, i) => (i === tokens.start.length - 1 ? true : !skip.some(([a, b]) => st >= a && st < b)));
+    const pick = <U>(xs: readonly U[]): U[] => xs.filter((_, i) => keep[i] === true);
+    tokens = { kind: pick(tokens.kind), start: pick(tokens.start), end: pick(tokens.end), id: pick(tokens.id) };
+  }
+  const errors: ParseError[] = lexed.errors.map((error): ParseError => ({ kind: "lex", error }));
+  let node: T | undefined;
+  try {
+    node = read(new Parser(text, tokens, dialect));
+  } catch (e) {
+    if (!(e instanceof Failure)) throw e;
+    errors.push(e.error);
+  }
+  return { node, errors, comments: allComments(lexed.comments, text) };
+}
+
+/**
+ * Reads a range of a text as one expression, with offsets of the whole text (commons data 0070-sql-routines FR-006).
+ *
+ * @param text - the whole text
+ * @param dialect - how it is written
+ * @param from - where the range begins
+ * @param to - where it ends
+ * @returns the expression, the errors and the comments; it does not throw
+ */
+export function parseExpressionRange(text: string, dialect: Dialect, from: number, to: number): Fragment<Expr> {
+  return readRange(text, dialect, from, to, [], (p) => p.fragmentExpression());
+}
+
+/** What {@link parseStatementRange} may be given. */
+export interface StatementRangeOptions {
+  /** Whether the range is a `PERFORM`: a select that begins at its select list, with no `SELECT`. */
+  readonly perform?: boolean;
+  /** Ranges of the text whose tokens are left out, which is how the `INTO` of a statement is taken out of it. */
+  readonly skip?: readonly (readonly [number, number])[];
+}
+
+/**
+ * Reads a range of a text as one statement, with offsets of the whole text (commons data 0070-sql-routines FR-006).
+ *
+ * @param text - the whole text
+ * @param dialect - how it is written
+ * @param from - where the range begins
+ * @param to - where it ends
+ * @param options - whether it is a `PERFORM`, and what to leave out
+ * @returns the statement, the errors and the comments; it does not throw
+ */
+export function parseStatementRange(
+  text: string,
+  dialect: Dialect,
+  from: number,
+  to: number,
+  options: StatementRangeOptions = {},
+): Fragment<Statement> {
+  return readRange(text, dialect, from, to, options.skip ?? [], (p) => p.fragmentStatement(options.perform === true));
+}
+
+/** Reads a range of a text as one data type, with offsets of the whole text. */
+export function parseTypeRange(text: string, dialect: Dialect, from: number, to: number): Fragment<DataType> {
+  return readRange(text, dialect, from, to, [], (p) => p.fragmentType());
+}
 
 /** What a parse gives. */
 export interface Parsed {
@@ -206,6 +288,18 @@ const kw = (lx: CompiledLexical) => {
     HOUR: k("HOUR"),
     MINUTE: k("MINUTE"),
     SECOND: k("SECOND"),
+    FOR: k("FOR"),
+    WINDOW: k("WINDOW"),
+    WITHIN: k("WITHIN"),
+    GROUPING: k("GROUPING"),
+    SETS: k("SETS"),
+    QUALIFY: k("QUALIFY"),
+    FORMAT: k("FORMAT"),
+    OTHERS: k("OTHERS"),
+    EXCLUDE: k("EXCLUDE"),
+    TIES: k("TIES"),
+    ANY: k("ANY"),
+    SOME: k("SOME"),
   } as const;
 };
 type Kw = ReturnType<typeof kw>;
@@ -260,7 +354,7 @@ const TYPE_WORDS: ReadonlySet<string> = new Set([
 ]);
 /** The words that begin a statement the grammar keeps as a command. */
 const COMMAND_WORDS: ReadonlySet<string> = new Set(
-  "SET SHOW EXPLAIN DESCRIBE DESC ANALYZE ANALYSE GRANT REVOKE USE PRAGMA BEGIN START COMMIT ROLLBACK SAVEPOINT RELEASE TRUNCATE COPY VACUUM CALL EXEC EXECUTE DECLARE IF WHILE LOAD ATTACH DETACH INSTALL EXPORT IMPORT COMMENT LOCK UNLOCK REFRESH REINDEX CLUSTER CHECKPOINT RESET DISCARD DO LISTEN NOTIFY PREPARE DEALLOCATE FETCH OPTIMIZE MERGE UNSET UNDROP RENAME SYSTEM".split(
+  "SET SHOW EXPLAIN DESCRIBE DESC ANALYZE ANALYSE GRANT REVOKE USE PRAGMA BEGIN START COMMIT ROLLBACK SAVEPOINT RELEASE TRUNCATE COPY VACUUM CALL EXEC EXECUTE DECLARE IF WHILE LOAD ATTACH DETACH INSTALL EXPORT IMPORT COMMENT LOCK UNLOCK REFRESH REINDEX CLUSTER CHECKPOINT RESET DISCARD DO LISTEN NOTIFY PREPARE DEALLOCATE FETCH OPTIMIZE MERGE UNSET UNDROP RENAME SYSTEM END ABORT CLOSE MOVE OPEN".split(
     " ",
   ),
 );
@@ -272,6 +366,28 @@ const OBJECT_MODIFIERS: ReadonlySet<string> = new Set(
 );
 /** The words that may stand between `CREATE` and `TABLE`. */
 const TABLE_MODIFIERS: ReadonlySet<string> = new Set("TEMP TEMPORARY GLOBAL LOCAL UNLOGGED TRANSIENT VOLATILE EXTERNAL".split(" "));
+/** The words after `BEGIN` that make it a transaction and not a block. */
+const TXN_WORDS: ReadonlySet<string> = new Set("TRANSACTION WORK DEFERRED IMMEDIATE EXCLUSIVE ISOLATION READ NOT TRAN".split(" "));
+/** The words after `DECLARE` (or its first name) that make it a cursor and not the declarations of a block. */
+const CURSOR_WORDS: ReadonlySet<string> = new Set("CURSOR BINARY INSENSITIVE ASENSITIVE SCROLL NO".split(" "));
+/** The words after `END` that close a kind of block and open nothing. */
+const END_QUALIFIERS: ReadonlySet<string> = new Set("IF LOOP CASE WHILE REPEAT FOR TRY CATCH".split(" "));
+/** What may stand before an `IF` that begins a statement. */
+const BLOCK_PREV: ReadonlySet<string> = new Set([";", "THEN", "ELSE", "ELSIF", "ELSEIF", "BEGIN", "LOOP", ">>", "DO", "REPEAT", "ATOMIC"]);
+/** The objects whose `CREATE` has a body of statements. */
+const PROCEDURAL_OBJECTS: ReadonlySet<string> = new Set("FUNCTION PROCEDURE TRIGGER PACKAGE EVENT".split(" "));
+/** The objects that a `CREATE` that is not procedural makes, which end the search for a procedural one. */
+const PLAIN_OBJECTS: ReadonlySet<string> = new Set(
+  "TABLE VIEW INDEX SEQUENCE TYPE DATABASE SCHEMA ROLE USER EXTENSION DOMAIN COLLATION STAGE WAREHOUSE".split(" "),
+);
+/** The words that, after the first word of a parameter, show that the first word is a type and the parameter has no name. */
+const ROUTINE_CONTINUATION: ReadonlySet<string> = new Set(["PRECISION", "VARYING", "WITH", "WITHOUT", "ZONE"]);
+/** The words that begin a statement and not the declaration of a variable: before a `BEGIN`, they show that a `DECLARE` is a statement of its own. */
+const NOT_DECLARATIONS: ReadonlySet<string> = new Set(
+  "DECLARE SELECT INSERT UPDATE DELETE CREATE DROP ALTER SET WITH CALL EXEC EXECUTE USE SHOW EXPLAIN GRANT TRUNCATE COPY VALUES MERGE".split(
+    " ",
+  ),
+);
 const STYLES: readonly ParamStyle[] = ["question", "question", "dollar-number", "dollar-name", "colon-name", "at-name"];
 const ESCAPES: Readonly<Record<string, string>> = { n: "\n", t: "\t", r: "\r", "0": "\0", b: "\b", f: "\f", v: "\v" };
 
@@ -329,6 +445,8 @@ class Parser {
   private readonly wordOps: ReadonlyMap<number, Infix>;
   private i = 0;
   private depth = 0;
+  /** Set for `PERFORM`: the query begins at the select list, with no `SELECT`. */
+  private skipSelect = false;
   readonly errors: ParseError[] = [];
 
   constructor(
@@ -527,7 +645,7 @@ class Parser {
           if (Prec.Cast < min) break;
           this.i++;
           const type = this.dataType(true);
-          left = { kind: "cast", start: s, end: this.last(), arg: left, type };
+          left = { kind: "cast", start: s, end: this.last(), arg: left, type, try: false, format: undefined };
           continue;
         }
         const info = this.infix[oid];
@@ -718,13 +836,14 @@ class Parser {
         this.expectKind(Tok.RBracket, "]");
         return { kind: "array", start: s, end: this.last(), items };
       }
-      if (w === K.CAST && paren) {
+      if (paren && (w === K.CAST || this.isTryCast(w))) {
         this.i += 2;
         const arg = this.expr(0);
         this.expect(K.AS, "AS");
         const type = this.dataType(true);
+        const format = this.eat(K.FORMAT) ? this.expr(0) : undefined;
         this.expectKind(Tok.RParen, ")");
-        return { kind: "cast", start: s, end: this.last(), arg, type };
+        return { kind: "cast", start: s, end: this.last(), arg, type, try: w !== K.CAST, format };
       }
       if (w === K.EXTRACT && paren) {
         this.i += 2;
@@ -769,6 +888,15 @@ class Parser {
     return name;
   }
 
+  /** Whether the word at the cursor is `TRY_CAST` or `SAFE_CAST`, which are not keywords. */
+  private isTryCast(w: number): boolean {
+    if (w !== 0) return false;
+    const n = (this.ends[this.i] ?? 0) - (this.starts[this.i] ?? 0);
+    if (n !== 8 && n !== 9) return false;
+    const t = this.slice().toUpperCase();
+    return t === "TRY_CAST" || t === "SAFE_CAST";
+  }
+
   private isIntervalUnit(w: number): boolean {
     const K = this.K;
     return w === K.YEAR || w === K.MONTH || w === K.DAY || w === K.HOUR || w === K.MINUTE || w === K.SECOND;
@@ -807,7 +935,14 @@ class Parser {
       else this.eat(K.ALL);
       args.push(...this.commaList(() => this.argument()));
     }
+    const orderBy = this.orderByClause();
     this.expectKind(Tok.RParen, ")");
+    let withinGroup: OrderItem[] = [];
+    if (this.at(K.WITHIN) && this.at(K.GROUP, 1) && this.kind(2) === Tok.LParen) {
+      this.i += 3;
+      withinGroup = this.orderByClause();
+      this.expectKind(Tok.RParen, ")");
+    }
     let filter: Expr | undefined;
     if (this.at(K.FILTER) && this.kind(1) === Tok.LParen) {
       this.i += 2;
@@ -820,7 +955,7 @@ class Parser {
       this.i++;
       over = this.kind() === Tok.LParen ? this.windowSpec() : this.namedWindow();
     }
-    return { kind: "call", start: name.start, end: this.last(), name, args, distinct, filter, over };
+    return { kind: "call", start: name.start, end: this.last(), name, args, distinct, orderBy, withinGroup, filter, over };
   }
 
   private argument(): Argument {
@@ -841,6 +976,11 @@ class Parser {
       const s = this.start();
       this.i++;
       return { kind: "star", start: s, end: this.last(), qualifier: undefined };
+    }
+    if (this.atQuery()) {
+      const s = this.start();
+      const query = this.query();
+      return { kind: "scalar-query", start: s, end: this.last(), query };
     }
     return this.expr(0);
   }
@@ -879,10 +1019,26 @@ class Parser {
       const from = this.frameBound();
       this.expect(K.AND, "AND");
       const to = this.frameBound();
-      return { kind: "frame", start: s, end: this.last(), unit, from, to };
+      return { kind: "frame", start: s, end: this.last(), unit, from, to, exclude: this.frameExclude() };
     }
     const from = this.frameBound();
-    return { kind: "frame", start: s, end: this.last(), unit, from, to: undefined };
+    return { kind: "frame", start: s, end: this.last(), unit, from, to: undefined, exclude: this.frameExclude() };
+  }
+
+  private frameExclude(): string | undefined {
+    const K = this.K;
+    if (!this.eat(K.EXCLUDE)) return undefined;
+    if (this.eat(K.NO)) {
+      if (!this.eat(K.OTHERS)) this.fail("OTHERS");
+      return "NO OTHERS";
+    }
+    if (this.eat(K.CURRENT)) {
+      this.expect(K.ROW, "ROW");
+      return "CURRENT ROW";
+    }
+    if (this.eat(K.GROUP)) return "GROUP";
+    if (this.eat(K.TIES)) return "TIES";
+    return this.fail("NO OTHERS, CURRENT ROW, GROUP or TIES");
   }
 
   private frameBound(): FrameBound {
@@ -963,6 +1119,15 @@ class Parser {
         words.push(this.slice().toUpperCase());
         this.i++;
       } else break;
+    }
+    while (this.kind() === Tok.Dot && this.kind(1) === Tok.Word && words.length === 1) {
+      this.i++;
+      words[0] = `${words[0] ?? ""}.${this.slice().toUpperCase()}`;
+      this.i++;
+    }
+    if (this.atOp(operatorId(this.lx, "%") ?? -1) && (this.wordIs("TYPE", 1) || this.wordIs("ROWTYPE", 1))) {
+      words[words.length - 1] = `${words[words.length - 1] ?? ""}%${this.slice(1).toUpperCase()}`;
+      this.i += 2;
     }
     let name = words.join(" ");
     while (this.kind() === Tok.LBracket && this.kind(1) === Tok.RBracket) {
@@ -1088,7 +1253,7 @@ class Parser {
 
   private queryTerm(): Query {
     const K = this.K;
-    if (this.at(K.SELECT)) return this.selectCore();
+    if (this.skipSelect || this.at(K.SELECT)) return this.selectCore();
     if (this.at(K.VALUES)) return this.values();
     if (this.kind() === Tok.LParen && this.atQuery()) {
       this.i++;
@@ -1112,6 +1277,69 @@ class Parser {
     return { kind: "values", start: s, end: this.last(), rows };
   }
 
+  /** Whether the word at the cursor is the `QUALIFY` of a clause (and not a name): it is, unless something that ends an item follows it. */
+  private atQualify(): boolean {
+    if (!this.at(this.K.QUALIFY)) return false;
+    const k = this.kind(1);
+    return !(k === Tok.Comma || k === Tok.RParen || k === Tok.Semicolon || k === Tok.Eof);
+  }
+
+  /** Whether the token at the cursor can begin an expression (and so a list after `GROUP BY ALL`). */
+  private startsExpression(): boolean {
+    const k = this.kind();
+    if (k === Tok.Number || k === Tok.String || k === Tok.Param || k === Tok.LParen || k === Tok.QuotedIdent || k === Tok.LBracket)
+      return true;
+    if (k === Tok.Op) return this.id() === this.opMinus || this.id() === this.opPlus;
+    if (k !== Tok.Word) return false;
+    const K = this.K;
+    const w = this.id();
+    return !(
+      w === K.HAVING ||
+      w === K.ORDER ||
+      w === K.LIMIT ||
+      w === K.OFFSET ||
+      w === K.FETCH ||
+      w === K.UNION ||
+      w === K.INTERSECT ||
+      w === K.EXCEPT ||
+      w === K.WINDOW ||
+      w === K.QUALIFY ||
+      w === K.FOR
+    );
+  }
+
+  /** One item of `GROUP BY`: an expression, the empty grouping `()`, or `GROUPING SETS (...)` (a call of that name). */
+  private groupItem(): Expr {
+    const K = this.K;
+    const s = this.start();
+    if (this.kind() === Tok.LParen && this.kind(1) === Tok.RParen) {
+      this.i += 2;
+      return { kind: "tuple", start: s, end: this.last(), items: [] };
+    }
+    if (this.at(K.GROUPING) && this.at(K.SETS, 1) && this.kind(2) === Tok.LParen) {
+      this.i += 2;
+      const nameEnd = this.last();
+      const ident: Ident = { kind: "ident", start: s, end: nameEnd, name: "GROUPING SETS", quoted: false };
+      const name: Name = { kind: "name", start: s, end: nameEnd, parts: [ident] };
+      this.i++;
+      const args = this.commaList(() => this.groupItem());
+      this.expectKind(Tok.RParen, ")");
+      return {
+        kind: "call",
+        start: s,
+        end: this.last(),
+        name,
+        args,
+        distinct: false,
+        orderBy: [],
+        withinGroup: [],
+        filter: undefined,
+        over: undefined,
+      };
+    }
+    return this.expr(0);
+  }
+
   private selectItem(): SelectItem {
     const K = this.K;
     const s = this.start();
@@ -1122,35 +1350,68 @@ class Parser {
     } else expr = this.expr(0);
     let alias: Ident | undefined;
     if (this.eat(K.AS)) alias = this.ident(true);
-    else if (this.canBeIdent()) alias = this.ident();
+    else if (this.canBeIdent() && !this.atQualify()) alias = this.ident();
     return { kind: "select-item", start: s, end: this.last(), expr, alias };
   }
 
   private selectCore(): Select {
     const K = this.K;
     const s = this.start();
-    this.i++;
+    if (this.skipSelect) this.skipSelect = false;
+    else this.i++;
     const distinct = this.eat(K.DISTINCT);
+    let distinctOn: Expr[] = [];
+    if (distinct && this.at(K.ON) && this.kind(1) === Tok.LParen) {
+      this.i += 2;
+      distinctOn = this.commaList(() => this.expr(0));
+      this.expectKind(Tok.RParen, ")");
+    }
     if (!distinct) this.eat(K.ALL);
     const items = this.commaList(() => this.selectItem());
     const from = this.eat(K.FROM) ? this.commaList(() => this.joined()) : [];
     const where = this.eat(K.WHERE) ? this.expr(0) : undefined;
     let groupBy: Expr[] = [];
+    let groupAll = false;
     if (this.eat(K.GROUP)) {
       this.expect(K.BY, "BY");
-      groupBy = this.commaList(() => this.expr(0));
+      if (this.at(K.ALL)) {
+        groupAll = true;
+        this.i++;
+      }
+      if (!groupAll || this.startsExpression()) groupBy = this.commaList(() => this.groupItem());
     }
-    const having = this.eat(K.HAVING) ? this.expr(0) : undefined;
+    let having: Expr | undefined;
+    let qualify: Expr | undefined;
+    let windows: WindowDef[] = [];
+    for (;;) {
+      if (having === undefined && this.eat(K.HAVING)) having = this.expr(0);
+      else if (qualify === undefined && this.eat(K.QUALIFY)) qualify = this.expr(0);
+      else if (windows.length === 0 && this.at(K.WINDOW)) {
+        this.i++;
+        windows = this.commaList((): WindowDef => {
+          const ws = this.start();
+          const name = this.ident();
+          this.expect(K.AS, "AS");
+          if (this.kind() !== Tok.LParen) this.fail("(");
+          const spec = this.windowSpec();
+          return { kind: "window-def", start: ws, end: this.last(), name, spec };
+        });
+      } else break;
+    }
     return {
       kind: "select",
       start: s,
       end: this.last(),
       distinct,
+      distinctOn,
       items,
       from,
       where,
       groupBy,
+      groupAll,
       having,
+      windows,
+      qualify,
       orderBy: [],
       limit: undefined,
       offset: undefined,
@@ -1164,7 +1425,7 @@ class Parser {
     const s = this.start();
     let name: Ident;
     if (this.eat(K.AS)) name = this.ident(true);
-    else if (this.canBeIdent()) name = this.ident();
+    else if (this.canBeIdent() && !this.atQualify()) name = this.ident();
     else return undefined;
     const columns = this.kind() === Tok.LParen ? this.identList() : [];
     return { kind: "alias", start: s, end: this.last(), name, columns };
@@ -1188,16 +1449,26 @@ class Parser {
     }
     if (this.kind() === Tok.LParen) {
       if (this.atQuery(1)) {
-        this.i++;
-        const query = this.query();
-        this.expectKind(Tok.RParen, ")");
-        const alias = this.alias();
-        return { kind: "subquery", start: s, end: this.last(), query, alias, lateral };
+        const mark = this.i;
+        const depth = this.depth;
+        const nested = this.kind(1) === Tok.LParen;
+        try {
+          this.i++;
+          const query = this.query();
+          this.expectKind(Tok.RParen, ")");
+          const alias = this.alias();
+          return { kind: "subquery", start: s, end: this.last(), query, alias, lateral };
+        } catch (e) {
+          if (!(e instanceof Failure) || !nested) throw e;
+          this.i = mark;
+          this.depth = depth;
+        }
       }
       this.i++;
       const inner = this.joined();
       this.expectKind(Tok.RParen, ")");
-      return inner;
+      const alias = this.alias();
+      return alias === undefined ? inner : this.withAlias(inner, alias, s);
     }
     const name = this.qualifiedName();
     if (this.kind() === Tok.LParen) {
@@ -1208,6 +1479,22 @@ class Parser {
     }
     const alias = this.alias();
     return { kind: "table", start: s, end: this.last(), name, alias };
+  }
+
+  /** A parenthesized source with an alias: the alias goes on the source where the node has one, else it is kept by a subquery of the source's own text. */
+  private withAlias(inner: Source, alias: Alias, s: number): Source {
+    switch (inner.kind) {
+      case "join":
+        return { ...inner, start: s, end: this.last(), alias };
+      case "table":
+        return inner.alias === undefined ? { ...inner, start: s, end: this.last(), alias } : this.fail("an alias");
+      case "subquery":
+        return inner.alias === undefined ? { ...inner, start: s, end: this.last(), alias } : this.fail("an alias");
+      case "table-fn":
+        return inner.alias === undefined ? { ...inner, start: s, end: this.last(), alias } : this.fail("an alias");
+      default:
+        return absurd(inner);
+    }
   }
 
   private joined(): Source {
@@ -1232,7 +1519,7 @@ class Parser {
       let using: Ident[] = [];
       if (this.eat(K.ON)) on = this.expr(0);
       else if (this.eat(K.USING)) using = this.identList();
-      left = { kind: "join", start: s, end: this.last(), type: type ?? "inner", natural, left, right, on, using };
+      left = { kind: "join", start: s, end: this.last(), type: type ?? "inner", natural, left, right, on, using, alias: undefined };
     }
   }
 
@@ -1405,6 +1692,8 @@ class Parser {
       if (this.slice().toUpperCase().startsWith("TEMP")) temporary = true;
       this.i++;
     }
+    if (!unique && (this.wordIs("FUNCTION") || this.wordIs("PROCEDURE")))
+      return this.routine(s, orReplace, this.wordIs("FUNCTION") ? "function" : "procedure", first);
     if (this.eat(K.TABLE)) {
       const ifNotExists = this.ifNotExists();
       const name = this.qualifiedName();
@@ -1445,6 +1734,210 @@ class Parser {
     }
     this.i = first;
     return this.command();
+  }
+
+  private routineParam(): RoutineParam {
+    const s = this.start();
+    let mode: RoutineParam["mode"];
+    const m = this.kind() === Tok.Word ? this.slice().toUpperCase() : "";
+    if (m === "OUT" || m === "INOUT" || m === "VARIADIC" || m === "IN") {
+      mode = m === "OUT" ? "out" : m === "INOUT" ? "inout" : m === "VARIADIC" ? "variadic" : "in";
+      this.i++;
+      if (m === "IN" && this.wordIs("OUT")) {
+        mode = "inout";
+        this.i++;
+      }
+    }
+    const next = this.kind(1);
+    const typeOnly =
+      next === Tok.Comma ||
+      next === Tok.RParen ||
+      next === Tok.LParen ||
+      next === Tok.LBracket ||
+      next === Tok.Dot ||
+      next === Tok.Eof ||
+      (next === Tok.Word && (ROUTINE_CONTINUATION.has(this.slice(1).toUpperCase()) || this.at(this.K.DEFAULT, 1))) ||
+      (next === Tok.Op && this.id(1) === (operatorId(this.lx, "=") ?? -1));
+    const name = !typeOnly && this.canBeIdent() ? this.ident() : undefined;
+    const type = this.dataType(true);
+    let def: Expr | undefined;
+    if (this.eat(this.K.DEFAULT) || this.atOp(operatorId(this.lx, "=") ?? -1)) {
+      if (this.atOp(operatorId(this.lx, "=") ?? -1)) this.i++;
+      def = this.expr(0);
+    }
+    return { kind: "routine-param", start: s, end: this.last(), mode, name, type, default: def };
+  }
+
+  /** The body that follows `AS`: a string, two strings (an external routine), or a block. */
+  private bodyAfterAs(): RoutineBody {
+    const s = this.start();
+    if (this.kind() !== Tok.String) return this.blockBody();
+    const raw = this.slice();
+    const tag = this.id();
+    const { value } = stringValue(raw, this.lx, tag);
+    const start = this.starts[this.i] ?? 0;
+    const end = this.ends[this.i] ?? 0;
+    this.i++;
+    if (this.kind() === Tok.Comma && this.kind(1) === Tok.String) {
+      this.i += 2;
+      return {
+        kind: "routine-body",
+        start: s,
+        end: this.last(),
+        style: "external",
+        text: value,
+        bodyStart: start,
+        bodyEnd: end,
+        exact: false,
+        expr: undefined,
+      };
+    }
+    if (tag === 0) {
+      const tagLen = raw.indexOf("$", 1) + 1;
+      return {
+        kind: "routine-body",
+        start: s,
+        end: this.last(),
+        style: "dollar",
+        text: value,
+        bodyStart: start + tagLen,
+        bodyEnd: end - tagLen,
+        exact: true,
+        expr: undefined,
+      };
+    }
+    const syn = this.lx.lexical.strings[tag - 1];
+    const prefixLen = syn === undefined ? 0 : raw.indexOf(syn.open);
+    const open = syn?.open.length ?? 1;
+    const close = syn?.close.length ?? 1;
+    const bodyStart = start + prefixLen + open;
+    const bodyEnd = end - close;
+    return {
+      kind: "routine-body",
+      start: s,
+      end: this.last(),
+      style: "string",
+      text: value,
+      bodyStart,
+      bodyEnd,
+      exact: this.text.slice(bodyStart, bodyEnd) === value,
+      expr: undefined,
+    };
+  }
+
+  /** `BEGIN [ATOMIC] ... END`: the body is what is between them. */
+  private blockBody(): RoutineBody {
+    const s = this.start();
+    if (!this.wordIs("BEGIN")) this.fail("a body: AS, BEGIN or RETURN");
+    this.i++;
+    if (this.wordIs("ATOMIC")) this.i++;
+    const bodyStart = this.ends[this.i - 1] ?? 0;
+    this.scanBlocks(1, "end");
+    if (!this.wordIs("END")) this.fail("END");
+    const bodyEnd = this.starts[this.i] ?? 0;
+    this.i++;
+    return {
+      kind: "routine-body",
+      start: s,
+      end: this.last(),
+      style: "block",
+      text: this.text.slice(bodyStart, bodyEnd),
+      bodyStart,
+      bodyEnd,
+      exact: true,
+      expr: undefined,
+    };
+  }
+
+  /** `CREATE [OR REPLACE] FUNCTION | PROCEDURE name (parameters) ...` (0070-sql-routines FR-003, FR-004); a header that is not read is a command. */
+  private routine(s: number, orReplace: boolean, object: "function" | "procedure", first: number): Statement {
+    const K = this.K;
+    try {
+      this.i++;
+      this.ifNotExists();
+      const name = this.qualifiedName();
+      this.expectKind(Tok.LParen, "(");
+      const params = this.kind() === Tok.RParen ? [] : this.commaList(() => this.routineParam());
+      this.expectKind(Tok.RParen, ")");
+      let returns: DataType | undefined;
+      let setof = false;
+      let table: ColumnDef[] = [];
+      if (this.wordIs("RETURNS")) {
+        this.i++;
+        if (this.wordIs("SETOF")) {
+          setof = true;
+          this.i++;
+        }
+        if (this.at(K.TABLE)) {
+          this.i++;
+          this.expectKind(Tok.LParen, "(");
+          table = this.commaList(() => this.columnDef());
+          this.expectKind(Tok.RParen, ")");
+        } else returns = this.dataType(true);
+      }
+      let language: string | undefined;
+      let body: RoutineBody | undefined;
+      const options: string[] = [];
+      while (!this.atEnd() && this.kind() !== Tok.Semicolon) {
+        if (this.wordIs("LANGUAGE")) {
+          this.i++;
+          language = this.slice().toLowerCase();
+          if (language.startsWith("'") && language.endsWith("'") && language.length > 1) language = language.slice(1, -1);
+          this.i++;
+        } else if (this.at(K.AS)) {
+          this.i++;
+          body = this.bodyAfterAs();
+        } else if (this.wordIs("BEGIN")) body = this.blockBody();
+        else if (this.wordIs("RETURN")) {
+          const bs = this.start();
+          this.i++;
+          const e = this.expr(0);
+          body = {
+            kind: "routine-body",
+            start: bs,
+            end: this.last(),
+            style: "return",
+            text: this.text.slice(e.start, e.end),
+            bodyStart: e.start,
+            bodyEnd: e.end,
+            exact: true,
+            expr: e,
+          };
+        } else {
+          const from = this.i;
+          this.i++;
+          while (
+            !this.atEnd() &&
+            this.kind() !== Tok.Semicolon &&
+            !this.wordIs("LANGUAGE") &&
+            !this.at(K.AS) &&
+            !this.wordIs("BEGIN") &&
+            !this.wordIs("RETURN")
+          )
+            this.i++;
+          options.push(this.text.slice(this.starts[from] ?? 0, this.ends[this.i - 1] ?? 0));
+        }
+      }
+      return {
+        kind: "create-routine",
+        start: s,
+        end: this.last(),
+        object,
+        orReplace,
+        name,
+        params,
+        returns,
+        setof,
+        table,
+        language,
+        options: options.length === 0 ? undefined : options.join(" "),
+        body,
+      };
+    } catch (e) {
+      if (!(e instanceof Failure)) throw e;
+      this.i = first;
+      return this.command();
+    }
   }
 
   private ifNotExists(): boolean {
@@ -1540,9 +2033,142 @@ class Parser {
     return { kind: "drop", start: s, end: this.last(), object, ifExists, names, behavior };
   }
 
+  private wordIs(w: string, at = 0): boolean {
+    return this.kind(at) === Tok.Word && this.slice(at).toUpperCase() === w;
+  }
+
+  /** Whether a `THEN` stands before the next `;`, from `at` tokens after the cursor. */
+  private thenAhead(at: number): boolean {
+    for (let j = at + 1; this.kind(j) !== Tok.Eof && this.kind(j) !== Tok.Semicolon; j++) if (this.wordIs("THEN", j)) return true;
+    return false;
+  }
+
+  /** Whether the `DECLARE` at the cursor begins the declarations of a block: only declarations, each ended by `;`, come before a `BEGIN`. */
+  private declaresBlock(): boolean {
+    let j = 1;
+    while (this.kind(j) !== Tok.Eof) {
+      if (this.wordIs("BEGIN", j)) return true;
+      if (this.kind(j) === Tok.Word && NOT_DECLARATIONS.has(this.slice(j).toUpperCase())) return false;
+      while (this.kind(j) !== Tok.Eof && this.kind(j) !== Tok.Semicolon) j++;
+      if (this.kind(j) === Tok.Semicolon) j++;
+    }
+    return false;
+  }
+
+  /** Whether a word stands before the next `;`, after the one at the cursor. */
+  private wordAhead(w: string): boolean {
+    for (let j = 1; this.kind(j) !== Tok.Eof && this.kind(j) !== Tok.Semicolon; j++) if (this.wordIs(w, j)) return true;
+    return false;
+  }
+
+  /** Whether the statement that begins at the cursor is procedural: its end is found by blocks and not by the first `;` (0070-sql-routines FR-001, FR-002). */
+  private proceduralStart(): boolean {
+    if (this.kind() !== Tok.Word) return false;
+    switch (this.slice().toUpperCase()) {
+      case "BEGIN":
+        return !(
+          this.kind(1) === Tok.Semicolon ||
+          this.kind(1) === Tok.Eof ||
+          (this.kind(1) === Tok.Word && TXN_WORDS.has(this.slice(1).toUpperCase())) ||
+          (this.wordIs("WITH", 1) && this.wordIs("LABEL", 2))
+        );
+      case "DECLARE":
+        return (
+          this.kind(1) !== Tok.Param &&
+          !(this.kind(1) === Tok.Word && CURSOR_WORDS.has(this.slice(1).toUpperCase())) &&
+          !(this.kind(2) === Tok.Word && CURSOR_WORDS.has(this.slice(2).toUpperCase())) &&
+          this.declaresBlock()
+        );
+      case "WITH":
+        return this.wordIs("FUNCTION", 1);
+      case "IF":
+        return this.thenAhead(0);
+      case "WHILE":
+      case "LOOP":
+      case "FOR":
+      case "REPEAT":
+        return true;
+      case "CREATE":
+        for (let j = 1; j < 14 && this.kind(j) !== Tok.Eof && this.kind(j) !== Tok.Semicolon && this.kind(j) !== Tok.LParen; j++) {
+          if (this.kind(j) !== Tok.Word) continue;
+          const w = this.slice(j).toUpperCase();
+          if (PROCEDURAL_OBJECTS.has(w)) return true;
+          if (PLAIN_OBJECTS.has(w)) return false;
+        }
+        return false;
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * Moves the cursor over blocks. In `semicolon` mode it stops at the first `;` outside every block (the end of a procedural statement); in `end` mode, from inside a block, at the `END` that closes it, leaving
+   * the cursor on it. A block is opened by `BEGIN`, `CASE`, `LOOP`, `REPEAT`, `DECLARE` and an `IF` that begins a statement and has a `THEN`, and closed by `END`, and a word after `END` that names a kind of block opens nothing.
+   */
+  private scanBlocks(depth0: number, mode: "semicolon" | "end"): void {
+    let depth = depth0;
+    let prev = ";";
+    const declared: number[] = [];
+    // `CREATE PROCEDURE p IS declarations BEGIN ... END`: the declarations are part of the block that `IS` opens
+    const create = mode === "semicolon" && this.wordIs("CREATE");
+    while (!this.atEnd()) {
+      const k = this.kind();
+      if (k === Tok.Semicolon) {
+        if (depth <= 0) return;
+        prev = ";";
+        this.i++;
+        continue;
+      }
+      if (k === Tok.Word) {
+        const w = this.slice().toUpperCase();
+        if (w === "END") {
+          if (mode === "end" && depth <= 1) return;
+          depth--;
+          this.i++;
+          if (this.kind() === Tok.Word && END_QUALIFIERS.has(this.slice().toUpperCase())) this.i++;
+          prev = "END";
+          continue;
+        }
+        if (w === "DECLARE") {
+          if (depth === 0) {
+            depth++;
+            declared.push(depth);
+          }
+        } else if (
+          create &&
+          depth === 0 &&
+          w === "IS" &&
+          !["NULL", "NOT", "TRUE", "FALSE", "UNKNOWN", "DISTINCT", "OF"].includes(
+            this.kind(1) === Tok.Word ? this.slice(1).toUpperCase() : "",
+          )
+        ) {
+          depth++;
+          declared.push(depth);
+        } else if (w === "BEGIN") {
+          if (declared[declared.length - 1] === depth) declared.pop();
+          else depth++;
+        } else if (w === "CASE" || w === "LOOP" || w === "REPEAT") depth++;
+        else if (w === "IF" && BLOCK_PREV.has(prev) && this.thenAhead(0)) depth++;
+        else if (w === "WHILE" && this.wordAhead("DO")) depth++;
+        prev = w;
+      } else prev = k === Tok.Op ? this.slice() : "(";
+      this.i++;
+    }
+  }
+
+  /** Moves the cursor to the `;` that ends the statement it is in, or the end of the text. */
+  private skipStatement(procedural: boolean): void {
+    if (!procedural) {
+      while (!this.atEnd() && this.kind() !== Tok.Semicolon) this.i++;
+      return;
+    }
+    this.scanBlocks(0, "semicolon");
+  }
+
   /** A statement that holds no node: its keyword, its object for `CREATE`, `ALTER` and `DROP`, and its text. */
   private command(): Statement {
     const s = this.start();
+    const first = this.i;
     const keyword = this.slice().toUpperCase();
     this.i++;
     let object: string | undefined;
@@ -1552,7 +2178,13 @@ class Parser {
       if (this.kind(at) === Tok.Word) object = this.slice(at).toUpperCase();
     }
     const from = this.i;
-    while (!this.atEnd() && this.kind() !== Tok.Semicolon) this.i++;
+    this.i = first;
+    const procedural = this.proceduralStart();
+    this.i = from;
+    if (procedural) {
+      this.i = first;
+      this.scanBlocks(0, "semicolon");
+    } else this.skipStatement(false);
     const text = this.i > from ? this.text.slice(this.starts[from] ?? 0, this.ends[this.i - 1] ?? 0) : "";
     return { kind: "command", start: s, end: this.last(), keyword, object, text };
   }
@@ -1570,11 +2202,41 @@ class Parser {
     return this.fail("a statement");
   }
 
+  /** Reads what the tokens hold as one expression. */
+  fragmentExpression(): Expr {
+    this.depth = 0;
+    const e = this.expr(0);
+    if (!this.atEnd()) this.fail("the end of the expression");
+    return e;
+  }
+
+  /** Reads what the tokens hold as one statement, or as a `PERFORM` (a select with no `SELECT`). */
+  fragmentStatement(perform: boolean): Statement {
+    this.depth = 0;
+    let s: Statement;
+    if (perform) {
+      this.skipSelect = true;
+      s = this.query();
+    } else s = this.statement();
+    this.eatKind(Tok.Semicolon);
+    if (!this.atEnd()) this.fail("the end of the statement");
+    return s;
+  }
+
+  /** Reads what the tokens hold as one data type. */
+  fragmentType(): DataType {
+    this.depth = 0;
+    const t = this.dataType();
+    if (!this.atEnd()) this.fail("the end of the type");
+    return t;
+  }
+
   script(): Script {
     const statements: Statement[] = [];
     while (!this.atEnd()) {
       if (this.eatKind(Tok.Semicolon)) continue;
       const first = this.i;
+      const procedural = this.proceduralStart();
       try {
         this.depth = 0;
         const statement = this.statement();
@@ -1583,7 +2245,8 @@ class Parser {
       } catch (e) {
         if (!(e instanceof Failure)) throw e;
         this.errors.push(e.error);
-        while (!this.atEnd() && this.kind() !== Tok.Semicolon) this.i++;
+        this.i = first;
+        this.skipStatement(procedural);
         if (this.i === first) this.i++;
         statements.push({ kind: "unparsed", start: this.starts[first] ?? 0, end: this.ends[Math.max(first, this.i - 1)] ?? 0 });
       }

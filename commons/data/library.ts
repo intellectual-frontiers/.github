@@ -48,6 +48,7 @@ export const library = {
     "./sql/lang/dialects/trino",
     "./sql/lang/dialects/tsql",
     "./sql/lang/extensions/docs",
+    "./sql/lang/extensions/plpgsql",
     "./sql/lang/extensions/query",
     "./sql/lang/extensions/unist",
     "./sql/logical",

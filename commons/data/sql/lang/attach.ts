@@ -24,15 +24,24 @@ import { children } from "./walk.ts";
 /** Where a comment is, relative to its node. */
 export type Placement = "leading" | "trailing" | "dangling" | "detached";
 
-/** A comment, its node and its placement. */
-export interface Attachment {
+/** Anything with a range of the text: a node of the tree, or of another tree made over the same text. */
+export interface Ranged {
+  readonly start: number;
+  readonly end: number;
+}
+
+/** A comment, its node and its placement, for any tree. */
+export interface AttachedTo<N extends Ranged> {
   readonly comment: Comment;
   readonly placement: Placement;
   /** The node it is attached to. */
-  readonly node: Node;
+  readonly node: N;
   /** The smallest node that contains it, which may be the node it is attached to or the one above. */
-  readonly enclosing: Node;
+  readonly enclosing: N;
 }
+
+/** A comment, its node and its placement. */
+export type Attachment = AttachedTo<Node>;
 
 /** The comments of one node, by placement, in the order of the text. */
 export interface NodeComments {
@@ -42,12 +51,15 @@ export interface NodeComments {
   readonly detached: readonly Comment[];
 }
 
-/** Every comment's attachment, and the attachments of each node. */
-export interface CommentTable {
+/** Every comment's attachment, and the attachments of each node, for any tree. */
+export interface TableOf<N extends Ranged> {
   /** One attachment for each comment, in the order of the text. */
-  readonly all: readonly Attachment[];
-  readonly byNode: ReadonlyMap<Node, readonly Attachment[]>;
+  readonly all: readonly AttachedTo<N>[];
+  readonly byNode: ReadonlyMap<N, readonly AttachedTo<N>[]>;
 }
+
+/** Every comment's attachment, and the attachments of each node. */
+export type CommentTable = TableOf<Node>;
 
 /** The table of a text with no comments. */
 export const NO_COMMENTS: CommentTable = { all: [], byNode: new Map() };
@@ -59,7 +71,7 @@ export const NO_COMMENTS: CommentTable = { all: [], byNode: new Map() };
  * @param node - a node of that parse's tree
  * @returns its comments; empty where it has none
  */
-export function commentsOf(table: CommentTable, node: Node): NodeComments {
+export function commentsOf<N extends Ranged>(table: TableOf<N>, node: N): NodeComments {
   const list = table.byNode.get(node) ?? [];
   const of = (p: Placement): readonly Comment[] => list.filter((a) => a.placement === p).map((a) => a.comment);
   return { leading: of("leading"), trailing: of("trailing"), dangling: of("dangling"), detached: of("detached") };
@@ -73,12 +85,23 @@ export function commentsOf(table: CommentTable, node: Node): NodeComments {
  * @returns the table
  */
 export function attachComments(script: Script, comments: readonly Comment[]): CommentTable {
-  if (comments.length === 0) return NO_COMMENTS;
-  const all: Attachment[] = [];
-  const byNode = new Map<Node, Attachment[]>();
+  return comments.length === 0 ? NO_COMMENTS : attachTree<Node>(script, comments, children);
+}
+
+/**
+ * Attaches the comments of a text to the nodes of any tree over it, by the same rule (0066-sql-ast-parser FR-014): the tree's root must contain every comment, and its nodes' children be given in the order of the text.
+ *
+ * @param root - the tree, whose range contains the comments
+ * @param comments - the comments, in order
+ * @param children - the children of a node, in the order of the text
+ * @returns the table
+ */
+export function attachTree<N extends Ranged>(root: N, comments: readonly Comment[], children: (n: N) => readonly N[]): TableOf<N> {
+  const all: AttachedTo<N>[] = [];
+  const byNode = new Map<N, AttachedTo<N>[]>();
   // the children of a node are made once, however many comments are inside it, and are in the order of the text
-  const cache = new Map<Node, readonly Node[]>();
-  const kidsOf = (n: Node): readonly Node[] => {
+  const cache = new Map<N, readonly N[]>();
+  const kidsOf = (n: N): readonly N[] => {
     const known = cache.get(n);
     if (known !== undefined) return known;
     const made = children(n);
@@ -88,9 +111,9 @@ export function attachComments(script: Script, comments: readonly Comment[]): Co
   for (const comment of comments) {
     const from = comment.span.start;
     const to = comment.span.end;
-    let enclosing: Node = script;
-    let preceding: Node | undefined;
-    let following: Node | undefined;
+    let enclosing: N = root;
+    let preceding: N | undefined;
+    let following: N | undefined;
     for (;;) {
       const kids = kidsOf(enclosing);
       // the first child that begins after the comment does; the child before it is the one that may contain it
@@ -112,7 +135,7 @@ export function attachComments(script: Script, comments: readonly Comment[]): Co
       break;
     }
     let placement: Placement;
-    let node: Node;
+    let node: N;
     if (comment.ownLine) {
       if (following !== undefined) [placement, node] = comment.blankAfter ? ["detached", enclosing] : ["leading", following];
       else if (preceding !== undefined) [placement, node] = ["trailing", preceding];
@@ -120,7 +143,7 @@ export function attachComments(script: Script, comments: readonly Comment[]): Co
     } else if (preceding !== undefined) [placement, node] = ["trailing", preceding];
     else if (following !== undefined) [placement, node] = ["leading", following];
     else [placement, node] = ["dangling", enclosing];
-    const a: Attachment = { comment, placement, node, enclosing };
+    const a: AttachedTo<N> = { comment, placement, node, enclosing };
     all.push(a);
     const list = byNode.get(node);
     if (list === undefined) byNode.set(node, [a]);

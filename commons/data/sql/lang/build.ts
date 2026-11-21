@@ -55,6 +55,17 @@ export const build = {
   },
   /** A call of a function. */
   call(at: Span, name: Name, args: readonly Expr[]): Call {
-    return { kind: "call", start: at.start, end: at.end, name, args, distinct: false, filter: undefined, over: undefined };
+    return {
+      kind: "call",
+      start: at.start,
+      end: at.end,
+      name,
+      args,
+      distinct: false,
+      orderBy: [],
+      withinGroup: [],
+      filter: undefined,
+      over: undefined,
+    };
   },
 };

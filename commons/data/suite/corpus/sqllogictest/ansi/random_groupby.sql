@@ -14,8 +14,6 @@ SELECT DISTINCT - 50 AS col1 FROM tab2 AS cor0 GROUP BY cor0.col0, cor0.col0;
 
 SELECT DISTINCT - 8 FROM tab1 AS cor0 GROUP BY cor0.col1;
 
-SELECT DISTINCT + - 88 DIV 33 AS col1 FROM tab0, tab0 AS cor0 GROUP BY cor0.col2;
-
 SELECT col0 * col0 col1 FROM tab1 AS cor0 GROUP BY cor0.col0;
 
 SELECT - 56 / - cor0.col2 col0 FROM tab0 cor0 GROUP BY cor0.col2;
@@ -81,8 +79,6 @@ SELECT - col0 FROM tab0 AS cor0 GROUP BY cor0.col1, cor0.col0;
 SELECT ALL cor0.col1 - - cor0.col1 * + cor0.col0 AS col2 FROM tab0 AS cor0 GROUP BY cor0.col0, cor0.col1;
 
 SELECT DISTINCT + col0 AS col0 FROM tab2 cor0 GROUP BY col0;
-
-SELECT ALL + cor0.col1 DIV + cor0.col0 FROM tab0 AS cor0 GROUP BY cor0.col0, col1;
 
 SELECT DISTINCT cor0.col1 col1 FROM tab0 AS cor0 GROUP BY col1;
 
@@ -196,10 +192,6 @@ SELECT ALL - 71 AS col2 FROM tab1 AS cor0 GROUP BY cor0.col1, cor0.col1;
 
 SELECT ALL cor0.col2 col1 FROM tab1 AS cor0 GROUP BY cor0.col2;
 
-SELECT cor0.col0 DIV ( - cor0.col2 ) + col2 * cor0.col0 FROM tab0 AS cor0 GROUP BY cor0.col0, cor0.col2;
-
-SELECT ALL - cor0.col2 DIV - cor0.col2 AS col0 FROM tab2 AS cor0 GROUP BY cor0.col2;
-
 SELECT - cor0.col0 - + cor0.col0 / 14 FROM tab2, tab2 AS cor0 GROUP BY cor0.col0;
 
 SELECT + col0 AS col2 FROM tab0 GROUP BY tab0.col0;
@@ -239,8 +231,6 @@ SELECT ALL - CASE cor0.col2 WHEN cor0.col2 THEN col2 ELSE cor0.col2 END col2 FRO
 SELECT cor0.col1 FROM tab2 cor0 CROSS JOIN tab2 AS cor1 GROUP BY cor0.col1, cor0.col1;
 
 SELECT + cor0.col0 * - ( + cor0.col0 ) AS col1 FROM tab0 AS cor0 GROUP BY cor0.col0, col2;
-
-SELECT + 52 DIV - cor0.col0 + cor0.col0 * cor0.col0 FROM tab1 AS cor0 GROUP BY cor0.col0;
 
 SELECT DISTINCT 9 FROM tab1 AS cor0 GROUP BY cor0.col0;
 
@@ -286,8 +276,6 @@ SELECT DISTINCT + 65 * - col0 + 73 FROM tab2 GROUP BY col0;
 
 SELECT + - 95 AS col1 FROM tab2 GROUP BY tab2.col0;
 
-SELECT cor0.col0 + cor0.col0 DIV - 33 FROM tab1 AS cor0 GROUP BY cor0.col0;
-
 SELECT - ( + cor0.col0 ) AS col1 FROM tab2 AS cor0 GROUP BY cor0.col0, cor0.col1;
 
 SELECT DISTINCT - col0 * + 92 - - cor0.col0 * + 34 AS col1 FROM tab2 AS cor0 GROUP BY cor0.col0;
@@ -324,8 +312,6 @@ SELECT cor0.col1 FROM tab1 AS cor0 CROSS JOIN tab1 AS cor1 GROUP BY cor0.col1, c
 
 SELECT DISTINCT + 18 AS col2 FROM tab2 GROUP BY tab2.col2;
 
-SELECT col2 - - cor0.col2 DIV - cor0.col2 FROM tab0 AS cor0 GROUP BY cor0.col2;
-
 SELECT cor0.col1 * cor0.col1 - - col1 * CAST( NULL AS SIGNED ) FROM tab2 AS cor0 GROUP BY cor0.col1;
 
 SELECT DISTINCT + 9 AS col0 FROM tab2 GROUP BY col2;
@@ -351,8 +337,6 @@ SELECT DISTINCT AVG ( DISTINCT - col2 ) FROM tab0 AS cor0 WHERE NOT NULL IS NULL
 SELECT - + col2 AS col2 FROM tab1 cor0 GROUP BY col1, col2, col0;
 
 SELECT col1 FROM tab0 GROUP BY col1, col2 HAVING NULL = - col1;
-
-SELECT ALL + col0 DIV col0 - - col0 AS col1 FROM tab1 cor0 GROUP BY col0;
 
 SELECT DISTINCT - col2 + + col1 FROM tab2 GROUP BY col2, col1;
 
@@ -580,8 +564,6 @@ SELECT - 7 AS col0 FROM tab2 GROUP BY col2;
 
 SELECT DISTINCT - CAST ( NULL AS INTEGER ) * + 2 / 58 AS col2 FROM tab1 GROUP BY col1;
 
-SELECT + 74 DIV - - col2 + col2 + + col2 * ( + - col2 ) * - + col2 FROM tab1 cor0 GROUP BY col2;
-
 SELECT DISTINCT col1 * + - col1 + - col1 AS col1 FROM tab0 GROUP BY col1;
 
 SELECT - + 95 FROM tab0 AS cor0 GROUP BY col2, col1 HAVING - col1 * ( - 42 / 30 ) IS NOT NULL;
@@ -622,11 +604,7 @@ SELECT ALL ( - - col2 ), + 93 col2 FROM tab1 AS cor0 GROUP BY col2, col1;
 
 SELECT col2 AS col2, - 31 FROM tab1 cor0 GROUP BY col2 HAVING NULL BETWEEN col2 AND col2;
 
-SELECT ALL - - col0 DIV + - col0 AS col1 FROM tab2 AS cor0 GROUP BY col0;
-
 SELECT ALL - + 73 FROM tab0 AS cor0 GROUP BY col0 HAVING NOT NULL IN ( col0 );
-
-SELECT 62 DIV 90 FROM tab1 GROUP BY col2, col0;
 
 SELECT - 53 FROM tab1 GROUP BY col0;
 
@@ -651,8 +629,6 @@ SELECT - col1 * - - col2 FROM tab0 GROUP BY col1, col2;
 SELECT - + 79 AS col2 FROM tab2 AS cor0 GROUP BY col1, col0;
 
 SELECT + 26 * - col1 + col1 * - 41 * - col1 FROM tab1 GROUP BY col1 HAVING NULL > NULL;
-
-SELECT DISTINCT col0 DIV COALESCE ( + 74, - 77 - - + 32 ) FROM tab0 AS cor0 GROUP BY col0;
 
 SELECT ALL + col2 FROM tab2 AS cor0 GROUP BY col2, col1 HAVING NOT NULL IS NOT NULL;
 
@@ -744,8 +720,6 @@ SELECT - CAST( - 96 AS SIGNED ) + - 24 FROM tab1 AS cor0 GROUP BY col2;
 
 SELECT DISTINCT - CAST( NULL AS SIGNED ) AS col1 FROM tab0 AS cor0 GROUP BY col0, col2 HAVING NOT ( NULL ) IS NULL;
 
-SELECT - + col1 DIV + col1 + col1 + - 98 + + - col1 DIV + COALESCE ( 39, - 78 * + col0 * ( + col2 ) - + 27, + 50 ) AS col1 FROM tab2 AS cor0 GROUP BY col1 HAVING NULL IS NULL;
-
 SELECT - - col0, + col0 AS col1 FROM tab1 AS cor0 GROUP BY col0, col0 HAVING ( NOT + col0 >= NULL );
 
 SELECT - CAST( NULL AS SIGNED ) FROM tab1 GROUP BY col2, col2;
@@ -775,8 +749,6 @@ SELECT ALL + col2 + + - CAST ( 82 AS INTEGER ) FROM tab1 cor0 GROUP BY col2;
 SELECT + + COUNT ( * ) FROM tab2 cor0 GROUP BY col0;
 
 SELECT 91 * + - 47 * - col1 FROM tab2 GROUP BY col1, col1;
-
-SELECT - 86 + 86 + + COUNT( * ) DIV - col2 AS col1 FROM tab1 GROUP BY col2;
 
 SELECT DISTINCT - COUNT( * ) AS col0 FROM tab1 WHERE NOT NULL IS NULL GROUP BY col1;
 
@@ -852,8 +824,6 @@ SELECT col1 + col1 AS col2 FROM tab2 AS cor0 GROUP BY col1;
 
 SELECT cor0.col1 * - cor0.col1 + 67 FROM tab2 AS cor0 GROUP BY cor0.col1;
 
-SELECT cor0.col1 DIV 23 FROM tab0 cor0 GROUP BY cor0.col1;
-
 SELECT + 82 FROM tab2 AS cor0 GROUP BY cor0.col2;
 
 SELECT 44 AS col1 FROM tab1, tab1 AS cor0 GROUP BY tab1.col1;
@@ -867,8 +837,6 @@ SELECT ALL - + 45 / + 86 FROM tab1, tab2 AS cor0 GROUP BY cor0.col0;
 SELECT 86 FROM tab0 AS cor0 GROUP BY cor0.col1, cor0.col0;
 
 SELECT - 41 * 18 AS col0 FROM tab0 cor0 GROUP BY cor0.col1;
-
-SELECT DISTINCT + cor0.col2 DIV 77 col2 FROM tab2 AS cor0 GROUP BY cor0.col2, cor0.col0;
 
 SELECT - + CAST( NULL AS SIGNED ) FROM tab2, tab2 AS cor0 GROUP BY cor0.col0;
 
@@ -956,8 +924,6 @@ SELECT DISTINCT + cor0.col2 col1 FROM tab1 cor0 GROUP BY cor0.col0, cor0.col2;
 
 SELECT + CAST ( col0 AS INTEGER ) * - cor0.col0 + - col0 col1 FROM tab0 AS cor0 GROUP BY cor0.col0;
 
-SELECT ALL + tab0.col2 DIV - 27 col0 FROM tab0 GROUP BY col2;
-
 SELECT DISTINCT - CAST ( - 98 AS INTEGER ) AS col0 FROM tab2 AS cor0 GROUP BY cor0.col0;
 
 SELECT DISTINCT col0 * CAST( NULL AS SIGNED ) FROM tab0 AS cor0 GROUP BY col2, cor0.col2, col0;
@@ -991,8 +957,6 @@ SELECT ALL - 78 FROM tab0 GROUP BY tab0.col1;
 SELECT - 28 FROM tab0 AS cor0 GROUP BY col1;
 
 SELECT tab1.col1 * col1 col1 FROM tab1 GROUP BY tab1.col1;
-
-SELECT - 94 DIV col2 AS col0 FROM tab0 AS cor0 GROUP BY col2, col1;
 
 SELECT ALL - 22 FROM tab1 AS cor0 GROUP BY cor0.col2;
 
@@ -1090,8 +1054,6 @@ SELECT DISTINCT 62 FROM tab2 AS cor0 GROUP BY cor0.col2;
 
 SELECT NULLIF ( + cor0.col1, - cor0.col1 ) FROM tab1 AS cor0 GROUP BY cor0.col1;
 
-SELECT DISTINCT tab2.col1 DIV 8 + + tab2.col1 DIV - tab2.col1 AS col2 FROM tab2 GROUP BY tab2.col1;
-
 SELECT - tab0.col0 AS col2 FROM tab0 GROUP BY tab0.col0 HAVING NOT NULL IS NULL;
 
 SELECT DISTINCT + - 81 FROM tab0 GROUP BY tab0.col2;
@@ -1155,8 +1117,6 @@ SELECT ALL - 57 AS col1 FROM tab0 GROUP BY tab0.col0;
 SELECT DISTINCT - CAST ( NULL AS INTEGER ) FROM tab0 AS cor0 CROSS JOIN tab2 AS cor1 GROUP BY cor1.col2;
 
 SELECT DISTINCT - + tab0.col2 FROM tab0, tab0 AS cor0 GROUP BY tab0.col2;
-
-SELECT + cor0.col0 DIV 53 FROM tab0 AS cor0 GROUP BY cor0.col0, col0, col0;
 
 SELECT + tab0.col2 col1 FROM tab0 GROUP BY col2;
 
@@ -1236,11 +1196,7 @@ SELECT + CAST( NULL AS DECIMAL ) FROM tab0 GROUP BY tab0.col2;
 
 SELECT DISTINCT - 68 col2 FROM tab2 GROUP BY tab2.col0;
 
-SELECT cor0.col1 DIV 69 AS col1 FROM tab2 AS cor0 GROUP BY cor0.col1;
-
 SELECT DISTINCT - - 41 AS col2 FROM tab2 GROUP BY tab2.col0;
-
-SELECT cor0.col0 DIV cor0.col0 col0 FROM tab1 AS cor0 GROUP BY cor0.col0;
 
 SELECT ALL 38 FROM tab1 GROUP BY tab1.col2;
 
@@ -1282,8 +1238,6 @@ SELECT - tab2.col1 + + tab2.col1 col2 FROM tab2 GROUP BY tab2.col1;
 
 SELECT - 56 AS col0 FROM tab2 GROUP BY tab2.col1;
 
-SELECT + cor0.col1 + + NULLIF ( + cor0.col1 + + cor0.col1, - cor0.col2 ) DIV - 76 FROM tab2 AS cor0 GROUP BY cor0.col1, cor0.col1, cor0.col2;
-
 SELECT + + 41 AS col1 FROM tab0 GROUP BY tab0.col1;
 
 SELECT DISTINCT + + COALESCE ( + 8, tab0.col0, COALESCE ( tab0.col0, tab0.col1, - tab0.col2 * tab0.col2 ) * - tab0.col1 + tab0.col2, 34 ) / 29 FROM tab0 GROUP BY tab0.col0;
@@ -1310,8 +1264,6 @@ SELECT - tab2.col2 FROM tab2 WHERE NOT NULL IS NOT NULL GROUP BY tab2.col2;
 
 SELECT DISTINCT 78 FROM tab0 cor0 GROUP BY col1;
 
-SELECT DISTINCT - tab1.col0 - - col0 DIV tab1.col0 AS col0 FROM tab1 GROUP BY tab1.col0;
-
 SELECT - COALESCE ( - 37, cor0.col0 / 63 + + cor0.col0 ) / col2 + cor0.col2 * 41 AS col0 FROM tab1 AS cor0 GROUP BY cor0.col2;
 
 SELECT DISTINCT CAST( NULL AS SIGNED ) / 44 FROM tab2 GROUP BY tab2.col1;
@@ -1321,8 +1273,6 @@ SELECT ALL + CAST ( + 78 AS INTEGER ) AS col2 FROM tab2 AS cor0 GROUP BY col1, c
 SELECT ALL - cor0.col0 col1 FROM tab0 AS cor0 GROUP BY col0;
 
 SELECT 79 / - cor0.col2 AS col0 FROM tab0 cor0 GROUP BY cor0.col1, cor0.col2;
-
-SELECT ALL cor0.col1 DIV - 62 AS col0 FROM tab1 AS cor0 GROUP BY cor0.col1;
 
 SELECT DISTINCT + col1 / 57 FROM tab2 AS cor0 GROUP BY cor0.col1, cor0.col0;
 
@@ -1341,8 +1291,6 @@ SELECT + + CAST ( NULL AS INTEGER ) FROM tab1 GROUP BY col1;
 SELECT ALL - 89 col0 FROM tab2 GROUP BY tab2.col0;
 
 SELECT DISTINCT col1 AS col1 FROM tab1 GROUP BY col1;
-
-SELECT DISTINCT col0 DIV + cor0.col0 + col0 AS col1 FROM tab2 AS cor0 GROUP BY cor0.col0, col2;
 
 SELECT ALL - - 17 + + tab0.col0 AS col1 FROM tab0 GROUP BY tab0.col0;
 
@@ -1368,15 +1316,11 @@ SELECT DISTINCT + tab2.col1 AS col1 FROM tab2 WHERE ( NULL ) NOT IN ( tab2.col1 
 
 SELECT - 3 AS col2 FROM tab2 GROUP BY tab2.col1;
 
-SELECT - 57 DIV - 89 FROM tab2 AS cor0 GROUP BY cor0.col1;
-
 SELECT - 0 / - tab1.col0 AS col2 FROM tab1 GROUP BY tab1.col0;
 
 SELECT ALL CASE cor0.col2 WHEN - cor0.col0 THEN - cor0.col2 ELSE NULL END / - cor0.col1 + cor0.col1 * - cor0.col1 FROM tab2 AS cor0 GROUP BY cor0.col1, cor0.col2, col0;
 
 SELECT + cor0.col2 AS col2 FROM tab1 cor0 GROUP BY cor0.col2, cor0.col0, cor0.col0;
-
-SELECT ALL - cor0.col0 DIV cor0.col1 FROM tab2 AS cor0 GROUP BY cor0.col0, cor0.col1;
 
 SELECT + col2 - - cor0.col2 FROM tab2 cor0 GROUP BY col2;
 
@@ -1397,8 +1341,6 @@ SELECT DISTINCT - + tab1.col2 + 17 FROM tab1 GROUP BY tab1.col2;
 SELECT + cor1.col0 + + cor1.col0 AS col0 FROM tab0 AS cor0 CROSS JOIN tab0 cor1 GROUP BY cor1.col0;
 
 SELECT 84 * - 62 FROM tab2 AS cor0 GROUP BY cor0.col2;
-
-SELECT DISTINCT + tab2.col0 DIV tab2.col0 FROM tab2 GROUP BY tab2.col0;
 
 SELECT 13 AS col1 FROM tab0 AS cor0 GROUP BY col0;
 
@@ -1436,8 +1378,6 @@ SELECT ALL 50 AS col0 FROM tab2 cor0 GROUP BY cor0.col2, cor0.col0;
 
 SELECT ALL - cor0.col2 FROM tab1 AS cor0 GROUP BY cor0.col2, col2;
 
-SELECT DISTINCT cor0.col0 * COALESCE ( cor0.col0 DIV - cor0.col1, - col1 * cor0.col1 ) AS col1 FROM tab1 AS cor0 GROUP BY cor0.col0, cor0.col1, col0;
-
 SELECT - 80 FROM tab0 GROUP BY tab0.col1;
 
 SELECT DISTINCT - - CAST ( NULL AS INTEGER ) * + tab1.col1 AS col0 FROM tab1 GROUP BY col1;
@@ -1452,15 +1392,9 @@ SELECT DISTINCT cor0.col2 * + cor0.col2 FROM tab2 AS cor0 GROUP BY col2;
 
 SELECT col2 AS col1 FROM tab2 cor0 GROUP BY col2;
 
-SELECT DISTINCT - 25 DIV + 19 FROM tab2 GROUP BY col1;
-
 SELECT - col1 FROM tab1 GROUP BY tab1.col1 HAVING ( NULL ) NOT BETWEEN NULL AND ( NULL );
 
 SELECT DISTINCT - 49 + tab0.col2 FROM tab0 GROUP BY tab0.col2;
-
-SELECT - cor0.col1 DIV cor0.col1 AS col0 FROM tab2 AS cor0 GROUP BY cor0.col1;
-
-SELECT ALL tab2.col2 DIV + 27 AS col1 FROM tab2 GROUP BY tab2.col2;
 
 SELECT ALL - - tab1.col2 FROM tab1, tab1 AS cor0 GROUP BY tab1.col2;
 
@@ -1590,8 +1524,6 @@ SELECT + + tab2.col2 col2 FROM tab2 GROUP BY tab2.col2;
 
 SELECT + cor0.col0 - + cor0.col0 FROM tab2 AS cor0 GROUP BY cor0.col0;
 
-SELECT + col2 DIV cor0.col2 FROM tab1 cor0 GROUP BY cor0.col2;
-
 SELECT - cor1.col0 FROM tab0 AS cor0 CROSS JOIN tab2 AS cor1 GROUP BY cor1.col0;
 
 SELECT + CAST ( NULL AS REAL ) FROM tab1 GROUP BY tab1.col2;
@@ -1646,13 +1578,9 @@ SELECT DISTINCT cor0.col1 FROM tab1 AS cor0 GROUP BY col1;
 
 SELECT ALL + 52 * - col0 FROM tab0 AS cor0 GROUP BY cor0.col2, cor0.col0;
 
-SELECT cor0.col1 DIV + 84 + - cor0.col1 AS col0 FROM tab1 AS cor0 GROUP BY cor0.col1;
-
 SELECT DISTINCT - 69 + - cor0.col0 FROM tab0 AS cor0 GROUP BY cor0.col0;
 
 SELECT DISTINCT - ( cor0.col1 ) AS col2 FROM tab0 AS cor0 GROUP BY cor0.col1, col0;
-
-SELECT cor0.col2 DIV + cor0.col2 FROM tab0 AS cor0 GROUP BY cor0.col2;
 
 SELECT ALL + cor0.col1 FROM tab1 cor0 GROUP BY cor0.col1;
 
@@ -1796,10 +1724,6 @@ SELECT ALL - 57 AS col0 FROM tab2 AS cor0 GROUP BY cor0.col2;
 
 SELECT 42 + 7 * + cor0.col2 FROM tab2 AS cor0 GROUP BY cor0.col2;
 
-SELECT DISTINCT - col1 DIV CAST( + col1 AS SIGNED ) AS col0 FROM tab2 AS cor0 GROUP BY cor0.col1, cor0.col1;
-
-SELECT DISTINCT cor0.col0 DIV + cor0.col0 AS col2 FROM tab1 AS cor0 GROUP BY cor0.col0;
-
 SELECT ALL cor0.col0 + cor0.col0 AS col0 FROM tab2 AS cor0 GROUP BY cor0.col0;
 
 SELECT col0 AS col2 FROM tab0 AS cor0 GROUP BY col0;
@@ -1823,8 +1747,6 @@ SELECT + 45 FROM tab2 cor0 GROUP BY cor0.col1;
 SELECT + + 79 * tab2.col1 AS col0 FROM tab2 GROUP BY col1;
 
 SELECT - 62 * 3 AS col1 FROM tab2 AS cor0 GROUP BY cor0.col0;
-
-SELECT cor0.col0 DIV + cor0.col2 FROM tab2 cor0 GROUP BY cor0.col2, cor0.col0;
 
 SELECT ALL - + tab0.col1 * + tab0.col1 AS col2 FROM tab0 GROUP BY tab0.col1;
 
@@ -1864,15 +1786,11 @@ SELECT col1 + tab2.col1 col0 FROM tab2 GROUP BY tab2.col1;
 
 SELECT ALL + 67 FROM tab1 GROUP BY col1;
 
-SELECT DISTINCT + cor0.col1 DIV - cor0.col1 AS col1 FROM tab1 AS cor0 GROUP BY cor0.col1;
-
 SELECT DISTINCT + 54 FROM tab0 AS cor0 GROUP BY cor0.col1;
 
 SELECT DISTINCT + 45 FROM tab2 AS cor0 CROSS JOIN tab1 cor1 GROUP BY cor1.col0;
 
 SELECT - 68 FROM tab1 GROUP BY tab1.col1;
-
-SELECT tab2.col1 DIV tab2.col1 FROM tab2 GROUP BY tab2.col1;
 
 SELECT + 42 FROM tab1 GROUP BY tab1.col1;
 
@@ -1893,8 +1811,6 @@ SELECT 38 + 25 * tab1.col1 FROM tab1 GROUP BY tab1.col1;
 SELECT ALL + 1 FROM tab1 AS cor0 CROSS JOIN tab2 AS cor1 GROUP BY cor1.col1;
 
 SELECT + 90 col1 FROM tab0 GROUP BY tab0.col2;
-
-SELECT 27 DIV + 49 AS col1 FROM tab1 GROUP BY col0;
 
 SELECT ALL 84 AS col1 FROM tab1 GROUP BY tab1.col1;
 
@@ -1950,8 +1866,6 @@ SELECT DISTINCT - 68 + + 56 AS col1 FROM tab2 AS cor0 GROUP BY cor0.col2;
 
 SELECT ALL CAST ( NULL AS INTEGER ) / - tab0.col1 FROM tab0 GROUP BY tab0.col1;
 
-SELECT ALL + - tab2.col1 DIV tab2.col1 AS col0 FROM tab2 GROUP BY tab2.col1;
-
 SELECT DISTINCT cor0.col2 + cor0.col2 FROM tab2 AS cor0 GROUP BY col2;
 
 SELECT + ( 38 ) + tab2.col1 FROM tab2 GROUP BY tab2.col1;
@@ -1960,15 +1874,11 @@ SELECT + tab1.col2 * 2 + - 34 AS col1 FROM tab1 GROUP BY tab1.col2;
 
 SELECT cor0.col2 + ( - 67 ) FROM tab2 AS cor0 GROUP BY cor0.col2;
 
-SELECT col0 DIV 21 FROM tab1 GROUP BY tab1.col0;
-
 SELECT ALL - 73 FROM tab0 AS cor0 GROUP BY col0;
 
 SELECT 74 + + tab0.col2 / ( 97 ) FROM tab0 GROUP BY tab0.col2;
 
 SELECT - col0 + 6 / tab0.col0 AS col0 FROM tab0 GROUP BY tab0.col0;
-
-SELECT + cor0.col0 DIV + cor0.col2 FROM tab2 AS cor0 GROUP BY col2, cor0.col0;
 
 SELECT DISTINCT - - 82 FROM tab1 GROUP BY col2;
 
@@ -2100,8 +2010,6 @@ SELECT col0 col2 FROM tab1 GROUP BY col0;
 
 SELECT DISTINCT col2 + col2 AS col2 FROM tab0 GROUP BY col2, col0 HAVING NOT NULL < NULL;
 
-SELECT DISTINCT - col2 DIV - col2 AS col0 FROM tab1 AS cor0 GROUP BY col2, col2;
-
 SELECT ALL + col2 * + col1 * col1 - - col2 FROM tab0 GROUP BY col2, col1;
 
 SELECT DISTINCT col0 * col0, + col0 col1 FROM tab0 GROUP BY col0;
@@ -2109,8 +2017,6 @@ SELECT DISTINCT col0 * col0, + col0 col1 FROM tab0 GROUP BY col0;
 SELECT col0 AS col2 FROM tab0 cor0 GROUP BY col0;
 
 SELECT DISTINCT - col0 col2 FROM tab2 GROUP BY col0, col0;
-
-SELECT col0 DIV - col0 AS col2 FROM tab0 AS cor0 GROUP BY col0, col0;
 
 SELECT ALL col0 + + - col0 FROM tab2 AS cor0 GROUP BY col0;
 

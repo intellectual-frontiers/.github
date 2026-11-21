@@ -42,6 +42,7 @@
     "./sql/lang/dialects/trino": "./sql/lang/dialects/trino/mod.ts",
     "./sql/lang/dialects/tsql": "./sql/lang/dialects/tsql/mod.ts",
     "./sql/lang/extensions/docs": "./sql/lang/extensions/docs/mod.ts",
+    "./sql/lang/extensions/plpgsql": "./sql/lang/extensions/plpgsql/mod.ts",
     "./sql/lang/extensions/query": "./sql/lang/extensions/query/mod.ts",
     "./sql/lang/extensions/unist": "./sql/lang/extensions/unist/mod.ts",
     "./sql/logical": "./sql/logical/api.ts",

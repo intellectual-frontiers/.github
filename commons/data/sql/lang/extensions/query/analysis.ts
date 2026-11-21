@@ -137,6 +137,8 @@ export function readOnlyProblem(script: Script): string | undefined {
       return undefined;
     case "unparsed":
       return "it holds a statement that could not be read";
+    case "create-routine":
+      return `it holds a CREATE ${only.object.toUpperCase()}`;
     case "command":
       return `it holds a ${only.keyword}${only.object === undefined ? "" : ` ${only.object}`} command`;
     case "insert":

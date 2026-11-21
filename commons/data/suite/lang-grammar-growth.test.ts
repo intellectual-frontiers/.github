@@ -54,9 +54,10 @@ proves(
     assertEquals(c("TRUNCATE TABLE t"), "TRUNCATE|-|TABLE t");
     assertEquals(c("IF EXISTS (SELECT 1) DROP VIEW v", tsql), "IF|-|EXISTS (SELECT 1) DROP VIEW v");
     assertEquals(c("CREATE SEQUENCE s START 1"), "CREATE|SEQUENCE|SEQUENCE s START 1");
+    assertEquals(c("CREATE EXTENSION IF NOT EXISTS hstore"), "CREATE|EXTENSION|EXTENSION IF NOT EXISTS hstore");
     assertEquals(
-      c("CREATE OR REPLACE FUNCTION f(a int) RETURNS int AS $$ select 1 $$ LANGUAGE sql", postgres),
-      "CREATE|FUNCTION|OR REPLACE FUNCTION f(a int) RETURNS int AS $$ select 1 $$ LANGUAGE sql",
+      c("CREATE TRIGGER t BEFORE INSERT ON x FOR EACH ROW EXECUTE FUNCTION f()"),
+      "CREATE|TRIGGER|TRIGGER t BEFORE INSERT ON x FOR EACH ROW EXECUTE FUNCTION f()",
     );
     assertEquals(c("CREATE MATERIALIZED VIEW m AS SELECT 1"), "CREATE|VIEW|MATERIALIZED VIEW m AS SELECT 1");
     assertEquals(c("DROP SEQUENCE s"), "DROP|SEQUENCE|SEQUENCE s");
@@ -190,3 +191,84 @@ proves(["0069-sql-dialects FR-015"], "COLLATE is read after an expression as a n
   const q = firstItem(parse("SELECT a COLLATE s.c"));
   assert(q.kind === "collate" && q.collation.parts.length === 2);
 });
+
+proves(
+  ["0069-sql-dialects FR-016"],
+  "a select is read with DISTINCT ON, GROUP BY ALL, the empty grouping and GROUPING SETS, a WINDOW clause and QUALIFY, and a frame with its EXCLUDE; QUALIFY stays a name where nothing but the end of an item follows it",
+  () => {
+    const sel = (sql: string, d: Dialect = ansi) => {
+      const s = one(sql, d);
+      assert(s.kind === "select", sql);
+      return s;
+    };
+    assertEquals(sel("SELECT DISTINCT ON (a, b) a FROM t", postgres).distinctOn.length, 2);
+    const g = sel("SELECT a FROM t GROUP BY ALL");
+    assertEquals([g.groupAll, g.groupBy.length], [true, 0]);
+    const g2 = sel("SELECT a FROM t GROUP BY ALL a, b");
+    assertEquals([g2.groupAll, g2.groupBy.length], [true, 2]);
+    const g3 = sel("SELECT a FROM t GROUP BY GROUPING SETS ((a), (a, b), ()), ()");
+    const sets = g3.groupBy[0];
+    assert(sets?.kind === "call" && sets.name.parts[0]?.name === "GROUPING SETS" && sets.args.length === 3);
+    assert(g3.groupBy[1]?.kind === "tuple" && g3.groupBy[1].items.length === 0);
+    const w = sel(
+      "SELECT sum(a) OVER w FROM t WINDOW w AS (PARTITION BY b ORDER BY c ROWS BETWEEN 1 PRECEDING AND CURRENT ROW EXCLUDE TIES), v AS (w)",
+      postgres,
+    );
+    assertEquals(
+      w.windows.map((x) => x.name.name),
+      ["w", "v"],
+    );
+    assertEquals(w.windows[0]?.spec.frame?.exclude, "TIES");
+    const q = sel("SELECT a FROM t QUALIFY row_number() OVER (ORDER BY a) = 1", postgres);
+    assert(q.qualify?.kind === "binary");
+    const n = sel("SELECT qualify FROM t");
+    assert(n.items[0]?.expr.kind === "name" && n.qualify === undefined);
+    assertEquals(sel("SELECT 1 qualify").items[0]?.alias?.name, "qualify");
+  },
+);
+
+proves(
+  ["0069-sql-dialects FR-017"],
+  "a call is read with an ORDER BY among its arguments, WITHIN GROUP, and a query as an argument",
+  () => {
+    const c = (sql: string) => {
+      const e = firstItem(parse(`SELECT ${sql}`));
+      assert(e.kind === "call", sql);
+      return e;
+    };
+    const a = c("string_agg(x, ',' ORDER BY y DESC, z)");
+    assertEquals([a.args.length, a.orderBy.length], [2, 2]);
+    const w = c("percentile_cont(0.5) WITHIN GROUP (ORDER BY x) FILTER (WHERE y > 1)");
+    assertEquals([w.withinGroup.length, w.filter?.kind], [1, "binary"]);
+    const q = c("ANY (SELECT b FROM t)");
+    assert(q.args[0]?.kind === "scalar-query");
+    const r = firstItem(parse("SELECT a = ALL (SELECT b FROM t)"));
+    assert(r.kind === "binary" && r.right.kind === "call");
+    assertEquals(parse("SELECT array(SELECT 1)").errors, []);
+  },
+);
+
+proves(
+  ["0069-sql-dialects FR-018"],
+  "TRY_CAST, SAFE_CAST and CAST ... FORMAT are casts, and a parenthesized join keeps its alias and may begin with a query",
+  () => {
+    const t = firstItem(parse("SELECT TRY_CAST(a AS INT), safe_cast(a AS INT), CAST(a AS DATE FORMAT 'YYYY')"));
+    assert(t.kind === "cast" && t.try && t.format === undefined);
+    const items = one("SELECT TRY_CAST(a AS INT), safe_cast(a AS INT), CAST(a AS DATE FORMAT 'YYYY')");
+    assert(items.kind === "select");
+    assertEquals(
+      items.items.map((i) => (i.expr.kind === "cast" ? [i.expr.try, i.expr.format?.kind] : [])),
+      [
+        [true, undefined],
+        [true, undefined],
+        [false, "string"],
+      ],
+    );
+    const j = one("SELECT * FROM (a LEFT JOIN b ON a.x = b.x) AS t");
+    assert(j.kind === "select" && j.from[0]?.kind === "join" && j.from[0].alias?.name.name === "t");
+    const k = one("SELECT * FROM ((SELECT 1 AS x) AS a INNER JOIN b ON a.x = b.x)");
+    assert(k.kind === "select" && k.from[0]?.kind === "join");
+    assert(one("SELECT * FROM ((SELECT 1) JOIN t ON TRUE)").kind === "select");
+    assert(one("SELECT * FROM ((SELECT 1) UNION (SELECT 2)) AS u").kind === "select");
+  },
+);

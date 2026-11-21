@@ -4,8 +4,6 @@ SELECT DISTINCT col3 FROM tab3 AS cor0 WHERE ( NOT NULL <= NULL );
 
 SELECT - 53 AS col3 FROM tab3 WHERE NULL IS NULL;
 
-SELECT ALL * FROM tab4 AS cor0 WHERE NOT 30 * col1 BETWEEN - + col3 DIV + - CAST( col0 AS SIGNED ) * col4 AND NULL;
-
 SELECT MIN ( ALL col0 ) AS col2 FROM tab1 AS cor0 WHERE NOT ( NULL ) > col3 + 67 - - + col1 + - 53;
 
 SELECT + 42 AS col4 FROM tab3 AS cor0 WHERE NULL IS NULL;
@@ -600,8 +598,6 @@ SELECT ALL - col0 AS col1 FROM tab0 WHERE col0 NOT IN ( CAST ( NULL AS INTEGER )
 
 SELECT ALL + 94 FROM tab1 AS cor0 WHERE NULL IS NOT NULL;
 
-SELECT ALL - 10 DIV CAST( col4 AS SIGNED ) + - ( + 50 ) FROM tab3 AS cor0 WHERE col1 IS NOT NULL;
-
 SELECT COUNT ( * ) FROM tab0 AS cor0 WHERE NULL BETWEEN 84 AND NULL;
 
 SELECT col5 FROM tab1 AS cor0 WHERE + col1 * + 86 IS NULL;
@@ -764,8 +760,6 @@ SELECT * FROM tab4 WHERE NOT NULL NOT BETWEEN ( col1 - + col0 ) AND ( NULL );
 
 SELECT ALL - col1 + + col0 * - col3 * + + col4 * + - col3 FROM tab4 WHERE - col4 IS NULL;
 
-SELECT ALL - 69 DIV 35 FROM tab2 AS cor0 WHERE NOT ( NOT + + col1 IS NOT NULL );
-
 SELECT - 4 AS col4 FROM tab4 WHERE NULL IS NULL;
 
 SELECT ALL col2 AS col1 FROM tab4 cor0 WHERE ( NULL ) IS NOT NULL;
@@ -801,8 +795,6 @@ SELECT DISTINCT - COUNT( * ) * AVG ( ALL - col3 ) FROM tab2 AS cor0 WHERE - ( 14
 SELECT ALL + + 19 FROM tab4 WHERE NOT - 55 + - - col0 < - ( 50 );
 
 SELECT CAST ( NULL AS INTEGER ) FROM tab4 AS cor0 WHERE NOT + col0 IS NULL;
-
-SELECT - + CAST( - - 86 AS SIGNED ) DIV - - col3 * - col3 FROM tab2 WHERE NULL IS NULL;
 
 SELECT ( + 5 ) AS col0, MIN( DISTINCT - + 69 ) FROM tab2 AS cor0 WHERE NULL IS NOT NULL;
 
@@ -1399,8 +1391,6 @@ SELECT DISTINCT - COUNT( * ) FROM tab4 cor0 WHERE + col5 IS NOT NULL;
 SELECT ALL * FROM tab3 WHERE - col1 <= ( NULL );
 
 SELECT ALL col4 AS col1 FROM tab3 AS cor0 WHERE NOT ( + col3 * 81 * + col3 - - + ( + + col1 ) + + col4 ) BETWEEN ( col4 * - 21 ) AND NULL;
-
-SELECT + + COUNT( * ) DIV - - 94 AS col3 FROM tab4 AS cor0 WHERE NOT ( NULL ) IS NULL;
 
 SELECT + - col3 AS col5 FROM tab3 AS cor0 WHERE NOT ( - col0 ) < col0 * + 40;
 

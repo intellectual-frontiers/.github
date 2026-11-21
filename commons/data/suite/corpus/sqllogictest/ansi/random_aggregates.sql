@@ -106,13 +106,9 @@ SELECT - 87 FROM tab2 AS cor0 WHERE NOT NULL IS NOT NULL;
 
 SELECT - + MIN( + col2 ) AS col0 FROM tab1 AS cor0;
 
-SELECT ALL col1 DIV + - 83 + col0 + ( col1 ) * + col1 AS col1 FROM tab1 AS cor0;
-
 SELECT + col2 - CAST( - 26 AS SIGNED ) AS col2 FROM tab1 cor0 WHERE NULL IS NOT NULL;
 
 SELECT DISTINCT + COUNT ( - col2 ) AS col1 FROM tab1 WHERE NOT NULL IS NULL;
-
-SELECT 88 + + col2 DIV - + col2 + + 62 FROM tab0 cor0 WHERE NOT - 57 IS NULL;
 
 SELECT DISTINCT - + MAX( - col2 ) * - 58 FROM tab1 AS cor0;
 
@@ -224,8 +220,6 @@ SELECT DISTINCT + CAST( NULL AS SIGNED ) + + 6 FROM tab2 AS cor0;
 
 SELECT + + col0, col0 AS col0 FROM tab1 AS cor0 WHERE NOT ( NULL IS NULL );
 
-SELECT - - COUNT( * ) - + 60 DIV - COUNT( * ) AS col0 FROM tab2 AS cor0;
-
 SELECT DISTINCT 81 * - 20 col0, col2 FROM tab1 AS cor0;
 
 SELECT ALL * FROM tab0 AS cor0 WHERE NOT NULL NOT IN ( 26, + col2, - + col2 );
@@ -242,8 +236,6 @@ SELECT - + ( - - 26 ) FROM tab2 AS cor0;
 
 SELECT DISTINCT + + 8 * - - 61 AS col2 FROM tab1 AS cor0;
 
-SELECT ALL col2 DIV col1 * - 83 - + - 3 * + col2 + + col0 FROM tab2 AS cor0;
-
 SELECT + col0 * + 46 AS col2 FROM tab0;
 
 SELECT + COUNT ( * ) + 37 * + - 22 FROM tab1;
@@ -255,8 +247,6 @@ SELECT ALL + - ( COUNT ( * ) ) * CAST ( - SUM ( - + col1 ) AS INTEGER ) + + SUM 
 SELECT DISTINCT + COUNT ( * ) * - COUNT ( DISTINCT - 31 ) * + COUNT ( * ) col1 FROM tab0;
 
 SELECT - col0 AS col2 FROM tab0 AS cor0 WHERE NOT NULL >= 37 + - col2 + + col1 * 87;
-
-SELECT + 88 DIV + + col2 + + col1 FROM tab2 cor0;
 
 SELECT DISTINCT col0, col1 AS col1 FROM tab2;
 
@@ -275,8 +265,6 @@ SELECT DISTINCT + + COUNT ( * ) AS col1 FROM tab2 AS cor0 WHERE NOT 55 * + col0 
 SELECT COUNT ( * ) FROM tab0 WHERE NOT col0 BETWEEN ( col2 + 42 ) AND ( ( col0 ) );
 
 SELECT ALL - ( + col0 ) + + ( + 21 ) * 56, 45 AS col0 FROM tab1 cor0;
-
-SELECT + - col1 AS col1, col0 DIV - col2 AS col1 FROM tab2 AS cor0;
 
 SELECT * FROM tab1 WHERE + col2 + + col1 NOT BETWEEN ( + col1 ) AND - col0 / - col1 + + + col0 + 78 * - - col2 - - - 23;
 
@@ -382,8 +370,6 @@ SELECT ALL - - COUNT( * ) + 65 * 20 FROM tab1 cor0;
 
 SELECT ALL ( - col1 ) * + + col0 AS col1, col0 FROM tab1 AS cor0;
 
-SELECT col1 DIV col1 + col2 FROM tab2 AS cor0 WHERE ( + col2 ) IS NOT NULL;
-
 SELECT DISTINCT + - COUNT ( * ), - 21 / + 9 AS col1 FROM tab1 AS cor0 WHERE ( NOT NULL IS NOT NULL );
 
 SELECT - 13 + - - ( + - 20 ) * - COUNT ( * ) AS col2 FROM tab1 AS cor0 CROSS JOIN tab0 AS cor1;
@@ -414,8 +400,6 @@ SELECT + 54 * col1 + col0 FROM tab1;
 
 SELECT DISTINCT CAST( NULL AS SIGNED ) * COUNT( * ) FROM tab2 cor0 WHERE NOT ( NULL ) BETWEEN NULL AND NULL;
 
-SELECT ALL - col0 AS col1, col2 DIV + + col0 - 64 FROM tab1 cor0;
-
 SELECT + CAST( - col0 AS SIGNED ) * - col0 + - col0 - + + col1 * col1 FROM tab0;
 
 SELECT + col2 FROM tab0 AS cor0 WHERE + col0 * - - col2 > - ( + CAST( - + col2 AS SIGNED ) );
@@ -438,21 +422,15 @@ SELECT DISTINCT col1 - + col1 * - col2 FROM tab1 AS cor0;
 
 SELECT - 93 AS col2 FROM tab0 cor0;
 
-SELECT col1 DIV - 90 FROM tab0 WHERE NULL IS NULL;
-
 SELECT DISTINCT - 18 AS col0, + COUNT( * ) FROM tab2 AS cor0;
 
 SELECT DISTINCT 17 - - COUNT ( * ) FROM tab0;
 
 SELECT ALL col0 - - + 94, ( - 62 ) AS col0 FROM tab1;
 
-SELECT DISTINCT - col0 DIV - + col1 AS col0 FROM tab1 AS cor0;
-
 SELECT ALL * FROM tab0 WHERE NULL <= - col1 * ( col1 );
 
 SELECT DISTINCT col0 AS col1 FROM tab1 WHERE NOT + 44 IS NULL;
-
-SELECT DISTINCT ( col0 ) DIV - col0 FROM tab1;
 
 SELECT DISTINCT - ( + 74 ) FROM tab1 AS cor0;
 
@@ -468,10 +446,6 @@ SELECT 11 * + CAST( NULL AS SIGNED ) AS col1, ( + 97 ) AS col2 FROM tab0;
 
 SELECT DISTINCT 29 + + CAST ( NULL AS INTEGER ) FROM tab2;
 
-SELECT DISTINCT - 71 DIV + MAX( ALL + col2 ) - MIN( ALL + + col2 ) + COUNT( * ) FROM tab1 AS cor0;
-
-SELECT + col1 DIV CAST( col0 AS SIGNED ) AS col1 FROM tab0;
-
 SELECT ALL col0 - 3 AS col1 FROM tab1 cor0;
 
 SELECT DISTINCT 35 * - 33 * col1 AS col0 FROM tab0;
@@ -486,15 +460,11 @@ SELECT ALL - 45, col2 FROM tab0 AS cor0;
 
 SELECT - COUNT( DISTINCT 53 ) col1 FROM tab1;
 
-SELECT - ( 47 ) - col1 DIV + ( + col0 - + 55 ) FROM tab2;
-
 SELECT DISTINCT * FROM tab0 AS cor0 WHERE NOT - col0 * + col1 IN ( - 33 );
 
 SELECT ALL col1 * + col2 col1 FROM tab2 AS cor0;
 
 SELECT ALL + COUNT( * ) AS col1, + 88 AS col1 FROM tab1 AS cor0;
-
-SELECT ALL 14 + - + ( + + 18 ) DIV + col0 + + col2 + - 16 + + col0 AS col0 FROM tab2;
 
 SELECT * FROM tab2 cor0 WHERE - col2 NOT BETWEEN ( - - 51 ) AND - col0 * - 30;
 
@@ -640,8 +610,6 @@ SELECT + - 78 + + - COUNT( * ) AS col2 FROM tab2 AS cor0;
 
 SELECT * FROM tab2 WHERE ( - 31 < + col1 * col0 * - col2 );
 
-SELECT + + col1, 52 + - - col2 * col2 DIV + col2 AS col2 FROM tab0 AS cor0;
-
 SELECT ALL col0 - + col2 AS col2 FROM tab2 WHERE col1 IN ( + col1 );
 
 SELECT DISTINCT + 21 * + col2 AS col2, col0 * + - 4 FROM tab1;
@@ -722,8 +690,6 @@ SELECT DISTINCT * FROM tab1 cor0 WHERE + col1 BETWEEN + col0 AND NULL;
 
 SELECT ALL SUM( - - 63 ) FROM tab1 AS cor0;
 
-SELECT - - 89 DIV + 83 + - - col0 * col2 * - - col0 AS col1 FROM tab1 cor0;
-
 SELECT 53 FROM tab0 AS cor0 CROSS JOIN tab1 cor1;
 
 SELECT DISTINCT col2 / 22 AS col0 FROM tab1;
@@ -745,8 +711,6 @@ SELECT - col2 * + - 47 FROM tab1;
 SELECT ALL ( - + col2 ) + + - col0 + - col0 AS col1 FROM tab1;
 
 SELECT DISTINCT + CAST ( NULL AS INTEGER ) + - col1 AS col0 FROM tab2 AS cor0;
-
-SELECT DISTINCT COUNT( * ) DIV - - 63 AS col1 FROM tab1;
 
 SELECT DISTINCT - col0 / 19 col1 FROM tab2;
 
@@ -846,8 +810,6 @@ SELECT ( - - CAST ( - col1 AS INTEGER ) ) + + + col1 / col0 / - 14 + - 67 FROM t
 
 SELECT - ( 57 ) / + ( - CAST ( NULL AS INTEGER ) ) FROM tab2;
 
-SELECT - 28 DIV - 92 + col1 AS col2 FROM tab0 AS cor0;
-
 SELECT DISTINCT COUNT ( * ) * + SUM ( col1 ) * + - 40 FROM tab1;
 
 SELECT + - MIN ( DISTINCT + - col2 ) AS col0 FROM tab0 AS cor0;
@@ -871,8 +833,6 @@ SELECT COUNT( * ) + + 20 FROM tab0;
 SELECT DISTINCT col2 + 82 AS col0 FROM tab1 AS cor0 WHERE NOT col0 IS NOT NULL;
 
 SELECT col1 * + col1 * + col1 col1 FROM tab1;
-
-SELECT DISTINCT + 67 DIV + col2 FROM tab1;
 
 SELECT ALL + - 39 + - - COUNT ( * ) col0 FROM tab2 AS cor0;
 
@@ -898,11 +858,7 @@ SELECT * FROM tab1 AS cor0 WHERE NOT + 42 IS NOT NULL;
 
 SELECT MIN( + 67 ) FROM tab1;
 
-SELECT col0 DIV ( - - 93 ) AS col2 FROM tab1;
-
 SELECT DISTINCT COUNT( + ( - col2 ) ) AS col0 FROM tab2 AS cor0;
-
-SELECT 15 DIV 64 * - col2 FROM tab0 AS cor0;
 
 SELECT - - COUNT ( * ) col2 FROM tab2 AS cor0 WHERE NOT + col2 IS NOT NULL;
 
@@ -933,10 +889,6 @@ SELECT + MAX( - col0 ) + + - CAST( + COUNT( * ) AS SIGNED ) AS col1 FROM tab2;
 SELECT * FROM tab1 cor0 WHERE NOT col2 / + 64 + - CAST ( NULL AS INTEGER ) IN ( - 30 );
 
 SELECT DISTINCT 53 col1, col1 FROM tab1;
-
-SELECT + 24 + - COUNT( * ) + - MIN( col1 ) DIV + 7 * 91 AS col1 FROM tab1 AS cor0;
-
-SELECT - COUNT( - col0 ) DIV - COUNT( * ) AS col2 FROM tab1 AS cor0;
 
 SELECT - COUNT( + 23 ) AS col0 FROM tab0;
 
@@ -1044,8 +996,6 @@ SELECT ALL - ( COUNT ( * ) ) + COUNT ( * ) FROM tab0 AS cor0;
 
 SELECT ALL + 1 - MIN( DISTINCT - col1 ) FROM tab0;
 
-SELECT 82 + + + 33 DIV - + col2 FROM tab2;
-
 SELECT + 6 + 30 FROM tab2;
 
 SELECT ALL MAX ( - - 95 ) * + 72 AS col0 FROM tab2;
@@ -1116,8 +1066,6 @@ SELECT - col2 - - - col1 + - col1 * - ( - + 34 ) FROM tab1 AS cor0;
 
 SELECT DISTINCT + col2 col1 FROM tab2 cor0 WHERE - 73 > NULL;
 
-SELECT - col0 - - col1 DIV - col1 col2 FROM tab1;
-
 SELECT DISTINCT * FROM tab0 AS cor0 WHERE NOT + ( - 81 ) NOT IN ( + ( - 9 ), col1 + - - 78 - col2 * col1 );
 
 SELECT + SUM( + + col0 ) AS col1 FROM tab2;
@@ -1135,8 +1083,6 @@ SELECT - COUNT ( * ) / - 37 AS col2 FROM tab1;
 SELECT ALL - - COUNT ( * ) * + COUNT ( * ) + COUNT ( * ) + + 93 FROM tab1 AS cor0;
 
 SELECT SUM ( ALL + 66 ) AS col0 FROM tab2;
-
-SELECT - - col0 DIV - col2 col0 FROM tab2 AS cor0;
 
 SELECT DISTINCT 6 * 38 AS col2 FROM tab0 AS cor0;
 
@@ -1181,8 +1127,6 @@ SELECT ( CAST ( NULL AS INTEGER ) ) + COUNT ( - col0 ) * COUNT ( * ) FROM tab2 A
 SELECT ALL - - SUM ( DISTINCT - 21 ) + + 58 FROM tab0 AS cor0;
 
 SELECT DISTINCT COUNT ( * ) / - - COUNT ( * ) AS col2 FROM tab1;
-
-SELECT ALL 29 DIV - 89 AS col2, 28 FROM tab0;
 
 SELECT COUNT ( * ) AS col0 FROM ( tab2 AS cor0 CROSS JOIN tab1 cor1 ) WHERE NULL IS NOT NULL;
 
@@ -1239,8 +1183,6 @@ SELECT + CAST ( NULL AS INTEGER ) * CAST ( NULL AS INTEGER ) - CAST ( NULL AS RE
 SELECT ALL COUNT( + col0 ) AS col0 FROM tab1;
 
 SELECT ALL + COUNT( * ) * SUM( DISTINCT - - col2 ) AS col2 FROM tab0 AS cor0;
-
-SELECT ALL - COUNT( * ) DIV 52 col0, 48 col2 FROM tab1;
 
 SELECT DISTINCT - MAX( DISTINCT - - col2 ) AS col2, 95 AS col2 FROM tab1;
 
@@ -1408,8 +1350,6 @@ SELECT - COUNT ( * ) * - + MIN ( + + 92 ) + - MIN ( - col2 + + col2 ) FROM tab1 
 
 SELECT - + MIN ( - col1 ) FROM tab0 AS cor0;
 
-SELECT + 50 + + COUNT( DISTINCT - col1 ) DIV - 3 AS col0 FROM tab0 AS cor0;
-
 SELECT ALL - col1 * + - col2 AS col2 FROM tab2 AS cor0;
 
 SELECT ALL + col1 * + CAST ( NULL AS INTEGER ) + - - 92 AS col2 FROM tab1 AS cor0;
@@ -1473,8 +1413,6 @@ SELECT + ( + CAST ( NULL AS INTEGER ) ) + + col0 FROM tab1;
 SELECT DISTINCT 46 * + col0 AS col0 FROM tab0;
 
 SELECT ( ( + col0 ) ) + + 81 * col1 * - - 96 * - ( - 44 ) FROM tab2;
-
-SELECT ALL 67 DIV + COUNT( * ) AS col0 FROM tab0;
 
 SELECT ALL * FROM tab0 WHERE NOT + CAST( NULL AS SIGNED ) IN ( - + 53 );
 
@@ -1545,8 +1483,6 @@ SELECT + 41 + COUNT( * ) + - 3 * + COUNT( * ) FROM tab1, tab0 AS cor0;
 SELECT - COUNT( DISTINCT + col1 ) + + - 36 AS col0, - 20 FROM tab1;
 
 SELECT DISTINCT + MIN ( - + col0 ) AS col1 FROM tab1 AS cor0;
-
-SELECT + + 29 DIV COUNT( * ) AS col1 FROM tab0 AS cor0;
 
 SELECT SUM ( - col1 ), + 52 AS col0 FROM tab1 AS cor0;
 
@@ -1632,8 +1568,6 @@ SELECT ALL - - 10 * + col2 + + col0 + + 97 - + col0 + col2 * - col2 FROM tab0 AS
 
 SELECT 53 * 40 * ( - col1 ) FROM tab2;
 
-SELECT ALL + 67 DIV 56 + COUNT( ALL - 97 ) AS col2 FROM tab2 WHERE NULL IS NULL;
-
 SELECT DISTINCT - COUNT( + col2 ) FROM tab2 WHERE ( NULL ) IS NULL;
 
 SELECT + + col2 / - CAST ( NULL AS INTEGER ) AS col0 FROM tab1 AS cor0;
@@ -1645,8 +1579,6 @@ SELECT 0 * - CAST ( 6 AS INTEGER ) FROM tab1 cor0;
 SELECT ALL 50 - + - col0 AS col2 FROM tab1 AS cor0;
 
 SELECT ALL + - COUNT ( DISTINCT + + col0 ) + - + 89 * - 81 FROM tab1 AS cor0;
-
-SELECT 92 DIV - col1 FROM tab2;
 
 SELECT ALL + + CAST ( NULL AS REAL ) col1 FROM ( tab1 AS cor0 CROSS JOIN tab0 AS cor1 );
 
@@ -1686,8 +1618,6 @@ SELECT DISTINCT 63 - - 83 * - 59 AS col0 FROM tab2 AS cor0;
 
 SELECT ALL - CAST ( + AVG ( - col0 ) AS INTEGER ) AS col0 FROM tab1 cor0 WHERE NOT NULL < col2;
 
-SELECT + ( - MIN( - col2 ) ) DIV - COUNT( * ) AS col0 FROM tab2 AS cor0;
-
 SELECT ALL 89 / - 37 FROM tab2 cor0;
 
 SELECT - COUNT( * ) FROM tab0 WHERE NOT + - col0 IN ( + CAST( - 88 AS DECIMAL ) );
@@ -1719,8 +1649,6 @@ SELECT + 82 + CAST ( NULL AS REAL ) * - + col2 FROM tab0 AS cor0;
 SELECT - - CAST( - ( 43 ) AS SIGNED ) + - 15 FROM tab1 AS cor0;
 
 SELECT - col0 FROM tab0 AS cor0 WHERE col0 * col0 NOT IN ( col1 * col0 );
-
-SELECT DISTINCT 91 DIV COUNT( * ) + COUNT( * ) * 81 FROM tab0 AS cor0;
 
 SELECT * FROM tab1 WHERE NOT 32 IS NULL;
 
@@ -1852,10 +1780,6 @@ SELECT ALL + + 63 * + col2 + - - col0 FROM tab2 AS cor0;
 
 SELECT ALL + 33 FROM tab1 WHERE NOT + 60 IS NULL;
 
-SELECT DISTINCT + col0 DIV - - col2 + - 80 + - ( - + col0 ) AS col2 FROM tab0 AS cor0;
-
-SELECT 34 DIV + 29 + - col1 AS col2, - col0 FROM tab0;
-
 SELECT ALL + COUNT ( ALL + col2 ) AS col0, + 82 AS col0 FROM tab0;
 
 SELECT + 49 + - COUNT( * ) AS col1 FROM tab2;
@@ -1878,8 +1802,6 @@ SELECT ALL - + ( col2 ) AS col2 FROM tab2 cor0;
 
 SELECT DISTINCT - ( col0 ) AS col0 FROM tab2 AS cor0 WHERE NOT 44 IS NULL;
 
-SELECT DISTINCT col0, col1 DIV - 32 FROM tab1 cor0;
-
 SELECT DISTINCT col2 / - col1 + + col1 + 95 + col1 FROM tab0 AS cor0;
 
 SELECT DISTINCT COUNT ( * ) AS col1 FROM tab2 WHERE col2 IS NULL;
@@ -1887,8 +1809,6 @@ SELECT DISTINCT COUNT ( * ) AS col1 FROM tab2 WHERE col2 IS NULL;
 SELECT + col1 * + - col1 col2, col2 FROM tab0;
 
 SELECT CAST ( NULL AS INTEGER ) - + CAST ( NULL AS INTEGER ) * + + 33 / - COUNT ( * ) AS col2 FROM tab2;
-
-SELECT col1 DIV + 5 + + col1 FROM tab1 AS cor0 WHERE + ( col0 ) IS NOT NULL;
 
 SELECT DISTINCT + 50 * COUNT ( * ) * COUNT ( * ) * + - COUNT ( * ) col2 FROM tab2 AS cor0;
 
@@ -1901,8 +1821,6 @@ SELECT * FROM tab1 cor0 WHERE NOT NULL NOT BETWEEN NULL AND col1;
 SELECT - - 30 * COUNT ( * ) AS col2 FROM tab0 AS cor0;
 
 SELECT DISTINCT SUM ( - + col2 ) AS col1 FROM tab2;
-
-SELECT + col0, - col1 DIV + + ( + col1 ) AS col2 FROM tab0 AS cor0;
 
 SELECT ALL COUNT ( * ) * + - COUNT ( * ) * 92 FROM tab0 AS cor0;
 
@@ -2026,8 +1944,6 @@ SELECT - + ( + 50 ) FROM tab1 AS cor0;
 
 SELECT - MAX ( ALL - 53 ) col0 FROM tab0 AS cor0;
 
-SELECT 10 DIV + + col2 FROM tab2;
-
 SELECT COUNT ( * ) * + 92 FROM tab2 AS cor0 CROSS JOIN tab0;
 
 SELECT DISTINCT * FROM tab1 WHERE NOT NULL IN ( + + col2 * + + col1 );
@@ -2042,15 +1958,11 @@ SELECT ALL + - CAST( NULL AS SIGNED ) AS col1 FROM tab1 AS cor0;
 
 SELECT DISTINCT col2 * 76 FROM tab1;
 
-SELECT ALL 7 - - col2 + - 63 DIV col0 + - col2 AS col0 FROM tab1;
-
 SELECT - 26 + + 54 + + 20 - ( - COUNT ( * ) ) AS col0 FROM tab1 AS cor0;
 
 SELECT DISTINCT - col0 - - 58 FROM tab2 AS cor0;
 
 SELECT ALL + col2 AS col2, ( col2 ) + - col1 + - + col1 * 61 * + col1 + ( - + ( - + 14 ) ) + - + 52 FROM tab2 AS cor0;
-
-SELECT + col1 DIV - 85 col0 FROM tab1;
 
 SELECT ALL - COUNT ( * ) + 2 col0 FROM tab2;
 
@@ -2154,8 +2066,6 @@ SELECT DISTINCT col2 * - col0 + - col0 FROM tab1;
 
 SELECT ALL - MIN( + col0 ) AS col2 FROM tab2;
 
-SELECT DISTINCT + 37 DIV - + ( col2 ) AS col1 FROM tab1;
-
 SELECT ALL col0 * col0 + + - 59 + - col2 + ( + 91 ), col2 AS col1 FROM tab1 cor0;
 
 SELECT 14 + + 94 / + ( + 37 ), + col0 - - + CAST ( NULL AS INTEGER ) + - CAST ( + col0 AS INTEGER ) + - - col0 AS col0 FROM tab1 AS cor0;
@@ -2172,17 +2082,11 @@ SELECT - + col0 FROM tab2 WHERE NOT NULL IS NULL;
 
 SELECT + 27 * + COUNT( * ) + - COUNT( * ) col1 FROM tab1;
 
-SELECT DISTINCT + + COUNT( ALL + col0 ) DIV - COUNT( * ) AS col1 FROM tab0 AS cor0;
-
 SELECT ALL 57 + + 24 * ( + col2 ) AS col1 FROM tab1;
 
 SELECT ALL + + col1 FROM tab1 AS cor0 WHERE col2 * + col0 < + CAST( + col0 AS SIGNED ) / + + col0 + + col0;
 
-SELECT DISTINCT - col0 DIV + col0 col2 FROM tab2 AS cor0;
-
 SELECT ALL + ( + + 56 ) + - - COUNT ( * ) + 60 col1 FROM tab1 AS cor0;
-
-SELECT DISTINCT CAST( NULL AS SIGNED ) AS col1, + col0 DIV col1 FROM tab2;
 
 SELECT ALL - col0 AS col1 FROM tab1 AS cor0 WHERE NOT ( NULL ) IS NULL;
 
@@ -2200,13 +2104,9 @@ SELECT + 63 + + col2 + - col2 FROM tab0;
 
 SELECT DISTINCT + COUNT( * ) AS col2, 98 FROM tab1 AS cor0;
 
-SELECT col0 AS col0, 70 * - col2 - ( - + col1 ) DIV - - ( col1 ) AS col1 FROM tab1 AS cor0;
-
 SELECT - + 1 * COUNT ( * ) + - COUNT ( * ) FROM tab1 AS cor0;
 
 SELECT - MIN ( DISTINCT + col2 ) col0 FROM tab2;
-
-SELECT 50 + col0 DIV - 44 FROM tab2 AS cor0;
 
 SELECT + 87 * - AVG ( - 82 ) FROM tab2 AS cor0 WHERE NULL <> NULL;
 
@@ -2232,15 +2132,9 @@ SELECT + col1 + col2 AS col0 FROM tab0 cor0 WHERE col2 IS NULL;
 
 SELECT + col0 / - col1 AS col1 FROM tab2 WHERE NOT NULL = CAST( - + 90 AS SIGNED );
 
-SELECT col1 * + col1 + - col1 + + CAST( - 66 AS SIGNED ) DIV - + col1 AS col1 FROM tab1 AS cor0;
-
 SELECT DISTINCT + 38 * + col1 + - + col0, - col1 AS col2 FROM tab1 cor0;
 
-SELECT ALL COUNT( * ) DIV ( + COUNT( * ) ) FROM tab0;
-
 SELECT ALL ( - 62 ) AS col1 FROM tab0 AS cor0 WHERE ( col1 ) IS NOT NULL;
-
-SELECT DISTINCT 85 DIV + - col0 col2 FROM tab0;
 
 SELECT DISTINCT ( - - 68 ) + - CAST( NULL AS SIGNED ) * + 5 AS col1 FROM tab1;
 
@@ -2291,8 +2185,6 @@ SELECT - 90 AS col1, COUNT( * ) * + 94 AS col1 FROM tab1 AS cor0;
 SELECT DISTINCT * FROM tab2 AS cor0 WHERE NOT NULL BETWEEN NULL AND ( + + CAST( - 98 AS SIGNED ) ) * + - col1;
 
 SELECT - CAST ( - col2 AS INTEGER ) AS col2, - col2 + - col2 * - + col1 + + 83 AS col2 FROM tab1;
-
-SELECT col2 DIV 91 AS col2 FROM tab1 AS cor0;
 
 SELECT MIN( col1 ) AS col1 FROM tab0;
 
@@ -2432,11 +2324,7 @@ SELECT 90 * - col1 + + col0 col1, CAST( - col1 AS SIGNED ) + + + col1 FROM tab1 
 
 SELECT 87 - - col1 - + - col2 + + ( + col0 ) - CAST( NULL AS SIGNED ) AS col0 FROM tab0;
 
-SELECT ALL - col1 + + col0 DIV + col2 FROM tab1;
-
 SELECT ALL * FROM tab1 WHERE NOT ( NULL >= + CAST( NULL AS SIGNED ) );
-
-SELECT - + col1 DIV + col1 FROM tab1 AS cor0;
 
 SELECT + ( + COUNT ( DISTINCT - - col1 ) ) AS col2 FROM tab1 WHERE CAST ( 80 AS INTEGER ) < NULL;
 
@@ -2545,7 +2433,5 @@ SELECT * FROM tab0 AS cor0 WHERE col1 * col2 IS NULL;
 SELECT - - 42 * + MIN( DISTINCT + + 19 ) FROM tab0 AS cor0;
 
 SELECT ALL + 59 - col2 FROM tab0 AS cor0;
-
-SELECT DISTINCT + col0 DIV 47 AS col1 FROM tab0 AS cor0;
 
 SELECT ALL 6 AS col1 FROM tab1 AS cor0 CROSS JOIN tab0 AS cor1;

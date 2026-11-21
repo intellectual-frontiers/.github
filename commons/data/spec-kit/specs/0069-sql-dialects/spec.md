@@ -31,6 +31,12 @@
 - **FR-014**: A dialect's grammar MAY name word operators, operators that are keywords (MySQL's `DIV`, `MOD` and `XOR`), with their binding powers, and a grammar that names a word its lexical does not have as a keyword MUST be an error value.
 - **FR-015**: `COLLATE name` MUST be read after an expression (a node `collate`) and after a data type (in the type's `collation`).
 
+## The grammar of the standard and of PostgreSQL and SQLite
+
+- **FR-016**: A select MUST be read with `DISTINCT ON (...)`, `GROUP BY ALL`, a `GROUP BY` of the empty grouping `()` and of `GROUPING SETS (...)` (a call of that name), a `WINDOW` clause (nodes `window-def`) and `QUALIFY`; the frame of a window MUST be read with its `EXCLUDE` (`NO OTHERS`, `CURRENT ROW`, `GROUP`, `TIES`); and `QUALIFY` MUST stay a name where nothing but the end of an item follows it.
+- **FR-017**: A call MUST be read with an `ORDER BY` among its arguments (`string_agg(x, ',' ORDER BY y)`), with `WITHIN GROUP (ORDER BY ...)`, and with a query as an argument (`ANY (SELECT ...)`, `array(SELECT ...)`), which is a scalar query node.
+- **FR-018**: `TRY_CAST` and `SAFE_CAST` MUST be a cast that says it gives `NULL` on failure, `CAST(x AS type FORMAT 'f')` MUST keep its format as an expression, and a parenthesized join or source MUST be read where it follows `(` and begins with a query in parentheses (`((SELECT 1) JOIN t)`), and MUST keep its alias (`(a JOIN b ON c) AS t`) on the join.
+
 ## Out of scope
 
 - Reading everything each engine accepts: the grammar of each dialect beyond the common ground grows as the corpora ask, one feature at a time, each with its specification.

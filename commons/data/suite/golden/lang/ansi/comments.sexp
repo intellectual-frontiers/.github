@@ -12,10 +12,10 @@ script
     elements[2]: column-def
       name: ident name="born" quoted=false
       type: data-type name="DATE"
-  statements[1]: select distinct=false
+  statements[1]: select distinct=false groupAll=false
     items[0]: select-item
       expr: number text="1"
-  statements[2]: select distinct=false
+  statements[2]: select distinct=false groupAll=false
     items[0]: select-item
       expr: name
         parts[0]: ident name="a" quoted=false

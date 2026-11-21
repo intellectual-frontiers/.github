@@ -185,6 +185,10 @@ export interface Cast extends Base {
   readonly kind: "cast";
   readonly arg: Expr;
   readonly type: DataType;
+  /** `TRY_CAST` and `SAFE_CAST`, which give `NULL` where the cast fails. */
+  readonly try: boolean;
+  /** The `FORMAT` of `CAST(x AS type FORMAT 'f')`. */
+  readonly format: Expr | undefined;
 }
 
 /** `EXTRACT(field FROM x)`; the field is upper case. */
@@ -234,6 +238,10 @@ export interface Call extends Base {
   readonly name: Name;
   readonly args: readonly (Expr | NamedArg)[];
   readonly distinct: boolean;
+  /** The `ORDER BY` among the arguments: `string_agg(x, ',' ORDER BY y)`. */
+  readonly orderBy: readonly OrderItem[];
+  /** `WITHIN GROUP (ORDER BY ...)`. */
+  readonly withinGroup: readonly OrderItem[];
   readonly filter: Expr | undefined;
   readonly over: WindowSpec | undefined;
 }
@@ -301,6 +309,8 @@ export interface Frame extends Base {
   readonly unit: "rows" | "range" | "groups";
   readonly from: FrameBound;
   readonly to: FrameBound | undefined;
+  /** The `EXCLUDE` of the frame, upper case: `NO OTHERS`, `CURRENT ROW`, `GROUP` or `TIES`. */
+  readonly exclude: string | undefined;
 }
 
 /** A window: `OVER name`, or `OVER ([name] [PARTITION BY ...] [ORDER BY ...] [frame])`. */
@@ -322,6 +332,13 @@ export interface OrderItem extends Base {
 
 // queries
 
+/** `name AS (window)` of a `WINDOW` clause. */
+export interface WindowDef extends Base {
+  readonly kind: "window-def";
+  readonly name: Ident;
+  readonly spec: WindowSpec;
+}
+
 /** One item of a select list: an expression and its alias. */
 export interface SelectItem extends Base {
   readonly kind: "select-item";
@@ -336,8 +353,15 @@ export interface Select extends Base {
   readonly items: readonly SelectItem[];
   readonly from: readonly Source[];
   readonly where: Expr | undefined;
+  /** The expressions of `DISTINCT ON (...)`. */
+  readonly distinctOn: readonly Expr[];
   readonly groupBy: readonly Expr[];
+  /** `GROUP BY ALL`. */
+  readonly groupAll: boolean;
   readonly having: Expr | undefined;
+  /** The named windows of `WINDOW w AS (...)`. */
+  readonly windows: readonly WindowDef[];
+  readonly qualify: Expr | undefined;
   readonly orderBy: readonly OrderItem[];
   readonly limit: Expr | undefined;
   readonly offset: Expr | undefined;
@@ -427,6 +451,8 @@ export interface Join extends Base {
   readonly right: Source;
   readonly on: Expr | undefined;
   readonly using: readonly Ident[];
+  /** The alias of a parenthesized join: `(a JOIN b ON ...) AS t`. */
+  readonly alias: Alias | undefined;
 }
 
 /** A source of rows. */
@@ -643,6 +669,52 @@ export interface Drop extends Base {
 
 // scripts
 
+/** A parameter of a routine. */
+export interface RoutineParam extends Base {
+  readonly kind: "routine-param";
+  readonly mode: "in" | "out" | "inout" | "variadic" | undefined;
+  readonly name: Ident | undefined;
+  readonly type: DataType;
+  readonly default: Expr | undefined;
+}
+
+/** How a routine's body is written. */
+export type BodyStyle = "dollar" | "string" | "block" | "return" | "external";
+
+/** The body of a routine: its style, its text, and where the text is in the whole text. */
+export interface RoutineBody extends Base {
+  readonly kind: "routine-body";
+  readonly style: BodyStyle;
+  /** The text between its delimiters; for a string body, the string's value. */
+  readonly text: string;
+  /** Where the text begins in the whole text. */
+  readonly bodyStart: number;
+  /** Where the text ends in the whole text. */
+  readonly bodyEnd: number;
+  /** Whether the source between `bodyStart` and `bodyEnd` is `text`: false where a string body has escapes. */
+  readonly exact: boolean;
+  /** The expression of `RETURN expression`. */
+  readonly expr: Expr | undefined;
+}
+
+/** `CREATE [OR REPLACE] FUNCTION | PROCEDURE name (parameters) ...`: its header and its body. */
+export interface CreateRoutine extends Base {
+  readonly kind: "create-routine";
+  readonly object: "function" | "procedure";
+  readonly orReplace: boolean;
+  readonly name: Name;
+  readonly params: readonly RoutineParam[];
+  readonly returns: DataType | undefined;
+  readonly setof: boolean;
+  /** The columns of `RETURNS TABLE (...)`. */
+  readonly table: readonly ColumnDef[];
+  /** The language, lower case. */
+  readonly language: string | undefined;
+  /** The other characteristics as written (`IMMUTABLE`, `SECURITY DEFINER`, `COST 10`). */
+  readonly options: string | undefined;
+  readonly body: RoutineBody | undefined;
+}
+
 /**
  * A statement of a kind the grammar does not read: a command (`SET`, `SHOW`, `EXPLAIN`, `GRANT`, ...) or a `CREATE`, `ALTER` or `DROP` of an object it does not read (a function, a sequence, a type). It holds no node:
  * its keyword and, for those three, its object, upper case, and the text after them as written.
@@ -660,7 +732,8 @@ export interface Unparsed extends Base {
 }
 
 /** A statement. */
-export type Statement = Query | Insert | Update | Delete | CreateTable | CreateIndex | CreateView | AlterTable | Drop | Command | Unparsed;
+export type Statement =
+  Query | Insert | Update | Delete | CreateTable | CreateIndex | CreateView | AlterTable | Drop | CreateRoutine | Command | Unparsed;
 
 /** A script: its statements. */
 export interface Script extends Base {
@@ -676,6 +749,7 @@ export type Node =
   | FrameBound
   | Frame
   | WindowSpec
+  | WindowDef
   | OrderItem
   | When
   | SelectItem
@@ -688,6 +762,8 @@ export type Node =
   | ColumnConstraint
   | Reference
   | ColumnDef
+  | RoutineParam
+  | RoutineBody
   | Statement
   | AlterAction
   | Script;
