@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/archon-dialect-mise",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "The dialect of tools for Archon that installs them with mise: mise, which installs the tools of an account in the account's own folder at the versions it is told.",
   "type": "module",
   "engines": {

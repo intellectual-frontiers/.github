@@ -10,7 +10,7 @@ export const library = {
   level: "L1",
   specKit: "spec-kit",
   verify: "bun run verify",
-  version: "0.5.1",
+  version: "0.5.2",
   distribution: ["github", "npm"],
   exports: ["."],
   versionConstants: [{ file: "src/state-record.ts", name: "ERGONEX_VERSION" }],
