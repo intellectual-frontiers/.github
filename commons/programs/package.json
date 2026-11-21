@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/programs",
   "private": true,
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "The program libraries as one install, each at an exact version. The operations program of a repository, workspaces, data, integrations and the other programs.",
   "type": "module",
   "engines": {

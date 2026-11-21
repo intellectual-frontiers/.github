@@ -26,8 +26,10 @@ export const library = {
       { name: "homebrew", instanceOf: "src/physical/dialect/", placement: "package" },
       { name: "mise", instanceOf: "src/physical/dialect/", placement: "package" },
       { name: "winget", instanceOf: "src/physical/dialect/", placement: "package" },
+      { name: "ansible", instanceOf: "src/physical/dialect/", placement: "package" },
+      { name: "cloud-init", instanceOf: "src/physical/dialect/", placement: "package" },
     ],
-    plugins: [{ noun: "tool" }],
+    plugins: [{ noun: "tool" }, { noun: "converge" }, { noun: "boot" }, { noun: "dns" }],
     units: [
       { folder: "src/governance/", layer: "governance", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }] },
       {

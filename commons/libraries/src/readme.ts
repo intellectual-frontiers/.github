@@ -61,6 +61,8 @@ export function parseLibraryName(text: string): Result<LibraryName, string> {
 
 /** The role of each library, by name. A new library is classified here, or the check names it. */
 export const ROLE_OF: ReadonlyMap<string, Role> = new Map<string, Role>([
+  ["catalog-nist-sp800", "standard"],
+  ["catalog-nist-csf-2", "standard"],
   ["core", "foundation"],
   ["crypto", "foundation"],
   ["formats", "foundation"],
@@ -88,6 +90,11 @@ export const ROLE_OF: ReadonlyMap<string, Role> = new Map<string, Role>([
   ["archon-dialect-native-pinned", "program"],
   ["package-managers", "program"],
   ["archon-dialect-apt", "program"],
+  ["archon-dialect-ansible", "program"],
+  ["archon-dialect-cloud-init", "program"],
+  ["archon-converge", "program"],
+  ["archon-boot", "program"],
+  ["archon-dns", "program"],
   ["archon-dialect-homebrew", "program"],
   ["archon-dialect-mise", "program"],
   ["archon-dialect-winget", "program"],
@@ -104,6 +111,9 @@ export const ROLE_OF: ReadonlyMap<string, Role> = new Map<string, Role>([
   ["machine-probe", "program"],
   ["lab", "program"],
   ["evidence-capture", "program"],
+  ["netboot", "program"],
+  ["linux-observe", "program"],
+  ["linux-services", "program"],
   ["lang-sql", "program"],
   ["integrations-fhir", "standard"],
   ["integrations-x12", "standard"],

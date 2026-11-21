@@ -99,39 +99,77 @@ async function assessmentResults(a: Assessment, ctx: SerializeContext): Promise<
   };
 }
 
+/** What the caller says of the system, beyond what the assessment shows: nothing is invented where it is not said. */
+type SystemOptions = {
+  readonly description?: string;
+  readonly sensitivity?: "low" | "moderate" | "high";
+  readonly boundary?: string;
+  readonly profile?: string;
+  readonly informationTypes?: readonly { readonly title: string; readonly description: string }[];
+  readonly components?: readonly { readonly name: string; readonly type?: string; readonly description?: string }[];
+  readonly users?: readonly { readonly title: string }[];
+  /** Whose each control is: `provider` satisfies it for others, `inherited` comes from a provider, `customer` is left to the customer. */
+  readonly responsibilities?: Readonly<Record<string, "provider" | "inherited" | "customer">>;
+};
+
+function systemOf(ctx: SerializeContext): SystemOptions {
+  const v = ctx.options?.["system"];
+  return typeof v === "object" && v !== null && !Array.isArray(v) ? (v as SystemOptions) : {};
+}
+
 async function ssp(a: Assessment, ctx: SerializeContext): Promise<Obj> {
-  const component = await uuidOf([a.id, "component"]);
-  const implemented = new Map<string, Set<string>>();
+  const sys = systemOf(ctx);
+  const subjects = [...new Set(a.results.map((r) => r.subject))].sort();
+  const thisSystem = await uuidOf([a.id, "component"]);
+  const extra = await Promise.all((sys.components ?? []).map(async (c) => ({ uuid: await uuidOf([a.id, "component", c.name]), type: c.type ?? "software", title: c.name, description: c.description ?? `${c.name}, as the system's description names it.`, status: { state: "operational" } })));
+  // what each control is shown by: the checks, and whether every result passes
+  const shown = new Map<string, { checks: Set<string>; allPass: boolean }>();
   for (const r of a.results) {
-    if (r.status !== "pass" && r.status !== "accepted") continue;
-    for (const c of r.controls) implemented.set(controlOf(c, ctx).id, new Set([...(implemented.get(controlOf(c, ctx).id) ?? []), r.check]));
+    for (const c of r.controls) {
+      const id = controlOf(c, ctx).id;
+      const e = shown.get(id) ?? { checks: new Set<string>(), allPass: true };
+      e.checks.add(r.check);
+      if (r.status !== "pass" && r.status !== "accepted" && r.status !== "not-applicable") e.allPass = false;
+      shown.set(id, e);
+    }
   }
   const requirements = await Promise.all(
-    [...implemented.keys()].sort().map(async (id) => ({
-      uuid: await uuidOf([a.id, "implemented", id]),
-      "control-id": id,
-      "by-components": [
-        { "component-uuid": component, uuid: await uuidOf([a.id, "by", id]), description: `Shown by the checks ${[...(implemented.get(id) ?? [])].sort().join(", ")}.` },
-      ],
-    })),
+    [...shown.keys()].sort().map(async (id) => {
+      const e = shown.get(id) ?? { checks: new Set<string>(), allPass: false };
+      const who = sys.responsibilities?.[id] ?? sys.responsibilities?.[id.toUpperCase()];
+      const by: Obj = {
+        "component-uuid": thisSystem,
+        uuid: await uuidOf([a.id, "by", id]),
+        description: `${e.allPass ? "Shown" : "Not yet shown"} by the checks ${[...e.checks].sort().join(", ")}.`,
+        "implementation-status": { state: e.allPass ? "implemented" : "partial" },
+        ...(who === "inherited" ? { inherited: [{ uuid: await uuidOf([a.id, "inherited", id]), description: `${id} is inherited from a provider.` }] } : {}),
+        ...(who === "provider" ? { satisfied: [{ uuid: await uuidOf([a.id, "satisfied", id]), description: `${id} is satisfied by this system for its customers.` }] } : {}),
+        ...(who === "customer" ? { export: { responsibilities: [{ uuid: await uuidOf([a.id, "responsibility", id]), description: `${id} is the customer's to satisfy.` }] } } : {}),
+      };
+      return { uuid: await uuidOf([a.id, "implemented", id]), "control-id": id, "by-components": [by] };
+    }),
   );
   return {
     "system-security-plan": {
       uuid: await uuidOf([a.id, "system-security-plan"]),
       metadata: await metadata(a, `${a.title}: system security plan`),
-      "import-profile": { href: `#${await uuidOf([a.id, "profile"])}` },
+      "import-profile": { href: sys.profile ?? `#${await uuidOf([a.id, "profile"])}` },
       "system-characteristics": {
         "system-ids": [{ id: a.id }],
         "system-name": a.title,
-        description: `The controls implemented, as shown by the checks of ${a.title}; the assessment says nothing else of the system.`,
+        description: sys.description ?? `The controls implemented, as shown by the checks of ${a.title}; the assessment says nothing else of the system.`,
+        ...(sys.sensitivity === undefined ? {} : { "security-sensitivity-level": sys.sensitivity }),
+        "system-information": {
+          "information-types": await Promise.all((sys.informationTypes ?? [{ title: "Not stated by the assessment.", description: "The assessment does not say what information the system holds." }]).map(async (t) => ({ uuid: await uuidOf([a.id, "information-type", t.title]), title: t.title, description: t.description }))),
+        },
         status: { state: "operational" },
-        "authorization-boundary": { description: "Not stated by the assessment." },
+        "authorization-boundary": { description: sys.boundary ?? "Not stated by the assessment." },
       },
       "system-implementation": {
-        users: [{ uuid: await uuidOf([a.id, "user"]), title: "Not stated by the assessment." }],
-        components: [{ uuid: component, type: "this-system", title: a.title, description: `The subjects assessed: ${[...new Set(a.results.map((r) => r.subject))].sort().join(", ") || "none"}.`, status: { state: "operational" } }],
+        users: await Promise.all((sys.users ?? [{ title: "Not stated by the assessment." }]).map(async (u) => ({ uuid: await uuidOf([a.id, "user", u.title]), title: u.title }))),
+        components: [{ uuid: thisSystem, type: "this-system", title: a.title, description: `The subjects assessed: ${subjects.join(", ") || "none"}.`, status: { state: "operational" } }, ...extra],
       },
-      "control-implementation": { description: `What ${a.title} shows to be implemented.`, "implemented-requirements": requirements },
+      "control-implementation": { description: `What ${a.title} shows of each control.`, "implemented-requirements": requirements },
     },
   };
 }

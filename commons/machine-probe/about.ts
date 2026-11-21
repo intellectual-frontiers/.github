@@ -10,7 +10,7 @@ import type { About } from "@intellectual-frontiers/core/about";
 /** Machine Probe. */
 export const about: About = {
   title: "Machine Probe",
-  summary: "The probe a machine runs for its fleet: the three read-only requests it answers (facts, version, one osquery SELECT), the key line that restricts a key to them, the facts as a typed observation, and the policy pack that judges an observation with its Secure Controls Framework controls.",
+  summary: "The probe a machine runs for its fleet: the three read-only requests it answers (facts, version, one osquery SELECT), the key line that restricts a key to them, the facts as a typed observation, and the policy pack that judges an observation with the NIST SP 800-53 controls each gives evidence for.",
   folders: [
     { path: "spec-kit/", what: "The library's own specifications, numbered from 0001.", mayImport: ["nothing: Markdown and TSV"] },
     { path: "src/governance/", what: "Layer 1: what the library is, as data and types.", mayImport: ["core, by package name"] },
