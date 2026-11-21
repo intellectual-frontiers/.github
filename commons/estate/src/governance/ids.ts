@@ -35,11 +35,25 @@ export const parseAssetKind: (text: string) => Result<AssetKind, string> = made<
 /** A system id from text: lower case words joined by hyphens, at most 60 characters. */
 export const parseSystemId: (text: string) => Result<SystemId, string> = made<"estate system id">("a system id", "lower case words joined by hyphens", word, 60);
 
-/** The states of an asset: seen and not adopted, known and observed but not changed, and changed to match what is declared. */
+/** The ways an asset came to be in the fleet (Stolos 107-pairing-and-query FR-007): the controller adopted by itself, paired, integrated, brought in by an integration, installed (managed) or found in a cloud account. */
+export const WAYS_OF_JOINING = ["auto-adopted", "paired", "integrated", "integration", "managed", "cloud"] as const;
+
+/**
+ * How an asset came to be in the fleet: `managed` is for an asset the system installed, and no other asset is `managed`.
+ *
+ * @example
+ * ```ts
+ * import type { WayOfJoining } from "./ids.ts";
+ * const way: WayOfJoining = "paired";
+ * ```
+ */
+export type WayOfJoining = (typeof WAYS_OF_JOINING)[number];
+
+/** The states of an asset: seen and not adopted, observed and checked but never changed, and installed and changed to match what is declared. */
 export const STATES = ["discovered", "adopted", "managed"] as const;
 
 /**
- * The state of an asset: `discovered` (seen, not adopted), `adopted` (known, observed and verified, never changed) or `managed` (changed to match what is declared).
+ * The state of an asset: `discovered` (seen, not adopted), `adopted` (someone else's install, observed and checked, never changed) or `managed` (installed by the system and changed to match what is declared).
  *
  * @example
  * ```ts

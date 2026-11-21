@@ -6,14 +6,14 @@
  * @example
  * ```ts
  * import { defineAsset } from "./asset.ts";
- * const a = defineAsset({ id: "olympia", kind: "server", state: "adopted", owners: { observe: "archon", verify: "archon", access: "archon" } });
+ * const a = defineAsset({ id: "athens", kind: "server", state: "adopted", joined: "paired", owners: { observe: "archon", verify: "archon" } });
  * a.kind; // "ok"
  * ```
  *
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import { CAPABILITIES, parseAssetId, parseAssetKind, parseSystemId, type AssetId, type AssetKind, type AssetState, type Capability, type SystemId } from "./ids.ts";
+import { CAPABILITIES, parseAssetId, parseAssetKind, parseSystemId, WAYS_OF_JOINING, type AssetId, type AssetKind, type AssetState, type Capability, type SystemId, type WayOfJoining } from "./ids.ts";
 import { offers, reasonNotOffered } from "./states.ts";
 
 /** What `defineAsset` takes. */
@@ -21,6 +21,8 @@ export type AssetInput = {
   readonly id: string;
   readonly kind: string;
   readonly state: AssetState;
+  /** How it came to be in the fleet; a managed asset is `managed` (the default) and no other is. */
+  readonly joined?: WayOfJoining;
   /** For each capability the state offers, the system that owns it. */
   readonly owners: Readonly<Partial<Record<Capability, string>>>;
 };
@@ -35,6 +37,8 @@ export type Asset = {
   readonly id: AssetId;
   readonly kind: AssetKind;
   readonly state: AssetState;
+  /** How it came to be in the fleet, where that is known. */
+  readonly joined?: WayOfJoining;
   /** Every capability, in the order of the closed list. */
   readonly capabilities: readonly CapabilityLine[];
 };
@@ -53,6 +57,10 @@ export function defineAsset(input: AssetInput): Result<Asset, readonly string[]>
   const kind = parseAssetKind(input.kind);
   if (kind.kind === "err") problems.push(kind.error);
   const lines: CapabilityLine[] = [];
+  const joined: WayOfJoining | undefined = input.joined ?? (input.state === "managed" ? "managed" : undefined);
+  if (joined !== undefined && !WAYS_OF_JOINING.includes(joined)) problems.push(`${input.id}: ${JSON.stringify(joined)} is not a way of joining`);
+  else if (joined === "managed" && input.state !== "managed") problems.push(`${input.id}: only an asset the system installed joined as managed, and this one is ${input.state}`);
+  else if (input.state === "managed" && joined !== "managed") problems.push(`${input.id}: a managed asset joined as managed, not ${joined ?? "unknown"}`);
   for (const capability of CAPABILITIES) {
     const owner = input.owners[capability];
     if (!offers(input.state, capability)) {
@@ -68,5 +76,5 @@ export function defineAsset(input: AssetInput): Result<Asset, readonly string[]>
     if (system.kind === "err") problems.push(`${input.id}: ${system.error}`);
     else lines.push({ capability, offered: true, owner: system.value });
   }
-  return problems.length > 0 || id.kind === "err" || kind.kind === "err" ? err(problems) : ok({ id: id.value, kind: kind.value, state: input.state, capabilities: lines });
+  return problems.length > 0 || id.kind === "err" || kind.kind === "err" ? err(problems) : ok({ id: id.value, kind: kind.value, state: input.state, ...(joined === undefined ? {} : { joined }), capabilities: lines });
 }

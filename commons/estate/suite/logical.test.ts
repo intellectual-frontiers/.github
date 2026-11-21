@@ -16,22 +16,27 @@ function asset(state: "discovered" | "adopted" | "managed", owners: Record<strin
   return a.value;
 }
 
-proves(["0002-estate-governance FR-003", "0003-estate-logical FR-001"], "a move keeps the owners of what the new state offers, gives up the rest, takes the owners of what is new, and is refused where it is not allowed", () => {
+proves(["0002-estate-governance FR-003", "0003-estate-logical FR-001"], "an adoption and a release keep and give up owners, keep the way of joining, a managed asset is never moved, and a move that is not allowed is refused", () => {
+  const discovered = asset("discovered", {});
+  const none = moveState(discovered, "adopted");
+  assert(none.kind === "err" && none.error.length === 2, "observe and verify need an owner");
+  const adopted = moveState(discovered, "adopted", { observe: "archon", verify: "archon" });
+  assert(adopted.kind === "ok" && ownerOf(adopted.value, "observe") === "archon" && ownerOf(adopted.value, "verify") === "archon");
+  const released = moveState(adopted.kind === "ok" ? adopted.value : discovered, "discovered");
+  assert(released.kind === "ok" && released.value.capabilities.every((c) => !c.offered), "a released asset offers nothing");
+  const joined = defineAsset({ id: "defiant", kind: "workstation", state: "adopted", joined: "paired", owners: { observe: "archon", verify: "archon" } });
+  assert(joined.kind === "ok");
+  const back = moveState(joined.value, "discovered");
+  assert(back.kind === "ok" && back.value.joined === "paired", "the way it joined is kept");
   const managed = asset("managed", ALL);
-  const adopted = moveState(managed, "adopted");
-  assert(adopted.kind === "ok");
-  assertEquals([ownerOf(adopted.value, "verify"), ownerOf(adopted.value, "observe"), ownerOf(adopted.value, "access"), ownerOf(adopted.value, "converge")], ["archon", "archon", "archon", undefined]);
-  const back = moveState(adopted.value, "managed");
-  assert(back.kind === "err" && back.error.length === 7, "seven capabilities need an owner again");
-  const again = moveState(adopted.value, "managed", { provision: "archon", identity: "archon", plan: "archon", converge: "archon", update: "archon", backup: "archon", retire: "archon" });
-  assert(again.kind === "ok" && ownerOf(again.value, "verify") === "archon" && ownerOf(again.value, "converge") === "archon");
-  const discovered = asset("discovered", { observe: "archon" });
+  for (const to of ["adopted", "discovered"] as const) {
+    const r = moveState(managed, to);
+    assert(r.kind === "err" && r.error[0]?.includes("never moved") === true, `a managed asset is not moved to ${to}`);
+  }
   const skip = moveState(discovered, "managed");
-  assert(skip.kind === "err" && skip.error[0]?.includes("adopted first") === true);
+  assert(skip.kind === "err" && skip.error[0]?.includes("never moved") === true);
   const same = moveState(discovered, "discovered");
   assert(same.kind === "err" && same.error[0]?.includes("already") === true);
-  const up = moveState(discovered, "adopted", { verify: "archon", access: "archon" });
-  assert(up.kind === "ok" && ownerOf(up.value, "observe") === "archon");
 });
 
 proves(["0003-estate-logical FR-002"], "a capability moves to another system only with a passed acceptance test for this asset, this capability and that system", () => {
@@ -47,29 +52,29 @@ proves(["0003-estate-logical FR-002"], "a capability moves to another system onl
   assert(moved.kind === "ok" && ownerOf(moved.value, "converge") === "archon" && ownerOf(moved.value, "update") === "stolos");
   const same = moveCapability(moved.kind === "ok" ? moved.value : managed, "converge", "archon", record);
   assert(same.kind === "err" && same.error[0]?.includes("already owned") === true);
-  const adopted = asset("adopted", { observe: "archon", verify: "archon", access: "archon" });
+  const adopted = asset("adopted", { observe: "archon", verify: "archon" });
   const notOffered = moveCapability(adopted, "converge", "archon", record);
   assert(notOffered.kind === "err" && notOffered.error[0]?.includes("not offered") === true);
   assertEquals(moveCapability(managed, "converge", "Not A System", record).kind, "err");
 });
 
 proves(["0003-estate-logical FR-003"], "operational truth tells what differs between declared and observed, how old the observation is, and never says an unobserved asset agrees", () => {
-  const adopted = asset("adopted", { observe: "archon", verify: "archon", access: "archon" });
+  const adopted = asset("adopted", { observe: "archon", verify: "archon" });
   const declared = { "pkg.git": { version: "2.43.0" }, "svc.ssh": { enabled: true } };
   const base = { asset: adopted, declared, now: "2026-12-01T12:00:00Z", within: "PT24H" };
-  const same = operationalTruth({ ...base, observed: { at: "2026-12-01T11:00:00Z", state: declared } });
-  assert(same.kind === "ok" && same.value.agrees && same.value.currency === "fresh" && same.value.observedAt === "2026-12-01T11:00:00Z");
-  const drifted = operationalTruth({ ...base, observed: { at: "2026-12-01T11:00:00Z", state: { "pkg.git": { version: "2.44.0" }, "svc.cron": { enabled: true } } } });
-  assert(drifted.kind === "ok" && !drifted.value.agrees);
+  const same = operationalTruth({ ...base, observed: { at: "2026-12-01T11:00:00Z", source: "probe", state: declared } });
+  assert(same.kind === "ok" && same.value.agrees && same.value.currency === "fresh" && same.value.observedAt === "2026-12-01T11:00:00Z" && same.value.alignment === "aligned" && same.value.source === "probe");
+  const drifted = operationalTruth({ ...base, observed: { at: "2026-12-01T11:00:00Z", source: "probe", state: { "pkg.git": { version: "2.44.0" }, "svc.cron": { enabled: true } } } });
+  assert(drifted.kind === "ok" && !drifted.value.agrees && drifted.value.alignment === "drifted");
   assertEquals(drifted.kind === "ok" ? drifted.value.difference?.added : undefined, ["svc.cron"]);
   assertEquals(drifted.kind === "ok" ? drifted.value.difference?.removed : undefined, ["svc.ssh"]);
   assertEquals(drifted.kind === "ok" ? drifted.value.difference?.changed.map((c) => c.path) : undefined, ["version"]);
-  const stale = operationalTruth({ ...base, observed: { at: "2026-11-29T11:00:00Z", state: declared } });
+  const stale = operationalTruth({ ...base, observed: { at: "2026-11-29T11:00:00Z", source: "probe", state: declared } });
   assert(stale.kind === "ok" && stale.value.currency === "stale" && stale.value.agrees);
   const never = operationalTruth({ ...base, observed: undefined });
-  assert(never.kind === "ok" && never.value.currency === "never-observed" && !never.value.agrees && never.value.difference === null);
-  const discovered = operationalTruth({ asset: asset("discovered", { observe: "archon" }), declared, observed: { at: "2026-12-01T11:00:00Z", state: { x: 1 } }, now: base.now, within: base.within });
-  assert(discovered.kind === "ok" && discovered.value.difference === null, "nothing is declared of a discovered asset");
+  assert(never.kind === "ok" && never.value.currency === "never-observed" && !never.value.agrees && never.value.difference === null && never.value.alignment === "not-observed" && never.value.source === null);
+  const discovered = operationalTruth({ asset: asset("discovered", {}), declared, observed: { at: "2026-12-01T11:00:00Z", source: "probe", state: { x: 1 } }, now: base.now, within: base.within });
+  assert(discovered.kind === "ok" && discovered.value.difference === null && discovered.value.alignment === "not-observed", "nothing is declared of a discovered asset, so it is never aligned");
   assertEquals(operationalTruth({ ...base, observed: undefined, within: "soon" }).kind, "err");
   assertEquals(operationalTruth({ ...base, observed: undefined, now: "yesterday" }).kind, "err");
 });
