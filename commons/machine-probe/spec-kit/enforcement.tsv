@@ -20,3 +20,6 @@ requirement	mechanism	by	note
 0005-machine-probe-state FR-002	check	.github: cd commons/machine-probe && bun run verify	suite/state.test.ts
 0005-machine-probe-state FR-003	check	.github: cd commons/machine-probe && bun run verify	suite/state.test.ts
 0005-machine-probe-state FR-004	check	.github: cd commons/machine-probe && bun run verify	suite/state.test.ts
+0006-machine-probe-grc FR-001	check	.github: cd commons/machine-probe && bun run verify	suite/grc.test.ts
+0006-machine-probe-grc FR-002	check	.github: cd commons/machine-probe && bun run verify	suite/grc.test.ts
+0006-machine-probe-grc FR-003	check	.github: cd commons/machine-probe && bun run verify	suite/grc.test.ts

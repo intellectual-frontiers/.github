@@ -7,3 +7,4 @@
 export * from "./observed.ts";
 export * from "./policies.ts";
 export * from "./state.ts";
+export * from "./grc.ts";
