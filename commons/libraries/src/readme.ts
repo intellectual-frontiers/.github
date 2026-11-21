@@ -100,6 +100,7 @@ export const ROLE_OF: ReadonlyMap<string, Role> = new Map<string, Role>([
   ["lab", "program"],
   ["evidence-capture", "program"],
   ["netboot", "program"],
+  ["linux-observe", "program"],
   ["integrations-fhir", "standard"],
   ["integrations-x12", "standard"],
   ["mizan", "standard"],

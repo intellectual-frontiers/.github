@@ -95,6 +95,7 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/integrations-github`](https://www.npmjs.com/package/@intellectual-frontiers/integrations-github) | Program | The reference connector of Integrations for the posture of one organization of a code host | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/lab`](commons/lab) | Program | Disposable machines for tests | layers | L1 | held |
 | [`@intellectual-frontiers/libraries`](https://www.npmjs.com/package/@intellectual-frontiers/libraries) | Program | The tools of a repository of commons | - | L1 | GitHub, npm |
+| [`@intellectual-frontiers/linux-observe`](commons/linux-observe) | Program | What a Linux machine is, read with no change | layers | L1 | held |
 | [`@intellectual-frontiers/machine-probe`](commons/machine-probe) | Program | The probe a machine runs for its fleet | layers | L1 | held |
 | [`@intellectual-frontiers/netboot`](commons/netboot) | Program | The network boot of a blank machine | layers | L1 | held |
 | [`@intellectual-frontiers/package-managers`](commons/package-managers) | Program | The shared kit of the dialects that drive a package manager | layers | L1 | held |
