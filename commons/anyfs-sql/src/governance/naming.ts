@@ -7,7 +7,7 @@
  * ```ts
  * import { parseNaming, tableOf } from "./naming.ts";
  * const n = parseNaming({ prefix: "fleet" });
- * n.kind === "ok" && tableOf(n.value, "objects"); // "fleet_objects"
+ * n.kind === "ok" && tableOf(n.value, "versions"); // "fleet_versions"
  * ```
  *
  * @module
@@ -17,9 +17,15 @@ import { type Brand, err, ok, type Result } from "@intellectual-frontiers/core";
 /** A word of a table name: lower case letters, digits and underscores, starting with a letter, at most 32 characters. Made only by `parseWord`. */
 export type Word = Brand<string, "anyfs sql word">;
 
-/** The tables of a store, by what each holds: the facts of the layout, the objects, the earlier revisions of each, and the index of search. */
-export const TABLE_ROLES = ["meta", "objects", "revisions", "search"] as const;
-/** The role of one table. */
+/** The tables a dump carries, by what each holds: the version rows and the blobs. */
+export const MERGEABLE_ROLES = ["versions", "blobs"] as const;
+/** The tables that belong to one replica and that no import writes: its facts and identity, whom it trusts, the epochs it holds and its caches (the deltas held back, and the index of search). */
+export const LOCAL_ROLES = ["meta", "trust", "epochs", "cache", "search"] as const;
+/** The views made from the rows and nothing else: the heads of every path, the files that are there, the siblings and the version vector. */
+export const VIEW_ROLES = ["heads", "names", "siblings", "vector"] as const;
+/** Every name of a store, by what it holds. */
+export const TABLE_ROLES = [...MERGEABLE_ROLES, ...LOCAL_ROLES, ...VIEW_ROLES] as const;
+/** The role of one table or view. */
 export type TableRole = (typeof TABLE_ROLES)[number];
 
 /** The names of the tables of one store. */

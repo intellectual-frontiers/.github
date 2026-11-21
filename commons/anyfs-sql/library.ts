@@ -29,9 +29,9 @@ export const library = {
         packages: [
           { name: "@intellectual-frontiers/core", subpaths: [] },
           { name: "@intellectual-frontiers/crypto", subpaths: ["sha256"] },
-          { name: "@intellectual-frontiers/system", subpaths: ["path"] },
+          { name: "@intellectual-frontiers/system", subpaths: ["path", "fs"] },
           { name: "@intellectual-frontiers/lang-sql", subpaths: "any" },
-          { name: "@intellectual-frontiers/anyfs", subpaths: ["governance", "logical"] },
+          { name: "@intellectual-frontiers/anyfs", subpaths: ["governance", "logical", "merge"] },
           { name: "@intellectual-frontiers/anyfs-sql", subpaths: ["governance"] },
         ],
       },
