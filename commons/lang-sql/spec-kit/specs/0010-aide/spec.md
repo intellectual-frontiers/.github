@@ -78,6 +78,10 @@
 - **FR-025**: The engine MUST answer `TABLESAMPLE BERNOULLI (p)` and `TABLESAMPLE SYSTEM (p)` after a table and its alias, with or without `REPEATABLE (seed)`: each row is kept where a pseudo-random number of a generator that the seed starts (the seed 0 where none is given, so that the same query over the same rows gives the same rows) is under `p` percent (`p` from 0 to 100); any other method, and a `p` out of range, MUST be an error value.
 - **FR-026**: The engine MUST answer `LATERAL (subquery)` and `JOIN LATERAL`, `CROSS JOIN LATERAL` and `LEFT JOIN LATERAL ... ON TRUE`: the subquery is run for each row of what stands before it in the `FROM` and may name that row's columns, an inner or cross join keeping the rows that the subquery gives and a left join keeping the row once with nulls where it gives none.
 
+## Numbers and truncation
+
+- **FR-027**: The engine MUST have `round(x [, n])` (half away from zero, as decimal text reads it, so that `round(2.675, 2)` is 2.68; `n` a whole number that may be negative, 0 where it is not given), `floor(x)`, `ceil(x)` and `ceiling(x)`, and `date_trunc(field, x)` of a date or a timestamp (a date is read as its midnight, and the answer is a timestamp) for the fields `microseconds`, `milliseconds`, `second`, `minute`, `hour`, `day`, `week` (the Monday), `month`, `quarter`, `year`, `decade`, `century` and `millennium`, the field without regard to case; a null argument gives a null, and an argument that is not a number (or not a date or a timestamp), a `n` that is not whole and a field that is none MUST be error values.
+
 ## Out of scope
 
 - Joins, aggregates and optimizing across tables in the planner; a cost model; any change of a store.
