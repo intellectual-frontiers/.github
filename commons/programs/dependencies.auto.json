@@ -11,6 +11,7 @@
     "@intellectual-frontiers/grc": "0.3.3",
     "@intellectual-frontiers/integrations": "0.2.3",
     "@intellectual-frontiers/integrations-github": "0.2.3",
+    "@intellectual-frontiers/lang-sql": "0.1.0",
     "@intellectual-frontiers/libraries": "0.5.4",
     "@intellectual-frontiers/package-managers": "0.1.2",
     "@intellectual-frontiers/repoctl": "0.2.3",

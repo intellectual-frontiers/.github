@@ -1,0 +1,14 @@
+# Files with no extension
+
+$ sqlfs --root $ROOT 'SELECT path FROM files WHERE kind = '\''f'\'' AND ext = '\'''\'''
+path
+---------
+lib/noext
+
+$ sqlfind --root $ROOT --emit shell 'SELECT path FROM files WHERE kind = '\''f'\'' AND ext = '\'''\'''
+find $ROOT -mindepth 1 -maxdepth 64 -type f -printf '%P\0%y\0%s\0%Ts\0%m\0%u\0'
+
+$ sqlfind --root $ROOT 'SELECT path FROM files WHERE kind = '\''f'\'' AND ext = '\'''\'''
+path
+---------
+lib/noext

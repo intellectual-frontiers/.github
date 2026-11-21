@@ -1,0 +1,7 @@
+SELECT generate_series FROM GENERATE_SERIES(1,2);
+
+SELECT g FROM GENERATE_SERIES(1,2) AS g;
+
+SELECT g FROM GENERATE_SERIES(1,2) AS t(g);
+
+SELECT jsonvalue.id FROM deal, JSONB_TO_RECORDSET(CAST(deal.type AS JSONB)) AS jsonvalue(id INT, key VARCHAR, text VARCHAR);

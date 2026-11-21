@@ -1,0 +1,675 @@
+SELECT SPACE(2);
+
+SELECT purchases, LAST_VALUE(item) OVER item_window AS most_popular FROM Produce WINDOW item_window AS (PARTITION BY purchases ORDER BY purchases ROWS BETWEEN 2 PRECEDING AND 2 FOLLOWING);
+
+SELECT DATE_ADD(CURRENT_DATE, -2);
+
+SELECT TIMESTAMPDIFF(MINUTE, CAST(FROM_UNIXTIME(0) AS TIMESTAMP), CAST(FROM_UNIXTIME(60) AS TIMESTAMP));
+
+SELECT DATE_ADD(MINUTE, '10', CAST('2008-12-25 15:30:00+00' AS TIMESTAMP));
+
+SELECT * FROM EXPLODE(ARRAY(STRUCT('Alice' AS name, STRUCT(85 AS math, 90 AS english) AS scores), STRUCT('Bob' AS name, STRUCT(92 AS math, 88 AS english) AS scores)));
+
+SELECT * FROM EXPLODE(ARRAY(STRUCT('Alice' AS name, 85 AS score), STRUCT('Bob' AS name, 92 AS score), STRUCT('Diana' AS name, 95 AS score)));
+
+SELECT UNIX_SECONDS('2008-12-25 15:30:00+00');
+
+SELECT TIMESTAMPDIFF(MILLISECOND, '2023-01-01T05:00:00', '2023-01-01T00:00:00');
+
+SELECT TIMESTAMPADD(MILLISECOND, '1', '2023-01-01T00:00:00');
+
+SELECT TIMESTAMPADD(MILLISECOND, '1' * -1, '2023-01-01T00:00:00');
+
+SELECT DATE_TRUNC('HOUR', '2023-01-01T01:01:01');
+
+SELECT SUBSTRING_INDEX('a.b.c.d', '.', 2);
+
+SELECT b.name, t.id FROM a CROSS JOIN LATERAL EXPLODE(a.ids) AS t(id) JOIN b ON b.id = t.id;
+
+SELECT a.k, t.x FROM a LEFT JOIN LATERAL EXPLODE(a.arr) AS t(x) ON TRUE;
+
+SELECT s.x FROM a CROSS JOIN LATERAL EXPLODE(a.arrays) AS t(arr) CROSS JOIN LATERAL EXPLODE(t.arr) AS s(x);
+
+SELECT * FROM INLINE(ARRAYS_ZIP(ARRAY(1, 2), ARRAY(3))) AS t(x, y);
+
+SELECT t.n, COUNT(*) FROM a CROSS JOIN LATERAL (SELECT * EXCEPT (pos), CAST(pos AS BIGINT) + 1 AS n FROM POSEXPLODE(a.arr)) AS t(x, n) JOIN b ON b.id = t.n WHERE t.n = 1 GROUP BY t.n HAVING t.n > 0 ORDER BY t.n NULLS LAST;
+
+SELECT n, (SELECT n FROM b) AS other_n FROM a CROSS JOIN LATERAL (SELECT * EXCEPT (pos), CAST(pos AS BIGINT) + 1 AS n FROM POSEXPLODE(a.arr)) AS t(x, n);
+
+SELECT * FROM a CROSS JOIN LATERAL (SELECT * EXCEPT (pos), CAST(pos AS BIGINT) + 1 AS n FROM POSEXPLODE(a.arr)) AS t(x, n);
+
+SELECT * FROM (SELECT * EXCEPT (pos), CAST(pos AS BIGINT) + 1 AS n FROM POSEXPLODE(ARRAY(10, 20))) AS t(x, n);
+
+SELECT * FROM (SELECT col.*, CAST(pos AS BIGINT) + 1 AS n FROM POSEXPLODE(ARRAYS_ZIP(ARRAY(1, 2), ARRAY(3)))) AS t(x, y, n);
+
+SELECT * FROM (SELECT * EXCEPT (pos), CAST(pos AS BIGINT) + 1 AS n FROM POSEXPLODE(MAP_FROM_ARRAYS(ARRAY(1), ARRAY(10)))) AS t(k, v, n);
+
+SELECT * FROM (SELECT * EXCEPT (pos), CAST(pos AS BIGINT) + 1 AS ordinality FROM POSEXPLODE(ARRAY(10, 20)));
+
+SELECT `t`.`n` FROM a CROSS JOIN LATERAL (SELECT * EXCEPT (pos), CAST(pos AS BIGINT) + 1 AS `n` FROM POSEXPLODE(a.arr)) AS `t`(`x`, `n`);
+
+CREATE TABLE t (ts TIMESTAMP(9));
+
+SELECT CAST('2024-01-01 00:00:00' AS TIMESTAMP);
+
+SELECT CAST(x AS TIMESTAMP);
+
+SELECT CAST(x AS TIMESTAMP(6));
+
+INSERT INTO target REPLACE USING (c1, c2) SELECT c1, c2 FROM source;
+
+CREATE TABLE foo (my_arr ARRAY<STRING COLLATE UTF8_BINARY>);
+
+CREATE TABLE foo (m MAP<STRING, STRING COLLATE UTF8_BINARY>);
+
+SELECT CAST('a' AS STRING COLLATE UTF8_BINARY);
+
+SELECT COSH(1.5);
+
+DESCRIBE EXTENDED staging.onetrade_startb AS JSON;
+
+SELECT BITMAP_BIT_POSITION(10);
+
+SELECT BITMAP_BUCKET_NUMBER(32769);
+
+SELECT BITMAP_CONSTRUCT_AGG(value);
+
+SELECT EXP(1);
+
+SELECT MODE(category);
+
+SELECT MODE(price, TRUE) AS deterministic_mode FROM products;
+
+SELECT CAST(NULL AS VOID);
+
+SELECT void FROM t;
+
+SELECT * FROM stream;
+
+SELECT * FROM STREAM t;
+
+SELECT t.current_time FROM t;
+
+ALTER TABLE labels ADD COLUMN label_score FLOAT;
+
+DESCRIBE HISTORY a.b;
+
+DESCRIBE history.tbl;
+
+CREATE TABLE t (a STRUCT<c: MAP<STRING, STRING>>);
+
+CREATE TABLE t (c STRUCT<interval: DOUBLE COMMENT 'aaa'>);
+
+CREATE TABLE t (c STRING COMMENT 'Hello World');
+
+CREATE TABLE my_table TBLPROPERTIES (a.b=15);
+
+CREATE TABLE my_table TBLPROPERTIES ('a.b'=15);
+
+CREATE TABLE table1 CLUSTER BY AUTO;
+
+CREATE TABLE t (customer_id INT NOT NULL, ts TIMESTAMP NOT NULL, CONSTRAINT customer_features_pk PRIMARY KEY (customer_id, ts TIMESERIES));
+
+CREATE TABLE t (a INT, b TIMESTAMP, PRIMARY KEY (a, b TIMESERIES));
+
+ALTER TABLE t CLUSTER BY NONE;
+
+CREATE TABLE t CLUSTER BY (col1);
+
+CREATE TABLE t CLUSTER BY (col1, col2);
+
+SELECT col1 FROM t CLUSTER BY col1;
+
+SELECT col1, col2 FROM t CLUSTER BY col1, col2;
+
+SELECT CAST('11 23:4:0' AS INTERVAL DAY TO HOUR);
+
+SELECT CAST('11 23:4:0' AS INTERVAL DAY TO MINUTE);
+
+SELECT CAST('11 23:4:0' AS INTERVAL DAY TO SECOND);
+
+SELECT CAST('23:00:00' AS INTERVAL HOUR TO MINUTE);
+
+SELECT CAST('23:00:00' AS INTERVAL HOUR TO SECOND);
+
+SELECT CAST('23:00:00' AS INTERVAL MINUTE TO SECOND);
+
+CREATE TABLE target SHALLOW CLONE source;
+
+INSERT INTO a REPLACE WHERE cond VALUES (1), (2);
+
+CREATE FUNCTION a.b(x INT) RETURNS INT RETURN x + 1;
+
+CREATE FUNCTION f(col STRING) RETURNS STRING DETERMINISTIC RETURN col;
+
+CREATE FUNCTION f(col STRING) RETURNS STRING NOT DETERMINISTIC RETURN col;
+
+CREATE FUNCTION a AS b;
+
+SELECT ${x} FROM ${y} WHERE ${z} > 1;
+
+CREATE TABLE foo (x DATE GENERATED ALWAYS AS (CAST(y AS DATE)));
+
+TRUNCATE TABLE t1 PARTITION(age = 10, name = 'test', address);
+
+SELECT PARSE_JSON('{}');
+
+SELECT RANDSTR(123);
+
+SELECT RANDSTR(123, 456);
+
+CREATE TABLE IF NOT EXISTS db.table (a TIMESTAMP, b BOOLEAN GENERATED ALWAYS AS (NOT a IS NULL)) USING DELTA;
+
+SELECT * FROM sales UNPIVOT INCLUDE NULLS (sales FOR quarter IN (q1 AS `Jan-Mar`));
+
+SELECT * FROM sales UNPIVOT EXCLUDE NULLS (sales FOR quarter IN (q1 AS `Jan-Mar`));
+
+CREATE FUNCTION add_one(x INT) RETURNS INT LANGUAGE PYTHON AS $$def add_one(x):
+  return x+1$$;
+
+CREATE FUNCTION add_one(x INT) RETURNS INT LANGUAGE PYTHON AS $FOO$def add_one(x):
+  return x+1$FOO$;
+
+TRUNCATE TABLE t1 PARTITION(age = 10, name = 'test', city LIKE 'LA');
+
+COPY INTO target FROM `s3://link` FILEFORMAT = AVRO VALIDATE = ALL FILES = ('file1', 'file2') FORMAT_OPTIONS ('opt1'='true', 'opt2'='test') COPY_OPTIONS ('mergeSchema'='true');
+
+SELECT * FROM t1, t2;
+
+SELECT * FROM t1 CROSS JOIN t2;
+
+SELECT TIMESTAMP '2025-04-29 18.47.18'::DATE;
+
+SELECT CAST(CAST('2025-04-29 18.47.18' AS DATE) AS TIMESTAMP);
+
+SELECT DATE_FORMAT(CAST(FROM_UTC_TIMESTAMP(foo, 'America/Los_Angeles') AS TIMESTAMP), 'yyyy-MM-dd HH:mm:ss') AS foo FROM t;
+
+SELECT DATE_FORMAT(CAST(FROM_UTC_TIMESTAMP(CAST(foo AS TIMESTAMP), 'America/Los_Angeles') AS TIMESTAMP), 'yyyy-MM-dd HH:mm:ss') AS foo FROM t;
+
+SELECT r"\\foo.bar\";
+
+SELECT '\\\\foo.bar\\';
+
+SELECT SUBSTRING_INDEX(str, delim, count);
+
+SELECT SUBSTR('Spark' FROM 5 FOR 1);
+
+SELECT SUBSTRING('Spark', 5, 1);
+
+SELECT SUBSTR('Spark SQL', 5);
+
+SELECT SUBSTRING('Spark SQL', 5);
+
+SELECT SUBSTR(ENCODE('Spark SQL', 'utf-8'), 5);
+
+SELECT SUBSTRING(ENCODE('Spark SQL', 'utf-8'), 5);
+
+SELECT TYPEOF(1);
+
+SELECT c1:item[1].price;
+
+SELECT GET_JSON_OBJECT(c1, '$.item[1].price');
+
+CREATE TABLE foo (x INT GENERATED ALWAYS AS (YEAR(y)));
+
+CREATE TABLE t1 AS (SELECT c FROM t2);
+
+SELECT X'1A2B';
+
+CREATE OR REPLACE FUNCTION func(a BIGINT, b BIGINT) RETURNS TABLE (a INT) RETURN SELECT a;
+
+CREATE OR REPLACE FUNCTION func(a BIGINT, b BIGINT) RETURNS BIGINT RETURN a;
+
+SELECT ANY(col) FROM VALUES (TRUE), (FALSE) AS tab(col);
+
+SELECT test, LISTAGG(email, '') AS Email FROM organizations GROUP BY test;
+
+WITH t AS (VALUES ('foo_val') AS t(foo1)) SELECT foo1 FROM t;
+
+WITH t AS (SELECT * FROM VALUES ('foo_val') AS t(foo1)) SELECT foo1 FROM t;
+
+SELECT ELT(2, 'foo', 'bar', 'baz') AS Result;
+
+SELECT MAKE_INTERVAL(100, 11, 12, 13, 14, 14, 15);
+
+SELECT name, GROUPING_ID() FROM customer GROUP BY ROLLUP (name);
+
+SELECT CURDATE();
+
+SELECT CURRENT_DATE;
+
+CREATE TABLE tbl (id BIGINT NOT NULL GENERATED BY DEFAULT AS IDENTITY (START WITH 1 INCREMENT BY 1));
+
+CREATE TABLE tbl (id BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1));
+
+INSERT INTO t REPLACE WHERE a = 1 SELECT * FROM src;
+
+INSERT INTO t REPLACE WHERE a = 2 (SELECT * FROM src);
+
+WITH s AS (SELECT * FROM src) INSERT INTO t REPLACE WHERE a = 1 SELECT * FROM s;
+
+WITH s AS (SELECT * FROM src) INSERT INTO t REPLACE USING (a) SELECT * FROM s;
+
+SELECT c1:price, c1:price.foo, c1:price.bar[1];
+
+SELECT TRY_CAST(c1:price AS ARRAY<VARIANT>);
+
+SELECT TRY_CAST(c1:["foo bar"]["baz qux"] AS ARRAY<VARIANT>);
+
+SELECT c1:item[1].price FROM VALUES ('{ "item": [ { "model" : "basic", "price" : 6.12 }, { "model" : "medium", "price" : 9.24 } ] }') AS T(c1);
+
+SELECT c1:item[*].price FROM VALUES ('{ "item": [ { "model" : "basic", "price" : 6.12 }, { "model" : "medium", "price" : 9.24 } ] }') AS T(c1);
+
+SELECT FROM_JSON(c1:item[*].price, 'ARRAY<DOUBLE>')[0] FROM VALUES ('{ "item": [ { "model" : "basic", "price" : 6.12 }, { "model" : "medium", "price" : 9.24 } ] }') AS T(c1);
+
+SELECT INLINE(FROM_JSON(c1:item[*], 'ARRAY<STRUCT<model STRING, price DOUBLE>>')) FROM VALUES ('{ "item": [ { "model" : "basic", "price" : 6.12 }, { "model" : "medium", "price" : 9.24 } ] }') AS T(c1);
+
+SELECT c1:['price'] FROM VALUES ('{ "price": 5 }') AS T(c1);
+
+SELECT c1:["price"] FROM VALUES ('{ "price": 5 }') AS T(c1);
+
+SELECT GET_JSON_OBJECT(c1, '$.price') FROM VALUES ('{ "price": 5 }') AS T(c1);
+
+SELECT GET_JSON_OBJECT(col, path_col);
+
+SELECT GET_JSON_OBJECT(col, CONCAT('$.', field_name));
+
+SELECT GET_JSON_OBJECT(GET_JSON_OBJECT(col, '$[0]'), '$.a');
+
+SELECT raw:`zip code`, raw:`fb:testid`, raw:store['bicycle'], raw:store["zip code"];
+
+SELECT raw:["zip code"], raw:["fb:testid"], raw:store["bicycle"], raw:store["zip code"];
+
+SELECT col:`fr'uit`;
+
+SELECT col:["fr'uit"];
+
+SELECT DATEDIFF(year, 'start', 'end');
+
+SELECT DATEDIFF(microsecond, 'start', 'end');
+
+SELECT DATEDIFF(millisecond, 'start', 'end');
+
+SELECT DATEDIFF(second, 'start', 'end');
+
+SELECT DATEDIFF(minute, 'start', 'end');
+
+SELECT DATEDIFF(hour, 'start', 'end');
+
+SELECT DATEDIFF(day, 'start', 'end');
+
+SELECT DATEDIFF(week, 'start', 'end');
+
+SELECT DATEDIFF(month, 'start', 'end');
+
+SELECT DATEDIFF(quarter, 'start', 'end');
+
+SELECT DATEADD(year, 1, '2020-01-01');
+
+SELECT DATE_ADD(YEAR, 1, '2020-01-01');
+
+SELECT DATEDIFF('end', 'start');
+
+SELECT DATE_ADD('2020-01-01', 1);
+
+SELECT DATE_ADD(MONTH, 1, '2020-01-01');
+
+SELECT DATEADD(e, 24) FROM t;
+
+SELECT DATE_ADD(e, 24) FROM t;
+
+CREATE TABLE x (SELECT 1);
+
+CREATE TABLE x AS (SELECT 1);
+
+WITH x (select 1) SELECT * FROM x;
+
+WITH x AS (SELECT 1) SELECT * FROM x;
+
+CREATE STREAMING TABLE raw_data AS SELECT * FROM STREAM READ_FILES('abfss://container@storageAccount.dfs.core.windows.net/base/path');
+
+CREATE OR REFRESH STREAMING TABLE csv_data (id INT, ts TIMESTAMP, event STRING) AS SELECT * FROM STREAM READ_FILES('s3://bucket/path', format => 'csv', schema => 'id int, ts timestamp, event string');
+
+GRANT CREATE ON SCHEMA my_schema TO `alf@melmak.et`;
+
+GRANT SELECT ON TABLE sample_data TO `alf@melmak.et`;
+
+GRANT ALL PRIVILEGES ON TABLE forecasts TO finance;
+
+GRANT SELECT ON TABLE t TO `fab9e00e-ca35-11ec-9d64-0242ac120002`;
+
+REVOKE CREATE ON SCHEMA my_schema FROM `alf@melmak.et`;
+
+REVOKE SELECT ON TABLE sample_data FROM `alf@melmak.et`;
+
+REVOKE ALL PRIVILEGES ON TABLE forecasts FROM finance;
+
+REVOKE SELECT ON TABLE t FROM `fab9e00e-ca35-11ec-9d64-0242ac120002`;
+
+optimize db.t;
+
+SELECT 1 optimize;
+
+SELECT 1 AS optimize;
+
+SELECT * FROM t optimize;
+
+SELECT * FROM t AS optimize;
+
+SELECT OPTIMIZE(1);
+
+OPTIMIZE db.t FULL WHERE p = 1 ZORDER BY (x, y);
+
+OPTIMIZE catalog. /* first */ db. /* second */ t;
+
+OPTIMIZE catalog.db.t /* first */ /* second */;
+
+/* first */ OPTIMIZE db. /* second */ t /* third */;
+
+OPTIMIZE db.t /* second */ /* third */ /* first */;
+
+OPTIMIZE CaT. /* sqlglot.meta case_sensitive=true */ Db /* sqlglot.meta case_sensitive=false */;
+
+OPTIMIZE CaT.Db /* sqlglot.meta case_sensitive=true */ /* sqlglot.meta case_sensitive=false */;
+
+ANALYZE TABLE tbl COMPUTE DELTA STATISTICS NOSCAN;
+
+ANALYZE TABLE tbl COMPUTE DELTA STATISTICS FOR ALL COLUMNS;
+
+ANALYZE TABLE tbl COMPUTE DELTA STATISTICS FOR COLUMNS foo, bar;
+
+ANALYZE TABLE ctlg.db.tbl COMPUTE DELTA STATISTICS NOSCAN;
+
+ANALYZE TABLES COMPUTE STATISTICS NOSCAN;
+
+ANALYZE TABLES FROM db COMPUTE STATISTICS;
+
+ANALYZE TABLES IN db COMPUTE STATISTICS;
+
+ANALYZE TABLE ctlg.db.tbl PARTITION(foo = 'foo', bar = 'bar') COMPUTE STATISTICS NOSCAN;
+
+CREATE FUNCTION a() ENVIRONMENT (dependencies = '["foo1==1", "foo2==2"]', environment_version = 'None');
+
+CREATE FUNCTION a() HANDLER 'handler_function';
+
+CREATE FUNCTION a() PARAMETER STYLE PANDAS;
+
+SELECT '20'?::INTEGER;
+
+SELECT TRY_CAST('20' AS INT);
+
+SELECT OVERLAY('Spark SQL', 'ANSI ', 7, 0);
+
+SELECT OVERLAY('Spark SQL' PLACING 'ANSI ' FROM 7 FOR 0);
+
+SELECT OVERLAY('Spark SQL' PLACING 'CORE' FROM 7);
+
+SELECT OVERLAY(ENCODE('Spark SQL', 'utf-8') PLACING ENCODE('_', 'utf-8') FROM 6);
+
+SET VAR v = 5;
+
+SET VARIABLE v = 5;
+
+SET VARIABLE v1 = 1, v2 = '2';
+
+SET VARIABLE (v1, v2) = (SELECT 1, 2);
+
+SET VARIABLE v = (SELECT MAX(c1) FROM VALUES (1), (2) AS T(c1));
+
+SET VARIABLE v = DEFAULT;
+
+SELECT IF(x > 0, 'positive', 'non-positive');
+
+SELECT IFF(x > 0, 'positive', 'non-positive');
+
+SELECT TRY_DIVIDE(a, b);
+
+DECLARE VAR x INT;
+
+DECLARE x INT;
+
+DECLARE VARIABLE myvar INT DEFAULT 1;
+
+DECLARE myvar INT = 1;
+
+DECLARE x, y, z INT DEFAULT 1;
+
+DECLARE x, y, z INT = 1;
+
+DECLARE x INT = 1;
+
+DECLARE OR REPLACE x INT = 1;
+
+OPTIMIZE db.t /* comment */;
+
+/* trailing */ OPTIMIZE t UNKNOWN;
+
+WITH t AS (SELECT '{"x-y": "z"}' AS c) SELECT get_json_object(c, '$.x-y') FROM t;
+
+WITH t AS (SELECT '{"x-y": "z"}' AS c) SELECT GET_JSON_OBJECT(c, '$["x-y"]') FROM t;
+
+CREATE TABLE a LIKE b;
+
+SELECT NVL2(a, b, c);
+
+SELECT NVL2(a, b);
+
+SELECT array_except(array(1, 2, 3), array(2));
+
+SELECT array_position(array(1, 2, 3), 2);
+
+SELECT a FROM x CROSS JOIN LATERAL (SELECT * EXCEPT (pos), CAST(pos AS BIGINT) + 1 AS ordinality FROM POSEXPLODE(y)) AS t(a, ordinality);
+
+SELECT * FROM x CROSS JOIN LATERAL EXPLODE(y) AS t;
+
+SELECT COUNT_IF(col % 2 = 0) FROM foo;
+
+SELECT COUNT_IF(col % 2 = 0) FILTER(WHERE col < 1000) FROM foo;
+
+SELECT ROW_NUMBER() OVER (ORDER BY NULL) FROM t;
+
+SELECT CUME_DIST() OVER (ORDER BY NULL) FROM t;
+
+SELECT ROW_NUMBER() OVER (PARTITION BY a ORDER BY b) FROM t;
+
+WITH t AS (SELECT 1 AS c) SELECT * FROM (SELECT c FROM t) AS subq;
+
+SELECT * FROM EXPLODE(SEQUENCE(CAST('2020-01-01' AS DATE), CAST('2020-02-01' AS DATE), INTERVAL '1' WEEK));
+
+SELECT 1 EXCEPT ALL SELECT 1;
+
+SELECT * FROM VALUES (1), (2) AS t(x) PIVOT(SUM(x) FOR x IN (1));
+
+SELECT GET_JSON_OBJECT(a, CONCAT('$.', f));
+
+SELECT SLICE(ARRAY(1, 2, 3, 4), 2, 2);
+
+SELECT CAST('foo' AS TIMESTAMP_NTZ);
+
+CREATE OR REPLACE FUNCTION func(a INT, b FLOAT) RETURNS TABLE RETURN SELECT a;
+
+SELECT substring_index('www.apache.org', '.', 2);
+
+SELECT substring_index('555A66A777' COLLATE UTF8_BINARY, 'a', 2);
+
+SELECT substring_index('555A66A777' COLLATE UTF8_LCASE, 'a', 2);
+
+SELECT substring_index('A|a|A' COLLATE UTF8_LCASE, 'A' COLLATE UTF8_LCASE, 2);
+
+SELECT DATE_FORMAT(CAST('2024-07-08 13:45:00' AS TIMESTAMP), 'EEE');
+
+SELECT CONVERT_TIMEZONE('Europe/Berlin', 'America/New_York', '2012-05-10 12:00:00');
+
+SELECT LAST_DAY('2008-11-25');
+
+SELECT QUARTER('2016-08-31');
+
+CREATE OR REPLACE VIEW `schema`.`v` (`col` COMMENT 'desc') AS SELECT `src_col` AS `col`;
+
+SELECT id, city, COUNT(*) FROM dealer GROUP BY ALL;
+
+SELECT car_model, COUNT(DISTINCT city) FROM dealer GROUP BY ALL;
+
+SELECT car_model, city FROM dealer GROUP BY ALL;
+
+SELECT COUNT(*) FROM dealer GROUP BY ALL;
+
+SELECT UPPER(city), COUNT(*) FROM dealer GROUP BY ALL;
+
+SELECT city AS c, COUNT(*) + 1 FROM dealer GROUP BY ALL;
+
+SELECT city, COUNT(*) OVER () FROM dealer GROUP BY ALL;
+
+SELECT * FROM t GROUP BY ALL;
+
+CREATE TABLE test STORED AS INPUTFORMAT 'foo1' OUTPUTFORMAT 'foo2';
+
+ALTER TABLE db.example_table ADD PARTITION(col_a = 'a') LOCATION 'b';
+
+SELECT EXISTS(ARRAY(2, 3), x -> x % 2 = 0);
+
+SELECT EXISTS(ARRAY(2, 3), x -> x % NULLIF(2, 0) = 0);
+
+SELECT MAP(*), STRUCT(*) FROM t;
+
+SELECT FIRST(sample_col, TRUE);
+
+SELECT FIRST(sample_col) IGNORE NULLS;
+
+SELECT FIRST_VALUE(sample_col, TRUE);
+
+SELECT FIRST_VALUE(sample_col) IGNORE NULLS;
+
+SELECT LAST_VALUE(sample_col, TRUE);
+
+SELECT LAST_VALUE(sample_col) IGNORE NULLS;
+
+SELECT LAST(sample_col, TRUE);
+
+SELECT LAST(sample_col) IGNORE NULLS;
+
+FROM x INSERT INTO t SELECT v QUALIFY ROW_NUMBER() OVER (PARTITION BY k ORDER BY v) = 1;
+
+FROM x INSERT OVERWRITE TABLE a SELECT k;
+
+SELECT * FROM EXPLODE(SEQUENCE(CAST('2024-01-01' AS TIMESTAMP), CAST('2024-01-03' AS TIMESTAMP), INTERVAL '12' HOURS));
+
+SELECT PERCENTILE_APPROX(amount, 0.5);
+
+SELECT * FROM EXPLODE(SEQUENCE(a, b));
+
+WITH t AS (SELECT ARRAY(1, 2, 3) AS col) SELECT * FROM t WHERE EXISTS(col, x -> 1 <= x) AND EXISTS(col, x -> 2 = x);
+
+SELECT * FROM EXPLODE(SEQUENCE(CAST('2024-01-01' AS DATE), CAST('2024-01-05' AS DATE), INTERVAL '1' DAY));
+
+SELECT * FROM EXPLODE(SEQUENCE(CAST('2024-01-01 00:00:00' AS TIMESTAMP), CAST('2024-01-01 00:00:02' AS TIMESTAMP), INTERVAL '0.5' SECONDS));
+
+SELECT * FROM EXPLODE(SEQUENCE(CAST('2024-01-01 00:00:00' AS TIMESTAMP), CAST('2024-01-01 02:00:00' AS TIMESTAMP), INTERVAL '1' HOURS));
+
+SELECT CAST('2020-05-11T11:15:05' AS TIMESTAMP);
+
+SELECT CAST('2020-05-11' AS DATE);
+
+SELECT GET_JSON_OBJECT('{ "farm": {"barn": { "color": "red", "feed stocked": true }}}', '$.farm.barn.color');
+
+SELECT a, b FROM (SELECT a AS a, b AS b, ROW_NUMBER() OVER (PARTITION BY a ORDER BY c DESC NULLS FIRST) AS _row_number FROM x) AS _t WHERE _row_number = 1;
+
+SELECT DATE_ADD(MONTH, 18, '2008-02-28');
+
+CREATE TABLE t (a INT);
+
+SELECT PARSE_JSON('{"fruit":"banana"}'):fruit;
+
+SELECT i, p, o FROM qt QUALIFY ROW_NUMBER() OVER (PARTITION BY p ORDER BY o NULLS LAST) = 1;
+
+SELECT CONVERT_TIMEZONE('America/New_York', '2024-08-06 09:10:00.000');
+
+SELECT CONVERT_TIMEZONE('America/Los_Angeles', 'America/New_York', '2024-08-06 09:10:00.000');
+
+SELECT CURRENT_VERSION();
+
+SELECT * FROM example TABLESAMPLE (3 PERCENT) REPEATABLE (82);
+
+SELECT GETBIT(11, 1);
+
+MERGE INTO t USING s ON t.id = s.id WHEN MATCHED THEN UPDATE SET * WHEN NOT MATCHED THEN INSERT *;
+
+CREATE TABLE t (a INT, b STRING);
+
+SELECT TRY_ELEMENT_AT(ARRAY(1, 2, 3), 2);
+
+SELECT ELEMENT_AT(ARRAY(1, 2, 3), 1);
+
+SELECT TRY_ELEMENT_AT(MAP(1, 'a', 2, 'b'), 2);
+
+WITH tbl AS (SELECT 1 AS id, 'eggy' AS name UNION ALL SELECT NULL AS id, 'jake' AS name) SELECT COUNT(DISTINCT id, name) AS cnt FROM tbl;
+
+SELECT TO_TIMESTAMP('2016-12-31', 'yyyy-MM-dd');
+
+SELECT TO_DATE(x, 'MM/dd/yyyy');
+
+SELECT TO_TIMESTAMP('2016-12-31 03:04:05', 'yyyy-MM-dd HH:mm:ss');
+
+SELECT TRY_CAST(123456 AS STRING);
+
+SELECT TRY_CAST('a' AS INT);
+
+SELECT DATEDIFF(MONTH, '2020-01-01', '2020-03-05');
+
+SELECT * FROM quarterly_sales PIVOT(SUM(amount) amount, 'dummy' bar FOR quarter IN ('2023_Q1'));
+
+SELECT * FROM quarterly_sales PIVOT(SUM(amount) AS amount, 'dummy' AS bar FOR quarter IN ('2023_Q1'));
+
+SELECT DATE_ADD(MONTH, 20, col);
+
+SELECT TIMESTAMPDIFF(MONTH, foo, bar);
+
+SELECT TRY_CAST(col AS TIMESTAMP);
+
+SELECT * FROM {df};
+
+SELECT * FROM {df} WHERE id > :foo;
+
+SELECT BIT_COUNT(0);
+
+SELECT * FROM foo TIMESTAMP AS OF '2020-01-01 00:00:00' AS bar;
+
+WITH RECURSIVE t(n) AS (SELECT * FROM VALUES (1) AS _values) SELECT n FROM t;
+
+SELECT STRUCT(1 AS a, 'x' AS b);
+
+WITH cte AS (SELECT cola FROM other_table) INSERT OVERWRITE TABLE table SELECT cola FROM cte;
+
+SELECT * FROM db.table1 EXCEPT SELECT * FROM db.table2;
+
+SELECT ARRAY_INSERT(ARRAY('a', 'b', 'c'), 1, 'z');
+
+SELECT id, t.type, t.scores FROM example_table, LATERAL INLINE(ARRAYS_ZIP(SPLIT(type, CONCAT('\\Q', ';', '\\E')), scores)) AS t(type, scores);
+
+SELECT CAST(amount AS BIGINT) AS converted FROM events;
+
+USE tduser;
+
+CREATE TABLE a;
+
+SELECT CAST('2020-05-11T11:15:05.000000000' AS TIMESTAMP);
+
+CREATE TEMPORARY TABLE mytemptable (a INT) USING PARQUET;
+
+CREATE TABLE `dbo`.`mytable` (`email` VARCHAR(255) NOT NULL);
+
+CREATE TABLE tbl (id BIGINT NOT NULL GENERATED BY DEFAULT AS IDENTITY (START WITH 10 INCREMENT BY 1) PRIMARY KEY);
+
+SELECT DATEADD(WEEK, 1, '2017/08/25');
+
+SELECT ${x};
+
+SET count = (SELECT COUNT(1) FROM x);
+
+SELECT SPLIT_PART('1,2,3', ',', 1);
+
+WITH t AS (SELECT 'a.b.c' AS value, 1 AS idx) SELECT SPLIT_PART(value, '.', idx) FROM t;
+
+SELECT DATEDIFF(MONTH, CAST('start' AS TIMESTAMP), CAST('end' AS TIMESTAMP));
+
+SELECT DATEDIFF(QUARTER, CAST('start' AS TIMESTAMP), CAST('end' AS TIMESTAMP));

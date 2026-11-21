@@ -1,0 +1,14 @@
+# Files in the top directory only
+
+$ sqlfs --root $ROOT 'SELECT path FROM files WHERE depth = 1 AND kind = '\''f'\'''
+path
+---------
+README.md
+
+$ sqlfind --root $ROOT --emit shell 'SELECT path FROM files WHERE depth = 1 AND kind = '\''f'\'''
+find $ROOT -mindepth 1 -maxdepth 1 -type f -printf '%P\0%y\0%s\0%Ts\0%m\0%u\0'
+
+$ sqlfind --root $ROOT 'SELECT path FROM files WHERE depth = 1 AND kind = '\''f'\'''
+path
+---------
+README.md

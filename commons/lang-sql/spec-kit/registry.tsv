@@ -1,0 +1,12 @@
+number	slug	state
+0001	sql-lang	in force
+0002	sql-ast-parser	in force
+0003	sql-ast-tools	in force
+0004	sql-docs	in force
+0005	sql-dialects	in force
+0006	sql-routines	in force
+0007	sql-emit	in force
+0008	sql-introspect	in force
+0009	sql-print	in force
+0010	aide	in force
+0011	acceptance	in force

@@ -1,0 +1,1 @@
+SELECT a FROM x LEFT SEMI JOIN y ON x.b = y.b;

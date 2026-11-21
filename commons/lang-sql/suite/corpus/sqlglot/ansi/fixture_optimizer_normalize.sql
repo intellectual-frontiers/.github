@@ -1,0 +1,1 @@
+SELECT * FROM x WHERE (A AND B) OR C;

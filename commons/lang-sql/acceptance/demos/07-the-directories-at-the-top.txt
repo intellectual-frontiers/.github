@@ -1,0 +1,22 @@
+# The directories at the top
+
+$ sqlfs --root $ROOT 'SELECT path FROM files WHERE kind = '\''d'\'' AND depth = 1 ORDER BY path'
+path
+-------
+.hidden
+docs
+empty
+lib
+src
+
+$ sqlfind --root $ROOT --emit shell 'SELECT path FROM files WHERE kind = '\''d'\'' AND depth = 1 ORDER BY path'
+find $ROOT -mindepth 1 -maxdepth 1 -type d -printf '%P\0%y\0%s\0%Ts\0%m\0%u\0'
+
+$ sqlfind --root $ROOT 'SELECT path FROM files WHERE kind = '\''d'\'' AND depth = 1 ORDER BY path'
+path
+-------
+.hidden
+docs
+empty
+lib
+src

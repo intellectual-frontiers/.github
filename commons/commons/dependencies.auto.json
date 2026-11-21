@@ -19,6 +19,7 @@
     "@intellectual-frontiers/integrations-github": "0.2.3",
     "@intellectual-frontiers/integrations-x12": "0.2.3",
     "@intellectual-frontiers/kanon": "0.3.3",
+    "@intellectual-frontiers/lang-sql": "0.1.0",
     "@intellectual-frontiers/libraries": "0.5.4",
     "@intellectual-frontiers/lint": "0.2.3",
     "@intellectual-frontiers/mizan": "0.2.3",
