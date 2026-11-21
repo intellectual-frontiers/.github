@@ -215,6 +215,7 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/archon-dialect-winget/spec-kit" },
     { layout: "commons", dir: "commons/archon-tool/spec-kit" },
     { layout: "commons", dir: "commons/estate/spec-kit" },
+    { layout: "commons", dir: "commons/anyfs/spec-kit" },
     { layout: "commons", dir: "commons/evidence-capture/spec-kit" },
     { layout: "commons", dir: "commons/integrations-fhir/spec-kit" },
     { layout: "commons", dir: "commons/integrations-x12/spec-kit" },

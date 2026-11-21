@@ -69,6 +69,7 @@ export const ROLE_OF: ReadonlyMap<string, Role> = new Map<string, Role>([
   ["net", "foundation"],
   ["rdf", "foundation"],
   ["system", "foundation"],
+  ["anyfs", "foundation"],
   ["telemetry", "foundation"],
   ["terminal", "foundation"],
   ["test", "foundation"],

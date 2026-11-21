@@ -1,0 +1,35 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-anyfs-layers FR-001	check	.github: cd commons/anyfs && bun run verify	suite/layers.test.ts
+0001-anyfs-layers FR-002	check	.github: cd commons/anyfs && bun run verify	suite/layers.test.ts
+0001-anyfs-layers FR-003	check	.github: cd commons/anyfs && bun run verify	suite/layers.test.ts
+0001-anyfs-layers FR-004	check	.github: cd commons/anyfs && bun run verify	suite/layers.test.ts
+0001-anyfs-layers FR-005	check	.github: cd commons/anyfs && bun run verify	suite/layers.test.ts
+0001-anyfs-layers FR-006	check	.github: cd commons/anyfs && bun run verify	suite/layers.test.ts
+0002-anyfs-governance FR-001	check	.github: cd commons/anyfs && bun run verify	suite/governance.test.ts
+0002-anyfs-governance FR-002	check	.github: cd commons/anyfs && bun run verify	suite/governance.test.ts
+0002-anyfs-governance FR-003	check	.github: cd commons/anyfs && bun run verify	suite/governance.test.ts
+0002-anyfs-governance FR-004	check	.github: cd commons/anyfs && bun run verify	suite/governance.test.ts
+0002-anyfs-governance FR-005	check	.github: cd commons/anyfs && bun run verify	suite/governance.test.ts
+0002-anyfs-governance FR-006	check	.github: cd commons/anyfs && bun run verify	suite/governance.test.ts
+0002-anyfs-governance FR-007	check	.github: cd commons/anyfs && bun run verify	suite/governance.test.ts
+0002-anyfs-governance FR-008	check	.github: cd commons/anyfs && bun run verify	suite/governance.test.ts
+0003-anyfs-logical FR-001	check	.github: cd commons/anyfs && bun run verify	suite/logical.test.ts
+0003-anyfs-logical FR-002	check	.github: cd commons/anyfs && bun run verify	suite/logical.test.ts
+0003-anyfs-logical FR-003	check	.github: cd commons/anyfs && bun run verify	suite/logical.test.ts
+0003-anyfs-logical FR-004	check	.github: cd commons/anyfs && bun run verify	suite/logical.test.ts
+0003-anyfs-logical FR-005	check	.github: cd commons/anyfs && bun run verify	suite/logical.test.ts
+0003-anyfs-logical FR-006	check	.github: cd commons/anyfs && bun run verify	suite/logical.test.ts
+0004-anyfs-middleware FR-001	check	.github: cd commons/anyfs && bun run verify	suite/layers-of-a-store.test.ts
+0004-anyfs-middleware FR-002	check	.github: cd commons/anyfs && bun run verify	suite/layers-of-a-store.test.ts
+0004-anyfs-middleware FR-003	check	.github: cd commons/anyfs && bun run verify	suite/layers-of-a-store.test.ts
+0004-anyfs-middleware FR-004	check	.github: cd commons/anyfs && bun run verify	suite/layers-of-a-store.test.ts
+0004-anyfs-middleware FR-005	check	.github: cd commons/anyfs && bun run verify	suite/layers-of-a-store.test.ts
+0004-anyfs-middleware FR-006	check	.github: cd commons/anyfs && bun run verify	suite/layers-of-a-store.test.ts
+0005-anyfs-conformance FR-001	check	.github: cd commons/anyfs && bun run verify	suite/conformance.test.ts
+0005-anyfs-conformance FR-002	check	.github: cd commons/anyfs && bun run verify	suite/conformance.test.ts
+0005-anyfs-conformance FR-003	check	.github: cd commons/anyfs && bun run verify	suite/conformance.test.ts
+0005-anyfs-conformance FR-004	check	.github: cd commons/anyfs && bun run verify	suite/conformance.test.ts
+0005-anyfs-conformance FR-005	check	.github: cd commons/anyfs && bun run verify	suite/conformance.test.ts
+0005-anyfs-conformance FR-006	check	.github: cd commons/anyfs && bun run verify	suite/conformance.test.ts
