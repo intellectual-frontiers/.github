@@ -48,11 +48,11 @@
 ## Assumptions
 
 - The monorepo's issue files are private: the fixtures of the tests are made-up files of the schema, and the monorepo's own files were compared by hand, read only, outside this repository.
-- The id that AnyFS makes is a valid UUID version 7 with the counter in `rand_a` and 62 bits of the replica's id in `rand_b`; how it differs from the wording of RFC 9562 section 5.7 is for the owner (the table is in the report of the phase, and the tests state the layout).
+- The id that AnyFS makes is a UUID version 7 as RFC 9562 section 5.7 words it: a counter in `rand_a` that starts at a random seed in each new millisecond (section 6.2, method 1) and a random `rand_b` for each id; it holds no replica, and the clock of the library holds the replica and its entropy as values.
 
 ## Open questions
 
-- **OQ-1**: Whether the version id of AnyFS should fill `rand_b` with random bits for each id, as RFC 9562 section 5.7 words it, and seed its counter at random with each new millisecond (section 6.2); the library uses it as it is.
+- None.
 
 ## Key entities
 

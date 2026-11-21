@@ -27,7 +27,7 @@ import {
   type PersonActor,
   person,
 } from "@intellectual-frontiers/planning/governance";
-import { mintEventId, mintItemId, newClock, type Clock } from "@intellectual-frontiers/planning/logical";
+import { type Entropy, mintEventId, mintItemId, newClock, type Clock } from "@intellectual-frontiers/planning/logical";
 
 /** The value of a success; a failure fails the test with what it says. */
 export function must<T, E>(result: Result<T, E>): T {
@@ -53,8 +53,17 @@ export const ACTORS: readonly Actor[] = [
   must(actorFor({ kind: "session", person: BOB }, { kind: "tool", id: "scanner", name: "Scanner" })),
 ];
 
+/** Entropy that is the same on every run: the counter starts at zero and `rand_b` is the first eight bytes of the replica's id, so that the ids of a test are the same each time. */
+export const testEntropy = (replica: ReplicaId): Entropy => ({
+  counterSeed: () => 0,
+  bytes: () => Uint8Array.from({ length: 8 }, (_, i) => Number.parseInt(replica.slice(i * 2, i * 2 + 2), 16)),
+});
+
+/** The clock of a replica with the entropy of the tests. */
+export const testClock = (replica: ReplicaId = REPLICA, maxDriftMs?: number): Clock => (maxDriftMs === undefined ? newClock(replica, undefined, testEntropy(replica)) : newClock(replica, maxDriftMs, testEntropy(replica)));
+
 /** The clock of a fresh replica. */
-export const clock = (replica: ReplicaId = REPLICA): Clock => newClock(replica);
+export const clock = (replica: ReplicaId = REPLICA): Clock => testClock(replica);
 
 /** `count` event ids, in the order they were made, from one clock at one wall time (so that the counter orders them). */
 export function eventIds(count: number, replica: ReplicaId = REPLICA, wall: number = WALL): readonly EventId[] {

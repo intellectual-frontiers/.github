@@ -21,8 +21,8 @@ import {
   parseDay,
   STATE_KINDS,
 } from "@intellectual-frontiers/planning/governance";
-import { canonical, describeFoldProblem, fold, mintEventId, newClock, orderEvents, seeId } from "@intellectual-frontiers/planning/logical";
-import { ACTORS, ADA, BOB, event, eventIds, history, historyArb, itemId, must, OTHER_REPLICA, policyArb, REPLICA, WALL } from "./support.ts";
+import { canonical, describeFoldProblem, fold, mintEventId, orderEvents, seeId } from "@intellectual-frontiers/planning/logical";
+import { ACTORS, ADA, BOB, event, eventIds, history, historyArb, itemId, must, OTHER_REPLICA, policyArb, REPLICA, testClock, WALL } from "./support.ts";
 
 const AGENT = ACTORS[2] as Actor;
 const TOOL = ACTORS[3] as Actor;
@@ -55,7 +55,7 @@ proves(["0002-planning-core FR-006"], "two stores' events merge by union: any in
   const item = itemId();
   fc.assert(
     fc.property(fc.array(fc.record({ replica: fc.boolean(), step: fc.integer({ min: 0, max: 12 }), wall: fc.integer({ min: 0, max: 30 }) }), { minLength: 1, maxLength: 20 }), fc.integer(), (specs, seed) => {
-      let clocks = { a: newClock(REPLICA), b: newClock(OTHER_REPLICA) };
+      let clocks = { a: testClock(REPLICA), b: testClock(OTHER_REPLICA) };
       const first = must(mintEventId(clocks.a, WALL));
       clocks = { ...clocks, a: first.clock };
       const events: ItemEvent[] = [event(item, first.id, 0, ADA, { type: "opened", kind: "issue", title: "T", body: "", labels: [], assignees: [], origin: "declared" })];
@@ -71,7 +71,7 @@ proves(["0002-planning-core FR-006"], "two stores' events merge by union: any in
       const shuffled = merged.map((e, i) => ({ e, k: (seed * (i + 7919)) % 1009 })).sort((x, y) => x.k - y.k).map((x) => x.e);
       assert(canonical(fold(shuffled)) === canonical(fold(events)));
       // After the merge, the next id made by either replica is after every id taken.
-      let c = newClock(REPLICA);
+      let c = testClock(REPLICA);
       for (const e of events) c = must(seeId(c, e.id, WALL + 60_000));
       const next = must(mintEventId(c, WALL));
       return events.every((e) => next.id > e.id);

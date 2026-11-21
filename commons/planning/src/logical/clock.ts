@@ -13,25 +13,31 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import { type IdTime, makeVersionId, type ReplicaId } from "@intellectual-frontiers/anyfs/governance";
+import { type IdTime, makeVersionId, randomCounterSeed, randomIdBytes, type ReplicaId } from "@intellectual-frontiers/anyfs/governance";
 import { DEFAULT_MAX_DRIFT, nextTime, seeTime } from "@intellectual-frontiers/anyfs/merge";
 import { type EventId, type IdProblem, idTime, type ItemId, parseEventId, parseItemId } from "@intellectual-frontiers/planning/governance";
 
-/** The clock of one replica: who it is, the time of the last id it made or saw, and how far ahead of the wall time it takes an id. */
-export type Clock = { readonly replica: ReplicaId; readonly last: IdTime | undefined; readonly maxDriftMs: number };
+/** Where the randomness of an id comes from: the seed of the counter of a new millisecond (0 to 2047) and the bytes of `rand_b`. A test gives its own; the default is the CSPRNG of the runtime, through AnyFS. */
+export type Entropy = { readonly counterSeed: () => number; readonly bytes: () => Uint8Array };
+
+/** The entropy of the runtime's CSPRNG (RFC 9562 sections 6.9 and 8). */
+export const SYSTEM_ENTROPY: Entropy = { counterSeed: randomCounterSeed, bytes: randomIdBytes };
+
+/** The clock of one replica: which replica it is (the id holds nothing of it), the time of the last id it made or saw, how far ahead of the wall time it takes an id, and its entropy. */
+export type Clock = { readonly replica: ReplicaId; readonly last: IdTime | undefined; readonly maxDriftMs: number; readonly entropy: Entropy };
 
 /** Why an id is not taken from another store. */
 export type ClockProblem = { readonly kind: "future-id"; readonly id: string; readonly aheadByMs: number; readonly limitMs: number };
 
 /** The clock of a replica that has made and seen no id. */
-export function newClock(replica: ReplicaId, maxDriftMs: number = DEFAULT_MAX_DRIFT): Clock {
-  return { replica, last: undefined, maxDriftMs };
+export function newClock(replica: ReplicaId, maxDriftMs: number = DEFAULT_MAX_DRIFT, entropy: Entropy = SYSTEM_ENTROPY): Clock {
+  return { replica, last: undefined, maxDriftMs, entropy };
 }
 
 /** The next time, and the text of the id made from it. */
 function next(clock: Clock, wallMs: number): { readonly text: string; readonly clock: Clock } {
-  const time = nextTime(clock.last, wallMs);
-  return { text: makeVersionId(time, clock.replica), clock: { ...clock, last: time } };
+  const time = nextTime(clock.last, wallMs, clock.entropy.counterSeed());
+  return { text: makeVersionId(time, clock.entropy.bytes()), clock: { ...clock, last: time } };
 }
 
 /** A new event id, after every id the clock has made or seen, and the clock after it. */

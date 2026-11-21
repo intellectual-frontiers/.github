@@ -20,8 +20,9 @@ import {
   parseInstant,
   parseItemId,
 } from "@intellectual-frontiers/planning/governance";
-import { mintEventId, mintItemId, newClock, seeId } from "@intellectual-frontiers/planning/logical";
-import { eventIds, must, OTHER_REPLICA, REPLICA, WALL } from "./support.ts";
+import { mintEventId, mintItemId, seeId } from "@intellectual-frontiers/planning/logical";
+import { eventIds, must, OTHER_REPLICA, REPLICA, testClock, testEntropy, WALL } from "./support.ts";
+import { newClock, SYSTEM_ENTROPY } from "@intellectual-frontiers/planning/logical";
 
 const V7 = "018f3a6e-7c00-7000-8123-456789abcdef";
 
@@ -80,18 +81,18 @@ proves(["0002-planning-core FR-003"], "an external id is a source's name and a v
 });
 
 proves(["0002-planning-core FR-003"], "an id is minted from the hybrid clock of the merge of AnyFS, as that clock makes it, and every id after every id seen or made", () => {
-  const made = must(mintEventId(newClock(REPLICA), WALL));
-  const time = nextTime(undefined, WALL);
-  assertEquals<string>(made.id, makeVersionId(time, REPLICA));
+  const made = must(mintEventId(testClock(REPLICA), WALL));
+  const time = nextTime(undefined, WALL, 0);
+  assertEquals<string>(made.id, makeVersionId(time, testEntropy(REPLICA).bytes()));
   assertEquals(made.clock.last, time);
   assertEquals(idTime(made.id), time);
-  assertEquals(timeOfId(makeVersionId(time, REPLICA)), time);
+  assertEquals(timeOfId(makeVersionId(time, testEntropy(REPLICA).bytes())), time);
   const item = must(mintItemId(made.clock, WALL));
   assert(String(item.id) > String(made.id), "the next id is after the last");
   fc.assert(
     fc.property(fc.array(fc.integer({ min: WALL - 5000, max: WALL + 5000 }), { minLength: 1, maxLength: 60 }), (walls) => {
       // The wall clock goes back and forth: the ids still never go back and never repeat.
-      let c = newClock(REPLICA);
+      let c = testClock(REPLICA);
       const out: string[] = [];
       for (const w of walls) {
         const m = must(mintEventId(c, w));
@@ -115,8 +116,8 @@ proves(["0002-planning-core FR-003"], "a full counter moves to the next millisec
 proves(["0002-planning-core FR-003"], "after an id is taken from another store the next id made is after it, and after every id of any order of ids taken", () => {
   fc.assert(
     fc.property(fc.array(fc.integer({ min: 0, max: 200 }), { minLength: 1, maxLength: 20 }), fc.integer({ min: 0, max: 50 }), (offsets, local) => {
-      const remote = offsets.map((o) => must(mintEventId(newClock(OTHER_REPLICA), WALL + o * 1000)).id);
-      let c = newClock(REPLICA);
+      const remote = offsets.map((o) => must(mintEventId(testClock(OTHER_REPLICA), WALL + o * 1000)).id);
+      let c = testClock(REPLICA);
       for (const id of remote) c = must(seeId(c, id, WALL));
       const next = must(mintEventId(c, WALL + local));
       return remote.every((id) => next.id > id);
@@ -126,14 +127,14 @@ proves(["0002-planning-core FR-003"], "after an id is taken from another store t
 });
 
 proves(["0002-planning-core FR-003"], "an id whose time is further ahead of the wall time than the limit is refused when taken, and one at the limit is taken", () => {
-  const far = must(mintEventId(newClock(OTHER_REPLICA), WALL + DEFAULT_MAX_DRIFT + 1)).id;
-  const refusal = seeId(newClock(REPLICA), far, WALL);
+  const far = must(mintEventId(testClock(OTHER_REPLICA), WALL + DEFAULT_MAX_DRIFT + 1)).id;
+  const refusal = seeId(testClock(REPLICA), far, WALL);
   assert(refusal.kind === "err" && refusal.error.kind === "future-id" && refusal.error.aheadByMs === DEFAULT_MAX_DRIFT + 1 && refusal.error.limitMs === DEFAULT_MAX_DRIFT);
-  const edge = must(mintEventId(newClock(OTHER_REPLICA), WALL + DEFAULT_MAX_DRIFT)).id;
-  assert(seeId(newClock(REPLICA), edge, WALL).kind === "ok");
-  const tight = newClock(REPLICA, 1000);
-  assert(seeId(tight, must(mintEventId(newClock(OTHER_REPLICA), WALL + 1001)).id, WALL).kind === "err");
-  assert(seeId(tight, must(mintEventId(newClock(OTHER_REPLICA), WALL + 1000)).id, WALL).kind === "ok");
+  const edge = must(mintEventId(testClock(OTHER_REPLICA), WALL + DEFAULT_MAX_DRIFT)).id;
+  assert(seeId(testClock(REPLICA), edge, WALL).kind === "ok");
+  const tight = testClock(REPLICA, 1000);
+  assert(seeId(tight, must(mintEventId(testClock(OTHER_REPLICA), WALL + 1001)).id, WALL).kind === "err");
+  assert(seeId(tight, must(mintEventId(testClock(OTHER_REPLICA), WALL + 1000)).id, WALL).kind === "ok");
 });
 
 /** The fields of a UUID read as RFC 9562 section 5.7 draws them: 48 bits of `unix_ts_ms`, 4 of version, 12 of `rand_a`, 2 of variant and 62 of `rand_b`. */
@@ -142,24 +143,27 @@ function fieldsOf(id: string) {
   return { ms: Number(bits >> 80n), version: Number((bits >> 76n) & 0xfn), randA: Number((bits >> 64n) & 0xfffn), variant: Number((bits >> 62n) & 0x3n), randB: bits & ((1n << 62n) - 1n) };
 }
 
-proves(["0002-planning-core FR-003"], "the id that AnyFS makes is a valid UUID version 7 of RFC 9562 section 5.7, and differs from its wording in three stated ways", () => {
+proves(["0002-planning-core FR-003"], "the id that AnyFS makes is a valid UUID version 7 of RFC 9562 section 5.7 with a random rand_b for each id and a seeded counter, and holds nothing of the replica", () => {
+  // The system entropy: the counter of a new millisecond starts at a seed below 2048 and rand_b is random for each id.
+  let c = newClock(REPLICA);
+  const made: ReturnType<typeof fieldsOf>[] = [];
+  for (let i = 0; i < 40; i++) {
+    const m = must(mintEventId(c, WALL));
+    c = m.clock;
+    made.push(fieldsOf(m.id));
+  }
+  for (const x of made) assert(x.version === 7 && x.variant === 0b10 && x.ms === WALL);
+  assert((made[0]?.randA ?? 4096) < 2048, "the counter starts at a seed below 2048");
+  made.forEach((x, i) => i > 0 && assertEquals(x.randA, (made[i - 1]?.randA ?? 0) + 1));
+  assert(new Set(made.map((x) => x.randB)).size > 35, "rand_b is random for each id");
+  const replicaBits = BigInt(`0x${REPLICA.slice(0, 16)}`) & ((1n << 62n) - 1n);
+  assert(made.every((x) => x.randB !== replicaBits), "the id holds no bits of the replica");
+  // With the entropy of the tests the layout is exactly the one that is drawn: counter at the seed, rand_b the given bytes.
   const ids = eventIds(6);
   const f = ids.map(fieldsOf);
-  for (const x of f) {
-    assertEquals(x.version, 7);
-    assertEquals(x.variant, 0b10);
-  }
-  // unix_ts_ms is the time of the id, and rand_a holds the counter (Method 1 of section 6.2, immediately after the timestamp).
-  assertEquals(f.map((x) => x.ms), Array(6).fill(WALL));
   assertEquals(f.map((x) => x.randA), [0, 1, 2, 3, 4, 5]);
-  // Difference 1: rand_b is not random for each id (section 5.7): it is the same 62 bits of the replica's id in every id the replica makes.
-  assertEquals(new Set(f.map((x) => x.randB)).size, 1);
   assertEquals(f[0]?.randB, BigInt(`0x${REPLICA.slice(0, 16)}`) & ((1n << 62n) - 1n));
-  // Two replicas share the time and the counter and differ only in rand_b.
-  const other = fieldsOf(eventIds(1, OTHER_REPLICA)[0] ?? "");
-  assert(other.ms === f[0]?.ms && other.randA === f[0]?.randA && other.randB !== f[0]?.randB);
-  // Difference 2: the counter starts at zero in each new millisecond; section 6.2 (Fixed Bit-Length Dedicated Counter Seeding) has it randomly initialized with each new timestamp tick.
-  assertEquals(fieldsOf(must(mintEventId(newClock(REPLICA), WALL + 1)).id).randA, 0);
-  // Difference 3: the counter is incremented by 1, which section 6.2 (Monotonic Random) says SHOULD NOT be used by implementations that favor unguessability; and the node's identity is in rand_b of a version 7, where section 6.4 would put it in a version 8.
-  assert((f[1]?.randA ?? 0) - (f[0]?.randA ?? 0) === 1);
+  assert(SYSTEM_ENTROPY.counterSeed() <= 0x7ff && SYSTEM_ENTROPY.bytes().length === 8);
+  // A new millisecond restarts the counter at the seed.
+  assertEquals(fieldsOf(must(mintEventId(testClock(REPLICA), WALL + 1)).id).randA, 0);
 });
