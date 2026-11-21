@@ -422,8 +422,9 @@ const site: Workflow = {
       ],
     }),
     publish: job({
+      comment: "always(): a library whose run failed is an ancestor that failed, and would otherwise skip the publication of a site that was built",
       needs: ["site"],
-      when: onMainOrSchedule,
+      when: `always() && needs.site.result == 'success' && (${onMainOrSchedule})`,
       runsOn: "ubuntu-24.04",
       timeoutMinutes: 10,
       permissions: { pages: "write", "id-token": "write" },
