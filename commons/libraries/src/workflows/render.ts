@@ -153,6 +153,7 @@ export function renderWorkflow(w: Workflow): string {
   }
   if (w.on.schedule !== undefined && w.on.schedule.length > 0) out.push("  schedule:", ...w.on.schedule.map((c) => `    - cron: ${scalar(c)}`));
   if (w.on.workflowCall === true) out.push("  workflow_call:");
+  if (w.on.workflowRun !== undefined) out.push("  workflow_run:", `    workflows: [${w.on.workflowRun.workflows.map(scalar).join(", ")}]`, "    types: [completed]");
   out.push("");
   if (w.permissions !== undefined) out.push(...permissions(w.permissions, 0), "");
   if (w.env !== undefined) out.push(...mapping("env", w.env, 0), "");

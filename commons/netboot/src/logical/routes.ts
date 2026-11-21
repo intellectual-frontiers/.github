@@ -13,7 +13,7 @@
  */
 
 /** The install's own names under its URL. */
-export const INSTALL_FILES = ["user-data", "meta-data", "vendor-data", "guard.sh", "facts", "event", "done"] as const;
+export const INSTALL_FILES = ["user-data", "preseed.cfg", "ks.cfg", "autoinst.xml", "meta-data", "vendor-data", "guard.sh", "facts", "event", "done"] as const;
 /** A name under an install's URL. */
 export type InstallFile = (typeof INSTALL_FILES)[number];
 

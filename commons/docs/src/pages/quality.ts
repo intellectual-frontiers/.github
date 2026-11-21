@@ -7,7 +7,8 @@
  * @module
  */
 import type { Build } from "../build.ts";
-import { type Evidence, isOpen, type LibraryResults, standing, testsFor, type TestResult, type Ticket, type TypedIssue } from "../evidence.ts";
+import { type Finding, message } from "../check.ts";
+import { type Evidence, isOpen, type LibraryResults, standing, testsFor, type TestResult, type Ticket, type TypedIssue, type WorkflowRun } from "../evidence.ts";
 import { specPage } from "../links.ts";
 import type { Area } from "../sources.ts";
 import type { Badge, Block, Inline, Page, Tone } from "../model.ts";
@@ -78,6 +79,17 @@ export function heldFindings(b: Build, library: string): number {
 const openIssuesOf = (ev: Evidence, library: string): TypedIssue[] => ev.issues.filter((i) => i.library === library && isOpen(i));
 const openTicketsOf = (ev: Evidence, library: string): Ticket[] => ev.tickets.filter((t) => t.state === "open" && t.libraries.includes(library));
 
+/** Why a library has no test report in the run, from what its job says: none where it has one, or where no run is recorded. */
+export function noRunReason(ev: Evidence, library: string): string | undefined {
+  if (ev.results.has(library) || !ev.recorded) return undefined;
+  const st = ev.status.get(library);
+  if (st === undefined) return "no job of the run reported for it";
+  if (st.install === "failure") return "its packages could not be installed";
+  if (st.runner === "failure") return "the test runner could not be installed";
+  if (st.tests === "cancelled") return "its job was cancelled or timed out";
+  return "its tests could not be run (it has no suite, or the runner failed)";
+}
+
 /** The line of a run: which commit and when, or that none is recorded. */
 function runLine(b: Build): Inline[] {
   const run = b.evidence.run;
@@ -128,6 +140,21 @@ const BANNER = (failed: number): Block => ({
   blocks: [{ kind: "paragraph", inlines: [text(`${plural(failed, "test")} failed in the run these pages show. The site is published anyway, so that the failure is seen and not hidden.`)] }],
 });
 
+/** The line that says which build of the site this is, and how the generator's own check ended. */
+function buildLine(b: Build): Inline[] {
+  const bi = b.evidence.build;
+  if (bi === undefined) return [];
+  const check = bi.check === undefined ? "" : bi.check === "success" ? "passed" : bi.check === "skipped" ? "was not run for this build" : bi.check;
+  return [
+    text("This site was built "),
+    ...(bi.at === undefined ? [] : [text(`at ${bi.at} `)]),
+    ...(bi.commit === undefined ? [] : [text("from the commit "), { kind: "link" as const, href: { kind: "external" as const, url: `${b.config.repository}/commit/${bi.commit}` }, children: [code(bi.commit.slice(0, 10))] }, text(" ")]),
+    ...(bi.url === undefined ? [] : [text("("), { kind: "link" as const, href: { kind: "external" as const, url: bi.url }, children: [text("the run")] }, text(")")]),
+    ...(check === "" ? [] : [text(`; the generator's own tests and check ${check}`)]),
+    text(". The tests are as of the run above, which may be older: the site is built on every push and the tests by the hour."),
+  ];
+}
+
 /** The dashboard, the page of each library, the register of issues and tickets, and a page for each issue. */
 export function qualityPages(b: Build): void {
   const ev = b.evidence;
@@ -142,7 +169,7 @@ export function qualityPages(b: Build): void {
     const q = requirementStanding(b, lib);
     return [
       [link(`quality/${lib}.html`, title(lib))],
-      [text(r === undefined ? "none" : String(r.tests.length))],
+      [text(r === undefined ? (noRunReason(ev, lib) === undefined ? "none" : "no run") : String(r.tests.length))],
       [text(r === undefined ? "" : String(r.passed))],
       [text(r === undefined ? "" : String(r.failed))],
       [text(r === undefined ? "" : String(r.skipped + r.other))],
@@ -163,6 +190,8 @@ export function qualityPages(b: Build): void {
     blocks: [
       ...(failedAll > 0 ? [BANNER(failedAll)] : []),
       { kind: "paragraph", inlines: runLine(b) },
+      ...(ev.build === undefined ? [] : [{ kind: "paragraph" as const, inlines: buildLine(b) }]),
+      { kind: "paragraph", inlines: [link("quality/ci.html", "The workflows"), text(": how the latest runs ended. "), link("quality/findings.html", "The documentation's own findings"), text(": what the generator found while it made this site.")] },
       ...(ev.recorded
         ? [{
           kind: "paragraph" as const,
@@ -186,6 +215,8 @@ export function qualityPages(b: Build): void {
     const blocks: Block[] = [];
     if (r !== undefined && r.failed > 0) blocks.push(BANNER(r.failed));
     blocks.push({ kind: "paragraph", inlines: runLine(b) });
+    const noRun = noRunReason(ev, lib);
+    if (noRun !== undefined) blocks.push({ kind: "callout", tone: "warn", title: "No test run for this library", blocks: [{ kind: "paragraph", inlines: [text(`No test report of the library is in the run these pages show: ${noRun}.`)] }] });
     if (hasOverview(lib)) blocks.push({ kind: "paragraph", inlines: [text("The library: "), link(`overview/${lib}.html`, title(lib)), text(".")] });
     if (r !== undefined) {
       blocks.push({ kind: "heading", level: 2, id: "tests", text: [text("Tests")] });
@@ -225,6 +256,8 @@ export function qualityPages(b: Build): void {
       blocks,
     });
   });
+  ciPage(b);
+  b.add({ path: "quality/findings.html", title: "Documentation findings", description: "What the generator found while it made this site.", section: "quality", group: "Quality", order: 5, blocks: [] });
   issuePages(b);
 }
 
@@ -262,12 +295,11 @@ function ticketTable(b: Build, tickets: readonly Ticket[]): Block {
 /** The register, and a page for each issue. */
 function issuePages(b: Build): void {
   const ev = b.evidence;
-  if (ev.issues.length === 0 && ev.tickets.length === 0) return;
   const open = ev.issues.filter(isOpen);
   const closed = ev.issues.filter((i) => !isOpen(i));
   const openTickets = ev.tickets.filter((t) => t.state === "open");
   const blocks: Block[] = [
-    { kind: "paragraph", inlines: [text(`${plural(open.length, "issue")} kept as typed code are open (${closed.length} closed), and ${plural(openTickets.length, "ticket")} of GitHub.`)] },
+    { kind: "paragraph", inlines: [text(ev.issues.length === 0 && ev.tickets.length === 0 ? "No issue is kept as typed code and no ticket of GitHub is recorded for this build of the site." : `${plural(open.length, "issue")} kept as typed code are open (${closed.length} closed), and ${plural(openTickets.length, "ticket")} of GitHub.`)] },
   ];
   if (open.length > 0) blocks.push({ kind: "heading", level: 2, id: "issues", text: [text("Open issues")] }, issueTable(b, open));
   if (openTickets.length > 0) blocks.push({ kind: "heading", level: 2, id: "tickets", text: [text("Open tickets of GitHub")] }, ticketTable(b, openTickets));
@@ -443,4 +475,82 @@ export function qualityData(b: Build): readonly { readonly path: string; readonl
     };
   });
   return [{ path: "quality.json", text: `${JSON.stringify({ recorded: ev.recorded, run: ev.run ?? null, libraries }, null, 2)}\n`, what: "the results of the tests, the requirements proved and the open issues and tickets, by library" }];
+}
+
+
+const ago = (a: string | undefined, z: string | undefined): number | undefined => {
+  if (a === undefined || z === undefined) return undefined;
+  const ms = Date.parse(z) - Date.parse(a);
+  return Number.isFinite(ms) && ms >= 0 ? Math.round(ms / 60000) : undefined;
+};
+const mark = (r: WorkflowRun): string => (r.status !== "completed" ? "…" : r.conclusion === "success" ? "✓" : r.conclusion === "failure" ? "✗" : "–");
+
+/** The CI/CD page: each workflow's latest run, the last ten as marks, how long a run takes, whether it flaps, and which jobs failed in the latest failed runs. */
+function ciPage(b: Build): void {
+  const ev = b.evidence;
+  const blocks: Block[] = [];
+  if (ev.workflows.length === 0) {
+    blocks.push({ kind: "callout", tone: "note", title: "No run history", blocks: [{ kind: "paragraph", inlines: [text(ev.runsError === undefined ? "The runs of the workflows are not recorded for this build of the site." : `The runs of the workflows could not be read for this build: ${ev.runsError}.`)] }] });
+  } else {
+    const latestFailed = ev.workflows.filter((w) => w.runs.find((r) => r.status === "completed" && r.conclusion !== "cancelled")?.conclusion === "failure");
+    if (latestFailed.length > 0) blocks.push({ kind: "callout", tone: "warn", title: "Workflows are failing", blocks: [{ kind: "paragraph", inlines: [text(`The latest run of ${latestFailed.map((w) => w.name).join(", ")} failed.`)] }] });
+    blocks.push({ kind: "paragraph", inlines: [text(`The last runs of each workflow on main. A mark is a run, newest first: ✓ passed, ✗ failed, – cancelled or skipped, … running. A workflow that flips between passing and failing is marked as flapping.`)] });
+    blocks.push({
+      kind: "table",
+      filter: "Filter the workflows",
+      head: th("Workflow", "Latest", "When", "Minutes", "Last runs", "Flapping"),
+      rows: ev.workflows.map((w) => {
+        const done = w.runs.filter((r) => r.status === "completed" && r.conclusion !== "cancelled");
+        const latest = w.runs[0];
+        const flips = done.slice(0, 10).filter((r, i, a) => i > 0 && (r.conclusion === "success") !== (a[i - 1]?.conclusion === "success")).length;
+        const mins = ago(latest?.startedAt, latest?.updatedAt);
+        return [
+          [text(w.name)],
+          latest === undefined ? [] : [{ kind: "link", href: { kind: "external", url: latest.url }, children: [text(latest.status === "completed" ? (latest.conclusion ?? "completed") : latest.status)] }],
+          [text(latest?.createdAt.replace("T", " ").replace(/:\d\dZ$/, " UTC") ?? "")],
+          [text(mins === undefined ? "" : String(mins))],
+          [text(w.runs.slice(0, 10).map(mark).join(" "))],
+          [text(flips >= 3 ? `flapping (${flips} flips in ${Math.min(10, done.length)} runs)` : "")],
+        ];
+      }),
+    });
+    for (const w of ev.workflows) {
+      const failing = w.failed.filter((f) => f.jobs.length > 0).slice(0, 3);
+      if (failing.length === 0) continue;
+      blocks.push({ kind: "heading", level: 2, id: slugOf(w.name), text: [text(`${w.name}: jobs that failed`)] });
+      blocks.push({
+        kind: "table",
+        head: th("Run", "Job", "Step"),
+        rows: failing.flatMap((f) => {
+          const run = w.runs.find((r) => r.id === f.run);
+          return f.jobs.map((j): Inline[][] => [
+            [{ kind: "link", href: { kind: "external", url: run?.url ?? j.url }, children: [text(`#${run?.number ?? f.run}`)] }, ...(run === undefined ? [] : [text(` ${run.title.slice(0, 60)}`)])],
+            [{ kind: "link", href: { kind: "external", url: j.url }, children: [text(j.name)] }],
+            [text(j.step ?? "")],
+          ]);
+        }),
+      });
+    }
+  }
+  b.add({ path: "quality/ci.html", title: "Workflows", description: "How the latest runs of the repository's workflows ended, and which jobs failed.", section: "quality", group: "Quality", order: 1, blocks });
+}
+
+/** Fills the page of the documentation's own findings, once every finding is known: the count by kind and the list, by library. */
+export function fillFindings(b: Build, found: readonly Finding[]): void {
+  const i = b.pages.findIndex((p) => p.path === "quality/findings.html");
+  const p = b.pages[i];
+  if (p === undefined) return;
+  const libOf = (where: string): string => /^commons\/([a-z0-9-]+)\//.exec(where)?.[1] ?? /^([a-z0-9-]+)\/[^ ]/.exec(where)?.[1] ?? "other";
+  const kinds = new Map<string, number>();
+  for (const f of found) kinds.set(f.problem.kind, (kinds.get(f.problem.kind) ?? 0) + 1);
+  const rows = [...found].sort((x, y) => (libOf(x.where) < libOf(y.where) ? -1 : libOf(x.where) > libOf(y.where) ? 1 : x.where < y.where ? -1 : x.where > y.where ? 1 : 0));
+  const shown = rows.slice(0, 400);
+  const blocks: Block[] = found.length === 0
+    ? [{ kind: "paragraph", inlines: [text("The generator found nothing wrong while it made this site: every link and anchor resolves, every export has its documentation and every citation names a specification of the kits.")] }]
+    : [
+      { kind: "paragraph", inlines: [text(`${plural(found.length, "finding")}: ${[...kinds].sort(([a], [c]) => (a < c ? -1 : 1)).map(([k, n]) => `${n} ${k}`).join(", ")}. A finding is something the generator would have a person fix (a broken link, an export with no documentation, a citation of a specification that is not there); the site is published with them.`)] },
+      { kind: "table", filter: "Filter the findings", head: th("Library", "Where", "What"), rows: shown.map((f) => [[text(libOf(f.where))], [code(f.where)], [text(message(f.problem))]]) },
+      ...(rows.length > shown.length ? [{ kind: "paragraph" as const, inlines: [text(`${rows.length - shown.length} more are not listed here; \`ifc-docs check\` lists them all.`)] }] : []),
+    ];
+  b.pages[i] = { ...p, badges: found.length === 0 ? [{ text: "none", tone: "good" }] : [{ text: String(found.length), tone: "warn" }], blocks };
 }

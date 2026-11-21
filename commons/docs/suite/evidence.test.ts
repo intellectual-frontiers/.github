@@ -1,4 +1,4 @@
-// Spec: 0001-docs FR-009, FR-010, FR-011, FR-012
+// Spec: 0001-docs FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015
 /**
  * The evidence the site shows beside the code (docs 0001-docs FR-009 to FR-012): CTRF results, GitHub tickets and typed issues read from files, the Quality section made from them, the lines on a requirement, a library and a
  * module, the findings for a file that cannot be read and a test that names a requirement that is not there, and, with no run recorded, nothing shown as passed.
@@ -10,7 +10,7 @@ import { assert, assertEquals, assertStringIncludes, proves } from "@intellectua
 import { report } from "../src/check.ts";
 import { loadConfig } from "../src/cli.ts";
 import { type EvidenceSource, resolveConfig } from "../src/config.ts";
-import { parseCtrf, parseTickets, readEvidence, requirementsIn, standing } from "../src/evidence.ts";
+import { parseCtrf, parseRuns, parseTickets, readEvidence, requirementsIn, standing } from "../src/evidence.ts";
 import { markdownOf } from "../src/emit/markdown.ts";
 import { buildSite } from "../src/site.ts";
 import { ROOT } from "./helpers.ts";
@@ -136,3 +136,89 @@ proves(["0001-docs FR-012"], "the evidence tool runs a library's suite into CTRF
     await fs.remove(out, { recursive: true });
   }
 }, { timeout: 180_000 });
+
+proves(["0001-docs FR-013", "0001-docs FR-011"], "the runs of the workflows are read from runs.json, and the Workflows page says how each ended, the last runs as marks, how long a run takes, which jobs failed, and what flaps", async () => {
+  const r = parseRuns(fs.readTextFileSync(path.join(EVIDENCE, "runs.json")));
+  assert("workflows" in r && r.workflows.length === 2 && r.workflows[0]?.runs.length === 5 && r.workflows[0].failed[0]?.jobs[0]?.step === "verify (its packing is checked)");
+  assert("error" in parseRuns("{}") && "error" in parseRuns("["), "a file that is not the runs is said so");
+  const b = await built({ results: EVIDENCE });
+  const page = markdownOf(b.pages.find((p) => p.path === "quality/ci.html") as never);
+  assertStringIncludes(page, "Workflows are failing");
+  assertStringIncludes(page, "The latest run of ci failed.");
+  assertStringIncludes(page, "✗ ✓ ✗ ✓ –");
+  assertStringIncludes(page, "| 12 |", "the latest run took 12 minutes");
+  assertStringIncludes(page, "flapping (3 flips in 4 runs)");
+  assertStringIncludes(page, "verify (grc)");
+  assertStringIncludes(page, "… |", "a run in progress is a mark");
+  const none = markdownOf((await built({ issues: [] })).pages.find((p) => p.path === "quality/ci.html") as never);
+  assertStringIncludes(none, "The runs of the workflows are not recorded for this build of the site.");
+});
+
+proves(["0001-docs FR-011"], "the dashboard says which build this is and how the generator's own check ended, and a library with no report says why from what its job says", async () => {
+  const dir = await fs.makeTempDir({ prefix: "ifc-docs-status-" });
+  try {
+    await fs.writeTextFile(path.join(dir, "meta.json"), '{ "commit": "abc", "at": "2026-11-21 09:00 UTC" }');
+    await fs.writeTextFile(path.join(dir, "build.json"), fs.readTextFileSync(path.join(EVIDENCE, "build.json")));
+    await fs.writeTextFile(path.join(dir, "status-fixture.json"), '{ "library": "fixture", "install": "failure", "runner": "success", "tests": "skipped", "reported": false }');
+    await fs.writeTextFile(path.join(dir, "other.ctrf.json"), fs.readTextFileSync(path.join(EVIDENCE, "fixture.ctrf.json")));
+    const b = await built({ results: dir });
+    const dash = markdownOf(b.pages.find((p) => p.path === "quality/index.html") as never);
+    assertStringIncludes(dash, "from the commit [`fedcba9876`]");
+    assertStringIncludes(dash, "the generator's own tests and check failure");
+    assertStringIncludes(dash, "| no run |");
+    const lib = markdownOf(b.pages.find((p) => p.path === "quality/fixture.html") as never);
+    assertStringIncludes(lib, "No test report of the library is in the run these pages show: its packages could not be installed.");
+    for (const [status, why] of [['{ "library": "fixture", "install": "success", "runner": "failure", "tests": "skipped" }', "the test runner could not be installed"], ['{ "library": "fixture", "install": "success", "runner": "success", "tests": "cancelled" }', "its job was cancelled or timed out"], ['{ "library": "fixture", "install": "success", "runner": "success", "tests": "failure" }', "it has no suite, or the runner failed"]] as const) {
+      await fs.writeTextFile(path.join(dir, "status-fixture.json"), status);
+      assertStringIncludes(markdownOf((await built({ results: dir })).pages.find((p) => p.path === "quality/fixture.html") as never), why);
+    }
+  } finally {
+    await fs.remove(dir, { recursive: true });
+  }
+});
+
+proves(["0001-docs FR-011"], "the findings page says what the generator found while it made the site, by library, and that it found nothing where it did", async () => {
+  const b = await built({ results: EVIDENCE });
+  const page = markdownOf(b.pages.find((p) => p.path === "quality/findings.html") as never);
+  assertStringIncludes(page, "1 finding: 1 test-requirement-unknown.");
+  assertStringIncludes(page, "proves 001-greeting FR-009");
+  const clean = await built({ issues: [] });
+  assertStringIncludes(markdownOf(clean.pages.find((p) => p.path === "quality/findings.html") as never), "The generator found nothing wrong while it made this site");
+});
+
+proves(["0001-docs FR-015"], "a configuration's problems and a lens that throws are findings and the site is made without them", async () => {
+  const loaded = await loadConfig(FIXTURE);
+  assert(loaded.kind === "ok");
+  const broken = { name: "broken", read: async () => { throw new Error("the lens could not read its library"); } };
+  const throwsPages = { name: "pages", read: async () => () => { throw new Error("its pages could not be made"); } };
+  const throwsFiles = { name: "files", read: async () => (_b: unknown, n: number) => n, files: () => { throw new Error("its files could not be made"); } };
+  const b = await buildSite({ ...loaded.value, problems: [{ where: "commons/grc", error: "Cannot find package 'x'" }], lenses: [broken, throwsPages, throwsFiles] as never });
+  const said = report(b.found);
+  for (const want of ["commons/grc: the module could not be imported: Cannot find package", "lens broken: the module could not be imported: the lens could not read", "a lens's pages: the module could not be imported: its pages", "lens files: the module could not be imported: its files"]) assert(said.some((l) => l.startsWith(want) || l.includes(want)), `${want} in ${said.join(" | ")}`);
+  assert(b.pages.length > 5, "the site is made");
+  assertEquals(resolveConfig({ name: "N", repository: "https://github.com/e/n", home: { dir: ".", about: { title: "N", summary: "n." } }, packages: [], citations: { prefix: "n", digits: 3 }, problems: [{ where: "x", error: "y" }, 3] }, "/x/docs.config.ts").kind, "ok");
+});
+
+proves(["0001-docs FR-013", "0001-docs FR-014"], "the tool that reads the runs writes a file that says so where the API cannot be reached, and the emergency page is made from the evidence alone", async () => {
+  const out = await fs.makeTempDir({ prefix: "ifc-docs-tools-" });
+  try {
+    const cwd = path.join(ROOT, "commons/docs");
+    const runs = await proc.run(["bun", "tools/ci-runs.ts", "--out", path.join(out, "runs.json")], { cwd, env: { GITHUB_REPOSITORY: "", PATH: proc.env.get("PATH") ?? "" } });
+    assertEquals(runs.code, 0, runs.stderr);
+    const written = JSON.parse(fs.readTextFileSync(path.join(out, "runs.json"))) as { workflows: unknown[]; error?: string };
+    assertEquals([written.workflows.length, typeof written.error], [0, "string"]);
+    assert("workflows" in parseRuns(fs.readTextFileSync(path.join(out, "runs.json"))), "the file is a valid runs file");
+    await fs.writeTextFile(path.join(out, "build.log"), "Error: the build broke\n    at somewhere\n");
+    const site = path.join(out, "site");
+    const emergency = await proc.run(["bun", "tools/status-site.ts", "--evidence", EVIDENCE, "--log", path.join(out, "build.log"), "--out", site], { cwd });
+    assertEquals(emergency.code, 0, emergency.stderr);
+    const html = fs.readTextFileSync(path.join(site, "index.html"));
+    for (const said of ["the documentation build failed", "Error: the build broke", "fedcba9876", "<td>fixture</td><td>4</td><td>2</td><td>1</td><td>1</td>", "001-greeting FR-002", ">failure</a>"]) assertStringIncludes(html, said);
+    const bare = await proc.run(["bun", "tools/status-site.ts", "--out", path.join(out, "bare")], { cwd });
+    assertEquals(bare.code, 0, "with nothing at all it still writes a page");
+    assertStringIncludes(fs.readTextFileSync(path.join(out, "bare/index.html")), "No test report is kept.");
+    assertEquals((await proc.run(["bun", "tools/status-site.ts"], { cwd })).code, 2);
+  } finally {
+    await fs.remove(out, { recursive: true });
+  }
+}, { timeout: 120_000 });

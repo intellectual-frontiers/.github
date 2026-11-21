@@ -1,0 +1,20 @@
+{
+  "repository": "example/fixture",
+  "workflows": [
+    {
+      "name": "ci", "path": ".github/workflows/ci.auto.yml",
+      "runs": [
+        { "id": 30, "run_number": 12, "event": "push", "status": "completed", "conclusion": "failure", "head_sha": "aaaaaaaaaaaaaaaaaaaa", "display_title": "Break the build", "html_url": "https://github.com/example/fixture/actions/runs/30", "created_at": "2026-11-21T09:00:00Z", "run_started_at": "2026-11-21T09:00:05Z", "updated_at": "2026-11-21T09:12:05Z" },
+        { "id": 29, "run_number": 11, "event": "push", "status": "completed", "conclusion": "success", "head_sha": "bbbbbbbbbbbbbbbbbbbb", "display_title": "Fix it", "html_url": "https://github.com/example/fixture/actions/runs/29", "created_at": "2026-11-21T08:00:00Z", "run_started_at": "2026-11-21T08:00:05Z", "updated_at": "2026-11-21T08:10:05Z" },
+        { "id": 28, "run_number": 10, "event": "push", "status": "completed", "conclusion": "failure", "head_sha": "cccccccccccccccccccc", "display_title": "Break it", "html_url": "https://github.com/example/fixture/actions/runs/28", "created_at": "2026-11-21T07:00:00Z", "run_started_at": "2026-11-21T07:00:05Z", "updated_at": "2026-11-21T07:08:05Z" },
+        { "id": 27, "run_number": 9, "event": "push", "status": "completed", "conclusion": "success", "head_sha": "dddddddddddddddddddd", "display_title": "Fine", "html_url": "https://github.com/example/fixture/actions/runs/27", "created_at": "2026-11-21T06:00:00Z", "run_started_at": "2026-11-21T06:00:05Z", "updated_at": "2026-11-21T06:09:05Z" },
+        { "id": 26, "run_number": 8, "event": "push", "status": "completed", "conclusion": "cancelled", "head_sha": "eeeeeeeeeeeeeeeeeeee", "display_title": "Replaced", "html_url": "https://github.com/example/fixture/actions/runs/26", "created_at": "2026-11-21T05:00:00Z", "updated_at": "2026-11-21T05:00:30Z" }
+      ],
+      "failed": [
+        { "run": 30, "jobs": [{ "name": "verify (grc)", "url": "https://github.com/example/fixture/actions/runs/30/job/1", "step": "verify (its packing is checked)" }] },
+        { "run": 28, "jobs": [] }
+      ]
+    },
+    { "name": "site", "path": ".github/workflows/site.auto.yml", "runs": [{ "id": 40, "run_number": 5, "event": "push", "status": "in_progress", "head_sha": "ffffffffffffffffffff", "display_title": "Building", "html_url": "https://github.com/example/fixture/actions/runs/40", "created_at": "2026-11-21T10:00:00Z" }], "failed": [] }
+  ]
+}

@@ -16,7 +16,7 @@ import { diagramSources, drawable } from "./emit/html.ts";
 import { markdownOf } from "./emit/markdown.ts";
 import { readEvidence } from "./evidence.ts";
 import { presentationFiles, writeFiles } from "./presentation.ts";
-import { decorate, qualityData, qualityPages } from "./pages/quality.ts";
+import { decorate, fillFindings, qualityData, qualityPages } from "./pages/quality.ts";
 import { readApi } from "./extract/api.ts";
 import { readSpecKits } from "./extract/specs.ts";
 import type { LensPages, SiteFile } from "./lens.ts";
@@ -228,7 +228,15 @@ export async function buildSite(config: Config): Promise<Built> {
     : await readApi(root, areas.map((a) => ({ slug: a.slug, entryPoints: a.entryPoints.map((e) => under(a.pkg.dir, e)) })), packages.map((p) => p.dir));
   const modules = registerApi(b, areas, apis);
   const lenses: LensPages[] = [];
-  for (const lens of config.lenses) lenses.push(await lens.read(b, areas, apis));
+  for (const p of config.problems) b.found.push({ where: p.where, problem: { kind: "import-failed", error: p.error } });
+  // a lens that fails is a finding, and the site is made without it
+  for (const lens of config.lenses) {
+    try {
+      lenses.push(await lens.read(b, areas, apis));
+    } catch (thrown) {
+      b.found.push({ where: `lens ${lens.name}`, problem: { kind: "import-failed", error: thrown instanceof Error ? thrown.message : String(thrown) } });
+    }
+  }
   specPages(b);
   // a test that names a requirement that no specification of the kits has is stale: a requirement renumbered or removed
   if (b.evidence.recorded) {
@@ -249,7 +257,13 @@ export async function buildSite(config: Config): Promise<Built> {
   apiPages(b, areas, apis, modules);
   areaPages(b, areas, modules);
   let after = 100;
-  for (const make of lenses) after = make(b, after);
+  for (const make of lenses) {
+    try {
+      after = make(b, after);
+    } catch (thrown) {
+      b.found.push({ where: "a lens's pages", problem: { kind: "import-failed", error: thrown instanceof Error ? thrown.message : String(thrown) } });
+    }
+  }
   homes(b, packages);
   qualityPages(b);
   decorate(b, areas);
@@ -257,7 +271,16 @@ export async function buildSite(config: Config): Promise<Built> {
   b.found.push(...brokenLinks(b.pages));
   for (const p of b.pages) for (const src of diagramSources(p.blocks)) if (!drawable(src)) b.found.push({ where: p.path, problem: { kind: "diagram-undrawable", first: src.split("\n")[0] ?? "" } });
   b.found.push(...wordFindings(b.pages, config.retired, config.forbiddenInGuides));
-  const files = [...config.lenses.flatMap((l) => l.files?.(b) ?? []), ...qualityData(b)];
+  fillFindings(b, b.found);
+  const lensFiles = config.lenses.flatMap((l) => {
+    try {
+      return l.files?.(b) ?? [];
+    } catch (thrown) {
+      b.found.push({ where: `lens ${l.name}`, problem: { kind: "import-failed", error: thrown instanceof Error ? thrown.message : String(thrown) } });
+      return [];
+    }
+  });
+  const files = [...lensFiles, ...qualityData(b)];
   return { pages: b.pages, found: b.found, files };
 }
 

@@ -100,6 +100,8 @@ export type Triggers = {
   readonly schedule?: readonly string[];
   /** Called by another workflow. */
   readonly workflowCall?: true;
+  /** Run when other workflows of the repository have completed (on the default branch). */
+  readonly workflowRun?: { readonly workflows: readonly string[] };
 };
 
 /** The cells of a matrix: the values of each axis, or an expression that gives the whole matrix (`expr("fromJSON(needs.plan.outputs.linux)")`), which a job reads from the output of another. */
