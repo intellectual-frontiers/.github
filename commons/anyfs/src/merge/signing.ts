@@ -49,9 +49,23 @@ export type Signer = {
   sign(domain: SignedDomain, text: string): Promise<string>;
 };
 
-/** A key pair made for a replica: the private key as a JWK (to be kept as a secret), the roster entry to give to others, and the signer. */
-export type SigningKey = { readonly privateJwk: JsonWebKey; readonly entry: KeyEntry };
+/** The private key of a replica as a JSON Web Key (RFC 8037, Ed25519): declared here, so that no consumer needs the `dom` library for a type of it. */
+export type PrivateJwk = {
+  readonly kty?: string;
+  readonly crv?: string;
+  readonly x?: string;
+  readonly d?: string;
+  readonly ext?: boolean;
+  readonly key_ops?: string[];
+};
 
+/** The two keys `generateKey` makes for Ed25519. */
+type KeyPair = { readonly publicKey: CryptoKey; readonly privateKey: CryptoKey };
+
+const isKeyPair = (x: CryptoKey | KeyPair): x is KeyPair => "privateKey" in x && "publicKey" in x;
+
+/** A key pair made for a replica: the private key as a JWK (to be kept as a secret), the roster entry to give to others, and the signer. */
+export type SigningKey = { readonly privateJwk: PrivateJwk; readonly entry: KeyEntry };
 
 /** The id of a key: the first 16 hexadecimal digits of the SHA-256 of its 32 bytes. */
 export async function keyIdOf(publicRaw: Uint8Array): Promise<string> {
@@ -60,7 +74,9 @@ export async function keyIdOf(publicRaw: Uint8Array): Promise<string> {
 
 /** A new key pair for a replica. */
 export async function generateSigningKey(replica: ReplicaId, window: { readonly notBefore?: number; readonly notAfter?: number } = {}): Promise<SigningKey> {
-  const pair = (await crypto.subtle.generateKey({ name: "Ed25519" }, true, ["sign", "verify"])) as CryptoKeyPair;
+  const made: CryptoKey | KeyPair = await crypto.subtle.generateKey({ name: "Ed25519" }, true, ["sign", "verify"]);
+  if (!isKeyPair(made)) throw new Error("an Ed25519 generateKey makes a key pair");
+  const pair = made;
   const raw = new Uint8Array(await crypto.subtle.exportKey("raw", pair.publicKey));
   const privateJwk = await crypto.subtle.exportKey("jwk", pair.privateKey);
   return { privateJwk, entry: { replica, keyId: await keyIdOf(raw), publicKey: toBase64(raw), ...(window.notBefore === undefined ? {} : { notBefore: window.notBefore }), ...(window.notAfter === undefined ? {} : { notAfter: window.notAfter }) } };
@@ -168,7 +184,7 @@ export function parseSigningKey(source: string): Result<SigningKey, string> {
   if (entry.kind === "err") return err(`the entry of the signing key: ${entry.error}`);
   const jwk = o["privateJwk"];
   if (o["format"] !== 1 || typeof jwk !== "object" || jwk === null || (jwk as { kty?: unknown }).kty !== "OKP" || typeof (jwk as { d?: unknown }).d !== "string") return err("a signing key is format 1 with an Ed25519 private key (JWK)");
-  return ok({ privateJwk: jwk as JsonWebKey, entry: entry.value[0] as KeyEntry });
+  return ok({ privateJwk: jwk as PrivateJwk, entry: entry.value[0] as KeyEntry });
 }
 
 /** A delta signed by the signer of its origin among several, as it is signed where more than one replica's key is in hand; a delta whose origin has no signer here is returned as it is, unsigned. */

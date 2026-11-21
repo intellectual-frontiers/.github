@@ -120,7 +120,8 @@ export function libraryFindings(repo: string): readonly string[] {
       if (first !== undefined && first !== "0001") found.push(`commons/${name}'s registry starts at ${first}, not 0001 (FR-002)`);
     }
     for (const file of tsFiles(dir)) {
-      for (const m of read(file).matchAll(/(?:from|import)\s*\(?\s*"(\.{1,2}\/[^"]*)"/g)) {
+      // an import statement begins a line; the same words inside a string literal of a fixture are text, not an import
+      for (const m of read(file).matchAll(/^[ \t]*(?:(?:import|export)\b[^"'`;]*?\bfrom|import)\s*\(?\s*"(\.{1,2}\/[^"]*)"/gm)) {
         const target = path.resolve(path.dirname(file), m[1] ?? "");
         if (target !== dir && !target.startsWith(`${dir}/`))
           found.push(`${path.relative(repo, file)} imports ${m[1]}, outside commons/${name} (FR-004)`);

@@ -53,6 +53,24 @@ export const LETS_ENCRYPT = "https://acme-v02.api.letsencrypt.org/directory";
 /** Let's Encrypt's staging directory: certificates no browser trusts, for trying a setup without its rate limits. */
 export const LETS_ENCRYPT_STAGING = "https://acme-staging-v02.api.letsencrypt.org/directory";
 
+/** A JSON Web Key (RFC 7517) as the fields this module reads and writes, declared here so that no consumer needs the `dom` library for a type of it. */
+export type Jwk = {
+  readonly alg?: string;
+  readonly crv?: string;
+  readonly d?: string;
+  readonly e?: string;
+  readonly ext?: boolean;
+  readonly key_ops?: string[];
+  readonly kty?: string;
+  readonly n?: string;
+  readonly use?: string;
+  readonly x?: string;
+  readonly y?: string;
+};
+
+/** The two keys of an ECDSA key pair of Web Crypto. */
+export type KeyPair = { readonly publicKey: CryptoKey; readonly privateKey: CryptoKey };
+
 /** Where TXT records are set and removed (a zone's DNS host): `name` is the whole name, `value` the record's text. */
 export type DnsProvider = {
   setTxt(name: string, value: string): Promise<void>;
@@ -67,7 +85,7 @@ export type IssueOptions = {
   readonly domains: readonly string[];
   readonly dns: DnsProvider;
   /** The account's ES256 private key as a JWK; a new one is made where it is absent (and given back to keep). */
-  readonly accountKey?: JsonWebKey;
+  readonly accountKey?: Jwk;
   /** The account's contacts (`mailto:...`), sent when the account is made. */
   readonly contact?: readonly string[];
   /** Called for each TXT record once all are set, before the challenges are answered: wait until the record can be seen. */
@@ -87,7 +105,7 @@ export type Issued = {
   /** The certificate's ES256 private key, PKCS #8 PEM. */
   readonly privateKeyPem: string;
   /** The account's ES256 private key as a JWK: keep it (it is a secret) and give it to the next `issue`. */
-  readonly accountKey: JsonWebKey;
+  readonly accountKey: Jwk;
   /** The certificate's `notAfter`, ISO 8601. */
   readonly notAfter: string;
   /** A TXT record that could not be removed, one sentence each (none when all were). */
@@ -150,7 +168,7 @@ export function ecdsaRawToDer(raw: Uint8Array): Uint8Array {
 }
 
 /** The RFC 7638 thumbprint of an EC public JWK: the base64url SHA-256 of `{"crv","kty","x","y"}` in that order. */
-export async function jwkThumbprint(jwk: JsonWebKey): Promise<string> {
+export async function jwkThumbprint(jwk: Jwk): Promise<string> {
   const canonical = JSON.stringify({ crv: jwk.crv, kty: jwk.kty, x: jwk.x, y: jwk.y });
   return toBase64Url(bytesOf(await crypto.subtle.digest("SHA-256", utf8(canonical))));
 }
@@ -169,7 +187,7 @@ const EC = { name: "ECDSA", namedCurve: "P-256" } as const;
 const ES256 = { name: "ECDSA", hash: "SHA-256" } as const;
 
 /** A certification request (PKCS #10, RFC 2986) for these names, signed by the key: the first name as the common name, all as DNS SANs. */
-export async function csr(domains: readonly string[], keys: CryptoKeyPair): Promise<Uint8Array> {
+export async function csr(domains: readonly string[], keys: KeyPair): Promise<Uint8Array> {
   const first = domains[0] ?? "";
   const subject =
     first.length > 0 && first.length <= 64
@@ -226,9 +244,9 @@ export function needsRenewal(certificatePem: string, now: Date, days = 30): bool
   return end === undefined || end.getTime() - now.getTime() < days * 86_400_000;
 }
 
-type AccountKey = { readonly privateKey: CryptoKey; readonly jwk: JsonWebKey; readonly privateJwk: JsonWebKey };
+type AccountKey = { readonly privateKey: CryptoKey; readonly jwk: Jwk; readonly privateJwk: Jwk };
 
-async function accountKeyOf(given: JsonWebKey | undefined): Promise<Result<AccountKey, string>> {
+async function accountKeyOf(given: Jwk | undefined): Promise<Result<AccountKey, string>> {
   try {
     let privateJwk = given;
     if (privateJwk === undefined) {
@@ -238,7 +256,7 @@ async function accountKeyOf(given: JsonWebKey | undefined): Promise<Result<Accou
     if (privateJwk.kty !== "EC" || privateJwk.crv !== "P-256" || privateJwk.d === undefined)
       return err("the account key is not an ES256 (EC P-256) private JWK");
     const privateKey = await crypto.subtle.importKey("jwk", privateJwk, EC, false, ["sign"]);
-    const jwk: JsonWebKey = { kty: "EC", crv: "P-256", x: privateJwk.x ?? "", y: privateJwk.y ?? "" };
+    const jwk: Jwk = { kty: "EC", crv: "P-256", x: privateJwk.x ?? "", y: privateJwk.y ?? "" };
     const { key_ops: _ops, ext: _ext, ...kept } = privateJwk;
     return ok({ privateKey, jwk, privateJwk: kept });
   } catch {

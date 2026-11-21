@@ -100,8 +100,23 @@ export function encodeCoseKey(key: CoseKey): Uint8Array {
   return encodeCbor(m);
 }
 
+/** A JSON Web Key (RFC 7517) as the fields this module reads and writes, declared here so that no consumer needs the `dom` library for a type of it. */
+export type Jwk = {
+  readonly alg?: string;
+  readonly crv?: string;
+  readonly d?: string;
+  readonly e?: string;
+  readonly ext?: boolean;
+  readonly key_ops?: string[];
+  readonly kty?: string;
+  readonly n?: string;
+  readonly use?: string;
+  readonly x?: string;
+  readonly y?: string;
+};
+
 /** The `COSE_Key` of a public JSON Web Key: EC on P-256 (as ES256) or OKP on Ed25519 (as EdDSA); any other key refused. */
-export function coseKeyFromJwk(jwk: JsonWebKey): Result<Uint8Array, string> {
+export function coseKeyFromJwk(jwk: Jwk): Result<Uint8Array, string> {
   const b = (v: string | undefined, name: string): Result<Uint8Array, string> => {
     if (v === undefined) return err(`the JWK has no ${name}`);
     const r = fromBase64Url(v);
@@ -123,7 +138,7 @@ export function coseKeyFromJwk(jwk: JsonWebKey): Result<Uint8Array, string> {
 }
 
 /** The public JSON Web Key of a COSE key. */
-export function jwkOfCoseKey(key: CoseKey): JsonWebKey {
+export function jwkOfCoseKey(key: CoseKey): Jwk {
   return key.kty === "EC2"
     ? { kty: "EC", crv: "P-256", x: toBase64Url(key.x), y: toBase64Url(key.y) }
     : { kty: "OKP", crv: "Ed25519", x: toBase64Url(key.x) };
