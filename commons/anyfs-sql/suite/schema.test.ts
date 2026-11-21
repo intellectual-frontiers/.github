@@ -90,7 +90,7 @@ proves(["0004-sql-schema FR-003"], "a migration that takes something away runs o
   assert(allowed.kind === "ok" && allowed.value.version === SCHEMA_VERSION + 1);
 });
 
-proves(["0004-sql-schema FR-004"], "the index of search is made where asked (SQLite) and not where it is off, and PostgreSQL and DuckDB are refused with a sentence until their layouts are made", async () => {
+proves(["0004-sql-schema FR-004"], "the index of search is made where asked (SQLite, PostgreSQL) and not where it is off, and DuckDB has none and says so where it is required", async () => {
   const on = await sqliteMemory();
   const auto = await migrate(on, naming, { search: "auto" });
   assert(auto.kind === "ok" && auto.value.search);
@@ -99,9 +99,16 @@ proves(["0004-sql-schema FR-004"], "the index of search is made where asked (SQL
   const none = await migrate(off, naming, { search: "off" });
   assert(none.kind === "ok" && !none.value.search);
   assertEquals(await hasSearch(off, naming), false);
+  const pg = await pgliteMemory();
+  const made = await migrate(pg, naming, { search: "auto" });
+  assert(made.kind === "ok" && made.value.search && (await hasSearch(pg, naming)));
+  const duck = await duckdbMemory();
+  const none2 = await migrate(duck, naming, { search: "auto" });
+  assert(none2.kind === "ok" && !none2.value.search);
+  const required = await migrate(await duckdbMemory(), naming, { search: "require" });
+  assert(required.kind === "err" && /no index that keeps itself current/.test(required.error));
   for (const make of [pgliteMemory, duckdbMemory]) {
-    const port = await make();
-    const r = await openSqlStore(port);
-    assert(r.kind === "err" && /made for SQLite and its drivers/.test(r.error), `${port.dialect}: ${r.kind === "err" ? r.error : "opened"}`);
+    const opened = await openSqlStore(await make());
+    assert(opened.kind === "ok");
   }
 });

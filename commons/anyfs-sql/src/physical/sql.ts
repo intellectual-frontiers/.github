@@ -62,8 +62,8 @@ export type Query = {
   name(name: string): Query;
   /** Adds the bytes of an object as a value for a binary column. */
   bytes(value: Uint8Array): Query;
-  /** Adds the binary column as it is selected, so that its bytes come back as bytes or as hex. */
-  selectBytes(column: string): Query;
+  /** Adds the binary column as it is selected (of a table given by an alias where there is one), so that its bytes come back as bytes or as hex. */
+  selectBytes(column: string, qualifier?: string): Query;
   /** Adds ` FOR UPDATE` where the dialect locks a row that way. */
   forUpdate(): Query;
   done(): Statement;
@@ -110,8 +110,9 @@ export function sqlFor(dialect: SqlDialect, naming: Naming) {
         } else self.param(value);
         return self;
       },
-      selectBytes(column) {
-        text += dialect === "duckdb" ? `hex(${nameOf(column)}) AS ${nameOf(column)}` : nameOf(column);
+      selectBytes(column, qualifier) {
+        const q = qualifier === undefined ? "" : `${nameOf(qualifier)}.`;
+        text += dialect === "duckdb" ? `hex(${q}${nameOf(column)}) AS ${nameOf(column)}` : `${q}${nameOf(column)}`;
         return self;
       },
       forUpdate() {
@@ -129,6 +130,8 @@ export function sqlFor(dialect: SqlDialect, naming: Naming) {
     query,
     name: nameOf,
     table: tableName,
+    /** The function that gives the length of a binary value in bytes. */
+    byteLength: dialect === "sqlite" ? "length" : "octet_length",
     /** The type of a column in this dialect. */
     type: (kind: "text" | "integer" | "bytes" | "path"): string => {
       switch (kind) {

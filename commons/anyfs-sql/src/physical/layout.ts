@@ -42,6 +42,13 @@ export function layoutOf(sql: Sql) {
   const VERSION_SELECT = "SELECT id, sum, replica, seq, path, parent, merged, kind, blob FROM ";
 
   return {
+    // ---- the order of writers
+    /**
+     * What makes the writers of a store go one after another, or nothing where the engine does it already: SQLite takes the write lock at the start of a transaction and DuckDB has one connection, and PostgreSQL, where
+     * two connections write side by side, takes an advisory lock that lasts to the end of the transaction, named by the tables of the store so that stores do not wait for one another.
+     */
+    lockWriters: (): Query | undefined => (sql.dialect === "postgres" ? sql.query().text("SELECT pg_advisory_xact_lock(hashtextextended(").param(sql.table("versions")).text(", 0))") : undefined),
+
     // ---- the rows of a path, and the clock of the replica
     /** Every version row of a path. */
     selectRowsOfPath: (path: string): Query => sql.query().text(VERSION_SELECT).table("versions").text(" WHERE path = ").param(path).text(" ORDER BY id, sum"),
@@ -145,13 +152,13 @@ export function layoutOf(sql: Sql) {
     // ---- the views
     /** The file at a path: its winner, its digest, its size and its bytes. */
     selectCurrent: (path: string): Query =>
-      sql.query().text("SELECT n.id AS id, n.blob AS blob, length(b.bytes) AS size, b.").selectBytes("bytes").text(" FROM ").table("names").text(" n JOIN ").table("blobs").text(" b ON b.sha = n.blob WHERE n.path = ").param(path),
+      sql.query().text("SELECT n.id AS id, n.blob AS blob, " + sql.byteLength + "(b.bytes) AS size, ").selectBytes("bytes", "b").text(" FROM ").table("names").text(" n JOIN ").table("blobs").text(" b ON b.sha = n.blob WHERE n.path = ").param(path),
     /** The winner of a path, with the size of its bytes. */
     selectCurrentStat: (path: string): Query =>
-      sql.query().text("SELECT n.id AS id, n.blob AS blob, length(b.bytes) AS size FROM ").table("names").text(" n JOIN ").table("blobs").text(" b ON b.sha = n.blob WHERE n.path = ").param(path),
+      sql.query().text("SELECT n.id AS id, n.blob AS blob, " + sql.byteLength + "(b.bytes) AS size FROM ").table("names").text(" n JOIN ").table("blobs").text(" b ON b.sha = n.blob WHERE n.path = ").param(path),
     /** A page of the files below a prefix, after a path, in the order of the bytes of the paths: one more than the page, to know whether there is a next. */
     selectPage: (prefix: string, after: string | undefined, limit: number): Query => {
-      const q = sql.query().text("SELECT n.path AS path, n.id AS id, n.blob AS blob, length(b.bytes) AS size FROM ").table("names").text(" n JOIN ").table("blobs").text(" b ON b.sha = n.blob WHERE 1 = 1");
+      const q = sql.query().text("SELECT n.path AS path, n.id AS id, n.blob AS blob, " + sql.byteLength + "(b.bytes) AS size FROM ").table("names").text(" n JOIN ").table("blobs").text(" b ON b.sha = n.blob WHERE 1 = 1");
       range(q, "n.path", prefix);
       if (after !== undefined) q.text(" AND n.path > ").param(after);
       return q.text(" ORDER BY n.path LIMIT ").param(limit + 1);
@@ -160,7 +167,7 @@ export function layoutOf(sql: Sql) {
     selectHistory: (path: string, limit: number): Query =>
       sql
         .query()
-        .text("SELECT v.id AS id, v.blob AS blob, length(b.bytes) AS size FROM ")
+        .text("SELECT v.id AS id, v.blob AS blob, " + sql.byteLength + "(b.bytes) AS size FROM ")
         .table("versions")
         .text(" v LEFT JOIN ")
         .table("blobs")
@@ -221,13 +228,19 @@ export function layoutOf(sql: Sql) {
     deleteAllWords: (): Query => sql.query().text("DELETE FROM ").table("search"),
     insertWords: (path: string, text: string): Query => sql.query().text("INSERT INTO ").table("search").text(" (path, text) VALUES (").param(path).text(", ").param(text).text(")"),
     searchWords: (prefix: string, words: string, limit: number): Query => {
+      if (sql.dialect === "postgres") {
+        // the words are plain text for `plainto_tsquery`, which joins them with AND and has no operator a caller could write
+        const p = sql.query().text("SELECT n.path AS path, n.blob AS blob FROM ").table("search").text(" s JOIN ").table("names").text(" n ON n.path = s.path WHERE s.tsv @@ plainto_tsquery('simple', ").param(words).text(")");
+        range(p, "n.path", prefix);
+        return p.text(" ORDER BY ts_rank(s.tsv, plainto_tsquery('simple', ").param(words).text(")) DESC, n.path LIMIT ").param(limit);
+      }
       const q = sql.query().text("SELECT n.path AS path, n.blob AS blob FROM ").table("search").text(" JOIN ").table("names").text(" n ON n.path = ").table("search").text(".path WHERE ").table("search").text(" MATCH ").param(words);
       range(q, "n.path", prefix);
       return q.text(" ORDER BY rank, n.path LIMIT ").param(limit);
     },
     /** The files whose bytes are small enough to be indexed: for the index to be made again after a merge. */
     selectIndexable: (maxBytes: number, after: string | undefined, limit: number): Query => {
-      const q = sql.query().text("SELECT n.path AS path, b.").selectBytes("bytes").text(" FROM ").table("names").text(" n JOIN ").table("blobs").text(" b ON b.sha = n.blob WHERE length(b.bytes) <= ").param(maxBytes);
+      const q = sql.query().text("SELECT n.path AS path, ").selectBytes("bytes", "b").text(" FROM ").table("names").text(" n JOIN ").table("blobs").text(" b ON b.sha = n.blob WHERE " + sql.byteLength + "(b.bytes) <= ").param(maxBytes);
       if (after !== undefined) q.text(" AND n.path > ").param(after);
       return q.text(" ORDER BY n.path LIMIT ").param(limit);
     },
@@ -256,8 +269,12 @@ export function layoutOf(sql: Sql) {
         if (i > 0) q.text(", ");
         q.param(v);
       });
-      return q.text(")");
+      return q.text(") ON CONFLICT DO NOTHING");
     },
-    replayBlob: (sha: string, bytes: Uint8Array): Query => sql.query().text("INSERT INTO ").table("blobs").text(" VALUES (").param(sha).text(", ").bytes(bytes).text(")"),
+    replayBlob: (sha: string, bytes: Uint8Array): Query => sql.query().text("INSERT INTO ").table("blobs").text(" VALUES (").param(sha).text(", ").bytes(bytes).text(") ON CONFLICT DO NOTHING"),
+    /** Every version row, in key order, as the columns of the table: what a dump of an engine that has no `quote` is made from. */
+    selectVersionRows: (): Query => sql.query().text(VERSION_SELECT).table("versions").text(" ORDER BY id, sum"),
+    /** Every blob, in order of digest. */
+    selectBlobRows: (): Query => sql.query().text("SELECT sha, ").selectBytes("bytes").text(" FROM ").table("blobs").text(" ORDER BY sha"),
   };
 }

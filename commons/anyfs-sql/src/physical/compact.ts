@@ -119,6 +119,8 @@ async function collect(port: SqlPort, c: Ctx, horizon: VersionVector, roster: re
   const number = (previous?.n ?? 0) + 1;
   let blobs = 0;
   await port.transaction(async (tx: SqlRunner) => {
+    const lock = c.l.lockWriters();
+    if (lock !== undefined) await runQ(tx, lock);
     for (let i = 0; i < dead.length; i += BATCH) for (const d of dead.slice(i, i + BATCH)) await execQ(tx, c.l.deleteVersion(d.id, d.sum));
     const before = numberOf((await runQ(tx, c.l.countBlobs()))[0]?.["n"] ?? null);
     await execQ(tx, c.l.deleteBlobsUnnamed());
