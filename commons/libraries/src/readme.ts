@@ -61,6 +61,7 @@ export function parseLibraryName(text: string): Result<LibraryName, string> {
 
 /** The role of each library, by name. A new library is classified here, or the check names it. */
 export const ROLE_OF: ReadonlyMap<string, Role> = new Map<string, Role>([
+  ["catalog-nist-csf-2", "standard"],
   ["core", "foundation"],
   ["crypto", "foundation"],
   ["formats", "foundation"],
