@@ -63,7 +63,7 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 
 | Library | Role | What it is | Kanon | Level | Published to |
 | --- | --- | --- | --- | --- | --- |
-| [`@intellectual-frontiers/anyfs`](commons/anyfs) | Foundation | One typed interface to the places bytes live | layers, plugins | L1 | held |
+| [`@intellectual-frontiers/anyfs`](https://www.npmjs.com/package/@intellectual-frontiers/anyfs) | Foundation | One typed interface to the places bytes live | layers, plugins | L1 | GitHub, npm |
 | [`@intellectual-frontiers/anyfs-bridge`](commons/anyfs-bridge) | Foundation | Copy, sync, move, check, two-way sync and mirror between any two AnyFS stores | layers, extension | L1 | held |
 | [`@intellectual-frontiers/anyfs-git`](commons/anyfs-git) | Foundation | A branch of a Git repository and a Git working tree, each kept as an AnyFS store | layers, extension | L1 | held |
 | [`@intellectual-frontiers/anyfs-githost`](commons/anyfs-githost) | Foundation | The Git host backend of AnyFS | layers, extension | L1 | held |
@@ -86,7 +86,7 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/test`](https://www.npmjs.com/package/@intellectual-frontiers/test) | Foundation | Tests that run unchanged under `bun test` and `node --test` | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/headless`](https://www.npmjs.com/package/@intellectual-frontiers/headless) | Pattern | The contract of a program that has no window | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/kanon`](https://www.npmjs.com/package/@intellectual-frontiers/kanon) | Pattern | The pattern of a library built in three layers | - | L1 | GitHub, npm |
-| [`@intellectual-frontiers/planning`](commons/planning) | Pattern | Planning content from many places as one item each with one stable id | layers | L1 | held |
+| [`@intellectual-frontiers/planning`](https://www.npmjs.com/package/@intellectual-frontiers/planning) | Pattern | Planning content from many places as one item each with one stable id | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/anyfs-cli`](commons/anyfs-cli) | Program | The `anyfs` program: POSIX-style access to any AnyFS store (ls, cat, cp, rm, find, grep, diff) and the bridge verbs (sync, bisync, mirror, check, merge, sync-medium) from the command line | layers, extension | L1 | held |
 | [`@intellectual-frontiers/archon`](https://www.npmjs.com/package/@intellectual-frontiers/archon) | Program | A Kanon library that orders subjects: a machine, a device, a workstation or a cloud account | layers, instances, plugins | L1 | GitHub, npm |
 | [`@intellectual-frontiers/archon-boot`](commons/archon-boot) | Program | The plugin that gives `archon` its verbs for the network install | layers, extension | L1 | held |
