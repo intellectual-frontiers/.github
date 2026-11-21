@@ -103,11 +103,14 @@ function taskOf(r: Requirement, index: number, problems: string[]): Obj | readon
       const name = str(o, "name", problems, id, true, NAME);
       const shell = str(o, "shell", problems, id, false, /^\/[A-Za-z0-9/_.-]+$/);
       const home = str(o, "home", problems, id, false, /^\/[A-Za-z0-9/_.-]+$/);
+      const uid = o["uid"];
+      if (uid !== undefined && (typeof uid !== "number" || !Number.isInteger(uid) || uid < 0 || uid > 4294967294)) problems.push(`${id}: desired.uid is a whole number`);
+      const comment = str(o, "comment", problems, id, false, /^[^:\r\n\u0000]{0,200}$/);
       const groups = o["groups"];
       if (groups !== undefined && (!Array.isArray(groups) || groups.some((g) => typeof g !== "string" || !NAME.test(g)))) problems.push(`${id}: desired.groups is a list of group names`);
       if (name === undefined) return undefined;
       if (absent) return base("ansible.builtin.user", { name, state: "absent" });
-      return base("ansible.builtin.user", { name, state: "present", ...(shell === undefined ? {} : { shell }), ...(home === undefined ? {} : { home }), ...(Array.isArray(groups) ? { groups: [...groups].sort().join(","), append: true } : {}) });
+      return base("ansible.builtin.user", { name, state: "present", ...(shell === undefined ? {} : { shell }), ...(home === undefined ? {} : { home }), ...(typeof uid === "number" ? { uid } : {}), ...(comment === undefined ? {} : { comment }), ...(Array.isArray(groups) ? { groups: [...groups].sort().join(","), append: true } : {}) });
     }
     case "directory": {
       const path = absolute(o, "path", problems, id);

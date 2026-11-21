@@ -33,7 +33,7 @@ function orderOf(requirements: readonly Requirement[]) {
 
 const REQS = [
   req("group.lab", "group", { name: "labgroup" }),
-  req("user.lab", "user", { name: "labuser", shell: "/bin/bash", groups: ["labgroup"] }, { dependsOn: ["group.lab"] }),
+  req("user.lab", "user", { name: "labuser", uid: 1500, comment: "Lab User", shell: "/bin/bash", groups: ["labgroup"] }, { dependsOn: ["group.lab"] }),
   req("dir.lab", "directory", { path: "/srv/lab", owner: "labuser", mode: "0750" }, { dependsOn: ["user.lab"] }),
   req("file.lab", "file", { path: "/srv/lab/motd", content: "hello\n", owner: "labuser", mode: "0640" }, { dependsOn: ["dir.lab"] }),
   req("setting.timezone", "system-setting", { name: "timezone", value: "America/New_York" }),
