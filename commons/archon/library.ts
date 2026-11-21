@@ -30,7 +30,7 @@ export const library = {
       { name: "ansible", instanceOf: "src/physical/dialect/", placement: "package" },
       { name: "cloud-init", instanceOf: "src/physical/dialect/", placement: "package" },
     ],
-    plugins: [{ noun: "tool" }],
+    plugins: [{ noun: "tool" }, { noun: "converge" }],
     units: [
       { folder: "src/governance/", layer: "governance", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }] },
       {
