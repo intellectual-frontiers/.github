@@ -9,7 +9,7 @@ export const library = {
   level: "L1",
   specKit: "spec-kit",
   verify: "bun run verify",
-  version: "0.2.6",
+  version: "0.2.7",
   distribution: ["github", "npm"],
   exports: ["."],
   summary: "The reference connector of Integrations for the posture of one organization of a code host: read-only, with its governance as data, its posture policies in the vocabulary of GRC, its records and entities, proved by the conformance suite over made-up recorded answers.",

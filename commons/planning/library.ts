@@ -11,8 +11,7 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
-  held: "new: the logical core (0037-planning phases 0 and 1) is built and verified; the library is not released until its sources and surfaces are",
+  distribution: ["github", "npm"],
   exports: [".", "./governance", "./logical", "./records", "./physical"],
   summary: "Planning content from many places as one item each with one stable id, its history as append-only events and its state a fold of them, with every act of an agent made on behalf of a person; sources are lenses over the places, and a write goes back in the place's own form.",
   kanon: {
