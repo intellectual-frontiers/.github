@@ -50,6 +50,7 @@ export const KINDS: readonly KindSpec[] = [
       str("region", "The region."),
       str("identifier", "The provider's own identifier."),
       str("source", "Where the asset was learned from.", { values: ["iac", "connector", "manual"] }),
+      str("provenance", "Where the asset was read from, as tool:file#address (written by the importers of infrastructure as code)."),
     ],
   },
   {
@@ -64,6 +65,7 @@ export const KINDS: readonly KindSpec[] = [
       str("exposure", "Who can reach it.", { values: ["internet", "partner", "internal", "management"] }),
       str("authentication", "How a client proves who it is.", { values: ["none", "basic", "token", "oauth", "mtls", "session", "unknown"] }),
       str("api", "The description of its interface, where it is an API.", { values: ["openapi", "graphql", "grpc", "soap", "none"] }),
+      str("provenance", "Where the asset was read from, as tool:file#address (written by the importers of infrastructure as code)."),
     ],
   },
   {
@@ -73,7 +75,9 @@ export const KINDS: readonly KindSpec[] = [
       str("tier", "What it does in the system.", { values: ["web", "api", "worker", "batch", "database", "library"] }),
       str("language", "The language it is written in."),
       str("repository", "The address of its source repository."),
+      str("image", "The container image it runs from, where it runs from one."),
       strs("handles", "The data classes it handles."),
+      str("provenance", "Where the asset was read from, as tool:file#address (written by the importers of infrastructure as code)."),
     ],
   },
   {
@@ -90,17 +94,17 @@ export const KINDS: readonly KindSpec[] = [
   {
     kind: "service",
     summary: "A common network service running somewhere (a database, a mail server, a directory).",
-    attributes: [str("service", "The common service, by its name in the services catalog.", { required: true }), str("version", "The version."), num("port", "The port, where it is not the usual one.")],
+    attributes: [str("service", "The common service, by its name in the services catalog.", { required: true }), str("version", "The version."), num("port", "The port, where it is not the usual one."), str("provenance", "Where the asset was read from, as tool:file#address (written by the importers of infrastructure as code).")],
   },
   {
     kind: "domain",
     summary: "A name in the domain name system.",
-    attributes: [str("name", "The name.", { required: true }), str("registrar", "The registrar."), bool("dnssec", "Whether it is signed.")],
+    attributes: [str("name", "The name.", { required: true }), str("registrar", "The registrar."), bool("dnssec", "Whether it is signed."), str("provenance", "Where the asset was read from, as tool:file#address (written by the importers of infrastructure as code).")],
   },
   {
     kind: "certificate",
     summary: "A certificate of the web or of a service.",
-    attributes: [str("subject", "The name it is issued to.", { required: true }), str("issuer", "Who issued it."), str("not-after", "The day it expires, as YYYY-MM-DD."), str("key", "The key type and size, for example rsa-2048.")],
+    attributes: [str("subject", "The name it is issued to.", { required: true }), str("issuer", "Who issued it."), str("not-after", "The day it expires, as YYYY-MM-DD."), str("key", "The key type and size, for example rsa-2048."), str("provenance", "Where the asset was read from, as tool:file#address (written by the importers of infrastructure as code).")],
   },
 ];
 

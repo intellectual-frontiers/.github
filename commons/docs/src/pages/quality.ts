@@ -1,4 +1,4 @@
-// Spec: 0001-docs FR-010, FR-011, FR-022, FR-023
+// Spec: 0001-docs FR-010, FR-011, FR-022, FR-023, FR-026
 /**
  * The Quality section (docs 0001-docs FR-010, FR-011; commons 0011-documentation FR-041): what the tests and the issues say of each library, made from the evidence the configuration names (`evidence.ts`): a dashboard with a row
  * for each library, a page for each library (its failing and its skipped tests, its slowest, the requirements no passing test proves, its open issues and tickets), a register of the issues and tickets and a page for each issue kept
@@ -412,6 +412,43 @@ function issuePages(b: Build): void {
   });
 }
 
+/** Whether a text names a file by its path from the root of the repository (the path not being the tail of a longer one). */
+const namesPath = (words: string, file: string): boolean => {
+  for (let at = words.indexOf(file); at >= 0; at = words.indexOf(file, at + 1)) {
+    const before = at === 0 ? "" : (words[at - 1] ?? "");
+    const after = words[at + file.length] ?? "";
+    if (!/[\w/.-]/.test(before) && !/[\w/-]/.test(after) && !(after === "." && /\w/.test(words[at + file.length + 1] ?? ""))) return true;
+  }
+  return false;
+};
+
+/** The open issues and tickets that name a file: an issue by a `file` or a `test` in its evidence, a ticket by its path in its title or words (docs 0001-docs FR-026). */
+export function issuesNamingFile(b: Build, file: string): { readonly issues: readonly TypedIssue[]; readonly tickets: readonly Ticket[] } {
+  const ev = b.evidence;
+  if (file === "") return { issues: [], tickets: [] };
+  return {
+    issues: ev.issues.filter((i) => isOpen(i) && (i.evidence ?? []).some((e) => (e.kind === "file" && e["path"] === file) || (e.kind === "test" && e["file"] === file))),
+    tickets: ev.tickets.filter((t) => t.state === "open" && namesPath(`${t.title}\n${t.body}`, file)),
+  };
+}
+
+/** What the page of a file says of the open issues and tickets that name it: none where none does. */
+export function fileIssueBlocks(b: Build, file: string): Block[] {
+  const { issues, tickets } = issuesNamingFile(b, file);
+  if (issues.length === 0 && tickets.length === 0) return [];
+  return [{
+    kind: "callout",
+    tone: "warn",
+    title: `${plural(issues.length + tickets.length, "open issue")} name this file`,
+    blocks: [
+      { kind: "list", ordered: false, items: [
+        ...issues.map((i) => [{ kind: "paragraph" as const, inlines: [link(issuePath(i), issueName(i)), text(` (${i.severity}, ${i.status.kind})`)] }]),
+        ...tickets.map((t) => [{ kind: "paragraph" as const, inlines: [{ kind: "link" as const, href: { kind: "external" as const, url: t.url }, children: [text(`#${t.number}: ${t.title}`)] }, text(" (ticket)")] }]),
+      ] },
+    ],
+  }];
+}
+
 function statusText(i: TypedIssue): string {
   const s = i.status;
   return [s.kind, s.by === undefined ? "" : `by ${s.by}`, s.reason === undefined ? "" : `(${s.reason})`, s.of === undefined ? "" : `of ${s.of}`, s.until === undefined ? "" : `until ${s.until}`].filter((x) => x !== "").join(" ");
@@ -421,7 +458,7 @@ function evidenceInlines(b: Build, e: { readonly kind: string; readonly [k: stri
   const s = (k: string): string => (typeof e[k] === "string" ? (e[k] as string) : "");
   switch (e.kind) {
     case "file":
-      return [text("file "), { kind: "link", href: { kind: "external", url: b.index.blob(s("path")) }, children: [code(s("path") + (typeof e["line"] === "number" ? `:${e["line"]}` : ""))] }];
+      return [text("file "), { kind: "link", href: { kind: "external", url: b.index.blob(s("path")) }, children: [code(s("path") + (typeof e["line"] === "number" ? `:${e["line"]}` : ""))] }, ...(b.apiFiles.get(s("path")) === undefined ? [] : [text(" ("), link(b.apiFiles.get(s("path")) ?? "", "its documentation"), text(")")])];
     case "test":
       return [text("test "), { kind: "link", href: { kind: "external", url: b.index.blob(s("file")) }, children: [code(s("file"))] }, text(`: ${s("name")}`)];
     case "spec":

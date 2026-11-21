@@ -1,4 +1,4 @@
-// Spec: 0001-docs FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016, FR-017, FR-020, FR-022, FR-023, FR-025
+// Spec: 0001-docs FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016, FR-017, FR-020, FR-022, FR-023, FR-025, FR-026
 /**
  * The evidence the site shows beside the code (docs 0001-docs FR-009 to FR-012): CTRF results, GitHub tickets and typed issues read from files, the Quality section made from them, the lines on a requirement, a library and a
  * module, the findings for a file that cannot be read and a test that names a requirement that is not there, and, with no run recorded, nothing shown as passed.
@@ -9,7 +9,7 @@ import { fs, path, proc } from "@intellectual-frontiers/system";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { report } from "../src/check.ts";
 import { loadConfig } from "../src/cli.ts";
-import { causeOf, deliveryOf } from "../src/pages/quality.ts";
+import { causeOf, deliveryOf, issuesNamingFile } from "../src/pages/quality.ts";
 import { movementsOf, parseHistoryRun, runsOf } from "../src/history.ts";
 import { sparkText } from "../src/emit/html.ts";
 import { busFactor, lastChanged, libraryOfPath, parseLog } from "../src/pages/git.ts";
@@ -364,4 +364,17 @@ proves(["0001-docs FR-025"], "the tests that exercise an export are those of its
   const b = await built({ results: EVIDENCE });
   const api = markdownOf(b.pages.find((p) => p.path.startsWith("api/greeting/")) as never);
   assertStringIncludes(api, "greet");
+});
+
+proves(["0001-docs FR-026"], "the open issues and tickets that name a file are on the page of the file, with a badge, and an issue's file evidence links back to the page of the file", async () => {
+  const b = await built({ results: EVIDENCE, github: `${EVIDENCE}/github-issues.json`, issues: [{ library: "fixture", issues: [ISSUE, CLOSED, { ...CLOSED, id: 3, status: { kind: "open" }, evidence: [{ kind: "file", path: "src/mod.ts.bak" }] }] }] });
+  const api = b.pages.find((p) => p.path.startsWith("api/greeting/") && p.title.includes("mod")) as never;
+  const md = markdownOf(api);
+  assertStringIncludes(md, "name this file");
+  assertStringIncludes(md, "The greeting has no comma");
+  assert(!md.includes("A closed one"), "a closed issue is not shown, and a path that only begins with the file's is another file");
+  assertStringIncludes(markdownOf(b.pages.find((p) => p.path.startsWith("quality/issues/fixture-00001")) as never), "its documentation");
+  const none = await built({ results: EVIDENCE });
+  assert(!markdownOf(none.pages.find((p) => p.path.startsWith("api/greeting/") && p.title.includes("mod")) as never).includes("name this file"));
+  void issuesNamingFile;
 });
