@@ -148,6 +148,8 @@ export function memoryStore(options: MemoryOptions = {}): MemoryStore {
         return ok({ op: "list", value });
       }
       case "batch": {
+        // the digests are made first, and the copy of the state after them, so that a write made while they were made is in the copy and is not lost when it is committed
+        const prepared = await Promise.all(op.changes.map(async (c) => (c.kind === "put" ? { change: c, rev: await revisionOfBytes(c.bytes) } : { change: c, rev: undefined })));
         const next = new Map(state);
         const applyChange = (change: Change, rev: Revision | undefined): Result<ChangeResult, Problem> => {
           if (change.kind === "put") {
@@ -158,7 +160,6 @@ export function memoryStore(options: MemoryOptions = {}): MemoryStore {
           const r = remove(next, change.path, change.expect);
           return r.kind === "err" ? r : ok({ kind: "delete", path: change.path, existed: r.value.existed });
         };
-        const prepared = await Promise.all(op.changes.map(async (c) => (c.kind === "put" ? { change: c, rev: await revisionOfBytes(c.bytes) } : { change: c, rev: undefined })));
         const results: ChangeResult[] = [];
         for (const { change, rev } of prepared) {
           const done = applyChange(change, rev);

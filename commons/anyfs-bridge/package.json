@@ -11,7 +11,8 @@
     ".": "./src/mod.ts",
     "./governance": "./src/governance/mod.ts",
     "./logical": "./src/logical/mod.ts",
-    "./conformance": "./src/conformance/mod.ts"
+    "./conformance": "./src/conformance/mod.ts",
+    "./mirror": "./src/mirror/mod.ts"
   },
   "scripts": {
     "check": "tsc -p tsconfig.json",

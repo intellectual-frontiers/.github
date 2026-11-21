@@ -23,7 +23,7 @@ const by = (o: Observed, now = NOW) => Object.fromEntries(evaluate(o, now).map((
 
 proves(["0004-machine-probe-policies FR-001"], "the pack holds the ten policies in order, each with a title and at least one control", () => {
   assertEquals(POLICIES.map((p) => p.id), ["observed", "disk-encryption", "firewall", "auto-updates", "updates-waiting", "supported-os", "ssh-keys-only", "antivirus", "few-admins", "osquery"]);
-  for (const p of POLICIES) assert(p.title.length > 5 && p.controls.length > 0 && p.controls.every((c) => /^[A-Z]{3}-\d{2}$/.test(c)), `${p.id} has a title and SCF controls`);
+  for (const p of POLICIES) assert(p.title.length > 5 && p.controls.length > 0 && p.controls.every((c) => /^[A-Z]{2}-\d{1,2}$/.test(c)), `${p.id} has a title and SP 800-53 controls`);
 });
 
 proves(["0004-machine-probe-policies FR-002", "0004-machine-probe-policies FR-003"], "a real Ubuntu observation fails the settings that are off, passes what holds, gives no result for a policy that does not apply, and each result says how to make it pass", () => {
@@ -32,7 +32,7 @@ proves(["0004-machine-probe-policies FR-002", "0004-machine-probe-policies FR-00
   assertEquals([r["disk-encryption"]?.status, r["firewall"]?.status, r["auto-updates"]?.status], ["fail", "fail", "fail"]);
   assertEquals([r["observed"]?.status, r["updates-waiting"]?.status, r["supported-os"]?.status, r["few-admins"]?.status, r["osquery"]?.status], ["pass", "pass", "pass", "pass", "warn"]);
   assert(r["firewall"]?.fix.includes("ufw") === true && r["disk-encryption"]?.fix.includes("LUKS") === true);
-  assertEquals(r["disk-encryption"]?.controls, ["CRY-07"]);
+  assertEquals(r["disk-encryption"]?.controls, ["SC-28"]);
   assertEquals(r["observed"]?.status && by(observed(), "2026-12-05T00:00:00Z")["observed"]?.status, "fail", "an observation older than seven days fails");
 });
 

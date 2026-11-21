@@ -61,6 +61,21 @@ export interface Bound {
 
 const lc = (s: string): string => s.toLowerCase();
 
+/** A table as another system says it: its columns' names and the types of that system. */
+export interface TableDescription {
+  readonly name: string;
+  readonly columns: readonly { readonly name: string; readonly type: string }[];
+}
+
+const OWN_TYPES: ReadonlySet<string> = new Set(["int", "float", "text", "bool", "timestamp", "null", "unknown"]);
+
+/** A catalog of tables described in the types of another system; `types` maps those types (without regard to case) to the types of a catalog, and a type that is in neither is `unknown`. */
+export function catalogFromTables(tables: readonly TableDescription[], types: Readonly<Record<string, Type>> = {}, functions: readonly FunctionSig[] = []): Catalog {
+  const map = new Map(Object.entries(types).map(([k, v]) => [lc(k), v]));
+  const entries = tables.map((t) => [t.name, { columns: Object.fromEntries(t.columns.map((c) => [c.name, map.get(lc(c.type)) ?? (OWN_TYPES.has(lc(c.type)) ? (lc(c.type) as Type) : "unknown")])) }] as const);
+  return { tables: Object.fromEntries(entries), functions };
+}
+
 function distance(a: string, b: string): number {
   const m = a.length;
   const n = b.length;

@@ -1,7 +1,6 @@
 // Spec: 0004-machine-probe-policies FR-001, FR-002, FR-003, FR-004
 /**
- * The policy pack for a machine that is observed and not managed (Stolos 067-adopt): each policy reads an observation and says pass, fail, warn or unknown, with the fix in words for the machine's operating system, and names the Secure Controls
- * Framework (SCF) controls it gives evidence for, so that no result is without a control. A policy that does not apply to what was observed gives no result.
+ * The policy pack for a machine that is observed and not managed (Stolos 067-adopt): each policy reads an observation and says pass, fail, warn or unknown, with the fix in words for the machine's operating system, and names the controls of NIST SP 800-53 Rev 5 (the public anchor, by identifier) it gives evidence for, so that no result is without a control. A policy that does not apply to what was observed gives no result.
  *
  * @example
  * ```ts
@@ -17,7 +16,7 @@ import type { Observed } from "./observed.ts";
 /** What a policy found: the finding and what was found. */
 export type Verdict = { readonly status: "pass" | "fail" | "warn" | "unknown"; readonly detail: string };
 
-/** One policy: its id, what it requires, the SCF controls it gives evidence for, how it judges an observation and how to make it pass on that machine. */
+/** One policy: its id, what it requires, the SP 800-53 Rev 5 controls it gives evidence for, how it judges an observation and how to make it pass on that machine. */
 export type Policy = {
   readonly id: string;
   readonly title: string;
@@ -51,14 +50,14 @@ export const POLICIES: readonly Policy[] = [
   {
     id: "observed",
     title: "Observed in the last 7 days",
-    controls: ["AST-04", "MON-02"],
+    controls: ["CM-8", "SI-4"],
     assert: (o, now) => ({ status: (Date.parse(now) - Date.parse(o.at)) / DAY_MS <= 7 ? "pass" : "fail", detail: `last observed ${o.at.slice(0, 10)}` }),
     fix: () => "observe the machine again",
   },
   {
     id: "disk-encryption",
     title: "The disk is encrypted",
-    controls: ["CRY-07"],
+    controls: ["SC-28"],
     assert: (o) => ({ status: onOff(o.security.diskEncryption), detail: `disk encryption: ${o.security.diskEncryption}` }),
     fix: (o) =>
       win(o)
@@ -70,7 +69,7 @@ export const POLICIES: readonly Policy[] = [
   {
     id: "firewall",
     title: "The firewall is on",
-    controls: ["END-07", "NET-02"],
+    controls: ["SC-7"],
     assert: (o) => ({ status: onOff(o.security.firewall), detail: `firewall: ${o.security.firewall}` }),
     fix: (o) =>
       win(o)
@@ -84,7 +83,7 @@ export const POLICIES: readonly Policy[] = [
   {
     id: "auto-updates",
     title: "Security updates install by themselves",
-    controls: ["VPM-08"],
+    controls: ["SI-2"],
     assert: (o) => ({ status: onOff(o.security.autoUpdates, "manual"), detail: `automatic updates: ${o.security.autoUpdates}${o.software.pendingUpdates !== undefined ? `; ${o.software.pendingUpdates} waiting` : ""}` }),
     fix: (o) =>
       win(o)
@@ -98,14 +97,14 @@ export const POLICIES: readonly Policy[] = [
   {
     id: "updates-waiting",
     title: "Few updates waiting",
-    controls: ["VPM-08"],
+    controls: ["SI-2"],
     assert: (o) => (o.software.pendingUpdates === undefined ? undefined : { status: o.software.pendingUpdates <= 20 ? "pass" : "warn", detail: `${o.software.pendingUpdates} updates waiting` }),
     fix: (o) => (mac(o) ? "System Settings > General > Software Update" : "install them with the system's updater"),
   },
   {
     id: "supported-os",
     title: "The operating system is still supported",
-    controls: ["AST-39"],
+    controls: ["SA-22"],
     assert: (o) => {
       const s = supportedOs(o);
       return { status: s === true ? "pass" : s === false ? "fail" : "unknown", detail: `${o.os.name} ${o.os.version}`.trim() };
@@ -115,21 +114,21 @@ export const POLICIES: readonly Policy[] = [
   {
     id: "ssh-keys-only",
     title: "SSH accepts keys, not passwords",
-    controls: ["IAC-14", "CFG-04"],
+    controls: ["IA-2", "IA-5"],
     assert: (o) => (o.security.sshPasswordAuth === undefined ? undefined : { status: o.security.sshPasswordAuth === "no" ? "pass" : "warn", detail: `PasswordAuthentication ${o.security.sshPasswordAuth}` }),
     fix: () => "PasswordAuthentication no in /etc/ssh/sshd_config, then restart sshd",
   },
   {
     id: "antivirus",
     title: "Anti-malware protection is on",
-    controls: ["END-04"],
+    controls: ["SI-3"],
     assert: (o) => (o.security.antivirus === undefined ? undefined : { status: onOff(o.security.antivirus), detail: `real-time protection: ${o.security.antivirus}` }),
     fix: () => "Windows Security > Virus & threat protection > Real-time protection: on",
   },
   {
     id: "few-admins",
     title: "At most three administrators",
-    controls: ["IAC-30"],
+    controls: ["AC-6"],
     assert: (o) => ({
       status: o.security.admins.length === 0 ? "unknown" : o.security.admins.length <= 3 ? "pass" : "warn",
       detail: o.security.admins.length > 0 ? `administrators: ${o.security.admins.join(", ")}` : "administrators: unknown",
@@ -139,7 +138,7 @@ export const POLICIES: readonly Policy[] = [
   {
     id: "osquery",
     title: "osquery is installed (fleet-wide SQL questions)",
-    controls: ["MON-02"],
+    controls: ["SI-4"],
     assert: (o) => ({ status: o.software.osquery ? "pass" : "warn", detail: o.software.osquery ? `osquery ${o.software.osquery}` : "osquery is not installed" }),
     fix: (o) => (win(o) ? "install osquery's MSI" : mac(o) ? "brew install --cask osquery" : "install osquery from osquery.io's apt or yum repository"),
   },

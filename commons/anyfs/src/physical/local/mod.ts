@@ -48,8 +48,12 @@ export const LOCAL_CAPABILITIES = ["read", "write", "list", "stat", "delete", "c
 /** The type of the store in a folder. */
 export type LocalStore = Store<(typeof LOCAL_CAPABILITIES)[number]>;
 
-/** What the store in a folder is made with: whether to make the folder, whether to refuse paths another file system could not hold (the default), and how long to wait for a lock. */
-export type LocalOptions = { readonly create?: boolean; readonly portable?: boolean; readonly lockTimeoutMs?: number };
+/**
+ * What the store in a folder is made with: whether to make the folder, whether to refuse paths another file system could not hold (the default), how long to wait for a lock, and whether the file system tells names apart by case: where the caller says, no probe file is written
+ * (a store that must not write where it is opened, such as one at the root of a computer's file system, says); where it does not, a probe file is made and removed. The locks of writers are kept in `lockDir`,
+ * an absolute folder, where it is given, and in a folder of the store's own where it is not: a store at the root of a file system names a folder of the account's own, since the root is not the account's to write.
+ */
+export type LocalOptions = { readonly create?: boolean; readonly portable?: boolean; readonly lockTimeoutMs?: number; readonly caseSensitive?: boolean; readonly lockDir?: string };
 
 const HIDDEN = ".anyfs-";
 const PAGE = 1000;
@@ -103,15 +107,19 @@ export async function localStore(root: string, options: LocalOptions = {}): Prom
   // whether the file system tells names apart by case: made once, with a probe the store removes
   const probe = osPath.join(realRoot, `${HIDDEN}case-${crypto.randomUUID()}`);
   let caseSensitive = true;
-  try {
-    await fs.writeTextFile(probe, "", { createNew: true });
-    caseSensitive = !(await fs.exists(probe.replace(HIDDEN, HIDDEN.toUpperCase())));
-    await fs.remove(probe);
-  } catch {
-    caseSensitive = true;
+  if (options.caseSensitive !== undefined) caseSensitive = options.caseSensitive;
+  else {
+    try {
+      await fs.writeTextFile(probe, "", { createNew: true });
+      caseSensitive = !(await fs.exists(probe.replace(HIDDEN, HIDDEN.toUpperCase())));
+      await fs.remove(probe);
+    } catch {
+      caseSensitive = true;
+    }
   }
 
-  const inside = (real: string): boolean => real === realRoot || real.startsWith(realRoot + osPath.sep);
+  const rootWithSeparator = realRoot.endsWith(osPath.sep) ? realRoot : realRoot + osPath.sep;
+  const inside = (real: string): boolean => real === realRoot || real.startsWith(rootWithSeparator);
   const absOf = (p: Path): string => osPath.join(realRoot, ...p.split("/"));
   const seen = new Map<string, { readonly fingerprint: string; readonly rev: Revision; readonly at: number }>();
 
@@ -190,7 +198,7 @@ export async function localStore(root: string, options: LocalOptions = {}): Prom
   }
 
   async function withLock<T>(p: Path, run: () => Promise<Result<T, Problem>>): Promise<Result<T, Problem>> {
-    const dir = osPath.join(realRoot, `${HIDDEN}locks`);
+    const dir = options.lockDir ?? osPath.join(realRoot, `${HIDDEN}locks`);
     await fs.mkdir(dir, { recursive: true });
     const held = await acquireLock(osPath.join(dir, `${(await hex(p)).slice(0, 32)}.lock`), { wait: true, pollMs: 2, timeoutMs: lockTimeout, command: "anyfs" });
     if (held === undefined) return err(unavailable(`${p} is locked by another writer`, true, p));

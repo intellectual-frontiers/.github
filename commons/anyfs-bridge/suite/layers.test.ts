@@ -23,18 +23,18 @@ async function sources(folder: string): Promise<readonly { readonly file: string
   return out;
 }
 
-proves(["0001-bridge-layers FR-001"], "the manifest is a plugin of the family of AnyFS whose exports are the ones of the package, and the layers are governance, logical and conformance", async () => {
+proves(["0001-bridge-layers FR-001"], "the manifest is a plugin of the family of AnyFS whose exports are the ones of the package, and the layers are governance, logical, mirror and conformance", async () => {
   assertEquals(library.family, { host: "anyfs", role: "plugin" });
   assertEquals(library.kanon.extends, "@intellectual-frontiers/anyfs");
   const manifest = JSON.parse(await fs.readTextFile(path.join(ROOT, "package.json"))) as { exports: Record<string, string> };
   assertEquals([...library.exports].sort(), Object.keys(manifest.exports).sort());
   assert(Object.keys(governance).includes("parseGlob") && Object.keys(logical).includes("diff") && Object.keys(conformance).includes("runBridgeConformance"));
-  assertEquals(library.kanon.units.filter((u) => "layer" in u).map((u) => ("layer" in u ? u.layer : "")), ["governance", "logical", "logical"]);
+  assertEquals(library.kanon.units.filter((u) => "layer" in u).map((u) => ("layer" in u ? u.layer : "")), ["governance", "logical", "logical", "logical"]);
 });
 
 proves(["0001-bridge-layers FR-002"], "no source of the library reaches a file, a network or a process: every change is an operation of a store", async () => {
   const forbidden = /from "node:|from "@intellectual-frontiers\/(system|net)|\bBun\.|\bDeno\.|\bfetch\(|\bprocess\.(env|exit)/;
-  const files = [...(await sources("src/governance")), ...(await sources("src/logical")), ...(await sources("src/conformance"))];
+  const files = [...(await sources("src/governance")), ...(await sources("src/logical")), ...(await sources("src/mirror")), ...(await sources("src/conformance"))];
   assert(files.length >= 12, "the sources are read");
   for (const f of files) assertEquals(forbidden.test(f.text), false, `${f.file} does input or output`);
 });

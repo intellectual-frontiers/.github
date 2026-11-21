@@ -13,4 +13,4 @@
  */
 
 /** The version of the library, which the manifest, the package and the release record say as well. */
-export const REPOCTL_VERSION = "0.2.3";
+export const REPOCTL_VERSION = "0.2.4";

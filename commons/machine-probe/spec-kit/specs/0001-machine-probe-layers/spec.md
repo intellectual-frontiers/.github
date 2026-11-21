@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** The probe a machine runs for its fleet: the three read-only requests it answers (facts, version, one osquery SELECT), the key line that restricts a key to them, the facts as a typed observation, and the policy pack that judges an observation with its Secure Controls Framework controls. It is built to Kanon (commons 0033-kanon): Governance says what it is, Logical is the model it reasons with, and Physical is what touches the world.
+**Input:** The probe a machine runs for its fleet: the three read-only requests it answers (facts, version, one osquery SELECT), the key line that restricts a key to them, the facts as a typed observation, and the policy pack that judges an observation with the NIST SP 800-53 controls each gives evidence for. It is built to Kanon (commons 0033-kanon): Governance says what it is, Logical is the model it reasons with, and Physical is what touches the world.
 
 ## Requirements
 

@@ -20,6 +20,8 @@
   },
   "devDependencies": {
     "@intellectual-frontiers/anyfs": "link:../anyfs",
+    "@intellectual-frontiers/anyfs-bridge": "link:../anyfs-bridge",
+    "@intellectual-frontiers/anyfs-git": "link:../anyfs-git",
     "@intellectual-frontiers/core": "link:../core",
     "@intellectual-frontiers/crypto": "link:../crypto",
     "@intellectual-frontiers/headless": "link:../headless",

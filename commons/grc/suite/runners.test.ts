@@ -15,6 +15,7 @@ import { createEvaluators, externalRunner } from "@intellectual-frontiers/grc/ru
 import { fileRunner, selectPointer } from "@intellectual-frontiers/grc/runners/file";
 import { manualRunner } from "@intellectual-frontiers/grc/runners/manual";
 import { remoteRunner } from "@intellectual-frontiers/grc/runners/remote";
+import { dialect as sqlite } from "@intellectual-frontiers/lang-sql/dialects/sqlite";
 import { refusal, sqlRunner } from "@intellectual-frontiers/grc/runners/sql";
 import { standardRunners } from "../src/standard.ts";
 import { aCheck, AT, A1, evidencePolicyOf, must } from "./fixtures.ts";
@@ -62,18 +63,22 @@ proves(["0005-grc-runners FR-004"], "the sql runner needs a read-only connection
   const rw = await sqlRunner({ readOnly: false, query: () => Promise.resolve([]) }).run(withRunner("sql", q), ctx());
   assertEquals(rw.kind === "err" ? rw.error.message : "", "the connection is not read-only");
   for (const [text, why] of [
-    ["select 1; drop table t", "more than one"],
-    ["delete from t", "not a SELECT"],
-    ["with x as (select 1) delete from t", "write"],
-    ["pragma journal_mode = wal", "sets"],
+    ["select 1; drop table t", "2 statements"],
+    ["delete from t", "delete"],
+    ["with x as (select 1) delete from t", "delete"],
+    ["select * into t2 from t", "INTO"],
     ["", "empty"],
-    ["update t set a = 1", "not a SELECT"],
+    ["update t set a = 1", "update"],
   ] as const) assertStringIncludes(refusal(text) ?? "ok", why, text);
-  for (const fine of ["select 1", "SELECT 'a;b' ; ", "with x as (select 1) select * from x", "values (1)", "pragma table_info(t)", "select 1 -- drop table t"]) assertEquals(refusal(fine), undefined, fine);
+  assertStringIncludes(refusal("pragma journal_mode = wal", sqlite) ?? "ok", "sets", "a PRAGMA that sets");
+  for (const fine of ["select 1", "SELECT 'a;b' ; ", "with x as (select 1) select * from x", "values (1)", "select 1 -- drop table t"]) assertEquals(refusal(fine), undefined, fine);
+  assertEquals(refusal("pragma table_info(t)", sqlite), undefined, "a PRAGMA that reads");
+  const viaDialect = await sqlRunner({ readOnly: true, dialect: sqlite, query: () => Promise.resolve([]) }).run(withRunner("sql", { query: "pragma journal_mode = wal" }), ctx());
+  assertEquals(viaDialect.kind, "err");
   const bad = await sqlRunner({ readOnly: true, query: () => Promise.resolve([]) }).run(withRunner("sql", { nope: 1 }), ctx());
   assertEquals(bad.kind, "err");
   const unit = await fs.readTextFile(path.join(path.dirname(path.fromFileUrl(import.meta.url)), "..", "src", "runners", "sql", "mod.ts"));
-  assert(!/from "(?!@intellectual-frontiers\/(core|grc))/.test(unit), "the sql unit imports a database library");
+  assert(!/from "(?!@intellectual-frontiers\/(core|grc|lang-sql))/.test(unit), "the sql unit imports a database library");
 });
 
 proves(["0005-grc-runners FR-005"], "the file runner reads json, lines or text, selects by a JSON pointer, and a missing file is a problem", async () => {

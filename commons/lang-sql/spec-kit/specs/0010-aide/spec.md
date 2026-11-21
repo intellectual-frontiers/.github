@@ -13,7 +13,7 @@
 
 ## Profiles
 
-- **FR-002**: `defineProfile(spec)` and `conform(parsed, profile)` MUST restrict a parse to a subset of the language: the kinds of statement, the kinds of node, the names of functions, the names of tables, and the limits of depth, of nodes and of tables used; `conform` MUST give an `ok` value where the parse is inside the profile and an `err` value of every violation with the span of its node and one sentence each.
+- **FR-002**: `defineProfile(spec)` and `conform(parsed, profile)` MUST restrict a parse to a subset of the language: the kinds of statement, the kinds of node, the names of functions, the names of tables, the functions that are denied, the most statements a text may hold, and the limits of depth, of nodes and of tables used; `conform` MUST give an `ok` value where the parse is inside the profile and an `err` value of every violation with the span of its node and one sentence each.
 
 ## Catalog, names and types
 
@@ -36,6 +36,10 @@
 ## Writing, templates and diagnostics
 
 - **FR-009**: `transpile(text, from, to)` MUST read the text in one dialect and write it in another, and give with the text the list of constructs that the other dialect does not read (found by reading what was written in it); `sql` MUST be a tagged template that gives the text and the values of a statement with a parameter for each value in the dialect's style, and MUST NOT put a value into the text; `renderDiagnostic(text, diagnostic)` MUST write a diagnostic with its line, the text of the line and a caret under its span.
+
+## Relations
+
+- **FR-010**: `createEngine(provider, functions?)` of `aide/relational` MUST answer one `SELECT`, `WITH`, set operation or `VALUES` over the relations a `Provider` gives by name (inner, left and cross joins, `WHERE`, `GROUP BY` with `count`, `sum`, `avg`, `min`, `max` and `group_concat`, `HAVING`, `ORDER BY`, `LIMIT`, subqueries and common table expressions), with the logic of SQL, and MUST give an error value, never a throw, for text that is not one query, a statement that writes, and a clause it does not have; `providerOf(record)` MUST find the relations of a record without regard to case; `aide/introspect` (the relations of a parse and the rules written as queries, 0008-sql-introspect) MUST run on it.
 
 ## Out of scope
 

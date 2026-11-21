@@ -7,6 +7,9 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
+import { findAll, parse } from "@intellectual-frontiers/lang-sql";
+import { refusal } from "@intellectual-frontiers/lang-sql/aide/guard";
+import { dialect as sqlite } from "@intellectual-frontiers/lang-sql/dialects/sqlite";
 import type { Driver } from "@intellectual-frontiers/data/sql/lifecycle";
 import type { OsqueryType, OsquerySchema, Platform } from "./schema.ts";
 
@@ -49,55 +52,22 @@ export interface OsqueryOptions {
 /** The tables that act on the world and not only report it: they fetch from the network or carve files. */
 export const SIDE_EFFECT_TABLES: readonly string[] = ["carves", "curl", "curl_certificate"];
 
-const WRITES = /\b(insert|update|delete|drop|create|alter|attach|detach|pragma|replace|vacuum|reindex|analyze|savepoint|release|rollback|begin|commit)\b/i;
-
-/** The text of a statement without its comments and the text of its strings (which are replaced by `''`), so that what is looked for is code. */
-function bare(sql: string): string {
-  let out = "";
-  for (let i = 0; i < sql.length; i++) {
-    const ch = sql[i] ?? "";
-    if (ch === "-" && sql[i + 1] === "-") {
-      while (i < sql.length && sql[i] !== "\n") i++;
-    } else if (ch === "/" && sql[i + 1] === "*") {
-      const end = sql.indexOf("*/", i + 2);
-      i = end < 0 ? sql.length : end + 1;
-      out += " ";
-    } else if (ch === "'" || ch === '"' || ch === "`") {
-      let j = i + 1;
-      while (j < sql.length) {
-        if (sql[j] === ch) {
-          if (sql[j + 1] === ch) j += 2;
-          else break;
-        } else j++;
-      }
-      out += ch === "'" ? "''" : `${ch}${ch}`;
-      i = j;
-    } else out += ch;
-  }
-  return out;
-}
-
 /**
- * Whether a statement may be run: one statement, that begins with `SELECT` or `WITH` and holds no word that writes.
+ * Whether a statement may be run: one statement that only reads, as the guard of the SQL language library judges it with the SQLite parser (0058-sql-osquery FR-004).
  *
  * @param sql - the statement
  * @returns the statement as it is to be run, or why it is refused
  */
 export function selectOnly(sql: string): Result<string, OsqueryError> {
-  const code = bare(sql).trim().replace(/;+\s*$/, "");
-  if (code === "") return err({ kind: "not-select", why: "the statement is empty" });
-  if (code.includes(";")) return err({ kind: "not-select", why: "more than one statement: osquery here runs one SELECT at a time" });
-  if (!/^(select|with)\b/i.test(code)) return err({ kind: "not-select", why: "only a SELECT is run: this machine is read, never changed" });
-  const w = WRITES.exec(code);
-  if (w !== null) return err({ kind: "not-select", why: `the word ${w[0].toUpperCase()} writes, and only a SELECT is run` });
-  return ok(sql.trim().replace(/;+\s*$/, ""));
+  const why = refusal(sql, sqlite);
+  return why === undefined ? ok(sql.trim().replace(/;+\s*$/, "")) : err({ kind: "not-select", why });
 }
 
-/** The names that follow `FROM` and `JOIN` in a statement, in lower case, as the tables it reads. */
+/** The names of the tables a statement reads, in lower case and the order first read, found in its tree (a name in a string or a comment is none); none for a text that does not read. */
 export function tablesRead(sql: string): readonly string[] {
-  const code = bare(sql);
+  const parsed = parse(sql, sqlite);
   const out = new Set<string>();
-  for (const m of code.matchAll(/\b(?:from|join)\s+([A-Za-z_][A-Za-z0-9_]*)/gi)) out.add((m[1] ?? "").toLowerCase());
+  for (const s of parsed.script.statements) for (const t of findAll(s, "table")) if (t.name.parts.length === 1) out.add((t.name.parts[0]?.name ?? "").toLowerCase());
   return [...out];
 }
 

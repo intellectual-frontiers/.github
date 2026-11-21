@@ -59,6 +59,8 @@ proves(["0005-repoctl-library-commit-doctor FR-003"], "the role is written into 
   assert(made.kind === "ok");
   assertEquals(made.value, source.replace('  ["libraries", "program"],\n', '  ["libraries", "program"],\n  ["widget", "program"],\n'));
   assertEquals(withRole(made.value, "widget", "program"), ok(made.value), "a library that is there is not added twice");
+  const last = withRole('export const ROLE_OF = new Map([\n  ["a", "foundation"],\n  ["z", "standard"],\n]);', "y", "standard");
+  assert(last.kind === "ok" && last.value.includes('  ["z", "standard"],\n  ["y", "standard"],\n]);'), "a library of the role that ends the map goes inside the map");
   const pattern = withRole(source, "shape", "pattern");
   assert(pattern.kind === "ok" && pattern.value.includes('  ["shape", "pattern"],\n]);'), "a role with no library yet goes at the end of the map");
   assertEquals(withRole("nothing", "x", "program").kind, "err");

@@ -14,6 +14,7 @@
  * @module
  */
 import { PERSONAL } from "./classify.ts";
+export { osqueryCatalog } from "./catalog.ts";
 export { classify, type Classification, PERSONAL } from "./classify.ts";
 export { type MachineTarget, type OsqueryError, OsqueryFailure, type OsqueryOptions, osqueryDriver, osqueryQuery, osqueryTarget, type OsqueryRow, type Ran, type Run, selectOnly, SIDE_EFFECT_TABLES, tablesRead } from "./driver.ts";
 /**

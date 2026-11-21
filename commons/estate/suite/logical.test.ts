@@ -5,7 +5,7 @@
  * @module
  */
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { defineAsset, ownerOf, type Asset } from "../src/governance/mod.ts";
+import { defineAsset, installOf, ownerOf, type Asset } from "../src/governance/mod.ts";
 import { moveCapability, moveState, operationalTruth, unexpectedAssets, type AcceptanceRecord } from "../src/logical/mod.ts";
 
 const ALL = { provision: "stolos", identity: "stolos", plan: "stolos", converge: "stolos", verify: "archon", observe: "archon", update: "stolos", access: "archon", backup: "stolos", retire: "stolos" } as const;
@@ -24,19 +24,39 @@ proves(["0002-estate-governance FR-003", "0003-estate-logical FR-001"], "an adop
   assert(adopted.kind === "ok" && ownerOf(adopted.value, "observe") === "archon" && ownerOf(adopted.value, "verify") === "archon");
   const released = moveState(adopted.kind === "ok" ? adopted.value : discovered, "discovered");
   assert(released.kind === "ok" && released.value.capabilities.every((c) => !c.offered), "a released asset offers nothing");
-  const joined = defineAsset({ id: "defiant", kind: "workstation", state: "adopted", joined: "paired", owners: { observe: "archon", verify: "archon" } });
-  assert(joined.kind === "ok");
-  const back = moveState(joined.value, "discovered");
-  assert(back.kind === "ok" && back.value.joined === "paired", "the way it joined is kept");
+  const paired = defineAsset({ id: "defiant", kind: "workstation", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" } });
+  assert(paired.kind === "ok");
+  const back = moveState(paired.value, "discovered");
+  assert(back.kind === "ok" && back.value.origin === "paired", "where it came from is kept");
   const managed = asset("managed", ALL);
   for (const to of ["adopted", "discovered"] as const) {
     const r = moveState(managed, to);
     assert(r.kind === "err" && r.error[0]?.includes("never moved") === true, `a managed asset is not moved to ${to}`);
   }
-  const skip = moveState(discovered, "managed");
+  const skip = moveState(discovered, "managed", ALL, { by: "ada", planHash: HASH });
   assert(skip.kind === "err" && skip.error[0]?.includes("never moved") === true);
   const same = moveState(discovered, "discovered");
   assert(same.kind === "err" && same.error[0]?.includes("already") === true);
+});
+
+const HASH = `sha256:${"a".repeat(64)}`;
+
+proves(["0003-estate-logical FR-008"], "an adopted asset is taken over only with an approval and an owner for each capability that is new, keeps where it came from, is then inherited and does not offer provision, and cannot go back", () => {
+  const adopted = defineAsset({ id: "defiant", kind: "server", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" } });
+  assert(adopted.kind === "ok");
+  const { provision: _p, ...rest } = ALL;
+  const noApproval = moveState(adopted.value, "managed", rest);
+  assert(noApproval.kind === "err" && noApproval.error[0]?.includes("only with an approval") === true);
+  for (const bad of [{ by: "", planHash: HASH }, { by: "ada", planHash: "abc" }]) assertEquals(moveState(adopted.value, "managed", rest, bad).kind, "err");
+  const noOwners = moveState(adopted.value, "managed", {}, { by: "ada", planHash: HASH });
+  assert(noOwners.kind === "err" && noOwners.error.length > 0, "an owner is needed for each capability that is new");
+  const taken = moveState(adopted.value, "managed", rest, { by: "ada", planHash: HASH });
+  assert(taken.kind === "ok" && taken.value.state === "managed" && taken.value.origin === "paired" && installOf(taken.value) === "inherited");
+  assertEquals(ownerOf(taken.value, "provision"), undefined);
+  const withProvision = moveState(adopted.value, "managed", ALL, { by: "ada", planHash: HASH });
+  assert(withProvision.kind === "err" && withProvision.error.some((m) => m.includes("provision")), "provision is not given to an inherited asset");
+  const back = moveState(taken.value, "adopted");
+  assert(back.kind === "err" && back.error[0]?.includes("never moved") === true);
 });
 
 proves(["0003-estate-logical FR-002"], "a capability moves to another system only with a passed acceptance test for this asset, this capability and that system", () => {
