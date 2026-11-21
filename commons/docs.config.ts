@@ -245,6 +245,7 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/linux-observe/spec-kit" },
     { layout: "commons", dir: "commons/linux-services/spec-kit" },
     { layout: "commons", dir: "commons/netboot/spec-kit" },
+    { layout: "commons", dir: "commons/estate-query/spec-kit" },
   ],
   citations: { prefix: "commons", digits: 4, text: ["erga", "archon", "stolos", "thyra"] },
   lenses: [guides, releases, dataModels, programs],
