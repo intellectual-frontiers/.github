@@ -463,7 +463,7 @@ proves(["0005-reach-and-targets FR-010"], "no unit of the library imports an ssh
   if (decoded.kind === "err") throw new Error(decoded.error);
   const table = decoded.value;
   const packages = (folder: string) => (table.units.find((u) => u.folder === folder)?.packages ?? []).map((a) => a.name);
-  assertEquals(table.units.filter((u) => u.folder.startsWith("src/targets/")).map((u) => u.folder), ["src/targets/local/", "src/targets/ssh/"]);
+  assertEquals(table.units.filter((u) => u.folder.startsWith("src/targets/")).map((u) => u.folder), ["src/targets/local/", "src/targets/container/", "src/targets/ssh/"]);
   assertEquals(packages("src/targets/ssh/"), ["@intellectual-frontiers/core", "@intellectual-frontiers/system", "@intellectual-frontiers/terminal"]);
   assertEquals(packages("src/surfaces/ssh-inbound/"), ["@intellectual-frontiers/core"]);
   const files = (path: string, spec: string) => [{ path, text: `import { x } from "${spec}";\n` }];

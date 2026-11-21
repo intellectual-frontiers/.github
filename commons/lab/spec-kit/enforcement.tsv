@@ -1,0 +1,10 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-lab-layers FR-001	check	.github: cd commons/lab && bun run verify	suite/layers.test.ts: every file of the real tree is in a unit and no import is outside its row
+0001-lab-layers FR-002	check	.github: cd commons/lab && bun run verify	suite/layers.test.ts: verify runs every check of the library
+0002-lab-machine FR-001	check	.github: cd commons/lab && bun run verify	suite/machine.test.ts
+0002-lab-machine FR-002	check	.github: cd commons/lab && bun run verify	suite/machine.test.ts
+0002-lab-machine FR-003	check	.github: cd commons/lab && bun run verify	suite/machine.test.ts
+0002-lab-machine FR-004	check	.github: cd commons/lab && bun run verify	suite/machine.test.ts
+0002-lab-machine FR-005	check	.github: cd commons/lab && bun run verify	suite/machine.test.ts

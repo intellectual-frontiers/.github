@@ -32,6 +32,7 @@ const EXPORTS: Record<string, string> = {
   "./cli": "./src/surfaces/cli/mod.ts",
   "./targets/local": "./src/targets/local/mod.ts",
   "./targets/ssh": "./src/targets/ssh/mod.ts",
+  "./targets/container": "./src/targets/container/mod.ts",
   "./ssh-inbound": "./src/surfaces/ssh-inbound/mod.ts",
   "./otel": "./src/otel/mod.ts",
   "./askpass": "./src/surfaces/askpass/mod.ts",
