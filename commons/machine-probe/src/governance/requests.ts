@@ -52,3 +52,14 @@ export function parseRequest(text: string): Result<ProbeRequest, string> {
   if (trimmed.includes(";")) return err("one statement");
   return ok({ kind: "osquery", sql: trimmed });
 }
+
+/**
+ * How to reach a machine for observation: the account the probe runs as, the address and port, and the name of the key made for the probe. The name is a reference: the key itself is kept outside the repository, where only the machine that observes has it.
+ *
+ * @example
+ * ```ts
+ * import type { ProbeReach } from "./requests.ts";
+ * const reach: ProbeReach = { address: "sparta.example", user: "admin", credential: "sparta-probe" };
+ * ```
+ */
+export type ProbeReach = { readonly address: string; readonly port?: number; readonly user: string; readonly credential: string };
