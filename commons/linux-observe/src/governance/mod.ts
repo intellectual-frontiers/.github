@@ -1,7 +1,8 @@
 // Spec: 0001-linux-observe-layers FR-001
 /**
- * The Governance layer of Linux Observe: what it is, as data and types.
+ * The Governance layer of Linux Observe: what kind of machine a Linux machine is.
  *
  * @module
  */
-export {};
+export { ARCHITECTURES, FAMILIES, FAMILY_OF_ID, ROLES, familyOf } from "./platform.ts";
+export type { Architecture, Declared, Family, Observed, Role } from "./platform.ts";

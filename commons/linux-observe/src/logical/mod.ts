@@ -5,3 +5,4 @@
  * @module
  */
 export * from "./shapes.ts";
+export { architectureOf, osReleaseTable, parseDeclared, platformDrift, platformOfOsRelease } from "./platform.ts";

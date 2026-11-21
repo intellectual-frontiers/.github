@@ -26,7 +26,7 @@
 
 ## Assumptions
 
-- The machine is Ubuntu or Debian with systemd, as the programs read assume.
+- The machine is Linux with systemd; the package program is the one of its platform (0004-linux-observe-platform).
 
 ## Open questions
 

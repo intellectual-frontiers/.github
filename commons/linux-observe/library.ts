@@ -19,8 +19,8 @@ export const library = {
     package: "@intellectual-frontiers/linux-observe",
     units: [
       { folder: "src/governance/", layer: "governance", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }] },
-      { folder: "src/logical/", layer: "logical", packages: [{ name: "@intellectual-frontiers/archon", subpaths: ["governance"] }, { name: "@intellectual-frontiers/core", subpaths: [] }] },
-      { folder: "src/physical/", layer: "physical", mayImport: ["src/governance/", "src/logical/"], packages: [{ name: "@intellectual-frontiers/archon", subpaths: ["governance"] }, { name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/headless", subpaths: ["logical"] }, { name: "@intellectual-frontiers/linux-observe", subpaths: ["logical"] }, { name: "@intellectual-frontiers/system", subpaths: "any" }] },
+      { folder: "src/logical/", layer: "logical", packages: [{ name: "@intellectual-frontiers/archon", subpaths: ["governance"] }, { name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/linux-observe", subpaths: ["governance"] }] },
+      { folder: "src/physical/", layer: "physical", mayImport: ["src/governance/", "src/logical/"], packages: [{ name: "@intellectual-frontiers/archon", subpaths: ["governance"] }, { name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/headless", subpaths: ["logical"] }, { name: "@intellectual-frontiers/linux-observe", subpaths: ["governance", "logical"] }, { name: "@intellectual-frontiers/system", subpaths: "any" }] },
       { folder: "src/", own: true },
       { folder: "suite/", own: true },
       { folder: "tools/", own: true },

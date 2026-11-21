@@ -11,12 +11,14 @@
  *
  * @module
  */
+import { err, type Result } from "@intellectual-frontiers/core";
+import type { Observed } from "@intellectual-frontiers/linux-observe/governance";
 import type { JsonValue, Requirement, RequirementId } from "@intellectual-frontiers/archon/governance";
 import { textOf, type Executor } from "@intellectual-frontiers/headless/logical";
-import { groupShape, keyFileOf, keyShape, packageShape, pathShape, parseStat, serviceShape, settingShape, userShape } from "@intellectual-frontiers/linux-observe/logical";
+import { platformOfOsRelease, groupShape, keyFileOf, keyShape, packageShape, pathShape, parseStat, serviceShape, settingShape, userShape } from "@intellectual-frontiers/linux-observe/logical";
 
 /** The programs that observation runs, and no others: every one of them only reads. */
-export const READERS = ["getent", "id", "stat", "cat", "systemctl", "dpkg-query", "readlink"] as const;
+export const READERS = ["getent", "id", "stat", "cat", "systemctl", "dpkg-query", "readlink", "uname"] as const;
 
 type Obj = { readonly [key: string]: JsonValue };
 const isObj = (v: JsonValue): v is Obj => typeof v === "object" && v !== null && !Array.isArray(v);
@@ -68,4 +70,15 @@ export async function observeRequirements(executor: Executor, requirements: read
     if (seen !== undefined) out.set(q.id, seen);
   }
   return out;
+}
+
+/** The platform of the machine, read with no change from `/etc/os-release` and `uname -m`, or why it is not one Archon knows. */
+export async function observePlatform(executor: Executor, elevate: readonly string[] = []): Promise<Result<Observed, string>> {
+  const run = async (argv: readonly string[]): Promise<string | undefined> => {
+    const r = await executor.exec([...elevate, ...argv]);
+    return r.success ? textOf(r.stdout) : undefined;
+  };
+  const text = (await run(["cat", "/etc/os-release"])) ?? (await run(["cat", "/usr/lib/os-release"]));
+  if (text === undefined) return err("the machine has no os-release to read");
+  return platformOfOsRelease(text, await run(["uname", "-m"]));
 }

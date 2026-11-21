@@ -8,3 +8,7 @@ requirement	mechanism	by	note
 0002-linux-observe-shapes FR-003	check	.github: cd commons/linux-observe && bun run verify	suite/observe.test.ts
 0003-linux-observe-observe FR-001	check	.github: cd commons/linux-observe && bun run verify	suite/observe.test.ts
 0003-linux-observe-observe FR-002	check	.github: cd commons/linux-observe && bun run verify	suite/observe.test.ts
+0004-linux-observe-platform FR-001	check	.github: cd commons/linux-observe && bun run verify	suite/platform.test.ts
+0004-linux-observe-platform FR-002	check	.github: cd commons/linux-observe && bun run verify	suite/platform.test.ts
+0004-linux-observe-platform FR-003	check	.github: cd commons/linux-observe && bun run verify	suite/platform.test.ts
+0004-linux-observe-platform FR-004	check	.github: cd commons/linux-observe && bun run verify	suite/platform.test.ts
