@@ -7,4 +7,4 @@
 export { tablesOf } from "./data.ts";
 export type { EstateData, Tables } from "./data.ts";
 export { CATALOG, DEFAULT_BUDGET, formatTable, openEstateQuery } from "./query.ts";
-export type { Budget, EstateQuery, QueryProblem } from "./query.ts";
+export type { Budget, EstateQuery, Live, QueryProblem } from "./query.ts";
