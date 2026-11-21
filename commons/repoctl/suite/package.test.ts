@@ -16,7 +16,8 @@ proves(["0010-repoctl-host FR-003"], "the packed tarball installed into a scratc
   if (!CAN_RUN || node === undefined || tar === undefined) return;
   const packed = await proc.run(["bun", "tools/pack.ts"], { cwd: ROOT });
   assertEquals(packed.code, 0, `${packed.stdout}${packed.stderr}`);
-  const tarball = path.join(ROOT, "dist/intellectual-frontiers-repoctl-0.1.0.tgz");
+  const version = (JSON.parse(await fs.readTextFile(path.join(ROOT, "package.json"))) as { version: string }).version;
+  const tarball = path.join(ROOT, `dist/intellectual-frontiers-repoctl-${version}.tgz`);
   assert(await fs.exists(tarball), tarball);
   await fs.withTempDir(async (dir) => {
     const installed = path.join(dir, "node_modules/@intellectual-frontiers/repoctl");
