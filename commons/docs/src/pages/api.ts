@@ -1,4 +1,4 @@
-// Spec: 0001-docs FR-001
+// Spec: 0001-docs FR-001, FR-025
 /**
  * The API pages of each area (commons 0011-documentation FR-010): a page for each source file its exports come from, in the order its
  * entry points export them, with the file's module comment (what it is, its account, its examples, its limits) and an entry for each
@@ -11,6 +11,8 @@ import type { Build } from "../build.ts";
 import type { ApiExport, AreaApi } from "../extract/api.ts";
 import type { LinkScope } from "../links.ts";
 import type { Badge, Block, Inline } from "../model.ts";
+import { importIndex, testsImporting } from "../exercise.ts";
+import { standing } from "../evidence.ts";
 import { type Area, inside } from "../sources.ts";
 import { moduleComment } from "../tsdoc.ts";
 import { firstSentence } from "./overview.ts";
@@ -133,10 +135,13 @@ function entryBlocks(b: Build, e: ApiExport, scope: LinkScope): Block[] {
  * @param modules - the module pages `registerApi` gave
  */
 export function apiPages(b: Build, areas: readonly Area[], apis: readonly AreaApi[], modules: ReadonlyMap<string, readonly ModulePage[]>): void {
+  const index = b.evidence.recorded ? importIndex(b) : [];
   areas.forEach((area, ai) => {
     const api = apis.find((a) => a.slug === area.slug);
     if (api === undefined) return;
     const spec = area.spec?.id ?? area.pkg.about.spec?.id;
+    const prefix = area.pkg.dir === "" ? "" : `${area.pkg.dir}/`;
+    const ran = index.some((x) => x.test.file.startsWith(prefix));
     (modules.get(area.slug) ?? []).forEach((m, mi) => {
       const scope: LinkScope = { page: m.page, file: m.file || (area.dir === "" ? "" : `${area.dir}/`), area: area.slug, ...(spec === undefined ? {} : { spec }) };
       const doc = m.file !== "" && b.exists(m.file) ? moduleComment(b.read(m.file)) : undefined;
@@ -149,6 +154,9 @@ export function apiPages(b: Build, areas: readonly Area[], apis: readonly AreaAp
       }
       if (m.file === "") blocks.push({ kind: "paragraph", inlines: [textInl(m.summary)] });
       else blocks.push({ kind: "meta", inlines: [textInl("Source: "), { kind: "link", href: { kind: "external", url: b.index.blob(m.file) }, children: [{ kind: "code", text: m.file }] }] });
+      let tested = 0;
+      let exercised = 0;
+      const head = blocks.length;
       for (const e of api.exports.filter((x) => pageOf(area, x.file) === m.page)) {
         if (!e.documented) b.found.push({ where: `${m.file} (${area.slug})`, problem: { kind: "undocumented", name: e.name } });
         const badges: Badge[] = e.kinds.map((k) => ({ text: k, tone: "neutral" }));
@@ -162,9 +170,22 @@ export function apiPages(b: Build, areas: readonly Area[], apis: readonly AreaAp
         const model: Block[] = shown === undefined
           ? []
           : [{ kind: "meta", inlines: [textInl("A table of the model: "), { kind: "link", href: { kind: "page", path: shown }, children: [textInl("columns, diagram, SQL and governance")] }] }];
-        const body = e.kinds.includes("namespace") ? [] : [...declared, ...model, ...entryBlocks(b, e, { ...scope, file: e.file })];
+        const exercising = !ran || e.kinds.includes("namespace") ? [] : testsImporting(index, area.pkg.dir, e.name);
+        const found = exercising.map((x) => x.test);
+        const stand = standing(found);
+        if (ran && !e.kinds.includes("namespace")) {
+          tested += 1;
+          if (exercising.length > 0) exercised += 1;
+          if (stand === "failing") badges.push({ text: "tests failing", tone: "warn" });
+          else if (exercising.length === 0) badges.push({ text: "no test imports it", tone: "info" });
+        }
+        const tests: Block[] = exercising.length === 0
+          ? []
+          : [{ kind: "meta", inlines: [textInl(`Imported by ${exercising.length === 1 ? "1 test" : `${exercising.length} tests`} of the run (${found.filter((t) => t.status === "passed").length} passed, ${found.filter((t) => t.status === "failed").length} failed): `), ...found.filter((t) => t.status === "failed").slice(0, 3).flatMap((t, i): Inline[] => [textInl(`${i === 0 ? "" : "; "}${t.name.replace(/^.*?: /, "").slice(0, 80)}`)]), ...(found.some((t) => t.status === "failed") ? [textInl(". ")] : []), { kind: "link", href: { kind: "page", path: `quality/${exercising[0]?.library ?? "repository"}.html` }, children: [textInl("the library's results")] }]}];
+        const body = e.kinds.includes("namespace") ? [] : [...declared, ...model, ...entryBlocks(b, e, { ...scope, file: e.file }), ...tests];
         blocks.push({ kind: "entry", id: anchorOf(e.name), name: e.name, badges, signature: e.signature, blocks: body });
       }
+      if (tested > 0) blocks.splice(head, 0, { kind: "meta", inlines: [textInl(`${exercised} of ${tested} exports are imported by a test of the run. A test that imports an export may not call it or check what it returns.`)] });
       b.add({
         path: m.page,
         title: m.title,
@@ -177,3 +198,4 @@ export function apiPages(b: Build, areas: readonly Area[], apis: readonly AreaAp
     });
   });
 }
+

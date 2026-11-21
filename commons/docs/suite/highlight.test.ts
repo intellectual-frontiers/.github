@@ -34,3 +34,16 @@ proves(["0011-documentation FR-037"], "the same text gives the same runs every t
   assertStringIncludes(html, "&lt;");
   assertEquals(html.includes("<script"), false);
 });
+
+proves(["0001-docs FR-024"], "SQL is coloured by the lexer of the SQL language library: a keyword, a call, a string with a dollar quote, a parameter and a comment each with its colour, a word in a string or a comment is none, nothing is lost, and text the lexer cannot read is left to Shiki", () => {
+  assertEquals(coloured("SELECT count(*) FROM t WHERE a = $1 AND b = 'FROM x' -- WHERE c", "sql"), [
+    "SELECT|#D73A49|#F97583", "count|#6F42C1|#B392F0", "FROM|#D73A49|#F97583", "WHERE|#D73A49|#F97583", "$1|#E36209|#FFAB70", "AND|#D73A49|#F97583", "'FROM x'|#032F62|#9ECBFF", "-- WHERE c|#6A737D|#6A737D",
+  ]);
+  assertEquals(coloured("SELECT $$it's$$;", "sql"), ["SELECT|#D73A49|#F97583", "$$it's$$|#032F62|#9ECBFF"]);
+  const code = "SELECT a,\n       b -- two\n  FROM t;\n";
+  assertEquals(runs(code, "sql").map((l) => l.map((r) => r.text).join("")).join("\n"), code);
+  assertEquals(runs(code, "sql").length, 4);
+  const open = "SELECT 'not closed";
+  assertEquals(runs(open, "sql").map((l) => l.map((r) => r.text).join("")).join("\n"), open);
+  assertStringIncludes(highlightedHtml("SELECT 1 < 2", "sql"), "&lt;");
+});

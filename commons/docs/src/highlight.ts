@@ -24,6 +24,8 @@ import typescript from "shiki/langs/typescript.mjs";
 import yaml from "shiki/langs/yaml.mjs";
 import githubDark from "shiki/themes/github-dark.mjs";
 import githubLight from "shiki/themes/github-light.mjs";
+import { highlight as sqlSpans, type SpanKind } from "@intellectual-frontiers/lang-sql/aide/text";
+import { dialect as postgres } from "@intellectual-frontiers/lang-sql/dialects/postgres";
 import type { Lang } from "./model.ts";
 
 /** The themes of the two schemes. */
@@ -60,10 +62,54 @@ export interface Run {
   readonly bold: boolean;
 }
 
+/** The colours of the kinds of SQL token, those of the themes' own for the same kinds in the other languages (a name, a quoted name, an operator and a mark of punctuation are the themes' own text). */
+const SQL_COLOURS: Readonly<Partial<Record<SpanKind, { readonly light: string; readonly dark: string; readonly italic?: true }>>> = {
+  keyword: { light: "#D73A49", dark: "#F97583" },
+  function: { light: "#6F42C1", dark: "#B392F0" },
+  number: { light: "#005CC5", dark: "#79B8FF" },
+  string: { light: "#032F62", dark: "#9ECBFF" },
+  param: { light: "#E36209", dark: "#FFAB70" },
+  comment: { light: "#6A737D", dark: "#6A737D" },
+};
+
+/**
+ * SQL read by the lexer of the SQL language library (0001-docs FR-024), in the PostgreSQL dialect (dollar quotes, `::` casts and `$1` parameters, and the keywords of the one most used), so that a word is a keyword where the dialect says so and a word in a string or a
+ * comment is none; or `undefined` where the lexer cannot read the text (a stray character, a string that is not closed), which Shiki then colours as it always did.
+ */
+function sqlRuns(code: string): readonly (readonly Run[])[] | undefined {
+  const spans = sqlSpans(code, postgres);
+  if (spans.some((s) => s.kind === "error")) return undefined;
+  const lines: Run[][] = [[]];
+  const put = (text: string, kind: SpanKind | undefined): void => {
+    const colour = kind === undefined ? undefined : SQL_COLOURS[kind];
+    for (const [i, part] of text.split("\n").entries()) {
+      if (i > 0) lines.push([]);
+      if (part === "") continue;
+      const line = lines[lines.length - 1];
+      const run: Run = colour === undefined ? { text: part, italic: false, bold: false } : { text: part, light: colour.light, dark: colour.dark, italic: false, bold: false };
+      const last = line?.[line.length - 1];
+      if (line !== undefined && last !== undefined && last.light === run.light && last.dark === run.dark) line[line.length - 1] = { ...last, text: last.text + run.text };
+      else line?.push(run);
+    }
+  };
+  let at = 0;
+  for (const s of spans) {
+    if (s.start > at) put(code.slice(at, s.start), undefined);
+    put(code.slice(s.start, s.end), s.kind);
+    at = s.end;
+  }
+  if (at < code.length) put(code.slice(at), undefined);
+  return lines;
+}
+
 /** The runs of the lines of code, by line, in the language given; one plain run for a language that is not coloured. */
 export function runs(code: string, lang: Lang): readonly (readonly Run[])[] {
   const grammar = GRAMMAR[lang];
   if (grammar === undefined || code.length > LONGEST_COLOURED) return code.split("\n").map((line) => [{ text: line, italic: false, bold: false }]);
+  if (lang === "sql") {
+    const read = sqlRuns(code);
+    if (read !== undefined) return read;
+  }
   const lines = highlighter.codeToTokensWithThemes(code, { lang: grammar, themes: THEMES });
   return lines.map((line) => {
     const out: Run[] = [];

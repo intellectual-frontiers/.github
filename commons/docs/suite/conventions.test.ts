@@ -47,7 +47,7 @@ proves(["0011-documentation FR-001"], "the package's name, exports and command, 
   const deps = entries(pkg, "dependencies");
   const dev = entries(pkg, "devDependencies");
   assertEquals(deps.map(([n]) => n).sort(), ["beautiful-mermaid", "shiki", "typescript"]);
-  assertEquals(dev.map(([n]) => n).sort(), ["@intellectual-frontiers/core", "@intellectual-frontiers/libraries", "@intellectual-frontiers/mizan", "@intellectual-frontiers/system", "@intellectual-frontiers/test", "@types/node"]);
+  assertEquals(dev.map(([n]) => n).sort(), ["@intellectual-frontiers/core", "@intellectual-frontiers/lang-sql", "@intellectual-frontiers/libraries", "@intellectual-frontiers/mizan", "@intellectual-frontiers/system", "@intellectual-frontiers/test", "@types/node"]);
   for (const [n, v] of dev) if (n.startsWith("@intellectual-frontiers/")) assertEquals(v, `link:../${n.split("/")[1]}`, `${n} is a link to its library`);
   for (const [n, v] of [...deps, ...dev]) if (!v.startsWith("link:")) assert(/^\d+\.\d+\.\d+(-[\w.]+)?$/.test(v), `${n} is pinned exactly`);
   assert(deps.some(([n, v]) => n === "typescript" && v === "7.1.0-beta"));
@@ -74,7 +74,7 @@ const PACKAGES = new Set(["typescript/async", "beautiful-mermaid", "shiki/core",
 /** The grammars and themes of Shiki the highlighter imports one by one. */
 const SHIKI_FILES = /^shiki\/(langs|themes)\/[a-z-]+\.mjs$/;
 /** The libraries lifted out of IFC TypeScript, which the generator imports by package name (0032-libraries-by-concern FR-003). */
-const LIFTED = /^@intellectual-frontiers\/(core(\/about)?|system|test)$|^@intellectual-frontiers\/(libraries\/pack|mizan\/(trace|host\/trace))$/;
+const LIFTED = /^@intellectual-frontiers\/(core(\/about)?|system|test)$|^@intellectual-frontiers\/(libraries\/pack|mizan\/(trace|host\/trace)|lang-sql\/(aide\/text|dialects\/postgres))$/;
 
 proves(["0011-documentation FR-002"], "a file imports the generator and typescript/async; a lens also the libraries' entry points", () => {
   const lensMay = new Set(["docs/src/mod.ts"]);
