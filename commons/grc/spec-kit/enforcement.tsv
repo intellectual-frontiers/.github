@@ -115,3 +115,9 @@ requirement	mechanism	by	note
 0012-grc-subtenants FR-010	check	.github: cd commons/grc && bun run verify	suite/subtenants.test.ts
 0012-grc-subtenants FR-011	check	.github: cd commons/grc && bun run verify	suite/subtenants.test.ts
 0012-grc-subtenants FR-012	check	.github: cd commons/grc && bun run verify	suite/subtenants.test.ts
+0013-grc-gitref FR-001	check	.github: cd commons/grc && bun run verify	suite/gitref.test.ts
+0013-grc-gitref FR-002	check	.github: cd commons/grc && bun run verify	suite/gitref.test.ts
+0013-grc-gitref FR-003	check	.github: cd commons/grc && bun run verify	suite/gitref.test.ts
+0013-grc-gitref FR-004	check	.github: cd commons/grc && bun run verify	suite/gitref.test.ts
+0013-grc-gitref FR-005	check	.github: cd commons/grc && bun run verify	suite/gitref.test.ts
+0013-grc-gitref FR-006	check	.github: cd commons/grc && bun run verify	suite/gitref.test.ts

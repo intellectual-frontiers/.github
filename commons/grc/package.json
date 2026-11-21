@@ -28,6 +28,7 @@
     "./stores/memory": "./src/stores/memory/mod.ts",
     "./stores/files": "./src/stores/files/mod.ts",
     "./stores/git": "./src/stores/git/mod.ts",
+    "./stores/gitref": "./src/stores/gitref/mod.ts",
     "./stores/object": "./src/stores/object/mod.ts",
     "./signers/dsse": "./src/signers/dsse/mod.ts",
     "./surfaces/headless": "./src/surfaces/headless/mod.ts"

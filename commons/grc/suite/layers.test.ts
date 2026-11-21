@@ -21,6 +21,7 @@ const EXPORTS: Record<string, string> = {
   "./runners/sql": "./src/runners/sql/mod.ts",
   "./runners/file": "./src/runners/file/mod.ts",
   "./stores/files": "./src/stores/files/mod.ts",
+  "./stores/gitref": "./src/stores/gitref/mod.ts",
   "./surfaces/headless": "./src/surfaces/headless/mod.ts",
 };
 const find = (file: string, text: string) => layerFindings([{ path: file, text }], EXPORTS).map((f) => f.rule);
