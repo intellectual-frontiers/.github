@@ -1,4 +1,4 @@
-// Spec: 0036-distribution FR-029
+// Spec: 0001-libraries FR-007
 /**
  * The tools of the one package (commons 0036-distribution FR-029): the packages that compiling every library of commons needs, which `commons/commons` installs by itself (`bun install --frozen-lockfile` in that folder alone, as the release workflow
  * does) and which its `package.json` and its `bun.lock` therefore MUST carry. They are derived from the manifests of the libraries and from what their packed sources import, never listed by hand, and a library that starts to need a package that the folder
@@ -22,7 +22,7 @@
  * typesPackageOf("@duckdb/node-api"); // "@types/duckdb__node-api"
  * ```
  *
- * Spec: 0036-distribution FR-029
+ * Spec: 0001-libraries FR-007
  *
  * @module
  */
