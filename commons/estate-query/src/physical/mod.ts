@@ -1,7 +1,8 @@
 // Spec: 0001-estate-query-layers FR-001
 /**
- * The Physical layer of Estate Query: what reads files, runs programs and reaches the network.
+ * The Physical layer of Estate Query: the estate as the connection of the `sql` runner of `grc`, so that a policy is a question in SQL.
  *
  * @module
  */
-export {};
+export { checkOf, estateConnection, estateRunners, runEstateChecks } from "./checks.ts";
+export type { SavedCheck } from "./checks.ts";

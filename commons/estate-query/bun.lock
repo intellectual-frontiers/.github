@@ -8,6 +8,7 @@
         "@intellectual-frontiers/archon": "link:../archon",
         "@intellectual-frontiers/core": "link:../core",
         "@intellectual-frontiers/estate": "link:../estate",
+        "@intellectual-frontiers/grc": "link:../grc",
         "@intellectual-frontiers/kanon": "link:../kanon",
         "@intellectual-frontiers/lang-sql": "link:../lang-sql",
         "@intellectual-frontiers/libraries": "link:../libraries",
@@ -26,6 +27,8 @@
     "@intellectual-frontiers/core": ["@intellectual-frontiers/core@link:../core", {}],
 
     "@intellectual-frontiers/estate": ["@intellectual-frontiers/estate@link:../estate", {}],
+
+    "@intellectual-frontiers/grc": ["@intellectual-frontiers/grc@link:../grc", {}],
 
     "@intellectual-frontiers/kanon": ["@intellectual-frontiers/kanon@link:../kanon", {}],
 
