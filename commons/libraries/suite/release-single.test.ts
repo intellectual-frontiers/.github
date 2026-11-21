@@ -1,5 +1,5 @@
 /**
- * The release of the one package (commons 0036-distribution FR-027, FR-028): in `single` mode the plan is one release, `commons`, raised by the greatest `Impact:` across all libraries since the last tag with the rule of major version 0, a held library
+ * The release of the one package (commons 0001-libraries FR-032): in `single` mode the plan is one release, `commons`, raised by the greatest `Impact:` across all libraries since the last tag with the rule of major version 0, a held library
  * counted like any other, a version ahead of its tag released as it is, the record naming the registries of its one entry, and the publication sending the tarball to the GitHub package registry alone.
  *
  * @module
@@ -13,7 +13,7 @@ import { SINGLE_TARGETS } from "../src/distribution.ts";
 import { offlineRegistry, planLines, publishAll, readRecord, recordText, releasePlan, type Tools } from "../src/releasing.ts";
 import { currentLook } from "@intellectual-frontiers/system/tty";
 
-const DIST = "0036-distribution";
+const SPEC = "0001-libraries";
 
 const manifest = (name: string, version: string, extra: Record<string, unknown> = {}): string =>
   `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", version, exports: ["."], distribution: ["github", "npm"], ...extra })};\n`;
@@ -27,7 +27,7 @@ function put(dir: string, name: string, version: string, extra: Record<string, u
 
 const offline = async (): Promise<undefined> => undefined;
 
-proves([`${DIST} FR-027`], "single mode plans one release of commons: raised by the greatest Impact across all libraries (a minor for a major while 0.x), a held library counted, a version ahead of its tag released as it is, and the record has the one entry and its tag", async () => {
+proves([`${SPEC} FR-032`], "single mode plans one release of commons: raised by the greatest Impact across all libraries (a minor for a major while 0.x), a held library counted, a version ahead of its tag released as it is, and the record has the one entry and its tag", async () => {
   const git = proc.which("git");
   if (git === undefined) return;
   await withTempDir(async (dir) => {
@@ -83,7 +83,7 @@ proves([`${DIST} FR-027`], "single mode plans one release of commons: raised by 
   });
 });
 
-proves([`${DIST} FR-028`], "the registries of the one package are github alone, and the publication sends the tarball to the GitHub package registry and tags, and asks npm for nothing", async () => {
+proves([`${SPEC} FR-032`], "the registries of the one package are github alone, and the publication sends the tarball to the GitHub package registry and tags, and asks npm for nothing", async () => {
   assertEquals([...SINGLE_TARGETS], ["github"]);
   const asked: string[] = [];
   const tools: Tools = {

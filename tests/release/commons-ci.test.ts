@@ -24,7 +24,10 @@ proves(
     // the workflows: the cell of the package and the build job install in its folder, run its verify, and install nothing at the root before it
     const ci = await fs.readTextFile(path.join(ROOT, ".github", "workflows", "ci.auto.yml"));
     const release = await fs.readTextFile(path.join(ROOT, ".github", "workflows", "release.auto.yml"));
-    for (const [name, text, job] of [["ci.auto.yml", ci, "verify (${{ matrix.name }})"], ["release.auto.yml", release, "build (${{ matrix.slug }} ${{ matrix.version }})"]] as const) {
+    for (const [name, text, job] of [
+      ["ci.auto.yml", ci, "verify (${{ matrix.name }})"],
+      ["release.auto.yml", release, "build (${{ matrix.slug }} ${{ matrix.version }})"],
+    ] as const) {
       const lines = text.split("\n");
       const start = lines.findIndex((l) => l.trim() === `name: ${job}`);
       assert(start >= 0, `${name} has the job ${job}`);
@@ -32,7 +35,11 @@ proves(
       const block = lines.slice(start, end === -1 ? undefined : end);
       const installs = block.flatMap((l, i) => (l.includes("run: bun install --frozen-lockfile") ? [block[i + 1] ?? ""] : []));
       assertEquals(installs.length, 1, `${name}: the job ${job} installs once`);
-      assertEquals((installs[0] ?? "").trim(), "working-directory: ${{ matrix.folder }}", `${name}: the install is in the folder of the package, not at the root`);
+      assertEquals(
+        (installs[0] ?? "").trim(),
+        "working-directory: ${{ matrix.folder }}",
+        `${name}: the install is in the folder of the package, not at the root`,
+      );
     }
     const scratch = await fs.makeTempDir({ prefix: "commons-ci-" });
     try {

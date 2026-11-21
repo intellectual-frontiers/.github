@@ -29,7 +29,7 @@
  * rewriteSpecifiers('import { ok } from "@intellectual-frontiers/core";', new Set(["core"])).text; // 'import { ok } from "@intellectual-frontiers/commons/core";'
  * ```
  *
- * Spec: 0036-distribution FR-021
+ * Spec: 0001-libraries FR-029
  *
  * @module
  */

@@ -1,5 +1,5 @@
 /**
- * The one package of commons (commons 0036-distribution FR-019 to FR-026): the mode, the keys of the `exports`, the rewriting of specifiers, the union of dependencies, the commands, what runs when a file is loaded, and the packer on a small repository
+ * The one package of commons (commons 0001-libraries FR-028 to FR-031): the mode, the keys of the `exports`, the rewriting of specifiers, the union of dependencies, the commands, what runs when a file is loaded, and the packer on a small repository
  * of real files (real folders, the real compiler, a real tarball) with each check that matters broken in a copy and named. The proof on the whole of commons, installed with npm and Bun, is `tests/release/commons-package.test.ts`.
  *
  * @module
@@ -32,7 +32,7 @@ import {
 } from "../src/pack-commons.ts";
 import { devDependenciesOf, importedPackages, linkTools, readLock, toolFindings, toolsOf, typesPackageOf, writeTools } from "../src/pack-tools.ts";
 
-const DIST = "0036-distribution";
+const SPEC = "0001-libraries";
 const LIBRARIES = resolve(dirname(fromFileUrl(import.meta.url)), "..");
 const REPO = resolve(LIBRARIES, "..", "..");
 
@@ -51,7 +51,7 @@ const facts = (name: string, extra: Partial<Facts> = {}): Facts => ({
   ...extra,
 });
 
-proves([`${DIST} FR-019`], "the mode is one of two, the repository is in single mode, the environment names the other for one run and a value that is no mode is refused", () => {
+proves([`${SPEC} FR-028`], "the mode is one of two, the repository is in single mode, the environment names the other for one run and a value that is no mode is refused", () => {
   assertEquals([...DISTRIBUTION_MODES], ["per-library", "single"]);
   assertEquals(DISTRIBUTION, "single");
   assertEquals(parseMode("single").kind, "ok");
@@ -63,7 +63,7 @@ proves([`${DIST} FR-019`], "the mode is one of two, the repository is in single 
   assertStringIncludes(bad.error, "IFC_DISTRIBUTION");
 });
 
-proves([`${DIST} FR-022`], "each library is mapped to ./<library> and ./<library>/<subpath>, so that the subpaths of two libraries do not collide, each entry naming its types, its source and its compiled file", () => {
+proves([`${SPEC} FR-029`], "each library is mapped to ./<library> and ./<library>/<subpath>, so that the subpaths of two libraries do not collide, each entry naming its types, its source and its compiled file", () => {
   assertEquals(exportKey("core", "."), "./core");
   assertEquals(exportKey("anyfs", "./governance"), "./anyfs/governance");
   const map = exportsMap([facts("a", { exports: { ".": "./src/mod.ts", "./governance": "./src/governance/mod.ts" } }), facts("b", { exports: { "./governance": "./src/governance/mod.ts" } })]);
@@ -71,7 +71,7 @@ proves([`${DIST} FR-022`], "each library is mapped to ./<library> and ./<library
   assertEquals(map["./b/governance"], { types: "./b/dist/src/governance/mod.d.ts", bun: "./b/src/governance/mod.ts", default: "./b/dist/src/governance/mod.js" });
 });
 
-proves([`${DIST} FR-022`], "an import of a library is written as an import of the package, in code and in the example of a comment; a string that is no import, a name that is no library and the examples of a Markdown fence are left or found", () => {
+proves([`${SPEC} FR-029`], "an import of a library is written as an import of the package, in code and in the example of a comment; a string that is no import, a name that is no library and the examples of a Markdown fence are left or found", () => {
   const names = new Set(["core", "anyfs-sql"]);
   const source = [
     "/**",
@@ -102,7 +102,7 @@ proves([`${DIST} FR-022`], "an import of a library is written as an import of th
   assertEquals(importSpecifiers('import a from "./a.ts";\nconst s = "import b from \\"./b.ts\\"";'), ["./a.ts"]);
 });
 
-proves([`${DIST} FR-023`], "the dependencies are the union of the libraries' and the drivers', each exact; two versions of one package and a version that is not exact are findings", () => {
+proves([`${SPEC} FR-029`], "the dependencies are the union of the libraries' and the drivers', each exact; two versions of one package and a version that is not exact are findings", () => {
   const u = unionDependencies([facts("a", { dependencies: { shiki: "4.5.0" } }), facts("b", { dependencies: { shiki: "4.5.0" }, drivers: { pg: "8.23.1" } })]);
   assertEquals(u.problems, []);
   assertEquals(u.dependencies, { pg: "8.23.1", shiki: "4.5.0" });
@@ -112,7 +112,7 @@ proves([`${DIST} FR-023`], "the dependencies are the union of the libraries' and
   assertEquals(unionDependencies([facts("a", { dependencies: { typescript: "7.1.0-beta" } })]).problems, []);
 });
 
-proves([`${DIST} FR-024`], "a command is a launcher of the compiled module and a name that two libraries declare is a finding", async () => {
+proves([`${SPEC} FR-029`], "a command is a launcher of the compiled module and a name that two libraries declare is a finding", async () => {
   await withTempDir((dir) => {
     for (const lib of ["a", "b"]) {
       mkdirSync(join(dir, "commons", lib, "bin"), { recursive: true });
@@ -129,7 +129,7 @@ proves([`${DIST} FR-024`], "a command is a launcher of the compiled module and a
   });
 });
 
-proves([`${DIST} FR-025`], "a file that does something when it is loaded is found, and a declaration, a guard for the program and the end of a template are not", () => {
+proves([`${SPEC} FR-029`], "a file that does something when it is loaded is found, and a declaration, a guard for the program and the end of a template are not", () => {
   assertEquals(runsWhenLoaded("export const a = 1;\nexport function f() {\n    return 2;\n}\n"), false);
   assertEquals(runsWhenLoaded('import { x } from "./x.js";\nexport function install(p) {\n    x(p);\n}\nsetProcessTracer(traceProcess);\n'), true);
   assertEquals(runsWhenLoaded("export const a = 1;\nif (import.meta.main) {\n    run();\n}\n"), false);
@@ -181,7 +181,7 @@ function readLibraryFiles(folder: string): readonly string[] {
 
 const OPTIONS = { tsc: join(LIBRARIES, "node_modules", "typescript", "bin", "tsc"), toolsFolder: LIBRARIES, parallel: 2 };
 
-proves([`${DIST} FR-021`, `${DIST} FR-022`, `${DIST} FR-023`, `${DIST} FR-024`, `${DIST} FR-025`, `${DIST} FR-026`], "the packer builds the real files of a small repository into one tarball that passes its own inspection, and each check that matters is shown on a copy made to fail", async () => {
+proves([`${SPEC} FR-029`, `${SPEC} FR-030`], "the packer builds the real files of a small repository into one tarball that passes its own inspection, and each check that matters is shown on a copy made to fail", async () => {
   await withTempDir(async (dir) => {
     make(dir);
     const packed = await packCommons(dir, OPTIONS);
@@ -254,7 +254,7 @@ proves([`${DIST} FR-021`, `${DIST} FR-022`, `${DIST} FR-023`, `${DIST} FR-024`, 
 });
 
 
-proves([`${DIST} FR-030`], "every folder of a library that is not one that only develops it is shipped, and the folders that are not shipped are the closed set NOT_RUNTIME; in the real repository the data of the catalogs, the guides of Docs and the installers of Ergonex are among them", () => {
+proves([`${SPEC} FR-029`], "every folder of a library that is not one that only develops it is shipped, and the folders that are not shipped are the closed set NOT_RUNTIME; in the real repository the data of the catalogs, the guides of Docs and the installers of Ergonex are among them", () => {
   assertEquals([...NOT_RUNTIME].sort(), ["aat", "acceptance", "bin", "dist", "node_modules", "oat", "spec-kit", "suite", "tools", "uat"]);
   const byName = new Map(packableLibraries(REPO).libraries.map((l) => [l.name, factsOf(REPO, l).facts.folders] as const));
   assertEquals(byName.get("catalog-nist-sp800"), ["data"]);
@@ -264,7 +264,7 @@ proves([`${DIST} FR-030`], "every folder of a library that is not one that only 
   for (const [name, folders] of byName) for (const f of folders) assert(!NOT_RUNTIME.has(f), `${name}/${f} is a development folder`);
 });
 
-proves([`${DIST} FR-029`], "the tools of the package are the union of the dependencies and the drivers, the compiler, the types of Node and of a package, and what the packed sources import, each at one version; a package no manifest versions and two versions of one are findings", () => {
+proves([`${SPEC} FR-031`], "the tools of the package are the union of the dependencies and the drivers, the compiler, the types of Node and of a package, and what the packed sources import, each at one version; a package no manifest versions and two versions of one are findings", () => {
   assertEquals(typesPackageOf("pg"), "@types/pg");
   assertEquals(typesPackageOf("@duckdb/node-api"), "@types/duckdb__node-api");
   const lib = (name: string, dependencies: Record<string, string>, devDependencies: Record<string, string>) => ({ name, roots: ["src"], dependencies, devDependencies });
@@ -280,7 +280,7 @@ proves([`${DIST} FR-029`], "the tools of the package are the union of the depend
   assertEquals([...importedPackages([{ file: "a.ts", text: 'import { x } from "zod/v4";\nimport "node:fs";\nimport { y } from "./y.ts";\nimport { z } from "@intellectual-frontiers/core";\nimport s from "@scope/pkg/sub";\n' }]).keys()], ["zod", "@scope/pkg"]);
 });
 
-proves([`${DIST} FR-029`], "a package the libraries need that the manifest or the lockfile of the folder lacks, or holds at another version, is a finding that names it, and the writing form makes the manifest what the tools say", () => {
+proves([`${SPEC} FR-031`], "a package the libraries need that the manifest or the lockfile of the folder lacks, or holds at another version, is a finding that names it, and the writing form makes the manifest what the tools say", () => {
   const tools = { pg: "8.23.1", shiki: "4.5.0" };
   const manifest = JSON.stringify({ name: "x", devDependencies: { "@intellectual-frontiers/system": "link:../system", shiki: "4.5.0" } });
   const lock = (workspace: Record<string, string>, packages: Record<string, string>): string =>
@@ -299,7 +299,7 @@ proves([`${DIST} FR-029`], "a package the libraries need that the manifest or th
   assertStringIncludes(toolFindings("commons/commons", written.text, undefined, tools).join("\n"), "bun.lock is missing");
 });
 
-proves([`${DIST} FR-029`], "in the real repository the manifest and the lockfile of commons/commons hold every package that compiling the libraries needs, so that a library that starts to need another is found here", () => {
+proves([`${SPEC} FR-031`], "in the real repository the manifest and the lockfile of commons/commons hold every package that compiling the libraries needs, so that a library that starts to need another is found here", () => {
   const listed = packableLibraries(REPO);
   const facts = listed.libraries.map((l) => factsOf(REPO, l).facts);
   const union = unionDependencies(facts);
@@ -312,7 +312,7 @@ proves([`${DIST} FR-029`], "in the real repository the manifest and the lockfile
   assertStringIncludes(toolsFindingsOf(REPO, { ...needed.tools, "left-pad": "1.3.0" }).join("\n"), "no devDependency left-pad@1.3.0");
 });
 
-proves([`${DIST} FR-029`], "the third-party packages of the folder of the package are linked where the sources of a library are resolved from, those that are already there are left, and the libraries are not touched", async () => {
+proves([`${SPEC} FR-031`], "the third-party packages of the folder of the package are linked where the sources of a library are resolved from, those that are already there are left, and the libraries are not touched", async () => {
   await withTempDir((dir) => {
     const tools = join(dir, "tools");
     for (const p of ["shiki", "@types/pg", "@intellectual-frontiers/system", "already"]) {

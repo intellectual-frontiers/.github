@@ -18,7 +18,7 @@
  * parseMode("per-library").kind; // "ok"
  * ```
  *
- * Spec: 0036-distribution FR-019
+ * Spec: 0001-libraries FR-028
  *
  * @module
  */

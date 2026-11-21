@@ -14,7 +14,7 @@
  * importSpecifiers('import a from "./a.ts"; const s = "import b from \\"./b.ts\\"";'); // ["./a.ts"]
  * ```
  *
- * Spec: 0036-distribution FR-022
+ * Spec: 0001-libraries FR-029
  *
  * @module
  */

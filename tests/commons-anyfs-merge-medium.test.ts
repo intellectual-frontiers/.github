@@ -14,10 +14,25 @@ import { makeStore, type OpCapability, type Store } from "../commons/anyfs/src/l
 import { localStore } from "../commons/anyfs/src/physical/local/mod.ts";
 import { adoptPublished, openSqlStore, publishEpoch, type SqlStore } from "../commons/anyfs-sql/src/mod.ts";
 import { openSqliteFile } from "../commons/anyfs-sql/src/physical/adapters/sqlite.ts";
-import { type Mergeable, memoryCursor, publishVector, pruneDeltas, readVectors, syncThrough } from "../commons/anyfs-bridge/src/exchange/mod.ts";
+import {
+  type Mergeable,
+  memoryCursor,
+  publishVector,
+  pruneDeltas,
+  readVectors,
+  syncThrough,
+} from "../commons/anyfs-bridge/src/exchange/mod.ts";
 import { gitRefStore, parseIdentity } from "../commons/anyfs-git/src/mod.ts";
 import { openSshStore } from "../commons/anyfs-ssh/src/mod.ts";
-import { createBucket, fetchTransport, makeClient, openS3Store, parseBucketName, parseEndpoint, staticCredentials } from "../commons/anyfs-s3/src/mod.ts";
+import {
+  createBucket,
+  fetchTransport,
+  makeClient,
+  openS3Store,
+  parseBucketName,
+  parseEndpoint,
+  staticCredentials,
+} from "../commons/anyfs-s3/src/mod.ts";
 import { rustfsBinary, startRustfs } from "../commons/anyfs-s3/tools/rustfs.ts";
 import { executorOf, placeOf, withSshd } from "../commons/anyfs-ssh/tools/sshd-test.ts";
 import { fs, path, proc } from "../commons/system/src/mod.ts";
@@ -27,7 +42,12 @@ const dec = new TextDecoder();
 const gitEnv = { GIT_CONFIG_GLOBAL: "/dev/null", GIT_CONFIG_SYSTEM: "/dev/null" };
 
 type Medium = Store<"read" | "write" | "list" | "delete">;
-type Replica = { readonly sql: SqlStore; readonly id: ReplicaId; readonly cursor: ReturnType<typeof memoryCursor>; readonly close: () => Promise<void> };
+type Replica = {
+  readonly sql: SqlStore;
+  readonly id: ReplicaId;
+  readonly cursor: ReturnType<typeof memoryCursor>;
+  readonly close: () => Promise<void>;
+};
 
 const ids = (n: number): ReplicaId[] =>
   Array.from({ length: n }, (_, i) => {
@@ -99,7 +119,8 @@ async function exercise(name: string, medium: Medium, dir: string): Promise<stri
   // the concurrent edit of both.txt is kept: one wins and the other is a sibling, at every replica
   const bothPath = (await import("../commons/anyfs/src/governance/mod.ts")).parsePath("both.txt");
   assert(bothPath.kind === "ok");
-  for (const r of [a, b, c]) assertEquals((await r.sql.siblings(bothPath.value)).length, 1, `${name}: the loser of the concurrent edit is a sibling`);
+  for (const r of [a, b, c])
+    assertEquals((await r.sql.siblings(bothPath.value)).length, 1, `${name}: the loser of the concurrent edit is a sibling`);
 
   // an exchange cut in the middle leaves whole files only
   for (let i = 0; i < 4; i++) await put(a, `more/${i}.txt`, `m${i}`);
@@ -113,7 +134,13 @@ async function exercise(name: string, medium: Medium, dir: string): Promise<stri
     capabilities: caps,
     handle: async (op) => (op.op === "write" && ++writes === 3 ? err(unavailable("the medium went away", true)) : medium.handle(op)),
   }) as unknown as Medium;
-  const cut = await syncThrough({ self: a.id, replica: a.sql.store as unknown as Mergeable, medium: breaking, cursor: a.cursor, maxRows: 1 });
+  const cut = await syncThrough({
+    self: a.id,
+    replica: a.sql.store as unknown as Mergeable,
+    medium: breaking,
+    cursor: a.cursor,
+    maxRows: 1,
+  });
   assert(cut.kind === "err", `${name}: the cut exchange says so`);
   for (const r of [b, c, a]) await sync(r, medium, { maxRows: 1 });
   for (const r of [b, c, a]) await sync(r, medium);
@@ -124,7 +151,8 @@ async function exercise(name: string, medium: Medium, dir: string): Promise<stri
   assert(del.kind === "ok");
   assert((await b.sql.store.delete(del.value, expectAny)).kind === "ok");
   for (let round = 0; round < 3; round++) for (const r of [a, b, c]) await sync(r, medium);
-  for (const r of [a, b, c]) assert((await publishVector({ self: r.id, replica: r.sql.store as unknown as Mergeable, medium })).kind === "ok");
+  for (const r of [a, b, c])
+    assert((await publishVector({ self: r.id, replica: r.sql.store as unknown as Mergeable, medium })).kind === "ok");
   const vectors = await readVectors(medium);
   assert(vectors.kind === "ok" && Object.keys(vectors.value).length === 3);
   const roster = [a.id, b.id, c.id];
@@ -145,82 +173,109 @@ async function exercise(name: string, medium: Medium, dir: string): Promise<stri
 
 const tempDir = (prefix: string): Promise<string> => fs.makeTempDir({ prefix }).then((d) => fs.realPath(d));
 
-proves(["0007-bridge-exchange FR-008", "0007-bridge-exchange FR-009", "0007-bridge-exchange FR-010", "0009-sql-compaction FR-006"], "three SQLite replicas exchange through a folder: they converge, a cut exchange leaves whole files, the vectors let one collect and the others take the epoch", async () => {
-  const dir = await tempDir("anyfs-medium-folder-");
-  try {
-    const shared = path.join(dir, "shared");
-    await fs.mkdir(shared);
-    const m = await localStore(shared);
-    if (m.kind === "err") throw new Error(m.error);
-    console.log(`[anyfs merge medium] ${await exercise("folder", m.value as unknown as Medium, dir)}`);
-  } finally {
-    await fs.remove(dir, { recursive: true }).catch(() => undefined);
-  }
-});
+proves(
+  ["0007-bridge-exchange FR-008", "0007-bridge-exchange FR-009", "0007-bridge-exchange FR-010", "0009-sql-compaction FR-006"],
+  "three SQLite replicas exchange through a folder: they converge, a cut exchange leaves whole files, the vectors let one collect and the others take the epoch",
+  async () => {
+    const dir = await tempDir("anyfs-medium-folder-");
+    try {
+      const shared = path.join(dir, "shared");
+      await fs.mkdir(shared);
+      const m = await localStore(shared);
+      if (m.kind === "err") throw new Error(m.error);
+      console.log(`[anyfs merge medium] ${await exercise("folder", m.value as unknown as Medium, dir)}`);
+    } finally {
+      await fs.remove(dir, { recursive: true }).catch(() => undefined);
+    }
+  },
+);
 
-proves(["0007-bridge-exchange FR-008", "0007-bridge-exchange FR-009", "0007-bridge-exchange FR-010", "0009-sql-compaction FR-006"], "three SQLite replicas exchange through a branch of a real Git repository", async (t) => {
-  if (proc.which("git") === undefined) {
-    t.skip("this computer has no git");
-    return;
-  }
-  const dir = await tempDir("anyfs-medium-git-");
-  try {
-    const repo = path.join(dir, "exchange.git");
-    const init = await proc.run(["git", "-C", dir, "init", "-q", "--bare", "-b", "main", repo], { env: gitEnv });
-    if (!init.success) throw new Error(init.stderr);
-    const identity = parseIdentity("Exchange", "exchange@example.test");
-    if (identity.kind === "err") throw new Error(identity.error);
-    const git = await gitRefStore({ repo, branch: "exchange", commit: { author: identity.value, clock: () => Date.UTC(2026, 0, 1) } });
-    if (git.kind === "err") throw new Error(git.error);
-    console.log(`[anyfs merge medium] ${await exercise("git branch", git.value.store as unknown as Medium, dir)}`);
-  } finally {
-    await fs.remove(dir, { recursive: true }).catch(() => undefined);
-  }
-});
+proves(
+  ["0007-bridge-exchange FR-008", "0007-bridge-exchange FR-009", "0007-bridge-exchange FR-010", "0009-sql-compaction FR-006"],
+  "three SQLite replicas exchange through a branch of a real Git repository",
+  async (t) => {
+    if (proc.which("git") === undefined) {
+      t.skip("this computer has no git");
+      return;
+    }
+    const dir = await tempDir("anyfs-medium-git-");
+    try {
+      const repo = path.join(dir, "exchange.git");
+      const init = await proc.run(["git", "-C", dir, "init", "-q", "--bare", "-b", "main", repo], { env: gitEnv });
+      if (!init.success) throw new Error(init.stderr);
+      const identity = parseIdentity("Exchange", "exchange@example.test");
+      if (identity.kind === "err") throw new Error(identity.error);
+      const git = await gitRefStore({ repo, branch: "exchange", commit: { author: identity.value, clock: () => Date.UTC(2026, 0, 1) } });
+      if (git.kind === "err") throw new Error(git.error);
+      console.log(`[anyfs merge medium] ${await exercise("git branch", git.value.store as unknown as Medium, dir)}`);
+    } finally {
+      await fs.remove(dir, { recursive: true }).catch(() => undefined);
+    }
+  },
+);
 
-proves(["0007-bridge-exchange FR-008", "0007-bridge-exchange FR-009", "0007-bridge-exchange FR-010", "0009-sql-compaction FR-006"], "three SQLite replicas exchange through a real OpenSSH server", async () => {
-  const dir = await tempDir("anyfs-medium-ssh-");
-  try {
-    const ran = await withSshd(async (host) => {
-      const opened = await openSshStore(executorOf(host), { place: placeOf(host), root: `${host.root}/exchange`, create: true });
+proves(
+  ["0007-bridge-exchange FR-008", "0007-bridge-exchange FR-009", "0007-bridge-exchange FR-010", "0009-sql-compaction FR-006"],
+  "three SQLite replicas exchange through a real OpenSSH server",
+  async () => {
+    const dir = await tempDir("anyfs-medium-ssh-");
+    try {
+      const ran = await withSshd(async (host) => {
+        const opened = await openSshStore(executorOf(host), { place: placeOf(host), root: `${host.root}/exchange`, create: true });
+        if (opened.kind === "err") throw new Error(opened.error);
+        console.log(`[anyfs merge medium] ${await exercise("real sshd", opened.value.store as unknown as Medium, dir)}`);
+      });
+      if (ran.kind === "skipped") console.log(`[anyfs merge medium] the real sshd was not run: ${ran.reason}`);
+    } finally {
+      await fs.remove(dir, { recursive: true }).catch(() => undefined);
+    }
+  },
+);
+
+proves(
+  ["0007-bridge-exchange FR-008", "0007-bridge-exchange FR-009", "0007-bridge-exchange FR-010", "0009-sql-compaction FR-006"],
+  "three SQLite replicas exchange through a bucket of a real S3-compatible server",
+  async (t) => {
+    const bin = await rustfsBinary();
+    if (bin.kind === "err") {
+      t.skip(`RustFS was not run: ${bin.error}`);
+      return;
+    }
+    const run = await startRustfs(bin.value);
+    if (run.kind === "err") {
+      t.skip(`RustFS was not run: ${run.error}`);
+      return;
+    }
+    process.once("exit", () => run.value.kill());
+    const dir = await tempDir("anyfs-medium-s3-");
+    try {
+      const keys = staticCredentials(run.value.accessKey, run.value.secretKey);
+      const bucket = parseBucketName("exchange");
+      const endpoint = parseEndpoint(run.value.endpoint);
+      if (keys.kind === "err" || bucket.kind === "err" || endpoint.kind === "err")
+        throw new Error("the throwaway keys, bucket or endpoint are not accepted");
+      const client = makeClient({
+        endpoint: endpoint.value,
+        region: "us-east-1",
+        bucket: bucket.value,
+        addressing: "path",
+        credentials: keys.value,
+        transport: fetchTransport(),
+        timeoutMs: 10_000,
+        payload: "auto",
+        now: () => new Date(),
+      });
+      const made = await createBucket(client, "us-east-1");
+      if (made.kind === "err") throw new Error(made.error);
+      const place = parsePlace("s3://exchange/sync");
+      if (place.kind === "err" || place.value.kind !== "s3") throw new Error("not a place");
+      const opened = await openS3Store({ place: place.value, credentials: keys.value, endpoint: run.value.endpoint });
       if (opened.kind === "err") throw new Error(opened.error);
-      console.log(`[anyfs merge medium] ${await exercise("real sshd", opened.value.store as unknown as Medium, dir)}`);
-    });
-    if (ran.kind === "skipped") console.log(`[anyfs merge medium] the real sshd was not run: ${ran.reason}`);
-  } finally {
-    await fs.remove(dir, { recursive: true }).catch(() => undefined);
-  }
-});
-
-proves(["0007-bridge-exchange FR-008", "0007-bridge-exchange FR-009", "0007-bridge-exchange FR-010", "0009-sql-compaction FR-006"], "three SQLite replicas exchange through a bucket of a real S3-compatible server", async (t) => {
-  const bin = await rustfsBinary();
-  if (bin.kind === "err") {
-    t.skip(`RustFS was not run: ${bin.error}`);
-    return;
-  }
-  const run = await startRustfs(bin.value);
-  if (run.kind === "err") {
-    t.skip(`RustFS was not run: ${run.error}`);
-    return;
-  }
-  process.once("exit", () => run.value.kill());
-  const dir = await tempDir("anyfs-medium-s3-");
-  try {
-    const keys = staticCredentials(run.value.accessKey, run.value.secretKey);
-    const bucket = parseBucketName("exchange");
-    const endpoint = parseEndpoint(run.value.endpoint);
-    if (keys.kind === "err" || bucket.kind === "err" || endpoint.kind === "err") throw new Error("the throwaway keys, bucket or endpoint are not accepted");
-    const client = makeClient({ endpoint: endpoint.value, region: "us-east-1", bucket: bucket.value, addressing: "path", credentials: keys.value, transport: fetchTransport(), timeoutMs: 10_000, payload: "auto", now: () => new Date() });
-    const made = await createBucket(client, "us-east-1");
-    if (made.kind === "err") throw new Error(made.error);
-    const place = parsePlace("s3://exchange/sync");
-    if (place.kind === "err" || place.value.kind !== "s3") throw new Error("not a place");
-    const opened = await openS3Store({ place: place.value, credentials: keys.value, endpoint: run.value.endpoint });
-    if (opened.kind === "err") throw new Error(opened.error);
-    if (opened.value.mode === "read-only") throw new Error("the keys can write");
-    console.log(`[anyfs merge medium] ${await exercise("real S3 (RustFS)", opened.value.store as unknown as Medium, dir)}`);
-  } finally {
-    run.value.kill();
-    await fs.remove(dir, { recursive: true }).catch(() => undefined);
-  }
-});
+      if (opened.value.mode === "read-only") throw new Error("the keys can write");
+      console.log(`[anyfs merge medium] ${await exercise("real S3 (RustFS)", opened.value.store as unknown as Medium, dir)}`);
+    } finally {
+      run.value.kill();
+      await fs.remove(dir, { recursive: true }).catch(() => undefined);
+    }
+  },
+);
