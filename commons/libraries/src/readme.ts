@@ -95,6 +95,7 @@ export const ROLE_OF: ReadonlyMap<string, Role> = new Map<string, Role>([
   ["archon-dialect-apt", "program"],
   ["archon-dialect-ansible", "program"],
   ["archon-dialect-cloud-init", "program"],
+  ["archon-dialect-opentofu", "program"],
   ["archon-converge", "program"],
   ["archon-boot", "program"],
   ["archon-dns", "program"],

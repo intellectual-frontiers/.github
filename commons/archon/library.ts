@@ -28,6 +28,7 @@ export const library = {
       { name: "winget", instanceOf: "src/physical/dialect/", placement: "package" },
       { name: "ansible", instanceOf: "src/physical/dialect/", placement: "package" },
       { name: "cloud-init", instanceOf: "src/physical/dialect/", placement: "package" },
+      { name: "opentofu", instanceOf: "src/physical/dialect/", placement: "package" },
     ],
     plugins: [{ noun: "tool" }, { noun: "converge" }, { noun: "boot" }, { noun: "dns" }],
     units: [
