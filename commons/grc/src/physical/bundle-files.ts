@@ -51,11 +51,12 @@ const keysFile = object({ keys: array(object({ keyid: string, role: string, jwk:
 
 async function importKey(jwk: unknown): Promise<Result<CryptoKey, string>> {
   if (typeof jwk !== "object" || jwk === null) return err("a key is a JSON Web Key object");
-  const json = jwk as JsonWebKey;
+  // a JSON Web Key is read by its fields; the type of the web platform is not assumed to be in the compiler's libraries
+  const json = jwk as { readonly kty?: string; readonly crv?: string };
   try {
-    if (json.kty === "OKP" && json.crv === "Ed25519") return ok(await crypto.subtle.importKey("jwk", json, { name: "Ed25519" }, true, ["verify"]));
+    if (json.kty === "OKP" && json.crv === "Ed25519") return ok(await crypto.subtle.importKey("jwk", json as never, { name: "Ed25519" }, true, ["verify"]));
     if (json.kty === "EC" && (json.crv === "P-256" || json.crv === "P-384" || json.crv === "P-521")) {
-      return ok(await crypto.subtle.importKey("jwk", json, { name: "ECDSA", namedCurve: json.crv }, true, ["verify"]));
+      return ok(await crypto.subtle.importKey("jwk", json as never, { name: "ECDSA", namedCurve: json.crv }, true, ["verify"]));
     }
     return err("a key is an Ed25519 (OKP) or an EC (P-256, P-384, P-521) public key");
   } catch (e) {
