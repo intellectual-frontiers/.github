@@ -5,4 +5,5 @@
  * @module
  */
 export * from "./journal.ts";
+export * from "./query.ts";
 export * from "./spans.ts";

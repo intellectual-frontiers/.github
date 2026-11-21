@@ -29,3 +29,7 @@ requirement	mechanism	by	note
 0005-evidence-capture-views FR-006	check	.github: cd commons/evidence-capture && bun run verify	suite/views.test.ts
 0005-evidence-capture-views FR-007	check	.github: cd commons/evidence-capture && bun run verify	suite/views.test.ts
 0005-evidence-capture-views FR-008	check	.github: cd commons/evidence-capture && bun run verify	suite/views.test.ts
+0006-evidence-capture-query FR-001	check	.github: cd commons/evidence-capture && bun run verify	suite/views.test.ts
+0006-evidence-capture-query FR-002	check	.github: cd commons/evidence-capture && bun run verify	suite/views.test.ts
+0006-evidence-capture-query FR-003	check	.github: cd commons/evidence-capture && bun run verify	suite/views.test.ts
+0006-evidence-capture-query FR-004	check	.github: cd commons/evidence-capture && bun run verify	suite/views.test.ts

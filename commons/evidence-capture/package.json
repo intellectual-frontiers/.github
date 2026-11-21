@@ -25,6 +25,7 @@
     "@intellectual-frontiers/estate": "link:../estate",
     "@intellectual-frontiers/grc": "link:../grc",
     "@intellectual-frontiers/headless": "link:../headless",
+    "@intellectual-frontiers/lang-sql": "link:../lang-sql",
     "@intellectual-frontiers/kanon": "link:../kanon",
     "@intellectual-frontiers/libraries": "link:../libraries",
     "@intellectual-frontiers/mizan": "link:../mizan",
