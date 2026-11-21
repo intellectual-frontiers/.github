@@ -7,7 +7,7 @@
  */
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { ansi, createRegistry } from "@intellectual-frontiers/lang-sql";
-import { introspect, type Value } from "@intellectual-frontiers/lang-sql/extensions/introspect";
+import { introspect, type Value } from "@intellectual-frontiers/lang-sql/aide/introspect";
 import { dialect as postgres } from "@intellectual-frontiers/lang-sql/dialects/postgres";
 
 const rows = (sql: string, text: string, params: readonly Value[] = []): readonly (readonly Value[])[] => {

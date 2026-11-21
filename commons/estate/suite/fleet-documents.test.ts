@@ -39,7 +39,7 @@ proves(["0005-estate-fleet-documents FR-002"], "an asset is kept as one document
     assertEquals(inputOf(got.value.value).id, a.id);
   }
   // an adopted asset that names an owner for a capability its state does not offer: written by hand below the layer
-  const broken = JSON.stringify({ id: "sparta", kind: "server", state: "adopted", joined: "paired", owners: { observe: "archon", verify: "archon", access: "archon", converge: "archon" }, $version: 1 });
+  const broken = JSON.stringify({ id: "sparta", kind: "server", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon", access: "archon", converge: "archon" }, $version: 1 });
   assert((await store.write(path("assets/s/sparta.json"), bytes(broken), expectAny)).kind === "ok");
   const listed = await fleet.listAssets();
   assert(listed.kind === "ok");

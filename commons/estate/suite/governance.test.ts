@@ -5,7 +5,7 @@
  * @module
  */
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { CAPABILITIES, STATES, defineAsset, defineEstate, mayMove, offers, ownerOf, parseAssetId, parseAssetKind, parseSystemId, reasonNotOffered } from "../src/governance/mod.ts";
+import { CAPABILITIES, STATES, defineAsset, defineEstate, installOf, mayMove, offers, ownerOf, parseAssetId, parseAssetKind, parseSystemId, reasonNotOffered } from "../src/governance/mod.ts";
 
 proves(["0002-estate-governance FR-001"], "the identities are made only by their parsers and a text that is not one is refused with its rule", () => {
   for (const ok of ["olympia", "build-01.example", "a1"]) assertEquals(parseAssetId(ok).kind, "ok", ok);
@@ -23,12 +23,15 @@ proves(["0002-estate-governance FR-002", "0002-estate-governance FR-003"], "each
   assertEquals(CAPABILITIES.filter((c) => offers("discovered", c)), [], "a discovered asset is listed and nothing more");
   assertEquals(CAPABILITIES.filter((c) => offers("adopted", c)), ["verify", "observe"], "an adopted asset is observed and checked");
   assertEquals(CAPABILITIES.filter((c) => offers("managed", c)).length, 10);
+  assertEquals(CAPABILITIES.filter((c) => offers("managed", c, "paired")).length, 9, "a managed asset that is not provisioned does not offer provision");
+  assertEquals(offers("managed", "provision", "provisioned"), true);
+  assert(reasonNotOffered("managed", "provision", "integration")?.includes("installed by someone else") === true);
   assertEquals(reasonNotOffered("managed", "converge"), undefined);
   assert(reasonNotOffered("adopted", "converge")?.includes("never changed") === true);
   assert(reasonNotOffered("discovered", "observe")?.includes("only listed") === true);
   assertEquals(mayMove("discovered", "adopted"), true);
   assertEquals(mayMove("adopted", "discovered"), true);
-  assertEquals(mayMove("adopted", "managed"), false, "a managed asset is installed as managed, never moved to it");
+  assertEquals(mayMove("adopted", "managed"), true, "an adopted asset is taken over");
   assertEquals(mayMove("managed", "adopted"), false);
   assertEquals(mayMove("discovered", "managed"), false);
   assertEquals(mayMove("managed", "discovered"), false);
@@ -73,16 +76,24 @@ proves(["0002-estate-governance FR-006"], "a typed estate makes each asset by it
   assert(asset.kind === "err", "an asset that is refused refuses the estate");
 });
 
-proves(["0002-estate-governance FR-007"], "an asset says how it joined, a managed asset joined as managed and no other did, and any other word is refused", () => {
-  const paired = defineAsset({ id: "defiant", kind: "workstation", state: "adopted", joined: "paired", owners: { observe: "archon", verify: "archon" } });
-  assert(paired.kind === "ok" && paired.value.joined === "paired");
-  const managed = defineAsset({ id: "olympia", kind: "server", state: "managed", owners: Object.fromEntries(CAPABILITIES.map((c) => [c, "archon"])) });
-  assert(managed.kind === "ok" && managed.value.joined === "managed", "managed is the default way a managed asset joined");
-  const wrongManaged = defineAsset({ id: "defiant", kind: "workstation", state: "adopted", joined: "managed", owners: { observe: "archon", verify: "archon" } });
-  assert(wrongManaged.kind === "err" && wrongManaged.error.some((m) => m.includes("only an asset the system installed")));
-  const wrongOther = defineAsset({ id: "olympia", kind: "server", state: "managed", joined: "paired", owners: Object.fromEntries(CAPABILITIES.map((c) => [c, "archon"])) });
-  assert(wrongOther.kind === "err" && wrongOther.error.some((m) => m.includes("joined as managed")));
-  // @ts-expect-error a way of joining outside the closed list does not compile
-  const unknown = defineAsset({ id: "x", kind: "server", state: "adopted", joined: "wandered-in", owners: { observe: "archon", verify: "archon" } });
-  assert(unknown.kind === "err" && unknown.error.some((m) => m.includes("is not a way of joining")));
+proves(["0002-estate-governance FR-007"], "an asset says where it came from, a managed asset is provisioned by default, only a managed asset can be, an inherited managed asset does not offer provision, and any other word is refused", () => {
+  const paired = defineAsset({ id: "defiant", kind: "workstation", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" } });
+  assert(paired.kind === "ok" && paired.value.origin === "paired" && installOf(paired.value) === "inherited");
+  const all = Object.fromEntries(CAPABILITIES.map((c) => [c, "archon"]));
+  const provisioned = defineAsset({ id: "olympia", kind: "server", state: "managed", owners: all });
+  assert(provisioned.kind === "ok" && provisioned.value.origin === "provisioned" && installOf(provisioned.value) === "provisioned", "provisioned is the default origin of a managed asset");
+  assert(provisioned.value.capabilities.every((c) => c.offered), "a provisioned asset offers every capability");
+  const { provision: _p, ...rest } = all;
+  const inherited = defineAsset({ id: "olympia", kind: "server", state: "managed", origin: "paired", owners: rest });
+  assert(inherited.kind === "ok" && installOf(inherited.value) === "inherited");
+  const line = inherited.value.capabilities.find((c) => c.capability === "provision");
+  assert(line !== undefined && !line.offered && line.reason.includes("installed by someone else"), "an inherited asset does not offer provision");
+  assertEquals(inherited.value.capabilities.filter((c) => c.offered).length, CAPABILITIES.length - 1);
+  const owned = defineAsset({ id: "olympia", kind: "server", state: "managed", origin: "paired", owners: all });
+  assert(owned.kind === "err" && owned.error.some((m) => m.includes("provision is owned by archon")));
+  const wrong = defineAsset({ id: "defiant", kind: "workstation", state: "adopted", origin: "provisioned", owners: { observe: "archon", verify: "archon" } });
+  assert(wrong.kind === "err" && wrong.error.some((m) => m.includes("only a managed asset can be provisioned")));
+  // @ts-expect-error an origin outside the closed list does not compile
+  const unknown = defineAsset({ id: "x", kind: "server", state: "adopted", origin: "wandered-in", owners: { observe: "archon", verify: "archon" } });
+  assert(unknown.kind === "err" && unknown.error.some((m) => m.includes("is not an origin")));
 });

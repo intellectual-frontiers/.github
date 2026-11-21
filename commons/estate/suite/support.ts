@@ -27,7 +27,7 @@ export const named = (text: string): ReplicaName => {
 
 /** An adopted asset with a made up identity. */
 export function adopted(id: string, kind = "server"): Asset {
-  const made = defineAsset({ id, kind, state: "adopted", joined: "paired", owners: { observe: "archon", verify: "archon" } });
+  const made = defineAsset({ id, kind, state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" } });
   assert(made.kind === "ok", `${id} is an asset`);
   return made.value;
 }

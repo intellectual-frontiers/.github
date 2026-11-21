@@ -10,3 +10,4 @@ number	slug	state
 0009	sql-print	in force
 0010	aide	in force
 0011	acceptance	in force
+0012	sql-guard	in force

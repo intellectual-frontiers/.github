@@ -33,7 +33,7 @@ import {
 } from "@intellectual-frontiers/anyfs/docs";
 import { parsePrefix, type Prefix } from "@intellectual-frontiers/anyfs/governance";
 import type { Json } from "@intellectual-frontiers/grc/governance";
-import { type Asset, type AssetInput, defineAsset, STATES, WAYS_OF_JOINING } from "@intellectual-frontiers/estate/governance";
+import { type Asset, type AssetInput, defineAsset, ORIGINS, STATES } from "@intellectual-frontiers/estate/governance";
 
 /** The schema the manifest of a store says it is kept at, and the one this code reads and writes. */
 export const FLEET_SCHEMA = 1;
@@ -124,26 +124,26 @@ const refused = (path: string, expected: string, problems: readonly string[]): D
 
 // --- the asset -------------------------------------------------------------------------------------------------------------------------------------
 
-const assetFields = object({ id: string, kind: string, state: literal(...STATES), owners: record(string) }, { joined: literal(...WAYS_OF_JOINING) });
+const assetFields = object({ id: string, kind: string, state: literal(...STATES), owners: record(string) }, { origin: literal(...ORIGINS) });
 
 const assetDecoder: Decoder<Asset> = (input, path = "$") => {
   const fields = assetFields(input, path);
   if (fields.kind === "err") return fields;
-  const made = defineAsset({ id: fields.value.id, kind: fields.value.kind, state: fields.value.state, owners: fields.value.owners, ...(fields.value.joined === undefined ? {} : { joined: fields.value.joined }) });
+  const made = defineAsset({ id: fields.value.id, kind: fields.value.kind, state: fields.value.state, owners: fields.value.owners, ...(fields.value.origin === undefined ? {} : { origin: fields.value.origin }) });
   return made.kind === "ok" ? ok(made.value) : err(refused(path, "an asset the estate accepts", made.error));
 };
 
 function assetEncode(asset: Asset): Result<JsonObject, string> {
   const owners: Record<string, string> = {};
   for (const line of asset.capabilities) if (line.offered) owners[line.capability] = line.owner;
-  return ok({ id: asset.id, kind: asset.kind, state: asset.state, ...(asset.joined === undefined ? {} : { joined: asset.joined }), owners });
+  return ok({ id: asset.id, kind: asset.kind, state: asset.state, ...(asset.origin === undefined ? {} : { origin: asset.origin }), owners });
 }
 
 /** The input an asset is made from: the owners of the capabilities it offers. */
 export function inputOf(asset: Asset): AssetInput {
   const owners: Partial<Record<(typeof asset.capabilities)[number]["capability"], string>> = {};
   for (const line of asset.capabilities) if (line.offered) owners[line.capability] = line.owner;
-  return { id: asset.id, kind: asset.kind, state: asset.state, ...(asset.joined === undefined ? {} : { joined: asset.joined }), owners };
+  return { id: asset.id, kind: asset.kind, state: asset.state, ...(asset.origin === undefined ? {} : { origin: asset.origin }), owners };
 }
 
 /** The codec of an asset document. */

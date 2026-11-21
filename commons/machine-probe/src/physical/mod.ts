@@ -7,3 +7,4 @@
 export * from "./key.ts";
 export * from "./run.ts";
 export * from "./scripts.ts";
+export * from "./enroll.ts";

@@ -11,6 +11,7 @@
  * @module
  */
 import {
+  catalogPackage,
   check,
   controlScope,
   createKinds,
@@ -30,6 +31,7 @@ import { assessment, attestation, evidence, evidenceManifest, finding, ledgerEnt
 export function standardKinds(): Kinds {
   const kinds = createKinds();
   for (const k of [
+    catalogPackage,
     framework,
     crosswalk,
     policy,

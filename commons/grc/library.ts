@@ -12,7 +12,7 @@ export const library = {
   verify: "bun run verify",
   version: "0.3.3",
   distribution: ["github", "npm"],
-  exports: [".", "./governance", "./logical", "./physical", "./conformance", "./standard", "./serializers/oscal", "./serializers/ocsf", "./serializers/sarif", "./serializers/cyclonedx", "./serializers/intoto", "./runners/sql", "./runners/file", "./runners/api", "./runners/remote", "./runners/manual", "./runners/external", "./stores/memory", "./stores/files", "./stores/git", "./stores/gitref", "./stores/object", "./signers/dsse", "./signers/sshsig", "./surfaces/headless"],
+  exports: [".", "./governance", "./logical", "./physical", "./conformance", "./standard", "./serializers/oscal", "./serializers/ocsf", "./serializers/sarif", "./serializers/cyclonedx", "./serializers/intoto", "./runners/sql", "./runners/file", "./runners/api", "./runners/remote", "./runners/manual", "./runners/external", "./stores/memory", "./stores/files", "./stores/git", "./stores/gitref", "./stores/object", "./signers/dsse", "./signers/sshsig", "./surfaces/headless", "./surfaces/query"],
   summary:
     "Governance, risk and compliance in three layers: governance (frameworks, crosswalks, policies, checks, requirements, evidence policy and exceptions as data), the logical model (results, findings, evidence, attestations, assessments and the pure computations over them, as self-describing versioned documents) and the physical layer (registries of typed ports with conformance suites: runners, evidence stores, signers, serializers), with the headless verbs grc check, assess, explain and evidence.",
 };

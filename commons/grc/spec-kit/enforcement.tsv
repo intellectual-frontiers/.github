@@ -68,12 +68,12 @@ requirement	mechanism	by	note
 0007-grc-surface FR-004	check	.github: cd commons/grc && bun run verify	suite/surface.test.ts
 0007-grc-surface FR-005	check	.github: cd commons/grc && bun run verify	suite/surface.test.ts
 0007-grc-surface FR-006	check	.github: cd commons/grc && bun run verify	suite/surface.test.ts
-0008-grc-catalogs FR-001	none	-	draft: the shape of a data package, built later
-0008-grc-catalogs FR-002	none	-	draft: the shape of a data package, built later
-0008-grc-catalogs FR-003	none	-	draft: the shape of a data package, built later
-0008-grc-catalogs FR-004	none	-	draft: the shape of a data package, built later
-0008-grc-catalogs FR-005	none	-	draft: the shape of a data package, built later
-0008-grc-catalogs FR-006	none	-	draft: the shape of a data package, built later
+0008-grc-catalogs FR-001	check	.github: cd commons/grc && bun run verify	suite/catalog.test.ts
+0008-grc-catalogs FR-002	check	.github: cd commons/grc && bun run verify	suite/catalog.test.ts
+0008-grc-catalogs FR-003	check	.github: cd commons/grc && bun run verify	suite/catalog.test.ts
+0008-grc-catalogs FR-004	check	.github: cd commons/grc && bun run verify	suite/catalog.test.ts
+0008-grc-catalogs FR-005	check	.github: cd commons/grc && bun run verify	suite/catalog.test.ts
+0008-grc-catalogs FR-006	check	.github: cd commons/grc && bun run verify	suite/catalog.test.ts
 0009-grc-groups FR-001	check	.github: cd commons/grc && bun run verify	suite/groups.test.ts
 0009-grc-groups FR-002	check	.github: cd commons/grc && bun run verify	suite/groups.test.ts
 0009-grc-groups FR-003	check	.github: cd commons/grc && bun run verify	suite/groups.test.ts
@@ -126,3 +126,8 @@ requirement	mechanism	by	note
 0014-grc-sshsig FR-003	check	.github: cd commons/grc && bun run verify	suite/sshsig.test.ts
 0014-grc-sshsig FR-004	check	.github: cd commons/grc && bun run verify	suite/sshsig.test.ts
 0014-grc-sshsig FR-005	check	.github: cd commons/grc && bun run verify	suite/sshsig.test.ts
+0015-grc-query FR-001	check	.github: cd commons/grc && bun run verify	suite/query.test.ts
+0015-grc-query FR-002	check	.github: cd commons/grc && bun run verify	suite/query.test.ts
+0015-grc-query FR-003	check	.github: cd commons/grc && bun run verify	suite/query.test.ts
+0015-grc-query FR-004	check	.github: cd commons/grc && bun run verify	suite/query.test.ts
+0015-grc-query FR-005	check	.github: cd commons/grc && bun run verify	suite/query.test.ts
