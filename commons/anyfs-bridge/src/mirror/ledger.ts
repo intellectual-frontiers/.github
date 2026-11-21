@@ -15,6 +15,7 @@
 import { array, err, object, ok, type Result, string, tuple } from "@intellectual-frontiers/core";
 import { byId, collection, type Collection, defineSchema, describeDocProblem, type DocId, jsonTree, parseExtension, versioned } from "@intellectual-frontiers/anyfs/docs";
 import { comparePaths, expectAny, type Path, parsePath, type Prefix } from "@intellectual-frontiers/anyfs/governance";
+import type { Change } from "@intellectual-frontiers/anyfs/logical";
 import type { Dest, Ledger } from "@intellectual-frontiers/anyfs-bridge/logical";
 
 /** The document of a ledger: the replica it is of and, for each path, the SHA-256 in hex of the bytes the replica was last brought to. */
@@ -44,6 +45,8 @@ export type LedgerBook = {
   /** The ledger of a replica: an empty one where there is none, and a problem where one is there and cannot be read. */
   load(replica: DocId): Promise<Result<Ledger, LedgerProblem>>;
   save(replica: DocId, ledger: Ledger): Promise<Result<void, LedgerProblem>>;
+  /** Saves several ledgers: as one batch where the primary has one (one commit of a branch, not one for each), else one after the other. */
+  saveMany(entries: readonly { readonly replica: DocId; readonly ledger: Ledger }[]): Promise<Result<void, LedgerProblem>>;
   /** Takes the ledger of a replica away, where it can be; what cannot be taken away is left. */
   remove(replica: DocId): Promise<void>;
 };
@@ -58,8 +61,10 @@ export function ledgerBook(primary: Dest, prefix: Prefix): Result<LedgerBook, st
   const extension = parseExtension(".json");
   if (extension.kind === "err") return extension;
   if (schema.kind === "err") return schema;
-  const docs: Collection<LedgerDoc, DocId, "read" | "write" | "list" | "stat" | "delete"> = collection(primary, { prefix, layout: byId(extension.value), codec: versioned(jsonTree, schema.value) });
-  return ok({
+  const codec = versioned(jsonTree, schema.value);
+  const layout = byId(extension.value);
+  const docs: Collection<LedgerDoc, DocId, "read" | "write" | "list" | "stat" | "delete"> = collection(primary, { prefix, layout, codec });
+  const book: LedgerBook = {
     async load(replica) {
       const got = await docs.get(replica);
       if (got.kind === "err") return got.error.kind === "store" && got.error.problem.kind === "missing" ? ok({ applied: new Map<Path, string>() }) : err({ kind: "unreadable", replica, detail: describeDocProblem(got.error) });
@@ -70,8 +75,29 @@ export function ledgerBook(primary: Dest, prefix: Prefix): Result<LedgerBook, st
       const put = await docs.put(replica, ledgerDoc(replica, ledger), expectAny);
       return put.kind === "ok" ? ok(undefined) : err({ kind: "unwritable", replica, detail: describeDocProblem(put.error) });
     },
+    async saveMany(entries) {
+      if (entries.length === 0) return ok(undefined);
+      if (!primary.capabilities.has("batch")) {
+        for (const e of entries) {
+          const one = await book.save(e.replica, e.ledger);
+          if (one.kind === "err") return one;
+        }
+        return ok(undefined);
+      }
+      const changes: Change[] = [];
+      for (const e of entries) {
+        const at = docs.pathOf(e.replica);
+        if (at.kind === "err") return err({ kind: "unwritable", replica: e.replica, detail: describeDocProblem(at.error) });
+        const body = codec.encode(ledgerDoc(e.replica, e.ledger));
+        if (body.kind === "err") return err({ kind: "unwritable", replica: e.replica, detail: body.error.detail });
+        changes.push({ kind: "put", path: at.value, bytes: body.value, expect: expectAny });
+      }
+      const done = await primary.handle({ op: "batch", changes });
+      return done.kind === "ok" ? ok(undefined) : err({ kind: "unwritable", replica: entries[0]?.replica ?? "", detail: `${done.error.kind}` });
+    },
     async remove(replica) {
       await docs.delete(replica, expectAny);
     },
-  });
+  };
+  return ok(book);
 }

@@ -6,6 +6,8 @@
       "name": "@intellectual-frontiers/anyfs-ssh",
       "devDependencies": {
         "@intellectual-frontiers/anyfs": "link:../anyfs",
+        "@intellectual-frontiers/anyfs-bridge": "link:../anyfs-bridge",
+        "@intellectual-frontiers/anyfs-git": "link:../anyfs-git",
         "@intellectual-frontiers/core": "link:../core",
         "@intellectual-frontiers/crypto": "link:../crypto",
         "@intellectual-frontiers/headless": "link:../headless",
@@ -22,6 +24,10 @@
   },
   "packages": {
     "@intellectual-frontiers/anyfs": ["@intellectual-frontiers/anyfs@link:../anyfs", {}],
+
+    "@intellectual-frontiers/anyfs-bridge": ["@intellectual-frontiers/anyfs-bridge@link:../anyfs-bridge", {}],
+
+    "@intellectual-frontiers/anyfs-git": ["@intellectual-frontiers/anyfs-git@link:../anyfs-git", {}],
 
     "@intellectual-frontiers/core": ["@intellectual-frontiers/core@link:../core", {}],
 

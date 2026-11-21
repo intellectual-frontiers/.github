@@ -201,19 +201,21 @@ export async function openMirror<C extends Capability>(primary: Member<Store<C>>
     const before = done.value.before;
     if (failed === 0) slot.pending.clear();
     const state: ReplicaState = before.kind === "diverged" ? { kind: "diverged", paths: before.paths, pending: failed } : failed > 0 ? { kind: "behind", pending: failed } : { kind: "in-sync" };
-    const saved = await ledgers.save(slot.name, slot.ledger);
     emit({ kind: "converged", replica: slot.name, applied, failed });
     if (state.kind === "diverged") emit({ kind: "diverged", replica: slot.name, paths: state.paths });
     if (state.kind === "behind") emit({ kind: "behind", replica: slot.name, pending: state.pending, reachable: true });
-    return { replica: slot.name, state, reachable: true, applied, failed, ledger: saved.kind === "ok" ? "saved" : saved.error };
+    return { replica: slot.name, state, reachable: true, applied, failed, ledger: "saved" };
   };
 
   const settleAll = async (only?: ReplicaName): Promise<Result<readonly Settled[], MirrorProblem>> => {
     const chosen = only === undefined ? slots : slots.filter((s) => s.name === only);
     if (only !== undefined && chosen.length === 0) return err({ kind: "unknown-replica", name: only });
-    const out: Settled[] = [];
-    for (const slot of chosen) out.push(await settleOne(slot));
-    return ok(out);
+    const done: Settled[] = [];
+    for (const slot of chosen) done.push(await settleOne(slot));
+    // the ledgers of the replicas that were reached are written together, so that a primary that is a branch makes one commit of them
+    const reached = done.filter((d) => d.reachable);
+    const saved = await ledgers.saveMany(chosen.filter((c) => reached.some((d) => d.replica === c.name)).map((c) => ({ replica: c.name, ledger: c.ledger })));
+    return ok(saved.kind === "ok" ? done : done.map((d) => (d.reachable ? { ...d, ledger: saved.error } : d)));
   };
 
   const schedule = (): void => {
@@ -361,10 +363,8 @@ export async function openMirror<C extends Capability>(primary: Member<Store<C>>
           other.pending.clear();
         }
         const problems: LedgerProblem[] = [];
-        for (const s of slots) {
-          const saved = await ledgers.save(s.name, s.ledger);
-          if (saved.kind === "err") problems.push(saved.error);
-        }
+        const saved = await ledgers.saveMany(slots.map((s) => ({ replica: s.name, ledger: s.ledger })));
+        if (saved.kind === "err") problems.push(saved.error);
         for (const n of formerNames) await oldBook.remove(n);
         emit({ kind: "promoted", from: old.name, to: slot.name, lost: done.value.lost });
         return ok({ from: old.name, to: slot.name, lost: done.value.lost, ledgers: problems.length === 0 ? ("saved" as const) : problems });

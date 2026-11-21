@@ -18,11 +18,9 @@
  */
 import { assertEquals, proves } from "@intellectual-frontiers/test";
 import { runConformance } from "@intellectual-frontiers/anyfs/conformance";
-import { sshExecutor } from "@intellectual-frontiers/headless/targets/ssh";
-import { target } from "@intellectual-frontiers/headless/logical";
 import { proc } from "@intellectual-frontiers/system";
 import { openSshStore } from "../src/mod.ts";
-import { ENV_PREFIX, type SshdHost, withSshd } from "../tools/sshd-test.ts";
+import { ENV_PREFIX, executorOf, placeOf, type SshdHost, withSshd } from "../tools/sshd-test.ts";
 
 const env = (name: string): string | undefined => proc.env.get(`${ENV_PREFIX}${name}`);
 
@@ -38,18 +36,11 @@ function named(): SshdHost | undefined {
 }
 
 async function conformance(host: SshdHost): Promise<readonly string[]> {
-  const t = target({ id: "fleet-test", class: "server", address: host.address, ...(host.user === "" ? {} : { user: host.user }), port: host.port, credential: "test-key" });
-  if (t.kind === "err") throw new Error(t.error);
-  const executor = sshExecutor(t.value, [t.value], {
-    knownHostsRepository: host.knownHosts,
-    knownHostsUser: host.knownHosts,
-    identityFor: (name) => (name === "test-key" ? host.key : undefined),
-    ...(host.controlDir === "" ? {} : { controlDir: host.controlDir }),
-  });
+  const executor = executorOf(host);
   let n = 0;
   const reports = await runConformance(async () => {
     n += 1;
-    const opened = await openSshStore(executor, { place: { host: host.address, ...(host.user === "" ? {} : { user: host.user }), port: host.port }, root: `${host.root}/run-${Date.now()}-${n}`, create: true });
+    const opened = await openSshStore(executor, { place: placeOf(host), root: `${host.root}/run-${Date.now()}-${n}`, create: true });
     if (opened.kind === "err") throw new Error(opened.error);
     return opened.value.store;
   });

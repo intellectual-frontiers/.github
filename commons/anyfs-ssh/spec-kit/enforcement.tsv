@@ -33,3 +33,7 @@ requirement	mechanism	by	note
 0004-anyfs-ssh-sshd-test FR-005	check	.github: cd commons/anyfs-ssh && bun run verify	suite/sshd-tool.test.ts: the requirement
 0004-anyfs-ssh-sshd-test FR-006	check	.github: cd commons/anyfs-ssh && bun run verify	suite/sshd-tool.test.ts: the requirement
 0004-anyfs-ssh-sshd-test FR-007	check	.github: cd commons/anyfs-ssh && bun run verify	suite/sshd.test.ts: the requirement
+0005-anyfs-ssh-mirror FR-001	check	.github: cd commons/anyfs-ssh && bun run verify	suite/mirror.test.ts: the requirement
+0005-anyfs-ssh-mirror FR-002	check	.github: cd commons/anyfs-ssh && bun run verify	suite/mirror.test.ts: the requirement
+0005-anyfs-ssh-mirror FR-003	check	.github: cd commons/anyfs-ssh && bun run verify	suite/mirror.test.ts: the requirement
+0005-anyfs-ssh-mirror FR-004	check	.github: cd commons/anyfs-ssh && bun run verify	suite/mirror.test.ts: the requirement

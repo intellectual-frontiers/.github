@@ -21,6 +21,8 @@
 import net from "node:net";
 import os from "node:os";
 import process from "node:process";
+import { sshExecutor } from "@intellectual-frontiers/headless/targets/ssh";
+import { type Executor, target } from "@intellectual-frontiers/headless/logical";
 import { fs, path, proc } from "@intellectual-frontiers/system";
 
 /** The prefix of the variables that name the server to the tests. */
@@ -70,6 +72,23 @@ export function envOf(host: SshdHost): Readonly<Record<string, string>> {
     [`${ENV_PREFIX}ROOT`]: host.root,
     [`${ENV_PREFIX}CONTROL_DIR`]: host.controlDir,
   };
+}
+
+/** The executor that reaches the server by the real client, with the calls of a run sharing one connection (where the host names a folder for them). */
+export function executorOf(host: SshdHost): Executor {
+  const t = target({ id: "fleet-test", class: "server", address: host.address, ...(host.user === "" ? {} : { user: host.user }), port: host.port, credential: "test-key" });
+  if (t.kind === "err") throw new Error(t.error);
+  return sshExecutor(t.value, [t.value], {
+    knownHostsRepository: host.knownHosts,
+    knownHostsUser: host.knownHosts,
+    identityFor: (name) => (name === "test-key" ? host.key : undefined),
+    ...(host.controlDir === "" ? {} : { controlDir: host.controlDir }),
+  });
+}
+
+/** The place of the server, as the store names it. */
+export function placeOf(host: SshdHost): { readonly host: string; readonly user?: string; readonly port: number } {
+  return { host: host.address, ...(host.user === "" ? {} : { user: host.user }), port: host.port };
 }
 
 /** The line of known hosts for a server: its host key, for the address and port, and nothing else. */

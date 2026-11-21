@@ -261,3 +261,20 @@ proves(["0005-anyfs-conformance FR-006", "0003-anyfs-logical FR-003"], "the stor
   void err;
   void unavailable;
 });
+
+proves(["0005-anyfs-conformance FR-003"], "the memory store keeps a write that is made while a batch is being prepared: the batch is applied to the state as it is when the batch is committed", async () => {
+  const store = memoryStore({ name: "race" });
+  const at = (text: string): Path => {
+    const r = parsePath(text);
+    if (r.kind === "err") throw new Error(r.error);
+    return r.value;
+  };
+  const big = new Uint8Array(1 << 20).fill(7);
+  const batching = store.batch([{ kind: "put", path: at("batch/a"), bytes: big, expect: expectAny }]);
+  const writing = Promise.all(Array.from({ length: 20 }, (_, i) => store.write(at(`w/${i}`), new TextEncoder().encode(String(i)), expectAny)));
+  const [batched] = await Promise.all([batching, writing]);
+  assert(batched.kind === "ok");
+  const listed = await store.list(ROOT);
+  assert(listed.kind === "ok");
+  assertEquals(listed.value.entries.length, 21, "no write was lost by the batch");
+});
