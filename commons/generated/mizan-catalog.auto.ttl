@@ -110,7 +110,7 @@
     dcat:version "1.0.0" .
 
 <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-planning> a dcat:Dataset ;
-    dcterms:description "The vocabulary of Planning: the seven kinds of planning item, the events that make their history and the states folded from them, the actors, the observations of what a source saw and where, the traces and links between items, the patches that write a change back and their previews, the sources that read and write, and the closed code lists the model branches on."@en ;
+    dcterms:description "The vocabulary of Planning: the four kinds of planning item, the events that make their history and the states folded from them, the actors, the observations of what a source saw and where, the traces and links between items, the patches that write a change back and their previews, the sources that read and write, and the closed code lists the model branches on."@en ;
     dcterms:identifier "https://www.intellectualfrontiers.com/ontology/planning" ;
     dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
     dcterms:publisher <https://www.intellectualfrontiers.com/> ;

@@ -283,6 +283,7 @@ export const PLANNING: OntologyPublication = {
     ["ActorKind", planningOntology.actorKinds],
     ["LocatorKind", planningOntology.locatorKinds],
     ["EventType", planningOntology.eventTypes],
+    ["PrincipalBasis", planningOntology.principalBases],
   ]),
   source: "commons/ontology/src/planning/*.ts",
   run: RUN,

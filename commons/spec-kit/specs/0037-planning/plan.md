@@ -1,6 +1,6 @@
 # Implementation Plan: Planning
 
-**Spec:** 0037-planning (Draft; the name and the prefix are confirmed, the custom types of OQ-9 are not). **Written:** 2026-11-21. No code is written by this plan: it is the order in which the library is built once the owner has answered OQ-9, and how each requirement is proved. The inventory it generalizes is `inventory.md`; the first version covers its entries 1 to 14, and the records of 15 to 22 are the later phase.
+**Spec:** 0037-planning (Draft; the name, the prefix and the custom types of OQ-9 are confirmed by the owner). **Written:** 2026-11-21. It is the order in which the library is built and how each requirement is proved. The inventory it generalizes is `inventory.md`; the first version covers its entries 1 to 14, and the records of 15 to 22 are the later phase.
 
 ## Standards considered
 
@@ -27,7 +27,7 @@ Planning reuses and does not make again: the hybrid clock and the version id of 
 
 ## The order
 
-1. Confirm OQ-9 with the owner; scaffold the libraries.
+1. Scaffold the libraries.
 2. The core algebra and `fold`.
 3. The ids and the clock; the event store.
 4. `reconcile` and the three-way merge.
@@ -45,7 +45,7 @@ Size is in working sessions of one agent with the owner reviewing at its end.
 
 | Phase | Deliverables | Exit criteria | Size |
 | --- | --- | --- | --- |
-| 0. Confirm and scaffold | The owner's answers to OQ-9 written into the spec and the ontology (a cut type is removed in the same change); `repoctl new library planning` and the plugin folders; the spec kit of the library (`planning/spec-kit`: layers, algebra, sources, surfaces) with its enforcement register; `docs.config.ts` entry | `repoctl sync`, `repoctl check`, the Mizan check and the ontology generation green with no code; the ontology audit says every kept class has its basis | 0.5 |
+| 0. Scaffold | `repoctl new library planning` and the plugin folders; the spec kit of the library (`planning/spec-kit`: layers, algebra, sources, surfaces) with its enforcement register; `docs.config.ts` entry | `repoctl sync`, `repoctl check`, the Mizan check and the ontology generation green with no code; the ontology audit says every kept class has its basis | 0.5 |
 | 1. Core algebra and `fold` | The kinds, events, states, severities, verdicts, link kinds, capabilities, actors with principal, branded ids, the closed unions with an exhaustive `switch`; `fold` with the order by id; the refusal of an agent with no principal and of a person naming an agent; the cycle check of `blocks` | Property tests: `fold` is the same for any order and any repeat of the events (FR-004); the actor laws (FR-005); proposals are not counted (FR-006); a cycle is refused with its items (FR-009); the typing test finds no `any`, `!`, `enum` or cast but `brand` | 2 |
 | 2. Ids, the clock and the store | The ids of FR-007 over the AnyFS clock; the legacy id function of FR-044; the encoding of events as JSON5 files (one file for each event; one for each item in the edition); the decoder that is total | Properties: two replicas' stores merge by union in any order with the same `fold`; the next id after a merge is after every id taken; a far-future id is refused; the same ULID gives the same id on any machine and its order is the ULID's; encode then decode is the identity and the key order is that of RFC 8785 | 1.5 |
 | 3. `reconcile` and the merge | `reconcile` (the match order of FR-016), the baseline classes of FR-017, the derived close and reopening (FR-018), the conflict value, the duplicate proposals (FR-019), the outbox (FR-033), the patch and the preview with their hash (FR-010, FR-011, FR-014) | Properties over generated places and stores: a read of an unchanged place gives no event; each disagreement is an event or a conflict, never a silent choice; a person's event beats a derived close; the same inputs give the same proposals in the same order; a preview that differs from the plan is refused | 2 |
@@ -122,7 +122,6 @@ Documentation: the TSDoc of each module, `about.ts` for the layers, the spec kit
 
 ## Risks and open items
 
-- **OQ-9** is the gate: no code before the owner has confirmed or cut each custom type; a cut type is removed from the spec, the ontology and its test in one change.
 - **The principal in the monorepo's schema** (OQ-10): until it has a field, an agent's event cannot be written there with its principal, so the event-file source is read-only for agent events or a person's; the existing events of an agent written as a person are read by the explicit rule of FR-044.
 - **Fold order for legacy ids** where two events of one second hold ids of two forms: a documented difference that a property test against the real fold reports; the owner decides whether it matters.
 - **The Git host contract** holds no close reason, assignee or comment and has no write for an issue: the host source is read-only until `githost` is extended, which is its own specification.
@@ -131,4 +130,4 @@ Documentation: the TSDoc of each module, `about.ts` for the layers, the spec kit
 - **The names** of the plugins (OQ-8) and the markers (OQ-11) move together if the owner changes them.
 - **Scale**: one file for each event gives many small files for a large history; the published edition holds one file for each item, and the store is read through AnyFS's listing: measured in phase 2 with a store of ten thousand events before the layout is frozen.
 - **Overlap** (OQ-6): who owns what is the owner's; Planning reads data 0044 and 0045 and the notes scan of Docs and does not replace them, and the first version changes none of them.
-- **The later phase** (sources of the Quality System, pen test findings, SARIF files and tests) has hooks only: the kind `plan:Finding`, the locator of a file span or a row, the observation's fingerprint and the reserved names of FR-031; nothing more is designed until the library has been used.
+- **The later phase** (sources of the Quality System, pen test findings, SARIF files and tests) has hooks only: the kind `plan:Finding`, the locator of a file span, the observation's fingerprint and the reserved names of FR-031; nothing more is designed until the library has been used.

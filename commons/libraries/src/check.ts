@@ -213,6 +213,7 @@ export function main(
                   planningOntology.actorKinds,
                   planningOntology.locatorKinds,
                   planningOntology.eventTypes,
+                  planningOntology.principalBases,
                 ].flatMap((l) => Object.keys(l)),
               ]),
               ifr: ifrOntology.termNames,
