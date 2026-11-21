@@ -3,3 +3,5 @@ number	slug	state
 0002	estate-governance	in force
 0003	estate-logical	in force
 0004	estate-capture	in force
+0005	estate-fleet-documents	in force
+0006	estate-fleet-store	in force

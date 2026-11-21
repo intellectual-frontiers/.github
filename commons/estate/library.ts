@@ -13,10 +13,10 @@ export const library = {
   version: "0.1.0",
   distribution: ["github"],
   held: "built and verified but not released: the owner publishes the libraries of the fleet work together, when the first fleet runs on them",
-  exports: [".", "./governance", "./logical"],
+  exports: [".", "./governance", "./logical", "./physical"],
   family: { host: "estate", role: "host" },
   summary:
-    "Estate in the layers of Kanon: the assets of an organization (machines, services, accounts) as discovered, adopted or managed, the capabilities each state offers with the reason for each it does not, what each is declared to be against what is observed of it, and which system owns each capability.",
+    "Estate in the layers of Kanon: the assets of an organization (machines, services, accounts) as discovered, adopted or managed, the capabilities each state offers with the reason for each it does not, what each is declared to be against what is observed of it, and which system owns each capability, and the fleet store that keeps all of it as typed documents in a store of AnyFS: a host reached by SSH is the system of record, with a Git branch, a bucket or a folder as mirrors.",
   kanon: {
     package: "@intellectual-frontiers/estate",
     units: [
@@ -27,6 +27,17 @@ export const library = {
         packages: [
           { name: "@intellectual-frontiers/core", subpaths: [] },
           { name: "@intellectual-frontiers/grc", subpaths: ["governance", "logical"] },
+        ],
+      },
+      {
+        folder: "src/physical/",
+        layer: "physical",
+        mayImport: ["src/governance/", "src/logical/"],
+        packages: [
+          { name: "@intellectual-frontiers/core", subpaths: [] },
+          { name: "@intellectual-frontiers/grc", subpaths: ["governance", "logical"] },
+          { name: "@intellectual-frontiers/anyfs", subpaths: ["governance", "logical", "docs", "memory", "local"] },
+          { name: "@intellectual-frontiers/anyfs-bridge", subpaths: ["governance", "mirror"] },
         ],
       },
       { folder: "src/", own: true },

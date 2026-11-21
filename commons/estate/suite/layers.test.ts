@@ -18,6 +18,7 @@ const EXPORTS: Record<string, string> = {
   ".": "./src/mod.ts",
   "./governance": "./src/governance/mod.ts",
   "./logical": "./src/logical/mod.ts",
+  "./physical": "./src/physical/mod.ts",
 };
 const PKG = "@intellectual-frontiers/estate";
 const at = (path: string, text: string) => ({ path, text });
