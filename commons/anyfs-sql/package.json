@@ -38,7 +38,9 @@
     "@intellectual-frontiers/system": "link:../system",
     "@intellectual-frontiers/test": "link:../test",
     "@types/node": "26.6.6",
+    "@types/pg": "8.11.10",
     "fast-check": "4.10.2",
+    "pg": "8.13.1",
     "typescript": "7.0.2"
   }
 }

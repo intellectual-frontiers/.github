@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/quality",
   "private": true,
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "The quality system of Intellectual Frontiers: the run of a suite of tests as evidence (the record, its reports and its ledger entry), the canonical record of a run and its renderings (JUnit, CTRF, SARIF, TAP, the documents of ISO/IEC/IEEE 29119-3), the append-only quality branch with its notes, the evidence ladder, freshness, nonconformances and CAPA, objectives, the tiers, and the Trust page and the signed assessor pack made from the evidence; the same code on Bun and Node 26.",
   "type": "module",
   "engines": {

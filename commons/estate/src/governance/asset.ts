@@ -14,6 +14,7 @@
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { CAPABILITIES, parseAssetId, parseAssetKind, parseSystemId, ORIGINS, type AssetId, type AssetKind, type AssetState, type Capability, type Install, type Origin, type SystemId } from "./ids.ts";
+import { checkAttributes, type AttributeValue } from "./kinds.ts";
 import { offers, reasonNotOffered } from "./states.ts";
 
 /** What `defineAsset` takes. */
@@ -25,6 +26,8 @@ export type AssetInput = {
   readonly origin?: Origin;
   /** For each capability the state offers, the system that owns it. */
   readonly owners: Readonly<Partial<Record<Capability, string>>>;
+  /** The attributes of the asset, checked against the catalog of its kind where the kind has one (`kinds.ts`). */
+  readonly attributes?: Readonly<Record<string, AttributeValue>>;
 };
 
 /** One capability of an asset: offered and owned, or not offered with the reason. */
@@ -39,6 +42,8 @@ export type Asset = {
   readonly state: AssetState;
   /** Where it came from, where that is known. */
   readonly origin?: Origin;
+  /** The attributes it states, checked against the catalog of its kind. */
+  readonly attributes?: Readonly<Record<string, AttributeValue>>;
   /** Every capability, in the order of the closed list. */
   readonly capabilities: readonly CapabilityLine[];
 };
@@ -61,6 +66,7 @@ export function defineAsset(input: AssetInput): Result<Asset, readonly string[]>
   if (id.kind === "err") problems.push(id.error);
   const kind = parseAssetKind(input.kind);
   if (kind.kind === "err") problems.push(kind.error);
+  for (const m of checkAttributes(input.kind, input.attributes)) problems.push(`${input.id}: ${m}`);
   const lines: CapabilityLine[] = [];
   const origin: Origin | undefined = input.origin ?? (input.state === "managed" ? "provisioned" : undefined);
   if (origin !== undefined && !ORIGINS.includes(origin)) problems.push(`${input.id}: ${JSON.stringify(origin)} is not an origin (${ORIGINS.join(", ")})`);
@@ -80,5 +86,5 @@ export function defineAsset(input: AssetInput): Result<Asset, readonly string[]>
     if (system.kind === "err") problems.push(`${input.id}: ${system.error}`);
     else lines.push({ capability, offered: true, owner: system.value });
   }
-  return problems.length > 0 || id.kind === "err" || kind.kind === "err" ? err(problems) : ok({ id: id.value, kind: kind.value, state: input.state, ...(origin === undefined ? {} : { origin }), capabilities: lines });
+  return problems.length > 0 || id.kind === "err" || kind.kind === "err" ? err(problems) : ok({ id: id.value, kind: kind.value, state: input.state, ...(origin === undefined ? {} : { origin }), ...(input.attributes === undefined ? {} : { attributes: input.attributes }), capabilities: lines });
 }

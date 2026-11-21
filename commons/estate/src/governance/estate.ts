@@ -17,6 +17,7 @@
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { defineAsset, type Asset, type AssetInput } from "./asset.ts";
+import { checkLink } from "./kinds.ts";
 
 /** The input for an asset, whose identity is its key. */
 export type AssetSpec = Omit<AssetInput, "id">;
@@ -52,6 +53,8 @@ export function defineEstate<const A extends Readonly<Record<string, AssetSpec>>
     if (!keys.includes(l.from)) problems.push(`a link starts at ${l.from}, which is no asset`);
     if (!keys.includes(l.to)) problems.push(`a link ends at ${l.to}, which is no asset`);
     if (l.from === l.to) problems.push(`${l.from} is linked to itself`);
+    const [a, b] = [made[l.from], made[l.to]];
+    if (a !== undefined && b !== undefined) for (const m of checkLink(l.kind, a.kind, b.kind)) problems.push(`${l.from} to ${l.to}: ${m}`);
   }
   return problems.length > 0 ? err(problems) : ok({ assets: made as { readonly [P in K]: Asset }, links, ids: keys });
 }

@@ -3,3 +3,4 @@ number	slug	state
 0002	anyfs-cli-governance	in force
 0003	anyfs-cli-logical	in force
 0004	anyfs-cli-surfaces	in force
+0005	anyfs-cli-merge-signing	in force

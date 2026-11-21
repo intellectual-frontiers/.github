@@ -8,6 +8,7 @@
         "@intellectual-frontiers/core": "link:../core",
         "@intellectual-frontiers/crypto": "link:../crypto",
         "@intellectual-frontiers/formats": "link:../formats",
+        "@intellectual-frontiers/lang-sql": "link:../lang-sql",
         "@intellectual-frontiers/libraries": "link:../libraries",
         "@intellectual-frontiers/mizan": "link:../mizan",
         "@intellectual-frontiers/ontology": "link:../ontology",
@@ -27,6 +28,8 @@
     "@intellectual-frontiers/crypto": ["@intellectual-frontiers/crypto@link:../crypto", {}],
 
     "@intellectual-frontiers/formats": ["@intellectual-frontiers/formats@link:../formats", {}],
+
+    "@intellectual-frontiers/lang-sql": ["@intellectual-frontiers/lang-sql@link:../lang-sql", {}],
 
     "@intellectual-frontiers/libraries": ["@intellectual-frontiers/libraries@link:../libraries", {}],
 

@@ -19,6 +19,7 @@
 ## Catalogs from tables
 
 - **FR-007**: `catalogFromTables(tables, types?)` MUST make a catalog of the tables from a list of tables with the columns' names and the types of their own system (`{ name, columns: [{ name, type }] }`) and a map from those types to the types of a catalog (a type not in the map is `unknown`, and a map need not be given for the types of a catalog), so that a library whose schema is data makes its catalog in one call.
+- **FR-008**: The guard MUST allow a query that uses set operations, window functions, any join, `NULLS FIRST` and `LAST`, `FETCH FIRST` and a recursive common table expression where nothing in it writes, and MUST still refuse the same query where a data change stands in it (a `WITH` that holds an `INSERT`, `UPDATE` or `DELETE`, a `SELECT ... INTO` in a side of a set operation).
 
 ## Out of scope
 

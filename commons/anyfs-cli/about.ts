@@ -1,7 +1,7 @@
 // Spec: 0001-anyfs-cli-layers FR-001
 /**
  * The typed facts of the AnyFS command line, an independent library of commons (commons 0027-commons-libraries) and a plugin of the family of AnyFS: the `anyfs` program. Its specification is its own spec kit
- * (`spec-kit/`, `0001-anyfs-cli-layers` to `0004-anyfs-cli-surfaces`); this repository knows it as one requirement of 0027-commons-libraries, proved by `bun run verify` in this folder.
+ * (`spec-kit/`, `0001-anyfs-cli-layers` to `0005-anyfs-cli-merge-signing`); this repository knows it as one requirement of 0027-commons-libraries, proved by `bun run verify` in this folder.
  *
  * @module
  */
@@ -11,7 +11,7 @@ import type { About } from "@intellectual-frontiers/core/about";
 export const about: About = {
   title: "AnyFS command line",
   summary:
-    "The `anyfs` program: POSIX-style access to any AnyFS store (ls, cat, cp, rm, find, grep, diff) and the bridge verbs (sync, bisync, mirror, check, merge, sync-medium) from the command line, a tool server and a REST description, with every operation saying how it was carried out and every destruction a plan first.",
+    "The `anyfs` program: POSIX-style access to any AnyFS store (ls, cat, cp, rm, find, grep, diff) and the bridge verbs (sync, bisync, mirror, check, merge, sync-medium) from the command line, a tool server and a REST description, with every operation saying how it was carried out and every destruction a plan first. `merge` and `sync-medium` take `--trust open|allowlist|signed` with a roster of keys and the keys to sign with, named by a file or by an environment variable and never by their text, or the same said by a mount.",
   folders: [
     { path: "spec-kit/", what: "The library's own specifications, numbered from 0001.", mayImport: ["nothing: Markdown and TSV"] },
     { path: "src/governance/", what: "Layer 1: the facts of the verbs, the tiers, the problem codes, and the grammar of a place on a command line.", mayImport: ["the kernel and the governance of AnyFS and Headless, by package name"] },

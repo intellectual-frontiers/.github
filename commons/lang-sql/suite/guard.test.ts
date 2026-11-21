@@ -151,3 +151,20 @@ proves(["0012-sql-guard FR-005"], "a common table expression's own name is not a
   assert(why("WITH asset AS (SELECT id FROM users) SELECT id FROM asset", postgres, o) !== undefined, "a name does not hide the table its own body reads");
   assert(why("SELECT id FROM t", postgres, o) !== undefined, "outside the WITH it is a table");
 });
+
+proves(["0012-sql-guard FR-008"], "set operations, window functions, joins, NULLS, FETCH and recursive CTEs are allowed where nothing writes, and refused where a data change or a SELECT INTO stands in them", () => {
+  for (const q of [
+    "SELECT a FROM t UNION ALL SELECT a FROM u INTERSECT SELECT a FROM v EXCEPT SELECT a FROM w",
+    "SELECT a, rank() OVER (PARTITION BY b ORDER BY c DESC NULLS LAST ROWS BETWEEN 1 PRECEDING AND CURRENT ROW) FROM t",
+    "SELECT * FROM t RIGHT JOIN u USING (a) FULL OUTER JOIN v ON v.a = t.a NATURAL JOIN w",
+    "SELECT a FROM t ORDER BY a NULLS FIRST OFFSET 1 ROWS FETCH FIRST 2 ROWS ONLY",
+    "WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n + 1 FROM r WHERE n < 3) SELECT n FROM r",
+  ]) assert(allowed(q, postgres), q);
+  for (const q of [
+    "WITH d AS (DELETE FROM t RETURNING a) SELECT a FROM d",
+    "WITH RECURSIVE r(n) AS (INSERT INTO t VALUES (1) RETURNING a) SELECT n FROM r",
+    "SELECT a INTO copy FROM t UNION ALL SELECT a FROM u",
+    "SELECT a FROM t UNION ALL SELECT a INTO copy FROM u",
+    "SELECT a FROM t UNION ALL SELECT a FROM u FOR UPDATE",
+  ]) assert(!allowed(q, postgres), q);
+});

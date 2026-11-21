@@ -135,8 +135,12 @@ export async function withTemp<T>(use: (dir: string) => Promise<T>): Promise<T> 
 
 export { osPath };
 
-/** The engines a store that merges is tried on: SQLite, the real engine of the runtime. The layouts of PostgreSQL and DuckDB are refused with a sentence until they are made. */
-export const ENGINES: readonly { readonly name: string; readonly make: () => Promise<SqlPort>; readonly search: boolean }[] = [{ name: "sqlite", make: sqliteMemory, search: true }];
+/** The engines a store that merges is tried on, each the real engine: SQLite of the runtime, PostgreSQL itself (PGlite) and DuckDB. Search is there where the engine has an index that keeps itself current. */
+export const ENGINES: readonly { readonly name: string; readonly make: () => Promise<SqlPort>; readonly search: boolean }[] = [
+  { name: "sqlite", make: sqliteMemory, search: true },
+  { name: "postgres", make: pgliteMemory, search: true },
+  { name: "duckdb", make: duckdbMemory, search: false },
+];
 
 /** A replica identity from a number: the same number is the same identity. */
 export const replicaOf = (n: number): ReplicaId => {
@@ -150,3 +154,23 @@ export const monotone = (start = 1_700_000_000_000): (() => number) => {
   let t = start;
   return () => (t += 1);
 };
+
+/** A database of a REAL PostgreSQL server reached by `pg`: the database is made, and its port closes the pool. */
+export async function realPostgres(server: { readonly host: string; readonly port: number; readonly user: string; createDatabase(name: string): Promise<{ readonly database: string }> }, name: string): Promise<SqlPort> {
+  const { Pool } = await import("pg");
+  const { database } = await server.createDatabase(name);
+  const pool = new Pool({ host: server.host, port: server.port, user: server.user, database, max: 4 });
+  // a connection the server ends while the pool is idle is the pool's to drop, never an error of the test
+  pool.on("error", () => undefined);
+  pools.add(pool);
+  return pgPort(pool as never);
+}
+
+const pools = new Set<{ end(): Promise<void> }>();
+
+/** Ends every pool the tests opened on a real server, before the server is stopped. */
+export async function closePools(): Promise<void> {
+  const open = [...pools];
+  pools.clear();
+  await Promise.all(open.map((pool) => pool.end().catch(() => undefined)));
+}

@@ -7,3 +7,4 @@ number	slug	state
 0006	bridge-mirrored	in force
 0007	bridge-exchange	in force
 0008	bridge-merge-mode	in force
+0009	bridge-merge-signing	in force

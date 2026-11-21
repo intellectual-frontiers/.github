@@ -20,3 +20,4 @@ requirement	mechanism	by	note
 0005-estate-query-live FR-003	check	.github: cd commons/estate-query && bun run verify	suite/live.test.ts
 0005-estate-query-live FR-004	check	.github: cd commons/estate-query && bun run verify	suite/live.test.ts
 0002-estate-query-relations FR-006	check	.github: cd commons/estate-query && bun run verify	suite/estate-query.test.ts
+0002-estate-query-relations FR-007	check	.github: cd commons/estate-query && bun run verify	suite/estate-query.test.ts

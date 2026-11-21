@@ -110,16 +110,16 @@ proves(["0008-sql-introspect FR-005"], "the query language has the clauses, oper
 proves(["0008-sql-introspect FR-006"], "what astsql does not have is an error value that names it", () => {
   const i = introspect("SELECT 1", postgres);
   for (const [sql, part] of [
-    ["SELECT 1 UNION SELECT 2", "set operations"],
-    ["VALUES (1)", "VALUES"],
-    ["WITH RECURSIVE r AS (SELECT 1) SELECT * FROM r", "recursive"],
-    ["SELECT row_number() OVER () FROM node", "row_number"],
+    ["SELECT DISTINCT ON (id) id FROM node", "that clause"],
+    ["SELECT sum(id) OVER (ORDER BY id GROUPS 1 PRECEDING) FROM node", "GROUPS"],
+    ["SELECT id FROM node WHERE row_number() OVER () = 1", "window function"],
+    ["SELECT 1 FROM node a CROSS JOIN LATERAL (SELECT 1) AS x", "LATERAL"],
     ["SELECT * FROM nowhere", "no relation nowhere"],
     ["SELECT nope()", "nope"],
     ["SELECT nocolumn FROM node", "no column nocolumn"],
     ["SELECT id FROM node a JOIN node b ON TRUE", "ambiguous"],
     ["SELECT count(*) FROM node WHERE count(*) > 1", "aggregate"],
-    ["SELECT 1 FROM node FULL JOIN node b ON TRUE", "full join"],
+    ["SELECT 1 FROM node a SEMI JOIN node b ON TRUE", "semi join"],
     ["SELECT ?", "no value"],
   ] as const) {
     const r = i.query(sql);

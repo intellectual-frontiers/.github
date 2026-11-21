@@ -20,7 +20,7 @@ import { posix } from "@intellectual-frontiers/anyfs-posix/physical";
 import type { Posix } from "@intellectual-frontiers/anyfs-posix/logical";
 import type { Prefix } from "@intellectual-frontiers/anyfs/governance";
 import { type Location, parseLocation, type ProblemCode } from "@intellectual-frontiers/anyfs-cli/governance";
-import { type Host, viewable } from "@intellectual-frontiers/anyfs-cli/logical";
+import { type Host, type MountTrustInput, viewable } from "@intellectual-frontiers/anyfs-cli/logical";
 
 /** A word of a command line, bound to the store it points into. */
 export type Bound = {
@@ -33,6 +33,8 @@ export type Bound = {
   /** The path inside the store, absolute and resolved. */
   readonly inner: PosixPath;
   readonly readOnly: boolean;
+  /** What the mount says of whom the store takes changes from and how it signs, where the word is a mount that says. */
+  readonly trust: MountTrustInput | undefined;
 };
 
 /** Why a word was not bound: the code, the sentence, and whether it is the command line's fault or the computer's. */
@@ -60,6 +62,7 @@ export async function bind(host: Host, text: string): Promise<Result<Bound, Bind
   let place: Place;
   let path: string;
   let readOnlyMount = false;
+  let trust: MountTrustInput | undefined;
   if (location.kind === "local") {
     const l = host.world.local(location.path);
     place = { kind: "file", path: l.root };
@@ -70,6 +73,7 @@ export async function bind(host: Host, text: string): Promise<Result<Bound, Bind
     place = mount.place;
     path = location.path;
     readOnlyMount = mount.readOnly;
+    trust = mount.trust;
   } else {
     place = location.place.kind === "file" ? { kind: "file", path: "/" } : location.place.kind === "ssh" ? { ...location.place, path: "/" } : location.place;
     path = location.path;
@@ -81,7 +85,7 @@ export async function bind(host: Host, text: string): Promise<Result<Bound, Bind
   if (readable === undefined) return err({ code: "E-OPEN", message: `${text}: the store ${store.id} cannot be read as files: it lacks read, list or stat`, fault: "environment" });
   const inner = parseAbsolute(path);
   if (inner.kind === "err") return err({ code: "E-LOCATION", message: `${text}: ${inner.error}`, fault: "usage" });
-  return ok({ text, location, store, view: posix(readable), inner: inner.value, readOnly: readOnlyMount || !store.capabilities.has("write") });
+  return ok({ text, location, store, view: posix(readable), inner: inner.value, readOnly: readOnlyMount || !store.capabilities.has("write"), trust });
 }
 
 /** The prefix of the store that a bound directory is, for a transfer. */

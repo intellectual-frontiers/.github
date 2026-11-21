@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/mizan",
   "private": true,
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Mizan as code: the rules a specification is held to as plugins of one harness, the levels of conformance, the integrations of standards, the change-control and release rules, and the trace of requirements to code and tests; the same code on Bun and Node 26.",
   "type": "module",
   "engines": {

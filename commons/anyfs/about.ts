@@ -1,7 +1,7 @@
 // Spec: 0001-anyfs-layers FR-001
 /**
  * The typed facts of AnyFS, an independent library of commons (commons 0027-commons-libraries): one interface to the places bytes live. Its specification is in its own spec kit (`spec-kit/`, `0001-anyfs-layers`
- * to `0006-anyfs-documents`); this repository knows it as one requirement of 0027-commons-libraries, proved by `bun run verify` in this folder.
+ * to `0010-anyfs-merge-signing`); this repository knows it as one requirement of 0027-commons-libraries, proved by `bun run verify` in this folder.
  *
  * @module
  */
@@ -11,7 +11,7 @@ import type { About } from "@intellectual-frontiers/core/about";
 export const about: About = {
   title: "AnyFS",
   summary:
-    "One typed interface to the places bytes live: a path is a normalized key, a place is a typed address, every read returns a revision and every write states what it expects, and the capabilities of a store are in its type, so that code which needs one cannot be handed a store without it.",
+    "One typed interface to the places bytes live: a path is a normalized key, a place is a typed address, every read returns a revision and every write states what it expects, and the capabilities of a store are in its type, so that code which needs one cannot be handed a store without it. A store may also merge by nature: its changes are immutable version rows with time-ordered ids, replicas exchange deltas, and a replica takes changes from an allowlist of replicas, from anyone, or only from deltas signed by a key of the replica that made them (Ed25519, a roster of keys with the windows they speak in).",
   folders: [
     { path: "spec-kit/", what: "The library's own specifications, numbered from 0001.", mayImport: ["nothing: Markdown and TSV"] },
     { path: "src/governance/", what: "Layer 1: paths, prefixes, revisions, expectations, capabilities, places and the problems a store reports.", mayImport: ["core, by package name"] },

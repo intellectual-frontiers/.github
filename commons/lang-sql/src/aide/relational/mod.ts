@@ -7,7 +7,7 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import { ansi, children, type Dialect, type Expr, type Node, parse, type Query, type Select, type SelectItem, type Source, declareDialect } from "../../mod.ts";
+import { ansi, children, type Dialect, type Expr, type FrameBound, type Node, type OrderItem, parse, type Query, type Select, type SelectItem, type SetOp, type Source, type WindowDef, type WindowSpec, declareDialect } from "../../mod.ts";
 
 /** A value of a relation. */
 export type Value = string | number | boolean | null;
@@ -52,7 +52,15 @@ interface Binding {
   readonly alias: string;
   readonly columns: readonly string[];
   readonly row: readonly Value[];
+  /** The columns (in lower case) that a `USING` or `NATURAL` join made one, which `*` and an unqualified name read from the join's own column instead (0010-aide FR-014). */
+  readonly hidden?: ReadonlySet<string>;
 }
+
+/** A binding with more of its columns hidden from `*` and from unqualified names. */
+const hiding = (b: Binding, columns: readonly string[]): Binding => ({ ...b, hidden: new Set([...(b.hidden ?? []), ...columns]) });
+
+/** Whether `*` and an unqualified name read the column at `i` of the binding. */
+const visible = (b: Binding, i: number): boolean => !(b.hidden ?? new Set<string>()).has(lc(b.columns[i] ?? ""));
 interface Env {
   readonly bindings: readonly Binding[];
   readonly outer: Env | undefined;
@@ -63,6 +71,8 @@ interface Context {
   readonly params: readonly Value[];
   readonly paramIndex: ReadonlyMap<Node, number>;
   readonly ctes: ReadonlyMap<string, Table>;
+  /** The values of the window functions of the select being run, by call and by the row they are for (0010-aide FR-013). */
+  readonly windowValues?: Map<Node, ReadonlyMap<Env, Value>>;
 }
 
 const AGGREGATES: ReadonlySet<string> = new Set(["count", "sum", "avg", "min", "max", "group_concat"]);
@@ -156,7 +166,7 @@ function lookup(env: Env, qualifier: string | undefined, name: string): Value {
     for (const b of e.bindings) {
       if (qualifier !== undefined && lc(b.alias) !== lc(qualifier)) continue;
       const i = b.columns.findIndex((c) => lc(c) === n);
-      if (i >= 0) {
+      if (i >= 0 && (qualifier !== undefined || visible(b, i))) {
         found = b.row[i] ?? null;
         count++;
       }
@@ -167,15 +177,24 @@ function lookup(env: Env, qualifier: string | undefined, name: string): Value {
   return fail(`no column ${qualifier === undefined ? "" : `${qualifier}.`}${name}`);
 }
 
+/** The key of the values a join compares: null where any is null (a null equals nothing), else the values as text with their types. */
+const rowKeyValue = (values: readonly Value[]): Value => (values.some((v) => v === null) ? null : values.map((v) => `${typeof v}:${String(v)}`).join("\u0001"));
+
 const isQuery = (n: Node): boolean => n.kind === "select" || n.kind === "set-op" || n.kind === "values" || n.kind === "with";
 
 function hasAggregate(n: Node): boolean {
-  if (n.kind === "call" && AGGREGATES.has(lc(n.name.parts[n.name.parts.length - 1]?.name ?? ""))) return true;
+  if (n.kind === "call" && n.over === undefined && AGGREGATES.has(lc(n.name.parts[n.name.parts.length - 1]?.name ?? ""))) return true;
   for (const c of children(n)) {
     if (isQuery(c)) continue;
     if (hasAggregate(c)) return true;
   }
   return false;
+}
+
+/** The window functions (calls with `OVER`) of an expression, not looking into a subquery. */
+function windowCallsOf(n: Node, out: Extract<Expr, { kind: "call" }>[]): void {
+  if (n.kind === "call" && n.over !== undefined) out.push(n);
+  for (const c of children(n)) if (!isQuery(c)) windowCallsOf(c, out);
 }
 
 function paramsOf(n: Node, out: Node[]): void {
@@ -358,33 +377,49 @@ function evalExpr(e: Expr, env: Env, ctx: Context, group: readonly Env[] | undef
   }
 }
 
+/** An aggregate of the values it is given (nulls already left out) and the number of rows it ranges over. */
+function reduce(name: string, distinct: boolean, values: readonly Value[], rows: number, star: boolean, separator: string): Value {
+  let v = values;
+  if (distinct) v = v.filter((x, i) => v.findIndex((w) => compare(x, w) === 0) === i);
+  switch (name) {
+    case "count":
+      return star ? rows : v.length;
+    case "sum":
+      return v.length === 0 ? null : v.reduce<number>((s, x) => s + (numberOf(x) ?? 0), 0);
+    case "avg":
+      return v.length === 0 ? null : v.reduce<number>((s, x) => s + (numberOf(x) ?? 0), 0) / v.length;
+    case "min":
+      return v.length === 0 ? null : v.reduce((m, x) => (compare(x, m) < 0 ? x : m));
+    case "max":
+      return v.length === 0 ? null : v.reduce((m, x) => (compare(x, m) > 0 ? x : m));
+    default:
+      return v.length === 0 ? null : v.map(String).join(separator);
+  }
+}
+
+const isPlainArg = (a: Extract<Expr, { kind: "call" }>["args"][number] | undefined): a is Expr => a !== undefined && a.kind !== "star" && a.kind !== "named-arg" && a.kind !== "keyword-arg";
+
+/** The separator of `group_concat(x, sep)`, a comma where none is given. */
+function separatorOf(e: Extract<Expr, { kind: "call" }>, env: Env, ctx: Context): string {
+  const a = e.args[1];
+  return isPlainArg(a) ? String(evalExpr(a, env, ctx, undefined)) : ",";
+}
+
 function callFunction(e: Extract<Expr, { kind: "call" }>, env: Env, ctx: Context, group: readonly Env[] | undefined): Value {
   const name = lc(e.name.parts[e.name.parts.length - 1]?.name ?? "");
+  if (e.over !== undefined) {
+    const values = ctx.windowValues?.get(e);
+    if (values === undefined) return fail("a window function stands only in the select list and the ORDER BY");
+    return values.get(env) ?? null;
+  }
   if (AGGREGATES.has(name)) {
     if (group === undefined) return fail(`${name} is an aggregate and stands only in a query that groups`);
+    const filter = e.filter;
+    const rows = filter === undefined ? group : group.filter((g) => truthy(evalExpr(filter, g, ctx, undefined)));
     const star = e.args[0]?.kind === "star";
     const arg = e.args[0];
-    if (arg !== undefined && arg.kind !== "star" && arg.kind !== "named-arg" && arg.kind !== "keyword-arg") {
-      let values = group.map((g) => evalExpr(arg, g, ctx, undefined)).filter((v) => v !== null);
-      if (e.distinct) values = values.filter((v, i) => values.findIndex((w) => compare(v, w) === 0) === i);
-      switch (name) {
-        case "count":
-          return values.length;
-        case "sum":
-          return values.length === 0 ? null : values.reduce<number>((s, v) => s + (numberOf(v) ?? 0), 0);
-        case "avg":
-          return values.length === 0 ? null : values.reduce<number>((s, v) => s + (numberOf(v) ?? 0), 0) / values.length;
-        case "min":
-          return values.length === 0 ? null : values.reduce((m, v) => (compare(v, m) < 0 ? v : m));
-        case "max":
-          return values.length === 0 ? null : values.reduce((m, v) => (compare(v, m) > 0 ? v : m));
-        default: {
-          const sep = e.args[1] === undefined || e.args[1].kind === "star" || e.args[1].kind === "named-arg" || e.args[1].kind === "keyword-arg" ? "," : String(evalExpr(e.args[1], env, ctx, undefined));
-          return values.length === 0 ? null : values.map(String).join(sep);
-        }
-      }
-    }
-    if (name === "count" && (star || e.args.length === 0)) return group.length;
+    if (isPlainArg(arg)) return reduce(name, e.distinct, rows.map((g) => evalExpr(arg, g, ctx, undefined)).filter((v) => v !== null), rows.length, false, name === "group_concat" ? separatorOf(e, env, ctx) : ",");
+    if (name === "count" && (star || e.args.length === 0)) return rows.length;
     return fail(`${name} takes an expression`);
   }
   const fn = ctx.functions.get(name) ?? BUILTIN.get(name);
@@ -416,29 +451,62 @@ function envsOf(src: Source, ctx: Context, outer: Env | undefined): { readonly e
       return { envs: t.rows.map((row) => pushScope(outer, { alias, columns: cols, row })), names: [empty] };
     }
     case "join": {
-      if (src.natural || src.using.length > 0) return fail("NATURAL and USING joins are not in astsql");
-      if (src.type !== "inner" && src.type !== "left" && src.type !== "cross") return fail(`a ${src.type} join is not in astsql`);
+      if (src.type !== "inner" && src.type !== "left" && src.type !== "right" && src.type !== "full" && src.type !== "cross") return fail(`a ${src.type} join is not in astsql`);
       const left = envsOf(src.left, ctx, outer);
       const right = envsOf(src.right, ctx, outer);
-      const names = [...left.names, ...right.names];
+      const type = src.type;
+      // the columns a USING list or a NATURAL join makes one (FR-014)
+      const columnsOf = (bs: readonly Binding[]): string[] => bs.flatMap((b) => b.columns.filter((_, k) => visible(b, k)));
+      const leftColumns = columnsOf(left.names);
+      const rightColumns = columnsOf(right.names);
+      let joined: readonly string[] = [];
+      if (src.natural) joined = leftColumns.filter((c, k) => leftColumns.findIndex((d) => lc(d) === lc(c)) === k && rightColumns.some((d) => lc(d) === lc(c)));
+      else if (src.using.length > 0) {
+        joined = src.using.map((u) => u.name);
+        for (const c of joined) {
+          if (!leftColumns.some((d) => lc(d) === lc(c))) return fail(`the column ${c} of USING is not in the left side`);
+          if (!rightColumns.some((d) => lc(d) === lc(c))) return fail(`the column ${c} of USING is not in the right side`);
+        }
+      }
+      const hide = (bs: readonly Binding[]): Binding[] => (joined.length === 0 ? [...bs] : bs.map((b) => hiding(b, joined.map(lc))));
+      const valueIn = (e: Env, c: string): Value => lookup({ bindings: e.bindings, outer: undefined }, undefined, c);
+      const mergedNames: Binding[] = joined.length === 0 ? [] : [{ alias: "", columns: joined, row: [] }];
+      const names = [...mergedNames, ...hide(left.names), ...hide(right.names)];
+      const nullOf = (bs: readonly Binding[]): Binding[] => bs.map((b) => ({ ...b, row: b.columns.map(() => null) }));
+      const nullLeft = hide(nullOf(left.names));
+      const nullRight = hide(nullOf(right.names));
+      const merge = (l: Env | undefined, r: Env | undefined): Env => {
+        const lb = l === undefined ? nullLeft : hide(l.bindings);
+        const rb = r === undefined ? nullRight : hide(r.bindings);
+        if (joined.length === 0) return { bindings: [...lb, ...rb], outer };
+        const lv = l ?? { bindings: left.names, outer: undefined };
+        const rv = r ?? { bindings: right.names, outer: undefined };
+        const row = joined.map((c) => (l !== undefined ? valueIn(lv, c) : valueIn(rv, c)));
+        return { bindings: [{ alias: "", columns: joined, row }, ...lb, ...rb], outer };
+      };
       const out: Env[] = [];
-      const nullRight: Binding[] = right.names.map((b) => ({ alias: b.alias, columns: b.columns, row: b.columns.map(() => null) }));
-      // an equality of two qualified columns is a hash join
+      const keep = type === "left" || type === "full";
+      const keepRight = type === "right" || type === "full";
+      const matchedRight = new Set<Env>();
       const on = src.on;
-      let hash: { readonly leftKey: Expr; readonly rightKey: Expr } | undefined;
-      if (on !== undefined && on.kind === "binary" && on.op === "=" && on.left.kind === "name" && on.right.kind === "name" && right.names.length === 1) {
+      // an equality of two qualified columns, or the columns of USING, is a hash join
+      let hash: { readonly leftKey: (e: Env) => Value; readonly rightKey: (e: Env) => Value } | undefined;
+      if (joined.length > 0) hash = { leftKey: (e) => rowKeyValue(joined.map((c) => valueIn(e, c))), rightKey: (e) => rowKeyValue(joined.map((c) => valueIn(e, c))) };
+      else if (on !== undefined && on.kind === "binary" && on.op === "=" && on.left.kind === "name" && on.right.kind === "name" && right.names.length === 1) {
         const ra = lc(right.names[0]?.alias ?? "");
         const lq = lc(on.left.parts.length > 1 ? (on.left.parts[on.left.parts.length - 2]?.name ?? "") : "");
         const rq = lc(on.right.parts.length > 1 ? (on.right.parts[on.right.parts.length - 2]?.name ?? "") : "");
-        if (rq === ra && lq !== ra && lq !== "") hash = { leftKey: on.left, rightKey: on.right };
-        else if (lq === ra && rq !== ra && rq !== "") hash = { leftKey: on.right, rightKey: on.left };
+        const a = on.left;
+        const b = on.right;
+        if (rq === ra && lq !== ra && lq !== "") hash = { leftKey: (e) => evalExpr(a, e, ctx, undefined), rightKey: (e) => evalExpr(b, e, ctx, undefined) };
+        else if (lq === ra && rq !== ra && rq !== "") hash = { leftKey: (e) => evalExpr(b, e, ctx, undefined), rightKey: (e) => evalExpr(a, e, ctx, undefined) };
       }
       let index: Map<string, Env[]> | undefined;
       if (hash !== undefined) {
         const h = hash;
         index = new Map();
         for (const r of right.envs) {
-          const k = evalExpr(h.rightKey, r, ctx, undefined);
+          const k = h.rightKey(r);
           if (k === null) continue;
           const key = `${typeof k}:${String(k)}`;
           const list = index.get(key);
@@ -449,18 +517,20 @@ function envsOf(src: Source, ctx: Context, outer: Env | undefined): { readonly e
       for (const l of left.envs) {
         let matched = false;
         const candidates = index !== undefined && hash !== undefined ? (() => {
-          const k = evalExpr(hash.leftKey, l, ctx, undefined);
+          const k = hash.leftKey(l);
           return k === null ? [] : (index.get(`${typeof k}:${String(k)}`) ?? []);
         })() : right.envs;
         for (const r of candidates) {
-          const merged: Env = { bindings: [...l.bindings, ...r.bindings], outer };
-          if (on === undefined || truthy(evalExpr(on, merged, ctx, undefined))) {
-            out.push(merged);
+          const both = merge(l, r);
+          if (on === undefined || truthy(evalExpr(on, both, ctx, undefined))) {
+            out.push(both);
             matched = true;
+            if (keepRight) matchedRight.add(r);
           }
         }
-        if (!matched && src.type === "left") out.push({ bindings: [...l.bindings, ...nullRight], outer });
+        if (!matched && keep) out.push(merge(l, undefined));
       }
+      if (keepRight) for (const r of right.envs) if (!matchedRight.has(r)) out.push(merge(undefined, r));
       return { envs: out, names };
     }
     default:
@@ -468,8 +538,179 @@ function envsOf(src: Source, ctx: Context, outer: Env | undefined): { readonly e
   }
 }
 
+/** A row a select gives, before it is projected: its environment and, where the select groups, the rows of its group. */
+interface Unit {
+  readonly env: Env;
+  readonly group: readonly Env[] | undefined;
+}
+
+type CallExpr = Extract<Expr, { kind: "call" }>;
+
+const WINDOW_ONLY: ReadonlySet<string> = new Set(["row_number", "rank", "dense_rank", "percent_rank", "cume_dist", "ntile", "lag", "lead", "first_value", "last_value", "nth_value"]);
+
+/** The window of a call with the named window it refines put together (`OVER w`, `OVER (w ORDER BY ...)`). */
+function resolveWindow(over: WindowSpec, defs: readonly WindowDef[], seen: readonly string[] = []): WindowSpec {
+  if (over.base === undefined) return over;
+  const name = lc(over.base.name);
+  if (seen.includes(name)) return fail(`the window ${over.base.name} is defined by itself`);
+  const def = defs.find((d) => lc(d.name.name) === name);
+  if (def === undefined) return fail(`there is no window ${over.base.name}`);
+  const base = resolveWindow(def.spec, defs, [...seen, name]);
+  if (over.partitionBy.length > 0 && base.partitionBy.length > 0) return fail(`the window ${over.base.name} has a PARTITION BY already`);
+  if (over.orderBy.length > 0 && base.orderBy.length > 0) return fail(`the window ${over.base.name} has an ORDER BY already`);
+  return { ...over, base: undefined, partitionBy: over.partitionBy.length > 0 ? over.partitionBy : base.partitionBy, orderBy: over.orderBy.length > 0 ? over.orderBy : base.orderBy, frame: over.frame ?? base.frame };
+}
+
+/** The first and last rows (by place in the partition) of the frame of the row at `i`, or `undefined` where the frame is empty (0010-aide FR-013). */
+function frameOf(w: WindowSpec, i: number, n: number, peerStart: number, peerEnd: number, valueOf: (e: Expr) => Value): readonly [number, number] | undefined {
+  if (w.frame === undefined) return w.orderBy.length === 0 ? [0, n - 1] : [0, peerEnd];
+  const f = w.frame;
+  if (f.unit === "groups") return fail("a GROUPS frame is not in astsql");
+  if (f.exclude !== undefined && f.exclude !== "NO OTHERS") return fail("EXCLUDE is not in astsql");
+  const bound = (b: FrameBound, start: boolean): number => {
+    const offset = (): number => {
+      const v = b.offset === undefined ? null : numberOf(valueOf(b.offset));
+      if (v === null || !Number.isInteger(v) || v < 0) return fail("the distance of a frame is a whole number that is not negative");
+      return v;
+    };
+    switch (b.type) {
+      case "unbounded-preceding":
+        return 0;
+      case "unbounded-following":
+        return n - 1;
+      case "current-row":
+        return f.unit === "rows" ? i : start ? peerStart : peerEnd;
+      case "preceding":
+        return f.unit === "rows" ? i - offset() : fail("a RANGE frame with a distance is not in astsql");
+      default:
+        return f.unit === "rows" ? i + offset() : fail("a RANGE frame with a distance is not in astsql");
+    }
+  };
+  const from = Math.max(0, bound(f.from, true));
+  const to = Math.min(n - 1, bound(f.to ?? { kind: "frame-bound", type: "current-row", offset: undefined, start: 0, end: 0 }, false));
+  return from > to ? undefined : [from, to];
+}
+
+/** The values of every window function of a select, for each of its rows (0010-aide FR-013): each partition ordered by its window, the function computed over it, the value kept for the row. */
+function computeWindows(calls: readonly CallExpr[], units: readonly Unit[], defs: readonly WindowDef[], ctx: Context): Map<Node, Map<Env, Value>> {
+  const out = new Map<Node, Map<Env, Value>>();
+  for (const call of calls) {
+    if (out.has(call)) continue;
+    const over = call.over;
+    if (over === undefined) continue;
+    const name = lc(call.name.parts[call.name.parts.length - 1]?.name ?? "");
+    if (!WINDOW_ONLY.has(name) && !AGGREGATES.has(name)) fail(`the function ${name} is not a window function in astsql`);
+    if (call.distinct || call.orderBy.length > 0 || call.withinGroup.length > 0 || call.parameters.length > 0) fail(`${name} with DISTINCT, ORDER BY or WITHIN GROUP is not a window function in astsql`);
+    if (call.nullTreatment === "ignore") fail("IGNORE NULLS is not in astsql");
+    const w = resolveWindow(over, defs);
+    const values = new Map<Env, Value>();
+    out.set(call, values);
+    const partitions = new Map<string, Unit[]>();
+    for (const u of units) {
+      const key = rowKey(w.partitionBy.map((x) => evalExpr(x, u.env, ctx, u.group)));
+      const list = partitions.get(key);
+      if (list === undefined) partitions.set(key, [u]);
+      else list.push(u);
+    }
+    const arg = (u: Unit, k: number): Value => {
+      const a = call.args[k];
+      return isPlainArg(a) ? evalExpr(a, u.env, ctx, u.group) : fail(`${name} takes plain arguments`);
+    };
+    for (const part of partitions.values()) {
+      const keyed = part.map((u) => ({ u, keys: w.orderBy.map((o) => evalExpr(o.expr, u.env, ctx, u.group)) }));
+      if (w.orderBy.length > 0) {
+        keyed.sort((a, b) => {
+          for (const [i, o] of w.orderBy.entries()) {
+            const c = nullsOrder(a.keys[i] ?? null, b.keys[i] ?? null, o.direction === "desc" ? -1 : 1, o.nulls);
+            if (c !== 0) return c;
+          }
+          return 0;
+        });
+      }
+      const n = keyed.length;
+      const same = (a: number, b: number): boolean => w.orderBy.length === 0 || w.orderBy.every((_, k) => nullsOrder(keyed[a]?.keys[k] ?? null, keyed[b]?.keys[k] ?? null, 1, undefined) === 0);
+      const peerStart: number[] = [];
+      const peerEnd: number[] = [];
+      for (let i = 0; i < n; i++) peerStart[i] = i > 0 && same(i, i - 1) ? (peerStart[i - 1] ?? i) : i;
+      for (let i = n - 1; i >= 0; i--) peerEnd[i] = i < n - 1 && same(i, i + 1) ? (peerEnd[i + 1] ?? i) : i;
+      let dense = 0;
+      for (const [i, { u }] of keyed.entries()) {
+        const first = peerStart[i] ?? i;
+        const last = peerEnd[i] ?? i;
+        if (first === i) dense++;
+        const frameValue = (e: Expr): Value => evalExpr(e, u.env, ctx, u.group);
+        const frame = (): readonly [number, number] | undefined => frameOf(w, i, n, first, last, frameValue);
+        let v: Value;
+        switch (name) {
+          case "row_number":
+            v = i + 1;
+            break;
+          case "rank":
+            v = first + 1;
+            break;
+          case "dense_rank":
+            v = dense;
+            break;
+          case "percent_rank":
+            v = n <= 1 ? 0 : first / (n - 1);
+            break;
+          case "cume_dist":
+            v = (last + 1) / n;
+            break;
+          case "ntile": {
+            const k = numberOf(arg(u, 0));
+            if (k === null || !Number.isInteger(k) || k < 1) return fail("ntile takes a whole number of buckets that is more than 0");
+            const size = Math.floor(n / k);
+            const extra = n % k;
+            const wide = extra * (size + 1);
+            v = i < wide ? Math.floor(i / (size + 1)) + 1 : extra + Math.floor((i - wide) / Math.max(size, 1)) + 1;
+            break;
+          }
+          case "lag":
+          case "lead": {
+            const by = call.args[1] === undefined ? 1 : numberOf(arg(u, 1));
+            if (by === null || !Number.isInteger(by) || by < 0) return fail(`${name} takes an offset that is a whole number and not negative`);
+            const at = name === "lag" ? i - by : i + by;
+            v = at >= 0 && at < n ? arg(keyed[at]?.u ?? u, 0) : call.args[2] === undefined ? null : arg(u, 2);
+            break;
+          }
+          case "first_value":
+          case "last_value":
+          case "nth_value": {
+            const f = frame();
+            let at: number | undefined;
+            if (f !== undefined) {
+              if (name === "first_value") at = f[0];
+              else if (name === "last_value") at = f[1];
+              else {
+                const k = numberOf(arg(u, 1));
+                if (k === null || !Number.isInteger(k) || k < 1) return fail("nth_value takes a whole number that is more than 0");
+                at = f[0] + k - 1 <= f[1] ? f[0] + k - 1 : undefined;
+              }
+            }
+            v = at === undefined ? null : arg(keyed[at]?.u ?? u, 0);
+            break;
+          }
+          default: {
+            const f = frame();
+            const rows = f === undefined ? [] : keyed.slice(f[0], f[1] + 1).map((k) => k.u);
+            const filter = call.filter;
+            const kept = filter === undefined ? rows : rows.filter((r) => truthy(evalExpr(filter, r.env, ctx, r.group)));
+            const star = call.args[0]?.kind === "star";
+            if (name === "count" && (star || call.args.length === 0)) v = kept.length;
+            else if (!isPlainArg(call.args[0])) return fail(`${name} takes an expression`);
+            else v = reduce(name, false, kept.map((r) => arg(r, 0)).filter((x) => x !== null), kept.length, false, name === "group_concat" ? separatorOf(call, u.env, ctx) : ",");
+          }
+        }
+        values.set(u.env, v);
+      }
+    }
+  }
+  return out;
+}
+
 function runSelect(q: Select, ctx: Context, outer: Env | undefined): Table {
-  if (q.distinctOn.length > 0 || q.windows.length > 0 || q.qualify !== undefined || q.groupAll || q.top !== undefined || q.into !== undefined) return fail("that clause of SELECT is not in astsql");
+  if (q.distinctOn.length > 0 || q.qualify !== undefined || q.groupAll || q.top !== undefined || q.into !== undefined) return fail("that clause of SELECT is not in astsql");
   let envs: Env[];
   let names: readonly Binding[] = [];
   if (q.from.length === 0) envs = [{ bindings: [], outer }];
@@ -487,6 +728,14 @@ function runSelect(q: Select, ctx: Context, outer: Env | undefined): Table {
     const w = q.where;
     envs = envs.filter((e) => truthy(evalExpr(w, e, ctx, undefined)));
   }
+  for (const x of [q.where, q.having, ...q.groupBy]) {
+    const bad: CallExpr[] = [];
+    if (x !== undefined) windowCallsOf(x, bad);
+    if (bad.length > 0) fail("a window function stands only in the select list and the ORDER BY");
+  }
+  const windowCalls: CallExpr[] = [];
+  for (const x of [...q.items.map((i) => i.expr), ...q.orderBy.map((o) => o.expr)]) windowCallsOf(x, windowCalls);
+  const wctx: Context = windowCalls.length === 0 ? ctx : { ...ctx, windowValues: new Map() };
   const grouped = q.groupBy.length > 0 || q.items.some((i) => hasAggregate(i.expr)) || (q.having !== undefined && hasAggregate(q.having));
   // the columns of the output
   const colNames: string[] = [];
@@ -496,7 +745,7 @@ function runSelect(q: Select, ctx: Context, outer: Env | undefined): Table {
       const qual = item.expr.qualifier?.parts.map((p) => p.name).join(".");
       const picked = names.filter((b) => qual === undefined || lc(b.alias) === lc(qual));
       if (picked.length === 0 && qual !== undefined) fail(`no relation ${qual}`);
-      for (const b of picked) for (const c of b.columns) colNames.push(c);
+      for (const b of picked) for (const [k, c] of b.columns.entries()) if (qual !== undefined || visible(b, k)) colNames.push(c);
       itemsOut.push({ item, star: [] });
     } else {
       colNames.push(item.alias?.name ?? (item.expr.kind === "name" ? (item.expr.parts[item.expr.parts.length - 1]?.name ?? "?") : `column${colNames.length + 1}`));
@@ -515,9 +764,9 @@ function runSelect(q: Select, ctx: Context, outer: Env | undefined): Table {
         const qual = item.expr.kind === "star" ? item.expr.qualifier?.parts.map((p) => p.name).join(".") : undefined;
         for (const b of env.bindings.length > 0 ? env.bindings : []) {
           if (qual !== undefined && lc(b.alias) !== lc(qual)) continue;
-          for (const v of b.row) values.push(v);
+          for (const [k, v] of b.row.entries()) if (qual !== undefined || visible(b, k)) values.push(v);
         }
-      } else values.push(evalExpr(item.expr, env, ctx, group));
+      } else values.push(evalExpr(item.expr, env, wctx, group));
     }
     const keys = q.orderBy.map((o): Value => {
       const ex = o.expr;
@@ -526,10 +775,11 @@ function runSelect(q: Select, ctx: Context, outer: Env | undefined): Table {
         const i = colNames.findIndex((c) => lc(c) === lc(ex.parts[0]?.name ?? ""));
         if (i >= 0 && itemsOut[i]?.item.alias !== undefined) return values[i] ?? null;
       }
-      return evalExpr(ex, env, ctx, group);
+      return evalExpr(ex, env, wctx, group);
     });
     return { values, keys };
   };
+  const units: Unit[] = [];
   if (grouped) {
     const groups = new Map<string, Env[]>();
     if (q.groupBy.length === 0) groups.set("", envs);
@@ -544,17 +794,22 @@ function runSelect(q: Select, ctx: Context, outer: Env | undefined): Table {
     for (const g of groups.values()) {
       const rep = g[0] ?? { bindings: names.map((b) => ({ alias: b.alias, columns: b.columns, row: b.columns.map(() => null) })), outer };
       if (q.having !== undefined && !truthy(evalExpr(q.having, rep, ctx, g))) continue;
-      outs.push(project(rep, g));
+      units.push({ env: rep, group: g });
     }
-  } else for (const e of envs) outs.push(project(e, undefined));
+  } else for (const e of envs) units.push({ env: e, group: undefined });
+  if (windowCalls.length > 0) {
+    const computed = computeWindows(windowCalls, units, q.windows, wctx);
+    for (const [k, v] of computed) wctx.windowValues?.set(k, v);
+  }
+  for (const u of units) outs.push(project(u.env, u.group));
   let result = outs;
   if (q.distinct) result = result.filter((o, i) => result.findIndex((p) => p.values.length === o.values.length && p.values.every((v, j) => order(v, o.values[j] ?? null) === 0)) === i);
   if (q.orderBy.length > 0) {
     const dirs = q.orderBy.map((o) => (o.direction === "desc" ? -1 : 1));
     result = [...result].sort((a, b) => {
       for (const [i, d] of dirs.entries()) {
-        const c = order(a.keys[i] ?? null, b.keys[i] ?? null);
-        if (c !== 0) return c * d;
+        const c = nullsOrder(a.keys[i] ?? null, b.keys[i] ?? null, d, q.orderBy[i]?.nulls);
+        if (c !== 0) return c;
       }
       return 0;
     });
@@ -573,25 +828,158 @@ function runSelect(q: Select, ctx: Context, outer: Env | undefined): Table {
   return { columns: colNames, rows };
 }
 
+/** A key that two rows share where they are equal for a set operation: a null equals a null, a value only a value of its type. */
+const rowKey = (row: readonly Value[]): string => row.map((v) => (v === null ? "null" : `${typeof v}:${String(v)}`)).join("\u0001");
+
+/** The rows of a table counted by their key, in the order each is first met. */
+function counted(rows: readonly (readonly Value[])[]): Map<string, { readonly row: readonly Value[]; n: number }> {
+  const out = new Map<string, { readonly row: readonly Value[]; n: number }>();
+  for (const row of rows) {
+    const k = rowKey(row);
+    const c = out.get(k);
+    if (c === undefined) out.set(k, { row, n: 1 });
+    else c.n++;
+  }
+  return out;
+}
+
+/** `UNION`, `INTERSECT` and `EXCEPT`, with or without `ALL` (0010-aide FR-012), then the `ORDER BY`, `OFFSET` and `LIMIT` of the whole. */
+function runSetOp(q: SetOp, ctx: Context, outer: Env | undefined): Table {
+  if (q.byName) return fail("BY NAME is not in astsql");
+  if (q.locking !== undefined || q.settings !== undefined) return fail("that clause of a set operation is not in astsql");
+  const left = runQuery(q.left, ctx, outer);
+  const right = runQuery(q.right, ctx, outer);
+  if (left.columns.length !== right.columns.length) return fail(`the two sides of ${q.op.toUpperCase()} have ${left.columns.length} and ${right.columns.length} columns`);
+  const all = q.quantifier === "all";
+  let rows: (readonly Value[])[];
+  switch (q.op) {
+    case "union":
+      rows = all ? [...left.rows, ...right.rows] : [...counted([...left.rows, ...right.rows]).values()].map((c) => c.row);
+      break;
+    case "intersect": {
+      const r = counted(right.rows);
+      rows = [];
+      for (const [k, c] of counted(left.rows)) {
+        const n = Math.min(c.n, r.get(k)?.n ?? 0);
+        for (let i = 0; i < (all ? n : Math.min(n, 1)); i++) rows.push(c.row);
+      }
+      break;
+    }
+    case "except": {
+      const r = counted(right.rows);
+      rows = [];
+      for (const [k, c] of counted(left.rows)) {
+        const n = all ? c.n - (r.get(k)?.n ?? 0) : r.has(k) ? 0 : 1;
+        for (let i = 0; i < n; i++) rows.push(c.row);
+      }
+      break;
+    }
+    default:
+      return fail(`the set operator ${q.op} is not in astsql`);
+  }
+  return tail({ columns: left.columns, rows }, q.orderBy, q.limit, q.offset, ctx, outer);
+}
+
+/** The `ORDER BY` (by the name of an output column or its place), `OFFSET` and `LIMIT` of a query that is made of a set operation. */
+function tail(t: Table, orderBy: readonly OrderItem[], limit: Expr | undefined, offset: Expr | undefined, ctx: Context, outer: Env | undefined): Table {
+  let rows = t.rows;
+  if (orderBy.length > 0) {
+    const keys = orderBy.map((o): { readonly at: number; readonly sign: number; readonly nulls: "first" | "last" | undefined } => {
+      const ex = o.expr;
+      let at = -1;
+      if (ex.kind === "number") at = Number(ex.text) - 1;
+      else if (ex.kind === "name" && ex.parts.length === 1) at = t.columns.findIndex((c) => lc(c) === lc(ex.parts[0]?.name ?? ""));
+      if (at < 0 || at >= t.columns.length) return fail("the ORDER BY of a set operation names an output column or its place");
+      return { at, sign: o.direction === "desc" ? -1 : 1, nulls: o.nulls };
+    });
+    rows = [...rows].sort((a, b) => {
+      for (const k of keys) {
+        const x = a[k.at] ?? null;
+        const y = b[k.at] ?? null;
+        const c = nullsOrder(x, y, k.sign, k.nulls);
+        if (c !== 0) return c;
+      }
+      return 0;
+    });
+  }
+  const num = (x: Expr | undefined): number | undefined => {
+    if (x === undefined) return undefined;
+    const n = numberOf(evalExpr(x, { bindings: [], outer }, ctx, undefined));
+    return n === null ? undefined : n;
+  };
+  const off = num(offset);
+  const lim = num(limit);
+  if (off !== undefined) rows = rows.slice(off);
+  if (lim !== undefined) rows = rows.slice(0, lim);
+  return { columns: t.columns, rows };
+}
+
+/** The order of two values of an `ORDER BY` key: nulls first for `ASC` and last for `DESC` where `NULLS` is not written, and as it says where it is; `sign` is -1 for `DESC`. */
+function nullsOrder(a: Value, b: Value, sign: number, nulls: "first" | "last" | undefined): number {
+  if (a === null || b === null) {
+    if (a === null && b === null) return 0;
+    const nullFirst = nulls === undefined ? sign > 0 : nulls === "first";
+    return (a === null ? -1 : 1) * (nullFirst ? 1 : -1);
+  }
+  return compare(a, b) * sign;
+}
+
+/** Whether a query names a relation (a table in a `FROM`), without regard to case, anywhere in it. */
+function mentions(n: Node, name: string): boolean {
+  if (n.kind === "table" && n.name.parts.length === 1 && lc(n.name.parts[0]?.name ?? "") === name) return true;
+  return children(n).some((c) => mentions(c, name));
+}
+
+/** The most rounds and rows of a recursive common table expression (0010-aide FR-016). */
+const MOST_ROUNDS = 10_000;
+const MOST_ROWS = 1_000_000;
+
+/** `WITH RECURSIVE name AS (anchor UNION [ALL] step)`: the anchor once, then the step on the rows the last round made, until a round makes none (0010-aide FR-016). */
+function runRecursive(q: SetOp, name: string, columns: readonly string[], ctx: Context, outer: Env | undefined): Table {
+  const self = lc(name);
+  if (mentions(q.left, self)) return fail(`the first part of the recursive ${name} names ${name}: the anchor comes first`);
+  const all = q.quantifier === "all";
+  const anchor = runQuery(q.left, ctx, outer);
+  const cols = columns.length > 0 ? columns : anchor.columns;
+  if (cols.length !== anchor.columns.length) return fail(`the recursive ${name} has ${cols.length} column names and its anchor ${anchor.columns.length} columns`);
+  const seen = new Set<string>();
+  const first = all ? anchor.rows : anchor.rows.filter((r) => (seen.has(rowKey(r)) ? false : (seen.add(rowKey(r)), true)));
+  const result: (readonly Value[])[] = [...first];
+  let working: readonly (readonly Value[])[] = first;
+  for (let round = 1; working.length > 0; round++) {
+    if (round > MOST_ROUNDS) return fail(`the recursive ${name} did not end in ${MOST_ROUNDS} rounds`);
+    const step = runQuery(q.right, { ...ctx, ctes: new Map(ctx.ctes).set(self, { columns: cols, rows: working }) }, outer);
+    if (step.columns.length !== cols.length) return fail(`the step of the recursive ${name} has ${step.columns.length} columns, and the anchor ${cols.length}`);
+    working = all ? step.rows : step.rows.filter((r) => (seen.has(rowKey(r)) ? false : (seen.add(rowKey(r)), true)));
+    result.push(...working);
+    if (result.length > MOST_ROWS) return fail(`the recursive ${name} made more than ${MOST_ROWS} rows`);
+  }
+  return tail({ columns: cols, rows: result }, q.orderBy, q.limit, q.offset, ctx, outer);
+}
+
 function runQuery(q: Query, ctx: Context, outer: Env | undefined): Table {
   switch (q.kind) {
     case "select":
       return runSelect(q, ctx, outer);
     case "with": {
-      if (q.recursive) return fail("recursive queries are not in astsql");
       const ctes = new Map(ctx.ctes);
       for (const c of q.ctes) {
         if (c.query.kind === "insert" || c.query.kind === "update" || c.query.kind === "delete") return fail("a data change is not in astsql");
-        const t = runQuery(c.query, { ...ctx, ctes }, outer);
-        ctes.set(lc(c.name.name), c.columns.length > 0 ? { columns: c.columns.map((x) => x.name), rows: t.rows } : t);
+        const self = lc(c.name.name);
+        const t = q.recursive && c.query.kind === "set-op" && c.query.op === "union" && (mentions(c.query.right, self) || mentions(c.query.left, self)) ? runRecursive(c.query, c.name.name, c.columns.map((x) => x.name), { ...ctx, ctes }, outer) : runQuery(c.query, { ...ctx, ctes }, outer);
+        ctes.set(self, c.columns.length > 0 ? { columns: c.columns.map((x) => x.name), rows: t.rows } : t);
       }
       if (q.body.kind === "insert" || q.body.kind === "update" || q.body.kind === "delete") return fail("a data change is not in astsql");
       return runQuery(q.body, { ...ctx, ctes }, outer);
     }
     case "set-op":
-      return fail("set operations are not in astsql");
-    case "values":
-      return fail("VALUES is not in astsql");
+      return runSetOp(q, ctx, outer);
+    case "values": {
+      const rows = q.rows.map((t) => t.items.map((x) => evalExpr(x, { bindings: [], outer }, ctx, undefined)));
+      const width = rows[0]?.length ?? 0;
+      if (rows.some((r) => r.length !== width)) return fail("the rows of VALUES have different numbers of columns");
+      return { columns: Array.from({ length: width }, (_, i) => `column${i + 1}`), rows };
+    }
     default:
       return fail("that query is not in astsql");
   }

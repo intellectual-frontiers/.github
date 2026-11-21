@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/grc",
   "private": true,
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Governance, risk and compliance as a library of three layers: governance (frameworks, crosswalks, policies, checks, requirements, evidence policy and exceptions as data), the logical model (results, findings, evidence, attestations, assessments and the pure computations over them, as self-describing versioned documents) and the physical layer (registries of typed ports, with conformance suites, for runners, evidence stores, signers and serializers), with the headless verbs grc check, assess, explain and evidence; the same code on Bun and Node 26.",
   "type": "module",
   "engines": {
