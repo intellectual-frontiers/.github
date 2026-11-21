@@ -89,8 +89,40 @@ export const DEBIAN_13_PROFILE: BootProfile = {
   guard: false,
 };
 
+/**
+ * Rocky Linux 9.9: the installer's kernel and ramdisk and the network boot loader, pinned by the SHA-256 of the installer's `.treeinfo` of 2026-11-21 (and checked against the files themselves). The files of the tree are replaced in place by a point release, so a new one is
+ * adopted by changing these pins in a reviewed commit. The installer fetches its packages from the repository named on its command line.
+ */
+export const ROCKY_9: BootPins = {
+  release: "9",
+  point: "9.9",
+  netboot: "https://download.rockylinux.org/pub/rocky/9/BaseOS/x86_64/os/",
+  files: {
+    "BOOTX64.EFI": "1ff3f223c2fcf5b11615d042fcb5674c4651bbbc8505b5b2987d60da0cb65d1a",
+    "grubx64.efi": "509b375e4977d4607445636d4fa8c0d9fdf6d386040a66f58b28f010253ea4bf",
+    vmlinuz: "d527e7002f40dfcf56e5e87481e8bed3439343e74a509aa68e9e78c248665a9a",
+    "initrd.img": "6c20b39dc3815783bc348e6b756512fcffc096fb7b4d390aa4207cfdc32dbedc",
+  },
+  paths: { "BOOTX64.EFI": "EFI/BOOT/BOOTX64.EFI", "grubx64.efi": "EFI/BOOT/grubx64.efi", vmlinuz: "images/pxeboot/vmlinuz", "initrd.img": "images/pxeboot/initrd.img" },
+};
+
+/** Rocky Linux 9: Anaconda is told where its Kickstart is and where the packages are. */
+export const ROCKY_9_PROFILE: BootProfile = {
+  id: "rocky-9",
+  family: "redhat",
+  title: `Rocky Linux ${ROCKY_9.point}`,
+  pins: ROCKY_9,
+  kernel: "vmlinuz",
+  initrd: "initrd.img",
+  cmdline: "ip=dhcp inst.repo=https://download.rockylinux.org/pub/rocky/9/BaseOS/x86_64/os/ inst.ks={install}ks.cfg inst.text",
+  document: "ks.cfg",
+  documentType: "text/plain; charset=utf-8",
+  // Anaconda's environment has no curl and no lsblk either
+  guard: false,
+};
+
 /** Every profile there is. */
-export const PROFILES: readonly BootProfile[] = [UBUNTU_26_04_PROFILE, DEBIAN_13_PROFILE];
+export const PROFILES: readonly BootProfile[] = [UBUNTU_26_04_PROFILE, DEBIAN_13_PROFILE, ROCKY_9_PROFILE];
 
 /** The profile of a name, if there is one. */
 export function profileById(id: string): BootProfile | undefined {

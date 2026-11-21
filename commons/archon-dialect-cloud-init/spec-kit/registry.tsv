@@ -2,3 +2,4 @@ number	slug	state
 0001	cloud-init-layers	in force
 0002	cloud-init-dialect	in force
 0003	preseed-dialect	in force
+0004	kickstart-dialect	in force

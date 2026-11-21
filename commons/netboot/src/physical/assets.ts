@@ -54,7 +54,7 @@ export async function ensureAssets(dir: string, pins: BootPins, fetcher: Fetch =
   await fs.mkdir(dir, { recursive: true });
   const files: Record<string, string> = {};
   for (const [name, sha] of Object.entries(pins.files)) {
-    const r = await ensure(dir, name, pins.netboot + name, sha, fetcher, say);
+    const r = await ensure(dir, name, pins.netboot + (pins.paths?.[name] ?? name), sha, fetcher, say);
     if (r.kind === "err") return r;
     files[name] = r.value;
   }

@@ -10,7 +10,7 @@ import dgram from "node:dgram";
 import net from "node:net";
 import { fs, path } from "@intellectual-frontiers/system";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { BASE_PLACEHOLDER, PASSWORD_PLACEHOLDER, UBUNTU_26_04, UBUNTU_26_04_PROFILE, DEBIAN_13_PROFILE, PROFILES, profileById, type BootPins, type BootProfile } from "../src/governance/mod.ts";
+import { BASE_PLACEHOLDER, PASSWORD_PLACEHOLDER, UBUNTU_26_04, UBUNTU_26_04_PROFILE, DEBIAN_13_PROFILE, ROCKY_9_PROFILE, PROFILES, profileById, type BootPins, type BootProfile } from "../src/governance/mod.ts";
 import { agreedOptions, arm, armedHosts, chooserMenu, classify, decide, describeFacts, disarm, done, emptyState, hostMenu, isArmed, mainMenu, newToken, note, parseFacts, parseRequest, servedPath, tokenFits } from "../src/logical/mod.ts";
 import { assetStatus, bootHandler, ensureAssets, httpServer, parseRange, readState, sha256File, startBoot, tftpServer, updateState, type BootProvider } from "../src/physical/mod.ts";
 
@@ -356,7 +356,7 @@ proves(["0004-netboot-physical FR-005"], "the handler refuses a method it does n
 });
 
 proves(["0005-netboot-profiles FR-001", "0005-netboot-profiles FR-002", "0005-netboot-profiles FR-005", "0005-netboot-profiles FR-006"], "every profile pins its boot files by SHA-256, names a kernel and a ramdisk it holds and an install document, and a profile is found by its id", () => {
-  assertEquals(PROFILES.map((p) => p.id), ["ubuntu-26.04", "debian-13"]);
+  assertEquals(PROFILES.map((p) => p.id), ["ubuntu-26.04", "debian-13", "rocky-9"]);
   for (const p of PROFILES) {
     assert(Object.keys(p.pins.files).includes(p.kernel) && Object.keys(p.pins.files).includes(p.initrd), p.id);
     for (const v of Object.values(p.pins.files)) assert(/^[0-9a-f]{64}$/.test(v), `${p.id} ${v}`);
@@ -364,7 +364,8 @@ proves(["0005-netboot-profiles FR-001", "0005-netboot-profiles FR-002", "0005-ne
   }
   assertEquals(profileById("nope"), undefined);
   assertEquals(DEBIAN_13_PROFILE.pins.iso, undefined, "the Debian installer fetches from a mirror: no image");
-  assertEquals([UBUNTU_26_04_PROFILE.guard, DEBIAN_13_PROFILE.guard], [true, false]);
+  assertEquals([UBUNTU_26_04_PROFILE.guard, DEBIAN_13_PROFILE.guard, ROCKY_9_PROFILE.guard], [true, false, false]);
+  for (const [name] of Object.entries(ROCKY_9_PROFILE.pins.paths ?? {})) assert(name in ROCKY_9_PROFILE.pins.files, name);
 });
 
 proves(["0005-netboot-profiles FR-003"], "a Debian host's menu boots its own kernel and ramdisk with the URL of its preseed, escapes nothing that GRUB would split, and Ubuntu's keeps the escaped semicolon", () => {
@@ -393,4 +394,23 @@ proves(["0005-netboot-profiles FR-004"], "a server of the Debian profile serves 
     assertEquals((await c.http(`/install/athens/${token}/aa:bb:cc:dd:ee:ff/user-data`)).status, 404, "a Debian install does not read a user-data");
     assertEquals((await c.http(`/iso/x.iso`)).status, 404);
   }, {}, DEBIAN_13_PROFILE);
+});
+
+proves(["0005-netboot-profiles FR-003"], "a Rocky host's menu boots its kernel with the URL of its Kickstart and the repository, and a file of a two-folder tree is fetched from its own path", async () => {
+  const base = "http://192.0.2.10:8080/";
+  const token = "r".repeat(32);
+  const menu = hostMenu({ name: "corinth" }, ROCKY_9_PROFILE, base, token);
+  assert(menu.includes("linux /boot/vmlinuz ip=dhcp inst.repo=https://download.rockylinux.org/") && menu.includes(`inst.ks=${base}install/corinth/${token}/${"$"}{net_default_mac}/ks.cfg`) && menu.includes("initrd /boot/initrd.img") && menu.includes("Rocky Linux 9.9"), menu);
+  const asked: string[] = [];
+  const bodies: Record<string, string> = Object.fromEntries(Object.keys(ROCKY_9_PROFILE.pins.files).map((n) => [n, `body of ${n}`]));
+  const pins: BootPins = { ...ROCKY_9_PROFILE.pins, files: Object.fromEntries(Object.entries(bodies).map(([n, b]) => [n, sha(b)])) };
+  await scratch(async (dir) => {
+    const r = await ensureAssets(dir, pins, async (u) => {
+      asked.push(u);
+      const name = Object.entries(pins.paths ?? {}).find(([, p]) => u.endsWith(p))?.[0] ?? "";
+      return new Response(bodies[name] ?? "", { status: bodies[name] === undefined ? 404 : 200 });
+    });
+    assert(r.kind === "ok", JSON.stringify(r));
+  });
+  assert(asked.includes("https://download.rockylinux.org/pub/rocky/9/BaseOS/x86_64/os/EFI/BOOT/BOOTX64.EFI") && asked.includes("https://download.rockylinux.org/pub/rocky/9/BaseOS/x86_64/os/images/pxeboot/vmlinuz"), asked.join(" "));
 });

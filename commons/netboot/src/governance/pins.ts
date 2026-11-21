@@ -25,6 +25,8 @@ export type BootPins = {
   readonly iso?: { readonly name: string; readonly url: string; readonly sha256: string };
   /** The network boot files by name, each with its SHA-256. */
   readonly files: Readonly<Record<string, string>>;
+  /** Where a file is, relative to `netboot`, where that is not its own name (the boot files of some distributions are in two folders). */
+  readonly paths?: Readonly<Record<string, string>>;
 };
 
 /** Ubuntu 26.04.1 for amd64. */
