@@ -58,7 +58,7 @@ proves(["0001-native-pinned-layers FR-005"], "the release record agrees with the
   assertEquals(release.slug, library.name);
   assertEquals(release.version, library.version);
   assertEquals(release.kind, "Software");
-  assertEquals(library.distribution, ["github"], "held back from npm until the owner says it is ready");
+  assertEquals(library.distribution, ["github", "npm"]);
 });
 
 proves(["0001-native-pinned-layers FR-006"], "no source runs a package manager, asks for administrator rights or runs a compiler", async () => {

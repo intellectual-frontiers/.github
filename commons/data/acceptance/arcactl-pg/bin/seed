@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Step 5: puts the tenants and their sample rows into the database. The tenants are made as the superuser; each tenant's rows
+# are written by the role uat_writer through the views, in that tenant's scope (so the policies are exercised as the rows go in).
+set -euo pipefail
+. "$(dirname "$0")/env"
+cd "$UAT_DATA"
+psql -v ON_ERROR_STOP=1 -q -f "$UAT_DIR/seed/tenants.sql"
+for tenant in northwind acme initech globex; do
+  { arcactl scope --tenant "$tenant" 2>/dev/null; cat "$UAT_DIR/seed/$tenant.sql"; } | PGPASSWORD="$UAT_PASSWORD" psql -U uat_writer -v ON_ERROR_STOP=1 -q
+  echo "seed: $tenant"
+done
+echo "seed: done. Next: bin/rls-check"

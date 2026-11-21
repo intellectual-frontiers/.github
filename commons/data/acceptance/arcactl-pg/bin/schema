@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Step 4: makes the schema with arcactl and applies it with psql. Run it as a PostgreSQL superuser, in the UAT database.
+# The statements hold the seal's key (the database must), so they are piped straight into psql and never written to a file.
+set -euo pipefail
+. "$(dirname "$0")/env"
+cd "$UAT_DATA"
+arcactl sql --module acceptance/arcactl-pg/models/crm.ts --schema data --protect crm_owner --seal --reach set --wildcard | psql -v ON_ERROR_STOP=1 -q
+echo "schema: done. Next: bin/seed"

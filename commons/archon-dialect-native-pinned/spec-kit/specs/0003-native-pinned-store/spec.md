@@ -16,6 +16,7 @@
 - **FR-005**: An install MUST be unpacked in a temporary folder inside the store and switched into its place by one rename; an existing copy MUST be moved aside before the rename and removed only once the new copy is in place, a rename refused with `EPERM`, `EBUSY` or `EACCES` MUST be retried a number of times with a pause that grows, and where the switch fails the old copy MUST be put back as it was and the temporary folder MUST be removed.
 - **FR-006**: On Linux and macOS the program of an install MUST be made executable, and its shims MUST be written to `<store>/bin`.
 - **FR-007**: `clean` MUST remove what can be got again, each with its size: the cache, the leftover temporary folders and, only when asked, the programs of the store.
+- **FR-008**: An install MUST make the symbolic links of the archive after its files are written and before the folder is switched in, and MUST make executable every file the archive marks as executable besides the program and the files beside it; the install record MUST hold each link by its path and its target.
 
 ## Acceptance scenarios
 

@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/telemetry",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.2.3",
   "description": "OpenTelemetry-native signals for TypeScript, written from the specification itself with no OpenTelemetry package: the data model, W3C Trace Context, OTLP/HTTP JSON, typed signals, a pure renderer of the console, and a host that exports, journals and shows them; the same code on Bun and Node 26.",
   "type": "module",
   "engines": {

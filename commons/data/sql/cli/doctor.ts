@@ -47,6 +47,8 @@ interface Context {
 
 const lit = (s: string): string => postgres.literal(s);
 const rows = (c: Context, sql: string) => c.driver.query(sql);
+/** What the models are called in a message: their names, or, for a project that gave a module of its own, that. */
+const modelsOf = (c: Context): string => (c.config.models.length === 0 ? "the project's models" : c.config.models.join(", "));
 const num = (v: unknown): number => Number(v ?? 0);
 const names = (xs: readonly string[], max = 8): string => (xs.length <= max ? xs.join(", ") : `${xs.slice(0, max).join(", ")} and ${xs.length - max} more`);
 
@@ -89,14 +91,14 @@ const checks: readonly Check[] = [
     async run(c) {
       const have = await rows(c, `SELECT table_name AS t FROM information_schema.tables WHERE table_schema = ${lit(c.config.schema)}`);
       if (have.length === 0)
-        return { status: "fail", detail: `nothing is in the schema ${c.config.schema}: this database has not been initialised for ${c.config.models.join(", ")}`, next: "initialise it (arcactl init), or apply the models' DDL to this schema" };
+        return { status: "fail", detail: `nothing is in the schema ${c.config.schema}: this database has not been initialised for ${modelsOf(c)}`, next: "initialise it (arcactl init), or apply the models' DDL to this schema" };
       const there = new Set(have.map((r) => String(r["t"])));
       const b = bound(c);
       const wanted = b === undefined ? [] : [...new Set(b.statements.flatMap((s) => (s.group === "table" ? [/^CREATE TABLE IF NOT EXISTS (?:"[^"]+"\.)?"([^"]+)"/.exec(s.sql)?.[1] ?? ""] : [])))].filter((x) => x !== "");
       const missing = wanted.filter((t) => !there.has(t));
       return missing.length > 0
         ? { status: "fail", detail: `${missing.length} of ${wanted.length} tables are missing: ${names(missing)}`, next: "bring the database to the model (arcactl init), after reviewing what drift (ARCA-D003) says" }
-        : { status: "pass", detail: `all ${wanted.length} tables of ${c.config.models.join(", ")} are in ${c.config.schema}` };
+        : { status: "pass", detail: `all ${wanted.length} tables of ${modelsOf(c)} are in ${c.config.schema}` };
     },
   },
   {

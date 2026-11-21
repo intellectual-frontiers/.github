@@ -10,7 +10,7 @@ import { contribute, defineExtension, type Extension, extensionId, type IdError 
 import { statementsPoint } from "@intellectual-frontiers/data/sql/physical";
 import { accessSource, type AccessSettings } from "./access.ts";
 
-export { accessSource, governedTables, scopeStatement, sealedScope, type AccessSettings } from "./access.ts";
+export { accessSource, governedTables, grantOf, scopeStatement, sealedScope, type AccessSettings } from "./access.ts";
 
 /**
  * Access as an extension of the engine.
