@@ -12,8 +12,16 @@
  * @module
  */
 
-/** The base images a machine may be made from: the releases of Ubuntu the fleet runs. */
-export type BaseImage = "ubuntu:24.04" | "ubuntu:26.04";
+/** The base images a machine may be made from: the releases of Ubuntu the fleet runs, Debian 13 and Rocky Linux 9 (a RHEL-family image from a registry that does not limit anonymous pulls). */
+export const BASE_IMAGES = ["ubuntu:24.04", "ubuntu:26.04", "debian:13", "quay.io/rockylinux/rockylinux:9"] as const;
+
+/** A base image. */
+export type BaseImage = (typeof BASE_IMAGES)[number];
+
+/** The family of Linux of an image, by how its packages are managed: `debian` (apt) or `rhel` (dnf). */
+export function imageFamily(image: BaseImage): "debian" | "rhel" {
+  return image.startsWith("quay.io/rockylinux/") ? "rhel" : "debian";
+}
 
 /** A user of a machine: its name, and whether it may use sudo with no password (as the first user of a cloud image does). */
 export type MachineUser = { readonly name: string; readonly sudo: boolean };
@@ -24,7 +32,7 @@ export type MachineSpec = {
   readonly name: string;
   readonly image: BaseImage;
   readonly users: readonly MachineUser[];
-  /** Packages of the release's own archive, installed with apt when the image is made. */
+  /** Packages of the release's own archive, installed with the package program of the image's family (apt or dnf) when the image is made. */
   readonly packages: readonly string[];
   /** The time zone the machine is set to (an area/location name). */
   readonly timezone?: string;

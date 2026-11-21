@@ -12,3 +12,7 @@ requirement	mechanism	by	note
 0002-ansible-dialect FR-004	check	.github: cd commons/archon-dialect-ansible && bun run verify	suite/dialect.test.ts
 0002-ansible-dialect FR-005	check	.github: cd commons/archon-dialect-ansible && bun run verify	suite/dialect.test.ts
 0002-ansible-dialect FR-006	check	.github: cd commons/archon-dialect-ansible && bun run verify	suite/dialect.test.ts: on a disposable machine with the real ansible-core; skipped with its reason where there is no container runtime
+0003-ansible-families FR-001	check	.github: cd commons/archon-dialect-ansible && bun run verify	suite/families.test.ts
+0003-ansible-families FR-002	check	.github: cd commons/archon-dialect-ansible && bun run verify	suite/families.test.ts
+0003-ansible-families FR-003	check	.github: cd commons/archon-dialect-ansible && bun run verify	suite/families.test.ts
+0003-ansible-families FR-004	check	.github: cd commons/archon-dialect-ansible && bun run verify	suite/families.test.ts

@@ -39,12 +39,13 @@ export async function planFor(m: Made): Promise<Result<Planned, string>> {
   if (name.kind === "err") return name;
   const order = buildOrder({ subject: { name: name.value, class: "machine" }, assurance: "solo", layers: [{ layer: "fleet", requirements: m.subject.requirements }] });
   if (order.kind === "err") return err(`the order cannot be made: ${JSON.stringify(order.error)}`);
-  const observed = await observeRequirements(m.subject.executor, order.value.requirements, m.subject.elevate);
+  const dialect = m.subject.dialect ?? m.dialect;
+  const observed = await observeRequirements(m.subject.executor, order.value.requirements, m.subject.elevate, m.subject.family);
   const plan = planOrder(order.value, observed);
-  const rendered = await m.dialect.render(order.value, plan);
+  const rendered = await dialect.render(order.value, plan);
   if (rendered.kind === "err") return err(rendered.error.join("; "));
   const elevate = m.subject.elevate;
-  const steps = m.dialect.steps(plan, rendered.value).map((s) => ({ ...s, apply: [...elevate, ...s.apply], check: s.check === undefined ? undefined : [...elevate, ...s.check] }));
+  const steps = dialect.steps(plan, rendered.value).map((s) => ({ ...s, apply: [...elevate, ...s.apply], check: s.check === undefined ? undefined : [...elevate, ...s.check] }));
   const exec = executionPlanOf(plan, rendered.value, steps);
   if (exec.kind === "err") return err(exec.error.map((p) => JSON.stringify(p)).join("; "));
   return ok({ plan, exec: exec.value, hash: exec.value === undefined ? undefined : planHash(exec.value), rendered: rendered.value.files, digest: rendered.value.digest, unexpressed: m.subject.unexpressed });
@@ -90,7 +91,7 @@ export async function applyPlan(m: Made & { readonly renderRoot: string; readonl
   if (p.value.hash !== m.approvedHash) return err(`the plan changed: you approved ${m.approvedHash} and it is now ${p.value.hash}; read it again with plan`);
   const destructive = p.value.exec.steps.some((s) => s.effect === "destructive");
   if (destructive && !m.destroy) return err("the plan removes something: read it, and add --allow-removal yes to carry it out");
-  const version = await checkToolVersion(m.subject.executor, m.subject.elevate, m.toolVersion, m.dialect);
+  const version = await checkToolVersion(m.subject.executor, m.subject.elevate, m.toolVersion, m.subject.dialect ?? m.dialect);
   if (version.kind === "err") return version;
   const delivered = await deliver(m.subject.executor, m.renderRoot, p.value, m.subject.elevate);
   if (delivered.kind === "err") return delivered;

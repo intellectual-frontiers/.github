@@ -20,11 +20,12 @@
   "devDependencies": {
     "@intellectual-frontiers/archon": "link:../archon",
     "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/crypto": "link:../crypto",
     "@intellectual-frontiers/kanon": "link:../kanon",
     "@intellectual-frontiers/lab": "link:../lab",
     "@intellectual-frontiers/libraries": "link:../libraries",
+    "@intellectual-frontiers/linux-observe": "link:../linux-observe",
     "@intellectual-frontiers/mizan": "link:../mizan",
-    "@intellectual-frontiers/crypto": "link:../crypto",
     "@intellectual-frontiers/system": "link:../system",
     "@intellectual-frontiers/test": "link:../test",
     "@types/node": "26.6.6",
