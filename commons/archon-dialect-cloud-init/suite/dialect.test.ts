@@ -13,7 +13,7 @@ import { runtimeUsable, startMachine } from "@intellectual-frontiers/lab/physica
 import { proc } from "@intellectual-frontiers/system";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { cloudInit, DIALECT_ID, installSpecOf, KINDS_CARRIED, type CloudInitOptions } from "../src/dialect.ts";
-import { autoinstall, convergeScript, GUARD_SCRIPT, metaData, PASSWORD_PLACEHOLDER } from "../src/install.ts";
+import { autoinstall, convergeScript, metaData, PASSWORD_PLACEHOLDER } from "../src/install.ts";
 
 function req(id: string, kind: string, desired: unknown, more: Record<string, unknown> = {}): Requirement {
   const r = defineRequirement({ id, summary: `${id}.`, why: ["a made-up reason"], subject: { by: "all" }, kind, desired, change: "additive", ...more });
@@ -92,7 +92,6 @@ proves(["0002-cloud-init-dialect FR-003", "0002-cloud-init-dialect FR-004"], "th
   assertEquals(metaData({ hostname: "athens" }), "instance-id: archon-athens\nlocal-hostname: athens\n");
   const served = autoinstall(installSpecOf(order, OPTIONS).kind === "ok" ? (installSpecOf(order, OPTIONS) as { value: Parameters<typeof autoinstall>[0] }).value : (undefined as never), "$6$made$up");
   assert(served.includes('"password": "$6$made$up"') && !served.includes(PASSWORD_PLACEHOLDER), "the boot server puts the hash in when it serves the file");
-  assert(GUARD_SCRIPT.includes("poweroff -f") && GUARD_SCRIPT.includes("nothing was erased"), "no answer, no install");
 });
 
 proves(["0002-cloud-init-dialect FR-005"], "a secret in a requirement and a kind that is not carried are refused by the render", async () => {

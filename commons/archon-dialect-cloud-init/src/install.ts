@@ -48,39 +48,6 @@ export function metaData(spec: Pick<InstallSpec, "hostname">): string {
   return `instance-id: archon-${spec.hostname}\nlocal-hostname: ${spec.hostname}\n`;
 }
 
-/** The script the installer runs before it touches a disk: it reports the machine's facts and does what the boot server answers; with no answer, nothing is erased. */
-export const GUARD_SCRIPT = `#!/bin/sh
-# archon: before any disk is touched, report this machine's facts to the boot server and do what it answers. Nothing here writes a disk.
-B="$1"
-F=/tmp/archon-facts
-{
-  for k in sys_vendor product_name product_serial board_vendor board_name; do
-    echo "$k=$(cat /sys/class/dmi/id/$k 2>/dev/null)"
-  done
-  echo "mem_kib=$(awk '/^MemTotal:/ { print $2 }' /proc/meminfo)"
-  echo "cpus=$(nproc 2>/dev/null)"
-  lsblk -dnbro NAME,SIZE,TYPE,TRAN -e 1,7,11 2>/dev/null |
-    awk '$3 == "disk" && $1 !~ /^zram/ { print "disk=" $1 " " $2 " " $4 }'
-  for d in $(lsblk -dnro NAME,TYPE -e 1,7,11 2>/dev/null | awk '$2 == "disk" && $1 !~ /^zram/ { print "/dev/" $1 }'); do
-    command -v wipefs >/dev/null || { echo "signature=$d unchecked (no wipefs)"; continue; }
-    for x in $d $(lsblk -nrpo NAME,TYPE "$d" 2>/dev/null | awk '$2 == "part" { print $1 }'); do
-      [ "$x" = "$d" ] || echo "signature=$x partition"
-      wipefs -n --noheadings -O DEVICE,TYPE "$x" 2>/dev/null | awk 'NF > 1 { print "signature=" $1 " " $2 }' ||
-        echo "signature=$x unchecked"
-    done
-  done
-} >"$F"
-A=$(curl -fsS --noproxy "*" -m 30 -X POST -H 'content-type: text/plain' --data-binary @"$F" "\${B}facts") ||
-  A="stop: the boot server did not answer, so nothing was erased"
-case "$A" in
-  ok*) exit 0 ;;
-esac
-echo "archon: $A" | tee /dev/console
-echo "archon: nothing was written to any disk; this machine powers off in 30 seconds." | tee /dev/console
-sleep 30
-poweroff -f
-`;
-
 /**
  * The script that converges the machine from its signed repository, run at first boot and then on a timer: it gets the repository at its branch, runs nothing unless the tip is signed by one of the signers in `/etc/archon/allowed_signers`, and runs
  * the playbook the repository holds for this machine. Shell, because nothing else is on the machine yet; it needs only git, ssh-keygen and ansible-core, which first boot installs from Ubuntu's archive.
