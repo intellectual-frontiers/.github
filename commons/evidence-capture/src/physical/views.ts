@@ -14,7 +14,7 @@
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { instantMs } from "@intellectual-frontiers/grc/governance";
 import type { GitRefStore } from "@intellectual-frontiers/grc/stores/gitref";
-import { parseSpan } from "@intellectual-frontiers/evidence-capture/logical";
+import { type Answer, parseSpan, queryJournal, type QueryOptions } from "@intellectual-frontiers/evidence-capture/logical";
 import { readJournal } from "./collect.ts";
 
 /** How the states kept on the branch are read and compared: `read` gives the state a file's text holds (nothing where it does not), and `diff` the difference of two. */
@@ -112,4 +112,11 @@ export async function verifyJournalOf(store: GitRefStore, branch: string): Promi
   if ((await store.head()) === undefined) return err(`the branch ${branch} does not exist: nothing was captured`);
   const journal = await readJournal(store);
   return journal.kind === "err" ? journal : ok({ entries: journal.value.length, head: journal.value.at(-1)?.digest, branch });
+}
+
+/** One read-only question of the journal of the branch (0006-evidence-capture-query FR-004): the journal is read through the store, which verifies its chain, and a branch that does not exist says that nothing was captured. */
+export async function askJournal(store: GitRefStore, branch: string, sql: string, options: QueryOptions = {}): Promise<Result<Answer, string>> {
+  if ((await store.head()) === undefined) return err(`the branch ${branch} does not exist: nothing was captured`);
+  const journal = await readJournal(store);
+  return journal.kind === "err" ? journal : queryJournal(journal.value, sql, options);
 }

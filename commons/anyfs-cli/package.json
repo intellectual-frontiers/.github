@@ -2,7 +2,7 @@
   "name": "@intellectual-frontiers/anyfs-cli",
   "private": true,
   "version": "0.1.0",
-  "description": "The `anyfs` program: POSIX-style access to any AnyFS store (ls, cat, cp, rm, find, grep, diff) and the bridge verbs (sync, bisync, mirror, check) from the command line, a tool server and a REST description, with every operation saying how it was carried out and every destruction a plan first.",
+  "description": "The `anyfs` program: POSIX-style access to any AnyFS store (ls, cat, cp, rm, find, grep, diff) and the bridge verbs (sync, bisync, mirror, check, merge, sync-medium) from the command line, a tool server and a REST description, with every operation saying how it was carried out and every destruction a plan first.",
   "type": "module",
   "engines": {
     "node": ">=26"

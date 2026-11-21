@@ -71,7 +71,21 @@ export function sqlitePort(db: SqliteDatabase, options: SqliteOptions = {}): Sql
           throw thrown;
         }
       }),
-    close: async () => void db.close(),
+    // the log of write-ahead mode is folded into the file, so that the file alone is the whole database
+    checkpoint: () =>
+      gate.run(async () => {
+        db.prepare("PRAGMA wal_checkpoint(TRUNCATE)").all();
+      }),
+    close: async () => {
+      try {
+        await gate.run(async () => {
+          db.prepare("PRAGMA wal_checkpoint(TRUNCATE)").all();
+        });
+      } catch {
+        // a database that cannot be checkpointed (in memory, or locked by another connection) is closed all the same
+      }
+      db.close();
+    },
   };
 }
 

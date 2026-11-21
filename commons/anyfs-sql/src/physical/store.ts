@@ -70,7 +70,8 @@ import {
   withBlob,
 } from "@intellectual-frontiers/anyfs/merge";
 import { DEFAULT_MAX_OBJECT, HARD_MAX_OBJECT, type Naming, type NamingOptions, parseNaming, SCHEMA_VERSION, type SqlDialect, type SqlPort, type SqlRunner } from "@intellectual-frontiers/anyfs-sql/governance";
-import { type Ctx, deltaOfDatabase, execQ, runQ, siblingsOfPath, stateOf, takeDelta, vectorOfDatabase, verifyDatabase } from "./merge.ts";
+import { type Compacted, type CompactInput, compactDatabase, adoptEpoch, type EpochProposal, retireReplica, retiredOf, type Retired, epochsOf } from "./compact.ts";
+import { type Ctx, type EpochRow, deltaOfDatabase, execQ, runQ, siblingsOfPath, stateOf, takeDelta, vectorOfDatabase, verifyDatabase } from "./merge.ts";
 import { hasSearch, layoutVersion, migrate, type MigrateOptions } from "./schema.ts";
 import { type Layout, layoutOf } from "./layout.ts";
 import { bytesOf, numberOf, type Sql, sqlFor, textOf } from "./sql.ts";
@@ -133,6 +134,18 @@ export type SqlStore = {
   pending(): Promise<number>;
   /** The index of search made again from the files, after rows were put in by a SQL import. */
   reindex(): Promise<void>;
+  /** The log of the engine folded into the file, so that a file copied now is the whole database: `done` for an engine that keeps a log, `not-needed` for one that does not. Closing the port does it too. */
+  checkpoint(): Promise<"done" | "not-needed">;
+  /** Collects the rows every replica of a roster holds, against what each has reported; refused where a replica of the roster has not reported, and the epoch it writes keeps an old dump from bringing back what was collected. */
+  compact(input: CompactInput): Promise<Result<Compacted, string>>;
+  /** Takes an epoch another replica made, where this one holds all the rows it covers. */
+  adopt(proposal: EpochProposal): Promise<Result<Compacted | "nothing", string>>;
+  /** Retires a replica that will not return: it is no longer trusted, and who did it, when and why is written down. */
+  retire(replica: ReplicaId, reason: string, at: string): Promise<Result<Retired, string>>;
+  /** The replicas that were retired. */
+  retired(): Promise<readonly Retired[]>;
+  /** The epochs, oldest first. */
+  epochs(): Promise<readonly EpochRow[]>;
   /** The context the merge and the dump work in. */
   readonly ctx: Ctx;
   readonly port: SqlPort;
@@ -498,6 +511,16 @@ export async function openSqlStore(port: SqlPort, options: SqlOptions = {}): Pro
     verify: () => verifyDatabase(port, ctx, clock()),
     pending: async () => numberOf((await runQ(port, l.countPending()))[0]?.["n"] ?? null),
     reindex,
+    checkpoint: async () => {
+      if (port.checkpoint === undefined) return "not-needed";
+      await port.checkpoint();
+      return "done";
+    },
+    compact: (input) => compactDatabase(port, ctx, input),
+    adopt: (proposal) => adoptEpoch(port, ctx, proposal),
+    retire: (who, reason, at) => retireReplica(port, ctx, who, reason, at),
+    retired: () => retiredOf(port, ctx),
+    epochs: () => epochsOf(port, ctx),
     ctx,
     port,
   });

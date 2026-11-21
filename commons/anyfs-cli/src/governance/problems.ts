@@ -32,6 +32,9 @@ export type ProblemCode =
   | "E-DIFFERENT"
   | "E-PLAN-REFUSED"
   | "E-PLAN-STALE"
+  | "E-MERGE-REFUSED"
+  | "E-SYNC-FAILED"
+  | "E-FILES-ASIDE"
   | "E-CONFLICTS"
   | "E-APPLY-FAILED"
   | "E-REPLICA-DIVERGED"
@@ -52,6 +55,9 @@ export const PROBLEM_CODES: readonly ProblemCode[] = [
   "E-DIFFERENT",
   "E-PLAN-REFUSED",
   "E-PLAN-STALE",
+  "E-MERGE-REFUSED",
+  "E-SYNC-FAILED",
+  "E-FILES-ASIDE",
   "E-CONFLICTS",
   "E-APPLY-FAILED",
   "E-REPLICA-DIVERGED",
@@ -78,6 +84,9 @@ export const CATALOGUE: Readonly<Record<ProblemCode, Explained>> = {
   "E-DIFFERENT": { title: "The two differ", what: "diff or check found that the two sides are not the same.", why: "A real difference.", fix: "anyfs sync SRC DST --dry-run shows what would make them equal" },
   "E-PLAN-REFUSED": { title: "No plan was made", what: "The plan was refused before it was made: a rail was crossed, the deletes were over their allowance, something would be lost, or a store lacks what the mode needs.", why: "The reason is in the message: rails, delete budget, losses or capability.", fix: "change the rails or the allowance named in the message, or look at the plan with --dry-run" },
   "E-PLAN-STALE": { title: "The plan changed", what: "The hash that was approved is not the hash of the plan made now: a store changed since the plan was looked at.", why: "Someone changed the source or the destination between the dry run and the apply.", fix: "run --dry-run again, read the new plan, then apply with its hash" },
+  "E-MERGE-REFUSED": { title: "The merge was refused", what: "The merge was not made: a store cannot merge, a rail was crossed, or the plan changed since it was approved.", why: "The reason is in the message: capability, rails or a changed store.", fix: "run anyfs merge A B (the dry run), read the plan, then apply with --yes --plan-hash HASH" },
+  "E-SYNC-FAILED": { title: "The exchange did not finish", what: "Publishing or taking deltas through the shared place stopped on a problem.", why: "The place was unreachable, refused a write, or a delta was refused.", fix: "run the same command again: what is done is not done twice" },
+  "E-FILES-ASIDE": { title: "Some deltas were set aside", what: "The exchange finished, but some delta files were refused or are waiting for rows that are not here yet.", why: "A delta was malformed, forged, from an untrusted replica or has parents not yet held.", fix: "read the report: trust the replica, or wait for the missing deltas, then run it again" },
   "E-CONFLICTS": { title: "The plan has conflicts", what: "Some names changed on both sides or collide, so the plan will not apply them unasked.", why: "A change on both sides, a name that two paths make, or names that differ only in case.", fix: "settle them by hand, or choose a rule (--conflict newer-wins or keep-both for bisync)" },
   "E-APPLY-FAILED": { title: "Some of the plan did not apply", what: "At least one action failed or was skipped; the report says which and why.", why: "A store was unreachable, refused a write, or changed under the plan.", fix: "run the same command again: what is done is not done twice" },
   "E-REPLICA-DIVERGED": { title: "A replica changed on its own", what: "The replica holds changes the primary does not, so a sync would lose them.", why: "Someone wrote to the replica directly.", fix: "decide which side is right; anyfs mirror status names the paths" },

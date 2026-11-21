@@ -1,4 +1,4 @@
-// Spec: 0007-sql-merge FR-001, FR-002, FR-003, FR-004, FR-005, FR-006
+// Spec: 0007-sql-merge FR-001, FR-002, FR-003, FR-004
 /**
  * What the database does of merging: the rows of a path as the pure model's state (so that the winner, the heads and the next id are the model's, not a second reading of them), the version vector and the delta since one, the
  * judgement of a delta (whom it is from, its checksums, its time, whether the database holds what its rows replace and the blobs its puts name, until it does the delta waits in the database) and its adding in one step,
@@ -121,10 +121,68 @@ export async function stateOf(r: SqlRunner, c: Ctx, paths: readonly string[]): P
   return { ...state, last: time, ownSeq: Math.max(state.ownSeq, seq === null ? 0 : numberOf(seq)) };
 }
 
-/** The version vector of the database: for each replica, the number of its last row held with none missing before it. */
+/** An epoch as the database holds it: how far the rows are collected (a horizon), against which roster, which covered rows it keeps (as keys) and the greatest id it collected. */
+export type EpochRow = { readonly n: number; readonly horizon: VersionVector; readonly roster: readonly ReplicaId[]; readonly retained: readonly string[]; readonly bound: string };
+
+const numbersOf = (text: string): VersionVector => {
+  try {
+    const x = JSON.parse(text) as unknown;
+    if (typeof x !== "object" || x === null) return {};
+    const out: Record<string, number> = {};
+    for (const [k, v] of Object.entries(x as Record<string, unknown>)) if (typeof v === "number" && Number.isSafeInteger(v) && v >= 0) out[k] = v;
+    return out;
+  } catch {
+    return {};
+  }
+};
+
+const listOf = (text: string): readonly string[] => {
+  try {
+    const x = JSON.parse(text) as unknown;
+    return Array.isArray(x) ? x.filter((e): e is string => typeof e === "string") : [];
+  } catch {
+    return [];
+  }
+};
+
+/** The epochs the database holds, oldest first. */
+export async function epochsOfDatabase(r: SqlRunner, c: Ctx): Promise<readonly EpochRow[]> {
+  const out: EpochRow[] = [];
+  for (const row of await runQ(r, c.l.selectEpochs())) {
+    const roster: ReplicaId[] = [];
+    for (const who of listOf(textOf(row["roster"] ?? null))) {
+      const id = parseReplicaId(who);
+      if (id.kind === "ok") roster.push(id.value);
+    }
+    out.push({ n: numberOf(row["n"] ?? null), horizon: numbersOf(textOf(row["horizon"] ?? null)), roster, retained: listOf(textOf(row["retained"] ?? null)), bound: textOf(row["bound"] ?? null) });
+  }
+  return out;
+}
+
+/** The newest epoch, or nothing where no rows were ever collected. */
+export async function latestEpoch(r: SqlRunner, c: Ctx): Promise<EpochRow | undefined> {
+  const all = await epochsOfDatabase(r, c);
+  return all[all.length - 1];
+}
+
+/**
+ * The version vector of the database: for each replica, the number of its last row held with none missing before it. Where rows were collected, what an epoch covers counts as held, so the numbers start from its
+ * horizon: the rows above it are walked from there.
+ */
 export async function vectorOfDatabase(r: SqlRunner, c: Ctx): Promise<VersionVector> {
   const out: Record<string, number> = {};
   for (const row of await runQ(r, c.l.selectVector())) out[textOf(row["replica"] ?? null)] = numberOf(row["n"] ?? null);
+  const epoch = await latestEpoch(r, c);
+  if (epoch === undefined) return out;
+  for (const [replica, floor] of Object.entries(epoch.horizon)) {
+    let n = floor;
+    for (const row of await runQ(r, c.l.selectSeqsAbove(replica, floor))) {
+      const seq = numberOf(row["seq"] ?? null);
+      if (seq === n + 1) n = seq;
+      else if (seq > n + 1) break;
+    }
+    if (n > 0) out[replica] = n;
+  }
   return out;
 }
 
@@ -154,7 +212,7 @@ async function heldIds(r: SqlRunner, c: Ctx, ids: readonly string[]): Promise<Re
   return held;
 }
 
-async function heldKeys(r: SqlRunner, c: Ctx, ids: readonly string[]): Promise<ReadonlySet<string>> {
+export async function heldKeys(r: SqlRunner, c: Ctx, ids: readonly string[]): Promise<ReadonlySet<string>> {
   const held = new Set<string>();
   for (const part of chunks([...new Set(ids)], CHUNK)) for (const row of await runQ(r, c.l.selectRowsOfIds(part))) held.add(`${textOf(row["id"] ?? null)}|${textOf(row["sum"] ?? null)}`);
   return held;
@@ -220,8 +278,10 @@ export async function judgeDelta(r: SqlRunner, c: Ctx, delta: Delta, wall: numbe
   const inDelta = new Set(delta.versions.map((v) => v.id as string));
   const wanted = delta.versions.flatMap((v) => [...(v.parent === null ? [] : [v.parent]), ...v.merged]).filter((id) => !inDelta.has(id));
   const idsHeld = await heldIds(r, c, wanted);
+  const bound = (await latestEpoch(r, c))?.bound ?? "";
   const missing = new Set<string>();
-  for (const id of wanted) if (!idsHeld.has(id)) missing.add(`version ${id}`);
+  // a row that an epoch collected is not waited for: its id is not above the greatest id the epoch collected
+  for (const id of wanted) if (!idsHeld.has(id) && !(bound !== "" && id <= bound)) missing.add(`version ${id}`);
   const needBlobs = delta.versions.flatMap((v) => (v.blob === null || blobs.has(v.blob) ? [] : [v.blob]));
   const needHeld = await heldBlobs(r, c, needBlobs);
   for (const sha of needBlobs) if (!needHeld.has(sha)) missing.add(`blob ${sha}`);
@@ -286,6 +346,7 @@ const PAGE = 2000;
 export async function verifyDatabase(r: SqlRunner, c: Ctx, wall: number): Promise<readonly MergeFinding[]> {
   const out: MergeFinding[] = [];
   const trust = c.config.trust;
+  const bound = (await latestEpoch(r, c))?.bound ?? "";
   let after: { readonly id: string; readonly sum: string } | undefined;
   for (;;) {
     const page = await runQ(r, c.l.selectVersionsPage(after, PAGE));
@@ -311,7 +372,7 @@ export async function verifyDatabase(r: SqlRunner, c: Ctx, wall: number): Promis
       }
     }
     const held = await heldIds(r, c, refs);
-    for (const ref of new Set(refs)) if (!held.has(ref)) for (const who of owners.get(ref) ?? []) out.push({ kind: "dangling-parent", subject: who, message: `the row ${who} replaces ${ref}, which is not held` });
+    for (const ref of new Set(refs)) if (!held.has(ref) && !(bound !== "" && ref <= bound)) for (const who of owners.get(ref) ?? []) out.push({ kind: "dangling-parent", subject: who, message: `the row ${who} replaces ${ref}, which is not held` });
     const last = page[page.length - 1];
     if (last === undefined || page.length < PAGE) break;
     after = { id: textOf(last["id"] ?? null), sum: textOf(last["sum"] ?? null) };

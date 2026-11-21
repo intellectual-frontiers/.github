@@ -25,6 +25,8 @@
 - **FR-014**: `places` MUST list the mounts with their places and what each kind of place is (built in, from the configuration, or no store yet), `doctor` MUST say what is wrong with the setup and the command for each, and both MUST run where there is no configuration.
 - **FR-015**: The program MUST be one Headless tree made in one place from a host, MUST carry the version, the codes it explains and the tiers, and MUST be the same for the command line, the tool server and the description of the REST surface.
 - **FR-016**: `main` MUST run the program with the words after its name and give its exit status; `--json` MUST give the one envelope of Headless and nothing else on standard output; a variable ANYFS_TIER that is no tier MUST end with the usage status.
+- **FR-017**: `merge` MUST bring two stores that both merge together, MUST plan first and print the plan with its hash, MUST apply only with `--yes` and the plan hash where given (a stale hash ends with `E-PLAN-STALE`), and MUST refuse a store that does not merge.
+- **FR-018**: `sync-medium` MUST exchange a store that merges with a shared place under the identity given by `--replica`, MUST keep its cursor in the state folder, MUST change nothing under `--dry-run`, and MUST end with `E-FILES-ASIDE` where delta files were refused.
 
 ## Acceptance scenarios
 
@@ -44,6 +46,8 @@
 14. **Given** no configuration, **When** places runs, **Then** it says there are no mounts and lists the kinds, per FR-014.
 15. **Given** the program, **When** its model is described, **Then** it has the verbs and the three surfaces agree, per FR-015.
 16. **Given** --json, **When** ls runs, **Then** standard output is one JSON document, per FR-016.
+17. **Given** two stores that merge, **When** merge runs with --dry-run and then with a stale hash, **Then** the first prints a plan hash and the second ends with E-PLAN-STALE, per FR-017.
+18. **Given** a store that merges and a shared folder, **When** sync-medium runs, **Then** delta files appear under the folder, per FR-018.
 
 ## Out of scope
 

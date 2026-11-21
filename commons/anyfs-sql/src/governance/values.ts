@@ -32,5 +32,7 @@ export type SqlPort = SqlRunner & {
   readonly dialect: SqlDialect;
   /** Runs the function in a transaction that holds until it returns and is undone where it throws; no other statement of this port runs in between, where the driver has one connection. */
   transaction<T>(run: (tx: SqlRunner) => Promise<T>): Promise<T>;
+  /** Brings what the engine holds in a log back into the file, so that the file alone is the whole database: a file copied after it is complete. Only a port of an engine that keeps a log has it (SQLite in write-ahead mode). */
+  checkpoint?(): Promise<void>;
   close(): Promise<void>;
 };
