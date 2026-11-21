@@ -1,0 +1,35 @@
+{
+  "name": "@intellectual-frontiers/anyfs-ssh",
+  "private": true,
+  "version": "0.1.0",
+  "description": "The SSH backend of AnyFS: a store over a folder on a host reached by SSH, the fleet's system of record, with a revision on every read and a stated expectation on every write, reached only through the safe executor of headless.",
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "exports": {
+    ".": "./src/mod.ts",
+    "./helper": "./src/helper/mod.ts"
+  },
+  "scripts": {
+    "check": "tsc -p tsconfig.json",
+    "test": "bun test suite/",
+    "test:node": "node --test \"suite/**/*.test.ts\"",
+    "verify": "bun tools/helper.ts --check && tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../libraries/src/check.ts --root spec-kit --level L1 && bun ../kanon/src/check.ts && bun tools/check.ts && bun test suite/ && bun tools/pack.ts --check",
+    "pack": "bun tools/pack.ts"
+  },
+  "devDependencies": {
+    "@intellectual-frontiers/anyfs": "link:../anyfs",
+    "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/crypto": "link:../crypto",
+    "@intellectual-frontiers/headless": "link:../headless",
+    "@intellectual-frontiers/kanon": "link:../kanon",
+    "@intellectual-frontiers/libraries": "link:../libraries",
+    "@intellectual-frontiers/mizan": "link:../mizan",
+    "@intellectual-frontiers/system": "link:../system",
+    "@intellectual-frontiers/test": "link:../test",
+    "@types/node": "26.6.6",
+    "fast-check": "4.10.2",
+    "typescript": "7.0.2"
+  }
+}

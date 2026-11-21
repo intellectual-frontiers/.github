@@ -1,0 +1,6 @@
+number	slug	state
+0001	anyfs-posix-layers	in force
+0002	anyfs-posix-governance	in force
+0003	anyfs-posix-logical	in force
+0004	anyfs-posix-physical	in force
+0005	anyfs-posix-conformance	in force
