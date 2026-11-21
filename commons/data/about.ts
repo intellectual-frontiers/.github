@@ -42,6 +42,11 @@ export const about: About = {
       what: "Arca's typical data models as governance: the party model first.",
       mayImport: ["governance/, engine/, by package name"],
     },
+    {
+      path: "acceptance/",
+      what: "The acceptance kits (acceptance/README.md): testing by people or agents, for the experience beyond the code, with their own specifications (acceptance/spec-kit), made-up data and checks, and run apart from the library's tests by `bun run acceptance`. The first is `arcactl-pg`, a UAT of arcactl and row-level security on PostgreSQL. Not packed.",
+      mayImport: ["governance/, sql/, models/, by package name"],
+    },
     { path: "suite/", what: "The tests.", mayImport: ["anything here"] },
   ],
   commands: [{ run: "bun run verify", does: "The compiler, the specification checker and the rules on spec-kit/, and the tests." }],

@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Takes the UAT out of your database: the schemas, the seal and the roles. Run it as a PostgreSQL superuser, in the UAT database.
+# The guard refuses to drop the tables unless the session holds the unlock secret, so this script says it. It asks first.
+set -euo pipefail
+. "$(dirname "$0")/env"
+printf 'This DROPS the schemas data, api and ifc_seal and the uat_* and crm_* roles from the database %s. Type yes to go on: ' "$(psql -Atc 'select current_database()')"
+read -r answer
+[ "$answer" = "yes" ] || { echo "nothing done"; exit 1; }
+psql -v ON_ERROR_STOP=1 -q -v unlock="$ARCA_UNLOCK_SECRET" -f "$UAT_DIR/sql/reset.sql"
+echo "reset: done"

@@ -1,4 +1,4 @@
-// Spec: 0009-sql-features FR-008, FR-009, FR-010, FR-019
+// Spec: 0009-sql-features FR-008, FR-009, FR-010, FR-019, FR-020
 /**
  * Access (commons data 0009-sql-features FR-008 to FR-010): what governance says of who may see what becomes what the engine enforces. A column that carries `security.scope` makes its table's
  * rows visible only where the column equals the setting of the scope; a concept that carries `security.access` grants its read roles `SELECT` and its write roles `INSERT`, `UPDATE` and
@@ -35,6 +35,14 @@ export interface AccessSettings {
    * (the service that has authenticated the caller) makes the mark with `sealedScope`. Row security is forced on the tables' owners and a guard refuses to disable it, or drop a policy or a table of it unless the session holds the secret whose hash is `unlock`.
    */
   readonly seal?: { readonly key: string; readonly unlock?: string };
+  /**
+   * How far a scope reaches (0009-sql-features FR-020, PostgreSQL). `exact`, the default, shows a row where its scope column equals the setting. `set` reads the setting as a list of values, separated by commas
+   * (`acme,acme-eu`), and shows a row where its column is one of them: a reseller reaches the tenants beneath it, a support role the few it is asked to help, and the issuer of the scope (which has
+   * authenticated the caller and knows the hierarchy) decides which. With `wildcard`, the value `*` reaches every row, for a platform operator. A reach is only as trustworthy as the scope: seal it.
+   */
+  readonly reach?: "exact" | "set";
+  /** With `reach: "set"`, whether the value `*` reaches every row; off by default. */
+  readonly wildcard?: boolean;
 }
 
 const sealed = (key: string, msg: string): string => {
@@ -44,6 +52,14 @@ const sealed = (key: string, msg: string): string => {
 
 /** The value to give a sealed scope setting: the value and its mark, made by the issuer that holds the key. */
 export const sealedScope = (key: string, name: string, value: string): string => `${value}.${sealed(key, `${name}=${value}`)}`;
+
+/** What a scope of a set reaches: the tenants, or every one (`*`). A value with a comma in it cannot be listed, since the comma is what separates them. */
+export function grantOf(values: readonly string[] | "*"): string {
+  if (values === "*") return "*";
+  if (values.length === 0) throw new Error("a scope that reaches nothing is no scope: leave it unset");
+  for (const v of values) if (v === "" || v.includes(",") || v === "*") throw new Error(`a scope value cannot be empty, hold a comma or be *: ${JSON.stringify(v)}`);
+  return [...values].join(",");
+}
 
 /** The statement that sets a sealed scope for the transaction (or, where `local` is false, the session) that runs it. */
 export const scopeStatement = (key: string, name: string, value: string, prefix = "app", local = true): string =>
@@ -109,10 +125,10 @@ export function accessSource(settings: AccessSettings = {}): StatementSource {
         }
         const col = written.column(column.id);
         if (col === undefined) continue;
-        const test =
-          seal === undefined
-            ? `${q(col)}::text = current_setting(${dialect.literal(`${prefix}.${scope}`)}, true)`
-            : `${q(col)}::text = ${SEAL}.scope(${dialect.literal(scope)})`;
+        const setting = seal === undefined ? `current_setting(${dialect.literal(`${prefix}.${scope}`)}, true)` : `${SEAL}.scope(${dialect.literal(scope)})`;
+        const test = settings.reach !== "set"
+          ? `${q(col)}::text = ${setting}`
+          : `${q(col)}::text = ANY (string_to_array(${setting}, ','))${settings.wildcard === true ? ` OR ${setting} = '*'` : ""}`;
         const of = [t.id, column.id, featureId("policy", [...t.name, ...words(scope)])];
         out.push({ group: "policy", sql: `ALTER TABLE ${written.ref(t.id)} ENABLE ROW LEVEL SECURITY;`, of });
         if (settings.viewsSchema !== undefined || seal !== undefined)

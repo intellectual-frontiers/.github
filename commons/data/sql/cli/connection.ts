@@ -10,6 +10,7 @@
  * @module
  */
 import type { Driver } from "@intellectual-frontiers/data/sql/lifecycle";
+import { resolveTarget, urlOfTarget } from "./resolve.ts";
 
 /** A connection: the driver the library runs on, which runtime made it, and how it is closed. */
 export interface Connection {
@@ -26,6 +27,8 @@ export interface ConnectOptions {
   readonly connectTimeout?: number;
   /** Which client: Bun's where this is Bun, `pg` elsewhere, unless this says (`pg` can be used on Bun too). */
   readonly driver?: "bun" | "pg";
+  /** The environment libpq's variables are read from, when there is no URL; the process's by default. */
+  readonly env?: Readonly<Record<string, string | undefined>>;
 }
 
 type Row = Record<string, unknown>;
@@ -47,7 +50,22 @@ interface PgClient {
 }
 
 /** Connects with Bun's client where this is Bun, and with `pg` where it is not. */
-export async function connect(options: ConnectOptions = {}): Promise<Connection> {
+export async function connect(given: ConnectOptions = {}): Promise<Connection> {
+  // with no URL, connect as psql does: libpq's variables, the service PGSERVICE names, and the password from .pgpass (0046-arcactl FR-014)
+  const target = given.url === undefined ? resolveTarget(given.env ?? process.env) : undefined;
+  const options: ConnectOptions = target === undefined ? given : { ...given, url: urlOfTarget(target) };
+  try {
+    return await open(options);
+  } catch (thrown) {
+    // a driver may quote what it was given: the password that was found in a file is never in the error
+    const secret = target?.password;
+    if (secret === undefined || secret === "" || !(thrown instanceof Error)) throw thrown;
+    const clean = (m: string): string => m.replaceAll(secret, "***").replaceAll(encodeURIComponent(secret), "***");
+    throw new Error(clean(thrown.message));
+  }
+}
+
+async function open(options: ConnectOptions): Promise<Connection> {
   const bun = (globalThis as { Bun?: { SQL?: new (...a: unknown[]) => BunSql } }).Bun;
   if (options.driver === "bun" && bun?.SQL === undefined) throw new Error("Bun's client was asked for and this is not Bun");
   if (bun?.SQL !== undefined && options.driver !== "pg") {
