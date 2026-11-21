@@ -16,6 +16,7 @@ import { diagramSources, drawable } from "./emit/html.ts";
 import { markdownOf } from "./emit/markdown.ts";
 import { readEvidence } from "./evidence.ts";
 import { presentationFiles, writeFiles } from "./presentation.ts";
+import { gitPage } from "./pages/git.ts";
 import { insightPages, sbom } from "./pages/insight.ts";
 import { decorate, fillFindings, qualityData, qualityPages } from "./pages/quality.ts";
 import { readApi } from "./extract/api.ts";
@@ -269,6 +270,7 @@ export async function buildSite(config: Config): Promise<Built> {
   homes(b, packages);
   qualityPages(b);
   insightPages(b);
+  await gitPage(b);
   decorate(b, areas);
   citedBy(b);
   b.found.push(...brokenLinks(b.pages));

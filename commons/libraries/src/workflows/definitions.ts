@@ -476,7 +476,7 @@ const site: Workflow = {
       timeoutMinutes: 20,
       permissions: { contents: "read", issues: "read", actions: "read" },
       steps: [
-        checkout(),
+        checkout({ fetchDepth: 0, comment: "the whole history, for the page of hotspots and owners" }),
         bun(),
         { ...tools("commons/docs", "TypeScript 7.1 (beta), Shiki, beautiful-mermaid and @types/node, exactly as bun.lock pins them"), continueOnError: true },
         run(
