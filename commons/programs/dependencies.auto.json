@@ -8,6 +8,7 @@
     "@intellectual-frontiers/grc": "0.3.0",
     "@intellectual-frontiers/integrations": "0.2.0",
     "@intellectual-frontiers/integrations-github": "0.2.0",
+    "@intellectual-frontiers/lang-sql": "0.1.0",
     "@intellectual-frontiers/libraries": "0.5.0",
     "@intellectual-frontiers/repoctl": "0.1.0"
   }

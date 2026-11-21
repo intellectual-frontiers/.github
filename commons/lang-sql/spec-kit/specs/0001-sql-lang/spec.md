@@ -47,7 +47,7 @@
 
 - The parser, the abstract syntax tree, the attachment of comments to nodes, the walkers and queries over the tree, the projection to `unist`, the extraction of documentation, SQL over a data structure, a file system or an object store, and the dialects beyond the three: later specifications of this folder, numbered after this one.
 - Writing SQL from a tree (generation) and changing a tree into another dialect's.
-- Publishing the package to npm (OQ-1).
+- Splitting the dialects into packages of their own (OQ-1).
 
 ## Edge cases
 
@@ -68,7 +68,7 @@
 
 ## Open questions
 
-- **OQ-1**: When this library is published to npm. Its manifest declares `distribution: ["github"]` and it is held back from npm until a first real consumer (the SQL store of AnyFS) imports it; splitting each dialect into its own `lang-sql-<dialect>` package is deferred until one of them has a heavy dependency.
+- **OQ-1**: Whether each dialect becomes its own `lang-sql-<dialect>` package. Splitting is deferred until one of them has a heavy dependency; until then the dialects are subpath exports of this package, which is published to npm like every library of commons.
 
 ## Key entities
 

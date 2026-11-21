@@ -1,8 +1,7 @@
 // Spec: 0001-sql-lang FR-003
 /**
  * The manifest of Lang Sql, a library of commons (commons 0027-commons-libraries FR-012): data a program reads and never runs. Registering a library is a folder with a manifest like this one; this
- * repository's specification of the libraries is made from it (`bun commons/libraries/src/libraries.ts`), and a test fails where the manifest and the folder disagree. It is held back from npm (`distribution` is
- * `github` alone) until the SQL store of AnyFS is its first consumer.
+ * repository's specification of the libraries is made from it (`bun commons/libraries/src/libraries.ts`), and a test fails where the manifest and the folder disagree.
  *
  * @module
  */
@@ -12,8 +11,7 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
-  held: "built and verified but not released to npm: the owner publishes it when the SQL store of AnyFS (anyfs-sql) is its first consumer",
+  distribution: ["github", "npm"],
   exports: [
     ".",
     "./dialects/athena",
