@@ -32,15 +32,19 @@ import type {
   ColumnConstraint,
   ColumnDef,
   Cte,
+  CteBody,
   DataType,
   Default,
+  Delete,
   Expr,
   ForeignKey,
   Frame,
   FrameBound,
   Ident,
+  Insert,
   Name,
   NotNull,
+  OnConflict,
   OrderItem,
   PrimaryKey,
   Query,
@@ -50,11 +54,14 @@ import type {
   Script,
   SelectItem,
   Source,
+  StarModifier,
   Statement,
+  StringLit,
   TableConstraint,
   TableRef,
   Tuple,
   Unique,
+  Update,
   When,
   WindowDef,
   WindowSpec,
@@ -122,7 +129,8 @@ class Rewriter {
         return this.parts(e);
       case "star": {
         const qualifier = opt(e.qualifier, (q) => this.name(q));
-        return qualifier === e.qualifier ? e : { ...e, qualifier };
+        const modifiers = mapList(e.modifiers, (m) => this.starModifier(m));
+        return qualifier === e.qualifier && modifiers === e.modifiers ? e : { ...e, qualifier, modifiers };
       }
       case "number":
       case "string":
@@ -140,7 +148,7 @@ class Rewriter {
         return left === e.left && right === e.right ? e : { ...e, left, right };
       }
       case "operator": {
-        const left = this.expr(e.left);
+        const left = opt(e.left, (x) => this.expr(x));
         const right = this.expr(e.right);
         return left === e.left && right === e.right ? e : { ...e, left, right };
       }
@@ -209,8 +217,18 @@ class Rewriter {
       }
       case "subscript": {
         const arg = this.expr(e.arg);
-        const index = this.expr(e.index);
-        return arg === e.arg && index === e.index ? e : { ...e, arg, index };
+        const index = opt(e.index, (x) => this.expr(x));
+        const upper = opt(e.upper, (x) => this.expr(x));
+        return arg === e.arg && index === e.index && upper === e.upper ? e : { ...e, arg, index, upper };
+      }
+      case "field": {
+        const arg = this.expr(e.arg);
+        const field = opt(e.field, (x) => this.ident(x));
+        return arg === e.arg && field === e.field ? e : { ...e, arg, field };
+      }
+      case "typed-string": {
+        const value = this.stringLit(e.value);
+        return value === e.value ? e : { ...e, value };
       }
       case "collate": {
         const arg = this.expr(e.arg);
@@ -233,7 +251,16 @@ class Rewriter {
     return cond === w.cond && result === w.result ? w : { ...w, cond, result };
   }
 
+  private stringLit(s: StringLit): StringLit {
+    const e = this.expr(s);
+    return e.kind === "string" ? e : s;
+  }
+
   private arg(a: Argument): Argument {
+    if (a.kind === "keyword-arg") {
+      const value = opt(a.value, (x) => this.expr(x));
+      return value === a.value ? a : { ...a, value };
+    }
     if (a.kind !== "named-arg") return this.expr(a);
     const name = this.ident(a.name);
     const value = this.expr(a.value);
@@ -351,7 +378,7 @@ class Rewriter {
       }
       case "with": {
         const ctes = mapList(q.ctes, (x) => this.cte(x));
-        const body = this.query(q.body);
+        const body = this.cteBody(q.body);
         return ctes === q.ctes && body === q.body ? q : { ...q, ctes, body };
       }
       default:
@@ -359,17 +386,41 @@ class Rewriter {
     }
   }
 
+  private starModifier(m: StarModifier): StarModifier {
+    const items = mapList(m.items, (x) => this.selectItem(x));
+    return items === m.items ? m : { ...m, items };
+  }
+
+  private cteBody(b: CteBody): CteBody {
+    switch (b.kind) {
+      case "insert":
+        return this.insertNode(b);
+      case "update":
+        return this.updateNode(b);
+      case "delete":
+        return this.deleteNode(b);
+      case "select":
+      case "set-op":
+      case "values":
+      case "with":
+        return this.query(b);
+      default:
+        return absurd(b);
+    }
+  }
+
   private cte(c: Cte): Cte {
     const name = this.ident(c.name);
     const columns = mapList(c.columns, (x) => this.ident(x));
-    const query = this.query(c.query);
+    const query = this.cteBody(c.query);
     return name === c.name && columns === c.columns && query === c.query ? c : { ...c, name, columns, query };
   }
 
   private alias(a: Alias): Alias {
     const name = this.ident(a.name);
     const columns = mapList(a.columns, (x) => this.ident(x));
-    return name === a.name && columns === a.columns ? a : { ...a, name, columns };
+    const types = mapList(a.types, (x) => (x === undefined ? x : this.dataType(x)));
+    return name === a.name && columns === a.columns && types === a.types ? a : { ...a, name, columns, types };
   }
 
   source(s: Source): Source {
@@ -396,10 +447,11 @@ class Rewriter {
         const right = this.source(s.right);
         const on = opt(s.on, (x) => this.expr(x));
         const using = mapList(s.using, (x) => this.ident(x));
+        const usingAlias = opt(s.usingAlias, (x) => this.ident(x));
         const alias = opt(s.alias, (x) => this.alias(x));
-        return left === s.left && right === s.right && on === s.on && using === s.using && alias === s.alias
+        return left === s.left && right === s.right && on === s.on && using === s.using && usingAlias === s.usingAlias && alias === s.alias
           ? s
-          : { ...s, left, right, on, using, alias };
+          : { ...s, left, right, on, using, usingAlias, alias };
       }
       default:
         return absurd(s);
@@ -419,6 +471,37 @@ class Rewriter {
     return this.rules.statement?.(rebuilt) ?? rebuilt;
   }
 
+  private insertNode(s: Insert): Insert {
+    const table = this.name(s.table);
+    const alias = opt(s.alias, (x) => this.ident(x));
+    const columns = mapList(s.columns, (x) => this.expr(x));
+    const source = opt(s.source, (x) => this.query(x));
+    const onConflict = opt(s.onConflict, (x) => this.onConflict(x));
+    const returning = mapList(s.returning, (x) => this.selectItem(x));
+    return table === s.table && alias === s.alias && columns === s.columns && source === s.source && onConflict === s.onConflict && returning === s.returning
+      ? s
+      : { ...s, table, alias, columns, source, onConflict, returning };
+  }
+
+  private updateNode(s: Update): Update {
+    const table = this.tableRef(s.table);
+    const assignments = mapList(s.assignments, (x) => this.assignment(x));
+    const from = mapList(s.from, (x) => this.source(x));
+    const where = opt(s.where, (x) => this.expr(x));
+    const returning = mapList(s.returning, (x) => this.selectItem(x));
+    return table === s.table && assignments === s.assignments && from === s.from && where === s.where && returning === s.returning
+      ? s
+      : { ...s, table, assignments, from, where, returning };
+  }
+
+  private deleteNode(s: Delete): Delete {
+    const table = this.tableRef(s.table);
+    const using = mapList(s.using, (x) => this.source(x));
+    const where = opt(s.where, (x) => this.expr(x));
+    const returning = mapList(s.returning, (x) => this.selectItem(x));
+    return table === s.table && using === s.using && where === s.where && returning === s.returning ? s : { ...s, table, using, where, returning };
+  }
+
   private statementChildren(s: Statement): Statement {
     switch (s.kind) {
       case "select":
@@ -426,31 +509,12 @@ class Rewriter {
       case "values":
       case "with":
         return this.queryChildren(s);
-      case "insert": {
-        const table = this.name(s.table);
-        const columns = mapList(s.columns, (x) => this.ident(x));
-        const source = opt(s.source, (x) => this.query(x));
-        const returning = mapList(s.returning, (x) => this.selectItem(x));
-        return table === s.table && columns === s.columns && source === s.source && returning === s.returning
-          ? s
-          : { ...s, table, columns, source, returning };
-      }
-      case "update": {
-        const table = this.tableRef(s.table);
-        const assignments = mapList(s.assignments, (x) => this.assignment(x));
-        const from = mapList(s.from, (x) => this.source(x));
-        const where = opt(s.where, (x) => this.expr(x));
-        const returning = mapList(s.returning, (x) => this.selectItem(x));
-        return table === s.table && assignments === s.assignments && from === s.from && where === s.where && returning === s.returning
-          ? s
-          : { ...s, table, assignments, from, where, returning };
-      }
-      case "delete": {
-        const table = this.tableRef(s.table);
-        const where = opt(s.where, (x) => this.expr(x));
-        const returning = mapList(s.returning, (x) => this.selectItem(x));
-        return table === s.table && where === s.where && returning === s.returning ? s : { ...s, table, where, returning };
-      }
+      case "insert":
+        return this.insertNode(s);
+      case "update":
+        return this.updateNode(s);
+      case "delete":
+        return this.deleteNode(s);
       case "create-table": {
         const name = this.name(s.name);
         const elements = mapList(s.elements, (el) => (el.kind === "column-def" ? this.columnDef(el) : this.tableConstraint(el)));
@@ -509,8 +573,19 @@ class Rewriter {
     return expr === b.expr ? b : { ...b, expr };
   }
 
+  private onConflict(c: OnConflict): OnConflict {
+    const targets = mapList(c.targets, (x) => this.expr(x));
+    const constraint = opt(c.constraint, (x) => this.ident(x));
+    const targetWhere = opt(c.targetWhere, (x) => this.expr(x));
+    const assignments = mapList(c.assignments, (x) => this.assignment(x));
+    const where = opt(c.where, (x) => this.expr(x));
+    return targets === c.targets && constraint === c.constraint && targetWhere === c.targetWhere && assignments === c.assignments && where === c.where
+      ? c
+      : { ...c, targets, constraint, targetWhere, assignments, where };
+  }
+
   private assignment(a: Assignment): Assignment {
-    const target = this.name(a.target);
+    const target = this.expr(a.target);
     const value = this.expr(a.value);
     return target === a.target && value === a.value ? a : { ...a, target, value };
   }
@@ -577,6 +652,11 @@ class Rewriter {
         return this.check(c);
       case "foreign-key":
         return this.foreignKey(c);
+      case "column-option": {
+        const name = this.constraintName(c.name);
+        const expr = opt(c.expr, (x) => this.expr(x));
+        return name === c.name && expr === c.expr ? c : { ...c, name, expr };
+      }
       default:
         return absurd(c);
     }
@@ -592,6 +672,15 @@ class Rewriter {
         return this.check(c);
       case "foreign-key":
         return this.foreignKey(c);
+      case "column-option": {
+        const name = this.constraintName(c.name);
+        const expr = opt(c.expr, (x) => this.expr(x));
+        return name === c.name && expr === c.expr ? c : { ...c, name, expr };
+      }
+      case "table-like": {
+        const table = this.name(c.table);
+        return table === c.table ? c : { ...c, table };
+      }
       default:
         return absurd(c);
     }

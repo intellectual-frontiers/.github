@@ -31,17 +31,22 @@ import type {
   BinaryOp,
   ColumnConstraint,
   ColumnDef,
+  ColumnOption,
   Cte,
+  CteBody,
   DataType,
+  Delete,
   Expr,
   Frame,
   FrameBound,
   Ident,
   Insert,
   IsTest,
+  KeywordArg,
   JoinType,
   Name,
   NamedArg,
+  OnConflict,
   OrderItem,
   Query,
   RefAction,
@@ -54,10 +59,14 @@ import type {
   SetOp,
   SetOperator,
   Source,
+  StarModifier,
   Statement,
+  StringLit,
   TableConstraint,
+  TableLike,
   TableRef,
   Tuple,
+  Update,
   WindowDef,
   WindowSpec,
 } from "./ast.ts";
@@ -281,6 +290,7 @@ const kw = (lx: CompiledLexical) => {
     COLLATE: k("COLLATE"),
     NO: k("NO"),
     TIME: k("TIME"),
+    ZONE: k("ZONE"),
     WITHOUT: k("WITHOUT"),
     YEAR: k("YEAR"),
     MONTH: k("MONTH"),
@@ -298,6 +308,10 @@ const kw = (lx: CompiledLexical) => {
     OTHERS: k("OTHERS"),
     EXCLUDE: k("EXCLUDE"),
     TIES: k("TIES"),
+    BOTH: k("BOTH"),
+    LEADING: k("LEADING"),
+    TRAILING: k("TRAILING"),
+    SIMILAR: k("SIMILAR"),
     ANY: k("ANY"),
     SOME: k("SOME"),
   } as const;
@@ -326,6 +340,24 @@ const CORE_INFIX: readonly (readonly [string, number, BinaryOp])[] = [
   [">", Prec.Compare, ">"],
   [">=", Prec.Compare, ">="],
 ];
+
+/** The type names that may stand before a string to make a typed literal (`DATE '2020-01-01'`). */
+const TYPED_STRING_WORDS: ReadonlySet<string> = new Set(
+  (
+    "DATE TIME TIMETZ TIMESTAMP TIMESTAMPTZ INT INT2 INT4 INT8 INTEGER SMALLINT BIGINT FLOAT FLOAT4 FLOAT8 REAL NUMERIC DECIMAL BOOL BOOLEAN TEXT VARCHAR CHAR BYTEA JSON JSONB UUID BIT NAME OID " +
+    "REGCLASS REGTYPE POINT BOX LSEG PATH POLYGON CIRCLE CIDR INET MACADDR MONEY XML TSVECTOR TSQUERY"
+  ).split(" "),
+);
+
+/** The characters an operator of PostgreSQL is made of. */
+const OP_RUN_CHARS: ReadonlySet<number> = new Set([...("+-*/<>=~!@#%^&|?")].map((c) => c.charCodeAt(0)));
+const SPECIAL_OP_CHARS: ReadonlySet<number> = new Set([...("~!@#%^&|?")].map((c) => c.charCodeAt(0)));
+
+/** The words that begin a column option the grammar keeps as text. */
+const COLUMN_OPTION_WORDS: ReadonlySet<string> = new Set("GENERATED AUTOINCREMENT AUTO_INCREMENT DEFERRABLE INITIALLY ASC DESC NO".split(" "));
+
+/** The words that begin a column constraint, where an option ends. */
+const CONSTRAINT_STARTS: ReadonlySet<string> = new Set("CONSTRAINT NOT NULL DEFAULT PRIMARY UNIQUE CHECK REFERENCES COLLATE".split(" "));
 
 /** The words that may follow the first word of a type's name where what follows the type is an expression. */
 const TYPE_WORDS: ReadonlySet<string> = new Set([
@@ -438,6 +470,8 @@ class Parser {
   private readonly infix: readonly (Infix | undefined)[];
   private readonly likeWords: ReadonlySet<number>;
   private readonly castOp: number;
+  private readonly runs: boolean;
+  private readonly emptySelect: boolean;
   private readonly opMinus: number;
   private readonly opPlus: number;
   private readonly opStar: number;
@@ -490,6 +524,8 @@ class Parser {
       if (id !== undefined) like.add(id);
     }
     this.likeWords = like;
+    this.runs = d.grammar.operatorRuns;
+    this.emptySelect = d.grammar.emptySelect;
     this.castOp = d.grammar.castOperator === undefined ? -1 : (operatorId(d.compiled, d.grammar.castOperator) ?? -1);
     this.opMinus = operatorId(d.compiled, "-") ?? -1;
     this.opPlus = operatorId(d.compiled, "+") ?? -1;
@@ -515,10 +551,6 @@ class Parser {
   }
   private id(at = 0): number {
     return this.ids[this.i + at] ?? 0;
-  }
-  /** The kind of the token `back` before the cursor. */
-  private tokens(back: number): TokKind {
-    return this.kinds[this.i + back] ?? Tok.Eof;
   }
   private atEnd(): boolean {
     return this.kind() === Tok.Eof;
@@ -649,6 +681,17 @@ class Parser {
           continue;
         }
         const info = this.infix[oid];
+        if (this.runs) {
+          const run = this.opRun();
+          if (run !== undefined && (run > 1 || info === undefined)) {
+            if (Prec.Other < min) break;
+            const op = this.text.slice(this.starts[this.i] ?? 0, this.ends[this.i + run - 1] ?? 0);
+            this.i += run;
+            const right = this.expr(Prec.Other + 1);
+            left = { kind: "operator", start: s, end: this.last(), op, left, right };
+            continue;
+          }
+        }
         if (info === undefined || info.prec < min) break;
         this.i++;
         const right = this.expr(info.prec + 1);
@@ -661,9 +704,29 @@ class Parser {
       if (k === Tok.LBracket) {
         if (Prec.Cast < min) break;
         this.i++;
-        const index = this.expr(0);
+        const index = this.atColon() ? undefined : this.expr(0);
+        let upper: Expr | undefined;
+        const slice = this.atColon();
+        if (slice) {
+          this.i++;
+          if (this.kind() !== Tok.RBracket) upper = this.expr(0);
+        }
         this.expectKind(Tok.RBracket, "]");
-        left = { kind: "subscript", start: s, end: this.last(), arg: left, index };
+        left = { kind: "subscript", start: s, end: this.last(), arg: left, index, upper, slice };
+        continue;
+      }
+      if (k === Tok.Dot) {
+        if (Prec.Cast < min) break;
+        const nk = this.kind(1);
+        if (nk === Tok.Op && this.id(1) === this.opStar) {
+          this.i += 2;
+          left = { kind: "field", start: s, end: this.last(), arg: left, field: undefined };
+          continue;
+        }
+        if (nk !== Tok.Word && nk !== Tok.QuotedIdent) break;
+        this.i++;
+        const field = this.ident(true);
+        left = { kind: "field", start: s, end: this.last(), arg: left, field };
         continue;
       }
       if (k !== Tok.Word) break;
@@ -704,33 +767,48 @@ class Parser {
           this.expect(K.FROM, "FROM");
           test = "distinct-from";
           other = this.expr(Prec.Compare + 1);
+        } else if (this.startsExpression() && !this.at(K.AND) && !this.at(K.OR)) {
+          test = "distinct-from";
+          other = this.expr(Prec.Compare + 1);
+          left = { kind: "is", start: s, end: this.last(), arg: left, test, negated: !negated, other };
+          continue;
         } else this.fail("NULL, TRUE, FALSE, UNKNOWN or DISTINCT FROM");
         left = { kind: "is", start: s, end: this.last(), arg: left, test, negated, other };
-      } else if (w === K.NOT || w === K.BETWEEN || w === K.IN || w === K.LIKE || this.likeWords.has(w)) {
+      } else if (w === K.NOT && this.at(K.NULL, 1)) {
+        if (Prec.Is < min) break;
+        this.i += 2;
+        left = { kind: "is", start: s, end: this.last(), arg: left, test: "null", negated: true, other: undefined };
+      } else if (w === K.NOT || w === K.BETWEEN || w === K.IN || w === K.LIKE || this.likeWords.has(w) || (w === K.SIMILAR && this.at(K.TO, 1))) {
         const neg = w === K.NOT;
         const at = neg ? 1 : 0;
         const nw = this.id(at);
-        if (this.kind(at) !== Tok.Word || (nw !== K.BETWEEN && nw !== K.IN && nw !== K.LIKE && !this.likeWords.has(nw))) break;
+        const similar = nw === K.SIMILAR && this.at(K.TO, at + 1);
+        if (this.kind(at) !== Tok.Word || (nw !== K.BETWEEN && nw !== K.IN && nw !== K.LIKE && !this.likeWords.has(nw) && !similar)) break;
         if (Prec.Like < min) break;
-        this.i += at + 1;
+        this.i += at + (similar ? 2 : 1);
         if (nw === K.BETWEEN) {
           const low = this.expr(Prec.Like + 1);
           this.expect(K.AND, "AND");
           const high = this.expr(Prec.Like + 1);
           left = { kind: "between", start: s, end: this.last(), arg: left, negated: neg, low, high };
         } else if (nw === K.IN) {
-          this.expectKind(Tok.LParen, "(");
-          if (this.atQuery()) {
-            const query = this.query();
-            this.expectKind(Tok.RParen, ")");
-            left = { kind: "in-query", start: s, end: this.last(), arg: left, negated: neg, query };
+          if (this.kind() !== Tok.LParen) {
+            const table = this.qualifiedName();
+            left = { kind: "in", start: s, end: this.last(), arg: left, negated: neg, values: [table], bare: true };
           } else {
-            const values = this.commaList(() => this.expr(0));
-            this.expectKind(Tok.RParen, ")");
-            left = { kind: "in", start: s, end: this.last(), arg: left, negated: neg, values };
+            this.i++;
+            if (this.atQuery()) {
+              const query = this.query();
+              this.expectKind(Tok.RParen, ")");
+              left = { kind: "in-query", start: s, end: this.last(), arg: left, negated: neg, query };
+            } else {
+              const values = this.kind() === Tok.RParen ? [] : this.commaList(() => this.expr(0));
+              this.expectKind(Tok.RParen, ")");
+              left = { kind: "in", start: s, end: this.last(), arg: left, negated: neg, values, bare: false };
+            }
           }
         } else {
-          const op = this.text.slice(this.starts[this.i - 1] ?? 0, this.ends[this.i - 1] ?? 0).toUpperCase();
+          const op = similar ? "SIMILAR TO" : this.text.slice(this.starts[this.i - 1] ?? 0, this.ends[this.i - 1] ?? 0).toUpperCase();
           const pattern = this.expr(Prec.Like + 1);
           const escape = this.eat(K.ESCAPE) ? this.expr(Prec.Like + 1) : undefined;
           left = { kind: "like", start: s, end: this.last(), arg: left, op, negated: neg, pattern, escape };
@@ -790,6 +868,13 @@ class Parser {
           this.i++;
           const arg = this.expr(Prec.Unary);
           return { kind: "unary", start: s, end: this.last(), op: o === this.opMinus ? "-" : "+", arg };
+        }
+        const run = this.runs ? this.opRun() : undefined;
+        if (run !== undefined) {
+          const op = this.text.slice(this.starts[this.i] ?? 0, this.ends[this.i + run - 1] ?? 0);
+          this.i += run;
+          const right = this.expr(Prec.Unary);
+          return { kind: "operator", start: s, end: this.last(), op, left: undefined, right };
         }
         return this.fail("an expression");
       }
@@ -866,10 +951,37 @@ class Parser {
         if (this.kind() === Tok.Word && this.isIntervalUnit(this.id())) {
           unit = this.slice().toUpperCase();
           this.i++;
+          if (this.at(K.TO) && this.kind(1) === Tok.Word && this.isIntervalUnit(this.id(1))) {
+            unit += ` TO ${this.slice(1).toUpperCase()}`;
+            this.i += 2;
+            if (this.kind() === Tok.LParen && this.kind(1) === Tok.Number && this.kind(2) === Tok.RParen) {
+              unit += `(${this.slice(1)})`;
+              this.i += 3;
+            }
+          }
         }
         return { kind: "interval", start: s, end: this.last(), value, unit };
       }
+      if (w === K.DEFAULT && !paren) {
+        this.i++;
+        const ident: Ident = { kind: "ident", start: s, end: this.last(), name: "DEFAULT", quoted: false };
+        return { kind: "name", start: s, end: this.last(), parts: [ident] };
+      }
       if (this.isReserved() && !paren) return this.fail("an expression");
+      const zone = (this.at(K.WITH, 1) || this.at(K.WITHOUT, 1)) && this.at(K.TIME, 2) && this.at(K.ZONE, 3) && this.kind(4) === Tok.String;
+      if ((this.kind(1) === Tok.String || zone) && !paren && TYPED_STRING_WORDS.has(this.slice().toUpperCase())) {
+        let type = this.slice().toUpperCase();
+        this.i++;
+        if (zone) {
+          type += ` ${this.slice().toUpperCase()} TIME ZONE`;
+          this.i += 3;
+        }
+        const vs = this.start();
+        const { value, prefix } = stringValue(this.slice(), this.lx, this.id());
+        this.i++;
+        const lit: StringLit = { kind: "string", start: vs, end: this.last(), value, prefix };
+        return { kind: "typed-string", start: s, end: this.last(), type, value: lit };
+      }
     }
     const first = this.ident(true);
     const parts: Ident[] = [first];
@@ -877,7 +989,8 @@ class Parser {
       if (this.kind(1) === Tok.Op && this.id(1) === this.opStar) {
         this.i += 2;
         const qualifier: Name = { kind: "name", start: s, end: this.ends[this.i - 2] ?? s, parts };
-        return { kind: "star", start: s, end: this.last(), qualifier };
+        const modifiers = this.starModifiers();
+        return { kind: "star", start: s, end: this.last(), qualifier, modifiers };
       }
       if (this.kind(1) !== Tok.Word && this.kind(1) !== Tok.QuotedIdent) break;
       this.i++;
@@ -929,14 +1042,26 @@ class Parser {
     if (this.kind() === Tok.Op && this.id() === this.opStar && this.kind(1) === Tok.RParen) {
       const ss = this.start();
       this.i++;
-      args.push({ kind: "star", start: ss, end: this.last(), qualifier: undefined });
+      args.push({ kind: "star", start: ss, end: this.last(), qualifier: undefined, modifiers: [] });
     } else if (this.kind() !== Tok.RParen) {
       if (this.eat(K.DISTINCT)) distinct = true;
       else this.eat(K.ALL);
-      args.push(...this.commaList(() => this.argument()));
+      for (;;) {
+        args.push(this.argument());
+        for (let kw = this.keywordArg(); kw !== undefined; kw = this.keywordArg()) args.push(kw);
+        if (!this.eatKind(Tok.Comma)) break;
+      }
     }
     const orderBy = this.orderByClause();
     this.expectKind(Tok.RParen, ")");
+    let nullTreatment: "ignore" | "respect" | undefined;
+    if (this.kind() === Tok.Word && this.at(K.NULLS, 1)) {
+      const t = this.slice().toUpperCase();
+      if (t === "IGNORE" || t === "RESPECT") {
+        nullTreatment = t === "IGNORE" ? "ignore" : "respect";
+        this.i += 2;
+      }
+    }
     let withinGroup: OrderItem[] = [];
     if (this.at(K.WITHIN) && this.at(K.GROUP, 1) && this.kind(2) === Tok.LParen) {
       this.i += 3;
@@ -955,10 +1080,36 @@ class Parser {
       this.i++;
       over = this.kind() === Tok.LParen ? this.windowSpec() : this.namedWindow();
     }
-    return { kind: "call", start: name.start, end: this.last(), name, args, distinct, orderBy, withinGroup, filter, over };
+    return { kind: "call", start: name.start, end: this.last(), name, args, distinct, orderBy, withinGroup, nullTreatment, filter, over };
+  }
+
+  /** A keyword of a call's arguments that follows an argument (`FROM`, `FOR`, `IN`, `PLACING`, `SIMILAR`), with the expression after it. */
+  private keywordArg(): KeywordArg | undefined {
+    const K = this.K;
+    if (this.kind() !== Tok.Word) return undefined;
+    const w = this.id();
+    if (w !== K.FROM && w !== K.FOR && w !== K.IN && w !== K.SIMILAR && w !== K.ESCAPE && !(w === 0 && this.slice().toUpperCase() === "PLACING")) return undefined;
+    const s = this.start();
+    const keyword = this.slice().toUpperCase();
+    this.i++;
+    const value = this.expr(Prec.Like + 1);
+    return { kind: "keyword-arg", start: s, end: this.last(), keyword, value };
   }
 
   private argument(): Argument {
+    const K = this.K;
+    if (this.kind() === Tok.Word) {
+      const w = this.id();
+      const head = w === K.BOTH || w === K.LEADING || w === K.TRAILING || (w === 0 && this.slice().toUpperCase() === "VARIADIC");
+      const nk = this.kind(1);
+      if (head && (nk === Tok.Word || nk === Tok.String || nk === Tok.QuotedIdent || nk === Tok.Number || nk === Tok.Param)) {
+        const s = this.start();
+        const keyword = this.slice().toUpperCase();
+        this.i++;
+        const value = this.at(K.FROM) ? undefined : this.expr(Prec.Like + 1);
+        return { kind: "keyword-arg", start: s, end: this.last(), keyword, value };
+      }
+    }
     if (
       (this.kind() === Tok.Word || this.kind() === Tok.QuotedIdent) &&
       this.kind(1) === Tok.Op &&
@@ -975,7 +1126,7 @@ class Parser {
     if (this.kind() === Tok.Op && this.id() === this.opStar) {
       const s = this.start();
       this.i++;
-      return { kind: "star", start: s, end: this.last(), qualifier: undefined };
+      return { kind: "star", start: s, end: this.last(), qualifier: undefined, modifiers: [] };
     }
     if (this.atQuery()) {
       const s = this.start();
@@ -1065,18 +1216,34 @@ class Parser {
     return { kind: "frame-bound", start: s, end: this.last(), type: preceding ? "preceding" : "following", offset };
   }
 
-  private orderItem(): OrderItem {
+  private orderItem(indexItem = false): OrderItem {
     const K = this.K;
     const s = this.start();
     const expr = this.expr(0);
+    let opclass: string | undefined;
+    if (indexItem && this.canBeIdent() && !this.at(K.ASC) && !this.at(K.DESC) && !this.at(K.NULLS)) {
+      const from = this.i;
+      this.i++;
+      while (this.kind() === Tok.Dot) this.i += 2;
+      if (this.kind() === Tok.LParen) this.skipGroup();
+      opclass = this.text.slice(this.starts[from] ?? 0, this.ends[this.i - 1] ?? 0);
+    }
     const direction = this.eat(K.ASC) ? "asc" : this.eat(K.DESC) ? "desc" : undefined;
+    let using: string | undefined;
+    if (direction === undefined && this.at(K.USING) && this.kind(1) === Tok.Op) {
+      const from = this.i + 1;
+      this.i++;
+      const run = this.runs ? (this.opRun() ?? 1) : 1;
+      this.i += run;
+      using = this.text.slice(this.starts[from] ?? 0, this.ends[this.i - 1] ?? 0);
+    }
     let nulls: "first" | "last" | undefined;
     if (this.eat(K.NULLS)) {
       if (this.eat(K.FIRST)) nulls = "first";
       else if (this.eat(K.LAST)) nulls = "last";
       else this.fail("FIRST or LAST");
     }
-    return { kind: "order-item", start: s, end: this.last(), expr, direction, nulls };
+    return { kind: "order-item", start: s, end: this.last(), expr, direction, nulls, opclass, using };
   }
 
   private orderByClause(): OrderItem[] {
@@ -1114,7 +1281,8 @@ class Parser {
       } else if (
         this.kind() === Tok.Word &&
         (!this.isReserved() || ((this.at(K.WITH) || this.at(K.WITHOUT)) && this.at(K.TIME, 1))) &&
-        (!strict || this.isTypeWord())
+        (!strict || this.isTypeWord()) &&
+        !COLUMN_OPTION_WORDS.has(this.slice().toUpperCase())
       ) {
         words.push(this.slice().toUpperCase());
         this.i++;
@@ -1130,8 +1298,8 @@ class Parser {
       this.i += 2;
     }
     let name = words.join(" ");
-    while (this.kind() === Tok.LBracket && this.kind(1) === Tok.RBracket) {
-      this.i += 2;
+    while (this.kind() === Tok.LBracket && (this.kind(1) === Tok.RBracket || (this.kind(1) === Tok.Number && this.kind(2) === Tok.RBracket))) {
+      this.i += this.kind(1) === Tok.RBracket ? 2 : 3;
       name += "[]";
     }
     let collation: string | undefined;
@@ -1171,13 +1339,44 @@ class Parser {
       const name = this.ident();
       const columns = this.kind() === Tok.LParen ? this.identList() : [];
       this.expect(K.AS, "AS");
+      let materialized: "materialized" | "not-materialized" | undefined;
+      if (this.wordIs("MATERIALIZED")) {
+        materialized = "materialized";
+        this.i++;
+      } else if (this.at(K.NOT) && this.wordIs("MATERIALIZED", 1)) {
+        materialized = "not-materialized";
+        this.i += 2;
+      }
       this.expectKind(Tok.LParen, "(");
-      const query = this.query();
+      const query: CteBody = this.at(K.INSERT) ? this.insert() : this.at(K.UPDATE) ? this.update() : this.at(K.DELETE) ? this.delete() : this.query();
       this.expectKind(Tok.RParen, ")");
-      return { kind: "cte", start: cs, end: this.last(), name, columns, query };
+      const trailer = this.cteTrailer();
+      return { kind: "cte", start: cs, end: this.last(), name, columns, query, materialized, trailer };
     });
-    const body = this.queryExpr();
+    const body = this.at(K.INSERT) ? this.insert() : this.at(K.UPDATE) ? this.update() : this.at(K.DELETE) ? this.delete() : this.queryExpr();
     return { kind: "with", start: s, end: this.last(), recursive, ctes, body };
+  }
+
+  /** The `SEARCH` or `CYCLE` clause after a common table expression, as text. */
+  private cteTrailer(): string | undefined {
+    const K = this.K;
+    const from = this.i;
+    while (this.kind() === Tok.Word && (this.wordIs("SEARCH") || this.wordIs("CYCLE"))) {
+      while (!this.atEnd() && !this.at(K.SET)) this.i++;
+      if (!this.eat(K.SET)) this.fail("SET");
+      this.ident(true);
+      if (this.wordIs("TO")) {
+        this.i++;
+        this.expr(Prec.Additive);
+        this.expect(K.DEFAULT, "DEFAULT");
+        this.expr(Prec.Additive);
+      }
+      if (this.at(K.USING)) {
+        this.i++;
+        this.ident(true);
+      }
+    }
+    return this.textFrom(from);
   }
 
   private queryExpr(): Query {
@@ -1188,7 +1387,14 @@ class Parser {
     let limit: Expr | undefined;
     let offset: Expr | undefined;
     for (;;) {
-      if (this.eat(K.LIMIT)) limit = this.expr(0);
+      if (this.eat(K.LIMIT)) {
+        limit = this.expr(0);
+        if (this.kind() === Tok.Comma) {
+          this.i++;
+          offset = limit;
+          limit = this.expr(0);
+        }
+      }
       else if (this.eat(K.OFFSET)) {
         offset = this.expr(0);
         if (!this.eat(K.ROWS)) this.eat(K.ROW);
@@ -1278,6 +1484,57 @@ class Parser {
   }
 
   /** Whether the word at the cursor is the `QUALIFY` of a clause (and not a name): it is, unless something that ends an item follows it. */
+  /** Moves past the parenthesis at the cursor and what it holds. */
+  private skipGroup(): void {
+    let depth = 0;
+    do {
+      if (this.kind() === Tok.LParen) depth++;
+      else if (this.kind() === Tok.RParen) depth--;
+      this.i++;
+    } while (depth > 0 && !this.atEnd());
+  }
+
+  /** The text of the tokens from `from` to the cursor, or `undefined` where there are none. */
+  private textFrom(from: number): string | undefined {
+    return this.i > from ? this.text.slice(this.starts[from] ?? 0, this.ends[this.i - 1] ?? 0) : undefined;
+  }
+
+  /** How many tokens, from the cursor, are one operator of a run of operator characters (PostgreSQL's rule: a run does not end in `+` or `-` unless it holds one of `~ ! @ # % ^ & | ?`), or `undefined` where there is none. */
+  private opRun(): number | undefined {
+    let n = 0;
+    let at = this.starts[this.i] ?? 0;
+    let special = false;
+    while (this.kind(n) === Tok.Op && (this.starts[this.i + n] ?? 0) === at && this.id(n) !== this.castOp) {
+      const from = this.starts[this.i + n] ?? 0;
+      const to = this.ends[this.i + n] ?? 0;
+      for (let c = from; c < to; c++) {
+        const ch = this.text.charCodeAt(c);
+        if (!OP_RUN_CHARS.has(ch)) return n === 0 ? undefined : this.trimRun(n, special);
+        if (SPECIAL_OP_CHARS.has(ch)) special = true;
+      }
+      at = to;
+      n++;
+    }
+    return n === 0 ? undefined : this.trimRun(n, special);
+  }
+
+  private trimRun(n: number, special: boolean): number | undefined {
+    let count = n;
+    if (!special) {
+      while (count > 1) {
+        const last = this.text.charCodeAt((this.ends[this.i + count - 1] ?? 1) - 1);
+        if (last !== 43 && last !== 45) break;
+        count--;
+      }
+    }
+    return count;
+  }
+
+  /** Whether the token at the cursor is the `:` of a slice. */
+  private atColon(): boolean {
+    return this.kind() === Tok.Op && (this.ends[this.i] ?? 0) - (this.starts[this.i] ?? 0) === 1 && this.text.charCodeAt(this.starts[this.i] ?? 0) === 58;
+  }
+
   private atQualify(): boolean {
     if (!this.at(this.K.QUALIFY)) return false;
     const k = this.kind(1);
@@ -1333,11 +1590,27 @@ class Parser {
         distinct: false,
         orderBy: [],
         withinGroup: [],
+        nullTreatment: undefined,
         filter: undefined,
         over: undefined,
       };
     }
     return this.expr(0);
+  }
+
+  /** `EXCEPT (a, b)`, `EXCLUDE (a)`, `REPLACE (x AS a)`, `RENAME (a AS b)` after a star. */
+  private starModifiers(): StarModifier[] {
+    const K = this.K;
+    const out: StarModifier[] = [];
+    while ((this.at(K.EXCEPT) || this.at(K.EXCLUDE) || this.at(K.REPLACE) || this.at(K.RENAME)) && this.kind(1) === Tok.LParen && !this.atQuery(1)) {
+      const s = this.start();
+      const keyword = this.slice().toUpperCase();
+      this.i += 2;
+      const items = this.commaList(() => this.selectItem());
+      this.expectKind(Tok.RParen, ")");
+      out.push({ kind: "star-modifier", start: s, end: this.last(), keyword, items });
+    }
+    return out;
   }
 
   private selectItem(): SelectItem {
@@ -1346,7 +1619,8 @@ class Parser {
     let expr: Expr;
     if (this.kind() === Tok.Op && this.id() === this.opStar) {
       this.i++;
-      expr = { kind: "star", start: s, end: this.last(), qualifier: undefined };
+      const modifiers = this.starModifiers();
+      expr = { kind: "star", start: s, end: this.last(), qualifier: undefined, modifiers };
     } else expr = this.expr(0);
     let alias: Ident | undefined;
     if (this.eat(K.AS)) alias = this.ident(true);
@@ -1367,7 +1641,7 @@ class Parser {
       this.expectKind(Tok.RParen, ")");
     }
     if (!distinct) this.eat(K.ALL);
-    const items = this.commaList(() => this.selectItem());
+    const items = this.emptySelect && (this.at(K.FROM) || this.kind() === Tok.Semicolon || this.kind() === Tok.RParen || this.atEnd() || this.at(K.UNION) || this.at(K.INTERSECT) || this.at(K.EXCEPT)) ? [] : this.commaList(() => this.selectItem());
     const from = this.eat(K.FROM) ? this.commaList(() => this.joined()) : [];
     const where = this.eat(K.WHERE) ? this.expr(0) : undefined;
     let groupBy: Expr[] = [];
@@ -1425,17 +1699,39 @@ class Parser {
     const s = this.start();
     let name: Ident;
     if (this.eat(K.AS)) name = this.ident(true);
-    else if (this.canBeIdent() && !this.atQualify()) name = this.ident();
+    else if (this.canBeIdent() && !this.atQualify() && !(this.wordIs("INDEXED") && this.at(K.BY, 1))) name = this.ident();
     else return undefined;
-    const columns = this.kind() === Tok.LParen ? this.identList() : [];
-    return { kind: "alias", start: s, end: this.last(), name, columns };
+    const columns: Ident[] = [];
+    const types: (DataType | undefined)[] = [];
+    if (this.kind() === Tok.LParen) {
+      this.i++;
+      do {
+        columns.push(this.ident(true));
+        types.push(this.kind() === Tok.Comma || this.kind() === Tok.RParen ? undefined : this.dataType());
+      } while (this.eatKind(Tok.Comma));
+      this.expectKind(Tok.RParen, ")");
+    }
+    return { kind: "alias", start: s, end: this.last(), name, columns, types: types.some((t) => t !== undefined) ? types : [] };
   }
 
   private tableRef(): TableRef {
     const s = this.start();
     const name = this.qualifiedName();
     const alias = this.alias();
-    return { kind: "table", start: s, end: this.last(), name, alias };
+    const hint = this.tableHint();
+    return { kind: "table", start: s, end: this.last(), name, alias, hint };
+  }
+
+  /** `NOT INDEXED` or `INDEXED BY name` after a table, as text. */
+  private tableHint(): string | undefined {
+    const K = this.K;
+    const from = this.i;
+    if (this.at(K.NOT) && this.wordIs("INDEXED", 1)) this.i += 2;
+    else if (this.wordIs("INDEXED") && this.at(K.BY, 1)) {
+      this.i += 2;
+      this.qualifiedName();
+    } else return undefined;
+    return this.textFrom(from);
   }
 
   private sourceTerm(): Source {
@@ -1474,11 +1770,14 @@ class Parser {
     if (this.kind() === Tok.LParen) {
       const call = this.call(name);
       if (call.kind !== "call") return this.fail("a function call");
+      const ordinality = this.at(K.WITH) && this.wordIs("ORDINALITY", 1);
+      if (ordinality) this.i += 2;
       const alias = this.alias();
-      return { kind: "table-fn", start: s, end: this.last(), call, alias, lateral };
+      return { kind: "table-fn", start: s, end: this.last(), call, alias, lateral, ordinality };
     }
     const alias = this.alias();
-    return { kind: "table", start: s, end: this.last(), name, alias };
+    const hint = this.tableHint();
+    return { kind: "table", start: s, end: this.last(), name, alias, hint };
   }
 
   /** A parenthesized source with an alias: the alias goes on the source where the node has one, else it is kept by a subquery of the source's own text. */
@@ -1497,10 +1796,16 @@ class Parser {
     }
   }
 
-  private joined(): Source {
+  /** Whether a join begins at the cursor. */
+  private atJoinStart(): boolean {
     const K = this.K;
-    const s = this.start();
-    let left = this.sourceTerm();
+    return this.at(K.JOIN) || this.at(K.INNER) || this.at(K.LEFT) || this.at(K.RIGHT) || this.at(K.FULL) || this.at(K.CROSS) || this.at(K.NATURAL);
+  }
+
+  private joined(first?: Source): Source {
+    const K = this.K;
+    const s = first === undefined ? this.start() : first.start;
+    let left = first ?? this.sourceTerm();
     for (;;) {
       const natural = this.eat(K.NATURAL);
       let type: JoinType | undefined;
@@ -1510,16 +1815,28 @@ class Parser {
       else if (this.eat(K.FULL)) type = "full";
       else if (this.eat(K.CROSS)) type = "cross";
       if (type === "left" || type === "right" || type === "full") this.eat(K.OUTER);
+      if ((type === "left" || type === "right" || type === undefined) && (this.wordIs("SEMI") || this.wordIs("ANTI")) && this.at(K.JOIN, 1)) {
+        type = this.wordIs("SEMI") ? "semi" : "anti";
+        this.i++;
+      }
       if (!this.eat(K.JOIN)) {
         if (natural || type !== undefined) this.fail("JOIN");
         return left;
       }
-      const right = this.sourceTerm();
+      let right = this.sourceTerm();
+      if (type !== "cross" && !natural && !this.at(K.ON) && !this.at(K.USING) && this.atJoinStart()) right = this.joined(right);
       let on: Expr | undefined;
       let using: Ident[] = [];
+      let usingAlias: Ident | undefined;
       if (this.eat(K.ON)) on = this.expr(0);
-      else if (this.eat(K.USING)) using = this.identList();
-      left = { kind: "join", start: s, end: this.last(), type: type ?? "inner", natural, left, right, on, using, alias: undefined };
+      else if (this.eat(K.USING)) {
+        using = this.identList();
+        if (this.at(K.AS)) {
+          this.i++;
+          usingAlias = this.ident(true);
+        }
+      }
+      left = { kind: "join", start: s, end: this.last(), type: type ?? "inner", natural, left, right, on, using, usingAlias, alias: undefined };
     }
   }
 
@@ -1532,46 +1849,92 @@ class Parser {
   private insert(): Insert {
     const K = this.K;
     const s = this.start();
+    let conflict: string | undefined;
+    if (this.at(K.REPLACE)) conflict = "REPLACE";
     this.i++;
+    if (conflict === undefined && this.eat(K.OR)) {
+      if (this.kind() !== Tok.Word) this.fail("IGNORE, REPLACE, ABORT, FAIL or ROLLBACK");
+      conflict = this.slice().toUpperCase();
+      this.i++;
+    }
     this.expect(K.INTO, "INTO");
     const table = this.qualifiedName();
-    const columns = this.kind() === Tok.LParen && !this.atQuery(1) ? this.identList() : [];
+    const alias = this.eat(K.AS) ? this.ident(true) : undefined;
+    let columns: Expr[] = [];
+    if (this.kind() === Tok.LParen && !this.atQuery(1)) {
+      this.i++;
+      columns = this.commaList(() => this.expr(Prec.Cast));
+      this.expectKind(Tok.RParen, ")");
+    }
     let source: Query | undefined;
     if (this.eat(K.DEFAULT)) this.expect(K.VALUES, "VALUES");
     else source = this.query();
+    const onConflict = this.at(K.ON) && this.wordIs("CONFLICT", 1) ? this.onConflict() : undefined;
     const returning = this.returning();
-    return { kind: "insert", start: s, end: this.last(), table, columns, source, returning };
+    return { kind: "insert", start: s, end: this.last(), table, alias, columns, source, conflict, onConflict, returning };
   }
 
-  private update(): Statement {
+  private onConflict(): OnConflict {
+    const K = this.K;
+    const s = this.start();
+    this.i += 2;
+    let targets: Expr[] = [];
+    let constraint: Ident | undefined;
+    let targetWhere: Expr | undefined;
+    if (this.kind() === Tok.LParen) {
+      this.i++;
+      targets = this.commaList(() => this.expr(0));
+      this.expectKind(Tok.RParen, ")");
+      if (this.eat(K.WHERE)) targetWhere = this.expr(0);
+    } else if (this.at(K.ON) && this.wordIs("CONSTRAINT", 1)) {
+      this.i += 2;
+      constraint = this.ident(true);
+    }
+    if (!this.wordIs("DO")) this.fail("DO");
+    this.i++;
+    if (this.wordIs("NOTHING")) {
+      this.i++;
+      return { kind: "on-conflict", start: s, end: this.last(), targets, constraint, targetWhere, update: false, assignments: [], where: undefined };
+    }
+    this.expect(K.UPDATE, "NOTHING or UPDATE");
+    this.expect(K.SET, "SET");
+    const assignments = this.commaList(() => this.assignment());
+    const where = this.eat(K.WHERE) ? this.expr(0) : undefined;
+    return { kind: "on-conflict", start: s, end: this.last(), targets, constraint, targetWhere, update: true, assignments, where };
+  }
+
+  private assignment(): Assignment {
+    const s = this.start();
+    const target = this.expr(Prec.Cast);
+    if (!this.atOp(operatorId(this.lx, "=") ?? -1)) this.fail("=");
+    this.i++;
+    const value = this.expr(0);
+    return { kind: "assignment", start: s, end: this.last(), target, value };
+  }
+
+  private update(): Update {
     const K = this.K;
     const s = this.start();
     this.i++;
     const table = this.tableRef();
     this.expect(K.SET, "SET");
-    const assignments = this.commaList((): Assignment => {
-      const as = this.start();
-      const target = this.qualifiedName();
-      if (!this.atOp(operatorId(this.lx, "=") ?? -1)) this.fail("=");
-      this.i++;
-      const value = this.expr(0);
-      return { kind: "assignment", start: as, end: this.last(), target, value };
-    });
+    const assignments = this.commaList(() => this.assignment());
     const from = this.eat(K.FROM) ? this.commaList(() => this.joined()) : [];
     const where = this.eat(K.WHERE) ? this.expr(0) : undefined;
     const returning = this.returning();
     return { kind: "update", start: s, end: this.last(), table, assignments, from, where, returning };
   }
 
-  private delete(): Statement {
+  private delete(): Delete {
     const K = this.K;
     const s = this.start();
     this.i++;
     this.expect(K.FROM, "FROM");
     const table = this.tableRef();
+    const using = this.eat(K.USING) ? this.commaList(() => this.joined()) : [];
     const where = this.eat(K.WHERE) ? this.expr(0) : undefined;
     const returning = this.returning();
-    return { kind: "delete", start: s, end: this.last(), table, where, returning };
+    return { kind: "delete", start: s, end: this.last(), table, using, where, returning };
   }
 
   private refAction(): RefAction {
@@ -1602,18 +1965,60 @@ class Parser {
       else if (this.eat(K.UPDATE)) onUpdate = this.refAction();
       else this.fail("DELETE or UPDATE");
     }
-    return { kind: "reference", start: s, end: this.last(), table, columns, onDelete, onUpdate };
+    const optFrom = this.i;
+    while (this.wordIs("MATCH") || this.wordIs("DEFERRABLE") || this.wordIs("INITIALLY") || (this.at(K.NOT) && this.wordIs("DEFERRABLE", 1))) {
+      this.i += this.at(K.NOT) ? 2 : 1;
+      if (this.kind() === Tok.Word && !this.at(K.ON)) this.i += this.wordIs("DEFERRED") || this.wordIs("IMMEDIATE") || this.wordIs("FULL") || this.wordIs("PARTIAL") || this.wordIs("SIMPLE") ? 1 : 0;
+    }
+    return { kind: "reference", start: s, end: this.last(), table, columns, onDelete, onUpdate, options: this.textFrom(optFrom) };
+  }
+
+  private tableLike(): TableLike {
+    const s = this.start();
+    this.i++;
+    const table = this.qualifiedName();
+    const from = this.i;
+    let depth = 0;
+    while (!this.atEnd() && this.kind() !== Tok.Semicolon && !(depth === 0 && (this.kind() === Tok.Comma || this.kind() === Tok.RParen))) {
+      if (this.kind() === Tok.LParen) depth++;
+      else if (this.kind() === Tok.RParen) depth--;
+      this.i++;
+    }
+    return { kind: "table-like", start: s, end: this.last(), table, options: this.textFrom(from) };
   }
 
   private atTableConstraint(): boolean {
     const K = this.K;
-    return this.at(K.CONSTRAINT) || this.at(K.PRIMARY) || this.at(K.UNIQUE) || this.at(K.CHECK) || this.at(K.FOREIGN);
+    return this.at(K.CONSTRAINT) || this.at(K.PRIMARY) || this.at(K.UNIQUE) || this.at(K.CHECK) || this.at(K.FOREIGN) || (this.at(K.NOT) && this.at(K.NULL, 1));
+  }
+
+  /** `NO INHERIT` or `NOT VALID` after a check, as text. */
+  private constraintOptions(): string | undefined {
+    const K = this.K;
+    const from = this.i;
+    for (;;) {
+      if (this.at(K.NO) && this.wordIs("INHERIT", 1)) this.i += 2;
+      else if (this.at(K.NOT) && (this.wordIs("VALID", 1) || this.wordIs("ENFORCED", 1))) this.i += 2;
+      else if (this.wordIs("ENFORCED")) this.i++;
+      else break;
+    }
+    return this.textFrom(from);
   }
 
   private tableConstraint(): TableConstraint {
     const K = this.K;
     const s = this.start();
     const name = this.eat(K.CONSTRAINT) ? this.ident() : undefined;
+    if (this.at(K.NOT)) {
+      const from = this.i;
+      let depth = 0;
+      while (!this.atEnd() && this.kind() !== Tok.Semicolon && !(depth === 0 && (this.kind() === Tok.Comma || this.kind() === Tok.RParen))) {
+        if (this.kind() === Tok.LParen) depth++;
+        else if (this.kind() === Tok.RParen) depth--;
+        this.i++;
+      }
+      return { kind: "column-option", start: s, end: this.last(), name, text: this.textFrom(from) ?? "", expr: undefined };
+    }
     if (this.eat(K.PRIMARY)) {
       this.expect(K.KEY, "KEY");
       const columns = this.identList();
@@ -1627,7 +2032,8 @@ class Parser {
       this.expectKind(Tok.LParen, "(");
       const expr = this.expr(0);
       this.expectKind(Tok.RParen, ")");
-      return { kind: "check", start: s, end: this.last(), name, expr };
+      const options = this.constraintOptions();
+      return { kind: "check", start: s, end: this.last(), name, expr, options };
     }
     this.expect(K.FOREIGN, "PRIMARY KEY, UNIQUE, CHECK or FOREIGN KEY");
     this.expect(K.KEY, "KEY");
@@ -1649,7 +2055,7 @@ class Parser {
       } else if (this.eat(K.NULL)) {
         continue;
       } else if (this.eat(K.DEFAULT)) {
-        const expr = this.expr(0);
+        const expr = this.expr(Prec.Is + 1);
         out.push({ kind: "default", start: s, end: this.last(), name, expr });
       } else if (this.eat(K.PRIMARY)) {
         this.expect(K.KEY, "KEY");
@@ -1660,15 +2066,48 @@ class Parser {
         this.expectKind(Tok.LParen, "(");
         const expr = this.expr(0);
         this.expectKind(Tok.RParen, ")");
-        out.push({ kind: "check", start: s, end: this.last(), name, expr });
+        const options = this.constraintOptions();
+        out.push({ kind: "check", start: s, end: this.last(), name, expr, options });
       } else if (this.at(K.REFERENCES)) {
         const reference = this.reference();
         out.push({ kind: "foreign-key", start: s, end: this.last(), name, columns: [], reference });
+      } else if (this.atColumnOption()) {
+        out.push(this.columnOption(s, name));
       } else {
         if (named) this.fail("a constraint");
         return out;
       }
     }
+  }
+
+  private atColumnOption(): boolean {
+    const K = this.K;
+    if (this.kind() !== Tok.Word) return false;
+    if (this.at(K.AS) && this.kind(1) === Tok.LParen) return true;
+    if (this.at(K.NOT) && this.kind(1) === Tok.Word && this.wordIs("DEFERRABLE", 1)) return true;
+    return COLUMN_OPTION_WORDS.has(this.slice().toUpperCase());
+  }
+
+  /** A column option, as text, with the expression of `AS (expr)` where it has one; it ends at a comma, a closing parenthesis or the start of a constraint. */
+  private columnOption(s: number, name: Ident | undefined): ColumnOption {
+    const K = this.K;
+    const from = this.i;
+    let expr: Expr | undefined;
+    do {
+      if (this.at(K.AS) && this.kind(1) === Tok.LParen && expr === undefined) {
+        this.i += 2;
+        expr = this.expr(0);
+        this.expectKind(Tok.RParen, ")");
+      } else if (this.kind() === Tok.LParen) this.skipGroup();
+      else this.i++;
+    } while (
+      !this.atEnd() &&
+      this.kind() !== Tok.Comma &&
+      this.kind() !== Tok.RParen &&
+      this.kind() !== Tok.Semicolon &&
+      !(this.kind() === Tok.Word && CONSTRAINT_STARTS.has(this.slice().toUpperCase()))
+    );
+    return { kind: "column-option", start: s, end: this.last(), name, text: this.textFrom(from) ?? "", expr };
   }
 
   private columnDef(): ColumnDef {
@@ -1697,11 +2136,12 @@ class Parser {
     if (this.eat(K.TABLE)) {
       const ifNotExists = this.ifNotExists();
       const name = this.qualifiedName();
-      const elements =
-        this.kind() === Tok.LParen && !this.atQuery(1)
-          ? (this.i++, this.commaList(() => (this.atTableConstraint() ? this.tableConstraint() : this.columnDef())))
-          : [];
-      if (elements.length > 0 || this.tokens(-1) === Tok.LParen) this.expectKind(Tok.RParen, ")");
+      let elements: (ColumnDef | TableConstraint)[] = [];
+      if (this.kind() === Tok.LParen && !this.atQuery(1)) {
+        this.i++;
+        if (this.kind() !== Tok.RParen) elements = this.commaList(() => (this.at(K.LIKE) ? this.tableLike() : this.atTableConstraint() ? this.tableConstraint() : this.columnDef()));
+        this.expectKind(Tok.RParen, ")");
+      }
       const from = this.i;
       let depth = 0;
       while (!this.atEnd() && this.kind() !== Tok.Semicolon && !(depth === 0 && this.at(K.AS))) {
@@ -1719,18 +2159,38 @@ class Parser {
       const name = this.at(K.ON) ? undefined : this.qualifiedName();
       this.expect(K.ON, "ON");
       const table = this.qualifiedName();
+      const method = this.eat(K.USING) ? this.ident(true).name : undefined;
       this.expectKind(Tok.LParen, "(");
-      const items = this.commaList(() => this.orderItem());
+      const items = this.commaList(() => this.orderItem(true));
       this.expectKind(Tok.RParen, ")");
+      const from = this.i;
+      while (!this.atEnd() && this.kind() !== Tok.Semicolon && !this.at(K.WHERE)) {
+        if (this.kind() === Tok.LParen) this.skipGroup();
+        else this.i++;
+      }
+      const options = this.textFrom(from);
       const where = this.eat(K.WHERE) ? this.expr(0) : undefined;
-      return { kind: "create-index", start: s, end: this.last(), unique, ifNotExists, name, table, items, where };
+      return { kind: "create-index", start: s, end: this.last(), unique, ifNotExists, name, table, items, where, method, options };
     }
     if (this.eat(K.VIEW)) {
       const name = this.qualifiedName();
       const columns = this.kind() === Tok.LParen ? this.identList() : [];
+      let options: string | undefined;
+      if (this.at(K.WITH) && this.kind(1) === Tok.LParen) {
+        const from = this.i;
+        this.i++;
+        this.skipGroup();
+        options = this.textFrom(from);
+      }
       this.expect(K.AS, "AS");
       const query = this.query();
-      return { kind: "create-view", start: s, end: this.last(), orReplace, name, columns, query };
+      let checkOption: string | undefined;
+      if (this.at(K.WITH)) {
+        const from = this.i;
+        while (!this.atEnd() && this.kind() !== Tok.Semicolon) this.i++;
+        checkOption = this.textFrom(from);
+      }
+      return { kind: "create-view", start: s, end: this.last(), orReplace, name, columns, options, query, checkOption };
     }
     this.i = first;
     return this.command();
@@ -1964,7 +2424,9 @@ class Parser {
     if (this.eat(K.ADD)) {
       if (this.atTableConstraint()) {
         const constraint = this.tableConstraint();
-        return { kind: "add-constraint", start: s, end: this.last(), constraint };
+        const optFrom = this.i;
+        if (this.at(K.NOT) && this.wordIs("VALID", 1)) this.i += 2;
+        return { kind: "add-constraint", start: s, end: this.last(), constraint, options: this.textFrom(optFrom) };
       }
       this.eat(K.COLUMN);
       const ifNotExists = this.ifNotExists();
@@ -1980,7 +2442,8 @@ class Parser {
       this.eat(K.COLUMN);
       const ifExists = this.ifExists();
       const name = this.ident();
-      return { kind: "drop-column", start: s, end: this.last(), ifExists, name };
+      const behavior = this.eat(K.CASCADE) ? "cascade" : this.eat(K.RESTRICT) ? "restrict" : undefined;
+      return { kind: "drop-column", start: s, end: this.last(), ifExists, name, behavior };
     }
     if (this.eat(K.RENAME)) {
       if (this.eat(K.TO)) {
@@ -2193,7 +2656,7 @@ class Parser {
     const K = this.K;
     if (this.kind() === Tok.Word && COMMAND_WORDS.has(this.slice().toUpperCase())) return this.command();
     if (this.kind() === Tok.LParen || this.at(K.SELECT) || this.at(K.WITH) || this.at(K.VALUES)) return this.query();
-    if (this.at(K.INSERT)) return this.insert();
+    if (this.at(K.INSERT) || (this.at(K.REPLACE) && this.at(K.INTO, 1))) return this.insert();
     if (this.at(K.UPDATE)) return this.update();
     if (this.at(K.DELETE)) return this.delete();
     if (this.at(K.CREATE)) return this.create();

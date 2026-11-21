@@ -51,6 +51,15 @@ export interface Name extends Base {
 export interface Star extends Base {
   readonly kind: "star";
   readonly qualifier: Name | undefined;
+  /** What follows the star: `EXCEPT (a)`, `EXCLUDE (a)`, `REPLACE (x AS a)`, `RENAME (a AS b)`, in the order written. */
+  readonly modifiers: readonly StarModifier[];
+}
+
+/** A modifier of a star: its keyword (upper case) and its items (a plain column is an item without an alias). */
+export interface StarModifier extends Base {
+  readonly kind: "star-modifier";
+  readonly keyword: string;
+  readonly items: readonly SelectItem[];
 }
 
 // literals
@@ -113,7 +122,8 @@ export interface Binary extends Base {
 export interface Operator extends Base {
   readonly kind: "operator";
   readonly op: string;
-  readonly left: Expr;
+  /** Missing for an operator written before its operand (`@ x`, `|/ x`). */
+  readonly left: Expr | undefined;
   readonly right: Expr;
 }
 
@@ -145,6 +155,8 @@ export interface In extends Base {
   readonly arg: Expr;
   readonly negated: boolean;
   readonly values: readonly Expr[];
+  /** `x IN t`, with no parentheses (SQLite): the one value is the table's name. */
+  readonly bare: boolean;
 }
 
 /** `x [NOT] IN (query)`. */
@@ -218,11 +230,35 @@ export interface ArrayLit extends Base {
   readonly items: readonly Expr[];
 }
 
-/** `x[i]`. */
+/** `x[i]`, and the slice `x[i:j]` (either end may be missing: `x[:j]`, `x[i:]`). */
 export interface Subscript extends Base {
   readonly kind: "subscript";
   readonly arg: Expr;
-  readonly index: Expr;
+  readonly index: Expr | undefined;
+  /** The end of a slice. */
+  readonly upper: Expr | undefined;
+  readonly slice: boolean;
+}
+
+/** A field of a row: `(r).c`, `(r).*` (a field of `undefined` is the star). */
+export interface FieldAccess extends Base {
+  readonly kind: "field";
+  readonly arg: Expr;
+  readonly field: Ident | undefined;
+}
+
+/** A literal written with its type's name before the string: `DATE '2020-01-01'`, `int2 '2'`; the type is upper case. */
+export interface TypedString extends Base {
+  readonly kind: "typed-string";
+  readonly type: string;
+  readonly value: StringLit;
+}
+
+/** A keyword argument of a call: the `FROM`, `FOR`, `IN`, `PLACING` or `SIMILAR` of `SUBSTRING(x FROM 1 FOR 2)`, the `BOTH`, `LEADING` or `TRAILING` of `TRIM`, `VARIADIC`; its value is missing for `TRIM(BOTH FROM x)`'s `BOTH`. */
+export interface KeywordArg extends Base {
+  readonly kind: "keyword-arg";
+  readonly keyword: string;
+  readonly value: Expr | undefined;
 }
 
 /** `x COLLATE name`. */
@@ -236,12 +272,14 @@ export interface Collate extends Base {
 export interface Call extends Base {
   readonly kind: "call";
   readonly name: Name;
-  readonly args: readonly (Expr | NamedArg)[];
+  readonly args: readonly Argument[];
   readonly distinct: boolean;
   /** The `ORDER BY` among the arguments: `string_agg(x, ',' ORDER BY y)`. */
   readonly orderBy: readonly OrderItem[];
   /** `WITHIN GROUP (ORDER BY ...)`. */
   readonly withinGroup: readonly OrderItem[];
+  /** `IGNORE NULLS` or `RESPECT NULLS` after the arguments. */
+  readonly nullTreatment: "ignore" | "respect" | undefined;
   readonly filter: Expr | undefined;
   readonly over: WindowSpec | undefined;
 }
@@ -287,6 +325,8 @@ export type Expr =
   | Interval
   | ArrayLit
   | Subscript
+  | FieldAccess
+  | TypedString
   | Collate
   | Call
   | Exists
@@ -328,6 +368,10 @@ export interface OrderItem extends Base {
   readonly expr: Expr;
   readonly direction: "asc" | "desc" | undefined;
   readonly nulls: "first" | "last" | undefined;
+  /** The operator class after an index column. */
+  readonly opclass: string | undefined;
+  /** The operator of `ORDER BY x USING <`. */
+  readonly using: string | undefined;
 }
 
 // queries
@@ -393,7 +437,11 @@ export interface Cte extends Base {
   readonly kind: "cte";
   readonly name: Ident;
   readonly columns: readonly Ident[];
-  readonly query: Query;
+  readonly query: CteBody;
+  /** `MATERIALIZED` or `NOT MATERIALIZED`, where written. */
+  readonly materialized: "materialized" | "not-materialized" | undefined;
+  /** The `SEARCH` or `CYCLE` clause after it, as text. */
+  readonly trailer: string | undefined;
 }
 
 /** `WITH [RECURSIVE] ctes body`. */
@@ -401,8 +449,12 @@ export interface With extends Base {
   readonly kind: "with";
   readonly recursive: boolean;
   readonly ctes: readonly Cte[];
-  readonly body: Query;
+  /** What follows: a query, or a data change (`WITH x AS (...) INSERT ...`). */
+  readonly body: CteBody;
 }
+
+/** What a common table expression or a `WITH` holds: a query, or a data change (`WITH x AS (INSERT ... RETURNING *) ...`). */
+export type CteBody = Query | Insert | Update | Delete;
 
 /** A query. */
 export type Query = Select | SetOp | Values | With;
@@ -414,6 +466,8 @@ export interface Alias extends Base {
   readonly kind: "alias";
   readonly name: Ident;
   readonly columns: readonly Ident[];
+  /** The types of a list of column definitions (`AS t (a int, b text)`), in the order of the columns; an entry is missing for a column written without one. */
+  readonly types: readonly (DataType | undefined)[];
 }
 
 /** A table named in `FROM`, with its alias. */
@@ -421,6 +475,8 @@ export interface TableRef extends Base {
   readonly kind: "table";
   readonly name: Name;
   readonly alias: Alias | undefined;
+  /** `NOT INDEXED` or `INDEXED BY name` after the table (SQLite), as text. */
+  readonly hint: string | undefined;
 }
 
 /** A query used as a source: `[LATERAL] (query) [alias]`. */
@@ -437,10 +493,12 @@ export interface TableFn extends Base {
   readonly call: Call;
   readonly alias: Alias | undefined;
   readonly lateral: boolean;
+  /** `WITH ORDINALITY`. */
+  readonly ordinality: boolean;
 }
 
 /** The types of join. */
-export type JoinType = "inner" | "left" | "right" | "full" | "cross";
+export type JoinType = "inner" | "left" | "right" | "full" | "cross" | "semi" | "anti";
 
 /** A join of two sources, with `ON` or `USING`. */
 export interface Join extends Base {
@@ -451,6 +509,8 @@ export interface Join extends Base {
   readonly right: Source;
   readonly on: Expr | undefined;
   readonly using: readonly Ident[];
+  /** The alias of the `USING` list: `JOIN t USING (i) AS x`. */
+  readonly usingAlias: Ident | undefined;
   /** The alias of a parenthesized join: `(a JOIN b ON ...) AS t`. */
   readonly alias: Alias | undefined;
 }
@@ -464,15 +524,34 @@ export type Source = TableRef | SubquerySource | TableFn | Join;
 export interface Insert extends Base {
   readonly kind: "insert";
   readonly table: Name;
-  readonly columns: readonly Ident[];
+  /** The alias of the table (`INSERT INTO t AS x`). */
+  readonly alias: Ident | undefined;
+  /** The columns: names, or parts of them (`a[1]`, `r.f`). */
+  readonly columns: readonly Expr[];
   readonly source: Query | undefined;
+  /** The `OR` of `INSERT OR REPLACE`, or `REPLACE` for `REPLACE INTO`, upper case. */
+  readonly conflict: string | undefined;
+  readonly onConflict: OnConflict | undefined;
   readonly returning: readonly SelectItem[];
+}
+
+/** `ON CONFLICT [(target) | ON CONSTRAINT name] [WHERE ...] DO NOTHING | DO UPDATE SET ... [WHERE ...]`. */
+export interface OnConflict extends Base {
+  readonly kind: "on-conflict";
+  readonly targets: readonly Expr[];
+  readonly constraint: Ident | undefined;
+  readonly targetWhere: Expr | undefined;
+  /** Whether the action is `DO UPDATE` (and not `DO NOTHING`). */
+  readonly update: boolean;
+  readonly assignments: readonly Assignment[];
+  readonly where: Expr | undefined;
 }
 
 /** One `target = value` of an `UPDATE`. */
 export interface Assignment extends Base {
   readonly kind: "assignment";
-  readonly target: Name;
+  /** The column, or a part of one (`a[1]`, `r.f`), or a row of columns (`(a, b)`). */
+  readonly target: Expr;
   readonly value: Expr;
 }
 
@@ -490,6 +569,8 @@ export interface Update extends Base {
 export interface Delete extends Base {
   readonly kind: "delete";
   readonly table: TableRef;
+  /** The sources of `USING`. */
+  readonly using: readonly Source[];
   readonly where: Expr | undefined;
   readonly returning: readonly SelectItem[];
 }
@@ -537,6 +618,8 @@ export interface Check extends Base {
   readonly kind: "check";
   readonly name: Ident | undefined;
   readonly expr: Expr;
+  /** `NO INHERIT` or `NOT VALID` after it, as text. */
+  readonly options: string | undefined;
 }
 
 /** What a foreign key does when the row it refers to changes. */
@@ -549,6 +632,8 @@ export interface Reference extends Base {
   readonly columns: readonly Ident[];
   readonly onDelete: RefAction | undefined;
   readonly onUpdate: RefAction | undefined;
+  /** What follows (`MATCH FULL`, `NOT DEFERRABLE`, `DEFERRABLE INITIALLY DEFERRED`), as text. */
+  readonly options: string | undefined;
 }
 
 /** `[CONSTRAINT name] [FOREIGN KEY (columns)] REFERENCES ...`; the columns are empty on a column. */
@@ -560,10 +645,25 @@ export interface ForeignKey extends Base {
 }
 
 /** A constraint of a column. */
-export type ColumnConstraint = NotNull | Default | PrimaryKey | Unique | Check | ForeignKey;
+export type ColumnConstraint = NotNull | Default | PrimaryKey | Unique | Check | ForeignKey | ColumnOption;
+
+/** An option of a column that the grammar does not read apart (`AUTOINCREMENT`, `UNSIGNED`, `GENERATED ALWAYS AS (expr) STORED`), as text, with the expression of `AS (expr)` where there is one. */
+export interface ColumnOption extends Base {
+  readonly kind: "column-option";
+  readonly name: Ident | undefined;
+  readonly text: string;
+  readonly expr: Expr | undefined;
+}
+
+/** `LIKE table [INCLUDING ...]` among the elements of a `CREATE TABLE`; the options are text. */
+export interface TableLike extends Base {
+  readonly kind: "table-like";
+  readonly table: Name;
+  readonly options: string | undefined;
+}
 
 /** A constraint of a table. */
-export type TableConstraint = PrimaryKey | Unique | Check | ForeignKey;
+export type TableConstraint = PrimaryKey | Unique | Check | ForeignKey | TableLike | ColumnOption;
 
 /** A column of a table: its name, type and constraints. */
 export interface ColumnDef extends Base {
@@ -596,6 +696,10 @@ export interface CreateIndex extends Base {
   readonly table: Name;
   readonly items: readonly OrderItem[];
   readonly where: Expr | undefined;
+  /** The method of `USING method`, as written. */
+  readonly method: string | undefined;
+  /** What follows the columns (`INCLUDE (...)`, `WITH (...)`, `NULLS NOT DISTINCT`), as text. */
+  readonly options: string | undefined;
 }
 
 /** `CREATE [OR REPLACE] VIEW name [(columns)] AS query`. */
@@ -604,7 +708,11 @@ export interface CreateView extends Base {
   readonly orReplace: boolean;
   readonly name: Name;
   readonly columns: readonly Ident[];
+  /** The `WITH (...)` before `AS`, as text. */
+  readonly options: string | undefined;
   readonly query: Query;
+  /** The `WITH CHECK OPTION` after the query, as text. */
+  readonly checkOption: string | undefined;
 }
 
 /** `ADD [COLUMN] [IF NOT EXISTS] column`. */
@@ -619,12 +727,16 @@ export interface DropColumn extends Base {
   readonly kind: "drop-column";
   readonly ifExists: boolean;
   readonly name: Ident;
+  /** `CASCADE` or `RESTRICT`, where written. */
+  readonly behavior: "cascade" | "restrict" | undefined;
 }
 
 /** `ADD constraint`. */
 export interface AddConstraint extends Base {
   readonly kind: "add-constraint";
   readonly constraint: TableConstraint;
+  /** `NOT VALID`, as text. */
+  readonly options: string | undefined;
 }
 
 /** `DROP CONSTRAINT [IF EXISTS] name`. */
@@ -750,6 +862,9 @@ export type Node =
   | Frame
   | WindowSpec
   | WindowDef
+  | StarModifier
+  | OnConflict
+  | TableLike
   | OrderItem
   | When
   | SelectItem
@@ -769,7 +884,7 @@ export type Node =
   | Script;
 
 /** An argument of a call. */
-export type Argument = Expr | NamedArg;
+export type Argument = Expr | NamedArg | KeywordArg;
 
 /** The kinds of node. */
 export type Kind = Node["kind"];

@@ -18,6 +18,8 @@ export const dialect = declareDialect({
   grammar: (g) => ({
     ...g,
     castOperator: "::",
+    operatorRuns: true,
+    emptySelect: true,
     likeWords: ["ILIKE"],
     operators: [
       ...g.operators,

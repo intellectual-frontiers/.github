@@ -167,7 +167,7 @@ script
           parts[0]: ident name="c" quoted=false
   statements[7]: select distinct=false groupAll=false
     items[0]: select-item
-      expr: in negated=false
+      expr: in negated=false bare=false
         arg: name
           parts[0]: ident name="a" quoted=false
         values[0]: number text="1"
@@ -185,7 +185,7 @@ script
             name: name
               parts[0]: ident name="t" quoted=false
     items[2]: select-item
-      expr: in negated=false
+      expr: in negated=false bare=false
         arg: name
           parts[0]: ident name="a" quoted=false
         values[0]: tuple

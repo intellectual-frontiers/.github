@@ -64,7 +64,7 @@ function statement(p: Parsed, s: Statement, options: DocOptions): Declaration {
       const members: Declaration[] = [];
       for (const el of s.elements) {
         if (el.kind === "column-def") members.push(make(p, "column", el.name.name, el, undefined, [], options));
-        else if (el.name !== undefined) members.push(make(p, "constraint", el.name.name, el, undefined, [], options));
+        else if (el.kind !== "table-like" && el.name !== undefined) members.push(make(p, "constraint", el.name.name, el, undefined, [], options));
       }
       return make(p, "table", qualified(s.name), s, s.name, members, options);
     }

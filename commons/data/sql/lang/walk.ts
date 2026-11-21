@@ -45,13 +45,20 @@ export function children(n: Node): readonly Node[] {
       break;
     case "star":
       opt(out, n.qualifier);
+      all(out, n.modifiers);
+      break;
+    case "star-modifier":
+      all(out, n.items);
       break;
     case "unary":
       out.push(n.arg);
       break;
     case "binary":
-    case "operator":
       out.push(n.left, n.right);
+      break;
+    case "operator":
+      opt(out, n.left);
+      out.push(n.right);
       break;
     case "is":
       out.push(n.arg);
@@ -89,6 +96,30 @@ export function children(n: Node): readonly Node[] {
     case "interval":
       out.push(n.value);
       break;
+    case "field":
+      out.push(n.arg);
+      opt(out, n.field);
+      break;
+    case "typed-string":
+      out.push(n.value);
+      break;
+    case "keyword-arg":
+      opt(out, n.value);
+      break;
+    case "on-conflict":
+      all(out, n.targets);
+      opt(out, n.constraint);
+      opt(out, n.targetWhere);
+      all(out, n.assignments);
+      opt(out, n.where);
+      break;
+    case "column-option":
+      opt(out, n.name);
+      opt(out, n.expr);
+      break;
+    case "table-like":
+      out.push(n.table);
+      break;
     case "named-arg":
       out.push(n.name, n.value);
       break;
@@ -109,7 +140,9 @@ export function children(n: Node): readonly Node[] {
       all(out, n.items);
       break;
     case "subscript":
-      out.push(n.arg, n.index);
+      out.push(n.arg);
+      opt(out, n.index);
+      opt(out, n.upper);
       break;
     case "collate":
       out.push(n.arg, n.collation);
@@ -172,7 +205,11 @@ export function children(n: Node): readonly Node[] {
       break;
     case "alias":
       out.push(n.name);
-      all(out, n.columns);
+      for (const [i, c] of n.columns.entries()) {
+        out.push(c);
+        const t = n.types[i];
+        if (t !== undefined) out.push(t);
+      }
       break;
     case "table":
       out.push(n.name);
@@ -190,12 +227,15 @@ export function children(n: Node): readonly Node[] {
       out.push(n.left, n.right);
       opt(out, n.on);
       all(out, n.using);
+      opt(out, n.usingAlias);
       opt(out, n.alias);
       break;
     case "insert":
       out.push(n.table);
+      opt(out, n.alias);
       all(out, n.columns);
       opt(out, n.source);
+      opt(out, n.onConflict);
       all(out, n.returning);
       break;
     case "assignment":
@@ -210,6 +250,7 @@ export function children(n: Node): readonly Node[] {
       break;
     case "delete":
       out.push(n.table);
+      all(out, n.using);
       opt(out, n.where);
       all(out, n.returning);
       break;

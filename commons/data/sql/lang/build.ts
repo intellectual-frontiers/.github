@@ -43,7 +43,7 @@ export const build = {
   },
   /** A star, with a qualifier or without. */
   star(at: Span, qualifier?: Name): Star {
-    return { kind: "star", start: at.start, end: at.end, qualifier };
+    return { kind: "star", start: at.start, end: at.end, qualifier, modifiers: [] };
   },
   /** A unary expression. */
   unary(at: Span, op: UnaryOp, arg: Expr): Unary {
@@ -64,6 +64,7 @@ export const build = {
       distinct: false,
       orderBy: [],
       withinGroup: [],
+      nullTreatment: undefined,
       filter: undefined,
       over: undefined,
     };

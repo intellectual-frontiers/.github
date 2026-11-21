@@ -10,8 +10,10 @@ script
     table: name
       parts[0]: ident name="s" quoted=false
       parts[1]: ident name="t" quoted=false
-    columns[0]: ident name="a" quoted=false
-    columns[1]: ident name="b" quoted=false
+    columns[0]: name
+      parts[0]: ident name="a" quoted=false
+    columns[1]: name
+      parts[0]: ident name="b" quoted=false
     source: values
       rows[0]: tuple
         items[0]: number text="1"
@@ -29,7 +31,8 @@ script
   statements[2]: insert
     table: name
       parts[0]: ident name="t" quoted=false
-    columns[0]: ident name="a" quoted=false
+    columns[0]: name
+      parts[0]: ident name="a" quoted=false
     source: select distinct=false groupAll=false
       items[0]: select-item
         expr: name

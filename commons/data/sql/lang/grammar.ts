@@ -50,10 +50,14 @@ export interface Grammar {
   readonly likeWords: readonly string[];
   /** The binary operators that are keywords (`DIV`, `MOD`, `XOR` in MySQL), upper case, each an `operator` node. */
   readonly wordOperators: readonly CustomOperator[];
+  /** Whether any run of operator characters is an operator (PostgreSQL): a run the dialect does not list is read as one `operator` node of the loosest binding power, or as a prefix operator. */
+  readonly operatorRuns: boolean;
+  /** Whether a select may have no items (`SELECT FROM t`, PostgreSQL). */
+  readonly emptySelect: boolean;
 }
 
 /** The grammar of the common ground: nothing is added. */
-export const ANSI_GRAMMAR: Grammar = { operators: [], castOperator: undefined, likeWords: [], wordOperators: [] };
+export const ANSI_GRAMMAR: Grammar = { operators: [], castOperator: undefined, likeWords: [], wordOperators: [], operatorRuns: false, emptySelect: false };
 
 /** The words the common grammar reserves: they are identifiers only after a `.` or where quoted. */
 export const RESERVED_WORDS: readonly string[] = (

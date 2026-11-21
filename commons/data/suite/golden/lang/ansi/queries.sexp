@@ -104,7 +104,7 @@ script
             parts[1]: ident name="a" quoted=false
       alias: alias
         name: ident name="l" quoted=false
-    from[2]: table-fn lateral=false
+    from[2]: table-fn lateral=false ordinality=false
       call: call distinct=false
         name: name
           parts[0]: ident name="generate_series" quoted=false

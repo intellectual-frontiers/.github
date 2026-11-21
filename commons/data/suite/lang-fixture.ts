@@ -115,8 +115,9 @@ export function show(e: Expr): string {
     case "unary":
       return `(${e.op} ${show(e.arg)})`;
     case "binary":
-    case "operator":
       return `(${show(e.left)} ${e.op} ${show(e.right)})`;
+    case "operator":
+      return e.left === undefined ? `(${e.op} ${show(e.right)})` : `(${show(e.left)} ${e.op} ${show(e.right)})`;
     case "is":
       return `(${show(e.arg)} IS ${e.negated ? "NOT " : ""}${e.test}${e.other === undefined ? "" : ` ${show(e.other)}`})`;
     case "between":
@@ -128,7 +129,7 @@ export function show(e: Expr): string {
     case "cast":
       return `(${show(e.arg)} :: ${e.type.name})`;
     case "call":
-      return `${e.name.parts.map((p) => p.name).join(".")}(${e.args.map((a) => (a.kind === "named-arg" ? `${a.name.name} => ${show(a.value)}` : show(a))).join(", ")})`;
+      return `${e.name.parts.map((p) => p.name).join(".")}(${e.args.map((a) => (a.kind === "named-arg" ? `${a.name.name} => ${show(a.value)}` : a.kind === "keyword-arg" ? `${a.keyword}${a.value === undefined ? "" : ` ${show(a.value)}`}` : show(a))).join(", ")})`;
     case "tuple":
       return `<${e.items.map(show).join(", ")}>`;
     case "case":
@@ -139,6 +140,8 @@ export function show(e: Expr): string {
     case "scalar-query":
     case "array":
     case "subscript":
+    case "field":
+    case "typed-string":
     case "collate":
       return `{${e.kind}}`;
     default:

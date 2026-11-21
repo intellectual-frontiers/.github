@@ -48,7 +48,7 @@ script
         args[1]: named-arg
           name: ident name="b" quoted=false
           value: number text="2"
-    from[0]: table-fn lateral=false
+    from[0]: table-fn lateral=false ordinality=false
       call: call distinct=false
         name: name
           parts[0]: ident name="read_csv" quoted=false

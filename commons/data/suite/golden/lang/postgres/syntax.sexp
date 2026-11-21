@@ -78,7 +78,8 @@ script
   statements[5]: insert
     table: name
       parts[0]: ident name="t" quoted=false
-    columns[0]: ident name="a" quoted=false
+    columns[0]: name
+      parts[0]: ident name="a" quoted=false
     source: values
       rows[0]: tuple
         items[0]: param style="dollar-number" text="$1"
