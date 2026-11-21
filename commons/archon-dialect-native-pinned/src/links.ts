@@ -1,7 +1,7 @@
 // Spec: 0002-native-pinned-install FR-007, FR-008
 /**
  * The links of an archive, checked and resolved as pure functions (commons 0002-native-pinned-install FR-007, FR-008): a symbolic link is kept only where its target is a relative path that stays inside
- * the folder the archive is unpacked into, names something the archive holds, and passes through no other link; a hard link is kept as a copy of the file it names, which the archive holds before it;
+ * the folder the archive is unpacked into, names something the archive holds (a file, a folder, or another link whose own target is such, with no loop), and passes through no link folder; a hard link is kept as a copy of the file it names, which the archive holds before it;
  * and no file, folder or link is written below a link. Nothing here reads a file or makes a link: the result says which links to make, and a system that cannot make links is given copies.
  *
  * @remarks
@@ -146,17 +146,35 @@ export function resolveLinks(entries: readonly TarEntry[], windows: boolean): Re
   for (const path of [...files.keys(), ...linkPaths]) for (const above of ancestors(path)) known.add(above);
   const links: SymbolicLink[] = [];
   const copies = new Map(files);
+  const targetOf = new Map(symlinks.map((l) => [l.path, l.target]));
+  /** What a link names at the end of its chain: no folder on the way is a link, each link of the chain stays inside the folder, and a chain that comes back to a link it has passed is a loop. */
+  const settle = (from: string, first: string): Result<string, LinkProblem> => {
+    const passed = new Set<string>([from]);
+    let at = first;
+    for (;;) {
+      for (const above of ancestors(at)) if (linkPaths.has(above)) return err("through-link");
+      const next = targetOf.get(at);
+      if (next === undefined) return ok(at);
+      if (passed.has(at)) return err("loops");
+      passed.add(at);
+      const r = resolveTarget(at, next);
+      if (r.kind === "err") return r;
+      at = r.value;
+      if (passed.has(at)) return err("loops");
+    }
+  };
   for (const l of [...symlinks].sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0))) {
     if (known.has(l.path)) return refuse(l.path, "collides");
     const resolved = resolveTarget(l.path, l.target);
     if (resolved.kind === "err") return refuse(l.path, resolved.error);
     const target = resolved.value;
     if (ancestors(l.path).includes(target)) return refuse(l.path, "loops");
-    for (const part of [target, ...ancestors(target)]) if (linkPaths.has(part)) return refuse(l.path, "through-link");
-    const isFile = files.has(target);
-    if (!isFile && !known.has(target)) return refuse(l.path, "dangling");
+    const final = settle(l.path, target);
+    if (final.kind === "err") return refuse(l.path, final.error);
+    const isFile = files.has(final.value);
+    if (!isFile && !known.has(final.value)) return refuse(l.path, "dangling");
     if (windows) {
-      const bytes = files.get(target);
+      const bytes = files.get(final.value);
       if (bytes === undefined) return refuse(l.path, "directory-on-windows");
       copies.set(l.path, bytes);
     } else {

@@ -67,6 +67,21 @@ proves(["0002-native-pinned-install FR-007"], "a link may name a folder, a file 
   assertEquals(r.value.links.map((l) => `${l.path} -> ${l.target}`), ["pkg/bin -> v1/bin", "pkg/current -> v1", "pkg/v1/lib/deep/again -> ../../bin/tool", "pkg/v1/lib/up -> ../bin/tool"].sort());
 });
 
+proves(["0002-native-pinned-install FR-007"], "a link may name another link, to any depth, where the chain ends at something the archive holds and no folder on the way is a link; on a system without links each becomes a copy of the file at the end", () => {
+  const entries = [
+    FILE("tl/bin/pdftex", true),
+    { kind: "symlink", path: "tl/bin/latex", link: "pdftex" },
+    { kind: "symlink", path: "tl/bin/allec", link: "latex" },
+    { kind: "symlink", path: "tl/bin/allcm", link: "allec" },
+  ] as const;
+  const r = resolved([...entries]);
+  assert(r.kind === "ok", JSON.stringify(r));
+  assertEquals(r.value.links.map((l) => `${l.path} -> ${l.target}`), ["tl/bin/allcm -> allec", "tl/bin/allec -> latex", "tl/bin/latex -> pdftex"]);
+  const w = resolved([...entries], true);
+  assert(w.kind === "ok", JSON.stringify(w));
+  assertEquals([...w.value.files.keys()].sort(), ["tl/bin/allcm", "tl/bin/allec", "tl/bin/latex", "tl/bin/pdftex"]);
+});
+
 proves(["0002-native-pinned-install FR-007"], "each way a link cannot be trusted refuses the whole archive with the path of the link and one reason", () => {
   assertEquals(refusal([FILE("a/f"), { kind: "symlink", path: "a/l", link: "/etc/passwd" }]), { path: "a/l", why: "absolute" });
   assertEquals(refusal([FILE("a/f"), { kind: "symlink", path: "a/l", link: "C:/Windows/system32" }]), { path: "a/l", why: "absolute" });
@@ -80,9 +95,10 @@ proves(["0002-native-pinned-install FR-007"], "each way a link cannot be trusted
   assertEquals(refusal([FILE("a/b/f"), { kind: "symlink", path: "a/b/l", link: ".." }]), { path: "a/b/l", why: "loops" });
   assertEquals(refusal([FILE("a/b/f"), { kind: "symlink", path: "a/b/l", link: "../.." }]), { path: "a/b/l", why: "loops" });
   assertEquals(refusal([FILE("a/f"), { kind: "symlink", path: "a/l", link: ".." }]), { path: "a/l", why: "loops" });
-  assertEquals(refusal([FILE("a/f"), { kind: "symlink", path: "a/one", link: "f" }, { kind: "symlink", path: "a/two", link: "one" }]), { path: "a/two", why: "through-link" });
+  assertEquals(refusal([FILE("a/f"), { kind: "symlink", path: "a/one", link: "two" }, { kind: "symlink", path: "a/two", link: "one" }]), { path: "a/one", why: "loops" });
+  assertEquals(refusal([FILE("a/f"), { kind: "symlink", path: "a/one", link: "missing" }, { kind: "symlink", path: "a/two", link: "one" }]), { path: "a/one", why: "dangling" });
   assertEquals(refusal([FILE("a/d/f"), { kind: "symlink", path: "a/dir", link: "d" }, { kind: "symlink", path: "a/two", link: "dir/f" }]), { path: "a/two", why: "through-link" });
-  assertEquals(refusal([FILE("a/f"), { kind: "symlink", path: "a/a", link: "a" }]), { path: "a/a", why: "through-link" });
+  assertEquals(refusal([FILE("a/f"), { kind: "symlink", path: "a/a", link: "a" }]), { path: "a/a", why: "loops" });
   assertEquals(refusal([FILE("a/f"), { kind: "symlink", path: "a/f", link: "f" }]), { path: "a/f", why: "collides" });
   assertEquals(refusal([FILE("a/d/f"), { kind: "symlink", path: "a/d", link: "d/f" }]), { path: "a/d", why: "written-through" });
   assertEquals(refusal([{ kind: "dir", path: "a/d" }, FILE("a/f"), { kind: "symlink", path: "a/d", link: "f" }]), { path: "a/d", why: "collides" });

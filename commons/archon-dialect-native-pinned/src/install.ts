@@ -6,7 +6,7 @@
  *
  * @remarks
  * A hash that differs is `hash-mismatch` and nothing is returned: there is no function here that gives files for bytes that did not match. An archive is refused whole for a path that leaves the
- * folder, a path twice, or a link that cannot be installed safely (`links.ts` says which are: a relative target that stays inside the folder, names what the archive holds and passes through no other
+ * folder, a path twice, or a link that cannot be installed safely (`links.ts` says which are: a relative target that stays inside the folder, names what the archive holds (a link may name a link) and passes through no other
  * link). A tar is read whether it is plain, gzipped or xz-compressed, found by its first bytes. The program of a tool is found at its folder with its name, with `.exe` added on Windows where the name has
  * no extension.
  *
