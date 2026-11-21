@@ -43,7 +43,7 @@ export function releasesLens(options: ReleasesOptions): Lens {
           {
             kind: "table",
             head: ["Order", "Library", "Version", "Tag", "Published"].map((h) => [text(h)]),
-            rows: rows.map((r, i) => [[text(String(i + 1))], [{ kind: "link", href: { kind: "page", path: `overview/${r.slug}.html` }, children: [{ kind: "code", text: r.slug }] }], [{ kind: "code", text: r.version }], [{ kind: "code", text: r.tag }], [text(r.publish ? "yes" : "tag only")]]),
+            rows: rows.map((r, i) => [[text(String(i + 1))], [build.pages.some((p) => p.path === `overview/${r.slug}.html`) ? { kind: "link", href: { kind: "page", path: `overview/${r.slug}.html` }, children: [{ kind: "code", text: r.slug }] } : { kind: "code", text: r.slug }], [{ kind: "code", text: r.version }], [{ kind: "code", text: r.tag }], [text(r.publish ? "yes" : "tag only")]]),
           },
         ];
         build.add({ path: "overview/releases.html", title: "Releases", description: "What the next release publishes and tags, library by library.", section: "overview", group: "Libraries", order: 8, blocks });

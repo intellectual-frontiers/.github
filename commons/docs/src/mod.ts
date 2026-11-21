@@ -25,7 +25,12 @@ export type {
   AboutPhaseState,
   AboutRule,
   AboutSpec,
+  BookPart,
+  BookVolume,
+  BooksConfig,
   CitationsConfig,
+  PageSelector,
+  PresentationId,
   Config,
   DocsConfig,
   HomeConfig,
@@ -35,7 +40,7 @@ export type {
   SpecKitConfig,
   SpecKitSource,
 } from "./config.ts";
-export { isAbout, normalDir, resolveConfig, under } from "./config.ts";
+export { DEFAULT_PRESENTATIONS, isAbout, normalDir, PRESENTATION_IDS, resolveConfig, under } from "./config.ts";
 export { Build } from "./build.ts";
 export { type Finding, message, type Problem, report } from "./check.ts";
 export type { ApiExport, ApiMember, AreaApi, ExportKind } from "./extract/api.ts";
@@ -50,4 +55,7 @@ export { areaPage, firstSentence } from "./pages/overview.ts";
 export type { Area, Package } from "./sources.ts";
 export { type DocComment, moduleComment } from "./tsdoc.ts";
 export { type Built, buildSite, writeSite } from "./site.ts";
+export { type Made, type OutFile, PRESENTATIONS, type Presentation, presentationFiles, staleFiles, writeFiles } from "./presentation.ts";
+export { bookFiles, GENERATED, selection, volumeText, type BookFile } from "./book.ts";
+export { type AdocScope, inlinesAdoc, pageAdoc, pageAnchor } from "./emit/asciidoc.ts";
 export { type Command, findConfig, loadConfig, main, parseArgs, USAGE } from "./cli.ts";

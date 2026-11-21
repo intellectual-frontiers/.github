@@ -24,6 +24,7 @@
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { path } from "@intellectual-frontiers/system";
 import type { Lens } from "./lens.ts";
+import { ALL_SECTIONS, type Section } from "./model.ts";
 
 import type { About } from "@intellectual-frontiers/core/about";
 
@@ -103,6 +104,59 @@ export interface CitationsConfig {
   readonly text?: readonly string[];
 }
 
+/** The presentations of the pages (docs 0001-docs FR-007): the static site, the Markdown twins with `llms.txt`, the JSON a lens adds, and the AsciiDoc of the volumes of a book. */
+export const PRESENTATION_IDS = ["web", "markdown", "data", "book"] as const;
+
+/** The name of a presentation. */
+export type PresentationId = (typeof PRESENTATION_IDS)[number];
+
+/** The presentations `build` writes when none is named: the site as it has always been. */
+export const DEFAULT_PRESENTATIONS: readonly PresentationId[] = ["web", "markdown", "data"];
+
+/** Which pages a part of a volume takes (docs 0001-docs FR-008): those of a section, of a group of it, under a path, and not under another. */
+export interface PageSelector {
+  /** The section. */
+  readonly section?: Section;
+  /** The group of the section's navigation. */
+  readonly group?: string;
+  /** A path from the site's root that the page's path begins with. */
+  readonly prefix?: string;
+  /** Paths from the site's root that the page's path must not begin with. */
+  readonly exclude?: readonly string[];
+}
+
+/** A part of a volume: a title, a line, and the pages it takes (a page is in the first part that takes it). */
+export interface BookPart {
+  /** Its title. */
+  readonly title: string;
+  /** What it holds, in a sentence. */
+  readonly about?: string;
+  /** The pages, selector by selector, each in the order of the site's navigation. */
+  readonly select: readonly PageSelector[];
+  /** Make a part of each group of the pages it takes, titled by the group, in place of one part (the API, library by library). */
+  readonly perGroup?: boolean;
+}
+
+/** A volume of a book: the slug of the book of `erga` it is a chapter source of, and its parts. */
+export interface BookVolume {
+  /** Its slug: the book's folder, and the name of the file it is written to. */
+  readonly id: string;
+  /** Its title. */
+  readonly title: string;
+  /** What it is, in a sentence. */
+  readonly about: string;
+  /** Its parts, in order. */
+  readonly parts: readonly BookPart[];
+}
+
+/** What the book presentation writes (docs 0001-docs FR-008): the volumes, and where a link to a page outside the volume goes. */
+export interface BooksConfig {
+  /** The address of the site, ending in `/`: a link to a page that is not in the volume goes there; with none it is only its text. */
+  readonly site?: string;
+  /** The volumes. */
+  readonly volumes: readonly BookVolume[];
+}
+
 /** The configuration a repository gives (commons 0011-documentation FR-023), as its `docs.config.ts` exports it. */
 export interface DocsConfig {
   /** The site's name, at the top of every page. */
@@ -133,6 +187,10 @@ export interface DocsConfig {
   readonly forbiddenInGuides?: readonly string[];
   /** Where `build` writes the site, from the root; `_site` by default. */
   readonly out?: string;
+  /** The presentations `build` writes when the command line names none; the site, the Markdown and the data by default. */
+  readonly presentations?: readonly PresentationId[];
+  /** The volumes of the book presentation (docs 0001-docs FR-008); none by default. */
+  readonly books?: BooksConfig;
 }
 
 /** A package as the build reads it: its folder from the root (`""` for the root), its name, and where its `About` is. */
@@ -189,6 +247,10 @@ export interface Config {
   readonly forbiddenInGuides: readonly string[];
   /** Where `build` writes the site, absolute. */
   readonly out: string;
+  /** The presentations written by default. */
+  readonly presentations: readonly PresentationId[];
+  /** The volumes of the book presentation. */
+  readonly books: BooksConfig;
 }
 
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
@@ -230,6 +292,69 @@ export function isAbout(v: unknown): v is About {
 /** Whether a value is a lens: a name and a `read` function. */
 function isLens(v: unknown): v is Lens {
   return isRecord(v) && typeof v["name"] === "string" && typeof v["read"] === "function";
+}
+
+/** The books of a configuration checked (docs 0001-docs FR-008): a volume's slug, title and parts, and a selector's section. */
+function booksOf(v: unknown, bad: (what: string) => void): BooksConfig {
+  if (v === undefined) return { volumes: [] };
+  if (!isRecord(v)) {
+    bad("books must be an object: { site?, volumes }");
+    return { volumes: [] };
+  }
+  const site = v["site"];
+  if (site !== undefined && (typeof site !== "string" || !/^https:\/\/\S+\/$/.test(site))) bad("books.site must be an https address ending in /");
+  const raw = v["volumes"];
+  if (!Array.isArray(raw)) {
+    bad("books.volumes must be an array of { id, title, about, parts }");
+    return { volumes: [] };
+  }
+  const volumes: BookVolume[] = [];
+  const text = (x: unknown, where: string): string => {
+    if (typeof x === "string" && x.trim() !== "") return x;
+    bad(`${where} must be a non-empty string`);
+    return "";
+  };
+  raw.forEach((x: unknown, i) => {
+    const where = `books.volumes[${i}]`;
+    if (!isRecord(x)) return bad(`${where} must be an object: { id, title, about, parts }`);
+    const id = text(x["id"], `${where}.id`);
+    if (id !== "" && !SLUG.test(id)) bad(`${where}.id ${JSON.stringify(id)} must be lower-case words joined by hyphens`);
+    if (volumes.some((o) => o.id === id)) bad(`${where}.id ${id} names two volumes`);
+    const parts: BookPart[] = [];
+    const rawParts = x["parts"];
+    if (!Array.isArray(rawParts) || rawParts.length === 0) bad(`${where}.parts must be a non-empty array of { title, select }`);
+    else {
+      rawParts.forEach((p: unknown, j) => {
+        const at = `${where}.parts[${j}]`;
+        if (!isRecord(p)) return bad(`${at} must be an object: { title, about?, select }`);
+        const select: PageSelector[] = [];
+        const rawSelect = p["select"];
+        if (!Array.isArray(rawSelect) || rawSelect.length === 0) bad(`${at}.select must be a non-empty array of selectors`);
+        else {
+          rawSelect.forEach((s: unknown, k) => {
+            const sel = `${at}.select[${k}]`;
+            if (!isRecord(s)) return bad(`${sel} must be an object: { section?, group?, prefix?, exclude? }`);
+            const section = ALL_SECTIONS.find((a) => a === s["section"]);
+            if (s["section"] !== undefined && section === undefined) bad(`${sel}.section ${JSON.stringify(s["section"])} must be one of ${ALL_SECTIONS.join(", ")}`);
+            const exclude = s["exclude"] ?? [];
+            if (!Array.isArray(exclude) || !exclude.every((e: unknown) => typeof e === "string")) bad(`${sel}.exclude must be an array of paths`);
+            if (s["group"] !== undefined && typeof s["group"] !== "string") bad(`${sel}.group must be a string`);
+            if (s["prefix"] !== undefined && typeof s["prefix"] !== "string") bad(`${sel}.prefix must be a string`);
+            if (section === undefined && s["prefix"] === undefined) bad(`${sel} names neither a section nor a prefix`);
+            select.push({
+              ...(section === undefined ? {} : { section }),
+              ...(typeof s["group"] === "string" ? { group: s["group"] } : {}),
+              ...(typeof s["prefix"] === "string" ? { prefix: s["prefix"] } : {}),
+              ...(Array.isArray(exclude) ? { exclude: exclude.map(String) } : {}),
+            });
+          });
+        }
+        parts.push({ title: text(p["title"], `${at}.title`), ...(typeof p["about"] === "string" ? { about: p["about"] } : {}), select, ...(p["perGroup"] === true ? { perGroup: true } : {}) });
+      });
+    }
+    volumes.push({ id, title: text(x["title"], `${where}.title`), about: text(x["about"], `${where}.about`), parts });
+  });
+  return { ...(typeof site === "string" ? { site } : {}), volumes };
 }
 
 /**
@@ -348,6 +473,19 @@ export function resolveConfig(value: unknown, file: string): Result<Config, stri
   const forbiddenInGuides = names("forbiddenInGuides");
   const lint = optStr("lintRules", "lintRules");
   const out = path.resolve(root, optStr("out", "out") ?? "_site");
+  const presentations: PresentationId[] = [];
+  const rawPresentations = value["presentations"];
+  if (rawPresentations === undefined) presentations.push(...DEFAULT_PRESENTATIONS);
+  else if (!Array.isArray(rawPresentations) || rawPresentations.length === 0) bad(`presentations must be a non-empty array of ${PRESENTATION_IDS.join(", ")}`);
+  else {
+    for (const p of rawPresentations) {
+      const id = PRESENTATION_IDS.find((x) => x === p);
+      if (id === undefined) bad(`presentations names ${JSON.stringify(p)}: one of ${PRESENTATION_IDS.join(", ")}`);
+      else if (!presentations.includes(id)) presentations.push(id);
+    }
+  }
+  const books = booksOf(value["books"], bad);
+  if (presentations.includes("book") && books.volumes.length === 0) bad("presentations names book, and books names no volume");
   if (problems.length > 0) return err(problems);
   return ok({
     file,
@@ -366,5 +504,7 @@ export function resolveConfig(value: unknown, file: string): Result<Config, stri
     retired,
     forbiddenInGuides,
     out,
+    presentations,
+    books,
   });
 }

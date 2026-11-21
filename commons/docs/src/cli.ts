@@ -12,21 +12,32 @@
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { fs, path, proc } from "@intellectual-frontiers/system";
-import { report } from "./check.ts";
-import { type Config, resolveConfig } from "./config.ts";
+import { type Finding, report } from "./check.ts";
+import { type Config, PRESENTATION_IDS, type PresentationId, resolveConfig } from "./config.ts";
+import { presentationFiles, staleFiles } from "./presentation.ts";
 import { buildSite, writeSite } from "./site.ts";
 
 /** What the command line asks for. */
 export type Command =
-  | { readonly kind: "build"; readonly out: string | undefined; readonly config: string | undefined }
+  | {
+    readonly kind: "build";
+    readonly out: string | undefined;
+    readonly config: string | undefined;
+    /** The presentations asked for; the configuration's where none. */
+    readonly presentations?: readonly PresentationId[];
+    /** Write nothing: say which files are not what a build would write. */
+    readonly verify?: boolean;
+  }
   | { readonly kind: "check"; readonly config: string | undefined }
   | { readonly kind: "help" };
 
 /** The usage, printed by `--help` and with a refusal. */
-export const USAGE = `usage: ifc-docs build [--out DIR] [--config FILE]
+export const USAGE = `usage: ifc-docs build [--out DIR] [--config FILE] [--presentation NAME[,NAME...]] [--check]
        ifc-docs check [--config FILE]
 
 build   writes the site into DIR (the configuration's out, else _site at the repository's root)
+--presentation NAME   what to write: ${PRESENTATION_IDS.join(", ")} (the configuration's presentations, else web, markdown and data); book writes <volume>/generated/<volume>.adoc for each volume
+--check   with build: writes nothing, and exits 1 where a file is not what a build would write
 check   builds the site into a temporary folder, prints every finding, and exits 1 where there is one
 --config FILE   the configuration (default: the first docs.config.ts from here up to the repository's root)`;
 
@@ -40,21 +51,32 @@ export function parseArgs(args: readonly string[]): Result<Command, string> {
   if (verb === undefined || verb === "--help" || verb === "-h" || verb === "help") return ok({ kind: "help" });
   let out: string | undefined;
   let config: string | undefined;
+  let presentations: PresentationId[] | undefined;
+  let verify = false;
   for (let i = 0; i < rest.length; i++) {
     const a = rest[i];
     const value = rest[i + 1];
-    if (a === "--out" || a === "--config") {
+    if (a === "--check") verify = true;
+    else if (a === "--out" || a === "--config" || a === "--presentation") {
       if (value === undefined || value.startsWith("--")) return err(`${a} needs a value`);
       if (a === "--out") out = value;
-      else config = value;
+      else if (a === "--config") config = value;
+      else {
+        for (const name of value.split(",")) {
+          const id = PRESENTATION_IDS.find((x) => x === name);
+          if (id === undefined) return err(`--presentation ${JSON.stringify(name)} is not one of ${PRESENTATION_IDS.join(", ")}`);
+          presentations = [...(presentations ?? []), id];
+        }
+      }
       i++;
     } else return err(`unknown argument ${JSON.stringify(a)}`);
   }
   switch (verb) {
     case "build":
-      return ok({ kind: "build", out, config });
+      return ok({ kind: "build", out, config, ...(presentations === undefined ? {} : { presentations }), ...(verify ? { verify } : {}) });
     case "check":
       if (out !== undefined) return err("check writes nothing: --out is for build");
+      if (presentations !== undefined || verify) return err("check builds every presentation its configuration names: --presentation and --check are for build");
       return ok({ kind: "check", config });
     default:
       return err(`unknown command ${JSON.stringify(verb)}: build or check`);
@@ -127,17 +149,33 @@ export async function main(args: readonly string[], cwd: string = proc.cwd()): P
   const lines = report(built.found);
   if (c.kind === "check") {
     const tmp = await fs.makeTempDir({ prefix: "ifc-docs-" });
+    let more: readonly Finding[] = [];
     try {
-      await writeSite(config, built, tmp);
+      more = await writeSite(config, built, tmp, [...new Set<PresentationId>([...config.presentations, ...(config.books.volumes.length > 0 ? ["book" as const] : [])])]);
     } finally {
       await fs.remove(tmp, { recursive: true });
     }
+    lines.push(...report([...more]));
     for (const l of lines) console.error(l);
     console.error(`${built.pages.length} pages, ${lines.length} findings`);
     return lines.length > 0 ? 1 : 0;
   }
   const out = c.out === undefined ? config.out : path.resolve(cwd, c.out);
-  await writeSite(config, built, out);
+  const ids = c.presentations ?? config.presentations;
+  if (ids.includes("book") && config.books.volumes.length === 0) {
+    console.error("ifc-docs: --presentation book, and the configuration names no volume (books.volumes)");
+    return 2;
+  }
+  if (c.verify === true) {
+    const made = presentationFiles(config, built, ids);
+    const stale = await staleFiles(out, made.files);
+    lines.push(...report([...made.found]));
+    for (const l of lines) console.error(l);
+    for (const s of stale) console.error(`${path.join(out, s)}: is not what a build writes; rewrite it with ifc-docs build${c.presentations === undefined ? "" : ` --presentation ${ids.join(",")}`}`);
+    console.error(`${stale.length} of ${made.files.length} files are not current; ${lines.length} findings`);
+    return stale.length > 0 || lines.length > 0 ? 1 : 0;
+  }
+  lines.push(...report([...(await writeSite(config, built, out, ids))]));
   for (const l of lines) console.error(l);
   console.error(`${built.pages.length} pages written to ${out}; ${lines.length} findings`);
   return 0;
