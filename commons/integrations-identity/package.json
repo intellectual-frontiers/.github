@@ -1,0 +1,34 @@
+{
+  "name": "@intellectual-frontiers/integrations-identity",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Read-only connectors for the identity and device posture of a managed service provider's customers: a Microsoft Entra tenant (who has multifactor authentication, whether a policy requires it), Microsoft Intune managed devices (compliance, encryption, staleness) and a Google Workspace domain (two-step verification, administrators), each written against the read port of Integrations, with its governance as data and a conformance run over recorded answers.",
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "exports": {
+    ".": "./src/mod.ts",
+    "./governance": "./src/governance/mod.ts",
+    "./logical": "./src/logical/mod.ts",
+    "./physical": "./src/physical/mod.ts"
+  },
+  "scripts": {
+    "check": "tsc -p tsconfig.json",
+    "test": "bun test suite/",
+    "test:node": "node --test \"suite/**/*.test.ts\"",
+    "verify": "tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../libraries/src/check.ts --root spec-kit --level L1 && bun ../kanon/src/check.ts && bun tools/check.ts && bun test suite/"
+  },
+  "devDependencies": {
+    "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/integrations": "link:../integrations",
+    "@intellectual-frontiers/kanon": "link:../kanon",
+    "@intellectual-frontiers/libraries": "link:../libraries",
+    "@intellectual-frontiers/mizan": "link:../mizan",
+    "@intellectual-frontiers/system": "link:../system",
+    "@intellectual-frontiers/test": "link:../test",
+    "@types/node": "26.6.6",
+    "fast-check": "4.10.2",
+    "typescript": "7.0.2"
+  }
+}

@@ -134,6 +134,7 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/catalog-nist-sp800`](commons/catalog-nist-sp800) | Standard | NIST SP 800-53 Rev 5.2.0 and SP 800-171 Rev 3 as grc catalog packages | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/catalog-soc2`](commons/catalog-soc2) | Standard | SOC 2 Trust Services Criteria as a grc catalog package | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/integrations-fhir`](https://www.npmjs.com/package/@intellectual-frontiers/integrations-fhir) | Standard | The FHIR plugin of Integrations | - | L1 | GitHub, npm |
+| [`@intellectual-frontiers/integrations-identity`](commons/integrations-identity) | Standard | Read-only connectors for the identity and device posture of a managed service provider's customers | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/integrations-x12`](https://www.npmjs.com/package/@intellectual-frontiers/integrations-x12) | Standard | The X12 envelope and acknowledgement skeleton of Integrations | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/mizan`](https://www.npmjs.com/package/@intellectual-frontiers/mizan) | Standard | Mizan, the IF Spec Profile, as code | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/ontology`](https://www.npmjs.com/package/@intellectual-frontiers/ontology) | Standard | The ontologies of Intellectual Frontiers Commons | - | L1 | GitHub, npm |
