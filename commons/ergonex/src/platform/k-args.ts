@@ -8,6 +8,7 @@
 export {
   editDistance,
   flag,
+  many,
   formatUsageError,
   helpOf,
   parseArgs,

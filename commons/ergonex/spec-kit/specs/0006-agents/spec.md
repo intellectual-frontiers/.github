@@ -1,7 +1,7 @@
 # Feature Specification: Agents
 
 **Spec ID:** 0006-agents
-**Status:** Draft
+**Status:** Active
 **Owner:** if
 **Domain:** commons
 
@@ -125,6 +125,16 @@ What runs against what, and what cannot be verified here. Each test names the re
 
 **Not verifiable here, and so never claimed:** a full agent session of Claude Code, Codex or herdr (it needs an account of each); herdr's remote machines against our host (they are herdr's own feature: this work does not exercise them); Omarchy on real hardware and with a desktop session; macOS and Windows OpenSSH (nothing was run); the GitHub App installation token itself (it needs the owner's App: the tests use a file with a made-up value and record that).
 
+## What the implementation settled
+
+These are choices the requirements leave open, made when the code was written; each is in the code and in a test.
+
+- The `agents` policy is read from the manifest, and from `.ergonex/agents.json` (which `ergonex init --persona agent --policy FILE` writes after decoding the policy) where the manifest does not say it; `agents` gained `rawCommands` (FR-031).
+- `--job` carries `apply` (with `--plan-hash`, compared with the plan made again at once) and the commands that only read; every other command that changes the host is refused as a job. `agent jobs wait` that finds the job not done ends with the status 4 of Headless.
+- `remote bootstrap` takes `--harness` more than once, `--identity FILE` for the SSH key and `--dry-run`, which probes with the host key it would pin and changes nothing, on the machine and on this one. A first install runs the installer of 0004-onboarding FR-008, sent on standard input with its SHA-256 checked, and, where the machine has no scoped line for the registry, writes one to the account's Bun configuration that refers to the token by the name `ERGONEX_GITHUB_TOKEN`: this amends 0004-onboarding FR-005, whose test now allows that one file.
+- `agent doctor` takes `--offline`, which skips the two network checks.
+- Headless' `mcp` and `ssh-inbound` exports join `governance`, `logical` and `cli` as the ones Ergonex uses (0001-ergonex FR-031).
+
 ## Out of scope
 
 - Running or supervising an agent, giving it a model or an account: that is the harness's.
@@ -147,12 +157,14 @@ What runs against what, and what cannot be verified here. Each test names the re
 
 ## Open questions
 
-- **OQ-1**: Whether the harness adapters become a Kanon family (`ergonex-harness-<name>`, packages in the Physical layer of Ergonex). Ergonex does not declare `kanon` today and its root files are not in folders, so it would have to be restructured first; until it is, the adapters are folder instances behind one port (FR-011) so that they can be lifted. The owner leans to the family.
-- **OQ-2**: Whether the `ergonex:` terms of this specification (Persona, Harness, Distro, Job, Agent policy, Disposable environment) become an ontology namespace `ergonex`. There is none today: the `ergonex:` names are defined by the specifications. Unaligned terms need Decisions of the owner.
-- **OQ-3**: When the tool server must be dual-era. Claude Code 2.1.330 connected to the revision `2025-06-18`; Codex, herdr and other clients are not verified.
-- **OQ-4**: Whether the adapter `herdr` is a harness at all: herdr hosts agents and the integrations are per agent. FR-002 and FR-015 treat it as the runtime, as the owner's list names it; the evidence records both.
-- **OQ-5**: Who makes the installation token (the controller holds the App's private key and passes the token on standard input) and where that key lives: the owner's.
-- **OQ-6**: Whether `claude-code` should register the server with `claude mcp add --scope user` where the command exists, instead of `.mcp.json` and `enabledMcpjsonServers`; both are documented ways.
+None is open. Each of the six was decided by the owner on 2026-11-22.
+
+- **OQ-1** (decided): the harness adapters are folder instances behind one port (`src/agents/adapters/`) now; a Kanon family (`ergonex-harness-<name>`) comes later, when Ergonex declares `kanon`.
+- **OQ-2** (decided): the `ergonex` ontology namespace exists. The Decisions that keep each term `unaligned` are written in `commons/spec-kit/audits/2026-11-ergonex-decisions.md` and their signatures are left blank (the owner signs them); the namespace as code is not written yet.
+- **OQ-3** (decided): the tool server answers the revision `2025-06-18` now; a newer revision is added when a client needs it.
+- **OQ-4** (decided): herdr is the runtime and the harness is the agent it hosts; the evidence record names both (FR-006).
+- **OQ-5** (decided): the controller holds the GitHub App's private key and passes the installation token on standard input, never as an argument, in the environment or in a log; the key's path comes from an option and is never stored.
+- **OQ-6** (decided): `claude-code` registers the server with `claude mcp add` where that command exists and writes `.mcp.json` where it does not. `enx` is an alias of an interactive shell only; the interface of an agent is `ergonex`.
 
 ## Key entities
 

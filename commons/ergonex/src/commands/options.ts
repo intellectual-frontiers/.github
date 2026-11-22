@@ -14,13 +14,35 @@
  */
 import { defineReach } from "@intellectual-frontiers/headless/governance";
 import type { ActionTraits } from "@intellectual-frontiers/headless/logical";
-import { value } from "../platform/k-args.ts";
+import { flag, value } from "../platform/k-args.ts";
 
 /** The option every command takes: the root of the workspace for the run. */
 export const HOME = {
   home: value({
     help: "The root of the workspace for this run (else $ERGONEX_HOME, else $HOME/workspaces).",
     valueName: "DIR",
+  }),
+  persona: value({
+    help: "Who drives this run: human or agent (else $ERGONEX_PERSONA, else the manifest's persona, else human).",
+    valueName: "PERSONA",
+  }),
+  harness: value({
+    help: "The harness that drives this run: claude-code, codex, herdr or other (else $ERGONEX_HARNESS, else other).",
+    valueName: "HARNESS",
+  }),
+  session: value({
+    help: "The identifier of the session of the harness (else $ERGONEX_SESSION).",
+    valueName: "ID",
+  }),
+  text: flag({
+    help: "The text form where the persona agent would get the JSON envelope.",
+  }),
+  job: flag({
+    help: "For the persona agent: run the command as a job that outlives this session, print its identifier at once (agent jobs).",
+  }),
+  planHash: value({
+    help: "With --job on a command that changes the host: the hash `ergonex plan` printed; a hash that is not the plan's refuses the job.",
+    valueName: "SHA256",
   }),
 };
 

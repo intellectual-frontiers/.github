@@ -26,7 +26,8 @@ import process from "node:process";
 import { launch, type Io } from "@intellectual-frontiers/headless/cli";
 import { BUILT_IN_WORDS } from "@intellectual-frontiers/headless/logical";
 import { existsSync } from "./platform/r-fs.ts";
-import { resolve } from "./platform/r-path.ts";
+import { join, resolve } from "./platform/r-path.ts";
+import { AREA, readManifest } from "./host/workspace.ts";
 import { build, cwd as workingFolder, env as processEnv } from "./platform/r-proc.ts";
 import { stdin, stdout, stderr } from "./platform/r-stdio.ts";
 import { exitCodeOf } from "./modules/types.ts";
@@ -37,6 +38,8 @@ import { placesOf } from "./host/locations.ts";
 import { homeOf } from "./layout.ts";
 import { findModule } from "./modules/registry.ts";
 import { moduleName } from "./modules/name.ts";
+import { finishJob, startJob } from "./agents/host/job-launch.ts";
+import { dirname, fromFileUrl } from "./platform/r-path.ts";
 import type { Context } from "./modules/types.ts";
 
 /** What `main` is given besides the command line; each is read from this process where it is not. */
@@ -59,6 +62,42 @@ function homeWord(words: readonly string[]): string | undefined {
   const i = words.indexOf("--home");
   if (i >= 0) return words[i + 1];
   return words.find((w) => w.startsWith("--home="))?.slice("--home=".length);
+}
+
+/** The word after `--persona` in an argument vector (or `--persona=agent`), found without parsing the rest. */
+function personaWord(words: readonly string[]): string | undefined {
+  const end = words.indexOf("--");
+  const own = end < 0 ? words : words.slice(0, end);
+  const i = own.indexOf("--persona");
+  if (i >= 0) return own[i + 1];
+  return own.find((w) => w.startsWith("--persona="))?.slice("--persona=".length);
+}
+
+/** The persona of a run, found before the program parses its words: the option, the variable, the manifest. Only the word `agent` changes how the words are given to the program. */
+async function personaOf(
+  words: readonly string[],
+  environment: Readonly<Record<string, string | undefined>>,
+  homeFor: (override: string | undefined) => string | undefined
+): Promise<string> {
+  const given = personaWord(words) ?? ((environment["ERGONEX_PERSONA"] ?? "") === "" ? undefined : environment["ERGONEX_PERSONA"]);
+  if (given !== undefined) return given;
+  const home = homeFor(homeWord(words));
+  if (home === undefined || !existsSync(join(home, AREA))) return "human";
+  const m = await readManifest(home, "1970-01-01", environment["ERGONEX_ALLOW_LOOPBACK_HTTP"] === "1");
+  return m.kind === "ok" ? (m.value.persona ?? "human") : "human";
+}
+
+/** The words an agent gives (`mcp` is the protocol's: nothing but it is written to standard output): no prompt, and the JSON envelope unless the text form (`--text`), a format (`--format`) or a document (`--sarif`) is asked for (0006-agents FR-003). */
+export function agentWords(words: readonly string[]): readonly string[] {
+  const end = words.indexOf("--");
+  const own = end < 0 ? words : words.slice(0, end);
+  const rest = end < 0 ? [] : words.slice(end);
+  if (own.length === 0 || own[0]?.startsWith("-") === true || (BUILT_IN_WORDS as readonly string[]).includes(own[0] ?? "") || own[0] === "mcp") return words;
+  const asked = (w: string): boolean => w === "--text" || w === "--json" || w === "--sarif" || w === "--format" || w.startsWith("--format=") || w === "--help" || w === "-h";
+  const extra: string[] = [];
+  if (!own.includes("--non-interactive")) extra.push("--non-interactive");
+  if (!own.some(asked)) extra.push("--json");
+  return [...own, ...extra, ...rest];
 }
 
 /** Runs `ergonex` with the words after its name; returns the exit status. */
@@ -103,6 +142,8 @@ export async function main(argv: readonly string[], deps: MainDeps = {}): Promis
       globals: {},
       home: homeFor(homeWord(rest)),
       mode: "apply",
+      identity: { persona: "human", harness: "other" },
+      agents: undefined,
     };
     const start = BigInt(now()) * 1_000_000n;
     const found = await discoverModules(ctx);
@@ -121,8 +162,10 @@ export async function main(argv: readonly string[], deps: MainDeps = {}): Promis
     }
   }
 
-  return await launch(program, {
-    argv,
+  const asked = await personaOf(argv, environment, homeFor);
+  if (asked === "agent" && argv.includes("--job")) return await jobMain(argv, environment, homeFor, now, deps.out);
+  const code = await launch(program, {
+    argv: asked === "agent" ? agentWords(argv) : argv,
     io: {
       env: (n) => {
         const v = environment[n];
@@ -139,6 +182,36 @@ export async function main(argv: readonly string[], deps: MainDeps = {}): Promis
       ...deps.io,
     },
   });
+  // a job records how it ended (0006-agents FR-024)
+  const jobId = environment["ERGONEX_JOB_ID"];
+  const jobHome = homeFor(homeWord(argv));
+  if (jobId !== undefined && jobId !== "" && jobHome !== undefined) await finishJob(jobHome, jobId, code, now() - 60_000);
+  return code;
+}
+
+/** The launcher a job runs the program with. */
+const ENTRY = join(dirname(fromFileUrl(import.meta.url)), "..", "bin", "ergonex.mjs");
+
+/** `--job`: starts the job and says its identifier at once, without waiting for it. */
+async function jobMain(
+  argv: readonly string[],
+  environment: Readonly<Record<string, string | undefined>>,
+  homeFor: (override: string | undefined) => string | undefined,
+  now: () => number,
+  out: ((text: string) => void) | undefined,
+): Promise<number> {
+  const say = out ?? ((t: string): void => void stdout.writeSync(t));
+  const fail = (message: string, code: number): number => {
+    ((t: string): void => void stderr.writeSync(t))(`ergonex: ${message}\n`);
+    return code;
+  };
+  const home = homeFor(homeWord(argv));
+  if (home === undefined || !existsSync(join(home, AREA))) return fail("a job needs a workspace: run `ergonex init` first", exitCodeOf("Environment"));
+  const token = environment["ERGONEX_GITHUB_TOKEN"];
+  const started = await startJob({ home, words: argv, env: environment, entry: ENTRY, now: now(), secrets: token === undefined || token === "" ? [] : [token] });
+  if ("kind" in started) return fail(started.message, exitCodeOf(started.kind === "usage" ? "Usage" : "Environment"));
+  say(argv.includes("--text") ? `${started.id}\n` : `${JSON.stringify({ job: started.id, state: started.state })}\n`);
+  return 0;
 }
 
 if (import.meta.main) process.exitCode = await main(process.argv.slice(2));

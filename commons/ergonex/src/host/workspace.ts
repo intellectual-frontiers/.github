@@ -90,6 +90,23 @@ export function loopbackFinding(today: string): Finding {
   };
 }
 
+/** Where the persona and the `agents` policy are kept where the person did not write them in the manifest. */
+export function agentsFilePath(home: string): string {
+  return join(home, AREA, "agents.json");
+}
+
+/** The `persona` and `agents` that `agents.json` holds, or nothing where there is no such file or it is not a JSON object. */
+async function readAgentsFile(home: string): Promise<Readonly<Record<string, unknown>> | undefined> {
+  const path = agentsFilePath(home);
+  if (!existsSync(path)) return undefined;
+  try {
+    const v: unknown = JSON.parse(await readTextFile(path));
+    return typeof v === "object" && v !== null && !Array.isArray(v) ? { ...("persona" in v ? { persona: v.persona } : {}), ...("agents" in v ? { agents: v.agents } : {}) } : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 /** Where the manifest is. */
 export function manifestPath(home: string): string {
   return join(home, AREA, "workspace.ts");
@@ -153,7 +170,11 @@ export async function readManifest(home: string, today: string, loopbackHttp = f
         },
       ],
     });
-  const decoded = decodeManifest(withEntries(imported.value.base, imported.value.list), { loopbackHttp });
+  // the persona and the `agents` policy may be in `.ergonex/agents.json`, which `ergonex init --persona agent --policy FILE` writes; `workspace.ts` wins where it says them too (0006-agents FR-029)
+  const base = imported.value.base;
+  const extra = await readAgentsFile(home);
+  const merged = typeof base === "object" && base !== null && !Array.isArray(base) && extra !== undefined ? { ...extra, ...base } : base;
+  const decoded = decodeManifest(withEntries(merged, imported.value.list), { loopbackHttp });
   if (decoded.kind === "err")
     return err({
       kind: "manifest",

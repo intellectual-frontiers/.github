@@ -34,6 +34,8 @@ import { describeNameError, moduleName } from "./modules/name.ts";
 import { collisions } from "./portable.ts";
 import { decodeCatalog, type ToolCatalog } from "./tools/catalog.ts";
 import { type Policy, hostAllowed, policyOf } from "./policy.ts";
+import { type AgentsPolicy, decodeAgentsPolicy } from "./agents/policy.ts";
+import { isPersona, type Persona } from "./agents/persona.ts";
 import { branchName, describeBrandError, gitHost, type BranchName, type RepoPath } from "./types.ts";
 
 const repositoryShape = object({ remote: string }, { branch: string, group: string, worktrees: array(string) });
@@ -55,6 +57,8 @@ const manifestShape = object(
     direnv: boolean,
     tools: unknownValue,
     modules: array(object({ name: string, program: string }, { sha256: string, summary: string })),
+    persona: string,
+    agents: unknownValue,
   },
 );
 
@@ -105,6 +109,10 @@ export type Manifest = {
   readonly modules: readonly ManifestModule[];
   /** The tool catalog (0002-workspace-model FR-037): empty where the manifest names none. */
   readonly catalog: ToolCatalog;
+  /** The persona of a run that says nothing else (0006-agents FR-001). */
+  readonly persona?: Persona | undefined;
+  /** What the persona `agent` may change (0006-agents FR-005); absent means nothing. */
+  readonly agents?: AgentsPolicy | undefined;
 };
 
 /** One thing wrong in the manifest, with where. */
@@ -212,6 +220,18 @@ export function decodeManifest(
     else for (const i of c.error) issues.push({ rule: i.rule, path: i.path, message: i.message });
   }
 
+  let persona: Persona | undefined;
+  if (raw.persona !== undefined) {
+    if (isPersona(raw.persona)) persona = raw.persona;
+    else issues.push({ rule: "ergonex/manifest-agents", path: "$.persona", message: `${JSON.stringify(raw.persona)} is not a persona: use human or agent` });
+  }
+  let agents: AgentsPolicy | undefined;
+  if (raw.agents !== undefined) {
+    const a = decodeAgentsPolicy(raw.agents);
+    if (a.kind === "ok") agents = a.value;
+    else for (const i of a.error) issues.push({ rule: "ergonex/manifest-agents", path: i.path, message: i.message });
+  }
+
   const policy = policyOf(raw.policy);
   const repositories: ManifestRepo[] = [];
   const named: { id: string; path: string }[] = [];
@@ -312,6 +332,8 @@ export function decodeManifest(
     direnv: raw.direnv === true,
     modules,
     catalog,
+    ...(persona === undefined ? {} : { persona }),
+    ...(agents === undefined ? {} : { agents }),
   });
 }
 
