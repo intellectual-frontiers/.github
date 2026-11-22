@@ -1,0 +1,117 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45030073010",
+    "workflow": "tests",
+    "commit": "f80804a48ab56ad3f10722fbb6d7786e1efb5896",
+    "at": "2026-11-22T13:57:12Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45030073010"
+  },
+  "steps": [
+    {
+      "id": "commons-generated-files-and-specificatio-8",
+      "job": "check",
+      "module": "repository",
+      "tool": "checks",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5385,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-documentation-generator-s-dependenci-4",
+      "job": "check",
+      "module": "repository",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 30,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-formatter-6",
+      "job": "check",
+      "module": "repository",
+      "tool": "format",
+      "outcome": "findings",
+      "findings": 1,
+      "durationMs": 16,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-linter-type-aware-no-warning-allowed-7",
+      "job": "check",
+      "module": "repository",
+      "tool": "lint",
+      "outcome": "no-output",
+      "findings": 1,
+      "durationMs": 1690,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-root-s-development-tools-from-bun-lo-3",
+      "job": "check",
+      "module": "repository",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 192,
+      "exitStatus": 0
+    },
+    {
+      "id": "typescript-7-on-the-tests-of-the-root-an-5",
+      "job": "check",
+      "module": "repository",
+      "tool": "tsc",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1926,
+      "exitStatus": 0
+    },
+    {
+      "id": "commons-generated-files-and-specificatio-3",
+      "job": "windows",
+      "module": "repository",
+      "tool": "checks",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1512,
+      "exitStatus": 0
+    }
+  ],
+  "findings": [
+    {
+      "id": "f-3b32259e3d363339",
+      "tool": "format",
+      "module": "repository",
+      "evidence": {
+        "run": "45030073010",
+        "commit": "f80804a48ab56ad3f10722fbb6d7786e1efb5896",
+        "step": "the-formatter-6",
+        "logSha256": "679bfe933fef98cad903144ae6dc2018ff45589c514bd9077281ead19545c9bb"
+      },
+      "at": "2026-11-22T13:56:26Z",
+      "code": "unformatted",
+      "file": "tests/commons-kanon.test.ts",
+      "severity": "warning",
+      "message": "tests/commons-kanon.test.ts is not formatted",
+      "key": "tests/commons-kanon.test.ts"
+    },
+    {
+      "id": "f-4174d1bdef5c6317",
+      "tool": "lint",
+      "code": "no-output",
+      "module": "repository",
+      "severity": "error",
+      "message": "the command ended with status 1 and printed nothing a parser of lint reads",
+      "key": "the-linter-type-aware-no-warning-allowed-7:no-output",
+      "evidence": {
+        "run": "45030073010",
+        "commit": "f80804a48ab56ad3f10722fbb6d7786e1efb5896",
+        "step": "the-linter-type-aware-no-warning-allowed-7",
+        "logSha256": "947701d132ee9f5a48856250bbb395c8c074b5301cb815fb92dff8c2ea81f109"
+      },
+      "at": "2026-11-22T13:56:28Z"
+    }
+  ]
+}
