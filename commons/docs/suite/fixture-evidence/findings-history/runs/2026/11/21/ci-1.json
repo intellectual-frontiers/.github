@@ -1,0 +1,85 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "1",
+    "workflow": "ci",
+    "commit": "c1",
+    "at": "2026-11-21T10:00:00Z",
+    "url": "https://github.com/example/n/actions/runs/1"
+  },
+  "steps": [
+    {
+      "id": "verify",
+      "job": "verify",
+      "module": "fixture",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 1,
+      "durationMs": 1000
+    },
+    {
+      "id": "verify",
+      "job": "verify",
+      "module": "other",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 1,
+      "durationMs": 1000
+    }
+  ],
+  "findings": [
+    {
+      "id": "f-558c995a6a49bd8f",
+      "tool": "tsc",
+      "code": "TS2322",
+      "module": "fixture",
+      "file": "src/greeting.ts",
+      "line": 3,
+      "severity": "error",
+      "message": "Type 'string' is not assignable to type 'number'.",
+      "key": "TS2322:Type 'string' is not assignable to type 'number'.",
+      "evidence": {
+        "run": "1",
+        "commit": "c1",
+        "step": "verify",
+        "logSha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "at": "2026-11-21T10:00:00Z"
+    },
+    {
+      "id": "f-d7a0001996cda8b0",
+      "tool": "bun-test",
+      "code": "test-failed",
+      "module": "fixture",
+      "file": "suite/greeting.test.ts",
+      "severity": "error",
+      "message": "the test failed: says hello, with a comma",
+      "key": "says hello, with a comma",
+      "evidence": {
+        "run": "1",
+        "commit": "c1",
+        "step": "verify",
+        "logSha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "at": "2026-11-21T10:00:00Z"
+    },
+    {
+      "id": "f-1fa309afbfeabf96",
+      "tool": "lint",
+      "code": "no-var",
+      "module": "other",
+      "file": "src/a.ts",
+      "line": 9,
+      "severity": "warning",
+      "message": "Unexpected var, use let or const instead.",
+      "key": "no-var:Unexpected var, use let or const instead.:var x = 1",
+      "evidence": {
+        "run": "1",
+        "commit": "c1",
+        "step": "verify",
+        "logSha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "at": "2026-11-21T10:00:00Z"
+    }
+  ]
+}

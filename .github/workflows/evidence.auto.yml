@@ -239,7 +239,7 @@ jobs:
         id: the-mutation-run-kept-as-a-small-report-5
         shell: bash
         run: |
-          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-mutation-run-kept-as-a-small-report-5 --job "mutation" --module "${{ matrix.library }}" --tool bun-test --timeout 32 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-mutation-run-kept-as-a-small-report-5 --job "mutation" --module "${{ matrix.library }}" --tool exit-status --timeout 36 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
         env:
           IFC_STEP_SCRIPT: "bun commons/docs/tools/mutation.ts --library \"${{ matrix.library }}\" --out \"$RUNNER_TEMP/evidence\""
         continue-on-error: true
@@ -345,7 +345,7 @@ jobs:
     needs: [plan, tests, repository, mutation, collect]
     if: "always()"
     permissions:
-      contents: write
+      contents: read
       checks: write
       actions: read
     steps:
@@ -367,12 +367,7 @@ jobs:
           empty='{}'
           if [ "$PLAN_RESULT" != "success" ]; then echo "the plan could not be made (the red cause plan-unavailable)"; exit 2; fi
           n_tests=$(jq '[(.include // [])[].name] | unique | length' <<<"${PLAN_LINUX:-$empty}")
-          H=""
-          if [ "$GITHUB_REF" = refs/heads/main ]; then
-            export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
-            H="--history https://github.com/$GITHUB_REPOSITORY.git"
-          fi
-          bun commons/libraries/src/ci/collect.ts --dir _findings --out _findings-out --workflow evidence --expect "tests:$n_tests" --expect repository:1 --check-run $H
+          bun commons/libraries/src/ci/collect.ts --dir _findings --out _findings-out --workflow evidence --expect "tests:$n_tests" --expect repository:1 --check-run
         env:
           GH_TOKEN: ${{ github.token }}
           WORKFLOW: evidence
@@ -386,4 +381,33 @@ jobs:
           path: _findings-out
           if-no-files-found: ignore
           retention-days: 7
+        continue-on-error: true
+
+  # the findings of this run added to the history branch (0038-build-policy FR-012): main only, the one job with the permission to write the repository's contents, never a red run
+  keep-findings:
+    name: keep-findings
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    needs: [findings]
+    if: "always() && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')"
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        continue-on-error: true
+      - uses: ./.github/actions/bun
+        continue-on-error: true
+      - name: The merged findings of this workflow
+        uses: actions/download-artifact@v4
+        with:
+          name: findings-evidence
+          path: _findings-merged
+        continue-on-error: true
+      - name: "The findings added to the history branch (the only writer)"
+        shell: bash
+        run: |
+          export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          bun commons/libraries/src/ci/history.ts --file _findings-merged/findings.json --remote "https://github.com/$GITHUB_REPOSITORY.git"
+        env:
+          GH_TOKEN: ${{ github.token }}
         continue-on-error: true

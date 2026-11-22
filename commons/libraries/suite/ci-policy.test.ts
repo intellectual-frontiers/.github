@@ -84,7 +84,7 @@ proves([`${SPEC} FR-005`], "the validation finds a step with no policy, a step o
   assert(policyFindings(after).some((f) => f.includes("does not run with always()")));
 });
 
-proves([`${SPEC} FR-005`], "the script of the job that gathers the findings of ci counts the cells from the plan's real output shape, passes them to the collector, and ends 2 only where the plan could not be made", () => {
+proves([`${SPEC} FR-005`], "the script of the job that gathers the findings of ci counts the cells from the plan's real output shape, passes them to the collector, and ends 2 only where the plan could not be made; the job that keeps the history is the only one that may write the repository, only on main and never after a pull request", () => {
   const ci = workflows().find((w) => w.file === "ci");
   const gatherStep = ci?.jobs["ci"]?.steps.find((s) => s.kind === "run" && s.env?.["WORKFLOW"] !== undefined);
   assert(gatherStep !== undefined && gatherStep.kind === "run");
@@ -104,8 +104,26 @@ proves([`${SPEC} FR-005`], "the script of the job that gathers the findings of c
     const noPlan = run({ PLAN_RESULT: "failure", PLAN_LINUX: "", PLAN_SYSTEMS: "" });
     assertEquals(noPlan.status, 2, "a plan that could not be made is the red cause plan-unavailable");
     const main = run({ PLAN_RESULT: "success", PLAN_LINUX: plan, PLAN_SYSTEMS: "", GITHUB_REF: "refs/heads/main" });
-    assert(main.stdout.includes("--history https://github.com/o/r.git"), "on main the run is added to the history");
+    assert(!main.stdout.includes("--history"), "the gathering job never writes the history: the job keep-findings does, on main only");
   } finally {
     rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+proves([`${SPEC} FR-005`, `${SPEC} FR-007`], "the history is written by one job only: keep-findings, the only job of any workflow with the permission to write contents but the release's publish, on main and never after a pull request, and it is never a red run", () => {
+  const writers: string[] = [];
+  for (const w of workflows()) {
+    for (const [id, j] of Object.entries(w.jobs)) {
+      if (j.permissions?.["contents"] === "write") writers.push(`${w.file}/${id}`);
+    }
+  }
+  assertEquals(writers.filter((x) => !x.startsWith("release/")).sort(), ["ci/keep-findings", "conformance/keep-findings", "evidence/keep-findings", "site/keep-findings", "tests/keep-findings"]);
+  for (const w of workflows()) {
+    const k = w.jobs["keep-findings"];
+    if (k === undefined) continue;
+    assert((k.when ?? "").includes("github.ref == 'refs/heads/main'") && !(k.when ?? "").includes("pull_request") && (k.when ?? "").includes("github.event_name == 'push'"), `${w.file}: keep-findings runs on main after a push, a run by hand or the schedule, and never after a pull request`);
+    assert(k.steps.every((s) => s.continueOnError === true), `${w.file}: keep-findings is never a red run`);
+    const gather = w.jobs[w.file === "ci" ? "ci" : "findings"];
+    assert(gather?.permissions?.["contents"] !== "write", `${w.file}: the job that runs on every event holds no write permission`);
   }
 });

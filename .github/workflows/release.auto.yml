@@ -181,7 +181,7 @@ jobs:
     needs: [plan, build, publish]
     if: "always()"
     permissions:
-      contents: write
+      contents: read
       checks: write
       actions: read
     steps:
@@ -202,12 +202,7 @@ jobs:
           set -u
           empty='{}'
           if [ "$PLAN_RESULT" != "success" ]; then echo "the plan could not be made (the red cause plan-unavailable)"; exit 2; fi
-          H=""
-          if [ "$GITHUB_REF" = refs/heads/main ]; then
-            export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
-            H="--history https://github.com/$GITHUB_REPOSITORY.git"
-          fi
-          bun commons/libraries/src/ci/collect.ts --dir _findings --out _findings-out --workflow release  --check-run $H
+          bun commons/libraries/src/ci/collect.ts --dir _findings --out _findings-out --workflow release  --check-run
         env:
           GH_TOKEN: ${{ github.token }}
           WORKFLOW: release
@@ -221,4 +216,33 @@ jobs:
           path: _findings-out
           if-no-files-found: ignore
           retention-days: 7
+        continue-on-error: true
+
+  # the findings of this run added to the history branch (0038-build-policy FR-012): main only, the one job with the permission to write the repository's contents, never a red run
+  keep-findings:
+    name: keep-findings
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    needs: [findings]
+    if: "always() && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')"
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        continue-on-error: true
+      - uses: ./.github/actions/bun
+        continue-on-error: true
+      - name: The merged findings of this workflow
+        uses: actions/download-artifact@v4
+        with:
+          name: findings-release
+          path: _findings-merged
+        continue-on-error: true
+      - name: "The findings added to the history branch (the only writer)"
+        shell: bash
+        run: |
+          export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          bun commons/libraries/src/ci/history.ts --file _findings-merged/findings.json --remote "https://github.com/$GITHUB_REPOSITORY.git"
+        env:
+          GH_TOKEN: ${{ github.token }}
         continue-on-error: true

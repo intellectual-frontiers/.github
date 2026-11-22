@@ -110,11 +110,24 @@ jobs:
             # the newest evidence the workflow `evidence` kept, whatever its result; none is a site that says no run is recorded
             gh run download --name evidence --dir _evidence || echo 'no evidence has been kept yet'
         continue-on-error: true
-      - name: "The open issues, the runs of the workflows, and which build this is"
-        id: the-open-issues-the-runs-of-the-workflow-5
+      - name: "The findings of the runs, from the history branch, and the accepted risks"
+        id: the-findings-of-the-runs-from-the-histor-5
         shell: bash
         run: |
-          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-open-issues-the-runs-of-the-workflow-5 --job "site" --module "repository" --tool exit-status --timeout 10 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-findings-of-the-runs-from-the-histor-5 --job "site" --module "repository" --tool exit-status --timeout 10 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: |
+            mkdir -p _evidence/findings-history
+            # the findings of the runs, which the workflows keep on the branch findings-history, laid out for the page of build findings (0038-build-policy FR-012), and the accepted risks as data
+            git fetch -q origin findings-history:refs/remotes/origin/findings-history || echo 'no findings history has been kept yet'
+            git archive --format=tar refs/remotes/origin/findings-history runs 2>/dev/null | tar -x -C _evidence/findings-history || echo 'no findings history to lay out'
+            bun commons/libraries/src/ci/accepted.ts --json _evidence/accepted-findings.json || echo 'the accepted risks could not be read'
+        continue-on-error: true
+      - name: "The open issues, the runs of the workflows, and which build this is"
+        id: the-open-issues-the-runs-of-the-workflow-6
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-open-issues-the-runs-of-the-workflow-6 --job "site" --module "repository" --tool exit-status --timeout 10 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
         env:
           GH_TOKEN: ${{ github.token }}
           IFC_STEP_SCRIPT: |
@@ -135,11 +148,11 @@ jobs:
         working-directory: commons/docs
         continue-on-error: true
       - name: "The emergency page, where the build failed"
-        id: the-emergency-page-where-the-build-faile-7
+        id: the-emergency-page-where-the-build-faile-8
         if: "steps.build.outputs.outcome != 'success'"
         shell: bash
         run: |
-          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-emergency-page-where-the-build-faile-7 --job "site" --module "repository" --tool exit-status --timeout 16 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-emergency-page-where-the-build-faile-8 --job "site" --module "repository" --tool exit-status --timeout 16 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
         env:
           IFC_STEP_SCRIPT: "bun tools/status-site.ts --evidence \"$GITHUB_WORKSPACE/_evidence\" --log \"$RUNNER_TEMP/build.log\" --out \"$GITHUB_WORKSPACE/_site\""
         working-directory: commons/docs
@@ -183,7 +196,7 @@ jobs:
     needs: [check, site, publish]
     if: "always()"
     permissions:
-      contents: write
+      contents: read
       checks: write
       actions: read
     steps:
@@ -203,12 +216,7 @@ jobs:
         run: |
           set -u
           empty='{}'
-          H=""
-          if [ "$GITHUB_REF" = refs/heads/main ]; then
-            export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
-            H="--history https://github.com/$GITHUB_REPOSITORY.git"
-          fi
-          bun commons/libraries/src/ci/collect.ts --dir _findings --out _findings-out --workflow site  --check-run $H
+          bun commons/libraries/src/ci/collect.ts --dir _findings --out _findings-out --workflow site  --check-run
         env:
           GH_TOKEN: ${{ github.token }}
           WORKFLOW: site
@@ -220,4 +228,33 @@ jobs:
           path: _findings-out
           if-no-files-found: ignore
           retention-days: 7
+        continue-on-error: true
+
+  # the findings of this run added to the history branch (0038-build-policy FR-012): main only, the one job with the permission to write the repository's contents, never a red run
+  keep-findings:
+    name: keep-findings
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    needs: [findings]
+    if: "always() && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')"
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        continue-on-error: true
+      - uses: ./.github/actions/bun
+        continue-on-error: true
+      - name: The merged findings of this workflow
+        uses: actions/download-artifact@v4
+        with:
+          name: findings-site
+          path: _findings-merged
+        continue-on-error: true
+      - name: "The findings added to the history branch (the only writer)"
+        shell: bash
+        run: |
+          export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          bun commons/libraries/src/ci/history.ts --file _findings-merged/findings.json --remote "https://github.com/$GITHUB_REPOSITORY.git"
+        env:
+          GH_TOKEN: ${{ github.token }}
         continue-on-error: true

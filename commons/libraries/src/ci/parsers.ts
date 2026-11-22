@@ -46,7 +46,8 @@ function bunTest(out: string): readonly Draft[] {
   let file: string | undefined;
   for (const raw of out.split("\n")) {
     const line = raw.trimEnd();
-    const header = /^(\S.*\.(?:test\.)?(?:ts|tsx|js|mjs)):$/.exec(line);
+    // a pipeline's log folds each file under a `::group::` marker
+    const header = /^(?:::group::)?(\S.*\.(?:test\.)?(?:ts|tsx|js|mjs)):$/.exec(line);
     if (header !== null) {
       file = header[1];
       continue;

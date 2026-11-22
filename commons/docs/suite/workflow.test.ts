@@ -15,13 +15,15 @@ proves(["0011-documentation FR-020"], "site.yml tests and checks on pull request
   assert(!/git (add|commit|push)/.test(yml), "the site is never committed");
 });
 
-proves(["0011-documentation FR-022"], "no workflow makes a GitHub release, and the write permission is the release job's alone", async () => {
+proves(["0011-documentation FR-022"], "no workflow makes a GitHub release, and the write permission is the release job's and the one job that keeps the findings on the history branch", async () => {
   for (const f of fs.readDirSync(path.join(ROOT, ".github/workflows"))) {
     const text = await fs.readTextFile(path.join(ROOT, ".github/workflows", f.name));
     assert(!/gh release (create|upload)|softprops\/action-gh-release/.test(text), `${f.name} makes a release`);
     // the write permission is for the job that publishes the libraries and makes their tags, in the release workflow, and for nothing else
     const at = text.indexOf("\n  publish:\n");
-    const rest = at < 0 || f.name !== "release.auto.yml" ? text : text.slice(0, at) + text.slice(at).replace(/^\n {2}publish:\n[\s\S]*?(?=\n {2}[a-z][\w-]*:\n|$)/, "");
+    const withoutPublish = at < 0 || f.name !== "release.auto.yml" ? text : text.slice(0, at) + text.slice(at).replace(/^\n {2}publish:\n[\s\S]*?(?=\n {2}[a-z][\w-]*:\n|$)/, "");
+    // and for the job that keeps the findings of a run on the history branch (0038-build-policy FR-012): on the default branch only, after no pull request, and never a red run
+    const rest = withoutPublish.replace(/\n {2}keep-findings:\n[\s\S]*?(?=\n {2}[a-z][\w-]*:\n|$)/, "");
     assert(!/contents: write/.test(rest), `${f.name} has a write permission that is not the release job's`);
   }
 });

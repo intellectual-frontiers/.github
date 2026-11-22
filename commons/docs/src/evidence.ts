@@ -12,6 +12,7 @@ import { type LibraryMutation, parseMutation } from "./mutation.ts";
 import { fs, path } from "@intellectual-frontiers/system";
 import type { Finding } from "./check.ts";
 import type { EvidenceSource, IssueLike } from "./config.ts";
+import { type Acceptance, decodeFindingsFile, type FindingsFile } from "@intellectual-frontiers/libraries/ci/findings";
 import { type HistoryRun, parseHistoryRun } from "./history.ts";
 
 /** How a test ended, in CTRF's words. */
@@ -139,10 +140,14 @@ export interface Evidence {
   readonly coverage: ReadonlyMap<string, LibraryCoverage>;
   /** The mutation run of each library that has one (docs 0001-docs FR-027). */
   readonly mutation: ReadonlyMap<string, LibraryMutation>;
+  /** The findings of the runs of the workflows, from the history branch, oldest first (docs 0001-docs FR-030). */
+  readonly findings: readonly FindingsFile[];
+  /** The accepted risks of the repository and what was wrong with their files (docs 0001-docs FR-030). */
+  readonly acceptances: { readonly accepted: readonly Acceptance[]; readonly problems: readonly string[] };
 }
 
 /** No evidence: nothing recorded. */
-export const NONE: Evidence = { results: new Map(), run: undefined, issues: [], tickets: [], recorded: false, status: new Map(), build: undefined, workflows: [], runsError: undefined, history: [], coverage: new Map(), mutation: new Map() };
+export const NONE: Evidence = { results: new Map(), run: undefined, issues: [], tickets: [], recorded: false, status: new Map(), build: undefined, workflows: [], runsError: undefined, history: [], findings: [], acceptances: { accepted: [], problems: [] }, coverage: new Map(), mutation: new Map() };
 
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 const str = (v: unknown): string | undefined => (typeof v === "string" && v !== "" ? v : undefined);
@@ -344,6 +349,39 @@ export function readEvidence(root: string, source: EvidenceSource | undefined, f
       else history.push(r.value);
     }
   }
+  // the findings of the runs of the workflows, kept on the history branch and laid out under findings-history/runs/YYYY/MM/DD/ by the site's workflow (docs 0001-docs FR-030)
+  const findings: FindingsFile[] = [];
+  const findingsDir = dir === undefined ? undefined : path.join(dir, "findings-history", "runs");
+  const walkFindings = (d: string): void => {
+    for (const e of [...fs.readDirSync(d)].sort((a, b) => (a.name < b.name ? -1 : 1))) {
+      const full = path.join(d, e.name);
+      if (e.isDirectory) walkFindings(full);
+      else if (e.name.endsWith(".json")) {
+        let parsed: unknown;
+        try {
+          parsed = JSON.parse(fs.readTextFileSync(full));
+        } catch (cause) {
+          found.push({ where: path.relative(root, full).split(path.sep).join("/"), problem: { kind: "evidence-unreadable", why: cause instanceof Error ? cause.message : String(cause) } });
+          continue;
+        }
+        const r = decodeFindingsFile(parsed);
+        if (r.kind === "ok") findings.push(r.value);
+        else found.push({ where: path.relative(root, full).split(path.sep).join("/"), problem: { kind: "evidence-unreadable", why: r.error } });
+      }
+    }
+  };
+  if (findingsDir !== undefined && fs.existsSync(findingsDir)) walkFindings(findingsDir);
+  findings.sort((a, b) => (a.run.at < b.run.at ? -1 : a.run.at > b.run.at ? 1 : a.run.id < b.run.id ? -1 : 1));
+  let acceptances: Evidence["acceptances"] = { accepted: [], problems: [] };
+  const acceptedFile = dir === undefined ? undefined : path.join(dir, "accepted-findings.json");
+  if (acceptedFile !== undefined && fs.existsSync(acceptedFile)) {
+    try {
+      const j = JSON.parse(fs.readTextFileSync(acceptedFile)) as { acceptances?: Acceptance[]; problems?: string[] };
+      acceptances = { accepted: Array.isArray(j.acceptances) ? j.acceptances : [], problems: Array.isArray(j.problems) ? j.problems : [] };
+    } catch (cause) {
+      found.push({ where: path.relative(root, acceptedFile).split(path.sep).join("/"), problem: { kind: "evidence-unreadable", why: cause instanceof Error ? cause.message : String(cause) } });
+    }
+  }
   let tickets: readonly Ticket[] = [];
   if (source.github !== undefined) {
     const file = path.resolve(root, source.github);
@@ -353,7 +391,7 @@ export function readEvidence(root: string, source: EvidenceSource | undefined, f
       else tickets = r.value;
     }
   }
-  return { results, run, issues, tickets, recorded, status, build, workflows, runsError, history, coverage, mutation };
+  return { results, run, issues, tickets, recorded, status, build, workflows, runsError, history, findings, acceptances, coverage, mutation };
 }
 
 /** The tests of every library that name a requirement, as `0009-example FR-001`. */

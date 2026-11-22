@@ -1,0 +1,13 @@
+{
+  "acceptances": [
+    {
+      "id": "f-558c995a6a49bd8f",
+      "owner": "the fixture team",
+      "reason": "waiting for the compiler release that fixes it",
+      "from": "2026-11-01",
+      "until": "2026-12-31",
+      "by": "shah"
+    }
+  ],
+  "problems": []
+}

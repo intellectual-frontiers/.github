@@ -1,11 +1,10 @@
 // Spec: 0002-libraries-ci-findings FR-006
 /**
- * The gathering of the findings of a workflow (commons 0038-build-policy FR-005, FR-011, FR-012): `bun commons/libraries/src/ci/collect.ts --dir DIR --out DIR --workflow NAME [--expect JOB:MODULES ...] [--policy-review] [--check-run] [--history REMOTE]` merges the files that the
- * steps wrote, makes sure that every cell that ran left its file (the red cause `reports-not-produced`: the only way it ends red), writes the merged file and a summary, gives the commit the neutral check `findings` and, on the default branch, adds the run to the history
- * branch. A finding is never a reason to end red.
+ * The gathering of the findings of a workflow (commons 0038-build-policy FR-005, FR-011, FR-012): `bun commons/libraries/src/ci/collect.ts --dir DIR --out DIR --workflow NAME [--expect JOB:MODULES ...] [--policy-review] [--check-run]` merges the files that the
+ * steps wrote, makes sure that every cell that ran left its file (the red cause `reports-not-produced`: the only way it ends red), writes the merged file and a summary, and gives the commit the neutral check `findings`. A finding is never a reason to end red.
  *
  * @remarks
- * It imports no package. The check run is made with `gh`, the history with `git`; where either cannot be done the run says so and is not red for it (the pipeline is sound where its findings were kept, and the artifact keeps them).
+ * It imports no package. The check run is made with `gh`; where it cannot be done the run says so and is not red for it. It never writes the history: that is the job `keep-findings`, on the default branch only, with the permission to write to itself (the pipeline is sound where its findings were kept, and the artifact keeps them).
  *
  * @example
  * ```ts
@@ -19,7 +18,6 @@ import { spawnSync } from "node:child_process";
 import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { decodeFindingsFile, type Finding, type FindingsFile, type RunInfo, type StepRecord } from "./findings.ts";
-import { keepRun } from "./history.ts";
 import { releaseDecision } from "./policy.ts";
 import { makeFinding, sha256Of } from "./findings.ts";
 
@@ -118,15 +116,6 @@ if (import.meta.main) {
     const conclusion = merged.findings.length > 0 ? "neutral" : "success";
     const r = spawnSync("gh", ["api", `repos/${process.env["GITHUB_REPOSITORY"]}/check-runs`, "-f", `name=findings (${workflow})`, "-f", `head_sha=${process.env["GITHUB_SHA"]}`, "-f", "status=completed", "-f", `conclusion=${conclusion}`, "-f", "output[title]=Findings", "-f", `output[summary]=${summary}`], { encoding: "utf8" });
     process.stdout.write(r.status === 0 ? `the check run is ${conclusion}\n` : `the check run could not be made (${(r.stderr ?? "").trim().split("\n")[0] ?? "no reason"}); the findings are kept all the same\n`);
-  }
-  const history = arg(argv, "--history");
-  if (history !== undefined) {
-    try {
-      const kept = keepRun(".", history, merged);
-      process.stdout.write(`history: ${kept.kind}${kept.kind === "failed" ? ` (${kept.error.split("\n")[0]})` : ` ${kept.path}`}\n`);
-    } catch (e) {
-      process.stdout.write(`history: could not be kept (${e instanceof Error ? e.message.split("\n")[0] : String(e)})\n`);
-    }
   }
   const bad = expectationProblems(merged, expect);
   if (bad.length > 0) {

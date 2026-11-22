@@ -16,7 +16,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import type { FindingsFile, RunInfo } from "./findings.ts";
+import { decodeFindingsFile, type FindingsFile, type RunInfo } from "./findings.ts";
 
 /** The branch that keeps the history. */
 export const BRANCH = "findings-history";
@@ -89,3 +89,23 @@ export function readHistory(repo: string, ref: string = `refs/remotes/origin/${B
 
 /** The text of a file of a folder, or `undefined`. */
 export const readText = (p: string): string | undefined => (existsSync(p) ? readFileSync(p, "utf8") : undefined);
+
+if (import.meta.main) {
+  const argv = process.argv.slice(2);
+  const arg = (n: string): string | undefined => (argv.indexOf(n) >= 0 ? argv[argv.indexOf(n) + 1] : undefined);
+  const from = arg("--file");
+  const remote = arg("--remote");
+  if (from === undefined || remote === undefined) {
+    process.stderr.write("usage: bun history.ts --file FINDINGS.json --remote URL\n");
+    process.exitCode = 2;
+  } else {
+    const text = readText(from);
+    const decoded = text === undefined ? undefined : decodeFindingsFile(JSON.parse(text));
+    if (decoded === undefined || decoded.kind === "err") {
+      process.stdout.write(`history: ${from} is not a findings file${decoded === undefined ? "" : ` (${decoded.error})`}; nothing was kept\n`);
+    } else {
+      const kept = keepRun(".", remote, decoded.value);
+      process.stdout.write(`history: ${kept.kind}${kept.kind === "failed" ? ` (${kept.error.split("\n")[0]})` : ` ${kept.path}`}\n`);
+    }
+  }
+}

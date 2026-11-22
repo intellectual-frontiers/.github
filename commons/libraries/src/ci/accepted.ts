@@ -12,7 +12,7 @@
  *
  * @module
  */
-import { existsSync, readdirSync } from "node:fs";
+import { existsSync, readdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { type Acceptance, acceptanceProblems } from "./findings.ts";
 
@@ -50,8 +50,13 @@ export async function loadAcceptances(dir: string): Promise<{ readonly acceptanc
 }
 
 if (import.meta.main) {
-  const dir = process.argv[2] ?? ACCEPTED_DIR;
+  const argv = process.argv.slice(2);
+  const jsonAt = argv.indexOf("--json");
+  const out = jsonAt >= 0 ? argv[jsonAt + 1] : undefined;
+  const dir = argv.find((a, i) => !a.startsWith("--") && argv[i - 1] !== "--json") ?? ACCEPTED_DIR;
   const r = await loadAcceptances(dir);
+  // for the site, which reads data and never runs a typed file: `--json FILE` keeps what was read
+  if (out !== undefined) writeFileSync(out, `${JSON.stringify({ acceptances: r.acceptances, problems: r.problems }, null, 2)}\n`);
   for (const p of r.problems) process.stdout.write(`${p}\n`);
   process.stdout.write(`accepted-findings: ${r.acceptances.length} acceptances, ${r.problems.length} problems\n`);
   process.exitCode = r.problems.length > 0 ? 1 : 0;

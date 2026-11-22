@@ -42,7 +42,7 @@
 ## The package
 
 - **FR-021**: The generator MUST be consumed as the package `@intellectual-frontiers/docs` (docs 0001-docs FR-002 to FR-005): its entry exports the configuration's types, `Lens`, what a lens uses, `loadConfig`, `buildSite`, `writeSite` and `main`, and its command `ifc-docs` runs on Bun and, where Node 26 reads the configuration, on Node. In this repository the command is `commons/docs/ifc-docs.mjs`, which runs `src/cli.ts` as it is (Node 26 strips its types); the packed package is proved by installing it into an empty project (docs 0001-docs FR-005).
-- **FR-022**: No workflow MUST make a GitHub release or attach a tarball of the generator, and the write permission to the contents is the tag job's of the workflow a library is published by, which makes the tag of the version it published; the generator is published to npm by the release of the libraries, like every library of commons that has `npm` in its distribution.
+- **FR-022**: No workflow MUST make a GitHub release or attach a tarball of the generator, and the write permission to the contents is the tag job's of the workflow a library is published by, which makes the tag of the version it published, and the job `keep-findings` of each workflow, which adds the findings of a run to the history branch on the default branch only and never after a pull request (commons 0038-build-policy FR-012); the generator is published to npm by the release of the libraries, like every library of commons that has `npm` in its distribution.
 
 ## The configuration
 
