@@ -1,0 +1,148 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45051758758",
+    "workflow": "ci",
+    "commit": "b17446154bfaf5e8c55c2e9cb6034042668c51c6",
+    "at": "2026-11-22T17:56:19Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45051758758"
+  },
+  "steps": [
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "systems",
+      "module": "ergonex",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 152,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "systems",
+      "module": "ergonex",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 128256,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "systems",
+      "module": "ergonex",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 83214,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "commons",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 472,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "commons",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 117,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "docs",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 247,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "docs",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 2,
+      "durationMs": 238845,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "ergonex",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 156,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "ergonex",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 122137,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "ergonex",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 80765,
+      "exitStatus": 0
+    }
+  ],
+  "findings": [
+    {
+      "id": "f-64f50d23fea39945",
+      "tool": "verify",
+      "module": "docs",
+      "evidence": {
+        "run": "45051758758",
+        "commit": "b17446154bfaf5e8c55c2e9cb6034042668c51c6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "3f47af5631eb59496e506262bff25aa19910d1297297931a9d41613f3910986e"
+      },
+      "at": "2026-11-22T17:55:57Z",
+      "code": "test-failed",
+      "file": "suite/layered-lens.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0011-documentation FR-038: each task guide has the five headings in order and a prompt block, and each guide names the command that proves the result",
+      "key": "0011-documentation FR-038: each task guide has the five headings in order and a prompt block, and each guide names the command that proves the result"
+    },
+    {
+      "id": "f-b2f01535f2655b97",
+      "tool": "verify",
+      "module": "docs",
+      "evidence": {
+        "run": "45051758758",
+        "commit": "b17446154bfaf5e8c55c2e9cb6034042668c51c6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "3f47af5631eb59496e506262bff25aa19910d1297297931a9d41613f3910986e"
+      },
+      "at": "2026-11-22T17:55:57Z",
+      "code": "test-failed",
+      "file": "suite/ai-guides.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0011-documentation FR-038: each task guide has the five headings in order and a prompt block, and each guide names the command that proves the result",
+      "key": "0011-documentation FR-038: each task guide has the five headings in order and a prompt block, and each guide names the command that proves the result"
+    }
+  ]
+}
