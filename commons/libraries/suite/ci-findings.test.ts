@@ -47,6 +47,10 @@ proves([`${SPEC} FR-003`], "each parser reads the real output of its tool into f
   assert(gen.length >= 4 && gen.every((f) => f.code === "stale-generated" && f.file?.startsWith(".github/") === true));
   assertEquals(parseOutput("kanon-check", "tools/pack.ts:1: trace/unknown-spec: its Spec: line names 0001-x, which is no specification\nkanon-check: FAILED: 1 new", ctx).map((f) => [f.code, f.file, f.line]), [["trace/unknown-spec", "tools/pack.ts", 1]]);
   assertEquals(parseOutput("tsc", "all good\n", ctx).length, 0, "a parser says nothing where there is nothing");
+  // seen in a real run: the tests of a library print what tsc prints for a broken fixture, after the library's own type check has passed
+  const noisy = "$ tsc -p tsconfig.json && bun test suite/\nbun test v1.4.4 (abc)\n\nsuite/a.test.ts:\na.ts(3,1): error TS2322: no\n(fail) a real failure [1ms]\n";
+  assertEquals(parseOutput("verify", noisy, ctx).map((f) => f.code), ["test-failed"], "a line of a test's own output is not a type error");
+  assertEquals(parseOutput("verify", "src/x.ts(1,1): error TS2322: real\nbun test v1.4.4 (abc)\n", ctx).map((f) => f.code), ["TS2322"], "what precedes the runner is the type check's");
 });
 
 proves([`${SPEC} FR-002`], "the id of a finding is the same when the line, the run, the time or the message changes, and differs when the file or the key does", () => {
