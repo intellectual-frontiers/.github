@@ -21,6 +21,7 @@ import { writeOnce } from "@intellectual-frontiers/quality";
 import type { Finding } from "../findings.ts";
 import { type EvidenceFacts, type ExitStatus, exitCodeOf } from "../modules/types.ts";
 import { ERGONEX_VERSION } from "../state-record.ts";
+import { type Identity, identityAttributes } from "../agents/persona.ts";
 import { AREA, native, type Site } from "./workspace.ts";
 
 /** What a run is recorded as. */
@@ -37,6 +38,8 @@ export type RunFacts = {
   /** The run's start and end, in nanoseconds since the Unix epoch (UTC). */
   readonly start: bigint;
   readonly end: bigint;
+  /** Who drove the run; named in the record where it is an agent (0006-agents FR-006). */
+  readonly identity?: Identity;
 };
 
 /** Why the record could not be written. */
@@ -100,6 +103,7 @@ export function resourceAttributes(run: RunFacts, regulated: boolean): Attribute
   if (f?.stateSha256 !== undefined) attributes["ergonex.state.sha256"] = f.stateSha256;
   if (f?.applied !== undefined) attributes["ergonex.applied"] = f.applied;
   for (const t of f?.tools ?? []) attributes[`ergonex.tool.${t.name}.version`] = t.version;
+  if (run.identity !== undefined) for (const [k, v] of Object.entries(identityAttributes(run.identity))) attributes[k] = v;
   return attributes;
 }
 

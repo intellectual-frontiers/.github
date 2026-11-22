@@ -71,7 +71,8 @@ proves(
         if (!fs.existsSync(path.join(dir, "tools", "pack.ts"))) continue;
         const installed = await sh([bun, "install", "--frozen-lockfile"], dir);
         assertEquals(installed.code, 0, `${name}: bun install: ${installed.out}`);
-        const packed = await sh([bun, "tools/pack.ts"], dir);
+        // the repository is in single mode (0036-distribution FR-020): this proves the machinery of the per-library package, so it asks for that mode
+        const packed = await sh([bun, "tools/pack.ts"], dir, { ...process.env, IFC_DISTRIBUTION: "per-library" } as Record<string, string>);
         assertEquals(packed.code, 0, `${name}: ${packed.out.slice(0, 1500)}`);
         const tarball = (packed.out.match(/\S+\.tgz/g) ?? []).at(-1) ?? "";
         assert(tarball.endsWith(".tgz") && fs.existsSync(tarball), `${name}: no tarball in ${packed.out}`);

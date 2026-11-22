@@ -1288,10 +1288,10 @@ proves(
       assertEquals(String((v["mappingRelation"] as unknown) ?? ""), "closeMatch", local);
       assert(String(v["justification"]).includes("two relationship types"), `${local}: the judgement is said`);
     }
-    // the classes are in the vocabulary and the proposed Decision record exists and is unsigned
+    // the classes are in the vocabulary and the Decision record exists, signed by the owner on his own statement (an agent only records it)
     for (const local of ["ContentPolicy", "SizeBudget", "UsageReport", "PeerDependency", "OptionalPeer"]) assert(local in (mod as unknown as Record<string, unknown>) || auditTerms.some((x) => x.iri.endsWith(`term-pm-${local}`)), local);
     const record = fs.readTextFileSync(path.join(path.dirname(path.fromFileUrl(import.meta.url)), "../commons/spec-kit/audits/2026-11-distribution-terms.md"));
-    assert(record.includes("Status:** Proposed") && record.includes("pending the signature of the owner") && record.includes("Signed by the owner:** ______"), "the Decision is proposed, never signed for the owner");
+    assert(record.includes("Status:** Proposed") && record.includes("Signed by the owner:** Shahid N. Shah") && record.includes("not a cryptographic signature"), "the Decision is signed by the owner on his own statement, and says that it is a recording and not a cryptographic signature");
   },
 );
 

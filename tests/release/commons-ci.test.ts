@@ -33,7 +33,7 @@ proves(
       assert(start >= 0, `${name} has the job ${job}`);
       const end = lines.findIndex((l, i) => i > start && /^ {2}[\w-]+:$/.test(l));
       const block = lines.slice(start, end === -1 ? undefined : end);
-      const installs = block.flatMap((l, i) => (l.includes("run: bun install --frozen-lockfile") ? [block[i + 1] ?? ""] : []));
+      const installs = block.flatMap((l, i) => (l.includes("run: bun install --frozen-lockfile") || l.includes("IFC_STEP_SCRIPT: bun install --frozen-lockfile") ? [block[i + 1] ?? ""] : []));
       assertEquals(installs.length, 1, `${name}: the job ${job} installs once`);
       assertEquals(
         (installs[0] ?? "").trim(),

@@ -8,16 +8,16 @@ requirement	mechanism	by	note
 0002-lab-machine FR-003	check	.github: cd commons/lab && bun run verify	suite/machine.test.ts
 0002-lab-machine FR-004	check	.github: cd commons/lab && bun run verify	suite/machine.test.ts
 0002-lab-machine FR-005	check	.github: cd commons/lab && bun run verify	suite/machine.test.ts
-0003-lab-arch-family FR-001	none	-	draft: no code exists, so nothing proves it
-0003-lab-arch-family FR-002	none	-	draft: no code exists, so nothing proves it
-0003-lab-arch-family FR-003	none	-	draft: no code exists, so nothing proves it
-0003-lab-arch-family FR-004	none	-	draft: no code exists, so nothing proves it
-0003-lab-arch-family FR-005	none	-	draft: no code exists, so nothing proves it
-0003-lab-arch-family FR-006	none	-	draft: no code exists, so nothing proves it
-0003-lab-arch-family FR-007	none	-	draft: no code exists, so nothing proves it
-0003-lab-arch-family FR-008	none	-	draft: no code exists, so nothing proves it
-0003-lab-arch-family FR-009	none	-	draft: no code exists, so nothing proves it
-0003-lab-arch-family FR-010	none	-	draft: no code exists, so nothing proves it
-0003-lab-arch-family FR-011	none	-	draft: no code exists, so nothing proves it
-0003-lab-arch-family FR-012	none	-	draft: no code exists, so nothing proves it
-0003-lab-arch-family FR-013	none	-	draft: no code exists, so nothing proves it
+0003-lab-arch-family FR-001	check	.github: cd commons/lab && bun run verify	suite/arch.test.ts: the family of every image; a real Arch image started
+0003-lab-arch-family FR-002	check	.github: cd commons/lab && bun run verify	suite/arch.test.ts: the tag holds the digest of the base
+0003-lab-arch-family FR-003	check	.github: cd commons/lab && bun run verify	suite/arch.test.ts: the text of the Containerfile, and a real image built through the proxy with pacman
+0003-lab-arch-family FR-004	check	.github: cd commons/lab && bun run verify	suite/arch.test.ts: init none on a real container; the systemd case runs only on a cgroup v2 host and is skipped with its reason here
+0003-lab-arch-family FR-005	check	.github: cd commons/lab && bun run verify	suite/arch.test.ts: the refusal with a marker file; skipped where there is no container runtime
+0003-lab-arch-family FR-006	check	.github: cd commons/lab && bun run verify	suite/arch.test.ts: the list checked against the real core and extra of pacman
+0003-lab-arch-family FR-007	check	.github: cd commons/lab && bun run verify	suite/arch.test.ts: the area name
+0003-lab-arch-family FR-008	check	.github: cd commons/lab && bun run verify	suite/vm.test.ts: manifest, digests and cache against a local origin, and the real image pinned
+0003-lab-arch-family FR-009	check	.github: cd commons/lab && bun run verify	suite/vm.test.ts: the credential, the emulator's arguments and the real boot (key, overlay, image unchanged)
+0003-lab-arch-family FR-010	check	.github: cd commons/lab && bun run verify	suite/vm.test.ts: kvm or tcg said, the bounds, SSH answered by the real image
+0003-lab-arch-family FR-011	check	.github: cd commons/lab && bun run verify	suite/vm.test.ts: the executor on the real image, and vmUsable
+0003-lab-arch-family FR-012	check	.github: cd commons/lab && bun run verify	suite/vm.test.ts: the areas stated not faithful
+0003-lab-arch-family FR-013	check	.github: cd commons/lab && bun run verify	suite/vm.test.ts: the CA trusted after boot only where the builder has one; HTTPS to the outside from the real image

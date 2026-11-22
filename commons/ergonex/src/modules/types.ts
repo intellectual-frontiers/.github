@@ -16,6 +16,8 @@ import type { Sha256 } from "@intellectual-frontiers/crypto";
 import type { Finding } from "../findings.ts";
 import type { Places } from "../places.ts";
 import type { RunFacts } from "../setup/evidence.ts";
+import type { Identity } from "../agents/persona.ts";
+import type { AgentsPolicy } from "../agents/policy.ts";
 
 /** How a run ends: the keys of the code list `ergonex:ExitStatus`. */
 export type ExitStatus = "Ok" | "Findings" | "Usage" | "Environment";
@@ -77,6 +79,8 @@ export type Report = {
   readonly next?: readonly string[];
   /** What the verdict says where all is well (`Workspace made`); Headless says `Up to date` where there is none. */
   readonly title?: string;
+  /** What the run waits for: each is a pending problem, and a run with one ends with the status Headless gives a run that is not done (4). */
+  readonly pending?: readonly string[];
   /** The run writes no evidence record: `ergonex shell print <shell>` writes no file (0003-host FR-017), and a hook only reads (FR-015). */
   readonly noEvidence?: boolean;
 };
@@ -109,12 +113,36 @@ export type Outcome = Result<Report, Failure>;
 /** The options of a command that are its own to all commands: the root of the workspace for the run. */
 export type Globals = {
   readonly home?: string;
+  /** `--persona`, `--harness` and `--session` as given (0006-agents FR-037), resolved into `Context.identity`. */
+  readonly persona?: string;
+  readonly harness?: string;
+  readonly session?: string;
+  readonly job?: boolean;
+  readonly planHash?: string;
+  /** `--text`: the text form where the persona agent would get the JSON envelope (0006-agents FR-003). */
+  readonly text?: boolean;
 };
 
 /** The globals out of the options a command parsed (a decoder at the boundary: the one place that reads them). */
 export function globalsOf(options: Readonly<Record<string, unknown>>): Globals {
-  const home = options["home"];
-  return typeof home === "string" && home !== "" ? { home } : {};
+  const word = (k: string): string | undefined => {
+    const v = options[k];
+    return typeof v === "string" && v !== "" ? v : undefined;
+  };
+  const home = word("home");
+  const persona = word("persona");
+  const harness = word("harness");
+  const session = word("session");
+  const planHash = word("planHash");
+  return {
+    ...(home === undefined ? {} : { home }),
+    ...(persona === undefined ? {} : { persona }),
+    ...(harness === undefined ? {} : { harness }),
+    ...(session === undefined ? {} : { session }),
+    ...(options["text"] === true ? { text: true } : {}),
+    ...(options["job"] === true ? { job: true } : {}),
+    ...(planHash === undefined ? {} : { planHash }),
+  };
 }
 
 /** The computer a run is on. */
@@ -167,4 +195,8 @@ export type Context = BaseContext & {
   readonly home: string | undefined;
   /** Whether the run is a preview (`--dry-run`), a check (`--check`) or neither. */
   readonly mode: "apply" | "dry-run" | "check";
+  /** Who drives the run (0006-agents FR-001, FR-002). */
+  readonly identity: Identity;
+  /** What the persona `agent` may change, from the manifest (0006-agents FR-005); undefined where the manifest has none. */
+  readonly agents: AgentsPolicy | undefined;
 };

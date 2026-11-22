@@ -129,42 +129,42 @@ requirement	mechanism	by	note
 0005-repositories FR-008	check	.github: cd commons/ergonex && bun test suite/	ergonex-repositories.test.ts: adopt lists adoptable, misplaced and remoteless repositories and changes nothing
 0005-repositories FR-009	check	.github: cd commons/ergonex && bun test suite/	ergonex-repositories.test.ts: adopt --apply adds the adoptable ones only
 0005-repositories FR-010	check	.github: cd commons/ergonex && bun test suite/	ergonex-repositories.test.ts: status notes each unmanaged repository
-0006-agents FR-001	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-002	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-003	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-004	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-005	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-006	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-007	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-008	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-009	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-010	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-011	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-012	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-013	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-014	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-015	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-016	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-017	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-018	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-019	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-020	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-021	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-022	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-023	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-024	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-025	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-026	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-027	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-028	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-029	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-030	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-031	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-032	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-033	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-034	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-035	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-036	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-037	none	-	draft: no code exists, so nothing proves it
-0006-agents FR-038	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-001	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents.test.ts: the persona resolves from the option, the variable, the manifest and the default; a word outside the set is refused
+0006-agents FR-002	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents.test.ts: the harness and the session resolve in a closed set; herdr as the runtime is named beside the harness
+0006-agents FR-003	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents.test.ts: an agent gets the JSON envelope and no prompt unless --text; run as the real program
+0006-agents FR-004	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents.test.ts: apply and render are refused with E-AGENT-DENIED for the persona agent and run where the policy allows
+0006-agents FR-005	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents.test.ts: the typed agents policy refuses an unknown key and a value outside its set, naming the key
+0006-agents FR-006	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents.test.ts: the evidence record names the persona, the harness, the runtime and the session of an agent run
+0006-agents FR-007	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents.test.ts: the token is found in the three places in order, a wide file is refused, nothing shows the value
+0006-agents FR-008	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents.test.ts: apply sets the identity of the policy and the commit-msg hook of an agent refuses a message without the trailer
+0006-agents FR-009	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents.test.ts: the brief is the same bytes for the same state and has no secret; the real command gives Markdown and data
+0006-agents FR-010	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents.test.ts: the brief is at most 32 KiB, keeps the newest repositories and names how many it omitted
+0006-agents FR-011	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents.test.ts: agent init writes the files of one harness of a closed set, previews, and is idempotent
+0006-agents FR-012	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents.test.ts: the files are merged, never replaced: another tool's hook, server and table are kept; a second run changes nothing
+0006-agents FR-013	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents.test.ts: claude-code: the real claude command registers the server, claude mcp list connects, the SessionStart hook is merged
+0006-agents FR-014	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents.test.ts: codex: the table of config.toml is written with the absolute path and a timeout of 30 seconds, others kept; no claim is made of codex mcp list (codex is not installed here)
+0006-agents FR-015	none	-	the adapter herdr runs herdr's own `herdr integration install`; the herdr binary is not installed where this was built, so nothing proves it yet
+0006-agents FR-016	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents.test.ts: other: one block of AGENTS.md and nothing else
+0006-agents FR-017	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents.test.ts: on Omarchy the shared ~/.agents/AGENTS.md is written and no folder is made for a harness that was never used
+0006-agents FR-018	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents.test.ts: agent doctor reports the token, tools, harnesses, configuration, tool server handshake and jobs; run as the real program
+0006-agents FR-019	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents.test.ts: the disposable finding, and the Omarchy recommendation in the words of the requirement
+0006-agents FR-020	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents-surface.test.ts: the real tool server writes only the protocol to standard output and serves the verbs of the program from their declarations
+0006-agents FR-021	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents-surface.test.ts: the tier is the lower of the policy's and ERGONEX_TIER; a verb that changes is not offered and is refused if called; read-only
+0006-agents FR-022	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents-surface.test.ts: agent keys line prints the forced-command line and the Match block, writes no file, refuses a private key without naming it
+0006-agents FR-023	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents-remote.test.ts: the revision 2025-06-18 is answered over a real ssh connection and by the real claude mcp list (a client Ergonex did not write)
+0006-agents FR-024	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents-surface.test.ts: a job is a detached process with a record under jobs/<id>/; it outlives a real ssh session (ergonex-agents-remote.test.ts)
+0006-agents FR-025	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents-surface.test.ts: a job that changes the workspace needs the hash of its plan; a wrong hash changes nothing
+0006-agents FR-026	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents-surface.test.ts: a job whose process is gone is abandoned and its record stays as it was
+0006-agents FR-027	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents-remote.test.ts: every connection is made with BatchMode, no terminal, strict host key checking and the known-hosts file of Ergonex; the policy's remote list; a real sshd
+0006-agents FR-028	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents-remote.test.ts: no fingerprint refuses and prints it, a wrong one refuses, the right one pins, a changed key refuses; trust on first use; a real sshd
+0006-agents FR-029	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents-remote.test.ts: bootstrap over a real ssh connection: probe, token from standard input at mode 0600, workspace and policy, harness files, doctor, handshake; the first install from the registry is not proved here
+0006-agents FR-030	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents-remote.test.ts: bootstrap run again says unchanged for every step, a preview changes nothing, token refresh rewrites the file atomically
+0006-agents FR-031	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents-remote.test.ts: remote run runs one ergonex command and gives its status and envelope, and refuses raw commands unless the policy says so
+0006-agents FR-032	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents-remote.test.ts: the refusal of a system that is not Linux names its phase; a target that is not Linux was not available to run against
+0006-agents FR-033	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents.test.ts: the distribution is behind one interface, Omarchy the reference implementation and a generic fallback
+0006-agents FR-034	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents.test.ts: Omarchy is recognized by ID=omarchy, installs to ~/.local/bin, uses mise, and a shim is no proof of a tool; the real Omarchy image was not run
+0006-agents FR-035	review	0006-agents FR-035	A reviewer checks that the how-to page `Give an agent a machine` and the AI guide link to the specifications and do not copy them; the documentation build of the site holds the links
+0006-agents FR-036	check	.github: cd commons/ergonex && bun test suite/	ergonex-command.test.ts: the tree holds agent, mcp and remote with their words; ergonex-headless.test.ts holds the surfaces used
+0006-agents FR-037	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents.test.ts: every command accepts --persona, --harness and --session, resolved once at the boundary and carried into the evidence
+0006-agents FR-038	check	.github: cd commons/ergonex && bun test suite/	ergonex-agents-surface.test.ts: agent register writes the workstation declaration whole, idempotently, and never over other content
 0006-agents FR-039	none	-	a statement of the alignment to standards: there is nothing to run

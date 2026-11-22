@@ -49,6 +49,11 @@ function outcome(text: string[], findings: readonly Finding[]): Outcome {
   });
 }
 
+/** The lines of a message, trimmed; a trailer is one of them. */
+function parseTrailerLines(text: string): readonly string[] {
+  return text.split(/\r?\n/).map((l) => l.trim());
+}
+
 async function commitMsg(ctx: Context, file: string | undefined): Promise<Outcome> {
   if (file === undefined)
     return err({
@@ -71,6 +76,16 @@ async function commitMsg(ctx: Context, file: string | undefined): Promise<Outcom
       "changes/commit-names-no-issue",
       "the commit names no issue: put `Refs #N` on a line of its own (and `Closes #N` on the commit that finishes it)",
     );
+  // the persona agent signs its commits with the trailer the policy names (0006-agents FR-008)
+  const trailer = ctx.identity.persona === "agent" ? ctx.agents?.commit?.trailer : undefined;
+  if (trailer !== undefined && !parseTrailerLines(await readTextFile(file)).includes(trailer))
+    findings.push({
+      ruleId: "ergonex/commit-lacks-trailer",
+      severity: "Error",
+      message: `the commit of an agent ends with the line \`${trailer}\`; add it on a line of its own`,
+      subject: "commit message",
+      firstSeen: ctx.today,
+    });
   for (const w of parsed.wrongWords)
     at(
       "changes/wrong-closing-word",

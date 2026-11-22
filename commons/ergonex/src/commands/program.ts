@@ -18,6 +18,10 @@ import { defineCommand, type Host, type Make } from "./define.ts";
 import { doctorCommand } from "./doctor.ts";
 import { guidanceFor } from "./guidance.ts";
 import { hookCommand } from "./hook.ts";
+import { agentCommands } from "./agent.ts";
+import { jobsCommands } from "./jobs.ts";
+import { mcpCommand } from "./mcp.ts";
+import { remoteCommands } from "./remote.ts";
 import { initCommand } from "./init.ts";
 import { modulesCommand } from "./list.ts";
 import { HOME, reads } from "./options.ts";
@@ -53,10 +57,13 @@ const start = defineCommand({
 /** An entry of the program's tree: a command, or a branch of commands, each made for a host. Tagged, so that a `switch` over it is exhaustive. */
 export type Entry =
   | { readonly kind: "command"; readonly make: Make }
-  | { readonly kind: "branch"; readonly name: string; readonly summary: string; readonly children: readonly Make[] };
+  | { readonly kind: "branch"; readonly name: string; readonly summary: string; readonly children: readonly MakeNode[] };
+
+/** A command or a branch of commands, once it is given the host it runs on. */
+type MakeNode = (host: Host) => Node;
 
 const command = (make: Make): Entry => ({ kind: "command", make });
-const branchOf = (name: string, summary: string, children: readonly Make[]): Entry => ({ kind: "branch", name, summary, children });
+const branchOf = (name: string, summary: string, children: readonly MakeNode[]): Entry => ({ kind: "branch", name, summary, children });
 
 /** The tree of the program, in the order the help lists it. */
 export const TREE: readonly Entry[] = [
@@ -76,6 +83,20 @@ export const TREE: readonly Entry[] = [
   command(toolsCommand),
   command(modulesCommand),
   command(hookCommand),
+  branchOf("agent", "What an agent given this machine needs: the brief, the files of its harness, the doctor, the jobs, the forced-command key and the registration.", [
+    agentCommands.brief,
+    agentCommands.init,
+    agentCommands.doctor,
+    agentCommands.register,
+    (host) =>
+      branch({
+        name: "jobs",
+        summary: "The jobs an agent started with --job: list, show, wait, cancel.",
+        children: [jobsCommands.list, jobsCommands.show, jobsCommands.wait, jobsCommands.cancel].map((m) => m(host)),
+      }),
+    (host) => branch({ name: "keys", summary: "The forced-command key an agent reaches this machine with.", children: [agentCommands.keysLine(host)] }),
+  ]),
+  branchOf("remote", "Reach another machine over SSH: bootstrap Ergonex there, run one command, refresh its token.", [remoteCommands.bootstrap, remoteCommands.run, remoteCommands.token]),
 ];
 
 /** The nodes of the tree, made for a host. */
@@ -102,10 +123,13 @@ export type ProgramHost = Omit<Host, "builtins">;
 
 /** `ergonex` as a Headless program, for the host it runs on. */
 export function ergonexProgram(host: ProgramHost): Program {
-  const names = nodesOf(TREE, { ...host, builtins: [] });
+  // `ergonex mcp` serves the program as it is assembled, so it holds the program through a closure (0006-agents FR-020)
+  let assembled: Program | undefined;
+  const asHost = (builtins: readonly ErgonexModule[]): Host => ({ ...host, builtins });
+  const names = [...nodesOf(TREE, asHost([])), mcpCommand(asHost([]), () => assembled)];
   const builtins = modulesOf(names);
-  const children = nodesOf(TREE, { ...host, builtins });
-  return programOf({
+  const children = [...nodesOf(TREE, asHost(builtins)), mcpCommand(asHost(builtins), () => assembled)];
+  const made = programOf({
     name: "ergonex",
     summary: "The workspaces management of Intellectual Frontiers: it sets up and operates a team's repositories, tools and shell. It manages only Intellectual Frontiers Workspaces; it is not a general IFC or Mizan controller and does not front ifc.",
     version: ERGONEX_VERSION,
@@ -121,4 +145,6 @@ export function ergonexProgram(host: ProgramHost): Program {
     secretKeys: ["ERGONEX_GITHUB_TOKEN"],
     defaultCommand: ["start"],
   });
+  assembled = made;
+  return made;
 }

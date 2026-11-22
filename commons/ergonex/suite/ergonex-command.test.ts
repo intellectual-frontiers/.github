@@ -17,7 +17,7 @@ import { BEGIN, END } from "../src/shell/block.ts";
 import { evidenceFiles, Ergonex, LAUNCHER, needsWorld, ONE_REPOSITORY, REMOTE, withWorld, type World } from "./ergonex-fixtures.ts";
 
 /** The words of the program's own tree, at the top level. */
-const TOP = ["apply", "doctor", "hook", "init", "modules", "paths", "plan", "render", "repos", "setup", "shell", "start", "status", "tools", "verify", "worktree"];
+const TOP = ["agent", "apply", "doctor", "hook", "init", "mcp", "modules", "paths", "plan", "remote", "render", "repos", "setup", "shell", "start", "status", "tools", "verify", "worktree"];
 
 /** The modules a JSON `modules` names, by name. */
 async function modules(w: World, ...extra: string[]): Promise<{ name: string; source: string; summary: string }[]> {
@@ -47,7 +47,7 @@ const MANIFEST_OK = JSON.stringify({
 });
 
 proves(
-  ["0001-ergonex FR-002", "0001-ergonex FR-003", "0001-ergonex FR-001", "0002-workspace-model FR-004"],
+  ["0001-ergonex FR-002", "0001-ergonex FR-003", "0001-ergonex FR-001", "0002-workspace-model FR-004", "0006-agents FR-036"],
   "ergonex --help says it manages only Intellectual Frontiers Workspaces and is not an IFC or Mizan controller, and modules names every module with its source",
   async () => {
     await withWorld(async (w) => {

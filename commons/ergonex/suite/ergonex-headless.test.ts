@@ -136,7 +136,7 @@ proves(
       for (const m of text.matchAll(/from\s+["'](@intellectual-frontiers\/headless[^"']*)["']/g)) {
         const spec = m[1] ?? "";
         if (!rel.startsWith("src/commands/") && rel !== "src/ergonex.ts") bad.push(`${rel}: ${spec}`);
-        if (!["@intellectual-frontiers/headless/governance", "@intellectual-frontiers/headless/logical", "@intellectual-frontiers/headless/cli"].includes(spec)) bad.push(`${rel}: ${spec} is not an export`);
+        if (!["@intellectual-frontiers/headless/governance", "@intellectual-frontiers/headless/logical", "@intellectual-frontiers/headless/cli", "@intellectual-frontiers/headless/mcp", "@intellectual-frontiers/headless/ssh-inbound"].includes(spec)) bad.push(`${rel}: ${spec} is not an export`);
       }
     }
     assertEquals(bad, []);

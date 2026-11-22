@@ -5,3 +5,4 @@
  * @module
  */
 export * from "./machine.ts";
+export * from "./vm.ts";

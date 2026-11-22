@@ -12,6 +12,7 @@
  */
 import { type Sha256 } from "@intellectual-frontiers/crypto";
 import type { Manifest } from "./manifest.ts";
+import { mayChangeRepo } from "./agents/policy.ts";
 import type { Desired, DesiredFile, DesiredRepo, DesiredWorktree } from "./plan.ts";
 import { fileDigest, type GeneratedFile } from "./render.ts";
 
@@ -45,12 +46,14 @@ export function settingsOf(manifest: Manifest, facts: DesiredFacts): Readonly<Re
 /** What the manifest and its generated files want. */
 export async function desiredOf(manifest: Manifest, files: readonly GeneratedFile[], facts: DesiredFacts): Promise<Desired> {
   const settings = settingsOf(manifest, facts);
+  const commit = manifest.agents?.commit;
   const repos: DesiredRepo[] = manifest.repositories.map((r) => ({
     path: r.path,
     ref: r.ref,
     cloneUrl: r.cloneUrl,
     branch: r.branch,
-    settings,
+    // the identity the `agents` policy gives is set in each repository the persona may change (0006-agents FR-008)
+    settings: commit !== undefined && mayChangeRepo(manifest.agents, r.cloneUrl) ? { ...settings, "user.name": commit.name, "user.email": commit.email } : settings,
   }));
   const worktrees: DesiredWorktree[] = manifest.repositories.flatMap((r) =>
     r.worktrees.map((w) => ({ path: w.path, repo: r.path, branch: w.branch })),

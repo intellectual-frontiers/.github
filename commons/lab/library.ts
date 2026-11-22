@@ -14,13 +14,13 @@ export const library = {
   distribution: ["github"],
   held: { kind: "tests-only", reason: "a library of disposable machines that no program of ours depends on at run time" },
   exports: [".", "./governance", "./logical", "./physical"],
-  summary: "Disposable machines for tests: a systemd and sshd container rendered from a typed description, started and removed per test with a throwaway key, and what a container can and cannot stand in for.",
+  summary: "Disposable machines for tests: a systemd and sshd container of the Debian, RHEL or Arch family rendered from a typed description, and a virtual machine of the published Omarchy image under QEMU, each started and removed per test with a throwaway key, and what each can and cannot stand in for.",
   kanon: {
     package: "@intellectual-frontiers/lab",
     units: [
       { folder: "src/governance/", layer: "governance", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }] },
       { folder: "src/logical/", layer: "logical", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }] },
-      { folder: "src/physical/", layer: "physical", mayImport: ["src/governance/", "src/logical/"], packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/headless", subpaths: ["logical", "ssh-inbound", "targets/container"] }, { name: "@intellectual-frontiers/net", subpaths: ["tcp"] }, { name: "@intellectual-frontiers/system", subpaths: "any" }] },
+      { folder: "src/physical/", layer: "physical", mayImport: ["src/governance/", "src/logical/"], packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/headless", subpaths: ["logical", "ssh-inbound", "targets/container", "targets/ssh"] }, { name: "@intellectual-frontiers/net", subpaths: ["tcp"] }, { name: "@intellectual-frontiers/system", subpaths: "any" }] },
       { folder: "src/", own: true },
       { folder: "suite/", own: true },
       { folder: "tools/", own: true },
