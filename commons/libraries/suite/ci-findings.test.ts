@@ -11,8 +11,9 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { acceptanceProblems, countsOf, decodeFindingsFile, deriveRows, type FindingsFile, findingId, type Acceptance } from "../src/ci/findings.ts";
 import { parseOutput, type ParseContext } from "../src/ci/parsers.ts";
-import { APPROVERS, RED_CAUSES, RELEASE_POLICY, releaseDecision, TOOLS } from "../src/ci/policy.ts";
-import { execute, fileOfRun, parseRequest, runCommand } from "../src/ci/step.ts";
+import { APPROVERS, heldLibraries, RED_CAUSES, RELEASE_POLICY, releaseDecision, TOOLS } from "../src/ci/policy.ts";
+import { gateReport } from "../src/ci/release-gate.ts";
+import { execute, fileOfRun, parseRequest, runCommand, sectionsOf } from "../src/ci/step.ts";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const SPEC = "0002-libraries-ci-findings";
@@ -130,14 +131,46 @@ proves([`${SPEC} FR-002`], "an acceptance makes a finding accepted until its day
   assertEquals(deriveRows([r1], [byAgent], "2026-11-22")[0]?.status, "open", "an acceptance by an agent is not counted");
   assert(acceptanceProblems({ ...live, until: "2028-01-01" }).some((p) => p.includes("at most 366")));
   assert(acceptanceProblems({ ...live, reason: "ok" }).length > 0);
-  assert(APPROVERS.includes("shah"));
+  assertEquals([...APPROVERS], ["shah"], "the approvers are the owner only (decided on 2026-11-22), as typed data");
 });
 
-proves([`${SPEC} FR-001`, `${SPEC} FR-008`], "the release publishes regardless until 2027-01-31 and, after it, does not proceed and carries the finding owner-review-due", () => {
+proves([`${SPEC} FR-001`, `${SPEC} FR-008`], "the release publishes regardless until 2027-01-31 and, from 2027-02-01, holds per library for an open error and carries owner-review-due until the owner has reviewed", () => {
   assertEquals(RELEASE_POLICY.until, "2027-01-31");
+  assertEquals(RELEASE_POLICY.then, { mode: "hold-critical", from: "2027-02-01" });
   assertEquals(releaseDecision("2026-11-22").proceed, true);
-  assertEquals(releaseDecision("2027-01-31").proceed, true);
+  const until = releaseDecision("2027-01-31");
+  assertEquals(until.proceed && until.mode, "publish-regardless");
   const after = releaseDecision("2027-02-01");
-  assertEquals(after.proceed, false);
-  assert(!after.proceed && after.finding.code === "owner-review-due" && after.finding.severity === "error");
+  assertEquals(after.proceed, true, "nothing is held by the date itself: the libraries are");
+  assert(after.mode === "hold-critical" && after.ownerReview?.code === "owner-review-due" && after.ownerReview.severity === "error" && after.ownerReview.module === "repository");
+  const reviewed = releaseDecision("2027-02-01", { ...RELEASE_POLICY, reviewedOn: "2027-01-20" });
+  assert(reviewed.mode === "hold-critical" && reviewed.ownerReview === undefined, "the finding stays until the owner has reviewed");
+});
+
+proves([`${SPEC} FR-010`], "from the day after the policy a library with an open error that is not accepted is held and the others go on; a warning, an accepted finding and a finding of the repository hold nothing; the single package is held while a library is", () => {
+  const r1 = run("1", "2027-02-01T00:00:00Z", ["core", "net", "repository"], [["core", "a"], ["repository", "r"]]);
+  const net = run("2", "2027-02-01T01:00:00Z", ["net"], []);
+  const day = "2027-02-02";
+  const gate = gateReport(day, [r1, net]);
+  assertEquals(gate.held, ["core"], "core has an open error, net has none, and the repository holds no library");
+  assertEquals(gate.proceed, false, "in single mode the one package is held while a library is");
+  assert(gate.lines.some((l) => l.startsWith("held: core")) && gate.lines.some((l) => l.includes("owner-review-due")) && gate.lines.some((l) => l.includes("the distribution is single")));
+  assertEquals(gateReport(day, [r1, net], "per-library").proceed, true, "per library the others are released and core is named held");
+  assertEquals(heldLibraries([{ module: "core", severity: "warning" }, { module: "net", severity: "note" }, { module: "repository", severity: "error" }]), []);
+  const before = gateReport("2027-01-31", [r1, net]);
+  assertEquals([before.proceed, before.held], [true, []], "until the day of the policy nothing is held");
+  assert(before.lines[0]?.includes("publish-regardless") === true);
+});
+
+proves([`${SPEC} FR-014`], "the root tests are read per file: the findings are of one module for each file, each file that ran is a step, and a file that stops failing is fixed while another keeps failing", () => {
+  const out = ["tests/a.test.ts:", "(fail) a one [1.00ms]", "", "tests/b.test.ts:", "(pass) b one [1.00ms]", ""].join("\n");
+  const ran = { output: out, exitStatus: 1, timedOut: false, durationMs: 5 };
+  const req = { id: "root", job: "tests", module: "repository", tool: "bun-test" as const, timeoutMinutes: 10, out: "x", command: ["bun", "test"], perFile: true };
+  const file = fileOfRun(req, ran, { id: "1", workflow: "tests", commit: "c", at: "2026-11-22T00:00:00Z" });
+  assertEquals(file.findings.map((f) => [f.module, f.file]), [["repository/tests/a.test.ts", "tests/a.test.ts"]]);
+  assertEquals(file.steps.map((s) => s.module), ["repository", "repository/tests/a.test.ts", "repository/tests/b.test.ts"]);
+  const next = fileOfRun(req, { ...ran, output: ["tests/a.test.ts:", "(pass) a one [1.00ms]", "", "tests/b.test.ts:", "(fail) b one [1.00ms]"].join("\n") }, { id: "2", workflow: "tests", commit: "d", at: "2026-11-23T00:00:00Z" });
+  const rows = deriveRows([file, next], [], "2026-11-23");
+  assertEquals(rows.map((r) => [r.finding.module, r.status]).sort(), [["repository/tests/a.test.ts", "fixed"], ["repository/tests/b.test.ts", "open"]]);
+  assertEquals(sectionsOf("noise\ntests/x.test.ts:\nline").map((s) => s.file), ["tests/x.test.ts"]);
 });

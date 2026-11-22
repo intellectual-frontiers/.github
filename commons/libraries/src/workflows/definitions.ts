@@ -617,8 +617,15 @@ const tests: Workflow = {
             name: "Independent validators of the exports (rdflib, pySHACL, jsonschema), which the Mizan test uses where they are installed",
           },
         ),
-        run("bun test ./tests/*.test.ts", {
-          name: "The tests on Bun (tests/release/ is the release's: it packs, installs and type-checks every library)",
+        run(
+          lines(
+            "for f in tests/*.test.ts; do",
+            '  echo "$f:"',
+            '  timeout 5m bun test "$f" || true',
+            "done",
+          ),
+          {
+            name: "The tests on Bun, each file by itself so that one that hangs or fails hides no other (tests/release/ is the release's: it packs, installs and type-checks every library)",
           when: "matrix.runtime == 'bun'",
         }),
         run('node --test "tests/*.test.ts"', { name: "The tests on Node 26", when: "matrix.runtime == 'node'" }),

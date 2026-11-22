@@ -29,6 +29,7 @@ export function wrapStep(step: Step, jobId: string, index: number): Step {
     `--module "${p.module}"`,
     `--tool ${p.tool}`,
     `--timeout ${p.timeoutMinutes}`,
+    ...(p.perFile ? ["--per-file true"] : []),
     '--out "$RUNNER_TEMP/findings"',
     `-- bash ${p.errexit ? "-e " : ""}-o pipefail -c "$IFC_STEP_SCRIPT"`,
   ].join(" ");

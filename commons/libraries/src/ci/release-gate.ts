@@ -13,20 +13,27 @@
  */
 import { type FindingsFile, deriveRows } from "./findings.ts";
 import { readHistory } from "./history.ts";
-import { RELEASE_POLICY, releaseDecision } from "./policy.ts";
+import { heldLibraries, RELEASE_POLICY, releaseDecision } from "./policy.ts";
 
-/** What the gate says on a day, with the open findings of each module of the history it was given. */
-export function gateReport(day: string, history: readonly FindingsFile[]): { readonly proceed: boolean; readonly lines: readonly string[] } {
+/** What the gate says on a day, with the open findings of each module of the history it was given and, from the day the policy holds, the libraries held. `distribution` is the mode of 0036-distribution: in `single` the one package is held while any library is. */
+export function gateReport(day: string, history: readonly FindingsFile[], distribution: "single" | "per-library" = "single"): { readonly proceed: boolean; readonly held: readonly string[]; readonly lines: readonly string[] } {
   const d = releaseDecision(day);
   const lines: string[] = [];
-  if (d.proceed) lines.push(`the release policy is "${RELEASE_POLICY.mode}" until ${d.until}: a library is released whatever its open findings are, and they are listed here`);
-  else lines.push(d.finding.message, `finding ${d.finding.code} (${d.finding.severity}): the owner decides again before anything is released`);
   const rows = deriveRows(history, [], day).filter((r) => r.status === "open");
+  const held = d.mode === "hold-critical" ? heldLibraries(rows.map((r) => r.finding)) : [];
+  if (d.mode === "publish-regardless") lines.push(`the release policy is "${RELEASE_POLICY.mode}" until ${d.until}: a library is released whatever its open findings are, and they are listed here`);
+  else {
+    lines.push(`the release policy is "${RELEASE_POLICY.then.mode}" from ${d.from}: a library with an open finding of severity error that is not accepted is held, the others are released`);
+    if (d.ownerReview !== undefined) lines.push(d.ownerReview.message, `finding ${d.ownerReview.code} (${d.ownerReview.severity}): the owner decides again; it holds nothing by itself`);
+    for (const m of held) lines.push(`held: ${m} (an open finding of severity error that is not accepted)`);
+    if (held.length === 0) lines.push("held: none");
+    if (held.length > 0 && distribution === "single") lines.push("the distribution is single: the one package holds every library, so it is held while a library is");
+  }
   const by = new Map<string, number>();
   for (const r of rows) by.set(r.finding.module, (by.get(r.finding.module) ?? 0) + 1);
   if (by.size === 0) lines.push("open findings: none recorded in the history");
   for (const [m, n] of [...by].sort()) lines.push(`open findings of ${m}: ${n}`);
-  return { proceed: d.proceed, lines };
+  return { proceed: held.length === 0 || distribution === "per-library", held, lines };
 }
 
 if (import.meta.main) {

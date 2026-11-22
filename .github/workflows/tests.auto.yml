@@ -128,7 +128,7 @@ jobs:
         id: the-root-s-development-tools-from-bun-lo-3
         shell: bash
         run: |
-          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-root-s-development-tools-from-bun-lo-3 --job "tests" --module "${{ matrix.name }}" --tool install --timeout 4 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-root-s-development-tools-from-bun-lo-3 --job "tests" --module "repository" --tool install --timeout 4 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
         env:
           IFC_STEP_SCRIPT: bun install --frozen-lockfile
         working-directory: .
@@ -138,7 +138,7 @@ jobs:
         if: "runner.os == 'Linux'"
         shell: bash
         run: |
-          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id shellcheck-which-the-packaging-test-uses-4 --job "tests" --module "${{ matrix.name }}" --tool exit-status --timeout 12 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id shellcheck-which-the-packaging-test-uses-4 --job "tests" --module "repository" --tool exit-status --timeout 12 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
         env:
           IFC_STEP_SCRIPT: "sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck"
         continue-on-error: true
@@ -146,28 +146,32 @@ jobs:
         id: independent-validators-of-the-exports-rd-5
         shell: bash
         run: |
-          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id independent-validators-of-the-exports-rd-5 --job "tests" --module "${{ matrix.name }}" --tool exit-status --timeout 12 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id independent-validators-of-the-exports-rd-5 --job "tests" --module "repository" --tool exit-status --timeout 12 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
         env:
           IFC_STEP_SCRIPT: |
             python3 -m venv "$RUNNER_TEMP/venv"
             "$RUNNER_TEMP/venv/bin/pip" install -q rdflib==7.6.0 pyshacl==0.40.2 jsonschema==4.26.0 pyyaml==6.0.3
             echo "$RUNNER_TEMP/venv/bin" >> "$GITHUB_PATH"
         continue-on-error: true
-      - name: "The tests on Bun (tests/release/ is the release's: it packs, installs and type-checks every library)"
-        id: the-tests-on-bun-tests-release-is-the-re-6
+      - name: "The tests on Bun, each file by itself so that one that hangs or fails hides no other (tests/release/ is the release's: it packs, installs and type-checks every library)"
+        id: the-tests-on-bun-each-file-by-itself-so--6
         if: "matrix.runtime == 'bun'"
         shell: bash
         run: |
-          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-tests-on-bun-tests-release-is-the-re-6 --job "tests" --module "${{ matrix.name }}" --tool bun-test --timeout 12 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-tests-on-bun-each-file-by-itself-so--6 --job "tests" --module "repository" --tool bun-test --timeout 12 --per-file true --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
         env:
-          IFC_STEP_SCRIPT: "bun test ./tests/*.test.ts"
+          IFC_STEP_SCRIPT: |
+            for f in tests/*.test.ts; do
+              echo "$f:"
+              timeout 5m bun test "$f" || true
+            done
         continue-on-error: true
       - name: The tests on Node 26
         id: the-tests-on-node-26-7
         if: "matrix.runtime == 'node'"
         shell: bash
         run: |
-          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-tests-on-node-26-7 --job "tests" --module "${{ matrix.name }}" --tool bun-test --timeout 12 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-tests-on-node-26-7 --job "tests" --module "repository" --tool bun-test --timeout 12 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
         env:
           IFC_STEP_SCRIPT: "node --test \"tests/*.test.ts\""
         continue-on-error: true

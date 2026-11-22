@@ -101,8 +101,8 @@ if (import.meta.main) {
   let merged = mergeFiles(read.files, run);
   if (argv.includes("--policy-review")) {
     const d = releaseDecision(run.at.slice(0, 10));
-    if (!d.proceed) {
-      const f = makeFinding({ tool: "policy", code: d.finding.code, module: d.finding.module, severity: d.finding.severity, message: d.finding.message, key: "release-policy", evidence: { run: run.id, commit: run.commit, step: "policy", logSha256: sha256Of(d.finding.message) }, at: run.at });
+    if (d.mode === "hold-critical" && d.ownerReview !== undefined) {
+      const f = makeFinding({ tool: "policy", code: d.ownerReview.code, module: d.ownerReview.module, severity: d.ownerReview.severity, message: d.ownerReview.message, key: "release-policy", evidence: { run: run.id, commit: run.commit, step: "policy", logSha256: sha256Of(d.ownerReview.message) }, at: run.at });
       merged = { ...merged, findings: [...merged.findings, f], steps: [...merged.steps, { id: "policy", job: "findings", module: "repository", tool: "policy", outcome: "findings", findings: 1, durationMs: 0 }] };
     }
   }

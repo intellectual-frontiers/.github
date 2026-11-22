@@ -18,12 +18,12 @@
 import { spawn } from "node:child_process";
 import { appendFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { type FindingsFile, type Outcome, type StepRecord } from "./findings.ts";
+import { type Finding, type FindingsFile, type Outcome, type StepRecord } from "./findings.ts";
 import { outcomeFinding, type ParseContext, parseOutput } from "./parsers.ts";
 import { TOOLS, type Tool } from "./policy.ts";
 
 /** What the wrapper was asked to do, or the sentence that says it was called wrongly. */
-export type Request = { readonly id: string; readonly job: string; readonly module: string; readonly tool: Tool; readonly timeoutMinutes: number; readonly out: string; readonly command: readonly string[] };
+export type Request = { readonly id: string; readonly job: string; readonly module: string; readonly tool: Tool; readonly timeoutMinutes: number; readonly out: string; readonly command: readonly string[]; /** Findings of one module for each test file the output names (0038-build-policy FR-014). */ readonly perFile?: boolean };
 
 /** The request an argument list makes (the words before `--` are options, the words after it the command), or what is wrong with it. */
 export function parseRequest(argv: readonly string[]): { readonly kind: "ok"; readonly request: Request } | { readonly kind: "err"; readonly error: string } {
@@ -50,7 +50,7 @@ export function parseRequest(argv: readonly string[]): { readonly kind: "ok"; re
   if (job === undefined || module === undefined || out === undefined) return { kind: "err", error: "--job, --module and --out are needed" };
   if (tool === undefined || !TOOLS.includes(tool as Tool)) return { kind: "err", error: `--tool is one of ${TOOLS.join(", ")}` };
   if (!Number.isFinite(minutes) || minutes <= 0) return { kind: "err", error: "--timeout is a number of minutes greater than 0" };
-  return { kind: "ok", request: { id, job, module, tool: tool as Tool, timeoutMinutes: minutes, out, command } };
+  return { kind: "ok", request: { id, job, module, tool: tool as Tool, timeoutMinutes: minutes, out, command, ...(need("per-file") === "true" ? { perFile: true } : {}) } };
 }
 
 const MAX_KEPT = 20 * 1024 * 1024;
@@ -110,7 +110,40 @@ export function fileOfRun(req: Request, ran: Ran, run: { readonly id: string; re
     outcome = "no-output";
   }
   const step: StepRecord = { id: req.id, job: req.job, module: req.module, tool: req.tool, outcome, findings: findings.length, durationMs: ran.durationMs, ...(ran.exitStatus === null ? {} : { exitStatus: ran.exitStatus }) };
+  if (req.perFile === true && ran.startError === undefined) return perFileOf(req, ran, run, step, findings);
   return { schema: "build-findings/1", run, steps: [step], findings };
+}
+
+/** The test files a runner's output names, each with the lines of its section (a header line `tests/x.test.ts:` begins one). */
+export function sectionsOf(output: string): readonly { readonly file: string; readonly text: string }[] {
+  const out: { file: string; text: string[] }[] = [];
+  for (const raw of output.split("\n")) {
+    const header = /^(?:::group::)?(\S.*\.(?:test\.)?(?:ts|tsx|js|mjs)):$/.exec(raw.trimEnd());
+    if (header !== null) {
+      const file = header[1] ?? "";
+      if (!out.some((s) => s.file === file)) out.push({ file, text: [] });
+      out.find((s) => s.file === file)?.text.push(raw);
+    } else out[out.length - 1]?.text.push(raw);
+  }
+  return out.map((s) => ({ file: s.file, text: s.text.join("\n") }));
+}
+
+/**
+ * The file of a step whose tests are the repository's root (0038-build-policy FR-014): the findings are of one module for each test file (`repository/tests/x.test.ts`), a step record for each file records that the file ran (so that a file that no longer fails is fixed),
+ * and what the whole run said that belongs to no file (a timeout, a status with nothing read) stays with the module of the step.
+ */
+function perFileOf(req: Request, ran: Ran, run: Parameters<typeof fileOfRun>[2], whole: StepRecord, wholeFindings: readonly Finding[]): FindingsFile {
+  const steps: StepRecord[] = [];
+  const findings: Finding[] = [];
+  for (const s of sectionsOf(ran.output)) {
+    const module = `${req.module}/${s.file}`;
+    const mine = parseOutput(req.tool, s.text, { module, run: run.id, commit: run.commit, step: req.id, at: run.at });
+    findings.push(...mine);
+    steps.push({ id: req.id, job: req.job, module, tool: req.tool, outcome: mine.length > 0 ? "findings" : "ok", findings: mine.length, durationMs: 0 });
+  }
+  const rest = wholeFindings.filter((f) => f.code !== "test-failed" && f.code !== "test-timeout" && f.code !== "unhandled-error");
+  const kept = [...findings, ...rest];
+  return { schema: "build-findings/1", run, steps: [{ ...whole, findings: rest.length, outcome: rest.length > 0 ? whole.outcome : "ok" }, ...steps], findings: kept };
 }
 
 /** Runs a request and writes its file; returns the file. */

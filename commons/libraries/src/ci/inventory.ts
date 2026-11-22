@@ -27,7 +27,7 @@ export const stepName = (s: Step): string => s.name ?? (s.kind === "uses" ? s.us
 
 /** The module the findings of a step in a job are of: the library of a matrix cell, `repository` otherwise. */
 function moduleOf(file: string, jobId: string, job: Job): string {
-  if (job.strategy === undefined) return "repository";
+  if (job.strategy === undefined || file === "tests") return "repository";
   if (file === "evidence" && jobId === "mutation") return "${{ matrix.library }}";
   if (file === "release" && jobId === "build") return "${{ matrix.slug }}";
   if (file === "conformance" && jobId === "compile") return "system";
@@ -40,7 +40,7 @@ export type Rule = { readonly why: string; readonly match: (p: Place) => boolean
 const text = (p: Place): string => (p.step.kind === "run" ? p.step.run : p.step.uses);
 const named = (p: Place, re: RegExp): boolean => re.test(`${p.step.name ?? ""}\n${text(p)}`);
 const minutes = (p: Place, share: number): number => Math.max(1, Math.floor(p.job.timeoutMinutes * share));
-const find = (tool: Parameters<typeof finding>[0], share: number, o: { errexit?: boolean } = {}) => (p: Place): StepPolicy => finding(tool, minutes(p, share), { module: moduleOf(p.file, p.jobId, p.job), ...o });
+const find = (tool: Parameters<typeof finding>[0], share: number, o: { errexit?: boolean; perFile?: boolean } = {}) => (p: Place): StepPolicy => finding(tool, minutes(p, share), { module: moduleOf(p.file, p.jobId, p.job), ...o });
 
 /** The rules, in order: the first that matches a step is its policy. */
 export const RULES: readonly Rule[] = [
@@ -54,6 +54,7 @@ export const RULES: readonly Rule[] = [
   { why: "the packages of a cell: a cell that cannot install them has a finding of its own and no other cell is touched", match: (p) => p.step.kind === "run" && named(p, /bun install --frozen-lockfile/), policy: find("install", 0.3) },
   { why: "a library's own `verify`: type check, spec checks, tests", match: (p) => p.step.kind === "run" && named(p, /matrix\.verify|bun run verify|\bverify\b/) && !named(p, /Why there is a report/), policy: find("verify", 0.8) },
   { why: "the mutation run of a small library: it makes the suite run once for each change, so it takes most of its job's time (a library at 33 of 40 minutes is not a finding of a timeout)", match: (p) => p.step.kind === "run" && named(p, /mutation\.ts/), policy: find("exit-status", 0.92) },
+  { why: "the tests of the repository's root, each file run by itself with its own time limit, so that one that hangs or fails hides no other and each is a module of its own (0038-build-policy FR-014)", match: (p) => p.step.kind === "run" && p.file === "tests" && named(p, /tests\/\*\.test\.ts/) && named(p, /bun test/), policy: find("bun-test", 0.8, { perFile: true }) },
   { why: "the tests of a library on Node, the tests of the repository, the tests kept as a report", match: (p) => p.step.kind === "run" && named(p, /bun test|node --test|evidence\.ts|matrix\.node|mutation\.ts/), policy: find("bun-test", 0.8) },
   { why: "the type checker on the repository's own files", match: (p) => p.step.kind === "run" && named(p, /tsc -p/), policy: find("tsc", 0.6, { errexit: false }) },
   { why: "the formatter", match: (p) => p.step.kind === "run" && named(p, /bun fmt --check/), policy: find("format", 0.6) },

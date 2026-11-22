@@ -46,7 +46,7 @@ export type Gate = (typeof GATES)[number];
  */
 export type StepPolicy =
   | { readonly kind: "red-cause"; readonly cause: RedCause }
-  | { readonly kind: "finding"; readonly tool: Tool; readonly timeoutMinutes: number; readonly module: string; readonly errexit: boolean }
+  | { readonly kind: "finding"; readonly tool: Tool; readonly timeoutMinutes: number; readonly module: string; readonly errexit: boolean; readonly perFile: boolean }
   | { readonly kind: "gate"; readonly gate: Gate }
   | { readonly kind: "plumbing" };
 
@@ -54,9 +54,9 @@ export type StepPolicy =
 export const redCause = (cause: RedCause): StepPolicy => ({ kind: "red-cause", cause });
 /**
  * The policy of a step whose output is read into findings: the tool, the minutes after which the wrapper stops its command, the module its findings are of (the text of a matrix expression such as `${{ matrix.name }}` where the step is
- * in a library's cell, `repository` otherwise) and whether the script stops at its first failing command (`errexit`; a script of several independent checks does not, so that each one runs and says its findings).
+ * in a library's cell, `repository` otherwise), whether the findings are of one module for each test file the output names (`perFile`, for the tests of the repository's root: 0038-build-policy FR-014) and whether the script stops at its first failing command (`errexit`; a script of several independent checks does not, so that each one runs and says its findings).
  */
-export const finding = (tool: Tool, timeoutMinutes: number, o: { readonly module?: string; readonly errexit?: boolean } = {}): StepPolicy => ({ kind: "finding", tool, timeoutMinutes, module: o.module ?? "repository", errexit: o.errexit ?? true });
+export const finding = (tool: Tool, timeoutMinutes: number, o: { readonly module?: string; readonly errexit?: boolean; readonly perFile?: boolean } = {}): StepPolicy => ({ kind: "finding", tool, timeoutMinutes, module: o.module ?? "repository", errexit: o.errexit ?? true, perFile: o.perFile ?? false });
 /** The policy of a step that is a gate. */
 export const gate = (g: Gate): StepPolicy => ({ kind: "gate", gate: g });
 /** The policy of a step that is plumbing. */
@@ -68,28 +68,36 @@ export const APPROVERS: readonly string[] = ["shah"];
 /** The longest an acceptance may last, in days (0038-build-policy FR-008). */
 export const ACCEPTANCE_MAX_DAYS = 366;
 
-/** The decision the release is under (0038-build-policy FR-010). */
-export type ReleasePolicy = { readonly mode: "publish-regardless"; readonly until: string };
+/** The decision the release is under (0038-build-policy FR-010): publish whatever is open until a day, then hold per library for an open finding of severity `error` that is not accepted; `reviewedOn` is the day the owner reviewed it, and the finding `owner-review-due` is kept until it is set. */
+export type ReleasePolicy = {
+  readonly mode: "publish-regardless";
+  readonly until: string;
+  readonly then: { readonly mode: "hold-critical"; readonly from: string };
+  readonly reviewedOn?: string;
+};
 
-/** The release policy: until the day, a library is released whatever its open findings are; after it the owner decides again (January 2027). */
-export const RELEASE_POLICY: ReleasePolicy = { mode: "publish-regardless", until: "2027-01-31" };
+/** The release policy (decided by the owner on 2026-11-22): until 2027-01-31 a library is released whatever its open findings are; from 2027-02-01 a library with an open, not accepted finding of severity `error` is held and the owner is asked again. */
+export const RELEASE_POLICY: ReleasePolicy = { mode: "publish-regardless", until: "2027-01-31", then: { mode: "hold-critical", from: "2027-02-01" } };
 
-/** What the release may do on a day, with the finding the owner must see where it may not. */
+/** The finding the owner must see where the policy has run out and has not been reviewed. */
+export type OwnerReview = { readonly tool: "policy"; readonly code: "owner-review-due"; readonly severity: "error"; readonly module: "repository"; readonly message: string };
+
+/** What the release may do on a day: always proceed, by one of two modes, with the finding the owner must see where the first mode has ended and has not been reviewed. */
 export type ReleaseDecision =
-  | { readonly proceed: true; readonly reportOpenFindings: true; readonly until: string }
-  | { readonly proceed: false; readonly finding: { readonly tool: "policy"; readonly code: "owner-review-due"; readonly severity: "error"; readonly module: "repository"; readonly message: string } };
+  | { readonly proceed: true; readonly mode: "publish-regardless"; readonly reportOpenFindings: true; readonly until: string }
+  | { readonly proceed: true; readonly mode: "hold-critical"; readonly from: string; readonly ownerReview: OwnerReview | undefined };
 
-/** The decision of the release on a day (`YYYY-MM-DD`): publish regardless until the day of the policy, and after it nothing proceeds silently (0038-build-policy FR-010). */
+/** The decision of the release on a day (`YYYY-MM-DD`) (0038-build-policy FR-010). */
 export function releaseDecision(day: string, policy: ReleasePolicy = RELEASE_POLICY): ReleaseDecision {
-  if (day <= policy.until) return { proceed: true, reportOpenFindings: true, until: policy.until };
-  return {
-    proceed: false,
-    finding: {
-      tool: "policy",
-      code: "owner-review-due",
-      severity: "error",
-      module: "repository",
-      message: `the release policy "${policy.mode}" ended on ${policy.until}: the owner decides again whether a library with open findings is released`,
-    },
-  };
+  if (day <= policy.until) return { proceed: true, mode: "publish-regardless", reportOpenFindings: true, until: policy.until };
+  const ownerReview: OwnerReview | undefined =
+    policy.reviewedOn !== undefined
+      ? undefined
+      : { tool: "policy", code: "owner-review-due", severity: "error", module: "repository", message: `the release policy "${policy.mode}" ended on ${policy.until}: from ${policy.then.from} a library with an open finding of severity error that is not accepted is held; the owner decides again` };
+  return { proceed: true, mode: "hold-critical", from: policy.then.from, ownerReview };
+}
+
+/** The libraries a finding holds under `hold-critical`: those that have an open finding of severity `error` (an accepted one is not open); a finding of the module `repository` holds no library. */
+export function heldLibraries(open: readonly { readonly module: string; readonly severity: string }[]): readonly string[] {
+  return [...new Set(open.filter((f) => f.severity === "error" && f.module !== "repository").map((f) => f.module))].sort();
 }
