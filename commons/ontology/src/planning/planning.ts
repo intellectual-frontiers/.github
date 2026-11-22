@@ -45,7 +45,7 @@ import {
   XSD,
   xsd,
 } from "@intellectual-frontiers/rdf";
-import { bases, MZ, MZID, OntologyTerm } from "../mizan/mizan.ts";
+import { bases, Decision, MZ, MZID, OntologyTerm } from "../mizan/mizan.ts";
 import { provMore } from "../kanon/kanon.ts";
 
 /** The namespace of Planning's terms. */
@@ -78,6 +78,10 @@ export const plan = vocabulary(PLANNING, {
   LocatorKind: "owl:Class",
   EventType: "owl:Class",
   PrincipalBasis: "owl:Class",
+  BaselineClass: "owl:Class",
+  ConflictValue: "owl:Class",
+  OutboxEntry: "owl:Class",
+  tracePresent: "owl:DatatypeProperty",
   itemId: "owl:DatatypeProperty",
   itemKind: "owl:ObjectProperty",
   itemState: "owl:ObjectProperty",
@@ -271,6 +275,17 @@ export const principalBases = codes(PrincipalBasisSchema, PLANNING, {
   CommitAuthor: { label: en("Commit author"), definition: en("The author of a commit whose trailer names the agent, where the configuration names that rule.") },
 });
 
+/** The schema of a baseline class: the class of an observation against the one last taken (SARIF 2.1.0 section 3.27.24, `baselineState`). */
+export const BaselineClassSchema = classSchema(plan.BaselineClass, CODE);
+
+/** The four classes of an observation against the one last taken, with the values of the standard's own property `baselineState` (0037-planning FR-008; OQ-13). */
+export const baselineClasses = codes(BaselineClassSchema, PLANNING, {
+  New: { label: en("New"), definition: en("The observation is of a thing that was not there when the last one was taken (SARIF baselineState `new`).") },
+  Unchanged: { label: en("Unchanged"), definition: en("The observation is of a thing that was there and has not changed (SARIF baselineState `unchanged`).") },
+  Updated: { label: en("Updated"), definition: en("The observation is of a thing that was there and has changed (SARIF baselineState `updated`).") },
+  Absent: { label: en("Absent"), definition: en("The observation is of a thing that was there when the last one was taken and is not now (SARIF baselineState `absent`).") },
+});
+
 // ---- the classes and the properties, each with its label and definition
 
 /** The classes, each with its label and definition. */
@@ -337,11 +352,15 @@ export const classes = [
   OwlClass.make(plan.ActorKind, { label: en("Actor kind"), subClassOf: [skos.Concept], definition: en("One of the kinds of actor: person, agent or tool.") }),
   OwlClass.make(plan.LocatorKind, { label: en("Locator kind"), subClassOf: [skos.Concept], definition: en("One of the ways a place is named.") }),
   OwlClass.make(plan.EventType, { label: en("Event type"), subClassOf: [skos.Concept], definition: en("One of the cases of the union an item's history is made of.") }),
+  OwlClass.make(plan.BaselineClass, { label: en("Baseline class"), subClassOf: [skos.Concept], definition: en("One of the four classes of an observation against the one last taken: new, unchanged, updated or absent.") }),
+  OwlClass.make(plan.ConflictValue, { label: en("Conflict value"), subClassOf: [prov.Entity], definition: en("The value of a field where two sources disagree and the authority of the field does not settle it: it holds each source's value and waits for a person (0037-planning FR-017).") }),
+  OwlClass.make(plan.OutboxEntry, { label: en("Outbox entry"), subClassOf: [prov.Entity], definition: en("A patch that a source cannot carry out yet, kept with what it waits for: a capability, a person's confirmation, or a schema that cannot say it (0037-planning FR-033).") }),
   OwlClass.make(plan.PrincipalBasis, { label: en("Principal basis"), subClassOf: [skos.Concept], definition: en("One of the ways the person an agent acts for was established.") }),
 ] as const;
 
 /** The properties, each with its domain, range and definition. */
 export const properties = [
+  DatatypeProperty.make(plan.tracePresent, { domain: plan.Trace, range: xsd.boolean, label: en("trace present"), definition: en("Whether the thing a trace names is present in the place at the time the trace was made, or absent from it (0037-planning FR-009).") }),
   DatatypeProperty.make(plan.itemId, { domain: plan.Item, range: xsd.string, label: en("item id"), definition: en("The stable id of the item; it does not change when the item moves between places.") }),
   ObjectProperty.make(plan.itemKind, { domain: plan.Item, range: plan.ItemKind, label: en("item kind"), definition: en("The kind of the item.") }),
   ObjectProperty.make(plan.itemState, { domain: plan.Item, range: plan.State, label: en("item state"), definition: en("The state of the item, folded from its events.") }),
@@ -421,8 +440,33 @@ function specializes(local: keyof typeof plan, standardTerm: string, definedBy: 
 }
 
 const CONCEPT = skos.Concept.iri;
+const DECISION_RECORD = "commons/spec-kit/audits/2026-11-planning-decisions.md";
+const OWN = ["ConflictValue", "OutboxEntry"] as const;
 
-/** The audit of Planning: one record for every class; none is `unaligned`. */
+/** The record of a term of the library's own: no standard names it, it is `unaligned`, and the owner accepted it as the library's own on 2026-11-22 (0037-planning OQ-13); the Decision is for the owner to sign. */
+function own(local: (typeof OWN)[number], definedBy: string) {
+  return OntologyTerm.make(term(MZID, `term-planning-${local}`), {
+    label: en(`plan:${local}`),
+    termIri: plan[local].iri,
+    basis: bases.Unaligned,
+    justification: "No standard adopted: searched for a standard that names it (SARIF, PROV-O, iCalendar, the Web Annotation Vocabulary) and none was found. Decision of the owner kept it as the library's own (0018-standards-first FR-005).",
+    addedOn: "2026-11-22",
+    decision: term(MZID, `decision-planning-${local}`),
+    definedBy: [definedBy],
+  });
+}
+
+/** The decisions of the terms kept unaligned, to be signed by the owner (the record is `commons/spec-kit/audits/2026-11-planning-decisions.md`). */
+export const decisions = OWN.map((local) =>
+  Decision.make(term(MZID, `decision-planning-${local}`), {
+    label: en(`Keep plan:${local} unaligned: a term of the library's own`),
+    decisionOf: term(MZID, `term-planning-${local}`),
+    decidedOn: "2026-11-22",
+    record: DECISION_RECORD,
+  }),
+);
+
+/** The audit of Planning: one record for every class; the two terms of the library's own are `unaligned` by the owner's decision of 2026-11-22. */
 export const terms = [
   specializes("Item", prov.Entity.iri, "0037-planning FR-001"),
   specializes("Event", prov.Activity.iri, "0037-planning FR-003"),
@@ -447,6 +491,9 @@ export const terms = [
   specializes("LocatorKind", CONCEPT, "0037-planning FR-008"),
   specializes("EventType", CONCEPT, "0037-planning FR-003"),
   specializes("PrincipalBasis", CONCEPT, "0037-planning FR-045"),
+  specializes("BaselineClass", CONCEPT, "0037-planning FR-008"),
+  own("ConflictValue", "0037-planning FR-017"),
+  own("OutboxEntry", "0037-planning FR-033"),
 ] as const;
 
 /** The file this module states: its name, its prefixes and its individuals. */
@@ -470,6 +517,8 @@ export const file: OntologyFile = {
     ...Object.values(locatorKinds),
     ...Object.values(eventTypes),
     ...Object.values(principalBases),
+    ...Object.values(baselineClasses),
     ...terms,
+    ...decisions,
   ],
 };

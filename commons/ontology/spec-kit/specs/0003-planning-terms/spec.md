@@ -16,15 +16,15 @@
 
 ## Audit and boundaries
 
-- **FR-005**: Every class of the ontology MUST have a record of its basis (commons 0018-standards-first FR-003), each specializing a term of PROV-O or SKOS that the library `rdf` holds, and none is `unaligned`.
+- **FR-005**: Every class of the ontology MUST have a record of its basis (commons 0018-standards-first FR-003), each specializing a term of PROV-O or SKOS that the library `rdf` holds, except the two terms of the library's own (`plan:ConflictValue` and `plan:OutboxEntry`), which are `unaligned` by the owner's decision of 2026-11-22, with a Decision for the owner to sign (`commons/spec-kit/audits/2026-11-planning-decisions.md`).
 - **FR-006**: The modules MUST import only `core`, `rdf` and the ontologies of this library by relative path, and the ontology MUST be published like the others (Turtle, SHACL shapes, SSSOM, code lists) by `bun commons/libraries/src/generate-ontology.ts`.
 
 ## Acceptance scenarios
 
-1. **Given** the ontology, **When** its classes are read, **Then** the ten classes of the model and the thirteen classes of the code lists are there, per FR-002.
+1. **Given** the ontology, **When** its classes are read, **Then** the twelve classes of the model (the ten and the two of the library's own) and the fourteen classes of the code lists (the thirteen and the baseline classes) are there, per FR-002.
 2. **Given** the code lists, **When** their members are counted, **Then** there are 4, 5, 3, 3, 4, 4, 7, 4, 3, 3, 3, 14 and 4, per FR-003.
 3. **Given** the severity `Error`, **When** its SARIF level is read, **Then** it is the name `error` and the property's definition cites SARIF 2.1.0 sections 3.27.9 and 3.27.10, per FR-004.
-4. **Given** every class, **When** the audit is read, **Then** each has a record that specializes a PROV-O or SKOS term and none is `unaligned`, per FR-005.
+4. **Given** every class, **When** the audit is read, **Then** each has a record that specializes a PROV-O or SKOS term, except the two of the library's own, which are `unaligned`, per FR-005.
 5. **Given** the modules of the ontology, **When** their imports are read, **Then** none is outside `core`, `rdf` and the library, per FR-006.
 
 ## Out of scope

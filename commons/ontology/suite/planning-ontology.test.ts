@@ -41,13 +41,13 @@ proves(["0003-planning-terms FR-001"], "the ontology has its namespace, the vers
   for (const s of ["four kinds", "events", "observations", "patches"]) assert(d.includes(s), `the description says ${s}`);
 });
 
-proves(["0003-planning-terms FR-002"], "the ten classes of the model and the thirteen of the code lists are there, each with a definition", () => {
+proves(["0003-planning-terms FR-002"], "the twelve classes of the model and the fourteen of the code lists are there, each with a definition", () => {
   const names = new Set(classes.map((c) => c.iri));
-  for (const n of ["Item", "Event", "Actor", "Observation", "Locator", "Trace", "Link", "Patch", "Preview", "Source"] as const) assert(names.has(plan[n].iri), `the class ${n}`);
-  for (const n of ["ItemKind", "State", "CloseReason", "Severity", "Verdict", "LinkKind", "Capability", "FieldAuthority", "Origin", "ActorKind", "LocatorKind", "EventType", "PrincipalBasis"] as const) assert(names.has(plan[n].iri), `the class ${n}`);
-  assertEquals(classes.length, 23);
+  for (const n of ["Item", "Event", "Actor", "Observation", "Locator", "Trace", "Link", "Patch", "Preview", "Source", "ConflictValue", "OutboxEntry"] as const) assert(names.has(plan[n].iri), `the class ${n}`);
+  for (const n of ["ItemKind", "State", "CloseReason", "Severity", "Verdict", "LinkKind", "Capability", "FieldAuthority", "Origin", "ActorKind", "LocatorKind", "EventType", "PrincipalBasis", "BaselineClass"] as const) assert(names.has(plan[n].iri), `the class ${n}`);
+  assertEquals(classes.length, 26);
   const props = new Set(properties.map((p) => p.iri));
-  for (const n of ["principalBasis", "externalSource", "externalValue", "deferredUntil", "itemMotivation", "itemBlocker", "itemTarget", "itemSource", "itemPriority", "itemSize", "itemGoals", "itemEngines", "itemCites", "itemEvidence", "sourceSeverity"] as const)
+  for (const n of ["principalBasis", "externalSource", "externalValue", "deferredUntil", "itemMotivation", "itemBlocker", "itemTarget", "itemSource", "itemPriority", "itemSize", "itemGoals", "itemEngines", "itemCites", "itemEvidence", "sourceSeverity", "tracePresent"] as const)
     assert(props.has(plan[n].iri), `the property ${n}`);
   for (const c of classes) assert((c.values.definition?.value ?? "").length > 20, `${c.iri} has a definition`);
 });
@@ -109,10 +109,15 @@ proves(["0003-planning-terms FR-004"], "a name from another standard is a name i
   }
 });
 
-proves(["0003-planning-terms FR-005"], "every class has a record of its basis, specializing a PROV-O or SKOS term, and none is unaligned", () => {
+proves(["0003-planning-terms FR-005"], "every class has a record of its basis, specializing a PROV-O or SKOS term, except the two terms of the library's own, which are unaligned", () => {
   const recorded = new Set(terms.map((t) => t.values.termIri));
   for (const c of classes) assert(recorded.has(c.iri), `${c.iri} has a record`);
+  const OWN: readonly string[] = [plan.ConflictValue.iri, plan.OutboxEntry.iri];
   for (const t of terms) {
+    if (OWN.includes(String(t.values.termIri))) {
+      assertEquals(t.values.basis.iri, bases.Unaligned.iri);
+      continue;
+    }
     assertEquals(t.values.basis.iri, bases.Specializes.iri);
     const std = t.values.standardTerm ?? "";
     assert(std.startsWith("http://www.w3.org/ns/prov#") || std.startsWith("http://www.w3.org/2004/02/skos/core#"), `${t.values.termIri} rests on PROV-O or SKOS`);
