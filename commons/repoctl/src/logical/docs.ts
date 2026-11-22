@@ -1,4 +1,4 @@
-// Spec: 0011-repoctl-docs FR-001
+// Spec: 0011-repoctl-docs FR-001, FR-005
 /**
  * The documentation verbs' reasoning (commons repoctl 0011-repoctl-docs FR-001 to FR-004): what `repoctl docs build`, `serve` and `check` ask of the documentation generator `ifc-docs` of `@intellectual-frontiers/docs`, as arguments of its command
  * line, and what a missing generator or a failed run is as a finding. The generator is not carried by repoctl: the Physical layer loads it by its package name where it is installed, through the port below, and a test fills the port with its own.
@@ -32,7 +32,7 @@ export function docsArguments(ask: DocsAsk, settings: DocsSettings, repo: string
 
 /** The finding of a generator that is not installed. */
 export function missingGenerator(why: string): Finding {
-  return finding("fail", "E-DOCS-GENERATOR-MISSING", `the documentation generator is not installed: ${why}`, "bun add --dev @intellectual-frontiers/docs");
+  return finding("fail", "E-DOCS-GENERATOR-MISSING", `the documentation generator is not installed: ${why}`, "bun add --dev @intellectual-frontiers/commons (the one package: the generator is its entry ./docs) or, in per-library mode, bun add --dev @intellectual-frontiers/docs");
 }
 
 /** The finding of a generator that ended with a status other than 0. */

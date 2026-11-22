@@ -4,7 +4,8 @@
  * Keeps a secret out of what a program prints, logs or returns (commons headless 0002-headless-governance FR-011, 0008-exit-style-consent FR-003). It redacts only what is a secret and
  * never what merely looks like a line about one: the secret values the program holds, the password of a URL and a `password=` assignment, the shapes of the tokens that have a known
  * form (GitHub, GitLab, Slack, AWS, npm, `sk-`, bearer and JWT tokens, private-key blocks), and the value of a key that the program declared secret (`KEY=value`, or
- * `"KEY": "value"`). A sentence that names a variable (`ERGONEX_GITHUB_TOKEN: the token is not set`) is prose and is left as it is.
+ * `"KEY": "value"`). A sentence that names a variable (`ERGONEX_GITHUB_TOKEN: the token is not set`) is prose and is left as it is, and so is a value that a shell expands (`KEY="$(command)"`),
+ * which is a reference to a secret and not one (0008-exit-style-consent FR-003).
  *
  * @example
  * ```ts
@@ -48,6 +49,9 @@ const SHAPES: readonly RegExp[] = [
 const escape = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const VALUE = String.raw`('[^']*'|"[^"]*"|[^\s,;&'"]+)`;
 
+/** Whether a value is a reference that a shell or a script expands (`$(command)`, `${name}`, `$name`, `($expression)`, with or without a quote before it): where a secret comes from, and not one. */
+const REFERENCE = /^["']?\(?\$[({A-Za-z_]/;
+
 /** The text with the password of every URL, a `password=` assignment, every token of a known shape, the value of every declared key and every given secret replaced by `***`. */
 export function redact(text: string, secrets: readonly string[] = [], options: RedactOptions = {}): string {
   let out = text
@@ -61,7 +65,7 @@ export function redact(text: string, secrets: readonly string[] = [], options: R
   if (keys.length > 0) {
     const alt = keys.map(escape).join("|");
     out = out
-      .replace(new RegExp(String.raw`(\b(?:${alt})\s*=\s*)${VALUE}`, "g"), `$1${MASK}`)
+      .replace(new RegExp(String.raw`(\b(?:${alt})\s*=\s*)${VALUE}`, "g"), (all: string, head: string, value: string) => (REFERENCE.test(value) ? all : `${head}${MASK}`))
       .replace(new RegExp(String.raw`("(?:${alt})"\s*:\s*)("[^"]*")`, "g"), `$1"${MASK}"`);
   }
   const longestFirst = [...secrets].filter((s) => s.length >= MIN_SECRET).sort((a, b) => b.length - a.length);

@@ -60,7 +60,7 @@
 ## Planned
 
 - **FR-016**: `ergonex init` SHOULD write the scoped GitHub-registry line of FR-001 to the `.npmrc` of a repository that has a private package, taking the token from `ERGONEX_GITHUB_TOKEN` and never from `GITHUB_TOKEN`. Planned: it needs the manifest of the workspace to say which of its packages are private, which Ergonex's own specifications (`ergonex 0001-ergonex`, `ergonex 0004-onboarding`) decide first.
-- **FR-017**: `commons/docs` (the site generator and the `ifc-docs` command) MUST be published as a library, so that a consumer takes it from a registry too: it is `@intellectual-frontiers/docs`, a library in the sense of 0027-commons-libraries.
+- **FR-017**: `commons/docs` (the site generator and the `ifc-docs` command) MUST be published as a library, so that a consumer takes it from a registry too: in `single` mode, the mode of this repository, it is the entry `@intellectual-frontiers/commons/docs` of the one package, with the command `ifc-docs` in its `bin`; only in `per-library` mode is it the package `@intellectual-frontiers/docs` (FR-019, FR-020). A program that loads the generator (`repoctl docs`, commons repoctl 0011-repoctl-docs FR-005) MUST look for the one package first.
 
 ## The documents
 

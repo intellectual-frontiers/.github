@@ -10,7 +10,7 @@
  * @module
  */
 import { absurd } from "@intellectual-frontiers/core";
-import { readTextFile, realPath } from "../platform/r-fs.ts";
+import { existsSync, lstatSync, readTextFile, realPath } from "../platform/r-fs.ts";
 import { build, run, which } from "../platform/r-proc.ts";
 import type { FsProbe, LongPaths, ToolProbe } from "../doctor.ts";
 
@@ -116,4 +116,26 @@ export async function isElevated(): Promise<boolean> {
 /** Whether `direnv` is on the `PATH` (0003-host FR-023). */
 export function direnvFound(path?: string): boolean {
   return which("direnv", path) !== undefined;
+}
+
+/**
+ * Every program named `name` on a `PATH`, in the order of the `PATH` (what `which -a` lists; 0003-host FR-027, FR-028): a file of that name in a folder of it, with, on Windows, each of the extensions a command has. A folder that is
+ * not there, a name that is a folder and a path that cannot be read are not programs. Nothing is run.
+ */
+export function programsNamed(name: string, path: string | undefined, windows: boolean): readonly string[] {
+  if (path === undefined || path === "") return [];
+  const found: string[] = [];
+  const names = windows ? [name, ...[".exe", ".cmd", ".bat", ".ps1", ".com"].map((e) => `${name}${e}`)] : [name];
+  for (const dir of path.split(windows ? ";" : ":")) {
+    if (dir === "") continue;
+    for (const n of names) {
+      const file = `${dir.replace(/[\\/]+$/, "")}${windows ? "\\" : "/"}${n}`;
+      try {
+        if (existsSync(file) && !lstatSync(file).isDirectory && !found.includes(file)) found.push(file);
+      } catch {
+        // not readable: not a program
+      }
+    }
+  }
+  return found;
 }

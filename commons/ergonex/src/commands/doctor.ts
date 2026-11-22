@@ -13,10 +13,10 @@ import { err, ok } from "@intellectual-frontiers/core";
 import { build, run as runProgram, runtimeName, runtimeVersion, which } from "../platform/r-proc.ts";
 import { flag } from "../platform/k-args.ts";
 import { scopesOf, tokenChecks } from "../token.ts";
-import { type Check, findingsOf, fsCheck, hookChecks, type HookFacts, pathChecks, repoPathChecks, runtimeChecks } from "../doctor.ts";
+import { type Check, enxChecks, findingsOf, fsCheck, hookChecks, type HookFacts, pathChecks, repoPathChecks, runtimeChecks } from "../doctor.ts";
 import { discoverModules } from "../host/discovery.ts";
 import { fileFacts } from "../host/files.ts";
-import { probeFileSystem, probeLongPaths, probeTool } from "../host/probe.ts";
+import { probeFileSystem, probeLongPaths, probeTool, programsNamed } from "../host/probe.ts";
 import { rememberSeen } from "../host/seen.ts";
 import { type Loaded, native, situate } from "../host/workspace.ts";
 import type { Context } from "../modules/types.ts";
@@ -242,6 +242,7 @@ const doctor = defineCommand({
         }),
       );
       checks.push(fsCheck(await probeFileSystem(loaded.home), loaded.home));
+      checks.push(...enxChecks(programsNamed("enx", ctx.env["PATH"] ?? ctx.env["Path"], ctx.platform.windows)));
 
       const s = await situate(ctx, loaded, { fetch: false });
       if (s.kind === "err")

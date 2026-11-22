@@ -91,6 +91,54 @@ proves(["0011-repoctl-docs FR-002"], "the generator is loaded from the repositor
   );
 });
 
+proves(["0011-repoctl-docs FR-005"], "the generator is found as the entry ./docs of the one package first and as the package of its own after, and the problem names both places", async () => {
+  if (!CAN_RUN) return;
+  const single = (dir: string): Promise<void> =>
+    put(dir, "node_modules/@intellectual-frontiers/commons/package.json", JSON.stringify({ name: "@intellectual-frontiers/commons", version: "9.9.9", type: "module", exports: { "./docs": { types: "./docs/mod.d.ts", bun: "./docs/mod.ts", default: "./docs/mod.mjs" } } })).then(() =>
+      put(dir, "node_modules/@intellectual-frontiers/commons/docs/mod.mjs", GENERATOR),
+    );
+  // the one package alone: no @intellectual-frontiers/docs is installed, and the verb works
+  await withSite(
+    async (dir) => {
+      await single(dir);
+      const built = await run(dir, ["docs", "build"]);
+      assertEquals(built.code, 0, built.err);
+      assertEquals(await fs.readTextFile(path.join(dir, "_site/index.html")), "<h1>the site</h1>");
+      assertEquals(JSON.parse(await fs.readTextFile(path.join(dir, "node_modules/@intellectual-frontiers/commons/docs/record.json"))), ["build", "--out", path.join(dir, "_site"), "--config", path.join(dir, "docs.config.ts")]);
+      assertEquals((await run(dir, ["docs", "check"])).code, 0);
+    },
+    false,
+  );
+  // both installed: the one package is used, the package of its own is not asked
+  await withSite(async (dir, generator) => {
+    await single(dir);
+    assertEquals((await run(dir, ["docs", "check"])).code, 0);
+    assert(await fs.exists(path.join(dir, "node_modules/@intellectual-frontiers/commons/docs/record.json")), "the one package was used");
+    assert(!(await fs.exists(path.join(generator, "record.json"))), "the per-library package was not asked");
+  });
+  // the per-library package alone still works
+  await withSite(async (dir, generator) => {
+    assertEquals((await run(dir, ["docs", "check"])).code, 0);
+    assert(await fs.exists(path.join(generator, "record.json")));
+  });
+  // neither: the problem names both places, and the one package first
+  await withSite(
+    async (dir) => {
+      const missing = await run(dir, ["docs", "check"]);
+      assertEquals(missing.code, 1);
+      assertStringIncludes(missing.err, "E-DOCS-GENERATOR-MISSING");
+      assertStringIncludes(missing.err, "@intellectual-frontiers/commons/docs");
+      assertStringIncludes(missing.err, "@intellectual-frontiers/docs");
+      const fix = CATALOGUE["E-DOCS-GENERATOR-MISSING"].fix;
+      assert(fix.indexOf("@intellectual-frontiers/commons") < fix.indexOf("@intellectual-frontiers/docs"), "the one package comes first");
+      assertStringIncludes(fix, "single");
+      assertStringIncludes(fix, "per-library");
+      assertStringIncludes(fix, "shiki");
+    },
+    false,
+  );
+});
+
 proves(["0011-repoctl-docs FR-003"], "a generator that ends with a status other than 0 is E-DOCS-FAILED", async () => {
   if (!CAN_RUN) return;
   await withSite(async (dir, generator) => {
