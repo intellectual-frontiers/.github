@@ -70,7 +70,7 @@ jobs:
     name: verify (${{ matrix.name }})
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: [plan
+    needs: [plan]
     if: "needs.plan.outputs.has-linux == 'true'"
     strategy:
       fail-fast: false
