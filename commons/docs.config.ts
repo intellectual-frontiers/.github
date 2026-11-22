@@ -12,6 +12,12 @@ import { DEFAULT_LICENSE } from "./libraries/src/license/standard.ts";
 import { guidesLens } from "./docs/src/lens/guides.ts";
 import { releasesLens } from "./docs/src/lens/releases.ts";
 import { programLens } from "./docs/src/lens/program.ts";
+import { type OpsFact, type OpsVerb, type OpsWorkflow, repoOpsLens } from "./docs/src/lens/repo-ops.ts";
+import { slugOf } from "./docs/src/model.ts";
+import { DISTRIBUTION, GITHUB_REGISTRY, SINGLE, SINGLE_TARGETS } from "./libraries/src/distribution.ts";
+import { workflows as workflowDefinitions } from "./libraries/src/workflows/definitions.ts";
+import type { Triggers } from "./libraries/src/workflows/model.ts";
+import { VERBS } from "./repoctl/src/governance/verbs.ts";
 import { ergonexProgram, type ProgramHost } from "./ergonex/src/mod.ts";
 import { describe } from "./headless/src/describe/mod.ts";
 import { anyfsProgram, INERT_HOST as ANYFS_INERT_HOST } from "./anyfs-cli/src/mod.ts";
@@ -46,6 +52,80 @@ const INERT_HOST: ProgramHost = { env: {}, cwd: "/", today: "2026-11-20", platfo
 
 /** The programs built on headless, documented by tier from their own descriptions: ergonex, the workspaces tool, repoctl, the operations program of this repository, and anyfs, the command line of the stores. */
 const programs = programLens({ name: "programs", source: () => [...describe(ergonexProgram(INERT_HOST)), ...describe(repoctlProgram(REPOCTL_INERT_HOST)), ...describe(anyfsProgram(ANYFS_INERT_HOST))] });
+
+/** What starts a workflow, in words: its typed triggers read one by one. */
+function triggerWords(on: Triggers): string[] {
+  return [
+    ...(on.push === undefined ? [] : [on.push.branches === undefined ? "push (paths of commons)" : `push to ${on.push.branches.join(", ")}`]),
+    ...(on.pullRequest === undefined ? [] : ["pull request"]),
+    ...(on.workflowDispatch === undefined ? [] : ["by hand"]),
+    ...(on.schedule ?? []).map((cron) => `schedule ${cron} (UTC)`),
+    ...(on.workflowRun === undefined ? [] : [`after ${on.workflowRun.workflows.join(", ")}`]),
+    ...(on.workflowCall === undefined ? [] : ["called by another workflow"]),
+  ];
+}
+
+/** The first sentence of a comment, for the table of the workflows. */
+function purposeOf(comment: string | undefined): string {
+  const flat = (comment ?? "").replace(/\s+/g, " ").trim();
+  return /^(.+?[.!?])(\s|$)/.exec(flat)?.[1] ?? flat;
+}
+
+/** The options every verb has, which the page says once and does not repeat for each. */
+const COMMON_OPTIONS: readonly string[] = ["--json", "--sarif", "--quiet", "--verbose", "--color", "--non-interactive"];
+
+/** The verbs of repoctl for the Repo Ops section: its typed table of verbs with the options and examples of its own program description (the contributor tier, which sees every verb a person runs). */
+function repoctlVerbs(): readonly OpsVerb[] {
+  const tier = describe(repoctlProgram(REPOCTL_INERT_HOST)).find((m) => m.name === "repoctl-contributor");
+  return Object.values(VERBS).map((v): OpsVerb => {
+    const element = tier?.elements.find((e) => e.kind === "verb" && e.name === v.id);
+    const examples = element?.properties["examples"];
+    return {
+      words: v.id,
+      summary: v.summary,
+      effect: v.effect,
+      tier: v.tier,
+      idempotent: v.idempotent,
+      dryRun: v.dryRun,
+      check: v.check,
+      options: (tier?.elements ?? []).filter((e) => e.kind === "option" && e.parent === element?.id && !COMMON_OPTIONS.includes(e.name)).map((o) => ({ name: o.name, meaning: o.definition })),
+      examples: Array.isArray(examples) ? (examples as readonly string[]) : [],
+      page: `programs/repoctl-contributor/verb-${slugOf(v.id.replace(/[^A-Za-z0-9]+/g, "-"))}.html`,
+    };
+  });
+}
+
+/** The workflows for the Repo Ops section, read from the typed definitions their files are made from. */
+function repoWorkflows(): readonly OpsWorkflow[] {
+  return workflowDefinitions().map((w): OpsWorkflow => ({ file: `.github/workflows/${w.file}.auto.yml`, name: w.name, triggers: triggerWords(w.on), jobs: Object.entries(w.jobs).map(([id, j]) => ({ id, ...(j.name === undefined ? {} : { name: j.name }) })), purpose: purposeOf(w.comment) }));
+}
+
+/** The facts of the release for the Repo Ops section, read from the typed constants of the release. */
+function releaseFacts(): readonly OpsFact[] {
+  return [
+    { label: "Distribution mode", value: DISTRIBUTION },
+    { label: "The one package (single mode)", value: SINGLE.package },
+    { label: "Its tag", value: `${SINGLE.slug}-v<version>` },
+    { label: "Publish targets (single mode)", value: SINGLE_TARGETS.join(", ") },
+    { label: "The GitHub package registry", value: GITHUB_REGISTRY },
+    { label: "The record", value: "commons/generated/release.auto.json" },
+  ];
+}
+
+/** The section Repo Ops (docs 0001-docs FR-029): how this repository is operated, written by people and completed by what the typed definitions say. */
+const repoOps = repoOpsLens({
+  name: "repo-ops",
+  workflows: repoWorkflows,
+  verbs: repoctlVerbs,
+  facts: releaseFacts,
+  pages: [
+    { file: "commons/docs/guides/ops-index.md", path: "repo-ops/index.html", order: 0 },
+    { file: "commons/docs/guides/ops-ci-cd.md", path: "repo-ops/ci-cd.html", order: 1, generated: "workflows" },
+    { file: "commons/docs/guides/ops-dev-loop.md", path: "repo-ops/dev-loop.html", order: 2 },
+    { file: "commons/docs/guides/ops-release.md", path: "repo-ops/release.html", order: 3, generated: "facts" },
+    { file: "commons/docs/guides/ops-repoctl.md", path: "repo-ops/repoctl.html", order: 4, generated: "verbs" },
+  ],
+});
 
 /** The libraries of commons: each folder with a manifest (`library.ts`), a `package.json` and an `about.ts`, in order of name. */
 const libraryNames: readonly string[] = readdirSync(new URL("./", import.meta.url), { withFileTypes: true })
@@ -308,7 +388,7 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/integrations-identity/spec-kit" },
   ],
   citations: { prefix: "commons", digits: 4, text: ["erga", "archon", "stolos", "thyra"] },
-  lenses: [guides, releases, dataModels, programs],
+  lenses: [guides, releases, dataModels, programs, repoOps],
   lintRules: "commons/lint/src/rules",
   retired: ["SQL Aide", "sql-aide", "File Aide", "IFRFS"],
   forbiddenInGuides: ["formerly", "previously", "legacy", "deprecated", "replaces", "replaced", "migration", "backward", "backwards", "acceptance test", "history", "no longer"],

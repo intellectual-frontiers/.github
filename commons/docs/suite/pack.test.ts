@@ -15,7 +15,7 @@ proves(["0001-docs FR-004", "0001-docs FR-003"], "the package is packed with com
   const m = p.manifest as { name: string; license: string; bin: Record<string, string>; exports: Record<string, { types: string; default: string }>; dependencies: Record<string, string>; files: string[] };
   assertEquals([m.name, m.license], ["@intellectual-frontiers/docs", "PolyForm-Noncommercial-1.0.0"]);
   assertEquals(m.bin, { "ifc-docs": "./ifc-docs.mjs" });
-  assertEquals(Object.keys(m.exports), [".", "./lens/layered", "./lens/program", "./lens/guides", "./lens/releases"]);
+  assertEquals(Object.keys(m.exports), [".", "./lens/layered", "./lens/program", "./lens/guides", "./lens/releases", "./lens/repo-ops"]);
   for (const dep of ["typescript", "shiki", "beautiful-mermaid", "@intellectual-frontiers/core", "@intellectual-frontiers/system"]) assert(dep in m.dependencies, `${dep} is a dependency`);
   assertEquals(m.dependencies["typescript"], "7.1.0-beta");
   assert(Object.values(m.dependencies).every((v) => !v.startsWith("link:") && !v.startsWith("file:")), "every dependency is a version of npm");

@@ -18,7 +18,7 @@ proves(["0011-documentation FR-032", "0011-documentation FR-039"], "a guide that
   make(b, 10);
   assertEquals(b.pages.length, 0);
   assertEquals(b.found.map((f) => f.problem.kind), ["undescribed"]);
-  assertEquals(SECTIONS.map((s) => s.section), ["start", "concepts", "overview", "howto", "specs", "api", "models", "programs", "quality"]);
+  assertEquals(SECTIONS.map((s) => s.section), ["start", "concepts", "overview", "howto", "specs", "api", "models", "programs", "quality", "repoops"]);
 });
 
 proves(["0011-documentation FR-032", "0011-documentation FR-033"], "commons' site has the guides of every section with their citations and links resolved to pages, and a library map that names what each library imports", async () => {

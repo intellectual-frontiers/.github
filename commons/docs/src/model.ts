@@ -92,10 +92,10 @@ export type Block =
   | { readonly kind: "tree"; readonly nodes: readonly TreeNode[] };
 
 /** The sections of the site (commons 0011-documentation FR-009 and FR-032): the guides, the concepts, the libraries, the how-to pages, and the reference (specifications, API and models). */
-export type Section = "start" | "concepts" | "overview" | "howto" | "specs" | "api" | "models" | "programs" | "quality";
+export type Section = "start" | "concepts" | "overview" | "howto" | "specs" | "api" | "models" | "programs" | "quality" | "repoops";
 
 /** Every section, for what names one (a volume of a book selects pages by section). */
-export const ALL_SECTIONS: readonly Section[] = ["start", "concepts", "overview", "howto", "specs", "api", "models", "programs", "quality"];
+export const ALL_SECTIONS: readonly Section[] = ["start", "concepts", "overview", "howto", "specs", "api", "models", "programs", "quality", "repoops"];
 
 /** A page: where it is, what it is called, which section and group of the navigation it is in, and its blocks. */
 export interface Page {

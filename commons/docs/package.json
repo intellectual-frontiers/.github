@@ -15,7 +15,8 @@
     "./lens/layered": "./src/lens/layered.ts",
     "./lens/program": "./src/lens/program.ts",
     "./lens/guides": "./src/lens/guides.ts",
-    "./lens/releases": "./src/lens/releases.ts"
+    "./lens/releases": "./src/lens/releases.ts",
+    "./lens/repo-ops": "./src/lens/repo-ops.ts"
   },
   "scripts": {
     "check": "tsc -p tsconfig.json",

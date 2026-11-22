@@ -42,7 +42,7 @@ proves(["0011-documentation FR-001"], "the package's name, exports and command, 
   const pkg: unknown = JSON.parse(read("commons/docs/package.json"));
   const root: unknown = JSON.parse(read("package.json"));
   assertEquals(fieldOf(pkg, "name"), "@intellectual-frontiers/docs");
-  assertEquals(fieldOf(pkg, "exports"), { ".": "./src/mod.ts", "./lens/layered": "./src/lens/layered.ts", "./lens/program": "./src/lens/program.ts", "./lens/guides": "./src/lens/guides.ts", "./lens/releases": "./src/lens/releases.ts" });
+  assertEquals(fieldOf(pkg, "exports"), { ".": "./src/mod.ts", "./lens/layered": "./src/lens/layered.ts", "./lens/program": "./src/lens/program.ts", "./lens/guides": "./src/lens/guides.ts", "./lens/releases": "./src/lens/releases.ts", "./lens/repo-ops": "./src/lens/repo-ops.ts" });
   assertEquals(fieldOf(pkg, "bin"), { "ifc-docs": "./ifc-docs.mjs" });
   const deps = entries(pkg, "dependencies");
   const dev = entries(pkg, "devDependencies");
@@ -74,7 +74,7 @@ const PACKAGES = new Set(["typescript/async", "beautiful-mermaid", "shiki/core",
 /** The grammars and themes of Shiki the highlighter imports one by one. */
 const SHIKI_FILES = /^shiki\/(langs|themes)\/[a-z-]+\.mjs$/;
 /** The libraries lifted out of IFC TypeScript, which the generator imports by package name (0032-libraries-by-concern FR-003). */
-const LIFTED = /^@intellectual-frontiers\/(core(\/about)?|system|test)$|^@intellectual-frontiers\/(libraries\/pack|mizan\/(trace|host\/trace)|lang-sql\/(aide\/text|dialects\/postgres))$/;
+const LIFTED = /^@intellectual-frontiers\/(core(\/about)?|system|test)$|^@intellectual-frontiers\/(libraries\/(pack|distribution)|mizan\/(trace|host\/trace)|lang-sql\/(aide\/text|dialects\/postgres))$/;
 
 proves(["0011-documentation FR-002"], "a file imports the generator and typescript/async; a lens also the libraries' entry points", () => {
   const lensMay = new Set(["docs/src/mod.ts"]);

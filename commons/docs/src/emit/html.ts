@@ -36,6 +36,7 @@ export const SECTIONS: readonly { readonly section: Section; readonly label: str
   { section: "models", label: "Models", home: "models/index.html" },
   { section: "programs", label: "Programs", home: "programs/index.html" },
   { section: "quality", label: "Quality", home: "quality/index.html" },
+  { section: "repoops", label: "Repo Ops", home: "repo-ops/index.html" },
 ];
 
 /** Text made safe for HTML. */
