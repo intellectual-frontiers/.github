@@ -538,7 +538,6 @@ const checkScripts = (shellOnly: boolean): readonly string[] => {
   ];
   const more = [
     "commons/libraries/src/libraries.ts --check",
-    "commons/libraries/src/generate-workflows.ts --check",
     "commons/libraries/src/versions.ts check",
     "commons/libraries/src/versions.ts ledger",
     "commons/mizan/src/integrations/host/import.ts commons/libraries/src/imports/schema-org.import.ts --check --fetch",
@@ -613,6 +612,16 @@ const tests: Workflow = {
           when: "matrix.runtime == 'bun'",
         }),
         run('node --test "tests/*.test.ts"', { name: "The tests on Node 26", when: "matrix.runtime == 'node'" }),
+      ],
+    }),
+    workflows: job({
+      comment: "the workflow files are what the model makes and what GitHub's schema accepts (0038-build-policy FR-002): a fault of the pipeline's own configuration, the one thing here that ends a run red",
+      runsOn: "ubuntu-latest",
+      timeoutMinutes: 10,
+      steps: [
+        checkout(),
+        bun(),
+        run("bun commons/libraries/src/generate-workflows.ts --check", { name: "The workflow files are what the model makes", shell: "bash" }),
       ],
     }),
     windows: job({

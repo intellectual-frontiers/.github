@@ -87,7 +87,6 @@ jobs:
             bun commons/libraries/src/generate-ontology.ts --check
             bun commons/libraries/src/check.ts
             bun commons/libraries/src/libraries.ts --check
-            bun commons/libraries/src/generate-workflows.ts --check
             bun commons/libraries/src/versions.ts check
             bun commons/libraries/src/versions.ts ledger
             bun commons/mizan/src/integrations/host/import.ts commons/libraries/src/imports/schema-org.import.ts --check --fetch
@@ -97,7 +96,6 @@ jobs:
             node commons/libraries/src/generate-ontology.ts --check
             node commons/libraries/src/check.ts
             node commons/libraries/src/libraries.ts --check
-            node commons/libraries/src/generate-workflows.ts --check
             node commons/libraries/src/versions.ts check
             node commons/libraries/src/versions.ts ledger
             node commons/mizan/src/integrations/host/import.ts commons/libraries/src/imports/schema-org.import.ts --check --fetch
@@ -182,6 +180,19 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
         continue-on-error: true
+
+  # the workflow files are what the model makes and what GitHub's schema accepts (0038-build-policy FR-002): a fault of the pipeline's own configuration, the one thing here that ends a run red
+  workflows:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        continue-on-error: true
+      - uses: ./.github/actions/bun
+        continue-on-error: true
+      - name: The workflow files are what the model makes
+        shell: bash
+        run: bun commons/libraries/src/generate-workflows.ts --check
 
   # Windows: what has no shell in it. The generator and the specification checker run on both runtimes; the installers' tests need a POSIX `sh` and a Unix PATH, and
   # `agora-install.ps1` is read by its test on the other systems and is not run by any test (it needs a sign-in to GitHub).
@@ -269,7 +280,7 @@ jobs:
     name: findings
     runs-on: ubuntu-24.04
     timeout-minutes: 10
-    needs: [check, tests, windows, robot]
+    needs: [check, tests, workflows, windows, robot]
     if: "always()"
     permissions:
       contents: write
