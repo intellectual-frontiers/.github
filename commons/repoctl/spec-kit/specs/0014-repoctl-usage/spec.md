@@ -1,6 +1,6 @@
 # Feature Specification: What a consumer uses of the package
 
-**Spec ID:** 0013-repoctl-usage
+**Spec ID:** 0014-repoctl-usage
 **Status:** Active
 **Owner:** if
 **Domain:** repoctl

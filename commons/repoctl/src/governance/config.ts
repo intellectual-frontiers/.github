@@ -106,6 +106,8 @@ export type Capabilities = {
   readonly newLibrary: boolean;
   /** `query`: questions of the libraries, specifications and requirements in SQL. */
   readonly query: boolean;
+  /** `ci step`: one step of a pipeline under the build policy, its findings kept and its status never red (commons 0038-build-policy). */
+  readonly ci: boolean;
   /** `status` of the packages. */
   readonly status: boolean;
   /** `prove`, the proof of a change by its blast radius. */
@@ -171,7 +173,7 @@ export type ConfigInput = {
 };
 
 /** The names of the optional verbs a configuration turns on with a flag. */
-export const CAPABILITY_NAMES: readonly (keyof Capabilities)[] = ["release", "newLibrary", "status", "prove", "query"];
+export const CAPABILITY_NAMES: readonly (keyof Capabilities)[] = ["release", "newLibrary", "status", "prove", "query", "ci"];
 
 /** The name of the file a repository keeps its configuration in, at its root. */
 export const CONFIG_FILE = "repoctl.config.ts";
@@ -315,8 +317,8 @@ export function parseConfig(input: ConfigInput): Result<Config, readonly string[
   }
   if (!dedupe(checks.map((k) => k.id))) bad("checks: an id is used twice");
 
-  const capabilities: Capabilities = { release: false, newLibrary: false, status: false, prove: false, query: false, ...input.capabilities };
-  const needsLibraries = CAPABILITY_NAMES.filter((name) => capabilities[name]);
+  const capabilities: Capabilities = { release: false, newLibrary: false, status: false, prove: false, query: false, ci: false, ...input.capabilities };
+  const needsLibraries = CAPABILITY_NAMES.filter((name) => name !== "ci" && capabilities[name]);
   const libraries: LibrariesSettings | undefined =
     input.libraries === undefined ? undefined : { folder: input.libraries.folder, specKit: input.libraries.specKit, versionConstants: input.libraries.versionConstants ?? false, declaredDependencies: input.libraries.declaredDependencies ?? false, linker: input.libraries.linker, roleFile: input.libraries.roleFile, docsFile: input.libraries.docsFile };
   if (libraries === undefined && needsLibraries.length > 0) bad(`capabilities ${needsLibraries.join(", ")} need libraries: { folder }, the folder of the library manifests`);
@@ -358,6 +360,9 @@ export function enabledVerbs(config: Config): readonly VerbId[] {
         return;
       case "query":
         out.push("query");
+        return;
+      case "ci":
+        out.push("ci step");
         return;
       default:
         absurd(name);

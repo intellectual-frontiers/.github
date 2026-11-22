@@ -1,6 +1,6 @@
-// Spec: 0013-repoctl-usage FR-001, FR-002, FR-004, FR-005
+// Spec: 0014-repoctl-usage FR-001, FR-002, FR-004, FR-005
 /**
- * `repoctl usage` on Headless (commons repoctl 0013-repoctl-usage): what a repository uses of the package `@intellectual-frontiers/commons`, read from its own files and from the sources of the installed package, as a table or as JSON. It reads through the world's ports and
+ * `repoctl usage` on Headless (commons repoctl 0014-repoctl-usage): what a repository uses of the package `@intellectual-frontiers/commons`, read from its own files and from the sources of the installed package, as a table or as JSON. It reads through the world's ports and
  * changes nothing.
  *
  * @example

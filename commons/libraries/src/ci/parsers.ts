@@ -65,10 +65,21 @@ function lint(out: string): readonly Draft[] {
   const drafts: Draft[] = [];
   const lines = out.split("\n");
   for (let i = 0; i < lines.length; i++) {
+    // the linter's XML-like report (a terminal that is not a pipeline's)
     const m = /^<(error|warning) file="([^"]*)" line="(\d+)" column="\d+" rule="([^"]*)"[^>]*>$/.exec(lines[i] ?? "");
-    if (m === null) continue;
-    const message = (lines[i + 1] ?? "").trim();
-    drafts.push({ code: m[4] ?? "lint", file: m[2] ?? "", line: Number(m[3]), severity: m[1] === "warning" ? "warning" : "error", message, key: `${m[4]}:${message}` });
+    if (m !== null) {
+      const message = (lines[i + 1] ?? "").trim();
+      drafts.push({ code: m[4] ?? "lint", file: m[2] ?? "", line: Number(m[3]), severity: m[1] === "warning" ? "warning" : "error", message, key: `${m[4]}:${message}` });
+      continue;
+    }
+    // the linter's report in a pipeline's log: `error: message  rule` and, under the code that is quoted, `    at file:line:column`
+    const c = /^(error|warning): (.*?)\s{2,}(@?[\w/-]+)$/.exec(lines[i] ?? "");
+    if (c === null) continue;
+    let at: RegExpExecArray | null = null;
+    for (let j = i + 1; j < Math.min(i + 4, lines.length) && at === null; j++) at = /^\s+at (\S+?):(\d+):(\d+)$/.exec(lines[j] ?? "");
+    // the quoted code (the line above the marker) tells two findings of one rule in one file apart without a line number
+    const quoted = /^\s*\d+ \| (.*)$/.exec(lines[i - 2] ?? "")?.[1]?.trim() ?? "";
+    drafts.push({ code: c[3] ?? "lint", ...(at === null ? {} : { file: at[1] ?? "", line: Number(at[2]) }), severity: c[1] === "warning" ? "warning" : "error", message: c[2] ?? "", key: `${c[3]}:${c[2]}:${quoted}` });
   }
   return drafts;
 }

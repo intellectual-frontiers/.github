@@ -1,6 +1,6 @@
-// Spec: 0013-repoctl-usage FR-001, FR-002, FR-003, FR-004
+// Spec: 0014-repoctl-usage FR-001, FR-002, FR-003, FR-004
 /**
- * What a consumer uses of the package `@intellectual-frontiers/commons` (commons repoctl 0013-repoctl-usage; commons 0036-distribution FR-034): the libraries a repository imports and with which subpaths, read from its own files; the graph of the package, read from the sources
+ * What a consumer uses of the package `@intellectual-frontiers/commons` (commons repoctl 0014-repoctl-usage; commons 0036-distribution FR-034): the libraries a repository imports and with which subpaths, read from its own files; the graph of the package, read from the sources
  * of the installed copy (which library imports which, the files and bytes of each); and the answer, a pure function of the two: the libraries imported directly, those reached only through the imports of those, and those never touched, with their sizes.
  *
  * @remarks

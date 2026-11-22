@@ -72,7 +72,7 @@ export function configInput(extra: Partial<ConfigInput> = {}): ConfigInput {
   return {
     repo: "fixture",
     commit: { identity: TEST_IDENTITY, issue: { prefix: "Refs #", required: false }, trailers: ["issue", "co-author", "session"], coAuthor: TEST_CO_AUTHOR },
-    capabilities: { release: true, newLibrary: true, status: true, prove: true, query: true },
+    capabilities: { release: true, newLibrary: true, status: true, prove: true, query: true, ci: true },
     libraries: { folder: "commons" },
     docs: {},
     hygiene: { scope: "@family/", gitSources: ["family/platform"], pathSegment: "platform", sourceMarker: "platform/marker.ts" },

@@ -25,6 +25,7 @@ import { checkVerb, doctorVerb, hygieneVerb, statusVerb } from "./verbs/check.ts
 import { docsBuildVerb, docsCheckVerb, docsServeVerb } from "./verbs/docs.ts";
 import { commitVerb, newLibraryVerb } from "./verbs/library.ts";
 import { proveVerb } from "./verbs/prove.ts";
+import { ciStepVerb } from "./verbs/ci.ts";
 import { queryVerb } from "./verbs/query.ts";
 import { usageVerb } from "./verbs/usage.ts";
 import { releaseApplyVerb, releasePlanVerb, releasePublishVerb } from "./verbs/releasing.ts";
@@ -57,6 +58,7 @@ export function repoctlProgram(host: Host): Program {
     ...(on.prove ? [proveVerb(host)] : []),
     ...(on.query ? [queryVerb(host)] : []),
     usageVerb(host),
+    ...(on.ci ? [branch({ name: "ci", summary: "Steps of a pipeline under the build policy: findings, never failures.", children: [ciStepVerb(host)] })] : []),
     ...(host.config.docs === undefined ? [] : [branch({ name: "docs", summary: "Build, check and serve the documentation site with the documentation generator.", children: [docsBuildVerb(host), docsCheckVerb(host), docsServeVerb(host)] })]),
   ];
   const mcp = command({

@@ -1,5 +1,5 @@
 /**
- * `repoctl usage` (commons repoctl 0013-repoctl-usage): the imports of a consumer read from its files, the graph of the installed package read from its sources, and the answer: the libraries imported directly, those reached through them and those never touched, with their sizes.
+ * `repoctl usage` (commons repoctl 0014-repoctl-usage): the imports of a consumer read from its files, the graph of the installed package read from its sources, and the answer: the libraries imported directly, those reached through them and those never touched, with their sizes.
  *
  * @module
  */
@@ -11,7 +11,7 @@ import { execute, hostOf } from "./world.ts";
 
 const PKG = "@intellectual-frontiers/commons";
 
-proves(["0013-repoctl-usage FR-001"], "the libraries a file imports are read with their subpaths; the bare package, a string that is no import of a library and another package are left out", () => {
+proves(["0014-repoctl-usage FR-001"], "the libraries a file imports are read with their subpaths; the bare package, a string that is no import of a library and another package are left out", () => {
   const text = [
     `import { ok } from "${PKG}/core";`,
     `import { sha256 } from '${PKG}/crypto/sha256';`,
@@ -27,7 +27,7 @@ proves(["0013-repoctl-usage FR-001"], "the libraries a file imports are read wit
   ]);
 });
 
-proves(["0013-repoctl-usage FR-002"], "the libraries a source imports are read as the package writes them and as a library of the repository writes them, and never the library itself or a name the package does not hold", () => {
+proves(["0014-repoctl-usage FR-002"], "the libraries a source imports are read as the package writes them and as a library of the repository writes them, and never the library itself or a name the package does not hold", () => {
   const known = new Set(["core", "crypto", "grc"]);
   const text = `import { a } from "${PKG}/core";\nimport { b } from "@intellectual-frontiers/crypto/sha256";\nimport { c } from "@intellectual-frontiers/grc";\nimport { d } from "@intellectual-frontiers/nowhere";`;
   assertEquals(libraryImports(text, "grc", PKG, known), ["core", "crypto"]);
@@ -41,7 +41,7 @@ const graph: readonly PackageLibrary[] = [
   { name: "unused", imports: [], files: 1, bytes: 25 },
 ];
 
-proves(["0013-repoctl-usage FR-003", "0013-repoctl-usage FR-004"], "the libraries are the imported ones, the reached ones with the library through which each is reached first, and the ones never touched, with their bytes, the same for the same inputs; a library the package does not hold is a finding and is not counted", () => {
+proves(["0014-repoctl-usage FR-003", "0014-repoctl-usage FR-004"], "the libraries are the imported ones, the reached ones with the library through which each is reached first, and the ones never touched, with their bytes, the same for the same inputs; a library the package does not hold is a finding and is not counted", () => {
   const imports = [
     { library: "grc", subpath: undefined, file: "b.ts" },
     { library: "grc", subpath: "governance", file: "a.ts" },
@@ -94,7 +94,7 @@ const world = (files: ReadonlyMap<string, string>): World => ({
 });
 void under;
 
-proves(["0013-repoctl-usage FR-005", "0013-repoctl-usage FR-002", "0013-repoctl-usage FR-004"], "the verb is declared once, public and read-only, reads the consumer's code files and the installed package, answers as a table and as JSON, names an import the package does not hold, and ends with an environment problem where the package is not installed", async () => {
+proves(["0014-repoctl-usage FR-005", "0014-repoctl-usage FR-002", "0014-repoctl-usage FR-004"], "the verb is declared once, public and read-only, reads the consumer's code files and the installed package, answers as a table and as JSON, names an import the package does not hold, and ends with an environment problem where the package is not installed", async () => {
   assert(verbIds().includes("usage") && VERBS["usage"].effect === "read" && VERBS["usage"].tier === "public");
   const host = hostOf(world(FILES), { config: { capabilities: { query: false }, libraries: { folder: "commons" } } });
   const table = await execute(host, ["usage"]);
