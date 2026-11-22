@@ -43,6 +43,13 @@ export type VerbId =
   | "mirror status"
   | "mirror sync"
   | "mirror promote"
+  | "serve"
+  | "keygen"
+  | "roster show"
+  | "roster add"
+  | "roster publish"
+  | "roster fetch"
+  | "roster rotate"
   | "places"
   | "doctor";
 
@@ -71,6 +78,9 @@ const report = (id: VerbId, summary: string): VerbFacts => ({ id, summary, kind:
 const change = (id: VerbId, summary: string, idempotent: boolean): VerbFacts => ({ id, summary, kind: "action", effect: "mutate", idempotent, dryRun: true, tier: "writer", channels: CHANGE, confirmation: "none" });
 const destroy = (id: VerbId, summary: string): VerbFacts => ({ id, summary, kind: "action", effect: "destructive", idempotent: false, dryRun: true, tier: "writer", channels: CHANGE, confirmation: "flag" });
 
+/** The verbs that come through the command line only: they open a listener or hold, make or change keys, which a tool server never does for an agent. */
+export const LOCAL_ONLY_VERBS: readonly VerbId[] = ["serve", "keygen", "roster add", "roster publish", "roster fetch", "roster rotate"];
+
 /** Every verb, by its words: a registry the compiler holds complete. */
 export const VERBS: Readonly<Record<VerbId, VerbFacts>> = {
   ls: report("ls", "List what is in a directory of a store, or say what a file is."),
@@ -98,13 +108,20 @@ export const VERBS: Readonly<Record<VerbId, VerbFacts>> = {
   "mirror status": report("mirror status", "Say whether a replica is in sync with its primary, behind it, or has diverged."),
   "mirror sync": destroy("mirror sync", "Bring a replica to its primary, never touching what the replica changed itself."),
   "mirror promote": destroy("mirror promote", "Make a replica the primary, saying what that loses."),
+  serve: { id: "serve", summary: "Serve a place of a store as WebDAV on this computer, so that an operating system mounts it: it listens on the loopback with a token it prints to standard error, until it is stopped.", kind: "action", effect: "mutate", idempotent: false, dryRun: true, tier: "writer", channels: ["local"], confirmation: "none" },
+  keygen: { id: "keygen", summary: "Make the signing key of a replica: the key goes to a file for its owner only and is never printed, and the entry for the roster is printed.", kind: "action", effect: "mutate", idempotent: false, dryRun: true, tier: "writer", channels: ["local"], confirmation: "none" },
+  "roster show": report("roster show", "Say each key of a roster file, the replica it speaks for and whether it speaks now."),
+  "roster add": { id: "roster add", summary: "Add the public keys of files (rosters, entries, signing keys) to a roster file.", kind: "action", effect: "mutate", idempotent: true, dryRun: true, tier: "writer", channels: ["local"], confirmation: "none" },
+  "roster publish": { id: "roster publish", summary: "Write a roster, public keys only, to a file of a store so that the others can fetch it.", kind: "action", effect: "mutate", idempotent: true, dryRun: true, tier: "writer", channels: ["local"], confirmation: "none" },
+  "roster fetch": { id: "roster fetch", summary: "Read a roster from a store and take in only the new keys whose ids were accepted by name; show the others.", kind: "action", effect: "mutate", idempotent: true, dryRun: true, tier: "writer", channels: ["local"], confirmation: "none" },
+  "roster rotate": { id: "roster rotate", summary: "Replace a key: make a new key for the same replica, end the old one at an instant and start the new one after it.", kind: "action", effect: "mutate", idempotent: false, dryRun: true, tier: "writer", channels: ["local"], confirmation: "none" },
   places: report("places", "List the mounts of the configuration with their places, and what each kind of place is today."),
   doctor: report("doctor", "Say what is wrong with this computer's setup for the program, and the command for each."),
 };
 
 /** The ids of the verbs, in the order they are listed. */
 export const VERB_IDS: readonly VerbId[] = [
-  "ls", "cat", "stat", "head", "tail", "find", "du", "tree", "grep", "diff", "sha256sum", "put", "mkdir", "touch", "cp", "mv", "rm", "sync", "bisync", "merge", "sync-medium", "check", "mirror status", "mirror sync", "mirror promote", "places", "doctor",
+  "ls", "cat", "stat", "head", "tail", "find", "du", "tree", "grep", "diff", "sha256sum", "put", "mkdir", "touch", "cp", "mv", "rm", "sync", "bisync", "merge", "sync-medium", "check", "mirror status", "mirror sync", "mirror promote", "serve", "keygen", "roster show", "roster add", "roster publish", "roster fetch", "roster rotate", "places", "doctor",
 ];
 
 /** The ids of the verbs, in the order they are listed. */

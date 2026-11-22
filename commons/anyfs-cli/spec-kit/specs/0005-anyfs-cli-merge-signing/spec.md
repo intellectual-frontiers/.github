@@ -21,7 +21,7 @@
 
 ## Out of scope
 
-- A verb that makes keys inside the program, the distribution of rosters, and trust for the mount of a medium.
+- Trust for the mount of a medium. A verb that makes keys, and the distribution of rosters and the rotation of keys, are 0007-anyfs-cli-keys.
 
 ## Edge cases
 

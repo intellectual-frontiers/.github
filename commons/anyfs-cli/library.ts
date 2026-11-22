@@ -18,7 +18,7 @@ export const library = {
   family: { host: "anyfs", role: "plugin" },
   versionConstants: [{ file: "src/governance/version.ts", name: "ANYFS_CLI_VERSION" }],
   summary:
-    "The `anyfs` program: POSIX-style access to any AnyFS store (ls, cat, cp, rm, find, grep, diff) and the bridge verbs (sync, bisync, mirror, check, merge, sync-medium) from the command line, a tool server and a REST description, with every operation saying how it was carried out and every destruction a plan first.",
+    "The `anyfs` program: POSIX-style access to any AnyFS store (ls, cat, cp, rm, find, grep, diff) and the bridge verbs (sync, bisync, mirror, check, merge, sync-medium), `serve` (WebDAV) and the keys of signed merges (keygen, roster) from the command line, a tool server and a REST description, with every operation saying how it was carried out and every destruction a plan first.",
   kanon: {
     package: "@intellectual-frontiers/anyfs-cli",
     extends: "@intellectual-frontiers/anyfs",
@@ -38,7 +38,7 @@ export const library = {
         mayImport: ["src/governance/"],
         packages: [
           { name: "@intellectual-frontiers/core", subpaths: [] },
-          { name: "@intellectual-frontiers/anyfs", subpaths: ["governance", "logical"] },
+          { name: "@intellectual-frontiers/anyfs", subpaths: ["governance", "logical", "merge"] },
           { name: "@intellectual-frontiers/anyfs-bridge", subpaths: ["governance", "logical"] },
           { name: "@intellectual-frontiers/anyfs-posix", subpaths: ["governance", "logical"] },
           { name: "@intellectual-frontiers/headless", subpaths: ["governance", "logical"] },
@@ -54,6 +54,7 @@ export const library = {
           { name: "@intellectual-frontiers/anyfs-bridge", subpaths: "any" },
           { name: "@intellectual-frontiers/anyfs-posix", subpaths: "any" },
           { name: "@intellectual-frontiers/anyfs-ssh", subpaths: "any" },
+          { name: "@intellectual-frontiers/anyfs-serve", subpaths: ["governance", "physical"] },
           { name: "@intellectual-frontiers/headless", subpaths: "any" },
           { name: "@intellectual-frontiers/terminal", subpaths: ["args", "commands"] },
           { name: "@intellectual-frontiers/crypto", subpaths: ["sha256"] },

@@ -12,3 +12,5 @@ export * from "./ids.ts";
 export * from "./actor.ts";
 export * from "./event.ts";
 export * from "./item.ts";
+export * from "./observation.ts";
+export * from "./patch.ts";

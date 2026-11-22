@@ -16,7 +16,7 @@ export const library = {
   exports: [".", "./governance", "./logical", "./physical"],
   family: { host: "anyfs", role: "plugin" },
   summary:
-    "AnyFS over HTTP: any AnyFS store served as WebDAV, class 1 and 2, on the POSIX view, so an operating system mounts it with no kernel module, and every response says whether it was native, emulated or refused.",
+    "AnyFS over HTTP and NFS: any AnyFS store served as WebDAV, class 1 and 2, or as NFS version 3 on the loopback, on the POSIX view, so an operating system mounts it, and every response says whether it was native, emulated or refused.",
   kanon: {
     package: "@intellectual-frontiers/anyfs-serve",
     extends: "@intellectual-frontiers/anyfs",
@@ -38,7 +38,7 @@ export const library = {
           { name: "@intellectual-frontiers/core", subpaths: [] },
           { name: "@intellectual-frontiers/crypto", subpaths: ["sha256"] },
           { name: "@intellectual-frontiers/anyfs", subpaths: ["governance", "logical"] },
-          { name: "@intellectual-frontiers/anyfs-posix", subpaths: ["governance", "physical"] },
+          { name: "@intellectual-frontiers/anyfs-posix", subpaths: ["governance", "logical", "physical"] },
         ],
       },
       {
@@ -48,8 +48,8 @@ export const library = {
         packages: [
           { name: "@intellectual-frontiers/core", subpaths: [] },
           { name: "@intellectual-frontiers/anyfs", subpaths: ["governance", "logical"] },
-          { name: "@intellectual-frontiers/anyfs-posix", subpaths: ["physical"] },
-          { name: "@intellectual-frontiers/net", subpaths: ["serve"] },
+          { name: "@intellectual-frontiers/anyfs-posix", subpaths: ["governance", "physical"] },
+          { name: "@intellectual-frontiers/net", subpaths: ["serve", "tcp"] },
         ],
       },
       { folder: "src/", own: true },

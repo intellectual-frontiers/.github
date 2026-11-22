@@ -20,7 +20,7 @@ import { dirsOf } from "@intellectual-frontiers/system/dirs";
 import { mkdir, readFile, readTextFile, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { dirname, join, parse, resolve, sep } from "@intellectual-frontiers/system/path";
 import { cwd as workingFolder, env as processEnv } from "@intellectual-frontiers/system/proc";
-import { stdin, stdout } from "@intellectual-frontiers/system/stdio";
+import { stderr, stdin, stdout } from "@intellectual-frontiers/system/stdio";
 import { type Config, type LocalPlace, type OpenProblem, type World } from "@intellectual-frontiers/anyfs-cli/logical";
 import { builtinKinds } from "./openers.ts";
 import { osOf } from "./os.ts";
@@ -45,6 +45,9 @@ export type WorldOptions = {
   readonly run?: RunLocal;
   readonly readStdin?: () => Promise<Uint8Array>;
   readonly writeStdout?: (bytes: Uint8Array) => void;
+  /** Where a notice to the person goes (standard error by default). */
+  readonly notice?: (text: string) => void;
+  readonly stop?: AbortSignal;
 };
 
 /** The state folder of the program for an environment. */
@@ -83,6 +86,8 @@ export function systemWorld(o: WorldOptions): World {
     local: (path) => localPlace(o.cwd, path, osOf()),
     readStdin: o.readStdin ?? (() => stdin.bytes()),
     writeStdout: o.writeStdout ?? ((bytes) => void stdout.writeSync(bytes)),
+    notice: o.notice ?? ((text) => void stderr.writeSync(`${text}\n`)),
+    ...(o.stop === undefined ? {} : { stop: o.stop }),
     readLocalFile: async (path) => {
       try {
         return ok(await readFile(resolve(o.cwd, path)));

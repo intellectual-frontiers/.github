@@ -5,3 +5,4 @@
  * @module
  */
 export * from "./serve.ts";
+export * from "./nfs.ts";

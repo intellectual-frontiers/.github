@@ -7,7 +7,7 @@
 import { defineAction } from "@intellectual-frontiers/headless/governance";
 import { actionProblems } from "@intellectual-frontiers/headless/governance";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { CATALOGUE, isProblemCode, LADDER, parseLocation, parseMountName, PROBLEM_CODES, TIER_IDS, TIERS, tierOf, VERB_IDS, VERBS, verbIds } from "../src/governance/mod.ts";
+import { CATALOGUE, LOCAL_ONLY_VERBS, isProblemCode, LADDER, parseLocation, parseMountName, PROBLEM_CODES, TIER_IDS, TIERS, tierOf, VERB_IDS, VERBS, verbIds } from "../src/governance/mod.ts";
 
 proves(["0002-anyfs-cli-governance FR-001"], "every verb has one entry and every entry one verb", () => {
   assertEquals([...verbIds()].sort(), Object.keys(VERBS).sort());
@@ -15,12 +15,12 @@ proves(["0002-anyfs-cli-governance FR-001"], "every verb has one entry and every
   for (const id of VERB_IDS) assertEquals(VERBS[id].id, id);
 });
 
-proves(["0002-anyfs-cli-governance FR-002"], "the facts of no verb contradict each other by the rules of Headless, and a verb that changes anything comes through local and mcp only", () => {
+proves(["0002-anyfs-cli-governance FR-002"], "the facts of no verb contradict each other by the rules of Headless, and a verb that changes anything comes through local and mcp only, but a server of files only through local", () => {
   for (const id of VERB_IDS) {
     const f = VERBS[id];
     const facts = defineAction({ id, summary: f.summary, kind: f.kind, effect: f.effect, idempotent: f.idempotent, dryRun: f.dryRun, tier: TIERS[f.tier], humanOnly: [] });
     assertEquals(actionProblems(facts), [], id);
-    if (f.effect !== "read") assertEquals([...f.channels], ["local", "mcp"], id);
+    if (f.effect !== "read") assertEquals([...f.channels], LOCAL_ONLY_VERBS.includes(id) ? ["local"] : ["local", "mcp"], id);
     if (f.effect === "destructive") assert(f.confirmation !== "none", `${id} is confirmed`);
   }
 });

@@ -70,7 +70,7 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/anyfs-posix`](commons/anyfs-posix) | Foundation | The POSIX view of any AnyFS store | layers, extension | L1 | not released (unfinished) |
 | [`@intellectual-frontiers/anyfs-query`](commons/anyfs-query) | Foundation | Read-only SQL over the files, places, revisions and content of any AnyFS store | layers, extension | L1 | not released (unfinished) |
 | [`@intellectual-frontiers/anyfs-s3`](commons/anyfs-s3) | Foundation | The S3 backend of AnyFS: a store over a bucket and a prefix of any S3-compatible service | layers, extension | L1 | not released (unfinished) |
-| [`@intellectual-frontiers/anyfs-serve`](commons/anyfs-serve) | Foundation | AnyFS over HTTP: any AnyFS store served as WebDAV | layers, extension | L1 | not released (unfinished) |
+| [`@intellectual-frontiers/anyfs-serve`](commons/anyfs-serve) | Foundation | AnyFS over HTTP and NFS: any AnyFS store served as WebDAV | layers, extension | L1 | not released (unfinished) |
 | [`@intellectual-frontiers/anyfs-sql`](commons/anyfs-sql) | Foundation | A SQLite database kept as an AnyFS store that merges by nature | layers, extension | L1 | not released (unfinished) |
 | [`@intellectual-frontiers/anyfs-ssh`](commons/anyfs-ssh) | Foundation | The SSH backend of AnyFS: a store over a folder on a host reached by SSH | layers, extension | L1 | not released (unfinished) |
 | [`@intellectual-frontiers/core`](https://www.npmjs.com/package/@intellectual-frontiers/core) | Foundation | Errors as values (`Result`) | - | L1 | GitHub, npm |
@@ -91,7 +91,7 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/planning`](https://www.npmjs.com/package/@intellectual-frontiers/planning) | Pattern | Planning content from many places as one item each with one stable id | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/posture-report`](commons/posture-report) | Pattern | A read-only static report site for a compliance posture | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/tenancy`](commons/tenancy) | Pattern | Tenancy for service providers | layers | L1 | not released (owner-blocked) |
-| [`@intellectual-frontiers/anyfs-cli`](commons/anyfs-cli) | Program | The `anyfs` program: POSIX-style access to any AnyFS store (ls, cat, cp, rm, find, grep, diff) and the bridge verbs (sync, bisync, mirror, check, merge, sync-medium) from the command line | layers, extension | L1 | not released (unfinished) |
+| [`@intellectual-frontiers/anyfs-cli`](commons/anyfs-cli) | Program | The `anyfs` program: POSIX-style access to any AnyFS store (ls, cat, cp, rm, find, grep, diff) and the bridge verbs (sync, bisync, mirror, check, merge, sync-medium) | layers, extension | L1 | not released (unfinished) |
 | [`@intellectual-frontiers/archon`](https://www.npmjs.com/package/@intellectual-frontiers/archon) | Program | A Kanon library that orders subjects: a machine, a device, a workstation or a cloud account | layers, instances, plugins | L1 | GitHub, npm |
 | [`@intellectual-frontiers/archon-boot`](commons/archon-boot) | Program | The plugin that gives `archon` its verbs for the network install | layers, extension | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/archon-converge`](commons/archon-converge) | Program | The plugin that gives `archon` its verbs for convergence | layers, extension | L1 | not released (owner-blocked) |

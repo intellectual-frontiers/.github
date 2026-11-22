@@ -14,3 +14,4 @@ export * from "./grep.ts";
 export * from "./trail.ts";
 export * from "./outcomes.ts";
 export * from "./plans.ts";
+export * from "./roster.ts";

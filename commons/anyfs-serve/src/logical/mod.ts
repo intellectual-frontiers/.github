@@ -12,3 +12,6 @@ export * from "./ifheader.ts";
 export * from "./props.ts";
 export * from "./respond.ts";
 export * from "./handler.ts";
+export * from "./xdr.ts";
+export * from "./rpc.ts";
+export * from "./nfs3.ts";

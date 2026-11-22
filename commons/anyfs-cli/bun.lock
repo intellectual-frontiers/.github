@@ -8,6 +8,7 @@
         "@intellectual-frontiers/anyfs": "link:../anyfs",
         "@intellectual-frontiers/anyfs-bridge": "link:../anyfs-bridge",
         "@intellectual-frontiers/anyfs-posix": "link:../anyfs-posix",
+        "@intellectual-frontiers/anyfs-serve": "link:../anyfs-serve",
         "@intellectual-frontiers/anyfs-ssh": "link:../anyfs-ssh",
         "@intellectual-frontiers/core": "link:../core",
         "@intellectual-frontiers/crypto": "link:../crypto",
@@ -30,6 +31,8 @@
     "@intellectual-frontiers/anyfs-bridge": ["@intellectual-frontiers/anyfs-bridge@link:../anyfs-bridge", {}],
 
     "@intellectual-frontiers/anyfs-posix": ["@intellectual-frontiers/anyfs-posix@link:../anyfs-posix", {}],
+
+    "@intellectual-frontiers/anyfs-serve": ["@intellectual-frontiers/anyfs-serve@link:../anyfs-serve", {}],
 
     "@intellectual-frontiers/anyfs-ssh": ["@intellectual-frontiers/anyfs-ssh@link:../anyfs-ssh", {}],
 
