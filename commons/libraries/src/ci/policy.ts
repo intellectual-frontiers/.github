@@ -68,33 +68,38 @@ export const APPROVERS: readonly string[] = ["shah"];
 /** The longest an acceptance may last, in days (0038-build-policy FR-008). */
 export const ACCEPTANCE_MAX_DAYS = 366;
 
-/** The decision the release is under (0038-build-policy FR-010): publish whatever is open until a day, then hold per library for an open finding of severity `error` that is not accepted; `reviewedOn` is the day the owner reviewed it, and the finding `owner-review-due` is kept until it is set. */
+/** A hold the owner recorded (0038-build-policy FR-010): `by` is a login of `APPROVERS`, `on` the first day it holds, `mode` what it holds by. Only the owner decides a hold; an agent never records one. */
+export type RecordedDecision = { readonly by: string; readonly on: string; readonly mode: "hold-critical" };
+
+/** The decision the release is under (0038-build-policy FR-010): publish whatever is open, on every day, unless the owner recorded a hold; `until` is the day after which the finding `owner-review-due` asks the owner again, and `reviewedOn` the day the owner reviewed the policy. */
 export type ReleasePolicy = {
   readonly mode: "publish-regardless";
   readonly until: string;
-  readonly then: { readonly mode: "hold-critical"; readonly from: string };
   readonly reviewedOn?: string;
+  readonly decision?: RecordedDecision;
 };
 
-/** The release policy (decided by the owner on 2026-11-22): until 2027-01-31 a library is released whatever its open findings are; from 2027-02-01 a library with an open, not accepted finding of severity `error` is held and the owner is asked again. */
-export const RELEASE_POLICY: ReleasePolicy = { mode: "publish-regardless", until: "2027-01-31", then: { mode: "hold-critical", from: "2027-02-01" } };
+/** The release policy (decided by the owner on 2026-11-22): publish whatever is open; a hold, of a library or of the package, is a serious decision and only ever the owner's; until 2027-01-31 the owner holds nothing by default, and from 2027-02-01 the finding `owner-review-due` asks again. No decision is recorded. */
+export const RELEASE_POLICY: ReleasePolicy = { mode: "publish-regardless", until: "2027-01-31" };
 
 /** The finding the owner must see where the policy has run out and has not been reviewed. */
 export type OwnerReview = { readonly tool: "policy"; readonly code: "owner-review-due"; readonly severity: "error"; readonly module: "repository"; readonly message: string };
 
-/** What the release may do on a day: always proceed, by one of two modes, with the finding the owner must see where the first mode has ended and has not been reviewed. */
+/** What the release may do on a day: always proceed from the gate's side; by one of two modes (the second only by a decision of the owner), with the finding the owner must see where the policy has run out and has not been reviewed, and the refusal of a decision that is not the owner's. */
 export type ReleaseDecision =
-  | { readonly proceed: true; readonly mode: "publish-regardless"; readonly reportOpenFindings: true; readonly until: string }
-  | { readonly proceed: true; readonly mode: "hold-critical"; readonly from: string; readonly ownerReview: OwnerReview | undefined };
+  | { readonly proceed: true; readonly mode: "publish-regardless"; readonly reportOpenFindings: true; readonly until: string; readonly ownerReview: OwnerReview | undefined; readonly refused: string | undefined }
+  | { readonly proceed: true; readonly mode: "hold-critical"; readonly from: string; readonly by: string; readonly ownerReview: undefined; readonly refused: undefined };
 
-/** The decision of the release on a day (`YYYY-MM-DD`) (0038-build-policy FR-010). */
+/** The decision of the release on a day (`YYYY-MM-DD`) (0038-build-policy FR-010): never a hold of its own; a hold only from the day of a recorded decision whose `by` is an approver. */
 export function releaseDecision(day: string, policy: ReleasePolicy = RELEASE_POLICY): ReleaseDecision {
-  if (day <= policy.until) return { proceed: true, mode: "publish-regardless", reportOpenFindings: true, until: policy.until };
-  const ownerReview: OwnerReview | undefined =
-    policy.reviewedOn !== undefined
-      ? undefined
-      : { tool: "policy", code: "owner-review-due", severity: "error", module: "repository", message: `the release policy "${policy.mode}" ended on ${policy.until}: from ${policy.then.from} a library with an open finding of severity error that is not accepted is held; the owner decides again` };
-  return { proceed: true, mode: "hold-critical", from: policy.then.from, ownerReview };
+  const d = policy.decision;
+  if (d !== undefined && APPROVERS.includes(d.by) && day >= d.on) return { proceed: true, mode: "hold-critical", from: d.on, by: d.by, ownerReview: undefined, refused: undefined };
+  const refused = d !== undefined && !APPROVERS.includes(d.by) ? `the decision to hold recorded by ${JSON.stringify(d.by)} is refused: only the owner (${APPROVERS.join(", ")}) decides a hold; nothing is held` : undefined;
+  const due = day > policy.until && policy.reviewedOn === undefined && d === undefined;
+  const ownerReview: OwnerReview | undefined = due
+    ? { tool: "policy", code: "owner-review-due", severity: "error", module: "repository", message: `the release policy "${policy.mode}" ran until ${policy.until}: the owner decides again whether to hold; the gate holds nothing by itself and the release goes on` }
+    : undefined;
+  return { proceed: true, mode: "publish-regardless", reportOpenFindings: true, until: policy.until, ownerReview, refused };
 }
 
 /** The libraries a finding holds under `hold-critical`: those that have an open finding of severity `error` (an accepted one is not open); a finding of the module `repository` holds no library. */
