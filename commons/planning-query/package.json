@@ -1,0 +1,36 @@
+{
+  "name": "@intellectual-frontiers/planning-query",
+  "private": true,
+  "version": "0.1.0",
+  "description": "The items of Planning as read-only SQL relations: issues, events, links and traces, with a catalog that is data made from the same list of columns as the rows, asked with one read-only statement through the guard and the engine of lang-sql, a proposed item counted only where the question says so.",
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "exports": {
+    ".": "./src/mod.ts",
+    "./governance": "./src/governance/mod.ts",
+    "./logical": "./src/logical/mod.ts",
+    "./physical": "./src/physical/mod.ts"
+  },
+  "scripts": {
+    "check": "tsc -p tsconfig.json",
+    "test": "bun test suite/",
+    "test:node": "node --test \"suite/**/*.test.ts\"",
+    "verify": "tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../libraries/src/check.ts --root spec-kit --level L1 && bun ../kanon/src/check.ts && bun tools/check.ts && bun test suite/"
+  },
+  "devDependencies": {
+    "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/anyfs": "link:../anyfs",
+    "@intellectual-frontiers/kanon": "link:../kanon",
+    "@intellectual-frontiers/lang-sql": "link:../lang-sql",
+    "@intellectual-frontiers/libraries": "link:../libraries",
+    "@intellectual-frontiers/mizan": "link:../mizan",
+    "@intellectual-frontiers/planning": "link:../planning",
+    "@intellectual-frontiers/system": "link:../system",
+    "@intellectual-frontiers/test": "link:../test",
+    "@types/node": "26.6.6",
+    "fast-check": "4.10.2",
+    "typescript": "7.0.2"
+  }
+}

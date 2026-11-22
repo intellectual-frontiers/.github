@@ -384,6 +384,7 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/gate/spec-kit" },
     { layout: "commons", dir: "commons/posture-report/spec-kit" },
     { layout: "commons", dir: "commons/integrations-identity/spec-kit" },
+    { layout: "commons", dir: "commons/planning-query/spec-kit" },
   ],
   citations: { prefix: "commons", digits: 4, text: ["erga", "archon", "stolos", "thyra"] },
   lenses: [guides, releases, dataModels, programs, repoOps],
