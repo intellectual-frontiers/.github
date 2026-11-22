@@ -784,6 +784,85 @@ const release: Workflow = {
   },
 };
 
+/** The housekeeping of the release (commons 0030-generated-workflows FR-012): by hand only; it cleans the package registry and makes a tag, each by the one input that says which. */
+const maintenance: Workflow = {
+  file: "maintenance",
+  name: "maintenance",
+  comment: lines(
+    "The housekeeping of the release (commons 0030-generated-workflows FR-012): by hand only, from main. With an empty `tag` the job `package-clean` lists the versions of the package on the GitHub package registry, plans with",
+    "`commons/libraries/src/registry-clean.ts` which to delete (the newest `keep` plain versions stay) and deletes them only where `dry-run` is false. With a `tag` the job `tag` makes that tag at `sha`, which must be on main, by",
+    "`git push` or by the refs API, and says the registry's own words if it refuses. A tag that is there is kept; nothing is ever force-pushed.",
+  ).trimEnd(),
+  on: {
+    workflowDispatch: {
+      inputs: {
+        keep: { description: "package-clean: how many of the newest plain versions to keep (at least 1)", type: "string", default: "1" },
+        "dry-run": { description: "package-clean: only print the plan; delete nothing", type: "boolean", default: true },
+        tag: { description: "tag: the tag to make, commons-v<major>.<minor>.<patch>; empty runs package-clean instead", type: "string", default: "" },
+        sha: { description: "tag: the commit to tag, 40 hexadecimal digits, on main", type: "string", default: "" },
+        method: { description: "tag: git-push or refs-api", type: "string", default: "git-push" },
+      },
+    },
+  },
+  permissions: { contents: "read" },
+  concurrency: { group: "maintenance", cancelInProgress: false },
+  jobs: {
+    "package-clean": job({
+      when: "inputs.tag == ''",
+      runsOn: "ubuntu-latest",
+      timeoutMinutes: 15,
+      permissions: { contents: "read", packages: "write" },
+      steps: [
+        checkout(),
+        bun(),
+        run("bun install --frozen-lockfile", { name: "The packages the planner reads, from the root's bun.lock" }),
+        run("bun commons/libraries/src/link.ts", { name: "The libraries, linked by name before any of them is imported" }),
+        run(
+          lines(
+            "set -eu",
+            String.raw`gh api --paginate "/orgs/$GITHUB_REPOSITORY_OWNER/packages/npm/commons/versions?per_page=100" --jq '.[] | {id: .id, name: .name}' > versions.jsonl`,
+            String.raw`bun commons/libraries/src/registry-clean.ts --keep "$KEEP" < versions.jsonl | tee plan.txt`,
+            'if [ "$DRY_RUN" = "true" ]; then echo "dry run: nothing is deleted"; exit 0; fi',
+            String.raw`for id in $(tail -n 1 plan.txt | jq -r ".delete[]"); do`,
+            '  echo "deleting version id $id"',
+            '  gh api -X DELETE "/orgs/${GITHUB_REPOSITORY_OWNER}/packages/npm/commons/versions/$id"',
+            "done",
+          ),
+          { name: "The versions the registry lists, the plan, and (only where dry-run is false) the deletion of what the plan names", shell: "bash", env: { GH_TOKEN: expr("secrets.GITHUB_TOKEN"), KEEP: expr("inputs.keep"), DRY_RUN: expr("inputs.dry-run") } },
+        ),
+      ],
+    }),
+    tag: job({
+      when: "inputs.tag != ''",
+      runsOn: "ubuntu-latest",
+      timeoutMinutes: 10,
+      permissions: { contents: "write" },
+      steps: [
+        checkout({ fetchDepth: 0, comment: "main and the tags: the commit must be on main and a tag that is there is kept" }),
+        run(
+          lines(
+            "set -u",
+            String.raw`echo "$TAG" | grep -Eq '^commons-v[0-9]+\.[0-9]+\.[0-9]+$' || { echo "the tag $TAG is not commons-v<major>.<minor>.<patch>"; exit 1; }`,
+            String.raw`echo "$SHA" | grep -Eq '^[0-9a-f]{40}$' || { echo "the sha is not 40 hexadecimal digits"; exit 1; }`,
+            'git merge-base --is-ancestor "$SHA" origin/main || { echo "$SHA is not on main"; exit 1; }',
+            'if git rev-parse -q --verify "refs/tags/$TAG" > /dev/null; then echo "the tag $TAG is there: kept"; exit 0; fi',
+            'case "$METHOD" in',
+            "  git-push)",
+            '    git tag "$TAG" "$SHA"',
+            String.raw`    git push origin "refs/tags/$TAG" 2>&1 || { echo "git push of $TAG was refused (the text above is the remote's own)"; exit 1; } ;;`,
+            "  refs-api)",
+            '    gh api -X POST "repos/${GITHUB_REPOSITORY}/git/refs" -f ref="refs/tags/$TAG" -f sha="$SHA" 2>&1 || { echo "the refs API refused $TAG (the text above is its own)"; exit 1; } ;;',
+            '  *) echo "method is git-push or refs-api"; exit 1 ;;',
+            "esac",
+            'echo "the tag $TAG is made at $SHA"',
+          ),
+          { name: "The tag, made at a commit on main, and the text of a refusal if there is one", shell: "bash", env: { GH_TOKEN: expr("secrets.GITHUB_TOKEN"), TAG: expr("inputs.tag"), SHA: expr("inputs.sha"), METHOD: expr("inputs.method") } },
+        ),
+      ],
+    }),
+  },
+};
+
 /** The script of the job that gathers the findings of a workflow: the sound-pipeline check for the cells that ran, then `collect.ts` (0038-build-policy FR-005). */
 function gatherScript(w: Workflow): string {
   const planGuard = "plan" in w.jobs ? ['if [ "$PLAN_RESULT" != "success" ]; then echo "the plan could not be made (the red cause plan-unavailable)"; exit 2; fi'] : [];
@@ -823,6 +902,7 @@ export function workflows(): readonly Workflow[] {
     site,
     conformance,
     tests,
+    maintenance,
   ].map(underPolicy).sort((a, b) => (a.file < b.file ? -1 : a.file > b.file ? 1 : 0));
 }
 

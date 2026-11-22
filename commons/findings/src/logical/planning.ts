@@ -84,6 +84,8 @@ export function statusOf(item: Item, now: string): { readonly status: Status; re
   const lastComment = item.comments.at(-1)?.body;
   if (s.kind === "closed") return { status: s.reason === "completed" ? "verified" : s.reason === "duplicate" ? "duplicate" : "false-positive", lapsed: false, ...(lastComment === undefined ? {} : { reason: lastComment }) };
   if (s.kind === "deferred" && has(LABEL.accepted)) {
+    // a deferral keeps its day optional (0037-planning OQ-12): an acceptance with no end day is not an acceptance (0004-findings-lifecycle FR-002)
+    if (s.until === undefined) return { status: "open", lapsed: true };
     const lapsed = day(now) > s.until;
     return lapsed ? { status: "open", lapsed: true, until: s.until } : { status: "accepted", lapsed: false, until: s.until, ...(lastComment === undefined ? {} : { reason: lastComment }) };
   }

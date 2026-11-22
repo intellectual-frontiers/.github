@@ -1,6 +1,6 @@
 # Decision record (proposed): the terms of the distribution of a package of commons
 
-**Status:** Proposed on 2026-11-22; the owner accepted the recommendation in conversation the same day ("accept all recommendations"), pending the signature of the owner. The ontology records the Decision of the three `unaligned` terms with that date (0018-standards-first FR-005: due within 90 days of the commit that adds the term, 2027-02-20); the signature below is the owner's alone to give.
+**Status:** Proposed on 2026-11-22; the owner accepted the recommendation in conversation the same day ("accept all recommendations"), signed by the owner on 2026-11-22 (his accepted recommendation, recorded by an agent at his direction). The ontology records the Decision of the three `unaligned` terms with that date (0018-standards-first FR-005: due within 90 days of the commit that adds the term, 2027-02-20); the signature below is the owner's alone to give.
 
 **Specifications:** 0002-packaging FR-030 and FR-031; 0036-distribution FR-023, FR-031 to FR-034 and OQ-1.
 
@@ -29,4 +29,4 @@
 
 Keep `pm:ContentPolicy`, `pm:SizeBudget` and `pm:UsageReport` as commons' own terms, `unaligned`, because no standard examined names them; revisit if a standard that names a package's content policy or size limit is found. Keep the two peer terms mapped to SPDX 3.0.1 as written.
 
-**Signed by the owner:** ______________________  **Date:** ____________
+**Signed by the owner:** Shahid N. Shah (login `shah`)  Date: 2026-11-22. Recorded by an AI agent on his explicit statement in the session "IFC & Erga Assistant" (https://claude.ai/code/session_01Juu3CorghZXkPDS1x3r3eW). This records the owner's decision; it is not a cryptographic signature.

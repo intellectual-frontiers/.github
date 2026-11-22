@@ -85,7 +85,7 @@ export function findingsPage(b: Build): void {
     inlines: [
       text("A run of a workflow of this repository is red only for a fault of the pipeline's own scripting or configuration: "),
       ...RED_CAUSES.flatMap((c, i): Inline[] => [...(i === 0 ? [] : [text(", ")]), code(c)]),
-      text(`. What a module says (a failing test, a type error, a warning) is a finding, kept here with its history. The release publishes regardless of open findings until ${RELEASE_POLICY.until}; from ${RELEASE_POLICY.then.from} a library with an open finding of severity error that is not accepted is held and the others are published, and the owner decides again.`),
+      text(`. What a module says (a failing test, a type error, a warning) is a finding, kept here with its history. The release publishes regardless of open findings. A hold, of a library or of the package, is a serious decision and only the owner makes it: the gate holds nothing by itself. After ${RELEASE_POLICY.until} the finding owner-review-due asks the owner again until the policy is reviewed.`),
     ],
   };
   blocks.push(policy);
@@ -101,7 +101,7 @@ export function findingsPage(b: Build): void {
   const rows = deriveRows(runs, accepted, today);
   const counts = countsOf(rows, runs);
   const decision = releaseDecision(today);
-  if (decision.mode === "hold-critical" && decision.ownerReview !== undefined) {
+  if (decision.ownerReview !== undefined) {
     blocks.unshift({ kind: "callout", tone: "warn", title: "Owner review due", blocks: [{ kind: "paragraph", inlines: [text(decision.ownerReview.message)] }] });
   }
   blocks.push({ kind: "paragraph", inlines: [text(`As of ${today}, from ${plural(runs.length, "run")} of the workflows: `), text(`${counts.open} open, ${counts.fresh} new in the latest run, ${counts.fixed} fixed in it, ${counts.accepted} accepted. `), { kind: "link", href: { kind: "external", url: "build-findings.json" }, children: [text("JSON")] }, text(" and "), { kind: "link", href: { kind: "external", url: "build-findings.csv" }, children: [text("CSV")] }, text(" hold every row.")] });

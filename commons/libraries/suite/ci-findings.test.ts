@@ -134,32 +134,58 @@ proves([`${SPEC} FR-002`], "an acceptance makes a finding accepted until its day
   assertEquals([...APPROVERS], ["shah"], "the approvers are the owner only (decided on 2026-11-22), as typed data");
 });
 
-proves([`${SPEC} FR-001`, `${SPEC} FR-008`], "the release publishes regardless until 2027-01-31 and, from 2027-02-01, holds per library for an open error and carries owner-review-due until the owner has reviewed", () => {
+const OWNER_HOLD = { ...RELEASE_POLICY, decision: { by: "shah", on: "2027-02-01", mode: "hold-critical" as const } };
+
+proves([`${SPEC} FR-001`, `${SPEC} FR-008`], "with no recorded decision the release publishes regardless on every day, holds nothing by itself and carries owner-review-due after 2027-01-31 until the owner has reviewed", () => {
   assertEquals(RELEASE_POLICY.until, "2027-01-31");
-  assertEquals(RELEASE_POLICY.then, { mode: "hold-critical", from: "2027-02-01" });
+  assertEquals("decision" in RELEASE_POLICY, false, "no hold is recorded: a hold is the owner's decision");
   assertEquals(releaseDecision("2026-11-22").proceed, true);
   const until = releaseDecision("2027-01-31");
-  assertEquals(until.proceed && until.mode, "publish-regardless");
+  assert(until.mode === "publish-regardless" && until.ownerReview === undefined);
   const after = releaseDecision("2027-02-01");
-  assertEquals(after.proceed, true, "nothing is held by the date itself: the libraries are");
-  assert(after.mode === "hold-critical" && after.ownerReview?.code === "owner-review-due" && after.ownerReview.severity === "error" && after.ownerReview.module === "repository");
+  assert(after.mode === "publish-regardless" && after.proceed && after.ownerReview?.code === "owner-review-due" && after.ownerReview.severity === "error" && after.ownerReview.module === "repository", "after the day the owner is asked, and nothing is held");
+  const later = releaseDecision("2028-06-01");
+  assert(later.mode === "publish-regardless", "never a hold of its own, on any day");
   const reviewed = releaseDecision("2027-02-01", { ...RELEASE_POLICY, reviewedOn: "2027-01-20" });
-  assert(reviewed.mode === "hold-critical" && reviewed.ownerReview === undefined, "the finding stays until the owner has reviewed");
+  assert(reviewed.mode === "publish-regardless" && reviewed.ownerReview === undefined, "the finding stays until the owner has reviewed");
 });
 
-proves([`${SPEC} FR-010`], "from the day after the policy a library with an open error that is not accepted is held and the others go on; a warning, an accepted finding and a finding of the repository hold nothing; the single package is held while a library is", () => {
+proves([`${SPEC} FR-010`], "without a decision the gate lists the open findings and the single package goes on; the finding asks the owner after the policy day and holds nothing", () => {
   const r1 = run("1", "2027-02-01T00:00:00Z", ["core", "net", "repository"], [["core", "a"], ["repository", "r"]]);
   const net = run("2", "2027-02-01T01:00:00Z", ["net"], []);
   const day = "2027-02-02";
   const gate = gateReport(day, [r1, net]);
+  assertEquals([gate.proceed, gate.held], [true, []], "an open error holds nothing on its own");
+  assert(gate.lines.some((l) => l.includes("owner-review-due")) && gate.lines.some((l) => l.includes("open findings of core: 1")), gate.lines.join("\n"));
+  assert(gate.lines[0]?.includes("only the owner makes it") === true);
+  const before = gateReport("2027-01-31", [r1, net]);
+  assertEquals([before.proceed, before.held], [true, []]);
+});
+
+proves([`${SPEC} FR-010`], "a decision recorded by the owner holds from its day: a library with an open error that is not accepted is held and the others go on; a warning, an accepted finding and a finding of the repository hold nothing; the single package is held while a library is; before its day nothing is held", () => {
+  const r1 = run("1", "2027-02-01T00:00:00Z", ["core", "net", "repository"], [["core", "a"], ["repository", "r"]]);
+  const net = run("2", "2027-02-01T01:00:00Z", ["net"], []);
+  const day = "2027-02-02";
+  const gate = gateReport(day, [r1, net], "single", OWNER_HOLD);
   assertEquals(gate.held, ["core"], "core has an open error, net has none, and the repository holds no library");
   assertEquals(gate.proceed, false, "in single mode the one package is held while a library is");
-  assert(gate.lines.some((l) => l.startsWith("held: core")) && gate.lines.some((l) => l.includes("owner-review-due")) && gate.lines.some((l) => l.includes("the distribution is single")));
-  assertEquals(gateReport(day, [r1, net], "per-library").proceed, true, "per library the others are released and core is named held");
+  assert(gate.lines.some((l) => l.startsWith("the owner (shah) decided to hold")) && gate.lines.some((l) => l.startsWith("held: core")) && gate.lines.some((l) => l.includes("the distribution is single")));
+  assertEquals(gateReport(day, [r1, net], "per-library", OWNER_HOLD).proceed, true, "per library the others are released and core is named held");
   assertEquals(heldLibraries([{ module: "core", severity: "warning" }, { module: "net", severity: "note" }, { module: "repository", severity: "error" }]), []);
-  const before = gateReport("2027-01-31", [r1, net]);
-  assertEquals([before.proceed, before.held], [true, []], "until the day of the policy nothing is held");
+  const before = gateReport("2027-01-31", [r1, net], "single", OWNER_HOLD);
+  assertEquals([before.proceed, before.held], [true, []], "before the day of the decision nothing is held");
   assert(before.lines[0]?.includes("publish-regardless") === true);
+});
+
+proves([`${SPEC} FR-010`], "a decision recorded by anyone but the owner is refused and nothing is held; an agent never holds", () => {
+  const agent = { ...RELEASE_POLICY, decision: { by: "claude", on: "2026-11-22", mode: "hold-critical" as const } };
+  const d = releaseDecision("2027-02-02", agent);
+  assert(d.mode === "publish-regardless" && d.refused !== undefined && d.refused.includes("only the owner"), "the decision is refused");
+  const r1 = run("1", "2027-02-01T00:00:00Z", ["core"], [["core", "a"]]);
+  const gate = gateReport("2027-02-02", [r1], "single", agent);
+  assertEquals([gate.proceed, gate.held], [true, []]);
+  assert(gate.lines.some((l) => l.includes("is refused")), gate.lines.join("\n"));
+  assertEquals(releaseDecision("2027-02-02", OWNER_HOLD).mode, "hold-critical");
 });
 
 proves([`${SPEC} FR-014`], "the root tests are read per file: the findings are of one module for each file, each file that ran is a step, and a file that stops failing is fixed while another keeps failing", () => {
