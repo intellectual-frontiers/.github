@@ -443,7 +443,7 @@ const CONCEPT = skos.Concept.iri;
 const DECISION_RECORD = "commons/spec-kit/audits/2026-11-planning-decisions.md";
 const OWN = ["ConflictValue", "OutboxEntry"] as const;
 
-/** The record of a term of the library's own: no standard names it, it is `unaligned`, and the owner accepted it as the library's own on 2026-11-22 (0037-planning OQ-13); the Decision is for the owner to sign. */
+/** The record of a term of the library's own: no standard names it, it is `unaligned`, and the owner accepted it as the library's own on 2026-11-22 (0037-planning OQ-13); the Decision is signed (the record names how). */
 function own(local: (typeof OWN)[number], definedBy: string) {
   return OntologyTerm.make(term(MZID, `term-planning-${local}`), {
     label: en(`plan:${local}`),
@@ -456,7 +456,7 @@ function own(local: (typeof OWN)[number], definedBy: string) {
   });
 }
 
-/** The decisions of the terms kept unaligned, to be signed by the owner (the record is `commons/spec-kit/audits/2026-11-planning-decisions.md`). */
+/** The decisions of the terms kept unaligned, signed by the owner on 2026-11-22 (the record is `commons/spec-kit/audits/2026-11-planning-decisions.md`). */
 export const decisions = OWN.map((local) =>
   Decision.make(term(MZID, `decision-planning-${local}`), {
     label: en(`Keep plan:${local} unaligned: a term of the library's own`),
