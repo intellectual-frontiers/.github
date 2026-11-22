@@ -25,6 +25,7 @@
 
 - **FR-009**: The types, the table of capabilities and the reader of a remote MUST import `core` alone, and the adapters MUST import only `node:` built-ins, `core`, `net` and `system`, so that the types are pure and no other library is needed to read a remote.
 - **FR-010**: The library MUST be published to npm as compiled modules with their declarations, one entry for the package (`.`) and one for each module (`./types`, `./capabilities`, `./remote`, `./github`, `./gitlab`, `./git`), and its declarations MUST name no package it does not declare (commons 0032-libraries-by-concern FR-005, FR-013).
+- **FR-011**: The description of an issue (`IssueInfo`) MUST carry the reason the host gives for its state, `closeReason` (`completed`, `not_planned`, `duplicate` for a closed issue and `reopened` for one that was closed and opened again: GitHub's `state_reason`, decided by the owner on 2026-11-22 so that a reader of issues, the planning source of a Git host among them, does not read every closed issue as completed), and MUST leave it absent where the host gives none (GitLab's REST API v4 holds no reason, so a closed GitLab issue has none) or gives a word the contract does not name (an unknown word is not a reason); the reason MUST NOT change what `state` says.
 
 ## Acceptance scenarios
 

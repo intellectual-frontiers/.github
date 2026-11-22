@@ -40,6 +40,9 @@ export type RepoInfo = {
   readonly archived: boolean;
 };
 
+/** The reasons an issue is in its state, as GitHub gives them (`state_reason`). */
+export type IssueStateReason = "completed" | "not_planned" | "duplicate" | "reopened";
+
 /** What a host says of an issue: the words and sections the change-control check reads. */
 export type IssueInfo = {
   /** The number the host gives it, in the repository (`#N` on GitHub, `#N` of a project on GitLab). */
@@ -47,6 +50,8 @@ export type IssueInfo = {
   readonly title: string;
   readonly body: string;
   readonly state: "open" | "closed";
+  /** Why the issue is in its state, where the host says (GitHub's `state_reason`: `completed`, `not_planned`, `duplicate` for a closed issue, `reopened` for one that was closed and opened again). Absent where the host gives none (GitLab's REST API v4 holds no reason). */
+  readonly closeReason?: IssueStateReason | undefined;
   readonly url: string;
   /** The issue this one is a child of, where the host has parent and child issues. */
   readonly parent?: number | undefined;

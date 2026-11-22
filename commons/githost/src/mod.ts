@@ -44,6 +44,7 @@ export {
   type HostKind,
   type HostResult,
   type IssueInfo,
+  type IssueStateReason,
   type RepoInfo,
   type RepoRef,
   type Visibility,

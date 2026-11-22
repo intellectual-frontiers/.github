@@ -39,6 +39,7 @@ import type {
   HostFailure,
   HostResult,
   IssueInfo,
+  IssueStateReason,
   RepoInfo,
   RepoRef,
   Visibility,
@@ -59,8 +60,12 @@ export type GithubOptions = {
 const repoShape = object({ private: boolean, default_branch: string, clone_url: string, archived: boolean }, { visibility: string });
 const issueShape = object(
   { number: integer, title: string, state: literal("open", "closed"), html_url: string },
-  { body: nullable(string), labels: array(oneOf(string, object({ name: string }))), pull_request: unknownValue },
+  { body: nullable(string), labels: array(oneOf(string, object({ name: string }))), pull_request: unknownValue, state_reason: nullable(string) },
 );
+/** The reason GitHub gives for the state of an issue, where it is one of those the contract names (an unknown word is not a reason). */
+function stateReasonOf(word: string | null | undefined): IssueStateReason | undefined {
+  return word === "completed" || word === "not_planned" || word === "duplicate" || word === "reopened" ? word : undefined;
+}
 const subIssuesShape = array(object({ number: integer }));
 const pullShape = object(
   {
@@ -158,6 +163,7 @@ export function githubClient(options: GithubOptions): GitHostClient {
       title: r.value.title,
       body: r.value.body ?? "",
       state: r.value.state,
+      ...(stateReasonOf(r.value.state_reason) === undefined ? {} : { closeReason: stateReasonOf(r.value.state_reason) }),
       url: r.value.html_url,
       ...(parentNumber === undefined ? {} : { parent: parentNumber }),
       children,

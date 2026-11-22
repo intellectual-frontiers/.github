@@ -68,6 +68,18 @@ const github: Exchange[] = [
   ok(`${GH}/issues/8`, ghIssue(8, { body: null, labels: [] })),
   bad(`${GH}/issues/8/parent`, 404, GH_NOT_FOUND),
   bad(`${GH}/issues/8/sub_issues?per_page=100`, 404, GH_NOT_FOUND),
+  ok(`${GH}/issues/10`, ghIssue(10, { state: "closed", state_reason: "not_planned" })),
+  bad(`${GH}/issues/10/parent`, 404, GH_NOT_FOUND),
+  ok(`${GH}/issues/10/sub_issues?per_page=100`, []),
+  ok(`${GH}/issues/11`, ghIssue(11, { state: "closed", state_reason: "completed" })),
+  bad(`${GH}/issues/11/parent`, 404, GH_NOT_FOUND),
+  ok(`${GH}/issues/11/sub_issues?per_page=100`, []),
+  ok(`${GH}/issues/12`, ghIssue(12, { state: "open", state_reason: "reopened" })),
+  bad(`${GH}/issues/12/parent`, 404, GH_NOT_FOUND),
+  ok(`${GH}/issues/12/sub_issues?per_page=100`, []),
+  ok(`${GH}/issues/13`, ghIssue(13, { state: "closed", state_reason: "something_new" })),
+  bad(`${GH}/issues/13/parent`, 404, GH_NOT_FOUND),
+  ok(`${GH}/issues/13/sub_issues?per_page=100`, []),
   bad(`${GH}/issues/9`, 410, { message: "This issue was deleted" }),
   ok(`${GH}/pulls/1`, {
     number: 1,
@@ -128,6 +140,16 @@ proves(["0001-githost FR-001", "0001-githost FR-003"], "the GitHub adapter passe
     unsigned: UNSIGNED,
     secrets: [token],
   });
+});
+
+proves(["0001-githost FR-011"], "GitHub: an issue carries the reason for its state where GitHub gives one that the contract names, and none otherwise; GitLab gives none", async () => {
+  const c = githubClient({ transport: recordedTransport(github) });
+  const repo = ghRef("octo", "hello");
+  const reasons = await Promise.all([10, 11, 12, 13, 8].map(async (n) => {
+    const r = await c.issue(repo, n);
+    return r.kind === "ok" ? [r.value.state, r.value.closeReason] : undefined;
+  }));
+  assertEquals(reasons, [["closed", "not_planned"], ["closed", "completed"], ["open", "reopened"], ["closed", undefined], ["open", undefined]]);
 });
 
 proves(
