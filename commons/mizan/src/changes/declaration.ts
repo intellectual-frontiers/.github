@@ -85,8 +85,12 @@ export type DecisionRecord = {
   readonly id: string;
   /** The role that approved it (0020-ifccm FR-019). */
   readonly approvedBy: string;
-  /** What it authorizes: requirements as `NNNN-slug FR-nnn` for a departure, or `gate-relaxed <revision>` for a relaxed declaration. */
+  /** What it authorizes: requirements as `NNNN-slug FR-nnn` for a departure, `gate-relaxed <revision>` for a relaxed declaration, or `no-issue <revision>` for the one commit the owner exempts from naming a change request. */
   readonly covers: readonly string[];
+  /** Why it was made; a Decision that covers `no-issue <revision>` MUST state it. */
+  readonly reason?: string;
+  /** The day it was made, `YYYY-MM-DD`; a Decision that covers `no-issue <revision>` MUST state it. */
+  readonly decidedOn?: string;
   /** The change request that records it (`mz:record`), by number. */
   readonly record?: number;
 };
@@ -106,7 +110,7 @@ const declarationDecoder = object(
   { regulatedDomains: array(domain) },
   { productionDeclaredOn: day, retentionDays: retention, releaseTier: tier },
 );
-const decisionDecoder = object({ id: string, approvedBy: string, covers: array(string) }, { record: integer });
+const decisionDecoder = object({ id: string, approvedBy: string, covers: array(string) }, { record: integer, reason: string, decidedOn: string });
 
 /** A declaration decoded from data read from a file. */
 export function decodeDeclaration(input: unknown): Result<Declaration, DecodeError> {
@@ -126,7 +130,11 @@ export function decodeDecisions(input: unknown): Result<readonly DecisionRecord[
   const r = array(decisionDecoder)(input, "decisions");
   if (r.kind === "err") return r;
   return ok(
-    r.value.map((d) => ({ id: d.id, approvedBy: d.approvedBy, covers: d.covers, ...(d.record === undefined ? {} : { record: d.record }) })),
+    r.value.map((d) => ({ id: d.id, approvedBy: d.approvedBy, covers: d.covers,
+      ...(d.record === undefined ? {} : { record: d.record }),
+      ...(d.reason === undefined ? {} : { reason: d.reason }),
+      ...(d.decidedOn === undefined ? {} : { decidedOn: d.decidedOn }),
+    })),
   );
 }
 
@@ -236,13 +244,46 @@ export function relaxations(history: readonly DeclarationVersion[]): readonly Re
   return out;
 }
 
-/** Whether a Decision covers a thing (a requirement, or `gate-relaxed <revision>`): a covered revision may be named by a prefix of at least 7 characters. */
+/** The word a `covers` entry starts with when the owner exempts one commit from naming a change request: `no-issue <revision>` (0020-ifccm FR-046). */
+export const NO_ISSUE = "no-issue";
+
+/** The words of a `covers` entry that names one revision, `gate-relaxed <revision>` or `no-issue <revision>`. */
+const REVISION_ENTRY = /^(gate-relaxed|no-issue) ([0-9a-f]{7,64})$/;
+
+/** Whether a Decision covers a thing (a requirement, `gate-relaxed <revision>` or `no-issue <revision>`): a covered revision may be named by a prefix of at least 7 characters. */
 export function covers(decision: DecisionRecord, thing: string): boolean {
   return decision.covers.some((c) => {
     if (c === thing) return true;
-    const m = /^gate-relaxed ([0-9a-f]{7,})$/.exec(c);
-    return m?.[1] !== undefined && thing.startsWith("gate-relaxed ") && thing.slice("gate-relaxed ".length).startsWith(m[1]);
+    const m = REVISION_ENTRY.exec(c);
+    return m?.[1] !== undefined && m[2] !== undefined && thing.startsWith(`${m[1]} `) && thing.slice(m[1].length + 1).startsWith(m[2]);
   });
+}
+
+/** The entries of a Decision that exempt a commit (`no-issue ...`): each with its revision where it is well formed (`no-issue` and 7 to 64 lowercase hexadecimal characters), none where it is not. */
+export function noIssueEntries(decision: DecisionRecord): readonly { readonly entry: string; readonly revision: string | undefined }[] {
+  return decision.covers
+    .filter((c) => c === NO_ISSUE || c.startsWith(`${NO_ISSUE} `))
+    .map((entry) => {
+      const m = REVISION_ENTRY.exec(entry);
+      return { entry, revision: m?.[1] === NO_ISSUE ? m[2] : undefined };
+    });
+}
+
+/**
+ * What is wrong with a Decision that exempts a commit (0020-ifccm FR-046), as sentences; none for a Decision that covers no `no-issue` entry or one whose entries, person, day and reason are all sound.
+ * The person is `approvedBy`: it MUST name someone, and MUST NOT be a role of `roles`, because a role is not a person.
+ */
+export function noIssueProblems(decision: DecisionRecord, roles: Readonly<Record<string, string>>): readonly string[] {
+  const entries = noIssueEntries(decision);
+  if (entries.length === 0) return [];
+  const out: string[] = [];
+  for (const e of entries)
+    if (e.revision === undefined) out.push(`its entry "${e.entry}" is not "no-issue" and a revision of 7 to 64 lowercase hexadecimal characters`);
+  if (decision.approvedBy.trim() === "" || Object.values(roles).includes(decision.approvedBy))
+    out.push("approvedBy does not name a person (it is empty or is a role)");
+  if (decision.decidedOn === undefined || dayOf(decision.decidedOn) === undefined) out.push("decidedOn is not a day (YYYY-MM-DD)");
+  if (decision.reason === undefined || decision.reason.trim() === "") out.push("it states no reason");
+  return out;
 }
 
 /** The word a Decision's `covers` entry starts with when it waives the signed-commit rule for a bot account that signs through the host: `signing-waiver <account> <key>` (ergonex 0002-workspace-model FR-049, which reads the entries this module decodes). */

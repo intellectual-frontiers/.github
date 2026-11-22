@@ -324,6 +324,9 @@ requirement	mechanism	by	note
 0020-ifccm FR-043	review	0032-libraries-by-concern FR-010	kept by the library githost: githost 0001-githost FR-005
 0020-ifccm FR-044	review	0032-libraries-by-concern FR-010	kept by the library githost: githost 0001-githost FR-006
 0020-ifccm FR-045	check	.github: cd commons/mizan && bun test suite/	mizan-changes-pure.test.ts: an Impact line is read as major, minor or patch in any case, and one that is none of the three is changes/impact with its value, a warning or a gate by the phase
+0020-ifccm FR-046	check	.github: cd commons/mizan && bun test suite/	mizan-changes-git.test.ts: in a real Git repository a commit with no Refs fails and the same range passes with a Decision that covers its revision (full or by a 7-character prefix), and a different commit is not covered; mizan-changes-pure.test.ts: the entry syntax, the person, day and reason
+0020-ifccm FR-047	check	.github: cd commons/mizan && bun test suite/	mizan-changes-git.test.ts: the command reports the exempted commit as covered with the Decision, the person, the day and the reason, and still reports the commit it does not name
+0020-ifccm FR-048	check	.github: cd commons/mizan && bun test suite/	mizan-changes-pure.test.ts and mizan-changes-git.test.ts: a Decision with no person, a role, no day or reason, a malformed entry, a revision outside the range, an ambiguous prefix or a commit that names an issue is changes/decision, and exempts nothing
 0021-ifqs FR-001	none	-	Planned, M3 of issue #10: a principle held by the requirements under it: what runs is graded above what is stated (FR-021); the grade list exists (ifqs-ontology.test.ts)
 0021-ifqs FR-002	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-011
 0021-ifqs FR-003	review	0032-libraries-by-concern FR-010	kept by the library quality: 0001-quality-evidence FR-012

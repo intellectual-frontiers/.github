@@ -525,3 +525,58 @@ proves(
   },
   skip,
 );
+
+proves(
+  ["0020-ifccm FR-046", "0020-ifccm FR-047", "0020-ifccm FR-048"],
+  "in a real repository a commit with no Refs fails, the same range passes with a Decision that names its revision, another commit is not covered and a malformed Decision is a finding",
+  async () => {
+    await withTempDir(async (repo) => {
+      await init(repo);
+      const base = await commit(repo, "Base\n\nRefs #1\n", "2026-11-01");
+      const bare = await commit(repo, "Chapter\n", "2026-11-02");
+      const other = await commit(repo, "Other chapter\n", "2026-11-03");
+      const args = ["--repo", repo, "--range", `${base}..HEAD`, "--today", "2026-11-22"];
+      const record = (covers: string, extra = ""): string =>
+        `export const decisions = [{ id: "D-9", approvedBy: "Shahid Shah", covers: [${JSON.stringify(covers)}], decidedOn: "2026-11-22", reason: "outside repoctl commit"${extra} }];\n`;
+      // without a Decision both commits are reported
+      const none = await cmd(args);
+      assertEquals(none.code, 1);
+      assertStringIncludes(none.err, bare.slice(0, 12));
+      // the Decision covers the one commit (by a 7-character prefix); the other is still reported
+      writeTextFileSync(join(repo, RECORD_FILE), record(`no-issue ${bare.slice(0, 7)}`));
+      const one = await cmd(args);
+      assertEquals(one.code, 1);
+      assert(!one.err.includes(`${bare.slice(0, 12)}: the commit`), one.err);
+      assertStringIncludes(one.err, other.slice(0, 12));
+      assertStringIncludes(one.err, `changes/no-issue covered: ${bare.slice(0, 12)} by Decision D-9 (Shahid Shah, 2026-11-22): outside repoctl commit`);
+      // both covered: the range passes
+      writeTextFileSync(
+        join(repo, RECORD_FILE),
+        `export const decisions = [{ id: "D-9", approvedBy: "Shahid Shah", covers: ["no-issue ${bare}", "no-issue ${other.slice(0, 9)}"], decidedOn: "2026-11-22", reason: "outside repoctl commit" }];\n`,
+      );
+      const both = await cmd(args);
+      assertEquals(both.code, 0, both.err);
+      assertStringIncludes(both.err, "covered");
+      // a Decision for a revision that is not in the range is a finding
+      writeTextFileSync(join(repo, RECORD_FILE), record(`no-issue ${base.slice(0, 7)}`));
+      const absent = await cmd(["--repo", repo, "--range", `${base}..HEAD`, "--today", "2026-11-22"]);
+      assertStringIncludes(absent.err, "changes/decision");
+      assertStringIncludes(absent.err, "not in the range");
+      // a malformed Decision (no reason, a role as person) is a finding, and exempts nothing
+      writeTextFileSync(
+        join(repo, RECORD_FILE),
+        `export const decisions = [{ id: "D-9", approvedBy: "Shahid Shah", covers: ["no-issue ${bare.slice(0, 7)}"], decidedOn: "2026-11-22" }];\n`,
+      );
+      const bad = await cmd(args);
+      assertEquals(bad.code, 1);
+      assertStringIncludes(bad.err, "states no reason");
+      assertStringIncludes(bad.err, `${bare.slice(0, 12)}: the commit`);
+      // a commit that names an issue makes the Decision unneeded
+      const named = await commit(repo, "Named\n\nRefs #2\n", "2026-11-04");
+      writeTextFileSync(join(repo, RECORD_FILE), record(`no-issue ${named.slice(0, 7)}`));
+      assertStringIncludes((await cmd(args)).err, "not needed");
+      void other;
+    });
+  },
+  skip,
+);

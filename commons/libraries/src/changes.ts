@@ -1,7 +1,7 @@
 /**
  * The `changes` check of Intellectual Frontiers Capabilities Configuration Management (commons 0020-ifccm): every commit of a range names the change request it serves, a closing word is
  * `Closes` and only on the commit that finishes a capability, a departure from a specification has a Decision, a relaxed declaration is found, and each requirement can be followed from its issue
- * to the run that proved it.
+ * to the run that proved it. A Decision of the record that covers `no-issue <revision>` exempts that one commit from naming a change request (FR-046 to FR-048); the check says it is covered.
  *
  *     bun commons/libraries/src/changes.ts --range origin/main..HEAD         judge the commits of the range (offline: no network)
  *     bun commons/libraries/src/changes.ts --range A..B --strict             also ask the Git host for each change request the commits name
@@ -67,7 +67,9 @@ import {
   CHANGES_RULES,
   type ChangesFinding,
   commitFindings,
+  decisionFindings,
   declarationFindings,
+  noIssueExemptions,
   relaxationFindings,
   ruleCases,
   STRICT_RULES,
@@ -92,7 +94,7 @@ export type RuleResult = {
 };
 
 /** The rules that need no range of commits: the declaration's own, and its history. */
-const WITHOUT_RANGE: readonly string[] = ["changes/declaration", "changes/gate-relaxed"];
+const WITHOUT_RANGE: readonly string[] = ["changes/declaration", "changes/gate-relaxed", "changes/decision"];
 
 /** What the command is given besides its arguments: the host's client and the repository it serves, which the command never makes, and where it writes. */
 export type Deps = {
@@ -362,6 +364,8 @@ export async function run(
 
   // the commits of a range
   const range = value("--range");
+  if (range === undefined) findings.push(...decisionFindings(undefined, record.decisions, record.roles, phase, recordName));
+  const covered: string[] = [];
   if (range !== undefined) {
     const read = await readRange(repo, range);
     if (read.kind === "err") {
@@ -369,6 +373,9 @@ export async function run(
       return 3;
     }
     const commits = read.value;
+    findings.push(...decisionFindings(commits, record.decisions, record.roles, phase, recordName));
+    for (const [sha, d] of noIssueExemptions(commits, record.decisions, record.roles))
+      covered.push(`changes/no-issue covered: ${sha.slice(0, 12)} by Decision ${d.id} (${d.approvedBy}, ${d.decidedOn ?? ""}): ${d.reason ?? ""}`);
     findings.push(
       ...commitFindings(commits, {
         phase,
@@ -428,6 +435,7 @@ export async function run(
     log(`${lines.join("\n")}\n`);
     if (!passes(verdict)) failed = true;
   }
+  for (const line of covered) log(`${line}\n`);
   if (has("--strict") && notRun !== undefined)
     for (const c of ruleCases(findings, notRun)) if (c.outcome === "not_run") log(`${c.rule}: not_run: ${c.reason}\n`);
 

@@ -9,7 +9,7 @@
 import type { IssueInfo } from "@intellectual-frontiers/githost/types";
 import * as ifccm from "@intellectual-frontiers/ontology/ifccm";
 import { holdHarness } from "../src/harness.ts";
-import { CHANGES_RULES, commitFindings, strictFindings, type CommitFacts, type Context, type IssueAnswer } from "../src/changes/rules.ts";
+import { CHANGES_RULES, commitFindings, decisionFindings, noIssueExemptions, strictFindings, type CommitFacts, type Context, type IssueAnswer } from "../src/changes/rules.ts";
 import { namedIssues, parseMessage } from "../src/changes/commit-message.ts";
 import {
   doneWhenItems,
@@ -23,6 +23,9 @@ import {
   dayOf,
   decodeHarnessRecord,
   declarationProblem,
+  type DecisionRecord,
+  covers,
+  noIssueProblems,
   type Declaration,
   type DeclarationVersion,
   phaseOf,
@@ -566,3 +569,61 @@ proves(
     }
   },
 );
+
+const EXEMPT = "8158b35b48b9" + "0".repeat(28);
+const OTHER = "9999999aaaaa" + "0".repeat(28);
+const sound: DecisionRecord = {
+  id: "D-1",
+  approvedBy: "Shahid Shah",
+  covers: ["no-issue 8158b35b48b9"],
+  decidedOn: "2026-11-22",
+  reason: "made outside repoctl commit",
+};
+const bare = (sha: string, message = "Chapter\n"): CommitFacts => ({ ...commit(1, message), sha });
+
+proves(["0020-ifccm FR-046", "0020-ifccm FR-047"], "a sound no-issue Decision exempts exactly the commit it names, in full or by a 7-character prefix, and no other", () => {
+  const ctx: Context = { phase: "warn", decisions: [sound], roles: { "a@example.com": "author" } };
+  assertEquals(commitFindings([bare(EXEMPT)], ctx), []);
+  assertEquals(commitFindings([bare(EXEMPT)], { ...ctx, decisions: [{ ...sound, covers: [`no-issue ${EXEMPT}`] }] }), []);
+  assertEquals(commitFindings([bare(EXEMPT)], { ...ctx, decisions: [{ ...sound, covers: ["no-issue 8158b35"] }] }), []);
+  assertEquals(commitFindings([bare(OTHER)], ctx).map((f) => f.rule), ["changes/no-issue"]);
+  assertEquals(covers(sound, `no-issue ${EXEMPT}`), true);
+  assertEquals(covers(sound, `gate-relaxed ${EXEMPT}`), false);
+  // a Decision of another kind (a relaxed declaration, a departure) exempts no commit
+  const relaxed: DecisionRecord = { id: "D-2", approvedBy: "Shahid Shah", covers: [`gate-relaxed ${EXEMPT}`, "0020-ifccm FR-007"] };
+  assertEquals(commitFindings([bare(EXEMPT)], { ...ctx, decisions: [relaxed] }).map((f) => f.rule), ["changes/no-issue"]);
+  assertEquals(covers({ ...sound, covers: [`no-issue ${EXEMPT}`] }, `gate-relaxed ${EXEMPT}`), false);
+  assertEquals([...noIssueExemptions([bare(EXEMPT), bare(OTHER)], [sound], {}).keys()], [EXEMPT]);
+});
+
+proves(["0020-ifccm FR-048"], "a no-issue Decision with no person, a role as the person, no day, no reason or a malformed entry is a changes/decision finding and exempts nothing", () => {
+  const roles = { "a@example.com": "quality" };
+  const cases: readonly [string, DecisionRecord][] = [
+    ["person", { ...sound, approvedBy: "  " }],
+    ["role", { ...sound, approvedBy: "quality" }],
+    ["decidedOn", { ...sound, decidedOn: "2026-13-40" }],
+    ["reason", { ...sound, reason: "" }],
+    ["entry", { ...sound, covers: ["no-issue 8158"] }],
+  ];
+  assertEquals(noIssueProblems(sound, roles), []);
+  assertEquals(noIssueProblems({ id: "D-2", approvedBy: "quality", covers: ["0020-ifccm FR-012"] }, roles), []);
+  for (const [name, d] of cases) {
+    assert(noIssueProblems(d, roles).length > 0, name);
+    assertEquals(decisionFindings(undefined, [d], roles, "gate", "r.ts").map((f) => [f.rule, f.severity]), [["changes/decision", "gate"]], name);
+    assertEquals(commitFindings([bare(EXEMPT)], { phase: "warn", decisions: [d], roles }).map((f) => f.rule), ["changes/no-issue"], name);
+  }
+  const { reason: _omitted, ...noReason } = sound;
+  assertEquals(noIssueProblems(noReason, {}).length, 1);
+});
+
+proves(["0020-ifccm FR-048"], "a no-issue Decision for a revision outside the range, an ambiguous prefix or a commit that names an issue is a finding", () => {
+  const find = (commits: readonly CommitFacts[], d: DecisionRecord) => decisionFindings(commits, [d], {}, "warn", "r.ts").map((f) => f.message);
+  assertEquals(find([bare(EXEMPT)], sound), []);
+  assertEquals(find([bare(OTHER)], sound).length, 1);
+  assertStringIncludes(find([bare(OTHER)], sound)[0] ?? "", "not in the range");
+  const twin = "8158b35b48b9" + "1".repeat(28);
+  assertStringIncludes(find([bare(EXEMPT), bare(twin)], sound)[0] ?? "", "names 2 commits");
+  assertEquals(commitFindings([bare(EXEMPT), bare(twin)], { phase: "warn", decisions: [sound], roles: {} }).length, 2);
+  assertStringIncludes(find([bare(EXEMPT, "Chapter\n\nRefs #10\n")], sound)[0] ?? "", "not needed");
+  assertEquals(new Set(CHANGES_RULES).has("changes/decision"), true);
+});

@@ -29,6 +29,9 @@ import {
   covers,
   declarationProblem,
   isRegulated,
+  NO_ISSUE,
+  noIssueEntries,
+  noIssueProblems,
   type Phase,
   type Relaxation,
 } from "./declaration.ts";
@@ -46,7 +49,8 @@ export type ChangesRule =
   | "changes/no-decision"
   | "changes/self-approved"
   | "changes/declaration"
-  | "changes/impact";
+  | "changes/impact"
+  | "changes/decision";
 
 /** Every rule, in the order the report lists them. */
 export const CHANGES_RULES: readonly ChangesRule[] = [
@@ -61,6 +65,7 @@ export const CHANGES_RULES: readonly ChangesRule[] = [
   "changes/self-approved",
   "changes/declaration",
   "changes/impact",
+  "changes/decision",
 ];
 
 /** The rules that need the host (`--strict`, 0020-ifccm FR-009). */
@@ -117,12 +122,75 @@ function isMerge(c: CommitFacts): boolean {
   return c.parents.length >= 2;
 }
 
+/**
+ * The commits of a range that a Decision exempts from naming a change request (0020-ifccm FR-046), by revision: a Decision that is sound (`noIssueProblems` says nothing) and whose `no-issue <revision>`
+ * names exactly one commit of the range, in full or by a prefix of at least 7 characters. A prefix that names two commits exempts neither.
+ */
+export function noIssueExemptions(
+  commits: readonly CommitFacts[],
+  decisions: readonly DecisionRecord[],
+  roles: Readonly<Record<string, string>>,
+): ReadonlyMap<string, DecisionRecord> {
+  const out = new Map<string, DecisionRecord>();
+  for (const d of decisions) {
+    if (noIssueProblems(d, roles).length > 0) continue;
+    for (const e of noIssueEntries(d)) {
+      const rev = e.revision;
+      if (rev === undefined) continue;
+      const hit = commits.filter((c) => c.sha.startsWith(rev));
+      const only = hit[0];
+      if (hit.length === 1 && only !== undefined && !out.has(only.sha)) out.set(only.sha, d);
+    }
+  }
+  return out;
+}
+
+/**
+ * The findings of the Decisions that exempt a commit (0020-ifccm FR-046): one that is not sound (no person, no day, no reason, a malformed entry) and, where the commits of a range are given, one
+ * whose revision is not in the range, names two commits of it, or names a commit that already names a change request or is a merge (an exemption nothing needs).
+ */
+export function decisionFindings(
+  commits: readonly CommitFacts[] | undefined,
+  decisions: readonly DecisionRecord[],
+  roles: Readonly<Record<string, string>>,
+  phase: Phase,
+  file: string,
+): readonly ChangesFinding[] {
+  const out: ChangesFinding[] = [];
+  const add = (d: DecisionRecord, about: string, message: string): void => {
+    out.push({
+      file,
+      line: 1,
+      rule: "changes/decision",
+      severity: phase,
+      message: `${d.id}: ${message}`,
+      key: `changes/decision ${d.id} ${about}`,
+    });
+  };
+  for (const d of decisions) {
+    for (const p of noIssueProblems(d, roles)) add(d, p.split(" ")[0] ?? "problem", `a Decision that covers ${NO_ISSUE} <revision>: ${p}`);
+    if (commits === undefined) continue;
+    for (const e of noIssueEntries(d)) {
+      const rev = e.revision;
+      if (rev === undefined) continue;
+      const hit = commits.filter((c) => c.sha.startsWith(rev));
+      const only = hit[0];
+      if (hit.length === 0) add(d, `absent ${rev}`, `"${e.entry}" names a revision that is not in the range`);
+      else if (hit.length > 1) add(d, `ambiguous ${rev}`, `"${e.entry}" names ${hit.length} commits of the range; name more of the revision`);
+      else if (only !== undefined && (names(parseMessage(only.message)) || isMerge(only)))
+        add(d, `unneeded ${rev}`, `"${e.entry}" is not needed: that commit names a change request or is a merge`);
+    }
+  }
+  return out;
+}
+
 /** The offline findings of a range of commits: no issue, a closing word other than `Closes`, a departure with no Decision, an `Impact:` line that is not major, minor or patch, and a Decision approved by the author where a regulated domain is claimed. */
 export function commitFindings(commits: readonly CommitFacts[], ctx: Context): readonly ChangesFinding[] {
     const out: ChangesFinding[] = [];
+  const exempt = noIssueExemptions(commits, ctx.decisions, ctx.roles);
   for (const c of commits) {
     const m = parseMessage(c.message);
-    if (!names(m) && !isMerge(c))
+    if (!names(m) && !isMerge(c) && !exempt.has(c.sha))
       out.push(
         found(
           "changes/no-issue",
