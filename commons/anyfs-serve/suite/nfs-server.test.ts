@@ -258,6 +258,33 @@ proves(["0006-anyfs-serve-nfs FR-008"], "create (unchecked, guarded, exclusive w
   }),
 );
 
+proves(["0006-anyfs-serve-nfs FR-008"], "an overwrite as a kernel client makes it, an unchecked create with a size of 0 or a SETATTR of the size, truncates the file, and a guarded create of a name that is there is refused", () =>
+  using({}, async (r) => {
+    const bytes = (s: string): Uint8Array => new TextEncoder().encode(s);
+    const text = async (fh: Uint8Array): Promise<string> => new TextDecoder().decode(await r.c.readAll(fh));
+    const f = await r.c.create(r.root, "o.txt", 1);
+    const fh = f.fh ?? new Uint8Array();
+    assertEquals((await r.c.write(fh, 0, bytes("old content"))).status, 0);
+    // a guarded create (what libnfs 5.0.2 sends for nfs_creat) is refused and changes nothing
+    assertEquals((await r.c.create(r.root, "o.txt", 1, undefined, 0o644)).status, NFS_STATUS.EXIST);
+    assertEquals(await text(fh), "old content");
+    // an unchecked create without a size accepts the name and keeps the bytes
+    assertEquals((await r.c.create(r.root, "o.txt", 0, undefined, 0o644)).status, 0);
+    assertEquals(await text(fh), "old content");
+    // an unchecked create with a size of 0 (open with O_TRUNC) truncates
+    assertEquals((await r.c.create(r.root, "o.txt", 0, undefined, undefined, 0)).status, 0);
+    assertEquals(await text(fh), "");
+    assertEquals((await r.c.write(fh, 0, bytes("new"))).status, 0);
+    assertEquals(await text(fh), "new");
+    // a SETATTR of the size truncates and extends
+    assertEquals(await r.c.setattr(fh, { size: 0 }), 0);
+    assertEquals(await text(fh), "");
+    assertEquals((await r.c.write(fh, 0, bytes("abcdef"))).status, 0);
+    assertEquals(await r.c.setattr(fh, { size: 3 }), 0);
+    assertEquals(await text(fh), "abc");
+  }),
+);
+
 proves(["0006-anyfs-serve-nfs FR-009"], "links, symbolic links and nodes are refused, a mode, owner or time the store cannot keep is refused by default and accepted and counted where asked, and the mode of a create is said not to be kept", async () => {
   await using({}, async (r) => {
     const f = await r.c.create(r.root, "f", 1, undefined, 0o600);

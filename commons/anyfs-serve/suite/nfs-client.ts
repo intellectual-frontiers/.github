@@ -154,10 +154,10 @@ export class NfsClient {
     return { status, fh, ...(attr === undefined ? {} : { attr }) };
   }
 
-  async create(dir: Uint8Array, name: string, how: 0 | 1 | 2 = 1, verf = new Uint8Array(8), mode?: number): Promise<{ status: number; fh?: Uint8Array; attr?: Fattr }> {
+  async create(dir: Uint8Array, name: string, how: 0 | 1 | 2 = 1, verf = new Uint8Array(8), mode?: number, size?: number): Promise<{ status: number; fh?: Uint8Array; attr?: Fattr }> {
     const w = new XdrWriter().opaque(dir).string(name).u32(how);
     if (how === 2) w.fixed(verf);
-    else sattr(w, mode === undefined ? {} : { mode });
+    else sattr(w, { ...(mode === undefined ? {} : { mode }), ...(size === undefined ? {} : { size }) });
     const r = await this.nfs("CREATE", w.bytes());
     const status = r.u32();
     if (status !== 0) return { status };
