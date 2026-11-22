@@ -152,11 +152,7 @@ export interface Evidence {
 }
 
 /** No evidence: nothing recorded. */
-<<<<<<< HEAD
-export const NONE: Evidence = { packageReport: undefined, usages: [], results: new Map(), run: undefined, issues: [], tickets: [], recorded: false, status: new Map(), build: undefined, workflows: [], runsError: undefined, history: [], coverage: new Map(), mutation: new Map() };
-=======
-export const NONE: Evidence = { results: new Map(), run: undefined, issues: [], tickets: [], recorded: false, status: new Map(), build: undefined, workflows: [], runsError: undefined, history: [], findings: [], acceptances: { accepted: [], problems: [] }, coverage: new Map(), mutation: new Map() };
->>>>>>> 856caa74a6ea80c3629a5100f5935563055a4bf6
+export const NONE: Evidence = { packageReport: undefined, usages: [], results: new Map(), run: undefined, issues: [], tickets: [], recorded: false, status: new Map(), build: undefined, workflows: [], runsError: undefined, history: [], findings: [], acceptances: { accepted: [], problems: [] }, coverage: new Map(), mutation: new Map() };
 
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 const str = (v: unknown): string | undefined => (typeof v === "string" && v !== "" ? v : undefined);
@@ -410,11 +406,7 @@ export function readEvidence(root: string, source: EvidenceSource | undefined, f
       else tickets = r.value;
     }
   }
-<<<<<<< HEAD
-  return { packageReport, usages, results, run, issues, tickets, recorded, status, build, workflows, runsError, history, coverage, mutation };
-=======
-  return { results, run, issues, tickets, recorded, status, build, workflows, runsError, history, findings, acceptances, coverage, mutation };
->>>>>>> 856caa74a6ea80c3629a5100f5935563055a4bf6
+  return { packageReport, usages, results, run, issues, tickets, recorded, status, build, workflows, runsError, history, findings, acceptances, coverage, mutation };
 }
 
 /** The tests of every library that name a requirement, as `0009-example FR-001`. */

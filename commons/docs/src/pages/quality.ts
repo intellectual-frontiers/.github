@@ -323,11 +323,8 @@ export function qualityPages(b: Build): void {
     });
   });
   ciPage(b);
-<<<<<<< HEAD
-  packagePage(b);
-=======
   findingsPage(b);
->>>>>>> 856caa74a6ea80c3629a5100f5935563055a4bf6
+  packagePage(b);
   b.add({ path: "quality/findings.html", title: "Documentation findings", description: "What the generator found while it made this site.", section: "quality", group: "Quality", order: 5, blocks: [] });
   issuePages(b);
 }
