@@ -129,3 +129,42 @@ requirement	mechanism	by	note
 0005-repositories FR-008	check	.github: cd commons/ergonex && bun test suite/	ergonex-repositories.test.ts: adopt lists adoptable, misplaced and remoteless repositories and changes nothing
 0005-repositories FR-009	check	.github: cd commons/ergonex && bun test suite/	ergonex-repositories.test.ts: adopt --apply adds the adoptable ones only
 0005-repositories FR-010	check	.github: cd commons/ergonex && bun test suite/	ergonex-repositories.test.ts: status notes each unmanaged repository
+0006-agents FR-001	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-002	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-003	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-004	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-005	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-006	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-007	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-008	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-009	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-010	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-011	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-012	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-013	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-014	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-015	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-016	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-017	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-018	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-019	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-020	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-021	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-022	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-023	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-024	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-025	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-026	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-027	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-028	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-029	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-030	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-031	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-032	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-033	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-034	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-035	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-036	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-037	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-038	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-039	none	-	a statement of the alignment to standards: there is nothing to run
