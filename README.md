@@ -129,7 +129,7 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/netboot`](commons/netboot) | Program | The network boot of a blank machine | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/package-managers`](https://www.npmjs.com/package/@intellectual-frontiers/package-managers) | Program | The shared kit of the dialects that drive a package manager | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/pentest`](commons/pentest) | Program | The rules of an authorized security test of an estate | layers | L1 | not released (owner-blocked) |
-| [`@intellectual-frontiers/planning-query`](commons/planning-query) | Program | The items of Planning as read-only SQL relations | layers | L1 | GitHub |
+| [`@intellectual-frontiers/planning-query`](https://www.npmjs.com/package/@intellectual-frontiers/planning-query) | Program | The items of Planning as read-only SQL relations | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/repoctl`](https://www.npmjs.com/package/@intellectual-frontiers/repoctl) | Program | The operations program of this repository | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/scanners`](commons/scanners) | Program | Runs security scanners (a built-in TLS and header check, nuclei, nmap, trivy, grype, semgrep, checkov and ZAP's baseline scan) the safe way | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/toolchain`](https://www.npmjs.com/package/@intellectual-frontiers/toolchain) | Program | A Kanon library of the tools a computer needs | layers | L1 | GitHub, npm |
