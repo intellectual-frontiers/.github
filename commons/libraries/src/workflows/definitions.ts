@@ -433,7 +433,7 @@ const evidence: Workflow = {
           lines(
             "mkdir -p _evidence",
             "printf '{ \"commit\": \"%s\", \"at\": \"%s\", \"url\": \"%s\" }\\n' \"$GITHUB_SHA\" \"$(date -u '+%Y-%m-%d %H:%M UTC')\" \"$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\" > _evidence/meta.json",
-            "ls -l _evidence | head -200",
+            "ls -l _evidence | sed -n '1,200p'",
           ),
           { name: "Which run this is", shell: "bash" },
         ),
@@ -516,7 +516,7 @@ const site: Workflow = {
             "gh api --paginate -X GET \"repos/$GITHUB_REPOSITORY/issues\" -f state=all -f per_page=100 --jq '.[]' | jq -s '.' > _evidence/github-issues.json || echo '[]' > _evidence/github-issues.json",
             "bun commons/docs/tools/ci-runs.ts --out _evidence/runs.json || echo 'the runs of the workflows could not be read'",
             "printf '{ \"commit\": \"%s\", \"at\": \"%s\", \"url\": \"%s\", \"check\": \"%s\" }\\n' \"$GITHUB_SHA\" \"$(date -u '+%Y-%m-%d %H:%M UTC')\" \"$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\" \"${{ needs.check.result }}\" > _evidence/build.json",
-            "ls -l _evidence | head -80",
+            "ls -l _evidence | sed -n '1,80p'",
           ),
           { name: "The open issues, the runs of the workflows, and which build this is", shell: "bash", continueOnError: true, env: { GH_TOKEN: expr("github.token") } },
         ),

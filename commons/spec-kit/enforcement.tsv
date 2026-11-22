@@ -579,6 +579,7 @@ requirement	mechanism	by	note
 0030-generated-workflows FR-007	check	.github: cd commons/libraries && bun test suite/	workflows.test.ts and plan.test.ts: the plan and the one result are jobs of the workflow ci
 0030-generated-workflows FR-008	check	.github: cd commons/libraries && bun test suite/	workflows.test.ts: the composite action is written with the line that says it is generated, and --check compares it
 0030-generated-workflows FR-009	check	.github: cd commons/libraries && bun test suite/	workflows.test.ts: the one release workflow is run by hand from main, plans, proves and packs each library, publishes in the order of the record to npm with provenance (the token only where the repository has it) and to GitHub with its own token, skips a version that is there and tags with the runner; no library has a workflow of its own; a library with npm and no tools/pack.ts is a finding
+0030-generated-workflows FR-010	check	.github: cd commons/libraries && bun test suite/	workflows.test.ts: no script of a bash step pipes into head, so that a long listing cannot fail the step that prints it (the evidence run of 08:00 failed at `ls -l _evidence | head -200`)
 0031-install-locations FR-001	review	0032-libraries-by-concern FR-010	kept by the library system: 0001-system FR-008
 0031-install-locations FR-002	review	0032-libraries-by-concern FR-010	kept by the library system: 0001-system FR-008
 0031-install-locations FR-003	review	0032-libraries-by-concern FR-010	kept by the library system: 0001-system FR-008
