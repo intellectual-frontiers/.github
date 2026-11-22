@@ -17,7 +17,7 @@ import type { Channel, ConfirmationClass, Effect, Kind } from "@intellectual-fro
 import type { TierId } from "./tiers.ts";
 
 /** The words of every verb, as a person types them: a closed union. */
-export type VerbId = "sync" | "merge" | "check" | "status" | "hygiene" | "release plan" | "release apply" | "release publish" | "new library" | "commit" | "doctor" | "prove" | "docs build" | "docs serve" | "docs check" | "query" | "mcp";
+export type VerbId = "sync" | "merge" | "check" | "status" | "hygiene" | "release plan" | "release apply" | "release publish" | "new library" | "commit" | "doctor" | "prove" | "docs build" | "docs serve" | "docs check" | "query" | "ci step" | "mcp";
 
 /** What a verb is. */
 export type VerbFacts = {
@@ -118,6 +118,19 @@ export const VERBS: Readonly<Record<VerbId, VerbFacts>> = {
     check: false,
     tier: "public",
     channels: ["local", "mcp"],
+    confirmation: "none",
+    humanOnly: [],
+  },
+  "ci step": {
+    id: "ci step",
+    summary: "Run one step of a pipeline under the build policy: run the command given after --, keep what it prints, read it into findings with the parser of its tool, write the step's findings file and end 0 whatever the command's status was (commons 0038-build-policy FR-013).",
+    kind: "action",
+    effect: "mutate",
+    idempotent: false,
+    dryRun: false,
+    check: false,
+    tier: "contributor",
+    channels: ["local"],
     confirmation: "none",
     humanOnly: [],
   },
@@ -268,5 +281,5 @@ export const VERBS: Readonly<Record<VerbId, VerbFacts>> = {
 
 /** The words of every verb, in the order the help lists them. */
 export function verbIds(): readonly VerbId[] {
-  return ["check", "sync", "merge", "status", "hygiene", "release plan", "release apply", "release publish", "new library", "commit", "doctor", "prove", "docs build", "docs serve", "docs check", "query", "mcp"];
+  return ["check", "sync", "merge", "status", "hygiene", "release plan", "release apply", "release publish", "new library", "commit", "doctor", "prove", "docs build", "docs serve", "docs check", "query", "ci step", "mcp"];
 }

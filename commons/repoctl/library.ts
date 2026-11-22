@@ -35,7 +35,7 @@ export const library = {
           { name: "@intellectual-frontiers/headless", subpaths: "any" },
           { name: "@intellectual-frontiers/terminal", subpaths: ["args", "commands"] },
           { name: "@intellectual-frontiers/system", subpaths: "any" },
-          { name: "@intellectual-frontiers/libraries", subpaths: ["libraries", "family", "license", "releasing", "link", "affected", "workflows/definitions"] },
+          { name: "@intellectual-frontiers/libraries", subpaths: ["libraries", "family", "license", "releasing", "link", "affected", "workflows/definitions", "ci/step"] },
           { name: "@intellectual-frontiers/crypto", subpaths: ["sha256"] },
           { name: "@intellectual-frontiers/net", subpaths: ["serve"] },
         ],

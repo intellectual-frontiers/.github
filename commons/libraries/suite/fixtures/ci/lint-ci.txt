@@ -1,0 +1,60 @@
+93 | const sync = async (r: Replica, medium: Medium, more: { readonly maxRows?: number } = {}) => {
+94 |   const done = await syncThrough({ self: r.id, replica: r.sql.store as unknown as Mergeable, medium, cursor: r.cursor, ...more });
+                                                             ^
+error: This assertion is unnecessary since the receiver accepts the original type of the expression.  @typescript-eslint/no-unnecessary-type-assertion
+    at tests/commons-anyfs-merge-medium.test.ts:94:57
+
+137 |   const cut = await syncThrough({
+138 |     self: a.id,
+139 |     replica: a.sql.store as unknown as Mergeable,
+                   ^
+error: This assertion is unnecessary since the receiver accepts the original type of the expression.  @typescript-eslint/no-unnecessary-type-assertion
+    at tests/commons-anyfs-merge-medium.test.ts:139:14
+
+153 |   for (let round = 0; round < 3; round++) for (const r of [a, b, c]) await sync(r, medium);
+154 |   for (const r of [a, b, c])
+155 |     assert((await publishVector({ self: r.id, replica: r.sql.store as unknown as Mergeable, medium })).kind === "ok");
+                                                             ^
+error: This assertion is unnecessary since the receiver accepts the original type of the expression.  @typescript-eslint/no-unnecessary-type-assertion
+    at tests/commons-anyfs-merge-medium.test.ts:155:56
+
+184 |       const m = await localStore(shared);
+185 |       if (m.kind === "err") throw new Error(m.error);
+186 |       console.log(`[anyfs merge medium] ${await exercise("folder", m.value as unknown as Medium, dir)}`);
+                                                                         ^
+error: This assertion is unnecessary since the receiver accepts the original type of the expression.  @typescript-eslint/no-unnecessary-type-assertion
+    at tests/commons-anyfs-merge-medium.test.ts:186:68
+
+208 |       const git = await gitRefStore({ repo, branch: "exchange", commit: { author: identity.value, clock: () => Date.UTC(2026, 0, 1) } });
+209 |       if (git.kind === "err") throw new Error(git.error);
+210 |       console.log(`[anyfs merge medium] ${await exercise("git branch", git.value.store as unknown as Medium, dir)}`);
+                                                                             ^
+error: This assertion is unnecessary since the receiver accepts the original type of the expression.  @typescript-eslint/no-unnecessary-type-assertion
+    at tests/commons-anyfs-merge-medium.test.ts:210:72
+
+224 |         const opened = await openSshStore(executorOf(host), { place: placeOf(host), root: `${host.root}/exchange`, create: true });
+225 |         if (opened.kind === "err") throw new Error(opened.error);
+226 |         console.log(`[anyfs merge medium] ${await exercise("real sshd", opened.value.store as unknown as Medium, dir)}`);
+                                                                              ^
+error: This assertion is unnecessary since the receiver accepts the original type of the expression.  @typescript-eslint/no-unnecessary-type-assertion
+    at tests/commons-anyfs-merge-medium.test.ts:226:73
+
+273 |       if (opened.kind === "err") throw new Error(opened.error);
+274 |       if (opened.value.mode === "read-only") throw new Error("the keys can write");
+275 |       console.log(`[anyfs merge medium] ${await exercise("real S3 (RustFS)", opened.value.store as unknown as Medium, dir)}`);
+                                                                                   ^
+error: This assertion is unnecessary since the receiver accepts the original type of the expression.  @typescript-eslint/no-unnecessary-type-assertion
+    at tests/commons-anyfs-merge-medium.test.ts:275:78
+
+7 problems (7 errors, 0 warnings)
+7 can be fixed with --fix
+##[error]This assertion is unnecessary since the receiver accepts the original type of the expression.
+##[error]This assertion is unnecessary since the receiver accepts the original type of the expression.
+##[error]This assertion is unnecessary since the receiver accepts the original type of the expression.
+##[error]This assertion is unnecessary since the receiver accepts the original type of the expression.
+##[error]This assertion is unnecessary since the receiver accepts the original type of the expression.
+##[error]This assertion is unnecessary since the receiver accepts the original type of the expression.
+##[error]This assertion is unnecessary since the receiver accepts the original type of the expression.
+Linted 30 files [151.23ms]
+
+ci step the-linter-type-aware-no-warning-allowed-7: no-output, 1 findings (never a red step)

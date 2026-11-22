@@ -87,3 +87,5 @@ requirement	mechanism	by	note
 0012-repoctl-query FR-003	check	.github: cd commons/repoctl && bun run verify	suite/query.test.ts
 0012-repoctl-query FR-004	check	.github: cd commons/repoctl && bun run verify	suite/query.test.ts
 0012-repoctl-query FR-005	check	.github: cd commons/repoctl && bun run verify	suite/query.test.ts
+0013-repoctl-ci FR-001	check	.github: cd commons/repoctl && bun test suite/	ci.test.ts: the verb is in the table, local only, and comes where the capability is on
+0013-repoctl-ci FR-002	check	.github: cd commons/repoctl && bun test suite/	ci.test.ts: a failing command ends 0 with its finding kept, a wrong call ends 2

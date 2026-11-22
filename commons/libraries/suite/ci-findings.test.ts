@@ -33,6 +33,8 @@ proves([`${SPEC} FR-003`], "each parser reads the real output of its tool into f
   const lint = parseOutput("lint", fixture("lint.txt"), ctx);
   assert(lint.some((f) => f.code === "no-var" && f.severity === "warning" && f.line === 2), "a lint warning keeps its severity and line");
   assert(lint.some((f) => f.code === "ifc/module-doc" && f.severity === "error"));
+  const lintCi = parseOutput("lint", fixture("lint-ci.txt"), ctx);
+  assert(lintCi.length >= 3 && lintCi.every((f) => f.code === "@typescript-eslint/no-unnecessary-type-assertion" && f.file === "tests/commons-anyfs-merge-medium.test.ts" && f.severity === "error"), "the linter's report as a pipeline's log holds it (kept from a real run of this repository's CI)");
   const fmt = parseOutput("format", fixture("format.txt"), ctx);
   assertEquals(fmt.map((f) => f.file), ["tests/_tmp.ts", "tests/commons-kanon.test.ts"]);
   const rc = parseOutput("repoctl-check", fixture("repoctl-check.txt"), ctx);
