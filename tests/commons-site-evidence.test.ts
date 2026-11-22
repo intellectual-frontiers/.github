@@ -31,14 +31,16 @@ proves(
     ])
       assertStringIncludes(e, said);
     assert(!e.includes("push:"), "the evidence is not gathered on a push");
-    assert(!e.includes("contents: write"), "nothing here writes to the repository: the history travels in the artifact");
+    // the one job that writes is the one that keeps the findings of a run on the history branch (0038-build-policy FR-012); the evidence's own history travels in the artifact
+    const withoutKeep = e.replace(/\n {2}keep-findings:\n[\s\S]*?(?=\n {2}[a-z][\w-]*:\n|$)/, "");
+    assert(!withoutKeep.includes("contents: write"), "nothing here writes to the repository but the job that keeps the findings: the history of the evidence travels in the artifact");
     const w = read(".github/workflows/site.auto.yml");
     for (const said of [
       "gh run download --name evidence",
       "_evidence/github-issues.json",
       "tools/ci-runs.ts",
       "tools/status-site.ts",
-      "steps.build.outcome != 'success'",
+      "steps.build.outputs.outcome != 'success'",
       "workflow_run:",
       "needs: [check]",
       "always() && github.event_name != 'pull_request'",
