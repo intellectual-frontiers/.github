@@ -1,7 +1,8 @@
 // Spec: 0007-estate-kinds FR-001, FR-002, FR-003
+// Spec: 0008-estate-workstations FR-001, FR-002, FR-003, FR-005
 /**
  * The kinds of asset that carry typed attributes, and the named kinds of link between assets. An asset of a kind in this catalog states its attributes as data, and each is checked: a required one is there, one that is there is of its type and, where the catalog lists
- * the values, one of them. A kind that is not in the catalog (`server`, `workstation`, `device`) carries none, and still any word is a kind. The catalog is additive: a kind or an attribute is added, never renamed.
+ * the values, one of them. A kind that is not in the catalog (`server`, `device`) carries none, and still any word is a kind. The catalog is additive: a kind or an attribute is added, never renamed.
  *
  * @example
  * ```ts
@@ -36,6 +37,12 @@ const strs = (name: string, summary: string): AttributeSpec => ({ name, type: "s
 
 /** The data classes an application or a service may handle, in the words of a government contractor's scope. */
 export const DATA_CLASSES = ["cui", "fci", "phi", "pii", "pci", "public"] as const;
+
+/** The coding harnesses an estate knows by name (a harness not here is `other`). */
+export const HARNESSES = ["claude-code", "codex", "herdr", "other"] as const;
+
+/** The digest of the typed `agents` policy that bounds what the harnesses of a workstation may do: `sha256:` and 64 hexadecimal digits. */
+export const AGENTS_POLICY_DIGEST = /^sha256:[0-9a-f]{64}$/;
 
 /** The kinds with attributes. */
 export const KINDS: readonly KindSpec[] = [
@@ -72,12 +79,29 @@ export const KINDS: readonly KindSpec[] = [
     kind: "application",
     summary: "A piece of software the organization runs or ships.",
     attributes: [
-      str("tier", "What it does in the system.", { values: ["web", "api", "worker", "batch", "database", "library"] }),
+      str("tier", "What it does in the system.", { values: ["web", "api", "worker", "batch", "database", "library", "agent-harness"] }),
+      str("harness", "The coding harness, where the tier is agent-harness.", { values: HARNESSES }),
       str("language", "The language it is written in."),
       str("repository", "The address of its source repository."),
       str("image", "The container image it runs from, where it runs from one."),
       strs("handles", "The data classes it handles."),
       str("provenance", "Where the asset was read from, as tool:file#address (written by the importers of infrastructure as code)."),
+    ],
+  },
+  {
+    kind: "workstation",
+    summary: "A machine a person or an agent works on; an agent workspace is one whose role is agent-workspace.",
+    attributes: [
+      str("role", "What the machine is for.", { values: ["agent-workspace", "developer", "other"] }),
+      str("disposability", "Whether it may be thrown away and rebuilt.", { values: ["disposable", "persistent"] }),
+      str("isolation", "What isolates it from the machine it runs on.", { values: ["container", "vm", "physical"] }),
+      str("os-family", "The family of the operating system, as observed.", { values: ["arch", "debian", "rhel", "macos", "windows", "other"] }),
+      str("distro", "The distribution, as observed (the real one: an Omarchy machine is arch).", { values: ["arch", "ubuntu", "debian", "rocky", "macos", "windows", "other"] }),
+      bool("omarchy", "Whether the machine is an Omarchy machine (distro arch, with Omarchy on it), as observed."),
+      strs("harnesses", "The coding harnesses installed: claude-code, codex, herdr or other."),
+      str("coordinator", "The version of the coordinator (Ergonex) that is installed."),
+      str("persona", "Who works on the machine.", { values: ["human", "agent"] }),
+      str("agents-policy", "The digest (sha256:, 64 hexadecimal digits) of the typed agents policy that bounds the harnesses."),
     ],
   },
   {
@@ -138,6 +162,16 @@ export function checkAttributes(kind: string, attributes: Readonly<Record<string
   if (kind === "endpoint" || kind === "service") {
     const name = given["service"];
     if (typeof name === "string" && serviceByName(name) === undefined) problems.push(`${kind} names the service ${name}, which the services catalog does not have`);
+  }
+  if (kind === "application") {
+    const harness = given["harness"];
+    if (harness !== undefined && given["tier"] !== "agent-harness") problems.push("application attribute harness is for the tier agent-harness");
+  }
+  if (kind === "workstation") {
+    const digest = given["agents-policy"];
+    if (typeof digest === "string" && !AGENTS_POLICY_DIGEST.test(digest)) problems.push("workstation attribute agents-policy is not a digest (sha256: and 64 hexadecimal digits)");
+    if (given["omarchy"] === true && given["distro"] !== undefined && given["distro"] !== "arch") problems.push("an Omarchy workstation is distro arch");
+    if (given["omarchy"] === true && given["os-family"] !== undefined && given["os-family"] !== "arch") problems.push("an Omarchy workstation is os-family arch");
   }
   return problems;
 }

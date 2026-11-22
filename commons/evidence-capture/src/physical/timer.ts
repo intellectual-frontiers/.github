@@ -22,7 +22,7 @@ import { installJob, removeJob, type JobOptions, type JobReport } from "@intelle
  * cadence is an hour or more. The collector decides, on each firing, which assets are due.
  */
 export function timerEvery(policy: CapturePolicy): { readonly kind: "minutes"; readonly every: number } | { readonly kind: "hourly" } {
-  const cadences = [policy.cadence.managed, policy.cadence.adopted, ...Object.values(policy.cadence.perAsset)].map((c) => parseDuration(c)).flatMap((r) => (r.kind === "ok" ? [r.value] : []));
+  const cadences = [policy.cadence.managed, policy.cadence.adopted, ...Object.values(policy.cadence.perRole), ...Object.values(policy.cadence.perAsset)].map((c) => parseDuration(c)).flatMap((r) => (r.kind === "ok" ? [r.value] : []));
   const shortest = Math.min(...cadences);
   const minutes = Math.floor(shortest / 60_000);
   if (minutes >= 60) return { kind: "hourly" };

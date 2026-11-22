@@ -125,7 +125,7 @@ export async function collect(input: CollectInput): Promise<Result<Collected, st
       const kept = text(await store.read(statePath(id)));
       const before = { digest: kept === undefined ? undefined : await textDigest(kept), lastJournaledAt: memory.journaled[id] };
       memory.attempts[id] = now;
-      const type = entryTypeFor(found, before, policy, now);
+      const type = entryTypeFor(found, before, policy, now, input.assets.find((a) => a.id === id) ?? {});
       if (found.kind === "state" && stateText !== undefined && before.digest !== found.digest) stateChanges.push({ path: statePath(id), bytes: new TextEncoder().encode(stateText) });
       if (type !== undefined) {
         const failure: CaptureFailure | undefined = found.kind === "failure" ? found.failure : undefined;

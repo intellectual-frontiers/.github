@@ -1,0 +1,4 @@
+# Requirements proven by review: the requirement, a tab, how it is verified.
+0008-estate-workstations FR-017	Kept by commons/machine-probe (0008-machine-probe-agent-workspace FR-002, FR-003): the rules and the pack are proved in its suite/agent-workspace.test.ts.
+0008-estate-workstations FR-018	Kept by commons/machine-probe (0008-machine-probe-agent-workspace FR-001, FR-005): the section @agent is proved there against the output of a real Omarchy 4.5.0 machine and of the script run for real.
+0008-estate-workstations FR-019	Kept by commons/machine-probe (0008-machine-probe-agent-workspace FR-004): supported-os of an Omarchy machine is proved there.

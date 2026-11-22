@@ -69,6 +69,47 @@ facts() {
   elif has lsof; then lsof -nP -iTCP -sTCP:LISTEN 2>/dev/null | awk 'NR>1{print $9}' | sed 's/.*://' | sort -un | tr '\n' ' ' | sed 's/^/ports=/;s/ *$//'; echo
   elif has netstat; then netstat -ltn 2>/dev/null | awk 'NR>2{print $4}' | sed 's/.*://' | sort -un | tr '\n' ' ' | sed 's/^/ports=/;s/ *$//'; echo
   fi
+  agent_facts
+}
+
+# The facts of a machine on which a coding harness works (commons machine-probe 0008-machine-probe-agent-workspace). The section is
+# written only where a harness, the coordinator or its folder is found. A harness is a program on the PATH that is not a mise shim
+# (a shim starts an install over the network when run, so it is looked for and never run). Only the NAMES of the variables that look
+# like secrets are given, never a value.
+agent_facts() {
+  cfg="${XDG_CONFIG_HOME:-${HOME:-/nonexistent}/.config}/ergonex"
+  harnesses=""
+  for h in claude:claude-code codex:codex herdr:herdr; do
+    bin=${h%%:*}; name=${h#*:}
+    p=$(command -v "$bin" 2>/dev/null)
+    case "$p" in ""|*/mise/shims/*) ls -d "${HOME:-/nonexistent}"/.local/share/mise/installs/*"$bin"* >/dev/null 2>&1 && harnesses="$harnesses $name";; *) harnesses="$harnesses $name";; esac
+  done
+  harnesses=$(printf '%s\n' $harnesses | sort -u | tr '\n' ' ' | sed 's/ *$//')
+  if [ -z "$harnesses" ] && ! has ergonex && [ ! -d "$cfg" ] && [ -z "${ERGONEX_PERSONA:-}" ]; then return 0; fi
+  echo "@agent"
+  has ergonex && kv coordinator "$(ergonex --version 2>/dev/null | grep -Eo '[0-9]+(\.[0-9]+)+' | head -1)"
+  kv persona "${ERGONEX_PERSONA:-}"
+  kv harnesses "$harnesses"
+  [ -r "$cfg/agents-policy.digest" ] && kv policy-digest "$(head -1 "$cfg/agents-policy.digest")"
+  tf=${ERGONEX_GITHUB_TOKEN_FILE:-$cfg/token}
+  if [ -e "$tf" ]; then
+    m=$(stat -L -c %a "$tf" 2>/dev/null || stat -L -f %Lp "$tf" 2>/dev/null)
+    [ -n "$m" ] && kv token-file-mode "$(printf '%04d' "$m")"
+  fi
+  names=$( {
+    env | sed -n 's/^\([A-Za-z_][A-Za-z0-9_]*\)=.*/\1/p'
+    for f in "${HOME:-/nonexistent}/.profile" "${HOME:-/nonexistent}/.bash_profile" "${HOME:-/nonexistent}/.bashrc" "${HOME:-/nonexistent}/.zshenv" /etc/environment; do
+      [ -r "$f" ] && sed -n 's/^[[:space:]]*\(export[[:space:]][[:space:]]*\)\{0,1\}\([A-Za-z_][A-Za-z0-9_]*\)=.*/\2/p' "$f"
+    done
+    for f in "${HOME:-/nonexistent}"/.config/environment.d/*.conf; do [ -r "$f" ] && sed -n 's/^[[:space:]]*\([A-Za-z_][A-Za-z0-9_]*\)=.*/\1/p' "$f"; done
+  } 2>/dev/null | grep -E 'TOKEN|SECRET|PASSWORD|PASSWD|CREDENTIAL|API_?KEY|PRIVATE_?KEY|ACCESS_?KEY' | grep -vE '_(FILE|PATH)$|TOKENS$' | sort -u | tr '\n' ' ' | sed 's/ *$//')
+  kv ambient-secret-names "$names"
+  kv uid "$(id -u 2>/dev/null)"
+  if has systemd-detect-virt; then
+    v=$(systemd-detect-virt 2>/dev/null); [ -n "$v" ] || v=none
+    if systemd-detect-virt -q --container 2>/dev/null; then iso=container; elif systemd-detect-virt -q --vm 2>/dev/null; then iso=vm; else iso=physical; fi
+  else v=unknown; iso=unknown; fi
+  kv virt "$v"; kv isolation "$iso"
 }
 
 case "$req" in

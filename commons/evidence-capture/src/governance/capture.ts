@@ -14,7 +14,7 @@
 import type { Result } from "@intellectual-frontiers/core";
 
 /** An asset the collector observes: its id and whether it is managed or adopted (a discovered asset is not observed). */
-export type Observed = { readonly id: string; readonly state: "managed" | "adopted" };
+export type Observed = { readonly id: string; readonly state: "managed" | "adopted"; /** The attributes of the asset, where the policy keys on them (the role of its cadence, its disposability). */ readonly attributes?: Readonly<Record<string, unknown>> };
 
 /** Why an asset could not be observed: it could not be reached, it refused, or what it said could not be read. */
 export type CaptureFailure = { readonly kind: "unreachable" | "refused" | "unreadable"; readonly message: string };

@@ -1,0 +1,36 @@
+@probe
+version=1
+at=2026-11-22T17:33:41Z
+@os
+kernel=Linux
+release=7.2.15-1-omarchy
+arch=x86_64
+hostname=omarchy-test
+family=omarchy (arch)
+name=Omarchy
+version=4.5.0
+model=Standard PC (Q35 + ICH9, 2009)
+@hardware
+cpus=2
+memory_mb=3901
+disk_total_gb=37
+disk_used_pct=32
+@security
+disk_encryption=off
+firewall=on
+auto_updates=manual
+admins=omarchy
+ssh_password_auth=no
+@software
+manager=pacman
+packages=893
+pending_updates=0
+@listening
+ports=22 53 631
+@agent
+persona=
+harnesses=herdr
+ambient-secret-names=
+uid=1000
+virt=qemu
+isolation=vm

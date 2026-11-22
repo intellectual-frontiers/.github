@@ -30,8 +30,8 @@ export type SealRequirement = "never" | "on-export" | "daily";
 export type CapturePolicyInput = {
   readonly branch?: string;
   readonly collector?: { readonly runsOn?: string };
-  readonly cadence?: { readonly managed?: string; readonly adopted?: string; readonly perAsset?: Readonly<Record<string, string>> };
-  readonly journal?: { readonly granularity?: JournalGranularity; readonly heartbeat?: string; readonly commit?: { readonly every?: string } };
+  readonly cadence?: { readonly managed?: string; readonly adopted?: string; readonly perRole?: Readonly<Record<string, string>>; readonly perAsset?: Readonly<Record<string, string>> };
+  readonly journal?: { readonly granularity?: JournalGranularity; readonly heartbeat?: string; readonly disposable?: { readonly granularity: JournalGranularity; readonly heartbeat?: string }; readonly commit?: { readonly every?: string } };
   readonly push?: { readonly mode?: PushMode; readonly remote?: string; readonly every?: string };
   readonly sealing?: { readonly required?: SealRequirement; readonly key?: string };
 };
@@ -40,8 +40,8 @@ export type CapturePolicyInput = {
 export type CapturePolicy = {
   readonly branch: string;
   readonly collector: { readonly runsOn: string };
-  readonly cadence: { readonly managed: string; readonly adopted: string; readonly perAsset: Readonly<Record<string, string>> };
-  readonly journal: { readonly granularity: JournalGranularity; readonly heartbeat: string | null; readonly commit: { readonly every: string } };
+  readonly cadence: { readonly managed: string; readonly adopted: string; readonly perRole: Readonly<Record<string, string>>; readonly perAsset: Readonly<Record<string, string>> };
+  readonly journal: { readonly granularity: JournalGranularity; readonly heartbeat: string | null; readonly disposable: { readonly granularity: JournalGranularity; readonly heartbeat: string | null } | null; readonly commit: { readonly every: string } };
   readonly push: { readonly mode: PushMode; readonly remote: string; readonly every: string | null };
   readonly sealing: { readonly required: SealRequirement; readonly key: string | null };
 };
@@ -53,10 +53,16 @@ export const LONGEST_WINDOW_MS = 7 * 86_400_000;
 export const DEFAULT_CAPTURE_POLICY: CapturePolicy = {
   branch: "evidence",
   collector: { runsOn: "controller" },
-  cadence: { managed: "PT15M", adopted: "P1D", perAsset: {} },
-  journal: { granularity: "every-capture", heartbeat: null, commit: { every: "PT1H" } },
+  cadence: { managed: "PT15M", adopted: "P1D", perRole: {}, perAsset: {} },
+  journal: { granularity: "every-capture", heartbeat: null, disposable: null, commit: { every: "PT1H" } },
   push: { mode: "never", remote: "origin", every: null },
   sealing: { required: "on-export", key: null },
+};
+
+/** The capture policy for the agent workspaces of an estate (0008-estate-workstations FR-016): an agent workspace is observed every 15 minutes whether adopted or managed, and a disposable one is journaled as changes and a heartbeat. */
+export const AGENT_WORKSPACE_CAPTURE: CapturePolicyInput = {
+  cadence: { perRole: { "agent-workspace": "PT15M" } },
+  journal: { disposable: { granularity: "changes-and-heartbeat", heartbeat: "PT30M" } },
 };
 
 /** How long an observation is good for at a cadence: twice the cadence, and never more than the longest window. */
@@ -86,10 +92,14 @@ export function defineCapturePolicy(input: CapturePolicyInput = {}): Result<Capt
     }
     return r.value;
   };
-  const cadence = { managed: input.cadence?.managed ?? d.cadence.managed, adopted: input.cadence?.adopted ?? d.cadence.adopted, perAsset: { ...(input.cadence?.perAsset ?? {}) } };
+  const cadence = { managed: input.cadence?.managed ?? d.cadence.managed, adopted: input.cadence?.adopted ?? d.cadence.adopted, perRole: { ...(input.cadence?.perRole ?? {}) }, perAsset: { ...(input.cadence?.perAsset ?? {}) } };
   const cadences: { label: string; text: string; ms: number | undefined }[] = [
     { label: "the cadence of managed assets", text: cadence.managed, ms: duration("the cadence of managed assets", cadence.managed) },
     { label: "the cadence of adopted assets", text: cadence.adopted, ms: duration("the cadence of adopted assets", cadence.adopted) },
+    ...Object.entries(cadence.perRole).map(([role, text]) => {
+      if (!/^[a-z][a-z0-9-]*$/.test(role)) problems.push(`${JSON.stringify(role)} in the cadences of roles is not a role (lower case words joined by hyphens)`);
+      return { label: `the cadence of the role ${role}`, text, ms: duration(`the cadence of the role ${role}`, text) };
+    }),
     ...Object.entries(cadence.perAsset).map(([id, text]) => {
       if (parseAssetId(id).kind === "err") problems.push(`${JSON.stringify(id)} in the cadences is not an asset`);
       return { label: `the cadence of ${id}`, text, ms: duration(`the cadence of ${id}`, text) };
@@ -109,6 +119,21 @@ export function defineCapturePolicy(input: CapturePolicyInput = {}): Result<Capt
         for (const c of cadences) if (c.ms !== undefined && hb > freshnessWindowMs(c.ms)) problems.push(`the heartbeat ${heartbeat} is longer than the freshness window of ${c.label.replace("the cadence of ", "")} (${c.text}): it would look stale between heartbeats`);
       }
     }
+  }
+  let disposable: { readonly granularity: JournalGranularity; readonly heartbeat: string | null } | null = null;
+  if (input.journal?.disposable !== undefined) {
+    const g = input.journal.disposable.granularity;
+    const hb = input.journal.disposable.heartbeat ?? null;
+    if (g !== "every-capture" && g !== "changes-and-heartbeat") problems.push(`${JSON.stringify(g)} is not a granularity of the journal of disposable assets`);
+    else if (g === "every-capture" && hb !== null) problems.push("a heartbeat is for a journal of changes and a heartbeat: every capture is journaled already (disposable assets)");
+    else if (g === "changes-and-heartbeat") {
+      if (hb === null) problems.push("a journal of changes and a heartbeat needs the heartbeat (disposable assets)");
+      else {
+        const ms = duration("the heartbeat of disposable assets", hb);
+        if (ms !== undefined) for (const c of cadences) if (c.ms !== undefined && ms > freshnessWindowMs(c.ms)) problems.push(`the heartbeat ${hb} of disposable assets is longer than the freshness window of ${c.label.replace("the cadence of ", "")} (${c.text}): it would look stale between two heartbeats`);
+      }
+    }
+    disposable = { granularity: g, heartbeat: hb };
   }
   const commitEvery = input.journal?.commit?.every ?? d.journal.commit.every;
   duration("the commit interval of the journal", commitEvery);
@@ -134,15 +159,24 @@ export function defineCapturePolicy(input: CapturePolicyInput = {}): Result<Capt
     branch,
     collector: { runsOn },
     cadence,
-    journal: { granularity, heartbeat, commit: { every: commitEvery } },
+    journal: { granularity, heartbeat, disposable, commit: { every: commitEvery } },
     push: { mode, remote, every: pushEvery },
     sealing: { required, key },
   });
 }
 
-/** The cadence of an asset: its own where the policy gives one, else that of its state; nothing for an asset that is not observed (a discovered asset). */
-export function cadenceOf(policy: CapturePolicy, asset: { readonly id: string; readonly state: "discovered" | "adopted" | "managed" }): string | undefined {
+/** The cadence of an asset: its own where the policy gives one, else that of its role (the `role` attribute), else that of its state; nothing for an asset that is not observed (a discovered asset). */
+export function cadenceOf(policy: CapturePolicy, asset: { readonly id: string; readonly state: "discovered" | "adopted" | "managed"; readonly attributes?: Readonly<Record<string, unknown>> }): string | undefined {
   const own = policy.cadence.perAsset[asset.id];
   if (own !== undefined) return own;
-  return asset.state === "managed" ? policy.cadence.managed : asset.state === "adopted" ? policy.cadence.adopted : undefined;
+  if (asset.state === "discovered") return undefined;
+  const role = asset.attributes?.["role"];
+  const ofRole = typeof role === "string" ? policy.cadence.perRole[role] : undefined;
+  if (ofRole !== undefined) return ofRole;
+  return asset.state === "managed" ? policy.cadence.managed : policy.cadence.adopted;
+}
+
+/** How the journal records an asset: that of disposable assets where the asset says it is `disposable` and the policy gives one, else that of the policy. */
+export function journalOf(policy: CapturePolicy, asset: { readonly attributes?: Readonly<Record<string, unknown>> }): { readonly granularity: JournalGranularity; readonly heartbeat: string | null } {
+  return asset.attributes?.["disposability"] === "disposable" && policy.journal.disposable !== null ? policy.journal.disposable : { granularity: policy.journal.granularity, heartbeat: policy.journal.heartbeat };
 }

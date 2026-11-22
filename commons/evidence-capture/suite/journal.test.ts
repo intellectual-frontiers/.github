@@ -61,6 +61,16 @@ proves(["0002-evidence-capture-journal FR-004"], "a changed state is an entry, t
   }
 });
 
+proves(["0002-evidence-capture-journal FR-004"], "a disposable asset is journaled as the policy of disposable assets says, and another as the policy says", () => {
+  const p = policy({ cadence: { perRole: { "agent-workspace": "PT15M" } }, journal: { disposable: { granularity: "changes-and-heartbeat", heartbeat: "PT30M" } } });
+  const same = { kind: "state", digest: "d1" } as const;
+  const before = { digest: "d1", lastJournaledAt: "2026-12-01T09:45:00Z" };
+  assertEquals(entryTypeFor(same, before, p, "2026-12-01T10:00:00Z"), "capture.unchanged", "an asset that says nothing is journaled as the policy says: every capture");
+  assertEquals(entryTypeFor(same, before, p, "2026-12-01T10:00:00Z", { attributes: { disposability: "disposable" } }), undefined, "a disposable asset waits for its heartbeat");
+  assertEquals(entryTypeFor(same, before, p, "2026-12-01T10:00:00Z", { attributes: { disposability: "persistent" } }), "capture.unchanged");
+  assertEquals(entryTypeFor(same, { ...before, lastJournaledAt: "2026-12-01T09:30:00Z" }, p, "2026-12-01T10:00:00Z", { attributes: { disposability: "disposable" } }), "capture.unchanged");
+});
+
 proves(["0002-evidence-capture-journal FR-005"], "the assets due are those whose cadence has run or never looked at, in order, and a bad instant gives none", () => {
   const p = policy({ cadence: { perAsset: { olympia: "PT5M" } } });
   const assets = [{ id: "sparta", state: "adopted" }, { id: "athens", state: "managed" }, { id: "olympia", state: "managed" }] as const;
@@ -70,5 +80,8 @@ proves(["0002-evidence-capture-journal FR-005"], "the assets due are those whose
   assertEquals(dueAssets(p, assets, () => undefined, "2026-12-01T10:00:00Z"), ["athens", "olympia", "sparta"], "never looked at");
   assertEquals(dueAssets(p, assets, (id) => last[id], "2026-12-02T09:45:00Z"), ["athens", "olympia", "sparta"]);
   assertEquals(dueAssets(p, assets, () => undefined, "now"), []);
+  const roles = policy({ cadence: { perRole: { "agent-workspace": "PT15M" } } });
+  const boxes = [{ id: "agentbox", state: "adopted", attributes: { role: "agent-workspace" } }, { id: "devbox", state: "adopted", attributes: { role: "developer" } }] as const;
+  assertEquals(dueAssets(roles, boxes, () => "2026-12-01T09:45:00Z", "2026-12-01T10:00:00Z"), ["agentbox"], "an agent workspace is due every 15 minutes whether adopted or managed; another role keeps the cadence of its state");
   assertEquals(dueAssets(p, [{ id: "printer", state: "discovered" } as never], () => undefined, "2026-12-01T10:00:00Z"), [], "a discovered asset has no cadence");
 });

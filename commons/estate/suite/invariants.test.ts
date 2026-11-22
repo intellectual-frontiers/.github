@@ -29,5 +29,5 @@ proves(["0003-estate-logical FR-007"], "an observation with no source and a poli
 
 proves(["0003-estate-logical FR-007"], "every invariant of the ontology says whether an estate checks it, and none is missing or invented", () => {
   assertEquals(Object.keys(INVARIANT_COVERAGE).sort(), Object.keys(invariants).sort());
-  assertEquals(Object.entries(INVARIANT_COVERAGE).filter(([, v]) => v === "checked").map(([k]) => k).sort(), ["NoComplianceWithoutTraceability", "NoEvidenceWithoutAttribution", "NoUnownedResponsibilities"]);
+  assertEquals(Object.entries(INVARIANT_COVERAGE).filter(([, v]) => v === "checked").map(([k]) => k).sort(), ["NoAuthorityWithoutScope", "NoComplianceWithoutTraceability", "NoEvidenceWithoutAttribution", "NoUnownedResponsibilities"]);
 });
