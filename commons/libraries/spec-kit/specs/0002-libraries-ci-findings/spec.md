@@ -18,6 +18,8 @@
 - **FR-007**: `src/ci/history.ts` MUST keep a run as one new file of the orphan branch `findings-history` at `runs/YYYY/MM/DD/<workflow>-<run id>.json` by a commit that adds a file and changes none, never replace a file that is there, push as a fast-forward and, where the branch moved, retry from its new tip and never force; and MUST read the files of the branch, oldest first (commons 0038-build-policy FR-012).
 - **FR-008**: `src/ci/release-gate.ts` MUST say what the release policy lets the run do on a day, list the open findings of each module of the history, and end 1, as the release's own decision, where the policy does not let it proceed (commons 0038-build-policy FR-010).
 
+- **FR-009**: `src/ci/accepted.ts` MUST read the accepted risks of `commons/spec-kit/accepted-findings/` (typed files with an export `acceptance`) and find an acceptance with no reason, an end that is not a day or is more than 366 days ahead, an approver who is not on the list, a file not named for its finding's id and two acceptances of one finding, and end 1 for any; the check MUST be one of `repoctl check` (commons 0038-build-policy FR-008).
+
 ## Acceptance scenarios
 
 1. **Given** the output of `tsc`, `bun test`, the linter, the formatter, `repoctl check`, the checks of Mizan and Kanon and the generator's check as the tools printed it, **When** the parsers read it, **Then** each gives its findings with the file, the line and the code, per FR-003.

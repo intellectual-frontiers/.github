@@ -41,3 +41,4 @@ requirement	mechanism	by	note
 0002-libraries-ci-findings FR-006	check	.github: cd commons/libraries && bun test suite/	ci-collect.test.ts: the merge, the sound-pipeline check, the summary
 0002-libraries-ci-findings FR-007	check	.github: cd commons/libraries && bun test suite/	ci-history.test.ts: a real repository, a file added and never replaced, a moved branch retried
 0002-libraries-ci-findings FR-008	check	.github: cd commons/libraries && bun test suite/	ci-findings.test.ts: the release policy of a day
+0002-libraries-ci-findings FR-009	check	.github: cd commons/libraries && bun test suite/	ci-accepted.test.ts: each rule of an acceptance is found in real files and a good one passes

@@ -25,6 +25,7 @@ export type ProblemCode =
   | "E-SPEC-KIT"
   | "E-MIZAN-RULE"
   | "E-VERSIONS"
+  | "E-ACCEPTANCE"
   | "E-TYPES"
   | "E-VERSION-CONSTANT"
   | "E-UNDECLARED-DEPENDENCY"
@@ -78,6 +79,7 @@ export const PROBLEM_CODES: readonly ProblemCode[] = [
   "E-SPEC-KIT",
   "E-MIZAN-RULE",
   "E-VERSIONS",
+  "E-ACCEPTANCE",
   "E-TYPES",
   "E-VERSION-CONSTANT",
   "E-UNDECLARED-DEPENDENCY",
@@ -170,6 +172,12 @@ export const CATALOGUE: Readonly<Record<ProblemCode, Explained>> = {
     title: "A version record is wrong",
     what: "The check of versions found a record that is wrong, an identity that changed, or a version that went back since the base.",
     why: "A version was raised by hand or lowered; versions grow only at the release.",
+    fix: "run the command named in the finding and read its output",
+  },
+  "E-ACCEPTANCE": {
+    title: "An accepted risk is wrong",
+    what: "A typed file of accepted findings (commons/spec-kit/accepted-findings) has no reason, an end that is not a day or is more than 366 days ahead, an approver who is not on the list, a name that is not its finding's id, or accepts a finding twice.",
+    why: "An acceptance is a person's word that a risk has been seen until a day (commons 0038-build-policy FR-008), and a file that breaks its rules would say it for no one.",
     fix: "run the command named in the finding and read its output",
   },
   "E-TYPES": {
