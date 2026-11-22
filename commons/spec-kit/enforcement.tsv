@@ -637,6 +637,7 @@ requirement	mechanism	by	note
 0033-kanon FR-031	check	.github: bun test ./tests/	commons-kanon.test.ts: the ontology kanon has the twelve classes, Relation and Bundle with their basis
 0033-kanon FR-032	none	-	a recorded paragraph, nothing to run: a paragraph of this specification records that docs is not classified and how a consumer's ladder and the layers are kept apart
 0033-kanon FR-033	check	.github: bun test ./tests/	commons/libraries/suite/family.test.ts: content and content-* are refused to a library of no family
+0033-kanon FR-034	review	0033-kanon FR-034	a reviewer checks that no check of Kanon fails a build by itself; the policy is the host's typed value, and the library content has not been made
 0011-documentation FR-030	check	.github: cd commons/docs && bun run verify	pending
 0034-archon FR-001	review	0034-archon FR-001	a reviewer checks that no package, folder or command of commons is named stolos and that what the retired engine did that is general is done by a library
 0034-archon FR-002	review	0034-archon FR-002	a reviewer checks that no library carries a shim, re-export or migration path for the retired engine
@@ -779,3 +780,22 @@ requirement	mechanism	by	note
 0038-build-policy FR-013	check	.github: cd commons/libraries && bun test suite/	0002-libraries-ci-findings: ci-findings.test.ts: the wrapper exits 0 for a failing test, no output, a missing program and a timeout
 0038-build-policy FR-014	check	.github: cd commons/libraries && bun test suite/	0002-libraries-ci-findings: ci-findings.test.ts: the root tests are read per file, each file that ran is a step, a file that stops failing is fixed while another keeps failing; the generated workflow runs each file by itself and its findings are of the module repository
 0030-generated-workflows FR-011	check	.github: cd commons/libraries && bun test suite/	ci-policy.test.ts: every step of the real workflows has a policy, and each rule of the validation finds what it is for on a workflow made to break it
+0039-content-method FR-001	review	0039-content-method FR-001	the series bible and the roles of the books are kept by their authors; a reviewer reads them
+0039-content-method FR-002	review	0039-content-method FR-002	no book has passed the audit gate; a reviewer reads the status
+0039-content-method FR-003	review	0039-content-method FR-003	the voice sweep has no command today, a recorded gap
+0039-content-method FR-004	review	0039-content-method FR-004	decided at the bundle by draft 0003 FR-004; reviewed until the library exists
+0039-content-method FR-005	review	0039-content-method FR-005	a reviewer reads the series bible's list of what stays off a public surface
+0039-content-method FR-006	review	0039-content-method FR-006	the vocabulary is a block of this specification; the module comes with the library
+0039-content-method FR-007	review	0039-content-method FR-007	as FR-006
+0039-content-method FR-008	review	0039-content-method FR-008	as FR-006
+0039-content-method FR-009	review	0039-content-method FR-009	the collector does not exist yet
+0039-content-method FR-010	review	0039-content-method FR-010	the prototype parser was run in scratch, 6 tests; it is not in a repository
+0039-content-method FR-011	review	0039-content-method FR-011	as FR-010
+0039-content-method FR-012	review	0039-content-method FR-012	a proposal pending the owner and the session that keeps the books
+0039-content-method FR-013	review	0039-content-method FR-013	as FR-010
+0039-content-method FR-014	review	0039-content-method FR-014	the typed policy was tested in scratch; it is not in a repository until the library exists
+0039-content-method FR-015	review	0039-content-method FR-015	as 0033-kanon FR-034
+0039-content-method FR-016	review	0039-content-method FR-016	no instance exists yet
+0039-content-method FR-017	review	0039-content-method FR-017	no instance exists yet
+0039-content-method FR-018	review	0039-content-method FR-018	no instance exists yet
+0039-content-method FR-019	review	0039-content-method FR-019	the matrix is a table of this specification until the assembly exists

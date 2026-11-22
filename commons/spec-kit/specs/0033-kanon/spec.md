@@ -111,6 +111,7 @@ A library that states one thing and carries it out in several places of one kind
 - **FR-031**: The ontology `kanon` MUST also have the classes `kanon:Relation` and `kanon:Bundle`, each a specialization of `prov:Entity` with a record of its basis (0018-standards-first FR-003), and the properties `kanon:relationKind`, `kanon:relationFrom` and `kanon:relationTo`; FR-015's ten classes are therefore twelve. The alignment of FR-008 gains the rows below, and a standard not read in this work MUST be marked `not verified`.
 - **FR-032**: This specification MUST record, without deciding them, that `docs` is not classified (OQ-3): it reads `LayeredModel` and MAY later be a consumer or an instance of a content host once a web instance exists; and that a consumer's own ladder (0016-ladder) and Kanon's layers are kept apart as 0033-kanon FR-017 says: a consumer's rungs rank its whole harness, the layers rank the units inside one library or one body of content, a rung is never a layer, and the two are cross-referenced where a consumer's table names the rung its units stand on, never unified (OQ-2).
 - **FR-033**: The names `content` and `content-*` MUST be held as data of the check of the manifests, for the host `content`, until the library of Kanon for content exists (FR-024; 0027-commons-libraries FR-024). The package of an instance of that host is named `{host}-rendition-{name}`: a template of FR-021 needs only `{host}` and `{name}` once each, so the word `dialect` is in the name of the field of the rule and in this vocabulary's term for an instance, never required in a package name.
+- **FR-034**: A finding of Kanon MUST be a finding and nothing more: what a finding does to a build, whether it stops it, warns, or opens a planning issue (0037-planning), is the decision of the host that runs the check, written as a typed dated policy of that host (the form of `RELEASE_POLICY`, 0038-build-policy FR-010), and not a property of the finding; the checks of Kanon MUST give the same findings under any policy. The library `content` states its policy in 0039-content-method FR-014.
 
 ## Acceptance scenarios
 
@@ -141,6 +142,7 @@ A library that states one thing and carries it out in several places of one kind
 24. **Given** a Governance unit of data modules that imports a Logical unit, **When** the check runs, **Then** it reports `layers/above`, per FR-025.
 25. **Given** a model with a vocabulary and an element of a kind the vocabulary does not list, **When** it is checked, **Then** `kanon/kind` names the element, per FR-028.
 26. **Given** the names `content` and `content-web`, **When** the manifests are checked and no library declares the family of `content`, **Then** a library of either name is refused, per FR-033.
+27. **Given** the same model checked under a host policy that warns and under one that fails the build, **When** the findings are listed, **Then** they are the same, and only the host's decision differs, per FR-034.
 
 ## Out of scope
 
