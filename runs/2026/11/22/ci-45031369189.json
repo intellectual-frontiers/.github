@@ -1,0 +1,2588 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45031369189",
+    "workflow": "ci",
+    "commit": "437080f3d5477a62857fffac4250f358c408d148",
+    "at": "2026-11-22T14:34:25Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45031369189"
+  },
+  "steps": [
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "systems",
+      "module": "ergonex",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1650,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "systems",
+      "module": "ergonex",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 21291,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "systems",
+      "module": "ergonex",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 23049,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "systems",
+      "module": "headless",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 167,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "systems",
+      "module": "headless",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 8429,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "systems",
+      "module": "headless",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2779,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "systems",
+      "module": "libraries",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 320,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "systems",
+      "module": "libraries",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 20343,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "systems",
+      "module": "libraries",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 1,
+      "durationMs": 21920,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "systems",
+      "module": "net",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1491,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "systems",
+      "module": "net",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1759,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "systems",
+      "module": "net",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2699,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "systems",
+      "module": "system",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 230,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "systems",
+      "module": "system",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 7395,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "systems",
+      "module": "system",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 7322,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-bridge",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 194,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-bridge",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1590,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-cli",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 205,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-cli",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1776,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-gdrive",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 161,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-gdrive",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1192,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-git",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 139,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-git",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 25071,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-githost",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 164,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-githost",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5606,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-onedrive",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 201,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-onedrive",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 937,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-posix",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 143,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-posix",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 3146,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-query",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 427,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-query",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1418,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-s3",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 170,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-s3",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 18299,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-serve",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 163,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-serve",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2055,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-sql",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 393,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-sql",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 219678,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-ssh",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 141,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-ssh",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 63113,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 120,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1954,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-boot",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 151,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-boot",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 688,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-converge",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 182,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-converge",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 58006,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-dialect-ansible",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 160,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-dialect-ansible",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 225041,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-dialect-apt",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 397,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-dialect-apt",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1056,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-dialect-cloud-init",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 149,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-dialect-cloud-init",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 58887,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-dialect-homebrew",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 322,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-dialect-homebrew",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 839,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-dialect-mise",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 177,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-dialect-mise",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 547,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-dialect-native-pinned",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 197,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-dialect-native-pinned",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2022,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-dialect-opentofu",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 146,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-dialect-opentofu",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 608,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-dialect-winget",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 357,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-dialect-winget",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 654,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-dns",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 151,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-dns",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 630,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-tool",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 398,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-tool",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 994,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 218,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 691,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "assessment",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 234,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "assessment",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 741,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "catalog-nist-csf-2",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 146,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "catalog-nist-csf-2",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 441,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "catalog-nist-sp800",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 170,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "catalog-nist-sp800",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1054,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "catalog-soc2",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 268,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "catalog-soc2",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 524,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "change-control",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 342,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "change-control",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2339,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "commons",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 515,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "commons",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 150,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "core",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 180,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "core",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1023,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "core",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 792,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "crypto",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 216,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "crypto",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2672,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "crypto",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2438,
+      "exitStatus": 0
+    },
+    {
+      "id": "after-verify-5",
+      "job": "verify",
+      "module": "data",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 163,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "data",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 339,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "data",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 150189,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "data",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 244012,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "docs",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 262,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "docs",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 4,
+      "durationMs": 400903,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "ergonex",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 167,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "ergonex",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 120408,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "ergonex",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 69110,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "estate-endpoints",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 180,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "estate-endpoints",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 831,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "estate-iac",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 165,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "estate-iac",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 723,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "estate-query",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 156,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "estate-query",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1498,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "estate",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 390,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "estate",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 734,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "evidence-capture",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 323,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "evidence-capture",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 2,
+      "durationMs": 3380,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "findings",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 162,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "findings",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 580,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "formats",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 219,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "formats",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 3989,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "formats",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 3378,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "foundation",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 57,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "foundation",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 114,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "gate",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 138,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "gate",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 432,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "githost",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 174,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "githost",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 979,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "githost",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 759,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "grc",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 156,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "grc",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5421,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "grc",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2991,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "headless",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 246,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "headless",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 7810,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "headless",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2876,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "integrations-fhir",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 142,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "integrations-fhir",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 312,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "integrations-fhir",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 730,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "integrations-github",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 138,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "integrations-github",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 337,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "integrations-github",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 741,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "integrations-identity",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 189,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "integrations-identity",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 970,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "integrations-x12",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 178,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "integrations-x12",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 228,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "integrations-x12",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 600,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "integrations",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 146,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "integrations",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1816,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "integrations",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1113,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "kanon",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 173,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "kanon",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1209,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "kanon",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 628,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "lab",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 409,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "lab",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 28610,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "lang-sql",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 137,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "lang-sql",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9191,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "libraries",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 175,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "libraries",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 11255,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "libraries",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 1,
+      "durationMs": 12911,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "lint",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 179,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "lint",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 890,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "lint",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2132,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "linux-observe",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 190,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "linux-observe",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 58273,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "linux-services",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 140,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "linux-services",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1157,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "machine-probe",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 355,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "machine-probe",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 47730,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "mizan",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 143,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "mizan",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 15180,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "mizan",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 13,
+      "durationMs": 7271,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "net",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 204,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "net",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1396,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "net",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1382,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "netboot",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 182,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "netboot",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2613,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "ontology",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 273,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "ontology",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1693,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "ontology",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1115,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "package-managers",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 112,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "package-managers",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2224,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "patterns",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 78,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "patterns",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 85,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "pentest",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 153,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "pentest",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 711,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "planning-query",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 348,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "planning-query",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1613,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "planning",
+      "tool": "install",
+      "outcome": "no-output",
+      "findings": 1,
+      "durationMs": 8,
+      "exitStatus": 1
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "planning",
+      "tool": "verify",
+      "outcome": "no-output",
+      "findings": 1,
+      "durationMs": 8,
+      "exitStatus": 127
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "posture-report",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 197,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "posture-report",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 619,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "programs",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 92,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "programs",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 84,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "quality",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 173,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "quality",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 32440,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "quality",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 18456,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "rdf",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 168,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "rdf",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 201,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "rdf",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 442,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "repoctl",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 199,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "repoctl",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 6,
+      "durationMs": 38597,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "scanners",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 158,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "scanners",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1485,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "standards",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 67,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "standards",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 128,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "system",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 159,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "system",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6697,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "system",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 7270,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "telemetry",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 142,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "telemetry",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 3153,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "telemetry",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 3212,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "tenancy",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 118,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "tenancy",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 425,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "terminal",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 161,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "terminal",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 715,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "terminal",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 569,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "test",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 137,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "test",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 932,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "test",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 598,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "toolchain",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 146,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "toolchain",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 755,
+      "exitStatus": 0
+    }
+  ],
+  "findings": [
+    {
+      "id": "f-02b7df85acf1100e",
+      "tool": "verify",
+      "module": "mizan",
+      "evidence": {
+        "run": "45031369189",
+        "commit": "437080f3d5477a62857fffac4250f358c408d148",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "9ab5f4a540d0bf9157ae5771056b81866f5b1d4630b7dc19a5b10c60a7c3232b"
+      },
+      "at": "2026-11-22T14:27:12Z",
+      "code": "mizan/requirement-keyword",
+      "file": "specs/0001-x/spec.md",
+      "line": 6,
+      "severity": "error",
+      "message": "FR-001 has none of MUST, MUST NOT, SHOULD, SHOULD NOT, MAY",
+      "key": "specs/0001-x/spec.md:mizan/requirement-keyword:FR-001 has none of MUST, MUST NOT, SHOULD, SHOULD NOT, MAY"
+    },
+    {
+      "id": "f-02c80c1a38b1d8d7",
+      "tool": "verify",
+      "code": "no-output",
+      "module": "planning",
+      "severity": "error",
+      "message": "the command ended with status 127 and printed nothing a parser of verify reads",
+      "key": "verify-its-packing-is-checked-where-the--4:no-output",
+      "evidence": {
+        "run": "45031369189",
+        "commit": "437080f3d5477a62857fffac4250f358c408d148",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "dfd8e16db55b9fe8cccb64ff8c13bdc1775711962697f6a25306290cbc48bdd2"
+      },
+      "at": "2026-11-22T14:29:21Z"
+    },
+    {
+      "id": "f-1c39fb7ddb6c3d1d",
+      "tool": "verify",
+      "module": "docs",
+      "evidence": {
+        "run": "45031369189",
+        "commit": "437080f3d5477a62857fffac4250f358c408d148",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "b212cc25eee7cfaae763377fbaa8a03eec9cb86180898cbbf66d46fc4a13295c"
+      },
+      "at": "2026-11-22T14:33:29Z",
+      "code": "test-failed",
+      "file": "::group::suite/layered-lens.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0011-documentation FR-004: commons keeps no README",
+      "key": "0011-documentation FR-004: commons keeps no README"
+    },
+    {
+      "id": "f-1d0e15590fb9f511",
+      "tool": "verify",
+      "module": "mizan",
+      "evidence": {
+        "run": "45031369189",
+        "commit": "437080f3d5477a62857fffac4250f358c408d148",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "9ab5f4a540d0bf9157ae5771056b81866f5b1d4630b7dc19a5b10c60a7c3232b"
+      },
+      "at": "2026-11-22T14:27:12Z",
+      "code": "mizan/spec-term-unknown",
+      "file": "specs/0001-x/spec.md",
+      "line": 3,
+      "severity": "error",
+      "message": "h:Gone is named here and the ontology of h: does not define it",
+      "key": "specs/0001-x/spec.md:mizan/spec-term-unknown:h:Gone is named here and the ontology of h: does not define it"
+    },
+    {
+      "id": "f-2f3875757b53cd36",
+      "tool": "verify",
+      "module": "mizan",
+      "evidence": {
+        "run": "45031369189",
+        "commit": "437080f3d5477a62857fffac4250f358c408d148",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "9ab5f4a540d0bf9157ae5771056b81866f5b1d4630b7dc19a5b10c60a7c3232b"
+      },
+      "at": "2026-11-22T14:27:12Z",
+      "code": "mizan/term-basis-missing",
+      "file": "ontology/h.ts",
+      "line": 1,
+      "severity": "error",
+      "message": "https://h/New is a term of the ontology and has no record of the standard it rests on, or that none is adopted",
+      "key": "ontology/h.ts:mizan/term-basis-missing:https://h/New is a term of the ontology and has no record of the standard it rests on, or that none is adopted"
+    },
+    {
+      "id": "f-30b0d681e9b4ee8d",
+      "tool": "verify",
+      "module": "docs",
+      "evidence": {
+        "run": "45031369189",
+        "commit": "437080f3d5477a62857fffac4250f358c408d148",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "b212cc25eee7cfaae763377fbaa8a03eec9cb86180898cbbf66d46fc4a13295c"
+      },
+      "at": "2026-11-22T14:33:29Z",
+      "code": "test-failed",
+      "file": "::group::suite/workflow.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0011-documentation FR-022: no workflow makes a GitHub release, and the write permission is the release job's alone",
+      "key": "0011-documentation FR-022: no workflow makes a GitHub release, and the write permission is the release job's alone"
+    },
+    {
+      "id": "f-36d4198ae7f34ff5",
+      "tool": "verify",
+      "module": "docs",
+      "evidence": {
+        "run": "45031369189",
+        "commit": "437080f3d5477a62857fffac4250f358c408d148",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "b212cc25eee7cfaae763377fbaa8a03eec9cb86180898cbbf66d46fc4a13295c"
+      },
+      "at": "2026-11-22T14:33:29Z",
+      "code": "test-failed",
+      "file": "::group::suite/conventions.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0011-documentation FR-004: commons keeps no README",
+      "key": "0011-documentation FR-004: commons keeps no README"
+    },
+    {
+      "id": "f-3daf77125b344261",
+      "tool": "verify",
+      "module": "mizan",
+      "evidence": {
+        "run": "45031369189",
+        "commit": "437080f3d5477a62857fffac4250f358c408d148",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "9ab5f4a540d0bf9157ae5771056b81866f5b1d4630b7dc19a5b10c60a7c3232b"
+      },
+      "at": "2026-11-22T14:27:12Z",
+      "code": "mizan/decision-missing",
+      "file": "ontology/audit.ts",
+      "line": 1,
+      "severity": "error",
+      "message": "https://h/Here is unaligned and its decision is due in 89 days",
+      "key": "ontology/audit.ts:mizan/decision-missing:https://h/Here is unaligned and its decision is due in 89 days"
+    },
+    {
+      "id": "f-4773945068063ca9",
+      "tool": "verify",
+      "module": "repoctl",
+      "evidence": {
+        "run": "45031369189",
+        "commit": "437080f3d5477a62857fffac4250f358c408d148",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f3c405a8674d88901ff053e6c322b4d0f02cfe313dbdf1fbca2c90bafc354626"
+      },
+      "at": "2026-11-22T14:29:35Z",
+      "code": "TS2322",
+      "file": "      src/mod.ts",
+      "line": 1,
+      "severity": "error",
+      "message": "Type 'string' is not assignable to type 'number'.",
+      "key": "TS2322:Type 'string' is not assignable to type 'number'."
+    },
+    {
+      "id": "f-51cbbff0531d1a54",
+      "tool": "verify",
+      "module": "evidence-capture",
+      "evidence": {
+        "run": "45031369189",
+        "commit": "437080f3d5477a62857fffac4250f358c408d148",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "610218be2227840aac9615aab44ab151c22977046ca45e728ed54cfaa339318b"
+      },
+      "at": "2026-11-22T14:27:14Z",
+      "code": "test-failed",
+      "file": "::group::suite/journal.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0003-evidence-capture-collect FR-001, 0003-evidence-capture-collect FR-002: a state is kept only where it changed, every look is journaled, commits come when a state changed or the batch interval has run, and the commit is made at the instant and names what changed",
+      "key": "0003-evidence-capture-collect FR-001, 0003-evidence-capture-collect FR-002: a state is kept only where it changed, every look is journaled, commits come when a state changed or the batch interval has run, and the commit is made at the instant and names what changed"
+    },
+    {
+      "id": "f-540e10dc26763f66",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45031369189",
+        "commit": "437080f3d5477a62857fffac4250f358c408d148",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "a555df609709e6f881ff6402fdbd0ca6a8837e3863e95d5c4bf5b8db4e03b28e"
+      },
+      "at": "2026-11-22T14:24:42Z",
+      "code": "TS2322",
+      "file": "      top: src/mod.ts",
+      "line": 2,
+      "severity": "error",
+      "message": "Type 'string' is not assignable to type 'number'.",
+      "key": "TS2322:Type 'string' is not assignable to type 'number'."
+    },
+    {
+      "id": "f-5802d05ae6cbdcb3",
+      "tool": "verify",
+      "module": "mizan",
+      "evidence": {
+        "run": "45031369189",
+        "commit": "437080f3d5477a62857fffac4250f358c408d148",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "9ab5f4a540d0bf9157ae5771056b81866f5b1d4630b7dc19a5b10c60a7c3232b"
+      },
+      "at": "2026-11-22T14:27:12Z",
+      "code": "mizan/profile-section-missing",
+      "file": "specs/0001-x/spec.md",
+      "line": 5,
+      "severity": "error",
+      "message": "a service specification has a section \"Service level objectives\", and this one has none",
+      "key": "specs/0001-x/spec.md:mizan/profile-section-missing:a service specification has a section \"Service level objectives\", and this one has none"
+    },
+    {
+      "id": "f-5d09fe28afd7479f",
+      "tool": "verify",
+      "module": "docs",
+      "evidence": {
+        "run": "45031369189",
+        "commit": "437080f3d5477a62857fffac4250f358c408d148",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "b212cc25eee7cfaae763377fbaa8a03eec9cb86180898cbbf66d46fc4a13295c"
+      },
+      "at": "2026-11-22T14:33:29Z",
+      "code": "test-failed",
+      "file": "::group::suite/layered-lens.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0011-documentation FR-022: no workflow makes a GitHub release, and the write permission is the release job's alone",
+      "key": "0011-documentation FR-022: no workflow makes a GitHub release, and the write permission is the release job's alone"
+    },
+    {
+      "id": "f-5ddd281bf612aa36",
+      "tool": "verify",
+      "module": "mizan",
+      "evidence": {
+        "run": "45031369189",
+        "commit": "437080f3d5477a62857fffac4250f358c408d148",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "9ab5f4a540d0bf9157ae5771056b81866f5b1d4630b7dc19a5b10c60a7c3232b"
+      },
+      "at": "2026-11-22T14:27:12Z",
+      "code": "versions/approval-missing",
+      "file": "lib/release.ts",
+      "line": 1,
+      "severity": "error",
+      "message": "revision 7 of a controlled document has no approval record (approvedBy, role, on, decision): a revision with no approval is a finding",
+      "key": "lib/release.ts:versions/approval-missing:revision 7 of a controlled document has no approval record (approvedBy, role, on, decision): a revision with no approval is a finding"
+    },
+    {
+      "id": "f-5e9bbf4675c654ff",
+      "tool": "verify",
+      "module": "mizan",
+      "evidence": {
+        "run": "45031369189",
+        "commit": "437080f3d5477a62857fffac4250f358c408d148",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "9ab5f4a540d0bf9157ae5771056b81866f5b1d4630b7dc19a5b10c60a7c3232b"
+      },
+      "at": "2026-11-22T14:27:12Z",
+      "code": "mizan/profile-section-missing",
+      "file": "specs/0001-x/spec.md",
+      "line": 5,
+      "severity": "error",
+      "message": "a service specification has a section \"Contract tests\", and this one has none",
+      "key": "specs/0001-x/spec.md:mizan/profile-section-missing:a service specification has a section \"Contract tests\", and this one has none"
+    },
+    {
+      "id": "f-663d62d9141fed66",
+      "tool": "verify",
+      "module": "mizan",
+      "evidence": {
+        "run": "45031369189",
+        "commit": "437080f3d5477a62857fffac4250f358c408d148",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "9ab5f4a540d0bf9157ae5771056b81866f5b1d4630b7dc19a5b10c60a7c3232b"
+      },
+      "at": "2026-11-22T14:27:12Z",
+      "code": "mizan/term-not-defined-by",
+      "file": "specs/001-demo/spec.md",
+      "line": 1,
+      "severity": "error",
+      "message": "FR-001 names x:Alpha, which states no mz:definedBy: the term should say 001-demo FR-001 defines it",
+      "key": "specs/001-demo/spec.md:mizan/term-not-defined-by:FR-001 names x:Alpha, which states no mz:definedBy: the term should say 001-demo FR-001 defines it"
+    },
+    {
+      "id": "f-677a089758b05571",
+      "tool": "verify",
+      "module": "evidence-capture",
+      "evidence": {
+        "run": "45031369189",
+        "commit": "437080f3d5477a62857fffac4250f358c408d148",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "610218be2227840aac9615aab44ab151c22977046ca45e728ed54cfaa339318b"
+      },
+      "at": "2026-11-22T14:27:14Z",
+      "code": "test-failed",
+      "file": "::group::suite/collect.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0003-evidence-capture-collect FR-001, 0003-evidence-capture-collect FR-002: a state is kept only where it changed, every look is journaled, commits come when a state changed or the batch interval has run, and the commit is made at the instant and names what changed",
+      "key": "0003-evidence-capture-collect FR-001, 0003-evidence-capture-collect FR-002: a state is kept only where it changed, every look is journaled, commits come when a state changed or the batch interval has run, and the commit is made at the instant and names what changed"
+    },
+    {
+      "id": "f-81ae4e3ae6c958a6",
+      "tool": "verify",
+      "module": "repoctl",
+      "evidence": {
+        "run": "45031369189",
+        "commit": "437080f3d5477a62857fffac4250f358c408d148",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f3c405a8674d88901ff053e6c322b4d0f02cfe313dbdf1fbca2c90bafc354626"
+      },
+      "at": "2026-11-22T14:29:35Z",
+      "code": "TS2322",
+      "file": "[x] types of prov failed: src/mod.ts",
+      "line": 1,
+      "severity": "error",
+      "message": "Type 'string' is not assignable to type 'number'. [E-PROVE-FAILED]",
+      "key": "TS2322:Type 'string' is not assignable to type 'number'. [E-PROVE-FAILED]"
+    },
+    {
+      "id": "f-852ff524eb6af230",
+      "tool": "verify",
+      "module": "repoctl",
+      "evidence": {
+        "run": "45031369189",
+        "commit": "437080f3d5477a62857fffac4250f358c408d148",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f3c405a8674d88901ff053e6c322b4d0f02cfe313dbdf1fbca2c90bafc354626"
+      },
+      "at": "2026-11-22T14:29:35Z",
+      "code": "TS2307",
+      "file": "      src/mod.ts",
+      "line": 1,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/prov' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/prov' or its corresponding type declarations."
+    },
+    {
+      "id": "f-8b2a7737c76d1713",
+      "tool": "verify",
+      "module": "repoctl",
+      "evidence": {
+        "run": "45031369189",
+        "commit": "437080f3d5477a62857fffac4250f358c408d148",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f3c405a8674d88901ff053e6c322b4d0f02cfe313dbdf1fbca2c90bafc354626"
+      },
+      "at": "2026-11-22T14:29:35Z",
+      "code": "TS2322",
+      "file": "a.ts",
+      "line": 3,
+      "severity": "error",
+      "message": "no",
+      "key": "TS2322:no"
+    },
+    {
+      "id": "f-ac884392d79970e9",
+      "tool": "install",
+      "code": "no-output",
+      "module": "planning",
+      "severity": "error",
+      "message": "the command ended with status 1 and printed nothing a parser of install reads",
+      "key": "the-development-tools-from-bun-lock-the--3:no-output",
+      "evidence": {
+        "run": "45031369189",
+        "commit": "437080f3d5477a62857fffac4250f358c408d148",
+        "step": "the-development-tools-from-bun-lock-the--3",
+        "logSha256": "62e94fc0ff098eacbd70768772d9a43f759904188eeb745f0f2c872e9d5ba605"
+      },
+      "at": "2026-11-22T14:29:21Z"
+    },
+    {
+      "id": "f-b34931cb0c875758",
+      "tool": "verify",
+      "module": "mizan",
+      "evidence": {
+        "run": "45031369189",
+        "commit": "437080f3d5477a62857fffac4250f358c408d148",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "9ab5f4a540d0bf9157ae5771056b81866f5b1d4630b7dc19a5b10c60a7c3232b"
+      },
+      "at": "2026-11-22T14:27:12Z",
+      "code": "mizan/decision-missing",
+      "file": "ontology.ts",
+      "line": 1,
+      "severity": "error",
+      "message": "https://example.org/T is unaligned and its decision is due in 73 days",
+      "key": "ontology.ts:mizan/decision-missing:https://example.org/T is unaligned and its decision is due in 73 days"
+    },
+    {
+      "id": "f-c49e8968a73c9104",
+      "tool": "verify",
+      "module": "mizan",
+      "evidence": {
+        "run": "45031369189",
+        "commit": "437080f3d5477a62857fffac4250f358c408d148",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "9ab5f4a540d0bf9157ae5771056b81866f5b1d4630b7dc19a5b10c60a7c3232b"
+      },
+      "at": "2026-11-22T14:27:12Z",
+      "code": "mizan/decision-overdue",
+      "file": "ontology/audit.ts",
+      "line": 1,
+      "severity": "error",
+      "message": "https://h/Here is unaligned and its decision was due 14 days ago",
+      "key": "ontology/audit.ts:mizan/decision-overdue:https://h/Here is unaligned and its decision was due 14 days ago"
+    },
+    {
+      "id": "f-c97c1c096bf656f3",
+      "tool": "verify",
+      "module": "repoctl",
+      "evidence": {
+        "run": "45031369189",
+        "commit": "437080f3d5477a62857fffac4250f358c408d148",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f3c405a8674d88901ff053e6c322b4d0f02cfe313dbdf1fbca2c90bafc354626"
+      },
+      "at": "2026-11-22T14:29:35Z",
+      "code": "TS2307",
+      "file": "[x] types of idle failed: src/mod.ts",
+      "line": 1,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/prov' or its corresponding type declarations. [E-PROVE-FAILED]",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/prov' or its corresponding type declarations. [E-PROVE-FAILED]"
+    },
+    {
+      "id": "f-d3c902c3b9a2e74e",
+      "tool": "verify",
+      "module": "mizan",
+      "evidence": {
+        "run": "45031369189",
+        "commit": "437080f3d5477a62857fffac4250f358c408d148",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "9ab5f4a540d0bf9157ae5771056b81866f5b1d4630b7dc19a5b10c60a7c3232b"
+      },
+      "at": "2026-11-22T14:27:12Z",
+      "code": "versions/record-invalid",
+      "file": "lib/release.ts",
+      "line": 1,
+      "severity": "error",
+      "message": "release.colour: expected one of the fields of a record (slug, kind, title, authors, version, iri, partOf, position, identifier, repository, exclude, paths, snapshot, approval, retention, retired, migratedFrom, replaces), found an unknown field",
+      "key": "lib/release.ts:versions/record-invalid:release.colour: expected one of the fields of a record (slug, kind, title, authors, version, iri, partOf, position, identifier, repository, exclude, paths, snapshot, approval, retention, retired, migratedFrom, replaces), found an unknown field"
+    },
+    {
+      "id": "f-d8eb0967d3f74fe5",
+      "tool": "verify",
+      "module": "mizan",
+      "evidence": {
+        "run": "45031369189",
+        "commit": "437080f3d5477a62857fffac4250f358c408d148",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "9ab5f4a540d0bf9157ae5771056b81866f5b1d4630b7dc19a5b10c60a7c3232b"
+      },
+      "at": "2026-11-22T14:27:12Z",
+      "code": "mizan/profile-section-missing",
+      "file": "specs/0001-x/spec.md",
+      "line": 5,
+      "severity": "error",
+      "message": "a service specification has a section \"Quality attributes\", and this one has none",
+      "key": "specs/0001-x/spec.md:mizan/profile-section-missing:a service specification has a section \"Quality attributes\", and this one has none"
+    },
+    {
+      "id": "f-df534b690bb8517b",
+      "tool": "verify",
+      "module": "repoctl",
+      "evidence": {
+        "run": "45031369189",
+        "commit": "437080f3d5477a62857fffac4250f358c408d148",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f3c405a8674d88901ff053e6c322b4d0f02cfe313dbdf1fbca2c90bafc354626"
+      },
+      "at": "2026-11-22T14:29:35Z",
+      "code": "TS2307",
+      "file": "[x] types of user failed: src/mod.ts",
+      "line": 1,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/prov' or its corresponding type declarations. [E-PROVE-FAILED]",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/prov' or its corresponding type declarations. [E-PROVE-FAILED]"
+    },
+    {
+      "id": "f-f15e5285543f87be",
+      "tool": "verify",
+      "module": "mizan",
+      "evidence": {
+        "run": "45031369189",
+        "commit": "437080f3d5477a62857fffac4250f358c408d148",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "9ab5f4a540d0bf9157ae5771056b81866f5b1d4630b7dc19a5b10c60a7c3232b"
+      },
+      "at": "2026-11-22T14:27:12Z",
+      "code": "changes/declaration",
+      "file": "ifccm.declaration.ts",
+      "line": 1,
+      "severity": "error",
+      "message": "the declaration claims DeviceQuality and states no production day (productionDeclaredOn)",
+      "key": "ifccm.declaration.ts:changes/declaration:the declaration claims DeviceQuality and states no production day (productionDeclaredOn)"
+    }
+  ]
+}
