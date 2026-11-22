@@ -1,0 +1,83 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45042659115",
+    "workflow": "site",
+    "commit": "8df3cc3b893643d73e02b7f25d1b774776819d99",
+    "at": "2026-11-22T16:22:27Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45042659115"
+  },
+  "steps": [
+    {
+      "id": "the-compiler-the-generator-s-tests-then--4",
+      "job": "check",
+      "module": "repository",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 291440,
+      "exitStatus": 0
+    },
+    {
+      "id": "typescript-7-1-beta-shiki-beautiful-merm-3",
+      "job": "check",
+      "module": "repository",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 250,
+      "exitStatus": 0
+    },
+    {
+      "id": "build",
+      "job": "site",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 33254,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-findings-of-the-runs-from-the-histor-5",
+      "job": "site",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 179,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-newest-test-reports-4",
+      "job": "site",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 11475,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-open-issues-the-runs-of-the-workflow-6",
+      "job": "site",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 81352,
+      "exitStatus": 0
+    },
+    {
+      "id": "typescript-7-1-beta-shiki-beautiful-merm-3",
+      "job": "site",
+      "module": "repository",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 238,
+      "exitStatus": 0
+    }
+  ],
+  "findings": []
+}
