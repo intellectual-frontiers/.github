@@ -1,15 +1,13 @@
 # Decisions on Kanon (2026-11-22)
 
-**Status:** D-2 and D-3 are signed by the owner on 2026-11-22 (he instructed an agent to record his signature; the signature lines say so). D-1 and D-4 are the owner's decisions of the same session and are recorded but not yet signed. The owner gave these decisions in the session of 2026-11-22. Specification: `commons/spec-kit/specs/0033-kanon` (OQ-4, OQ-5, FR-026). Ticket: intellectual-frontiers/.github#22.
+**Status:** D-2 and D-3 are signed by the owner on 2026-11-22 (he instructed an agent to record his signature; the signature lines say so). D-1 is signed (the owner's statement of 2026-11-22). D-4 is the owner's decision of the same session and is recorded but not yet signed. The owner gave these decisions in the session of 2026-11-22. Specification: `commons/spec-kit/specs/0033-kanon` (OQ-4, OQ-5, FR-026). Ticket: intellectual-frontiers/.github#22.
 
-## D-1: the name stays Kanon
+## D-1: the name stays Kanon, as an internal working name
 
-- **Decision:** keep the name Kanon for the pattern and the library.
-- **What was checked:** the registries (npm `kanon`, PyPI `kanon`, crates.io `kanon` are held by unrelated projects; the packages here are scoped, so they do not collide); GitHub (small unrelated projects); a web search of trademark records (one KANON Madrid designation in classes 6, 7 and 37, near-homophones such as KAON in software classes, and the sound of CANON).
-- **What could not be checked:** a search of the USPTO's trademark database or any other register in classes 9, 35 and 42.
-- **Condition:** before the name is used as an external product name, a trademark attorney or that search checks classes 9, 35 and 42.
-- **Fallback:** Strata, with the name changed once in the specification, the ontology namespace and the library, and no alias kept.
-- Signed by: ______  Date: ______
+- **Decision:** keep the name Kanon for the pattern and the library, as an internal working name (owner, 2026-11-22: "trademark: not necessary, Kanon is internal working name").
+- **Trademark and registry clearance:** not needed. The packages here are scoped (`@intellectual-frontiers/commons/kanon`), so the names `kanon` on npm, PyPI and crates.io (held by unrelated projects) do not collide; no trademark search was made, and none is required while the name stays internal.
+- **If the name ever becomes external** (a product or a brand outside the company), the owner decides again then; the fallback is Strata, with the name changed once in the specification, the ontology namespace and the library, and no alias kept.
+- Signed by: Shahid N. Shah (login `shah`)  Date: 2026-11-22. Recorded by an AI agent on his explicit statement in the session "IFC & Erga Assistant" (https://claude.ai/code/session_01Juu3CorghZXkPDS1x3r3eW). This records the owner's decision; it is not a cryptographic signature.
 
 ## D-2: `Vocabulary` is a term of commons' own
 

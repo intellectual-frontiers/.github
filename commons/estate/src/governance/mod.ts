@@ -11,3 +11,4 @@ export * from "./kinds.ts";
 export * from "./services.ts";
 export * from "./states.ts";
 export * from "./capture.ts";
+export * from "./workstation.ts";

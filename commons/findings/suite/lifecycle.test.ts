@@ -103,6 +103,13 @@ proves(["0004-findings-lifecycle FR-001"], "each action is Planning's events and
   assert(eventsOf({ kind: "triage", as: "duplicate", reason: "r" }).kind === "err" && eventsOf({ kind: "accept", reason: "r", until: "soon" }).kind === "err");
 });
 
+proves(["0004-findings-lifecycle FR-002"], "a deferral with the label of an accepted risk and no day is not an acceptance: it is open and the acceptance lapsed", () => {
+  const life = new Life(F("a")).do({ kind: "accept", reason: "reviewed quarterly", until: "2027-02-01" });
+  const noDay: Item = { ...life.item, state: { kind: "deferred" } };
+  const s = statusOf(noDay, "2026-11-22T00:00:00Z");
+  assertEquals([s.status, s.lapsed, s.until], ["open", true, undefined], "no risk is accepted without an end day");
+});
+
 proves(["0004-findings-lifecycle FR-002"], "an acceptance is Planning's deferral until a day, the last day is still accepted, and the finding is open again, saying the acceptance lapsed, after it", () => {
   const life = new Life(F("a")).do({ kind: "accept", reason: "reviewed quarterly", until: "2027-02-01" });
   assertEquals(life.status("2027-02-01T23:59:59Z").status, "accepted");

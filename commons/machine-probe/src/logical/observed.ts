@@ -1,4 +1,5 @@
 // Spec: 0003-machine-probe-observation FR-001, FR-002, FR-003
+// Spec: 0008-machine-probe-agent-workspace FR-001
 /**
  * The facts a probe gives, as a typed observation: the sections and `key=value` lines of its output read into a record of the operating system, the hardware, the security settings, the software and the ports that listen, with what the probe could
  * not tell said as `unknown`; and the keyed records of that observation that an estate compares with what is declared, which hold nothing that changes only because the time does.
@@ -48,7 +49,24 @@ export type Observed = {
   readonly software: { readonly manager?: string; readonly packages?: number; readonly brewPackages?: number; readonly pendingUpdates?: number; readonly osquery?: string };
   /** The TCP ports that listen, in order. */
   readonly listening: readonly number[];
+  /** What the probe found of a machine on which a coding harness works, where it gave the section `@agent` (0008-machine-probe-agent-workspace FR-001). */
+  readonly agent?: AgentFacts;
 };
+
+/** The facts of the section `@agent`: the version of the coordinator, the persona, the harnesses found, the digest of the typed agents policy that the coordinator recorded, the mode of the token file, the names (never the values) of the variables that look like secrets, the user, and what isolates the machine. */
+export type AgentFacts = {
+  readonly coordinator?: string;
+  readonly persona?: string;
+  readonly harnesses: readonly string[];
+  readonly policyDigest?: string;
+  readonly tokenFileMode?: string;
+  readonly ambientSecretNames: readonly string[];
+  readonly uid?: number;
+  readonly virt?: string;
+  readonly isolation?: string;
+};
+
+const words = (v: string | undefined): readonly string[] => (v ?? "").split(/\s+/).filter(Boolean);
 
 const num = (v: string | undefined): number | undefined => {
   const n = Number(v);
@@ -90,7 +108,23 @@ export function toObserved(p: ProbeOutput): Result<Observed, string> {
     },
     software: { ...some("manager", sw["manager"] || undefined), ...some("packages", num(sw["packages"])), ...some("brewPackages", num(sw["brew_packages"])), ...some("pendingUpdates", num(sw["pending_updates"])), ...some("osquery", sw["osquery"] || undefined) },
     listening: (p["listening"]?.["ports"] ?? "").split(/\s+/).map(Number).filter((n) => n > 0).sort((a, b) => a - b),
+    ...(p["agent"] === undefined ? {} : { agent: agentFacts(p["agent"]) }),
   });
+}
+
+function agentFacts(a: Readonly<Record<string, string>>): AgentFacts {
+  const some = <K extends string, V>(key: K, value: V | undefined): { readonly [P in K]?: V } => (value === undefined ? {} : ({ [key]: value } as { readonly [P in K]: V }));
+  return {
+    harnesses: [...words(a["harnesses"])].sort(),
+    ambientSecretNames: [...words(a["ambient-secret-names"])].sort(),
+    ...some("coordinator", a["coordinator"] || undefined),
+    ...some("persona", a["persona"] || undefined),
+    ...some("policyDigest", a["policy-digest"] || undefined),
+    ...some("tokenFileMode", a["token-file-mode"] || undefined),
+    ...some("uid", num(a["uid"])),
+    ...some("virt", a["virt"] || undefined),
+    ...some("isolation", a["isolation"] || undefined),
+  };
 }
 
 /**
@@ -105,5 +139,19 @@ export function observedState(o: Observed): Readonly<Record<string, Json>> {
     "security": { ...o.security, admins: [...o.security.admins] },
     "software": { ...(o.software.manager === undefined ? {} : { manager: o.software.manager }), ...(o.software.osquery === undefined ? {} : { osquery: o.software.osquery }) },
     "listening": [...o.listening],
+    ...(o.agent === undefined
+      ? {}
+      : {
+          "agent": {
+            harnesses: [...o.agent.harnesses],
+            "ambient-secret-names": [...o.agent.ambientSecretNames],
+            ...(o.agent.coordinator === undefined ? {} : { coordinator: o.agent.coordinator }),
+            ...(o.agent.persona === undefined ? {} : { persona: o.agent.persona }),
+            ...(o.agent.policyDigest === undefined ? {} : { "policy-digest": o.agent.policyDigest }),
+            ...(o.agent.tokenFileMode === undefined ? {} : { "token-file-mode": o.agent.tokenFileMode }),
+            ...(o.agent.uid === undefined ? {} : { uid: o.agent.uid }),
+            ...(o.agent.isolation === undefined ? {} : { isolation: o.agent.isolation }),
+          },
+        }),
   };
 }

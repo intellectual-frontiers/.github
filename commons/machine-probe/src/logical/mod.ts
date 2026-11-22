@@ -9,3 +9,4 @@ export * from "./policies.ts";
 export * from "./state.ts";
 export * from "./grc.ts";
 export * from "./judge.ts";
+export * from "./rules.ts";

@@ -109,6 +109,7 @@ proves(["0005-evidence-capture-views FR-005"], "the journal is verified and its 
 proves(["0005-evidence-capture-views FR-006"], "the timer fires in the largest whole step of the clock that is not longer than the shortest cadence, every hour for longer ones, and is planned for a scheduler", () => {
   const every = (managed: string, adopted = "P1D") => timerEvery(mk({ cadence: { managed, adopted } }));
   assertEquals([every("PT15M"), every("PT1M"), every("PT7M"), every("PT2H")], [{ kind: "minutes", every: 15 }, { kind: "minutes", every: 1 }, { kind: "minutes", every: 6 }, { kind: "hourly" }].map((x, i) => (i === 3 ? { kind: "hourly" } : x)));
+  assertEquals(timerEvery(mk({ cadence: { managed: "PT1H", perRole: { "agent-workspace": "PT15M" } } })), { kind: "minutes", every: 15 }, "the cadence of a role counts");
   const t = timerFor(policy, { name: "evidence-lab", owner: { domain: "example.test", folder: "Lab" }, argv: ["/usr/bin/bun", "run.ts", "collect"], workdir: "/srv/lab", os: "linux", home: "/home/ada", uid: 1000 });
   assert(t.kind === "ok", t.kind === "err" ? t.error : "");
   assertEquals([t.value.firesEvery, t.value.windowMs], ["15 minutes", 1_800_000]);

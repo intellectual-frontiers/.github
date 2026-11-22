@@ -55,25 +55,25 @@ requirement	mechanism	by	note
 0007-estate-kinds FR-003	check	.github: cd commons/estate && bun run verify	suite/kinds.test.ts
 0007-estate-kinds FR-004	check	.github: cd commons/estate && bun run verify	suite/kinds.test.ts
 0007-estate-kinds FR-005	check	.github: cd commons/estate && bun run verify	suite/kinds.test.ts
-0008-estate-workstations FR-001	none	-	draft: no code exists, so nothing proves it
-0008-estate-workstations FR-002	none	-	draft: no code exists, so nothing proves it
-0008-estate-workstations FR-003	none	-	draft: no code exists, so nothing proves it
-0008-estate-workstations FR-004	none	-	draft: no code exists, so nothing proves it
-0008-estate-workstations FR-005	none	-	draft: no code exists, so nothing proves it
-0008-estate-workstations FR-006	none	-	draft: no code exists, so nothing proves it
-0008-estate-workstations FR-007	none	-	draft: no code exists, so nothing proves it
-0008-estate-workstations FR-008	none	-	draft: no code exists, so nothing proves it
-0008-estate-workstations FR-009	none	-	draft: no code exists, so nothing proves it
-0008-estate-workstations FR-010	none	-	draft: no code exists, so nothing proves it
-0008-estate-workstations FR-011	none	-	draft: no code exists, so nothing proves it
-0008-estate-workstations FR-012	none	-	draft: no code exists, so nothing proves it
-0008-estate-workstations FR-013	none	-	draft: no code exists, so nothing proves it
-0008-estate-workstations FR-014	none	-	draft: no code exists, so nothing proves it
-0008-estate-workstations FR-015	none	-	draft: no code exists, so nothing proves it
-0008-estate-workstations FR-016	none	-	draft: no code exists, so nothing proves it
-0008-estate-workstations FR-017	none	-	draft: no code exists, so nothing proves it
-0008-estate-workstations FR-018	none	-	draft: no code exists, so nothing proves it
-0008-estate-workstations FR-019	none	-	draft: no code exists, so nothing proves it
-0008-estate-workstations FR-020	none	-	draft: no code exists, so nothing proves it
-0008-estate-workstations FR-021	none	-	draft: no code exists, so nothing proves it
-0008-estate-workstations FR-022	none	-	draft: no code exists, so nothing proves it
+0008-estate-workstations FR-001	check	.github: cd commons/estate && bun run verify	suite/workstations.test.ts
+0008-estate-workstations FR-002	check	.github: cd commons/estate && bun run verify	suite/workstations.test.ts
+0008-estate-workstations FR-003	check	.github: cd commons/estate && bun run verify	suite/workstations.test.ts
+0008-estate-workstations FR-004	check	.github: cd commons/estate && bun run verify	suite/workstations.test.ts
+0008-estate-workstations FR-005	check	.github: cd commons/estate && bun run verify	suite/workstations.test.ts
+0008-estate-workstations FR-006	check	.github: cd commons/estate && bun run verify	suite/workstations.test.ts
+0008-estate-workstations FR-007	check	.github: cd commons/estate && bun run verify	suite/workstations.test.ts
+0008-estate-workstations FR-008	check	.github: cd commons/estate && bun run verify	suite/workstations.test.ts
+0008-estate-workstations FR-009	check	.github: cd commons/estate && bun run verify	suite/workstations.test.ts
+0008-estate-workstations FR-010	check	.github: cd commons/estate && bun run verify	suite/workstations.test.ts
+0008-estate-workstations FR-011	check	.github: cd commons/estate && bun run verify	suite/workstations.test.ts
+0008-estate-workstations FR-012	check	.github: cd commons/estate && bun run verify	suite/workstations.test.ts
+0008-estate-workstations FR-013	check	.github: cd commons/estate && bun run verify	suite/workstations.test.ts
+0008-estate-workstations FR-014	check	.github: cd commons/estate && bun run verify	suite/workstations.test.ts
+0008-estate-workstations FR-015	check	.github: cd commons/estate && bun run verify	suite/workstations.test.ts
+0008-estate-workstations FR-016	check	.github: cd commons/estate && bun run verify	suite/workstations.test.ts
+0008-estate-workstations FR-017	review	0008-estate-workstations FR-017	kept by commons/machine-probe: 0008-machine-probe-agent-workspace, proved in suite/agent-workspace.test.ts
+0008-estate-workstations FR-018	review	0008-estate-workstations FR-018	kept by commons/machine-probe: 0008-machine-probe-agent-workspace, proved in suite/agent-workspace.test.ts
+0008-estate-workstations FR-019	review	0008-estate-workstations FR-019	kept by commons/machine-probe: 0008-machine-probe-agent-workspace, proved in suite/agent-workspace.test.ts
+0008-estate-workstations FR-020	check	.github: cd commons/estate && bun run verify	suite/workstations.test.ts
+0008-estate-workstations FR-021	check	.github: cd commons/estate && bun run verify	suite/workstations.test.ts
+0008-estate-workstations FR-022	check	.github: cd commons/estate && bun run verify	suite/workstations.test.ts

@@ -148,7 +148,7 @@ A library that states one thing and carries it out in several places of one kind
 
 - Moving the copies of the check that `commons/data` and `commons/headless` keep: they switch to the library later (see the migration note below), and each stays in force until then.
 - Renaming or editing the constitution of a company or a harness: the article is drafted in the appendix for the owner to decide.
-- Clearing the name Kanon as a trademark in any jurisdiction: see OQ-4.
+- Clearing the name Kanon as a trademark in any jurisdiction: not needed while the name is internal (OQ-4).
 - Any commons library that is not named in FR-009.
 - The code of any host (`archon` and its dialects and plugins are written by their owners); what this specification gives is the table, the checks and the matrix they declare and are held to.
 
@@ -178,7 +178,7 @@ A library that states one thing and carries it out in several places of one kind
 - **OQ-1**: Whether a conformance level (0028-conformance-levels) requires `kanon` of a library, and which.
 - **OQ-2**: Whether the ladder (0016-ladder) and Kanon are one rule, and what the one specification would be; the two are cross-referenced and not unified.
 - **OQ-3**: Which of `mizan`, `ontology`, `docs`, `quality`, `test`, `githost`, `libraries`, `lint` and `ergonex` are Kanon.
-- **OQ-4** (decided by the owner on 2026-11-22: the name is kept): The name Kanon is kept. The names `kanon` on npm, PyPI and crates.io are held by unrelated projects (a proof-of-concept static site generator, a history-of-astronomy library and a Gemini server), which does not block this library: its packages are scoped (`@intellectual-frontiers/commons/kanon`). No proper trademark search was possible from this repository: a web search found one KANON record (a Madrid designation in classes 6, 7 and 37) and near-homophones in software classes (KAON), and the name sounds like CANON; none of it settles whether a software mark exists. Before the name is used as an external product name, a trademark attorney or a search of the USPTO's database should check classes 9, 35 and 42. The fallback stays Strata (taken on npm, PyPI and crates.io, which scoped packages tolerate too), and the change would be the name in this specification, the ontology namespace and the library, with no alias kept. The decision is recorded in `commons/spec-kit/audits/2026-11-kanon-decisions.md`.
+- **OQ-4** (decided by the owner on 2026-11-22): the name Kanon is kept as an internal working name, and no trademark or registry clearance is needed. The names `kanon` on npm, PyPI and crates.io are held by unrelated projects, which does not block this library: its packages are scoped (`@intellectual-frontiers/commons/kanon`). If the name ever becomes external, the owner decides again; the fallback is Strata, and the change would be the name in this specification, the ontology namespace and the library, with no alias kept. The decision is recorded in `commons/spec-kit/audits/2026-11-kanon-decisions.md`.
 - **OQ-5** (the two terms decided by the owner on 2026-11-22; the rest open): The `unaligned` rows of the alignment table need Decisions of the owner (0018-standards-first FR-005). The owner accepted `Vocabulary` and `Data module` as commons' own terms; the Decision records are in `commons/spec-kit/audits/2026-11-kanon-decisions.md`, signed by the owner on 2026-11-22 (D-2, D-3). The MDA wording and the SHACL and 42010 rows still need verifying against the documents themselves.
 
 ## Key entities

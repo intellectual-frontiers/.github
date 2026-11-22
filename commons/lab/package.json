@@ -2,7 +2,7 @@
   "name": "@intellectual-frontiers/lab",
   "private": true,
   "version": "0.1.0",
-  "description": "Disposable machines for tests: a systemd and sshd container rendered from a typed description, started and removed per test with a throwaway key, and what a container can and cannot stand in for.",
+  "description": "Disposable machines for tests: a systemd and sshd container of the Debian, RHEL or Arch family rendered from a typed description, and a virtual machine of the published Omarchy image under QEMU, each started and removed per test with a throwaway key, and what each can and cannot stand in for.",
   "type": "module",
   "engines": {
     "node": ">=26"

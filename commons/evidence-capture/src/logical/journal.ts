@@ -13,7 +13,7 @@
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
-import { cadenceOf, type CapturePolicy } from "@intellectual-frontiers/estate/governance";
+import { cadenceOf, journalOf, type CapturePolicy } from "@intellectual-frontiers/estate/governance";
 import { instantMs, parseDuration } from "@intellectual-frontiers/grc/governance";
 import { canonicalize, type LedgerEntry } from "@intellectual-frontiers/grc/logical";
 import { JOURNAL_TYPES, type CaptureFailure, type JournalType, type Observed } from "@intellectual-frontiers/evidence-capture/governance";
@@ -67,11 +67,12 @@ export type Before = { readonly digest: string | undefined; readonly lastJournal
  * The kind of entry a look makes, or nothing where it makes none. A state that differs from the kept one is `capture.changed`; one that is the same is `capture.unchanged` where every capture is journaled, and, where only changes and a heartbeat are,
  * only when the asset was last journaled a heartbeat ago or more; a failure is always an entry.
  */
-export function entryTypeFor(found: Found, before: Before, policy: CapturePolicy, now: string): JournalType | undefined {
+export function entryTypeFor(found: Found, before: Before, policy: CapturePolicy, now: string, asset: { readonly attributes?: Readonly<Record<string, unknown>> } = {}): JournalType | undefined {
   if (found.kind === "failure") return `capture.${found.failure.kind}`;
   if (before.digest !== found.digest) return "capture.changed";
-  if (policy.journal.granularity === "every-capture") return "capture.unchanged";
-  const heartbeat = policy.journal.heartbeat === null ? undefined : parseDuration(policy.journal.heartbeat);
+  const journal = journalOf(policy, asset);
+  if (journal.granularity === "every-capture") return "capture.unchanged";
+  const heartbeat = journal.heartbeat === null ? undefined : parseDuration(journal.heartbeat);
   const last = before.lastJournaledAt === undefined ? undefined : instantMs(before.lastJournaledAt);
   const at = instantMs(now);
   if (heartbeat === undefined || heartbeat.kind === "err" || last === undefined || at === undefined) return "capture.unchanged";

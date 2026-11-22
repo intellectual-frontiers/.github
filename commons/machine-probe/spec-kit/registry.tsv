@@ -6,3 +6,4 @@ number	slug	state
 0005	machine-probe-state	in force
 0006	machine-probe-grc	in force
 0007	machine-probe-enroll	in force
+0008	machine-probe-agent-workspace	in force

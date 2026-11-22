@@ -20,7 +20,7 @@ const SPEC = "0002-libraries-ci-findings";
 
 proves([`${SPEC} FR-005`], "every workflow of the repository keeps the policy: every step has one, the steps of findings are wrapped with a limit below their job's, no matrix fails fast and a job after a matrix runs with always()", () => {
   const ws = workflows();
-  assert(ws.length === 6);
+  assert(ws.length === 7);
   for (const w of ws) assertEquals(policyFindings(w), [], `${w.file} breaks the policy`);
 });
 
@@ -117,7 +117,7 @@ proves([`${SPEC} FR-005`, `${SPEC} FR-007`], "the history is written by one job 
       if (j.permissions?.["contents"] === "write") writers.push(`${w.file}/${id}`);
     }
   }
-  assertEquals(writers.filter((x) => !x.startsWith("release/")).sort(), ["ci/keep-findings", "conformance/keep-findings", "evidence/keep-findings", "site/keep-findings", "tests/keep-findings"]);
+  assertEquals(writers.filter((x) => !x.startsWith("release/") && x !== "maintenance/tag").sort(), ["ci/keep-findings", "conformance/keep-findings", "evidence/keep-findings", "site/keep-findings", "tests/keep-findings"]);
   for (const w of workflows()) {
     const k = w.jobs["keep-findings"];
     if (k === undefined) continue;

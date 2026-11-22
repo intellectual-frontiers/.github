@@ -16,7 +16,7 @@ const refused = (input: CapturePolicyInput): readonly string[] => {
 proves(["0004-estate-capture FR-001"], "no input gives the defaults, a left out field is the default, and every reason is given together", () => {
   const p = defineCapturePolicy();
   assertEquals(p, { kind: "ok", value: DEFAULT_CAPTURE_POLICY });
-  assertEquals(DEFAULT_CAPTURE_POLICY.cadence, { managed: "PT15M", adopted: "P1D", perAsset: {} });
+  assertEquals(DEFAULT_CAPTURE_POLICY.cadence, { managed: "PT15M", adopted: "P1D", perRole: {}, perAsset: {} });
   assertEquals([DEFAULT_CAPTURE_POLICY.branch, DEFAULT_CAPTURE_POLICY.collector.runsOn, DEFAULT_CAPTURE_POLICY.push, DEFAULT_CAPTURE_POLICY.sealing.required], ["evidence", "controller", { mode: "never", remote: "origin", every: null }, "on-export"]);
   const some = defineCapturePolicy({ push: { mode: "after-commit" }, cadence: { perAsset: { olympia: "PT5M" } } });
   assert(some.kind === "ok" && some.value.push.mode === "after-commit" && some.value.push.remote === "origin" && some.value.cadence.managed === "PT15M" && some.value.cadence.perAsset["olympia"] === "PT5M");

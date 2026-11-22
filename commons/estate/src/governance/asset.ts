@@ -1,4 +1,5 @@
 // Spec: 0002-estate-governance FR-004, FR-005
+// Spec: 0008-estate-workstations FR-011
 /**
  * An asset: its identity, kind and state, and for every capability either the system that owns it or the reason it is not offered, so that nothing is silently dropped. An asset is refused where it
  * names an owner for a capability its state does not offer, or leaves a capability it does offer with no owner.
@@ -16,6 +17,7 @@ import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { CAPABILITIES, parseAssetId, parseAssetKind, parseSystemId, ORIGINS, type AssetId, type AssetKind, type AssetState, type Capability, type Install, type Origin, type SystemId } from "./ids.ts";
 import { checkAttributes, type AttributeValue } from "./kinds.ts";
 import { offers, reasonNotOffered } from "./states.ts";
+import { checkWorkstationOwners } from "./workstation.ts";
 
 /** What `defineAsset` takes. */
 export type AssetInput = {
@@ -86,5 +88,6 @@ export function defineAsset(input: AssetInput): Result<Asset, readonly string[]>
     if (system.kind === "err") problems.push(`${input.id}: ${system.error}`);
     else lines.push({ capability, offered: true, owner: system.value });
   }
+  if (input.kind === "workstation") for (const m of checkWorkstationOwners(input.owners, input.attributes)) problems.push(`${input.id}: ${m}`);
   return problems.length > 0 || id.kind === "err" || kind.kind === "err" ? err(problems) : ok({ id: id.value, kind: kind.value, state: input.state, ...(origin === undefined ? {} : { origin }), ...(input.attributes === undefined ? {} : { attributes: input.attributes }), capabilities: lines });
 }

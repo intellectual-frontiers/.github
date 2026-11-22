@@ -5,3 +5,4 @@
  * @module
  */
 export * from "./containerfile.ts";
+export * from "./omarchy.ts";
