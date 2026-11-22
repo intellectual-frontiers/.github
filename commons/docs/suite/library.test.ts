@@ -19,8 +19,8 @@ proves(["0001-docs FR-001"], "the manifest, the package and the folder agree: th
   assert(fs.existsSync(path.join(DOCS, library.specKit, "registry.tsv")) && fs.existsSync(path.join(DOCS, "about.ts")) && fs.existsSync(path.join(DOCS, "src/mod.ts")));
 });
 
-proves(["0001-docs FR-002"], "a configuration can import by name the entry, which exports the configuration's types and the functions, and the four lens factories", async () => {
-  assertEquals(Object.keys(pkg.exports), [".", "./lens/layered", "./lens/program", "./lens/guides", "./lens/releases"]);
+proves(["0001-docs FR-002"], "a configuration can import by name the entry, which exports the configuration's types and the functions, and the five lens factories", async () => {
+  assertEquals(Object.keys(pkg.exports), [".", "./lens/layered", "./lens/program", "./lens/guides", "./lens/releases", "./lens/repo-ops"]);
   for (const target of Object.values(pkg.exports)) assert(fs.existsSync(path.join(DOCS, target)), `${target} is a file`);
   const entry = await import("../src/mod.ts");
   for (const name of ["buildSite", "writeSite", "report", "resolveConfig", "loadConfig", "main"]) assert(typeof (entry as Record<string, unknown>)[name] === "function", `the entry exports ${name}`);
@@ -28,4 +28,5 @@ proves(["0001-docs FR-002"], "a configuration can import by name the entry, whic
   assert(typeof (await import("../src/lens/program.ts")).programLens === "function");
   assert(typeof (await import("../src/lens/guides.ts")).guidesLens === "function");
   assert(typeof (await import("../src/lens/releases.ts")).releasesLens === "function");
+  assert(typeof (await import("../src/lens/repo-ops.ts")).repoOpsLens === "function");
 });

@@ -46,7 +46,7 @@ proves(["0011-documentation FR-003", "0011-documentation FR-009", "0011-document
   assertEquals(report(one.found), []);
   const html = (b: typeof one): string[] => b.pages.map((p) => document(p, { name: "N", repository: "r", pages: b.pages }));
   assertEquals(html(one), html(two));
-  assertEquals([...new Set(one.pages.map((p) => p.section))].sort(), ["api", "concepts", "howto", "models", "overview", "programs", "quality", "specs", "start"]);
+  assertEquals([...new Set(one.pages.map((p) => p.section))].sort(), ["api", "concepts", "howto", "models", "overview", "programs", "quality", "repoops", "specs", "start"]);
   for (const needed of ["index.html", "specs/matrix.html", "api/core/index.html", "models/index.html", "models/layers.html", "models/arca-party/person.html", "quality/index.html", "quality/data.html", "quality/issues/index.html", "quality/issues/data-00005.html", "quality/requirements.html", "quality/dependencies.html", "quality/todo.html", "quality/acceptance.html", "quality/ci.html", "quality/findings.html", "quality/hotspots.html", "quality/health.html"]) {
     assert(one.pages.some((p) => p.path === needed), `the site has ${needed}`);
   }

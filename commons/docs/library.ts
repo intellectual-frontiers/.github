@@ -12,7 +12,7 @@ export const library = {
   verify: "bun run verify",
   version: "0.3.7",
   distribution: ["github", "npm"],
-  exports: [".", "./lens/layered", "./lens/program", "./lens/guides", "./lens/releases"],
+  exports: [".", "./lens/layered", "./lens/program", "./lens/guides", "./lens/releases", "./lens/repo-ops"],
   summary:
     "The generator of a repository's documentation site, made from its TypeScript and its spec kit alone: a typed configuration, an API reference for every export, the specifications with the tests that prove each requirement, lenses for layered models, programs, guides and releases, Markdown and JSON beside every page, presentations other than the site (the AsciiDoc of the volumes of a book of erga), and one command, ifc-docs, that builds or checks them.",
 };

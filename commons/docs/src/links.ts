@@ -173,11 +173,15 @@ function resolveFrom(file: string, dest: string): string {
 /**
  * Where a Markdown link's destination goes, from the file it is written in.
  *
- * @param dest - the destination as written
+ * @param dest - the destination as written (`site:quality/index.html` names a page of the site that no file makes, and the check of the links finds it where it is not there)
  * @param index - what links can reach
  * @param scope - where the link is
  */
 export function hrefFor(dest: string, index: LinkIndex, scope: LinkScope): Href {
+  if (dest.startsWith("site:")) {
+    const [sitePath = "", siteAnchor] = dest.slice("site:".length).split("#");
+    return { kind: "page", path: sitePath, ...(siteAnchor === undefined ? {} : { anchor: siteAnchor }) };
+  }
   if (/^[a-z][a-z0-9+.-]*:/i.test(dest)) return { kind: "external", url: dest };
   if (dest.startsWith("#")) return { kind: "page", path: scope.page, anchor: dest.slice(1) };
   const [p = "", anchor] = dest.split("#");
