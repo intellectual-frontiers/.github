@@ -13,6 +13,9 @@
  *
  * @module
  */
+import { classify } from "../ci/inventory.ts";
+import { gatherJob, wrapWorkflow } from "../ci/wrap.ts";
+import { isWrapped } from "../ci/inventory.ts";
 import { type CompositeAction, expr, job, run, type Step, use, type Workflow } from "./model.ts";
 
 /** The versions the workflows pin (FR-005): each once. */
@@ -214,23 +217,6 @@ const ci: Workflow = {
       strategy: { failFast: false, matrix: expr("fromJSON(needs.plan.outputs.systems)") },
       steps: cellSteps(),
     }),
-    ci: job({
-      comment: "The one result to require: every job it needs passed or had nothing to run.",
-      needs: ["plan", "verify", "systems"],
-      when: "always()",
-      runsOn: "ubuntu-latest",
-      timeoutMinutes: 5,
-      steps: [
-        run(
-          lines(
-            'for r in "${{ needs.plan.result }}" "${{ needs.verify.result }}" "${{ needs.systems.result }}"; do',
-            '  case "$r" in success|skipped) ;; *) echo "a job of ci ended $r"; exit 1 ;; esac',
-            "done",
-          ),
-          { name: "No job failed", shell: "bash" },
-        ),
-      ],
-    }),
   },
 };
 
@@ -371,7 +357,7 @@ const evidence: Workflow = {
         run(
           lines(
             "mkdir -p \"$RUNNER_TEMP/evidence\"",
-            "printf '{ \"library\": \"%s\", \"install\": \"%s\", \"runner\": \"%s\", \"tests\": \"%s\", \"reported\": %s }\\n' \"${{ matrix.name }}\" \"${{ steps.install.outcome }}\" \"${{ steps.runner.outcome }}\" \"${{ steps.tests.outcome }}\" \"$(test -f \"$RUNNER_TEMP/evidence/${{ matrix.name }}.ctrf.json\" && echo true || echo false)\" > \"$RUNNER_TEMP/evidence/status-${{ matrix.name }}.json\"",
+            "printf '{ \"library\": \"%s\", \"install\": \"%s\", \"runner\": \"%s\", \"tests\": \"%s\", \"reported\": %s }\\n' \"${{ matrix.name }}\" \"${{ steps.install.outputs.outcome }}\" \"${{ steps.runner.outputs.outcome }}\" \"${{ steps.tests.outputs.outcome }}\" \"$(test -f \"$RUNNER_TEMP/evidence/${{ matrix.name }}.ctrf.json\" && echo true || echo false)\" > \"$RUNNER_TEMP/evidence/status-${{ matrix.name }}.json\"",
           ),
           { name: "Why there is a report, or none", when: "always()", shell: "bash" },
         ),
@@ -394,7 +380,7 @@ const evidence: Workflow = {
         run(
           lines(
             "mkdir -p \"$RUNNER_TEMP/evidence\"",
-            "printf '{ \"library\": \"repository\", \"install\": \"%s\", \"runner\": \"%s\", \"tests\": \"%s\", \"reported\": %s }\\n' \"${{ steps.install.outcome }}\" \"${{ steps.runner.outcome }}\" \"${{ steps.tests.outcome }}\" \"$(test -f \"$RUNNER_TEMP/evidence/repository.ctrf.json\" && echo true || echo false)\" > \"$RUNNER_TEMP/evidence/status-repository.json\"",
+            "printf '{ \"library\": \"repository\", \"install\": \"%s\", \"runner\": \"%s\", \"tests\": \"%s\", \"reported\": %s }\\n' \"${{ steps.install.outputs.outcome }}\" \"${{ steps.runner.outputs.outcome }}\" \"${{ steps.tests.outputs.outcome }}\" \"$(test -f \"$RUNNER_TEMP/evidence/repository.ctrf.json\" && echo true || echo false)\" > \"$RUNNER_TEMP/evidence/status-repository.json\"",
           ),
           { name: "Why there is a report, or none", when: "always()", shell: "bash" },
         ),
@@ -523,7 +509,7 @@ const site: Workflow = {
         run('set -o pipefail; bun src/main.ts build --out "$GITHUB_WORKSPACE/_site" 2>&1 | tee "$RUNNER_TEMP/build.log"', { name: "The site, built", id: "build", continueOnError: true, shell: "bash", workingDirectory: "commons/docs" }),
         run('bun tools/status-site.ts --evidence "$GITHUB_WORKSPACE/_evidence" --log "$RUNNER_TEMP/build.log" --out "$GITHUB_WORKSPACE/_site"', {
           name: "The emergency page, where the build failed",
-          when: "steps.build.outcome != 'success'",
+          when: "steps.build.outputs.outcome != 'success'",
           shell: "bash",
           workingDirectory: "commons/docs",
         }),
@@ -730,7 +716,7 @@ const release: Workflow = {
       when: "needs.plan.outputs.has-build == 'true'",
       runsOn: "ubuntu-latest",
       timeoutMinutes: 20,
-      strategy: { failFast: true, matrix: expr("fromJSON(needs.plan.outputs.build)") },
+      strategy: { failFast: false, matrix: expr("fromJSON(needs.plan.outputs.build)") },
       steps: [
         checkout(),
         bun(),
@@ -745,7 +731,7 @@ const release: Workflow = {
     }),
     publish: job({
       needs: ["plan", "build"],
-      when: "inputs.publish && needs.plan.outputs.has-build == 'true'",
+      when: "always() && inputs.publish && needs.plan.outputs.has-build == 'true' && needs.plan.result == 'success'",
       runsOn: "ubuntu-latest",
       timeoutMinutes: 60,
       permissions: { contents: "write", "id-token": "write", packages: "write" },
@@ -757,6 +743,7 @@ const release: Workflow = {
         run("bun commons/libraries/src/link.ts", { name: "The libraries, linked by name before any of them is imported" }),
         use(PIN.setupNode, { with: { "node-version": expr("env.NODE_VERSION"), "registry-url": "https://registry.npmjs.org" } }),
         use(PIN.downloadArtifact, { name: "The tarballs", with: { pattern: "package-*", path: "package" } }),
+        run("bun commons/libraries/src/ci/release-gate.ts --history refs/remotes/origin/findings-history", { name: "The release policy of the day, and the findings that are open (commons 0038-build-policy FR-010)", shell: "bash" }),
         run(PUBLISH_COMMAND, {
           name: "Published in dependency order to npm and to the GitHub package registry, and tagged: each release by itself, a version already on npm is only tagged",
           shell: "bash",
@@ -771,7 +758,44 @@ const release: Workflow = {
   },
 };
 
-/** Every workflow, the libraries'' made from their manifests, in the order of their files' names. */
+/** The script of the job that gathers the findings of a workflow: the sound-pipeline check for the cells that ran, then `collect.ts` (0038-build-policy FR-005). */
+function gatherScript(w: Workflow): string {
+  const history = [
+    'H=""',
+    'if [ "$GITHUB_REF" = refs/heads/main ]; then',
+    '  export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $(printf \'x-access-token:%s\' "$GH_TOKEN" | base64 -w0)"',
+    '  H="--history https://github.com/$GITHUB_REPOSITORY.git"',
+    "fi",
+  ];
+  const planGuard = "plan" in w.jobs ? ['if [ "$PLAN_RESULT" != "success" ]; then echo "the plan could not be made (the red cause plan-unavailable)"; exit 2; fi'] : [];
+  const expects: string[] = [];
+  const counts: string[] = [];
+  if (w.file === "ci") {
+    counts.push('n_linux=$(jq \'[.[].name] | unique | length\' <<<"${PLAN_LINUX:-[]}")', 'n_systems=$(jq \'[.[].name] | unique | length\' <<<"${PLAN_SYSTEMS:-[]}")');
+    expects.push('--expect "verify:$n_linux"', '--expect "systems:$n_systems"');
+  }
+  if (w.file === "evidence") {
+    counts.push('n_tests=$(jq \'[.[].name] | unique | length\' <<<"${PLAN_LINUX:-[]}")');
+    expects.push('--expect "tests:$n_tests"', "--expect repository:1");
+  }
+  const review = w.file === "ci" ? " --policy-review" : "";
+  return lines("set -u", ...planGuard, ...counts, ...history, `bun commons/libraries/src/ci/collect.ts --dir _findings --out _findings-out --workflow ${w.file} ${expects.join(" ")}${review} --check-run $H`);
+}
+
+/** A workflow under the build policy (0038-build-policy): every step has its policy, the steps of findings run through the wrapper, and the job that gathers the findings ends the run. */
+function underPolicy(w: Workflow): Workflow {
+  const wrapped = wrapWorkflow(classify(w));
+  const makers = Object.entries(wrapped.jobs).filter(([, j]) => j.steps.some((st) => isWrapped(st))).map(([id]) => id);
+  if (makers.length === 0) return wrapped;
+  const all = Object.keys(wrapped.jobs);
+  const id = w.file === "ci" ? "ci" : "findings";
+  const gather = { ...gatherJob(wrapped, all, gatherScript(wrapped)), name: w.file === "ci" ? "ci" : "findings" };
+  const planResults = "plan" in wrapped.jobs ? { PLAN_RESULT: expr("needs.plan.result"), PLAN_LINUX: expr("needs.plan.outputs.linux"), ...(w.file === "ci" ? { PLAN_SYSTEMS: expr("needs.plan.outputs.systems") } : {}) } : {};
+  const steps = gather.steps.map((st) => (st.kind === "run" && st.env?.["WORKFLOW"] !== undefined ? { ...st, env: { ...st.env, ...planResults } } : st)) as unknown as typeof gather.steps;
+  return { ...wrapped, jobs: { ...wrapped.jobs, [id]: { ...gather, steps } } };
+}
+
+/** Every workflow, the libraries' made from their manifests, in the order of their files' names, under the build policy. */
 export function workflows(): readonly Workflow[] {
   return [
     ci,
@@ -780,7 +804,7 @@ export function workflows(): readonly Workflow[] {
     site,
     conformance,
     tests,
-  ].sort((a, b) => (a.file < b.file ? -1 : a.file > b.file ? 1 : 0));
+  ].map(underPolicy).sort((a, b) => (a.file < b.file ? -1 : a.file > b.file ? 1 : 0));
 }
 
 /** The composite actions of `.github/actions/`: the pinned Bun, which every workflow uses. */

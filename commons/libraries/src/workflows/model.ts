@@ -27,6 +27,8 @@
  * @module
  */
 
+import type { StepPolicy } from "../ci/policy.ts";
+
 declare const expression: unique symbol;
 /** A string the runner reads as an expression: `${{ ... }}`. */
 export type Expr = string & { readonly [expression]: true };
@@ -51,6 +53,8 @@ type StepCommon = {
   readonly continueOnError?: boolean;
   /** A comment written above the step. */
   readonly comment?: string;
+  /** What the step is under the build policy (0038-build-policy FR-003): a red cause, a step whose output is read into findings, a gate or plumbing. Set by the inventory, read by the validation of the policy. */
+  readonly policy?: StepPolicy;
 };
 
 /** A step that uses an action: `owner/name@version`, or `./path` for one of this repository's. */

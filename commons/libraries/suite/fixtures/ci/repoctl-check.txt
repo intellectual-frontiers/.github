@@ -1,0 +1,105 @@
+$ bun commons/libraries/src/link.ts && bun commons/repoctl/src/repoctl.ts check
+ok    The files of the generator libraries
+ok    The files of the generator metapackages
+ok    The files of the generator single-tools
+ok    The files of the generator packaging
+ok    The files of the generator ontology
+ok    The files of the generator workflows
+ok    The files of the generator register
+ok    The files of the generator readme
+ok    The files of the generator license
+ok    The files of the generator installers
+FAIL  The format of the specification kit of commons. (2)
+ok    The rules Mizan adds to the format, held by the baseline that only shrinks.
+ok    The version records: a record that is wrong, an identity that changed and a version that went back.
+ok    TypeScript 7 on the tests of the root.
+ok    TypeScript 7 on the tools of commons.
+ok    The specification kit of anyfs
+ok    The specification kit of anyfs-bridge
+ok    The specification kit of anyfs-cli
+ok    The specification kit of anyfs-gdrive
+ok    The specification kit of anyfs-git
+ok    The specification kit of anyfs-githost
+ok    The specification kit of anyfs-onedrive
+ok    The specification kit of anyfs-posix
+ok    The specification kit of anyfs-query
+ok    The specification kit of anyfs-s3
+ok    The specification kit of anyfs-serve
+ok    The specification kit of anyfs-sql
+ok    The specification kit of anyfs-ssh
+ok    The specification kit of archon
+ok    The specification kit of archon-boot
+ok    The specification kit of archon-converge
+ok    The specification kit of archon-dialect-ansible
+ok    The specification kit of archon-dialect-apt
+ok    The specification kit of archon-dialect-cloud-init
+ok    The specification kit of archon-dialect-homebrew
+ok    The specification kit of archon-dialect-mise
+ok    The specification kit of archon-dialect-native-pinned
+ok    The specification kit of archon-dialect-opentofu
+ok    The specification kit of archon-dialect-winget
+ok    The specification kit of archon-dns
+ok    The specification kit of archon-tool
+ok    The specification kit of assessment
+ok    The specification kit of catalog-nist-csf-2
+ok    The specification kit of catalog-nist-sp800
+ok    The specification kit of catalog-soc2
+ok    The specification kit of change-control
+ok    The specification kit of core
+ok    The specification kit of crypto
+ok    The specification kit of data
+ok    The specification kit of docs
+ok    The specification kit of ergonex
+ok    The specification kit of estate
+ok    The specification kit of estate-endpoints
+ok    The specification kit of estate-iac
+ok    The specification kit of estate-query
+ok    The specification kit of evidence-capture
+ok    The specification kit of findings
+ok    The specification kit of formats
+ok    The specification kit of gate
+ok    The specification kit of githost
+ok    The specification kit of grc
+ok    The specification kit of headless
+ok    The specification kit of integrations
+ok    The specification kit of integrations-fhir
+ok    The specification kit of integrations-github
+ok    The specification kit of integrations-identity
+ok    The specification kit of integrations-x12
+ok    The specification kit of kanon
+ok    The specification kit of lab
+ok    The specification kit of lang-sql
+ok    The specification kit of libraries
+ok    The specification kit of lint
+ok    The specification kit of linux-observe
+ok    The specification kit of linux-services
+ok    The specification kit of machine-probe
+ok    The specification kit of mizan
+ok    The specification kit of net
+ok    The specification kit of netboot
+ok    The specification kit of ontology
+ok    The specification kit of package-managers
+ok    The specification kit of pentest
+ok    The specification kit of planning
+ok    The specification kit of planning-query
+ok    The specification kit of posture-report
+ok    The specification kit of quality
+ok    The specification kit of rdf
+ok    The specification kit of repoctl
+ok    The specification kit of scanners
+ok    The specification kit of system
+ok    The specification kit of telemetry
+ok    The specification kit of tenancy
+ok    The specification kit of terminal
+ok    The specification kit of test
+ok    The specification kit of toolchain
+ok    The constants of the sources that say a version
+ok    The packages each library imports and declares
+explain a code: repoctl explain <code>
+
+[x] specs/0038-build-policy: has no row in registry.tsv [E-SPEC-KIT]
+   fix: bun commons/tools/mizan-check.ts
+[x] registry.tsv:39: a row is a number of three or four digits, a slug and one of ['in force', 'retired'] [E-SPEC-KIT]
+next: bun commons/tools/mizan-check.ts
+error: script "repoctl" exited with code 1
+exit 1

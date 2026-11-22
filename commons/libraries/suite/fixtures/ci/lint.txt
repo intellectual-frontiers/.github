@@ -1,0 +1,148 @@
+<error file="tests/_tmp.ts" line="1" column="1" rule="ifc/module-doc">
+begin the file with its module's documentation: a /** ... */ block that says @module, before any code or other comment
+<source>
+1 | export   const   x  =  1 ;
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+2 | var unused = 2
+</source>
+</error>
+<warning file="tests/_tmp.ts" line="2" column="1" rule="no-var" fixable="true">
+Unexpected var, use let or const instead.
+<source>
+1 | export   const   x  =  1 ;
+2 | var unused = 2
+    ^^^^^^^^^^^^^^
+3 | export function f(a:any){ debugger; return a==1 }
+</source>
+</warning>
+<warning file="tests/_tmp.ts" line="2" column="5" rule="@typescript-eslint/no-unused-vars">
+'unused' is assigned a value but never used.
+<source>
+1 | export   const   x  =  1 ;
+2 | var unused = 2
+        ^^^^^^
+3 | export function f(a:any){ debugger; return a==1 }
+</source>
+<help>Remove it, or prefix it with _.</help>
+</warning>
+<error file="tests/_tmp.ts" line="3" column="8" rule="@typescript-eslint/explicit-module-boundary-types">
+Missing return type on function.
+<source>
+1 | export   const   x  =  1 ;
+2 | var unused = 2
+3 | export function f(a:any){ debugger; return a==1 }
+           ^^^^^^^^^^
+</source>
+</error>
+<error file="tests/_tmp.ts" line="3" column="19" rule="@typescript-eslint/explicit-module-boundary-types">
+Argument 'a' should be typed with a non-any type.
+<source>
+1 | export   const   x  =  1 ;
+2 | var unused = 2
+3 | export function f(a:any){ debugger; return a==1 }
+                      ^^^^^
+</source>
+</error>
+<error file="tests/_tmp.ts" line="3" column="21" rule="@typescript-eslint/no-explicit-any">
+Unexpected any. Specify a different type.
+<source>
+1 | export   const   x  =  1 ;
+2 | var unused = 2
+3 | export function f(a:any){ debugger; return a==1 }
+                        ^^^
+</source>
+<help>Use unknown if the type isn't known.</help>
+<suggestion>Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct.</suggestion>
+<suggestion>Use `never` instead, this is useful when instantiating generic type parameters that you don't need to know the type of.</suggestion>
+</error>
+<error file="tests/_tmp.ts" line="3" column="27" rule="no-debugger">
+Unexpected 'debugger' statement.
+<source>
+1 | export   const   x  =  1 ;
+2 | var unused = 2
+3 | export function f(a:any){ debugger; return a==1 }
+                              ^^^^^^^^^
+</source>
+</error>
+<error file="tests/_tmp.ts" line="3" column="45" rule="eqeqeq">
+Expected '===' and instead saw '=='.
+<source>
+1 | export   const   x  =  1 ;
+2 | var unused = 2
+3 | export function f(a:any){ debugger; return a==1 }
+                                                ^^
+</source>
+<suggestion>Use '===' instead of '=='.</suggestion>
+</error>
+<error file="tests/commons-anyfs-merge-medium.test.ts" line="94" column="57" rule="@typescript-eslint/no-unnecessary-type-assertion" fixable="true">
+This assertion is unnecessary since the receiver accepts the original type of the expression.
+<source>
+92 | 
+93 | const sync = async (r: Replica, medium: Medium, more: { readonly maxRows?: number } = {}) => {
+94 |   const done = await syncThrough({ self: r.id, replica: r.sql.store as unknown as Mergeable, medium, cursor: r.cursor, ...more });
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+95 |   if (done.kind === "err") throw new Error(JSON.stringify(done.error));
+</source>
+</error>
+<error file="tests/commons-anyfs-merge-medium.test.ts" line="139" column="14" rule="@typescript-eslint/no-unnecessary-type-assertion" fixable="true">
+This assertion is unnecessary since the receiver accepts the original type of the expression.
+<source>
+137 |   const cut = await syncThrough({
+138 |     self: a.id,
+139 |     replica: a.sql.store as unknown as Mergeable,
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+140 |     medium: breaking,
+</source>
+</error>
+<error file="tests/commons-anyfs-merge-medium.test.ts" line="155" column="56" rule="@typescript-eslint/no-unnecessary-type-assertion" fixable="true">
+This assertion is unnecessary since the receiver accepts the original type of the expression.
+<source>
+153 |   for (let round = 0; round < 3; round++) for (const r of [a, b, c]) await sync(r, medium);
+154 |   for (const r of [a, b, c])
+155 |     assert((await publishVector({ self: r.id, replica: r.sql.store as unknown as Mergeable, medium })).kind === "ok");
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+156 |   const vectors = await readVectors(medium);
+</source>
+</error>
+<error file="tests/commons-anyfs-merge-medium.test.ts" line="186" column="68" rule="@typescript-eslint/no-unnecessary-type-assertion" fixable="true">
+This assertion is unnecessary since the receiver accepts the original type of the expression.
+<source>
+184 |       const m = await localStore(shared);
+185 |       if (m.kind === "err") throw new Error(m.error);
+186 |       console.log(`[anyfs merge medium] ${await exercise("folder", m.value as unknown as Medium, dir)}`);
+                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+187 |     } finally {
+</source>
+</error>
+<error file="tests/commons-anyfs-merge-medium.test.ts" line="210" column="72" rule="@typescript-eslint/no-unnecessary-type-assertion" fixable="true">
+This assertion is unnecessary since the receiver accepts the original type of the expression.
+<source>
+208 |       const git = await gitRefStore({ repo, branch: "exchange", commit: { author: identity.value, clock: () => Date.UTC(2026, 0, 1) } });
+209 |       if (git.kind === "err") throw new Error(git.error);
+210 |       console.log(`[anyfs merge medium] ${await exercise("git branch", git.value.store as unknown as Medium, dir)}`);
+                                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+211 |     } finally {
+</source>
+</error>
+<error file="tests/commons-anyfs-merge-medium.test.ts" line="226" column="73" rule="@typescript-eslint/no-unnecessary-type-assertion" fixable="true">
+This assertion is unnecessary since the receiver accepts the original type of the expression.
+<source>
+224 |         const opened = await openSshStore(executorOf(host), { place: placeOf(host), root: `${host.root}/exchange`, create: true });
+225 |         if (opened.kind === "err") throw new Error(opened.error);
+226 |         console.log(`[anyfs merge medium] ${await exercise("real sshd", opened.value.store as unknown as Medium, dir)}`);
+                                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+227 |       });
+</source>
+</error>
+<error file="tests/commons-anyfs-merge-medium.test.ts" line="275" column="78" rule="@typescript-eslint/no-unnecessary-type-assertion" fixable="true">
+This assertion is unnecessary since the receiver accepts the original type of the expression.
+<source>
+273 |       if (opened.kind === "err") throw new Error(opened.error);
+274 |       if (opened.value.mode === "read-only") throw new Error("the keys can write");
+275 |       console.log(`[anyfs merge medium] ${await exercise("real S3 (RustFS)", opened.value.store as unknown as Medium, dir)}`);
+                                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+276 |     } finally {
+</source>
+</error>
+Linted 23 files [3.16s]
+exit 1

@@ -20,6 +20,7 @@
  */
 import process from "node:process";
 import { ACTIONS, workflows } from "./workflows/definitions.ts";
+import { policyFindings } from "./ci/inventory.ts";
 import { validateAction, validateWorkflow } from "./workflows/model.ts";
 import { renderAction, renderWorkflow } from "./workflows/render.ts";
 import { readLibraries } from "./libraries.ts";
@@ -44,7 +45,7 @@ export function outputs(repo: string): { readonly files: ReadonlyMap<string, str
   }
   const files = new Map<string, string>();
   for (const w of workflows()) {
-    problems.push(...validateWorkflow(w));
+    problems.push(...validateWorkflow(w), ...policyFindings(w));
     files.set(`${FOLDER}/${w.file}.auto.yml`, renderWorkflow(w));
   }
   for (const a of ACTIONS) {

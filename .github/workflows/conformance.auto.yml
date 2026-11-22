@@ -36,26 +36,54 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        continue-on-error: true
       - uses: ./.github/actions/bun
+        continue-on-error: true
       - name: "The development tools, from bun.lock"
-        run: bun install --frozen-lockfile
-        working-directory: commons/telemetry
-      - name: "The OpenTelemetry Collector, verified against commons' pins"
+        id: the-development-tools-from-bun-lock-3
         shell: bash
         run: |
-          url=$(sed -n 's/^OTELCOL_CONTRIB_URL_X86_64=//p' commons/generated/pins.auto.env)
-          sum=$(sed -n 's/^OTELCOL_CONTRIB_SHA256_X86_64=//p' commons/generated/pins.auto.env)
-          dir="$RUNNER_TEMP/otelcol"
-          mkdir -p "$dir"
-          curl -fsSL -o "$dir/otelcol.tar.gz" "$url"
-          echo "$sum  $dir/otelcol.tar.gz" | sha256sum -c -
-          tar -xzf "$dir/otelcol.tar.gz" -C "$dir" otelcol-contrib
-          echo "IFC_OTELCOL=$dir/otelcol-contrib" >>"$GITHUB_ENV"
-      - name: "The conformance test, on Bun and on Node"
-        run: |
-          bun test suite/otel-conformance.test.ts
-          node --test suite/otel-conformance.test.ts
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-development-tools-from-bun-lock-3 --job "otel-conformance" --module "repository" --tool install --timeout 3 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: bun install --frozen-lockfile
         working-directory: commons/telemetry
+        continue-on-error: true
+      - name: "The OpenTelemetry Collector, verified against commons' pins"
+        id: the-opentelemetry-collector-verified-aga-4
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-opentelemetry-collector-verified-aga-4 --job "otel-conformance" --module "repository" --tool exit-status --timeout 8 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: |
+            url=$(sed -n 's/^OTELCOL_CONTRIB_URL_X86_64=//p' commons/generated/pins.auto.env)
+            sum=$(sed -n 's/^OTELCOL_CONTRIB_SHA256_X86_64=//p' commons/generated/pins.auto.env)
+            dir="$RUNNER_TEMP/otelcol"
+            mkdir -p "$dir"
+            curl -fsSL -o "$dir/otelcol.tar.gz" "$url"
+            echo "$sum  $dir/otelcol.tar.gz" | sha256sum -c -
+            tar -xzf "$dir/otelcol.tar.gz" -C "$dir" otelcol-contrib
+            echo "IFC_OTELCOL=$dir/otelcol-contrib" >>"$GITHUB_ENV"
+        continue-on-error: true
+      - name: "The conformance test, on Bun and on Node"
+        id: the-conformance-test-on-bun-and-on-node-5
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-conformance-test-on-bun-and-on-node-5 --job "otel-conformance" --module "repository" --tool bun-test --timeout 8 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: |
+            bun test suite/otel-conformance.test.ts
+            node --test suite/otel-conformance.test.ts
+        working-directory: commons/telemetry
+        continue-on-error: true
+      - name: "The findings of this job, kept for the job that gathers them"
+        if: "always()"
+        uses: actions/upload-artifact@v4
+        with:
+          name: findings-conformance-otel-conformance-${{ strategy.job-index }}
+          path: ${{ runner.temp }}/findings
+          if-no-files-found: ignore
+          retention-days: 7
+        continue-on-error: true
 
   # commons system 0001-system FR-013: a program built into one binary by the pinned Bun on each system, then run; and Windows built from Linux.
   compile:
@@ -67,26 +95,99 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - uses: actions/checkout@v4
+        continue-on-error: true
       - uses: ./.github/actions/bun
+        continue-on-error: true
       - name: "The development tools, from bun.lock"
-        run: bun install --frozen-lockfile
-        working-directory: commons/system
-      - name: "Built for this computer, with an embedded file, and run"
+        id: the-development-tools-from-bun-lock-3
         shell: bash
-        run: bun test suite/compile.test.ts
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-development-tools-from-bun-lock-3 --job "compile" --module "system" --tool install --timeout 3 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: bun install --frozen-lockfile
         working-directory: commons/system
+        continue-on-error: true
+      - name: "Built for this computer, with an embedded file, and run"
+        id: built-for-this-computer-with-an-embedded-4
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id built-for-this-computer-with-an-embedded-4 --job "compile" --module "system" --tool bun-test --timeout 8 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: bun test suite/compile.test.ts
+        working-directory: commons/system
+        continue-on-error: true
       - name: "Built for Windows from Linux, by the pinned Bun alone"
+        id: built-for-windows-from-linux-by-the-pinn-5
         if: "runner.os == 'Linux'"
         shell: bash
         run: |
-          v=$(sed -n 's/^BUN_VERSION=//p' ../generated/pins.auto.env)
-          mkdir -p "$RUNNER_TEMP/cross"
-          printf 'console.log("ok");\n' >"$RUNNER_TEMP/cross/hello.ts"
-          bun -e '
-            import { compile, describeCompileError } from "./src/compile.ts";
-            const r = await compile({ entry: process.argv[1], outfile: process.argv[2], target: "windows-x64", bunVersion: process.argv[3] });
-            if (r.kind === "err") { console.error(describeCompileError(r.error)); process.exit(1); }
-            console.log(r.value.path, r.value.sha256);
-          ' "$RUNNER_TEMP/cross/hello.ts" "$RUNNER_TEMP/cross/hello" "$v"
-          test -f "$RUNNER_TEMP/cross/hello.exe"
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id built-for-windows-from-linux-by-the-pinn-5 --job "compile" --module "system" --tool exit-status --timeout 8 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: |
+            v=$(sed -n 's/^BUN_VERSION=//p' ../generated/pins.auto.env)
+            mkdir -p "$RUNNER_TEMP/cross"
+            printf 'console.log("ok");\n' >"$RUNNER_TEMP/cross/hello.ts"
+            bun -e '
+              import { compile, describeCompileError } from "./src/compile.ts";
+              const r = await compile({ entry: process.argv[1], outfile: process.argv[2], target: "windows-x64", bunVersion: process.argv[3] });
+              if (r.kind === "err") { console.error(describeCompileError(r.error)); process.exit(1); }
+              console.log(r.value.path, r.value.sha256);
+            ' "$RUNNER_TEMP/cross/hello.ts" "$RUNNER_TEMP/cross/hello" "$v"
+            test -f "$RUNNER_TEMP/cross/hello.exe"
         working-directory: commons/system
+        continue-on-error: true
+      - name: "The findings of this job, kept for the job that gathers them"
+        if: "always()"
+        uses: actions/upload-artifact@v4
+        with:
+          name: findings-conformance-compile-${{ strategy.job-index }}
+          path: ${{ runner.temp }}/findings
+          if-no-files-found: ignore
+          retention-days: 7
+        continue-on-error: true
+
+  # the findings of this workflow, gathered: it passes if and only if the pipeline is sound (0038-build-policy FR-005); a failing test, a type error or a crashed command in any cell is a finding here and never a red job
+  findings:
+    name: findings
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    needs: [otel-conformance, compile]
+    if: "always()"
+    permissions:
+      contents: write
+      checks: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: ./.github/actions/bun
+      - name: The findings every job kept
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "findings-conformance-*"
+          path: _findings
+          merge-multiple: true
+        continue-on-error: true
+      - name: "The findings, merged; the pipeline is sound where every cell that ran left its file (ci/collect.ts)"
+        shell: bash
+        run: |
+          set -u
+          H=""
+          if [ "$GITHUB_REF" = refs/heads/main ]; then
+            export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+            H="--history https://github.com/$GITHUB_REPOSITORY.git"
+          fi
+          bun commons/libraries/src/ci/collect.ts --dir _findings --out _findings-out --workflow conformance  --check-run $H
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WORKFLOW: conformance
+      - name: "The merged findings, kept for the site"
+        if: "always()"
+        uses: actions/upload-artifact@v4
+        with:
+          name: findings-conformance
+          path: _findings-out
+          if-no-files-found: ignore
+          retention-days: 7
+        continue-on-error: true

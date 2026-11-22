@@ -49,32 +49,55 @@ jobs:
       matrix: ${{ fromJSON(needs.plan.outputs.linux) }}
     steps:
       - uses: actions/checkout@v4
+        continue-on-error: true
       - uses: ./.github/actions/bun
+        continue-on-error: true
       - name: "The development tools, from bun.lock (the libraries it imports are linked)"
         id: install
-        run: bun install --frozen-lockfile
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id install --job "tests" --module "${{ matrix.name }}" --tool install --timeout 7 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: bun install --frozen-lockfile
         working-directory: ${{ matrix.folder }}
         continue-on-error: true
       - name: "The test runner's own packages (commons quality)"
         id: runner
-        run: bun install --frozen-lockfile
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id runner --job "tests" --module "${{ matrix.name }}" --tool install --timeout 7 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: bun install --frozen-lockfile
         working-directory: commons/quality
         continue-on-error: true
       - name: "The packages of the tool that keeps the report (commons docs)"
-        run: bun install --frozen-lockfile
+        id: the-packages-of-the-tool-that-keeps-the--5
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-packages-of-the-tool-that-keeps-the--5 --job "tests" --module "${{ matrix.name }}" --tool install --timeout 7 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: bun install --frozen-lockfile
         working-directory: commons/docs
         continue-on-error: true
       - name: "The tests, kept as a CTRF report"
         id: tests
         shell: bash
-        run: "bun commons/docs/tools/evidence.ts --library \"${{ matrix.name }}\" --coverage --out \"$RUNNER_TEMP/evidence\""
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id tests --job "tests" --module "${{ matrix.name }}" --tool bun-test --timeout 20 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: "bun commons/docs/tools/evidence.ts --library \"${{ matrix.name }}\" --coverage --out \"$RUNNER_TEMP/evidence\""
         continue-on-error: true
       - name: "Why there is a report, or none"
+        id: why-there-is-a-report-or-none-7
         if: "always()"
         shell: bash
         run: |
-          mkdir -p "$RUNNER_TEMP/evidence"
-          printf '{ "library": "%s", "install": "%s", "runner": "%s", "tests": "%s", "reported": %s }\n' "${{ matrix.name }}" "${{ steps.install.outcome }}" "${{ steps.runner.outcome }}" "${{ steps.tests.outcome }}" "$(test -f "$RUNNER_TEMP/evidence/${{ matrix.name }}.ctrf.json" && echo true || echo false)" > "$RUNNER_TEMP/evidence/status-${{ matrix.name }}.json"
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id why-there-is-a-report-or-none-7 --job "tests" --module "${{ matrix.name }}" --tool exit-status --timeout 20 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: |
+            mkdir -p "$RUNNER_TEMP/evidence"
+            printf '{ "library": "%s", "install": "%s", "runner": "%s", "tests": "%s", "reported": %s }\n' "${{ matrix.name }}" "${{ steps.install.outputs.outcome }}" "${{ steps.runner.outputs.outcome }}" "${{ steps.tests.outputs.outcome }}" "$(test -f "$RUNNER_TEMP/evidence/${{ matrix.name }}.ctrf.json" && echo true || echo false)" > "$RUNNER_TEMP/evidence/status-${{ matrix.name }}.json"
+        continue-on-error: true
       - name: "The report and its status, kept for the site"
         if: "always()"
         uses: actions/upload-artifact@v4
@@ -83,6 +106,16 @@ jobs:
           path: ${{ runner.temp }}/evidence/*.json
           if-no-files-found: ignore
           retention-days: 7
+        continue-on-error: true
+      - name: "The findings of this job, kept for the job that gathers them"
+        if: "always()"
+        uses: actions/upload-artifact@v4
+        with:
+          name: findings-evidence-tests-${{ strategy.job-index }}
+          path: ${{ runner.temp }}/findings
+          if-no-files-found: ignore
+          retention-days: 7
+        continue-on-error: true
 
   # the tests of the repository's own files (`tests/`)
   repository:
@@ -93,35 +126,63 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+        continue-on-error: true
       - uses: ./.github/actions/bun
+        continue-on-error: true
       - name: "The root's development tools, from bun.lock"
         id: install
-        run: bun install --frozen-lockfile
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id install --job "repository" --module "repository" --tool install --timeout 7 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: bun install --frozen-lockfile
         working-directory: .
         continue-on-error: true
       - name: "The documentation generator's dependencies, which the tests of the root import"
-        run: bun install --frozen-lockfile
+        id: the-documentation-generator-s-dependenci-4
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-documentation-generator-s-dependenci-4 --job "repository" --module "repository" --tool install --timeout 7 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: bun install --frozen-lockfile
         working-directory: commons/docs
         continue-on-error: true
       - name: "The test runner's own packages (commons quality)"
         id: runner
-        run: bun install --frozen-lockfile
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id runner --job "repository" --module "repository" --tool install --timeout 7 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: bun install --frozen-lockfile
         working-directory: commons/quality
         continue-on-error: true
       - name: "The libraries, linked by name"
-        run: bun commons/libraries/src/link.ts
+        id: the-libraries-linked-by-name-6
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-libraries-linked-by-name-6 --job "repository" --module "repository" --tool exit-status --timeout 20 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: bun commons/libraries/src/link.ts
         continue-on-error: true
       - name: "The tests, kept as a CTRF report"
         id: tests
         shell: bash
-        run: "bun commons/docs/tools/evidence.ts --library repository --coverage --out \"$RUNNER_TEMP/evidence\""
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id tests --job "repository" --module "repository" --tool bun-test --timeout 20 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: "bun commons/docs/tools/evidence.ts --library repository --coverage --out \"$RUNNER_TEMP/evidence\""
         continue-on-error: true
       - name: "Why there is a report, or none"
+        id: why-there-is-a-report-or-none-8
         if: "always()"
         shell: bash
         run: |
-          mkdir -p "$RUNNER_TEMP/evidence"
-          printf '{ "library": "repository", "install": "%s", "runner": "%s", "tests": "%s", "reported": %s }\n' "${{ steps.install.outcome }}" "${{ steps.runner.outcome }}" "${{ steps.tests.outcome }}" "$(test -f "$RUNNER_TEMP/evidence/repository.ctrf.json" && echo true || echo false)" > "$RUNNER_TEMP/evidence/status-repository.json"
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id why-there-is-a-report-or-none-8 --job "repository" --module "repository" --tool exit-status --timeout 20 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: |
+            mkdir -p "$RUNNER_TEMP/evidence"
+            printf '{ "library": "repository", "install": "%s", "runner": "%s", "tests": "%s", "reported": %s }\n' "${{ steps.install.outputs.outcome }}" "${{ steps.runner.outputs.outcome }}" "${{ steps.tests.outputs.outcome }}" "$(test -f "$RUNNER_TEMP/evidence/repository.ctrf.json" && echo true || echo false)" > "$RUNNER_TEMP/evidence/status-repository.json"
+        continue-on-error: true
       - name: "The report and its status, kept for the site"
         if: "always()"
         uses: actions/upload-artifact@v4
@@ -130,6 +191,16 @@ jobs:
           path: ${{ runner.temp }}/evidence/*.json
           if-no-files-found: ignore
           retention-days: 7
+        continue-on-error: true
+      - name: "The findings of this job, kept for the job that gathers them"
+        if: "always()"
+        uses: actions/upload-artifact@v4
+        with:
+          name: findings-evidence-repository-${{ strategy.job-index }}
+          path: ${{ runner.temp }}/findings
+          if-no-files-found: ignore
+          retention-days: 7
+        continue-on-error: true
 
   # the mutation score of a small library, by the night and by hand: the suite is run once for each change made to the library's code, so it is slow; where it cannot be done the score of the night before stays
   mutation:
@@ -143,18 +214,34 @@ jobs:
         library: [archon-dialect-apt, archon-dialect-homebrew, archon-dialect-mise, archon-dialect-winget, integrations-github, catalog-nist-csf-2, archon-dns, catalog-nist-sp800, archon-converge, integrations-x12, lab]
     steps:
       - uses: actions/checkout@v4
+        continue-on-error: true
       - uses: ./.github/actions/bun
+        continue-on-error: true
       - name: "The development tools, from bun.lock (the libraries it imports are linked)"
-        run: bun install --frozen-lockfile
+        id: the-development-tools-from-bun-lock-the--3
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-development-tools-from-bun-lock-the--3 --job "mutation" --module "${{ matrix.library }}" --tool install --timeout 12 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: bun install --frozen-lockfile
         working-directory: ${{ format('commons/{0}', matrix.library) }}
         continue-on-error: true
       - name: "The packages of the tool that keeps the report (commons docs)"
-        run: bun install --frozen-lockfile
+        id: the-packages-of-the-tool-that-keeps-the--4
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-packages-of-the-tool-that-keeps-the--4 --job "mutation" --module "${{ matrix.library }}" --tool install --timeout 12 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: bun install --frozen-lockfile
         working-directory: commons/docs
         continue-on-error: true
       - name: "The mutation run, kept as a small report"
+        id: the-mutation-run-kept-as-a-small-report-5
         shell: bash
-        run: "bun commons/docs/tools/mutation.ts --library \"${{ matrix.library }}\" --out \"$RUNNER_TEMP/evidence\""
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-mutation-run-kept-as-a-small-report-5 --job "mutation" --module "${{ matrix.library }}" --tool bun-test --timeout 32 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: "bun commons/docs/tools/mutation.ts --library \"${{ matrix.library }}\" --out \"$RUNNER_TEMP/evidence\""
         continue-on-error: true
       - name: "The score, kept for the site"
         if: "always()"
@@ -164,6 +251,16 @@ jobs:
           path: ${{ runner.temp }}/evidence/*.mutation.json
           if-no-files-found: ignore
           retention-days: 7
+        continue-on-error: true
+      - name: "The findings of this job, kept for the job that gathers them"
+        if: "always()"
+        uses: actions/upload-artifact@v4
+        with:
+          name: findings-evidence-mutation-${{ strategy.job-index }}
+          path: ${{ runner.temp }}/findings
+          if-no-files-found: ignore
+          retention-days: 7
+        continue-on-error: true
 
   # every report in one artifact, whatever happened to the jobs that made them, with the run added to the history that the artifact of the run before carried
   collect:
@@ -176,9 +273,16 @@ jobs:
       actions: read
     steps:
       - uses: actions/checkout@v4
+        continue-on-error: true
       - uses: ./.github/actions/bun
+        continue-on-error: true
       - name: "The packages of the tool that keeps the history (commons docs)"
-        run: bun install --frozen-lockfile
+        id: the-packages-of-the-tool-that-keeps-the--3
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-packages-of-the-tool-that-keeps-the--3 --job "collect" --module "repository" --tool install --timeout 3 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: bun install --frozen-lockfile
         working-directory: commons/docs
         continue-on-error: true
       - name: The reports of the tests
@@ -187,25 +291,34 @@ jobs:
           pattern: "evidence-*"
           path: _evidence
           merge-multiple: true
+        continue-on-error: true
       - name: Which run this is
+        id: which-run-this-is-5
         shell: bash
         run: |
-          mkdir -p _evidence
-          printf '{ "commit": "%s", "at": "%s", "url": "%s" }\n' "$GITHUB_SHA" "$(date -u '+%Y-%m-%d %H:%M UTC')" "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" > _evidence/meta.json
-          ls -l _evidence | sed -n '1,200p'
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id which-run-this-is-5 --job "collect" --module "repository" --tool exit-status --timeout 8 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: |
+            mkdir -p _evidence
+            printf '{ "commit": "%s", "at": "%s", "url": "%s" }\n' "$GITHUB_SHA" "$(date -u '+%Y-%m-%d %H:%M UTC')" "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" > _evidence/meta.json
+            ls -l _evidence | sed -n '1,200p'
+        continue-on-error: true
       - name: "The run, added to the history"
+        id: the-run-added-to-the-history-6
         shell: bash
         run: |
-          # the history travels from one run's artifact to the next: this run adds itself to the one the run before kept (it is cut to the newest 120)
-          mkdir -p _history _prev
-          gh run download --name evidence --dir _prev || echo 'no earlier evidence: the history begins here'
-          if [ -d _prev/history ]; then cp -r _prev/history/. _history/; fi
-          # the mutation scores are made by the night; the hours between keep the ones the run before had
-          for f in _prev/*.mutation.json; do if [ -e "$f" ] && [ ! -e "_evidence/$(basename "$f")" ]; then cp "$f" _evidence/; fi; done
-          bun commons/docs/tools/history.ts --evidence _evidence --history _history || echo 'the history could not be kept'
-          mkdir -p _evidence/history && cp -r _history/runs _evidence/history/ 2>/dev/null || true
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-run-added-to-the-history-6 --job "collect" --module "repository" --tool exit-status --timeout 5 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
         env:
           GH_TOKEN: ${{ github.token }}
+          IFC_STEP_SCRIPT: |
+            # the history travels from one run's artifact to the next: this run adds itself to the one the run before kept (it is cut to the newest 120)
+            mkdir -p _history _prev
+            gh run download --name evidence --dir _prev || echo 'no earlier evidence: the history begins here'
+            if [ -d _prev/history ]; then cp -r _prev/history/. _history/; fi
+            # the mutation scores are made by the night; the hours between keep the ones the run before had
+            for f in _prev/*.mutation.json; do if [ -e "$f" ] && [ ! -e "_evidence/$(basename "$f")" ]; then cp "$f" _evidence/; fi; done
+            bun commons/docs/tools/history.ts --evidence _evidence --history _history || echo 'the history could not be kept'
+            mkdir -p _evidence/history && cp -r _history/runs _evidence/history/ 2>/dev/null || true
         continue-on-error: true
       - name: "The evidence, kept for the site"
         uses: actions/upload-artifact@v4
@@ -213,3 +326,63 @@ jobs:
           name: evidence
           path: _evidence
           retention-days: 7
+        continue-on-error: true
+      - name: "The findings of this job, kept for the job that gathers them"
+        if: "always()"
+        uses: actions/upload-artifact@v4
+        with:
+          name: findings-evidence-collect-${{ strategy.job-index }}
+          path: ${{ runner.temp }}/findings
+          if-no-files-found: ignore
+          retention-days: 7
+        continue-on-error: true
+
+  # the findings of this workflow, gathered: it passes if and only if the pipeline is sound (0038-build-policy FR-005); a failing test, a type error or a crashed command in any cell is a finding here and never a red job
+  findings:
+    name: findings
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    needs: [plan, tests, repository, mutation, collect]
+    if: "always()"
+    permissions:
+      contents: write
+      checks: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: ./.github/actions/bun
+      - name: The findings every job kept
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "findings-evidence-*"
+          path: _findings
+          merge-multiple: true
+        continue-on-error: true
+      - name: "The findings, merged; the pipeline is sound where every cell that ran left its file (ci/collect.ts)"
+        shell: bash
+        run: |
+          set -u
+          if [ "$PLAN_RESULT" != "success" ]; then echo "the plan could not be made (the red cause plan-unavailable)"; exit 2; fi
+          n_tests=$(jq '[.[].name] | unique | length' <<<"${PLAN_LINUX:-[]}")
+          H=""
+          if [ "$GITHUB_REF" = refs/heads/main ]; then
+            export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+            H="--history https://github.com/$GITHUB_REPOSITORY.git"
+          fi
+          bun commons/libraries/src/ci/collect.ts --dir _findings --out _findings-out --workflow evidence --expect "tests:$n_tests" --expect repository:1 --check-run $H
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WORKFLOW: evidence
+          PLAN_RESULT: ${{ needs.plan.result }}
+          PLAN_LINUX: ${{ needs.plan.outputs.linux }}
+      - name: "The merged findings, kept for the site"
+        if: "always()"
+        uses: actions/upload-artifact@v4
+        with:
+          name: findings-evidence
+          path: _findings-out
+          if-no-files-found: ignore
+          retention-days: 7
+        continue-on-error: true

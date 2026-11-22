@@ -1,0 +1,2 @@
+kanon-check: passed: 0 new, 0 stale, 0 held by kanon.baseline.txt
+exit 0

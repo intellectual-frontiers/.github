@@ -56,32 +56,62 @@ jobs:
     needs: [plan]
     if: "needs.plan.outputs.has-build == 'true'"
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix: ${{ fromJSON(needs.plan.outputs.build) }}
     steps:
       - uses: actions/checkout@v4
+        continue-on-error: true
       - uses: ./.github/actions/bun
+        continue-on-error: true
       - name: "The development tools, from bun.lock"
-        run: bun install --frozen-lockfile
+        id: the-development-tools-from-bun-lock-3
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-development-tools-from-bun-lock-3 --job "build" --module "${{ matrix.slug }}" --tool install --timeout 6 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: bun install --frozen-lockfile
         working-directory: ${{ matrix.folder }}
+        continue-on-error: true
       - name: "verify, which includes the packing"
-        run: bun run verify
+        id: verify-which-includes-the-packing-4
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id verify-which-includes-the-packing-4 --job "build" --module "${{ matrix.slug }}" --tool verify --timeout 16 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: bun run verify
         working-directory: ${{ matrix.folder }}
+        continue-on-error: true
       - name: The package that is published
-        run: bun tools/pack.ts
+        id: the-package-that-is-published-5
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-package-that-is-published-5 --job "build" --module "${{ matrix.slug }}" --tool exit-status --timeout 16 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: bun tools/pack.ts
         working-directory: ${{ matrix.folder }}
+        continue-on-error: true
       - name: "The tarball, kept for the job that publishes it"
         uses: actions/upload-artifact@v4
         with:
           name: package-${{ matrix.slug }}
           path: ${{ matrix.folder }}/dist/*.tgz
           if-no-files-found: error
+        continue-on-error: true
+      - name: "The findings of this job, kept for the job that gathers them"
+        if: "always()"
+        uses: actions/upload-artifact@v4
+        with:
+          name: findings-release-build-${{ strategy.job-index }}
+          path: ${{ runner.temp }}/findings
+          if-no-files-found: ignore
+          retention-days: 7
+        continue-on-error: true
 
   publish:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     needs: [plan, build]
-    if: "inputs.publish && needs.plan.outputs.has-build == 'true'"
+    if: "always() && inputs.publish && needs.plan.outputs.has-build == 'true' && needs.plan.result == 'success'"
     permissions:
       contents: write
       id-token: write
@@ -93,20 +123,39 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+        continue-on-error: true
       - uses: ./.github/actions/bun
+        continue-on-error: true
       - name: "The packages the command reads, from the root's bun.lock"
-        run: bun install --frozen-lockfile
+        id: the-packages-the-command-reads-from-the--3
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-packages-the-command-reads-from-the--3 --job "publish" --module "repository" --tool install --timeout 18 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: bun install --frozen-lockfile
+        continue-on-error: true
       - name: "The libraries, linked by name before any of them is imported"
-        run: bun commons/libraries/src/link.ts
+        id: the-libraries-linked-by-name-before-any--4
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-libraries-linked-by-name-before-any--4 --job "publish" --module "repository" --tool exit-status --timeout 48 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: bun commons/libraries/src/link.ts
+        continue-on-error: true
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           registry-url: "https://registry.npmjs.org"
+        continue-on-error: true
       - name: The tarballs
         uses: actions/download-artifact@v4
         with:
           pattern: "package-*"
           path: package
+        continue-on-error: true
+      - name: "The release policy of the day, and the findings that are open (commons 0038-build-policy FR-010)"
+        shell: bash
+        run: bun commons/libraries/src/ci/release-gate.ts --history refs/remotes/origin/findings-history
       - name: "Published in dependency order to npm and to the GitHub package registry, and tagged: each release by itself, a version already on npm is only tagged"
         shell: bash
         run: bun commons/libraries/src/releasing.ts publish --dir package
@@ -114,3 +163,61 @@ jobs:
           NPM_TOKEN: ${{ secrets.INFRO_NPMJS_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: "The findings of this job, kept for the job that gathers them"
+        if: "always()"
+        uses: actions/upload-artifact@v4
+        with:
+          name: findings-release-publish-${{ strategy.job-index }}
+          path: ${{ runner.temp }}/findings
+          if-no-files-found: ignore
+          retention-days: 7
+        continue-on-error: true
+
+  # the findings of this workflow, gathered: it passes if and only if the pipeline is sound (0038-build-policy FR-005); a failing test, a type error or a crashed command in any cell is a finding here and never a red job
+  findings:
+    name: findings
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    needs: [plan, build, publish]
+    if: "always()"
+    permissions:
+      contents: write
+      checks: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: ./.github/actions/bun
+      - name: The findings every job kept
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "findings-release-*"
+          path: _findings
+          merge-multiple: true
+        continue-on-error: true
+      - name: "The findings, merged; the pipeline is sound where every cell that ran left its file (ci/collect.ts)"
+        shell: bash
+        run: |
+          set -u
+          if [ "$PLAN_RESULT" != "success" ]; then echo "the plan could not be made (the red cause plan-unavailable)"; exit 2; fi
+          H=""
+          if [ "$GITHUB_REF" = refs/heads/main ]; then
+            export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+            H="--history https://github.com/$GITHUB_REPOSITORY.git"
+          fi
+          bun commons/libraries/src/ci/collect.ts --dir _findings --out _findings-out --workflow release  --check-run $H
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WORKFLOW: release
+          PLAN_RESULT: ${{ needs.plan.result }}
+          PLAN_LINUX: ${{ needs.plan.outputs.linux }}
+      - name: "The merged findings, kept for the site"
+        if: "always()"
+        uses: actions/upload-artifact@v4
+        with:
+          name: findings-release
+          path: _findings-out
+          if-no-files-found: ignore
+          retention-days: 7
+        continue-on-error: true

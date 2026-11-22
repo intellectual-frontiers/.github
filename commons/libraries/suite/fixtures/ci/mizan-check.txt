@@ -1,0 +1,3 @@
+registry.tsv:39: a row is a number of three or four digits, a slug and one of ['in force', 'retired']
+specs/0038-build-policy: has no row in registry.tsv
+exit 1

@@ -1,0 +1,4 @@
+tests/_tmp.ts
+tests/commons-kanon.test.ts
+2 files need formatting. Run bun fmt to fix them.
+exit 1

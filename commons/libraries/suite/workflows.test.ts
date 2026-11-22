@@ -171,7 +171,7 @@ proves(
       assertStringIncludes(ci, "bun commons/libraries/src/plan.ts");
       assertStringIncludes(ci, "matrix: ${{ fromJSON(needs.plan.outputs.linux) }}");
       assertStringIncludes(ci, "matrix: ${{ fromJSON(needs.plan.outputs.systems) }}");
-      assertStringIncludes(ci, "run: ${{ matrix.verify }}");
+      assertStringIncludes(ci, "IFC_STEP_SCRIPT: ${{ matrix.verify }}");
       assertStringIncludes(ci, "working-directory: ${{ matrix.folder }}");
       assertStringIncludes(ci, "needs: [plan, verify, systems]");
       assert(!ci.includes("commons/alpha"), "no library is named in the workflow: the plan says which are affected");
@@ -237,11 +237,11 @@ proves(
     assert(!w.includes("\n  push:") && !w.includes("pull_request"), "a release is never made by a push");
     assertStringIncludes(w, "publish:\n        description:");
     assertStringIncludes(w, "refs/heads/main");
-    assertStringIncludes(w, "if: \"inputs.publish && needs.plan.outputs.has-build == 'true'\"");
+    assertStringIncludes(w, "if: \"always() && inputs.publish && needs.plan.outputs.has-build == 'true' && needs.plan.result == 'success'\"");
     // the order of the plan, the proof and the pack of each library, provenance and the token only where there is one
     assertStringIncludes(w, "bun commons/libraries/src/releasing.ts matrix");
-    assertStringIncludes(w, "run: bun run verify");
-    assertStringIncludes(w, "run: bun tools/pack.ts");
+    assertStringIncludes(w, "IFC_STEP_SCRIPT: bun run verify");
+    assertStringIncludes(w, "IFC_STEP_SCRIPT: bun tools/pack.ts");
     assertStringIncludes(w, "bun commons/libraries/src/releasing.ts publish --dir package");
     assertStringIncludes(w, "id-token: write");
     assertStringIncludes(w, "environment:\n      name: npm");

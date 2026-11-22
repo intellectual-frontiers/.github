@@ -40,13 +40,36 @@ jobs:
     if: "github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'"
     steps:
       - uses: actions/checkout@v4
+        continue-on-error: true
       - uses: ./.github/actions/bun
+        continue-on-error: true
       - name: "TypeScript 7.1 (beta), Shiki, beautiful-mermaid and @types/node, exactly as bun.lock pins them"
-        run: bun install --frozen-lockfile
+        id: typescript-7-1-beta-shiki-beautiful-merm-3
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id typescript-7-1-beta-shiki-beautiful-merm-3 --job "check" --module "repository" --tool install --timeout 4 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: bun install --frozen-lockfile
         working-directory: commons/docs
+        continue-on-error: true
       - name: "The compiler, the generator's tests, then check on commons"
-        run: bun run verify
+        id: the-compiler-the-generator-s-tests-then--4
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-compiler-the-generator-s-tests-then--4 --job "check" --module "repository" --tool verify --timeout 12 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: bun run verify
         working-directory: commons/docs
+        continue-on-error: true
+      - name: "The findings of this job, kept for the job that gathers them"
+        if: "always()"
+        uses: actions/upload-artifact@v4
+        with:
+          name: findings-site-check-${{ strategy.job-index }}
+          path: ${{ runner.temp }}/findings
+          if-no-files-found: ignore
+          retention-days: 7
+        continue-on-error: true
 
   # the site, built from the sources and the evidence, whatever else failed; where the build itself fails, a page made from the evidence alone
   site:
@@ -63,47 +86,77 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+        continue-on-error: true
       - uses: ./.github/actions/bun
+        continue-on-error: true
       - name: "TypeScript 7.1 (beta), Shiki, beautiful-mermaid and @types/node, exactly as bun.lock pins them"
-        run: bun install --frozen-lockfile
+        id: typescript-7-1-beta-shiki-beautiful-merm-3
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id typescript-7-1-beta-shiki-beautiful-merm-3 --job "site" --module "repository" --tool install --timeout 6 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: bun install --frozen-lockfile
         working-directory: commons/docs
         continue-on-error: true
       - name: The newest test reports
+        id: the-newest-test-reports-4
         shell: bash
         run: |
-          mkdir -p _evidence
-          # the newest evidence the workflow `evidence` kept, whatever its result; none is a site that says no run is recorded
-          gh run download --name evidence --dir _evidence || echo 'no evidence has been kept yet'
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-newest-test-reports-4 --job "site" --module "repository" --tool exit-status --timeout 10 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
         env:
           GH_TOKEN: ${{ github.token }}
+          IFC_STEP_SCRIPT: |
+            mkdir -p _evidence
+            # the newest evidence the workflow `evidence` kept, whatever its result; none is a site that says no run is recorded
+            gh run download --name evidence --dir _evidence || echo 'no evidence has been kept yet'
         continue-on-error: true
       - name: "The open issues, the runs of the workflows, and which build this is"
+        id: the-open-issues-the-runs-of-the-workflow-5
         shell: bash
         run: |
-          mkdir -p _evidence
-          # each page of the answer is an array: the pages are made one
-          gh api --paginate -X GET "repos/$GITHUB_REPOSITORY/issues" -f state=all -f per_page=100 --jq '.[]' | jq -s '.' > _evidence/github-issues.json || echo '[]' > _evidence/github-issues.json
-          bun commons/docs/tools/ci-runs.ts --out _evidence/runs.json || echo 'the runs of the workflows could not be read'
-          printf '{ "commit": "%s", "at": "%s", "url": "%s", "check": "%s" }\n' "$GITHUB_SHA" "$(date -u '+%Y-%m-%d %H:%M UTC')" "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" "${{ needs.check.result }}" > _evidence/build.json
-          ls -l _evidence | sed -n '1,80p'
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-open-issues-the-runs-of-the-workflow-5 --job "site" --module "repository" --tool exit-status --timeout 10 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
         env:
           GH_TOKEN: ${{ github.token }}
+          IFC_STEP_SCRIPT: |
+            mkdir -p _evidence
+            # each page of the answer is an array: the pages are made one
+            gh api --paginate -X GET "repos/$GITHUB_REPOSITORY/issues" -f state=all -f per_page=100 --jq '.[]' | jq -s '.' > _evidence/github-issues.json || echo '[]' > _evidence/github-issues.json
+            bun commons/docs/tools/ci-runs.ts --out _evidence/runs.json || echo 'the runs of the workflows could not be read'
+            printf '{ "commit": "%s", "at": "%s", "url": "%s", "check": "%s" }\n' "$GITHUB_SHA" "$(date -u '+%Y-%m-%d %H:%M UTC')" "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" "${{ needs.check.result }}" > _evidence/build.json
+            ls -l _evidence | sed -n '1,80p'
         continue-on-error: true
       - name: "The site, built"
         id: build
         shell: bash
-        run: "set -o pipefail; bun src/main.ts build --out \"$GITHUB_WORKSPACE/_site\" 2>&1 | tee \"$RUNNER_TEMP/build.log\""
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id build --job "site" --module "repository" --tool exit-status --timeout 16 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: "set -o pipefail; bun src/main.ts build --out \"$GITHUB_WORKSPACE/_site\" 2>&1 | tee \"$RUNNER_TEMP/build.log\""
         working-directory: commons/docs
         continue-on-error: true
       - name: "The emergency page, where the build failed"
-        if: "steps.build.outcome != 'success'"
+        id: the-emergency-page-where-the-build-faile-7
+        if: "steps.build.outputs.outcome != 'success'"
         shell: bash
-        run: "bun tools/status-site.ts --evidence \"$GITHUB_WORKSPACE/_evidence\" --log \"$RUNNER_TEMP/build.log\" --out \"$GITHUB_WORKSPACE/_site\""
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-emergency-page-where-the-build-faile-7 --job "site" --module "repository" --tool exit-status --timeout 16 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: "bun tools/status-site.ts --evidence \"$GITHUB_WORKSPACE/_evidence\" --log \"$RUNNER_TEMP/build.log\" --out \"$GITHUB_WORKSPACE/_site\""
         working-directory: commons/docs
+        continue-on-error: true
       - name: "The site, kept for Pages"
         uses: actions/upload-pages-artifact@v3
         with:
           path: _site
+      - name: "The findings of this job, kept for the job that gathers them"
+        if: "always()"
+        uses: actions/upload-artifact@v4
+        with:
+          name: findings-site-site-${{ strategy.job-index }}
+          path: ${{ runner.temp }}/findings
+          if-no-files-found: ignore
+          retention-days: 7
+        continue-on-error: true
 
   # always(): whatever failed before is an ancestor that failed, and would otherwise skip the publication of a site that was built
   publish:
@@ -121,3 +174,49 @@ jobs:
       - name: Published to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  # the findings of this workflow, gathered: it passes if and only if the pipeline is sound (0038-build-policy FR-005); a failing test, a type error or a crashed command in any cell is a finding here and never a red job
+  findings:
+    name: findings
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    needs: [check, site, publish]
+    if: "always()"
+    permissions:
+      contents: write
+      checks: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: ./.github/actions/bun
+      - name: The findings every job kept
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "findings-site-*"
+          path: _findings
+          merge-multiple: true
+        continue-on-error: true
+      - name: "The findings, merged; the pipeline is sound where every cell that ran left its file (ci/collect.ts)"
+        shell: bash
+        run: |
+          set -u
+          H=""
+          if [ "$GITHUB_REF" = refs/heads/main ]; then
+            export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+            H="--history https://github.com/$GITHUB_REPOSITORY.git"
+          fi
+          bun commons/libraries/src/ci/collect.ts --dir _findings --out _findings-out --workflow site  --check-run $H
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WORKFLOW: site
+      - name: "The merged findings, kept for the site"
+        if: "always()"
+        uses: actions/upload-artifact@v4
+        with:
+          name: findings-site
+          path: _findings-out
+          if-no-files-found: ignore
+          retention-days: 7
+        continue-on-error: true

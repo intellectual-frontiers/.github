@@ -77,25 +77,57 @@ jobs:
       matrix: ${{ fromJSON(needs.plan.outputs.linux) }}
     steps:
       - uses: actions/checkout@v4
+        continue-on-error: true
       - uses: ./.github/actions/bun
+        continue-on-error: true
       - name: "The development tools, from bun.lock (the libraries it imports are linked)"
-        run: bun install --frozen-lockfile
+        id: the-development-tools-from-bun-lock-the--3
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-development-tools-from-bun-lock-the--3 --job "verify" --module "${{ matrix.name }}" --tool install --timeout 6 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: bun install --frozen-lockfile
         working-directory: ${{ matrix.folder }}
+        continue-on-error: true
       - name: "verify (its packing is checked where the exports changed, and by the release)"
-        run: ${{ matrix.verify }}
+        id: verify-its-packing-is-checked-where-the--4
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id verify-its-packing-is-checked-where-the--4 --job "verify" --module "${{ matrix.name }}" --tool verify --timeout 16 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
         env:
           IFC_SKIP_PACK: ${{ matrix.pack == false && '1' || '' }}
+          IFC_STEP_SCRIPT: ${{ matrix.verify }}
         working-directory: ${{ matrix.folder }}
+        continue-on-error: true
       - name: After verify
+        id: after-verify-5
         if: "matrix.after != ''"
         shell: bash
-        run: ${{ matrix.after }}
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id after-verify-5 --job "verify" --module "${{ matrix.name }}" --tool verify --timeout 16 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: ${{ matrix.after }}
         working-directory: ${{ matrix.folder }}
+        continue-on-error: true
       - name: The tests on Node 26
+        id: the-tests-on-node-26-6
         if: "matrix.node != ''"
         shell: bash
-        run: ${{ matrix.node }}
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-tests-on-node-26-6 --job "verify" --module "${{ matrix.name }}" --tool bun-test --timeout 16 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: ${{ matrix.node }}
         working-directory: ${{ matrix.folder }}
+        continue-on-error: true
+      - name: "The findings of this job, kept for the job that gathers them"
+        if: "always()"
+        uses: actions/upload-artifact@v4
+        with:
+          name: findings-ci-verify-${{ strategy.job-index }}
+          path: ${{ runner.temp }}/findings
+          if-no-files-found: ignore
+          retention-days: 7
+        continue-on-error: true
 
   systems:
     name: verify (${{ matrix.name }}, ${{ matrix.os }})
@@ -108,36 +140,106 @@ jobs:
       matrix: ${{ fromJSON(needs.plan.outputs.systems) }}
     steps:
       - uses: actions/checkout@v4
+        continue-on-error: true
       - uses: ./.github/actions/bun
+        continue-on-error: true
       - name: "The development tools, from bun.lock (the libraries it imports are linked)"
-        run: bun install --frozen-lockfile
-        working-directory: ${{ matrix.folder }}
-      - name: "verify (its packing is checked where the exports changed, and by the release)"
-        run: ${{ matrix.verify }}
-        env:
-          IFC_SKIP_PACK: ${{ matrix.pack == false && '1' || '' }}
-        working-directory: ${{ matrix.folder }}
-      - name: After verify
-        if: "matrix.after != ''"
-        shell: bash
-        run: ${{ matrix.after }}
-        working-directory: ${{ matrix.folder }}
-      - name: The tests on Node 26
-        if: "matrix.node != ''"
-        shell: bash
-        run: ${{ matrix.node }}
-        working-directory: ${{ matrix.folder }}
-
-  # The one result to require: every job it needs passed or had nothing to run.
-  ci:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    needs: [plan, verify, systems]
-    if: "always()"
-    steps:
-      - name: No job failed
+        id: the-development-tools-from-bun-lock-the--3
         shell: bash
         run: |
-          for r in "${{ needs.plan.result }}" "${{ needs.verify.result }}" "${{ needs.systems.result }}"; do
-            case "$r" in success|skipped) ;; *) echo "a job of ci ended $r"; exit 1 ;; esac
-          done
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-development-tools-from-bun-lock-the--3 --job "systems" --module "${{ matrix.name }}" --tool install --timeout 6 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: bun install --frozen-lockfile
+        working-directory: ${{ matrix.folder }}
+        continue-on-error: true
+      - name: "verify (its packing is checked where the exports changed, and by the release)"
+        id: verify-its-packing-is-checked-where-the--4
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id verify-its-packing-is-checked-where-the--4 --job "systems" --module "${{ matrix.name }}" --tool verify --timeout 16 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_SKIP_PACK: ${{ matrix.pack == false && '1' || '' }}
+          IFC_STEP_SCRIPT: ${{ matrix.verify }}
+        working-directory: ${{ matrix.folder }}
+        continue-on-error: true
+      - name: After verify
+        id: after-verify-5
+        if: "matrix.after != ''"
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id after-verify-5 --job "systems" --module "${{ matrix.name }}" --tool verify --timeout 16 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: ${{ matrix.after }}
+        working-directory: ${{ matrix.folder }}
+        continue-on-error: true
+      - name: The tests on Node 26
+        id: the-tests-on-node-26-6
+        if: "matrix.node != ''"
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-tests-on-node-26-6 --job "systems" --module "${{ matrix.name }}" --tool bun-test --timeout 16 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: ${{ matrix.node }}
+        working-directory: ${{ matrix.folder }}
+        continue-on-error: true
+      - name: "The findings of this job, kept for the job that gathers them"
+        if: "always()"
+        uses: actions/upload-artifact@v4
+        with:
+          name: findings-ci-systems-${{ strategy.job-index }}
+          path: ${{ runner.temp }}/findings
+          if-no-files-found: ignore
+          retention-days: 7
+        continue-on-error: true
+
+  # the findings of this workflow, gathered: it passes if and only if the pipeline is sound (0038-build-policy FR-005); a failing test, a type error or a crashed command in any cell is a finding here and never a red job
+  ci:
+    name: ci
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    needs: [plan, verify, systems]
+    if: "always()"
+    permissions:
+      contents: write
+      checks: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: ./.github/actions/bun
+      - name: The findings every job kept
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "findings-ci-*"
+          path: _findings
+          merge-multiple: true
+        continue-on-error: true
+      - name: "The findings, merged; the pipeline is sound where every cell that ran left its file (ci/collect.ts)"
+        shell: bash
+        run: |
+          set -u
+          if [ "$PLAN_RESULT" != "success" ]; then echo "the plan could not be made (the red cause plan-unavailable)"; exit 2; fi
+          n_linux=$(jq '[.[].name] | unique | length' <<<"${PLAN_LINUX:-[]}")
+          n_systems=$(jq '[.[].name] | unique | length' <<<"${PLAN_SYSTEMS:-[]}")
+          H=""
+          if [ "$GITHUB_REF" = refs/heads/main ]; then
+            export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+            H="--history https://github.com/$GITHUB_REPOSITORY.git"
+          fi
+          bun commons/libraries/src/ci/collect.ts --dir _findings --out _findings-out --workflow ci --expect "verify:$n_linux" --expect "systems:$n_systems" --policy-review --check-run $H
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WORKFLOW: ci
+          PLAN_RESULT: ${{ needs.plan.result }}
+          PLAN_LINUX: ${{ needs.plan.outputs.linux }}
+          PLAN_SYSTEMS: ${{ needs.plan.outputs.systems }}
+      - name: "The merged findings, kept for the site"
+        if: "always()"
+        uses: actions/upload-artifact@v4
+        with:
+          name: findings-ci
+          path: _findings-out
+          if-no-files-found: ignore
+          retention-days: 7
+        continue-on-error: true

@@ -1,0 +1,8 @@
+.github/workflows/ci.auto.yml is not what the model makes; run: bun commons/libraries/src/generate-workflows.ts
+.github/workflows/conformance.auto.yml is not what the model makes; run: bun commons/libraries/src/generate-workflows.ts
+.github/workflows/evidence.auto.yml is not what the model makes; run: bun commons/libraries/src/generate-workflows.ts
+.github/workflows/release.auto.yml is not what the model makes; run: bun commons/libraries/src/generate-workflows.ts
+.github/workflows/site.auto.yml is not what the model makes; run: bun commons/libraries/src/generate-workflows.ts
+.github/workflows/tests.auto.yml is not what the model makes; run: bun commons/libraries/src/generate-workflows.ts
+.github/actions/bun/action.yml is not what the model makes; run: bun commons/libraries/src/generate-workflows.ts
+exit 1
