@@ -1,0 +1,184 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45050190045",
+    "workflow": "ci",
+    "commit": "a652172e9b90561346b74375afac48453a4e210f",
+    "at": "2026-11-22T17:40:34Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45050190045"
+  },
+  "steps": [
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "systems",
+      "module": "ergonex",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1384,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "systems",
+      "module": "ergonex",
+      "tool": "bun-test",
+      "outcome": "findings",
+      "findings": 1,
+      "durationMs": 23033,
+      "exitStatus": 1
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "systems",
+      "module": "ergonex",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 2,
+      "durationMs": 25245,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "commons",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 447,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "commons",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 123,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "ergonex",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 192,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "ergonex",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 135221,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "ergonex",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 80968,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "findings",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 182,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "findings",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 674,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "scanners",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 116,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "scanners",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1268,
+      "exitStatus": 0
+    }
+  ],
+  "findings": [
+    {
+      "id": "f-0cbf1c811db2e361",
+      "tool": "bun-test",
+      "module": "ergonex",
+      "evidence": {
+        "run": "45050190045",
+        "commit": "a652172e9b90561346b74375afac48453a4e210f",
+        "step": "the-tests-on-node-26-6",
+        "logSha256": "611a5f080573f0810e52d9787eb0e24e41aa4148825930889092e0e0acccf26f"
+      },
+      "at": "2026-11-22T17:35:56Z",
+      "code": "test-failed",
+      "severity": "error",
+      "message": "the test failed: 0003-host FR-028: programsNamed finds each program of a name in the order of the PATH, enxChecks says it as a warning with the paths or as ok, and ergonex doctor reports it without running the program",
+      "key": "0003-host FR-028: programsNamed finds each program of a name in the order of the PATH, enxChecks says it as a warning with the paths or as ok, and ergonex doctor reports it without running the program"
+    },
+    {
+      "id": "f-6896ab53f32579e5",
+      "tool": "verify",
+      "module": "ergonex",
+      "evidence": {
+        "run": "45050190045",
+        "commit": "a652172e9b90561346b74375afac48453a4e210f",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1143d34f5db6b17a7eddee523b214ac35ed762a384f7f8afd4a68332ae7d890f"
+      },
+      "at": "2026-11-22T17:35:32Z",
+      "code": "test-failed",
+      "file": "suite\\ergonex-enx.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0003-host FR-028: programsNamed finds each program of a name in the order of the PATH, enxChecks says it as a warning with the paths or as ok, and ergonex doctor reports it without running the program",
+      "key": "0003-host FR-028: programsNamed finds each program of a name in the order of the PATH, enxChecks says it as a warning with the paths or as ok, and ergonex doctor reports it without running the program"
+    },
+    {
+      "id": "f-be14677783fc1ea0",
+      "tool": "verify",
+      "module": "ergonex",
+      "evidence": {
+        "run": "45050190045",
+        "commit": "a652172e9b90561346b74375afac48453a4e210f",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1143d34f5db6b17a7eddee523b214ac35ed762a384f7f8afd4a68332ae7d890f"
+      },
+      "at": "2026-11-22T17:35:32Z",
+      "code": "test-failed",
+      "file": "suite\\ergonex-wiring.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0003-host FR-028: programsNamed finds each program of a name in the order of the PATH, enxChecks says it as a warning with the paths or as ok, and ergonex doctor reports it without running the program",
+      "key": "0003-host FR-028: programsNamed finds each program of a name in the order of the PATH, enxChecks says it as a warning with the paths or as ok, and ergonex doctor reports it without running the program"
+    }
+  ]
+}
