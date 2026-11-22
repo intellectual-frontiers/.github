@@ -1,0 +1,113 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45066356489",
+    "workflow": "site",
+    "commit": "314722a0c0dbfcf82dc5bc2b8e535d596a910ca8",
+    "at": "2026-11-22T20:37:41Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45066356489"
+  },
+  "steps": [
+    {
+      "id": "the-compiler-the-generator-s-tests-then--4",
+      "job": "check",
+      "module": "repository",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 514978,
+      "exitStatus": 0
+    },
+    {
+      "id": "typescript-7-1-beta-shiki-beautiful-merm-3",
+      "job": "check",
+      "module": "repository",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 312,
+      "exitStatus": 0
+    },
+    {
+      "id": "build",
+      "job": "site",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 36185,
+      "exitStatus": 0
+    },
+    {
+      "id": "package",
+      "job": "site",
+      "module": "repository",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 16616,
+      "exitStatus": 0
+    },
+    {
+      "id": "registry",
+      "job": "site",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 552,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-findings-of-the-runs-from-the-histor-5",
+      "job": "site",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 184,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-newest-test-reports-4",
+      "job": "site",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 16002,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-open-issues-the-runs-of-the-workflow-6",
+      "job": "site",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 44730,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-one-package-s-own-to-8",
+      "job": "site",
+      "module": "repository",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 316,
+      "exitStatus": 0
+    },
+    {
+      "id": "typescript-7-1-beta-shiki-beautiful-merm-3",
+      "job": "site",
+      "module": "repository",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 212,
+      "exitStatus": 0
+    }
+  ],
+  "findings": []
+}
