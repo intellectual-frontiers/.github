@@ -222,6 +222,7 @@ const guides = guidesLens({
     { file: "commons/docs/guides/consuming-commons.md", path: "how-to/consuming-commons.html", section: "howto", group: "How-to", order: 5 },
     { file: "commons/docs/guides/repoctl-in-your-repo.md", path: "how-to/repoctl-in-your-repo.html", section: "howto", group: "How-to", order: 6 },
     { file: "commons/docs/guides/grc-entity-groups.md", path: "how-to/grc-entity-groups.html", section: "howto", group: "How-to", order: 7 },
+    { file: "commons/docs/guides/give-an-agent-a-machine.md", path: "how-to/give-an-agent-a-machine.html", section: "howto", group: "How-to", order: 8 },
     { file: "commons/docs/guides/ai-start.md", path: "how-to/ai-start.html", section: "howto", group: "With an AI assistant", order: 0 },
     { file: "commons/docs/guides/ai-add-a-library.md", path: "how-to/ai-add-a-library.html", section: "howto", group: "With an AI assistant", order: 1 },
     { file: "commons/docs/guides/ai-fix-a-failing-check.md", path: "how-to/ai-fix-a-failing-check.html", section: "howto", group: "With an AI assistant", order: 2 },
@@ -231,6 +232,7 @@ const guides = guidesLens({
     { file: "commons/docs/guides/ai-add-a-dialect.md", path: "how-to/ai-add-a-dialect.html", section: "howto", group: "With an AI assistant", order: 6 },
     { file: "commons/docs/guides/ai-review-a-diff.md", path: "how-to/ai-review-a-diff.html", section: "howto", group: "With an AI assistant", order: 7 },
     { file: "commons/docs/guides/ai-cut-a-release.md", path: "how-to/ai-cut-a-release.html", section: "howto", group: "With an AI assistant", order: 8 },
+    { file: "commons/docs/guides/ai-give-an-agent-a-machine.md", path: "how-to/ai-give-an-agent-a-machine.html", section: "howto", group: "With an AI assistant", order: 9 },
   ],
 });
 

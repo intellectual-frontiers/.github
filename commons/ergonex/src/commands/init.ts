@@ -5,7 +5,12 @@
  * @module
  */
 import { err, ok } from "@intellectual-frontiers/core";
-import { flag } from "../platform/k-args.ts";
+import { flag, value } from "../platform/k-args.ts";
+import { parseJson5 } from "@intellectual-frontiers/formats";
+import { decodeAgentsPolicy } from "../agents/policy.ts";
+import { agentsFilePath } from "../host/workspace.ts";
+import { readTextFile } from "../platform/r-fs.ts";
+import { writeBeside } from "../agents/host/write.ts";
 import { exists, mkdir, writeTextFile } from "../platform/r-fs.ts";
 import { defineCommand } from "./define.ts";
 import { changes, HOME } from "./options.ts";
@@ -33,6 +38,10 @@ const OPTIONS = {
   }),
   noPath: flag({
     help: "On Windows, do not add the folder of the command files to your path.",
+  }),
+  policy: value({
+    help: "With --persona agent: the file (or - for standard input) that holds the agents policy; it is decoded, refused where it is not valid, and kept in .ergonex/agents.json.",
+    valueName: "FILE",
   }),
 };
 
@@ -70,6 +79,20 @@ const init = defineCommand({
         kind: "environment",
         message: `the root ${home} cannot be written: ${e instanceof Error ? e.message : String(e)}`,
       });
+    }
+    // the persona and the policy of an agent's machine (0006-agents FR-029): decoded here, and kept where the manifest reads them
+    if (args.options.policy !== undefined) {
+      const source = args.options.policy;
+      const text = source === "-" ? await ctx.stdin() : await readTextFile(source).catch(() => undefined);
+      if (text === undefined) return err({ kind: "usage", message: `${source} cannot be read` });
+      const parsed = parseJson5(text);
+      if (parsed.kind === "err") return err({ kind: "usage", message: "the agents policy is not JSON" });
+      const policy = decodeAgentsPolicy(parsed.value);
+      if (policy.kind === "err") return err({ kind: "usage", message: `the agents policy is not valid: ${policy.error.map((i) => `${i.path}: ${i.message}`).join("; ")}` });
+      const persona = ctx.globals.persona ?? "agent";
+      if (persona !== "agent" && persona !== "human") return err({ kind: "usage", message: `${JSON.stringify(persona)} is not a persona: use human or agent` });
+      const changed = await writeBeside(agentsFilePath(home), `${JSON.stringify({ persona, agents: parsed.value }, null, 2)}\n`);
+      if (changed) made.push(agentsFilePath(home));
     }
     const lines =
       made.length === 0

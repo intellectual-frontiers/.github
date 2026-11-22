@@ -18,6 +18,7 @@ import { join } from "../../platform/r-path.ts";
 import { build, runtimeName, runtimeVersion } from "../../platform/r-proc.ts";
 import { formatHostError } from "@intellectual-frontiers/quality";
 import { writeOnce } from "@intellectual-frontiers/quality";
+import { type Identity, identityAttributes } from "../../agents/persona.ts";
 import { caseCount, evidenceFileName, holdsCredential, runRules, type RunFacts } from "../evidence.ts";
 
 /** What is needed to write the evidence of a run. */
@@ -30,6 +31,8 @@ export type EvidenceDeps = {
   readonly end: bigint;
   /** The environment the installation record is read from (`IFC_TEST_ROLE`, `CI`, ...). */
   readonly env: Readonly<Record<string, string | undefined>>;
+  /** Who drove the run; named in the record where it is an agent (0006-agents FR-006). */
+  readonly identity?: Identity;
 };
 
 function hex(bytes: number): string {
@@ -93,6 +96,7 @@ export async function writeRunEvidence(deps: EvidenceDeps, facts: RunFacts): Pro
     start: deps.start,
     end: deps.end,
     runner: installation,
+    ...(deps.identity === undefined || deps.identity.persona !== "agent" ? {} : { resourceAttributes: identityAttributes(deps.identity) }),
   });
   if (record.kind === "err") return err(formatQualityError(record.error));
   if (holdsCredential(record.value.text)) return err("the evidence of this run would hold a credential; it was not written");

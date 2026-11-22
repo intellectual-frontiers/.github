@@ -37,6 +37,8 @@ import { type BaseContext, type Context, type ExitStatus, globalsOf, type Outcom
 import { writeRunEvidence } from "../setup/host/evidence.ts";
 import type { RunFacts } from "../setup/evidence.ts";
 import { codeOfRule } from "./catalogue.ts";
+import { type Identity, resolveIdentity } from "../agents/persona.ts";
+import { decideAgent, denialMessage } from "../agents/policy.ts";
 
 /** What the program holds for every run of its commands: the facts of the host, which a test of the program gives its own. */
 export type Host = Omit<BaseContext, "interact" | "note"> & {
@@ -95,7 +97,7 @@ function sarifOfFinding(f: Finding): HeadlessFinding {
 export function outcomeOfReport(r: Report, extra: readonly Finding[] = []): HeadlessOutcome {
   const findings = [...r.findings, ...extra];
   const lenient = r.status === "Ok";
-  const problems = findings.map((f) => problemOfFinding(f, lenient));
+  const problems = [...findings.map((f) => problemOfFinding(f, lenient)), ...(r.pending ?? []).map((m) => problem("pending", m, { code: "E-JOB-PENDING" }))];
   return outcomeOf(r.data, {
     ...(r.text === "" ? {} : { text: r.text }),
     ...(r.next === undefined ? {} : { next: r.next.map((n) => `next: ${n}`) }),
@@ -117,7 +119,7 @@ function wordsAfter(argv: readonly string[], id: string): readonly string[] {
 
 /** The evidence record of a run (the report it ended in, or why it did not run), where the workspace has a place for it: the problem it ends in, if it cannot be written. */
 export async function recordEvidence(
-  ctx: Pick<Context, "home" | "places" | "env" | "today">,
+  ctx: Pick<Context, "home" | "places" | "env" | "today"> & { readonly identity?: Identity },
   host: Pick<Host, "argv" | "now">,
   id: string,
   start: bigint,
@@ -139,7 +141,7 @@ export async function recordEvidence(
   const runFacts: RunFacts | undefined = done.report?.runFacts;
   // the evidence of `setup` and `tools` is made by the setup module's writer from the facts of the run; every other run's by this one's
   if (runFacts !== undefined) {
-    const w = await writeRunEvidence({ home, places, start, end, env: ctx.env }, { ...runFacts, exit: done.status });
+    const w = await writeRunEvidence({ home, places, start, end, env: ctx.env, ...(ctx.identity === undefined ? {} : { identity: ctx.identity }) }, { ...runFacts, exit: done.status });
     return w.kind === "err" ? w.error : undefined;
   }
   const w = await writeEvidence(
@@ -153,6 +155,7 @@ export async function recordEvidence(
       facts: { ...done.report?.facts, tools },
       start,
       end,
+      ...(ctx.identity === undefined ? {} : { identity: ctx.identity }),
     },
     regulated,
   );
@@ -175,16 +178,38 @@ export function defineCommand<S extends Spec>(d: CommandDefinition<S>): Make {
       run: async (args: Args<S>, h: HeadlessContext): Promise<HeadlessOutcome> => {
         const start = BigInt(host.now()) * 1_000_000n;
         const globals = globalsOf(args.options);
+        const home = host.homeFor(globals.home);
+        // the persona is resolved once, here, from the option, the variable and the manifest (0006-agents FR-001, FR-037)
+        const manifest = home !== undefined && existsSync(join(home, AREA)) ? await readManifest(home, host.today, loopbackAllowed(host.env)) : undefined;
+        const found = manifest?.kind === "ok" ? manifest.value : undefined;
+        const who = resolveIdentity({ persona: globals.persona, harness: globals.harness, session: globals.session, env: host.env, manifestPersona: found?.persona });
+        const id = h.command;
+        if (who.kind === "err") {
+          const failed: Context = { ...host, interact: { terminal: false, confirm: () => Promise.resolve(undefined) }, note: () => undefined, globals, home, mode: h.mode, identity: { persona: "human", harness: "other" }, agents: undefined };
+          await recordEvidence(failed, host, id, start, { status: "Usage", findings: [], notRun: who.error });
+          return outcomeOfFailure(who.error, "usage");
+        }
         const ctx: Context = {
           ...host,
-          interact: { terminal: h.interactive, confirm: (q) => h.prompt.confirm(q) },
+          interact: { terminal: h.interactive && who.value.persona !== "agent", confirm: (q) => (who.value.persona === "agent" ? Promise.resolve(undefined) : h.prompt.confirm(q)) },
           note: (text) => h.progress({ kind: "outcome", text }),
           globals,
-          home: host.homeFor(globals.home),
+          home,
           mode: h.mode,
+          identity: who.value,
+          agents: found?.agents,
         };
+        if (who.value.persona === "agent") {
+          const denied = decideAgent(found?.agents, id, h.mode);
+          if (!denied.allowed) {
+            const message = denialMessage(denied.command);
+            const finding: Finding = { ruleId: "ergonex/agent-denied", severity: "Error", message, subject: id, firstSeen: ctx.today };
+            const reason = await recordEvidence(ctx, host, id, start, { status: "Findings", findings: [finding], report: { text: "", data: null, findings: [finding] } });
+            const o = outcomeOfReport({ text: "", data: null, findings: [finding], status: "Findings" });
+            return reason === undefined ? o : { ...o, problems: [...o.problems, problem("fail", `the evidence record could not be written (${reason})`, { code: "E-EVIDENCE" })] };
+          }
+        }
         const outcome = await d.run(ctx, args);
-        const id = h.command;
         if (outcome.kind === "err") {
           const f = outcome.error;
           const status: ExitStatus = f.kind === "usage" ? "Usage" : "Environment";
@@ -198,7 +223,7 @@ export function defineCommand<S extends Spec>(d: CommandDefinition<S>): Make {
         const findings = [...r.findings, ...extra];
         const status: ExitStatus = r.status ?? exitStatusOf(findings);
         const reason = await recordEvidence(ctx, host, id, start, { status, findings, report: r });
-        const o = outcomeOfReport(r, extra);
+        const o = r.pending !== undefined && r.pending.length > 0 && status === "Ok" ? withExit(outcomeOfReport(r, extra), "pending") : outcomeOfReport(r, extra);
         if (reason === undefined) return o;
         return withExit({ ...o, problems: [...o.problems, problem("fail", `the evidence record could not be written (${reason}); the run is reported as a failure of the host`, { code: "E-EVIDENCE" })] }, "environment");
       },

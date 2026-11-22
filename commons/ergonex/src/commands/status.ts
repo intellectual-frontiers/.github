@@ -32,7 +32,7 @@ async function count(folder: string, args: readonly string[]): Promise<number> {
 }
 
 /** What a state says in a word or two, with the numbers it carries. */
-function describeState(s: RepoState): string {
+export function describeState(s: RepoState): string {
   switch (s.kind) {
     case "Ahead":
       return `Ahead ${s.commits}`;

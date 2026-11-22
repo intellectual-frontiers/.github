@@ -10,7 +10,7 @@ import type { About } from "@intellectual-frontiers/core/about";
 /** Lab. */
 export const about: About = {
   title: "Lab",
-  summary: "Disposable machines for tests: a systemd and sshd container rendered from a typed description, started and removed per test with a throwaway key, and what a container can and cannot stand in for.",
+  summary: "Disposable machines for tests: a systemd and sshd container of the Debian, RHEL or Arch family rendered from a typed description, and a virtual machine of the published Omarchy image under QEMU, each started and removed per test with a throwaway key, and what each can and cannot stand in for.",
   folders: [
     { path: "spec-kit/", what: "The library's own specifications, numbered from 0001.", mayImport: ["nothing: Markdown and TSV"] },
     { path: "src/governance/", what: "Layer 1: what the library is, as data and types.", mayImport: ["core, by package name"] },

@@ -1,7 +1,7 @@
 # Feature Specification: The Arch family and the Omarchy virtual machine
 
 **Spec ID:** 0003-lab-arch-family
-**Status:** Draft
+**Status:** Adopted
 **Owner:** if
 **Domain:** commons
 
@@ -10,10 +10,10 @@
 ## The Arch family
 
 - **FR-001**: The base images MUST include `ghcr.io/archlinux/archlinux:latest` (Arch Linux's own image, pulled anonymously), and the family of an image (`imageFamily`) MUST be the closed union `debian`, `rhel` and `arch`, every `switch` over it ending in `absurd`.
-- **FR-002**: Because the tag `latest` moves, the identity of an image made for the family `arch` MUST include the digest of the base image it was made on, so that a new base makes a new image and the same description on the same base finds the same one (0002-lab-machine FR-003).
+- **FR-002**: Because the tag `latest` moves, the identity of an image made for the family `arch` MUST include the digest of the base image it was made on (the registry's digest of the image pulled, else its id; the base is pulled again before each start), so that a new base makes a new image and the same description on the same base finds the same one (0002-lab-machine FR-003).
 - **FR-003**: `containerfile` MUST give for a description of the family `arch`, and the same description, the same text, with: the packages `systemd`, `openssh`, `sudo`, `iproute2`, `tzdata` and `ca-certificates` and those of the description installed by `pacman -Syu --noconfirm --needed`; `pacman --disable-sandbox` WHERE the kernel of the builder does not list Landlock in `/sys/kernel/security/lsm`; the build secret `ca`, WHERE the builder gives one, copied to `/etc/ca-certificates/trust-source/anchors/` and trusted with `update-ca-trust`, and the file left in no layer; the host keys made and `sshd.service` enabled; the users with their keys and the `sudo` rule of the description; and `/sbin/init` as the command.
 - **FR-004**: A machine of the family `arch` MUST say in its description how it is started, `init: "systemd"` (the default) or `init: "none"`; with `none` its main process MUST be the SSH server in the foreground, no systemd runs, and the areas that need systemd (units and timers, the firewall's service) MUST be stated `not faithful` for it (0002-lab-machine FR-001).
-- **FR-005**: `runtimeUsable` MUST say, for a machine of the family `arch` with `init: "systemd"`, that it cannot run on a host whose kernel has no cgroup v2 (no `/sys/fs/cgroup/cgroup.controllers`), because the systemd that Arch ships has no support for cgroup v1 and exits at once with status 255 and no message, so that a test that needs it is skipped with that reason and never passes; a machine with `init: "none"` MUST NOT be refused for it.
+- **FR-005**: `runtimeUsable`, given the description of the machine, MUST say, for a machine of the family `arch` with `init: "systemd"`, that it cannot run on a host whose kernel has no cgroup v2 (no `/sys/fs/cgroup/cgroup.controllers`), because the systemd that Arch ships has no support for cgroup v1 and exits at once with status 255 and no message, so that a test that needs it is skipped with that reason and never passes; a machine with `init: "none"` MUST NOT be refused for it.
 - **FR-006**: Lab MUST give the packages of Omarchy's terminal side that Arch's own repositories carry as data, `OMARCHY_TERMINAL_PACKAGES` (read from `install/omarchy-base.packages` of Omarchy 4.5.0 and checked against `core` and `extra`: `git`, `tmux`, `mise`, `starship`, `gum`, `fzf`, `ripgrep`, `fd`, `jq` and `github-cli`), and a machine made with them MUST be described as "Arch with Omarchy's terminal-side packages", never as Omarchy, because the packages of Omarchy's own repository (`omarchy`, `omarchy-settings`, `herdr`, `mise-bin`, `yay`) are not installed; `herdr` MUST be installed, WHERE a test needs it, by the installer of herdr with its SHA-256 check and not by `pacman`.
 - **FR-007**: The area of what a machine is that is called "apt packages" MUST be called "packages (apt, dnf or pacman)", with the same fidelity for each family.
 
@@ -22,9 +22,9 @@
 - **FR-008**: Lab MUST be able to start a virtual machine from a published image of Omarchy: from a manifest (`latest.json`: the image's address, its SHA-256, the kernel, the initrd and the command line) it MUST fetch the image and the files, check each SHA-256 and refuse the whole machine, naming each, where one differs, and MUST cache them by that digest.
 - **FR-009**: A virtual machine MUST run on a copy-on-write overlay of the image that is deleted when the machine stops, so that the image is never written; each boot MUST make a new ed25519 key, hand its public half in through a systemd credential carried in the firmware tables (as Omarchy's `vm-boot` does, `tmpfiles.extra`), forward a local port to the machine's SSH port, and MUST NOT put a key or a password in the image.
 - **FR-010**: Lab MUST use hardware acceleration (`kvm`) WHERE `/dev/kvm` is usable and software emulation (`tcg`) otherwise, MUST say which it used, and MUST wait for SSH for at most 300 seconds with acceleration and 2400 with emulation (observed in this work: 137 seconds to SSH with emulation on four processors and 6 GiB, Omarchy 4.5.0), ending with an error that names the bound and what the machine had printed if it does not answer.
-- **FR-011**: A virtual machine MUST give the same executor as a container (`exec` of a program, with input), so that a test is written once for a container and for a virtual machine; and `runtimeUsable` MUST say why a virtual machine cannot be run here (no `qemu-system-x86_64`, `qemu-img` or `ssh`, or not enough room for the overlay).
+- **FR-011**: A virtual machine MUST give the same executor as a container (`exec` of a program, with input), so that a test is written once for a container and for a virtual machine; and `vmUsable` (beside `runtimeUsable`) MUST say why a virtual machine cannot be run here (no `qemu-system-x86_64`, `qemu-img`, `ssh` or `curl`, or not enough room for the overlay).
 - **FR-012**: A virtual machine MUST NOT be described as a faithful stand-in for hardware: the areas of UEFI and Secure Boot, hardware facts and a power cycle stay `not faithful` (0002-lab-machine FR-001), and a virtual machine started by emulation MUST NOT be used to claim anything about speed.
-- **FR-013**: WHERE the builder gives a CA (`LAB_CA_BUNDLE`, a network that inspects TLS), a virtual machine MUST be given it after it boots (copied to the machine and trusted with its own tool, `trust anchor` on Arch and Omarchy) before a test that needs the network runs, because the published image does not trust it (observed: `mise` fails with `UnknownIssuer` on a network that re-signs TLS); a machine on a network that does not inspect TLS MUST NOT be given one.
+- **FR-013**: WHERE the builder gives a CA (`LAB_CA_BUNDLE`, a network that inspects TLS), a virtual machine MUST be given it after it boots (copied to the machine's `/etc/ca-certificates/trust-source/anchors/` and trusted with `update-ca-trust`, as on the container path, because `trust anchor --store` refuses a bundle that holds a certificate the system has already, observed) before a test that needs the network runs, because the published image does not trust it (observed: `mise` fails with `UnknownIssuer` on a network that re-signs TLS); a machine on a network that does not inspect TLS MUST NOT be given one.
 
 ## Acceptance scenarios
 
@@ -61,10 +61,19 @@
 
 - The image that Omarchy publishes at `https://nightly.omarchy.org/stable/latest.json` keeps its form (an address, a SHA-256, the kernel, the initrd, the command line and a user `omarchy`); a change of form is a finding of the manifest check of FR-008.
 
+## Decisions
+
+Decided by the owner on 2026-11-22:
+
+- **D-1**: The Arch family is built from the container, with systemd and sshd, and the proxy's CA reaches `pacman` through the same `ca` build secret as the `rhel` path. Omarchy's terminal-side packages and configuration are read from the Omarchy repository.
+- **D-2**: `init: "none"` exists because the sandbox kernel is cgroup v1 and the systemd of Arch (262) exits with status 255 there (FR-004, FR-005).
+- **D-3**: The virtual machine is a machine kind of Lab (answers OQ-1: the executor is shared), booted under QEMU emulation (`tcg`) where there is no KVM, from the published image: pinned by digest, checked, with a key made for each run and the host key pinned; stopping the machine removes it.
+- **D-4**: The published Omarchy image and the nightly may be downloaded and cached (answers OQ-2 for this host: the cache is a folder named by the digest, kept between runs; the policy for the continuous integration is left to it).
+- **D-5**: Honesty: the container is Arch with Omarchy's terminal-side parts, not Omarchy; the virtual machine is real Omarchy, under emulation here. Tests run against the real container and the real image and are skipped, with the reason, only where QEMU or the image is absent, never faked.
+
 ## Open questions
 
-- **OQ-1**: Whether the virtual machine belongs in Lab or in a library of its own: Lab already means disposable machines, and the executor is shared (FR-011).
-- **OQ-2**: Whether the image of Omarchy may be cached on the machines of the continuous integration, and for how long: it is 4.2 GB.
+None open.
 
 ## Key entities
 

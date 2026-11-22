@@ -178,7 +178,10 @@ proves(
     const bad: string[] = [];
     for (const f of WORKSPACES) {
       const text = code(readTextFileSync(join(ROOT, f)));
+      // the one code that writes a package manager's configuration is `remote bootstrap`, on the machine it makes ready, and the line it writes refers to the token by name (0006-agents FR-029 amends this requirement)
+      const bootstrapConfig = f === "src/commands/remote.ts" && /\$ERGONEX_GITHUB_TOKEN/.test(readTextFileSync(join(ROOT, f)));
       if (
+        !bootstrapConfig &&
         /\.npmrc|bunfig\.toml|\.yarnrc/.test(
           readTextFileSync(join(ROOT, f))
             .replace(/\/\*[\s\S]*?\*\//g, "")
