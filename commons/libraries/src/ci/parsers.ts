@@ -157,8 +157,12 @@ function draftsOf(tool: Tool, out: string): readonly Draft[] {
       return kanonCheck(out);
     case "generated-files":
       return generatedFiles(out);
-    case "verify":
-      return [...tsc(out), ...bunTest(out), ...kanonCheck(out)];
+    case "verify": {
+      // a `verify` script type-checks and checks before it runs the tests, and the tests may print what a tool prints (a library that runs `tsc` on a broken fixture): only what precedes the runner's first line is the type check's and the checks'
+      const at = out.search(/^bun test v[\d.]+/m);
+      const before = at < 0 ? out : out.slice(0, at);
+      return [...tsc(before), ...kanonCheck(before), ...bunTest(out)];
+    }
     case "checks":
       return [...generatedFiles(out), ...repoctlCheck(out), ...kanonCheck(out), ...mizanCheck(out)];
     case "exit-status":
