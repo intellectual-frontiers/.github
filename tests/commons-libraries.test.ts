@@ -140,7 +140,8 @@ export function libraryFindings(repo: string): readonly string[] {
     const w = read(ci);
     if (!w.includes("commons/libraries/src/plan.ts"))
       found.push(".github/workflows/ci.auto.yml does not plan the libraries a change affects (FR-010)");
-    if (!w.includes("run: ${{ matrix.verify }}")) found.push(".github/workflows/ci.auto.yml does not run verify (FR-010)");
+    // the script of a cell moves into the environment of its step, which runs through the step wrapper (0038-build-policy FR-003)
+    if (!w.includes("IFC_STEP_SCRIPT: ${{ matrix.verify }}")) found.push(".github/workflows/ci.auto.yml does not run verify (FR-010)");
     if (!w.includes('- "commons/**"')) found.push(".github/workflows/ci.auto.yml is not triggered by commons/** (FR-010)");
   }
   for (const name of librariesOf(repo)) {
@@ -294,8 +295,8 @@ proves(
   () => {
     using c = copyOf();
     assertEquals(libraryFindings(c.repo), []);
-    edit(`${c.repo}/.github/workflows/ci.auto.yml`, "run: ${{ matrix.verify }}", "run: bun test");
-    edit(`${c.repo}/.github/workflows/ci.auto.yml`, "run: ${{ matrix.verify }}", "run: bun test");
+    edit(`${c.repo}/.github/workflows/ci.auto.yml`, "IFC_STEP_SCRIPT: ${{ matrix.verify }}", "IFC_STEP_SCRIPT: bun test");
+    edit(`${c.repo}/.github/workflows/ci.auto.yml`, "IFC_STEP_SCRIPT: ${{ matrix.verify }}", "IFC_STEP_SCRIPT: bun test");
     assertStringIncludes(libraryFindings(c.repo).join("\n"), "ci.auto.yml does not run verify");
     edit(`${c.repo}/.github/workflows/ci.auto.yml`, "commons/libraries/src/plan.ts", "commons/libraries/src/other.ts");
     assertStringIncludes(libraryFindings(c.repo).join("\n"), "ci.auto.yml does not plan the libraries");
