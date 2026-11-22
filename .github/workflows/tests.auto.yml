@@ -190,9 +190,11 @@ jobs:
         continue-on-error: true
       - uses: ./.github/actions/bun
         continue-on-error: true
-      - name: The workflow files are what the model makes
+      - name: "The workflow files are what the model makes, on Bun and on Node 26"
         shell: bash
-        run: bun commons/libraries/src/generate-workflows.ts --check
+        run: |
+          bun commons/libraries/src/generate-workflows.ts --check
+          node commons/libraries/src/generate-workflows.ts --check
 
   # Windows: what has no shell in it. The generator and the specification checker run on both runtimes; the installers' tests need a POSIX `sh` and a Unix PATH, and
   # `agora-install.ps1` is read by its test on the other systems and is not run by any test (it needs a sign-in to GitHub).

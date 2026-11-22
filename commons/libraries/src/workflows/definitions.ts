@@ -621,7 +621,7 @@ const tests: Workflow = {
       steps: [
         checkout(),
         bun(),
-        run("bun commons/libraries/src/generate-workflows.ts --check", { name: "The workflow files are what the model makes", shell: "bash" }),
+        run(lines("bun commons/libraries/src/generate-workflows.ts --check", "node commons/libraries/src/generate-workflows.ts --check"), { name: "The workflow files are what the model makes, on Bun and on Node 26", shell: "bash" }),
       ],
     }),
     windows: job({
