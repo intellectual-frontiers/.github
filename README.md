@@ -65,8 +65,10 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | --- | --- | --- | --- | --- | --- |
 | [`@intellectual-frontiers/anyfs`](https://www.npmjs.com/package/@intellectual-frontiers/anyfs) | Foundation | One typed interface to the places bytes live | layers, plugins | L1 | GitHub, npm |
 | [`@intellectual-frontiers/anyfs-bridge`](commons/anyfs-bridge) | Foundation | Copy, sync, move, check, two-way sync and mirror between any two AnyFS stores | layers, extension | L1 | not released (unfinished) |
+| [`@intellectual-frontiers/anyfs-gdrive`](commons/anyfs-gdrive) | Foundation | The Google Drive backend of AnyFS | layers, extension | L1 | not released (unfinished) |
 | [`@intellectual-frontiers/anyfs-git`](commons/anyfs-git) | Foundation | A branch of a Git repository and a Git working tree, each kept as an AnyFS store | layers, extension | L1 | not released (unfinished) |
 | [`@intellectual-frontiers/anyfs-githost`](commons/anyfs-githost) | Foundation | The Git host backend of AnyFS | layers, extension | L1 | not released (unfinished) |
+| [`@intellectual-frontiers/anyfs-onedrive`](commons/anyfs-onedrive) | Foundation | The OneDrive backend of AnyFS | layers, extension | L1 | not released (unfinished) |
 | [`@intellectual-frontiers/anyfs-posix`](commons/anyfs-posix) | Foundation | The POSIX view of any AnyFS store | layers, extension | L1 | not released (unfinished) |
 | [`@intellectual-frontiers/anyfs-query`](commons/anyfs-query) | Foundation | Read-only SQL over the files, places, revisions and content of any AnyFS store | layers, extension | L1 | not released (unfinished) |
 | [`@intellectual-frontiers/anyfs-s3`](commons/anyfs-s3) | Foundation | The S3 backend of AnyFS: a store over a bucket and a prefix of any S3-compatible service | layers, extension | L1 | not released (unfinished) |
@@ -127,6 +129,7 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/netboot`](commons/netboot) | Program | The network boot of a blank machine | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/package-managers`](https://www.npmjs.com/package/@intellectual-frontiers/package-managers) | Program | The shared kit of the dialects that drive a package manager | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/pentest`](commons/pentest) | Program | The rules of an authorized security test of an estate | layers | L1 | not released (owner-blocked) |
+| [`@intellectual-frontiers/planning-query`](commons/planning-query) | Program | The items of Planning as read-only SQL relations | layers | L1 | GitHub |
 | [`@intellectual-frontiers/repoctl`](https://www.npmjs.com/package/@intellectual-frontiers/repoctl) | Program | The operations program of this repository | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/scanners`](commons/scanners) | Program | Runs security scanners (a built-in TLS and header check, nuclei, nmap, trivy, grype, semgrep, checkov and ZAP's baseline scan) the safe way | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/toolchain`](https://www.npmjs.com/package/@intellectual-frontiers/toolchain) | Program | A Kanon library of the tools a computer needs | layers | L1 | GitHub, npm |

@@ -32,7 +32,9 @@ export type Preview = {
 /** The preview of a plan. */
 export async function previewOf(plan: Plan): Promise<Preview> {
   const effects = await Promise.all(plan.effects.map(async (e) => ({ target: e.target, expect: e.expect, afterHash: await sha256(e.after), summary: e.summary })));
-  const hash = await sha256(canonical({ source: plan.source, place: plan.place, patch: plan.patch, effects }));
+  // what is asked (the operation, the thing and the change, by whom) and what it writes: not the id and the time of the event, which are the run's and appear in the effects where the place writes them
+  const asked = { op: plan.patch.op, source: plan.patch.source, place: plan.patch.place, fingerprint: plan.patch.fingerprint, data: plan.patch.event.data, actor: plan.patch.event.actor };
+  const hash = await sha256(canonical({ source: plan.source, place: plan.place, asked, effects }));
   return { source: plan.source, place: plan.place, effects, hash };
 }
 

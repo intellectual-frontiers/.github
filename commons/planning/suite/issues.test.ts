@@ -17,7 +17,7 @@ const REAL = resolve(dirname(fromFileUrl(import.meta.url)), "..", "..", "data", 
 
 const ISSUE = (n: string, status: string) => `// Spec: 0044-issues FR-001
 /** An issue ${n} */
-import { issue } from "@x/governance";
+import { issue } from "./kit.ts";
 
 export default issue({
   id: ${Number(n)},
