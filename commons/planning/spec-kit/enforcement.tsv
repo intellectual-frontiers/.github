@@ -39,3 +39,9 @@ requirement	mechanism	by	note
 0004-planning-sources FR-009	check	.github: cd commons/planning && bun run verify	suite/comments.test.ts: the markers, the fingerprint that survives a move, the anchor, generated and vendored files
 0004-planning-sources FR-010	check	.github: cd commons/planning && bun run verify	suite/sources.test.ts: a real temporary Git repository for the commits and a local fake of the host's client; no account, so the live client is left untested
 0004-planning-sources FR-011	check	.github: cd commons/planning && bun run verify	suite/sources.test.ts: the reserved names, the matrix of every source, and a journal of the real Evidence Capture code that no source reads or changes
+0005-planning-surfaces FR-001	check	.github: cd commons/planning && bun run verify	suite/planctl.test.ts: definePlanning, the one reader and the field it names for each wrong value
+0005-planning-surfaces FR-002	check	.github: cd commons/planning && bun run verify	suite/planctl.test.ts: the principal by session, argument and configuration, and the refusal that says none is established
+0005-planning-surfaces FR-003	check	.github: cd commons/planning && bun run verify	suite/planctl.test.ts: the verbs over a made-up repository in process and as a real process, the dry run, the hash and the check status
+0005-planning-surfaces FR-004	check	.github: cd commons/planning && bun run verify	suite/planctl.test.ts: the tool server over its real transport with an agent and its principal, human-only options refused and an agent that cannot confirm
+0005-planning-surfaces FR-005	check	.github: cd commons/planning && bun run verify	suite/planctl.test.ts: only the file at the root, JSON not read, a trust recorded by the person and lost when the file changes
+0005-planning-surfaces FR-006	check	.github: cd commons/planning && bun run verify	suite/planctl.test.ts: planctl render prints the items in the formats and says what Markdown cannot hold
