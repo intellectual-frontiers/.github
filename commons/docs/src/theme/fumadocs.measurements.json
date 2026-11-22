@@ -1,0 +1,319 @@
+{
+ "reference": "https://www.fumadocs.dev/docs/headless/page-conventions, and /docs/ui for the search dialog",
+ "read": "2026-11-22",
+ "widths": [
+  1440,
+  1920
+ ],
+ "schemes": [
+  "light",
+  "dark"
+ ],
+ "regions": [
+  "actions",
+  "article",
+  "brand",
+  "callout",
+  "codeBar",
+  "codeBody",
+  "codeFigure",
+  "codeLine",
+  "codePre",
+  "collapse",
+  "description",
+  "h1",
+  "h2",
+  "header",
+  "inlineCode",
+  "listItem",
+  "navActive",
+  "navHeading",
+  "navLink",
+  "pager",
+  "pagerLink",
+  "panel",
+  "prose",
+  "proseLink",
+  "proseP",
+  "scroller",
+  "searchButton",
+  "searchDialog",
+  "searchDialog.escButton",
+  "searchDialog.input",
+  "searchDialog.option",
+  "searchDialog.optionSelected",
+  "selector",
+  "sidebar",
+  "table",
+  "tableWrap",
+  "tabs",
+  "td",
+  "th",
+  "toc",
+  "tocActive",
+  "tocLink",
+  "tocTitle"
+ ],
+ "equal": 3266,
+ "differences": [
+  {
+   "region": "brand",
+   "property": "marginRight",
+   "reference": "93.2656px",
+   "ours": "54.6094px",
+   "explanation": "The name of the site with its version is longer than the reference's, so the free space that the automatic margin takes differs; the height of the row is equal.",
+   "in": [
+    "1440 light",
+    "1440 dark",
+    "1920 light",
+    "1920 dark"
+   ]
+  },
+  {
+   "region": "navActive",
+   "property": "color",
+   "reference": "rgb(75, 44, 232)",
+   "ours": "rgb(23, 23, 23)",
+   "explanation": "Departure of FR-036 (the owner's decision of 2026-11-22): the accent is the reference's neutral grayscale; the live documentation sets a blue of its own for the current item.",
+   "in": [
+    "1440 light",
+    "1440 dark",
+    "1920 light",
+    "1920 dark"
+   ]
+  },
+  {
+   "region": "navActive",
+   "property": "backgroundColor",
+   "reference": "oklab(0.478926 0.0355011 -0.254916 / 0.1)",
+   "ours": "oklab(0.204625 0.00000931323 0.00000409782 / 0.1)",
+   "explanation": "Departure of FR-036 (the owner's decision of 2026-11-22): the accent is the reference's neutral grayscale; the live documentation sets a blue of its own for the current item.",
+   "in": [
+    "1440 light",
+    "1440 dark",
+    "1920 light",
+    "1920 dark"
+   ]
+  },
+  {
+   "region": "panel",
+   "property": "backgroundColor",
+   "reference": "rgb(245, 245, 245)",
+   "ours": "rgb(255, 255, 255)",
+   "explanation": "The one departure of FR-036: the reading area of the light theme is white (#ffffff) where the reference's is #f5f5f5.",
+   "in": [
+    "1440 light",
+    "1920 light"
+   ]
+  },
+  {
+   "region": "scroller",
+   "property": "paddingRight",
+   "reference": "40.5px",
+   "ours": "49px",
+   "explanation": "Derived from the width of the panel (max(24px, (100% - 760px - 304px) / 2)), which the reference's page narrows by the 15-pixel scrollbar of its own document; the formula is equal.",
+   "in": [
+    "1440 light",
+    "1440 dark",
+    "1920 light",
+    "1920 dark"
+   ]
+  },
+  {
+   "region": "scroller",
+   "property": "paddingLeft",
+   "reference": "40.5px",
+   "ours": "49px",
+   "explanation": "Derived from the width of the panel (max(24px, (100% - 760px - 304px) / 2)), which the reference's page narrows by the 15-pixel scrollbar of its own document; the formula is equal.",
+   "in": [
+    "1440 light",
+    "1440 dark",
+    "1920 light",
+    "1920 dark"
+   ]
+  },
+  {
+   "region": "h2",
+   "property": "lineHeight",
+   "reference": "31.9999px",
+   "ours": "32px",
+   "explanation": "A rounding of a fractional line height (31.9999px and 32px).",
+   "in": [
+    "1440 light",
+    "1440 dark",
+    "1920 light",
+    "1920 dark"
+   ]
+  },
+  {
+   "region": "inlineCode",
+   "property": "lineHeight",
+   "reference": "18.5714px",
+   "ours": "28px",
+   "explanation": "The reference's first inline code measured is in a callout (`text-sm`, whose line height is a ratio that the code inherits); the site's is in body text, whose line height is 28px.",
+   "in": [
+    "1440 light",
+    "1440 dark",
+    "1920 light",
+    "1920 dark"
+   ]
+  },
+  {
+   "region": "listItem",
+   "property": "paddingLeft",
+   "reference": "6px",
+   "ours": "0px",
+   "explanation": "The first list of the reference's page is a list of another kind (inside its wrapper) than the first list of the site's pages measured; the type, the margins and the colour of a list item are equal where both are measured.",
+   "in": [
+    "1440 light",
+    "1440 dark",
+    "1920 light",
+    "1920 dark"
+   ]
+  },
+  {
+   "region": "callout",
+   "property": "marginTop",
+   "reference": "0px",
+   "ours": "16px",
+   "explanation": "The reference's callout measured is the first child of its wrapper, whose `prose-no-margin` takes its top margin; the site's is after a block.",
+   "in": [
+    "1440 light",
+    "1440 dark",
+    "1920 light",
+    "1920 dark"
+   ]
+  },
+  {
+   "region": "table",
+   "property": "lineHeight",
+   "reference": "24.0001px",
+   "ours": "24px",
+   "explanation": "A rounding of a fractional line height (24.0001px and 24px).",
+   "in": [
+    "1440 light",
+    "1440 dark",
+    "1920 light",
+    "1920 dark"
+   ]
+  },
+  {
+   "region": "th",
+   "property": "lineHeight",
+   "reference": "24.0001px",
+   "ours": "24px",
+   "explanation": "A rounding of a fractional line height (24.0001px and 24px).",
+   "in": [
+    "1440 light",
+    "1440 dark",
+    "1920 light",
+    "1920 dark"
+   ]
+  },
+  {
+   "region": "td",
+   "property": "lineHeight",
+   "reference": "24.0001px",
+   "ours": "24px",
+   "explanation": "A rounding of a fractional line height (24.0001px and 24px).",
+   "in": [
+    "1440 light",
+    "1440 dark",
+    "1920 light",
+    "1920 dark"
+   ]
+  },
+  {
+   "region": "tableWrap",
+   "property": "lineHeight",
+   "reference": "24.0001px",
+   "ours": "24px",
+   "explanation": "A rounding of a fractional line height (24.0001px and 24px).",
+   "in": [
+    "1440 light",
+    "1440 dark",
+    "1920 light",
+    "1920 dark"
+   ]
+  },
+  {
+   "region": "tabs",
+   "property": "paddingRight",
+   "reference": "8px",
+   "ours": "16px",
+   "explanation": "The tab list measured on the reference's page is the tab list of its code-block tabs, another component than the Tabs component the site's tabs follow, whose classes are those of /docs/ui/components/tabs.",
+   "in": [
+    "1440 light",
+    "1440 dark",
+    "1920 light",
+    "1920 dark"
+   ]
+  },
+  {
+   "region": "tabs",
+   "property": "paddingLeft",
+   "reference": "8px",
+   "ours": "16px",
+   "explanation": "The tab list measured on the reference's page is the tab list of its code-block tabs, another component than the Tabs component the site's tabs follow, whose classes are those of /docs/ui/components/tabs.",
+   "in": [
+    "1440 light",
+    "1440 dark",
+    "1920 light",
+    "1920 dark"
+   ]
+  },
+  {
+   "region": "tabs",
+   "property": "color",
+   "reference": "rgb(99, 99, 99)",
+   "ours": "rgb(23, 23, 23)",
+   "explanation": "The tab list measured on the reference's page is the tab list of its code-block tabs, another component than the Tabs component the site's tabs follow, whose classes are those of /docs/ui/components/tabs.",
+   "in": [
+    "1440 light",
+    "1440 dark",
+    "1920 light",
+    "1920 dark"
+   ]
+  },
+  {
+   "region": "tabs",
+   "property": "gap",
+   "reference": "normal",
+   "ours": "14px",
+   "explanation": "The tab list measured on the reference's page is the tab list of its code-block tabs, another component than the Tabs component the site's tabs follow, whose classes are those of /docs/ui/components/tabs.",
+   "in": [
+    "1440 light",
+    "1440 dark",
+    "1920 light",
+    "1920 dark"
+   ]
+  },
+  {
+   "region": "tocLink",
+   "property": "color",
+   "reference": "rgb(75, 44, 232)",
+   "ours": "rgb(23, 23, 23)",
+   "explanation": "Departure of FR-036 (the owner's decision of 2026-11-22): the accent is the reference's neutral grayscale; the live documentation sets a blue of its own for the outline's current heading.",
+   "in": [
+    "1440 light",
+    "1440 dark",
+    "1920 light",
+    "1920 dark"
+   ]
+  },
+  {
+   "region": "tocActive",
+   "property": "color",
+   "reference": "rgb(75, 44, 232)",
+   "ours": "rgb(23, 23, 23)",
+   "explanation": "Departure of FR-036 (the owner's decision of 2026-11-22): the accent is the reference's neutral grayscale; the live documentation sets a blue of its own for the outline's current heading.",
+   "in": [
+    "1440 light",
+    "1440 dark",
+    "1920 light",
+    "1920 dark"
+   ]
+  }
+ ],
+ "method": "bun src/main.ts build, a static server, and Playwright with Chromium: for each region the computed width (where it is fixed), height (where it is fixed), padding, margin, font size, weight, line height, letter spacing, colour, background, border, radius, shadow and gap, of the reference page and of the matching element of four pages of the site (the first page, a specification, a model page and the Packaging page), which supply the blocks the reference page has; the search dialog is measured open on both."
+}

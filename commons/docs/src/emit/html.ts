@@ -8,10 +8,13 @@
  * @module
  */
 import { absurd } from "@intellectual-frontiers/core";
-import { highlightedHtml } from "../highlight.ts";
+import { BLOCK_VARIABLES, highlightedHtml, highlightedLines } from "../highlight.ts";
 import type { Badge, Block, Card, Href, Inline, Lang, Page, Section, TreeNode } from "../model.ts";
 import { plain } from "../model.ts";
 import type { Release } from "../published.ts";
+import { icon, BUTTON, SEARCH_DIALOG, shell, type NavNode, type SectionChoice } from "./shell.ts";
+import type { IconName } from "./icons.ts";
+import { escape, relative } from "./util.ts";
 
 /** What every page shares: the site's name, the navigation of each section, and the address of the repository. */
 export interface Site {
@@ -41,25 +44,7 @@ export const SECTIONS: readonly { readonly section: Section; readonly label: str
   { section: "repoops", label: "Repo Ops", home: "repo-ops/index.html" },
 ];
 
-/** Text made safe for HTML. */
-export function escape(s: string): string {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-}
-
-/**
- * The relative address from one page of the site to another.
- *
- * @param from - the path of the page the link is on
- * @param to - the path of the page it goes to
- */
-export function relative(from: string, to: string): string {
-  const a = from.split("/").slice(0, -1);
-  const b = to.split("/");
-  let i = 0;
-  while (i < a.length && i < b.length - 1 && a[i] === b[i]) i++;
-  const up = a.length - i;
-  return `${"../".repeat(up)}${b.slice(i).join("/")}` || "index.html";
-}
+export { escape, relative } from "./util.ts";
 
 /** The address an `Href` is, seen from a page. */
 export function hrefOf(h: Href, from: string): string {
@@ -90,7 +75,7 @@ function inline(i: Inline, from: string): string {
       return `<strong>${inlines(i.children, from)}</strong>`;
     case "link": {
       const external = i.href.kind === "external";
-      return `<a href="${escape(hrefOf(i.href, from))}"${external ? ' rel="noopener" class="ext"' : ""}>${inlines(i.children, from)}</a>`;
+      return `<a href="${escape(hrefOf(i.href, from))}"${external ? ' rel="noopener"' : ""}>${inlines(i.children, from)}</a>`;
     }
     default:
       return absurd(i);
@@ -171,106 +156,141 @@ export function diagramSources(bs: readonly Block[]): string[] {
 export function diagramSvg(source: string): string {
   try {
     if (renderMermaidSVG === undefined) return `<pre class="lang-mermaid"><code>${escape(source)}</code></pre>`;
-    return renderMermaidSVG(source, { bg: "var(--page)", fg: "var(--text)", line: "var(--muted)", accent: "var(--link)", muted: "var(--faint)", surface: "var(--chrome)", border: "var(--border-strong)", transparent: true, font: "inherit" });
+    return renderMermaidSVG(source, { bg: "var(--color-fd-card)", fg: "var(--color-fd-foreground)", line: "var(--color-fd-muted-foreground)", accent: "var(--color-fd-primary)", muted: "var(--color-fd-muted-foreground)", surface: "var(--color-fd-secondary)", border: "var(--color-fd-border)", transparent: true, font: "inherit" });
   } catch {
     return `<pre class="lang-mermaid"><code>${escape(source)}</code></pre>`;
   }
 }
 
-const badge = (b: Badge): string => `<span class="badge badge-${b.tone}">${escape(b.text)}</span>`;
-const badges = (bs: readonly Badge[] | undefined): string => (bs === undefined || bs.length === 0 ? "" : `<span class="badges">${bs.map(badge).join("")}</span>`);
+const TONE_DOT: Readonly<Record<Badge["tone"], string>> = { neutral: "bg-fd-muted-foreground", good: "bg-fd-success", warn: "bg-fd-warning", info: "bg-fd-info" };
+const badge = (b: Badge): string =>
+  `<span class="inline-flex items-center gap-1.5 rounded-md border bg-fd-secondary px-1.5 py-0.5 text-xs font-medium text-fd-secondary-foreground not-prose"><span aria-hidden="true" class="size-1.5 rounded-full ${TONE_DOT[b.tone]}"></span>${escape(b.text)}</span>`;
+const badges = (bs: readonly Badge[] | undefined): string => (bs === undefined || bs.length === 0 ? "" : `<span class="inline-flex flex-wrap items-center gap-1.5 align-middle">${bs.map(badge).join("")}</span>`);
 
 const LONG_SIGNATURE = 400;
+
+const COPY_BUTTON = `<button type="button" class="${BUTTON} p-1 [&_svg]:size-4 hover:text-fd-accent-foreground data-checked:text-fd-accent-foreground" aria-live="polite" data-copy>${icon("clipboard")}<span class="sr-only">Copy Text</span></button>`;
+
+/** Code as the reference's code block: a title bar with a button that copies it, or the button in the corner where there is no title. */
+function codeFigure(text: string, lang: Lang, title: string | undefined, extra = ""): string {
+  const head = title === undefined
+    ? `<div class="empty:hidden absolute top-2 right-2 z-2 backdrop-blur-lg rounded-lg text-fd-muted-foreground">${COPY_BUTTON}</div>`
+    : `<div class="flex text-fd-muted-foreground items-center gap-2 h-9.5 border-b px-4"><figcaption class="flex-1 truncate">${escape(title)}</figcaption><div class="empty:hidden -me-2">${COPY_BUTTON}</div></div>`;
+  return `<figure dir="ltr" class="my-4 bg-fd-card rounded-xl shiki relative border not-prose overflow-hidden text-sm shiki shiki-themes catppuccin-latte catppuccin-mocha${extra}" style="${BLOCK_VARIABLES}" tabindex="-1">${head}<div tabindex="0" class="text-[0.8125rem] py-3.5 overflow-auto max-h-[600px] fd-scroll-container focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-fd-ring"${title === undefined ? ' style="--padding-right:calc(var(--spacing) * 8)"' : ""}><pre class="min-w-full w-max *:flex *:flex-col lang-${lang}"><code>${highlightedLines(text, lang)}</code></pre></div></figure>`;
+}
+
+const CARD = "block rounded-xl border bg-fd-card p-4 text-fd-card-foreground transition-colors @max-lg:col-span-full hover:bg-fd-accent/80";
 
 function card(c: Card, from: string): string {
   const kids = c.children === undefined || c.children.length === 0
     ? ""
-    : `<div class="card-children">${c.children.map((k) => card(k, from)).join("")}</div>`;
-  return `<div class="card"><a class="card-link" href="${escape(hrefOf(c.href, from))}"><span class="card-title">${escape(c.title)}</span>${
-    badges(c.badges)
-  }<span class="card-text">${inlines(unlinked(c.text), from)}</span></a>${kids}</div>`;
+    : `<div class="col-span-full grid grid-cols-2 gap-3 ms-4 ps-4 border-s @max-lg:grid-cols-1">${c.children.map((k) => card(k, from)).join("")}</div>`;
+  return `<a data-card="true" href="${escape(hrefOf(c.href, from))}" class="${CARD}"><h3 class="not-prose mb-1 text-sm font-medium">${escape(c.title)} ${badges(c.badges)}</h3><div class="text-sm text-fd-muted-foreground prose-no-margin empty:hidden">${inlines(unlinked(c.text), from)}</div></a>${kids}`;
 }
 
-function tree(nodes: readonly TreeNode[], from: string): string {
-  return `<ul>${
-    nodes
-      .map(
-        (n) =>
-          `<li><span class="tree-node"><code>${escape(n.label)}</code>${n.note === undefined ? "" : `<span class="tree-note">${inlines(n.note, from)}</span>`}</span>${
-            n.children.length === 0 ? "" : tree(n.children, from)
-          }</li>`,
-      )
-      .join("")
-  }</ul>`;
+/** The files and folders of the reference: a folder is a row with the folder's mark and what it holds under it, in a rule. */
+function tree(nodes: readonly TreeNode[], from: string, top: boolean): string {
+  const row = "flex flex-row items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-fd-accent hover:text-fd-accent-foreground [&_svg]:size-4";
+  const inner = nodes
+    .map((n) => {
+      const label = `<code class="not-prose font-mono">${escape(n.label)}</code>${n.note === undefined ? "" : `<span class="text-fd-muted-foreground">${inlines(n.note, from)}</span>`}`;
+      return n.children.length === 0
+        ? `<div class="${row}">${icon("file")}${label}</div>`
+        : `<div data-open=""><div class="${row}">${icon("folder-open")}${label}</div>${tree(n.children, from, false)}</div>`;
+    })
+    .join("");
+  return top ? `<div class="not-prose rounded-md border bg-fd-card p-2">${inner}</div>` : `<div class="ms-2 flex flex-col border-l ps-2">${inner}</div>`;
 }
+
+const CALLOUT: Readonly<Record<"note" | "limit" | "warn", { readonly colour: string; readonly icon: IconName }>> = {
+  note: { colour: "info", icon: "info" },
+  limit: { colour: "warning", icon: "triangle-exclamation-point" },
+  warn: { colour: "error", icon: "circle-x" },
+};
+
+const heading = (level: number, id: string, inner: string): string => {
+  if (level <= 1) return `<h1 id="${escape(id)}" class="text-[1.75em] font-semibold">${inner}</h1>`;
+  return `<h${level} id="${escape(id)}" class="group/heading flex scroll-m-28 flex-row items-center gap-1"><a data-card="" href="#${escape(id)}">${inner}</a><button type="button" aria-live="polite" data-anchor class="inline-flex items-center justify-center rounded-md text-sm font-medium duration-100 disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-fd-ring hover:bg-fd-accent hover:text-fd-accent-foreground p-1 [&_svg]:size-4 not-prose shrink-0 text-fd-muted-foreground opacity-0 transition-opacity group-hover/heading:opacity-100 focus-visible:opacity-100">${icon("link")}<span class="sr-only">Copy Anchor Link</span></button></h${level}>`;
+};
 
 /** A block as HTML. */
 export function block(b: Block, from: string): string {
   switch (b.kind) {
     case "heading":
-      return `<h${b.level} id="${escape(b.id)}"><a class="anchor" href="#${escape(b.id)}" aria-hidden="true">#</a>${inlines(b.text, from)}</h${b.level}>`;
+      return heading(b.level, b.id, inlines(b.text, from));
     case "paragraph":
       return `<p>${inlines(b.inlines, from)}</p>`;
     case "meta":
-      return `<p class="meta">${inlines(b.inlines, from)}</p>`;
+      return `<p class="text-sm text-fd-muted-foreground">${inlines(b.inlines, from)}</p>`;
     case "list": {
       const tag = b.ordered ? "ol" : "ul";
       return `<${tag}>${b.items.map((it) => `<li>${blocks(it, from, true)}</li>`).join("")}</${tag}>`;
     }
     case "code":
-      return `<figure class="code">${b.title === undefined ? "" : `<figcaption>${escape(b.title)}</figcaption>`}<pre class="lang-${b.lang}"><code>${
-        highlighted(b.text, b.lang)
-      }</code></pre></figure>`;
+      return codeFigure(b.text, b.lang, b.title);
     case "table":
-      return `${b.filter === undefined ? "" : `<input type="search" class="table-filter" placeholder="${escape(b.filter)}" aria-label="${escape(b.filter)}">`}<div class="table-wrap${b.compact === true ? " compact" : ""}"><table><thead><tr>${b.head.map((h) => `<th>${inlines(h, from)}</th>`).join("")}</tr></thead><tbody>${
+      return `${
+        b.filter === undefined
+          ? ""
+          : `<input type="search" data-table-filter class="mt-4 -mb-2 w-full max-w-sm h-9 rounded-lg border bg-fd-secondary/50 px-3 text-sm placeholder:text-fd-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-fd-ring" placeholder="${escape(b.filter)}" aria-label="${escape(b.filter)}">`
+      }<div class="relative overflow-auto prose-no-margin my-6${b.compact === true ? " [&_table]:text-[0.8125rem]" : ""}" tabindex="0"><table><thead><tr>${b.head.map((h) => `<th>${inlines(h, from)}</th>`).join("")}</tr></thead><tbody>${
         b.rows.map((r) => `<tr>${r.map((c) => `<td>${inlines(c, from)}</td>`).join("")}</tr>`).join("")
       }</tbody></table></div>`;
-    case "callout":
-      return `<aside class="callout callout-${b.tone}"><p class="callout-title">${escape(b.title)}</p>${blocks(b.blocks, from)}</aside>`;
+    case "callout": {
+      const c = CALLOUT[b.tone];
+      return `<div class="flex gap-2 my-4 rounded-xl border bg-fd-card p-3 ps-1 text-sm text-fd-card-foreground" style="--callout-color:var(--color-fd-${c.colour}, var(--color-fd-muted))"><div role="none" class="w-0.5 bg-(--callout-color)/50 rounded-sm"></div>${
+        icon(c.icon, "size-5 -me-0.5 fill-(--callout-color) text-fd-card")
+      }<div class="flex flex-col gap-2 min-w-0 flex-1"><p class="font-medium my-0!">${escape(b.title)}</p><div class="text-fd-muted-foreground prose-no-margin empty:hidden">${blocks(b.blocks, from)}</div></div></div>`;
+    }
     case "entry": {
       const sig = b.signature === undefined
         ? ""
         : b.signature.length > LONG_SIGNATURE
-        ? `<details class="sig-long"><summary><code>${escape(b.signature.slice(0, 120))}…</code> <span class="muted">(${b.signature.length} characters)</span></summary><pre class="sig lang-ts"><code>${
-          highlighted(b.signature, "ts")
-        }</code></pre></details>`
-        : `<pre class="sig lang-ts"><code>${highlighted(b.signature, "ts")}</code></pre>`;
-      return `<section class="entry" id="${escape(b.id)}"><div class="entry-head"><a class="entry-name" href="#${escape(b.id)}"><code>${
-        escape(b.name)
-      }</code></a>${badges(b.badges)}</div>${sig}<div class="entry-body">${blocks(b.blocks, from)}</div></section>`;
+        ? `<details class="border-t"><summary class="cursor-pointer px-4 py-2 text-sm text-fd-muted-foreground hover:text-fd-accent-foreground"><code class="not-prose font-mono">${escape(b.signature.slice(0, 120))}…</code> (${b.signature.length} characters)</summary>${codeFigure(b.signature, "ts", undefined, " my-0 rounded-none border-0 border-t")}</details>`
+        : codeFigure(b.signature, "ts", undefined, " my-0 rounded-none border-0 border-t");
+      return `<section id="${escape(b.id)}" class="scroll-m-28 my-6 rounded-xl border bg-fd-card text-fd-card-foreground overflow-hidden"><div class="not-prose flex flex-wrap items-center gap-2 px-4 py-3"><a class="font-mono text-sm font-medium hover:text-fd-accent-foreground" href="#${escape(b.id)}">${escape(b.name)}</a>${badges(b.badges)}</div>${sig}<div class="prose-no-margin border-t px-4 py-3 text-sm empty:hidden">${blocks(b.blocks, from)}</div></section>`;
     }
     case "tabs":
-      return `<div class="tabs" data-tabs><div class="tab-list" role="tablist">${
+      return `<div class="flex flex-col overflow-hidden rounded-xl border bg-fd-secondary my-4" data-tabs><div role="tablist" class="flex gap-3.5 text-fd-secondary-foreground overflow-x-auto px-4 not-prose">${
         b.tabs
           .map((t, i) =>
-            `<button type="button" role="tab" id="${escape(`${b.id}-tab-${i}`)}" aria-controls="${escape(`${b.id}-panel-${i}`)}" aria-selected="${
-              i === 0 ? "true" : "false"
-            }">${escape(t.label)}</button>`
+            `<button type="button" role="tab" id="${escape(`${b.id}-tab-${i}`)}" aria-controls="${escape(`${b.id}-panel-${i}`)}" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}"${
+              i === 0 ? ` data-active=""` : ""
+            } class="inline-flex items-center gap-2 whitespace-nowrap text-fd-muted-foreground border-b border-transparent py-2 text-sm font-medium transition-colors [&_svg]:size-4 hover:text-fd-accent-foreground disabled:pointer-events-none disabled:opacity-50 data-[active]:border-fd-primary data-[active]:text-fd-primary">${escape(t.label)}</button>`
           )
           .join("")
       }</div>${
         b.tabs
           .map((t, i) =>
-            `<div class="tab-panel" role="tabpanel" id="${escape(`${b.id}-panel-${i}`)}" aria-labelledby="${escape(`${b.id}-tab-${i}`)}"${
+            `<div role="tabpanel" id="${escape(`${b.id}-panel-${i}`)}" aria-labelledby="${escape(`${b.id}-tab-${i}`)}" tabindex="0"${
               i === 0 ? "" : " hidden"
-            }>${blocks(t.blocks, from)}</div>`
+            } class="p-4 text-[0.9375rem] bg-fd-background rounded-xl outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-fd-ring prose-no-margin [&>figure:only-child]:-m-4 [&>figure:only-child]:border-none">${blocks(t.blocks, from)}</div>`
           )
           .join("")
       }</div>`;
     case "diagram":
-      return `<figure class="diagram"><div class="diagram-wrap">${diagramSvg(b.source)}</div><figcaption>${
+      return `<figure class="not-prose my-4 rounded-xl border bg-fd-card text-fd-card-foreground overflow-hidden"><div class="overflow-auto p-4" data-diagram>${diagramSvg(b.source)}</div><figcaption class="border-t px-4 py-2 text-sm text-fd-muted-foreground">${
         escape(b.caption)
-      }</figcaption><details class="diagram-source"><summary>Diagram source</summary><pre class="lang-text"><code>${escape(b.source)}</code></pre></details></figure>`;
+      }</figcaption><details class="border-t"><summary class="cursor-pointer px-4 py-2 text-sm text-fd-muted-foreground hover:text-fd-accent-foreground">Diagram source</summary>${codeFigure(b.source, "text", undefined, " my-0 rounded-none border-0 border-t")}</details></figure>`;
     case "cards":
-      return `<div class="cards">${b.cards.map((c) => card(c, from)).join("")}</div>`;
+      return `<div class="grid grid-cols-2 gap-3 @container">${b.cards.map((c) => card(c, from)).join("")}</div>`;
     case "badges":
-      return `<p class="badge-row">${b.badges.map(badge).join("")}</p>`;
+      return `<p class="flex flex-wrap gap-1.5">${b.badges.map(badge).join("")}</p>`;
     case "stats":
-      return `<ul class="stats">${b.items.map((x) => `<li class="stat">${x.href === undefined ? "" : `<a class="stat-link" href="${escape(hrefOf(x.href, from))}">`}<span class="stat-value">${escape(x.value)}</span><span class="stat-label">${escape(x.label)}</span>${x.href === undefined ? "" : "</a>"}</li>`).join("")}</ul>`;
+      return `<ul class="not-prose grid grid-cols-2 gap-3 @2xl:grid-cols-4 @container my-4 p-0 list-none">${
+        b.items
+          .map((x) => {
+            const inner = `<span class="block text-2xl font-semibold">${escape(x.value)}</span><span class="block text-sm text-fd-muted-foreground">${escape(x.label)}</span>`;
+            return `<li class="rounded-xl border bg-fd-card text-fd-card-foreground">${
+              x.href === undefined ? `<div class="p-4">${inner}</div>` : `<a class="block rounded-xl p-4 transition-colors hover:bg-fd-accent/80" href="${escape(hrefOf(x.href, from))}">${inner}</a>`
+            }</li>`;
+          })
+          .join("")
+      }</ul>`;
     case "trend":
       return trendHtml(b.label, b.values, b.unit);
     case "tree":
-      return `<div class="tree">${tree(b.nodes, from)}</div>`;
+      return tree(b.nodes, from, true);
     default:
       return absurd(b);
   }
@@ -331,7 +351,7 @@ function trendHtml(label: string, values: readonly number[], unit: string | unde
   const y = (v: number): number => (hi === lo ? h / 2 : h - 3 - ((v - lo) / (hi - lo)) * (h - 6));
   const points = values.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
   const range = values.length === 0 ? "no runs" : `${lo === hi ? String(lo) : `${lo} to ${hi}`}${unit === undefined ? "" : ` ${unit}`}, latest ${values[values.length - 1]}`;
-  return `<figure class="trend"><svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="${escape(label)}: ${escape(range)}"><polyline fill="none" stroke="currentColor" stroke-width="1.5" points="${points}"/>${values.length === 0 ? "" : `<circle cx="${x(values.length - 1).toFixed(1)}" cy="${y(values[values.length - 1] ?? 0).toFixed(1)}" r="2.2" fill="currentColor"/>`}</svg><figcaption>${escape(label)}: ${escape(range)}</figcaption></figure>`;
+  return `<figure class="not-prose my-4 flex flex-col gap-1 text-fd-primary"><svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="${escape(label)}: ${escape(range)}"><polyline fill="none" stroke="currentColor" stroke-width="1.5" points="${points}"/>${values.length === 0 ? "" : `<circle cx="${x(values.length - 1).toFixed(1)}" cy="${y(values[values.length - 1] ?? 0).toFixed(1)}" r="2.2" fill="currentColor"/>`}</svg><figcaption class="text-sm text-fd-muted-foreground">${escape(label)}: ${escape(range)}</figcaption></figure>`;
 }
 
 /** The headings and entries of a page, for its table of contents. */
@@ -354,8 +374,8 @@ export function navigation(pages: readonly Page[], section: Section): { readonly
     .sort((a, b) => firstOrder(a.pages) - firstOrder(b.pages) || (a.group < b.group ? -1 : 1));
 }
 
-/** The navigation of a section as HTML (FR-040): each group is a `details` element that is open where it holds the page being read, a page lists beneath it the pages whose `parent` it is only while it or one of them is being read, and no script is needed. */
-function navHtml(pages: readonly Page[], current: Page, from: string): string {
+/** The navigation of a section as the nodes of the side navigation (FR-037): the groups, as headings where the section has few and as folders where it has many (the folder of the page being read is open), and the pages of each, where a page lists beneath it the pages whose `parent` it is (open while it or one of them is being read). */
+function navNodes(pages: readonly Page[], current: Page, from: string): NavNode[] {
   const inSection = pages.filter((q) => q.section === current.section);
   const byPath = new Map(inSection.map((p) => [p.path, p] as const));
   const childrenOf = new Map<string, Page[]>();
@@ -363,26 +383,24 @@ function navHtml(pages: readonly Page[], current: Page, from: string): string {
   const trail = new Set<string>();
   for (let at: Page | undefined = current; at !== undefined; at = at.parent === undefined ? undefined : byPath.get(at.parent)) trail.add(at.path);
   const order = (a: Page, b: Page): number => a.order - b.order || (a.title < b.title ? -1 : a.title > b.title ? 1 : 0);
-  const item = (p: Page): string => {
+  const item = (p: Page): NavNode => {
     const kids = (childrenOf.get(p.path) ?? []).sort(order);
-    const link = `<a href="${escape(relative(from, p.path))}"${p.path === from ? ' class="current" aria-current="page"' : ""}>${escape(p.navTitle ?? p.title)}</a>`;
-    if (kids.length === 0 || !trail.has(p.path)) return `<li>${link}</li>`;
     let kind: string | undefined;
-    const inner = kids.map((k) => {
-      const head = k.navKind !== undefined && k.navKind !== kind ? `<li class="nav-kind">${escape(k.navKind)}</li>` : "";
+    const children = kids.flatMap((k): NavNode[] => {
+      const head: NavNode[] = k.navKind !== undefined && k.navKind !== kind ? [{ kind: "heading", title: k.navKind }] : [];
       kind = k.navKind;
-      return `${head}${item(k)}`;
-    }).join("");
-    return `<li>${link}<ul class="nav-sub">${inner}</ul></li>`;
+      return [...head, item(k)];
+    });
+    return { kind: "link", title: p.navTitle ?? p.title, href: relative(from, p.path), current: p.path === from, open: trail.has(p.path), children };
   };
   const roots = navigation(inSection, current.section).map((g) => ({ group: g.group, pages: g.pages.filter((p) => p.parent === undefined || !byPath.has(p.parent)) }));
   const small = roots.length <= 4;
-  return roots
-    .map((g) => {
-      const open = small || g.pages.some((p) => trail.has(p.path) || [...trail].some((t) => (childrenOf.get(p.path) ?? []).some((k) => k.path === t)));
-      return `<details class="nav-group"${open ? " open" : ""}><summary><span class="nav-title">${escape(g.group)}</span><span class="nav-count">${g.pages.length}</span></summary><ul>${g.pages.map(item).join("")}</ul></details>`;
-    })
-    .join("");
+  return roots.flatMap((g): NavNode[] => {
+    const nodes = g.pages.map(item);
+    if (small) return [...(g.group === "" ? [] : [{ kind: "heading", title: g.group } as const]), ...nodes];
+    const open = g.pages.some((p) => trail.has(p.path) || [...trail].some((t) => (childrenOf.get(p.path) ?? []).some((k) => k.path === t)));
+    return [{ kind: "folder", title: g.group, open, children: nodes }];
+  });
 }
 
 /** The previous and the next page of a page in the order of the side navigation of its section (FR-037): the groups in order and the pages of each in order. */
@@ -397,6 +415,9 @@ function versionTitle(r: Release): string {
   return r.source === "registry" ? `The newest version on the package registry${r.date === undefined ? "" : `, published ${r.date}`}` : "The version of package.json: not confirmed on the package registry";
 }
 
+/** The script of the head, which runs before the page is first drawn: the theme (the reader's choice, else the system's) as the class `dark` of the page, and the width (FR-040) from the cookie `ifc-docs-width` as the attribute `data-width`. Each part is guarded, so that a browser that blocks storage or cookies draws the page in the reference's width and the system's theme. */
+export const HEAD_SCRIPT = `(function(){var d=document.documentElement;try{var t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&matchMedia("(prefers-color-scheme: dark)").matches)){d.classList.add("dark");d.style.colorScheme="dark"}}catch(e){}try{var m=document.cookie.match(/(?:^|; )ifc-docs-width=([^;]*)/);if(m&&m[1]==="full")d.dataset.width="full"}catch(e){}})()`;
+
 /**
  * A page as a whole HTML document.
  *
@@ -410,68 +431,58 @@ export function document(page: Page, site: Site): string {
   const release = site.release;
   const versioned = release === undefined ? site.name : `${site.name} v${release.version}`;
   const section = SECTIONS.find((s) => s.section === page.section);
-  const top = SECTIONS.filter((s) => site.sections === undefined || site.sections.includes(s.section)).map((s) =>
-    `<a class="section-link${s.section === page.section ? " current" : ""}" href="${escape(relative(from, s.home))}">${escape(s.label)}</a>`
-  ).join("");
-  const nav = navHtml(site.pages, page, from);
+  const choices: SectionChoice[] = SECTIONS.filter((s) => site.sections === undefined || site.sections.includes(s.section)).map((s) => ({ label: s.label, href: relative(from, s.home), current: s.section === page.section }));
   const toc = outline(page.blocks);
-  const tocItems = toc.map((t) => `<li class="toc-${t.level}"><a href="#${escape(t.id)}">${escape(t.text)}</a></li>`).join("");
-  const tocHtml = toc.length < 2 ? "" : `<nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p><ul>${tocItems}</ul></nav>`;
-  const tocMobile = toc.length < 2 ? "" : `<details class="toc-mobile"><summary>On this page</summary><ul>${tocItems}</ul></details>`;
   const isHome = page.path === "index.html";
   const crumbs = isHome || section === undefined
     ? ""
-    : `<nav class="crumbs" aria-label="Breadcrumb"><a href="${escape(relative(from, section.home))}">${escape(section.label)}</a>${page.path === section.home || page.group === "" || page.group === section.label ? "" : `<span aria-hidden="true">/</span><span>${escape(page.group)}</span>`}</nav>`;
+    : `<nav class="flex flex-wrap items-center gap-1.5 text-sm text-fd-muted-foreground -mb-2" aria-label="Breadcrumb"><a class="hover:text-fd-accent-foreground" href="${escape(relative(from, section.home))}">${escape(section.label)}</a>${
+      page.path === section.home || page.group === "" || page.group === section.label ? "" : `${icon("chevron-right", "size-3.5")}<span>${escape(page.group)}</span>`
+    }</nav>`;
   const { previous, next } = neighbours(site.pages, page);
+  const NEIGHBOUR = "group flex flex-col gap-1 rounded-2xl border p-4 text-sm transition-colors hover:bg-fd-accent/40 @max-md:col-span-full";
   const pager = previous === undefined && next === undefined
     ? ""
-    : `<nav class="pager" aria-label="Previous and next page">${
-      previous === undefined ? "<span></span>" : `<a class="pager-prev" rel="prev" href="${escape(relative(from, previous.path))}"><span class="pager-label">Previous</span><span class="pager-title">${escape(previous.navTitle ?? previous.title)}</span></a>`
-    }${next === undefined ? "<span></span>" : `<a class="pager-next" rel="next" href="${escape(relative(from, next.path))}"><span class="pager-label">Next</span><span class="pager-title">${escape(next.navTitle ?? next.title)}</span></a>`}</nav>`;
-  const footer = `<footer class="foot"><p>${
+    : `<nav class="@container grid grid-cols-2 gap-3 mt-8" aria-label="Previous and next page">${
+      previous === undefined ? "" : `<a rel="prev" href="${escape(relative(from, previous.path))}" class="${NEIGHBOUR}"><span class="inline-flex items-center gap-1.5 text-fd-muted-foreground">${icon("arrow-left", "size-3.5 transition-transform group-hover:-translate-x-0.5 rtl:rotate-180")}Previous Page</span><span class="font-medium">${escape(previous.navTitle ?? previous.title)}</span></a>`
+    }${next === undefined ? "" : `<a rel="next" href="${escape(relative(from, next.path))}" class="${NEIGHBOUR} col-start-2 items-end text-end"><span class="inline-flex items-center gap-1.5 text-fd-muted-foreground">Next Page${icon("arrow-right", "size-3.5 transition-transform group-hover:translate-x-0.5 rtl:rotate-180")}</span><span class="font-medium">${escape(next.navTitle ?? next.title)}</span></a>`}</nav>`;
+  const footer = `<div class="flex flex-col gap-1 text-sm text-fd-muted-foreground mt-4"><p>${
     release === undefined
       ? escape(site.name)
-      : `<strong>${escape(versioned)}</strong>${release.source === "registry" ? (release.date === undefined ? "" : ` · published ${escape(release.date)}`) : ` · <span class="foot-unconfirmed">version of package.json, not confirmed on the package registry</span>`}`
-  }${release?.commit === undefined ? "" : ` · built from commit <code>${escape(release.commit)}</code>`}${
-    release?.ahead === undefined ? "" : ` · <span class="badge badge-warn">${release.ahead} commit${release.ahead === 1 ? "" : "s"} since the release</span>`
-  }</p><p class="foot-links"><a href="${escape(relative(from, "repo-ops/packaging.html"))}">How the package is made</a> · <a href="${escape(site.repository)}" rel="noopener">GitHub</a></p></footer>`;
+      : `<strong class="font-medium text-fd-foreground">${escape(versioned)}</strong>${release.source === "registry" ? (release.date === undefined ? "" : ` · published ${escape(release.date)}`) : ` · <span>version of package.json, not confirmed on the package registry</span>`}`
+  }${release?.commit === undefined ? "" : ` · built from commit <code class="font-mono">${escape(release.commit)}</code>`}${
+    release?.ahead === undefined ? "" : ` · ${badge({ text: `${release.ahead} commit${release.ahead === 1 ? "" : "s"} since the release`, tone: "warn" })}`
+  }</p><p><a class="underline underline-offset-2 hover:text-fd-accent-foreground" href="${escape(relative(from, "repo-ops/packaging.html"))}">How the package is made</a> · <a class="underline underline-offset-2 hover:text-fd-accent-foreground" href="${escape(site.repository)}" rel="noopener">GitHub</a></p></div>`;
+  const article = `<article data-full="false" id="nd-page" class="flex flex-col gap-4 w-full min-w-0 max-w-(--fd-page-width) pt-6 pb-8">${crumbs}<h1 class="text-[1.75em] font-semibold">${escape(page.title)} ${badges(page.badges)}</h1><p class="text-lg text-fd-muted-foreground mb-2">${escape(page.description)}</p><div class="flex flex-row flex-wrap gap-2 items-center border-b pb-6 mb-4"><button type="button" data-copy-link aria-live="polite" class="inline-flex items-center justify-center rounded-md p-2 font-medium transition-colors duration-100 disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-fd-ring border bg-fd-secondary text-fd-secondary-foreground hover:bg-fd-accent hover:text-fd-accent-foreground px-2 py-1.5 text-xs gap-2 [&_svg]:size-3.5 [&_svg]:text-fd-muted-foreground">${icon("copy")}Copy link</button></div><div class="prose flex-1 text-fd-foreground/90">${blocks(page.blocks, from)}</div>${footer}${pager}</article>`;
+  const version = release === undefined ? "" : ` <span data-version title="${escape(versionTitle(release))}"${release.source === "registry" ? "" : ' class="text-fd-muted-foreground"'}>v${escape(release.version)}</span>`;
+  const body = shell({
+    name: site.name,
+    version,
+    home: relative(from, "index.html"),
+    repository: site.repository,
+    sections: choices,
+    nav: navNodes(site.pages, page, from),
+    toc,
+    article,
+    pageTitle: page.title,
+  });
   return `<!doctype html>
 <html lang="en" data-root="${escape(root)}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
 <title>${escape(page.title)} · ${escape(versioned)}</title>
 <meta name="description" content="${escape(page.description)}">
-<script>try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}</script>
+<script>${HEAD_SCRIPT}</script>
 <link rel="preload" href="${asset("fonts/inter-latin-wght-normal.woff2")}" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="${asset("fumadocs.css")}">
 <link rel="stylesheet" href="${asset("site.css")}">
 <script src="${asset("site.js")}" defer></script>
 </head>
-<body${isHome ? ' class="home"' : ""}>
-<a class="skip" href="#content">Skip to the content</a>
-<header class="top">
-<button type="button" class="menu-button" aria-controls="sidebar" aria-expanded="false" aria-label="Menu"><span></span></button>
-<a class="brand" href="${escape(relative(from, "index.html"))}">${escape(site.name)}${release === undefined ? "" : ` <span class="version${release.source === "registry" ? "" : " unconfirmed"}" title="${escape(versionTitle(release))}">v${escape(release.version)}</span>`}</a>
-<nav class="sections" aria-label="Sections">${top}</nav>
-<button type="button" class="search-button" aria-haspopup="dialog"><span>Search</span><kbd>/</kbd></button>
-<button type="button" class="theme-button" aria-label="Switch between the light and the dark theme" title="Theme (t)"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg></button>
-<a class="repo" href="${escape(site.repository)}" rel="noopener">GitHub</a>
-</header>
-<div class="layout">
-<aside class="sidebar" id="sidebar"><nav aria-label="${escape(section?.label ?? "")}">${nav}</nav></aside>
-<main id="content" class="content">
-<article>
-${crumbs}
-<header class="page-head"><h1>${escape(page.title)}</h1>${badges(page.badges)}</header>
-${tocMobile}
-${blocks(page.blocks, from)}
-${pager}
-</article>
-${footer}
-</main>
-${tocHtml}
-</div>
-<dialog class="search" aria-label="Search"><form method="dialog"><input type="search" placeholder="Search the documentation" aria-label="Search" autocomplete="off"><select class="search-kind" aria-label="Filter by kind"><option value="">Everything</option></select></form><ul class="results" role="listbox"></ul><p class="search-hint">Titles, headings, exports, tables, columns and requirements. <kbd>↑</kbd> <kbd>↓</kbd> move, <kbd>Enter</kbd> opens, <kbd>Esc</kbd> closes.</p></dialog>
+<body class="ui relative flex min-h-screen flex-col${isHome ? " home" : ""}">
+${body}
+${SEARCH_DIALOG}
 </body>
 </html>
 `;

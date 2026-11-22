@@ -34,6 +34,7 @@ const FONTS = ["inter-latin-wght-normal.woff2", "jetbrains-mono-latin-wght-norma
 function assets(): readonly OutFile[] {
   const theme = (f: string): string => path.fromFileUrl(new URL(`./theme/${f}`, import.meta.url));
   return [
+    { path: "assets/fumadocs.css", from: theme("fumadocs.css") },
     { path: "assets/site.css", from: theme("site.css") },
     { path: "assets/site.js", from: theme("site.js") },
     ...FONTS.map((f): OutFile => ({ path: `assets/fonts/${f}`, from: theme(`fonts/${f}`) })),

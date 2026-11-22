@@ -254,7 +254,7 @@ proves(["0001-docs FR-016"], "the history says how a library's tests moved over 
   assertEquals(q.libraries.find((l) => l.library === "fixture")?.flaky, ["001-greeting FR-001: E comes and goes"]);
   // the line, in the page itself
   const html = document(b.pages.find((p) => p.path === "quality/fixture.html") as never, { name: "N", repository: "r", pages: b.pages });
-  assertStringIncludes(html, '<figure class="trend"><svg viewBox="0 0 120 28"');
+  assertStringIncludes(html, '<figure class="not-prose my-4 flex flex-col gap-1 text-fd-primary"><svg viewBox="0 0 120 28"');
   assertStringIncludes(html, "Pass rate: ");
   assertEquals(sparkText([1, 2, 3, 4, 5, 6, 7, 8]), "▁▂▃▄▅▆▇█");
   assertEquals(sparkText([5, 5]), "▄▄");

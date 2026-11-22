@@ -10,4 +10,28 @@ The names Ergonex, Mizan, Kanon, Archon and Stolos and the logos are trademarks 
 
 What in this repository is not ours, and its licenses, is in THIRD_PARTY_NOTICES.md.
 
-The look of the documentation site (layout, spacing and the grayscale palette) is inspired by Fumadocs (https://github.com/fuma-nama/fumadocs, MIT License, Copyright (c) 2023 Fuma). No source, stylesheet or asset of Fumadocs is copied or depended on; the stylesheet is our own.
+The look of the documentation site is the look of the Fumadocs documentation theme (https://github.com/fuma-nama/fumadocs). The values of its colour tokens, widths, spacings, radii and type sizes, and the structure and the classes of its layout and components, are copied from its package fumadocs-ui 16.19.7 and from the pages of its documentation as they were on 2026-11-22, and commons/docs/src/theme/fumadocs.css is what Tailwind CSS 4.3.5 made of them (commons/docs/src/theme/fumadocs.provenance.json records the versions, the pages and what is ours). The one departure is the reading area of the light theme, which is white. Nothing of Fumadocs or of Tailwind CSS is a dependency of this repository, of its packages or of its build, and nothing is loaded from another host. The license of Fumadocs, whose permission text applies to what was copied, is:
+
+MIT License
+
+Copyright (c) 2023 Fuma
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Tailwind CSS (MIT License, Copyright (c) Tailwind Labs, Inc.) is the tool that wrote the stylesheet and its banner stays in it. The icons are drawn from Lucide (ISC License, Copyright (c) 2026 Lucide Icons and Contributors, and the MIT License, Copyright (c) Cole Bemis, from 2013, for the icons derived from Feather), and the colours of SQL in code blocks are those of Catppuccin (MIT License, Copyright (c) 2021 Catppuccin); THIRD_PARTY_NOTICES.md lists each.

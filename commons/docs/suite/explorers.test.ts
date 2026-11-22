@@ -46,7 +46,7 @@ proves(["0011-documentation FR-035"], "the releases page lists the record in its
 
 proves(["0011-documentation FR-035"], "the search has a filter by kind, which the script fills from the index", async () => {
   const html = document({ path: "index.html", title: "T", description: "D", section: "overview", group: "G", order: 0, blocks: [] }, { name: "N", repository: "r", pages: [] });
-  assertStringIncludes(html, 'class="search-kind"');
+  assertStringIncludes(html, "data-search-kind");
   const js = await fs.readTextFile(path.join(ROOT, "commons/docs/src/theme/site.js"));
   assertStringIncludes(js, "e.group !== only");
   assert(traceOf !== undefined);

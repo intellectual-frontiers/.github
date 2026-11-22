@@ -1,14 +1,14 @@
 // Spec: 0001-docs FR-001
 /**
  * Code highlighted when the site is built (commons 0011-documentation FR-017, FR-037), so that a page needs no script to colour it: Shiki, with the grammars of the languages the site shows (TypeScript, SQL, shell, TOML, JSON,
- * Turtle and YAML) and one theme for the light scheme and one for the dark, on the Oniguruma engine (WebAssembly, so the same on Bun and Node, with no native part). Each coloured run is a span whose two colours
+ * Turtle and YAML) and one theme for the light scheme and one for the dark (the two of the Fumadocs theme's default, Catppuccin Latte and Mocha), on the Oniguruma engine (WebAssembly, so the same on Bun and Node, with no native part). Each coloured run is a span whose two colours
  * are custom properties (`--l`, `--d`), which the stylesheet picks between by the same rule as the rest of the site's colours; a run in the theme's own foreground is plain text. Text and diagrams are not coloured.
  *
  * @example
  * ```ts
  * import { highlightedHtml } from "./highlight.ts";
  * highlightedHtml("const a = 1;", "ts");
- * // '<span class="t" style="--l:#D73A49;--d:#F97583">const</span> a <span ...'
+ * // '<span class="t" style="--l:#8839EF;--d:#CBA6F7">const</span> a <span ...'
  * ```
  *
  * @module
@@ -19,7 +19,7 @@ import { dialect as postgres } from "@intellectual-frontiers/lang-sql/dialects/p
 import type { Lang } from "./model.ts";
 
 /** The themes of the two schemes. */
-export const THEMES = { light: "github-light", dark: "github-dark" } as const;
+export const THEMES = { light: "catppuccin-latte", dark: "catppuccin-mocha" } as const;
 
 /** The grammar each language of the site is read with; those not here are left plain. */
 const GRAMMAR: Readonly<Partial<Record<Lang, string>>> = { ts: "typescript", sql: "sql", sh: "shellscript", toml: "toml", json: "json", turtle: "turtle", yaml: "yaml" };
@@ -33,7 +33,7 @@ type Loaded = { readonly highlighter: HighlighterCore; readonly foreground: { re
  */
 async function load(): Promise<Loaded | undefined> {
   try {
-    const [core, engine, json, shellscript, sql, toml, turtle, typescript, yaml, githubDark, githubLight] = await Promise.all([
+    const [core, engine, json, shellscript, sql, toml, turtle, typescript, yaml, catppuccinMocha, catppuccinLatte] = await Promise.all([
       import("shiki/core"),
       import("shiki/engine/oniguruma"),
       import("shiki/langs/json.mjs"),
@@ -43,17 +43,17 @@ async function load(): Promise<Loaded | undefined> {
       import("shiki/langs/turtle.mjs"),
       import("shiki/langs/typescript.mjs"),
       import("shiki/langs/yaml.mjs"),
-      import("shiki/themes/github-dark.mjs"),
-      import("shiki/themes/github-light.mjs"),
+      import("shiki/themes/catppuccin-mocha.mjs"),
+      import("shiki/themes/catppuccin-latte.mjs"),
     ]);
     const highlighter = await core.createHighlighterCore({
-      themes: [githubLight.default, githubDark.default],
+      themes: [catppuccinLatte.default, catppuccinMocha.default],
       langs: [typescript.default, sql.default, shellscript.default, toml.default, json.default, turtle.default, yaml.default],
       engine: engine.createOnigurumaEngine(import("shiki/wasm")),
     });
     return {
       highlighter,
-      foreground: { light: githubLight.default.colors?.["editor.foreground"]?.toLowerCase() ?? "#24292e", dark: githubDark.default.colors?.["editor.foreground"]?.toLowerCase() ?? "#e1e4e8" },
+      foreground: { light: catppuccinLatte.default.colors?.["editor.foreground"]?.toLowerCase() ?? "#4c4f69", dark: catppuccinMocha.default.colors?.["editor.foreground"]?.toLowerCase() ?? "#cdd6f4" },
     };
   } catch (e) {
     console.warn(`docs: shiki is not installed (or cannot be loaded: ${e instanceof Error ? e.message.split("\n")[0] : String(e)}), so the code of the site is shown plain: install shiki at >=4.5.0 <5.0.0 beside the package to colour it`);
@@ -75,7 +75,7 @@ for (const [lang, sample] of loaded === undefined ? [] : [["typescript", 'const 
 const escapeHtml = (s: string): string => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 /** The colours that are the themes' own text, which are left as plain text. */
-const FOREGROUND = loaded?.foreground ?? { light: "#24292e", dark: "#e1e4e8" };
+const FOREGROUND = loaded?.foreground ?? { light: "#4c4f69", dark: "#cdd6f4" };
 
 /** One coloured run of code. */
 export interface Run {
@@ -88,14 +88,14 @@ export interface Run {
   readonly bold: boolean;
 }
 
-/** The colours of the kinds of SQL token, those of the themes' own for the same kinds in the other languages (a name, a quoted name, an operator and a mark of punctuation are the themes' own text). */
+/** The colours of the kinds of SQL token, those of the Catppuccin themes' own for the same kinds in the other languages (a name, a quoted name, an operator and a mark of punctuation are the themes' own text). */
 const SQL_COLOURS: Readonly<Partial<Record<SpanKind, { readonly light: string; readonly dark: string; readonly italic?: true }>>> = {
-  keyword: { light: "#D73A49", dark: "#F97583" },
-  function: { light: "#6F42C1", dark: "#B392F0" },
-  number: { light: "#005CC5", dark: "#79B8FF" },
-  string: { light: "#032F62", dark: "#9ECBFF" },
-  param: { light: "#E36209", dark: "#FFAB70" },
-  comment: { light: "#6A737D", dark: "#6A737D" },
+  keyword: { light: "#8839EF", dark: "#CBA6F7" },
+  function: { light: "#1E66F5", dark: "#89B4FA" },
+  number: { light: "#FE640B", dark: "#FAB387" },
+  string: { light: "#40A02B", dark: "#A6E3A1" },
+  param: { light: "#E64553", dark: "#EBA0AC" },
+  comment: { light: "#7C7F93", dark: "#9399B2" },
 };
 
 /**
@@ -165,6 +165,31 @@ export function highlightedHtml(code: string, lang: Lang): string {
             : `<span class="t${r.italic ? " i" : ""}${r.bold ? " b" : ""}" style="--l:${r.light ?? "inherit"};--d:${r.dark ?? "inherit"}">${escapeHtml(r.text)}</span>`
         )
         .join("")
+    )
+    .join("\n");
+}
+
+/** The two themes' own text colours and backgrounds, for the variables of a code block (the dark first, as Shiki writes them). */
+export const BLOCK_VARIABLES = "--shiki-dark:#cdd6f4;--shiki-light:#4c4f69;--shiki-dark-bg:#1e1e2e;--shiki-light-bg:#eff1f5";
+
+/**
+ * Code as the lines of a code block of the Fumadocs theme (FR-038): each line is a `span.line`, and each coloured run a span whose two colours are the variables `--shiki-light` and `--shiki-dark` (and their font styles), which the stylesheet picks
+ * between by the theme of the page, so that one drawing serves both themes. A run in the themes' own text is plain text.
+ */
+export function highlightedLines(code: string, lang: Lang): string {
+  return runs(code, lang)
+    .map((line) =>
+      `<span class="line">${
+        line
+          .map((r) => {
+            if (r.light === undefined && r.dark === undefined && !r.italic && !r.bold) return escapeHtml(r.text);
+            const style = `--shiki-dark:${r.dark ?? FOREGROUND.dark};--shiki-light:${r.light ?? FOREGROUND.light}${
+              r.italic ? ";--shiki-light-font-style:italic;--shiki-dark-font-style:italic" : ""
+            }${r.bold ? ";font-weight:bold" : ""}`;
+            return `<span style="${style}">${escapeHtml(r.text)}</span>`;
+          })
+          .join("")
+      }</span>`
     )
     .join("\n");
 }

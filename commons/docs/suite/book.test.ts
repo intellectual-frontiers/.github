@@ -183,7 +183,7 @@ proves(["0001-docs FR-007", "0001-docs FR-008"], "the files of a presentation ar
     await fs.remove(path.join(dir, "books.json"));
     assertEquals((await staleFiles(dir, made.files)).sort(), ["books.json", "fixture-guide/generated/fixture-guide.adoc"]);
     const web = presentationFiles(config, built, ["web", "markdown"]).files.map((f) => f.path);
-    assert(web.includes("index.html") && web.includes("index.md") && web.includes("llms.txt") && web.includes("assets/site.css") && !web.some((p) => p.endsWith(".adoc")));
+    assert(web.includes("index.html") && web.includes("index.md") && web.includes("llms.txt") && web.includes("assets/site.css") && web.includes("assets/fumadocs.css") && !web.some((p) => p.endsWith(".adoc")));
   } finally {
     await fs.remove(dir, { recursive: true });
   }

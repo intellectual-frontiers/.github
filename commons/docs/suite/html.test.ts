@@ -30,7 +30,7 @@ const every: readonly Block[] = [
 
 proves(["0011-documentation FR-017"], "every case of the page model is written, text escaped and links relative to the page", () => {
   const html = every.map((b) => block(b, "a/x.html")).join("\n");
-  for (const tag of ["<h2", "<p>", 'class="meta"', "<ol>", 'class="t"', "<table>", "callout-limit", 'class="entry"', 'role="tablist"', 'class="diagram-wrap"', 'class="cards"', "badge-good", 'class="tree"']) {
+  for (const tag of ["<h2", "<p>", "text-sm text-fd-muted-foreground", "<ol>", "--shiki-light:", "<table>", "--color-fd-warning", "scroll-m-28 my-6 rounded-xl border", 'role="tablist"', "data-diagram", 'data-card="true"', "bg-fd-success", "not-prose rounded-md border bg-fd-card p-2"]) {
     assertStringIncludes(html, tag);
   }
   assertStringIncludes(html, "&lt;b&gt;");
@@ -52,9 +52,9 @@ proves(["0011-documentation FR-017"], "a page asks nothing of another host, draw
   }
   assert(!plain.includes("mermaid") && !withDiagram.includes("mermaid.min.js") && withDiagram.includes("<svg"), "a diagram is an SVG in the page, with no script to draw it");
   const css = await fs.readTextFile(path.join(ROOT, "commons/docs/src/theme/site.css"));
-  assertMatch(css, /--page: #ffffff;/);
-  assertMatch(css, /\.content \{ background: var\(--page\)/);
-  assertMatch(css, /prefers-color-scheme: dark/);
+  assertMatch(css, /:root:not\(\.dark\) \{ --color-fd-background: #ffffff; \}/);
+  assertMatch(plain, /prefers-color-scheme: dark/);
+  assertMatch(plain, /id="nd-page-panel" class="[^"]*bg-fd-background/);
 });
 
 proves(["0011-documentation FR-019"], "the fixture's pages are what is committed", async () => {

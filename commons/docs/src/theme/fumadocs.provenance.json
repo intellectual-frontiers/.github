@@ -1,0 +1,49 @@
+{
+  "packages": {
+    "fumadocs-ui": "16.19.7",
+    "tailwindcss": "4.3.5"
+  },
+  "classes": 1351,
+  "stylesheetSha256": "031f4494568a9a1fc24725ee40b07a2987efa78ce3a8b827930b3f56b5770a8b",
+  "reference": {
+    "package": "fumadocs-ui 16.19.7 (npm, MIT, Copyright (c) 2023 Fuma): css/neutral.css, css/lib/default-colors.css, css/lib/base.css, css/lib/shiki.css and dist/tailwind/typography.js are the tokens, the base, the code rules and the typography of the stylesheet",
+    "live": {
+      "site": "https://www.fumadocs.dev",
+      "read": "2026-11-22",
+      "pages": [
+        "/docs/ui",
+        "/docs/ui/components",
+        "/docs/ui/components/tabs",
+        "/docs/ui/components/files",
+        "/docs/ui/components/steps",
+        "/docs/ui/components/accordion",
+        "/docs/ui/components/codeblock",
+        "/docs/headless/page-conventions"
+      ],
+      "why": "The layout the live documentation shows is the `spacious` layout (`#fd-spacious-layout`), which no released version of fumadocs-ui contains (16.19.7 and 17.0.0 have the docs, flux, glass, home and notebook layouts): its markup and classes are read from the live pages, and where the package and the live pages differ the live pages win."
+    }
+  },
+  "additions": [
+    "the `layout` variant of the spacious layout (`#fd-spacious-layout:has(> &, > * > &, > * > * > &)`), which the live stylesheet defines and the package's base.css defines for the other layouts",
+    "the animation `fd-roll-in`, which the live stylesheet defines and the package lacks",
+    "the typefaces: `--font-sans` is Inter and `--font-mono` is JetBrains Mono, where the live documentation sets its own (Geist)"
+  ],
+  "departures": [
+    "the reading area of the light theme is white (`--color-fd-background: #ffffff` in src/theme/site.css), where the reference's is `#f5f5f5` (the owner's decision of 2026-11-22)",
+    "the accent is the reference's neutral grayscale (`--color-fd-primary` is near black in the light theme and near white in the dark), where the live documentation sets a blue of its own for its current item and its links (the owner's decision of 2026-11-22: the neutral grayscale)",
+    "the code themes are the reference's default pair, Catppuccin Latte and Mocha (Shiki), and SQL, which the library lang-sql reads better than Shiki's grammar, uses the same palettes"
+  ],
+  "noEquivalent": [
+    "badges (a small label with a coloured dot): drawn with the classes of the reference's `kbd` and secondary button and its tone colours",
+    "tiles of the first page (`stats`): drawn with the reference's card",
+    "trend lines: drawn in `text-fd-primary` with a caption in the muted colour",
+    "the entries of the API and of the specifications: a card with a header row, the signature as a code block and the description",
+    "diagrams: a card around the drawing, drawn in the tokens, with its source in a disclosure",
+    "the filter above a table: the reference's search field, in the classes of its search button",
+    "the selector of the sections: the reference's selector of root folders, whose menu is the reference's popover menu, placed by a script",
+    "the lozenge that follows the pointer in the side navigation: the reference's, moved by a script of the site",
+    "the scrollbar of the side navigation: hidden, as the reference's is, with no overlay thumb"
+  ],
+  "tool": "tools/fumadocs-css.mjs, run by hand; it is not a dependency of the library, of its package or of its build",
+  "measured": "src/theme/fumadocs.measurements.json"
+}

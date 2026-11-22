@@ -23,6 +23,38 @@ Packages installed from a registry (listed in `bun.lock`) are not vendored: noth
 - **License**: OFL-1.1 (SIL Open Font License 1.1), the package's own license field and the LICENSE it carries, copied unchanged to commons/docs/src/theme/fonts/JetBrainsMono-OFL.txt.
 - **Checked**: The license text of the package was read on 2026-11-22 and is the OFL 1.1 with the JetBrains Mono Project's copyright line. The font is used unmodified and not sold on its own.
 
+## `commons/docs/src/theme/fumadocs.css`
+
+- **What**: The stylesheet of the documentation site: Tailwind CSS made of the classes the pages use, with the tokens, the base, the code and the typography rules of fumadocs-ui 16.19.7; the values of its tokens, widths, spacings, radii and type sizes are the Fumadocs documentation theme's (docs 0001-docs FR-036, FR-041; the record is src/theme/fumadocs.provenance.json).
+- **Source**: https://github.com/fuma-nama/fumadocs (the npm package fumadocs-ui 16.19.7 and the layout the live documentation at https://www.fumadocs.dev shows), compiled by commons/docs/tools/fumadocs-css.mjs with the npm package tailwindcss 4.3.5, whose banner the file keeps.
+- **Owner**: Fuma (Fumadocs); Tailwind Labs, Inc. (Tailwind CSS).
+- **License**: MIT, both; the permission text of Fumadocs is in NOTICE and that of Tailwind CSS travels with it in the banner's reference (https://tailwindcss.com).
+- **Checked**: The LICENSE files of fumadocs-ui 16.19.7 (MIT, Copyright (c) 2023 Fuma) and of tailwindcss 4.3.5 (MIT, Copyright (c) Tailwind Labs, Inc.) were read on 2026-11-22. No Fumadocs or Tailwind package is a dependency of any library, of the package or of the build: the tool installs them in a scratch directory, by hand.
+
+## `commons/docs/src/emit/shell.ts`
+
+- **What**: The markup and the classes of the chrome of a page (the grid, the side navigation, the panel and its header, the outline, the search dialog) and, in html.ts, those of its components (callouts, tabs, cards, code blocks, the file tree): the structure of the Fumadocs documentation theme, as its pages are written.
+- **Source**: https://www.fumadocs.dev, the pages read on 2026-11-22 (the DOM and the computed styles of /docs/ui, /docs/ui/components and its pages, /docs/headless/page-conventions).
+- **Owner**: Fuma (Fumadocs).
+- **License**: MIT, Copyright (c) 2023 Fuma; the permission text is in NOTICE.
+- **Checked**: The structure and the class lists were read from the live pages and compared with fumadocs-ui 16.19.7; no source file of Fumadocs is vendored.
+
+## `commons/docs/src/emit/icons.ts`
+
+- **What**: The drawings of the icons of the pages (the paths of Lucide icons, as the Fumadocs pages draw them) and of the mark of GitHub.
+- **Source**: https://lucide.dev (the npm package lucide 1.77.0, whose LICENSE was read) and the pages of https://www.fumadocs.dev.
+- **Owner**: Lucide Icons and Contributors; for the icons derived from Feather, Cole Bemis.
+- **License**: ISC (Lucide) and MIT (the icons derived from Feather), as the LICENSE of lucide says; the mark of GitHub belongs to GitHub, Inc. and is used to link to the repository.
+- **Checked**: The LICENSE of the npm package lucide 1.77.0 was read on 2026-11-22: ISC, Copyright (c) 2026 Lucide Icons and Contributors, and MIT, Copyright (c) Cole Bemis, from 2013, for the icons it lists as derived from Feather. The icons are drawn in the pages and never loaded from a host.
+
+## `commons/docs/src/highlight.ts`
+
+- **What**: The colours of the kinds of SQL token, which are those of the Catppuccin Latte and Mocha palettes (the two themes of the code of the Fumadocs documentation; the themes themselves are the npm package shiki's and are not vendored).
+- **Source**: https://github.com/catppuccin/palette.
+- **Owner**: Catppuccin.
+- **License**: MIT, Copyright (c) 2021 Catppuccin.
+- **Checked**: The LICENSE of the repository catppuccin/palette was read on 2026-11-22: MIT, Copyright (c) 2021 Catppuccin.
+
 ## `commons/libraries/src/workflows/schema/github-workflow.schema.json`
 
 - **What**: The JSON Schema of GitHub Actions workflows, the copy fetched on 2026-11-19, which the tests validate the generated workflows against.

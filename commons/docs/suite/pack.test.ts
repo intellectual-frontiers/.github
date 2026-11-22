@@ -19,7 +19,7 @@ proves(["0001-docs FR-004", "0001-docs FR-003"], "the package is packed with com
   for (const dep of ["typescript", "shiki", "beautiful-mermaid", "@intellectual-frontiers/core", "@intellectual-frontiers/system"]) assert(dep in m.dependencies, `${dep} is a dependency`);
   assertEquals(m.dependencies["typescript"], "7.1.0-beta");
   assert(Object.values(m.dependencies).every((v) => !v.startsWith("link:") && !v.startsWith("file:")), "every dependency is a version of npm");
-  for (const f of ["dist/mod.js", "dist/mod.d.ts", "dist/cli.js", "dist/theme/site.css", "dist/theme/site.js", "src/theme/site.css", "ifc-docs.mjs", "LICENSE", "README.md"]) assert(fs.existsSync(path.join(p.stage, f)), `${f} is in the package`);
+  for (const f of ["dist/mod.js", "dist/mod.d.ts", "dist/cli.js", "dist/theme/site.css", "dist/theme/fumadocs.css", "dist/theme/site.js", "src/theme/site.css", "src/theme/fumadocs.css", "ifc-docs.mjs", "LICENSE", "README.md"]) assert(fs.existsSync(path.join(p.stage, f)), `${f} is in the package`);
   const launcher = await fs.readTextFile(path.join(p.stage, "ifc-docs.mjs"));
   assert(launcher.startsWith("#!/usr/bin/env node\n") && launcher.includes('"./dist/cli.js"'), "the launcher runs the compiled cli");
 }, { timeout: 240_000 });

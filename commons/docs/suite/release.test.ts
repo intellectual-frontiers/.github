@@ -57,15 +57,16 @@ proves(["0001-docs FR-033"], "every page has the version in its heading, its tit
   const release = resolveRelease({ registry: reg("0.4.2"), local: "0.4.2", commit: "abc12345", recorded: "0.4.2", ahead: 3 });
   const html = document(page, { name: "IF Commons", repository: "https://example.test/r", pages: [page], ...(release === undefined ? {} : { release }) });
   assertStringIncludes(html, "<title>T · IF Commons v0.4.2</title>");
-  assertStringIncludes(html, '<span class="version" title="The newest version on the package registry, published 2026-11-10">v0.4.2</span>');
-  assertStringIncludes(html, "<strong>IF Commons v0.4.2</strong> · published 2026-11-10");
-  assertStringIncludes(html, "<code>abc12345</code>");
+  assertStringIncludes(html, '<span data-version title="The newest version on the package registry, published 2026-11-10">v0.4.2</span>');
+  assertStringIncludes(html, 'IF Commons <span data-version');
+  assertStringIncludes(html, '<strong class="font-medium text-fd-foreground">IF Commons v0.4.2</strong> · published 2026-11-10');
+  assertStringIncludes(html, '<code class="font-mono">abc12345</code>');
   assertStringIncludes(html, "3 commits since the release");
   const bare = resolveRelease({ registry: undefined, local: "0.4.2", commit: undefined, recorded: undefined, ahead: undefined });
   const unconfirmed = document(page, { name: "IF Commons", repository: "r", pages: [page], ...(bare === undefined ? {} : { release: bare }) });
-  assertStringIncludes(unconfirmed, 'class="version unconfirmed"');
+  assertStringIncludes(unconfirmed, 'data-version title="The version of package.json: not confirmed on the package registry" class="text-fd-muted-foreground"');
   assertStringIncludes(unconfirmed, "not confirmed on the package registry");
-  assert(!document(page, { name: "N", repository: "r", pages: [page] }).includes('class="version'), "a site with no package has no version");
+  assert(!document(page, { name: "N", repository: "r", pages: [page] }).includes("data-version"), "a site with no package has no version");
 });
 
 proves(["0001-docs FR-033"], "an evidence file that says the registry could not be read is a typed finding with its reason, and the evidence is still read", async () => {
