@@ -12,7 +12,7 @@
  *
  * @module
  */
-import { countsOf, diagnose, finding, findingsOfStatus, gatherFacts, gatherHygieneFacts, hygiene, type HygieneFinding, reportOk, runCheck, runStatus, type CheckReport, tableOf } from "@intellectual-frontiers/repoctl/logical";
+import { countsOf, diagnose, finding, findingsOfStatus, gatherFacts, gatherHygieneFacts, hygiene, identityFindings, MERGE_LOG, parseMerges, type HygieneFinding, reportOk, runCheck, runStatus, type CheckReport, tableOf } from "@intellectual-frontiers/repoctl/logical";
 import { flag } from "@intellectual-frontiers/terminal/args";
 import { defineVerb, generatorsOf, outcomeOfDone, outcomeOfEnvironment } from "../define.ts";
 
@@ -119,7 +119,10 @@ export const hygieneVerb = defineVerb({
     const policy = host.config.hygiene;
     if (policy === undefined) return outcomeOfEnvironment("this repository's configuration has no hygiene policy");
     const facts = await gatherHygieneFacts(w, policy);
-    const findings = hygiene(facts, policy);
+    const history = await w.process.run(["git", ...MERGE_LOG], { cwd: w.repo });
+    const noRepository = history.code !== 0 && /not a git repository/i.test(history.stderr);
+    if (history.code !== 0 && !noRepository) return outcomeOfEnvironment(`the history cannot be read, so the identity of its merges is not checked: ${history.stderr.trim() || "git log failed"}`);
+    const findings = [...hygiene(facts, policy), ...(noRepository ? [] : identityFindings(parseMerges(history.stdout), host.config.commit.identity, host.config.commit.heldMerges))];
     const first = findings.find((f) => f.level === "fail") ?? findings[0];
     return outcomeOfDone({
       data: { repository: facts.repository, ...countsOf(findings), findings },

@@ -61,6 +61,7 @@ export type ProblemCode =
   | "E-HYGIENE-VENDORED"
   | "E-HYGIENE-DUPLICATE"
   | "E-HYGIENE-RANGE"
+  | "E-HYGIENE-IDENTITY"
   | "E-PROVE-FAILED"
   | "E-PROVE-QUARANTINE"
   | "E-CHECK-FAILED"
@@ -116,6 +117,7 @@ export const PROBLEM_CODES: readonly ProblemCode[] = [
   "E-HYGIENE-VENDORED",
   "E-HYGIENE-DUPLICATE",
   "E-HYGIENE-RANGE",
+  "E-HYGIENE-IDENTITY",
   "E-PROVE-FAILED",
   "E-PROVE-QUARANTINE",
   "E-CHECK-FAILED",
@@ -355,6 +357,12 @@ export const CATALOGUE: Readonly<Record<ProblemCode, Explained>> = {
     what: "`git` does not run here, or the folder is not a Git working tree with an origin.",
     why: "Git is not installed, or the folder is not a clone.",
     fix: "git --version",
+  },
+  "E-HYGIENE-IDENTITY": {
+    title: "A merge commit was not made by the repository's identity",
+    what: "A merge commit of the history has an author or a committer that is not the identity `commit.identity` of the configuration, and the configuration does not hold it in `commit.heldMerges`; or a held hash matches no merge of the history.",
+    why: "A `git pull` or `git merge` made where `user.name` and `user.email` were not set takes the identity of the machine or the session, so the history credits another name. History is never rewritten: the commit stays, and only the held list can carry it.",
+    fix: "git config user.name and user.email to the identity of the configuration before a pull, or merge with repoctl merge; list an old offender in commit.heldMerges",
   },
   "E-HYGIENE-GIT": {
     title: "A dependency by Git on the repository of commons",
