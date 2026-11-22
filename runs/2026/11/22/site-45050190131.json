@@ -1,0 +1,118 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45050190131",
+    "workflow": "site",
+    "commit": "a652172e9b90561346b74375afac48453a4e210f",
+    "at": "2026-11-22T17:42:33Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45050190131"
+  },
+  "steps": [
+    {
+      "id": "the-compiler-the-generator-s-tests-then--4",
+      "job": "check",
+      "module": "repository",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 2,
+      "durationMs": 262612,
+      "exitStatus": 1
+    },
+    {
+      "id": "typescript-7-1-beta-shiki-beautiful-merm-3",
+      "job": "check",
+      "module": "repository",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 178,
+      "exitStatus": 0
+    },
+    {
+      "id": "build",
+      "job": "site",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 33197,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-findings-of-the-runs-from-the-histor-5",
+      "job": "site",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 439,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-newest-test-reports-4",
+      "job": "site",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 15747,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-open-issues-the-runs-of-the-workflow-6",
+      "job": "site",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 43624,
+      "exitStatus": 0
+    },
+    {
+      "id": "typescript-7-1-beta-shiki-beautiful-merm-3",
+      "job": "site",
+      "module": "repository",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 225,
+      "exitStatus": 0
+    }
+  ],
+  "findings": [
+    {
+      "id": "f-1838ffa8d80c73a5",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45050190131",
+        "commit": "a652172e9b90561346b74375afac48453a4e210f",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "77f62cf298781cb1c0e31668f2226f392997dc4ae64f0af10b1e56f9ff963819"
+      },
+      "at": "2026-11-22T17:39:43Z",
+      "code": "test-failed",
+      "file": "suite/newcomer.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0011-documentation FR-022: no workflow makes a GitHub release, and the write permission is the release job's and the one job that keeps the findings on the history branch",
+      "key": "0011-documentation FR-022: no workflow makes a GitHub release, and the write permission is the release job's and the one job that keeps the findings on the history branch"
+    },
+    {
+      "id": "f-4c3310b94ccb7e97",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45050190131",
+        "commit": "a652172e9b90561346b74375afac48453a4e210f",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "77f62cf298781cb1c0e31668f2226f392997dc4ae64f0af10b1e56f9ff963819"
+      },
+      "at": "2026-11-22T17:39:43Z",
+      "code": "test-failed",
+      "file": "suite/workflow.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0011-documentation FR-022: no workflow makes a GitHub release, and the write permission is the release job's and the one job that keeps the findings on the history branch",
+      "key": "0011-documentation FR-022: no workflow makes a GitHub release, and the write permission is the release job's and the one job that keeps the findings on the history branch"
+    }
+  ]
+}
