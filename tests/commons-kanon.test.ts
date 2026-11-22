@@ -212,11 +212,11 @@ proves(
 );
 
 proves(
-  ["0033-kanon FR-015"],
-  "the ontology kanon has the ten classes, the three layers with their rank and MDA viewpoint, and a record of the basis of each class",
+  ["0033-kanon FR-015", "0033-kanon FR-031"],
+  "the ontology kanon has the twelve classes (ten, and Relation and Bundle), the three layers with their rank and MDA viewpoint, and a record of the basis of each class",
   () => {
     const labels = classes.map((c) => c.values.label?.value);
-    assertEquals(labels, ["Layer", "Element", "Projection", "Trace edge", "Surface", "Finding", "Instance", "Plugin", "Family", "Matrix"]);
+    assertEquals(labels, ["Layer", "Element", "Projection", "Trace edge", "Surface", "Finding", "Instance", "Plugin", "Family", "Matrix", "Relation", "Bundle"]);
     assertEquals(
       Object.values(layers).map((l) => [l.values.layerRank, l.values.mdaViewpoint, l.values.dataModelingLevel]),
       [
@@ -225,7 +225,7 @@ proves(
         [3, "PSM", "physical"],
       ],
     );
-    assertEquals(terms.length, 10);
+    assertEquals(terms.length, 12);
     for (const t of terms) assertEquals(t.values.mappingRelation, "subClassOf");
   },
 );

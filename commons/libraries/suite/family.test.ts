@@ -81,10 +81,10 @@ proves(["0001-libraries FR-016"], "a member whose table does not extend the host
   assert(familyFindings(bare).some((s) => s.includes("declares no family")));
 });
 
-proves(["0001-libraries FR-016"], "the names held are data, and a library of the family may hold them and no other", () => {
+proves(["0001-libraries FR-016", "0033-kanon FR-033"], "the names held are data, and a library of the family may hold them and no other", () => {
   const names = (n: string): readonly string[] => reservationFindings([{ name: n }]);
-  for (const held of ["archon", "archon-dialect-x", "archon-server", "signing", "gitops", "estate", "toolchain"]) assertEquals(names(held).length, 1, held);
-  for (const free of ["archonic", "signing-tools", "gitops2", "estates", "toolchains", "data", "arch"]) assertEquals(names(free), [], free);
+  for (const held of ["archon", "archon-dialect-x", "archon-server", "signing", "gitops", "estate", "toolchain", "content", "content-rendition-web"]) assertEquals(names(held).length, 1, held);
+  for (const free of ["archonic", "signing-tools", "gitops2", "estates", "toolchains", "data", "arch", "contents", "contentful"]) assertEquals(names(free), [], free);
   assertEquals(reservationFindings([{ name: "archon-server", family: { host: "archon", role: "plugin" } }]), []);
   assertEquals(reservationFindings([{ name: "signing", family: { host: "signing", role: "host" } }]), []);
   assertEquals(names("signing").length, 1);
@@ -92,6 +92,6 @@ proves(["0001-libraries FR-016"], "the names held are data, and a library of the
   assert(matches({ kind: "prefix", prefix: "a-" }, "a-b") && !matches({ kind: "exact", name: "a" }, "a-b"));
   assertEquals(
     RESERVED.map((r) => (r.match.kind === "exact" ? r.match.name : `${r.match.prefix}*`)),
-    ["archon", "archon-*", "signing", "gitops", "anyfs", "anyfs-*", "estate", "toolchain"],
+    ["archon", "archon-*", "signing", "gitops", "anyfs", "anyfs-*", "estate", "content", "content-*", "toolchain"],
   );
 });

@@ -35,6 +35,9 @@ export type Reservation = { readonly match: Match; readonly host: string; readon
 /** The reason the names of the retired fleet engine are held (intellectual-frontiers/.github#11). */
 const ARCHON = "held for the fleet library and its dialects and plugins, which replace the retired fleet engine (intellectual-frontiers/.github#11)";
 
+/** The reason the names of the library of Kanon for content are held (intellectual-frontiers/.github#22). */
+const CONTENT = "held for the content library, Kanon for content, and its renditions, named content-rendition-<name> (intellectual-frontiers/.github#22)";
+
 /** The names held, as data: the check reads them and no folder holds them. */
 export const RESERVED: readonly Reservation[] = [
   { match: { kind: "exact", name: "archon" }, host: "archon", reason: ARCHON },
@@ -44,6 +47,8 @@ export const RESERVED: readonly Reservation[] = [
   { match: { kind: "exact", name: "anyfs" }, host: "anyfs", reason: "held for the AnyFS library and its backends, plugins named anyfs-<noun> (intellectual-frontiers/.github#21)" },
   { match: { kind: "prefix", prefix: "anyfs-" }, host: "anyfs", reason: "held for the AnyFS library and its backends, plugins named anyfs-<noun> (intellectual-frontiers/.github#21)" },
   { match: { kind: "exact", name: "estate" }, host: "estate", reason: "held for the estate library of the fleet libraries (intellectual-frontiers/.github#11)" },
+  { match: { kind: "exact", name: "content" }, host: "content", reason: CONTENT },
+  { match: { kind: "prefix", prefix: "content-" }, host: "content", reason: CONTENT },
   { match: { kind: "exact", name: "toolchain" }, host: "toolchain", reason: "held for the toolchain library of the fleet libraries (intellectual-frontiers/.github#11)" },
 ];
 

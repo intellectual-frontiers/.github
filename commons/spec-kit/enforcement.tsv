@@ -625,6 +625,15 @@ requirement	mechanism	by	note
 0033-kanon FR-022	check	.github: bun test ./tests/	commons-kanon.test.ts: an annotation accounted for in one dialect and not the other is kanon/dropped for the other; commons/kanon/suite
 0033-kanon FR-023	check	.github: bun test ./tests/	commons-kanon.test.ts: the matrix is built and rendered as Markdown; commons/kanon/suite holds the JSON and the property test
 0033-kanon FR-024	check	.github: bun test ./tests/	commons-kanon.test.ts: the reserved names are refused to a library of no family; commons/libraries/suite/family.test.ts
+0033-kanon FR-025	check	.github: bun test ./tests/	commons/kanon/suite/content.test.ts: a governance unit of data modules that imports a logical unit is layers/above
+0033-kanon FR-026	check	.github: bun test ./tests/	commons/kanon/suite/content.test.ts: the bundle is the same bytes twice, loads whole and is refused whole with each fault named
+0033-kanon FR-027	check	.github: bun test ./tests/	commons/kanon/suite/content.test.ts: a package of another scope is a member where the family takes any scope, with its role in its own table
+0033-kanon FR-028	check	.github: bun test ./tests/	commons/kanon/suite/content.test.ts: with a vocabulary, a kind or a name it does not list is a finding; without one nothing is checked
+0033-kanon FR-029	check	.github: bun test ./tests/	commons/kanon/suite/content.test.ts: dangling, relation-layer and duplicate-id are found and a cycle is not
+0033-kanon FR-030	check	.github: bun test ./tests/	commons/kanon/suite/content.test.ts: the content claim with a third instance and no disposition is kanon/dropped and a dropped cell of the matrix
+0033-kanon FR-031	check	.github: bun test ./tests/	commons-kanon.test.ts: the ontology kanon has the twelve classes, Relation and Bundle with their basis
+0033-kanon FR-032	none	-	a recorded paragraph, nothing to run: a paragraph of this specification records that docs is not classified and how a consumer's ladder and the layers are kept apart
+0033-kanon FR-033	check	.github: bun test ./tests/	commons/libraries/suite/family.test.ts: content and content-* are refused to a library of no family
 0011-documentation FR-030	check	.github: cd commons/docs && bun run verify	pending
 0034-archon FR-001	review	0034-archon FR-001	a reviewer checks that no package, folder or command of commons is named stolos and that what the retired engine did that is general is done by a library
 0034-archon FR-002	review	0034-archon FR-002	a reviewer checks that no library carries a shim, re-export or migration path for the retired engine

@@ -69,6 +69,8 @@ export const kanon = vocabulary(KANON, {
   Plugin: "owl:Class",
   Family: "owl:Class",
   Matrix: "owl:Class",
+  Relation: "owl:Class",
+  Bundle: "owl:Class",
   layerRank: "owl:DatatypeProperty",
   mdaViewpoint: "owl:DatatypeProperty",
   dataModelingLevel: "owl:DatatypeProperty",
@@ -93,6 +95,9 @@ export const kanon = vocabulary(KANON, {
   familyHost: "owl:DatatypeProperty",
   matrixFamily: "owl:ObjectProperty",
   matrixOutcome: "owl:DatatypeProperty",
+  relationKind: "owl:DatatypeProperty",
+  relationFrom: "owl:ObjectProperty",
+  relationTo: "owl:ObjectProperty",
 });
 
 // ---- the code list: the layers
@@ -195,6 +200,20 @@ export const classes = [
     subClassOf: [prov.Entity],
     definition: en(
       "The table of requirement by instance: for each annotation of Governance and each instance, whether it is expressed, carried or unexpressed with its reason, or dropped.",
+    ),
+  }),
+  OwlClass.make(kanon.Relation, {
+    label: en("Relation"),
+    subClassOf: [prov.Entity],
+    definition: en(
+      "A link between two elements of one layer, with a kind the model's vocabulary declares: it may be cyclic and is never a trace edge (0033-kanon FR-029).",
+    ),
+  }),
+  OwlClass.make(kanon.Bundle, {
+    label: en("Bundle"),
+    subClassOf: [prov.Entity],
+    definition: en(
+      "The Logical model published as files with a manifest of every file and its SHA-256, which a loader refuses whole where any file differs (0033-kanon FR-026).",
     ),
   }),
 ] as const;
@@ -351,6 +370,24 @@ export const properties = [
     label: en("matrix outcome"),
     definition: en("How a cell of the matrix ends: expressed, carried, unexpressed or dropped."),
   }),
+  DatatypeProperty.make(kanon.relationKind, {
+    domain: kanon.Relation,
+    range: xsd.string,
+    label: en("relation kind"),
+    definition: en("The kind of a relation, from the vocabulary of the model that holds it."),
+  }),
+  ObjectProperty.make(kanon.relationFrom, {
+    domain: kanon.Relation,
+    range: kanon.Element,
+    label: en("relation from"),
+    definition: en("The element a relation leaves."),
+  }),
+  ObjectProperty.make(kanon.relationTo, {
+    domain: kanon.Relation,
+    range: kanon.Element,
+    label: en("relation to"),
+    definition: en("The element a relation arrives at."),
+  }),
 ] as const;
 
 /** The ontology itself: its label, description and version. */
@@ -389,6 +426,8 @@ export const terms = [
   specializes("Plugin", prov.Entity.iri, "0033-kanon FR-015"),
   specializes("Family", skos.Collection.iri, "0033-kanon FR-015"),
   specializes("Matrix", prov.Entity.iri, "0033-kanon FR-015"),
+  specializes("Relation", prov.Entity.iri, "0033-kanon FR-031"),
+  specializes("Bundle", prov.Entity.iri, "0033-kanon FR-031"),
 ] as const;
 
 /** The file this module states: its name, its prefixes and its individuals. */
