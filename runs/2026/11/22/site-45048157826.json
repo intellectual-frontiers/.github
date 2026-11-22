@@ -1,0 +1,356 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45048157826",
+    "workflow": "site",
+    "commit": "81a2f0b12db75e4471d1fe8db2a0f16b88d67668",
+    "at": "2026-11-22T17:22:24Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45048157826"
+  },
+  "steps": [
+    {
+      "id": "the-compiler-the-generator-s-tests-then--4",
+      "job": "check",
+      "module": "repository",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 16,
+      "durationMs": 353319,
+      "exitStatus": 1
+    },
+    {
+      "id": "typescript-7-1-beta-shiki-beautiful-merm-3",
+      "job": "check",
+      "module": "repository",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 266,
+      "exitStatus": 0
+    },
+    {
+      "id": "build",
+      "job": "site",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 51765,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-findings-of-the-runs-from-the-histor-5",
+      "job": "site",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 509,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-newest-test-reports-4",
+      "job": "site",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 12892,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-open-issues-the-runs-of-the-workflow-6",
+      "job": "site",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 41639,
+      "exitStatus": 0
+    },
+    {
+      "id": "typescript-7-1-beta-shiki-beautiful-merm-3",
+      "job": "site",
+      "module": "repository",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 290,
+      "exitStatus": 0
+    }
+  ],
+  "findings": [
+    {
+      "id": "f-296bff806a111eb6",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45048157826",
+        "commit": "81a2f0b12db75e4471d1fe8db2a0f16b88d67668",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "5641c02c550e79b215069ff27f0600871c5d2b5aea3b10b6bba061dbccc7e176"
+      },
+      "at": "2026-11-22T17:19:21Z",
+      "code": "test-failed",
+      "file": "suite/repo-ops.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0001-docs FR-029: the site of commons has the section Repo Ops with every workflow and every verb read from their typed definitions, its links to other pages resolve, and the top bar names it",
+      "key": "0001-docs FR-029: the site of commons has the section Repo Ops with every workflow and every verb read from their typed definitions, its links to other pages resolve, and the top bar names it"
+    },
+    {
+      "id": "f-37bd1dc7ee47c88d",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45048157826",
+        "commit": "81a2f0b12db75e4471d1fe8db2a0f16b88d67668",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "5641c02c550e79b215069ff27f0600871c5d2b5aea3b10b6bba061dbccc7e176"
+      },
+      "at": "2026-11-22T17:19:21Z",
+      "code": "test-failed",
+      "file": "suite/program-lens.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0001-docs FR-029: the site of commons has the section Repo Ops with every workflow and every verb read from their typed definitions, its links to other pages resolve, and the top bar names it",
+      "key": "0001-docs FR-029: the site of commons has the section Repo Ops with every workflow and every verb read from their typed definitions, its links to other pages resolve, and the top bar names it"
+    },
+    {
+      "id": "f-43e0bacf71b2ba4b",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45048157826",
+        "commit": "81a2f0b12db75e4471d1fe8db2a0f16b88d67668",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "5641c02c550e79b215069ff27f0600871c5d2b5aea3b10b6bba061dbccc7e176"
+      },
+      "at": "2026-11-22T17:19:21Z",
+      "code": "test-failed",
+      "file": "suite/program-lens.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0011-documentation FR-038: commons' site has a page for each AI guide in the group With an AI assistant",
+      "key": "0011-documentation FR-038: commons' site has a page for each AI guide in the group With an AI assistant"
+    },
+    {
+      "id": "f-50ad9c9b094f47db",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45048157826",
+        "commit": "81a2f0b12db75e4471d1fe8db2a0f16b88d67668",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "5641c02c550e79b215069ff27f0600871c5d2b5aea3b10b6bba061dbccc7e176"
+      },
+      "at": "2026-11-22T17:19:21Z",
+      "code": "test-failed",
+      "file": "suite/library-site.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0011-documentation FR-031: commons' site has a page and an API for every library, shows each library's specifications on its page, and groups the specifications by the library that keeps them",
+      "key": "0011-documentation FR-031: commons' site has a page and an API for every library, shows each library's specifications on its page, and groups the specifications by the library that keeps them"
+    },
+    {
+      "id": "f-7cc98ec74574fbf0",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45048157826",
+        "commit": "81a2f0b12db75e4471d1fe8db2a0f16b88d67668",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "5641c02c550e79b215069ff27f0600871c5d2b5aea3b10b6bba061dbccc7e176"
+      },
+      "at": "2026-11-22T17:19:21Z",
+      "code": "test-failed",
+      "file": "suite/ai-guides.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0011-documentation FR-038: commons' site has a page for each AI guide in the group With an AI assistant",
+      "key": "0011-documentation FR-038: commons' site has a page for each AI guide in the group With an AI assistant"
+    },
+    {
+      "id": "f-832f818fea7ee8bd",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45048157826",
+        "commit": "81a2f0b12db75e4471d1fe8db2a0f16b88d67668",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "5641c02c550e79b215069ff27f0600871c5d2b5aea3b10b6bba061dbccc7e176"
+      },
+      "at": "2026-11-22T17:19:21Z",
+      "code": "test-failed",
+      "file": "suite/program-lens.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0011-documentation FR-031: commons' site has a page and an API for every library, shows each library's specifications on its page, and groups the specifications by the library that keeps them",
+      "key": "0011-documentation FR-031: commons' site has a page and an API for every library, shows each library's specifications on its page, and groups the specifications by the library that keeps them"
+    },
+    {
+      "id": "f-90d5b1359a4d87c0",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45048157826",
+        "commit": "81a2f0b12db75e4471d1fe8db2a0f16b88d67668",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "5641c02c550e79b215069ff27f0600871c5d2b5aea3b10b6bba061dbccc7e176"
+      },
+      "at": "2026-11-22T17:19:21Z",
+      "code": "test-failed",
+      "file": "suite/program-lens.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0011-documentation FR-032, 0011-documentation FR-033: commons' site has the guides of every section with their citations and links resolved to pages, and a library map that names what each library imports",
+      "key": "0011-documentation FR-032, 0011-documentation FR-033: commons' site has the guides of every section with their citations and links resolved to pages, and a library map that names what each library imports"
+    },
+    {
+      "id": "f-9a319d7ca26f6f4f",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45048157826",
+        "commit": "81a2f0b12db75e4471d1fe8db2a0f16b88d67668",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "5641c02c550e79b215069ff27f0600871c5d2b5aea3b10b6bba061dbccc7e176"
+      },
+      "at": "2026-11-22T17:19:21Z",
+      "code": "test-failed",
+      "file": "suite/program-lens.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0001-docs FR-005, 0001-docs FR-006: the packed package installed into an empty project builds and checks a small repository at a private address, with relative links, no other host and the links to files made from the configuration",
+      "key": "0001-docs FR-005, 0001-docs FR-006: the packed package installed into an empty project builds and checks a small repository at a private address, with relative links, no other host and the links to files made from the configuration"
+    },
+    {
+      "id": "f-adf6d32961199dcc",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45048157826",
+        "commit": "81a2f0b12db75e4471d1fe8db2a0f16b88d67668",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "5641c02c550e79b215069ff27f0600871c5d2b5aea3b10b6bba061dbccc7e176"
+      },
+      "at": "2026-11-22T17:19:21Z",
+      "code": "test-failed",
+      "file": "suite/program-lens.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0011-documentation FR-029: commons' own site has the data models: the layers, each model, each concept with its SQL and typed table, the registers and the JSON, with no finding",
+      "key": "0011-documentation FR-029: commons' own site has the data models: the layers, each model, each concept with its SQL and typed table, the registers and the JSON, with no finding"
+    },
+    {
+      "id": "f-b6ffaa27972ab6c2",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45048157826",
+        "commit": "81a2f0b12db75e4471d1fe8db2a0f16b88d67668",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "5641c02c550e79b215069ff27f0600871c5d2b5aea3b10b6bba061dbccc7e176"
+      },
+      "at": "2026-11-22T17:19:21Z",
+      "code": "test-failed",
+      "file": "suite/program-lens.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0011-documentation FR-003: check writes nothing in the checkout and exits 0 on commons",
+      "key": "0011-documentation FR-003: check writes nothing in the checkout and exits 0 on commons"
+    },
+    {
+      "id": "f-bcd171eaed5a4d32",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45048157826",
+        "commit": "81a2f0b12db75e4471d1fe8db2a0f16b88d67668",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "5641c02c550e79b215069ff27f0600871c5d2b5aea3b10b6bba061dbccc7e176"
+      },
+      "at": "2026-11-22T17:19:21Z",
+      "code": "test-failed",
+      "file": "suite/consumer.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0001-docs FR-005, 0001-docs FR-006: the packed package installed into an empty project builds and checks a small repository at a private address, with relative links, no other host and the links to files made from the configuration",
+      "key": "0001-docs FR-005, 0001-docs FR-006: the packed package installed into an empty project builds and checks a small repository at a private address, with relative links, no other host and the links to files made from the configuration"
+    },
+    {
+      "id": "f-c434551b5054549a",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45048157826",
+        "commit": "81a2f0b12db75e4471d1fe8db2a0f16b88d67668",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "5641c02c550e79b215069ff27f0600871c5d2b5aea3b10b6bba061dbccc7e176"
+      },
+      "at": "2026-11-22T17:19:21Z",
+      "code": "test-failed",
+      "file": "suite/program-lens.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0011-documentation FR-003, 0011-documentation FR-009, 0011-documentation FR-041, 0001-docs FR-018, 0001-docs FR-019, 0001-docs FR-021: the site of commons builds with no finding, the same twice, with its sections, the Quality section and the issues of data",
+      "key": "0011-documentation FR-003, 0011-documentation FR-009, 0011-documentation FR-041, 0001-docs FR-018, 0001-docs FR-019, 0001-docs FR-021: the site of commons builds with no finding, the same twice, with its sections, the Quality section and the issues of data"
+    },
+    {
+      "id": "f-dd78185ee11e297a",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45048157826",
+        "commit": "81a2f0b12db75e4471d1fe8db2a0f16b88d67668",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "5641c02c550e79b215069ff27f0600871c5d2b5aea3b10b6bba061dbccc7e176"
+      },
+      "at": "2026-11-22T17:19:21Z",
+      "code": "test-failed",
+      "file": "suite/check.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0011-documentation FR-003, 0011-documentation FR-009, 0011-documentation FR-041, 0001-docs FR-018, 0001-docs FR-019, 0001-docs FR-021: the site of commons builds with no finding, the same twice, with its sections, the Quality section and the issues of data",
+      "key": "0011-documentation FR-003, 0011-documentation FR-009, 0011-documentation FR-041, 0001-docs FR-018, 0001-docs FR-019, 0001-docs FR-021: the site of commons builds with no finding, the same twice, with its sections, the Quality section and the issues of data"
+    },
+    {
+      "id": "f-e1ef7595f10b70c7",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45048157826",
+        "commit": "81a2f0b12db75e4471d1fe8db2a0f16b88d67668",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "5641c02c550e79b215069ff27f0600871c5d2b5aea3b10b6bba061dbccc7e176"
+      },
+      "at": "2026-11-22T17:19:21Z",
+      "code": "test-failed",
+      "file": "suite/guides.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0011-documentation FR-032, 0011-documentation FR-033: commons' site has the guides of every section with their citations and links resolved to pages, and a library map that names what each library imports",
+      "key": "0011-documentation FR-032, 0011-documentation FR-033: commons' site has the guides of every section with their citations and links resolved to pages, and a library map that names what each library imports"
+    },
+    {
+      "id": "f-e532f474b6076ea8",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45048157826",
+        "commit": "81a2f0b12db75e4471d1fe8db2a0f16b88d67668",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "5641c02c550e79b215069ff27f0600871c5d2b5aea3b10b6bba061dbccc7e176"
+      },
+      "at": "2026-11-22T17:19:21Z",
+      "code": "test-failed",
+      "file": "suite/check.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0011-documentation FR-003: check writes nothing in the checkout and exits 0 on commons",
+      "key": "0011-documentation FR-003: check writes nothing in the checkout and exits 0 on commons"
+    },
+    {
+      "id": "f-edc967d15a1fd70b",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45048157826",
+        "commit": "81a2f0b12db75e4471d1fe8db2a0f16b88d67668",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "5641c02c550e79b215069ff27f0600871c5d2b5aea3b10b6bba061dbccc7e176"
+      },
+      "at": "2026-11-22T17:19:21Z",
+      "code": "test-failed",
+      "file": "suite/layered-lens.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0011-documentation FR-029: commons' own site has the data models: the layers, each model, each concept with its SQL and typed table, the registers and the JSON, with no finding",
+      "key": "0011-documentation FR-029: commons' own site has the data models: the layers, each model, each concept with its SQL and typed table, the registers and the JSON, with no finding"
+    }
+  ]
+}
