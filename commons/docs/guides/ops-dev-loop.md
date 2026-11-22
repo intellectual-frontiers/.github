@@ -16,7 +16,7 @@ Once, `bun install`. Then `bun run dev:check` at the root finds the libraries yo
 2. `bun run dev:check` (and `bun run verify` in the library you touched).
 3. `bun run repoctl sync` so that no generated file is stale.
 4. `bun run repoctl commit -m "Subject" --refs N` (the commit has the identity, the trailers, no `.claude/`, no `node_modules`, no secret and no stale generated file).
-5. `bun run repoctl merge origin/main` (or `git pull --no-rebase origin main`): a generated file that conflicts is made again, never merged by hand.
+5. `bun run repoctl merge origin/main` (or `git pull --no-rebase origin main`): a generated file that conflicts is made again, never merged by hand. Set `git config user.name` and `user.email` to the identity of `repoctl.config.ts` first (an agent session sets them before its first pull): a merge made where they are not set credits another name, and `repoctl hygiene` reports it as `E-HYGIENE-IDENTITY` ([commons repoctl 0007-repoctl-hygiene FR-007](../../repoctl/spec-kit/specs/0007-repoctl-hygiene/spec.md)).
 6. `git push origin HEAD:main`. Never force-push; CI proves each step while the next is written.
 
 ## What CI runs that you run only where your change touches it

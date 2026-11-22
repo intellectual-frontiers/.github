@@ -131,6 +131,70 @@ async function mountStatus(port: number, uid: number): Promise<number> {
   });
 }
 
+/** MNT of `/` then SETATTR of the mode of the root, over TCP and written out by hand from RFC 1813: the status SETATTR answers with (0 accepted, 10004 not supported). */
+async function setModeStatus(port: number, uid: number): Promise<number> {
+  const { connect } = await import("node:net");
+  const u32 = (...n: number[]): number[] => n.flatMap((x) => [(x >>> 24) & 255, (x >>> 16) & 255, (x >>> 8) & 255, x & 255]);
+  const machine = [...new TextEncoder().encode("test")];
+  const cred = [...u32(0), ...u32(machine.length), ...machine, ...u32(uid, uid, 0)];
+  const socket = await new Promise<import("node:net").Socket>((resolve, reject) => {
+    const x = connect(port, "127.0.0.1", () => resolve(x));
+    x.on("error", reject);
+  });
+  const call = (xid: number, program: number, proc: number, args: number[]): Promise<Uint8Array> =>
+    new Promise((resolve) => {
+      const body = [...u32(xid, 0, 2, program, 3, proc, 1, cred.length), ...cred, ...u32(0, 0), ...args];
+      const framed = Uint8Array.from([...u32((0x80000000 | body.length) >>> 0), ...body]);
+      let got = Buffer.alloc(0);
+      const on = (d: Buffer): void => {
+        got = Buffer.concat([got, d]);
+        if (got.length >= 4 && got.length >= 4 + (got.readUInt32BE(0) & 0x7fffffff)) {
+          socket.off("data", on);
+          resolve(new Uint8Array(got.subarray(4)));
+        }
+      };
+      socket.on("data", on);
+      socket.write(framed);
+    });
+  try {
+    const path = [...new TextEncoder().encode("/")];
+    const mnt = await call(1, 100005, 1, [...u32(path.length), ...path, 0, 0, 0]);
+    const view = new DataView(mnt.buffer, mnt.byteOffset, mnt.byteLength);
+    if (view.getUint32(24) !== 0) return view.getUint32(24);
+    const fhLength = view.getUint32(28);
+    const fh = [...mnt.subarray(32, 32 + fhLength)];
+    const pad = (4 - (fhLength % 4)) % 4;
+    // SETATTR3: the handle, then sattr3 with a mode set to 0o600 and nothing else, then no guard
+    const args = [...u32(fhLength), ...fh, ...Array(pad).fill(0), ...u32(1, 0o600, 0, 0, 0, 0, 0), ...u32(0)];
+    const set = await call(2, 100003, 2, args);
+    return new DataView(set.buffer, set.byteOffset, set.byteLength).getUint32(24);
+  } finally {
+    socket.destroy();
+  }
+}
+
+proves(["0006-anyfs-cli-serve FR-005"], "serve --nfs accepts and counts a mode that a client sets by default, and refuses it where --nfs-attributes refuse says so, and says which applies", () =>
+  withLab(async (l) => {
+    const mine = process.getuid?.() ?? 0;
+    const plain = await start(l, ["--nfs", "docs:/"]);
+    try {
+      assertStringIncludes(plain.stderr(), "accepted without effect and counted");
+      const port = Number(/on 127\.0\.0\.1:(\d+)/u.exec(plain.stderr())?.[1]);
+      assertEquals(await setModeStatus(port, mine), 0, "the default of the command line is ignore: SETATTR of a mode is accepted");
+    } finally {
+      assertEquals(await plain.stop(), 0, plain.stderr());
+    }
+    const strict = await start(l, ["--nfs", "--nfs-attributes", "refuse", "docs:/"]);
+    try {
+      assertStringIncludes(strict.stderr(), "refused");
+      const port = Number(/on 127\.0\.0\.1:(\d+)/u.exec(strict.stderr())?.[1]);
+      assertEquals(await setModeStatus(port, mine), 10004, "with refuse the same SETATTR is NFS3ERR_NOTSUPP");
+    } finally {
+      assertEquals(await strict.stop(), 0, strict.stderr());
+    }
+  }),
+);
+
 proves(["0006-anyfs-cli-serve FR-005"], "serve --nfs hosts the store as NFS on the loopback for the uid of the account and root, says the mount command on standard error, and refuses what does not fit", () =>
   withLab(async (l) => {
     const s = await start(l, ["--nfs", "docs:/"]);

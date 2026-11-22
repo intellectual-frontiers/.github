@@ -96,10 +96,36 @@ const generators: readonly GeneratorInput[] = [
   },
 ];
 
+/**
+ * Merge commits that were made before `repoctl hygiene` checked them, by a `git pull` where no `user.name` and `user.email` were set (68 authored as Claude, 36 as another address of the owner, 3 as a third): held by the first twelve characters of their hashes. History is never rewritten
+ * (commons repoctl 0007-repoctl-hygiene FR-007), so this list only shrinks; a new merge by another identity is a finding, and a hash here that matches no merge is a warning.
+ */
+const HELD_MERGES = [
+  "7edb0b2ea3a5", "26dd63e6bc9a", "558e3e86d045", "36bc191848a8", "86425c129a91", "0f2a7e2a46da",
+  "7ae74cf7d89c", "dd0c192714ba", "3b162c4685c1", "79257638f295", "3464e88f0ffa", "056a6018a475",
+  "413756f2843e", "10a2b285c171", "b2f9e8c59337", "2661651a6421", "6086c6732d33", "a414ed922034",
+  "bc47bb91ed00", "24810573a16a", "a2b68e6323fe", "8a5d28fd9daf", "e6687e4bbebf", "e7becc115224",
+  "ad8fa60e9915", "e3dec9065c90", "5c6022bedf4b", "404369ead5c2", "67e2ba0a50a7", "cd0d23e7ae3b",
+  "cafd3640e16d", "51c457fbeb4a", "fa5c42bdd19a", "f62c972cdce5", "c7d3e381a63f", "df7a7668a03b",
+  "2916e7278433", "ad3705cabf6c", "3d857395dca1", "936dda3072bb", "d86a1e066b5a", "4cdfa08268ef",
+  "6b7b0679d50b", "83a4ebc917a8", "8320c89136fd", "810400a8de86", "3465f1f84d38", "f349c6efbfea",
+  "401b3a1a8b4f", "d9a010b9ef1b", "b479c756f9a9", "6e6f49d35a51", "d81f17036cca", "d862b08f53ff",
+  "a54b0d7956b5", "0c60a05c988e", "1cff13b47b9a", "1a5b2af7477e", "ebcb61a6639a", "f87fdc634cbf",
+  "35e4a6655b09", "b2d1f9127e58", "21d308308a93", "318ff299309c", "1619eac26209", "7e357f82ba46",
+  "8b12d9f02563", "414df6a59aab", "7dd38c6116fc", "cfa9a66d91d3", "64e4197ea560", "4afeac1fab5b",
+  "12958f5dee6a", "30ef02da6b24", "5b18e419d4d6", "8be70335379c", "8b901e14e361", "4314a7549cc8",
+  "209aefbf2659", "b59d9ff83d2e", "8371f0d93dc0", "35ea42fdce06", "e9c3b8c702fa", "403ce6a1da41",
+  "5b6c42864adb", "55b29e508fb4", "cd0d846a6b6b", "2c3043e69cfa", "7eb19873acac", "46ae573d560d",
+  "10d471e7860e", "49d418a01adf", "75e2e685bf61", "ecbbc699248a", "da361307be00", "d4ad353d044e",
+  "ccb4cb779354", "0fc109ddc308", "910c1c7d7e08", "5012971602d5", "02c17b68e11e", "821cd4be17e5",
+  "16bb50016b3a", "b8ce4feeed68", "a6ff63b5f352", "ae8bdfaa547a", "ad702429cb8f",
+] as const;
+
 export default defineConfig({
   repo: "intellectual-frontiers/.github",
   commit: {
     identity: { name: "Shahid Shah", email: "47497+shah@users.noreply.github.com" },
+    heldMerges: HELD_MERGES,
     issue: { prefix: "Refs #", required: false },
     trailers: ["issue", "impact", "co-author", "session"],
     coAuthor: "Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>",

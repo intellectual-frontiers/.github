@@ -24,6 +24,9 @@ import { environment, type Host, usage, viewable } from "@intellectual-frontiers
 import { prefixOfBound } from "../bind.ts";
 import { bindAll, defineVerb } from "./common.ts";
 
+/** What the command line does with a mode, an owner or a time the store cannot keep when the option is not given: accept it without effect and count it (0006-anyfs-cli-serve FR-005), where the library's own default is to refuse it (0006-anyfs-serve-nfs FR-009). */
+export const DEFAULT_NFS_ATTRIBUTES = "ignore" as const;
+
 /** Resolves when the context or the world asks the run to end. */
 function untilStopped(ctx: Context, host: Host): Promise<void> {
   return new Promise<void>((resolve) => {
@@ -49,7 +52,7 @@ const serve = (host: Host): Command =>
       allowHost: value({ valueName: "HOST[,HOST]", help: "The host names that may be asked for when the address is not the loopback (the Host header), so that a page of another site cannot reach the server." }),
       readOnly: flag({ help: "Serve nothing that changes the store, whatever the store can do." }),
       nfs: flag({ help: "Serve as NFS version 3 on the loopback instead of WebDAV: no token (the callers are the uid of this account and root), and the mount command is printed." }),
-      nfsAttributes: value({ valueName: "refuse|ignore", help: "With --nfs: what to do with a mode, an owner or a time the store cannot keep: refuse it (default), or accept it without effect." }),
+      nfsAttributes: value({ valueName: "refuse|ignore", help: "With --nfs: what to do with a mode, an owner or a time the store cannot keep: accept it without effect and count it (default), or refuse it." }),
     },
     operands: [{ name: "LOCATION", help: "The place to serve: a mount, a folder, an address; a directory below the root of a store is served as the root.", arity: "one" }],
     examples: [
@@ -91,12 +94,13 @@ const serve = (host: Host): Command =>
       const where = `${b.text} (${asked ? "read-only" : "read-write"}) on ${exposure.kind === "loopback" ? "the loopback" : exposure.hostname}`;
       if (args.options.nfs) {
         if (ctx.mode !== "apply") return outcomeOf({ location: b.text, readOnly: asked, port, served: false, protocol: "nfs" }, { text: `would serve ${where} as ${protocol}` });
-        const nfs = await serveNfs(store, { port, readOnly: asked, ...(attributes === undefined ? {} : { attributes }), ...(mine === undefined ? {} : { uids: [mine, 0] }) });
+        const nfs = await serveNfs(store, { port, readOnly: asked, attributes: attributes ?? DEFAULT_NFS_ATTRIBUTES, ...(mine === undefined ? {} : { uids: [mine, 0] }) });
         if (nfs.kind === "err") return environment("E-OPEN", nfs.error);
         const n = nfs.value;
         h.world.notice(`serving ${where} as ${protocol} on ${n.hostname}:${n.port}`);
         h.world.notice(`mount: ${n.mountCommand("DIRECTORY")}`);
         h.world.notice(`callers: ${mine === undefined ? "any" : `uid ${mine} and root`}; nothing is kept that a store has no place for (modes, owners, times, links)`);
+        h.world.notice(`attributes: a mode, an owner or a time that is set is ${(attributes ?? DEFAULT_NFS_ATTRIBUTES) === "ignore" ? "accepted without effect and counted" : "refused"}`);
         h.world.notice("stop with Ctrl-C");
         await untilStopped(ctx, h);
         const failed = await n.close();
