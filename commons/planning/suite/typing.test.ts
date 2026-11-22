@@ -33,7 +33,7 @@ function code(text: string): string {
 
 const PURE = [...files(join(ROOT, "src", "governance")), ...files(join(ROOT, "src", "logical"))];
 
-proves(["0002-planning-core FR-009"], "the governance and logical sources hold no any, no non-null assertion, no enum and no cast but the one brand", () => {
+proves(["0002-planning-core FR-009", "0003-planning-reconcile FR-014"], "the governance and logical sources hold no any, no non-null assertion, no enum and no cast but the one brand", () => {
   assert(PURE.length >= 19, "the sources were found");
   for (const file of PURE) {
     const text = code(readTextFileSync(file));
@@ -98,7 +98,7 @@ proves(["0002-planning-core FR-009"], "an item, an actor and an id that were not
 const FORBIDDEN_IMPORTS = [/from\s+"node:/, /from\s+"@intellectual-frontiers\/system/, /from\s+"@intellectual-frontiers\/telemetry/, /require\(/, /\bimport\(/];
 const FORBIDDEN_GLOBALS = [/\bDate\.now\s*\(/, /\bnew\s+Date\s*\(\s*\)/, /\bMath\.random\b/, /\bperformance\b/, /\bgetRandomValues\b/, /\brandomUUID\b/, /\bfetch\s*\(/, /\bprocess\./, /\bBun\./, /\bsetTimeout\b/, /\bsetInterval\b/, /\bconsole\./, /\bglobalThis\b/];
 
-proves(["0002-planning-core FR-008"], "the governance and logical sources import no module of the system, read no clock, use no random source and make no call out", () => {
+proves(["0002-planning-core FR-008", "0003-planning-reconcile FR-014"], "the governance and logical sources import no module of the system, read no clock, use no random source and make no call out", () => {
   for (const file of PURE) {
     const text = code(readTextFileSync(file));
     const where = file.slice(ROOT.length);
