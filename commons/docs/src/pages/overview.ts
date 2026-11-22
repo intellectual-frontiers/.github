@@ -8,10 +8,10 @@
  * @module
  */
 import { absurd } from "@intellectual-frontiers/core";
-import type { Build } from "../build.ts";
+import { type Build, itemsOf } from "../build.ts";
 import { type About, type AboutEnforcer, under } from "../config.ts";
 import { specPage } from "../links.ts";
-import { type Block, type Card, type Inline, possessive } from "../model.ts";
+import { type Block, type Card, type Inline, possessive, type Stat } from "../model.ts";
 import { type Area, areaFiles, type Package } from "../sources.ts";
 import { exampleBlocks } from "./areas.ts";
 import { numberOf } from "./specs.ts";
@@ -146,6 +146,20 @@ function capabilityCards(b: Build): Card[] {
   return b.kit.specs.filter((s) => s.partOf === undefined).map((s) => cardOf(s.id));
 }
 
+/** The tiles of the first page (docs 0001-docs FR-038): what the site is about, counted from what it holds and linked to where it is read. */
+function statsOf(b: Build, libraries: number): Block {
+  const requirements = b.kit.specs.reduce((n, sp) => n + itemsOf(sp.body).filter((i) => i.startsWith("FR-")).length, 0);
+  let exports = 0;
+  for (const m of b.exports.values()) exports += m.size;
+  const items: Stat[] = [
+    { value: String(libraries), label: "libraries", href: { kind: "page", path: "index.html", anchor: "libraries" } },
+    { value: String(b.kit.specs.length), label: "specifications", href: { kind: "page", path: "specs/index.html" } },
+    { value: String(requirements), label: "requirements", href: { kind: "page", path: "specs/index.html" } },
+    ...(exports === 0 ? [] : [{ value: String(exports), label: "exports in the API", href: { kind: "page", path: "api/index.html" } } satisfies Stat]),
+  ];
+  return { kind: "stats", items };
+}
+
 /**
  * The home page and a page for each package.
  *
@@ -175,6 +189,7 @@ export function overviewPages(b: Build, top: Package, packages: readonly Package
     order: 0,
     blocks: [
       ...b.md(top.about.summary, homeScope),
+      statsOf(b, packages.length),
       heading("libraries", "Libraries"),
       {
         kind: "cards",

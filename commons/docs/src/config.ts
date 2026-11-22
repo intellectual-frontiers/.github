@@ -238,6 +238,8 @@ export interface DocsConfig {
   readonly books?: BooksConfig;
   /** The evidence the site shows beside the code: test results, issues, tickets (docs 0001-docs FR-009); none by default. */
   readonly evidence?: EvidenceSource;
+  /** The package the site is the documentation of (docs 0001-docs FR-033): its `package.json` (the version shown where the registry says none) and the file that records its release (the commits since it are counted from the commit that made it), both from the root. */
+  readonly release?: ReleaseSource;
   /** What could not be read while the configuration was made, each a finding of the site (docs 0001-docs FR-015): the configuration goes on without it, so that one library does not stop the site. */
   readonly problems?: readonly { readonly where: string; readonly error: string }[];
 }
@@ -302,6 +304,8 @@ export interface Config {
   readonly books: BooksConfig;
   /** The evidence the site shows. */
   readonly evidence: EvidenceSource | undefined;
+  /** The package whose release the site shows. */
+  readonly release: ReleaseSource | undefined;
   /** What could not be read while the configuration was made. */
   readonly problems: readonly { readonly where: string; readonly error: string }[];
 }
@@ -345,6 +349,14 @@ export function isAbout(v: unknown): v is About {
 /** Whether a value is a lens: a name and a `read` function. */
 function isLens(v: unknown): v is Lens {
   return isRecord(v) && typeof v["name"] === "string" && typeof v["read"] === "function";
+}
+
+/** The package a site shows the release of. */
+export interface ReleaseSource {
+  /** The package's `package.json`, from the root. */
+  readonly package: string;
+  /** The file that records its release, from the root. */
+  readonly record?: string;
 }
 
 /** The evidence of a configuration checked (docs 0001-docs FR-009): paths that are strings, and issues of the shape the site reads. */
@@ -581,6 +593,12 @@ export function resolveConfig(value: unknown, file: string): Result<Config, stri
   }
   const books = booksOf(value["books"], bad);
   const evidence = evidenceOf(value["evidence"], bad);
+  const rawRelease = value["release"];
+  let release: ReleaseSource | undefined;
+  if (rawRelease !== undefined) {
+    if (!isRecord(rawRelease) || typeof rawRelease["package"] !== "string" || rawRelease["package"] === "" || (rawRelease["record"] !== undefined && typeof rawRelease["record"] !== "string")) bad("release must be { package: PATH of a package.json from the root, record?: PATH of the release record }");
+    else release = { package: rawRelease["package"], ...(typeof rawRelease["record"] === "string" ? { record: rawRelease["record"] } : {}) };
+  }
   if (presentations.includes("book") && books.volumes.length === 0) bad("presentations names book, and books names no volume");
   if (problems.length > 0) return err(problems);
   return ok({
@@ -603,6 +621,7 @@ export function resolveConfig(value: unknown, file: string): Result<Config, stri
     presentations,
     books,
     evidence,
+    release,
     problems: (Array.isArray(value["problems"]) ? value["problems"] : []).filter((x): x is { where: string; error: string } => isRecord(x) && typeof x["where"] === "string" && typeof x["error"] === "string"),
   });
 }

@@ -12,10 +12,12 @@ import type { Block, Inline } from "../model.ts";
 const text = (t: string): Inline => ({ kind: "text", text: t });
 const code = (t: string): Inline => ({ kind: "code", text: t });
 const th = (...hs: string[]): Inline[][] => hs.map((h) => [text(h)]);
-const mb = (bytes: number): string => `${(bytes / 1_048_576).toFixed(2)} MB`;
+/** A size in mebibytes, to two places. */
+export const mb = (bytes: number): string => `${(bytes / 1_048_576).toFixed(2)} MB`;
 const share = (value: number, of: number): string => (of <= 0 ? "" : `${((value / of) * 100).toFixed(1)}% of the budget`);
 
-function budgetTable(r: PackageReport): Block {
+/** The package against its budget: files, apparent size and tarball, each with its share. */
+export function budgetTable(r: PackageReport): Block {
   const rows: [string, string, string, string][] = [
     ["Files", String(r.total.files), String(r.budget.files), share(r.total.files, r.budget.files)],
     ["Apparent size", mb(r.total.bytes), mb(r.budget.apparentBytes), share(r.total.bytes, r.budget.apparentBytes)],
@@ -24,11 +26,13 @@ function budgetTable(r: PackageReport): Block {
   return { kind: "table", head: th("", "Now", "Budget", "Share"), rows: rows.map(([a, c, d, e]) => [[text(a)], [text(c)], [text(d)], [text(e)]]) };
 }
 
-function kindTable(r: PackageReport): Block {
+/** The bytes and files of the package by kind of file. */
+export function kindTable(r: PackageReport): Block {
   return { kind: "table", head: th("Kind of file", "Files", "Size"), rows: Object.entries(r.total.byKind).map(([k, v]) => [[text(k)], [text(String(v.files))], [text(mb(v.bytes))]]) };
 }
 
-function libraryTable(r: PackageReport): Block {
+/** The libraries of the package, the largest first, with their bytes by kind of file. */
+export function libraryTable(r: PackageReport): Block {
   const kinds = [...new Set(r.libraries.flatMap((l) => Object.keys(l.byKind)))].sort();
   return {
     kind: "table",
@@ -38,7 +42,8 @@ function libraryTable(r: PackageReport): Block {
   };
 }
 
-function peerTable(r: PackageReport): Block {
+/** What the package installs and what it asks of the consumer, the optional peers named. */
+export function peerTable(r: PackageReport): Block {
   const deps = Object.entries(r.dependencies).map(([n, v]) => [[code(n)], [text("installed with the package")], [text(v)]]);
   const peers = Object.entries(r.peerDependencies).map(([n, v]) => [[code(n)], [text(r.optionalPeers.includes(n) ? "optional peer: the consumer installs it" : "peer: the consumer has it")], [text(v)]]);
   return { kind: "table", head: th("Package", "How", "Version or range"), rows: [...deps, ...peers] };

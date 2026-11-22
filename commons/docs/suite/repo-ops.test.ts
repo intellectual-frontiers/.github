@@ -58,7 +58,7 @@ proves(["0001-docs FR-029"], "the site of commons has the section Repo Ops with 
   const built = await buildSite(CONFIG);
   assertEquals(built.found, []);
   const ops = built.pages.filter((p) => p.section === "repoops").map((p) => p.path).sort();
-  assertEquals(ops, ["repo-ops/ci-cd.html", "repo-ops/dev-loop.html", "repo-ops/index.html", "repo-ops/release.html", "repo-ops/repoctl.html"]);
+  assertEquals(ops, ["repo-ops/ci-cd.html", "repo-ops/dev-loop.html", "repo-ops/index.html", "repo-ops/packaging.html", "repo-ops/release.html", "repo-ops/repoctl.html"]);
   const { workflows } = await viaRoot<{ workflows: () => readonly { file: string }[] }>("commons/libraries/src/workflows/definitions.ts");
   const { VERBS } = await viaRoot<{ VERBS: Record<string, { id: string; summary: string }> }>("commons/repoctl/src/governance/verbs.ts");
   const ci = text(built.pages.find((p) => p.path === "repo-ops/ci-cd.html")?.blocks);

@@ -83,6 +83,8 @@ function block(b: Block, from: string, level: number): string[] {
       return [...cards(b.cards, from, 0), ""];
     case "badges":
       return [b.badges.map((x) => `\`${x.text}\``).join(" "), ""];
+    case "stats":
+      return [b.items.map((x) => `**${x.value}** ${x.label}`).join(" · "), ""];
     case "trend":
       return [`*${b.label}: ${sparkText(b.values)} (${b.values.length === 0 ? "no runs" : `${Math.min(...b.values)} to ${Math.max(...b.values)}${b.unit === undefined ? "" : ` ${b.unit}`}, latest ${b.values[b.values.length - 1]}`})*`, ""];
     case "tree":

@@ -482,7 +482,7 @@ const site: Workflow = {
       when: `always() && ${onMainOrSchedule}`,
       runsOn: "ubuntu-24.04",
       timeoutMinutes: 20,
-      permissions: { contents: "read", issues: "read", actions: "read" },
+      permissions: { contents: "read", issues: "read", actions: "read", packages: "read" },
       steps: [
         checkout({ fetchDepth: 0, comment: "the whole history, for the page of hotspots and owners" }),
         bun(),
@@ -515,6 +515,27 @@ const site: Workflow = {
             "ls -l _evidence | sed -n '1,80p'",
           ),
           { name: "The open issues, the runs of the workflows, and which build this is", shell: "bash", continueOnError: true, env: { GH_TOKEN: expr("github.token") } },
+        ),
+        run(
+          lines(
+            "mkdir -p _evidence",
+            "# the versions the package registry holds, with their days: the version in the heading of every page (docs 0001-docs FR-033, FR-039). A registry that cannot be read is a file that says why, which the site shows as a finding, never a stop.",
+            "set -o pipefail",
+            "if gh api --paginate -X GET \"/orgs/$GITHUB_REPOSITORY_OWNER/packages/npm/commons/versions\" -f per_page=100 --jq '.[]' | jq -s '{ versions: [ .[] | { version: .name, createdAt: .created_at } ] }' > _evidence/registry.json.new; then mv _evidence/registry.json.new _evidence/registry.json; else rm -f _evidence/registry.json.new; printf '{ \"error\": \"the package registry could not be read with the token of this job\" }\\n' > _evidence/registry.json; fi",
+            "cat _evidence/registry.json | head -c 600",
+          ),
+          { name: "The versions the package registry holds", id: "registry", shell: "bash", continueOnError: true, env: { GH_TOKEN: expr("github.token") } },
+        ),
+        { ...tools("commons/commons", "The packages of the one package's own tools (commons commons)"), continueOnError: true },
+        run(
+          lines(
+            "# what the packer says of the package at this commit, for the pages of the package (docs 0001-docs FR-032, FR-034, FR-039); where it cannot be made, no file is kept and the pages say nothing was measured",
+            "bun install --frozen-lockfile",
+            "bun commons/libraries/src/link.ts",
+            "(cd commons/commons && bun tools/pack.ts --size > \"$RUNNER_TEMP/pack.log\" 2>&1; tail -n 5 \"$RUNNER_TEMP/pack.log\")",
+            "cp commons/commons/dist/package-report.json _evidence/package.report.json || echo 'the package could not be measured'",
+          ),
+          { name: "The package, measured", id: "package", shell: "bash", continueOnError: true },
         ),
         run('set -o pipefail; bun src/main.ts build --out "$GITHUB_WORKSPACE/_site" 2>&1 | tee "$RUNNER_TEMP/build.log"', { name: "The site, built", id: "build", continueOnError: true, shell: "bash", workingDirectory: "commons/docs" }),
         run('bun tools/status-site.ts --evidence "$GITHUB_WORKSPACE/_evidence" --log "$RUNNER_TEMP/build.log" --out "$GITHUB_WORKSPACE/_site"', {

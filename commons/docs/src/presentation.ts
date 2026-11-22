@@ -27,18 +27,22 @@ export interface Made {
   readonly found: readonly Finding[];
 }
 
+/** The typefaces of the site (FR-035): Latin subsets of two variable fonts under the SIL Open Font License 1.1, with their license texts, served by the site itself. */
+const FONTS = ["inter-latin-wght-normal.woff2", "jetbrains-mono-latin-wght-normal.woff2", "Inter-OFL.txt", "JetBrainsMono-OFL.txt"] as const;
+
 /** The files of the theme (beside this module, in the source and in the package alike), and where the site serves them. */
 function assets(): readonly OutFile[] {
   const theme = (f: string): string => path.fromFileUrl(new URL(`./theme/${f}`, import.meta.url));
   return [
     { path: "assets/site.css", from: theme("site.css") },
     { path: "assets/site.js", from: theme("site.js") },
+    ...FONTS.map((f): OutFile => ({ path: `assets/fonts/${f}`, from: theme(`fonts/${f}`) })),
   ];
 }
 
 const web = (config: Config, built: Built): Made => {
   const sections = [...new Set(built.pages.map((p) => p.section))];
-  const site = { name: config.name, repository: config.repository, pages: built.pages, sections };
+  const site = { name: config.name, repository: config.repository, pages: built.pages, sections, ...(built.release === undefined ? {} : { release: built.release }) };
   const pages = [...built.pages].sort((a, b) => (a.path < b.path ? -1 : 1));
   return {
     files: [

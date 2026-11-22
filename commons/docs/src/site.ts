@@ -15,6 +15,8 @@ import { type Config, type PresentationId, under } from "./config.ts";
 import { diagramSources, drawable } from "./emit/html.ts";
 import { markdownOf } from "./emit/markdown.ts";
 import { readEvidence } from "./evidence.ts";
+import type { Release } from "./published.ts";
+import { readRelease } from "./published-read.ts";
 import { presentationFiles, writeFiles } from "./presentation.ts";
 import { gitPage } from "./pages/git.ts";
 import { impactPage } from "./pages/impact.ts";
@@ -38,6 +40,8 @@ export interface Built {
   readonly found: readonly Finding[];
   /** The files the lenses added beside the pages (the JSON of a model). */
   readonly files: readonly SiteFile[];
+  /** The release of the package the site documents (FR-033), where the configuration names a package. */
+  readonly release?: Release;
 }
 
 /** The section home pages for the API and the models, which list the areas and the models. */
@@ -166,6 +170,7 @@ function hrefsOf(bs: readonly Block[]): Href[] {
         case "diagram":
         case "badges":
         case "trend":
+        case "stats":
           break;
         default:
           absurd(b);
@@ -291,7 +296,8 @@ export async function buildSite(config: Config): Promise<Built> {
   });
   const bom = sbom(b);
   const files = [...lensFiles, ...qualityData(b), ...(bom === undefined ? [] : [bom])];
-  return { pages: b.pages, found: b.found, files };
+  const release = await readRelease(config, b.evidence);
+  return { pages: b.pages, found: b.found, files, ...(release === undefined ? {} : { release }) };
 }
 
 /**

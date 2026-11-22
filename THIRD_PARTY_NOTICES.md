@@ -7,6 +7,22 @@ Where an item says `unverified:` the license was recorded from a secondary sourc
 
 Packages installed from a registry (listed in `bun.lock`) are not vendored: nothing of them is in this repository, and each package carries its own license.
 
+## `commons/docs/src/theme/fonts/inter-latin-wght-normal.woff2`
+
+- **What**: Inter, the variable font, Latin subset (48256 bytes), the typeface of the documentation site's text; its license text is beside it in Inter-OFL.txt.
+- **Source**: https://github.com/rsms/inter, as packaged by the npm package @fontsource-variable/inter 5.3.0 (the file files/inter-latin-wght-normal.woff2, SHA-256 3100e775e8616cd2611beecfa23a4263d7037586789b43f035236a2e6fbd4c62).
+- **Owner**: The Inter Project Authors.
+- **License**: OFL-1.1 (SIL Open Font License 1.1), the package's own license field and the LICENSE it carries, copied unchanged to commons/docs/src/theme/fonts/Inter-OFL.txt.
+- **Checked**: The license text of the package was read on 2026-11-22 and is the OFL 1.1 with the Inter Project's copyright line. The font is used unmodified and not sold on its own.
+
+## `commons/docs/src/theme/fonts/jetbrains-mono-latin-wght-normal.woff2`
+
+- **What**: JetBrains Mono, the variable font, Latin subset (40404 bytes), the typeface of code on the documentation site; its license text is beside it in JetBrainsMono-OFL.txt.
+- **Source**: https://github.com/JetBrains/JetBrainsMono, as packaged by the npm package @fontsource-variable/jetbrains-mono 5.3.0 (the file files/jetbrains-mono-latin-wght-normal.woff2, SHA-256 18be452724bfdc236c074ca94a249a7f41a86752c7d04ab258ce9ed5651f6a7e).
+- **Owner**: The JetBrains Mono Project Authors.
+- **License**: OFL-1.1 (SIL Open Font License 1.1), the package's own license field and the LICENSE it carries, copied unchanged to commons/docs/src/theme/fonts/JetBrainsMono-OFL.txt.
+- **Checked**: The license text of the package was read on 2026-11-22 and is the OFL 1.1 with the JetBrains Mono Project's copyright line. The font is used unmodified and not sold on its own.
+
 ## `commons/libraries/src/workflows/schema/github-workflow.schema.json`
 
 - **What**: The JSON Schema of GitHub Actions workflows, the copy fetched on 2026-11-19, which the tests validate the generated workflows against.

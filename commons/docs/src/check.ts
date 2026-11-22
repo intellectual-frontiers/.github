@@ -27,6 +27,7 @@ export type Problem =
   | { readonly kind: "diagram-undrawable"; readonly first: string }
   | { readonly kind: "book-part-empty"; readonly volume: string; readonly part: string }
   | { readonly kind: "evidence-unreadable"; readonly why: string }
+  | { readonly kind: "registry-unreadable"; readonly why: string }
   | { readonly kind: "test-requirement-unknown"; readonly requirement: string; readonly test: string }
   | { readonly kind: "retired-name"; readonly name: string }
   | { readonly kind: "forbidden-word"; readonly word: string };
@@ -74,6 +75,8 @@ export function message(p: Problem): string {
       return `has a diagram that cannot be drawn (it is not a flowchart, state, sequence, class or entity-relationship diagram, or it is not valid): ${p.first}`;
     case "evidence-unreadable":
       return `cannot be read as evidence: it ${p.why}`;
+    case "registry-unreadable":
+      return `says the package registry could not be read (${p.why}), so the site shows the version of package.json as unconfirmed`;
     case "test-requirement-unknown":
       return `holds a test, "${p.test}", that proves ${p.requirement}, which is not a requirement of the spec kits`;
     case "book-part-empty":

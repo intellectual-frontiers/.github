@@ -187,6 +187,8 @@ function blockAdoc(b: Block, scope: AdocScope, at: AdocPage, depth: number): str
       return [...cardsAdoc(b.cards, scope, 0), ""];
     case "badges":
       return [b.badges.map((x) => codeAdoc(x.text)).join(" "), ""];
+    case "stats":
+      return [b.items.map((x) => `${textAdoc(x.value)} ${textAdoc(x.label)}`).join(" | "), ""];
     case "trend":
       return [`__${textAdoc(`${b.label}: ${b.values.length === 0 ? "no runs" : `${Math.min(...b.values)} to ${Math.max(...b.values)}${b.unit === undefined ? "" : ` ${b.unit}`}, latest ${b.values[b.values.length - 1]}`}`)}__`, ""];
     case "tree":

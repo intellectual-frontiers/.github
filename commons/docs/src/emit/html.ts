@@ -11,6 +11,7 @@ import { absurd } from "@intellectual-frontiers/core";
 import { highlightedHtml } from "../highlight.ts";
 import type { Badge, Block, Card, Href, Inline, Lang, Page, Section, TreeNode } from "../model.ts";
 import { plain } from "../model.ts";
+import type { Release } from "../published.ts";
 
 /** What every page shares: the site's name, the navigation of each section, and the address of the repository. */
 export interface Site {
@@ -22,6 +23,8 @@ export interface Site {
   readonly pages: readonly Page[];
   /** The sections the top bar shows, where not all four: a site leaves out a section with no page (FR-009). */
   readonly sections?: readonly Section[];
+  /** The release of the package the site documents (FR-033): its version is in the heading of every page. */
+  readonly release?: Release;
 }
 
 /** The names of the sections, in the order the top bar shows them, and the page each opens on. */
@@ -262,6 +265,8 @@ export function block(b: Block, from: string): string {
       return `<div class="cards">${b.cards.map((c) => card(c, from)).join("")}</div>`;
     case "badges":
       return `<p class="badge-row">${b.badges.map(badge).join("")}</p>`;
+    case "stats":
+      return `<ul class="stats">${b.items.map((x) => `<li class="stat">${x.href === undefined ? "" : `<a class="stat-link" href="${escape(hrefOf(x.href, from))}">`}<span class="stat-value">${escape(x.value)}</span><span class="stat-label">${escape(x.label)}</span>${x.href === undefined ? "" : "</a>"}</li>`).join("")}</ul>`;
     case "trend":
       return trendHtml(b.label, b.values, b.unit);
     case "tree":
@@ -299,6 +304,7 @@ export function hasDiagram(bs: readonly Block[]): boolean {
       case "cards":
       case "badges":
       case "trend":
+      case "stats":
       case "tree":
         return false;
       default:
@@ -379,6 +385,18 @@ function navHtml(pages: readonly Page[], current: Page, from: string): string {
     .join("");
 }
 
+/** The previous and the next page of a page in the order of the side navigation of its section (FR-037): the groups in order and the pages of each in order. */
+export function neighbours(pages: readonly Page[], current: Page): { readonly previous: Page | undefined; readonly next: Page | undefined } {
+  const flat = navigation(pages, current.section).flatMap((g) => g.pages);
+  const at = flat.findIndex((p) => p.path === current.path);
+  return at < 0 ? { previous: undefined, next: undefined } : { previous: flat[at - 1], next: flat[at + 1] };
+}
+
+/** The tooltip of the version: where it was read. */
+function versionTitle(r: Release): string {
+  return r.source === "registry" ? `The newest version on the package registry${r.date === undefined ? "" : `, published ${r.date}`}` : "The version of package.json: not confirmed on the package registry";
+}
+
 /**
  * A page as a whole HTML document.
  *
@@ -389,48 +407,71 @@ export function document(page: Page, site: Site): string {
   const from = page.path;
   const root = relative(from, "index.html").replace(/index\.html$/, "");
   const asset = (name: string): string => `${root}assets/${name}`;
+  const release = site.release;
+  const versioned = release === undefined ? site.name : `${site.name} v${release.version}`;
+  const section = SECTIONS.find((s) => s.section === page.section);
   const top = SECTIONS.filter((s) => site.sections === undefined || site.sections.includes(s.section)).map((s) =>
     `<a class="section-link${s.section === page.section ? " current" : ""}" href="${escape(relative(from, s.home))}">${escape(s.label)}</a>`
   ).join("");
   const nav = navHtml(site.pages, page, from);
   const toc = outline(page.blocks);
-  const tocHtml = toc.length < 2
+  const tocItems = toc.map((t) => `<li class="toc-${t.level}"><a href="#${escape(t.id)}">${escape(t.text)}</a></li>`).join("");
+  const tocHtml = toc.length < 2 ? "" : `<nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p><ul>${tocItems}</ul></nav>`;
+  const tocMobile = toc.length < 2 ? "" : `<details class="toc-mobile"><summary>On this page</summary><ul>${tocItems}</ul></details>`;
+  const isHome = page.path === "index.html";
+  const crumbs = isHome || section === undefined
     ? ""
-    : `<nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p><ul>${
-      toc.map((t) => `<li class="toc-${t.level}"><a href="#${escape(t.id)}">${escape(t.text)}</a></li>`).join("")
-    }</ul></nav>`;
+    : `<nav class="crumbs" aria-label="Breadcrumb"><a href="${escape(relative(from, section.home))}">${escape(section.label)}</a>${page.path === section.home || page.group === "" || page.group === section.label ? "" : `<span aria-hidden="true">/</span><span>${escape(page.group)}</span>`}</nav>`;
+  const { previous, next } = neighbours(site.pages, page);
+  const pager = previous === undefined && next === undefined
+    ? ""
+    : `<nav class="pager" aria-label="Previous and next page">${
+      previous === undefined ? "<span></span>" : `<a class="pager-prev" rel="prev" href="${escape(relative(from, previous.path))}"><span class="pager-label">Previous</span><span class="pager-title">${escape(previous.navTitle ?? previous.title)}</span></a>`
+    }${next === undefined ? "<span></span>" : `<a class="pager-next" rel="next" href="${escape(relative(from, next.path))}"><span class="pager-label">Next</span><span class="pager-title">${escape(next.navTitle ?? next.title)}</span></a>`}</nav>`;
+  const footer = `<footer class="foot"><p>${
+    release === undefined
+      ? escape(site.name)
+      : `<strong>${escape(versioned)}</strong>${release.source === "registry" ? (release.date === undefined ? "" : ` · published ${escape(release.date)}`) : ` · <span class="foot-unconfirmed">version of package.json, not confirmed on the package registry</span>`}`
+  }${release?.commit === undefined ? "" : ` · built from commit <code>${escape(release.commit)}</code>`}${
+    release?.ahead === undefined ? "" : ` · <span class="badge badge-warn">${release.ahead} commit${release.ahead === 1 ? "" : "s"} since the release</span>`
+  }</p><p class="foot-links"><a href="${escape(relative(from, "repo-ops/packaging.html"))}">How the package is made</a> · <a href="${escape(site.repository)}" rel="noopener">GitHub</a></p></footer>`;
   return `<!doctype html>
 <html lang="en" data-root="${escape(root)}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${escape(page.title)} · ${escape(site.name)}</title>
+<title>${escape(page.title)} · ${escape(versioned)}</title>
 <meta name="description" content="${escape(page.description)}">
 <script>try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preload" href="${asset("fonts/inter-latin-wght-normal.woff2")}" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${asset("site.css")}">
 <script src="${asset("site.js")}" defer></script>
 </head>
-<body>
+<body${isHome ? ' class="home"' : ""}>
 <a class="skip" href="#content">Skip to the content</a>
 <header class="top">
 <button type="button" class="menu-button" aria-controls="sidebar" aria-expanded="false" aria-label="Menu"><span></span></button>
-<a class="brand" href="${escape(relative(from, "index.html"))}">${escape(site.name)}</a>
+<a class="brand" href="${escape(relative(from, "index.html"))}">${escape(site.name)}${release === undefined ? "" : ` <span class="version${release.source === "registry" ? "" : " unconfirmed"}" title="${escape(versionTitle(release))}">v${escape(release.version)}</span>`}</a>
 <nav class="sections" aria-label="Sections">${top}</nav>
 <button type="button" class="search-button" aria-haspopup="dialog"><span>Search</span><kbd>/</kbd></button>
 <button type="button" class="theme-button" aria-label="Switch between the light and the dark theme" title="Theme (t)"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg></button>
 <a class="repo" href="${escape(site.repository)}" rel="noopener">GitHub</a>
 </header>
 <div class="layout">
-<aside class="sidebar" id="sidebar"><nav aria-label="${escape(SECTIONS.find((s) => s.section === page.section)?.label ?? "")}">${nav}</nav></aside>
+<aside class="sidebar" id="sidebar"><nav aria-label="${escape(section?.label ?? "")}">${nav}</nav></aside>
 <main id="content" class="content">
 <article>
+${crumbs}
 <header class="page-head"><h1>${escape(page.title)}</h1>${badges(page.badges)}</header>
+${tocMobile}
 ${blocks(page.blocks, from)}
+${pager}
 </article>
+${footer}
 </main>
 ${tocHtml}
 </div>
-<dialog class="search" aria-label="Search"><form method="dialog"><input type="search" placeholder="Search the documentation" aria-label="Search" autocomplete="off"><select class="search-kind" aria-label="Filter by kind"><option value="">Everything</option></select></form><ul class="results" role="listbox"></ul><p class="search-hint">Titles, headings, exports, tables, columns and requirements. <kbd>Esc</kbd> closes.</p></dialog>
+<dialog class="search" aria-label="Search"><form method="dialog"><input type="search" placeholder="Search the documentation" aria-label="Search" autocomplete="off"><select class="search-kind" aria-label="Filter by kind"><option value="">Everything</option></select></form><ul class="results" role="listbox"></ul><p class="search-hint">Titles, headings, exports, tables, columns and requirements. <kbd>↑</kbd> <kbd>↓</kbd> move, <kbd>Enter</kbd> opens, <kbd>Esc</kbd> closes.</p></dialog>
 </body>
 </html>
 `;

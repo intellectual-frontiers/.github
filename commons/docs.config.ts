@@ -12,6 +12,7 @@ import { DEFAULT_LICENSE } from "./libraries/src/license/standard.ts";
 import { guidesLens } from "./docs/src/lens/guides.ts";
 import { releasesLens } from "./docs/src/lens/releases.ts";
 import { programLens } from "./docs/src/lens/program.ts";
+import { packagingBlocks } from "./docs/src/pages/packaging.ts";
 import { type OpsFact, type OpsPolicy, type OpsVerb, type OpsWorkflow, repoOpsLens } from "./docs/src/lens/repo-ops.ts";
 import { inventory } from "./libraries/src/ci/inventory.ts";
 import { RED_CAUSE_WHY, RED_CAUSES, RELEASE_POLICY } from "./libraries/src/ci/policy.ts";
@@ -132,12 +133,14 @@ const repoOps = repoOpsLens({
   verbs: repoctlVerbs,
   facts: releaseFacts,
   policy: buildPolicy,
+  packaging: packagingBlocks,
   pages: [
     { file: "commons/docs/guides/ops-index.md", path: "repo-ops/index.html", order: 0 },
     { file: "commons/docs/guides/ops-ci-cd.md", path: "repo-ops/ci-cd.html", order: 1, generated: ["workflows", "policy"] },
     { file: "commons/docs/guides/ops-dev-loop.md", path: "repo-ops/dev-loop.html", order: 2 },
     { file: "commons/docs/guides/ops-release.md", path: "repo-ops/release.html", order: 3, generated: "facts" },
-    { file: "commons/docs/guides/ops-repoctl.md", path: "repo-ops/repoctl.html", order: 4, generated: "verbs" },
+    { file: "commons/docs/guides/ops-packaging.md", path: "repo-ops/packaging.html", order: 4, generated: "packaging" },
+    { file: "commons/docs/guides/ops-repoctl.md", path: "repo-ops/repoctl.html", order: 5, generated: "verbs" },
   ],
 });
 
@@ -318,6 +321,7 @@ export const config: DocsConfig = {
   subject: "commons",
   root: "..",
   repository: "https://github.com/intellectual-frontiers/.github",
+  release: { package: "commons/commons/package.json", record: "commons/generated/release.auto.json" },
   home: { dir: "commons" },
   packages: await Promise.all(libraryNames.map(libraryPackage)),
   specKits: [

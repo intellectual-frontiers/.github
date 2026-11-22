@@ -19,7 +19,7 @@
  * @module
  */
 import { fs, path } from "@intellectual-frontiers/system";
-import type { Block, Inline, Lens, LensPages } from "../mod.ts";
+import type { Block, Build, Inline, Lens, LensPages } from "../mod.ts";
 
 /** One workflow, as the typed definitions say it. */
 export interface OpsWorkflow {
@@ -64,7 +64,7 @@ export interface OpsFact {
 }
 
 /** What follows a page's words. */
-export type OpsGenerated = "workflows" | "verbs" | "facts" | "policy";
+export type OpsGenerated = "workflows" | "verbs" | "facts" | "policy" | "packaging";
 
 /** One page of the section: the Markdown file, its address and what is generated after it. */
 export interface RepoOpsPage {
@@ -100,6 +100,8 @@ export interface RepoOpsOptions {
   readonly facts?: () => readonly OpsFact[];
   /** The build policy and the classification of every step. */
   readonly policy?: () => OpsPolicy;
+  /** The blocks of the page of the packaging, from the build's evidence (docs 0001-docs FR-034); none given, a page that says so. */
+  readonly packaging?: (build: Build) => readonly Block[];
   /** The command the verbs are run with (`repoctl`), for the usage lines. */
   readonly command?: string;
 }
@@ -194,7 +196,7 @@ export function repoOpsLens(options: RepoOpsOptions): Lens {
           const title = m?.[1]?.trim() ?? p.path;
           const body = m === null ? text : text.slice(m[0].length);
           const kinds: readonly OpsGenerated[] = p.generated === undefined ? [] : typeof p.generated === "string" ? [p.generated] : p.generated;
-          const generated: Block[] = kinds.flatMap((k): Block[] => (k === "workflows" ? workflowBlocks(options.workflows?.() ?? []) : k === "verbs" ? verbBlocks(options.verbs?.() ?? [], command) : k === "policy" ? policyBlocks(options.policy?.()) : factBlocks(options.facts?.() ?? [])));
+          const generated: Block[] = kinds.flatMap((k): Block[] => (k === "workflows" ? workflowBlocks(options.workflows?.() ?? []) : k === "verbs" ? verbBlocks(options.verbs?.() ?? [], command) : k === "policy" ? policyBlocks(options.policy?.()) : k === "packaging" ? [...(options.packaging?.(build) ?? [heading("The package at this commit", "the-package-at-this-commit"), para(t("No evidence of the package was given to this page."))])] : factBlocks(options.facts?.() ?? [])));
           const lead = /^(?![#>|`\-*\d])[^\n]+/m.exec(body)?.[0] ?? title;
           build.add({ path: p.path, title, description: firstSentence(lead.replace(/\[([^\]]*)\]\([^)]*\)/g, "$1").replace(/[`*_]/g, "")), section: "repoops", group: "Repo Ops", order: p.order, blocks: [...build.md(body, { page: p.path, file: p.file }), ...generated] });
         }

@@ -26,6 +26,22 @@ export type ThirdPartyItem = {
 /** The items, in the order the notices list them. */
 export const THIRD_PARTY: readonly ThirdPartyItem[] = [
   {
+    path: "commons/docs/src/theme/fonts/inter-latin-wght-normal.woff2",
+    what: "Inter, the variable font, Latin subset (48256 bytes), the typeface of the documentation site's text; its license text is beside it in Inter-OFL.txt",
+    source: "https://github.com/rsms/inter, as packaged by the npm package @fontsource-variable/inter 5.3.0 (the file files/inter-latin-wght-normal.woff2, SHA-256 3100e775e8616cd2611beecfa23a4263d7037586789b43f035236a2e6fbd4c62)",
+    owner: "The Inter Project Authors",
+    license: "OFL-1.1 (SIL Open Font License 1.1), the package's own license field and the LICENSE it carries, copied unchanged to commons/docs/src/theme/fonts/Inter-OFL.txt",
+    checked: "The license text of the package was read on 2026-11-22 and is the OFL 1.1 with the Inter Project's copyright line. The font is used unmodified and not sold on its own.",
+  },
+  {
+    path: "commons/docs/src/theme/fonts/jetbrains-mono-latin-wght-normal.woff2",
+    what: "JetBrains Mono, the variable font, Latin subset (40404 bytes), the typeface of code on the documentation site; its license text is beside it in JetBrainsMono-OFL.txt",
+    source: "https://github.com/JetBrains/JetBrainsMono, as packaged by the npm package @fontsource-variable/jetbrains-mono 5.3.0 (the file files/jetbrains-mono-latin-wght-normal.woff2, SHA-256 18be452724bfdc236c074ca94a249a7f41a86752c7d04ab258ce9ed5651f6a7e)",
+    owner: "The JetBrains Mono Project Authors",
+    license: "OFL-1.1 (SIL Open Font License 1.1), the package's own license field and the LICENSE it carries, copied unchanged to commons/docs/src/theme/fonts/JetBrainsMono-OFL.txt",
+    checked: "The license text of the package was read on 2026-11-22 and is the OFL 1.1 with the JetBrains Mono Project's copyright line. The font is used unmodified and not sold on its own.",
+  },
+  {
     path: "commons/libraries/src/workflows/schema/github-workflow.schema.json",
     what: "The JSON Schema of GitHub Actions workflows, the copy fetched on 2026-11-19, which the tests validate the generated workflows against",
     source: "https://json.schemastore.org/github-workflow.json (the SchemaStore project, https://github.com/SchemaStore/schemastore)",

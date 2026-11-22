@@ -8,6 +8,7 @@ The repository is small on purpose. The organization's public profile, the insta
 
 - [CI/CD: the workflows](ops-ci-cd.md): the six workflows, what starts each, and how they are made (they are generated from typed definitions and never edited by hand).
 - [The release](ops-release.md): one release, one package, and the three steps of it (`release plan`, `release apply`, `release publish`) with the workflow that publishes.
+- [Packaging](ops-packaging.md): how the one package is made, what is in it and what is not, its size against its budget, the versions the registry holds, and what it asks of a consumer.
 - [The development loop](ops-dev-loop.md): what you run between edits and before a push (`bun run dev:check`, `repoctl prove`), and how a small step reaches `main`.
 - [The `repoctl` command](ops-repoctl.md): every verb, what it does, its options and examples, generated from the program's own typed definitions.
 
