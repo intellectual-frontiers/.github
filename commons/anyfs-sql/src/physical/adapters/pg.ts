@@ -12,7 +12,7 @@
  * @module
  */
 import type { SqlPort, SqlRow, SqlRunner, SqlValue } from "@intellectual-frontiers/anyfs-sql/governance";
-import { Gate, rowOf } from "./common.ts";
+import { Gate, requireDriver, rowOf } from "./common.ts";
 
 /** What `query` gives. */
 export interface PgResult {
@@ -47,6 +47,7 @@ const runnerOf = (q: PgQueryable): SqlRunner => ({
 
 /** The port of a pool: a transaction takes a connection and gives it back. */
 export function pgPort(pool: PgPool): SqlPort {
+  requireDriver("pgPort", "pg", ">=8.23.1 <9.0.0", pool, ["query", "connect"]);
   return {
     dialect: "postgres",
     ...runnerOf(pool),
@@ -76,6 +77,7 @@ export function pgPort(pool: PgPool): SqlPort {
 
 /** The port of one client: a transaction at a time. */
 export function pgClientPort(client: PgClient): SqlPort {
+  requireDriver("pgClientPort", "pg", ">=8.23.1 <9.0.0", client, ["query"]);
   const gate = new Gate();
   const direct = runnerOf(client);
   return {

@@ -15,9 +15,20 @@
  *
  * @module
  */
-import { API } from "typescript/async";
 import { fs, path } from "@intellectual-frontiers/system";
 import { type DocComment, docOf, type DocTag, moduleComment } from "../tsdoc.ts";
+
+/**
+ * The programmatic API of the compiler, loaded with `import()` (0036-distribution FR-033): `typescript` is an optional peer of the package, so a consumer that reads no API installs none and the consumer's own compiler is the one used. Reading the API needs
+ * `typescript/async` of the compiler 7.1 (7.0 has only `unstable/async`, whose program is not the same); where it is missing the read stops with a message that names the package and the range to install.
+ */
+async function compilerApi(): Promise<typeof import("typescript/async").API> {
+  try {
+    return (await import("typescript/async")).API;
+  } catch (e) {
+    throw new Error(`docs: the API of an area is read through typescript/async, which the package typescript provides from 7.1: install typescript at >=7.1.0-0 beside the package (${e instanceof Error ? e.message.split("\n")[0] : String(e)})`, { cause: e });
+  }
+}
 
 /** What an export is. */
 export type ExportKind = "function" | "const" | "class" | "interface" | "type" | "namespace" | "enum";
@@ -174,6 +185,7 @@ export function typeRootsOf(root: string, dirs: readonly string[] = []): string[
 export async function readApi(root: string, areas: readonly AreaEntry[], dirs: readonly string[] = []): Promise<AreaApi[]> {
   const abs = (rel: string): string => path.join(root, rel);
   const relOf = (file: string): string => path.relative(root, file).split(path.sep).join("/");
+  const API = await compilerApi();
   const api = new API({ cwd: root });
   const entries = areas.flatMap((a) => a.entryPoints.map(abs));
   const typeRoots = typeRootsOf(root, dirs).slice(0, 1);

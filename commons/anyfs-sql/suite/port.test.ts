@@ -7,6 +7,9 @@
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { type SqlPort, parseNaming } from "../src/mod.ts";
 import { sqlFor } from "../src/physical/mod.ts";
+import { duckdbPort } from "../src/physical/adapters/duckdb.ts";
+import { pglitePort } from "../src/physical/adapters/pglite.ts";
+import { pgClientPort, pgPort } from "../src/physical/adapters/pg.ts";
 import { Gate, rowOf, valueOf } from "../src/physical/adapters/common.ts";
 import { duckdbMemory, libsqlFake, pgFake, pgliteMemory, sqliteMemory } from "./kit.ts";
 
@@ -231,4 +234,27 @@ proves(["0003-sql-port FR-009"], "the port of DuckDB runs a transaction as BEGIN
   assert(threw);
   assertEquals((await port.query("SELECT id FROM t", [])).length, 1);
   await port.close();
+});
+
+proves(["0003-sql-port FR-010"], "a port that is handed no connection of its driver says which package to install and in which range, and a real connection is accepted", async () => {
+  const cases: readonly (readonly [string, () => unknown, string, string])[] = [
+    ["duckdbPort", () => duckdbPort(undefined as never), "@duckdb/node-api", ">=2.0.0-r.1"],
+    ["pglitePort", () => pglitePort({} as never), "@electric-sql/pglite", ">=0.5.16 <1.0.0"],
+    ["pgPort", () => pgPort(null as never), "pg", ">=8.23.1 <9.0.0"],
+    ["pgClientPort", () => pgClientPort(42 as never), "pg", ">=8.23.1 <9.0.0"],
+  ];
+  for (const [port, make, driver, range] of cases) {
+    let thrown: unknown;
+    try {
+      make();
+    } catch (e) {
+      thrown = e;
+    }
+    assert(thrown instanceof TypeError, `${port} refuses what is no connection`);
+    assert(thrown.message.includes(driver) && thrown.message.includes(range) && thrown.message.includes("install"), `${port}: ${thrown.message}`);
+  }
+  // a real connection is accepted: the drivers of the development of this library are installed here
+  const duck = await duckdbMemory();
+  assertEquals(duck.dialect, "duckdb");
+  await duck.close();
 });

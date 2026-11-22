@@ -67,7 +67,8 @@ export type ProblemCode =
   | "E-CONFIG-LOAD"
   | "E-CONFIG-INVALID"
   | "E-DOCS-GENERATOR-MISSING"
-  | "E-DOCS-FAILED";
+  | "E-DOCS-FAILED"
+  | "E-USAGE-UNKNOWN";
 
 /** Every code, in the order the explanations are listed. */
 export const PROBLEM_CODES: readonly ProblemCode[] = [
@@ -121,6 +122,7 @@ export const PROBLEM_CODES: readonly ProblemCode[] = [
   "E-CONFIG-INVALID",
   "E-DOCS-GENERATOR-MISSING",
   "E-DOCS-FAILED",
+  "E-USAGE-UNKNOWN",
 ];
 
 /** Whether a text is one of the codes. */
@@ -429,5 +431,11 @@ export const CATALOGUE: Readonly<Record<ProblemCode, Explained>> = {
     what: "The generator ended with a status that is not 0, or could not be served.",
     why: "The site has a finding (its lines are above), or the configuration file named by `docs.config` is wrong.",
     fix: "repoctl docs check",
+  },
+  "E-USAGE-UNKNOWN": {
+    title: "A library the package does not hold is imported",
+    what: "A file of the repository imports `@intellectual-frontiers/commons/<library>` and the installed package has no library of that name; it is not counted.",
+    why: "A library that was renamed or removed, a library of a newer version than the one installed, or a path that only looks like an import.",
+    fix: "install the version of the package the repository was written against, or correct the import",
   },
 };

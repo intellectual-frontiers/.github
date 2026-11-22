@@ -13,7 +13,7 @@
  * @module
  */
 import type { SqlPort, SqlRow, SqlRunner, SqlValue } from "@intellectual-frontiers/anyfs-sql/governance";
-import { Gate, rowOf } from "./common.ts";
+import { Gate, requireDriver, rowOf } from "./common.ts";
 
 /** What `runAndReadAll` gives. */
 export interface DuckdbRows {
@@ -27,6 +27,7 @@ export interface DuckdbConnection {
 
 /** The port of a DuckDB connection; `close` is the caller's to give where the connection has one. */
 export function duckdbPort(connection: DuckdbConnection, close: () => Promise<void> = async () => undefined): SqlPort {
+  requireDriver("duckdbPort", "@duckdb/node-api", ">=2.0.0-r.1", connection, ["run", "runAndReadAll"]);
   const gate = new Gate();
   const runner: SqlRunner = {
     async query(sql, params): Promise<readonly SqlRow[]> {

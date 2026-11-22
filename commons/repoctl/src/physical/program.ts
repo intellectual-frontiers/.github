@@ -26,6 +26,7 @@ import { docsBuildVerb, docsCheckVerb, docsServeVerb } from "./verbs/docs.ts";
 import { commitVerb, newLibraryVerb } from "./verbs/library.ts";
 import { proveVerb } from "./verbs/prove.ts";
 import { queryVerb } from "./verbs/query.ts";
+import { usageVerb } from "./verbs/usage.ts";
 import { releaseApplyVerb, releasePlanVerb, releasePublishVerb } from "./verbs/releasing.ts";
 import { mergeVerb, syncVerb } from "./verbs/sync.ts";
 
@@ -55,6 +56,7 @@ export function repoctlProgram(host: Host): Program {
     doctorVerb(host),
     ...(on.prove ? [proveVerb(host)] : []),
     ...(on.query ? [queryVerb(host)] : []),
+    usageVerb(host),
     ...(host.config.docs === undefined ? [] : [branch({ name: "docs", summary: "Build, check and serve the documentation site with the documentation generator.", children: [docsBuildVerb(host), docsCheckVerb(host), docsServeVerb(host)] })]),
   ];
   const mcp = command({

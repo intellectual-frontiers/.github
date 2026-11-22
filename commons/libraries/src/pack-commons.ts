@@ -4,19 +4,20 @@
  *
  *     bun commons/commons/tools/pack.ts            (in commons/commons) pack `dist/intellectual-frontiers-commons-<version>.tgz`
  *     bun commons/commons/tools/pack.ts --check    the same, and print what was found; exit 1 where anything was
+ *     bun commons/commons/tools/pack.ts --size    the same, and print what was packed by kind and by library (also `dist/package-report.json`, which the site shows)
  *     bun commons/libraries/src/pack-commons.ts --report    the facts of the package without compiling: the libraries, the keys of `exports`, the commands and the dependencies
  *     bun commons/libraries/src/pack-commons.ts --tools [--check]    the packages that compiling needs, in `commons/commons/package.json` and `bun.lock` (pack-tools.ts, FR-029)
  *
  * @remarks
  * A library is a folder of commons with a manifest that is not a metapackage ({@link packableLibraries}); `single` mode leaves none out unless `SINGLE_EXCLUDED` names it (a `held` library is packed like any other). The package maps a library to
  * `./<library>` (its `.` entry) and `./<library>/<subpath>` (each other key), because the subpaths of two libraries collide (`./governance` is a key of ten of them). Each entry names its declarations (`types`), its source for Bun (`bun`) and its compiled file
- * (`default`); a library's compiled files are under `<library>/dist/` at the same paths as its sources are in its folder, and its sources at those paths, so that a library keeps the shape it has in this repository. The compiler builds each library by itself
+ * (`default`); a library's declarations are under `<library>/dist/` at the same paths as its sources are in its folder, its compiled files are beside their sources, and its sources at those paths, so that a library keeps the shape it has in this repository. The compiler builds each library by itself
  * (the same configuration as the packer of a library: the base of commons, `preserveSymlinks`, so that a declaration names another library by its package and not by a path), and every specifier that names a library, `@intellectual-frontiers/<library>[/<subpath>]`,
  * is written as `@intellectual-frontiers/commons/<library>[/<subpath>]` in the compiled files, the declarations and the sources the package carries (the package names itself, which Node, Bun and TypeScript resolve). The sources of this repository keep the name of
- * the library (Kanon, 0033-kanon FR-010). The dependencies are the union of the runtime dependencies of the libraries and of the drivers the libraries take as ports (`SINGLE_DRIVERS`), each at an exact version; the commands are those the libraries declare,
+ * the library (Kanon, 0033-kanon FR-010). The dependencies are the union of the runtime dependencies of the libraries, each at an exact version, except the packages `SINGLE_PEERS` names (the database drivers the libraries take as ports, what only Docs loads and the TypeScript compiler), which are optional peer dependencies the consumer installs; the commands are those the libraries declare,
  * each a launcher in `bin/` that imports the compiled module; the files of the package that do something when they are loaded (a module that installs a port, a command) are named in `sideEffects`, and every other is free of effects, which the inspection proves by
- * reading the compiled files. A folder of a library other than its entries' folders and those of {@link NOT_RUNTIME} (the data of a catalog, the guides of Docs, the installers of Ergonex) is shipped beside the sources and beside `dist/`, so that a module reads it at the
- * same relative path from its source (Bun) and from its compiled file (Node). The libraries are resolved by name and the third-party packages from `commons/commons` alone (they are linked under `commons/node_modules`, which is not committed), so that a fresh clone in which only
+ * reading the compiled files. A folder of a library other than its entries' folders and those of {@link NOT_RUNTIME} (the data of a catalog, the guides of Docs, the installers of Ergonex) is shipped once, beside the sources, and the compiled file of each source is beside it, so that a module reads it at the
+ * same relative path from its source (Bun) and from its compiled file (Node), and no file is in the package twice (`dist/` holds declarations only). The libraries are resolved by name and the third-party packages from `commons/commons` alone (they are linked under `commons/node_modules`, which is not committed), so that a fresh clone in which only
  * that folder was installed packs the package; the folder's `package.json` and `bun.lock` hold what that takes (`pack-tools.ts`), which the packer checks before it compiles.
  *
  * @limits
@@ -33,12 +34,13 @@
  *
  * @module
  */
+import { createHash } from "node:crypto";
 import process from "node:process";
 import { chmod } from "@intellectual-frontiers/system/fs";
-import { existsSync, mkdirSync, readDirSync, readTextFileSync, removeSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { existsSync, mkdirSync, readDirSync, readFileSync, readTextFileSync, removeSync, statSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { dirname, join, resolve, toPosix } from "@intellectual-frontiers/system/path";
 import { env, run, which } from "@intellectual-frontiers/system/proc";
-import { activeMode, GITHUB_REGISTRY, MODE_VARIABLE, SINGLE, SINGLE_DRIVERS, SINGLE_EXCLUDED, SINGLE_TARGETS } from "./distribution.ts";
+import { activeMode, GITHUB_REGISTRY, MODE_VARIABLE, SINGLE, SINGLE_BUDGET, SINGLE_EXCLUDED, SINGLE_PEERS, SINGLE_TARGETS } from "./distribution.ts";
 import { type Library, readLibraries } from "./libraries.ts";
 import { licenseOf } from "./license.ts";
 import { linkAll } from "./link.ts";
@@ -79,8 +81,8 @@ export type Facts = {
   readonly bin: Readonly<Record<string, string>>;
   /** Its runtime dependencies on packages that are not of commons, each with the version the library names. */
   readonly dependencies: Readonly<Record<string, string>>;
-  /** What it names of the drivers of {@link SINGLE_DRIVERS} in its `dependencies` or `devDependencies`. */
-  readonly drivers: Readonly<Record<string, string>>;
+  /** What it names of the packages of {@link SINGLE_PEERS} in its `dependencies` or `devDependencies`, with the version it names: the package asks the consumer for them, and compiling needs them. */
+  readonly peers: Readonly<Record<string, string>>;
   /** Its `devDependencies` that are not of commons: what the compiler needs of it besides its runtime dependencies. */
   readonly devDependencies: Readonly<Record<string, string>>;
   readonly held: boolean;
@@ -136,10 +138,12 @@ export function factsOf(repo: string, l: Library): { readonly facts: Facts; read
   const dir = join(repo, "commons", l.name);
   const folders = (existsSync(dir) ? readDirSync(dir) : []).filter((e) => e.isDirectory && !e.name.startsWith(".") && !NOT_RUNTIME.has(e.name) && !roots.includes(e.name)).map((e) => e.name).sort(byName);
   const strings = (v: unknown): Record<string, string> => Object.fromEntries(Object.entries(objectOf(v)).flatMap(([k, x]) => (typeof x === "string" ? [[k, x] as const] : [])));
-  const dependencies = Object.fromEntries(Object.entries(strings(pkg["dependencies"])).filter(([k]) => !k.startsWith(`${SCOPE}/`)));
+  const declared = Object.fromEntries(Object.entries(strings(pkg["dependencies"])).filter(([k]) => !k.startsWith(`${SCOPE}/`)));
   const dev = strings(pkg["devDependencies"]);
-  const drivers = Object.fromEntries(SINGLE_DRIVERS.flatMap((d) => {
-    const version = dependencies[d] ?? dev[d];
+  // what the package asks of the consumer is not installed by it: it is a peer (0036-distribution FR-023)
+  const dependencies = Object.fromEntries(Object.entries(declared).filter(([k]) => !SINGLE_PEERS.has(k)));
+  const peers = Object.fromEntries([...SINGLE_PEERS].flatMap(([d, rule]) => {
+    const version = (rule.pinnedBy === "dependencies" ? declared : dev)[d];
     return version === undefined ? [] : [[d, version] as const];
   }));
   return {
@@ -152,7 +156,7 @@ export function factsOf(repo: string, l: Library): { readonly facts: Facts; read
       folders,
       bin,
       dependencies,
-      drivers,
+      peers,
       devDependencies: Object.fromEntries(Object.entries(dev).filter(([k]) => !k.startsWith(`${SCOPE}/`))),
       held: l.held !== undefined,
     },
@@ -198,12 +202,12 @@ export function commandsOf(repo: string, facts: readonly Facts[]): { readonly co
   return { commands, problems };
 }
 
-/** The union of the dependencies of the libraries and of the drivers, and the problems: two versions of one package are a conflict, and a version that is not exact is refused. */
+/** The union of the runtime dependencies of the libraries that the package installs, and the problems: two versions of one package are a conflict, and a version that is not exact is refused. The packages the package asks of the consumer are not among them (`peersOf`). */
 export function unionDependencies(facts: readonly Facts[]): { readonly dependencies: Readonly<Record<string, string>>; readonly problems: Findings } {
   const out = new Map<string, { readonly version: string; readonly by: string }>();
   const problems: string[] = [];
   for (const f of facts) {
-    for (const [name, version] of [...Object.entries(f.dependencies), ...Object.entries(f.drivers)]) {
+    for (const [name, version] of Object.entries(f.dependencies)) {
       const had = out.get(name);
       if (had === undefined) out.set(name, { version, by: f.name });
       else if (had.version !== version) problems.push(`${name} is ${had.version} in ${had.by} and ${version} in ${f.name}: the package has one version of it`);
@@ -216,13 +220,37 @@ export function unionDependencies(facts: readonly Facts[]): { readonly dependenc
 /** An exact version of npm: three numbers and, optionally, a prerelease. */
 export const EXACT = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/;
 
+/** What the package asks of the consumer (0036-distribution FR-023): the `peerDependencies` with their ranges and the `peerDependenciesMeta` that marks each optional one, from `SINGLE_PEERS` for the packages the libraries name; two libraries that name two versions of one of them are a finding. `@types/node` is added by the packer where a declaration names a type of Node, and is not optional. */
+export function peersOf(facts: readonly Facts[]): { readonly peerDependencies: Readonly<Record<string, string>>; readonly peerDependenciesMeta: Readonly<Record<string, { readonly optional: true }>>; readonly problems: Findings } {
+  const seen = new Map<string, { readonly version: string; readonly by: string }>();
+  const problems: string[] = [];
+  for (const f of facts) {
+    for (const [name, version] of Object.entries(f.peers)) {
+      const had = seen.get(name);
+      if (had === undefined) seen.set(name, { version, by: f.name });
+      else if (had.version !== version) problems.push(`${name} is ${had.version} in ${had.by} and ${version} in ${f.name}: the libraries are written against one version of it`);
+    }
+  }
+  const names = [...seen.keys()].sort(byName);
+  const rules = names.flatMap((n) => {
+    const r = SINGLE_PEERS.get(n);
+    return r === undefined ? [] : [[n, r] as const];
+  });
+  return {
+    peerDependencies: Object.fromEntries(rules.map(([n, r]) => [n, r.range])),
+    peerDependenciesMeta: Object.fromEntries(rules.filter(([, r]) => r.optional).map(([n]) => [n, { optional: true as const }])),
+    problems,
+  };
+}
+
 /** The `exports` of the package for these libraries: each entry names the declarations, the source for Bun and the compiled file of the library's entry, under the folder of the library. */
 export function exportsMap(facts: readonly Facts[]): Record<string, unknown> {
   const out: Record<string, unknown> = {};
   for (const f of [...facts].sort((a, b) => byName(a.name, b.name))) {
     for (const [key, target] of Object.entries(f.exports).sort(([a], [b]) => byName(a, b))) {
       const rel = noDot(target).replace(/\.ts$/, "");
-      out[exportKey(f.name, key)] = { types: `./${f.name}/dist/${rel}.d.ts`, bun: `./${f.name}/${noDot(target)}`, default: `./${f.name}/dist/${rel}.js` };
+      // the declarations are in `dist/`; the compiled file is beside its source, so that what a module reads is at one path for Bun and for Node (0036-distribution FR-030)
+      out[exportKey(f.name, key)] = { types: `./${f.name}/dist/${rel}.d.ts`, bun: `./${f.name}/${noDot(target)}`, default: `./${f.name}/${rel}.js` };
     }
   }
   return out;
@@ -301,6 +329,108 @@ export function runsWhenLoaded(compiled: string): boolean {
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
+// the content policy, the budget and the report
+// ---------------------------------------------------------------------------------------------------------------------
+
+/** The specifiers a source imports statically: those after `from` and after a bare `import`, never `import(` and never a statement of types only (`import type`, `export type`), which leaves no import at run time. */
+export function staticSpecifiers(source: string): readonly string[] {
+  const { code } = scanSource(source);
+  return specifierRanges(source)
+    .filter((r) => {
+      const before = code.slice(0, r.start);
+      if (/\bimport\s*\(\s*["']$/.test(before.slice(-24))) return false;
+      const at = Math.max(before.lastIndexOf("import"), before.lastIndexOf("export"));
+      return !/^(?:import|export)\s+type\b/.test(before.slice(Math.max(at, 0)));
+    })
+    .map((r) => source.slice(r.start, r.end));
+}
+
+/** What only commons needs internally and never ships (0036-distribution FR-031): the folders of a library that develop, prove and document it, the tests, the source maps, the lockfiles, the baselines of the checks and the manifest of the library. */
+export const INTERNAL_PATHS: readonly RegExp[] = [/^[^/]+\/(?:suite|spec-kit|tools|acceptance|oat|uat|aat|node_modules)\//, /\.test\.(?:ts|js|d\.ts)$/, /\.map$/, /(?:^|\/)bun\.lock$/, /\.baseline\.txt$/, /^[^/]+\/(?:library|release|about)\.ts$/];
+
+/** The kinds of file the report counts. */
+export const KINDS = ["compiled", "source", "declaration", "data", "documentation", "package"] as const;
+/** A kind of file. */
+export type Kind = (typeof KINDS)[number];
+
+/** The kind of a file of the staged package: the declarations are the `.d.ts` of `dist/`, a source is a `.ts`, a compiled file is a `.js` beside a source of the same name, documentation is Markdown, and what else a library carries is data. */
+export function kindOf(rel: string, files: ReadonlySet<string>): Kind {
+  if (!rel.includes("/") || rel.startsWith("bin/")) return "package";
+  if (rel.endsWith(".d.ts")) return "declaration";
+  if (rel.endsWith(".ts")) return "source";
+  if (/\.m?js$/.test(rel) && files.has(rel.replace(/\.m?js$/, ".ts"))) return "compiled";
+  return rel.endsWith(".md") ? "documentation" : "data";
+}
+
+/** The bytes and the files of one set of files, by kind. */
+export type Sizes = { readonly files: number; readonly bytes: number; readonly byKind: Readonly<Record<Kind, { readonly files: number; readonly bytes: number }>> };
+
+/** What was packed, for the page of the site and for the budget (0036-distribution FR-032). */
+export type PackageReport = {
+  readonly name: string;
+  readonly version: string;
+  readonly total: Sizes;
+  readonly tarballBytes: number | undefined;
+  readonly libraries: readonly (Sizes & { readonly name: string })[];
+  readonly dependencies: Readonly<Record<string, string>>;
+  readonly peerDependencies: Readonly<Record<string, string>>;
+  readonly optionalPeers: readonly string[];
+  readonly budget: typeof SINGLE_BUDGET;
+};
+
+const emptyKinds = (): Record<Kind, { files: number; bytes: number }> => Object.fromEntries(KINDS.map((k) => [k, { files: 0, bytes: 0 }])) as Record<Kind, { files: number; bytes: number }>;
+
+/** The report of a staged package: its sizes in all, by library and by kind, and what it depends on and asks of the consumer. */
+export function reportOfStage(stage: string, tarballBytes?: number): PackageReport {
+  const manifest = objectOf(JSON.parse(readTextFileSync(join(stage, "package.json"))) as unknown);
+  const files = filesUnder(stage);
+  const set = new Set(files);
+  const tally = (): { files: number; bytes: number; byKind: Record<Kind, { files: number; bytes: number }> } => ({ files: 0, bytes: 0, byKind: emptyKinds() });
+  const total = tally();
+  const by = new Map<string, ReturnType<typeof tally>>();
+  for (const rel of files) {
+    const bytes = readFileBytes(join(stage, rel));
+    const kind = kindOf(rel, set);
+    const lib = rel.includes("/") && !rel.startsWith("bin/") ? (rel.split("/")[0] ?? "") : "";
+    const t = lib === "" ? undefined : (by.get(lib) ?? tally());
+    for (const x of t === undefined ? [total] : [total, t]) {
+      x.files += 1;
+      x.bytes += bytes;
+      x.byKind[kind].files += 1;
+      x.byKind[kind].bytes += bytes;
+    }
+    if (t !== undefined) by.set(lib, t);
+  }
+  const meta = objectOf(manifest["peerDependenciesMeta"]);
+  return {
+    name: text(manifest["name"]),
+    version: text(manifest["version"]),
+    total,
+    tarballBytes,
+    libraries: [...by].sort(([a], [b]) => byName(a, b)).map(([name, t]) => ({ name, ...t })),
+    dependencies: Object.fromEntries(Object.entries(objectOf(manifest["dependencies"])).map(([k, v]) => [k, text(v)])),
+    peerDependencies: Object.fromEntries(Object.entries(objectOf(manifest["peerDependencies"])).map(([k, v]) => [k, text(v)])),
+    optionalPeers: Object.keys(meta).sort(byName),
+    budget: SINGLE_BUDGET,
+  };
+}
+
+const readFileBytes = (file: string): number => statSync(file).size;
+
+/** The text of the table `--size` prints: the package, its kinds, its libraries by size, and its dependencies. */
+export function sizeTable(r: PackageReport): string {
+  const mb = (b: number): string => `${(b / 1_048_576).toFixed(2)} MB`;
+  const rows = [`${r.name}@${r.version}: ${r.total.files} files, ${mb(r.total.bytes)} apparent${r.tarballBytes === undefined ? "" : `, ${mb(r.tarballBytes)} tarball`} (budget ${SINGLE_BUDGET.files} files, ${mb(SINGLE_BUDGET.apparentBytes)}, ${mb(SINGLE_BUDGET.tarballBytes)} tarball)`, ""];
+  rows.push("by kind:");
+  for (const k of KINDS) rows.push(`  ${k.padEnd(14)} ${String(r.total.byKind[k].files).padStart(5)} files ${mb(r.total.byKind[k].bytes).padStart(10)}`);
+  rows.push("", "by library (largest first):");
+  for (const l of [...r.libraries].sort((a, b) => b.bytes - a.bytes)) rows.push(`  ${l.name.padEnd(30)} ${String(l.files).padStart(5)} files ${mb(l.bytes).padStart(10)}`);
+  rows.push("", `dependencies: ${Object.keys(r.dependencies).length === 0 ? "none" : Object.entries(r.dependencies).map(([k, v]) => `${k}@${v}`).join(", ")}`);
+  rows.push(`peer dependencies: ${Object.entries(r.peerDependencies).map(([k, v]) => `${k} ${v}${r.optionalPeers.includes(k) ? " (optional)" : ""}`).join(", ") || "none"}`);
+  return `${rows.join("\n")}\n`;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
 // the inspection
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -308,7 +438,7 @@ const BUILTIN = /^(?:node|bun|data):/;
 const COMPILED = /\.(?:js|mjs)$/;
 
 /** What is wrong with the package staged in a folder (the files of the tarball, `package/` unpacked), for the libraries it is to hold: see the remarks of this module. */
-export function inspectCommons(stage: string, libraries: readonly string[]): Findings {
+export function inspectCommons(stage: string, libraries: readonly string[], budget: { readonly apparentBytes: number; readonly files: number } = SINGLE_BUDGET): Findings {
   const found: string[] = [];
   const manifestFile = join(stage, "package.json");
   if (!existsSync(manifestFile)) return ["package.json is not in the package"];
@@ -377,6 +507,41 @@ export function inspectCommons(stage: string, libraries: readonly string[]): Fin
   }
   // the declarations that name the types of Node need them where the package is type-checked
   if (namesNodeTypes(stage) && declared.has("@types/node") === false) found.push("a declaration names a type of Node and @types/node is not a dependency or a peer dependency");
+  // the peers (0036-distribution FR-023, FR-033): asked for with a range, never installed, and an optional one is never imported statically
+  const peerDeps = objectOf(manifest["peerDependencies"]);
+  const peerMeta = objectOf(manifest["peerDependenciesMeta"]);
+  const optional = new Set<string>();
+  for (const [name, rule] of SINGLE_PEERS) {
+    if (peerDeps[name] === undefined) continue;
+    if (name in deps) found.push(`${name} is a dependency and a peer dependency of the package: the consumer installs it`);
+    if (peerDeps[name] !== rule.range) found.push(`${name} is asked for as ${text(peerDeps[name])}, and SINGLE_PEERS says ${rule.range}`);
+    if (rule.optional && !isObject(peerMeta[name])) found.push(`${name} is an optional peer and peerDependenciesMeta does not say so`);
+    if (rule.optional) optional.add(name);
+  }
+  for (const name of Object.keys(deps)) if (SINGLE_PEERS.has(name)) found.push(`${name} is installed by the package: it is a peer (SINGLE_PEERS)`);
+  for (const f of files) {
+    if (f.endsWith(".d.ts") || !/\.(?:ts|js|mjs)$/.test(f)) continue;
+    for (const s of staticSpecifiers(readTextFileSync(join(stage, f)))) {
+      const pkg = packageOf(s);
+      if (pkg !== undefined && optional.has(pkg)) found.push(`${f} imports the optional peer ${pkg} statically: it is loaded with import() where it is used, and the missing package is said (0036-distribution FR-033)`);
+    }
+  }
+  // the content policy (FR-030, FR-031): dist/ holds declarations and nothing else, nothing internal ships, and no file is shipped twice
+  const sizes = new Map<string, string[]>();
+  let apparent = 0;
+  for (const f of files) {
+    apparent += readFileBytes(join(stage, f));
+    if (/^[^/]+\/dist\//.test(f) && !f.endsWith(".d.ts")) found.push(`${f} is in dist/, which holds declarations only: a file a module reads is shipped once, beside its source`);
+    if (INTERNAL_PATHS.some((re) => re.test(f))) found.push(`${f} is internal to commons (a test, a specification, a tool, a map, a lockfile or a baseline) and is not shipped`);
+    if (!/\.(?:ts|js|mjs)$/.test(f) && f.includes("/") && !f.startsWith("bin/")) {
+      const key = `${f.split("/")[0]}\u0000${createHash("sha256").update(readFileSync(join(stage, f))).digest("hex")}`;
+      sizes.set(key, [...(sizes.get(key) ?? []), f]);
+    }
+  }
+  for (const group of sizes.values()) if (group.length > 1) found.push(`${group.join(" and ")} are the same file shipped twice`);
+  // the budget (FR-032)
+  if (files.size > budget.files) found.push(`the package has ${files.size} files, and the budget is ${budget.files}`);
+  if (apparent > budget.apparentBytes) found.push(`the package is ${apparent} bytes apparent, and the budget is ${budget.apparentBytes}`);
   return found;
 }
 
@@ -455,7 +620,7 @@ async function compileLibrary(repo: string, f: Facts, work: string, bun: string,
 /** The launcher of a command: the line Node runs, which imports the compiled module. */
 export function launcherOf(c: Command): string {
   const rel = c.module.replace(/\.ts$/, "");
-  const target = `../${c.library}/dist/${rel}.js`;
+  const target = `../${c.library}/${rel}.js`;
   return c.form === "main"
     ? `#!/usr/bin/env node\nimport { main } from "${target}";\n\nprocess.exit(await main(process.argv.slice(2)));\n`
     : `#!/usr/bin/env node\nimport "${target}";\n`;
@@ -554,7 +719,8 @@ export async function packCommons(repo: string, options: PackCommonsOptions = {}
     const out = join(work, f.name, "out");
     if (existsSync(join(out, f.name)))
       for (const rel of filesUnder(join(out, f.name))) {
-        if (rel.endsWith(".js") || rel.endsWith(".d.ts")) place(join(out, f.name, rel), join(stage, f.name, "dist", rel), names, unknown, `${f.name}/dist/${rel}`);
+        if (rel.endsWith(".d.ts")) place(join(out, f.name, rel), join(stage, f.name, "dist", rel), names, unknown, `${f.name}/dist/${rel}`);
+        else if (rel.endsWith(".js")) place(join(out, f.name, rel), join(stage, f.name, rel), names, unknown, `${f.name}/${rel}`);
       }
     for (const other of existsSync(out) ? filesUnder(out).map((p) => p.split("/")[0] ?? "") : []) if (other !== f.name && other !== "") unknown.add(`${f.name} reaches the folder ${other} of commons by a relative path`);
     for (const r of f.roots) {
@@ -564,16 +730,12 @@ export async function packCommons(repo: string, options: PackCommonsOptions = {}
         const source = join(from, rel);
         const inPackage = `${r}/${rel}`;
         place(source, join(stage, f.name, inPackage), names, unknown, `${f.name}/${inPackage}`);
-        if (!rel.endsWith(".ts")) place(source, join(stage, f.name, "dist", inPackage), names, unknown, `${f.name}/dist/${inPackage}`);
       }
     }
-    // the folders the library reads at run time: where its sources are (Bun) and where its compiled files are (Node), at the same path from the module that reads them
+    // the folders the library reads at run time, once: the compiled files are beside their sources, so the module that reads them finds them at the same path under Bun and under Node
     for (const r of f.folders) {
       const from = join(root, "commons", f.name, r);
-      for (const rel of filesUnder(from)) {
-        place(join(from, rel), join(stage, f.name, r, rel), names, unknown, `${f.name}/${r}/${rel}`);
-        place(join(from, rel), join(stage, f.name, "dist", r, rel), names, unknown, `${f.name}/dist/${r}/${rel}`);
-      }
+      for (const rel of filesUnder(from)) place(join(from, rel), join(stage, f.name, r, rel), names, unknown, `${f.name}/${r}/${rel}`);
     }
   }
   found.push(...[...unknown].sort(byName));
@@ -591,14 +753,15 @@ export async function packCommons(repo: string, options: PackCommonsOptions = {}
   for (const rel of filesUnder(stage)) {
     if (COMPILED.test(rel) && !rel.startsWith("bin/") && runsWhenLoaded(readTextFileSync(join(stage, rel)))) {
       effects.push(rel);
-      const lib = rel.split("/")[0] ?? "";
-      const src = rel.replace(`${lib}/dist/`, `${lib}/`).replace(/\.js$/, ".ts");
+      const src = rel.replace(/\.js$/, ".ts");
       if (existsSync(join(stage, src))) effects.push(src);
     }
   }
   const exportsOut = exportsMap(facts);
   const licenseId = licenseOf(manifestOfFolder.library);
-  const peers = namesNodeTypes(stage) ? { "@types/node": ">=26" } : undefined;
+  const asked = peersOf(facts);
+  found.push(...asked.problems);
+  const peers = { ...(namesNodeTypes(stage) ? { "@types/node": ">=26" } : {}), ...asked.peerDependencies };
   const manifest: Json = {
     name: SELF,
     version,
@@ -610,7 +773,8 @@ export async function packCommons(repo: string, options: PackCommonsOptions = {}
     bin: binOut,
     exports: exportsOut,
     dependencies: union.dependencies,
-    ...(peers === undefined ? {} : { peerDependencies: peers }),
+    ...(Object.keys(peers).length === 0 ? {} : { peerDependencies: peers }),
+    ...(Object.keys(asked.peerDependenciesMeta).length === 0 ? {} : { peerDependenciesMeta: asked.peerDependenciesMeta }),
     files: ["bin", ...facts.map((f) => f.name), "README.md", "LICENSE"],
     keywords: ["intellectual-frontiers", "commons"],
     repository: { type: "git", url: "git+https://github.com/intellectual-frontiers/.github.git", directory: SINGLE.folder },
@@ -628,7 +792,13 @@ export async function packCommons(repo: string, options: PackCommonsOptions = {}
   if (found.length > 0) return { stage, tarball: undefined, findings: found, manifest, counts };
   const packed = await run([bun, "pm", "pack", "--destination", dist], { cwd: stage });
   if (packed.code !== 0) return { stage, tarball: undefined, findings: [`bun pm pack stopped: ${packed.stderr || packed.stdout}`.trim()], manifest, counts };
-  return { stage, tarball: join(dist, tarballName(SELF, version)), findings: [], manifest, counts };
+  const tarball = join(dist, tarballName(SELF, version));
+  // what was packed, as a report for the page of the site and the budget of the tarball (0036-distribution FR-032)
+  const report = reportOfStage(stage, statSync(tarball).size);
+  writeTextFileSync(join(dist, "package-report.json"), `${JSON.stringify(report, null, 2)}\n`);
+  if (report.tarballBytes !== undefined && report.tarballBytes > SINGLE_BUDGET.tarballBytes)
+    return { stage, tarball: undefined, findings: [`the tarball is ${report.tarballBytes} bytes, and the budget is ${SINGLE_BUDGET.tarballBytes}`], manifest, counts };
+  return { stage, tarball, findings: [], manifest, counts };
 }
 
 /** The facts of the package without compiling: the libraries, the keys of the `exports`, the commands and the dependencies, and what is wrong with them. */
@@ -660,9 +830,11 @@ export function singleExportKeys(repo: string): readonly string[] {
 
 /** The tools that compiling the libraries needs (FR-029): from their manifests and from what their packed sources import. */
 export function toolsOfLibraries(repo: string, facts: readonly Facts[], union: Tools): { readonly tools: Tools; readonly problems: Findings } {
-  const sources = facts.map((f) => ({ name: f.name, roots: f.roots, dependencies: f.dependencies, devDependencies: { ...f.devDependencies, ...f.drivers } }));
+  const sources = facts.map((f) => ({ name: f.name, roots: f.roots, dependencies: f.dependencies, devDependencies: f.devDependencies }));
   const imported = importedPackages(facts.flatMap((f) => sourcesOf(repo, f.name, f.roots)));
-  return toolsOf(sources, union, imported);
+  // what the package asks of the consumer is not installed by it, and compiling needs it at the version the libraries are written against
+  const pinned = Object.fromEntries(facts.flatMap((f) => Object.entries(f.peers)));
+  return toolsOf(sources, { ...pinned, ...union }, imported);
 }
 
 /** What the manifest and the lockfile of the folder of the package lack of the tools. */
@@ -728,6 +900,10 @@ export async function main(repo: string, argv: readonly string[], options: PackC
   const r = await packCommons(repo, options);
   for (const f of r.findings) console.error(f);
   if (r.tarball === undefined) return 1;
+  if (argv.includes("--size")) {
+    console.log(sizeTable(reportOfStage(r.stage, statSync(r.tarball).size)));
+    return 0;
+  }
   console.log(argv.includes("--check") ? `packed ${r.tarball}: nothing wrong (${r.counts.libraries} libraries, ${r.counts.exports} entries, ${r.counts.files} files)` : r.tarball);
   return 0;
 }

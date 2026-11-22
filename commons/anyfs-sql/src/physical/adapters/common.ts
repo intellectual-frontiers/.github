@@ -71,3 +71,12 @@ export function gateOfFile(absolute: string): Gate {
   FILE_GATES.set(absolute, made);
   return made;
 }
+
+/**
+ * Says which driver to install where a port is handed no connection of it (0003-sql-port FR-010): a driver is an optional peer of the package that holds this library, and no source of commons imports it, so a caller that did not install it has nothing to hand over. A
+ * value with every method the port uses is accepted; anything else is a `TypeError` that names the driver and the range of versions.
+ */
+export function requireDriver(port: string, driver: string, range: string, value: unknown, methods: readonly string[]): void {
+  const have = typeof value === "object" && value !== null && methods.every((m) => typeof (value as Record<string, unknown>)[m] === "function");
+  if (!have) throw new TypeError(`${port} needs a connection of ${driver} (${range}), which the package does not install: install ${driver} beside it and hand the connection over (it was given ${value === undefined ? "nothing" : typeof value})`);
+}

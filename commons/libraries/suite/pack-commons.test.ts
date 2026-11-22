@@ -4,13 +4,13 @@
  *
  * @module
  */
-import { existsSync as existsSyncOf, mkdirSync, readTextFileSync, symlinkSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
+import { existsSync as existsSyncOf, mkdirSync, readTextFileSync, removeSync, symlinkSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { dirname, fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
 import { proc } from "@intellectual-frontiers/system";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { importSpecifiers } from "../src/scan.ts";
 import { filesUnder } from "../src/pack-library.ts";
-import { activeMode, DISTRIBUTION, DISTRIBUTION_MODES, parseMode } from "../src/distribution.ts";
+import { activeMode, DISTRIBUTION, DISTRIBUTION_MODES, parseMode, SINGLE_PEERS } from "../src/distribution.ts";
 import {
   type Command,
   commandsOf,
@@ -18,12 +18,15 @@ import {
   exportsMap,
   type Facts,
   inspectCommons,
+  kindOf,
   launcherOf,
   oldSpecifiers,
   packCommons,
+  peersOf,
   rewriteSpecifiers,
   NOT_RUNTIME,
   runsWhenLoaded,
+  staticSpecifiers,
   toolsFindingsOf,
   toolsOfLibraries,
   unionDependencies,
@@ -45,7 +48,7 @@ const facts = (name: string, extra: Partial<Facts> = {}): Facts => ({
   folders: [],
   bin: {},
   dependencies: {},
-  drivers: {},
+  peers: {},
   devDependencies: {},
   held: false,
   ...extra,
@@ -68,7 +71,7 @@ proves([`${SPEC} FR-029`], "each library is mapped to ./<library> and ./<library
   assertEquals(exportKey("anyfs", "./governance"), "./anyfs/governance");
   const map = exportsMap([facts("a", { exports: { ".": "./src/mod.ts", "./governance": "./src/governance/mod.ts" } }), facts("b", { exports: { "./governance": "./src/governance/mod.ts" } })]);
   assertEquals(Object.keys(map), ["./a", "./a/governance", "./b/governance"]);
-  assertEquals(map["./b/governance"], { types: "./b/dist/src/governance/mod.d.ts", bun: "./b/src/governance/mod.ts", default: "./b/dist/src/governance/mod.js" });
+  assertEquals(map["./b/governance"], { types: "./b/dist/src/governance/mod.d.ts", bun: "./b/src/governance/mod.ts", default: "./b/src/governance/mod.js" });
 });
 
 proves([`${SPEC} FR-029`], "an import of a library is written as an import of the package, in code and in the example of a comment; a string that is no import, a name that is no library and the examples of a Markdown fence are left or found", () => {
@@ -102,14 +105,33 @@ proves([`${SPEC} FR-029`], "an import of a library is written as an import of th
   assertEquals(importSpecifiers('import a from "./a.ts";\nconst s = "import b from \\"./b.ts\\"";'), ["./a.ts"]);
 });
 
-proves([`${SPEC} FR-029`], "the dependencies are the union of the libraries' and the drivers', each exact; two versions of one package and a version that is not exact are findings", () => {
-  const u = unionDependencies([facts("a", { dependencies: { shiki: "4.5.0" } }), facts("b", { dependencies: { shiki: "4.5.0" }, drivers: { pg: "8.23.1" } })]);
+proves([`${SPEC} FR-029`], "the dependencies are the union of what the libraries need at run time and the package installs, each exact; two versions of one package and a version that is not exact are findings; what the package asks of the consumer is a peer and never installed", () => {
+  const u = unionDependencies([facts("a", { dependencies: { left: "1.0.0" } }), facts("b", { dependencies: { left: "1.0.0", right: "2.0.0" }, peers: { pg: "8.23.1" } })]);
   assertEquals(u.problems, []);
-  assertEquals(u.dependencies, { pg: "8.23.1", shiki: "4.5.0" });
-  const two = unionDependencies([facts("a", { dependencies: { pg: "8.13.1" } }), facts("b", { drivers: { pg: "8.23.1" } })]);
-  assertStringIncludes(two.problems.join("\n"), "pg is 8.13.1 in a and 8.23.1 in b");
-  assertStringIncludes(unionDependencies([facts("a", { dependencies: { shiki: "^4.5.0" } })]).problems.join("\n"), "not an exact version");
-  assertEquals(unionDependencies([facts("a", { dependencies: { typescript: "7.1.0-beta" } })]).problems, []);
+  assertEquals(u.dependencies, { left: "1.0.0", right: "2.0.0" }, "a peer is not installed by the package");
+  const two = unionDependencies([facts("a", { dependencies: { left: "1.1.0" } }), facts("b", { dependencies: { left: "1.0.0" } })]);
+  assertStringIncludes(two.problems.join("\n"), "left is 1.1.0 in a and 1.0.0 in b");
+  assertStringIncludes(unionDependencies([facts("a", { dependencies: { left: "^1.0.0" } })]).problems.join("\n"), "not an exact version");
+});
+
+proves([`${SPEC} FR-029`], "the packages the package asks of the consumer are optional peers with the range of SINGLE_PEERS, and two versions of one of them are a finding", () => {
+  const asked = peersOf([facts("a", { peers: { pg: "8.23.1", typescript: "7.1.0-beta" } }), facts("b", { peers: { pg: "8.23.1", shiki: "4.5.0" } })]);
+  assertEquals(asked.problems, []);
+  assertEquals(asked.peerDependencies, { pg: ">=8.23.1 <9.0.0", shiki: ">=4.5.0 <5.0.0", typescript: ">=7.1.0-0" });
+  assertEquals(asked.peerDependenciesMeta, { pg: { optional: true }, shiki: { optional: true }, typescript: { optional: true } });
+  assertStringIncludes(peersOf([facts("a", { peers: { pg: "8.23.1" } }), facts("b", { peers: { pg: "8.13.1" } })]).problems.join("\n"), "pg is 8.23.1 in a and 8.13.1 in b");
+  assertEquals([...SINGLE_PEERS.keys()].sort(), ["@duckdb/node-api", "@electric-sql/pglite", "beautiful-mermaid", "pg", "shiki", "typescript"]);
+});
+
+proves([`${SPEC} FR-033`], "a static import of a package is found and a dynamic one, a statement of types only and a name in a string are not", () => {
+  assertEquals(staticSpecifiers('import a from "shiki/core";\nimport "x";\nexport { b } from "y";\nexport * from "z";'), ["shiki/core", "x", "y", "z"]);
+  assertEquals(staticSpecifiers('const m = await import("shiki");\nimport type { T } from "pg";\nexport type { U } from "pg";\nconst s = "import q from \\"shiki\\"";'), []);
+  assertEquals(staticSpecifiers('import {\n  a,\n  b,\n} from "typescript/async";'), ["typescript/async"]);
+});
+
+proves([`${SPEC} FR-032`], "a staged package is reported by kind and by library, and a compiled file is the one beside a source of the same name", () => {
+  const files = new Set(["package.json", "bin/x.mjs", "a/src/m.ts", "a/src/m.js", "a/dist/src/m.d.ts", "a/data/x.json", "a/guides/g.md", "a/src/site.js"]);
+  assertEquals([...files].map((f) => kindOf(f, files)), ["package", "package", "source", "compiled", "declaration", "data", "documentation", "data"]);
 });
 
 proves([`${SPEC} FR-029`], "a command is a launcher of the compiled module and a name that two libraries declare is a finding", async () => {
@@ -121,7 +143,7 @@ proves([`${SPEC} FR-029`], "a command is a launcher of the compiled module and a
     const one = commandsOf(dir, [facts("a", { bin: { tool: "./bin/tool.mjs" } })]);
     assertEquals(one.problems, []);
     assertEquals(one.commands, [{ name: "tool", library: "a", module: "src/tool.ts", form: "main" }]);
-    assertStringIncludes(launcherOf(one.commands[0] as Command), 'import { main } from "../a/dist/src/tool.js";');
+    assertStringIncludes(launcherOf(one.commands[0] as Command), 'import { main } from "../a/src/tool.js";');
     const clash = commandsOf(dir, [facts("a", { bin: { tool: "./bin/tool.mjs" } }), facts("b", { bin: { tool: "./bin/tool.mjs" } })]);
     assertStringIncludes(clash.problems.join("\n"), "the command tool is declared by a and by b");
     assertStringIncludes(commandsOf(dir, [facts("a", { bin: { other: "./bin/none.mjs" } })]).problems.join("\n"), "which is not there");
@@ -191,9 +213,9 @@ proves([`${SPEC} FR-029`, `${SPEC} FR-030`], "the packer builds the real files o
     assertEquals(Object.keys(m["exports"] as object), ["./alpha", "./alpha/util", "./beta", "./beta/util"]);
     assertEquals(m["bin"], { beta: "./bin/beta.mjs" });
     assertEquals(packed.counts.libraries, 2);
-    assertEquals(m["sideEffects"], ["./beta/dist/src/mod.js", "./beta/src/mod.ts"], "the module that logs when it is loaded is named, and no other");
+    assertEquals(m["sideEffects"], ["./beta/src/mod.js", "./beta/src/mod.ts"], "the module that logs when it is loaded is named, and no other");
     const stage = packed.stage;
-    assertStringIncludes(readTextFileSync(join(stage, "beta/dist/src/cli.js")), 'from "@intellectual-frontiers/commons/alpha/util"');
+    assertStringIncludes(readTextFileSync(join(stage, "beta/src/cli.js")), 'from "@intellectual-frontiers/commons/alpha/util"');
     assertStringIncludes(readTextFileSync(join(stage, "beta/src/mod.ts")), 'import { alpha } from "@intellectual-frontiers/commons/alpha";');
     assertStringIncludes(readTextFileSync(join(stage, "beta/src/mod.ts")), ' * import { alpha } from "@intellectual-frontiers/commons/alpha";');
     assertEquals(inspectCommons(stage, ["alpha", "beta"]), []);
@@ -210,7 +232,9 @@ proves([`${SPEC} FR-029`, `${SPEC} FR-030`], "the packer builds the real files o
     writeTextFileSync(join(dir, "consumer", "data.mjs"), 'import { data } from "@intellectual-frontiers/commons/alpha/util";\nprocess.stdout.write(data());\n');
     for (const runtime of ["node", proc.which("bun") ?? "bun"]) assertEquals((await proc.run([runtime, "data.mjs"], { cwd: join(dir, "consumer") })).stdout, "the data of alpha\n", `${runtime} reads the data folder`);
     const shipped = new Set(readLibraryFiles(into));
-    for (const f of ["alpha/data/x.txt", "alpha/data/sub/y.txt", "alpha/dist/data/x.txt", "alpha/dist/data/sub/y.txt"]) assert(shipped.has(f), `${f} is in the package`);
+    for (const f of ["alpha/data/x.txt", "alpha/data/sub/y.txt"]) assert(shipped.has(f), `${f} is in the package`);
+    for (const f of shipped) if (f.startsWith("alpha/dist/")) assert(f.endsWith(".d.ts"), `${f}: dist/ holds declarations only, a file a module reads is shipped once`);
+    assertEquals(inspectCommons(into, ["alpha", "beta"]), [], "the inspection of the installed package");
     for (const f of shipped) for (const dev of ["suite", "spec-kit", "tools", "acceptance"]) assert(!f.startsWith(`alpha/${dev}/`) && !f.startsWith(`alpha/dist/${dev}/`), `${f} only develops the library and is not in the package`);
     // a missing library
     const without = JSON.parse(readTextFileSync(join(stage, "package.json"))) as Record<string, unknown>;
@@ -222,7 +246,7 @@ proves([`${SPEC} FR-029`, `${SPEC} FR-030`], "the packer builds the real files o
     keep({ ...without, dependencies: { shiki: "^4.5.0" } });
     assertStringIncludes(inspectCommons(stage, ["alpha", "beta"]).join("\n"), "shiki is ^4.5.0, which is not an exact version");
     writeTextFileSync(join(stage, "package.json"), original);
-    const cli = join(stage, "beta/dist/src/cli.js");
+    const cli = join(stage, "beta/src/cli.js");
     const cliText = readTextFileSync(cli);
     writeTextFileSync(cli, `import "left-pad";\n${cliText}`);
     assertStringIncludes(inspectCommons(stage, ["alpha", "beta"]).join("\n"), "imports left-pad, which is not a dependency of @intellectual-frontiers/commons");
@@ -240,8 +264,29 @@ proves([`${SPEC} FR-029`, `${SPEC} FR-030`], "the packer builds the real files o
     writeTextFileSync(util, utilText);
     // a file that does something when it is loaded, marked free of effects
     keep({ ...without, sideEffects: false });
-    assertStringIncludes(inspectCommons(stage, ["alpha", "beta"]).join("\n"), "beta/dist/src/mod.js does something when it is loaded, and sideEffects does not name it");
+    assertStringIncludes(inspectCommons(stage, ["alpha", "beta"]).join("\n"), "beta/src/mod.js does something when it is loaded, and sideEffects does not name it");
     keep(without);
+    assertEquals(inspectCommons(stage, ["alpha", "beta"]), []);
+    // a static import of an optional peer, a file in dist/ that is no declaration, an internal file, a file shipped twice and a package over its budget
+    keep({ ...without, peerDependencies: { shiki: ">=4.5.0 <5.0.0" }, peerDependenciesMeta: { shiki: { optional: true } } });
+    writeTextFileSync(cli, `import "shiki/core";\n${cliText}`);
+    assertStringIncludes(inspectCommons(stage, ["alpha", "beta"]).join("\n"), "imports the optional peer shiki statically");
+    writeTextFileSync(cli, `const shiki = await import("shiki/core");\n${cliText}`);
+    assertEquals(inspectCommons(stage, ["alpha", "beta"]).filter((f) => f.includes("optional peer")), [], "a dynamic import is how an optional peer is loaded");
+    writeTextFileSync(cli, cliText);
+    keep(without);
+    writeTextFileSync(join(stage, "alpha/dist/x.txt"), "twice\n");
+    assertStringIncludes(inspectCommons(stage, ["alpha", "beta"]).join("\n"), "alpha/dist/x.txt is in dist/, which holds declarations only");
+    writeTextFileSync(join(stage, "alpha/data/x2.txt"), "the data of alpha\n");
+    assertStringIncludes(inspectCommons(stage, ["alpha", "beta"]).join("\n"), "are the same file shipped twice");
+    mkdirSync(join(stage, "alpha/suite"), { recursive: true });
+    writeTextFileSync(join(stage, "alpha/suite/a.test.ts"), "export {};\n");
+    writeTextFileSync(join(stage, "alpha/src/util.js.map"), "{}");
+    const internal = inspectCommons(stage, ["alpha", "beta"]).join("\n");
+    assertStringIncludes(internal, "alpha/suite/a.test.ts is internal to commons");
+    assertStringIncludes(internal, "alpha/src/util.js.map is internal to commons");
+    for (const f of ["alpha/dist/x.txt", "alpha/data/x2.txt", "alpha/suite", "alpha/src/util.js.map"]) removeSync(join(stage, f), { recursive: true });
+    assertStringIncludes(inspectCommons(stage, ["alpha", "beta"], { apparentBytes: 100, files: 3 }).join("\n"), "the budget is 3");
     assertEquals(inspectCommons(stage, ["alpha", "beta"]), []);
     // a command that two libraries declare stops the packer
     writeTextFileSync(join(dir, "commons/alpha/package.json"), JSON.stringify({ name: "@intellectual-frontiers/alpha", version: "0.1.0", type: "module", exports: { ".": "./src/mod.ts", "./util": "./src/util.ts" }, bin: { beta: "./bin/beta.mjs" } }));

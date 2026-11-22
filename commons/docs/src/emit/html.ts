@@ -9,7 +9,6 @@
  */
 import { absurd } from "@intellectual-frontiers/core";
 import { highlightedHtml } from "../highlight.ts";
-import { renderMermaidSVG } from "beautiful-mermaid";
 import type { Badge, Block, Card, Href, Inline, Lang, Page, Section, TreeNode } from "../model.ts";
 import { plain } from "../model.ts";
 
@@ -121,8 +120,21 @@ export function highlighted(code: string, lang: Lang): string {
   return highlightedHtml(code, lang);
 }
 
-/** Whether a diagram can be drawn: its source is of a type the renderer draws (flowchart, state, sequence, class, entity-relationship). */
+/**
+ * The renderer of diagrams, loaded with `import()` (0036-distribution FR-033): `beautiful-mermaid` is an optional peer of the package, so every entry imports without it. Where it is absent a diagram stays as its source in the page, with one warning that names the package and the range to install.
+ */
+const renderMermaidSVG: ((source: string, options?: Record<string, string | boolean>) => string) | undefined = await (async () => {
+  try {
+    return (await import("beautiful-mermaid")).renderMermaidSVG;
+  } catch (e) {
+    console.warn(`docs: beautiful-mermaid is not installed (or cannot be loaded: ${e instanceof Error ? e.message.split("\n")[0] : String(e)}), so diagrams stay as their source: install beautiful-mermaid at >=1.1.3 <2.0.0 beside the package to draw them`);
+    return undefined;
+  }
+})();
+
+/** Whether a diagram can be drawn: its source is of a type the renderer draws (flowchart, state, sequence, class, entity-relationship). Where the renderer is not installed no diagram is judged: they all stay as their source. */
 export function drawable(source: string): boolean {
+  if (renderMermaidSVG === undefined) return true;
   try {
     renderMermaidSVG(source);
     return true;
@@ -155,6 +167,7 @@ export function diagramSources(bs: readonly Block[]): string[] {
  */
 export function diagramSvg(source: string): string {
   try {
+    if (renderMermaidSVG === undefined) return `<pre class="lang-mermaid"><code>${escape(source)}</code></pre>`;
     return renderMermaidSVG(source, { bg: "var(--page)", fg: "var(--text)", line: "var(--muted)", accent: "var(--link)", muted: "var(--faint)", surface: "var(--chrome)", border: "var(--border-strong)", transparent: true, font: "inherit" });
   } catch {
     return `<pre class="lang-mermaid"><code>${escape(source)}</code></pre>`;

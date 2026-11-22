@@ -57,11 +57,25 @@ export const SINGLE = { package: "@intellectual-frontiers/commons", slug: "commo
  */
 export const SINGLE_EXCLUDED: ReadonlyMap<string, string> = new Map<string, string>();
 
+/** How a package the single package does not install is asked for: the range a consumer's copy must satisfy, whether the package works without it, and why (0036-distribution FR-023). */
+export type PeerRule = { readonly range: string; readonly optional: boolean; readonly why: string; readonly pinnedBy: "dependencies" | "devDependencies" };
+
 /**
- * The third-party packages that the single package depends on although no source of commons imports them by name: the database drivers that the libraries take as ports (a driver is handed to the library by its caller, typed by the shape it
- * is used by), so that a consumer who uses a store of AnyFS or of Data finds the driver installed. The version of each is the one the libraries name in their own `package.json`; two libraries that name two versions are a finding.
+ * The third-party packages that the single package does not install but asks the consumer for, as `peerDependencies` (0036-distribution FR-023, FR-033): the database drivers that the libraries take as ports (a driver is handed to a library by its
+ * caller, typed by the shape it is used by, and no source of commons imports one by name), the two packages only the documentation generator loads, and the TypeScript compiler, whose API the documentation generator reads. Each is optional: a consumer that uses a
+ * store of AnyFS or of Data installs its driver, one that builds a site installs what Docs loads, and the compiler of the consumer is the one used, so that a second is never installed. The range of each is the versions the libraries are written against, and `pinnedBy` says where a library names the version it is written against (a driver in its `devDependencies`, what Docs loads in its `dependencies`).
  */
-export const SINGLE_DRIVERS: readonly string[] = ["@duckdb/node-api", "@electric-sql/pglite", "pg"];
+export const SINGLE_PEERS: ReadonlyMap<string, PeerRule> = new Map<string, PeerRule>([
+  ["@duckdb/node-api", { range: ">=2.0.0-r.1", optional: true, pinnedBy: "devDependencies", why: "the DuckDB store of AnyFS and of Data: the caller hands the connection to the library, so it installs the driver" }],
+  ["@electric-sql/pglite", { range: ">=0.5.16 <1.0.0", optional: true, pinnedBy: "devDependencies", why: "the in-process PostgreSQL store of AnyFS and of Data: the caller installs the driver" }],
+  ["pg", { range: ">=8.23.1 <9.0.0", optional: true, pinnedBy: "devDependencies", why: "the PostgreSQL store of AnyFS and of Data: the caller installs the driver" }],
+  ["shiki", { range: ">=4.5.0 <5.0.0", optional: true, pinnedBy: "dependencies", why: "Docs colours the code of a page with it; without it the page is plain and Docs says so" }],
+  ["beautiful-mermaid", { range: ">=1.1.3 <2.0.0", optional: true, pinnedBy: "dependencies", why: "Docs draws a diagram with it; without it the diagram stays as its source and Docs says so" }],
+  ["typescript", { range: ">=7.1.0-0", optional: true, pinnedBy: "dependencies", why: "Docs reads the API of an area through `typescript/async` of the compiler 7.1; the consumer's own compiler is used" }],
+]);
+
+/** The size budget of the single package (0036-distribution FR-032): a growth beyond it is a finding, so that it is a decision and never an accident. Bytes of the staged package, files of it, and bytes of the tarball. */
+export const SINGLE_BUDGET = { apparentBytes: 27_000_000, files: 4_700, tarballBytes: 6_000_000 } as const;
 
 /** The registries a release can send a package to: a closed set. */
 export const PUBLISH_TARGETS = ["github", "npm"] as const;

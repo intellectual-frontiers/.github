@@ -18,6 +18,7 @@
 - **FR-007**: The port of PGlite MUST run a transaction through PGlite's own, so that a statement outside it waits for it.
 - **FR-008**: The port of `pg` MUST take a connection of a pool for each transaction and give it back, or run one transaction at a time on a client, read a `BIGINT` that arrives as text and a buffer as bytes, and never take credentials from a place.
 - **FR-009**: The port of DuckDB MUST run a transaction as `BEGIN TRANSACTION` and `COMMIT`, undone with `ROLLBACK`, one at a time on a connection.
+- **FR-010**: Each port of a driver (`pg`, PGlite, DuckDB) MUST say which package to install where it is handed no connection of that driver: the driver is an optional peer of the package that holds the library and no source of commons imports it (commons 0036-distribution FR-023, FR-033), so a port that is given nothing, or something that has not the methods it uses, MUST throw a `TypeError` that names the driver, the range of versions and that the caller installs it and hands the connection over.
 
 ## Acceptance scenarios
 

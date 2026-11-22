@@ -13,17 +13,7 @@
  *
  * @module
  */
-import { createHighlighterCore } from "shiki/core";
-import { createOnigurumaEngine } from "shiki/engine/oniguruma";
-import json from "shiki/langs/json.mjs";
-import shellscript from "shiki/langs/shellscript.mjs";
-import sql from "shiki/langs/sql.mjs";
-import toml from "shiki/langs/toml.mjs";
-import turtle from "shiki/langs/turtle.mjs";
-import typescript from "shiki/langs/typescript.mjs";
-import yaml from "shiki/langs/yaml.mjs";
-import githubDark from "shiki/themes/github-dark.mjs";
-import githubLight from "shiki/themes/github-light.mjs";
+import type { HighlighterCore } from "shiki/core";
 import { highlight as sqlSpans, type SpanKind } from "@intellectual-frontiers/lang-sql/aide/text";
 import { dialect as postgres } from "@intellectual-frontiers/lang-sql/dialects/postgres";
 import type { Lang } from "./model.ts";
@@ -34,22 +24,58 @@ export const THEMES = { light: "github-light", dark: "github-dark" } as const;
 /** The grammar each language of the site is read with; those not here are left plain. */
 const GRAMMAR: Readonly<Partial<Record<Lang, string>>> = { ts: "typescript", sql: "sql", sh: "shellscript", toml: "toml", json: "json", turtle: "turtle", yaml: "yaml" };
 
-/** Shiki, with the Oniguruma engine (WebAssembly, the same on Bun and Node) made once when the module is read; reading code with it is then synchronous. */
-const highlighter = await createHighlighterCore({ themes: [githubLight, githubDark], langs: [typescript, sql, shellscript, toml, json, turtle, yaml], engine: createOnigurumaEngine(import("shiki/wasm")) });
+/** Shiki, with the Oniguruma engine (WebAssembly, the same on Bun and Node) and the themes it is read with, loaded once when the module is read; reading code with it is then synchronous. */
+type Loaded = { readonly highlighter: HighlighterCore; readonly foreground: { readonly light: string; readonly dark: string } };
+
+/**
+ * Loads Shiki with `import()` (0036-distribution FR-033): it is an optional peer of the package, so a consumer that builds no site installs none of it, and every entry of the package imports without it. Where it is absent the code of a page is shown plain, with one warning that
+ * names the package and the range to install; a site is still made.
+ */
+async function load(): Promise<Loaded | undefined> {
+  try {
+    const [core, engine, json, shellscript, sql, toml, turtle, typescript, yaml, githubDark, githubLight] = await Promise.all([
+      import("shiki/core"),
+      import("shiki/engine/oniguruma"),
+      import("shiki/langs/json.mjs"),
+      import("shiki/langs/shellscript.mjs"),
+      import("shiki/langs/sql.mjs"),
+      import("shiki/langs/toml.mjs"),
+      import("shiki/langs/turtle.mjs"),
+      import("shiki/langs/typescript.mjs"),
+      import("shiki/langs/yaml.mjs"),
+      import("shiki/themes/github-dark.mjs"),
+      import("shiki/themes/github-light.mjs"),
+    ]);
+    const highlighter = await core.createHighlighterCore({
+      themes: [githubLight.default, githubDark.default],
+      langs: [typescript.default, sql.default, shellscript.default, toml.default, json.default, turtle.default, yaml.default],
+      engine: engine.createOnigurumaEngine(import("shiki/wasm")),
+    });
+    return {
+      highlighter,
+      foreground: { light: githubLight.default.colors?.["editor.foreground"]?.toLowerCase() ?? "#24292e", dark: githubDark.default.colors?.["editor.foreground"]?.toLowerCase() ?? "#e1e4e8" },
+    };
+  } catch (e) {
+    console.warn(`docs: shiki is not installed (or cannot be loaded: ${e instanceof Error ? e.message.split("\n")[0] : String(e)}), so the code of the site is shown plain: install shiki at >=4.5.0 <5.0.0 beside the package to colour it`);
+    return undefined;
+  }
+}
+
+const loaded = await load();
 
 /** Code longer than this many characters is shown plain: a computed type of thousands of characters costs more to colour than it helps a reader, and the page folds it. */
 export const LONGEST_COLOURED = 6000;
 
 // The first reading of a grammar by the engine can give runs that are not cut at its tokens (a comment left in the text before it). A reading of each grammar here, whose result is not used, makes the readings that are
 // used the same whatever came first; the test of the highlighter holds this.
-for (const [lang, sample] of [["typescript", 'const a = f("x"); // c'], ["sql", "SELECT 1 -- c"], ["shellscript", 'echo "$A" # c'], ["toml", '[a]\nb = "x" # c'], ["json", '{"a": [1, true, null]}'], ["turtle", 'a:b a c:D ; d:e "f"@en .'], ["yaml", "a: 1\nb: [x] # c"]] as const) {
-  for (const theme of [THEMES.light, THEMES.dark]) highlighter.codeToTokensBase(sample, { lang, theme });
+for (const [lang, sample] of loaded === undefined ? [] : [["typescript", 'const a = f("x"); // c'], ["sql", "SELECT 1 -- c"], ["shellscript", 'echo "$A" # c'], ["toml", '[a]\nb = "x" # c'], ["json", '{"a": [1, true, null]}'], ["turtle", 'a:b a c:D ; d:e "f"@en .'], ["yaml", "a: 1\nb: [x] # c"]] as const) {
+  for (const theme of [THEMES.light, THEMES.dark]) loaded?.highlighter.codeToTokensBase(sample, { lang, theme });
 }
 
 const escapeHtml = (s: string): string => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 /** The colours that are the themes' own text, which are left as plain text. */
-const FOREGROUND = { light: githubLight.colors?.["editor.foreground"]?.toLowerCase() ?? "#24292e", dark: githubDark.colors?.["editor.foreground"]?.toLowerCase() ?? "#e1e4e8" };
+const FOREGROUND = loaded?.foreground ?? { light: "#24292e", dark: "#e1e4e8" };
 
 /** One coloured run of code. */
 export interface Run {
@@ -105,12 +131,12 @@ function sqlRuns(code: string): readonly (readonly Run[])[] | undefined {
 /** The runs of the lines of code, by line, in the language given; one plain run for a language that is not coloured. */
 export function runs(code: string, lang: Lang): readonly (readonly Run[])[] {
   const grammar = GRAMMAR[lang];
-  if (grammar === undefined || code.length > LONGEST_COLOURED) return code.split("\n").map((line) => [{ text: line, italic: false, bold: false }]);
+  if (grammar === undefined || loaded === undefined || code.length > LONGEST_COLOURED) return code.split("\n").map((line) => [{ text: line, italic: false, bold: false }]);
   if (lang === "sql") {
     const read = sqlRuns(code);
     if (read !== undefined) return read;
   }
-  const lines = highlighter.codeToTokensWithThemes(code, { lang: grammar, themes: THEMES });
+  const lines = loaded.highlighter.codeToTokensWithThemes(code, { lang: grammar, themes: THEMES });
   return lines.map((line) => {
     const out: Run[] = [];
     for (const t of line) {

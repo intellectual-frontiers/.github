@@ -17,7 +17,7 @@ import type { Channel, ConfirmationClass, Effect, Kind } from "@intellectual-fro
 import type { TierId } from "./tiers.ts";
 
 /** The words of every verb, as a person types them: a closed union. */
-export type VerbId = "sync" | "merge" | "check" | "status" | "hygiene" | "release plan" | "release apply" | "release publish" | "new library" | "commit" | "doctor" | "prove" | "docs build" | "docs serve" | "docs check" | "query" | "mcp";
+export type VerbId = "sync" | "merge" | "check" | "status" | "hygiene" | "release plan" | "release apply" | "release publish" | "new library" | "commit" | "doctor" | "prove" | "docs build" | "docs serve" | "docs check" | "query" | "usage" | "mcp";
 
 /** What a verb is. */
 export type VerbFacts = {
@@ -111,6 +111,19 @@ export const VERBS: Readonly<Record<VerbId, VerbFacts>> = {
   query: {
     id: "query",
     summary: "Ask the libraries, their specifications and their requirements in SQL: one read-only SELECT over the relations libraries, specs and requirements.",
+    kind: "report",
+    effect: "read",
+    idempotent: true,
+    dryRun: false,
+    check: false,
+    tier: "public",
+    channels: ["local", "mcp"],
+    confirmation: "none",
+    humanOnly: [],
+  },
+  usage: {
+    id: "usage",
+    summary: "Say what this repository uses of the package @intellectual-frontiers/commons: the libraries it imports, those reached through them and those never touched, with their sizes.",
     kind: "report",
     effect: "read",
     idempotent: true,
@@ -268,5 +281,5 @@ export const VERBS: Readonly<Record<VerbId, VerbFacts>> = {
 
 /** The words of every verb, in the order the help lists them. */
 export function verbIds(): readonly VerbId[] {
-  return ["check", "sync", "merge", "status", "hygiene", "release plan", "release apply", "release publish", "new library", "commit", "doctor", "prove", "docs build", "docs serve", "docs check", "query", "mcp"];
+  return ["check", "sync", "merge", "status", "hygiene", "release plan", "release apply", "release publish", "new library", "commit", "doctor", "prove", "docs build", "docs serve", "docs check", "query", "usage", "mcp"];
 }

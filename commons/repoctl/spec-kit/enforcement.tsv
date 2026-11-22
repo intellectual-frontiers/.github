@@ -87,3 +87,8 @@ requirement	mechanism	by	note
 0012-repoctl-query FR-003	check	.github: cd commons/repoctl && bun run verify	suite/query.test.ts
 0012-repoctl-query FR-004	check	.github: cd commons/repoctl && bun run verify	suite/query.test.ts
 0012-repoctl-query FR-005	check	.github: cd commons/repoctl && bun run verify	suite/query.test.ts
+0013-repoctl-usage FR-001	check	.github: cd commons/repoctl && bun run verify	suite/usage.test.ts
+0013-repoctl-usage FR-002	check	.github: cd commons/repoctl && bun run verify	suite/usage.test.ts
+0013-repoctl-usage FR-003	check	.github: cd commons/repoctl && bun run verify	suite/usage.test.ts
+0013-repoctl-usage FR-004	check	.github: cd commons/repoctl && bun run verify	suite/usage.test.ts
+0013-repoctl-usage FR-005	check	.github: cd commons/repoctl && bun run verify	suite/usage.test.ts

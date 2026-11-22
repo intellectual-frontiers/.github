@@ -12,7 +12,7 @@
  * @module
  */
 import type { SqlPort, SqlRow, SqlRunner, SqlValue } from "@intellectual-frontiers/anyfs-sql/governance";
-import { rowOf } from "./common.ts";
+import { rowOf, requireDriver } from "./common.ts";
 
 /** What `query` gives. */
 export interface PgliteResult {
@@ -39,6 +39,7 @@ const runnerOf = (db: PgliteQueryable): SqlRunner => ({
 
 /** The port of a PGlite database. */
 export function pglitePort(db: PgliteDatabase): SqlPort {
+  requireDriver("pglitePort", "@electric-sql/pglite", ">=0.5.16 <1.0.0", db, ["query", "transaction", "close"]);
   return {
     dialect: "postgres",
     ...runnerOf(db),
