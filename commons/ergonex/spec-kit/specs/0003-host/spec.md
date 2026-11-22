@@ -38,7 +38,7 @@
 ## The shell snippet
 
 - **FR-017**: `ergonex shell print <bash|zsh|fish|pwsh|nu>` MUST print the snippet for that shell on standard output and nothing else, MUST write no file and change nothing, and MUST exit 2 for another shell.
-- **FR-018**: The snippet MUST do four things and no more, besides the token of 0004-onboarding FR-004 and the short name of FR-027: export `ERGONEX_HOME` where it is not set, add `~/.local/bin` (on Windows, `<data>/tools/bin`), where the shims of the pinned tools and of the `ergonex-*` modules are, to the `PATH`, define the completions of `ergonex`, and define one function, `wcd`, that changes to a repository of the workspace by its name.
+- **FR-018**: The snippet MUST do four things and no more, besides the token of 0004-onboarding FR-004 and the short name of 0003-host FR-027: export `ERGONEX_HOME` where it is not set, add `~/.local/bin` (on Windows, `<data>/tools/bin`), where the shims of the pinned tools and of the `ergonex-*` modules are, to the `PATH`, define the completions of `ergonex`, and define one function, `wcd`, that changes to a repository of the workspace by its name.
 - **FR-019**: `ergonex shell install` MUST write one block (and with `--dry-run` show it as a unified diff) between the lines `# >>> ergonex >>>` and `# <<< ergonex <<<` in the shell's start-up file (`~/.bashrc`, `~/.zshrc`, `~/.config/fish/conf.d/ergonex.fish`, the PowerShell `$PROFILE`, or the Nushell `config.nu`, or the file `--rc` names) and ask, MUST write only after a yes (and exit 2 where there is no terminal and no `--yes`), MUST leave one block where it is run twice, and `--uninstall` MUST remove exactly that block and nothing else.
 
 ## What is not managed
