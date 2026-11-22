@@ -258,3 +258,11 @@ proves(
       assert(!/-publish\.auto\.yml$/.test(f), `${f}: a workflow of a library's own publication`);
   },
 );
+
+proves([`${SPEC} FR-010`], "no script of a bash step pipes into head: under pipefail a listing longer than the cut fails the step that prints it", () => {
+  const found: string[] = [];
+  for (const w of workflows())
+    for (const [id, j] of Object.entries(w.jobs))
+      for (const s of j.steps) if (s.kind === "run" && (s.shell === "bash" || s.shell === undefined) && /\|\s*head\b/.test(s.run)) found.push(`${w.file}/${id}: ${s.name ?? s.run.slice(0, 40)}`);
+  assertEquals(found, []);
+});
