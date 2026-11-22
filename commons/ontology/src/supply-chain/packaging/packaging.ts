@@ -65,6 +65,11 @@ export const pm = vocabulary(PM, {
   Assurance: "owl:Class",
   ManagerKind: "owl:Class",
   Tier: "owl:Class",
+  ContentPolicy: "owl:Class",
+  SizeBudget: "owl:Class",
+  UsageReport: "owl:Class",
+  PeerDependency: "owl:Class",
+  OptionalPeer: "owl:Class",
   executable: "owl:DatatypeProperty",
   kind: "owl:ObjectProperty",
   needsAdministrator: "owl:DatatypeProperty",
@@ -384,6 +389,38 @@ export const classes = [
     label: en("Record field"),
     definition: en(
       "One field of the record a setup keeps of how an account was set up: its name, its type and, where only some values are allowed, which.",
+    ),
+  }),
+  // the distribution of a package of commons (commons 0002-packaging FR-030, FR-031; 0036-distribution)
+  OwlClass.make(pm.ContentPolicy, {
+    label: en("Content policy"),
+    definition: en(
+      "What a published package may and may not hold: nothing that is the repository's own checking (tests, tools, specifications, sources of the checks) and no byte-identical copy of a file, which the packer's inspection enforces.",
+    ),
+  }),
+  OwlClass.make(pm.SizeBudget, {
+    label: en("Size budget"),
+    definition: en(
+      "The greatest apparent size, number of files and compressed size a published package may have, which the packer's inspection enforces and a release cannot pass.",
+    ),
+  }),
+  OwlClass.make(pm.UsageReport, {
+    label: en("Usage report"),
+    definition: en(
+      "What a consumer repository imports of a package, what that reaches through the package's own imports, and what it never touches.",
+    ),
+  }),
+  OwlClass.make(pm.PeerDependency, {
+    label: en("Peer dependency"),
+    definition: en(
+      "A dependency that a package does not carry and assumes its consumer provides: npm's `peerDependencies`. The consumer, not the package, chooses its version within the range the package names.",
+    ),
+  }),
+  OwlClass.make(pm.OptionalPeer, {
+    label: en("Optional peer"),
+    subClassOf: [pm.PeerDependency],
+    definition: en(
+      "A peer dependency that a consumer need not install: npm's `peerDependenciesMeta` entry marked optional, and the field `ifcOptionalPeers` of the one package of commons, which names the same thing because the GitHub package registry drops `peerDependenciesMeta`. A library that needs one and does not find it says so by name.",
     ),
   }),
   // individuals that name a kind

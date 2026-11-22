@@ -85,6 +85,7 @@ const ROWS: readonly Row[] = [
   ["ergonex/repo-path-room", "A repository's path leaves little room", "A repository's own path leaves little room for the files inside it on Windows.", "A deep root.", "ergonex doctor"],
   ["ergonex/repo-path-too-long", "A repository's path is too long", "A repository's own path is too long for the system.", "A deep root or a long name.", "ergonex doctor"],
   ["ergonex/runtime", "The runtime is not the one expected", "ergonex runs on Bun by default and Node 26 as the backup.", "An older runtime.", "ergonex doctor"],
+  ["ergonex/enx", "Another program is named enx", "A program named enx is on the PATH, so the short name enx of `ergonex shell` is not defined (it is defined only where none is found); ergonex always works.", "Another tool, such as a package of the same name, put an enx on the PATH.", "which -a enx"],
   ["ergonex/tool", "A tool that ergonex needs is not usable", "Git, Bun or Node is missing or too old.", "It is not installed.", "ergonex doctor"],
   ["ergonex/filesystem", "The file system of the root is not suitable", "The root is on a file system that is case-insensitive or does not keep Git's files safe.", "A network or removable disk.", "ergonex doctor"],
   ["ergonex/hooks", "A repository's hooks are not the generated ones", "The repository does not use the hooks folder that ergonex generates.", "It has not been configured yet.", "ergonex apply"],

@@ -46,6 +46,8 @@ export type CommitPolicy = {
   readonly trailers: readonly TrailerKind[];
   /** The line that credits the agent where neither the command line nor the environment gives one. */
   readonly coAuthor: string | undefined;
+  /** The merge commits of the history that `repoctl hygiene` does not report though their author or committer is not the identity: hashes of at least seven lower-case hexadecimal characters, each a prefix of the hash it holds. History is never rewritten, so this is the list that only shrinks. */
+  readonly heldMerges: readonly string[];
   readonly forbidden: {
     readonly paths: readonly ForbiddenPath[];
     /** Globs of paths that are allowed though a forbidden glob matches them. */
@@ -161,6 +163,7 @@ export type ConfigInput = {
     readonly issue?: { readonly prefix: string; readonly required?: boolean };
     readonly trailers?: readonly TrailerKind[];
     readonly coAuthor?: string;
+    readonly heldMerges?: readonly string[];
     readonly forbidden?: { readonly paths?: readonly ForbiddenPath[]; readonly allow?: readonly string[]; readonly secrets?: readonly SecretPattern[] };
   };
   readonly generators?: readonly GeneratorInput[];
@@ -249,6 +252,8 @@ export function parseConfig(input: ConfigInput): Result<Config, readonly string[
 
   const c = input.commit;
   if (c.identity.name.trim() === "" || !/^[^@\s]+@[^@\s]+$/.test(c.identity.email)) bad("commit.identity needs a name and an email address");
+  for (const h of c.heldMerges ?? []) if (!/^[0-9a-f]{7,40}$/.test(h)) bad(`commit.heldMerges: ${JSON.stringify(h)} is not a hash (seven to forty lower-case hexadecimal characters)`);
+  if (new Set(c.heldMerges ?? []).size !== (c.heldMerges ?? []).length) bad("commit.heldMerges names a hash twice");
   const trailers = c.trailers ?? TRAILER_KINDS.filter((t) => t !== "issue" || c.issue !== undefined);
   if (!dedupe(trailers)) bad("commit.trailers names a trailer twice");
   if (c.issue === undefined && trailers.includes("issue")) bad("commit.trailers has \"issue\" and commit.issue gives no prefix");
@@ -267,6 +272,7 @@ export function parseConfig(input: ConfigInput): Result<Config, readonly string[
     issue: { prefix: c.issue?.prefix ?? "", required: c.issue?.required ?? false },
     trailers,
     coAuthor: c.coAuthor,
+    heldMerges: c.heldMerges ?? [],
     forbidden: { paths: c.forbidden?.paths ?? DEFAULT_FORBIDDEN_PATHS, allow: c.forbidden?.allow ?? DEFAULT_ALLOWED_PATHS, secrets },
   };
 

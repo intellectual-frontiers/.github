@@ -327,3 +327,19 @@ export function hookChecks(facts: readonly HookFacts[], wantedHooksPath: string)
           },
     );
 }
+
+/**
+ * The short name `enx` (0003-host FR-028): every program of that name found on the `PATH` is a warning that names each path and says that the alias of `ergonex shell` is defined only where none is found and that `ergonex` always works; none is an `ok`. A program is never run,
+ * renamed or removed.
+ */
+export function enxChecks(found: readonly string[]): readonly Check[] {
+  if (found.length === 0) return [{ id: "ergonex/enx", level: "ok", subject: "enx", message: "no other program named enx is on the PATH: the short name enx of `ergonex shell` is free" }];
+  return [
+    {
+      id: "ergonex/enx",
+      level: "warn",
+      subject: "enx",
+      message: `another program named enx is on the PATH (${found.join(", ")}): the short name enx of \`ergonex shell\` is defined only where none is found, so it is not defined; ergonex always works`,
+    },
+  ];
+}

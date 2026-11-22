@@ -1,8 +1,9 @@
-// Spec: 0003-host FR-017
+// Spec: 0003-host FR-017, FR-027
 /**
  * The shell snippet (commons 0003-host FR-017, FR-018): what `ergonex shell print <bash|zsh|fish|pwsh|nu>` prints on standard output. It does four things and no more: exports `ERGONEX_HOME`
  * where it is not set, adds `<home>/.ergonex/tools/bin` to the `PATH` (once) so that `ergonex-*` modules and the pinned tools resolve, defines the completions of `ergonex`, and defines one function,
- * `wcd`, that changes to a repository of the workspace by its name.
+ * `wcd`, that changes to a repository of the workspace by its name; and, besides, the token of the person's sign-in and the short name `enx` (FR-027), an alias of `ergonex` that is defined only where no other program, alias or function
+ * of that name is found. An alias exists only in an interactive shell that sourced the snippet: a script, a hook and an agent use `ergonex`.
  *
  * @remarks
  * Pure: the snippet is text made from the shell's name, the root (the default, `$HOME/workspaces`, or a path a run named) and the modules to complete. It holds no secret and no command that runs
@@ -37,6 +38,8 @@ export type Completions = readonly {
 export type SnippetFacts = {
   readonly home: HomeSpec;
   readonly completions: Completions;
+  /** Whether a program named `enx` was found on the `PATH` when the snippet was made: only Nushell reads it (its aliases are fixed when a file is read), the other shells ask when the snippet is sourced (FR-027). */
+  readonly enxTaken?: boolean;
 };
 
 const posixQuote = (s: string): string => `'${s.replaceAll("'", `'\\''`)}'`;
@@ -48,6 +51,14 @@ const words = (c: Completions): string => c.map((m) => m.module).join(" ");
 
 /** `bash` and `zsh` share the body: POSIX parameter expansion, `case`, `find` and `cd`. */
 function posix(f: SnippetFacts, shell: "bash" | "zsh"): string {
+  /** The short name: an alias of `ergonex` and its completions, only where nothing of that name is found as the snippet is sourced (0003-host FR-027). */
+  const enx = (completion: readonly string[]): readonly string[] => [
+    "# the short name enx, an alias of ergonex, only where no other program, alias or function of that name is found; an alias lives in an interactive shell, so a script or an agent uses ergonex (0003-host FR-027)",
+    "if ! command -v enx >/dev/null 2>&1; then",
+    "  alias enx=ergonex",
+    ...completion.map((l) => `  ${l}`),
+    "fi",
+  ];
   const home = f.home.kind === "default" ? "" : posixQuote(f.home.path);
   const several = f.completions.filter((m) => m.commands.length > 1);
   const completion =
@@ -64,6 +75,7 @@ function posix(f: SnippetFacts, shell: "bash" | "zsh"): string {
           "  fi",
           "}",
           "complete -F _ergonex_complete ergonex",
+          ...enx(["complete -F _ergonex_complete enx"]),
         ]
       : [
           "_ergonex_complete() {",
@@ -76,6 +88,7 @@ function posix(f: SnippetFacts, shell: "bash" | "zsh"): string {
           "  fi",
           "}",
           "if (( $+functions[compdef] )); then compdef _ergonex_complete ergonex; fi",
+          ...enx(["if (( $+functions[compdef] )); then compdef _ergonex_complete enx; fi"]),
         ];
   return [
     "# IF Workspaces (ergonex): the root, the pinned tools on the PATH, the completions of ergonex, and wcd.",
@@ -121,6 +134,11 @@ function fish(f: SnippetFacts): string {
     "end",
     `complete -c ergonex -f -n __fish_use_subcommand -a ${fishQuote(words(f.completions))}`,
     ...several.map((m) => `complete -c ergonex -f -n '__fish_seen_subcommand_from ${m.module}' -a ${fishQuote(m.commands.join(" "))}`),
+    "# the short name enx, an alias of ergonex, only where no other program, alias or function of that name is found; an alias lives in an interactive shell, so a script or an agent uses ergonex (0003-host FR-027)",
+    "if not type -q enx",
+    "    alias enx ergonex",
+    "    complete -c enx -w ergonex",
+    "end",
     "function wcd",
     "    if test (count $argv) -lt 1",
     "        echo 'usage: wcd NAME' >&2; return 2",
@@ -151,13 +169,19 @@ function pwsh(f: SnippetFacts): string {
     "    $ergonexToken = (& gh auth token 2>$null)",
     '    if ($LASTEXITCODE -eq 0 -and $ergonexToken) { $env:ERGONEX_GITHUB_TOKEN = "$ergonexToken".Trim() }',
     "}",
-    "Register-ArgumentCompleter -Native -CommandName ergonex -ScriptBlock {",
+    "$ergonexCompleter = {",
     "    param($wordToComplete, $commandAst, $cursorPosition)",
     "    $parts = @($commandAst.CommandElements | ForEach-Object { $_.ToString() })",
     `    $choices = if ($parts.Count -le 1 -or ($parts.Count -eq 2 -and $wordToComplete)) { ${pwshQuote(words(f.completions))} -split ' ' }`,
     ...several.map((m) => `    elseif ($parts[1] -eq '${m.module}') { ${pwshQuote(m.commands.join(" "))} -split ' ' }`),
     "    else { @() }",
     "    $choices | Where-Object { $_ -like \"$wordToComplete*\" } | ForEach-Object { [Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_) }",
+    "}",
+    "Register-ArgumentCompleter -Native -CommandName ergonex -ScriptBlock $ergonexCompleter",
+    "# the short name enx, an alias of ergonex, only where no other program, alias or function of that name is found; an alias lives in an interactive shell, so a script or an agent uses ergonex (0003-host FR-027)",
+    "if (-not (Get-Command enx -ErrorAction SilentlyContinue)) {",
+    "    Set-Alias -Name enx -Value ergonex -Scope Global",
+    "    Register-ArgumentCompleter -Native -CommandName enx -ScriptBlock $ergonexCompleter",
     "}",
     "function wcd {",
     "    param([Parameter(Mandatory = $true)][string]$Name)",
@@ -171,7 +195,7 @@ function pwsh(f: SnippetFacts): string {
 }
 
 function nu(f: SnippetFacts): string {
-  const home = f.home.kind === "default" ? '($nu.home-path | path join "workspaces")' : nuQuote(f.home.path);
+  const home = f.home.kind === "default" ? '(($nu.home-dir? | default $nu.home-path?) | path join "workspaces")' : nuQuote(f.home.path);
   const several = f.completions.filter((m) => m.commands.length > 1);
   return [
     "# IF Workspaces (ergonex): the root, the pinned tools on the PATH, the completions of ergonex, and wcd.",
@@ -187,8 +211,11 @@ function nu(f: SnippetFacts): string {
     `def "nu-complete ergonex" [] { [${f.completions.map((m) => nuQuote(m.module)).join(" ")}] }`,
     ...several.map((m) => `def "nu-complete ergonex ${m.module}" [] { [${m.commands.map(nuQuote).join(" ")}] }`),
     'extern "ergonex" [ module?: string@"nu-complete ergonex", ...rest: string ]',
+    ...(f.enxTaken === true
+      ? ["# enx is not defined: another program named enx was found on the PATH when this was made, and a Nushell alias is fixed when a file is read (0003-host FR-027)"]
+      : ["# the short name enx, an alias of ergonex; an alias lives in an interactive shell, so a script or an agent uses ergonex (0003-host FR-027)", "alias enx = ergonex"]),
     "def --env wcd [name: string] {",
-    '    let hits = (glob ($env.ERGONEX_HOME | path join "**" $name) --depth 8 --no-file | where { |p| (($p | path join ".git") | path exists) and not ($p =~ "[\\\\/]\\.(worktrees|ergonex)[\\\\/]") } | sort)',
+    '    let hits = (glob ($env.ERGONEX_HOME | path join "**" $name) --depth 8 --no-file | where { |p| (($p | path join ".git") | path exists) and not ($p =~ r#\'[\\\\/]\\.(worktrees|ergonex)[\\\\/]\'#) } | sort)',
     '    if ($hits | is-empty) { error make { msg: $"wcd: no repository named ($name) in ($env.ERGONEX_HOME)" } }',
     '    if ($hits | length) > 1 { error make { msg: $"wcd: more than one repository is named ($name): ($hits | str join ", ")" } }',
     "    cd ($hits | first)",

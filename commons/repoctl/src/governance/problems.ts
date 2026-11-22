@@ -61,6 +61,7 @@ export type ProblemCode =
   | "E-HYGIENE-VENDORED"
   | "E-HYGIENE-DUPLICATE"
   | "E-HYGIENE-RANGE"
+  | "E-HYGIENE-IDENTITY"
   | "E-PROVE-FAILED"
   | "E-PROVE-QUARANTINE"
   | "E-CHECK-FAILED"
@@ -116,6 +117,7 @@ export const PROBLEM_CODES: readonly ProblemCode[] = [
   "E-HYGIENE-VENDORED",
   "E-HYGIENE-DUPLICATE",
   "E-HYGIENE-RANGE",
+  "E-HYGIENE-IDENTITY",
   "E-PROVE-FAILED",
   "E-PROVE-QUARANTINE",
   "E-CHECK-FAILED",
@@ -356,6 +358,12 @@ export const CATALOGUE: Readonly<Record<ProblemCode, Explained>> = {
     why: "Git is not installed, or the folder is not a clone.",
     fix: "git --version",
   },
+  "E-HYGIENE-IDENTITY": {
+    title: "A merge commit was not made by the repository's identity",
+    what: "A merge commit of the history has an author or a committer that is not the identity `commit.identity` of the configuration, and the configuration does not hold it in `commit.heldMerges`; or a held hash matches no merge of the history.",
+    why: "A `git pull` or `git merge` made where `user.name` and `user.email` were not set takes the identity of the machine or the session, so the history credits another name. History is never rewritten: the commit stays, and only the held list can carry it.",
+    fix: "git config user.name and user.email to the identity of the configuration before a pull, or merge with repoctl merge; list an old offender in commit.heldMerges",
+  },
   "E-HYGIENE-GIT": {
     title: "A dependency by Git on the repository of commons",
     what: "A package.json depends on the family's own repository by Git (github:, git+https:, git: or ssh:, at a commit or not).",
@@ -430,9 +438,9 @@ export const CATALOGUE: Readonly<Record<ProblemCode, Explained>> = {
   },
   "E-DOCS-GENERATOR-MISSING": {
     title: "The documentation generator is not installed",
-    what: "`@intellectual-frontiers/docs`, the package of the generator `ifc-docs`, cannot be imported from this repository.",
+    what: "The generator `ifc-docs` cannot be imported from this repository: neither the entry `./docs` of the one package `@intellectual-frontiers/commons` (`single` mode) nor the package `@intellectual-frontiers/docs` (`per-library` mode) is installed.",
     why: "`repoctl docs` wraps the generator and does not carry it: it is an optional peer of repoctl.",
-    fix: "bun add --dev @intellectual-frontiers/docs (or npm install --save-dev @intellectual-frontiers/docs)",
+    fix: "bun add --dev @intellectual-frontiers/commons (or npm install --save-dev @intellectual-frontiers/commons) in `single` mode; bun add --dev @intellectual-frontiers/docs in `per-library` mode. The generator names its own optional peers (shiki, beautiful-mermaid, typescript) when one is missing: install them too.",
   },
   "E-DOCS-FAILED": {
     title: "The documentation generator reported a failure",

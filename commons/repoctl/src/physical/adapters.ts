@@ -144,21 +144,27 @@ export function manifestLibraries(repo: string, configured: boolean): Libraries 
   };
 }
 
-/** The package of the documentation generator, which `repoctl docs` loads where it is installed. */
+/** Where the documentation generator may be installed, in the order it is looked for (commons repoctl 0011-repoctl-docs FR-005): the entry `./docs` of the one package (`single` mode), then the package of its own (`per-library` mode). */
+export const DOCS_PLACES: readonly { readonly package: string; readonly subpath: string; readonly mode: "single" | "per-library" }[] = [
+  { package: "@intellectual-frontiers/commons", subpath: "./docs", mode: "single" },
+  { package: "@intellectual-frontiers/docs", subpath: ".", mode: "per-library" },
+];
+
+/** The package of the documentation generator of the `per-library` mode (kept for the name of the problem and its fix). */
 export const DOCS_PACKAGE = "@intellectual-frontiers/docs";
 
 const isRecord = (v: unknown): v is Readonly<Record<string, unknown>> => typeof v === "object" && v !== null;
 
-/** The entry file of an installed package: its `exports` entry `.` (as `import` or `default`), else `module`, else `main`. */
-function entryOf(folder: string): string | undefined {
+/** The entry file of an installed package for an `exports` subpath (`.` or `./docs`), as `import`, `default` or `bun`, else, for `.`, `module` or `main`. */
+function entryOf(folder: string, subpath: string): string | undefined {
   const manifest = join(folder, "package.json");
   if (!existsSync(manifest)) return undefined;
   const json: unknown = JSON.parse(readTextFileSync(manifest));
   if (!isRecord(json)) return undefined;
-  const exported = isRecord(json["exports"]) ? json["exports"]["."] : json["exports"];
-  const pick = (v: unknown): string | undefined => (typeof v === "string" ? v : isRecord(v) ? pick(v["import"]) ?? pick(v["default"]) : undefined);
-  const entry = pick(exported) ?? pick(json["module"]) ?? pick(json["main"]) ?? "index.js";
-  return join(folder, entry);
+  const exported = isRecord(json["exports"]) && subpath in json["exports"] ? json["exports"][subpath] : subpath === "." ? json["exports"] : undefined;
+  const pick = (v: unknown): string | undefined => (typeof v === "string" ? v : isRecord(v) ? pick(v["import"]) ?? pick(v["default"]) ?? pick(v["bun"]) : undefined);
+  const entry = pick(exported) ?? (subpath === "." ? pick(json["module"]) ?? pick(json["main"]) ?? "index.js" : undefined);
+  return entry === undefined ? undefined : join(folder, entry);
 }
 
 function generatorOf(mod: unknown): DocsGenerator | undefined {
@@ -180,21 +186,24 @@ export const systemDocs: DocsPort = {
         return err(`${generator}: ${e instanceof Error ? e.message : String(e)}`);
       }
     }
-    for (let dir = repo; ; dir = dirname(dir)) {
-      const entry = entryOf(join(dir, "node_modules", DOCS_PACKAGE));
-      if (entry !== undefined && existsSync(entry)) {
-        try {
-          const found = generatorOf(await import(toFileUrl(entry).href));
-          if (found !== undefined) return ok(found);
-          tried.push(`${entry} exports no main`);
-        } catch (e) {
-          tried.push(`${entry}: ${e instanceof Error ? e.message : String(e)}`);
+    for (const place of DOCS_PLACES) {
+      let found: DocsGenerator | undefined;
+      for (let dir = repo; ; dir = dirname(dir)) {
+        const entry = entryOf(join(dir, "node_modules", place.package), place.subpath);
+        if (entry !== undefined && existsSync(entry)) {
+          try {
+            found = generatorOf(await import(toFileUrl(entry).href));
+            if (found === undefined) tried.push(`${entry} exports no main`);
+          } catch (e) {
+            tried.push(`${entry}: ${e instanceof Error ? e.message : String(e)}`);
+          }
+          break;
         }
-        break;
+        if (dirname(dir) === dir) break;
       }
-      if (dirname(dir) === dir) break;
+      if (found !== undefined) return ok(found);
     }
-    if (tried.length === 0) tried.push(`${DOCS_PACKAGE} is not in the node_modules of ${repo} or above it`);
+    if (tried.length === 0) tried.push(`neither ${DOCS_PLACES.map((p) => (p.subpath === "." ? p.package : `${p.package}${p.subpath.slice(1)}`)).join(" nor ")} is in the node_modules of ${repo} or above it`);
     return err(tried.join("; "));
   },
 };

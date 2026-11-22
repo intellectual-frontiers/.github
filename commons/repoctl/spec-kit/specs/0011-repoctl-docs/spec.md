@@ -10,9 +10,10 @@
 ## Requirements
 
 - **FR-001**: A configuration with `docs: { config, out }` (`docs.config.ts` and `_site` where it names none) MUST turn on the verbs `docs build` (a mutation that previews with `--dry-run`), `docs check` (a report of the public tier that writes nothing in the repository) and `docs serve`; a configuration with no `docs` has none of them.
-- **FR-002**: The generator MUST be loaded where it is installed (the `node_modules` of the repository or above it, else by its package name) as an optional peer, its `main` called with the arguments of `build` or `check` as `ifc-docs` reads them (`build --out DIR --config FILE`, `check --config FILE`, paths absolute from the repository's root); where it cannot be loaded the verb MUST end with 1 and the problem `E-DOCS-GENERATOR-MISSING`, whose explanation says how to install it.
+- **FR-002**: The generator MUST be loaded where it is installed (the `node_modules` of the repository or above it, else by its package name) as an optional peer, its `main` called with the arguments of `build` or `check` as `ifc-docs` reads them (`build --out DIR --config FILE`, `check --config FILE`, paths absolute from the repository's root); where it cannot be loaded the verb MUST end with 1 and the problem `E-DOCS-GENERATOR-MISSING`, whose explanation says how to install it (FR-005 says where it is looked for).
 - **FR-003**: A generator that ends with a status other than 0 MUST be the problem `E-DOCS-FAILED` and the status 1; `docs build` MUST say the folder it built and `docs check` MUST say there is no finding where there is none.
 - **FR-004**: `docs serve` MUST build the site and then serve the folder on a loopback port only (`127.0.0.1`, the port of `--port`, 4173 by default, 0 for one the system chooses) until it is interrupted or `--for SECONDS` has passed; it MUST NOT send the site anywhere and MUST answer a path that is not there with 404.
+- **FR-005**: The generator MUST be looked for in the order of the distribution (commons 0036-distribution FR-019): first as the entry `./docs` of the one package `@intellectual-frontiers/commons` (`single` mode, the mode of this repository, where `@intellectual-frontiers/docs` does not exist), then as the package `@intellectual-frontiers/docs` (`per-library` mode); the first that is installed and exports `main` MUST be used, and a repository that has the one package MUST NOT be asked to install another. The explanation and the fix of `E-DOCS-GENERATOR-MISSING` MUST name both places and say which mode each is for, and say that the generator's own optional peers (`shiki`, `beautiful-mermaid`, `typescript`) are the consumer's to install, as the generator names them when one is missing.
 
 ## Acceptance scenarios
 
@@ -21,6 +22,8 @@
 3. **Given** a generator installed in the fixture repository, **When** `docs build` runs, **Then** it is asked for `build --out <root>/_site --config <root>/docs.config.ts` and the site is there, per FR-002.
 4. **Given** a generator that ends with 3, **When** `docs check` runs, **Then** `E-DOCS-FAILED`, per FR-003.
 5. **Given** a built folder, **When** it is served on port 0, **Then** `/` answers its `index.html`, a missing path 404, and the address is a loopback one, per FR-004.
+6. **Given** a repository whose `node_modules` holds the one package `@intellectual-frontiers/commons` with the entry `./docs` and no `@intellectual-frontiers/docs`, **When** `docs build` runs, **Then** the generator of the one package is asked for `build --out <root>/_site --config <root>/docs.config.ts`, per FR-005.
+7. **Given** a repository with neither, **When** `docs check` runs, **Then** the problem names the one package for `single` mode and `@intellectual-frontiers/docs` for `per-library` mode, per FR-005.
 
 ## Out of scope
 
