@@ -41,7 +41,14 @@ export const usageVerb = defineVerb({
     const libraries = (await w.files.list(pkg)).filter((n) => !n.includes(".") && n !== "bin");
     if (libraries.length === 0 || !(await w.files.exists(join(pkg, "package.json")))) return outcomeOfEnvironment(`the package ${USAGE_PACKAGE} is not installed at ${pkg}: install it, or name its folder with --package`);
     const known = new Set<string>();
-    for (const n of libraries) if (await w.files.exists(join(pkg, n, "src"))) known.add(n);
+    // a file of the package root (LICENSE) is no library: asking for a folder beneath it throws
+    for (const n of libraries) {
+      try {
+        if (await w.files.exists(join(pkg, n, "src"))) known.add(n);
+      } catch {
+        // not a folder
+      }
+    }
     // the graph of the package: the sources of each library say which libraries it imports; every file of it counts its bytes
     const graph: PackageLibrary[] = [];
     for (const name of [...known].sort()) {
