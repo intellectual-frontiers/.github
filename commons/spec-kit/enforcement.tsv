@@ -65,6 +65,8 @@ requirement	mechanism	by	note
 0002-packaging FR-027	check	.github: bun test ./tests/	Commands: every error of the reader is a value of a closed union and is told in one sentence
 0002-packaging FR-028	check	.github: bun test ./tests/	Tables: the generated files carry install-exact
 0002-packaging FR-029	check	.github: bun test ./tests/	Commands: missingExitStatus is stated for the query-installed of apt and brew and absent elsewhere
+0002-packaging FR-030	check	.github: bun test ./tests/	the three classes of the distribution are in the ontology and its audit, unaligned, with the examined standards
+0002-packaging FR-031	check	.github: bun test ./tests/	the peer and optional peer classes map to the SPDX 3.0.1 relationship types read
 0004-rules FR-001	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
 0004-rules FR-002	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script
 0004-rules FR-003	check	.github: bun test ./tests/	Rules: the set, the generator's refusals, the portability tool and its use on the installer script

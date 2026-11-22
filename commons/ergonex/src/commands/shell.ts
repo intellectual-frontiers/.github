@@ -1,4 +1,4 @@
-// Spec: 0003-host FR-017
+// Spec: 0003-host FR-017, FR-027
 /**
  * `ergonex shell print|install|uninstall <bash|zsh|fish|pwsh|nu>` (commons 0003-host FR-017 to FR-019, 0001-ergonex FR-020, FR-021): `print` writes the snippet for that shell on standard output and changes nothing; `install` writes the one
  * marked block into the shell's start-up file, and `uninstall` removes exactly that block; `--dry-run` shows the unified diff of either and writes nothing. Neither creates a start-up file that is not there: where it is absent `install` writes nothing
@@ -10,6 +10,7 @@ import { err, ok } from "@intellectual-frontiers/core";
 import { value } from "../platform/k-args.ts";
 import { existsSync, readTextFile, writeTextFile } from "../platform/r-fs.ts";
 import { unifiedDiff } from "../diff.ts";
+import { programsNamed } from "../host/probe.ts";
 import { describeBlockError, installBlock, removeBlock } from "../shell/block.ts";
 import { type Completions, createCommand, isShell, rcFileFor, type Shell, SHELLS, snippetFor } from "../shell/snippet.ts";
 import type { Context, Outcome } from "../modules/types.ts";
@@ -33,6 +34,8 @@ const snippetOf = (ctx: Context, shell: Shell): string =>
   snippetFor(shell, {
     home: ctx.globals.home === undefined ? { kind: "default" } : { kind: "path", path: ctx.globals.home },
     completions: completionsOf(ctx),
+    // only Nushell reads it: its aliases are fixed when a file is read, so the short name enx is left out where another program of that name is on the PATH (0003-host FR-027)
+    enxTaken: shell === "nu" && programsNamed("enx", ctx.env["PATH"] ?? ctx.env["Path"], ctx.platform.windows).length > 0,
   });
 
 const print = defineCommand({

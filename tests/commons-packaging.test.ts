@@ -23,6 +23,7 @@ import {
   test,
 } from "../commons/test/src/test.ts";
 import * as mod from "../commons/generated/packaging.auto.ts";
+import { terms as auditTerms } from "../commons/ontology/src/audit/packaging.ts";
 import { rules as portabilityRules, scan } from "../commons/tools/shell-portability-check.ts";
 import { words } from "../commons/tools/shlex.ts";
 import { pyJson } from "../commons/tools/emit.ts";
@@ -1259,6 +1260,38 @@ proves(
       }
     const ex = exactVersionOf(managerOf("apt"));
     assert(ex.kind === "ok" && !("missingExitStatus" in ex.value));
+  },
+);
+
+proves(
+  ["0002-packaging FR-030", "0002-packaging FR-031"],
+  "Distribution terms: the policy, the budget and the report are unaligned commons terms with the standards examined; the peer terms map to the SPDX 3.0.1 relationship types the model gives",
+  () => {
+    const find = (local: string) => {
+      const t = auditTerms.find((x) => x.iri.endsWith(`term-pm-${local}`));
+      assert(t !== undefined, `the audit has no record of pm:${local}`);
+      return t.values as Record<string, unknown>;
+    };
+    const basisOf = (v: Record<string, unknown>): string => String(((v["basis"] as { iri?: string } | undefined)?.iri ?? "").split("#")[1]);
+    for (const local of ["ContentPolicy", "SizeBudget", "UsageReport"]) {
+      const v = find(local);
+      assertEquals(basisOf(v), "Unaligned", local);
+      assert(String(v["justification"]).includes("SPDX 3.0.1 Core RelationshipType"), `${local}: the standards examined are named`);
+      assertEquals(v["addedOn"], "2026-11-22", local);
+    }
+    const spdx = (local: string): string => String(find(local)["standardTerm"]);
+    assertEquals(spdx("PeerDependency"), "https://spdx.org/rdf/3.0.1/terms/Core/RelationshipType/hasProvidedDependency");
+    assertEquals(spdx("OptionalPeer"), "https://spdx.org/rdf/3.0.1/terms/Core/RelationshipType/hasOptionalDependency");
+    for (const local of ["PeerDependency", "OptionalPeer"]) {
+      const v = find(local);
+      assertEquals(basisOf(v), "Maps", local);
+      assertEquals(String((v["mappingRelation"] as unknown) ?? ""), "closeMatch", local);
+      assert(String(v["justification"]).includes("two relationship types"), `${local}: the judgement is said`);
+    }
+    // the classes are in the vocabulary and the proposed Decision record exists and is unsigned
+    for (const local of ["ContentPolicy", "SizeBudget", "UsageReport", "PeerDependency", "OptionalPeer"]) assert(local in (mod as unknown as Record<string, unknown>) || auditTerms.some((x) => x.iri.endsWith(`term-pm-${local}`)), local);
+    const record = fs.readTextFileSync(path.join(path.dirname(path.fromFileUrl(import.meta.url)), "../commons/spec-kit/audits/2026-11-distribution-terms.md"));
+    assert(record.includes("Status:** Proposed") && record.includes("pending the signature of the owner") && record.includes("Signed by the owner:** ______"), "the Decision is proposed, never signed for the owner");
   },
 );
 

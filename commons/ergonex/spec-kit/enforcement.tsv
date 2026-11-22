@@ -100,6 +100,8 @@ requirement	mechanism	by	note
 0003-host FR-024	check	.github: cd commons/ergonex && bun test suite/	ergonex-templates.test.ts: lefthook.auto.yml calls the three generated hooks by their relative path and holds no checker
 0003-host FR-025	check	.github: cd commons/ergonex && bun test suite/	ergonex-templates.test.ts, ergonex-render.test.ts: a hook finds the root from its own place, holds no absolute path, sends the checker's output to standard error and reads its status as go on, stop or cannot run
 0003-host FR-026	check	.github: cd commons/ergonex && bun test suite/	ergonex-shell.test.ts: installBlock refuses a file that is not there (absent) and takes an empty one, and the command that creates a start-up file is said for each shell with a path quoted for it; ergonex-command.test.ts: ergonex shell --install, run as a program, never creates the start-up file or its folder (exit status 3, the path and the command named, the user's home as it was, with --yes or without), --uninstall creates none, and a file the person made takes the block
+0003-host FR-027	check	.github: cd commons/ergonex && bun test suite/	ergonex-enx.test.ts: the snippet of each shell, sourced by the real shell, defines enx as ergonex only where no other enx is found, with its completions, and is safe to repeat; zsh, fish, PowerShell and Nushell where installed
+0003-host FR-028	check	.github: cd commons/ergonex && bun test suite/	ergonex-enx.test.ts: doctor names each program called enx on the PATH as a warning and says the short name is free where there is none
 0001-ergonex FR-025	check	.github: cd commons/ergonex && bun test suite/	ergonex-command.test.ts: ergonex init makes the root and the area and writes the starter manifest once, and run again changes nothing
 0001-ergonex FR-026	check	.github: cd commons/ergonex && bun test suite/	ergonex-command.test.ts, ergonex-render.test.ts: ergonex shell print <shell> and a hook write no evidence record; every other run does
 0001-ergonex FR-027	check	.github: cd commons/ergonex && bun test suite/	ergonex-render.test.ts: the commit-msg, pre-push and pre-commit hooks run ergonex hook, which only reads and ends 0 or 1 where it ran its checker, and the script turns any other status into cannot-run
@@ -127,3 +129,42 @@ requirement	mechanism	by	note
 0005-repositories FR-008	check	.github: cd commons/ergonex && bun test suite/	ergonex-repositories.test.ts: adopt lists adoptable, misplaced and remoteless repositories and changes nothing
 0005-repositories FR-009	check	.github: cd commons/ergonex && bun test suite/	ergonex-repositories.test.ts: adopt --apply adds the adoptable ones only
 0005-repositories FR-010	check	.github: cd commons/ergonex && bun test suite/	ergonex-repositories.test.ts: status notes each unmanaged repository
+0006-agents FR-001	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-002	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-003	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-004	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-005	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-006	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-007	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-008	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-009	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-010	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-011	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-012	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-013	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-014	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-015	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-016	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-017	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-018	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-019	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-020	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-021	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-022	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-023	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-024	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-025	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-026	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-027	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-028	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-029	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-030	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-031	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-032	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-033	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-034	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-035	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-036	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-037	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-038	none	-	draft: no code exists, so nothing proves it
+0006-agents FR-039	none	-	a statement of the alignment to standards: there is nothing to run

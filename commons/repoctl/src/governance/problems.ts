@@ -438,9 +438,9 @@ export const CATALOGUE: Readonly<Record<ProblemCode, Explained>> = {
   },
   "E-DOCS-GENERATOR-MISSING": {
     title: "The documentation generator is not installed",
-    what: "`@intellectual-frontiers/docs`, the package of the generator `ifc-docs`, cannot be imported from this repository.",
+    what: "The generator `ifc-docs` cannot be imported from this repository: neither the entry `./docs` of the one package `@intellectual-frontiers/commons` (`single` mode) nor the package `@intellectual-frontiers/docs` (`per-library` mode) is installed.",
     why: "`repoctl docs` wraps the generator and does not carry it: it is an optional peer of repoctl.",
-    fix: "bun add --dev @intellectual-frontiers/docs (or npm install --save-dev @intellectual-frontiers/docs)",
+    fix: "bun add --dev @intellectual-frontiers/commons (or npm install --save-dev @intellectual-frontiers/commons) in `single` mode; bun add --dev @intellectual-frontiers/docs in `per-library` mode. The generator names its own optional peers (shiki, beautiful-mermaid, typescript) when one is missing: install them too.",
   },
   "E-DOCS-FAILED": {
     title: "The documentation generator reported a failure",

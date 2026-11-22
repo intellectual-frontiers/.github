@@ -83,6 +83,7 @@ requirement	mechanism	by	note
 0011-repoctl-docs FR-002	check	.github: cd commons/repoctl && bun run verify	suite/docs.test.ts: the generator is loaded from the repository and missing is its typed problem
 0011-repoctl-docs FR-003	check	.github: cd commons/repoctl && bun run verify	suite/docs.test.ts: a failing generator is E-DOCS-FAILED
 0011-repoctl-docs FR-004	check	.github: cd commons/repoctl && bun run verify	suite/docs.test.ts: serve answers on loopback only
+0011-repoctl-docs FR-005	check	.github: cd commons/repoctl && bun run verify	suite/docs.test.ts: the generator is found in the one package first, then the per-library package, and the problem names both
 0012-repoctl-query FR-001	check	.github: cd commons/repoctl && bun run verify	suite/query.test.ts
 0012-repoctl-query FR-002	check	.github: cd commons/repoctl && bun run verify	suite/query.test.ts
 0012-repoctl-query FR-003	check	.github: cd commons/repoctl && bun run verify	suite/query.test.ts
