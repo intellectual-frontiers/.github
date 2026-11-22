@@ -10,6 +10,7 @@ import { fs, path, proc } from "../../commons/system/src/mod.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../../commons/test/src/test.ts";
 import { filesUnder } from "../../commons/libraries/src/pack-library.ts";
 import { inspectCommons, oldSpecifiers } from "../../commons/libraries/src/pack-commons.ts";
+import { SINGLE_BUDGET, SINGLE_PEERS } from "../../commons/libraries/src/distribution.ts";
 import { linter } from "../../commons/lint/src/test-rule.ts";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..", "..");
@@ -24,10 +25,10 @@ async function sh(
   argv: readonly string[],
   cwd: string,
   env?: Record<string, string>,
-): Promise<{ readonly code: number; readonly out: string; readonly ms: number }> {
+): Promise<{ readonly code: number; readonly out: string; readonly stdout: string; readonly ms: number }> {
   const t = Date.now();
   const r = await proc.run(argv, { cwd, ...(env === undefined ? {} : { env }) });
-  return { code: r.code, out: `${r.stdout}${r.stderr}`, ms: Date.now() - t };
+  return { code: r.code, out: `${r.stdout}${r.stderr}`, stdout: r.stdout, ms: Date.now() - t };
 }
 
 proves(
@@ -38,6 +39,10 @@ proves(
     "0036-distribution FR-024",
     "0036-distribution FR-025",
     "0036-distribution FR-026",
+    "0036-distribution FR-030",
+    "0036-distribution FR-031",
+    "0036-distribution FR-032",
+    "0036-distribution FR-033",
   ],
   "the one package is packed from the real libraries, inspected, installed with npm and with Bun, every entry of every library imported on Node and on Bun, its commands run, and a consumer of every entry type-checked with and without the dom library",
   async () => {
@@ -78,9 +83,21 @@ proves(
         "https://npm.pkg.github.com",
         "the package is sent to the GitHub package registry alone",
       );
+      // what the package asks of the consumer is not installed with it (0036-distribution FR-023): no dependency, and the drivers, what Docs loads and the compiler as optional peers with their ranges
+      assertEquals(obj(manifest["dependencies"]), {}, "the package installs nothing but itself");
+      const peerDependencies = obj(manifest["peerDependencies"]);
+      const peerMeta = obj(manifest["peerDependenciesMeta"]);
+      for (const [name, rule] of SINGLE_PEERS) {
+        assertEquals(peerDependencies[name], rule.range, `${name} is asked for with its range`);
+        assert(!rule.optional || obj(peerMeta[name])["optional"] === true, `${name} is an optional peer`);
+      }
+      assertEquals(peerDependencies["@types/node"], ">=26", "the types of Node are a peer");
+      // the content policy and the budget (FR-030 to FR-032): dist/ holds declarations, no file is shipped twice, and the package is within its budget
+      for (const rel of filesUnder(unpacked)) if (/^[^/]+\/dist\//.test(rel)) assert(rel.endsWith(".d.ts"), `${rel} is in dist/, which holds declarations only`);
+      assert(bytes <= SINGLE_BUDGET.tarballBytes, `the tarball is ${bytes} bytes, over its budget of ${SINGLE_BUDGET.tarballBytes}`);
       const sideEffects = manifest["sideEffects"];
       assert(
-        Array.isArray(sideEffects) && sideEffects.includes("./telemetry/dist/src/host/otel.js"),
+        Array.isArray(sideEffects) && sideEffects.includes("./telemetry/src/host/otel.js"),
         "the telemetry host installs a port when loaded: it is not marked free of effects",
       );
       const keys = Object.keys(obj(manifest["exports"]));
@@ -122,14 +139,14 @@ proves(
         const onNode = await sh([node, "use.mjs"], project);
         assertEquals(onNode.code, 0, `Node: ${onNode.out}`);
         assertEquals(
-          JSON.parse(onNode.out.trim().split("\n").at(-1) ?? "{}"),
+          JSON.parse(onNode.stdout.trim().split("\n").at(-1) ?? "{}"),
           { runtime: "node", entries: keys.length, bad: [] },
           `every entry is imported on Node (${tool})`,
         );
         const onBun = await sh([bun, "use.mjs"], project);
         assertEquals(onBun.code, 0, `Bun: ${onBun.out}`);
         assertEquals(
-          JSON.parse(onBun.out.trim().split("\n").at(-1) ?? "{}"),
+          JSON.parse(onBun.stdout.trim().split("\n").at(-1) ?? "{}"),
           { runtime: "bun", entries: keys.length, bad: [] },
           `every entry is imported on Bun (${tool})`,
         );
@@ -175,7 +192,7 @@ proves(
         for (const rt of [node, bun]) {
           const ran = await sh([rt, "runtime.mjs"], project);
           assertEquals(ran.code, 0, `${tool}: runtime ${rt}: ${ran.out.slice(0, 800)}`);
-          const seen = JSON.parse(ran.out.trim().split("\n").at(-1) ?? "{}") as Record<string, unknown>;
+          const seen = JSON.parse(ran.stdout.trim().split("\n").at(-1) ?? "{}") as Record<string, unknown>;
           const label = `${tool} on ${rt}`;
           assertEquals(seen["sp800"], [1014, 2781, 97, 422, 110, 320], `${label}: the SP 800 catalog loads from the installed package`);
           assert(

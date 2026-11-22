@@ -19,6 +19,7 @@ import type { Badge, Block, Inline, Page, Tone } from "../model.ts";
 import { slugOf } from "../model.ts";
 import { gateBlocks, gateMark, gateResult } from "./insight.ts";
 import { areaPage } from "./overview.ts";
+import { packagePage } from "./package.ts";
 import type { Spec } from "../extract/specs.ts";
 import { kitDirOf, kitNameOf } from "./specs.ts";
 
@@ -321,6 +322,7 @@ export function qualityPages(b: Build): void {
     });
   });
   ciPage(b);
+  packagePage(b);
   b.add({ path: "quality/findings.html", title: "Documentation findings", description: "What the generator found while it made this site.", section: "quality", group: "Quality", order: 5, blocks: [] });
   issuePages(b);
 }

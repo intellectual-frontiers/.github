@@ -1,4 +1,4 @@
-// Spec: 0001-docs FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016, FR-017, FR-020, FR-022, FR-023, FR-025, FR-026, FR-027, FR-028
+// Spec: 0001-docs FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016, FR-017, FR-020, FR-022, FR-023, FR-025, FR-026, FR-027, FR-028, FR-032
 /**
  * The evidence the site shows beside the code (docs 0001-docs FR-009 to FR-012): CTRF results, GitHub tickets and typed issues read from files, the Quality section made from them, the lines on a requirement, a library and a
  * module, the findings for a file that cannot be read and a test that names a requirement that is not there, and, with no run recorded, nothing shown as passed.
@@ -19,6 +19,7 @@ import { kindOfPath, parseNameStatus } from "../src/pages/impact.ts";
 import { parseMutation, scoreOf, summariseStryker } from "../src/mutation.ts";
 import { importedNames, importIndex, testsImporting } from "../src/exercise.ts";
 import { parseCoverage, parseLcov, percent } from "../src/coverage.ts";
+import { parsePackageReport, parseUsage } from "../src/package.ts";
 import { parseCtrf, parseRuns, parseTickets, readEvidence, requirementsIn, standing } from "../src/evidence.ts";
 import { markdownOf } from "../src/emit/markdown.ts";
 import { buildSite } from "../src/site.ts";
@@ -407,4 +408,25 @@ proves(["0001-docs FR-028"], "the changes since the tests ran are read from git'
   const b = await built({ results: EVIDENCE });
   const page = markdownOf(b.pages.find((p) => p.path === "quality/changes.html") as never);
   assertStringIncludes(page, "No history");
+});
+
+proves(["0001-docs FR-032"], "the package page shows the report against its budget, by kind and by library, the peers and each consumer; a file that is no report is a finding, and no report says how to make one", async () => {
+  assert("error" in parsePackageReport("{"));
+  assert("error" in parsePackageReport("{}"));
+  assert("error" in parseUsage("erga", '{"data":{}}'));
+  const found: never[] = [];
+  const ev = readEvidence(path.join(ROOT, "commons/docs/suite"), { results: "fixture-evidence" }, found);
+  assertEquals([ev.packageReport?.version, ev.packageReport?.total.files, ev.packageReport?.optionalPeers, ev.usages.map((u) => [u.consumer, u.direct.length, u.untouched.length])], ["9.9.9", 10, ["pg"], [["erga", 1, 1]]]);
+  const b = await built({ results: EVIDENCE });
+  const page = markdownOf(b.pages.find((p) => p.path === "quality/package.html") as never);
+  assertStringIncludes(page, "@intellectual-frontiers/commons@9.9.9");
+  assertStringIncludes(page, "75.0% of the budget");
+  assertStringIncludes(page, "optional peer: the consumer installs it");
+  assertStringIncludes(page, "never touched");
+  assertStringIncludes(page, "erga: 2 libraries in the package");
+  const none = await built({ results: path.join(EVIDENCE, "history") });
+  const empty = none.pages.find((p) => p.path === "quality/package.html");
+  assert(empty !== undefined, "the page is there with a run recorded and no report of the package");
+  assertStringIncludes(markdownOf(empty as never), "No report of the package");
+  assertStringIncludes(markdownOf(empty as never), "pack.ts --size");
 });

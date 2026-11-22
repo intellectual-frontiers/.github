@@ -1,0 +1,25 @@
+{
+  "schema": "headless.envelope/1",
+  "data": {
+    "package": "@intellectual-frontiers/commons",
+    "libraries": 2,
+    "bytes": 3145728,
+    "direct": [
+      {
+        "library": "core",
+        "subpaths": [],
+        "files": 3,
+        "bytes": 1048576
+      }
+    ],
+    "reached": [],
+    "untouched": [
+      {
+        "library": "data",
+        "bytes": 2097152
+      }
+    ],
+    "totals": {},
+    "unknown": []
+  }
+}

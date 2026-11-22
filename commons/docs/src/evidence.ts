@@ -9,6 +9,7 @@
  */
 import { type LibraryCoverage, parseCoverage } from "./coverage.ts";
 import { type LibraryMutation, parseMutation } from "./mutation.ts";
+import { type ConsumerUsage, type PackageReport, parsePackageReport, parseUsage } from "./package.ts";
 import { fs, path } from "@intellectual-frontiers/system";
 import type { Finding } from "./check.ts";
 import type { EvidenceSource, IssueLike } from "./config.ts";
@@ -120,6 +121,10 @@ export interface WorkflowRuns {
 
 /** Everything the site knows of quality. */
 export interface Evidence {
+  /** What the package weighs, from the report of its packer (docs 0001-docs FR-032), where one is kept. */
+  readonly packageReport: PackageReport | undefined;
+  /** What each consumer repository reaches of the package, from `usage.<consumer>.json`. */
+  readonly usages: readonly ConsumerUsage[];
   readonly results: ReadonlyMap<string, LibraryResults>;
   readonly run: RunMeta | undefined;
   readonly issues: readonly TypedIssue[];
@@ -142,7 +147,7 @@ export interface Evidence {
 }
 
 /** No evidence: nothing recorded. */
-export const NONE: Evidence = { results: new Map(), run: undefined, issues: [], tickets: [], recorded: false, status: new Map(), build: undefined, workflows: [], runsError: undefined, history: [], coverage: new Map(), mutation: new Map() };
+export const NONE: Evidence = { packageReport: undefined, usages: [], results: new Map(), run: undefined, issues: [], tickets: [], recorded: false, status: new Map(), build: undefined, workflows: [], runsError: undefined, history: [], coverage: new Map(), mutation: new Map() };
 
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 const str = (v: unknown): string | undefined => (typeof v === "string" && v !== "" ? v : undefined);
@@ -285,6 +290,8 @@ export function readEvidence(root: string, source: EvidenceSource | undefined, f
   const history: HistoryRun[] = [];
   const coverage = new Map<string, LibraryCoverage>();
   const mutation = new Map<string, LibraryMutation>();
+  let packageReport: PackageReport | undefined;
+  const usages: ConsumerUsage[] = [];
   const dir = source.results === undefined ? undefined : path.resolve(root, source.results);
   if (dir !== undefined && fs.existsSync(dir)) {
     for (const entry of [...fs.readDirSync(dir)].sort((a, b) => (a.name < b.name ? -1 : 1))) {
@@ -316,6 +323,14 @@ export function readEvidence(root: string, source: EvidenceSource | undefined, f
         } catch (e) {
           found.push({ where: rel, problem: { kind: "evidence-unreadable", why: `is not JSON: ${e instanceof Error ? e.message : String(e)}` } });
         }
+      } else if (entry.isFile && entry.name === "package.report.json") {
+        const r = parsePackageReport(fs.readTextFileSync(path.join(dir, entry.name)));
+        if ("error" in r) found.push({ where: rel, problem: { kind: "evidence-unreadable", why: r.error } });
+        else packageReport = r.value;
+      } else if (entry.isFile && entry.name.startsWith("usage.") && entry.name.endsWith(".json")) {
+        const r = parseUsage(entry.name.slice("usage.".length, -".json".length), fs.readTextFileSync(path.join(dir, entry.name)));
+        if ("error" in r) found.push({ where: rel, problem: { kind: "evidence-unreadable", why: r.error } });
+        else usages.push(r.value);
       } else if (entry.isFile && entry.name.endsWith(".mutation.json")) {
         const r = parseMutation(fs.readTextFileSync(path.join(dir, entry.name)));
         if ("error" in r) found.push({ where: rel, problem: { kind: "evidence-unreadable", why: r.error } });
@@ -353,7 +368,7 @@ export function readEvidence(root: string, source: EvidenceSource | undefined, f
       else tickets = r.value;
     }
   }
-  return { results, run, issues, tickets, recorded, status, build, workflows, runsError, history, coverage, mutation };
+  return { packageReport, usages, results, run, issues, tickets, recorded, status, build, workflows, runsError, history, coverage, mutation };
 }
 
 /** The tests of every library that name a requirement, as `0009-example FR-001`. */

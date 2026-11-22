@@ -24,9 +24,9 @@
 
 ## Edge cases
 
-- A library the repository imports by a subpath the library does not export: counted as imported, the subpath is listed as written.
-- A library reached by two paths: the library through which it is first reached, in the order of the names, is the one named.
-- A file that is not text: it counts its bytes and imports nothing.
+- A library the repository imports by a subpath the library does not export: counted as imported, the subpath is listed as written, per FR-001.
+- A library reached by two paths: the library through which it is first reached, in the order of the names, is the one named, per FR-003.
+- A file that is not text: it counts its bytes and imports nothing, per FR-002.
 
 ## Assumptions
 

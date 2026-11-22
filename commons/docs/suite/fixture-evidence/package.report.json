@@ -1,0 +1,76 @@
+{
+  "name": "@intellectual-frontiers/commons",
+  "version": "9.9.9",
+  "total": {
+    "files": 10,
+    "bytes": 3145728,
+    "byKind": {
+      "compiled": {
+        "files": 4,
+        "bytes": 1048576
+      },
+      "source": {
+        "files": 4,
+        "bytes": 1048576
+      },
+      "data": {
+        "files": 2,
+        "bytes": 1048576
+      }
+    }
+  },
+  "tarballBytes": 524288,
+  "libraries": [
+    {
+      "name": "core",
+      "files": 6,
+      "bytes": 1048576,
+      "byKind": {
+        "compiled": {
+          "files": 2,
+          "bytes": 524288
+        },
+        "source": {
+          "files": 2,
+          "bytes": 524288
+        },
+        "data": {
+          "files": 2,
+          "bytes": 0
+        }
+      }
+    },
+    {
+      "name": "data",
+      "files": 4,
+      "bytes": 2097152,
+      "byKind": {
+        "compiled": {
+          "files": 2,
+          "bytes": 524288
+        },
+        "source": {
+          "files": 2,
+          "bytes": 524288
+        },
+        "data": {
+          "files": 0,
+          "bytes": 1048576
+        }
+      }
+    }
+  ],
+  "dependencies": {},
+  "peerDependencies": {
+    "@types/node": ">=26",
+    "pg": ">=8.23.1 <9.0.0"
+  },
+  "optionalPeers": [
+    "pg"
+  ],
+  "budget": {
+    "apparentBytes": 4194304,
+    "files": 20,
+    "tarballBytes": 1048576
+  }
+}
