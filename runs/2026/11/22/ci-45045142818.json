@@ -1,0 +1,570 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45045142818",
+    "workflow": "ci",
+    "commit": "81245cb5f8f4adf3b86951b3ad79544cbd610b5c",
+    "at": "2026-11-22T16:47:23Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45045142818"
+  },
+  "steps": [
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "systems",
+      "module": "ergonex",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1303,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "systems",
+      "module": "ergonex",
+      "tool": "bun-test",
+      "outcome": "findings",
+      "findings": 1,
+      "durationMs": 13365,
+      "exitStatus": 1
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "systems",
+      "module": "ergonex",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 2,
+      "durationMs": 16735,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-boot",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 165,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-boot",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 919,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-converge",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 153,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-converge",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 51587,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-dialect-ansible",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 166,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-dialect-ansible",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 198121,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-dialect-cloud-init",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 161,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-dialect-cloud-init",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 37390,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-dialect-opentofu",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 148,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-dialect-opentofu",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 859,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "commons",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 521,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "commons",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 151,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "ergonex",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 163,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "ergonex",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 128071,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "ergonex",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 75790,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "estate-endpoints",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 149,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "estate-endpoints",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 859,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "estate-iac",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 157,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "estate-iac",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 691,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "estate-query",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 157,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "estate-query",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1024,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "estate",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 297,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "estate",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 901,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "evidence-capture",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 431,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "evidence-capture",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 2,
+      "durationMs": 3324,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "findings",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 143,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "findings",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 482,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "lab",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 408,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "lab",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 29770,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "linux-observe",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 190,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "linux-observe",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 64985,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "machine-probe",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 383,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "machine-probe",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 27046,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "pentest",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 154,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "pentest",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 997,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "planning-query",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 365,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "planning-query",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 776,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "planning",
+      "tool": "install",
+      "outcome": "no-output",
+      "findings": 1,
+      "durationMs": 10,
+      "exitStatus": 1
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "planning",
+      "tool": "verify",
+      "outcome": "no-output",
+      "findings": 1,
+      "durationMs": 11,
+      "exitStatus": 127
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "scanners",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 143,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "scanners",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1265,
+      "exitStatus": 0
+    }
+  ],
+  "findings": [
+    {
+      "id": "f-02c80c1a38b1d8d7",
+      "tool": "verify",
+      "code": "no-output",
+      "module": "planning",
+      "severity": "error",
+      "message": "the command ended with status 127 and printed nothing a parser of verify reads",
+      "key": "verify-its-packing-is-checked-where-the--4:no-output",
+      "evidence": {
+        "run": "45045142818",
+        "commit": "81245cb5f8f4adf3b86951b3ad79544cbd610b5c",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "dfd8e16db55b9fe8cccb64ff8c13bdc1775711962697f6a25306290cbc48bdd2"
+      },
+      "at": "2026-11-22T16:42:23Z"
+    },
+    {
+      "id": "f-0cbf1c811db2e361",
+      "tool": "bun-test",
+      "module": "ergonex",
+      "evidence": {
+        "run": "45045142818",
+        "commit": "81245cb5f8f4adf3b86951b3ad79544cbd610b5c",
+        "step": "the-tests-on-node-26-6",
+        "logSha256": "8eb4fb8e66f32032a186418cf6f96ad1dc3ab6753c7ff1ddff1c2afcfa1754d7"
+      },
+      "at": "2026-11-22T16:42:57Z",
+      "code": "test-failed",
+      "severity": "error",
+      "message": "the test failed: 0003-host FR-028: programsNamed finds each program of a name in the order of the PATH, enxChecks says it as a warning with the paths or as ok, and ergonex doctor reports it without running the program",
+      "key": "0003-host FR-028: programsNamed finds each program of a name in the order of the PATH, enxChecks says it as a warning with the paths or as ok, and ergonex doctor reports it without running the program"
+    },
+    {
+      "id": "f-367e813aaf0e3799",
+      "tool": "verify",
+      "module": "evidence-capture",
+      "evidence": {
+        "run": "45045142818",
+        "commit": "81245cb5f8f4adf3b86951b3ad79544cbd610b5c",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "e3cf878948efa2a7af227c577c12d8c69eae01a6d4d380c160ead7940c2c26f4"
+      },
+      "at": "2026-11-22T16:43:12Z",
+      "code": "test-failed",
+      "file": "suite/collect.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0003-evidence-capture-collect FR-001, 0003-evidence-capture-collect FR-002: a state is kept only where it changed, every look is journaled, commits come when a state changed or the batch interval has run, and the commit is made at the instant and names what changed",
+      "key": "0003-evidence-capture-collect FR-001, 0003-evidence-capture-collect FR-002: a state is kept only where it changed, every look is journaled, commits come when a state changed or the batch interval has run, and the commit is made at the instant and names what changed"
+    },
+    {
+      "id": "f-6896ab53f32579e5",
+      "tool": "verify",
+      "module": "ergonex",
+      "evidence": {
+        "run": "45045142818",
+        "commit": "81245cb5f8f4adf3b86951b3ad79544cbd610b5c",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "4338df61b5e7e0913110a39545214b8f34a5a5717fdda039e227b8afc02dc35c"
+      },
+      "at": "2026-11-22T16:42:44Z",
+      "code": "test-failed",
+      "file": "suite\\ergonex-enx.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0003-host FR-028: programsNamed finds each program of a name in the order of the PATH, enxChecks says it as a warning with the paths or as ok, and ergonex doctor reports it without running the program",
+      "key": "0003-host FR-028: programsNamed finds each program of a name in the order of the PATH, enxChecks says it as a warning with the paths or as ok, and ergonex doctor reports it without running the program"
+    },
+    {
+      "id": "f-ac884392d79970e9",
+      "tool": "install",
+      "code": "no-output",
+      "module": "planning",
+      "severity": "error",
+      "message": "the command ended with status 1 and printed nothing a parser of install reads",
+      "key": "the-development-tools-from-bun-lock-the--3:no-output",
+      "evidence": {
+        "run": "45045142818",
+        "commit": "81245cb5f8f4adf3b86951b3ad79544cbd610b5c",
+        "step": "the-development-tools-from-bun-lock-the--3",
+        "logSha256": "62e94fc0ff098eacbd70768772d9a43f759904188eeb745f0f2c872e9d5ba605"
+      },
+      "at": "2026-11-22T16:42:23Z"
+    },
+    {
+      "id": "f-be14677783fc1ea0",
+      "tool": "verify",
+      "module": "ergonex",
+      "evidence": {
+        "run": "45045142818",
+        "commit": "81245cb5f8f4adf3b86951b3ad79544cbd610b5c",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "4338df61b5e7e0913110a39545214b8f34a5a5717fdda039e227b8afc02dc35c"
+      },
+      "at": "2026-11-22T16:42:44Z",
+      "code": "test-failed",
+      "file": "suite\\ergonex-wiring.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0003-host FR-028: programsNamed finds each program of a name in the order of the PATH, enxChecks says it as a warning with the paths or as ok, and ergonex doctor reports it without running the program",
+      "key": "0003-host FR-028: programsNamed finds each program of a name in the order of the PATH, enxChecks says it as a warning with the paths or as ok, and ergonex doctor reports it without running the program"
+    },
+    {
+      "id": "f-ffc5c01fe2f2a103",
+      "tool": "verify",
+      "module": "evidence-capture",
+      "evidence": {
+        "run": "45045142818",
+        "commit": "81245cb5f8f4adf3b86951b3ad79544cbd610b5c",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "e3cf878948efa2a7af227c577c12d8c69eae01a6d4d380c160ead7940c2c26f4"
+      },
+      "at": "2026-11-22T16:43:12Z",
+      "code": "test-failed",
+      "file": "suite/journal.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0003-evidence-capture-collect FR-001, 0003-evidence-capture-collect FR-002: a state is kept only where it changed, every look is journaled, commits come when a state changed or the batch interval has run, and the commit is made at the instant and names what changed",
+      "key": "0003-evidence-capture-collect FR-001, 0003-evidence-capture-collect FR-002: a state is kept only where it changed, every look is journaled, commits come when a state changed or the batch interval has run, and the commit is made at the instant and names what changed"
+    }
+  ]
+}
