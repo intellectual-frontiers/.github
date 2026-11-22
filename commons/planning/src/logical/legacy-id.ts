@@ -67,3 +67,15 @@ export async function eventIdOfExternal(source: string, value: string, atMs: num
   const text = await textOf(source, value, atMs);
   return text.kind === "ok" ? parseEventId(text.value) : text;
 }
+
+/** The ULID text that reads back as this id: its time as the 48 bits and its 74 random bits as the first 74 of the 80, so that `uuid7OfUlid` of it is the id again (the last six bits are zero). */
+export function ulidOfUuid7(id: ItemId | EventId): string {
+  const hex = id.replace(/-/gu, "");
+  const ms = BigInt(`0x${hex.slice(0, 12)}`);
+  const randA = BigInt(`0x${hex.slice(13, 16)}`);
+  const randB = BigInt(`0x${hex.slice(16, 32)}`) & ((1n << 62n) - 1n);
+  const value = (ms << 80n) | (((randA << 62n) | randB) << 6n);
+  let out = "";
+  for (let i = 25; i >= 0; i--) out += CROCKFORD.charAt(Number((value >> BigInt(5 * i)) & 31n));
+  return out;
+}

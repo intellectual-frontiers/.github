@@ -139,6 +139,7 @@ proves(["0002-planning-core FR-008"], "the work of the library runs with the clo
       return boom("Date.now")();
     }
   }
+  let pending: Promise<string> | undefined;
   try {
     Date.now = boom("Date.now");
     Math.random = boom("Math.random");
@@ -151,11 +152,14 @@ proves(["0002-planning-core FR-008"], "the work of the library runs with the clo
     const minted = must(mintEventId(newClock(REPLICA), WALL));
     assert(ids.length === 5 && minted.id.length === 36);
     assertEquals(must(records.decodeEvent(records.encodeEvent(events[0] as (typeof events)[number]))).id, events[0]?.id);
-    assertEquals((await uuid7OfExternal("s", "v", 1)).length, 36);
+    // started with the clock taken away; awaited after it is given back, so that no other test runs without a clock
+    pending = uuid7OfExternal("s", "v", 1);
   } finally {
+    // the global is given back first: `Date.now` is the property of whichever class `Date` names at that moment
+    globalThis.Date = RealDate;
     Date.now = realNow;
     Math.random = realRandom;
     globalThis.fetch = realFetch;
-    globalThis.Date = RealDate;
   }
+  assertEquals((await pending)?.length, 36);
 });

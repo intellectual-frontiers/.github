@@ -138,7 +138,8 @@ function sourceOf(v: Json | undefined): Result<FindingSource | undefined, CodecP
   return ok(out);
 }
 
-function dataOf(type: string, d: JsonObject): Result<EventData, CodecProblem> {
+/** The data of an event of a type from its JSON object, or why it is not one. */
+export function eventDataOfJson(type: string, d: JsonObject): Result<EventData, CodecProblem> {
   switch (type) {
     case "opened": {
       const kind = itemKind.parse(d["kind"]);
@@ -276,7 +277,7 @@ export function eventOfJson(j: Json | undefined): Result<ItemEvent, CodecProblem
   if (actor.kind === "err") return bad(describeActorProblem(actor.error));
   const dataJson = j["data"];
   if (dataJson === undefined || !isJsonObject(dataJson)) return bad("the data of an event is an object");
-  const data = dataOf(type.value, dataJson);
+  const data = eventDataOfJson(type.value, dataJson);
   if (data.kind === "err") return data;
   const ext = j["external"];
   const externals: ExternalId[] = [];
