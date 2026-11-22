@@ -1,0 +1,70 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45042862318",
+    "workflow": "ci",
+    "commit": "e045e4d57b0618e616815cb34fc583a620f07db3",
+    "at": "2026-11-22T16:17:45Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45042862318"
+  },
+  "steps": [
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-cli",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 156,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-cli",
+      "tool": "verify",
+      "outcome": "no-output",
+      "findings": 1,
+      "durationMs": 751,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "commons",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 507,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "commons",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 153,
+      "exitStatus": 0
+    }
+  ],
+  "findings": [
+    {
+      "id": "f-675dfd07f7911fed",
+      "tool": "verify",
+      "code": "no-output",
+      "module": "anyfs-cli",
+      "severity": "error",
+      "message": "the command ended with status 1 and printed nothing a parser of verify reads",
+      "key": "verify-its-packing-is-checked-where-the--4:no-output",
+      "evidence": {
+        "run": "45042862318",
+        "commit": "e045e4d57b0618e616815cb34fc583a620f07db3",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "487a744338abe7bf51f62e3d496071e0a376dd62a867f094e2e8602379f15de3"
+      },
+      "at": "2026-11-22T16:17:03Z"
+    }
+  ]
+}
