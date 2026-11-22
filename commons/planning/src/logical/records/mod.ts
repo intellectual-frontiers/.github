@@ -9,3 +9,4 @@ export * from "./erga.ts";
 export * from "./erga-read.ts";
 export * from "./erga-index.ts";
 export * from "./store.ts";
+export * from "./render.ts";
