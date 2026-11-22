@@ -268,7 +268,10 @@ proves([`${SPEC} FR-029`, `${SPEC} FR-030`], "the packer builds the real files o
     keep(without);
     assertEquals(inspectCommons(stage, ["alpha", "beta"]), []);
     // a static import of an optional peer, a file in dist/ that is no declaration, an internal file, a file shipped twice and a package over its budget
+    // the GitHub package registry drops peerDependenciesMeta, so an optional peer is not a peerDependencies entry there (FR-023): listing it is a finding, naming it in ifcOptionalPeers is how it is asked for
     keep({ ...without, peerDependencies: { shiki: ">=4.5.0 <5.0.0" }, peerDependenciesMeta: { shiki: { optional: true } } });
+    assertStringIncludes(inspectCommons(stage, ["alpha", "beta"]).join("\n"), "shiki is an optional peer listed in peerDependencies: the registry drops peerDependenciesMeta");
+    keep({ ...without, ifcOptionalPeers: { shiki: ">=4.5.0 <5.0.0" } });
     writeTextFileSync(cli, `import "shiki/core";\n${cliText}`);
     assertStringIncludes(inspectCommons(stage, ["alpha", "beta"]).join("\n"), "imports the optional peer shiki statically");
     writeTextFileSync(cli, `const shiki = await import("shiki/core");\n${cliText}`);

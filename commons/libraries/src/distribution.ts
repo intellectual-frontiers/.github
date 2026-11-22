@@ -90,6 +90,14 @@ export const GITHUB_REGISTRY = "https://npm.pkg.github.com";
  */
 export const SINGLE_TARGETS: readonly PublishTarget[] = ["github"];
 
+/**
+ * Whether an optional peer of {@link SINGLE_PEERS} can be a `peerDependencies` entry marked optional in `peerDependenciesMeta` (0036-distribution FR-023): it can where no registry the package is sent to drops `peerDependenciesMeta`. The GitHub package registry
+ * drops it from the metadata a package manager resolves from, so a package sent to it names an optional peer in `ifcOptionalPeers` instead, which no package manager reads.
+ */
+export function optionalPeersAsPeerDependencies(targets: readonly PublishTarget[] = SINGLE_TARGETS): boolean {
+  return !targets.includes("github");
+}
+
 /** Whether a run is in `single` mode: the environment's mode, or the repository's. A value that is no mode is not `single`; the commands that pack and release refuse it. */
 export function isSingle(fromEnvironment: string | undefined): boolean {
   const m = activeMode(fromEnvironment);

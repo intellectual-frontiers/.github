@@ -85,13 +85,14 @@ proves(
       );
       // what the package asks of the consumer is not installed with it (0036-distribution FR-023): no dependency, and the drivers, what Docs loads and the compiler as optional peers with their ranges
       assertEquals(obj(manifest["dependencies"]), {}, "the package installs nothing but itself");
+      // the GitHub package registry drops peerDependenciesMeta from the metadata a package manager resolves from, so the optional peers are not peerDependencies entries (a package manager would install them): they are named in ifcOptionalPeers
       const peerDependencies = obj(manifest["peerDependencies"]);
-      const peerMeta = obj(manifest["peerDependenciesMeta"]);
+      const optionalPeers = obj(manifest["ifcOptionalPeers"]);
       for (const [name, rule] of SINGLE_PEERS) {
-        assertEquals(peerDependencies[name], rule.range, `${name} is asked for with its range`);
-        assert(!rule.optional || obj(peerMeta[name])["optional"] === true, `${name} is an optional peer`);
+        assertEquals(optionalPeers[name], rule.range, `${name} is asked for with its range`);
+        assert(!(name in peerDependencies), `${name} is not a peerDependencies entry: the registry would lose that it is optional`);
       }
-      assertEquals(peerDependencies["@types/node"], ">=26", "the types of Node are a peer");
+      assertEquals(peerDependencies, { "@types/node": ">=26" }, "the types of Node are the one peer a package manager sees");
       // the content policy and the budget (FR-030 to FR-032): dist/ holds declarations, no file is shipped twice, and the package is within its budget
       for (const rel of filesUnder(unpacked)) if (/^[^/]+\/dist\//.test(rel)) assert(rel.endsWith(".d.ts"), `${rel} is in dist/, which holds declarations only`);
       assert(bytes <= SINGLE_BUDGET.tarballBytes, `the tarball is ${bytes} bytes, over its budget of ${SINGLE_BUDGET.tarballBytes}`);

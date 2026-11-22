@@ -40,7 +40,7 @@ import { chmod } from "@intellectual-frontiers/system/fs";
 import { existsSync, mkdirSync, readDirSync, readFileSync, readTextFileSync, removeSync, statSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { dirname, join, resolve, toPosix } from "@intellectual-frontiers/system/path";
 import { env, run, which } from "@intellectual-frontiers/system/proc";
-import { activeMode, GITHUB_REGISTRY, MODE_VARIABLE, SINGLE, SINGLE_BUDGET, SINGLE_EXCLUDED, SINGLE_PEERS, SINGLE_TARGETS } from "./distribution.ts";
+import { activeMode, GITHUB_REGISTRY, MODE_VARIABLE, optionalPeersAsPeerDependencies, SINGLE, SINGLE_BUDGET, SINGLE_EXCLUDED, SINGLE_PEERS, SINGLE_TARGETS } from "./distribution.ts";
 import { type Library, readLibraries } from "./libraries.ts";
 import { licenseOf } from "./license.ts";
 import { linkAll } from "./link.ts";
@@ -402,6 +402,7 @@ export function reportOfStage(stage: string, tarballBytes?: number): PackageRepo
     if (t !== undefined) by.set(lib, t);
   }
   const meta = objectOf(manifest["peerDependenciesMeta"]);
+  const hidden = objectOf(manifest["ifcOptionalPeers"]);
   return {
     name: text(manifest["name"]),
     version: text(manifest["version"]),
@@ -409,8 +410,8 @@ export function reportOfStage(stage: string, tarballBytes?: number): PackageRepo
     tarballBytes,
     libraries: [...by].sort(([a], [b]) => byName(a, b)).map(([name, t]) => ({ name, ...t })),
     dependencies: Object.fromEntries(Object.entries(objectOf(manifest["dependencies"])).map(([k, v]) => [k, text(v)])),
-    peerDependencies: Object.fromEntries(Object.entries(objectOf(manifest["peerDependencies"])).map(([k, v]) => [k, text(v)])),
-    optionalPeers: Object.keys(meta).sort(byName),
+    peerDependencies: Object.fromEntries(Object.entries({ ...objectOf(manifest["peerDependencies"]), ...hidden }).map(([k, v]) => [k, text(v)])),
+    optionalPeers: [...new Set([...Object.keys(meta), ...Object.keys(hidden)])].sort(byName),
     budget: SINGLE_BUDGET,
   };
 }
@@ -451,7 +452,7 @@ export function inspectCommons(stage: string, libraries: readonly string[], budg
   const files = new Set(filesUnder(stage));
   const exportsMap = objectOf(manifest["exports"]);
   const deps = objectOf(manifest["dependencies"]);
-  const declared = new Set<string>([...Object.keys(deps), ...Object.keys(objectOf(manifest["peerDependencies"])), ...Object.keys(objectOf(manifest["optionalDependencies"]))]);
+  const declared = new Set<string>([...Object.keys(deps), ...Object.keys(objectOf(manifest["peerDependencies"])), ...Object.keys(objectOf(manifest["optionalDependencies"])), ...Object.keys(objectOf(manifest["ifcOptionalPeers"]))]);
   for (const [name, version] of Object.entries(deps)) if (typeof version !== "string" || !EXACT.test(version)) found.push(`${name} is ${String(version)}, which is not an exact version`);
   // every library has entries
   for (const lib of libraries) {
@@ -507,15 +508,19 @@ export function inspectCommons(stage: string, libraries: readonly string[], budg
   }
   // the declarations that name the types of Node need them where the package is type-checked
   if (namesNodeTypes(stage) && declared.has("@types/node") === false) found.push("a declaration names a type of Node and @types/node is not a dependency or a peer dependency");
-  // the peers (0036-distribution FR-023, FR-033): asked for with a range, never installed, and an optional one is never imported statically
+  // the peers (0036-distribution FR-023, FR-033): asked for with a range, never installed, and an optional one is never imported statically. Where the registry drops peerDependenciesMeta an optional peer is in ifcOptionalPeers and not in peerDependencies
   const peerDeps = objectOf(manifest["peerDependencies"]);
   const peerMeta = objectOf(manifest["peerDependenciesMeta"]);
+  const hidden = objectOf(manifest["ifcOptionalPeers"]);
+  const metaKept = optionalPeersAsPeerDependencies();
   const optional = new Set<string>();
   for (const [name, rule] of SINGLE_PEERS) {
-    if (peerDeps[name] === undefined) continue;
+    if (rule.optional && !metaKept && peerDeps[name] !== undefined) found.push(`${name} is an optional peer listed in peerDependencies: the registry drops peerDependenciesMeta, so a package manager would install it (FR-023)`);
+    const asked = rule.optional && !metaKept ? hidden[name] : peerDeps[name];
+    if (asked === undefined) continue;
     if (name in deps) found.push(`${name} is a dependency and a peer dependency of the package: the consumer installs it`);
-    if (peerDeps[name] !== rule.range) found.push(`${name} is asked for as ${text(peerDeps[name])}, and SINGLE_PEERS says ${rule.range}`);
-    if (rule.optional && !isObject(peerMeta[name])) found.push(`${name} is an optional peer and peerDependenciesMeta does not say so`);
+    if (asked !== rule.range) found.push(`${name} is asked for as ${text(asked)}, and SINGLE_PEERS says ${rule.range}`);
+    if (rule.optional && metaKept && !isObject(peerMeta[name])) found.push(`${name} is an optional peer and peerDependenciesMeta does not say so`);
     if (rule.optional) optional.add(name);
   }
   for (const name of Object.keys(deps)) if (SINGLE_PEERS.has(name)) found.push(`${name} is installed by the package: it is a peer (SINGLE_PEERS)`);
@@ -761,7 +766,11 @@ export async function packCommons(repo: string, options: PackCommonsOptions = {}
   const licenseId = licenseOf(manifestOfFolder.library);
   const asked = peersOf(facts);
   found.push(...asked.problems);
-  const peers = { ...(namesNodeTypes(stage) ? { "@types/node": ">=26" } : {}), ...asked.peerDependencies };
+  // an optional peer is a peerDependencies entry marked optional where the registries keep peerDependenciesMeta; the GitHub package registry drops it, so there it is named in ifcOptionalPeers (FR-023)
+  const metaKept = optionalPeersAsPeerDependencies();
+  const required = Object.fromEntries(Object.entries(asked.peerDependencies).filter(([n]) => !(n in asked.peerDependenciesMeta)));
+  const optionalOnes = Object.fromEntries(Object.entries(asked.peerDependencies).filter(([n]) => n in asked.peerDependenciesMeta));
+  const peers = { ...(namesNodeTypes(stage) ? { "@types/node": ">=26" } : {}), ...required, ...(metaKept ? optionalOnes : {}) };
   const manifest: Json = {
     name: SELF,
     version,
@@ -774,7 +783,8 @@ export async function packCommons(repo: string, options: PackCommonsOptions = {}
     exports: exportsOut,
     dependencies: union.dependencies,
     ...(Object.keys(peers).length === 0 ? {} : { peerDependencies: peers }),
-    ...(Object.keys(asked.peerDependenciesMeta).length === 0 ? {} : { peerDependenciesMeta: asked.peerDependenciesMeta }),
+    ...(!metaKept || Object.keys(asked.peerDependenciesMeta).length === 0 ? {} : { peerDependenciesMeta: asked.peerDependenciesMeta }),
+    ...(metaKept || Object.keys(optionalOnes).length === 0 ? {} : { ifcOptionalPeers: optionalOnes }),
     files: ["bin", ...facts.map((f) => f.name), "README.md", "LICENSE"],
     keywords: ["intellectual-frontiers", "commons"],
     repository: { type: "git", url: "git+https://github.com/intellectual-frontiers/.github.git", directory: SINGLE.folder },
