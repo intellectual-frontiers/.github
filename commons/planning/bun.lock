@@ -6,14 +6,19 @@
       "name": "@intellectual-frontiers/planning",
       "devDependencies": {
         "@intellectual-frontiers/anyfs": "link:../anyfs",
+        "@intellectual-frontiers/anyfs-sql": "link:../anyfs-sql",
         "@intellectual-frontiers/core": "link:../core",
         "@intellectual-frontiers/crypto": "link:../crypto",
+        "@intellectual-frontiers/evidence-capture": "link:../evidence-capture",
         "@intellectual-frontiers/formats": "link:../formats",
+        "@intellectual-frontiers/githost": "link:../githost",
+        "@intellectual-frontiers/headless": "link:../headless",
         "@intellectual-frontiers/kanon": "link:../kanon",
         "@intellectual-frontiers/libraries": "link:../libraries",
         "@intellectual-frontiers/mizan": "link:../mizan",
         "@intellectual-frontiers/ontology": "link:../ontology",
         "@intellectual-frontiers/system": "link:../system",
+        "@intellectual-frontiers/terminal": "link:../terminal",
         "@intellectual-frontiers/test": "link:../test",
         "@types/node": "26.6.6",
         "fast-check": "4.10.2",
@@ -24,11 +29,19 @@
   "packages": {
     "@intellectual-frontiers/anyfs": ["@intellectual-frontiers/anyfs@link:../anyfs", {}],
 
+    "@intellectual-frontiers/anyfs-sql": ["@intellectual-frontiers/anyfs-sql@link:../anyfs-sql", {}],
+
     "@intellectual-frontiers/core": ["@intellectual-frontiers/core@link:../core", {}],
 
     "@intellectual-frontiers/crypto": ["@intellectual-frontiers/crypto@link:../crypto", {}],
 
+    "@intellectual-frontiers/evidence-capture": ["@intellectual-frontiers/evidence-capture@link:../evidence-capture", {}],
+
     "@intellectual-frontiers/formats": ["@intellectual-frontiers/formats@link:../formats", {}],
+
+    "@intellectual-frontiers/githost": ["@intellectual-frontiers/githost@link:../githost", {}],
+
+    "@intellectual-frontiers/headless": ["@intellectual-frontiers/headless@link:../headless", {}],
 
     "@intellectual-frontiers/kanon": ["@intellectual-frontiers/kanon@link:../kanon", {}],
 
@@ -39,6 +52,8 @@
     "@intellectual-frontiers/ontology": ["@intellectual-frontiers/ontology@link:../ontology", {}],
 
     "@intellectual-frontiers/system": ["@intellectual-frontiers/system@link:../system", {}],
+
+    "@intellectual-frontiers/terminal": ["@intellectual-frontiers/terminal@link:../terminal", {}],
 
     "@intellectual-frontiers/test": ["@intellectual-frontiers/test@link:../test", {}],
 
