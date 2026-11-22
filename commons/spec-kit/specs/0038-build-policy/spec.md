@@ -1,0 +1,79 @@
+# Feature Specification: Build policy, findings and never failures
+
+**Spec ID:** 0038-build-policy
+**Status:** Draft
+**Owner:** if
+**Domain:** commons
+**Part of:** 0003-mizan
+
+**Input:** A repository of many libraries must not stop all of them because one of them has a failing test, a type error or a warning. A pipeline is red only for a fault in its own scripting or configuration. Everything else a module says is a finding: a typed record, collected over runs, shown to the people who review quality and risk, and decided on by an explicit policy and never by the exit status of a step. Tracked in intellectual-frontiers/.github#23.
+
+## The principle
+
+- **FR-001**: A run of a workflow of this repository MUST end red only for a cause in the closed list `RED_CAUSES` (FR-002); everything that a module, a tool or a test says about the repository's content (a failing test, a type error, a lint or format warning, a finding of a check, a stale generated file of a library, a tool that crashed or timed out in a module's own cell) MUST be a finding (FR-006) and MUST NOT change the status of any job, of any other module's cell, or of the run.
+- **FR-002**: The red causes MUST be a closed union written once in `commons/libraries/src/ci/policy.ts`, each with the sentence that justifies it, and the list MUST be these: `workflow-invalid` (a file of `.github/workflows/` or of `.github/actions/` that is not what the model makes, or that the schema of GitHub workflows refuses: the pipeline's own configuration), `wrapper-misused` (`repoctl ci step` called with an unknown step, no command or an unreadable policy: the pipeline's own scripting), `plan-unavailable` (the job that plans the matrix could not make it, so no cell can run and no report can be made: the pipeline cannot start), and `reports-not-produced` (the last job of a run found no findings file for a cell that ran: the pipeline lost what it exists to keep). Nothing else MAY be added without an amendment of this requirement.
+- **FR-003**: Every step of every job of every workflow of the model MUST carry a policy, a union of `red-cause` (naming one of FR-002), `finding` (naming the tool whose output the step turns into findings, FR-013), `gate` (naming a gate of FR-010 or FR-009) and `plumbing` (a step that moves or keeps what other steps made and cannot say anything about a module: checkout of the repository, uploading an artifact, writing the step summary); and the model MUST be validated so that a step with no policy, a `finding` step that is not run through `repoctl ci step` and has no `continueOnError`, and a `plumbing` step that is not `continueOnError` where it is in a job of a module's cell, are findings of the model, and the generator writes nothing while there is one.
+- **FR-004**: No job of a module's cell MAY be able to end red from a module's own words: every matrix of the model MUST have `failFast: false`; every step of `finding` policy MUST have a `timeoutMinutes` strictly less than the `timeoutMinutes` of its job, so that a command that hangs is stopped by the step and recorded as a finding (the outcome `timeout`) before the job is; and a job that runs after a cell MUST run with `always()` and MUST NOT need the success of a cell.
+- **FR-005**: The one job to require of the repository, `ci`, MUST pass if and only if the pipeline is sound: the plan was made, and every cell that ran produced its findings file. A cell whose tests fail, whose type check finds errors or whose command crashed MUST NOT make it fail.
+- **FR-006**: A finding MUST be a typed record with: a `tool` (a closed union of the tools of FR-013), a `code` (the tool's own code for the rule or the outcome), a `module` (the library, or `repository`), a `file` and a `line` where the tool names them, a `severity` (`error`, `warning` or `note`), a `message` of one sentence, a `key` (the stable text that tells this finding from another of the same code in the same file), the `evidence` (the run, the commit, the step and the SHA-256 of the log the finding was read from) and the `at` instant; and its `id` MUST be derived from the tool, the code, the module, the file and the key, and never from the line, the run, the time or the message, so that the same finding is the same finding in the next run.
+- **FR-007**: The status of a finding MUST be derived, never written: `open` where the latest run has it; `fixed` where an earlier run had it and the latest run, in which the same cell ran, does not; `accepted` where it is open and a live acceptance (FR-008) names its id; a finding of a cell that did not run in the latest run MUST keep the status of the last run in which it did (a cell that did not run is not a cell that is clean). An acceptance that has expired MUST NOT count, and the finding MUST be open again with the note that the acceptance ended.
+- **FR-008**: An accepted risk MUST be a typed file at `findings/accepted/<id>.ts` of the repository (an export `acceptance` with the finding's `id`, the `owner` who answers for the risk, the `reason`, the day it `until` ends, which MUST be at most 366 days after the day it begins, and the `by` who approved it, a person of the list `APPROVERS` of `policy.ts`), and a check of the repository MUST find an acceptance with no reason, an end that is not a day or is more than 366 days ahead, a `by` that is not an approver, an `id` that is no finding of the last run (as a note, not a failure), and two acceptances of one id. The path MUST be one that only its owner changes (the CODEOWNERS of the repository names it); an agent MUST NOT write one, and an acceptance MUST NOT be made to pass a check, only to say who has seen a risk and until when.
+- **FR-009**: The two hard stops of a commit MUST stay: `repoctl commit` MUST refuse a commit that adds a secret (the hygiene rule of commons 0007-repoctl-hygiene), and one that adds a license text written by hand (commons 0035-licensing FR-004); they are a commit's, never a pipeline's, and they do not become findings.
+- **FR-010**: The release MUST be decided by an explicit policy, a typed value `RELEASE_POLICY` in `policy.ts`: `{ mode: "publish-regardless", until: "2027-01-31" }`. While the day of the run is not after `until`, a library MUST be released whatever its open findings are, and the release run MUST report the open findings of each library it released. After `until`, the release MUST NOT proceed and the report MUST carry the finding `owner-review-due` (tool `policy`, severity `error`, module `repository`) saying that the owner decides again, so that nothing continues silently; the owner changes the value by an amendment of this requirement and of the value. A library whose build fails in the release MUST be held (not published, not tagged) while the others go on, and the release MUST still be run by the owner (`repoctl release` and the workflow `release`, FR-009 of commons 0030-generated-workflows).
+- **FR-011**: A run MUST give each commit a neutral status: a check run named `findings` on the commit, with the conclusion `neutral` where the run has open findings and `success` where it has none, whose summary says how many are open, how many are new since the run before and how many were fixed, and whose link is the findings page; it MUST NEVER be `failure`. The branch protection of the default branch MUST require only the check `ci` (FR-005).
+- **FR-012**: The findings of every run MUST be kept beyond the artifact that holds them for seven days, on an orphan branch `findings-history` of this repository, one new file for each run at `runs/YYYY/MM/DD/<run id>.json` holding the file of FR-006 for the run, written by the job `keep-findings` of the workflow `evidence` (and by no other writer) with the token of the run, by a commit that adds a file and changes none; a push that would not be a fast-forward MUST be retried from the new tip and never forced; and the site MUST read its history from this branch and from nothing else. A file already on the branch MUST NOT be replaced.
+- **FR-013**: The verb `repoctl ci step` (commons repoctl 0013-repoctl-ci) MUST run one step: it MUST read the step's id and policy from the model, run the command given after `--` in the working directory with the time limit of the step, keep the output, read it into findings with the parser of the step's tool (a closed table: `tsc`, `bun-test`, `lint`, `format`, `repoctl-check`, `mizan-check`, `kanon-check`, `generated-files`, `exit-status`), write the findings file of the step, print the output as the command printed it, and exit 0 whatever the command's own status was; the only exits that are not 0 are those of FR-002 (`wrapper-misused`). A command that cannot be started, that exits non-zero with no output a parser can read, or that is stopped by the time limit MUST become a finding of the tool with the code `tool-error`, `no-output` or `timeout`, so that a crash is a finding and not a red run.
+
+## Acceptance scenarios
+
+1. **Given** a library whose test fails, **When** the run of the workflow `ci` reaches its cell, **Then** the cell ends green with one finding `bun-test` for the test, the other libraries' cells are unchanged, and `ci` passes, per FR-001, FR-005 and FR-013.
+2. **Given** a generated workflow file edited by hand, **When** the check `workflow-invalid` runs, **Then** the run is red and names the file, per FR-001 and FR-002.
+3. **Given** a command that does not end, **When** its step reaches its time limit, **Then** the step records the finding with the code `timeout` and its job continues, per FR-004 and FR-013.
+4. **Given** a finding of the run before that the latest run, in which the same cell ran, does not have, **When** the history is read, **Then** its status is `fixed`; and where the cell did not run, it keeps its last status, per FR-007.
+5. **Given** an acceptance that ended yesterday, **When** the status is derived, **Then** the finding is open with the note that the acceptance ended, per FR-007 and FR-008.
+6. **Given** the day 2027-02-01 and the policy of FR-010, **When** the release plans, **Then** it does not proceed and the report carries `owner-review-due`, per FR-010.
+7. **Given** a step of a job of the model with no policy, **When** the model is validated, **Then** the finding names the workflow, the job and the step, and the generator writes nothing, per FR-003.
+8. **Given** two runs at the same time on the branch `findings-history`, **When** the second pushes, **Then** its push is retried from the new tip and both files are on the branch, per FR-012.
+
+## Out of scope
+
+- A policy for what the owner accepts as a risk: only the form of an acceptance (FR-008).
+- The findings of another repository: `erga` has its own ticket (intellectual-frontiers/erga#218) and keeps its findings private; it imports this model from the published package.
+- Merging pull requests: the branch protection is a setting of GitHub, written down in FR-011 and applied by the owner.
+
+## Edge cases
+
+- A tool that prints nothing and exits 1: a finding `no-output` of that tool, per FR-013.
+- A cell that could not install its packages: a finding of the tool `install` for the module (`exit-status` parser), and no other cell is touched, per FR-001.
+- A finding at a line that moved: the same finding, per FR-006.
+- A library removed from the repository: its findings keep their status of the last run that had them and the page lists them as of a module that is gone, per FR-007.
+- A step of a composite action: classified with the step that uses it, per FR-003.
+
+## Assumptions
+
+- GitHub's check runs accept the conclusion `neutral` from the token of a run with `checks: write`, and a branch protection can require one named check.
+- The runs of `evidence` are the writer of the history; a push by another writer is not refused by Git but is found by the check of the branch.
+
+## Open questions
+
+- **OQ-1**: Whether the release should hold a library with open findings of severity `error` after the date of FR-010; the owner decides in January 2027.
+- **OQ-2**: Whether the findings of the tests of the repository's root (`tests/`) are one module `repository` or one per file.
+
+## Key entities
+
+- **Red cause** - one of the closed list of what may turn a run red (FR-002).
+- **Finding** - a typed record of what a tool said about a module, with a stable id (FR-006).
+- **Acceptance** - a person's word that a risk has been seen, until a day (FR-008).
+- **Release policy** - the typed value that decides publishing (FR-010).
+- **History branch** - `findings-history`, the append-only record of the runs' findings (FR-012).
+
+## Success criteria
+
+- **SC-001**: No step of any workflow can turn a run red but a red cause, proved by a test over the typed model and by a run with a failing module.
+- **SC-002**: Every finding of a run is on the findings page with its history, and a reviewer can tell new from old, open from fixed and accepted from neither.
+
+## Review & acceptance checklist
+
+- [x] Every requirement is testable (MUST / MUST NOT), not aspirational
+- [x] No company fact is asserted here
+- [x] Every open item is marked, not silently decided
