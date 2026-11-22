@@ -93,7 +93,7 @@ async function parseAll(config: EventFilesConfig, files: readonly { readonly pat
     const item = folded.value;
     const open = read.value.events[0];
     const opened = open?.data.type === "opened" ? open.data : undefined;
-    const state: ObservedState = item.state.kind === "closed" ? { kind: "closed", reason: item.state.reason } : item.state.kind === "deferred" ? { kind: "deferred", until: item.state.until } : item.state.kind === "in-progress" ? { kind: "in-progress" } : { kind: "open" };
+    const state: ObservedState = item.state.kind === "closed" ? { kind: "closed", reason: item.state.reason } : item.state.kind === "deferred" ? { kind: "deferred", ...(item.state.until === undefined ? {} : { until: item.state.until }), ...(item.state.untilText === undefined ? {} : { untilText: item.state.untilText }) } : item.state.kind === "in-progress" ? { kind: "in-progress" } : { kind: "open" };
     const lines = home.text.split("\n").length;
     observations.push({
       source: SOURCE,
@@ -126,8 +126,7 @@ async function parseAll(config: EventFilesConfig, files: readonly { readonly pat
 function ergaEventOf(patch: Patch): Result<ErgaEvent, SourceProblem> {
   const e = patch.event;
   const a = e.actor;
-  if (a.kind === "agent") return err({ kind: "unexpressed", reason: "the issue schema has no field for the principal of an agent (the person it acts for), so an event of an agent is not written (OQ-10 of commons 0037-planning)" });
-  const actor = { type: a.kind, id: a.id, name: a.name };
+  const actor = a.kind === "agent" ? { type: a.kind, id: a.id, name: a.name, principal: { id: a.principal.id, name: a.principal.name, basis: a.basis } } : { type: a.kind, id: a.id, name: a.name };
   const head = { id: ulidOfUuid7(e.id), at: e.at, actor };
   const d = e.data;
   const typed = (type: ErgaEvent["type"], data?: JsonObject): Result<ErgaEvent, SourceProblem> => ok(data === undefined ? { ...head, type } : { ...head, type, data });

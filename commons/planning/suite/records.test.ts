@@ -10,6 +10,7 @@ import * as records from "@intellectual-frontiers/planning/records";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { type ItemEvent, EVENT_TYPES, type Item } from "@intellectual-frontiers/planning/governance";
 import { canonical, fold } from "@intellectual-frontiers/planning/logical";
+import { parseDay } from "@intellectual-frontiers/planning/governance";
 import { ACTORS, ADA, event, eventIds, history, historyArb, itemId, must, SAMPLES } from "./support.ts";
 import { fullIssue, HEADER, issueText, storeEventText, ULIDS } from "./erga-fixtures.ts";
 
@@ -375,4 +376,22 @@ proves(["0002-planning-core FR-011"], "the summary of a work's issues is rendere
   const text = records.encodeIndex(index);
   assertEquals(records.encodeIndex(must(records.decodeIndex(text))), text);
   assertEquals([index.open, index.blockers], [1, 1]);
+});
+
+proves(["0002-planning-core FR-011"], "a deferral keeps the text of its until and an optional day, as an event and as a state, and one with neither is refused (0037-planning OQ-12)", () => {
+  const item = itemId();
+  const ids = eventIds(2);
+  const day = must(parseDay("2027-03-01"));
+  const text = event(item, ids[0] as never, 2, ADA, { type: "deferred", untilText: "after the next stage", reason: "later" });
+  const both = event(item, ids[1] as never, 3, ADA, { type: "deferred", until: day, untilText: "March", reason: "later" });
+  for (const e of [text, both]) {
+    const encoded = encodeEvent(e);
+    assertStringIncludes(encoded, "untilText");
+    assertEquals(canonical(must(decodeEvent(encoded))), canonical(e));
+  }
+  assert(!encodeEvent(text).includes("until:"), "no day is made up for a text");
+  const neither = parseJson5(encodeEvent(text));
+  assert(neither.kind === "ok");
+  const stripped = encodeEvent(text).replace(/\s*untilText:[^\n]*\n/, "\n");
+  assert(records.decodeEvent(stripped).kind === "err", "a deferral with neither a day nor the text is refused");
 });

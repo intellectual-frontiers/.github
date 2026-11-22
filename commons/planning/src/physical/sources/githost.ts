@@ -7,7 +7,7 @@
  *
  * @remarks
  * The commits that name an issue are carried in the issue's observation (its record as read and its `evidence`), and not as an observation of their own: `reconcile` matches one observation to an item in a run, so a
- * second observation of the same issue in the same source would be a new item. A closed issue is read as closed as completed, which is the host's default and the one reason the contract can neither confirm nor deny.
+ * second observation of the same issue in the same source would be a new item. A closed issue is read with the reason the host gives (`closeReason` of the contract: `completed`, `not_planned` as not planned, `duplicate`; decided by the owner on 2026-11-22, 0037-planning OQ-14), and as closed as completed where the host gives none (GitLab's) or one the contract does not name, which is the host's own default.
  *
  * @example
  * ```ts
@@ -97,7 +97,7 @@ async function observe(ref: RepoRef, info: IssueInfo, commits: readonly { readon
       body: info.body,
       labels: info.labels,
       assignees: [],
-      state: info.state === "open" ? { kind: "open" } : { kind: "closed", reason: "completed" },
+      state: info.state === "open" ? { kind: "open" } : { kind: "closed", reason: info.closeReason === "not_planned" ? "not-planned" : info.closeReason === "duplicate" ? "duplicate" : "completed" },
       origin: "declared",
       external: ext.kind === "ok" ? [ext.value] : [],
       ...(parent === undefined ? {} : { parent }),

@@ -28,7 +28,7 @@ export const ISSUE_COLUMNS = [
   c("body", "text", "The body."),
   c("state", "text", "proposed, open, in-progress, deferred or closed."),
   c("reason", "text", "Why it is closed (completed, not-planned, duplicate); empty where it is not."),
-  c("until", "text", "The day a deferred item is deferred until, as YYYY-MM-DD; empty where it is not deferred."),
+  c("until", "text", "The day a deferred item is deferred until, as YYYY-MM-DD, or the text it was given where that is not a day; empty where it is not deferred."),
   c("severity", "text", "error, warning or note; empty where the item has none."),
   c("source_severity", "text", "The severity as its source wrote it where the source has more levels (critical, high, medium, low); empty where none."),
   c("blocker", "bool", "Whether the item is a blocker."),

@@ -63,7 +63,7 @@ export type EventData =
   | { readonly type: "severity-set"; readonly severity: Severity }
   | { readonly type: "blocker-set"; readonly blocker: boolean }
   | { readonly type: "started" }
-  | { readonly type: "deferred"; readonly until: Day; readonly reason?: string }
+  | { readonly type: "deferred"; readonly until?: Day; readonly untilText?: string; readonly reason?: string }
   | { readonly type: "closed"; readonly reason: CloseReason }
   | { readonly type: "reopened" }
   | { readonly type: "decided"; readonly verdict: Verdict; readonly note: string }

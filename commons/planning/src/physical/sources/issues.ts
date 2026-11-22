@@ -7,7 +7,7 @@
  * @remarks
  * The status of an issue is a sum whose cases carry what they need: a fixed issue its proof, a duplicate its original, a refused one its reason. A change of status that needs what the event does not carry (a close:
  * the proof, the original or the reason) cannot be written and goes to the outbox; the source writes the reopening (open), a start (in progress, by the actor of the event) and a deferral that names its reason and a day.
- * The `until` of a deferral in these files is free text and the model's is a day: a deferral whose `until` is not a day is read as open with a finding that holds the text (commons planning 0004-planning-sources OQ-1).
+ * The `until` of a deferral in these files is free text and the model's may be a day: the text is kept as text (`untilText`) and the day is given where the text is one, so that nothing is lost (decided by the owner on 2026-11-22, commons planning 0004-planning-sources OQ-1).
  *
  * @example
  * ```ts
@@ -202,8 +202,13 @@ export function stateOfStatus(status: Raw | undefined): { readonly state: Observ
     case "not-a-defect":
       return { state: { kind: "closed", reason: "not-planned" } };
     case "deferred": {
-      const day = typeof status["until"] === "string" ? parseDay(status["until"]) : undefined;
-      return day?.kind === "ok" ? { state: { kind: "deferred", until: day.value } } : { state: { kind: "open" }, finding: `the issue is deferred until ${JSON.stringify(status["until"] ?? null)}, which is not a day: it is read as open` };
+      // the day is kept as a day where the text is one; the text is kept as text in every case (decided by the owner on 2026-11-22, 0037-planning OQ-12): nothing is lost, and a text that is no day is an informational finding and not a different state
+      const raw = typeof status["until"] === "string" && status["until"].trim() !== "" ? status["until"].trim() : undefined;
+      const day = raw === undefined ? undefined : parseDay(raw);
+      if (raw === undefined) return { state: { kind: "open" }, finding: "the issue is deferred and gives no until: it is read as open" };
+      return day?.kind === "ok"
+        ? { state: { kind: "deferred", until: day.value, untilText: raw } }
+        : { state: { kind: "deferred", untilText: raw }, finding: `the issue is deferred until ${JSON.stringify(raw)}, which is not a day: it is kept as text, with no day` };
     }
     default:
       return { state: { kind: "open" }, finding: `the status kind ${JSON.stringify(kind ?? null)} is not known` };

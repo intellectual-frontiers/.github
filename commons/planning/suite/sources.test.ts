@@ -135,6 +135,8 @@ const REF: RepoRef = { kind: "Github", host: "github.com", path: ["owner", "repo
 const ISSUES: Readonly<Record<number, IssueInfo>> = {
   7: { number: 7, title: "Seven", body: "The seventh.", state: "open", url: "https://github.com/owner/repo/issues/7", children: [8], labels: ["bug"] },
   8: { number: 8, title: "Eight", body: "", state: "closed", url: "https://github.com/owner/repo/issues/8", parent: 7, children: [], labels: [] },
+  10: { number: 10, title: "Ten", body: "", state: "closed", closeReason: "not_planned", url: "https://github.com/owner/repo/issues/10", children: [], labels: [] },
+  11: { number: 11, title: "Eleven", body: "", state: "closed", closeReason: "duplicate", url: "https://github.com/owner/repo/issues/11", children: [], labels: [] },
   9: { number: 9, title: "Nine", body: "", state: "open", url: "https://github.com/owner/repo/issues/9", children: [], labels: [], hierarchy: "unavailable" },
 };
 /** A local fake of the host's client with answers written by hand: the real client needs an account and is `githost`'s own, tested there. */
@@ -149,6 +151,16 @@ const fakeClient = (): GitHostClient => ({
   changeRequest: async () => err({ kind: "unsupported", host: "Github", capability: "ChangeRequests" }),
   branchProtection: async () => err({ kind: "unsupported", host: "Github", capability: "ProtectedBranches" }),
   commitVerified: async () => err({ kind: "unsupported", host: "Github", capability: "SignedCommits" }),
+});
+
+proves(["0004-planning-sources FR-010"], "a closed issue is read with the reason the host gives: not planned, duplicate, and completed where the host gives none", async () => {
+  const source = must(githostSource({ client: fakeClient(), ref: REF, issues: [8, 10, 11] }));
+  const read = must(await source.acquire());
+  const reason = (n: number): unknown => {
+    const o = read.observations.find((x) => x.locator.kind === "url" && x.locator.url.endsWith(`/issues/${n}`));
+    return o?.content.kind === "issue" && o.content.state.kind === "closed" ? o.content.state.reason : undefined;
+  };
+  assertEquals([reason(8), reason(10), reason(11)], ["completed", "not-planned", "duplicate"]);
 });
 
 proves(["0004-planning-sources FR-010"], "the references of a commit are the Refs line and the closing keywords of the host, for this repository only", () => {

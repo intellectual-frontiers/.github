@@ -104,7 +104,7 @@ export function stateKey(s: ObservedState | State): string {
     case "closed":
       return `closed:${s.reason}`;
     case "deferred":
-      return `deferred:${s.until}`;
+      return `deferred:${s.until ?? ""}:${s.untilText ?? ""}`;
     case "open":
     case "in-progress":
     case "proposed":
@@ -142,7 +142,7 @@ function stateEvents(s: ObservedState): readonly EventData[] {
     case "in-progress":
       return [{ type: "started" }];
     case "deferred":
-      return [{ type: "deferred", until: s.until }];
+      return [{ type: "deferred", ...(s.until === undefined ? {} : { until: s.until }), ...(s.untilText === undefined ? {} : { untilText: s.untilText }) }];
     case "closed":
       return [{ type: "closed", reason: s.reason }];
     default: {
@@ -411,7 +411,7 @@ function merge(item: Item, base: ObservedItem, now: ObservedItem, input: Reconci
 
 /** The state of an item as a place would say it (proposed is open to a place). */
 function observedOf(s: State): ObservedState {
-  return s.kind === "proposed" ? { kind: "open" } : s.kind === "closed" ? { kind: "closed", reason: s.reason } : s.kind === "deferred" ? { kind: "deferred", until: s.until } : { kind: s.kind };
+  return s.kind === "proposed" ? { kind: "open" } : s.kind === "closed" ? { kind: "closed", reason: s.reason } : s.kind === "deferred" ? { kind: "deferred", ...(s.until === undefined ? {} : { until: s.until }), ...(s.untilText === undefined ? {} : { untilText: s.untilText }) } : { kind: s.kind };
 }
 
 /** The event that takes an item in the state `from` to the state a place says. */
@@ -422,7 +422,7 @@ function stateChange(to: ObservedState, from: State): EventData | undefined {
     case "in-progress":
       return from.kind === "in-progress" ? undefined : { type: "started" };
     case "deferred":
-      return { type: "deferred", until: to.until };
+      return { type: "deferred", ...(to.until === undefined ? {} : { until: to.until }), ...(to.untilText === undefined ? {} : { untilText: to.untilText }) };
     case "closed":
       return { type: "closed", reason: to.reason };
     default: {

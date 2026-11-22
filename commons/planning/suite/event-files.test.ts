@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { makeEvent, makePatch, parseInstant, person, tool } from "@intellectual-frontiers/planning/governance";
 import { fold, ulidOfUuid7, uuid7OfUlid, mintEventId } from "@intellectual-frontiers/planning/logical";
 import { decodeIssueFile } from "@intellectual-frontiers/planning/records";
@@ -95,7 +95,7 @@ proves(["0004-planning-sources FR-007"], "a new event is written by the rules of
   assert(fold(w2.world.events).kind === "ok", "the item folds");
 });
 
-proves(["0004-planning-sources FR-007"], "an event of an agent, which the schema cannot give a principal, and a type it has no event for wait in the outbox with their reason", async () => {
+proves(["0004-planning-sources FR-007"], "an event of an agent is written with the principal it acts for and the basis, and read back as an agent of that person; a type the schema has no event for still waits in the outbox with its reason", async () => {
   const store = await storeWith({ "planning/ISSUE-1.json5": FILE });
   const source = must(fileSource(store, eventFilesLens(), "planning/"));
   const o = must(await source.acquire()).observations[0];
@@ -104,13 +104,23 @@ proves(["0004-planning-sources FR-007"], "an event of an agent, which the schema
   assert(a !== undefined && b !== undefined, "ids");
   const agentActor = must(actorFor({ kind: "session", person: ADA }, { kind: "agent", id: "claude", name: "Claude" }));
   const byAgent = must(makePatch("event-files", "planning/", must(makeEvent({ id: a, item: itemId(), at: instant(5), actor: agentActor }, { type: "commented", body: "x" })), o.fingerprint));
-  const r = await applyPatch(source, byAgent, instant(6));
-  assert(r.kind === "outbox" && r.entry.waiting.kind === "unexpressed" && r.entry.waiting.reason.includes("principal"), `the principal is unexpressed: ${JSON.stringify(r)}`);
+  const dry = await applyPatch(source, byAgent, instant(6));
+  assert(dry.kind === "dry-run", `the event of an agent has a plan now, and no longer waits for a principal: ${JSON.stringify(dry)}`);
+  const r = await applyPatch(source, byAgent, instant(6), dry.preview.hash);
+  assert(r.kind !== "outbox" && r.kind !== "failed", `the principal is written now: ${JSON.stringify(r)}`);
+  const written = (await snapshotOf(store))["planning/ISSUE-1.json5"] ?? "";
+  assertStringIncludes(written, "principal");
+  assertStringIncludes(written, "\"basis\": \"session\"");
+  const again = must(await must(fileSource(store, eventFilesLens(), "planning/")).acquire());
+  const raw = JSON.stringify(again.observations[0]?.raw);
+  assertStringIncludes(raw, "claude");
+  const back = again.observations[0]?.raw as { events?: { actor?: { type?: string; principal?: { id?: string; basis?: string } } }[] } | undefined;
+  const agentEvent = back?.events?.find((e) => e.actor?.type === "agent");
+  assertEquals([agentEvent?.actor?.principal?.id, agentEvent?.actor?.principal?.basis], [ADA.id, "session"], "read back as an agent of the person, with the basis it was stored with");
   const scanner = must(tool("scanner", "Scanner"));
   const started = must(makePatch("event-files", "planning/", must(makeEvent({ id: b, item: itemId(), at: instant(5), actor: scanner }, { type: "started" })), o.fingerprint));
   const s = await applyPatch(source, started, instant(6));
   assert(s.kind === "outbox" && s.entry.waiting.kind === "unexpressed", "no event of that type");
-  assertEquals((await snapshotOf(store))["planning/ISSUE-1.json5"], FILE);
 });
 
 proves(["0004-planning-sources FR-007"], "the ULID of an id reads back as the id for any id", () => {

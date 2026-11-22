@@ -22,7 +22,7 @@ export type State =
   | { readonly kind: "proposed" }
   | { readonly kind: "open" }
   | { readonly kind: "in-progress" }
-  | { readonly kind: "deferred"; readonly until: Day }
+  | { readonly kind: "deferred"; readonly until?: Day; readonly untilText?: string }
   | { readonly kind: "closed"; readonly reason: CloseReason; readonly at: Instant; readonly by: Actor };
 
 /** A link of one item to another: the first blocks, is the same as, relates to or is the parent of the second. */

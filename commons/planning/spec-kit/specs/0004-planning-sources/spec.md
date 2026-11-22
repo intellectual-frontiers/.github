@@ -39,7 +39,7 @@
 
 ## Edge cases
 
-- A file of `issues/` whose status is deferred with an `until` that is not a day: it is read as open with a finding, per FR-006 (OQ-1).
+- A file of `issues/` whose status is deferred with an `until` that is not a day: it is read as deferred with the text and no day, with an informational finding, per FR-006 (OQ-1).
 - A line of Markdown inside a fenced code block: not an item, per FR-008.
 - A closed Git host issue: read as closed as completed, because the contract holds no close reason, per FR-010.
 - A comment in a generated file: read, never written to, per FR-009.
@@ -50,7 +50,7 @@
 
 ## Open questions
 
-- **OQ-1**: The `until` of a deferred typed issue (data 0044) is free text and the `until` of a deferred item (commons 0037-planning FR-004) is a day. Until the owner says how one is carried into the other (an optional day, or a carried text), a deferral whose text is not a day is read as open with a finding that holds the text.
+- **OQ-1** (decided by the owner on 2026-11-22): The `until` of a deferred typed issue (data 0044) is free text and a deferred item's may be a day: the text is kept as text and the day is given where the text is one (`planning 0037-planning` OQ-12); a text that is not a day is an informational finding and the state is deferred, not open.
 
 ## Key entities
 

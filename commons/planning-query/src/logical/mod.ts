@@ -35,7 +35,7 @@ const ISSUE_FILL: Fill<typeof ISSUE_COLUMNS, Item> = {
   body: (i) => i.body,
   state: (i) => i.state.kind,
   reason: (i) => (i.state.kind === "closed" ? i.state.reason : ""),
-  until: (i) => (i.state.kind === "deferred" ? i.state.until : ""),
+  until: (i) => (i.state.kind === "deferred" ? (i.state.until ?? i.state.untilText ?? "") : ""),
   severity: (i) => i.severity ?? "",
   source_severity: (i) => i.sourceSeverity ?? "",
   blocker: (i) => i.blocker === true,

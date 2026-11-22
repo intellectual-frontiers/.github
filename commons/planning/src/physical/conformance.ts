@@ -37,7 +37,7 @@ function stateEvent(s: ObservedState): EventData {
     case "in-progress":
       return { type: "started" };
     case "deferred":
-      return { type: "deferred", until: s.until };
+      return { type: "deferred", ...(s.until === undefined ? {} : { until: s.until }), ...(s.untilText === undefined ? {} : { untilText: s.untilText }) };
     case "closed":
       return { type: "closed", reason: s.reason };
     default: {

@@ -29,7 +29,13 @@ export const ERGA_EVENT_TYPES = ["opened", "commented", "edited", "labeled", "as
 export type ErgaEventType = (typeof ERGA_EVENT_TYPES)[number];
 
 /** Who made an event: `type` person, agent or tool, an `id` and a `name` where it has one. */
-export type ErgaActor = { readonly type: "person" | "agent" | "tool"; readonly id: string; readonly name?: string };
+export type ErgaActor = {
+  readonly type: "person" | "agent" | "tool";
+  readonly id: string;
+  readonly name?: string;
+  /** The person an agent acts for, and how that was established (`session`, `argument`, `configuration` or `commit-author`): an optional key of the schema, written for an agent (decided by the owner on 2026-11-22, 0037-planning OQ-10). */
+  readonly principal?: { readonly id: string; readonly name?: string; readonly basis: string };
+};
 
 /** One event: its id, its time (`YYYY-MM-DDTHH:MM:SSZ`), its actor, its type and its data as written. */
 export type ErgaEvent = { readonly id: string; readonly at: string; readonly actor: ErgaActor; readonly type: ErgaEventType; readonly data?: Json };
@@ -78,7 +84,13 @@ function actorOf(v: Json | undefined): Result<ErgaActor, ErgaProblem> {
   const id = v["id"];
   const name = v["name"];
   if ((type !== "person" && type !== "agent" && type !== "tool") || typeof id !== "string") return bad("an actor has a type of person, agent or tool, and an id");
-  return ok(typeof name === "string" ? { type, id, name } : { type, id });
+  const p = v["principal"];
+  let principal: ErgaActor["principal"];
+  if (p !== undefined) {
+    if (!isJsonObject(p) || typeof p["id"] !== "string" || typeof p["basis"] !== "string") return bad("an actor's principal has an id and the basis it was established by");
+    principal = { id: p["id"], ...(typeof p["name"] === "string" ? { name: p["name"] } : {}), basis: p["basis"] };
+  }
+  return ok({ type, id, ...(typeof name === "string" ? { name } : {}), ...(principal === undefined ? {} : { principal }) });
 }
 
 /** One event from a JSON value, or why it is not one. */
@@ -184,7 +196,8 @@ export function decodeIndex(text: string): Result<ErgaIndex, ErgaProblem> {
 const byText = (a: string, b: string): number => (a < b ? -1 : a > b ? 1 : 0);
 
 function actorJson(a: ErgaActor): JsonObject {
-  return a.name === undefined ? { type: a.type, id: a.id } : { type: a.type, id: a.id, name: a.name };
+  const head = a.name === undefined ? { type: a.type, id: a.id } : { type: a.type, id: a.id, name: a.name };
+  return a.principal === undefined ? head : { ...head, principal: a.principal.name === undefined ? { id: a.principal.id, basis: a.principal.basis } : { id: a.principal.id, name: a.principal.name, basis: a.principal.basis } };
 }
 
 /** An event as a file writes it: `id`, `at`, `actor`, `type`, and `data` where it has any. */

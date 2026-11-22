@@ -59,7 +59,10 @@ function stateOf(v: Json | undefined): Result<ObservedState, CodecProblem> {
       return ok({ kind: "in-progress" });
     case "deferred": {
       const day = typeof v["until"] === "string" ? parseDay(v["until"]) : undefined;
-      return day?.kind === "ok" ? ok({ kind: "deferred", until: day.value }) : bad("a deferred state has an until day");
+      const untilText = typeof v["untilText"] === "string" && v["untilText"] !== "" ? v["untilText"] : undefined;
+      if (v["until"] !== undefined && day?.kind !== "ok") return bad("a deferred state's until is a day");
+      if (day?.kind !== "ok" && untilText === undefined) return bad("a deferred state has an until day or the text of it");
+      return ok({ kind: "deferred", ...(day?.kind === "ok" ? { until: day.value } : {}), ...(untilText === undefined ? {} : { untilText }) });
     }
     case "closed": {
       const r = closeReason.parse(v["reason"]);

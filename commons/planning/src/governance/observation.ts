@@ -30,7 +30,7 @@ export type Locator =
 export type ObservedState =
   | { readonly kind: "open" }
   | { readonly kind: "in-progress" }
-  | { readonly kind: "deferred"; readonly until: Day }
+  | { readonly kind: "deferred"; readonly until?: Day; readonly untilText?: string }
   | { readonly kind: "closed"; readonly reason: CloseReason };
 
 /** What a source read of one thing, as an item would hold it. */

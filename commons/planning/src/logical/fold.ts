@@ -148,7 +148,7 @@ function stateOf(opening: ItemEvent, opened: OpenedData, counted: ReadonlySet<Ev
         if (counted.has(e.id) && (state.kind === "open" || state.kind === "in-progress" || state.kind === "deferred")) state = { kind: "in-progress" };
         break;
       case "deferred":
-        if (counted.has(e.id) && (state.kind === "open" || state.kind === "in-progress" || state.kind === "deferred")) state = { kind: "deferred", until: d.until };
+        if (counted.has(e.id) && (state.kind === "open" || state.kind === "in-progress" || state.kind === "deferred")) state = { kind: "deferred", ...(d.until === undefined ? {} : { until: d.until }), ...(d.untilText === undefined ? {} : { untilText: d.untilText }) };
         break;
       case "closed":
         if (counted.has(e.id) && state.kind !== "proposed") state = { kind: "closed", reason: d.reason, at: e.at, by: e.actor };

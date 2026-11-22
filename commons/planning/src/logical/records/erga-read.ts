@@ -32,6 +32,7 @@ import {
   parseInstant,
   type PersonActor,
   person,
+  PRINCIPAL_BASES,
   type Severity,
   type Target,
   tool,
@@ -119,6 +120,14 @@ function actorOf(a: ErgaActor, eventId: string, o: ReadOptions, findings: ReadFi
   if (a.type === "tool") {
     const t = tool(a.id, name);
     return t.kind === "ok" ? t : refuse(`the tool of ${eventId} is not an actor`);
+  }
+  if (a.type === "agent" && rule === undefined && a.principal !== undefined) {
+    // the record names the person the agent acts for and how that was established: read as it is stored
+    const p = person(a.principal.id, a.principal.name ?? "");
+    const basis = PRINCIPAL_BASES.find((b) => b === a.principal?.basis);
+    if (p.kind !== "ok" || basis === undefined) return refuse(`the principal of the agent ${a.id} in ${eventId} is not a person or its basis is not one of ${PRINCIPAL_BASES.join(", ")}`);
+    const g = agent(a.id, name, p.value, basis);
+    return g.kind === "ok" ? g : refuse(`the agent of ${eventId} is not an actor`);
   }
   if (a.type === "agent" || rule !== undefined) {
     if (rule === undefined) return refuse(`the event ${eventId} is by the agent ${a.id}, and no rule of the configuration says whom it acts for: an agent with no principal is invalid`);

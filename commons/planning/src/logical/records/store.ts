@@ -221,13 +221,16 @@ export function eventDataOfJson(type: string, d: JsonObject): Result<EventData, 
     case "confirmed":
       return ok({ type });
     case "deferred": {
-      const until = text(d, "until");
+      const until = optionalText(d, "until");
       if (until.kind === "err") return until;
-      const day = parseDay(until.value);
+      const untilText = optionalText(d, "untilText");
+      if (untilText.kind === "err") return untilText;
+      const day = until.value === undefined ? undefined : parseDay(until.value);
       const reason = optionalText(d, "reason");
-      if (day.kind === "err") return bad("until is not a day");
+      if (day?.kind === "err") return bad("until is not a day");
       if (reason.kind === "err") return reason;
-      return ok({ type, until: day.value, ...(reason.value === undefined ? {} : { reason: reason.value }) });
+      if (day === undefined && untilText.value === undefined) return bad("a deferral has an until day or the text of it");
+      return ok({ type, ...(day === undefined ? {} : { until: day.value }), ...(untilText.value === undefined ? {} : { untilText: untilText.value }), ...(reason.value === undefined ? {} : { reason: reason.value }) });
     }
     case "closed": {
       const r = closeReason.parse(d["reason"]);

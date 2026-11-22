@@ -53,7 +53,7 @@ proves(["0004-planning-sources FR-006"], "the literal of an issue file is parsed
   assertEquals(listedBy('import a from "./00001-a.ts";\nimport b from "./00002-b.ts";\n'), ["00001-a.ts", "00002-b.ts"]);
 });
 
-proves(["0004-planning-sources FR-006"], "an issue is read as an item with every field of it kept: the severity as the source's own value, the state of its status, and a deferral that is not a day read as open with a finding", async () => {
+proves(["0004-planning-sources FR-006"], "an issue is read as an item with every field of it kept: the severity as the source's own value, the state of its status, and a deferral whose until is not a day kept as text with no day and an informational finding", async () => {
   const store = await storeWith({
     "issues/mod.ts": BARREL(["00001-a.ts", "00002-b.ts", "00003-c.ts", "00004-d.ts"]),
     "issues/00001-a.ts": ISSUE("00001", '{ kind: "open" }'),
@@ -63,7 +63,7 @@ proves(["0004-planning-sources FR-006"], "an issue is read as an item with every
   });
   const source = must(fileSource(store, issuesLens({ scope: "x" }), "issues/"));
   const read = must(await source.acquire());
-  assertEquals(read.observations.map((o) => o.content.state), [{ kind: "open" }, { kind: "closed", reason: "completed" }, { kind: "deferred", until: "2027-02-03" }, { kind: "open" }] as never);
+  assertEquals(read.observations.map((o) => o.content.state), [{ kind: "open" }, { kind: "closed", reason: "completed" }, { kind: "deferred", until: "2027-02-03", untilText: "2027-02-03" }, { kind: "deferred", untilText: "after the next stage" }] as never);
   const first = read.observations[0];
   assert(first !== undefined, "an observation");
   assertEquals(first.content.sourceSeverity, "high");
