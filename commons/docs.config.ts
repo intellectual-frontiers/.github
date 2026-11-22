@@ -12,7 +12,9 @@ import { DEFAULT_LICENSE } from "./libraries/src/license/standard.ts";
 import { guidesLens } from "./docs/src/lens/guides.ts";
 import { releasesLens } from "./docs/src/lens/releases.ts";
 import { programLens } from "./docs/src/lens/program.ts";
-import { type OpsFact, type OpsVerb, type OpsWorkflow, repoOpsLens } from "./docs/src/lens/repo-ops.ts";
+import { type OpsFact, type OpsPolicy, type OpsVerb, type OpsWorkflow, repoOpsLens } from "./docs/src/lens/repo-ops.ts";
+import { inventory } from "./libraries/src/ci/inventory.ts";
+import { RED_CAUSE_WHY, RED_CAUSES, RELEASE_POLICY } from "./libraries/src/ci/policy.ts";
 import { slugOf } from "./docs/src/model.ts";
 import { DISTRIBUTION, GITHUB_REGISTRY, SINGLE, SINGLE_TARGETS } from "./libraries/src/distribution.ts";
 import { workflows as workflowDefinitions } from "./libraries/src/workflows/definitions.ts";
@@ -112,15 +114,27 @@ function releaseFacts(): readonly OpsFact[] {
   ];
 }
 
+/** The build policy of the workflows, from the typed values they are made from (commons 0038-build-policy): the red causes, the release policy and the policy of every step. */
+function buildPolicy(): OpsPolicy {
+  const inv = inventory(workflowDefinitions());
+  return {
+    redCauses: RED_CAUSES.map((cause) => ({ cause, why: RED_CAUSE_WHY[cause] })),
+    release: RELEASE_POLICY,
+    counts: inv.counts,
+    steps: inv.rows.map((r) => ({ file: `${r.file}.auto.yml`, job: r.job, step: r.step, policy: r.policy, detail: r.detail, why: r.why })),
+  };
+}
+
 /** The section Repo Ops (docs 0001-docs FR-029): how this repository is operated, written by people and completed by what the typed definitions say. */
 const repoOps = repoOpsLens({
   name: "repo-ops",
   workflows: repoWorkflows,
   verbs: repoctlVerbs,
   facts: releaseFacts,
+  policy: buildPolicy,
   pages: [
     { file: "commons/docs/guides/ops-index.md", path: "repo-ops/index.html", order: 0 },
-    { file: "commons/docs/guides/ops-ci-cd.md", path: "repo-ops/ci-cd.html", order: 1, generated: "workflows" },
+    { file: "commons/docs/guides/ops-ci-cd.md", path: "repo-ops/ci-cd.html", order: 1, generated: ["workflows", "policy"] },
     { file: "commons/docs/guides/ops-dev-loop.md", path: "repo-ops/dev-loop.html", order: 2 },
     { file: "commons/docs/guides/ops-release.md", path: "repo-ops/release.html", order: 3, generated: "facts" },
     { file: "commons/docs/guides/ops-repoctl.md", path: "repo-ops/repoctl.html", order: 4, generated: "verbs" },

@@ -769,9 +769,10 @@ requirement	mechanism	by	note
 0038-build-policy FR-005	check	.github: cd commons/libraries && bun test suite/	0002-libraries-ci-findings: ci-collect.test.ts: ends 2 only where a cell that ran left no file
 0038-build-policy FR-006	check	.github: cd commons/libraries && bun test suite/	0002-libraries-ci-findings: ci-findings.test.ts: the id is stable across lines, runs and messages
 0038-build-policy FR-007	check	.github: cd commons/libraries && bun test suite/	0002-libraries-ci-findings: ci-findings.test.ts: open, fixed and accepted are derived from the runs and the acceptances
-0038-build-policy FR-008	none	-	draft: the code that proves it is written in the phases of intellectual-frontiers/.github#23
-0038-build-policy FR-009	none	-	draft: the code that proves it is written in the phases of intellectual-frontiers/.github#23
+0038-build-policy FR-008	check	.github: cd commons/libraries && bun test suite/	ci-accepted.test.ts: each rule of an acceptance is found in real files; the check is one of repoctl check; the path is the owner's in CODEOWNERS
+0038-build-policy FR-009	check	.github: cd commons/repoctl && bun test suite/	library-commit-doctor.test.ts: a staged secret is refused by the commit verb; the license text is made by license.ts and a hand-written one is a stale generated file
 0038-build-policy FR-010	check	.github: cd commons/libraries && bun test suite/	0002-libraries-ci-findings: ci-findings.test.ts: publish regardless until 2027-01-31, owner-review-due after
-0038-build-policy FR-011	none	-	draft: the code that proves it is written in the phases of intellectual-frontiers/.github#23
+0038-build-policy FR-011	check	.github: cd commons/libraries && bun test suite/	ci-collect.test.ts: the conclusion is neutral or success and never failure; seen live: findings (tests) neutral on the run of the commit that made it. Branch protection is a setting of GitHub that the owner applies
 0038-build-policy FR-012	check	.github: cd commons/libraries && bun test suite/	0002-libraries-ci-findings: ci-history.test.ts: on real git, a file added and never replaced, six writers racing at once
 0038-build-policy FR-013	check	.github: cd commons/libraries && bun test suite/	0002-libraries-ci-findings: ci-findings.test.ts: the wrapper exits 0 for a failing test, no output, a missing program and a timeout
+0030-generated-workflows FR-011	check	.github: cd commons/libraries && bun test suite/	ci-policy.test.ts: every step of the real workflows has a policy, and each rule of the validation finds what it is for on a workflow made to break it

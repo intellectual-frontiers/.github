@@ -4,8 +4,8 @@
  *
  * @module
  */
-import { execFileSync, spawn } from "node:child_process";
-import { mkdtempSync, rmSync } from "node:fs";
+import { execFileSync, spawn, spawnSync } from "node:child_process";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { FindingsFile } from "../src/ci/findings.ts";
@@ -37,6 +37,26 @@ proves([`${SPEC} FR-007`], "a run is added to the orphan branch as one new file 
     git(clone, "fetch", "-q", "origin", `${BRANCH}:refs/remotes/origin/${BRANCH}`);
     assertEquals(readHistory(clone).map((f) => f.path), ["runs/2026/11/20/ci-1.json", "runs/2026/11/21/tests-2.json"]);
     assertEquals(readHistory(root, "refs/remotes/origin/nothing").length, 0);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+proves([`${SPEC} FR-007`], "the program keeps a findings file given on the command line and says so where the file is not one", () => {
+  const root = mkdtempSync(join(tmpdir(), "history-"));
+  try {
+    const remote = join(root, "remote.git");
+    git(root, "init", "-q", "--bare", remote);
+    const program = new URL("../src/ci/history.ts", import.meta.url).pathname;
+    writeFileSync(join(root, "f.json"), JSON.stringify(file("5", "tests", "2026-11-22T10:00:00Z")));
+    const ok = spawnSync("bun", [program, "--file", join(root, "f.json"), "--remote", remote], { encoding: "utf8" });
+    assertEquals(ok.status, 0, ok.stderr);
+    assert(ok.stdout.includes("history: kept runs/2026/11/22/tests-5.json"), ok.stdout);
+    writeFileSync(join(root, "bad.json"), "{}");
+    const bad = spawnSync("bun", [program, "--file", join(root, "bad.json"), "--remote", remote], { encoding: "utf8" });
+    assertEquals(bad.status, 0, "a file that is not one is said and is never a red run");
+    assert(bad.stdout.includes("is not a findings file"), bad.stdout);
+    assertEquals(spawnSync("bun", [program], { encoding: "utf8" }).status, 2, "a call with no file is a wrong call");
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

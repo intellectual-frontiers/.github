@@ -128,7 +128,7 @@ proves(["0002-repoctl-governance FR-005"], "the generators of the repository's c
 
 proves(["0002-repoctl-governance FR-006"], "the checks of the repository's configuration have a command and a code for each", async () => {
   const { checks } = await realConfig();
-  assertEquals(checks.map((c) => c.id), ["specs", "rules", "versions", "types", "tools-types"]);
+  assertEquals(checks.map((c) => c.id), ["specs", "rules", "accepted-findings", "versions", "types", "tools-types"]);
   for (const c of checks) {
     const program = c.run.kind === "program" ? c.run.argv[1] : undefined;
     // the compiler of the root is the root's install, which a library job has not made

@@ -1,0 +1,41 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "2",
+    "workflow": "ci",
+    "commit": "c2",
+    "at": "2026-11-22T10:00:00Z",
+    "url": "https://github.com/example/n/actions/runs/2"
+  },
+  "steps": [
+    {
+      "id": "verify",
+      "job": "verify",
+      "module": "fixture",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 1,
+      "durationMs": 1000
+    }
+  ],
+  "findings": [
+    {
+      "id": "f-558c995a6a49bd8f",
+      "tool": "tsc",
+      "code": "TS2322",
+      "module": "fixture",
+      "file": "src/greeting.ts",
+      "line": 3,
+      "severity": "error",
+      "message": "Type 'string' is not assignable to type 'number'.",
+      "key": "TS2322:Type 'string' is not assignable to type 'number'.",
+      "evidence": {
+        "run": "2",
+        "commit": "c2",
+        "step": "verify",
+        "logSha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "at": "2026-11-22T10:00:00Z"
+    }
+  ]
+}

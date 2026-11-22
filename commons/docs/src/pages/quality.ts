@@ -17,6 +17,7 @@ import { specPage } from "../links.ts";
 import type { Area } from "../sources.ts";
 import type { Badge, Block, Inline, Page, Tone } from "../model.ts";
 import { slugOf } from "../model.ts";
+import { findingsData, findingsPage } from "./findings.ts";
 import { gateBlocks, gateMark, gateResult } from "./insight.ts";
 import { areaPage } from "./overview.ts";
 import { packagePage } from "./package.ts";
@@ -212,7 +213,7 @@ export function qualityPages(b: Build): void {
       ...(failedAll > 0 ? [BANNER(failedAll)] : []),
       { kind: "paragraph", inlines: runLine(b) },
       ...(ev.build === undefined ? [] : [{ kind: "paragraph" as const, inlines: buildLine(b) }]),
-      { kind: "paragraph", inlines: [link("quality/ci.html", "The workflows"), text(": how the latest runs ended. "), link("quality/requirements.html", "Requirements"), text(": proved, by specification. "), link("quality/dependencies.html", "Dependencies"), text(" and the SBOM. "), link("quality/todo.html", "Notes in the code"), text(". "), link("quality/acceptance.html", "Acceptance kits"), text(". "), link("quality/hotspots.html", "Hotspots and ownership"), text(". "), link("quality/health.html", "Repository health"), text(". "), link("quality/changes.html", "What changed"), text(": coverage and mutation of the files changed since the tests ran. "), link("quality/findings.html", "The documentation's own findings"), text(": what the generator found while it made this site.")] },
+      { kind: "paragraph", inlines: [link("quality/ci.html", "The workflows"), text(": how the latest runs ended. "), link("quality/build-findings.html", "Build findings"), text(": what the tools said of each module in the runs, with the history. "), link("quality/requirements.html", "Requirements"), text(": proved, by specification. "), link("quality/dependencies.html", "Dependencies"), text(" and the SBOM. "), link("quality/todo.html", "Notes in the code"), text(". "), link("quality/acceptance.html", "Acceptance kits"), text(". "), link("quality/hotspots.html", "Hotspots and ownership"), text(". "), link("quality/health.html", "Repository health"), text(". "), link("quality/changes.html", "What changed"), text(": coverage and mutation of the files changed since the tests ran. "), link("quality/findings.html", "The documentation's own findings"), text(": what the generator found while it made this site.")] },
       ...(ev.recorded
         ? [{
           kind: "paragraph" as const,
@@ -322,7 +323,11 @@ export function qualityPages(b: Build): void {
     });
   });
   ciPage(b);
+<<<<<<< HEAD
   packagePage(b);
+=======
+  findingsPage(b);
+>>>>>>> 856caa74a6ea80c3629a5100f5935563055a4bf6
   b.add({ path: "quality/findings.html", title: "Documentation findings", description: "What the generator found while it made this site.", section: "quality", group: "Quality", order: 5, blocks: [] });
   issuePages(b);
 }
@@ -603,7 +608,7 @@ export function qualityData(b: Build): readonly { readonly path: string; readonl
       }, null, 2)}\n`,
     };
   });
-  return [...per, { path: "quality.json", text: `${JSON.stringify({ recorded: ev.recorded, run: ev.run ?? null, libraries }, null, 2)}\n`, what: "the results of the tests, the requirements proved and the open issues and tickets, by library" }];
+  return [...per, ...findingsData(b), { path: "quality.json", text: `${JSON.stringify({ recorded: ev.recorded, run: ev.run ?? null, libraries }, null, 2)}\n`, what: "the results of the tests, the requirements proved and the open issues and tickets, by library" }];
 }
 
 

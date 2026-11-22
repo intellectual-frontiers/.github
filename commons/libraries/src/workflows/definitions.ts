@@ -14,7 +14,7 @@
  * @module
  */
 import { classify } from "../ci/inventory.ts";
-import { gatherJob, wrapWorkflow } from "../ci/wrap.ts";
+import { gatherJob, keepJob, wrapWorkflow } from "../ci/wrap.ts";
 import { isWrapped } from "../ci/inventory.ts";
 import { type CompositeAction, expr, job, run, type Step, use, type Workflow } from "./model.ts";
 
@@ -497,6 +497,16 @@ const site: Workflow = {
         ),
         run(
           lines(
+            "mkdir -p _evidence/findings-history",
+            "# the findings of the runs, which the workflows keep on the branch findings-history, laid out for the page of build findings (0038-build-policy FR-012), and the accepted risks as data",
+            "git fetch -q origin findings-history:refs/remotes/origin/findings-history || echo 'no findings history has been kept yet'",
+            "git archive --format=tar refs/remotes/origin/findings-history runs 2>/dev/null | tar -x -C _evidence/findings-history || echo 'no findings history to lay out'",
+            "bun commons/libraries/src/ci/accepted.ts --json _evidence/accepted-findings.json || echo 'the accepted risks could not be read'",
+          ),
+          { name: "The findings of the runs, from the history branch, and the accepted risks", shell: "bash", continueOnError: true },
+        ),
+        run(
+          lines(
             "mkdir -p _evidence",
             "# each page of the answer is an array: the pages are made one",
             "gh api --paginate -X GET \"repos/$GITHUB_REPOSITORY/issues\" -f state=all -f per_page=100 --jq '.[]' | jq -s '.' > _evidence/github-issues.json || echo '[]' > _evidence/github-issues.json",
@@ -769,26 +779,19 @@ const release: Workflow = {
 
 /** The script of the job that gathers the findings of a workflow: the sound-pipeline check for the cells that ran, then `collect.ts` (0038-build-policy FR-005). */
 function gatherScript(w: Workflow): string {
-  const history = [
-    'H=""',
-    'if [ "$GITHUB_REF" = refs/heads/main ]; then',
-    '  export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $(printf \'x-access-token:%s\' "$GH_TOKEN" | base64 -w0)"',
-    '  H="--history https://github.com/$GITHUB_REPOSITORY.git"',
-    "fi",
-  ];
   const planGuard = "plan" in w.jobs ? ['if [ "$PLAN_RESULT" != "success" ]; then echo "the plan could not be made (the red cause plan-unavailable)"; exit 2; fi'] : [];
   const expects: string[] = [];
   const counts: string[] = [];
   if (w.file === "ci") {
-    counts.push('n_linux=$(jq \'[.[].name] | unique | length\' <<<"${PLAN_LINUX:-[]}")', 'n_systems=$(jq \'[.[].name] | unique | length\' <<<"${PLAN_SYSTEMS:-[]}")');
+    counts.push('n_linux=$(jq \'[(.include // [])[].name] | unique | length\' <<<"${PLAN_LINUX:-$empty}")', 'n_systems=$(jq \'[(.include // [])[].name] | unique | length\' <<<"${PLAN_SYSTEMS:-$empty}")');
     expects.push('--expect "verify:$n_linux"', '--expect "systems:$n_systems"');
   }
   if (w.file === "evidence") {
-    counts.push('n_tests=$(jq \'[.[].name] | unique | length\' <<<"${PLAN_LINUX:-[]}")');
+    counts.push('n_tests=$(jq \'[(.include // [])[].name] | unique | length\' <<<"${PLAN_LINUX:-$empty}")');
     expects.push('--expect "tests:$n_tests"', "--expect repository:1");
   }
   const review = w.file === "ci" ? " --policy-review" : "";
-  return lines("set -u", ...planGuard, ...counts, ...history, `bun commons/libraries/src/ci/collect.ts --dir _findings --out _findings-out --workflow ${w.file} ${expects.join(" ")}${review} --check-run $H`);
+  return lines("set -u", "empty='{}'", ...planGuard, ...counts, `bun commons/libraries/src/ci/collect.ts --dir _findings --out _findings-out --workflow ${w.file} ${expects.join(" ")}${review} --check-run`);
 }
 
 /** A workflow under the build policy (0038-build-policy): every step has its policy, the steps of findings run through the wrapper, and the job that gathers the findings ends the run. */
@@ -801,7 +804,7 @@ function underPolicy(w: Workflow): Workflow {
   const gather = { ...gatherJob(wrapped, all, gatherScript(wrapped)), name: w.file === "ci" ? "ci" : "findings" };
   const planResults = "plan" in wrapped.jobs ? { PLAN_RESULT: expr("needs.plan.result"), PLAN_LINUX: expr("needs.plan.outputs.linux"), ...(w.file === "ci" ? { PLAN_SYSTEMS: expr("needs.plan.outputs.systems") } : {}) } : {};
   const steps = gather.steps.map((st) => (st.kind === "run" && st.env?.["WORKFLOW"] !== undefined ? { ...st, env: { ...st.env, ...planResults } } : st)) as unknown as typeof gather.steps;
-  return { ...wrapped, jobs: { ...wrapped.jobs, [id]: { ...gather, steps } } };
+  return { ...wrapped, jobs: { ...wrapped.jobs, [id]: { ...gather, steps }, "keep-findings": keepJob(wrapped, id) } };
 }
 
 /** Every workflow, the libraries' made from their manifests, in the order of their files' names, under the build policy. */

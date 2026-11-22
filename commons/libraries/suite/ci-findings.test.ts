@@ -30,6 +30,7 @@ proves([`${SPEC} FR-003`], "each parser reads the real output of its tool into f
   const test = parseOutput("bun-test", fixture("bun-test.txt"), ctx);
   assertEquals(test.map((f) => f.key), ["a failing one for the capture", "another failing one"]);
   assertEquals(test[0]?.file, "suite/_fail.test.ts");
+  assertEquals(parseOutput("bun-test", "::group::suite/demo-failing.test.ts:\n(fail) a demonstration: this test fails on purpose [0.4ms]\n", ctx)[0]?.file, "suite/demo-failing.test.ts", "a GitHub log's group marker is not part of the file (seen in a real run)");
   const lint = parseOutput("lint", fixture("lint.txt"), ctx);
   assert(lint.some((f) => f.code === "no-var" && f.severity === "warning" && f.line === 2), "a lint warning keeps its severity and line");
   assert(lint.some((f) => f.code === "ifc/module-doc" && f.severity === "error"));

@@ -64,7 +64,7 @@ export interface OpsFact {
 }
 
 /** What follows a page's words. */
-export type OpsGenerated = "workflows" | "verbs" | "facts";
+export type OpsGenerated = "workflows" | "verbs" | "facts" | "policy";
 
 /** One page of the section: the Markdown file, its address and what is generated after it. */
 export interface RepoOpsPage {
@@ -74,8 +74,16 @@ export interface RepoOpsPage {
   readonly path: string;
   /** Its place in the section, lowest first. */
   readonly order: number;
-  /** The typed facts that follow its words. */
-  readonly generated?: OpsGenerated;
+  /** The typed facts that follow its words (one kind, or several in order). */
+  readonly generated?: OpsGenerated | readonly OpsGenerated[];
+}
+
+/** The build policy as the typed values of the workflows say it (commons 0038-build-policy): the red causes with their reasons, the release policy, and the classification of every step. */
+export interface OpsPolicy {
+  readonly redCauses: readonly { readonly cause: string; readonly why: string }[];
+  readonly release: { readonly mode: string; readonly until: string };
+  readonly counts: Readonly<Record<string, number>>;
+  readonly steps: readonly { readonly file: string; readonly job: string; readonly step: string; readonly policy: string; readonly detail: string; readonly why: string }[];
 }
 
 /** What the Repo Ops lens is given. */
@@ -90,6 +98,8 @@ export interface RepoOpsOptions {
   readonly verbs?: () => readonly OpsVerb[];
   /** The facts of the release. */
   readonly facts?: () => readonly OpsFact[];
+  /** The build policy and the classification of every step. */
+  readonly policy?: () => OpsPolicy;
   /** The command the verbs are run with (`repoctl`), for the usage lines. */
   readonly command?: string;
 }
@@ -122,6 +132,20 @@ function factBlocks(fs_: readonly OpsFact[]): Block[] {
     heading("The release at this commit", "the-release-at-this-commit"),
     para(t("Read from the typed constants of the release, not written here.")),
     { kind: "table", head: [[t("Fact")], [t("Value")]], rows: fs_.map((f) => [[t(f.label)], [c(f.value)]]) },
+  ];
+}
+
+function policyBlocks(p: OpsPolicy | undefined): Block[] {
+  if (p === undefined) return [heading("The build policy", "the-build-policy"), para(t("No policy was given to this page."))];
+  const total = Object.values(p.counts).reduce((n, x) => n + x, 0);
+  return [
+    heading("The build policy", "the-build-policy"),
+    para(t("Read from the typed values the workflows are made from (commons 0038-build-policy), so that this page and the pipeline cannot disagree. A run ends red only for a cause of this list; everything else a module says is a finding, shown on "), { kind: "link", href: { kind: "page", path: "quality/build-findings.html" }, children: [t("the build findings page")] }, t(".")),
+    { kind: "table", head: [[t("Red cause")], [t("Why it is one")]], rows: p.redCauses.map((r) => [[c(r.cause)], [t(r.why)]]) },
+    para(t(`The release publishes regardless of open findings until ${p.release.until} (the policy "${p.release.mode}"); after that day the run does not proceed and carries the finding owner-review-due, so that nothing continues silently.`)),
+    heading("What each step is", "what-each-step-is"),
+    para(t(`${total} steps in all: ${Object.entries(p.counts).map(([k, n]) => `${n} ${k}`).join(", ")}. A step of findings runs through one wrapper and ends green; plumbing never decides; only a red cause or a gate may end a job red.`)),
+    { kind: "table", filter: "Filter the steps", head: [[t("Workflow")], [t("Job")], [t("Step")], [t("Is")], [t("Detail")]], rows: p.steps.map((x) => [[t(x.file)], [t(x.job)], [t(x.step)], [t(x.policy)], [t(x.detail)]]) },
   ];
 }
 
@@ -169,7 +193,8 @@ export function repoOpsLens(options: RepoOpsOptions): Lens {
           const m = /^#\s+(.+)\n+/.exec(text);
           const title = m?.[1]?.trim() ?? p.path;
           const body = m === null ? text : text.slice(m[0].length);
-          const generated: Block[] = p.generated === "workflows" ? workflowBlocks(options.workflows?.() ?? []) : p.generated === "verbs" ? verbBlocks(options.verbs?.() ?? [], command) : p.generated === "facts" ? factBlocks(options.facts?.() ?? []) : [];
+          const kinds: readonly OpsGenerated[] = p.generated === undefined ? [] : typeof p.generated === "string" ? [p.generated] : p.generated;
+          const generated: Block[] = kinds.flatMap((k): Block[] => (k === "workflows" ? workflowBlocks(options.workflows?.() ?? []) : k === "verbs" ? verbBlocks(options.verbs?.() ?? [], command) : k === "policy" ? policyBlocks(options.policy?.()) : factBlocks(options.facts?.() ?? [])));
           const lead = /^(?![#>|`\-*\d])[^\n]+/m.exec(body)?.[0] ?? title;
           build.add({ path: p.path, title, description: firstSentence(lead.replace(/\[([^\]]*)\]\([^)]*\)/g, "$1").replace(/[`*_]/g, "")), section: "repoops", group: "Repo Ops", order: p.order, blocks: [...build.md(body, { page: p.path, file: p.file }), ...generated] });
         }
