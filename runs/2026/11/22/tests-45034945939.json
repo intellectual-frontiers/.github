@@ -1,0 +1,227 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45034945939",
+    "workflow": "tests",
+    "commit": "0338268654f0b981ff266f8880bfc201b12b9a45",
+    "at": "2026-11-22T14:51:00Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45034945939"
+  },
+  "steps": [
+    {
+      "id": "commons-generated-files-and-specificatio-8",
+      "job": "check",
+      "module": "repository",
+      "tool": "checks",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5889,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-documentation-generator-s-dependenci-4",
+      "job": "check",
+      "module": "repository",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 50,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-formatter-6",
+      "job": "check",
+      "module": "repository",
+      "tool": "format",
+      "outcome": "findings",
+      "findings": 1,
+      "durationMs": 20,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-linter-type-aware-no-warning-allowed-7",
+      "job": "check",
+      "module": "repository",
+      "tool": "lint",
+      "outcome": "findings",
+      "findings": 7,
+      "durationMs": 1321,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-root-s-development-tools-from-bun-lo-3",
+      "job": "check",
+      "module": "repository",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 344,
+      "exitStatus": 0
+    },
+    {
+      "id": "typescript-7-on-the-tests-of-the-root-an-5",
+      "job": "check",
+      "module": "repository",
+      "tool": "tsc",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 3971,
+      "exitStatus": 0
+    },
+    {
+      "id": "commons-generated-files-and-specificatio-3",
+      "job": "windows",
+      "module": "repository",
+      "tool": "checks",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2051,
+      "exitStatus": 0
+    }
+  ],
+  "findings": [
+    {
+      "id": "f-1be5934591a5378e",
+      "tool": "lint",
+      "module": "repository",
+      "evidence": {
+        "run": "45034945939",
+        "commit": "0338268654f0b981ff266f8880bfc201b12b9a45",
+        "step": "the-linter-type-aware-no-warning-allowed-7",
+        "logSha256": "795e9c46f335be460d187414acf3a0e3da2395c3bf4e0f38145d49166611186d"
+      },
+      "at": "2026-11-22T14:50:22Z",
+      "code": "@typescript-eslint/no-unnecessary-type-assertion",
+      "file": "tests/commons-anyfs-merge-medium.test.ts",
+      "line": 139,
+      "severity": "error",
+      "message": "This assertion is unnecessary since the receiver accepts the original type of the expression.",
+      "key": "@typescript-eslint/no-unnecessary-type-assertion:This assertion is unnecessary since the receiver accepts the original type of the expression.:replica: a.sql.store as unknown as Mergeable,"
+    },
+    {
+      "id": "f-3b32259e3d363339",
+      "tool": "format",
+      "module": "repository",
+      "evidence": {
+        "run": "45034945939",
+        "commit": "0338268654f0b981ff266f8880bfc201b12b9a45",
+        "step": "the-formatter-6",
+        "logSha256": "679bfe933fef98cad903144ae6dc2018ff45589c514bd9077281ead19545c9bb"
+      },
+      "at": "2026-11-22T14:50:21Z",
+      "code": "unformatted",
+      "file": "tests/commons-kanon.test.ts",
+      "severity": "warning",
+      "message": "tests/commons-kanon.test.ts is not formatted",
+      "key": "tests/commons-kanon.test.ts"
+    },
+    {
+      "id": "f-42f94108c4e31fba",
+      "tool": "lint",
+      "module": "repository",
+      "evidence": {
+        "run": "45034945939",
+        "commit": "0338268654f0b981ff266f8880bfc201b12b9a45",
+        "step": "the-linter-type-aware-no-warning-allowed-7",
+        "logSha256": "795e9c46f335be460d187414acf3a0e3da2395c3bf4e0f38145d49166611186d"
+      },
+      "at": "2026-11-22T14:50:22Z",
+      "code": "@typescript-eslint/no-unnecessary-type-assertion",
+      "file": "tests/commons-anyfs-merge-medium.test.ts",
+      "line": 226,
+      "severity": "error",
+      "message": "This assertion is unnecessary since the receiver accepts the original type of the expression.",
+      "key": "@typescript-eslint/no-unnecessary-type-assertion:This assertion is unnecessary since the receiver accepts the original type of the expression.:console.log(`[anyfs merge medium] ${await exercise(\"real sshd\", opened.value.store as unknown as Medium, dir)}`);"
+    },
+    {
+      "id": "f-8762d74d284fa9a1",
+      "tool": "lint",
+      "module": "repository",
+      "evidence": {
+        "run": "45034945939",
+        "commit": "0338268654f0b981ff266f8880bfc201b12b9a45",
+        "step": "the-linter-type-aware-no-warning-allowed-7",
+        "logSha256": "795e9c46f335be460d187414acf3a0e3da2395c3bf4e0f38145d49166611186d"
+      },
+      "at": "2026-11-22T14:50:22Z",
+      "code": "@typescript-eslint/no-unnecessary-type-assertion",
+      "file": "tests/commons-anyfs-merge-medium.test.ts",
+      "line": 210,
+      "severity": "error",
+      "message": "This assertion is unnecessary since the receiver accepts the original type of the expression.",
+      "key": "@typescript-eslint/no-unnecessary-type-assertion:This assertion is unnecessary since the receiver accepts the original type of the expression.:console.log(`[anyfs merge medium] ${await exercise(\"git branch\", git.value.store as unknown as Medium, dir)}`);"
+    },
+    {
+      "id": "f-8f38f15eb3de5a29",
+      "tool": "lint",
+      "module": "repository",
+      "evidence": {
+        "run": "45034945939",
+        "commit": "0338268654f0b981ff266f8880bfc201b12b9a45",
+        "step": "the-linter-type-aware-no-warning-allowed-7",
+        "logSha256": "795e9c46f335be460d187414acf3a0e3da2395c3bf4e0f38145d49166611186d"
+      },
+      "at": "2026-11-22T14:50:22Z",
+      "code": "@typescript-eslint/no-unnecessary-type-assertion",
+      "file": "tests/commons-anyfs-merge-medium.test.ts",
+      "line": 155,
+      "severity": "error",
+      "message": "This assertion is unnecessary since the receiver accepts the original type of the expression.",
+      "key": "@typescript-eslint/no-unnecessary-type-assertion:This assertion is unnecessary since the receiver accepts the original type of the expression.:assert((await publishVector({ self: r.id, replica: r.sql.store as unknown as Mergeable, medium })).kind === \"ok\");"
+    },
+    {
+      "id": "f-a6ee255b88ce666b",
+      "tool": "lint",
+      "module": "repository",
+      "evidence": {
+        "run": "45034945939",
+        "commit": "0338268654f0b981ff266f8880bfc201b12b9a45",
+        "step": "the-linter-type-aware-no-warning-allowed-7",
+        "logSha256": "795e9c46f335be460d187414acf3a0e3da2395c3bf4e0f38145d49166611186d"
+      },
+      "at": "2026-11-22T14:50:22Z",
+      "code": "@typescript-eslint/no-unnecessary-type-assertion",
+      "file": "tests/commons-anyfs-merge-medium.test.ts",
+      "line": 275,
+      "severity": "error",
+      "message": "This assertion is unnecessary since the receiver accepts the original type of the expression.",
+      "key": "@typescript-eslint/no-unnecessary-type-assertion:This assertion is unnecessary since the receiver accepts the original type of the expression.:console.log(`[anyfs merge medium] ${await exercise(\"real S3 (RustFS)\", opened.value.store as unknown as Medium, dir)}`);"
+    },
+    {
+      "id": "f-cb2e17397f22d384",
+      "tool": "lint",
+      "module": "repository",
+      "evidence": {
+        "run": "45034945939",
+        "commit": "0338268654f0b981ff266f8880bfc201b12b9a45",
+        "step": "the-linter-type-aware-no-warning-allowed-7",
+        "logSha256": "795e9c46f335be460d187414acf3a0e3da2395c3bf4e0f38145d49166611186d"
+      },
+      "at": "2026-11-22T14:50:22Z",
+      "code": "@typescript-eslint/no-unnecessary-type-assertion",
+      "file": "tests/commons-anyfs-merge-medium.test.ts",
+      "line": 94,
+      "severity": "error",
+      "message": "This assertion is unnecessary since the receiver accepts the original type of the expression.",
+      "key": "@typescript-eslint/no-unnecessary-type-assertion:This assertion is unnecessary since the receiver accepts the original type of the expression.:const done = await syncThrough({ self: r.id, replica: r.sql.store as unknown as Mergeable, medium, cursor: r.cursor, ...more });"
+    },
+    {
+      "id": "f-dfbc555184b12f3c",
+      "tool": "lint",
+      "module": "repository",
+      "evidence": {
+        "run": "45034945939",
+        "commit": "0338268654f0b981ff266f8880bfc201b12b9a45",
+        "step": "the-linter-type-aware-no-warning-allowed-7",
+        "logSha256": "795e9c46f335be460d187414acf3a0e3da2395c3bf4e0f38145d49166611186d"
+      },
+      "at": "2026-11-22T14:50:22Z",
+      "code": "@typescript-eslint/no-unnecessary-type-assertion",
+      "file": "tests/commons-anyfs-merge-medium.test.ts",
+      "line": 186,
+      "severity": "error",
+      "message": "This assertion is unnecessary since the receiver accepts the original type of the expression.",
+      "key": "@typescript-eslint/no-unnecessary-type-assertion:This assertion is unnecessary since the receiver accepts the original type of the expression.:console.log(`[anyfs merge medium] ${await exercise(\"folder\", m.value as unknown as Medium, dir)}`);"
+    }
+  ]
+}
