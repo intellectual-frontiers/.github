@@ -10,7 +10,7 @@
 ## Requirements
 
 - **FR-001**: The verbs MUST be a closed union `VerbId` with one entry in the table `VERBS` for each, the compiler MUST hold the table complete, and `verbIds()` MUST list every entry once.
-- **FR-002**: The facts of every verb MUST NOT contradict each other by the rules of Headless (`actionProblems`): a report only reads, an action does not only read, a destructive verb previews and is not idempotent, and every verb that changes anything MUST name the channels `local` and `mcp` only.
+- **FR-002**: The facts of every verb MUST NOT contradict each other by the rules of Headless (`actionProblems`): a report only reads, an action does not only read, a destructive verb previews and is not idempotent, and every verb that changes anything MUST name the channels `local` and `mcp` only, except `serve`, which opens a listener on the computer and MUST name `local` only.
 - **FR-003**: The tiers MUST be two, `reader` and `writer`, lowest first, the ladder's default MUST be `writer`, `tierOf` MUST name each and no other word, and every verb of the tier `reader` MUST only read.
 - **FR-004**: Every problem the program raises MUST be one of the closed union of codes `ProblemCode`, each code MUST have one explanation of four non-empty parts in `CATALOGUE`, and `isProblemCode` MUST accept the codes and nothing else.
 - **FR-005**: `parseMountName` MUST accept lower-case words joined by hyphens of two to thirty-two characters that start with a letter, and MUST refuse the name of a kind of place and any other word, so that `name:` on a command line is never a place.

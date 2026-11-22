@@ -47,6 +47,10 @@ export type World = {
   /** The bytes of a file of this computer. */
   readonly readLocalFile: (path: string) => Promise<Result<Uint8Array, string>>;
   readonly state: StateStore;
+  /** A line to standard error, outside the report: what a long-running verb tells the person who started it (the address and the token of a server). */
+  readonly notice: (text: string) => void;
+  /** Aborted when the host asks the run to end (a test, or the process's own stop); a verb that waits listens to this as well as to the signal of its context. */
+  readonly stop?: AbortSignal;
 };
 
 /** What the program holds for every run of its verbs. */

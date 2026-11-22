@@ -44,6 +44,10 @@ export type MainDeps = {
   readonly stateDir?: string;
   /** How the ssh program is run; the system's where it is left out. */
   readonly run?: RunLocal;
+  /** Where a notice to the person goes, outside the report (the address and token of a server); standard error by default. */
+  readonly notice?: (text: string) => void;
+  /** Ends a verb that waits (`serve`) the way the person's interrupt does. */
+  readonly stop?: AbortSignal;
 };
 
 /** The words of the command line without `--config FILE` (or `--config=FILE`), and the file it named. */
@@ -89,7 +93,7 @@ export async function main(argv: readonly string[], deps: MainDeps = {}): Promis
     config,
     ...(problem === undefined ? {} : { configProblem: problem }),
     ...(file === undefined ? {} : { configFile: file }),
-    world: systemWorld({ env, cwd, json, config, ...(deps.stateDir === undefined ? {} : { stateDir: deps.stateDir }), ...(deps.run === undefined ? {} : { run: deps.run }), ...(deps.readStdin === undefined ? {} : { readStdin: deps.readStdin }), ...(deps.writeStdout === undefined ? {} : { writeStdout: deps.writeStdout }) }),
+    world: systemWorld({ env, cwd, json, config, ...(deps.stateDir === undefined ? {} : { stateDir: deps.stateDir }), ...(deps.run === undefined ? {} : { run: deps.run }), ...(deps.readStdin === undefined ? {} : { readStdin: deps.readStdin }), ...(deps.writeStdout === undefined ? {} : { writeStdout: deps.writeStdout }), ...(deps.notice === undefined ? (deps.err === undefined ? {} : { notice: (t: string) => deps.err?.(`${t}\n`) }) : { notice: deps.notice }), ...(deps.stop === undefined ? {} : { stop: deps.stop }) }),
   };
   const program = anyfsProgram(host, deps.run);
   return await launch(program, {
