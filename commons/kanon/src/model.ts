@@ -1,4 +1,4 @@
-// Spec: 0001-kanon-checker FR-006
+// Spec: 0001-kanon-checker FR-006; 0002-kanon-content-checks FR-001
 /**
  * The layered model of a Kanon library (commons 0033-kanon FR-013): what a library that is built in layers gives to be documented, checked and traced, as types and the names of its kinds and
  * the builders of its ids, and no code that a program runs beyond them. It is the shape of the layered model of the documentation generator (`commons/docs`, 0011-documentation FR-029): the
@@ -94,6 +94,20 @@ export type Disposition =
   | (DispositionBase & { readonly outcome: "carried"; readonly target: ElementId })
   | (DispositionBase & { readonly outcome: "unexpressed"; readonly reason: string });
 
+/** A link between two elements of one layer, with a kind of the model's vocabulary: it may be cyclic and is never a trace edge (0033-kanon FR-029). */
+export interface Relation {
+  readonly from: ElementId;
+  readonly to: ElementId;
+  readonly kind: string;
+}
+
+/** What a host declares for its model (0033-kanon FR-028): the kinds of element of each layer, the kinds of relation and the names of the annotations of Governance. */
+export interface ModelVocabulary {
+  readonly kinds: readonly { readonly layer: Layer; readonly kinds: readonly string[] }[];
+  readonly relationKinds: readonly string[];
+  readonly annotations: readonly string[];
+}
+
 /** The layered model of a Kanon library. */
 export interface LayeredModel {
   /** Its name and the library it is of, as `arca`, `data`. */
@@ -109,6 +123,10 @@ export interface LayeredModel {
   readonly dispositions: readonly Disposition[];
   /** The instances (dialects) the model has, each of which every annotation of Governance is accounted for (0033-kanon FR-022); none where the model has no instances of a unit kind. */
   readonly instances: readonly InstanceName[];
+  /** The links between elements of one layer (0033-kanon FR-029); none where the model has none. */
+  readonly relations?: readonly Relation[];
+  /** What the host declares for the model (0033-kanon FR-028); where absent no kind and no name is checked. */
+  readonly vocabulary?: ModelVocabulary;
 }
 
 /** The kinds of element that a program says (0033-kanon FR-013). */

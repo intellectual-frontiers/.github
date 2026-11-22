@@ -96,6 +96,11 @@ export type Plugin = {
   readonly dependsOn: readonly PackageName[];
 };
 
+/** What an extension of another scope says it is, in its own table (0033-kanon FR-027): a dialect of a unit of the host, or a plugin with its noun. */
+export type ExtensionRole =
+  | { readonly kind: "dialect"; readonly name: InstanceName; readonly instanceOf: FolderName }
+  | { readonly kind: "plugin"; readonly noun: PluginNoun };
+
 /** The table of a library that is Kanon. */
 export type Table = {
   /** The package's own name, which a unit uses to import another unit. */
@@ -109,6 +114,8 @@ export type Table = {
   readonly plugins: readonly Plugin[];
   /** The host library this package extends, as a dialect or a plugin of it: a package is a host or an extension, never both (0033-kanon FR-020). */
   readonly extends?: PackageName;
+  /** Its role in that host, where the host's family takes members of any scope (0033-kanon FR-027). */
+  readonly role?: ExtensionRole;
 };
 
 const nonEmpty: Decoder<string> = (input, path = "$") => {
@@ -121,12 +128,13 @@ const unitForm = object(
   { folder: nonEmpty },
   { layer: literal(...LAYERS), instances: boolean, own: boolean, mayImport: array(nonEmpty), packages: array(allowed) },
 );
-const familyForm = object({ dialect: nonEmpty, plugin: nonEmpty }, { contract: nonEmpty });
+const familyForm = object({ dialect: nonEmpty, plugin: nonEmpty }, { contract: nonEmpty, scope: literal("own", "any") });
+const roleForm = object({ kind: literal("dialect", "plugin") }, { name: nonEmpty, instanceOf: nonEmpty, noun: nonEmpty });
 const instanceForm = object({ name: nonEmpty, instanceOf: nonEmpty, placement: literal("folder", "package") });
 const pluginForm = object({ noun: nonEmpty }, { dependsOn: array(nonEmpty) });
 const body = object(
   { package: nonEmpty, units: array(unitForm) },
-  { family: familyForm, instances: array(instanceForm), plugins: array(pluginForm), extends: nonEmpty },
+  { family: familyForm, instances: array(instanceForm), plugins: array(pluginForm), extends: nonEmpty, role: roleForm },
 );
 
 /** The table read from the `kanon` field of a manifest, or one sentence saying what is wrong with it (0033-kanon FR-010). */
@@ -174,7 +182,23 @@ export function decodeTable(input: unknown): Result<Table, string> {
   if (extended?.kind === "err") return err(`kanon.extends: ${extended.error}`);
   if (extended !== undefined && (members.value.family !== undefined || members.value.instances.length + members.value.plugins.length > 0))
     return err("kanon: a package is a host (family, instances, plugins) or an extension (extends), never both");
-  return ok({ package: pkg.value, units: out, ...members.value, ...(extended === undefined ? {} : { extends: extended.value }) });
+  let role: ExtensionRole | undefined;
+  if (r.value.role !== undefined) {
+    if (extended === undefined) return err("kanon.role: a role is an extension's, and the table has no extends");
+    const f = r.value.role;
+    if (f.kind === "dialect") {
+      const name = parseInstanceName(f.name ?? "");
+      const unit = parseFolder(f.instanceOf ?? "");
+      if (name.kind === "err") return err(`kanon.role.name: ${name.error}`);
+      if (unit.kind === "err") return err(`kanon.role.instanceOf: ${unit.error}`);
+      role = { kind: "dialect", name: name.value, instanceOf: unit.value };
+    } else {
+      const noun = parsePluginNoun(f.noun ?? "");
+      if (noun.kind === "err") return err(`kanon.role.noun: ${noun.error}`);
+      role = { kind: "plugin", noun: noun.value };
+    }
+  }
+  return ok({ package: pkg.value, units: out, ...members.value, ...(extended === undefined ? {} : { extends: extended.value }), ...(role === undefined ? {} : { role }) });
 }
 
 type Form = Decoded<typeof body>;
@@ -197,7 +221,7 @@ function decodeMembers(
   const contract = form.family.contract;
   if (contract !== undefined && !/^\.\/[A-Za-z0-9_./-]+$/.test(contract))
     return err(`kanon.family.contract: ${JSON.stringify(contract)} is not an export subpath, as ./plugin`);
-  const family: FamilyRule = { dialect: dialect.value, plugin: plugin.value, ...(contract === undefined ? {} : { contract }) };
+  const family: FamilyRule = { dialect: dialect.value, plugin: plugin.value, ...(contract === undefined ? {} : { contract }), ...(form.family.scope === undefined ? {} : { scope: form.family.scope }) };
   const instances: Instance[] = [];
   const seen = new Set<string>();
   for (const [i, f] of (form.instances ?? []).entries()) {

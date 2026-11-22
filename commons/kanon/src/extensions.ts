@@ -1,4 +1,4 @@
-// Spec: 0001-kanon-checker FR-012
+// Spec: 0001-kanon-checker FR-012; 0002-kanon-content-checks FR-006
 /**
  * The check of a package that extends a host (commons 0033-kanon FR-019, FR-020, FR-021): a dialect or a plugin, a package of its own, reaches the host only through the host's public `exports`, and
  * reaches no other member of the host's family but a declared dependency. Given the host's table and `exports`, the extension's table, files and `exports`, it returns findings in the form of the import
@@ -18,7 +18,7 @@
  * @module
  */
 import { absurd } from "@intellectual-frontiers/core";
-import { classify, type Member, rootPackage } from "./family.ts";
+import { classify, type Member, rootPackage, splitPackage } from "./family.ts";
 import {
   climbs,
   entryOf,
@@ -51,6 +51,27 @@ export function roleOf(host: Table, packageName: string): Role | undefined {
   return plugin === undefined ? undefined : { kind: "plugin", dependsOn: plugin.dependsOn };
 }
 
+/**
+ * The role of an extension of another scope, from its own table (0033-kanon FR-027): the role it declares, where it is the one its package name reads as by the host's rule and, for a dialect, where the unit it is
+ * an instance of is a layered unit of the host. `undefined` where it declares none or one that its name does not bear out.
+ */
+export function roleOfForeign(host: Table, ext: Table): Role | undefined {
+  const declared = ext.role;
+  if (declared === undefined || host.family === undefined) return undefined;
+  const member = classify(host.family, host.package, ext.package);
+  switch (declared.kind) {
+    case "dialect": {
+      if (member?.kind !== "dialect" || member.name !== declared.name) return undefined;
+      const unit = host.units.find((u) => u.folder === declared.instanceOf);
+      return unit === undefined || unit.kind !== "layered" ? undefined : { kind: "dialect", from: { name: unit.folder, unit } };
+    }
+    case "plugin":
+      return member?.kind === "plugin" && member.noun === declared.noun ? { kind: "plugin", dependsOn: [] } : undefined;
+    default:
+      return absurd(declared);
+  }
+}
+
 /** Whether a member of the family is one a dialect or a plugin may not import: a sibling dialect for a dialect, any other member for a plugin that does not depend on it. */
 function memberFinding(role: Role, member: Exclude<Member, { readonly kind: "host" }>, root: string): "instances/sibling" | "plugins/undeclared" | undefined {
   switch (role.kind) {
@@ -81,9 +102,14 @@ export function extensionFindings(
 ): readonly Finding[] {
   const out: Finding[] = [...importFindings(ext, files, exportsMap)];
   const name = (message: string): Finding => finding("family/name", "library.ts", 1, message, ext.package);
-  const role = host.family === undefined ? undefined : roleOf(host, ext.package);
+  const other = host.family !== undefined && splitPackage(ext.package).scope !== splitPackage(host.package).scope;
+  const role = host.family === undefined ? undefined : other ? roleOfForeign(host, ext) : roleOf(host, ext.package);
   if (ext.extends !== host.package) {
     out.push(name(`${ext.package} extends ${ext.extends ?? "nothing"}, and it is checked against ${host.package}`));
+    return out;
+  }
+  if (other && host.family?.scope !== "any") {
+    out.push(name(`${ext.package} is of another scope than ${host.package}, and the family of ${host.package} takes only its own (scope: own)`));
     return out;
   }
   if (host.family === undefined || role === undefined || classify(host.family, host.package, ext.package) === undefined) {

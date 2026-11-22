@@ -7,7 +7,8 @@
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { fs } from "@intellectual-frontiers/system";
 import { run } from "../src/check.ts";
-import { BASELINE, findings, readExports, readSources, readTable } from "../src/host.ts";
+import { BASELINE, findings, readBundle, readExports, readSources, readTable } from "../src/host.ts";
+import { makeBundle, verifyBundle } from "../src/mod.ts";
 
 const PKG = "@intellectual-frontiers/demo";
 
@@ -138,4 +139,21 @@ proves(["0001-kanon-checker FR-007", "0001-kanon-checker FR-009"], "the host rea
   const t = readTable("/lib", files);
   assert(t.kind === "ok");
   assertEquals(readTable("/other", files).kind, "err");
+});
+
+proves(["0002-kanon-content-checks FR-011"], "a folder is read as a bundle, nothing is written, and an extra file in it is found", async () => {
+  const dir = fs.makeTempDirSync({ prefix: "kanon-bundle-" });
+  const bundle = await makeBundle({ name: "e", library: "e", title: "E", summary: "E.", layers: [], elements: [], trace: [], findings: [], dispositions: [], instances: [] });
+  for (const [name, text] of bundle.files) fs.writeTextFileSync(`${dir}/${name}`, text);
+  fs.writeTextFileSync(`${dir}/manifest.json`, bundle.manifest);
+  const before = [...fs.readDirSync(dir)].map((e) => e.name).sort();
+  const read = unwrap(readBundle(dir));
+  assertEquals([...read.files.keys()], ["dispositions.json", "elements.json", "model.json", "relations.json", "trace.json"]);
+  assertEquals([...fs.readDirSync(dir)].map((e) => e.name).sort(), before, "reading writes nothing");
+  assertEquals((await verifyBundle(read)).kind, "ok");
+  fs.mkdirSync(`${dir}/sub`, { recursive: true });
+  fs.writeTextFileSync(`${dir}/sub/extra.txt`, "x");
+  const again = await verifyBundle(unwrap(readBundle(dir)));
+  assert(again.kind === "err" && again.error[0]?.kind === "extra" && again.error[0].path === "sub/extra.txt");
+  assertEquals(readBundle(`${dir}/absent`).kind, "err");
 });

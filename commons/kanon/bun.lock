@@ -6,6 +6,7 @@
       "name": "@intellectual-frontiers/kanon",
       "devDependencies": {
         "@intellectual-frontiers/core": "link:../core",
+        "@intellectual-frontiers/crypto": "link:../crypto",
         "@intellectual-frontiers/formats": "link:../formats",
         "@intellectual-frontiers/libraries": "link:../libraries",
         "@intellectual-frontiers/mizan": "link:../mizan",
@@ -19,6 +20,8 @@
   },
   "packages": {
     "@intellectual-frontiers/core": ["@intellectual-frontiers/core@link:../core", {}],
+
+    "@intellectual-frontiers/crypto": ["@intellectual-frontiers/crypto@link:../crypto", {}],
 
     "@intellectual-frontiers/formats": ["@intellectual-frontiers/formats@link:../formats", {}],
 

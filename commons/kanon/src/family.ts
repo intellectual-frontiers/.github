@@ -1,4 +1,4 @@
-// Spec: 0001-kanon-checker FR-010, FR-011
+// Spec: 0001-kanon-checker FR-010, FR-011; 0002-kanon-content-checks FR-004, FR-005
 /**
  * The family of a Kanon library (commons 0033-kanon FR-021): the naming rule of the packages that extend a host, as data of the host's table, and the names that rule makes and reads. A host
  * `@scope/archon` has dialects `@scope/archon-dialect-<tool>` and plugins `@scope/archon-<noun>`; the rule is two templates, never a pattern in a program.
@@ -58,6 +58,8 @@ export type FamilyRule = {
   readonly plugin: NameTemplate;
   /** The subpath of the host's `exports` that is the plugin contract (`./plugin`): each plugin imports it, and the host exports it. */
   readonly contract?: string;
+  /** Whose scope a member may be of: `own` (the host's, where absent) or `any` (0033-kanon FR-027). */
+  readonly scope?: "own" | "any";
 };
 
 /** What a package of a family is: a closed union. */
@@ -105,8 +107,8 @@ export function memberPackage(
 export function classify(rule: FamilyRule, host: PackageName, candidate: string): Member | undefined {
   const h = splitPackage(host);
   const c = splitPackage(candidate);
-  if (c.scope !== h.scope) return undefined;
-  if (c.base === h.base) return { kind: "host" };
+  if (c.scope !== h.scope && rule.scope !== "any") return undefined;
+  if (c.base === h.base && c.scope === h.scope) return { kind: "host" };
   const dialect = pattern(rule.dialect, h.base).exec(c.base)?.[1];
   if (dialect !== undefined) {
     const n = parseInstanceName(dialect);

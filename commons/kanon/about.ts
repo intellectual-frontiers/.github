@@ -18,8 +18,8 @@ export const about: About = {
     { path: "spec-kit/", what: "The library's own specifications, numbered from 0001.", mayImport: ["nothing: Markdown and TSV"] },
     {
       path: "src/",
-      what: "The table (`table.ts`), the import check (`imports.ts`), the check of dropped annotations (`dropped.ts`, `account.ts`), the matrix (`matrix.ts`), the family and its names (`family.ts`), the check of an extension (`extensions.ts`), the types of the model (`model.ts`), the host side that reads a library's folder (`host.ts`) and the command (`check.ts`).",
-      mayImport: ["core, the formats and the system, by package name"],
+      what: "The table (`table.ts`), the import check (`imports.ts`), the check of dropped annotations (`dropped.ts`, `account.ts`), the matrix (`matrix.ts`), the family and its names (`family.ts`), the check of an extension (`extensions.ts`), the types of the model (`model.ts`), the host side that reads a library's folder (`host.ts`) and the command (`check.ts`)., the checks of a model's vocabulary and relations (`vocabulary.ts`), the bundle of a model and its verification (`bundle.ts`)",
+      mayImport: ["core, crypto, the formats and the system, by package name"],
     },
     {
       path: "suite/",

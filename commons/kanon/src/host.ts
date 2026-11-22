@@ -15,14 +15,17 @@
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { exportedLiteral } from "@intellectual-frontiers/formats/ts-literal";
-import { existsSync, readDirSync, readTextFileSync } from "@intellectual-frontiers/system/fs";
+import { existsSync, readDirSync, readFileSync, readTextFileSync } from "@intellectual-frontiers/system/fs";
 import { splitPackage } from "./family.ts";
+import { MANIFEST as BUNDLE_MANIFEST } from "./bundle.ts";
 import { extensionFindings } from "./extensions.ts";
 import { type ExportsMap, type Finding, importFindings, type SourceFile } from "./imports.ts";
 import { decodeTable, type Table } from "./table.ts";
 
 /** The name of a library's manifest in its folder. */
 export const MANIFEST = "library.ts";
+/** The name of the manifest of a consumer, a package that is not a library of commons (0033-kanon FR-027): the export `kanon`, a table in the form of the field `kanon` of `library.ts`. */
+export const CONSUMER_MANIFEST = "kanon.ts";
 /** The name of the baseline of findings a library holds, in its folder. */
 export const BASELINE = "kanon.baseline.txt";
 
@@ -31,6 +34,8 @@ export type Files = {
   readonly exists: (path: string) => boolean;
   readonly readDir: (path: string) => readonly { readonly name: string; readonly isDirectory: boolean }[];
   readonly readText: (path: string) => string;
+  /** The bytes of a file, for a bundle (0002-kanon-content-checks FR-011). */
+  readonly readBytes?: (path: string) => Uint8Array;
 };
 
 /** The real file system. */
@@ -38,6 +43,7 @@ export const systemFiles: Files = {
   exists: (path) => existsSync(path),
   readDir: (path) => readDirSync(path).map((e) => ({ name: e.name, isDirectory: e.isDirectory })),
   readText: (path) => readTextFileSync(path),
+  readBytes: (path) => readFileSync(path),
 };
 
 /** An `exports` map: each subpath to its target, a string or an object of conditions of strings. */
@@ -57,8 +63,23 @@ function attempt<T>(what: string, read: () => T): Result<T, string> {
 
 /** The table of the library at `root`, from the field `kanon` of its manifest; an error as a sentence where there is none or it is not a table. */
 export function readTable(root: string, files: Files = systemFiles): Result<Table, string> {
+  const r = readTableOf(root, files);
+  return r.kind === "ok" ? ok(r.value.table) : r;
+}
+
+/** The table of a package and the manifest it was read from: `library.ts` (its field `kanon`) or, where there is none, the consumer's `kanon.ts` (0002-kanon-content-checks FR-007). */
+export function readTableOf(root: string, files: Files = systemFiles): Result<{ readonly table: Table; readonly manifest: typeof MANIFEST | typeof CONSUMER_MANIFEST }, string> {
   const file = `${root}/${MANIFEST}`;
-  if (!files.exists(file)) return err(`${file} is not there`);
+  if (!files.exists(file)) {
+    const consumer = `${root}/${CONSUMER_MANIFEST}`;
+    if (!files.exists(consumer)) return err(`neither ${file} nor ${consumer} is there`);
+    const own = attempt(consumer, () => files.readText(consumer));
+    if (own.kind === "err") return own;
+    const table = exportedLiteral(own.value, "kanon");
+    if (table.kind === "err") return err(`${CONSUMER_MANIFEST} is not a literal: ${table.error.expected}`);
+    const decoded = decodeTable(table.value);
+    return decoded.kind === "ok" ? ok({ table: decoded.value, manifest: CONSUMER_MANIFEST }) : decoded;
+  }
   const text = attempt(file, () => files.readText(file));
   if (text.kind === "err") return text;
   const lit = exportedLiteral(text.value, "library");
@@ -69,7 +90,35 @@ export function readTable(root: string, files: Files = systemFiles): Result<Tabl
       ? Object.entries(input).find(([k]) => k === "kanon")?.[1]
       : undefined;
   if (field === undefined) return err("the manifest declares no kanon table");
-  return decodeTable(field);
+  const decoded = decodeTable(field);
+  return decoded.kind === "ok" ? ok({ table: decoded.value, manifest: MANIFEST }) : decoded;
+}
+
+/** The files of a bundle in a folder, and the text of its manifest, read and nothing written: every file under the folder but the manifest, by its path from the folder with `/` (0002-kanon-content-checks FR-011). */
+export function readBundle(dir: string, files: Files = systemFiles): Result<{ readonly manifest: string; readonly files: ReadonlyMap<string, Uint8Array> }, string> {
+  if (files.readBytes === undefined) return err("this host reads no bytes");
+  const read = files.readBytes;
+  const found = new Map<string, Uint8Array>();
+  const walk = (rel: string): Result<true, string> => {
+    const entries = attempt(dir, () => files.readDir(rel === "" ? dir : `${dir}/${rel}`));
+    if (entries.kind === "err") return entries;
+    for (const e of [...entries.value].sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))) {
+      const path = rel === "" ? e.name : `${rel}/${e.name}`;
+      if (e.isDirectory) {
+        const inner = walk(path);
+        if (inner.kind === "err") return inner;
+      } else if (path !== BUNDLE_MANIFEST) {
+        const b = attempt(path, () => read(`${dir}/${path}`));
+        if (b.kind === "err") return b;
+        found.set(path, b.value);
+      }
+    }
+    return ok(true);
+  };
+  const walked = walk("");
+  if (walked.kind === "err") return walked;
+  const manifest = attempt(BUNDLE_MANIFEST, () => files.readText(`${dir}/${BUNDLE_MANIFEST}`));
+  return manifest.kind === "err" ? manifest : ok({ manifest: manifest.value, files: found });
 }
 
 /** The `.ts` files under `dir`, as paths from `root` with `/`, in the order of their names. */

@@ -15,3 +15,14 @@ requirement	mechanism	by	note
 0001-kanon-checker FR-012	check	.github: cd commons/kanon && bun run verify	extensions.test.ts: the fixture host with two dialects and two plugins passes, and each new code is found from a table, files and exports
 0001-kanon-checker FR-013	check	.github: cd commons/kanon && bun run verify	matrix.test.ts: the check of dropped annotations is made for each instance, with the instance in the key
 0001-kanon-checker FR-014	check	.github: cd commons/kanon && bun run verify	matrix.test.ts: the matrix of the fixture, its Markdown and JSON, and for any dispositions the dropped cells are the findings (property test)
+0002-kanon-content-checks FR-001	check	.github: cd commons/kanon && bun run verify	content.test.ts: a vocabulary and relations are optional on the model, and a model without them is as it was
+0002-kanon-content-checks FR-002	check	.github: cd commons/kanon && bun run verify	content.test.ts: duplicate ids, dangling relations, relations between layers, and the kinds and annotations a vocabulary does not list
+0002-kanon-content-checks FR-003	check	.github: cd commons/kanon && bun run verify	content.test.ts: each finding has its code in the closed union with a summary and a group (the compiler holds the switches)
+0002-kanon-content-checks FR-004	check	.github: cd commons/kanon && bun run verify	content.test.ts: a role with no extends and a host with a role are refused; the scope is read from the family
+0002-kanon-content-checks FR-005	check	.github: cd commons/kanon && bun run verify	content.test.ts: classify reads a package of another scope where the family takes any, and not where it takes its own
+0002-kanon-content-checks FR-006	check	.github: cd commons/kanon && bun run verify	content.test.ts: an extension of another scope is judged as any member, and refused for scope, role, name or unit
+0002-kanon-content-checks FR-007	check	.github: cd commons/kanon && bun run verify	content.test.ts: the table of a package with no library.ts is read from kanon.ts, and library.ts wins where both are there
+0002-kanon-content-checks FR-008	check	.github: cd commons/kanon && bun run verify	content.test.ts: a model is made into a bundle the same bytes twice, with the manifest of every file and not of itself
+0002-kanon-content-checks FR-009	check	.github: cd commons/kanon && bun run verify	content.test.ts: a bundle with a file changed, missing and extra is refused whole with each fault named, and a bad manifest is refused
+0002-kanon-content-checks FR-010	check	.github: cd commons/kanon && bun run verify	content.test.ts: a verified bundle loads equal to its model, and a verified file that is not of the form is the fault form
+0002-kanon-content-checks FR-011	check	.github: cd commons/kanon && bun run verify	tools/check.ts and the layers of the manifest: the bundle code imports core and crypto only; host.test.ts reads a folder as a bundle

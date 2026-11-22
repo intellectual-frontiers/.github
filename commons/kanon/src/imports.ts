@@ -48,7 +48,12 @@ export type Rule =
   | "plugins/undeclared"
   | "plugins/contract"
   | "family/name"
-  | "kanon/dropped";
+  | "kanon/dropped"
+  | "kanon/kind"
+  | "kanon/annotation"
+  | "kanon/dangling"
+  | "kanon/relation-layer"
+  | "kanon/duplicate-id";
 
 /** The codes in one list, for a program that walks them. */
 export const RULES = [
@@ -66,6 +71,11 @@ export const RULES = [
   "plugins/contract",
   "family/name",
   "kanon/dropped",
+  "kanon/kind",
+  "kanon/annotation",
+  "kanon/dangling",
+  "kanon/relation-layer",
+  "kanon/duplicate-id",
 ] as const satisfies readonly Rule[];
 
 /** What each code means, in a sentence: a registry with an entry for every code of the closed union, which the compiler holds complete. */
@@ -84,6 +94,11 @@ export const RULE_SUMMARY: Readonly<Record<Rule, string>> = {
   "plugins/contract": "a plugin contract that the host does not export, or a plugin that does not import it",
   "family/name": "a package that extends a host and is not named and declared by the host's family rule",
   "kanon/dropped": "an annotation of Governance that ends neither expressed, nor carried, nor named unexpressed",
+  "kanon/kind": "an element or a relation of a kind that the model's vocabulary does not list",
+  "kanon/annotation": "an annotation of Governance whose name the model's vocabulary does not list",
+  "kanon/dangling": "a relation with an end that is no element of the model",
+  "kanon/relation-layer": "a relation between elements of two layers, which is a trace edge's work and not a relation's",
+  "kanon/duplicate-id": "two elements of a model with one id",
 };
 
 /** The family of a code: the import check's or the model's; an exhaustive match, so that a code added to the union fails to compile here until it is placed. */
@@ -107,6 +122,11 @@ export function familyOf(rule: Rule): "layers" | "instances" | "plugins" | "fami
     case "family/name":
       return "family";
     case "kanon/dropped":
+    case "kanon/kind":
+    case "kanon/annotation":
+    case "kanon/dangling":
+    case "kanon/relation-layer":
+    case "kanon/duplicate-id":
       return "kanon";
     default:
       return absurd(rule);
