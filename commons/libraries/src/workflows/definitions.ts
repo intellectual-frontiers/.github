@@ -780,15 +780,15 @@ function gatherScript(w: Workflow): string {
   const expects: string[] = [];
   const counts: string[] = [];
   if (w.file === "ci") {
-    counts.push('n_linux=$(jq \'[.[].name] | unique | length\' <<<"${PLAN_LINUX:-[]}")', 'n_systems=$(jq \'[.[].name] | unique | length\' <<<"${PLAN_SYSTEMS:-[]}")');
+    counts.push('n_linux=$(jq \'[(.include // [])[].name] | unique | length\' <<<"${PLAN_LINUX:-$empty}")', 'n_systems=$(jq \'[(.include // [])[].name] | unique | length\' <<<"${PLAN_SYSTEMS:-$empty}")');
     expects.push('--expect "verify:$n_linux"', '--expect "systems:$n_systems"');
   }
   if (w.file === "evidence") {
-    counts.push('n_tests=$(jq \'[.[].name] | unique | length\' <<<"${PLAN_LINUX:-[]}")');
+    counts.push('n_tests=$(jq \'[(.include // [])[].name] | unique | length\' <<<"${PLAN_LINUX:-$empty}")');
     expects.push('--expect "tests:$n_tests"', "--expect repository:1");
   }
   const review = w.file === "ci" ? " --policy-review" : "";
-  return lines("set -u", ...planGuard, ...counts, ...history, `bun commons/libraries/src/ci/collect.ts --dir _findings --out _findings-out --workflow ${w.file} ${expects.join(" ")}${review} --check-run $H`);
+  return lines("set -u", "empty='{}'", ...planGuard, ...counts, ...history, `bun commons/libraries/src/ci/collect.ts --dir _findings --out _findings-out --workflow ${w.file} ${expects.join(" ")}${review} --check-run $H`);
 }
 
 /** A workflow under the build policy (0038-build-policy): every step has its policy, the steps of findings run through the wrapper, and the job that gathers the findings ends the run. */

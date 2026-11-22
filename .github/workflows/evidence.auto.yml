@@ -364,8 +364,9 @@ jobs:
         shell: bash
         run: |
           set -u
+          empty='{}'
           if [ "$PLAN_RESULT" != "success" ]; then echo "the plan could not be made (the red cause plan-unavailable)"; exit 2; fi
-          n_tests=$(jq '[.[].name] | unique | length' <<<"${PLAN_LINUX:-[]}")
+          n_tests=$(jq '[(.include // [])[].name] | unique | length' <<<"${PLAN_LINUX:-$empty}")
           H=""
           if [ "$GITHUB_REF" = refs/heads/main ]; then
             export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"

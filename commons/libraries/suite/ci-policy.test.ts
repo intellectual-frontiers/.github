@@ -5,6 +5,10 @@
  *
  * @module
  */
+import { chmodSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { classify, inventory, policyFindings } from "../src/ci/inventory.ts";
 import { RED_CAUSES } from "../src/ci/policy.ts";
 import { wrapWorkflow } from "../src/ci/wrap.ts";
@@ -78,4 +82,30 @@ proves([`${SPEC} FR-005`], "the validation finds a step with no policy, a step o
   assert(policyFindings(wrapWorkflow(fast)).some((f) => f.includes("fails fast")));
   const after: Workflow = { ...ok, jobs: { ...ok.jobs, last: job({ runsOn: "ubuntu-latest", timeoutMinutes: 5, needs: ["cell"], steps: [{ ...run("echo done"), policy: { kind: "red-cause", cause: "reports-not-produced" } }] }) } };
   assert(policyFindings(after).some((f) => f.includes("does not run with always()")));
+});
+
+proves([`${SPEC} FR-005`], "the script of the job that gathers the findings of ci counts the cells from the plan's real output shape, passes them to the collector, and ends 2 only where the plan could not be made", () => {
+  const ci = workflows().find((w) => w.file === "ci");
+  const gatherStep = ci?.jobs["ci"]?.steps.find((s) => s.kind === "run" && s.env?.["WORKFLOW"] !== undefined);
+  assert(gatherStep !== undefined && gatherStep.kind === "run");
+  const dir = mkdtempSync(join(tmpdir(), "gather-"));
+  try {
+    // a `bun` that only says what it was asked, so that the script's own arithmetic and quoting are what is tested
+    writeFileSync(join(dir, "bun"), '#!/bin/sh\necho "BUN $@"\n');
+    chmodSync(join(dir, "bun"), 0o755);
+    const plan = JSON.stringify({ include: [{ name: "a" }, { name: "b" }, { name: "a" }] });
+    const run = (env: Record<string, string>) => spawnSync("bash", ["-e", "-o", "pipefail", "-c", gatherStep.run], { encoding: "utf8", env: { ...process.env, PATH: `${dir}:${process.env["PATH"] ?? ""}`, GITHUB_REF: "refs/heads/x", GITHUB_REPOSITORY: "o/r", GH_TOKEN: "t", WORKFLOW: "ci", ...env } });
+    const ok = run({ PLAN_RESULT: "success", PLAN_LINUX: plan, PLAN_SYSTEMS: JSON.stringify({ include: [{ name: "net" }] }) });
+    assertEquals(ok.status, 0, ok.stderr + ok.stdout);
+    assert(ok.stdout.includes("--expect verify:2") && ok.stdout.includes("--expect systems:1") && ok.stdout.includes("--policy-review") && ok.stdout.includes("--check-run"), ok.stdout);
+    const none = run({ PLAN_RESULT: "success", PLAN_LINUX: "", PLAN_SYSTEMS: "" });
+    assertEquals(none.status, 0, "a plan with nothing to run is sound: " + none.stderr);
+    assert(none.stdout.includes("--expect verify:0"), none.stdout);
+    const noPlan = run({ PLAN_RESULT: "failure", PLAN_LINUX: "", PLAN_SYSTEMS: "" });
+    assertEquals(noPlan.status, 2, "a plan that could not be made is the red cause plan-unavailable");
+    const main = run({ PLAN_RESULT: "success", PLAN_LINUX: plan, PLAN_SYSTEMS: "", GITHUB_REF: "refs/heads/main" });
+    assert(main.stdout.includes("--history https://github.com/o/r.git"), "on main the run is added to the history");
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });

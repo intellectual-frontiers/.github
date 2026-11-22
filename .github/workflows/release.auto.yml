@@ -200,6 +200,7 @@ jobs:
         shell: bash
         run: |
           set -u
+          empty='{}'
           if [ "$PLAN_RESULT" != "success" ]; then echo "the plan could not be made (the red cause plan-unavailable)"; exit 2; fi
           H=""
           if [ "$GITHUB_REF" = refs/heads/main ]; then
