@@ -4,3 +4,4 @@ number	slug	state
 0003	anyfs-serve-logical	in force
 0004	anyfs-serve-physical	in force
 0005	anyfs-serve-conformance	in force
+0006	anyfs-serve-nfs	in force

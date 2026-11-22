@@ -13,6 +13,7 @@
 - **FR-002**: The server MUST be told the token it made, and the verb MUST write the address and the token to standard error (never to the report, so that a pipe of the report does not carry it), and a request without the token MUST be refused.
 - **FR-003**: A mount that is read-only, and `--read-only`, MUST serve nothing that changes the store; an address other than the loopback (`--listen ADDRESS`) MUST need `--allow-host` for the names it may be asked for, and `--allow-host` without `--listen` MUST be a usage error.
 - **FR-004**: The verb MUST wait until the context's signal (SIGINT, SIGTERM) or the world's stop ends the run, and then MUST close the server and end with the report that it stopped; `--dry-run` MUST say what it would serve and listen on nothing. The verb MUST come through the command line only, never through the tool server.
+- **FR-005**: `serve --nfs` MUST host the store as NFS version 3 through `serveNfs` of `anyfs-serve` on the loopback, MUST let only the uid of the account that started it and root ask (where the computer has uids), MUST write the mount command and the callers to standard error, MUST end as the WebDAV server does, MUST take `--nfs-attributes refuse|ignore` (anything else a usage error, and without `--nfs` a usage error), and MUST refuse `--listen` (a usage error).
 
 ## Acceptance scenarios
 
@@ -20,7 +21,7 @@
 
 ## Out of scope
 
-- NFS (the next server of `anyfs-serve`), TLS, and a token that is chosen by the person (the server makes it).
+- TLS, and a token that is chosen by the person (the server makes it).
 
 ## Edge cases
 

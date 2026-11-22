@@ -3,6 +3,7 @@
  *
  * @module
  */
+import process from "node:process";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { fs, path } from "@intellectual-frontiers/system";
 import { main } from "../src/anyfs.ts";
@@ -15,7 +16,7 @@ async function start(l: Lab, args: readonly string[]): Promise<Running> {
   const controller = new AbortController();
   let err = "";
   const exited = main(["serve", ...args], { cwd: l.dir, env: {}, stateDir: l.state, out: () => undefined, err: (t) => void (err += t), notice: (t) => void (err += `${t}\n`), stop: controller.signal });
-  for (let i = 0; i < 200 && !/token: \S+/u.test(err); i++) {
+  for (let i = 0; i < 200 && !/stop with/u.test(err); i++) {
     await new Promise((r) => setTimeout(r, 25));
     if (/not\b/u.test(err) && !err.includes("serving")) break;
   }
@@ -108,5 +109,46 @@ proves(["0006-anyfs-cli-serve FR-004"], "--dry-run says what it would serve and 
     assertStringIncludes(dry.out, "would serve");
     const { VERBS } = await import("../src/governance/mod.ts");
     assertEquals([...VERBS["serve"].channels], ["local"]);
+  }),
+);
+
+/** One call of the mount protocol (MNT of `/`) over TCP, written out by hand from RFC 5531 and RFC 1813: the status it answers with. */
+async function mountStatus(port: number, uid: number): Promise<number> {
+  const { connect } = await import("node:net");
+  const u32 = (...n: number[]): number[] => n.flatMap((x) => [(x >>> 24) & 255, (x >>> 16) & 255, (x >>> 8) & 255, x & 255]);
+  const machine = [...new TextEncoder().encode("test")];
+  const cred = [...u32(0), ...u32(machine.length), ...machine, ...u32(uid, uid, 0)];
+  const args = [...u32(1), 47, 0, 0, 0];
+  const call = [...u32(9, 0, 2, 100005, 3, 1, 1, cred.length), ...cred, ...u32(0, 0), ...args];
+  const framed = Uint8Array.from([...u32((0x80000000 | call.length) >>> 0), ...call]);
+  return await new Promise<number>((resolve, reject) => {
+    const socket = connect(port, "127.0.0.1", () => socket.write(framed));
+    socket.on("data", (d: Buffer) => {
+      resolve(d.readUInt32BE(4 + 24));
+      socket.destroy();
+    });
+    socket.on("error", reject);
+  });
+}
+
+proves(["0006-anyfs-cli-serve FR-005"], "serve --nfs hosts the store as NFS on the loopback for the uid of the account and root, says the mount command on standard error, and refuses what does not fit", () =>
+  withLab(async (l) => {
+    const s = await start(l, ["--nfs", "docs:/"]);
+    try {
+      assertStringIncludes(s.stderr(), "NFS version 3");
+      assertStringIncludes(s.stderr(), "mount: mount -t nfs -o vers=3,proto=tcp,port=");
+      const port = Number(/on 127\.0\.0\.1:(\d+)/u.exec(s.stderr())?.[1]);
+      assert(port > 0, s.stderr());
+      const mine = process.getuid?.() ?? 0;
+      assertEquals(await mountStatus(port, mine), 0);
+      assertEquals(await mountStatus(port, 0), 0);
+      if (mine !== 4242) assertEquals(await mountStatus(port, 4242), 13);
+    } finally {
+      assertEquals(await s.stop(), 0, s.stderr());
+    }
+    assertEquals((await l.run(["serve", "--nfs", "--listen", "0.0.0.0", "--allow-host", "x", "docs:/"])).code, 2);
+    assertEquals((await l.run(["serve", "--nfs-attributes", "ignore", "docs:/"])).code, 2);
+    assertEquals((await l.run(["serve", "--nfs", "--nfs-attributes", "maybe", "docs:/"])).code, 2);
+    assertEquals((await l.run(["serve", "--nfs", "--dry-run", "docs:/"])).code, 0);
   }),
 );

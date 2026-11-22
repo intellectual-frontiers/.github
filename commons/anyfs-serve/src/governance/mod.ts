@@ -9,3 +9,4 @@ export * from "./methods.ts";
 export * from "./status.ts";
 export * from "./options.ts";
 export * from "./mime.ts";
+export * from "./nfs.ts";

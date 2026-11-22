@@ -55,3 +55,4 @@ requirement	mechanism	by	note
 0007-anyfs-cli-keys FR-004	check	.github: cd commons/anyfs-cli && bun run verify	suite/keys.test.ts
 0007-anyfs-cli-keys FR-005	check	.github: cd commons/anyfs-cli && bun run verify	suite/keys.test.ts
 0007-anyfs-cli-keys FR-006	check	.github: cd commons/anyfs-cli && bun run verify	suite/keys.test.ts
+0006-anyfs-cli-serve FR-005	check	.github: cd commons/anyfs-cli && bun run verify	suite/serve.test.ts

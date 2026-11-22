@@ -2,7 +2,7 @@
   "name": "@intellectual-frontiers/anyfs-serve",
   "private": true,
   "version": "0.1.0",
-  "description": "AnyFS over HTTP: any AnyFS store served as WebDAV, class 1 and 2, on the POSIX view, so an operating system mounts it with no kernel module, and every response says whether it was native, emulated or refused.",
+  "description": "AnyFS over HTTP and NFS: any AnyFS store served as WebDAV, class 1 and 2, or as NFS version 3 on the loopback, on the POSIX view, so an operating system mounts it, and every response says whether it was native, emulated or refused.",
   "type": "module",
   "engines": {
     "node": ">=26"

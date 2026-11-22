@@ -70,7 +70,7 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/anyfs-posix`](commons/anyfs-posix) | Foundation | The POSIX view of any AnyFS store | layers, extension | L1 | not released (unfinished) |
 | [`@intellectual-frontiers/anyfs-query`](commons/anyfs-query) | Foundation | Read-only SQL over the files, places, revisions and content of any AnyFS store | layers, extension | L1 | not released (unfinished) |
 | [`@intellectual-frontiers/anyfs-s3`](commons/anyfs-s3) | Foundation | The S3 backend of AnyFS: a store over a bucket and a prefix of any S3-compatible service | layers, extension | L1 | not released (unfinished) |
-| [`@intellectual-frontiers/anyfs-serve`](commons/anyfs-serve) | Foundation | AnyFS over HTTP: any AnyFS store served as WebDAV | layers, extension | L1 | not released (unfinished) |
+| [`@intellectual-frontiers/anyfs-serve`](commons/anyfs-serve) | Foundation | AnyFS over HTTP and NFS: any AnyFS store served as WebDAV | layers, extension | L1 | not released (unfinished) |
 | [`@intellectual-frontiers/anyfs-sql`](commons/anyfs-sql) | Foundation | A SQLite database kept as an AnyFS store that merges by nature | layers, extension | L1 | not released (unfinished) |
 | [`@intellectual-frontiers/anyfs-ssh`](commons/anyfs-ssh) | Foundation | The SSH backend of AnyFS: a store over a folder on a host reached by SSH | layers, extension | L1 | not released (unfinished) |
 | [`@intellectual-frontiers/core`](https://www.npmjs.com/package/@intellectual-frontiers/core) | Foundation | Errors as values (`Result`) | - | L1 | GitHub, npm |

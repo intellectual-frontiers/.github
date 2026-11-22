@@ -17,7 +17,8 @@ import { outcomeOf, type Command, type Context, type Outcome } from "@intellectu
 import { flag, value } from "@intellectual-frontiers/terminal/args";
 import { readOnly, sub, type Store } from "@intellectual-frontiers/anyfs/logical";
 import { expose, LOOPBACK, type Exposure } from "@intellectual-frontiers/anyfs-serve/governance";
-import { serveStore } from "@intellectual-frontiers/anyfs-serve/physical";
+import { serveNfs, serveStore } from "@intellectual-frontiers/anyfs-serve/physical";
+import { uid } from "@intellectual-frontiers/system/proc";
 import type { Viewable } from "@intellectual-frontiers/anyfs-posix/physical";
 import { environment, type Host, usage, viewable } from "@intellectual-frontiers/anyfs-cli/logical";
 import { prefixOfBound } from "../bind.ts";
@@ -47,6 +48,8 @@ const serve = (host: Host): Command =>
       listen: value({ valueName: "ADDRESS", help: "An address to listen on instead of the loopback; needs --allow-host." }),
       allowHost: value({ valueName: "HOST[,HOST]", help: "The host names that may be asked for when the address is not the loopback (the Host header), so that a page of another site cannot reach the server." }),
       readOnly: flag({ help: "Serve nothing that changes the store, whatever the store can do." }),
+      nfs: flag({ help: "Serve as NFS version 3 on the loopback instead of WebDAV: no token (the callers are the uid of this account and root), and the mount command is printed." }),
+      nfsAttributes: value({ valueName: "refuse|ignore", help: "With --nfs: what to do with a mode, an owner or a time the store cannot keep: refuse it (default), or accept it without effect." }),
     },
     operands: [{ name: "LOCATION", help: "The place to serve: a mount, a folder, an address; a directory below the root of a store is served as the root.", arity: "one" }],
     examples: [
@@ -65,6 +68,10 @@ const serve = (host: Host): Command =>
         if (made.kind === "err") return usage(`--listen: ${made.error}; name them with --allow-host`);
         exposure = made.value;
       } else if (args.options.allowHost !== undefined) return usage("--allow-host needs --listen with an address");
+      const attributes = args.options.nfsAttributes;
+      if (attributes !== undefined && attributes !== "refuse" && attributes !== "ignore") return usage(`--nfs-attributes is ${attributes}: refuse or ignore`);
+      if (!args.options.nfs && attributes !== undefined) return usage("--nfs-attributes needs --nfs");
+      if (args.options.nfs && args.options.listen !== undefined) return usage("--nfs serves the loopback only: it cannot be given --listen");
       const bound = await bindAll(h, [word]);
       if (bound.kind === "err") return bound.error;
       const b = bound.value[0];
@@ -79,12 +86,28 @@ const serve = (host: Host): Command =>
       }
       const asked = args.options.readOnly || b.readOnly;
       if (asked) store = readOnly(store);
+      const mine = uid();
+      const protocol = args.options.nfs ? "NFS version 3" : "WebDAV";
       const where = `${b.text} (${asked ? "read-only" : "read-write"}) on ${exposure.kind === "loopback" ? "the loopback" : exposure.hostname}`;
-      if (ctx.mode !== "apply") return outcomeOf({ location: b.text, readOnly: asked, port, served: false }, { text: `would serve ${where} as WebDAV` });
+      if (args.options.nfs) {
+        if (ctx.mode !== "apply") return outcomeOf({ location: b.text, readOnly: asked, port, served: false, protocol: "nfs" }, { text: `would serve ${where} as ${protocol}` });
+        const nfs = await serveNfs(store, { port, readOnly: asked, ...(attributes === undefined ? {} : { attributes }), ...(mine === undefined ? {} : { uids: [mine, 0] }) });
+        if (nfs.kind === "err") return environment("E-OPEN", nfs.error);
+        const n = nfs.value;
+        h.world.notice(`serving ${where} as ${protocol} on ${n.hostname}:${n.port}`);
+        h.world.notice(`mount: ${n.mountCommand("DIRECTORY")}`);
+        h.world.notice(`callers: ${mine === undefined ? "any" : `uid ${mine} and root`}; nothing is kept that a store has no place for (modes, owners, times, links)`);
+        h.world.notice("stop with Ctrl-C");
+        await untilStopped(ctx, h);
+        const failed = await n.close();
+        if (failed.length > 0) return environment("E-FILESYSTEM", `not put: ${failed.join(", ")}`);
+        return outcomeOf({ location: b.text, readOnly: asked, port: n.port, served: true, protocol: "nfs" }, { text: `stopped serving ${b.text}` });
+      }
+      if (ctx.mode !== "apply") return outcomeOf({ location: b.text, readOnly: asked, port, served: false }, { text: `would serve ${where} as ${protocol}` });
       const running = await serveStore(store, { port, exposure });
       if (running.kind === "err") return environment("E-OPEN", running.error);
       const s = running.value;
-      h.world.notice(`serving ${where} as WebDAV at ${s.url}`);
+      h.world.notice(`serving ${where} as ${protocol} at ${s.url}`);
       if (s.token !== undefined) h.world.notice(`token: ${s.token}  (basic: any user name with it as the password, or Authorization: Bearer)`);
       h.world.notice("stop with Ctrl-C");
       await untilStopped(ctx, h);
