@@ -7,7 +7,7 @@
  */
 import { fs, path, proc } from "@intellectual-frontiers/system";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
-import { DOCS, packedDocs } from "./packed.ts";
+import { consumableDocs, DOCS } from "./packed.ts";
 
 const FIXTURE = path.join(DOCS, "suite/fixture-repo");
 const ADDRESS = "https://git.example.internal/team/private-repo";
@@ -27,8 +27,8 @@ async function filesOf(dir: string): Promise<string[]> {
 }
 
 proves(["0001-docs FR-005", "0001-docs FR-006"], "the packed package installed into an empty project builds and checks a small repository at a private address, with relative links, no other host and the links to files made from the configuration", async () => {
-  const packed = await packedDocs();
-  assert(packed.tarball !== undefined, "a tarball");
+  const packed = await consumableDocs();
+  assert(packed.tarball.endsWith(".tgz"), "a tarball");
   const project = await fs.makeTempDir({ prefix: "docs-consumer-" });
   // the small repository: the fixture's sources and specifications, and a configuration that imports the package by its name
   for (const f of await filesOf(FIXTURE)) {
@@ -38,12 +38,13 @@ proves(["0001-docs FR-005", "0001-docs FR-006"], "the packed package installed i
   }
   const config = (await fs.readTextFile(path.join(FIXTURE, "docs.config.ts")))
     .replace('repository: "https://github.com/example/fixture",', `repository: "${ADDRESS}",\n  branch: "trunk",`)
-    .replace(/\n {4}linked: \[[^\]]*\],/, "");
+    .replace(/\n {4}linked: \[[^\]]*\],/, "")
+    .replace('from "@intellectual-frontiers/docs"', `from "${packed.importName}"`);
   await fs.writeTextFile(path.join(project, "docs.config.ts"), config);
-  await fs.writeTextFile(path.join(project, "package.json"), `${JSON.stringify({ name: "consumer", private: true, type: "module", dependencies: { "@intellectual-frontiers/docs": `file:${packed.tarball}` } }, null, 2)}\n`);
+  await fs.writeTextFile(path.join(project, "package.json"), `${JSON.stringify({ name: "consumer", private: true, type: "module", dependencies: { [packed.packageName]: `file:${packed.tarball}` } }, null, 2)}\n`);
   const installed = await proc.run(["bun", "install"], { cwd: project });
   assertEquals(installed.code, 0, installed.stderr);
-  const command = path.join(project, "node_modules/@intellectual-frontiers/docs/ifc-docs.mjs");
+  const command = path.join(project, "node_modules", packed.packageName, packed.command);
   const built = await proc.run(["bun", command, "build", "--out", "site"], { cwd: project });
   assertEquals(built.code, 0, `${built.stdout}${built.stderr}`);
   const checked = await proc.run(["bun", command, "check"], { cwd: project });
