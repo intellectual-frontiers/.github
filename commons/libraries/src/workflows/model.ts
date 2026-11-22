@@ -91,8 +91,10 @@ export type Permissions = Readonly<
 /** The branches, paths and tags a push or a pull request is run for; none is every one. */
 export type Filter = { readonly branches?: readonly string[]; readonly paths?: readonly string[]; readonly tags?: readonly string[] };
 
-/** A question a run by hand asks: a yes or no with its default. */
-export type DispatchInput = { readonly description: string; readonly type: "boolean"; readonly default: boolean };
+/** A question a run by hand asks: a yes or no, or a line of text, with its default. */
+export type DispatchInput =
+  | { readonly description: string; readonly type: "boolean"; readonly default: boolean }
+  | { readonly description: string; readonly type: "string"; readonly default: string };
 
 /** What starts a generated workflow: pushes, pull requests, dispatch and schedule. */
 export type Triggers = {

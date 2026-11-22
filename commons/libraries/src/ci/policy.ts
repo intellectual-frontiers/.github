@@ -36,7 +36,7 @@ export const TOOLS = ["tsc", "bun-test", "lint", "format", "repoctl-check", "miz
 export type Tool = (typeof TOOLS)[number];
 
 /** The gates there are: the decisions that depend on findings, each written as data of this file. */
-export const GATES = ["release", "branch-protection", "pages"] as const;
+export const GATES = ["release", "branch-protection", "maintenance", "pages"] as const;
 /** A gate. */
 export type Gate = (typeof GATES)[number];
 
