@@ -9,7 +9,7 @@
 
 ## Requirements
 
-- **FR-001**: `keygen --replica ID --key FILE` MUST write the key of the replica to FILE readable by its owner only, MUST print the entry for the roster and never the private key, MUST NOT write over a file that is there, and MUST accept `--not-before` and `--not-after` (milliseconds) as the window of the key. It replaces the script `tools/keygen.ts` of 0005 FR-005 (the script stays and does the same).
+- **FR-001**: `keygen --replica ID --key FILE` MUST write the key of the replica to FILE readable by its owner only, MUST print the entry for the roster and never the private key, MUST NOT write over a file that is there, and MUST accept `--not-before` and `--not-after` (milliseconds) as the window of the key. It replaces the script `tools/keygen.ts` of 0005-anyfs-cli-merge-signing FR-005 (the script stays and does the same).
 - **FR-002**: The verbs that make or change keys and rosters (`keygen`, `roster add`, `roster publish`, `roster fetch`, `roster rotate`) MUST come through the command line only, never through the tool server; `roster show` only reads.
 - **FR-003**: `roster show ROSTER` MUST say each key with its replica, its id and whether it is `active`, `expired` or `future` at `--at` (now by default); `roster add ROSTER SOURCE...` MUST add the public keys of rosters, entries and signing keys (never reading out the private part), MUST be idempotent, and MUST refuse a key id that is there with another public key.
 - **FR-004**: `roster publish ROSTER LOCATION` MUST write the roster, public keys only, to a file of a store.

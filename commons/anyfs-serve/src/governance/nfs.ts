@@ -17,9 +17,11 @@ import { ERRNO_NUMBER, type Errno } from "@intellectual-frontiers/anyfs-posix/go
 
 /** The programs of ONC RPC the server answers: NFS and its mount protocol. */
 export const NFS_PROGRAM = 100003;
+/** The program number of the mount protocol of ONC RPC. */
 export const MOUNT_PROGRAM = 100005;
 /** The only versions: NFS 3 and MOUNT 3. */
 export const NFS_VERSION = 3;
+/** The one version of the mount protocol answered: 3. */
 export const MOUNT_VERSION = 3;
 
 /** The procedures of NFS version 3, by number. */
