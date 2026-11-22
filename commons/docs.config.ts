@@ -344,6 +344,8 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/anyfs-posix/spec-kit" },
     { layout: "commons", dir: "commons/anyfs-serve/spec-kit" },
     { layout: "commons", dir: "commons/anyfs-s3/spec-kit" },
+    { layout: "commons", dir: "commons/anyfs-onedrive/spec-kit" },
+    { layout: "commons", dir: "commons/anyfs-gdrive/spec-kit" },
     { layout: "commons", dir: "commons/anyfs-ssh/spec-kit" },
     { layout: "commons", dir: "commons/anyfs-bridge/spec-kit" },
     { layout: "commons", dir: "commons/anyfs-cli/spec-kit" },

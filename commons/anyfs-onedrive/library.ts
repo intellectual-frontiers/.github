@@ -1,0 +1,30 @@
+// Spec: 0001-anyfs-onedrive-layers FR-001
+/**
+ * The manifest of the OneDrive backend of AnyFS, a library of commons (commons 0027-commons-libraries FR-012) and a plugin of the family of AnyFS (commons 0033-kanon FR-019 to FR-024): it extends
+ * `@intellectual-frontiers/anyfs` and reaches it only through its exports.
+ *
+ * @module
+ */
+export const library = {
+  name: "anyfs-onedrive",
+  level: "L1",
+  specKit: "spec-kit",
+  verify: "bun run verify",
+  version: "0.1.0",
+  distribution: ["github"],
+  held: { kind: "unfinished", reason: "built and verified against an in-process fake of Microsoft Graph and the documented response shapes, and not yet run against a live tenant, which needs a test tenant and an account from the owner", missing: ["a run against a live Microsoft Graph tenant"], liftedWhen: "the suite has run against a test tenant and its findings are in the issue" },
+  exports: ["."],
+  family: { host: "anyfs", role: "plugin" },
+  summary:
+    "The OneDrive backend of AnyFS: a store over a drive and a folder of Microsoft Graph, with a revision on every read and a stated expectation on every write, held to the same conformance suite as every backend.",
+  kanon: {
+    package: "@intellectual-frontiers/anyfs-onedrive",
+    extends: "@intellectual-frontiers/anyfs",
+    units: [
+      { folder: "src/", layer: "physical" },
+      { folder: "suite/", own: true },
+      { folder: "tools/", own: true },
+      { folder: "./", own: true },
+    ],
+  },
+};
