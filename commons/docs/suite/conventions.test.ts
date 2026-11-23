@@ -74,7 +74,7 @@ const PACKAGES = new Set(["typescript/async", "beautiful-mermaid", "shiki/core",
 /** The grammars and themes of Shiki the highlighter imports one by one. */
 const SHIKI_FILES = /^shiki\/(langs|themes)\/[a-z-]+\.mjs$/;
 /** The libraries lifted out of IFC TypeScript, which the generator imports by package name (0032-libraries-by-concern FR-003). */
-const LIFTED = /^@intellectual-frontiers\/(core(\/about)?|system|test)$|^@intellectual-frontiers\/(libraries\/(pack|distribution|ci\/(findings|policy|inventory))|mizan\/(trace|host\/trace)|lang-sql\/(aide\/text|dialects\/postgres))$/;
+const LIFTED = /^@intellectual-frontiers\/(core(\/about)?|system|test)$|^@intellectual-frontiers\/(libraries\/(pack|distribution|libraries|ci\/(findings|policy|inventory))|mizan\/(trace|host\/trace)|lang-sql\/(aide\/text|dialects\/postgres))$/;
 
 proves(["0011-documentation FR-002"], "a file imports the generator and typescript/async; a lens also the libraries' entry points", () => {
   const lensMay = new Set(["docs/src/mod.ts"]);
