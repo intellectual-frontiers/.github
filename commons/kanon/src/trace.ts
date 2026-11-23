@@ -13,6 +13,7 @@ export type TraceGraph = {
   readonly downstreamOf: (sources: readonly ElementId[]) => ReadonlySet<ElementId>;
 };
 
+/** The trace graph of a layered model: each element's downstream reach and the edges that are invalid. */
 export function traceGraph(model: LayeredModel, byId: ReadonlyMap<ElementId, ModelElement>): TraceGraph {
   const next = new Map<ElementId, ElementId[]>();
   const invalid: TraceEdge[] = [];
