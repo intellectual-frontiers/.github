@@ -76,6 +76,8 @@ function bounds(spec: string): { readonly from: number; readonly to: number } | 
 export type Library = {
   /** The folder's name, and the package's: `@intellectual-frontiers/<name>`. */
   readonly name: string;
+  /** The folder from `commons/` where the manifest was found (`anyfs/s3`): set by {@link readLibraries}, never written in a manifest; {@link folderOf} says `name` where it is not set (0027-commons-libraries FR-026). */
+  readonly dir?: string;
   /** The conformance level the library is held to (`L1` where the manifest declares none). */
   readonly level: LevelKey;
   /** The path of its spec kit from its folder; none at L0. */
@@ -320,17 +322,59 @@ export function decodeLibrarySource(source: string): Result<Library, string> {
 /** A library found in the folder of commons: its folder and what its manifest says, or why it cannot be read. */
 export type Found = { readonly dir: string; readonly library: Library } | { readonly dir: string; readonly problem: string };
 
-/** The manifests of `commons/*`, in the order of the folders' names: every folder that holds a `library.ts`. */
+/**
+ * The hosts whose extensions the check holds to the folder FR-026 derives: a family is added here with the commit that moves it, and the set is every host of the repository when the last family is moved
+ * (the folders of a host's extensions are then a rule and not a plan).
+ */
+export const LAYOUT_HOSTS: ReadonlySet<string> = new Set<string>([]);
+
+/** The folders of `commons/` that hold no library of their own and are never searched for one. */
+const NOT_LIBRARY_FOLDERS: ReadonlySet<string> = new Set(["node_modules", "dist", "generated", "spec-kit", "src", "suite", "tools"]);
+
+/**
+ * The manifests of commons, in the order of the libraries' names: every folder `commons/<name>/` that holds a `library.ts`, and every folder `commons/<host>/<extension>/` that holds one, an extension
+ * of a host being inside the folder of its host (0027-commons-libraries FR-026). `dir` is the folder from `commons/`, `anyfs/s3` for the extension and `anyfs` for the host.
+ */
 export function readLibraries(repo: string): readonly Found[] {
   const commons = `${repo.replace(/[\\/]$/, "")}/commons`;
   if (!existsSync(commons)) return [];
-  return readDirSync(commons)
-    .filter((e) => e.isDirectory && existsSync(`${commons}/${e.name}/${LIBRARY_FILE}`))
-    .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
-    .map((e): Found => {
-      const r = decodeLibrarySource(readTextFileSync(`${commons}/${e.name}/${LIBRARY_FILE}`));
-      return r.kind === "ok" ? { dir: e.name, library: r.value } : { dir: e.name, problem: r.error };
-    });
+  const dirs: string[] = [];
+  for (const e of readDirSync(commons)) {
+    if (!e.isDirectory || NOT_LIBRARY_FOLDERS.has(e.name)) continue;
+    if (existsSync(`${commons}/${e.name}/${LIBRARY_FILE}`)) dirs.push(e.name);
+    if (!existsSync(`${commons}/${e.name}/${LIBRARY_FILE}`)) continue;
+    for (const c of readDirSync(`${commons}/${e.name}`))
+      if (c.isDirectory && !NOT_LIBRARY_FOLDERS.has(c.name) && existsSync(`${commons}/${e.name}/${c.name}/${LIBRARY_FILE}`)) dirs.push(`${e.name}/${c.name}`);
+  }
+  const found = dirs.map((dir): Found => {
+    const r = decodeLibrarySource(readTextFileSync(`${commons}/${dir}/${LIBRARY_FILE}`));
+    return r.kind === "ok" ? { dir, library: { ...r.value, dir } } : { dir, problem: r.error };
+  });
+  const key = (f: Found): string => ("library" in f ? f.library.name : f.dir);
+  return found.sort((a, b) => (key(a) < key(b) ? -1 : key(a) > key(b) ? 1 : 0));
+}
+
+/**
+ * The folder of a library from `commons/`, as its manifest derives it (0027-commons-libraries FR-026): `<host>/<extension>` where `family.host` names another library and the name starts with
+ * `<host>-`, `<name>` for any other library. Where the family names a host that has no folder of its own, or the name does not start with the host's, the folder is `<name>`.
+ */
+export function derivedDir(library: Library, hosts: ReadonlySet<string>): string {
+  const f = library.family;
+  if (f === undefined || f.role === "host" || f.host === library.name || !hosts.has(f.host) || !library.name.startsWith(`${f.host}-`)) return library.name;
+  return `${f.host}/${library.name.slice(f.host.length + 1)}`;
+}
+
+/** The folder of a library from `commons/`: where it was found, or its name. */
+export const folderOf = (l: Library): string => l.dir ?? l.name;
+
+/** The folders of the libraries from `commons/`, by name, where they are (0027-commons-libraries FR-026): the one answer to "where is the library X". */
+export function libraryDirs(found: readonly Found[]): ReadonlyMap<string, string> {
+  return new Map(found.flatMap((f) => ("library" in f ? [[f.library.name, f.dir] as const] : [])));
+}
+
+/** The folder of the library `name` from the repository's root (`commons/anyfs/s3`), or `commons/<name>` where no manifest of that name is found: the one resolver of the folder of a library. */
+export function libraryDir(repo: string, name: string): string {
+  return `commons/${libraryDirs(readLibraries(repo)).get(name) ?? name}`;
 }
 
 /** The keys of a package's `exports`, its name and version and the scripts it has, read from `package.json`. */
@@ -383,11 +427,12 @@ export function docsConfigFindings(root: string, libraries: readonly Library[]):
  * What is wrong where a manifest and its folder disagree (0027-commons-libraries FR-013), one sentence each: a folder with a spec kit and no manifest, a manifest that cannot be read, that names another
  * folder, a level above L0 with no spec kit, a spec kit that is not there, a package of another name, a version that is not the package's, exports that are not the package's, and a verify that is no script of the package.
  */
-export function manifestFindings(repo: string): readonly string[] {
+export function manifestFindings(repo: string, layoutHosts: ReadonlySet<string> = LAYOUT_HOSTS): readonly string[] {
   const root = repo.replace(/[\\/]$/, "");
   const commons = `${root}/commons`;
   const found: string[] = [];
   const have = readLibraries(root);
+  const hostFolders = new Set(have.flatMap((f) => ("library" in f && f.library.family?.role === "host" ? [f.library.name] : [])));
   for (const e of existsSync(commons) ? readDirSync(commons) : [])
     if (e.isDirectory && existsSync(`${commons}/${e.name}/spec-kit`) && !have.some((l) => l.dir === e.name))
       found.push(`commons/${e.name} has a spec kit and no ${LIBRARY_FILE}: a library declares itself (FR-012)`);
@@ -398,7 +443,10 @@ export function manifestFindings(repo: string): readonly string[] {
       continue;
     }
     const l = f.library;
-    if (l.name !== f.dir) found.push(`commons/${f.dir}/${LIBRARY_FILE} is named ${l.name}, and its folder is ${f.dir} (FR-013)`);
+    const folderName = f.dir.includes("/") ? `${f.dir.split("/")[0]}-${f.dir.split("/").slice(1).join("-")}` : f.dir;
+    if (l.name !== folderName) found.push(`commons/${f.dir}/${LIBRARY_FILE} is named ${l.name}, and its folder is ${f.dir} (FR-013, FR-026)`);
+    const want = derivedDir(l, hostFolders);
+    if (want !== f.dir && layoutHosts.has(l.family?.host ?? "")) found.push(`commons/${f.dir}: the library ${l.name} of the family ${l.family?.host ?? ""} is in ${f.dir}, and its manifest puts it in commons/${want} (FR-026)`);
     if (rankOf(l.level) >= 1 && l.specKit === undefined)
       found.push(`commons/${f.dir}/${LIBRARY_FILE} declares ${l.level} and no spec kit, which a level above L0 asks (FR-013)`);
     if (l.specKit !== undefined && !existsSync(`${dir}/${l.specKit}/registry.tsv`))
@@ -461,19 +509,19 @@ const list = (items: readonly string[]): string => {
 };
 
 /** The requirement of a library, as the section "The libraries" holds it (FR-014): one line. */
-export function requirementOf(id: string, l: Library): string {
-  const kit = l.specKit === undefined ? "" : `, its spec kit at \`commons/${l.name}/${l.specKit}\``;
+export function requirementOf(id: string, l: Library, dir: string = l.name): string {
+  const kit = l.specKit === undefined ? "" : `, its spec kit at \`commons/${dir}/${l.specKit}\``;
   const summary = l.summary === undefined ? "" : ` ${l.summary}`;
   const where = l.held === undefined ? l.distribution.map((r) => REGISTRY_NAME[r]).join(" and ") : `no registry (not released, ${holdSentence(l.held)})`;
   const own = l.publishes === undefined ? `@intellectual-frontiers/${l.name}` : l.publishes;
   const sets = l.bundle === undefined ? "" : `, a metapackage with no code of its own (the set ${l.bundle}, 0036-distribution FR-005)`;
-  return `- **${id}**: \`commons/${l.name}\` MUST be a library at conformance level ${l.level} (\`${LEVEL_TERM[l.level]}\`): the package \`${own}\`${sets} at version \`${l.version}\`${kit}, exporting ${list(l.exports)}, published to ${where}, proved by \`cd commons/${l.name} && ${l.verify}\`.${summary}`;
+  return `- **${id}**: \`commons/${dir}\` MUST be a library at conformance level ${l.level} (\`${LEVEL_TERM[l.level]}\`): the package \`${own}\`${sets} at version \`${l.version}\`${kit}, exporting ${list(l.exports)}, published to ${where}, proved by \`cd commons/${l.name} && ${l.verify}\`.${summary}`;
 }
 
 /** The row of `enforcement.tsv` of a library's requirement. */
-export function rowOf(id: string, l: Library): string {
+export function rowOf(id: string, l: Library, dir: string = l.name): string {
   const kit = l.specKit === undefined ? "its manifest" : "its compiler, specification checker, rules and tests";
-  return `${LIBRARIES_SPEC} ${id}\tcheck\t.github: cd commons/${l.name} && ${l.verify}\tcommons/${l.name}: the verify of the library (${kit}); the manifest ${LIBRARY_FILE} agrees with the folder and the package (commons-libraries.test.ts)`;
+  return `${LIBRARIES_SPEC} ${id}\tcheck\t.github: cd commons/${dir} && ${l.verify}\tcommons/${dir}: the verify of the library (${kit}); the manifest ${LIBRARY_FILE} agrees with the folder and the package (commons-libraries.test.ts)`;
 }
 
 /** The ids the section already gives each library, by name, read from its text between the markers. */
@@ -510,6 +558,7 @@ export function generated(
   spec: string,
   enforcement: string,
   libraries: readonly Library[],
+  dirs: ReadonlyMap<string, string> = new Map(),
 ): Result<{ readonly spec: string; readonly enforcement: string }, string> {
   const b = bounds(spec);
   if (b === undefined)
@@ -517,9 +566,9 @@ export function generated(
   const ids = idsFor(libraries, idsIn(spec));
   // in the order of their numbers, which a library keeps for its life: a library added later is after those that were there, whatever its name
   const byNumber = [...libraries].sort((a, b) => Number((ids.get(a.name) ?? "").slice(3)) - Number((ids.get(b.name) ?? "").slice(3)));
-  const lines = byNumber.map((l) => requirementOf(ids.get(l.name) ?? "", l));
+  const lines = byNumber.map((l) => requirementOf(ids.get(l.name) ?? "", l, dirs.get(l.name) ?? l.name));
   const newSpec = `${spec.slice(0, b.from + BEGIN.length)}\n\n${lines.join("\n")}\n\n${spec.slice(b.to)}`;
-  const rows = byNumber.map((l) => rowOf(ids.get(l.name) ?? "", l));
+  const rows = byNumber.map((l) => rowOf(ids.get(l.name) ?? "", l, dirs.get(l.name) ?? l.name));
   const kept = enforcement.split("\n").filter((l) => l !== "" && !new RegExp(`^${LIBRARIES_SPEC} FR-(?:[1-9]\\d{2,})\\t`).test(l));
   const last = kept.map((l, i) => (l.startsWith(`${LIBRARIES_SPEC} `) ? i : -1)).reduce((a, b) => Math.max(a, b), -1);
   const at = last < 0 ? kept.length : last + 1;
@@ -540,7 +589,7 @@ export function synchronize(repo: string, write: boolean): { readonly stale: rea
   const libraries = have.flatMap((f) => ("library" in f ? [f.library] : []));
   const spec = readTextFileSync(SPEC_FILE(root)).replace(/\r\n/g, "\n"); // a Windows checkout may hold CRLF; the markers are found on lines of LF
   const enforcement = readTextFileSync(ENFORCEMENT_FILE(root)).replace(/\r\n/g, "\n");
-  const made = generated(spec, enforcement, libraries);
+  const made = generated(spec, enforcement, libraries, libraryDirs(have));
   if (made.kind === "err") return { stale: [], problems: [...problems, made.error] };
   const stale: string[] = [];
   if (made.value.spec !== spec) {
