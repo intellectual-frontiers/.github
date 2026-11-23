@@ -52,6 +52,7 @@ import {
 import { exposed, methodOf, pathOf, operationId } from "@intellectual-frontiers/headless/rest";
 import { listable, toolName, toolOf } from "@intellectual-frontiers/headless/mcp";
 import type { Option, Operand } from "@intellectual-frontiers/terminal/args";
+import { parseElementId } from "@intellectual-frontiers/kanon";
 import type { Disposition, ElementId, LayeredModel, ModelElement, ModelFinding, ModelLayer, SourceLocation, TraceEdge } from "@intellectual-frontiers/kanon";
 import {
   actionIdOf,
@@ -356,6 +357,12 @@ function modelFor(program: Program, tier: TierName, anchor: ElementId, options: 
     trace.push({ from, to, how: "projects to" });
   };
 
+  const definition = idOf(parseElementId(`program-definition:${name}`));
+  if (definition !== undefined) {
+    put("program-definition", definition, name, program.summary, sourceOf({ kind: "program" }), {});
+    edge(definition, anchor);
+  }
+
   put("program", anchor, name, program.summary, sourceOf({ kind: "program" }), {
     version: program.version,
     envPrefix: program.envPrefix,
@@ -420,11 +427,14 @@ function modelFor(program: Program, tier: TierName, anchor: ElementId, options: 
     for (const [key, o, standard] of [...declared.map(([k, v]) => [k, v, false] as const), ...added.map(([k, v]) => [k, v, true] as const)]) {
       const flag = flagOf(key);
       const id = idOf(optionIdOf(verb, flag));
-      if (id !== undefined && put("option", id, flag, o.help, source, optionProps(o, standard, p.facts.humanOnly.includes(key)), verb)) flags.set(flag, id);
+      if (id !== undefined && put("option", id, flag, o.help, source, optionProps(o, standard, p.facts.humanOnly.includes(key)), verb)) {
+        flags.set(flag, id);
+        edge(action, id);
+      }
     }
     for (const o of p.command.operands) {
       const id = idOf(operandIdOf(verb, o.name));
-      if (id !== undefined) put("operand", id, o.name, o.help, source, operandProps(o), verb);
+      if (id !== undefined && put("operand", id, o.name, o.help, source, operandProps(o), verb)) edge(action, id);
     }
 
     // its projections
@@ -493,12 +503,13 @@ function modelFor(program: Program, tier: TierName, anchor: ElementId, options: 
   // the plugins that contributed verbs
   for (const [owner, verbs] of [...owned.entries()].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))) {
     const id = idOf(pluginIdOf(owner));
-    if (id !== undefined) put("plugin", id, owner, `The plugin ${owner}, which contributes ${verbs.length} ${verbs.length === 1 ? "verb" : "verbs"} to ${name}.`, sourceOf({ kind: "plugin", owner }, owner), { verbs }, anchor);
+    if (id !== undefined && put("plugin", id, owner, `The plugin ${owner}, which contributes ${verbs.length} ${verbs.length === 1 ? "verb" : "verbs"} to ${name}.`, sourceOf({ kind: "plugin", owner }, owner), { verbs }, anchor) && definition !== undefined) edge(definition, id);
   }
 
   // the document of the REST surface, which holds the routes
   if (documentId !== undefined && routes.length > 0) {
     put("openapi-document", documentId, `${name} OpenAPI 3.1`, `The OpenAPI 3.1 document of ${name} for a caller of the tier ${tier}.`, sourceOf({ kind: "program" }), { openapi: "3.1.0", version: program.version, tier, paths: routes.length });
+    edge(anchor, documentId);
   }
 
   // what is wrong with the model

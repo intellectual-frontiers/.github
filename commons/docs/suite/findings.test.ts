@@ -5,11 +5,11 @@
  * @module
  */
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
-import { path } from "@intellectual-frontiers/system";
+import { fs, path } from "@intellectual-frontiers/system";
 import { loadConfig } from "../src/cli.ts";
 import { buildSite } from "../src/site.ts";
 import { csvOf, exportRows } from "../src/pages/findings.ts";
-import { deriveRows } from "@intellectual-frontiers/libraries/ci/findings";
+import { deriveRows, type FindingsFile } from "@intellectual-frontiers/libraries/ci/findings";
 import { readEvidence } from "../src/evidence.ts";
 import { ROOT } from "./helpers.ts";
 
@@ -66,4 +66,34 @@ proves(["0001-docs FR-030"], "where no run has kept findings the page says so an
   const page = built.pages.find((p) => p.path === "quality/build-findings.html");
   if (page === undefined) return; // no Quality section without evidence: the section says so itself
   assertStringIncludes(text(page.blocks), "No findings recorded yet");
+});
+
+proves(["0001-docs FR-030"], "Quality shows the Kanon outcome and keeps the finding through a verify that never reached the checker", async () => {
+  await fs.withTempDir(async (dir) => {
+    const rows = path.join(dir, "findings-history", "runs");
+    await fs.ensureDir(rows);
+    const url = "https://github.com/intellectual-frontiers/.github/actions/runs/123";
+    const run = { id: "123", workflow: "ci", commit: "first", at: "2026-11-20T00:00:00Z", url };
+    const first: FindingsFile = {
+      schema: "build-findings/1", run,
+      steps: [{ id: "import", job: "verify", module: "demo", tool: "kanon-check", kanonCheck: "import", outcome: "findings", findings: 1, durationMs: 3 }],
+      findings: [{ id: "f-kanon", tool: "kanon-check", module: "demo", code: "layers/above", key: "import target", file: "src/x.ts", line: 7,
+        severity: "error", message: "Upward import", at: run.at, evidence: { run: run.id, commit: run.commit, step: "import", logSha256: "hash" } }],
+    };
+    const skipped: FindingsFile = {
+      schema: "build-findings/1", run: { ...run, id: "124", commit: "next", at: "2026-11-21T00:00:00Z" },
+      steps: [{ id: "verify", job: "verify", module: "demo", tool: "verify", outcome: "findings", findings: 0, durationMs: 3 }],
+      findings: [],
+    };
+    await fs.writeTextFile(path.join(rows, "123.json"), JSON.stringify(first));
+    await fs.writeTextFile(path.join(rows, "124.json"), JSON.stringify(skipped));
+    const built = await site(dir);
+    const page = built.pages.find((p) => p.path === "quality/build-findings.html");
+    assert(page !== undefined);
+    for (const value of ["Kanon checks", "not recorded in latest verify", "layers/above", "src/x.ts:7", url])
+      assertStringIncludes(text(page.blocks), value);
+    const outputs = new Map(built.files.map((f) => [f.path, f.text]));
+    assertStringIncludes(outputs.get("quality/build-findings.json") ?? "", '"status": "open"');
+    assertStringIncludes(outputs.get("quality/build-findings.csv") ?? "", "f-kanon,open,kanon-check,layers/above");
+  });
 });

@@ -9,17 +9,17 @@
  * no unit of the table holds is found (`layers/unclassified`).
  *
  * @limits
- * It reads the manifest as data (`exportedLiteral`), never runs it.
+ * It reads the manifest as data (`readManifestLiteral`), never runs it.
  *
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import { exportedLiteral } from "@intellectual-frontiers/formats/ts-literal";
 import { existsSync, readDirSync, readFileSync, readTextFileSync } from "@intellectual-frontiers/system/fs";
 import { splitPackage } from "./family.ts";
 import { MANIFEST as BUNDLE_MANIFEST } from "./bundle.ts";
 import { extensionFindings } from "./extensions.ts";
 import { type ExportsMap, type Finding, importFindings, type SourceFile } from "./imports.ts";
+import { readManifestLiteral } from "./source.ts";
 import { decodeTable, type Table } from "./table.ts";
 
 /** The name of a library's manifest in its folder. */
@@ -75,15 +75,15 @@ export function readTableOf(root: string, files: Files = systemFiles): Result<{ 
     if (!files.exists(consumer)) return err(`neither ${file} nor ${consumer} is there`);
     const own = attempt(consumer, () => files.readText(consumer));
     if (own.kind === "err") return own;
-    const table = exportedLiteral(own.value, "kanon");
-    if (table.kind === "err") return err(`${CONSUMER_MANIFEST} is not a literal: ${table.error.expected}`);
+    const table = readManifestLiteral(own.value, "kanon");
+    if (table.kind === "err") return err(`${CONSUMER_MANIFEST} is not a literal: ${table.error}`);
     const decoded = decodeTable(table.value);
     return decoded.kind === "ok" ? ok({ table: decoded.value, manifest: CONSUMER_MANIFEST }) : decoded;
   }
   const text = attempt(file, () => files.readText(file));
   if (text.kind === "err") return text;
-  const lit = exportedLiteral(text.value, "library");
-  if (lit.kind === "err") return err(`the manifest is not a literal: ${lit.error.expected}`);
+  const lit = readManifestLiteral(text.value, "library");
+  if (lit.kind === "err") return err(`the manifest is not a literal: ${lit.error}`);
   const input = lit.value;
   const field =
     typeof input === "object" && input !== null && !Array.isArray(input)
@@ -203,5 +203,5 @@ export function judge(
   baseline: ReadonlySet<string>,
 ): { readonly fresh: readonly Finding[]; readonly stale: readonly string[] } {
   const keys = new Set(found.map((f) => f.key));
-  return { fresh: found.filter((f) => !baseline.has(f.key)), stale: [...baseline].filter((k) => !keys.has(k)).sort() };
+  return { fresh: found.filter((f) => f.rule === "layers/syntax" || !baseline.has(f.key)), stale: [...baseline].filter((k) => !keys.has(k)).sort() };
 }

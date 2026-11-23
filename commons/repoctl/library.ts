@@ -40,7 +40,7 @@ export const library = {
           { name: "@intellectual-frontiers/net", subpaths: ["serve"] },
         ],
       },
-      { folder: "src/", own: true },
+      { folder: "src/", own: true, files: ["mod.ts", "repoctl.ts"] },
       { folder: "bin/", own: true },
       { folder: "suite/", own: true },
       { folder: "tools/", own: true },

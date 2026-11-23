@@ -200,3 +200,19 @@ proves([`${SPEC} FR-014`], "the root tests are read per file: the findings are o
   assertEquals(rows.map((r) => [r.finding.module, r.status]).sort(), [["repository/tests/a.test.ts", "fixed"], ["repository/tests/b.test.ts", "open"]]);
   assertEquals(sectionsOf("noise\ntests/x.test.ts:\nline").map((s) => s.file), ["tests/x.test.ts"]);
 });
+
+proves([`${SPEC} FR-002`], "a Kanon violation stays open through a skipped run and closes after its checker completes", () => {
+  const req = { id: "verify", job: "verify", module: "demo", tool: "verify" as const, timeoutMinutes: 2, out: "x", command: ["verify"] };
+  const record = JSON.stringify({ rule: "layers/above", file: "src/model.ts", line: 2, message: "upward import", key: "model target" });
+  const run = (id: string, output: string) => fileOfRun(req, { output, durationMs: 10, exitStatus: id === "3" ? 0 : 1, timedOut: false }, {
+    id, workflow: "ci", commit: id, at: `2026-11-2${id}T00:00:00Z`,
+  });
+  const broken = run("1", `kanon-check: finding ${record}\nkanon-check: import result findings`);
+  const skipped = run("2", "src/model.ts(2,1): error TS1234: Cannot verify");
+  const model = run("3", "kanon-check: model result ok");
+  const fixed = run("3", "kanon-check: import result ok");
+  assertEquals(broken.steps.map((s) => [s.tool, s.kanonCheck]), [["verify", undefined], ["kanon-check", "import"]]);
+  assertEquals(broken.findings.map((f) => [f.tool, f.key]), [["kanon-check", "model target"]]);
+  assertEquals(deriveRows([broken, skipped, model], [], "2026-11-23").find((r) => r.finding.tool === "kanon-check")?.status, "open");
+  assertEquals(deriveRows([broken, skipped, fixed], [], "2026-11-23").find((r) => r.finding.tool === "kanon-check")?.status, "fixed");
+});

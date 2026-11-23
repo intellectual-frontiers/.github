@@ -28,7 +28,10 @@
  */
 import { absurd } from "@intellectual-frontiers/core";
 import { classify, rootPackage } from "./family.ts";
+import { readModuleReferences, type Specifier } from "./source.ts";
 import { type Allowed, type Layer, RANK, type Table, type Unit } from "./table.ts";
+
+export type { Specifier } from "./source.ts";
 
 /** An `exports` map: each subpath to its target, a string or an object of conditions of strings. */
 export type ExportsMap = Readonly<Record<string, string | { readonly [condition: string]: string }>>;
@@ -42,6 +45,7 @@ export type Rule =
   | "layers/above"
   | "layers/around"
   | "layers/cycle"
+  | "layers/syntax"
   | "instances/sibling"
   | "instances/undeclared"
   | "plugins/inverted"
@@ -53,6 +57,9 @@ export type Rule =
   | "kanon/annotation"
   | "kanon/dangling"
   | "kanon/relation-layer"
+  | "kanon/trace-invalid"
+  | "kanon/trace-missing"
+  | "kanon/disposition-duplicate"
   | "kanon/duplicate-id";
 
 /** The codes in one list, for a program that walks them. */
@@ -64,6 +71,7 @@ export const RULES = [
   "layers/above",
   "layers/around",
   "layers/cycle",
+  "layers/syntax",
   "instances/sibling",
   "instances/undeclared",
   "plugins/inverted",
@@ -75,6 +83,9 @@ export const RULES = [
   "kanon/annotation",
   "kanon/dangling",
   "kanon/relation-layer",
+  "kanon/trace-invalid",
+  "kanon/trace-missing",
+  "kanon/disposition-duplicate",
   "kanon/duplicate-id",
 ] as const satisfies readonly Rule[];
 
@@ -86,7 +97,8 @@ export const RULE_SUMMARY: Readonly<Record<Rule, string>> = {
   "layers/external": "an import of a package that the row of the unit does not allow",
   "layers/above": "an import of a unit that stands below the importer",
   "layers/around": "an import of another unit of the same layer that the row does not list",
-  "layers/cycle": "units of one class that import each other in a loop",
+  "layers/syntax": "a file whose TypeScript syntax could not be parsed",
+  "layers/cycle": "distinct units that form a cycle of permitted imports",
   "instances/sibling": "an instance of a unit kind that imports another instance of it",
   "instances/undeclared": "a folder under a unit with declared instances that the table does not declare as an instance",
   "plugins/inverted": "a host that imports a package that extends it",
@@ -98,6 +110,9 @@ export const RULE_SUMMARY: Readonly<Record<Rule, string>> = {
   "kanon/annotation": "an annotation of Governance whose name the model's vocabulary does not list",
   "kanon/dangling": "a relation with an end that is no element of the model",
   "kanon/relation-layer": "a relation between elements of two layers, which is a trace edge's work and not a relation's",
+  "kanon/trace-invalid": "an invalid trace edge",
+  "kanon/trace-missing": "an element with no trace from Governance",
+  "kanon/disposition-duplicate": "repeated dispositions for one annotation and instance",
   "kanon/duplicate-id": "two elements of a model with one id",
 };
 
@@ -111,6 +126,7 @@ export function familyOf(rule: Rule): "layers" | "instances" | "plugins" | "fami
     case "layers/above":
     case "layers/around":
     case "layers/cycle":
+    case "layers/syntax":
       return "layers";
     case "instances/sibling":
     case "instances/undeclared":
@@ -126,6 +142,9 @@ export function familyOf(rule: Rule): "layers" | "instances" | "plugins" | "fami
     case "kanon/annotation":
     case "kanon/dangling":
     case "kanon/relation-layer":
+    case "kanon/trace-invalid":
+    case "kanon/trace-missing":
+    case "kanon/disposition-duplicate":
     case "kanon/duplicate-id":
       return "kanon";
     default:
@@ -148,8 +167,13 @@ export type SourceFile = { readonly path: string; readonly text: string };
 /** The unit a file is in, as the table holds it: the unit's name (its folder, and for an instance the folder under it) and the row it comes from. */
 export type Placed = { readonly name: string; readonly unit: Unit };
 
-/** An import of a file, with its line. */
-export type Specifier = { readonly line: number; readonly specifier: string };
+/** The source input for the layer and extension rules, parsed once per file. */
+export type ParsedSource = {
+  readonly path: string;
+  readonly references: ReturnType<typeof readModuleReferences>;
+};
+
+export const parseImports = (file: SourceFile): ParsedSource => ({ path: file.path, references: readModuleReferences(file.text) });
 
 /** Make a finding with its key. */
 export function finding(rule: Rule, file: string, line: number, message: string, about?: string): Finding {
@@ -162,6 +186,8 @@ export function unitOf(table: Table, path: string): Placed | undefined {
   for (const u of table.units) {
     const inside = u.folder === "./" ? !path.includes("/") : path.startsWith(u.folder);
     if (!inside) continue;
+    const relative = u.folder === "./" ? path : path.slice(u.folder.length);
+    if (u.kind === "own" && u.files !== undefined && !u.files.includes(relative)) continue;
     let placed: Placed | undefined;
     if (!u.instances) placed = { name: u.folder, unit: u };
     else {
@@ -198,21 +224,11 @@ export function resolveImport(from: string, specifier: string): string {
   return parts.join("/");
 }
 
-/** Every import of a file's text, relative or by name: static, side-effect, re-export and dynamic `import()`, `import type` included. */
+/** Statically known module targets of valid TypeScript source. Use readModuleReferences for diagnostics and computed targets. */
 export function specifiersOf(text: string): readonly Specifier[] {
-  const out: Specifier[] = [];
-  for (const [i, raw] of text.split("\n").entries()) {
-    const t = raw.trim();
-    if (t.startsWith("//") || t.startsWith("*") || t.startsWith("/*")) continue;
-    const found = [
-      ...raw.matchAll(/^\s*(?:import|export)\b[^;'"]*?\bfrom\s*["']([^"']+)["']/g),
-      ...raw.matchAll(/^\s*import\s*["']([^"']+)["']/g),
-      ...raw.matchAll(/\bimport\s*\(\s*["']([^"']+)["']\s*\)/g),
-      ...raw.matchAll(/^\s*\}\s*from\s*["']([^"']+)["']/g),
-    ];
-    for (const m of found) if (m[1] !== undefined) out.push({ line: i + 1, specifier: m[1] });
-  }
-  return out;
+  const parsed = readModuleReferences(text);
+  return parsed.kind === "err" ? [] : parsed.value.flatMap((reference) =>
+    reference.kind === "computed-dynamic" ? [] : [{ line: reference.line, specifier: reference.specifier }]);
 }
 
 /** Whether a specifier is one of the packages a unit may import. */
@@ -247,6 +263,7 @@ export function layerOf(u: Unit): Layer | undefined {
 /** Whether a unit may import another unit of the library (0033-kanon FR-004): its own folder, the units its row lists, or by default a unit of a layer above its own. */
 export function mayReach(from: Placed, to: Placed): boolean {
   if (to.name === from.name) return true;
+  if (climbs(from, to)) return false;
   const list = from.unit.mayImport;
   if (list !== undefined) return list.some((m) => m === to.name || m === to.unit.folder);
   const a = layerOf(from.unit);
@@ -274,12 +291,19 @@ export function importFindings(
   files: readonly SourceFile[],
   exportsMap: ExportsMap,
 ): readonly Finding[] {
+  return parsedImportFindings(table, files.map(parseImports), exportsMap);
+}
+
+export function parsedImportFindings(table: Table, files: readonly ParsedSource[], exportsMap: ExportsMap): readonly Finding[] {
   const out: Finding[] = [];
   const undeclared = new Set<string>();
   const hasDeclared = (folder: string): boolean => table.instances.some((i) => i.kind === "folder" && i.instanceOf === folder);
   const among = new Map<string, Map<string, { readonly file: string; readonly line: number }>>();
   const pkg: string = table.package;
   for (const file of files) {
+    const parsed = file.references;
+    if (parsed.kind === "err")
+      out.push(finding("layers/syntax", file.path, parsed.error.line, parsed.error.message));
     const here = unitOf(table, file.path);
     if (here === undefined) {
       out.push(finding("layers/unclassified", file.path, 1, "no unit of the table holds it: put it in one, or add the unit to the table"));
@@ -297,7 +321,10 @@ export function importFindings(
         ),
       );
     }
-    for (const { line, specifier } of specifiersOf(file.text)) {
+    if (parsed.kind === "err") continue;
+    for (const reference of parsed.value) {
+      if (reference.kind === "computed-dynamic") continue;
+      const { line, specifier } = reference;
       if (specifier.startsWith("./") || specifier.startsWith("../")) {
         if (escapesRoot(file.path, specifier)) {
           out.push(finding("layers/relative", file.path, line, `it imports ${specifier}, which leaves the package: import it by its package name`, specifier));
@@ -349,7 +376,7 @@ export function importFindings(
           );
           continue;
         }
-        if (target.name !== here.name && target.unit.instances && target.unit.folder === here.unit.folder && mayReach(here, target)) {
+        if (target.name !== here.name && mayReach(here, target)) {
           const to = among.get(here.name) ?? new Map<string, { readonly file: string; readonly line: number }>();
           if (!to.has(target.name)) to.set(target.name, { file: file.path, line });
           among.set(here.name, to);
@@ -383,7 +410,7 @@ export function importFindings(
   const contract = table.family?.contract;
   if (contract !== undefined && entryOf(exportsMap, contract) === undefined)
     out.push(finding("plugins/contract", "library.ts", 1, `the family names ${contract} as the plugin contract and the package's exports do not`, contract));
-  // a cycle among instances of one class: found once, at the import that closes it
+  // a cycle among distinct units: found once, at the import that closes it
   const state = new Map<string, "visiting" | "done">();
   const walk = (from: string, path: readonly string[]): void => {
     state.set(from, "visiting");

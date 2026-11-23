@@ -18,6 +18,7 @@
  * @module
  */
 import { absurd } from "@intellectual-frontiers/core";
+import { traceGraph } from "./trace.ts";
 import { accountOf, type Cell, OUTCOMES } from "./account.ts";
 import type { InstanceName } from "./family.ts";
 import type { ElementId, LayeredModel } from "./model.ts";
@@ -44,14 +45,16 @@ export type Matrix = {
 export function buildMatrix(model: LayeredModel): Matrix {
   const top = model.layers[0]?.id;
   const rows: MatrixRow[] = [];
+  const graph = traceGraph(model, new Map(model.elements.map((el) => [el.id, el])));
   for (const el of model.elements) {
     if (el.layer !== top) continue;
+    const downstream = graph.downstreamOf([el.id]);
     for (const annotation of Object.keys(el.properties))
       rows.push({
         element: el.id,
         name: el.name,
         annotation,
-        cells: model.instances.map((instance) => ({ instance, cell: accountOf(model, el, annotation, instance) })),
+        cells: model.instances.map((instance) => ({ instance, cell: accountOf(model, el, annotation, instance, downstream) })),
       });
   }
   return { model: model.name, instances: model.instances, rows };

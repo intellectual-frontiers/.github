@@ -104,6 +104,7 @@ function contentModel(dispositions: readonly Disposition[], extra: Partial<Layer
       { ...el("llms:home", "physical", "llms-entry"), instance: llms },
     ],
     trace: [
+      { from: CLAIM, to: COLLECTED, how: "collects evidence" },
       { from: PAGE, to: COLLECTED, how: "projects to" },
       { from: COLLECTED, to: WEB_EL, how: "written as" },
       { from: COLLECTED, to: LLMS_EL, how: "written as" },
@@ -275,4 +276,16 @@ proves(["0002-kanon-content-checks FR-010"], "a file whose digest holds but whos
   const r = await verifyBundle({ manifest: JSON.stringify(fixed), files });
   assert(r.kind === "err");
   assertEquals(r.error.map((f) => [f.kind, f.path]), [["form", "elements.json"]]);
+});
+
+proves(["0002-kanon-content-checks FR-002"], "trace validation rejects an orphan, a reverse edge and a self-targeted disposition", () => {
+  const model = contentModel([
+    { element: CLAIM, annotation: "evidence", instance: web, outcome: "expressed", target: CLAIM },
+    ...ALL,
+  ], { trace: [{ from: WEB_EL, to: COLLECTED, how: "reversed" }] });
+  const rules = modelFindings(model).map((f) => f.rule);
+  assertEquals(rules.includes("kanon/trace-invalid"), true);
+  assertEquals(rules.includes("kanon/trace-missing"), true);
+  assertEquals(rules.includes("kanon/disposition-duplicate"), true);
+  assertEquals(droppedFindings(model).some((f) => f.message.includes("no valid trace")), true);
 });

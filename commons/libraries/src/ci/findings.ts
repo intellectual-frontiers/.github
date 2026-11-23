@@ -41,13 +41,16 @@ export type Finding = {
   readonly at: string;
 };
 
+/** Which Kanon check produced evidence. */
+export type KanonCheck = "import" | "model";
+
 /** How a step ended. */
 export const OUTCOMES = ["ok", "findings", "tool-error", "timeout", "no-output"] as const;
 /** An outcome. */
 export type Outcome = (typeof OUTCOMES)[number];
 
 /** What the file of a run says of one step: that it ran, for which module, and how it ended. */
-export type StepRecord = { readonly id: string; readonly job: string; readonly module: string; readonly tool: Tool; readonly outcome: Outcome; readonly findings: number; readonly durationMs: number; readonly exitStatus?: number };
+export type StepRecord = { readonly id: string; readonly job: string; readonly module: string; readonly tool: Tool; readonly kanonCheck?: KanonCheck; readonly outcome: Outcome; readonly findings: number; readonly durationMs: number; readonly exitStatus?: number };
 
 /** The run a file is of. */
 export type RunInfo = { readonly id: string; readonly workflow: string; readonly commit: string; readonly at: string; readonly url?: string };
@@ -122,13 +125,23 @@ export type Row = {
   readonly acceptance?: Acceptance;
 };
 
+/** The Kanon check responsible for a diagnostic code. */
+export function kanonCheckOf(code: string): KanonCheck {
+  return code.startsWith("kanon/") ? "model" : "import";
+}
+
 /**
  * The rows of a history (oldest run first) on a day: every finding any run had, once, as it was in the run that last had it. A finding is `open` where the last run in which its module ran has it, `fixed` where that run
  * does not, and `accepted` where it is open and a live acceptance names it; an acceptance that has ended leaves it open with the note.
  */
 export function deriveRows(history: readonly FindingsFile[], acceptances: readonly Acceptance[], today: string): readonly Row[] {
   const latestModuleRun = new Map<string, FindingsFile>();
-  for (const run of history) for (const s of run.steps) latestModuleRun.set(s.module, run);
+  const latestCompletedKanonRun = new Map<string, FindingsFile>();
+  for (const run of history) for (const step of run.steps) {
+    latestModuleRun.set(step.module, run);
+    if (step.tool === "kanon-check" && (step.outcome === "ok" || step.outcome === "findings"))
+      latestCompletedKanonRun.set(`${step.module}/${step.kanonCheck ?? "import"}`, run);
+  }
   const seen = new Map<string, { finding: Finding; first: string; last: string; count: number }>();
   for (const run of history) {
     for (const f of run.findings) {
@@ -138,8 +151,10 @@ export function deriveRows(history: readonly FindingsFile[], acceptances: readon
   }
   const rows: Row[] = [];
   for (const [id, e] of seen) {
-    const decisive = latestModuleRun.get(e.finding.module);
-    const present = decisive?.findings.some((f) => f.id === id) ?? false;
+    const decisive = e.finding.tool === "kanon-check"
+      ? latestCompletedKanonRun.get(`${e.finding.module}/${kanonCheckOf(e.finding.code)}`)
+      : latestModuleRun.get(e.finding.module);
+    const present = decisive?.findings.some((f) => f.id === id) ?? true;
     const base = { finding: e.finding, firstSeen: e.first, lastSeen: e.last, runsSeen: e.count };
     if (!present) {
       rows.push({ ...base, status: "fixed" });

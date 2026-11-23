@@ -105,6 +105,19 @@ proves([`${SPEC} FR-029`], "an import of a library is written as an import of th
   assertEquals(importSpecifiers('import a from "./a.ts";\nconst s = "import b from \\"./b.ts\\"";'), ["./a.ts"]);
 });
 
+proves(["0001-libraries FR-029"], "package rewriting recognizes literal templates and TypeScript import assignments", () => {
+  const input = [
+    'import x = require("@intellectual-frontiers/core");',
+    'const lazy = () => import(`@intellectual-frontiers/core`);',
+    "const example = 'import(\"@intellectual-frontiers/core\")';",
+  ].join("\n");
+  const output = rewriteSpecifiers(input, new Set(["core"]));
+  assertEquals(output.unknown, []);
+  assertStringIncludes(output.text, 'require("@intellectual-frontiers/commons/core")');
+  assertStringIncludes(output.text, 'import(`@intellectual-frontiers/commons/core`)');
+  assertStringIncludes(output.text, input.split("\n").at(-1) ?? "");
+});
+
 proves([`${SPEC} FR-029`], "the dependencies are the union of what the libraries need at run time and the package installs, each exact; two versions of one package and a version that is not exact are findings; what the package asks of the consumer is a peer and never installed", () => {
   const u = unionDependencies([facts("a", { dependencies: { left: "1.0.0" } }), facts("b", { dependencies: { left: "1.0.0", right: "2.0.0" }, peers: { pg: "8.23.1" } })]);
   assertEquals(u.problems, []);

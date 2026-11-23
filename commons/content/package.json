@@ -1,0 +1,28 @@
+{
+  "name": "@intellectual-frontiers/content",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Collects governed claims and their evidence into a checked model for publication.",
+  "engines": { "node": ">=26" },
+  "exports": {
+    ".": "./src/mod.ts",
+    "./governance": "./src/governance/mod.ts",
+    "./logical": "./src/logical/mod.ts",
+    "./rendition": "./src/physical/rendition/mod.ts"
+  },
+  "scripts": {
+    "verify": "tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../libraries/src/check.ts --root spec-kit --level L1 && bun ../kanon/src/check.ts && bun tools/check.ts && bun tools/model-fixture.ts && bun ../kanon/src/check.ts --bundle dist/kanon-proof && bun test suite/",
+    "test": "bun test suite/",
+    "test:node": "node --test \"suite/**/*.test.ts\""
+  },
+  "devDependencies": {
+    "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/kanon": "link:../kanon",
+    "@intellectual-frontiers/mizan": "link:../mizan",
+    "@intellectual-frontiers/system": "link:../system",
+    "@intellectual-frontiers/test": "link:../test",
+    "@types/node": "26.6.6",
+    "typescript": "7.0.2"
+  }
+}

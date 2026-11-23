@@ -271,7 +271,7 @@ export function rewriteSpecifiers(source: string, libraries: ReadonlySet<string>
   const unknown = new Set<string>();
   const edits: { start: number; end: number; to: string }[] = [];
   for (const r of specifierRanges(source)) {
-    const spec = source.slice(r.start, r.end);
+    const spec = r.specifier;
     const m = /^@intellectual-frontiers\/([^/]+)(\/.*)?$/.exec(spec);
     if (m?.[1] === undefined) continue;
     if (libraries.has(m[1])) edits.push({ ...r, to: `${SELF}/${m[1]}${m[2] ?? ""}` });
@@ -334,15 +334,9 @@ export function runsWhenLoaded(compiled: string): boolean {
 
 /** The specifiers a source imports statically: those after `from` and after a bare `import`, never `import(` and never a statement of types only (`import type`, `export type`), which leaves no import at run time. */
 export function staticSpecifiers(source: string): readonly string[] {
-  const { code } = scanSource(source);
   return specifierRanges(source)
-    .filter((r) => {
-      const before = code.slice(0, r.start);
-      if (/\bimport\s*\(\s*["']$/.test(before.slice(-24))) return false;
-      const at = Math.max(before.lastIndexOf("import"), before.lastIndexOf("export"));
-      return !/^(?:import|export)\s+type\b/.test(before.slice(Math.max(at, 0)));
-    })
-    .map((r) => source.slice(r.start, r.end));
+    .filter((r) => r.kind !== "dynamic" && r.kind !== "type")
+    .map((r) => r.specifier);
 }
 
 /** What only commons needs internally and never ships (0036-distribution FR-031): the folders of a library that develop, prove and document it, the tests, the source maps, the lockfiles, the baselines of the checks and the manifest of the library. */

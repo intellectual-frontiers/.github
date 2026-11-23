@@ -156,6 +156,15 @@ export function model(dispositions: readonly Disposition[] = DISPOSITIONS): Laye
         properties: { effect: "write", audit: true },
       },
       {
+        id: id("order:ssh-keys"),
+        layer: "logical",
+        kind: "order",
+        name: "SSH keys order",
+        definition: "Keys to install.",
+        source: { file: "src/order.ts", line: 1 },
+        properties: {},
+      },
+      {
         id: PLAY,
         layer: "physical",
         kind: "play",
@@ -176,7 +185,11 @@ export function model(dispositions: readonly Disposition[] = DISPOSITIONS): Laye
         instance: DSC_NAME,
       },
     ],
-    trace: [],
+    trace: [
+      { from: SSH_KEYS, to: id("order:ssh-keys"), how: "plans" },
+      { from: id("order:ssh-keys"), to: PLAY, how: "renders" },
+      { from: id("order:ssh-keys"), to: DSC_RESOURCE, how: "renders" },
+    ],
     findings: [],
     dispositions,
     instances: [ANSIBLE_NAME, DSC_NAME],

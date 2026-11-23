@@ -1,5 +1,7 @@
 # Kanon for content: what changed, what is unverified, and the contract for the first consumer
 
+The approved [Content collector](../../../content/spec-kit/specs/0001-content-collector/spec.md) now implements the initial slice as a decoded-data bundle. The notes below record the state when the draft was handed over.
+
 Written for intellectual-frontiers/.github#22. This is a note for the owner, not a Decision: a Decision authorizes, and none is made here. The name of Kanon (OQ-4 of 0033-kanon) stays with the owner; nothing is aliased or blocked.
 
 ## What changed

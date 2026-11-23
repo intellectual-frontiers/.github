@@ -377,6 +377,7 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/integrations-fhir/spec-kit" },
     { layout: "commons", dir: "commons/integrations-x12/spec-kit" },
     { layout: "commons", dir: "commons/kanon/spec-kit" },
+    { layout: "commons", dir: "commons/content/spec-kit" },
     { layout: "commons", dir: "commons/lab/spec-kit" },
     { layout: "commons", dir: "commons/machine-probe/spec-kit" },
     { layout: "commons", dir: "commons/archon-boot/spec-kit" },

@@ -156,3 +156,15 @@ proves(
     });
   },
 );
+
+proves([`${SPEC} FR-020`], "the planner reads template imports and ignores strings with import text", async () => {
+  await withTempDir(async (dir) => {
+    repo(dir);
+    put(dir, "commons/alpha/src/mod.ts", "const example = 'import(\"@x/base/runtime\")';");
+    assert(!inputsOf(dir, "alpha").codePaths.includes("commons/base/runtime/**"));
+    put(dir, "commons/alpha/src/mod.ts", "await import(`@x/base/runtime`);");
+    assert(inputsOf(dir, "alpha").codePaths.includes("commons/base/runtime/**"));
+    put(dir, "commons/alpha/src/mod.ts", "await import(target);");
+    assert(inputsOf(dir, "alpha").codePaths.includes("commons/base/**"));
+  });
+});

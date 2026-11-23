@@ -15,8 +15,7 @@
  * affected where a changed file is among its inputs, or where a library it depends on is affected. Nothing is run and nothing is written; the result is the same for the same files.
  *
  * @limits
- * It reads sources with a pattern for `import`, `export ... from` and `import()`, which finds every file a source names (and at worst a file that a comment names, which only adds an input); a file that
- * is read by a program through a path it builds at run time is not found, and a dependency that a library has outside commons is not followed. Where Git cannot say what changed, every library is affected.
+ * It parses module references. An unresolved source import conservatively includes the library’s declared linked dependencies. Runtime file reads and dependencies outside commons are not followed. Where Git cannot say what changed, every library is affected.
  *
  * @example
  * ```ts
@@ -29,6 +28,7 @@
  * @module
  */
 import process from "node:process";
+import { readModuleReferences } from "@intellectual-frontiers/kanon";
 import { existsSync, readDirSync, readTextFileSync } from "@intellectual-frontiers/system/fs";
 import { dirname, join, normalize, resolve, toPosix } from "@intellectual-frontiers/system/path";
 import { stdio } from "@intellectual-frontiers/system";
@@ -54,7 +54,6 @@ export type Inputs = {
 export const SHARED = ["commons/tools/**", ".github/actions/**"] as const;
 
 const SOURCE = /\.(?:ts|mts|js|mjs)$/;
-const SPECIFIER = /(?:\bimport|\bexport)\s+(?:type\s+)?(?:[^'";]*?\s+from\s+)?["']([^"']+)["']|\bimport\(\s*["']([^"']+)["']\s*\)/g;
 
 const posix = (p: string): string => toPosix(normalize(p));
 
@@ -110,8 +109,14 @@ function sourcesUnder(root: string, dir: string): readonly string[] {
   return out.sort();
 }
 
-const specifiersOf = (text: string): readonly string[] =>
-  [...text.matchAll(SPECIFIER)].map((m) => m[1] ?? m[2] ?? "").filter((s) => s !== "");
+function referencesOf(text: string): { readonly targets: readonly string[]; readonly unresolved: boolean } {
+  const parsed = readModuleReferences(text);
+  if (parsed.kind === "err") return { targets: [], unresolved: true };
+  return {
+    targets: parsed.value.flatMap((ref) => ref.kind === "computed-dynamic" ? [] : [ref.specifier]),
+    unresolved: parsed.value.some((ref) => ref.kind === "computed-dynamic"),
+  };
+}
 
 /** The file a relative specifier names, from the repository's root: the path as written, or with `.ts`, `/mod.ts` or `/index.ts`. */
 function resolveFile(root: string, from: string, specifier: string): string | undefined {
@@ -129,7 +134,7 @@ function closure(root: string, entries: readonly string[]): ReadonlySet<string> 
     if (seen.has(f) || !existsSync(join(root, f))) continue;
     seen.add(f);
     if (!SOURCE.test(f)) continue;
-    for (const s of specifiersOf(readTextFileSync(join(root, f)))) {
+    for (const s of referencesOf(readTextFileSync(join(root, f))).targets) {
       if (!s.startsWith(".")) continue;
       const r = resolveFile(root, f, s);
       if (r !== undefined) todo.push(r);
@@ -157,7 +162,7 @@ export function inputsOf(repo: string, name: string): Inputs {
   const folder = `commons/${name}`;
   const pkg = readPackage(join(root, folder));
   const sources = sourcesUnder(root, folder);
-  const texts = sources.map((f) => ({ f, text: readTextFileSync(join(root, f)) }));
+  const texts = sources.map((f) => ({ f, ...referencesOf(readTextFileSync(join(root, f))) }));
   const entries = new Set<string>();
   const codeEntries = new Set<string>();
   const whole = new Set<string>();
@@ -172,11 +177,13 @@ export function inputsOf(repo: string, name: string): Inputs {
     if (dir.startsWith("..") || !existsSync(join(root, dir))) continue;
     const depPkg = readPackage(join(root, dir));
     dependsOn.add(dir.split("/")[1] ?? dir);
-    const importedBy = (own: readonly { readonly f: string; readonly text: string }[]): ReadonlySet<string> => {
+    const importedBy = (own: readonly (typeof texts)[number][]): ReadonlySet<string> => {
       const found = new Set<string>();
-      for (const { text } of own)
-        for (const s of specifiersOf(text))
-          if (s === dep || s.startsWith(`${dep}/`)) found.add(s === dep ? "." : `.${s.slice(dep.length)}`);
+      for (const { targets, unresolved } of own) {
+        if (unresolved) found.add("*");
+        for (const target of targets)
+          if (target === dep || target.startsWith(`${dep}/`)) found.add(target === dep ? "." : `.${target.slice(dep.length)}`);
+      }
       return found;
     };
     // what its types and tests read is what its own code (`about.ts` and `src/`) imports; its suite and its tools also read the packages their scripts run
@@ -188,7 +195,7 @@ export function inputsOf(repo: string, name: string): Inputs {
       [ownCode, codeEntries, codeWhole],
     ] as const)
       for (const key of keys) {
-        const target = depPkg?.exports.get(key);
+        const target = key === "*" ? undefined : depPkg?.exports.get(key);
         if (target === undefined) all.add(`${dir}/**`);
         else into.add(posix(join(dir, target)));
       }

@@ -21,7 +21,7 @@ import { absurd, type Result } from "@intellectual-frontiers/core";
 import { cliId, type ElementId, headlessId, type Layer, mcpId, operandId, optionId, parseElementId, restId } from "@intellectual-frontiers/kanon";
 
 /** The kinds of element of a described program: a closed union. */
-export const KINDS = ["action", "problem-code", "outcome", "program", "plugin", "verb", "option", "operand", "cli-command", "mcp-tool", "rest-route", "openapi-document"] as const;
+export const KINDS = ["program-definition", "action", "problem-code", "outcome", "program", "plugin", "verb", "option", "operand", "cli-command", "mcp-tool", "rest-route", "openapi-document"] as const;
 
 /** A kind of element. */
 export type Kind = (typeof KINDS)[number];
@@ -29,6 +29,7 @@ export type Kind = (typeof KINDS)[number];
 /** The layer a kind of element is in: governance says what an action is and may do, the logical layer is the program's own tree, and the surfaces are the physical layer. */
 export function layerOf(kind: Kind): Layer {
   switch (kind) {
+    case "program-definition":
     case "action":
     case "problem-code":
     case "outcome":

@@ -5,7 +5,7 @@
  * @module
  */
 import fc from "fast-check";
-import { type Disposition, droppedFindings, type ElementId, type LayeredModel, type ModelElement } from "@intellectual-frontiers/kanon";
+import { type Disposition, droppedFindings, type ElementId, type LayeredModel, modelFindings, type ModelElement } from "@intellectual-frontiers/kanon";
 import { flag, value } from "@intellectual-frontiers/terminal/args";
 import { assert, assertEquals, assertStringIncludes, proves, the } from "@intellectual-frontiers/test";
 import { ADMINISTRATOR, defineReach, OPERATOR, PUBLIC, type TierName, tierGate } from "../src/governance/mod.ts";
@@ -213,6 +213,7 @@ proves(["0015-describe FR-008", "0015-describe FR-009"], "the trace goes from th
 
 /** Every disposition names an element of the model, and Kanon's check finds nothing dropped. */
 const accounted = (m: LayeredModel): void => {
+  assertEquals(modelFindings(m).map((f) => f.key), []);
   assertEquals(droppedFindings(m).map((f) => f.key), []);
   const all = new Set<ElementId>(m.elements.map((e) => e.id));
   for (const d of m.dispositions) {

@@ -22,3 +22,6 @@ runs:
     - name: "Bun, pinned and checked"
       shell: bash
       run: "node commons/libraries/src/install-bun.ts \"$RUNNER_TEMP/bun\""
+    - name: Install shared tooling from the root lockfile
+      shell: bash
+      run: bun install --frozen-lockfile

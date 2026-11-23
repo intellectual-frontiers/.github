@@ -1,0 +1,5 @@
+requirement	mechanism	by	note
+0001-content-collector FR-001	check	.github: cd commons/content && bun run verify	Manifest, layer and public entry checks.
+0001-content-collector FR-002	check	.github: cd commons/content && bun run verify	content.test.ts checks source location, markers, restriction, dates and evidence.
+0001-content-collector FR-003	check	.github: cd commons/content && bun run verify	content.test.ts checks missing rendition evidence and bundle verification.
+0001-content-collector FR-004	check	.github: cd commons/content && bun run verify	content.test.ts checks warning and dated owner decision.

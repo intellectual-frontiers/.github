@@ -3,7 +3,7 @@
 requirement	mechanism	by	note
 0001-kanon-checker FR-001	check	.github: cd commons/kanon && bun run verify	table.test.ts: a table is decoded and every malformed table is refused with a sentence naming the unit
 0001-kanon-checker FR-002	check	.github: cd commons/kanon && bun run verify	imports.test.ts: a file is placed in the most specific unit, instances one unit each, none where no unit holds it
-0001-kanon-checker FR-003	check	.github: cd commons/kanon && bun run verify	imports.test.ts: static, side-effect, re-export and dynamic imports are read with their lines and comments are skipped
+0001-kanon-checker FR-003	check	.github: cd commons/kanon && bun run verify	imports.test.ts: actual module references are typed with source lines, and invalid syntax is a finding
 0001-kanon-checker FR-004	check	.github: cd commons/kanon && bun run verify	imports.test.ts: every code of the check is found from a table, a file set and an exports map, and an own unit is exempt
 0001-kanon-checker FR-005	check	.github: cd commons/kanon && bun run verify	dropped.test.ts: an annotation no disposition accounts for, a missing target and an unexplained unexpressed are kanon/dropped
 0001-kanon-checker FR-006	check	.github: cd commons/kanon && bun run verify	model.test.ts: the ids are built as agreed, and a model is assignable to the shape of the documentation generator's layered model

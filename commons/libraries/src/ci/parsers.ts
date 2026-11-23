@@ -16,7 +16,7 @@
  *
  * @module
  */
-import { type Evidence, type Finding, makeFinding, type Severity, sha256Of } from "./findings.ts";
+import { type Evidence, type Finding, type KanonCheck, makeFinding, type Severity, sha256Of } from "./findings.ts";
 import type { Tool } from "./policy.ts";
 
 /** What a parser needs to know of the run and the step it reads. */
@@ -138,6 +138,45 @@ function generatedFiles(out: string): readonly Draft[] {
   return drafts;
 }
 
+function beforeBunTests(out: string): string {
+  const at = out.search(/^bun test v[\d.]+/m);
+  return at < 0 ? out : out.slice(0, at);
+}
+
+/** Completed or unavailable Kanon checks reported before test-runner output. */
+export function kanonRunOutcomes(tool: Tool, out: string): readonly {
+  readonly check: KanonCheck; readonly outcome: "ok" | "findings" | "tool-error";
+}[] {
+  if (tool !== "verify" && tool !== "checks" && tool !== "kanon-check") return [];
+  return [...beforeBunTests(out).matchAll(/^kanon-check: (import|model) result (ok|findings|tool-error)[ \t]*$/gm)].flatMap((m) => {
+    const [, check, outcome] = m;
+    return (check === "import" || check === "model") && (outcome === "ok" || outcome === "findings" || outcome === "tool-error")
+      ? [{ check, outcome }] : [];
+  });
+}
+
+function kanonDrafts(tool: Tool, out: string): readonly Draft[] {
+  if (kanonRunOutcomes(tool, out).length === 0) return kanonCheck(out);
+  return out.split("\n").flatMap((line) => {
+    const prefix = "kanon-check: finding ";
+    if (!line.startsWith(prefix)) return [];
+    try {
+      const value: unknown = JSON.parse(line.slice(prefix.length));
+      if (typeof value !== "object" || value === null) return [];
+      if (!("rule" in value) || typeof value.rule !== "string" ||
+        !("file" in value) || typeof value.file !== "string" ||
+        !("line" in value) || typeof value.line !== "number" ||
+        !("message" in value) || typeof value.message !== "string" ||
+        !("key" in value) || typeof value.key !== "string") return [];
+      return [{ code: value.rule, file: value.file, line: value.line, severity: "error", message: value.message, key: value.key }];
+    } catch {
+      return [];
+    }
+  });
+}
+
+const isKanonCode = (code: string): boolean => /^(?:layers|instances|plugins|family|kanon)\//.test(code);
+
 /** The drafts of a tool's output: what its parser reads (none for the tools that have no parser of their own). */
 function draftsOf(tool: Tool, out: string): readonly Draft[] {
   switch (tool) {
@@ -154,17 +193,17 @@ function draftsOf(tool: Tool, out: string): readonly Draft[] {
     case "mizan-check":
       return mizanCheck(out);
     case "kanon-check":
-      return kanonCheck(out);
+      return kanonDrafts(tool, out);
     case "generated-files":
       return generatedFiles(out);
     case "verify": {
       // a `verify` script type-checks and checks before it runs the tests, and the tests may print what a tool prints (a library that runs `tsc` on a broken fixture): only what precedes the runner's first line is the type check's and the checks'
       const at = out.search(/^bun test v[\d.]+/m);
       const before = at < 0 ? out : out.slice(0, at);
-      return [...tsc(before), ...kanonCheck(before), ...bunTest(out)];
+      return [...tsc(before), ...kanonDrafts(tool, before), ...bunTest(out)];
     }
     case "checks":
-      return [...generatedFiles(out), ...repoctlCheck(out), ...kanonCheck(out), ...mizanCheck(out)];
+      return [...generatedFiles(out), ...repoctlCheck(out), ...kanonDrafts(tool, beforeBunTests(out)), ...mizanCheck(out)];
     case "exit-status":
     case "install":
     case "policy":
@@ -175,10 +214,12 @@ function draftsOf(tool: Tool, out: string): readonly Draft[] {
 /** The findings a tool's output holds, with their ids and their evidence (the SHA-256 of the output), in the order the tool printed them and without a finding twice. */
 export function parseOutput(tool: Tool, output: string, ctx: ParseContext): readonly Finding[] {
   const evidence: Evidence = { run: ctx.run, commit: ctx.commit, step: ctx.step, logSha256: sha256Of(output) };
+  const reportedKanon = kanonRunOutcomes(tool, output).length > 0;
   const seen = new Set<string>();
   const out: Finding[] = [];
   for (const d of draftsOf(tool, output)) {
-    const f = makeFinding({ tool, module: ctx.module, evidence, at: ctx.at, ...d });
+    const origin = (tool === "verify" || tool === "checks") && isKanonCode(d.code) && reportedKanon ? "kanon-check" : tool;
+    const f = makeFinding({ tool: origin, module: ctx.module, evidence, at: ctx.at, ...d });
     if (seen.has(f.id)) continue;
     seen.add(f.id);
     out.push(f);

@@ -10,12 +10,14 @@ on:
     paths:
       - "commons/**"
       - package.json
+      - bun.lock
       - .github/workflows/site.auto.yml
       - ".github/actions/bun/**"
   pull_request:
     paths:
       - "commons/**"
       - package.json
+      - bun.lock
       - .github/workflows/site.auto.yml
       - ".github/actions/bun/**"
   workflow_dispatch:

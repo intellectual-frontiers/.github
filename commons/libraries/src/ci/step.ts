@@ -18,8 +18,8 @@
 import { spawn } from "node:child_process";
 import { appendFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { type Finding, type FindingsFile, type Outcome, type StepRecord } from "./findings.ts";
-import { outcomeFinding, type ParseContext, parseOutput } from "./parsers.ts";
+import { type Finding, type FindingsFile, kanonCheckOf, type Outcome, type StepRecord } from "./findings.ts";
+import { kanonRunOutcomes, outcomeFinding, type ParseContext, parseOutput } from "./parsers.ts";
 import { TOOLS, type Tool } from "./policy.ts";
 
 /** What the wrapper was asked to do, or the sentence that says it was called wrongly. */
@@ -111,7 +111,12 @@ export function fileOfRun(req: Request, ran: Ran, run: { readonly id: string; re
   }
   const step: StepRecord = { id: req.id, job: req.job, module: req.module, tool: req.tool, outcome, findings: findings.length, durationMs: ran.durationMs, ...(ran.exitStatus === null ? {} : { exitStatus: ran.exitStatus }) };
   if (req.perFile === true && ran.startError === undefined) return perFileOf(req, ran, run, step, findings);
-  return { schema: "build-findings/1", run, steps: [step], findings };
+  const reported = kanonRunOutcomes(req.tool, ran.output).map(({ check, outcome: result }): StepRecord => ({
+    ...step, id: `${req.id}/kanon-${check}`, tool: "kanon-check", kanonCheck: check, outcome: result,
+    findings: findings.filter((f) => f.tool === "kanon-check" && kanonCheckOf(f.code) === check).length,
+  }));
+  const steps = req.tool === "kanon-check" && reported.length > 0 ? reported : [step, ...reported];
+  return { schema: "build-findings/1", run, steps, findings };
 }
 
 /** The test files a runner's output names, each with the lines of its section (a header line `tests/x.test.ts:` begins one). */

@@ -302,7 +302,7 @@ const conformance: Workflow = {
   },
 };
 
-const docsPaths = ["commons/**", "package.json", own("site"), BUN_ACTION];
+const docsPaths = ["commons/**", "package.json", "bun.lock", own("site"), BUN_ACTION];
 /** A push to main, a run by hand on main, or the night's run: where the evidence is gathered and the site published. */
 const onMainOrSchedule = "github.event_name != 'pull_request' && github.ref == 'refs/heads/main'";
 
@@ -952,6 +952,7 @@ export const ACTIONS: readonly CompositeAction[] = [
         },
       ),
       run('node commons/libraries/src/install-bun.ts "$RUNNER_TEMP/bun"', { name: "Bun, pinned and checked", shell: "bash" }),
+      run("bun install --frozen-lockfile", { name: "Install shared tooling from the root lockfile", shell: "bash" }),
     ],
   },
 ];

@@ -19,6 +19,8 @@
  * @module
  */
 
+import { readModuleReferencesWithSpans, type ModuleReferenceSpan } from "@intellectual-frontiers/kanon";
+
 /** What a source is made of, for the readers below: its code with the comments and the insides of strings, templates and regular expressions blanked (each character a space, the quotes and the lines kept), and where the strings and the comments are. */
 export type Scanned = {
   readonly code: string;
@@ -141,14 +143,13 @@ export function scanSource(source: string): Scanned {
   return { code: out.join(""), strings, comments };
 }
 
-/** The strings of a source that are specifiers: those that follow `from`, `import` or `import(`, with where each is. A name in a string that is no specifier (a list of packages, a field of a manifest, the text of generated code) is not one. */
-export function specifierRanges(source: string): readonly { readonly start: number; readonly end: number }[] {
-  const { code, strings } = scanSource(source);
-  return strings.filter((r) => /(?:\bfrom|\bimport|\bimport\s*\()\s*["']$/.test(code.slice(Math.max(0, r.start - 24), r.start)));
+/** Literal module targets and their original source offsets. Invalid source has no trustworthy ranges. */
+export function specifierRanges(source: string): readonly ModuleReferenceSpan[] {
+  const parsed = readModuleReferencesWithSpans(source);
+  return parsed.kind === "err" ? [] : parsed.value.flatMap((r) => r.kind === "computed-dynamic" ? [] : [r]);
 }
 
-/** The specifiers a source imports: no comment, no string that is no specifier. */
+/** The literal module targets imported by a source. */
 export function importSpecifiers(source: string): readonly string[] {
-  return specifierRanges(source).map((r) => source.slice(r.start, r.end));
+  return specifierRanges(source).map((r) => r.specifier);
 }
-

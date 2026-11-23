@@ -91,6 +91,7 @@ export const ROLE_OF: ReadonlyMap<string, Role> = new Map<string, Role>([
   ["anyfs-cli", "program"],
   ["headless", "pattern"],
   ["kanon", "pattern"],
+  ["content", "pattern"],
   ["planning", "pattern"],
   ["assessment", "pattern"],
   ["tenancy", "pattern"],

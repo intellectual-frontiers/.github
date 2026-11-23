@@ -17,6 +17,7 @@
  *
  * @module
  */
+import { traceGraph } from "./trace.ts";
 import { accountOf } from "./account.ts";
 import { type Finding, finding } from "./imports.ts";
 import type { LayeredModel } from "./model.ts";
@@ -27,11 +28,13 @@ export function droppedFindings(model: LayeredModel): readonly Finding[] {
   if (top === undefined) return [];
   const out: Finding[] = [];
   const scopes = model.instances.length === 0 ? [undefined] : model.instances;
+  const graph = traceGraph(model, new Map(model.elements.map((el) => [el.id, el])));
   for (const el of model.elements) {
     if (el.layer !== top) continue;
+    const downstream = graph.downstreamOf([el.id]);
     for (const annotation of Object.keys(el.properties)) {
       for (const scope of scopes) {
-        const cell = accountOf(model, el, annotation, scope);
+        const cell = accountOf(model, el, annotation, scope, downstream);
         if (cell.outcome === "dropped")
           out.push(
             finding("kanon/dropped", el.source.file, el.source.line, cell.why, `${el.id} ${annotation}${scope === undefined ? "" : ` @${scope}`}`),

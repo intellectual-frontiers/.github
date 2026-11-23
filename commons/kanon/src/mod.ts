@@ -84,3 +84,5 @@ export {
   type Table,
   type Unit,
 } from "./table.ts";
+
+export { type ModuleReference, type ModuleReferenceSpan, readModuleReferences, readModuleReferencesWithSpans, type SourceDiagnostic } from "./source.ts";

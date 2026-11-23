@@ -61,7 +61,7 @@ export const library = {
           { name: "@intellectual-frontiers/system", subpaths: "any" },
         ],
       },
-      { folder: "src/", own: true },
+      { folder: "src/", own: true, files: ["mod.ts", "anyfs.ts"] },
       { folder: "bin/", own: true },
       { folder: "suite/", own: true },
       { folder: "tools/", own: true },

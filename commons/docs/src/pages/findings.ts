@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { type Acceptance, countsOf, deriveRows, type Row } from "@intellectual-frontiers/libraries/ci/findings";
+import { type Acceptance, countsOf, deriveRows, type FindingsFile, type Row } from "@intellectual-frontiers/libraries/ci/findings";
 import { RED_CAUSE_WHY, RED_CAUSES, RELEASE_POLICY, releaseDecision } from "@intellectual-frontiers/libraries/ci/policy";
 import type { Build } from "../build.ts";
 import { sparkText } from "../emit/html.ts";
@@ -38,6 +38,8 @@ export type ExportRow = {
   readonly owner: string;
   readonly acceptedUntil: string;
   readonly note: string;
+  readonly commit: string;
+  readonly run: string;
 };
 
 /** The rows of the export, in the order of the page. */
@@ -61,6 +63,8 @@ export function exportRows(rows: readonly Row[]): readonly ExportRow[] {
       owner: r.acceptance?.owner ?? "",
       acceptedUntil: r.status === "accepted" ? (r.acceptance?.until ?? "") : "",
       note: r.note ?? "",
+      commit: r.finding.evidence.commit,
+      run: r.finding.evidence.run,
     }));
 }
 
@@ -71,8 +75,51 @@ const csvCell = (v: string | number | null): string => {
 
 /** The rows as CSV, with a header. */
 export function csvOf(rows: readonly ExportRow[]): string {
-  const head = ["id", "status", "tool", "code", "module", "file", "line", "severity", "message", "firstSeen", "lastSeen", "runsSeen", "owner", "acceptedUntil", "note"] as const;
+  const head = ["id", "status", "tool", "code", "module", "file", "line", "severity", "message", "firstSeen", "lastSeen", "runsSeen", "owner", "acceptedUntil", "note", "commit", "run"] as const;
   return `${[head.join(","), ...rows.map((r) => head.map((h) => csvCell(r[h])).join(","))].join("\n")}\n`;
+}
+
+function kanonChecks(runs: readonly FindingsFile[]) {
+  const latest = new Map<string, { module: string; check: string; outcome: string; commit: string; at: string; url: string }>();
+  for (const { steps, run } of runs) for (const step of steps) {
+    if (step.tool === "kanon-check") {
+      const check = step.kanonCheck ?? "import";
+      latest.set(`${step.module}/${check}`, { module: step.module, check, outcome: step.outcome, commit: run.commit, at: run.at, url: run.url ?? "" });
+    } else if (step.tool === "verify") {
+      for (const [key, previous] of latest) {
+        if (previous.module === step.module && !steps.some((s) => s.module === step.module && s.tool === "kanon-check" && (s.kanonCheck ?? "import") === previous.check))
+          latest.set(key, { ...previous, outcome: "not recorded in latest verify" });
+      }
+    }
+  }
+  return [...latest.values()].sort((a, b) => a.module.localeCompare(b.module) || a.check.localeCompare(b.check));
+}
+
+function runLink(url: string): Inline {
+  return /^https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/actions\/runs\/\d+$/.test(url)
+    ? { kind: "link", href: { kind: "external", url }, children: [text("Workflow run")] }
+    : text("");
+}
+
+function kanonBlocks(runs: readonly FindingsFile[], rows: readonly ExportRow[]): readonly Block[] {
+  const checks = kanonChecks(runs);
+  const findings = rows.filter((r) => r.tool === "kanon-check" || /^(?:layers|instances|plugins|family|kanon)\//.test(r.code));
+  const heading: Block = { kind: "heading", level: 2, id: "kanon", text: [text("Kanon checks")] };
+  const status: Block = checks.length === 0
+    ? { kind: "paragraph", inlines: [text("No Kanon check result has been recorded.")] }
+    : { kind: "table", head: th("Library", "Check", "Outcome", "Last recorded at", "Commit", "Run"), rows: checks.map((check) => [
+      [text(check.module)], [text(check.check)], [text(check.outcome)], [text(check.at)], [code(check.commit)],
+      [runLink(check.url)],
+    ]) };
+  if (findings.length === 0) return [heading, status];
+  return [heading, status, {
+    kind: "table", head: th("Library", "State", "Rule", "Location", "Finding", "Commit", "Run"),
+    rows: findings.slice(0, SHOWN).map((row) => [
+      [text(row.module)], [text(row.status)], [code(row.code)],
+      [text(row.line === null ? row.file : `${row.file}:${row.line}`)], [text(row.message)], [code(row.commit)],
+      [runLink(runs.find((r) => r.run.id === row.run)?.run.url ?? "")],
+    ]),
+  }];
 }
 
 /** Adds the page `quality/findings.html` and its exports; nothing where no run has findings recorded and no acceptance is kept (the Quality page then says so). */
@@ -92,6 +139,7 @@ export function findingsPage(b: Build): void {
   blocks.push({ kind: "list", ordered: false, items: RED_CAUSES.map((c) => [{ kind: "paragraph", inlines: [code(c), text(`: ${RED_CAUSE_WHY[c]}.`)] }]) });
   if (runs.length === 0 && ev.acceptances.accepted.length === 0) {
     blocks.push({ kind: "callout", tone: "note", title: "No findings recorded yet", blocks: [{ kind: "paragraph", inlines: [text("No run has kept its findings on the history branch yet. Nothing here is a pass: the findings of a run appear after the run that follows the push of the workflows that make them.")] }] });
+    blocks.push(...kanonBlocks(runs, []));
     b.add({ path: "quality/build-findings.html", title: "Build findings", description: "What the tools said of each module in the runs of the workflows.", section: "quality", group: "Quality", order: 6, blocks });
     return;
   }
@@ -105,6 +153,7 @@ export function findingsPage(b: Build): void {
     blocks.unshift({ kind: "callout", tone: "warn", title: "Owner review due", blocks: [{ kind: "paragraph", inlines: [text(decision.ownerReview.message)] }] });
   }
   blocks.push({ kind: "paragraph", inlines: [text(`As of ${today}, from ${plural(runs.length, "run")} of the workflows: `), text(`${counts.open} open, ${counts.fresh} new in the latest run, ${counts.fixed} fixed in it, ${counts.accepted} accepted. `), { kind: "link", href: { kind: "external", url: "build-findings.json" }, children: [text("JSON")] }, text(" and "), { kind: "link", href: { kind: "external", url: "build-findings.csv" }, children: [text("CSV")] }, text(" hold every row.")] });
+  blocks.push(...kanonBlocks(runs, exportRows(rows)));
   const open = rows.filter((r) => r.status === "open");
   const byModule = new Map<string, { errors: number; warnings: number; accepted: number; oldest: number }>();
   for (const r of rows.filter((x) => x.status !== "fixed")) {
@@ -184,7 +233,7 @@ export function findingsData(b: Build): readonly { readonly path: string; readon
   const today = dayOf(latest.run.at);
   const rows = deriveRows(runs, ev.acceptances.accepted, today);
   const exported = exportRows(rows);
-  const doc = { schema: "build-findings-export/1", asOf: today, runs: runs.length, policy: { redCauses: [...RED_CAUSES], release: RELEASE_POLICY }, counts: countsOf(rows, runs), rows: exported };
+  const doc = { schema: "build-findings-export/1", asOf: today, runs: runs.length, policy: { redCauses: [...RED_CAUSES], release: RELEASE_POLICY }, counts: countsOf(rows, runs), kanonChecks: kanonChecks(runs), rows: exported };
   return [
     { path: "quality/build-findings.json", text: `${JSON.stringify(doc, null, 2)}\n`, what: "the findings of the build with their status and history, and the policy they are under" },
     { path: "quality/build-findings.csv", text: csvOf(exported), what: "the same rows, for a spreadsheet" },

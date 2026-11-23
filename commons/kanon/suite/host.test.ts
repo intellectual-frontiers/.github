@@ -6,7 +6,7 @@
  */
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { fs } from "@intellectual-frontiers/system";
-import { run } from "../src/check.ts";
+import { run, runBundle } from "../src/check.ts";
 import { BASELINE, findings, readBundle, readExports, readSources, readTable } from "../src/host.ts";
 import { makeBundle, verifyBundle } from "../src/mod.ts";
 
@@ -80,6 +80,35 @@ proves(
   },
 );
 
+proves(["0001-kanon-checker FR-007"], "the manifest reader uses the real export and rejects executable initializers", () => {
+  const fake = 'export const library = { kanon: {} };';
+  const good = library(`// ${fake}\nconst sample = '${fake}';\n${MANIFEST}`, {});
+  const expression = library(MANIFEST.replace("};", "} || makeLibrary();"), {});
+  try {
+    assertEquals(unwrap(readTable(good)).package, PKG);
+    assertEquals(readTable(expression).kind, "err");
+  } finally {
+    fs.removeSync(good, { recursive: true });
+    fs.removeSync(expression, { recursive: true });
+  }
+});
+
+proves(["0001-kanon-checker FR-003", "0001-kanon-checker FR-007"], "a syntax error fails the command despite a baseline", () => {
+  const root = library(MANIFEST, { "src/mod.ts": "const broken = ;" });
+  const baseline = "layers/syntax src/mod.ts\n";
+  try {
+    fs.writeTextFileSync(`${root}/${BASELINE}`, baseline);
+    for (const args of [[], ["--write-baseline"]]) {
+      const outcome = run(root, args);
+      assertEquals(outcome.code, 1);
+      assertStringIncludes(outcome.lines.join("\n"), "src/mod.ts:1: layers/syntax");
+      assertEquals(fs.readTextFileSync(`${root}/${BASELINE}`), baseline);
+    }
+  } finally {
+    fs.removeSync(root, { recursive: true });
+  }
+});
+
 proves(["0001-kanon-checker FR-007"], "a manifest with no table, or a table that is not one, exits 2", () => {
   const none = library('export const library = { name: "demo" };\n', {});
   const bad = library(
@@ -151,9 +180,11 @@ proves(["0002-kanon-content-checks FR-011"], "a folder is read as a bundle, noth
   assertEquals([...read.files.keys()], ["dispositions.json", "elements.json", "model.json", "relations.json", "trace.json"]);
   assertEquals([...fs.readDirSync(dir)].map((e) => e.name).sort(), before, "reading writes nothing");
   assertEquals((await verifyBundle(read)).kind, "ok");
+  assertEquals((await runBundle(dir)).code, 0);
   fs.mkdirSync(`${dir}/sub`, { recursive: true });
   fs.writeTextFileSync(`${dir}/sub/extra.txt`, "x");
   const again = await verifyBundle(unwrap(readBundle(dir)));
   assert(again.kind === "err" && again.error[0]?.kind === "extra" && again.error[0].path === "sub/extra.txt");
   assertEquals(readBundle(`${dir}/absent`).kind, "err");
+  assertEquals((await runBundle(dir)).code, 2);
 });

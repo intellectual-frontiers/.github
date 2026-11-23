@@ -77,7 +77,7 @@ type UnitBase = {
 /** A unit in one of the three layers. */
 export type LayeredUnit = UnitBase & { readonly kind: "layered"; readonly layer: Layer };
 /** The library's own checking (its tests, tools and examples): in no layer, and it may import any file of the library by a relative path. */
-export type OwnUnit = UnitBase & { readonly kind: "own" };
+export type OwnUnit = UnitBase & { readonly kind: "own"; readonly files?: readonly string[] };
 /** A unit of the table: a sum, so that a unit is a layered one or an own one and never both or neither. */
 export type Unit = LayeredUnit | OwnUnit;
 
@@ -126,7 +126,7 @@ const nonEmpty: Decoder<string> = (input, path = "$") => {
 const allowed: Decoder<Allowed> = object({ name: nonEmpty, subpaths: oneOf(literal("any"), array(nonEmpty)) });
 const unitForm = object(
   { folder: nonEmpty },
-  { layer: literal(...LAYERS), instances: boolean, own: boolean, mayImport: array(nonEmpty), packages: array(allowed) },
+  { layer: literal(...LAYERS), instances: boolean, own: boolean, files: array(nonEmpty), mayImport: array(nonEmpty), packages: array(allowed) },
 );
 const familyForm = object({ dialect: nonEmpty, plugin: nonEmpty }, { contract: nonEmpty, scope: literal("own", "any") });
 const roleForm = object({ kind: literal("dialect", "plugin") }, { name: nonEmpty, instanceOf: nonEmpty, noun: nonEmpty });
@@ -152,9 +152,12 @@ export function decodeTable(input: unknown): Result<Table, string> {
     if (seen.has(u.folder)) return err(`${at}.folder ${JSON.stringify(u.folder)} is in the table twice`);
     seen.add(u.folder);
     const base = { folder: folder.value, instances: u.instances === true };
+    if (u.files !== undefined && (u.own !== true || u.instances === true ||
+        u.files.some((file) => file.startsWith("/") || file.includes("\\") || file.split("/").some((part) => part === "" || part === "." || part === ".."))))
+      return err(`${at}.files must contain relative paths in a non-instance own unit`);
     if (u.own === true) {
       if (u.layer !== undefined) return err(`${at} is the library's own checking and is in no layer: it declares ${u.layer}`);
-      units.push({ kind: "own", ...base });
+      units.push({ kind: "own", ...base, ...(u.files === undefined ? {} : { files: u.files }) });
     } else if (u.layer === undefined) {
       return err(`${at} (${u.folder}) is in no layer: it declares a layer of ${LAYERS.join(", ")} or is own`);
     } else units.push({ kind: "layered", layer: u.layer, ...base });

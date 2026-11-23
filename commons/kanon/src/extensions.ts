@@ -25,12 +25,12 @@ import {
   type ExportsMap,
   type Finding,
   finding,
-  importFindings,
   layerOf,
   mayReach,
+  parsedImportFindings,
+  parseImports,
   type Placed,
   type SourceFile,
-  specifiersOf,
   unitOf,
 } from "./imports.ts";
 import type { Table } from "./table.ts";
@@ -100,7 +100,8 @@ export function extensionFindings(
   files: readonly SourceFile[],
   exportsMap: ExportsMap,
 ): readonly Finding[] {
-  const out: Finding[] = [...importFindings(ext, files, exportsMap)];
+  const parsed = files.map(parseImports);
+  const out: Finding[] = [...parsedImportFindings(ext, parsed, exportsMap)];
   const name = (message: string): Finding => finding("family/name", "library.ts", 1, message, ext.package);
   const other = host.family !== undefined && splitPackage(ext.package).scope !== splitPackage(host.package).scope;
   const role = host.family === undefined ? undefined : other ? roleOfForeign(host, ext) : roleOf(host, ext.package);
@@ -118,10 +119,13 @@ export function extensionFindings(
   }
   const contract = host.family.contract;
   let importsContract = false;
-  for (const file of files) {
+  for (const file of parsed) {
     const here = unitOf(ext, file.path);
     if (here === undefined || here.unit.kind === "own") continue;
-    for (const { line, specifier } of specifiersOf(file.text)) {
+    if (file.references.kind === "err") continue;
+    for (const reference of file.references.value) {
+      if (reference.kind === "computed-dynamic") continue;
+      const { line, specifier } = reference;
       if (specifier.startsWith(".")) continue;
       const root = rootPackage(specifier);
       if (root === ext.package) continue;

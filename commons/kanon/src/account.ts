@@ -10,6 +10,7 @@
  * @module
  */
 import { absurd } from "@intellectual-frontiers/core";
+import { traceGraph } from "./trace.ts";
 import type { InstanceName } from "./family.ts";
 import type { Disposition, ElementId, LayeredModel, ModelElement } from "./model.ts";
 
@@ -33,7 +34,7 @@ function pick(model: LayeredModel, element: ElementId, annotation: string, scope
 export const forInstance = (scope: InstanceName | undefined): string => (scope === undefined ? "" : ` for the instance ${scope}`);
 
 /** How the annotation of an element ends for an instance (`undefined` where the model has no instances): one cell. */
-export function accountOf(model: LayeredModel, el: ModelElement, annotation: string, scope: InstanceName | undefined): Cell {
+export function accountOf(model: LayeredModel, el: ModelElement, annotation: string, scope: InstanceName | undefined, downstream = traceGraph(model, new Map(model.elements.map((el) => [el.id, el]))).downstreamOf([el.id])): Cell {
   const d = pick(model, el.id, annotation, scope);
   if (d === undefined)
     return {
@@ -55,6 +56,8 @@ export function accountOf(model: LayeredModel, el: ModelElement, annotation: str
           outcome: "dropped",
           why: `${el.id} says ${annotation} is ${d.outcome} for the instance ${scope} by ${d.target}, which belongs to the instance ${target.instance}`,
         };
+      if (!downstream.has(d.target))
+        return { outcome: "dropped", why: `${el.id} names ${d.target} for ${annotation}, but no valid trace connects them` };
       return { outcome: d.outcome, target: d.target };
     }
     default:

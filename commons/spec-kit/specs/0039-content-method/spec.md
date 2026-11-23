@@ -8,6 +8,8 @@
 
 **Input:** A body of content is written once as books and then carried out in renditions (a website for people and for agents, a Markdown twin, a feed, print). The books hold the claims, their evidence and their dates; a rendition never holds a fact the books do not. This specification states the method, the authoring grammar that lets a collector read the books, the typed vocabulary of the annotations and relations, the contracts of the instances, and the first requirement-by-instance matrix. It is generic: it names no company, product or site, and the first consumer is a site series.
 
+The owner approved the collector and rendition-evidence contract for `commons/content`. The library specification activates that implementation. The website rollout and author markers in the corpus remain draft work.
+
 ## The method
 
 - **FR-001**: A body of content MUST be made as a **series** of **books** and never as pages: a series has a **series bible** (a decision table, shared terms, the claim labels of FR-006, the dated facts, the source discipline, a register of the companies and people named, the fact-check protocol, a register of research debt, a corrections log, the 90-day re-verification of FR-009 and the editions), and each book has one declared **role** (market research, a fieldbook of regimes and facts with source keys, a questions book of sourced questions and answers, a practice book); a rendition is made from books and MUST NOT be edited by hand to say what no book says.
@@ -108,7 +110,7 @@ export const CONTENT_GATE_POLICY: ContentGatePolicy = { mode: "warn-as-planning-
 
 ## Out of scope
 
-- The books themselves and any claim they make; a site, a brand or a company; the library `content` (it does not exist; it is made only after Kanon A and B are in force and the owner says so); a product-and-proof book, a buyer's guide, a glossary and a customer-evidence book (none is planned).
+- The books themselves and any claim they make; a site, a brand or a company; the Content library’s implementation (specified in `commons/content/spec-kit`); a product-and-proof book, a buyer's guide, a glossary and a customer-evidence book (none is planned).
 
 ## Edge cases
 
@@ -118,7 +120,7 @@ export const CONTENT_GATE_POLICY: ContentGatePolicy = { mode: "warn-as-planning-
 
 ## Assumptions
 
-- Kanon A (0033-kanon with FR-025 to FR-034) and Kanon B (kanon 0001-kanon-checker and 0002-kanon-content-checks) are Draft, not in force, as of 2026-11-22.
+- Kanon’s general specs remain drafts. The approved collector slice is active in the Content library.
 - The books are AsciiDoc with `.sources.txt` beside each chapter.
 
 ## Standards considered
@@ -141,9 +143,9 @@ A standard not read here is not cited. The nearest for facts with a validity per
 ## Open questions
 
 - **OQ-1**: The values of `license` (candidates are an SPDX expression for software and a Creative Commons identifier for text; neither was read for this specification).
-- **OQ-2**: Whether the typed vocabulary module is made now in scratch form or only when `commons/content` exists (the owner says so).
+- **OQ-2** (decided): The vocabulary of the collector slice is written in the Content library.
 - **OQ-3**: Whether the owner approves the proposal `// CLAIM` and the session that keeps the books agrees; until both, the books are not edited and the collector mints ids (FR-012).
-- **OQ-4**: Whether Kanon A and B are put in force so that `commons/content` may be made with `bun run repoctl new library content`; the owner is asked before it is created.
+- **OQ-4** (decided): The owner approved creating `commons/content` and activating the collector and rendition-evidence contract for it.
 
 ## Key entities
 

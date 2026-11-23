@@ -5,7 +5,7 @@
  * @module
  */
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { decodeTable, importFindings, specifiersOf, type Table, unitOf } from "../src/mod.ts";
+import { decodeTable, importFindings, readModuleReferences, specifiersOf, type Table, unitOf } from "../src/mod.ts";
 
 const PKG = "@intellectual-frontiers/x";
 const RAW = {
@@ -78,6 +78,40 @@ proves(
   },
 );
 
+proves(["0001-kanon-checker FR-003"], "imports follow TypeScript syntax and distinguish literal targets from computed targets", () => {
+  const result = readModuleReferences([
+    `const example = 'import("fake-string")';`,
+    '/* import "fake-comment"; */',
+    "import { x }",
+    '  from "./multiline.ts";',
+    'import "./setup.ts";',
+    'export * from "./re-export.ts";',
+    'import type { T } from "./types.ts";',
+    'type C = typeof import("./type-query.ts");',
+    'import Q = require("./equals.ts");',
+    'await import(`./literal.ts`);',
+    'await import(name);',
+  ].join("\n"));
+  assert(result.kind === "ok");
+  assertEquals(result.value, [
+    { kind: "static", line: 4, specifier: "./multiline.ts" },
+    { kind: "side-effect", line: 5, specifier: "./setup.ts" },
+    { kind: "re-export", line: 6, specifier: "./re-export.ts" },
+    { kind: "type", line: 7, specifier: "./types.ts" },
+    { kind: "type", line: 8, specifier: "./type-query.ts" },
+    { kind: "static", line: 9, specifier: "./equals.ts" },
+    { kind: "dynamic", line: 10, specifier: "./literal.ts" },
+    { kind: "computed-dynamic", line: 11 },
+  ]);
+});
+
+proves(["0001-kanon-checker FR-003", "0001-kanon-checker FR-004"], "multiline imports reach layer checks and a syntax error is a finding", () => {
+  const file = "src/governance/a.ts";
+  assertEquals(rules([at(file, `import { x }\n  from "${PKG}/logical";`)]), ["layers/above"]);
+  const found = importFindings(TABLE, [at(file, "const ok = 1;\nconst broken = ;")], EXPORTS);
+  assertEquals(found.map(({ rule, line }) => [rule, line]), [["layers/syntax", 2]]);
+});
+
 proves(["0001-kanon-checker FR-004"], "a file in no unit is layers/unclassified", () => {
   assertEquals(rules([at("src/surfaces/mcp.ts", "export const a = 1;\n")]), ["layers/unclassified"]);
 });
@@ -140,4 +174,19 @@ proves(["0001-kanon-checker FR-004"], "the target of an exports entry may be an 
     found.map((f) => f.rule),
     ["layers/above"],
   );
+});
+
+proves(["0001-kanon-checker FR-004"], "an allowlist cannot permit an upward dependency and same-layer unit cycles are reported", () => {
+  const decoded = decodeTable({ package: PKG, units: [
+    { folder: "src/governance/", layer: "governance", mayImport: ["src/a/"] },
+    { folder: "src/a/", layer: "logical", mayImport: ["src/b/"] },
+    { folder: "src/b/", layer: "logical", mayImport: ["src/a/"] },
+  ] });
+  assert(decoded.kind === "ok");
+  const found = importFindings(decoded.value, [
+    at("src/governance/mod.ts", `import "${PKG}/a";`),
+    at("src/a/mod.ts", `import "${PKG}/b";`),
+    at("src/b/mod.ts", `import "${PKG}/a";`),
+  ], { "./a": "./src/a/mod.ts", "./b": "./src/b/mod.ts" });
+  assertEquals(found.map((f) => f.rule), ["layers/above", "layers/cycle"]);
 });
