@@ -113,6 +113,8 @@ A library that states one thing and carries it out in several places of one kind
 - **FR-033**: The names `content` and `content-*` MUST be held as data of the check of the manifests, for the host `content`, until the library of Kanon for content exists (FR-024; 0027-commons-libraries FR-024). The package of an instance of that host is named `{host}-rendition-{name}`: a template of FR-021 needs only `{host}` and `{name}` once each, so the word `dialect` is in the name of the field of the rule and in this vocabulary's term for an instance, never required in a package name.
 - **FR-034**: A finding of Kanon MUST be a finding and nothing more: what a finding does to a build, whether it stops it, warns, or opens a planning issue (0037-planning), is the decision of the host that runs the check, written as a typed dated policy of that host (the form of `RELEASE_POLICY`, 0038-build-policy FR-010), and not a property of the finding; the checks of Kanon MUST give the same findings under any policy. The library `content` states its policy in 0039-content-method FR-014.
 
+- **FR-035**: A family MUST own the folders of its extensions: the folder of a plugin or a dialect is inside the folder of its host (`commons/<host>/<extension>/`, 0027-commons-libraries FR-026), and the host's table, the spec kit of the host and its generated files MUST NOT name an extension by a path built from its name.
+
 ## Acceptance scenarios
 
 1. **Given** a library whose logical unit imports a file of a physical unit by a relative path, **When** the check runs, **Then** it reports `layers/relative` naming the file and the line, per FR-004 and FR-011.

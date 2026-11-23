@@ -38,14 +38,26 @@ const nameOf = (file: string): string | undefined => {
   }
 };
 
-/** The packages of commons by name and the folder of each. */
-export function linksOf(repo: string): ReadonlyMap<string, string> {
-  const links = new Map<string, string>();
-  const dirs = readdirSync(join(repo, "commons"), { withFileTypes: true })
+/** The folders of `commons/` that hold a package: `commons/<name>` and, inside a folder that is a package, the folders of its extensions, `commons/<host>/<extension>` (0027-commons-libraries FR-026). */
+function packageFolders(repo: string): readonly string[] {
+  const top = readdirSync(join(repo, "commons"), { withFileTypes: true })
     .filter((e) => e.isDirectory() && e.name !== "node_modules")
     .map((e) => e.name)
     .sort((a, b) => (a < b ? -1 : 1));
-  for (const d of dirs) {
+  const out: string[] = [];
+  for (const d of top) {
+    out.push(d);
+    if (!existsSync(join(repo, "commons", d, "library.ts"))) continue;
+    for (const c of readdirSync(join(repo, "commons", d), { withFileTypes: true }))
+      if (c.isDirectory() && c.name !== "node_modules" && existsSync(join(repo, "commons", d, c.name, "library.ts"))) out.push(`${d}/${c.name}`);
+  }
+  return out;
+}
+
+/** The packages of commons by name and the folder of each. */
+export function linksOf(repo: string): ReadonlyMap<string, string> {
+  const links = new Map<string, string>();
+  for (const d of packageFolders(repo)) {
     const name = nameOf(join(repo, "commons", d, "package.json"));
     if (name !== undefined && name.startsWith(SCOPE) && !links.has(name)) links.set(name, join(repo, "commons", d));
   }
